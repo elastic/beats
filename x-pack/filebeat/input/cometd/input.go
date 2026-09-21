@@ -37,9 +37,7 @@ const (
 func (in *cometdInput) Run() {
 	var err error
 	in.workerOnce.Do(func() {
-		in.workerWg.Add(1)
-		go func() {
-			defer in.workerWg.Done()
+		in.workerWg.Go(func() {
 			defer in.workerCancel()
 			in.log.Info("Input worker has started.")
 			defer in.log.Info("Input worker has stopped.")
@@ -74,7 +72,7 @@ func (in *cometdInput) Run() {
 					}
 				}
 			}
-		}()
+		})
 	})
 }
 

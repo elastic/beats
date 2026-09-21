@@ -79,7 +79,7 @@ func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publ
 
 			if rf.saveFirstResponse {
 				// store first response in transform context
-				var bodyMap map[string]interface{}
+				var bodyMap map[string]any
 				body, err := io.ReadAll(httpResp.Body)
 				if err != nil {
 					err = fmt.Errorf("failed to read http response body: %w", err)
@@ -230,7 +230,11 @@ func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publ
 	defer httpResp.Body.Close()
 	// if pagination exists for the parent request along with chaining, then for each page response the chain is processed
 	if isChainWithPageExpected {
-		n += r.processRemainingChainEvents(ctx, trCtx, publisher, initialResponse, chainIndex)
+		nChain, err := r.processRemainingChainEvents(ctx, trCtx, publisher, initialResponse, chainIndex)
+		n += nChain
+		if err != nil {
+			return err
+		}
 	}
 	r.status.UpdateStatus(status.Running, "")
 	r.log.Infof("request finished: %d events published", n)
@@ -304,9 +308,16 @@ type requestFactory struct {
 	chainResponseProcessor *responseProcessor
 	saveFirstResponse      bool
 	log                    *logp.Logger
+	userAgent              string
+
+	// originURL and allowedOrigins constrain the URL that transforms
+	// can produce. When originURL is non-nil, newHTTPRequest validates
+	// the post-transform URL against originURL and allowedOrigins.
+	originURL      *url.URL
+	allowedOrigins []*url.URL
 }
 
-func newRequestFactory(ctx context.Context, config config, stat status.StatusReporter, log *logp.Logger, metrics *inputMetrics, reg *monitoring.Registry) ([]*requestFactory, error) {
+func newRequestFactory(ctx context.Context, config config, stat status.StatusReporter, log *logp.Logger, metrics *inputMetrics, reg *monitoring.Registry, userAgent string) ([]*requestFactory, error) {
 	// config validation already checked for errors here
 	rfs := make([]*requestFactory, 0, len(config.Chain)+1)
 	ts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Request.Transforms, requestNamespace, stat, log)
@@ -317,6 +328,7 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 		body:              config.Request.Body,
 		transforms:        ts,
 		log:               log,
+		userAgent:         userAgent,
 		encoder:           registeredEncoders[config.Request.EncodeAs],
 		saveFirstResponse: config.Response.SaveFirstResponse,
 	}
@@ -335,6 +347,14 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 		}
 	}
 	rfs = append(rfs, rf)
+	var chainAllowedOrigins []*url.URL
+	for _, s := range config.Response.PaginationAllowedHosts {
+		u, err := url.Parse(s)
+		if err != nil {
+			continue // already validated by responseConfig.Validate
+		}
+		chainAllowedOrigins = append(chainAllowedOrigins, u)
+	}
 	for _, ch := range config.Chain {
 		var rf *requestFactory
 		// chain calls requestFactory object
@@ -347,18 +367,24 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 			}
 
 			responseProcessor := newChainResponseProcessor(ch, client, xmlDetails, metrics, stat, log)
+			stepURL := ch.Step.Request.URL.URL
 			rf = &requestFactory{
-				url:                    *ch.Step.Request.URL.URL,
+				url:                    *stepURL,
 				method:                 ch.Step.Request.Method,
 				body:                   ch.Step.Request.Body,
 				transforms:             ts,
 				log:                    log,
+				userAgent:              userAgent,
 				encoder:                registeredEncoders[config.Request.EncodeAs],
 				replace:                ch.Step.Replace,
 				replaceWith:            ch.Step.ReplaceWith,
 				isChain:                true,
 				chainClient:            client,
 				chainResponseProcessor: responseProcessor,
+			}
+			if ch.Step.Replace == "" {
+				rf.originURL = stepURL
+				rf.allowedOrigins = chainAllowedOrigins
 			}
 			if ch.Step.Auth != nil && ch.Step.Auth.Basic.isEnabled() {
 				rf.user = ch.Step.Auth.Basic.User
@@ -374,12 +400,14 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 			}
 
 			responseProcessor := newChainResponseProcessor(ch, client, xmlDetails, metrics, stat, log)
+			whileURL := ch.While.Request.URL.URL
 			rf = &requestFactory{
-				url:                    *ch.While.Request.URL.URL,
+				url:                    *whileURL,
 				method:                 ch.While.Request.Method,
 				body:                   ch.While.Request.Body,
 				transforms:             ts,
 				log:                    log,
+				userAgent:              userAgent,
 				encoder:                registeredEncoders[config.Request.EncodeAs],
 				replace:                ch.While.Replace,
 				replaceWith:            ch.While.ReplaceWith,
@@ -387,6 +415,10 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 				isChain:                true,
 				chainClient:            client,
 				chainResponseProcessor: responseProcessor,
+			}
+			if ch.While.Replace == "" {
+				rf.originURL = whileURL
+				rf.allowedOrigins = chainAllowedOrigins
 			}
 			if ch.While.Auth != nil && ch.While.Auth.Basic.isEnabled() {
 				rf.user = ch.While.Auth.Basic.User
@@ -441,6 +473,16 @@ func (rf *requestFactory) newHTTPRequest(ctx context.Context, trCtx *transformCo
 		return nil, err
 	}
 
+	if rf.originURL != nil {
+		target := trReq.url()
+		if !allowedOrigin(rf.originURL, rf.allowedOrigins, &target) {
+			return nil, fmt.Errorf(
+				"pagination URL origin %q does not match configured origin %q",
+				target.Host, rf.originURL.Host,
+			)
+		}
+	}
+
 	var body []byte
 	if rf.method == http.MethodPost {
 		if rf.encoder != nil {
@@ -480,7 +522,7 @@ func (rf *requestFactory) newRequest(ctx *transformContext) (transformable, erro
 
 	header := http.Header{}
 	header.Set("Accept", "application/json")
-	header.Set("User-Agent", userAgent)
+	header.Set("User-Agent", rf.userAgent)
 	req.setHeader(header)
 
 	var err error
@@ -502,6 +544,52 @@ func (rf *requestFactory) newRequest(ctx *transformContext) (transformable, erro
 	rf.log.Debugw("new request", "req", redact{value: mapstrM(req), fields: []string{"header.Authorization"}})
 
 	return req, nil
+}
+
+// allowedOrigin returns true if target shares the same origin as base,
+// or if it matches any of the additional allowed origins. An allowed
+// origin only matches when the target also does not downgrade from the
+// base scheme, so an HTTP entry in the allowlist cannot bypass HTTPS
+// enforcement on the configured request URL.
+func allowedOrigin(base *url.URL, allowed []*url.URL, target *url.URL) bool {
+	if sameOrigin(base, target) {
+		return true
+	}
+	if base.Scheme == "https" && target.Scheme != "https" {
+		return false
+	}
+	for _, a := range allowed {
+		if sameOrigin(a, target) {
+			return true
+		}
+	}
+	return false
+}
+
+// sameOrigin returns true when target shares the same origin (scheme,
+// hostname, and port) as base. HTTPS-to-HTTP downgrades are rejected
+// explicitly; scheme upgrades also fail because the default ports
+// differ (80 vs 443). Explicit default ports are normalised so that
+// https://example.com and https://example.com:443 are the same origin.
+func sameOrigin(base, target *url.URL) bool {
+	if base.Scheme == "https" && target.Scheme != "https" {
+		return false
+	}
+	return base.Hostname() == target.Hostname() && portOrDefault(base) == portOrDefault(target)
+}
+
+func portOrDefault(u *url.URL) string {
+	if p := u.Port(); p != "" {
+		return p
+	}
+	switch u.Scheme {
+	case "https":
+		return "443"
+	case "http":
+		return "80"
+	default:
+		return ""
+	}
 }
 
 type requester struct {
@@ -544,7 +632,7 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 		}
 
 		// get replace values from collected json
-		var v interface{}
+		var v any
 		if err := json.Unmarshal(b, &v); err != nil {
 			return nil, fmt.Errorf("cannot unmarshal data: %w", textContextError{error: err, body: b})
 		}
@@ -554,7 +642,7 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 		}
 
 		switch tresp := values.(type) {
-		case []interface{}:
+		case []any:
 			for _, v := range tresp {
 				switch v.(type) {
 				case float64, string:
@@ -574,11 +662,11 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 }
 
 // processRemainingChainEvents, processes the remaining pagination events for chain blocks
-func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, initialResp []*http.Response, chainIndex int) int {
+func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, initialResp []*http.Response, chainIndex int) (int, error) {
 	// we start from 0, and skip the 1st event since we have already processed it
 	p := newChainProcessor(r, trCtx, publisher, chainIndex, r.status)
 	r.responseProcessors[0].startProcessing(stdCtx, trCtx, initialResp, true, true, p)
-	return p.eventCount()
+	return p.eventCount(), p.err
 }
 
 // chainProcessor is a chained processing handler.
@@ -589,6 +677,7 @@ type chainProcessor struct {
 	idx    int
 	tail   bool
 	n      int
+	err    error
 	status status.StatusReporter
 }
 
@@ -602,8 +691,11 @@ func newChainProcessor(req *requester, trCtx *transformContext, pub inputcursor.
 	}
 }
 
-// handleEvents processes msg as a request body in an execution chain.
+// handleEvent processes msg as a request body in an execution chain.
 func (p *chainProcessor) handleEvent(ctx context.Context, msg mapstr.M) {
+	if p.err != nil {
+		return
+	}
 	if !p.tail {
 		// Skip first event as it has already been processed.
 		p.tail = true
@@ -616,12 +708,16 @@ func (p *chainProcessor) handleEvent(ctx context.Context, msg mapstr.M) {
 	// we construct a new response here from each of the pagination events
 	err := json.NewEncoder(body).Encode(msg)
 	if err != nil {
+		p.setErr(fmt.Errorf("error processing chain event: %w", err))
 		p.req.log.Errorf("error processing chain event: %v", err)
 		return
 	}
 	response.Body = io.NopCloser(body)
+	defer response.Body.Close()
 
-	// updates the cursor for pagination last_event & last_response when chaining is present
+	// Parent-page cursor must be visible to this page's chain transforms,
+	// but it must not stick if the chain itself fails.
+	savedCursor := p.trCtx.cursor.clone()
 	p.trCtx.updateLastEvent(msg)
 	p.trCtx.updateCursor()
 
@@ -632,15 +728,12 @@ func (p *chainProcessor) handleEvent(ctx context.Context, msg mapstr.M) {
 			p.req.log.Debugf("ignored error processing chain event: %v", err)
 			return
 		}
+		p.trCtx.cursor.restore(savedCursor)
+		p.setErr(err)
 		p.req.log.Errorf("error processing chain event: %v", err)
 		return
 	}
 	p.n += n
-
-	err = response.Body.Close()
-	if err != nil {
-		p.req.log.Errorf("error closing http response body: %v", err)
-	}
 }
 
 func (p *chainProcessor) handleError(err error) {
@@ -648,8 +741,15 @@ func (p *chainProcessor) handleError(err error) {
 		p.req.log.Debugf("ignored error processing response: %v", err)
 		return
 	}
+	p.setErr(err)
 	p.status.UpdateStatus(status.Degraded, "error processing response: "+err.Error())
 	p.req.log.Errorf("error processing response: %v", err)
+}
+
+func (p *chainProcessor) setErr(err error) {
+	if p.err == nil {
+		p.err = err
+	}
 }
 
 // notLogged is an error that is not logged except at DEBUG.
@@ -866,7 +966,7 @@ const (
 )
 
 func fetchValueFromContext(trCtx *transformContext, expression string) (string, bool, error) {
-	var val interface{}
+	var val any
 
 	switch keys := processExpression(expression); keys[0] {
 	case lastResponse:
@@ -929,7 +1029,7 @@ func responseToMap(r *response) (mapstr.M, error) {
 	if r.body == nil {
 		return nil, fmt.Errorf("response body is empty for request url: %s", &r.url)
 	}
-	respMap := map[string]interface{}{
+	respMap := map[string]any{
 		"header": make(mapstr.M),
 		"body":   r.body,
 	}
@@ -941,7 +1041,7 @@ func responseToMap(r *response) (mapstr.M, error) {
 	return respMap, nil
 }
 
-func iterateRecursive(m mapstr.M, keys []string, depth int) (interface{}, error) {
+func iterateRecursive(m mapstr.M, keys []string, depth int) (any, error) {
 	val := m[keys[depth]]
 
 	if val == nil {
@@ -960,7 +1060,7 @@ func iterateRecursive(m mapstr.M, keys []string, depth int) (interface{}, error)
 	case reflect.String:
 		return v.String(), nil
 	case reflect.Map:
-		nextMap, ok := v.Interface().(map[string]interface{})
+		nextMap, ok := v.Interface().(map[string]any)
 		if !ok {
 			return nil, errors.New("unable to parse the value of the given expression")
 		}

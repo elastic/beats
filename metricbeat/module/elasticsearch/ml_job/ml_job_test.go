@@ -18,7 +18,8 @@
 package ml_job
 
 import (
-	"io/ioutil"
+	"os"
+
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -45,7 +46,7 @@ func createEsMuxer(mlEnabled bool) *http.ServeMux {
 			http.NotFound(w, r)
 		}
 
-		input, _ := ioutil.ReadFile("./_meta/test/root.710.json")
+		input, _ := os.ReadFile("./_meta/test/root.710.json")
 		input = []byte(strings.Replace(string(input), "7.10.0", "7.10.0", -1))
 		w.Write(input)
 	}
@@ -106,8 +107,8 @@ func TestMLNotAvailable(t *testing.T) {
 	}
 }
 
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string) map[string]any {
+	return map[string]any{
 		"module":     elasticsearch.ModuleName,
 		"metricsets": []string{"ml_job"},
 		"hosts":      []string{host},

@@ -47,6 +47,6 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 }
 
 func (m *MetricSet) WithPrefix(prefix string) *MetricSet {
-	m.HTTP.SetBody([]byte(fmt.Sprintf(`{"prefix": "%s", "format": "json"}`, prefix)))
+	m.HTTP.SetBody(fmt.Appendf(nil, `{"prefix": "%s", "format": "json"}`, prefix))
 	return m
 }

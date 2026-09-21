@@ -129,10 +129,13 @@ func (s *server) Run(ctx input.Context, evtChan chan<- netinput.DataMetadata, m 
 						"truncated", metadata.Truncated)
 				}
 
-				evtChan <- netinput.DataMetadata{
+				select {
+				case evtChan <- netinput.DataMetadata{
 					Data:      data,
 					Metadata:  metadata,
 					Timestamp: now,
+				}:
+				case <-ctx.Cancelation.Done():
 				}
 			},
 			split,

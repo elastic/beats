@@ -64,7 +64,7 @@ func (m *DataStoreMetricSet) mapEvent(ds mo.Datastore, data *metricData) mapstr.
 	return event
 }
 
-func mapPerfMetricToEvent(event mapstr.M, perfMetricMap map[string]interface{}) {
+func mapPerfMetricToEvent(event mapstr.M, perfMetricMap map[string]any) {
 	const bytesMultiplier int64 = 1024
 
 	if val, exist := perfMetricMap["datastore.read.average"]; exist {

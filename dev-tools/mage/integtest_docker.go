@@ -389,7 +389,7 @@ func DockerComposeProjectName() string {
 	version = strings.NewReplacer(".", "_").Replace(version)
 
 	projectName := "{{.BeatName}}_{{.Version}}_{{.ShortCommit}}-{{.StackEnvironment}}"
-	projectName = MustExpand(projectName, map[string]interface{}{
+	projectName = MustExpand(projectName, map[string]any{
 		"StackEnvironment": StackEnvironment,
 		"ShortCommit":      commit[:10],
 		"Version":          version,

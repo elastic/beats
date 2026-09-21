@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Report archived cluster setting names in the autoops_es cluster_settings metricset
+component: metricbeat

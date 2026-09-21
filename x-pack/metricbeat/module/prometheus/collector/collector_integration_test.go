@@ -17,7 +17,7 @@ import (
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "prometheus")
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":        "prometheus",
 		"metricsets":    []string{"collector"},
 		"hosts":         []string{service.Host()},
@@ -26,7 +26,7 @@ func TestData(t *testing.T) {
 	}
 	ms := mbtest.NewReportingMetricSetV2Error(t, config)
 	var err error
-	for retries := 0; retries < 3; retries++ {
+	for range 3 {
 		err = mbtest.WriteEventsReporterV2Error(ms, t, "")
 		if err == nil {
 			return

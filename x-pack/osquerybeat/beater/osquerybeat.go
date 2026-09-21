@@ -9,9 +9,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 	"time"
 
@@ -75,6 +77,9 @@ type osquerybeat struct {
 	config config.Config
 	// osquery install settings are sourced from inputs[0].osquery.elastic_options.install.
 	osqueryInstallConfig config.InstallConfig
+	// checkTimeout is the osqueryd --version startup check deadline, from
+	// elastic_options.check_timeout (default 15s).
+	checkTimeout time.Duration
 	// runtime-selected osquery metadata.
 	osqueryVersion string
 	osquerySource  string
@@ -89,8 +94,15 @@ type osquerybeat struct {
 	cancel context.CancelFunc
 	mx     sync.Mutex
 
-	diagMx        sync.RWMutex
-	diagQueryExec queryExecutor
+	// clockSkewWarnLogged latches the pre-start clamp warning to once per
+	// schedule name. handleQueryResult runs per result document, so without
+	// this a persistently skewed agent would warn on every snapshot/diff hit.
+	clockSkewWarnLogged map[string]struct{}
+
+	diagMx          sync.RWMutex
+	diagQueryExec   queryExecutor
+	diagExtensions  config.ExtensionsConfig
+	diagOsqueryData string
 
 	// parent process watcher (disabled via disableWatcher when running as an OTel receiver)
 	watcher        *Watcher
@@ -99,6 +111,15 @@ type osquerybeat struct {
 	osquerydFactory          osqd.RunnerFactory
 	executablePath           func() (string, error)
 	otelStatusFactoryWrapper cfgfile.FactoryWrapper
+
+	// osqueryDataPath is the resolved osqueryd data directory, captured at
+	// New() time. Capturing it here (during CreateLogs) rather than in Run()
+	// prevents a race when multiple receivers are created concurrently: the
+	// libbeat paths package has global state, and a second receiver's
+	// CreateLogs call can overwrite it before the first receiver's Run()
+	// goroutine reads it, causing both osqueryd instances to share the same
+	// pidfile and kill each other.
+	osqueryDataPath string
 }
 
 type osquerybeatPublisher interface {
@@ -124,16 +145,26 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 	if err != nil {
 		return nil, fmt.Errorf("invalid osquery.elastic_options.install configuration: %w", err)
 	}
+	checkTimeout, err := config.GetOsqueryCheckTimeout(c.Inputs)
+	if err != nil {
+		return nil, err
+	}
 
 	bt := &osquerybeat{
 		b:                    b,
 		config:               c,
 		osqueryInstallConfig: installCfg,
+		checkTimeout:         checkTimeout,
 		log:                  log,
 		pub:                  pub.New(b, log),
 		qp:                   newQueryProfiler(log),
 		osquerydFactory:      osqd.New,
 		executablePath:       os.Executable,
+		// Resolve the osqueryd data path now, while b.Info.Paths still reflects
+		// this specific receiver's configuration. Run() is called in a goroutine
+		// and may execute after a concurrently-started receiver has overwritten
+		// the global paths state.
+		osqueryDataPath: b.Info.Paths.Resolve(paths.Data, "osquery"),
 	}
 
 	profileCfg := config.GetQueryProfileStorageConfig(c.Inputs)
@@ -201,8 +232,73 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	}
 	defer bt.close()
 
+	// Start checking in with Elastic Agent before validating osqueryd, but do not
+	// apply configuration until startup has completed successfully.
+	if err := b.Manager.PreInit(); err != nil {
+		b.Manager.UpdateStatus(status.Failed, "Failed to pre-initialize manager: "+err.Error())
+		return err
+	}
+	managerEarlyStop := b.Manager.Stop
+	defer func() {
+		if managerEarlyStop != nil {
+			managerEarlyStop()
+		}
+	}()
+
 	// Watch input configuration updates
 	inputConfigCh := config.WatchInputs(ctx, bt.log, b.Registry)
+
+	// Set up OTel status shim runner tracking. reconcileOtelRunners starts a
+	// shim runner for each added input and stops runners for removed inputs so
+	// that per-input componentstatus events stay current for both static and
+	// dynamically delivered configs. This must happen before the osqueryd
+	// setup so that status events reach the host even in environments where
+	// osqueryd is unavailable.
+	var (
+		otelFactory cfgfile.RunnerFactory
+		otelRunners = make(map[string]cfgfile.Runner)
+	)
+	if bt.otelStatusFactoryWrapper != nil {
+		otelFactory = bt.otelStatusFactoryWrapper(&osqueryInputRunnerFactory{})
+	}
+	inputKey := func(idx int, ic config.InputConfig) string {
+		if ic.ID != "" {
+			return ic.ID
+		}
+		return fmt.Sprintf("index:%d", idx)
+	}
+	reconcileOtelRunners := func(inputs []config.InputConfig) {
+		if otelFactory == nil {
+			return
+		}
+		newKeys := make(map[string]struct{}, len(inputs))
+		for i := range inputs {
+			key := inputKey(i, inputs[i])
+			newKeys[key] = struct{}{}
+			if _, exists := otelRunners[key]; exists {
+				continue
+			}
+			rawCfg, cfgErr := conf.NewConfigFrom(&inputs[i])
+			if cfgErr != nil {
+				bt.log.Warnf("otel status: failed to build config for input %s: %v", key, cfgErr)
+				continue
+			}
+			runner, cfgErr := otelFactory.Create(b.Publisher, rawCfg)
+			if cfgErr != nil {
+				bt.log.Warnf("otel status: failed to create status runner for input %s: %v", key, cfgErr)
+				continue
+			}
+			runner.Start()
+			otelRunners[key] = runner
+		}
+		for key, runner := range otelRunners {
+			if _, ok := newKeys[key]; !ok {
+				runner.Stop()
+				delete(otelRunners, key)
+			}
+		}
+	}
+	reconcileOtelRunners(bt.config.Inputs)
 
 	// Create socket path
 	socketPath, cleanupFn, err := osqd.CreateSocketPath()
@@ -226,6 +322,8 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		osqd.WithConfigRefresh(configurationRefreshIntervalSecs),
 		osqd.WithConfigPlugin(configPluginName),
 		osqd.WithLoggerPlugin(loggerPluginName),
+		osqd.WithDataPath(bt.osqueryDataPath),
+		osqd.WithCheckTimeout(bt.checkTimeout),
 	}
 	if osqueryRuntime.BinDir != "" {
 		opts = append(opts, osqd.WithBinaryPath(osqueryRuntime.BinDir))
@@ -244,6 +342,10 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		b.Manager.UpdateStatus(status.Failed, "Failed to create osqueryd: "+err.Error())
 		return err
 	}
+
+	// Register diagnostic hooks before any operation that may fail so that
+	// hooks are always available regardless of whether osqueryd is reachable.
+	bt.registerDiagnosticHooks(b)
 
 	// Check that osqueryd exists and runnable
 	err = osq.Check(ctx)
@@ -266,8 +368,8 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	// It exits if osqueryd fails to run for any reason, like a bad configuration for example
 	runner := newOsqueryRunner(bt.log)
 	g.Go(func() error {
-		return runner.Run(ctx, func(ctx context.Context, flags osqd.Flags, inputCh <-chan []config.InputConfig) error {
-			return bt.runOsquery(ctx, b, osq, flags, inputCh, rah, osqdMetrics)
+		return runner.Run(ctx, func(ctx context.Context, flags osqd.Flags, extensions config.ExtensionsConfig, inputCh <-chan []config.InputConfig) error {
+			return bt.runOsquery(ctx, b, osq, flags, extensions, inputCh, rah, osqdMetrics)
 		})
 	})
 
@@ -278,13 +380,8 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		_ = runner.Update(ctx, bt.config.Inputs)
 	}
 
-	// Ensure that all the hooks and actions are ready before starting the Manager
-	// to receive configuration.
-	bt.registerDiagnosticHooks(b)
-	if err := b.Manager.Start(); err != nil { //nolint:staticcheck // SA1019 will be addressed in a follow-up
-		b.Manager.UpdateStatus(status.Failed, "Failed to start manager: "+err.Error())
-		return err
-	}
+	b.Manager.PostInit()
+	managerEarlyStop = nil
 
 	// Set the osquery beat version to the manager payload. This allows the bundled osquery version to be reported to the stack.
 	bt.setManagerPayload(b)
@@ -307,6 +404,9 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 				return ctx.Err()
 			case inputConfigs := <-inputConfigCh:
 				b.Manager.UpdateStatus(status.Configuring, "Received updated configuration")
+				if len(inputConfigs) == 0 {
+					bt.log.Warn("Osquery input unit was removed; osquery actions (live queries, scheduled packs) will not be available until an osquery input unit is received from Fleet. If the agent was moved to a new policy, ensure the destination policy includes Osquery Manager and that the policy was fully applied.")
+				}
 				err = bt.pub.Configure(inputConfigs)
 				if err != nil {
 					bt.log.Errorf("Failed to connect beat publisher client, err: %v", err)
@@ -316,6 +416,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 				if err != nil {
 					bt.log.Errorf("Failed to configure osquery runner, err: %v", err)
 				}
+				reconcileOtelRunners(inputConfigs)
 			}
 		}
 	})
@@ -351,7 +452,7 @@ func (bt *osquerybeat) registerDiagnosticHooks(b *beat.Beat) {
 			ctx, cancel := context.WithTimeout(context.Background(), scheduledQueryProfilesDiagTimeout)
 			defer cancel()
 
-			payload := map[string]interface{}{
+			payload := map[string]any{
 				"generated_at": time.Now().UTC().Format(time.RFC3339Nano),
 			}
 
@@ -361,12 +462,10 @@ func (bt *osquerybeat) registerDiagnosticHooks(b *beat.Beat) {
 			if err != nil {
 				payload["error"] = err.Error()
 			} else {
-				for key, value := range scheduledPayload {
-					payload[key] = value
-				}
+				maps.Copy(payload, scheduledPayload)
 			}
 
-			liveProfiles := []map[string]interface{}{}
+			liveProfiles := []map[string]any{}
 			if bt.liveProfiles != nil {
 				liveProfiles = bt.liveProfiles.List()
 			}
@@ -383,6 +482,102 @@ func (bt *osquerybeat) registerDiagnosticHooks(b *beat.Beat) {
 			return data
 		},
 	)
+
+	b.Manager.RegisterDiagnosticHook(
+		"osquery_extensions",
+		"Customer-managed osquery extensions: configuration, autoload file, and extensions loaded by osqueryd.",
+		"osquery_extensions.json",
+		"application/json",
+		func() []byte {
+			ctx, cancel := context.WithTimeout(context.Background(), scheduledQueryProfilesDiagTimeout)
+			defer cancel()
+
+			data, err := json.MarshalIndent(bt.extensionsDiagnosticsPayload(ctx), "", "  ")
+			if err != nil {
+				if bt.log != nil {
+					bt.log.Warnw("Failed to collect osquery extensions diagnostics.", "error", err)
+				}
+				return diagnosticsErrorJSON(err.Error())
+			}
+			return data
+		},
+	)
+}
+
+// extensionsDiagnosticsPayload reports the customer-managed extension configuration,
+// the per-path pre-check result, the current autoload file contents, and the
+// extensions osqueryd actually loaded (via the osquery_extensions table). This makes
+// load failures (missing binary, unsafe permissions) visible in agent diagnostics.
+func (bt *osquerybeat) extensionsDiagnosticsPayload(ctx context.Context) map[string]any {
+	bt.diagMx.RLock()
+	extensions := bt.diagExtensions
+	dataPath := bt.diagOsqueryData
+	qe := bt.diagQueryExec
+	bt.diagMx.RUnlock()
+
+	payload := map[string]any{
+		"generated_at":       time.Now().UTC().Format(time.RFC3339Nano),
+		"unsupported_notice": "Custom extensions are not developed, validated, or supported by Elastic. Customers are fully responsible for security, maintenance, and stability.",
+	}
+
+	resolved := osqd.ResolveExtensions(extensions.Paths)
+	entries := make([]map[string]any, 0, len(resolved))
+	loadedCount := 0
+	for _, res := range resolved {
+		entry := map[string]any{"entry": res.Entry}
+		if res.Error != "" {
+			entry["status"] = "error"
+			entry["reason"] = res.Error
+		} else {
+			entry["status"] = "ok"
+			entry["loaded"] = res.Loaded
+			loadedCount += len(res.Loaded)
+			if len(res.Skipped) > 0 {
+				skipped := make([]map[string]any, 0, len(res.Skipped))
+				for _, s := range res.Skipped {
+					skipped = append(skipped, map[string]any{"path": s.Path, "reason": s.Reason})
+				}
+				entry["skipped"] = skipped
+			}
+		}
+		entries = append(entries, entry)
+	}
+	payload["configured_entries"] = entries
+	payload["configured_entries_count"] = len(entries)
+	payload["discovered_extensions_count"] = loadedCount
+	if extensions.Timeout > 0 {
+		payload["extensions_timeout"] = extensions.Timeout
+	}
+	if len(extensions.Require) > 0 {
+		payload["extensions_require"] = extensions.Require
+	}
+
+	if dataPath != "" {
+		autoloadPath := osqd.AutoloadPath(dataPath)
+		payload["autoload_path"] = autoloadPath
+		if content, err := os.ReadFile(autoloadPath); err != nil {
+			payload["autoload_error"] = err.Error()
+		} else {
+			entries := []string{}
+			for l := range strings.SplitSeq(strings.TrimRight(string(content), "\n"), "\n") {
+				if l != "" {
+					entries = append(entries, l)
+				}
+			}
+			payload["autoload_entries"] = entries
+		}
+	}
+
+	if qe != nil {
+		rows, err := qe.Query(ctx, "SELECT name, version, sdk_version, path, type FROM osquery_extensions;", 10*time.Second)
+		if err != nil {
+			payload["loaded_extensions_error"] = err.Error()
+		} else {
+			payload["loaded_extensions"] = rows
+		}
+	}
+
+	return payload
 }
 
 func (bt *osquerybeat) setDiagnosticsQueryExecutor(qe queryExecutor) {
@@ -391,8 +586,22 @@ func (bt *osquerybeat) setDiagnosticsQueryExecutor(qe queryExecutor) {
 	bt.diagQueryExec = qe
 }
 
-func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Runner, flags osqd.Flags, inputCh <-chan []config.InputConfig, rah *resetableActionHandler, osqdMetrics *osquerydMetrics) error {
+func (bt *osquerybeat) setExtensionsDiagnostics(extensions config.ExtensionsConfig, dataPath string) {
+	bt.diagMx.Lock()
+	defer bt.diagMx.Unlock()
+	bt.diagExtensions = extensions
+	bt.diagOsqueryData = dataPath
+}
+
+func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Runner, flags osqd.Flags, extensions config.ExtensionsConfig, inputCh <-chan []config.InputConfig, rah *resetableActionHandler, osqdMetrics *osquerydMetrics) error {
 	socketPath := osq.SocketPath()
+
+	// Apply customer-managed extension entries before starting osqueryd so prepare()
+	// writes the autoload file for the current set, and record them for diagnostics
+	// and monitoring metrics.
+	osq.SetExtensions(extensions.PathsOrEmpty(), extensions.Timeout, extensions.Require)
+	bt.setExtensionsDiagnostics(extensions, osq.DataPath())
+	osqdMetrics.updateExtensionCounts(osqd.ResolveExtensions(extensions.PathsOrEmpty()))
 
 	// Create a cache for queries types resolution
 	cache, err := lru.New[string, map[string]string](adhocOsqueriesTypesCacheSize)
@@ -438,6 +647,9 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		bt.handleQueryResult(ctx, cli, configPlugin, res)
 	})
 
+	// Create recurrence query handler for scheduling queries with RRULE expressions
+	var rruleHandler *recurrenceQueryHandler
+
 	// Run main loop
 	g.Go(func() error {
 		// Connect to osqueryd
@@ -448,6 +660,24 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		bt.setDiagnosticsQueryExecutor(cli)
 		defer cli.Close()
 		defer bt.setDiagnosticsQueryExecutor(nil)
+
+		// Initialize and start RRULE query handler after osqueryd connection is established
+		rruleHandler = newRecurrenceQueryHandler(bt.log, cli, configPlugin, bt.pub, bt.liveProfiles, bt.osqueryVersion)
+		rruleHandler.Start(ctx)
+		defer rruleHandler.Stop()
+
+		// Drive RRULE updates from the same moment native osqueryd applies policy: GenerateConfig
+		// promotes staged query metadata after osqueryd pulls config (see ConfigPlugin.GenerateConfig).
+		configPlugin.SetOnGenerateConfigApplied(func() {
+			if rruleHandler != nil {
+				if err := rruleHandler.UpdateFromConfig(configPlugin.EffectiveOsqueryConfig()); err != nil {
+					bt.log.Errorf("failed to update RRULE scheduled queries: %v", err)
+					if clearErr := rruleHandler.UpdateFromConfig(nil); clearErr != nil {
+						bt.log.Errorf("failed to clear RRULE scheduled queries after update error: %v", clearErr)
+					}
+				}
+			}
+		})
 
 		// Start osqueryd health monitoring after connection is established
 		g.Go(func() error {
@@ -464,7 +694,9 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		bt.registerActionHandler(b, cli, configPlugin, rah)
 		defer bt.unregisterActionHandler(b, rah)
 
-		// Process input
+		// Process Elastic Agent/Fleet input. A failed Set means the policy cannot be applied
+		// safely (invalid ECS mapping, schedule rules, and so on); we exit this runner so the beat
+		// surfaces the error instead of continuing with stale or partial osquery extension state.
 		for {
 			select {
 			case <-ctx.Done():
@@ -521,42 +753,60 @@ func runExtensionServer(ctx context.Context, socketPath string, configPlugin *Co
 	return g.Wait()
 }
 
-// nativeScheduleExecutionCount returns the 1-based execution count for a native (interval) schedule,
-// computed from start_date and interval so it is deterministic across agents.
-// Returns 0 if startDate is empty, interval <= 0, or runTime is before startDate.
-func nativeScheduleExecutionCount(startDateRFC3339 string, intervalSecs int, runTimeUnix int64) int64 {
+// nativeScheduleTiming returns deterministic timing metadata for a native
+// interval schedule. A run reported before a valid start date is clamped to the
+// first execution and its planned start date so clock skew cannot produce an
+// execution count of zero or a pre-schedule planned time.
+func nativeScheduleTiming(startDateRFC3339 string, intervalSecs int, runTimeUnix int64) (executionCount int64, plannedScheduleTime time.Time, clockSkewClamped bool) {
+	runTime := time.Unix(runTimeUnix, 0).UTC()
 	if startDateRFC3339 == "" || intervalSecs <= 0 {
-		return 0
+		return 0, runTime, false
 	}
+
 	startTime, err := time.Parse(time.RFC3339, startDateRFC3339)
 	if err != nil {
-		return 0
+		return 0, runTime, false
+	}
+	startTime = startTime.UTC()
+
+	if runTime.Before(startTime) {
+		return 1, startTime, true
 	}
 
-	startUnix := startTime.Unix()
-	if runTimeUnix < startUnix {
-		return 0
-	}
+	elapsedSeconds := runTimeUnix - startTime.Unix()
+	executionCount = 1 + (elapsedSeconds / int64(intervalSecs))
+	plannedScheduleTime = startTime.Add(time.Duration(executionCount-1) * time.Duration(intervalSecs) * time.Second)
+	return executionCount, plannedScheduleTime, false
+}
 
-	elapsedSeconds := runTimeUnix - startUnix
-	return 1 + (elapsedSeconds / int64(intervalSecs))
+// nativeScheduleExecutionCount returns the 1-based execution count for a native
+// interval schedule. It returns 0 for missing or invalid schedule metadata.
+func nativeScheduleExecutionCount(startDateRFC3339 string, intervalSecs int, runTimeUnix int64) int64 {
+	executionCount, _, _ := nativeScheduleTiming(startDateRFC3339, intervalSecs, runTimeUnix)
+	return executionCount
 }
 
 // nativePlannedScheduleTime returns the intended schedule slot for a native interval schedule.
 // Falls back to runTimeUnix when schedule metadata is missing or invalid.
 func nativePlannedScheduleTime(startDateRFC3339 string, intervalSecs int, runTimeUnix int64) time.Time {
-	runTime := time.Unix(runTimeUnix, 0).UTC()
-	executionCount := nativeScheduleExecutionCount(startDateRFC3339, intervalSecs, runTimeUnix)
-	if executionCount <= 0 {
-		return runTime
-	}
+	_, plannedScheduleTime, _ := nativeScheduleTiming(startDateRFC3339, intervalSecs, runTimeUnix)
+	return plannedScheduleTime
+}
 
-	startTime, err := time.Parse(time.RFC3339, startDateRFC3339)
-	if err != nil {
-		return runTime
+// shouldLogClockSkewWarn reports whether a clock-skew clamp warning should be
+// emitted for scheduleName. The first call for a name returns true; later
+// calls for the same name return false.
+func (bt *osquerybeat) shouldLogClockSkewWarn(scheduleName string) bool {
+	bt.mx.Lock()
+	defer bt.mx.Unlock()
+	if bt.clockSkewWarnLogged == nil {
+		bt.clockSkewWarnLogged = make(map[string]struct{})
 	}
-
-	return startTime.UTC().Add(time.Duration(executionCount-1) * time.Duration(intervalSecs) * time.Second)
+	if _, logged := bt.clockSkewWarnLogged[scheduleName]; logged {
+		return false
+	}
+	bt.clockSkewWarnLogged[scheduleName] = struct{}{}
+	return true
 }
 
 func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Client, configPlugin *ConfigPlugin, res QueryResult) {
@@ -579,18 +829,23 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 	if scheduleID == "" {
 		scheduleID = res.Name
 	}
-	// Schedule execution count from start_date + interval (same across agents)
-	scheduleExecutionCount := nativeScheduleExecutionCount(qi.StartDate, qi.Interval, res.UnixTime)
-
 	var totalHits int
 
 	responseID := uuid.Must(uuid.NewV4()).String()
-	runTime := time.Unix(res.UnixTime, 0)
-	plannedScheduleTime := nativePlannedScheduleTime(qi.StartDate, qi.Interval, res.UnixTime)
-	publishResolved := func(resultType, action string, hits []map[string]interface{}) {
+	runTime := time.Unix(res.UnixTime, 0).UTC()
+	scheduleExecutionCount, plannedScheduleTime, clockSkewClamped := nativeScheduleTiming(qi.StartDate, qi.Interval, res.UnixTime)
+	if clockSkewClamped && bt.shouldLogClockSkewWarn(res.Name) {
+		bt.log.Warnf(
+			"Native scheduled query %q reported run time %s before start_date %s; possible clock skew, clamping to execution 1",
+			res.Name,
+			runTime.Format(time.RFC3339Nano),
+			plannedScheduleTime.Format(time.RFC3339Nano),
+		)
+	}
+	publishResolved := func(resultType, action string, hits []map[string]any) {
 		totalHits += len(hits)
 		meta := queryResultMeta(resultType, action, res, scheduleExecutionCount, plannedScheduleTime)
-		bt.pub.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, qi.SpaceID, qi.PackID, meta, hits, qi.ECSMapping, nil)
+		bt.pub.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, qi.SpaceID, qi.PackID, qi.PackName, qi.QueryName, meta, hits, qi.ECSMapping, nil)
 	}
 
 	if res.Action == "snapshot" {
@@ -624,15 +879,15 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 		if err != nil {
 			bt.log.Debugf("failed to collect scheduled query profile for %s: %v", res.Name, err)
 		} else {
-			bt.pub.PublishQueryProfile(config.QueryProfileDatastream(ns), res.Name, "", responseID, profile, nil)
+			bt.pub.PublishQueryProfile(config.QueryProfileDatastream(ns), res.Name, "", responseID, qi.SpaceID, profile, nil)
 		}
 	}
 
-	bt.pub.PublishScheduledResponse(scheduleID, qi.PackID, qi.SpaceID, responseID, runTime, runTime, plannedScheduleTime, totalHits, scheduleExecutionCount)
+	bt.pub.PublishScheduledResponse(scheduleID, qi.PackID, qi.PackName, qi.QueryName, qi.SpaceID, responseID, runTime, runTime, plannedScheduleTime, totalHits, scheduleExecutionCount)
 }
 
-func queryResultMeta(typ, action string, res QueryResult, scheduleExecutionCount int64, plannedScheduleTime time.Time) map[string]interface{} {
-	m := map[string]interface{}{
+func queryResultMeta(typ, action string, res QueryResult, scheduleExecutionCount int64, plannedScheduleTime time.Time) map[string]any {
+	m := map[string]any{
 		"type":                     typ,
 		"calendar_type":            res.CalendarTime,
 		"unix_time":                res.UnixTime,
@@ -650,7 +905,7 @@ func queryResultMeta(typ, action string, res QueryResult, scheduleExecutionCount
 
 func (bt *osquerybeat) setManagerPayload(b *beat.Beat) {
 	if b.Manager != nil {
-		b.Manager.SetPayload(map[string]interface{}{
+		b.Manager.SetPayload(map[string]any{
 			"osquery_version": bt.osqueryVersion,
 			"osquery_source":  bt.osquerySource,
 		})
@@ -726,12 +981,13 @@ func (bt *osquerybeat) registerActionHandler(b *beat.Beat, cli *osqdcli.Client, 
 	}
 
 	ah := &actionHandler{
-		log:       bt.log,
-		inputType: osqueryInputType,
-		publisher: bt.pub,
-		queryExec: cli,
-		np:        configPlugin,
-		profiles:  bt.liveProfiles,
+		log:             bt.log,
+		inputType:       osqueryInputType,
+		publisher:       bt.pub,
+		queryExec:       cli,
+		np:              configPlugin,
+		profiles:        bt.liveProfiles,
+		profileDefaults: configPlugin,
 	}
 	rah.Attach(ah)
 	b.Manager.RegisterAction(rah)

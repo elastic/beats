@@ -65,13 +65,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	m.HTTP.SetBody([]byte(fmt.Sprintf(`{"prefix": "%s", "format": "json"}`, cephStatusPrefix)))
+	m.HTTP.SetBody(fmt.Appendf(nil, `{"prefix": "%s", "format": "json"}`, cephStatusPrefix))
 	statusContent, err := m.HTTP.FetchContent()
 	if err != nil {
 		return err
 	}
 
-	m.HTTP.SetBody([]byte(fmt.Sprintf(`{"prefix": "%s", "format": "json"}`, cephTimeSyncStatusPrefix)))
+	m.HTTP.SetBody(fmt.Appendf(nil, `{"prefix": "%s", "format": "json"}`, cephTimeSyncStatusPrefix))
 	timeStatusContent, err := m.HTTP.FetchContent()
 	if err != nil {
 		return err

@@ -82,7 +82,6 @@ non_indexable_policy.dead_letter_index:
 	}
 
 	for name, test := range tests {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			c := conf.MustNewConfigFrom(test)
 			elasticsearchOutputConfig, err := readConfig(c)

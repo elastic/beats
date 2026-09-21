@@ -39,7 +39,7 @@ type statelessPublisher struct {
 	wrapped stateless.Publisher
 }
 
-func (pub statelessPublisher) Publish(event beat.Event, _ interface{}) error {
+func (pub statelessPublisher) Publish(event beat.Event, _ any) error {
 	pub.wrapped.Publish(event)
 	return nil
 }

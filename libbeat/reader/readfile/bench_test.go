@@ -73,7 +73,7 @@ func BenchmarkEncoderReader(b *testing.B) {
 
 func createBenchmarkLines(numLines int, lineLength int) []byte {
 	buf := bytes.NewBuffer(nil)
-	for i := 0; i < numLines; i++ {
+	for range numLines {
 		line := make([]byte, hex.DecodedLen(lineLength))
 		if _, err := rand.Read(line); err != nil {
 			panic(fmt.Sprintf("failed to generate random input: %v", err))

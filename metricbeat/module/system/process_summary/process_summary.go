@@ -30,9 +30,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/process"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // init registers the MetricSet with the central registry.
@@ -130,7 +130,7 @@ func threadStats(sys resolve.Resolver) (mapstr.M, error) {
 		return nil, fmt.Errorf("error reading procfs file %s: %w", statPath, err)
 	}
 	threadData := mapstr.M{}
-	for _, line := range strings.Split(string(procData), "\n") {
+	for line := range strings.SplitSeq(string(procData), "\n") {
 		// look for format procs_[STATE] [COUNT]
 		fields := strings.Fields(line)
 		if len(fields) < 2 {
@@ -144,7 +144,7 @@ func threadStats(sys resolve.Resolver) (mapstr.M, error) {
 			}
 			procsInt, err := strconv.ParseInt(fields[1], 10, 64)
 			if err != nil {
-				return nil, fmt.Errorf("Error parsing value %s from %s: %w", fields[0], statPath, err)
+				return nil, fmt.Errorf("error parsing value %s from %s: %w", fields[0], statPath, err)
 			}
 
 			threadData[keyFields[1]] = procsInt

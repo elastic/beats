@@ -26,11 +26,11 @@ import (
 // Equals is a Condition for testing string equality.
 type Equals map[string]equalsValue
 
-type equalsValue func(interface{}) bool
+type equalsValue func(any) bool
 
 func equalsIntValue(i uint64, log *logp.Logger) equalsValue {
 	logger := log.Named(logName)
-	return func(value interface{}) bool {
+	return func(value any) bool {
 		if sValue, err := ExtractInt(value); err == nil {
 			return sValue == i
 		}
@@ -41,7 +41,7 @@ func equalsIntValue(i uint64, log *logp.Logger) equalsValue {
 
 func equalsStringValue(s string, log *logp.Logger) equalsValue {
 	logger := log.Named(logName)
-	return func(value interface{}) bool {
+	return func(value any) bool {
 		if sValue, err := ExtractString(value); err == nil {
 			return sValue == s
 		}
@@ -52,7 +52,7 @@ func equalsStringValue(s string, log *logp.Logger) equalsValue {
 
 func equalsBoolValue(b bool, log *logp.Logger) equalsValue {
 	logger := log.Named(logName)
-	return func(value interface{}) bool {
+	return func(value any) bool {
 		if sValue, err := ExtractBool(value); err == nil {
 			return sValue == b
 		}
@@ -62,7 +62,7 @@ func equalsBoolValue(b bool, log *logp.Logger) equalsValue {
 }
 
 // NewEqualsCondition builds a new Equals using the given configuration of string equality checks.
-func NewEqualsCondition(fields map[string]interface{}, log *logp.Logger) (c Equals, err error) {
+func NewEqualsCondition(fields map[string]any, log *logp.Logger) (c Equals, err error) {
 	c = Equals{}
 
 	for field, value := range fields {

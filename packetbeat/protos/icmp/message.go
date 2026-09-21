@@ -83,40 +83,40 @@ type icmpMessage struct {
 	length int
 }
 
-func isRequest(tuple *icmpTuple, msg *icmpMessage) bool {
+func isRequest(tuple *icmpTuple, msg *icmpMessage, logger *logp.Logger) bool {
 	if tuple.icmpVersion == 4 {
 		return !icmp4ResponseTypes[msg.Type]
 	}
 	if tuple.icmpVersion == 6 {
 		return !icmp6ResponseTypes[msg.Type]
 	}
-	logp.NewLogger("icmp").DPanic("Invalid ICMP version[%d]", tuple.icmpVersion)
+	logger.Named("icmp").DPanic("Invalid ICMP version[%d]", tuple.icmpVersion)
 	return true
 }
 
-func isError(tuple *icmpTuple, msg *icmpMessage) bool {
+func isError(tuple *icmpTuple, msg *icmpMessage, logger *logp.Logger) bool {
 	if tuple.icmpVersion == 4 {
 		return icmp4ErrorTypes[msg.Type]
 	}
 	if tuple.icmpVersion == 6 {
 		return icmp6ErrorTypes[msg.Type]
 	}
-	logp.NewLogger("icmp").DPanic("Invalid ICMP version[%d]", tuple.icmpVersion)
+	logger.Named("icmp").DPanic("Invalid ICMP version[%d]", tuple.icmpVersion)
 	return true
 }
 
-func requiresCounterpart(tuple *icmpTuple, msg *icmpMessage) bool {
+func requiresCounterpart(tuple *icmpTuple, msg *icmpMessage, logger *logp.Logger) bool {
 	if tuple.icmpVersion == 4 {
 		return icmp4PairTypes[msg.Type]
 	}
 	if tuple.icmpVersion == 6 {
 		return icmp6PairTypes[msg.Type]
 	}
-	logp.NewLogger("icmp").DPanic("Invalid ICMP version[%d]", tuple.icmpVersion)
+	logger.Named("icmp").DPanic("Invalid ICMP version[%d]", tuple.icmpVersion)
 	return false
 }
 
-func extractTrackingData(icmpVersion uint8, msgType uint8, baseLayer *layers.BaseLayer) (uint16, uint16) {
+func extractTrackingData(icmpVersion uint8, msgType uint8, baseLayer *layers.BaseLayer, logger *logp.Logger) (uint16, uint16) {
 	if icmpVersion == 4 {
 		if icmp4PairTypes[msgType] {
 			id := binary.BigEndian.Uint16(baseLayer.Contents[4:6])
@@ -133,17 +133,17 @@ func extractTrackingData(icmpVersion uint8, msgType uint8, baseLayer *layers.Bas
 		}
 		return 0, 0
 	}
-	logp.NewLogger("icmp").DPanic("Invalid ICMP version[%d]", icmpVersion)
+	logger.Named("icmp").DPanic("Invalid ICMP version[%d]", icmpVersion)
 	return 0, 0
 }
 
-func humanReadable(tuple *icmpTuple, msg *icmpMessage) string {
+func humanReadable(tuple *icmpTuple, msg *icmpMessage, logger *logp.Logger) string {
 	if tuple.icmpVersion == 4 {
 		return layers.ICMPv4TypeCode(binary.BigEndian.Uint16([]byte{msg.Type, msg.code})).String()
 	}
 	if tuple.icmpVersion == 6 {
 		return layers.ICMPv6TypeCode(binary.BigEndian.Uint16([]byte{msg.Type, msg.code})).String()
 	}
-	logp.NewLogger("icmp").DPanic("Invalid ICMP version[%d]", tuple.icmpVersion)
+	logger.Named("icmp").DPanic("Invalid ICMP version[%d]", tuple.icmpVersion)
 	return ""
 }

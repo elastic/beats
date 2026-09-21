@@ -27,9 +27,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	metrics "github.com/elastic/beats/v7/pkg/systemmetrics/metric/cpu"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	metrics "github.com/elastic/elastic-agent-system-metrics/metric/cpu"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 func init() {
@@ -152,7 +152,7 @@ func (m *MetricSet) fetchCPUInfo() []byte {
 // copyFieldsOrDefault copies the field specified by key to the given map. It will
 // overwrite the key if it exists. It will update the map with a default value if
 // the key does not exist in the source map.
-func copyFieldsOrDefault(from, to mapstr.M, key, newkey string, value interface{}) error {
+func copyFieldsOrDefault(from, to mapstr.M, key, newkey string, value any) error {
 	v, err := from.GetValue(key)
 	if errors.Is(err, mapstr.ErrKeyNotFound) {
 		_, err = to.Put(newkey, value)

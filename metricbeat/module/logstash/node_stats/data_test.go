@@ -21,9 +21,9 @@ package node_stats
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	os0 "os"
 	"testing"
 
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
@@ -57,7 +57,7 @@ func EventMappingForFiles(t *testing.T, fixtureVersions []string, expectedEvents
 
 	for _, f := range fixtureVersions {
 		path := fmt.Sprintf("./_meta/test/node_stats.%s.json", f)
-		input, err := ioutil.ReadFile(path)
+		input, err := os0.ReadFile(path)
 		require.NoError(t, err)
 
 		reporter := &mbtest.CapturingReporterV2{}
@@ -75,13 +75,13 @@ func TestData(t *testing.T) {
 			http.NotFound(w, r)
 		}
 
-		input, _ := ioutil.ReadFile("./_meta/test/root.710.json")
+		input, _ := os0.ReadFile("./_meta/test/root.710.json")
 		w.Write(input)
 	}))
 
 	mux.Handle("/_node/stats", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			input, _ := ioutil.ReadFile("./_meta/test/node_stats.710.json")
+			input, _ := os0.ReadFile("./_meta/test/node_stats.710.json")
 			w.Write(input)
 		}))
 
@@ -94,8 +94,8 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string) map[string]any {
+	return map[string]any{
 		"module":     logstash.ModuleName,
 		"metricsets": []string{"node_stats"},
 		"hosts":      []string{host},
@@ -112,7 +112,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 			pipelines: []PipelineStats{
 				{
 					ID: "test_pipeline",
-					Vertices: []map[string]interface{}{
+					Vertices: []map[string]any{
 						{
 							"id": "vertex_1",
 						},
@@ -130,7 +130,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 				"prod_cluster_id": {
 					{
 						ID: "test_pipeline",
-						Vertices: []map[string]interface{}{
+						Vertices: []map[string]any{
 							{
 								"id": "vertex_1",
 							},
@@ -149,7 +149,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 			pipelines: []PipelineStats{
 				{
 					ID: "test_pipeline",
-					Vertices: []map[string]interface{}{
+					Vertices: []map[string]any{
 						{
 							"id":           "vertex_1",
 							"cluster_uuid": "es_1",
@@ -168,7 +168,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 				"prod_cluster_id": {
 					{
 						ID: "test_pipeline",
-						Vertices: []map[string]interface{}{
+						Vertices: []map[string]any{
 							{
 								"id":           "vertex_1",
 								"cluster_uuid": "es_1",
@@ -188,7 +188,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 			pipelines: []PipelineStats{
 				{
 					ID: "test_pipeline_1",
-					Vertices: []map[string]interface{}{
+					Vertices: []map[string]any{
 						{
 							"id":           "vertex_1_1",
 							"cluster_uuid": "es_1",
@@ -203,7 +203,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 				},
 				{
 					ID: "test_pipeline_2",
-					Vertices: []map[string]interface{}{
+					Vertices: []map[string]any{
 						{
 							"id": "vertex_2_1",
 						},
@@ -221,7 +221,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 				"prod_cluster_id": {
 					{
 						ID: "test_pipeline_1",
-						Vertices: []map[string]interface{}{
+						Vertices: []map[string]any{
 							{
 								"id":           "vertex_1_1",
 								"cluster_uuid": "es_1",
@@ -236,7 +236,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 					},
 					{
 						ID: "test_pipeline_2",
-						Vertices: []map[string]interface{}{
+						Vertices: []map[string]any{
 							{
 								"id": "vertex_2_1",
 							},
@@ -255,7 +255,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 			pipelines: []PipelineStats{
 				{
 					ID: "test_pipeline_1",
-					Vertices: []map[string]interface{}{
+					Vertices: []map[string]any{
 						{
 							"id":           "vertex_1_1",
 							"cluster_uuid": "es_1",
@@ -271,7 +271,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 				},
 				{
 					ID: "test_pipeline_2",
-					Vertices: []map[string]interface{}{
+					Vertices: []map[string]any{
 						{
 							"id": "vertex_2_1",
 						},
@@ -288,7 +288,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 				"es_1": {
 					{
 						ID: "test_pipeline_1",
-						Vertices: []map[string]interface{}{
+						Vertices: []map[string]any{
 							{
 								"id":           "vertex_1_1",
 								"cluster_uuid": "es_1",
@@ -306,7 +306,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 				"es_2": {
 					{
 						ID: "test_pipeline_1",
-						Vertices: []map[string]interface{}{
+						Vertices: []map[string]any{
 							{
 								"id":           "vertex_1_1",
 								"cluster_uuid": "es_1",
@@ -324,7 +324,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 				"": {
 					{
 						ID: "test_pipeline_2",
-						Vertices: []map[string]interface{}{
+						Vertices: []map[string]any{
 							{
 								"id": "vertex_2_1",
 							},

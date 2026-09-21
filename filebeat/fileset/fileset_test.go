@@ -68,7 +68,7 @@ func TestLoadManifestNginx(t *testing.T) {
 
 	vars := manifest.Vars
 	assert.Equal(t, "paths", vars[0]["name"])
-	path := (vars[0]["default"]).([]interface{})[0].(string)
+	path := (vars[0]["default"]).([]any)[0].(string)
 	assert.Equal(t, path, "/var/log/nginx/access.log*")
 }
 
@@ -95,11 +95,11 @@ func TestEvaluateVarsNginx(t *testing.T) {
 	vars, err := fs.evaluateVars(makeTestInfo("6.6.0"))
 	require.NoError(t, err)
 
-	builtin := vars["builtin"].(map[string]interface{})
+	builtin := vars["builtin"].(map[string]any)
 	assert.IsType(t, "a-mac-with-esc-key", builtin["hostname"])
 	assert.IsType(t, "local", builtin["domain"])
 
-	assert.IsType(t, []interface{}{"/usr/local/var/log/nginx/access.log*"}, vars["paths"])
+	assert.IsType(t, []any{"/usr/local/var/log/nginx/access.log*"}, vars["paths"])
 }
 
 func TestEvaluateVarsNginxOverride(t *testing.T) {
@@ -111,7 +111,7 @@ func TestEvaluateVarsNginxOverride(t *testing.T) {
 	modulesPath, err := filepath.Abs("../module")
 	require.NoError(t, err)
 	fs, err := New(modulesPath, "access", "nginx", &FilesetConfig{
-		Var: map[string]interface{}{
+		Var: map[string]any{
 			"pipeline": "no_plugins",
 		},
 	}, logptest.NewTestingLogger(t, ""), beatPaths)
@@ -136,21 +136,21 @@ func TestEvaluateVarsMySQL(t *testing.T) {
 	vars, err := fs.evaluateVars(makeTestInfo("6.6.0"))
 	require.NoError(t, err)
 
-	builtin := vars["builtin"].(map[string]interface{})
+	builtin := vars["builtin"].(map[string]any)
 	assert.IsType(t, "a-mac-with-esc-key", builtin["hostname"])
 	assert.IsType(t, "local", builtin["domain"])
 
-	expectedPaths := []interface{}{
+	expectedPaths := []any{
 		"/var/log/mysql/mysql-slow.log*",
 		fmt.Sprintf("/var/lib/mysql/%s-slow.log", builtin["hostname"]),
 	}
 	if runtime.GOOS == "darwin" {
-		expectedPaths = []interface{}{
+		expectedPaths = []any{
 			fmt.Sprintf("/usr/local/var/mysql/%s-slow.log*", builtin["hostname"]),
 		}
 	}
 	if runtime.GOOS == "windows" {
-		expectedPaths = []interface{}{
+		expectedPaths = []any{
 			"c:/programdata/MySQL/MySQL Server*/mysql-slow.log*",
 		}
 	}
@@ -160,25 +160,25 @@ func TestEvaluateVarsMySQL(t *testing.T) {
 
 func TestResolveVariable(t *testing.T) {
 	tests := []struct {
-		Value    interface{}
-		Vars     map[string]interface{}
-		Expected interface{}
+		Value    any
+		Vars     map[string]any
+		Expected any
 	}{
 		{
 			Value: "test-{{.value}}",
-			Vars: map[string]interface{}{
+			Vars: map[string]any{
 				"value":   2,
-				"builtin": map[string]interface{}{},
+				"builtin": map[string]any{},
 			},
 			Expected: "test-2",
 		},
 		{
-			Value: []interface{}{"test-{{.value}}", "test1-{{.value}}"},
-			Vars: map[string]interface{}{
+			Value: []any{"test-{{.value}}", "test1-{{.value}}"},
+			Vars: map[string]any{
 				"value":   2,
-				"builtin": map[string]interface{}{},
+				"builtin": map[string]any{},
 			},
-			Expected: []interface{}{"test-2", "test1-2"},
+			Expected: []any{"test-2", "test1-2"},
 		},
 	}
 
@@ -209,14 +209,14 @@ func TestGetInputConfigNginxOverrides(t *testing.T) {
 	require.NoError(t, err)
 
 	tests := map[string]struct {
-		input      map[string]interface{}
+		input      map[string]any
 		expectedFn require.ValueAssertionFunc
 	}{
 		"close_eof": {
-			map[string]interface{}{
+			map[string]any{
 				"close_eof": true,
 			},
-			func(t require.TestingT, cfg interface{}, rest ...interface{}) {
+			func(t require.TestingT, cfg any, rest ...any) {
 				c, ok := cfg.(*conf.C)
 				if !ok {
 					t.FailNow()
@@ -233,10 +233,10 @@ func TestGetInputConfigNginxOverrides(t *testing.T) {
 			},
 		},
 		"pipeline": {
-			map[string]interface{}{
+			map[string]any{
 				"pipeline": "foobar",
 			},
-			func(t require.TestingT, cfg interface{}, rest ...interface{}) {
+			func(t require.TestingT, cfg any, rest ...any) {
 				c, ok := cfg.(*conf.C)
 				if !ok {
 					t.FailNow()
@@ -299,8 +299,8 @@ func TestGetPipelineNginx(t *testing.T) {
 }
 
 func TestGetTemplateFunctions(t *testing.T) {
-	vars := map[string]interface{}{
-		"builtin": map[string]interface{}{},
+	vars := map[string]any{
+		"builtin": map[string]any{},
 	}
 	templateFunctions, err := getTemplateFunctions(vars)
 	require.NoError(t, err)

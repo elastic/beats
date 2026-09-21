@@ -144,7 +144,7 @@ func TestComplexExampleWithIntermediateConversion(t *testing.T) {
 
 		state struct {
 			Internal stateInternal
-			Cursor   interface{}
+			Cursor   any
 		}
 	)
 
@@ -152,7 +152,7 @@ func TestComplexExampleWithIntermediateConversion(t *testing.T) {
 		"_key": "test",
 		"internal": mapstr.M{
 			"ttl":     float64(1800000000000),
-			"updated": []interface{}{float64(515579904576), float64(1588432943)},
+			"updated": []any{float64(515579904576), float64(1588432943)},
 		},
 		"cursor": mapstr.M{
 			"monotonictimestamp": float64(24881645756),

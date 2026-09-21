@@ -110,7 +110,7 @@ func TestMapperWithExpectedEvents(
 		actualBytes, err := json.Marshal(ev)
 		require.NoError(t, err)
 
-		var actual map[string]interface{}
+		var actual map[string]any
 		err = json.Unmarshal(actualBytes, &actual)
 		require.NoError(t, err)
 
@@ -137,13 +137,13 @@ func TestMapperExpectingError(
 	require.Equal(t, 0, len(events), "Number of events mismatch")
 }
 
-func loadExpectedEventsFromFiles(t *testing.T, files []string) []map[string]interface{} {
-	expected := make([]map[string]interface{}, 0, len(files))
+func loadExpectedEventsFromFiles(t *testing.T, files []string) []map[string]any {
+	expected := make([]map[string]any, 0, len(files))
 	for _, f := range files {
 		content, err := os.ReadFile(f)
 		require.NoError(t, err)
 
-		var ev map[string]interface{}
+		var ev map[string]any
 		err = json.Unmarshal(content, &ev)
 		require.NoError(t, err)
 

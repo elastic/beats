@@ -60,14 +60,15 @@ func TestReloader(t *testing.T) {
 	})
 	// config.C{}
 
-	reloader := NewReloader(logptest.NewTestingLogger(t, "cfgfile-test.reload"), nil, config, paths.Paths)
+	// The glob is absolute, so an empty paths.Path resolves it unchanged.
+	reloader := NewReloader(logptest.NewTestingLogger(t, "cfgfile-test.reload"), nil, config, paths.New())
 	retryCount := 10
 
 	go reloader.Run(nil)
 	defer reloader.Stop()
 
 	// wait until configScans >= 2 (which should happen after ~1 second)
-	for i := 0; i < retryCount; i++ {
+	for range retryCount {
 		if configScans.Get() >= 2 {
 			break
 		}
@@ -100,7 +101,7 @@ func TestReloader(t *testing.T) {
 	// configReloads is, giving a false negative. Waiting two iterations
 	// guarantees that the change from the first one has taken effect.
 	targetScans := configScans.Get() + 2
-	for i := 0; i < retryCount; i++ {
+	for range retryCount {
 		time.Sleep(time.Second)
 		if configScans.Get() >= targetScans {
 			break

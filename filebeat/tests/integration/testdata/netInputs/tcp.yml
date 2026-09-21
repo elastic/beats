@@ -15,7 +15,7 @@ queue.mem:
 
 http:
   enabled: true
-  port: 5066
+  port: {{.httpPort}}
 
 logging:
   level: debug

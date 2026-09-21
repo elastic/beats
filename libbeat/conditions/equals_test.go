@@ -29,7 +29,7 @@ import (
 
 func TestEqualsCreate(t *testing.T) {
 	config := Config{
-		Equals: &Fields{fields: map[string]interface{}{
+		Equals: &Fields{fields: map[string]any{
 			"proc.pid": 0.08,
 		}},
 	}
@@ -40,7 +40,7 @@ func TestEqualsCreate(t *testing.T) {
 
 func TestEqualsSingleFieldPositiveMatch(t *testing.T) {
 	testConfig(t, true, secdTestEvent, &Config{
-		Equals: &Fields{fields: map[string]interface{}{
+		Equals: &Fields{fields: map[string]any{
 			"type": "process",
 		}},
 	})
@@ -48,7 +48,7 @@ func TestEqualsSingleFieldPositiveMatch(t *testing.T) {
 
 func TestEqualsBooleanFieldNegativeMatch(t *testing.T) {
 	testConfig(t, false, secdTestEvent, &Config{
-		Equals: &Fields{fields: map[string]interface{}{
+		Equals: &Fields{fields: map[string]any{
 			"final": true,
 		}},
 	})
@@ -56,7 +56,7 @@ func TestEqualsBooleanFieldNegativeMatch(t *testing.T) {
 
 func TestEqualsMultiFieldAndTypePositiveMatch(t *testing.T) {
 	testConfig(t, true, secdTestEvent, &Config{
-		Equals: &Fields{fields: map[string]interface{}{
+		Equals: &Fields{fields: map[string]any{
 			"type":     "process",
 			"proc.pid": 305,
 		}},
@@ -64,7 +64,7 @@ func TestEqualsMultiFieldAndTypePositiveMatch(t *testing.T) {
 }
 
 func BenchmarkEquals(b *testing.B) {
-	cases := map[string]map[string]interface{}{
+	cases := map[string]map[string]any{
 		"1 condition": {
 			"type": "process",
 		},

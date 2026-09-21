@@ -149,7 +149,7 @@ func TestOp_Execute(t *testing.T) {
 	})
 }
 
-func mustCreateUpdateOp(t *testing.T, store *store, resource *resource, updates interface{}) *updateOp {
+func mustCreateUpdateOp(t *testing.T, store *store, resource *resource, updates any) *updateOp {
 	op, err := createUpdateOp(store, resource, updates)
 	if err != nil {
 		t.Fatalf("Failed to create update op: %v", err)

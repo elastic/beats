@@ -40,7 +40,7 @@ type clientHandler struct {
 // ESClient defines the minimal interface required for the index manager to
 // prepare an index.
 type ESClient interface {
-	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
+	Request(method, path string, pipeline string, params map[string]string, body any) (int, []byte, error)
 	GetVersion() version.V
 	IsServerless() bool
 }

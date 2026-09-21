@@ -40,7 +40,7 @@ var (
 )
 
 func eventMapping(r mb.ReporterV2, content []byte) error {
-	var inInterface map[string]interface{}
+	var inInterface map[string]any
 
 	err := json.Unmarshal(content, &inInterface)
 	if err != nil {

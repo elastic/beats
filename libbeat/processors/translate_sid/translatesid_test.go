@@ -66,7 +66,7 @@ func TestTranslateSID(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			evt := &beat.Event{Fields: map[string]interface{}{
+			evt := &beat.Event{Fields: map[string]any{
 				"sid": tc.SID,
 			}}
 
@@ -120,7 +120,7 @@ func TestTranslateSIDEmptyTarget(t *testing.T) {
 	c := defaultConfig()
 	c.Field = "sid"
 
-	evt := &beat.Event{Fields: map[string]interface{}{
+	evt := &beat.Event{Fields: map[string]any{
 		"sid": "S-1-5-32-544",
 	}}
 
@@ -134,7 +134,6 @@ func TestTranslateSIDEmptyTarget(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			p, err := newFromConfig(tc.Config, logger)
 			require.NoError(t, err)
@@ -162,7 +161,7 @@ func BenchmarkProcessor_Run(b *testing.B) {
 	}
 
 	b.Run("builtin", func(b *testing.B) {
-		evt := &beat.Event{Fields: map[string]interface{}{
+		evt := &beat.Event{Fields: map[string]any{
 			"sid": "S-1-5-7",
 		}}
 
@@ -175,7 +174,7 @@ func BenchmarkProcessor_Run(b *testing.B) {
 	})
 
 	b.Run("no_mapping", func(b *testing.B) {
-		evt := &beat.Event{Fields: map[string]interface{}{
+		evt := &beat.Event{Fields: map[string]any{
 			"sid": "S-1-5-2025429265-500",
 		}}
 
@@ -188,7 +187,7 @@ func BenchmarkProcessor_Run(b *testing.B) {
 	})
 }
 
-func assertEqualIgnoreCase(t *testing.T, expected string, actual interface{}) {
+func assertEqualIgnoreCase(t *testing.T, expected string, actual any) {
 	t.Helper()
 	actualStr, ok := actual.(string)
 	if !ok {

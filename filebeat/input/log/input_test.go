@@ -20,7 +20,6 @@
 package log
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 	"sync"
@@ -191,13 +190,13 @@ func testInputLifecycle(t *testing.T, context input.Context, closer func(input.C
 	defer goroutines.Check(t)
 
 	// Prepare a log file
-	tmpdir, err := ioutil.TempDir(os.TempDir(), "input-test")
+	tmpdir, err := os.MkdirTemp(os.TempDir(), "input-test")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer os.RemoveAll(tmpdir)
 	logs := []byte("some log line\nother log line\n")
-	err = ioutil.WriteFile(path.Join(tmpdir, "some.log"), logs, 0o644)
+	err = os.WriteFile(path.Join(tmpdir, "some.log"), logs, 0o644)
 	assert.NoError(t, err)
 
 	// Setup the input
@@ -334,7 +333,7 @@ func (t TestFileInfo) Size() int64        { return 0 }
 func (t TestFileInfo) Mode() os.FileMode  { return 0 }
 func (t TestFileInfo) ModTime() time.Time { return t.time }
 func (t TestFileInfo) IsDir() bool        { return false }
-func (t TestFileInfo) Sys() interface{}   { return nil }
+func (t TestFileInfo) Sys() any           { return nil }
 
 type eventCapturer struct {
 	closed    bool

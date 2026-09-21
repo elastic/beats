@@ -3,6 +3,35 @@ The `file_integrity` module sends events when a file is changed (created, update
 The module is implemented for Linux, macOS (Darwin), and Windows.
 
 
+## Required privileges [_required_privileges_file_integrity]
+
+Privilege requirements vary by backend.
+
+**fsnotify (default)**
+:   No special Linux capabilities are needed. Auditbeat only needs read access to the paths it monitors. It can run as a non-root user as long as file permissions allow it to read the monitored files or directories.
+
+**kprobes**
+:   Requires `CAP_SYS_ADMIN` to install kernel probes through tracefs. The tracefs or debugfs filesystem must be accessible at `/sys/kernel/tracing` or `/sys/kernel/debug/tracing`.
+
+    In Docker containers, bind-mount `/sys` from the host so that tracefs is available inside the container. The mount must be writable because Auditbeat must write probe definitions to tracefs:
+
+    ```sh
+    docker run --cap-add=SYS_ADMIN -v /sys:/sys ...
+    ```
+
+**ebpf**
+:   Requires `CAP_SYS_ADMIN` and `CAP_BPF` (or root), and a kernel version of 5.10.16 or later. The kernel BPF policy must permit eBPF programs.
+
+    In Docker containers, add `--cap-add=SYS_ADMIN --cap-add=BPF` and mount `/sys` from the host.
+
+**ETW (Windows only)**
+:   Requires Administrator privileges.
+
+::::{note}
+When using the `kprobes` or `ebpf` backend in a Docker container, bind-mount the host `/sys` directory and add the required capabilities. Refer to [Run Auditbeat on Docker](/reference/auditbeat/running-on-docker.md).
+::::
+
+
 ## How it works [_how_it_works_2]
 
 This module uses features of the operating system to monitor file changes in realtime. When the module starts it creates a subscription with the OS to receive notifications of changes to the specified files or directories. Upon receiving notification of a change the module will read the file’s metadata and then compute a hash of the file’s contents.
@@ -17,8 +46,13 @@ The operating system features that power this feature are as follows.
   * `ReadDirectoryChangesW` is used.
   * {applies_to}`stack: preview 9.2.0` Multiple backends are supported: `auto`, `fsnotify`, `etw`. By default, `fsnotify` is used, which utilizes the `ReadDirectoryChangesW` Windows API. The `etw` backend uses Event Tracing for Windows (ETW) to monitor file system activities at the kernel level, supporting enhanced process context information. It requires Administrator privileges.
 
-The file integrity module should not be used to monitor paths on network file systems.
+    :::{admonition} ETW backend behavior
+    Process and user information attached to ETW-backed file events can vary depending on the underlying ETW event type.
 
+    Create and open operations typically include richer execution context, so Auditbeat can attach additional process metadata and user and security information. Update operations, such as file content writes or attribute changes, often use a smaller event payload that only includes basic identifiers like the process ID (PID).
+    :::
+
+The file integrity module should not be used to monitor paths on network file systems.
 
 ## Configuration options [_configuration_options_18]
 

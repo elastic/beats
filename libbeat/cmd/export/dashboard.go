@@ -33,7 +33,7 @@ import (
 func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 	genTemplateConfigCmd := &cobra.Command{
 		Use:   "dashboard",
-		Short: "Export defined dashboard to stdout",
+		Short: "Export dashboards to files",
 		Run: func(cmd *cobra.Command, args []string) {
 			dashboard, _ := cmd.Flags().GetString("id")
 			yml, _ := cmd.Flags().GetString("yml")
@@ -101,7 +101,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 	}
 
 	genTemplateConfigCmd.Flags().String("id", "", "Dashboard id")
-	genTemplateConfigCmd.Flags().String("yml", "", "Yaml file containing list of dashboard ID and filename pairs")
+	genTemplateConfigCmd.Flags().String("yml", "", "YAML file containing dashboard ID and filename pairs")
 	genTemplateConfigCmd.Flags().String("folder", "", "Target folder to save exported assets")
 
 	return genTemplateConfigCmd

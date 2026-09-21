@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-ucfg"
 
 	"github.com/stretchr/testify/assert"
@@ -117,9 +118,9 @@ func newProtocols() Protocols {
 	udp := &UDPProtocol{Ports: []int{5060}}
 	tcpUDP := &TCPUDPProtocol{Ports: []int{53}}
 
-	p.register(1, nil, tcp)
-	p.register(2, nil, udp)
-	p.register(3, nil, tcpUDP)
+	p.register(1, nil, tcp, logp.NewNopLogger())
+	p.register(2, nil, udp, logp.NewNopLogger())
+	p.register(3, nil, tcpUDP, logp.NewNopLogger())
 	return p
 }
 
@@ -206,15 +207,15 @@ func TestGetUDP(t *testing.T) {
 func TestValidateProtocolDevice(t *testing.T) {
 	tcs := []struct {
 		testCase, device string
-		config           map[string]interface{}
+		config           map[string]any
 		expectedValid    bool
 		expectedErr      string
 	}{
 		{
 			"DeviceIsIncorrect",
 			"eth0",
-			map[string]interface{}{
-				"interface": map[string]interface{}{
+			map[string]any{
+				"interface": map[string]any{
 					"device": "eth1",
 				},
 			},
@@ -224,8 +225,8 @@ func TestValidateProtocolDevice(t *testing.T) {
 		{
 			"DeviceIsCorrect",
 			"eth1",
-			map[string]interface{}{
-				"interface": map[string]interface{}{
+			map[string]any{
+				"interface": map[string]any{
 					"device": "eth1",
 				},
 			},
@@ -235,7 +236,7 @@ func TestValidateProtocolDevice(t *testing.T) {
 		{
 			"ConfigIsInvalid",
 			"eth0",
-			map[string]interface{}{
+			map[string]any{
 				"interface": "eth1",
 			},
 			false,
@@ -244,7 +245,6 @@ func TestValidateProtocolDevice(t *testing.T) {
 	}
 
 	for _, tc := range tcs {
-		tc := tc
 		t.Run(tc.testCase, func(t *testing.T) {
 			cfg := (*conf.C)(ucfg.MustNewFrom(tc.config))
 			isValid, err := validateProtocolDevice(tc.device, cfg)

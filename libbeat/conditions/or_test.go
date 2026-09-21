@@ -31,13 +31,13 @@ func TestORCondition(t *testing.T) {
 	config := Config{
 		OR: []Config{
 			{
-				Range: &Fields{fields: map[string]interface{}{
+				Range: &Fields{fields: map[string]any{
 					"http.code.gte": 400,
 					"http.code.lt":  500,
 				}},
 			},
 			{
-				Range: &Fields{fields: map[string]interface{}{
+				Range: &Fields{fields: map[string]any{
 					"http.code.gte": 200,
 					"http.code.lt":  300,
 				}},

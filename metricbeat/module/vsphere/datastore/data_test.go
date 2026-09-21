@@ -50,7 +50,7 @@ func TestEventMapping(t *testing.T) {
 	}
 
 	var metricDataTest = metricData{
-		perfMetrics: map[string]interface{}{
+		perfMetrics: map[string]any{
 			"datastore.read.average":      int64(100),
 			"datastore.write.average":     int64(200),
 			"disk.capacity.latest":        int64(10000),

@@ -35,6 +35,14 @@ type PublisherMetadata struct {
 	Handle EvtHandle // Handle to the publisher metadata from EvtOpenPublisherMetadata.
 }
 
+type openPublisherMetadataFunc func(
+	session EvtHandle,
+	publisherIdentity *uint16,
+	logFilePath *uint16,
+	locale uint32,
+	flags uint32,
+) (EvtHandle, error)
+
 // Close releases the publisher metadata handle.
 func (m *PublisherMetadata) Close() error {
 	return m.Handle.Close()
@@ -43,6 +51,15 @@ func (m *PublisherMetadata) Close() error {
 // NewPublisherMetadata opens the publisher's metadata. Close must be called on
 // the returned PublisherMetadata to release its handle.
 func NewPublisherMetadata(session EvtHandle, name string, locale uint32) (*PublisherMetadata, error) {
+	return newPublisherMetadata(_EvtOpenPublisherMetadata, session, name, locale)
+}
+
+func newPublisherMetadata(
+	openPublisherMetadata openPublisherMetadataFunc,
+	session EvtHandle,
+	name string,
+	locale uint32,
+) (*PublisherMetadata, error) {
 	var publisherName, logFile *uint16
 	if info, err := os.Stat(name); err == nil && info.Mode().IsRegular() {
 		logFile, err = syscall.UTF16PtrFromString(name)
@@ -56,7 +73,7 @@ func NewPublisherMetadata(session EvtHandle, name string, locale uint32) (*Publi
 		}
 	}
 
-	handle, err := _EvtOpenPublisherMetadata(session, publisherName, logFile, 0, 0)
+	handle, err := openPublisherMetadata(session, publisherName, logFile, locale, 0)
 	if err != nil {
 		return nil, fmt.Errorf("failed in EvtOpenPublisherMetadata: %w", err)
 	}
@@ -181,7 +198,7 @@ func NewMetadataKeywords(publisherMetadataHandle EvtHandle) ([]MetadataKeyword, 
 	}
 
 	var values []MetadataKeyword
-	for i := uint32(0); i < arrayLen; i++ {
+	for i := range arrayLen {
 		md, err := NewMetadataKeyword(publisherMetadataHandle, arrayHandle, i)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get keyword at array index %v: %w", i, err)
@@ -255,7 +272,7 @@ func NewMetadataOpcodes(publisherMetadataHandle EvtHandle) ([]MetadataOpcode, er
 	}
 
 	var values []MetadataOpcode
-	for i := uint32(0); i < arrayLen; i++ {
+	for i := range arrayLen {
 		md, err := NewMetadataOpcode(publisherMetadataHandle, arrayHandle, i)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get opcode at array index %v: %w", i, err)
@@ -332,7 +349,7 @@ func NewMetadataLevels(publisherMetadataHandle EvtHandle) ([]MetadataLevel, erro
 	}
 
 	var values []MetadataLevel
-	for i := uint32(0); i < arrayLen; i++ {
+	for i := range arrayLen {
 		md, err := NewMetadataLevel(publisherMetadataHandle, arrayHandle, i)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get level at array index %v: %w", i, err)
@@ -406,7 +423,7 @@ func NewMetadataTasks(publisherMetadataHandle EvtHandle) ([]MetadataTask, error)
 	}
 
 	var values []MetadataTask
-	for i := uint32(0); i < arrayLen; i++ {
+	for i := range arrayLen {
 		md, err := NewMetadataTask(publisherMetadataHandle, arrayHandle, i)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get task at array index %v: %w", i, err)
@@ -487,7 +504,7 @@ func NewMetadataChannels(publisherMetadataHandle EvtHandle) ([]MetadataChannel, 
 	}
 
 	var values []MetadataChannel
-	for i := uint32(0); i < arrayLen; i++ {
+	for i := range arrayLen {
 		md, err := NewMetadataChannel(publisherMetadataHandle, arrayHandle, i)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get task at array index %v: %w", i, err)
@@ -596,7 +613,7 @@ func (itr *EventMetadataIterator) Err() error {
 	return itr.lastErr
 }
 
-func typeCastError(expected, got interface{}) error {
+func typeCastError(expected, got any) error {
 	return fmt.Errorf("wrong type for property. expected:%T got:%T", expected, got)
 }
 

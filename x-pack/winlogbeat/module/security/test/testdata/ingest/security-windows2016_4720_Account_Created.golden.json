@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-09-06T13:24:39.2933111Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "added-user-account",
@@ -54,9 +54,9 @@
         "HomePath": "\u003cvalue not set\u003e",
         "LogonHours": "All",
         "NewUACList": [
+          "USER_NORMAL_ACCOUNT",
           "USER_ACCOUNT_DISABLED",
-          "USER_PASSWORD_NOT_REQUIRED",
-          "USER_NORMAL_ACCOUNT"
+          "USER_PASSWORD_NOT_REQUIRED"
         ],
         "NewUacValue": "0x15",
         "OldUacValue": "0x0",
@@ -106,7 +106,7 @@
   {
     "@timestamp": "2019-09-06T13:25:21.8672707Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "added-user-account",
@@ -158,9 +158,9 @@
         "HomePath": "\u003cvalue not set\u003e",
         "LogonHours": "All",
         "NewUACList": [
+          "USER_NORMAL_ACCOUNT",
           "USER_ACCOUNT_DISABLED",
-          "USER_PASSWORD_NOT_REQUIRED",
-          "USER_NORMAL_ACCOUNT"
+          "USER_PASSWORD_NOT_REQUIRED"
         ],
         "NewUacValue": "0x15",
         "OldUacValue": "0x0",

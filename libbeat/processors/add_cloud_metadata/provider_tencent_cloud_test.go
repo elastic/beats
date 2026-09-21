@@ -56,7 +56,7 @@ func TestRetrieveQCloudMetadata(t *testing.T) {
 	server := initQCloudTestServer()
 	defer server.Close()
 
-	config, err := conf.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]any{
 		"providers": []string{"tencent"},
 		"host":      server.Listener.Addr().String(),
 	})

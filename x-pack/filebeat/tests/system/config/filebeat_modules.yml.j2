@@ -3,6 +3,9 @@ filebeat.config.modules:
 
 filebeat.overwrite_pipelines: true
 
+path.logs: {{ beat.working_dir }}
+path.data: {{ beat.working_dir }}/data
+
 {% if not skip_registry_config %}
 filebeat.registry:
   path: {{ beat.working_dir + '/' }}{{ registry_home|default("registry")}}

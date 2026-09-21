@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !integration
-// +build !integration
 
 package index_template
 
@@ -127,16 +126,16 @@ func expectValidParsedDetailedTemplatesCommon(t *testing.T, data metricset.Fetch
 
 	auto_ops_testing.CheckEventWithoutTransactionId(t, event2, data.ClusterInfo)
 
-	simpleMapping, err := utils.DeserializeData[map[string]interface{}]([]byte(getMappingObject(t, "simple-response")))
+	simpleMapping, err := utils.DeserializeData[map[string]any]([]byte(getMappingObject(t, "simple-response")))
 	require.NoError(t, err)
-	simple, err := templateSchema.Apply((*simpleMapping)["index_template"].(map[string]interface{}))
+	simple, err := templateSchema.Apply((*simpleMapping)["index_template"].(map[string]any))
 	require.NoError(t, err)
 
 	simpleTemplate := mapstr.M{"template": simple}
 
-	detailedMapping, err := utils.DeserializeData[map[string]interface{}]([]byte(getMappingObject(t, "detailed-response")))
+	detailedMapping, err := utils.DeserializeData[map[string]any]([]byte(getMappingObject(t, "detailed-response")))
 	require.NoError(t, err)
-	detailed, err := templateSchema.Apply((*detailedMapping)["index_template"].(map[string]interface{}))
+	detailed, err := templateSchema.Apply((*detailedMapping)["index_template"].(map[string]any))
 	require.NoError(t, err)
 
 	detailedTemplate := mapstr.M{"template": detailed}
@@ -232,7 +231,7 @@ func TestGetIndexPatterns(t *testing.T) {
 			name: "should throw error when missing index_patterns",
 			template: IndexTemplate{
 				Name:          "test-index-template",
-				IndexTemplate: map[string]interface{}{},
+				IndexTemplate: map[string]any{},
 			},
 			want:        nil,
 			expectError: `index_patterns not found in template "test-index-template"`,
@@ -241,7 +240,7 @@ func TestGetIndexPatterns(t *testing.T) {
 			name: "should throw error when index_patterns is not a slice",
 			template: IndexTemplate{
 				Name: "wrongtype",
-				IndexTemplate: map[string]interface{}{
+				IndexTemplate: map[string]any{
 					"index_patterns": "not-a-slice",
 				},
 			},
@@ -252,8 +251,8 @@ func TestGetIndexPatterns(t *testing.T) {
 			name: "should throw error when index_patterns contains non-string element",
 			template: IndexTemplate{
 				Name: "nonstring",
-				IndexTemplate: map[string]interface{}{
-					"index_patterns": []interface{}{"valid", 123},
+				IndexTemplate: map[string]any{
+					"index_patterns": []any{"valid", 123},
 				},
 			},
 			want:        nil,
@@ -263,8 +262,8 @@ func TestGetIndexPatterns(t *testing.T) {
 			name: "should return a valid index_patterns",
 			template: IndexTemplate{
 				Name: "valid",
-				IndexTemplate: map[string]interface{}{
-					"index_patterns": []interface{}{"log-*", "metrics-*"},
+				IndexTemplate: map[string]any{
+					"index_patterns": []any{"log-*", "metrics-*"},
 				},
 			},
 			want:        []string{"log-*", "metrics-*"},

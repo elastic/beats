@@ -69,7 +69,7 @@ func New(name string, opts Options, logger *logp.Logger) (*PersistentCache, erro
 
 // Put writes the given key and value to the map replacing any
 // existing value if it exists.
-func (c *PersistentCache) Put(k string, v interface{}) error {
+func (c *PersistentCache) Put(k string, v any) error {
 	return c.PutWithTimeout(k, v, 0)
 }
 
@@ -77,7 +77,7 @@ func (c *PersistentCache) Put(k string, v interface{}) error {
 // existing value if it exists.
 // The cache expiration time will be overwritten by timeout of the key being
 // inserted.
-func (c *PersistentCache) PutWithTimeout(k string, v interface{}, timeout time.Duration) error {
+func (c *PersistentCache) PutWithTimeout(k string, v any, timeout time.Duration) error {
 	d, err := c.codec.Encode(v)
 	if err != nil {
 		return fmt.Errorf("encoding item to store in cache: %w", err)
@@ -90,7 +90,7 @@ func (c *PersistentCache) PutWithTimeout(k string, v interface{}, timeout time.D
 
 // Get the current value associated with a key or nil if the key is not
 // present. The last access time of the element is updated.
-func (c *PersistentCache) Get(k string, v interface{}) error {
+func (c *PersistentCache) Get(k string, v any) error {
 	d, err := c.store.Get([]byte(k))
 	if err != nil {
 		return err

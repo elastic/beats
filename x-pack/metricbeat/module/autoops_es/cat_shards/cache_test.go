@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !integration
-// +build !integration
 
 package cat_shards
 
@@ -58,6 +57,11 @@ func getShard(nodeId string, nodeName string, shardId int32, primary bool, state
 	get_missing_time := []int64{100, 101, 102, 103}
 	get_missing_total := []int64{110, 111, 112, 113}
 
+	bulk_total_size_in_bytes := []int64{200, 201, 202, 203}
+	bulk_total_operations := []int64{300, 301, 302, 303}
+	total_data_set_size_in_bytes := []int64{10, 11, 12, 13}
+	dense_vector_count := []int64{0, 0, 0, 0}
+
 	shard.docs = &docs[index]
 	shard.store = &store[index]
 	shard.segments_count = &segments_count[index]
@@ -70,6 +74,10 @@ func getShard(nodeId string, nodeName string, shardId int32, primary bool, state
 	shard.merges_total_time = &merges_total_time[index]
 	shard.get_missing_time = &get_missing_time[index]
 	shard.get_missing_total = &get_missing_total[index]
+	shard.bulk_total_size_in_bytes = &bulk_total_size_in_bytes[index]
+	shard.bulk_total_operations = &bulk_total_operations[index]
+	shard.total_data_set_size_in_bytes = &total_data_set_size_in_bytes[index]
+	shard.dense_vector_count = &dense_vector_count[index]
 
 	return shard
 }
@@ -118,6 +126,7 @@ func getIndexMetadata() map[string]IndexMetadata {
 	return map[string]IndexMetadata{
 		"my-index": {
 			aliases:    []string{"alias1", "alias2"},
+			dataStream: "data-stream1",
 			attributes: []string{"attribute1"},
 			indexType:  "index",
 			hidden:     false,
@@ -161,6 +170,7 @@ func TestEnrichNodeIndexShardsWithoutCache(t *testing.T) {
 		require.Nil(t, nodeIndexShards.SearchLatencyInMillis)
 		// unknown index metadata
 		require.Nil(t, nodeIndexShards.Aliases)
+		require.Equal(t, "", nodeIndexShards.DataStream)
 		require.Nil(t, nodeIndexShards.Attributes)
 		require.Nil(t, nodeIndexShards.IndexType)
 		require.Nil(t, nodeIndexShards.IsHidden)
@@ -193,6 +203,7 @@ func TestEnrichNodeIndexShardsWithoutCachedValues(t *testing.T) {
 		require.Nil(t, nodeIndexShards.SearchLatencyInMillis)
 		// unknown index metadata
 		require.Nil(t, nodeIndexShards.Aliases)
+		require.Equal(t, "", nodeIndexShards.DataStream)
 		require.Nil(t, nodeIndexShards.Attributes)
 		require.Nil(t, nodeIndexShards.IndexType)
 		require.Nil(t, nodeIndexShards.IsHidden)
@@ -242,6 +253,7 @@ func TestEnrichNodeIndexShardsWithCachedValues(t *testing.T) {
 		metadata := indexMetadata[nodeIndexShards.Index]
 
 		require.ElementsMatch(t, metadata.aliases, nodeIndexShards.Aliases)
+		require.Equal(t, metadata.dataStream, nodeIndexShards.DataStream)
 		require.ElementsMatch(t, metadata.attributes, nodeIndexShards.Attributes)
 		require.Equal(t, metadata.indexType, *nodeIndexShards.IndexType)
 		require.Equal(t, metadata.hidden, *nodeIndexShards.IsHidden)
@@ -320,6 +332,7 @@ func TestEnrichNodeIndexShardsWithCachedValuesWithNoChange(t *testing.T) {
 		metadata := indexMetadata[nodeIndexShards.Index]
 
 		require.ElementsMatch(t, metadata.aliases, nodeIndexShards.Aliases)
+		require.Equal(t, metadata.dataStream, nodeIndexShards.DataStream)
 		require.ElementsMatch(t, metadata.attributes, nodeIndexShards.Attributes)
 		require.Equal(t, metadata.indexType, *nodeIndexShards.IndexType)
 		require.Equal(t, metadata.hidden, *nodeIndexShards.IsHidden)
@@ -387,6 +400,7 @@ func TestEnrichNodeIndexShardsWithCachedValuesWithHoles(t *testing.T) {
 		metadata := indexMetadata[nodeIndexShards.Index]
 
 		require.ElementsMatch(t, metadata.aliases, nodeIndexShards.Aliases)
+		require.Equal(t, metadata.dataStream, nodeIndexShards.DataStream)
 		require.ElementsMatch(t, metadata.attributes, nodeIndexShards.Attributes)
 		require.Equal(t, metadata.indexType, *nodeIndexShards.IndexType)
 		require.Equal(t, metadata.hidden, *nodeIndexShards.IsHidden)
@@ -445,6 +459,7 @@ func TestEnrichNodeIndexShardsWithCachedValuesWithNewNodeAndIndex(t *testing.T) 
 			metadata := indexMetadata[nodeIndexShards.Index]
 
 			require.ElementsMatch(t, metadata.aliases, nodeIndexShards.Aliases)
+			require.Equal(t, metadata.dataStream, nodeIndexShards.DataStream)
 			require.ElementsMatch(t, metadata.attributes, nodeIndexShards.Attributes)
 			require.Equal(t, metadata.indexType, *nodeIndexShards.IndexType)
 			require.Equal(t, metadata.hidden, *nodeIndexShards.IsHidden)
@@ -462,6 +477,7 @@ func TestEnrichNodeIndexShardsWithCachedValuesWithNewNodeAndIndex(t *testing.T) 
 			require.Nil(t, nodeIndexShards.SearchLatencyInMillis)
 			// unknown index metadata
 			require.Nil(t, nodeIndexShards.Aliases)
+			require.Equal(t, "", nodeIndexShards.DataStream)
 			require.Nil(t, nodeIndexShards.Attributes)
 			require.Nil(t, nodeIndexShards.IndexType)
 			require.Nil(t, nodeIndexShards.IsHidden)
@@ -573,6 +589,7 @@ func TestConvertToNodeIndexShardsUncached(t *testing.T) {
 	require.Equal(t, YELLOW, *yellowNode2.IndexStatus)
 	require.Nil(t, yellowNode2.IndexType)
 	require.Nil(t, yellowNode2.Aliases)
+	require.Equal(t, "", yellowNode2.DataStream)
 	require.Nil(t, yellowNode2.Attributes)
 	require.Nil(t, yellowNode2.IsHidden)
 	require.Nil(t, yellowNode2.IsOpen)
@@ -631,6 +648,7 @@ func TestConvertToNodeIndexShardsUncached(t *testing.T) {
 	require.Equal(t, RED, *redIndex.IndexStatus)
 	require.Nil(t, redIndex.IndexType)
 	require.Nil(t, redIndex.Aliases)
+	require.Equal(t, "", redIndex.DataStream)
 	require.Nil(t, redIndex.Attributes)
 	require.Nil(t, redIndex.IsHidden)
 	require.Nil(t, redIndex.IsOpen)
@@ -705,6 +723,7 @@ func TestConvertToNodeIndexShardsWithCache(t *testing.T) {
 	require.Equal(t, GREEN, *myIndexNode1.IndexStatus)
 	require.Equal(t, "index", *myIndexNode1.IndexType)
 	require.ElementsMatch(t, []string{"alias1", "alias2"}, myIndexNode1.Aliases)
+	require.Equal(t, "data-stream1", myIndexNode1.DataStream)
 	require.ElementsMatch(t, []string{"attribute1"}, myIndexNode1.Attributes)
 	require.Equal(t, false, *myIndexNode1.IsHidden)
 	require.Equal(t, true, *myIndexNode1.IsOpen)
@@ -763,6 +782,7 @@ func TestConvertToNodeIndexShardsWithCache(t *testing.T) {
 	require.Equal(t, GREEN, *myIndexNode3.IndexStatus)
 	require.Equal(t, "index", *myIndexNode3.IndexType)
 	require.ElementsMatch(t, []string{"alias1", "alias2"}, myIndexNode3.Aliases)
+	require.Equal(t, "data-stream1", myIndexNode3.DataStream)
 	require.ElementsMatch(t, []string{"attribute1"}, myIndexNode3.Attributes)
 	require.Equal(t, false, *myIndexNode3.IsHidden)
 	require.Equal(t, true, *myIndexNode3.IsOpen)
@@ -810,4 +830,144 @@ func TestConvertToNodeIndexShardsWithCache(t *testing.T) {
 	require.Nil(t, myIndexNode3.SearchLatencyInMillis)
 	require.Nil(t, myIndexNode3.SearchRatePerSecond)
 	require.Nil(t, myIndexNode3.TimestampDiff)
+}
+
+func getNodeIndexShardsWithIngestBulk() map[string]NodeIndexShards {
+	docsCount := []int64{1, 2}
+	sizeInBytes := []int64{10, 11}
+	bulkTotalSizeInBytes := []int64{200, 201}
+	bulkTotalOperations := []int64{300, 301}
+
+	base := getNodeIndexShards()
+
+	n1 := base["my-index-node_id-node1"]
+	n1.DocsCount = &docsCount[0]
+	n1.SizeInBytes = &sizeInBytes[0]
+	n1.BulkTotalSizeInBytes = &bulkTotalSizeInBytes[0]
+	n1.BulkTotalOperations = &bulkTotalOperations[0]
+	base["my-index-node_id-node1"] = n1
+
+	n2 := base["my-index-node_id-node2"]
+	n2.DocsCount = &docsCount[1]
+	n2.SizeInBytes = &sizeInBytes[1]
+	n2.BulkTotalSizeInBytes = &bulkTotalSizeInBytes[1]
+	n2.BulkTotalOperations = &bulkTotalOperations[1]
+	base["my-index-node_id-node2"] = n2
+
+	return base
+}
+
+func TestEnrichNodeIndexShardsIngestAndBulkRatesWithoutCache(t *testing.T) {
+	clearCache()
+
+	nodeIndexShardsMap := getNodeIndexShardsWithIngestBulk()
+	nodeIndexShardsList := enrichNodeIndexShards(nodeIndexShardsMap, map[string]IndexMetadata{})
+
+	for _, nodeIndexShards := range nodeIndexShardsList {
+		require.Nil(t, nodeIndexShards.IngestDocsPerSecond)
+		require.Nil(t, nodeIndexShards.IngestBytesPerSecond)
+		require.Nil(t, nodeIndexShards.BulkBytesPerSecond)
+		require.Nil(t, nodeIndexShards.BulkOperationsPerSecond)
+	}
+}
+
+func TestEnrichNodeIndexShardsIngestAndBulkRatesWithCachedValues(t *testing.T) {
+	// 10s ago cache
+	initCache(getNodeIndexShardsWithIngestBulk(), 10)
+
+	nodeIndexShardsMap := getNodeIndexShardsWithIngestBulk()
+
+	for key, nodeIndexShards := range nodeIndexShardsMap {
+		*nodeIndexShards.DocsCount += 10             // delta=10 → 10/10 = 1/s
+		*nodeIndexShards.SizeInBytes += 20           // delta=20 → 20/10 = 2/s
+		*nodeIndexShards.BulkTotalSizeInBytes += 100 // delta=100 → 100/10 = 10/s
+		*nodeIndexShards.BulkTotalOperations += 50   // delta=50 → 50/10 = 5/s
+
+		nodeIndexShardsMap[key] = nodeIndexShards
+	}
+
+	nodeIndexShardsList := enrichNodeIndexShards(nodeIndexShardsMap, map[string]IndexMetadata{})
+
+	for _, nodeIndexShards := range nodeIndexShardsList {
+		require.EqualValues(t, 1, *nodeIndexShards.IngestDocsPerSecond)
+		require.EqualValues(t, 2, *nodeIndexShards.IngestBytesPerSecond)
+		require.EqualValues(t, 10, *nodeIndexShards.BulkBytesPerSecond)
+		require.EqualValues(t, 5, *nodeIndexShards.BulkOperationsPerSecond)
+	}
+}
+
+func TestEnrichNodeIndexShardsIngestAndBulkRatesWithNoChange(t *testing.T) {
+	// 10s ago cache — identical values, expect zero rates
+	initCache(getNodeIndexShardsWithIngestBulk(), 10)
+
+	nodeIndexShardsMap := getNodeIndexShardsWithIngestBulk()
+	nodeIndexShardsList := enrichNodeIndexShards(nodeIndexShardsMap, map[string]IndexMetadata{})
+
+	for _, nodeIndexShards := range nodeIndexShardsList {
+		require.EqualValues(t, 0, *nodeIndexShards.IngestDocsPerSecond)
+		require.EqualValues(t, 0, *nodeIndexShards.IngestBytesPerSecond)
+		require.EqualValues(t, 0, *nodeIndexShards.BulkBytesPerSecond)
+		require.EqualValues(t, 0, *nodeIndexShards.BulkOperationsPerSecond)
+	}
+}
+
+func TestEnrichNodeIndexShardsIngestAndBulkRatesWithNewNode(t *testing.T) {
+	// 10s ago cache with only node1 — node2 is a cache miss
+	initCache(getNodeIndexShardsWithIngestBulk(), 10)
+
+	nodeIndexShardsMap := getNodeIndexShardsWithIngestBulk()
+
+	for key, nodeIndexShards := range nodeIndexShardsMap {
+		*nodeIndexShards.DocsCount += 10
+		*nodeIndexShards.SizeInBytes += 20
+		*nodeIndexShards.BulkTotalSizeInBytes += 100
+		*nodeIndexShards.BulkTotalOperations += 50
+		nodeIndexShardsMap[key] = nodeIndexShards
+	}
+
+	newNode := getNodeIndexShardsWithIngestBulk()["my-index-node_id-node2"]
+	newNode.Index = "my-other-index"
+	newNode.NodeId = "node3"
+	newNode.IndexNode = "my-other-index-node_id-node3"
+	nodeIndexShardsMap["my-other-index-node_id-node3"] = newNode
+
+	nodeIndexShardsList := enrichNodeIndexShards(nodeIndexShardsMap, map[string]IndexMetadata{})
+
+	for _, nodeIndexShards := range nodeIndexShardsList {
+		if nodeIndexShards.NodeId != "node3" {
+			require.EqualValues(t, 1, *nodeIndexShards.IngestDocsPerSecond)
+			require.EqualValues(t, 2, *nodeIndexShards.IngestBytesPerSecond)
+			require.EqualValues(t, 10, *nodeIndexShards.BulkBytesPerSecond)
+			require.EqualValues(t, 5, *nodeIndexShards.BulkOperationsPerSecond)
+		} else {
+			require.Nil(t, nodeIndexShards.IngestDocsPerSecond)
+			require.Nil(t, nodeIndexShards.IngestBytesPerSecond)
+			require.Nil(t, nodeIndexShards.BulkBytesPerSecond)
+			require.Nil(t, nodeIndexShards.BulkOperationsPerSecond)
+		}
+	}
+}
+
+func TestEnrichNodeIndexShardsGaugeDecreaseWritesNilIngestRate(t *testing.T) {
+	initCache(getNodeIndexShardsWithIngestBulk(), 10)
+
+	nodeIndexShardsMap := getNodeIndexShardsWithIngestBulk()
+	for key, nodeIndexShards := range nodeIndexShardsMap {
+		*nodeIndexShards.DocsCount -= 5              // gauge decrease → not written (nil)
+		*nodeIndexShards.SizeInBytes -= 3            // gauge decrease → not written (nil)
+		*nodeIndexShards.BulkTotalSizeInBytes += 100 // counter → still reports rate
+		*nodeIndexShards.BulkTotalOperations += 50   // counter → still reports rate
+		nodeIndexShardsMap[key] = nodeIndexShards
+	}
+
+	nodeIndexShardsList := enrichNodeIndexShards(nodeIndexShardsMap, map[string]IndexMetadata{})
+
+	for _, nodeIndexShards := range nodeIndexShardsList {
+		// gauge-backed rates are nil on decrease (not written)
+		require.Nil(t, nodeIndexShards.IngestDocsPerSecond)
+		require.Nil(t, nodeIndexShards.IngestBytesPerSecond)
+		// counter-backed rates still report correctly
+		require.EqualValues(t, 10, *nodeIndexShards.BulkBytesPerSecond)
+		require.EqualValues(t, 5, *nodeIndexShards.BulkOperationsPerSecond)
+	}
 }

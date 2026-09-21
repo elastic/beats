@@ -43,7 +43,7 @@ const (
 //	+---------+----------------------------------------+
 //	|  Map    | nested fields found in option records. |
 //	+---------+----------------------------------------+
-type Map map[string]interface{}
+type Map map[string]any
 
 // Record represents a NetFlow record extracted from a NetFlow packet.
 type Record struct {

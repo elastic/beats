@@ -35,10 +35,11 @@ func TestConfigDefault(t *testing.T) {
 		Fields:    mapstr.M{},
 		Timestamp: time.Now(),
 	}
-	testConfig, err := cfg.NewConfigFrom(map[string]interface{}{})
+	testConfig, err := cfg.NewConfigFrom(map[string]any{})
 	assert.NoError(t, err)
 
 	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
 
 	newEvent, err := p.Run(event)
 	assert.NoError(t, err)
@@ -57,10 +58,11 @@ func TestOverwriteFalse(t *testing.T) {
 		Fields:    mapstr.M{"observer": mapstr.M{"foo": "bar"}},
 		Timestamp: time.Now(),
 	}
-	testConfig, err := cfg.NewConfigFrom(map[string]interface{}{})
+	testConfig, err := cfg.NewConfigFrom(map[string]any{})
 	require.NoError(t, err)
 
 	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
 
 	newEvent, err := p.Run(event)
 	require.NoError(t, err)
@@ -75,10 +77,11 @@ func TestOverwriteTrue(t *testing.T) {
 		Fields:    mapstr.M{"observer": mapstr.M{"foo": "bar"}},
 		Timestamp: time.Now(),
 	}
-	testConfig, err := cfg.NewConfigFrom(map[string]interface{}{"overwrite": true})
+	testConfig, err := cfg.NewConfigFrom(map[string]any{"overwrite": true})
 	require.NoError(t, err)
 
 	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
 
 	newEvent, err := p.Run(event)
 	require.NoError(t, err)
@@ -93,12 +96,13 @@ func TestConfigNetInfoDisabled(t *testing.T) {
 		Fields:    mapstr.M{},
 		Timestamp: time.Now(),
 	}
-	testConfig, err := cfg.NewConfigFrom(map[string]interface{}{
+	testConfig, err := cfg.NewConfigFrom(map[string]any{
 		"netinfo.enabled": false,
 	})
 	assert.NoError(t, err)
 
 	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
 
 	newEvent, err := p.Run(event)
 	assert.NoError(t, err)
@@ -118,7 +122,7 @@ func TestConfigGeoEnabled(t *testing.T) {
 		Timestamp: time.Now(),
 	}
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"geo.name":             "yerevan-am",
 		"geo.location":         "40.177200, 44.503490",
 		"geo.continent_name":   "Asia",
@@ -144,13 +148,60 @@ func TestConfigGeoEnabled(t *testing.T) {
 	assert.Len(t, eventGeoField, len(config))
 }
 
+func TestHostnameOverride(t *testing.T) {
+	beat.SetHostnameOverride("Override-Host")
+	t.Cleanup(func() { beat.SetHostnameOverride("") })
+
+	testConfig, err := cfg.NewConfigFrom(map[string]any{})
+	require.NoError(t, err)
+
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	newEvent, err := p.Run(&beat.Event{Fields: mapstr.M{}})
+	require.NoError(t, err)
+
+	v, err := newEvent.GetValue("observer.hostname")
+	require.NoError(t, err)
+	assert.Equal(t, "Override-Host", v, "observer.hostname should preserve the supplied casing")
+}
+
+func TestHostnameOverrideAppliedOnCacheRefresh(t *testing.T) {
+	// Populate cache with no override set.
+	testConfig, err := cfg.NewConfigFrom(map[string]any{"cache.ttl": "1h"})
+	require.NoError(t, err)
+
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+	primed, err := p.Run(&beat.Event{Fields: mapstr.M{}})
+	require.NoError(t, err)
+	osHostname, err := primed.GetValue("observer.hostname")
+	require.NoError(t, err)
+	require.NotEmpty(t, osHostname, "cache should be primed with the OS hostname")
+
+	// Now set the override and force cache expiry.
+	beat.SetHostnameOverride("override-host")
+	t.Cleanup(func() { beat.SetHostnameOverride("") })
+	typedProc, ok := p.(*observerMetadata)
+	require.True(t, ok)
+	// No goroutine runs the processor yet, so the mutex around lastUpdate is not needed here.
+	typedProc.lastUpdate.Time = time.Time{}
+
+	newEvent, err := p.Run(&beat.Event{Fields: mapstr.M{}})
+	require.NoError(t, err)
+
+	v, err := newEvent.GetValue("observer.hostname")
+	require.NoError(t, err)
+	assert.Equal(t, "override-host", v)
+}
+
 func TestConfigGeoDisabled(t *testing.T) {
 	event := &beat.Event{
 		Fields:    mapstr.M{},
 		Timestamp: time.Now(),
 	}
 
-	config := map[string]interface{}{}
+	config := map[string]any{}
 
 	testConfig, err := cfg.NewConfigFrom(config)
 	require.NoError(t, err)

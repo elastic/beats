@@ -60,6 +60,37 @@ type StdMonitorFields struct {
 	BadConfig bool
 }
 
+// IsSyntheticsType reports whether the monitor runs via the embedded synthetics
+// Node.js agent (browser, api) rather than a Go-side lightweight check.
+func (s StdMonitorFields) IsSyntheticsType() bool {
+	return IsSyntheticsType(s.Type)
+}
+
+// IsSyntheticsType is the string-based variant of (StdMonitorFields).IsSyntheticsType.
+// It matches the canonical plugin names and every registered alias, since a
+// monitor's configured `type` may be any of them (see plugin.Register calls in
+// the browser and api packages).
+func IsSyntheticsType(monitorType string) bool {
+	switch monitorType {
+	case "browser", "synthetic", "synthetics/synthetic":
+		return true
+	default:
+		return IsAPIType(monitorType)
+	}
+}
+
+// IsAPIType reports whether the monitor is the `api` synthetics type. It matches
+// the canonical name and every registered alias, since a monitor's configured
+// `type` may be any of them (see plugin.RegisterWithHashFunc in the api package).
+func IsAPIType(monitorType string) bool {
+	switch monitorType {
+	case "api", "synthetics/api":
+		return true
+	default:
+		return false
+	}
+}
+
 func ConfigToStdMonitorFields(conf *config.C) (StdMonitorFields, error) {
 	sFields := StdMonitorFields{Enabled: true, MaxAttempts: 1}
 
@@ -81,7 +112,7 @@ func ConfigToStdMonitorFields(conf *config.C) (StdMonitorFields, error) {
 	}
 
 	for _, mw := range sFields.MaintenanceWindows {
-		parsed, err := mw.Parse(true)
+		parsed, err := mw.Parse()
 		if err != nil {
 			return StdMonitorFields{}, fmt.Errorf("could not parse maintenance window for monitor (id:%s name:%s): %w", sFields.ID, sFields.Name, err)
 		}

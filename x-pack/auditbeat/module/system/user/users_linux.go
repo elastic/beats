@@ -225,7 +225,7 @@ func readShadowFile() (map[string]shadowFileEntry, error) {
 // multiRoundHash performs 10 rounds of SHA-512 hashing.
 func multiRoundHash(s string) []byte {
 	hash := sha512.Sum512([]byte(s))
-	for i := 0; i < 9; i++ {
+	for range 9 {
 		hash = sha512.Sum512(hash[:])
 	}
 	return hash[:]

@@ -48,6 +48,8 @@ func minimalProvider(cfg *config.C, _ *logp.Logger) (entcollect.Provider, time.D
 
 		SyncInterval   time.Duration `config:"sync_interval"`
 		UpdateInterval time.Duration `config:"update_interval"`
+
+		ScratchDir string `config:"scratch_dir"`
 	}
 
 	d := ecentraid.DefaultConfig()
@@ -83,6 +85,7 @@ func minimalProvider(cfg *config.C, _ *logp.Logger) (entcollect.Provider, time.D
 		SelectDevices:  lc.Select.Devices,
 		SyncInterval:   lc.SyncInterval,
 		UpdateInterval: lc.UpdateInterval,
+		ScratchDir:     lc.ScratchDir,
 	}
 
 	if err := ec.Validate(); err != nil {

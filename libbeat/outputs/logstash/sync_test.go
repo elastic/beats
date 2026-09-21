@@ -86,9 +86,7 @@ func newClientTestDriver(client outputs.NetworkClient) *testSyncDriver {
 		returns: nil,
 	}
 
-	driver.wg.Add(1)
-	go func() {
-		defer driver.wg.Done()
+	driver.wg.Go(func() {
 
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
@@ -110,7 +108,7 @@ func newClientTestDriver(client outputs.NetworkClient) *testSyncDriver {
 				driver.returns = append(driver.returns, testClientReturn{cmd.batch, err})
 			}
 		}
-	}()
+	})
 
 	return driver
 }

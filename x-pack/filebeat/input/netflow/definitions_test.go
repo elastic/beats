@@ -90,7 +90,7 @@ func TestLoadFieldDefinitions(t *testing.T) {
 		},
 	} {
 		t.Run(testCase.title, func(t *testing.T) {
-			var tree interface{}
+			var tree any
 			if err := yaml.Unmarshal([]byte(testCase.yaml), &tree); err != nil {
 				t.Fatal(err)
 			}

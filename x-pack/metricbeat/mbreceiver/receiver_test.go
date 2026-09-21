@@ -104,8 +104,8 @@ func TestNewReceiver(t *testing.T) {
 				return assert.NotContains(c, logs["r1"][0].Flatten(), "host.architecture")
 			}, "failed to check processors loaded")
 			assert.Condition(c, func() bool {
-				metricsStarted := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s")
-				return assert.NotEmpty(t, metricsStarted.All(), "metrics logging not started")
+				metricsSkipped := zapLogs.FilterMessageSnippet("Skipping metrics logging")
+				return assert.NotEmpty(t, metricsSkipped.All(), "metric reporter did not initialize")
 			}, "failed to check metrics logging")
 		},
 	})
@@ -214,10 +214,10 @@ func TestMultipleReceivers(t *testing.T) {
 			r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r2"))
 			assert.Equal(c, 1, r2StartLogs.Len(), "r2 should have a single start log")
 
-			r1StartMetricsLogs := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r1"))
-			assert.Equalf(c, 1, r1StartMetricsLogs.Len(), "r1 should have a single start metrircs logging every 30s")
-			r2StartMetricsLogs := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r1"))
-			assert.Equalf(c, 1, r2StartMetricsLogs.Len(), "r2 should have a single start metrircs logging every 30s")
+			r1StartMetricsLogs := zapLogs.FilterMessageSnippet("Skipping metrics logging").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r1"))
+			assert.Equalf(c, 1, r1StartMetricsLogs.Len(), "r1 should have a single skipping metrics logging entry")
+			r2StartMetricsLogs := zapLogs.FilterMessageSnippet("Skipping metrics logging").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r1"))
+			assert.Equalf(c, 1, r2StartMetricsLogs.Len(), "r2 should have a single skipping metrics logging entry")
 
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
@@ -325,7 +325,7 @@ func BenchmarkFactory(b *testing.B) {
 	tmpDir := b.TempDir()
 
 	cfg := &Config{
-		Beatconfig: map[string]interface{}{
+		Beatconfig: map[string]any{
 			"metricbeat": map[string]any{
 				"modules": []map[string]any{
 					{

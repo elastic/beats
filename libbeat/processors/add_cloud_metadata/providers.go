@@ -90,7 +90,7 @@ func providersFilter(configList providerList, allProviders map[string]provider) 
 		// this environment variable as a workaround in case the
 		// configured/default providers misbehave.
 		configList = nil
-		for _, name := range strings.Split(v, ",") {
+		for name := range strings.SplitSeq(v, ",") {
 			configList = append(configList, strings.TrimSpace(name))
 		}
 		if len(configList) == 0 {
@@ -160,27 +160,27 @@ func (p *addCloudMetadata) fetchMetadata(ctx context.Context) *result {
 		p.logger.Debugf("add_cloud_metadata: fetchMetadata ran for %v", time.Since(start))
 	}()
 
-	// Create HTTP client with our timeouts and keep-alive disabled.
-	client := http.Client{
-		Timeout: p.initData.timeout,
-		Transport: &http.Transport{
-			DisableKeepAlives: true,
-			DialContext: (&net.Dialer{
-				Timeout:   p.initData.timeout,
-				KeepAlive: 0,
-			}).DialContext,
-			TLSClientConfig: p.initData.tlsConfig.ToConfig(),
-		},
-	}
-
 	// Create context to enable explicit cancellation of the http requests.
 	ctx, cancel := context.WithTimeout(ctx, p.initData.timeout)
 	defer cancel()
 
 	results := make(chan result)
 	for _, fetcher := range p.initData.fetchers {
-		fetcher := fetcher
 		go func() {
+			// Create an HTTP client with our timeouts and keep-alive disabled. We cannot share the client: net/http
+			// mutates the Transport's *tls.Config on first use, racing the concurrent fetchers.
+			client := http.Client{
+				Timeout: p.initData.timeout,
+				Transport: &http.Transport{
+					DisableKeepAlives: true,
+					DialContext: (&net.Dialer{
+						Timeout:   p.initData.timeout,
+						KeepAlive: 0,
+					}).DialContext,
+					TLSClientConfig: p.initData.tlsConfig.ToConfig(),
+				},
+			}
+
 			select {
 			case <-ctx.Done():
 			case results <- fetcher.fetchMetadata(ctx, client, p.logger):

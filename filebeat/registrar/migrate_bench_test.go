@@ -23,7 +23,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -101,7 +100,7 @@ func tempDir(t testing.TB) string {
 		t.Fatal(err)
 	}
 
-	path, err := ioutil.TempDir(cwd, "")
+	path, err := os.MkdirTemp(cwd, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -121,12 +120,12 @@ func mkDir(t testing.TB, path string) {
 }
 
 func clearDir(t testing.TB, path string) {
-	old, err := ioutil.ReadDir(path)
+	old, err := os.ReadDir(path)
 	if err != nil {
 		t.Fatal(err)
 	}
 	for _, info := range old {
-		if err := os.RemoveAll(info.Name()); err != nil {
+		if err := os.RemoveAll(filepath.Join(path, info.Name())); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -134,7 +133,7 @@ func clearDir(t testing.TB, path string) {
 
 func writeFile(t testing.TB, path string, contents []byte) {
 	t.Helper()
-	err := ioutil.WriteFile(path, contents, 0o600)
+	err := os.WriteFile(path, contents, 0o600)
 	if err != nil {
 		t.Fatal(err)
 	}

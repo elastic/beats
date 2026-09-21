@@ -222,11 +222,11 @@ func getVM(vmName string, vms []VmResource) (VmResource, bool) {
 
 // Helper function to generate a string key for the dimensions
 func getDimensionKey(dimensions []Dimension) string {
-	var dimensionKey string
+	var dimensionKey strings.Builder
 	for _, dimension := range dimensions {
-		dimensionKey += dimension.Name + ","
+		dimensionKey.WriteString(dimension.Name + ",")
 	}
-	return dimensionKey
+	return dimensionKey.String()
 }
 
 // Function to get the resource IDs from the batch of metrics

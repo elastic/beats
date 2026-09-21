@@ -178,7 +178,7 @@ func monitoringDocExists(t *testing.T, monitoringType string) bool {
 
 // getMonitoringDoc retrieves a monitoring document of the given type and returns
 // its _source as a map.
-func getMonitoringDoc(t *testing.T, monitoringType string) map[string]interface{} {
+func getMonitoringDoc(t *testing.T, monitoringType string) map[string]any {
 	t.Helper()
 	monURL := getMonitoringESURL(t)
 	monURL.Path = "/.monitoring-beats-*/_search"
@@ -200,7 +200,7 @@ func getMonitoringDoc(t *testing.T, monitoringType string) map[string]interface{
 	var raw struct {
 		Hits struct {
 			Hits []struct {
-				Source map[string]interface{} `json:"_source"`
+				Source map[string]any `json:"_source"`
 			} `json:"hits"`
 		} `json:"hits"`
 	}

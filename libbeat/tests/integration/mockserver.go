@@ -27,9 +27,14 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
 
-	"github.com/elastic/elastic-agent-client/v7/pkg/client"
-	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	// The Elastic Agent V2 control protocol cannot be mocked without the
+	// Elastic licensed client. This package only provides test helpers and is
+	// never linked into a shipped Apache 2.0 licensed binary. Removing the
+	// dependency requires reimplementing the protocol, see
+	// https://github.com/elastic/beats/pull/48353.
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"      //nolint:depguard // test-only mock of the Elastic Agent, see comment above
+	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock" //nolint:depguard // test-only mock of the Elastic Agent, see comment above
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"       //nolint:depguard // test-only mock of the Elastic Agent, see comment above
 )
 
 // unitKey is used to identify a unique unit in a map
@@ -111,7 +116,7 @@ func doesStateMatch(
 	return observed.FeaturesIdx == expected.FeaturesIdx
 }
 
-func RequireNewStruct(t *testing.T, v map[string]interface{}) *structpb.Struct {
+func RequireNewStruct(t *testing.T, v map[string]any) *structpb.Struct {
 	str, err := structpb.NewStruct(v)
 	if err != nil {
 		require.NoError(t, err, "could not convert map[string]interface{} into structpb")

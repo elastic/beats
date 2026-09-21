@@ -22,9 +22,6 @@ package ech
 import (
 	"debug/buildinfo"
 	"os"
-	"os/exec"
-	"runtime"
-	"strings"
 	"testing"
 	"time"
 
@@ -34,6 +31,7 @@ import (
 	"github.com/elastic/go-elasticsearch/v8"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v7/testing/testutils"
 )
 
 // VerifyEnvVars ensures that the env vars to connect to ES are set, and that the ES_HOST starts with https
@@ -55,38 +53,9 @@ func VerifyEnvVars(t *testing.T) {
 func VerifyFIPSBinary(t *testing.T, binaryPath string) {
 	t.Helper()
 	info, err := buildinfo.ReadFile(binaryPath)
-	assert.NoError(t, err)
+	require.NoError(t, err, "unable to read build info from %s", binaryPath)
 
-	var checkLinks, foundTags, foundExperiment bool
-	for _, setting := range info.Settings {
-		switch setting.Key {
-		case "-tags":
-			foundTags = true
-			assert.Contains(t, setting.Value, "requirefips")
-			continue
-		case "GOEXPERIMENT":
-			foundExperiment = true
-			assert.Contains(t, setting.Value, "systemcrypto")
-			continue
-		case "-ldflags":
-			if !strings.Contains(setting.Value, "-s") {
-				checkLinks = true
-			}
-		}
-	}
-
-	assert.True(t, foundTags, "did not find build tags")
-	assert.True(t, foundExperiment, "did not find GOEXPERIMENT")
-
-	if checkLinks && runtime.GOOS == "linux" {
-		t.Log("Binary is not stripped, checking for OpenSSL in the symbols table.")
-		output, err := exec.CommandContext(t.Context(), "go", "tool", "nm", binaryPath).Output()
-		assert.NoError(t, err, "unable to run go tool nm")
-		assert.Contains(t, output, "OpenSSL_version", "Unable to find OpenSSL_version in symbols link")
-	}
-	if t.Failed() {
-		t.Fatal("Unable to verify FIPS binary.") // stop test if non-FIPS binary is used.
-	}
+	testutils.RequireFIPSBuildInfo(t, info.Settings)
 }
 
 // RunSmokeTest runs the beat on binaryPath with the passed config, and ensures that data ends up in Elasticsearch.

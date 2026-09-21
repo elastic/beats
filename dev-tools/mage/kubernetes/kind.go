@@ -24,6 +24,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -120,13 +121,16 @@ nodes:
 		args = append(args, "--image", fmt.Sprintf("kindest/node:%s", kubeVersion))
 	}
 
-	_, err = sh.Exec(
-		map[string]string{},
-		stdOut,
-		stdErr,
-		"kind",
-		args...,
-	)
+	err = withGODEBUGWithoutFIPS140(func() error {
+		_, err := sh.Exec(
+			map[string]string{},
+			stdOut,
+			stdErr,
+			"kind",
+			args...,
+		)
+		return err
+	})
 	if err != nil {
 		return err
 	}
@@ -147,22 +151,42 @@ func (m *KindIntegrationTestStep) Teardown(env map[string]string) error {
 	name, created := env["KIND_CLUSTER"]
 	_, keepUp := os.LookupEnv("KIND_SKIP_DELETE")
 	if created && !keepUp {
-		_, err := sh.Exec(
-			env,
-			stdOut,
-			stdErr,
-			"kind",
-			"delete",
-			"cluster",
-			"--name",
-			name,
-		)
+		err := withGODEBUGWithoutFIPS140(func() error {
+			_, err := sh.Exec(
+				env,
+				stdOut,
+				stdErr,
+				"kind",
+				"delete",
+				"cluster",
+				"--name",
+				name,
+			)
+			return err
+		})
 		if err != nil {
 			return err
 		}
 		delete(env, "KIND_CLUSTER")
 	}
 	return nil
+}
+
+// withGODEBUGWithoutFIPS140 temporarily unsets GODEBUG while fn runs when it
+// contains fips140=only, then restores the previous value. Kind is a non-FIPS
+// Go binary and fails under GODEBUG=fips140=only (used by FIPS integ tests).
+func withGODEBUGWithoutFIPS140(fn func() error) error {
+	orig, had := os.LookupEnv("GODEBUG")
+	if !had || !strings.Contains(orig, "fips140=only") {
+		return fn()
+	}
+
+	defer func() {
+		_ = os.Setenv("GODEBUG", orig)
+	}()
+
+	_ = os.Unsetenv("GODEBUG")
+	return fn()
 }
 
 func envKubeConfigExists(env map[string]string, envVar string) bool {

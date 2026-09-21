@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -128,13 +129,13 @@ func newDummyMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *dummyMetricSet) Fetch(r mb.ReporterV2) {
 }
 
-func getMetricSet(t *testing.T, registry *mb.Register, config map[string]interface{}) *MetricSet {
+func getMetricSet(t *testing.T, registry *mb.Register, config map[string]any) *MetricSet {
 	t.Helper()
 
 	c, err := conf.NewConfigFrom(config)
 	require.NoError(t, err)
 
-	_, metricsets, err := mb.NewModule(c, registry, paths.New(), logptest.NewTestingLogger(t, ""))
+	_, metricsets, err := mb.NewModule(c, registry, beat.Info{Paths: paths.New(), Logger: logptest.NewTestingLogger(t, "")})
 	require.NoError(t, err)
 	require.Len(t, metricsets, 1)
 
@@ -144,8 +145,8 @@ func getMetricSet(t *testing.T, registry *mb.Register, config map[string]interfa
 	return ms.MetricSet
 }
 
-func getConfig(host string, password string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string, password string) map[string]any {
+	return map[string]any{
 		"module":     "redis",
 		"metricsets": "test",
 		"hosts":      []string{host},

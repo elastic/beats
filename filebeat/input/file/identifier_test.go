@@ -68,8 +68,7 @@ func TestINodeDeviceIdentifier(t *testing.T) {
 
 	identifier, _ := newINodeDeviceIdentifier(nil, nil)
 	for name, test := range tests {
-		test := test
-		for i := 0; i < len(test.states); i++ {
+		for i := range len(test.states) {
 			test.states[i].Id, test.states[i].IdentifierName = identifier.GenerateID(test.states[i])
 		}
 
@@ -112,8 +111,7 @@ func TestPathIdentifier(t *testing.T) {
 
 	identifier, _ := newPathIdentifier(nil, nil)
 	for name, test := range tests {
-		test := test
-		for i := 0; i < len(test.states); i++ {
+		for i := range len(test.states) {
 			test.states[i].Id, test.states[i].IdentifierName = identifier.GenerateID(test.states[i])
 		}
 		t.Run(name, func(t *testing.T) {
@@ -181,8 +179,7 @@ func TestInodeMarkerIdentifier(t *testing.T) {
 
 	identifier := newMockInodeMarkerIdentifier()
 	for name, test := range tests {
-		test := test
-		for i := 0; i < len(test.states); i++ {
+		for i := range len(test.states) {
 			test.states[i].Id, test.states[i].IdentifierName = identifier.GenerateID(test.states[i])
 		}
 		t.Run(name, func(t *testing.T) {

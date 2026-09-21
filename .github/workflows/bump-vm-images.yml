@@ -40,7 +40,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.filter.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           # NOTE: as long as the updatecli bump differs between branches, we need to
           # checkout the branch that we are going to bump that we are going to bump

@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -26,22 +27,31 @@ func DefaultConfig() *Config {
 }
 
 type Config struct {
-	Schedule  string                 `config:"schedule"`
-	Params    map[string]interface{} `config:"params"`
+	Schedule  string         `config:"schedule"`
+	Params    map[string]any `config:"params"`
 	RawConfig *config.C
 	Source    *source.Source `config:"source"`
+	// Type is the monitor type ("browser" or "api"); used to shape the CLI invocation.
+	Type string `config:"type"`
 	// Name is optional for lightweight checks but required for browsers
 	Name string `config:"name"`
 	// Id is optional for lightweight checks but required for browsers
-	Id                string                        `config:"id"`
-	Sandbox           bool                          `config:"sandbox"`
-	Throttling        interface{}                   `config:"throttling"`
-	Screenshots       string                        `config:"screenshots"`
-	SyntheticsArgs    []string                      `config:"synthetics_args"`
-	PlaywrightOpts    map[string]interface{}        `config:"playwright_options"`
-	FilterJourneys    synthexec.FilterJourneyConfig `config:"filter_journeys"`
-	IgnoreHTTPSErrors bool                          `config:"ignore_https_errors"`
-	Timeout           time.Duration                 `config:"timeout"`
+	Id                            string                        `config:"id"`
+	Sandbox                       bool                          `config:"sandbox"`
+	Throttling                    any                           `config:"throttling"`
+	Screenshots                   string                        `config:"screenshots"`
+	SyntheticsArgs                []string                      `config:"synthetics_args"`
+	PlaywrightOpts                map[string]any                `config:"playwright_options"`
+	FilterJourneys                synthexec.FilterJourneyConfig `config:"filter_journeys"`
+	IgnoreHTTPSErrors             bool                          `config:"ignore_https_errors"`
+	CertificateErrorSpkiAllowlist []string                      `config:"certificate_error_spki_allowlist"`
+	Timeout                       time.Duration                 `config:"timeout"`
+}
+
+// IsAPI reports whether this is the `api` monitor type (or its alias), which
+// reuses the browser pipeline but filters out browser-only CLI flags.
+func (c *Config) IsAPI() bool {
+	return stdfields.IsAPIType(c.Type)
 }
 
 var ErrNameRequired = fmt.Errorf("config 'name' must be specified for this monitor")
@@ -63,14 +73,15 @@ func (c *Config) Validate() error {
 	return nil
 }
 
-// hashConfig generates a unit config hash, excluding params
-// field which can be dynamically updated
-func hashConfig(cfg *config.C) (uint64, error) {
+// HashConfig generates a unit config hash, excluding params
+// field which can be dynamically updated. Exported so the sibling
+// api plugin can register with the same params-insensitive hash.
+func HashConfig(cfg *config.C) (uint64, error) {
 	if cfg == nil {
 		return 0, fmt.Errorf("nil config")
 	}
 
-	var config map[string]interface{}
+	var config map[string]any
 	if err := cfg.Unpack(&config); err != nil {
 		return 0, err
 	}

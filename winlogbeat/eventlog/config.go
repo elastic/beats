@@ -33,7 +33,7 @@ type validator interface {
 	Validate() error
 }
 
-func readConfig(c *conf.C, config interface{}) error {
+func readConfig(c *conf.C, config any) error {
 	if err := c.Unpack(config); err != nil {
 		return fmt.Errorf("failed unpacking config. %w", err)
 	}

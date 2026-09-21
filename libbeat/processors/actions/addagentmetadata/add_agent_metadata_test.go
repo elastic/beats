@@ -193,15 +193,15 @@ func TestAddAgentMetadata_PreservesExistingSubMaps(t *testing.T) {
 }
 
 func TestAddAgentMetadata_FromConfig(t *testing.T) {
-	c, err := conf.NewConfigFrom(map[string]interface{}{
+	c, err := conf.NewConfigFrom(map[string]any{
 		"input_id":  "test-input",
 		"stream_id": "test-stream",
-		"data_stream": map[string]interface{}{
+		"data_stream": map[string]any{
 			"dataset":   "system.cpu",
 			"namespace": "default",
 			"type":      "metrics",
 		},
-		"elastic_agent": map[string]interface{}{
+		"elastic_agent": map[string]any{
 			"id":       "agent-123",
 			"snapshot": false,
 			"version":  "9.3.0",

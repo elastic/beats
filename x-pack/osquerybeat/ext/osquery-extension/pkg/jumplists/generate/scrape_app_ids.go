@@ -33,8 +33,8 @@ func scrapeJumplistAppIDs(opts generatorOptions, log *logger.Logger) (map[string
 		return nil, err
 	}
 
-	lines := strings.Split(bodyString, "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(bodyString, "\n")
+	for line := range lines {
 		line = strings.TrimSpace(line)
 		if line == "" {
 			continue // Skip empty lines

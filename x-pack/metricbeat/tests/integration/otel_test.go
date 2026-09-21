@@ -22,7 +22,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -41,21 +40,16 @@ func TestMetricbeatOTelE2E(t *testing.T) {
 	mbIndex := "logs-integration-mb-" + namespace
 	mbReceiverIndex := "logs-integration-mbreceiver-" + namespace
 
-	otelMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
-	metricbeatMonitoringPort := int(libbeattesting.MustAvailableTCP4Port(t))
-
 	otelConfig := struct {
-		Index          string
-		ESURL          string
-		Username       string
-		Password       string
-		MonitoringPort int
+		Index    string
+		ESURL    string
+		Username string
+		Password string
 	}{
-		Index:          mbReceiverIndex,
-		ESURL:          fmt.Sprintf("%s://%s", host.Scheme, host.Host),
-		Username:       user,
-		Password:       password,
-		MonitoringPort: otelMonitoringPort,
+		Index:    mbReceiverIndex,
+		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+		Username: user,
+		Password: password,
 	}
 
 	cfg := `receivers:
@@ -82,7 +76,7 @@ func TestMetricbeatOTelE2E(t *testing.T) {
     setup.template.enabled: false
     http.enabled: true
     http.host: localhost
-    http.port: {{.MonitoringPort}}
+    http.port: 0
     management.otel.enabled: true
 exporters:
   debug:
@@ -146,7 +140,7 @@ processors:
     - add_kubernetes_metadata: ~
 http.enabled: true
 http.host: localhost
-http.port: {{.MonitoringPort}}
+http.port: 0
 `
 
 	es := integration.GetESClient(t, "http")
@@ -161,23 +155,23 @@ http.port: {{.MonitoringPort}}
 	var mbConfigBuffer bytes.Buffer
 	require.NoError(t, template.Must(template.New("config").Parse(beatsCfgFile)).Execute(&mbConfigBuffer,
 		struct {
-			Index          string
-			ESURL          string
-			Username       string
-			Password       string
-			MonitoringPort int
+			Index    string
+			ESURL    string
+			Username string
+			Password string
 		}{
-			Index:          mbIndex,
-			ESURL:          fmt.Sprintf("%s://%s", host.Scheme, host.Host),
-			Username:       user,
-			Password:       password,
-			MonitoringPort: metricbeatMonitoringPort,
+			Index:    mbIndex,
+			ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+			Username: user,
+			Password: password,
 		}))
 
 	metricbeat := integration.NewBeat(t, "metricbeat", "../../metricbeat.test")
 	metricbeat.WriteConfigFile(mbConfigBuffer.String())
 	metricbeat.Start()
 	defer metricbeat.Stop()
+
+	metricbeatMonitoringPort := metricbeat.MonitoringPort(30 * time.Second)
 
 	// Make sure find the logs
 	var metricbeatDocs estools.Documents
@@ -232,9 +226,8 @@ func TestMetricbeatOTelMultipleReceiversE2E(t *testing.T) {
 	password, _ := host.User.Password()
 
 	type receiverConfig struct {
-		MonitoringPort int
-		InputFile      string
-		PathHome       string
+		InputFile string
+		PathHome  string
 	}
 
 	es := integration.GetESClient(t, "http")
@@ -261,12 +254,10 @@ func TestMetricbeatOTelMultipleReceiversE2E(t *testing.T) {
 		Password: password,
 		Receivers: []receiverConfig{
 			{
-				MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
-				PathHome:       filepath.Join(tmpDir, "r1"),
+				PathHome: filepath.Join(tmpDir, "r1"),
 			},
 			{
-				MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
-				PathHome:       filepath.Join(tmpDir, "r2"),
+				PathHome: filepath.Join(tmpDir, "r2"),
 			},
 		},
 	}
@@ -295,11 +286,9 @@ func TestMetricbeatOTelMultipleReceiversE2E(t *testing.T) {
     queue.mem.flush.timeout: 0s
     path.home: {{$receiver.PathHome}}
     management.otel.enabled: true
-{{if $receiver.MonitoringPort}}
     http.enabled: true
     http.host: localhost
-    http.port: {{$receiver.MonitoringPort}}
-{{end}}
+    http.port: 0
 {{end}}
 exporters:
   debug:
@@ -338,7 +327,7 @@ service:
 		}
 	})
 
-	oteltestcol.New(t, string(configContents))
+	collector := oteltestcol.New(t, string(configContents))
 
 	var r0Docs, r1Docs estools.Documents
 	var err error
@@ -371,8 +360,8 @@ service:
 		},
 		1*time.Minute, 100*time.Millisecond, "expected at least 1 log for each receiver")
 	assertMapstrKeysEqual(t, r0Docs.Hits.Hits[0].Source, r1Docs.Hits.Hits[0].Source, nil, "expected documents keys to be equal")
-	for _, rec := range otelConfig.Receivers {
-		assertMonitoring(t, rec.MonitoringPort)
+	for _, port := range collector.MonitoringPorts(t, len(otelConfig.Receivers)) {
+		assertMonitoring(t, port)
 	}
 }
 

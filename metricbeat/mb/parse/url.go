@@ -44,7 +44,7 @@ type URLHostParserBuilder struct {
 // options set in URLHostParserBuilder.
 func (b URLHostParserBuilder) Build() mb.HostParser {
 	return func(module mb.Module, host string) (mb.HostData, error) {
-		conf := map[string]interface{}{}
+		conf := map[string]any{}
 		err := module.UnpackConfig(conf)
 		if err != nil {
 			return mb.HostData{}, err
@@ -52,7 +52,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 
 		query, ok := conf["query"]
 		if ok {
-			queryMap, ok := query.(map[string]interface{})
+			queryMap, ok := query.(map[string]any)
 			if !ok {
 				return mb.HostData{}, fmt.Errorf("'query' config for module %v is not a map", module.Name())
 			}

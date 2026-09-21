@@ -22,9 +22,9 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"runtime"
-	"sync"
+	"strings"
 	"time"
+	"unicode"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -47,6 +47,9 @@ const (
 	// esDocumentIDAttribute is the attribute key used to store the document ID in the log record.
 	esDocumentIDAttribute = "elasticsearch.document_id"
 
+	// esIndexAttribute matches elasticsearchexporter/internal/elasticsearch.IndexAttributeName.
+	esIndexAttribute = "elasticsearch.index"
+
 	// receivertestUniqueIDAttrName mirrors receivertest.UniqueIDAttrName.
 	// It is duplicated here to avoid importing the receivertest package
 	// (and pulling its testify/testing deps) into production binaries.
@@ -68,9 +71,7 @@ type otelConsumer struct {
 	log            *logp.Logger
 	isReceiverTest bool // whether we are running in receivertest context
 
-	retry        retryConfig
-	retryBackoff backoff.Backoff
-	backoffInit  sync.Once
+	retry retryConfig
 }
 
 func MakeOtelConsumer(beat beat.Info, observer outputs.Observer) (outputs.Group, error) {
@@ -81,20 +82,16 @@ func MakeOtelConsumer(beat beat.Info, observer outputs.Observer) (outputs.Group,
 		retry = retryConfig{init: 1 * time.Millisecond, max: 2 * time.Millisecond}
 	}
 
-	// Default to runtime.NumCPU() workers
-	clients := make([]outputs.Client, 0, runtime.NumCPU())
-	for range runtime.NumCPU() {
-		clients = append(clients, &otelConsumer{
-			observer:       observer,
-			logsConsumer:   beat.LogConsumer,
-			beatInfo:       beat,
-			log:            beat.Logger.Named("otelconsumer"),
-			isReceiverTest: isReceiverTest,
-			retry:          retry,
-		})
+	client := &otelConsumer{
+		observer:       observer,
+		logsConsumer:   beat.LogConsumer,
+		beatInfo:       beat,
+		log:            beat.Logger.Named("otelconsumer"),
+		isReceiverTest: isReceiverTest,
+		retry:          retry,
 	}
 
-	return outputs.Group{Clients: clients}, nil
+	return outputs.Group{Clients: []outputs.Client{client}}, nil
 }
 
 // Close is a noop for otelconsumer
@@ -119,10 +116,6 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 
 	pLogs := out.eventsToLogs(events, &out.beatInfo)
 
-	out.backoffInit.Do(func() {
-		out.retryBackoff = backoff.NewEqualJitterBackoff(ctx.Done(), out.retry.init, out.retry.max)
-	})
-
 	err := out.logsConsumer.ConsumeLogs(otelctx.NewConsumerContext(ctx, out.beatInfo), pLogs)
 	if err != nil {
 		// Queue full errors are expected backpressure signals, not true errors.
@@ -142,7 +135,8 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			batch.Drop()
 		} else {
 			st.RetryableErrors(len(events))
-			if !out.retryBackoff.Wait() {
+			bo := backoff.NewEqualJitterBackoff(out.retry.init, out.retry.max)
+			if !bo.Wait(ctx) {
 				batch.Cancelled()
 				return nil
 			}
@@ -153,7 +147,6 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 
 	batch.ACK()
 	st.AckedEvents(len(events))
-	out.retryBackoff.Reset()
 	return nil
 }
 
@@ -234,6 +227,12 @@ func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, bea
 			observedTimestamp = pcommon.NewTimestampFromTime(created)
 		case common.Time:
 			observedTimestamp = pcommon.NewTimestampFromTime(time.Time(created))
+		case string:
+			t, err := time.Parse(time.RFC3339Nano, created)
+			if err != nil {
+				t = time.Now()
+			}
+			observedTimestamp = pcommon.NewTimestampFromTime(t)
 		case nil:
 			// not set
 		default:
@@ -249,6 +248,16 @@ func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, bea
 				logRecord.Attributes().PutStr("data_stream."+sub, vStr)
 			}
 		}
+		// temporary workaround for https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/49337
+		applyNonStandardDataStreamIndex(logRecord, ds)
+	}
+
+	// If raw_index is set on event metadata, propagate it as the
+	// Elasticsearch index, potentially overwriting the non-standard
+	// data stream index. This matches the behavior of the Beats
+	// index selector.
+	if s, ok := event.Content.Meta["raw_index"].(string); ok {
+		logRecord.Attributes().PutStr(esIndexAttribute, s)
 	}
 
 	bodyMap := logRecord.Body().SetEmptyMap()
@@ -280,11 +289,50 @@ func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, bea
 	return nil
 }
 
-func tryToMapStr(v interface{}) (mapstr.M, bool) {
+// applyNonStandardDataStreamIndex is a WORKAROUND: elasticsearchexporter's MappingBodyMap
+// mode only routes data_stream.type "logs" and "metrics" via data_stream.* attributes; other
+// types (e.g. "synthetics") are rejected. This sets elasticsearch.index directly to bypass
+// that restriction. Remove this function and sanitizeDataStreamField when upstream adds support.
+func applyNonStandardDataStreamIndex(logRecord plog.LogRecord, ds mapstr.M) {
+	const (
+		// maxDataStreamBytes and disallowed* mirror the sanitisation constants in
+		// elasticsearchexporter so the computed index name matches exactly.
+		maxDataStreamBytes       = 100
+		disallowedNamespaceRunes = `\/*?"<>| ,#:`
+		disallowedDatasetRunes   = `-\/*?"<>| ,#:`
+	)
+	dsType, _ := ds["type"].(string)
+	if dsType == "" || dsType == "logs" || dsType == "metrics" {
+		return
+	}
+	dataset, _ := ds["dataset"].(string)
+	namespace, _ := ds["namespace"].(string)
+	sanitizedDataset := sanitizeDataStreamField(dataset, disallowedDatasetRunes, maxDataStreamBytes)
+	sanitizedNamespace := sanitizeDataStreamField(namespace, disallowedNamespaceRunes, maxDataStreamBytes)
+	logRecord.Attributes().PutStr(esIndexAttribute, fmt.Sprintf("%s-%s-%s", dsType, sanitizedDataset, sanitizedNamespace))
+}
+
+// sanitizeDataStreamField mirrors elasticsearchexporter's sanitizeDataStreamField:
+// it lower-cases the value, replaces disallowed runes with '_', and truncates to 100 bytes.
+// No suffix is appended (MappingBodyMap never adds one).
+func sanitizeDataStreamField(field, disallowed string, maxLength int) string {
+	field = strings.Map(func(r rune) rune {
+		if strings.ContainsRune(disallowed, r) {
+			return '_'
+		}
+		return unicode.ToLower(r)
+	}, field)
+	if len(field) > maxLength {
+		field = field[:maxLength]
+	}
+	return field
+}
+
+func tryToMapStr(v any) (mapstr.M, bool) {
 	switch m := v.(type) {
 	case mapstr.M:
 		return m, true
-	case map[string]interface{}:
+	case map[string]any:
 		return mapstr.M(m), true
 	default:
 		return nil, false

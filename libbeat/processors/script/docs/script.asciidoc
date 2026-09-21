@@ -150,8 +150,7 @@ returns true if the source key was successfully renamed to the target key.
 *Example*: `var deleted = event.Delete("user.email");`
 
 |`Cancel()`
-|Flag the event as cancelled which causes the processor to drop
-event.
+|Flag the event as cancelled, which causes the processor to drop the event.
 
 *Example*: `event.Cancel(); return;`
 

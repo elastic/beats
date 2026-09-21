@@ -77,6 +77,13 @@ type Pipeline struct {
 	closeOnce sync.Once
 
 	processors processing.Supporter
+
+	// clients is the set of connected clients. The Pipeline finalizes each of
+	// them (stage two of client shutdown, client.disconnect) when it is
+	// disconnected. Clients register on ConnectWith and remove themselves when
+	// disconnected. Guarded by clientsMu.
+	clientsMu sync.Mutex
+	clients   map[*client]struct{}
 }
 
 // Settings is used to pass additional settings to a newly created pipeline instance.
@@ -157,6 +164,7 @@ func New(
 		observer:         nilObserver,
 		waitCloseTimeout: settings.WaitClose,
 		processors:       settings.Processors,
+		clients:          make(map[*client]struct{}),
 	}
 
 	p.forceCloseQueue = settings.WaitCloseMode == WaitOnPipelineCloseThenForce
@@ -184,6 +192,7 @@ func New(
 	outputController.Set(out)
 	p.outputController = outputController
 
+	p.startReaper()
 	return p, nil
 }
 
@@ -192,7 +201,6 @@ func NewForReceiver(
 	monitors Monitors,
 	userQueueConfig conf.Namespace,
 	settings Settings,
-	intakeQueueID string,
 ) (*Pipeline, error) {
 	p := &Pipeline{
 		beatInfo:         beatInfo,
@@ -200,6 +208,7 @@ func NewForReceiver(
 		observer:         newMetricsObserver(monitors.Metrics),
 		waitCloseTimeout: settings.WaitClose,
 		processors:       settings.Processors,
+		clients:          make(map[*client]struct{}),
 	}
 
 	// Convert the raw queue config to a parsed Settings object that will
@@ -210,21 +219,21 @@ func NewForReceiver(
 		queueType = b
 	}
 	// Receiver pipelines route through the OTel output controller. With an
-	// in-memory queue configuration the controller uses the slabqueue pool
-	// (a global default pool when no intake queue ID is set, or a pool
-	// keyed by the ID when one is). With an explicit queue.disk config the
-	// controller falls back to building its queue via queueFactory, in
-	// which case sharing is not supported.
+	// in-memory queue configuration the controller joins the process-global
+	// slabqueue pool, sharing one in-memory event budget across all receivers.
+	// With an explicit queue.disk config the controller falls back to building
+	// its queue via queueFactory and owns it outright.
 	queueFactory, queueConfig, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), beatInfo.Paths)
 	if err != nil {
 		return nil, err
 	}
 
-	p.outputController, err = newOTelOutputController(beatInfo, monitors, p.observer, intakeQueueID, queueFactory, queueConfig)
+	p.outputController, err = newOTelOutputController(beatInfo, monitors, p.observer, queueFactory, queueConfig)
 	if err != nil {
 		return nil, err
 	}
 
+	p.startReaper()
 	return p, nil
 }
 
@@ -233,22 +242,91 @@ func NewForReceiver(
 // for a duration of WaitClose, if there are still active events in the pipeline.
 // Note: clients will no longer accept new Publish calls once Disconnect is started,
 // and will no longer receive event acknowledgments once Disconnect returns.
+//
+// The Beater is expected to close its clients (stage one) before disconnecting
+// the pipeline; Disconnect then performs stage two for any still-registered
+// client — see issues #50104 and #49794.
 func (p *Pipeline) Disconnect(ctx context.Context) error {
-	// Here context does not do anything for now but it will be the responsibility of the beater to determine how long to wait before full disconnection
-	// See issue: https://github.com/elastic/beats/issues/49794
 	p.closeOnce.Do(func() {
 		log := p.monitors.Logger
 
 		log.Debug("close pipeline")
 
-		// Note: active clients are not closed / disconnected.
-		timeoutCtx, cancel := context.WithTimeout(context.Background(), p.waitCloseTimeout)
-		defer cancel()
+		// The Beater determines how long to wait before full disconnection by
+		// supplying a context with a deadline (issue #49794). If the caller did
+		// not set one, fall back to the pipeline's configured waitCloseTimeout.
+		timeoutCtx := ctx
+		if _, hasDeadline := ctx.Deadline(); !hasDeadline {
+			var cancel context.CancelFunc
+			timeoutCtx, cancel = context.WithTimeout(context.Background(), p.waitCloseTimeout)
+			defer cancel()
+		}
 		p.outputController.waitClose(timeoutCtx, p.forceCloseQueue)
+
+		// Release this pipeline from the shared reaper. release() acquires
+		// its internal sweepMu as a barrier, so any c.disconnect() call
+		// the reaper goroutine started for this pipeline's clients is
+		// guaranteed to have completed before release() returns. After
+		// this point the reaper will never touch p's clients again.
+		sharedReaper.release(p)
+
+		// Stage two of client shutdown: the queue has now drained or been
+		// force-closed and no further acknowledgments will arrive, so finalize
+		// every still-registered client (stop ack handling, drop references).
+		// disconnect() is idempotent, so clients the reaper already finalized
+		// are skipped (they removed themselves from p.clients on finalization).
+		p.disconnectClients()
 
 		p.observer.cleanup()
 	})
 	return nil
+}
+
+// registerClient adds a connected client to the set the Pipeline finalizes on
+// Disconnect.
+func (p *Pipeline) registerClient(c *client) {
+	p.clientsMu.Lock()
+	p.clients[c] = struct{}{}
+	p.clientsMu.Unlock()
+}
+
+// unregisterClient removes a client from the set once it has been disconnected.
+// Called from client.disconnect via the onRemove callback.
+func (p *Pipeline) unregisterClient(c *client) {
+	p.clientsMu.Lock()
+	delete(p.clients, c)
+	p.clientsMu.Unlock()
+}
+
+// disconnectClients finalizes every connected client (stage two of client
+// shutdown). It snapshots the set under the lock and calls disconnect outside
+// it, because client.disconnect calls back into unregisterClient (which takes
+// the same lock). disconnect is idempotent, so a client already finalized is
+// unaffected.
+func (p *Pipeline) disconnectClients() {
+	p.clientsMu.Lock()
+	clients := make([]*client, 0, len(p.clients))
+	for c := range p.clients {
+		clients = append(clients, c)
+	}
+	p.clientsMu.Unlock()
+
+	for _, c := range clients {
+		c.disconnect()
+	}
+}
+
+// startReaper registers this pipeline with the process-wide shared reaper.
+// Called once from each pipeline constructor.
+func (p *Pipeline) startReaper() {
+	sharedReaper.acquire(p)
+}
+
+// finalizeWhenDrained hands a Closed client to the shared reaper so it is
+// finalized (stage two) as soon as its already-published events are
+// acknowledged, rather than lingering until the whole pipeline disconnects.
+func (p *Pipeline) finalizeWhenDrained(c *client) {
+	sharedReaper.add(p, c)
 }
 
 // Connect creates a new client with default settings.
@@ -280,7 +358,9 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		canDrop = true
 	}
 
-	waitClose := cfg.WaitClose
+	// Note: cfg.WaitClose no longer makes client.Close block. Pipeline.Disconnect
+	// (bounded by its context) is now responsible for waiting on outstanding
+	// acknowledgments — see issues #50104 and #49794.
 
 	processors, err := p.createEventProcessing(cfg.Processing, publishDisabled)
 	if err != nil {
@@ -305,16 +385,6 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 
 	ackHandler := cfg.EventListener
 
-	var waiter *clientCloseWaiter
-	if waitClose > 0 {
-		waiter = newClientCloseWaiter(waitClose)
-		if ackHandler == nil {
-			ackHandler = waiter
-		} else {
-			ackHandler = acker.Combine(waiter, ackHandler)
-		}
-	}
-
 	producerCfg := queue.ProducerConfig{
 		ACK: func(count int) {
 			client.observer.eventsACKed(count)
@@ -329,13 +399,20 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	}
 
 	client.eventListener = ackHandler
-	client.waiter = waiter
 	client.producer = p.outputController.queueProducer(producerCfg)
 	if client.producer == nil {
 		// This can only happen if the pipeline was shut down while clients
 		// were still waiting to connect.
 		return nil, fmt.Errorf("client failed to connect because the pipeline is shutting down")
 	}
+
+	// Register the client so the Pipeline can finalize it (stage two of
+	// shutdown) when the pipeline disconnects. The client removes itself from
+	// the registry when it is disconnected, and hands itself to the reaper on
+	// Close so it is finalized as soon as its events drain.
+	client.onRemove = func() { p.unregisterClient(client) }
+	client.requestFinalize = func() { p.finalizeWhenDrained(client) }
+	p.registerClient(client)
 
 	p.observer.clientConnected()
 	return client, nil

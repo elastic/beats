@@ -67,7 +67,7 @@ func (t *batchACKTracker) ACK() {
 // to decrement the number of pending ACKs.
 func newEventACKHandler() beat.EventListener {
 	return acker.ConnectionOnly(
-		acker.EventPrivateReporter(func(_ int, privates []interface{}) {
+		acker.EventPrivateReporter(func(_ int, privates []any) {
 			for _, private := range privates {
 				if ack, ok := private.(*batchACKTracker); ok {
 					ack.ACK()

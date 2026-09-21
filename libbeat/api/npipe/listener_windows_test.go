@@ -21,7 +21,7 @@ package npipe
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -52,7 +52,7 @@ func TestHTTPOverNamedPipe(t *testing.T) {
 
 	r, err := c.Get("http://npipe/echo-hello")
 	require.NoError(t, err)
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	defer r.Body.Close()
 
 	assert.Equal(t, "ehlo!", string(body))

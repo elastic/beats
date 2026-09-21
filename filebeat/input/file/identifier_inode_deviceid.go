@@ -21,7 +21,7 @@ package file
 
 import (
 	"fmt"
-	"io/ioutil"
+
 	"os"
 	"path/filepath"
 	"time"
@@ -79,7 +79,7 @@ func (i *inodeMarkerIdentifier) markerContents() string {
 		return ""
 	}
 	if i.markerFileLastModifitaion.Before(fi.ModTime()) {
-		contents, err := ioutil.ReadFile(i.markerPath)
+		contents, err := os.ReadFile(i.markerPath)
 		if err != nil {
 			i.log.Errorf("Error while reading contents of marker file: %v", err)
 			return ""

@@ -27,8 +27,8 @@ import (
 // TestProtocolFieldsIsInSyncWithECS ensures that Packetbeat's clone of
 // ecs.Http stays in sync.
 func TestProtocolFieldsIsInSyncWithECS(t *testing.T) {
-	ecs := getFields(reflect.TypeOf(ecs.Http{}))
-	packetbeat := getFields(reflect.TypeOf(ProtocolFields{}))
+	ecs := getFields(reflect.TypeFor[ecs.Http]())
+	packetbeat := getFields(reflect.TypeFor[ProtocolFields]())
 
 	for name := range ecs {
 		_, found := packetbeat[name]
@@ -45,8 +45,7 @@ func TestProtocolFieldsIsInSyncWithECS(t *testing.T) {
 
 func getFields(typ reflect.Type) map[string]reflect.Type {
 	fields := map[string]reflect.Type{}
-	for i := 0; i < typ.NumField(); i++ {
-		structField := typ.Field(i)
+	for structField := range typ.Fields() {
 		tag := structField.Tag.Get("ecs")
 		if tag == "" {
 			continue

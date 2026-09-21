@@ -10,7 +10,7 @@ This checklist is intended for Devs which create or update a module to make sure
 
 ## Modules
 
-For a metricset to go GA, the following criterias should be met:
+For a metricset to go GA, the following criteria should be met:
 
 * [ ] Supported versions are documented
 * [ ] Supported operating systems are documented (if applicable)

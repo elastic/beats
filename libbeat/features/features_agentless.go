@@ -34,8 +34,8 @@ func init() {
 func initFromEnv(envName string) {
 	esTypesEnabled = make(map[string]struct{})
 
-	arr := strings.Split(os.Getenv(envName), ",")
-	for _, e := range arr {
+	arr := strings.SplitSeq(os.Getenv(envName), ",")
+	for e := range arr {
 		k := strings.TrimSpace(e)
 		if k != "" {
 			esTypesEnabled[k] = struct{}{}

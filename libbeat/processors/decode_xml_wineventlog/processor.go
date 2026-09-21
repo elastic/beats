@@ -156,7 +156,7 @@ func fields(evt winevent.Event) (mapstr.M, mapstr.M) {
 	return win, ecs
 }
 
-func getValue(m mapstr.M, key string) interface{} {
+func getValue(m mapstr.M, key string) any {
 	v, _ := m.GetValue(key)
 	return v
 }

@@ -19,7 +19,6 @@ package blockinfo
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -44,7 +43,7 @@ func isRedundant(raidStr string) bool {
 
 func parseIntVal(path string) (int64, error) {
 	var value int64
-	raw, err := ioutil.ReadFile(path)
+	raw, err := os.ReadFile(path)
 	if err != nil {
 		return value, err
 	}
@@ -62,7 +61,7 @@ func parseIntVal(path string) (int64, error) {
 // if there's no sync operation in progress, the file will just have 'none'
 // in which case, default to to the overall size
 func getSyncStatus(path string, size int64) (SyncStatus, error) {
-	raw, err := ioutil.ReadFile(filepath.Join(path, "md", "sync_completed"))
+	raw, err := os.ReadFile(filepath.Join(path, "md", "sync_completed"))
 	if err != nil {
 		return SyncStatus{}, fmt.Errorf("could not open sync_completed: %w", err)
 	}
@@ -188,7 +187,7 @@ func getDisks(path string) (DiskStates, error) {
 }
 
 func getDisk(path string) (string, error) {
-	state, err := ioutil.ReadFile(filepath.Join(path, "state"))
+	state, err := os.ReadFile(filepath.Join(path, "state"))
 	if err != nil {
 		return "", fmt.Errorf("error getting disk state: %w", err)
 	}

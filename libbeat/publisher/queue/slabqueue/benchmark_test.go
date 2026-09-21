@@ -125,7 +125,7 @@ func BenchmarkSlabQueuePool(b *testing.B) {
 
 			queues := make([]queue.Queue[benchEvent], m)
 			producers := make([]queue.Producer[benchEvent], m)
-			for i := 0; i < m; i++ {
+			for i := range m {
 				queues[i] = pool.Connect()
 				producers[i] = queues[i].Producer(queue.ProducerConfig{})
 			}
@@ -158,7 +158,6 @@ func runWorkload(b *testing.B, producers []queue.Producer[benchEvent], consumerQ
 	var consumerWG sync.WaitGroup
 	consumerWG.Add(len(consumerQueues))
 	for _, q := range consumerQueues {
-		q := q
 		go func() {
 			defer consumerWG.Done()
 			for {
@@ -182,11 +181,11 @@ func runWorkload(b *testing.B, producers []queue.Producer[benchEvent], consumerQ
 
 	var producerWG sync.WaitGroup
 	producerWG.Add(m)
-	for i := 0; i < m; i++ {
+	for i := range m {
 		prod := producers[i]
 		go func() {
 			defer producerWG.Done()
-			for j := 0; j < perProducer; j++ {
+			for j := range perProducer {
 				prod.Publish(benchEvent{id: j})
 			}
 		}()
@@ -211,13 +210,6 @@ func runWorkload(b *testing.B, producers []queue.Producer[benchEvent], consumerQ
 // (libbeat/publisher/queue/memqueue/queue_test.go) for direct EPS
 // comparison: 10 producer goroutines feed a single 10,000-slot queue
 // while one consumer drains batches.
-//
-// Because slabqueue's Get returns immediately with whatever events are
-// available (no FlushTimeout / MaxGetRequest equivalent), per-iteration
-// batch size varies. To make the comparison fair we count events actually
-// processed and report events/s via b.ReportMetric; the memqueue
-// benchmark's events/s can be derived as queueSize / ns-per-op since it
-// always drains a full batch.
 func BenchmarkProducerThroughput(b *testing.B) {
 	const queueSize = 10000
 	const publishWorkers = 10

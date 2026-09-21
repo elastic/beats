@@ -210,7 +210,7 @@ func (nfs *nfs) eatData(op int, xdr *xdr) error {
 		if _, err := xdr.getOpaque(16); err != nil {
 			return err
 		}
-		for i := 0; i < 4; i++ {
+		for range 4 {
 			if _, err := xdr.getUInt(); err != nil {
 				return err
 			}

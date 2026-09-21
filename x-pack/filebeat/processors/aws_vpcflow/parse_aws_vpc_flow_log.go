@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"slices"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -237,10 +238,8 @@ func (p *formatProcessor) process(substrings []string, event *beat.Event) error 
 // exist in the slice. It determines if item is in the slice by iterating over
 // all elements in the slice and checking equality.
 func appendUnique(s []string, item string) []string {
-	for _, existing := range s {
-		if item == existing {
-			return s
-		}
+	if slices.Contains(s, item) {
+		return s
 	}
 	return append(s, item)
 }

@@ -262,7 +262,6 @@ func TestParseRFC5424(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -301,7 +300,6 @@ func BenchmarkParseRFC5424(b *testing.B) {
 	}
 
 	for name, bc := range tests {
-		bc := bc
 		b.Run(name, func(b *testing.B) {
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
@@ -331,7 +329,6 @@ func TestIsRFC5424(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -358,7 +355,6 @@ func BenchmarkIsRFC5424(b *testing.B) {
 	}
 
 	for name, bc := range tests {
-		bc := bc
 		b.Run(name, func(b *testing.B) {
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {

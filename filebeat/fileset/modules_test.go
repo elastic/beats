@@ -35,7 +35,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-func load(t *testing.T, from interface{}) *conf.C {
+func load(t *testing.T, from any) *conf.C {
 	config, err := conf.NewConfigFrom(from)
 	if err != nil {
 		t.Fatalf("Config err: %v", err)
@@ -139,8 +139,8 @@ func TestNewModuleRegistryConfig(t *testing.T) {
 			Module: "nginx",
 			Filesets: map[string]*FilesetConfig{
 				"access": {
-					Var: map[string]interface{}{
-						"paths": []interface{}{"/hello/test"},
+					Var: map[string]any{
+						"paths": []any{"/hello/test"},
 					},
 				},
 				"error": {
@@ -165,7 +165,7 @@ func TestNewModuleRegistryConfig(t *testing.T) {
 
 	nginxAccess := reg.registry[0].filesets[0]
 	if assert.NotNil(t, nginxAccess) {
-		assert.Equal(t, []interface{}{"/hello/test"}, nginxAccess.vars["paths"])
+		assert.Equal(t, []any{"/hello/test"}, nginxAccess.vars["paths"])
 	}
 	for _, fileset := range reg.registry[0].filesets {
 		assert.NotEqual(t, fileset.name, "error")
@@ -209,55 +209,55 @@ func TestApplyOverrides(t *testing.T) {
 		{
 			name: "var overrides",
 			fcfg: FilesetConfig{
-				Var: map[string]interface{}{
+				Var: map[string]any{
 					"a":   "test",
 					"b.c": "test",
 				},
-				Input: map[string]interface{}{},
+				Input: map[string]any{},
 			},
 			module:  "nginx",
 			fileset: "access",
 			overrides: &ModuleOverrides{
 				"nginx": map[string]*conf.C{
-					"access": load(t, map[string]interface{}{
+					"access": load(t, map[string]any{
 						"var.a":   "test1",
 						"var.b.c": "test2",
 					}),
 				},
 			},
 			expected: FilesetConfig{
-				Var: map[string]interface{}{
+				Var: map[string]any{
 					"a": "test1",
-					"b": map[string]interface{}{"c": "test2"},
+					"b": map[string]any{"c": "test2"},
 				},
-				Input: map[string]interface{}{},
+				Input: map[string]any{},
 			},
 		},
 		{
 			name: "enable and var overrides",
 			fcfg: FilesetConfig{
 				Enabled: &falseVar,
-				Var: map[string]interface{}{
+				Var: map[string]any{
 					"paths": []string{"/var/log/nginx"},
 				},
-				Input: map[string]interface{}{},
+				Input: map[string]any{},
 			},
 			module:  "nginx",
 			fileset: "access",
 			overrides: &ModuleOverrides{
 				"nginx": map[string]*conf.C{
-					"access": load(t, map[string]interface{}{
+					"access": load(t, map[string]any{
 						"enabled":   true,
-						"var.paths": []interface{}{"/var/local/nginx/log"},
+						"var.paths": []any{"/var/local/nginx/log"},
 					}),
 				},
 			},
 			expected: FilesetConfig{
 				Enabled: &trueVar,
-				Var: map[string]interface{}{
-					"paths": []interface{}{"/var/local/nginx/log"},
+				Var: map[string]any{
+					"paths": []any{"/var/local/nginx/log"},
 				},
-				Input: map[string]interface{}{},
+				Input: map[string]any{},
 			},
 		},
 		{
@@ -267,16 +267,16 @@ func TestApplyOverrides(t *testing.T) {
 			fileset: "access",
 			overrides: &ModuleOverrides{
 				"nginx": map[string]*conf.C{
-					"access": load(t, map[string]interface{}{
+					"access": load(t, map[string]any{
 						"input.close_eof": true,
 					}),
 				},
 			},
 			expected: FilesetConfig{
-				Input: map[string]interface{}{
+				Input: map[string]any{
 					"close_eof": true,
 				},
-				Var: map[string]interface{}{},
+				Var: map[string]any{},
 			},
 		},
 	}
@@ -315,7 +315,7 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 					Module: "moduleB",
 					Filesets: map[string]*FilesetConfig{
 						"fileset": {
-							Var: map[string]interface{}{
+							Var: map[string]any{
 								"paths": "test",
 							},
 						},
@@ -328,7 +328,7 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 					Module: "moduleB",
 					Filesets: map[string]*FilesetConfig{
 						"fileset": {
-							Var: map[string]interface{}{
+							Var: map[string]any{
 								"paths": "test",
 							},
 						},
@@ -346,7 +346,7 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 					Enabled: &falseVar,
 					Filesets: map[string]*FilesetConfig{
 						"fileset": {
-							Var: map[string]interface{}{
+							Var: map[string]any{
 								"paths": "test",
 							},
 						},
@@ -360,7 +360,7 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 					Enabled: &falseVar,
 					Filesets: map[string]*FilesetConfig{
 						"fileset": {
-							Var: map[string]interface{}{
+							Var: map[string]any{
 								"paths": "test",
 							},
 						},
@@ -391,7 +391,7 @@ func TestMcfgFromConfig(t *testing.T) {
 	}{
 		{
 			name: "disable fileset",
-			config: load(t, map[string]interface{}{
+			config: load(t, map[string]any{
 				"module":        "nginx",
 				"error.enabled": false,
 			}),
@@ -408,7 +408,7 @@ func TestMcfgFromConfig(t *testing.T) {
 		},
 		{
 			name: "set variable",
-			config: load(t, map[string]interface{}{
+			config: load(t, map[string]any{
 				"module":          "nginx",
 				"access.var.test": false,
 			}),
@@ -416,7 +416,7 @@ func TestMcfgFromConfig(t *testing.T) {
 				Module: "nginx",
 				Filesets: map[string]*FilesetConfig{
 					"access": {
-						Var: map[string]interface{}{
+						Var: map[string]any{
 							"test": false,
 						},
 						Input: nil,
@@ -426,7 +426,7 @@ func TestMcfgFromConfig(t *testing.T) {
 		},
 		{
 			name: "empty fileset (nil)",
-			config: load(t, map[string]interface{}{
+			config: load(t, map[string]any{
 				"module": "nginx",
 				"error":  nil,
 			}),
@@ -457,7 +457,7 @@ func TestMissingModuleFolder(t *testing.T) {
 	p.Home = "/no/such/path"
 
 	configs := []*conf.C{
-		load(t, map[string]interface{}{"module": "nginx"}),
+		load(t, map[string]any{"module": "nginx"}),
 	}
 
 	logger := logptest.NewTestingLogger(t, "")
@@ -554,7 +554,7 @@ func TestEnableFilesetsFromOverrides(t *testing.T) {
 					Module: "foo",
 					Filesets: map[string]*FilesetConfig{
 						"bar": {
-							Var: map[string]interface{}{
+							Var: map[string]any{
 								"a": "b",
 							},
 						},
@@ -571,7 +571,7 @@ func TestEnableFilesetsFromOverrides(t *testing.T) {
 					Module: "foo",
 					Filesets: map[string]*FilesetConfig{
 						"bar": {
-							Var: map[string]interface{}{
+							Var: map[string]any{
 								"a": "b",
 							},
 						},

@@ -24,107 +24,125 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func TestConvertNestedMapStr(t *testing.T) {
-	logp.TestingSetup()
+// normalizationModes are the two ways the converter builds its result. Both
+// must return the same event for the same input.
+var normalizationModes = []struct {
+	name    string
+	inPlace bool
+}{
+	{"copy", false},
+	{"in place", true},
+}
 
-	type io struct {
-		Input  mapstr.M
-		Output mapstr.M
+// forEachMode runs fn once per normalization mode. Converting in place leaves
+// the input normalized, so a shared input reaches later modes already converted.
+func forEachMode(t *testing.T, keepNull bool, fn func(t *testing.T, g *GenericEventConverter)) {
+	t.Helper()
+	for _, mode := range normalizationModes {
+		t.Run(mode.name, func(t *testing.T) {
+			fn(t, NewGenericEventConverter(keepNull, mode.inPlace,
+				logptest.NewTestingLogger(t, "")))
+		})
 	}
+}
 
-	type String string
+func TestConvertNestedMapStr(t *testing.T) {
+	type myString string
 
-	tests := []io{
+	tests := []struct {
+		in   mapstr.M
+		want mapstr.M
+	}{
 		{
-			Input: mapstr.M{
+			in: mapstr.M{
 				"key": mapstr.M{
 					"key1": "value1",
 				},
 			},
-			Output: mapstr.M{
+			want: mapstr.M{
 				"key": mapstr.M{
 					"key1": "value1",
 				},
 			},
 		},
 		{
-			Input: mapstr.M{
+			in: mapstr.M{
 				"key": mapstr.M{
-					"key1": String("value1"),
+					"key1": myString("value1"),
 				},
 			},
-			Output: mapstr.M{
+			want: mapstr.M{
 				"key": mapstr.M{
 					"key1": "value1",
 				},
 			},
 		},
 		{
-			Input: mapstr.M{
+			in: mapstr.M{
 				"key": mapstr.M{
 					"key1": []string{"value1", "value2"},
 				},
 			},
-			Output: mapstr.M{
+			want: mapstr.M{
 				"key": mapstr.M{
 					"key1": []string{"value1", "value2"},
 				},
 			},
 		},
 		{
-			Input: mapstr.M{
+			in: mapstr.M{
 				"key": mapstr.M{
-					"key1": []String{"value1", "value2"},
+					"key1": []myString{"value1", "value2"},
 				},
 			},
-			Output: mapstr.M{
+			want: mapstr.M{
 				"key": mapstr.M{
-					"key1": []interface{}{"value1", "value2"},
+					"key1": []any{"value1", "value2"},
 				},
 			},
 		},
 		{
-			Input: mapstr.M{
+			in: mapstr.M{
 				"@timestamp": MustParseTime("2015-03-01T12:34:56.123Z"),
 			},
-			Output: mapstr.M{
+			want: mapstr.M{
 				"@timestamp": MustParseTime("2015-03-01T12:34:56.123Z"),
 			},
 		},
 		{
-			Input: mapstr.M{
+			in: mapstr.M{
 				"env":  nil,
 				"key2": uintptr(88),
 				"key3": func() { t.Log("hello") },
 			},
-			Output: mapstr.M{},
+			want: mapstr.M{},
 		},
 		{
-			Input: mapstr.M{
+			in: mapstr.M{
 				"key": []mapstr.M{
-					{"keyX": []String{"value1", "value2"}},
+					{"keyX": []myString{"value1", "value2"}},
 				},
 			},
-			Output: mapstr.M{
+			want: mapstr.M{
 				"key": []mapstr.M{
-					{"keyX": []interface{}{"value1", "value2"}},
+					{"keyX": []any{"value1", "value2"}},
 				},
 			},
 		},
 		{
-			Input: mapstr.M{
-				"key": []interface{}{
+			in: mapstr.M{
+				"key": []any{
 					mapstr.M{"key1": []string{"value1", "value2"}},
 				},
 			},
-			Output: mapstr.M{
-				"key": []interface{}{
+			want: mapstr.M{
+				"key": []any{
 					mapstr.M{"key1": []string{"value1", "value2"}},
 				},
 			},
@@ -135,28 +153,25 @@ func TestConvertNestedMapStr(t *testing.T) {
 		},
 	}
 
-	g := NewGenericEventConverter(false, logptest.NewTestingLogger(t, ""))
-	for i, test := range tests {
-		assert.Equal(t, test.Output, g.Convert(test.Input), "Test case %d", i)
-	}
+	forEachMode(t, false, func(t *testing.T, g *GenericEventConverter) {
+		for i, test := range tests {
+			assert.Equal(t, test.want, g.Convert(test.in), "Test case %d", i)
+		}
+	})
 }
 
 func TestConvertNestedStruct(t *testing.T) {
-	logp.TestingSetup()
-
-	type io struct {
-		Input  mapstr.M
-		Output mapstr.M
-	}
-
 	type TestStruct struct {
 		A string
 		B int
 	}
 
-	tests := []io{
+	tests := []struct {
+		in   mapstr.M
+		want mapstr.M
+	}{
 		{
-			Input: mapstr.M{
+			in: mapstr.M{
 				"key": mapstr.M{
 					"key1": TestStruct{
 						A: "hello",
@@ -164,7 +179,7 @@ func TestConvertNestedStruct(t *testing.T) {
 					},
 				},
 			},
-			Output: mapstr.M{
+			want: mapstr.M{
 				"key": mapstr.M{
 					"key1": mapstr.M{
 						"A": "hello",
@@ -174,16 +189,16 @@ func TestConvertNestedStruct(t *testing.T) {
 			},
 		},
 		{
-			Input: mapstr.M{
-				"key": []interface{}{
+			in: mapstr.M{
+				"key": []any{
 					TestStruct{
 						A: "hello",
 						B: 5,
 					},
 				},
 			},
-			Output: mapstr.M{
-				"key": []interface{}{
+			want: mapstr.M{
+				"key": []any{
 					mapstr.M{
 						"A": "hello",
 						"B": float64(5),
@@ -193,81 +208,80 @@ func TestConvertNestedStruct(t *testing.T) {
 		},
 	}
 
-	g := NewGenericEventConverter(false, logptest.NewTestingLogger(t, ""))
-	for i, test := range tests {
-		assert.Equal(t, test.Output, g.Convert(test.Input), "Test case %v", i)
-	}
+	forEachMode(t, false, func(t *testing.T, g *GenericEventConverter) {
+		for i, test := range tests {
+			assert.Equal(t, test.want, g.Convert(test.in), "Test case %v", i)
+		}
+	})
 }
 
 func TestConvertWithNullEmission(t *testing.T) {
-	logp.TestingSetup()
-
-	type io struct {
-		Input  mapstr.M
-		Output mapstr.M
-	}
-
 	type TestStruct struct {
-		A interface{}
+		A any
 	}
 
-	tests := []io{
+	tests := []struct {
+		in   mapstr.M
+		want mapstr.M
+	}{
 		{
-			Input: mapstr.M{
+			in: mapstr.M{
 				"key": mapstr.M{
 					"key1": nil,
 				},
 			},
-			Output: mapstr.M{
+			want: mapstr.M{
 				"key": mapstr.M{
 					"key1": nil,
 				},
 			},
 		},
 		{
-			Input: mapstr.M{
+			in: mapstr.M{
 				"key": TestStruct{
 					A: nil,
 				},
 			},
-			Output: mapstr.M{
+			want: mapstr.M{
 				"key": mapstr.M{
 					"A": nil,
 				},
 			},
-		}}
-
-	g := NewGenericEventConverter(true, logptest.NewTestingLogger(t, ""))
-	for i, test := range tests {
-		assert.Equal(t, test.Output, g.Convert(test.Input), "Test case %v", i)
+		},
 	}
+
+	forEachMode(t, true, func(t *testing.T, g *GenericEventConverter) {
+		for i, test := range tests {
+			assert.Equal(t, test.want, g.Convert(test.in), "Test case %v", i)
+		}
+	})
 }
 
 func TestNormalizeValue(t *testing.T) {
-	logp.TestingSetup()
+	type testCase struct{ in, out any }
 
-	type testCase struct{ in, out interface{} }
-
-	runTests := func(check func(t *testing.T, a, b interface{}), tests map[string]testCase) {
-		g := NewGenericEventConverter(false, logptest.NewTestingLogger(t, ""))
-		for name, test := range tests {
-			test := test
-			t.Run(name, func(t *testing.T) {
-				out, err := g.normalizeValue(test.in)
-				if err != nil {
-					t.Error(err)
-					return
+	runTests := func(group string, check func(t *testing.T, a, b any), tests map[string]testCase) {
+		t.Run(group, func(t *testing.T) {
+			forEachMode(t, false, func(t *testing.T, g *GenericEventConverter) {
+				for name, test := range tests {
+					t.Run(name, func(t *testing.T) {
+						out, err := g.normalizeValue(test.in)
+						if err != nil {
+							t.Error(err)
+							return
+						}
+						check(t, test.out, out)
+					})
 				}
-				check(t, test.out, out)
 			})
-		}
+		})
 	}
 
-	checkEq := func(t *testing.T, a, b interface{}) {
+	checkEq := func(t *testing.T, a, b any) {
 		assert.Equal(t, a, b)
 	}
 
-	checkDelta := func(t *testing.T, a, b interface{}) {
+	checkDelta := func(t *testing.T, a, b any) {
 		assert.InDelta(t, a, b, 0.000001)
 	}
 
@@ -284,7 +298,7 @@ func TestNormalizeValue(t *testing.T) {
 	type myuint uint8
 	type myuint64 uint64
 
-	runTests(checkEq, map[string]testCase{
+	runTests("exact", checkEq, map[string]testCase{
 		"nil":                               {nil, nil},
 		"pointers are dereferenced":         {&someString, someString},
 		"drop nil string pointer":           {nilStringPtr, nil},
@@ -296,13 +310,13 @@ func TestNormalizeValue(t *testing.T) {
 		"uint8 value":                       {uint8(8), uint8(8)},
 		"uint64 masked":                     {uint64(1<<63 + 10), uint64(10)},
 		"string value":                      {"hello", "hello"},
-		"map to mapstr.M":                   {map[string]interface{}{"foo": "bar"}, mapstr.M{"foo": "bar"}},
+		"map to mapstr.M":                   {map[string]any{"foo": "bar"}, mapstr.M{"foo": "bar"}},
+		"map[string]string to mapstr.M":     {map[string]string{"foo": "bar"}, mapstr.M{"foo": "bar"}},
 
 		// Other map types are converted using marshalUnmarshal which will lose
 		// type information for arrays which become []interface{} and numbers
 		// which all become float64.
-		"map[string]string to mapstr.M":   {map[string]string{"foo": "bar"}, mapstr.M{"foo": "bar"}},
-		"map[string][]string to mapstr.M": {map[string][]string{"list": {"foo", "bar"}}, mapstr.M{"list": []interface{}{"foo", "bar"}}},
+		"map[string][]string to mapstr.M": {map[string][]string{"list": {"foo", "bar"}}, mapstr.M{"list": []any{"foo", "bar"}}},
 
 		"array of strings":         {[]string{"foo", "bar"}, []string{"foo", "bar"}},
 		"array of bools":           {[]bool{true, false}, []bool{true, false}},
@@ -310,7 +324,7 @@ func TestNormalizeValue(t *testing.T) {
 		"array of uint64 ok":       {[]uint64{1, 2, 3}, []uint64{1, 2, 3}},
 		"array of uint64 masked":   {[]uint64{1<<63 + 1, 1<<63 + 2, 1<<63 + 3}, []uint64{1, 2, 3}},
 		"array of mapstr.M":        {[]mapstr.M{{"foo": "bar"}}, []mapstr.M{{"foo": "bar"}}},
-		"array of map to mapstr.M": {[]map[string]interface{}{{"foo": "bar"}}, []mapstr.M{{"foo": "bar"}}},
+		"array of map to mapstr.M": {[]map[string]any{{"foo": "bar"}}, []mapstr.M{{"foo": "bar"}}},
 
 		// Wrapper types are converted to primitives using reflection.
 		"custom bool type":          {mybool(true), true},
@@ -320,34 +334,85 @@ func TestNormalizeValue(t *testing.T) {
 		"custom uint64 type masked": {myuint64(1<<63 + 42), uint64(42)},
 
 		// Slices of wrapper types are converted to an []interface{} of primitives.
-		"array of custom bool type":     {[]mybool{true, false}, []interface{}{true, false}},
-		"array of custom int type":      {[]myint{32}, []interface{}{int64(32)}},
-		"array of custom uint type":     {[]myuint{8}, []interface{}{uint64(8)}},
-		"array of custom uint64 ok":     {[]myuint64{64}, []interface{}{uint64(64)}},
-		"array of custom uint64 masked": {[]myuint64{1<<63 + 64}, []interface{}{uint64(64)}},
+		"array of custom bool type":     {[]mybool{true, false}, []any{true, false}},
+		"array of custom int type":      {[]myint{32}, []any{int64(32)}},
+		"array of custom uint type":     {[]myuint{8}, []any{uint64(8)}},
+		"array of custom uint64 ok":     {[]myuint64{64}, []any{uint64(64)}},
+		"array of custom uint64 masked": {[]myuint64{1<<63 + 64}, []any{uint64(64)}},
 	})
 
-	runTests(checkDelta, map[string]testCase{
+	runTests("in delta", checkDelta, map[string]testCase{
 		"float32 value": {float32(1), float64(1)},
 		"float64 value": {float64(1), float64(1)},
 	})
 }
 
-func TestNormalizeMapError(t *testing.T) {
-	badInputs := []mapstr.M{
-		{"func": func() {}},
-		{"chan": make(chan struct{})},
-		{"uintptr": uintptr(123)},
-	}
-
-	g := NewGenericEventConverter(false, logptest.NewTestingLogger(t, ""))
-	for i, in := range badInputs {
-		_, errs := g.normalizeMap(in, "bad.type")
-		if assert.Len(t, errs, 1) {
-			t.Log(errs[0])
-			assert.Contains(t, errs[0].Error(), "key=bad.type", "Test case %v", i)
+func TestNormalizeInPlace(t *testing.T) {
+	ts := time.Date(2026, 4, 13, 9, 23, 18, 0, time.UTC)
+	input := func() mapstr.M {
+		return mapstr.M{
+			"str":     "value",
+			"dropped": nil,
+			"ts":      ts,
+			"nested":  mapstr.M{"n": 1, "dropped": nil},
+			"list":    []mapstr.M{{"l": "a", "dropped": nil}, nil},
+			"nilList": []mapstr.M(nil),
+			"nilMap":  mapstr.M(nil),
 		}
 	}
+	want := mapstr.M{
+		"str":     "value",
+		"ts":      Time(ts),
+		"nested":  mapstr.M{"n": 1},
+		"list":    []mapstr.M{{"l": "a"}, {}},
+		"nilList": []mapstr.M{},
+		"nilMap":  mapstr.M{},
+	}
+
+	t.Run("copying leaves the input untouched", func(t *testing.T) {
+		in := input()
+		g := NewGenericEventConverter(false, false, logptest.NewTestingLogger(t, ""))
+
+		out := g.Convert(in)
+
+		assert.Equal(t, want, out, "the input must be normalized")
+		assert.Equal(t, input(), in, "Convert must not modify the map it was given")
+
+		nested, ok := out["nested"].(mapstr.M)
+		require.True(t, ok, "nested map must stay a mapstr.M")
+		out["added"] = true
+		nested["added"] = true
+		assert.Equal(t, input(), in, "the converted event must not share maps with the input")
+	})
+
+	t.Run("in place normalizes the input itself", func(t *testing.T) {
+		in := input()
+		g := NewGenericEventConverter(false, true, logptest.NewTestingLogger(t, ""))
+
+		out := g.Convert(in)
+
+		assert.Equal(t, want, out, "the input must be normalized")
+		assert.Equal(t, want, in, "converting in place must normalize the map it was given")
+	})
+}
+
+func TestNormalizeMapError(t *testing.T) {
+	forEachMode(t, false, func(t *testing.T, g *GenericEventConverter) {
+		// Rebuilt per mode: converting in place drops the offending keys, so a
+		// second pass over the same maps would report no errors at all.
+		badInputs := []mapstr.M{
+			{"func": func() {}},
+			{"chan": make(chan struct{})},
+			{"uintptr": uintptr(123)},
+		}
+
+		for i, in := range badInputs {
+			_, errs := g.normalizeMap(in, "bad.type")
+			if assert.Len(t, errs, 1) {
+				assert.Contains(t, errs[0].Error(), "key=bad.type", "Test case %v", i)
+			}
+		}
+	})
 }
 
 func TestJoinKeys(t *testing.T) {
@@ -362,7 +427,7 @@ func TestMarshalUnmarshalMap(t *testing.T) {
 		in  mapstr.M
 		out mapstr.M
 	}{
-		{mapstr.M{"names": []string{"a", "b"}}, mapstr.M{"names": []interface{}{"a", "b"}}},
+		{mapstr.M{"names": []string{"a", "b"}}, mapstr.M{"names": []any{"a", "b"}}},
 	}
 
 	for i, test := range tests {
@@ -379,14 +444,14 @@ func TestMarshalUnmarshalMap(t *testing.T) {
 
 func TestMarshalUnmarshalArray(t *testing.T) {
 	tests := []struct {
-		in  interface{}
-		out interface{}
+		in  any
+		out any
 	}{
-		{[]string{"a", "b"}, []interface{}{"a", "b"}},
+		{[]string{"a", "b"}, []any{"a", "b"}},
 	}
 
 	for i, test := range tests {
-		var out interface{}
+		var out any
 		err := marshalUnmarshal(test.in, &out)
 		if err != nil {
 			t.Error(err)
@@ -404,7 +469,7 @@ func TestNormalizeTime(t *testing.T) {
 	}
 
 	now := time.Now().In(ny)
-	g := NewGenericEventConverter(false, logptest.NewTestingLogger(t, ""))
+	g := NewGenericEventConverter(false, false, logptest.NewTestingLogger(t, ""))
 	v, errs := g.normalizeValue(now, "@timestamp")
 	if len(errs) > 0 {
 		t.Fatal(errs)
@@ -419,52 +484,100 @@ func TestNormalizeTime(t *testing.T) {
 	assert.True(t, now.Equal(time.Time(utcCommonTime)))
 }
 
+// BenchmarkConvertEvent measures normalization of a realistic event. Every
+// iteration converts a fresh one, otherwise the in place converter would spend
+// all but the first iteration on an already normalized event.
+func BenchmarkConvertEvent(b *testing.B) {
+	newEvent := func() mapstr.M {
+		return mapstr.M{
+			"message": "2026-01-02T03:04:05.000Z INFO [publisher] pipeline/output.go:143 Connecting to backoff(elasticsearch(http://localhost:9200))",
+			"log": mapstr.M{
+				"level":  "info",
+				"logger": "publisher",
+				"offset": 12345,
+				"file":   mapstr.M{"path": "/var/log/filebeat/filebeat.log"},
+			},
+			"host": mapstr.M{
+				"name":         "host-01",
+				"architecture": "x86_64",
+				"ip":           []string{"10.0.0.4", "fe80::1"},
+				"os": mapstr.M{
+					"family": "debian", "kernel": "6.1.0", "name": "Ubuntu",
+					"platform": "ubuntu", "type": "linux", "version": "22.04.3 LTS",
+				},
+			},
+			"agent": mapstr.M{
+				"type": "filebeat", "version": "9.2.0", "name": "host-01",
+				"id": "8a4f500d-a42a-4f1d-b8c9-1a2b3c4d5e6f",
+			},
+			"ecs":    mapstr.M{"version": "8.11.0"},
+			"input":  mapstr.M{"type": "filestream"},
+			"event":  mapstr.M{"dataset": "filebeat.log", "module": "beat"},
+			"labels": mapstr.M{"env": "prod", "team": "platform"},
+		}
+	}
+
+	for _, mode := range normalizationModes {
+		b.Run(mode.name, func(b *testing.B) {
+			g := NewGenericEventConverter(false, mode.inPlace, logptest.NewTestingLogger(b, ""))
+			b.ReportAllocs()
+			for b.Loop() {
+				b.StopTimer()
+				event := newEvent()
+				b.StartTimer()
+
+				g.Convert(event)
+			}
+		})
+	}
+}
+
 // Uses TextMarshaler interface.
 func BenchmarkConvertToGenericEventNetString(b *testing.B) {
-	g := NewGenericEventConverter(false, logptest.NewTestingLogger(b, ""))
-	for i := 0; i < b.N; i++ {
+	g := NewGenericEventConverter(false, false, logptest.NewTestingLogger(b, ""))
+	for b.Loop() {
 		g.Convert(mapstr.M{"key": NetString("hola")})
 	}
 }
 
-// Uses reflection.
+// Uses the map[string]string fast path.
 func BenchmarkConvertToGenericEventMapStringString(b *testing.B) {
-	g := NewGenericEventConverter(false, logptest.NewTestingLogger(b, ""))
-	for i := 0; i < b.N; i++ {
+	g := NewGenericEventConverter(false, false, logptest.NewTestingLogger(b, ""))
+	for b.Loop() {
 		g.Convert(mapstr.M{"key": map[string]string{"greeting": "hola"}})
 	}
 }
 
 // Uses recursion to step into the nested mapstr.M.
 func BenchmarkConvertToGenericEventMapStr(b *testing.B) {
-	g := NewGenericEventConverter(false, logptest.NewTestingLogger(b, ""))
-	for i := 0; i < b.N; i++ {
-		g.Convert(mapstr.M{"key": map[string]interface{}{"greeting": "hola"}})
+	g := NewGenericEventConverter(false, false, logptest.NewTestingLogger(b, ""))
+	for b.Loop() {
+		g.Convert(mapstr.M{"key": map[string]any{"greeting": "hola"}})
 	}
 }
 
 // No reflection required.
 func BenchmarkConvertToGenericEventStringSlice(b *testing.B) {
-	g := NewGenericEventConverter(false, logptest.NewTestingLogger(b, ""))
-	for i := 0; i < b.N; i++ {
+	g := NewGenericEventConverter(false, false, logptest.NewTestingLogger(b, ""))
+	for b.Loop() {
 		g.Convert(mapstr.M{"key": []string{"foo", "bar"}})
 	}
 }
 
 // Uses reflection to convert the string array.
 func BenchmarkConvertToGenericEventCustomStringSlice(b *testing.B) {
-	g := NewGenericEventConverter(false, logptest.NewTestingLogger(b, ""))
+	g := NewGenericEventConverter(false, false, logptest.NewTestingLogger(b, ""))
 	type myString string
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		g.Convert(mapstr.M{"key": []myString{"foo", "bar"}})
 	}
 }
 
 // Pointers require reflection to generically dereference.
 func BenchmarkConvertToGenericEventStringPointer(b *testing.B) {
-	g := NewGenericEventConverter(false, logptest.NewTestingLogger(b, ""))
+	g := NewGenericEventConverter(false, false, logptest.NewTestingLogger(b, ""))
 	val := "foo"
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		g.Convert(mapstr.M{"key": &val})
 	}
 }
@@ -472,7 +585,7 @@ func TestDeDotJSON(t *testing.T) {
 	var tests = []struct {
 		input  []byte
 		output []byte
-		valuer func() interface{}
+		valuer func() any
 	}{
 		{
 			input: []byte(`[
@@ -487,7 +600,7 @@ func TestDeDotJSON(t *testing.T) {
 				{"key_with_multiple_dots_3": {"key_with_dot_2":"value2_1"}}
 			]
 			`),
-			valuer: func() interface{} { return []interface{}{} },
+			valuer: func() any { return []any{} },
 		},
 		{
 			input: []byte(`{
@@ -512,7 +625,7 @@ func TestDeDotJSON(t *testing.T) {
 				}
 			}
 			`),
-			valuer: func() interface{} { return map[string]interface{}{} },
+			valuer: func() any { return map[string]any{} },
 		},
 	}
 	for _, test := range tests {
@@ -520,8 +633,8 @@ func TestDeDotJSON(t *testing.T) {
 		assert.NoError(t, json.Unmarshal(test.input, &input))
 		assert.NoError(t, json.Unmarshal(test.output, &output))
 		assert.Equal(t, output, DeDotJSON(input))
-		if _, ok := test.valuer().(map[string]interface{}); ok {
-			assert.Equal(t, mapstr.M(output.(map[string]interface{})), DeDotJSON(mapstr.M(input.(map[string]interface{}))))
+		if _, ok := test.valuer().(map[string]any); ok {
+			assert.Equal(t, mapstr.M(output.(map[string]any)), DeDotJSON(mapstr.M(input.(map[string]any))))
 		}
 	}
 }

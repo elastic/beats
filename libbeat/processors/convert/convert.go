@@ -72,7 +72,7 @@ func (p *processor) String() string {
 }
 
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
-	converted := make([]interface{}, len(p.Fields))
+	converted := make([]any, len(p.Fields))
 
 	// Convert the fields and write the results to temporary storage.
 	if err := p.convertFields(event, converted); err != nil {
@@ -98,7 +98,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (p *processor) convertFields(event *beat.Event, converted []interface{}) error {
+func (p *processor) convertFields(event *beat.Event, converted []any) error {
 	// Write conversion results to temporary storage.
 	for i, conv := range p.Fields {
 		v, err := p.convertField(event, conv)
@@ -114,7 +114,7 @@ func (p *processor) convertFields(event *beat.Event, converted []interface{}) er
 	return nil
 }
 
-func (p *processor) convertField(event *beat.Event, conversion field) (interface{}, error) {
+func (p *processor) convertField(event *beat.Event, conversion field) (any, error) {
 	v, err := event.GetValue(conversion.From)
 	if err != nil {
 		if p.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
@@ -134,7 +134,7 @@ func (p *processor) convertField(event *beat.Event, conversion field) (interface
 	return v, nil
 }
 
-func (p *processor) writeToEvent(event *beat.Event, converted []interface{}) error {
+func (p *processor) writeToEvent(event *beat.Event, converted []any) error {
 	for i, conversion := range p.Fields {
 		v := converted[i]
 		if v == ignoredFailure {
@@ -162,7 +162,7 @@ func (p *processor) writeToEvent(event *beat.Event, converted []interface{}) err
 	return nil
 }
 
-func transformType(typ dataType, value interface{}) (interface{}, error) {
+func transformType(typ dataType, value any) (any, error) {
 	switch typ {
 	case String:
 		return toString(value)
@@ -183,7 +183,7 @@ func transformType(typ dataType, value interface{}) (interface{}, error) {
 	}
 }
 
-func toString(value interface{}) (string, error) {
+func toString(value any) (string, error) {
 	switch v := value.(type) {
 	case nil:
 		return "", errors.New("invalid conversion of [null] to string")
@@ -194,7 +194,7 @@ func toString(value interface{}) (string, error) {
 	}
 }
 
-func toLong(value interface{}) (int64, error) {
+func toLong(value any) (int64, error) {
 	switch v := value.(type) {
 	case string:
 		return strToInt(v, 64)
@@ -227,7 +227,7 @@ func toLong(value interface{}) (int64, error) {
 	}
 }
 
-func toInteger(value interface{}) (int32, error) {
+func toInteger(value any) (int32, error) {
 	switch v := value.(type) {
 	case string:
 		i, err := strToInt(v, 32)
@@ -261,7 +261,7 @@ func toInteger(value interface{}) (int32, error) {
 	}
 }
 
-func toFloat(value interface{}) (float32, error) {
+func toFloat(value any) (float32, error) {
 	switch v := value.(type) {
 	case string:
 		f, err := strconv.ParseFloat(v, 32)
@@ -295,7 +295,7 @@ func toFloat(value interface{}) (float32, error) {
 	}
 }
 
-func toDouble(value interface{}) (float64, error) {
+func toDouble(value any) (float64, error) {
 	switch v := value.(type) {
 	case string:
 		f, err := strconv.ParseFloat(v, 64)
@@ -329,7 +329,7 @@ func toDouble(value interface{}) (float64, error) {
 	}
 }
 
-func toBoolean(value interface{}) (bool, error) {
+func toBoolean(value any) (bool, error) {
 	switch v := value.(type) {
 	case string:
 		return strconv.ParseBool(v)
@@ -340,7 +340,7 @@ func toBoolean(value interface{}) (bool, error) {
 	}
 }
 
-func toIP(value interface{}) (string, error) {
+func toIP(value any) (string, error) {
 	switch v := value.(type) {
 	case string:
 		// This is validating that the value is an IP.
@@ -353,7 +353,7 @@ func toIP(value interface{}) (string, error) {
 	}
 }
 
-func newConvertError(conversion field, cause error, tag string, message string, params ...interface{}) error {
+func newConvertError(conversion field, cause error, tag string, message string, params ...any) error {
 	var buf strings.Builder
 	buf.WriteString("failed in processor.convert")
 	if tag != "" {
@@ -378,15 +378,15 @@ func newConvertError(conversion field, cause error, tag string, message string, 
 // cloneValue returns a shallow copy of a map. All other types are passed
 // through in the return. This should be used when making straight copies of
 // maps without doing any type conversions.
-func cloneValue(value interface{}) interface{} {
+func cloneValue(value any) any {
 	switch v := value.(type) {
 	case mapstr.M:
 		return v.Clone()
-	case map[string]interface{}:
+	case map[string]any:
 		return mapstr.M(v).Clone()
-	case []interface{}:
+	case []any:
 		len := len(v)
-		newArr := make([]interface{}, len)
+		newArr := make([]any, len)
 		for idx, val := range v {
 			newArr[idx] = cloneValue(val)
 		}

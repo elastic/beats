@@ -317,9 +317,9 @@ func (client *BaseClient) GetVMForMetadata(resource *Resource, referencePoint Ke
 	vm.Name = *expandedResource.Name
 
 	if expandedResource.Properties != nil {
-		if properties, ok := expandedResource.Properties.(map[string]interface{}); ok {
+		if properties, ok := expandedResource.Properties.(map[string]any); ok {
 			if hardware, ok := properties["hardwareProfile"]; ok {
-				if vmSz, ok := hardware.(map[string]interface{}); ok {
+				if vmSz, ok := hardware.(map[string]any); ok {
 					if vmSz, ok := vmSz["vmSize"]; ok {
 						vm.Size, _ = vmSz.(string)
 					}

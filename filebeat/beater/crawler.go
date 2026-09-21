@@ -122,7 +122,7 @@ func (c *crawler) startInput(
 		return nil
 	}
 
-	var h map[string]interface{}
+	var h map[string]any
 	err := config.Unpack(&h)
 	if err != nil {
 		return fmt.Errorf("could not unpack config: %w", err)
@@ -155,17 +155,14 @@ func (c *crawler) Stop() {
 	c.log.Info("Stopping Crawler")
 
 	asyncWaitStop := func(stop func()) {
-		c.wg.Add(1)
-		go func() {
-			defer c.wg.Done()
+		c.wg.Go(func() {
 			stop()
-		}()
+		})
 	}
 
 	c.log.Infof("Stopping %d inputs", len(c.inputs))
 	// Stop inputs in parallel
 	for id, p := range c.inputs {
-		id, p := id, p
 		asyncWaitStop(func() {
 			c.log.Infof("Stopping input: %d", id)
 			p.Stop()

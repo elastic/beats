@@ -66,8 +66,8 @@ func TestFetchNoRAID(t *testing.T) {
 	assert.Empty(t, events)
 }
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
+func getConfig() map[string]any {
+	return map[string]any{
 		"module":     "system",
 		"metricsets": []string{"raid"},
 		"hostfs":     "./_meta/testdata",

@@ -39,7 +39,7 @@ type TypeInfo interface {
 
 	// New creates a pointer to an empty version of whatever type
 	// is referenced by the TypeInfo receiver
-	New() interface{}
+	New() any
 }
 
 type NativeType struct {
@@ -48,7 +48,7 @@ type NativeType struct {
 	custom string // only used for TypeCustom
 }
 
-func (t NativeType) New() interface{} {
+func (t NativeType) New() any {
 	return reflect.New(goType(t)).Interface()
 }
 
@@ -82,43 +82,42 @@ type CollectionType struct {
 func goType(t TypeInfo) reflect.Type {
 	switch t.Type() {
 	case TypeVarchar, TypeASCII, TypeInet, TypeText:
-		return reflect.TypeOf(*new(string))
+		return reflect.TypeFor[string]()
 	case TypeBigInt, TypeCounter:
-		return reflect.TypeOf(*new(int64))
+		return reflect.TypeFor[int64]()
 	case TypeTimestamp:
-		return reflect.TypeOf(*new(time.Time))
+		return reflect.TypeFor[time.Time]()
 	case TypeBlob:
-		return reflect.TypeOf(*new([]byte))
+		return reflect.TypeFor[[]byte]()
 	case TypeBoolean:
-		return reflect.TypeOf(*new(bool))
+		return reflect.TypeFor[bool]()
 	case TypeFloat:
-		return reflect.TypeOf(*new(float32))
+		return reflect.TypeFor[float32]()
 	case TypeDouble:
-		return reflect.TypeOf(*new(float64))
+		return reflect.TypeFor[float64]()
 	case TypeInt:
-		return reflect.TypeOf(*new(int))
+		return reflect.TypeFor[int]()
 	case TypeDecimal:
-		return reflect.TypeOf(*new(*inf.Dec))
+		return reflect.TypeFor[*inf.Dec]()
 	case TypeUUID, TypeTimeUUID:
-		return reflect.TypeOf(*new(UUID))
+		return reflect.TypeFor[UUID]()
 	case TypeList, TypeSet:
 		return reflect.SliceOf(goType(t.(CollectionType).Elem))
 	case TypeMap:
 		return reflect.MapOf(goType(t.(CollectionType).Key), goType(t.(CollectionType).Elem))
 	case TypeVarint:
-		return reflect.TypeOf(*new(*big.Int))
+		return reflect.TypeFor[*big.Int]()
 	case TypeTuple:
 		// what can we do here? all there is to do is to make a list of interface{}
-		tuple := t.(TupleTypeInfo)
-		return reflect.TypeOf(make([]interface{}, len(tuple.Elems)))
+		return reflect.TypeFor[[]any]()
 	case TypeUDT:
-		return reflect.TypeOf(make(map[string]interface{}))
+		return reflect.TypeFor[map[string]any]()
 	default:
 		return nil
 	}
 }
 
-func (t CollectionType) New() interface{} {
+func (t CollectionType) New() any {
 	return reflect.New(goType(t)).Interface()
 }
 
@@ -140,7 +139,7 @@ type TupleTypeInfo struct {
 	Elems []TypeInfo
 }
 
-func (t TupleTypeInfo) New() interface{} {
+func (t TupleTypeInfo) New() any {
 	return reflect.New(goType(t)).Interface()
 }
 
@@ -156,7 +155,7 @@ type UDTTypeInfo struct {
 	Elements []UDTField
 }
 
-func (u UDTTypeInfo) New() interface{} {
+func (u UDTTypeInfo) New() any {
 	return reflect.New(goType(u)).Interface()
 }
 
@@ -351,11 +350,13 @@ const (
 
 type protoVersion byte
 
-func (p protoVersion) IsRequest() bool {
+func (p protoVersion) IsRequest(logger *logp.Logger) bool {
 	v := p.version()
 
 	if v < protoVersion1 || v > protoVersion4 {
-		logp.Err("unsupported request version: %x", v)
+		if logger != nil {
+			logger.Errorf("unsupported request version: %x", v)
+		}
 	}
 
 	if v == protoVersion4 {
@@ -369,11 +370,13 @@ func (p protoVersion) IsRequest() bool {
 	return p == 0x00
 }
 
-func (p protoVersion) IsResponse() bool {
+func (p protoVersion) IsResponse(logger *logp.Logger) bool {
 	v := p.version()
 
 	if v < protoVersion1 || v > protoVersion4 {
-		logp.Err("unsupported response version: %x", v)
+		if logger != nil {
+			logger.Errorf("unsupported response version: %x", v)
+		}
 	}
 
 	if v == protoVersion4 {
@@ -393,7 +396,7 @@ func (p protoVersion) version() byte {
 
 func (p protoVersion) String() string {
 	dir := "REQ"
-	if p.IsResponse() {
+	if p.IsResponse(nil) {
 		dir = "RESP"
 	}
 

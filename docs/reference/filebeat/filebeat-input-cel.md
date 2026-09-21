@@ -4,7 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html
 sub:
   mito_docs: https://pkg.go.dev/github.com/elastic/mito
-  mito_version: v1.25.1
+  mito_version: v1.26.1-0.20260617204810-b54ab9f21153
 applies_to:
   stack: ga 8.6.0
   serverless: ga
@@ -122,7 +122,7 @@ After completion of a program’s execution it should return a single object wit
 }
 ```
 
-1. The `events` field must be present, but may be empty or null. If it is not empty, it must only have objects as elements. The field should be an array, but in the case of an error condition in the CEL program it is acceptable to return a single object instead of an array; this will will be wrapped as an array for publication and an error will be logged. If the single object contains a key, "error", the error value will be used to update the status of the input to report to Elastic Agent. This can be used to more rapidly respond to API failures. It is recommended that the object conforms to ECS field definitions, but this is not enforced.
+1. The `events` field must be present, but may be empty or null. If it is not empty, it must only have objects as elements. The field should be an array, but in the case of an error condition in the CEL program it is acceptable to return a single object instead of an array; this will be wrapped as an array for publication and an error will be logged. If the single object contains a key, "error", the error value will be used to update the status of the input to report to Elastic Agent. This can be used to more rapidly respond to API failures. It is recommended that the object conforms to ECS field definitions, but this is not enforced. As an alternative to collecting events in this array, the [`emit` macro](#cel-emit-macro) can publish events individually during evaluation.
 2. If `cursor` is present it must be either be a single object or an array with the same length as events; each element *i* of the `cursor` will be the details for obtaining the events at and beyond event *i* in the `events` array. If the `cursor` is a single object it is will be the details for obtaining events after the last event in the `events` array and will only be retained on successful publication of all the events in the `events` array.
 3. If `rate_limit` is present it must be a map with numeric fields `rate` and `burst`. The `rate_limit` field may also have a string `error` field and other fields which will be logged. If it has an `error` field, the `rate` and `burst` will not be used to set rate limit behavior. The [Limit]({{mito_docs}}@{{mito_version}}/lib#Limit), and [Okta Rate Limit policy]({{mito_docs}}@{{mito_version}}/lib#OktaRateLimit) and [Draft Rate Limit policy]({{mito_docs}}@{{mito_version}}/lib#DraftRateLimit) documentation show how to construct this field.
 4. The evaluation is repeated with the new state, after removing the events field, if the "want_more" field is present and true, and a non-zero events array is returned. If the "want_more" field is present after a failed evaluation, it is set to false.
@@ -134,6 +134,60 @@ The `status_code`, `header` and `rate_limit` values may be omitted if the progra
 ## Debug state logging [_debug_state_logging]
 
 The CEL input will log the complete state after evaluation when logging at the DEBUG level. This will include any sensitive or secret information kept in the `state` object, and so DEBUG level logging should not be used in production when sensitive information is retained in the `state` object. Values under `state.secret` are always redacted automatically (see [`secret_state`](#secret-state-cel)). See [`redact`](#cel-state-redact) configuration parameters for settings to exclude other sensitive fields from DEBUG logs.
+
+
+## Emit macro [cel-emit-macro]
+
+```{applies_to}
+stack: ga 9.5+
+```
+
+The `emit` macro provides an alternative to collecting events in the `events` array. Instead of building a list of events and returning them in state, `emit` publishes each event individually during CEL evaluation. This is useful for processing large payloads — particularly when combined with streaming decompression (`stream_gzip`, `stream_zip`) and lazy JSON decoding (`decode_json_stream_lazy`) — because events are published as they are decoded rather than being held in memory.
+
+### Call forms
+
+```text
+// Two-arg: publish each element, no cursor tracking.
+<range>.emit(<iterVar>, <valueExpr>)
+
+// Three-arg: publish each element with a per-element cursor.
+<range>.emit(<iterVar>, <valueExpr>, <cursorExpr>)
+```
+
+The range must be a list or iterable (such as the result of `decode_json_stream_lazy`). For each element, the macro evaluates the value expression, optionally the cursor expression, and publishes the event. Iteration is sequential and cursor ordering is preserved.
+
+The macro returns `{"published": <int>}`. If a cursor expression was provided and at least one event was published, the result also contains `{"cursor": <lastCursor>}`. If iteration stops early due to a decode error, an evaluation error, or a publish failure, the result includes `{"error": <message>}`.
+
+### Cursor bookkeeping
+
+When `emit` is used with cursors (three-arg form), the program must return a single-element `events` array and a corresponding `cursor` so the input can track cursor state for error recovery. The sentinel event is typically dropped by a [filebeat processor](/reference/filebeat/filtering-enhancing-data.md) such as `drop_event` so it is not sent to the output. This is the same pattern used when `want_more` is true with no publishable results.
+
+When `emit` is used without cursors (two-arg form), `events` may be empty.
+
+### Example
+
+Streaming decompression with lazy decode and emit:
+
+```yaml
+filebeat.inputs:
+- type: cel
+  resource.url: https://example.com/api/export
+  program: |
+    bytes(state.url.get(state.header).Body).as(body,
+      body.stream_gzip().decode_json_stream_lazy().emit(e, e, state.cursor).as(r,
+        has(r.error) ?
+          {"events": [{"error": r.error}]}
+        :
+          {"events": [r], "cursor": [r.cursor]}
+      )
+    )
+  processors:
+    - drop_event:
+        when:
+          has_fields: ["published"]
+```
+
+When emit encounters an error, the result map contains an `"error"` key. The example above checks for this with `has(r.error)` and returns an error object instead of advancing the cursor. This prevents the input from skipping past data that was not fully processed.
 
 
 ## CEL extension libraries [_cel_extension_libraries]
@@ -209,6 +263,8 @@ As noted above the `cel` input provides functions, macros, and global variables 
     * [Encode JSON]({{mito_docs}}@{{mito_version}}/lib#hdr-Encode_JSON-JSON)
     * [Decode JSON]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_JSON-JSON)
     * [Decode JSON Stream]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_JSON_Stream-JSON)
+    * [Decode JSON Stream Lazy]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_JSON_Stream_Lazy-JSON) — lazy iterable that decodes concatenated JSON values on demand; accepts bytes, string, or a stream value from `stream_gzip`/`stream_zip` {applies_to}`stack: ga 9.5+`
+    * [Decode JSON Stream Lazy String Numbers]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_JSON_Stream_Lazy_String_Numbers-JSON) {applies_to}`stack: ga 9.5+`
 
 * [XML]({{mito_docs}}@{{mito_version}}/lib#XML) — the XML extension is initialized with XML schema definitions provided via the `xsd` configuration option.
 
@@ -259,6 +315,22 @@ As noted above the `cel` input provides functions, macros, and global variables 
 * [Debug]({{mito_docs}}@{{mito_version}}/lib#Debug) — the debug handler registers a logger with the name extension `cel_debug` and calls to the CEL `debug` function are emitted to that logger.
 
     * [Debug]({{mito_docs}}@{{mito_version}}/lib#hdr-Debug)
+
+* [Emit]({{mito_docs}}@{{mito_version}}/lib#Emit) — the emit macro publishes events during CEL evaluation instead of collecting them in the `events` array. See [Emit macro](#cel-emit-macro) for details. {applies_to}`stack: ga 9.5+`
+
+* [Stream]({{mito_docs}}@{{mito_version}}/lib#Stream) — stream producers wrap decompression readers around in-memory bytes, returning an opaque stream value for use with lazy decode functions. {applies_to}`stack: ga 9.5+`
+
+    * [stream_gzip]({{mito_docs}}@{{mito_version}}/lib#hdr-stream_gzip-Stream)
+    * [stream_zip]({{mito_docs}}@{{mito_version}}/lib#hdr-stream_zip-Stream)
+
+* [CSV]({{mito_docs}}@{{mito_version}}/lib#CSV) — lazy CSV stream decoders that produce rows on demand from a stream, bytes, or string value. {applies_to}`stack: ga 9.5+`
+
+    * [decode_csv_stream_lazy]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_CSV_Stream_Lazy-CSV) — the first row is treated as a header; each subsequent row is returned as a `map<string, string>` keyed by the header values
+    * [decode_csv_stream_lazy_no_header]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_CSV_Stream_Lazy_No_Header-CSV) — each row is returned as a `list<string>` with no header row consumed
+
+* [Lines]({{mito_docs}}@{{mito_version}}/lib#Lines) — lazy line streamer that yields one string per line from a stream, bytes, or string value. {applies_to}`stack: ga 9.5+`
+
+    * [decode_lines]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_Lines-Lines)
 
 
 In addition to the extensions provided in the packages listed above, a global variable `useragent` is also provided which gives the user CEL program access to the filebeat user-agent string. By default, this value is assigned to all requests' user-agent headers unless the CEL program has already set the user-agent header value. Programs wishing to not provide a user-agent, should set this header to the empty string, `""`.
@@ -711,17 +783,17 @@ OAuth2 settings are disabled if either `enabled` is set to `false` or the `auth.
 
 ### `auth.oauth2.provider` [_auth_oauth2_provider]
 
-Used to configure supported oauth2 providers. Each supported provider will require specific settings. It is not set by default. Supported providers are: `azure`, `google`, `okta`.
+Used to configure supported oauth2 providers. Each supported provider will require specific settings. It is not set by default. Supported providers are: `azure`, `box`, `google`, `okta`.
 
 
 ### `auth.oauth2.client.id` [_auth_oauth2_client_id]
 
-The client ID used as part of the authentication flow. It is always required except if using `google` as provider. Required for providers: `default`, `azure`, `okta`.
+The client ID used as part of the authentication flow. It is always required except if using `google` as provider. Required for providers: `default`, `azure`, `okta`. For `box`, required when using discrete credentials; not used when `box.config_file` or `box.config_json` is set.
 
 
 ### `auth.oauth2.client.secret` [_auth_oauth2_client_secret]
 
-The client secret used as part of the authentication flow. It is always required except if using `google` or `okta` as provider. Required for providers: `default`, `azure`.
+The client secret used as part of the authentication flow. It is always required except if using `google` or `okta` as provider. Required for providers: `default`, `azure`. For `box`, required when using discrete credentials; not used when `box.config_file` or `box.config_json` is set.
 
 
 ### `auth.oauth2.user` [_auth_oauth2_user]
@@ -750,6 +822,8 @@ The endpoint that will be used to generate the tokens during the oauth2 flow. It
 
 ::::{note}
 For `azure` provider either `token_url` or `azure.tenant_id` is required.
+
+For `box` provider `token_url` is optional and defaults to `https://api.box.com/oauth2/token`.
 ::::
 
 
@@ -780,6 +854,86 @@ For information about where to find it, you can refer to [https://docs.microsoft
 ### `auth.oauth2.azure.resource` [_auth_oauth2_azure_resource]
 
 The accessed WebAPI resource when using `azure` provider. It is not required.
+
+
+### `auth.oauth2.box.config_file` [_auth_oauth2_box_config_file]
+
+```{applies_to}
+stack: ga 9.6.0
+```
+
+Path to the `config.json` file downloaded from the Box Developer Console. The file contains all credentials needed to authenticate: client ID, client secret, RSA private key, passphrase, public key ID, and enterprise ID.
+
+::::{note}
+Only one of `box.config_file`, `box.config_json`, or discrete credentials (`box.private_key`) may be set. For more information, refer to [https://developer.box.com/guides/authentication/jwt/without-sdk/](https://developer.box.com/guides/authentication/jwt/without-sdk/).
+::::
+
+
+### `auth.oauth2.box.config_json` [_auth_oauth2_box_config_json]
+
+```{applies_to}
+stack: ga 9.6.0
+```
+
+The Box Developer Console `config.json` content as a raw JSON blob. Use this when the credentials are injected as an environment variable or a secret rather than stored on disk.
+
+::::{note}
+Only one of `box.config_file`, `box.config_json`, or discrete credentials (`box.private_key`) may be set. For more information, refer to [https://developer.box.com/guides/authentication/jwt/without-sdk/](https://developer.box.com/guides/authentication/jwt/without-sdk/).
+::::
+
+
+### `auth.oauth2.box.enterprise_id` [_auth_oauth2_box_enterprise_id]
+
+```{applies_to}
+stack: ga 9.6.0
+```
+
+The Box enterprise ID. Used as the JWT subject when `box.subject_type` is `enterprise` (the default). Not required when using `box.config_file` or `box.config_json`, since the enterprise ID is read from those files.
+
+
+### `auth.oauth2.box.public_key_id` [_auth_oauth2_box_public_key_id]
+
+```{applies_to}
+stack: ga 9.6.0
+```
+
+The public key ID from the Box Developer Console, added as the `kid` header of the JWT assertion. Optional for discrete credentials; not used when `box.config_file` or `box.config_json` is set.
+
+
+### `auth.oauth2.box.private_key` [_auth_oauth2_box_private_key]
+
+```{applies_to}
+stack: ga 9.6.0
+```
+
+The RSA private key in PKCS#8 PEM form for the Box app. Supports both plain (`BEGIN PRIVATE KEY`) and encrypted (`BEGIN ENCRYPTED PRIVATE KEY`) blocks. When the key is encrypted, provide the passphrase via `box.passphrase`. Required for discrete credentials; not used when `box.config_file` or `box.config_json` is set.
+
+
+### `auth.oauth2.box.passphrase` [_auth_oauth2_box_passphrase]
+
+```{applies_to}
+stack: ga 9.6.0
+```
+
+Passphrase for decrypting `box.private_key` when it is an encrypted PKCS#8 key. Leave empty for unencrypted keys. When using `box.config_file` or `box.config_json`, the passphrase is read from the file.
+
+
+### `auth.oauth2.box.subject_type` [_auth_oauth2_box_subject_type]
+
+```{applies_to}
+stack: ga 9.6.0
+```
+
+Whether the JWT subject identifies an enterprise service account or a specific user. Accepted values: `enterprise` (default) or `user`. When set to `user`, `box.subject_id` must also be provided.
+
+
+### `auth.oauth2.box.subject_id` [_auth_oauth2_box_subject_id]
+
+```{applies_to}
+stack: ga 9.6.0
+```
+
+The Box user ID to impersonate. Required when `box.subject_type` is `user`. Must not be set when `box.subject_type` is `enterprise`.
 
 
 ### `auth.oauth2.google.credentials_file` [_auth_oauth2_google_credentials_file]
@@ -1120,12 +1274,23 @@ The maximum time to wait before a retry is attempted. Default: `60s`.
 
 ### `resource.redirect.forward_headers` [_resource_redirect_forward_headers]
 
-When set to `true` request headers are forwarded in case of a redirect. Default: `false`.
+When set to `true` request headers are forwarded in case of a redirect. Headers listed in `redirect.sensitive_headers` are removed automatically on cross-origin or HTTPS-to-HTTP redirects. Default: `false`.
 
 
 ### `resource.redirect.headers_ban_list` [_resource_redirect_headers_ban_list]
 
 When `redirect.forward_headers` is set to `true`, all headers *except* the ones defined in this list will be forwarded. Default: `[]`.
+
+
+### `resource.redirect.sensitive_headers` [_resource_redirect_sensitive_headers]
+
+```{applies_to}
+stack: ga 9.3+
+```
+
+A list of header names that are automatically removed when a redirect crosses to a different host or downgrades from HTTPS to HTTP. This prevents credential leakage to unintended origins. Default: `["Authorization", "Proxy-Authorization", "Cookie"]`.
+
+Set to `[]` to disable cross-origin header stripping and forward all headers regardless of the redirect target (not recommended unless the target shares the same authentication domain).
 
 
 ### `resource.redirect.max_redirects` [_resource_redirect_max_redirects]

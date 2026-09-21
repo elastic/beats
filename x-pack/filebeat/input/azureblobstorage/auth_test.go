@@ -6,25 +6,41 @@ package azureblobstorage
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	"regexp"
+	"slices"
+	"strings"
+	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/sync/errgroup"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/mock"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
+
+// imdsHost is the link-local address of the Azure Instance Metadata Service. A
+// managed identity credential asks this host for a token when it runs on an Azure
+// virtual machine.
+const imdsHost = "169.254.169.254"
 
 // customTransporter implements the Transporter interface with a custom Do & RoundTrip method
 type customTransporter struct {
@@ -39,6 +55,19 @@ func (t *customTransporter) RoundTrip(req *http.Request) (*http.Response, error)
 // Do is responsible for the routing of the request to the appropriate handler based on the request URL
 func (t *customTransporter) Do(req *http.Request) (*http.Response, error) {
 	logp.L().Named("azure-blob-storage-test").Debug("request URL: ", req.URL)
+
+	// A managed identity credential reads its token from the identity endpoint of
+	// the Azure host, which is a link-local address. Answer it here so the test
+	// needs no Azure host. The body is what the SDK unmarshals into an access
+	// token.
+	if req.URL.Host == imdsHost {
+		return createJSONResponse(map[string]any{
+			"access_token": "mock_access_token_123",
+			"expires_in":   3600,
+			"resource":     "https://storage.azure.com",
+			"token_type":   "Bearer",
+		}, http.StatusOK)
+	}
 
 	// Intercept calls to Azure AD endpoints and route them to our test server
 	testURL, _ := url.Parse(t.servURL)
@@ -55,14 +84,14 @@ func (t *customTransporter) Do(req *http.Request) (*http.Response, error) {
 
 			switch action {
 			case "v2.0/.well-known/openid-configuration":
-				return createJSONResponse(map[string]interface{}{
+				return createJSONResponse(map[string]any{
 					"token_endpoint":         "https://login.microsoftonline.com/" + tenant_id + "/oauth2/v2.0/token",
 					"authorization_endpoint": "https://login.microsoftonline.com/" + tenant_id + "/oauth2/v2.0/authorize",
 					"issuer":                 "https://login.microsoftonline.com/" + tenant_id + "/v2.0",
 				}, 200)
 
 			case "oauth2/v2.0/token":
-				return createJSONResponse(map[string]interface{}{
+				return createJSONResponse(map[string]any{
 					"token_type":   "Bearer",
 					"expires_in":   3600,
 					"access_token": "mock_access_token_123",
@@ -75,7 +104,7 @@ func (t *customTransporter) Do(req *http.Request) (*http.Response, error) {
 	return t.rt.RoundTrip(req)
 }
 
-func createJSONResponse(data interface{}, statusCode int) (*http.Response, error) {
+func createJSONResponse(data any, statusCode int) (*http.Response, error) {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		return nil, err
@@ -91,18 +120,344 @@ func createJSONResponse(data interface{}, statusCode int) (*http.Response, error
 	return resp, nil
 }
 
+// flakyTransporter wraps customTransporter and answers the first failListBlobs
+// "list blobs" requests with a synthetic Azure "503 ServerBusy" before letting
+// requests through. It reproduces the transient throttling from sdh-beats#7324
+// so we can assert that blob listing (pagination) is now retried.
+type flakyTransporter struct {
+	inner         *customTransporter
+	failListBlobs int
+
+	mu           sync.Mutex
+	listAttempts int
+}
+
+func (t *flakyTransporter) Do(req *http.Request) (*http.Response, error) {
+	// The list-blobs call is the pagination request (GET on the container with
+	// comp=list); blob downloads use a different path and are left untouched.
+	if req.URL.Query().Get("comp") == "list" {
+		t.mu.Lock()
+		shouldFail := t.listAttempts < t.failListBlobs
+		if shouldFail {
+			t.listAttempts++
+		}
+		t.mu.Unlock()
+		if shouldFail {
+			return serverBusyResponse(req), nil
+		}
+	}
+	return t.inner.Do(req)
+}
+
+// attempts reports how many list-blobs requests have been observed so far,
+// under the same lock used to record them.
+func (t *flakyTransporter) attempts() int {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	return t.listAttempts
+}
+
+func serverBusyResponse(req *http.Request) *http.Response {
+	const body = `<?xml version="1.0" encoding="utf-8"?><Error><Code>ServerBusy</Code><Message>The server is busy.</Message></Error>`
+	h := make(http.Header)
+	h.Set("Content-Type", "application/xml")
+	return &http.Response{
+		StatusCode: http.StatusServiceUnavailable,
+		Status:     "503 The server is busy.",
+		Body:       io.NopCloser(strings.NewReader(body)),
+		Header:     h,
+		Request:    req,
+	}
+}
+
+// Test_ListBlobsRetriesOnTransientError verifies that a transient 503 during
+// blob listing no longer kills the input: with retries configured, the pager
+// recovers and every expected blob is still ingested.
+func Test_ListBlobsRetriesOnTransientError(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+
+	serv := httptest.NewServer(mock.AzureStorageServer())
+	t.Cleanup(serv.Close)
+
+	// Fail the first three list attempts, then succeed. With max_retries: 10 the
+	// pager has enough attempts left to get through the throttling.
+	transport := &flakyTransporter{
+		inner:         &customTransporter{rt: http.DefaultTransport, servURL: serv.URL},
+		failListBlobs: 3,
+	}
+
+	baseConfig := map[string]any{
+		"account_name": "beatsblobnew",
+		"auth.oauth2": map[string]any{
+			"client_id":     "12345678-90ab-cdef-1234-567890abcdef",
+			"client_secret": "abcdefg1234567890!@#$%^&*()-_=+",
+			"tenant_id":     "87654321-abcd-ef90-1234-fedcba098765",
+		},
+		"max_workers": 2,
+		"poll":        false,
+		"containers": []map[string]any{
+			{"name": beatsContainer},
+		},
+		// Keep the backoff tiny so the test stays fast.
+		"retry": map[string]any{
+			"max_retries":         10,
+			"initial_retry_delay": "1ms",
+			"max_retry_delay":     "5ms",
+		},
+	}
+	expected := map[string]bool{
+		mock.Beatscontainer_blob_ata_json:      true,
+		mock.Beatscontainer_blob_data3_json:    true,
+		mock.Beatscontainer_blob_docs_ata_json: true,
+	}
+
+	cfg := conf.MustNewConfigFrom(baseConfig)
+	c := config{}
+	require.NoError(t, cfg.Unpack(&c))
+
+	// inject the flaky transport; the retry policy is wired from c.Retry.
+	c.clientOptions = azcore.ClientOptions{
+		InsecureAllowCredentialWithHTTP: true,
+		Transport:                       transport,
+	}
+
+	input := newStatelessInput(c, serv.URL+"/", logger)
+	assert.NoError(t, input.Test(v2.TestContext{}), "input.Test should succeed")
+
+	chanClient := beattest.NewChanClient(len(expected))
+	t.Cleanup(func() { _ = chanClient.Close() })
+
+	ctx, cancel := newV2Context(t)
+	t.Cleanup(cancel)
+	ctx.ID += "-retry"
+
+	var g errgroup.Group
+	g.Go(func() error {
+		return input.Run(ctx, chanClient)
+	})
+
+	timeout := time.NewTimer(10 * time.Second)
+	t.Cleanup(func() { timeout.Stop() })
+
+	var receivedCount int
+wait:
+	for {
+		select {
+		case <-timeout.C:
+			t.Errorf("timed out waiting for %d events after transient list failures", len(expected))
+			cancel()
+			break wait
+		case got := <-chanClient.Channel:
+			val, err := got.Fields.GetValue("message")
+			assert.NoError(t, err, "published event should carry a message field")
+			assert.True(t, expected[val.(string)], "received unexpected message: %v", val)
+			receivedCount++
+			if receivedCount == len(expected) {
+				cancel()
+				break wait
+			}
+		}
+	}
+
+	// Wait for the input to finish so the transport goroutines are done before
+	// we inspect the attempt counter.
+	assert.NoError(t, g.Wait(), "input run should complete without error")
+	assert.GreaterOrEqual(t, transport.attempts(), 3,
+		"the list-blobs request should have been retried past the transient 503s")
+}
+
+// recordingStatusReporter captures the statuses reported by the input so tests
+// can assert on the transitions.
+type recordingStatusReporter struct {
+	mu       sync.Mutex
+	statuses []status.Status
+}
+
+func (r *recordingStatusReporter) UpdateStatus(s status.Status, _ string) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.statuses = append(r.statuses, s)
+}
+
+func (r *recordingStatusReporter) has(target status.Status) bool {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return slices.Contains(r.statuses, target)
+}
+
+// last returns the most recently reported status, if any.
+func (r *recordingStatusReporter) last() (status.Status, bool) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if len(r.statuses) == 0 {
+		return 0, false
+	}
+	return r.statuses[len(r.statuses)-1], true
+}
+
+// Test_ListBlobsNonFatalWhilePolling verifies that a sustained listing failure
+// (throttling that outlives the SDK's per-request retries) is non-fatal when
+// polling: the input is marked Degraded and keeps running so it can recover on
+// a later poll. Without polling there is no next cycle, so the failure surfaces
+// and the input stops.
+func Test_ListBlobsNonFatalWhilePolling(t *testing.T) {
+	// A server that always answers with 503 ServerBusy, simulating a sustained
+	// Azure Storage outage.
+	serv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/xml")
+		w.WriteHeader(http.StatusServiceUnavailable)
+		_, _ = io.WriteString(w, `<?xml version="1.0" encoding="utf-8"?><Error><Code>ServerBusy</Code><Message>The server is busy.</Message></Error>`)
+	}))
+	t.Cleanup(serv.Close)
+
+	baseConfig := map[string]any{
+		"account_name":                        "beatsblobnew",
+		"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+		"max_workers":                         1,
+		"containers": []map[string]any{
+			{"name": beatsContainer},
+		},
+		// Keep the retry backoff tiny so the failing list call returns quickly.
+		"retry": map[string]any{
+			"max_retries":         1,
+			"initial_retry_delay": "1ms",
+			"max_retry_delay":     "5ms",
+		},
+	}
+
+	newSched := func(t *testing.T, poll bool, statusRec status.StatusReporter) *scheduler {
+		t.Helper()
+		cfg := conf.MustNewConfigFrom(baseConfig)
+		c := defaultConfig()
+		require.NoError(t, cfg.Unpack(&c), "config should unpack")
+
+		log := logptest.NewTestingLogger(t, "")
+		serviceClient, credential, err := fetchServiceClientAndCreds(c, c.Retry, serv.URL+"/", log)
+		require.NoError(t, err, "service client should be created")
+		containerClient, err := fetchContainerClient(serviceClient, beatsContainer, log)
+		require.NoError(t, err, "container client should be created")
+
+		src := &Source{
+			AccountName:   c.AccountName,
+			ContainerName: beatsContainer,
+			MaxWorkers:    1,
+			Poll:          poll,
+			PollInterval:  time.Millisecond,
+			Retry:         c.Retry,
+		}
+		return newScheduler(&publisher{}, containerClient, credential, src, &c, newState(), serv.URL+"/", statusRec, nil, log)
+	}
+
+	t.Run("polling keeps the input alive and Degraded", func(t *testing.T) {
+		rec := &recordingStatusReporter{}
+		sched := newSched(t, true, rec)
+
+		err := sched.scheduleOnce(context.Background())
+		assert.NoError(t, err, "a listing failure while polling must be non-fatal so the input keeps running")
+		assert.True(t, rec.has(status.Degraded), "the input should be marked Degraded after a listing failure")
+		assert.False(t, rec.has(status.Failed), "a polling listing failure must not mark the input Failed")
+	})
+
+	t.Run("without polling the failure is fatal", func(t *testing.T) {
+		rec := &recordingStatusReporter{}
+		sched := newSched(t, false, rec)
+
+		err := sched.scheduleOnce(context.Background())
+		assert.Error(t, err, "without polling there is no recovery, so the listing failure must surface")
+		assert.True(t, rec.has(status.Failed), "a one-shot listing failure should mark the input Failed")
+	})
+}
+
+// Test_ListBlobsRecoversToRunningOnEmptyPoll covers the Degraded -> Running
+// recovery path for the edge case where a poll recovers but schedules no jobs
+// (no new blobs, or everything filtered out or already past the checkpoint).
+// A transient listing failure first marks the input Degraded; once listing
+// succeeds the input must report Running again even though the successful poll
+// publishes no events (so nothing else would clear the Degraded state).
+func Test_ListBlobsRecoversToRunningOnEmptyPoll(t *testing.T) {
+	// healthy flips from false (503 ServerBusy) to true (a valid but empty
+	// listing) between the two polls, simulating an outage that clears.
+	var healthy atomic.Bool
+	serv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/xml")
+		if !healthy.Load() {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			_, _ = io.WriteString(w, `<?xml version="1.0" encoding="utf-8"?><Error><Code>ServerBusy</Code><Message>The server is busy.</Message></Error>`)
+			return
+		}
+		// A valid but empty blob listing: the poll succeeds yet schedules no jobs.
+		_, _ = io.WriteString(w, `<?xml version="1.0" encoding="utf-8"?>
+<EnumerationResults ServiceEndpoint="https://127.0.0.1/" ContainerName="`+beatsContainer+`">
+	<Blobs></Blobs>
+	<NextMarker />
+</EnumerationResults>`)
+	}))
+	t.Cleanup(serv.Close)
+
+	baseConfig := map[string]any{
+		"account_name":                        "beatsblobnew",
+		"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+		"max_workers":                         1,
+		"poll":                                true,
+		"containers": []map[string]any{
+			{"name": beatsContainer},
+		},
+		// Keep the retry backoff tiny so the failing list call returns quickly.
+		"retry": map[string]any{
+			"max_retries":         1,
+			"initial_retry_delay": "1ms",
+			"max_retry_delay":     "5ms",
+		},
+	}
+
+	cfg := conf.MustNewConfigFrom(baseConfig)
+	c := defaultConfig()
+	require.NoError(t, cfg.Unpack(&c), "config should unpack")
+
+	log := logptest.NewTestingLogger(t, "")
+	serviceClient, credential, err := fetchServiceClientAndCreds(c, c.Retry, serv.URL+"/", log)
+	require.NoError(t, err, "service client should be created")
+	containerClient, err := fetchContainerClient(serviceClient, beatsContainer, log)
+	require.NoError(t, err, "container client should be created")
+
+	src := &Source{
+		AccountName:   c.AccountName,
+		ContainerName: beatsContainer,
+		MaxWorkers:    1,
+		Poll:          true,
+		PollInterval:  time.Millisecond,
+		Retry:         c.Retry,
+	}
+	rec := &recordingStatusReporter{}
+	sched := newScheduler(&publisher{}, containerClient, credential, src, &c, newState(), serv.URL+"/", rec, nil, log)
+
+	// First poll: the outage is ongoing, so the transient listing failure is
+	// non-fatal and marks the input Degraded.
+	require.NoError(t, sched.scheduleOnce(context.Background()), "a transient listing failure while polling must be non-fatal")
+	require.True(t, rec.has(status.Degraded), "the input should be Degraded after a transient listing failure")
+
+	// Second poll: listing succeeds but returns no blobs. The input must still
+	// report Running so a recovery that schedules no jobs is not left Degraded.
+	healthy.Store(true)
+	require.NoError(t, sched.scheduleOnce(context.Background()), "a successful empty poll must not error")
+
+	got, ok := rec.last()
+	require.True(t, ok, "at least one status should have been reported")
+	assert.Equal(t, status.Running, got, "an empty but successful poll should return the input to Running")
+}
+
 func Test_OAuth2(t *testing.T) {
 	tests := []struct {
 		name        string
-		baseConfig  map[string]interface{}
+		baseConfig  map[string]any
 		mockHandler func() http.Handler
 		expected    map[string]bool
 	}{
 		{
 			name: "OAuth2TConfig",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"account_name": "beatsblobnew",
-				"auth.oauth2": map[string]interface{}{
+				"auth.oauth2": map[string]any{
 					"client_id":     "12345678-90ab-cdef-1234-567890abcdef",
 					"client_secret": "abcdefg1234567890!@#$%^&*()-_=+",
 					"tenant_id":     "87654321-abcd-ef90-1234-fedcba098765",
@@ -110,7 +465,7 @@ func Test_OAuth2(t *testing.T) {
 				"max_workers":   2,
 				"poll":          true,
 				"poll_interval": "30s",
-				"containers": []map[string]interface{}{
+				"containers": []map[string]any{
 					{
 						"name": beatsContainer,
 					},
@@ -125,7 +480,6 @@ func Test_OAuth2(t *testing.T) {
 		},
 	}
 
-	logp.TestingSetup()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			serv := httptest.NewServer(tt.mockHandler())
@@ -144,7 +498,7 @@ func Test_OAuth2(t *testing.T) {
 			assert.NoError(t, err)
 
 			// inject custom transport & client options
-			conf.Auth.OAuth2.clientOptions = azcore.ClientOptions{
+			conf.clientOptions = azcore.ClientOptions{
 				InsecureAllowCredentialWithHTTP: true,
 				Transport:                       httpClient.Transport.(*customTransporter),
 			}
@@ -183,7 +537,7 @@ func Test_OAuth2(t *testing.T) {
 					cancel()
 					return
 				case got := <-chanClient.Channel:
-					var val interface{}
+					var val any
 					var err error
 					val, err = got.Fields.GetValue("message")
 					assert.NoError(t, err)
@@ -197,4 +551,200 @@ func Test_OAuth2(t *testing.T) {
 			}
 		})
 	}
+}
+
+// clearManagedIdentityEnv removes every environment variable that the Azure SDK
+// reads to choose a managed identity source. With none of them set the credential
+// asks IMDS for its token, so a test behaves the same way on a developer machine
+// and on an Azure host.
+//
+// t.Setenv records the original value and restores it during cleanup. Unsetting
+// afterwards keeps that record, and makes the variable absent rather than empty,
+// so the test does not depend on the SDK reading it with os.Getenv rather than
+// os.LookupEnv.
+func clearManagedIdentityEnv(t *testing.T) {
+	t.Helper()
+	for _, k := range []string{
+		"IDENTITY_ENDPOINT",
+		"IDENTITY_HEADER",
+		"IDENTITY_SERVER_THUMBPRINT",
+		"MSI_ENDPOINT",
+		"MSI_SECRET",
+		"IMDS_ENDPOINT",
+	} {
+		t.Setenv(k, "")
+		require.NoError(t, os.Unsetenv(k), "unsetting %s should succeed", k)
+	}
+}
+
+// Test_ManagedIdentity checks that the input authenticates with a managed
+// identity token and then reads every blob in the container. The injected
+// transport answers the token request, so the test needs no Azure host.
+func Test_ManagedIdentity(t *testing.T) {
+	clearManagedIdentityEnv(t)
+
+	tests := []struct {
+		name       string
+		baseConfig map[string]any
+	}{
+		{
+			name: "system_assigned",
+			baseConfig: map[string]any{
+				"account_name":                  "beatsblobnew",
+				"auth.managed_identity.enabled": true,
+				"max_workers":                   2,
+				"poll":                          false,
+				"containers": []map[string]any{
+					{"name": beatsContainer},
+				},
+			},
+		},
+		{
+			name: "user_assigned",
+			baseConfig: map[string]any{
+				"account_name":                    "beatsblobnew",
+				"auth.managed_identity.enabled":   true,
+				"auth.managed_identity.client_id": "12345678-90ab-cdef-1234-567890abcdef",
+				"max_workers":                     2,
+				"poll":                            false,
+				"containers": []map[string]any{
+					{"name": beatsContainer},
+				},
+			},
+		},
+	}
+
+	expected := map[string]bool{
+		mock.Beatscontainer_blob_ata_json:      true,
+		mock.Beatscontainer_blob_data3_json:    true,
+		mock.Beatscontainer_blob_docs_ata_json: true,
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			serv := httptest.NewServer(mock.AzureStorageServer())
+			t.Cleanup(serv.Close)
+
+			cfg := conf.MustNewConfigFrom(tt.baseConfig)
+			c := defaultConfig()
+			require.NoError(t, cfg.Unpack(&c), "config should unpack")
+
+			// The mock storage server speaks plain HTTP, so the SDK needs the
+			// insecure flag before it sends a bearer token to it.
+			c.clientOptions = azcore.ClientOptions{
+				InsecureAllowCredentialWithHTTP: true,
+				Transport:                       &customTransporter{rt: http.DefaultTransport, servURL: serv.URL},
+			}
+
+			input := newStatelessInput(c, serv.URL+"/", logptest.NewTestingLogger(t, ""))
+			assert.NoError(t, input.Test(v2.TestContext{}), "input.Test should succeed")
+
+			chanClient := beattest.NewChanClient(len(expected))
+			t.Cleanup(func() { _ = chanClient.Close() })
+
+			ctx, cancel := newV2Context(t)
+			t.Cleanup(cancel)
+			ctx.ID += tt.name
+
+			var g errgroup.Group
+			g.Go(func() error {
+				return input.Run(ctx, chanClient)
+			})
+
+			timeout := time.NewTimer(10 * time.Second)
+			t.Cleanup(func() { timeout.Stop() })
+
+			var receivedCount int
+		wait:
+			for {
+				select {
+				case <-timeout.C:
+					t.Errorf("timed out waiting for %d events", len(expected))
+					cancel()
+					break wait
+				case got := <-chanClient.Channel:
+					val, err := got.Fields.GetValue("message")
+					assert.NoError(t, err, "published event should carry a message field")
+					msg, ok := val.(string)
+					require.True(t, ok, "message field should be a string, got %T", val)
+					assert.True(t, expected[msg], "received unexpected message: %v", msg)
+					receivedCount++
+					if receivedCount == len(expected) {
+						cancel()
+						break wait
+					}
+				}
+			}
+
+			assert.NoError(t, g.Wait(), "input run should complete without error")
+		})
+	}
+}
+
+// failingTokenTransporter answers every token request with a 500 and counts the
+// attempts. Requests to any other host fail, because this transport is only used
+// for token requests.
+type failingTokenTransporter struct {
+	tokenAttempts atomic.Int32
+}
+
+func (t *failingTokenTransporter) Do(req *http.Request) (*http.Response, error) {
+	if req.URL.Host != imdsHost {
+		return nil, fmt.Errorf("unexpected request to %s", req.URL)
+	}
+	t.tokenAttempts.Add(1)
+	return &http.Response{
+		StatusCode: http.StatusInternalServerError,
+		Status:     "500 Internal Server Error",
+		Body:       io.NopCloser(strings.NewReader("")),
+		Header:     make(http.Header),
+		Request:    req,
+	}, nil
+}
+
+// Test_ManagedIdentityRetriesTokenRequests checks that newManagedIdentityCredential
+// discards the storage retry policy, so turning storage retries off in the config
+// does not stop the credential from retrying a token request.
+func Test_ManagedIdentityRetriesTokenRequests(t *testing.T) {
+	clearManagedIdentityEnv(t)
+
+	transport := &failingTokenTransporter{}
+
+	// The Azure SDK caches tokens for the whole process, keyed in part by the
+	// identity and the scope. Use an identity and a scope that no other test uses,
+	// so this test always reaches the token endpoint.
+	const (
+		clientID = "99999999-0000-4444-8888-999999999999"
+		scope    = "https://retry-probe.invalid/.default"
+	)
+
+	cfg := conf.MustNewConfigFrom(map[string]any{
+		"account_name":                    "beatsblobnew",
+		"auth.managed_identity.enabled":   true,
+		"auth.managed_identity.client_id": clientID,
+		"containers": []map[string]any{
+			{"name": beatsContainer},
+		},
+		// A negative value turns off retries for Azure Storage requests.
+		"retry": map[string]any{
+			"max_retries": -1,
+		},
+	})
+	c := defaultConfig()
+	require.NoError(t, cfg.Unpack(&c), "config should unpack")
+	c.clientOptions = azcore.ClientOptions{Transport: transport}
+
+	_, creds, err := fetchServiceClientAndCreds(c, c.Retry, "http://127.0.0.1:1/", logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err, "the credential should be created")
+
+	// The SDK waits about two seconds before the first retry, and the endpoint
+	// never recovers, so GetToken returns when this context expires. The budget
+	// only needs to cover the first retry.
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	t.Cleanup(cancel)
+
+	_, err = creds.tokenCreds.GetToken(ctx, policy.TokenRequestOptions{Scopes: []string{scope}})
+	assert.Error(t, err, "the token request must fail because the endpoint always fails")
+	assert.Greater(t, transport.tokenAttempts.Load(), int32(1),
+		"the credential must retry a token request even though the input turns off storage retries")
 }

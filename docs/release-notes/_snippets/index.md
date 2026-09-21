@@ -1,3 +1,6 @@
+:::{include} /release-notes/_snippets/index/9.5.md
+:::
+
 :::{include} /release-notes/_snippets/index/9.4.md
 :::
 

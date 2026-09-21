@@ -130,8 +130,8 @@ func TestManagerV2(t *testing.T) {
 						Streams: []*proto.Stream{
 							{
 								Id: "system/metrics-system.filesystem-default-system-1",
-								Source: integration.RequireNewStruct(t, map[string]interface{}{
-									"metricsets": []interface{}{"filesystem"},
+								Source: integration.RequireNewStruct(t, map[string]any{
+									"metricsets": []any{"filesystem"},
 									"period":     "1m",
 								}),
 							},
@@ -151,15 +151,15 @@ func TestManagerV2(t *testing.T) {
 						Streams: []*proto.Stream{
 							{
 								Id: "system/metrics-system.filesystem-default-system-2",
-								Source: integration.RequireNewStruct(t, map[string]interface{}{
-									"metricsets": []interface{}{"filesystem"},
+								Source: integration.RequireNewStruct(t, map[string]any{
+									"metricsets": []any{"filesystem"},
 									"period":     "1m",
 								}),
 							},
 							{
 								Id: "system/metrics-system.filesystem-default-system-3",
-								Source: integration.RequireNewStruct(t, map[string]interface{}{
-									"metricsets": []interface{}{"filesystem"},
+								Source: integration.RequireNewStruct(t, map[string]any{
+									"metricsets": []any{"filesystem"},
 									"period":     "1m",
 								}),
 							},
@@ -326,8 +326,8 @@ func TestManagerV2_ReloadCount(t *testing.T) {
 						Streams: []*proto.Stream{
 							{
 								Id: "system/metrics-system.filesystem-default-system-1",
-								Source: integration.RequireNewStruct(t, map[string]interface{}{
-									"metricsets": []interface{}{"filesystem"},
+								Source: integration.RequireNewStruct(t, map[string]any{
+									"metricsets": []any{"filesystem"},
 									"period":     "1m",
 								}),
 							},
@@ -361,8 +361,8 @@ func TestManagerV2_ReloadCount(t *testing.T) {
 						Streams: []*proto.Stream{
 							{
 								Id: "system/metrics-system.filesystem-default-system-1",
-								Source: integration.RequireNewStruct(t, map[string]interface{}{
-									"metricsets": []interface{}{"filesystem"},
+								Source: integration.RequireNewStruct(t, map[string]any{
+									"metricsets": []any{"filesystem"},
 									"period":     "10m",
 								}),
 							},
@@ -555,7 +555,7 @@ func TestOutputError(t *testing.T) {
 				Type: "mock",
 				Name: "mock",
 				Source: integration.RequireNewStruct(t,
-					map[string]interface{}{
+					map[string]any{
 						"Is":        "this",
 						"required?": "Yes!",
 					}),
@@ -582,7 +582,7 @@ func TestOutputError(t *testing.T) {
 				Type: "mock",
 				Name: "mock",
 				Source: integration.RequireNewStruct(t,
-					map[string]interface{}{
+					map[string]any{
 						"this":     "is",
 						"required": true,
 					}),
@@ -693,7 +693,7 @@ func TestErrorPerUnit(t *testing.T) {
 			Type: "mock",
 			Name: "mock",
 			Source: integration.RequireNewStruct(t,
-				map[string]interface{}{
+				map[string]any{
 					"Is":        "this",
 					"required?": "Yes!",
 				}),
@@ -713,7 +713,7 @@ func TestErrorPerUnit(t *testing.T) {
 			Streams: []*proto.Stream{
 				{
 					Id: "filestream-id",
-					Source: integration.RequireNewStruct(t, map[string]interface{}{
+					Source: integration.RequireNewStruct(t, map[string]any{
 						"id": "input-unit1",
 					}),
 				},
@@ -733,7 +733,7 @@ func TestErrorPerUnit(t *testing.T) {
 			Streams: []*proto.Stream{
 				{
 					Id: "filestream-id",
-					Source: integration.RequireNewStruct(t, map[string]interface{}{
+					Source: integration.RequireNewStruct(t, map[string]any{
 						"id": "input-unit2",
 					}),
 				},
@@ -808,6 +808,32 @@ func TestErrorPerUnit(t *testing.T) {
 	require.Eventually(t, func() bool {
 		return stateReached.Load()
 	}, 10*time.Second, 100*time.Millisecond, "desired state, was not reached")
+}
+
+// TestReloadNilOutputUnit verifies reload does not panic when no output unit is present.
+func TestReloadNilOutputUnit(t *testing.T) {
+	r := reload.NewRegistry()
+	output := &mockOutput{
+		ReloadFn: func(config *reload.ConfigWithMeta) error {
+			return nil
+		},
+	}
+	r.MustRegisterOutput(output)
+
+	m, err := NewV2AgentManagerWithClient(
+		&Config{Enabled: false},
+		r,
+		nil,
+		logptest.NewTestingLogger(t, ""),
+	)
+	require.NoError(t, err, "could not instantiate ManagerV2")
+
+	mm, ok := m.(*BeatV2Manager)
+	require.True(t, ok, "unexpected type for BeatV2Manager: %T", m)
+
+	require.NotPanics(t, func() {
+		mm.reload(map[unitKey]*agentUnit{})
+	}, "reload must not panic when there is no output unit")
 }
 
 type reloadable struct {

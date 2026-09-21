@@ -256,3 +256,27 @@ func AWSNewOIDCChain(ctx context.Context, cfg AWSOIDCChainConfig) (*awssdk.Confi
 
 	return AWSConfigRoleChaining(baseCfg, chain), nil
 }
+
+type AWSWIIWebIdentityStep struct {
+	RoleARN     string
+	TokenSource *WIITokenSource
+	Options     func(*stscreds.WebIdentityRoleOptions)
+	// CacheOptions, when non-nil, is applied to the CredentialsCache for this
+	// step. Use this to set ExpiryWindow or other cache-level options.
+	CacheOptions func(*awssdk.CredentialsCacheOptions)
+}
+
+func (s *AWSWIIWebIdentityStep) BuildCredentialsCache(client *sts.Client) *awssdk.CredentialsCache {
+	provider := stscreds.NewWebIdentityRoleProvider(
+		client,
+		s.RoleARN,
+		s.TokenSource,
+		s.Options,
+	)
+	if s.CacheOptions != nil {
+		return awssdk.NewCredentialsCache(provider, s.CacheOptions)
+	}
+	return awssdk.NewCredentialsCache(provider)
+}
+
+var _ AWSRoleChainingStep = (*AWSWIIWebIdentityStep)(nil)

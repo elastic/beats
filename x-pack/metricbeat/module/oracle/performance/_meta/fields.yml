@@ -66,7 +66,7 @@
               description: Total number of cursors opened since the instance started
         - name: parse
           type: group
-          description: Parses statistic information that occured in the current session
+          description: Parses statistic information that occurred in the current session
           fields:
             - name: real
               type: long

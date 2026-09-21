@@ -24,7 +24,6 @@ import (
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/go-concert/unison"
 )
 
 const (
@@ -47,9 +46,7 @@ type netflowInputManager struct {
 	log *logp.Logger
 }
 
-func (im *netflowInputManager) Init(_ unison.Group) error {
-	return nil
-}
+func (im *netflowInputManager) Close() {}
 
 func (im *netflowInputManager) Create(cfg *conf.C) (v2.Input, error) {
 	inputCfg := defaultConfig
@@ -157,7 +154,7 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 		client, err := connector.ConnectWith(beat.ClientConfig{
 			PublishMode: beat.DefaultGuarantees,
 			Processing: beat.ProcessingConfig{
-				EventNormalization: boolPtr(false),
+				EventNormalization: new(false),
 			},
 			EventListener: nil,
 		})
@@ -269,5 +266,3 @@ func (n *netflowInput) stop() {
 
 	n.started = false
 }
-
-func boolPtr(b bool) *bool { return &b }

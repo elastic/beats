@@ -196,7 +196,7 @@ func getICMPTypeCode(event *beat.Event, typeField, codeField string) (t, c uint8
 	return t, c, true
 }
 
-func tryToIP(from interface{}) (net.IP, bool) {
+func tryToIP(from any) (net.IP, bool) {
 	switch v := from.(type) {
 	case net.IP:
 		return v, true
@@ -210,7 +210,7 @@ func tryToIP(from interface{}) (net.IP, bool) {
 
 // tryToUint tries to coerce the given interface to an uint16. On success it
 // returns the int value and true.
-func tryToUint(from interface{}) (uint, bool) {
+func tryToUint(from any) (uint, bool) {
 	switch v := from.(type) {
 	case int:
 		return uint(v), true
@@ -243,7 +243,7 @@ func tryToUint(from interface{}) (uint, bool) {
 	}
 }
 
-func tryToUint8(from interface{}) (uint8, bool) {
+func tryToUint8(from any) (uint8, bool) {
 	to, ok := tryToUint(from)
 	return uint8(to), ok
 }
@@ -275,7 +275,7 @@ var transports = map[string]uint8{
 	"sctp":      sctpProtocol,
 }
 
-func tryToIANATransportProtocol(from interface{}) (uint8, bool) {
+func tryToIANATransportProtocol(from any) (uint8, bool) {
 	switch v := from.(type) {
 	case string:
 		transport, found := transports[v]

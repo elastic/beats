@@ -24,7 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/conditions"
-	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -52,7 +52,7 @@ func NewTokenAppender(cfg *conf.C, logger *logp.Logger) (autodiscover.Appender, 
 
 	err := cfg.Unpack(&conf)
 	if err != nil {
-		return nil, fmt.Errorf("unable to unpack config due to error: %v", err)
+		return nil, fmt.Errorf("unable to unpack config due to error: %w", err)
 	}
 
 	var cond conditions.Condition
@@ -60,7 +60,7 @@ func NewTokenAppender(cfg *conf.C, logger *logp.Logger) (autodiscover.Appender, 
 		// Attempt to create a condition. If fails then report error
 		cond, err = conditions.NewCondition(conf.ConditionConfig, logger)
 		if err != nil {
-			return nil, fmt.Errorf("unable to create condition due to error: %v", err)
+			return nil, fmt.Errorf("unable to create condition due to error: %w", err)
 		}
 	}
 	appender := tokenAppender{
@@ -87,13 +87,13 @@ func (t *tokenAppender) Append(event bus.Event) {
 	}
 
 	// Check if the condition is met. Attempt to append only if that is the case.
-	if t.Condition == nil || t.Condition.Check(mapstr.M(event)) == true {
+	if t.Condition == nil || t.Condition.Check(mapstr.M(event)) {
 		tok := t.getAuthHeaderFromToken()
 		// If token is empty then just return
 		if tok == "" {
 			return
 		}
-		for i := 0; i < len(cfgs); i++ {
+		for i := range cfgs {
 			// Unpack the config
 			cfg := cfgs[i]
 			c := mapstr.M{}

@@ -59,7 +59,7 @@ const (
 func TestPublishListTCP(t *testing.T) {
 	key := "test_publish_tcp"
 	db := 0
-	redisConfig := map[string]interface{}{
+	redisConfig := map[string]any{
 		"hosts":    []string{getRedisAddr()},
 		"key":      key,
 		"db":       db,
@@ -73,7 +73,7 @@ func TestPublishListTCP(t *testing.T) {
 func TestPublishListTLS(t *testing.T) {
 	key := "test_publish_tls"
 	db := 0
-	redisConfig := map[string]interface{}{
+	redisConfig := map[string]any{
 		"hosts":    []string{getSRedisAddr()},
 		"key":      key,
 		"db":       db,
@@ -109,7 +109,7 @@ func TestWithSchema(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			key := "test_publish_tls"
 			db := 0
-			redisConfig := map[string]interface{}{
+			redisConfig := map[string]any{
 				"hosts":    []string{test.host},
 				"key":      key,
 				"db":       db,
@@ -129,7 +129,7 @@ func TestWithSchema(t *testing.T) {
 
 }
 
-func testPublishList(t *testing.T, cfg map[string]interface{}) {
+func testPublishList(t *testing.T, cfg map[string]any) {
 	batches := 100
 	batchSize := 1000
 	total := batches & batchSize
@@ -183,7 +183,7 @@ func testPublishList(t *testing.T, cfg map[string]interface{}) {
 func TestPublishChannelTCP(t *testing.T) {
 	db := 0
 	key := "test_pubchan_tcp"
-	redisConfig := map[string]interface{}{
+	redisConfig := map[string]any{
 		"hosts":    []string{getRedisAddr()},
 		"key":      key,
 		"db":       db,
@@ -197,7 +197,7 @@ func TestPublishChannelTCP(t *testing.T) {
 func TestPublishChannelTLS(t *testing.T) {
 	db := 0
 	key := "test_pubchan_tls"
-	redisConfig := map[string]interface{}{
+	redisConfig := map[string]any{
 		"hosts":    []string{getSRedisAddr()},
 		"key":      key,
 		"db":       db,
@@ -218,7 +218,7 @@ func TestPublishChannelTCPWithFormatting(t *testing.T) {
 	t.Skip("format string not yet supported")
 	db := 0
 	key := "test_pubchan_tcp"
-	redisConfig := map[string]interface{}{
+	redisConfig := map[string]any{
 		"hosts":               []string{getRedisAddr()},
 		"key":                 key,
 		"db":                  db,
@@ -230,7 +230,7 @@ func TestPublishChannelTCPWithFormatting(t *testing.T) {
 	testPublishChannel(t, redisConfig)
 }
 
-func testPublishChannel(t *testing.T, cfg map[string]interface{}) {
+func testPublishChannel(t *testing.T, cfg map[string]any) {
 	batches := 100
 	batchSize := 1000
 	total := batches & batchSize
@@ -270,11 +270,9 @@ func testPublishChannel(t *testing.T, cfg map[string]interface{}) {
 	var wg sync.WaitGroup
 	var pubErr error
 	out := newRedisTestingOutput(t, cfg)
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		pubErr = sendTestEvents(out, batches, batchSize)
-	}()
+	})
 
 	// collect published events by subscription
 	var messages [][]byte
@@ -339,7 +337,7 @@ func getSRedisAddr() string {
 		getEnv("SREDIS_PORT", SRedisDefaultPort))
 }
 
-func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) outputs.Client {
+func newRedisTestingOutput(t *testing.T, cfg map[string]any) outputs.Client {
 	config, err := conf.NewConfigFrom(cfg)
 	if err != nil {
 		t.Fatalf("Error reading config: %v", err)
@@ -371,7 +369,7 @@ func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) outputs.Cli
 
 func sendTestEvents(out outputs.Client, batches, N int) error {
 	i := 1
-	for b := 0; b < batches; b++ {
+	for range batches {
 		events := make([]beat.Event, N)
 		for n := range events {
 			events[n] = createEvent(i)

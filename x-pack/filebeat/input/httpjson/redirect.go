@@ -57,7 +57,7 @@ func (m InputManager) migrateCursor(src, dst *conf.C) {
 	if err != nil {
 		return
 	}
-	store, err := m.cursor.StateStore.StoreFor("httpjson")
+	store, err := m.cursor.StateStore.StoreFor("httpjson", id)
 	if err != nil {
 		m.cursor.Logger.Warnw("cursor migration: cannot open store", "error", err)
 		return
@@ -65,7 +65,7 @@ func (m InputManager) migrateCursor(src, dst *conf.C) {
 	defer store.Close()
 
 	key := cursorKey("httpjson", id, u.String())
-	var entry map[string]interface{}
+	var entry map[string]any
 	if err := store.Get(key, &entry); err != nil {
 		return
 	}

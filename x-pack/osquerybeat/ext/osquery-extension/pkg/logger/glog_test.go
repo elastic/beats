@@ -366,7 +366,7 @@ func TestConcurrentLogging(t *testing.T) {
 
 	// Run concurrent logging operations
 	done := make(chan bool)
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		go func(id int) {
 			log.Infof("concurrent message %d", id)
 			log.Warningf("concurrent warning %d", id)
@@ -376,7 +376,7 @@ func TestConcurrentLogging(t *testing.T) {
 	}
 
 	// Wait for all goroutines to complete
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		<-done
 	}
 

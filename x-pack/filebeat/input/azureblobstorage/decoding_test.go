@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 // all test files are read from the "testdata" directory
@@ -35,8 +35,7 @@ type noopReporter struct{}
 func (n noopReporter) UpdateStatus(status status.Status, msg string) {}
 
 func TestDecoding(t *testing.T) {
-	logp.TestingSetup()
-	log := logp.L()
+	log := logptest.NewTestingLogger(t, "")
 
 	testCases := []struct {
 		name          string
@@ -57,7 +56,7 @@ func TestDecoding(t *testing.T) {
 				Codec: &decoder.CodecConfig{
 					CSV: &decoder.CSVCodecConfig{
 						Enabled: true,
-						Comma:   ptr[decoder.Rune](' '),
+						Comma:   new(decoder.Rune(' ')),
 					},
 				},
 			},
@@ -72,7 +71,7 @@ func TestDecoding(t *testing.T) {
 				Codec: &decoder.CodecConfig{
 					CSV: &decoder.CSVCodecConfig{
 						Enabled: true,
-						Comma:   ptr[decoder.Rune](' '),
+						Comma:   new(decoder.Rune(' ')),
 					},
 				},
 			},
@@ -106,13 +105,13 @@ func TestDecoding(t *testing.T) {
 			defer f.Close()
 			p := &pub{t: t}
 			item := &azcontainer.BlobItem{
-				Name: ptr("test_blob"),
+				Name: new("test_blob"),
 				Properties: &azcontainer.BlobProperties{
-					ContentType:  ptr(tc.content),
+					ContentType:  new(tc.content),
 					LastModified: &time.Time{},
 				},
 			}
-			j := newJob(&blob.Client{}, item, "https://foo.blob.core.windows.net/", newState(), &Source{}, p, noopReporter{}, nil, log)
+			j := newJob(&blob.Client{}, item, "https://foo.blob.core.windows.net/", newState(), &Source{}, 0, p, noopReporter{}, nil, log)
 			j.src.ReaderConfig.Decoding = tc.config
 			err = j.decode(context.Background(), f, "test")
 			if err != nil {
@@ -139,7 +138,7 @@ type pub struct {
 	events []beat.Event
 }
 
-func (p *pub) Publish(e beat.Event, _cursor interface{}) error {
+func (p *pub) Publish(e beat.Event, _cursor any) error {
 	p.t.Logf("%v\n", e.Fields)
 	p.events = append(p.events, e)
 	return nil
@@ -179,7 +178,7 @@ codec:
 			Codec: &decoder.CodecConfig{
 				CSV: &decoder.CSVCodecConfig{
 					Enabled: true,
-					Comma:   ptr[decoder.Rune](' '),
+					Comma:   new(decoder.Rune(' ')),
 					Comment: '#',
 				},
 			}},
@@ -210,7 +209,7 @@ codec:
 			Codec: &decoder.CodecConfig{
 				CSV: &decoder.CSVCodecConfig{
 					Enabled: true,
-					Comma:   ptr[decoder.Rune]('\x00'),
+					Comma:   new(decoder.Rune('\x00')),
 				},
 			}},
 	},
@@ -257,5 +256,3 @@ func sameError(a, b error) bool {
 		return a.Error() == b.Error()
 	}
 }
-
-func ptr[T any](v T) *T { return &v }

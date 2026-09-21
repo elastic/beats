@@ -24,6 +24,7 @@ package journalctl
 
 import (
 	"sync"
+	"time"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 )
@@ -44,6 +45,9 @@ var _ Jctl = &JctlMock{}
 //			NextFunc: func(canceler input.Canceler) ([]byte, error) {
 //				panic("mock out the Next method")
 //			},
+//			SetReadDeadlineFunc: func(t time.Time) bool {
+//				panic("mock out the SetReadDeadline method")
+//			},
 //		}
 //
 //		// use mockedJctl in code that requires Jctl
@@ -57,6 +61,9 @@ type JctlMock struct {
 	// NextFunc mocks the Next method.
 	NextFunc func(canceler input.Canceler) ([]byte, error)
 
+	// SetReadDeadlineFunc mocks the SetReadDeadline method.
+	SetReadDeadlineFunc func(t time.Time) bool
+
 	// calls tracks calls to the methods.
 	calls struct {
 		// Kill holds details about calls to the Kill method.
@@ -67,9 +74,15 @@ type JctlMock struct {
 			// Canceler is the canceler argument value.
 			Canceler input.Canceler
 		}
+		// SetReadDeadline holds details about calls to the SetReadDeadline method.
+		SetReadDeadline []struct {
+			// T is the t argument value.
+			T time.Time
+		}
 	}
-	lockKill sync.RWMutex
-	lockNext sync.RWMutex
+	lockKill            sync.RWMutex
+	lockNext            sync.RWMutex
+	lockSetReadDeadline sync.RWMutex
 }
 
 // Kill calls KillFunc.
@@ -128,5 +141,37 @@ func (mock *JctlMock) NextCalls() []struct {
 	mock.lockNext.RLock()
 	calls = mock.calls.Next
 	mock.lockNext.RUnlock()
+	return calls
+}
+
+// SetReadDeadline calls SetReadDeadlineFunc.
+func (mock *JctlMock) SetReadDeadline(t time.Time) bool {
+	if mock.SetReadDeadlineFunc == nil {
+		panic("JctlMock.SetReadDeadlineFunc: method is nil but Jctl.SetReadDeadline was just called")
+	}
+	callInfo := struct {
+		T time.Time
+	}{
+		T: t,
+	}
+	mock.lockSetReadDeadline.Lock()
+	mock.calls.SetReadDeadline = append(mock.calls.SetReadDeadline, callInfo)
+	mock.lockSetReadDeadline.Unlock()
+	return mock.SetReadDeadlineFunc(t)
+}
+
+// SetReadDeadlineCalls gets all the calls that were made to SetReadDeadline.
+// Check the length with:
+//
+//	len(mockedJctl.SetReadDeadlineCalls())
+func (mock *JctlMock) SetReadDeadlineCalls() []struct {
+	T time.Time
+} {
+	var calls []struct {
+		T time.Time
+	}
+	mock.lockSetReadDeadline.RLock()
+	calls = mock.calls.SetReadDeadline
+	mock.lockSetReadDeadline.RUnlock()
 	return calls
 }

@@ -84,7 +84,7 @@ type VMData struct {
 	DatastoreNames  []string
 	CustomFields    mapstr.M
 	Snapshots       []VMSnapshotData
-	PerformanceData map[string]interface{}
+	PerformanceData map[string]any
 	triggeredAlarms []triggeredAlarm
 }
 

@@ -19,7 +19,8 @@ package http
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
+
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -180,7 +181,7 @@ func TestCheckBody(t *testing.T) {
 			for _, n := range test.negative {
 				negativePatterns = append(negativePatterns, match.MustCompile(n))
 			}
-			body, err := ioutil.ReadAll(res.Body)
+			body, err := io.ReadAll(res.Body)
 			require.NoError(t, err)
 			check := checkBody(positivePatterns, negativePatterns)(res, string(body))
 

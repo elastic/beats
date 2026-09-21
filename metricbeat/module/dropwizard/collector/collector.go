@@ -90,7 +90,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	if err != nil {
 		return err
 	}
-	dw := map[string]interface{}{}
+	dw := map[string]any{}
 
 	d := json.NewDecoder(strings.NewReader(string(body)))
 	d.UseNumber()

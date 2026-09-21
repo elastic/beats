@@ -30,7 +30,7 @@ type reloader struct {
 	*cfgfile.RunnerList
 }
 
-func newReloader(name string, factory *processorFactory, pipeline beat.PipelineConnector, logger *logp.Logger) *reloader {
+func newReloader(name string, factory cfgfile.RunnerFactory, pipeline beat.PipelineConnector, logger *logp.Logger) *reloader {
 	return &reloader{
 		RunnerList: cfgfile.NewRunnerList(name, factory, pipeline, logger),
 	}

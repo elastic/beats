@@ -47,6 +47,29 @@ func TestTemplateValues(t *testing.T) {
 	assert.Equal(t, 0, len(vals))
 }
 
+func TestTemplateValuesBodyType(t *testing.T) {
+	// When the body is a plain map[string]interface{} (as produced by
+	// json.Unmarshal), templateValues must convert it to mapstr.M so
+	// that the String method produces valid JSON for use in templates
+	// with value_type: json. See elastic/beats#50384.
+	resp := &response{
+		body: map[string]any{
+			"key": "value",
+		},
+	}
+
+	vals := resp.templateValues()
+
+	body := vals["body"]
+	m, ok := body.(mapstr.M)
+	if !ok {
+		t.Fatalf("body type = %T, want mapstr.M", body)
+	}
+	if m.String() != `{"key":"value"}` {
+		t.Errorf("body.String() = %s, want %s", m.String(), `{"key":"value"}`)
+	}
+}
+
 var asTransformablesTests = []struct {
 	name                   string
 	message                string
@@ -138,7 +161,7 @@ var asTransformablesTests = []struct {
 func TestAsTransformables(t *testing.T) {
 	for _, test := range asTransformablesTests {
 		t.Run(test.name, func(t *testing.T) {
-			var data interface{}
+			var data any
 			err := json.Unmarshal([]byte(test.message), &data)
 			if err != nil {
 				t.Fatalf("error unmarshalling json: %s", err)

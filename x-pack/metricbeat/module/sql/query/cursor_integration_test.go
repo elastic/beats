@@ -9,6 +9,7 @@ package query
 import (
 	"database/sql"
 	"fmt"
+	"maps"
 	"net"
 	"os"
 	"path/filepath"
@@ -27,6 +28,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/paths"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
@@ -39,24 +41,17 @@ import (
 const testTableName = "cursor_test_events"
 
 // newMetricSetWithPaths creates a MetricSet with custom paths for cursor storage.
-// It sets the global paths.Paths.Data to the test's data directory so that
-// GetCursorRegistry resolves to the correct temp path, and uses t.Cleanup
-// to restore the original value when the test completes.
-func newMetricSetWithPaths(t *testing.T, config map[string]interface{}, p *paths.Path) mb.MetricSet {
+// The per-instance *paths.Path is passed straight to the module so cursor state
+// resolves under the per-test temp directory, without relying on any global
+// paths singleton.
+func newMetricSetWithPaths(t *testing.T, config map[string]any, p *paths.Path) mb.MetricSet {
 	t.Helper()
-
-	// Override the global data path so GetCursorRegistry creates its
-	// registry under the per-test temp directory instead of the shared
-	// process-level path.
-	origData := paths.Paths.Data
-	paths.Paths.Data = p.Data
-	t.Cleanup(func() { paths.Paths.Data = origData })
 
 	c, err := conf.NewConfigFrom(config)
 	require.NoError(t, err)
 
 	logger := logptest.NewTestingLogger(t, "")
-	_, metricsets, err := mb.NewModule(c, mb.Registry, p, logger)
+	_, metricsets, err := mb.NewModule(c, mb.Registry, beat.Info{Paths: p, Logger: logger})
 	require.NoError(t, err)
 	require.Len(t, metricsets, 1)
 
@@ -131,7 +126,7 @@ func TestMySQLCursor(t *testing.T) {
 	// First connect without database to create test database
 	db0, err := sql.Open("mysql", baseDSN)
 	require.NoError(t, err)
-	_, err = db0.Exec("CREATE DATABASE IF NOT EXISTS cursor_test")
+	_, err = db0.ExecContext(t.Context(), "CREATE DATABASE IF NOT EXISTS cursor_test")
 	require.NoError(t, err)
 	db0.Close()
 
@@ -142,7 +137,7 @@ func TestMySQLCursor(t *testing.T) {
 	db, err := sql.Open("mysql", dsn)
 	require.NoError(t, err)
 	defer db.Close()
-	defer func() { _, _ = db.Exec("DROP DATABASE IF EXISTS cursor_test") }()
+	defer func() { _, _ = db.ExecContext(t.Context(), "DROP DATABASE IF EXISTS cursor_test") }()
 
 	setupMySQLTestTable(t, db)
 
@@ -182,8 +177,8 @@ func insertTestData(t *testing.T, db *sql.DB, driver string, n int) {
 		t.Fatalf("unsupported driver for insertTestData: %s", driver)
 	}
 
-	for i := 0; i < n; i++ {
-		_, err := db.Exec(insertSQL, fmt.Sprintf("event-%d", i))
+	for i := range n {
+		_, err := db.ExecContext(t.Context(), insertSQL, fmt.Sprintf("event-%d", i))
 		require.NoError(t, err)
 	}
 }
@@ -196,7 +191,7 @@ func setupPostgresTestTable(t *testing.T, db *sql.DB) {
 	})
 
 	// Drop table if exists
-	_, err := db.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s", testTableName))
+	_, err := db.ExecContext(t.Context(), fmt.Sprintf("DROP TABLE IF EXISTS %s", testTableName))
 	require.NoError(t, err)
 
 	// Create table with columns for all cursor types
@@ -209,16 +204,16 @@ func setupPostgresTestTable(t *testing.T, db *sql.DB) {
 			price NUMERIC(10,2)
 		)
 	`, testTableName)
-	_, err = db.Exec(createSQL)
+	_, err = db.ExecContext(t.Context(), createSQL)
 	require.NoError(t, err)
 
 	// Insert test data with values for all cursor types
 	insertSQL := fmt.Sprintf(`INSERT INTO %s (event_data, created_at, score, price) VALUES ($1, $2, $3, $4)`, testTableName)
 	now := time.Now().UTC()
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		score := float64(i+1) * 1.5   // 1.5, 3.0, 4.5, 6.0, 7.5
 		price := float64(i+1) * 10.25 // 10.25, 20.50, 30.75, 41.00, 51.25
-		_, err := db.Exec(insertSQL, fmt.Sprintf("event-%d", i), now.Add(time.Duration(i)*time.Second), score, price)
+		_, err := db.ExecContext(t.Context(), insertSQL, fmt.Sprintf("event-%d", i), now.Add(time.Duration(i)*time.Second), score, price)
 		require.NoError(t, err)
 	}
 }
@@ -231,7 +226,7 @@ func setupMySQLTestTable(t *testing.T, db *sql.DB) {
 	})
 
 	// Drop table if exists
-	_, err := db.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s", testTableName))
+	_, err := db.ExecContext(t.Context(), fmt.Sprintf("DROP TABLE IF EXISTS %s", testTableName))
 	require.NoError(t, err)
 
 	// Create table with columns for all cursor types
@@ -243,22 +238,22 @@ func setupMySQLTestTable(t *testing.T, db *sql.DB) {
 			price DECIMAL(10,2)
 		)
 	`, testTableName)
-	_, err = db.Exec(createSQL)
+	_, err = db.ExecContext(t.Context(), createSQL)
 	require.NoError(t, err)
 
 	// Insert test data with values for all cursor types
 	insertSQL := fmt.Sprintf(`INSERT INTO %s (event_data, created_at, price) VALUES (?, ?, ?)`, testTableName)
 	now := time.Now().UTC()
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		price := float64(i+1) * 10.25 // 10.25, 20.50, 30.75, 41.00, 51.25
-		_, err := db.Exec(insertSQL, fmt.Sprintf("event-%d", i), now.Add(time.Duration(i)*time.Second), price)
+		_, err := db.ExecContext(t.Context(), insertSQL, fmt.Sprintf("event-%d", i), now.Add(time.Duration(i)*time.Second), price)
 		require.NoError(t, err)
 	}
 }
 
 func cleanupTestTable(t *testing.T, db *sql.DB, driver string) {
 	t.Helper()
-	_, err := db.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s", testTableName))
+	_, err := db.ExecContext(t.Context(), fmt.Sprintf("DROP TABLE IF EXISTS %s", testTableName))
 	if err != nil {
 		t.Logf("Warning: failed to cleanup test table: %v", err)
 	}
@@ -272,7 +267,7 @@ func testIntegerCursor(t *testing.T, driver, dsn string) {
 
 	query := fmt.Sprintf("SELECT id, event_data FROM %s WHERE id > :cursor ORDER BY id ASC LIMIT 3", testTableName)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -330,7 +325,7 @@ func testTimestampCursor(t *testing.T, driver, dsn string) {
 
 	query := fmt.Sprintf("SELECT id, event_data, created_at FROM %s WHERE created_at > :cursor ORDER BY created_at ASC LIMIT 3", testTableName)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -375,7 +370,7 @@ func testFloatCursor(t *testing.T, driver, dsn string) {
 	// With cursor default 0.0 and LIMIT 3, first fetch gets 1.5, 3.0, 4.5
 	query := fmt.Sprintf("SELECT id, event_data, score FROM %s WHERE score > :cursor ORDER BY score ASC LIMIT 3", testTableName)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -429,7 +424,7 @@ func testDecimalCursor(t *testing.T, driver, dsn string) {
 	// With cursor default 0.00 and LIMIT 3, first fetch gets 10.25, 20.50, 30.75
 	query := fmt.Sprintf("SELECT id, event_data, price FROM %s WHERE price > :cursor ORDER BY price ASC LIMIT 3", testTableName)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -483,7 +478,7 @@ func testDescendingIntegerCursor(t *testing.T, driver, dsn string) {
 	// Default 999999, first fetch gets ids 5, 4, 3 (ORDER BY id DESC LIMIT 3)
 	query := fmt.Sprintf("SELECT id, event_data FROM %s WHERE id < :cursor ORDER BY id DESC LIMIT 3", testTableName)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -542,7 +537,7 @@ func testCompoundWhereCursor(t *testing.T, driver, dsn string) {
 		"SELECT id, event_data FROM %s WHERE id > :cursor AND event_data LIKE 'event-%%' ORDER BY id ASC LIMIT 3",
 		testTableName)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -609,7 +604,7 @@ func TestCursorStatePersistence(t *testing.T) {
 
 	query := fmt.Sprintf("SELECT id, event_data FROM %s WHERE id > :cursor ORDER BY id ASC", testTableName)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -665,10 +660,10 @@ func TestCursorNullValues(t *testing.T) {
 
 	// Create table with nullable timestamp
 	tableName := "cursor_null_test"
-	_, err = db.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s", tableName))
+	_, err = db.ExecContext(t.Context(), fmt.Sprintf("DROP TABLE IF EXISTS %s", tableName))
 	require.NoError(t, err)
 
-	_, err = db.Exec(fmt.Sprintf(`
+	_, err = db.ExecContext(t.Context(), fmt.Sprintf(`
 		CREATE TABLE %s (
 			id SERIAL PRIMARY KEY,
 			event_data TEXT,
@@ -676,15 +671,15 @@ func TestCursorNullValues(t *testing.T) {
 		)
 	`, tableName))
 	require.NoError(t, err)
-	defer func() { _, _ = db.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s", tableName)) }()
+	defer func() { _, _ = db.ExecContext(t.Context(), fmt.Sprintf("DROP TABLE IF EXISTS %s", tableName)) }()
 
 	// Insert data with NULL timestamps
 	now := time.Now().UTC()
-	_, err = db.Exec(fmt.Sprintf(`INSERT INTO %s (event_data, updated_at) VALUES ($1, $2)`, tableName), "event-1", now)
+	_, err = db.ExecContext(t.Context(), fmt.Sprintf(`INSERT INTO %s (event_data, updated_at) VALUES ($1, $2)`, tableName), "event-1", now)
 	require.NoError(t, err)
-	_, err = db.Exec(fmt.Sprintf(`INSERT INTO %s (event_data, updated_at) VALUES ($1, NULL)`, tableName), "event-2-null")
+	_, err = db.ExecContext(t.Context(), fmt.Sprintf(`INSERT INTO %s (event_data, updated_at) VALUES ($1, NULL)`, tableName), "event-2-null")
 	require.NoError(t, err)
-	_, err = db.Exec(fmt.Sprintf(`INSERT INTO %s (event_data, updated_at) VALUES ($1, $2)`, tableName), "event-3", now.Add(time.Second))
+	_, err = db.ExecContext(t.Context(), fmt.Sprintf(`INSERT INTO %s (event_data, updated_at) VALUES ($1, $2)`, tableName), "event-3", now.Add(time.Second))
 	require.NoError(t, err)
 
 	// Set up temp paths for cursor store
@@ -693,7 +688,7 @@ func TestCursorNullValues(t *testing.T) {
 	defaultTimestamp := now.Add(-time.Hour).Format(time.RFC3339)
 	query := fmt.Sprintf("SELECT id, event_data, updated_at FROM %s WHERE updated_at > :cursor OR updated_at IS NULL ORDER BY id ASC", tableName)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -761,7 +756,7 @@ func TestOracleCursor(t *testing.T) {
 	// See: https://oracle.github.io/odpi/doc/installation.html
 	testDB, err := sql.Open("godror", "user/pass@localhost:1521/test")
 	if err == nil {
-		err = testDB.Ping()
+		err = testDB.PingContext(t.Context())
 		testDB.Close()
 	}
 	if err != nil && containsOracleClientError(err.Error()) {
@@ -843,7 +838,7 @@ func setupOracleTestTable(t *testing.T, db *sql.DB) {
 	})
 
 	// Drop table if exists (Oracle doesn't have IF EXISTS, so we ignore errors)
-	_, _ = db.Exec("DROP TABLE cursor_test_events")
+	_, _ = db.ExecContext(t.Context(), "DROP TABLE cursor_test_events")
 
 	// Create table with Oracle-specific syntax.
 	// Uses TIMESTAMP (not TIMESTAMP WITH TIME ZONE) and DATE to test
@@ -856,16 +851,16 @@ func setupOracleTestTable(t *testing.T, db *sql.DB) {
 			event_date DATE DEFAULT CURRENT_DATE
 		)
 	`
-	_, err := db.Exec(createSQL)
+	_, err := db.ExecContext(t.Context(), createSQL)
 	require.NoError(t, err, "Failed to create Oracle test table")
 
 	// Insert 10 rows with timestamps 1 second apart.
 	// This gives enough data to test multi-batch pagination (e.g., 3+3+3+1+0).
 	insertSQL := `INSERT INTO cursor_test_events (event_data, created_at, event_date) VALUES (:1, :2, :3)`
 	now := time.Now().UTC()
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		ts := now.Add(time.Duration(i) * time.Second)
-		_, err := db.Exec(insertSQL, fmt.Sprintf("event-%d", i), ts, ts)
+		_, err := db.ExecContext(t.Context(), insertSQL, fmt.Sprintf("event-%d", i), ts, ts)
 		require.NoError(t, err, "Failed to insert Oracle test data row %d", i)
 	}
 	t.Log("Oracle test table created with 10 rows")
@@ -873,7 +868,7 @@ func setupOracleTestTable(t *testing.T, db *sql.DB) {
 
 func cleanupOracleTestTable(t *testing.T, db *sql.DB) {
 	t.Helper()
-	_, err := db.Exec("DROP TABLE cursor_test_events")
+	_, err := db.ExecContext(t.Context(), "DROP TABLE cursor_test_events")
 	if err != nil {
 		t.Logf("Warning: failed to cleanup Oracle test table: %v", err)
 	}
@@ -890,7 +885,7 @@ func testOracleIntegerCursor(t *testing.T, dsn string) {
 	// :cursor is translated to :cursor_val for Oracle by cursor.TranslateQuery
 	query := "SELECT id, event_data FROM cursor_test_events WHERE id > :cursor ORDER BY id ASC FETCH FIRST 3 ROWS ONLY"
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -944,7 +939,7 @@ func testOracleIntegerCursor(t *testing.T, dsn string) {
 	ms5 := newMetricSetWithPaths(t, cfg, testPaths)
 	events5, errs5 := fetchEvents(t, ms5)
 	require.Empty(t, errs5, "Fifth fetch should not have errors")
-	require.Len(t, events5, 0, "Fifth fetch should return 0 events (all consumed)")
+	require.Empty(t, events5, "Fifth fetch should return 0 events (all consumed)")
 	if closer, ok := ms5.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
@@ -961,7 +956,7 @@ func testOracleIntegerCursorRestart(t *testing.T, dsn string) {
 	// No FETCH FIRST — get all rows in one go
 	query := "SELECT id, event_data FROM cursor_test_events WHERE id > :cursor ORDER BY id ASC"
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -993,7 +988,7 @@ func testOracleIntegerCursorRestart(t *testing.T, dsn string) {
 	ms2 := newMetricSetWithPaths(t, cfg, testPaths)
 	events2, errs2 := fetchEvents(t, ms2)
 	require.Empty(t, errs2)
-	require.Len(t, events2, 0, "After restart, should get 0 rows (cursor loaded from persisted state)")
+	require.Empty(t, events2, "After restart, should get 0 rows (cursor loaded from persisted state)")
 	if closer, ok := ms2.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
@@ -1014,7 +1009,7 @@ func testOracleTimestampCursorMultiBatch(t *testing.T, dsn string) {
 
 	query := "SELECT id, event_data, created_at FROM cursor_test_events WHERE created_at > :cursor ORDER BY created_at ASC FETCH FIRST 3 ROWS ONLY"
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -1073,7 +1068,7 @@ func testOracleTimestampCursorMultiBatch(t *testing.T, dsn string) {
 	ms5 := newMetricSetWithPaths(t, cfg, testPaths)
 	events5, errs5 := fetchEvents(t, ms5)
 	require.Empty(t, errs5, "Fifth timestamp fetch should not have errors")
-	require.Len(t, events5, 0, "Fifth timestamp fetch should return 0 events (all consumed)")
+	require.Empty(t, events5, "Fifth timestamp fetch should return 0 events (all consumed)")
 	if closer, ok := ms5.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
@@ -1091,7 +1086,7 @@ func testOracleTimestampTimezoneHandling(t *testing.T, dsn string) {
 
 	query := "SELECT id, event_data, created_at FROM cursor_test_events WHERE created_at > :cursor ORDER BY created_at ASC FETCH FIRST 5 ROWS ONLY"
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -1127,7 +1122,7 @@ func testOracleTimestampTimezoneHandling(t *testing.T, dsn string) {
 	ms3 := newMetricSetWithPaths(t, cfg, testPaths)
 	events3, errs3 := fetchEvents(t, ms3)
 	require.Empty(t, errs3)
-	require.Len(t, events3, 0, "Third fetch should return 0 events (all consumed)")
+	require.Empty(t, events3, "Third fetch should return 0 events (all consumed)")
 	if closer, ok := ms3.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
@@ -1146,7 +1141,7 @@ func testOracleTimestampPrecision(t *testing.T, dsn string) {
 	// FETCH FIRST 1 ROW ONLY to test single-row pagination
 	query := "SELECT id, event_data, created_at FROM cursor_test_events WHERE created_at > :cursor ORDER BY created_at ASC FETCH FIRST 1 ROWS ONLY"
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -1163,7 +1158,7 @@ func testOracleTimestampPrecision(t *testing.T, dsn string) {
 	// Fetch rows one at a time — precision loss would cause rows to be
 	// skipped (cursor jumps too far) or re-fetched (cursor doesn't advance).
 	var totalFetched int
-	for i := 0; i < 12; i++ { // 10 rows + 2 safety iterations
+	for i := range 12 { // 10 rows + 2 safety iterations
 		ms := newMetricSetWithPaths(t, cfg, testPaths)
 		events, errs := fetchEvents(t, ms)
 		require.Empty(t, errs, "Fetch %d should not have errors", i+1)
@@ -1197,8 +1192,8 @@ func testOracleDateCursor(t *testing.T, dsn string) {
 	require.NoError(t, err)
 	defer db.Close()
 
-	_, _ = db.Exec(fmt.Sprintf("DROP TABLE %s", tableName))
-	_, err = db.Exec(fmt.Sprintf(`
+	_, _ = db.ExecContext(t.Context(), fmt.Sprintf("DROP TABLE %s", tableName))
+	_, err = db.ExecContext(t.Context(), fmt.Sprintf(`
 		CREATE TABLE %s (
 			id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 			event_data VARCHAR2(255),
@@ -1206,14 +1201,14 @@ func testOracleDateCursor(t *testing.T, dsn string) {
 		)
 	`, tableName))
 	require.NoError(t, err, "Failed to create date cursor test table")
-	defer func() { _, _ = db.Exec(fmt.Sprintf("DROP TABLE %s", tableName)) }()
+	defer func() { _, _ = db.ExecContext(t.Context(), fmt.Sprintf("DROP TABLE %s", tableName)) }()
 
 	// Insert 6 rows across 6 distinct dates (today-5 .. today), all at midnight
 	// so TO_DATE comparison works cleanly.
 	today := time.Now().UTC().Truncate(24 * time.Hour)
-	for i := 0; i < 6; i++ {
+	for i := range 6 {
 		d := today.AddDate(0, 0, i-5) // today-5, today-4, ..., today
-		_, err := db.Exec(
+		_, err := db.ExecContext(t.Context(),
 			fmt.Sprintf("INSERT INTO %s (event_data, event_date) VALUES (:1, :2)", tableName),
 			fmt.Sprintf("event-%d", i), d,
 		)
@@ -1228,7 +1223,7 @@ func testOracleDateCursor(t *testing.T, dsn string) {
 		tableName,
 	)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -1279,9 +1274,9 @@ func testOracleNullHandling(t *testing.T, db *sql.DB, dsn string) {
 
 	// Create a separate table with NULL values
 	tableName := "cursor_null_test_oracle"
-	_, _ = db.Exec(fmt.Sprintf("DROP TABLE %s", tableName))
+	_, _ = db.ExecContext(t.Context(), fmt.Sprintf("DROP TABLE %s", tableName))
 
-	_, err := db.Exec(fmt.Sprintf(`
+	_, err := db.ExecContext(t.Context(), fmt.Sprintf(`
 		CREATE TABLE %s (
 			id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 			event_data VARCHAR2(255),
@@ -1289,15 +1284,15 @@ func testOracleNullHandling(t *testing.T, db *sql.DB, dsn string) {
 		)
 	`, tableName))
 	require.NoError(t, err, "Failed to create NULL test table")
-	defer func() { _, _ = db.Exec(fmt.Sprintf("DROP TABLE %s", tableName)) }()
+	defer func() { _, _ = db.ExecContext(t.Context(), fmt.Sprintf("DROP TABLE %s", tableName)) }()
 
 	// Insert rows: some with timestamps, some with NULL
 	now := time.Now().UTC()
-	_, err = db.Exec(fmt.Sprintf("INSERT INTO %s (event_data, updated_at) VALUES (:1, :2)", tableName), "event-1", now)
+	_, err = db.ExecContext(t.Context(), fmt.Sprintf("INSERT INTO %s (event_data, updated_at) VALUES (:1, :2)", tableName), "event-1", now)
 	require.NoError(t, err)
-	_, err = db.Exec(fmt.Sprintf("INSERT INTO %s (event_data, updated_at) VALUES (:1, NULL)", tableName), "event-2-null")
+	_, err = db.ExecContext(t.Context(), fmt.Sprintf("INSERT INTO %s (event_data, updated_at) VALUES (:1, NULL)", tableName), "event-2-null")
 	require.NoError(t, err)
-	_, err = db.Exec(fmt.Sprintf("INSERT INTO %s (event_data, updated_at) VALUES (:1, :2)", tableName), "event-3", now.Add(time.Second))
+	_, err = db.ExecContext(t.Context(), fmt.Sprintf("INSERT INTO %s (event_data, updated_at) VALUES (:1, :2)", tableName), "event-3", now.Add(time.Second))
 	require.NoError(t, err)
 
 	testPaths := createTestPaths(t)
@@ -1308,7 +1303,7 @@ func testOracleNullHandling(t *testing.T, db *sql.DB, dsn string) {
 		"SELECT id, event_data, updated_at FROM %s WHERE updated_at > :cursor OR updated_at IS NULL ORDER BY id ASC",
 		tableName)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -1344,7 +1339,7 @@ func testOracleEmptyResultSet(t *testing.T, dsn string) {
 
 	query := "SELECT id, event_data, created_at FROM cursor_test_events WHERE created_at > :cursor ORDER BY created_at ASC FETCH FIRST 3 ROWS ONLY"
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -1361,7 +1356,7 @@ func testOracleEmptyResultSet(t *testing.T, dsn string) {
 	ms := newMetricSetWithPaths(t, cfg, testPaths)
 	events, errs := fetchEvents(t, ms)
 	require.Empty(t, errs, "Empty result set should not cause errors")
-	require.Len(t, events, 0, "Should return 0 events when cursor is in the far future")
+	require.Empty(t, events, "Should return 0 events when cursor is in the far future")
 
 	// Verify cursor remains unchanged after empty result
 	queryMs, ok := ms.(*MetricSet)
@@ -1389,7 +1384,7 @@ func testOracleQueryChangeResetsCursor(t *testing.T, dsn string) {
 	// First query — fetch 5 rows
 	query1 := "SELECT id, event_data FROM cursor_test_events WHERE id > :cursor ORDER BY id ASC FETCH FIRST 5 ROWS ONLY"
 
-	cfg1 := map[string]interface{}{
+	cfg1 := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -1415,7 +1410,7 @@ func testOracleQueryChangeResetsCursor(t *testing.T, dsn string) {
 	// state key hash, so the cursor resets to default.
 	query2 := "SELECT id, event_data FROM cursor_test_events WHERE id > :cursor ORDER BY id ASC FETCH FIRST 3 ROWS ONLY"
 
-	cfg2 := map[string]interface{}{
+	cfg2 := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -1457,7 +1452,7 @@ func testOracleDriverTypeConversions(t *testing.T, db *sql.DB) {
 	})
 
 	// Query a row to inspect godror's type mapping for Oracle columns
-	rows, err := db.Query("SELECT id, created_at, event_date FROM cursor_test_events WHERE ROWNUM <= 1")
+	rows, err := db.QueryContext(t.Context(), "SELECT id, created_at, event_date FROM cursor_test_events WHERE ROWNUM <= 1")
 	require.NoError(t, err)
 	defer rows.Close()
 
@@ -1473,7 +1468,7 @@ func testOracleDriverTypeConversions(t *testing.T, db *sql.DB) {
 		))
 	}
 
-	var id, createdAt, eventDate interface{}
+	var id, createdAt, eventDate any
 	err = rows.Scan(&id, &createdAt, &eventDate)
 	require.NoError(t, err)
 
@@ -1590,8 +1585,8 @@ func testOracleTimestampCursorTimezoneMismatch(t *testing.T, host, port string) 
 	defer db.Close()
 
 	// Setup table
-	_, _ = db.Exec(fmt.Sprintf("DROP TABLE %s", tableName))
-	_, err = db.Exec(fmt.Sprintf(`
+	_, _ = db.ExecContext(t.Context(), fmt.Sprintf("DROP TABLE %s", tableName))
+	_, err = db.ExecContext(t.Context(), fmt.Sprintf(`
 		CREATE TABLE %s (
 			id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 			event_data VARCHAR2(255),
@@ -1599,15 +1594,15 @@ func testOracleTimestampCursorTimezoneMismatch(t *testing.T, host, port string) 
 		)
 	`, tableName))
 	require.NoError(t, err, "Failed to create timezone test table")
-	defer func() { _, _ = db.Exec(fmt.Sprintf("DROP TABLE %s", tableName)) }()
+	defer func() { _, _ = db.ExecContext(t.Context(), fmt.Sprintf("DROP TABLE %s", tableName)) }()
 
 	// Insert 10 rows with timestamps 1 second apart.
 	// With params.Timezone=UTC, godror sends the raw UTC value and Oracle stores
 	// it as-is in the plain TIMESTAMP column (no timezone conversion on storage).
 	now := time.Now().UTC()
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		ts := now.Add(time.Duration(i) * time.Second)
-		_, err := db.Exec(
+		_, err := db.ExecContext(t.Context(),
 			fmt.Sprintf("INSERT INTO %s (event_data, created_at) VALUES (:1, :2)", tableName),
 			fmt.Sprintf("event-%d", i), ts)
 		require.NoError(t, err, "Failed to insert row %d", i)
@@ -1618,7 +1613,7 @@ func testOracleTimestampCursorTimezoneMismatch(t *testing.T, host, port string) 
 	// insert and read use the same params.Timezone=UTC. The mismatch only
 	// manifests during comparison (WHERE clause with > operator).
 	var storedTS time.Time
-	err = db.QueryRow(fmt.Sprintf(
+	err = db.QueryRowContext(t.Context(), fmt.Sprintf(
 		"SELECT created_at FROM %s WHERE ROWNUM = 1 ORDER BY id", tableName)).Scan(&storedTS)
 	require.NoError(t, err)
 	t.Logf("Inserted Go time (UTC):  %s", now.Format(time.RFC3339Nano))
@@ -1629,7 +1624,7 @@ func testOracleTimestampCursorTimezoneMismatch(t *testing.T, host, port string) 
 	// Use a raw SQL query with a TIMESTAMP WITH TIME ZONE literal to show
 	// that Oracle converts stored TIMESTAMP using session TZ for comparison.
 	var countDirect int
-	err = db.QueryRow(fmt.Sprintf(
+	err = db.QueryRowContext(t.Context(), fmt.Sprintf(
 		"SELECT COUNT(*) FROM %s WHERE created_at > TO_TIMESTAMP(:1, 'YYYY-MM-DD\"T\"HH24:MI:SS.FF\"Z\"')",
 		tableName),
 		now.Add(-1*time.Hour).Format("2006-01-02T15:04:05.000000Z")).Scan(&countDirect)
@@ -1648,7 +1643,7 @@ func testOracleTimestampCursorTimezoneMismatch(t *testing.T, host, port string) 
 		"SELECT id, event_data, created_at FROM %s WHERE created_at > :cursor ORDER BY created_at ASC FETCH FIRST 3 ROWS ONLY",
 		tableName)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{mismatchDSN},
@@ -1768,7 +1763,7 @@ func setupMSSQLTestTable(t *testing.T, db *sql.DB) {
 	})
 
 	// Drop table if exists
-	_, _ = db.Exec("DROP TABLE IF EXISTS cursor_test_events")
+	_, _ = db.ExecContext(t.Context(), "DROP TABLE IF EXISTS cursor_test_events")
 
 	// Create table with MSSQL-specific syntax
 	createSQL := `
@@ -1779,15 +1774,15 @@ func setupMSSQLTestTable(t *testing.T, db *sql.DB) {
 			event_date DATE DEFAULT CAST(GETUTCDATE() AS DATE)
 		)
 	`
-	_, err := db.Exec(createSQL)
+	_, err := db.ExecContext(t.Context(), createSQL)
 	require.NoError(t, err, "Failed to create MSSQL test table")
 
 	// Insert test data
 	insertSQL := `INSERT INTO cursor_test_events (event_data, created_at, event_date) VALUES (@p1, @p2, @p3)`
 	now := time.Now().UTC()
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		ts := now.Add(time.Duration(i) * time.Second)
-		_, err := db.Exec(insertSQL, fmt.Sprintf("event-%d", i), ts, ts)
+		_, err := db.ExecContext(t.Context(), insertSQL, fmt.Sprintf("event-%d", i), ts, ts)
 		require.NoError(t, err, "Failed to insert MSSQL test data")
 	}
 	t.Log("MSSQL test table created with 5 rows")
@@ -1795,7 +1790,7 @@ func setupMSSQLTestTable(t *testing.T, db *sql.DB) {
 
 func cleanupMSSQLTestTable(t *testing.T, db *sql.DB) {
 	t.Helper()
-	_, err := db.Exec("DROP TABLE IF EXISTS cursor_test_events")
+	_, err := db.ExecContext(t.Context(), "DROP TABLE IF EXISTS cursor_test_events")
 	if err != nil {
 		t.Logf("Warning: failed to cleanup MSSQL test table: %v", err)
 	}
@@ -1808,7 +1803,7 @@ func testMSSQLIntegerCursor(t *testing.T, dsn string) {
 
 	query := "SELECT TOP 3 id, event_data FROM cursor_test_events WHERE id > @p1 ORDER BY id ASC"
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -1847,7 +1842,7 @@ func testMSSQLIntegerCursor(t *testing.T, dsn string) {
 	ms3 := newMetricSetWithPaths(t, cfg, testPaths)
 	events3, errs3 := fetchEvents(t, ms3)
 	require.Empty(t, errs3, "Third fetch should not have errors")
-	require.Len(t, events3, 0, "Third fetch should return 0 events")
+	require.Empty(t, events3, "Third fetch should return 0 events")
 
 	if closer, ok := ms3.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
@@ -1860,7 +1855,7 @@ func testMSSQLTimestampCursor(t *testing.T, dsn string) {
 	testPaths := createTestPaths(t)
 	defaultTimestamp := time.Now().Add(-1 * time.Hour).UTC().Format(time.RFC3339)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -1901,7 +1896,7 @@ func testMSSQLDateCursor(t *testing.T, dsn string) {
 	testPaths := createTestPaths(t)
 	defaultDate := time.Now().Add(-24 * time.Hour).UTC().Format("2006-01-02")
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -1956,10 +1951,10 @@ func waitForMSSQLConnection(t *testing.T, host string) {
 
 	dsn := GetMSSQLConnectionDSN(host)
 
-	for i := 0; i < maxRetries; i++ {
+	for i := range maxRetries {
 		db, err := sql.Open("sqlserver", dsn)
 		if err == nil {
-			err = db.Ping()
+			err = db.PingContext(t.Context())
 			db.Close()
 			if err == nil {
 				t.Log("MSSQL is ready")
@@ -1969,10 +1964,7 @@ func waitForMSSQLConnection(t *testing.T, host string) {
 			}
 		}
 
-		delay := time.Duration(1<<uint(i)) * baseDelay
-		if delay > 30*time.Second {
-			delay = 30 * time.Second
-		}
+		delay := min(time.Duration(1<<uint(i))*baseDelay, 30*time.Second)
 
 		t.Logf("MSSQL not ready yet (attempt %d/%d), waiting %v: %v", i+1, maxRetries, delay, err)
 		time.Sleep(delay)
@@ -2009,7 +2001,7 @@ func TestCursorQueryChangeResetsState(t *testing.T) {
 	query1 := fmt.Sprintf("SELECT id, event_data FROM %s WHERE id > :cursor ORDER BY id ASC LIMIT 2", testTableName)
 	query2 := fmt.Sprintf("SELECT id, event_data FROM %s WHERE id > :cursor ORDER BY id ASC LIMIT 3", testTableName)
 
-	cfgBase := map[string]interface{}{
+	cfgBase := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -2022,16 +2014,12 @@ func TestCursorQueryChangeResetsState(t *testing.T) {
 		"cursor.default":      "0",
 	}
 
-	cfg1 := map[string]interface{}{}
-	for k, v := range cfgBase {
-		cfg1[k] = v
-	}
+	cfg1 := map[string]any{}
+	maps.Copy(cfg1, cfgBase)
 	cfg1["sql_query"] = query1
 
-	cfg2 := map[string]interface{}{}
-	for k, v := range cfgBase {
-		cfg2[k] = v
-	}
+	cfg2 := map[string]any{}
+	maps.Copy(cfg2, cfgBase)
 	cfg2["sql_query"] = query2
 
 	// First run with query1 advances cursor to id=2.
@@ -2085,7 +2073,7 @@ func TestCursorStateIsolation(t *testing.T) {
 	query1 := fmt.Sprintf("SELECT id, event_data FROM %s WHERE id > :cursor ORDER BY id ASC LIMIT 2", testTableName)
 	query2 := fmt.Sprintf("SELECT id, event_data FROM %s WHERE id > :cursor ORDER BY id ASC LIMIT 3", testTableName)
 
-	cfg1 := map[string]interface{}{
+	cfg1 := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -2099,7 +2087,7 @@ func TestCursorStateIsolation(t *testing.T) {
 		"cursor.default":      "0",
 	}
 
-	cfg2 := map[string]interface{}{
+	cfg2 := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -2175,7 +2163,7 @@ func TestCursorRegistrySharing(t *testing.T) {
 	testPaths := createTestPaths(t)
 
 	// Configuration for first MetricSet - query with LIMIT 2
-	cfg1 := map[string]interface{}{
+	cfg1 := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -2191,7 +2179,7 @@ func TestCursorRegistrySharing(t *testing.T) {
 	}
 
 	// Configuration for second MetricSet - different query with LIMIT 3
-	cfg2 := map[string]interface{}{
+	cfg2 := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -2306,7 +2294,7 @@ func TestCursorQueryTimeout(t *testing.T) {
 		testTableName,
 	)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},
@@ -2378,7 +2366,7 @@ func TestCursorNormalQueryCompletesWithinTimeout(t *testing.T) {
 
 	query := fmt.Sprintf("SELECT id, event_data FROM %s WHERE id > :cursor ORDER BY id ASC LIMIT 3", testTableName)
 
-	cfg := map[string]interface{}{
+	cfg := map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{dsn},

@@ -27,6 +27,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -63,7 +64,7 @@ func TestSchedJobRun(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 			limit := int64(100)
-			s := Create(limit, monitoring.NewRegistry(), tarawaTime(), nil, false)
+			s := Create(limit, monitoring.NewRegistry(), tarawaTime(), nil, false, logptest.NewTestingLogger(t, ""))
 
 			if testCase.overLimit {
 				err := s.limitSem.Acquire(context.Background(), limit)
@@ -80,7 +81,7 @@ func TestSchedJobRun(t *testing.T) {
 			}
 
 			beforeStart := time.Now()
-			sj := newSchedJob(testCase.jobCtx, s, "myid", "atype", tf)
+			sj := newSchedJob(testCase.jobCtx, s, "myid", "atype", tf, logptest.NewTestingLogger(t, ""))
 			startedAt := sj.run()
 
 			// This will panic in the case where we don't check s.limitSem.Acquire
@@ -101,7 +102,7 @@ func TestSchedJobRun(t *testing.T) {
 func TestRecursiveForkingJob(t *testing.T) {
 	s := Create(1000, monitoring.NewRegistry(), tarawaTime(), map[string]*config.JobLimit{
 		"atype": {Limit: 1},
-	}, false)
+	}, false, logptest.NewTestingLogger(t, ""))
 	var ran atomic.Int64
 
 	var terminalTf TaskFunc = func(ctx context.Context) []TaskFunc {
@@ -115,7 +116,7 @@ func TestRecursiveForkingJob(t *testing.T) {
 		}
 	}
 
-	sj := newSchedJob(context.Background(), s, "myid", "atype", forkingTf)
+	sj := newSchedJob(context.Background(), s, "myid", "atype", forkingTf, logptest.NewTestingLogger(t, ""))
 
 	sj.run()
 	require.Equal(t, int64(4), ran.Load())

@@ -155,20 +155,24 @@ func TestGetAllIndices(t *testing.T) {
 }
 
 // GetConfig returns config for elasticsearch module
-func getConfigForMetricset(metricset string, host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfigForMetricset(metricset string, host string) map[string]any {
+	return map[string]any{
 		"module":                     elasticsearch.ModuleName,
 		"metricsets":                 []string{metricset},
 		"hosts":                      []string{host},
+		"username":                   os.Getenv("ES_SUPERUSER_USER"),
+		"password":                   os.Getenv("ES_SUPERUSER_PASS"),
 		"index_recovery.active_only": false,
 	}
 }
 
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string) map[string]any {
+	return map[string]any{
 		"module":     elasticsearch.ModuleName,
 		"metricsets": metricSets,
 		"hosts":      []string{host},
+		"username":   os.Getenv("ES_SUPERUSER_USER"),
+		"password":   os.Getenv("ES_SUPERUSER_PASS"),
 		// index_recovery.active_only is part of the config of the index_recovery Metricset and it is required during the
 		// test of that particular metricset to get some data from the ES node (instead of an empty JSON if set to true)
 		"index_recovery.active_only": false,
@@ -202,6 +206,7 @@ func createIndex(host string, isHidden bool) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("could not build create index request: %w", err)
 	}
+	req.SetBasicAuth(os.Getenv("ES_SUPERUSER_USER"), os.Getenv("ES_SUPERUSER_PASS"))
 	req.Header.Add("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -242,6 +247,7 @@ func enableTrialLicense(host string, version *version.V) error {
 	if err != nil {
 		return err
 	}
+	req.SetBasicAuth(os.Getenv("ES_SUPERUSER_USER"), os.Getenv("ES_SUPERUSER_PASS"))
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -273,6 +279,7 @@ func checkTrialLicenseEnabled(host string, version *version.V) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	req.SetBasicAuth(os.Getenv("ES_SUPERUSER_USER"), os.Getenv("ES_SUPERUSER_PASS"))
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -371,6 +378,7 @@ func checkCCRStatsExists(host string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	req.SetBasicAuth(os.Getenv("ES_SUPERUSER_USER"), os.Getenv("ES_SUPERUSER_PASS"))
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -386,7 +394,7 @@ func checkCCRStatsExists(host string) (bool, error) {
 
 	var data struct {
 		FollowStats struct {
-			Indices []map[string]interface{} `json:"indices"`
+			Indices []map[string]any `json:"indices"`
 		} `json:"follow_stats"`
 	}
 	err = json.Unmarshal(body, &data)
@@ -439,6 +447,7 @@ func checkExists(url string) bool {
 	if err != nil {
 		return false
 	}
+	req.SetBasicAuth(os.Getenv("ES_SUPERUSER_USER"), os.Getenv("ES_SUPERUSER_PASS"))
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -565,6 +574,7 @@ func getElasticsearchVersion(elasticsearchHostPort string) (*version.V, error) {
 	if err != nil {
 		return nil, err
 	}
+	req.SetBasicAuth(os.Getenv("ES_SUPERUSER_USER"), os.Getenv("ES_SUPERUSER_PASS"))
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -609,6 +619,7 @@ func httpSendJSON(host, path, method string, body []byte) ([]byte, *http.Respons
 	if err != nil {
 		return nil, nil, err
 	}
+	req.SetBasicAuth(os.Getenv("ES_SUPERUSER_USER"), os.Getenv("ES_SUPERUSER_PASS"))
 	req.Header.Add("Content-Type", "application/json")
 
 	client := &http.Client{}

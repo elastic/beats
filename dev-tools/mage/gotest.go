@@ -23,11 +23,11 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"maps"
 	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
-	"slices"
 	"strings"
 	"time"
 
@@ -69,7 +69,7 @@ func makeGoTestArgs(name string) GoTestArgs {
 		TestName:        name,
 		Race:            RaceDetector,
 		Packages:        []string{"./..."},
-		Env:             make(map[string]string),
+		Env:             fipsTestEnv(),
 		OutputFile:      fileName + ".out",
 		JUnitReportFile: fileName + ".xml",
 		Tags:            testTagsFromEnv(),
@@ -89,6 +89,7 @@ func makeGoTestArgsForPackage(name, pkg string) GoTestArgs {
 		TestName:        fmt.Sprintf("%s-%s", name, pkg),
 		Race:            RaceDetector,
 		Packages:        []string{fmt.Sprintf("./module/%s", pkg)},
+		Env:             fipsTestEnv(),
 		OutputFile:      fileName + ".out",
 		JUnitReportFile: fileName + ".xml",
 		Tags:            testTagsFromEnv(),
@@ -141,6 +142,16 @@ func testTagsFromEnv() []string {
 	return tags
 }
 
+// fipsTestEnv returns the environment variables required to compile and run FIPS tests.
+func fipsTestEnv() map[string]string {
+	env := make(map[string]string, len(FIPSConfig.Compile.Env))
+	if !FIPSBuild {
+		return env
+	}
+	maps.Copy(env, FIPSConfig.Compile.Env)
+	return env
+}
+
 // DefaultGoTestUnitArgs returns a default set of arguments for running
 // all unit tests. We tag unit test files with '!integration'.
 func DefaultGoTestUnitArgs() GoTestArgs { return makeGoTestArgs("Unit") }
@@ -163,6 +174,7 @@ func DefaultGoFIPSOnlyTestArgs() GoTestArgs {
 // windows integration tests. We tag integration test files with 'integration'.
 func DefaultGoWindowsTestIntegrationArgs() GoTestArgs {
 	args := makeGoTestArgs("Windows-Integration")
+	args.Race = testbin.RaceDetectorEnabled()
 	args.Tags = append(args.Tags, "win_integration")
 	args.ExtraFlags = append(args.ExtraFlags, "-count=1")
 	args.Packages = []string{"./tests/integration/windows"}
@@ -173,6 +185,7 @@ func DefaultGoWindowsTestIntegrationArgs() GoTestArgs {
 // all integration tests. We tag integration test files with 'integration'.
 func DefaultGoTestIntegrationArgs(ctx context.Context) GoTestArgs {
 	args := makeGoTestArgs("Integration")
+	args.Race = testbin.RaceDetectorEnabled()
 	args.Tags = append(args.Tags, "integration")
 
 	cmdCtx, cmdCancel := context.WithTimeout(ctx, 5*time.Second)
@@ -233,6 +246,7 @@ func FIPSOnlyGoTestIntegrationFromHostArgs(ctx context.Context) GoTestArgs {
 func GoTestIntegrationArgsForPackage(pkg string) GoTestArgs {
 	args := makeGoTestArgsForPackage("Integration", pkg)
 
+	args.Race = testbin.RaceDetectorEnabled()
 	args.Tags = append(args.Tags, "integration")
 	// some test build docker images which download artifacts, and it can take a
 	// long time.
@@ -262,16 +276,16 @@ func DefaultTestBinaryArgs() TestBinaryArgs {
 //
 // This method executes integration tests for a single module at a time.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
+// Use INTEG_RACE_DETECTOR=true to enable the race detector.
 // Use MODULE=module to run only tests for `module`.
 func GoTestIntegrationForModule(ctx context.Context) error {
 	modules := EnvOr("MODULE", "")
 	if modules == "" {
 		log.Printf("Warning: environment variable MODULE is empty: [%s]\n", modules)
 	}
-	moduleArr := strings.Split(modules, ",")
+	moduleArr := strings.SplitSeq(modules, ",")
 
-	for _, module := range moduleArr {
+	for module := range moduleArr {
 		err := goTestIntegrationForSingleModule(ctx, module)
 		if err != nil {
 			return err
@@ -383,18 +397,14 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 	var testArgs []string
 
 	if params.Race {
-		// Enable the race detector for supported platforms.
-		// This is an intersection of the supported platforms for Beats and Go.
-		//
-		// See https://go.dev/doc/articles/race_detector#Requirements.
+		// Only pass -race on platforms that support it; the predicate is shared
+		// with the test binary builder (testbin) to keep the two in sync.
 		devOS := os.Getenv("DEV_OS")
 		devArch := os.Getenv("DEV_ARCH")
-		raceAmd64 := devArch == "amd64"
-		raceArm64 := devArch == "arm64" &&
-			slices.Contains([]string{"linux", "darwin"}, devOS)
-		if raceAmd64 || raceArm64 {
+		if testbin.RaceDetectorSupported(devOS, devArch) {
 			testArgs = append(testArgs, "-race")
 		} else {
+			//nolint:gosec // G706: DEV_OS/DEV_ARCH are trusted build-time env vars, not untrusted input
 			log.Printf("Warning: skipping -race flag for unsupported platform %s/%s\n", devOS, devArch)
 		}
 	}

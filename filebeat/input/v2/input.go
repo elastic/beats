@@ -30,8 +30,6 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-
-	"github.com/elastic/go-concert/unison"
 )
 
 const (
@@ -48,16 +46,15 @@ const (
 // of common settings not unique to a particular input type, or require a more
 // specific Input interface to be implemented by the actual input.
 type InputManager interface {
-	// Init signals to InputManager to initialize internal resources.
-	// The mode tells the input manager if the Beat is actually running the inputs or
-	// if inputs are only configured for testing/validation purposes.
-	Init(grp unison.Group) error
-
 	// Create builds a new Input instance from the given configuation, or returns
 	// an error if the configuation is invalid.
 	// The input must establish any connection for data collection yet. The Beat
 	// will use the Test/Run methods of the input.
 	Create(*conf.C) (Input, error)
+
+	// Close releases any resources held by the InputManager. Call after all
+	// inputs managed by this InputManager have stopped.
+	Close()
 }
 
 // Input is a configured input object that can be used to test or start

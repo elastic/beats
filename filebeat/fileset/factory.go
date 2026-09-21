@@ -89,7 +89,7 @@ func (f *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, e
 	}
 
 	// Hash module ID
-	var h map[string]interface{}
+	var h map[string]any
 	if err = c.Unpack(&h); err != nil {
 		return nil, fmt.Errorf("failed to unpack config: %w", err)
 	}

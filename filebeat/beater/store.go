@@ -124,7 +124,7 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 				// the es.Registry (subscriber) and all filebeatStore wrappers (publishers).
 				// Multiple Notify() calls are idempotent, so sharing across wrappers is safe.
 				shared.notifier = es.NewNotifier()
-				shared.esRegistry = statestore.NewRegistry(es.New(ctx, logger, shared.notifier))
+				shared.esRegistry = statestore.NewRegistry(es.New(ctx, logger, shared.notifier, info))
 			default:
 				shared.esRegistry = statestore.NewRegistry(cfg.ESStorageExtension)
 			}
@@ -158,12 +158,31 @@ func (s *filebeatStore) Close() {
 	}
 }
 
-// StoreFor returns the storage registry depending on the type. Default is the file store.
-func (s *filebeatStore) StoreFor(typ string) (*statestore.Store, error) {
-	if features.IsElasticsearchStateStoreEnabledForInput(typ) && s.shared.esRegistry != nil {
-		return s.shared.esRegistry.Get(s.storeName)
+// StoreFor returns the store for the input type and ID. It uses file storage by default.
+func (s *filebeatStore) StoreFor(typ, id string) (*statestore.Store, error) {
+	if s.usesES(typ) {
+		return s.shared.esRegistry.Get(s.esStoreName(id))
 	}
 	return s.shared.registry.Get(s.storeName)
+}
+
+// StoreKey returns the identifier of the shared persistent registry backend.
+func (s *filebeatStore) StoreKey(typ, id string) string {
+	if s.usesES(typ) {
+		return s.storeKey + "::es::" + s.esStoreName(id)
+	}
+	return s.storeKey
+}
+
+func (s *filebeatStore) usesES(typ string) bool {
+	return features.IsElasticsearchStateStoreEnabledForInput(typ) && s.shared.esRegistry != nil
+}
+
+func (s *filebeatStore) esStoreName(id string) string {
+	if id == "" {
+		return s.storeName
+	}
+	return id
 }
 
 func (s *filebeatStore) CleanupInterval() time.Duration {

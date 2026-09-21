@@ -6,6 +6,7 @@ package httpjson
 
 import (
 	"fmt"
+	"net/url"
 	"strings"
 )
 
@@ -21,6 +22,7 @@ type responseConfig struct {
 	RequestBodyOnPagination bool             `config:"request_body_on_pagination"`
 	Transforms              transformsConfig `config:"transforms"`
 	Pagination              transformsConfig `config:"pagination"`
+	PaginationAllowedHosts  []string         `config:"pagination_allowed_hosts"`
 	Split                   *splitConfig     `config:"split"`
 	SaveFirstResponse       bool             `config:"save_first_response"`
 }
@@ -42,6 +44,15 @@ func (c *responseConfig) Validate() error {
 	}
 	if _, err := newBasicTransformsFromConfig(registeredTransforms, c.Pagination, paginationNamespace, noopReporter{}, nil); err != nil {
 		return err
+	}
+	for _, origin := range c.PaginationAllowedHosts {
+		u, err := url.Parse(origin)
+		if err != nil {
+			return fmt.Errorf("invalid pagination_allowed_hosts entry %q: %w", origin, err)
+		}
+		if u.Scheme == "" || u.Host == "" {
+			return fmt.Errorf("pagination_allowed_hosts entry %q must have both a scheme and a host", origin)
+		}
 	}
 	if c.DecodeAs != "" {
 		if _, found := registeredDecoders[c.DecodeAs]; !found {

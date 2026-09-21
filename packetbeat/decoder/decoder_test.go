@@ -20,13 +20,14 @@
 package decoder
 
 import (
+	"slices"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/elastic/beats/v7/packetbeat/flows"
 	"github.com/elastic/beats/v7/packetbeat/protos"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
@@ -92,7 +93,6 @@ var ipv4TcpDNS = []byte{
 
 // Test that DecodePacket decodes and IPv4/TCP packet and invokes the TCP processor.
 func TestDecodePacketData_ipv4Tcp(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("decoder"))
 
 	p := gopacket.NewPacket(ipv4TcpDNS, layers.LinkTypeEthernet, gopacket.Default)
 	if p.ErrorLayer() != nil {
@@ -213,7 +213,7 @@ func newTestDecoder(t *testing.T) (*Decoder, *TestTCPProcessor, *TestUDPProcesso
 	icmp6Layer := &TestIcmp6Processor{}
 	tcpLayer := &TestTCPProcessor{}
 	udpLayer := &TestUDPProcessor{}
-	d, err := New(nil, layers.LinkTypeEthernet, icmp4Layer, icmp6Layer, tcpLayer, udpLayer, false)
+	d, err := New(nil, layers.LinkTypeEthernet, icmp4Layer, icmp6Layer, tcpLayer, udpLayer, false, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("Error creating decoder %v", err)
 	}
@@ -258,9 +258,7 @@ func TestFragment(t *testing.T) {
 	t.Run("out_of_order", func(t *testing.T) {
 		d, tcp, udp := newTestDecoder(t)
 
-		// Reverse the order of the packets.
-		for i := len(packets) - 1; i >= 0; i-- {
-			p := packets[i]
+		for _, p := range slices.Backward(packets) {
 			d.OnPacket(p.Data(), &p.Metadata().CaptureInfo)
 		}
 

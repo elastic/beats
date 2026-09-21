@@ -2,14 +2,14 @@
   {
     "auditd": {
       "log": {
-        "auid": "4294967295",
+        "auid": "unset",
         "dst": "192.168.0.0",
         "dst_prefixlen": "16",
         "op": "SPD-delete",
         "record_type": "MAC_IPSEC_EVENT",
         "result": "success",
         "sequence": "18877201",
-        "ses": "4294967295",
+        "ses": "unset",
         "src": "192.168.2.0",
         "src_prefixlen": "24"
       }
@@ -23,7 +23,7 @@
         "a2": "b8",
         "a3": "0",
         "arch": "x86_64",
-        "auid": "4294967295",
+        "auid": "unset",
         "comm": "charon",
         "egid": "0",
         "euid": "0",
@@ -38,7 +38,7 @@
         "record_type": "SYSCALL",
         "result": "success",
         "sequence": "18877199",
-        "ses": "4294967295",
+        "ses": "unset",
         "sgid": "0",
         "suid": "0",
         "syscall": "sendto",
@@ -66,7 +66,7 @@
     "auditd": {
       "log": {
         "addr": "216.160.83.61",
-        "auid": "4294967295",
+        "auid": "unset",
         "cipher": "chacha20-poly1305@openssh.com",
         "direction": "from-server",
         "exe": "/usr/sbin/sshd",
@@ -80,7 +80,7 @@
         "result": "success",
         "rport": "63927",
         "sequence": "406",
-        "ses": "4294967295",
+        "ses": "unset",
         "spid": "1299",
         "subj_category": "c0.c1023",
         "subj_domain": "sshd_t",
@@ -154,14 +154,14 @@
   {
     "auditd": {
       "log": {
-        "auid": "4294967295",
+        "auid": "unset",
         "comm": "systemd-update-utmp",
         "exe": "/usr/lib/systemd/systemd-update-utmp",
         "pid": "678",
         "record_type": "SYSTEM_BOOT",
         "result": "success",
         "sequence": "5",
-        "ses": "4294967295",
+        "ses": "unset",
         "subj_domain": "init_t",
         "subj_level": "s0",
         "subj_role": "system_r",
@@ -173,14 +173,14 @@
   {
     "auditd": {
       "log": {
-        "auid": "4294967295",
+        "auid": "unset",
         "comm": "systemd-update-utmp",
         "exe": "/usr/lib/systemd/systemd-update-utmp",
         "pid": "4440",
         "record_type": "SYSTEM_SHUTDOWN",
         "result": "success",
         "sequence": "1163",
-        "ses": "4294967295",
+        "ses": "unset",
         "subj_domain": "init_t",
         "subj_level": "s0",
         "subj_role": "system_r",
@@ -243,7 +243,7 @@
   {
     "auditd": {
       "log": {
-        "auid": "4294967295",
+        "auid": "unset",
         "exe": "/usr/sbin/libvirtd",
         "img-ctx": "system_u:object_r:svirt_image_t:s0:c444,c977",
         "model": "selinux",
@@ -251,7 +251,7 @@
         "record_type": "VIRT_MACHINE_ID",
         "result": "success",
         "sequence": "23118",
-        "ses": "4294967295",
+        "ses": "unset",
         "subj_category": "c0.c1023",
         "subj_domain": "virtd_t",
         "subj_level": "s0-s0",

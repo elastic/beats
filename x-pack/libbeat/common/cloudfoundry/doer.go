@@ -76,7 +76,7 @@ func (d *authTokenDoer) getAuthTokenWithExpiresIn(username, password string) (st
 	}
 	defer resp.Body.Close()
 
-	jsonData := make(map[string]interface{})
+	jsonData := make(map[string]any)
 	decoder := json.NewDecoder(resp.Body)
 	err = decoder.Decode(&jsonData)
 	if err != nil {

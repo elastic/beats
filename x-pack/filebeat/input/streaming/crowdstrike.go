@@ -11,11 +11,15 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
+	"net"
 	"net/http"
 	"net/url"
 	"strconv"
+	"sync"
 	"time"
 
+	"golang.org/x/net/publicsuffix"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
@@ -36,10 +40,11 @@ type falconHoseStream struct {
 
 	status status.StatusReporter
 
-	creds         *clientcredentials.Config
-	authTransport *rateLimitTransport
-	discoverURL   string
-	plainClient   *http.Client
+	creds          *clientcredentials.Config
+	authTransport  *rateLimitTransport
+	discoverURL    string
+	allowedOrigins []*url.URL
+	plainClient    *http.Client
 
 	time func() time.Time
 }
@@ -73,6 +78,57 @@ func runRefreshLoopWithAfter(ctx context.Context, wait time.Duration, after func
 				return
 			}
 		}
+	}
+}
+
+// sameOrigin reports whether target shares the same origin as base. It returns
+// true when the hostnames are identical or when both resolve to the same
+// registrable domain (eTLD+1). It rejects HTTPS-to-HTTP scheme downgrades.
+// For IP addresses or hosts where the registrable domain is undefined, only
+// an exact hostname match is accepted.
+func sameOrigin(base, target *url.URL) bool {
+	if base.Scheme == "https" && target.Scheme != "https" {
+		return false
+	}
+	bh := base.Hostname()
+	th := target.Hostname()
+	if bh == th {
+		return true
+	}
+	bd, bErr := publicsuffix.EffectiveTLDPlusOne(bh)
+	td, tErr := publicsuffix.EffectiveTLDPlusOne(th)
+	if bErr != nil || tErr != nil {
+		return false
+	}
+	return bd == td
+}
+
+// allowedOrigin reports whether target is permitted given the discover URL's
+// origin and an optional set of explicitly allowed origins. The target is
+// accepted when sameOrigin(base, target) is true or when the target's
+// scheme, hostname, and port match any entry in allowed. Absent ports are
+// normalised to the scheme default (443 for HTTPS, 80 for HTTP).
+func allowedOrigin(base *url.URL, allowed []*url.URL, target *url.URL) bool {
+	if sameOrigin(base, target) {
+		return true
+	}
+	for _, a := range allowed {
+		if a.Scheme == target.Scheme && a.Hostname() == target.Hostname() && portOrDefault(a) == portOrDefault(target) {
+			return true
+		}
+	}
+	return false
+}
+
+func portOrDefault(u *url.URL) string {
+	if p := u.Port(); p != "" {
+		return p
+	}
+	switch u.Scheme {
+	case "https", "wss":
+		return "443"
+	default:
+		return "80"
 	}
 }
 
@@ -115,7 +171,7 @@ func NewFalconHoseFollower(ctx context.Context, env v2.Context, cfg config, curs
 		return nil, err
 	}
 
-	s.prg, s.ast, err = newProgram(ctx, cfg.Program, root, patterns, log)
+	s.prg, s.ast, err = newProgram(ctx, cfg.Program, root, patterns, env.Agent.UserAgent, log)
 	if err != nil {
 		s.metrics.errorsTotal.Inc()
 		stat.UpdateStatus(status.Failed, err.Error())
@@ -133,6 +189,21 @@ func NewFalconHoseFollower(ctx context.Context, env v2.Context, cfg config, curs
 	u.RawQuery = query.Encode()
 	s.discoverURL = u.String()
 
+	for _, raw := range cfg.ResourceOrigins {
+		o, err := url.Parse(raw)
+		if err != nil {
+			err = fmt.Errorf("failed to parse resource_origins entry %q: %w", raw, err)
+			stat.UpdateStatus(status.Failed, err.Error())
+			return nil, err
+		}
+		s.allowedOrigins = append(s.allowedOrigins, o)
+	}
+
+	ua := cfg.UserAgent
+	if ua == "" {
+		ua = env.Agent.UserAgent
+	}
+
 	// Build the auth transport before zeroing timeouts for the streaming
 	// client. The oauth2 token endpoint needs normal request timeouts;
 	// moving this after the timeout zeroing will cause auth requests to
@@ -146,7 +217,7 @@ func NewFalconHoseFollower(ctx context.Context, env v2.Context, cfg config, curs
 		now = time.Now
 	}
 	s.authTransport = &rateLimitTransport{
-		base:     authClient.Transport,
+		base:     userAgentTransport{ua: ua, base: authClient.Transport},
 		timeout:  authClient.Timeout,
 		maxRetry: 3,
 		wait:     60 * time.Second,
@@ -161,8 +232,25 @@ func NewFalconHoseFollower(ctx context.Context, env v2.Context, cfg config, curs
 		stat.UpdateStatus(status.Failed, "failed to configure client: "+err.Error())
 		return nil, err
 	}
+	s.plainClient.Transport = userAgentTransport{ua: ua, base: s.plainClient.Transport}
 
 	return &s, nil
+}
+
+var _ http.RoundTripper = userAgentTransport{}
+
+// userAgentTransport wraps an http.RoundTripper and unconditionally
+// sets the User-Agent header on every outgoing request. It overwrites
+// Go's default "Go-http-client/1.1" which http.Client.Do sets before
+// calling RoundTrip.
+type userAgentTransport struct {
+	ua   string
+	base http.RoundTripper
+}
+
+func (t userAgentTransport) RoundTrip(r *http.Request) (*http.Response, error) {
+	r.Header.Set("User-Agent", t.ua)
+	return t.base.RoundTrip(r)
 }
 
 // FollowStream receives, processes and publishes events from the subscribed
@@ -183,8 +271,18 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 	defer cli.CloseIdleConnections()
 
 	var err error
+	// attempt counts only failures that count toward the termination cap, i.e.
+	// non-transient ones. failures counts every consecutive failure and drives
+	// the back-off and DEGRADED reporting, so a persistent transient outage
+	// still backs off and is surfaced as DEGRADED without ever terminating the
+	// input.
 	attempt := 0
+	failures := 0
 	const maxAttemptsUnconfigured = 10
+	// Number of consecutive failures tolerated before reporting DEGRADED,
+	// so a single transient blip (e.g. an empty discover response) does not
+	// churn the unit health status.
+	const degradeAfterFailures = 3
 	for {
 		state, err = s.followSession(ctx, cli, state)
 		if err != nil {
@@ -197,28 +295,45 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 				return err
 			}
 
-			attempt++
+			failures++
 
-			if s.cfg.Retry != nil && !s.cfg.Retry.InfiniteRetries && attempt >= s.cfg.Retry.MaxAttempts {
-				return fmt.Errorf("max retry attempts (%d) exceeded: %w", s.cfg.Retry.MaxAttempts, err)
-			} else if attempt >= maxAttemptsUnconfigured {
-				return fmt.Errorf("max retry attempts (%d unconfigured) exceeded: %w", maxAttemptsUnconfigured, err)
+			// Transient connection-level failures (empty discover body,
+			// failed discover GET, timeouts) self-heal once the upstream
+			// recovers, so they retry with capped back-off indefinitely
+			// rather than counting toward the attempt limit and terminating
+			// the input. Only genuine hardErrors terminate immediately; other
+			// soft errors still honour the configured (or default) attempt cap.
+			if !errors.Is(err, transientError{}) {
+				attempt++
+				// The unconfigured cap must only apply when no retry policy is
+				// set. Keeping it as an else-if on the configured branch caused
+				// infinite_retries and max_attempts > 10 to be silently capped
+				// at 10.
+				if s.cfg.Retry != nil {
+					if !s.cfg.Retry.InfiniteRetries && attempt >= s.cfg.Retry.MaxAttempts {
+						return fmt.Errorf("max retry attempts (%d) exceeded: %w", s.cfg.Retry.MaxAttempts, err)
+					}
+				} else if attempt >= maxAttemptsUnconfigured {
+					return fmt.Errorf("max retry attempts (%d unconfigured) exceeded: %w", maxAttemptsUnconfigured, err)
+				}
 			}
 
 			var waitTime time.Duration
 			if s.cfg.Retry != nil {
-				waitTime = calculateWaitTime(s.cfg.Retry.WaitMin, s.cfg.Retry.WaitMax, attempt, s.cfg.Retry.MaxAttempts)
+				waitTime = calculateWaitTime(s.cfg.Retry.WaitMin, s.cfg.Retry.WaitMax, failures, s.cfg.Retry.MaxAttempts)
 			} else {
 				s.log.Warnw("no retry configured: using linear back-off")
-				waitTime = min(time.Duration(attempt)*time.Second, 30*time.Second)
+				waitTime = min(time.Duration(failures)*time.Second, 30*time.Second)
 			}
 			var rle *rateLimitError
 			if errors.As(err, &rle) && rle.wait > waitTime {
 				waitTime = rle.wait
 			}
 
-			s.status.UpdateStatus(status.Degraded, err.Error())
-			s.log.Warnw("session warning", "error", err, "attempt", attempt, "wait", waitTime.String())
+			if failures >= degradeAfterFailures {
+				s.status.UpdateStatus(status.Degraded, err.Error())
+			}
+			s.log.Warnw("session warning", "error", err, "transient", errors.Is(err, transientError{}), "attempt", attempt, "failures", failures, "wait", waitTime.String())
 
 			select {
 			case <-ctx.Done():
@@ -230,6 +345,7 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 
 		// Reset for success.
 		attempt = 0
+		failures = 0
 		s.status.UpdateStatus(status.Running, "")
 	}
 }
@@ -247,9 +363,20 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 	}
 	resp, err := cli.Do(req)
 	if err != nil {
-		err = fmt.Errorf("failed GET to discover stream: %w", err)
-		s.status.UpdateStatus(status.Degraded, err.Error())
-		return state, err
+		// A connection-level failure (refused, reset, DNS, timeout), including
+		// a network failure while fetching the OAuth token, is transient: the
+		// retry loop backs off and retries without counting it toward the
+		// attempt limit or terminating the input. A non-network failure (for
+		// example an OAuth auth error from bad credentials) is left as an
+		// ordinary soft error so a genuine misconfiguration still terminates
+		// the input after the configured attempts rather than retrying forever.
+		// Status transitions are owned by the retry loop so a single blip does
+		// not immediately report DEGRADED.
+		var netErr net.Error
+		if errors.As(err, &netErr) {
+			return state, transientError{fmt.Errorf("failed GET to discover stream: %w", err)}
+		}
+		return state, fmt.Errorf("failed GET to discover stream: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -276,30 +403,52 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 
 	dec := json.NewDecoder(resp.Body)
 
-	type resource struct {
-		FeedURL string `json:"dataFeedURL"`
-		Session struct {
-			Token   string    `json:"token"`
-			Expires time.Time `json:"expiration"`
-		} `json:"sessionToken"`
-		RefreshURL   string `json:"refreshActiveSessionURL"`
-		RefreshAfter int    `json:"refreshActiveSessionInterval"`
-	}
 	var body struct {
 		Resources []resource     `json:"resources"`
 		Meta      map[string]any `json:"meta"`
 	}
 	err = dec.Decode(&body)
 	if err != nil {
+		// A 200 response with an empty body yields io.EOF from Decode. This
+		// is a transient upstream condition (the discover endpoint
+		// occasionally returns no content), distinct from a malformed body,
+		// so mark it transient and surface it clearly rather than as a
+		// generic decode failure.
+		if errors.Is(err, io.EOF) {
+			return state, transientError{errors.New("discover stream returned an empty body")}
+		}
 		return state, fmt.Errorf("failed to decode discover body: %w", err)
 	}
 	s.log.Debugw("stream discover metadata", logp.Namespace(s.ns), "meta", mapstr.M(body.Meta))
 
+	discoverOrigin, err := url.Parse(s.discoverURL)
+	if err != nil {
+		return state, fmt.Errorf("failed to parse discover url for origin check: %w", err)
+	}
+
+	type preparedFeed struct {
+		resource resource
+		feedName string
+		offset   int
+	}
 	cursors, _ := state["cursor"].(map[string]any)
-	// Clean up state feed annotation. This unfortunate code placement
-	// is in order to avoid allocating defers in a loop.
-	defer delete(state, "feed")
+	feeds := make([]preparedFeed, 0, len(body.Resources))
 	for _, r := range body.Resources {
+		feedURL, err := url.Parse(r.FeedURL)
+		if err != nil {
+			return state, fmt.Errorf("failed to parse feed url: %w", err)
+		}
+		if !allowedOrigin(discoverOrigin, s.allowedOrigins, feedURL) {
+			return nil, hardError{fmt.Errorf("feed url origin %q does not match discover origin %q", feedURL.Host, discoverOrigin.Host)}
+		}
+		refreshURL, err := url.Parse(r.RefreshURL)
+		if err != nil {
+			return state, fmt.Errorf("failed to parse refresh url: %w", err)
+		}
+		if !allowedOrigin(discoverOrigin, s.allowedOrigins, refreshURL) {
+			return nil, hardError{fmt.Errorf("refresh url origin %q does not match discover origin %q", refreshURL.Host, discoverOrigin.Host)}
+		}
+
 		feedName := r.FeedURL // Retain this since we will mutate it to set the offset.
 		var offset int
 		if cursor, ok := cursors[feedName].(map[string]any); ok {
@@ -310,113 +459,185 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 				offset = int(off)
 			}
 		}
-		refreshAfter := time.Duration(r.RefreshAfter) * time.Second
-		go func() {
-			runRefreshLoopWithAfter(sessionCtx, refreshSessionWait(refreshAfter), time.After, func() error {
-				s.log.Debugw("session refresh", "url", r.RefreshURL)
-				req, err := http.NewRequestWithContext(sessionCtx, http.MethodPost, r.RefreshURL, nil)
-				if err != nil {
-					s.metrics.errorsTotal.Inc()
-					s.status.UpdateStatus(status.Failed, "failed to prepare refresh stream request: "+err.Error())
-					s.log.Errorw("failed to prepare refresh stream request", "error", err)
-					return err
-				}
-				req.Header.Set("Content-Type", "application/json")
-				resp, err := cli.Do(req)
-				if err != nil {
-					s.metrics.errorsTotal.Inc()
-					s.status.UpdateStatus(status.Failed, "failed to refresh stream connection: "+err.Error())
-					s.log.Errorw("failed to refresh stream connection", "error", err)
-					return err
-				}
-				err = resp.Body.Close()
-				if err != nil {
-					s.metrics.errorsTotal.Inc()
-					s.status.UpdateStatus(status.Failed, "failed to close refresh response body: "+err.Error())
-					s.log.Warnw("failed to close refresh response body", "error", err)
-				}
-				return nil
-			})
-		}()
+		feeds = append(feeds, preparedFeed{resource: r, feedName: feedName, offset: offset})
+	}
 
-		if offset > 0 {
-			feedURL, err := url.Parse(r.FeedURL)
+	merged := &feedCursors{cursor: maps.Clone(cursors)}
+	var wg sync.WaitGroup
+	feedCtx, cancel := context.WithCancelCause(sessionCtx)
+	defer cancel(context.Canceled)
+	for _, f := range feeds {
+		wg.Add(1)
+		go func(f preparedFeed) {
+			defer wg.Done()
+			feedState := cloneState(state)
+			feedState["feed"] = f.feedName
+			err := s.consumeFeed(feedCtx, cli, f.resource, f.feedName, f.offset, feedState, merged)
 			if err != nil {
-				return state, fmt.Errorf("failed to parse feed url: %w", err)
+				cancel(err)
 			}
-			feedQuery, err := url.ParseQuery(feedURL.RawQuery)
-			if err != nil {
-				return state, fmt.Errorf("failed to parse feed query: %w", err)
-			}
-			feedQuery.Set("offset", strconv.Itoa(offset))
-			feedURL.RawQuery = feedQuery.Encode()
-			r.FeedURL = feedURL.String()
+		}(f)
+	}
+	wg.Wait()
+	delete(state, "feed")
+	if merged.cursor != nil {
+		state["cursor"] = merged.cursor
+	}
+	if err := context.Cause(feedCtx); err != nil {
+		if errors.Is(err, hardError{}) {
+			return nil, err
 		}
-
-		s.log.Debugw("stream request", "url", r.FeedURL)
-		req, err := http.NewRequestWithContext(sessionCtx, "GET", r.FeedURL, nil)
-		if err != nil {
-			return state, fmt.Errorf("failed to make firehose request to %s: %w", r.FeedURL, err)
-		}
-		req.Header = make(http.Header)
-		req.Header.Add("Accept", "application/json")
-		req.Header.Add("Authorization", "Token "+r.Session.Token)
-
-		resp, err := s.plainClient.Do(req)
-		if err != nil {
-			return state, fmt.Errorf("failed to get firehose from %s: %w", r.FeedURL, err)
-		}
-		defer resp.Body.Close()
-
-		if resp.StatusCode != http.StatusOK {
-			var buf bytes.Buffer
-			_, _ = io.Copy(&buf, resp.Body)
-			s.log.Errorw("unsuccessful firehose request", "status_code", resp.StatusCode, "status", resp.Status, "body", buf.String())
-			return state, fmt.Errorf("unsuccessful firehose request: %s: %s", resp.Status, &buf)
-		}
-
-		// Prepare state to understand which feed is being processed.
-		// This is cleared by the deferred delete above the loop.
-		state["feed"] = feedName
-		dec := json.NewDecoder(resp.Body)
-		for {
-			var msg json.RawMessage
-			err := dec.Decode(&msg)
-			if err != nil {
-				s.metrics.errorsTotal.Inc()
-				//nolint:errorlint // will not be a wrapped error here.
-				if err == io.EOF {
-					s.log.Info("stream ended, restarting")
-					return state, nil
-				}
-				return state, fmt.Errorf("error decoding event: %w", err)
-			}
-			s.metrics.receivedBytesTotal.Add(uint64(len(msg)))
-			if len(msg) == 0 || msg[0] != '{' {
-				s.metrics.errorsTotal.Inc()
-				s.log.Warnw("skipping non-object message from firehose", logp.Namespace(s.ns), "msg", debugMsg(msg))
-				continue
-			}
-			state["response"] = []byte(msg)
-			s.log.Debugw("received firehose message", logp.Namespace(s.ns), "msg", debugMsg(msg))
-			currentCursor, ok := state["cursor"].(map[string]any)
-			if !ok {
-				currentCursor = s.cursor
-			}
-			newCursor, err := s.process(ctx, state, currentCursor, s.now().In(time.UTC))
-			if newCursor != nil {
-				state["cursor"] = newCursor
-			}
-			if err != nil {
-				s.log.Errorw("failed to process and publish data", "error", err)
-				s.status.UpdateStatus(status.Failed, "failed to process and publish data: "+err.Error())
-				// Fail the input so that we do not attempt to progress
-				// while dropping data on the floor.
-				return nil, hardError{err}
-			}
-		}
+		return state, err
 	}
 	return state, nil
+}
+
+type resource struct {
+	FeedURL string `json:"dataFeedURL"`
+	Session struct {
+		Token   string    `json:"token"`
+		Expires time.Time `json:"expiration"`
+	} `json:"sessionToken"`
+	RefreshURL   string `json:"refreshActiveSessionURL"`
+	RefreshAfter int    `json:"refreshActiveSessionInterval"`
+}
+
+// feedCursors serializes CEL evaluation and publication across concurrent
+// feeds and keeps a merged per-feed cursor so each worker sees offsets
+// from the others.
+type feedCursors struct {
+	mu     sync.Mutex
+	cursor map[string]any
+}
+
+func (c *feedCursors) evalAndPublish(s *falconHoseStream, ctx context.Context, state map[string]any) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if c.cursor != nil {
+		state["cursor"] = maps.Clone(c.cursor)
+	}
+	current, ok := state["cursor"].(map[string]any)
+	if !ok {
+		current = s.cursor
+	}
+	newCursor, err := s.process(ctx, state, current, s.now().In(time.UTC))
+	if newCursor != nil {
+		c.cursor = newCursor
+		state["cursor"] = newCursor
+	}
+	return err
+}
+
+func cloneState(state map[string]any) map[string]any {
+	out := maps.Clone(state)
+	if out == nil {
+		out = make(map[string]any)
+	}
+	if c, ok := state["cursor"].(map[string]any); ok {
+		out["cursor"] = maps.Clone(c)
+	}
+	return out
+}
+
+// consumeFeed follows a single discovered FalconHose resource until the
+// stream ends, the context is cancelled, or an error occurs.
+func (s *falconHoseStream) consumeFeed(ctx context.Context, cli *http.Client, r resource, feedName string, offset int, state map[string]any, cursors *feedCursors) error {
+	refreshAfter := time.Duration(r.RefreshAfter) * time.Second
+	go func() {
+		runRefreshLoopWithAfter(ctx, refreshSessionWait(refreshAfter), time.After, func() error {
+			s.log.Debugw("session refresh", "url", r.RefreshURL)
+			req, err := http.NewRequestWithContext(ctx, http.MethodPost, r.RefreshURL, nil)
+			if err != nil {
+				s.metrics.errorsTotal.Inc()
+				s.status.UpdateStatus(status.Failed, "failed to prepare refresh stream request: "+err.Error())
+				s.log.Errorw("failed to prepare refresh stream request", "error", err)
+				return err
+			}
+			req.Header.Set("Content-Type", "application/json")
+			resp, err := cli.Do(req)
+			if err != nil {
+				s.metrics.errorsTotal.Inc()
+				s.status.UpdateStatus(status.Failed, "failed to refresh stream connection: "+err.Error())
+				s.log.Errorw("failed to refresh stream connection", "error", err)
+				return err
+			}
+			err = resp.Body.Close()
+			if err != nil {
+				s.metrics.errorsTotal.Inc()
+				s.status.UpdateStatus(status.Failed, "failed to close refresh response body: "+err.Error())
+				s.log.Warnw("failed to close refresh response body", "error", err)
+			}
+			return nil
+		})
+	}()
+
+	feedURL, err := url.Parse(r.FeedURL)
+	if err != nil {
+		return fmt.Errorf("failed to parse feed url: %w", err)
+	}
+	if offset > 0 {
+		feedQuery, err := url.ParseQuery(feedURL.RawQuery)
+		if err != nil {
+			return fmt.Errorf("failed to parse feed query: %w", err)
+		}
+		feedQuery.Set("offset", strconv.Itoa(offset))
+		feedURL.RawQuery = feedQuery.Encode()
+		r.FeedURL = feedURL.String()
+	}
+
+	s.log.Debugw("stream request", "url", r.FeedURL)
+	req, err := http.NewRequestWithContext(ctx, "GET", r.FeedURL, nil)
+	if err != nil {
+		return fmt.Errorf("failed to make firehose request to %s: %w", r.FeedURL, err)
+	}
+	req.Header = make(http.Header)
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Authorization", "Token "+r.Session.Token)
+
+	resp, err := s.plainClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to get firehose from %s: %w", r.FeedURL, err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		var buf bytes.Buffer
+		_, _ = io.Copy(&buf, resp.Body)
+		s.log.Errorw("unsuccessful firehose request", "status_code", resp.StatusCode, "status", resp.Status, "body", buf.String())
+		return fmt.Errorf("unsuccessful firehose request: %s: %s", resp.Status, &buf)
+	}
+
+	dec := json.NewDecoder(resp.Body)
+	for {
+		var msg json.RawMessage
+		err := dec.Decode(&msg)
+		if err != nil {
+			s.metrics.errorsTotal.Inc()
+			if errors.Is(err, context.Canceled) || errors.Is(ctx.Err(), context.Canceled) {
+				return ctx.Err()
+			}
+			if errors.Is(err, io.EOF) {
+				s.log.Infow("feed stream ended", "url", feedName)
+				return nil
+			}
+			return fmt.Errorf("error decoding event: %w", err)
+		}
+		s.metrics.receivedBytesTotal.Add(uint64(len(msg)))
+		if len(msg) == 0 || msg[0] != '{' {
+			s.metrics.errorsTotal.Inc()
+			s.log.Warnw("skipping non-object message from firehose", logp.Namespace(s.ns), "msg", debugMsg(msg))
+			continue
+		}
+		state["response"] = []byte(msg)
+		s.log.Debugw("received firehose message", logp.Namespace(s.ns), "msg", debugMsg(msg))
+		if err := cursors.evalAndPublish(s, ctx, state); err != nil {
+			s.log.Errorw("failed to process and publish data", "error", err)
+			s.status.UpdateStatus(status.Failed, "failed to process and publish data: "+err.Error())
+			// Fail the input so that we do not attempt to progress
+			// while dropping data on the floor.
+			return hardError{err}
+		}
+	}
 }
 
 // rateLimitError carries a retry-after duration from a 429 response so
@@ -441,6 +662,24 @@ func (e hardError) Is(target error) bool {
 }
 
 func (e hardError) Unwrap() error {
+	return e.error
+}
+
+// transientError is a connection-level error that the retry loop retries
+// indefinitely with capped back-off instead of counting toward the attempt
+// limit. It is the counterpart to hardError: hardError terminates the input,
+// transientError never does.
+type transientError struct {
+	error
+}
+
+// Is returns true if target is a transientError.
+func (e transientError) Is(target error) bool {
+	_, ok := target.(transientError)
+	return ok
+}
+
+func (e transientError) Unwrap() error {
 	return e.error
 }
 

@@ -21,6 +21,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike/validator"
 
@@ -52,7 +53,7 @@ func Test_runPublishJob(t *testing.T) {
 			"simple",
 			simpleJob,
 			[]validator.Validator{
-				lookslike.MustCompile(map[string]interface{}{"foo": "bar"}),
+				lookslike.MustCompile(map[string]any{"foo": "bar"}),
 			},
 		},
 		{
@@ -62,8 +63,8 @@ func Test_runPublishJob(t *testing.T) {
 				return []jobs.Job{simpleJob}, nil
 			},
 			[]validator.Validator{
-				lookslike.MustCompile(map[string]interface{}{"foo": "bar"}),
-				lookslike.MustCompile(map[string]interface{}{"foo": "bar"}),
+				lookslike.MustCompile(map[string]any{"foo": "bar"}),
+				lookslike.MustCompile(map[string]any{"foo": "bar"}),
 			},
 		},
 		{
@@ -76,9 +77,9 @@ func Test_runPublishJob(t *testing.T) {
 				}, nil
 			},
 			[]validator.Validator{
-				lookslike.MustCompile(map[string]interface{}{"foo": "bar"}),
-				lookslike.MustCompile(map[string]interface{}{"baz": "bot"}),
-				lookslike.MustCompile(map[string]interface{}{"blah": "blargh"}),
+				lookslike.MustCompile(map[string]any{"foo": "bar"}),
+				lookslike.MustCompile(map[string]any{"baz": "bot"}),
+				lookslike.MustCompile(map[string]any{"blah": "blargh"}),
 			},
 		},
 		{
@@ -88,7 +89,7 @@ func Test_runPublishJob(t *testing.T) {
 				return []jobs.Job{simpleJob}, nil
 			},
 			[]validator.Validator{
-				lookslike.MustCompile(map[string]interface{}{"foo": "bar"}),
+				lookslike.MustCompile(map[string]any{"foo": "bar"}),
 			},
 		},
 	}
@@ -98,7 +99,7 @@ func Test_runPublishJob(t *testing.T) {
 			pipel := &MockPipeline{}
 			client, err := pipel.Connect()
 			require.NoError(t, err)
-			queue := runPublishJob(tc.job, client)
+			queue := runPublishJob(tc.job, client, logptest.NewTestingLogger(t, ""))
 			for {
 				if len(queue) == 0 {
 					break

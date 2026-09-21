@@ -21,7 +21,6 @@ package perfmon
 
 import (
 	"errors"
-	"strings"
 	"testing"
 	"time"
 
@@ -35,15 +34,15 @@ import (
 const processorTimeCounter = `\Processor Information(_Total)\% Processor Time`
 
 func TestData(t *testing.T) {
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "windows",
 		"metricsets": []string{"perfmon"},
 		"period":     "10s",
-		"perfmon.queries": []map[string]interface{}{
+		"perfmon.queries": []map[string]any{
 			{
 				"object":   "Processor Information",
 				"instance": []string{"_Total"},
-				"counters": []map[string]interface{}{
+				"counters": []map[string]any{
 					{
 						"name":  "% Processor Time",
 						"field": "processor.time.total.pct",
@@ -66,14 +65,14 @@ func TestData(t *testing.T) {
 }
 
 func TestCounterWithNoInstanceName(t *testing.T) {
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "windows",
 		"metricsets": []string{"perfmon"},
 		"period":     "10s",
-		"perfmon.queries": []map[string]interface{}{
+		"perfmon.queries": []map[string]any{
 			{
 				"object": "UDPv4",
-				"counters": []map[string]interface{}{
+				"counters": []map[string]any{
 					{
 						"name": "Datagrams Sent/sec",
 					},
@@ -115,7 +114,7 @@ func TestQuery(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for i := 0; i < 2; i++ {
+	for range 2 {
 		err = q.CollectData()
 		if err != nil {
 			t.Fatal(err)
@@ -245,7 +244,7 @@ func TestLongOutputFormat(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotZero(t, len(path))
+	assert.NotEmpty(t, path)
 	err = query.AddCounter(path[0], "", "long", false)
 	if err != nil && !errors.Is(err, pdh.PDH_NO_MORE_DATA) {
 		t.Fatal(err)
@@ -284,7 +283,7 @@ func TestFloatOutputFormat(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotZero(t, len(path))
+	assert.NotEmpty(t, path)
 	err = query.AddCounter(path[0], "", "float", false)
 	if err != nil && !errors.Is(err, pdh.PDH_NO_MORE_DATA) {
 		t.Fatal(err)
@@ -338,7 +337,7 @@ func TestWildcardQuery(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotZero(t, len(values))
+	assert.NotEmpty(t, values)
 	pctKey, err := values[0].MetricSetFields.HasKey("metrics.%_processor_time")
 	if err != nil {
 		t.Fatal(err)
@@ -388,7 +387,7 @@ func TestWildcardQueryNoInstanceName(t *testing.T) {
 		}
 		instanceString, ok := instance.(string)
 		assert.True(t, ok, "instance should have been a string")
-		assert.False(t, strings.Contains(instanceString, "*"))
+		assert.NotContains(t, instanceString, "*")
 	}
 
 	t.Log(values)
@@ -428,7 +427,7 @@ func TestGroupByInstance(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.EqualValues(t, 1, len(values)) // Assert all metrics have been grouped into a single event
+	assert.Len(t, values, 1) // Assert all metrics have been grouped into a single event
 
 	// Test all keys exist in the event
 	pctKey, err := values[0].MetricSetFields.HasKey("metrics.%_processor_time")

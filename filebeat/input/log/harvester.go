@@ -312,11 +312,9 @@ func (h *Harvester) Run() error {
 
 	logger.Infof("Harvester started for paths: %v", h.config.Paths)
 
-	h.doneWg.Add(1)
-	go func() {
+	h.doneWg.Go(func() {
 		h.monitorFileSize()
-		h.doneWg.Done()
-	}()
+	})
 
 	for {
 		select {
@@ -560,7 +558,7 @@ func (h *Harvester) validateFile(f *os.File) error {
 
 	// Compares the stat of the opened file to the state given by the input. Abort if not match.
 	if !os.SameFile(h.state.Fileinfo, info) {
-		return errors.New("file info is not identical with opened file. Aborting harvesting and retrying file later again")
+		return errors.New("file info is not identical with opened file. Aborting harvesting and retrying file later")
 	}
 
 	h.encoding, err = h.encodingFactory(f)

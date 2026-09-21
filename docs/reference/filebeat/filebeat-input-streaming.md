@@ -34,6 +34,8 @@ The `streaming` input websocket handler does not currently support XML messages.
 
 The Crowdstrike streaming input requires OAuth2.0 as described in the Crowdstrike documentation for the API. When using the Crowdstrike streaming type, the `crowdstrike_app_id` configuration field must be set. This field specifies the `appId` parameter sent to the Crowdstrike API. See the Crowdstrike documentation for details.
 
+The feed and refresh URLs returned by the Crowdstrike discover endpoint are validated against the configured URL's origin before any request is made. By default, both URLs must share the same registrable domain (e.g. `crowdstrike.com`) as the configured `url`. If the discover response returns URLs on a different domain, you can allowlist additional origins with the `resource_origins` option.
+
 The `stream_type` configuration field specifies which type of streaming input to use, "websocket" or "crowdstrike". If it is not set, the input defaults to websocket streaming  .
 
 ## Execution [_execution_3]
@@ -50,9 +52,11 @@ On start the `state` will be something like this:
 }
 ```
 
-The `streaming` input websocket handler creates a `response` field in the state map and attaches the websocket message to this field. All `CEL` programs written should act on this `response` field. Additional fields may be present at the root of the object and if the program tolerates it, the cursor value may be absent. Only the cursor is persisted over restarts, but all fields in state are retained between iterations of the processing loop except for the produced events array, see below.
+The `streaming` input websocket handler creates a `response` field in the state map and attaches the websocket message to this field. All `CEL` programs written should act on this `response` field. For the CrowdStrike handler, `state.feed` contains the original `dataFeedURL` of the resource that produced the message. Additional fields may be present at the root of the object and if the program tolerates it, the cursor value may be absent. Only the cursor is persisted over restarts, but all fields in state are retained between iterations of the processing loop except for the produced events array, see below.
 
 If the cursor is present the program should process or filter out responses based on its value. If cursor is not present all responses should be processed as per the program’s logic.
+
+{applies_to}`stack: ga 9.4+` The CrowdStrike discover endpoint can return multiple feed resources. Each resource is followed concurrently, so a long-lived feed cannot starve the others. A CrowdStrike cursor must therefore be a single object keyed by `state.feed`, with each value storing that feed's offset. When producing a new cursor, merge the current feed's offset into `state.cursor` so that offsets for the other feeds are retained. A flat cursor such as `{"offset": 123}` cannot track more than one feed.
 
 After completion of a program’s execution it should return a single object with a structure looking like this:
 
@@ -70,7 +74,7 @@ After completion of a program’s execution it should return a single object wit
 ```
 
 1. The `events` field must be present, but may be empty or null. If it is not empty, it must only have objects as elements. The field could be an array or a single object that will be treated as an array with a single element. This depends completely on the streaming data source. The `events` field is the array of events to be published to the output. Each event must be a JSON object.
-2. If `cursor` is present it must be either be a single object or an array with the same length as events; each element *i* of the `cursor` will be the details for obtaining the events at and beyond event *i* in the `events` array. If the `cursor` is a single object, it will be the details for obtaining events after the last event in the `events` array and will only be retained on successful publication of all the events in the `events` array. Note that the Crowdstrike streaming input does not support array cursors.
+2. If `cursor` is present it must be either be a single object or an array with the same length as events; each element *i* of the `cursor` will be the details for obtaining the events at and beyond event *i* in the `events` array. If the `cursor` is a single object, it will be the details for obtaining events after the last event in the `events` array and will only be retained on successful publication of all the events in the `events` array. Note that the CrowdStrike streaming input does not support array cursors and requires the per-feed single-object cursor described earlier on this page.
 
 
 Example configurations:
@@ -103,9 +107,11 @@ filebeat.inputs:
     state.response.decode_json().as(body,{
       "events": [body],
       ?"cursor": has(body.?metadata.offset) ?
-        optional.of({"offset": body.metadata.offset})
+        optional.of(state.?cursor.orValue({}).with({
+          ?state.feed: body.?metadata.optMap(m, {"offset": m.offset}),
+        }))
       :
-        optional.none(),
+        state.?cursor,
     })
 ```
 
@@ -241,6 +247,34 @@ The `streaming` input supports the following configuration options plus the [Com
 ### `stream_type` [stream_type-streaming]
 
 The flavor of streaming to use. This may be either "websocket", "crowdstrike", or unset. If the field is unset, websocket streaming is used.
+
+
+### `resource_origins` [resource-origins-streaming]
+
+An optional list of additional origins (scheme and host) to accept for CrowdStrike resource URLs. This only applies when `stream_type` is `crowdstrike`.
+
+By default, the `dataFeedURL` and `refreshActiveSessionURL` returned by the discover endpoint must share the same registrable domain as the configured `url` (for example, both `api.crowdstrike.com` and `firehose.crowdstrike.com` share the registrable domain `crowdstrike.com`). HTTPS-to-HTTP scheme downgrades are always rejected.
+
+If CrowdStrike returns resource URLs on a different registrable domain, add them here to allow those origins without waiting for a code change. Each entry must include a scheme and host.
+
+```yaml
+resource_origins:
+  - "https://firehose.newdomain.com"
+```
+
+
+### `user_agent` [user-agent-streaming]
+```{applies_to}
+stack: ga 9.4+
+```
+
+An optional string that overrides the default `User-Agent` header sent on all outbound HTTP requests. This only applies when `stream_type` is `crowdstrike`. The header is set on discover, firehose, session refresh, and OAuth2 token requests.
+
+When not set, the Elastic Agent's built-in user agent string is used.
+
+```yaml
+user_agent: "Elastic-crowdstrike/4.0.0"
+```
 
 
 ### `program` [program-streaming]
@@ -541,5 +575,5 @@ Example value: `"%{[agent.name]}-myindex-%{+yyyy.MM.dd}"` might expand to `"file
 By default, all events contain `host.name`. This option can be set to `true` to disable the addition of this field to all events. The default value is `false`.
 
 ::::{note}
-The `streaming` input is currently tagged as experimental and might have bugs and other issues. Please report any issues on the [Github](https://github.com/elastic/beats) repository.
+The `streaming` input is currently tagged as experimental and might have bugs and other issues. Please report any issues on the [GitHub](https://github.com/elastic/beats) repository.
 ::::

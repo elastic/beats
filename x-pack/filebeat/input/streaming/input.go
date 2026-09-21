@@ -78,7 +78,7 @@ func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
 // context cancellation or type invalidity errors, any other error will be retried.
 func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor, pub inputcursor.Publisher) error {
 	env.UpdateStatus(status.Starting, "")
-	var cursor map[string]interface{}
+	var cursor map[string]any
 	if !crsr.IsNew() { // Allow the user to bootstrap the program if needed.
 		env.UpdateStatus(status.Configuring, "")
 		err := crsr.Unpack(&cursor)
@@ -122,14 +122,14 @@ type noopReporter struct{}
 func (noopReporter) UpdateStatus(status.Status, string) {}
 
 // getURL evaluates the url_program to compute the input URL from the current state.
-func getURL(ctx context.Context, name, src, url string, state map[string]any, redaction *redact, log *logp.Logger, now func() time.Time) (string, error) {
+func getURL(ctx context.Context, name, src, url string, state map[string]any, redaction *redact, userAgent string, log *logp.Logger, now func() time.Time) (string, error) {
 	if src == "" {
 		return url, nil
 	}
 
 	state["url"] = url
 	// CEL program which is used to prime/initialize the input url
-	url_prg, ast, err := newProgram(ctx, src, root, nil, log)
+	url_prg, ast, err := newProgram(ctx, src, root, nil, userAgent, log)
 	if err != nil {
 		return "", err
 	}
@@ -145,12 +145,12 @@ func getURL(ctx context.Context, name, src, url string, state map[string]any, re
 	return url, nil
 }
 
-func evalURLWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time) (string, error) {
+func evalURLWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]any, now time.Time) (string, error) {
 	out, err := evalRefVal(ctx, prg, ast, state, now)
 	if err != nil {
 		return "", fmt.Errorf("failed eval: %w", err)
 	}
-	v, err := out.ConvertToNative(reflect.TypeOf(""))
+	v, err := out.ConvertToNative(reflect.TypeFor[string]())
 	if err != nil {
 		return "", fmt.Errorf("failed type conversion: %w", err)
 	}
@@ -325,7 +325,7 @@ func (p processor) process(ctx context.Context, state, cursor map[string]any, st
 	return goodCursor, err
 }
 
-func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time) (map[string]interface{}, error) {
+func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]any, now time.Time) (map[string]any, error) {
 	out, err := evalRefVal(ctx, prg, ast, state, now)
 	if err != nil {
 		state["events"] = errorMessage(fmt.Sprintf("failed eval: %v", err))
@@ -333,7 +333,7 @@ func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[stri
 		return state, fmt.Errorf("failed eval: %w", err)
 	}
 
-	v, err := out.ConvertToNative(reflect.TypeOf((*structpb.Struct)(nil)))
+	v, err := out.ConvertToNative(reflect.TypeFor[*structpb.Struct]())
 	if err != nil {
 		state["events"] = errorMessage(fmt.Sprintf("failed proto conversion: %v", err))
 		clearWantMore(state)
@@ -351,8 +351,8 @@ func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[stri
 	}
 }
 
-func evalRefVal(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time) (ref.Val, error) {
-	out, _, err := prg.ContextEval(ctx, map[string]interface{}{
+func evalRefVal(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]any, now time.Time) (ref.Val, error) {
+	out, _, err := prg.ContextEval(ctx, map[string]any{
 		// Replace global program "now" with current time. This is necessary
 		// as the lib.Time now global is static at program instantiation time
 		// which will persist over multiple evaluations. The lib.Time behaviour
@@ -378,14 +378,14 @@ func evalRefVal(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[st
 // It leaves state intact if there is no "want_more" element, and sets the element to false
 // if there is. This is necessary instead of just doing delete(state, "want_more") as
 // client CEL code may expect the want_more field to be present.
-func clearWantMore(state map[string]interface{}) {
+func clearWantMore(state map[string]any) {
 	if _, ok := state["want_more"]; ok {
 		state["want_more"] = false
 	}
 }
 
-func errorMessage(msg string) map[string]interface{} {
-	return map[string]interface{}{"error": map[string]interface{}{"message": msg}}
+func errorMessage(msg string) map[string]any {
+	return map[string]any{"error": map[string]any{"message": msg}}
 }
 
 func formHeader(cfg config) map[string][]string {

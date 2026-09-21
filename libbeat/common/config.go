@@ -58,7 +58,7 @@ const (
 var hasSelector = logp.HasSelector
 var configDebugf = logp.Debug
 
-func PrintConfigDebugf(c *config.C, msg string, params ...interface{}) {
+func PrintConfigDebugf(c *config.C, msg string, params ...any) {
 	selector := selectorConfigWithPassword
 	filtered := false
 	if !hasSelector(selector) {

@@ -25,7 +25,9 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -66,6 +68,154 @@ func TestNewInstance(t *testing.T) {
 	}
 	assert.Equal(t, "testbeat", b.Info.Beat)
 	assert.Equal(t, "testbeat", b.Info.IndexPrefix)
+}
+
+// initBeatTestEnv resets the global flag and monitoring state that NewInitializedBeat touches,
+// so tests in this package don't leak state into each other.
+func initBeatTestEnv(t *testing.T) {
+	t.Helper()
+	HostnameFlag = ""
+	t.Cleanup(func() { HostnameFlag = "" })
+	beat.SetHostnameOverride("")
+	t.Cleanup(func() { beat.SetHostnameOverride("") })
+	cfgfile.Initialize()
+	// -c appends to a list, so it must be reset to its default instead of set to "".
+	flag.Lookup("c").Value.(*config.StringsFlag).SetDefault("beat.yml")
+	t.Cleanup(func() { flag.Lookup("c").Value.(*config.StringsFlag).SetDefault("beat.yml") })
+	monitoring.GetNamespace("state").SetRegistry(nil)
+	t.Cleanup(func() { monitoring.GetNamespace("state").SetRegistry(nil) })
+	monitoring.GetNamespace("info").SetRegistry(nil)
+	t.Cleanup(func() { monitoring.GetNamespace("info").SetRegistry(nil) })
+}
+
+func TestHostnameFlagSetsHostname(t *testing.T) {
+	initBeatTestEnv(t)
+
+	HostnameFlag = "  Flag-Hostname  "
+
+	require.NoError(t, flag.Set("c", "testdata/nonameset.yml"))
+
+	b, err := NewInitializedBeat(Settings{})
+	require.NoError(t, err)
+
+	assert.Equal(t, "Flag-Hostname", b.Info.Hostname, "flag value is trimmed and casing preserved")
+	assert.Equal(t, "Flag-Hostname", b.Info.FQDN)
+	assert.Equal(t, "Flag-Hostname", beat.GetHostnameOverride())
+	assert.NotEqual(t, "Flag-Hostname", b.Info.Name, "hostname flag must not affect agent.name")
+}
+
+func TestHostnameRegisteredInMonitoring(t *testing.T) {
+	initBeatTestEnv(t)
+
+	HostnameFlag = "monitoring-test-node"
+
+	require.NoError(t, flag.Set("c", "testdata/nonameset.yml"))
+
+	b, err := NewInitializedBeat(Settings{Name: "mockbeat", Version: "0.0.1"})
+	require.NoError(t, err)
+
+	// RegisterHostname publishes FQDNAwareHostname, so it would report the OS hostname
+	// if ApplyHostname ran after it.
+	assert.Equal(t, "monitoring-test-node", b.Info.FQDNAwareHostname(false))
+
+	snapshot := monitoring.CollectStructSnapshot(b.Monitoring.InfoRegistry(), monitoring.Full, false)
+	assert.Equal(t, "monitoring-test-node", snapshot["hostname"])
+}
+
+func TestHostnameFlagEmptyKeepsProcessOverride(t *testing.T) {
+	initBeatTestEnv(t)
+
+	// HostnameFlag stays empty, as if --hostname was not passed.
+	HostnameFlag = ""
+	// Another component in the process set the override. A beat without --hostname
+	// must not clear it, and must not take it as its own hostname either.
+	beat.SetHostnameOverride("other-component-host")
+
+	require.NoError(t, flag.Set("c", "testdata/nonameset.yml"))
+
+	b, err := NewInitializedBeat(Settings{})
+	require.NoError(t, err)
+
+	expectedHostname, err := os.Hostname()
+	require.NoError(t, err)
+
+	assert.Equal(t, "other-component-host", beat.GetHostnameOverride(), "empty --hostname flag must leave the process override alone")
+	assert.Equal(t, expectedHostname, b.Info.Hostname, "without --hostname, Info.Hostname should be the OS hostname")
+	assert.NotEmpty(t, b.Info.FQDN, "FQDN lookup must still run when this beat has no override")
+}
+
+func TestNameAndHostnameFlagAreIndependent(t *testing.T) {
+	initBeatTestEnv(t)
+
+	HostnameFlag = "flag-hostname"
+
+	require.NoError(t, flag.Set("c", "testdata/mockbeat.yml"))
+
+	b, err := NewInitializedBeat(Settings{})
+	require.NoError(t, err)
+
+	assert.Equal(t, "TestMonitoringNameFromConfig", b.Info.Name)
+	assert.Equal(t, "flag-hostname", b.Info.Hostname)
+	assert.Equal(t, "flag-hostname", b.Info.FQDN)
+	assert.Equal(t, "flag-hostname", beat.GetHostnameOverride())
+}
+
+func TestConfigHostnameField(t *testing.T) {
+	initBeatTestEnv(t)
+
+	require.NoError(t, flag.Set("c", "testdata/hostnameset.yml"))
+
+	b, err := NewInitializedBeat(Settings{Name: "mockbeat", Version: "0.0.1"})
+	require.NoError(t, err)
+
+	assert.Equal(t, "config-hostname", b.Info.Hostname)
+	assert.Equal(t, "config-hostname", b.Info.FQDN)
+	assert.Equal(t, "config-hostname", beat.GetHostnameOverride())
+	assert.NotEqual(t, "config-hostname", b.Info.Name, "hostname: must not affect agent.name")
+}
+
+func TestConfigHostnameFieldIsTrimmed(t *testing.T) {
+	initBeatTestEnv(t)
+
+	require.NoError(t, flag.Set("c", "testdata/hostnamenormalize.yml"))
+
+	b, err := NewInitializedBeat(Settings{Name: "mockbeat", Version: "0.0.1"})
+	require.NoError(t, err)
+
+	assert.Equal(t, "Node-A", b.Info.Hostname, "hostname is trimmed and casing is preserved")
+	assert.Equal(t, "Node-A", b.Info.FQDN)
+	assert.Equal(t, "Node-A", beat.GetHostnameOverride())
+	assert.NotEqual(t, "Node-A", b.Info.Name, "hostname: must not affect agent.name")
+}
+
+func TestNameAndConfigHostnameAreIndependent(t *testing.T) {
+	initBeatTestEnv(t)
+
+	require.NoError(t, flag.Set("c", "testdata/nameandhostnameset.yml"))
+
+	b, err := NewInitializedBeat(Settings{Name: "mockbeat", Version: "0.0.1"})
+	require.NoError(t, err)
+
+	assert.Equal(t, "config-name", b.Info.Name)
+	assert.Equal(t, "config-hostname", b.Info.Hostname)
+	assert.Equal(t, "config-hostname", b.Info.FQDN)
+	assert.Equal(t, "config-hostname", beat.GetHostnameOverride())
+}
+
+func TestHostnameFlagOverridesConfigHostname(t *testing.T) {
+	initBeatTestEnv(t)
+
+	HostnameFlag = "flag-hostname"
+
+	require.NoError(t, flag.Set("c", "testdata/hostnameset.yml"))
+
+	b, err := NewInitializedBeat(Settings{Name: "mockbeat", Version: "0.0.1"})
+	require.NoError(t, err)
+
+	assert.Equal(t, "flag-hostname", b.Info.Hostname)
+	assert.Equal(t, "flag-hostname", b.Info.FQDN)
+	assert.Equal(t, "flag-hostname", beat.GetHostnameOverride())
+	assert.NotEqual(t, "flag-hostname", b.Info.Name, "hostname flag must not affect agent.name")
 }
 
 func TestNewInstanceUUID(t *testing.T) {
@@ -569,16 +719,51 @@ func TestMultipleLoadMeta(t *testing.T) {
 	metaFile := filepath.Join(t.TempDir(), "meta.json")
 	var wg sync.WaitGroup
 	for range 64 {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			testBeat, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
 			require.NoError(t, err)
 			logger := logptest.NewTestingLogger(t, "")
 			testBeat.Info.Logger = logger
 			err = testBeat.LoadMeta(metaFile)
 			require.NoError(t, err)
-		}()
+		})
 	}
 	wg.Wait()
+}
+
+// TestRunShutdownWatchdogPromptReturn verifies that when Run returns promptly
+// (runReturned is closed) the watchdog returns without disconnecting.
+func TestRunShutdownWatchdogPromptReturn(t *testing.T) {
+	runReturned := make(chan struct{})
+	close(runReturned)
+
+	var disconnected atomic.Bool
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		// A long grace: it must not be reached because runReturned is closed.
+		runShutdownWatchdog(runReturned, time.Hour, func() { disconnected.Store(true) })
+	}()
+
+	select {
+	case <-done:
+	case <-time.After(10 * time.Second):
+		t.Fatal("watchdog did not return after Run returned")
+	}
+	assert.False(t, disconnected.Load(), "watchdog must not disconnect when Run returns promptly")
+}
+
+// TestRunShutdownWatchdogTimeoutDisconnects verifies that when Run does not
+// return within the grace period the watchdog disconnects the pipeline.
+func TestRunShutdownWatchdogTimeoutDisconnects(t *testing.T) {
+	runReturned := make(chan struct{}) // never closed: simulates a hung beater
+
+	disconnected := make(chan struct{})
+	go runShutdownWatchdog(runReturned, time.Millisecond, func() { close(disconnected) })
+
+	select {
+	case <-disconnected:
+	case <-time.After(10 * time.Second):
+		require.Fail(t, "watchdog must disconnect the pipeline when Run does not return within the grace period")
+	}
 }

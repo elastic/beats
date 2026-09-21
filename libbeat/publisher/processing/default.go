@@ -148,9 +148,13 @@ var WithECS = WithFields(mapstr.M{
 
 // WithHost modifier adds `host.name` builtin fields to a processing pipeline
 var WithHost modifier = builtinModifier(func(info beat.Info) mapstr.M {
+	name := info.Name
+	if override := beat.GetHostnameOverride(); override != "" {
+		name = override
+	}
 	return mapstr.M{
 		"host": mapstr.M{
-			"name": info.Name,
+			"name": name,
 		},
 	}
 })
@@ -324,10 +328,10 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	// setup 1: generalize/normalize output (P)
 	if cfg.EventNormalization != nil {
 		if *cfg.EventNormalization {
-			processors.add(newGeneralizeProcessor(cfg.KeepNull, b.log))
+			processors.add(newGeneralizeProcessor(cfg.KeepNull, cfg.NormalizeInPlace, b.log))
 		}
 	} else if !b.skipNormalize {
-		processors.add(newGeneralizeProcessor(cfg.KeepNull, b.log))
+		processors.add(newGeneralizeProcessor(cfg.KeepNull, cfg.NormalizeInPlace, b.log))
 	}
 
 	// setup 2: add Meta from client config (C)

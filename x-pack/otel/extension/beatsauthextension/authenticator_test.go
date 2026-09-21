@@ -9,6 +9,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
+	"maps"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -409,9 +410,7 @@ func TestCertificateHotReload(t *testing.T) {
 			"key":                     keyPath,
 			"certificate_authorities": []string{string(caPEM)},
 		}
-		for k, v := range extras {
-			ssl[k] = v
-		}
+		maps.Copy(ssl, extras)
 		return map[string]any{"ssl": ssl}
 	}
 
