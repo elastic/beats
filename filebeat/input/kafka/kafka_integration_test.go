@@ -16,8 +16,7 @@
 // under the License.
 
 // This file was contributed to by generative AI
-//go:build integration
-
+//
 // # Running integration tests
 //
 // These tests require a running Kafka broker. The easiest way to run it is to use the
@@ -51,6 +50,8 @@
 // ## Teardown
 //
 //	docker rm -f beats-kafka-test
+
+//go:build integration
 
 package kafka
 
