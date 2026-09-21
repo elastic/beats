@@ -25,13 +25,13 @@ Review important information about the  8.19.22 release.
 
 **Filebeat**
 
-* Add api_endpoint configuration option to gcp-pubsub input to allow overriding the default Pub/Sub API endpoint. https://github.com/elastic/beats/pull/53080[#53080] 
-* Add hints.input_allow_list to restrict Filebeat hints-generated input types.  https://github.com/elastic/beats/issues/52624[#52624]
+* Add `api_endpoint` configuration option to `gcp-pubsub` input to allow overriding the default Pub/Sub API endpoint. https://github.com/elastic/beats/pull/53080[#53080]
+* Add `hints.input_allow_list` to restrict Filebeat hints-generated input types.  https://github.com/elastic/beats/issues/52624[#52624]
 
 
 **Packetbeat**
 
-* Log Npcap installer diagnostic files on installation failure. https://github.com/elastic/beats/pull/52667[#52667] 
+* Log Npcap installer diagnostic files on installation failure. https://github.com/elastic/beats/pull/52667[#52667]
 
 
 
@@ -45,33 +45,33 @@ Review important information about the  8.19.22 release.
 
 **All**
 
-* Revert non-Ironbank container images to UBI9. https://github.com/elastic/beats/pull/52823[#52823] 
+* Revert non-Ironbank container images to UBI9. https://github.com/elastic/beats/pull/52823[#52823]
 
 
 **Filebeat**
 
-* Scope the aws-s3 polling state registry to the input&#39;s bucket. https://github.com/elastic/beats/pull/52728[#52728] https://github.com/elastic/beats/issues/52721[#52721]
-* Prevent httpjson chain pagination from advancing the cursor when a chained request fails.  
-* Follow every CrowdStrike discover resource instead of only the first feed.  
+* Scope the `aws-s3` polling state registry to the input&#39;s bucket. https://github.com/elastic/beats/pull/52728[#52728] https://github.com/elastic/beats/issues/52721[#52721]
+* Prevent `httpjson` chain pagination from advancing the cursor when a chained request fails.
+* Follow every CrowdStrike discover resource instead of only the first feed.
 * Fix race condition in Kafka input when multiple inputs are configured.  https://github.com/elastic/beats/issues/34919[#34919]
-* Fix Azure AD entity analytics accumulating stale registered owners and users on devices.  
-* Fix Active Directory entity analytics panic when ssl.certificate_authorities is set.  
+* Fix Azure AD entity analytics accumulating stale registered owners and users on devices.
+* Fix Active Directory entity analytics panic when `ssl.certificate_authorities` is set.
 
 
 **Heartbeat**
 
-* Match Kibana maintenance windows for nth-weekday, tzid, until, hourly, inclusive duration, and old dtstart. https://github.com/elastic/beats/pull/52572[#52572] https://github.com/elastic/beats/issues/52571[#52571]
+* Align maintenance window recurrence handling with Kibana, including nth-weekday rules, `tzid` timezone evaluation, `until` end bounds, hourly recurrences, inclusive duration behavior, and legacy `dtstart` formats. https://github.com/elastic/beats/pull/52572[#52572] https://github.com/elastic/beats/issues/52571[#52571]
 
 
 **Metricbeat**
 
-* Fix Kubernetes metadata watcher deadlock that blocked metricset shutdown.  
+* Fix Kubernetes metadata watcher deadlock that blocked metricset shutdown.
 
 
 **Packetbeat**
 
-* Censor HTTP parameters for mixed-case `hide_keywords` entries. https://github.com/elastic/beats/pull/52650[#52650] 
-* Fix bounds-check panics in Packetbeat TLS and Cassandra protocol parsers.  
-* Fix rendering of TLS certificate serial numbers so each byte is always represented as two hex digits, matching OpenSSL output.  
+* Censor HTTP parameters for mixed-case `hide_keywords` entries. https://github.com/elastic/beats/pull/52650[#52650]
+* Fix bounds-check panics in Packetbeat TLS and Cassandra protocol parsers.
+* Fix rendering of TLS certificate serial numbers so each byte is always represented as two hex digits, matching OpenSSL output.
 
 // end 8.19.22 relnotes
