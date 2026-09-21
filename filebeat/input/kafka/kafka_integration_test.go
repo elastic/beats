@@ -36,7 +36,7 @@
 // inter-broker communication, which cannot be resolved on the host, causing all
 // external connections to fail.
 //
-// Wait for the container to become healthy (Kafka is ready when the healthcheck passes):
+// Wait for the container to become healthy (Kafka is ready when the healthcheck passes), then run:
 //
 //	until docker inspect --format='{{.State.Health.Status}}' beats-kafka-test | grep -q healthy; do sleep 2; done
 //
