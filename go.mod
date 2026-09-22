@@ -3,7 +3,7 @@ module github.com/elastic/beats/v7
 go 1.26.8
 
 require (
-	cloud.google.com/go/bigquery v1.82.0
+	cloud.google.com/go/bigquery v1.84.0
 	cloud.google.com/go/monitoring v1.30.0
 	cloud.google.com/go/pubsub v1.51.1
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
@@ -145,7 +145,7 @@ require (
 
 require (
 	cloud.google.com/go v0.123.0
-	cloud.google.com/go/compute v1.68.0
+	cloud.google.com/go/compute v1.69.0
 	cloud.google.com/go/redis v1.25.0
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.23.1
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.14.0
@@ -300,9 +300,9 @@ require (
 	al.essio.dev/pkg/shellescape v1.5.1 // indirect
 	aqwari.net/xml v0.0.0-20210331023308-d9421b293817 // indirect
 	cel.dev/expr v0.25.2 // indirect
-	cloud.google.com/go/auth v0.23.2 // indirect
+	cloud.google.com/go/auth v0.23.3 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
-	cloud.google.com/go/compute/metadata v0.9.0 // indirect
+	cloud.google.com/go/compute/metadata v0.9.1 // indirect
 	cloud.google.com/go/iam v1.13.0 // indirect
 	cloud.google.com/go/longrunning v1.2.0 // indirect
 	cloud.google.com/go/pubsub/v2 v2.7.0 // indirect
@@ -566,7 +566,7 @@ require (
 )
 
 require (
-	cloud.google.com/go/storage v1.67.1
+	cloud.google.com/go/storage v1.68.0
 	github.com/PaloAltoNetworks/pango v0.10.2
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/yuin/gopher-lua v1.1.1 // indirect
