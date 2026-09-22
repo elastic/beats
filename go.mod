@@ -161,10 +161,10 @@ require (
 	github.com/Azure/azure-storage-blob-go v0.15.0
 	github.com/aerospike/aerospike-client-go/v7 v7.7.1
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.19.1
-	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.22.44
-	github.com/aws/aws-sdk-go-v2/service/apigateway v1.42.7
-	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.37.7
-	github.com/aws/aws-sdk-go-v2/service/health v1.40.7
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.23.1
+	github.com/aws/aws-sdk-go-v2/service/apigateway v1.44.1
+	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.39.1
+	github.com/aws/aws-sdk-go-v2/service/health v1.42.1
 	github.com/aws/smithy-go v1.28.1
 	github.com/brianvoe/gofakeit v3.18.0+incompatible
 	github.com/dgraph-io/badger/v4 v4.6.0
