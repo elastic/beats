@@ -12,21 +12,12 @@ cloud.google.com/go/auth v0.23.3 h1:UMK+oBtuNGMCR/6i6mmySUItqjOazpJrbmZyhGbGBWo=
 cloud.google.com/go/auth v0.23.3/go.mod h1:fClbry28fo7XkxhSeT6AQtAVAp6Jy0fW9N99PoPNPFM=
 cloud.google.com/go/auth/oauth2adapt v0.2.8 h1:keo8NaayQZ6wimpNSmW5OPc283g65QNIiLpZnkHRbnc=
 cloud.google.com/go/auth/oauth2adapt v0.2.8/go.mod h1:XQ9y31RkqZCcwJWNSx2Xvric3RrU88hAYYbjDWYDL+c=
-<<<<<<< HEAD
-cloud.google.com/go/bigquery v1.82.0 h1:NcnkqYN8jjtn6B1o7W/aUNl7DjJiNqgO0xnDNGxW+2s=
-cloud.google.com/go/bigquery v1.82.0/go.mod h1:cc0XscySNQNuHBxuZSg5yyxFsg/ZHAfViAG49gJbWew=
-cloud.google.com/go/compute v1.68.0 h1:+8u41+P7i4Cdzbsna+mxfHl/cTm1HYDS+XmLdf0KcPw=
-cloud.google.com/go/compute v1.68.0/go.mod h1:h1O3BCv0Zd0/8rZ6PGx8aRBhKBtDC0AuvURtWg1hLLE=
-cloud.google.com/go/compute/metadata v0.9.0 h1:pDUj4QMoPejqq20dK0Pg2N4yG9zIkYGdBtwLoEkH9Zs=
-cloud.google.com/go/compute/metadata v0.9.0/go.mod h1:E0bWwX5wTnLPedCKqk3pJmVgCBSM6qQI1yTBdEb3C10=
-=======
 cloud.google.com/go/bigquery v1.84.0 h1:NHriqQ/NMOayYh2j8y22HouiR0rTPvfYIqrYGYv3vsI=
 cloud.google.com/go/bigquery v1.84.0/go.mod h1:IIY7YrpcbEIhaA/n5geZN5oQb11nQ6RhhkYdcgmv9Vs=
 cloud.google.com/go/compute v1.69.0 h1:5L0YnInNWpXm7k1UVfhiykSiGUuogRdxHedjaBUHtMs=
 cloud.google.com/go/compute v1.69.0/go.mod h1:X+MMKM2m3aZ73tAf+KCOlsxiw9gvjCga5nuToQDeAXw=
 cloud.google.com/go/compute/metadata v0.9.1 h1:CTE1OWBQ0vnF5uHwdFAQJvMQ0Fi/KRcqqKTo9V0F8Ik=
 cloud.google.com/go/compute/metadata v0.9.1/go.mod h1:NtnlvB6X3t4R6xSWyVX/ZWk493PCxGQlhI/iqxh4M8I=
->>>>>>> fe00b93 (build(deps): bump the gcp-sdks group with 5 updates (#53329))
 cloud.google.com/go/datacatalog v1.32.0 h1:fyYn8ODkGil5y3zTIqgIhOfzTu1ACaU2o+C750CO6Ac=
 cloud.google.com/go/datacatalog v1.32.0/go.mod h1:DE272tynQUwheJeQAyVfV+nO8yrdkuDyOgH2LtOrkWM=
 cloud.google.com/go/iam v1.13.0 h1:ufT3FPT5rFFXu6UtLkNoxaOaV5EuA1dsSkmemCSTo6U=
