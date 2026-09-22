@@ -153,7 +153,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		haveEnabledInputs = true
 	}
 
-	if !config.ConfigInput.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledInputs && config.Autodiscover == nil && management.UnderAgent() {
+	if !config.ConfigInput.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledInputs && config.Autodiscover == nil && !management.UnderAgent() {
 		if !b.InSetupCmd {
 			return nil, fmt.Errorf("no modules or inputs enabled and configuration reloading disabled. What files do you want me to watch?")
 		}

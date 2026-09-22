@@ -634,13 +634,20 @@ func TestLogSystemInfo(t *testing.T) {
 	b.Info.Logger = log
 	require.NoError(t, err, "could not create beat")
 
+	// logSystemInfo reads the process-wide UnderAgent flag, so reset it after
+	// the test to avoid leaking into other tests in this package.
+	t.Cleanup(func() { management.SetUnderAgent(false) })
+
 	for _, tc := range tcs {
-		buff.Reset()
+		t.Run(tc.name, func(t *testing.T) {
+			buff.Reset()
 
-		b.Manager = mockManager{enabled: tc.managed}
-		b.logSystemInfo(log)
+			management.SetUnderAgent(tc.managed)
+			b.Manager = mockManager{enabled: tc.managed}
+			b.logSystemInfo(log)
 
-		tc.assertFn(t, buff)
+			tc.assertFn(t, buff)
+		})
 	}
 }
 

@@ -99,7 +99,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	// Configuration delivered over the control protocol uses the agent
 	// stream layout rather than the static packetbeat.yml layout.
 	configurator := config.NewAgentConfig
-	if !management.UnderAgent() {
+	if !b.Manager.ConfigFromControlProtocol() {
 		configurator = initialConfig().FromStatic
 	}
 
