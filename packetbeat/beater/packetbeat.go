@@ -184,7 +184,7 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 		factory = pb.otelStatusFactoryWrapper(factory)
 	}
 
-	if !management.UnderAgent() {
+	if !b.Manager.ConfigFromControlProtocol() {
 		if beat.SetupPipelinesEnabled(b.BeatConfig) {
 			if b.Config.Output.Name() == "elasticsearch" {
 				_, err := elasticsearch.RegisterConnectCallback(func(esClient *eslegclient.Connection, _ *logp.Logger) error {
