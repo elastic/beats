@@ -78,10 +78,11 @@ func TestHTTPMonitorNTLMHandshake(t *testing.T) {
 		"hosts":   server.URL,
 		"timeout": "5s",
 		"ntlm": map[string]any{
-			"enabled":  true,
-			"username": "user",
-			"password": "pass",
-			"domain":   "CORP",
+			"enabled":     true,
+			"username":    "user",
+			"password":    "pass",
+			"domain":      "CORP",
+			"workstation": "mon01",
 		},
 	}
 	cfg, err := conf.NewConfigFrom(cfgSrc)
@@ -104,4 +105,5 @@ func TestHTTPMonitorNTLMHandshake(t *testing.T) {
 	assert.True(t, sawAnonymous, "negotiator should first probe anonymously")
 	require.NotEmpty(t, negotiateToken, "server must receive an NTLM negotiate token")
 	assert.True(t, bytes.HasPrefix(negotiateToken, []byte("NTLMSSP\x00")), "token must be a valid NTLMSSP message, got %q", negotiateToken)
+	assert.Contains(t, string(negotiateToken), "MON01", "negotiate token should carry the configured workstation")
 }

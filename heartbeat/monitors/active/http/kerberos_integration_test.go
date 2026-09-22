@@ -73,6 +73,9 @@ func TestHTTPMonitorKerberosHandshake(t *testing.T) {
 			"password":    pass,
 			"realm":       realm,
 			"config_path": krb5Conf,
+			// Fixture principal is HTTP/localhost. Pin it so a DNS search domain
+			// cannot rewrite the SPN (for example localhost -> localhost.router).
+			"service_name": "HTTP/localhost",
 		},
 	}
 	cfg, err := conf.NewConfigFrom(cfgSrc)
@@ -85,6 +88,43 @@ func TestHTTPMonitorKerberosHandshake(t *testing.T) {
 	event := &beat.Event{}
 	_, err = p.Jobs[0](event)
 	require.NoError(t, err, "kerberos-authenticated ping should succeed")
+
+	statusCode, err := event.GetValue("http.response.status_code")
+	require.NoError(t, err, "event must carry the response status code")
+	assert.Equal(t, 200, statusCode, "monitor should report the SPNEGO-authenticated response")
+}
+
+// TestHTTPMonitorKerberosInlineConf is the same handshake with the krb5.conf
+// body passed in the monitor config instead of a file on the agent.
+func TestHTTPMonitorKerberosInlineConf(t *testing.T) {
+	krb5Conf := envOr("HB_KRB5_CONF", "testdata/krb5.conf")
+	target := envOr("HB_KRB5_TARGET", "http://localhost:8080/")
+	body, err := os.ReadFile(krb5Conf)
+	require.NoError(t, err, "reading krb5 config %q", krb5Conf)
+	requireReachable(t, target)
+
+	cfgSrc := map[string]any{
+		"hosts":   target,
+		"timeout": "15s",
+		"kerberos": map[string]any{
+			"enabled":      true,
+			"auth_type":    "password",
+			"username":     envOr("HB_KRB5_USER", "testuser"),
+			"password":     envOr("HB_KRB5_PASS", "testpass"),
+			"realm":        envOr("HB_KRB5_REALM", "EXAMPLE.COM"),
+			"krb5_conf":    string(body),
+			"service_name": "HTTP/localhost",
+		},
+	}
+	cfg, err := conf.NewConfigFrom(cfgSrc)
+	require.NoError(t, err)
+
+	p, err := create("kerberos-inline", cfg, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
+	require.NoError(t, err)
+
+	event := &beat.Event{}
+	_, err = p.Jobs[0](event)
+	require.NoError(t, err, "inline krb5_conf should authenticate against the KDC")
 
 	statusCode, err := event.GetValue("http.response.status_code")
 	require.NoError(t, err, "event must carry the response status code")

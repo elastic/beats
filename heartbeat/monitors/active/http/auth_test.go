@@ -164,11 +164,12 @@ func TestAuthUnpackNestedAndBase64(t *testing.T) {
 	}
 
 	t.Run("ntlm nested object", func(t *testing.T) {
-		c := unpack(t, "urls: [http://x]\nntlm:\n  enabled: true\n  username: svc\n  password: secret\n  domain: CORP\n")
+		c := unpack(t, "urls: [http://x]\nntlm:\n  enabled: true\n  username: svc\n  password: secret\n  domain: CORP\n  workstation: MON01\n")
 		require.True(t, c.NTLM.IsEnabled())
 		assert.Equal(t, "svc", c.NTLM.Username)
 		assert.Equal(t, "secret", c.NTLM.Password)
 		assert.Equal(t, "CORP", c.NTLM.Domain)
+		assert.Equal(t, "MON01", c.NTLM.Workstation, "optional workstation should unpack")
 	})
 
 	t.Run("ntlm base64 string", func(t *testing.T) {

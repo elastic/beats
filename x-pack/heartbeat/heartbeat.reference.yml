@@ -202,8 +202,17 @@ heartbeat.monitors:
     #auth_type: password
     # Kerberos realm, e.g. EXAMPLE.COM.
     #realm: ''
-    # Path to the krb5.conf describing the realm and KDC.
+    # krb5.conf describing the realm and KDC. Set exactly one of config_path
+    # (a file on the agent) or krb5_conf (the file body, so Fleet can ship it
+    # with the monitor).
     #config_path: /etc/krb5.conf
+    #krb5_conf: |
+    #  [libdefaults]
+    #    default_realm = EXAMPLE.COM
+    #  [realms]
+    #    EXAMPLE.COM = {
+    #      kdc = kdc.example.com
+    #    }
     # Credentials when auth_type is 'password'.
     #username: ''
     #password: ''
@@ -225,6 +234,8 @@ heartbeat.monitors:
     # Optional when the domain is encoded in the username as "DOMAIN\user" or
     # "user@domain".
     #domain: ''
+    # Optional client machine name included in the NTLM negotiate message.
+    #workstation: ''
 
   # TLS/SSL connection settings for use with HTTPS endpoint. If not configured,
   # system defaults will be used.

@@ -21,13 +21,13 @@ summary: Add Kerberos (SPNEGO/Negotiate) and NTLM authentication to Heartbeat HT
 description: >
   Lightweight HTTP monitors can now authenticate against endpoints protected by
   Integrated Windows Authentication. Configure a `kerberos` block (reusing the
-  shared Beats Kerberos client: keytab or password against a krb5.conf realm) or
-  an `ntlm` block (username/password/domain). Either block may also be a
-  base64-encoded YAML/JSON string of the same object, which Heartbeat decodes
-  (used by the synthetics integration). Only one of basic, kerberos, or ntlm
-  may be enabled per monitor. Both schemes require the connection-reusing
-  HTTP transport, so they only work from Private Location agents that can reach
-  the realm/KDC; neither is available in FIPS builds.
+  shared Beats Kerberos client: keytab or password, with either a `config_path`
+  file or an inline `krb5_conf`) or an `ntlm` block (username/password/domain,
+  and an optional `workstation`). Either block may also be a base64-encoded
+  YAML/JSON string of the same object, which Heartbeat decodes (used by the
+  synthetics integration). Only one of basic, kerberos, or ntlm may be enabled
+  per monitor. Kerberos needs an agent that can reach the KDC. Neither scheme
+  is available in FIPS builds.
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.

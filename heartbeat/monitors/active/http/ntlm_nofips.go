@@ -29,6 +29,9 @@ import (
 // converts the request's Basic auth credentials into an NTLM/Negotiate
 // handshake. NTLM relies on MD4/RC4, so it is unavailable in FIPS builds (see
 // ntlm_fips.go).
-func wrapNTLMRoundTripper(rt http.RoundTripper) (http.RoundTripper, error) {
-	return ntlmssp.Negotiator{RoundTripper: rt}, nil
+func wrapNTLMRoundTripper(rt http.RoundTripper, ntlm *NTLMConfig) (http.RoundTripper, error) {
+	return ntlmssp.Negotiator{
+		RoundTripper:    rt,
+		WorkstationName: ntlm.Workstation,
+	}, nil
 }

@@ -155,7 +155,7 @@ func newRoundTripper(config *Config, userAgent string) (http.RoundTripper, error
 		// The Negotiator converts the request's Basic auth credentials into an
 		// NTLM/Negotiate handshake against the wrapped transport. This is gated
 		// off in FIPS builds (see ntlm_fips.go).
-		rt, err = wrapNTLMRoundTripper(rt)
+		rt, err = wrapNTLMRoundTripper(rt, config.NTLM)
 		if err != nil {
 			return nil, err
 		}

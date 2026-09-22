@@ -58,6 +58,13 @@ func TestAuthUnpackKerberos(t *testing.T) {
 		assert.Equal(t, "svc", c.Kerberos.Username)
 	})
 
+	t.Run("inline krb5_conf", func(t *testing.T) {
+		c := unpack(t, "urls: [http://x]\nkerberos:\n  enabled: true\n  auth_type: password\n  realm: CORP.LOCAL\n  username: svc\n  password: secret\n  krb5_conf: |\n    [libdefaults]\n      default_realm = CORP.LOCAL\n")
+		require.True(t, c.Kerberos.IsEnabled())
+		assert.Empty(t, c.Kerberos.ConfigPath, "inline config must not require a file")
+		assert.Contains(t, c.Kerberos.Krb5Conf, "default_realm = CORP.LOCAL")
+	})
+
 	t.Run("base64 json", func(t *testing.T) {
 		c := unpack(t, "urls: [http://x]\nkerberos: "+base64.StdEncoding.EncodeToString([]byte(`{"enabled":true,"auth_type":"password","realm":"CORP.LOCAL","config_path":"/etc/krb5.conf","username":"svc","password":"secret"}`))+"\n")
 		require.True(t, c.Kerberos.IsEnabled())

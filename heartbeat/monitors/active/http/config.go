@@ -64,6 +64,9 @@ type NTLMConfig struct {
 	// Domain is optional when the domain is already encoded in the username
 	// as "DOMAIN\\user" or "user@domain".
 	Domain string `config:"domain"`
+	// Workstation is the client machine name sent in the NTLM negotiate
+	// message. Optional; some servers record it for auditing.
+	Workstation string `config:"workstation"`
 }
 
 // IsEnabled returns true when the NTLM block is present and not explicitly
