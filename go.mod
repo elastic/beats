@@ -3,11 +3,7 @@ module github.com/elastic/beats/v7
 go 1.26.8
 
 require (
-<<<<<<< HEAD
-	cloud.google.com/go/bigquery v1.82.0
-=======
 	cloud.google.com/go/bigquery v1.84.0
->>>>>>> fe00b93 (build(deps): bump the gcp-sdks group with 5 updates (#53329))
 	cloud.google.com/go/monitoring v1.30.0
 	cloud.google.com/go/pubsub v1.51.1
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
