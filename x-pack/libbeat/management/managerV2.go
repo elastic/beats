@@ -815,7 +815,6 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 						delete(healthyInputs, unitErr.UnitID)
 					}
 				}
-				return
 
 			default:
 				// That is not one of the cases we know how to handle, hard stop
