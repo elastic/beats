@@ -730,11 +730,11 @@ func (s *testStore) Close() {
 	s.registry.Close()
 }
 
-func (s *testStore) StoreFor(string) (*statestore.Store, error) {
+func (s *testStore) StoreFor(_, _ string) (*statestore.Store, error) {
 	return s.registry.Get("filestream-benchmark")
 }
 
-func (s *testStore) StoreKey() string {
+func (s *testStore) StoreKey(_, _ string) string {
 	return fmt.Sprintf("test:%p", s.registry)
 }
 
