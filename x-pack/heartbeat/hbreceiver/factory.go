@@ -43,9 +43,18 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 	settings := cmd.HeartbeatSettings()
 	settings.ElasticLicensed = true
 
+	browserParams, err := extractBrowserMonitorParams(cfg.Beatconfig)
+	if err != nil {
+		return nil, fmt.Errorf("error extracting browser params: %w", err)
+	}
+
 	b, err := xpInstance.NewBeatForReceiver(settings, cfg.Beatconfig, consumer, set.ID.String(), set.Logger.Core())
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
+	}
+
+	if err := restoreBrowserMonitorParams(b.RawConfig, browserParams); err != nil {
+		return nil, fmt.Errorf("error restoring browser params: %w", err)
 	}
 
 	beatCreator := beater.New
