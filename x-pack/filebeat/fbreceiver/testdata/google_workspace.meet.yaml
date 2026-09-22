@@ -1,0 +1,93 @@
+# Source: google_workspace/data_stream/meet/agent/stream/cel.yml.hbs
+# rendered with default variable values; type injected by elastic-agent from
+# the stream manifest (input: cel). Dotted keys in the template (e.g.
+# resource.url) are expanded to nested maps by elastic-agent before delivery.
+type: cel
+config_version: 2
+interval: 30m
+resource:
+  tracer:
+    enabled: false
+    filename: ../../logs/cel/http-request-trace-*.ndjson
+    maxbackups: 5
+    maxsize: 5
+  url: https://admin.googleapis.com
+auth:
+  oauth2:
+    provider: google
+    google:
+      jwt_file: ''
+      jwt_json: ''
+      delegated_account: ''
+    scopes:
+      - https://www.googleapis.com/auth/admin.reports.audit.readonly
+state:
+  user_key: all
+  initial_interval: 24h
+  lag_time: 1h
+  batch_size: 1000
+  application_name_for_url: meet
+redact:
+  fields: ~
+program: |
+  (
+    state.?want_more.orValue(false) ?
+      state
+    :
+      state.with({
+        "start_time": state.?cursor.last_timestamp.orValue(
+          (now - duration(state.initial_interval) - duration(state.lag_time)).format(time_layout.RFC3339)
+        ),
+        "end_time": (now - duration(state.lag_time)).format(time_layout.RFC3339),
+      })
+  ).as(state, state.with(
+    request(
+      "GET",
+      state.url.trim_right("/") + "/admin/reports/v1/activity/users/" + state.user_key + "/applications/" + state.application_name_for_url + "?"+ {
+        "maxResults": [string(state.batch_size)],
+        "endTime": [state.end_time],
+        "startTime": [state.start_time],
+        ?"pageToken": state.?next.page_token.optMap(v, [v]),
+      }.format_query()
+    ).do_request().as(resp, resp.StatusCode == 200 ?
+      resp.Body.decode_json().as(body,{
+        "events": (
+          has(body.items) ?
+            body.items.map(item, item.events.map(event, item.drop("events").as(root,
+              {"message":root.with({"events": event}).encode_json()}
+            ))).flatten()
+          :
+            []
+        ),
+        "cursor": {
+          ?"last_timestamp": (
+            has(body.nextPageToken) ?
+              state.?cursor.last_timestamp
+            :
+              optional.of(state.end_time)
+          )
+        },
+        "want_more": has(body.nextPageToken),
+        "next": {
+          ?"page_token": body.?nextPageToken,
+        }
+      })
+    :
+      {
+        "events": {
+          "error": {
+            "code": string(resp.StatusCode),
+            "id": string(resp.Status),
+            "message": "GET:"+string(resp.Status),
+          },
+        },
+        "want_more": false,
+      }
+    )
+  ))
+tags:
+  - google_workspace-meet
+data_stream:
+  dataset: google_workspace.meet
+  type: logs
+  namespace: default
