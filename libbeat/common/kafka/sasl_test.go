@@ -31,9 +31,8 @@ import (
 
 func TestValidate(t *testing.T) {
 	tests := []struct {
-		mechanism    string
-		wantErr      bool
-		errSubstring string
+		mechanism string
+		wantErr   bool
 	}{
 		// All accepted mechanisms, in both canonical and lowercase forms.
 		{mechanism: ""},
@@ -58,9 +57,6 @@ func TestValidate(t *testing.T) {
 			err := cfg.Validate()
 			if tc.wantErr {
 				require.Error(t, err)
-				if tc.errSubstring != "" {
-					assert.ErrorContains(t, err, tc.errSubstring)
-				}
 			} else {
 				require.NoError(t, err)
 			}
