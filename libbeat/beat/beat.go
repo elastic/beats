@@ -114,7 +114,7 @@ func (beat *Beat) userAgentMode() useragent.AgentManagementMode {
 	if beat.Manager == nil {
 		return useragent.AgentManagementModeUnknown
 	}
-	if !beat.Manager.Enabled() {
+	if !beat.Manager.ConfigFromControlProtocol() {
 		return useragent.AgentManagementModeStandalone
 	}
 
@@ -130,7 +130,7 @@ func (beat *Beat) userAgentMode() useragent.AgentManagementMode {
 }
 
 func (beat *Beat) userAgentUnprivilegedMode() useragent.AgentUnprivilegedMode {
-	if beat.Manager == nil || !beat.Manager.Enabled() {
+	if beat.Manager == nil || !management.UnderAgent() {
 		return useragent.AgentUnprivilegedModeUnknown
 	}
 	if beat.Manager.AgentInfo().Unprivileged {

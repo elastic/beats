@@ -651,6 +651,7 @@ type mockManager struct {
 func (m mockManager) AgentInfo() management.AgentInfo         { return management.AgentInfo{} }
 func (m mockManager) CheckRawConfig(cfg *config.C) error      { return nil }
 func (m mockManager) Enabled() bool                           { return m.enabled }
+func (m mockManager) ConfigFromControlProtocol() bool         { return m.enabled }
 func (m mockManager) RegisterAction(action management.Action) {}
 func (m mockManager) RegisterDiagnosticHook(name, description, filename, contentType string, hook management.DiagnosticHook) {
 }
@@ -683,7 +684,6 @@ func TestManager(t *testing.T) {
 		b, err := NewInitializedBeat(Settings{})
 		require.NoError(t, err)
 		require.NotNil(t, b)
-		require.True(t, b.Manager.Enabled())
 		require.True(t, management.UnderAgent())
 		require.IsType(t, mockManager{}, b.Manager)
 	})
@@ -697,7 +697,6 @@ func TestManager(t *testing.T) {
 		b, err := NewInitializedBeat(Settings{})
 		require.NoError(t, err)
 		require.NotNil(t, b)
-		require.False(t, b.Manager.Enabled())
 		require.False(t, management.UnderAgent())
 	})
 	t.Run("management.enabled not set", func(t *testing.T) {
@@ -710,7 +709,6 @@ func TestManager(t *testing.T) {
 		b, err := NewInitializedBeat(Settings{})
 		require.NoError(t, err)
 		require.NotNil(t, b)
-		require.False(t, b.Manager.Enabled())
 		require.False(t, management.UnderAgent())
 	})
 }

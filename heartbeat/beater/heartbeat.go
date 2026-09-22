@@ -90,7 +90,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 
 	// Check if any of these can prevent using states client
 	stateLoader, replaceStateLoader := monitorstate.AtomicStateLoader(monitorstate.NilStateLoader, logger)
-	if b.Config.Output.Name() == "elasticsearch" && !b.Manager.Enabled() {
+	if b.Config.Output.Name() == "elasticsearch" && management.UnderAgent() {
 		// Connect to ES and setup the State loader if the output is not managed by agent
 		// Note this, intentionally, blocks until connected or max attempts reached
 		esClient, err := makeESClient(context.TODO(), b.Config.Output.Config(), 3, 2*time.Second, logger, b.Info)
@@ -104,7 +104,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		} else {
 			replaceStateLoader(monitorstate.MakeESLoader(esClient, monitorstate.DefaultDataStreams, parsedConfig.RunFrom, logger))
 		}
-	} else if b.Manager.Enabled() {
+	} else if !management.UnderAgent() {
 		stateLoader, replaceStateLoader = monitorstate.DeferredStateLoader(monitorstate.NilStateLoader, 15*time.Second, logger)
 	}
 
@@ -189,7 +189,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		waitMonitors.Add(monitors.WithLog(bt.scheduler.WaitForRunOnce, "Ending run_once run.", bt.logger))
 	}
 
-	if b.Manager.Enabled() {
+	if b.Manager.ConfigFromControlProtocol() {
 		bt.RunCentralMgmtMonitors(b)
 	}
 

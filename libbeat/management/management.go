@@ -34,8 +34,8 @@ var DebugK = "centralmgmt"
 type Manager interface {
 	status.StatusReporter
 
-	// Enabled returns true if manager is enabled.
-	Enabled() bool
+	// ConfigFromControlProtocol returns true if beat is running in process mode inside elastic-agent.
+	ConfigFromControlProtocol() bool
 
 	// Starts the unitListen loop, so the manager can already
 	// check-in with Elastic Agent, but no input/output will be
@@ -169,11 +169,7 @@ func (n *FallbackManager) Stop() {
 	}
 }
 
-// Enabled returns false because management is disabled.
-// the nilManager is still used for shutdown on some cases,
-// but that does not mean the Beat is being managed externally,
-// hence it will always return false.
-func (n *FallbackManager) Enabled() bool                      { return false }
+func (n *FallbackManager) ConfigFromControlProtocol() bool    { return false }
 func (n *FallbackManager) AgentInfo() AgentInfo               { return AgentInfo{} }
 func (n *FallbackManager) PreInit() error                     { return nil }
 func (n *FallbackManager) PostInit()                          {}
