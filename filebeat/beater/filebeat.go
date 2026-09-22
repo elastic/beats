@@ -441,7 +441,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		if b.Config.Output.Name() == "elasticsearch" {
 			pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config(), b.Info)
 		} else {
-			if !b.Manager.ConfigFromControlProtocol() {
+			if !management.UnderAgent() {
 				fb.logger.Warn(pipelinesWarning)
 			}
 		}

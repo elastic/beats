@@ -657,7 +657,6 @@ type mockManager struct {
 
 func (m mockManager) AgentInfo() management.AgentInfo         { return management.AgentInfo{} }
 func (m mockManager) CheckRawConfig(cfg *config.C) error      { return nil }
-func (m mockManager) Enabled() bool                           { return m.enabled }
 func (m mockManager) ConfigFromControlProtocol() bool         { return m.enabled }
 func (m mockManager) RegisterAction(action management.Action) {}
 func (m mockManager) RegisterDiagnosticHook(name, description, filename, contentType string, hook management.DiagnosticHook) {
