@@ -192,7 +192,10 @@ func TestContract_StateStoreKeyFormat(t *testing.T) {
 
 func TestContract_StateStoreKeyPrefix(t *testing.T) {
 	assert.Equal(t, "filebeat::aws-s3::state::", awsS3ObjectStatePrefix)
-	assert.Equal(t, "filebeat::aws-s3::tail", awsS3TailKey)
+	assert.Equal(t, "filebeat::aws-s3::tail::", awsS3TailKeyPrefix)
+	assert.Equal(t, "filebeat::aws-s3::tail", awsS3LegacyTailKey)
+	assert.Equal(t, "filebeat::aws-s3::tail::my-bucket::logs/", tailStoreKey("my-bucket", "logs/"))
+	assert.Equal(t, "filebeat::aws-s3::tail::my-bucket::", tailStoreKey("my-bucket", ""))
 }
 
 func TestContract_StateJSON_RoundTrip(t *testing.T) {
