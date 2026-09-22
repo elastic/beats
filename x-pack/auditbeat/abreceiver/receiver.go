@@ -7,26 +7,21 @@ package abreceiver
 import (
 	"context"
 	"fmt"
-	"sync"
 
 	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
 
 	"go.opentelemetry.io/collector/component"
-	"go.uber.org/zap"
 )
 
 type auditbeatReceiver struct {
 	xpInstance.BeatReceiver
-	wg sync.WaitGroup
 }
 
 func (ab *auditbeatReceiver) Start(ctx context.Context, host component.Host) error {
-	ab.wg.Go(func() {
-		ab.Logger.Info("starting auditbeat receiver")
-		if err := ab.BeatReceiver.Start(host); err != nil {
-			ab.Logger.Error("error starting auditbeat receiver", zap.Error(err))
-		}
-	})
+	ab.Logger.Info("starting auditbeat receiver")
+	if err := ab.BeatReceiver.Start(host); err != nil {
+		return fmt.Errorf("error starting auditbeat receiver: %w", err)
+	}
 	return nil
 }
 
@@ -35,6 +30,5 @@ func (ab *auditbeatReceiver) Shutdown(ctx context.Context) error {
 	if err := ab.BeatReceiver.Shutdown(ctx); err != nil {
 		return fmt.Errorf("error stopping auditbeat receiver: %w", err)
 	}
-	ab.wg.Wait()
 	return nil
 }
