@@ -1,0 +1,217 @@
+version: 8.19.22
+entries:
+    - kind: enhancement
+      summary: Add api_endpoint configuration option to gcp-pubsub input to allow overriding the default Pub/Sub API endpoint.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/53080
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778600000
+      file:
+        name: 1778600000-gcppubsub-api-endpoint.yaml
+        checksum: cf600c7cb83be9eb97ada83d55de0643cce2a264
+    - kind: bug-fix
+      summary: Match Kibana maintenance windows for nth-weekday, tzid, until, hourly, inclusive duration, and old dtstart.
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52572
+      issue:
+        - https://github.com/elastic/beats/issues/52571
+      impact: ""
+      action: ""
+      timestamp: 1786463939
+      file:
+        name: 1786463939-honor-nth-weekday-byweekday-in-maintenance-windows.yaml
+        checksum: 7164a4ecf1b2cdbe4ae1da6d8ff2ad826db801e6
+    - kind: bug-fix
+      summary: Censor HTTP parameters for mixed-case `hide_keywords` entries
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52650
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1786714344
+      file:
+        name: 1786714344-packetbeat-http-hide-keywords-case-insensitive.yaml
+        checksum: 3ac132ed9ca140905c99f4bdfd4c1c624e0e6601
+    - kind: enhancement
+      summary: Log Npcap installer diagnostic files on installation failure.
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52667
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1787010547
+      file:
+        name: 1787010547-npcap-log-installer-diagnostics.yaml
+        checksum: 86c0f010c8c2dc857eafa03e81ae3dce8ddedc38
+    - kind: bug-fix
+      summary: Scope the aws-s3 polling state registry to the input's bucket.
+      description: |
+        All aws-s3 inputs of a process share one persistent state registry. Each
+        polling input loaded every input's states into memory, and its periodic
+        registry cleanup then deleted from the shared store all entries missing
+        from its own bucket listing, including the other inputs' states. After a
+        restart the affected inputs found no persisted state and re-ingested
+        their buckets. Loading is now scoped to the input's bucket and key
+        prefix. This also removes the duplicated memory usage of the registry
+        when several polling inputs run in one process.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52728
+      issue:
+        - https://github.com/elastic/beats/issues/52721
+      impact: ""
+      action: ""
+      timestamp: 1787214552
+      file:
+        name: 1787214552-awss3-bucket-scoped-state-registry.yaml
+        checksum: e00ae0002d539f6c44db66bfaa9ab8cca290c4a3
+    - kind: bug-fix
+      summary: Revert non-Ironbank container images to UBI9.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/52823
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1787598969
+      file:
+        name: 1787598969-revert-non-ironbank-container-images-to-ubi9.yaml
+        checksum: 1b0e1c935a59e1ea06727e2264e452f7921c2c61
+    - kind: enhancement
+      summary: Add hints.input_allow_list to restrict Filebeat hints-generated input types
+      description: ""
+      component: filebeat
+      pr: []
+      issue:
+        - https://github.com/elastic/beats/issues/52624
+      impact: ""
+      action: ""
+      timestamp: 1787783258
+      file:
+        name: 1787783258-autodiscover-filter-list.yaml
+        checksum: 8519f5196ced81ed3c64084a72d334af3a3c616f
+    - kind: bug-fix
+      summary: Fix bounds-check panics in Packetbeat TLS and Cassandra protocol parsers.
+      description: ""
+      component: packetbeat
+      pr: []
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1787808118
+      file:
+        name: 1787808118-fix-packetbeat-tls-cassandra-parser-panics.yaml
+        checksum: 3c4938a9577fb91641c5b412bd47750fdfc2dcdc
+    - kind: bug-fix
+      summary: Prevent httpjson chain pagination from advancing the cursor when a chained request fails.
+      description: |
+        When a paginated httpjson root request drives chain steps, a transient chain
+        failure (timeout, 502, connection reset) was logged and ignored after the
+        page cursor had already been committed. Later intervals then skipped the
+        failed page's chain data. The interval now fails and the cursor stays on the
+        last successfully chained page so the next run retries it.
+      component: filebeat
+      pr: []
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1788162891
+      file:
+        name: 1788162891-httpjson-chain-pagination-cursor.yaml
+        checksum: 6841e348b48e45743b2885875bc6898098d66867
+    - kind: bug-fix
+      summary: Follow every CrowdStrike discover resource instead of only the first feed.
+      description: |
+        FalconHose followSession iterated discovered resources but blocked in the
+        first feed's decode loop and returned on EOF, so additional feeds in the same
+        discover response were never read. Each resource is now followed
+        concurrently with a merged per-feed cursor.
+      component: filebeat
+      pr: []
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1788162892
+      file:
+        name: 1788162892-crowdstrike-follow-all-feeds.yaml
+        checksum: 96835a1a53142b912c2381df72e3d22d81986041
+    - kind: bug-fix
+      summary: Fix Kubernetes metadata watcher deadlock that blocked metricset shutdown
+      description: |
+        The Kubernetes metadata enricher held the shared watcher registry lock while waiting for an informer cache to synchronize. When the Kubernetes API was unreachable or RBAC denied the initial LIST, that wait never completed and Stop() could not acquire the same lock to cancel it, hanging the metricset and blocking shutdown. Watcher startup now runs outside the registry lock as a shared attempt, and each metricset can cancel its own wait independently of other owners of the same watcher. Metricsets that successfully registered all their required metadata watchers now wait for those watchers to be ready before publishing. When add_metadata is disabled or client creation fails, the enricher is a no-op and publishing continues unenriched as before. A metricset whose extra metadata watcher (such as namespace enrichment) failed to register or synchronize does not collect.
+      component: metricbeat
+      pr: []
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1788250398
+      file:
+        name: 1788250398-kubernetes-enricher-watcher-deadlock.yaml
+        checksum: d68c332829e3545dba603bb9cac20c899f593ad9
+    - kind: bug-fix
+      summary: Fix rendering of TLS certificate serial numbers so each byte is always represented as two hex digits, matching OpenSSL output.
+      description: ""
+      component: packetbeat
+      pr: []
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1788474519
+      file:
+        name: 1788474519-52995-packetbeat-tls.yaml
+        checksum: 3e432080bd1c98920c32d0619dc8aea1b879be51
+    - kind: bug-fix
+      summary: Fix race condition in Kafka input when multiple inputs are configured.
+      description: ""
+      component: filebeat
+      pr: []
+      issue:
+        - https://github.com/elastic/beats/issues/34919
+      impact: ""
+      action: ""
+      timestamp: 1788943710
+      file:
+        name: 1788943710-filebeat-kafka-input-local-metrics-registry.yaml
+        checksum: ba35cab49b4a1f0c222cfe8ed2481df3189c811d
+    - kind: bug-fix
+      summary: Fix Azure AD entity analytics accumulating stale registered owners and users on devices.
+      description: |
+        Device.Merge was accumulating RegisteredOwners and RegisteredUsers across syncs
+        instead of replacing them. Because the Graph API always returns the complete
+        current list, the correct behaviour is replacement. Stale entries persisted
+        indefinitely, eventually bloating the kvstore.
+
+        Additionally, registered owner and user lookups were issued for deleted devices,
+        causing noisy 404 errors from the Graph API.
+      component: filebeat
+      pr: []
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1788993269
+      file:
+        name: 1788993269-fix-azuread-device-registered-owner-accumulation.yaml
+        checksum: 199dab9649808ea658a0d07de0136848b9e666b3
+    - kind: bug-fix
+      summary: Fix Active Directory entity analytics panic when ssl.certificate_authorities is set.
+      description: ""
+      component: filebeat
+      pr: []
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1789453087
+      file:
+        name: 1789453087-fix-ad-ea-nil-logger-tls.yaml
+        checksum: 97db8f0756e8568cbd29a65daab6382014eae1ef
