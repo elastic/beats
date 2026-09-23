@@ -1,0 +1,50 @@
+extensions:
+  elasticsearchclient:
+    hosts: ["https://localhost:9200"]
+    username: "elastic"
+    password: "changeme"
+    ssl.verification_mode: none
+    timeout: 10s
+
+receivers:
+  heartbeatreceiver:
+    elasticsearch_client: elasticsearchclient
+    heartbeat:
+      monitors:
+        - type: tcp
+          id: test-tcp
+          enabled: true
+          schedule: "@every 2s"
+          timeout: 1s
+          urls: ["https://localhost:9200"]
+          username: elastic
+          password: changeme
+          ssl.verification_mode: none
+    management.otel.enabled: true
+    queue.mem.flush.timeout: 0s
+
+exporters:
+  elasticsearch/manual:
+    endpoints: ["https://localhost:9200"]
+    user: "elastic"
+    password: "changeme"
+    logs_index: "synthetics-manual-heartbeat-state"
+    tls:
+      insecure_skip_verify: true
+    mapping:
+      mode: bodymap
+    sending_queue:
+      enabled: false
+
+service:
+  extensions:
+    - elasticsearchclient
+  pipelines:
+    logs:
+      receivers:
+        - heartbeatreceiver
+      exporters:
+        - debug
+  telemetry:
+    metrics:
+      level: none
