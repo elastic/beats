@@ -8,6 +8,22 @@ The `system` module collects various security related information about a system
 The module is fully implemented for Linux on x86. Currently, the `socket` module is not available on ARM. Some datasets are also available for macOS (Darwin) and Windows.
 
 
+## Required privileges [_required_privileges_system]
+
+Each dataset has its own privilege requirements. The following table summarizes the minimum setup for a least-privilege deployment on Linux. "Root or capability required" means the process must either run as root or hold the listed capability.
+
+| Dataset | Root or capability required | Host PID namespace | Notes |
+|---|---|---|---|
+| `host` | None | No | Reads general system info only |
+| `login` | `utmp` group membership | No | Reads `/var/log/wtmp` and `/var/log/btmp`; those files are group-readable by `utmp` on most distributions |
+| `package` | None (dpkg/Homebrew); root for RPM | No | RPM queries might need root to read the RPM DB; use `package.rpm_drop_to_uid` to drop privileges afterwards |
+| `process` | Recommended: root or `CAP_SYS_PTRACE` | Yes (Docker: `--pid=host`) | Without elevated privileges, some per-process details (for example, open file descriptors, env vars) are unavailable |
+| `socket` | `CAP_SYS_ADMIN` + `CAP_NET_RAW` | No | Also requires tracefs/debugfs access (`/sys` bind-mount in Docker); refer to [System socket dataset](/reference/auditbeat/auditbeat-dataset-system-socket.md) |
+| `user` | `shadow` group or root (when `detect_password_changes: true`) | No | `/etc/passwd` and `/etc/group` are world-readable; `/etc/shadow` requires elevated access |
+
+Refer to the individual dataset pages for full details.
+
+
 ## How it works [_how_it_works_3]
 
 Each dataset sends two kinds of information: state and events.

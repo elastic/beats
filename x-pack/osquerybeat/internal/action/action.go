@@ -20,10 +20,13 @@ var (
 )
 
 type Action struct {
-	Query     string
-	ID        string
+	Query string
+	ID    string
+	// SpaceID is the optional Kibana space the action originated from.
+	// It scopes query results and responses to that space in Kibana.
+	SpaceID   string
 	Platforms []string
-	// The optional action timeout
+	// Timeout is the optional query timeout.
 	Timeout    time.Duration
 	ECSMapping ecs.Mapping
 	// Profile is the optional per-action profiling override. When nil the global
@@ -99,9 +102,14 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 		return a, fmt.Errorf("missing query: %w", ErrActionRequest)
 	}
 
+	// A non-string space_id is ignored rather than failing the action;
+	// losing the field only affects space-scoped reads in Kibana.
+	spaceID, _ := m["space_id"].(string)
+
 	a = Action{
 		Query:      query,
 		ID:         id,
+		SpaceID:    strings.TrimSpace(spaceID),
 		Platforms:  platforms,
 		ECSMapping: ecsm,
 		Profile:    profile,

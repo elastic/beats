@@ -146,6 +146,35 @@ func TestActionFromMap(t *testing.T) {
 			},
 			Err: ErrActionRequest,
 		},
+		{
+			Name: "valid space_id",
+			Map: map[string]any{
+				"id":       "123456789",
+				"space_id": "my-space",
+				"data": map[string]any{
+					"query": "select * from foo",
+				},
+			},
+		},
+		{
+			Name: "absent space_id",
+			Map: map[string]any{
+				"id": "123456789",
+				"data": map[string]any{
+					"query": "select * from foo",
+				},
+			},
+		},
+		{
+			Name: "non-string space_id is ignored",
+			Map: map[string]any{
+				"id":       "123456789",
+				"space_id": 42,
+				"data": map[string]any{
+					"query": "select * from foo",
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {
@@ -170,6 +199,16 @@ func TestActionFromMap(t *testing.T) {
 			if tc.Name == "valid platform" {
 				if diff := cmp.Diff([]string{"linux", "windows"}, a.Platforms); diff != "" {
 					t.Errorf("unexpected platforms (-want +got):\n%s", diff)
+				}
+			}
+			if tc.Name == "valid space_id" {
+				if a.SpaceID != "my-space" {
+					t.Errorf("FromMap SpaceID = %q; want %q", a.SpaceID, "my-space")
+				}
+			}
+			if tc.Name == "absent space_id" || tc.Name == "non-string space_id is ignored" {
+				if a.SpaceID != "" {
+					t.Errorf("FromMap SpaceID = %q; want %q", a.SpaceID, "")
 				}
 			}
 		})

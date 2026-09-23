@@ -19,8 +19,11 @@ type stateRegistryV2 struct {
 
 // stateRegistryV2Config holds the parameters for creating a V2 state registry.
 type stateRegistryV2Config struct {
-	Log       *logp.Logger
-	Store     statestore.States
+	Log   *logp.Logger
+	Store statestore.States
+	// Bucket scopes the registry to the input's bucket, so inputs sharing the
+	// store don't load or clean up each other's states.
+	Bucket    string
 	KeyPrefix string
 	// Capacity controls behaviour:
 	//   0  = normal (unbounded) registry, no tail tracking
@@ -33,7 +36,7 @@ type stateRegistryV2Config struct {
 // and lexicographical formats) and handles cleanup/persistence.
 func newStateRegistryV2(cfg stateRegistryV2Config) (*stateRegistryV2, error) {
 	lexicographical := cfg.Capacity > 0
-	reg, err := newStateRegistry(cfg.Log, cfg.Store, cfg.KeyPrefix, lexicographical, cfg.Capacity)
+	reg, err := newStateRegistry(cfg.Log, cfg.Store, cfg.Bucket, cfg.KeyPrefix, lexicographical, cfg.Capacity)
 	if err != nil {
 		return nil, err
 	}

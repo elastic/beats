@@ -61,7 +61,8 @@ type adInput struct {
 // New creates a new instance of an Active Directory identity provider.
 func New(logger *logp.Logger, path *paths.Path) (provider.Provider, error) {
 	p := adInput{
-		cfg: defaultConfig(),
+		cfg:    defaultConfig(),
+		logger: logger,
 	}
 	p.Manager = &kvstore.Manager{
 		Logger:    logger,
@@ -152,9 +153,13 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 		case start := <-syncTimer.C:
 			last, err = p.runFullSync(inputCtx, store, client)
 			if err != nil {
-				msg := "Error running full sync"
-				p.logger.Errorw(msg, "error", err)
-				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				if provider.SyncInterrupted(inputCtx, err) {
+					p.logger.Infow(provider.SyncInterruptedMsg, "error", err)
+				} else {
+					msg := "Error running full sync"
+					p.logger.Errorw(msg, "error", err)
+					inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				}
 				p.metrics.syncError.Inc()
 			} else {
 				inputCtx.UpdateStatus(status.Running, "Successful full sync")
@@ -176,9 +181,13 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 		case start := <-updateTimer.C:
 			last, err = p.runIncrementalUpdate(inputCtx, store, last, client)
 			if err != nil {
-				msg := "Error running incremental update"
-				p.logger.Errorw(msg, "error", err)
-				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				if provider.SyncInterrupted(inputCtx, err) {
+					p.logger.Infow(provider.SyncInterruptedMsg, "error", err)
+				} else {
+					msg := "Error running incremental update"
+					p.logger.Errorw(msg, "error", err)
+					inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				}
 				p.metrics.updateError.Inc()
 			} else {
 				inputCtx.UpdateStatus(status.Running, "Successful incremental update")

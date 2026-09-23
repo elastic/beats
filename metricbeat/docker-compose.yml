@@ -19,12 +19,12 @@ services:
 
   # Used by base tests
   elasticsearch:
-    image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-9.5.2}-1
+    image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-9.5.4}-1
     build:
       context: ..
       dockerfile: metricbeat/module/elasticsearch/_meta/Dockerfile
       args:
-        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION:-9.5.2}
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION:-9.5.4}
     environment:
       - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
       - "transport.host=127.0.0.1"
@@ -45,11 +45,11 @@ services:
 
   # Used by base tests
   kibana:
-    image: docker.elastic.co/integrations-ci/beats-kibana:${KIBANA_VERSION:-9.5.2}-1
+    image: docker.elastic.co/integrations-ci/beats-kibana:${KIBANA_VERSION:-9.5.4}-1
     build:
       context: ./module/kibana/_meta
       args:
-        KIBANA_VERSION: ${KIBANA_VERSION:-9.5.2}
+        KIBANA_VERSION: ${KIBANA_VERSION:-9.5.4}
     environment:
       ELASTICSEARCH_USERNAME: kibana_system_user
       ELASTICSEARCH_PASSWORD: ${ES_PASS:-testing}
@@ -63,11 +63,11 @@ services:
 
   # Used by base tests
   metricbeat:
-    image: docker.elastic.co/integrations-ci/beats-metricbeat:${BEAT_VERSION:-9.5.2}-1
+    image: docker.elastic.co/integrations-ci/beats-metricbeat:${BEAT_VERSION:-9.5.4}-1
     build:
       context: ./module/beat/_meta
       args:
-        BEAT_VERSION: ${BEAT_VERSION:-9.5.2}
+        BEAT_VERSION: ${BEAT_VERSION:-9.5.4}
     environment:
       - ELASTICSEARCH_USERNAME=${ES_USER:-metricbeat_user}
       - ELASTICSEARCH_PASSWORD=${ES_PASS:-testing}

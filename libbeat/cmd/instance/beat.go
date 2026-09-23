@@ -21,7 +21,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"net"
@@ -116,6 +115,8 @@ type Beat struct {
 	keystore   keystore.Keystore
 	processors processing.Supporter
 
+	hostnameOverride string
+
 	InputQueueSize int // Size of the producer queue used by most queues.
 
 	// shouldReexec is a flag to indicate the Beat should restart
@@ -129,6 +130,7 @@ type beatConfig struct {
 
 	// beat top-level settings
 	Name      string `config:"name"`
+	Hostname  string `config:"hostname"`
 	MaxProcs  int    `config:"max_procs"`
 	GCPercent int    `config:"gc_percent"`
 
@@ -801,12 +803,34 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 	}())
 }
 
-// handleFlags converts -flag to --flags, parses the command line
-// flags, and it invokes the HandleFlags callback if implemented by
-// the Beat.
+// HostnameFlag holds the value of the --hostname flag.
+var HostnameFlag string
+
+// handleFlags invokes the HandleFlags callback if implemented by the Beat.
 func (b *Beat) handleFlags() error {
-	flag.Parse()
 	return cfgfile.HandleFlags()
+}
+
+// ApplyHostname sets Info.Hostname and Info.FQDN to h and updates the process-wide
+// hostname override used by processors (add_host_metadata, add_observer_metadata).
+// It is a no-op when h is empty or blank.
+func (b *Beat) ApplyHostname(h, source string) {
+	if strings.TrimSpace(h) == "" {
+		return
+	}
+	beat.SetHostnameOverride(h)
+	h = beat.GetHostnameOverride()
+	b.Info.Hostname = h
+	b.Info.FQDN = h
+	b.hostnameOverride = h
+	if b.Info.Logger != nil {
+		b.Info.Logger.Infof("hostname overridden to %q via %s", h, source)
+	}
+}
+
+// HostnameOverride returns the hostname override of this beat, or "" when it has none.
+func (b *Beat) HostnameOverride() string {
+	return b.hostnameOverride
 }
 
 // config reads the configuration file from disk, parses the common options
@@ -824,10 +848,10 @@ func (b *Beat) configure(settings Settings) error {
 
 	b.Monitoring = beatmonitoring.NewGlobalMonitoring()
 
-	if err := InitPaths(cfg); err != nil {
+	b.Info.Paths, err = InitPaths(cfg)
+	if err != nil {
 		return err
 	}
-	b.Info.Paths = paths.Paths //nolint:forbidigo // existing global paths initialization for the standalone beat entry point.
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
@@ -857,7 +881,7 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error unpacking config data: %w", err)
 	}
 
-	b.Info.Logger, err = configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType)
+	b.Info.Logger, err = configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, b.Info.Paths, logp.TypeKey, logp.EventType)
 	if err != nil {
 		return fmt.Errorf("error initializing logging: %w", err)
 	}
@@ -872,6 +896,13 @@ func (b *Beat) configure(settings Settings) error {
 	if err := features.UpdateFromConfig(b.RawConfig); err != nil {
 		return fmt.Errorf("could not parse features: %w", err)
 	}
+
+	hostname := b.Config.Hostname
+	if HostnameFlag != "" {
+		hostname = HostnameFlag
+	}
+	b.ApplyHostname(hostname, "hostname config")
+
 	b.RegisterHostname(features.FQDN())
 
 	b.Beat.Config = &b.Config.BeatConfig
@@ -901,23 +932,25 @@ func (b *Beat) configure(settings Settings) error {
 
 	logger.Infof("Beat ID: %v", b.Info.ID)
 
-	// Try to get the host's FQDN and set it.
-	h, err := sysinfo.Host()
-	if err != nil {
-		return fmt.Errorf("failed to get host information: %w", err)
-	}
+	if b.hostnameOverride == "" {
+		// Try to get the host's FQDN and set it.
+		h, err := sysinfo.Host()
+		if err != nil {
+			return fmt.Errorf("failed to get host information: %w", err)
+		}
 
-	fqdnLookupCtx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
-	defer cancel()
+		fqdnLookupCtx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+		defer cancel()
 
-	fqdn, err := h.FQDNWithContext(fqdnLookupCtx)
-	if err != nil {
-		// FQDN lookup is "best effort".  We log the error, fallback to
-		// the OS-reported hostname, and move on.
-		logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
-		b.Info.FQDN = b.Info.Hostname
-	} else {
-		b.Info.FQDN = fqdn
+		fqdn, err := h.FQDNWithContext(fqdnLookupCtx)
+		if err != nil {
+			// FQDN lookup is "best effort".  We log the error, fallback to
+			// the OS-reported hostname, and move on.
+			logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
+			b.Info.FQDN = b.Info.Hostname
+		} else {
+			b.Info.FQDN = fqdn
+		}
 	}
 
 	// initialize config manager
@@ -1499,7 +1532,7 @@ func isElasticsearchOutput(name string) bool {
 	return name == "elasticsearch"
 }
 
-func InitPaths(cfg *config.C) error {
+func InitPaths(cfg *config.C) (*paths.Path, error) {
 	// To Fix the chicken-egg problem with the Keystore and the loading of the configuration
 	// files we are doing a partial unpack of the configuration file and only take into consideration
 	// the paths field. After we will unpack the complete configuration and keystore reference
@@ -1509,14 +1542,14 @@ func InitPaths(cfg *config.C) error {
 	}{}
 
 	if err := cfg.Unpack(&partialConfig); err != nil {
-		return fmt.Errorf("error extracting default paths: %w", err)
+		return nil, fmt.Errorf("error extracting default paths: %w", err)
 	}
 
-	//nolint:forbidigo // existing global paths initialization for the standalone beat entry point.
-	if err := paths.InitPaths(&partialConfig.Path); err != nil {
-		return fmt.Errorf("error setting default paths: %w", err)
+	p := paths.New()
+	if err := p.InitPaths(&partialConfig.Path); err != nil {
+		return nil, fmt.Errorf("error setting default paths: %w", err)
 	}
-	return nil
+	return p, nil
 }
 
 // every IP address received from `Info()` has a netmask suffix
