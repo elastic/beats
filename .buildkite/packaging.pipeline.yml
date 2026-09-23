@@ -10,8 +10,8 @@ env:
 
   PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
   PLATFORMS_ARM: "+all linux/arm64 darwin/arm64 windows/arm64"
-  PLATFORMS_AMD64_FIPS: "+all linux/amd64"
-  PLATFORMS_ARM64_FIPS: "+all linux/arm64"
+  PLATFORMS_AMD64_FIPS: "+all linux/amd64 windows/amd64"
+  PLATFORMS_ARM64_FIPS: "+all linux/arm64 windows/arm64"
 
 # This section is used to define the plugins that will be used in the pipeline.
 # See https://buildkite.com/docs/pipelines/integrations/plugins/using#using-yaml-anchors-with-plugins
@@ -187,7 +187,7 @@ steps:
           - x-pack/packetbeat
           - x-pack/winlogbeat
 
-      - label: "SNAPSHOT: {{matrix}} Linux/amd64 FIPS"
+      - label: "SNAPSHOT: {{matrix}} Linux/amd64 and Windows/amd64 FIPS"
         env:
           PLATFORMS: "${PLATFORMS_AMD64_FIPS}"
           SNAPSHOT: true
@@ -214,7 +214,7 @@ steps:
           - x-pack/filebeat
           - x-pack/metricbeat
 
-      - label: "SNAPSHOT: {{matrix}} Linux/arm64 FIPS"
+      - label: "SNAPSHOT: {{matrix}} Linux/arm64 and Windows/arm64 FIPS"
         env:
           PLATFORMS: "${PLATFORMS_ARM64_FIPS}"
           SNAPSHOT: true
@@ -323,7 +323,7 @@ steps:
           - x-pack/packetbeat
           - x-pack/winlogbeat
 
-      - label: "STAGING: {{matrix}} Linux/amd64 FIPS"
+      - label: "STAGING: {{matrix}} Linux/amd64 and Windows/amd64 FIPS"
         env:
           PLATFORMS: "${PLATFORMS_AMD64_FIPS}"
           SNAPSHOT: false
@@ -352,7 +352,7 @@ steps:
           - x-pack/filebeat
           - x-pack/metricbeat
 
-      - label: "STAGING: {{matrix}} Linux/arm64 FIPS"
+      - label: "STAGING: {{matrix}} Linux/arm64 and Windows/arm64 FIPS"
         env:
           PLATFORMS: "${PLATFORMS_ARM64_FIPS}"
           SNAPSHOT: false

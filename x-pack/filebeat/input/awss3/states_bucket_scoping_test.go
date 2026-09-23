@@ -24,8 +24,10 @@ type diskBackedStatestore struct {
 	registry *statestore.Registry
 }
 
-func (s *diskBackedStatestore) StoreKey() string { return fmt.Sprintf("disk:%p", s.registry) }
-func (s *diskBackedStatestore) StoreFor(string) (*statestore.Store, error) {
+func (s *diskBackedStatestore) StoreKey(_, _ string) string {
+	return fmt.Sprintf("disk:%p", s.registry)
+}
+func (s *diskBackedStatestore) StoreFor(_, _ string) (*statestore.Store, error) {
 	return s.registry.Get("filebeat")
 }
 func (s *diskBackedStatestore) CleanupInterval() time.Duration { return 24 * time.Hour }
