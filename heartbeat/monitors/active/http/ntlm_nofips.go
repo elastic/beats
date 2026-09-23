@@ -17,35 +17,19 @@
 
 //go:build !requirefips
 
-package kerberos
+package http
 
 import (
-	"fmt"
-	"strings"
+	"net/http"
+
+	ntlmssp "github.com/Azure/go-ntlmssp"
 )
 
-func (c *Config) Validate() error {
-	switch c.AuthType {
-	case authPassword:
-		if c.Username == "" {
-			return fmt.Errorf("password authentication is selected for Kerberos, but username is not configured")
-		}
-		if c.Password == "" {
-			return fmt.Errorf("password authentication is selected for Kerberos, but password is not configured")
-		}
-
-	case authKeytab:
-		if c.KeyTabPath == "" {
-			return fmt.Errorf("keytab authentication is selected for Kerberos, but path to keytab is not configured")
-		}
-	default:
-		return ErrInvalidAuthType
-	}
-
-	hasPath := strings.TrimSpace(c.ConfigPath) != ""
-	hasInline := strings.TrimSpace(c.Krb5Conf) != ""
-	if hasPath == hasInline {
-		return fmt.Errorf("kerberos requires exactly one of config_path or krb5_conf")
-	}
-	return nil
+// wrapNTLMRoundTripper adds the NTLM negotiator. FIPS builds reject this
+// because NTLM uses MD4/RC4 (see ntlm_fips.go).
+func wrapNTLMRoundTripper(rt http.RoundTripper, ntlm *NTLMConfig) (http.RoundTripper, error) {
+	return ntlmssp.Negotiator{
+		RoundTripper:    rt,
+		WorkstationName: ntlm.Workstation,
+	}, nil
 }
