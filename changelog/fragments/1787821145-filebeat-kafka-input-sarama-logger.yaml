@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: Wire Sarama client logs in the Filebeat Kafka input so consumer-group lifecycle is visible.
+component: filebeat
+issue: https://github.com/elastic/beats/issues/51305

@@ -7,6 +7,10 @@ osquerybeat:
 #    - type: osquery
 #      osquery:
 #        elastic_options:
+#          # Optional deadline for the osqueryd --version startup check. Uses Go
+#          # duration format. Default: 15s. Increase on hosts where antivirus
+#          # scanning delays the first osqueryd exec.
+#          #check_timeout: 15s
 #          query_profile_storage:
 #            # Enable local storage of live query profiles.
 #            #enabled: true
@@ -475,7 +479,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -623,7 +627,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -934,7 +938,7 @@ setup.kibana:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -1187,7 +1191,7 @@ logging.files:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are

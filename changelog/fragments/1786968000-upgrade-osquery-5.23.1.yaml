@@ -1,7 +1,0 @@
-kind: upgrade
-
-summary: upgrade osquery version to 5.23.1
-
-description: osquery 5.23.1 fixes memory-safety issues in Windows process and Authenticode tables and Linux process file events, and hardens temporary carve directory permissions.
-
-component: osquerybeat
