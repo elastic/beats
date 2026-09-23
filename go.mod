@@ -175,7 +175,7 @@ require (
 	github.com/elastic/go-freelru v0.16.0
 	github.com/elastic/go-quark v0.8.0
 	github.com/elastic/go-sfdc v0.0.0-20260504130806-a46e22d049d9
-	github.com/elastic/mito v1.27.0
+	github.com/elastic/mito v1.28.0
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
 	github.com/elastic/sarama v1.19.1-0.20260310070522-abae92ca1603
 	github.com/elastic/tk-btf v0.2.0
@@ -185,7 +185,6 @@ require (
 	github.com/go-resty/resty/v2 v2.17.2
 	github.com/gofrs/uuid/v5 v5.3.2
 	github.com/golang-jwt/jwt/v5 v5.3.1
-	github.com/google/cel-go v0.28.0
 	github.com/googleapis/gax-go/v2 v2.23.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
@@ -228,6 +227,7 @@ require (
 )
 
 require (
+	cel.dev/cel-go v0.32.0
 	github.com/alexbrainman/sspi v0.0.0-20250919150558-7d374ff0d59e
 	github.com/apache/arrow-go/v18 v18.4.1
 	github.com/cilium/ebpf v0.22.0
