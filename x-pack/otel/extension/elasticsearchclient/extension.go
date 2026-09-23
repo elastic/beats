@@ -202,7 +202,7 @@ func (e *elasticsearchClient) Shutdown(_ context.Context) error {
 // The signature matches eslegclient.Connection.Request.
 // The underlying connection is not goroutine-safe; the
 // entire call, including JSON encoding and response buffering, runs under the
-// a request mutex. The returned body is copied so callers can use it
+// request mutex. The returned body is copied so callers can use it
 // after Request returns.
 func (e *elasticsearchClient) Request(
 	method, path, pipeline string,
