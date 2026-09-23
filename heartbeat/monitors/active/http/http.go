@@ -76,16 +76,10 @@ func create(
 		return plugin.Plugin{}, err
 	}
 
-	// Determine whether we're using a proxy or not and then use that to figure out how to
-	// run the job
 	var makeJob func(string) (jobs.Job, error)
-	// In the event that a ProxyURL is present, redirect support is enabled, or a
-	// challenge/response authentication scheme (Kerberos or NTLM) is configured,
-	// we execute DNS resolution requests inline with the request, not running them
-	// as a separate job, and not returning separate DNS rtt data. The custom
-	// SimpleTransport used by the per-IP path is a single write/read with no
-	// connection reuse, so it cannot perform the 401-challenge handshakes those
-	// schemes require.
+	// Proxy, redirects, Kerberos, and NTLM need http.Transport. The per-IP
+	// SimpleTransport is one write/read with no connection reuse, so it cannot
+	// finish a 401 challenge or follow a redirect.
 	if (config.Transport.Proxy.URL != nil && !config.Transport.Proxy.Disable) ||
 		config.MaxRedirects > 0 ||
 		config.Kerberos.IsEnabled() ||
@@ -138,10 +132,8 @@ func newRoundTripper(config *Config, userAgent string) (http.RoundTripper, error
 		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}),
 	}
 
-	// NTLM binds the authenticated session to the underlying TCP connection, so
-	// the negotiate/challenge/authenticate legs must travel over the same
-	// keep-alive connection. For every other case we keep the historical
-	// behaviour of disabling keep-alives so each ping uses a fresh connection.
+	// NTLM keeps the TCP connection for the whole handshake. Other checks
+	// disable keep-alives so each ping uses a fresh connection.
 	if !config.NTLM.IsEnabled() {
 		opts = append(opts, httpcommon.WithKeepaliveSettings{Disable: true})
 	}
@@ -152,9 +144,6 @@ func newRoundTripper(config *Config, userAgent string) (http.RoundTripper, error
 	}
 
 	if config.NTLM.IsEnabled() {
-		// The Negotiator converts the request's Basic auth credentials into an
-		// NTLM/Negotiate handshake against the wrapped transport. This is gated
-		// off in FIPS builds (see ntlm_fips.go).
 		rt, err = wrapNTLMRoundTripper(rt, config.NTLM)
 		if err != nil {
 			return nil, err

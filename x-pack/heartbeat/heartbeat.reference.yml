@@ -191,18 +191,15 @@ heartbeat.monitors:
   #username: ''
   #password: ''
 
-  # Kerberos/SPNEGO (Negotiate) authentication. Mutually exclusive with basic
-  # auth (username/password) and ntlm. Only usable from on-prem/Private Location
-  # agents that can reach the KDC. Not available in FIPS builds.
+  # Kerberos/SPNEGO. Mutually exclusive with username/password and ntlm.
+  # Requires a Private Location that can reach the KDC. Not available in FIPS builds.
   #kerberos:
     #enabled: true
     # Authentication type: 'password' or 'keytab'.
     #auth_type: password
     # Kerberos realm, e.g. EXAMPLE.COM.
     #realm: ''
-    # krb5.conf describing the realm and KDC. Set exactly one of config_path
-    # (a file on the agent) or krb5_conf (the file body, so Fleet can ship it
-    # with the monitor).
+    # Exactly one of config_path (file on the agent) or krb5_conf (inline body).
     #config_path: /etc/krb5.conf
     #krb5_conf: |
     #  [libdefaults]
@@ -216,23 +213,19 @@ heartbeat.monitors:
     #password: ''
     # Keytab path when auth_type is 'keytab'.
     #keytab: ''
-    # Optional SPN override, e.g. HTTP/host.example.com. Derived from the URL by
-    # default.
+    # Optional SPN override, e.g. HTTP/host.example.com. Empty derives it from the URL.
     #service_name: ''
-    # Enables Kerberos FAST authentication. This may conflict with certain
-    # Active Directory configurations. Default: false.
+    # Kerberos FAST. Can conflict with some Active Directory setups. Default: false.
     #enable_krb5_fast: false
 
-  # NTLM (Integrated Windows Authentication). Mutually exclusive with basic auth
-  # and kerberos. Not available in FIPS builds.
+  # NTLM. Mutually exclusive with username/password and kerberos. Not available in FIPS builds.
   #ntlm:
     #enabled: true
     #username: ''
     #password: ''
-    # Optional when the domain is encoded in the username as "DOMAIN\user" or
-    # "user@domain".
+    # Optional when username is already "DOMAIN\user" or "user@domain".
     #domain: ''
-    # Optional client machine name included in the NTLM negotiate message.
+    # Optional client name sent in the negotiate message.
     #workstation: ''
 
   # TLS/SSL connection settings for use with HTTPS endpoint. If not configured,

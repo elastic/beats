@@ -50,11 +50,9 @@ type Config struct {
 	Enabled    *bool    `config:"enabled" yaml:"enabled,omitempty"`
 	AuthType   AuthType `config:"auth_type" validate:"required"`
 	KeyTabPath string   `config:"keytab"`
-	// ConfigPath is a krb5.conf file on the agent. Mutually exclusive with Krb5Conf.
+	// ConfigPath is a krb5.conf file on the host. Mutually exclusive with Krb5Conf.
 	ConfigPath string `config:"config_path"`
-	// Krb5Conf is an inline krb5.conf, so the realm and KDC travel with the
-	// monitor instead of requiring a file on every agent. Mutually exclusive
-	// with ConfigPath.
+	// Krb5Conf is an inline krb5.conf. Mutually exclusive with ConfigPath.
 	Krb5Conf    string `config:"krb5_conf"`
 	ServiceName string `config:"service_name"`
 	Username    string `config:"username"`

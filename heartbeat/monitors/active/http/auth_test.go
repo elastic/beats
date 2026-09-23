@@ -28,9 +28,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
-// kerberosTestConfig returns a non-nil Kerberos config so the block is treated
-// as "enabled". These tests never contact a KDC, so the auth_type/keytab fields
-// (normally validated during config unpacking) are irrelevant here.
+// kerberosTestConfig is an enabled Kerberos block. These tests do not contact a KDC.
 func kerberosTestConfig() *kerberosSettings {
 	return &kerberosSettings{Config: &kerberos.Config{
 		Realm:      "CORP.LOCAL",

@@ -25,10 +25,8 @@ import (
 	ntlmssp "github.com/Azure/go-ntlmssp"
 )
 
-// wrapNTLMRoundTripper wraps the transport with the NTLM negotiator, which
-// converts the request's Basic auth credentials into an NTLM/Negotiate
-// handshake. NTLM relies on MD4/RC4, so it is unavailable in FIPS builds (see
-// ntlm_fips.go).
+// wrapNTLMRoundTripper adds the NTLM negotiator. FIPS builds reject this
+// because NTLM uses MD4/RC4 (see ntlm_fips.go).
 func wrapNTLMRoundTripper(rt http.RoundTripper, ntlm *NTLMConfig) (http.RoundTripper, error) {
 	return ntlmssp.Negotiator{
 		RoundTripper:    rt,

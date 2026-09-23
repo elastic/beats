@@ -26,9 +26,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
-// kerberosSettings wraps kerberos.Config so the `kerberos` field can unpack
-// either a nested object (heartbeat.yml) or a base64-encoded YAML/JSON blob
-// (synthetics integration / Fleet).
+// kerberosSettings unpacks a nested object or a base64 YAML/JSON string.
 type kerberosSettings struct {
 	*kerberos.Config
 }
@@ -50,8 +48,7 @@ func (k *kerberosSettings) Unpack(v any) error {
 	return nil
 }
 
-// ntlmPlain is NTLMConfig without Unpack, so ucfg can fill the struct tags
-// without recursing into NTLMConfig.Unpack.
+// ntlmPlain drops Unpack so ucfg fills the fields without calling it again.
 type ntlmPlain NTLMConfig
 
 func (n *NTLMConfig) Unpack(v any) error {

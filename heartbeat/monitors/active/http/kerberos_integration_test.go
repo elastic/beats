@@ -46,8 +46,7 @@ func TestHTTPMonitorKerberosHandshake(t *testing.T) {
 	require.NoError(t, err, "reading krb5 config")
 	requireReachable(t, target)
 
-	// service_name is pinned to the fixture principal. DNS search domains can
-	// otherwise rewrite localhost and ask the KDC for a different SPN.
+	// Pin the fixture principal. A DNS search domain can rewrite localhost into another SPN.
 	tests := []struct {
 		name string
 		key  string
@@ -88,8 +87,7 @@ func TestHTTPMonitorKerberosHandshake(t *testing.T) {
 	}
 }
 
-// requireReachable skips the test when the SPNEGO target cannot be dialed, so
-// local runs without the docker fixture skip cleanly instead of failing.
+// requireReachable skips locally and fails in CI when the fixture is down.
 func requireReachable(t *testing.T, rawURL string) {
 	t.Helper()
 	u, err := url.Parse(rawURL)

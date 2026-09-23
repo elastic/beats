@@ -161,8 +161,7 @@ func TestRedirectLimitIndependentOfVia(t *testing.T) {
 	var redirects []string
 	checker := makeCheckRedirect(limit, &redirects)
 
-	// The Kerberos SPNEGO client follows each hop with a new Client.Do(), so
-	// via never accumulates. The limit must still apply.
+	// SPNEGO starts a new Client.Do per hop, so via stays length 1. The limit still applies.
 	via := []*http.Request{makeTestHTTPRequest(t)}
 	for range limit - 1 {
 		req := makeTestHTTPRequest(t)

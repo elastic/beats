@@ -24,9 +24,7 @@ import (
 	"net/http"
 )
 
-// wrapNTLMRoundTripper rejects NTLM in FIPS builds: the protocol depends on
-// non-FIPS-approved primitives (MD4/RC4), and the go-ntlmssp implementation is
-// intentionally not linked into FIPS binaries.
+// wrapNTLMRoundTripper rejects NTLM in FIPS builds because it depends on MD4/RC4.
 func wrapNTLMRoundTripper(_ http.RoundTripper, _ *NTLMConfig) (http.RoundTripper, error) {
 	return nil, errors.New("ntlm authentication is not supported in fips mode")
 }

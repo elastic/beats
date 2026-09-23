@@ -53,9 +53,7 @@ import (
 
 type requestFactory func() (*http.Request, error)
 
-// httpDoer abstracts the subset of *http.Client used to execute a ping so the
-// monitor can transparently swap in the Kerberos SPNEGO client, which performs
-// the Negotiate handshake on top of a standard *http.Client.
+// httpDoer is the Do subset shared by *http.Client and the Kerberos SPNEGO client.
 type httpDoer interface {
 	Do(req *http.Request) (*http.Response, error)
 }
@@ -81,8 +79,7 @@ func newHTTPMonitorHostJob(
 			Timeout:       config.Transport.Timeout,
 		}
 
-		// Kerberos wraps the standard client so it can transparently answer the
-		// SPNEGO 401 challenge. NTLM is handled at the transport level instead.
+		// Kerberos answers the SPNEGO challenge on the client. NTLM does it on the transport.
 		var doer httpDoer = client
 		if config.Kerberos.IsEnabled() {
 			krbClient, err := kerberos.NewClient(config.Kerberos.Config, client)
@@ -228,14 +225,11 @@ func buildRequest(addr string, config *Config, enc contentEncoder) (*http.Reques
 
 	switch {
 	case config.NTLM.IsEnabled():
-		// NTLM negotiates over a persistent connection, so the connection must
-		// not be closed between the handshake legs. The negotiator reads the
-		// credentials from the request's Basic auth header.
+		// Keep the connection open for the handshake. The negotiator reads these Basic credentials.
 		request.Close = false
 		request.SetBasicAuth(config.NTLM.authUsername(), config.NTLM.Password)
 	case config.Kerberos.IsEnabled():
-		// The SPNEGO client sets the Authorization header during the Negotiate
-		// handshake, so nothing to add here.
+		// SPNEGO sets Authorization during the handshake.
 	case config.Username != "":
 		request.SetBasicAuth(config.Username, config.Password)
 	}
@@ -410,8 +404,7 @@ func makeCheckRedirect(max int, redirects *[]string) func(*http.Request, []*http
 		n := len(via)
 		if redirects != nil {
 			*redirects = append(*redirects, r.URL.String())
-			// Count our list, not via. The Kerberos SPNEGO client intercepts
-			// each hop and starts a new Do(), which resets via.
+			// SPNEGO starts a new Do per hop, which resets via, so count our own list.
 			n = len(*redirects)
 		}
 

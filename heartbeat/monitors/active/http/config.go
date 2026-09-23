@@ -41,12 +41,10 @@ type Config struct {
 	Username string `config:"username"`
 	Password string `config:"password"`
 
-	// Kerberos/SPNEGO (Negotiate) authentication. Accepts a nested object or a
-	// base64-encoded YAML/JSON string of that object (Fleet / synthetics).
+	// Kerberos accepts a nested object or a base64 YAML/JSON string.
 	Kerberos *kerberosSettings `config:"kerberos"`
 
-	// NTLM (Integrated Windows Authentication) authentication. Accepts a nested
-	// object or a base64-encoded YAML/JSON string of that object.
+	// NTLM accepts a nested object or a base64 YAML/JSON string.
 	NTLM *NTLMConfig `config:"ntlm"`
 
 	// http(s) ping validation
@@ -55,28 +53,23 @@ type Config struct {
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 }
 
-// NTLMConfig holds the credentials used for NTLM (NTLMv1/NTLMv2)
-// authentication against the monitored endpoint.
+// NTLMConfig is the NTLM credential block for an HTTP monitor.
 type NTLMConfig struct {
 	Enabled  *bool  `config:"enabled"`
 	Username string `config:"username"`
 	Password string `config:"password"`
-	// Domain is optional when the domain is already encoded in the username
-	// as "DOMAIN\\user" or "user@domain".
+	// Domain is optional when Username is already "DOMAIN\\user" or "user@domain".
 	Domain string `config:"domain"`
-	// Workstation is the client machine name sent in the NTLM negotiate
-	// message. Optional; some servers record it for auditing.
+	// Workstation is the optional client name sent in the negotiate message.
 	Workstation string `config:"workstation"`
 }
 
-// IsEnabled returns true when the NTLM block is present and not explicitly
-// disabled. It is safe to call on a nil receiver.
+// IsEnabled reports whether NTLM is on. Safe to call on a nil receiver.
 func (n *NTLMConfig) IsEnabled() bool {
 	return n != nil && (n.Enabled == nil || *n.Enabled)
 }
 
-// authUsername returns the username in the "DOMAIN\\user" form expected by the
-// NTLM negotiator, combining the separate domain field when provided.
+// authUsername returns DOMAIN\user when Domain is set and Username has neither \ nor @.
 func (n *NTLMConfig) authUsername() string {
 	if n.Domain != "" && !strings.ContainsAny(n.Username, `\@`) {
 		return n.Domain + `\` + n.Username
@@ -84,7 +77,7 @@ func (n *NTLMConfig) authUsername() string {
 	return n.Username
 }
 
-// Validate validates the NTLMConfig object.
+// Validate checks that enabled NTLM has a username and password.
 func (n *NTLMConfig) Validate() error {
 	if !n.IsEnabled() {
 		return nil
@@ -221,8 +214,6 @@ func (c *Config) Validate() error {
 		return fmt.Errorf("hosts is a mandatory parameter")
 	}
 
-	// Only a single authentication scheme can be active at once: basic
-	// (username/password), Kerberos, or NTLM.
 	authMethods := 0
 	if c.Username != "" || c.Password != "" {
 		authMethods++

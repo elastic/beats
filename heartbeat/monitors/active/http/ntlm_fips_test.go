@@ -31,8 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
-// TestNTLMRejectedInFIPS verifies NTLM monitors fail to build in FIPS mode,
-// since NTLM relies on non-FIPS-approved primitives (MD4/RC4).
+// TestNTLMRejectedInFIPS checks a FIPS build refuses NTLM, which depends on MD4/RC4.
 func TestNTLMRejectedInFIPS(t *testing.T) {
 	cfg, err := conf.NewConfigFrom(map[string]any{
 		"hosts": "http://localhost:9200",

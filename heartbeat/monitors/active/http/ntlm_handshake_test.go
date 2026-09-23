@@ -15,8 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// NTLM is unavailable in FIPS builds, so this end-to-end handshake test (which
-// constructs the NTLM transport via create) only runs in non-FIPS builds.
+// NTLM uses MD4/RC4, so this handshake test is non-FIPS only.
 //go:build !requirefips
 
 package http
@@ -39,10 +38,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
-// TestHTTPMonitorNTLMHandshake drives the full monitor against a server that
-// emulates the NTLM challenge. It proves the Negotiator is wired into the
-// transport: the server must observe a well-formed NTLM negotiate token and the
-// monitor must report the final authenticated response.
+// TestHTTPMonitorNTLMHandshake checks the monitor completes an NTLM negotiate against a fake challenge.
 func TestHTTPMonitorNTLMHandshake(t *testing.T) {
 	var mu sync.Mutex
 	var negotiateToken []byte
@@ -52,16 +48,14 @@ func TestHTTPMonitorNTLMHandshake(t *testing.T) {
 		authz := r.Header.Get("Authorization")
 		switch {
 		case authz == "":
-			// Anonymous attempt: ask the client to start NTLM.
+			// No Authorization yet: challenge with NTLM.
 			mu.Lock()
 			sawAnonymous = true
 			mu.Unlock()
 			w.Header().Set("WWW-Authenticate", "NTLM")
 			w.WriteHeader(http.StatusUnauthorized)
 		case strings.HasPrefix(authz, "NTLM "):
-			// The negotiate message arrived; capture it and accept. Returning a
-			// non-401 here ends the handshake per RFC 4559, which is enough to
-			// prove the negotiator engaged end-to-end.
+			// Negotiate token arrived. A non-401 ends the handshake (RFC 4559).
 			tok, _ := base64.StdEncoding.DecodeString(strings.TrimPrefix(authz, "NTLM "))
 			mu.Lock()
 			negotiateToken = tok

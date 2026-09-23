@@ -15,9 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Kerberos config unpacking is rejected in FIPS builds (libbeat's
-// kerberos.Config.Validate), so these success-path cases only run without
-// the requirefips tag.
+// Kerberos validation rejects FIPS builds, so these unpack cases are non-FIPS only.
 //go:build !requirefips
 
 package http
