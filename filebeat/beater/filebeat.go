@@ -123,7 +123,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		return nil, err
 	}
 
-	if err := config.FetchConfigs(b.Info.Logger); err != nil {
+	if err := config.FetchConfigs(b.Info.Logger, b.Info.Paths); err != nil {
 		return nil, err
 	}
 

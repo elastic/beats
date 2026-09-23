@@ -190,6 +190,69 @@ and if not matched the hints will be processed and if there is again no valid co
 the `hints.default_config` will be used.
 
 [float]
+==== Restrict hints-generated input types
+
+Hints can render any {beatname_uc} input type. `hints.input_allow_list` restricts which
+input types a hints-generated configuration can start.
+
+The option is disabled by default. When enabled, {beatname_uc} defaults to allowing inputs
+that read log files (`filestream`, `container`, and `log`). The allowed list can be overridden.
+
+`hints.input_allow_list.enabled`::
+Defaults to `false`. When enabled, {beatname_uc} filters hints-generated input types.
+
+`hints.input_allow_list.types`::
+List of allowed input type names. If empty or missing, it defaults to `filestream`,
+`container`, and `log`.
+
+When filtering is enabled, {beatname_uc} inspects the rendered input configuration after
+template interpolation. Direct input `type` values and nested module fileset `input.type`
+values are both checked. Any input or fileset with unreadable or disallowed type is rejected.
+Each rejection is logged at warning level.
+
+This Kubernetes example enables the allow list with the defaults:
+
+[source,yaml]
+-----
+filebeat.autodiscover:
+  providers:
+    - type: kubernetes
+      hints.enabled: true
+      hints.input_allow_list:
+        enabled: true
+      hints.default_config:
+        type: filestream
+        id: kubernetes-container-logs-${data.kubernetes.container.id}
+        close.on_state_change.removed: false
+        prospector:
+          scanner:
+            fingerprint.enabled: true
+            symlinks: true
+        file_identity.fingerprint: ~
+        parsers:
+          - container:
+              stream: all
+              format: auto
+        paths:
+          - /var/log/containers/*-${data.kubernetes.container.id}.log
+-----
+
+To replace the defaults, set `hints.input_allow_list.types` to the input types {beatname_uc}
+can start from hints. For example, to only allow the `filestream` input type:
+
+[source,yaml]
+-----
+filebeat.autodiscover:
+  providers:
+    - type: kubernetes
+      hints.enabled: true
+      hints.input_allow_list:
+        enabled: true
+        types:
+          - filestream
+-----
+
+[float]
 ==== Kubernetes
 
 Kubernetes autodiscover provider supports hints in Pod annotations. To enable it just set `hints.enabled`:
