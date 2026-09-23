@@ -514,15 +514,20 @@ func (k *kubernetesAnnotator) Close() error {
 
 func (k *kubernetesAnnotator) addPod(indexers *Indexers, pod *kubernetes.Pod) {
 	uid := string(pod.GetObjectMeta().GetUID())
-	// evict stale entries first; informer resync re-fires AddFunc for existing pods
-	k.deleteRecordedIndexes(uid)
-	metadatas := indexers.GetMetadata(pod)
-	indexes := make([]string, 0, len(metadatas))
-	for _, m := range metadatas {
-		k.cache.set(m.Index, m.Data)
-		indexes = append(indexes, m.Index)
+	// Load old keys before computing new metadata so the swap is atomic.
+	var oldKeys []string
+	if prev, ok := k.indexed.LoadAndDelete(uid); ok {
+		oldKeys, _ = prev.([]string)
 	}
-	k.indexed.Store(uid, indexes)
+	// Compute new metadata outside the lock — may be slow for pods with many containers.
+	metadatas := indexers.GetMetadata(pod)
+	// Atomically evict old entries and write new ones; readers see old state or new, never partial.
+	k.cache.batchUpdate(oldKeys, metadatas)
+	newKeys := make([]string, 0, len(metadatas))
+	for _, m := range metadatas {
+		newKeys = append(newKeys, m.Index)
+	}
+	k.indexed.Store(uid, newKeys)
 }
 
 // deleteRecordedIndexes evicts all cache keys previously stored for uid by addPod.

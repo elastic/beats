@@ -84,6 +84,21 @@ func (c *cache) set(key string, data mapstr.M) {
 	c.metadata[key] = data
 }
 
+// batchUpdate atomically marks toDelete keys for eviction and writes toAdd entries
+// in a single lock acquisition. Readers see either the old state or the new state,
+// never a partially-written intermediate.
+func (c *cache) batchUpdate(toDelete []string, toAdd []MetadataIndex) {
+	c.Lock()
+	defer c.Unlock()
+	for _, key := range toDelete {
+		c.deleted[key] = time.Now().Add(c.timeout)
+	}
+	for _, m := range toAdd {
+		delete(c.deleted, m.Index)
+		c.metadata[m.Index] = m.Data
+	}
+}
+
 func (c *cache) cleanup() {
 	if timeout <= 0 {
 		return
