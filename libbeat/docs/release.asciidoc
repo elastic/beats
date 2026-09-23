@@ -8,6 +8,7 @@ This section summarizes the changes in each release. Also read
 <<breaking-changes>> for more detail about changes that affect
 upgrade.
 
+* <<release-notes-8.19.21>>
 * <<release-notes-8.19.20>>
 * <<release-notes-8.19.19>>
 * <<release-notes-8.19.18>>

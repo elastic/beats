@@ -29,6 +29,7 @@ import (
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
@@ -109,7 +110,7 @@ func newS3PagerConstant(listPrefix string) *s3PagerConstant {
 		currentIndex: 0,
 	}
 
-	for i := 0; i < totalListingObjectsForInputS3; i++ {
+	for i := range totalListingObjectsForInputS3 {
 		ret.objects = append(ret.objects, s3Types.Object{
 			Key:          aws.String(fmt.Sprintf("%s-%d.json.gz", listPrefix, i)),
 			ETag:         aws.String(fmt.Sprintf("etag-%s-%d", listPrefix, i)),
@@ -304,7 +305,7 @@ func TestBenchmarkInputSQS(t *testing.T) {
 
 func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult {
 	return testing.Benchmark(func(b *testing.B) {
-		log := logp.NewLogger(inputName)
+		log := logptest.NewTestingLogger(t, inputName)
 		log.Infof("benchmark with %d number of workers", numberOfWorkers)
 
 		metrics := newInputMetrics(monitoring.NewRegistry(), numberOfWorkers, logp.NewNopLogger())
@@ -327,7 +328,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 
 		errChan := make(chan error)
 		wg := new(sync.WaitGroup)
-		for i := 0; i < 5; i++ {
+		for i := range 5 {
 			wg.Add(1)
 			go func(i int, wg *sync.WaitGroup) {
 				defer wg.Done()
@@ -337,12 +338,12 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 				s3API.pagerConstant = newS3PagerConstant(curConfig.BucketListPrefix)
 				store := openTestStatestore()
 
-				states, err := newStates(nil, store, "")
+				states, err := newStates(nil, store, "", "")
 				assert.NoError(t, err, "states creation should succeed")
 
 				s3EventHandlerFactory := newS3ObjectProcessorFactory(metrics, s3API, config.FileSelectors, backupConfig{}, logp.NewNopLogger())
 				s3Poller := &s3PollerInput{
-					log:             logp.NewLogger(inputName),
+					log:             log,
 					config:          config,
 					metrics:         metrics,
 					s3:              s3API,

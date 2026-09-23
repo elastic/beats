@@ -121,6 +121,15 @@ func (c *config) Validate() error {
 		return errors.New("crc.provider is required when crc.secret is defined")
 	}
 
+	// net/http panics for status codes outside this range, which would drop
+	// the client's connection with no response at all.
+	if c.ResponseCode < 100 || c.ResponseCode > 999 {
+		return fmt.Errorf("response_code must be a valid HTTP status code: %d", c.ResponseCode)
+	}
+	if len(c.OptionsHeaders) > 0 && (c.OptionsStatus < 100 || 999 < c.OptionsStatus) {
+		return fmt.Errorf("options_response_code must be a valid HTTP status code: %d", c.OptionsStatus)
+	}
+
 	if c.MaxBodySize != nil && *c.MaxBodySize < 0 {
 		return fmt.Errorf("max_body_bytes is negative: %d", *c.MaxBodySize)
 	}
