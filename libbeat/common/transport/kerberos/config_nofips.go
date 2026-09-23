@@ -42,13 +42,6 @@ func (c *Config) Validate() error {
 		return ErrInvalidAuthType
 	}
 
-	return c.validateKrb5Source()
-}
-
-// validateKrb5Source requires exactly one krb5 config source. A file suits
-// agents that already have krb5.conf; the inline body suits Fleet, where the
-// config has to travel with the monitor.
-func (c *Config) validateKrb5Source() error {
 	hasPath := strings.TrimSpace(c.ConfigPath) != ""
 	hasInline := strings.TrimSpace(c.Krb5Conf) != ""
 	if hasPath == hasInline {

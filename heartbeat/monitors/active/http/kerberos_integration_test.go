@@ -36,99 +36,56 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
-// TestHTTPMonitorKerberosHandshake drives the HTTP monitor against a real
-// SPNEGO/Negotiate-protected endpoint backed by an MIT KDC. Both the KDC and
-// the SPNEGO server are provided by the heartbeat_kerberos docker fixture
-// (see heartbeat/docker-compose.yml); the client authenticates with password
-// auth using the committed testdata/krb5.conf, so no keytab is needed host-side.
-//
-// CI runs this via heartbeat's Ubuntu "Go Integration Tests" step
-// (`mage goIntegTest`), which starts docker-compose then `go test -tags integration`
-// on the host against localhost:8080 / localhost:1088.
-//
-// Run locally with:
-//
-//	cd testing/environments/docker/heartbeat_kerberos && docker build -t hb-kdc:latest .
-//	docker run -d --name hb-kdc -p 1088:88 -p 1088:88/udp -p 18080:8080 hb-kdc:latest
-//	HB_KRB5_TARGET=http://localhost:18080/ go test -tags integration \
-//	    -run TestHTTPMonitorKerberosHandshake ./heartbeat/monitors/active/http/...
+// TestHTTPMonitorKerberosHandshake checks password auth against the heartbeat_kerberos fixture.
 func TestHTTPMonitorKerberosHandshake(t *testing.T) {
-	krb5Conf := envOr("HB_KRB5_CONF", "testdata/krb5.conf")
-	target := envOr("HB_KRB5_TARGET", "http://localhost:8080/")
-	realm := envOr("HB_KRB5_REALM", "EXAMPLE.COM")
-	user := envOr("HB_KRB5_USER", "testuser")
-	pass := envOr("HB_KRB5_PASS", "testpass")
-
-	_, err := os.Stat(krb5Conf)
-	require.NoError(t, err, "krb5 config %q must exist (committed testdata/krb5.conf, or set HB_KRB5_CONF)", krb5Conf)
+	const (
+		target   = "http://localhost:8080/"
+		confPath = "testdata/krb5.conf"
+	)
+	body, err := os.ReadFile(confPath)
+	require.NoError(t, err, "reading krb5 config")
 	requireReachable(t, target)
 
-	cfgSrc := map[string]any{
-		"hosts":   target,
-		"timeout": "15s",
-		"kerberos": map[string]any{
-			"enabled":     true,
-			"auth_type":   "password",
-			"username":    user,
-			"password":    pass,
-			"realm":       realm,
-			"config_path": krb5Conf,
-			// Fixture principal is HTTP/localhost. Pin it so a DNS search domain
-			// cannot rewrite the SPN (for example localhost -> localhost.router).
-			"service_name": "HTTP/localhost",
-		},
+	// service_name is pinned to the fixture principal. DNS search domains can
+	// otherwise rewrite localhost and ask the KDC for a different SPN.
+	tests := []struct {
+		name string
+		key  string
+		val  any
+	}{
+		{name: "config file", key: "config_path", val: confPath},
+		{name: "inline krb5_conf", key: "krb5_conf", val: string(body)},
 	}
-	cfg, err := conf.NewConfigFrom(cfgSrc)
-	require.NoError(t, err)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg, err := conf.NewConfigFrom(map[string]any{
+				"hosts":   target,
+				"timeout": "15s",
+				"kerberos": map[string]any{
+					"enabled":      true,
+					"auth_type":    "password",
+					"username":     "testuser",
+					"password":     "testpass",
+					"realm":        "EXAMPLE.COM",
+					"service_name": "HTTP/localhost",
+					tc.key:         tc.val,
+				},
+			})
+			require.NoError(t, err)
 
-	p, err := create("kerberos", cfg, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
-	require.NoError(t, err)
-	require.Equal(t, 1, p.Endpoints)
+			p, err := create("kerberos", cfg, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
+			require.NoError(t, err)
+			require.Equal(t, 1, p.Endpoints)
 
-	event := &beat.Event{}
-	_, err = p.Jobs[0](event)
-	require.NoError(t, err, "kerberos-authenticated ping should succeed")
+			event := &beat.Event{}
+			_, err = p.Jobs[0](event)
+			require.NoError(t, err, "kerberos-authenticated ping should succeed")
 
-	statusCode, err := event.GetValue("http.response.status_code")
-	require.NoError(t, err, "event must carry the response status code")
-	assert.Equal(t, 200, statusCode, "monitor should report the SPNEGO-authenticated response")
-}
-
-// TestHTTPMonitorKerberosInlineConf is the same handshake with the krb5.conf
-// body passed in the monitor config instead of a file on the agent.
-func TestHTTPMonitorKerberosInlineConf(t *testing.T) {
-	krb5Conf := envOr("HB_KRB5_CONF", "testdata/krb5.conf")
-	target := envOr("HB_KRB5_TARGET", "http://localhost:8080/")
-	body, err := os.ReadFile(krb5Conf)
-	require.NoError(t, err, "reading krb5 config %q", krb5Conf)
-	requireReachable(t, target)
-
-	cfgSrc := map[string]any{
-		"hosts":   target,
-		"timeout": "15s",
-		"kerberos": map[string]any{
-			"enabled":      true,
-			"auth_type":    "password",
-			"username":     envOr("HB_KRB5_USER", "testuser"),
-			"password":     envOr("HB_KRB5_PASS", "testpass"),
-			"realm":        envOr("HB_KRB5_REALM", "EXAMPLE.COM"),
-			"krb5_conf":    string(body),
-			"service_name": "HTTP/localhost",
-		},
+			statusCode, err := event.GetValue("http.response.status_code")
+			require.NoError(t, err, "event must carry the response status code")
+			assert.Equal(t, 200, statusCode, "monitor should report the SPNEGO-authenticated response")
+		})
 	}
-	cfg, err := conf.NewConfigFrom(cfgSrc)
-	require.NoError(t, err)
-
-	p, err := create("kerberos-inline", cfg, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
-	require.NoError(t, err)
-
-	event := &beat.Event{}
-	_, err = p.Jobs[0](event)
-	require.NoError(t, err, "inline krb5_conf should authenticate against the KDC")
-
-	statusCode, err := event.GetValue("http.response.status_code")
-	require.NoError(t, err, "event must carry the response status code")
-	assert.Equal(t, 200, statusCode, "monitor should report the SPNEGO-authenticated response")
 }
 
 // requireReachable skips the test when the SPNEGO target cannot be dialed, so
@@ -152,11 +109,4 @@ func requireReachable(t *testing.T, rawURL string) {
 		t.Skipf("SPNEGO target %q not reachable; start the heartbeat_kerberos fixture first: %v", rawURL, err)
 	}
 	_ = conn.Close()
-}
-
-func envOr(key, fallback string) string {
-	if v := os.Getenv(key); v != "" {
-		return v
-	}
-	return fallback
 }
