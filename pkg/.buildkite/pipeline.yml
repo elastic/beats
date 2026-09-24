@@ -1,0 +1,92 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+env:
+  SETUP_MAGE_VERSION: '1.16.0'
+  SETUP_GVM_VERSION: 'v0.6.0'
+
+steps:
+  - label: ":buildkite: Lint"
+    command:
+      - ".buildkite/scripts/lint.sh"
+    agents:
+      image: golang:${GO_VERSION}
+      cpu: "8"
+      memory: "4G"
+
+  - label: ":linux: Test Linux"
+    key: test-lin
+    command:
+      - ".buildkite/scripts/test.sh"
+    agents:
+      image: golang:${GO_VERSION}
+      cpu: "8"
+      memory: "4G"
+    artifact_paths:
+      - "junit-*.xml"
+
+    # Run unit tests with requirefips tag to validate functionality
+  - label: ":linux: Test Linux with requirefips build tag"
+    key: test-lin-fips-tag
+    command:
+      - ".buildkite/scripts/test.sh"
+    env:
+      FIPS: "true"
+    agents:
+      image: golang:${GO_VERSION}
+      cpu: "8"
+      memory: "4G"
+    artifact_paths:
+      - "junit-*.xml"
+
+    # Run unit tests with requirefips tag and GODEBUG=fips140=only
+    # This is a check against accidentally adding crypto that breaks FIPS compliance.
+  - label: ":linux: Test Linux fips140=only"
+    key: test-lin-fipsonly
+    command:
+      - ".buildkite/scripts/test-fipsonly.sh"
+    agents:
+      image: golang:${GO_VERSION}
+      cpu: "8"
+      memory: "4G"
+    artifact_paths:
+      - "junit-*.xml"
+
+  - label: ":windows: Test Windows"
+    key: test-win
+    command:
+      - ".buildkite/scripts/test.ps1"
+    agents:
+      provider: "gcp"
+      image: "family/core-windows-2019"
+    artifact_paths:
+      - "junit-*.xml"
+
+  - label: ":mac: Test MacOS"
+    key: test-mac
+    command:
+      - ".buildkite/scripts/test.sh junit-report-macos.xml"
+    agents:
+      provider: "orka"
+      imagePrefix: generic-13-ventura-x64
+    artifact_paths:
+      - "junit-*.xml"
+
+  - label: ":junit: Junit annotate"
+    agents:
+      # requires at least "bash", "curl" and "git"
+      image: "docker.elastic.co/ci-agent-images/buildkite-junit-annotate:1.0"
+    plugins:
+      - junit-annotate#v2.7.0:
+          artifacts: "junit-*.xml"
+          fail-build-on-error: true
+          run-in-docker: false
+    depends_on:
+      - step: "test-lin"
+        allow_failure: true
+      - step: "test-lin-fips-tag"
+        allow_failure: true
+      - step: "test-lin-fipsonly"
+        allow_failure: true
+      - step: "test-win"
+        allow_failure: true
+      - step: "test-mac"
+        allow_failure: true
