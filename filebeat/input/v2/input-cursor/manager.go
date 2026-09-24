@@ -21,6 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/elastic/go-concert/unison"
@@ -32,14 +33,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-<<<<<<< HEAD
-=======
-// globalCache shares cursor stores across the process.
-// Managers with the same cache key share one store and one background cleaner.
-// The cache closes the store after all managers and running inputs release it.
-var globalCache = statemanager.NewCache[*store](func(s *store) { s.Release() })
-
->>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
 // InputManager is used to create, manage, and coordinate stateful inputs and
 // their persistent state.
 // The InputManager ensures that only one input can be active for a unique source.
@@ -71,19 +64,21 @@ type InputManager struct {
 	// that will be used to collect events from each source.
 	Configure func(cfg *conf.C, log *logp.Logger) ([]Source, Input, error)
 
-<<<<<<< HEAD
-	initedFull   bool
-	initErr      error
-	store        *store
+	// mu protects stores and cleanerGroup. It is not held while a store opens or
+	// its cleaner starts, so a slow backend only delays Create for that store key.
+	mu sync.Mutex
+	// stores holds one entry per store key. Inputs whose IDs select different
+	// backends, as Elasticsearch does, must not share a store.
+	stores       map[string]*storeEntry
 	cleanerGroup unison.Group // saved from Init() for deferred cleaner start
-=======
-	// mu protects releases and closed from concurrent access.
-	// releases holds one globalCache release function for each store this manager uses.
-	// Close clears releases.
-	mu       sync.Mutex
-	releases map[string]func()
-	closed   bool
->>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
+}
+
+// storeEntry is a store that one Create call opens and the others with the same
+// store key wait for.
+type storeEntry struct {
+	ready chan struct{} // closed once store or err is set
+	store *store
+	err   error
 }
 
 // Source describe a source the input can collect data from.
@@ -98,56 +93,59 @@ var (
 	errNoInputRunner      = errors.New("no input runner available")
 )
 
-<<<<<<< HEAD
-// init initializes the state store with a full init (reading all states).
-// For ES-backed inputs, this is deferred until Create() where the inputID is known.
-func (cim *InputManager) init(inputID string) error {
-	if cim.initedFull {
-		return nil
-	}
-
-	if cim.DefaultCleanTimeout <= 0 {
-		cim.DefaultCleanTimeout = 30 * time.Minute
-	}
-
-	log := cim.Logger.With("input_type", cim.Type)
-	cim.store, cim.initErr = openStore(log, cim.StateStore, cim.Type, inputID, true)
-	if cim.initErr != nil {
-		return cim.initErr
-=======
-// cacheKey identifies the cursor store for this input type and ID.
+// storeKey identifies the cursor store for this input type and ID.
 // The key includes the type because each cursor store loads state for one type.
-func (cim *InputManager) cacheKey(inputID string) string {
+func (cim *InputManager) storeKey(inputID string) string {
 	return cim.StateStore.StoreKey(cim.Type, inputID) + "::" + cim.Type
 }
 
-// ensureSetup opens or reuses the store for inputID and returns its cache key.
-// Call ensureSetup without holding cim.mu.
-// It unlocks cim.mu before globalCache.Acquire, so Close can proceed while Acquire waits.
-func (cim *InputManager) ensureSetup(inputID string) (string, error) {
+// init opens the store for inputID, or returns the one already opened for that
+// key. Inputs whose IDs map to different backends get different stores, so an
+// Elasticsearch-backed input never reads or writes another input's index.
+// Each newly opened store gets its own cleaner once Init supplied a group.
+func (cim *InputManager) init(inputID string) (*store, error) {
+	key := cim.storeKey(inputID)
+
 	cim.mu.Lock()
-	if cim.closed {
+	if e, ok := cim.stores[key]; ok {
 		cim.mu.Unlock()
-		return "", errors.New("input manager is closed")
+		<-e.ready
+		return e.store, e.err
 	}
 	if cim.DefaultCleanTimeout <= 0 {
 		cim.DefaultCleanTimeout = 30 * time.Minute
 	}
-	key := cim.cacheKey(inputID)
-	if _, ok := cim.releases[key]; ok {
-		cim.mu.Unlock()
-		return key, nil
+	e := &storeEntry{ready: make(chan struct{})}
+	if cim.stores == nil {
+		cim.stores = make(map[string]*storeEntry)
 	}
-	log := cim.Logger.With("input_type", cim.Type)
-	interval := cim.StateStore.CleanupInterval()
-	if interval <= 0 {
-		interval = 5 * time.Minute
->>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
-	}
-	cim.initedFull = true
+	cim.stores[key] = e
+	group := cim.cleanerGroup
+	cim.mu.Unlock()
 
-<<<<<<< HEAD
-	return nil
+	// Open the store and start its cleaner without holding cim.mu: the
+	// Elasticsearch store waits for the output configuration before it reads
+	// state, and that must not block Create for other input IDs.
+	log := cim.Logger.With("input_type", cim.Type)
+	e.store, e.err = openStore(log, cim.StateStore, cim.Type, inputID, true)
+
+	// For ES-backed inputs the cleaner is deferred from Init() to here because
+	// the store isn't opened until init() is called with the inputID.
+	if e.err == nil && group != nil {
+		if err := cim.startCleaner(group, e.store); err != nil {
+			e.store, e.err = nil, err
+		}
+	}
+
+	if e.err != nil {
+		// Forget the failed entry so that a later Create can try again.
+		cim.mu.Lock()
+		delete(cim.stores, key)
+		cim.mu.Unlock()
+	}
+	close(e.ready)
+
+	return e.store, e.err
 }
 
 // Init starts background processes for deleting old entries from the
@@ -156,68 +154,24 @@ func (cim *InputManager) ensureSetup(inputID string) (string, error) {
 // inputID is known, so Init() only saves the group for later use.
 func (cim *InputManager) Init(group unison.Group) error {
 	if features.IsElasticsearchStateStoreEnabledForInput(cim.Type) {
+		cim.mu.Lock()
 		cim.cleanerGroup = group
+		cim.mu.Unlock()
 		return nil
 	}
 
-	if err := cim.init(""); err != nil {
-		return err
-=======
-	_, release, err := globalCache.Acquire(
-		key,
-		func() (*store, error) {
-			return openStore(log, cim.StateStore, cim.Type, inputID, true)
-		},
-		func(ctx context.Context, s *store) {
-			runCleaner(ctx, log, s, interval)
-		},
-		nil,
-		nil,
-	)
+	s, err := cim.init("")
 	if err != nil {
-		return "", err
+		return err
 	}
-
-	cim.mu.Lock()
-	defer cim.mu.Unlock()
-	if cim.closed {
-		release()
-		return "", errors.New("input manager is closed")
-	}
-	if _, ok := cim.releases[key]; ok {
-		// Another Create already added this key. Release the extra reference.
-		release()
-		return key, nil
-	}
-	if cim.releases == nil {
-		cim.releases = make(map[string]func())
-	}
-	cim.releases[key] = release
-	return key, nil
-}
-
-// Close releases all stores that this manager uses.
-// After the last user releases a store, the cache stops its cleaner and closes it.
-// Call Close after all inputs for this manager stop.
-func (cim *InputManager) Close() {
-	cim.mu.Lock()
-	cim.closed = true
-	releases := cim.releases
-	cim.releases = nil
-	cim.mu.Unlock()
-	for _, release := range releases {
-		release()
->>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
-	}
-	return cim.startCleaner(group)
+	return cim.startCleaner(group, s)
 }
 
 // startCleaner launches the background cleaner goroutine that removes stale
-// entries from the persistent store.
-func (cim *InputManager) startCleaner(group unison.Group) error {
+// entries from store. It runs one cleaner per store.
+func (cim *InputManager) startCleaner(group unison.Group, store *store) error {
 	log := cim.Logger.With("input_type", cim.Type)
 
-	store := cim.store
 	cleaner := &cleaner{log: log}
 	store.Retain()
 	// TL;DR: If Filebeat shuts down too quickly, the function passed to
@@ -229,7 +183,9 @@ func (cim *InputManager) startCleaner(group unison.Group) error {
 	waitRunning := make(chan struct{})
 	err := group.Go(func(canceler context.Context) error {
 		waitRunning <- struct{}{}
-		defer cim.shutdown()
+		// Release the reference opened by init() and the one retained above:
+		// the cleaner outlives every input using this store.
+		defer store.Release()
 		defer store.Release()
 		interval := cim.StateStore.CleanupInterval()
 		if interval <= 0 {
@@ -240,16 +196,12 @@ func (cim *InputManager) startCleaner(group unison.Group) error {
 	})
 	if err != nil {
 		store.Release()
-		cim.shutdown()
+		store.Release()
 		return fmt.Errorf("can not start registry cleanup process: %w", err)
 	}
 
 	<-waitRunning
 	return nil
-}
-
-func (cim *InputManager) shutdown() {
-	cim.store.Release()
 }
 
 // Create builds a new v2.Input using the provided Configure function.
@@ -263,22 +215,9 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		return nil, err
 	}
 
-<<<<<<< HEAD
-	if err := cim.init(settings.ID); err != nil {
-=======
-	cacheKey, err := cim.ensureSetup(settings.ID)
+	store, err := cim.init(settings.ID)
 	if err != nil {
->>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
 		return nil, err
-	}
-
-	// For ES-backed inputs, the cleaner is deferred from Init() to here
-	// because the store isn't created until init() is called with the inputID.
-	if cim.cleanerGroup != nil {
-		if err := cim.startCleaner(cim.cleanerGroup); err != nil {
-			return nil, err
-		}
-		cim.cleanerGroup = nil
 	}
 
 	sources, inp, err := cim.Configure(config, cim.Logger)
@@ -295,37 +234,18 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	return &managedInput{
 		manager:      cim,
 		userID:       settings.ID,
-		cacheKey:     cacheKey,
+		store:        store,
 		sources:      sources,
 		input:        inp,
 		cleanTimeout: settings.CleanInactive,
 	}, nil
 }
 
-<<<<<<< HEAD
-// Lock locks a key for exclusive access and returns an resource that can be used to modify
-// the cursor state and unlock the key.
-func (cim *InputManager) lock(ctx v2.Context, key string) (*resource, error) {
-	resource := cim.store.Get(key)
-=======
-// acquireLease keeps the store open while the caller uses it.
-// It returns ok=false if the manager is closed or the cache entry is inactive.
-// Call the returned release function exactly once.
-func (cim *InputManager) acquireLease(cacheKey string) (*store, func(), bool) {
-	cim.mu.Lock()
-	closed := cim.closed
-	cim.mu.Unlock()
-	if closed {
-		return nil, func() {}, false
-	}
-	return globalCache.Lease(cacheKey)
-}
-
 // lock gives the caller exclusive access to the cursor state for key.
-// The caller must hold a lease to keep store open until it releases the resource.
+// The store stays open until its cleaner stops, which happens after every input
+// using it has returned.
 func lock(ctx v2.Context, store *store, key string) (*resource, error) {
 	resource := store.Get(key)
->>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
 	err := lockResource(ctx.Logger, resource, ctx.Cancelation)
 	if err != nil {
 		resource.Release()

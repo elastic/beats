@@ -60,9 +60,11 @@ type Input interface {
 // continues. Only after all Run calls have returned will the managedInput be
 // done.
 type managedInput struct {
-	manager      *InputManager
-	userID       string
-	cacheKey     string
+	manager *InputManager
+	userID  string
+	// store holds the cursor state for this input. Inputs with different IDs
+	// can use different stores, so the input cannot read it off the manager.
+	store        *store
 	sources      []Source
 	input        Input
 	cleanTimeout time.Duration
@@ -121,18 +123,6 @@ func (inp *managedInput) Run(
 	// stage.)
 	monitoring.NewString(ctx.MetricsRegistry, "input").Set(inputmon.InputNested)
 
-<<<<<<< HEAD
-=======
-	// Acquire a lease on the shared store. This increments the cache user
-	// count so the store cannot be drained by a concurrent Close() call
-	// until all source goroutines have finished and leaseRelease is called.
-	store, leaseRelease, ok := inp.manager.acquireLease(inp.cacheKey)
-	if !ok {
-		return errors.New("input manager store is not available")
-	}
-	defer leaseRelease()
-
->>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
 	var grp unison.MultiErrGroup
 	for _, source := range inp.sources {
 		grp.Go(func() (err error) {
@@ -159,7 +149,7 @@ func (inp *managedInput) Run(
 			}
 			inpCtx = inpCtx.WithStatusReporter(ctx)
 
-			if err = inp.runSource(inpCtx, inp.manager.store, source, pc); err != nil {
+			if err = inp.runSource(inpCtx, inp.store, source, pc); err != nil {
 				cancel()
 			}
 			return err

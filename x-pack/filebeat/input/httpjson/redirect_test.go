@@ -438,11 +438,7 @@ func TestConvertHttpjsonToCel(t *testing.T) {
 	})
 
 	t.Run("realistic_full_config", func(t *testing.T) {
-<<<<<<< HEAD
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
-=======
-		cfg := conf.MustNewConfigFrom(map[string]any{ //nolint:gosec // dummy credentials in a test fixture
->>>>>>> eda1030 (statestore: scope the Elasticsearch state store by input id (#53178))
+		cfg := conf.MustNewConfigFrom(map[string]interface{}{ //nolint:gosec // dummy credentials in a test fixture
 			"type":        "httpjson",
 			"id":          "okta-system-log",
 			"interval":    "120s",

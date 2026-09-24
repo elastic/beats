@@ -49,7 +49,7 @@ func TestStoreCache_AcquireHit(t *testing.T) {
 	require.Equal(t, int32(1), firstStates.storeForCalls.Load())
 	require.Zero(t, secondStates.storeForCalls.Load())
 
-	entry := snapshotStoreCacheEntry(firstStates.StoreKey())
+	entry := snapshotStoreCacheEntry(firstStates.StoreKey("", ""))
 	require.True(t, entry.found)
 	require.Equal(t, storeActive, entry.state)
 	require.Equal(t, 2, entry.users)
@@ -85,7 +85,7 @@ func TestStoreCache_LastReleaseDrainsStore(t *testing.T) {
 	require.NoError(t, err)
 
 	releaseAcquiredStore(logger, first)
-	entry := snapshotStoreCacheEntry(states.StoreKey())
+	entry := snapshotStoreCacheEntry(states.StoreKey("", ""))
 	require.True(t, entry.found)
 	require.Equal(t, storeActive, entry.state)
 	require.Equal(t, 1, entry.users)
@@ -97,7 +97,7 @@ func TestStoreCache_LastReleaseDrainsStore(t *testing.T) {
 	}()
 	<-closeStarted
 
-	entry = snapshotStoreCacheEntry(states.StoreKey())
+	entry = snapshotStoreCacheEntry(states.StoreKey("", ""))
 	require.True(t, entry.found)
 	require.Equal(t, storeDraining, entry.state)
 	require.Zero(t, entry.users)
@@ -117,7 +117,7 @@ func TestStoreCache_AcquireWaitsForDrainingStore(t *testing.T) {
 	first.Retain() // Hold a short-lived getRetainedStore-style reference.
 	releaseAcquiredStore(logger, first)
 
-	entry := snapshotStoreCacheEntry(states.StoreKey())
+	entry := snapshotStoreCacheEntry(states.StoreKey("", ""))
 	require.True(t, entry.found)
 	require.Equal(t, storeDraining, entry.state)
 
@@ -249,7 +249,7 @@ func TestStoreCache_InitializationResetDoesNotLeakCleanerWaitGroup(t *testing.T)
 	<-states.firstStoreForStarted
 
 	globalStoreCache.mu.Lock()
-	entry := globalStoreCache.entries[states.StoreKey()]
+	entry := globalStoreCache.entries[states.StoreKey("", "")]
 	globalStoreCache.mu.Unlock()
 	require.NotNil(t, entry, "blocked initialization must have a cache entry")
 
@@ -357,8 +357,8 @@ func TestStoreCache_DifferentBackendsInitializeIndependently(t *testing.T) {
 	require.NotSame(t, first, second)
 
 	require.Equal(t, 2, storeCacheEntryCount(), "both backend cache entries must remain active")
-	require.True(t, snapshotStoreCacheEntry(firstStates.StoreKey()).found)
-	require.True(t, snapshotStoreCacheEntry(secondStates.StoreKey()).found)
+	require.True(t, snapshotStoreCacheEntry(firstStates.StoreKey("", "")).found)
+	require.True(t, snapshotStoreCacheEntry(secondStates.StoreKey("", "")).found)
 	require.Equal(t, int32(1), firstStates.storeForCalls.Load())
 	require.Equal(t, int32(1), secondStates.storeForCalls.Load())
 	require.Eventually(t, func() bool {
@@ -399,7 +399,7 @@ func TestStoreCache_ConcurrentAcquireRelease(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	require.False(t, snapshotStoreCacheEntry(states.StoreKey()).found)
+	require.False(t, snapshotStoreCacheEntry(states.StoreKey("", "")).found)
 }
 
 func TestStoreCache_InvalidStateReturnsErrorAndUnlocks(t *testing.T) {
@@ -410,11 +410,11 @@ func TestStoreCache_InvalidStateReturnsErrorAndUnlocks(t *testing.T) {
 	const invalidState = storeCacheState(255)
 
 	globalStoreCache.mu.Lock()
-	globalStoreCache.entries[states.StoreKey()] = &storeCacheEntry{state: invalidState}
+	globalStoreCache.entries[states.StoreKey("", "")] = &storeCacheEntry{state: invalidState}
 	globalStoreCache.mu.Unlock()
 	t.Cleanup(func() {
 		if globalStoreCache.mu.TryLock() {
-			delete(globalStoreCache.entries, states.StoreKey())
+			delete(globalStoreCache.entries, states.StoreKey("", ""))
 			globalStoreCache.mu.Unlock()
 			return
 		}

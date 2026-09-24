@@ -20,6 +20,7 @@ package cursor
 import (
 	"errors"
 	"fmt"
+	"sync"
 	"testing"
 	"time"
 
@@ -281,6 +282,36 @@ func (ts *esStateStore) StoreKey(_, id string) string {
 
 func (ts *esStateStore) StoreFor(_, id string) (*statestore.Store, error) {
 	return ts.registry.Get(id)
+}
+
+// gatedESStateStore is an esStateStore whose StoreFor waits, for each input ID
+// in gates, until that gate closes. It counts StoreFor calls per input ID.
+type gatedESStateStore struct {
+	*esStateStore
+	gates map[string]chan struct{}
+
+	mu    sync.Mutex
+	calls map[string]int
+}
+
+func (ts *gatedESStateStore) StoreFor(typ, id string) (*statestore.Store, error) {
+	ts.mu.Lock()
+	if ts.calls == nil {
+		ts.calls = make(map[string]int)
+	}
+	ts.calls[id]++
+	ts.mu.Unlock()
+
+	if gate, ok := ts.gates[id]; ok {
+		<-gate
+	}
+	return ts.esStateStore.StoreFor(typ, id)
+}
+
+func (ts *gatedESStateStore) storeForCalls(id string) int {
+	ts.mu.Lock()
+	defer ts.mu.Unlock()
+	return ts.calls[id]
 }
 
 // snapshotFor returns the saved state for the input ID.

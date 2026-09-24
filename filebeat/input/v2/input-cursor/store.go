@@ -150,6 +150,7 @@ func openStore(log *logp.Logger, statestore statestore.States, prefix string, in
 	}, nil
 }
 
+func (s *store) Retain() { s.refCount.Retain() }
 func (s *store) Release() {
 	if s.refCount.Release() {
 		closeStore(s)
