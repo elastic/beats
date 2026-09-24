@@ -25,6 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 	bolt "go.etcd.io/bbolt"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
@@ -62,10 +63,10 @@ func TestDistinctPathsAreIsolated(t *testing.T) {
 	require.NotEqual(t, resolvedDBPath(p1), resolvedDBPath(p2),
 		"the two test paths must resolve to different beat.db files")
 
-	b1, err := OpenBucket("k", p1)
+	b1, err := OpenBucket("k", p1, logp.NewNopLogger())
 	require.NoError(t, err, "OpenBucket on first path")
 	t.Cleanup(func() { assert.NoError(t, b1.Close(), "Close on first bucket") })
-	b2, err := OpenBucket("k", p2)
+	b2, err := OpenBucket("k", p2, logp.NewNopLogger())
 	require.NoError(t, err, "OpenBucket on second path")
 	t.Cleanup(func() { assert.NoError(t, b2.Close(), "Close on second bucket") })
 
@@ -81,7 +82,7 @@ func TestDistinctPathsAreIsolated(t *testing.T) {
 // TestDoubleCloseIsNoop documents the public-API contract: Close is
 // idempotent. Refcount safety is covered by TestDoubleCloseDoesNotStealSiblingRef.
 func TestDoubleCloseIsNoop(t *testing.T) {
-	b, err := OpenBucket("k", pathsAt(t))
+	b, err := OpenBucket("k", pathsAt(t), logp.NewNopLogger())
 	require.NoError(t, err, "OpenBucket")
 	assert.NoError(t, b.Close(), "first Close should succeed")
 	assert.NoError(t, b.Close(), "second Close on the same bucket must be a no-op")
@@ -91,7 +92,7 @@ func TestDoubleCloseIsNoop(t *testing.T) {
 // inside a transaction that commits before the named bucket is returned,
 // so the migration's writes are observable through the returned Bucket.
 func TestOpenBucketWithMigrationVisible(t *testing.T) {
-	migrate := func(tx *bolt.Tx) error {
+	migrate := func(tx *bolt.Tx, logger *logp.Logger) error {
 		bk, err := tx.CreateBucketIfNotExists([]byte("dst"))
 		if err != nil {
 			return err
@@ -99,7 +100,7 @@ func TestOpenBucketWithMigrationVisible(t *testing.T) {
 		return bk.Put([]byte("seed"), []byte("ok"))
 	}
 
-	b, err := OpenBucketWithMigration("dst", pathsAt(t), migrate)
+	b, err := OpenBucketWithMigration("dst", pathsAt(t), logp.NewNopLogger(), migrate)
 	require.NoError(t, err, "OpenBucketWithMigration")
 	t.Cleanup(func() { assert.NoError(t, b.Close(), "Close after migration") })
 
@@ -114,7 +115,7 @@ func TestOpenBucketWithMigrationVisible(t *testing.T) {
 func TestOpenBucketWithMigrationErrorPropagated(t *testing.T) {
 	wantErr := errors.New("boom")
 
-	b, err := OpenBucketWithMigration("dst", pathsAt(t), func(*bolt.Tx) error {
+	b, err := OpenBucketWithMigration("dst", pathsAt(t), logp.NewNopLogger(), func(*bolt.Tx, *logp.Logger) error {
 		return wantErr
 	})
 	require.Error(t, err, "OpenBucketWithMigration must surface the migration error")

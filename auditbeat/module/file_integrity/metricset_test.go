@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
@@ -73,7 +74,7 @@ func TestActions(t *testing.T) {
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
 	skipOnBuildkiteDarwinArm(t)
 
-	bucket, err := datastore.OpenBucket(bucketName, paths.New())
+	bucket, err := datastore.OpenBucket(bucketName, paths.New(), logp.NewNopLogger())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -174,7 +175,7 @@ func TestExcludedFiles(t *testing.T) {
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
 	skipOnBuildkiteDarwinArm(t)
 
-	bucket, err := datastore.OpenBucket(bucketName, paths.New())
+	bucket, err := datastore.OpenBucket(bucketName, paths.New(), logp.NewNopLogger())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -224,7 +225,7 @@ func TestIncludedExcludedFiles(t *testing.T) {
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
 	skipOnBuildkiteDarwinArm(t)
 
-	bucket, err := datastore.OpenBucket(bucketName, paths.New())
+	bucket, err := datastore.OpenBucket(bucketName, paths.New(), logp.NewNopLogger())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -459,7 +460,7 @@ func (e expectedEvent) validate(t *testing.T, ms *MetricSet) {
 type expectedEvents []expectedEvent
 
 func (e expectedEvents) validate(t *testing.T) {
-	bucket, err := datastore.OpenBucket(bucketName, testPaths(t.TempDir()))
+	bucket, err := datastore.OpenBucket(bucketName, testPaths(t.TempDir()), logp.NewNopLogger())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -724,7 +725,7 @@ func TestEventFailedHash(t *testing.T) {
 }
 
 func TestEventDelete(t *testing.T) {
-	bucket, err := datastore.OpenBucket(bucketName, testPaths(t.TempDir()))
+	bucket, err := datastore.OpenBucket(bucketName, testPaths(t.TempDir()), logp.NewNopLogger())
 	if err != nil {
 		t.Fatal(err)
 	}

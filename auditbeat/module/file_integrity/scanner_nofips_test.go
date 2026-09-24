@@ -24,6 +24,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -46,7 +47,7 @@ func Test_Scanner_Executable(t *testing.T) {
 	}
 	defer os.Remove(target)
 
-	reader, err := NewFileSystemScanner(c, nil)
+	reader, err := NewFileSystemScanner(c, nil, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -24,6 +24,7 @@ import (
 
 	bolt "go.etcd.io/bbolt"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
@@ -47,7 +48,7 @@ type boltDB struct {
 var defaultRegistry = &registry{dbs: map[string]*boltDB{}}
 
 // openBucket acquires the database for p, optionally runs migrate, ensures the bucket exists, and returns it.
-func (r *registry) openBucket(name string, p *paths.Path, migrate func(tx *bolt.Tx) error) (Bucket, error) {
+func (r *registry) openBucket(name string, p *paths.Path, logger *logp.Logger, migrate func(tx *bolt.Tx, logger *logp.Logger) error) (Bucket, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -62,7 +63,7 @@ func (r *registry) openBucket(name string, p *paths.Path, migrate func(tx *bolt.
 	nameBytes := []byte(name)
 	err = db.Update(func(tx *bolt.Tx) error {
 		if migrate != nil {
-			if err := migrate(tx); err != nil {
+			if err := migrate(tx, logger); err != nil {
 				return fmt.Errorf("datastore migration failed: %w", err)
 			}
 		}

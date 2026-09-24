@@ -34,6 +34,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
@@ -95,6 +96,7 @@ func newHTTPMonitorIPsJob(
 	body []byte,
 	validator multiValidator,
 	userAgent string,
+	logger *logp.Logger,
 ) (jobs.Job, error) {
 
 	var reqFactory requestFactory = func() (*http.Request, error) { return buildRequest(addr, config, enc) }
@@ -104,7 +106,7 @@ func newHTTPMonitorIPsJob(
 		return nil, err
 	}
 
-	pingFactory := createPingFactory(config, port, tls, reqFactory, body, validator, userAgent)
+	pingFactory := createPingFactory(config, port, tls, reqFactory, body, validator, userAgent, logger)
 	job, err := monitors.MakeByHostJob(hostname, config.Mode, monitors.NewStdResolver(), pingFactory)
 
 	return job, err
@@ -118,6 +120,7 @@ func createPingFactory(
 	body []byte,
 	validator multiValidator,
 	userAgent string,
+	logger *logp.Logger,
 ) func(*net.IPAddr) jobs.Job {
 	timeout := config.Transport.Timeout
 
@@ -134,7 +137,7 @@ func createPingFactory(
 		}
 
 		if isTLS {
-			d.AddLayer(dialchain.TLSLayer(tls, timeout))
+			d.AddLayer(dialchain.TLSLayer(tls, timeout, logger))
 		}
 
 		dialer, err := d.Build(event)

@@ -20,6 +20,7 @@ package monitor
 import (
 	"fmt"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/fsnotify/fsnotify"
 )
 
@@ -39,7 +40,7 @@ type Watcher interface {
 
 // New creates a new Watcher backed by fsnotify with optional recursive
 // logic.
-func New(recursive bool, isExcludedPath func(path string) bool) (Watcher, error) {
+func New(recursive bool, isExcludedPath func(path string) bool, logger *logp.Logger) (Watcher, error) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		return nil, fmt.Errorf("error creating new watcher: %w", err)
@@ -47,7 +48,7 @@ func New(recursive bool, isExcludedPath func(path string) bool) (Watcher, error)
 	// Use our simulated recursive watches unless the fsnotify implementation
 	// supports OS-provided recursive watches
 	if recursive && watcher.SetRecursive() != nil {
-		return newRecursiveWatcher(watcher, isExcludedPath), nil //nolint:nilerr // Ignore SetRecursive() errors.
+		return newRecursiveWatcher(watcher, isExcludedPath, logger), nil //nolint:nilerr // Ignore SetRecursive() errors.
 	}
 	return (*nonRecursiveWatcher)(watcher), nil
 }
