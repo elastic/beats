@@ -21,6 +21,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/config/configauth"
+	"go.opentelemetry.io/collector/config/confighttp"
 	"go.opentelemetry.io/collector/config/configopaque"
 	"go.opentelemetry.io/collector/config/configoptional"
 	"go.opentelemetry.io/collector/confmap"
@@ -421,6 +422,26 @@ unknown_key: value
 			require.NoError(t, config.Validate(), "supported decoded configuration must validate")
 		})
 	}
+}
+
+func TestProgrammaticKeepaliveOverridesFlattenedFields(t *testing.T) {
+	config := validConfig()
+	config.ClientConfig.DisableKeepAlives = true
+	config.ClientConfig.MaxIdleConns = 1
+	config.ClientConfig.MaxIdleConnsPerHost = 2
+	config.ClientConfig.IdleConnTimeout = time.Second
+	config.ClientConfig.Keepalive = configoptional.Some(confighttp.KeepaliveClientConfig{
+		MaxIdleConns:        10,
+		MaxIdleConnsPerHost: 20,
+		IdleConnTimeout:     30 * time.Second,
+	})
+
+	transport, err := newAuthenticator(config, nil).newTransport()
+	require.NoError(t, err)
+	require.False(t, transport.DisableKeepAlives)
+	require.Equal(t, 10, transport.MaxIdleConns)
+	require.Equal(t, 20, transport.MaxIdleConnsPerHost)
+	require.Equal(t, 30*time.Second, transport.IdleConnTimeout)
 }
 
 func TestAuthenticationRoundTrip(t *testing.T) {

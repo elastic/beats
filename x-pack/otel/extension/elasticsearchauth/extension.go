@@ -86,17 +86,22 @@ func (a *authenticator) newTransport() (*http.Transport, error) {
 		transport.WriteBufferSize = a.config.ClientConfig.WriteBufferSize
 	}
 
-	// confighttp folds its current keepalive section into these fields during
-	// unmarshaling so both current and deprecated configuration remain
-	// losslessly represented while the upstream deprecation window is active.
-	//nolint:staticcheck // confighttp.ClientConfig documents these as its effective decoded values.
-	transport.DisableKeepAlives = a.config.ClientConfig.DisableKeepAlives
-	//nolint:staticcheck // confighttp.ClientConfig documents these as its effective decoded values.
-	transport.MaxIdleConns = a.config.ClientConfig.MaxIdleConns
-	//nolint:staticcheck // confighttp.ClientConfig documents these as its effective decoded values.
-	transport.MaxIdleConnsPerHost = a.config.ClientConfig.MaxIdleConnsPerHost
-	//nolint:staticcheck // confighttp.ClientConfig documents these as its effective decoded values.
-	transport.IdleConnTimeout = a.config.ClientConfig.IdleConnTimeout
+	// Keepalive remains populated only in programmatic configurations and takes precedence, matching confighttp.ToClient.
+	if keepalive := a.config.ClientConfig.Keepalive.Get(); keepalive != nil {
+		transport.DisableKeepAlives = false
+		transport.MaxIdleConns = keepalive.MaxIdleConns
+		transport.MaxIdleConnsPerHost = keepalive.MaxIdleConnsPerHost
+		transport.IdleConnTimeout = keepalive.IdleConnTimeout
+	} else {
+		//nolint:staticcheck // confighttp.ClientConfig documents these as its effective decoded values.
+		transport.DisableKeepAlives = a.config.ClientConfig.DisableKeepAlives
+		//nolint:staticcheck // confighttp.ClientConfig documents these as its effective decoded values.
+		transport.MaxIdleConns = a.config.ClientConfig.MaxIdleConns
+		//nolint:staticcheck // confighttp.ClientConfig documents these as its effective decoded values.
+		transport.MaxIdleConnsPerHost = a.config.ClientConfig.MaxIdleConnsPerHost
+		//nolint:staticcheck // confighttp.ClientConfig documents these as its effective decoded values.
+		transport.IdleConnTimeout = a.config.ClientConfig.IdleConnTimeout
+	}
 	transport.MaxConnsPerHost = a.config.ClientConfig.MaxConnsPerHost
 	transport.ForceAttemptHTTP2 = a.config.ClientConfig.ForceAttemptHTTP2
 	if a.config.ClientConfig.ProxyURL != "" {
