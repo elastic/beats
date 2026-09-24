@@ -1742,11 +1742,11 @@ SOFTWARE
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-sdk-for-go/sdk/azidentity
-Version: v1.14.0
+Version: v1.14.1
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/azidentity@v1.14.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/azidentity@v1.14.1/LICENSE.txt:
 
 MIT License
 
@@ -36746,11 +36746,11 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/auto
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/go-autorest/autorest/to
-Version: v0.4.0
+Version: v0.4.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/autorest/to@v0.4.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/autorest/to@v0.4.1/LICENSE:
 
 
                                  Apache License
@@ -36947,11 +36947,11 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/auto
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/go-autorest/autorest/validation
-Version: v0.3.1
+Version: v0.3.2
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/autorest/validation@v0.3.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/autorest/validation@v0.3.2/LICENSE:
 
 
                                  Apache License
@@ -37148,11 +37148,11 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/auto
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/go-autorest/logger
-Version: v0.2.1
+Version: v0.2.2
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/logger@v0.2.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/logger@v0.2.2/LICENSE:
 
 
                                  Apache License
@@ -37349,11 +37349,11 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/logg
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/go-autorest/tracing
-Version: v0.6.0
+Version: v0.6.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/tracing@v0.6.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/tracing@v0.6.1/LICENSE:
 
 
                                  Apache License
@@ -37612,11 +37612,11 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure!a!d/microsoft-au
 
 --------------------------------------------------------------------------------
 Dependency : github.com/AzureAD/microsoft-authentication-library-for-go
-Version: v1.7.2
+Version: v1.8.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure!a!d/microsoft-authentication-library-for-go@v1.7.2/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure!a!d/microsoft-authentication-library-for-go@v1.8.0/LICENSE:
 
     MIT License
 
