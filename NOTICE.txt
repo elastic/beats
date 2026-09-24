@@ -1985,11 +1985,11 @@ SOFTWARE
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-sdk-for-go/sdk/azidentity
-Version: v1.14.0
+Version: v1.14.1
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/azidentity@v1.14.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/azidentity@v1.14.1/LICENSE.txt:
 
 MIT License
 
@@ -19483,11 +19483,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/microsoft/go-mssqldb
-Version: v1.11.0
+Version: v1.11.2
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/microsoft/go-mssqldb@v1.11.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/microsoft/go-mssqldb@v1.11.2/LICENSE.txt:
 
 Copyright (c) 2012 The Go Authors. All rights reserved.
 Copyright (c) Microsoft Corporation.
@@ -42193,11 +42193,11 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure!a!d/microsoft-au
 
 --------------------------------------------------------------------------------
 Dependency : github.com/AzureAD/microsoft-authentication-library-for-go
-Version: v1.7.2
+Version: v1.8.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure!a!d/microsoft-authentication-library-for-go@v1.7.2/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure!a!d/microsoft-authentication-library-for-go@v1.8.0/LICENSE:
 
     MIT License
 
