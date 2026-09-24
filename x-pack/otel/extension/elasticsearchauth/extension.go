@@ -117,6 +117,7 @@ func (a *authenticatedRoundTripper) RoundTrip(request *http.Request) (*http.Resp
 	if clonedRequest.Header == nil {
 		clonedRequest.Header = make(http.Header)
 	}
+
 	if host, found := a.config.Headers.Get("Host"); found && host != "" {
 		clonedRequest.Host = string(host)
 	}
