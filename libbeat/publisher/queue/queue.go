@@ -18,6 +18,8 @@
 package queue
 
 import (
+	"time"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -50,6 +52,17 @@ type Queue[T any] interface {
 	// Get retrieves a batch of up to eventCount events. If eventCount <= 0,
 	// there is no bound on the number of returned events.
 	Get(eventCount int) (Batch[T], error)
+}
+
+type UnblockingQueue[T any] interface {
+	Queue[T]
+	// Unblocking Get retrieves a batch of up to eventCount events without blocking.
+	// If the queue is empty, it returns nil.
+	TryGet(eventCount int) (Batch[T], error)
+	// ReadyChan returns a channel that notifies when the queue is ready to be read.
+	ReadyChan() <-chan struct{}
+	// GetDebounce returns the debounce time of the queue.
+	GetDebounce() time.Duration
 }
 
 // If encoderFactory is provided, then the resulting queue must use it to

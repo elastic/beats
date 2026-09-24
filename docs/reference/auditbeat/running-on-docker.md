@@ -154,9 +154,37 @@ COPY auditbeat.yml /usr/share/auditbeat/auditbeat.yml
 
 ## Special requirements [_special_requirements]
 
-Under Docker, Auditbeat runs as a non-root user, but requires some privileged capabilities to operate correctly. Ensure that the `AUDIT_CONTROL` and `AUDIT_READ` capabilities are available to the container.
+Auditbeat modules and datasets have different privilege requirements. The following table shows the minimum privileges needed for each component when running on Docker. Capabilities are given as the name you pass to `--cap-add`. Grant only the privileges your configuration actually uses.
 
-It is also essential to run Auditbeat in the host PID namespace.
+| Component | Required privileges | `--pid=host` | Volume mounts |
+|---|---|---|---|
+| **auditd** (multicast, default) | `AUDIT_READ` | No | — |
+| **auditd** (unicast) | `AUDIT_CONTROL`, `AUDIT_READ` | **Yes** | — |
+| **file_integrity** (fsnotify, default) | None | No | Paths to monitor (read-only) |
+| **file_integrity** (kprobes) | `SYS_ADMIN` | No | `-v /sys:/sys` |
+| **file_integrity** (ebpf) | `SYS_ADMIN`, `BPF` | No | `-v /sys:/sys` |
+| **system/host** | None | No | — |
+| **system/login** | None (utmp group membership) | No | `-v /var/log:/var/log:ro` |
+| **system/package** (dpkg) | None | No | `-v /var/lib/dpkg:/var/lib/dpkg:ro` |
+| **system/package** (RPM) | None (or root for RPM DB) | No | `-v /var/lib/rpm:/var/lib/rpm:ro` |
+| **system/process** | `SYS_PTRACE` (recommended) | **Yes** | — |
+| **system/socket** | `SYS_ADMIN`, `NET_RAW` | No | `-v /sys:/sys` |
+| **system/user** (default) | None | No | — |
+| **system/user** (`detect_password_changes: true`) | None (shadow group) | No | `-v /etc/shadow:/etc/shadow:ro` |
+| **add_session_metadata** (procfs) | `SYS_PTRACE` (or root) | **Yes** | — |
+| **add_session_metadata** (kernel_tracing/kprobes) | Root (`--user=root`) | **Yes** | `-v /sys/kernel/debug:/sys/kernel/debug` |
+| **add_session_metadata** (kernel_tracing/eBPF) | Root (`--user=root`) | **Yes** | `-v /sys/kernel/debug:/sys/kernel/debug -v /sys/fs/bpf:/sys/fs/bpf` |
+
+For more details on what each component requires and why, refer to the individual module and dataset pages:
+
+* [Auditd module](/reference/auditbeat/auditbeat-module-auditd.md)
+* [File Integrity module](/reference/auditbeat/auditbeat-module-file_integrity.md)
+* [System module](/reference/auditbeat/auditbeat-module-system.md)
+* [Add session metadata processor](/reference/auditbeat/add-session-metadata.md)
+
+**Typical full-featured setup**
+
+The volume-mounted configuration example earlier in this page uses `--cap-add=AUDIT_CONTROL --cap-add=AUDIT_READ --pid=host` — the minimum needed for the `auditd` module in unicast mode. If you also enable the `system/socket` dataset or `add_session_metadata` with kernel tracing, add the additional flags from the preceding table.
 
 ```sh subs=true
 docker run --cap-add=AUDIT_CONTROL --cap-add=AUDIT_READ --user=root --pid=host docker.elastic.co/beats/auditbeat:{{version.stack}}

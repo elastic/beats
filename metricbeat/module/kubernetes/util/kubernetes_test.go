@@ -23,6 +23,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -504,7 +505,7 @@ func TestEnricherStopUsesPointerOwnershipAndEvictsFinalWatcher(t *testing.T) {
 
 	funcs := mockFuncs{}
 	config := &kubernetesConfig{
-		AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig(),
+		AddResourceMetadata: &metadata.AddResourceMetadataConfig{},
 	}
 	log := logptest.NewTestingLogger(t, selector)
 	first := buildTestMetadataEnricher("pod", PodResource, resourceWatchers, config, &funcs, log)
@@ -515,7 +516,7 @@ func TestEnricherStopUsesPointerOwnershipAndEvictsFinalWatcher(t *testing.T) {
 	require.Len(t, resourceWatchers.metaWatchersMap[PodResource].enrichers, 2, "same-name enrichers must both receive invalidation")
 	resourceWatchers.lock.Unlock()
 
-	first.Start(resourceWatchers)
+	assert.True(t, first.Start(resourceWatchers), "Start() must return true")
 	resourceWatchers.lock.Lock()
 	require.True(t, resourceWatchers.metaWatchersMap[PodResource].started, "watcher must start")
 	resourceWatchers.lock.Unlock()
@@ -545,7 +546,7 @@ func TestPodAndContainerEnrichersShareWatcherByPointer(t *testing.T) {
 		enrichers: make(map[*enricher]struct{}),
 	}
 
-	config := &kubernetesConfig{AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig()}
+	config := &kubernetesConfig{AddResourceMetadata: &metadata.AddResourceMetadataConfig{}}
 	log := logptest.NewTestingLogger(t, selector)
 	funcs := mockFuncs{}
 	// Both metricsets enrich kubelet events from Pod API objects, so their
@@ -556,7 +557,7 @@ func TestPodAndContainerEnrichersShareWatcherByPointer(t *testing.T) {
 	// Starting either owner starts their shared watcher; using pod here is
 	// arbitrary. Stopping container then simulates one metricset shutting down
 	// while pod still needs the watcher, so the watcher must remain running.
-	pod.Start(resourceWatchers)
+	assert.True(t, pod.Start(resourceWatchers), "Start() must return true")
 	container.Stop(resourceWatchers)
 	resourceWatchers.lock.RLock()
 	require.Contains(t, resourceWatchers.metaWatchersMap, PodResource, "pod pointer must retain the shared watcher")
@@ -649,6 +650,7 @@ func TestNewResourceMetadataEnricherRollsBackRegisteredWatchers(t *testing.T) {
 	enricher := newFailingStateServiceEnricher(t, metricsRepo, resourceWatchers, false)
 
 	require.IsType(t, &nilEnricher{}, enricher, "metadata generator failure must disable enrichment")
+	assert.True(t, enricher.Start(resourceWatchers), "nilEnricher.Start() must return true for compatibility")
 	resourceWatchers.lock.RLock()
 	require.Empty(t, resourceWatchers.metaWatchersMap, "constructor rollback must evict an unstarted final-owner watcher")
 	resourceWatchers.lock.RUnlock()
@@ -668,7 +670,7 @@ func TestNewResourceMetadataEnricherRollbackDoesNotUpgradeNodeScopedOwner(t *tes
 	}
 	resourceWatchers.metaWatchersMap[ServiceResource] = metaWatcher
 
-	config := &kubernetesConfig{AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig()}
+	config := &kubernetesConfig{AddResourceMetadata: &metadata.AddResourceMetadataConfig{}}
 	log := logptest.NewTestingLogger(t, selector)
 	funcs := mockFuncs{}
 	nodeScoped := buildTestMetadataEnricherWithScope("service", ServiceResource, resourceWatchers, config, &funcs, log, true)
@@ -679,13 +681,14 @@ func TestNewResourceMetadataEnricherRollbackDoesNotUpgradeNodeScopedOwner(t *tes
 	enricher := newFailingStateServiceEnricher(t, metricsRepo, resourceWatchers, false)
 
 	require.IsType(t, &nilEnricher{}, enricher, "metadata generator failure must disable enrichment")
+	assert.True(t, enricher.Start(resourceWatchers), "nilEnricher.Start() must return true for compatibility")
 	resourceWatchers.lock.RLock()
 	require.Nil(t, metaWatcher.replacementWatcher, "rolling back the last cluster-scoped registration must discard its pending replacement")
 	require.Nil(t, metaWatcher.replacementWatcherFactory, "rollback must discard the replacement factory")
 	require.True(t, metaWatcher.nodeScope, "rollback must preserve the active node-scoped watcher's scope")
 	resourceWatchers.lock.RUnlock()
 
-	nodeScoped.Start(resourceWatchers)
+	assert.True(t, nodeScoped.Start(resourceWatchers), "Start() must return true")
 	require.Equal(t, 0, active.stopCalls, "remaining node-scoped owner must not stop the active watcher")
 	require.Same(t, active, metaWatcher.watcher, "remaining node-scoped owner must keep the active watcher")
 
@@ -709,7 +712,7 @@ func TestPendingScopeUpgradeRetainedForCommittedClusterScopedOwner(t *testing.T)
 	}
 	resourceWatchers.metaWatchersMap[PodResource] = metaWatcher
 
-	config := &kubernetesConfig{AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig()}
+	config := &kubernetesConfig{AddResourceMetadata: &metadata.AddResourceMetadataConfig{}}
 	log := logptest.NewTestingLogger(t, selector)
 	funcs := mockFuncs{}
 	nodeScoped := buildTestMetadataEnricherWithScope("pod", PodResource, resourceWatchers, config, &funcs, log, true)
@@ -732,7 +735,7 @@ func TestPendingScopeUpgradeRetainedForCommittedClusterScopedOwner(t *testing.T)
 	nodeScoped.Stop(resourceWatchers)
 }
 
-func TestConcurrentNodeScopedStartDoesNotApplyProvisionalScopeUpgrade(t *testing.T) {
+func TestNodeScopedStartDoesNotActivateStagedUpgrade(t *testing.T) {
 	resourceWatchers := NewWatchers()
 	active := newMockWatcher()
 	pending := newMockWatcher()
@@ -745,7 +748,7 @@ func TestConcurrentNodeScopedStartDoesNotApplyProvisionalScopeUpgrade(t *testing
 	}
 	resourceWatchers.metaWatchersMap[PodResource] = metaWatcher
 
-	config := &kubernetesConfig{AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig()}
+	config := &kubernetesConfig{AddResourceMetadata: &metadata.AddResourceMetadataConfig{}}
 	log := logptest.NewTestingLogger(t, selector)
 	funcs := mockFuncs{}
 	nodeScoped := buildTestMetadataEnricherWithScope("pod", PodResource, resourceWatchers, config, &funcs, log, true)
@@ -795,13 +798,13 @@ func TestFailedScopeUpgradeLeavesActiveWatcherRunning(t *testing.T) {
 	}
 	resourceWatchers.metaWatchersMap[PodResource] = metaWatcher
 
-	config := &kubernetesConfig{AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig()}
+	config := &kubernetesConfig{AddResourceMetadata: &metadata.AddResourceMetadataConfig{}}
 	log := logptest.NewTestingLogger(t, selector)
 	funcs := mockFuncs{}
 	nodeScoped := buildTestMetadataEnricherWithScope("pod", PodResource, resourceWatchers, config, &funcs, log, true)
 	clusterScoped := buildTestMetadataEnricher("state_pod", PodResource, resourceWatchers, config, &funcs, log)
 
-	clusterScoped.Start(resourceWatchers)
+	assert.False(t, clusterScoped.Start(resourceWatchers), "Start() must return false when replacement fails")
 	require.Equal(t, 1, firstFailed.startCalls, "pending replacement must be attempted")
 	require.Equal(t, 1, firstFailed.stopCalls, "failed replacement must be stopped")
 	require.Equal(t, 0, active.stopCalls, "failed replacement must not stop the active watcher")
@@ -810,13 +813,13 @@ func TestFailedScopeUpgradeLeavesActiveWatcherRunning(t *testing.T) {
 	require.True(t, metaWatcher.nodeScope, "failed replacement must preserve the active watcher scope")
 	require.True(t, metaWatcher.started, "failed replacement must preserve active watcher state")
 
-	clusterScoped.Start(resourceWatchers)
+	assert.False(t, clusterScoped.Start(resourceWatchers), "Start() must return false on repeated replacement failure")
 	require.Equal(t, 1, secondFailed.startCalls, "next Start must attempt a fresh replacement")
 	require.Equal(t, 1, secondFailed.stopCalls, "each failed replacement must be stopped")
 	require.Equal(t, 1, firstFailed.startCalls, "failed replacement must not be reused")
 	require.Equal(t, 0, active.stopCalls, "repeated replacement failures must preserve the active watcher")
 
-	clusterScoped.Start(resourceWatchers)
+	assert.True(t, clusterScoped.Start(resourceWatchers), "Start() must return true after successful scope upgrade")
 	require.Equal(t, 2, factoryCalls, "each retry must construct one fresh replacement")
 	require.Equal(t, 1, replacement.startCalls, "fresh replacement must be started")
 	require.Equal(t, 1, active.stopCalls, "active watcher must stop only after its replacement starts")
@@ -843,13 +846,13 @@ func TestNodeScopeReplacementWatcherLifecycle(t *testing.T) {
 	}
 	resourceWatchers.metaWatchersMap[PodResource] = metaWatcher
 
-	config := &kubernetesConfig{AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig()}
+	config := &kubernetesConfig{AddResourceMetadata: &metadata.AddResourceMetadataConfig{}}
 	log := logptest.NewTestingLogger(t, selector)
 	funcs := mockFuncs{}
 	nodeScoped := buildTestMetadataEnricherWithScope("pod", PodResource, resourceWatchers, config, &funcs, log, true)
 	clusterScoped := buildTestMetadataEnricher("state_pod", PodResource, resourceWatchers, config, &funcs, log)
 
-	clusterScoped.Start(resourceWatchers)
+	assert.True(t, clusterScoped.Start(resourceWatchers), "Start() must return true after scope upgrade")
 	require.Equal(t, 1, active.stopCalls, "scope upgrade must stop the old active watcher")
 	require.Equal(t, 1, replacement.startCalls, "scope upgrade must start the pending cluster-scoped watcher")
 	require.Same(t, replacement, metaWatcher.watcher, "replacement must become the active watcher")
@@ -878,7 +881,7 @@ func TestFinalOwnerEvictionDiscardsPendingReplacementWatcher(t *testing.T) {
 	}
 	resourceWatchers.metaWatchersMap[PodResource] = metaWatcher
 
-	config := &kubernetesConfig{AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig()}
+	config := &kubernetesConfig{AddResourceMetadata: &metadata.AddResourceMetadataConfig{}}
 	log := logptest.NewTestingLogger(t, selector)
 	funcs := mockFuncs{}
 	e := buildTestMetadataEnricher("state_pod", PodResource, resourceWatchers, config, &funcs, log)
@@ -932,8 +935,8 @@ func TestRealInformerIsRecreatedAfterFinalOwnerStops(t *testing.T) {
 		podA.Stop(resourceWatchers)
 		containerA.Stop(resourceWatchers)
 	})
-	podA.Start(resourceWatchers)
-	containerA.Start(resourceWatchers)
+	assert.True(t, podA.Start(resourceWatchers), "Start() must return true")
+	assert.True(t, containerA.Start(resourceWatchers), "Start() must return true")
 	_, err := client.CoreV1().Pods("default").Create(context.Background(), informerTestPod("pod-a", "a"), metav1.CreateOptions{})
 	require.NoError(t, err, "generation-A pod creation must succeed")
 	require.Eventually(t, func() bool {
@@ -953,8 +956,8 @@ func TestRealInformerIsRecreatedAfterFinalOwnerStops(t *testing.T) {
 		containerB.Stop(resourceWatchers)
 	})
 	require.NotEqual(t, watcherA, watcherB, "generation B must receive a fresh watcher and informer lifecycle")
-	podB.Start(resourceWatchers)
-	containerB.Start(resourceWatchers)
+	assert.True(t, podB.Start(resourceWatchers), "Start() must return true")
+	assert.True(t, containerB.Start(resourceWatchers), "Start() must return true")
 	_, err = client.CoreV1().Pods("default").Create(context.Background(), informerTestPod("pod-b", "b"), metav1.CreateOptions{})
 	require.NoError(t, err, "generation-B pod creation must succeed")
 	require.Eventually(t, func() bool {
@@ -989,7 +992,7 @@ func TestRealInformerIsRecreatedAfterFinalOwnerStops(t *testing.T) {
 func TestConcurrentInvalidationAndEnrichment(t *testing.T) {
 	resourceWatchers := NewWatchers()
 	log := logptest.NewTestingLogger(t, selector)
-	config := &kubernetesConfig{AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig()}
+	config := &kubernetesConfig{AddResourceMetadata: &metadata.AddResourceMetadataConfig{}}
 	resource := &kubernetes.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "deployment",
@@ -1033,7 +1036,7 @@ func TestConcurrentInvalidationAndEnrichment(t *testing.T) {
 		log,
 	)
 	require.NoError(t, watcher.Store().Add(resource), "deployment must be added to the mock watcher store")
-	e.Start(resourceWatchers)
+	assert.True(t, e.Start(resourceWatchers), "Start() must return true")
 
 	var workers sync.WaitGroup
 	workers.Go(func() {
@@ -1116,6 +1119,245 @@ func TestActiveWatcherLookupBlocksScopeReplacement(t *testing.T) {
 	e.Stop(resourceWatchers)
 }
 
+// TestScopeUpgradeKeepsOldWatcherActiveDuringCacheSync verifies that during a
+// scope upgrade the old node-scoped watcher W remains the active watcher while
+// the replacement cluster-scoped watcher R's WaitForCacheSync runs. The swap to
+// R happens only after R.Start() returns, so metadata lookups never see an empty
+// store (no blackout window).
+func TestScopeUpgradeKeepsOldWatcherActiveDuringCacheSync(t *testing.T) {
+	resourceWatchers := NewWatchers()
+
+	// W: node-scoped watcher with a pod already in its store.
+	oldWatcher := newMockWatcher()
+	pod := &kubernetes.Pod{ObjectMeta: metav1.ObjectMeta{
+		Name:      "my-pod",
+		Namespace: "default",
+		Labels:    map[string]string{"source": "old"},
+	}}
+	require.NoError(t, oldWatcher.Store().Add(pod))
+
+	// R: replacement cluster-scoped watcher; empty store; blocks in Start()
+	// until Stop() is called (simulating RBAC-gated WaitForCacheSync).
+	replacementW := newCancelErrorWatcher()
+
+	mw := &metaWatcher{
+		watcher:            oldWatcher,
+		started:            true,
+		nodeScope:          true,
+		replacementWatcher: replacementW,
+		users:              make(map[*enricher]watcherRegistration),
+		enrichers:          make(map[*enricher]struct{}),
+	}
+	resourceWatchers.metaWatchersMap[PodResource] = mw
+	e := newWatcherLookupTestEnricher(t, resourceWatchers, mw)
+
+	// Before the upgrade the old watcher serves "my-pod".
+	got := e.getMetadata(mapstr.M{"name": pod.Name})
+	require.NotNil(t, got, "old watcher must serve my-pod before the scope upgrade")
+	e.Lock()
+	e.metadataCache = make(map[string]mapstr.M) // clear so the next lookup hits the store
+	e.Unlock()
+
+	// Start() sets pendingReplacement=R and releases the lock, then blocks in R.Start().
+	// It deliberately leaves starting alone (that flag tracks W's own startup), and
+	// W remains the active watcher for the whole of R's WaitForCacheSync.
+	startDone := make(chan struct{})
+	go func() {
+		e.Start(resourceWatchers)
+		close(startDone)
+	}()
+	<-replacementW.startCalled // R.Start() is in progress; W is still the active watcher
+
+	// During R's WaitForCacheSync, W stays active: metadata lookups must not
+	// return nil. The swap to R happens only after R.Start() succeeds.
+	got = e.getMetadata(mapstr.M{"name": pod.Name})
+	assert.NotNil(t, got, "W must remain active during R's WaitForCacheSync; scope upgrade must not create a metadata blackout")
+
+	// Capture the attempt's done channel before Stop(); we must wait for the
+	// claimReplacement goroutine to close it before the test ends (goroutine races the
+	// testing.T cleanup). The goroutine will not log: ownership guard prevents it.
+	resourceWatchers.lock.RLock()
+	attemptDone := mw.pendingReplacement.done
+	resourceWatchers.lock.RUnlock()
+
+	// Stop() withdraws W, stops R via pendingReplacement (unblocking R.Start()).
+	e.Stop(resourceWatchers)
+	select {
+	case <-startDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("e.Start() goroutine did not finish after Stop()")
+	}
+	select {
+	case <-attemptDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("claimReplacement goroutine did not finish after Stop()")
+	}
+}
+
+// TestUpgradeCancelledWhenClusterScopedOwnerStops verifies the
+// else-if-!hasClusterScopedUser branch of releaseWatcherOwnership: when a scope
+// upgrade is in flight (pendingReplacement != nil) and the only cluster-scoped owner
+// stops, Stop() cancels the upgrade by stopping R, which unblocks R.Start().
+// nodeScope stays true throughout because W was never swapped out, and starting
+// is left alone because it belongs to W's own startup goroutine.
+func TestUpgradeCancelledWhenClusterScopedOwnerStops(t *testing.T) {
+	resourceWatchers := NewWatchers()
+
+	// W: already-started node-scoped watcher.
+	w := newMockWatcher()
+	pod := &kubernetes.Pod{ObjectMeta: metav1.ObjectMeta{Name: "my-pod", Namespace: "default"}}
+	require.NoError(t, w.Store().Add(pod))
+
+	// R: pending restart; blocks in Start() until Stop() is called.
+	r := newBlockingMockWatcher()
+
+	mw := &metaWatcher{
+		watcher:            w,
+		started:            true,
+		nodeScope:          true, // W is still the active watcher, so still node-scoped
+		pendingReplacement: &watcherStart{watcher: r, done: make(chan struct{})},
+		users:              make(map[*enricher]watcherRegistration),
+		enrichers:          make(map[*enricher]struct{}),
+	}
+	resourceWatchers.metaWatchersMap[PodResource] = mw
+
+	config := &kubernetesConfig{AddResourceMetadata: &metadata.AddResourceMetadataConfig{}}
+	log := logptest.NewTestingLogger(t, selector)
+
+	// E1: node-scoped, stays alive after E2 stops.
+	e1 := newMetadataEnricher("pod", PodResource, config, log)
+	e1.watcher = mw
+	e1.watchedResources = []string{PodResource}
+	mw.users[e1] = watcherRegistration{committed: true, nodeScope: true}
+	mw.enrichers[e1] = struct{}{}
+
+	// E2: the only cluster-scoped owner; its Stop() triggers the cancel path.
+	e2 := newMetadataEnricher("state_pod", PodResource, config, log)
+	e2.watcher = mw
+	e2.watchedResources = []string{PodResource}
+	mw.users[e2] = watcherRegistration{committed: true, nodeScope: false}
+	mw.enrichers[e2] = struct{}{}
+
+	// A goroutine holds R.Start() open; it unblocks when R.Stop() is called.
+	rStartDone := make(chan struct{})
+	go func() {
+		_ = r.Start()
+		close(rStartDone)
+	}()
+	<-r.startCalled
+
+	// E2 stops. It is the only cluster-scoped user, so releaseWatcherOwnership
+	// must cancel the upgrade by stopping R, which unblocks rStartDone.
+	e2.Stop(resourceWatchers)
+
+	select {
+	case <-rStartDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("R.Start() did not unblock after E2.Stop(); Stop() must have called R.Stop()")
+	}
+
+	resourceWatchers.lock.RLock()
+	assert.Nil(t, mw.starting, "starting must remain nil; cancel-upgrade does not touch it")
+	assert.True(t, mw.nodeScope, "nodeScope must stay true; W was never swapped out")
+	assert.Nil(t, mw.pendingReplacement, "pendingReplacement must be nil after upgrade cancellation")
+	assert.True(t, mw.started, "W must still be started; only E2 (non-final) stopped")
+	resourceWatchers.lock.RUnlock()
+
+	e1.Stop(resourceWatchers)
+}
+
+// TestUpgradeCancelDoesNotClearConcurrentActiveStart verifies that cancelling
+// a scope upgrade does not clear an unrelated startup claim for the active
+// watcher.
+func TestUpgradeCancelDoesNotClearConcurrentActiveStart(t *testing.T) {
+	resourceWatchers := NewWatchers()
+
+	// The active watcher blocks inside Start until it is stopped.
+	w := newBlockingMockWatcher()
+	// The in-flight replacement also blocks inside Start until it is stopped.
+	r := newBlockingMockWatcher()
+
+	mw := &metaWatcher{
+		watcher:            w,
+		started:            false,
+		nodeScope:          true,
+		pendingReplacement: &watcherStart{watcher: r, done: make(chan struct{})},
+		users:              make(map[*enricher]watcherRegistration),
+		enrichers:          make(map[*enricher]struct{}),
+	}
+	resourceWatchers.metaWatchersMap[PodResource] = mw
+
+	config := &kubernetesConfig{AddResourceMetadata: &metadata.AddResourceMetadataConfig{}}
+	log := logptest.NewTestingLogger(t, selector)
+
+	// The node-scoped owner starts the active watcher.
+	e1 := newMetadataEnricher("pod", PodResource, config, log)
+	e1.watcher = mw
+	e1.watchedResources = []string{PodResource}
+	mw.users[e1] = watcherRegistration{committed: true, nodeScope: true}
+	mw.enrichers[e1] = struct{}{}
+
+	// The cluster-scoped owner is the only owner that requires the upgrade.
+	e2 := newMetadataEnricher("state_pod", PodResource, config, log)
+	e2.watcher = mw
+	e2.watchedResources = []string{PodResource}
+	mw.users[e2] = watcherRegistration{committed: true, nodeScope: false}
+	mw.enrichers[e2] = struct{}{}
+
+	// Start the replacement attempt.
+	rStartDone := make(chan struct{})
+	go func() {
+		_ = r.Start()
+		close(rStartDone)
+	}()
+	<-r.startCalled
+
+	// Start the active watcher and wait until its startup attempt is in flight.
+	e1StartDone := make(chan struct{})
+	go func() {
+		e1.Start(resourceWatchers)
+		close(e1StartDone)
+	}()
+	<-w.startCalled
+
+	resourceWatchers.lock.RLock()
+	require.NotNil(t, mw.starting, "Start() must record the active watcher startup attempt before blocking")
+	resourceWatchers.lock.RUnlock()
+
+	// Cancelling the upgrade must stop the replacement without clearing the
+	// active watcher's startup claim.
+	e2.Stop(resourceWatchers)
+
+	select {
+	case <-rStartDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("replacement Start() did not unblock; upgrade cancellation must stop it")
+	}
+
+	resourceWatchers.lock.RLock()
+	starting := mw.starting
+	assert.Nil(t, mw.pendingReplacement, "pendingReplacement must be nil after upgrade cancellation")
+	assert.True(t, mw.nodeScope, "nodeScope must stay true; the active watcher was never replaced")
+	resourceWatchers.lock.RUnlock()
+	require.NotNil(t, starting, "the active watcher startup claim must survive upgrade cancellation")
+	startAttemptDone := starting.done
+
+	// Releasing the final owner detaches and stops the active startup attempt.
+	// launchStart then skips the stale commit and closes the attempt's done channel.
+	e1.Stop(resourceWatchers)
+
+	select {
+	case <-e1StartDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("active watcher Start() did not unblock after the final Stop()")
+	}
+	select {
+	case <-startAttemptDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("launchStart goroutine did not finish after Stop()")
+	}
+}
+
 func TestActiveWatcherLookupCompletesBeforeFinalOwnerStop(t *testing.T) {
 	resourceWatchers := NewWatchers()
 	lookupStarted := make(chan struct{})
@@ -1162,6 +1404,71 @@ func TestActiveWatcherLookupCompletesBeforeFinalOwnerStop(t *testing.T) {
 	e.metadataCache = make(map[string]mapstr.M)
 	e.Unlock()
 	require.Nil(t, e.getMetadata(mapstr.M{"name": resource.Name}), "lookup after withdrawal must not use the stopped watcher")
+}
+
+// TestReplacementWatcherOldWatcherStoppedAfterConcurrentStop covers the race where
+// (a) ensurePrimaryReady → claimReplacement sets pendingReplacement=R, keeps W as the
+//
+//	active watcher, releases the lock, then the goroutine blocks in R.Start(), and
+//
+// (b) a concurrent Stop() withdraws W (stopping it) and stops R via pendingReplacement,
+//
+//	which unblocks R.Start() with an error, and
+//
+// (c) the claimReplacement goroutine acquires the lock, finds the registry entry gone
+//
+//	(Stop() was the final owner and deleted it), and closes attempt.done.
+//	Stop() had already cleared pendingReplacement and stopped both W and R.
+func TestReplacementWatcherOldWatcherStoppedAfterConcurrentStop(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	oldWatcher := newCoordinatedWatcher(newMockWatcher().store)
+	replacementWatcher := newCancelErrorWatcher()
+
+	mw := &metaWatcher{
+		watcher:            oldWatcher,
+		started:            true,
+		users:              make(map[*enricher]watcherRegistration),
+		enrichers:          make(map[*enricher]struct{}),
+		nodeScope:          true,
+		replacementWatcher: replacementWatcher,
+	}
+	resourceWatchers.metaWatchersMap[PodResource] = mw
+	e := newWatcherLookupTestEnricher(t, resourceWatchers, mw)
+
+	startDone := make(chan struct{})
+	go func() {
+		e.Start(resourceWatchers)
+		close(startDone)
+	}()
+	<-replacementWatcher.startCalled // Start() set pendingReplacement=R and released the lock.
+
+	// Capture the attempt's done channel before Stop(); we must wait for the
+	// claimReplacement goroutine to close it before the test ends (goroutine races the
+	// testing.T cleanup). The goroutine will not log: ownership guard prevents it.
+	resourceWatchers.lock.RLock()
+	attemptDone := mw.pendingReplacement.done
+	resourceWatchers.lock.RUnlock()
+
+	// Stop() is the final owner release: it withdraws the active watcher (still W)
+	// and separately stops pendingReplacement (R). Stopping R unblocks R.Start(), which
+	// then returns an error.
+	e.Stop(resourceWatchers)
+
+	select {
+	case <-startDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("e.Start() goroutine did not finish after Stop()")
+	}
+	select {
+	case <-oldWatcher.stopped:
+	case <-time.After(5 * time.Second):
+		t.Fatal("old watcher W was not stopped by Stop()")
+	}
+	select {
+	case <-attemptDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("claimReplacement goroutine did not finish after Stop()")
+	}
 }
 
 func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
@@ -1217,7 +1524,7 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 	require.NotNil(t, mockW.handler)
 	resourceWatchers.lock.Unlock()
 
-	enricher.Start(resourceWatchers)
+	assert.True(t, enricher.Start(resourceWatchers), "Start() must return true after successful watcher setup")
 	resourceWatchers.lock.Lock()
 	require.True(t, watcher.started)
 	resourceWatchers.lock.Unlock()
@@ -1382,7 +1689,7 @@ func TestBuildMetadataEnricher_PartialMetadata(t *testing.T) {
 		log,
 	)
 
-	enricher.Start(resourceWatchers)
+	assert.True(t, enricher.Start(resourceWatchers), "Start() must return true after successful watcher setup")
 	resourceWatchers.lock.Lock()
 	require.True(t, watcher.started)
 	resourceWatchers.lock.Unlock()
@@ -1436,6 +1743,935 @@ func TestBuildMetadataEnricher_PartialMetadata(t *testing.T) {
 	require.NotContains(t, resourceWatchers.metaWatchersMap, ReplicaSetResource, "final owner must evict the watcher")
 	resourceWatchers.lock.Unlock()
 }
+
+// TestBuildMetadataEnricher_StartStopDeadlock ensures that Stop() can unblock
+// a Start() that is blocked inside watcher.Start() (e.g. WaitForCacheSync
+// waiting for an informer that never syncs due to missing RBAC).
+func TestBuildMetadataEnricher_StartStopDeadlock(t *testing.T) {
+	resourceWatchers := NewWatchers()
+
+	config := &kubernetesConfig{
+		Namespace:  "test-ns",
+		SyncPeriod: time.Minute,
+		Node:       "test-node",
+		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
+			CronJob:    false,
+			Deployment: false,
+		},
+	}
+	log := logptest.NewTestingLogger(t, selector)
+
+	blocking := newBlockingMockWatcher()
+	mw := &metaWatcher{
+		watcher:   blocking,
+		started:   false,
+		users:     make(map[*enricher]watcherRegistration),
+		enrichers: make(map[*enricher]struct{}),
+	}
+	enricherDeployment := newMetadataEnricher("state_deployment", DeploymentResource, config, log)
+	enricherDeployment.watchedResources = []string{DeploymentResource}
+	mw.users[enricherDeployment] = watcherRegistration{committed: true, nodeScope: true}
+
+	resourceWatchers.lock.Lock()
+	resourceWatchers.metaWatchersMap[DeploymentResource] = mw
+	resourceWatchers.lock.Unlock()
+
+	startDone := make(chan struct{})
+	go func() {
+		enricherDeployment.Start(resourceWatchers)
+		close(startDone)
+	}()
+
+	// Wait until Start() is blocked inside watcher.Start().
+	<-blocking.startCalled
+
+	// Capture the goroutine's done channel before calling Stop() so we can
+	// wait for the launchStart goroutine to finish after Start() returns.
+	resourceWatchers.lock.RLock()
+	attemptDone := mw.starting.done
+	resourceWatchers.lock.RUnlock()
+
+	stopDone := make(chan struct{})
+	go func() {
+		enricherDeployment.Stop(resourceWatchers)
+		close(stopDone)
+	}()
+
+	select {
+	case <-stopDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("Stop() did not return within 5 seconds")
+	}
+	select {
+	case <-startDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("Start() did not unblock after Stop() was called")
+	}
+	select {
+	case <-attemptDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("launchStart goroutine did not finish within 5 seconds")
+	}
+
+	resourceWatchers.lock.Lock()
+	assert.False(t, mw.started)
+	resourceWatchers.lock.Unlock()
+}
+
+// TestBuildMetadataEnricher_StartStopDeadlock_ExtraWatcher verifies that
+// Stop() can unblock a Start() that is blocked inside an extra watcher's
+// Start() (same deadlock as the main watcher path).
+func TestBuildMetadataEnricher_StartStopDeadlock_ExtraWatcher(t *testing.T) {
+	resourceWatchers := NewWatchers()
+
+	blockingNamespace := newBlockingMockWatcher()
+	namespaceConfig, err := conf.NewConfigFrom(map[string]any{"enabled": true})
+	require.NoError(t, err)
+
+	config := &kubernetesConfig{
+		Namespace:  "test-ns",
+		SyncPeriod: time.Minute,
+		Node:       "test-node",
+		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
+			CronJob:    false,
+			Deployment: false,
+			Namespace:  namespaceConfig,
+		},
+	}
+	log := logptest.NewTestingLogger(t, selector)
+
+	deployMW := &metaWatcher{
+		watcher:   newMockWatcher(),
+		started:   false,
+		users:     make(map[*enricher]watcherRegistration),
+		enrichers: make(map[*enricher]struct{}),
+	}
+	nsMW := &metaWatcher{
+		watcher:   blockingNamespace,
+		started:   false,
+		users:     make(map[*enricher]watcherRegistration),
+		enrichers: make(map[*enricher]struct{}),
+	}
+	enricherDeployment := newMetadataEnricher("state_deployment", DeploymentResource, config, log)
+	// The enricher owns both the main watcher and the namespace extra watcher.
+	enricherDeployment.watchedResources = []string{NamespaceResource, DeploymentResource}
+	deployMW.users[enricherDeployment] = watcherRegistration{committed: true, nodeScope: true}
+	nsMW.users[enricherDeployment] = watcherRegistration{committed: true, nodeScope: true}
+
+	resourceWatchers.lock.Lock()
+	resourceWatchers.metaWatchersMap[DeploymentResource] = deployMW
+	resourceWatchers.metaWatchersMap[NamespaceResource] = nsMW
+	resourceWatchers.lock.Unlock()
+
+	startDone := make(chan struct{})
+	go func() {
+		enricherDeployment.Start(resourceWatchers)
+		close(startDone)
+	}()
+
+	<-blockingNamespace.startCalled
+
+	// Capture the goroutine's done channel before calling Stop().
+	resourceWatchers.lock.RLock()
+	attemptDone := nsMW.starting.done
+	resourceWatchers.lock.RUnlock()
+
+	stopDone := make(chan struct{})
+	go func() {
+		enricherDeployment.Stop(resourceWatchers)
+		close(stopDone)
+	}()
+
+	select {
+	case <-stopDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("Stop() did not return within 5 seconds")
+	}
+	select {
+	case <-startDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("Start() did not unblock after Stop() was called")
+	}
+	select {
+	case <-attemptDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("launchStart goroutine did not finish within 5 seconds")
+	}
+
+	resourceWatchers.lock.Lock()
+	assert.False(t, nsMW.started)
+	resourceWatchers.lock.Unlock()
+}
+
+// TestExtraWatcherStopCancelsJoinedWait verifies the Stop/cancel lifecycle for a
+// second enricher sharing a namespace extra watcher: Stop() cancels e2's joined
+// wait on the in-flight goroutine and Start() returns false.
+func TestExtraWatcherStopCancelsJoinedWait(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	blockingNamespace := newBlockingMockWatcher()
+	namespaceConfig, err := conf.NewConfigFrom(map[string]any{"enabled": true})
+	require.NoError(t, err)
+	config := &kubernetesConfig{
+		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
+			Namespace: namespaceConfig,
+		},
+	}
+	log := logptest.NewTestingLogger(t, selector)
+
+	podMW := &metaWatcher{
+		watcher:   newMockWatcher(),
+		started:   true, // already started; primary does not block
+		users:     make(map[*enricher]watcherRegistration),
+		enrichers: make(map[*enricher]struct{}),
+	}
+	nsMW := &metaWatcher{
+		watcher:   blockingNamespace,
+		users:     make(map[*enricher]watcherRegistration),
+		enrichers: make(map[*enricher]struct{}),
+	}
+
+	e1 := newMetadataEnricher("pod", PodResource, config, log)
+	e1.watchedResources = []string{NamespaceResource, PodResource}
+	podMW.users[e1] = watcherRegistration{committed: true}
+	podMW.enrichers[e1] = struct{}{}
+	nsMW.users[e1] = watcherRegistration{committed: true}
+
+	e2 := newMetadataEnricher("state_pod", PodResource, config, log)
+	e2.watchedResources = []string{NamespaceResource, PodResource}
+	podMW.users[e2] = watcherRegistration{committed: true}
+	podMW.enrichers[e2] = struct{}{}
+	nsMW.users[e2] = watcherRegistration{committed: true}
+
+	resourceWatchers.lock.Lock()
+	resourceWatchers.metaWatchersMap[PodResource] = podMW
+	resourceWatchers.metaWatchersMap[NamespaceResource] = nsMW
+	resourceWatchers.lock.Unlock()
+
+	// e1 starts first; its goroutine calls blockingNamespace.Start() and blocks.
+	e1StartDone := make(chan struct{})
+	go func() {
+		e1.Start(resourceWatchers)
+		close(e1StartDone)
+	}()
+	<-blockingNamespace.startCalled
+
+	// Capture the goroutine's done channel before either Stop() call.
+	resourceWatchers.lock.RLock()
+	attemptDone := nsMW.starting.done
+	resourceWatchers.lock.RUnlock()
+
+	// e2 also starts; Stop() must cancel its joined wait and Start() return false.
+	e2StartDone := make(chan bool, 1)
+	go func() { e2StartDone <- e2.Start(resourceWatchers) }()
+
+	// Stop e2: its Start() must unblock with false.
+	e2StopDone := make(chan struct{})
+	go func() {
+		e2.Stop(resourceWatchers)
+		close(e2StopDone)
+	}()
+	select {
+	case <-e2StopDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("e2.Stop() did not return within 5 seconds")
+	}
+	select {
+	case result := <-e2StartDone:
+		assert.False(t, result, "e2.Start() must return false after Stop()")
+	case <-time.After(5 * time.Second):
+		t.Fatal("e2.Start() did not return after e2.Stop()")
+	}
+
+	// Cleanup: stop e1 then wait for the goroutine.
+	e1.Stop(resourceWatchers)
+	select {
+	case <-e1StartDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("e1.Start() did not return after e1.Stop()")
+	}
+	select {
+	case <-attemptDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("launchStart goroutine did not finish within 5 seconds")
+	}
+}
+
+// TestStartReturnsWhenExtrasReady verifies the positive path: Start() returns true
+// after extras (node, namespace) and the primary (pod) watcher all start successfully.
+// This is the path taken on every Fetch by pod/container metricsets with default config.
+func TestStartReturnsWhenExtrasReady(t *testing.T) {
+	resourceWatchers := NewWatchers()
+
+	nodeConfig, err := conf.NewConfigFrom(map[string]any{"enabled": true})
+	require.NoError(t, err)
+	namespaceConfig, err := conf.NewConfigFrom(map[string]any{"enabled": true})
+	require.NoError(t, err)
+	config := &kubernetesConfig{
+		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
+			Node:      nodeConfig,
+			Namespace: namespaceConfig,
+		},
+	}
+	log := logptest.NewTestingLogger(t, selector)
+
+	nodeMock := newMockWatcher()
+	nsMock := newMockWatcher()
+	podMock := newMockWatcher()
+
+	nodeMW := &metaWatcher{
+		watcher:   nodeMock,
+		users:     make(map[*enricher]watcherRegistration),
+		enrichers: make(map[*enricher]struct{}),
+	}
+	nsMW := &metaWatcher{
+		watcher:   nsMock,
+		users:     make(map[*enricher]watcherRegistration),
+		enrichers: make(map[*enricher]struct{}),
+	}
+	podMW := &metaWatcher{
+		watcher:   podMock,
+		users:     make(map[*enricher]watcherRegistration),
+		enrichers: make(map[*enricher]struct{}),
+	}
+
+	e := newMetadataEnricher("pod", PodResource, config, log)
+	e.watchedResources = []string{NodeResource, NamespaceResource, PodResource}
+	nodeMW.users[e] = watcherRegistration{committed: true}
+	nsMW.users[e] = watcherRegistration{committed: true}
+	podMW.users[e] = watcherRegistration{committed: true}
+
+	resourceWatchers.lock.Lock()
+	resourceWatchers.metaWatchersMap[NodeResource] = nodeMW
+	resourceWatchers.metaWatchersMap[NamespaceResource] = nsMW
+	resourceWatchers.metaWatchersMap[PodResource] = podMW
+	resourceWatchers.lock.Unlock()
+
+	assert.True(t, e.Start(resourceWatchers), "Start() must return true when all watchers commit successfully")
+
+	resourceWatchers.lock.RLock()
+	assert.True(t, nodeMW.started, "node extra watcher must be started before Start() returns")
+	assert.True(t, nsMW.started, "namespace extra watcher must be started before Start() returns")
+	assert.True(t, podMW.started, "primary watcher must be started before Start() returns")
+	resourceWatchers.lock.RUnlock()
+
+	assert.Equal(t, 1, nodeMock.startCalls, "node watcher must be started exactly once")
+	assert.Equal(t, 1, nsMock.startCalls, "namespace watcher must be started exactly once")
+	assert.Equal(t, 1, podMock.startCalls, "primary watcher must be started exactly once")
+
+	// Second Start(): all watchers already started — must hit the fast path and
+	// return true without calling watcher.Start() again.
+	assert.True(t, e.Start(resourceWatchers), "second Start() must return true via fast path")
+	assert.Equal(t, 1, nodeMock.startCalls, "fast path must not call node watcher.Start() again")
+	assert.Equal(t, 1, nsMock.startCalls, "fast path must not call namespace watcher.Start() again")
+	assert.Equal(t, 1, podMock.startCalls, "fast path must not call primary watcher.Start() again")
+}
+
+// TestHang1NonFinalOwnerStopCancelsStart verifies the hang-1 fix: a non-final
+// owner's Stop() cancels its own blocked Start() via stopCh without stopping the
+// shared watcher, so the remaining owner's eventual Stop() can clean up normally.
+func TestHang1NonFinalOwnerStopCancelsStart(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	blocking := newBlockingMockWatcher()
+	config := &kubernetesConfig{
+		AddResourceMetadata: &metadata.AddResourceMetadataConfig{}, // no extras
+	}
+	log := logptest.NewTestingLogger(t, selector)
+
+	mw := &metaWatcher{
+		watcher:   blocking,
+		users:     make(map[*enricher]watcherRegistration),
+		enrichers: make(map[*enricher]struct{}),
+	}
+
+	e1 := newMetadataEnricher("pod", PodResource, config, log)
+	e1.watchedResources = []string{PodResource}
+	mw.users[e1] = watcherRegistration{committed: true}
+	mw.enrichers[e1] = struct{}{}
+
+	e2 := newMetadataEnricher("state_pod", PodResource, config, log)
+	e2.watchedResources = []string{PodResource}
+	mw.users[e2] = watcherRegistration{committed: true}
+	mw.enrichers[e2] = struct{}{}
+
+	resourceWatchers.lock.Lock()
+	resourceWatchers.metaWatchersMap[PodResource] = mw
+	resourceWatchers.lock.Unlock()
+
+	// e1 starts; its goroutine blocks inside blocking.Start().
+	e1StartDone := make(chan bool, 1)
+	go func() {
+		e1StartDone <- e1.Start(resourceWatchers)
+	}()
+	<-blocking.startCalled
+
+	// Capture the goroutine's done channel before calling Stop().
+	resourceWatchers.lock.RLock()
+	attemptDone := mw.starting.done
+	resourceWatchers.lock.RUnlock()
+
+	// e1 is a non-final owner (e2 is still registered). Stop() must cancel e1's
+	// wait (via stopCh) without stopping the shared watcher.
+	e1StopDone := make(chan struct{})
+	go func() {
+		e1.Stop(resourceWatchers)
+		close(e1StopDone)
+	}()
+	select {
+	case <-e1StopDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("e1.Stop() did not return within 5 seconds")
+	}
+	result := <-e1StartDone
+	assert.False(t, result, "e1.Start() must return false after e1.Stop()")
+
+	// The watcher must still be registered for e2.
+	resourceWatchers.lock.RLock()
+	assert.NotNil(t, resourceWatchers.metaWatchersMap[PodResource], "watcher must remain in registry for the surviving owner e2")
+	resourceWatchers.lock.RUnlock()
+
+	// e2 is the final owner: its Stop() must stop the shared watcher, which
+	// unblocks the launchStart goroutine.
+	e2.Stop(resourceWatchers)
+	select {
+	case <-attemptDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("launchStart goroutine did not finish within 5 seconds after e2.Stop()")
+	}
+}
+
+// TestMissingRequiredExtraWatcherBlocksStart verifies that collectExtraDependencies returns
+// false when getExtraWatchers() requires an extra that is absent from the registry,
+// causing Start() to return false rather than proceeding with incomplete enrichment.
+func TestMissingRequiredExtraWatcherBlocksStart(t *testing.T) {
+	namespaceConfig, err := conf.NewConfigFrom(map[string]any{"enabled": true})
+	require.NoError(t, err)
+	config := &kubernetesConfig{
+		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
+			Namespace: namespaceConfig,
+		},
+	}
+	log := logptest.NewTestingLogger(t, selector)
+	resourceWatchers := NewWatchers()
+
+	podMW := &metaWatcher{
+		watcher:   newMockWatcher(),
+		started:   true,
+		users:     make(map[*enricher]watcherRegistration),
+		enrichers: make(map[*enricher]struct{}),
+	}
+	e := newMetadataEnricher("pod", PodResource, config, log)
+	e.watchedResources = []string{PodResource}
+	podMW.users[e] = watcherRegistration{committed: true}
+	podMW.enrichers[e] = struct{}{}
+
+	resourceWatchers.lock.Lock()
+	resourceWatchers.metaWatchersMap[PodResource] = podMW
+	// NamespaceResource intentionally not registered (failed construction).
+	resourceWatchers.lock.Unlock()
+
+	result := e.Start(resourceWatchers)
+	assert.False(t, result, "Start() must return false when a required extra watcher is missing from the registry")
+
+	e.Stop(resourceWatchers)
+}
+
+// TestWaitForAttemptCancellation directly tests waitForAttempt: closing stopCh returns
+// false whether done is closed concurrently or not, and closing done alone returns true.
+func TestWaitForAttemptCancellation(t *testing.T) {
+	t.Run("stopCh wins over open done", func(t *testing.T) {
+		attempt := &watcherStart{done: make(chan struct{})}
+		stopCh := make(chan struct{})
+		close(stopCh)
+		assert.False(t, waitForAttempt(attempt, stopCh), "closed stopCh must return false")
+	})
+
+	t.Run("done wins when stopCh is open", func(t *testing.T) {
+		attempt := &watcherStart{done: make(chan struct{})}
+		stopCh := make(chan struct{})
+		close(attempt.done)
+		assert.True(t, waitForAttempt(attempt, stopCh), "closed done must return true")
+	})
+
+	t.Run("both closed returns false via stopCh re-check", func(t *testing.T) {
+		attempt := &watcherStart{done: make(chan struct{})}
+		stopCh := make(chan struct{})
+		close(attempt.done)
+		close(stopCh)
+		// Outer select picks either branch; inner re-check on stopCh forces false.
+		for range 200 {
+			assert.False(t, waitForAttempt(attempt, stopCh), "both closed must return false")
+		}
+	})
+}
+
+// TestClaimStartJoinReturnsSameAttempt verifies that a second call to claimStart
+// while a start is already in progress returns the existing attempt, not a new one.
+// This is the unit-level proof of the join-on-concurrent-start invariant; it does
+// not rely on goroutine scheduling or timing.
+func TestClaimStartJoinReturnsSameAttempt(t *testing.T) {
+	mw := &metaWatcher{
+		watcher:   newMockWatcher(),
+		users:     make(map[*enricher]watcherRegistration),
+		enrichers: make(map[*enricher]struct{}),
+	}
+
+	first, claimed := claimStart(mw)
+	require.True(t, claimed, "first claimStart must claim the attempt")
+	require.NotNil(t, first)
+
+	second, claimed := claimStart(mw)
+	assert.False(t, claimed, "second claimStart must join, not claim")
+	assert.Same(t, first, second, "second caller must receive the same attempt pointer")
+}
+
+// TestClaimReplacementJoinReturnsSameAttempt verifies that a second call to claimReplacement
+// while a restart is already pending returns the existing attempt, not a new one.
+// This is the unit-level proof of the join-on-scope-replacement invariant.
+func TestClaimReplacementJoinReturnsSameAttempt(t *testing.T) {
+	rw := NewWatchers()
+	r := newReleasableWatcher()
+	log := logptest.NewTestingLogger(t, selector)
+
+	mw := &metaWatcher{
+		watcher:            newMockWatcher(),
+		started:            true,
+		nodeScope:          true,
+		replacementWatcher: r,
+		users:              make(map[*enricher]watcherRegistration),
+		enrichers:          make(map[*enricher]struct{}),
+	}
+	rw.metaWatchersMap[PodResource] = mw
+
+	rw.lock.Lock()
+	first, ok := claimReplacement(rw, log, PodResource, mw)
+	require.True(t, ok, "first claimReplacement must succeed")
+	require.NotNil(t, first)
+
+	second, ok := claimReplacement(rw, log, PodResource, mw)
+	rw.lock.Unlock()
+
+	require.True(t, ok, "second claimReplacement must join the pending attempt")
+	assert.Same(t, first, second, "second caller must receive the same attempt pointer")
+
+	r.Release()
+	<-first.done
+}
+
+// TestStartErrTerminalGuard verifies that a watcher failure records a terminal
+// startErr and prevents any further watcher.Start() calls: the watcher failed
+// once, so the metricset must not keep retrying on every Fetch.
+func TestStartErrTerminalGuard(t *testing.T) {
+	config := &kubernetesConfig{AddResourceMetadata: &metadata.AddResourceMetadataConfig{}}
+	log := logptest.NewTestingLogger(t, selector)
+
+	rw := NewWatchers()
+	failingMock := newMockWatcher()
+	failingMock.startErr = fmt.Errorf("watcher failed")
+	mw := &metaWatcher{
+		watcher:   failingMock,
+		users:     make(map[*enricher]watcherRegistration),
+		enrichers: make(map[*enricher]struct{}),
+	}
+	e := newMetadataEnricher("pod", PodResource, config, log)
+	e.watchedResources = []string{PodResource}
+	mw.users[e] = watcherRegistration{committed: true}
+	mw.enrichers[e] = struct{}{}
+	rw.metaWatchersMap[PodResource] = mw
+
+	assert.False(t, e.Start(rw), "Start() must return false when the watcher fails to start")
+	assert.Equal(t, 1, failingMock.startCalls, "watcher.Start() must be called exactly once")
+
+	rw.lock.RLock()
+	assert.Nil(t, mw.starting, "commitStart must clear starting after the attempt")
+	assert.Error(t, mw.startErr, "commitStart must record the terminal error")
+	rw.lock.RUnlock()
+
+	assert.False(t, e.Start(rw), "second Start() must return false without retrying")
+	assert.Equal(t, 1, failingMock.startCalls, "terminal startErr must prevent further watcher.Start() calls")
+}
+
+// TestStartInitialGuardAndIdempotency verifies the initial stopped() check in Start()
+// and that repeated calls after Stop() consistently return false.
+func TestStartInitialGuardAndIdempotency(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	config := &kubernetesConfig{AddResourceMetadata: &metadata.AddResourceMetadataConfig{}}
+	log := logptest.NewTestingLogger(t, selector)
+
+	mw := &metaWatcher{
+		watcher:   newMockWatcher(),
+		started:   true,
+		users:     make(map[*enricher]watcherRegistration),
+		enrichers: make(map[*enricher]struct{}),
+	}
+	resourceWatchers.metaWatchersMap[PodResource] = mw
+
+	e := newMetadataEnricher("pod", PodResource, config, log)
+	e.watchedResources = []string{PodResource}
+	mw.users[e] = watcherRegistration{committed: true}
+	mw.enrichers[e] = struct{}{}
+
+	// Stop() before Start() must always produce false.
+	e.Stop(resourceWatchers)
+	assert.False(t, e.Start(resourceWatchers), "Start() after Stop() must return false")
+
+	// Second call: idempotent.
+	assert.False(t, e.Start(resourceWatchers), "repeated Start() after Stop() must return false")
+}
+
+// TestHang2NonFinalClusterScopedOwnerStopCancelsReplacement verifies the hang-2 fix:
+// a non-final cluster-scoped owner's Stop() must cancel its own wait for the
+// scope-replacement goroutine (via stopCh) without stopping R or disturbing
+// the surviving cluster-scoped owner. EC2 returns true once R succeeds.
+func TestHang2NonFinalClusterScopedOwnerStopCancelsReplacement(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	w := newMockWatcher()
+	r := newReleasableWatcher()
+	config := &kubernetesConfig{AddResourceMetadata: &metadata.AddResourceMetadataConfig{}}
+	log := logptest.NewTestingLogger(t, selector)
+
+	mw := &metaWatcher{
+		watcher:            w,
+		started:            true,
+		nodeScope:          true,
+		replacementWatcher: r,
+		users:              make(map[*enricher]watcherRegistration),
+		enrichers:          make(map[*enricher]struct{}),
+	}
+	resourceWatchers.metaWatchersMap[PodResource] = mw
+
+	ec1 := newMetadataEnricher("state_pod", PodResource, config, log)
+	ec1.watchedResources = []string{PodResource}
+	mw.users[ec1] = watcherRegistration{committed: true, nodeScope: false}
+	mw.enrichers[ec1] = struct{}{}
+
+	ec2 := newMetadataEnricher("state_container", PodResource, config, log)
+	ec2.watchedResources = []string{PodResource}
+	mw.users[ec2] = watcherRegistration{committed: true, nodeScope: false}
+	mw.enrichers[ec2] = struct{}{}
+
+	// EC1 starts: claimReplacement launches R's goroutine; EC1 blocks on attempt.done.
+	ec1StartDone := make(chan bool, 1)
+	go func() { ec1StartDone <- ec1.Start(resourceWatchers) }()
+	<-r.startCalled
+
+	// EC1 is non-final: Stop() must cancel EC1's wait without stopping R.
+	ec1StopDone := make(chan struct{})
+	go func() {
+		ec1.Stop(resourceWatchers)
+		close(ec1StopDone)
+	}()
+	select {
+	case <-ec1StopDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("ec1.Stop() did not return within 5 seconds; must not block waiting for R")
+	}
+	assert.False(t, <-ec1StartDone, "ec1.Start() must return false after ec1.Stop()")
+
+	// R must still be in flight: pendingReplacement preserved for the surviving EC2.
+	resourceWatchers.lock.RLock()
+	assert.NotNil(t, mw.pendingReplacement, "pendingReplacement must remain: R is still starting for EC2")
+	resourceWatchers.lock.RUnlock()
+
+	// EC2 starts: joins the in-flight attempt; then R succeeds.
+	ec2StartDone := make(chan bool, 1)
+	go func() { ec2StartDone <- ec2.Start(resourceWatchers) }()
+
+	r.Release()
+
+	select {
+	case result := <-ec2StartDone:
+		assert.True(t, result, "ec2.Start() must return true after R succeeds")
+	case <-time.After(5 * time.Second):
+		t.Fatal("ec2.Start() did not return within 5 seconds after R succeeded")
+	}
+	assert.EqualValues(t, 1, r.startCount.Load(), "R.Start() must be called exactly once")
+}
+
+// TestScopeReplacementSecondClusterOwnerJoinsExistingAttempt verifies that two
+// concurrent cluster-scoped owners both waiting for scope replacement join a
+// single shared goroutine: R.Start() is called exactly once.
+func TestScopeReplacementSecondClusterOwnerJoinsExistingAttempt(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	w := newMockWatcher()
+	r := newReleasableWatcher()
+	config := &kubernetesConfig{AddResourceMetadata: &metadata.AddResourceMetadataConfig{}}
+	log := logptest.NewTestingLogger(t, selector)
+
+	mw := &metaWatcher{
+		watcher:            w,
+		started:            true,
+		nodeScope:          true,
+		replacementWatcher: r,
+		users:              make(map[*enricher]watcherRegistration),
+		enrichers:          make(map[*enricher]struct{}),
+	}
+	resourceWatchers.metaWatchersMap[PodResource] = mw
+
+	ec1 := newMetadataEnricher("state_pod", PodResource, config, log)
+	ec1.watchedResources = []string{PodResource}
+	mw.users[ec1] = watcherRegistration{committed: true, nodeScope: false}
+	mw.enrichers[ec1] = struct{}{}
+
+	ec2 := newMetadataEnricher("state_container", PodResource, config, log)
+	ec2.watchedResources = []string{PodResource}
+	mw.users[ec2] = watcherRegistration{committed: true, nodeScope: false}
+	mw.enrichers[ec2] = struct{}{}
+
+	ec1StartDone := make(chan bool, 1)
+	ec2StartDone := make(chan bool, 1)
+	go func() { ec1StartDone <- ec1.Start(resourceWatchers) }()
+	<-r.startCalled // R is in Start(); EC1 is blocking
+
+	// EC2 also starts; both must return true after R succeeds, R.Start() called once.
+	go func() { ec2StartDone <- ec2.Start(resourceWatchers) }()
+
+	r.Release()
+
+	select {
+	case result := <-ec1StartDone:
+		assert.True(t, result, "ec1.Start() must return true after R succeeds")
+	case <-time.After(5 * time.Second):
+		t.Fatal("ec1.Start() did not return within 5 seconds")
+	}
+	select {
+	case result := <-ec2StartDone:
+		assert.True(t, result, "ec2.Start() must return true after R succeeds")
+	case <-time.After(5 * time.Second):
+		t.Fatal("ec2.Start() did not return within 5 seconds")
+	}
+	assert.EqualValues(t, 1, r.startCount.Load(), "R.Start() must have been called exactly once total")
+}
+
+// TestScopeReplacementSuccessSwapsWatcher verifies that when R succeeds,
+// the active watcher is swapped from W to R, W is stopped, and both cluster-scoped
+// owners return true.
+func TestScopeReplacementSuccessSwapsWatcher(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	w := newBlockingMockWatcher()
+	r := newReleasableWatcher()
+	config := &kubernetesConfig{AddResourceMetadata: &metadata.AddResourceMetadataConfig{}}
+	log := logptest.NewTestingLogger(t, selector)
+
+	mw := &metaWatcher{
+		watcher:            w,
+		started:            true,
+		nodeScope:          true,
+		replacementWatcher: r,
+		users:              make(map[*enricher]watcherRegistration),
+		enrichers:          make(map[*enricher]struct{}),
+	}
+	resourceWatchers.metaWatchersMap[PodResource] = mw
+
+	ec := newMetadataEnricher("state_pod", PodResource, config, log)
+	ec.watchedResources = []string{PodResource}
+	mw.users[ec] = watcherRegistration{committed: true, nodeScope: false}
+	mw.enrichers[ec] = struct{}{}
+
+	ecStartDone := make(chan bool, 1)
+	go func() { ecStartDone <- ec.Start(resourceWatchers) }()
+	<-r.startCalled
+
+	r.Release()
+
+	select {
+	case result := <-ecStartDone:
+		assert.True(t, result, "ec.Start() must return true after R succeeds")
+	case <-time.After(5 * time.Second):
+		t.Fatal("ec.Start() did not return within 5 seconds")
+	}
+
+	resourceWatchers.lock.RLock()
+	assert.False(t, mw.nodeScope, "nodeScope must be false after R commits")
+	assert.True(t, mw.started, "started must be true after R commits")
+	assert.Nil(t, mw.pendingReplacement, "pendingReplacement must be nil after R commits")
+	resourceWatchers.lock.RUnlock()
+
+	// W must have been stopped by the replacement commit.
+	select {
+	case <-w.stopCalled:
+	case <-time.After(5 * time.Second):
+		t.Fatal("W.Stop() was not called after R committed")
+	}
+
+	ec.Stop(resourceWatchers)
+}
+
+// TestScopeReplacementFailureRestoresFactory verifies that when R fails,
+// W remains active, the factory is restored for retry, and the caller returns false.
+func TestScopeReplacementFailureRestoresFactory(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	w := newMockWatcher()
+	r := newReleasableWatcher()
+	factoryCalled := 0
+	factory := func() (kubernetes.Watcher, error) {
+		factoryCalled++
+		return r, nil
+	}
+	config := &kubernetesConfig{AddResourceMetadata: &metadata.AddResourceMetadataConfig{}}
+	log := logptest.NewTestingLogger(t, selector)
+
+	mw := &metaWatcher{
+		watcher:                   w,
+		started:                   true,
+		nodeScope:                 true,
+		replacementWatcherFactory: factory,
+		users:                     make(map[*enricher]watcherRegistration),
+		enrichers:                 make(map[*enricher]struct{}),
+	}
+	resourceWatchers.metaWatchersMap[PodResource] = mw
+
+	ec := newMetadataEnricher("state_pod", PodResource, config, log)
+	ec.watchedResources = []string{PodResource}
+	mw.users[ec] = watcherRegistration{committed: true, nodeScope: false}
+	mw.enrichers[ec] = struct{}{}
+
+	ecStartDone := make(chan bool, 1)
+	go func() { ecStartDone <- ec.Start(resourceWatchers) }()
+	<-r.startCalled
+
+	// R fails: stop it.
+	r.Stop()
+
+	select {
+	case result := <-ecStartDone:
+		assert.False(t, result, "ec.Start() must return false when R fails")
+	case <-time.After(5 * time.Second):
+		t.Fatal("ec.Start() did not return within 5 seconds after R failed")
+	}
+
+	resourceWatchers.lock.RLock()
+	assert.True(t, mw.nodeScope, "nodeScope must stay true; W was never swapped out")
+	assert.True(t, mw.started, "W must still be started")
+	assert.Nil(t, mw.pendingReplacement, "pendingReplacement must be nil after R failed")
+	assert.NotNil(t, mw.replacementWatcherFactory, "factory must be restored so the next Start() can retry")
+	resourceWatchers.lock.RUnlock()
+	assert.Equal(t, 1, factoryCalled, "factory must have been called exactly once to create R")
+
+	ec.Stop(resourceWatchers)
+}
+
+// TestNodeScopedOwnerReturnsTrueWhenReplacementCommits pins the commit-before-stop
+// ordering in claimReplacement: R must set m.started=true under the registry lock before
+// calling W.Stop(), so that EN's waitAndVerify (triggered when W's goroutine closes
+// W.attempt.done) observes the committed started state and returns true.
+func TestNodeScopedOwnerReturnsTrueWhenReplacementCommits(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	w := newBlockingMockWatcher() // W: node-scoped, not yet started
+	r := newReleasableWatcher()   // R: cluster-scoped replacement
+	config := &kubernetesConfig{AddResourceMetadata: &metadata.AddResourceMetadataConfig{}}
+	log := logptest.NewTestingLogger(t, selector)
+
+	mw := &metaWatcher{
+		watcher:            w,
+		started:            false,
+		nodeScope:          true,
+		replacementWatcher: r,
+		users:              make(map[*enricher]watcherRegistration),
+		enrichers:          make(map[*enricher]struct{}),
+	}
+	resourceWatchers.metaWatchersMap[PodResource] = mw
+
+	// EN: node-scoped owner. Its Start() waits on W's startup goroutine.
+	en := newMetadataEnricher("pod", PodResource, config, log)
+	en.watchedResources = []string{PodResource}
+	mw.users[en] = watcherRegistration{committed: true, nodeScope: true}
+	mw.enrichers[en] = struct{}{}
+
+	// EC: cluster-scoped owner. Its Start() triggers claimReplacement and waits for R.
+	ec := newMetadataEnricher("state_pod", PodResource, config, log)
+	ec.watchedResources = []string{PodResource}
+	mw.users[ec] = watcherRegistration{committed: true, nodeScope: false}
+	mw.enrichers[ec] = struct{}{}
+
+	// EN starts; its goroutine blocks in W.Start() (not started yet, so ensureWatcherReady runs).
+	enStartDone := make(chan bool, 1)
+	go func() { enStartDone <- en.Start(resourceWatchers) }()
+	<-w.startCalled
+
+	// EC starts; claimReplacement launches R's goroutine; EC blocks on R's attempt.done.
+	ecStartDone := make(chan bool, 1)
+	go func() { ecStartDone <- ec.Start(resourceWatchers) }()
+	<-r.startCalled
+
+	// Release R: R commits m.started=true, m.starting=nil under the lock, then
+	// stops W outside the lock. W.Start() returns error, W's goroutine closes
+	// W.attempt.done. EN's waitAndVerify re-reads m.started=true and returns true.
+	r.Release()
+
+	select {
+	case result := <-enStartDone:
+		assert.True(t, result, "EN must return true: R committed m.started=true before W's done closed")
+	case <-time.After(5 * time.Second):
+		t.Fatal("EN.Start() did not return within 5 seconds after R committed")
+	}
+	select {
+	case result := <-ecStartDone:
+		assert.True(t, result, "EC must return true after R succeeds")
+	case <-time.After(5 * time.Second):
+		t.Fatal("EC.Start() did not return within 5 seconds after R committed")
+	}
+
+	en.Stop(resourceWatchers)
+	ec.Stop(resourceWatchers)
+}
+
+func requireActiveWatcherWriterPending(t *testing.T, metaWatcher *metaWatcher, message string) {
+	t.Helper()
+
+	require.Eventually(t, func() bool {
+		if metaWatcher.activeWatcherLock.TryRLock() {
+			metaWatcher.activeWatcherLock.RUnlock()
+			return false
+		}
+		return true
+	}, time.Second, time.Millisecond, message)
+}
+
+// blockingMockWatcher blocks in Start() until Stop() is called.
+type blockingMockWatcher struct {
+	startCalled chan struct{}
+	stopCalled  chan struct{}
+	store       cache.Store
+}
+
+func newBlockingMockWatcher() *blockingMockWatcher {
+	return &blockingMockWatcher{
+		startCalled: make(chan struct{}),
+		stopCalled:  make(chan struct{}),
+		store: cache.NewStore(func(obj any) (string, error) {
+			objName, err := cache.ObjectToName(obj)
+			if err != nil {
+				return "", err
+			}
+			return objName.Name, nil
+		}),
+	}
+}
+
+func (m *blockingMockWatcher) Start() error {
+	select {
+	case <-m.startCalled:
+	default:
+		close(m.startCalled)
+	}
+	<-m.stopCalled
+	return fmt.Errorf("watcher stopped before cache sync")
+}
+
+func (m *blockingMockWatcher) Stop() {
+	// Close only once; a second Stop() call is a no-op.
+	select {
+	case <-m.stopCalled:
+	default:
+		close(m.stopCalled)
+	}
+}
+
+func (m *blockingMockWatcher) GetEventHandler() kubernetes.ResourceEventHandler  { return nil }
+func (m *blockingMockWatcher) AddEventHandler(r kubernetes.ResourceEventHandler) {}
+func (m *blockingMockWatcher) Store() cache.Store                                { return m.store }
+func (m *blockingMockWatcher) Client() k8s.Interface                             { return nil }
+func (m *blockingMockWatcher) CachedObject() runtime.Object                      { return nil }
 
 func TestGetWatcherStoreKeyFromMetadataKey(t *testing.T) {
 	t.Run("global resource", func(t *testing.T) {
@@ -1679,7 +2915,7 @@ func newWatcherLookupTestEnricher(t *testing.T, resourceWatchers *Watchers, meta
 	e := newMetadataEnricher(
 		"pod",
 		PodResource,
-		&kubernetesConfig{AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig()},
+		&kubernetesConfig{AddResourceMetadata: &metadata.AddResourceMetadataConfig{}},
 		logptest.NewTestingLogger(t, selector),
 	)
 	e.index = func(event mapstr.M) string {
@@ -1697,18 +2933,6 @@ func newWatcherLookupTestEnricher(t *testing.T, resourceWatchers *Watchers, meta
 	resourceWatchers.lock.Unlock()
 	commitWatcherOwnership(e, resourceWatchers)
 	return e
-}
-
-func requireActiveWatcherWriterPending(t *testing.T, metaWatcher *metaWatcher, message string) {
-	t.Helper()
-
-	require.Eventually(t, func() bool {
-		if metaWatcher.activeWatcherLock.TryRLock() {
-			metaWatcher.activeWatcherLock.RUnlock()
-			return false
-		}
-		return true
-	}, time.Second, time.Millisecond, message)
 }
 
 type mockFuncs struct {
@@ -1863,3 +3087,81 @@ func (*coordinatedWatcher) Client() k8s.Interface {
 func (*coordinatedWatcher) CachedObject() runtime.Object {
 	return nil
 }
+
+// cancelErrorWatcher blocks in Start() until Stop() is called, then returns an
+// error. Used to simulate a watcher whose Start() is cancelled mid-flight.
+type cancelErrorWatcher struct {
+	store       cache.Store
+	startCalled chan struct{}
+	cancel      chan struct{}
+	startOnce   sync.Once
+	stopOnce    sync.Once
+}
+
+func newCancelErrorWatcher() *cancelErrorWatcher {
+	return &cancelErrorWatcher{
+		store:       newMockWatcher().store,
+		startCalled: make(chan struct{}),
+		cancel:      make(chan struct{}),
+	}
+}
+
+func (w *cancelErrorWatcher) Start() error {
+	w.startOnce.Do(func() { close(w.startCalled) })
+	<-w.cancel
+	return fmt.Errorf("start cancelled")
+}
+
+func (w *cancelErrorWatcher) Stop() {
+	w.stopOnce.Do(func() { close(w.cancel) })
+}
+
+func (w *cancelErrorWatcher) Store() cache.Store                              { return w.store }
+func (w *cancelErrorWatcher) AddEventHandler(kubernetes.ResourceEventHandler) {}
+func (*cancelErrorWatcher) GetEventHandler() kubernetes.ResourceEventHandler  { return nil }
+func (*cancelErrorWatcher) Client() k8s.Interface                             { return nil }
+func (*cancelErrorWatcher) CachedObject() runtime.Object                      { return nil }
+
+// releasableWatcher blocks in Start() until explicitly released (→ nil) or stopped (→ error).
+// startCount is incremented on every entry to Start(), letting tests assert that a shared
+// blocking watcher was started exactly once across concurrent callers.
+type releasableWatcher struct {
+	store       cache.Store
+	startCalled chan struct{}
+	released    chan struct{}
+	stopped     chan struct{}
+	startOnce   sync.Once
+	releaseOnce sync.Once
+	stopOnce    sync.Once
+	startCount  atomic.Int64
+}
+
+func newReleasableWatcher() *releasableWatcher {
+	return &releasableWatcher{
+		store:       newMockWatcher().store,
+		startCalled: make(chan struct{}),
+		released:    make(chan struct{}),
+		stopped:     make(chan struct{}),
+	}
+}
+
+func (w *releasableWatcher) Start() error {
+	w.startCount.Add(1)
+	w.startOnce.Do(func() { close(w.startCalled) })
+	select {
+	case <-w.released:
+		return nil
+	case <-w.stopped:
+		return fmt.Errorf("watcher stopped before cache sync")
+	}
+}
+
+func (w *releasableWatcher) Release() { w.releaseOnce.Do(func() { close(w.released) }) }
+
+func (w *releasableWatcher) Stop() { w.stopOnce.Do(func() { close(w.stopped) }) }
+
+func (w *releasableWatcher) Store() cache.Store                              { return w.store }
+func (w *releasableWatcher) AddEventHandler(kubernetes.ResourceEventHandler) {}
+func (*releasableWatcher) GetEventHandler() kubernetes.ResourceEventHandler  { return nil }
+func (*releasableWatcher) Client() k8s.Interface                             { return nil }
+func (*releasableWatcher) CachedObject() runtime.Object                      { return nil }

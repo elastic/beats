@@ -6,9 +6,17 @@ package aws
 
 import (
 	"context"
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
+	"crypto/x509"
+	"crypto/x509/pkix"
+	"encoding/pem"
 	"fmt"
 	"io"
+	"math/big"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"os"
 	"path"
@@ -287,12 +295,30 @@ func TestApplyIdentityFederationChainValidation(t *testing.T) {
 		t.Setenv(identityfederation.AWSCloudResourceIDEnvVar, "abc123")
 		// IDTokenFileEnvVar intentionally not set — should not be required in IRSA mode
 
-		// We only check that the error is not about "id token"; the chain itself will
-		// fail later when STS is called, but config validation should pass.
+		// We only check that the error is not about "id token"; the chain itself will fail later when STS is called, but config validation should pass.
 		err := applyIdentityFederationChain(ConfigAWS{RoleArn: validRoleARN}, &aws.Config{Region: "us-east-1"}, logger)
 		if err != nil {
 			require.NotContains(t, err.Error(), "id token")
 		}
+	})
+
+	t.Run("wii: cert and key files are required and there is no silent legacy fallback", func(t *testing.T) {
+		t.Setenv(identityfederation.WIIIssuerURLEnvVar, "https://wii.example.com")
+		t.Setenv(identityfederation.AWSGlobalRoleARNEnvVar, "arn:aws:iam::999999999999:role/elastic-global-role")
+		t.Setenv(identityfederation.AWSIDTokenFileEnvVar, "/path/token")
+		t.Setenv(identityfederation.AWSCloudResourceIDEnvVar, "abc123")
+
+		err := applyIdentityFederationChain(ConfigAWS{RoleArn: validRoleARN}, &aws.Config{}, logger)
+		require.ErrorContains(t, err, "WORKLOAD_IDENTITY_SSL_CERT_FILE")
+	})
+
+	t.Run("wii: role_arn is required", func(t *testing.T) {
+		t.Setenv(identityfederation.WIIIssuerURLEnvVar, "https://wii.example.com")
+		t.Setenv(identityfederation.WIISSLCertFileEnvVar, "/path/wii-client.crt")
+		t.Setenv(identityfederation.WIISSLKeyFileEnvVar, "/path/wii-client.key")
+
+		err := applyIdentityFederationChain(ConfigAWS{}, &aws.Config{}, logger)
+		require.ErrorContains(t, err, "role_arn is required for WII identity federation")
 	})
 }
 
@@ -365,4 +391,118 @@ func TestDefaultRegion(t *testing.T) {
 			assert.Equal(t, c.expectedRegion, awsConfig.Region)
 		})
 	}
+}
+
+func TestApplyIdentityFederationChainWII(t *testing.T) {
+	const wiiToken = "eyJhbGciOiJSUzI1NiJ9.wii-test.sig" //nolint:gosec // G101: not a credential, an inert JWT-shaped test fixture
+
+	certPEM, keyPEM, err := genSelfSignedClientCert()
+	require.NoError(t, err)
+	tmpDir := t.TempDir()
+	certPath := path.Join(tmpDir, "wii-client.crt")
+	keyPath := path.Join(tmpDir, "wii-client.key")
+	require.NoError(t, os.WriteFile(certPath, certPEM, 0o600))
+	require.NoError(t, os.WriteFile(keyPath, keyPEM, 0o600))
+
+	wiiCalls := 0
+	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		wiiCalls++
+		assert.Equal(t, "/token", r.URL.Path)
+		body, err := io.ReadAll(r.Body)
+		assert.NoError(t, err)
+		assert.JSONEq(t, `{"aud":"sts.amazonaws.com"}`, string(body))
+		_, _ = fmt.Fprintf(w, `{"token":%q,"expires_at":%d}`, wiiToken, time.Now().Add(time.Hour).Unix())
+	}))
+	defer srv.Close()
+
+	serverCertPath := path.Join(tmpDir, "wii-server-ca.crt")
+	require.NoError(t, os.WriteFile(serverCertPath, pem.EncodeToMemory(
+		&pem.Block{Type: "CERTIFICATE", Bytes: srv.Certificate().Raw}), 0o600))
+
+	t.Setenv(identityfederation.WIIIssuerURLEnvVar, srv.URL)
+	t.Setenv(identityfederation.WIISSLCertFileEnvVar, certPath)
+	t.Setenv(identityfederation.WIISSLKeyFileEnvVar, keyPath)
+	t.Setenv(identityfederation.WIISSLCAFileEnvVar, serverCertPath)
+
+	config := ConfigAWS{
+		RoleArn:            "arn:aws:iam::123456789012:role/customer-role",
+		ExternalID:         "external-id-456",
+		AssumeRoleDuration: 45 * time.Minute,
+	}
+
+	baseConfig := &aws.Config{
+		Region:       "us-east-1",
+		BaseEndpoint: aws.String("https://aws.mock"),
+	}
+
+	stsCalls := 0
+	baseConfig.APIOptions = append(baseConfig.APIOptions, func(stack *middleware.Stack) error {
+		return stack.Finalize.Add(
+			middleware.FinalizeMiddlewareFunc(
+				"mock",
+				func(ctx context.Context, in middleware.FinalizeInput, next middleware.FinalizeHandler) (middleware.FinalizeOutput, middleware.Metadata, error) {
+					req, is := in.Request.(*smithyhttp.Request)
+					require.Truef(t, is, "expected *smithyhttp.Request, got: %T", in.Request)
+					stsCalls++
+					bd, err := io.ReadAll(req.GetStream())
+					assert.NoError(t, req.RewindStream())
+					assert.NoError(t, err)
+
+					q, err := url.ParseQuery(string(bd))
+					assert.NoError(t, err)
+					assert.Equal(t, "AssumeRoleWithWebIdentity", q.Get("Action"))
+					assert.Equal(t, config.RoleArn, q.Get("RoleArn"), "the customer role must be assumed directly")
+					assert.Equal(t, wiiToken, q.Get("WebIdentityToken"))
+					assert.Equal(t, "2700", q.Get("DurationSeconds"))
+					assert.Empty(t, q.Get("ExternalId"), "ExternalID must not be sent on the WII path")
+					return middleware.FinalizeOutput{
+						Result: &sts.AssumeRoleWithWebIdentityOutput{
+							Credentials: &types.Credentials{
+								AccessKeyId:     aws.String("AKIAFAKEEXAMPLE00003"),
+								SecretAccessKey: aws.String("FAKEwJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY3"),
+								SessionToken:    aws.String("FwoGZXIvYXdzEFAaDFAKESESSIONTOKENEXAMPLE3"),
+								Expiration:      aws.Time(time.Now().Add(time.Hour)),
+							},
+						},
+					}, middleware.Metadata{}, nil
+				},
+			),
+			middleware.After,
+		)
+	})
+
+	err = applyIdentityFederationChain(config, baseConfig, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	crd, err := baseConfig.Credentials.Retrieve(t.Context())
+	require.NoError(t, err)
+	require.Equal(t, "AKIAFAKEEXAMPLE00003", crd.AccessKeyID)
+	require.Equal(t, 1, stsCalls, "WII path must issue a single direct STS call")
+	require.Equal(t, 1, wiiCalls)
+}
+
+func genSelfSignedClientCert() (certPEM, keyPEM []byte, err error) {
+	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	if err != nil {
+		return nil, nil, err
+	}
+	template := &x509.Certificate{
+		SerialNumber: big.NewInt(1),
+		Subject:      pkix.Name{CommonName: "wii-test-client"},
+		NotBefore:    time.Now().Add(-time.Hour),
+		NotAfter:     time.Now().Add(time.Hour),
+		KeyUsage:     x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+	}
+	der, err := x509.CreateCertificate(rand.Reader, template, template, &key.PublicKey, key)
+	if err != nil {
+		return nil, nil, err
+	}
+	keyDER, err := x509.MarshalECPrivateKey(key)
+	if err != nil {
+		return nil, nil, err
+	}
+	certPEM = pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: der})
+	keyPEM = pem.EncodeToMemory(&pem.Block{Type: "EC PRIVATE KEY", Bytes: keyDER})
+	return certPEM, keyPEM, nil
 }

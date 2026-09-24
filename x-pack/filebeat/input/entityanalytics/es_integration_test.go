@@ -244,7 +244,6 @@ func newESStore(t *testing.T) (*statestore.Store, *eslegclient.Connection, strin
 	if err != nil {
 		t.Fatalf("registry Get: %v", err)
 	}
-	s.SetID(inputID)
 	t.Cleanup(func() {
 		s.Close()
 		// Clean up the test index.
