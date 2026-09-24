@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: Prevent Synthetics monitor state from resetting after Elastic Agent restarts
+component: heartbeat
+issue: https://github.com/elastic/elastic-agent/issues/16284

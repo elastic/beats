@@ -15,20 +15,43 @@ import (
 
 type heartbeatReceiver struct {
 	xpInstance.BeatReceiver
+	ctx                        context.Context
+	cancel                     context.CancelFunc
+	elasticsearchAuthRequester *esClient
 }
 
-func (hb *heartbeatReceiver) Start(ctx context.Context, host component.Host) error {
-	hb.Logger.Info("starting heartbeat receiver")
-	if err := hb.BeatReceiver.Start(host); err != nil {
-		return fmt.Errorf("error starting heartbeat receiverL %w", err)
+func newHeartbeatReceiver(br xpInstance.BeatReceiver) *heartbeatReceiver {
+	ctx, cancel := context.WithCancel(context.Background())
+	return &heartbeatReceiver{
+		BeatReceiver: br,
+		ctx:          ctx,
+		cancel:       cancel,
 	}
+}
+
+func (hb *heartbeatReceiver) Start(_ context.Context, host component.Host) error {
+	hb.Logger.Info("starting heartbeat receiver")
+
+	if err := hb.BeatReceiver.Start(host); err != nil {
+		return fmt.Errorf("starting heartbeat receiver: %w", err)
+	}
+
 	return nil
 }
 
 func (hb *heartbeatReceiver) Shutdown(ctx context.Context) error {
 	hb.Logger.Info("stopping heartbeat receiver")
+	if hb.cancel != nil {
+		hb.cancel()
+	}
+	defer func() {
+		if hb.elasticsearchAuthRequester != nil {
+			hb.elasticsearchAuthRequester.CloseIdleConnections()
+		}
+	}()
 	if err := hb.BeatReceiver.Shutdown(ctx); err != nil {
 		return fmt.Errorf("error stopping heartbeat receiver: %w", err)
 	}
+
 	return nil
 }
