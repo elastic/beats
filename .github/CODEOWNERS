@@ -57,7 +57,7 @@ CHANGELOG*
 /filebeat/module/santa @elastic/security-service-integrations
 /filebeat/module/system @elastic/elastic-agent-data-plane
 /filebeat/module/traefik # TODO: find right team
-/heartbeat/ @elastic/obs-ds-hosted-services
+/heartbeat/ @elastic/obs-signals-logs-team
 /journalbeat @elastic/elastic-agent-data-plane
 /libbeat/ @elastic/elastic-agent-data-plane
 /libbeat/autodiscover/providers/kubernetes @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
