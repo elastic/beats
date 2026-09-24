@@ -70,6 +70,9 @@ type harvestSession struct {
 	// their progress can't be represented by a plain offset/size comparison.
 	metricsOffset        *atomic.Int64
 	cleanupMetricsOffset func()
+
+	// harvesterState is this session's entry in the input's fileStateTable.
+	harvesterState *openFileState
 }
 
 // OpenSession opens (or resumes) a reading session for the source. id is the
@@ -113,6 +116,12 @@ func (inp *filestream) OpenSession(
 	if err != nil {
 		log.Errorf("File could not be opened for reading: %v", err)
 		return nil, err
+	}
+
+	s.harvesterState = inp.harvesterState.Register(src.Name())
+	// If fstat fails, the entry has no usable open file identity.
+	if fi, err := f.Stat(); err == nil {
+		s.harvesterState.PinOSState(file.GetOSState(fi))
 	}
 	if truncated {
 		s.state.Offset = 0
@@ -359,6 +368,9 @@ func (s *harvestSession) Close() error {
 	if s.cleanupMetricsOffset != nil {
 		s.cleanupMetricsOffset()
 	}
+	// Remove the recorded identity before closing its file.
+	s.inp.harvesterState.Deregister(s.harvesterState)
+	s.harvesterState = nil
 	if s.file != nil {
 		err := s.file.Close()
 		s.file = nil
