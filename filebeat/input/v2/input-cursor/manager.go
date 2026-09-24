@@ -20,17 +20,20 @@ package cursor
 import (
 	"context"
 	"errors"
-	"fmt"
 	"sync"
 	"time"
 
-	"github.com/elastic/go-concert/unison"
-
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/filebeat/input/v2/statemanager"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+// globalCache shares cursor stores across the process.
+// Managers with the same cache key share one store and one background cleaner.
+// The cache closes the store after all managers and running inputs release it.
+var globalCache = statemanager.NewCache[*store](func(s *store) { s.Release() })
 
 // InputManager is used to create, manage, and coordinate stateful inputs and
 // their persistent state.
@@ -42,7 +45,7 @@ import (
 // input, and without any pending update operations for the persistent store.
 //
 // The Type field is used to create the key name in the persistent store. Users
-// are allowed to add a custome per input configuration ID using the `id`
+// are allowed to add a custom per input configuration ID using the `id`
 // setting, to collect the same source multiple times, but with different
 // state. The key name in the persistent store becomes <Type>-[<ID>]-<Source Name>
 type InputManager struct {
@@ -63,16 +66,12 @@ type InputManager struct {
 	// that will be used to collect events from each source.
 	Configure func(cfg *conf.C, log *logp.Logger) ([]Source, Input, error)
 
-	// mu guards the deferred setup below. Inputs are created from several
-	// reload paths — static config, central management, autodiscovery — which
-	// can run concurrently for one input type.
-	mu         sync.Mutex
-	initedFull bool
-	initErr    error
-	store      *store
-	// cleanerGroup is the task group Init was given, held until an input is
-	// created and cleared once the cleaner is running.
-	cleanerGroup unison.Group
+	// mu protects releases and closed from concurrent access.
+	// releases holds one globalCache release function for each store this manager uses.
+	// Close clears releases.
+	mu       sync.Mutex
+	releases map[string]func()
+	closed   bool
 }
 
 // Source describe a source the input can collect data from.
@@ -87,100 +86,81 @@ var (
 	errNoInputRunner      = errors.New("no input runner available")
 )
 
-// init initializes the state store with a full init (reading all states).
-// Caller holds cim.mu.
-func (cim *InputManager) init(inputID string) error {
-	if cim.initedFull {
-		return nil
-	}
+// cacheKey identifies the cursor store for this input type and ID.
+// The key includes the type because each cursor store loads state for one type.
+func (cim *InputManager) cacheKey(inputID string) string {
+	return cim.StateStore.StoreKey(cim.Type, inputID) + "::" + cim.Type
+}
 
+// ensureSetup opens or reuses the store for inputID and returns its cache key.
+// Call ensureSetup without holding cim.mu.
+// It unlocks cim.mu before globalCache.Acquire, so Close can proceed while Acquire waits.
+func (cim *InputManager) ensureSetup(inputID string) (string, error) {
+	cim.mu.Lock()
+	if cim.closed {
+		cim.mu.Unlock()
+		return "", errors.New("input manager is closed")
+	}
 	if cim.DefaultCleanTimeout <= 0 {
 		cim.DefaultCleanTimeout = 30 * time.Minute
 	}
-
-	log := cim.Logger.With("input_type", cim.Type)
-	cim.store, cim.initErr = openStore(log, cim.StateStore, cim.Type, inputID, true)
-	if cim.initErr != nil {
-		return cim.initErr
+	key := cim.cacheKey(inputID)
+	if _, ok := cim.releases[key]; ok {
+		cim.mu.Unlock()
+		return key, nil
 	}
-	cim.initedFull = true
+	log := cim.Logger.With("input_type", cim.Type)
+	interval := cim.StateStore.CleanupInterval()
+	if interval <= 0 {
+		interval = 5 * time.Minute
+	}
+	cim.mu.Unlock()
 
-	return nil
-}
+	_, release, err := globalCache.Acquire(
+		key,
+		func() (*store, error) {
+			return openStore(log, cim.StateStore, cim.Type, inputID, true)
+		},
+		func(ctx context.Context, s *store) {
+			runCleaner(ctx, log, s, interval)
+		},
+		nil,
+		nil,
+	)
+	if err != nil {
+		return "", err
+	}
 
-// Init records the task group the registry cleanup process will run in. Opening
-// the store and starting that process are deferred to Create.
-//
-// v2.Loader.Init calls Init on every registered plugin, but a Beat instantiates
-// inputs for only a few of them: eager setup here cost one open registry store
-// and one idle cleanup goroutine per input type the Beat never runs. That is
-// paid per Beat, and elastic-agent runs one Beat receiver per input stream.
-//
-// Deferring also means a registry that cannot be opened now fails the inputs
-// that need it rather than the whole Beat. Elasticsearch-backed inputs already
-// worked this way, since they cannot open the store until Create gives them the
-// input ID.
-func (cim *InputManager) Init(group unison.Group) error {
 	cim.mu.Lock()
 	defer cim.mu.Unlock()
-
-	cim.cleanerGroup = group
-	return nil
+	if cim.closed {
+		release()
+		return "", errors.New("input manager is closed")
+	}
+	if _, ok := cim.releases[key]; ok {
+		// Another Create already added this key. Release the extra reference.
+		release()
+		return key, nil
+	}
+	if cim.releases == nil {
+		cim.releases = make(map[string]func())
+	}
+	cim.releases[key] = release
+	return key, nil
 }
 
-// setup opens the store and starts the registry cleanup process, once per
-// manager. Caller holds cim.mu.
-func (cim *InputManager) setup(inputID string) error {
-	if err := cim.init(inputID); err != nil {
-		return err
+// Close releases all stores that this manager uses.
+// After the last user releases a store, the cache stops its cleaner and closes it.
+// Call Close after all inputs for this manager stop.
+func (cim *InputManager) Close() {
+	cim.mu.Lock()
+	cim.closed = true
+	releases := cim.releases
+	cim.releases = nil
+	cim.mu.Unlock()
+	for _, release := range releases {
+		release()
 	}
-
-	if cim.cleanerGroup == nil {
-		return nil
-	}
-	group := cim.cleanerGroup
-	cim.cleanerGroup = nil
-	return cim.startCleaner(group)
-}
-
-// startCleaner launches the background cleaner goroutine that removes stale
-// entries from the persistent store. Caller holds cim.mu.
-func (cim *InputManager) startCleaner(group unison.Group) error {
-	log := cim.Logger.With("input_type", cim.Type)
-
-	store := cim.store
-	cleaner := &cleaner{log: log}
-	store.Retain()
-	// TL;DR: If Filebeat shuts down too quickly, the function passed to
-	// `group.Go` will never run, therefore this instance of store will
-	// never be released, locking Filebeat's shutdown process.
-	//
-	// To circumvent that, we wait for `group.Go` to start our function.
-	// See https://github.com/elastic/beats/issues/45034#issuecomment-3238261126
-	waitRunning := make(chan struct{})
-	err := group.Go(func(canceler context.Context) error {
-		waitRunning <- struct{}{}
-		defer cim.shutdown()
-		defer store.Release()
-		interval := cim.StateStore.CleanupInterval()
-		if interval <= 0 {
-			interval = 5 * time.Minute
-		}
-		cleaner.run(canceler, store, interval)
-		return nil
-	})
-	if err != nil {
-		store.Release()
-		cim.shutdown()
-		return fmt.Errorf("can not start registry cleanup process: %w", err)
-	}
-
-	<-waitRunning
-	return nil
-}
-
-func (cim *InputManager) shutdown() {
-	cim.store.Release()
 }
 
 // Create builds a new v2.Input using the provided Configure function.
@@ -194,9 +174,7 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		return nil, err
 	}
 
-	cim.mu.Lock()
-	err := cim.setup(settings.ID)
-	cim.mu.Unlock()
+	cacheKey, err := cim.ensureSetup(settings.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -215,16 +193,30 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	return &managedInput{
 		manager:      cim,
 		userID:       settings.ID,
+		cacheKey:     cacheKey,
 		sources:      sources,
 		input:        inp,
 		cleanTimeout: settings.CleanInactive,
 	}, nil
 }
 
-// Lock locks a key for exclusive access and returns an resource that can be used to modify
-// the cursor state and unlock the key.
-func (cim *InputManager) lock(ctx v2.Context, key string) (*resource, error) {
-	resource := cim.store.Get(key)
+// acquireLease keeps the store open while the caller uses it.
+// It returns ok=false if the manager is closed or the cache entry is inactive.
+// Call the returned release function exactly once.
+func (cim *InputManager) acquireLease(cacheKey string) (*store, func(), bool) {
+	cim.mu.Lock()
+	closed := cim.closed
+	cim.mu.Unlock()
+	if closed {
+		return nil, func() {}, false
+	}
+	return globalCache.Lease(cacheKey)
+}
+
+// lock gives the caller exclusive access to the cursor state for key.
+// The caller must hold a lease to keep store open until it releases the resource.
+func lock(ctx v2.Context, store *store, key string) (*resource, error) {
+	resource := store.Get(key)
 	err := lockResource(ctx.Logger, resource, ctx.Cancelation)
 	if err != nil {
 		resource.Release()

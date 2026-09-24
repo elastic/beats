@@ -65,13 +65,18 @@ func (e ignoredFileError) Unwrap() error {
 	return errFileIgnored
 }
 
+// isMissing reports whether err means the path is no longer there.
+func isMissing(err error) bool {
+	return errors.Is(err, os.ErrNotExist) || errors.Is(err, syscall.ENOTDIR)
+}
+
 // isObservationError reports whether err means the scanner could not observe a
 // path this scan (a filesystem syscall failure such as EMFILE/ENFILE, EACCES or
 // EIO), as opposed to the path being genuinely gone. It is false for a missing
-// file/dir (os.ErrNotExist/ENOTDIR) and for logical rejections that carry no
-// *os.PathError (e.g. "file is a directory", "symlinks disabled").
+// path and for logical rejections that carry no *os.PathError (e.g. "file is a
+// directory", "symlinks disabled").
 func isObservationError(err error) bool {
-	if err == nil || errors.Is(err, os.ErrNotExist) || errors.Is(err, syscall.ENOTDIR) {
+	if err == nil || isMissing(err) {
 		return false
 	}
 	var pathErr *os.PathError
@@ -142,6 +147,11 @@ type fileScanner struct {
 	pathIndex       map[string]int
 	pathsCanOverlap bool
 
+	// dirCache is the shared process-wide directory cache; nil means read directly.
+	// dirCacheMaxAge is min(check_interval, maxDirCacheAge) and is passed per call.
+	dirCache       *dirCache
+	dirCacheMaxAge time.Duration
+
 	// Everything below exists only to avoid per-file allocations
 
 	hasher       hash.Hash
@@ -153,12 +163,21 @@ type fileScanner struct {
 }
 
 func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, compression string) (*fileScanner, error) {
+	return newFileScannerWithCache(logger, paths, config, compression, nil, 0)
+}
+
+// newFileScannerWithCache is like newFileScanner but accepts a shared dirCache
+// and the per-call maxAge (typically min(check_interval, maxDirCacheAge)).
+// dc=nil means directory reads go directly to the OS without caching.
+func newFileScannerWithCache(logger *logp.Logger, paths []string, config fileScannerConfig, compression string, dc *dirCache, maxAge time.Duration) (*fileScanner, error) {
 	s := fileScanner{
-		paths:       paths,
-		cfg:         config,
-		log:         logger.Named("scanner"),
-		hasher:      sha256.New(),
-		compression: compression,
+		paths:          paths,
+		cfg:            config,
+		log:            logger.Named("scanner"),
+		hasher:         sha256.New(),
+		compression:    compression,
+		dirCache:       dc,
+		dirCacheMaxAge: maxAge,
 	}
 
 	if s.cfg.Fingerprint.Enabled {
@@ -241,7 +260,8 @@ type matchedTarget struct {
 
 // GetFiles walks each configured pattern's base directory a single time,
 // filtering inline so files are excluded as they are discovered, and returns
-// the matched descriptors, per-scan metrics, and unobservable prefixes.
+// the matched descriptors, per-scan metrics, and the prefixes this scan could
+// not resolve.
 func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) loginp.ScanResults {
 	if opts.CurrentTime.IsZero() {
 		opts.CurrentTime = time.Now()
@@ -260,29 +280,14 @@ func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) loginp.ScanResults {
 	}
 
 	for _, g := range s.walkGroups {
-		s.walk(g, st.process, st.recordUnobservable)
+		s.walk(g, st)
 	}
 
-	st.metrics.FilesUnique = int64(len(st.fdByName))
-
-	// prefixes is returned to the watcher, so it is built unconditionally.
-	var prefixes []string
-	if len(st.unobservable) > 0 {
-		prefixes = slices.Sorted(maps.Keys(st.unobservable))
-		s.debugLogUnobservable(prefixes)
-	}
-
-	s.lastCount = len(st.fdByName)
-	return loginp.ScanResults{
-		Files:        st.fdByName,
-		Metrics:      st.metrics,
-		Unobservable: prefixes,
-	}
+	return st.results()
 }
 
-// scanState is the mutable state of a single GetFiles scan. process and
-// recordUnobservable mutate it as the literal paths and the directory walk yield
-// entries.
+// scanState is the mutable state of a single GetFiles scan. It is the walkSink
+// the directory walk reports to, and the literal-path loop feeds it the same way.
 type scanState struct {
 	s    *fileScanner
 	opts loginp.FileScanOptions
@@ -300,6 +305,10 @@ type scanState struct {
 	// uses them to postpone delete detection so a transient failure does not wipe
 	// registry state and re-ingest files.
 	unobservable map[string]struct{}
+	// vanished collects paths that were listed but had disappeared by the time
+	// the scan inspected them, which happens for a delete but also for a rename
+	// between listing a directory and reading its contents.
+	vanished map[string]struct{}
 
 	metrics loginp.FileScanMetrics
 }
@@ -314,11 +323,12 @@ func (s *fileScanner) newScanState(opts loginp.FileScanOptions) *scanState {
 		uniqueIDs:    make(map[string]matchedTarget, s.lastCount),
 		uniqueFiles:  make(map[string]struct{}, s.lastCount),
 		unobservable: map[string]struct{}{},
+		vanished:     map[string]struct{}{},
 	}
 }
 
 // recordUnobservable marks path as a prefix the scan could not observe, counting
-// it once. Passed to walk as the recordUnobservable callback.
+// it once.
 func (st *scanState) recordUnobservable(path string) {
 	if _, ok := st.unobservable[path]; ok {
 		return
@@ -327,12 +337,42 @@ func (st *scanState) recordUnobservable(path string) {
 	st.metrics.ScanErrors++
 }
 
+// recordVanished marks path as listed but no longer there.
+func (st *scanState) recordVanished(path string) {
+	st.vanished[path] = struct{}{}
+}
+
+func (st *scanState) recordPathError(path string, err error) {
+	switch {
+	case isObservationError(err):
+		st.recordUnobservable(path)
+	case isMissing(err):
+		st.recordVanished(path)
+	}
+}
+
+// results assembles the scan outcome and records the descriptor count as the
+// size hint for the next scan's maps.
+func (st *scanState) results() loginp.ScanResults {
+	st.metrics.FilesUnique = int64(len(st.fdByName))
+	st.s.lastCount = len(st.fdByName)
+
+	unobservable := slices.Sorted(maps.Keys(st.unobservable))
+	st.s.debugLogUnobservable(unobservable)
+
+	return loginp.ScanResults{
+		Files:        st.fdByName,
+		Metrics:      st.metrics,
+		Unobservable: unobservable,
+		Vanished:     slices.Sorted(maps.Keys(st.vanished)),
+	}
+}
+
 // process evaluates one matched filename: it filters duplicates, builds an ingest
 // target and file descriptor, resolves file-identity collisions against paths
 // already matched this scan, and records the descriptor (or the relevant metric)
 // in the scan state. orderIndex is the position in s.paths of the pattern that
 // matched filename, used to resolve identity collisions deterministically.
-// Passed to walk as the process callback.
 func (st *scanState) process(filename string, orderIndex int) {
 	s, opts := st.s, st.opts
 	st.metrics.FilesMatched++
@@ -357,12 +397,13 @@ func (st *scanState) process(filename string, orderIndex int) {
 			return
 		}
 
-		// A stat/lstat that failed for a reason other than the file being
-		// gone (e.g. EMFILE) means we could not observe this path this scan.
-		if isObservationError(err) {
-			st.recordUnobservable(filename)
-		}
 		st.metrics.FilesNoIngestTarget++
+		if it.symlink && isMissing(err) {
+			// A dangling symlink stays listed indefinitely, so holding its state
+			// would defer the delete forever.
+			return
+		}
+		st.recordPathError(filename, err)
 		return
 	}
 
@@ -382,11 +423,9 @@ func (st *scanState) process(filename string, orderIndex int) {
 	}
 	if err != nil {
 		st.metrics.FilesNoIngestTarget++
-		// Fingerprinting opens the file; under fd exhaustion the open fails
-		// with EMFILE, which is an observation failure, not a missing file.
-		if isObservationError(err) {
-			st.recordUnobservable(filename)
-		}
+		// The path can disappear between getIngestTarget's stat and opening it
+		// for fingerprinting, even if the directory listing was fresh.
+		st.recordPathError(filename, err)
 		s.log.Warnf("cannot create a file descriptor for an ingest target %q: %s", filename, err)
 		return
 	}
@@ -423,7 +462,7 @@ func (st *scanState) process(filename string, orderIndex int) {
 // debugLogUnobservable logs a sample of the path prefixes a scan could not
 // observe (permissions or file-descriptor exhaustion). prefixes must be sorted.
 func (s *fileScanner) debugLogUnobservable(prefixes []string) {
-	if !s.log.IsDebug() {
+	if len(prefixes) == 0 || !s.log.IsDebug() {
 		return
 	}
 	const maxSamples = 5
@@ -500,11 +539,33 @@ type walkPattern struct {
 	orderIndex int
 }
 
-// walk traverses g.root once and invokes process for every entry matching one of
-// the group's patterns. A directory is only descended into when its name matches
+func (s *fileScanner) readNames(dir string, shared bool) ([]string, error) {
+	if s.dirCache != nil {
+		return s.dirCache.readDirNames(dir, s.dirCacheMaxAge, shared)
+	}
+	return osDirNames(dir)
+}
+
+func (s *fileScanner) readEntries(dir string, shared bool) ([]os.DirEntry, error) {
+	if s.dirCache != nil {
+		return s.dirCache.readDirEntries(dir, s.dirCacheMaxAge, shared)
+	}
+	return os.ReadDir(dir)
+}
+
+// walkSink receives what a walk finds: every entry matching one of the group's
+// patterns, and the prefixes it could not read.
+type walkSink interface {
+	process(filename string, orderIndex int)
+	recordUnobservable(prefix string)
+	recordVanished(prefix string)
+}
+
+// walk traverses g.root once and hands sink every entry matching one of the
+// group's patterns. A directory is only descended into when its name matches
 // the next component of some pattern. Pattern depth bounds the recursion, which
 // preserves the RecursiveGlobDepth cap and makes symlink cycles safe.
-func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderIndex int), recordUnobservable func(prefix string)) {
+func (s *fileScanner) walk(g *walkGroup, sink walkSink) {
 	// Flatten the group's patterns in ascending depth order, not map order, so
 	// malformed-pattern logging and matchLeaf's first-match break are deterministic
 	// rather than dependent on Go's map iteration.
@@ -543,9 +604,15 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 			}
 		}
 
+		// Only a path this scan already saw listed can vanish. The walk root
+		// coming from config missing should not be in 'vanished'.
+		listed := depth > 0
 		onReadError := func(err error) {
-			if isObservationError(err) {
-				recordUnobservable(dir)
+			switch {
+			case isObservationError(err):
+				sink.recordUnobservable(dir)
+			case listed && isMissing(err):
+				sink.recordVanished(dir)
 			}
 			s.log.Debugf("cannot read directory %q: %s", dir, err)
 		}
@@ -561,16 +628,17 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 					continue
 				}
 				if matched {
-					process(filepath.Join(dir, name), p.orderIndex)
+					sink.process(filepath.Join(dir, name), p.orderIndex)
 					break
 				}
 			}
 		}
 
-		// With nothing deeper to descend into, entry types are irrelevant: read
-		// only the names, avoiding os.ReadDir's per-entry os.DirEntry allocation.
+		shared := depth == 0 // only cache the walk root
+
 		if len(deeper) == 0 {
-			names, err := readDirNames(dir)
+			// Leaf: names only; Readdirnames avoids DirEntry allocation.
+			names, err := s.readNames(dir, shared)
 			if err != nil {
 				onReadError(err)
 				return
@@ -581,7 +649,8 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 			return
 		}
 
-		entries, err := os.ReadDir(dir)
+		// Non-leaf: DirEntry values needed for IsDir / IsSymlink checks.
+		entries, err := s.readEntries(dir, shared)
 		if err != nil {
 			onReadError(err)
 			return
@@ -617,7 +686,7 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 				info, statErr := os.Stat(full)
 				if statErr != nil {
 					if isObservationError(statErr) {
-						recordUnobservable(full)
+						sink.recordUnobservable(full)
 					}
 					continue
 				}
@@ -629,23 +698,6 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 		}
 	}
 	rec(g.root, 0, patterns)
-}
-
-// readDirNames returns the sorted entry names of dir, reading names only to avoid
-// os.ReadDir's per-entry os.DirEntry allocation. Used for leaf directories, where
-// entry types are not needed. Sorted to keep traversal order stable.
-func readDirNames(dir string) ([]string, error) {
-	f, err := os.Open(dir)
-	if err != nil {
-		return nil, err
-	}
-	names, err := f.Readdirnames(-1)
-	_ = f.Close()
-	if err != nil {
-		return nil, err
-	}
-	slices.Sort(names)
-	return names, nil
 }
 
 // hasGlobMeta reports whether path contains any glob metacharacter, mirroring the

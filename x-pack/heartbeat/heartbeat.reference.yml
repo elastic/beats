@@ -191,6 +191,43 @@ heartbeat.monitors:
   #username: ''
   #password: ''
 
+  # Kerberos/SPNEGO. Mutually exclusive with username/password and ntlm.
+  # Requires a Private Location that can reach the KDC. Not available in FIPS builds.
+  #kerberos:
+    #enabled: true
+    # Authentication type: 'password' or 'keytab'.
+    #auth_type: password
+    # Kerberos realm, e.g. EXAMPLE.COM.
+    #realm: ''
+    # Exactly one of config_path (file on the agent) or krb5_conf (inline body).
+    #config_path: /etc/krb5.conf
+    #krb5_conf: |
+    #  [libdefaults]
+    #    default_realm = EXAMPLE.COM
+    #  [realms]
+    #    EXAMPLE.COM = {
+    #      kdc = kdc.example.com
+    #    }
+    # Credentials when auth_type is 'password'.
+    #username: ''
+    #password: ''
+    # Keytab path when auth_type is 'keytab'.
+    #keytab: ''
+    # Optional SPN override, e.g. HTTP/host.example.com. Empty derives it from the URL.
+    #service_name: ''
+    # Kerberos FAST. Can conflict with some Active Directory setups. Default: false.
+    #enable_krb5_fast: false
+
+  # NTLM. Mutually exclusive with username/password and kerberos. Not available in FIPS builds.
+  #ntlm:
+    #enabled: true
+    #username: ''
+    #password: ''
+    # Optional when username is already "DOMAIN\user" or "user@domain".
+    #domain: ''
+    # Optional client name sent in the negotiate message.
+    #workstation: ''
+
   # TLS/SSL connection settings for use with HTTPS endpoint. If not configured,
   # system defaults will be used.
   #ssl:
@@ -685,7 +722,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -833,7 +870,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -1046,7 +1083,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -1225,7 +1262,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -1548,7 +1585,7 @@ setup.kibana:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -1801,7 +1838,7 @@ logging.files:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are

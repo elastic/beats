@@ -47,15 +47,18 @@ var (
 )
 
 type Config struct {
-	Enabled     *bool    `config:"enabled" yaml:"enabled,omitempty"`
-	AuthType    AuthType `config:"auth_type" validate:"required"`
-	KeyTabPath  string   `config:"keytab"`
-	ConfigPath  string   `config:"config_path" validate:"required"`
-	ServiceName string   `config:"service_name"`
-	Username    string   `config:"username"`
-	Password    string   `config:"password"`
-	Realm       string   `config:"realm" validate:"required"`
-	EnableFAST  bool     `config:"enable_krb5_fast"`
+	Enabled    *bool    `config:"enabled" yaml:"enabled,omitempty"`
+	AuthType   AuthType `config:"auth_type" validate:"required"`
+	KeyTabPath string   `config:"keytab"`
+	// ConfigPath is a krb5.conf file on the host. Mutually exclusive with Krb5Conf.
+	ConfigPath string `config:"config_path"`
+	// Krb5Conf is an inline krb5.conf. Mutually exclusive with ConfigPath.
+	Krb5Conf    string `config:"krb5_conf"`
+	ServiceName string `config:"service_name"`
+	Username    string `config:"username"`
+	Password    string `config:"password"`
+	Realm       string `config:"realm" validate:"required"`
+	EnableFAST  bool   `config:"enable_krb5_fast"`
 }
 
 // IsEnabled returns true if the `enable` field is set to true in the yaml.

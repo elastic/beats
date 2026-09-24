@@ -51,7 +51,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/go-concert/unison"
 )
 
 func BenchmarkFilestream(b *testing.B) {
@@ -450,7 +449,7 @@ paths:
   - /var/log/foo
 %s
 `, extra))
-		_, harvester, err := configure(cfg, logger, srcIdentifier)
+		_, harvester, err := configure(cfg, logger, srcIdentifier, nil)
 		require.NoError(t, err)
 		fs, ok := harvester.(*filestream)
 		require.True(t, ok)
@@ -668,13 +667,8 @@ func createFilestreamTestRunner(tb testing.TB, logger *logp.Logger, testID strin
 	require.NoError(tb, err)
 
 	p := Plugin(logger, createTestStore(tb))
-	var group unison.TaskGroup
-	require.NoError(tb, p.Manager.Init(&group))
-	tb.Cleanup(func() {
-		require.NoError(tb, group.Stop())
-		//nolint:errcheck // It's a test, let it panic if the casting fails
-		p.Manager.(*loginp.InputManager).Close()
-	})
+	//nolint:errcheck // It's a test, let it panic if the casting fails
+	tb.Cleanup(p.Manager.(*filestreamInputManager).Close)
 	input, err := p.Manager.Create(c)
 	require.NoError(tb, err)
 
@@ -736,11 +730,11 @@ func (s *testStore) Close() {
 	s.registry.Close()
 }
 
-func (s *testStore) StoreFor(string) (*statestore.Store, error) {
+func (s *testStore) StoreFor(_, _ string) (*statestore.Store, error) {
 	return s.registry.Get("filestream-benchmark")
 }
 
-func (s *testStore) StoreKey() string {
+func (s *testStore) StoreKey(_, _ string) string {
 	return fmt.Sprintf("test:%p", s.registry)
 }
 

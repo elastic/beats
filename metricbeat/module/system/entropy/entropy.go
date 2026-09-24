@@ -27,8 +27,8 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -51,7 +51,10 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	sys := base.Module().(resolve.Resolver)
+	sys, ok := base.Module().(resolve.Resolver)
+	if !ok {
+		return nil, fmt.Errorf("module %T does not implement resolve.Resolver", base.Module())
+	}
 
 	return &MetricSet{
 		BaseMetricSet: base,

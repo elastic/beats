@@ -198,9 +198,10 @@ func (p *Publisher) PublishActionResult(req map[string]any, res map[string]any) 
 	p.publishActionResponseEvent(fields, time.Now())
 }
 
-// PublishScheduledResponse publishes a synthetic response document for a scheduled query run (no action).
-// Includes schedule_execution_count;
-// native uses 1 + (run_time - start_date) / interval).
+// PublishScheduledResponse publishes a synthetic response document for a
+// scheduled query run (no action). Native schedule execution counts use
+// 1 + (run_time - start_date) / interval. The event timestamp is floored at the
+// planned slot while the original started_at and completed_at fields are kept.
 func (p *Publisher) PublishScheduledResponse(scheduleID, packID, packName, queryName, spaceID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64) {
 	p.mx.Lock()
 	defer p.mx.Unlock()
@@ -238,7 +239,11 @@ func (p *Publisher) PublishScheduledResponse(scheduleID, packID, packName, query
 	}
 
 	p.log.Debugf("Scheduled response event sent, schedule_id=%s, schedule_execution_count=%d", scheduleID, scheduleExecutionCount)
-	p.publishActionResponseEvent(fields, completedAt)
+	eventTimestamp := completedAt
+	if eventTimestamp.Before(plannedScheduleTime) {
+		eventTimestamp = plannedScheduleTime
+	}
+	p.publishActionResponseEvent(fields, eventTimestamp)
 }
 
 func (p *Publisher) publishActionResponseEvent(fields map[string]any, timestamp time.Time) {
@@ -249,7 +254,7 @@ func (p *Publisher) publishActionResponseEvent(fields map[string]any, timestamp 
 	p.actionResponsesClient.Publish(event)
 }
 
-func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]any, reqData any) {
+func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
@@ -261,6 +266,23 @@ func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID s
 		return
 	}
 
+	fields := queryProfileToEvent(queryName, actionID, responseID, spaceID, profile, reqData)
+
+	event := beat.Event{
+		Timestamp: time.Now(),
+		Fields:    fields,
+	}
+	if index != "" {
+		event.Meta = mapstr.M{events.FieldMetaRawIndex: index}
+	}
+
+	p.log.Debugf("Query profile event is sent, fields: %#v", fields)
+
+	p.queryProfileClient.Publish(event)
+}
+
+// queryProfileToEvent builds the field set for a query profile document.
+func queryProfileToEvent(queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) mapstr.M {
 	fields := mapstr.M{
 		"type": "osquery_profile",
 		"event": map[string]any{
@@ -279,21 +301,13 @@ func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID s
 	if responseID != "" {
 		fields["response_id"] = responseID
 	}
+	if spaceID != "" {
+		fields["space_id"] = spaceID
+	}
 	if reqData != nil {
 		fields["action_data"] = reqData
 	}
-
-	event := beat.Event{
-		Timestamp: time.Now(),
-		Fields:    fields,
-	}
-	if index != "" {
-		event.Meta = mapstr.M{events.FieldMetaRawIndex: index}
-	}
-
-	p.log.Debugf("Query profile event is sent, fields: %#v", fields)
-
-	p.queryProfileClient.Publish(event)
+	return fields
 }
 
 func actionResultToEvent(req, res map[string]any) map[string]any {

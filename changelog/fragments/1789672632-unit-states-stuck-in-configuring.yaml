@@ -1,0 +1,7 @@
+kind: bug-fix
+
+summary: "management: fix healthy input units stuck in CONFIGURING when a sibling unit fails config validation"
+
+component: libbeat
+
+issue: https://github.com/elastic/beats/issues/53292
