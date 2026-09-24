@@ -20,7 +20,7 @@ The following cloud providers are supported:
 * [Tencent Cloud](https://www.qcloud.com/?lang=en) (QCloud)
 * Alibaba Cloud (ECS)
 * Huawei Cloud (ECS)
-* Azure Virtual Machine
+* Azure Virtual Machine (VM)
 * Openstack Nova
 * Hetzner Cloud
 
@@ -61,17 +61,21 @@ List of names the `providers` setting supports:
 * "tencent", or "qcloud" for Tencent Cloud (disabled by default).
 * "hetzner" for Hetzner Cloud (enabled by default).
 
-## Azure credentials for AKS metadata lookup [_azure_credentials_for_aks_metadata_lookup]
+## Azure credentials for Azure Kubernetes Service metadata lookup [_azure_credentials_for_aks_metadata_lookup]
 
-After Azure VM metadata is detected, `add_cloud_metadata` automatically attempts a best-effort lookup through Azure Resource Manager (ARM), even when the VM is not an AKS node. The resulting AKS cluster name and ID fields (`orchestrator.cluster.name` and `orchestrator.cluster.id`) are optional.
+After Azure VM metadata is detected, `add_cloud_metadata` automatically attempts a best-effort lookup through Azure Resource Manager (ARM), even when the VM is not an Azure Kubernetes Service (AKS) node. The resulting AKS cluster name and ID fields (`orchestrator.cluster.name` and `orchestrator.cluster.id`) are optional.
 
-If all three of `TENANT_ID`, `CLIENT_ID`, and `CLIENT_SECRET` are set, Beats uses an explicit client secret credential for the ARM lookup. Otherwise, it uses the Azure SDK for Go `DefaultAzureCredential`.
+If all three of `TENANT_ID`, `CLIENT_ID`, and `CLIENT_SECRET` are set, Heartbeat uses an explicit client secret credential for the ARM lookup. Otherwise, it uses the Azure SDK for Go `DefaultAzureCredential`.
 
-On Windows, development-focused credentials in the bundled default chain may start Azure CLI, Azure Developer CLI, or Azure PowerShell. `AzurePowerShellCredential` is in the chain in Beats 9.1.8 and later 9.1 releases, 9.2.2 and later 9.2 releases, and all 9.3 and later releases; when included, it starts PowerShell with an encoded command.
+On Windows, development-focused credentials in the bundled default chain can start Azure CLI, Azure Developer CLI, or Azure PowerShell. `AzurePowerShellCredential` is in the chain in Beats 9.1.8 and later 9.1 releases, 9.2.2 and later 9.2 releases, and all 9.3 and later releases. When included, it starts PowerShell with an encoded command.
 
-{applies_to}`stack: ga 9.1.3+` {applies_to}`serverless: ga` To exclude development credentials, set `AZURE_TOKEN_CREDENTIALS=prod` in the Beat or Elastic Agent process environment and restart the process. This retains `EnvironmentCredential`, `WorkloadIdentityCredential`, and `ManagedIdentityCredential` while excluding developer credentials. For details, see Microsoft's guidance on [excluding a credential type category](https://learn.microsoft.com/en-us/azure/developer/go/sdk/authentication/credential-chains#exclude-a-credential-type-category). For Elastic Agent environment variable locations, see [Where to set proxy environment variables](https://www.elastic.co/docs/reference/fleet/host-proxy-env-vars#where-to-set-proxy-env-vars).
+{applies_to}`stack: ga 9.1.3+` {applies_to}`serverless: ga` To exclude development credentials, set `AZURE_TOKEN_CREDENTIALS=prod` in the Beat or {{agent}} process environment and restart the process. This setting retains `EnvironmentCredential`, `WorkloadIdentityCredential`, and `ManagedIdentityCredential`. For details, refer to Microsoft's guidance on [excluding a credential type category](https://learn.microsoft.com/en-us/azure/developer/go/sdk/authentication/credential-chains#exclude-a-credential-type-category). For {{agent}} environment variable locations, refer to [Where to set proxy environment variables](docs-content://reference/fleet/host-proxy-env-vars.md#where-to-set-proxy-env-vars).
 
-{applies_to}`stack: ga 9.1.3+` {applies_to}`serverless: ga` `AZURE_TOKEN_CREDENTIALS` applies process-wide to all uses of `DefaultAzureCredential`. It does not disable Azure metadata detection or the AKS lookup, and any retained credential can still call ARM. To prevent the lookup, exclude `azure` with the `providers` option; this also removes basic Azure VM metadata.
+:::{note}
+:applies_to: stack: ga 9.1.3+
+
+`AZURE_TOKEN_CREDENTIALS` applies process-wide to all uses of `DefaultAzureCredential`. It does not stop Azure metadata collection or the AKS lookup, and credentials that remain in the chain can still send requests to Azure Resource Manager. To stop Azure metadata collection, exclude `azure` from the `providers` setting. This also removes basic Azure VM metadata.
+:::
 
 For example, configuration below only utilize `aws` metadata retrieval mechanism,
 
