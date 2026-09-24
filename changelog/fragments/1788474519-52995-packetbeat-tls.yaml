@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix rendering of TLS certificate serial numbers so each byte is always represented as two hex digits, matching OpenSSL output.
+component: packetbeat

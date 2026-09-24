@@ -37,6 +37,20 @@ name: "my-shipper"
 ```
 
 
+### `hostname` [_hostname]
+```{applies_to}
+stack: ga 9.6
+```
+
+Sets the hostname the Beat reports in `host.name` and `observer.hostname` (when `add_observer_metadata` is configured). Use this when the Beat cannot determine its own hostname, for example in Kubernetes environments where `os.Hostname()` returns a pod name instead of the node name.
+
+Example:
+
+```yaml
+hostname: "k8s-node-01"
+```
+
+
 ### `tags` [_tags_3]
 
 A list of tags that the Beat includes in the `tags` field of each published transaction. Tags make it easy to group servers by different logical properties. For example, if you have a cluster of web servers, you can add the "webservers" tag to the Beat on each server, and then use filters and queries in the Kibana web interface to get visualisations for the whole group of servers.

@@ -17,7 +17,6 @@
 
 * Add support for index in inputs for Beat receivers. [#52662](https://github.com/elastic/beats/pull/52662) 
 * Correct disk queue metrics after blocked publishes. [#52666](https://github.com/elastic/beats/pull/52666) 
-* Revert non-Ironbank container images to UBI9. [#52823](https://github.com/elastic/beats/pull/52823) 
 
 **Auditbeat**
 
