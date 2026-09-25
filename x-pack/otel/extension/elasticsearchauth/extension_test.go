@@ -741,11 +741,6 @@ func generateCAAndCertificate(t *testing.T) (tls.Certificate, tls.Certificate) {
 	return ca, certificate
 }
 
-func writeCertificate(t *testing.T, name string, certificate tls.Certificate) string {
-	t.Helper()
-	return writePEMCertificate(t, name, certificate.Certificate[0])
-}
-
 func writePEMCertificate(t *testing.T, name string, rawCertificate []byte) string {
 	t.Helper()
 	path := filepath.Join(t.TempDir(), name)
