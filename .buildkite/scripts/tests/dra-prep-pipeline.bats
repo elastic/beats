@@ -190,17 +190,21 @@ dra_prep_plugin() {
   [ ! -s "$CURL_LOG" ]
 }
 
-@test "DRY_RUN unset renders upload as boolean true" {
+@test "DRY_RUN unset renders upload as true" {
   render_workflow snapshot
   [ "$(dra_prep_plugin '.upload')" = "true" ]
-  [ "$(dra_prep_plugin '.upload | tag')" = "!!bool" ]
+  # Buildkite interpolates after parsing, so the value reaches the plugin as
+  # a string, not a YAML boolean.
+  [ "$(dra_prep_plugin '.upload | tag')" = "!!str" ]
 }
 
-@test "DRY_RUN=true renders upload as boolean false" {
+@test "DRY_RUN=true renders upload as false" {
   export DRY_RUN="true"
   render_workflow snapshot
   [ "$(dra_prep_plugin '.upload')" = "false" ]
-  [ "$(dra_prep_plugin '.upload | tag')" = "!!bool" ]
+  # Buildkite interpolates after parsing, so the value reaches the plugin as
+  # a string, not a YAML boolean.
+  [ "$(dra_prep_plugin '.upload | tag')" = "!!str" ]
 }
 
 @test "annotate and trigger are skipped when DRY_RUN is true" {

@@ -8,14 +8,16 @@
 ##    DRA_TEST_VERSION       value printed by `make get-version`
 ##    MOCK_GCS_QUALIFIER     qualifier served by the dra-qualifier bucket;
 ##                           when unset, the bucket lookup returns 404
-##    MOCK_ARTIFACT_ROOT     tree copied into the destination on
-##                           `buildkite-agent artifact download`
+##    MOCK_ARTIFACT_ROOT     tree served by `buildkite-agent artifact
+##                           download`; only paths matching the requested
+##                           glob are copied, and no match is an error
 ##    MOCK_ARTIFACT_STEP     when set, artifact download fails unless
 ##                           `--step` matches it
 ##
 
 dra_test_setup() {
-  REPO_ROOT=$(git rev-parse --show-toplevel)
+  REPO_ROOT=$(cd "$BATS_TEST_DIRNAME/../../.." && pwd)
+  export REPO_ROOT
   TEST_TMPDIR=$(mktemp -d)
   mkdir -p "$TEST_TMPDIR/bin" "$TEST_TMPDIR/work" "$TEST_TMPDIR/artifact-root"
 
@@ -45,14 +47,13 @@ MOCK
 printf '%s\n' "$*" >>"${BUILDKITE_AGENT_LOG:?}"
 case "${1:-} ${2:-}" in
   "pipeline upload")
-    # Mimic Buildkite's upload-time interpolation of ${VAR} and ${VAR:-x}
-    # against the uploading process's environment.
-    content=$(cat "${3:-/dev/stdin}")
-    eval "cat <<__BK_EOF__
-${content}
-__BK_EOF__" >"${PIPELINE_OUTPUT:?}"
+    # Mimic Buildkite's upload-time interpolation: the YAML is parsed first
+    # and only string scalars are interpolated against the uploading
+    # process's environment, so `upload: ${VAR}` stays a string.
+    yq '(.. | select(tag == "!!str")) |= envsubst' "${3:-.buildkite/pipeline.yml}" >"${PIPELINE_OUTPUT:?}"
     ;;
   "artifact download")
+    glob="$3"
     dest="${4:-.}"
     step=""
     shift 4 || true
@@ -64,7 +65,20 @@ __BK_EOF__" >"${PIPELINE_OUTPUT:?}"
       echo "fatal: no step found matching \"${step}\"" >&2
       exit 1
     fi
-    cp -R "${MOCK_ARTIFACT_ROOT:?}/." "$dest"
+    found=false
+    while IFS= read -r -d '' file; do
+      rel="${file#"${MOCK_ARTIFACT_ROOT:?}"/}"
+      # shellcheck disable=SC2053 # glob match is intended
+      if [[ "$rel" == $glob ]]; then
+        mkdir -p "$dest/$(dirname "$rel")"
+        cp "$file" "$dest/$rel"
+        found=true
+      fi
+    done < <(find "${MOCK_ARTIFACT_ROOT:?}" -type f -print0)
+    if [[ "$found" != "true" ]]; then
+      echo "fatal: no artifacts found for search \"${glob}\"" >&2
+      exit 1
+    fi
     ;;
   "annotate "*)
     cat >"${DRA_ANNOTATION_OUTPUT:?}"

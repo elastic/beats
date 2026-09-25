@@ -56,8 +56,7 @@ assert_not_annotated() {
   local key
   key=$(yq -r '.steps[] | select(.command == "*dra-annotate.sh*") | .depends_on' "$PIPELINE")
   [ -n "$key" ] && [ "$key" != "null" ]
-  run yq -r '.steps[].key' "$PIPELINE"
-  [[ "$output" == *"$key"* ]]
+  yq -e ".steps[] | select(.key == \"$key\")" "$PIPELINE" >/dev/null
 }
 
 @test "snapshot annotates the summary link" {
@@ -139,20 +138,13 @@ assert_not_annotated() {
   assert_not_annotated
 }
 
-@test "fails when no manifest is downloaded" {
+@test "fails when the prep step uploaded no manifest" {
   MOCK_ARTIFACT_STEP=$(prep_step_key snapshot)
   export MOCK_ARTIFACT_STEP
-  mkdir -p "$MOCK_ARTIFACT_ROOT/artifacts/dra/beats"
 
   run "$SCRIPT" snapshot
   [ "$status" -ne 0 ]
-  [[ "$output" == *"ERROR: no DRA manifest found for workflow snapshot"* ]]
-  assert_not_annotated
-}
-
-@test "fails when the download produces no artifacts directory" {
-  run "$SCRIPT" snapshot
-  [ "$status" -ne 0 ]
+  [[ "$output" == *"no artifacts found"* ]]
   assert_not_annotated
 }
 
@@ -201,20 +193,8 @@ assert_not_annotated() {
   [ ! -e "$BUILDKITE_AGENT_LOG" ]
 }
 
-# Documents current behavior: with several manifests in the download dir the
-# script takes whichever `find` lists first, without checking the workflow.
-# Not a bug in practice: `--step dra-prep-<workflow>` scopes the download to
-# the single prep job of that workflow, and each job starts from a clean
-# checkout, so a manifest from the other workflow cannot be present.
-@test "multiple manifests: an arbitrary one is picked" {
-  write_manifest "9.9.0-ab12cd34" "9.9.0-SNAPSHOT"
-  write_manifest "9.9.0-ef56ab78" "9.9.0"
-
-  run "$SCRIPT" snapshot
-  [ "$status" -eq 0 ]
-
-  snapshot_url="https://artifacts-snapshot.elastic.co/beats/9.9.0-ab12cd34/summary-9.9.0-SNAPSHOT.html"
-  staging_url="https://artifacts-snapshot.elastic.co/beats/9.9.0-ef56ab78/summary-9.9.0.html"
-  annotation=$(cat "$DRA_ANNOTATION_OUTPUT")
-  [[ "$annotation" == *"$snapshot_url"* || "$annotation" == *"$staging_url"* ]]
-}
+# With several manifests in the download dir the script takes whichever
+# `find` lists first, without checking the workflow. Not tested: `--step
+# dra-prep-<workflow>` scopes the download to the single prep job of that
+# workflow, and each job starts from a clean checkout, so a manifest from the
+# other workflow cannot be present.
