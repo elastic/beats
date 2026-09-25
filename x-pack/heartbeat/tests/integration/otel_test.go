@@ -42,12 +42,11 @@ func TestHeartbeatOTelElasticsearchAuthLoadsMonitorState(t *testing.T) {
 	previousStateID := "previous-state-" + namespace
 
 	t.Cleanup(func() {
-		t.Logf("State Index: %q, Event Index: %q", stateIndex, eventIndex)
-		// _, err := es.Indices.Delete([]string{stateIndex})
-		// require.NoError(t, err, "failed to delete seeded monitor state index")
+		_, err := es.Indices.Delete([]string{stateIndex})
+		require.NoError(t, err, "failed to delete seeded monitor state index")
 
-		// _, err = es.Indices.DeleteDataStream([]string{eventIndex})
-		// require.NoError(t, err, "failed to delete emitted event data stream")
+		_, err = es.Indices.DeleteDataStream([]string{eventIndex})
+		require.NoError(t, err, "failed to delete emitted event data stream")
 	})
 
 	previousState := map[string]any{
