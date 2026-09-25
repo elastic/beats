@@ -25,7 +25,7 @@ steps:
     timeout_in_minutes: 30
     plugins:
       # Must match the google_oidc_plugin anchor in packaging.pipeline.yml
-      - elastic/oblt-google-auth#v1.3.1:
+      - elastic/oblt-google-auth#v1.3.4:
           lifetime: 10800 # seconds
           project-id: "elastic-observability-ci"
           project-number: "911195782929"
