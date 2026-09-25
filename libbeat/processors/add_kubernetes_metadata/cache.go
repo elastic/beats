@@ -55,6 +55,22 @@ func (c *cache) get(key string) mapstr.M {
 	return c.metadata[key]
 }
 
+// getFirstMatch returns metadata for the first matching candidate, or nil.
+// Holds the lock for the full scan so the cleanup goroutine cannot evict a later candidate between probes.
+func (c *cache) getFirstMatch(candidates []string) mapstr.M {
+	c.Lock()
+	defer c.Unlock()
+	for _, index := range candidates {
+		if t, ok := c.deleted[index]; ok {
+			c.deleted[index] = t.Add(c.timeout)
+		}
+		if m := c.metadata[index]; m != nil {
+			return m
+		}
+	}
+	return nil
+}
+
 func (c *cache) delete(key string) {
 	c.Lock()
 	defer c.Unlock()
@@ -66,6 +82,21 @@ func (c *cache) set(key string, data mapstr.M) {
 	defer c.Unlock()
 	delete(c.deleted, key)
 	c.metadata[key] = data
+}
+
+// batchUpdate atomically marks toDelete keys for eviction and writes toAdd entries
+// in a single lock acquisition. Readers see either the old state or the new state,
+// never a partially-written intermediate.
+func (c *cache) batchUpdate(toDelete []string, toAdd []MetadataIndex) {
+	c.Lock()
+	defer c.Unlock()
+	for _, key := range toDelete {
+		c.deleted[key] = time.Now().Add(c.timeout)
+	}
+	for _, m := range toAdd {
+		delete(c.deleted, m.Index)
+		c.metadata[m.Index] = m.Data
+	}
 }
 
 func (c *cache) cleanup() {
