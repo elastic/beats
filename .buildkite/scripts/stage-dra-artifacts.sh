@@ -71,7 +71,7 @@ else
     -exec cp {} artifacts/ \;
 fi
 
-if ! ls artifacts/* >/dev/null 2>&1; then
+if ! find artifacts -type f ! -name 'dependencies-*.csv' | grep -q .; then
   echo "ERROR: no ${WORKFLOW} artifacts found in artifacts/" >&2
   exit 1
 fi
