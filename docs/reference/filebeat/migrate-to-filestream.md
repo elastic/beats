@@ -112,7 +112,11 @@ The intermediate configuration snippets are for illustration purposes only.
 Every `filestream` input **must** have a unique identifier as `id`. Using meaningful identifiers for each new `filestream` input will also make it easier to troubleshoot if something goes wrong.
 
 ::::{important}
-Never change the ID of an input, or you will end up with duplicate events.
+Changing an input ID can result in duplicate events. To migrate an existing input to a new ID
+without re-ingesting data, use [`take_over.from_ids`](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-take-over) to transfer its registry state.
+
+To migrate registry state from multiple inputs when their IDs are unknown, use
+`take_over.from_any_id: true`.
 ::::
 
 Let's start the migration process with this simple set of `filestream` inputs without any additional parameters for now:

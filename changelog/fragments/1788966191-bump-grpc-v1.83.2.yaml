@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Bump google.golang.org/grpc to v1.83.2 to remediate CVE-2026-84445 (DoS via missing :authority and Host headers in gRPC requests).
+component: beats

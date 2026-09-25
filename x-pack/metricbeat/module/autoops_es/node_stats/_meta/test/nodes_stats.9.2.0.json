@@ -13,6 +13,10 @@
                 "remote_cluster_client",
                 "transform"
             ],
+            "attributes": {
+                "logical_availability_zone": "zone-1",
+                "instance_configuration": "gcp.es.datahot.n2.68x10x45"
+            },
             "indices": {
                 "docs": {
                     "count": 2902603,
