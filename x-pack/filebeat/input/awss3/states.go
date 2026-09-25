@@ -16,7 +16,16 @@ import (
 )
 
 const awsS3ObjectStatePrefix = "filebeat::aws-s3::state::"
-const awsS3TailKey = "filebeat::aws-s3::tail"
+
+// awsS3TailKeyPrefix prefixes the store key of the lexicographical tail. The
+// full key is built by tailStoreKey from the input's bucket and key prefix.
+const awsS3TailKeyPrefix = "filebeat::aws-s3::tail::"
+
+// awsS3LegacyTailKey is the single, unscoped key the tail was persisted under
+// before it was scoped per input. All lexicographical inputs of a process
+// shared it, so its value cannot be attributed to any one of them. It is
+// never read anymore and is removed from the store on startup.
+const awsS3LegacyTailKey = "filebeat::aws-s3::tail"
 
 // stateRegistry defines the interface for managing S3 object states.
 // This allows different implementations for normal mode vs lexicographical ordering mode.
@@ -230,6 +239,11 @@ type lexicographicalStateRegistry struct {
 	// persistedTail is the tail key stored in the persistent store.
 	// This survives crashes and is used as startAfterKey on restart.
 	persistedTail string
+	// tailKey is the store key persistedTail is saved under. The store is
+	// shared by all aws-s3 inputs of the process, so the key is scoped to this
+	// input's bucket and key prefix to keep inputs from reading and
+	// overwriting each other's tail.
+	tailKey string
 
 	// inFlightLock protects access to inFlight map and persistedTail
 	inFlightLock sync.Mutex
@@ -242,13 +256,19 @@ func newLexicographicalStateRegistry(log *logp.Logger, store *statestore.Store, 
 		return nil, fmt.Errorf("loading S3 input state: %w", err)
 	}
 
+	// The legacy tail is not migrated: it may belong to another input, and
+	// the tail is recomputed from the loaded states below when absent. A
+	// failed removal only leaves an orphaned entry behind, so it is ignored.
+	_ = store.Remove(awsS3LegacyTailKey)
+
+	tailKey := tailStoreKey(bucket, keyPrefix)
 	var persisted struct {
 		Tail string `json:"tail"`
 	}
-	if err := store.Get(awsS3TailKey, &persisted); err != nil {
+	if err := store.Get(tailKey, &persisted); err != nil {
 		// Key doesn't exist or can't be decoded - start fresh
 		if log != nil {
-			log.Infof("No valid persisted tail found (key=%s), starting fresh: %v", awsS3TailKey, err)
+			log.Infof("No valid persisted tail found (key=%s), starting fresh: %v", tailKey, err)
 		}
 	}
 	persistedTail := persisted.Tail
@@ -265,6 +285,7 @@ func newLexicographicalStateRegistry(log *logp.Logger, store *statestore.Store, 
 		capacity:      capacity,
 		inFlight:      make(map[string]struct{}),
 		persistedTail: persistedTail,
+		tailKey:       tailKey,
 	}
 
 	// Build heap from loaded states and trim to capacity
@@ -274,8 +295,8 @@ func newLexicographicalStateRegistry(log *logp.Logger, store *statestore.Store, 
 	if r.persistedTail == "" && r.heap.Len() > 0 {
 		if minState := r.heap.peek(); minState != nil {
 			r.persistedTail = minState.Key
-			_ = store.Remove(awsS3TailKey)
-			if err := store.Set(awsS3TailKey, struct {
+			_ = store.Remove(r.tailKey)
+			if err := store.Set(r.tailKey, struct {
 				Tail string `json:"tail"`
 			}{r.persistedTail}); err != nil {
 				return nil, fmt.Errorf("failed to persist initial tail key to store (key=%q): %w", r.persistedTail, err)
@@ -338,8 +359,8 @@ func (r *lexicographicalStateRegistry) MarkObjectInFlight(key string) error {
 	if r.persistedTail == "" || key < r.persistedTail {
 		r.persistedTail = key
 		r.storeLock.Lock()
-		_ = r.store.Remove(awsS3TailKey)
-		err := r.store.Set(awsS3TailKey, struct {
+		_ = r.store.Remove(r.tailKey)
+		err := r.store.Set(r.tailKey, struct {
 			Tail string `json:"tail"`
 		}{key})
 		r.storeLock.Unlock()
@@ -529,10 +550,10 @@ func (r *lexicographicalStateRegistry) recomputeAndPersistTail() error {
 	r.persistedTail = newTail
 
 	// Remove old tail entry first before setting new value to keep state store file clean.
-	_ = r.store.Remove(awsS3TailKey)
+	_ = r.store.Remove(r.tailKey)
 
 	if newTail != "" {
-		if err := r.store.Set(awsS3TailKey, struct {
+		if err := r.store.Set(r.tailKey, struct {
 			Tail string `json:"tail"`
 		}{newTail}); err != nil {
 			return fmt.Errorf("failed to persist tail key: %w", err)
@@ -618,6 +639,13 @@ func (h *stateHeap) Pop() any {
 // getStoreKey generates the key used by underlying persistent storage
 func getStoreKey(stateID string) string {
 	return awsS3ObjectStatePrefix + stateID
+}
+
+// tailStoreKey returns the store key of the lexicographical tail of the input
+// polling bucket with the given key prefix. S3 bucket names cannot contain
+// "::", so the key is unambiguous even when prefix is empty or contains "::".
+func tailStoreKey(bucket, prefix string) string {
+	return awsS3TailKeyPrefix + bucket + "::" + prefix
 }
 
 // loadS3StatesFromRegistry loads a copy of the registry states.
