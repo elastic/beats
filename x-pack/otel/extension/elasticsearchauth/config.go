@@ -101,13 +101,7 @@ func (c *Config) Unmarshal(conf *confmap.Conf) error {
 	return nil
 }
 
-type configWithoutUnmarshal struct {
-	ClientConfig confighttp.ClientConfig `mapstructure:",squash"`
-	Endpoints    []string                `mapstructure:"endpoints"`
-	User         string                  `mapstructure:"user"`
-	Password     configopaque.String     `mapstructure:"password"`
-	APIKey       configopaque.String     `mapstructure:"api_key"`
-}
+type configWithoutUnmarshal Config
 
 // Validate validates configuration relationships without accessing TLS files.
 func (c *Config) Validate() error {
