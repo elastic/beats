@@ -130,7 +130,9 @@ type authenticatedRoundTripper struct {
 
 func (a *authenticatedRoundTripper) RoundTrip(request *http.Request) (*http.Response, error) {
 	clonedRequest := request.Clone(request.Context())
-	clonedRequest.Header = request.Header.Clone()
+	if clonedRequest.Header == nil {
+		clonedRequest.Header = make(http.Header)
+	}
 	if host, found := a.config.ClientConfig.Headers.Get("Host"); found && host != "" {
 		clonedRequest.Host = string(host)
 	}

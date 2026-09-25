@@ -426,9 +426,13 @@ unknown_key: value
 
 func TestProgrammaticKeepaliveOverridesFlattenedFields(t *testing.T) {
 	config := validConfig()
+	//nolint:staticcheck // confighttp.ClientConfig documents these as its effective decoded values.
 	config.ClientConfig.DisableKeepAlives = true
+	//nolint:staticcheck // confighttp.ClientConfig documents these as its effective decoded values.
 	config.ClientConfig.MaxIdleConns = 1
+	//nolint:staticcheck // confighttp.ClientConfig documents these as its effective decoded values.
 	config.ClientConfig.MaxIdleConnsPerHost = 2
+	//nolint:staticcheck // confighttp.ClientConfig documents these as its effective decoded values.
 	config.ClientConfig.IdleConnTimeout = time.Second
 	config.ClientConfig.Keepalive = configoptional.Some(confighttp.KeepaliveClientConfig{
 		MaxIdleConns:        10,
