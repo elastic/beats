@@ -258,3 +258,154 @@ func Test_readPrefixAndHash(t *testing.T) {
 func simpleHTTPResponse() *http.Response {
 	return &http.Response{Body: io.NopCloser(strings.NewReader("hello"))}
 }
+
+// capturingValidator returns a bodyValidator that stores the body it receives, and a pointer
+// to that stored value. Use it to assert how many bytes processBody passed to a validator.
+func capturingValidator() (bodyValidator, *string) {
+	var captured string
+	return func(_ *http.Response, body string) error {
+		captured = body
+		return nil
+	}, &captured
+}
+
+func fakeResponse(body string) *http.Response {
+	return &http.Response{Body: io.NopCloser(strings.NewReader(body))}
+}
+
+// TestBodyMaxBytesCapsBodiesSentToValidators verifies that body validators receive at most
+// CheckBodyMaxBytes bytes, regardless of the actual response size.
+func TestBodyMaxBytesCapsBodiesSentToValidators(t *testing.T) {
+	const limit = 200
+	v, captured := capturingValidator()
+	validator := multiValidator{bodyValidators: []bodyValidator{v}}
+
+	resp := fakeResponse(strings.Repeat("x", 3*limit))
+	defer resp.Body.Close()
+
+	processBody( //nolint: errcheck //testcode
+		resp,
+		responseConfig{IncludeBody: "never", CheckBodyMaxBytes: limit, IncludeBodyMaxBytes: 2048},
+		validator,
+	)
+
+	assert.Len(t, *captured, limit, "validator must receive exactly BodyMaxBytes bytes")
+}
+
+// TestBodyMaxBytesDoesNotTruncateSmallBodies verifies that a response body smaller than
+// CheckBodyMaxBytes is passed to validators in full.
+func TestBodyMaxBytesDoesNotTruncateSmallBodies(t *testing.T) {
+	const limit = 1024
+	body := strings.Repeat("x", limit/2)
+	v, captured := capturingValidator()
+	validator := multiValidator{bodyValidators: []bodyValidator{v}}
+
+	resp := fakeResponse(body)
+	defer resp.Body.Close()
+
+	processBody( //nolint: errcheck //testcode
+		resp,
+		responseConfig{IncludeBody: "never", CheckBodyMaxBytes: limit, IncludeBodyMaxBytes: 2048},
+		validator,
+	)
+
+	assert.Equal(t, body, *captured, "validator must receive the full body when it fits within BodyMaxBytes")
+}
+
+// TestBodyMaxBytesMinimalBufferWithNoValidatorsAndNoIncludeBody verifies that when no body
+// validators are registered and include_body is "never", processBody allocates only a minimal
+// prefix buffer (minBufferBodyBytes). The bytes field must still reflect the full response size.
+func TestBodyMaxBytesMinimalBufferWithNoValidatorsAndNoIncludeBody(t *testing.T) {
+	const bodyMaxBytes = 1024
+	body := strings.Repeat("x", 2*bodyMaxBytes)
+
+	resp := fakeResponse(body)
+	defer resp.Body.Close()
+
+	fields, _, _ := processBody( //nolint: errcheck //testcode
+		resp,
+		responseConfig{IncludeBody: "never", CheckBodyMaxBytes: bodyMaxBytes, IncludeBodyMaxBytes: 2048},
+		multiValidator{},
+	)
+
+	assert.Equal(t, len(body), fields["bytes"], "bytes must reflect the full response length")
+	_, hasContent := fields["content"]
+	assert.False(t, hasContent, "content must be absent when include_body is never")
+}
+
+func TestBodyMaxBytesIncludeBodyDefaultSizeLessThanBodyMax(t *testing.T) {
+	const (
+		bodyMaxBytes        = 1024
+		includeBodyMaxBytes = 200 // default-like value, less than bodyMaxBytes
+	)
+	body := strings.Repeat("x", 2*bodyMaxBytes)
+
+	resp := fakeResponse(body)
+	defer resp.Body.Close()
+
+	fields, _, _ := processBody( //nolint: errcheck //testcode
+		resp,
+		responseConfig{IncludeBody: "always", CheckBodyMaxBytes: bodyMaxBytes, IncludeBodyMaxBytes: includeBodyMaxBytes},
+		multiValidator{}, // no body validators — triggers the bug
+	)
+
+	content, ok := fields["content"]
+	require.True(t, ok, "content must be present when include_body is always")
+	assert.Len(t, content, includeBodyMaxBytes,
+		"event content should be IncludeBodyMaxBytes bytes; if it is %d (minBufferBodyBytes) the IncludeBody buffer condition is using the wrong comparator",
+		minBufferBodyBytes)
+}
+
+// TestBodyMaxBytesExpandsWhenIncludeBodyMaxBytesIsLarger verifies that when
+// IncludeBodyMaxBytes > BodyMaxBytes and include_body is active, the buffer expands so
+// that the event content is not silently truncated below the configured limit.
+func TestBodyMaxBytesExpandsWhenIncludeBodyMaxBytesIsLarger(t *testing.T) {
+	const (
+		bodyMaxBytes        = 100
+		includeBodyMaxBytes = 300 // explicitly larger than bodyMaxBytes
+	)
+	body := strings.Repeat("x", 500)
+	v, captured := capturingValidator()
+	validator := multiValidator{bodyValidators: []bodyValidator{v}}
+
+	resp := fakeResponse(body)
+	defer resp.Body.Close()
+
+	fields, _, _ := processBody( //nolint: errcheck //testcode
+		resp,
+		responseConfig{IncludeBody: "always", CheckBodyMaxBytes: bodyMaxBytes, IncludeBodyMaxBytes: includeBodyMaxBytes},
+		validator,
+	)
+
+	assert.Len(t, *captured, includeBodyMaxBytes, "validator must see includeBodyMaxBytes when it exceeds bodyMaxBytes")
+	content, ok := fields["content"]
+	require.True(t, ok)
+	assert.Len(t, content, includeBodyMaxBytes, "event content must be capped at IncludeBodyMaxBytes")
+}
+
+// TestBodyMaxBytesEventContentTrimmedToIncludeBodyMaxBytes verifies that when validators
+// are present and CheckBodyMaxBytes > IncludeBodyMaxBytes, validators see CheckBodyMaxBytes bytes
+// while the event content is trimmed to IncludeBodyMaxBytes.
+func TestBodyMaxBytesEventContentTrimmedToIncludeBodyMaxBytes(t *testing.T) {
+	const (
+		bodyMaxBytes        = 500
+		includeBodyMaxBytes = 100
+	)
+	body := strings.Repeat("x", 1000)
+	v, captured := capturingValidator()
+	validator := multiValidator{bodyValidators: []bodyValidator{v}}
+
+	resp := fakeResponse(body)
+	defer resp.Body.Close()
+
+	fields, _, _ := processBody( //nolint: errcheck //testcode
+		resp,
+		responseConfig{IncludeBody: "always", CheckBodyMaxBytes: bodyMaxBytes, IncludeBodyMaxBytes: includeBodyMaxBytes},
+		validator,
+	)
+
+	assert.Len(t, *captured, bodyMaxBytes, "validator must receive BodyMaxBytes bytes")
+	content, ok := fields["content"]
+	require.True(t, ok)
+	assert.Len(t, content, includeBodyMaxBytes, "event content must be trimmed to IncludeBodyMaxBytes")
+}

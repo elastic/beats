@@ -100,7 +100,7 @@ func TestCheckJsonExpression(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests[6:] {
+	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
 			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintln(w, test.body)
