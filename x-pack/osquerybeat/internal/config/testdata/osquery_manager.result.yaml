@@ -1,0 +1,14 @@
+# Source: osquery_manager/data_stream/result/agent/stream/stream.yml.hbs
+# The osquery block is injected by elastic-agent's osquerybeatCfgFromStreams
+# into the result stream; the template itself only provides query and interval.
+type: osquery_manager
+id: test-result-stream-id
+data_stream:
+  dataset: osquery_manager.result
+  type: logs
+  namespace: default
+osquery:
+  schedule:
+    uptime:
+      query: SELECT total_seconds FROM uptime
+      interval: 3600
