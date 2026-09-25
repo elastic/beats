@@ -20,8 +20,9 @@ package monitor
 import (
 	"fmt"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/fsnotify/fsnotify"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (

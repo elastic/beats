@@ -24,8 +24,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func Test_Scanner_Executable(t *testing.T) {

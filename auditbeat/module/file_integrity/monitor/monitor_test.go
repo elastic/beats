@@ -27,9 +27,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/fsnotify/fsnotify"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func alwaysInclude(path string) bool {

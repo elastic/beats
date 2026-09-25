@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -380,7 +381,7 @@ func openLog(t testing.TB, state *checkpoint.EventLogState, config map[string]an
 		t.Fatal(err)
 	}
 
-	log, err := newWinEventLog(cfg)
+	log, err := newWinEventLog(cfg, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}

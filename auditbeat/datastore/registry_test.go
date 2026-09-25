@@ -22,10 +22,11 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	bolt "go.etcd.io/bbolt"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // snapshotEntry returns refCount and existence for path in r under the
