@@ -1,0 +1,19 @@
+{
+  "item": {
+    "id": "a580c680-ea40-11ed-aae7-4b4fd4906b3d",
+    "name": "test policy",
+    "description": "a policy used for testing",
+    "namespace": "default",
+    "monitoring_enabled": [
+      "logs",
+      "metrics"
+    ],
+    "inactivity_timeout": 1209600,
+    "status": "active",
+    "is_managed": false,
+    "revision": 1,
+    "updated_at": "2023-05-04T05:58:09.389Z",
+    "updated_by": "3118418258",
+    "schema_version": "1.1.0"
+  }
+}

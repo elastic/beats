@@ -1,0 +1,208 @@
+{
+  "item": {
+    "id": "26802301-8996-457a-ab6a-8ea955ef2723",
+    "access_api_key_id": "_XoIDYgBS-WQsBUaajOA",
+    "action_seq_no": [
+      1
+    ],
+    "active": true,
+    "agent": {
+      "id": "26802301-8996-457a-ab6a-8ea955ef2723",
+      "version": "8.7.1"
+    },
+    "enrolled_at": "2023-05-11T22:57:15Z",
+    "local_metadata": {
+      "elastic": {
+        "agent": {
+          "build.original": "8.7.1 (build: 10dc6a0a20c54d3aa319b6864faf4b5bf7c7d876 at 2023-04-27 13:56:11 +0000 UTC)",
+          "id": "26802301-8996-457a-ab6a-8ea955ef2723",
+          "log_level": "info",
+          "snapshot": false,
+          "upgradeable": true,
+          "version": "8.7.1"
+        }
+      },
+      "host": {
+        "architecture": "arm64",
+        "hostname": "Shaunaks-MBP.attlocal.net",
+        "id": "66037E8B-79B9-52D0-9B03-72AB59C873C0",
+        "ip": [
+          "127.0.0.1/8",
+          "::1/128",
+          "fe80::1/64",
+          "fe80::b43d:8fff:fea2:2f15/64",
+          "fe80::b43d:8fff:fea2:2f14/64",
+          "fe80::b43d:8fff:fea2:2f16/64",
+          "2603:6011:7400:b4::8c1/64",
+          "fe80::4d2:a0cc:a11:fab2/64",
+          "2603:6011:7400:b4:840:ce09:e33:269/64",
+          "2603:6011:7400:b4:38ac:5a22:7bf3:9973/64",
+          "192.168.2.70/24",
+          "2603:6011:7400:b4::f23/64",
+          "fe80::10fc:a3ff:fe4b:b526/64",
+          "fe80::10fc:a3ff:fe4b:b526/64",
+          "fe80::7921:7752:a56e:77e8/64",
+          "fe80::54d9:faf1:fb90:fc9f/64",
+          "fe80::ce81:b1c:bd2c:69e/64",
+          "fe80::5280:ffda:ec23:df52/64",
+          "fe80::1285:e67f:1fb4:9ae8/64",
+          "fe80::ad61:8c2d:6ae3:9c53/64",
+          "fe80::aef1:8461:8b5b:3f19/64"
+        ],
+        "mac": [
+          "b6:3d:8f:a2:2f:15",
+          "b6:3d:8f:a2:2f:14",
+          "b6:3d:8f:a2:2f:16",
+          "b6:3d:8f:a2:2f:f4",
+          "b6:3d:8f:a2:2f:f5",
+          "b6:3d:8f:a2:2f:f6",
+          "36:63:12:37:a2:00",
+          "36:63:12:37:a2:04",
+          "36:63:12:37:a2:08",
+          "36:63:12:37:a2:00",
+          "7e:e9:1e:c4:37:66",
+          "5c:e9:1e:c4:37:66",
+          "12:fc:a3:4b:b5:26",
+          "12:fc:a3:4b:b5:26"
+        ],
+        "name": "Shaunaks-MBP.attlocal.net"
+      },
+      "os": {
+        "family": "darwin",
+        "full": "macOS(13.3.1)",
+        "kernel": "22.4.0",
+        "name": "macOS",
+        "platform": "darwin",
+        "version": "13.3.1"
+      }
+    },
+    "policy_id": "8196af30-f041-11ed-a1b3-373f5d648cd4",
+    "type": "PERMANENT",
+    "outputs": {
+      "default": {
+        "api_key": "_3oIDYgBS-WQsBUadzPf:9exqZt6yTOas-QNsH5mUEw",
+        "permissions_hash": "09c6c11ffded26845fd91f1a6dc4c4edcc4275875376660a08c09b82b58bcc03",
+        "type": "elasticsearch",
+        "api_key_id": "_3oIDYgBS-WQsBUadzPf"
+      }
+    },
+    "policy_revision_idx": 4,
+    "policy_coordinator_idx": 1,
+    "updated_at": "2023-05-11T23:02:17Z",
+    "components": [
+      {
+        "id": "log-default",
+        "units": [
+          {
+            "id": "log-default-logfile-system-839b31c0-f041-11ed-a1b3-373f5d648cd4",
+            "type": "input",
+            "message": "Healthy",
+            "status": "HEALTHY"
+          },
+          {
+            "id": "log-default",
+            "type": "output",
+            "message": "Healthy",
+            "status": "HEALTHY"
+          }
+        ],
+        "type": "log",
+        "message": "Healthy: communicating with pid '81836'",
+        "status": "HEALTHY"
+      },
+      {
+        "id": "system/metrics-default",
+        "units": [
+          {
+            "id": "system/metrics-default",
+            "type": "output",
+            "message": "Healthy",
+            "status": "HEALTHY"
+          },
+          {
+            "id": "system/metrics-default-system/metrics-system-839b31c0-f041-11ed-a1b3-373f5d648cd4",
+            "type": "input",
+            "message": "Healthy",
+            "status": "HEALTHY"
+          }
+        ],
+        "type": "system/metrics",
+        "message": "Healthy: communicating with pid '81838'",
+        "status": "HEALTHY"
+      },
+      {
+        "id": "filestream-monitoring",
+        "units": [
+          {
+            "id": "filestream-monitoring",
+            "type": "output",
+            "message": "Healthy",
+            "status": "HEALTHY"
+          },
+          {
+            "id": "filestream-monitoring-filestream-monitoring-agent",
+            "type": "input",
+            "message": "Healthy",
+            "status": "HEALTHY"
+          }
+        ],
+        "type": "filestream",
+        "message": "Healthy: communicating with pid '81839'",
+        "status": "HEALTHY"
+      },
+      {
+        "id": "beat/metrics-monitoring",
+        "units": [
+          {
+            "id": "beat/metrics-monitoring-metrics-monitoring-beats",
+            "type": "input",
+            "message": "Healthy",
+            "status": "HEALTHY"
+          },
+          {
+            "id": "beat/metrics-monitoring",
+            "type": "output",
+            "message": "Healthy",
+            "status": "HEALTHY"
+          }
+        ],
+        "type": "beat/metrics",
+        "message": "Healthy: communicating with pid '81840'",
+        "status": "HEALTHY"
+      },
+      {
+        "id": "http/metrics-monitoring",
+        "units": [
+          {
+            "id": "http/metrics-monitoring",
+            "type": "output",
+            "message": "Healthy",
+            "status": "HEALTHY"
+          },
+          {
+            "id": "http/metrics-monitoring-metrics-monitoring-agent",
+            "type": "input",
+            "message": "Healthy",
+            "status": "HEALTHY"
+          }
+        ],
+        "type": "http/metrics",
+        "message": "Healthy: communicating with pid '81841'",
+        "status": "HEALTHY"
+      }
+    ],
+    "last_checkin_message": "Running",
+    "last_checkin_status": "online",
+    "last_checkin": "2023-05-11T23:02:15Z",
+    "policy_revision": 4,
+    "status": "online",
+    "packages": [],
+    "sort": [
+      1683845835000
+    ],
+    "metrics": {
+      "cpu_avg": 0.00103,
+      "memory_size_byte_avg": 140643947
+    }
+  }
+}
