@@ -127,7 +127,8 @@ func TestESClientRequest(t *testing.T) {
 			receivedRequest = request.Clone(request.Context())
 			return &http.Response{
 				StatusCode: http.StatusTeapot,
-				Body:       io.NopCloser(bytes.NewBufferString(`{"hits":{"hits":[]}}`)),
+				Status:     "418 I'm a teapot",
+				Body:       io.NopCloser(bytes.NewBufferString(`Brewing error`)),
 				Header:     make(http.Header),
 			}, nil
 		}),
@@ -137,7 +138,7 @@ func TestESClientRequest(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, elasticsearchRequestTimeout, client.client.Timeout, "Heartbeat must own the Elasticsearch request deadline")
 	status, body, err := client.Request(http.MethodPost, "/_search?size=1", "pipeline", map[string]string{"routing": "monitor"}, map[string]string{"query": "state"})
-	require.NoError(t, err)
+	require.EqualError(t, err, `418 I'm a teapot: Brewing error`)
 	assert.Equal(t, http.StatusTeapot, status)
 	assert.JSONEq(t, `{"hits":{"hits":[]}}`, string(body))
 	require.NotNil(t, receivedRequest)

@@ -137,6 +137,7 @@ func (e *esClient) Request(method, path, pipeline string, params map[string]stri
 			requestErr = err
 			continue
 		}
+
 		responseBody, readErr := io.ReadAll(response.Body)
 		closeErr := response.Body.Close()
 		if readErr != nil {
@@ -145,8 +146,14 @@ func (e *esClient) Request(method, path, pipeline string, params map[string]stri
 		if closeErr != nil {
 			return response.StatusCode, nil, fmt.Errorf("closing Elasticsearch response: %w", closeErr)
 		}
+
+		if response.StatusCode > 299 {
+			return response.StatusCode, responseBody, fmt.Errorf("%s: %s", response.Status, responseBody)
+		}
+
 		return response.StatusCode, responseBody, nil
 	}
+
 	return 0, nil, fmt.Errorf("requesting Elasticsearch endpoints: %w", requestErr)
 }
 
