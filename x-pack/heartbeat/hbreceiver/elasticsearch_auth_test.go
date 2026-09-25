@@ -126,6 +126,35 @@ func TestESClientRequest(t *testing.T) {
 		roundTripper: roundTripperFunc(func(request *http.Request) (*http.Response, error) {
 			receivedRequest = request.Clone(request.Context())
 			return &http.Response{
+				StatusCode: http.StatusOK,
+				Status:     "200 OK",
+				Body:       io.NopCloser(bytes.NewBufferString(`{"hits":{"hits":[]}}`)),
+				Header:     make(http.Header),
+			}, nil
+		}),
+	}
+
+	client, err := newESClient(auth)
+	require.NoError(t, err, "client creation")
+	assert.Equal(t, elasticsearchRequestTimeout, client.client.Timeout, "Heartbeat must own the Elasticsearch request deadline")
+	status, body, err := client.Request(http.MethodPost, "/_search?size=1", "pipeline", map[string]string{"routing": "monitor"}, map[string]string{"query": "state"})
+	require.NoError(t, err, "request should succeed")
+	assert.Equal(t, http.StatusOK, status, "status")
+	assert.JSONEq(t, `{"hits":{"hits":[]}}`, string(body), "unexpected body")
+	require.NotNil(t, receivedRequest, "returned request should be valid")
+	assert.Equal(t, http.MethodPost, receivedRequest.Method, "unexpected method")
+	assert.Equal(t, "/base/_search", receivedRequest.URL.Path, "unexpected path")
+	assert.Equal(t, "1", receivedRequest.URL.Query().Get("size"), "unexpected size query")
+	assert.Equal(t, "pipeline", receivedRequest.URL.Query().Get("pipeline"), "unexpected pipeline query")
+	assert.Equal(t, "monitor", receivedRequest.URL.Query().Get("routing"), "unexpected routing query")
+	assert.Equal(t, "application/json", receivedRequest.Header.Get("Content-Type"), "unexpected content type")
+}
+
+func TestESClientRequestNon2xx(t *testing.T) {
+	auth := &fakeElasticsearchAuthExtension{
+		endpoints: []string{"http://example.test"},
+		roundTripper: roundTripperFunc(func(*http.Request) (*http.Response, error) {
+			return &http.Response{
 				StatusCode: http.StatusTeapot,
 				Status:     "418 I'm a teapot",
 				Body:       io.NopCloser(bytes.NewBufferString(`Brewing error`)),
@@ -135,19 +164,11 @@ func TestESClientRequest(t *testing.T) {
 	}
 
 	client, err := newESClient(auth)
-	require.NoError(t, err)
-	assert.Equal(t, elasticsearchRequestTimeout, client.client.Timeout, "Heartbeat must own the Elasticsearch request deadline")
-	status, body, err := client.Request(http.MethodPost, "/_search?size=1", "pipeline", map[string]string{"routing": "monitor"}, map[string]string{"query": "state"})
-	require.EqualError(t, err, `418 I'm a teapot: Brewing error`)
-	assert.Equal(t, http.StatusTeapot, status)
-	assert.JSONEq(t, `{"hits":{"hits":[]}}`, string(body))
-	require.NotNil(t, receivedRequest)
-	assert.Equal(t, http.MethodPost, receivedRequest.Method)
-	assert.Equal(t, "/base/_search", receivedRequest.URL.Path)
-	assert.Equal(t, "1", receivedRequest.URL.Query().Get("size"))
-	assert.Equal(t, "pipeline", receivedRequest.URL.Query().Get("pipeline"))
-	assert.Equal(t, "monitor", receivedRequest.URL.Query().Get("routing"))
-	assert.Equal(t, "application/json", receivedRequest.Header.Get("Content-Type"))
+	require.NoError(t, err, "client creation")
+	status, body, err := client.Request(http.MethodGet, "/", "", nil, nil)
+	require.EqualError(t, err, `418 I'm a teapot: Brewing error`, "unexpected error message")
+	assert.Equal(t, http.StatusTeapot, status, "unexpected status code")
+	assert.Equal(t, "Brewing error", string(body), "unexpected response body")
 }
 
 func TestElasticsearchAuthStartHookInjectsBeforeRun(t *testing.T) {
