@@ -23,6 +23,8 @@ steps:
       provider: k8s
       ephemeralStorage: "40G"
     timeout_in_minutes: 30
+    artifact_paths:
+      - "artifacts/dra/beats/*/manifest-*.json"
     plugins:
       # Must match the google_oidc_plugin anchor in packaging.pipeline.yml
       - elastic/oblt-google-auth#v1.3.1:
