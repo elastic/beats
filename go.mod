@@ -171,7 +171,7 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.10.0
 	github.com/elastic/elastic-agent-libs v0.47.0
-	github.com/elastic/go-elasticsearch/v8 v8.19.0
+	github.com/elastic/go-elasticsearch/v8 v8.19.7
 	github.com/elastic/go-freelru v0.16.0
 	github.com/elastic/go-quark v0.8.0
 	github.com/elastic/go-sfdc v0.0.0-20260504130806-a46e22d049d9
@@ -363,7 +363,7 @@ require (
 	github.com/eapache/go-xerial-snappy v0.0.0-20230731223053-c322873962e3 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
 	github.com/ebitengine/purego v0.10.2 // indirect
-	github.com/elastic/elastic-transport-go/v8 v8.8.0 // indirect
+	github.com/elastic/elastic-transport-go/v8 v8.9.0 // indirect
 	github.com/elastic/go-docappender/v2 v2.14.1 // indirect
 	github.com/elastic/go-windows v1.0.2
 	github.com/elazarl/goproxy v0.0.0-20240909085733-6741dbfc16a1 // indirect
