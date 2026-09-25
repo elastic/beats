@@ -185,7 +185,7 @@ staged_artifacts() {
   sources=$(find "$TEST_TMPDIR/work/build/distributions" -type f -name '*-SNAPSHOT*' | wc -l)
   staged=$(staged_artifacts | wc -l)
   [ "$sources" -eq "$staged" ]
-  [ -z "$(find "$TEST_TMPDIR/work/build/distributions" -type f -printf '%f\n' | sort | uniq -d)" ]
+  [ -z "$(find "$TEST_TMPDIR/work/build/distributions" -type f -exec basename {} \; | sort | uniq -d)" ]
 }
 
 @test "fails when no files match the workflow" {

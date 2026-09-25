@@ -43,7 +43,7 @@ curl_calls() {
   export WORKFLOW=snapshot
   resolve
   [ "$status" -eq 0 ]
-  [ "${lines[-1]}" = "9.9.0||true" ]
+  [ "${lines[${#lines[@]}-1]}" = "9.9.0||true" ]
   [ "$(curl_calls)" -eq 0 ]
 }
 
@@ -52,7 +52,7 @@ curl_calls() {
   export VERSION_QUALIFIER=beta1
   resolve
   [ "$status" -eq 0 ]
-  [ "${lines[-1]}" = "9.9.0|beta1|true" ]
+  [ "${lines[${#lines[@]}-1]}" = "9.9.0|beta1|true" ]
   [ "$(curl_calls)" -eq 0 ]
 }
 
@@ -61,7 +61,7 @@ curl_calls() {
   export MOCK_GCS_QUALIFIER=beta1
   resolve
   [ "$status" -eq 0 ]
-  [ "${lines[-1]}" = "9.9.0||true" ]
+  [ "${lines[${#lines[@]}-1]}" = "9.9.0||true" ]
   [ "$(curl_calls)" -eq 0 ]
 }
 
@@ -71,7 +71,7 @@ curl_calls() {
   export MOCK_GCS_QUALIFIER=beta1
   resolve
   [ "$status" -eq 0 ]
-  [ "${lines[-1]}" = "9.9.0-rc2|rc2|true" ]
+  [ "${lines[${#lines[@]}-1]}" = "9.9.0-rc2|rc2|true" ]
   [ "$(curl_calls)" -eq 0 ]
 }
 
@@ -79,7 +79,7 @@ curl_calls() {
   export WORKFLOW=staging
   resolve
   [ "$status" -eq 0 ]
-  [ "${lines[-1]}" = "9.9.0||true" ]
+  [ "${lines[${#lines[@]}-1]}" = "9.9.0||true" ]
   [ "$(curl_calls)" -eq 1 ]
 }
 
@@ -88,7 +88,7 @@ curl_calls() {
   export MOCK_GCS_QUALIFIER=beta1
   resolve
   [ "$status" -eq 0 ]
-  [ "${lines[-1]}" = "9.9.0-beta1|beta1|true" ]
+  [ "${lines[${#lines[@]}-1]}" = "9.9.0-beta1|beta1|true" ]
   [ "$(curl_calls)" -gt 0 ]
   while IFS= read -r call; do
     [[ "$call" == *"https://storage.googleapis.com/dra-qualifier/${BUILDKITE_BRANCH}" ]]
@@ -101,7 +101,7 @@ curl_calls() {
   export MOCK_GCS_QUALIFIER=alpha1
   resolve
   [ "$status" -eq 0 ]
-  [ "${lines[-1]}" = "9.9.0-alpha1|alpha1|true" ]
+  [ "${lines[${#lines[@]}-1]}" = "9.9.0-alpha1|alpha1|true" ]
   [ "$(curl_calls)" -gt 0 ]
   while IFS= read -r call; do
     [[ "$call" == *"/dra-qualifier/main" ]]
@@ -114,7 +114,7 @@ curl_calls() {
   export MOCK_GCS_QUALIFIER=rc1
   resolve
   [ "$status" -eq 0 ]
-  [ "${lines[-1]}" = "10.1.0-rc1|rc1|true" ]
+  [ "${lines[${#lines[@]}-1]}" = "10.1.0-rc1|rc1|true" ]
 }
 
 @test "DRY_RUN=true disables the DRA upload" {
@@ -122,7 +122,7 @@ curl_calls() {
   export DRY_RUN=true
   resolve
   [ "$status" -eq 0 ]
-  [ "${lines[-1]}" = "9.9.0||false" ]
+  [ "${lines[${#lines[@]}-1]}" = "9.9.0||false" ]
 }
 
 @test "DRY_RUN unset, false, or any other value keeps the DRA upload enabled" {
@@ -135,7 +135,7 @@ curl_calls() {
     fi
     resolve
     [ "$status" -eq 0 ]
-    [ "${lines[-1]}" = "9.9.0||true" ]
+    [ "${lines[${#lines[@]}-1]}" = "9.9.0||true" ]
   done
 }
 
@@ -149,7 +149,7 @@ curl_calls() {
     bash -c "printf \"%s|%s|%s\n\" \"\$STACK_VERSION\" \"\$VERSION_QUALIFIER\" \"\$DRA_UPLOAD\""
   ' _ "$SCRIPT"
   [ "$status" -eq 0 ]
-  [ "${lines[-1]}" = "9.9.0-beta1|beta1|true" ]
+  [ "${lines[${#lines[@]}-1]}" = "9.9.0-beta1|beta1|true" ]
 }
 
 @test "staging works under set -u when WORKFLOW, DRY_RUN, and BUILDKITE_BRANCH are unset" {
@@ -161,14 +161,14 @@ curl_calls() {
     bash -c "printf \"%s|%s|%s\n\" \"\$STACK_VERSION\" \"\$VERSION_QUALIFIER\" \"\$DRA_UPLOAD\""
   ' _ "$SCRIPT"
   [ "$status" -eq 0 ]
-  [ "${lines[-1]}" = "9.9.0||true" ]
+  [ "${lines[${#lines[@]}-1]}" = "9.9.0||true" ]
 }
 
 @test "an unknown or missing WORKFLOW is treated like snapshot" {
   export MOCK_GCS_QUALIFIER=beta1
   resolve
   [ "$status" -eq 0 ]
-  [ "${lines[-1]}" = "9.9.0||true" ]
+  [ "${lines[${#lines[@]}-1]}" = "9.9.0||true" ]
   [ "$(curl_calls)" -eq 0 ]
 }
 
