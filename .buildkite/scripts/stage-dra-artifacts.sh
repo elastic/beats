@@ -27,12 +27,12 @@ echo "--- Normalizing filenames (${WORKFLOW})"
 
 # rename dependencies.csv to the versioned name dra-prep plugin's CSV classifier expects.
 VERSION=$(make get-version)
-FINAL_VERSION="${VERSION}-SNAPSHOT"
-if [[ "${WORKFLOW}" != "snapshot" ]]; then
-  FINAL_VERSION="${VERSION}"
-fi
+FINAL_VERSION="${VERSION}"
 if [[ -n "${VERSION_QUALIFIER}" ]]; then
   FINAL_VERSION="${FINAL_VERSION}-${VERSION_QUALIFIER}"
+fi
+if [[ "${WORKFLOW}" == "snapshot" ]]; then
+  FINAL_VERSION="${FINAL_VERSION}-SNAPSHOT"
 fi
 
 echo "Rename dependencies to ${FINAL_VERSION}"
