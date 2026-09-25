@@ -6,6 +6,7 @@ package instance
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -35,14 +36,19 @@ import (
 // stop it closes its client (stage one of the two-stage shutdown), modeling a
 // well-behaved Beater that owns its inputs' shutdown (issue #49794).
 type mockReceiverBeater struct {
-	npub     int
-	acked    *atomic.Int64
-	initDone chan struct{}
-	done     chan struct{}
-	stopOnce sync.Once
+	npub          int
+	acked         *atomic.Int64
+	initDone      chan struct{}
+	done          chan struct{}
+	stopOnce      sync.Once
+	runCalledHook func()
 }
 
 func (m *mockReceiverBeater) Run(b *beat.Beat) error {
+	if m.runCalledHook != nil {
+		m.runCalledHook()
+	}
+
 	client, err := b.Publisher.ConnectWith(beat.ClientConfig{
 		EventListener: acker.RawCounting(func(n int) { m.acked.Add(int64(n)) }),
 	})
@@ -142,6 +148,54 @@ func TestBeatReceiverStartShutdown(t *testing.T) {
 	// consuming and acking while the pipeline was disconnected.
 	assert.Equal(t, int64(npub), acked.Load(),
 		"all published events must be acknowledged by the time Shutdown returns")
+}
+
+func TestBeatReceiverStartHookRunsBeforeRun(t *testing.T) {
+	hookRan := &atomic.Bool{}
+	runObservedHook := make(chan bool, 1)
+	mb := &mockReceiverBeater{
+		acked:    &atomic.Int64{},
+		initDone: make(chan struct{}),
+		done:     make(chan struct{}),
+		runCalledHook: func() {
+			runObservedHook <- hookRan.Load()
+		},
+	}
+	creator := func(*beat.Beat, *conf.C) (beat.Beater, error) { return mb, nil }
+
+	b, err := NewBeatForReceiver(
+		cmd.FilebeatSettings("filebeat"),
+		map[string]any{"path.home": t.TempDir()},
+		consumertest.NewNop(),
+		"test-receiver",
+		zapcore.NewNopCore(),
+	)
+	require.NoError(t, err, "building the receiver beat should succeed")
+
+	rs := receiver.Settings{
+		ID: component.NewIDWithName(component.MustNewType("mockbeatreceiver"), "r1"),
+		TelemetrySettings: component.TelemetrySettings{
+			Logger: zap.NewNop(),
+		},
+	}
+	br, err := NewBeatReceiver(t.Context(), b, creator, rs)
+	require.NoError(t, err, "creating the beat receiver should succeed")
+
+	host := componenttest.NewNopHost()
+	br.SetStartHook(func(receivedHost component.Host) error {
+		assert.Same(t, host, receivedHost, "start hook should receive the Start host")
+		hookRan.Store(true)
+		return nil
+	})
+
+	require.NoError(t, br.Start(host), "starting the Beat receiver should succeed")
+	select {
+	case observed := <-runObservedHook:
+		assert.True(t, observed, "start hook should complete before beater.Run begins")
+	case <-time.After(5 * time.Second):
+		t.Fatal("beater.Run did not begin")
+	}
+	require.NoError(t, br.Shutdown(t.Context()), "shutting down the Beat receiver should succeed")
 }
 
 // fakeActionDiagExtension implements both otelmanager.DiagnosticExtension and
@@ -364,5 +418,52 @@ func TestBeatReceiverStartFailureShutdownDoesNotHang(t *testing.T) {
 	case <-done:
 	case <-time.After(5 * time.Second):
 		t.Fatal("Shutdown hung after BeatReceiver.Start failed — nil runDone not fixed")
+	}
+}
+
+func TestBeatReceiverStartHookFailureShutdownDoesNotHang(t *testing.T) {
+	mb := &mockReceiverBeater{
+		acked:    &atomic.Int64{},
+		initDone: make(chan struct{}),
+		done:     make(chan struct{}),
+	}
+	creator := func(*beat.Beat, *conf.C) (beat.Beater, error) { return mb, nil }
+
+	b, err := NewBeatForReceiver(
+		cmd.FilebeatSettings("filebeat"),
+		map[string]any{"path.home": t.TempDir()},
+		consumertest.NewNop(),
+		"test-receiver",
+		zapcore.NewNopCore(),
+	)
+	require.NoError(t, err, "building the receiver beat should succeed")
+
+	rs := receiver.Settings{
+		ID: component.NewIDWithName(component.MustNewType("mockbeatreceiver"), "r1"),
+		TelemetrySettings: component.TelemetrySettings{
+			Logger: zap.NewNop(),
+		},
+	}
+	br, err := NewBeatReceiver(t.Context(), b, creator, rs)
+	require.NoError(t, err, "creating the beat receiver should succeed")
+
+	hookErr := errors.New("start hook failed")
+	br.SetStartHook(func(component.Host) error {
+		return hookErr
+	})
+
+	startErr := br.Start(componenttest.NewNopHost())
+	require.ErrorIs(t, startErr, hookErr, "Start should return the start hook failure")
+
+	// Shutdown must complete promptly even though Start failed before launching
+	// beater.Run. Use t.Context() (no deadline during test execution) so that a
+	// missing runDone signal would block indefinitely.
+	done := make(chan error, 1)
+	go func() { done <- br.Shutdown(t.Context()) }()
+	select {
+	case err := <-done:
+		require.NoError(t, err, "Shutdown should consume the start failure signal without error")
+	case <-time.After(5 * time.Second):
+		t.Fatal("Shutdown hung after BeatReceiver.Start failed")
 	}
 }

@@ -104,6 +104,7 @@ func (a *authenticator) newTransport() (*http.Transport, error) {
 	}
 	transport.MaxConnsPerHost = a.config.ClientConfig.MaxConnsPerHost
 	transport.ForceAttemptHTTP2 = a.config.ClientConfig.ForceAttemptHTTP2
+
 	if a.config.ClientConfig.ProxyURL != "" {
 		proxyURL, err := url.ParseRequestURI(a.config.ClientConfig.ProxyURL)
 		if err != nil {
@@ -111,6 +112,7 @@ func (a *authenticator) newTransport() (*http.Transport, error) {
 		}
 		transport.Proxy = http.ProxyURL(proxyURL)
 	}
+
 	if a.config.ClientConfig.HTTP2ReadIdleTimeout > 0 {
 		// ConfigureTransports attaches the returned HTTP/2 transport to transport.
 		http2transport, err := http2.ConfigureTransports(transport)
@@ -120,6 +122,7 @@ func (a *authenticator) newTransport() (*http.Transport, error) {
 		http2transport.ReadIdleTimeout = a.config.ClientConfig.HTTP2ReadIdleTimeout
 		http2transport.PingTimeout = a.config.ClientConfig.HTTP2PingTimeout
 	}
+
 	return transport, nil
 }
 
@@ -133,6 +136,7 @@ func (a *authenticatedRoundTripper) RoundTrip(request *http.Request) (*http.Resp
 	if clonedRequest.Header == nil {
 		clonedRequest.Header = make(http.Header)
 	}
+
 	if host, found := a.config.ClientConfig.Headers.Get("Host"); found && host != "" {
 		clonedRequest.Host = string(host)
 	}

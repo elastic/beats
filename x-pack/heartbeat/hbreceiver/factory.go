@@ -12,8 +12,11 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/receiver"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
+
 	"github.com/elastic/beats/v7/heartbeat/beater"
 	"github.com/elastic/beats/v7/heartbeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/beat"
 
 	// Import OSS monitor types.
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
@@ -33,6 +36,25 @@ const (
 type Settings struct {
 	Home string
 	Data string
+}
+
+type heartbeatCreator struct {
+	creator   beat.Creator
+	heartbeat *beater.Heartbeat
+}
+
+func (c *heartbeatCreator) create(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
+	created, err := c.creator(b, cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	heartbeat, ok := created.(*beater.Heartbeat)
+	if !ok || heartbeat == nil {
+		return nil, fmt.Errorf("heartbeat creator returned %T, expected *beater.Heartbeat", created)
+	}
+	c.heartbeat = heartbeat
+	return created, nil
 }
 
 func createReceiver(ctx context.Context, set receiver.Settings, baseCfg component.Config, consumer consumer.Logs) (receiver.Logs, error) {
@@ -57,12 +79,24 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 		return nil, fmt.Errorf("error restoring browser params: %w", err)
 	}
 
-	beatCreator := beater.New
-	br, err := xpInstance.NewBeatReceiver(ctx, b, beatCreator, set)
+	baseCreator := beater.New
+	creator := &heartbeatCreator{creator: baseCreator}
+	br, err := xpInstance.NewBeatReceiver(ctx, b, creator.create, set)
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
 	}
-	return &heartbeatReceiver{BeatReceiver: br}, nil
+
+	hbReceiver := &heartbeatReceiver{BeatReceiver: br}
+	hbReceiver.SetStartHook(
+		elasticsearchAuthStartHook(
+			cfg.ElasticsearchAuth,
+			creator.heartbeat,
+			func(requester *esClient) {
+				hbReceiver.elasticsearchAuthRequester = requester
+			},
+		),
+	)
+	return hbReceiver, nil
 }
 
 // NewFactory creates a new receiver Factory with empty default paths.
