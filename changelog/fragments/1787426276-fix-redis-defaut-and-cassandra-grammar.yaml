@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix Redis module docs typo (defaut) and Cassandra field grammar (a error).
+component: all
