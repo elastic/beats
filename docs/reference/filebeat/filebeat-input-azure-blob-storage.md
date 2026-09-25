@@ -435,7 +435,7 @@ The `retry` attribute contains the following sub-attributes:
 
 Every sub-attribute is optional. Omitting the `retry` attribute (or any of its sub-attributes) keeps the Azure SDK defaults, so existing configurations continue to behave as before. The settings are applied per storage account and, therefore, affect all configured containers.
 
-These settings do not cover the token requests made by [auth.managed_identity](#attrib-auth-managed-identity). Those follow the Azure SDK's own retry behaviour for the identity endpoint of the host, which is tuned for the transient failures Azure returns while it attaches an identity to a host that has just started. Token requests made by [auth.oauth2](#attrib-auth-oauth2) do use the `retry` settings.
+{applies_to}`stack: ga 9.4.6+` These settings do not cover the token requests made by [auth.managed_identity](#attrib-auth-managed-identity). Those requests use the Azure SDK retry behavior for the identity endpoint of the host. That behavior is tuned for the transient failures Azure returns while it attaches an identity to a host that recently started. Token requests made by [auth.oauth2](#attrib-auth-oauth2) do use the `retry` settings.
 
 When polling is enabled, a transient blob-listing failure that outlives these retries (for example, an HTTP 503 `ServerBusy`, an HTTP 429, or a network timeout) no longer stops the input. Instead, the input is marked `degraded` and the listing is retried on the next [`poll_interval`](#attrib-poll_interval). This allows the input to ride out longer outages rather than exiting. Permanent failures, such as a missing container or an authentication error, still stop the input.
 
