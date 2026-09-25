@@ -108,7 +108,7 @@ func TestElasticsearchAuthStartHookErrors(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			err := elasticsearchAuthStartHook(test.reference, nil, func(*elasticsearchAuthRequester) {})(test.host)
+			err := elasticsearchAuthStartHook(test.reference, nil, func(*esClient) {})(test.host)
 			require.Error(t, err, "start hook should reject an invalid Elasticsearch authentication extension")
 			assert.Contains(t, err.Error(), test.wantError, "start hook should return the expected resolver error")
 		})
@@ -116,10 +116,10 @@ func TestElasticsearchAuthStartHookErrors(t *testing.T) {
 }
 
 func TestElasticsearchAuthStartHookEmptyReference(t *testing.T) {
-	require.NoError(t, elasticsearchAuthStartHook("", nil, func(*elasticsearchAuthRequester) {})(nil), "empty Elasticsearch auth reference should be a no-op")
+	require.NoError(t, elasticsearchAuthStartHook("", nil, func(*esClient) {})(nil), "empty Elasticsearch auth reference should be a no-op")
 }
 
-func TestElasticsearchAuthRequesterRequest(t *testing.T) {
+func TestESClientRequest(t *testing.T) {
 	var receivedRequest *http.Request
 	auth := &fakeElasticsearchAuthExtension{
 		endpoints: []string{"http://example.test/base"},
@@ -133,10 +133,10 @@ func TestElasticsearchAuthRequesterRequest(t *testing.T) {
 		}),
 	}
 
-	requester, err := newElasticsearchAuthRequester(auth)
+	client, err := newESClient(auth)
 	require.NoError(t, err)
-	assert.Equal(t, elasticsearchRequestTimeout, requester.client.Timeout, "Heartbeat must own the Elasticsearch request deadline")
-	status, body, err := requester.Request(http.MethodPost, "/_search?size=1", "pipeline", map[string]string{"routing": "monitor"}, map[string]string{"query": "state"})
+	assert.Equal(t, elasticsearchRequestTimeout, client.client.Timeout, "Heartbeat must own the Elasticsearch request deadline")
+	status, body, err := client.Request(http.MethodPost, "/_search?size=1", "pipeline", map[string]string{"routing": "monitor"}, map[string]string{"query": "state"})
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusTeapot, status)
 	assert.JSONEq(t, `{"hits":{"hits":[]}}`, string(body))

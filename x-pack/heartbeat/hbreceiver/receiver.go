@@ -15,7 +15,7 @@ import (
 
 type heartbeatReceiver struct {
 	xpInstance.BeatReceiver
-	elasticsearchAuthRequester *elasticsearchAuthRequester
+	elasticsearchAuthRequester *esClient
 }
 
 func (hb *heartbeatReceiver) Start(_ context.Context, host component.Host) error {

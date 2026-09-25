@@ -30,15 +30,15 @@ type elasticsearchAuthExtension interface {
 	Endpoints() []string
 }
 
-type elasticsearchAuthRequester struct {
+type esClient struct {
 	endpoints []*url.URL
 	client    *http.Client
 	next      atomic.Uint64
 }
 
-var _ monitorstate.ElasticsearchRequester = (*elasticsearchAuthRequester)(nil)
+var _ monitorstate.ElasticsearchRequester = (*esClient)(nil)
 
-func elasticsearchAuthStartHook(reference string, heartbeat *beater.Heartbeat, setRequester func(*elasticsearchAuthRequester)) func(component.Host) error {
+func elasticsearchAuthStartHook(reference string, heartbeat *beater.Heartbeat, setRequester func(*esClient)) func(component.Host) error {
 	return func(host component.Host) error {
 		if reference == "" {
 			return nil
@@ -66,7 +66,7 @@ func elasticsearchAuthStartHook(reference string, heartbeat *beater.Heartbeat, s
 			return fmt.Errorf("heartbeat instance was not captured for elasticsearch_auth extension %q", extensionID.String())
 		}
 
-		requester, err := newElasticsearchAuthRequester(auth)
+		requester, err := newESClient(auth)
 		if err != nil {
 			return fmt.Errorf("creating Elasticsearch requester from extension %q: %w", extensionID.String(), err)
 		}
@@ -76,7 +76,7 @@ func elasticsearchAuthStartHook(reference string, heartbeat *beater.Heartbeat, s
 	}
 }
 
-func newElasticsearchAuthRequester(auth elasticsearchAuthExtension) (*elasticsearchAuthRequester, error) {
+func newESClient(auth elasticsearchAuthExtension) (*esClient, error) {
 	endpoints := auth.Endpoints()
 	if len(endpoints) == 0 {
 		return nil, fmt.Errorf("extension has no endpoints")
@@ -95,7 +95,7 @@ func newElasticsearchAuthRequester(auth elasticsearchAuthExtension) (*elasticsea
 	if err != nil {
 		return nil, fmt.Errorf("creating authenticated transport: %w", err)
 	}
-	return &elasticsearchAuthRequester{
+	return &esClient{
 		endpoints: parsedEndpoints,
 		// elasticsearchauth intentionally does not own request deadlines; Heartbeat
 		// keeps the 10-second deadline used by its prior Elasticsearch requester.
@@ -108,7 +108,7 @@ func newElasticsearchAuthRequester(auth elasticsearchAuthExtension) (*elasticsea
 
 // Request implements monitorstate.ElasticsearchRequester with the authenticated
 // HTTP transport and endpoints exposed by elasticsearchauth.
-func (r *elasticsearchAuthRequester) Request(method, path, pipeline string, params map[string]string, body any) (int, []byte, error) {
+func (e *esClient) Request(method, path, pipeline string, params map[string]string, body any) (int, []byte, error) {
 	var encodedBody []byte
 	if body != nil {
 		encoded, err := json.Marshal(body)
@@ -118,10 +118,12 @@ func (r *elasticsearchAuthRequester) Request(method, path, pipeline string, para
 		encodedBody = encoded
 	}
 
-	start := int(r.next.Add(1)-1) % len(r.endpoints)
+	//nolint:gosec // It's the number of Elasticsearch hosts, it won't overflow
+	start := int(e.next.Add(1)-1) % len(e.endpoints)
 	var requestErr error
-	for offset := range len(r.endpoints) {
-		endpoint := requestURL(r.endpoints[(start+offset)%len(r.endpoints)], path, pipeline, params)
+	for offset := range len(e.endpoints) {
+		endpoint := requestURL(e.endpoints[(start+offset)%len(e.endpoints)], path, pipeline, params)
+		//nolint:noctx // The interface we're implementing does not accept a context and the HTTP client has a timeout set
 		request, err := http.NewRequest(method, endpoint.String(), bytes.NewReader(encodedBody))
 		if err != nil {
 			return 0, nil, fmt.Errorf("creating Elasticsearch request: %w", err)
@@ -130,7 +132,7 @@ func (r *elasticsearchAuthRequester) Request(method, path, pipeline string, para
 			request.Header.Set("Content-Type", "application/json")
 		}
 
-		response, err := r.client.Do(request)
+		response, err := e.client.Do(request)
 		if err != nil {
 			requestErr = err
 			continue
@@ -170,8 +172,8 @@ func requestURL(endpoint *url.URL, path, pipeline string, params map[string]stri
 	return &requestURL
 }
 
-func (r *elasticsearchAuthRequester) CloseIdleConnections() {
-	if closer, ok := r.client.Transport.(interface{ CloseIdleConnections() }); ok {
+func (e *esClient) CloseIdleConnections() {
+	if closer, ok := e.client.Transport.(interface{ CloseIdleConnections() }); ok {
 		closer.CloseIdleConnections()
 	}
 }
