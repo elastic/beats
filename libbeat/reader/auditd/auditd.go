@@ -31,47 +31,56 @@ import (
 	"github.com/elastic/go-libaudit/v2/auparse"
 )
 
-// innerMsgRe matches the content of an inner msg='...' block, which many
-// record types (ADD_GROUP, ADD_USER, USER_LOGIN, …) use to embed a second
-// set of key-value pairs inside the outer message.
-var innerMsgRe = regexp.MustCompile(`\bmsg='([^']*)'`)
-
-// avcRe extracts the AVC action and first requested permission from an audit
-// log line such as: "avc: denied { getattr } for".
-var avcRe = regexp.MustCompile(`\bavc:\s+(\w+)\s+\{\s+(\w+)\s+\}\s+for\s+`)
-
-// innerMsgKVRe extracts individual key=value pairs from inner msg content.
-// Unquoted values may span multiple words (e.g. op=adding group to /etc/group)
-// because auparse's KV regex stops at the first whitespace. The boundary is
-// the next key=value token.
-var innerMsgKVRe = regexp.MustCompile(`([a-z][a-z0-9_-]*)=(.*?)(?:\s+[a-z][a-z0-9_-]+=|\s*$)`)
-
-// Parser parses each line of an audit.log file using go-libaudit's auparse
-// package and populates auditd.log.* fields on the message.
+// Parser wraps the internal auditd parsing implementation selected by
+// Config.Mode. It satisfies reader.Reader and reader.DeadlineSetter.
 type Parser struct {
+	r reader.Reader
+}
+
+// NewParser creates a new auditd Parser. The behaviour is controlled by
+// cfg.Mode: ModeCoalesce groups records by sequence number into compound
+// events, ModeParse parses each line independently, and ModeNone passes
+// the input through unchanged.
+func NewParser(r reader.Reader, cfg Config, logger *logp.Logger) *Parser {
+	switch cfg.Mode {
+	case ModeCoalesce:
+		return &Parser{r: newCoalescingParser(r, cfg, logger)}
+	case ModeParse:
+		return &Parser{r: newParseParser(r, cfg, logger)}
+	default:
+		return &Parser{r: r}
+	}
+}
+
+func (p *Parser) Next() (reader.Message, error) { return p.r.Next() }
+
+// SetReadDeadline delegates to the wrapped reader (see reader.DeadlineSetter).
+func (p *Parser) SetReadDeadline(t time.Time) bool {
+	return reader.SetReadDeadline(p.r, t)
+}
+
+func (p *Parser) Close() error { return p.r.Close() }
+
+// parseParser parses each line of an audit.log file using go-libaudit's auparse
+// package and populates auditd.log.* fields on the message.
+type parseParser struct {
 	cfg    Config
 	reader reader.Reader
 	logger *logp.Logger
 }
 
-// NewParser creates a new auditd Parser.
-func NewParser(r reader.Reader, cfg Config, logger *logp.Logger) *Parser {
-	return &Parser{
+func newParseParser(r reader.Reader, cfg Config, logger *logp.Logger) *parseParser {
+	return &parseParser{
 		cfg:    cfg,
 		reader: r,
 		logger: logger.Named("reader_auditd"),
 	}
 }
 
-// Close closes the underlying reader.
-func (p *Parser) Close() error {
-	return p.reader.Close()
-}
-
 // Next reads the next line and parses it as an auditd log record, populating
 // auditd.log.* fields and setting the message timestamp. If a line cannot be
 // parsed, it is passed through unchanged (subject to the error config flags).
-func (p *Parser) Next() (reader.Message, error) {
+func (p *parseParser) Next() (reader.Message, error) {
 	msg, err := p.reader.Next()
 	if err != nil {
 		return msg, err
@@ -170,7 +179,23 @@ func stripNodePrefix(line string) (string, string) {
 	return line[i+1:], line[len(prefix):i]
 }
 
+var (
+	innerMsgRe = regexp.MustCompile(`\bmsg='([^']*)'`)
+
+	// innerMsgKVRe extracts individual key=value pairs from inner msg content.
+	// Unquoted values may span multiple words (e.g. op=adding group to /etc/group)
+	// because auparse's KV regex stops at the first whitespace. The boundary is
+	// the next key=value token.
+	innerMsgKVRe = regexp.MustCompile(`([a-z][a-z0-9_-]*)=(.*?)(?:\s+[a-z][a-z0-9_-]+=|\s*$)`)
+
+	avcRe = regexp.MustCompile(`\bavc:\s+(\w+)\s+\{\s+(\w+)\s+\}\s+for\s+`)
+)
+
 // SetReadDeadline delegates to the wrapped reader (see reader.DeadlineSetter).
-func (p *Parser) SetReadDeadline(t time.Time) bool {
+func (p *parseParser) SetReadDeadline(t time.Time) bool {
 	return reader.SetReadDeadline(p.reader, t)
+}
+
+func (p *parseParser) Close() error {
+	return p.reader.Close()
 }

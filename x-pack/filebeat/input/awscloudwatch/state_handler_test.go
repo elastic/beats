@@ -214,11 +214,11 @@ type testInputStore struct {
 	registry *statestore.Registry
 }
 
-func (s *testInputStore) StoreFor(typ string) (*statestore.Store, error) {
+func (s *testInputStore) StoreFor(typ, _ string) (*statestore.Store, error) {
 	return s.registry.Get(typ)
 }
 
-func (s *testInputStore) StoreKey() string {
+func (s *testInputStore) StoreKey(_, _ string) string {
 	return fmt.Sprintf("test:%p", s.registry)
 }
 

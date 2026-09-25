@@ -89,9 +89,25 @@ func newFileWatcher(
 	fi fileIdentifier,
 	srci *loginp.SourceIdentifier,
 ) (*fileWatcher, error) {
+	return newFileWatcherWithDirReader(logger, paths, config, compression, sendNotChanged, fi, srci, nil, 0)
+}
+
+// newFileWatcherWithDirReader is like newFileWatcher but accepts a shared dirCache
+// and the per-call maxAge for the directory listing cache. dc=nil disables caching.
+func newFileWatcherWithDirReader(
+	logger *logp.Logger,
+	paths []string,
+	config fileWatcherConfig,
+	compression string,
+	sendNotChanged bool,
+	fi fileIdentifier,
+	srci *loginp.SourceIdentifier,
+	dc *dirCache,
+	maxAge time.Duration,
+) (*fileWatcher, error) {
 
 	config.SendNotChanged = sendNotChanged
-	scanner, err := newFileScanner(logger, paths, config.Scanner, compression)
+	scanner, err := newFileScannerWithCache(logger, paths, config.Scanner, compression, dc, maxAge)
 	if err != nil {
 		return nil, err
 	}
@@ -377,19 +393,23 @@ func (w *fileWatcher) watch(
 		}
 	}
 
-	// Postpone deletes for unmatched entries under a prefix this scan could not
-	// observe (e.g. a directory that hit EMFILE). We cannot tell whether they are
-	// really gone; treating them as deleted would wipe registry state and
-	// re-ingest from offset 0 once the resource frees up.
+	// Postpone deletes for unmatched entries the scan could not resolve. An
+	// unobservable prefix (e.g. a directory that hit EMFILE) and a path that
+	// vanished mid-scan (a concurrent rename or delete) are both inconclusive:
+	// treating them as deleted would wipe registry state and re-ingest from
+	// offset 0 once the next scan sees the file again.
 	postponed := 0
-	if len(scanResults.Unobservable) > 0 {
-		unobservableSet := make(map[string]struct{}, len(scanResults.Unobservable))
-		for _, p := range scanResults.Unobservable {
-			unobservableSet[p] = struct{}{}
-		}
+	postponedUnobservable := 0
+	if len(scanResults.Unobservable) > 0 || len(scanResults.Vanished) > 0 {
+		unobservable := pathSet(scanResults.Unobservable)
+		vanished := pathSet(scanResults.Vanished)
 		for remainingPath, remainingDesc := range w.prev {
-			if !underAnyUnobservable(remainingPath, unobservableSet) {
+			failedObservation := underAnyPrefix(remainingPath, unobservable)
+			if !failedObservation && !underAnyPrefix(remainingPath, vanished) {
 				continue
+			}
+			if failedObservation {
+				postponedUnobservable++
 			}
 			scanResults.Files[remainingPath] = remainingDesc
 			delete(w.prev, remainingPath)
@@ -398,7 +418,7 @@ func (w *fileWatcher) watch(
 	}
 
 	// Unmatched-leftover deletes: prev files matched by neither rename pass and
-	// not under an unobservable prefix are genuinely gone.
+	// not postponed above are genuinely gone.
 	for remainingPath, remainingDesc := range w.prev {
 		srcID := w.getFileIdentity(remainingDesc)
 		select {
@@ -430,7 +450,10 @@ func (w *fileWatcher) watch(
 		}
 	}
 
-	if postponed > 0 && now.Sub(w.lastPostponedWarn) >= postponedWarnInterval {
+	// Only a genuine observation failure is worth warning about. A path that
+	// vanished mid-scan is an ordinary rename or delete and resolves itself on
+	// the next scan.
+	if postponedUnobservable > 0 && now.Sub(w.lastPostponedWarn) >= postponedWarnInterval {
 		w.lastPostponedWarn = now
 		w.log.Warnf("some previously seen files could not be observed (e.g. file-descriptor exhaustion) in the last %s, postponing their delete detection to avoid re-ingestion. See the filebeat.filestream.scan_errors metric for the current count.",
 			postponedWarnInterval)
@@ -530,9 +553,21 @@ func (w *fileWatcher) getFileIdentity(d loginp.FileDescriptor) string {
 	return w.sourceIdentifier.ID(src)
 }
 
-// underAnyUnobservable reports whether path equals, or is nested under, any of
+// pathSet indexes paths for underAnyPrefix lookups.
+func pathSet(paths []string) map[string]struct{} {
+	set := make(map[string]struct{}, len(paths))
+	for _, p := range paths {
+		set[p] = struct{}{}
+	}
+	return set
+}
+
+// underAnyPrefix reports whether path equals, or is nested under, any of
 // the prefixes. Separator-aware, so "/a/b" is not a prefix of "/a/bc".
-func underAnyUnobservable(path string, prefixes map[string]struct{}) bool {
+func underAnyPrefix(path string, prefixes map[string]struct{}) bool {
+	if len(prefixes) == 0 {
+		return false
+	}
 	if _, ok := prefixes[path]; ok {
 		return true
 	}
@@ -579,6 +614,14 @@ func (w *fileWatcher) Event() loginp.FSEvent {
 // completedFingerprints set, so these pre-watch scans cannot suppress the
 // bridging raw header a still-growing entry needs to migrate its registry key
 // after a restart.
+//
+// The dir-cache is bypassed: Init scans happen before the watch loop writes
+// any files, so caching their results would stale-serve the first watch scan.
 func (w *fileWatcher) GetFiles(opts loginp.FileScanOptions) loginp.ScanResults {
+	if fs, ok := w.scanner.(*fileScanner); ok {
+		dc := fs.dirCache
+		fs.dirCache = nil
+		defer func() { fs.dirCache = dc }()
+	}
 	return w.scanner.GetFiles(opts)
 }

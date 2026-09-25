@@ -59,3 +59,72 @@ func TestDefaultConfigContainsCloseRemovedFalse(t *testing.T) {
 		t.Fatalf("'close.on_state_change.removed' must be false")
 	}
 }
+
+func TestInputAllowListConfig(t *testing.T) {
+	tests := []struct {
+		name        string
+		userConfig  mapstr.M
+		wantEnabled bool
+		wantTypes   []string
+	}{
+		{
+			name:       "empty",
+			userConfig: mapstr.M{},
+		},
+		{
+			name: "disabled",
+			userConfig: mapstr.M{
+				"input_allow_list": mapstr.M{
+					"enabled": false,
+					"types":   []string{"httpjson"},
+				},
+			},
+			wantTypes: []string{"httpjson"},
+		},
+		{
+			name: "enabled with omitted types",
+			userConfig: mapstr.M{
+				"input_allow_list": mapstr.M{
+					"enabled": true,
+				},
+			},
+			wantEnabled: true,
+			wantTypes:   []string{"log", "filestream", "container"},
+		},
+		{
+			name: "enabled with empty types",
+			userConfig: mapstr.M{
+				"input_allow_list": mapstr.M{
+					"enabled": true,
+					"types":   []string{},
+				},
+			},
+			wantEnabled: true,
+			wantTypes:   []string{"log", "filestream", "container"},
+		},
+		{
+			name: "enabled with custom types",
+			userConfig: mapstr.M{
+				"input_allow_list": mapstr.M{
+					"enabled": true,
+					"types":   []string{"httpjson", "cel"},
+				},
+			},
+			wantEnabled: true,
+			wantTypes:   []string{"httpjson", "cel"},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			cfg := defaultConfig()
+			userConfig := conf.MustNewConfigFrom(test.userConfig)
+
+			assert.NoError(t, userConfig.Unpack(&cfg), "input allow list config should unpack")
+			assert.Equal(t, test.wantEnabled, cfg.InputAllowList.Enabled,
+				"input allow list enabled state should match")
+			assert.Equal(t, test.wantTypes, cfg.InputAllowList.Types,
+				"input allow list types should match")
+		})
+	}
+}

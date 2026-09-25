@@ -32,6 +32,12 @@ var (
 		"roles": c.Ifc("roles", s.Optional),
 		"host":  c.Str("host", s.Required),
 		"ip":    c.Str("ip", s.IgnoreAllErrors),
+		// Only the attributes explicitly requested by the filter_path are mapped; the
+		// node `attributes` map is operator-defined and otherwise unbounded.
+		"attributes": c.Dict("attributes", s.Schema{
+			"logical_availability_zone": c.Str("logical_availability_zone", s.IgnoreAllErrors),
+			"instance_configuration":    c.Str("instance_configuration", s.IgnoreAllErrors),
+		}, c.DictOptional),
 		"indices": c.Dict("indices", s.Schema{
 			"docs": c.Dict("docs", s.Schema{
 				"count": c.Int("count", s.IgnoreAllErrors),

@@ -53,20 +53,6 @@ func TestResource_CopyInto(t *testing.T) {
 }
 
 func TestStore_OpenClose(t *testing.T) {
-	t.Run("notifies after close hook", func(t *testing.T) {
-		var events []string
-		cleanup := closeStoreWith(func(*store) {
-			events = append(events, "close")
-		})
-		defer cleanup()
-
-		store := testOpenStore(t, "test", nil)
-		store.onClose = func() { events = append(events, "notify") }
-		store.Release()
-
-		require.Equal(t, []string{"close", "notify"}, events)
-	})
-
 	t.Run("acquiring and releasing store closes", func(t *testing.T) {
 		var closed bool
 		cleanup := closeStoreWith(func(s *store) {
@@ -77,9 +63,9 @@ func TestStore_OpenClose(t *testing.T) {
 
 		logger := logptest.NewTestingLogger(t, "")
 		states := createSampleStore(t, nil).WithGCPeriod(time.Minute)
-		store, err := acquireStore(logger, states, "test")
+		_, release, err := acquireStore(logger, states, "test")
 		require.NoError(t, err)
-		releaseAcquiredStore(logger, store)
+		release()
 
 		require.True(t, closed)
 	})
@@ -445,7 +431,7 @@ func TestSourceStoreTakeOver(t *testing.T) {
 	defer s.Release()
 	store := &sourceStore{
 		identifier:            &SourceIdentifier{"filestream::current-id::"},
-		identifiersToTakeOver: []*SourceIdentifier{{"filestream::previous-id::"}},
+		identifiersToTakeOver: []InputMatcher{&SourceIdentifier{"filestream::previous-id::"}},
 		store:                 s,
 	}
 
@@ -475,6 +461,59 @@ func TestSourceStoreTakeOver(t *testing.T) {
 			Updated: s.ephemeralStore.table["filestream::current-id::key1"].internalState.Updated,
 			TTL:     60 * time.Second,
 			Meta:    map[string]any{"identifier_name": "test-file-identity"},
+		},
+	}
+	s.ephemeralStore.mu.Unlock()
+
+	checkEqualStoreState(t, want, backend.snapshot())
+}
+
+func TestSourceStoreTakeOverAnyID(t *testing.T) {
+	backend := createSampleStore(t, map[string]state{
+		"filestream::old-input-a::key1": {
+			TTL:  60 * time.Second,
+			Meta: testMeta{IdentifierName: "test-file-identity"},
+		},
+		"filestream::old-input-b::key2": {
+			TTL:  60 * time.Second,
+			Meta: testMeta{IdentifierName: "test-file-identity"},
+		},
+		"filestream::current-id::key3": { // Already owned — must not be touched
+			TTL:  60 * time.Second,
+			Meta: testMeta{IdentifierName: "test-file-identity"},
+		},
+	})
+	s := testOpenStore(t, "filestream", backend)
+	defer s.Release()
+	store := &sourceStore{
+		identifier:    &SourceIdentifier{"filestream::current-id::"},
+		takeOverAnyID: true,
+		store:         s,
+	}
+
+	store.TakeOver(func(v TakeOverState) (string, any) {
+		m := testMeta{IdentifierName: v.IdentifierName}
+		// Remap both old IDs to current-id
+		newKey := strings.Replace(v.Key, "old-input-a::", "current-id::", 1)
+		newKey = strings.Replace(newKey, "old-input-b::", "current-id::", 1)
+		return newKey, m
+	})
+
+	s.ephemeralStore.mu.Lock()
+	want := map[string]state{
+		"filestream::current-id::key1": {
+			Updated: s.ephemeralStore.table["filestream::current-id::key1"].internalState.Updated,
+			TTL:     60 * time.Second,
+			Meta:    map[string]any{"identifier_name": "test-file-identity"},
+		},
+		"filestream::current-id::key2": {
+			Updated: s.ephemeralStore.table["filestream::current-id::key2"].internalState.Updated,
+			TTL:     60 * time.Second,
+			Meta:    map[string]any{"identifier_name": "test-file-identity"},
+		},
+		"filestream::current-id::key3": { // Unchanged
+			TTL:  60 * time.Second,
+			Meta: map[string]any{"identifier_name": "test-file-identity"},
 		},
 	}
 	s.ephemeralStore.mu.Unlock()
@@ -709,8 +748,8 @@ type testStateStore struct {
 
 func (ts testStateStore) WithGCPeriod(d time.Duration) testStateStore { ts.GCPeriod = d; return ts }
 func (ts testStateStore) CleanupInterval() time.Duration              { return ts.GCPeriod }
-func (ts testStateStore) StoreKey() string                            { return fmt.Sprintf("test:%p", ts.Store) }
-func (ts testStateStore) StoreFor(string) (*statestore.Store, error) {
+func (ts testStateStore) StoreKey(_, _ string) string                 { return fmt.Sprintf("test:%p", ts.Store) }
+func (ts testStateStore) StoreFor(_, _ string) (*statestore.Store, error) {
 	if ts.Store == nil {
 		return nil, errors.New("no store configured")
 	}
