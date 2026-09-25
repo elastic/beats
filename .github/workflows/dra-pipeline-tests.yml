@@ -11,6 +11,18 @@ on:
       - '.buildkite/scripts/packaging/resolve-dra-version.sh'
       - '.buildkite/scripts/tests/**'
       - '.github/workflows/dra-pipeline-tests.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - '.buildkite/dra-prep-pipeline.yml'
+      - '.buildkite/packaging.pipeline.yml'
+      - '.buildkite/scripts/dra-annotate.sh'
+      - '.buildkite/scripts/stage-dra-artifacts.sh'
+      - '.buildkite/scripts/version_qualifier.sh'
+      - '.buildkite/scripts/packaging/resolve-dra-version.sh'
+      - '.buildkite/scripts/tests/**'
+      - '.github/workflows/dra-pipeline-tests.yml'
   workflow_dispatch:
 
 permissions:
@@ -22,6 +34,8 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: bats-core/bats-action@4.0.0
         with:
           support-install: false
