@@ -58,14 +58,14 @@ func UploadPipelines(info beat.Info, esClient *eslegclient.Connection, overwrite
 	if err != nil {
 		return nil, err
 	}
-	return load(esClient, pipelines, overwritePipelines)
+	return load(esClient, pipelines, overwritePipelines, info.Logger)
 }
 
 // ExportPipelines reads all pipelines embedded in the Winlogbeat executable
 // and adapts the pipelines for a given ES version and writes the
 // converted pipelines to the given directory in JSON format.
 func ExportPipelines(info beat.Info, version version.V, directory string) error {
-	log := logp.NewLogger(logName)
+	log := info.Logger.Named(logName)
 	pipelines, err := readAll(info)
 	if err != nil {
 		return err
@@ -153,8 +153,8 @@ func readFile(filename string, info beat.Info) (p pipeline, err error) {
 // load will only overwrite existing pipelines if overwritePipelines is
 // true. An error in loading one of the pipelines will cause the
 // successfully loaded ones to be deleted.
-func load(esClient *eslegclient.Connection, pipelines []pipeline, overwritePipelines bool) (loaded []string, err error) {
-	log := logp.NewLogger(logName)
+func load(esClient *eslegclient.Connection, pipelines []pipeline, overwritePipelines bool, logger *logp.Logger) (loaded []string, err error) {
+	log := logger.Named(logName)
 
 	for _, pipeline := range pipelines {
 		err = fileset.LoadPipeline(esClient, pipeline.id, pipeline.contents, overwritePipelines, log)

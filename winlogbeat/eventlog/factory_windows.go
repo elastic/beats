@@ -21,13 +21,14 @@ package eventlog
 
 import (
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // New creates and returns a new EventLog instance based on the given config.
-func New(options *conf.C) (EventLog, error) {
+func New(options *conf.C, logger *logp.Logger) (EventLog, error) {
 	var config config
 	if err := readConfig(options, &config); err != nil {
 		return nil, err
 	}
-	return newWinEventLog(options)
+	return newWinEventLog(options, logger)
 }

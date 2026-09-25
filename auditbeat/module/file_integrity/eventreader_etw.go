@@ -216,7 +216,7 @@ func newETWReader(c Config, l *logp.Logger) (EventProducer, error) {
 		BufferSize:     1024,
 		MinimumBuffers: 8,
 		MaximumBuffers: 16,
-	})
+	}, l)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing ETW session: %w", err)
 	}

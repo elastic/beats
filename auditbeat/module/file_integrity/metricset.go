@@ -97,7 +97,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	logger := logp.NewLogger(moduleName)
+	logger := base.Logger().Named(moduleName)
 	id := base.Module().Config().ID
 	if id != "" {
 		logger = logger.With("id", id)
@@ -179,7 +179,7 @@ func (ms *MetricSet) Close() error {
 }
 
 func (ms *MetricSet) init(reporter mb.PushReporterV2) bool {
-	bucket, err := datastore.OpenBucket(bucketName, ms.GetPath())
+	bucket, err := datastore.OpenBucket(bucketName, ms.GetPath(), ms.log)
 	if err != nil {
 		err = fmt.Errorf("failed to open persistent datastore: %w", err)
 		reporter.Error(err)
@@ -198,7 +198,7 @@ func (ms *MetricSet) init(reporter mb.PushReporterV2) bool {
 
 	ms.scanStart = time.Now().UTC()
 	if ms.config.ScanAtStart {
-		ms.scanner, err = NewFileSystemScanner(ms.config, ms.findNewPaths())
+		ms.scanner, err = NewFileSystemScanner(ms.config, ms.findNewPaths(), ms.log)
 		if err != nil {
 			err = fmt.Errorf("failed to initialize file scanner: %w", err)
 			reporter.Error(err)

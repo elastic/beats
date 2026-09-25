@@ -68,7 +68,7 @@ func NewFromQuark(ms MetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("failed to fetch self mount inode: %w", err)
 	}
 	qm.selfMntNsIno = uint32(ino64) //nolint:gosec // mount namespace inodes fit in uint32
-	qm.cachedHasher, err = hasher.NewFileHasherWithCache(qm.config.HasherConfig, 4096)
+	qm.cachedHasher, err = hasher.NewFileHasherWithCache(qm.config.HasherConfig, 4096, ms.log)
 	if err != nil {
 		return nil, fmt.Errorf("can't create hash cache: %w", err)
 	}

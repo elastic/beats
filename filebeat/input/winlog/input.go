@@ -70,10 +70,10 @@ func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 	}
 }
 
-func configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, error) {
+func configure(cfg *conf.C, logger *logp.Logger) ([]cursor.Source, cursor.Input, error) {
 	// TODO: do we want to allow to read multiple eventLogs using a single config
 	//       as is common for other inputs?
-	eventLog, err := eventlog.New(cfg)
+	eventLog, err := eventlog.New(cfg, logger)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create new event log. %w", err)
 	}

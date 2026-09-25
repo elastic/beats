@@ -214,7 +214,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	log := base.Logger().Named(metricsetName)
 
-	bucket, err := datastore.OpenBucketWithMigration(bucketNameV2, base.GetPath(), migrateDatastoreSchema)
+	bucket, err := datastore.OpenBucketWithMigration(bucketNameV2, base.GetPath(), log, migrateDatastoreSchema)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open persistent datastore: %w", err)
 	}
@@ -718,7 +718,7 @@ type packageV1 struct {
 //
 // It performs the migration entirely within the given write transaction such
 // that if any problems occur the changes are rolled back.
-func migrateDatastoreSchema(tx *bbolt.Tx) error {
+func migrateDatastoreSchema(tx *bbolt.Tx, logger *logp.Logger) error {
 	const bucketNameV1 = "package.v1"
 
 	v2Bucket := tx.Bucket([]byte(bucketNameV2))
@@ -733,7 +733,7 @@ func migrateDatastoreSchema(tx *bbolt.Tx) error {
 		return nil
 	}
 
-	log := logp.NewLogger(metricsetName)
+	log := logger.Named(metricsetName)
 	log.Debugf("Migrating data from %v to %v bucket.", bucketNameV1, bucketNameV2)
 
 	var packages []*Package

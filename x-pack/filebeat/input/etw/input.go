@@ -46,7 +46,7 @@ const (
 // It abstracts the underlying operations needed to work with ETW, allowing for easier
 // testing and decoupling from the Windows-specific ETW API.
 type sessionOperator interface {
-	newSession(config config) (*etw.Session, error)
+	newSession(config config, logger *logp.Logger) (*etw.Session, error)
 	attachToExistingSession(session *etw.Session) error
 	createRealtimeSession(session *etw.Session) error
 	startConsumer(session *etw.Session) error
@@ -56,8 +56,8 @@ type sessionOperator interface {
 
 type realSessionOperator struct{}
 
-func (op *realSessionOperator) newSession(config config) (*etw.Session, error) {
-	return etw.NewSession(convertConfig(config))
+func (op *realSessionOperator) newSession(config config, logger *logp.Logger) (*etw.Session, error) {
+	return etw.NewSession(convertConfig(config), logger)
 }
 
 func (op *realSessionOperator) attachToExistingSession(session *etw.Session) error {
@@ -133,6 +133,7 @@ func (e *etwInput) Test(_ input.TestContext) error {
 // waiting will not fix, which reports Failed.
 func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	var err error
+	e.log = ctx.Logger.With("session", e.etwSession.Name)
 
 	// Lifecycle states are reported straight to the context; the agent
 	// drops repeats of the state it already has. Per-event health goes
@@ -145,7 +146,7 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	}
 
 	// Initialize a new ETW session with the provided configuration
-	e.etwSession, err = e.operator.newSession(e.config)
+	e.etwSession, err = e.operator.newSession(e.config, e.log)
 	if err != nil {
 		ctx.UpdateStatus(status.Failed, "failed to initialize ETW session: "+errDetail(err))
 		return fmt.Errorf("error initializing ETW session: %w", err)
@@ -159,7 +160,6 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	e.metrics = newInputMetrics(e.etwSession.Name, ctx.MetricsRegistry, ctx.Logger)
 
 	// Set up logger with session information
-	e.log = ctx.Logger.With("session", e.etwSession.Name)
 	e.log.Info("Starting " + inputName + " input")
 	defer e.log.Info(inputName + " input stopped")
 
