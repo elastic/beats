@@ -15,6 +15,7 @@ import (
 
 type heartbeatReceiver struct {
 	xpInstance.BeatReceiver
+	elasticsearchAuthRequester *elasticsearchAuthRequester
 }
 
 func (hb *heartbeatReceiver) Start(_ context.Context, host component.Host) error {
@@ -29,6 +30,11 @@ func (hb *heartbeatReceiver) Start(_ context.Context, host component.Host) error
 
 func (hb *heartbeatReceiver) Shutdown(ctx context.Context) error {
 	hb.Logger.Info("stopping heartbeat receiver")
+	defer func() {
+		if hb.elasticsearchAuthRequester != nil {
+			hb.elasticsearchAuthRequester.CloseIdleConnections()
+		}
+	}()
 	if err := hb.BeatReceiver.Shutdown(ctx); err != nil {
 		return fmt.Errorf("error stopping heartbeat receiver: %w", err)
 	}

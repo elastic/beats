@@ -16,7 +16,6 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/beater"
 	"github.com/elastic/beats/v7/heartbeat/cmd"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/libbeat/beat"
 
 	// Import OSS monitor types.
@@ -58,39 +57,6 @@ func (c *heartbeatCreator) create(b *beat.Beat, cfg *conf.C) (beat.Beater, error
 	return created, nil
 }
 
-func elasticsearchClientStartHook(reference string, heartbeat *beater.Heartbeat) func(component.Host) error {
-	return func(host component.Host) error {
-		if reference == "" {
-			return nil
-		}
-
-		var extensionID component.ID
-		if err := extensionID.UnmarshalText([]byte(reference)); err != nil {
-			return fmt.Errorf("invalid elasticsearch_client component ID %q: %w", reference, err)
-		}
-
-		extension, ok := host.GetExtensions()[extensionID]
-		if !ok {
-			return fmt.Errorf("elasticsearch_client extension %q not found", extensionID.String())
-		}
-		requester, ok := extension.(monitorstate.ElasticsearchRequester)
-		if !ok {
-			return fmt.Errorf(
-				"elasticsearch_client extension %q has type %T, which does not implement monitorstate.ElasticsearchRequester",
-				extensionID.String(),
-				extension,
-			)
-		}
-
-		if heartbeat == nil {
-			return fmt.Errorf("heartbeat instance was not captured for elasticsearch_client extension %q", extensionID.String())
-		}
-
-		heartbeat.WithElasticsearchStateLoader(requester)
-		return nil
-	}
-}
-
 func createReceiver(ctx context.Context, set receiver.Settings, baseCfg component.Config, consumer consumer.Logs) (receiver.Logs, error) {
 	cfg, ok := baseCfg.(*Config)
 	if !ok {
@@ -120,8 +86,17 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
 	}
 
-	br.SetStartHook(elasticsearchClientStartHook(cfg.ElasticsearchClient, creator.heartbeat))
-	return &heartbeatReceiver{BeatReceiver: br}, nil
+	hbReceiver := &heartbeatReceiver{BeatReceiver: br}
+	hbReceiver.SetStartHook(
+		elasticsearchAuthStartHook(
+			cfg.ElasticsearchAuth,
+			creator.heartbeat,
+			func(requester *elasticsearchAuthRequester) {
+				hbReceiver.elasticsearchAuthRequester = requester
+			},
+		),
+	)
+	return hbReceiver, nil
 }
 
 // NewFactory creates a new receiver Factory with empty default paths.

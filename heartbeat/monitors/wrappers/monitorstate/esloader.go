@@ -131,7 +131,6 @@ func MakeESLoader(
 
 func shouldRetry(status int) bool {
 	// A transport failure has no HTTP response and is represented by status 0.
-	// The elasticsearchclient extension connects lazily, so retry it just like a
-	// server-side Elasticsearch failure.
+	// A transport failure is retried like a server-side Elasticsearch failure.
 	return status == 0 || status >= 500
 }

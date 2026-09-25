@@ -15,8 +15,8 @@ import (
 // Config contains explicit receiver-only settings and the remaining Heartbeat
 // Beat configuration.
 type Config struct {
-	ElasticsearchClient string         `mapstructure:"elasticsearch_client"`
-	Beatconfig          map[string]any `mapstructure:",remain"`
+	ElasticsearchAuth string         `mapstructure:"elasticsearch_auth"`
+	Beatconfig        map[string]any `mapstructure:",remain"`
 }
 
 // Unmarshal implements confmap.Unmarshaler for custom unmarshaling logic.
