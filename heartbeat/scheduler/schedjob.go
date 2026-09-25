@@ -23,8 +23,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"golang.org/x/sync/semaphore"
-
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -34,7 +32,7 @@ type schedJob struct {
 	scheduler   *Scheduler
 	wg          *sync.WaitGroup
 	entrypoint  TaskFunc
-	jobLimitSem *semaphore.Weighted
+	jobLimitSem *jobLimitSemaphore
 	activeTasks atomic.Int64
 	logger      *logp.Logger
 }
@@ -47,7 +45,7 @@ func newSchedJob(ctx context.Context, s *Scheduler, id string, jobType string, t
 		id:          id,
 		ctx:         ctx,
 		scheduler:   s,
-		jobLimitSem: s.jobLimitSem[jobType],
+		jobLimitSem: s.getJobLimitSem(jobType),
 		entrypoint:  task,
 		wg:          &sync.WaitGroup{},
 		logger:      logger,
@@ -59,17 +57,14 @@ func newSchedJob(ctx context.Context, s *Scheduler, id string, jobType string, t
 // recursively.
 // The wait group passed into this function expects to already have its count incremented by one.
 func (sj *schedJob) run() (startedAt time.Time) {
+	err := sj.jobLimitSem.acquire(sj.ctx)
+	if err != nil {
+		sj.logger.Errorf("could not acquire job limit: %v", err)
+		return time.Now()
+	}
+	defer sj.jobLimitSem.release()
 	sj.wg.Add(1)
 	sj.activeTasks.Add(1)
-	if sj.jobLimitSem != nil {
-		err := sj.jobLimitSem.Acquire(sj.ctx, 1)
-		// Defer release only if acquired
-		if err == nil {
-			defer sj.jobLimitSem.Release(1)
-		} else {
-			sj.logger.Errorf("could not acquire semaphore: %v", err)
-		}
-	}
 
 	startedAt = sj.runTask(sj.entrypoint)
 
