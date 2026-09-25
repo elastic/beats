@@ -75,9 +75,55 @@ func createRate(rateKey string, key string) utils.EnrichedType[mapstr.M] {
 	}
 }
 
+const (
+	cgroupUsageNanosKey  = "os.cgroup.cpuacct.usage_nanos"
+	cgroupPeriodsKey     = "os.cgroup.cpu.stat.number_of_elapsed_periods"
+	cgroupQuotaMicrosKey = "os.cgroup.cpu.cfs_quota_micros"
+	cgroupCpuPercentKey  = "os.cgroup.cpu.usage_percent"
+)
+
+// Derive the percentage of the configured CFS quota that the process cgroup consumed
+// between two consecutive samples:
+//
+//	(Δusage_nanos / (Δnumber_of_elapsed_periods × cfs_quota_micros × 1000)) × 100
+//
+// This is emitted *alongside* `process.cpu.percent`, never in place of it: the latter
+// reports host-level CPU usage, which is misleading when a CFS quota caps the process,
+// while this field is relative to that quota. Keeping both means consumers can compare
+// the two views instead of guessing which one a sample represents.
+//
+// The value is deliberately not clamped to 100: a cgroup can burst above its quota
+// within a sampling window, and that is meaningful signal rather than an error.
+func enrichCgroupCpuUsagePercent(node *mapstr.M, prevNode *mapstr.M) {
+	if !hasKey(node, cgroupUsageNanosKey) || !hasKey(prevNode, cgroupUsageNanosKey) ||
+		!hasKey(node, cgroupPeriodsKey) || !hasKey(prevNode, cgroupPeriodsKey) ||
+		!hasKey(node, cgroupQuotaMicrosKey) {
+		return
+	}
+	quotaMicros := getValue(node, cgroupQuotaMicrosKey)
+	if quotaMicros <= 0 {
+		return
+	}
+	usageDelta := getValue(node, cgroupUsageNanosKey) - getValue(prevNode, cgroupUsageNanosKey)
+	periodsDelta := getValue(node, cgroupPeriodsKey) - getValue(prevNode, cgroupPeriodsKey)
+	if usageDelta < 0 || periodsDelta <= 0 {
+		return
+	}
+	// Truncate to a whole-number percentage: process.cpu.percent is already an integer
+	// (the ES node stats API returns 0–100 as int), and the account index mapping for
+	// this field is `long`. Emitting an integer keeps the stored value identical to
+	// what the agent sends rather than relying on ES coercion to truncate a float.
+	percent := int64(float64(usageDelta) / (float64(periodsDelta) * float64(quotaMicros) * 1000) * 100)
+
+	// `setValue` writes a literal flat key; use `Put` so the value lands inside the
+	// nested `os.cgroup.cpu` object that the schema already produces.
+	_, _ = node.Put(cgroupCpuPercentKey, percent)
+}
+
 func enrichNodeStats(id string, nodeStats *mapstr.M, timestampDiff int64) {
 	if prevNodeStats, exists := cache.PreviousCache[id]; exists {
 		utils.EnrichObject(nodeStats, &prevNodeStats, cache)
+		enrichCgroupCpuUsagePercent(nodeStats, &prevNodeStats)
 
 		setValue(nodeStats, "timestampDiff", timestampDiff)
 	}
