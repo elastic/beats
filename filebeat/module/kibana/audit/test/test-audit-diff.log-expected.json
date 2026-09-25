@@ -1,0 +1,60 @@
+[
+    {
+        "@timestamp": "2026-08-28T18:00:00.000+00:00",
+        "event.action": "saved_object_update",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "kibana.audit",
+        "event.kind": "event",
+        "event.module": "kibana",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "change"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "kibana.diff.format": "json_patch_extended",
+        "kibana.diff.noOps": [
+            {
+                "path": "/timeFieldName"
+            }
+        ],
+        "kibana.diff.ops": [
+            {
+                "oldValue": "Old title",
+                "op": "replace",
+                "path": "/title",
+                "value": "New title"
+            },
+            {
+                "op": "add",
+                "path": "/runtimeFieldMap",
+                "value": {}
+            }
+        ],
+        "kibana.saved_object.id": "logstash-*",
+        "kibana.saved_object.name": "logstash-*",
+        "kibana.saved_object.type": "index-pattern",
+        "kibana.space_id": "default",
+        "log.level": "INFO",
+        "log.logger": "plugins.security.audit.ecs",
+        "message": "User has updated index-pattern [id=logstash-*]",
+        "process.pid": 7,
+        "related.user": [
+            "elastic"
+        ],
+        "service.node.roles": [
+            "background_tasks",
+            "ui"
+        ],
+        "service.type": "kibana",
+        "trace.id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "transaction.id": "bbbbbbbbbbbbbbbb",
+        "user.name": "elastic",
+        "user.roles": [
+            "superuser"
+        ]
+    }
+]
