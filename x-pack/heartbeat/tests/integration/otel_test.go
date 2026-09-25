@@ -29,11 +29,11 @@ import (
 func TestHeartbeatOTelElasticsearchAuthLoadsMonitorState(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 
-	esHost := integration.GetESURL(t, "http")
+	esHost := integration.GetESAdminURL(t, "http")
 	esUser := esHost.User.Username()
 	esPassword, _ := esHost.User.Password()
 	esURL := fmt.Sprintf("%s://%s", esHost.Scheme, esHost.Host)
-	es := integration.GetESClient(t, "http")
+	es := integration.GetESAdminClient(t, "http")
 
 	namespace := uuid.Must(uuid.NewV4()).String()
 	stateIndex := "heartbeat-auth-state-" + namespace
@@ -182,8 +182,16 @@ service:
 				break
 			}
 		}
-		assert.True(ct, found,
+
+		assert.True(
+			ct,
+			found,
 			"expected an emitted Heartbeat event to contain the loaded previous state in state.ends; got %v",
-			docs.Hits.Hits)
-	}, 2*time.Minute, time.Second, "timed out waiting for Heartbeat to load and use monitor state")
+			docs.Hits.Hits,
+		)
+	},
+		2*time.Minute,
+		time.Second,
+		"timed out waiting for Heartbeat to load and use monitor state",
+	)
 }
