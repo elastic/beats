@@ -55,6 +55,31 @@ type JobLimit struct {
 	Limit int64 `config:"limit" validate:"min=0"`
 }
 
+// supportedJobTypes is the canonical list of monitor types Heartbeat schedules.
+// It is hard coded to avoid a cycle with the current plugin system.
+// TODO: refactor plugin system to DRY this up
+var supportedJobTypes = [...]string{"http", "tcp", "icmp", "browser", "api"}
+
+// SupportedJobTypes returns the monitor types Heartbeat can schedule. It is the
+// single source of truth for per-type concurrency limits and for the monitor
+// types reported in scheduler telemetry. The returned slice is a copy, so
+// callers cannot alter the list.
+func SupportedJobTypes() []string {
+	return append([]string(nil), supportedJobTypes[:]...)
+}
+
+// IsSupportedJobType reports whether jobType is one of the monitor types
+// returned by SupportedJobTypes.
+func IsSupportedJobType(jobType string) bool {
+	for _, supported := range supportedJobTypes {
+		if supported == jobType {
+			return true
+		}
+	}
+
+	return false
+}
+
 // Scheduler defines the syntax of a heartbeat.yml scheduler block.
 type Scheduler struct {
 	Limit    int64  `config:"limit"  validate:"min=0"`
@@ -72,9 +97,7 @@ func DefaultConfig(logger *logp.Logger) *Config {
 	}
 
 	// Read the env key SYNTHETICS_LIMIT_{TYPE} for each type of monitor to set scaling limits
-	// hard coded list of types to avoid cycles in current plugin system.
-	// TODO: refactor plugin system to DRY this up
-	for _, t := range []string{"http", "tcp", "icmp", "browser", "api"} {
+	for _, t := range SupportedJobTypes() {
 		envKey := fmt.Sprintf("SYNTHETICS_LIMIT_%s", strings.ToUpper(t))
 		if limitStr := os.Getenv(envKey); limitStr != "" {
 			tLimitVal, err := strconv.ParseInt(limitStr, 10, 64)
