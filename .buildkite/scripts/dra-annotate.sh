@@ -16,7 +16,7 @@ set -euo pipefail
 
 WORKFLOW="${1:?workflow required}"
 
-buildkite-agent artifact download "artifacts/dra/beats/*/manifest-*.json" . --step "dra-prep"
+buildkite-agent artifact download "artifacts/dra/beats/*/manifest-*.json" . --step "dra-prep-${WORKFLOW}"
 manifest=$(find artifacts/dra/beats -name "manifest-*.json" | head -1)
 if [[ -z "${manifest}" ]]; then
   echo "ERROR: no DRA manifest found for workflow ${WORKFLOW}" >&2
