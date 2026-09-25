@@ -52,6 +52,11 @@ type QuarkMetricSet struct {
 	queue        *quark.Queue // Quark runtime state
 	selfMntNsIno uint32       // Mnt inode from current process
 	cachedHasher *hasher.CachedHasher
+	// Wallclock time of boot in nanoseconds since the Unix epoch,
+	// added to quark boottime timestamps to get wallclock.
+	// Refreshed in maybeUpdateMetrics, only moves on a system
+	// clock step.
+	boottime uint64
 }
 
 // Used for testing only and not exposed via config
@@ -112,6 +117,7 @@ func (ms *QuarkMetricSet) Run(r mb.PushReporterV2) {
 
 	metricsStamp := time.Now()
 
+	ms.boottime = quark.Boottime()
 	for _, proc := range ms.queue.Snapshot() {
 		var snapshotEvent quark.Event
 		snapshotEvent.Process = proc
@@ -206,7 +212,7 @@ func (ms *QuarkMetricSet) toEvent(quarkEvent quark.Event, snap bool) (mb.Event, 
 
 	// Ids
 	event.RootFields.Put("process.parent.pid", process.Proc.Ppid)
-	startTime := time.Unix(0, int64(quark.TimeToWallclock(process.Proc.TimeBoot))) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
+	startTime := time.Unix(0, int64(process.Proc.TimeBoot+ms.boottime)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
 	if ms.HostID() != "" {
 		// TODO unify with sessionview and guarantee loss of precision
 		event.RootFields.Put("process.entity_id",
@@ -348,14 +354,12 @@ func (ms *QuarkMetricSet) maybeUpdateMetrics(stamp *time.Time) {
 	}
 
 	// Quark hands out timestamps in nanoseconds since boot, converted
-	// at the last moment with quark.TimeToWallclock(). Refresh the
-	// boottime epoch so a system clock step (say NTP correcting a
-	// clock that was wrong at boot) doesn't leave every converted
-	// timestamp skewed by the step size. Quark only stores the epoch
-	// if btime actually changed, which happens only on a step.
-	if err := quark.UpdateBoottime(); err != nil {
-		ms.log.Warnf("can't update quark boottime: %v", err)
-	}
+	// at the last moment by adding the boottime epoch. Quark keeps the
+	// epoch fresh by itself and only moves it on a system clock step
+	// (say NTP correcting a clock that was wrong at boot), but each
+	// Boottime() call is a cgo call, so we refetch it here instead of
+	// once per event.
+	ms.boottime = quark.Boottime()
 
 	*stamp = time.Now()
 }
