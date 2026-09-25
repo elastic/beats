@@ -31,7 +31,7 @@ import (
 
 	"github.com/magefile/mage/mg"
 
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 )
 
 // Paths to generated config file templates.
