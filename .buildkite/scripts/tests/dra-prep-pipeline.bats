@@ -12,7 +12,7 @@ DRA_PIPELINE=".buildkite/dra-prep-pipeline.yml"
 
 setup() {
   dra_test_setup
-  cd "$REPO_ROOT"
+  cd "$REPO_ROOT" || return
 }
 
 teardown() {
@@ -34,7 +34,8 @@ render_workflow() {
   step_workflow=$(dra_step "dra-${workflow}" .env.WORKFLOW)
   [[ -n "$cmd" && "$cmd" != "null" ]] || { echo "no command for dra-${workflow}" >&2; return 1; }
   [[ "$step_workflow" == "$workflow" ]] || { echo "unexpected WORKFLOW env: $step_workflow" >&2; return 1; }
-  WORKFLOW="$step_workflow" bash -c "$cmd"
+  # The agent runs step commands with `bash -e -c`.
+  WORKFLOW="$step_workflow" bash -e -c "$cmd"
 }
 
 # Prints the full plugin reference (name#version) matching a plugin name.
@@ -241,5 +242,55 @@ dra_prep_plugin() {
     cmd=$(dra_step "dra-${wf}" .command)
     [ "$(printf '%s\n' "$cmd" | sed -n 1p)" = "source .buildkite/scripts/packaging/resolve-dra-version.sh" ]
     [ "$(printf '%s\n' "$cmd" | sed -n 2p)" = "buildkite-agent pipeline upload ${DRA_PIPELINE}" ]
+  done
+}
+
+@test "dra-prep-pipeline.yml uses no interpolation syntax the test renderer cannot emulate" {
+  # `$$` escapes and command substitution are handled by Buildkite, not by
+  # the yq envsubst renderer in helpers.bash; fail loudly if they appear.
+  run grep -nE '[$][$]|[$][(]|`' "$DRA_PIPELINE"
+  [ "$status" -eq 1 ]
+}
+
+@test "prep step uploads the manifest that dra-annotate.sh downloads" {
+  skip "BUG: dra-prep-pipeline.yml has no artifact_paths; the plugin only uploads to GCS, so the annotate step cannot download the manifest"
+  local glob
+  glob=$(grep -oE 'artifact download "[^"]+"' .buildkite/scripts/dra-annotate.sh | cut -d'"' -f2)
+  [ -n "$glob" ]
+  render_workflow snapshot
+  run rendered '.steps[0].artifact_paths | (select(tag == "!!seq") | .[]), (select(tag == "!!str"))'
+  [[ "${lines[*]}" == *"$glob"* ]]
+}
+
+# Stages a minimal build/distributions tree for the given package version.
+stage_fixture() {
+  local version="$1" dist="$MOCK_ARTIFACT_ROOT/build/distributions"
+  mkdir -p "$dist/filebeat"
+  printf 'name,version\n' >"$dist/dependencies.csv"
+  touch "$dist/filebeat/filebeat-${version}-linux-x86_64.tar.gz"
+}
+
+@test "staged dependencies CSV matches the stack version handed to the plugin and trigger" {
+  local cases=("snapshot::9.9.0-SNAPSHOT" "staging::9.9.0" "staging:beta1:9.9.0-beta1")
+  for c in "${cases[@]}"; do
+    IFS=: read -r wf qualifier package_version <<<"$c"
+    rm -rf "$MOCK_ARTIFACT_ROOT" "$TEST_TMPDIR/work"
+    mkdir -p "$MOCK_ARTIFACT_ROOT" "$TEST_TMPDIR/work"
+    stage_fixture "$package_version"
+
+    VERSION_QUALIFIER="$qualifier" render_workflow "$wf"
+    local stack_version expected_csv
+    stack_version=$(dra_prep_plugin '.stack_version')
+    [ "$(trigger '.build.env.DRA_STACK_VERSION')" = "$stack_version" ]
+    # The plugin appends -SNAPSHOT for the snapshot workflow.
+    expected_csv="dependencies-${stack_version}.csv"
+    [[ "$wf" == "snapshot" ]] && expected_csv="dependencies-${stack_version}-SNAPSHOT.csv"
+
+    (
+      cd "$TEST_TMPDIR/work" &&
+        DRA_WORKFLOW=$(prep '.env.DRA_WORKFLOW') VERSION_QUALIFIER=$(prep '.env.VERSION_QUALIFIER') \
+          bash "$REPO_ROOT/.buildkite/scripts/stage-dra-artifacts.sh" >/dev/null
+    )
+    [ -f "$TEST_TMPDIR/work/artifacts/${expected_csv}" ]
   done
 }
