@@ -7,7 +7,34 @@ This metricset allows users to retrieve application insights metrics from specif
 
 `application_id`:: (_[]string_) ID of the application. This is Application ID from the API Access settings blade in the Azure portal.
 
+[float]
+==== Authentication
+
+Two authentication methods are supported: *Client secret (Microsoft Entra ID)* and *API key*.
+The method is selected using the `auth_type` option.
+
+`auth_type`:: (_string_) The authentication method to use. Valid values: `api_key` (default), `client_secret`.
+
+[float]
+===== API key authentication
+
 `api_key`:: (_[]string_) The API key which will be generated, more on the steps here https://dev.applicationinsights.io/documentation/Authorization/API-key-and-App-ID.
+
+[float]
+===== Client secret authentication
+
+Available since 8.19.14.
+
+Set `auth_type: "client_secret"` and provide the following options:
+
+`tenant_id`:: (_string_) The tenant ID of the Microsoft Entra ID (Azure Active Directory) instance.
+More on service principal authentication can be found here https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-service-principal-portal.
+
+`client_id`:: (_string_) The client/application ID of the service principal registered in Microsoft Entra ID.
+
+`client_secret`:: (_string_) The client secret associated with the service principal.
+
+All three of `tenant_id`, `client_id`, and `client_secret` are required when `auth_type` is `client_secret`.
 
 [float]
 ==== App insights metric configurations
