@@ -17,12 +17,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	metricreport "github.com/elastic/beats/v7/pkg/systemmetrics/report"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
 	otelstatus "github.com/elastic/beats/v7/x-pack/otel/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 
 	"go.opentelemetry.io/collector/component"
 )
