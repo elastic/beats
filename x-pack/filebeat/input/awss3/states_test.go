@@ -695,9 +695,9 @@ type trackingInputStore struct {
 	lastStoreForType string
 }
 
-func (s *trackingInputStore) StoreFor(typ string) (*statestore.Store, error) {
+func (s *trackingInputStore) StoreFor(typ, id string) (*statestore.Store, error) {
 	s.lastStoreForType = typ
-	return s.testInputStore.StoreFor(typ)
+	return s.testInputStore.StoreFor(typ, id)
 }
 
 func openTestStatestore() statestore.States {
@@ -710,11 +710,11 @@ func (s *testInputStore) Close() {
 	_ = s.registry.Close()
 }
 
-func (s *testInputStore) StoreFor(string) (*statestore.Store, error) {
+func (s *testInputStore) StoreFor(_, _ string) (*statestore.Store, error) {
 	return s.registry.Get("filebeat")
 }
 
-func (s *testInputStore) StoreKey() string {
+func (s *testInputStore) StoreKey(_, _ string) string {
 	return fmt.Sprintf("test:%p", s.registry)
 }
 

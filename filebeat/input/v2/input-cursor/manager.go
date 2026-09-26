@@ -21,6 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/elastic/go-concert/unison"
@@ -63,10 +64,21 @@ type InputManager struct {
 	// that will be used to collect events from each source.
 	Configure func(cfg *conf.C, log *logp.Logger) ([]Source, Input, error)
 
-	initedFull   bool
-	initErr      error
-	store        *store
+	// mu protects stores and cleanerGroup. It is not held while a store opens or
+	// its cleaner starts, so a slow backend only delays Create for that store key.
+	mu sync.Mutex
+	// stores holds one entry per store key. Inputs whose IDs select different
+	// backends, as Elasticsearch does, must not share a store.
+	stores       map[string]*storeEntry
 	cleanerGroup unison.Group // saved from Init() for deferred cleaner start
+}
+
+// storeEntry is a store that one Create call opens and the others with the same
+// store key wait for.
+type storeEntry struct {
+	ready chan struct{} // closed once store or err is set
+	store *store
+	err   error
 }
 
 // Source describe a source the input can collect data from.
@@ -81,25 +93,59 @@ var (
 	errNoInputRunner      = errors.New("no input runner available")
 )
 
-// init initializes the state store with a full init (reading all states).
-// For ES-backed inputs, this is deferred until Create() where the inputID is known.
-func (cim *InputManager) init(inputID string) error {
-	if cim.initedFull {
-		return nil
-	}
+// storeKey identifies the cursor store for this input type and ID.
+// The key includes the type because each cursor store loads state for one type.
+func (cim *InputManager) storeKey(inputID string) string {
+	return cim.StateStore.StoreKey(cim.Type, inputID) + "::" + cim.Type
+}
 
+// init opens the store for inputID, or returns the one already opened for that
+// key. Inputs whose IDs map to different backends get different stores, so an
+// Elasticsearch-backed input never reads or writes another input's index.
+// Each newly opened store gets its own cleaner once Init supplied a group.
+func (cim *InputManager) init(inputID string) (*store, error) {
+	key := cim.storeKey(inputID)
+
+	cim.mu.Lock()
+	if e, ok := cim.stores[key]; ok {
+		cim.mu.Unlock()
+		<-e.ready
+		return e.store, e.err
+	}
 	if cim.DefaultCleanTimeout <= 0 {
 		cim.DefaultCleanTimeout = 30 * time.Minute
 	}
-
-	log := cim.Logger.With("input_type", cim.Type)
-	cim.store, cim.initErr = openStore(log, cim.StateStore, cim.Type, inputID, true)
-	if cim.initErr != nil {
-		return cim.initErr
+	e := &storeEntry{ready: make(chan struct{})}
+	if cim.stores == nil {
+		cim.stores = make(map[string]*storeEntry)
 	}
-	cim.initedFull = true
+	cim.stores[key] = e
+	group := cim.cleanerGroup
+	cim.mu.Unlock()
 
-	return nil
+	// Open the store and start its cleaner without holding cim.mu: the
+	// Elasticsearch store waits for the output configuration before it reads
+	// state, and that must not block Create for other input IDs.
+	log := cim.Logger.With("input_type", cim.Type)
+	e.store, e.err = openStore(log, cim.StateStore, cim.Type, inputID, true)
+
+	// For ES-backed inputs the cleaner is deferred from Init() to here because
+	// the store isn't opened until init() is called with the inputID.
+	if e.err == nil && group != nil {
+		if err := cim.startCleaner(group, e.store); err != nil {
+			e.store, e.err = nil, err
+		}
+	}
+
+	if e.err != nil {
+		// Forget the failed entry so that a later Create can try again.
+		cim.mu.Lock()
+		delete(cim.stores, key)
+		cim.mu.Unlock()
+	}
+	close(e.ready)
+
+	return e.store, e.err
 }
 
 // Init starts background processes for deleting old entries from the
@@ -108,22 +154,24 @@ func (cim *InputManager) init(inputID string) error {
 // inputID is known, so Init() only saves the group for later use.
 func (cim *InputManager) Init(group unison.Group) error {
 	if features.IsElasticsearchStateStoreEnabledForInput(cim.Type) {
+		cim.mu.Lock()
 		cim.cleanerGroup = group
+		cim.mu.Unlock()
 		return nil
 	}
 
-	if err := cim.init(""); err != nil {
+	s, err := cim.init("")
+	if err != nil {
 		return err
 	}
-	return cim.startCleaner(group)
+	return cim.startCleaner(group, s)
 }
 
 // startCleaner launches the background cleaner goroutine that removes stale
-// entries from the persistent store.
-func (cim *InputManager) startCleaner(group unison.Group) error {
+// entries from store. It runs one cleaner per store.
+func (cim *InputManager) startCleaner(group unison.Group, store *store) error {
 	log := cim.Logger.With("input_type", cim.Type)
 
-	store := cim.store
 	cleaner := &cleaner{log: log}
 	store.Retain()
 	// TL;DR: If Filebeat shuts down too quickly, the function passed to
@@ -135,7 +183,9 @@ func (cim *InputManager) startCleaner(group unison.Group) error {
 	waitRunning := make(chan struct{})
 	err := group.Go(func(canceler context.Context) error {
 		waitRunning <- struct{}{}
-		defer cim.shutdown()
+		// Release the reference opened by init() and the one retained above:
+		// the cleaner outlives every input using this store.
+		defer store.Release()
 		defer store.Release()
 		interval := cim.StateStore.CleanupInterval()
 		if interval <= 0 {
@@ -146,16 +196,12 @@ func (cim *InputManager) startCleaner(group unison.Group) error {
 	})
 	if err != nil {
 		store.Release()
-		cim.shutdown()
+		store.Release()
 		return fmt.Errorf("can not start registry cleanup process: %w", err)
 	}
 
 	<-waitRunning
 	return nil
-}
-
-func (cim *InputManager) shutdown() {
-	cim.store.Release()
 }
 
 // Create builds a new v2.Input using the provided Configure function.
@@ -169,17 +215,9 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		return nil, err
 	}
 
-	if err := cim.init(settings.ID); err != nil {
+	store, err := cim.init(settings.ID)
+	if err != nil {
 		return nil, err
-	}
-
-	// For ES-backed inputs, the cleaner is deferred from Init() to here
-	// because the store isn't created until init() is called with the inputID.
-	if cim.cleanerGroup != nil {
-		if err := cim.startCleaner(cim.cleanerGroup); err != nil {
-			return nil, err
-		}
-		cim.cleanerGroup = nil
 	}
 
 	sources, inp, err := cim.Configure(config, cim.Logger)
@@ -196,16 +234,18 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	return &managedInput{
 		manager:      cim,
 		userID:       settings.ID,
+		store:        store,
 		sources:      sources,
 		input:        inp,
 		cleanTimeout: settings.CleanInactive,
 	}, nil
 }
 
-// Lock locks a key for exclusive access and returns an resource that can be used to modify
-// the cursor state and unlock the key.
-func (cim *InputManager) lock(ctx v2.Context, key string) (*resource, error) {
-	resource := cim.store.Get(key)
+// lock gives the caller exclusive access to the cursor state for key.
+// The store stays open until its cleaner stops, which happens after every input
+// using it has returned.
+func lock(ctx v2.Context, store *store, key string) (*resource, error) {
+	resource := store.Get(key)
 	err := lockResource(ctx.Logger, resource, ctx.Cancelation)
 	if err != nil {
 		resource.Release()

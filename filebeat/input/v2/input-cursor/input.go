@@ -60,8 +60,11 @@ type Input interface {
 // continues. Only after all Run calls have returned will the managedInput be
 // done.
 type managedInput struct {
-	manager      *InputManager
-	userID       string
+	manager *InputManager
+	userID  string
+	// store holds the cursor state for this input. Inputs with different IDs
+	// can use different stores, so the input cannot read it off the manager.
+	store        *store
 	sources      []Source
 	input        Input
 	cleanTimeout time.Duration
@@ -146,7 +149,7 @@ func (inp *managedInput) Run(
 			}
 			inpCtx = inpCtx.WithStatusReporter(ctx)
 
-			if err = inp.runSource(inpCtx, inp.manager.store, source, pc); err != nil {
+			if err = inp.runSource(inpCtx, inp.store, source, pc); err != nil {
 				cancel()
 			}
 			return err
@@ -181,7 +184,7 @@ func (inp *managedInput) runSource(
 	defer client.Close()
 
 	resourceKey := inp.createSourceID(source)
-	resource, err := inp.manager.lock(ctx, resourceKey)
+	resource, err := lock(ctx, store, resourceKey)
 	if err != nil {
 		return err
 	}

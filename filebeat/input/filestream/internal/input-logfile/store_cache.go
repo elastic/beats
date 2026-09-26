@@ -78,7 +78,7 @@ var globalStoreCache = storeCache{entries: make(map[string]*storeCacheEntry)}
 // acquireStore returns the shared store for a backend. The first caller initializes it;
 // concurrent callers wait, and callers arriving during draining wait for its replacement.
 func acquireStore(logger *logp.Logger, states statestore.States, prefix string) (*store, error) {
-	key := states.StoreKey()
+	key := states.StoreKey("", "")
 	logger = logger.
 		Named("filestream.store_cache").
 		WithLazy(zap.String("filestream_store_key", key))

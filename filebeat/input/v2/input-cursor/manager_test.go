@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/features"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -111,9 +112,7 @@ func TestManager_Init(t *testing.T) {
 
 func TestManager_InitDefersStoreForES(t *testing.T) {
 	// Verify that ES-backed inputs defer store creation from Init() to Create().
-	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "test")
-	features.ReinitForTest()
-	t.Cleanup(func() { features.ReinitForTest() }) // restore after test
+	enableESStateStore(t)
 
 	data := map[string]state{
 		"test::mykey": {Cursor: "value1"},
@@ -123,7 +122,68 @@ func TestManager_InitDefersStoreForES(t *testing.T) {
 	var grp unison.TaskGroup
 	defer grp.Stop() //nolint:errcheck // We don't need the error from grp.Stop()
 
-	manager := &InputManager{
+	manager := esManager(t, stateStore)
+
+	// Init() should not create a store for ES-backed inputs.
+	err := manager.Init(&grp)
+	require.NoError(t, err)
+	assert.Empty(t, manager.stores, "no store should be opened by Init() for ES-backed inputs")
+
+	// Create() should create the store with the inputID.
+	_, err = manager.Create(conf.MustNewConfigFrom(map[string]any{
+		"id": "my-input-id",
+	}))
+	require.NoError(t, err)
+	assert.Len(t, manager.stores, 1, "store should be created after Create()")
+
+	snap := storeMemorySnapshot(managerStore(t, manager, "my-input-id"))
+	assert.Contains(t, snap, "test::mykey")
+	assert.Equal(t, "value1", snap["test::mykey"].Cursor)
+}
+
+// Elasticsearch inputs with different IDs must use separate cursor stores,
+// even when they have the same input type.
+func TestManager_ESStorePerInputID(t *testing.T) {
+	enableESStateStore(t)
+
+	stateStore := createESStore(t)
+
+	var grp unison.TaskGroup
+	defer grp.Stop() //nolint:errcheck // We don't need the error from grp.Stop()
+
+	manager := esManager(t, stateStore)
+	require.NoError(t, manager.Init(&grp))
+
+	for _, id := range []string{"input-a", "input-b"} {
+		_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{"id": id}))
+		require.NoError(t, err, "Create must succeed for input id %q", id)
+	}
+	require.Len(t, manager.stores, 2, "each input id must get its own store")
+
+	// State written to one input's store must not appear in the other store.
+	storeA := managerStore(t, manager, "input-a")
+	storeA.UpdateTTL(storeA.Get("test::input-a::mykey"), time.Minute)
+
+	assert.Contains(t, stateStore.snapshotFor(t, "input-a"), "test::input-a::mykey",
+		"input-a must persist its own cursor")
+	assert.Empty(t, stateStore.snapshotFor(t, "input-b"),
+		"input-b must not see the cursor written by input-a")
+}
+
+// enableESStateStore routes the "test" input type to the Elasticsearch state store.
+func enableESStateStore(t *testing.T) {
+	t.Helper()
+
+	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "test")
+	features.ReinitForTest()
+	t.Cleanup(func() { features.ReinitForTest() }) // restore after test
+}
+
+// esManager builds an InputManager for the ES-backed "test" input type.
+func esManager(t *testing.T, stateStore statestore.States) *InputManager {
+	t.Helper()
+
+	return &InputManager{
 		Logger:              logptest.NewTestingLogger(t, "test"),
 		StateStore:          stateStore,
 		Type:                "test",
@@ -132,22 +192,85 @@ func TestManager_InitDefersStoreForES(t *testing.T) {
 			return sourceList("mykey"), &fakeTestInput{}, nil
 		},
 	}
+}
 
-	// Init() should not create a store for ES-backed inputs.
-	err := manager.Init(&grp)
-	require.NoError(t, err)
-	assert.Nil(t, manager.store, "store should be nil after Init() for ES-backed inputs")
+// managerStore returns the store the manager opened for inputID.
+func managerStore(t *testing.T, manager *InputManager, inputID string) *store {
+	t.Helper()
 
-	// Create() should create the store with the inputID.
-	_, err = manager.Create(conf.MustNewConfigFrom(map[string]any{
-		"id": "my-input-id",
-	}))
-	require.NoError(t, err)
-	assert.NotNil(t, manager.store, "store should be created after Create()")
+	manager.mu.Lock()
+	e, ok := manager.stores[manager.storeKey(inputID)]
+	manager.mu.Unlock()
+	require.True(t, ok, "no store for input id %q", inputID)
 
-	snap := storeMemorySnapshot(manager.store)
-	assert.Contains(t, snap, "test::mykey")
-	assert.Equal(t, "value1", snap["test::mykey"].Cursor)
+	<-e.ready
+	require.NoError(t, e.err, "the store for input id %q must open", inputID)
+	return e.store
+}
+
+// Opening a store can be slow: the Elasticsearch store waits for the output
+// configuration before it reads any state. That must not delay Create for other
+// input IDs, and concurrent Create calls for one ID must share one store.
+func TestManager_ESStoreOpenDoesNotBlockOtherInputIDs(t *testing.T) {
+	enableESStateStore(t)
+
+	slowGate := make(chan struct{})
+	releaseSlow := sync.OnceFunc(func() { close(slowGate) })
+	stateStore := &gatedESStateStore{
+		esStateStore: createESStore(t),
+		gates:        map[string]chan struct{}{"slow": slowGate},
+	}
+
+	var grp unison.TaskGroup
+	defer grp.Stop() //nolint:errcheck // We don't need the error from grp.Stop()
+
+	manager := esManager(t, stateStore)
+	require.NoError(t, manager.Init(&grp))
+
+	var wg sync.WaitGroup
+	// Unblock and wait for the slow Create calls before the registry closes.
+	t.Cleanup(func() {
+		releaseSlow()
+		wg.Wait()
+	})
+
+	slowInputs := make([]input.Input, 4)
+	for i := range slowInputs {
+		wg.Go(func() {
+			inp, err := manager.Create(conf.MustNewConfigFrom(map[string]any{"id": "slow"}))
+			assert.NoError(t, err, "Create for input id %q must succeed", "slow")
+			slowInputs[i] = inp
+		})
+	}
+	require.Eventually(t, func() bool { return stateStore.storeForCalls("slow") > 0 },
+		10*time.Second, time.Millisecond, "the store for input id %q must start opening", "slow")
+
+	fastDone := make(chan error, 1)
+	go func() {
+		_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{"id": "fast"}))
+		fastDone <- err
+	}()
+	select {
+	case err := <-fastDone:
+		assert.NoError(t, err, "Create for input id %q must succeed", "fast")
+	case <-time.After(10 * time.Second):
+		t.Fatalf("Create for input id %q waited for the store of input id %q to open", "fast", "slow")
+	}
+
+	releaseSlow()
+	wg.Wait()
+
+	assert.Equal(t, 1, stateStore.storeForCalls("slow"),
+		"concurrent Create calls for one input id must open its store once")
+	first, ok := slowInputs[0].(*managedInput)
+	require.True(t, ok, "Create for input id %q must return a managed input", "slow")
+	for i, inp := range slowInputs {
+		managed, ok := inp.(*managedInput)
+		if assert.True(t, ok, "Create call %d for input id %q must return a managed input", i, "slow") {
+			assert.Same(t, first.store, managed.store,
+				"Create call %d for input id %q must share the store of the first call", i, "slow")
+		}
+	}
 }
 
 func TestManager_Create(t *testing.T) {

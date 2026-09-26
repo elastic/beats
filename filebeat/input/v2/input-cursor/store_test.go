@@ -20,6 +20,7 @@ package cursor
 import (
 	"errors"
 	"fmt"
+	"sync"
 	"testing"
 	"time"
 
@@ -261,6 +262,69 @@ func createSampleStore(t *testing.T, data map[string]state) testStateStore {
 	}
 }
 
+var _ statestore.States = (*esStateStore)(nil)
+
+// esStateStore uses a separate store for each input ID, as Elasticsearch does.
+type esStateStore struct {
+	registry *statestore.Registry
+}
+
+func createESStore(t *testing.T) *esStateStore {
+	registry := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
+	t.Cleanup(func() { registry.Close() })
+	return &esStateStore{registry: registry}
+}
+
+func (ts *esStateStore) CleanupInterval() time.Duration { return 0 }
+func (ts *esStateStore) StoreKey(_, id string) string {
+	return fmt.Sprintf("es:%p::%s", ts.registry, id)
+}
+
+func (ts *esStateStore) StoreFor(_, id string) (*statestore.Store, error) {
+	return ts.registry.Get(id)
+}
+
+// gatedESStateStore is an esStateStore whose StoreFor waits, for each input ID
+// in gates, until that gate closes. It counts StoreFor calls per input ID.
+type gatedESStateStore struct {
+	*esStateStore
+	gates map[string]chan struct{}
+
+	mu    sync.Mutex
+	calls map[string]int
+}
+
+func (ts *gatedESStateStore) StoreFor(typ, id string) (*statestore.Store, error) {
+	ts.mu.Lock()
+	if ts.calls == nil {
+		ts.calls = make(map[string]int)
+	}
+	ts.calls[id]++
+	ts.mu.Unlock()
+
+	if gate, ok := ts.gates[id]; ok {
+		<-gate
+	}
+	return ts.esStateStore.StoreFor(typ, id)
+}
+
+func (ts *gatedESStateStore) storeForCalls(id string) int {
+	ts.mu.Lock()
+	defer ts.mu.Unlock()
+	return ts.calls[id]
+}
+
+// snapshotFor returns the saved state for the input ID.
+func (ts *esStateStore) snapshotFor(t *testing.T, id string) map[string]state {
+	t.Helper()
+
+	store, err := ts.StoreFor("", id)
+	require.NoError(t, err)
+	defer store.Close()
+
+	return testStateStore{Store: store}.snapshot()
+}
+
 var _ statestore.States = testStateStore{}
 
 type testStateStore struct {
@@ -270,8 +334,8 @@ type testStateStore struct {
 
 func (ts testStateStore) WithGCPeriod(d time.Duration) testStateStore { ts.GCPeriod = d; return ts }
 func (ts testStateStore) CleanupInterval() time.Duration              { return ts.GCPeriod }
-func (ts testStateStore) StoreKey() string                            { return fmt.Sprintf("test:%p", ts.Store) }
-func (ts testStateStore) StoreFor(string) (*statestore.Store, error) {
+func (ts testStateStore) StoreKey(_, _ string) string                 { return fmt.Sprintf("test:%p", ts.Store) }
+func (ts testStateStore) StoreFor(_, _ string) (*statestore.Store, error) {
 	if ts.Store == nil {
 		return nil, errors.New("no store configured")
 	}
