@@ -290,6 +290,58 @@ func TestFollowSession_FirehoseMalformedAfterEventsIsNotInterruption(t *testing.
 	}
 }
 
+func TestRefreshSession(t *testing.T) {
+	tests := []struct {
+		name       string
+		statusCode int
+		body       string
+		wantLog    bool
+	}{
+		{name: "ok", statusCode: http.StatusOK},
+		{name: "unauthorized", statusCode: http.StatusUnauthorized, body: `{"errors":[{"code":401,"message":"access denied, authorization failed"}]}`, wantLog: true},
+		{name: "server_error", statusCode: http.StatusInternalServerError, body: "internal server error", wantLog: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(tt.statusCode)
+				fmt.Fprint(w, tt.body)
+			}))
+			defer srv.Close()
+
+			s := newTestStream(t, "", srv.Client())
+			log, logs := logptest.NewTestingLoggerWithObserver(t, t.Name())
+			s.log = log
+
+			// A rejected refresh must not stop the refresh loop.
+			if err := s.refreshSession(context.Background(), srv.Client(), srv.URL+"/refresh"); err != nil {
+				t.Fatalf("refreshSession() error = %v; want nil", err)
+			}
+			entries := logs.FilterMessage("unsuccessful session refresh").All()
+			if tt.wantLog != (len(entries) != 0) {
+				t.Fatalf(`"unsuccessful session refresh" log entries = %d; want logged = %t`, len(entries), tt.wantLog)
+			}
+			if !tt.wantLog {
+				if got := s.metrics.errorsTotal.Get(); got != 0 {
+					t.Errorf("errors_total = %d; want 0", got)
+				}
+				return
+			}
+			fields := entries[0].ContextMap()
+			if got := fields["status_code"]; got != int64(tt.statusCode) {
+				t.Errorf("status_code = %v; want %d", got, tt.statusCode)
+			}
+			if got := fields["body"]; got != tt.body {
+				t.Errorf("body = %v; want %q", got, tt.body)
+			}
+			if got := s.metrics.errorsTotal.Get(); got != 1 {
+				t.Errorf("errors_total = %d; want 1", got)
+			}
+		})
+	}
+}
+
 func TestUserAgentTransport(t *testing.T) {
 	const want = "Elastic-crowdstrike/4.0.0"
 
