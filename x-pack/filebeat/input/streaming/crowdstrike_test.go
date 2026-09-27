@@ -16,7 +16,9 @@ import (
 	"net/url"
 	"os"
 	"runtime"
+	"slices"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -564,6 +566,58 @@ func TestFollowStreamDroppedStreamsWithoutProgressExhaustAttempts(t *testing.T) 
 	}
 }
 
+// TestFollowStreamReportsRunningWhileStreaming verifies that once events are
+// flowing again after failures that reported DEGRADED, the input reports
+// RUNNING without waiting for the long-lived firehose session to end.
+func TestFollowStreamReportsRunningWhileStreaming(t *testing.T) {
+	log := logptest.NewTestingLogger(t, t.Name())
+
+	release := make(chan struct{})
+	feed := func(w http.ResponseWriter, r *http.Request) {
+		writeFeedEvents(t, w, 1, 2)
+		select {
+		case <-release:
+		case <-r.Context().Done():
+		}
+	}
+	const failBefore = 3 // Enough discover failures to report DEGRADED.
+	var discoverCalls atomic.Int64
+	discoverURL, tokenURL, _ := startFeedWithDiscover(t, feed, func(w http.ResponseWriter, r *http.Request, ok http.HandlerFunc) {
+		if discoverCalls.Add(1) <= failBefore {
+			serverErrorDiscover(w, r)
+			return
+		}
+		ok(w, r)
+	})
+	t.Cleanup(func() { close(release) })
+	cfg := discoverConfig(t, discoverURL, tokenURL, &retry{MaxAttempts: 10, WaitMin: time.Millisecond, WaitMax: time.Millisecond})
+	rec := &statusRecorder{}
+	s := newDiscoverFollower(t, cfg, rec, log)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	done := make(chan error, 1)
+	go func() { done <- s.FollowStream(ctx) }()
+
+	deadline := time.After(10 * time.Second)
+	for !rec.sawDegraded() || rec.last() != status.Running {
+		select {
+		case <-deadline:
+			t.Fatalf("status never returned to RUNNING while streaming: degraded=%t last=%v", rec.sawDegraded(), rec.last())
+		case err := <-done:
+			t.Fatalf("FollowStream returned early: %v", err)
+		case <-time.After(5 * time.Millisecond):
+		}
+	}
+	cancel()
+
+	select {
+	case <-done:
+	case <-time.After(5 * time.Second):
+		t.Fatal("timed out waiting for FollowStream to return after cancel")
+	}
+}
+
 // startFeed starts token, discover and refresh endpoints and a firehose feed
 // endpoint served by feed. It returns the discover URL, token URL, and a
 // counter of discover requests.
@@ -627,6 +681,33 @@ func dropConnection(t *testing.T, w http.ResponseWriter) {
 		return
 	}
 	_ = conn.Close()
+}
+
+// statusRecorder records reported statuses.
+type statusRecorder struct {
+	mu       sync.Mutex
+	statuses []status.Status
+}
+
+func (r *statusRecorder) UpdateStatus(s status.Status, _ string) {
+	r.mu.Lock()
+	r.statuses = append(r.statuses, s)
+	r.mu.Unlock()
+}
+
+func (r *statusRecorder) last() status.Status {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if len(r.statuses) == 0 {
+		return status.Unknown
+	}
+	return r.statuses[len(r.statuses)-1]
+}
+
+func (r *statusRecorder) sawDegraded() bool {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return slices.Contains(r.statuses, status.Degraded)
 }
 
 // startDiscover starts a token endpoint and a discover endpoint served by the

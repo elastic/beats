@@ -530,6 +530,10 @@ type resource struct {
 type feedCursors struct {
 	mu     sync.Mutex
 	cursor map[string]any
+	// running records that the session has reported RUNNING, which it
+	// does on its first event since a healthy session may stay open for
+	// hours.
+	running bool
 }
 
 func (c *feedCursors) evalAndPublish(s *falconHoseStream, ctx context.Context, state map[string]any) error {
@@ -546,6 +550,10 @@ func (c *feedCursors) evalAndPublish(s *falconHoseStream, ctx context.Context, s
 	if newCursor != nil {
 		c.cursor = newCursor
 		state["cursor"] = newCursor
+	}
+	if err == nil && !c.running {
+		c.running = true
+		s.status.UpdateStatus(status.Running, "")
 	}
 	return err
 }
