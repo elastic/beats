@@ -408,7 +408,11 @@ func makeCheckRedirect(max int, redirects *[]string) func(*http.Request, []*http
 			n = len(*redirects)
 		}
 
-		if max == n {
+		// via always includes the original request on the first redirect
+		// callback (net/http), so len(via)==1 means "about to follow the
+		// first redirect". Reject only once more than max hops have been
+		// recorded.
+		if n > max {
 			return http.ErrUseLastResponse
 		}
 		return nil
