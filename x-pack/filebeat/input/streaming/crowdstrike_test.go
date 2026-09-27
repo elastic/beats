@@ -482,6 +482,153 @@ func TestFollowStreamTransientFailuresDoNotConsumeAttemptCap(t *testing.T) {
 	}
 }
 
+// TestFollowStreamDroppedStreamsDoNotExhaustAttempts verifies that firehose
+// connections that deliver events and are then dropped, as network devices
+// and the upstream do to long-lived connections, do not accumulate toward
+// MaxAttempts. Each dropped session made progress, so the input must keep
+// reconnecting rather than terminating after MaxAttempts drops spread over
+// the lifetime of the input.
+func TestFollowStreamDroppedStreamsDoNotExhaustAttempts(t *testing.T) {
+	log, logs := logptest.NewTestingLoggerWithObserver(t, t.Name())
+
+	var sessions atomic.Int64
+	feed := func(w http.ResponseWriter, r *http.Request) {
+		n := int(sessions.Add(1))
+		writeFeedEvents(t, w, n*10, 2)
+		dropConnection(t, w)
+	}
+	discoverURL, tokenURL, hits := startFeed(t, feed)
+	const maxAttempts = 3
+	cfg := discoverConfig(t, discoverURL, tokenURL, &retry{MaxAttempts: maxAttempts, WaitMin: time.Millisecond, WaitMax: time.Millisecond})
+	s := newDiscoverFollower(t, cfg, nil, log)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	done := make(chan error, 1)
+	go func() { done <- s.FollowStream(ctx) }()
+
+	deadline := time.After(10 * time.Second)
+	for hits.Load() <= 2*maxAttempts {
+		select {
+		case <-deadline:
+			t.Fatalf("discover attempts = %d before timeout; want > %d", hits.Load(), 2*maxAttempts)
+		case err := <-done:
+			t.Fatalf("FollowStream terminated after %d dropped sessions: %v; dropped sessions that made progress must not exhaust the attempt cap", hits.Load(), err)
+		case <-time.After(5 * time.Millisecond):
+		}
+	}
+	cancel()
+
+	select {
+	case err := <-done:
+		if err != nil {
+			t.Errorf("FollowStream() error = %v; want nil after context cancel", err)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("timed out waiting for FollowStream to return after cancel")
+	}
+
+	if logs.FilterMessage("feed stream read failed").Len() == 0 {
+		t.Error(`no "feed stream read failed" log entry for dropped firehose connections`)
+	}
+	if logs.FilterMessage("reconnecting after interrupted session").Len() == 0 {
+		t.Error(`no "reconnecting after interrupted session" log entry after dropped sessions that made progress`)
+	}
+}
+
+// TestFollowStreamDroppedStreamsWithoutProgressExhaustAttempts verifies that
+// a firehose that is dropped before delivering any events still counts toward
+// MaxAttempts, so a persistently broken feed terminates the input.
+func TestFollowStreamDroppedStreamsWithoutProgressExhaustAttempts(t *testing.T) {
+	log := logptest.NewTestingLogger(t, t.Name())
+
+	feed := func(w http.ResponseWriter, r *http.Request) {
+		writeFeedEvents(t, w, 0, 0)
+		dropConnection(t, w)
+	}
+	discoverURL, tokenURL, hits := startFeed(t, feed)
+	const maxAttempts = 3
+	cfg := discoverConfig(t, discoverURL, tokenURL, &retry{MaxAttempts: maxAttempts, WaitMin: time.Millisecond, WaitMax: time.Millisecond})
+	s := newDiscoverFollower(t, cfg, nil, log)
+
+	err := s.FollowStream(context.Background())
+	if err == nil {
+		t.Fatal("FollowStream() error = nil; want max-attempts error")
+	}
+	want := fmt.Sprintf("max retry attempts (%d) exceeded", maxAttempts)
+	if !strings.Contains(err.Error(), want) {
+		t.Errorf("FollowStream() error = %v; want substring %q", err, want)
+	}
+	if got := hits.Load(); got != maxAttempts {
+		t.Errorf("discover attempts = %d; want %d", got, maxAttempts)
+	}
+}
+
+// startFeed starts token, discover and refresh endpoints and a firehose feed
+// endpoint served by feed. It returns the discover URL, token URL, and a
+// counter of discover requests.
+func startFeed(t *testing.T, feed http.HandlerFunc) (discoverURL, tokenURL string, hits *atomic.Int64) {
+	t.Helper()
+	return startFeedWithDiscover(t, feed, func(w http.ResponseWriter, r *http.Request, ok http.HandlerFunc) {
+		ok(w, r)
+	})
+}
+
+// startFeedWithDiscover is startFeed with a discover handler that may
+// answer the request itself or delegate to ok, which serves a discover
+// response pointing at the feed endpoint.
+func startFeedWithDiscover(t *testing.T, feed http.HandlerFunc, discover func(w http.ResponseWriter, r *http.Request, ok http.HandlerFunc)) (discoverURL, tokenURL string, hits *atomic.Int64) {
+	t.Helper()
+	feedSrv := httptest.NewServer(feed)
+	t.Cleanup(feedSrv.Close)
+	refreshSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	t.Cleanup(refreshSrv.Close)
+	ok := func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = fmt.Fprintf(w, `{
+			"resources": [{
+				"dataFeedURL": %q,
+				"sessionToken": {"token": "tok", "expiration": "2099-01-01T00:00:00Z"},
+				"refreshActiveSessionURL": %q,
+				"refreshActiveSessionInterval": 1800
+			}],
+			"meta": {}
+		}`, feedSrv.URL+"/feed", refreshSrv.URL+"/refresh")
+	}
+	return startDiscover(t, func(w http.ResponseWriter, r *http.Request) {
+		discover(w, r, ok)
+	})
+}
+
+// writeFeedEvents writes n firehose events with offsets starting at from and
+// flushes them to the client. Write errors are logged rather than failing
+// the test since the client may already have gone away during teardown.
+func writeFeedEvents(t *testing.T, w http.ResponseWriter, from, n int) {
+	t.Helper()
+	w.Header().Set("Content-Type", "application/json")
+	for i := range n {
+		_, _ = fmt.Fprintf(w, `{"metadata":{"eventType":"test","offset":%d},"event":{}}`+"\n", from+i)
+	}
+	if err := http.NewResponseController(w).Flush(); err != nil {
+		t.Logf("failed to flush feed events: %v", err)
+	}
+}
+
+// dropConnection closes the underlying connection without terminating the
+// chunked response body, as a network device or upstream reset does. The
+// client sees an unexpected EOF while reading the stream.
+func dropConnection(t *testing.T, w http.ResponseWriter) {
+	t.Helper()
+	conn, _, err := http.NewResponseController(w).Hijack()
+	if err != nil {
+		t.Logf("failed to hijack feed connection: %v", err)
+		return
+	}
+	_ = conn.Close()
+}
+
 // startDiscover starts a token endpoint and a discover endpoint served by the
 // given handler, returning the discover URL, token URL, and a counter of
 // discover requests.

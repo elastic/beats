@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -197,6 +198,95 @@ func TestFollowSession_CleanEndIsNotAnError(t *testing.T) {
 	// finishes and must not be counted in errors_total.
 	if got := s.metrics.errorsTotal.Get(); got != 0 {
 		t.Errorf("errors_total = %d; want 0", got)
+	}
+}
+
+func TestFollowSession_FirehoseConnectionDropped(t *testing.T) {
+	tests := []struct {
+		name    string
+		trailer string // Bytes written after the complete events, before the drop.
+	}{
+		{name: "between_events"},
+		{name: "mid_event", trailer: `{"metadata":{"eventType":"Test","off`},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			firehoseSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				writeFeedEvents(t, w, 1, 2)
+				if tt.trailer != "" {
+					fmt.Fprint(w, tt.trailer)
+					if err := http.NewResponseController(w).Flush(); err != nil {
+						t.Logf("failed to flush trailer: %v", err)
+					}
+				}
+				dropConnection(t, w)
+			}))
+			defer firehoseSrv.Close()
+
+			discoverSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				fmt.Fprint(w, discoverResponse(t, firehoseSrv.URL+"/firehose", firehoseSrv.URL+"/refresh"))
+			}))
+			defer discoverSrv.Close()
+
+			pub := new(countingPublisher)
+			s := newTestStreamWithPublisher(t, discoverSrv.URL, firehoseSrv.Client(), pub)
+			state, err := s.followSession(context.Background(), discoverSrv.Client(), map[string]any{})
+			if err == nil {
+				t.Fatal("expected error from followSession, got nil")
+			}
+			if !errors.Is(err, io.ErrUnexpectedEOF) {
+				t.Errorf("followSession() error = %v; want io.ErrUnexpectedEOF", err)
+			}
+			if errors.Is(err, hardError{}) {
+				t.Errorf("followSession() error = %v; want non-hard error", err)
+			}
+			var interrupted interruptedError
+			if !errors.As(err, &interrupted) {
+				t.Errorf("followSession() error = %v; want interruptedError", err)
+			} else if interrupted.events != 2 {
+				t.Errorf("interruptedError events = %d; want 2", interrupted.events)
+			}
+			if state == nil {
+				t.Fatal("expected non-nil state on non-hard error")
+			}
+			if got := pub.published(); got != 2 {
+				t.Errorf("published events = %d; want 2", got)
+			}
+			// The cursor must hold the last published offset so the
+			// reconnect resumes after the delivered events.
+			crsr, _ := state["cursor"].(map[string]any)
+			feed, _ := crsr[firehoseSrv.URL+"/firehose"].(map[string]any)
+			if got := fmt.Sprint(feed["offset"]); got != "2" {
+				t.Errorf("cursor offset = %s; want 2", got)
+			}
+		})
+	}
+}
+
+func TestFollowSession_FirehoseMalformedAfterEventsIsNotInterruption(t *testing.T) {
+	firehoseSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		writeFeedEvents(t, w, 1, 2)
+		fmt.Fprint(w, `{"metadata":}`)
+	}))
+	defer firehoseSrv.Close()
+
+	discoverSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, discoverResponse(t, firehoseSrv.URL+"/firehose", firehoseSrv.URL+"/refresh"))
+	}))
+	defer discoverSrv.Close()
+
+	s := newTestStream(t, discoverSrv.URL, firehoseSrv.Client())
+	_, err := s.followSession(context.Background(), discoverSrv.Client(), map[string]any{})
+	if err == nil || !strings.Contains(err.Error(), "error decoding event") {
+		t.Fatalf("followSession() error = %v; want decode error", err)
+	}
+	// Malformed data would be served again from the same offset, so it
+	// must keep counting toward the attempt limit.
+	if errors.As(err, new(interruptedError)) {
+		t.Errorf("followSession() error = %v; want non-interrupted error", err)
 	}
 }
 
