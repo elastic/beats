@@ -173,6 +173,33 @@ func TestFollowSession_NonObjectMessage(t *testing.T) {
 	}
 }
 
+func TestFollowSession_CleanEndIsNotAnError(t *testing.T) {
+	firehoseSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, `{"metadata":{"eventType":"Test","offset":1},"event":{"field":"value"}}`)
+	}))
+	defer firehoseSrv.Close()
+
+	discoverSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, discoverResponse(t, firehoseSrv.URL+"/firehose", firehoseSrv.URL+"/refresh"))
+	}))
+	defer discoverSrv.Close()
+
+	pub := new(countingPublisher)
+	s := newTestStreamWithPublisher(t, discoverSrv.URL, firehoseSrv.Client(), pub)
+	if _, err := s.followSession(context.Background(), discoverSrv.Client(), map[string]any{}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got := pub.published(); got != 1 {
+		t.Errorf("published events = %d; want 1", got)
+	}
+	// The stream ending after the last event is how a session normally
+	// finishes and must not be counted in errors_total.
+	if got := s.metrics.errorsTotal.Get(); got != 0 {
+		t.Errorf("errors_total = %d; want 0", got)
+	}
+}
+
 func TestUserAgentTransport(t *testing.T) {
 	const want = "Elastic-crowdstrike/4.0.0"
 

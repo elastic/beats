@@ -612,7 +612,9 @@ func (s *falconHoseStream) consumeFeed(ctx context.Context, cli *http.Client, r 
 		var msg json.RawMessage
 		err := dec.Decode(&msg)
 		if err != nil {
-			s.metrics.errorsTotal.Inc()
+			// Errors returned here are counted in errors_total by the
+			// retry loop. A clean end of stream and cancellation are
+			// not errors.
 			if errors.Is(err, context.Canceled) || errors.Is(ctx.Err(), context.Canceled) {
 				return ctx.Err()
 			}
