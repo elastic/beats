@@ -27,7 +27,7 @@ import (
 )
 
 func TestFileParsers(t *testing.T) {
-	cfg, err := config.NewConfigFrom(map[string]interface{}{
+	cfg, err := config.NewConfigFrom(map[string]any{
 		"paths":        []string{"/usr/bin"},
 		"file_parsers": []string{"file.elf.sections", `/\.pe\./`},
 	})

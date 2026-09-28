@@ -50,7 +50,7 @@ type config struct {
 	// program. If it has a cursor field, that field will
 	// be overwritten by any stored cursor, but will be
 	// available if no stored cursor exists.
-	State map[string]interface{} `config:"state"`
+	State map[string]any `config:"state"`
 	// SecretState holds secret key-value pairs that are
 	// stored encrypted by Fleet (via secret: true) and
 	// placed at state.secret before CEL program execution.
@@ -108,12 +108,12 @@ func (c config) GetPackageData(key string) string {
 // to their stored string values. See
 // https://github.com/elastic/kibana/issues/267859
 type secretState struct {
-	m map[string]interface{}
+	m map[string]any
 }
 
-func (s *secretState) Unpack(v interface{}) error {
+func (s *secretState) Unpack(v any) error {
 	switch v := v.(type) {
-	case map[string]interface{}:
+	case map[string]any:
 		s.m = v
 		return nil
 	case string:

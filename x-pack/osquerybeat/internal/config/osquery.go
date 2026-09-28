@@ -232,7 +232,7 @@ type Query struct {
 	Description int    `config:"description" json:"description,omitempty"`
 
 	// Optional ECS mapping for the query, not rendered into osqueryd configuration
-	ECSMapping map[string]interface{} `config:"ecs_mapping" json:"-"`
+	ECSMapping map[string]any `config:"ecs_mapping" json:"-"`
 
 	// A boolean to set 'snapshot' mode, default true
 	// This is different from the default osquery behavior where the missing value defaults to false
@@ -313,16 +313,16 @@ type Events struct {
 }
 
 type OsqueryConfig struct {
-	Options               map[string]interface{} `config:"options" json:"options,omitempty"`
-	ElasticOptions        *ElasticOptions        `config:"elastic_options" json:"-"`
-	Schedule              map[string]Query       `config:"schedule" json:"schedule,omitempty"`
-	Packs                 map[string]Pack        `config:"packs" json:"packs,omitempty"`
-	Filepaths             map[string][]string    `config:"file_paths" json:"file_paths,omitempty"`
-	Views                 map[string]string      `config:"views" json:"views,omitempty"`
-	Events                *Events                `config:"events" json:"events,omitempty"`
-	Yara                  map[string]interface{} `config:"yara" json:"yara,omitempty"`
-	PrometheusTargets     map[string]interface{} `config:"prometheus_targets" json:"prometheus_targets,omitempty"`
-	AutoTableConstruction map[string]interface{} `config:"auto_table_construction" json:"auto_table_construction,omitempty"`
+	Options               map[string]any      `config:"options" json:"options,omitempty"`
+	ElasticOptions        *ElasticOptions     `config:"elastic_options" json:"-"`
+	Schedule              map[string]Query    `config:"schedule" json:"schedule,omitempty"`
+	Packs                 map[string]Pack     `config:"packs" json:"packs,omitempty"`
+	Filepaths             map[string][]string `config:"file_paths" json:"file_paths,omitempty"`
+	Views                 map[string]string   `config:"views" json:"views,omitempty"`
+	Events                *Events             `config:"events" json:"events,omitempty"`
+	Yara                  map[string]any      `config:"yara" json:"yara,omitempty"`
+	PrometheusTargets     map[string]any      `config:"prometheus_targets" json:"prometheus_targets,omitempty"`
+	AutoTableConstruction map[string]any      `config:"auto_table_construction" json:"auto_table_construction,omitempty"`
 }
 
 // forOsqueryd returns a copy of c without queries that osquerybeat runs via RRULE (they would

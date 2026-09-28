@@ -93,8 +93,8 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig(host string, raw bool) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string, raw bool) map[string]any {
+	return map[string]any{
 		"module":     "mysql",
 		"metricsets": []string{"status"},
 		"hosts":      []string{mysql.GetMySQLEnvDSN(host)},

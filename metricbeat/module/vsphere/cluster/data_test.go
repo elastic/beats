@@ -42,8 +42,8 @@ func TestEventMapping(t *testing.T) {
 		},
 		Configuration: types.ClusterConfigInfo{
 			DasConfig: types.ClusterDasConfigInfo{
-				Enabled:                 types.NewBool(false),
-				AdmissionControlEnabled: types.NewBool(true),
+				Enabled:                 new(false),
+				AdmissionControlEnabled: new(true),
 			},
 		},
 	}

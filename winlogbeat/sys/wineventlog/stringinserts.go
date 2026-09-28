@@ -56,7 +56,7 @@ func (si *stringInserts) Slice() []EvtVariant {
 // clear clears the pointers (and unsafe pointers) so that the memory can be
 // garbage collected.
 func (si *stringInserts) clear() {
-	for i := 0; i < len(si.evtVariants); i++ {
+	for i := range len(si.evtVariants) {
 		si.evtVariants[i] = EvtVariant{}
 		si.insertStrings[i] = nil
 	}
@@ -67,7 +67,7 @@ func (si *stringInserts) clear() {
 func newTemplateStringInserts() *stringInserts {
 	si := &stringInserts{}
 
-	for i := 0; i < len(si.evtVariants); i++ {
+	for i := range len(si.evtVariants) {
 		// Use i+1 to keep our inserts numbered the same as Window's inserts.
 		templateParam := leftTemplateDelim + `eventParam $ ` + strconv.Itoa(i+1) + rightTemplateDelim
 		strSlice, err := windows.UTF16FromString(templateParam)

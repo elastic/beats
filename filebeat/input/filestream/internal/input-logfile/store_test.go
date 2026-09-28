@@ -20,6 +20,7 @@ package input_logfile
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -52,6 +53,23 @@ func TestResource_CopyInto(t *testing.T) {
 }
 
 func TestStore_OpenClose(t *testing.T) {
+	t.Run("acquiring and releasing store closes", func(t *testing.T) {
+		var closed bool
+		cleanup := closeStoreWith(func(s *store) {
+			closed = true
+			s.close()
+		})
+		defer cleanup()
+
+		logger := logptest.NewTestingLogger(t, "")
+		states := createSampleStore(t, nil).WithGCPeriod(time.Minute)
+		_, release, err := acquireStore(logger, states, "test")
+		require.NoError(t, err)
+		release()
+
+		require.True(t, closed)
+	})
+
 	t.Run("releasing store closes", func(t *testing.T) {
 		var closed bool
 		cleanup := closeStoreWith(func(s *store) {
@@ -677,6 +695,7 @@ type testStateStore struct {
 
 func (ts testStateStore) WithGCPeriod(d time.Duration) testStateStore { ts.GCPeriod = d; return ts }
 func (ts testStateStore) CleanupInterval() time.Duration              { return ts.GCPeriod }
+func (ts testStateStore) StoreKey() string                            { return fmt.Sprintf("test:%p", ts.Store) }
 func (ts testStateStore) StoreFor(string) (*statestore.Store, error) {
 	if ts.Store == nil {
 		return nil, errors.New("no store configured")

@@ -101,8 +101,8 @@ The `add_kubernetes_metadata` processor has the following configuration settings
 `add_resource_metadata`
 :   (Optional) Specify filters and configuration for the extra metadata, that will be added to the event. Configuration parameters:
     * `node` or `namespace`: Specify labels and annotations filters for the extra metadata coming from node and namespace. By default all labels are included while annotations are not. To change default behaviour `include_labels`, `exclude_labels` and `include_annotations` can be defined. Those settings are useful when storing labels and annotations that require special handling to avoid overloading the storage output. Note: wildcards are not supported for those settings. The enrichment of `node` or `namespace` metadata can be individually disabled by setting `enabled: false`.
-    * `deployment`: If resource is `pod` and it is created from a `deployment`, by default the deployment name is added, this can be disabled by setting `deployment: false`.
-    * `cronjob`: If resource is `pod` and it is created from a `cronjob`, by default the cronjob name is added, this can be disabled by setting `cronjob: false`.
+    * `deployment`: If resource is `pod` and it is created from a `deployment`, the deployment name is added. This is disabled by default and can be enabled by setting `deployment: true`.
+    * `cronjob`: If resource is `pod` and it is created from a `cronjob`, the cronjob name is added. This is disabled by default and can be enabled by setting `cronjob: true`.
 
     Example:
 
@@ -117,8 +117,8 @@ The `add_kubernetes_metadata` processor has the following configuration settings
               include_annotations: ["nodeannotation1"]
               #labels.dedot: true
               #annotations.dedot: true
-            deployment: false
-            cronjob: false
+            deployment: true
+            cronjob: true
     ```
 
 `kube_config`

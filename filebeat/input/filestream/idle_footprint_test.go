@@ -28,6 +28,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -46,14 +47,14 @@ import (
 //   - heap-B/file      : live heap bytes retained per open idle file
 //   - idle-heap-MiB    : total live heap retained by the idle fleet
 func BenchmarkIdleResourceFootprint(b *testing.B) {
-	for _, fileCount := range []int{2000, 10000} {
-		b.Run(fmt.Sprintf("%d_idle_files", fileCount), func(b *testing.B) {
-			benchmarkIdleFootprint(b, fileCount, 5)
+	for _, count := range []int{2000, 10000} {
+		b.Run(fmt.Sprintf("filestream/%d_idle_files", count), func(b *testing.B) {
+			benchmarkFilestreamIdleFootprint(b, count, 5)
 		})
 	}
 }
 
-func benchmarkIdleFootprint(b *testing.B, fileCount, linesPerFile int) {
+func benchmarkFilestreamIdleFootprint(b *testing.B, fileCount, linesPerFile int) {
 	logger := logp.NewNopLogger()
 
 	dir := b.TempDir()
@@ -79,7 +80,10 @@ paths:
 	var gPerFile, bytesPerFile, heapMiB float64
 	for i := 0; i < b.N; i++ {
 		// A fresh store each iteration so the fleet is re-read from offset 0.
-		input, err := Plugin(logger, createTestStore(b)).Manager.Create(c)
+		p := Plugin(logger, createTestStore(b))
+		//nolint:errcheck // Close is a cleanup function and never returns an error
+		b.Cleanup(p.Manager.(*loginp.InputManager).Close)
+		input, err := p.Manager.Create(c)
 		require.NoError(b, err)
 
 		ctx, cancel := context.WithCancel(context.Background())

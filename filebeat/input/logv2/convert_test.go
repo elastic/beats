@@ -19,6 +19,7 @@ package logv2
 
 import (
 	_ "embed"
+	"fmt"
 	"testing"
 	"time"
 
@@ -48,6 +49,7 @@ func TestTranslateCfgAllLogInputConfigs(t *testing.T) {
 
 	store := openTestStatestore()
 	p := filestream.Plugin(logp.NewNopLogger(), store)
+	t.Cleanup(p.Manager.Close)
 	if _, err := p.Manager.Create(newCfg); err != nil {
 		t.Fatalf("Filestream input cannot be created from converted config: %s", err)
 	}
@@ -84,9 +86,6 @@ paths:
   ],
   "prospector": {
     "scanner": {
-      "fingerprint": {
-        "enabled": false
-      },
       "symlinks": true
     }
   },
@@ -124,9 +123,6 @@ paths:
   ],
   "prospector": {
     "scanner": {
-      "fingerprint": {
-        "enabled": false
-      },
       "symlinks": true
     }
   },
@@ -170,9 +166,6 @@ multiline.type: count
   ],
   "prospector": {
     "scanner": {
-      "fingerprint": {
-        "enabled": false
-      },
       "symlinks": true
     }
   },
@@ -200,13 +193,6 @@ paths:
 		  "paths": [
 		    "/tmp/foo"
 		  ],
-		  "prospector": {
-		    "scanner": {
-		      "fingerprint": {
-		        "enabled": false
-		      }
-		    }
-		  },
 		  "take_over": {
 		    "enabled": true
 		  },
@@ -232,13 +218,6 @@ file_identity.path: ~
 		  "paths": [
 		    "/tmp/foo"
 		  ],
-		  "prospector": {
-		    "scanner": {
-		      "fingerprint": {
-		        "enabled": false
-		      }
-		    }
-		  },
 		  "take_over": {
 		    "enabled": true
 		  },
@@ -295,13 +274,6 @@ parsers:
 		  "paths": [
 		    "/tmp/foo"
 		  ],
-		  "prospector": {
-		    "scanner": {
-		      "fingerprint": {
-		        "enabled": false
-		      }
-		    }
-		  },
 		  "take_over": {
 		    "enabled": true
 		  },
@@ -340,13 +312,6 @@ parsers:
 		  "paths": [
 		    "/tmp/foo"
 		  ],
-		  "prospector": {
-		    "scanner": {
-		      "fingerprint": {
-		        "enabled": false
-		      }
-		    }
-		  },
 		  "take_over": {
 		    "enabled": true
 		  },
@@ -384,13 +349,6 @@ parsers:
 		  "paths": [
 		    "/tmp/foo"
 		  ],
-		  "prospector": {
-		    "scanner": {
-		      "fingerprint": {
-		        "enabled": false
-		      }
-		    }
-		  },
 		  "take_over": {
 		    "enabled": true
 		  },
@@ -435,13 +393,6 @@ parsers:
 		  "paths": [
 		    "/tmp/foo"
 		  ],
-		  "prospector": {
-		    "scanner": {
-		      "fingerprint": {
-		        "enabled": false
-		      }
-		    }
-		  },
 		  "take_over": {
 		    "enabled": true
 		  },
@@ -471,13 +422,6 @@ multiline:
   "file_identity": {
     "native": null
   },
-  "prospector": {
-    "scanner": {
-      "fingerprint": {
-        "enabled": false
-      }
-    }
-  },
   "take_over": {
     "enabled": true
   },
@@ -506,13 +450,6 @@ multiline: true
 {
   "file_identity": {
     "native": null
-  },
-  "prospector": {
-    "scanner": {
-      "fingerprint": {
-        "enabled": false
-      }
-    }
   },
   "take_over": {
     "enabled": true
@@ -571,6 +508,10 @@ func (s *testInputStore) Close() {
 
 func (s *testInputStore) StoreFor(string) (*statestore.Store, error) {
 	return s.registry.Get("filebeat")
+}
+
+func (s *testInputStore) StoreKey() string {
+	return fmt.Sprintf("test:%p", s.registry)
 }
 
 func (s *testInputStore) CleanupInterval() time.Duration {

@@ -16,20 +16,24 @@ type Shard struct {
 	state     string
 
 	// optional; set if state != "UNASSIGNED"
-	docs                  *int64
-	store                 *int64
-	segments_count        *int64
-	search_query_total    *int64
-	search_query_time     *int64
-	indexing_index_total  *int64
-	indexing_index_time   *int64
-	indexing_index_failed *int64
-	merges_total          *int64
-	merges_total_time     *int64
-	get_missing_time      *int64
-	get_missing_total     *int64
-	unassigned_reason     *string
-	unassigned_details    *string
+	docs                         *int64
+	store                        *int64
+	segments_count               *int64
+	search_query_total           *int64
+	search_query_time            *int64
+	indexing_index_total         *int64
+	indexing_index_time          *int64
+	indexing_index_failed        *int64
+	merges_total                 *int64
+	merges_total_time            *int64
+	get_missing_time             *int64
+	get_missing_total            *int64
+	bulk_total_size_in_bytes     *int64
+	bulk_total_operations        *int64
+	total_data_set_size_in_bytes *int64
+	dense_vector_count           *int64
+	unassigned_reason            *string
+	unassigned_details           *string
 }
 
 type AssignedShard struct {
@@ -117,6 +121,18 @@ type NodeIndexShards struct {
 	TotalMergesTotal           *int64   `json:"total_merges_total"`       // includes replicas
 	TotalMergesTotalTime       *int64   `json:"total_merges_total_time"`  // includes replicas
 	TimestampDiff              *int64   `json:"timestamp_diff"`
+
+	// primary-only snapshot fields
+	BulkTotalSizeInBytes    *int64 `json:"bulk_total_size_in_bytes"`
+	BulkTotalOperations     *int64 `json:"bulk_total_operations"`
+	TotalDataSetSizeInBytes *int64 `json:"total_data_set_size_in_bytes"`
+	DenseVectorCount        *int64 `json:"dense_vector_count"`
+
+	// ingest / bulk rate fields
+	IngestDocsPerSecond     *float64 `json:"ingest_docs_per_second"`
+	IngestBytesPerSecond    *float64 `json:"ingest_bytes_per_second"`
+	BulkBytesPerSecond      *float64 `json:"bulk_bytes_per_second"`
+	BulkOperationsPerSecond *float64 `json:"bulk_operations_per_second"`
 }
 
 type NodeShardCount struct {
@@ -294,6 +310,10 @@ func indexShardsToNodeIndexShards(nodeIndexShardsMap map[string]NodeIndexShards,
 				nodeIndex.IndexingIndexTotalTime = utils.AddInt64OrNull(nodeIndex.IndexingIndexTotalTime, shard.indexing_index_time)
 				nodeIndex.MergesTotal = utils.AddInt64OrNull(nodeIndex.MergesTotal, shard.merges_total)
 				nodeIndex.MergesTotalTime = utils.AddInt64OrNull(nodeIndex.MergesTotalTime, shard.merges_total_time)
+				nodeIndex.BulkTotalSizeInBytes = utils.AddInt64OrNull(nodeIndex.BulkTotalSizeInBytes, shard.bulk_total_size_in_bytes)
+				nodeIndex.BulkTotalOperations = utils.AddInt64OrNull(nodeIndex.BulkTotalOperations, shard.bulk_total_operations)
+				nodeIndex.TotalDataSetSizeInBytes = utils.AddInt64OrNull(nodeIndex.TotalDataSetSizeInBytes, shard.total_data_set_size_in_bytes)
+				nodeIndex.DenseVectorCount = utils.AddInt64OrNull(nodeIndex.DenseVectorCount, shard.dense_vector_count)
 			}
 
 			assignedShard := toAssignedShard(shard)

@@ -19,6 +19,7 @@ package kubernetes
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -47,6 +48,8 @@ const (
 var (
 	accessor = meta.NewAccessor()
 )
+
+var ErrWatcherStopped = errors.New("kubernetes watcher has been stopped and cannot be restarted")
 
 // Watcher watches Kubernetes resources events
 type Watcher interface {
@@ -282,6 +285,18 @@ func (w *watcher) CachedObject() runtime.Object {
 
 // Start watching pods
 func (w *watcher) Start() error {
+	// A stopped SharedInformer cannot be restarted, and its watch options cannot
+	// be changed. Reject it so callers construct a fresh watcher.
+	if w.informer.IsStopped() || w.queue.ShuttingDown() || w.ctx.Err() != nil {
+		return fmt.Errorf(
+			"%w (informer_stopped=%t, queue_shutting_down=%t, context_error=%w)",
+			ErrWatcherStopped,
+			w.informer.IsStopped(),
+			w.queue.ShuttingDown(),
+			w.ctx.Err(),
+		)
+	}
+
 	go w.informer.Run(w.ctx.Done())
 
 	if !cache.WaitForCacheSync(w.ctx.Done(), w.informer.HasSynced) {

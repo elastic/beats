@@ -22,7 +22,7 @@ import (
 func TestCursorUpdate(t *testing.T) {
 	testCases := []struct {
 		name          string
-		baseConfig    map[string]interface{}
+		baseConfig    map[string]any
 		trCtx         *transformContext
 		initialState  mapstr.M
 		expectedState mapstr.M
@@ -30,8 +30,8 @@ func TestCursorUpdate(t *testing.T) {
 	}{
 		{
 			name: "update an unexisting value",
-			baseConfig: map[string]interface{}{
-				"entry1": map[string]interface{}{
+			baseConfig: map[string]any{
+				"entry1": map[string]any{
 					"value": "v1",
 				},
 			},
@@ -44,8 +44,8 @@ func TestCursorUpdate(t *testing.T) {
 		},
 		{
 			name: "update an existing value with a template",
-			baseConfig: map[string]interface{}{
-				"entry1": map[string]interface{}{
+			baseConfig: map[string]any{
+				"entry1": map[string]any{
 					"value": "[[ .last_response.body.foo ]]",
 				},
 			},
@@ -66,30 +66,30 @@ func TestCursorUpdate(t *testing.T) {
 		},
 		{
 			name: "don't update an existing value if template result is empty",
-			baseConfig: map[string]interface{}{
-				"entry1": map[string]interface{}{
+			baseConfig: map[string]any{
+				"entry1": map[string]any{
 					"value":              ``,
 					"do_not_log_failure": true,
 				},
-				"entry2": map[string]interface{}{
+				"entry2": map[string]any{
 					"value":              ``,
 					"ignore_empty_value": true,
 				},
-				"entry3": map[string]interface{}{
+				"entry3": map[string]any{
 					"value":              ``,
 					"ignore_empty_value": nil,
 				},
-				"entry4": map[string]interface{}{
+				"entry4": map[string]any{
 					"value":              ``,
 					"ignore_empty_value": false,
 					"do_not_log_failure": true,
 				},
-				"entry5": map[string]interface{}{
+				"entry5": map[string]any{
 					"value":              ``,
 					"ignore_empty_value": false,
 					"do_not_log_failure": false,
 				},
-				"entry6": map[string]interface{}{
+				"entry6": map[string]any{
 					"value":              ``,
 					"ignore_empty_value": false,
 				},
@@ -117,8 +117,8 @@ func TestCursorUpdate(t *testing.T) {
 		},
 		{
 			name: "update an existing value if template result is empty and ignore_empty_value is false",
-			baseConfig: map[string]interface{}{
-				"entry1": map[string]interface{}{
+			baseConfig: map[string]any{
+				"entry1": map[string]any{
 					"value":              ``,
 					"ignore_empty_value": false,
 					"do_not_log_failure": true,
@@ -161,9 +161,9 @@ func TestCursorUpdate(t *testing.T) {
 func BenchmarkCursorUpdate(b *testing.B) {
 	for _, nItems := range []int{100, 1000, 5000} {
 		b.Run(fmt.Sprintf("response_%d_items", nItems), func(b *testing.B) {
-			items := make([]interface{}, nItems)
+			items := make([]any, nItems)
 			for i := range items {
-				items[i] = map[string]interface{}{
+				items[i] = map[string]any{
 					"id":    i,
 					"name":  fmt.Sprintf("item-%d", i),
 					"value": strings.Repeat("x", 100),
@@ -175,13 +175,13 @@ func BenchmarkCursorUpdate(b *testing.B) {
 			}
 
 			lastEvent := mapstr.M{
-				"id":        map[string]interface{}{"time": "2025-01-01T00:00:00Z"},
+				"id":        map[string]any{"time": "2025-01-01T00:00:00Z"},
 				"name":      "some-event",
 				"important": "data",
 			}
 
-			cursorCfg := conf.MustNewConfigFrom(map[string]interface{}{
-				"updated": map[string]interface{}{
+			cursorCfg := conf.MustNewConfigFrom(map[string]any{
+				"updated": map[string]any{
 					"value": "[[ .last_event.id.time ]]",
 				},
 			})

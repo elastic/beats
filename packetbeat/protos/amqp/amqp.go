@@ -92,14 +92,14 @@ func New(
 }
 
 //go:inline
-func (amqp *amqpPlugin) debugf(format string, args ...interface{}) {
+func (amqp *amqpPlugin) debugf(format string, args ...any) {
 	if amqp.isDebug {
 		amqp.amqpLogger.Debugf(format, args...)
 	}
 }
 
 //go:inline
-func (amqp *amqpPlugin) detailedf(format string, args ...interface{}) {
+func (amqp *amqpPlugin) detailedf(format string, args ...any) {
 	if amqp.isDetailed {
 		amqp.amqpDetailedLogger.Debugf(format, args...)
 	}

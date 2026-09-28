@@ -249,7 +249,7 @@ func (hello *helloMessage) supportedCiphers() []string {
 	return ciphers
 }
 
-func (parser *parser) debugf(format string, args ...interface{}) {
+func (parser *parser) debugf(format string, args ...any) {
 	if parser.logger != nil && parser.logger.IsDebug() {
 		parser.logger.Debugf(format, args...)
 	}
@@ -605,7 +605,7 @@ func (version tlsVersion) IsZero() bool {
 	return version.major == 0 && version.minor == 0
 }
 
-func getKeySize(key interface{}) int {
+func getKeySize(key any) int {
 	if key == nil {
 		return 0
 	}
@@ -664,7 +664,7 @@ func toMap(name *pkix.Name) mapstr.M {
 	result := mapstr.M{}
 	fields := []struct {
 		name  string
-		value interface{}
+		value any
 	}{
 		{"country", name.Country},
 		{"organization", name.Organization},

@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -293,11 +294,9 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 	if err != nil {
 		return err
 	}
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		_ = q.logOSQueryOutput(ctx, stdout)
-	}()
+	})
 
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
@@ -318,20 +317,16 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 
 	// Capture stderr for error messages
 	// Log stderr line-by-line at error level for better visibility
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		_ = q.logOSQueryOutput(ctx, stderr)
-	}()
+	})
 
 	finished := make(chan error, 1)
 
 	// Wait on osqueryd exit
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		finished <- cmd.Wait()
-	}()
+	})
 
 	select {
 	case err = <-finished:
@@ -698,8 +693,13 @@ func verifyAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath string) er
 }
 
 func (q *OSQueryD) prepareBinPath() error {
-	// If path to osquery was not set use the current executable path
 	if q.binPath == "" {
+		// Allow tests to override binary discovery via env var (e.g. when the
+		// receiver runs in-process and os.Executable returns a temp test binary).
+		if dir := os.Getenv("OSQUERYBEAT_BINARY_DIR"); dir != "" {
+			q.binPath = dir
+			return nil
+		}
 		exePath, err := os.Executable()
 		if err != nil {
 			return err
@@ -723,9 +723,7 @@ func (q *OSQueryD) args(userFlags Flags) Args {
 	}
 
 	// Copy protected flags, protected keys overwrite the user keys
-	for k, v := range protectedFlags {
-		flags[k] = v
-	}
+	maps.Copy(flags, protectedFlags)
 
 	flags["pidfile"] = q.resolveDataPath(flags.GetString("pidfile"))
 	flags["database_path"] = q.resolveDataPath(flags.GetString("database_path"))
@@ -824,8 +822,7 @@ func getEnabledDisabledTables(userFlags Flags) (enabled, disabled []string) {
 	iterate := func(key string, fn func(name string)) {
 		if tablesValue, ok := userFlags[key]; ok {
 			if tablesString, ok := tablesValue.(string); ok {
-				tables := strings.Split(tablesString, ",")
-				for _, table := range tables {
+				for table := range strings.SplitSeq(tablesString, ",") {
 					name := strings.TrimSpace(table)
 					if name == "" {
 						continue

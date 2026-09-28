@@ -48,7 +48,7 @@ func createPipelineClient(pipeline beat.Pipeline, acks *awsACKHandler) (beat.Cli
 		Processing: beat.ProcessingConfig{
 			// This input only produces events with basic types so normalization
 			// is not required.
-			EventNormalization: boolPtr(false),
+			EventNormalization: new(false),
 		},
 	})
 }

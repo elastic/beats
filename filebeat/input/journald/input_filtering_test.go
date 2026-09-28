@@ -256,7 +256,11 @@ func TestInputSeek(t *testing.T) {
 			env := newInputTestingEnvironment(t)
 
 			if testCase.cursor != "" {
-				store, _ := env.stateStore.StoreFor("")
+				store, err := env.stateStore.StoreFor("")
+				if err != nil {
+					t.Fatalf("failed to open store: %v", err)
+				}
+				defer store.Close()
 				tmp := map[string]any{}
 				if err := json.Unmarshal([]byte(testCase.cursor), &tmp); err != nil {
 					t.Fatal(err)

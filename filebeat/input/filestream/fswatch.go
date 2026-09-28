@@ -277,8 +277,8 @@ func (w *fileWatcher) watch(
 	//   1. Exact-FileID rename match — works for every identity including
 	//      static fingerprint. Catches a plain rename where the file's
 	//      content (and so its fingerprint) is unchanged.
-	//   2. Prefix-match rename detection (Enhanced Fingerprint / growing
-	//      mode only) — catches rename + content growth in the same scan.
+	//   2. Prefix-match rename detection (growing fingerprint only) —
+	//      catches rename + content growth in the same scan.
 	//   3. Postpone deletes for entries under an unobservable prefix. Runs
 	//      AFTER both rename passes so a file renamed out of a directory that
 	//      became unobservable this scan is still detected as a rename, instead

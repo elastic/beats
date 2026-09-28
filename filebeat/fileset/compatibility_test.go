@@ -34,17 +34,17 @@ func TestAdaptPipelineForCompatibility(t *testing.T) {
 	cases := []struct {
 		name          string
 		esVersion     *version.V
-		content       map[string]interface{}
-		expected      map[string]interface{}
+		content       map[string]any
+		expected      map[string]any
 		isErrExpected bool
 	}{
 		{
 			name:      "ES < 6.7.0",
 			esVersion: version.MustNew("6.6.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"user_agent": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"user_agent": map[string]any{
 							"field": "foo.http_user_agent",
 						},
 					},
@@ -55,31 +55,31 @@ func TestAdaptPipelineForCompatibility(t *testing.T) {
 		{
 			name:      "ES == 6.7.0",
 			esVersion: version.MustNew("6.7.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"rename": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"rename": map[string]any{
 							"field":        "foo.src_ip",
 							"target_field": "source.ip",
 						},
 					},
-					map[string]interface{}{
-						"user_agent": map[string]interface{}{
+					map[string]any{
+						"user_agent": map[string]any{
 							"field": "foo.http_user_agent",
 						},
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"rename": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"rename": map[string]any{
 							"field":        "foo.src_ip",
 							"target_field": "source.ip",
 						},
 					},
-					map[string]interface{}{
-						"user_agent": map[string]interface{}{
+					map[string]any{
+						"user_agent": map[string]any{
 							"field": "foo.http_user_agent",
 							"ecs":   true,
 						},
@@ -91,31 +91,31 @@ func TestAdaptPipelineForCompatibility(t *testing.T) {
 		{
 			name:      "ES >= 7.0.0",
 			esVersion: version.MustNew("7.0.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"rename": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"rename": map[string]any{
 							"field":        "foo.src_ip",
 							"target_field": "source.ip",
 						},
 					},
-					map[string]interface{}{
-						"user_agent": map[string]interface{}{
+					map[string]any{
+						"user_agent": map[string]any{
 							"field": "foo.http_user_agent",
 						},
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"rename": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"rename": map[string]any{
 							"field":        "foo.src_ip",
 							"target_field": "source.ip",
 						},
 					},
-					map[string]interface{}{
-						"user_agent": map[string]interface{}{
+					map[string]any{
+						"user_agent": map[string]any{
 							"field": "foo.http_user_agent",
 						},
 					},
@@ -126,7 +126,6 @@ func TestAdaptPipelineForCompatibility(t *testing.T) {
 	}
 
 	for _, test := range cases {
-		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logptest.NewTestingLogger(t, logName))
@@ -144,17 +143,17 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 	cases := []struct {
 		name          string
 		esVersion     *version.V
-		content       map[string]interface{}
-		expected      map[string]interface{}
+		content       map[string]any
+		expected      map[string]any
 		isErrExpected bool
 	}{
 		{
 			name:      "ES < 7.9.0",
 			esVersion: version.MustNew("7.8.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"set": map[string]any{
 							"field":              "rule.name",
 							"value":              "{{panw.panos.ruleset}}",
 							"ignore_empty_value": true,
@@ -162,10 +161,10 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"set": map[string]any{
 							"field": "rule.name",
 							"value": "{{panw.panos.ruleset}}",
 							"if":    "ctx?.panw?.panos?.ruleset != null",
@@ -178,10 +177,10 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 		{
 			name:      "ES == 7.9.0",
 			esVersion: version.MustNew("7.9.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"set": map[string]any{
 							"field":              "rule.name",
 							"value":              "{{panw.panos.ruleset}}",
 							"ignore_empty_value": true,
@@ -189,10 +188,10 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"set": map[string]any{
 							"field":              "rule.name",
 							"value":              "{{panw.panos.ruleset}}",
 							"ignore_empty_value": true,
@@ -205,10 +204,10 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 		{
 			name:      "ES > 7.9.0",
 			esVersion: version.MustNew("8.0.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"set": map[string]any{
 							"field":              "rule.name",
 							"value":              "{{panw.panos.ruleset}}",
 							"ignore_empty_value": true,
@@ -216,10 +215,10 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"set": map[string]any{
 							"field":              "rule.name",
 							"value":              "{{panw.panos.ruleset}}",
 							"ignore_empty_value": true,
@@ -232,10 +231,10 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 		{
 			name:      "existing if",
 			esVersion: version.MustNew("7.7.7"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"set": map[string]any{
 							"field":              "rule.name",
 							"value":              "{{panw.panos.ruleset}}",
 							"ignore_empty_value": true,
@@ -244,10 +243,10 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"set": map[string]any{
 							"field": "rule.name",
 							"value": "{{panw.panos.ruleset}}",
 							"if":    "ctx?.panw?.panos?.ruleset != null",
@@ -260,10 +259,10 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 		{
 			name:      "ignore_empty_value is false",
 			esVersion: version.MustNew("7.7.7"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"set": map[string]any{
 							"field":              "rule.name",
 							"value":              "{{panw.panos.ruleset}}",
 							"ignore_empty_value": false,
@@ -272,10 +271,10 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"set": map[string]any{
 							"field": "rule.name",
 							"value": "{{panw.panos.ruleset}}",
 							"if":    "ctx?.panw?.panos?.ruleset != null",
@@ -288,20 +287,20 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 		{
 			name:      "no value",
 			esVersion: version.MustNew("7.7.7"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"set": map[string]any{
 							"field":              "rule.name",
 							"ignore_empty_value": false,
 						},
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"set": map[string]any{
 							"field": "rule.name",
 						},
 					},
@@ -312,7 +311,6 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 	}
 
 	for _, test := range cases {
-		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logptest.NewTestingLogger(t, logName))
@@ -330,17 +328,17 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 	cases := []struct {
 		name          string
 		esVersion     *version.V
-		content       map[string]interface{}
-		expected      map[string]interface{}
+		content       map[string]any
+		expected      map[string]any
 		isErrExpected bool
 	}{
 		{
 			name:      "ES < 7.10.0: set to true",
 			esVersion: version.MustNew("7.9.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"append": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"append": map[string]any{
 							"field":            "related.hosts",
 							"value":            "{{host.hostname}}",
 							"allow_duplicates": true,
@@ -348,10 +346,10 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"append": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"append": map[string]any{
 							"field": "related.hosts",
 							"value": "{{host.hostname}}",
 						},
@@ -363,10 +361,10 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 		{
 			name:      "ES < 7.10.0: set to false",
 			esVersion: version.MustNew("7.9.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"append": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"append": map[string]any{
 							"field":            "related.hosts",
 							"value":            "{{host.hostname}}",
 							"allow_duplicates": false,
@@ -374,10 +372,10 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"append": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"append": map[string]any{
 							"field": "related.hosts",
 							"value": "{{host.hostname}}",
 							"if":    "ctx?.host?.hostname != null && ((ctx?.related?.hosts instanceof List && !ctx?.related?.hosts.contains(ctx?.host?.hostname)) || ctx?.related?.hosts != ctx?.host?.hostname)",
@@ -390,10 +388,10 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 		{
 			name:      "ES == 7.10.0",
 			esVersion: version.MustNew("7.10.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"append": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"append": map[string]any{
 							"field":            "related.hosts",
 							"value":            "{{host.hostname}}",
 							"allow_duplicates": false,
@@ -401,10 +399,10 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"append": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"append": map[string]any{
 							"field":            "related.hosts",
 							"value":            "{{host.hostname}}",
 							"allow_duplicates": false,
@@ -417,10 +415,10 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 		{
 			name:      "ES > 7.10.0",
 			esVersion: version.MustNew("8.0.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"append": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"append": map[string]any{
 							"field":            "related.hosts",
 							"value":            "{{host.hostname}}",
 							"allow_duplicates": false,
@@ -428,10 +426,10 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"append": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"append": map[string]any{
 							"field":            "related.hosts",
 							"value":            "{{host.hostname}}",
 							"allow_duplicates": false,
@@ -444,10 +442,10 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 		{
 			name:      "ES < 7.10.0: existing if",
 			esVersion: version.MustNew("7.7.7"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"append": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"append": map[string]any{
 							"field":            "related.hosts",
 							"value":            "{{host.hostname}}",
 							"allow_duplicates": false,
@@ -456,10 +454,10 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"append": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"append": map[string]any{
 							"field": "related.hosts",
 							"value": "{{host.hostname}}",
 							"if":    "ctx?.host?.hostname != null && ((ctx?.related?.hosts instanceof List && !ctx?.related?.hosts.contains(ctx?.host?.hostname)) || ctx?.related?.hosts != ctx?.host?.hostname)",
@@ -472,10 +470,10 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 		{
 			name:      "ES < 7.10.0: existing if with contains",
 			esVersion: version.MustNew("7.7.7"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"append": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"append": map[string]any{
 							"field":            "related.hosts",
 							"value":            "{{host.hostname}}",
 							"allow_duplicates": false,
@@ -484,10 +482,10 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"append": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"append": map[string]any{
 							"field": "related.hosts",
 							"value": "{{host.hostname}}",
 							"if":    "!ctx?.related?.hosts.contains(ctx?.host?.hostname)",
@@ -500,20 +498,20 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 		{
 			name:      "ES < 7.10.0: no value",
 			esVersion: version.MustNew("7.7.7"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"append": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"append": map[string]any{
 							"field":            "related.hosts",
 							"allow_duplicates": false,
 						},
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"append": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"append": map[string]any{
 							"field": "related.hosts",
 						},
 					},
@@ -524,7 +522,6 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 	}
 
 	for _, test := range cases {
-		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logptest.NewTestingLogger(t, logName))
@@ -542,33 +539,33 @@ func TestRemoveURIPartsProcessor(t *testing.T) {
 	cases := []struct {
 		name          string
 		esVersion     *version.V
-		content       map[string]interface{}
-		expected      map[string]interface{}
+		content       map[string]any
+		expected      map[string]any
 		isErrExpected bool
 	}{
 		{
 			name:      "ES < 7.12.0",
 			esVersion: version.MustNew("7.11.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"uri_parts": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"uri_parts": map[string]any{
 							"field":        "test.url",
 							"target_field": "url",
 						},
 					},
-					map[string]interface{}{
-						"set": map[string]interface{}{
+					map[string]any{
+						"set": map[string]any{
 							"field": "test.field",
 							"value": "testvalue",
 						},
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"set": map[string]any{
 							"field": "test.field",
 							"value": "testvalue",
 						},
@@ -580,32 +577,32 @@ func TestRemoveURIPartsProcessor(t *testing.T) {
 		{
 			name:      "ES == 7.12.0",
 			esVersion: version.MustNew("7.12.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"uri_parts": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"uri_parts": map[string]any{
 							"field":        "test.url",
 							"target_field": "url",
 						},
 					},
-					map[string]interface{}{
-						"set": map[string]interface{}{
+					map[string]any{
+						"set": map[string]any{
 							"field": "test.field",
 							"value": "testvalue",
 						},
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"uri_parts": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"uri_parts": map[string]any{
 							"field":        "test.url",
 							"target_field": "url",
 						},
 					},
-					map[string]interface{}{
-						"set": map[string]interface{}{
+					map[string]any{
+						"set": map[string]any{
 							"field": "test.field",
 							"value": "testvalue",
 						},
@@ -617,32 +614,32 @@ func TestRemoveURIPartsProcessor(t *testing.T) {
 		{
 			name:      "ES > 7.12.0",
 			esVersion: version.MustNew("8.0.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"uri_parts": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"uri_parts": map[string]any{
 							"field":        "test.url",
 							"target_field": "url",
 						},
 					},
-					map[string]interface{}{
-						"set": map[string]interface{}{
+					map[string]any{
+						"set": map[string]any{
 							"field": "test.field",
 							"value": "testvalue",
 						},
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"uri_parts": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"uri_parts": map[string]any{
 							"field":        "test.url",
 							"target_field": "url",
 						},
 					},
-					map[string]interface{}{
-						"set": map[string]interface{}{
+					map[string]any{
+						"set": map[string]any{
 							"field": "test.field",
 							"value": "testvalue",
 						},
@@ -654,7 +651,6 @@ func TestRemoveURIPartsProcessor(t *testing.T) {
 	}
 
 	for _, test := range cases {
-		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logptest.NewTestingLogger(t, logName))
@@ -672,35 +668,35 @@ func TestRemoveNetworkDirectionProcessor(t *testing.T) {
 	cases := []struct {
 		name          string
 		esVersion     *version.V
-		content       map[string]interface{}
-		expected      map[string]interface{}
+		content       map[string]any
+		expected      map[string]any
 		isErrExpected bool
 	}{
 		{
 			name:      "ES < 7.13.0",
 			esVersion: version.MustNew("7.12.34"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"network_direction": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"network_direction": map[string]any{
 							"internal_networks": []string{
 								"loopback",
 								"private",
 							},
 						},
 					},
-					map[string]interface{}{
-						"set": map[string]interface{}{
+					map[string]any{
+						"set": map[string]any{
 							"field": "test.field",
 							"value": "testvalue",
 						},
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"set": map[string]any{
 							"field": "test.field",
 							"value": "testvalue",
 						},
@@ -712,36 +708,36 @@ func TestRemoveNetworkDirectionProcessor(t *testing.T) {
 		{
 			name:      "ES == 7.13.0",
 			esVersion: version.MustNew("7.13.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"network_direction": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"network_direction": map[string]any{
 							"internal_networks": []string{
 								"loopback",
 								"private",
 							},
 						},
 					},
-					map[string]interface{}{
-						"set": map[string]interface{}{
+					map[string]any{
+						"set": map[string]any{
 							"field": "test.field",
 							"value": "testvalue",
 						},
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"network_direction": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"network_direction": map[string]any{
 							"internal_networks": []string{
 								"loopback",
 								"private",
 							},
 						},
 					},
-					map[string]interface{}{
-						"set": map[string]interface{}{
+					map[string]any{
+						"set": map[string]any{
 							"field": "test.field",
 							"value": "testvalue",
 						},
@@ -753,36 +749,36 @@ func TestRemoveNetworkDirectionProcessor(t *testing.T) {
 		{
 			name:      "ES > 7.13.0",
 			esVersion: version.MustNew("8.0.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"network_direction": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"network_direction": map[string]any{
 							"internal_networks": []string{
 								"loopback",
 								"private",
 							},
 						},
 					},
-					map[string]interface{}{
-						"set": map[string]interface{}{
+					map[string]any{
+						"set": map[string]any{
 							"field": "test.field",
 							"value": "testvalue",
 						},
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"network_direction": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"network_direction": map[string]any{
 							"internal_networks": []string{
 								"loopback",
 								"private",
 							},
 						},
 					},
-					map[string]interface{}{
-						"set": map[string]interface{}{
+					map[string]any{
+						"set": map[string]any{
 							"field": "test.field",
 							"value": "testvalue",
 						},
@@ -794,7 +790,6 @@ func TestRemoveNetworkDirectionProcessor(t *testing.T) {
 	}
 
 	for _, test := range cases {
-		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logptest.NewTestingLogger(t, logName))
@@ -813,17 +808,17 @@ func TestReplaceConvertIPWithGrok(t *testing.T) {
 	cases := []struct {
 		name          string
 		esVersion     *version.V
-		content       map[string]interface{}
-		expected      map[string]interface{}
+		content       map[string]any
+		expected      map[string]any
 		isErrExpected bool
 	}{
 		{
 			name:      "ES >= 7.13.0: keep processor",
 			esVersion: version.MustNew("7.13.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"convert": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"convert": map[string]any{
 							"field":        "foo",
 							"target_field": "bar",
 							"type":         "ip",
@@ -831,10 +826,10 @@ func TestReplaceConvertIPWithGrok(t *testing.T) {
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"convert": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"convert": map[string]any{
 							"field":        "foo",
 							"target_field": "bar",
 							"type":         "ip",
@@ -847,10 +842,10 @@ func TestReplaceConvertIPWithGrok(t *testing.T) {
 		{
 			name:      "ES < 7.13.0: replace with grok",
 			esVersion: version.MustNew("7.12.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"convert": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"convert": map[string]any{
 							"field":        "foo",
 							"target_field": "bar",
 							"type":         "ip",
@@ -858,10 +853,10 @@ func TestReplaceConvertIPWithGrok(t *testing.T) {
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"grok": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"grok": map[string]any{
 							"field": "foo",
 							"patterns": []string{
 								"^%{IP:bar}$",
@@ -875,20 +870,20 @@ func TestReplaceConvertIPWithGrok(t *testing.T) {
 		{
 			name:      "implicit target",
 			esVersion: version.MustNew("7.9.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"convert": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"convert": map[string]any{
 							"field": "foo",
 							"type":  "ip",
 						},
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"grok": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"grok": map[string]any{
 							"field": "foo",
 							"patterns": []string{
 								"^%{IP:foo}$",
@@ -902,10 +897,10 @@ func TestReplaceConvertIPWithGrok(t *testing.T) {
 		{
 			name:      "missing field",
 			esVersion: version.MustNew("7.9.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"convert": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"convert": map[string]any{
 							"type": "ip",
 						},
 					},
@@ -916,10 +911,10 @@ func TestReplaceConvertIPWithGrok(t *testing.T) {
 		{
 			name:      "keep settings in grok",
 			esVersion: version.MustNew("7.0.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"convert": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"convert": map[string]any{
 							"field":          "foo",
 							"target_field":   "bar",
 							"type":           "ip",
@@ -928,14 +923,14 @@ func TestReplaceConvertIPWithGrok(t *testing.T) {
 							"if":             "condition",
 							"ignore_failure": false,
 							"tag":            "myTag",
-							"on_failure": []interface{}{
-								map[string]interface{}{
-									"foo": map[string]interface{}{
+							"on_failure": []any{
+								map[string]any{
+									"foo": map[string]any{
 										"baz": false,
 									},
 								},
-								map[string]interface{}{
-									"bar": map[string]interface{}{
+								map[string]any{
+									"bar": map[string]any{
 										"baz": true,
 									},
 								},
@@ -944,10 +939,10 @@ func TestReplaceConvertIPWithGrok(t *testing.T) {
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"grok": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"grok": map[string]any{
 							"field": "foo",
 							"patterns": []string{
 								"^%{IP:bar}$",
@@ -956,14 +951,14 @@ func TestReplaceConvertIPWithGrok(t *testing.T) {
 							"if":             "condition",
 							"ignore_failure": false,
 							"tag":            "myTag",
-							"on_failure": []interface{}{
-								map[string]interface{}{
-									"foo": map[string]interface{}{
+							"on_failure": []any{
+								map[string]any{
+									"foo": map[string]any{
 										"baz": false,
 									},
 								},
-								map[string]interface{}{
-									"bar": map[string]interface{}{
+								map[string]any{
+									"bar": map[string]any{
 										"baz": true,
 									},
 								},
@@ -977,7 +972,6 @@ func TestReplaceConvertIPWithGrok(t *testing.T) {
 	}
 
 	for _, test := range cases {
-		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logptest.NewTestingLogger(t, logName))
@@ -995,32 +989,32 @@ func TestRemoveRegisteredDomainProcessor(t *testing.T) {
 	cases := []struct {
 		name          string
 		esVersion     *version.V
-		content       map[string]interface{}
-		expected      map[string]interface{}
+		content       map[string]any
+		expected      map[string]any
 		isErrExpected bool
 	}{
 		{
 			name:      "ES < 7.13.0",
 			esVersion: version.MustNew("7.12.34"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"set": map[string]any{
 							"field": "test.field",
 							"value": "testvalue",
 						},
 					},
-					map[string]interface{}{
-						"registered_domain": map[string]interface{}{
+					map[string]any{
+						"registered_domain": map[string]any{
 							"field": "foo",
 						},
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"set": map[string]any{
 							"field": "test.field",
 							"value": "testvalue",
 						},
@@ -1032,30 +1026,30 @@ func TestRemoveRegisteredDomainProcessor(t *testing.T) {
 		{
 			name:      "ES == 7.13.0",
 			esVersion: version.MustNew("7.13.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"registered_domain": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"registered_domain": map[string]any{
 							"field": "foo",
 						},
 					},
-					map[string]interface{}{
-						"set": map[string]interface{}{
+					map[string]any{
+						"set": map[string]any{
 							"field": "test.field",
 							"value": "testvalue",
 						},
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"registered_domain": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"registered_domain": map[string]any{
 							"field": "foo",
 						},
 					},
-					map[string]interface{}{
-						"set": map[string]interface{}{
+					map[string]any{
+						"set": map[string]any{
 							"field": "test.field",
 							"value": "testvalue",
 						},
@@ -1067,30 +1061,30 @@ func TestRemoveRegisteredDomainProcessor(t *testing.T) {
 		{
 			name:      "ES > 7.13.0",
 			esVersion: version.MustNew("8.0.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"registered_domain": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"registered_domain": map[string]any{
 							"field": "foo",
 						},
 					},
-					map[string]interface{}{
-						"set": map[string]interface{}{
+					map[string]any{
+						"set": map[string]any{
 							"field": "test.field",
 							"value": "testvalue",
 						},
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"registered_domain": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"registered_domain": map[string]any{
 							"field": "foo",
 						},
 					},
-					map[string]interface{}{
-						"set": map[string]interface{}{
+					map[string]any{
+						"set": map[string]any{
 							"field": "test.field",
 							"value": "testvalue",
 						},
@@ -1102,7 +1096,6 @@ func TestRemoveRegisteredDomainProcessor(t *testing.T) {
 	}
 
 	for _, test := range cases {
-		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logptest.NewTestingLogger(t, logName))
@@ -1120,46 +1113,46 @@ func TestReplaceAlternativeFlowProcessors(t *testing.T) {
 	cases := []struct {
 		name          string
 		esVersion     *version.V
-		content       map[string]interface{}
-		expected      map[string]interface{}
+		content       map[string]any
+		expected      map[string]any
 		isErrExpected bool
 	}{
 		{
 			name:      "Replace in on_failure section",
 			esVersion: version.MustNew("7.0.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}(nil),
-				"on_failure": []interface{}{
-					map[string]interface{}{
-						"append": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any(nil),
+				"on_failure": []any{
+					map[string]any{
+						"append": map[string]any{
 							"field":            "related.hosts",
 							"value":            "{{host.hostname}}",
 							"allow_duplicates": false,
 						},
 					},
-					map[string]interface{}{
-						"community_id": map[string]interface{}{},
+					map[string]any{
+						"community_id": map[string]any{},
 					},
-					map[string]interface{}{
-						"append": map[string]interface{}{
+					map[string]any{
+						"append": map[string]any{
 							"field": "error.message",
 							"value": "something's wrong",
 						},
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}(nil),
-				"on_failure": []interface{}{
-					map[string]interface{}{
-						"append": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any(nil),
+				"on_failure": []any{
+					map[string]any{
+						"append": map[string]any{
 							"field": "related.hosts",
 							"value": "{{host.hostname}}",
 							"if":    "ctx?.host?.hostname != null && ((ctx?.related?.hosts instanceof List && !ctx?.related?.hosts.contains(ctx?.host?.hostname)) || ctx?.related?.hosts != ctx?.host?.hostname)",
 						},
 					},
-					map[string]interface{}{
-						"append": map[string]interface{}{
+					map[string]any{
+						"append": map[string]any{
 							"field": "error.message",
 							"value": "something's wrong",
 						},
@@ -1171,24 +1164,24 @@ func TestReplaceAlternativeFlowProcessors(t *testing.T) {
 		{
 			name:      "Replace in processor's on_failure",
 			esVersion: version.MustNew("7.0.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"foo": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"foo": map[string]any{
 							"bar": "baz",
-							"on_failure": []interface{}{
-								map[string]interface{}{
-									"append": map[string]interface{}{
+							"on_failure": []any{
+								map[string]any{
+									"append": map[string]any{
 										"field":            "related.hosts",
 										"value":            "{{host.hostname}}",
 										"allow_duplicates": false,
 									},
 								},
-								map[string]interface{}{
-									"community_id": map[string]interface{}{},
+								map[string]any{
+									"community_id": map[string]any{},
 								},
-								map[string]interface{}{
-									"append": map[string]interface{}{
+								map[string]any{
+									"append": map[string]any{
 										"field": "error.message",
 										"value": "something's wrong",
 									},
@@ -1198,21 +1191,21 @@ func TestReplaceAlternativeFlowProcessors(t *testing.T) {
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"foo": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"foo": map[string]any{
 							"bar": "baz",
-							"on_failure": []interface{}{
-								map[string]interface{}{
-									"append": map[string]interface{}{
+							"on_failure": []any{
+								map[string]any{
+									"append": map[string]any{
 										"field": "related.hosts",
 										"value": "{{host.hostname}}",
 										"if":    "ctx?.host?.hostname != null && ((ctx?.related?.hosts instanceof List && !ctx?.related?.hosts.contains(ctx?.host?.hostname)) || ctx?.related?.hosts != ctx?.host?.hostname)",
 									},
 								},
-								map[string]interface{}{
-									"append": map[string]interface{}{
+								map[string]any{
+									"append": map[string]any{
 										"field": "error.message",
 										"value": "something's wrong",
 									},
@@ -1227,24 +1220,24 @@ func TestReplaceAlternativeFlowProcessors(t *testing.T) {
 		{
 			name:      "Remove empty on_failure key",
 			esVersion: version.MustNew("7.0.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"foo": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"foo": map[string]any{
 							"bar": "baz",
-							"on_failure": []interface{}{
-								map[string]interface{}{
-									"community_id": map[string]interface{}{},
+							"on_failure": []any{
+								map[string]any{
+									"community_id": map[string]any{},
 								},
 							},
 						},
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"foo": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"foo": map[string]any{
 							"bar": "baz",
 						},
 					},
@@ -1255,10 +1248,10 @@ func TestReplaceAlternativeFlowProcessors(t *testing.T) {
 		{
 			name:      "process foreach processor",
 			esVersion: version.MustNew("7.0.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"append": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"append": map[string]any{
 							"field":            "related.hosts",
 							"value":            "{{host.hostname}}",
 							"allow_duplicates": false,
@@ -1267,10 +1260,10 @@ func TestReplaceAlternativeFlowProcessors(t *testing.T) {
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"append": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"append": map[string]any{
 							"field": "related.hosts",
 							"value": "{{host.hostname}}",
 							"if":    "ctx?.host?.hostname != null && ((ctx?.related?.hosts instanceof List && !ctx?.related?.hosts.contains(ctx?.host?.hostname)) || ctx?.related?.hosts != ctx?.host?.hostname)",
@@ -1283,44 +1276,44 @@ func TestReplaceAlternativeFlowProcessors(t *testing.T) {
 		{
 			name:      "Remove leftover foreach processor",
 			esVersion: version.MustNew("7.0.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"foreach": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"foreach": map[string]any{
 							"field": "foo",
-							"processor": map[string]interface{}{
-								"community_id": map[string]interface{}{},
+							"processor": map[string]any{
+								"community_id": map[string]any{},
 							},
 						},
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}(nil),
+			expected: map[string]any{
+				"processors": []any(nil),
 			},
 			isErrExpected: false,
 		},
 		{
 			name:      "nested",
 			esVersion: version.MustNew("7.0.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}(nil),
-				"on_failure": []interface{}{
-					map[string]interface{}{
-						"foreach": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any(nil),
+				"on_failure": []any{
+					map[string]any{
+						"foreach": map[string]any{
 							"field": "foo",
-							"processor": map[string]interface{}{
-								"append": map[string]interface{}{
+							"processor": map[string]any{
+								"append": map[string]any{
 									"field":            "related.hosts",
 									"value":            "{{host.hostname}}",
 									"allow_duplicates": false,
 									"if":               "ctx?.host?.hostname != null",
-									"on_failure": []interface{}{
-										map[string]interface{}{
-											"community_id": map[string]interface{}{},
+									"on_failure": []any{
+										map[string]any{
+											"community_id": map[string]any{},
 										},
-										map[string]interface{}{
-											"append": map[string]interface{}{
+										map[string]any{
+											"append": map[string]any{
 												"field": "error.message",
 												"value": "panic",
 											},
@@ -1332,20 +1325,20 @@ func TestReplaceAlternativeFlowProcessors(t *testing.T) {
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}(nil),
-				"on_failure": []interface{}{
-					map[string]interface{}{
-						"foreach": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any(nil),
+				"on_failure": []any{
+					map[string]any{
+						"foreach": map[string]any{
 							"field": "foo",
-							"processor": map[string]interface{}{
-								"append": map[string]interface{}{
+							"processor": map[string]any{
+								"append": map[string]any{
 									"field": "related.hosts",
 									"value": "{{host.hostname}}",
 									"if":    "ctx?.host?.hostname != null && ((ctx?.related?.hosts instanceof List && !ctx?.related?.hosts.contains(ctx?.host?.hostname)) || ctx?.related?.hosts != ctx?.host?.hostname)",
-									"on_failure": []interface{}{
-										map[string]interface{}{
-											"append": map[string]interface{}{
+									"on_failure": []any{
+										map[string]any{
+											"append": map[string]any{
 												"field": "error.message",
 												"value": "panic",
 											},
@@ -1362,7 +1355,6 @@ func TestReplaceAlternativeFlowProcessors(t *testing.T) {
 	}
 
 	for _, test := range cases {
-		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logptest.NewTestingLogger(t, logName))
@@ -1380,24 +1372,24 @@ func TestRemoveDescription(t *testing.T) {
 	cases := []struct {
 		name          string
 		esVersion     *version.V
-		content       map[string]interface{}
-		expected      map[string]interface{}
+		content       map[string]any
+		expected      map[string]any
 		isErrExpected bool
 	}{
 		{
 			name:      "ES < 7.9.0",
 			esVersion: version.MustNew("7.8.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"set": map[string]any{
 							"field":       "rule.name",
 							"value":       "{{panw.panos.ruleset}}",
 							"description": "This is a description",
 						},
 					},
-					map[string]interface{}{
-						"script": map[string]interface{}{
+					map[string]any{
+						"script": map[string]any{
 							"source":      "abcd",
 							"lang":        "painless",
 							"description": "This is a description",
@@ -1405,16 +1397,16 @@ func TestRemoveDescription(t *testing.T) {
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"set": map[string]any{
 							"field": "rule.name",
 							"value": "{{panw.panos.ruleset}}",
 						},
 					},
-					map[string]interface{}{
-						"script": map[string]interface{}{
+					map[string]any{
+						"script": map[string]any{
 							"source": "abcd",
 							"lang":   "painless",
 						},
@@ -1426,10 +1418,10 @@ func TestRemoveDescription(t *testing.T) {
 		{
 			name:      "ES == 7.9.0",
 			esVersion: version.MustNew("7.9.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"set": map[string]any{
 							"field":       "rule.name",
 							"value":       "{{panw.panos.ruleset}}",
 							"description": "This is a description",
@@ -1437,10 +1429,10 @@ func TestRemoveDescription(t *testing.T) {
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"set": map[string]any{
 							"field":       "rule.name",
 							"value":       "{{panw.panos.ruleset}}",
 							"description": "This is a description",
@@ -1453,10 +1445,10 @@ func TestRemoveDescription(t *testing.T) {
 		{
 			name:      "ES > 7.9.0",
 			esVersion: version.MustNew("8.0.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+			content: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"set": map[string]any{
 							"field":       "rule.name",
 							"value":       "{{panw.panos.ruleset}}",
 							"description": "This is a description",
@@ -1464,10 +1456,10 @@ func TestRemoveDescription(t *testing.T) {
 					},
 				},
 			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+			expected: map[string]any{
+				"processors": []any{
+					map[string]any{
+						"set": map[string]any{
 							"field":       "rule.name",
 							"value":       "{{panw.panos.ruleset}}",
 							"description": "This is a description",
@@ -1480,7 +1472,6 @@ func TestRemoveDescription(t *testing.T) {
 	}
 
 	for _, test := range cases {
-		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 			err := AdaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logptest.NewTestingLogger(t, logName))

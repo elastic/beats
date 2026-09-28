@@ -31,7 +31,7 @@ var doMetadataFetcher = provider{
 	DefaultEnabled: true,
 
 	Create: func(provider string, config *conf.C) (metadataFetcher, error) {
-		doSchema := func(m map[string]interface{}) mapstr.M {
+		doSchema := func(m map[string]any) mapstr.M {
 			m["serviceName"] = "Droplets"
 			out, _ := s.Schema{
 				"instance": s.Object{

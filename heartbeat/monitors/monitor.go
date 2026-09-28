@@ -210,7 +210,7 @@ func newMonitorUnsafe(
 }
 
 func (m *Monitor) configHash() (uint64, error) {
-	unpacked := map[string]interface{}{}
+	unpacked := map[string]any{}
 	err := m.config.Unpack(unpacked)
 	if err != nil {
 		return 0, err

@@ -34,7 +34,7 @@ import (
 func TestMakeESClient(t *testing.T) {
 	t.Run("should not modify the timeout setting from original config", func(t *testing.T) {
 		origTimeout := 90
-		origCfg, _ := conf.NewConfigFrom(map[interface{}]interface{}{
+		origCfg, _ := conf.NewConfigFrom(map[any]any{
 			"hosts":    []string{"http://localhost:9200"},
 			"username": "anyuser",
 			"password": "anypwd",

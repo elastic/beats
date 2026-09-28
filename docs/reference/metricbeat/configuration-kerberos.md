@@ -32,7 +32,7 @@ output.elasticsearch.kerberos.config_path: "/etc/krb5.conf"
 output.elasticsearch.kerberos.realm: "ELASTIC.CO"
 ```
 
-The service principal name for the Elasticsearch instance is contructed from these options. Based on this configuration it is going to be `HTTP/my-elasticsearch.elastic.co@ELASTIC.CO`.
+The service principal name for the Elasticsearch instance is constructed from these options. Based on this configuration it is going to be `HTTP/my-elasticsearch.elastic.co@ELASTIC.CO`.
 
 
 ## Configuration options [_configuration_options_9]
@@ -42,7 +42,7 @@ You can specify the following options in the `kerberos` section of the `metricbe
 
 ### `enabled` [_enabled_9]
 
-The `enabled` setting can be used to enable the kerberos configuration by setting it to `false`. The default value is `true`.
+The `enabled` setting can be used to enable the kerberos configuration by setting it to `true`. The default value is `true`.
 
 ::::{note}
 Kerberos settings are disabled if either `enabled` is set to `false` or the `kerberos` section is missing.

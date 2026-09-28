@@ -19,7 +19,7 @@ import (
 
 type keyAssertion struct {
 	key       string
-	assertion func(v interface{}, key string)
+	assertion func(v any, key string)
 }
 
 func TestFetch(t *testing.T) {
@@ -35,8 +35,8 @@ func TestFetch(t *testing.T) {
 	}
 	assert.NotEmpty(t, events)
 
-	float64Assertion := func(f func(float64) bool) func(v interface{}, key string) {
-		return func(v interface{}, key string) {
+	float64Assertion := func(f func(float64) bool) func(v any, key string) {
+		return func(v any, key string) {
 			value, ok := v.(float64)
 			if !ok {
 				t.Fatalf("%v is not a float64, but %T", key, v)
@@ -46,8 +46,8 @@ func TestFetch(t *testing.T) {
 		}
 	}
 
-	int64Assertion := func(f func(int64) bool) func(v interface{}, key string) {
-		return func(v interface{}, key string) {
+	int64Assertion := func(f func(int64) bool) func(v any, key string) {
+		return func(v any, key string) {
 			value, ok := v.(int64)
 			if !ok {
 				t.Fatalf("%v is not a int64, but %T", key, v)

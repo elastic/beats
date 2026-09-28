@@ -1,6 +1,6 @@
 - name: users
   type: group
-  release: beta
+  release: ga
   description: >
     Logged-in user session data
   fields:

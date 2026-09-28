@@ -29,6 +29,8 @@ import (
 	"sync/atomic"
 	"time"
 
+	"go.uber.org/zap"
+
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -64,6 +66,8 @@ func configure(cfg *conf.C, logger *logp.Logger) (input.Input, error) {
 		return nil, err
 	}
 
+	kafka.SetSaramaLogger(logger.Named("kafka").WithOptions(zap.AddCallerSkip(1)))
+
 	saramaConfig, err := newSaramaConfig(config, logger)
 	if err != nil {
 		return nil, fmt.Errorf("initializing Sarama config: %w", err)
@@ -86,11 +90,17 @@ func (input *kafkaInput) Name() string { return pluginName }
 func (input *kafkaInput) Test(ctx input.TestContext) error {
 	client, err := sarama.NewClient(input.config.Hosts, input.saramaConfig)
 	if err != nil {
-		ctx.Logger.Error(err)
+		return fmt.Errorf("failed to create kafka client: %w", err)
 	}
+	defer func() {
+		if closeErr := client.Close(); closeErr != nil {
+			ctx.Logger.Errorw("error closing kafka client", "error", closeErr)
+		}
+	}()
+
 	topics, err := client.Topics()
 	if err != nil {
-		ctx.Logger.Error(err)
+		return fmt.Errorf("failed to list kafka topics: %w", err)
 	}
 
 	var missingTopics []string
@@ -196,17 +206,24 @@ func (input *kafkaInput) runConsumerGroup(log *logp.Logger, client beat.Client, 
 		log:                      log,
 	}
 
-	input.saramaWaitGroup.Add(1)
-	defer func() {
-		consumerGroup.Close()
-		input.saramaWaitGroup.Done()
-	}()
-
-	// Listen asynchronously to any errors during the consume process
+	var errorsWG sync.WaitGroup
+	errorsWG.Add(1)
 	go func() {
+		defer errorsWG.Done()
 		for err := range consumerGroup.Errors() {
 			log.Errorw("Error reading from kafka", "error", err)
 		}
+	}()
+
+	input.saramaWaitGroup.Add(1)
+	defer func() {
+		if err := consumerGroup.Close(); err != nil {
+			log.Errorw("Error closing kafka consumer group", "error", err)
+		}
+		// Close() closes the errors channel asynchronously; wait so this
+		// goroutine cannot outlive the input and keep logging.
+		errorsWG.Wait()
+		input.saramaWaitGroup.Done()
 	}()
 
 	err := consumerGroup.Consume(context, input.config.Topics, handler)
@@ -353,7 +370,40 @@ func (h *groupHandler) createReader(claim sarama.ConsumerGroupClaim) reader.Read
 	}
 }
 
+// deadlineReceiver receives from a Kafka message channel with an optional read
+// deadline. It is embedded by the message readers so the multiline timeout can
+// be enforced synchronously (no goroutine). The receive is a channel operation,
+// so deadlines are always honored.
+type deadlineReceiver struct {
+	reader.Deadline
+}
+
+// recv returns the next message from ch. With a deadline set it returns
+// timedOut=true if no message arrives in time, so callers can surface
+// reader.ErrReadDeadline instead of blocking.
+func (d *deadlineReceiver) recv(ch <-chan *sarama.ConsumerMessage) (msg *sarama.ConsumerMessage, ok bool, timedOut bool) {
+	// Fast path: a message is already buffered, so no timer is needed.
+	select {
+	case msg, ok = <-ch:
+		return msg, ok, false
+	default:
+	}
+
+	// Arm returns nil when no deadline is set, which never fires, so this select
+	// covers both the deadline and the plain blocking receive.
+	timeout := d.Arm()
+	defer d.Disarm()
+	select {
+	case msg, ok = <-ch:
+		return msg, ok, false
+	case <-timeout:
+		return nil, false, true
+	}
+}
+
 type recordReader struct {
+	deadlineReceiver
+
 	claim        sarama.ConsumerGroupClaim
 	groupHandler *groupHandler
 	log          *logp.Logger
@@ -364,7 +414,10 @@ func (m *recordReader) Close() error {
 }
 
 func (m *recordReader) Next() (reader.Message, error) {
-	msg, ok := <-m.claim.Messages()
+	msg, ok, timedOut := m.recv(m.claim.Messages())
+	if timedOut {
+		return reader.Message{}, reader.ErrReadDeadline
+	}
 	if !ok {
 		return reader.Message{}, io.EOF
 	}
@@ -377,6 +430,8 @@ func (m *recordReader) Next() (reader.Message, error) {
 }
 
 type listFromFieldReader struct {
+	deadlineReceiver
+
 	claim        sarama.ConsumerGroupClaim
 	groupHandler *groupHandler
 	buffer       []reader.Message
@@ -393,7 +448,10 @@ func (l *listFromFieldReader) Next() (reader.Message, error) {
 		return l.returnFromBuffer()
 	}
 
-	msg, ok := <-l.claim.Messages()
+	msg, ok, timedOut := l.recv(l.claim.Messages())
+	if timedOut {
+		return reader.Message{}, reader.ErrReadDeadline
+	}
 	if !ok {
 		return reader.Message{}, io.EOF
 	}

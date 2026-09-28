@@ -20,13 +20,15 @@ package kafka
 import (
 	"fmt"
 
+	"go.uber.org/zap"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/kafka"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/sarama"
 )
 
 const (
@@ -44,7 +46,7 @@ func makeKafka(
 	cfg *config.C,
 ) (outputs.Group, error) {
 	log := beat.Logger.Named(logSelector)
-	sarama.Logger = kafkaLogger{log: log}
+	kafka.SetSaramaLogger(log.WithOptions(zap.AddCallerSkip(1)))
 
 	log.Debug("initialize kafka output")
 

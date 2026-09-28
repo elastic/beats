@@ -49,14 +49,9 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/go-concert/unison"
 
 	// Add filebeat level processors
-	_ "github.com/elastic/beats/v7/filebeat/processor/add_kubernetes_metadata"
 	_ "github.com/elastic/beats/v7/libbeat/processors/decode_csv_fields"
-
-	// include all filebeat specific autodiscover features
-	_ "github.com/elastic/beats/v7/filebeat/autodiscover"
 )
 
 const pipelinesWarning = "Filebeat is unable to load the ingest pipelines for the configured" +
@@ -423,16 +418,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		panic(err) // loader detected invalid state.
 	}
 
-	var inputTaskGroup unison.TaskGroup
-	defer func() {
-		_ = inputTaskGroup.Stop()
-	}()
-
-	// Store needs to be fully configured at this point
-	if err := v2InputLoader.Init(&inputTaskGroup); err != nil {
-		fb.logger.Errorf("Failed to initialize the input managers: %v", err)
-		return err
-	}
+	defer v2InputLoader.Close()
 
 	inputLoader := channel.RunnerFactoryWithCommonInputSettings(b.Info, compat.Combine(
 		compat.RunnerFactory(inputInfo, b.Monitoring.InputsRegistry(), v2InputLoader),

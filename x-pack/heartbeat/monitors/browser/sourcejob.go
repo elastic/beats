@@ -165,6 +165,10 @@ func (sj *SourceJob) extraArgs(uiOrigin bool) []string {
 	}
 	// The remaining flags require Chromium, so skip them for API journeys.
 	if !sj.browserCfg.IsAPI() {
+		if len(sj.browserCfg.CertificateErrorSpkiAllowlist) > 0 {
+			extraArgs = append(extraArgs, "--certificate-error-spki-allowlist")
+			extraArgs = append(extraArgs, sj.browserCfg.CertificateErrorSpkiAllowlist...)
+		}
 		if sj.browserCfg.Sandbox {
 			extraArgs = append(extraArgs, "--sandbox")
 		}

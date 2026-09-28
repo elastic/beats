@@ -253,7 +253,7 @@ func BenchmarkGetFilesLiteralMidComponent(b *testing.B) {
 	perDir := max(benchTreeFileCount(b)/(topDirs*(1+siblingDirs)), 1)
 	writeN := func(tb testing.TB, dir, prefix string) {
 		require.NoError(tb, os.MkdirAll(dir, 0o770))
-		for k := 0; k < perDir; k++ {
+		for k := range perDir {
 			require.NoError(tb, os.WriteFile(
 				filepath.Join(dir, fmt.Sprintf("%s-%d.log", prefix, k)), []byte("x"), 0o660))
 		}
@@ -317,7 +317,7 @@ func BenchmarkGetFilesMixed(b *testing.B) {
 	perDir := max((total-structuredFiles)/(hostCount*(1+siblingDirs)), 1)
 	writeN := func(dir, prefix string) {
 		require.NoError(b, os.MkdirAll(dir, 0o770))
-		for k := 0; k < perDir; k++ {
+		for k := range perDir {
 			require.NoError(b, os.WriteFile(
 				filepath.Join(dir, fmt.Sprintf("%s-%d.log", prefix, k)), []byte("x"), 0o660))
 		}

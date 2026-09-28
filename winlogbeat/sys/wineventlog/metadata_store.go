@@ -278,11 +278,20 @@ func (s *PublisherMetadataStore) getEventMetadata(eventID uint16, version uint8,
 		return defaultEM
 	}
 
-	// If we couldn't get a message from the event handle use the one
-	// from the installed provider metadata.
-	if defaultEM != nil && em.MsgStatic == "" && em.MsgTemplate == nil {
-		em.MsgStatic = defaultEM.MsgStatic
-		em.MsgTemplate = defaultEM.MsgTemplate
+	// Prefer the message from the installed provider metadata over the one
+	// obtained from the event handle. The message from the event handle is
+	// built with EvtFormatMessageEvent, which only substitutes the insert
+	// placeholders that correspond to string parameters. Placeholders for
+	// non-string parameters (e.g. win:UInt32) are replaced by a zero value,
+	// permanently baking values like "(PID: 0)" into the cached message
+	// template. The provider metadata message is built with
+	// EvtFormatMessageId, which substitutes all placeholders verbatim.
+	//
+	// Assign both fields together: MsgStatic and MsgTemplate are mutually
+	// exclusive representations, and formatMessage prefers MsgStatic. Copying
+	// only one field would leave a stale event-handle message in place.
+	if defaultEM != nil && (defaultEM.MsgStatic != "" || defaultEM.MsgTemplate != nil) {
+		em.MsgStatic, em.MsgTemplate = defaultEM.MsgStatic, defaultEM.MsgTemplate
 	}
 
 	s.log.Debugw("Obtained unique event metadata from event handle. "+
@@ -628,7 +637,7 @@ func (c *publisherMetadataCache) close() error {
 // --- Template Funcs
 
 // eventParam return an event data value inside a text/template.
-func eventParam(items []interface{}, paramNumber int) (interface{}, error) {
+func eventParam(items []any, paramNumber int) (any, error) {
 	// Windows parameter values start at %1 so adjust index value by -1.
 	index := paramNumber - 1
 	if index < len(items) {

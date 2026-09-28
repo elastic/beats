@@ -224,7 +224,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var headers map[string]interface{}
+	var headers map[string]any
 	if len(h.includeHeaders) != 0 {
 		headers = getIncludedHeaders(r, h.includeHeaders)
 	}
@@ -349,7 +349,7 @@ func (h *handler) sendAPIErrorResponse(txID string, w http.ResponseWriter, r *ht
 	}
 	enc := json.NewEncoder(mw)
 	enc.SetEscapeHTML(false)
-	err := enc.Encode(map[string]interface{}{"message": apiError.Error()})
+	err := enc.Encode(map[string]any{"message": apiError.Error()})
 	if err != nil {
 		log.Debugw("Failed to write HTTP response.", "error", err, "client.address", r.RemoteAddr)
 	}
@@ -460,7 +460,7 @@ func decodeJSON(body io.Reader, prg *program) (objs []mapstr.M, err error) {
 			return nil, fmt.Errorf("malformed JSON object at stream position %d: %w", decoder.InputOffset(), err)
 		}
 
-		var obj interface{}
+		var obj any
 		if err = newJSONDecoder(bytes.NewReader(raw)).Decode(&obj); err != nil {
 			return nil, fmt.Errorf("malformed JSON object at stream position %d: %w", decoder.InputOffset(), err)
 		}
@@ -470,7 +470,7 @@ func decodeJSON(body io.Reader, prg *program) (objs []mapstr.M, err error) {
 			if err != nil {
 				return nil, err
 			}
-			if _, ok := obj.([]interface{}); ok {
+			if _, ok := obj.([]any); ok {
 				// Re-marshal to ensure the raw bytes agree with the constructed object.
 				// This is only necessary when the program constructs an array return.
 				raw, err = json.Marshal(obj)
@@ -481,9 +481,9 @@ func decodeJSON(body io.Reader, prg *program) (objs []mapstr.M, err error) {
 		}
 
 		switch v := obj.(type) {
-		case map[string]interface{}:
+		case map[string]any:
 			objs = append(objs, v)
-		case []interface{}:
+		case []any:
 			nobjs, err := decodeJSONArray(bytes.NewReader(raw))
 			if err != nil {
 				return nil, fmt.Errorf("recursive error %d: %w", decoder.InputOffset(), err)
@@ -592,14 +592,14 @@ func (a *numberAdapter) NativeToValue(value any) ref.Val {
 	return a.fallback.NativeToValue(value)
 }
 
-func (p *program) eval(obj interface{}) (interface{}, error) {
-	out, _, err := p.prg.Eval(map[string]interface{}{"obj": obj})
+func (p *program) eval(obj any) (any, error) {
+	out, _, err := p.prg.Eval(map[string]any{"obj": obj})
 	if err != nil {
 		err = lib.DecoratedError{AST: p.ast, Err: err}
 		return nil, fmt.Errorf("failed eval: %w", err)
 	}
 
-	v, err := out.ConvertToNative(reflect.TypeOf((*structpb.Value)(nil)))
+	v, err := out.ConvertToNative(reflect.TypeFor[*structpb.Value]())
 	if err != nil {
 		return nil, fmt.Errorf("failed proto conversion: %w", err)
 	}
@@ -634,12 +634,12 @@ func decodeJSONArray(raw *bytes.Reader) (objs []mapstr.M, err error) {
 			return nil, fmt.Errorf("malformed JSON object at stream position %d: %w", dec.InputOffset(), err)
 		}
 
-		var obj interface{}
+		var obj any
 		if err := newJSONDecoder(bytes.NewReader(raw)).Decode(&obj); err != nil {
 			return nil, fmt.Errorf("malformed JSON object at stream position %d: %w", dec.InputOffset(), err)
 		}
 
-		m, ok := obj.(map[string]interface{})
+		m, ok := obj.(map[string]any)
 		if ok {
 			objs = append(objs, m)
 		}

@@ -2997,7 +2997,7 @@ func TestToFileDescriptor_TooSmallFile_NoFileOpen(t *testing.T) {
 		"expected errFileTooSmall, it probably tried to open the file")
 }
 
-// TestToFileDescriptor_GrowingLifecycle tests the Enhanced Fingerprint
+// TestToFileDescriptor_GrowingLifecycle tests the growing fingerprint
 // lifecycle through the scanner:
 //
 //  1. small file (below offset+length) under growing mode → raw-hex
@@ -3264,8 +3264,7 @@ func TestGetFiles_DuplicateFingerprint(t *testing.T) {
 	}
 }
 
-// TestGetFiles_DuplicateFingerprintAllocBudget asserts only dedup winners encode the bridging raw
-// header; a stray encode is invisible to a behavior test, so bound the growing-vs-static delta.
+// TestGetFiles_DuplicateFingerprintAllocBudget bounds the extra allocations.
 func TestGetFiles_DuplicateFingerprintAllocBudget(t *testing.T) {
 	dir := t.TempDir()
 	glob := writeBenchmarkDuplicateFiles(t, dir, benchmarkFileCount)
@@ -3290,12 +3289,12 @@ func TestGetFiles_DuplicateFingerprintAllocBudget(t *testing.T) {
 	staticAllocs := measure(false)
 	delta := growingAllocs - staticAllocs
 
-	// Budget one alloc per file: far below the ~2*benchmarkFileCount per-duplicate cost, above noise.
-	const budget = float64(benchmarkFileCount)
-	assert.Less(t, delta, budget,
-		"growing mode must not re-encode the bridging raw header per dropped "+
-			"duplicate: growing=%.0f static=%.0f delta=%.0f allocs exceeds "+
-			"budget=%.0f", growingAllocs, staticAllocs, delta, budget)
+	// One dedup winner encodes one header, so the delta is one allocation.
+	// The slack absorbs the noise of process-wide malloc counting.
+	const allocBudget = 10
+	assert.LessOrEqualf(t, delta, float64(allocBudget),
+		"growing mode must encode the bridging header once per scan, not once per duplicate: growing=%.1f static=%.1f allocs/scan over %d files",
+		growingAllocs, staticAllocs, benchmarkFileCount)
 }
 
 func BenchmarkToFileDescriptor(b *testing.B) {

@@ -62,7 +62,7 @@ type Channels struct {
 }
 
 // eventMapping maps a channel to a Metricbeat event
-func eventMapping(content map[string]interface{}) (mb.Event, error) {
+func eventMapping(content map[string]any) (mb.Event, error) {
 	fields, err := channelSchema.Apply(content)
 	if err != nil {
 		return mb.Event{}, fmt.Errorf("error applying channels schema: %w", err)
@@ -96,7 +96,7 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 				maxSubSeq = sub.LastSent
 			}
 		}
-		chWrapper := map[string]interface{}{
+		chWrapper := map[string]any{
 			"cluster_id": channelsIn.ClusterID,
 			"server_id":  channelsIn.ServerID,
 			"name":       ch.Name,

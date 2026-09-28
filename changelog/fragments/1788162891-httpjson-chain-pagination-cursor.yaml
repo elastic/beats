@@ -1,0 +1,9 @@
+kind: bug-fix
+summary: Prevent httpjson chain pagination from advancing the cursor when a chained request fails.
+description: |
+  When a paginated httpjson root request drives chain steps, a transient chain
+  failure (timeout, 502, connection reset) was logged and ignored after the
+  page cursor had already been committed. Later intervals then skipped the
+  failed page's chain data. The interval now fails and the cursor stays on the
+  last successfully chained page so the next run retries it.
+component: filebeat

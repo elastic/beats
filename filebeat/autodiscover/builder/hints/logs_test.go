@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/testing/testutils"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -1508,4 +1509,307 @@ func logsTestKeystore(t *testing.T, path, secret string) keystore.Keystore {
 	require.NoError(t, w.Store("PASSWORD", []byte(secret)))
 	require.NoError(t, w.Save())
 	return ks
+}
+
+func TestInputAllowListDisabled(t *testing.T) {
+	tests := []struct {
+		name           string
+		inputAllowList mapstr.M
+	}{
+		{
+			name: "empty",
+		},
+		{
+			name: "explicitly disabled",
+			inputAllowList: mapstr.M{
+				"enabled": false,
+				"types":   []string{"filestream"},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			builder := newInputAllowListTestBuilder(t, test.inputAllowList)
+
+			configs := builder.CreateConfig(inputAllowListRawEvent(
+				`[{"type":"httpjson"}]`,
+			))
+
+			requireInputTypes(
+				t,
+				configs,
+				[]string{"httpjson"},
+				"disabled filtering should retain the disallowed input",
+			)
+		})
+	}
+}
+
+func TestInputAllowListDefaultTypes(t *testing.T) {
+	tests := []struct {
+		name           string
+		inputAllowList mapstr.M
+	}{
+		{
+			name: "omitted types",
+			inputAllowList: mapstr.M{
+				"enabled": true,
+			},
+		},
+		{
+			name: "empty types",
+			inputAllowList: mapstr.M{
+				"enabled": true,
+				"types":   []string{},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			builder := newInputAllowListTestBuilder(t, test.inputAllowList)
+
+			configs := builder.CreateConfig(inputAllowListRawEvent(
+				`[{"type":"log"},{"type":"filestream"},{"type":"container"}]`,
+			))
+
+			requireInputTypes(
+				t,
+				configs,
+				[]string{"log", "filestream", "container"},
+				"default input types should preserve their raw configuration order",
+			)
+		})
+	}
+}
+
+func TestInputAllowListCustomTypesReplaceDefaults(t *testing.T) {
+	builder := newInputAllowListTestBuilder(
+		t,
+		mapstr.M{
+			"enabled": true,
+			"types":   []string{"httpjson"},
+		},
+	)
+
+	configs := builder.CreateConfig(inputAllowListRawEvent(
+		`[{"type":"httpjson"},{"type":"filestream"}]`,
+	))
+
+	requireInputTypes(
+		t,
+		configs,
+		[]string{"httpjson"},
+		"a custom allowed direct input should be retained",
+	)
+}
+
+func TestInputAllowListFiltersMixedRawConfigs(t *testing.T) {
+	builder := newInputAllowListTestBuilder(t, mapstr.M{"enabled": true})
+
+	configs := builder.CreateConfig(inputAllowListRawEvent(
+		`[{"type":"filestream"},{"type":"httpjson"},{"type":"container"}]`,
+	))
+
+	requireInputTypes(
+		t,
+		configs,
+		[]string{"filestream", "container"},
+		"mixed raw configurations should retain only valid allowed entries",
+	)
+}
+
+func TestInputAllowListFiltersAfterTemplateInterpolation(t *testing.T) {
+	builder := newInputAllowListTestBuilder(
+		t,
+		mapstr.M{
+			"enabled": true,
+			"types":   []string{"httpjson"},
+		})
+
+	event := inputAllowListRawEvent(
+		`[{"type":"${data.input_type}"},{"type":"foo"}]`,
+	)
+	event["input_type"] = "httpjson"
+
+	configs := builder.CreateConfig(event)
+
+	requireInputTypes(
+		t,
+		configs,
+		[]string{"httpjson"},
+		"the rendered input type should be checked",
+	)
+}
+
+func TestInputAllowListEnforcesModuleFilesetTypes(t *testing.T) {
+	tests := []struct {
+		name         string
+		module       mapstr.M
+		wantFilesets []string
+	}{
+		{
+			name: "allowed fileset input types",
+			module: mapstr.M{
+				"module": "apache",
+				"access": mapstr.M{
+					"enabled": true,
+					"input":   mapstr.M{"type": "filestream"},
+				},
+				"error": mapstr.M{
+					"enabled": true,
+					"input":   mapstr.M{"type": "container"},
+				},
+			},
+			wantFilesets: []string{"access", "error"},
+		},
+		{
+			name: "disallowed fileset is removed",
+			module: mapstr.M{
+				"module": "apache",
+				"access": mapstr.M{
+					"enabled": true,
+					"input":   mapstr.M{"type": "filestream"},
+				},
+				"error": mapstr.M{
+					"enabled": true,
+					"input":   mapstr.M{"type": "httpjson"},
+				},
+			},
+			wantFilesets: []string{"access"},
+		},
+		{
+			name: "module is rejected when its only fileset has no input type",
+			module: mapstr.M{
+				"module": "apache",
+				"access": mapstr.M{
+					"enabled": true,
+					"input":   mapstr.M{"paths": []string{"/var/log/apache/access.log"}},
+				},
+			},
+		},
+		{
+			name: "module is rejected when its only fileset has an unreadable input type",
+			module: mapstr.M{
+				"module": "apache",
+				"access": mapstr.M{
+					"enabled": true,
+					"input":   mapstr.M{"type": mapstr.M{"invalid": true}},
+				},
+			},
+		},
+		{
+			name: "module is rejected when all filesets are disallowed",
+			module: mapstr.M{
+				"module": "apache",
+				"access": mapstr.M{
+					"enabled": true,
+					"input":   mapstr.M{"type": "httpjson"},
+				},
+				"error": mapstr.M{
+					"enabled": true,
+					"input":   mapstr.M{"type": "cel"},
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			builder := newInputAllowListTestBuilder(t, mapstr.M{"enabled": true})
+			config := conf.MustNewConfigFrom(test.module)
+
+			configs := builder.applyConfigTemplate(bus.Event{}, []*conf.C{config})
+
+			if len(test.wantFilesets) == 0 {
+				assert.Empty(t, configs, "a module without allowed filesets should be rejected")
+				return
+			}
+
+			require.Len(t, configs, 1, "a module with allowed filesets should be retained")
+			var gotFilesets []string
+			for _, name := range configs[0].GetFields() {
+				switch name {
+				case "module", "enabled", "path":
+					continue
+				}
+				gotFilesets = append(gotFilesets, name)
+			}
+			assert.ElementsMatch(t, test.wantFilesets, gotFilesets,
+				"the retained module should contain only allowed filesets")
+		})
+	}
+}
+
+func TestInputAllowListRejectsMissingOrUnreadableDirectType(t *testing.T) {
+	tests := []struct {
+		name   string
+		config mapstr.M
+	}{
+		{
+			name:   "missing type",
+			config: mapstr.M{"paths": []string{"/var/log/app.log"}},
+		},
+		{
+			name:   "unreadable type",
+			config: mapstr.M{"type": mapstr.M{"invalid": true}},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			builder := newInputAllowListTestBuilder(t, mapstr.M{"enabled": true})
+			config := conf.MustNewConfigFrom(test.config)
+
+			configs := builder.applyConfigTemplate(bus.Event{}, []*conf.C{config})
+
+			assert.Empty(t, configs, "missing or unreadable direct input types should be rejected")
+		})
+	}
+}
+
+func newInputAllowListTestBuilder(
+	t *testing.T,
+	inputAllowList mapstr.M,
+) *logHints {
+	t.Helper()
+
+	userConfig := mapstr.M{}
+	if inputAllowList != nil {
+		userConfig["input_allow_list"] = inputAllowList
+	}
+
+	cfg := defaultConfig()
+	require.NoError(
+		t,
+		conf.MustNewConfigFrom(userConfig).Unpack(&cfg),
+		"input allow list builder config should unpack",
+	)
+
+	return &logHints{config: &cfg, log: logp.NewNopLogger()}
+}
+
+func inputAllowListRawEvent(raw string) bus.Event {
+	return bus.Event{
+		"host": "1.2.3.4",
+		"hints": mapstr.M{
+			"logs": mapstr.M{
+				"raw": raw,
+			},
+		},
+	}
+}
+
+func requireInputTypes(t *testing.T, configs []*conf.C, expected []string, message string) {
+	t.Helper()
+
+	types := make([]string, 0, len(configs))
+	for _, config := range configs {
+		inputType, err := config.String("type", -1)
+		require.NoError(t, err, "retained input configuration should have a readable type")
+		types = append(types, inputType)
+	}
+
+	require.Equal(t, expected, types, message)
 }

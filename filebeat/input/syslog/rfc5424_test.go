@@ -244,7 +244,7 @@ func TestRfc5424ParseStructuredData(t *testing.T) {
 func createVersionTestRule(v int, success bool) testRule {
 	rule := testRule{
 		title: fmt.Sprintf("versionTest v:%d", v),
-		log:   []byte(fmt.Sprintf(VersionTestTemplate, v)),
+		log:   fmt.Appendf(nil, VersionTestTemplate, v),
 		syslog: event{
 			priority:   34,
 			version:    v,
@@ -275,7 +275,7 @@ func createVersionTestRule(v int, success bool) testRule {
 func createPriorityTestRule(v int, success bool) testRule {
 	rule := testRule{
 		title: fmt.Sprintf("priorityTest v:%d", v),
-		log:   []byte(fmt.Sprintf(PriorityTestTemplate, v)),
+		log:   fmt.Appendf(nil, PriorityTestTemplate, v),
 		syslog: event{
 			priority:   v,
 			version:    1,

@@ -88,10 +88,15 @@ func readPIDNsInode() (uint64, error) {
 // NewProvider returns a new instance of kerneltracingprovider
 func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Registry) (provider.Provider, error) {
 	attr := quark.DefaultQueueAttr()
-	attr.Flags = quark.QQ_ALL_BACKENDS | quark.QQ_ENTRY_LEADER
+	attr.Flags = quark.QQ_EBPF | quark.QQ_ENTRY_LEADER
 	qq, err := quark.OpenQueue(attr)
 	if err != nil {
-		return nil, fmt.Errorf("open queue: %w", err)
+		logger.Warnw("failed to use ebpf, attempting to use kprobe", "error", err)
+		attr.Flags = quark.QQ_KPROBE | quark.QQ_ENTRY_LEADER
+		qq, err = quark.OpenQueue(attr)
+		if err != nil {
+			return nil, fmt.Errorf("open queue: %w", err)
+		}
 	}
 
 	procMetrics := NewStats(reg)
@@ -489,13 +494,11 @@ func setSameAsProcess(process *types.Process) {
 // This is a globally unique identifier for the process.
 func calculateEntityIDv1(pid uint32, startTime time.Time) string {
 	return base64.StdEncoding.EncodeToString(
-		[]byte(
-			fmt.Sprintf("%d__%s__%d__%d",
-				pidNsInode,
-				bootID,
-				uint64(pid),
-				uint64(startTime.Unix()), //nolint:gosec // process start times are always positive
-			),
+		fmt.Appendf(nil, "%d__%s__%d__%d",
+			pidNsInode,
+			bootID,
+			uint64(pid),
+			uint64(startTime.Unix()), //nolint:gosec // process start times are always positive
 		),
 	)
 }

@@ -1,0 +1,6 @@
+################### Mockbeat Configuration Example #########################
+
+############################# Mockbeat ######################################
+mockbeat:
+
+hostname: config-hostname

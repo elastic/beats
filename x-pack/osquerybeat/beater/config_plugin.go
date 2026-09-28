@@ -26,7 +26,7 @@ const (
 
 // nativeOsqueryOptionDefaults are applied to the options map when building the
 // config for osqueryd, only when each key is not already set in the native config.
-var nativeOsqueryOptionDefaults = map[string]interface{}{
+var nativeOsqueryOptionDefaults = map[string]any{
 	"schedule_splay_percent": 10,
 	"schedule_max_drift":     60,
 }
@@ -234,7 +234,7 @@ func newOsqueryConfig(osqueryConfig *config.OsqueryConfig) *config.OsqueryConfig
 		osqueryConfig = &config.OsqueryConfig{}
 	}
 	if osqueryConfig.Options == nil {
-		osqueryConfig.Options = make(map[string]interface{})
+		osqueryConfig.Options = make(map[string]any)
 	}
 	// Apply native osquery option defaults only when not already set in config
 	for k, v := range nativeOsqueryOptionDefaults {
@@ -416,7 +416,7 @@ func getPackQueryName(packName, queryName string) string {
 // Due to current configuration passing between the agent and beats the keys that contain dots (".")
 // are split into the nested tree-like structure.
 // This converts this dynamic map[string]interface{} tree into strongly typed flat map.
-func flattenECSMapping(m map[string]interface{}) (ecs.Mapping, error) {
+func flattenECSMapping(m map[string]any) (ecs.Mapping, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -433,7 +433,7 @@ func flattenECSMapping(m map[string]interface{}) (ecs.Mapping, error) {
 	return ecsm, nil
 }
 
-func traverseTree(depth int, ecsm ecs.Mapping, path []string, v interface{}) error {
+func traverseTree(depth int, ecsm ecs.Mapping, path []string, v any) error {
 
 	if path[len(path)-1] == keyField {
 		if s, ok := v.(string); ok {
@@ -462,7 +462,7 @@ func traverseTree(depth int, ecsm ecs.Mapping, path []string, v interface{}) err
 			Value: v,
 		}
 		return nil
-	} else if m, ok := v.(map[string]interface{}); ok {
+	} else if m, ok := v.(map[string]any); ok {
 		if depth < maxECSMappingDepth {
 			for k, v := range m {
 				if strings.TrimSpace(k) == "" {

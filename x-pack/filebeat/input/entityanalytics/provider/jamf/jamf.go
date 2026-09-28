@@ -137,9 +137,13 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 		case <-syncTimer.C:
 			start := time.Now()
 			if err := p.runFullSync(inputCtx, store, client); err != nil {
-				msg := "Error running full sync"
-				p.logger.Errorw(msg, "error", err)
-				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				if provider.SyncInterrupted(inputCtx, err) {
+					p.logger.Infow(provider.SyncInterruptedMsg, "error", err)
+				} else {
+					msg := "Error running full sync"
+					p.logger.Errorw(msg, "error", err)
+					inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				}
 				p.metrics.syncError.Inc()
 			} else {
 				inputCtx.UpdateStatus(status.Running, "Successful full sync")
@@ -161,9 +165,13 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 		case <-updateTimer.C:
 			start := time.Now()
 			if err := p.runIncrementalUpdate(inputCtx, store, client); err != nil {
-				msg := "Error running incremental update"
-				p.logger.Errorw(msg, "error", err)
-				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				if provider.SyncInterrupted(inputCtx, err) {
+					p.logger.Infow(provider.SyncInterruptedMsg, "error", err)
+				} else {
+					msg := "Error running incremental update"
+					p.logger.Errorw(msg, "error", err)
+					inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				}
 				p.metrics.updateError.Inc()
 			} else {
 				inputCtx.UpdateStatus(status.Running, "Successful incremental update")
@@ -273,10 +281,10 @@ func newRetryLog(log *logp.Logger) *retryLog {
 	return &retryLog{log: log.Named("retryablehttp").WithOptions(zap.AddCallerSkip(1))}
 }
 
-func (l *retryLog) Error(msg string, kv ...interface{}) { l.log.Errorw(msg, kv...) }
-func (l *retryLog) Info(msg string, kv ...interface{})  { l.log.Infow(msg, kv...) }
-func (l *retryLog) Debug(msg string, kv ...interface{}) { l.log.Debugw(msg, kv...) }
-func (l *retryLog) Warn(msg string, kv ...interface{})  { l.log.Warnw(msg, kv...) }
+func (l *retryLog) Error(msg string, kv ...any) { l.log.Errorw(msg, kv...) }
+func (l *retryLog) Info(msg string, kv ...any)  { l.log.Infow(msg, kv...) }
+func (l *retryLog) Debug(msg string, kv ...any) { l.log.Debugw(msg, kv...) }
+func (l *retryLog) Warn(msg string, kv ...any)  { l.log.Warnw(msg, kv...) }
 
 // runFullSync performs a full synchronization. It will fetch user and group
 // identities from Azure Active Directory, enrich users with group memberships,

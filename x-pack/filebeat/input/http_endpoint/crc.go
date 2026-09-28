@@ -74,7 +74,7 @@ func validateZoomCRC(crc *crcValidator, obj mapstr.M) (status int, resp string, 
 		return 0, "", errNotCRC
 	}
 
-	payload, ok := obj["payload"].(map[string]interface{})
+	payload, ok := obj["payload"].(map[string]any)
 	if !ok {
 		return 0, "", errNotCRC
 	}
