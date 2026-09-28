@@ -21,9 +21,10 @@ description: >
   "x-ms-ratelimit-microsoft.*-retry-after" headers, which the Azure SDK retry
   policy ignores, so a throttled fetch used to fail after a few seconds of
   backoff and, with no cursor and a 1440m period, the whole day of billing data
-  was lost. The hint is now translated into the standard Retry-After header, the
-  retry budget was raised so a per-minute quota window can clear (up to 5
-  retries, 10s base delay, 5m cap), and every request carries a ClientType
+  was lost. The longest wait advertised by those hints or by the standard
+  Retry-After headers is now honoured before retrying, the retry budget was
+  raised so a per-minute quota window can clear (up to 5 retries, 10s base
+  delay, 5m cap), and every request carries a ClientType
   header so the calls no longer share the default Cost Management quota pool
   with all unidentified callers in the tenant.
 

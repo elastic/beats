@@ -190,31 +190,86 @@ func TestRetryAfterTranslationPolicy(t *testing.T) {
 			wantRetryAfter: "90",
 		},
 		{
-			name:   "an existing Retry-After is not overwritten",
+			name:   "a longer vendor hint beats a shorter Retry-After",
 			status: http.StatusTooManyRequests,
 			headers: map[string]string{
 				"Retry-After": "5",
 				"x-ms-ratelimit-microsoft.costmanagement-qpu-retry-after": "120",
 			},
-			wantRetryAfter: "5",
+			wantRetryAfter: "120",
 		},
 		{
-			name:   "an existing x-ms-retry-after-ms is not overwritten",
+			name:   "a longer vendor hint beats a shorter x-ms-retry-after-ms",
 			status: http.StatusTooManyRequests,
 			headers: map[string]string{
-				"x-ms-retry-after-ms": "1500",
+				"X-Ms-Retry-After-Ms": "1500",
 				"x-ms-ratelimit-microsoft.costmanagement-qpu-retry-after": "120",
 			},
-			wantNoRetryAfter: true,
+			wantRetryAfter: "120",
 		},
 		{
-			name:   "an existing Retry-After-Ms is not overwritten",
+			name:   "a longer vendor hint beats a shorter Retry-After-Ms",
 			status: http.StatusTooManyRequests,
 			headers: map[string]string{
 				"Retry-After-Ms": "1500",
 				"x-ms-ratelimit-microsoft.costmanagement-qpu-retry-after": "120",
 			},
-			wantNoRetryAfter: true,
+			wantRetryAfter: "120",
+		},
+		{
+			name:   "a longer Retry-After beats a shorter vendor hint",
+			status: http.StatusTooManyRequests,
+			headers: map[string]string{
+				"Retry-After": "200",
+				"x-ms-ratelimit-microsoft.costmanagement-qpu-retry-after": "10",
+			},
+			wantRetryAfter: "200",
+		},
+		{
+			name:   "a longer x-ms-retry-after-ms beats a shorter vendor hint",
+			status: http.StatusTooManyRequests,
+			headers: map[string]string{
+				"X-Ms-Retry-After-Ms": "90000",
+				"x-ms-ratelimit-microsoft.costmanagement-qpu-retry-after": "10",
+			},
+			wantRetryAfter: "90",
+		},
+		{
+			// azcore alone would pick Retry-After-Ms, the first header in its order.
+			name:   "the longest standard hint wins, not the first one azcore reads",
+			status: http.StatusTooManyRequests,
+			headers: map[string]string{
+				"Retry-After-Ms": "100",
+				"Retry-After":    "60",
+			},
+			wantRetryAfter: "60",
+		},
+		{
+			name:           "a lone millisecond hint is rounded up into Retry-After",
+			status:         http.StatusTooManyRequests,
+			headers:        map[string]string{"X-Ms-Retry-After-Ms": "1500"},
+			wantRetryAfter: "2",
+		},
+		{
+			name:           "a Retry-After above the retry cap is clamped so azcore retries instead of giving up",
+			status:         http.StatusTooManyRequests,
+			headers:        map[string]string{"Retry-After": "600"},
+			wantRetryAfter: strconv.Itoa(int(billingMaxRetryDelay.Seconds())),
+		},
+		{
+			name:           "a Retry-After date is parsed",
+			status:         http.StatusTooManyRequests,
+			headers:        map[string]string{"Retry-After": time.Now().Add(time.Hour).UTC().Format(http.TimeFormat)},
+			wantRetryAfter: strconv.Itoa(int(billingMaxRetryDelay.Seconds())),
+		},
+		{
+			name:   "a Retry-After date in the past does not mask a vendor hint",
+			status: http.StatusTooManyRequests,
+			headers: map[string]string{
+				"Retry-After": time.Now().Add(-time.Hour).UTC().Format(http.TimeFormat),
+				"x-ms-ratelimit-microsoft.costmanagement-qpu-retry-after": "7",
+			},
+			wantRetryAfter: "7",
 		},
 		{
 			name:             "invalid values are ignored",
@@ -296,7 +351,13 @@ func TestRetryAfterTranslationPolicy(t *testing.T) {
 			}
 
 			require.True(t, found, "Retry-After must be set")
-			assert.Equal(t, test.wantRetryAfter, got)
+			assert.Equal(t, test.wantRetryAfter, got, "Retry-After must carry the longest hint")
+
+			// azcore reads these before Retry-After, so a leftover one would win.
+			for _, name := range []string{"Retry-After-Ms", "X-Ms-Retry-After-Ms"} {
+				value, found := headerValueInsensitive(resp.Header, name)
+				assert.False(t, found, "%s must be removed, got %q", name, value)
+			}
 		})
 	}
 }
@@ -393,6 +454,44 @@ func TestRetryAfterTranslationEndToEnd(t *testing.T) {
 		assert.True(t, found, "request %d must carry a %s header", i, clientTypeHeaderName)
 		assert.Equal(t, clientTypeHeaderValue, value, "request %d must identify this caller", i)
 	}
+}
+
+// TestLongestRetryHintWinsEndToEnd drives the billing pipeline against a transport
+// whose first 429 carries a short x-ms-retry-after-ms next to a longer Cost
+// Management hint. azcore reads the millisecond header first, so without the policy
+// it would retry after 10ms, long before the Cost Management quota has cleared.
+func TestLongestRetryHintWinsEndToEnd(t *testing.T) {
+	transport := &stubTransport{
+		responses: []cannedResponse{
+			{status: http.StatusTooManyRequests, headers: map[string]string{
+				"X-Ms-Retry-After-Ms": "10",
+				"x-ms-ratelimit-microsoft.costmanagement-qpu-retry-after": "1",
+			}},
+			{status: http.StatusOK},
+		},
+	}
+
+	clientOptions := newClientOptions(azure.Config{
+		ActiveDirectoryEndpoint: "https://login.microsoftonline.com/",
+	}, logptest.NewTestingLogger(t, ""))
+	clientOptions.Transport = transport
+
+	pipeline := runtime.NewPipeline("azurebillingtest", "v0.0.0", runtime.PipelineOptions{}, &clientOptions.ClientOptions)
+
+	req, err := runtime.NewRequest(context.Background(), http.MethodGet, testEndpoint)
+	require.NoError(t, err)
+
+	start := time.Now()
+	resp, err := pipeline.Do(req)
+	elapsed := time.Since(start)
+
+	require.NoError(t, err)
+	require.NotNil(t, resp)
+	defer resp.Body.Close()
+	assert.Equal(t, http.StatusOK, resp.StatusCode, "the retried request must succeed")
+	assert.Equal(t, 2, transport.requestCount(), "the throttled request must be retried exactly once")
+	assert.GreaterOrEqual(t, elapsed, 900*time.Millisecond,
+		"the retry must wait for the 1s Cost Management hint, not the 10ms x-ms-retry-after-ms")
 }
 
 // TestExponentialFallbackWithoutHint documents that a 429 carrying no usable hint
