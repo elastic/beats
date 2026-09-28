@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cgroup/cgcommon"
 	"github.com/elastic/elastic-agent-libs/opt"
@@ -121,7 +122,8 @@ func cpuStat(path string, cpu *CPUSubsystem) error {
 			cpu.Stats.Throttled.Periods = v
 
 		case "throttled_time":
-			cpu.Stats.Throttled.Us = v
+			// The kernel reports throttled_time in nanoseconds
+			cpu.Stats.Throttled.Us = v / uint64(time.Microsecond)
 		}
 	}
 
