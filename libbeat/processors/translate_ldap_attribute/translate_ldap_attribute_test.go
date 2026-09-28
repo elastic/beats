@@ -30,6 +30,60 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
+// TestConcurrentClientInitAndString exercises the race between String and the
+// lazy client initialization: ensureClient stores the discovered address and
+// base DN, while String reads the processor description. String is registered
+// on the processor logger via logp.Stringer, so it may be evaluated from any
+// goroutine while another initializes the client, because identically
+// configured processors are shared between inputs. Only meaningful under -race.
+func TestConcurrentClientInitAndString(t *testing.T) {
+	l := newFakeLDAPServer(t)
+
+	c := defaultConfig()
+	c.Field = "guid"
+	c.LDAPAddress = "ldap://" + l.Addr().String()
+	c.LDAPBaseDN = "dc=example,dc=com"
+	c.LDAPBindUser = "cn=admin,dc=example,dc=com"
+	c.LDAPBindPassword = "password"
+
+	p, err := newFromConfig(c, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+	defer p.Close()
+
+	done := make(chan struct{})
+	var readers sync.WaitGroup
+	for range 2 {
+		readers.Go(func() {
+			for {
+				select {
+				case <-done:
+					return
+				default:
+					_ = p.String()
+				}
+			}
+		})
+	}
+
+	var writers sync.WaitGroup
+	for range 4 {
+		writers.Go(func() {
+			for j := range 25 {
+				_, _ = p.ensureClient()
+				if j%5 == 4 {
+					// Drop the client so the next ensureClient
+					// reinitializes it and writes the discovered values again.
+					_ = p.Close()
+				}
+			}
+		})
+	}
+
+	writers.Wait()
+	close(done)
+	readers.Wait()
+}
+
 // newFakeLDAPServer starts a TCP listener that answers the initial LDAP bind
 // request on every connection with a canned success response. Together with a
 // configured base DN this is enough for newLDAPClient to succeed without a
@@ -67,62 +121,4 @@ func newFakeLDAPServer(t *testing.T) net.Listener {
 	}()
 
 	return l
-}
-
-// TestConcurrentClientInitAndString exercises the race between String and the
-// lazy client initialization: ensureClient stores the discovered address and
-// base DN, while String reads the processor description. String is registered
-// on the processor logger via logp.Stringer, so it may be evaluated from any
-// goroutine while another initializes the client, because identically
-// configured processors are shared between inputs. Only meaningful under -race.
-func TestConcurrentClientInitAndString(t *testing.T) {
-	l := newFakeLDAPServer(t)
-
-	c := defaultConfig()
-	c.Field = "guid"
-	c.LDAPAddress = "ldap://" + l.Addr().String()
-	c.LDAPBaseDN = "dc=example,dc=com"
-	c.LDAPBindUser = "cn=admin,dc=example,dc=com"
-	c.LDAPBindPassword = "password"
-
-	p, err := newFromConfig(c, logptest.NewTestingLogger(t, ""))
-	require.NoError(t, err)
-	defer p.Close()
-
-	done := make(chan struct{})
-	var readers sync.WaitGroup
-	for i := 0; i < 2; i++ {
-		readers.Add(1)
-		go func() {
-			defer readers.Done()
-			for {
-				select {
-				case <-done:
-					return
-				default:
-					_ = p.String()
-				}
-			}
-		}()
-	}
-
-	var writers sync.WaitGroup
-	for i := 0; i < 4; i++ {
-		writers.Add(1)
-		go func() {
-			defer writers.Done()
-			for j := 0; j < 25; j++ {
-				_, _ = p.ensureClient()
-				if j%5 == 4 {
-					// Drop the client so the next ensureClient
-					// reinitializes it and writes the discovered values again.
-					_ = p.Close()
-				}
-			}
-		}()
-	}
-
-	writers.Wait()
-	close(done)
-	readers.Wait()
 }
