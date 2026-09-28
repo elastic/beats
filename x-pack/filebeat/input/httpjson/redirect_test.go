@@ -438,7 +438,7 @@ func TestConvertHttpjsonToCel(t *testing.T) {
 	})
 
 	t.Run("realistic_full_config", func(t *testing.T) {
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{ //nolint:gosec // dummy credentials in a test fixture
+		cfg := conf.MustNewConfigFrom(map[string]any{ //nolint:gosec // dummy credentials in a test fixture
 			"type":        "httpjson",
 			"id":          "okta-system-log",
 			"interval":    "120s",
