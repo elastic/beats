@@ -80,6 +80,7 @@ var (
 	errNoInputRunner      = errors.New("no input runner available")
 )
 
+<<<<<<< HEAD
 // init initializes the state store
 // This function is called from:
 // 1. InputManager::Init on beat start
@@ -95,6 +96,35 @@ func (cim *InputManager) init(inputID string) error {
 		cim.DefaultCleanTimeout = 30 * time.Minute
 	}
 
+=======
+func (cim *InputManager) defaultCleanTimeout() time.Duration {
+	if cim.DefaultCleanTimeout <= 0 {
+		return 30 * time.Minute
+	}
+	return cim.DefaultCleanTimeout
+}
+
+// cacheKey identifies the cursor store for this input type and ID.
+// The key includes the type because each cursor store loads state for one type.
+func (cim *InputManager) cacheKey(inputID string) string {
+	return cim.StateStore.StoreKey(cim.Type, inputID) + "::" + cim.Type
+}
+
+// ensureSetup opens or reuses the store for inputID and returns its cache key.
+// Call ensureSetup without holding cim.mu.
+// It unlocks cim.mu before globalCache.Acquire, so Close can proceed while Acquire waits.
+func (cim *InputManager) ensureSetup(inputID string) (string, error) {
+	cim.mu.Lock()
+	if cim.closed {
+		cim.mu.Unlock()
+		return "", errors.New("input manager is closed")
+	}
+	key := cim.cacheKey(inputID)
+	if _, ok := cim.releases[key]; ok {
+		cim.mu.Unlock()
+		return key, nil
+	}
+>>>>>>> f32cdc9 (input-cursor: apply default clean timeout to every input (#53204))
 	log := cim.Logger.With("input_type", cim.Type)
 	var store *store
 	useES := features.IsElasticsearchStateStoreEnabledForInput(cim.Type)
@@ -162,7 +192,7 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	settings := struct {
 		ID            string        `config:"id"`
 		CleanInactive time.Duration `config:"clean_inactive"`
-	}{ID: "", CleanInactive: cim.DefaultCleanTimeout}
+	}{ID: "", CleanInactive: cim.defaultCleanTimeout()}
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
 	}
