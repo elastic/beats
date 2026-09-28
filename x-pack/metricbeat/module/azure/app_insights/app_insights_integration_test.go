@@ -16,7 +16,7 @@ import (
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
-var metrics = []map[string]interface{}{{
+var metrics = []map[string]any{{
 	"id": "requests/count",
 }}
 

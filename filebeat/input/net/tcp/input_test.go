@@ -32,8 +32,10 @@ import (
 	netinput "github.com/elastic/beats/v7/filebeat/input/net"
 	"github.com/elastic/beats/v7/filebeat/input/net/nettest"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/stretchr/testify/assert"
@@ -58,7 +60,7 @@ func TestInput(t *testing.T) {
 	v2Ctx := v2.Context{
 		ID:              t.Name(),
 		Cancelation:     ctx,
-		Logger:          logp.NewNopLogger(),
+		Logger:          logptest.NewTestingLogger(t, ""),
 		MetricsRegistry: monitoring.NewRegistry(),
 	}
 
@@ -100,6 +102,53 @@ func TestInput(t *testing.T) {
 	}
 }
 
+func TestInputStopsWhenPipelineIsBlocked(t *testing.T) {
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
+	serverAddr := ephemeralTCPAddr(t)
+	inp, err := configure(conf.MustNewConfigFrom(map[string]any{
+		"host": serverAddr,
+	}))
+	if err != nil {
+		t.Fatalf("cannot create input: %s", err)
+	}
+
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+	v2Ctx := v2.Context{
+		ID:              t.Name(),
+		Cancelation:     ctx,
+		Logger:          logp.NewNopLogger(),
+		MetricsRegistry: monitoring.NewRegistry(),
+	}
+
+	metrics := inp.InitMetrics("tcp", v2Ctx.MetricsRegistry, v2Ctx.Logger)
+	c := make(chan netinput.DataMetadata)
+
+	runReturned := make(chan struct{})
+	go func() {
+		defer close(runReturned)
+		if err := inp.Run(v2Ctx, c, metrics); err != nil {
+			if !errors.Is(err, context.Canceled) {
+				t.Errorf("input exited with error: %s", err)
+			}
+		}
+	}()
+
+	nettest.RunTCPClient(t, serverAddr, []string{"foo", "bar"})
+
+	nettest.RequireNetMetricsCount(t, v2Ctx.MetricsRegistry, 30*time.Second, 1, 0, 3)
+
+	cancel()
+
+	select {
+	case <-runReturned:
+	case <-t.Context().Done():
+		t.Fatal("input Run did not return before the test context was cancelled")
+	}
+}
+
 func BenchmarkInput(b *testing.B) {
 	serverAddr := ephemeralTCPAddr(b)
 
@@ -116,7 +165,7 @@ func BenchmarkInput(b *testing.B) {
 	v2Ctx := v2.Context{
 		ID:              b.Name(),
 		Cancelation:     ctx,
-		Logger:          logp.NewNopLogger(),
+		Logger:          logptest.NewTestingLogger(b, ""),
 		MetricsRegistry: monitoring.NewRegistry(),
 	}
 

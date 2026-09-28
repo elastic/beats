@@ -32,9 +32,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
 
-	"github.com/elastic/elastic-agent-autodiscover/bus"
-	"github.com/elastic/elastic-agent-autodiscover/docker"
-	"github.com/elastic/elastic-agent-autodiscover/utils"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/docker"
+	"github.com/elastic/beats/v7/pkg/autodiscover/utils"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -100,7 +100,7 @@ func AutodiscoverBuilder(
 		return nil, errWrap(fmt.Errorf("no configs or hints defined for autodiscover provider"))
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, nil, path)
+	builders, err := autodiscover.NewBuilders(logger, config.Builders, config.Hints, nil, path)
 	if err != nil {
 		return nil, errWrap(err)
 	}

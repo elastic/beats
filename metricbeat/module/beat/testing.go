@@ -18,8 +18,8 @@
 package beat
 
 // GetConfig for Metricbeat
-func GetConfig(metricset string, host string) map[string]interface{} {
-	return map[string]interface{}{
+func GetConfig(metricset string, host string) map[string]any {
+	return map[string]any{
 		"module":     ModuleName,
 		"metricsets": []string{metricset},
 		"hosts":      []string{host},

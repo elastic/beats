@@ -101,10 +101,10 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig(ts *simulator.Server) map[string]interface{} {
+func getConfig(ts *simulator.Server) map[string]any {
 	urlSimulator := ts.URL.Scheme + "://" + ts.URL.Host + ts.URL.Path
 
-	return map[string]interface{}{
+	return map[string]any{
 		"module":     "vsphere",
 		"metricsets": []string{"virtualmachine"},
 		"hosts":      []string{urlSimulator},

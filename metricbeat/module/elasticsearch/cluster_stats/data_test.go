@@ -115,8 +115,8 @@ func TestData(t *testing.T) {
 		t.Fatal("write", err)
 	}
 }
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string) map[string]any {
+	return map[string]any{
 		"module":     elasticsearch.ModuleName,
 		"metricsets": []string{"cluster_stats"},
 		"hosts":      []string{host},

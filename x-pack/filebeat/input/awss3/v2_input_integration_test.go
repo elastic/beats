@@ -80,14 +80,14 @@ func TestV2InputRunSQSOnLocalstack(t *testing.T) {
 		"testdata/log.txt",
 	)
 
-	sqsCfg := conf.MustNewConfigFrom(map[string]interface{}{
+	sqsCfg := conf.MustNewConfigFrom(map[string]any{
 		"queue_url":          queueURL,
 		"region":             region,
 		"endpoint":           "http://localhost:4566",
 		"number_of_workers":  1,
 		"visibility_timeout": "30s",
 		"path_style":         true,
-		"file_selectors": []map[string]interface{}{
+		"file_selectors": []map[string]any{
 			{
 				"regex":                        `events-array\.json$`,
 				"expand_event_list_from_field": "Events",
@@ -96,8 +96,8 @@ func TestV2InputRunSQSOnLocalstack(t *testing.T) {
 			{"regex": `\.(?:nd)?json(\.gz)?$`},
 			{
 				"regex": `multiline\.txt$`,
-				"parsers": []map[string]interface{}{
-					{"multiline": map[string]interface{}{
+				"parsers": []map[string]any{
+					{"multiline": map[string]any{
 						"pattern": "^<Event",
 						"negate":  true,
 						"match":   "after",
@@ -158,14 +158,14 @@ func TestV2InputRunS3PollingOnLocalstack(t *testing.T) {
 		"testdata/log.txt",
 	)
 
-	pollingCfg := conf.MustNewConfigFrom(map[string]interface{}{
+	pollingCfg := conf.MustNewConfigFrom(map[string]any{
 		"non_aws_bucket_name":  bucketName,
 		"region":               region,
 		"endpoint":             "http://localhost:4566",
 		"number_of_workers":    1,
 		"bucket_list_interval": "2s",
 		"path_style":           true,
-		"file_selectors": []map[string]interface{}{
+		"file_selectors": []map[string]any{
 			{
 				"regex":                        `events-array\.json$`,
 				"expand_event_list_from_field": "Events",
@@ -174,8 +174,8 @@ func TestV2InputRunS3PollingOnLocalstack(t *testing.T) {
 			{"regex": `\.(?:nd)?json(\.gz)?$`},
 			{
 				"regex": `multiline\.txt$`,
-				"parsers": []map[string]interface{}{
-					{"multiline": map[string]interface{}{
+				"parsers": []map[string]any{
+					{"multiline": map[string]any{
 						"pattern": "^<Event",
 						"negate":  true,
 						"match":   "after",
@@ -380,18 +380,18 @@ func newV2ContextWithRegistry(t *testing.T) (v2.Context, func()) {
 
 func enableV2(t *testing.T) {
 	t.Helper()
-	cfg := conf.MustNewConfigFrom(map[string]interface{}{
-		"features": map[string]interface{}{
-			"aws_s3_v2": map[string]interface{}{
+	cfg := conf.MustNewConfigFrom(map[string]any{
+		"features": map[string]any{
+			"aws_s3_v2": map[string]any{
 				"enabled": true,
 			},
 		},
 	})
 	require.NoError(t, features.UpdateFromConfig(cfg), "failed to enable V2 flag")
 	t.Cleanup(func() {
-		cfg := conf.MustNewConfigFrom(map[string]interface{}{
-			"features": map[string]interface{}{
-				"aws_s3_v2": map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]any{
+			"features": map[string]any{
+				"aws_s3_v2": map[string]any{
 					"enabled": false,
 				},
 			},

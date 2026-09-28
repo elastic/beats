@@ -11,10 +11,80 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
+
+type recordingClient struct {
+	events []beat.Event
+}
+
+func (c *recordingClient) Publish(event beat.Event) {
+	c.events = append(c.events, event)
+}
+
+func (c *recordingClient) PublishAll(events []beat.Event) {
+	c.events = append(c.events, events...)
+}
+
+func (c *recordingClient) Close() error {
+	return nil
+}
+
+func TestPublishScheduledResponseTimestamp(t *testing.T) {
+	completedAt := time.Date(2024, 1, 1, 4, 30, 0, 0, time.UTC)
+	tests := []struct {
+		name                string
+		plannedScheduleTime time.Time
+		expectedTimestamp   time.Time
+	}{
+		{
+			name:                "uses completion time after planned slot",
+			plannedScheduleTime: completedAt.Add(-time.Minute),
+			expectedTimestamp:   completedAt,
+		},
+		{
+			name:                "floors timestamp at future planned slot",
+			plannedScheduleTime: completedAt.Add(30 * time.Minute),
+			expectedTimestamp:   completedAt.Add(30 * time.Minute),
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			client := &recordingClient{}
+			publisher := &Publisher{
+				log:                   logptest.NewTestingLogger(t, "scheduled_response"),
+				actionResponsesClient: client,
+			}
+
+			publisher.PublishScheduledResponse(
+				"schedule-id",
+				"",
+				"",
+				"",
+				"",
+				"response-id",
+				completedAt.Add(-time.Second),
+				completedAt,
+				tc.plannedScheduleTime,
+				3,
+				1,
+			)
+
+			require.Len(t, client.events, 1, "scheduled response should publish one event")
+			event := client.events[0]
+			assert.Equal(t, tc.expectedTimestamp, event.Timestamp, "scheduled response event timestamp should not precede its planned slot")
+			assert.Equal(t, completedAt.Format(time.RFC3339Nano), event.Fields["completed_at"], "completed_at should preserve the endpoint time")
+			assert.Equal(t, tc.plannedScheduleTime.Format(time.RFC3339Nano), event.Fields["planned_schedule_time"], "planned_schedule_time should preserve the computed slot")
+		})
+	}
+}
 
 func TestHitToEvent(t *testing.T) {
 
@@ -22,10 +92,10 @@ func TestHitToEvent(t *testing.T) {
 
 	type params struct {
 		index, eventType, idValue, idFieldKey, responseID string
-		meta                                              map[string]interface{}
-		hit                                               map[string]interface{}
+		meta                                              map[string]any
+		hit                                               map[string]any
 		ecsm                                              ecs.Mapping
-		reqData                                           interface{}
+		reqData                                           any
 	}
 
 	genParams := func(mask int) (p params) {
@@ -43,7 +113,7 @@ func TestHitToEvent(t *testing.T) {
 			p.responseID = uuid.Must(uuid.NewV4()).String()
 		}
 		if mask>>2&1 > 0 {
-			p.hit = map[string]interface{}{
+			p.hit = map[string]any{
 				"foo": "bar",
 			}
 		}
@@ -55,14 +125,14 @@ func TestHitToEvent(t *testing.T) {
 			}
 		}
 		if mask&1 > 0 {
-			p.reqData = map[string]interface{}{
+			p.reqData = map[string]any{
 				"query": "select * from uptime",
 			}
 		}
 		return p
 	}
 
-	for i := 0; i < maxMask; i++ {
+	for i := range maxMask {
 		p := genParams(i)
 		ev := hitToEvent(p.index, p.eventType, p.idValue, p.idFieldKey, p.responseID, "", "", "", "", p.meta, p.hit, p.ecsm, p.reqData)
 
@@ -123,8 +193,8 @@ func TestActionResultToEvent(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		req, res map[string]interface{}
-		want     map[string]interface{}
+		req, res map[string]any
+		want     map[string]any
 	}{
 		{
 			name: "successful",
@@ -246,7 +316,7 @@ func TestHitToEvent_SpaceID(t *testing.T) {
 		"",
 		"",
 		nil,
-		map[string]interface{}{"foo": "bar"},
+		map[string]any{"foo": "bar"},
 		nil,
 		nil,
 	)
@@ -269,7 +339,7 @@ func TestHitToEvent_PackID(t *testing.T) {
 		"",
 		"",
 		nil,
-		map[string]interface{}{"foo": "bar"},
+		map[string]any{"foo": "bar"},
 		nil,
 		nil,
 	)
@@ -293,7 +363,7 @@ func TestHitToEvent_PackNameAndQueryName(t *testing.T) {
 		packName,
 		queryName,
 		nil,
-		map[string]interface{}{"foo": "bar"},
+		map[string]any{"foo": "bar"},
 		nil,
 		nil,
 	)
@@ -318,7 +388,7 @@ func TestHitToEvent_NoPackNameOrQueryName(t *testing.T) {
 		"",
 		"",
 		nil,
-		map[string]interface{}{"foo": "bar"},
+		map[string]any{"foo": "bar"},
 		nil,
 		nil,
 	)
@@ -331,8 +401,37 @@ func TestHitToEvent_NoPackNameOrQueryName(t *testing.T) {
 	}
 }
 
-func toMap(t *testing.T, s string) map[string]interface{} {
-	var m map[string]interface{}
+func TestQueryProfileToEvent_SpaceID(t *testing.T) {
+	tests := []struct {
+		name    string
+		spaceID string
+		present bool
+	}{
+		{name: "present", spaceID: "production", present: true},
+		{name: "absent", spaceID: "", present: false},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			fields := queryProfileToEvent("", "", "", tc.spaceID, map[string]any{"key": "val"}, nil)
+			got, ok := fields["space_id"]
+			if tc.present {
+				if !ok {
+					t.Errorf("expected space_id %q, field not present", tc.spaceID)
+				} else if got != tc.spaceID {
+					t.Errorf("space_id mismatch: got=%q want=%q", got, tc.spaceID)
+				}
+			} else {
+				if ok {
+					t.Errorf("expected no space_id field, got %v", got)
+				}
+			}
+		})
+	}
+}
+
+func toMap(t *testing.T, s string) map[string]any {
+	var m map[string]any
 	err := json.Unmarshal([]byte(s), &m)
 	if err != nil {
 		t.Fatal(err)

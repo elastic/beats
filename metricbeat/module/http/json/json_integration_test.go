@@ -62,7 +62,7 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig(host string, jsonType string) map[string]interface{} {
+func getConfig(host string, jsonType string) map[string]any {
 	var path string
 	var responseIsArray bool
 	switch jsonType {
@@ -74,7 +74,7 @@ func getConfig(host string, jsonType string) map[string]interface{} {
 		responseIsArray = true
 	}
 
-	return map[string]interface{}{
+	return map[string]any{
 		"module":        "http",
 		"metricsets":    []string{"json"},
 		"hosts":         []string{host},

@@ -110,7 +110,7 @@ var GroupResponse = []*fetcher.Group{
 var UserResponse = []*fetcher.User{
 	{
 		ID: uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
-		Fields: map[string]interface{}{
+		Fields: map[string]any{
 			"userPrincipalName": "user.one@example.com",
 			"mail":              "user.one@example.com",
 			"displayName":       "User One",
@@ -123,7 +123,7 @@ var UserResponse = []*fetcher.User{
 	},
 	{
 		ID: uuid.Must(uuid.FromString("d897d560-3d17-4dae-81b3-c898fe82bf84")),
-		Fields: map[string]interface{}{
+		Fields: map[string]any{
 			"userPrincipalName": "user.two@example.com",
 			"mail":              "user.two@example.com",
 			"displayName":       "User Two",
@@ -139,21 +139,21 @@ var UserResponse = []*fetcher.User{
 var DeviceResponse = []*fetcher.Device{
 	{
 		ID: uuid.Must(uuid.FromString("6a59ea83-02bd-468f-a40b-f2c3d1821983")),
-		Fields: map[string]interface{}{
+		Fields: map[string]any{
 			"accountEnabled":         true,
 			"deviceId":               "eab73519-780d-4d43-be6d-a4a89af2a348",
 			"displayName":            "DESKTOP-LK3PESR",
 			"operatingSystem":        "Windows",
 			"operatingSystemVersion": "10.0.19043.1237",
-			"physicalIds":            []interface{}{},
-			"extensionAttributes": map[string]interface{}{
+			"physicalIds":            []any{},
+			"extensionAttributes": map[string]any{
 				"extensionAttribute1": "BYOD-Device",
 				"extensionAttribute2": nil,
 				"extensionAttribute3": nil,
 				"extensionAttribute4": nil,
 			},
-			"alternativeSecurityIds": []interface{}{
-				map[string]interface{}{
+			"alternativeSecurityIds": []any{
+				map[string]any{
 					"type":             "2", // Rendered as string to avoid in-flight conversion to float.
 					"identityProvider": nil,
 					"key":              "WAA1ADAAOQA6AD...QBnAD0A",
@@ -163,21 +163,21 @@ var DeviceResponse = []*fetcher.Device{
 	},
 	{
 		ID: uuid.Must(uuid.FromString("adbbe40a-0627-4328-89f1-88cac84dbc7f")),
-		Fields: map[string]interface{}{
+		Fields: map[string]any{
 			"accountEnabled":         true,
 			"deviceId":               "2fbbb8f9-ff67-4a21-b867-a344d18a4198",
 			"displayName":            "DESKTOP-LETW452G",
 			"operatingSystem":        "Windows",
 			"operatingSystemVersion": "10.0.19043.1337",
-			"physicalIds":            []interface{}{},
-			"extensionAttributes": map[string]interface{}{
+			"physicalIds":            []any{},
+			"extensionAttributes": map[string]any{
 				"extensionAttribute1": "BYOD-Device",
 				"extensionAttribute2": nil,
 				"extensionAttribute3": nil,
 				"extensionAttribute4": nil,
 			},
-			"alternativeSecurityIds": []interface{}{
-				map[string]interface{}{
+			"alternativeSecurityIds": []any{
+				map[string]any{
 					"type":             "2", // Rendered as string to avoid in-flight conversion to float.
 					"identityProvider": nil,
 					"key":              "DGFSGHSGGTH345A...35DSFH0A",

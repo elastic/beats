@@ -183,6 +183,7 @@ processors:
 	var otelDocs estools.Documents
 	var err error
 
+	resendOnMiss := inputType == "udp"
 	require.EventuallyWithTf(t,
 		func(ct *assert.CollectT) {
 			findCtx, findCancel := context.WithTimeout(t.Context(), 900*time.Millisecond)
@@ -190,11 +191,17 @@ processors:
 
 			otelDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+otelIndex+"*", es)
 			assert.NoError(ct, err)
-			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, 1, "expected at least 1 otel document, got %d", otelDocs.Hits.Total.Value)
+			otelFound := assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, 1, "expected at least 1 otel document, got %d", otelDocs.Hits.Total.Value)
+			if resendOnMiss && !otelFound {
+				go runClient(t, otelAddress, data)
+			}
 
 			filebeatDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+fbIndex+"*", es)
 			assert.NoError(ct, err)
-			assert.GreaterOrEqual(ct, filebeatDocs.Hits.Total.Value, 1, "expected at least 1 filebeat document, got %d", filebeatDocs.Hits.Total.Value)
+			filebeatFound := assert.GreaterOrEqual(ct, filebeatDocs.Hits.Total.Value, 1, "expected at least 1 filebeat document, got %d", filebeatDocs.Hits.Total.Value)
+			if resendOnMiss && !filebeatFound {
+				go runClient(t, fbAddress, data)
+			}
 		},
 		3*time.Minute, 1*time.Second, "expected at least 1 document for both filebeat and otel modes")
 

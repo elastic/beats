@@ -17,6 +17,14 @@ Packetbeat will send ingest pipelines automatically to {{es}} if the {{es}} outp
 
 Make sure the user specified in `packetbeat.yml` is [authorized to set up Packetbeat](/reference/packetbeat/privileges-to-setup-beats.md).
 
+{applies_to}`stack: ga 9.6` To turn off automatic pipeline loading during normal publishing, set:
+
+```yaml
+setup.pipelines.enabled: false
+```
+
+Use this setting only when the required pipelines have already been loaded or are managed separately.
+
 If Packetbeat is sending events to {{ls}} or another output you need to load the ingest pipelines with the `setup` command or manually.
 
 

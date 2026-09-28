@@ -68,8 +68,8 @@ func dummyUint64Converter(s string) (uint64, error) {
 func TestGenericWmiConversionFunction(t *testing.T) {
 	type testCase struct {
 		name        string
-		input       interface{}
-		want        interface{}
+		input       any
+		want        any
 		expectError bool
 	}
 
@@ -81,12 +81,12 @@ func TestGenericWmiConversionFunction(t *testing.T) {
 		},
 		{
 			name:  "slice of strings as []interface{}",
-			input: []interface{}{"1", "2", "3"},
+			input: []any{"1", "2", "3"},
 			want:  []uint64{1, 2, 3},
 		},
 		{
 			name:        "slice contains non-string",
-			input:       []interface{}{"1", 2, "3"},
+			input:       []any{"1", 2, "3"},
 			expectError: true,
 		},
 		{
@@ -115,8 +115,8 @@ func Test_ConversionFunctions(t *testing.T) {
 	tests := []struct {
 		name        string
 		conversion  WmiConversionFunction
-		input       interface{}
-		expected    interface{}
+		input       any
+		expected    any
 		expectErr   bool
 		description string
 	}{
@@ -132,7 +132,7 @@ func Test_ConversionFunctions(t *testing.T) {
 		{
 			name:        "ConvertUint64 - valid array input",
 			conversion:  ConvertUint64,
-			input:       []interface{}{"12345", "345"},
+			input:       []any{"12345", "345"},
 			expected:    []uint64{12345, 345},
 			expectErr:   false,
 			description: "Should convert string to uint64",
@@ -157,7 +157,7 @@ func Test_ConversionFunctions(t *testing.T) {
 		{
 			name:        "ConvertSint64 - valid array input",
 			conversion:  ConvertSint64,
-			input:       []interface{}{"-12345", "345"},
+			input:       []any{"-12345", "345"},
 			expected:    []int64{-12345, 345},
 			expectErr:   false,
 			description: "Should convert string to uint64",

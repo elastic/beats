@@ -75,13 +75,7 @@ func processBody(resp *http.Response, config responseConfig, validator multiVali
 
 		// Do not store more bytes than the config specifies. We may
 		// have read extra bytes for the validators
-		sampleNumBytes := len(respBody)
-		if bodyLenBytes < sampleNumBytes {
-			sampleNumBytes = bodyLenBytes
-		}
-		if config.IncludeBodyMaxBytes < sampleNumBytes {
-			sampleNumBytes = config.IncludeBodyMaxBytes
-		}
+		sampleNumBytes := min(config.IncludeBodyMaxBytes, min(bodyLenBytes, len(respBody)))
 
 		bodyFields["content"] = respBody[0:sampleNumBytes]
 	}

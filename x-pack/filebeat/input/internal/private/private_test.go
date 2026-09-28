@@ -363,7 +363,7 @@ var redactTests = []redactTest{
 			return m
 		}(),
 		want:    map[string]any(nil),
-		wantErr: cycle{reflect.TypeOf(map[string]any(nil))},
+		wantErr: cycle{reflect.TypeFor[map[string]any]()},
 	},
 	func() redactTest {
 		type s struct {
@@ -467,7 +467,7 @@ var redactTests = []redactTest{
 			in:      v,
 			tag:     "",
 			want:    s{},
-			wantErr: cycle{reflect.TypeOf(&s{})},
+			wantErr: cycle{reflect.TypeFor[*s]()},
 		}
 	}(),
 	func() redactTest {
@@ -586,7 +586,7 @@ var redactTests = []redactTest{
 			in:      v,
 			tag:     "json",
 			want:    s{},
-			wantErr: cycle{reflect.TypeOf(&s{})},
+			wantErr: cycle{reflect.TypeFor[*s]()},
 		}
 	}(),
 	{

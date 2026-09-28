@@ -64,8 +64,8 @@ var (
 
 func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXpack bool) error {
 	nodesStruct := struct {
-		ClusterName string                            `json:"cluster_name"`
-		Nodes       map[string]map[string]interface{} `json:"nodes"`
+		ClusterName string                    `json:"cluster_name"`
+		Nodes       map[string]map[string]any `json:"nodes"`
 	}{}
 
 	err := json.Unmarshal(content, &nodesStruct)

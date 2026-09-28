@@ -23,15 +23,37 @@ func Test_validateConfig(t *testing.T) {
 		{
 			name: "valid config",
 			config: config{
-				ProviderName:    "Microsoft-Windows-DNSServer",
-				SessionName:     "MySession-DNSServer",
-				TraceLevel:      "verbose",
-				MatchAnyKeyword: 0xffffffffffffffff,
-				MatchAllKeyword: 0,
+				ProviderName:      "Microsoft-Windows-DNSServer",
+				SessionName:       "MySession-DNSServer",
+				TraceLevel:        "verbose",
+				MatchAnyKeyword:   0xffffffffffffffff,
+				MatchAllKeyword:   0,
+				RecoveryThreshold: 1,
 			},
 		},
 		{
 			name: "minimal config",
+			config: config{
+				ProviderName:      "Microsoft-Windows-DNSServer",
+				TraceLevel:        "verbose",
+				MatchAnyKeyword:   0xffffffffffffffff,
+				RecoveryThreshold: 1,
+			},
+		},
+		{
+			// A zero-valued struct field is serialised by ucfg and overrides
+			// the default, so this exercises the recovery_threshold check.
+			name: "zero recovery threshold with thresholding enabled",
+			config: config{
+				ProviderName:     "Microsoft-Windows-DNSServer",
+				TraceLevel:       "verbose",
+				MatchAnyKeyword:  0xffffffffffffffff,
+				FailureThreshold: 3,
+			},
+			wantError: "recovery_threshold must be at least 1 if failure_threshold is set",
+		},
+		{
+			name: "zero recovery threshold with thresholding disabled",
 			config: config{
 				ProviderName:    "Microsoft-Windows-DNSServer",
 				TraceLevel:      "verbose",
@@ -135,6 +157,69 @@ func Test_validateConfig(t *testing.T) {
 					t.Fatalf("Configuration validation failed. No error expected but got '%v'", err)
 				}
 			}
+		})
+	}
+}
+
+func Test_healthThresholds(t *testing.T) {
+	tests := []struct {
+		name         string
+		raw          map[string]any
+		wantFailure  uint
+		wantRecovery uint
+		wantError    string
+	}{
+		{
+			name:         "defaults",
+			raw:          map[string]any{"provider.name": "P"},
+			wantFailure:  defaultFailureThreshold,
+			wantRecovery: defaultRecoveryThreshold,
+		},
+		{
+			name:         "custom",
+			raw:          map[string]any{"provider.name": "P", "failure_threshold": 25, "recovery_threshold": 5},
+			wantFailure:  25,
+			wantRecovery: 5,
+		},
+		{
+			name:         "zero failure threshold disables",
+			raw:          map[string]any{"provider.name": "P", "failure_threshold": 0},
+			wantFailure:  0,
+			wantRecovery: defaultRecoveryThreshold,
+		},
+		{
+			name:      "zero recovery threshold rejected when thresholding enabled",
+			raw:       map[string]any{"provider.name": "P", "recovery_threshold": 0},
+			wantError: "recovery_threshold must be at least 1 if failure_threshold is set",
+		},
+		{
+			name:         "zero recovery threshold allowed when thresholding disabled",
+			raw:          map[string]any{"provider.name": "P", "failure_threshold": 0, "recovery_threshold": 0},
+			wantFailure:  0,
+			wantRecovery: 0,
+		},
+		{
+			name:      "negative failure threshold rejected",
+			raw:       map[string]any{"provider.name": "P", "failure_threshold": -1},
+			wantError: "can not convert 'int' into 'uint' accessing 'failure_threshold'",
+		},
+		{
+			name:      "negative recovery threshold rejected",
+			raw:       map[string]any{"provider.name": "P", "recovery_threshold": -1},
+			wantError: "can not convert 'int' into 'uint' accessing 'recovery_threshold'",
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			cfg := defaultConfig()
+			err := confpkg.MustNewConfigFrom(test.raw).Unpack(&cfg)
+			if test.wantError != "" {
+				assert.ErrorContains(t, err, test.wantError, "unpack of %v", test.raw)
+				return
+			}
+			assert.NoError(t, err, "unpack of %v", test.raw)
+			assert.Equal(t, test.wantFailure, cfg.FailureThreshold, "failure_threshold")
+			assert.Equal(t, test.wantRecovery, cfg.RecoveryThreshold, "recovery_threshold")
 		})
 	}
 }

@@ -36,7 +36,13 @@ import (
 // A new line ('\n') is added at the end of each entry.
 // There is a 100ms delay between sends, errors are logged, but not retried.
 func RunUDPClient(t *testing.T, address string, data []string) {
-	conn, err := net.Dial("udp", address)
+	RunUDPClientWithDelay(t, address, data, 100*time.Millisecond)
+}
+
+// RunUDPClientWithDelay is RunUDPClient with a configurable delay between sends.
+func RunUDPClientWithDelay(t *testing.T, address string, data []string, delay time.Duration) {
+	var dialer net.Dialer
+	conn, err := dialer.DialContext(t.Context(), "udp", address)
 	if err != nil {
 		t.Errorf("cannot create connection: %s", err)
 	}
@@ -47,10 +53,10 @@ func RunUDPClient(t *testing.T, address string, data []string) {
 		_, err = conn.Write([]byte(data + "\n"))
 		if err != nil {
 			t.Logf("Error sending data: %s, skipping to next entry", err)
-			time.Sleep(time.Second)
+			time.Sleep(10 * delay)
 			continue
 		}
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(delay)
 	}
 }
 
@@ -59,6 +65,11 @@ func RunUDPClient(t *testing.T, address string, data []string) {
 // A new line ('\n') is added at the end of each entry.
 // There is a 100ms delay between sends. Failing to send will fail the test
 func RunTCPClient(t *testing.T, address string, data []string) {
+	RunTCPClientWithDelay(t, address, data, 100*time.Millisecond)
+}
+
+// RunTCPClientWithDelay is RunTCPClient with a configurable delay between sends.
+func RunTCPClientWithDelay(t *testing.T, address string, data []string, delay time.Duration) {
 	var conn net.Conn
 	var err error
 
@@ -69,7 +80,8 @@ FOR:
 	for {
 		select {
 		case <-ticker:
-			conn, err = net.Dial("tcp", address)
+			var dialer net.Dialer
+			conn, err = dialer.DialContext(t.Context(), "tcp", address)
 			if err == nil {
 				break FOR
 			}
@@ -88,7 +100,7 @@ FOR:
 			t.Errorf("Failed to send data: %s", err)
 			return
 		}
-		time.Sleep(100 * time.Millisecond) // Simulate delay between messages
+		time.Sleep(delay) // Simulate delay between messages
 	}
 }
 
@@ -113,7 +125,11 @@ func GetHTTPInputMetrics(t *testing.T, inputID, addr string) NetInputMetrics {
 		t.Fatalf("cannot parse URL: %s", err)
 	}
 
-	data, err := http.Get(fullURL)
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, fullURL, nil)
+	if err != nil {
+		t.Fatalf("cannot create metrics request: %s", err)
+	}
+	data, err := http.DefaultClient.Do(req)
 	if err != nil {
 		t.Fatalf("cannot fetch metrics: %s", err)
 	}

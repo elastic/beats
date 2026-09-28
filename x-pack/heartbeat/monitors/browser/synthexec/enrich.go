@@ -108,7 +108,14 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	case StepScreenshot, StepScreenshotRef, ScreenshotBlock:
 		add_data_stream.SetEventDataset(event, "browser.screenshot")
 	case JourneyNetworkInfo:
-		add_data_stream.SetEventDataset(event, "browser.network")
+		// api.network must match the Fleet package's api_network data stream,
+		// or the scoped agent API key rejects the write with a 403. Unknown/
+		// legacy journeys fall back to browser.network.
+		if je.journey.IsAPI() {
+			add_data_stream.SetEventDataset(event, "api.network")
+		} else {
+			add_data_stream.SetEventDataset(event, "browser.network")
+		}
 	}
 
 	if se.Id != "" {

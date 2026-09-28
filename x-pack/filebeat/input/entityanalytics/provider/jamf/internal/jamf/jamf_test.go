@@ -20,13 +20,14 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/jamf/testjamf"
 )
 
 var logResponses = flag.Bool("log_response", false, "use to log users/devices returned from the API")
 
 var (
-	//go:embed testdata/computers.json
-	computers []byte
+	computers = testjamf.ComputersJSON
 
 	//go:embed testdata/users.json
 	users []byte
@@ -126,7 +127,7 @@ var jamfTests = []struct {
 
 			return tenant, username, password, cli, srv.Close, nil
 		},
-		wantComputers: mustParseJSON[*Computers]("testdata/computers.json", computers),
+		wantComputers: mustParseJSON[*Computers]("testjamf/testdata/computers.json", computers),
 		wantUsers:     mustParseJSON[*Users]("testdata/users.json", users).Users,
 	},
 }

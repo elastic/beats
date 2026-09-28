@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package guess
 
@@ -89,7 +88,7 @@ func (g *guessSyscallArgs) Probes() ([]helper.ProbeDef, error) {
 				Address:   "{{.SYS_GETTIMEOFDAY}}",
 				Fetchargs: "p1reg={{._SYS_P1}} p2reg={{._SYS_P2}} p1pt=+0x70({{._SYS_P1}}) p2pt=+0x68({{(._SYS_P1)}})",
 			},
-			Decoder: helper.NewStructDecoder(func() interface{} { return new(syscallGuess) }),
+			Decoder: helper.NewStructDecoder(func() any { return new(syscallGuess) }),
 		},
 	}, nil
 }
@@ -112,7 +111,7 @@ func (g *guessSyscallArgs) Trigger() error {
 }
 
 // Extract check which set of kprobe arguments received the magic values.
-func (g *guessSyscallArgs) Extract(ev interface{}) (mapstr.M, bool) {
+func (g *guessSyscallArgs) Extract(ev any) (mapstr.M, bool) {
 	args, ok := ev.(*syscallGuess)
 	if !ok {
 		return nil, false

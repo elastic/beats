@@ -168,7 +168,7 @@ func (f ByteArrayDecoder) ReadInet() (net.IP, int) {
 	}
 
 	data = *f.Data
-	if len(data) < 1 {
+	if len(data) < int(size) {
 		panic(fmt.Errorf("not enough bytes in buffer to Read inet require %d got: %d", size, len(data)))
 	}
 

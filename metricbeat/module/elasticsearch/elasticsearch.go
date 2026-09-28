@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -150,7 +151,7 @@ func getNodeName(http *helper.HTTP, uri string) (string, error) {
 	}
 
 	nodesStruct := struct {
-		Nodes map[string]interface{} `json:"nodes"`
+		Nodes map[string]any `json:"nodes"`
 	}{}
 
 	err = json.Unmarshal(content, &nodesStruct)
@@ -261,7 +262,7 @@ func GetClusterState(http *helper.HTTP, resetURI string, metrics []string, filte
 		return nil, err
 	}
 
-	var clusterState map[string]interface{}
+	var clusterState map[string]any
 	err = json.Unmarshal(content, &clusterState)
 	return clusterState, err
 }
@@ -283,7 +284,7 @@ func GetIndexSettings(http *helper.HTTP, resetURI string, indexPattern string, f
 		return nil, err
 	}
 
-	var indicesSettings map[string]interface{}
+	var indicesSettings map[string]any
 	err = json.Unmarshal(content, &indicesSettings)
 	return indicesSettings, err
 }
@@ -313,19 +314,19 @@ func GetClusterSettings(http *helper.HTTP, resetURI string, includeDefaults bool
 		return nil, err
 	}
 
-	var clusterSettings map[string]interface{}
+	var clusterSettings map[string]any
 	err = json.Unmarshal(content, &clusterSettings)
 	return clusterSettings, err
 }
 
 // GetStackUsage returns stack usage information.
-func GetStackUsage(http *helper.HTTP, resetURI string) (map[string]interface{}, error) {
+func GetStackUsage(http *helper.HTTP, resetURI string) (map[string]any, error) {
 	content, err := fetchPath(http, resetURI, "_xpack/usage", "")
 	if err != nil {
 		return nil, err
 	}
 
-	var stackUsage map[string]interface{}
+	var stackUsage map[string]any
 	err = json.Unmarshal(content, &stackUsage)
 	return stackUsage, err
 }
@@ -454,13 +455,7 @@ func (c *_licenseCache) set(license *License, ttl time.Duration) {
 func (l *License) IsOneOf(candidateLicenses ...string) bool {
 	t := l.Type
 
-	for _, candidateLicense := range candidateLicenses {
-		if candidateLicense == t {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(candidateLicenses, t)
 }
 
 // ToMapStr converts the license to a mapstr.M. This is necessary
@@ -514,7 +509,7 @@ func getSettingGroup(allSettings mapstr.M, groupKey string) (mapstr.M, error) {
 		return nil, fmt.Errorf("failure to extract %s settings: %w", groupKey, err)
 	}
 
-	v, ok := settings.(map[string]interface{})
+	v, ok := settings.(map[string]any)
 	if !ok {
 		return nil, fmt.Errorf("%s settings are not a map", groupKey)
 	}

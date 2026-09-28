@@ -45,7 +45,7 @@ import (
 func TestRunner(t *testing.T) {
 	pubClient, factory := newPubClientFactory()
 
-	config, err := conf.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]any{
 		"module":     moduleName,
 		"metricsets": []string{reportingFetcherName},
 	})
@@ -75,7 +75,7 @@ func TestRunner(t *testing.T) {
 func TestCPUDiagnostics(t *testing.T) {
 	pubClient, factory := newPubClientFactory()
 
-	config, err := conf.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]any{
 		"module":     "system",
 		"metricsets": []string{"cpu"},
 	})
@@ -138,7 +138,7 @@ func newPubClientFactory() (*pubtest.ChanClient, func() beat.Client) {
 
 func TestRunnerStop_ClientClosedAfterPublishGoroutine(t *testing.T) {
 	// Wrap a no-op processor with SafeWrap so it becomes a safeProcessorWithClose.
-	proc, err := processors.SafeWrap(func(_ *conf.C, _ *logp.Logger) (beat.Processor, error) {
+	proc, err := processors.SafeWrap("runner-test-noop-closer", func(_ *conf.C, _ *logp.Logger) (beat.Processor, error) {
 		return noopCloser{}, nil
 	})(nil, nil)
 	require.NoError(t, err)
@@ -163,7 +163,7 @@ func TestRunnerStop_ClientClosedAfterPublishGoroutine(t *testing.T) {
 		},
 	}
 
-	config, err := conf.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]any{
 		"module":     moduleName,
 		"metricsets": []string{pushMetricSetName},
 		"period":     "1s",

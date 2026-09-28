@@ -28,9 +28,9 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/process"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 func TestData(t *testing.T) {
@@ -104,7 +104,8 @@ func TestStateNames(t *testing.T) {
 		if key == "total" {
 			continue
 		}
-		if _, ok := val.(int); !ok {
+		count, ok := val.(int)
+		if !ok {
 			continue
 		}
 		// Check to make sure the values we got actually exist
@@ -117,7 +118,7 @@ func TestStateNames(t *testing.T) {
 		}
 		assert.True(t, exists, "could not find value %s in event #%v", key, event.StringToPrint())
 
-		sum = val.(int) + sum
+		sum = count + sum
 	}
 	assert.Equal(t, total, sum)
 

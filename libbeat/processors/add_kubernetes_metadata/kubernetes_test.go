@@ -746,3 +746,65 @@ func TestIsKubernetesAvailableWithTimeout(t *testing.T) {
 		assert.ErrorIs(t, err, context.Canceled)
 	})
 }
+
+// TestAnnotatorAppendFields verifies that when append_fields is true the processor
+// merges metadata into an event that already has a kubernetes field without
+// overwriting any existing keys, and that it is a no-op by default.
+func TestAnnotatorAppendFields(t *testing.T) {
+	cacheMeta := mapstr.M{
+		"kubernetes": mapstr.M{
+			"pod":       mapstr.M{"name": "mypod"},
+			"namespace": "kube-system",
+			"labels":    mapstr.M{"app": "myapp"},
+		},
+	}
+	existingKubernetes := mapstr.M{
+		"pod":       mapstr.M{"name": "existing-pod"},
+		"namespace": "existing-ns",
+	}
+
+	t.Run("default skips when kubernetes field present", func(t *testing.T) {
+		processor := newAnnotatorForTest(t, "abc000", cacheMeta)
+
+		event := baseEvent("abc000")
+		event.Fields["kubernetes"] = existingKubernetes.Clone()
+		inputFields := event.Fields.Clone()
+
+		result, err := processor.Run(event)
+		require.NoError(t, err)
+
+		k8sRaw, _ := result.Fields.GetValue("kubernetes")
+		assert.Equal(t, existingKubernetes, k8sRaw, "kubernetes field must be unchanged when append_fields is false")
+
+		// RunPdata path: assert Run == RunPdata.
+		assertRunPdataEquivalent(t, processor, inputFields, result.Fields)
+	})
+
+	t.Run("append_fields merges without overwriting existing keys", func(t *testing.T) {
+		processor := newAnnotatorForTest(t, "abc001", cacheMeta)
+		processor.appendFields = true
+
+		event := baseEvent("abc001")
+		event.Fields["kubernetes"] = existingKubernetes.Clone()
+		inputFields := event.Fields.Clone()
+
+		result, err := processor.Run(event)
+		require.NoError(t, err)
+
+		k8sRaw, err := result.Fields.GetValue("kubernetes")
+		require.NoError(t, err)
+		k8s, ok := k8sRaw.(mapstr.M)
+		require.True(t, ok)
+
+		// Conflicting keys must keep the pre-existing value.
+		podMap, ok := k8s["pod"].(mapstr.M)
+		require.True(t, ok, "kubernetes.pod must be a mapstr.M")
+		assert.Equal(t, "existing-pod", podMap["name"], "pod.name must not be overwritten")
+		assert.Equal(t, "existing-ns", k8s["namespace"], "namespace must not be overwritten")
+		// Keys absent from the event must be appended from the cache.
+		assert.Equal(t, mapstr.M{"app": "myapp"}, k8s["labels"], "labels should be appended from cache metadata")
+
+		// RunPdata path: assert Run == RunPdata.
+		assertRunPdataEquivalent(t, processor, inputFields, result.Fields)
+	})
+}

@@ -98,7 +98,7 @@ func New(
 }
 
 //go:inline
-func (redis *redisPlugin) debugf(format string, args ...interface{}) {
+func (redis *redisPlugin) debugf(format string, args ...any) {
 	if redis.isDebug {
 		redis.logger.Debug(fmt.Sprintf(format, args...))
 	}

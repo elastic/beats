@@ -293,7 +293,7 @@ func BenchmarkScheduler(b *testing.B) {
 	mainWins := []maintwin.ParsedMaintWin{mainWin}
 
 	executed := make(chan struct{})
-	for i := 0; i < 1024; i++ {
+	for range 1024 {
 		_, err := s.Add(sched, mainWins, "testPostStop", func(_ context.Context) []TaskFunc {
 			executed <- struct{}{}
 			return nil

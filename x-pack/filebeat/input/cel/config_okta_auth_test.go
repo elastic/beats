@@ -102,7 +102,7 @@ func checkToken(t *testing.T, text string, cnf *oauth2.Config) {
 func TestOktaTokenSource_Token(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		_ = json.NewEncoder(w).Encode(map[string]any{
 			"access_token": "mock",
 			"token_type":   "Bearer",
 			"expires_in":   3600,

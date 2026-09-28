@@ -125,7 +125,7 @@ func parseLevels(raw string) (map[uint8]struct{}, error) {
 		}
 	}
 
-	for _, expr := range strings.Split(raw, ",") {
+	for expr := range strings.SplitSeq(raw, ",") {
 		expr = strings.ToLower(strings.TrimSpace(expr))
 		switch expr {
 		case "verbose", "5":
@@ -156,7 +156,7 @@ func parseEventIDRanges(raw string) ([]eventIDRange, []eventIDRange, error) {
 	var includes []eventIDRange
 	var excludes []eventIDRange
 
-	for _, component := range strings.Split(raw, ",") {
+	for component := range strings.SplitSeq(raw, ",") {
 		component = strings.TrimSpace(component)
 		if component == "" {
 			return nil, nil, fmt.Errorf("invalid event ID query component ('%s')", component)

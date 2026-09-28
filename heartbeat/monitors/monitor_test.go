@@ -146,7 +146,7 @@ func (sr *MockStatusReporter) UpdateStatus(status status.Status, msg string) {
 }
 
 func TestStatusReporter(t *testing.T) {
-	confMap := map[string]interface{}{
+	confMap := map[string]any{
 		"type":     "fail",
 		"urls":     []string{"http://example.net"},
 		"schedule": "@every 1ms",

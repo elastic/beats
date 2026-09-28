@@ -131,12 +131,11 @@ func openStore(log *logp.Logger, statestore statestore.States, prefix string, in
 	ok := false
 
 	log.Debugf("input-cursor::openStore: prefix: %v inputID: %s", prefix, inputID)
-	persistentStore, err := statestore.StoreFor(prefix)
+	persistentStore, err := statestore.StoreFor(prefix, inputID)
 	if err != nil {
 		return nil, err
 	}
 	defer cleanup.IfNot(&ok, func() { persistentStore.Close() })
-	persistentStore.SetID(inputID)
 
 	states, err := readStates(log, persistentStore, prefix, fullInit)
 	if err != nil {
@@ -151,7 +150,6 @@ func openStore(log *logp.Logger, statestore statestore.States, prefix string, in
 	}, nil
 }
 
-func (s *store) Retain() { s.refCount.Retain() }
 func (s *store) Release() {
 	if s.refCount.Release() {
 		closeStore(s)

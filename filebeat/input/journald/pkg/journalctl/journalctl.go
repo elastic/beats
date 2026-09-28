@@ -31,6 +31,7 @@ import (
 	"syscall"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -48,6 +49,11 @@ type journalctl struct {
 	// can stop even if nobody is reading from the dataChan.
 	stopCh   chan struct{}
 	stopOnce sync.Once
+
+	// deadline bounds how long Next waits for the next entry before returning
+	// reader.ErrReadDeadline. Set/read by the consuming goroutine only (via
+	// SetReadDeadline before Next), so it needs no locking.
+	reader.Deadline
 }
 
 // NewFactory returns a function that instantiates [journalctl].
@@ -60,7 +66,7 @@ type journalctl struct {
 // The returned type is an interface to allow mocking for testing
 func NewFactory(chroot, journalctlPath string) JctlFactory {
 	return func(canceller input.Canceler, logger *logp.Logger, args ...string) (Jctl, error) {
-		//nolint:noctx // we use the canceller to correctly stop the process
+		//nolint:noctx,gosec // we use the canceller to stop the process; journalctlPath is operator-configured, not user input
 		cmd := exec.Command(journalctlPath, args...)
 
 		if chroot != "" {
@@ -204,19 +210,40 @@ func (j *journalctl) Kill() error {
 // exited unexpectedly, then `err` is non-nil, `finished` is false and an empty
 // byte array is returned.
 func (j *journalctl) Next(cancel input.Canceler) ([]byte, error) {
+	// Fast path: an entry is already available (or the input is cancelled), so no
+	// timer is needed.
 	select {
 	case <-cancel.Done():
 		return []byte{}, ErrCancelled
 	case d, open := <-j.dataChan:
-		if !open {
-			// Wait for the process to exit, so we can read the exit code.
-			j.waitDone.Wait()
-			return []byte{},
-				fmt.Errorf(
-					"no more data to read, journalctl exited unexpectedly, exit code: %d",
-					j.cmd.ProcessState.ExitCode())
-		}
-
-		return d, nil
+		return j.handleData(d, open)
+	default:
 	}
+
+	// Arm returns nil when no deadline is set, which never fires, so this select
+	// covers both the deadline and the plain blocking receive.
+	timeout := j.Arm()
+	defer j.Disarm()
+	select {
+	case <-cancel.Done():
+		return []byte{}, ErrCancelled
+	case <-timeout:
+		return []byte{}, reader.ErrReadDeadline
+	case d, open := <-j.dataChan:
+		return j.handleData(d, open)
+	}
+}
+
+// handleData turns a dataChan receive into the Next return values. open is false
+// when the channel was closed (journalctl exited).
+func (j *journalctl) handleData(d []byte, open bool) ([]byte, error) {
+	if !open {
+		// Wait for the process to exit, so we can read the exit code.
+		j.waitDone.Wait()
+		return []byte{},
+			fmt.Errorf(
+				"no more data to read, journalctl exited unexpectedly, exit code: %d",
+				j.cmd.ProcessState.ExitCode())
+	}
+	return d, nil
 }

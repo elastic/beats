@@ -63,7 +63,7 @@ func New(b *beat.Beat, _ *conf.C) (beat.Beater, error) {
 		return nil, fmt.Errorf("error reading configuration file: %w", err)
 	}
 
-	log := logp.NewLogger("winlogbeat")
+	log := b.Info.Logger
 
 	// resolve registry file path
 	config.RegistryFile = b.Info.Paths.Resolve(paths.Data, config.RegistryFile)
@@ -141,17 +141,19 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	if b.Config.Output.Name() == "elasticsearch" {
-		callback := func(esClient *eslegclient.Connection, _ *logp.Logger) error {
-			_, err := module.UploadPipelines(b.Info, esClient, eb.config.OverwritePipelines)
-			return err
+	if beat.SetupPipelinesEnabled(b.BeatConfig) {
+		if b.Config.Output.Name() == "elasticsearch" {
+			callback := func(esClient *eslegclient.Connection, _ *logp.Logger) error {
+				_, err := module.UploadPipelines(b.Info, esClient, eb.config.OverwritePipelines)
+				return err
+			}
+			_, err := elasticsearch.RegisterConnectCallback(callback)
+			if err != nil {
+				return err
+			}
+		} else {
+			eb.log.Warn(pipelinesWarning)
 		}
-		_, err := elasticsearch.RegisterConnectCallback(callback)
-		if err != nil {
-			return err
-		}
-	} else {
-		eb.log.Warn(pipelinesWarning)
 	}
 
 	acker := newEventACKer(eb.checkpoint)
@@ -171,7 +173,7 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 			"input_metrics.json", "application/json", func() []byte {
 				data, err := inputmon.MetricSnapshotJSON(b.Monitoring.InputsRegistry())
 				if err != nil {
-					logp.L().Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
+					eb.log.Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
 					return []byte(err.Error())
 				}
 				return data

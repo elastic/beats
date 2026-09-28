@@ -7,6 +7,7 @@ package hbreceiver
 import (
 	"context"
 	"fmt"
+	"maps"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -77,9 +78,7 @@ func staticMonitorConfig(t *testing.T, monitors []map[string]any, extra map[stri
 	hbSection := map[string]any{
 		"monitors": monitors,
 	}
-	for k, v := range extra {
-		hbSection[k] = v
-	}
+	maps.Copy(hbSection, extra)
 	return &Config{
 		Beatconfig: map[string]any{
 			"heartbeat":               hbSection,

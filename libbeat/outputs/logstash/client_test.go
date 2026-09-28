@@ -117,7 +117,7 @@ func testSimpleEvent(t *testing.T, factory clientFactory) {
 	// validate
 	events := batch.Events
 	assert.Equal(t, 1, len(events))
-	msg := events[0].(map[string]interface{})
+	msg := events[0].(map[string]any)
 	assert.Equal(t, "me", msg["name"])
 	assert.Equal(t, 10.0, msg["line"])
 }
@@ -148,7 +148,7 @@ func testSimpleEventWithTTL(t *testing.T, factory clientFactory) {
 	// validate
 	events := batch.Events
 	assert.Equal(t, 1, len(events))
-	msg := events[0].(map[string]interface{})
+	msg := events[0].(map[string]any)
 	assert.Equal(t, "me", msg["name"])
 	assert.Equal(t, 10.0, msg["line"])
 
@@ -168,7 +168,7 @@ func testSimpleEventWithTTL(t *testing.T, factory clientFactory) {
 	// validate
 	events = batch.Events
 	assert.Equal(t, 1, len(events))
-	msg = events[0].(map[string]interface{})
+	msg = events[0].(map[string]any)
 	assert.Equal(t, "me", msg["name"])
 	assert.Equal(t, 11.0, msg["line"])
 }
@@ -193,7 +193,7 @@ func testStructuredEvent(t *testing.T, factory clientFactory) {
 			"field1": 1,
 			"field2": true,
 			"field3": []int{1, 2, 3},
-			"field4": []interface{}{
+			"field4": []any{
 				1,
 				"test",
 				mapstr.M{
@@ -221,11 +221,11 @@ func testStructuredEvent(t *testing.T, factory clientFactory) {
 	assert.Equal(t, 2.0, eventGet(msg, "struct.field5.sub1"))
 }
 
-func eventGet(event interface{}, path string) interface{} {
-	doc := event.(map[string]interface{})
+func eventGet(event any, path string) any {
+	doc := event.(map[string]any)
 	elems := strings.Split(path, ".")
 	for i := 0; i < len(elems)-1; i++ {
-		doc = doc[elems[i]].(map[string]interface{})
+		doc = doc[elems[i]].(map[string]any)
 	}
 	return doc[elems[len(elems)-1]]
 }

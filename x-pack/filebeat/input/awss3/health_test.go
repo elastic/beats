@@ -200,6 +200,42 @@ func TestSQSHealth_Dedup(t *testing.T) {
 	}
 }
 
+func TestSQSHealth_ReceiveErrorMessageIsStable(t *testing.T) {
+	r := &testReporter{}
+	h := newSQSHealth(r, logp.NewNopLogger())
+	h.UpdateStatus(status.Running, "Input is running")
+
+	// Cross threshold with first batch of errors (3 different messages).
+	h.UpdateStatus(status.Degraded, "SQS error: request-id-1")
+	h.UpdateStatus(status.Degraded, "SQS error: request-id-2")
+	h.UpdateStatus(status.Degraded, "SQS error: request-id-3")
+	if len(r.updates) != 2 || r.updates[1].status != status.Degraded {
+		t.Fatalf("want Degraded after threshold, got %+v", r.updates)
+	}
+
+	// Further errors with varying messages should NOT produce additional
+	// updates because the published condition message is stable.
+	h.UpdateStatus(status.Degraded, "SQS error: request-id-4")
+	h.UpdateStatus(status.Degraded, "SQS error: request-id-5")
+	h.UpdateStatus(status.Degraded, "SQS error: request-id-6")
+	if len(r.updates) != 2 {
+		t.Fatalf("want no churn from varying error messages, got %d: %+v", len(r.updates), r.updates)
+	}
+
+	// A higher-priority condition surfacing while already Degraded DOES
+	// produce a new update (the message changes without leaving Degraded).
+	h.SetWorkerError(errors.New("pipeline broken"))
+	if len(r.updates) != 3 {
+		t.Fatalf("want new update when higher-priority condition fires, got %d: %+v", len(r.updates), r.updates)
+	}
+	if r.updates[2].status != status.Degraded {
+		t.Errorf("want Degraded, got %v", r.updates[2].status)
+	}
+	if r.updates[2].msg == r.updates[1].msg {
+		t.Errorf("want different message after condition change, but both are %q", r.updates[2].msg)
+	}
+}
+
 func TestSQSHealth_ProcessingErrorDoesNotDegrade(t *testing.T) {
 	r := &testReporter{}
 	h := newSQSHealth(r, logp.NewNopLogger())

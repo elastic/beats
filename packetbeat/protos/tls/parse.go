@@ -25,6 +25,7 @@ import (
 	"crypto/x509/pkix"
 	"encoding/hex"
 	"fmt"
+	"math/big"
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
@@ -249,7 +250,7 @@ func (hello *helloMessage) supportedCiphers() []string {
 	return ciphers
 }
 
-func (parser *parser) debugf(format string, args ...interface{}) {
+func (parser *parser) debugf(format string, args ...any) {
 	if parser.logger != nil && parser.logger.IsDebug() {
 		parser.logger.Debugf(format, args...)
 	}
@@ -605,7 +606,7 @@ func (version tlsVersion) IsZero() bool {
 	return version.major == 0 && version.minor == 0
 }
 
-func getKeySize(key interface{}) int {
+func getKeySize(key any) int {
 	if key == nil {
 		return 0
 	}
@@ -639,7 +640,7 @@ func certToMap(cert *x509.Certificate) mapstr.M {
 	certMap := mapstr.M{
 		"signature_algorithm":  cert.SignatureAlgorithm.String(),
 		"public_key_algorithm": toString(cert.PublicKeyAlgorithm),
-		"serial_number":        strings.ToUpper(cert.SerialNumber.Text(16)),
+		"serial_number":        serialHex(cert.SerialNumber),
 		"issuer":               toMap(&cert.Issuer),
 		"subject":              toMap(&cert.Subject),
 		"not_before":           cert.NotBefore,
@@ -660,11 +661,27 @@ func certToMap(cert *x509.Certificate) mapstr.M {
 	return certMap
 }
 
+// serialHex returns the certificate serial number as an uppercase hex string
+// with each byte zero-padded to two digits, matching OpenSSL's output format.
+// Zero serials render as "00"; negative serials (only reachable when
+// GODEBUG=x509negativeserial=1 is set) are prefixed with "-".
+func serialHex(n *big.Int) string {
+	b := n.Bytes()
+	if len(b) == 0 {
+		return "00"
+	}
+	s := strings.ToUpper(hex.EncodeToString(b))
+	if n.Sign() < 0 {
+		return "-" + s
+	}
+	return s
+}
+
 func toMap(name *pkix.Name) mapstr.M {
 	result := mapstr.M{}
 	fields := []struct {
 		name  string
-		value interface{}
+		value any
 	}{
 		{"country", name.Country},
 		{"organization", name.Organization},

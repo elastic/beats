@@ -10,7 +10,7 @@ import (
 
 const (
 	catShardsMetricSet = "cat_shards"
-	catShardsPath      = "/_cat/shards?s=i&h=n,i,id,s,p,st,d,sto,sc,sqto,sqti,iito,iiti,iif,mt,mtt,gmto,gmti,ur,ud&bytes=b&time=ms&format=json"
+	catShardsPath      = "/_cat/shards?s=i&h=n,i,id,s,p,st,d,sto,sc,sqto,sqti,iito,iiti,iif,mt,mtt,gmto,gmti,ur,ud,btsi,bto,dataset,dvc&bytes=b&time=ms&format=json"
 	resolveIndexPath   = "/_resolve/index/*?expand_wildcards=all&filter_path=indices"
 )
 

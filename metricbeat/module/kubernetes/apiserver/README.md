@@ -10,7 +10,7 @@
 - June 2019, `v1.14.3`
 
     `apiserver_request_total` will be used in spite of `apiserver_request_count`.
-    An _ugly trick_ has been put in place that will read both values, using `apiserver_request_total` if exists. The deprecated value is being configured under the bogus name `request.beforev14.count` and renamed to `request.count` if the newer does not exists.
+    An _ugly trick_ has been put in place that will read both values, using `apiserver_request_total` if it exists. The deprecated value is being configured under the bogus name `request.beforev14.count` and renamed to `request.count` if the newer one does not exist.
 
 ## Resources
 
@@ -69,7 +69,7 @@
 In order to support a new Kubernetes releases you'll have to generate new expectation files for this module in `_meta/test`. For that, start by deploying a new kubernetes cluster on the required Kubernetes version, for example:
 
 ```bash
-kind create cluster --image kindest/node:v1.32.0
+kind create cluster --image kindest/node:v1.36.1
 ```
 
 After that, you can apply the [`kubernetes.yml`](https://github.com/elastic/beats/blob/main/metricbeat/module/kubernetes/kubernetes.yml) file from the root of the kubernetes module:

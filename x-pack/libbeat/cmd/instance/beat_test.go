@@ -16,7 +16,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/cmd"
 	"github.com/elastic/beats/v7/filebeat/input/log"
-	libbeatinstance "github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -85,23 +85,38 @@ type: "log"`)
 	})
 }
 
-func TestNewBeatForReceiverDoesNotSetPacketbeatShutdownTimeout(t *testing.T) {
+func TestReceiverHostnameConfigField(t *testing.T) {
+	t.Cleanup(func() { beat.SetHostnameOverride("") })
+
 	cfg := map[string]any{
-		"packetbeat": map[string]any{},
-		"path.home":  t.TempDir(),
+		"path.home": t.TempDir(),
+		"hostname":  "receiver-node",
 	}
 
-	_, err := NewBeatForReceiver(
-		libbeatinstance.Settings{Name: "packetbeat"},
-		cfg,
-		consumertest.NewNop(),
-		"testcomponent",
-		zapcore.NewNopCore(),
-	)
+	b, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), cfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
 	require.NoError(t, err)
 
-	assert.NotContains(t, cfg["packetbeat"], "shutdown_timeout",
-		"packetbeat must retain its own shutdown timeout semantics")
+	assert.Equal(t, "receiver-node", b.Info.Hostname)
+	assert.Equal(t, "receiver-node", b.Info.FQDN)
+	assert.Equal(t, "receiver-node", beat.GetHostnameOverride())
+	assert.NotEqual(t, "receiver-node", b.Info.Name, "hostname: must not affect agent.name")
+}
+
+func TestReceiverNameAndHostnameAreIndependent(t *testing.T) {
+	t.Cleanup(func() { beat.SetHostnameOverride("") })
+
+	cfg := map[string]any{
+		"path.home": t.TempDir(),
+		"hostname":  "receiver-node",
+		"name":      "custom-name",
+	}
+
+	b, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), cfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
+	require.NoError(t, err)
+
+	assert.Equal(t, "receiver-node", b.Info.Hostname)
+	assert.Equal(t, "custom-name", b.Info.Name)
+	assert.Equal(t, "receiver-node", beat.GetHostnameOverride())
 }
 
 func TestNewBeatForReceiverMetricLoggingDefault(t *testing.T) {

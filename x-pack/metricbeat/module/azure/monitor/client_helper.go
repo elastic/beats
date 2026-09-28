@@ -113,12 +113,12 @@ func filterMetricNames(resourceId string, metricConfig azure.MetricConfig, metri
 func filterConfiguredMetrics(selectedRange []string, allRange []*armmonitor.MetricDefinition) ([]string, []string) {
 	var inRange []string
 	var notInRange []string
-	var allMetrics string
+	var allMetrics strings.Builder
 	for _, definition := range allRange {
-		allMetrics += *definition.Name.Value + " "
+		allMetrics.WriteString(*definition.Name.Value + " ")
 	}
 	for _, name := range selectedRange {
-		if strings.Contains(allMetrics, name) {
+		if strings.Contains(allMetrics.String(), name) {
 			inRange = append(inRange, name)
 		} else {
 			notInRange = append(notInRange, name)

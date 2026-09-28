@@ -23,7 +23,7 @@ import (
 
 // bufferPool contains a pool of PooledByteBuffer objects.
 var bufferPool = sync.Pool{
-	New: func() interface{} { return &PooledByteBuffer{ByteBuffer: NewByteBuffer(1024)} },
+	New: func() any { return &PooledByteBuffer{ByteBuffer: NewByteBuffer(1024)} },
 }
 
 // PooledByteBuffer is an expandable buffer backed by a byte slice.

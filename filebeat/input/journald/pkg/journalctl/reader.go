@@ -34,8 +34,17 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+// degradedRestartsThreshold is the number of consecutive journalctl
+// restarts, with no data delivered in between, after which the reader
+// reports a Degraded status. A single restart can happen during normal
+// operation (e.g. journal rotation), but repeated restarts without any
+// data being read indicate journalctl cannot run successfully.
+const degradedRestartsThreshold = 2
 
 // LocalSystemJournalID is the ID of the local system journal.
 const localSystemJournalID = "LOCAL_SYSTEM_JOURNAL"
@@ -65,6 +74,9 @@ type JctlFactory func(canceller input.Canceler, logger *logp.Logger, args ...str
 //
 //go:generate moq --fmt gofmt -out jctlmock_test.go . Jctl
 type Jctl interface {
+	// journalctl always honors read deadlines (its read is a channel receive)
+	reader.DeadlineSetter
+
 	// Next returns the next journal entry. If there is no entry available
 	// next will block until there is an entry or cancel is cancelled.
 	//
@@ -119,6 +131,39 @@ type Reader struct {
 	supportsBootAll bool
 
 	backoff backoff.Backoff
+
+	// deadline is the current read deadline. The Reader never blocks on it
+	// itself; it applies it to the underlying journalctl before each read so the
+	// deadline survives journalctl restarts.
+	deadline reader.Deadline
+
+	// statusReporter, when set, is used to report the reader's health:
+	// Degraded when journalctl keeps exiting without delivering any data,
+	// Running when it recovers.
+	statusReporter status.StatusReporter
+
+	// consecutiveRestarts counts journalctl restarts with no data read
+	// in between, it is reset whenever an entry is successfully read.
+	consecutiveRestarts int
+
+	// degraded tracks whether a Degraded status has been reported, so
+	// status updates are only sent on transitions.
+	degraded bool
+}
+
+// SetStatusReporter sets the status reporter used to report the reader's
+// health. It must be called before the first call to Next.
+func (r *Reader) SetStatusReporter(reporter status.StatusReporter) {
+	r.statusReporter = reporter
+}
+
+// updateStatus reports the status via the statusReporter, it is safe to
+// call when no statusReporter is set.
+func (r *Reader) updateStatus(s status.Status, msg string) {
+	if r.statusReporter == nil {
+		return
+	}
+	r.statusReporter.UpdateStatus(s, msg)
 }
 
 // maybeAddBootAll appends "--boot", "all" to args only when boot-all is
@@ -269,8 +314,12 @@ func New(
 		args = append(args, fmt.Sprintf("_TRANSPORT=%s", m))
 	}
 
+	// SYSLOG_FACILITY matches are used instead of `--facility` because the
+	// flag only exists on journalctl >= 245 and is implemented as exactly
+	// these matches. Matches on the same field are ORed by journalctl, which
+	// is the same semantics as repeated `--facility` flags.
 	for _, facility := range facilities {
-		args = append(args, "--facility", fmt.Sprintf("%d", facility))
+		args = append(args, fmt.Sprintf("SYSLOG_FACILITY=%d", facility))
 	}
 
 	supportsBootAll := journalctlSupportsBootAll(logger, newJctl)
@@ -317,10 +366,19 @@ func (r *Reader) Close() error {
 	return nil
 }
 
+// SetReadDeadline bounds how long the next read waits for an entry (see
+// reader.DeadlineSetter). It is forwarded to journalctl, which honors it.
+func (r *Reader) SetReadDeadline(t time.Time) bool {
+	return r.deadline.SetReadDeadline(t)
+}
+
 // next reads the next entry from journalctl. It handles any errors from
 // journalctl restarting it as necessary with a backoff strategy. It either
 // returns a valid journald entry or ErrCancelled when the input is cancelled.
 func (r *Reader) next(cancel input.Canceler) ([]byte, error) {
+	// Apply the current read deadline to the (possibly restarted) journalctl.
+	r.jctl.SetReadDeadline(r.deadline.ReadDeadline())
+
 	msg, err := r.jctl.Next(cancel)
 
 	// Check if the input has been cancelled
@@ -337,9 +395,26 @@ func (r *Reader) next(cancel input.Canceler) ([]byte, error) {
 	//   - Error, journalctl exited with an error, restart with
 	//     backoff if necessary.
 	if err == nil {
+		r.consecutiveRestarts = 0
+		if r.degraded {
+			r.degraded = false
+			r.updateStatus(status.Running, "journalctl recovered and is delivering data")
+		}
 		return msg, nil
 	}
+	if errors.Is(err, reader.ErrReadDeadline) {
+		// The read deadline elapsed (multiline timeout) — not a journalctl
+		// failure, so propagate it without restarting.
+		return nil, err
+	}
 	r.logger.Warnf("reader error: '%s', restarting...", err)
+
+	r.consecutiveRestarts++
+	if r.consecutiveRestarts >= degradedRestartsThreshold && !r.degraded {
+		r.degraded = true
+		r.updateStatus(status.Degraded,
+			fmt.Sprintf("journalctl keeps exiting without delivering any data, last error: %s", err))
+	}
 
 	// Handle backoff
 	//

@@ -12,7 +12,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 // Test getRateLimit function with a remaining quota, expect to receive 0, nil.
@@ -31,7 +32,7 @@ func TestGetRateLimitReturnsFalse0IfRemainingQuota(t *testing.T) {
 		limit:     tplLimit,
 		reset:     tplReset,
 		remaining: tplRemaining,
-		log:       logp.NewLogger(""),
+		log:       logptest.NewTestingLogger(t, t.Name()),
 	}
 	resp := &http.Response{Header: header}
 	applied, resumeAt, err := rateLimit.getRateLimit(resp)
@@ -55,7 +56,7 @@ func TestGetRateLimitReturnsTrue0IfResumeAtInPast(t *testing.T) {
 		limit:     tplLimit,
 		reset:     tplReset,
 		remaining: tplRemaining,
-		log:       logp.NewLogger(""),
+		log:       logptest.NewTestingLogger(t, t.Name()),
 	}
 	resp := &http.Response{Header: header}
 	applied, resumeAt, err := rateLimit.getRateLimit(resp)
@@ -83,7 +84,7 @@ func TestGetRateLimitReturnsResetValue(t *testing.T) {
 		limit:     tplLimit,
 		reset:     tplReset,
 		remaining: tplRemaining,
-		log:       logp.NewLogger(""),
+		log:       logptest.NewTestingLogger(t, t.Name()),
 	}
 	resp := &http.Response{Header: header}
 	applied, resumeAt, err := rateLimit.getRateLimit(resp)
@@ -114,7 +115,7 @@ func TestGetRateLimitReturns0IfEarlyLimit0(t *testing.T) {
 		limit:      tplLimit,
 		reset:      tplReset,
 		remaining:  tplRemaining,
-		log:        logp.NewLogger("TestGetRateLimitReturns0IfEarlyLimit0"),
+		log:        logptest.NewTestingLogger(t, t.Name()),
 		earlyLimit: earlyLimit,
 	}
 	resp := &http.Response{Header: header}
@@ -146,7 +147,7 @@ func TestGetRateLimitReturnsResetValueIfEarlyLimit1(t *testing.T) {
 		limit:      tplLimit,
 		reset:      tplReset,
 		remaining:  tplRemaining,
-		log:        logp.NewLogger("TestGetRateLimitReturnsResetValueIfEarlyLimit1"),
+		log:        logptest.NewTestingLogger(t, t.Name()),
 		earlyLimit: earlyLimit,
 	}
 	resp := &http.Response{Header: header}
@@ -178,7 +179,7 @@ func TestGetRateLimitReturns0IfEarlyLimitPercent(t *testing.T) {
 		limit:      tplLimit,
 		reset:      tplReset,
 		remaining:  tplRemaining,
-		log:        logp.NewLogger("TestGetRateLimitReturns0IfEarlyLimitPercent"),
+		log:        logptest.NewTestingLogger(t, t.Name()),
 		earlyLimit: earlyLimit,
 	}
 	resp := &http.Response{Header: header}
@@ -210,7 +211,7 @@ func TestGetRateLimitReturnsResetValueIfEarlyLimitPercent(t *testing.T) {
 		limit:      tplLimit,
 		reset:      tplReset,
 		remaining:  tplRemaining,
-		log:        logp.NewLogger("TestGetRateLimitReturnsResetValueIfEarlyLimitPercent"),
+		log:        logptest.NewTestingLogger(t, t.Name()),
 		earlyLimit: earlyLimit,
 	}
 	resp := &http.Response{Header: header}
@@ -240,7 +241,7 @@ func TestGetRateLimitWhenMissingLimit(t *testing.T) {
 		reset:      tplReset,
 		remaining:  tplRemaining,
 		status:     noopReporter{},
-		log:        logp.NewLogger("TestGetRateLimitWhenMissingLimit"),
+		log:        logptest.NewTestingLogger(t, t.Name()),
 		earlyLimit: earlyLimit,
 	}
 	resp := &http.Response{Header: header}
@@ -248,4 +249,34 @@ func TestGetRateLimitWhenMissingLimit(t *testing.T) {
 	assert.NoError(t, err)
 	assert.False(t, applied)
 	assert.EqualValues(t, 0, resumeAt)
+}
+
+// TestGetRateLimitMissingRemainingHeaderDoesNotDegrade verifies that when the
+// remaining header is absent from the response the rate limiter returns no
+// error and does not mark the input as Degraded (issue #53185).
+func TestGetRateLimitMissingRemainingHeaderDoesNotDegrade(t *testing.T) {
+	tplRemaining := &valueTpl{}
+	assert.NoError(t, tplRemaining.Unpack(`[[.last_response.header.Get "X-Rate-Limit-Remaining"]]`))
+	stat := &statusRecordingReporter{}
+	rateLimit := &rateLimiter{
+		remaining: tplRemaining,
+		status:    stat,
+		log:       logptest.NewTestingLogger(t, t.Name()),
+	}
+	resp := &http.Response{Header: make(http.Header)} // header absent
+	applied, resumeAt, err := rateLimit.getRateLimit(resp)
+	assert.NoError(t, err, "absent remaining header must not return an error")
+	assert.False(t, applied, "absent remaining header must not apply rate limit")
+	assert.EqualValues(t, 0, resumeAt)
+	assert.NotEqual(t, status.Degraded, stat.status, "absent remaining header must not degrade the input")
+}
+
+// statusRecordingReporter records the most-recent status update so tests can
+// assert that no unexpected Degraded transition occurred.
+type statusRecordingReporter struct {
+	status status.Status
+}
+
+func (r *statusRecordingReporter) UpdateStatus(s status.Status, _ string) {
+	r.status = s
 }

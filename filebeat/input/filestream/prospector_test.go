@@ -775,8 +775,8 @@ func (m *mockFileWatcher) Event() loginp.FSEvent {
 
 func (m *mockFileWatcher) Run(_ unison.Canceler, _ *loginp.Metrics, _ time.Duration, _ time.Time) {}
 
-func (m *mockFileWatcher) GetFiles(loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
-	return m.filesOnDisk, loginp.FileScanMetrics{}
+func (m *mockFileWatcher) GetFiles(loginp.FileScanOptions) loginp.ScanResults {
+	return loginp.ScanResults{Files: m.filesOnDisk}
 }
 
 func (m *mockFileWatcher) NotifyChan() chan loginp.HarvesterStatus {

@@ -259,13 +259,6 @@ func (res *miekgResolver) getOrCreateNameserverStats(ns string) *nameserverStats
 	return stats
 }
 
-func min(a, b uint32) uint32 {
-	if a < b {
-		return a
-	}
-	return b
-}
-
 func isIPv6Address(addr string) bool {
 	ip, err := netip.ParseAddr(addr)
 	if err != nil {

@@ -64,7 +64,7 @@ var (
 )
 
 func eventMapping(serverId string, response io.Reader, r mb.ReporterV2, logger *logp.Logger) {
-	fullEvent := map[string]interface{}{}
+	fullEvent := map[string]any{}
 	scanner := bufio.NewScanner(response)
 
 	// Iterate through all events to gather data

@@ -92,13 +92,10 @@ func logFileIdentifiers(logger *logp.Logger) map[string]file.StateIdentifier {
 func newProspector(
 	config config,
 	log *logp.Logger,
-	srci *loginp.SourceIdentifier) (loginp.Prospector, error) {
+	srci *loginp.SourceIdentifier,
+	dc *dirCache) (loginp.Prospector, error) {
 
 	logger := log.Named("filestream").With("id", config.ID)
-	err := checkConfigCompatibility(config)
-	if err != nil {
-		return nil, err
-	}
 
 	identifier, err := newFileIdentifier(
 		config.FileIdentity,
@@ -109,7 +106,7 @@ func newProspector(
 	}
 	logger.Debugf("file identity is set to %s", identifier.Name())
 
-	filewatcher, err := newFileWatcher(
+	filewatcher, err := newFileWatcherWithDirReader(
 		logger,
 		config.Paths,
 		config.FileWatcher,
@@ -117,6 +114,8 @@ func newProspector(
 		config.Delete.Enabled,
 		identifier,
 		srci,
+		dc,
+		min(config.FileWatcher.Interval, maxDirCacheAge),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating filewatcher %w", err)
@@ -191,14 +190,4 @@ func newProspector(
 	default:
 	}
 	return nil, fmt.Errorf("no such rotation method: %s", rotationMethod)
-}
-
-func checkConfigCompatibility(config config) error {
-	if config.FileIdentity != nil &&
-		config.FileIdentity.Name() == fingerprintName &&
-		!config.FileWatcher.Scanner.Fingerprint.Enabled {
-		return fmt.Errorf("fingerprint file identity can be used only when fingerprint is enabled in the scanner")
-	}
-
-	return nil
 }

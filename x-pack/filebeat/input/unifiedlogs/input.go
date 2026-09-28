@@ -283,7 +283,7 @@ func newWrappedPublisher(updateCursor bool, inner inputcursor.Publisher) *wrappe
 	}
 }
 
-func (pub *wrappedPublisher) Publish(event beat.Event, cursor interface{}) error {
+func (pub *wrappedPublisher) Publish(event beat.Event, cursor any) error {
 	pub.firstTimeOnce.Do(func() {
 		pub.firstProcessedTime, _ = cursor.(time.Time)
 		close(pub.firstTimeC)

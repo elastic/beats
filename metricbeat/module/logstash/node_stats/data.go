@@ -34,7 +34,7 @@ import (
 )
 
 type jvm struct {
-	GC  map[string]interface{} `json:"gc"`
+	GC  map[string]any `json:"gc"`
 	Mem struct {
 		HeapMaxInBytes  int `json:"heap_max_in_bytes"`
 		HeapUsedInBytes int `json:"heap_used_in_bytes"`
@@ -51,17 +51,17 @@ type events struct {
 }
 
 type commonStats struct {
-	Events  events                 `json:"events"`
-	JVM     jvm                    `json:"jvm"`
-	Reloads map[string]interface{} `json:"reloads"`
+	Events  events         `json:"events"`
+	JVM     jvm            `json:"jvm"`
+	Reloads map[string]any `json:"reloads"`
 	Queue   struct {
 		EventsCount int `json:"events_count"`
 	} `json:"queue"`
 }
 
 type cpu struct {
-	Percent     int                    `json:"percent"`
-	LoadAverage map[string]interface{} `json:"load_average,omitempty"`
+	Percent     int            `json:"percent"`
+	LoadAverage map[string]any `json:"load_average,omitempty"`
 }
 
 type process struct {
@@ -71,11 +71,11 @@ type process struct {
 }
 
 type cgroup struct {
-	CPUAcct map[string]interface{} `json:"cpuacct"`
+	CPUAcct map[string]any `json:"cpuacct"`
 	CPU     struct {
-		Stat           map[string]interface{} `json:"stat"`
-		ControlGroup   string                 `json:"control_group"`
-		CFSQuotaMicros int64                  `json:"cfs_quota_micros"`
+		Stat           map[string]any `json:"stat"`
+		ControlGroup   string         `json:"control_group"`
+		CFSQuotaMicros int64          `json:"cfs_quota_micros"`
 	} `json:"cpu"`
 }
 
@@ -138,13 +138,13 @@ type LogstashStats struct {
 
 // PipelineStats represents the stats of a Logstash pipeline
 type PipelineStats struct {
-	ID          string                   `json:"id"`
-	Hash        string                   `json:"hash"`
-	EphemeralID string                   `json:"ephemeral_id"`
-	Events      map[string]interface{}   `json:"events"`
-	Reloads     reloads                  `json:"reloads"`
-	Queue       map[string]interface{}   `json:"queue"`
-	Vertices    []map[string]interface{} `json:"vertices"`
+	ID          string           `json:"id"`
+	Hash        string           `json:"hash"`
+	EphemeralID string           `json:"ephemeral_id"`
+	Events      map[string]any   `json:"events"`
+	Reloads     reloads          `json:"reloads"`
+	Queue       map[string]any   `json:"queue"`
+	Vertices    []map[string]any `json:"vertices"`
 }
 
 func eventMapping(r mb.ReporterV2, content []byte, isXpack bool, logger *logp.Logger) error {

@@ -156,7 +156,7 @@ func eventMapping(r mb.ReporterV2, info beat.Info, clusterUUID string, content [
 		event.ModuleFields.Put("elasticsearch.cluster.id", clusterUUID)
 	}
 
-	var data map[string]interface{}
+	var data map[string]any
 	err := json.Unmarshal(content, &data)
 	if err != nil {
 		return fmt.Errorf("failure parsing Beat's Stats API response: %w", err)

@@ -330,7 +330,7 @@ func InitEvent(regionName string, accountName string, accountID string, timestam
 
 // CheckTagFiltersExist compare tags filter with a set of tags to see if tags
 // filter is a subset of tags
-func CheckTagFiltersExist(tagsFilter []Tag, tags interface{}) bool {
+func CheckTagFiltersExist(tagsFilter []Tag, tags any) bool {
 	var tagKeys []string
 	var tagValues []string
 

@@ -323,7 +323,7 @@ func TestErrorReporting(t *testing.T) {
 	close(done)
 	<-ready
 
-	getField := func(ev *mb.Event, field string) interface{} {
+	getField := func(ev *mb.Event, field string) any {
 		v, _ := ev.MetricSetFields.GetValue(field)
 		return v
 	}
@@ -336,7 +336,6 @@ func TestErrorReporting(t *testing.T) {
 
 	var event *mb.Event
 	for idx, ev := range events {
-		ev := ev
 		t.Log("event[", idx, "] = ", ev)
 		if match(&ev) {
 			event = &ev
@@ -361,7 +360,7 @@ func TestErrorReporting(t *testing.T) {
 	switch v := errors.(type) {
 	case string:
 		errList = []string{v}
-	case []interface{}:
+	case []any:
 		for _, val := range v {
 			str, ok := val.(string)
 			if !ok {
@@ -412,7 +411,7 @@ func (t *testReporter) Clear() {
 	t.errors = nil
 }
 
-func checkExpectedEvent(t *testing.T, ms *MetricSet, title string, input *Event, expected map[string]interface{}) {
+func checkExpectedEvent(t *testing.T, ms *MetricSet, title string, input *Event, expected map[string]any) {
 	t.Helper()
 
 	var reporter testReporter
@@ -450,7 +449,7 @@ func checkExpectedEvent(t *testing.T, ms *MetricSet, title string, input *Event,
 type expectedEvent struct {
 	title    string
 	input    Event
-	expected map[string]interface{}
+	expected map[string]any
 }
 
 func (e expectedEvent) validate(t *testing.T, ms *MetricSet) {
@@ -497,7 +496,7 @@ func TestEventFailedHash(t *testing.T) {
 						SHA256: []byte("11111111111111111111"),
 					},
 				},
-				expected: map[string]interface{}{
+				expected: map[string]any{
 					"event.action":     []string{"created"},
 					"event.type":       []string{"creation"},
 					"file.hash.sha256": Digest("11111111111111111111"),
@@ -519,7 +518,7 @@ func TestEventFailedHash(t *testing.T) {
 						SHA256: []byte("22222222222222222222"),
 					},
 				},
-				expected: map[string]interface{}{
+				expected: map[string]any{
 					"event.action":     []string{"updated"},
 					"event.type":       []string{"change"},
 					"file.hash.sha256": Digest("22222222222222222222"),
@@ -539,7 +538,7 @@ func TestEventFailedHash(t *testing.T) {
 					Action:     Updated,
 					hashFailed: true,
 				},
-				expected: map[string]interface{}{
+				expected: map[string]any{
 					"event.action":     []string{"updated"},
 					"event.type":       []string{"change"},
 					"file.hash.sha256": nil,
@@ -561,7 +560,7 @@ func TestEventFailedHash(t *testing.T) {
 						SHA256: []byte("33333333333333333333"),
 					},
 				},
-				expected: map[string]interface{}{
+				expected: map[string]any{
 					"event.action":     []string{"updated"},
 					"event.type":       []string{"change"},
 					"file.hash.sha256": Digest("33333333333333333333"),
@@ -583,7 +582,7 @@ func TestEventFailedHash(t *testing.T) {
 						SHA256: []byte("33333333333333333333"),
 					},
 				},
-				expected: map[string]interface{}{
+				expected: map[string]any{
 					"event.action":     []string{"attributes_modified"},
 					"event.type":       []string{"change"},
 					"file.hash.sha256": Digest("33333333333333333333"),
@@ -607,7 +606,7 @@ func TestEventFailedHash(t *testing.T) {
 					Source:     SourceFSNotify,
 					hashFailed: true,
 				},
-				expected: map[string]interface{}{
+				expected: map[string]any{
 					"event.action":     []string{"created"},
 					"event.type":       []string{"creation"},
 					"file.hash.sha256": nil,
@@ -629,7 +628,7 @@ func TestEventFailedHash(t *testing.T) {
 						SHA256: []byte("22222222222222222222"),
 					},
 				},
-				expected: map[string]interface{}{
+				expected: map[string]any{
 					"event.action":     []string{"updated", "attributes_modified"},
 					"event.type":       []string{"change"},
 					"file.hash.sha256": Digest("22222222222222222222"),
@@ -655,7 +654,7 @@ func TestEventFailedHash(t *testing.T) {
 						SHA256: []byte("22222222222222222222"),
 					},
 				},
-				expected: map[string]interface{}{
+				expected: map[string]any{
 					"event.action":     []string{"created"},
 					"event.type":       []string{"creation"},
 					"file.hash.sha256": Digest("22222222222222222222"),
@@ -671,7 +670,7 @@ func TestEventFailedHash(t *testing.T) {
 					Action:    Deleted,
 					Hashes:    nil,
 				},
-				expected: map[string]interface{}{
+				expected: map[string]any{
 					"event.action":     []string{"deleted"},
 					"event.type":       []string{"deletion"},
 					"file.hash.sha256": nil,
@@ -697,7 +696,7 @@ func TestEventFailedHash(t *testing.T) {
 						SHA256: []byte("22222222222222222222"),
 					},
 				},
-				expected: map[string]interface{}{
+				expected: map[string]any{
 					"event.action":     []string{"created"},
 					"event.type":       []string{"creation"},
 					"file.hash.sha256": Digest("22222222222222222222"),
@@ -714,7 +713,7 @@ func TestEventFailedHash(t *testing.T) {
 					Action: Moved,
 					Hashes: nil,
 				},
-				expected: map[string]interface{}{
+				expected: map[string]any{
 					"event.action":     []string{"moved"},
 					"event.type":       []string{"change"},
 					"file.hash.sha256": nil,
@@ -758,7 +757,7 @@ func TestEventDelete(t *testing.T) {
 						SHA256: sha,
 					},
 				},
-				expected: map[string]interface{}{
+				expected: map[string]any{
 					"event.action":     []string{"created"},
 					"event.type":       []string{"creation"},
 					"file.hash.sha256": sha,
@@ -772,7 +771,7 @@ func TestEventDelete(t *testing.T) {
 					Source:    SourceFSNotify,
 					Action:    Deleted,
 				},
-				expected: map[string]interface{}{
+				expected: map[string]any{
 					"event.action": []string{"deleted"},
 					"event.type":   []string{"deletion"},
 				},
@@ -793,7 +792,7 @@ func TestEventDelete(t *testing.T) {
 						SHA256: sha,
 					},
 				},
-				expected: map[string]interface{}{
+				expected: map[string]any{
 					"event.action":     []string{"created"},
 					"event.type":       []string{"creation"},
 					"file.hash.sha256": sha,
@@ -823,7 +822,7 @@ func TestEventDelete(t *testing.T) {
 						SHA256: sha,
 					},
 				},
-				expected: map[string]interface{}{
+				expected: map[string]any{
 					"event.action":     []string{"created"},
 					"event.type":       []string{"creation"},
 					"file.hash.sha256": sha,
@@ -845,7 +844,7 @@ func TestEventDelete(t *testing.T) {
 						SHA256: shaNext,
 					},
 				},
-				expected: map[string]interface{}{
+				expected: map[string]any{
 					"event.action":     []string{"updated"},
 					"event.type":       []string{"change"},
 					"file.hash.sha256": shaNext,
@@ -890,7 +889,7 @@ func TestEventDelete(t *testing.T) {
 						SHA256: sha,
 					},
 				},
-				expected: map[string]interface{}{
+				expected: map[string]any{
 					"event.action":     []string{"created"},
 					"event.type":       []string{"creation"},
 					"file.hash.sha256": sha,
@@ -938,8 +937,8 @@ func TestEventDelete(t *testing.T) {
 	})
 }
 
-func getConfig(path ...string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(path ...string) map[string]any {
+	return map[string]any{
 		"module":        "file_integrity",
 		"paths":         path,
 		"exclude_files": []string{`(?i)\.sw[nop]$`, `[/\\]\.git([/\\]|$)`},

@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Allow browser monitors to bypass certificate errors for configured SPKIs
+component: heartbeat

@@ -21,8 +21,8 @@ RUN \
 RUN \
     apt-get update \
     && apt-get install -y \
-        google-cloud-sdk=${SDK_VERSION} \
-        google-cloud-sdk-pubsub-emulator=${SDK_VERSION} \
+        google-cloud-cli=${SDK_VERSION} \
+        google-cloud-cli-pubsub-emulator=${SDK_VERSION} \
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN \

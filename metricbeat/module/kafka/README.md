@@ -79,7 +79,7 @@ Here is how the config should look like (in a MAC):
 
 #### Starting extra Producers/Consumers
 In order to create more stats for the Kafka Module, one could create more Producer/Consumer pairs (or combinations).
-For this we will reuse the scripts that are used withing the Docker container to bring up a Producer/Consumer pair for the testing.
+For this we will reuse the scripts that are used within the Docker container to bring up a Producer/Consumer pair for the testing.
 See the [source](https://github.com/elastic/beats/blob/87c49acb60b277a24c60c3956e9b4e23a644bce8/metricbeat/module/kafka/_meta/run.sh#L75).
 
 Here are the commands:

@@ -83,7 +83,6 @@ func TestFilestreamLiveFileTruncation(t *testing.T) {
 	integration.WriteLogFile(t, logFile, 200, false)
 	filebeat.Start()
 	filebeat.WaitLogsContains("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
-	filebeat.WaitLogsContains("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
 
 	// 2. Truncate the file and wait Filebeat to close the file
 	if err := os.Truncate(logFile, 0); err != nil {
@@ -106,8 +105,7 @@ func TestFilestreamLiveFileTruncation(t *testing.T) {
 
 	// 5. Start Filebeat again.
 	filebeat.Start()
-	filebeat.WaitLogsContains("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
-	filebeat.WaitLogsContains("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
+	waitForRegistryOffset(t, registryLogFile, 500, 30*time.Second)
 
 	assertLastOffset(t, registryLogFile, 500)
 }
@@ -130,7 +128,6 @@ func TestFilestreamOfflineFileTruncation(t *testing.T) {
 	// 2. Ingest the file and stop Filebeat
 	filebeat.Start()
 	filebeat.WaitLogsContains("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
-	filebeat.WaitLogsContains("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
 	filebeat.Stop()
 
 	// 3. Assert the offset is correctly set in the registry
@@ -142,10 +139,9 @@ func TestFilestreamOfflineFileTruncation(t *testing.T) {
 	}
 	integration.WriteLogFile(t, logFile, 5, true)
 
-	// 5. Read the file again and stop Filebeat
+	// 5. Read the file again and stop Filebeat.
 	filebeat.Start()
-	filebeat.WaitLogsContains("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
-	filebeat.WaitLogsContains("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
+	waitForRegistryOffset(t, registryLogFile, 250, 30*time.Second)
 	filebeat.Stop()
 
 	// 6. Assert the registry offset is new, smaller file size.
@@ -271,4 +267,26 @@ type entry struct {
 	// e.g: {"op":"set","id":46}
 	Op string `json:"op"`
 	ID int    `json:"id"`
+}
+
+// waitForRegistryOffset polls the registry log until an entry with the given
+// offset appears (or the timeout elapses). It parses the entries rather than
+// matching a substring because the cursor JSON field order is not stable
+// (e.g. `"offset":250}` vs `"offset":500,`), which makes raw string matching
+// unreliable.
+func waitForRegistryOffset(t *testing.T, path string, offset int, timeout time.Duration) {
+	t.Helper()
+	deadline := time.Now().Add(timeout)
+	for {
+		entries, _ := readFilestreamRegistryLog(t, path)
+		for _, e := range entries {
+			if e.Offset == offset {
+				return
+			}
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("registry did not reach offset %d within %s", offset, timeout)
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
 }

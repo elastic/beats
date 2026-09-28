@@ -62,6 +62,7 @@ type Input interface {
 type managedInput struct {
 	manager      *InputManager
 	userID       string
+	cacheKey     string
 	sources      []Source
 	input        Input
 	cleanTimeout time.Duration
@@ -120,6 +121,15 @@ func (inp *managedInput) Run(
 	// stage.)
 	monitoring.NewString(ctx.MetricsRegistry, "input").Set(inputmon.InputNested)
 
+	// Acquire a lease on the shared store. This increments the cache user
+	// count so the store cannot be drained by a concurrent Close() call
+	// until all source goroutines have finished and leaseRelease is called.
+	store, leaseRelease, ok := inp.manager.acquireLease(inp.cacheKey)
+	if !ok {
+		return errors.New("input manager store is not available")
+	}
+	defer leaseRelease()
+
 	var grp unison.MultiErrGroup
 	for _, source := range inp.sources {
 		grp.Go(func() (err error) {
@@ -146,7 +156,7 @@ func (inp *managedInput) Run(
 			}
 			inpCtx = inpCtx.WithStatusReporter(ctx)
 
-			if err = inp.runSource(inpCtx, inp.manager.store, source, pc); err != nil {
+			if err = inp.runSource(inpCtx, store, source, pc); err != nil {
 				cancel()
 			}
 			return err
@@ -181,7 +191,7 @@ func (inp *managedInput) runSource(
 	defer client.Close()
 
 	resourceKey := inp.createSourceID(source)
-	resource, err := inp.manager.lock(ctx, resourceKey)
+	resource, err := lock(ctx, store, resourceKey)
 	if err != nil {
 		return err
 	}

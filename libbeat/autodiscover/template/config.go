@@ -26,7 +26,7 @@ import (
 	"github.com/elastic/go-ucfg/parse"
 
 	"github.com/elastic/beats/v7/libbeat/conditions"
-	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
 )

@@ -66,9 +66,6 @@
       "exclude_files": [
         "excluded-file glob goes here"
       ],
-      "fingerprint": {
-        "enabled": false
-      },
       "recursive_glob": false,
       "symlinks": true
     }

@@ -103,6 +103,13 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 
 	logger := b.Info.Logger
 
+	timeout, err := config.GetShutDownTimeOut(rawConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	b.ShutdownTimeout = timeout
+
 	factory := newProcessorFactory(b.Info.Name, make(chan error, maxSniffers), b, configurator)
 	if err := factory.CheckConfig(rawConfig); err != nil {
 		return nil, err
@@ -176,16 +183,18 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 	}
 
 	if !b.Manager.Enabled() {
-		if b.Config.Output.Name() == "elasticsearch" {
-			_, err := elasticsearch.RegisterConnectCallback(func(esClient *eslegclient.Connection, _ *logp.Logger) error {
-				_, err := module.UploadPipelines(b.Info, esClient, pb.overwritePipelines)
-				return err
-			})
-			if err != nil {
-				return err
+		if beat.SetupPipelinesEnabled(b.BeatConfig) {
+			if b.Config.Output.Name() == "elasticsearch" {
+				_, err := elasticsearch.RegisterConnectCallback(func(esClient *eslegclient.Connection, _ *logp.Logger) error {
+					_, err := module.UploadPipelines(b.Info, esClient, pb.overwritePipelines)
+					return err
+				})
+				if err != nil {
+					return err
+				}
+			} else {
+				b.Info.Logger.Warn(pipelinesWarning)
 			}
-		} else {
-			b.Info.Logger.Warn(pipelinesWarning)
 		}
 
 		return pb.runStatic(b, factory)

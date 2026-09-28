@@ -27,14 +27,14 @@ type goLumberLogger struct {
 	parent *logp.Logger
 }
 
-func (l *goLumberLogger) Printf(s string, i ...interface{}) {
+func (l *goLumberLogger) Printf(s string, i ...any) {
 	l.parent.Debugf(s, i...)
 }
 
-func (l *goLumberLogger) Println(i ...interface{}) {
+func (l *goLumberLogger) Println(i ...any) {
 	l.parent.Debug(i...)
 }
 
-func (l *goLumberLogger) Print(i ...interface{}) {
+func (l *goLumberLogger) Print(i ...any) {
 	l.parent.Debug(i...)
 }

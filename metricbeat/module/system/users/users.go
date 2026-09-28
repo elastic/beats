@@ -26,10 +26,12 @@ import (
 
 	"github.com/godbus/dbus/v5"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+// Ensure MetricSet implements mb.Closer so dbus connections are released on stop/reload.
+var _ mb.Closer = (*MetricSet)(nil)
 
 // init registers the MetricSet with the central registry as soon as the program
 // starts. The New function will be called later to instantiate an instance of
@@ -52,8 +54,6 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	base.Logger().Warn(cfgwarn.Beta("The system users metricset is beta."))
-
 	conn, err := initDbusConnection()
 	if err != nil {
 		return nil, fmt.Errorf("error connecting to dbus: %w", err)
@@ -64,6 +64,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		counter:       1,
 		conn:          conn,
 	}, nil
+}
+
+// Close closes the dbus connection to logind.
+func (m *MetricSet) Close() error {
+	if m.conn == nil {
+		return nil
+	}
+	err := m.conn.Close()
+	m.conn = nil
+	return err
 }
 
 // Fetch methods implements the data gathering and data conversion to the right

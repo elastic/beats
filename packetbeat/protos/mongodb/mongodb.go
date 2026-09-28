@@ -19,6 +19,8 @@ package mongodb
 
 import (
 	"fmt"
+	"maps"
+	"slices"
 	"strings"
 	"time"
 
@@ -89,7 +91,7 @@ func New(
 }
 
 //go:inline
-func (mongodb *mongodbPlugin) debugf(format string, v ...interface{}) {
+func (mongodb *mongodbPlugin) debugf(format string, v ...any) {
 	if mongodb.isDebug {
 		mongodb.logger.Debugf(format, v...)
 	}
@@ -327,9 +329,7 @@ func newTransaction(requ, resp *mongodbMessage) *transaction {
 
 	// fill response
 	if resp != nil {
-		for k, v := range resp.event {
-			trans.event[k] = v
-		}
+		maps.Copy(trans.event, resp.event)
 
 		trans.error = resp.error
 		trans.documents = resp.documents
@@ -352,16 +352,10 @@ func (mongodb *mongodbPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	return private
 }
 
-func copyMapWithoutKey(d map[string]interface{}, keys ...string) map[string]interface{} {
-	res := map[string]interface{}{}
+func copyMapWithoutKey(d map[string]any, keys ...string) map[string]any {
+	res := map[string]any{}
 	for k, v := range d {
-		found := false
-		for _, excludeKey := range keys {
-			if k == excludeKey {
-				found = true
-				break
-			}
-		}
+		found := slices.Contains(keys, k)
 		if !found {
 			res[k] = v
 		}
@@ -371,7 +365,7 @@ func copyMapWithoutKey(d map[string]interface{}, keys ...string) map[string]inte
 
 func reconstructQuery(t *transaction, full bool, logger *logp.Logger) (query string) {
 	query = t.resource + "." + t.method + "("
-	var doc interface{}
+	var doc any
 
 	if len(t.params) > 0 {
 		if !full {

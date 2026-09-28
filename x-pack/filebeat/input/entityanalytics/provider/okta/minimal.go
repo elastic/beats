@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/entcollect"
 	ecokta "github.com/elastic/entcollect/provider/okta"
 )
@@ -44,7 +45,7 @@ func (o *minimalOAuth2Conf) isEnabled() bool {
 	return o != nil && (o.Enabled == nil || *o.Enabled)
 }
 
-func minimalProvider(cfg *config.C, _ *logp.Logger) (entcollect.Provider, time.Duration, time.Duration, error) {
+func minimalProvider(cfg *config.C, log *logp.Logger) (entcollect.Provider, time.Duration, time.Duration, error) {
 	// localConf mirrors ecokta.Config with config:"" tags for ucfg Unpack.
 	// If ecokta.Config gains a new field, add it here and in the mapping
 	// below; TestMinimalConfigRoundTrip (minimal_test.go) will catch any drift.
@@ -65,8 +66,12 @@ func minimalProvider(cfg *config.C, _ *logp.Logger) (entcollect.Provider, time.D
 		LimitFixed  *int          `config:"limit_fixed"`
 
 		ScratchDir string `json:"scratch_dir"`
+
+		Transport httpcommon.HTTPTransportSettings `config:"request"`
 	}
 
+	transport := httpcommon.DefaultHTTPTransportSettings()
+	transport.Timeout = 30 * time.Second
 	d := ecokta.DefaultConfig()
 	lc := localConf{
 		EnrichWith:     d.EnrichWith,
@@ -74,6 +79,7 @@ func minimalProvider(cfg *config.C, _ *logp.Logger) (entcollect.Provider, time.D
 		UpdateInterval: d.UpdateInterval,
 		IDSetShards:    d.IDSetShards,
 		LimitWindow:    d.LimitWindow,
+		Transport:      transport,
 	}
 	if err := cfg.Unpack(&lc); err != nil {
 		return nil, 0, 0, err
@@ -111,7 +117,11 @@ func minimalProvider(cfg *config.C, _ *logp.Logger) (entcollect.Provider, time.D
 	if err := ec.Validate(); err != nil {
 		return nil, 0, 0, err
 	}
-	return ecokta.New(ec), ec.SyncInterval, ec.UpdateInterval, nil
+	client, err := lc.Transport.Client(httpcommon.WithLogger(log), httpcommon.WithAPMHTTPInstrumentation())
+	if err != nil {
+		return nil, 0, 0, fmt.Errorf("creating HTTP client: %w", err)
+	}
+	return ecokta.NewWithClient(ec, client), ec.SyncInterval, ec.UpdateInterval, nil
 }
 
 // resolveJWK converts one of the three JWK input forms (JSON, file, PEM)

@@ -22,15 +22,15 @@ import (
 )
 
 // GetAPIServerConfig function returns configuration for talking to Kubernetes API server.
-func GetAPIServerConfig(t *testing.T, metricSetName string) map[string]interface{} {
+func GetAPIServerConfig(t *testing.T, metricSetName string) map[string]any {
 	t.Helper()
-	return map[string]interface{}{
+	return map[string]any{
 		"module":            "kubernetes",
 		"metricsets":        []string{metricSetName},
 		"host":              "${NODE_NAME}",
 		"hosts":             []string{"https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"},
 		"bearer_token_file": "/var/run/secrets/kubernetes.io/serviceaccount/token",
-		"ssl": map[string]interface{}{
+		"ssl": map[string]any{
 			"certificate_authorities": []string{
 				"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt",
 			},
@@ -39,9 +39,9 @@ func GetAPIServerConfig(t *testing.T, metricSetName string) map[string]interface
 }
 
 // GetKubeStateMetricsConfig function returns configuration for talking to kube-state-metrics.
-func GetKubeStateMetricsConfig(t *testing.T, metricSetName string) map[string]interface{} {
+func GetKubeStateMetricsConfig(t *testing.T, metricSetName string) map[string]any {
 	t.Helper()
-	return map[string]interface{}{
+	return map[string]any{
 		"module":     "kubernetes",
 		"metricsets": []string{metricSetName},
 		"host":       "${NODE_NAME}",
@@ -50,24 +50,24 @@ func GetKubeStateMetricsConfig(t *testing.T, metricSetName string) map[string]in
 }
 
 // GetKubeletConfig function returns configuration for talking to Kubelet API.
-func GetKubeletConfig(t *testing.T, metricSetName string) map[string]interface{} {
+func GetKubeletConfig(t *testing.T, metricSetName string) map[string]any {
 	t.Helper()
-	return map[string]interface{}{
+	return map[string]any{
 		"module":            "kubernetes",
 		"metricsets":        []string{metricSetName},
 		"host":              "${NODE_NAME}",
 		"hosts":             []string{"https://localhost:10250"},
 		"bearer_token_file": "/var/run/secrets/kubernetes.io/serviceaccount/token",
-		"ssl": map[string]interface{}{
+		"ssl": map[string]any{
 			"verification_mode": "none",
 		},
 	}
 }
 
 // GetKubeProxyConfig function returns configuration for talking to kube-proxy.
-func GetKubeProxyConfig(t *testing.T, metricSetName string) map[string]interface{} {
+func GetKubeProxyConfig(t *testing.T, metricSetName string) map[string]any {
 	t.Helper()
-	return map[string]interface{}{
+	return map[string]any{
 		"module":     "kubernetes",
 		"metricsets": []string{metricSetName},
 		"host":       "${NODE_NAME}",
@@ -76,9 +76,9 @@ func GetKubeProxyConfig(t *testing.T, metricSetName string) map[string]interface
 }
 
 // GetSchedulerConfig function returns configuration for talking to kube-scheduler.
-func GetSchedulerConfig(t *testing.T, metricSetName string) map[string]interface{} {
+func GetSchedulerConfig(t *testing.T, metricSetName string) map[string]any {
 	t.Helper()
-	return map[string]interface{}{
+	return map[string]any{
 		"module":                "kubernetes",
 		"metricsets":            []string{metricSetName},
 		"host":                  "${NODE_NAME}",
@@ -89,9 +89,9 @@ func GetSchedulerConfig(t *testing.T, metricSetName string) map[string]interface
 }
 
 // GetControllerManagerConfig function returns configuration for talking to kube-controller-manager.
-func GetControllerManagerConfig(t *testing.T, metricSetName string) map[string]interface{} {
+func GetControllerManagerConfig(t *testing.T, metricSetName string) map[string]any {
 	t.Helper()
-	return map[string]interface{}{
+	return map[string]any{
 		"module":                "kubernetes",
 		"metricsets":            []string{metricSetName},
 		"host":                  "${NODE_NAME}",

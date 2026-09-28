@@ -79,8 +79,8 @@ func defaultRoute(af int) (name string, index int, err error) {
 		if len(f) < 3 {
 			return "", -1, fmt.Errorf("unexpected netstat -I %s line: %q", name, sc.Text())
 		}
-		if strings.HasPrefix(f[2], "<Link#") {
-			idx, err := strconv.Atoi(strings.TrimSuffix(strings.TrimPrefix(f[2], "<Link#"), ">"))
+		if after, ok := strings.CutPrefix(f[2], "<Link#"); ok {
+			idx, err := strconv.Atoi(strings.TrimSuffix(after, ">"))
 			if err != nil {
 				return "", -1, fmt.Errorf("failed to parse index from %s: %v", f[2], err)
 			}

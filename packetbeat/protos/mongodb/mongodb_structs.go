@@ -53,8 +53,8 @@ type mongodbMessage struct {
 	method    string
 	error     string
 	resource  string
-	documents []interface{}
-	params    map[string]interface{}
+	documents []any
+	params    map[string]any
 
 	// Other fields vary very much depending on operation type
 	// lets just put them in a map
@@ -104,9 +104,9 @@ type transaction struct {
 	method           string
 	resource         string
 	error            string
-	params           map[string]interface{}
-	requestDocuments []interface{}
-	documents        []interface{}
+	params           map[string]any
+	requestDocuments []any
+	documents        []any
 }
 
 type msgKind byte

@@ -68,11 +68,47 @@ func TestHomebrew(t *testing.T) {
 	}
 }
 
-func checkFieldValue(t *testing.T, event beat.Event, fieldName string, fieldValue interface{}) {
+func checkFieldValue(t *testing.T, event beat.Event, fieldName string, fieldValue any) {
 	t.Helper()
 	value, err := event.GetValue(fieldName)
 	if assert.NoError(t, err, "checking field %s", fieldName) {
 		assert.Equal(t, fieldValue, value, "checking field %v", fieldName)
+	}
+}
+
+// TestHomebrewJWSFormula verifies that a receipt whose source.path points to a
+// non-.rb file (e.g. Homebrew 4.0's formula.jws.json API cache) does not
+// produce a "bufio.Scanner: token too long" error.
+func TestHomebrewJWSFormula(t *testing.T) {
+	packages, err := listBrewPackages("testdata/homebrew2/")
+	if !assert.NoError(t, err) {
+		return
+	}
+	if assert.Len(t, packages, 1) {
+		pkg := packages[0]
+		assert.Equal(t, "jws-package", pkg.Name)
+		assert.Equal(t, "1.0.0", pkg.Version)
+		assert.Empty(t, pkg.Summary)
+		assert.Empty(t, pkg.URL)
+		assert.NoError(t, pkg.error, "unexpected package error")
+	}
+}
+
+// TestHomebrewMissingRb verifies that a missing fallback .rb formula file does
+// not produce a pipeline error, as Homebrew 4.0 no longer installs .rb files
+// into the cellar.
+func TestHomebrewMissingRb(t *testing.T) {
+	packages, err := listBrewPackages("testdata/homebrew3/")
+	if !assert.NoError(t, err) {
+		return
+	}
+	if assert.Len(t, packages, 1) {
+		pkg := packages[0]
+		assert.Equal(t, "missing-rb-package", pkg.Name)
+		assert.Equal(t, "1.0.0", pkg.Version)
+		assert.Empty(t, pkg.Summary)
+		assert.Empty(t, pkg.URL)
+		assert.NoError(t, pkg.error, "unexpected package error")
 	}
 }
 

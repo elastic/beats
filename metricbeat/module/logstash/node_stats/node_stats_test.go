@@ -69,7 +69,7 @@ func TestGetServiceURIMultipleCalls(t *testing.T) {
 		uri := "_node/stats"
 
 		numCalls := 2 + (r % 10) // between 2 and 11
-		for i := uint(0); i < numCalls; i++ {
+		for range numCalls {
 			uri, err = getServiceURI(uri, func() error { return nil })
 			if err != nil {
 				return false

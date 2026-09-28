@@ -23,21 +23,23 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-ucfg"
 )
 
-type fakeBuilder struct{}
+type fakeBuilder struct {
+	logger *logp.Logger
+}
 
 func (f *fakeBuilder) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf.C {
 	return []*conf.C{conf.NewConfig()}
 }
 
 func newFakeBuilder(_ *conf.C, logger *logp.Logger, _ *paths.Path) (Builder, error) {
-	return &fakeBuilder{}, nil
+	return &fakeBuilder{logger: logger}, nil
 }
 
 func TestBuilderRegistry(t *testing.T) {
@@ -60,9 +62,12 @@ func TestBuilderRegistry(t *testing.T) {
 	// Make sure that config building doesn't fail
 	assert.NoError(t, err)
 
-	builder, err := reg.BuildBuilder(cfg, nil)
+	logger := logp.NewNopLogger()
+	builder, err := reg.BuildBuilder(logger, cfg, nil)
 	assert.NoError(t, err)
 	assert.NotNil(t, builder)
+	//nolint:errcheck // it's a test assertion, we don't need the returned value
+	assert.Same(t, logger, builder.(*fakeBuilder).logger, "BuildBuilder should pass the explicit logger to the constructor")
 
 	// Try to create a config with fake builder and assert length
 	// of configs returned is one

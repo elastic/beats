@@ -10,6 +10,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -80,8 +81,10 @@ func (in *s3PollerInput) Run(
 	in.pipeline = pipeline
 	var err error
 
-	// Load the persistent S3 polling state.
-	in.registry, err = newStateRegistry(in.log, in.store, in.config.BucketListPrefix, in.config.LexicographicalOrdering, in.config.LexicographicalLookbackKeys)
+	// Load the persistent S3 polling state, scoped to this input's bucket. The
+	// underlying store is shared by all aws-s3 inputs of the process.
+	bucketName := getBucketNameFromARN(in.config.getBucketARN())
+	in.registry, err = newStateRegistry(in.log, in.store, bucketName, in.config.BucketListPrefix, in.config.LexicographicalOrdering, in.config.LexicographicalLookbackKeys)
 	if err != nil {
 		err = fmt.Errorf("can not start persistent store: %w", err)
 		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failure: %s", err.Error()))
@@ -267,6 +270,7 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 	bucketName := getBucketNameFromARN(in.config.getBucketARN())
 
 	isStateValid := in.filterProvider.getApplierFunc()
+	excludePrefix := in.config.backupPrefixToExclude()
 
 	errorBackoff := backoff.NewEqualJitterBackoff(1, 120)
 	circuitBreaker := 0
@@ -304,6 +308,10 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 		// Metrics
 		in.metrics.s3ObjectsListedTotal.Add(uint64(totListedObjects))
 		for _, object := range page.Contents {
+			if excludePrefix != "" && strings.HasPrefix(*object.Key, excludePrefix) {
+				continue
+			}
+
 			state := newState(bucketName, *object.Key, *object.ETag, *object.LastModified)
 
 			if in.strategy.ShouldSkipObject(state, isStateValid) {

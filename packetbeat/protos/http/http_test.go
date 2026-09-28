@@ -747,6 +747,17 @@ func TestEatBodyChunkedWaitCRLF(t *testing.T) {
 	}
 }
 
+func TestParseBodyChunkedStartNegativeLength(t *testing.T) {
+	st := &stream{data: []byte("-1\r\n")}
+	msg := &message{}
+	parser := newParserForTest(&testParserConfig, logptest.NewTestingLogger(t, ""))
+
+	cont, ok, complete := parser.parseBodyChunkedStart(st, msg)
+	if cont != false || ok != false || complete != false {
+		t.Errorf("parseBodyChunkedStart(negative chunk) = (%v, %v, %v); want (false, false, false)", cont, ok, complete)
+	}
+}
+
 func TestHttpParser_requestURIWithSpace(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("http", "httpdetailed"))
 
@@ -887,6 +898,30 @@ func TestHttpParser_censorPasswordGET(t *testing.T) {
 	}
 }
 
+func TestHttp_hideKeywordsCaseInsensitive(t *testing.T) {
+	http := httpModForTests(nil)
+	config := defaultConfig
+	config.HideKeywords = []string{"Password", "AUTH_Token"}
+	http.setFromConfig(&config)
+
+	for _, tc := range []struct {
+		name string
+		key  string
+		want bool
+	}{
+		{name: "exact case", key: "Password", want: true},
+		{name: "lowercase", key: "password", want: true},
+		{name: "uppercase", key: "PASSWORD", want: true},
+		{name: "second exact case", key: "AUTH_Token", want: true},
+		{name: "second lowercase", key: "auth_token", want: true},
+		{name: "not configured", key: "username", want: false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equalf(t, tc.want, http.isSecretParameter(tc.key), "isSecretParameter(%q)", tc.key)
+		})
+	}
+}
+
 func TestHttpParser_RedactAuthorization(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("http", "httpdetailed"))
 
@@ -988,8 +1023,8 @@ func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
 		t.Errorf("Expecting a complete message")
 	}
 
-	rawMessageObscured := bytes.Index(msg, []byte("uthorization:*"))
-	if rawMessageObscured < 0 {
+	found := bytes.Contains(msg, []byte("uthorization:*"))
+	if !found {
 		t.Error("Obscured authorization string not found: " + string(msg[:]))
 	}
 }
@@ -1023,8 +1058,8 @@ func TestHttpParser_RedactAuthorization_Proxy_raw(t *testing.T) {
 		t.Errorf("Expecting a complete message")
 	}
 
-	rawMessageObscured := bytes.Index(msg, []byte("uthorization:*"))
-	if rawMessageObscured < 0 {
+	found := bytes.Contains(msg, []byte("uthorization:*"))
+	if !found {
 		t.Error("Failed to redact proxy-authorization header: " + string(msg[:]))
 	}
 }
@@ -2060,7 +2095,7 @@ func BenchmarkHttpLargeResponseBody(b *testing.B) {
 	const BodySize = 10 * 1024 * PacketSize
 	const numPackets = BodySize / PacketSize
 	bodyPayload := &protos.Packet{Payload: make([]byte, PacketSize)}
-	for i := 0; i < PacketSize; i++ {
+	for i := range PacketSize {
 		bodyPayload.Payload[i] = byte(0x30 + (i % 10))
 	}
 
@@ -2077,7 +2112,7 @@ func BenchmarkHttpLargeResponseBody(b *testing.B) {
 		private := protos.ProtocolData(&httpConnectionData{})
 		private = http.Parse(&headPkt, tcptuple, 0, private)
 
-		for j := 0; j < numPackets; j++ {
+		for range numPackets {
 			private = http.Parse(bodyPayload, tcptuple, 0, private)
 		}
 		http.ReceivedFin(tcptuple, 1, private)
