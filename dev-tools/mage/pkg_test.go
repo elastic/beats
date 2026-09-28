@@ -23,7 +23,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+<<<<<<< HEAD
 	"gopkg.in/yaml.v2"
+=======
+	"github.com/stretchr/testify/require"
+	"go.yaml.in/yaml/v2"
+>>>>>>> 3b62662 (feat: replace archived yaml dependency (#49339))
 )
 
 func testPackageSpec() PackageSpec {

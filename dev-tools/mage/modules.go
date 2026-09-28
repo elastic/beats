@@ -23,8 +23,12 @@ import (
 	"path/filepath"
 	"strings"
 
+<<<<<<< HEAD
 	"github.com/joeshaw/multierror"
 	"gopkg.in/yaml.v2"
+=======
+	"go.yaml.in/yaml/v2"
+>>>>>>> 3b62662 (feat: replace archived yaml dependency (#49339))
 )
 
 var modulesDConfigTemplate = `
