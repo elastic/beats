@@ -232,3 +232,120 @@ func TestStateRegistryCleanUpRespectsKeyPrefix(t *testing.T) {
 	assert.True(t, regB2.IsProcessed(stB.ID()),
 		"cleanup of a same-bucket input with a different prefix must not delete this input's state")
 }
+
+// TestLexicographicalTailIsBucketScoped is the regression test for the
+// lexicographical tail leaking between inputs. Two lexicographical inputs on
+// different buckets share the on-disk store; the tail persisted by one must
+// not become the other's StartAfter key.
+func TestLexicographicalTailIsBucketScoped(t *testing.T) {
+	home := t.TempDir()
+	log := logptest.NewTestingLogger(t, t.Name())
+
+	store := openDiskStatestore(t, home)
+	defer store.Close()
+
+	regA, err := newStateRegistry(log, store, "bucket-a", "", true, 100)
+	require.NoError(t, err)
+	defer regA.Close()
+
+	require.NoError(t, regA.MarkObjectInFlight("z/key-from-bucket-a"))
+
+	regB, err := newStateRegistry(log, store, "bucket-b", "", true, 100)
+	require.NoError(t, err)
+	defer regB.Close()
+
+	assert.Empty(t, regB.GetStartAfterKey(),
+		"lexicographical start_after key must be scoped per bucket and not reused across different buckets")
+}
+
+// TestLexicographicalTailIsPrefixScoped covers two lexicographical inputs on
+// the same bucket with disjoint key prefixes, which load disjoint states and
+// must therefore also keep separate tails.
+func TestLexicographicalTailIsPrefixScoped(t *testing.T) {
+	store := openTestStatestore()
+
+	regA, err := newStateRegistry(nil, store, "bucket", "prefix-a/", true, 100)
+	require.NoError(t, err)
+	defer regA.Close()
+	regB, err := newStateRegistry(nil, store, "bucket", "prefix-b/", true, 100)
+	require.NoError(t, err)
+	defer regB.Close()
+
+	require.NoError(t, regA.MarkObjectInFlight("prefix-a/obj"))
+	require.NoError(t, regB.MarkObjectInFlight("prefix-b/obj"))
+
+	assert.Equal(t, "prefix-a/obj", regA.GetStartAfterKey())
+	assert.Equal(t, "prefix-b/obj", regB.GetStartAfterKey())
+}
+
+// TestLexicographicalTailSurvivesRestartPerInput verifies that concurrent
+// lexicographical inputs do not overwrite each other's persisted tail while
+// running, so each recovers its own tail after a restart.
+func TestLexicographicalTailSurvivesRestartPerInput(t *testing.T) {
+	home := t.TempDir()
+	log := logptest.NewTestingLogger(t, t.Name())
+
+	store1 := openDiskStatestore(t, home)
+	regA1, err := newStateRegistry(log, store1, "bucket-a", "", true, 100)
+	require.NoError(t, err)
+	regB1, err := newStateRegistry(log, store1, "bucket-b", "", true, 100)
+	require.NoError(t, err)
+
+	// Interleave writes so the last writer differs per input.
+	require.NoError(t, regA1.MarkObjectInFlight("m/key-a"))
+	require.NoError(t, regB1.MarkObjectInFlight("b/key-b"))
+	require.Equal(t, "m/key-a", regA1.GetStartAfterKey())
+	require.Equal(t, "b/key-b", regB1.GetStartAfterKey())
+
+	regA1.Close()
+	regB1.Close()
+	store1.Close()
+
+	// Restart: each input must recover the tail it persisted itself.
+	store2 := openDiskStatestore(t, home)
+	defer store2.Close()
+	regA2, err := newStateRegistry(log, store2, "bucket-a", "", true, 100)
+	require.NoError(t, err)
+	defer regA2.Close()
+	regB2, err := newStateRegistry(log, store2, "bucket-b", "", true, 100)
+	require.NoError(t, err)
+	defer regB2.Close()
+
+	assert.Equal(t, "m/key-a", regA2.GetStartAfterKey(), "bucket-a must recover its own tail")
+	assert.Equal(t, "b/key-b", regB2.GetStartAfterKey(), "bucket-b must recover its own tail")
+}
+
+// TestLexicographicalLegacyTailIsDropped verifies the upgrade path: a tail
+// persisted under the old unscoped key is neither inherited by any input nor
+// left behind in the store. The tail is reseeded from the input's own states.
+func TestLexicographicalLegacyTailIsDropped(t *testing.T) {
+	home := t.TempDir()
+	log := logptest.NewTestingLogger(t, t.Name())
+	lastModified := time.Unix(1733221244, 0)
+
+	store := openDiskStatestore(t, home)
+	defer store.Close()
+
+	// Seed the store as an older version would have left it: one completed
+	// state for bucket-a and an unscoped tail written by some other input.
+	raw, err := store.StoreFor(inputName, "")
+	require.NoError(t, err)
+	defer raw.Close()
+	stA := newState("bucket-a", "logs/obj-a", "etag-a", lastModified)
+	stA.Stored = true
+	require.NoError(t, raw.Set(getStoreKey(stA.IDWithLexicographicalOrdering()), stA))
+	require.NoError(t, raw.Set(awsS3LegacyTailKey, struct {
+		Tail string `json:"tail"`
+	}{"z/key-from-another-bucket"}))
+
+	regA, err := newStateRegistry(log, store, "bucket-a", "", true, 100)
+	require.NoError(t, err)
+	defer regA.Close()
+
+	assert.Equal(t, "logs/obj-a", regA.GetStartAfterKey(),
+		"tail must be reseeded from the input's own states, not the legacy key")
+
+	has, err := raw.Has(awsS3LegacyTailKey)
+	require.NoError(t, err)
+	assert.False(t, has, "legacy unscoped tail key must be removed from the store")
+}
