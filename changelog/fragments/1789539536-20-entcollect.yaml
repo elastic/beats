@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: Fix EntraID entity analytics collection behavior for deleted devices when using minimal state mode.
+component: filebeat
+issue: https://github.com/elastic/entcollect/issues/20

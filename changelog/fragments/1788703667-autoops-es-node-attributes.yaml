@@ -1,3 +1,0 @@
-kind: enhancement
-summary: Collect logical_availability_zone and instance_configuration node attributes in the autoops_es node_stats metricset
-component: metricbeat

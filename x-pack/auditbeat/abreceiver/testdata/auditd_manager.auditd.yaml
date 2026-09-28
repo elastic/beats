@@ -1,0 +1,22 @@
+# Source: auditd_manager/data_stream/auditd/agent/stream/auditd.yml.hbs
+# rendered with default variable values, plus the module field that
+# elastic-agent must inject when translating audit/auditd streams.
+# elastic-agent currently has no auditbeat translation; this fixture
+# documents the format the abreceiver requires once it is added.
+module: auditd
+type: audit/auditd
+include_raw_message: true
+socket_type: ''
+immutable: false
+resolve_ids: true
+failure_mode: silent
+backlog_limit: 8192
+rate_limit: 0
+include_warnings: false
+backpressure_strategy: auto
+tags:
+  - auditd_manager-auditd
+data_stream:
+  dataset: auditd_manager.auditd
+  type: logs
+  namespace: default

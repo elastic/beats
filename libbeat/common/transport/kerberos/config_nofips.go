@@ -19,7 +19,10 @@
 
 package kerberos
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 func (c *Config) Validate() error {
 	switch c.AuthType {
@@ -39,5 +42,10 @@ func (c *Config) Validate() error {
 		return ErrInvalidAuthType
 	}
 
+	hasPath := strings.TrimSpace(c.ConfigPath) != ""
+	hasInline := strings.TrimSpace(c.Krb5Conf) != ""
+	if hasPath == hasInline {
+		return fmt.Errorf("kerberos requires exactly one of config_path or krb5_conf")
+	}
 	return nil
 }

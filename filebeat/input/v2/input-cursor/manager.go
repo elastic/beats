@@ -30,10 +30,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// globalCache is the process-wide singleton store for cursor inputs.
-// All InputManager instances that share a (backend, type) pair use one store
-// and one background cleaner goroutine. The store is closed only after the
-// last manager releases its reference.
+// globalCache shares cursor stores across the process.
+// Managers with the same cache key share one store and one background cleaner.
+// The cache closes the store after all managers and running inputs release it.
 var globalCache = statemanager.NewCache[*store](func(s *store) { s.Release() })
 
 // InputManager is used to create, manage, and coordinate stateful inputs and
@@ -67,13 +66,11 @@ type InputManager struct {
 	// that will be used to collect events from each source.
 	Configure func(cfg *conf.C, log *logp.Logger) ([]Source, Input, error)
 
-	// mu guards store, release, cacheKey, and closed. store, release, and
-	// cacheKey are set once on the first successful Create and store/release
-	// are cleared on Close.
+	// mu protects releases and closed from concurrent access.
+	// releases holds one globalCache release function for each store this manager uses.
+	// Close clears releases.
 	mu       sync.Mutex
-	store    *store
-	release  func()
-	cacheKey string
+	releases map[string]func()
 	closed   bool
 }
 
@@ -89,88 +86,80 @@ var (
 	errNoInputRunner      = errors.New("no input runner available")
 )
 
-// ensureSetup opens the shared store on first call. It must NOT be called
-// with cim.mu held: it releases and re-acquires the lock around the blocking
-// globalCache.Acquire call so that a concurrent Close() can always proceed.
-func (cim *InputManager) ensureSetup(inputID string) error {
+// cacheKey identifies the cursor store for this input type and ID.
+// The key includes the type because each cursor store loads state for one type.
+func (cim *InputManager) cacheKey(inputID string) string {
+	return cim.StateStore.StoreKey(cim.Type, inputID) + "::" + cim.Type
+}
+
+// ensureSetup opens or reuses the store for inputID and returns its cache key.
+// Call ensureSetup without holding cim.mu.
+// It unlocks cim.mu before globalCache.Acquire, so Close can proceed while Acquire waits.
+func (cim *InputManager) ensureSetup(inputID string) (string, error) {
 	cim.mu.Lock()
-	if cim.store != nil {
-		cim.mu.Unlock()
-		return nil
-	}
 	if cim.closed {
 		cim.mu.Unlock()
-		return errors.New("input manager is closed")
+		return "", errors.New("input manager is closed")
 	}
 	if cim.DefaultCleanTimeout <= 0 {
 		cim.DefaultCleanTimeout = 30 * time.Minute
 	}
+	key := cim.cacheKey(inputID)
+	if _, ok := cim.releases[key]; ok {
+		cim.mu.Unlock()
+		return key, nil
+	}
 	log := cim.Logger.With("input_type", cim.Type)
-	key := cim.StateStore.StoreKey() + "::" + cim.Type
-	cim.cacheKey = key
 	interval := cim.StateStore.CleanupInterval()
 	if interval <= 0 {
 		interval = 5 * time.Minute
 	}
 	cim.mu.Unlock()
 
-	var runFn func(context.Context, *store)
-	if interval > 0 {
-		runFn = func(ctx context.Context, s *store) {
-			runCleaner(ctx, log, s, interval)
-		}
-	}
-
-	// Acquire the store without holding cim.mu so that a concurrent Close()
-	// or another Create() can proceed while this potentially-slow call runs.
-	s, release, err := globalCache.Acquire(
+	_, release, err := globalCache.Acquire(
 		key,
 		func() (*store, error) {
 			return openStore(log, cim.StateStore, cim.Type, inputID, true)
 		},
-		runFn,
+		func(ctx context.Context, s *store) {
+			runCleaner(ctx, log, s, interval)
+		},
 		nil,
 		nil,
 	)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	cim.mu.Lock()
+	defer cim.mu.Unlock()
 	if cim.closed {
-		cim.mu.Unlock()
 		release()
-		return errors.New("input manager is closed")
+		return "", errors.New("input manager is closed")
 	}
-	if cim.store == nil {
-		s.Retain() // InputManager holds its own reference to keep the store alive.
-		cim.store = s
-		cim.release = release
-	} else {
-		// Another Create() won the race; release the redundant reference.
+	if _, ok := cim.releases[key]; ok {
+		// Another Create already added this key. Release the extra reference.
 		release()
+		return key, nil
 	}
-	cim.mu.Unlock()
-	return nil
+	if cim.releases == nil {
+		cim.releases = make(map[string]func())
+	}
+	cim.releases[key] = release
+	return key, nil
 }
 
-// Close releases the manager's reference to the shared store. When the last
-// manager sharing a (backend, type) key releases, the background cleaner is
-// stopped and the store is closed. Call after all inputs managed by this
-// manager have stopped.
+// Close releases all stores that this manager uses.
+// After the last user releases a store, the cache stops its cleaner and closes it.
+// Call Close after all inputs for this manager stop.
 func (cim *InputManager) Close() {
 	cim.mu.Lock()
 	cim.closed = true
-	s := cim.store
-	release := cim.release
-	cim.release = nil
-	cim.store = nil
+	releases := cim.releases
+	cim.releases = nil
 	cim.mu.Unlock()
-	if s != nil {
-		s.Release() // Drop the InputManager's own reference.
-	}
-	if release != nil {
-		release() // Drop the globalCache reference; closes the store when the last holder releases.
+	for _, release := range releases {
+		release()
 	}
 }
 
@@ -185,7 +174,8 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		return nil, err
 	}
 
-	if err := cim.ensureSetup(settings.ID); err != nil {
+	cacheKey, err := cim.ensureSetup(settings.ID)
+	if err != nil {
 		return nil, err
 	}
 
@@ -203,38 +193,29 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	return &managedInput{
 		manager:      cim,
 		userID:       settings.ID,
+		cacheKey:     cacheKey,
 		sources:      sources,
 		input:        inp,
 		cleanTimeout: settings.CleanInactive,
 	}, nil
 }
 
-// acquireLease increments the globalCache user count for this manager's key,
-// preventing the cache from draining the store while the caller is active.
-// Returns ok=false if the cache entry is not active (manager not yet set up or
-// already closed). The returned release function must be called exactly once.
-func (cim *InputManager) acquireLease() (*store, func(), bool) {
+// acquireLease keeps the store open while the caller uses it.
+// It returns ok=false if the manager is closed or the cache entry is inactive.
+// Call the returned release function exactly once.
+func (cim *InputManager) acquireLease(cacheKey string) (*store, func(), bool) {
 	cim.mu.Lock()
-	key := cim.cacheKey
 	closed := cim.closed
 	cim.mu.Unlock()
-	if key == "" || closed {
+	if closed {
 		return nil, func() {}, false
 	}
-	return globalCache.Lease(key)
+	return globalCache.Lease(cacheKey)
 }
 
-// lock locks a key for exclusive access and returns a resource that can be used to modify
-// the cursor state and unlock the key.
-// The store is guaranteed alive for the duration of this call because the InputManager holds
-// its own reference (acquired in ensureSetup, released in Close).
-func (cim *InputManager) lock(ctx v2.Context, key string) (*resource, error) {
-	cim.mu.Lock()
-	store := cim.store
-	cim.mu.Unlock()
-	if store == nil {
-		return nil, errors.New("input manager is closed")
-	}
+// lock gives the caller exclusive access to the cursor state for key.
+// The caller must hold a lease to keep store open until it releases the resource.
+func lock(ctx v2.Context, store *store, key string) (*resource, error) {
 	resource := store.Get(key)
 	err := lockResource(ctx.Logger, resource, ctx.Cancelation)
 	if err != nil {

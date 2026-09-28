@@ -39,12 +39,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	"github.com/elastic/beats/v7/pkg/autodiscover/docker"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cgroup"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // assertRunPdataEquivalent verifies that RunPdata, given the same input fields
