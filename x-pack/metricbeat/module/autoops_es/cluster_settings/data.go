@@ -6,6 +6,8 @@ package cluster_settings
 
 import (
 	"fmt"
+	"maps"
+	"slices"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
@@ -273,6 +275,65 @@ func flattenSettings(metricSetFields mapstr.M) mapstr.M {
 	return result
 }
 
+// collectArchivedSettings returns the names of the settings Elasticsearch has archived, gathered
+// from the raw response rather than the schema: `archived.*` keys are dynamic, and
+// `libbeat/common/schema` can only describe a fixed set of keys.
+//
+// The `archived.` prefix is stripped, so `archived.search.remote.connect` is reported as
+// `search.remote.connect`. Names from `persistent` and `transient` are unioned rather than
+// overridden -- an archived setting in each scope is two independent facts, not two values of the
+// same setting -- and the result is sorted so that repeated collections produce the same event.
+//
+// Returns nil when the cluster has no archived settings, so no empty key is added to the event.
+func collectArchivedSettings(settings map[string]any) []string {
+	names := map[string]struct{}{}
+
+	for _, scope := range []string{"persistent", "transient"} {
+		scoped, ok := settings[scope].(map[string]any)
+		if !ok {
+			continue
+		}
+
+		collectSettingNames("", scoped["archived"], names)
+	}
+
+	if len(names) == 0 {
+		return nil
+	}
+
+	sorted := slices.Collect(maps.Keys(names))
+	slices.Sort(sorted)
+
+	return sorted
+}
+
+// collectSettingNames walks a settings subtree and records the dotted name of every leaf.
+// Elasticsearch expands most dotted keys into nested objects, but leaves some as literal dotted
+// keys, so both shapes end up producing the same flattened name.
+func collectSettingNames(prefix string, value any, into map[string]struct{}) {
+	switch typed := value.(type) {
+	case nil:
+		return
+	case map[string]any:
+		for key, child := range typed {
+			collectSettingNames(joinSettingName(prefix, key), child, into)
+		}
+	default:
+		// a leaf: the value is irrelevant, only the name of the archived setting is reported
+		if prefix != "" {
+			into[prefix] = struct{}{}
+		}
+	}
+}
+
+func joinSettingName(prefix string, key string) string {
+	if prefix == "" {
+		return key
+	}
+
+	return prefix + "." + key
+}
+
 func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, settings *map[string]any) error {
 	metricSetFields, err := schema.Apply(*settings)
 
@@ -283,7 +344,15 @@ func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, settings *map[strin
 	}
 
 	// Flatten settings with precedence: transient > persistent > defaults
-	r.Event(events.CreateEventWithoutTransactionId(info, flattenSettings(metricSetFields)))
+	flattenedSettings := flattenSettings(metricSetFields)
+
+	// archived settings are collected outside the schema and are not subject to that precedence:
+	// they are reported as a single, scope-independent list of names
+	if archived := collectArchivedSettings(*settings); archived != nil {
+		flattenedSettings["archived"] = archived
+	}
+
+	r.Event(events.CreateEventWithoutTransactionId(info, flattenedSettings))
 
 	return nil
 }

@@ -57,13 +57,12 @@ func (m InputManager) migrateCursor(src, dst *conf.C) {
 	if err != nil {
 		return
 	}
-	store, err := m.cursor.StateStore.StoreFor("httpjson")
+	store, err := m.cursor.StateStore.StoreFor("httpjson", id)
 	if err != nil {
 		m.cursor.Logger.Warnw("cursor migration: cannot open store", "error", err)
 		return
 	}
 	defer store.Close()
-	store.SetID(id)
 
 	key := cursorKey("httpjson", id, u.String())
 	var entry map[string]any

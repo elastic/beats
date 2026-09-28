@@ -159,7 +159,8 @@ var closeStore = (*store).close
 func openStore(log *logp.Logger, statestore statestore.States, prefix string) (*store, error) {
 	ok := false
 
-	persistentStore, err := statestore.StoreFor("")
+	// Empty arguments select the shared file store for filestream.
+	persistentStore, err := statestore.StoreFor("", "")
 	if err != nil {
 		return nil, err
 	}

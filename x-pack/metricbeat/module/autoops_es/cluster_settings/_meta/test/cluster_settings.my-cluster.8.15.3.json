@@ -28,6 +28,24 @@
             "search": {
                 "search_power_min": "3"
             }
+        },
+        "archived": {
+            "xpack": {
+                "monitoring": {
+                    "exporters": {
+                        "cloud_monitoring": {
+                            "type": "http"
+                        }
+                    }
+                }
+            },
+            "cluster": {
+                "routing": {
+                    "allocation": {
+                        "disk.include_relocations": "false"
+                    }
+                }
+            }
         }
     },
     "transient": {
@@ -37,6 +55,13 @@
         "cluster": {
             "metadata": {
                 "display_name": "my-cluster"
+            }
+        },
+        "archived": {
+            "search": {
+                "remote": {
+                    "connect": "false"
+                }
             }
         }
     },

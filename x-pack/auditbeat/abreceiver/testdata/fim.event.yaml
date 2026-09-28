@@ -1,0 +1,35 @@
+# Source: fim/data_stream/event/agent/stream/file_integrity.yml.hbs
+# rendered with default variable values, plus the module field that
+# elastic-agent must inject when translating audit/file_integrity streams.
+module: file_integrity
+type: audit/file_integrity
+paths:
+  - /bin
+  - /usr/bin
+  - /sbin
+  - /usr/sbin
+  - /etc
+recursive: false
+scan_at_start: true
+backend: auto
+hash_types:
+  - sha1
+max_file_size: 100 MiB
+scan_rate_per_sec: 50 MiB
+exclude_files:
+  - '(?i)\.sw[nop]$'
+  - '~$'
+  - '/\.git($|/)'
+  - '\.tmp$'
+  - '\.log$'
+  - '\.db$'
+keep_null: false
+tags:
+  - fim-event
+data_stream:
+  dataset: fim.event
+  type: logs
+  namespace: default
+processors:
+  - add_host_metadata:
+      replace_fields: true

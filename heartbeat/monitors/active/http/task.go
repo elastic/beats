@@ -24,7 +24,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-
 	"net"
 	"net/http"
 	"net/url"
@@ -49,9 +48,15 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 )
 
 type requestFactory func() (*http.Request, error)
+
+// httpDoer is the Do subset shared by *http.Client and the Kerberos SPNEGO client.
+type httpDoer interface {
+	Do(req *http.Request) (*http.Response, error)
+}
 
 func newHTTPMonitorHostJob(
 	addr string,
@@ -74,12 +79,22 @@ func newHTTPMonitorHostJob(
 			Timeout:       config.Transport.Timeout,
 		}
 
+		// Kerberos answers the SPNEGO challenge on the client. NTLM does it on the transport.
+		var doer httpDoer = client
+		if config.Kerberos.IsEnabled() {
+			krbClient, err := kerberos.NewClient(config.Kerberos.Config, client)
+			if err != nil {
+				return fmt.Errorf("could not create kerberos client: %w", err)
+			}
+			doer = krbClient
+		}
+
 		req, err := reqFactory()
 		if err != nil {
 			return fmt.Errorf("could not make http request: %w", err)
 		}
 
-		_, err = execPing(event, client, req, body, config.Transport.Timeout, validator, config.Response)
+		_, err = execPing(event, doer, req, body, config.Transport.Timeout, validator, config.Response)
 		if len(redirects) > 0 {
 			_, _ = event.PutValue("http.response.redirects", redirects)
 		}
@@ -208,7 +223,14 @@ func buildRequest(addr string, config *Config, enc contentEncoder) (*http.Reques
 	}
 	request.Close = true
 
-	if config.Username != "" {
+	switch {
+	case config.NTLM.IsEnabled():
+		// Keep the connection open for the handshake. The negotiator reads these Basic credentials.
+		request.Close = false
+		request.SetBasicAuth(config.NTLM.authUsername(), config.NTLM.Password)
+	case config.Kerberos.IsEnabled():
+		// SPNEGO sets Authorization during the handshake.
+	case config.Username != "":
 		request.SetBasicAuth(config.Username, config.Password)
 	}
 	for k, v := range config.Check.Request.SendHeaders {
@@ -229,7 +251,7 @@ func buildRequest(addr string, config *Config, enc contentEncoder) (*http.Reques
 
 func execPing(
 	event *beat.Event,
-	client *http.Client,
+	client httpDoer,
 	req *http.Request,
 	reqBody []byte,
 	timeout time.Duration,
@@ -323,7 +345,7 @@ func attachRequestBody(ctx *context.Context, req *http.Request, body []byte) *ht
 }
 
 // execute the request. Note that this does not close the resp body, which should be done by caller
-func execRequest(client *http.Client, req *http.Request) (start time.Time, resp *http.Response, errReason reason.Reason) {
+func execRequest(client httpDoer, req *http.Request) (start time.Time, resp *http.Response, errReason reason.Reason) {
 	start = time.Now()
 	resp, err := client.Do(req)
 
@@ -379,11 +401,14 @@ func makeCheckRedirect(max int, redirects *[]string) func(*http.Request, []*http
 	}
 
 	return func(r *http.Request, via []*http.Request) error {
+		n := len(via)
 		if redirects != nil {
 			*redirects = append(*redirects, r.URL.String())
+			// SPNEGO starts a new Do per hop, which resets via, so count our own list.
+			n = len(*redirects)
 		}
 
-		if max == len(via) {
+		if max == n {
 			return http.ErrUseLastResponse
 		}
 		return nil

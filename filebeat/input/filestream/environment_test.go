@@ -196,7 +196,7 @@ func (e *inputTestingEnvironment) abspath(filename string) string {
 }
 
 func (e *inputTestingEnvironment) requireRegistryEntryCount(expectedCount int) {
-	inputStore, _ := e.stateStore.StoreFor("")
+	inputStore, _ := e.stateStore.StoreFor("", "")
 	defer inputStore.Close()
 
 	actual := 0
@@ -327,7 +327,7 @@ func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename, inputID str
 		e.t.Fatalf("cannot stat file when cheking for offset: %+v", err)
 	}
 
-	inputStore, _ := e.stateStore.StoreFor("")
+	inputStore, _ := e.stateStore.StoreFor("", "")
 	defer inputStore.Close()
 	id := getIDFromPath(filepath, inputID, fi)
 
@@ -349,7 +349,7 @@ func (e *inputTestingEnvironment) requireOffsetInRegistryByID(key string, expect
 }
 
 func (e *inputTestingEnvironment) getRegistryState(key string) (registryEntry, error) {
-	inputStore, _ := e.stateStore.StoreFor("")
+	inputStore, _ := e.stateStore.StoreFor("", "")
 	defer inputStore.Close()
 
 	var entry registryEntry
@@ -388,44 +388,6 @@ func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 		events := e.pipeline.GetAllEvents()
 		require.Len(t, events, count, "unexpected number of events")
 	}, 2*time.Minute, 10*time.Millisecond)
-}
-
-// waitUntilEventCountCtx calls waitUntilEventCount, but fails if ctx is cancelled.
-func (e *inputTestingEnvironment) waitUntilEventCountCtx(ctx context.Context, count int) {
-	e.t.Helper()
-	ch := make(chan struct{})
-
-	go func() {
-		e.waitUntilEventCount(count)
-		ch <- struct{}{}
-	}()
-
-	select {
-	case <-ctx.Done():
-		logLines := map[string][]string{}
-		for _, evt := range e.pipeline.GetAllEvents() {
-			flat := evt.Fields.Flatten()
-			pathi, _ := flat.GetValue("log.file.path")
-			path, ok := pathi.(string)
-			if !ok {
-				e.t.Fatalf("waitUntilEventCountCtx: path is not a string: %v", pathi)
-			}
-			msgi, _ := flat.GetValue("message")
-			msg, ok := msgi.(string)
-			if !ok {
-				e.t.Fatalf("waitUntilEventCountCtx: message is not a string: %v", msgi)
-			}
-			logLines[path] = append(logLines[path], msg)
-		}
-
-		e.t.Fatalf("waitUntilEventCountCtx: %v. Want %d events, got %d: %v",
-			ctx.Err(),
-			count,
-			len(e.pipeline.GetAllEvents()),
-			logLines)
-	case <-ch:
-		return
-	}
 }
 
 // waitUntilAtLeastEventCount waits until at least count events arrive to the client.
@@ -555,11 +517,11 @@ func (s *testInputStore) Close() {
 	s.registry.Close()
 }
 
-func (s *testInputStore) StoreFor(string) (*statestore.Store, error) {
+func (s *testInputStore) StoreFor(_, _ string) (*statestore.Store, error) {
 	return s.registry.Get("filebeat")
 }
 
-func (s *testInputStore) StoreKey() string {
+func (s *testInputStore) StoreKey(_, _ string) string {
 	return fmt.Sprintf("test:%p", s.registry)
 }
 
