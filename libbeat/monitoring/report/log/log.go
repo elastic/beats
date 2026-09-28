@@ -122,7 +122,7 @@ func MakeReporter(beat beat.Info, cfg *conf.C) (report.Reporter, error) {
 		registries: map[string]*monitoring.Registry{},
 	}
 
-	for _, ns := range r.config.Namespaces {
+	for _, ns := range r.Namespaces {
 		reg := monitoring.GetNamespace(ns).GetRegistry()
 
 		// That 'stats' namespace is reported as 'metrics' in the Elasticsearch
@@ -133,11 +133,9 @@ func MakeReporter(beat beat.Info, cfg *conf.C) (report.Reporter, error) {
 		r.registries[ns] = reg
 	}
 
-	r.wg.Add(1)
-	go func() {
-		defer r.wg.Done()
+	r.wg.Go(func() {
 		r.snapshotLoop()
-	}()
+	})
 	return r, nil
 }
 
@@ -147,6 +145,10 @@ func (r *reporter) Stop() {
 }
 
 func (r *reporter) snapshotLoop() {
+	if r.Period == 0 {
+		r.logger.Infof("Skipping metrics logging")
+		return
+	}
 	r.logger.Infof("Starting metrics logging every %v", r.Period)
 	defer r.logger.Infof("Stopping metrics logging.")
 	defer func() {
@@ -248,8 +250,8 @@ func snapshotLen(s monitoring.FlatSnapshot) int {
 	return len(s.Bools) + len(s.Floats) + len(s.Ints) + len(s.Strings)
 }
 
-func toKeyValuePairs(snaps map[string]monitoring.FlatSnapshot) []interface{} {
-	args := []interface{}{logp.Namespace("monitoring")}
+func toKeyValuePairs(snaps map[string]monitoring.FlatSnapshot) []any {
+	args := []any{logp.Namespace("monitoring")}
 
 	for name, snap := range snaps {
 		data := make(mapstr.M, snapshotLen(snap))

@@ -96,5 +96,11 @@ func (c *ElasticsearchConfig) Validate() error {
 		return fmt.Errorf("cannot set both api_key and username/password")
 	}
 
+	// Certificate hot-reload was introduced after this branch was cut. Disable it
+	// by default so it does not activate silently in a patch release.
+	if c.Transport.TLS != nil && c.Transport.TLS.CertificateReload.Enabled == nil {
+		c.Transport.TLS.CertificateReload.Enabled = new(false)
+	}
+
 	return nil
 }

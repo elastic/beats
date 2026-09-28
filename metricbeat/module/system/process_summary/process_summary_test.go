@@ -132,8 +132,8 @@ func TestThreads(t *testing.T) {
 	t.Logf("metrics: %#v", stats)
 }
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
+func getConfig() map[string]any {
+	return map[string]any{
 		"module":     "system",
 		"metricsets": []string{"process_summary"},
 	}

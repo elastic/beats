@@ -30,7 +30,7 @@ func nomadRoutes(node api.Node, allocs []api.Allocation, waitIndex uint64) *http
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/v1/nodes", func(w http.ResponseWriter, r *http.Request) {
-		payload, err := json.Marshal([]interface{}{node})
+		payload, err := json.Marshal([]any{node})
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			//nolint:errcheck // ignore

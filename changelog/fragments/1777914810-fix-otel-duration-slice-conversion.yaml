@@ -1,5 +1,0 @@
-kind: bug-fix
-
-summary: Fix OTel map conversion for []time.Duration fields to avoid dropping duration slices.
-
-component: libbeat

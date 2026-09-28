@@ -55,36 +55,36 @@ func clientPassword(index int, pass string) checker {
 
 func TestMakeRedis(t *testing.T) {
 	tests := map[string]struct {
-		config map[string]interface{}
+		config map[string]any
 		valid  bool
 		checks checker
 	}{
 		"no host": {
-			config: map[string]interface{}{
+			config: map[string]any{
 				"hosts": []string{},
 			},
 		},
 		"invald scheme": {
-			config: map[string]interface{}{
+			config: map[string]any{
 				"hosts": []string{"redisss://localhost:6379"},
 			},
 		},
 		"Single host": {
-			config: map[string]interface{}{
+			config: map[string]any{
 				"hosts": []string{"localhost:6379"},
 			},
 			valid:  true,
 			checks: checks(clientsLen(1), clientPassword(0, "")),
 		},
 		"Multiple hosts": {
-			config: map[string]interface{}{
+			config: map[string]any{
 				"hosts": []string{"redis://localhost:6379", "rediss://localhost:6380"},
 			},
 			valid:  true,
 			checks: clientsLen(2),
 		},
 		"Default password": {
-			config: map[string]interface{}{
+			config: map[string]any{
 				"hosts":    []string{"redis://localhost:6379"},
 				"password": "defaultPassword",
 			},
@@ -92,7 +92,7 @@ func TestMakeRedis(t *testing.T) {
 			checks: checks(clientsLen(1), clientPassword(0, "defaultPassword")),
 		},
 		"Specific and default password": {
-			config: map[string]interface{}{
+			config: map[string]any{
 				"hosts":    []string{"redis://localhost:6379", "rediss://:mypassword@localhost:6380"},
 				"password": "defaultPassword",
 			},
@@ -125,39 +125,39 @@ func TestMakeRedis(t *testing.T) {
 
 func TestKeySelection(t *testing.T) {
 	cases := map[string]struct {
-		cfg   map[string]interface{}
+		cfg   map[string]any
 		event beat.Event
 		want  string
 	}{
 		"key configured": {
-			cfg:  map[string]interface{}{"key": "test"},
+			cfg:  map[string]any{"key": "test"},
 			want: "test",
 		},
 		"key must keep case": {
-			cfg:  map[string]interface{}{"key": "Test"},
+			cfg:  map[string]any{"key": "Test"},
 			want: "Test",
 		},
 		"key setting": {
-			cfg: map[string]interface{}{
-				"keys": []map[string]interface{}{{"key": "test"}},
+			cfg: map[string]any{
+				"keys": []map[string]any{{"key": "test"}},
 			},
 			want: "test",
 		},
 		"keys setting must keep case": {
-			cfg: map[string]interface{}{
-				"keys": []map[string]interface{}{{"key": "Test"}},
+			cfg: map[string]any{
+				"keys": []map[string]any{{"key": "Test"}},
 			},
 			want: "Test",
 		},
 		"use event field": {
-			cfg: map[string]interface{}{"key": "test-%{[field]}"},
+			cfg: map[string]any{"key": "test-%{[field]}"},
 			event: beat.Event{
 				Fields: mapstr.M{"field": "from-event"},
 			},
 			want: "test-from-event",
 		},
 		"use event field must keep case": {
-			cfg: map[string]interface{}{"key": "Test-%{[field]}"},
+			cfg: map[string]any{"key": "Test-%{[field]}"},
 			event: beat.Event{
 				Fields: mapstr.M{"field": "From-Event"},
 			},

@@ -23,10 +23,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"slices"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"go.uber.org/zap"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
@@ -63,6 +66,8 @@ func configure(cfg *conf.C, logger *logp.Logger) (input.Input, error) {
 		return nil, err
 	}
 
+	kafka.SetSaramaLogger(logger.Named("kafka").WithOptions(zap.AddCallerSkip(1)))
+
 	saramaConfig, err := newSaramaConfig(config, logger)
 	if err != nil {
 		return nil, fmt.Errorf("initializing Sarama config: %w", err)
@@ -85,16 +90,22 @@ func (input *kafkaInput) Name() string { return pluginName }
 func (input *kafkaInput) Test(ctx input.TestContext) error {
 	client, err := sarama.NewClient(input.config.Hosts, input.saramaConfig)
 	if err != nil {
-		ctx.Logger.Error(err)
+		return fmt.Errorf("failed to create kafka client: %w", err)
 	}
+	defer func() {
+		if closeErr := client.Close(); closeErr != nil {
+			ctx.Logger.Errorw("error closing kafka client", "error", closeErr)
+		}
+	}()
+
 	topics, err := client.Topics()
 	if err != nil {
-		ctx.Logger.Error(err)
+		return fmt.Errorf("failed to list kafka topics: %w", err)
 	}
 
 	var missingTopics []string
 	for _, neededTopic := range input.config.Topics {
-		if !contains(topics, neededTopic) {
+		if !slices.Contains(topics, neededTopic) {
 			missingTopics = append(missingTopics, neededTopic)
 		}
 	}
@@ -109,13 +120,13 @@ func (input *kafkaInput) Test(ctx input.TestContext) error {
 func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 	log := ctx.Logger.Named("kafka input").With("hosts", input.config.Hosts)
 
+	attachSaramaMetrics(input.saramaConfig, ctx.MetricsRegistry, log)
+
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
 		EventListener: acker.ConnectionOnly(
-			acker.EventPrivateReporter(func(_ int, events []interface{}) {
+			acker.EventPrivateReporter(func(_ int, events []any) {
 				for _, event := range events {
-					if meta, ok := event.(eventMeta); ok {
-						meta.ackHandler()
-					}
+					ackEventPrivate(event)
 				}
 			}),
 		),
@@ -198,17 +209,24 @@ func (input *kafkaInput) runConsumerGroup(log *logp.Logger, client beat.Client, 
 		log:                      log,
 	}
 
-	input.saramaWaitGroup.Add(1)
-	defer func() {
-		consumerGroup.Close()
-		input.saramaWaitGroup.Done()
-	}()
-
-	// Listen asynchronously to any errors during the consume process
+	var errorsWG sync.WaitGroup
+	errorsWG.Add(1)
 	go func() {
+		defer errorsWG.Done()
 		for err := range consumerGroup.Errors() {
 			log.Errorw("Error reading from kafka", "error", err)
 		}
+	}()
+
+	input.saramaWaitGroup.Add(1)
+	defer func() {
+		if err := consumerGroup.Close(); err != nil {
+			log.Errorw("Error closing kafka consumer group", "error", err)
+		}
+		// Close() closes the errors channel asynchronously; wait so this
+		// goroutine cannot outlive the input and keep logging.
+		errorsWG.Wait()
+		input.saramaWaitGroup.Done()
 	}()
 
 	err := consumerGroup.Consume(context, input.config.Topics, handler)
@@ -221,6 +239,19 @@ func (input *kafkaInput) runConsumerGroup(log *logp.Logger, client beat.Client, 
 // been successfully sent.
 type eventMeta struct {
 	ackHandler func()
+}
+
+func ackEventPrivate(priv any) {
+	switch v := priv.(type) {
+	case eventMeta:
+		v.ackHandler()
+	case []any:
+		for _, el := range v {
+			if meta, ok := el.(eventMeta); ok {
+				meta.ackHandler()
+			}
+		}
+	}
 }
 
 func arrayForKafkaHeaders(headers []*sarama.RecordHeader) []string {
@@ -264,7 +295,7 @@ func (c channelCtx) Done() <-chan struct{} {
 func (c channelCtx) Err() error {
 	return c.ctx.Cancelation.Err()
 }
-func (c channelCtx) Value(_ interface{}) interface{} { return nil }
+func (c channelCtx) Value(_ any) any { return nil }
 
 // The group handler for the sarama consumer group interface. In addition to
 // providing the basic consumption callbacks needed by sarama, groupHandler is
@@ -415,7 +446,7 @@ func (l *listFromFieldReader) returnFromBuffer() (reader.Message, error) {
 
 // parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
 func (l *listFromFieldReader) parseMultipleMessages(bMessage []byte) []string {
-	var obj map[string][]interface{}
+	var obj map[string][]any
 	err := json.Unmarshal(bMessage, &obj)
 	if err != nil {
 		l.log.Errorw(fmt.Sprintf("Kafka desirializing multiple messages using the group object %s", l.field), "error", err)
@@ -467,13 +498,4 @@ func composeMessage(timestamp time.Time, content []byte, kafkaFields mapstr.M, a
 			ackHandler: ackHandler,
 		},
 	}
-}
-
-func contains(elements []string, element string) bool {
-	for _, e := range elements {
-		if e == element {
-			return true
-		}
-	}
-	return false
 }

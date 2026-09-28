@@ -304,7 +304,7 @@ func skipAddingHostMetadata(event *beat.Event) bool {
 			return false
 		}
 		return true
-	case map[string]interface{}:
+	case map[string]any:
 		hostMapStr := mapstr.M(m)
 		// if "name" is the only field, don't skip
 		hasName, _ := hostMapStr.HasKey("name")

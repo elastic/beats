@@ -5,8 +5,8 @@
 package task_stats
 
 import (
-	helpers "github.com/elastic/elastic-agent-autodiscover/docker"
-	"github.com/elastic/elastic-agent-autodiscover/utils"
+	helpers "github.com/elastic/beats/v7/pkg/autodiscover/docker"
+	"github.com/elastic/beats/v7/pkg/autodiscover/utils"
 )
 
 // container is a struct representation of a container

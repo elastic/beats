@@ -66,7 +66,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
-	"github.com/elastic/elastic-agent-libs/filewatcher"
+
 	"github.com/elastic/elastic-agent-libs/keystore"
 	kbn "github.com/elastic/elastic-agent-libs/kibana"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -153,7 +153,13 @@ type certReloadConfig struct {
 	Reload           cfgfile.Reload `config:"restart_on_cert_change" yaml:"restart_on_cert_change"`
 }
 
-func (c certReloadConfig) Validate() error {
+func (c *certReloadConfig) Validate() error {
+	// Certificate hot-reload was introduced after this branch was cut. Disable it
+	// by default so it does not activate silently in a patch release.
+	if c.CertificateReload.Enabled == nil {
+		c.CertificateReload.Enabled = new(false)
+	}
+
 	if c.Reload.Period < time.Second {
 		return errors.New("'restart_on_cert_change.period' must be equal or greather than 1s")
 	}
@@ -183,6 +189,7 @@ func Run(settings Settings, bt beat.Creator) error {
 	return handleError(func() error {
 		defer func() {
 			if r := recover(); r != nil {
+				//nolint:forbidigo // top-level panic handler in Run; no *logp.Logger is in scope here.
 				logp.NewLogger(settings.Name).Fatalw("Failed due to panic.",
 					"panic", r, zap.Stack("stack"))
 			}
@@ -764,10 +771,10 @@ func (b *Beat) configure(settings Settings) error {
 
 	b.Monitoring = beat.NewGlobalMonitoring()
 
-	if err := InitPaths(cfg); err != nil {
+	b.Info.Paths, err = InitPaths(cfg)
+	if err != nil {
 		return err
 	}
-	b.Info.Paths = paths.Paths
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
@@ -797,7 +804,7 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error unpacking config data: %w", err)
 	}
 
-	b.Info.Logger, err = configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType)
+	b.Info.Logger, err = configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, b.Info.Paths, logp.TypeKey, logp.EventType)
 	if err != nil {
 		return fmt.Errorf("error initializing logging: %w", err)
 	}
@@ -1207,65 +1214,10 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 	if !extendedTLSCfg.Reload.Enabled {
 		return nil
 	}
-	logger.Debug("exit on CA certs change enabled")
 
-	possibleFilesToWatch := append(
-		extendedTLSCfg.CAs,
-		extendedTLSCfg.Certificate.Certificate,
-		extendedTLSCfg.Certificate.Key,
-	)
-
-	filesToWatch := []string{}
-	for _, f := range possibleFilesToWatch {
-		if f == "" {
-			continue
-		}
-		if tlscommon.IsPEMString(f) {
-			// That's an embedded cert, we're only interested in files
-			continue
-		}
-
-		logger.Debugf("watching '%s' for changes", f)
-		filesToWatch = append(filesToWatch, f)
-	}
-
-	// If there are no files to watch, don't do anything.
-	if len(filesToWatch) == 0 {
-		logger.Debug("no files to watch, filewatcher will not be started")
-		return nil
-	}
-
-	watcher := filewatcher.New(filesToWatch...)
-	// Ignore the first scan as it will always return
-	// true for files changed. The output has not been
-	// started yet, so even if the files have changed since
-	// the Beat started, they don't need to be reloaded
-	_, _, _ = watcher.Scan()
-
-	// Watch for file changes while the Beat is alive
-	go func() {
-		ticker := time.Tick(extendedTLSCfg.Reload.Period)
-
-		for {
-			<-ticker
-			files, changed, err := watcher.Scan()
-			if err != nil {
-				logger.Warnf("could not scan certificate files: %s", err.Error())
-			}
-
-			if changed {
-				logger.Infof(
-					"some of the following files have been modified: %v, restarting %s.",
-					files, b.Info.Beat)
-
-				b.shouldReexec = true
-				b.Manager.Stop()
-
-				// we're done, finish the goroutine just for the sake of it
-				return
-			}
-		}
-	}()
+	logger.Warn("'ssl.restart_on_cert_change' is deprecated and has no effect. " +
+		"TLS certificates and CAs are now automatically reloaded using 'ssl.certificate_reload'. " +
+		"Please remove 'ssl.restart_on_cert_change' from your configuration.")
 
 	return nil
 }
@@ -1495,7 +1447,7 @@ func isElasticsearchOutput(name string) bool {
 	return name == "elasticsearch"
 }
 
-func InitPaths(cfg *config.C) error {
+func InitPaths(cfg *config.C) (*paths.Path, error) {
 	// To Fix the chicken-egg problem with the Keystore and the loading of the configuration
 	// files we are doing a partial unpack of the configuration file and only take into consideration
 	// the paths field. After we will unpack the complete configuration and keystore reference
@@ -1505,13 +1457,14 @@ func InitPaths(cfg *config.C) error {
 	}{}
 
 	if err := cfg.Unpack(&partialConfig); err != nil {
-		return fmt.Errorf("error extracting default paths: %w", err)
+		return nil, fmt.Errorf("error extracting default paths: %w", err)
 	}
 
-	if err := paths.InitPaths(&partialConfig.Path); err != nil {
-		return fmt.Errorf("error setting default paths: %w", err)
+	p := paths.New()
+	if err := p.InitPaths(&partialConfig.Path); err != nil {
+		return nil, fmt.Errorf("error setting default paths: %w", err)
 	}
-	return nil
+	return p, nil
 }
 
 // every IP address received from `Info()` has a netmask suffix

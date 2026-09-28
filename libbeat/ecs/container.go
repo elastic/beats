@@ -37,5 +37,5 @@ type Container struct {
 	Name string `ecs:"name"`
 
 	// Image labels.
-	Labels map[string]interface{} `ecs:"labels"`
+	Labels map[string]any `ecs:"labels"`
 }

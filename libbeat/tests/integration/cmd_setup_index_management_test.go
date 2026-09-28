@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"slices"
 	"strings"
 	"testing"
 
@@ -122,10 +123,8 @@ func isIndexPatternSet(t *testing.T, dataStream string) bool {
 	json.Unmarshal(body, &r)
 	for _, t := range r.IndexTemplates {
 		if t.Name == dataStream {
-			for _, p := range t.IndexTemplate.IndexPatterns {
-				if p == dataStream {
-					return true
-				}
+			if slices.Contains(t.IndexTemplate.IndexPatterns, dataStream) {
+				return true
 			}
 		}
 	}

@@ -136,11 +136,11 @@ func TestInputUnits(t *testing.T) {
 func TestInputIncludeMatches(t *testing.T) {
 	out := decompress(t, filepath.Join("testdata", "input-multiline-parser.journal.gz"))
 	tests := map[string]struct {
-		includeMatches   map[string]interface{}
+		includeMatches   map[string]any
 		expectedMessages []string
 	}{
 		"single match condition": {
-			includeMatches: map[string]interface{}{
+			includeMatches: map[string]any{
 				"match": []string{
 					"log.syslog.facility.code=3",
 				},
@@ -156,7 +156,7 @@ func TestInputIncludeMatches(t *testing.T) {
 			},
 		},
 		"multiple match condition": {
-			includeMatches: map[string]interface{}{
+			includeMatches: map[string]any{
 				"match": []string{
 					"journald.process.name=systemd",
 					"log.syslog.facility.code=3",

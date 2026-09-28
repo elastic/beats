@@ -24,8 +24,8 @@ import (
 	"compress/gzip"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
+	"maps"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -91,7 +91,7 @@ type PackageSpec struct {
 	OutputFile        string                 `yaml:"output_file,omitempty"` // Optional
 	ExtraVars         map[string]string      `yaml:"extra_vars,omitempty"`  // Optional
 
-	evalContext            map[string]interface{}
+	evalContext            map[string]any
 	packageDir             string
 	localPreInstallScript  string
 	localPostInstallScript string
@@ -295,13 +295,9 @@ func (typ PackageType) Build(spec PackageSpec) error {
 func (s PackageSpec) Clone() PackageSpec {
 	clone := s
 	clone.Files = make(map[string]PackageFile, len(s.Files))
-	for k, v := range s.Files {
-		clone.Files[k] = v
-	}
+	maps.Copy(clone.Files, s.Files)
 	clone.ExtraVars = make(map[string]string, len(s.ExtraVars))
-	for k, v := range s.ExtraVars {
-		clone.ExtraVars[k] = v
-	}
+	maps.Copy(clone.ExtraVars, s.ExtraVars)
 	return clone
 }
 
@@ -325,14 +321,14 @@ func (s *PackageSpec) ExtraVar(key, value string) {
 }
 
 // Expand expands a templated string using data from the spec.
-func (s PackageSpec) Expand(in string, args ...map[string]interface{}) (string, error) {
+func (s PackageSpec) Expand(in string, args ...map[string]any) (string, error) {
 	return expandTemplate("inline", in, FuncMap,
-		EnvMap(append([]map[string]interface{}{s.evalContext, s.toMap()}, args...)...))
+		EnvMap(append([]map[string]any{s.evalContext, s.toMap()}, args...)...))
 }
 
 // MustExpand expands a templated string using data from the spec. It panics if
 // an error occurs.
-func (s PackageSpec) MustExpand(in string, args ...map[string]interface{}) string {
+func (s PackageSpec) MustExpand(in string, args ...map[string]any) string {
 	v, err := s.Expand(in, args...)
 	if err != nil {
 		panic(err)
@@ -341,14 +337,14 @@ func (s PackageSpec) MustExpand(in string, args ...map[string]interface{}) strin
 }
 
 // ExpandFile expands a template file using data from the spec.
-func (s PackageSpec) ExpandFile(src, dst string, args ...map[string]interface{}) error {
+func (s PackageSpec) ExpandFile(src, dst string, args ...map[string]any) error {
 	return expandFile(src, dst,
-		EnvMap(append([]map[string]interface{}{s.evalContext, s.toMap()}, args...)...))
+		EnvMap(append([]map[string]any{s.evalContext, s.toMap()}, args...)...))
 }
 
 // MustExpandFile expands a template file using data from the spec. It panics if
 // an error occurs.
-func (s PackageSpec) MustExpandFile(src, dst string, args ...map[string]interface{}) {
+func (s PackageSpec) MustExpandFile(src, dst string, args ...map[string]any) {
 	if err := s.ExpandFile(src, dst, args...); err != nil {
 		panic(err)
 	}
@@ -356,8 +352,8 @@ func (s PackageSpec) MustExpandFile(src, dst string, args ...map[string]interfac
 
 // Evaluate expands all variables used in the spec definition and writes any
 // templated files used in the spec to disk. It panics if there is an error.
-func (s PackageSpec) Evaluate(args ...map[string]interface{}) PackageSpec {
-	args = append([]map[string]interface{}{s.toMap(), s.evalContext}, args...)
+func (s PackageSpec) Evaluate(args ...map[string]any) PackageSpec {
+	args = append([]map[string]any{s.toMap(), s.evalContext}, args...)
 	mustExpand := func(in string) string {
 		if in == "" {
 			return ""
@@ -366,7 +362,7 @@ func (s PackageSpec) Evaluate(args ...map[string]interface{}) PackageSpec {
 	}
 
 	if s.evalContext == nil {
-		s.evalContext = map[string]interface{}{}
+		s.evalContext = map[string]any{}
 	}
 
 	for k, v := range s.ExtraVars {
@@ -427,7 +423,7 @@ func (s PackageSpec) Evaluate(args ...map[string]interface{}) PackageSpec {
 			}
 
 			f.Source = filepath.Join(s.packageDir, filepath.Base(f.Target))
-			if err = ioutil.WriteFile(CreateDir(f.Source), []byte(content), 0644); err != nil {
+			if err = os.WriteFile(CreateDir(f.Source), []byte(content), 0644); err != nil {
 				panic(fmt.Errorf("failed to write file containing content for target=%v: %w", target, err))
 			}
 		case f.Template != "":
@@ -477,8 +473,8 @@ func copyInstallScript(spec PackageSpec, script string, local *string) error {
 		*local = strings.TrimSuffix(*local, ".tmpl")
 	}
 
-	if strings.HasSuffix(*local, "."+spec.Name) {
-		*local = strings.TrimSuffix(*local, "."+spec.Name)
+	if before, ok := strings.CutSuffix(*local, "."+spec.Name); ok {
+		*local = before
 	}
 
 	if err := spec.ExpandFile(script, createDir(*local)); err != nil {
@@ -506,8 +502,8 @@ func (s PackageSpec) hash() string {
 }
 
 // toMap returns a map containing the exported field names and their values.
-func (s PackageSpec) toMap() map[string]interface{} {
-	out := make(map[string]interface{})
+func (s PackageSpec) toMap() map[string]any {
+	out := make(map[string]any)
 	v := reflect.ValueOf(s)
 	typ := v.Type()
 
@@ -570,7 +566,7 @@ func PackageZip(spec PackageSpec) error {
 	spec.OutputFile = Zip.AddFileExtension(spec.OutputFile)
 
 	// Write the zip file.
-	if err := ioutil.WriteFile(CreateDir(spec.OutputFile), buf.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(CreateDir(spec.OutputFile), buf.Bytes(), 0644); err != nil {
 		return fmt.Errorf("failed to write zip file: %w", err)
 	}
 
@@ -633,7 +629,7 @@ func PackageTarGz(spec PackageSpec) error {
 			continue
 		}
 
-		tmpdir, err := ioutil.TempDir("", "TmpSymlinkDropPath")
+		tmpdir, err := os.MkdirTemp("", "TmpSymlinkDropPath")
 		if err != nil {
 			return err
 		}

@@ -114,7 +114,7 @@ func newDNS(store *eventStore, verbose bool) *dnsPlugin {
 		"send_request":        true,
 		"send_response":       true,
 	})
-	dns, err := New(false, callback, &procs.ProcessesWatcher{}, cfg)
+	dns, err := New(false, callback, &procs.ProcessesWatcher{}, cfg, logp.NewNopLogger())
 	if err != nil {
 		panic(err)
 	}

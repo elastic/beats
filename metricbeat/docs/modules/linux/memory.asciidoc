@@ -7,8 +7,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-metricset-linux-memory]]
 === Linux memory metricset
 
-beta[]
-
 include::../../../module/linux/memory/_meta/docs.asciidoc[]
 
 This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

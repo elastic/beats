@@ -21,8 +21,8 @@ import "github.com/elastic/beats/v7/libbeat/publisher/queue"
 
 // producer -> broker API
 
-type pushRequest struct {
-	event queue.Entry
+type pushRequest[T any] struct {
+	event T
 
 	// The event's encoded size in bytes if the configured output supports
 	// early encoding, 0 otherwise.
@@ -30,7 +30,7 @@ type pushRequest struct {
 
 	// The producer that generated this event, or nil if this producer does
 	// not require ack callbacks.
-	producer *ackProducer
+	producer *ackProducer[T]
 
 	// The index of the event in this producer only. Used to condense
 	// multiple acknowledgments for a producer to a single callback call.
@@ -40,9 +40,9 @@ type pushRequest struct {
 
 // consumer -> broker API
 
-type getRequest struct {
-	entryCount   int         // request entryCount events from the broker
-	responseChan chan *batch // channel to send response to
+type getRequest[T any] struct {
+	entryCount   int            // request entryCount events from the broker
+	responseChan chan *batch[T] // channel to send response to
 }
 
 type batchDoneMsg struct{}

@@ -11,7 +11,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -84,17 +84,16 @@ func TestStatesAddStateAndIsProcessed(t *testing.T) {
 	}
 
 	for name, test := range tests {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			store := openTestStatestore()
-			states, err := newStates(nil, store, "")
+			states, err := newStates(nil, store, "", "")
 			require.NoError(t, err, "states creation must succeed")
 			if test.statesEdit != nil {
 				err = test.statesEdit(states)
 				require.NoError(t, err, "states edit must succeed")
 			}
 			if test.shouldReload {
-				states, err = newStates(nil, store, "")
+				states, err = newStates(nil, store, "", "")
 				require.NoError(t, err, "states creation must succeed")
 			}
 
@@ -146,7 +145,7 @@ func TestStatesCleanUp(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			store := openTestStatestore()
-			statesInstance, err := newStates(nil, store, "")
+			statesInstance, err := newStates(nil, store, "", "")
 			require.NoError(t, err, "states creation must succeed")
 
 			for _, s := range test.initStates {
@@ -175,14 +174,14 @@ func TestStatesCleanUp(t *testing.T) {
 }
 
 func TestStatesPrefixHandling(t *testing.T) {
-	logger := logp.NewLogger("state-prefix-testing")
+	logger := logptest.NewTestingLogger(t, "state-prefix-testing")
 
 	t.Run("if prefix was set, accept only states with prefix", func(t *testing.T) {
 		// given
 		registry := openTestStatestore()
 
 		// when - registry with prefix
-		st, err := newStates(logger, registry, "staging-")
+		st, err := newStates(logger, registry, "", "staging-")
 		require.NoError(t, err)
 
 		// then - fail for non prefixed
@@ -208,7 +207,7 @@ func TestStatesPrefixHandling(t *testing.T) {
 		sSpace.Stored = true
 
 		// add various states first with no prefix
-		st, err := newStates(logger, registry, "")
+		st, err := newStates(logger, registry, "", "")
 		require.NoError(t, err)
 
 		_ = st.AddState(sA)
@@ -219,7 +218,7 @@ func TestStatesPrefixHandling(t *testing.T) {
 		// Reload states and validate
 
 		// when - no prefix reload
-		stNoPrefix, err := newStates(logger, registry, "")
+		stNoPrefix, err := newStates(logger, registry, "", "")
 		require.NoError(t, err)
 
 		require.True(t, stNoPrefix.IsProcessed(sA))
@@ -228,7 +227,7 @@ func TestStatesPrefixHandling(t *testing.T) {
 		require.True(t, stNoPrefix.IsProcessed(sSpace))
 
 		// when - with prefix `staging-`
-		st, err = newStates(logger, registry, "staging-")
+		st, err = newStates(logger, registry, "", "staging-")
 		require.NoError(t, err)
 
 		require.False(t, st.IsProcessed(sA))
@@ -237,7 +236,7 @@ func TestStatesPrefixHandling(t *testing.T) {
 		require.False(t, st.IsProcessed(sSpace))
 
 		// when - with prefix `production/`
-		st, err = newStates(logger, registry, "production/")
+		st, err = newStates(logger, registry, "", "production/")
 		require.NoError(t, err)
 
 		require.False(t, st.IsProcessed(sA))

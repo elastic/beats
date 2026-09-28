@@ -48,7 +48,7 @@ func TestProcessorRun(t *testing.T) {
 
 		evt := beat.Event{
 			Timestamp: time.Now().UTC(),
-			Fields: map[string]interface{}{
+			Fields: map[string]any{
 				"message": formatV5Sample,
 			},
 		}
@@ -157,7 +157,6 @@ func TestGoldenFile(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 
 		t.Run(tc.Name, func(t *testing.T) {
 			c := defaultConfig()
@@ -266,7 +265,6 @@ func BenchmarkProcessorRun(b *testing.B) {
 	}
 
 	for _, benchmark := range benchmarks {
-		benchmark := benchmark
 		b.Run(benchmark.name, func(b *testing.B) {
 			c := defaultConfig()
 			c.Format = []string{benchmark.format}
@@ -277,7 +275,7 @@ func BenchmarkProcessorRun(b *testing.B) {
 
 			evt := beat.Event{
 				Timestamp: time.Now().UTC(),
-				Fields: map[string]interface{}{
+				Fields: map[string]any{
 					"message": benchmark.message,
 				},
 			}

@@ -61,12 +61,12 @@ func TestExtractArrayProcessor_Run(t *testing.T) {
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
-					"array": []interface{}{"zero", 1, mapstr.M{"two": 2}},
+					"array": []any{"zero", 1, mapstr.M{"two": 2}},
 				},
 			},
 			expected: beat.Event{
 				Fields: mapstr.M{
-					"array":    []interface{}{"zero", 1, mapstr.M{"two": 2}},
+					"array":    []any{"zero", 1, mapstr.M{"two": 2}},
 					"dest.one": 1,
 					"dest.two": mapstr.M{"two": 2},
 				},
@@ -83,12 +83,12 @@ func TestExtractArrayProcessor_Run(t *testing.T) {
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
-					"array": []interface{}{"zero", 1, mapstr.M{"two": 2}},
+					"array": []any{"zero", 1, mapstr.M{"two": 2}},
 				},
 			},
 			expected: beat.Event{
 				Fields: mapstr.M{
-					"array":    []interface{}{"zero", 1, mapstr.M{"two": 2}},
+					"array":    []any{"zero", 1, mapstr.M{"two": 2}},
 					"dest.one": 1,
 					"dest.two": mapstr.M{"two": 3},
 				},
@@ -108,19 +108,19 @@ func TestExtractArrayProcessor_Run(t *testing.T) {
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
-					"array": []interface{}{"zero", 1, []interface{}{"a", "b"}},
+					"array": []any{"zero", 1, []any{"a", "b"}},
 				},
 			},
 			expected: beat.Event{
 				Fields: mapstr.M{
-					"array":    []interface{}{"zero", 1, []interface{}{"a", "b"}},
+					"array":    []any{"zero", 1, []any{"a", "b"}},
 					"dest.one": 1,
-					"dest.two": []interface{}{"a", "c"},
+					"dest.two": []any{"a", "c"},
 				},
 			},
 			afterFn: func(e *beat.Event) {
 				val, _ := e.GetValue("dest.two")
-				val.([]interface{})[1] = "c"
+				val.([]any)[1] = "c"
 			},
 		},
 
@@ -134,12 +134,12 @@ func TestExtractArrayProcessor_Run(t *testing.T) {
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
-					"array": []interface{}{"127.0.0.1"},
+					"array": []any{"127.0.0.1"},
 				},
 			},
 			expected: beat.Event{
 				Fields: mapstr.M{
-					"array": []interface{}{"127.0.0.1"},
+					"array": []any{"127.0.0.1"},
 				},
 			},
 			fail: true,
@@ -156,13 +156,13 @@ func TestExtractArrayProcessor_Run(t *testing.T) {
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
-					"array": []interface{}{3.14, 9000.0},
+					"array": []any{3.14, 9000.0},
 					"b":     true,
 				},
 			},
 			expected: beat.Event{
 				Fields: mapstr.M{
-					"array": []interface{}{3.14, 9000.0},
+					"array": []any{3.14, 9000.0},
 					"a":     3.14,
 					"b":     true,
 				},
@@ -180,12 +180,12 @@ func TestExtractArrayProcessor_Run(t *testing.T) {
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
-					"array": []interface{}{0, 42},
+					"array": []any{0, 42},
 				},
 			},
 			expected: beat.Event{
 				Fields: mapstr.M{
-					"array": []interface{}{0, 42},
+					"array": []any{0, 42},
 					"a":     42,
 					"b":     42,
 					"c":     42,
@@ -207,12 +207,12 @@ func TestExtractArrayProcessor_Run(t *testing.T) {
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
-					"array": []interface{}{0, "", []interface{}(nil), make(map[string]string), 0.0},
+					"array": []any{0, "", []any(nil), make(map[string]string), 0.0},
 				},
 			},
 			expected: beat.Event{
 				Fields: mapstr.M{
-					"array": []interface{}{0, "", []interface{}(nil), make(map[string]string), 0.0},
+					"array": []any{0, "", []any(nil), make(map[string]string), 0.0},
 					"a":     0,
 					"e":     0.0,
 				},
@@ -232,15 +232,15 @@ func TestExtractArrayProcessor_Run(t *testing.T) {
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
-					"array": []interface{}{nil, "", []interface{}(nil), map[string]string(nil), (*int)(nil)},
+					"array": []any{nil, "", []any(nil), map[string]string(nil), (*int)(nil)},
 				},
 			},
 			expected: beat.Event{
 				Fields: mapstr.M{
-					"array": []interface{}{nil, "", []interface{}(nil), map[string]string(nil), (*int)(nil)},
+					"array": []any{nil, "", []any(nil), map[string]string(nil), (*int)(nil)},
 					"a":     nil,
 					"b":     "",
-					"c":     []interface{}{},
+					"c":     []any{},
 					"d":     map[string]string(nil),
 					"e":     (*int)(nil),
 				},
@@ -282,12 +282,12 @@ func TestExtractArrayProcessor_Run(t *testing.T) {
 
 		event := &beat.Event{
 			Meta: mapstr.M{
-				"array": []interface{}{"zero", 1, mapstr.M{"two": 2}},
+				"array": []any{"zero", 1, mapstr.M{"two": 2}},
 			},
 		}
 
 		expMeta := mapstr.M{
-			"array":  []interface{}{"zero", 1, mapstr.M{"two": 2}},
+			"array":  []any{"zero", 1, mapstr.M{"two": 2}},
 			"first":  1,
 			"second": mapstr.M{"two": 2},
 		}

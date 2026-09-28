@@ -71,11 +71,11 @@ func IPv4Ntoa(ip uint32) string {
 // ReadString extracts the first null terminated string from
 // a slice of bytes.
 func ReadString(s []byte) (string, error) {
-	i := bytes.IndexByte(s, 0)
-	if i < 0 {
+	before, _, ok := bytes.Cut(s, []byte{0})
+	if !ok {
 		return "", errors.New("No string found")
 	}
-	res := string(s[:i])
+	res := string(before)
 	return res, nil
 }
 

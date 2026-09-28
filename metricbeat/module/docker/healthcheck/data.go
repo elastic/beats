@@ -21,7 +21,8 @@ import (
 	"context"
 	"strings"
 
-	"github.com/docker/docker/api/types/container"
+	"github.com/moby/moby/api/types/container"
+	dockerclient "github.com/moby/moby/client"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -40,31 +41,32 @@ func eventMapping(r mb.ReporterV2, cont *container.Summary, m *MetricSet) {
 		return
 	}
 
-	container, err := m.dockerClient.ContainerInspect(context.TODO(), cont.ID)
+	inspectResult, err := m.dockerClient.ContainerInspect(context.TODO(), cont.ID, dockerclient.ContainerInspectOptions{})
 	if err != nil {
 		return
 	}
 
 	// Check if the container has any health check
-	if container.State.Health == nil {
+	if inspectResult.Container.State.Health == nil {
 		return
 	}
 
-	lastEvent := len(container.State.Health.Log) - 1
+	lastEvent := len(inspectResult.Container.State.Health.Log) - 1
 
 	// Checks if a healthcheck already happened
 	if lastEvent < 0 {
 		return
 	}
 
+	health := inspectResult.Container.State.Health
 	fields := mapstr.M{
-		"status":        container.State.Health.Status,
-		"failingstreak": container.State.Health.FailingStreak,
+		"status":        health.Status,
+		"failingstreak": health.FailingStreak,
 		"event": mapstr.M{
-			"start_date": common.Time(container.State.Health.Log[lastEvent].Start),
-			"end_date":   common.Time(container.State.Health.Log[lastEvent].End),
-			"exit_code":  container.State.Health.Log[lastEvent].ExitCode,
-			"output":     container.State.Health.Log[lastEvent].Output,
+			"start_date": common.Time(health.Log[lastEvent].Start),
+			"end_date":   common.Time(health.Log[lastEvent].End),
+			"exit_code":  health.Log[lastEvent].ExitCode,
+			"output":     health.Log[lastEvent].Output,
 		},
 	}
 

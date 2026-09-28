@@ -1,24 +1,24 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "@timestamp": "2025-09-22T08:38:56.429Z",
     "event": {
         "dataset": "mongodb.collstats",
-        "duration": 115000,
+        "duration": 31226375,
         "module": "mongodb"
     },
     "metricset": {
         "name": "collstats",
-        "period": 10000
+        "period": 60000
     },
     "mongodb": {
         "collstats": {
-            "collection": "oplog.rs",
+            "collection": "users",
             "commands": {
-                "count": 0,
+                "count": 6,
                 "time": {
-                    "us": 0
+                    "us": 67484
                 }
             },
-            "db": "local",
+            "db": "testdb",
             "getmore": {
                 "count": 0,
                 "time": {
@@ -26,26 +26,26 @@
                 }
             },
             "insert": {
-                "count": 0,
+                "count": 1,
                 "time": {
-                    "us": 0
+                    "us": 4080
                 }
             },
             "lock": {
                 "read": {
-                    "count": 1,
+                    "count": 3,
                     "time": {
-                        "us": 7
+                        "us": 2167
                     }
                 },
                 "write": {
-                    "count": 1,
+                    "count": 4,
                     "time": {
-                        "us": 6600
+                        "us": 69397
                     }
                 }
             },
-            "name": "local.oplog.rs",
+            "name": "testdb.users",
             "queries": {
                 "count": 0,
                 "time": {
@@ -58,10 +58,23 @@
                     "us": 0
                 }
             },
+            "stats": {
+                "avgObjSize": 67,
+                "capped": false,
+                "count": 5,
+                "freeStorageSize": 0,
+                "nindexes": 4,
+                "numOrphanDocs": 0,
+                "scaleFactor": 1,
+                "size": 336,
+                "storageSize": 4096,
+                "totalIndexSize": 65536,
+                "totalSize": 69632
+            },
             "total": {
-                "count": 2,
+                "count": 7,
                 "time": {
-                    "us": 6607
+                    "us": 71564
                 }
             },
             "update": {
@@ -69,21 +82,11 @@
                 "time": {
                     "us": 0
                 }
-            },
-            "stats": {
-                "totalSize": 8192,
-                "max": 5000,
-                "nindexes": 1,
-                "size": 36,
-                "count": 1,
-                "avgObjSize": 36,
-                "storageSize": 4096,
-                "totalIndexSize": 4096
             }
         }
     },
     "service": {
-        "address": "172.28.0.5:27017",
+        "address": "mongodb://localhost:27017",
         "type": "mongodb"
     }
 }

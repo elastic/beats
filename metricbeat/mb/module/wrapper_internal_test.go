@@ -125,7 +125,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 		}{
 			{
 				name: "no failure_threshold: status DEGRADED after first error",
-				config: newConfig(t, map[string]interface{}{
+				config: newConfig(t, map[string]any{
 					"module":     mockModuleName,
 					"metricsets": []string{mockMetricSetName},
 					"period":     "100ms",
@@ -145,7 +145,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 			},
 			{
 				name: "no failure_threshold: status DEGRADED after first error, reset to Running after first successful fetch",
-				config: newConfig(t, map[string]interface{}{
+				config: newConfig(t, map[string]any{
 					"module":     mockModuleName,
 					"metricsets": []string{mockMetricSetName},
 					"period":     "100ms",
@@ -176,7 +176,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 			},
 			{
 				name: "failure_threshold = 3: status DEGRADED at the 3rd error",
-				config: newConfig(t, map[string]interface{}{
+				config: newConfig(t, map[string]any{
 					"module":            mockModuleName,
 					"metricsets":        []string{mockMetricSetName},
 					"period":            "100ms",
@@ -204,7 +204,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 			},
 			{
 				name: "failure_threshold = 3: status HEALTHY after 2 errors, 1 success and 2 more errors, DEGRADED at the 3rd consecutive error",
-				config: newConfig(t, map[string]interface{}{
+				config: newConfig(t, map[string]any{
 					"module":            mockModuleName,
 					"metricsets":        []string{mockMetricSetName},
 					"period":            "100ms",
@@ -242,7 +242,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 			},
 			{
 				name: "failure_threshold = 0: stream status update never become DEGRADED",
-				config: newConfig(t, map[string]interface{}{
+				config: newConfig(t, map[string]any{
 					"module":            mockModuleName,
 					"metricsets":        []string{mockMetricSetName},
 					"period":            "100ms",
@@ -355,7 +355,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 		}{
 			{
 				name: "no failure_threshold: status DEGRADED after first error",
-				config: newConfig(t, map[string]interface{}{
+				config: newConfig(t, map[string]any{
 					"module":     mockModuleName,
 					"metricsets": []string{mockMetricSetName},
 					"period":     "100ms",
@@ -375,7 +375,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 			},
 			{
 				name: "no failure_threshold: status DEGRADED after first error, reset to Running after first successful fetch",
-				config: newConfig(t, map[string]interface{}{
+				config: newConfig(t, map[string]any{
 					"module":     mockModuleName,
 					"metricsets": []string{mockMetricSetName},
 					"period":     "100ms",
@@ -406,7 +406,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 			},
 			{
 				name: "failure_threshold = 3: status DEGRADED at the 3rd error",
-				config: newConfig(t, map[string]interface{}{
+				config: newConfig(t, map[string]any{
 					"module":            mockModuleName,
 					"metricsets":        []string{mockMetricSetName},
 					"period":            "100ms",
@@ -434,7 +434,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 			},
 			{
 				name: "failure_threshold = 3: status HEALTHY after 2 errors, 1 success and 2 more errors, DEGRADED at the 3rd consecutive error",
-				config: newConfig(t, map[string]interface{}{
+				config: newConfig(t, map[string]any{
 					"module":            mockModuleName,
 					"metricsets":        []string{mockMetricSetName},
 					"period":            "100ms",
@@ -472,7 +472,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 			},
 			{
 				name: "failure_threshold = 0: stream status update never become DEGRADED",
-				config: newConfig(t, map[string]interface{}{
+				config: newConfig(t, map[string]any{
 					"module":            mockModuleName,
 					"metricsets":        []string{mockMetricSetName},
 					"period":            "100ms",
@@ -568,7 +568,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 	})
 }
 
-func newConfig(t testing.TB, moduleConfig interface{}) *conf.C {
+func newConfig(t testing.TB, moduleConfig any) *conf.C {
 	config, err := conf.NewConfigFrom(moduleConfig)
 	require.NoError(t, err)
 	return config

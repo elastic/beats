@@ -22,7 +22,8 @@ package multiline
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
+	"io"
+
 	"os"
 	"strings"
 	"testing"
@@ -377,7 +378,7 @@ func createMultilineTestReader(t *testing.T, in *bytes.Buffer, cfg Config) reade
 	}
 
 	var r reader.Reader
-	r, err = readfile.NewEncodeReader(ioutil.NopCloser(in), readfile.Config{
+	r, err = readfile.NewEncodeReader(io.NopCloser(in), readfile.Config{
 		Codec:      enc,
 		BufferSize: 4096,
 		Terminator: readfile.LineFeed,

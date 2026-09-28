@@ -28,7 +28,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/docker/docker/client"
+	dockerclient "github.com/moby/moby/client"
 
 	"github.com/elastic/go-sysinfo"
 
@@ -48,15 +48,15 @@ var NoSumStats = []string{
 var nsRegex = regexp.MustCompile(`\d+`)
 
 // fetchContainerNetStats gathers the PIDs associated with a container, and then uses go-sysinfo to grab the /proc/[pid]/net counters and sum them across PIDs.
-func fetchContainerNetStats(client *client.Client, timeout time.Duration, container string) (*sysinfotypes.NetworkCountersInfo, error) {
+func fetchContainerNetStats(client *dockerclient.Client, timeout time.Duration, container string) (*sysinfotypes.NetworkCountersInfo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	inspect, err := client.ContainerInspect(ctx, container)
+	inspectResult, err := client.ContainerInspect(ctx, container, dockerclient.ContainerInspectOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("error fetching stats for container %s: %w", container, err)
 	}
-	rootPID := inspect.ContainerJSONBase.State.Pid
+	rootPID := inspectResult.Container.State.Pid
 
 	proc, err := sysinfo.Process(rootPID)
 	if err != nil {

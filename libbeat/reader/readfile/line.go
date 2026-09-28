@@ -29,8 +29,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-const unlimited = 0
-
 // LineReader reads lines from underlying reader, decoding the input stream
 // using the configured codec. The reader keeps track of bytes consumed
 // from raw input stream for every decoded line.
@@ -77,7 +75,7 @@ func NewLineReader(input io.ReadCloser, config Config, logger *logp.Logger) (*Li
 		inBuffer:     streambuf.New(nil),
 		outBuffer:    streambuf.New(nil),
 		tempBuffer:   make([]byte, config.BufferSize),
-		logger:       logger.Named("reader_line"),
+		logger:       logger,
 	}, nil
 }
 
@@ -244,11 +242,9 @@ func (r *LineReader) advance() error {
 	r.inBuffer.Reset()
 
 	// Continue scanning input buffer from last position + 1
-	r.inOffset = idx + 1 - sz
-	if r.inOffset < 0 {
+	r.inOffset = max(idx+1-sz,
 		// Fix inOffset if newline has encoding > 8bits + firl line has been decoded
-		r.inOffset = 0
-	}
+		0)
 
 	return err
 }

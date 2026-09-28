@@ -19,14 +19,14 @@ package plugin
 
 import "fmt"
 
-type PluginLoader func(p interface{}) error
+type PluginLoader func(p any) error
 
 var registry = map[string]PluginLoader{}
 
 func Bundle(
-	bundles ...map[string][]interface{},
-) map[string][]interface{} {
-	ret := map[string][]interface{}{}
+	bundles ...map[string][]any,
+) map[string][]any {
+	ret := map[string][]any{}
 
 	for _, bundle := range bundles {
 		for name, plugins := range bundle {
@@ -37,8 +37,8 @@ func Bundle(
 	return ret
 }
 
-func MakePlugin(key string, ifc interface{}) map[string][]interface{} {
-	return map[string][]interface{}{
+func MakePlugin(key string, ifc any) map[string][]any {
+	return map[string][]any{
 		key: {ifc},
 	}
 }

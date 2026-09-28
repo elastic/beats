@@ -36,6 +36,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	testingfs "github.com/elastic/elastic-agent-libs/testing/fs"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -83,7 +85,6 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 	}
 
 	for name, testCase := range testCases {
-		testCase := testCase
 
 		t.Run(name, func(t *testing.T) {
 			testStore := newMockProspectorCleaner(testCase.entries)
@@ -154,7 +155,6 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 	}
 
 	for name, testCase := range testCases {
-		testCase := testCase
 
 		t.Run(name, func(t *testing.T) {
 			testStore := newMockProspectorCleaner(testCase.entries)
@@ -166,6 +166,79 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 			err := p.Init(testStore, newMockProspectorCleaner(nil), func(loginp.Source) string { return testCase.newKey })
 			require.NoError(t, err, "prospector Init must succeed")
 			assert.Equal(t, testCase.expectedUpdatedKeys, testStore.updatedKeys)
+		})
+	}
+}
+
+func TestProspector_UpdateIdentifiersOnlyForSameFiles(t *testing.T) {
+	workDir := testingfs.TempDir(t, "")
+	sourcePath := filepath.Join(workDir, "app.log")
+	oldSourcePath := filepath.Join(workDir, "app.log.1")
+
+	oldFile, err := os.Create(oldSourcePath)
+	require.NoError(t, err, "creating old log file")
+	defer oldFile.Close()
+
+	oldInfo, err := oldFile.Stat()
+	require.NoError(t, err, "stating old log file")
+	oldDescriptor := loginp.FileDescriptor{
+		Filename:    sourcePath,
+		Info:        file.ExtendFileInfo(oldInfo),
+		Fingerprint: "old-fingerprint",
+	}
+
+	currentFile, err := os.Create(sourcePath)
+	require.NoError(t, err, "creating current log file")
+	defer currentFile.Close()
+
+	currentInfo, err := currentFile.Stat()
+	require.NoError(t, err, "stating current log file")
+	currentDescriptor := loginp.FileDescriptor{
+		Filename:    sourcePath,
+		Info:        file.ExtendFileInfo(currentInfo),
+		Fingerprint: "current-fingerprint",
+	}
+
+	globalIdentifier, err := loginp.NewSourceIdentifier(pluginName, "")
+	require.NoError(t, err, "creating global source identifier")
+	inputIdentifier, err := loginp.NewSourceIdentifier(pluginName, "input-id")
+	require.NoError(t, err, "creating input source identifier")
+
+	for _, identityName := range []string{nativeName, fingerprintName} {
+		t.Run(identityName, func(t *testing.T) {
+			identifier := mustIdentifier(t, identityName)
+			oldSource := identifier.GetSource(loginp.FSEvent{
+				NewPath:    sourcePath,
+				Descriptor: oldDescriptor,
+			})
+
+			oldKey := globalIdentifier.ID(oldSource)
+			globalStore := newMockProspectorCleaner(map[string]loginp.Value{
+				oldKey: &mockUnpackValue{
+					key: oldKey,
+					fileMeta: fileMeta{
+						Source:         sourcePath,
+						IdentifierName: identityName,
+					},
+				},
+			})
+
+			p := fileProspector{
+				logger:     logptest.NewFileLogger(t, workDir).Logger,
+				identifier: identifier,
+				filewatcher: newMockFileWatcherWithFiles(
+					map[string]loginp.FileDescriptor{
+						sourcePath: currentDescriptor,
+					}),
+			}
+
+			err = p.Init(newMockProspectorCleaner(nil), globalStore, inputIdentifier.ID)
+			require.NoError(t, err, "prospector Init must succeed")
+			assert.Empty(
+				t,
+				globalStore.updatedKeys,
+				"stale global registry entry must not be migrated to the current file",
+			)
 		})
 	}
 }
@@ -372,7 +445,6 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 	}
 
 	for name, test := range testCases {
-		test := test
 
 		t.Run(name, func(t *testing.T) {
 			p := fileProspector{
@@ -423,12 +495,10 @@ func TestProspectorHarvesterUpdateIgnoredFiles(t *testing.T) {
 	hg := newTestHarvesterGroup()
 	testStore := newMockMetadataUpdater()
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
+	wg.Go(func() {
 		p.Run(ctx, testStore, hg)
 
-		wg.Done()
-	}()
+	})
 
 	// The prospector must persist the size of the file to the state
 	// as the offset, so when the file is updated only the new
@@ -475,7 +545,6 @@ func TestProspectorDeletedFile(t *testing.T) {
 	}
 
 	for name, test := range testCases {
-		test := test
 
 		t.Run(name, func(t *testing.T) {
 			p := fileProspector{
@@ -700,7 +769,7 @@ type mockMetadataUpdater struct {
 
 func newMockMetadataUpdater() *mockMetadataUpdater {
 	return &mockMetadataUpdater{
-		table: make(map[string]interface{}),
+		table: make(map[string]any),
 	}
 }
 
@@ -783,7 +852,7 @@ type mockUnpackValue struct {
 	key string
 }
 
-func (u *mockUnpackValue) UnpackCursorMeta(to interface{}) error {
+func (u *mockUnpackValue) UnpackCursorMeta(to any) error {
 	return typeconv.Convert(to, u.fileMeta)
 }
 
@@ -813,7 +882,7 @@ func (c *mockProspectorCleaner) CleanIf(pred func(v loginp.Value) bool) {
 	}
 }
 
-func (c *mockProspectorCleaner) UpdateIdentifiers(updater func(v loginp.Value) (string, interface{})) {
+func (c *mockProspectorCleaner) UpdateIdentifiers(updater func(v loginp.Value) (string, any)) {
 	for key, meta := range c.available {
 		k, _ := updater(meta)
 		if k != "" {
@@ -823,7 +892,7 @@ func (c *mockProspectorCleaner) UpdateIdentifiers(updater func(v loginp.Value) (
 }
 
 // FixUpIdentifiers does nothing
-func (c *mockProspectorCleaner) FixUpIdentifiers(func(loginp.Value) (string, interface{})) {}
+func (c *mockProspectorCleaner) FixUpIdentifiers(func(loginp.Value) (string, any)) {}
 
 type renamedPathIdentifier struct {
 	fileIdentifier
@@ -840,6 +909,17 @@ func mustPathIdentifier(renamed bool) fileIdentifier {
 		return &renamedPathIdentifier{pathIdentifier}
 	}
 	return pathIdentifier
+}
+
+func mustIdentifier(t *testing.T, name string) fileIdentifier {
+	t.Helper()
+
+	factory, ok := identifierFactories[name]
+	require.Truef(t, ok, "identifier factory %q must exist", name)
+
+	identifier, err := factory(nil, logp.NewNopLogger())
+	require.NoErrorf(t, err, "creating %q identifier", name)
+	return identifier
 }
 
 func TestOnRenameFileIdentity(t *testing.T) {
@@ -914,7 +994,7 @@ type testFileInfo struct {
 	name string
 	size int64
 	time time.Time
-	sys  interface{}
+	sys  any
 }
 
 func (t *testFileInfo) Name() string       { return t.name }
@@ -922,7 +1002,7 @@ func (t *testFileInfo) Size() int64        { return t.size }
 func (t *testFileInfo) Mode() os.FileMode  { return 0 }
 func (t *testFileInfo) ModTime() time.Time { return t.time }
 func (t *testFileInfo) IsDir() bool        { return false }
-func (t *testFileInfo) Sys() interface{}   { return t.sys }
+func (t *testFileInfo) Sys() any           { return t.sys }
 
 func createTestFileDescriptor() loginp.FileDescriptor {
 	return createTestFileDescriptorWithInfo(&testFileInfo{})

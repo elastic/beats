@@ -731,6 +731,7 @@ func Test_Concurrency(t *testing.T) {
 					MaxWorkers:    *container.MaxWorkers,
 					Poll:          *container.Poll,
 					PollInterval:  *container.PollInterval,
+					Retry:         input.config.Retry,
 				}
 			}
 			v2Ctx, cancel := newV2Context(t)

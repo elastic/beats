@@ -140,12 +140,12 @@ func TestManager_Create(t *testing.T) {
 			return sourceList(config.Sources...), &fakeTestInput{}, err
 		})
 
-		_, err := manager.Create(conf.MustNewConfigFrom(map[string]interface{}{
+		_, err := manager.Create(conf.MustNewConfigFrom(map[string]any{
 			"sources": []string{"a"},
 		}))
 		require.NoError(t, err)
 
-		_, err = manager.Create(conf.MustNewConfigFrom(map[string]interface{}{
+		_, err = manager.Create(conf.MustNewConfigFrom(map[string]any{
 			"sources": []string{"a"},
 		}))
 		require.NoError(t, err)
@@ -196,11 +196,9 @@ func TestManager_InputsTest(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.TODO())
 
 		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			err = inp.Test(input.TestContext{Cancelation: ctx})
-		}()
+		})
 
 		cancel()
 		wg.Wait()
@@ -228,12 +226,10 @@ func TestManager_InputsTest(t *testing.T) {
 		require.NoError(t, err)
 
 		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			err = inp.Test(input.TestContext{})
 			t.Logf("Test returned: %v", err)
-		}()
+		})
 
 		wg.Wait()
 		require.Error(t, err)
@@ -252,12 +248,10 @@ func TestManager_InputsTest(t *testing.T) {
 		require.NoError(t, err)
 
 		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			err = inp.Test(input.TestContext{Logger: logptest.NewTestingLogger(t, "test")})
 			t.Logf("Test returned: %v", err)
-		}()
+		})
 
 		wg.Wait()
 		require.Error(t, err)
@@ -279,8 +273,7 @@ func TestManager_InputsRun(t *testing.T) {
 		inp, err := manager.Create(conf.NewConfig())
 		require.NoError(t, err)
 
-		cancelCtx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		cancelCtx := t.Context()
 
 		var clientCounters pubtest.ClientCounter
 		id := uuid.Must(uuid.NewV4()).String()
@@ -309,8 +302,7 @@ func TestManager_InputsRun(t *testing.T) {
 		inp, err := manager.Create(conf.NewConfig())
 		require.NoError(t, err)
 
-		cancelCtx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		cancelCtx := t.Context()
 
 		var clientCounters pubtest.ClientCounter
 		id := uuid.Must(uuid.NewV4()).String()
@@ -345,9 +337,7 @@ func TestManager_InputsRun(t *testing.T) {
 
 		var clientCounters pubtest.ClientCounter
 		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			id := uuid.Must(uuid.NewV4()).String()
 			ctx := input.Context{
 				ID:              id,
@@ -358,7 +348,7 @@ func TestManager_InputsRun(t *testing.T) {
 				Logger:          manager.Logger,
 			}
 			err = inp.Run(ctx, clientCounters.BuildConnector())
-		}()
+		})
 
 		cancel()
 		wg.Wait()
@@ -466,8 +456,7 @@ func TestManager_InputsRun(t *testing.T) {
 		inp, err := manager.Create(conf.NewConfig())
 		require.NoError(t, err)
 
-		cancelCtx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		cancelCtx := t.Context()
 
 		// setup publishing pipeline and capture ACKer, so we can simulate progress in the Output
 		var acker beat.EventListener
@@ -487,9 +476,7 @@ func TestManager_InputsRun(t *testing.T) {
 
 		// start the input
 		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			id := uuid.Must(uuid.NewV4()).String()
 			ctx := input.Context{
 				ID:              id,
@@ -500,7 +487,7 @@ func TestManager_InputsRun(t *testing.T) {
 				Logger:          manager.Logger,
 			}
 			err = inp.Run(ctx, pipeline)
-		}()
+		})
 		// wait for test setup to shut down
 		defer wg.Wait()
 
@@ -573,15 +560,13 @@ func TestLockResource(t *testing.T) {
 		require.NoError(t, err)
 
 		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			resOther := store.Get("test::key")
 			err := lockResource(log, resOther, context.TODO())
 			if err == nil {
 				releaseResource(resOther)
 			}
-		}()
+		})
 
 		go func() {
 			time.Sleep(100 * time.Millisecond)

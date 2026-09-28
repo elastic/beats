@@ -6,15 +6,14 @@ package http_endpoint
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/natefinch/lumberjack.v2"
 
 	confpkg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/lumberjack"
 )
 
 func Test_validateConfig(t *testing.T) {
@@ -56,18 +55,39 @@ func Test_validateConfig(t *testing.T) {
 				URL:          "/",
 				ResponseBody: `{"message": "success"}`,
 				Method:       http.MethodPost,
+				ResponseCode: http.StatusOK,
 				Tracer:       &tracerConfig{Enabled: ptrTo(true), Logger: lumberjack.Logger{Filename: "http_endpoint/log"}},
 			},
 		},
 		{
-			name: "invalid log destination",
+			name: "invalid_log_destination_accepted_at_config_time",
 			config: config{
 				URL:          "/",
 				ResponseBody: `{"message": "success"}`,
 				Method:       http.MethodPost,
+				ResponseCode: http.StatusOK,
 				Tracer:       &tracerConfig{Enabled: ptrTo(true), Logger: lumberjack.Logger{Filename: "/var/log"}},
 			},
-			wantError: fmt.Errorf(`request tracer path must be within %q path accessing config`, inputName),
+		},
+		{
+			name: "response_code_zero_rejected",
+			config: config{
+				URL:          "/",
+				ResponseBody: `{"message": "success"}`,
+				Method:       http.MethodPost,
+				ResponseCode: 0,
+			},
+			wantError: errors.New("response_code must be a valid HTTP status code: 0 accessing config"),
+		},
+		{
+			name: "response_code_out_of_range_rejected",
+			config: config{
+				URL:          "/",
+				ResponseBody: `{"message": "success"}`,
+				Method:       http.MethodPost,
+				ResponseCode: 1000,
+			},
+			wantError: errors.New("response_code must be a valid HTTP status code: 1000 accessing config"),
 		},
 	}
 
@@ -79,6 +99,45 @@ func Test_validateConfig(t *testing.T) {
 
 			if !sameError(err, tc.wantError) {
 				t.Errorf("unexpected error from validation: got:%s want:%s", err, tc.wantError)
+			}
+		})
+	}
+}
+
+func TestValidateOptionsResponseCode(t *testing.T) {
+	tests := []struct {
+		name          string
+		optionsStatus int
+		wantError     string
+	}{
+		{
+			name:          "valid options response code",
+			optionsStatus: http.StatusOK,
+		},
+		{
+			name:          "options_response_code zero rejected",
+			optionsStatus: 0,
+			wantError:     "options_response_code must be a valid HTTP status code: 0",
+		},
+		{
+			name:          "options_response_code out of range rejected",
+			optionsStatus: 1000,
+			wantError:     "options_response_code must be a valid HTTP status code: 1000",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := defaultConfig()
+			// Use a non-empty header to trigger the options_response_code check;
+			// a nil or empty OptionsHeaders means the feature is not configured.
+			c.OptionsHeaders = http.Header{"Content-Type": {"application/json"}}
+			c.OptionsStatus = tt.optionsStatus
+			err := c.Validate()
+			if tt.wantError == "" {
+				require.NoError(t, err)
+			} else {
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), tt.wantError)
 			}
 		})
 	}

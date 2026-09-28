@@ -171,7 +171,7 @@ func GetVMStat(hostfs resolve.Resolver) (map[string]uint64, error) {
 
 	// I'm not a fan of throwing stuff directly to maps, but this is a huge amount of kernel/config specific metrics, and we're the only consumer of this for now.
 	vmstat := map[string]uint64{}
-	for _, metric := range strings.Split(string(content), "\n") {
+	for metric := range strings.SplitSeq(string(content), "\n") {
 		parts := strings.SplitN(metric, " ", 2)
 		if len(parts) != 2 {
 			continue

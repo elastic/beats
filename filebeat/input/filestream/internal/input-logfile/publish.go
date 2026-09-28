@@ -30,7 +30,7 @@ import (
 // Inputs are allowed to pass `nil` as cursor state. In this case the state is not updated, but the
 // event will still be published as is.
 type Publisher interface {
-	Publish(event beat.Event, cursor interface{}) error
+	Publish(event beat.Event, cursor any) error
 }
 
 // cursorPublisher implements the Publisher interface and used internally by the managedInput.
@@ -54,10 +54,10 @@ type updateOp struct {
 
 	// state updates to persist
 	timestamp time.Time
-	delta     interface{}
+	delta     any
 }
 
-func newUpdateOp(resource *resource, ts time.Time, delta interface{}) *updateOp {
+func newUpdateOp(resource *resource, ts time.Time, delta any) *updateOp {
 	return &updateOp{
 		resource:  resource,
 		timestamp: ts,
@@ -74,7 +74,7 @@ func (op *updateOp) Key() string {
 // It overwrite event.Private with the update operation, before finally sending the event.
 // The ACK ordering in the publisher pipeline guarantees that update operations
 // will be ACKed and executed in the correct order.
-func (c *cursorPublisher) Publish(event beat.Event, cursorUpdate interface{}) error {
+func (c *cursorPublisher) Publish(event beat.Event, cursorUpdate any) error {
 	if cursorUpdate == nil {
 		return c.forward(event)
 	}
@@ -96,7 +96,7 @@ func (c *cursorPublisher) forward(event beat.Event) error {
 	return c.canceler.Err()
 }
 
-func createUpdateOp(resource *resource, updates interface{}) (*updateOp, error) {
+func createUpdateOp(resource *resource, updates any) (*updateOp, error) {
 	ts := time.Now()
 
 	resource.stateMutex.Lock()

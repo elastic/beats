@@ -1,0 +1,79 @@
+// begin 8.19.18 relnotes
+
+[[release-notes-8.19.18]]
+==  8.19.18
+
+Review important information about the  8.19.18 release.
+
+
+
+
+
+
+
+
+
+
+
+
+[discrete]
+[[enhancements-8.19.18]]
+=== Enhancements
+
+
+
+
+**Filebeat**
+
+* Allow HTTP JSON input redirection to the CEL input. https://github.com/elastic/beats/pull/49614[#49614] 
+* Upgrade `elastic/go-lumber` to v0.2.0. https://github.com/elastic/beats/pull/51518[#51518]
+
+
+**Metricbeat**
+
+* Add MongoDB collstats collection through the `$collStats` aggregation stage. https://github.com/elastic/beats/pull/48638[#48638] https://github.com/elastic/beats/issues/45925[#45925]
+
+
+
+
+[discrete]
+[[bug-fixes-8.19.18]]
+=== Bug fixes
+
+
+
+
+**All**
+
+* Fix panic when `logging.metrics.period` is `0`. https://github.com/elastic/beats/pull/51462[#51462] 
+
+
+**Filebeat**
+
+* Fix `max_body_bytes` setting not working without HMAC and add missing documentation configuration options in HTTP Endpoint input. https://github.com/elastic/beats/pull/48550[#48550] https://github.com/elastic/beats/issues/48512[#48512]
+* Fix WebSocket reconnect loop ignoring context cancellation with infinite retries. https://github.com/elastic/beats/pull/51194[#51194] 
+* Fix WebSocket input hanging on shutdown when server stalls and `keep_alive` is disabled. https://github.com/elastic/beats/pull/51227[#51227] https://github.com/elastic/beats/issues/51213[#51213]
+* Fix handling of `User-Agent` header when using OAuth 2.0 authentication. https://github.com/elastic/beats/pull/51228[#51228] https://github.com/elastic/beats/issues/50867[#50867]
+* Fix data race on filestream registry cursor metadata. https://github.com/elastic/beats/pull/51287[#51287] 
+* Fix DPoP resource client signing method assignment in the CEL and HTTP JSON inputs. https://github.com/elastic/beats/pull/51433[#51433] 
+* Strip sensitive headers on cross-origin redirects in the HTTP JSON and CEL inputs. https://github.com/elastic/beats/pull/51434[#51434] 
+* Validate CrowdStrike streaming resource URL origins against the configured discover URL. https://github.com/elastic/beats/pull/51435[#51435] 
+* Use constant-time comparison for `http_endpoint` basic auth and secret header validation. https://github.com/elastic/beats/pull/51436[#51436] 
+* Validate request tracer path regardless of enabled state to prevent unintended file deletion. https://github.com/elastic/beats/pull/51479[#51479] 
+
+
+**Heartbeat**
+
+* Restore `tls.*` certificate metadata for HTTP monitors using `max_redirects &gt; 0`. https://github.com/elastic/beats/pull/51339[#51339] https://github.com/elastic/beats/issues/48335[#48335]
+
+
+**Libbeat**
+
+* Fix panic in the Kafka output during shutdown. https://github.com/elastic/beats/pull/51484[#51484] 
+
+
+**Metricbeat**
+
+* Fix missing `state_service` and `state_storageclass` events when `kube-state-metrics` denylists `*_created`. https://github.com/elastic/beats/pull/51255[#51255] https://github.com/elastic/beats/issues/34074[#34074]
+
+// end 8.19.18 relnotes

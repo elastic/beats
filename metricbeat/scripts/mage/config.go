@@ -33,7 +33,7 @@ func configFileParams(moduleDirs ...string) devtools.ConfigFileParams {
 
 	p := devtools.DefaultConfigFileParams()
 	p.Templates = append(p.Templates, devtools.OSSBeatDir("_meta/config/*.tmpl"), modulesConfigYml)
-	p.ExtraVars = map[string]interface{}{
+	p.ExtraVars = map[string]any{
 		"UseKubernetesMetadataProcessor": true,
 	}
 	return p

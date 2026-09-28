@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"text/template"
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/mito/lib/xml"
@@ -50,6 +51,15 @@ func newPagination(config config, client *httpClient, stat status.StatusReporter
 		return &mapstr.M{}
 	}()
 
+	var allowedOrigins []*url.URL
+	for _, s := range config.Response.PaginationAllowedHosts {
+		u, err := url.Parse(s)
+		if err != nil {
+			continue // already validated by responseConfig.Validate
+		}
+		allowedOrigins = append(allowedOrigins, u)
+	}
+
 	requestFactory := newPaginationRequestFactory(
 		config.Request.Method,
 		config.Request.EncodeAs,
@@ -57,6 +67,7 @@ func newPagination(config config, client *httpClient, stat status.StatusReporter
 		body,
 		append(rts, pts...),
 		config.Auth,
+		allowedOrigins,
 		stat,
 		log,
 	)
@@ -64,15 +75,17 @@ func newPagination(config config, client *httpClient, stat status.StatusReporter
 	return pagination
 }
 
-func newPaginationRequestFactory(method, encodeAs string, url url.URL, body *mapstr.M, ts []basicTransform, authConfig *authConfig, stat status.StatusReporter, log *logp.Logger) *requestFactory {
+func newPaginationRequestFactory(method, encodeAs string, u url.URL, body *mapstr.M, ts []basicTransform, authConfig *authConfig, allowedOrigins []*url.URL, stat status.StatusReporter, log *logp.Logger) *requestFactory {
 	// config validation already checked for errors here
 	rf := &requestFactory{
-		url:        url,
-		method:     method,
-		body:       body,
-		transforms: ts,
-		log:        log,
-		encoder:    registeredEncoders[encodeAs],
+		url:            u,
+		method:         method,
+		body:           body,
+		transforms:     ts,
+		log:            log,
+		encoder:        registeredEncoders[encodeAs],
+		originURL:      &u,
+		allowedOrigins: allowedOrigins,
 	}
 	if authConfig != nil && authConfig.Basic.isEnabled() {
 		rf.user = authConfig.Basic.User
@@ -129,17 +142,17 @@ func (iter *pageIterator) next() (*response, bool, error) {
 	}
 
 	httpReq, err := iter.pagination.requestFactory.newHTTPRequest(iter.stdCtx, iter.trCtx)
-	switch {
-	case err == nil:
-		// OK
-	case errors.Is(err, errNewURLValueNotSet),
-		errors.Is(err, errEmptyTemplateResult),
-		errors.Is(err, errExecutingTemplate):
-		// If this error happens here it means a transform
-		// did not find any new value and we can stop paginating without error.
-		iter.done = true
-		return nil, false, nil
-	default:
+	if err != nil {
+		var execErr template.ExecError
+		if errors.Is(err, errNewURLValueNotSet) ||
+			errors.Is(err, errEmptyTemplateResult) ||
+			errors.Is(err, errExecutingTemplate) ||
+			errors.As(err, &execErr) {
+			// If this error happens here it means a transform
+			// did not find any new value and we can stop paginating without error.
+			iter.done = true
+			return nil, false, nil
+		}
 		return nil, false, err
 	}
 

@@ -83,7 +83,7 @@ func TestStore(t *testing.T) {
 		t.Fatalf("could not create logs folder '%s': %s", logsFolder, err)
 	}
 
-	for i := 0; i < numLogFiles; i++ {
+	for i := range numLogFiles {
 		logFile := path.Join(logsFolder, fmt.Sprintf("log-%d.log", i))
 		integration.WriteLogFile(t, logFile, 10, false)
 	}
@@ -93,7 +93,7 @@ func TestStore(t *testing.T) {
 	// 2. Ingest the file and stop Filebeat
 	filebeat.Start()
 
-	for i := 0; i < numLogFiles; i++ {
+	for range numLogFiles {
 		// Files can be ingested out of order, so we cannot specify their path.
 		// There will be more than one log line per file, but that at least gives us
 		// some assurance the files were read

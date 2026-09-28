@@ -7,8 +7,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-metricset-system-users]]
 === System users metricset
 
-beta[]
-
 include::../../../module/system/users/_meta/docs.asciidoc[]
 
 

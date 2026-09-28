@@ -108,7 +108,7 @@ type testFileInfo struct {
 	name string
 	size int64
 	time time.Time
-	sys  interface{}
+	sys  any
 }
 
 func (t testFileInfo) Name() string       { return t.name }
@@ -116,4 +116,4 @@ func (t testFileInfo) Size() int64        { return t.size }
 func (t testFileInfo) Mode() os.FileMode  { return 0 }
 func (t testFileInfo) ModTime() time.Time { return t.time }
 func (t testFileInfo) IsDir() bool        { return false }
-func (t testFileInfo) Sys() interface{}   { return t.sys }
+func (t testFileInfo) Sys() any           { return t.sys }

@@ -31,12 +31,12 @@ type outputPlugin struct {
 
 var pluginKey = "libbeat.out"
 
-func Plugin(name string, f Factory) map[string][]interface{} {
+func Plugin(name string, f Factory) map[string][]any {
 	return p.MakePlugin(pluginKey, outputPlugin{name, f})
 }
 
 func init() {
-	p.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
+	p.MustRegisterLoader(pluginKey, func(ifc any) error {
 		b, ok := ifc.(outputPlugin)
 		if !ok {
 			return errors.New("plugin does not match output plugin type")

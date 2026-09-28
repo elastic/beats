@@ -18,9 +18,9 @@
 package docker
 
 import (
-	"github.com/docker/docker/api/types/container"
+	"github.com/moby/moby/api/types/container"
 
-	helpers "github.com/elastic/elastic-agent-autodiscover/docker"
+	helpers "github.com/elastic/beats/v7/pkg/autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

@@ -1,0 +1,40 @@
+# Kind can be one of:
+# - breaking-change: a change to previously-documented behavior
+# - deprecation: functionality that is being removed in a later release
+# - bug-fix: fixes a problem in a previous version
+# - enhancement: extends functionality but does not break or fix existing behavior
+# - feature: new functionality
+# - known-issue: problems that we are aware of in a given version
+# - security: impacts on the security of a product or a user's deployment.
+# - upgrade: important information for someone upgrading from a prior version
+# - other: does not fit into any of the other categories
+kind: bug-fix
+
+# Change summary; a 80ish characters long description of the change.
+summary: Respond to http_endpoint requests that contain no events instead of closing the connection
+
+# Long description; in case the summary is not enough to describe the change
+# this field accommodate a description without length limits.
+description: |
+  Since 8.9 the http_endpoint input wrote a zero HTTP status code when a
+  request decoded to no events. net/http rejects status codes below 100, so
+  the response panicked and the connection was closed with nothing written:
+  clients saw an empty reply and reverse proxies in front of the endpoint
+  turned it into a 502. Requests that hold no events are now answered with
+  the configured response_code and response_body, as they were before 8.9.
+  This covers an empty or nested-empty JSON array, an array holding only
+  non-object elements, a whitespace-only body, and a program that returns an
+  empty array. A request with no body at all is still rejected with 406, and
+  that rejection no longer depends on whether max_body_bytes,
+  max_in_flight_bytes or tracer is configured. Invalid response_code and
+  options_response_code values are now rejected at startup.
+
+# Affected component; usually one of "elastic-agent", "fleet-server",
+# "filebeat", "metricbeat", "auditbeat", "all", etc.
+component: filebeat
+
+# PR URL; optional; the PR number that added the changeset.
+# pr: https://github.com/owner/repo/1234
+
+# Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
+# issue: https://github.com/elastic/beats/issues/<new-issue>

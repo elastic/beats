@@ -93,6 +93,10 @@ func (resp *response) templateValues() mapstr.M {
 	if resp == nil {
 		return mapstr.M{}
 	}
+	body := resp.body
+	if m, ok := body.(map[string]interface{}); ok {
+		body = mapstr.M(m)
+	}
 	return mapstr.M{
 		"header": resp.header.Clone(),
 		"page":   resp.page,
@@ -100,7 +104,7 @@ func (resp *response) templateValues() mapstr.M {
 			"value":  resp.url.String(),
 			"params": resp.url.Query(),
 		},
-		"body": resp.body,
+		"body": body,
 	}
 }
 

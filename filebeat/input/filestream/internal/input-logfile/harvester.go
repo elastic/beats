@@ -33,10 +33,7 @@ import (
 	"github.com/elastic/go-concert/ctxtool"
 )
 
-var (
-	ErrHarvesterAlreadyRunning = errors.New("harvester is already running for file")
-	ErrHarvesterLimitReached   = errors.New("harvester limit reached")
-)
+var ErrHarvesterAlreadyRunning = errors.New("harvester is already running for file")
 
 type permanentHarvesterError struct {
 	err error
@@ -74,7 +71,7 @@ func newReaderGroup() *readerGroup {
 }
 
 // newContext creates a new context, cancel function and associates it with the given id within
-// the reader group. Using the cancel function does not remvoe the association.
+// the reader group. Using the cancel function does not remove the association.
 // An error is returned if the id is already associated with a context. The cancel
 // function is nil in that case and must not be called.
 //
@@ -146,6 +143,7 @@ type defaultHarvesterGroup struct {
 	metrics      *Metrics
 	notifyChan   chan HarvesterStatus
 	inputID      string
+	readUntilEOF ReadUntilEOFConfig
 }
 
 // HarvesterStatus is used to notify an observer that the harvester for the ID
@@ -179,15 +177,13 @@ func (hg *defaultHarvesterGroup) SetObserver(c chan HarvesterStatus) {
 // If the harvester limit has been reached, the harvester will wait until it can
 // be started. Start does not block.
 func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
-	sourceName := hg.identifier.ID(src)
-
-	ctx.Logger = ctx.Logger.With("source_file", sourceName)
-	ctx.Logger.Debug("Starting harvester for file")
+	ctx.Logger.Debugf("Starting harvester for file %s", hg.identifier.ID(src))
 
 	fn := startHarvester(ctx, hg, src, false, hg.metrics, hg.inputID)
 	if fn == nil {
 		return
 	}
+
 	if err := hg.tg.Go(fn); err != nil {
 		ctx.Logger.Warnf(
 			"tried to start harvester for %s with task group already closed",
@@ -200,10 +196,7 @@ func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
 // If the harvester limit has been reached, the harvester will wait until it can
 // be started. Restart does not block.
 func (hg *defaultHarvesterGroup) Restart(ctx inputv2.Context, src Source) {
-	sourceName := hg.identifier.ID(src)
-
-	ctx.Logger = ctx.Logger.With("source_file", sourceName)
-	ctx.Logger.Debug("Restarting harvester for file")
+	ctx.Logger.Debugf("Restarting harvester for file %s", hg.identifier.ID(src))
 
 	if err := hg.tg.Go(startHarvester(ctx, hg, src, true, hg.metrics, hg.inputID)); err != nil {
 		ctx.Logger.Warnf(
@@ -232,15 +225,14 @@ func startHarvester(
 		// until a slot is available. Without this early check, repeated file events
 		// would spawn goroutines that wait on the semaphore only to discover (after
 		// acquiring it) that a harvester is already running, causing a goroutine leak.
-		ctx.Logger.Debug("Harvester already running")
+		ctx.Logger.Debugf("Harvester already running for %s", srcID)
 		return nil
 	}
 
 	return func(canceler context.Context) (err error) {
 		defer func() {
 			if v := recover(); v != nil {
-				err := fmt.Errorf("harvester panic with: %+v\n%s", v, debug.Stack())
-				ctx.Logger.Errorf("Harvester crashed with: %+v", err)
+				err = fmt.Errorf("harvester panic for source %q: %+v\n%s", srcID, v, debug.Stack())
 				hg.readers.remove(srcID)
 			}
 
@@ -252,6 +244,9 @@ func startHarvester(
 				)
 			}
 		}()
+
+		// We clone the logger here where we need it to avoid redundant copies that increase memory pressure.
+		ctx.Logger = ctx.Logger.With("source_file", srcID)
 
 		if restart {
 			// stop previous harvester
@@ -300,7 +295,25 @@ func startHarvester(
 
 		hg.store.UpdateTTL(resource, hg.cleanTimeout)
 		cursor := makeCursor(resource)
-		publisher := &cursorPublisher{canceler: ctx.Cancelation, client: client, cursor: &cursor}
+
+		// When read_until_eof is enabled the canceler must be nil. If the harvester
+		// is blocked in client.Publish at the moment of input cancel, Publish
+		// eventually returns once backpressure releases. With a non-nil canceler,
+		// forward would then return ctx.Cancelation.Err() (context.Canceled),
+		// readLineFromSource would surface it as a generic error, and
+		// handleReadError would end the normal-read loop without entering the
+		// readUntilEOF drain. Returning nil here lets the outer loop re-check
+		// ctx.Cancelation and fall through to the readUntilEOF loop and finish
+		// reading the file and publishing events until EOF or the timeout is
+		// reached.
+		var publisherCanceler = ctx.Cancelation
+		if hg.readUntilEOF.Enabled {
+			publisherCanceler = nil
+		}
+		publisher := &cursorPublisher{
+			canceler: publisherCanceler,
+			client:   client,
+			cursor:   &cursor}
 
 		defer func() {
 			// The cursor struct used by Filestream, it is defined on:

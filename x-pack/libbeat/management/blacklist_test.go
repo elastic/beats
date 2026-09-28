@@ -21,7 +21,7 @@ func TestConfigBlacklistSettingsUnpack(t *testing.T) {
 	}{
 		{
 			name: "Simple config",
-			config: conf.MustNewConfigFrom(map[string]interface{}{
+			config: conf.MustNewConfigFrom(map[string]any{
 				"foo": "bar",
 			}),
 			expected: ConfigBlacklistSettings{
@@ -37,8 +37,8 @@ func TestConfigBlacklistSettingsUnpack(t *testing.T) {
 		},
 		{
 			name: "Tree config",
-			config: conf.MustNewConfigFrom(map[string]interface{}{
-				"foo": map[string]interface{}{
+			config: conf.MustNewConfigFrom(map[string]any{
+				"foo": map[string]any{
 					"bar": "baz",
 				},
 			}),
@@ -77,7 +77,7 @@ func TestConfigBlacklist(t *testing.T) {
 					Type: "output",
 					Blocks: []*ConfigBlock{
 						{
-							Raw: map[string]interface{}{
+							Raw: map[string]any{
 								"output": "console",
 							},
 						},
@@ -96,15 +96,15 @@ func TestConfigBlacklist(t *testing.T) {
 					Type: "output",
 					Blocks: []*ConfigBlock{
 						{
-							Raw: map[string]interface{}{
-								"console": map[string]interface{}{
+							Raw: map[string]any{
+								"console": map[string]any{
 									"pretty": "true",
 								},
 							},
 						},
 						{
-							Raw: map[string]interface{}{
-								"elasticsearch": map[string]interface{}{
+							Raw: map[string]any{
+								"elasticsearch": map[string]any{
 									"host": "localhost",
 								},
 							},
@@ -124,7 +124,7 @@ func TestConfigBlacklist(t *testing.T) {
 					Type: "metricbeat.modules",
 					Blocks: []*ConfigBlock{
 						{
-							Raw: map[string]interface{}{
+							Raw: map[string]any{
 								"module": "kubernetes",
 								"hosts":  "localhost:10255",
 							},
@@ -144,7 +144,7 @@ func TestConfigBlacklist(t *testing.T) {
 					Type: "metricbeat.modules",
 					Blocks: []*ConfigBlock{
 						{
-							Raw: map[string]interface{}{
+							Raw: map[string]any{
 								"module": "kubernetes",
 								"metricsets": []string{
 									"event",
@@ -153,7 +153,7 @@ func TestConfigBlacklist(t *testing.T) {
 							},
 						},
 						{
-							Raw: map[string]interface{}{
+							Raw: map[string]any{
 								"module": "kubernetes",
 								"metricsets": []string{
 									"default",
@@ -175,7 +175,7 @@ func TestConfigBlacklist(t *testing.T) {
 					Type: "metricbeat.modules",
 					Blocks: []*ConfigBlock{
 						{
-							Raw: map[string]interface{}{
+							Raw: map[string]any{
 								"module": "kubernetes",
 								"metricsets": []string{
 									"event",
@@ -189,9 +189,9 @@ func TestConfigBlacklist(t *testing.T) {
 					Type: "filebeat.inputs",
 					Blocks: []*ConfigBlock{
 						{
-							Raw: map[string]interface{}{
+							Raw: map[string]any{
 								"type": "docker",
-								"containers": map[string]interface{}{
+								"containers": map[string]any{
 									"ids": []string{
 										"1ffeb0dbd13",
 									},
@@ -199,9 +199,9 @@ func TestConfigBlacklist(t *testing.T) {
 							},
 						},
 						{
-							Raw: map[string]interface{}{
+							Raw: map[string]any{
 								"type": "docker",
-								"containers": map[string]interface{}{
+								"containers": map[string]any{
 									"ids": []string{
 										"256425931c2",
 									},
@@ -224,10 +224,10 @@ func TestConfigBlacklist(t *testing.T) {
 					Type: "list",
 					Blocks: []*ConfigBlock{
 						{
-							Raw: map[string]interface{}{
-								"of": map[string]interface{}{
-									"elements": []interface{}{
-										map[string]interface{}{
+							Raw: map[string]any{
+								"of": map[string]any{
+									"elements": []any{
+										map[string]any{
 											"forbidden": "yes",
 										},
 									},
@@ -235,10 +235,10 @@ func TestConfigBlacklist(t *testing.T) {
 							},
 						},
 						{
-							Raw: map[string]interface{}{
-								"of": map[string]interface{}{
-									"elements": []interface{}{
-										map[string]interface{}{
+							Raw: map[string]any{
+								"of": map[string]any{
+									"elements": []any{
+										map[string]any{
 											"allowed": "yes",
 										},
 									},
@@ -246,10 +246,10 @@ func TestConfigBlacklist(t *testing.T) {
 							},
 						},
 						{
-							Raw: map[string]interface{}{
-								"of": map[string]interface{}{
-									"elements": []interface{}{
-										map[string]interface{}{
+							Raw: map[string]any{
+								"of": map[string]any{
+									"elements": []any{
+										map[string]any{
 											"disallowed": "yes",
 										},
 									},

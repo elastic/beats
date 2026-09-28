@@ -165,7 +165,6 @@ func TestPostgreSQL(t *testing.T) {
 			t.Run("fetch with URL", func(t *testing.T) {
 				testFetch(t, cfg)
 			})
-
 		})
 
 		t.Run("table mode", func(t *testing.T) {
@@ -189,7 +188,6 @@ func TestPostgreSQL(t *testing.T) {
 			t.Run("fetch with URL", func(t *testing.T) {
 				testFetch(t, cfg)
 			})
-
 		})
 
 		t.Run("merged mode", func(t *testing.T) {
@@ -197,8 +195,8 @@ func TestPostgreSQL(t *testing.T) {
 				config: config{
 					Driver: "postgres",
 					Queries: []query{
-						query{Query: "SELECT blks_hit FROM pg_stat_database limit 1;", ResponseFormat: "table"},
-						query{Query: "SELECT blks_read FROM pg_stat_database limit 1;", ResponseFormat: "table"},
+						{Query: "SELECT blks_hit FROM pg_stat_database limit 1;", ResponseFormat: "table"},
+						{Query: "SELECT blks_read FROM pg_stat_database limit 1;", ResponseFormat: "table"},
 					},
 					ResponseFormat: tableResponseFormat,
 					RawData: rawData{
@@ -221,7 +219,6 @@ func TestPostgreSQL(t *testing.T) {
 			t.Run("fetch with URL", func(t *testing.T) {
 				testFetch(t, cfg)
 			})
-
 		})
 	})
 }
@@ -367,7 +364,7 @@ func waitForOracleConnection(t *testing.T, host, port string) {
 
 	for i := 0; i < maxRetries; i++ {
 		// First check if the port is open
-		conn, err := net.DialTimeout("tcp", net.JoinHostPort(host, port), 10*time.Second)
+		conn, err := (&net.Dialer{Timeout: 10 * time.Second}).DialContext(t.Context(), "tcp", net.JoinHostPort(host, port))
 		if err == nil {
 			conn.Close()
 			// Give Oracle a bit more time to fully initialize

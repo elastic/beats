@@ -173,17 +173,17 @@ func (f *extractArrayProcessor) String() (r string) {
 	return fmt.Sprintf("extract_array={field=%s, mappings=%v}", f.config.Field, f.mappings)
 }
 
-func clone(value interface{}) interface{} {
+func clone(value any) any {
 	// TODO: This is dangerous but done by most processors.
 	//       Otherwise need to reflect value and deep copy lists / map types.
 	switch v := value.(type) {
 	case mapstr.M:
 		return v.Clone()
-	case map[string]interface{}:
+	case map[string]any:
 		return mapstr.M(v).Clone()
-	case []interface{}:
+	case []any:
 		len := len(v)
-		newArr := make([]interface{}, len)
+		newArr := make([]any, len)
 		for idx, val := range v {
 			newArr[idx] = clone(val)
 		}

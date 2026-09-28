@@ -54,7 +54,7 @@ type ESClient interface {
 		method, path string,
 		pipeline string,
 		params map[string]string,
-		body interface{},
+		body any,
 	) (int, []byte, error)
 }
 
@@ -103,7 +103,7 @@ func createPolicy(cfg Config, info beat.Info, defaultPolicy mapstr.M) (Policy, e
 			return Policy{}, fmt.Errorf("failed to read policy file '%s': %w", path, err)
 		}
 
-		var body map[string]interface{}
+		var body map[string]any
 		if err := json.Unmarshal(contents, &body); err != nil {
 			return Policy{}, fmt.Errorf("failed to decode policy file '%s': %w", path, err)
 		}

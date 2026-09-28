@@ -19,7 +19,7 @@ package storecompliance
 
 import (
 	"fmt"
-	"io/ioutil"
+
 	"os"
 	"testing"
 
@@ -58,7 +58,7 @@ func WithPath(factory BackendFactory, fn func(*testing.T, *Registry)) func(t *te
 //	defer cleanup()
 //	...
 func SetupRegistry(t testing.TB, factory BackendFactory) (*Registry, func()) {
-	path, err := ioutil.TempDir(defaultTempDir, "")
+	path, err := os.MkdirTemp(defaultTempDir, "")
 	if err != nil {
 		t.Fatalf("Failed to create temporary test directory: %v", err)
 	}
@@ -143,7 +143,6 @@ func runWithBools(t *testing.T, name string, fn func(*testing.T, bool)) {
 func withBools(name string, fn func(*testing.T, bool)) func(t *testing.T) {
 	return func(t *testing.T) {
 		for _, b := range []bool{false, true} {
-			b := b
 			t.Run(fmt.Sprintf("%v=%v", name, b), func(t *testing.T) {
 				fn(t, b)
 			})
@@ -151,7 +150,7 @@ func withBools(name string, fn func(*testing.T, bool)) func(t *testing.T) {
 	}
 }
 
-func must(t testing.TB, err error, msg string, args ...interface{}) {
+func must(t testing.TB, err error, msg string, args ...any) {
 	if err != nil {
 		t.Fatal(fmt.Sprintf(msg, args...), ":", err)
 	}

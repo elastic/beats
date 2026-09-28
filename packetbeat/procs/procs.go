@@ -51,6 +51,10 @@ type ProcessesWatcher struct {
 
 	// watcher is the OS-dependent engine for the ProcessWatcher.
 	watcher processWatcher
+
+	logger, procLogger, procDetailedLogger *logp.Logger
+
+	isProcEnabled, isProcDetailedEnabled bool
 }
 
 // endpoint is a network address/port number complex.
@@ -80,8 +84,8 @@ type process struct {
 }
 
 // Init initializes the ProcessWatcher with the provided configuration.
-func (proc *ProcessesWatcher) Init(config ProcsConfig) error {
-	return proc.init(config, proc)
+func (proc *ProcessesWatcher) Init(config ProcsConfig, logger *logp.Logger) error {
+	return proc.init(config, proc, logger)
 }
 
 // processWatcher allows the OS-dependent implementation to be replaced by a mock for testing
@@ -99,8 +103,16 @@ type processWatcher interface {
 }
 
 // init sets up the necessary data structures for the ProcessWatcher.
-func (proc *ProcessesWatcher) init(config ProcsConfig, watcher processWatcher) error {
+func (proc *ProcessesWatcher) init(config ProcsConfig, watcher processWatcher, logger *logp.Logger) error {
 	proc.watcher = watcher
+	proc.logger = logger
+	proc.procLogger = logger.Named("procs")
+	proc.procDetailedLogger = logger.Named("procsdetailed")
+
+	// Check if the "procs" and "procsdetailed" selectors are enabled in the logger.
+	proc.isProcEnabled = proc.procLogger.IsDebug()
+	proc.isProcDetailedEnabled = proc.procDetailedLogger.IsDebug()
+
 	proc.portProcMap = map[applayer.Transport]map[endpoint]portProcMapping{
 		applayer.TransportUDP: make(map[endpoint]portProcMapping),
 		applayer.TransportTCP: make(map[endpoint]portProcMapping),
@@ -110,16 +122,16 @@ func (proc *ProcessesWatcher) init(config ProcsConfig, watcher processWatcher) e
 
 	proc.enabled = config.Enabled
 	if proc.enabled {
-		logp.Info("Process watcher enabled")
+		logger.Info("Process watcher enabled")
 	} else {
-		logp.Info("Process watcher disabled")
+		logger.Info("Process watcher disabled")
 	}
 
 	// Read the local IP addresses.
 	var err error
 	proc.localAddrs, err = watcher.GetLocalIPs()
 	if err != nil {
-		logp.Err("Error getting local IP addresses: %s", err)
+		logger.Errorf("Error getting local IP addresses: %s", err)
 	}
 
 	proc.monitored = config.Monitored
@@ -167,8 +179,8 @@ func (proc *ProcessesWatcher) enrich(dst *common.Process, ip net.IP, port uint16
 	dst.Args = p.args
 	dst.Exe = p.exe
 	dst.StartTime = p.startTime
-	if logp.IsDebug("procs") {
-		logp.Debug("procs", "Found process '%s' (pid=%d) for %s:%d/%s", p.name, p.pid, ip, port, transport)
+	if proc.isProcEnabled {
+		proc.procLogger.Debugf("Found process '%s' (pid=%d) for %s:%d/%s", p.name, p.pid, ip, port, transport)
 	}
 }
 
@@ -192,14 +204,14 @@ func (proc *ProcessesWatcher) findProc(address net.IP, port uint16, transport ap
 		return nil
 	}
 
-	p, exists := lookupMapping(address, port, procMap)
+	p, exists := lookupMapping(address, port, procMap, proc.procLogger)
 	if exists {
 		return p.proc
 	}
 
 	proc.updateMap(transport)
 
-	p, exists = lookupMapping(address, port, procMap)
+	p, exists = lookupMapping(address, port, procMap, proc.procLogger)
 	if exists {
 		return p.proc
 	}
@@ -208,7 +220,7 @@ func (proc *ProcessesWatcher) findProc(address net.IP, port uint16, transport ap
 }
 
 // proc.mu must be locked
-func lookupMapping(address net.IP, port uint16, procMap map[endpoint]portProcMapping) (portProcMapping, bool) {
+func lookupMapping(address net.IP, port uint16, procMap map[endpoint]portProcMapping, logger *logp.Logger) (portProcMapping, bool) {
 	now := time.Now()
 	key := endpoint{address.String(), port}
 	p, found := procMap[key]
@@ -238,7 +250,7 @@ func lookupMapping(address net.IP, port uint16, procMap map[endpoint]portProcMap
 	// it's old enough. When we fail the first time here, our caller
 	// updates all maps and calls us again.
 	if found && now.After(p.expires) {
-		logp.Debug("procs", "PID %d (%s) port %d is too old, discarding", p.pid, p.proc.name, port)
+		logger.Debugf("PID %d (%s) port %d is too old, discarding", p.pid, p.proc.name, port)
 		delete(procMap, key)
 		p = portProcMapping{}
 		found = false
@@ -249,16 +261,16 @@ func lookupMapping(address net.IP, port uint16, procMap map[endpoint]portProcMap
 
 // proc.mu must be locked
 func (proc *ProcessesWatcher) updateMap(transport applayer.Transport) {
-	if logp.HasSelector("procsdetailed") {
+	if proc.isProcDetailedEnabled {
 		start := time.Now()
 		defer func() {
-			logp.Debug("procsdetailed", "updateMap() took %v", time.Since(start))
+			proc.procDetailedLogger.Debugf("updateMap() took %v", time.Since(start))
 		}()
 	}
 
 	endpoints, err := proc.watcher.GetLocalPortToPIDMapping(transport)
 	if err != nil {
-		logp.Err("unable to list local ports: %v", err)
+		proc.logger.Errorf("unable to list local ports: %v", err)
 	}
 
 	proc.expireProcessCache()
@@ -307,8 +319,8 @@ func (proc *ProcessesWatcher) updateMappingEntry(transport applayer.Transport, e
 		expires:  time.Now().Add(10 * time.Second),
 	}
 
-	if logp.IsDebug("procsdetailed") {
-		logp.Debug("procsdetailed", "updateMappingEntry(): local=%s:%d/%s pid=%d process='%s'",
+	if proc.isProcDetailedEnabled {
+		proc.procDetailedLogger.Debugf("updateMappingEntry(): local=%s:%d/%s pid=%d process='%s'",
 			e.address, e.port, transport, pid, p.name)
 	}
 }
@@ -350,13 +362,13 @@ func (proc *ProcessesWatcher) GetProcess(pid int) *process {
 
 	p, err := sysinfo.Process(pid)
 	if err != nil {
-		logp.Err("Unable to get command-line for PID %d: %v", pid, err)
+		proc.logger.Errorf("Unable to get command-line for PID %d: %v", pid, err)
 		return nil
 	}
 
 	info, err := p.Info()
 	if err != nil {
-		logp.Err("Unable to get command-line for PID %d: %v", pid, err)
+		proc.logger.Errorf("Unable to get command-line for PID %d: %v", pid, err)
 		return nil
 	}
 

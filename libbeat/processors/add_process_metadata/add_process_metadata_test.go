@@ -1100,7 +1100,7 @@ func TestPIDToInt(t *testing.T) {
 	const intIs64bit = unsafe.Sizeof(int(0)) == unsafe.Sizeof(int64(0))
 	for _, test := range []struct {
 		name string
-		pid  interface{}
+		pid  any
 		fail bool
 	}{
 		{
@@ -1303,7 +1303,6 @@ func TestDefaultCgroupRegex(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(tc.TestName, func(t *testing.T) {
 			matches := defaultCgroupRegex.FindStringSubmatch(tc.CgroupPath)
 			if len(matches) < 2 || matches[1] != tc.ContainerID {

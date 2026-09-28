@@ -233,9 +233,10 @@ func (p *prometheus) ProcessMetrics(families []*MetricFamily, mapping *MetricsMa
 
 	// fill info from infoMetrics
 	for _, info := range infoMetrics {
+		flatLabels := info.Labels.Flatten()
 		for _, event := range events {
 			found := true
-			for k, v := range info.Labels.Flatten() {
+			for k, v := range flatLabels {
 				value, err := event.GetValue(k)
 				if err != nil || v != value {
 					found = false
@@ -247,6 +248,31 @@ func (p *prometheus) ProcessMetrics(families []*MetricFamily, mapping *MetricsMa
 			if found {
 				event.DeepUpdate(info.Meta)
 			}
+		}
+	}
+
+	// When no event-creating metrics produced any events, promote info
+	// metrics to standalone events so their label data is not lost.
+	// This handles cases like OpenShift's kube-state-metrics where
+	// --metric-denylist blocks *_created, leaving only InfoMetrics.
+	if len(events) == 0 {
+		infoEvents := map[string]mapstr.M{}
+		for _, info := range infoMetrics {
+			// Multiple metrics can be declared as InfoMetric() with the same
+			// key labels but different metadata (e.g. kube_service_info and
+			// kube_service_spec_type). Group by key labels and merge metadata.
+			key := info.Labels.String()
+			if existing, ok := infoEvents[key]; ok {
+				existing.DeepUpdate(info.Meta)
+			} else {
+				infoEvents[key] = info.Meta.Clone()
+			}
+		}
+		for _, event := range infoEvents {
+			for k, v := range mapping.ExtraFields {
+				event[k] = v
+			}
+			events = append(events, event)
 		}
 	}
 

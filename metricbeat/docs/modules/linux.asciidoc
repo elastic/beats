@@ -9,8 +9,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-module-linux]]
 == Linux module
 
-beta[]
-
 include::{libbeat-dir}/shared/integration-link.asciidoc[]
 
 :modulename!:

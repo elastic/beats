@@ -32,15 +32,16 @@ import (
 type managedInput struct {
 	// id is the input ID, it is defined by setting 'id'
 	// in the input configuration
-	id               string
-	metricsID        string
-	manager          *InputManager
-	ackCH            *updateChan
-	sourceIdentifier *SourceIdentifier
-	prospector       Prospector
-	harvester        Harvester
-	cleanTimeout     time.Duration
-	harvesterLimit   uint64
+	id                     string
+	manager                *InputManager
+	ackCH                  *updateChan
+	sourceIdentifier       *SourceIdentifier
+	previousSrcIdentifiers []*SourceIdentifier
+	prospector             Prospector
+	harvester              Harvester
+	cleanTimeout           time.Duration
+	harvesterLimit         uint64
+	readUntilEOF           ReadUntilEOFConfig
 }
 
 // Name is required to implement the v2.Input interface
@@ -69,20 +70,26 @@ func (inp *managedInput) Run(
 	ctx.Cancelation = cancelCtx
 
 	metrics := NewMetrics(ctx.MetricsRegistry, inp.manager.Logger)
-
+	harvesterGroupStopTimeout := time.Minute // magic number
+	if inp.readUntilEOF.Enabled {
+		// keep the magic alive
+		harvesterGroupStopTimeout +=
+			inp.readUntilEOF.Timeout + 100*time.Millisecond
+	}
 	hg := &defaultHarvesterGroup{
 		pipeline:     pipeline,
 		readers:      newReaderGroup(),
 		cleanTimeout: inp.cleanTimeout,
 		harvester:    inp.harvester,
+		readUntilEOF: inp.readUntilEOF,
 		store:        groupStore,
 		ackCH:        inp.ackCH,
 		identifier:   inp.sourceIdentifier,
 		tg: task.NewGroup(
 			inp.harvesterLimit,
-			time.Minute, // magic number
+			harvesterGroupStopTimeout,
 			ctx.Logger,
-			"harvester:"),
+			"harvester"),
 		metrics: metrics,
 		inputID: inp.id,
 	}
@@ -105,10 +112,10 @@ func (inp *managedInput) Run(
 }
 
 func newInputACKHandler(ch *updateChan) beat.EventListener {
-	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
+	return acker.EventPrivateReporter(func(acked int, private []any) {
 		var n uint
 		var last int
-		for i := 0; i < len(private); i++ {
+		for i := range private {
 			current := private[i]
 			if current == nil {
 				continue

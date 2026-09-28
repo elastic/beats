@@ -7,6 +7,7 @@ package management
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
@@ -27,8 +28,8 @@ type ConfigBlacklistSettings struct {
 
 // Unpack unpacks nested fields set with dot notation like foo.bar into the proper nesting
 // in a nested map/slice structure.
-func (f *ConfigBlacklistSettings) Unpack(from interface{}) error {
-	m, ok := from.(map[string]interface{})
+func (f *ConfigBlacklistSettings) Unpack(from any) error {
+	m, ok := from.(map[string]any)
 	if !ok {
 		return fmt.Errorf("wrong type, map is expected")
 	}
@@ -104,10 +105,8 @@ func (c *ConfigBlacklist) isBlacklistedBlock(pattern match.Matcher, segments []s
 	if current.IsDict() {
 		switch len(segments) {
 		case 0:
-			for _, field := range current.GetFields() {
-				if pattern.MatchString(field) {
-					return true
-				}
+			if slices.ContainsFunc(current.GetFields(), pattern.MatchString) {
+				return true
 			}
 
 		case 1:

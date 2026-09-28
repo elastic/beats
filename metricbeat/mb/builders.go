@@ -59,7 +59,7 @@ func NewModule(config *conf.C, r *Register, p *paths.Path, logger *logp.Logger) 
 		return nil, nil, ErrPathsRequired
 	}
 
-	bm, err := newBaseModuleFromConfig(config, logger)
+	bm, err := newBaseModuleFromConfig(config, logger, p)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -79,11 +79,12 @@ func NewModule(config *conf.C, r *Register, p *paths.Path, logger *logp.Logger) 
 
 // newBaseModuleFromConfig creates a new BaseModule from config. The returned
 // BaseModule's name will always be lower case.
-func newBaseModuleFromConfig(rawConfig *conf.C, logger *logp.Logger) (BaseModule, error) {
+func newBaseModuleFromConfig(rawConfig *conf.C, logger *logp.Logger, paths *paths.Path) (BaseModule, error) {
 	baseModule := BaseModule{
 		config:    DefaultModuleConfig(),
 		rawConfig: rawConfig,
 		Logger:    logger,
+		Paths:     paths,
 	}
 	err := rawConfig.Unpack(&baseModule.config)
 	if err != nil {
@@ -115,9 +116,7 @@ func createModule(r *Register, bm BaseModule) (Module, error) {
 }
 
 func initMetricSets(r *Register, m Module, p *paths.Path, logger *logp.Logger) ([]MetricSet, error) {
-	var (
-		errs multierror.Errors
-	)
+	var errs multierror.Errors
 
 	bms, err := newBaseMetricSets(r, m, p, logger)
 	if err != nil {
@@ -137,7 +136,7 @@ func initMetricSets(r *Register, m Module, p *paths.Path, logger *logp.Logger) (
 		if registration.HostParser != nil {
 			bm.hostData, err = registration.HostParser(bm.Module(), bm.host)
 			if err != nil {
-				errs = append(errs, fmt.Errorf("host parsing failed for %v-%v: %w.",
+				errs = append(errs, fmt.Errorf("host parsing failed for %v-%v: %w",
 					bm.Module().Name(), bm.Name(), err))
 				continue
 			}

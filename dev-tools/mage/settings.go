@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"go/build"
 	"log"
+	"maps"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -91,7 +92,6 @@ var (
 	FIPSConfig struct {
 		Beats   []string `yaml:"beats"`
 		Compile struct {
-			CGO       bool              `yaml:"cgo"`
 			Env       map[string]string `yaml:"env"`
 			Tags      []string          `yaml:"tags"`
 			Platforms []string          `yaml:"platforms"`
@@ -103,7 +103,7 @@ var (
 
 	caser = cases.Title(language.English, cases.NoLower)
 
-	FuncMap = map[string]interface{}{
+	FuncMap = map[string]any{
 		"beat_doc_branch":   BeatDocBranch,
 		"beat_version":      BeatQualifiedVersion,
 		"commit":            CommitHash,
@@ -173,7 +173,7 @@ var ErrUnknownProjectType = fmt.Errorf("unknown ProjectType")
 // EnvMap returns map containing the common settings variables and all variables
 // from the environment. args are appended to the output prior to adding the
 // environment variables (so env vars have the highest precedence).
-func EnvMap(args ...map[string]interface{}) map[string]interface{} {
+func EnvMap(args ...map[string]any) map[string]any {
 	envMap := varMap(args...)
 
 	// Add the environment (highest precedence).
@@ -185,8 +185,8 @@ func EnvMap(args ...map[string]interface{}) map[string]interface{} {
 	return envMap
 }
 
-func varMap(args ...map[string]interface{}) map[string]interface{} {
-	data := map[string]interface{}{
+func varMap(args ...map[string]any) map[string]any {
+	data := map[string]any{
 		"GOOS":            GOOS,
 		"GOARCH":          GOARCH,
 		"GOARM":           GOARM,
@@ -213,9 +213,7 @@ func varMap(args ...map[string]interface{}) map[string]interface{} {
 
 	// Add the extra args to the map.
 	for _, m := range args {
-		for k, v := range m {
-			data[k] = v
-		}
+		maps.Copy(data, m)
 	}
 
 	return data
@@ -481,7 +479,7 @@ func getBuildVariableSources() *BuildVariableSources {
 
 	panic(fmt.Errorf("magefile must call devtools.SetBuildVariableSources() "+
 		"because it is not an elastic beat (repo=%+v)", repo.RootImportPath))
-} //nolint:typecheck // typecheck linter complains about missing return here, however this is unreachable code with the panic() above
+}
 
 // BuildVariableSources is used to explicitly define what files contain build
 // variables and how to parse the values from that file. This removes ambiguity
@@ -510,7 +508,7 @@ type BuildVariableSources struct {
 }
 
 func (s *BuildVariableSources) expandVar(in string) (string, error) {
-	return expandTemplate("inline", in, map[string]interface{}{
+	return expandTemplate("inline", in, map[string]any{
 		"elastic_beats_dir": ElasticBeatsDir,
 	})
 }

@@ -46,7 +46,7 @@ func SeedPRNG(t *testing.T) {
 
 func GenerateEvents(numEvents, fieldsPerLevel, depth int) []beat.Event {
 	events := make([]beat.Event, numEvents)
-	for i := 0; i < numEvents; i++ {
+	for i := range numEvents {
 		event := &beat.Event{Fields: mapstr.M{}}
 		generateFields(event, fieldsPerLevel, depth)
 		events[i] = *event

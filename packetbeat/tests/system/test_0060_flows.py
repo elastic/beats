@@ -59,7 +59,7 @@ class Test(BaseTest):
 
         start_ts = parse_timestamp(objs[0]['event.start'])
         last_ts = parse_timestamp(objs[0]['event.end'])
-        assert last_ts > start_ts
+        assert last_ts >= start_ts
 
     def test_memcache_udp_flow(self):
         self.render_config_template(

@@ -74,6 +74,10 @@ func (a *actionHandler) execute(ctx context.Context, req map[string]interface{})
 	if err != nil {
 		return 0, fmt.Errorf("%w: %w", err, ErrQueryExecution)
 	}
+	if !ac.MatchesPlatform() {
+		a.log.Debugf("Skipping query for platforms: %v", ac.Platforms)
+		return 0, nil
+	}
 
 	var namespace string
 	if a.np != nil {

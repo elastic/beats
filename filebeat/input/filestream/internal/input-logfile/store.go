@@ -111,10 +111,10 @@ type resource struct {
 	// When processing update operations on ACKs, the state is applied to cursor
 	// first, which is finally written to the persistent store. This ensures that
 	// we always write the complete state of the key/value pair.
-	cursor             interface{}
-	pendingCursorValue interface{}
-	pendingUpdate      interface{} // delta value of most recent pending updateOp
-	cursorMeta         interface{}
+	cursor             any
+	pendingCursorValue any
+	pendingUpdate      any // delta value of most recent pending updateOp
+	cursorMeta         any
 }
 
 type (
@@ -131,8 +131,8 @@ type (
 	state struct {
 		TTL     time.Duration
 		Updated time.Time
-		Cursor  interface{}
-		Meta    interface{}
+		Cursor  any
+		Meta    any
 	}
 
 	stateInternal struct {
@@ -176,12 +176,12 @@ func newSourceStore(s *store, identifier *SourceIdentifier) *sourceStore {
 	}
 }
 
-func (s *sourceStore) FindCursorMeta(src Source, v interface{}) error {
+func (s *sourceStore) FindCursorMeta(src Source, v any) error {
 	key := s.identifier.ID(src)
 	return s.store.findCursorMeta(key, v)
 }
 
-func (s *sourceStore) UpdateMetadata(src Source, v interface{}) error {
+func (s *sourceStore) UpdateMetadata(src Source, v any) error {
 	key := s.identifier.ID(src)
 	return s.store.updateMetadata(key, v)
 }
@@ -191,7 +191,7 @@ func (s *sourceStore) Remove(src Source) error {
 	return s.store.remove(key)
 }
 
-func (s *sourceStore) ResetCursor(src Source, cur interface{}) error {
+func (s *sourceStore) ResetCursor(src Source, cur any) error {
 	key := s.identifier.ID(src)
 	return s.store.resetCursor(key, cur)
 }
@@ -220,7 +220,7 @@ func (s *sourceStore) CleanIf(pred func(v Value) bool) {
 
 // UpdateIdentifiers copies an existing resource to a new ID and marks the previous one
 // for removal.
-func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interface{})) {
+func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, any)) {
 	s.store.ephemeralStore.mu.Lock()
 	defer s.store.ephemeralStore.mu.Unlock()
 
@@ -229,14 +229,7 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interfac
 		// they're actually removed from the in-memory registry (ephemeralStore)
 		// and marked as removed in the registry operations log. So we need
 		// to skip all entries that were soft deleted.
-		//
-		//  - res.internalState.TTL == 0: entry has been deleted
-		//  - res.internalState.TTL == -1: entry will never be removed by TTL
-		//  - res.internalState.TTL > 0: entry will be removed once its TTL
-		//    is reached
-		//
-		// If the entry has been deleted, skip it
-		if res.internalState.TTL == 0 {
+		if res.isDeleted() {
 			continue
 		}
 
@@ -272,7 +265,15 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interfac
 			// We cannot use store.remove because it will
 			// acquire the same lock we hold, causing a deadlock.
 			// See store.remove for details.
+			// Fully remove the old resource from all stores.
+			//  - 1. Update the TLL, which soft-deletes it. This is the
+			//    mechanism used by store.remove. We cannot call store.remove
+			//    because it will acquire a lock we're holding.
+			//  - 2. Remove the resource from the in-memory store
+			//  - 3. Finally, synchronously remove it from the disk store.
 			s.store.UpdateTTL(res, 0)
+			delete(s.store.ephemeralStore.table, res.key)
+			_ = s.store.persistentStore.Remove(res.key)
 			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", key, newKey, r.cursor)
 		}
 
@@ -300,25 +301,28 @@ func (s *store) Get(key string) *resource {
 	return s.ephemeralStore.Find(key, true)
 }
 
-func (s *store) findCursorMeta(key string, to interface{}) error {
+func (s *store) findCursorMeta(key string, to any) error {
 	resource := s.ephemeralStore.Find(key, false)
 	if resource == nil {
 		return fmt.Errorf("resource '%s' not found", key)
 	}
-	return typeconv.Convert(to, resource.cursorMeta)
+	defer resource.Release()
+	return resource.UnpackCursorMeta(to)
 }
 
 // updateMetadata updates the cursor metadata in the persistent store.
-func (s *store) updateMetadata(key string, meta interface{}) error {
+func (s *store) updateMetadata(key string, meta any) error {
 	resource := s.ephemeralStore.Find(key, true)
 	if resource == nil {
 		return fmt.Errorf("resource '%s' not found", key)
 	}
+	defer resource.Release()
+
+	resource.stateMutex.Lock()
+	defer resource.stateMutex.Unlock()
 
 	resource.cursorMeta = meta
-
 	s.writeState(resource)
-	resource.Release()
 	return nil
 }
 
@@ -339,7 +343,7 @@ func (s *store) writeState(r *resource) {
 
 // resetCursor sets the cursor to the value in cur in the persistent store and
 // drops all pending cursor operations.
-func (s *store) resetCursor(key string, cur interface{}) error {
+func (s *store) resetCursor(key string, cur any) error {
 	r := s.ephemeralStore.Find(key, false)
 	if r == nil {
 		return fmt.Errorf("resource '%s' not found", key)
@@ -473,14 +477,16 @@ func (r *resource) UpdatesReleaseN(n uint) {
 func (r *resource) Finished() bool { return r.pending.Load() == 0 }
 
 // UnpackCursor deserializes the in memory state.
-func (r *resource) UnpackCursor(to interface{}) error {
+func (r *resource) UnpackCursor(to any) error {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
 	return typeconv.Convert(to, r.activeCursor())
 }
 
 // UnpackCursorMeta unpacks the cursor metadata's into the provided struct.
-func (r *resource) UnpackCursorMeta(to interface{}) error {
+func (r *resource) UnpackCursorMeta(to any) error {
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
 	return typeconv.Convert(to, r.cursorMeta)
 }
 
@@ -522,24 +528,12 @@ func (r *resource) copyInto(dst *resource) {
 }
 
 func (r *resource) copyWithNewKey(key string) *resource {
-	internalState := r.internalState
-
-	// This is required to prevent the cleaner from removing the
-	// entry from the registry immediately.
-	// It still might be removed if the output is blocked for a long
-	// time. If removed the whole file is resent to the output when found/updated.
-	internalState.Updated = time.Now()
-	return &resource{
-		key:                    key,
-		stored:                 r.stored,
-		internalState:          internalState,
-		activeCursorOperations: r.activeCursorOperations,
-		cursor:                 r.cursor,
-		pendingCursorValue:     nil,
-		pendingUpdate:          nil,
-		cursorMeta:             r.cursorMeta,
-		lock:                   unison.MakeMutex(),
+	dst := &resource{
+		key:  key,
+		lock: unison.MakeMutex(),
 	}
+	r.copyInto(dst)
+	return dst
 }
 
 // pendingCursor returns the current published cursor state not yet ACKed.
@@ -547,9 +541,9 @@ func (r *resource) copyWithNewKey(key string) *resource {
 // Note: The stateMutex must be locked when calling pendingCursor.
 //
 //nolint:errcheck // not changing behaviour on this commit
-func (r *resource) pendingCursor() interface{} {
+func (r *resource) pendingCursor() any {
 	if r.pendingUpdate != nil {
-		var tmp interface{}
+		var tmp any
 		typeconv.Convert(&tmp, &r.cursor)
 		typeconv.Convert(&tmp, r.pendingUpdate)
 		r.pendingCursorValue = tmp
@@ -559,7 +553,7 @@ func (r *resource) pendingCursor() interface{} {
 }
 
 // activeCursor
-func (r *resource) activeCursor() interface{} {
+func (r *resource) activeCursor() any {
 	if r.activeCursorOperations != 0 {
 		return r.pendingCursor()
 	}

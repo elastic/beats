@@ -36,7 +36,7 @@ type Extensions struct {
 }
 
 type (
-	extensionParser func(reader bufferView) interface{}
+	extensionParser func(reader bufferView, logger *logp.Logger) interface{}
 	extension       struct {
 		label   string
 		parser  extensionParser
@@ -73,7 +73,7 @@ var extensionMap = map[uint16]extension{
 }
 
 // ParseExtensions returns an Extensions object parsed from the supplied buffer
-func ParseExtensions(buffer bufferView) Extensions {
+func ParseExtensions(buffer bufferView, logger *logp.Logger) Extensions {
 	var extensionsLength uint16
 	if !buffer.read16Net(0, &extensionsLength) || extensionsLength == 0 {
 		// No extensions
@@ -90,7 +90,7 @@ func ParseExtensions(buffer bufferView) Extensions {
 	for base := 2; base < limit; {
 		var code, length uint16
 		if !buffer.read16Net(base, &code) || !buffer.read16Net(base+2, &length) {
-			logp.Warn("failed parsing extensions")
+			logger.Warn("failed parsing extensions")
 			return Extensions{}
 		}
 
@@ -103,7 +103,7 @@ func ParseExtensions(buffer bufferView) Extensions {
 		}
 
 		result.InOrder = append(result.InOrder, ExtensionID(code))
-		label, parsed, saveRaw := parseExtension(code, extBuffer)
+		label, parsed, saveRaw := parseExtension(code, extBuffer, logger)
 		if parsed != nil {
 			result.Parsed[label] = parsed
 		} else {
@@ -119,15 +119,15 @@ func ParseExtensions(buffer bufferView) Extensions {
 	return result
 }
 
-func parseExtension(code uint16, buffer bufferView) (string, interface{}, bool) {
+func parseExtension(code uint16, buffer bufferView, logger *logp.Logger) (string, interface{}, bool) {
 	if ext, ok := extensionMap[code]; ok {
-		parsed := ext.parser(buffer)
+		parsed := ext.parser(buffer, logger)
 		return ext.label, parsed, ext.saveRaw
 	}
 	return strconv.Itoa(int(code)), nil, false
 }
 
-func parseSni(buffer bufferView) interface{} {
+func parseSni(buffer bufferView, logger *logp.Logger) interface{} {
 	var listLength uint16
 	if !buffer.read16Net(0, &listLength) {
 		return nil
@@ -139,7 +139,7 @@ func parseSni(buffer bufferView) interface{} {
 		var host string
 		if !buffer.read8(pos, &nameType) || !buffer.read16Net(pos+1, &nameLen) ||
 			limit < pos+3+int(nameLen) || !buffer.readString(pos+3, int(nameLen), &host) {
-			logp.Warn("SNI hostname list truncated")
+			logger.Warn("SNI hostname list truncated")
 			break
 		}
 		if nameType == 0 {
@@ -150,7 +150,7 @@ func parseSni(buffer bufferView) interface{} {
 	return hosts
 }
 
-func parseMaxFragmentLen(buffer bufferView) interface{} {
+func parseMaxFragmentLen(buffer bufferView, _ *logp.Logger) interface{} {
 	var val uint8
 	if buffer.length() == 1 && buffer.read8(0, &val) {
 		if val > 0 && val < 5 {
@@ -161,11 +161,11 @@ func parseMaxFragmentLen(buffer bufferView) interface{} {
 	return nil
 }
 
-func ignoreContent(_ bufferView) interface{} {
+func ignoreContent(_ bufferView, _ *logp.Logger) interface{} {
 	return nil
 }
 
-func parseStatusReq(buffer bufferView) interface{} {
+func parseStatusReq(buffer bufferView, _ *logp.Logger) interface{} {
 	if buffer.length() == 0 {
 		// Initial server response.
 		return mapstr.M{"response": true}
@@ -185,14 +185,14 @@ func parseStatusReq(buffer bufferView) interface{} {
 	return mapstr.M{"type": typ, "responder_id_list_length": list, "request_extensions": exts}
 }
 
-func expectEmpty(buffer bufferView) interface{} {
+func expectEmpty(buffer bufferView, _ *logp.Logger) interface{} {
 	if buffer.length() != 0 {
 		return fmt.Sprintf("(expected empty: found %d bytes)", buffer.length())
 	}
 	return ""
 }
 
-func parseCertType(buffer bufferView) interface{} {
+func parseCertType(buffer bufferView, _ *logp.Logger) interface{} {
 	var value uint8
 	var types []string
 	pos, limit := 0, buffer.length()
@@ -220,7 +220,7 @@ func parseCertType(buffer bufferView) interface{} {
 	return types
 }
 
-func parseSupportedGroups(buffer bufferView) interface{} {
+func parseSupportedGroups(buffer bufferView, _ *logp.Logger) interface{} {
 	var value uint16
 	if !buffer.read16Net(0, &value) || int(value)+2 != buffer.length() {
 		return nil
@@ -234,7 +234,7 @@ func parseSupportedGroups(buffer bufferView) interface{} {
 	return groups
 }
 
-func parseEcPoints(buffer bufferView) interface{} {
+func parseEcPoints(buffer bufferView, _ *logp.Logger) interface{} {
 	var value, length uint8
 	if !buffer.read8(0, &length) || int(length)+1 != buffer.length() {
 		return nil
@@ -246,7 +246,7 @@ func parseEcPoints(buffer bufferView) interface{} {
 	return formats
 }
 
-func parseSrp(buffer bufferView) interface{} {
+func parseSrp(buffer bufferView, _ *logp.Logger) interface{} {
 	var length uint8
 	if !buffer.read8(0, &length) || int(length)+1 > buffer.length() {
 		return nil
@@ -258,7 +258,7 @@ func parseSrp(buffer bufferView) interface{} {
 	return user
 }
 
-func parseSignatureSchemes(buffer bufferView) interface{} {
+func parseSignatureSchemes(buffer bufferView, _ *logp.Logger) interface{} {
 	var value uint16
 	if !buffer.read16Net(0, &value) || int(value)+2 != buffer.length() {
 		return nil
@@ -270,14 +270,14 @@ func parseSignatureSchemes(buffer bufferView) interface{} {
 	return groups
 }
 
-func parseTicket(buffer bufferView) interface{} {
+func parseTicket(buffer bufferView, _ *logp.Logger) interface{} {
 	if buffer.length() > 0 {
 		return fmt.Sprintf("(%d bytes)", buffer.length())
 	}
 	return ""
 }
 
-func parseALPN(buffer bufferView) interface{} {
+func parseALPN(buffer bufferView, _ *logp.Logger) interface{} {
 	var length uint16
 	if !buffer.read16Net(0, &length) || int(length)+2 != buffer.length() {
 		return nil
@@ -295,7 +295,7 @@ func parseALPN(buffer bufferView) interface{} {
 	return protos
 }
 
-func parseSupportedVersions(buffer bufferView) interface{} {
+func parseSupportedVersions(buffer bufferView, _ *logp.Logger) interface{} {
 	// Parsing the supported_versions extensions requires knowing whether the
 	// extension is included in a client_hello or server_hello, but a workaround
 	// can be done by looking at the extension length.

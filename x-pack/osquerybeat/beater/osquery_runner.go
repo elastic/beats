@@ -44,11 +44,11 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 	var mx sync.Mutex
 	cancel := func() {
 		mx.Lock()
+		defer mx.Unlock()
 		if cn != nil {
 			cn()
 			cn = nil
 		}
-		defer mx.Unlock()
 	}
 
 	// Cleanup on exit
@@ -63,29 +63,32 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 		lastKnownInputs = inputs
 		newFlags := config.GetOsqueryOptions(inputs)
 
+		// cn is cleared by the spawned goroutine's cancel() on exit, so guard it with mx.
+		mx.Lock()
+		running := cn != nil
+		mx.Unlock()
+
 		// If Osqueryd is running and flags are different: stop osquery
-		if cn != nil && !osqd.FlagsAreSame(flags, newFlags) {
+		if running && !osqd.FlagsAreSame(flags, newFlags) {
 			r.log.Info("Osquery is running and options changed, stop osqueryd")
 
 			// Cancel context
 			cancel()
 
-			// Wait until osquery runner exists
+			// Wait until osquery runner exits
 			wg.Wait()
 		}
 
-		// Set the flags to use
-		flags = newFlags
-
+		mx.Lock()
 		// Start osqueryd if not running
 		if cn == nil {
 			r.log.Info("Start osqueryd")
+
+			flags = newFlags
 			inputCh = make(chan []config.InputConfig, 1)
 			ctx, cn = context.WithCancel(parentCtx)
 
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
+			wg.Go(func() {
 				err := runfn(ctx, flags, inputCh)
 
 				// Reset cancellable
@@ -94,8 +97,9 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 				// Forward error to main loop
 				r.log.Debugf("Forward osquery run error to the main runner loop: %v", err)
 				errCh <- err
-			}()
+			})
 		}
+		mx.Unlock()
 
 		select {
 		case inputCh <- inputs:

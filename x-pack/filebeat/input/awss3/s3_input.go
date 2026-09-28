@@ -10,6 +10,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -78,8 +79,10 @@ func (in *s3PollerInput) Run(
 	in.pipeline = pipeline
 	var err error
 
-	// Load the persistent S3 polling state.
-	in.states, err = newStates(in.log, in.store, in.config.BucketListPrefix)
+	// Load the persistent S3 polling state, scoped to this input's bucket. The
+	// underlying store is shared by all aws-s3 inputs of the process.
+	bucketName := getBucketNameFromARN(in.config.getBucketARN())
+	in.states, err = newStates(in.log, in.store, bucketName, in.config.BucketListPrefix)
 	if err != nil {
 		err = fmt.Errorf("can not start persistent store: %w", err)
 		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failure: %s", err.Error()))
@@ -127,12 +130,10 @@ func (in *s3PollerInput) runPoll(ctx context.Context) {
 	workChan := make(chan state)
 
 	// Start the worker goroutines to listen on the work channel
-	for i := 0; i < in.config.NumberOfWorkers; i++ {
-		workerWg.Add(1)
-		go func() {
-			defer workerWg.Done()
+	for range in.config.NumberOfWorkers {
+		workerWg.Go(func() {
 			in.workerLoop(ctx, workChan)
-		}()
+		})
 	}
 
 	// Start reading data and wait for its processing to be done
@@ -209,8 +210,18 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 			state.Stored = true
 		}
 
+		finalize := objHandler.FinalizeS3Object
+
 		// Add the cleanup handling to the acks helper
 		acks.Add(publishCount, func() {
+			// Finalize the object (backup/delete) after all events are ACKed.
+			// Only successfully processed objects are finalized.
+			if state.Stored {
+				if err := finalize(); err != nil {
+					in.log.Errorf("failed finalizing S3 object key %q in bucket %q: %v", state.Key, state.Bucket, err)
+				}
+			}
+
 			err := in.states.AddState(state)
 			if err != nil {
 				in.log.Errorf("saving completed object state: %v", err.Error())
@@ -233,6 +244,7 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 	bucketName := getBucketNameFromARN(in.config.getBucketARN())
 
 	isStateValid := in.filterProvider.getApplierFunc()
+	excludePrefix := in.config.backupPrefixToExclude()
 
 	errorBackoff := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
 	circuitBreaker := 0
@@ -266,6 +278,10 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 		// Metrics
 		in.metrics.s3ObjectsListedTotal.Add(uint64(totListedObjects))
 		for _, object := range page.Contents {
+			if excludePrefix != "" && strings.HasPrefix(*object.Key, excludePrefix) {
+				continue
+			}
+
 			state := newState(bucketName, *object.Key, *object.ETag, *object.LastModified)
 			if !isStateValid(in.log, state) {
 				continue

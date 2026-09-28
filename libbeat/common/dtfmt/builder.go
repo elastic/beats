@@ -123,10 +123,7 @@ func (b *builder) fractNanoOfSecond(digits int) {
 		digits = 9
 	}
 
-	minDigits := fractDigits
-	if digits < minDigits {
-		minDigits = digits
-	}
+	minDigits := min(digits, fractDigits)
 	b.add(paddedNumber{ftNanoOfSecond, 9 - digits, minDigits, digits, fractDigits, false})
 }
 

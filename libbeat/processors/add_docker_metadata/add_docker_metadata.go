@@ -26,13 +26,15 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
-	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/beats/v7/pkg/autodiscover/docker"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -50,7 +52,10 @@ const (
 // initCgroupPaths initializes a new cgroup reader. This enables
 // unit testing by allowing us to stub the OS interface.
 var initCgroupPaths processors.InitCgroupHandler = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (processors.CGReader, error) {
-	return cgroup.NewReader(rootfsMountpoint, ignoreRootCgroups)
+	return cgroup.NewReaderOptions(cgroup.ReaderOptions{
+		RootfsMountpoint:  rootfsMountpoint,
+		IgnoreRootCgroups: ignoreRootCgroups,
+	})
 }
 
 func init() {
@@ -63,10 +68,12 @@ type addDockerMetadata struct {
 	fields          []string
 	sourceProcessor beat.Processor
 
-	pidFields       []string      // Field names that contain PIDs.
-	cgroups         *common.Cache // Cache of PID (int) to container ids (string).
-	dedot           bool          // If set to true, replace dots in labels with `_`.
-	dockerAvailable bool          // If Docker exists in env, then it is set to true
+	pidFields       []string                     // Field names that contain PIDs.
+	cgroups         atomic.Pointer[common.Cache] // Cache of PID (int) to container ids (string).
+	cgroupsOnce     sync.Once                    // Guards the lazy initialization of cgroups.
+	dedot           bool                         // If set to true, replace dots in labels with `_`.
+	dockerAvailable bool                         // If Docker exists in env, then it is set to true
+	closed          atomic.Bool                  // Set by Close so a late cgroupCache skips starting the janitor.
 	cgreader        processors.CGReader
 }
 
@@ -102,7 +109,7 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 	// Use extract_field processor to get container ID from source file path.
 	var sourceProcessor beat.Processor
 	if config.MatchSource {
-		var procConf, _ = conf.NewConfigFrom(map[string]interface{}{
+		var procConf, _ = conf.NewConfigFrom(map[string]any{
 			"field":     "log.file.path",
 			"separator": string(os.PathSeparator),
 			"index":     config.SourceIndex,
@@ -133,15 +140,22 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 	}, nil
 }
 
-func lazyCgroupCacheInit(d *addDockerMetadata) {
-	if d.cgroups == nil {
+// cgroupCache returns the PID-to-container-ID cache, creating it and starting
+// its janitor on first use. It is safe to call from concurrent Run goroutines.
+func (d *addDockerMetadata) cgroupCache() *common.Cache {
+	d.cgroupsOnce.Do(func() {
 		d.log.Debug("Initializing cgroup cache")
 		evictionListener := func(k common.Key, v common.Value) {
 			d.log.Debugf("Evicted cached cgroups for PID=%v", k)
 		}
-		d.cgroups = common.NewCacheWithRemovalListener(cgroupCacheExpiration, 100, evictionListener)
-		d.cgroups.StartJanitor(5 * time.Second)
-	}
+		cache := common.NewCacheWithRemovalListener(cgroupCacheExpiration, 100, evictionListener)
+		d.cgroups.Store(cache)
+		// Avoid a race and only start the janitor only if Close() has not be called yet.
+		if !d.closed.Load() {
+			cache.StartJanitor(5 * time.Second)
+		}
+	})
+	return d.cgroups.Load()
 }
 
 func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
@@ -227,8 +241,9 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (d *addDockerMetadata) Close() error {
-	if d.cgroups != nil {
-		d.cgroups.StopJanitor()
+	d.closed.Store(true) // Prevent the janitor from starting.
+	if cgroups := d.cgroups.Load(); cgroups != nil {
+		cgroups.StopJanitor()
 	}
 	// Watcher can be nil if processor failed on creation
 	if d.watcher != nil {
@@ -263,10 +278,15 @@ func (d *addDockerMetadata) lookupContainerIDByPID(event *beat.Event) (string, e
 			continue
 		}
 
-		if d.cgroups != nil {
-			if cid := d.cgroups.Get(pid); cid != nil {
+		if cgroups := d.cgroups.Load(); cgroups != nil {
+			if cid := cgroups.Get(pid); cid != nil {
 				d.log.Debugf("Using cached cgroups for pid=%v", pid)
-				return cid.(string), nil
+				cidStr, ok := cid.(string)
+				if !ok {
+					d.log.Debugf("cached cgroup value for pid=%v is not a string (type=%T)", pid, cid)
+					continue
+				}
+				return cidStr, nil
 			}
 		}
 
@@ -282,11 +302,9 @@ func (d *addDockerMetadata) lookupContainerIDByPID(event *beat.Event) (string, e
 			d.log.Debugf("failed to get cgroups for pid=%v: %v", pid, err)
 		}
 
-		// Initialize at time of first use.
-		lazyCgroupCacheInit(d)
-
 		cid, err := getContainerIDFromCgroups(cgroups)
-		d.cgroups.Put(pid, cid)
+		// Cache the result, creating the cache on first use.
+		d.cgroupCache().Put(pid, cid)
 
 		return cid, err
 	}

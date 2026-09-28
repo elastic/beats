@@ -1,4 +1,4 @@
-import datetime
+import base64
 import json
 import logging
 import os
@@ -7,6 +7,7 @@ import re
 import shutil
 import unittest
 
+from elasticsearch import Elasticsearch
 from base import BaseTest
 from idxmgmt import IdxMgmt
 
@@ -24,8 +25,13 @@ class TestRunILM(BaseTest):
         self.data_stream = self.beat_name + "-9.9.9"
         self.policy_name = self.beat_name
         self.custom_policy = self.beat_name + "_bar"
-        self.es = self.es_client()
-        self.idxmgmt = IdxMgmt(self.es, self.data_stream)
+        self.es: Elasticsearch = self.es_client()
+        self.username = os.getenv("ES_USER", "")
+        self.password = os.getenv("ES_PASS", "")
+        self.auth_value = base64.b64encode(f"{self.username}:{self.password}".encode()).decode()
+        self.headers = {"Authorization": f"Basic {self.auth_value}"}
+
+        self.idxmgmt = IdxMgmt(self.es, self.data_stream, headers=self.headers)
         self.idxmgmt.delete(indices=[],
                             policies=[self.policy_name, self.custom_policy],
                             data_streams=[self.data_stream])
@@ -110,8 +116,13 @@ class TestCommandSetupILMPolicy(BaseTest):
         self.data_stream = self.beat_name + "-9.9.9"
         self.policy_name = self.beat_name
         self.custom_policy = self.beat_name + "_bar"
-        self.es = self.es_client()
-        self.idxmgmt = IdxMgmt(self.es, self.data_stream)
+        self.es: Elasticsearch = self.es_client()
+        self.username = os.getenv("ES_USER", "")
+        self.password = os.getenv("ES_PASS", "")
+        self.auth_value = base64.b64encode(f"{self.username}:{self.password}".encode()).decode()
+        self.headers = {"Authorization": f"Basic {self.auth_value}"}
+
+        self.idxmgmt = IdxMgmt(self.es, self.data_stream, headers=self.headers)
         self.idxmgmt.delete(indices=[],
                             policies=[self.policy_name, self.custom_policy],
                             data_streams=[self.data_stream])

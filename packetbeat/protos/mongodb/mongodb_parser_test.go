@@ -26,6 +26,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestMongodbParser_messageNotEvenStarted(t *testing.T) {
@@ -34,7 +36,7 @@ func TestMongodbParser_messageNotEvenStarted(t *testing.T) {
 
 	st := &stream{data: data, message: new(mongodbMessage)}
 
-	ok, complete := mongodbMessageParser(st)
+	ok, complete := mongodbMessageParser(st, logptest.NewTestingLogger(t, ""))
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -50,7 +52,7 @@ func TestMongodbParser_messageNotFinished(t *testing.T) {
 
 	st := &stream{data: data, message: new(mongodbMessage)}
 
-	ok, complete := mongodbMessageParser(st)
+	ok, complete := mongodbMessageParser(st, logptest.NewTestingLogger(t, ""))
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -70,7 +72,7 @@ func TestMongodbParser_simpleRequest(t *testing.T) {
 
 	st := &stream{data: data, message: new(mongodbMessage)}
 
-	ok, complete := mongodbMessageParser(st)
+	ok, complete := mongodbMessageParser(st, logptest.NewTestingLogger(t, ""))
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -98,7 +100,7 @@ func TestMongodbParser_OpMsg(t *testing.T) {
 
 		st := &stream{data: data, message: new(mongodbMessage)}
 
-		ok, complete := mongodbMessageParser(st)
+		ok, complete := mongodbMessageParser(st, logptest.NewTestingLogger(t, ""))
 
 		if !ok {
 			t.Errorf("Parsing returned error")
@@ -122,7 +124,7 @@ func TestMongodbParser_unknownOpCode(t *testing.T) {
 
 	st := &stream{data: data, message: new(mongodbMessage)}
 
-	ok, complete := mongodbMessageParser(st)
+	ok, complete := mongodbMessageParser(st, logptest.NewTestingLogger(t, ""))
 
 	if ok {
 		t.Errorf("Parsing should have returned an error")
@@ -195,7 +197,7 @@ func TestMongodbParser_negativeMessageLength(t *testing.T) {
 		}
 	}()
 
-	ok, complete := mongodbMessageParser(st)
+	ok, complete := mongodbMessageParser(st, logptest.NewTestingLogger(t, ""))
 
 	// Should reject the message (ok=false) without completing
 	assert.False(t, ok, "Parser should reject negative message length")
@@ -213,7 +215,7 @@ func TestMongodbParser_messageLengthTooSmall(t *testing.T) {
 
 	st := &stream{data: data, message: new(mongodbMessage)}
 
-	ok, complete := mongodbMessageParser(st)
+	ok, complete := mongodbMessageParser(st, logptest.NewTestingLogger(t, ""))
 
 	assert.False(t, ok, "Parser should reject message length smaller than header")
 	assert.False(t, complete, "Message should not be complete")
@@ -246,7 +248,7 @@ func TestMongodbParser_negativeBSONLength(t *testing.T) {
 		}
 	}()
 
-	ok, complete := mongodbMessageParser(st)
+	ok, complete := mongodbMessageParser(st, logptest.NewTestingLogger(t, ""))
 
 	assert.False(t, ok, "Parser should reject negative BSON document length")
 	assert.False(t, complete, "Message should not be complete")
@@ -271,7 +273,7 @@ func TestMongodbParser_zeroBSONLength(t *testing.T) {
 
 	st := &stream{data: data, message: new(mongodbMessage)}
 
-	ok, complete := mongodbMessageParser(st)
+	ok, complete := mongodbMessageParser(st, logptest.NewTestingLogger(t, ""))
 
 	assert.False(t, ok, "Parser should reject zero BSON document length")
 	assert.False(t, complete, "Message should not be complete")
@@ -301,7 +303,7 @@ func TestMongodbParser_negativeNumberReturned(t *testing.T) {
 		}
 	}()
 
-	ok, complete := mongodbMessageParser(st)
+	ok, complete := mongodbMessageParser(st, logptest.NewTestingLogger(t, ""))
 
 	assert.False(t, ok, "Parser should reject negative numberReturned")
 	assert.False(t, complete, "Message should not be complete")
@@ -333,7 +335,7 @@ func TestMongodbParser_hugeNumberReturned(t *testing.T) {
 		}
 	}()
 
-	ok, complete := mongodbMessageParser(st)
+	ok, complete := mongodbMessageParser(st, logptest.NewTestingLogger(t, ""))
 
 	// Should reject because numberReturned exceeds what could fit in remaining bytes
 	assert.False(t, ok, "Parser should reject numberReturned exceeding buffer capacity")
@@ -364,7 +366,7 @@ func TestMongodbParser_negativeOpMsgSequenceSize(t *testing.T) {
 		}
 	}()
 
-	ok, complete := mongodbMessageParser(st)
+	ok, complete := mongodbMessageParser(st, logptest.NewTestingLogger(t, ""))
 
 	assert.False(t, ok, "Parser should reject negative OP_MSG document sequence size")
 	assert.False(t, complete, "Message should not be complete")
@@ -388,7 +390,7 @@ func TestMongodbParser_opMsgSequenceSizeExceedsBuffer(t *testing.T) {
 
 	st := &stream{data: data, message: new(mongodbMessage)}
 
-	ok, complete := mongodbMessageParser(st)
+	ok, complete := mongodbMessageParser(st, logptest.NewTestingLogger(t, ""))
 
 	assert.False(t, ok, "Parser should reject OP_MSG sequence size exceeding buffer")
 	assert.False(t, complete, "Message should not be complete")
@@ -414,7 +416,7 @@ func TestMongodbParser_validOpReply(t *testing.T) {
 
 	st := &stream{data: data, message: new(mongodbMessage)}
 
-	ok, complete := mongodbMessageParser(st)
+	ok, complete := mongodbMessageParser(st, logptest.NewTestingLogger(t, ""))
 
 	assert.True(t, ok, "Parser should accept valid OP_REPLY")
 	assert.True(t, complete, "Message should be complete")

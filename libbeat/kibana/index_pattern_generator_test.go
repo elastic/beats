@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
@@ -40,7 +39,7 @@ func TestNewGenerator(t *testing.T) {
 	tmpDir := tmpPath(t)
 	defer os.RemoveAll(tmpDir)
 
-	data, err := ioutil.ReadFile("./testdata/fields.yml")
+	data, err := os.ReadFile("./testdata/fields.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -80,7 +79,7 @@ func TestGenerate(t *testing.T) {
 	versions := []*version.V{v7}
 	var d mapstr.M
 	for _, version := range versions {
-		data, err := ioutil.ReadFile("./testdata/fields.yml")
+		data, err := os.ReadFile("./testdata/fields.yml")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -119,7 +118,7 @@ func TestGenerateExtensive(t *testing.T) {
 
 	var d mapstr.M
 	for _, version := range versions {
-		data, err := ioutil.ReadFile("testdata/extensive/fields.yml")
+		data, err := os.ReadFile("testdata/extensive/fields.yml")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -159,7 +158,7 @@ func testGenerate(t *testing.T, tests []compare, sourceFilters bool) {
 				assert.Equal(t, ex["id"], test.created["id"])
 				assert.Equal(t, ex["type"], test.created["type"])
 
-				attrExisting = ex["attributes"].(map[string]interface{})
+				attrExisting = ex["attributes"].(map[string]any)
 				attrCreated = test.created["attributes"].(mapstr.M)
 			} else {
 				attrExisting = ex
@@ -167,7 +166,7 @@ func testGenerate(t *testing.T, tests []compare, sourceFilters bool) {
 			}
 
 			// check fieldFormatMap
-			var ffmExisting, ffmCreated map[string]interface{}
+			var ffmExisting, ffmCreated map[string]any
 			err = json.Unmarshal([]byte(attrExisting["fieldFormatMap"].(string)), &ffmExisting)
 			if err != nil {
 				t.Fatal(err)
@@ -179,7 +178,7 @@ func testGenerate(t *testing.T, tests []compare, sourceFilters bool) {
 			assert.Equal(t, ffmExisting, ffmCreated)
 
 			// check fields
-			var fieldsExisting, fieldsCreated []map[string]interface{}
+			var fieldsExisting, fieldsCreated []map[string]any
 			err = json.Unmarshal([]byte(attrExisting["fields"].(string)), &fieldsExisting)
 			if err != nil {
 				t.Fatal(err)
@@ -197,7 +196,7 @@ func testGenerate(t *testing.T, tests []compare, sourceFilters bool) {
 
 			// check sourceFilters
 			if sourceFilters {
-				var sfExisting, sfCreated []map[string]interface{}
+				var sfExisting, sfCreated []map[string]any
 				err = json.Unmarshal([]byte(attrExisting["sourceFilters"].(string)), &sfExisting)
 				if err != nil {
 					t.Fatal(err)
@@ -217,7 +216,7 @@ func testGenerate(t *testing.T, tests []compare, sourceFilters bool) {
 	}
 }
 
-func find(a []map[string]interface{}, key, val string) int {
+func find(a []map[string]any, key, val string) int {
 	for idx, e := range a {
 		if e[key].(string) == val {
 			return idx
@@ -226,16 +225,16 @@ func find(a []map[string]interface{}, key, val string) int {
 	return -1
 }
 
-func readNDJSON(path string) ([]map[string]interface{}, error) {
-	f, err := ioutil.ReadFile(path)
+func readNDJSON(path string) ([]map[string]any, error) {
+	f, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
-	data := make([]map[string]interface{}, 0)
+	data := make([]map[string]any, 0)
 	d := json.NewDecoder(bytes.NewReader(f))
 	for d.More() {
-		var dd map[string]interface{}
+		var dd map[string]any
 		err = d.Decode(&dd)
 		if err != nil {
 			return nil, fmt.Errorf("error reading ndjson: %+v", err)
@@ -246,7 +245,7 @@ func readNDJSON(path string) ([]map[string]interface{}, error) {
 }
 
 func tmpPath(t testing.TB) string {
-	tmpDir, err := ioutil.TempDir("", "kibana-tests")
+	tmpDir, err := os.MkdirTemp("", "kibana-tests")
 	if err != nil {
 		t.Fatal(err)
 	}

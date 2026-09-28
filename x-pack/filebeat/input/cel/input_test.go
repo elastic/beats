@@ -6,9 +6,11 @@
 package cel
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -34,24 +36,26 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints")
 
 var inputTests = []struct {
-	name          string
-	remote        bool
-	server        func(*testing.T, http.HandlerFunc, map[string]interface{})
-	handler       http.HandlerFunc
-	config        map[string]interface{}
-	time          func() time.Time
-	persistCursor map[string]interface{}
-	want          []map[string]interface{}
-	wantCursor    []map[string]interface{}
-	wantErr       error
-	prepare       func() error
-	wantFile      string
-	wantNoFile    string
+	name                string
+	remote              bool
+	server              func(*testing.T, http.HandlerFunc, map[string]interface{})
+	handler             http.HandlerFunc
+	config              map[string]interface{}
+	time                func() time.Time
+	persistCursor       map[string]interface{}
+	want                []map[string]interface{}
+	wantCursor          []map[string]interface{}
+	wantErr             error
+	prepare             func() error
+	wantFile            string
+	wantNoFile          string
+	wantTraceNotContain []string
 }{
 	// Autonomous tests (no FS or net dependency).
 	{
@@ -1474,64 +1478,22 @@ var inputTests = []struct {
 		},
 		wantNoFile: filepath.Join("cel", "logs", "http-request-trace-test_id_tracer_filename_sanitization_disabled*"),
 	},
+	// Path containment is enforced regardless of whether the tracer is
+	// enabled. The enabled case is tested in
+	// httplog.TestResolveTraceFilename; the test harness here rewrites
+	// enabled tracer filenames into a temp dir, so only the disabled
+	// case can exercise an out-of-tree path at the input level.
 	{
-		name: "tracer_escaping_logs",
-		config: map[string]interface{}{
-			"interval":                 1,
-			"resource.url":             "https://example.com/",
-			"resource.tracer.enabled":  true,
-			"resource.tracer.filename": "/var/log/http-request-trace-*.ndjson",
-			"state":                    map[string]interface{}{},
-			"program":                  "{}",
-		},
-		wantErr: fmt.Errorf(`request tracer path must be within %q path accessing 'resource'`, inputName),
-	},
-	{
-		name: "tracer_disabled_escaping_logs",
-		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
-			server := httptest.NewServer(h)
-			config["resource.url"] = server.URL
-			t.Cleanup(server.Close)
-		},
+		name:   "tracer_disabled_escaping_logs",
+		server: newTestServer(httptest.NewServer),
 		config: map[string]interface{}{
 			"interval":                 1,
 			"resource.tracer.enabled":  false,
 			"resource.tracer.filename": "/var/log/http-request-trace-*.ndjson",
-			"state": map[string]interface{}{
-				"fake_now": "2002-10-02T15:00:00Z",
-			},
-			"program": `
-	// Use terse non-standard check for presence of timestamp. The standard
-	// alternative is to use has(state.cursor) && has(state.cursor.timestamp).
-	(!is_error(state.cursor.timestamp) ?
-		state.cursor.timestamp
-	:
-		timestamp(state.fake_now)-duration('10m')
-	).as(time_cursor,
-	string(state.url).parse_url().with_replace({
-		"RawQuery": {"$filter": ["alertCreationTime ge "+string(time_cursor)]}.format_query()
-	}).format_url().as(url, bytes(get(url).Body)).decode_json().as(event, {
-		"events": [event],
-		// Get the timestamp from the event if it exists, otherwise advance a little to break a request loop.
-		// Due to the name of the @timestamp field, we can't use has(), so use is_error().
-		"cursor": [{"timestamp": !is_error(event["@timestamp"]) ? event["@timestamp"] : time_cursor+duration('1s')}],
-
-		// Just for testing, cycle this back into the next state.
-		"fake_now": state.fake_now
-	}))
-	`,
+			"program":                  `bytes(get(state.url).Body).as(body, {"events": [body.decode_json()]})`,
 		},
-		handler: dateCursorHandler(),
-		want: []map[string]interface{}{
-			{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
-			{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
-			{"@timestamp": "2002-10-02T15:00:02Z", "foo": "bar"},
-		},
-		wantCursor: []map[string]interface{}{
-			{"timestamp": "2002-10-02T15:00:00Z"},
-			{"timestamp": "2002-10-02T15:00:01Z"},
-			{"timestamp": "2002-10-02T15:00:02Z"},
-		},
+		handler: defaultHandler(http.MethodGet, ""),
+		wantErr: errors.New("request tracer path"),
 	},
 	{
 		name:   "pagination_cursor_object",
@@ -1885,7 +1847,14 @@ var inputTests = []struct {
 	})
 	`,
 		},
-		handler: oauth2Handler,
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			if r.UserAgent() != userAgent {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(fmt.Sprintf("unexpected UA: %s", r.UserAgent())))
+				return
+			}
+			oauth2Handler(w, r)
+		},
 		want: []map[string]interface{}{
 			{"hello": "world"},
 		},
@@ -1927,6 +1896,130 @@ var inputTests = []struct {
 				},
 			},
 		},
+	},
+
+	// Auth header sanitization in trace logs.
+	{
+		name: "trace_sanitize_basic_auth",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":                 1,
+			"auth.basic.user":          "test_client",
+			"auth.basic.password":      "secret_password",
+			"resource.tracer.enabled":  true,
+			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
+			"program": `
+	get(state.url).Body.as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandler(
+			fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("test_client:secret_password"))),
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+		wantFile:            filepath.Join("cel", "logs", "http-request-trace-test_id_trace_sanitize_basic_auth.ndjson"),
+		wantTraceNotContain: []string{"Authorization"},
+	},
+	{
+		name: "trace_sanitize_token_auth",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":                 1,
+			"auth.token.type":          "Token",
+			"auth.token.value":         "sssh_super_secret_token",
+			"resource.tracer.enabled":  true,
+			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
+			"program": `
+	get(state.url).Body.as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: tokenAuthHandler(
+			"Token sssh_super_secret_token",
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+		wantFile:            filepath.Join("cel", "logs", "http-request-trace-test_id_trace_sanitize_token_auth.ndjson"),
+		wantTraceNotContain: []string{"Authorization"},
+	},
+	{
+		name: "trace_sanitize_oauth2",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			config["auth.oauth2.token_url"] = s.URL + "/token"
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":                  1,
+			"auth.oauth2.client.id":     "a_client_id",
+			"auth.oauth2.client.secret": "a_client_secret",
+			"auth.oauth2.endpoint_params": map[string]interface{}{
+				"param1": "v1",
+			},
+			"auth.oauth2.scopes":       []string{"scope1", "scope2"},
+			"resource.tracer.enabled":  true,
+			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
+			"program": `
+	post(state.url, '', '').Body.as(body, {
+		"events": body.decode_json()
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			if r.UserAgent() != userAgent {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(fmt.Sprintf("unexpected UA: %s", r.UserAgent())))
+				return
+			}
+			oauth2Handler(w, r)
+		},
+		want: []map[string]interface{}{
+			{"hello": "world"},
+		},
+		wantFile:            filepath.Join("cel", "logs", "http-request-trace-test_id_trace_sanitize_oauth2.ndjson"),
+		wantTraceNotContain: []string{"Authorization"},
 	},
 
 	// Multi-step requests.
@@ -2104,7 +2197,7 @@ var inputTests = []struct {
 			},
 		},
 		time:       func() time.Time { return time.Date(2010, 2, 8, 0, 0, 0, 0, time.UTC) },
-		wantNoFile: filepath.Join("failure_dumps", "dump-2010-02-08T00-00-00.000.json"),
+		wantNoFile: filepath.Join("cel", "failure_dumps", "dump-2010-02-08T00-00-00.000.json"),
 		want: []map[string]interface{}{{
 			"message": map[string]interface{}{
 				"value": "division by zero",
@@ -2126,7 +2219,7 @@ var inputTests = []struct {
 			},
 		},
 		time:     func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
-		wantFile: filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
+		wantFile: filepath.Join("cel", "failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
 		want: []map[string]interface{}{
 			{
 				"error": map[string]interface{}{
@@ -2154,13 +2247,13 @@ var inputTests = []struct {
 		time: func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
 		prepare: func() error {
 			// Make a file that the configuration should delete.
-			err := os.MkdirAll("failure_dumps", 0o700)
+			err := os.MkdirAll(filepath.Join("cel", "failure_dumps"), 0o700)
 			if err != nil {
 				return err
 			}
-			return os.WriteFile(filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), nil, 0o600)
+			return os.WriteFile(filepath.Join("cel", "failure_dumps", "dump-2010-02-09T00-00-00.000.json"), nil, 0o600)
 		},
-		wantNoFile: filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
+		wantNoFile: filepath.Join("cel", "failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
 		want: []map[string]interface{}{
 			{
 				"error": map[string]interface{}{
@@ -2237,7 +2330,7 @@ func TestInput(t *testing.T) {
 	os.Setenv("CELTESTENVVAR", "TESTVALUE")
 	os.Setenv("DISALLOWEDCELTESTENVVAR", "DISALLOWEDTESTVALUE")
 
-	err := os.RemoveAll("failure_dumps")
+	err := os.RemoveAll(filepath.Join("cel", "failure_dumps"))
 	if err != nil {
 		t.Fatalf("failed to remove failure_dumps directory: %v", err)
 	}
@@ -2306,11 +2399,16 @@ func TestInput(t *testing.T) {
 			defer cancel()
 
 			id := "test_id:" + test.name
+			cwd, err := os.Getwd()
+			if err != nil {
+				t.Fatalf("failed to get working directory: %v", err)
+			}
 			v2Ctx := v2.Context{
 				Logger:          logp.NewLogger("cel_test"),
 				ID:              id,
 				IDWithoutName:   id,
 				Cancelation:     ctx,
+				Agent:           beat.Info{Paths: &paths.Path{Logs: cwd}},
 				MetricsRegistry: monitoring.NewRegistry(),
 			}
 			var client publisher
@@ -2319,8 +2417,8 @@ func TestInput(t *testing.T) {
 					cancel()
 				}
 			}
-			err = input{test.time}.run(v2Ctx, src, test.persistCursor, &client, &v2Ctx)
-			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
+			err = input{time: test.time}.run(v2Ctx, src, test.persistCursor, &client, &v2Ctx)
+			if !sameErrorOrContains(err, test.wantErr) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
 			}
 			if test.wantFile != "" {
@@ -2335,6 +2433,17 @@ func TestInput(t *testing.T) {
 				}
 				if len(paths) != 0 {
 					t.Errorf("unexpected files found: %v", paths)
+				}
+			}
+			if len(test.wantTraceNotContain) > 0 && test.wantFile != "" {
+				traceData, err := os.ReadFile(filepath.Join(tempDir, test.wantFile))
+				if err != nil {
+					t.Fatalf("failed to read trace file for content check: %v", err)
+				}
+				for _, s := range test.wantTraceNotContain {
+					if bytes.Contains(traceData, []byte(s)) {
+						t.Errorf("trace log must not contain %q", s)
+					}
 				}
 			}
 			if test.wantErr != nil {
@@ -2913,5 +3022,18 @@ func TestRedactor(t *testing.T) {
 				t.Errorf("unexpected redaction:\n--- got\n--- want\n%s", cmp.Diff(got, test.wantRedact))
 			}
 		})
+	}
+}
+
+// sameErrorOrContains reports whether got matches want: both nil, or got's
+// message contains want's message.
+func sameErrorOrContains(got, want error) bool {
+	switch {
+	case got == nil && want == nil:
+		return true
+	case got == nil, want == nil:
+		return false
+	default:
+		return strings.Contains(got.Error(), want.Error())
 	}
 }

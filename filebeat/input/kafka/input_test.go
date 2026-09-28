@@ -22,6 +22,7 @@ package kafka
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
@@ -52,4 +53,29 @@ func AssertNotStartedInputCanBeDone(t *testing.T, configMap *conf.C) {
 
 	_, err = Plugin(logp.NewNopLogger()).Manager.Create(config)
 	require.NoError(t, err)
+}
+
+func TestAckEventPrivate(t *testing.T) {
+	var acked int
+	meta := eventMeta{ackHandler: func() { acked++ }}
+
+	ackEventPrivate(meta)
+	require.Equal(t, 1, acked)
+
+	// Ensure ackHandlers are called in order
+	ackedCh := make(chan int, 3)
+	ackEventPrivate([]any{
+		eventMeta{ackHandler: func() { ackedCh <- 0 }},
+		eventMeta{ackHandler: func() { ackedCh <- 1 }},
+		eventMeta{ackHandler: func() { ackedCh <- 2 }},
+	},
+	)
+
+	close(ackedCh)
+	require.Len(t, ackedCh, 3, "expecting exact 3 ack handlers to be called")
+
+	for i := range 3 {
+		ack := <-ackedCh
+		assert.Equal(t, i, ack, "expecting ack to be %d, got %d. The order or value is wrong", i, ack)
+	}
 }

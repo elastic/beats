@@ -67,8 +67,8 @@ func TestFetchEventContents(t *testing.T) {
 	}
 }
 
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string) map[string]any {
+	return map[string]any{
 		"module":     "kvm",
 		"metricsets": []string{"status"},
 		"hosts":      []string{host},

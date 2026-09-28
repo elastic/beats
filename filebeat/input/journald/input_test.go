@@ -138,8 +138,7 @@ func TestCompareGoSystemdWithJournalctl(t *testing.T) {
 		"seek":  "head",
 	})
 
-	ctx, cancelInput := context.WithCancel(context.Background())
-	defer cancelInput()
+	ctx := t.Context()
 
 	env.startInput(ctx, inp)
 	env.waitUntilEventCount(8)
@@ -295,8 +294,7 @@ func TestMatchers(t *testing.T) {
 			cfg.Update(mapstr.M(tc.confiFields))
 			inp := env.mustCreateInput(cfg)
 
-			ctx, cancelInput := context.WithCancel(context.Background())
-			defer cancelInput()
+			ctx := t.Context()
 
 			env.startInput(ctx, inp)
 			env.waitUntilEventCount(tc.expectedEvents)

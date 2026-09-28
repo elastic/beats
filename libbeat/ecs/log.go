@@ -56,7 +56,7 @@ type Log struct {
 
 	// The Syslog metadata of the event, if the event was transmitted via
 	// Syslog. Please see RFCs 5424 or 3164.
-	Syslog map[string]interface{} `ecs:"syslog"`
+	Syslog map[string]any `ecs:"syslog"`
 
 	// The Syslog numeric severity of the log event, if available.
 	// If the event source publishing via Syslog provides a different numeric

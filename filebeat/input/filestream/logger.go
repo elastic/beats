@@ -18,29 +18,34 @@
 package filestream
 
 import (
+	"go.uber.org/zap"
+
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func loggerWithEvent(logger *logp.Logger, event loginp.FSEvent, src loginp.Source) *logp.Logger {
-	log := logger.With(
-		"operation", event.Op.String(),
-		"source_name", src.Name(),
+// loggerWithEvent returns a logger enriched with FS-event fields. Enrichment
+// is deferred via [logp.Logger.WithLazy], so the underlying core only pays
+// for the fields if a message is actually emitted.
+func loggerWithEvent(logger *logp.Logger, event loginp.FSEvent) *logp.Logger {
+	fields := make([]zap.Field, 0, 6)
+	fields = append(fields,
+		zap.String("operation", event.Op.String()),
+		zap.String("source_file", event.SrcID),
 	)
 	if event.Descriptor.Fingerprint != "" {
-		log = log.With("fingerprint", event.Descriptor.Fingerprint)
+		fields = append(fields, zap.String("fingerprint", event.Descriptor.Fingerprint))
 	}
-	if event.Descriptor.Info != nil {
-		osID := event.Descriptor.Info.GetOSState().String()
-		if osID != "" {
-			log = log.With("os_id", osID)
+	if info := event.Descriptor.Info; info != nil {
+		if osID := info.GetOSState().String(); osID != "" {
+			fields = append(fields, zap.String("os_id", osID))
 		}
 	}
 	if event.NewPath != "" {
-		log = log.With("new_path", event.NewPath)
+		fields = append(fields, zap.String("new_path", event.NewPath))
 	}
 	if event.OldPath != "" {
-		log = log.With("old_path", event.OldPath)
+		fields = append(fields, zap.String("old_path", event.OldPath))
 	}
-	return log
+	return logger.WithLazy(fields...)
 }

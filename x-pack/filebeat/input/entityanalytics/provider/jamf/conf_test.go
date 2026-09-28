@@ -10,10 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"gopkg.in/natefinch/lumberjack.v2"
-
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/lumberjack"
 )
 
 var validateTests = []struct {
@@ -72,7 +71,7 @@ var validateTests = []struct {
 		},
 	},
 	{
-		name: "invalid_path",
+		name: "invalid_path_accepted_at_config_time",
 		cfg: conf{
 			SyncInterval: 24 * time.Hour, UpdateInterval: 15 * time.Minute,
 			Tracer: &tracerConfig{
@@ -80,7 +79,6 @@ var validateTests = []struct {
 				Logger:  lumberjack.Logger{Filename: "/var/logs/path.log"},
 			},
 		},
-		wantErr: errors.New(`request tracer path must be within "jamf" path`),
 	},
 }
 

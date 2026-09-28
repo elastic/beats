@@ -7,8 +7,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-metricset-system-network_summary]]
 === System network_summary metricset
 
-beta[]
-
 include::../../../module/system/network_summary/_meta/docs.asciidoc[]
 
 

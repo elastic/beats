@@ -55,7 +55,7 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	// the Harvester detects the rename first thus allowing
 	// the output to receive the event and then close the source file.
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName) + "*"},
 		"prospector.scanner.check_interval":      "10ms",
@@ -100,7 +100,7 @@ func TestFilestreamMetadataUpdatedOnRename(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName) + "*"},
 		"prospector.scanner.check_interval":      "1ms",
@@ -158,7 +158,7 @@ func TestFilestreamCloseRemoved(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName) + "*"},
 		"prospector.scanner.check_interval":      "24h",
@@ -201,7 +201,7 @@ func TestFilestreamCloseEOF(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "24h",
@@ -239,7 +239,7 @@ func TestFilestreamEmptyLine(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "1ms",
@@ -280,7 +280,7 @@ func TestFilestreamEmptyLinesOnly(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "1ms",
@@ -306,7 +306,7 @@ func TestFilestreamExceedBuffer(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"buffer_size":                            10,
@@ -337,7 +337,7 @@ func TestFilestreamBOMUTF8(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.fingerprint.enabled": false,
@@ -375,14 +375,13 @@ func TestFilestreamUTF16BOMs(t *testing.T) {
 	}
 
 	for name, enc := range encodings {
-		name := name
 		encoder := enc.NewEncoder()
 		t.Run(name, func(t *testing.T) {
 			env := newInputTestingEnvironment(t)
 
 			testlogName := "test.log"
 			id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-			inp := env.mustCreateInput(map[string]interface{}{
+			inp := env.mustCreateInput(map[string]any{
 				"id":                                     id,
 				"paths":                                  []string{env.abspath(testlogName)},
 				"encoding":                               name,
@@ -417,7 +416,7 @@ func TestFilestreamCloseTimeout(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "24h",
@@ -453,7 +452,7 @@ func TestFilestreamCloseAfterInterval(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "24h",
@@ -483,7 +482,7 @@ func TestFilestreamCloseAfterIntervalRemoved(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                   id,
 		"paths":                                []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":    "24h",
@@ -518,7 +517,7 @@ func TestFilestreamCloseAfterIntervalRenamed(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                   id,
 		"paths":                                []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":    "24h",
@@ -555,7 +554,7 @@ func TestFilestreamCloseAfterIntervalRotatedAndRemoved(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                   id,
 		"paths":                                []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":    "24h",
@@ -593,7 +592,7 @@ func TestFilestreamCloseAfterIntervalRotatedAndNewRemoved(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"file_identity.native":                   map[string]any{},
@@ -639,7 +638,7 @@ func TestFilestreamTruncatedFileOpen(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "1ms",
@@ -675,7 +674,7 @@ func TestFilestreamTruncatedFileClosed(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "1ms",
@@ -715,7 +714,7 @@ func TestFilestreamTruncateWithSymlink(t *testing.T) {
 	testlogName := "test.log"
 	symlinkName := "test.log.symlink"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
 			env.abspath(testlogName),
@@ -762,7 +761,7 @@ func TestFilestreamTruncateBigScannerInterval(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "5s",
@@ -796,7 +795,7 @@ func TestFilestreamTruncateCheckOffset(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "1ms",
@@ -828,7 +827,7 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "200ms",
@@ -881,7 +880,7 @@ func TestFilestreamIgnoreSymlink(t *testing.T) {
 	testlogName := "test.log"
 	symlinkName := "test.log.symlink"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
 			env.abspath(symlinkName),
@@ -913,7 +912,7 @@ func TestFilestreamSymlinksEnabled(t *testing.T) {
 	testlogName := "test.log"
 	symlinkName := "test.log.symlink"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
 			env.abspath(symlinkName),
@@ -947,7 +946,7 @@ func TestFilestreamSymlinkRotated(t *testing.T) {
 	secondTestlogName := "test2.log"
 	symlinkName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
 			env.abspath(symlinkName),
@@ -999,7 +998,7 @@ func TestFilestreamSymlinkRemoved(t *testing.T) {
 	testlogName := "test.log"
 	symlinkName := "test.log.symlink"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
 			env.abspath(symlinkName),
@@ -1045,7 +1044,7 @@ func TestFilestreamSymlinkAndFile(t *testing.T) {
 	testlogName := "test.log"
 	symlinkName := "test.log.symlink"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
 			env.abspath(testlogName),
@@ -1079,7 +1078,7 @@ func TestFilestreamTruncate(t *testing.T) {
 	testlogName := "test.log"
 	symlinkName := "test.log.symlink"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
 			env.abspath("test.log*"),
@@ -1140,7 +1139,7 @@ func TestFilestreamHarvestAllFilesWhenHarvesterLimitExceeded(t *testing.T) {
 	}
 
 	id := "TestFilestreamHarvestAllFilesWhenHarvesterLimitExceeded"
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                  id,
 		"harvester_limit":     1,
 		"close.reader.on_eof": true,
@@ -1167,7 +1166,7 @@ func TestFilestreamDecodeError(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"encoding":                               "utf-16be",
@@ -1212,7 +1211,7 @@ func TestFilestreamDebugReader(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.fingerprint.enabled": false,
@@ -1249,7 +1248,7 @@ func TestFilestreamDebugReader(t *testing.T) {
 func TestGlobalIDCannotBeUsed(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 	testlogName := "test.log"
-	_, err := env.createInput(map[string]interface{}{
+	_, err := env.createInput(map[string]any{
 		"id":                                     ".global",
 		"paths":                                  []string{env.abspath(testlogName) + "*"},
 		"prospector.scanner.fingerprint.enabled": false,
@@ -1266,7 +1265,7 @@ func TestRotatingCloseInactiveLargerWriteRate(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
 			env.abspath("test.log*"),
@@ -1294,7 +1293,7 @@ func TestRotatingCloseInactiveLargerWriteRate(t *testing.T) {
 		}
 		n := 0
 		for n <= iterations {
-			f.Write([]byte(fmt.Sprintf("hello world %d\n", r*iterations+n)))
+			f.Write(fmt.Appendf(nil, "hello world %d\n", r*iterations+n))
 			n += 1
 			time.Sleep(100 * time.Millisecond)
 		}
@@ -1315,7 +1314,7 @@ func TestRotatingCloseInactiveLowWriteRate(t *testing.T) {
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
-	inp := env.mustCreateInput(map[string]interface{}{
+	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
 			env.abspath("test.log*"),

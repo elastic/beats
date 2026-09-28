@@ -20,10 +20,10 @@ package image
 import (
 	"time"
 
-	"github.com/docker/docker/api/types/image"
+	"github.com/moby/moby/api/types/image"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/beats/v7/pkg/autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -44,7 +44,7 @@ func eventMapping(img *image.Summary, dedot bool) mapstr.M {
 		"created": common.Time(time.Unix(img.Created, 0)),
 		"size": mapstr.M{
 			"regular": img.Size,
-			"virtual": img.VirtualSize,
+			"virtual": img.Size,
 		},
 		"tags": img.RepoTags,
 	}

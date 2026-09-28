@@ -102,25 +102,19 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	}
 
 	cfg := (*config.C)(tmp)
-	if settings.Name == "filebeat" {
-		partialConfig := struct {
-			Path paths.Path `config:"path"`
-		}{}
+	partialConfig := struct {
+		Path paths.Path `config:"path"`
+	}{}
 
-		if err := cfg.Unpack(&partialConfig); err != nil {
-			return nil, fmt.Errorf("error extracting default paths: %w", err)
-		}
-		p := paths.New()
-		if err := p.InitPaths(&partialConfig.Path); err != nil {
-			return nil, fmt.Errorf("error initializing default paths: %w", err)
-		}
-		b.Info.Paths = p
-	} else {
-		if err := instance.InitPaths(cfg); err != nil {
-			return nil, fmt.Errorf("error initializing paths: %w", err)
-		}
-		b.Info.Paths = paths.Paths
+	if err := cfg.Unpack(&partialConfig); err != nil {
+		return nil, fmt.Errorf("error extracting default paths: %w", err)
 	}
+
+	p := paths.New()
+	if err := p.InitPaths(&partialConfig.Path); err != nil {
+		return nil, fmt.Errorf("error initializing default paths: %w", err)
+	}
+	b.Info.Paths = p
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
@@ -289,7 +283,6 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 
 // setLogger configures a logp logger and sets it on b.Info.Logger
 func setLogger(b *instance.Beat, receiverConfig map[string]any, core zapcore.Core) error {
-
 	var err error
 	logpConfig := logp.Config{}
 	logpConfig.AddCaller = true

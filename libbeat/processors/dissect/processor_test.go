@@ -32,25 +32,25 @@ import (
 func TestProcessor(t *testing.T) {
 	tests := []struct {
 		name   string
-		c      map[string]interface{}
+		c      map[string]any
 		fields mapstr.M
 		values map[string]string
 	}{
 		{
 			name:   "default field/default target",
-			c:      map[string]interface{}{"tokenizer": "hello %{key}"},
+			c:      map[string]any{"tokenizer": "hello %{key}"},
 			fields: mapstr.M{"message": "hello world"},
 			values: map[string]string{"dissect.key": "world"},
 		},
 		{
 			name:   "default field/target root",
-			c:      map[string]interface{}{"tokenizer": "hello %{key}", "target_prefix": ""},
+			c:      map[string]any{"tokenizer": "hello %{key}", "target_prefix": ""},
 			fields: mapstr.M{"message": "hello world"},
 			values: map[string]string{"key": "world"},
 		},
 		{
 			name: "specific field/target root",
-			c: map[string]interface{}{
+			c: map[string]any{
 				"tokenizer":     "hello %{key}",
 				"target_prefix": "",
 				"field":         "new_field",
@@ -60,7 +60,7 @@ func TestProcessor(t *testing.T) {
 		},
 		{
 			name: "specific field/specific target",
-			c: map[string]interface{}{
+			c: map[string]any{
 				"tokenizer":     "hello %{key}",
 				"target_prefix": "new_target",
 				"field":         "new_field",
@@ -70,7 +70,7 @@ func TestProcessor(t *testing.T) {
 		},
 		{
 			name: "extract to already existing namespace not conflicting",
-			c: map[string]interface{}{
+			c: map[string]any{
 				"tokenizer":     "hello %{key} %{key2}",
 				"target_prefix": "extracted",
 				"field":         "message",
@@ -80,7 +80,7 @@ func TestProcessor(t *testing.T) {
 		},
 		{
 			name: "trimming trailing spaces",
-			c: map[string]interface{}{
+			c: map[string]any{
 				"tokenizer":     "hello %{key} %{key2}",
 				"target_prefix": "",
 				"field":         "message",
@@ -92,7 +92,7 @@ func TestProcessor(t *testing.T) {
 		},
 		{
 			name: "not trimming by default",
-			c: map[string]interface{}{
+			c: map[string]any{
 				"tokenizer":     "hello %{key} %{key2}",
 				"target_prefix": "",
 				"field":         "message",
@@ -102,7 +102,7 @@ func TestProcessor(t *testing.T) {
 		},
 		{
 			name: "trim leading space",
-			c: map[string]interface{}{
+			c: map[string]any{
 				"tokenizer":     "hello %{key} %{key2}",
 				"target_prefix": "",
 				"field":         "message",
@@ -114,7 +114,7 @@ func TestProcessor(t *testing.T) {
 		},
 		{
 			name: "trim all space",
-			c: map[string]interface{}{
+			c: map[string]any{
 				"tokenizer":     "hello %{key} %{key2}",
 				"target_prefix": "",
 				"field":         "message",
@@ -166,7 +166,7 @@ func TestProcessor(t *testing.T) {
 			"key":     "world",
 		}
 
-		c := map[string]interface{}{
+		c := map[string]any{
 			"tokenizer":     "hello %{key}",
 			"field":         "@metadata.message",
 			"target_prefix": "@metadata",
@@ -185,7 +185,7 @@ func TestProcessor(t *testing.T) {
 }
 
 func TestFieldDoesntExist(t *testing.T) {
-	c, err := conf.NewConfigFrom(map[string]interface{}{"tokenizer": "hello %{key}"})
+	c, err := conf.NewConfigFrom(map[string]any{"tokenizer": "hello %{key}"})
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -231,7 +231,7 @@ func TestFieldAlreadyExist(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			c, err := conf.NewConfigFrom(map[string]interface{}{
+			c, err := conf.NewConfigFrom(map[string]any{
 				"tokenizer":     test.tokenizer,
 				"target_prefix": test.prefix,
 			})
@@ -256,7 +256,7 @@ func TestFieldAlreadyExist(t *testing.T) {
 
 func TestErrorFlagging(t *testing.T) {
 	t.Run("when the parsing fails add a flag", func(t *testing.T) {
-		c, err := conf.NewConfigFrom(map[string]interface{}{
+		c, err := conf.NewConfigFrom(map[string]any{
 			"tokenizer": "%{ok} - %{notvalid}",
 		})
 
@@ -285,7 +285,7 @@ func TestErrorFlagging(t *testing.T) {
 	})
 
 	t.Run("when the parsing is succesful do not add a flag", func(t *testing.T) {
-		c, err := conf.NewConfigFrom(map[string]interface{}{
+		c, err := conf.NewConfigFrom(map[string]any{
 			"tokenizer": "%{ok} %{valid}",
 		})
 
@@ -313,26 +313,26 @@ func TestErrorFlagging(t *testing.T) {
 func TestIgnoreFailure(t *testing.T) {
 	tests := []struct {
 		name  string
-		c     map[string]interface{}
+		c     map[string]any
 		msg   string
 		err   error
 		flags bool
 	}{
 		{
 			name:  "default is to fail",
-			c:     map[string]interface{}{"tokenizer": "hello %{key}"},
+			c:     map[string]any{"tokenizer": "hello %{key}"},
 			msg:   "something completely different",
 			err:   errors.New("could not find beginning delimiter: `hello ` in remaining: `something completely different`, (offset: 0)"),
 			flags: true,
 		},
 		{
 			name: "ignore_failure is a noop on success",
-			c:    map[string]interface{}{"tokenizer": "hello %{key}", "ignore_failure": true},
+			c:    map[string]any{"tokenizer": "hello %{key}", "ignore_failure": true},
 			msg:  "hello world",
 		},
 		{
 			name:  "ignore_failure hides the error but maintains flags",
-			c:     map[string]interface{}{"tokenizer": "hello %{key}", "ignore_failure": true},
+			c:     map[string]any{"tokenizer": "hello %{key}", "ignore_failure": true},
 			msg:   "something completely different",
 			flags: true,
 		},
@@ -378,28 +378,28 @@ func TestIgnoreFailure(t *testing.T) {
 func TestOverwriteKeys(t *testing.T) {
 	tests := []struct {
 		name   string
-		c      map[string]interface{}
+		c      map[string]any
 		fields mapstr.M
 		values mapstr.M
 		err    error
 	}{
 		{
 			name:   "fail by default if key exists",
-			c:      map[string]interface{}{"tokenizer": "hello %{key}", "target_prefix": ""},
+			c:      map[string]any{"tokenizer": "hello %{key}", "target_prefix": ""},
 			fields: mapstr.M{"message": "hello world", "key": 42},
 			values: mapstr.M{"message": "hello world", "key": 42},
 			err:    errors.New("cannot override existing key with `key`"),
 		},
 		{
 			name:   "fail if key exists and overwrite disabled",
-			c:      map[string]interface{}{"tokenizer": "hello %{key}", "target_prefix": "", "overwrite_keys": false},
+			c:      map[string]any{"tokenizer": "hello %{key}", "target_prefix": "", "overwrite_keys": false},
 			fields: mapstr.M{"message": "hello world", "key": 42},
 			values: mapstr.M{"message": "hello world", "key": 42},
 			err:    errors.New("cannot override existing key with `key`"),
 		},
 		{
 			name:   "overwrite existing keys",
-			c:      map[string]interface{}{"tokenizer": "hello %{key}", "target_prefix": "", "overwrite_keys": true},
+			c:      map[string]any{"tokenizer": "hello %{key}", "target_prefix": "", "overwrite_keys": true},
 			fields: mapstr.M{"message": "hello world", "key": 42},
 			values: mapstr.M{"message": "hello world", "key": "world"},
 		},
@@ -444,15 +444,15 @@ func TestOverwriteKeys(t *testing.T) {
 func TestProcessorConvert(t *testing.T) {
 	tests := []struct {
 		name   string
-		c      map[string]interface{}
+		c      map[string]any
 		fields mapstr.M
-		values map[string]interface{}
+		values map[string]any
 	}{
 		{
 			name:   "extract integer",
-			c:      map[string]interface{}{"tokenizer": "userid=%{user_id|integer}"},
+			c:      map[string]any{"tokenizer": "userid=%{user_id|integer}"},
 			fields: mapstr.M{"message": "userid=7736"},
-			values: map[string]interface{}{"dissect.user_id": int32(7736)},
+			values: map[string]any{"dissect.user_id": int32(7736)},
 		},
 	}
 

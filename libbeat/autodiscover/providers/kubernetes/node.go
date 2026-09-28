@@ -23,16 +23,16 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/elastic-agent-autodiscover/utils"
+	"github.com/elastic/beats/v7/pkg/autodiscover/utils"
 
 	"github.com/gofrs/uuid/v5"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
 	k8s "k8s.io/client-go/kubernetes"
 
-	"github.com/elastic/elastic-agent-autodiscover/bus"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes/metadata"
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -110,14 +110,14 @@ func NewNodeEventer(
 }
 
 // OnAdd ensures processing of node objects that are newly created
-func (n *node) OnAdd(obj interface{}) {
+func (n *node) OnAdd(obj any) {
 	n.logger.Debugf("Watcher Node add: %+v", obj)
-	n.emit(obj.(*kubernetes.Node), "start")
+	n.emit(obj.(*kubernetes.Node), "start") //nolint:errcheck // informer object type is validated
 }
 
 // OnUpdate ensures processing of node objects that are updated
-func (n *node) OnUpdate(obj interface{}) {
-	node := obj.(*kubernetes.Node)
+func (n *node) OnUpdate(obj any) {
+	node := obj.(*kubernetes.Node) //nolint:errcheck // informer object type is validated
 	if node.GetObjectMeta().GetDeletionTimestamp() != nil {
 		n.logger.Debugf("Watcher Node update (terminating): %+v", obj)
 		// Node is terminating, don't reload its configuration and ignore the event as long as node is Ready.
@@ -133,9 +133,9 @@ func (n *node) OnUpdate(obj interface{}) {
 }
 
 // OnDelete ensures processing of node objects that are deleted
-func (n *node) OnDelete(obj interface{}) {
+func (n *node) OnDelete(obj any) {
 	n.logger.Debugf("Watcher Node delete: %+v", obj)
-	time.AfterFunc(n.config.CleanupTimeout, func() { n.emit(obj.(*kubernetes.Node), "stop") })
+	time.AfterFunc(n.config.CleanupTimeout, func() { n.emit(obj.(*kubernetes.Node), "stop") }) //nolint:errcheck // informer object type is validated
 }
 
 // GenerateHints creates hints needed for hints builder
@@ -147,11 +147,13 @@ func (n *node) GenerateHints(event bus.Event) bus.Event {
 	var kubeMeta mapstr.M
 	rawMeta, ok := event["kubernetes"]
 	if ok {
-		kubeMeta = rawMeta.(mapstr.M)
-		// The builder base config can configure any of the field values of kubernetes if need be.
-		e["kubernetes"] = kubeMeta
-		if rawAnn, ok := kubeMeta["annotations"]; ok {
-			annotations = rawAnn.(mapstr.M)
+		kubeMeta, ok = rawMeta.(mapstr.M)
+		if ok {
+			// The builder base config can configure any of the field values of kubernetes if need be.
+			e["kubernetes"] = kubeMeta
+			if rawAnn, ok := kubeMeta["annotations"]; ok {
+				annotations = rawAnn.(mapstr.M) //nolint:errcheck // type validated by map lookup
+			}
 		}
 	}
 	if host, ok := event["host"]; ok {
@@ -222,7 +224,7 @@ func (n *node) emit(node *kubernetes.Node, flag string) {
 	n.publish([]bus.Event{event})
 }
 
-func isUpdated(o, n interface{}) bool {
+func isUpdated(o, n any) bool {
 	old, _ := o.(*kubernetes.Node)
 	new, _ := n.(*kubernetes.Node)
 

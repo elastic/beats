@@ -20,6 +20,7 @@ package filestream
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
@@ -91,7 +92,7 @@ func (p *fileProspector) Init(
 	// If this fileProspector belongs to an input that did not have an ID
 	// this will find its files in the registry and update them to use the
 	// new ID.
-	globalCleaner.UpdateIdentifiers(func(v loginp.Value) (id string, val interface{}) {
+	globalCleaner.UpdateIdentifiers(func(v loginp.Value) (id string, val any) {
 		var fm fileMeta
 		err := v.UnpackCursorMeta(&fm)
 		if err != nil {
@@ -100,6 +101,24 @@ func (p *fileProspector) Init(
 
 		fd, ok := files[fm.Source]
 		if !ok {
+			return "", fm
+		}
+
+		registryKey := v.Key()
+		split := strings.Split(registryKey, identitySep)
+		// Wrong key format
+		if len(split) != 4 {
+			return "", fm
+		}
+
+		registryFileIdentity := split[2] + identitySep + split[3]
+		fileIdentity := p.identifier.GetSource(loginp.FSEvent{
+			NewPath:    fm.Source,
+			Descriptor: fd,
+		}).Name()
+
+		// Same paths, different file, do not migrate ID
+		if registryFileIdentity != fileIdentity {
 			return "", fm
 		}
 
@@ -132,7 +151,7 @@ func (p *fileProspector) Init(
 		p.logger.Debugf("file identity is '%s', will not migrate registry", identifierName)
 		return nil
 	}
-	cleaner.UpdateIdentifiers(func(v loginp.Value) (string, interface{}) {
+	cleaner.UpdateIdentifiers(func(v loginp.Value) (string, any) {
 		var fm fileMeta
 		err := v.UnpackCursorMeta(&fm)
 		if err != nil {
@@ -235,7 +254,7 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 			}
 
 			src := p.identifier.GetSource(fe)
-			p.onFSEvent(loggerWithEvent(p.logger, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
+			p.onFSEvent(loggerWithEvent(p.logger, fe), ctx, fe, src, s, hg, ignoreInactiveSince)
 		}
 		return nil
 	})
@@ -257,7 +276,6 @@ func (p *fileProspector) onFSEvent(
 	group loginp.HarvesterGroup,
 	ignoreSince time.Time,
 ) {
-	log = log.With("source_file", event.SrcID)
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite:
 		if event.Op == loginp.OpCreate {

@@ -77,7 +77,6 @@ func TestSourceIdentifier_ID(t *testing.T) {
 	}
 
 	for name, test := range testCases {
-		test := test
 
 		t.Run(name, func(t *testing.T) {
 			srcIdentifier, err := NewSourceIdentifier(testPluginName, test.userID)

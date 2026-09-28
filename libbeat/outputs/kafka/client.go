@@ -52,7 +52,8 @@ type client struct {
 	mux      sync.Mutex
 	done     chan struct{}
 
-	producer sarama.AsyncProducer
+	producerMux sync.RWMutex
+	producer    sarama.AsyncProducer
 
 	recordHeaders []sarama.RecordHeader
 
@@ -161,8 +162,15 @@ func (c *client) Close() error {
 		return nil
 	}
 
+	// Releases any Publish goroutine blocked on a channel send.
 	close(c.done)
+
+	// Take the write lock so AsyncClose, which closes the input channel, waits
+	// for in-flight sends to finish instead of racing with them; see send.
+	c.producerMux.Lock()
 	c.producer.AsyncClose()
+	c.producerMux.Unlock()
+
 	c.wg.Wait()
 	c.producer = nil
 	return nil
@@ -193,16 +201,35 @@ func (c *client) Publish(_ context.Context, batch publisher.Batch) error {
 
 		msg.ref = ref
 		msg.initProducerMessage()
-		select {
-		case <-c.done:
+		if !c.send(ch, &msg.msg) {
 			c.log.Errorf("output closing, dropping event")
 			ref.done()
 			c.observer.PermanentErrors(1)
-		case ch <- &msg.msg:
 		}
 	}
 
 	return nil
+}
+
+// send delivers msg to the producer's input channel, returning false if the
+// client is closing and the message was dropped instead.
+func (c *client) send(ch chan<- *sarama.ProducerMessage, msg *sarama.ProducerMessage) bool {
+	c.producerMux.RLock()
+	defer c.producerMux.RUnlock()
+
+	// Check if `ch` is still open (closed by producer.AsyncClose).
+	select {
+	case <-c.done:
+		return false
+	default:
+	}
+
+	select {
+	case <-c.done:
+		return false
+	case ch <- msg:
+		return true
+	}
 }
 
 func (c *client) String() string {

@@ -22,7 +22,7 @@ package cpu
 import (
 	"fmt"
 
-	"github.com/docker/docker/client"
+	dockerclient "github.com/moby/moby/client"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
@@ -38,7 +38,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	cpuService   *CPUService
-	dockerClient *client.Client
+	dockerClient *dockerclient.Client
 	dedot        bool
 	podman       bool
 }

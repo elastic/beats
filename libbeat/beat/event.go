@@ -53,8 +53,8 @@ type Event struct {
 	Timestamp  time.Time
 	Meta       mapstr.M
 	Fields     mapstr.M
-	Private    interface{} // for beats private use
-	TimeSeries bool        // true if the event contains timeseries data
+	Private    any  // for beats private use
+	TimeSeries bool // true if the event contains timeseries data
 }
 
 var (
@@ -77,7 +77,7 @@ func (e *Event) SetID(id string) {
 // Use `@timestamp` key for getting the event timestamp.
 // Use `@metadata.*` keys for getting the event metadata fields.
 // If `@metadata` key is used then `ErrMetadataAccess` is returned.
-func (e *Event) GetValue(key string) (interface{}, error) {
+func (e *Event) GetValue(key string) (any, error) {
 	if key == TimestampFieldKey {
 		return e.Timestamp, nil
 	}
@@ -164,7 +164,7 @@ func (e *Event) deepUpdate(d mapstr.M, mode updateMode) {
 		switch meta := metaValue.(type) {
 		case mapstr.M:
 			metaUpdate = meta
-		case map[string]interface{}:
+		case map[string]any:
 			metaUpdate = mapstr.M(meta)
 		}
 
@@ -205,7 +205,7 @@ func (e *Event) deepUpdate(d mapstr.M, mode updateMode) {
 	}
 }
 
-func (e *Event) setTimestamp(v interface{}) (interface{}, error) {
+func (e *Event) setTimestamp(v any) (any, error) {
 	// to satisfy the PutValue interface, this function
 	// must return the overwritten value
 	prevValue := e.Timestamp
@@ -233,7 +233,7 @@ func (e *Event) setTimestamp(v interface{}) (interface{}, error) {
 // Use `@timestamp` key for setting the event timestamp.
 // Use `@metadata.*` keys for setting the event metadata fields.
 // If `@metadata` key is used then `ErrAlterMetadataKey` is returned.
-func (e *Event) PutValue(key string, v interface{}) (interface{}, error) {
+func (e *Event) PutValue(key string, v any) (any, error) {
 	if key == TimestampFieldKey {
 		return e.setTimestamp(v)
 	}

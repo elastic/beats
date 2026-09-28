@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func nop(key string, data map[string]interface{}) (interface{}, error) {
+func nop(key string, data map[string]any) (any, error) {
 	return data[key], nil
 }
 
@@ -40,7 +40,7 @@ func TestSchema(t *testing.T) {
 		},
 	}
 
-	source := map[string]interface{}{
+	source := map[string]any{
 		"test":      "hello",
 		"testA":     "helloA",
 		"testB":     "helloB",
@@ -88,15 +88,15 @@ func TestOptions(t *testing.T) {
 
 func TestSchemaCases(t *testing.T) {
 
-	var errFunc = func(key string, data map[string]interface{}) (interface{}, error) {
+	var errFunc = func(key string, data map[string]any) (any, error) {
 		return nil, errors.New("test error")
 	}
-	var noopFunc = func(key string, data map[string]interface{}) (interface{}, error) { return data[key], nil }
+	var noopFunc = func(key string, data map[string]any) (any, error) { return data[key], nil }
 
 	var testCases = []struct {
 		name   string
 		schema Schema
-		source map[string]interface{}
+		source map[string]any
 
 		expectedErrorMessage string
 		expectedOutput       mapstr.M
@@ -110,7 +110,7 @@ func TestSchemaCases(t *testing.T) {
 					IgnoreAllErrors: true,
 				},
 			},
-			source: map[string]interface{}{
+			source: map[string]any{
 				"inField": "10",
 			},
 
@@ -127,7 +127,7 @@ func TestSchemaCases(t *testing.T) {
 					Optional: true,
 				},
 			},
-			source: map[string]interface{}{
+			source: map[string]any{
 				"doesntMatter": "",
 			},
 
@@ -144,7 +144,7 @@ func TestSchemaCases(t *testing.T) {
 					IgnoreAllErrors: true,
 				},
 			},
-			source: map[string]interface{}{
+			source: map[string]any{
 				"doesntMatter": "",
 			},
 

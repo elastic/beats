@@ -23,6 +23,7 @@ import (
 
 	"github.com/dustin/go-humanize"
 
+	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
@@ -33,9 +34,11 @@ import (
 type config struct {
 	Reader readerConfig `config:",inline"`
 
-	ID           string            `config:"id"`
-	Paths        []string          `config:"paths"`
-	Close        closerConfig      `config:"close"`
+	ID           string                    `config:"id"`
+	Paths        []string                  `config:"paths"`
+	Close        closerConfig              `config:"close"`
+	ReadUntilEOF loginp.ReadUntilEOFConfig `config:"read_until_eof"`
+
 	FileWatcher  fileWatcherConfig `config:"prospector.scanner"`
 	FileIdentity *conf.Namespace   `config:"file_identity"`
 
@@ -105,6 +108,7 @@ func defaultConfig() config {
 		HarvesterLimit: 0,
 		IgnoreOlder:    0,
 		FileWatcher:    defaultFileWatcherConfig(), // Config key: prospector.scanner
+		ReadUntilEOF:   loginp.DefaultReadUntilEOFConfig(),
 	}
 }
 

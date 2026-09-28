@@ -29,7 +29,7 @@ import (
 
 // Map  represents the keys and their values extracted with the defined tokenizer.
 type Map = map[string]string
-type MapConverted = map[string]interface{}
+type MapConverted = map[string]any
 
 // positions represents the start and end position of the keys found in the string.
 type positions []position
@@ -246,7 +246,7 @@ func strToInt(s string, bitSize int) (int64, error) {
 	return strconv.ParseInt(s, base, bitSize)
 }
 
-func transformType(typ dataType, value string) (interface{}, error) {
+func transformType(typ dataType, value string) (any, error) {
 	value = strings.TrimRight(value, " ")
 	switch typ {
 	case String:
@@ -274,7 +274,7 @@ func transformType(typ dataType, value string) (interface{}, error) {
 	}
 }
 
-func convertData(typ string, b string) interface{} {
+func convertData(typ string, b string) any {
 	if dt, ok := dataTypeNames[typ]; ok {
 		value, err := transformType(dt, b)
 		if err == nil {

@@ -271,7 +271,6 @@ func TestProcessorsConfigs(t *testing.T) {
 	}
 
 	for name, test := range cases {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -367,7 +366,6 @@ func TestNormalization(t *testing.T) {
 	}
 
 	for name, test := range cases {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 

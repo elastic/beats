@@ -55,6 +55,10 @@ processors:
   - rename:
       field: message
       target_field: event.original
+      if: 'ctx.event?.original == null'
+  - remove:
+      field: message
+      ignore_missing: true
   - rename:
       field: azure.signinlogs.resource_id
       target_field: azure.resource_id

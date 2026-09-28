@@ -144,7 +144,7 @@ func (d *ConsoleDriver) error(field string, err error) {
 	d.reported = true
 }
 
-func (d *ConsoleDriver) printf(format string, args ...interface{}) {
+func (d *ConsoleDriver) printf(format string, args ...any) {
 	for i := 0; i < d.level; i++ {
 		fmt.Fprint(d.Stdout, "  ")
 	}
@@ -152,9 +152,10 @@ func (d *ConsoleDriver) printf(format string, args ...interface{}) {
 }
 
 func (d *ConsoleDriver) indent(data string) string {
-	res := "\n"
-	for _, line := range strings.Split(data, "\n") {
-		res += strings.Repeat(" ", d.level+2) + line + "\n"
+	var res strings.Builder
+	res.WriteString("\n")
+	for line := range strings.SplitSeq(data, "\n") {
+		res.WriteString(strings.Repeat(" ", d.level+2) + line + "\n")
 	}
-	return res
+	return res.String()
 }

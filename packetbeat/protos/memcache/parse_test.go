@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -74,7 +75,7 @@ var defaultTestParserConfig = parserConfig{
 func newTestParser(tst *testing.T, state parserState) *testParser {
 	t := &testParser{
 		testing: tst,
-		parser:  newParser(&defaultTestParserConfig),
+		parser:  newParser(&defaultTestParserConfig, logptest.NewTestingLogger(tst, "")),
 		buf:     streambuf.New(nil),
 	}
 	return t

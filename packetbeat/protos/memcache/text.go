@@ -120,6 +120,7 @@ var (
 
 var argNoReply = argDef{
 	parse: func(parser *parser, hdr, buf *streambuf.Buffer) error {
+		parser.debugf("parse noreply")
 		b, err := parseNoReplyArg(buf)
 		parser.message.noreply = b
 		return err
@@ -383,10 +384,10 @@ func makeSubMessageParser(commands []textCommandType) parserStateFn {
 			return parser.failing(err)
 		}
 
-		debug("handle subcommand: %s", sub)
+		parser.debugf("handle subcommand: %s", sub)
 		cmd := findTextCommandType(commands, sub)
 		if cmd == nil {
-			debug("unknown sub-command: %s", sub)
+			parser.debugf("unknown sub-command: %s", sub)
 			if parser.config.parseUnknown {
 				cmd = &unknownCommand
 			} else {
@@ -450,7 +451,7 @@ func doParseTextCommand(parser *parser, buf *streambuf.Buffer) parseResult {
 		return parser.failing(err)
 	}
 
-	debug("parse command: '%s' '%s'", command, args)
+	parser.debugf("parse command: '%s' '%s'", command, args)
 
 	msg.IsRequest = 'a' <= command[0] && command[0] <= 'z'
 	var cmd *textCommandType
@@ -466,7 +467,7 @@ func doParseTextCommand(parser *parser, buf *streambuf.Buffer) parseResult {
 		}
 	}
 	if cmd == nil {
-		debug("unknown command: %s", msg.command)
+		parser.debugf("unknown command: %v", msg.command)
 		if parser.config.parseUnknown {
 			cmd = &unknownCommand
 		} else {
@@ -495,16 +496,16 @@ func parseCounterResponse(parser *parser, buf *streambuf.Buffer) parseResult {
 	msg.value, _ = tmp.UintASCII(false)
 	if tmp.Failed() {
 		err := tmp.Err()
-		debug("counter response invalid: %v", err)
+		parser.debugf("counter response invalid: %v", err)
 		return parser.failing(err)
 	}
-	debug("parsed counter response: %v", msg.value)
+	parser.debugf("parsed counter response: %v", msg.value)
 	return parser.yieldNoData(buf)
 }
 
 func parseData(parser *parser, buf *streambuf.Buffer) parseResult {
 	msg := parser.message
-	debug("parse message data (%v)", msg.bytes)
+	parser.debugf("parse message data (%v)", msg.bytes)
 	data, err := buf.CollectWithSuffix(
 		int(msg.bytes-msg.bytesLost),
 		[]byte("\r\n"),
@@ -516,7 +517,7 @@ func parseData(parser *parser, buf *streambuf.Buffer) parseResult {
 		return parser.failing(err)
 	}
 
-	debug("found message data")
+	parser.debugf("found message data")
 	if msg.bytesLost > 0 {
 		msg.countValues++
 	} else {
@@ -543,7 +544,7 @@ func parseStatLine(parser *parser, hdr, buf *streambuf.Buffer) error {
 func parseTextArgs(parser *parser, args []argDef) (err error) {
 	buf := streambuf.NewFixed(parser.message.rawArgs)
 	for _, arg := range args {
-		debug("args rest: %s", buf.Bytes())
+		parser.debugf("args rest: %s", buf.Bytes())
 		err = arg.parse(parser, nil, buf)
 		if err != nil {
 			break
@@ -582,8 +583,6 @@ func parseKeyArg(buf *streambuf.Buffer) ([]memcacheString, error) {
 }
 
 func parseNoReplyArg(buf *streambuf.Buffer) (bool, error) {
-	debug("parse noreply")
-
 	err := parseNextArg(buf)
 	if err != nil {
 		return false, textArgError(err)

@@ -31,6 +31,7 @@ import (
 //nolint:errorlint // These are never wrapped.
 func IsRecoverable(err error, isFile bool) bool {
 	return err == win.ERROR_INVALID_HANDLE ||
+		err == win.RPC_S_UNKNOWN_IF ||
 		err == win.RPC_S_SERVER_UNAVAILABLE ||
 		err == win.RPC_S_CALL_CANCELLED ||
 		err == win.ERROR_EVT_QUERY_RESULT_STALE ||

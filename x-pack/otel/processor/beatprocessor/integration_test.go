@@ -242,7 +242,7 @@ func writeEventsToLogFile(t *testing.T, filename string, numEvents int) {
 		t.Fatalf("could not create file '%s': %s", filename, err)
 	}
 	// write events to log file
-	for i := 0; i < numEvents; i++ {
+	for i := range numEvents {
 		msg := fmt.Sprintf("Line %d", i)
 		_, err = logFile.Write([]byte(msg + "\n"))
 		require.NoErrorf(t, err, "failed to write line %d to temp file", i)

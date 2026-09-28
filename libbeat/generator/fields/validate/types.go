@@ -22,7 +22,7 @@ import (
 	"time"
 )
 
-var typeValidator = map[string]func(interface{}) bool{
+var typeValidator = map[string]func(any) bool{
 	"long":    longValidator,
 	"integer": integerValidator,
 	"short":   shortValidator,
@@ -54,7 +54,7 @@ var ErrNotSupported = errors.New("type not supported")
 
 // TODO: numeric validators. The default JSON parser seems to parse all
 // numbers into a float64.
-func longValidator(value interface{}) bool {
+func longValidator(value any) bool {
 	switch value.(type) {
 	case int, int64, float64:
 		return true
@@ -62,33 +62,33 @@ func longValidator(value interface{}) bool {
 	return false
 }
 
-func integerValidator(value interface{}) bool {
+func integerValidator(value any) bool {
 	if val, ok := value.(int); ok {
 		return val >= -0x80000000 && val <= 0x7fffffff
 	}
 	return false
 }
 
-func shortValidator(value interface{}) bool {
+func shortValidator(value any) bool {
 	if val, ok := value.(int); ok {
 		return val >= -0x8000 && val <= 0x7fff
 	}
 	return false
 }
 
-func byteValidator(value interface{}) bool {
+func byteValidator(value any) bool {
 	if val, ok := value.(int); ok {
 		return val >= -128 && val <= 127
 	}
 	return false
 }
 
-func doubleValidator(value interface{}) bool {
+func doubleValidator(value any) bool {
 	_, ok := value.(float64)
 	return ok
 }
 
-func floatValidator(value interface{}) bool {
+func floatValidator(value any) bool {
 	if val, ok := value.(float64); ok {
 		// Unsure of this because of rounding when serialized to JSON
 		return float64(float32(val)) == val
@@ -96,17 +96,17 @@ func floatValidator(value interface{}) bool {
 	return false
 }
 
-func keywordValidator(value interface{}) bool {
+func keywordValidator(value any) bool {
 	// Everything is a keyword
 	return true
 }
 
-func textValidator(value interface{}) bool {
+func textValidator(value any) bool {
 	_, ok := value.(string)
 	return ok
 }
 
-func dateValidator(value interface{}) bool {
+func dateValidator(value any) bool {
 	s, ok := value.(string)
 	if !ok {
 		return false
@@ -119,26 +119,26 @@ func dateValidator(value interface{}) bool {
 	return false
 }
 
-func booleanValidator(value interface{}) bool {
+func booleanValidator(value any) bool {
 	_, ok := value.(bool)
 	return ok
 }
 
-func typeCheck(value interface{}, expected string) (dicts []map[string]interface{}, err error) {
+func typeCheck(value any, expected string) (dicts []map[string]any, err error) {
 	switch v := value.(type) {
-	case map[string]interface{}:
+	case map[string]any:
 		if expected != "group" {
 			return nil, ErrCannotConvert
 		}
 		return append(dicts, v), nil
 
-	case []map[string]interface{}:
+	case []map[string]any:
 		if expected != "group" {
 			return nil, ErrCannotConvert
 		}
 		return v, nil
 
-	case []interface{}:
+	case []any:
 		for _, item := range v {
 			if _, err := typeCheck(item, expected); err != nil {
 				return nil, err

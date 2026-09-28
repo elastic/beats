@@ -66,7 +66,7 @@ func (n *OtelManager) Start() error                              { return nil }
 func (n *OtelManager) CheckRawConfig(cfg *config.C) error        { return nil }
 func (n *OtelManager) RegisterAction(action management.Action)   {}
 func (n *OtelManager) UnregisterAction(action management.Action) {}
-func (n *OtelManager) SetPayload(map[string]interface{})         {}
+func (n *OtelManager) SetPayload(map[string]any)                 {}
 func (n *OtelManager) RegisterDiagnosticHook(_ string, description string, filename string, contentType string, hook management.DiagnosticHook) {
 	if n.ext != nil {
 		n.ext.RegisterDiagnosticHook(n.receiverName, description, filename, contentType, hook)

@@ -21,7 +21,7 @@ type indexerPlugin struct {
 	constructor IndexerConstructor
 }
 
-func IndexerPlugin(name string, c IndexerConstructor) map[string][]interface{} {
+func IndexerPlugin(name string, c IndexerConstructor) map[string][]any {
 	return p.MakePlugin(indexerKey, indexerPlugin{name, c})
 }
 
@@ -30,12 +30,12 @@ type matcherPlugin struct {
 	constructor MatcherConstructor
 }
 
-func MatcherPlugin(name string, m MatcherConstructor) map[string][]interface{} {
+func MatcherPlugin(name string, m MatcherConstructor) map[string][]any {
 	return p.MakePlugin(matcherKey, matcherPlugin{name, m})
 }
 
 func init() {
-	p.MustRegisterLoader(indexerKey, func(ifc interface{}) error {
+	p.MustRegisterLoader(indexerKey, func(ifc any) error {
 		i, ok := ifc.(indexerPlugin)
 		if !ok {
 			return errors.New("plugin does not match indexer plugin type")
@@ -50,7 +50,7 @@ func init() {
 		return nil
 	})
 
-	p.MustRegisterLoader(matcherKey, func(ifc interface{}) error {
+	p.MustRegisterLoader(matcherKey, func(ifc any) error {
 		m, ok := ifc.(matcherPlugin)
 		if !ok {
 			return errors.New("plugin does not match matcher plugin type")

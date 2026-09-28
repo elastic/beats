@@ -34,14 +34,14 @@ type Featurable interface {
 
 	// Factory returns the function used to create an instance of the Feature, the signature
 	// of the method is type checked by the 'FindFactory' of each namespace.
-	Factory() interface{}
+	Factory() any
 }
 
 // Feature contains the information for a specific feature
 type Feature struct {
 	namespace string
 	name      string
-	factory   interface{}
+	factory   any
 }
 
 // Namespace return the namespace of the feature.
@@ -55,12 +55,12 @@ func (f *Feature) Name() string {
 }
 
 // Factory returns the factory for the feature.
-func (f *Feature) Factory() interface{} {
+func (f *Feature) Factory() any {
 	return f.factory
 }
 
 // New returns a new Feature.
-func New(namespace, name string, factory interface{}) *Feature {
+func New(namespace, name string, factory any) *Feature {
 	return &Feature{
 		namespace: namespace,
 		name:      name,

@@ -85,7 +85,7 @@ func TestConvertNestedMapStr(t *testing.T) {
 			},
 			Output: mapstr.M{
 				"key": mapstr.M{
-					"key1": []interface{}{"value1", "value2"},
+					"key1": []any{"value1", "value2"},
 				},
 			},
 		},
@@ -113,18 +113,18 @@ func TestConvertNestedMapStr(t *testing.T) {
 			},
 			Output: mapstr.M{
 				"key": []mapstr.M{
-					{"keyX": []interface{}{"value1", "value2"}},
+					{"keyX": []any{"value1", "value2"}},
 				},
 			},
 		},
 		{
 			Input: mapstr.M{
-				"key": []interface{}{
+				"key": []any{
 					mapstr.M{"key1": []string{"value1", "value2"}},
 				},
 			},
 			Output: mapstr.M{
-				"key": []interface{}{
+				"key": []any{
 					mapstr.M{"key1": []string{"value1", "value2"}},
 				},
 			},
@@ -175,7 +175,7 @@ func TestConvertNestedStruct(t *testing.T) {
 		},
 		{
 			Input: mapstr.M{
-				"key": []interface{}{
+				"key": []any{
 					TestStruct{
 						A: "hello",
 						B: 5,
@@ -183,7 +183,7 @@ func TestConvertNestedStruct(t *testing.T) {
 				},
 			},
 			Output: mapstr.M{
-				"key": []interface{}{
+				"key": []any{
 					mapstr.M{
 						"A": "hello",
 						"B": float64(5),
@@ -208,7 +208,7 @@ func TestConvertWithNullEmission(t *testing.T) {
 	}
 
 	type TestStruct struct {
-		A interface{}
+		A any
 	}
 
 	tests := []io{
@@ -246,12 +246,11 @@ func TestConvertWithNullEmission(t *testing.T) {
 func TestNormalizeValue(t *testing.T) {
 	logp.TestingSetup()
 
-	type testCase struct{ in, out interface{} }
+	type testCase struct{ in, out any }
 
-	runTests := func(check func(t *testing.T, a, b interface{}), tests map[string]testCase) {
+	runTests := func(check func(t *testing.T, a, b any), tests map[string]testCase) {
 		g := NewGenericEventConverter(false, logptest.NewTestingLogger(t, ""))
 		for name, test := range tests {
-			test := test
 			t.Run(name, func(t *testing.T) {
 				out, err := g.normalizeValue(test.in)
 				if err != nil {
@@ -263,11 +262,11 @@ func TestNormalizeValue(t *testing.T) {
 		}
 	}
 
-	checkEq := func(t *testing.T, a, b interface{}) {
+	checkEq := func(t *testing.T, a, b any) {
 		assert.Equal(t, a, b)
 	}
 
-	checkDelta := func(t *testing.T, a, b interface{}) {
+	checkDelta := func(t *testing.T, a, b any) {
 		assert.InDelta(t, a, b, 0.000001)
 	}
 
@@ -296,13 +295,13 @@ func TestNormalizeValue(t *testing.T) {
 		"uint8 value":                       {uint8(8), uint8(8)},
 		"uint64 masked":                     {uint64(1<<63 + 10), uint64(10)},
 		"string value":                      {"hello", "hello"},
-		"map to mapstr.M":                   {map[string]interface{}{"foo": "bar"}, mapstr.M{"foo": "bar"}},
+		"map to mapstr.M":                   {map[string]any{"foo": "bar"}, mapstr.M{"foo": "bar"}},
 
 		// Other map types are converted using marshalUnmarshal which will lose
 		// type information for arrays which become []interface{} and numbers
 		// which all become float64.
 		"map[string]string to mapstr.M":   {map[string]string{"foo": "bar"}, mapstr.M{"foo": "bar"}},
-		"map[string][]string to mapstr.M": {map[string][]string{"list": {"foo", "bar"}}, mapstr.M{"list": []interface{}{"foo", "bar"}}},
+		"map[string][]string to mapstr.M": {map[string][]string{"list": {"foo", "bar"}}, mapstr.M{"list": []any{"foo", "bar"}}},
 
 		"array of strings":         {[]string{"foo", "bar"}, []string{"foo", "bar"}},
 		"array of bools":           {[]bool{true, false}, []bool{true, false}},
@@ -310,7 +309,7 @@ func TestNormalizeValue(t *testing.T) {
 		"array of uint64 ok":       {[]uint64{1, 2, 3}, []uint64{1, 2, 3}},
 		"array of uint64 masked":   {[]uint64{1<<63 + 1, 1<<63 + 2, 1<<63 + 3}, []uint64{1, 2, 3}},
 		"array of mapstr.M":        {[]mapstr.M{{"foo": "bar"}}, []mapstr.M{{"foo": "bar"}}},
-		"array of map to mapstr.M": {[]map[string]interface{}{{"foo": "bar"}}, []mapstr.M{{"foo": "bar"}}},
+		"array of map to mapstr.M": {[]map[string]any{{"foo": "bar"}}, []mapstr.M{{"foo": "bar"}}},
 
 		// Wrapper types are converted to primitives using reflection.
 		"custom bool type":          {mybool(true), true},
@@ -320,11 +319,11 @@ func TestNormalizeValue(t *testing.T) {
 		"custom uint64 type masked": {myuint64(1<<63 + 42), uint64(42)},
 
 		// Slices of wrapper types are converted to an []interface{} of primitives.
-		"array of custom bool type":     {[]mybool{true, false}, []interface{}{true, false}},
-		"array of custom int type":      {[]myint{32}, []interface{}{int64(32)}},
-		"array of custom uint type":     {[]myuint{8}, []interface{}{uint64(8)}},
-		"array of custom uint64 ok":     {[]myuint64{64}, []interface{}{uint64(64)}},
-		"array of custom uint64 masked": {[]myuint64{1<<63 + 64}, []interface{}{uint64(64)}},
+		"array of custom bool type":     {[]mybool{true, false}, []any{true, false}},
+		"array of custom int type":      {[]myint{32}, []any{int64(32)}},
+		"array of custom uint type":     {[]myuint{8}, []any{uint64(8)}},
+		"array of custom uint64 ok":     {[]myuint64{64}, []any{uint64(64)}},
+		"array of custom uint64 masked": {[]myuint64{1<<63 + 64}, []any{uint64(64)}},
 	})
 
 	runTests(checkDelta, map[string]testCase{
@@ -362,7 +361,7 @@ func TestMarshalUnmarshalMap(t *testing.T) {
 		in  mapstr.M
 		out mapstr.M
 	}{
-		{mapstr.M{"names": []string{"a", "b"}}, mapstr.M{"names": []interface{}{"a", "b"}}},
+		{mapstr.M{"names": []string{"a", "b"}}, mapstr.M{"names": []any{"a", "b"}}},
 	}
 
 	for i, test := range tests {
@@ -379,14 +378,14 @@ func TestMarshalUnmarshalMap(t *testing.T) {
 
 func TestMarshalUnmarshalArray(t *testing.T) {
 	tests := []struct {
-		in  interface{}
-		out interface{}
+		in  any
+		out any
 	}{
-		{[]string{"a", "b"}, []interface{}{"a", "b"}},
+		{[]string{"a", "b"}, []any{"a", "b"}},
 	}
 
 	for i, test := range tests {
-		var out interface{}
+		var out any
 		err := marshalUnmarshal(test.in, &out)
 		if err != nil {
 			t.Error(err)
@@ -439,7 +438,7 @@ func BenchmarkConvertToGenericEventMapStringString(b *testing.B) {
 func BenchmarkConvertToGenericEventMapStr(b *testing.B) {
 	g := NewGenericEventConverter(false, logptest.NewTestingLogger(b, ""))
 	for i := 0; i < b.N; i++ {
-		g.Convert(mapstr.M{"key": map[string]interface{}{"greeting": "hola"}})
+		g.Convert(mapstr.M{"key": map[string]any{"greeting": "hola"}})
 	}
 }
 
@@ -472,7 +471,7 @@ func TestDeDotJSON(t *testing.T) {
 	var tests = []struct {
 		input  []byte
 		output []byte
-		valuer func() interface{}
+		valuer func() any
 	}{
 		{
 			input: []byte(`[
@@ -487,7 +486,7 @@ func TestDeDotJSON(t *testing.T) {
 				{"key_with_multiple_dots_3": {"key_with_dot_2":"value2_1"}}
 			]
 			`),
-			valuer: func() interface{} { return []interface{}{} },
+			valuer: func() any { return []any{} },
 		},
 		{
 			input: []byte(`{
@@ -512,7 +511,7 @@ func TestDeDotJSON(t *testing.T) {
 				}
 			}
 			`),
-			valuer: func() interface{} { return map[string]interface{}{} },
+			valuer: func() any { return map[string]any{} },
 		},
 	}
 	for _, test := range tests {
@@ -520,8 +519,8 @@ func TestDeDotJSON(t *testing.T) {
 		assert.NoError(t, json.Unmarshal(test.input, &input))
 		assert.NoError(t, json.Unmarshal(test.output, &output))
 		assert.Equal(t, output, DeDotJSON(input))
-		if _, ok := test.valuer().(map[string]interface{}); ok {
-			assert.Equal(t, mapstr.M(output.(map[string]interface{})), DeDotJSON(mapstr.M(input.(map[string]interface{}))))
+		if _, ok := test.valuer().(map[string]any); ok {
+			assert.Equal(t, mapstr.M(output.(map[string]any)), DeDotJSON(mapstr.M(input.(map[string]any))))
 		}
 	}
 }

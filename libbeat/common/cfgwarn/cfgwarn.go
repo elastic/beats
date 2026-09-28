@@ -22,14 +22,14 @@ import (
 )
 
 // Beta returns a string suitable to log beta feature.
-func Beta(format string, v ...interface{}) string {
+func Beta(format string, v ...any) string {
 	return fmt.Sprintf("BETA: "+format, v...)
 }
 
 // Deprecate returns a deprecation message.
 // The version string contains the version when the future will be removed.
 // If version is empty, the message  will not mention the removal of the feature.
-func Deprecate(version string, format string, v ...interface{}) string {
+func Deprecate(version string, format string, v ...any) string {
 	var postfix string
 	if version != "" {
 		postfix = fmt.Sprintf(" Will be removed in version: %s", version)
@@ -38,6 +38,6 @@ func Deprecate(version string, format string, v ...interface{}) string {
 }
 
 // Experimental returns a "usage of an experimental feature" message.
-func Experimental(format string, v ...interface{}) string {
+func Experimental(format string, v ...any) string {
 	return fmt.Sprintf("EXPERIMENTAL: "+format, v...)
 }

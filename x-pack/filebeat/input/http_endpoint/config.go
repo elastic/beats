@@ -12,11 +12,8 @@ import (
 	"net/textproto"
 	"strings"
 
-	"gopkg.in/natefinch/lumberjack.v2"
-
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
-	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/lumberjack"
 )
 
 // Available providers for CRC validation (use lowercase)
@@ -124,6 +121,15 @@ func (c *config) Validate() error {
 		return errors.New("crc.provider is required when crc.secret is defined")
 	}
 
+	// net/http panics for status codes outside this range, which would drop
+	// the client's connection with no response at all.
+	if c.ResponseCode < 100 || c.ResponseCode > 999 {
+		return fmt.Errorf("response_code must be a valid HTTP status code: %d", c.ResponseCode)
+	}
+	if len(c.OptionsHeaders) > 0 && (c.OptionsStatus < 100 || 999 < c.OptionsStatus) {
+		return fmt.Errorf("options_response_code must be a valid HTTP status code: %d", c.OptionsStatus)
+	}
+
 	if c.MaxBodySize != nil && *c.MaxBodySize < 0 {
 		return fmt.Errorf("max_body_bytes is negative: %d", *c.MaxBodySize)
 	}
@@ -145,13 +151,6 @@ func (c *config) Validate() error {
 		// is excessive for a debugging logger, so default to 1MB
 		// which is the minimum.
 		c.Tracer.MaxSize = 1
-	}
-	ok, err := httplog.IsPathInLogsFor(inputName, c.Tracer.Filename)
-	if err != nil {
-		return err
-	}
-	if !ok {
-		return fmt.Errorf("request tracer path must be within %q path", paths.Resolve(paths.Logs, inputName))
 	}
 
 	return nil

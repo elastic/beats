@@ -18,7 +18,6 @@
 package file
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -30,7 +29,7 @@ type globTest struct {
 }
 
 func TestGlob(t *testing.T) {
-	root, err := ioutil.TempDir("", "testglob")
+	root, err := os.MkdirTemp("", "testglob")
 	if err != nil {
 		t.Fatal(err)
 	}

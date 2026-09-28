@@ -30,7 +30,7 @@ import (
 
 func TestRangeCreateNumeric(t *testing.T) {
 	config := Config{
-		Range: &Fields{fields: map[string]interface{}{
+		Range: &Fields{fields: map[string]any{
 			"gtr": 0.3,
 		}},
 	}
@@ -40,7 +40,7 @@ func TestRangeCreateNumeric(t *testing.T) {
 
 func TestRangeCreateLexicographic(t *testing.T) {
 	config := Config{
-		Range: &Fields{fields: map[string]interface{}{
+		Range: &Fields{fields: map[string]any{
 			"gt": "fdfdd",
 		}},
 	}
@@ -50,7 +50,7 @@ func TestRangeCreateLexicographic(t *testing.T) {
 
 func TestRangeSingleFieldNegativeMatch(t *testing.T) {
 	testConfig(t, false, secdTestEvent, &Config{
-		Range: &Fields{fields: map[string]interface{}{
+		Range: &Fields{fields: map[string]any{
 			"proc.cpu.total_p.gt": 0.5,
 		}},
 	})
@@ -58,7 +58,7 @@ func TestRangeSingleFieldNegativeMatch(t *testing.T) {
 
 func TestClosedRangeConditionPositiveMatch(t *testing.T) {
 	testConfig(t, true, httpResponseTestEvent, &Config{
-		Range: &Fields{fields: map[string]interface{}{
+		Range: &Fields{fields: map[string]any{
 			"http.code.gte": 200,
 			"http.code.lt":  300,
 		}},
@@ -67,7 +67,7 @@ func TestClosedRangeConditionPositiveMatch(t *testing.T) {
 
 func TestOpenRangeConditionPositiveMatch(t *testing.T) {
 	testConfig(t, true, httpResponseTestEvent, &Config{
-		Range: &Fields{fields: map[string]interface{}{
+		Range: &Fields{fields: map[string]any{
 			"bytes_out.gte": 2800,
 		}},
 	})
@@ -75,7 +75,7 @@ func TestOpenRangeConditionPositiveMatch(t *testing.T) {
 
 func TestMultipleOpenRangeConditionNegativeMatch(t *testing.T) {
 	testConfig(t, false, httpResponseTestEvent, &Config{
-		Range: &Fields{fields: map[string]interface{}{
+		Range: &Fields{fields: map[string]any{
 			"bytes_out.gte":   2800,
 			"responsetime.gt": 30,
 		}},
@@ -83,7 +83,7 @@ func TestMultipleOpenRangeConditionNegativeMatch(t *testing.T) {
 }
 
 var procCPURangeConfig = &Config{
-	Range: &Fields{fields: map[string]interface{}{
+	Range: &Fields{fields: map[string]any{
 		"proc.cpu.total_p.gte":     0.5,
 		"proc.cpu.total_p_str.gte": 0.5,
 	}},

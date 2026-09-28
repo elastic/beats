@@ -53,7 +53,7 @@ func TestSimpleInputConfig(t *testing.T) {
 				Type: "mock",
 				Name: "mock",
 				Source: integration.RequireNewStruct(t,
-					map[string]interface{}{
+					map[string]any{
 						"Is":        "this",
 						"required?": "Yes!",
 					}),
@@ -70,7 +70,7 @@ func TestSimpleInputConfig(t *testing.T) {
 				Type: "filestream",
 				// All fields get repeated here, including ID.
 				Source: integration.RequireNewStruct(t,
-					map[string]interface{}{
+					map[string]any{
 						"paths": []any{
 							"/tmp/logfile.log",
 						},
@@ -92,7 +92,7 @@ func TestSimpleInputConfig(t *testing.T) {
 				Type: "filestream",
 				Name: "mock",
 				Source: integration.RequireNewStruct(t,
-					map[string]interface{}{
+					map[string]any{
 						"this":     "is",
 						"required": true,
 					}),

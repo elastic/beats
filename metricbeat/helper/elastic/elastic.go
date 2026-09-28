@@ -19,6 +19,7 @@ package elastic
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -161,7 +162,7 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, optionalXpa
 	metricsets := xpackEnabledMetricsets
 	if err == nil && cfgdMetricsets != nil {
 		// Type cast the metricsets to a slice of strings
-		cfgdMetricsetsSlice := cfgdMetricsets.([]interface{})
+		cfgdMetricsetsSlice := cfgdMetricsets.([]any)
 		cfgdMetricsetsStrings := make([]string, len(cfgdMetricsetsSlice))
 		for i := range cfgdMetricsetsSlice {
 			cfgdMetricsetsStrings[i] = cfgdMetricsetsSlice[i].(string)
@@ -169,13 +170,7 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, optionalXpa
 
 		// Add any optional metricsets which are not already configured
 		for _, cfgdMs := range cfgdMetricsetsStrings {
-			found := false
-			for _, ms := range optionalXpackMetricsets {
-				if ms == cfgdMs {
-					found = true
-					break
-				}
-			}
+			found := slices.Contains(optionalXpackMetricsets, cfgdMs)
 
 			if found {
 				metricsets = append(metricsets, cfgdMs)

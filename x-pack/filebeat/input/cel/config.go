@@ -13,13 +13,11 @@ import (
 	"regexp"
 	"time"
 
-	"gopkg.in/natefinch/lumberjack.v2"
 	"gopkg.in/yaml.v3"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/lumberjack"
 	"github.com/elastic/mito/lib"
 )
 
@@ -171,9 +169,10 @@ func defaultConfig() config {
 				WaitMin:     &waitMin,
 				WaitMax:     &waitMax,
 			},
-			RedirectForwardHeaders: false,
-			RedirectMaxRedirects:   10,
-			Transport:              transport,
+			RedirectForwardHeaders:   false,
+			RedirectSensitiveHeaders: []string{"Authorization", "Proxy-Authorization", "Cookie"},
+			RedirectMaxRedirects:     10,
+			Transport:                transport,
 		},
 	}
 }
@@ -265,15 +264,16 @@ func (c keepAlive) settings() httpcommon.WithKeepaliveSettings {
 }
 
 type ResourceConfig struct {
-	URL                    *urlConfig       `config:"url" validate:"required"`
-	Headers                http.Header      `config:"headers"`
-	Retry                  retryConfig      `config:"retry"`
-	RedirectForwardHeaders bool             `config:"redirect.forward_headers"`
-	RedirectHeadersBanList []string         `config:"redirect.headers_ban_list"`
-	RedirectMaxRedirects   int              `config:"redirect.max_redirects"`
-	MaxBodySize            int64            `config:"max_body_size"`
-	RateLimit              *rateLimitConfig `config:"rate_limit"`
-	KeepAlive              keepAlive        `config:"keep_alive"`
+	URL                      *urlConfig       `config:"url" validate:"required"`
+	Headers                  http.Header      `config:"headers"`
+	Retry                    retryConfig      `config:"retry"`
+	RedirectForwardHeaders   bool             `config:"redirect.forward_headers"`
+	RedirectHeadersBanList   []string         `config:"redirect.headers_ban_list"`
+	RedirectSensitiveHeaders []string         `config:"redirect.sensitive_headers"`
+	RedirectMaxRedirects     int              `config:"redirect.max_redirects"`
+	MaxBodySize              int64            `config:"max_body_size"`
+	RateLimit                *rateLimitConfig `config:"rate_limit"`
+	KeepAlive                keepAlive        `config:"keep_alive"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 
@@ -323,13 +323,6 @@ func (c *ResourceConfig) Validate() error {
 		// is excessive for a debugging logger, so default to 1MB
 		// which is the minimum.
 		c.Tracer.MaxSize = 1
-	}
-	ok, err := httplog.IsPathInLogsFor(inputName, c.Tracer.Filename)
-	if err != nil {
-		return err
-	}
-	if !ok {
-		return fmt.Errorf("request tracer path must be within %q path", paths.Resolve(paths.Logs, inputName))
 	}
 	return nil
 }

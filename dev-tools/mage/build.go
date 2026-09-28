@@ -22,13 +22,17 @@ import (
 	"fmt"
 	"go/build"
 	"log"
+	"maps"
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/josephspurrier/goversioninfo"
 	"github.com/magefile/mage/sh"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 // BuildArgs are the arguments used for the "build" target and they define how
@@ -113,10 +117,7 @@ func DefaultBuildArgs() BuildArgs {
 		for _, tag := range FIPSConfig.Compile.Tags {
 			args.ExtraFlags = append(args.ExtraFlags, "-tags="+tag)
 		}
-		args.CGO = args.CGO || FIPSConfig.Compile.CGO
-		for varName, value := range FIPSConfig.Compile.Env {
-			args.Env[varName] = value
-		}
+		maps.Copy(args.Env, FIPSConfig.Compile.Env)
 	}
 
 	return args
@@ -127,23 +128,14 @@ func DefaultBuildArgs() BuildArgs {
 // The list of supported platforms is compiled based on the Go release notes: https://golang.org/doc/devel/release.html
 // The list has been updated according to the Go version: 1.16
 func positionIndependentCodeSupported() bool {
-	return oneOf(Platform.GOOS, "darwin") ||
-		(Platform.GOOS == "linux" && oneOf(Platform.GOARCH, "riscv64", "amd64", "arm", "arm64", "ppc64le", "386")) ||
+	return slices.Contains([]string{"darwin"}, Platform.GOOS) ||
+		(Platform.GOOS == "linux" && slices.Contains([]string{"riscv64", "amd64", "arm", "arm64", "ppc64le", "386"}, Platform.GOARCH)) ||
 		(Platform.GOOS == "aix" && Platform.GOARCH == "ppc64") ||
 
 		// Windows 32bit supports ASLR, but Windows Server 2003 and earlier do not.
 		// According to the support matrix (https://www.elastic.co/support/matrix), these old versions
 		// are not supported.
 		(Platform.GOOS == "windows")
-}
-
-func oneOf(value string, lst ...string) bool {
-	for _, other := range lst {
-		if other == value {
-			return true
-		}
-	}
-	return false
 }
 
 // DefaultGolangCrossBuildArgs returns the default BuildArgs for use in
@@ -168,8 +160,8 @@ func DefaultGolangCrossBuildArgs() BuildArgs {
 // environment.
 func GolangCrossBuild(params BuildArgs) error {
 	if os.Getenv("GOLANG_CROSSBUILD") != "1" {
-		return errors.New("Use the crossBuild target. golangCrossBuild can " +
-			"only be executed within the golang-crossbuild docker environment.")
+		return errors.New("use the crossBuild target; golangCrossBuild can " +
+			"only be executed within the golang-crossbuild docker environment")
 	}
 
 	defer DockerChown(filepath.Join(params.OutputDir, params.Name+binaryExtension(GOOS)))
@@ -292,7 +284,7 @@ func MakeWindowsSysoFile() (string, error) {
 		},
 		StringFileInfo: goversioninfo.StringFileInfo{
 			CompanyName:      BeatVendor,
-			ProductName:      strings.Title(BeatName),
+			ProductName:      cases.Title(language.English).String(BeatName),
 			ProductVersion:   version,
 			FileVersion:      version,
 			FileDescription:  BeatDescription,

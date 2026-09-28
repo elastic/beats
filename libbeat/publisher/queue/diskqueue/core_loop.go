@@ -386,8 +386,6 @@ func (dq *diskQueue) maybeReadPending() {
 		// the reading position to the end of the segment header.
 		// The first segment we read might not have the initial nextReadPosition
 		// set to 0 if it was already partially read on a previous run.
-		// However that can only happen when nextReadFrameID == 0, so in that
-		// case firstFrameID is already initialized to the correct value.
 		segment.firstFrameID = dq.segments.nextReadFrameID
 		dq.segments.nextReadPosition = segment.headerSize()
 	}
@@ -423,6 +421,7 @@ func (dq *diskQueue) maybeUnblockProducers() {
 		}
 		// Add the frame to pendingFrames and report success.
 		dq.enqueueWriteFrame(request.frame)
+		dq.observer.AddEvent(int(request.frame.sizeOnDisk())) //nolint:gosec // G115 Conversion from uint64 to int is safe here.
 		request.responseChan <- true
 		unblockedCount++
 	}

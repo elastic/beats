@@ -37,6 +37,10 @@ processors:
 - rename:
     field: message
     target_field: event.original
+    if: 'ctx.event?.original == null'
+- remove:
+    field: message
+    ignore_missing: true
 - remove:
     field: azure.platformlogs.time
     ignore_missing: true

@@ -34,9 +34,9 @@ import (
 	caches "k8s.io/client-go/tools/cache"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/elastic-agent-autodiscover/bus"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes/metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -347,7 +347,6 @@ func TestGenerateHints(t *testing.T) {
 		logger: logger.Named("kubernetes.pod"),
 	}
 	for _, test := range tests {
-		test := test
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.result, p.GenerateHints(test.event))
 		})
@@ -2016,21 +2015,21 @@ func TestNamespacePodUpdater(t *testing.T) {
 		}}
 
 	cases := map[string]struct {
-		pods     []interface{}
-		expected []interface{}
+		pods     []any
+		expected []any
 	}{
 		"no pods": {},
 		"two pods but only one in namespace": {
-			pods: []interface{}{
+			pods: []any{
 				pod("onepod", "foo"),
 				pod("onepod", "bar"),
 			},
-			expected: []interface{}{
+			expected: []any{
 				pod("onepod", "foo"),
 			},
 		},
 		"two pods but none in namespace": {
-			pods: []interface{}{
+			pods: []any{
 				pod("onepod", "bar"),
 				pod("otherpod", "bar"),
 			},
@@ -2079,22 +2078,22 @@ func TestNodePodUpdater(t *testing.T) {
 	}
 
 	cases := map[string]struct {
-		pods []interface{}
+		pods []any
 
-		expected []interface{}
+		expected []any
 	}{
 		"no pods": {},
 		"two pods but only one in node": {
-			pods: []interface{}{
+			pods: []any{
 				pod("onepod", "foo"),
 				pod("onepod", "bar"),
 			},
-			expected: []interface{}{
+			expected: []any{
 				pod("onepod", "foo"),
 			},
 		},
 		"two pods but none in node": {
-			pods: []interface{}{
+			pods: []any{
 				pod("onepod", "bar"),
 				pod("otherpod", "bar"),
 			},
@@ -2220,8 +2219,8 @@ func TestPodEventer_Namespace_Node_Watcher(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			namespaceWatcher := eventer.(*pod).namespaceWatcher
-			nodeWatcher := eventer.(*pod).nodeWatcher
+			namespaceWatcher := eventer.(*pod).namespaceWatcher //nolint:errcheck // test type assertion
+			nodeWatcher := eventer.(*pod).nodeWatcher           //nolint:errcheck // test type assertion
 
 			if test.expectedNil {
 				assert.Nilf(t, namespaceWatcher, "Namespace "+test.msg)
@@ -2235,15 +2234,15 @@ func TestPodEventer_Namespace_Node_Watcher(t *testing.T) {
 }
 
 type mockUpdaterHandler struct {
-	objects []interface{}
+	objects []any
 }
 
-func (h *mockUpdaterHandler) OnUpdate(obj interface{}) {
+func (h *mockUpdaterHandler) OnUpdate(obj any) {
 	h.objects = append(h.objects, obj)
 }
 
 type mockUpdaterStore struct {
-	objects []interface{}
+	objects []any
 }
 
 var store caches.Store
@@ -2280,7 +2279,7 @@ func (s *mockUpdaterWatcher) Store() caches.Store {
 func (s *mockUpdaterWatcher) AddEventHandler(kubernetes.ResourceEventHandler) {
 }
 
-func (s *mockUpdaterStore) List() []interface{} {
+func (s *mockUpdaterStore) List() []any {
 	return s.objects
 }
 

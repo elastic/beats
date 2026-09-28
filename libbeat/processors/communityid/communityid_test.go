@@ -173,7 +173,7 @@ func TestRun(t *testing.T) {
 	})
 }
 
-func testProcessor(t testing.TB, seed uint16, fields mapstr.M, expectedHash interface{}) {
+func testProcessor(t testing.TB, seed uint16, fields mapstr.M, expectedHash any) {
 	t.Helper()
 
 	c := defaultConfig()

@@ -114,7 +114,7 @@ func TestDropFieldRun(t *testing.T) {
 
 func TestNewDropFields(t *testing.T) {
 	t.Run("detects regexp fields and assign to RegexpFields property", func(t *testing.T) {
-		c := config2.MustNewConfigFrom(map[string]interface{}{
+		c := config2.MustNewConfigFrom(map[string]any{
 			"fields": []string{"/field_.*1/", "/second/", "third"},
 		})
 
@@ -129,7 +129,7 @@ func TestNewDropFields(t *testing.T) {
 	})
 
 	t.Run("returns error when regexp field is badly written", func(t *testing.T) {
-		c := config2.MustNewConfigFrom(map[string]interface{}{
+		c := config2.MustNewConfigFrom(map[string]any{
 			"fields": []string{"/[//"},
 		})
 

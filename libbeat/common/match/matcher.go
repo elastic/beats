@@ -17,7 +17,10 @@
 
 package match
 
-import "regexp/syntax"
+import (
+	"regexp/syntax"
+	"slices"
+)
 
 type Matcher struct {
 	stringMatcher
@@ -120,22 +123,22 @@ func (m *Matcher) Unpack(s string) error {
 }
 
 // MatchAnyString succeeds if any string in the given array contains a match.
-func (m *Matcher) MatchAnyString(strs interface{}) bool {
+func (m *Matcher) MatchAnyString(strs any) bool {
 	return matchAnyStrings(m.stringMatcher, strs)
 }
 
 // MatchAllStrings succeeds if all strings in the given array contain a match.
-func (m *Matcher) MatchAllStrings(strs interface{}) bool {
+func (m *Matcher) MatchAllStrings(strs any) bool {
 	return matchAllStrings(m.stringMatcher, strs)
 }
 
 // MatchAnyString succeeds if any string in the given array is an exact match.
-func (m *ExactMatcher) MatchAnyString(strs interface{}) bool {
+func (m *ExactMatcher) MatchAnyString(strs any) bool {
 	return matchAnyStrings(m.stringMatcher, strs)
 }
 
 // MatchAllStrings succeeds if all strings in the given array are an exact match.
-func (m *ExactMatcher) MatchAllStrings(strs interface{}) bool {
+func (m *ExactMatcher) MatchAllStrings(strs any) bool {
 	return matchAllStrings(m.stringMatcher, strs)
 }
 
@@ -149,27 +152,25 @@ func (m *ExactMatcher) Unpack(s string) error {
 	return nil
 }
 
-func matchAnyStrings(m stringMatcher, strs interface{}) bool {
+func matchAnyStrings(m stringMatcher, strs any) bool {
 	switch v := strs.(type) {
-	case []interface{}:
+	case []any:
 		for _, s := range v {
 			if str, ok := s.(string); ok && m.MatchString(str) {
 				return true
 			}
 		}
 	case []string:
-		for _, s := range v {
-			if m.MatchString(s) {
-				return true
-			}
+		if slices.ContainsFunc(v, m.MatchString) {
+			return true
 		}
 	}
 	return false
 }
 
-func matchAllStrings(m stringMatcher, strs interface{}) bool {
+func matchAllStrings(m stringMatcher, strs any) bool {
 	switch v := strs.(type) {
-	case []interface{}:
+	case []any:
 		for _, s := range v {
 			if str, ok := s.(string); ok && !m.MatchString(str) {
 				return false

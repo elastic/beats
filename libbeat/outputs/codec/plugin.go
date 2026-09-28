@@ -31,12 +31,12 @@ type codecPlugin struct {
 
 var pluginKey = "libbeat.output.codec"
 
-func Plugin(name string, f Factory) map[string][]interface{} {
+func Plugin(name string, f Factory) map[string][]any {
 	return plugin.MakePlugin(name, codecPlugin{name, f})
 }
 
 func init() {
-	plugin.MustRegisterLoader(pluginKey, func(ifc interface{}) (err error) {
+	plugin.MustRegisterLoader(pluginKey, func(ifc any) (err error) {
 		b, ok := ifc.(codecPlugin)
 		if !ok {
 			return errors.New("plugin does not match output codec plugin type")

@@ -20,7 +20,7 @@ package autodiscover
 import (
 	"fmt"
 
-	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	"github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -47,7 +47,7 @@ func (q queryConfigFrom) CreateConfig(e bus.Event) ([]*config.C, error) {
 	fieldName := string(q)
 	config, ok := e[fieldName].([]*config.C)
 	if !ok {
-		return nil, fmt.Errorf("Event field '%v' does not contain a valid configuration object", fieldName)
+		return nil, fmt.Errorf("Event field '%v' does not contain a valid configuration object", fieldName) //nolint:staticcheck // error message format
 	}
 	return config, nil
 }

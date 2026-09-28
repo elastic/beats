@@ -264,7 +264,7 @@ func TestStore_ResetCursor(t *testing.T) {
 		res = store.Get("test::key")
 		require.Equal(t, uint(1), res.version)
 		require.Equal(t, uint(0), res.lockedVersion)
-		require.Equal(t, map[string]interface{}{"offset": int64(10)}, res.cursor)
+		require.Equal(t, map[string]any{"offset": int64(10)}, res.cursor)
 
 		res, err := lock(input.Context{}, store, "test::key")
 		require.NoError(t, err)
@@ -284,7 +284,7 @@ func TestStore_ResetCursor(t *testing.T) {
 		res := store.Get("test::key")
 		require.Equal(t, uint(0), res.version)
 		require.Equal(t, uint(0), res.lockedVersion)
-		require.Equal(t, map[string]interface{}{"offset": int64(6)}, res.cursor)
+		require.Equal(t, map[string]any{"offset": int64(6)}, res.cursor)
 		require.Nil(t, res.pendingCursorValue)
 		require.Nil(t, res.pendingUpdate)
 
@@ -293,7 +293,7 @@ func TestStore_ResetCursor(t *testing.T) {
 		res = store.Get("test::key")
 		require.Equal(t, uint(1), res.version)
 		require.Equal(t, uint(0), res.lockedVersion)
-		require.Equal(t, map[string]interface{}{"offset": int64(0)}, res.cursor)
+		require.Equal(t, map[string]any{"offset": int64(0)}, res.cursor)
 
 		res, err := lock(input.Context{}, store, "test::key")
 		require.NoError(t, err)
@@ -329,7 +329,7 @@ func TestStore_ResetCursor(t *testing.T) {
 		require.Equal(t, uint(1), res.version)
 		require.Equal(t, uint(0), res.lockedVersion)
 		require.Equal(t, uint(0), res.activeCursorOperations)
-		require.Equal(t, map[string]interface{}{"offset": int64(0)}, res.cursor)
+		require.Equal(t, map[string]any{"offset": int64(0)}, res.cursor)
 		require.Nil(t, res.pendingCursorValue)
 		require.Nil(t, res.pendingUpdate)
 	})
@@ -347,8 +347,9 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 				Meta: testMeta{IdentifierName: "method"},
 			},
 			"test::key2": { // Deleted resource
-				TTL:  0 * time.Second,
-				Meta: testMeta{IdentifierName: "method"},
+				TTL:     0 * time.Second,
+				Meta:    testMeta{IdentifierName: "method"},
+				Updated: time.Now(), // required so isDeleted returns true
 			},
 		})
 		s := testOpenStore(t, "test", backend)
@@ -358,7 +359,7 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 			store:      s,
 		}
 
-		store.UpdateIdentifiers(func(v Value) (string, interface{}) {
+		store.UpdateIdentifiers(func(v Value) (string, any) {
 			var m testMeta
 			err := v.UnpackCursorMeta(&m)
 			if err != nil {
@@ -376,23 +377,20 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 		var deletedState state
 		s.persistentStore.Get("test::key1", &deletedState)
 
+		s.ephemeralStore.mu.Lock()
 		want := map[string]state{
-			"test::key1": { // old resource is deleted, TTL must be zero
-				Updated: deletedState.Updated,
-				TTL:     0 * time.Second,
-				Meta:    map[string]interface{}{"identifiername": "method"},
-			},
 			"test::key2": { // Unchanged
-				Updated: s.Get("test::key2").internalState.Updated,
+				Updated: s.ephemeralStore.table["test::key2"].internalState.Updated,
 				TTL:     0 * time.Second,
-				Meta:    map[string]interface{}{"identifiername": "method"},
+				Meta:    map[string]any{"identifiername": "method"},
 			},
 			"test::key1::updated": { // Updated resource
-				Updated: s.Get("test::key1::updated").internalState.Updated,
+				Updated: s.ephemeralStore.table["test::key1::updated"].internalState.Updated,
 				TTL:     60 * time.Second,
-				Meta:    map[string]interface{}{"identifiername": "something"},
+				Meta:    map[string]any{"identifiername": "something"},
 			},
 		}
+		s.ephemeralStore.mu.Unlock()
 
 		checkEqualStoreState(t, want, backend.snapshot())
 	})

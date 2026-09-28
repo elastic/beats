@@ -14,12 +14,13 @@ linters:
     - exhaustruct
     - forbidigo
     - gomoddirectives
-    - gomodguard
+    - gomodguard_v2
     - gosec
     - govet
     - importas
     - ineffassign
     - misspell
+    - modernize
     - nakedret
     - nilerr
     - noctx
@@ -65,12 +66,6 @@ linters:
     forbidigo:
       forbid:
         - pattern: fmt.Print.*
-        - pattern: ^paths\.Resolve$
-          msg: "use a per-beat *paths.Path instance instead of the global paths.Resolve"
-        - pattern: ^paths\.InitPaths$
-          msg: "use a per-beat *paths.Path instance instead of the global paths.InitPaths"
-        - pattern: ^paths\.Paths$
-          msg: "use a per-beat *paths.Path instance instead of the global paths.Paths"
         - pattern: ^logp\.NewLogger$
           msg: "accept a *logp.Logger as a parameter instead of creating one with logp.NewLogger"
         - pattern: ^logp\.L$
@@ -89,22 +84,21 @@ linters:
         - github.com/meraki/dashboard-api-go/v3
         - github.com/snowflakedb/gosnowflake
       replace-local: false
-    gomodguard:
+    gomodguard_v2:
       blocked:
-        modules:
-          - github.com/pkg/errors:
-              recommendations:
-                - errors
-                - fmt
-              reason: This package is deprecated, use `fmt.Errorf` with `%w` instead
-          - gotest.tools/v3:
-              recommendations:
-                - github.com/stretchr/testify
-              reason: Use one assertion library consistently across the codebase
-          - github.com/google/uuid:
-              recommendations:
-                - github.com/gofrs/uuid/v5
-              reason: Use one uuid library consistently across the codebase
+        - module: github.com/pkg/errors
+          recommendations:
+            - errors
+            - fmt
+          reason: This package is deprecated, use `fmt.Errorf` with `%w` instead
+        - module: gotest.tools/v3
+          recommendations:
+            - github.com/stretchr/testify
+          reason: Use one assertion library consistently across the codebase
+        - module: github.com/google/uuid
+          recommendations:
+            - github.com/gofrs/uuid/v5
+          reason: Use one uuid library consistently across the codebase
     gosec:
       excludes:
         - G306
@@ -112,6 +106,12 @@ linters:
         - G401
         - G501
         - G505
+    modernize:
+      # omitzero rewrites `,omitempty` struct tags to `,omitzero`, which changes
+      # JSON marshaling semantics for struct/array fields. It is not a mechanical,
+      # behavior-preserving fix, so keep it disabled.
+      disable:
+        - omitzero
     nolintlint:
       require-explanation: true
       require-specific: false

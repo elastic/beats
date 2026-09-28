@@ -41,7 +41,7 @@ func TestConfiguration(t *testing.T) {
 		return
 	}
 	t.Run("when user is set", func(t *testing.T) {
-		cfg := config.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]any{
 			"host": "unix:///tmp/ok",
 			"user": "admin",
 		})
@@ -51,7 +51,7 @@ func TestConfiguration(t *testing.T) {
 	})
 
 	t.Run("when security descriptor is set", func(t *testing.T) {
-		cfg := config.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]any{
 			"host":                "unix:///tmp/ok",
 			"security_descriptor": "D:P(A;;GA;;;1234)",
 		})
@@ -87,7 +87,7 @@ func TestSocket(t *testing.T) {
 		sockFile := tmpDir + "/test.sock"
 		t.Log(sockFile)
 
-		cfg := config.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]any{
 			"host": "unix://" + sockFile,
 		})
 
@@ -130,7 +130,7 @@ func TestSocket(t *testing.T) {
 		require.NoError(t, err)
 		f.Close()
 
-		cfg := config.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]any{
 			"host": "unix://" + sockFile,
 		})
 
@@ -167,7 +167,7 @@ func TestHTTP(t *testing.T) {
 	// select a random free port.
 	url := "http://localhost:0"
 
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
 		"host": url,
 	})
 	logger := logptest.NewTestingLogger(t, "")
@@ -198,7 +198,7 @@ func attachEchoHelloHandler(t *testing.T, s *Server) {
 }
 
 func TestAttachHandler(t *testing.T) {
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
 		"host": "http://localhost:0",
 	})
 

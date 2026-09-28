@@ -22,7 +22,7 @@ package diskio
 import (
 	"fmt"
 
-	"github.com/docker/docker/client"
+	dockerclient "github.com/moby/moby/client"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
@@ -59,7 +59,7 @@ func defaultConfig() Config {
 type MetricSet struct {
 	mb.BaseMetricSet
 	blkioService *BlkioService
-	dockerClient *client.Client
+	dockerClient *dockerclient.Client
 	config       Config
 }
 

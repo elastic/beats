@@ -26,12 +26,12 @@ import (
 // and the contents of a Beat's fields.yml and validated the document's
 // fields against it.
 func Document(docJSON []byte, fieldsYAML []byte) error {
-	var ifDocument interface{}
+	var ifDocument any
 	if err := json.Unmarshal(docJSON, &ifDocument); err != nil {
 		return fmt.Errorf("decoding JSON document: %w", err)
 	}
 
-	document, ok := ifDocument.(map[string]interface{})
+	document, ok := ifDocument.(map[string]any)
 	if !ok {
 		return fmt.Errorf("document must be a dictionary of string keys, but %T", ifDocument)
 	}

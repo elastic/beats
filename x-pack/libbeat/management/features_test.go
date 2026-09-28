@@ -15,8 +15,8 @@ import (
 )
 
 func TestNewConfigFromProto(t *testing.T) {
-	source, err := structpb.NewStruct(map[string]interface{}{
-		"fqdn": map[string]interface{}{
+	source, err := structpb.NewStruct(map[string]any{
+		"fqdn": map[string]any{
 			"enabled": false,
 		},
 	})

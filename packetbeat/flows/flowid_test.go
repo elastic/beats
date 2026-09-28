@@ -26,6 +26,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type applyAddr func(f *FlowID)
@@ -242,7 +244,7 @@ func TestFlowIDAddressSorted(t *testing.T) {
 	for i, test := range tests {
 		t.Logf("flow id address sorted(%v): %v", i, test)
 
-		id := newFlowID()
+		id := newFlowID(logptest.NewTestingLogger(t, ""))
 
 		test.add(id)
 
@@ -280,8 +282,8 @@ func TestSimilarWithOffsets(t *testing.T) {
 		addEther(mac1, mac2),
 		addIP(ip2, ip1), addIP(ip3, ip4), addIP(ip1, ip2))
 
-	id1 := newFlowID()
-	id2 := newFlowID()
+	id1 := newFlowID(logptest.NewTestingLogger(t, ""))
+	id2 := newFlowID(logptest.NewTestingLogger(t, ""))
 	addr1(id1)
 	addr2(id2)
 

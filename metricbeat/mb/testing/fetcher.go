@@ -37,7 +37,7 @@ type Fetcher interface {
 }
 
 // NewFetcher returns a test fetcher from a Metricset configuration
-func NewFetcher(t testing.TB, config interface{}) Fetcher {
+func NewFetcher(t testing.TB, config any) Fetcher {
 	metricSet := NewMetricSet(t, config)
 	switch metricSet := metricSet.(type) {
 	case mb.ReportingMetricSetV2:

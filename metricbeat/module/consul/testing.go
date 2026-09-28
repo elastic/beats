@@ -18,8 +18,8 @@
 package consul
 
 // GetConfig returns a config object specific for a Consul module and a provided Metricset in 'ms'
-func GetConfig(ms []string, host string) map[string]interface{} {
-	return map[string]interface{}{
+func GetConfig(ms []string, host string) map[string]any {
+	return map[string]any{
 		"module":     "consul",
 		"metricsets": ms,
 		"hosts":      []string{host},
