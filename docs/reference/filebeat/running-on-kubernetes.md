@@ -224,7 +224,9 @@ Use a single [filestream](/reference/filebeat/filebeat-input-filestream.md) inpu
 
 :::{note}
 With this configuration, [add_kubernetes_metadata](/reference/filebeat/add-kubernetes-metadata.md#_logs_path)
-adds pod metadata. {applies_to}`stack: ga 9.6+` Container metadata (`kubernetes.container.name`,
+adds pod metadata.
+
+{applies_to}`stack: ga 9.6+` Container metadata (`kubernetes.container.name`,
 `container.image.name`, `container.id`, and `container.runtime`) is also enriched for 9.6 and later.
 For earlier versions, or if you need per-container inputs, use autodiscover instead. Refer to the
 [autodiscover documentation](/reference/filebeat/configuration-autodiscover.md#_kubernetes) for details.
