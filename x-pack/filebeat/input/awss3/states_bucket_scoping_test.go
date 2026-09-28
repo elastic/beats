@@ -326,7 +326,7 @@ func TestLexicographicalLegacyTailIsDropped(t *testing.T) {
 
 	// Seed the store as an older version would have left it: one completed
 	// state for bucket-a and an unscoped tail written by some other input.
-	raw, err := store.StoreFor(inputName, "")
+	raw, err := store.StoreFor(inputName)
 	require.NoError(t, err)
 	defer raw.Close()
 	stA := newState("bucket-a", "logs/obj-a", "etag-a", lastModified)
