@@ -23,12 +23,11 @@ import (
 	"strconv"
 	"strings"
 
+	util "github.com/elastic/beats/v7/pkg/systemmetrics/metric"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/memory"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transform/typeconv"
-	util "github.com/elastic/elastic-agent-system-metrics/metric"
-	"github.com/elastic/elastic-agent-system-metrics/metric/memory"
-	metrics "github.com/elastic/elastic-agent-system-metrics/metric/memory"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // FetchLinuxMemStats gets page_stat and huge pages data for linux
@@ -67,7 +66,7 @@ func FetchLinuxMemStats(baseMap mapstr.M, hostfs resolve.Resolver) error {
 
 	// This is largely for convenience, and allows the swap.* metrics to more closely emulate how they're reported on system/memory
 	// This way very similar metrics aren't split across different modules, even though Linux reports them in different places.
-	eventRaw, err := metrics.Get(hostfs)
+	eventRaw, err := memory.Get(hostfs)
 	if err != nil {
 		return fmt.Errorf("error fetching memory metrics: %w", err)
 	}
