@@ -19,7 +19,9 @@ package mage
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/magefile/mage/sh"
 )
@@ -134,6 +136,12 @@ func GenerateFieldsGo(fieldsYML, out string) error {
 		return err
 	}
 
+	// Pin the toolchain to keep generator output consistent across environments.
+	env, err := goToolchainEnv(beatsDir)
+	if err != nil {
+		return err
+	}
+
 	cmd := []string{"run",
 		"-mod=readonly",
 		filepath.Join(beatsDir, assetCmdPath),
@@ -143,9 +151,7 @@ func GenerateFieldsGo(fieldsYML, out string) error {
 		"-license", toLibbeatLicenseName(BeatLicense),
 		BeatName,
 	}
-	assetCmd := sh.RunCmd("go", cmd...)
-
-	return assetCmd()
+	return sh.RunWith(env, "go", cmd...)
 }
 
 // GenerateModuleFieldsGo generates a fields.go file containing a copy of the
@@ -155,6 +161,12 @@ func GenerateModuleFieldsGo(moduleDir string) error {
 	const moduleFieldsCmdPath = "dev-tools/cmd/module_fields/module_fields.go"
 
 	beatsDir, err := ElasticBeatsDir()
+	if err != nil {
+		return err
+	}
+
+	// Pin the toolchain to keep generator output consistent across environments.
+	env, err := goToolchainEnv(beatsDir)
 	if err != nil {
 		return err
 	}
@@ -169,9 +181,7 @@ func GenerateModuleFieldsGo(moduleDir string) error {
 		"-license", toLibbeatLicenseName(BeatLicense),
 		moduleDir,
 	}
-	moduleFieldsCmd := sh.RunCmd("go", cmd...)
-
-	return moduleFieldsCmd()
+	return sh.RunWith(env, "go", cmd...)
 }
 
 // GenerateModuleIncludeListGo generates an include/list.go file containing
@@ -226,6 +236,17 @@ func GenerateIncludeListGo(options IncludeListOptions) error {
 		args = append(args, "-moduleExcludeDirs", dir)
 	}
 	return includeListCmd(args...)
+}
+
+// goToolchainEnv reads the Go version from .go-version in beatsDir and returns
+// an env map that sets GOTOOLCHAIN to that version, keeping all generator
+// invocations in sync with the project's canonical toolchain.
+func goToolchainEnv(beatsDir string) (map[string]string, error) {
+	data, err := os.ReadFile(filepath.Join(beatsDir, ".go-version"))
+	if err != nil {
+		return nil, fmt.Errorf("reading .go-version: %w", err)
+	}
+	return map[string]string{"GOTOOLCHAIN": "go" + strings.TrimSpace(string(data))}, nil
 }
 
 // toLibbeatLicenseName translates the license type used in packages to

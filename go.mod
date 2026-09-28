@@ -3,7 +3,7 @@ module github.com/elastic/beats/v7
 go 1.26.8
 
 require (
-	cloud.google.com/go/bigquery v1.83.0
+	cloud.google.com/go/bigquery v1.84.0
 	cloud.google.com/go/monitoring v1.30.0
 	cloud.google.com/go/pubsub v1.51.1
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
@@ -22,20 +22,20 @@ require (
 	github.com/apoydence/eachers v0.0.0-20181020210610-23942921fe77 // indirect
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/aws/aws-sdk-go-v2 v1.47.0
-	github.com/aws/aws-sdk-go-v2/config v1.33.4
-	github.com/aws/aws-sdk-go-v2/credentials v1.20.4
+	github.com/aws/aws-sdk-go-v2/config v1.33.5
+	github.com/aws/aws-sdk-go-v2/credentials v1.20.5
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.72.0
-	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.87.0
-	github.com/aws/aws-sdk-go-v2/service/costexplorer v1.72.0
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.332.0
+	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.88.0
+	github.com/aws/aws-sdk-go-v2/service/costexplorer v1.73.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.334.0
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.63.0
 	github.com/aws/aws-sdk-go-v2/service/iam v1.64.0
 	github.com/aws/aws-sdk-go-v2/service/organizations v1.60.0
 	github.com/aws/aws-sdk-go-v2/service/rds v1.129.0
 	github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.41.0
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.113.0
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.113.1
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.52.0
-	github.com/aws/aws-sdk-go-v2/service/sts v1.50.0
+	github.com/aws/aws-sdk-go-v2/service/sts v1.51.0
 	github.com/blakesmith/ar v0.0.0-20150311145944-8bd4349a67f2
 	github.com/cavaliergopher/rpm v1.2.0
 	github.com/cespare/xxhash/v2 v2.3.0
@@ -145,10 +145,10 @@ require (
 
 require (
 	cloud.google.com/go v0.123.0
-	cloud.google.com/go/compute v1.68.0
+	cloud.google.com/go/compute v1.69.0
 	cloud.google.com/go/redis v1.25.0
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.23.1
-	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.14.0
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.14.1
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/v2 v2.0.2
 	github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics v1.3.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0
@@ -160,7 +160,7 @@ require (
 	github.com/Azure/azure-storage-blob-go v0.15.0
 	github.com/aerospike/aerospike-client-go/v7 v7.7.1
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.20.0
-	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.23.5
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.23.7
 	github.com/aws/aws-sdk-go-v2/service/apigateway v1.47.0
 	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.42.0
 	github.com/aws/aws-sdk-go-v2/service/health v1.45.0
@@ -175,7 +175,7 @@ require (
 	github.com/elastic/go-freelru v0.16.0
 	github.com/elastic/go-quark v0.8.0
 	github.com/elastic/go-sfdc v0.0.0-20260504130806-a46e22d049d9
-	github.com/elastic/mito v1.27.0
+	github.com/elastic/mito v1.28.0
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
 	github.com/elastic/sarama v1.19.1-0.20260310070522-abae92ca1603
 	github.com/elastic/tk-btf v0.2.0
@@ -185,7 +185,6 @@ require (
 	github.com/go-resty/resty/v2 v2.17.2
 	github.com/gofrs/uuid/v5 v5.3.2
 	github.com/golang-jwt/jwt/v5 v5.3.1
-	github.com/google/cel-go v0.28.0
 	github.com/googleapis/gax-go/v2 v2.23.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
@@ -228,6 +227,7 @@ require (
 )
 
 require (
+	cel.dev/cel-go v0.32.0
 	github.com/alexbrainman/sspi v0.0.0-20250919150558-7d374ff0d59e
 	github.com/apache/arrow-go/v18 v18.4.1
 	github.com/cilium/ebpf v0.22.0
@@ -299,9 +299,9 @@ require (
 	al.essio.dev/pkg/shellescape v1.5.1 // indirect
 	aqwari.net/xml v0.0.0-20210331023308-d9421b293817 // indirect
 	cel.dev/expr v0.25.2 // indirect
-	cloud.google.com/go/auth v0.23.2 // indirect
+	cloud.google.com/go/auth v0.23.3 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
-	cloud.google.com/go/compute/metadata v0.9.0 // indirect
+	cloud.google.com/go/compute/metadata v0.9.1 // indirect
 	cloud.google.com/go/iam v1.13.0 // indirect
 	cloud.google.com/go/longrunning v1.2.0 // indirect
 	cloud.google.com/go/pubsub/v2 v2.7.0 // indirect
@@ -317,8 +317,8 @@ require (
 	github.com/Azure/go-autorest/autorest/validation v0.3.2 // indirect
 	github.com/Azure/go-autorest/logger v0.2.2 // indirect
 	github.com/Azure/go-autorest/tracing v0.6.1 // indirect
-	github.com/Azure/go-ntlmssp v0.1.1 // indirect
-	github.com/AzureAD/microsoft-authentication-library-for-go v1.7.2 // indirect
+	github.com/Azure/go-ntlmssp v0.1.1
+	github.com/AzureAD/microsoft-authentication-library-for-go v1.8.0 // indirect
 	github.com/BurntSushi/toml v1.6.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.35.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.57.0 // indirect
@@ -565,7 +565,7 @@ require (
 )
 
 require (
-	cloud.google.com/go/storage v1.67.1
+	cloud.google.com/go/storage v1.68.0
 	github.com/PaloAltoNetworks/pango v0.10.2
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/yuin/gopher-lua v1.1.1 // indirect

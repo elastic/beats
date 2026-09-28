@@ -22,6 +22,7 @@ package kerberos
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	krbclient "github.com/elastic/gokrb5/v8/client"
 	krbconfig "github.com/elastic/gokrb5/v8/config"
@@ -31,9 +32,13 @@ import (
 
 func NewClient(config *Config, httpClient *http.Client) (Client, error) {
 	var krbClient *krbclient.Client
-	krbConf, err := krbconfig.Load(config.ConfigPath)
+	krbConf, err := loadKrb5Config(config)
 	if err != nil {
-		return nil, fmt.Errorf("error creating Kerberos client: %w", err)
+		return nil, err
+	}
+
+	settings := []func(*krbclient.Settings){
+		krbclient.DisablePAFXFAST(!config.EnableFAST),
 	}
 
 	switch config.AuthType {
@@ -42,12 +47,28 @@ func NewClient(config *Config, httpClient *http.Client) (Client, error) {
 		if err != nil {
 			return nil, fmt.Errorf("cannot load keytab file %s: %w", config.KeyTabPath, err)
 		}
-		krbClient = krbclient.NewWithKeytab(config.Username, config.Realm, kTab, krbConf)
+		krbClient = krbclient.NewWithKeytab(config.Username, config.Realm, kTab, krbConf, settings...)
 	case authPassword:
-		krbClient = krbclient.NewWithPassword(config.Username, config.Realm, config.Password, krbConf)
+		krbClient = krbclient.NewWithPassword(config.Username, config.Realm, config.Password, krbConf, settings...)
 	default:
 		return nil, ErrInvalidAuthType
 	}
 
-	return spnego.NewClient(krbClient, httpClient, ""), nil
+	// Empty service_name lets gokrb5 derive HTTP/<host> from the request URL.
+	return spnego.NewClient(krbClient, httpClient, config.ServiceName), nil
+}
+
+func loadKrb5Config(config *Config) (*krbconfig.Config, error) {
+	if strings.TrimSpace(config.Krb5Conf) != "" {
+		krbConf, err := krbconfig.NewFromString(config.Krb5Conf)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing inline krb5_conf: %w", err)
+		}
+		return krbConf, nil
+	}
+	krbConf, err := krbconfig.Load(config.ConfigPath)
+	if err != nil {
+		return nil, fmt.Errorf("error creating Kerberos client: %w", err)
+	}
+	return krbConf, nil
 }
