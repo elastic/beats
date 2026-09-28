@@ -32,5 +32,5 @@ func init() {
 // AssetJolokia returns asset data.
 // This is the base64 encoded zlib format compressed contents of module/jolokia.
 func AssetJolokia() string {
-	return "eJx8kFFOwzAQRP99ipG/6QX8wQG4AkLISjbptrbX8m5RensUkoARqPM5uzN6mhOudA+4SJIrRwcYW6IA/7I53gEj6dC4GksJeHYAsF+RZbwlcoCepdn7IGXiOWCKSVe3UaKoFDCv1UpmXGYNePWqyT/Bn82qf3PAxJRGDV/lJ5SYqYdaZfe6FjW51d35h2vTHsQgxSIXRSZrPChoqaI04oPj91Ocqdge7ik2km2dvHTtf0EewvyMdcnLQULWffxe6dDB8hkAAP//TGJ6CQ=="
+	return "eJx8kFFuAyEMRP85xYjv5gJ89AC9QlVVaPFunABG2Kk2t69odtOoior5Gpjx0xxwpmvASbKcOTrA2DIF+Leb4h2QSKfOzVhqwKsDgO0VRdIlkwP0KN0+J6kzLwFzzDrUTpmiUsAyopXMuC4a8O5Vs3+BP5o1/+GAmSknDT/hB9RY6BFqjF3bCOpyaZvyhOt2NyMmqRa5KgpZ50lBaxOlhC+O909xoWqb+ZFizN5OWe/SM5B/YX7LOpV1J6F9I/C3pf3MTDlpcN8DAExiegk="
 }
