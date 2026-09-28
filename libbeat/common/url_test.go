@@ -84,9 +84,9 @@ func TestGetUrl(t *testing.T) {
 	}
 
 	inputOutputWithDefaults := map[string]string{
-		"http://localhost":      "http://localhost:9200/hello",
-		"http://localhost/test": "http://localhost:9200/test",
-		"192.156.4.5":           "https://192.156.4.5:9200/hello",
+		"http://localhost":                          "http://localhost:9200/hello",
+		"http://localhost/test":                     "http://localhost:9200/test",
+		"192.156.4.5":                               "https://192.156.4.5:9200/hello",
 		"http://username:password@es.found.io:9324": "http://username:password@es.found.io:9324/hello",
 	}
 
