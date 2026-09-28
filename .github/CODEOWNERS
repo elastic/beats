@@ -58,7 +58,7 @@ changelog/fragments/
 /filebeat/module/santa @elastic/security-service-integrations
 /filebeat/module/system @elastic/elastic-agent-data-plane
 /filebeat/module/traefik # TODO: find right team
-/heartbeat/ @elastic/obs-ds-hosted-services
+/heartbeat/ @elastic/obs-signals-logs-team
 /journalbeat @elastic/elastic-agent-data-plane
 /libbeat/ @elastic/elastic-agent-data-plane
 /libbeat/autodiscover/providers/kubernetes @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
@@ -97,7 +97,7 @@ changelog/fragments/
 /metricbeat/module/jolokia @elastic/obs-infraobs-integrations
 /metricbeat/module/kafka @elastic/obs-infraobs-integrations
 /metricbeat/module/kibana/ @elastic/stack-monitoring
-/metricbeat/module/kubernetes/ @elastic/obs-ds-hosted-services
+/metricbeat/module/kubernetes/ @elastic/obs-signals-metrics-team
 /metricbeat/module/logstash/ @elastic/stack-monitoring
 /metricbeat/module/memcached @elastic/obs-infraobs-integrations
 /metricbeat/module/mongodb @elastic/obs-infraobs-integrations
@@ -118,6 +118,7 @@ changelog/fragments/
 /metricbeat/module/windows/wmi @elastic/obs-infraobs-integrations
 /metricbeat/module/zookeeper @elastic/obs-infraobs-integrations
 /packetbeat/ @elastic/security-service-integrations
+/pkg/systemmetrics/ @elastic/elastic-agent-data-plane
 /pkg/autodiscover/ @elastic/elastic-agent-data-plane
 /script/ @elastic/elastic-agent-data-plane
 /testing/ @elastic/elastic-agent-data-plane

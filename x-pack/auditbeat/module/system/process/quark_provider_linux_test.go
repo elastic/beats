@@ -260,8 +260,8 @@ func makeSelfEvent(t *testing.T, qp quark.Process, be backend) mb.Event {
 			"process.args_count":                    len(qp.Cmdline),
 			"process.pid":                           uint32(os.Getpid()), //nolint:gosec // PID values fit in uint32
 			"process.executable":                    exe,
-			"process.parent.pid":                    uint32(os.Getppid()), //nolint:gosec // PID values fit in uint32
-			"process.start":                         time.Unix(0, int64(qp.Proc.TimeBoot)),
+			"process.parent.pid":                    uint32(os.Getppid()),                                         //nolint:gosec // PID values fit in uint32
+			"process.start":                         time.Unix(0, int64(quark.TimeToWallclock(qp.Proc.TimeBoot))), //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
 			"user.id":                               uint32(0),
 			"user.group.id":                         uint32(0),
 			"user.effective.id":                     uint32(0),
@@ -323,8 +323,8 @@ func makeEventOfCmd(t *testing.T, cmd *exec.Cmd, qev quark.Event, be backend) mb
 			"process.args_count":                    1,
 			"process.pid":                           uint32(cmd.Process.Pid), //nolint:gosec // PID values fit in uint32
 			"process.executable":                    "/usr/bin/true",
-			"process.parent.pid":                    uint32(os.Getpid()),                   //nolint:gosec // PID values fit in uint32
-			"process.start":                         time.Unix(0, int64(qp.Proc.TimeBoot)), //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
+			"process.parent.pid":                    uint32(os.Getpid()),                                          //nolint:gosec // PID values fit in uint32
+			"process.start":                         time.Unix(0, int64(quark.TimeToWallclock(qp.Proc.TimeBoot))), //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
 			"user.id":                               uint32(0),
 			"user.group.id":                         uint32(0),
 			"user.effective.id":                     uint32(0),

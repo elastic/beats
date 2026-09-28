@@ -1,0 +1,9 @@
+kind: bug-fix
+
+summary: Fix agentless Elasticsearch state store writing to the wrong input index
+
+description: >
+  Inputs affected by the bug re-ingest once, from their configured initial
+  lookback, the first time they read their own index.
+
+component: filebeat

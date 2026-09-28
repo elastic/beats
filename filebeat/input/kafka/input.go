@@ -120,6 +120,8 @@ func (input *kafkaInput) Test(ctx input.TestContext) error {
 func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 	log := ctx.Logger.Named("kafka input").With("hosts", input.config.Hosts)
 
+	attachSaramaMetrics(input.saramaConfig, ctx.MetricsRegistry, log)
+
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
 		EventListener: acker.ConnectionOnly(
 			acker.EventPrivateReporter(func(_ int, events []any) {

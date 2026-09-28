@@ -16,9 +16,9 @@ import (
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	metricreport "github.com/elastic/beats/v7/pkg/systemmetrics/report"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 )
 
 func resetSystemBridgeForTest() {
@@ -45,7 +45,7 @@ func setupTestRegistry(t *testing.T) *monitoring.Registry {
 	t.Helper()
 	reg := monitoring.NewRegistry()
 	err := metricreport.SetupMetricsOptions(metricreport.MetricOptions{
-		Logger:         logp.NewLogger("system-bridge-test"),
+		Logger:         logptest.NewTestingLogger(t, "system-bridge-test"),
 		Name:           "beat",
 		SystemMetrics:  reg.GetOrCreateRegistry("system"),
 		ProcessMetrics: reg.GetOrCreateRegistry("beat"),

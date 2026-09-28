@@ -1,0 +1,7 @@
+kind: bug-fix
+
+summary: Prevent filestream re-ingesting a file renamed while a scan is in progress
+
+component: filebeat
+
+issue: https://github.com/elastic/beats/issues/53193

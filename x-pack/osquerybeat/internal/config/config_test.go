@@ -6,6 +6,7 @@ package config
 
 import (
 	"testing"
+	"time"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
@@ -451,6 +452,97 @@ func TestGetOsqueryExtensions(t *testing.T) {
 		}
 		if len(cfg.Require) != 1 || cfg.Require[0] != "my_extension" {
 			t.Fatalf("unexpected require: %v", cfg.Require)
+		}
+	})
+}
+
+func TestGetOsqueryCheckTimeout(t *testing.T) {
+	t.Run("missing input returns default", func(t *testing.T) {
+		got, err := GetOsqueryCheckTimeout(nil)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if got != DefaultCheckTimeout {
+			t.Fatalf("expected default %s, got %s", DefaultCheckTimeout, got)
+		}
+	})
+
+	t.Run("returns first input check timeout", func(t *testing.T) {
+		inputs := []InputConfig{
+			{
+				Osquery: &OsqueryConfig{
+					ElasticOptions: &ElasticOptions{
+						CheckTimeout: "30s",
+					},
+				},
+			},
+		}
+		got, err := GetOsqueryCheckTimeout(inputs)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if got != 30*time.Second {
+			t.Fatalf("unexpected timeout: %s", got)
+		}
+	})
+
+	t.Run("unpacks config tags from yaml", func(t *testing.T) {
+		c, err := conf.NewConfigFrom(map[string]any{
+			"inputs": []map[string]any{
+				{
+					"osquery": map[string]any{
+						"elastic_options": map[string]any{
+							"check_timeout": "45s",
+						},
+					},
+				},
+			},
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		var parsed Config
+		if err := c.Unpack(&parsed); err != nil {
+			t.Fatal(err)
+		}
+		got, err := GetOsqueryCheckTimeout(parsed.Inputs)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if got != 45*time.Second {
+			t.Fatalf("unexpected timeout: %s", got)
+		}
+	})
+
+	t.Run("invalid duration returns error", func(t *testing.T) {
+		inputs := []InputConfig{
+			{
+				Osquery: &OsqueryConfig{
+					ElasticOptions: &ElasticOptions{
+						CheckTimeout: "not-a-duration",
+					},
+				},
+			},
+		}
+		_, err := GetOsqueryCheckTimeout(inputs)
+		if err == nil {
+			t.Fatal("expected error for invalid check_timeout")
+		}
+	})
+
+	t.Run("non-positive duration returns error", func(t *testing.T) {
+		inputs := []InputConfig{
+			{
+				Osquery: &OsqueryConfig{
+					ElasticOptions: &ElasticOptions{
+						CheckTimeout: "0s",
+					},
+				},
+			},
+		}
+		_, err := GetOsqueryCheckTimeout(inputs)
+		if err == nil {
+			t.Fatal("expected error for non-positive check_timeout")
 		}
 	})
 }

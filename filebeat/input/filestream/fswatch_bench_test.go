@@ -417,3 +417,41 @@ func BenchmarkGetFilesIdentityCollision(b *testing.B) {
 		}
 	}
 }
+
+// BenchmarkGetFilesSharedDir models N filestream inputs each watching the same
+// base directory with a different leaf glob.
+func BenchmarkGetFilesSharedDir(b *testing.B) {
+	for _, inputs := range []int{10, 100, 400} {
+		b.Run(fmt.Sprintf("inputs%d", inputs), func(b *testing.B) {
+			base := b.TempDir()
+			total := benchEnvInt(b, "BENCH_SHARED_FILES", 500)
+
+			for i := range total {
+				require.NoError(b, os.WriteFile(
+					filepath.Join(base, fmt.Sprintf("pod-%04d-container-abc123.log", i)), []byte("x"), 0o660))
+			}
+
+			cfg := fileScannerConfig{
+				RecursiveGlob: true,
+				Fingerprint:   fingerprintConfig{Enabled: false},
+			}
+			scanners := make([]*fileScanner, inputs)
+			dc := newDirCache()
+			b.Cleanup(func() { dc.reset() })
+			for i := range inputs {
+				glob := filepath.Join(base, fmt.Sprintf("pod-%04d-container-*.log", i%total))
+				var err error
+				scanners[i], err = newFileScannerWithCache(logp.NewNopLogger(), []string{glob}, cfg, CompressionNone, dc, maxDirCacheAge)
+				require.NoError(b, err)
+			}
+
+			b.ReportAllocs()
+			b.ResetTimer()
+			for b.Loop() {
+				for _, s := range scanners {
+					s.GetFiles(loginp.FileScanOptions{})
+				}
+			}
+		})
+	}
+}

@@ -19,5 +19,5 @@ func init() {
 // AssetLumberjack returns asset data.
 // This is the base64 encoded zlib format compressed contents of input/lumberjack.
 func AssetLumberjack() string {
-	return "eJxsjkEKwjAURPc5xdB9e4AsXLpy5wliMsXYNAm/P4XeXlpERYTPX8w8eNNj4maR2nyjPJyfDKBREy26yzvsDBC4eIlVY8kWJwMA58gUFoxSZnxgxFybDgYYj94ebI/sZv6Y9kK3SosxOVVmhlf6x7bfVaV5bcKA4NRB6BlXBsQMl8GVWbHsr6wU6J3fw6oULb6kwTwHACZsUA0="
+	return "eJxsjjEOwjAQBHu/YpU+eYALSio6XmDsjTBxbOtyjpTfo0QIEGKLK/ZGmu0xcbNIbb5RHs5PBtCoiRbd5V12BghcvMSqsWSLkwGAc2QKC0YpMz4wYq5NBwOMx98ebI/sZv6Y9uhWaTEmp8rM8Gr/2PZcVZrXJgwITh2EnnFlQMxwGVyZFct+ykqB3vk9rErR4ksazDMAAP//JmxQDQ=="
 }
