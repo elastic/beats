@@ -27,6 +27,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -355,10 +356,8 @@ func isIndexPatternSet(t *testing.T, template string, expectedPattern string) bo
 	require.NoError(t, json.Unmarshal(body, &r))
 	for _, entry := range r.IndexTemplates {
 		if entry.Name == template {
-			for _, p := range entry.IndexTemplate.IndexPatterns {
-				if p == expectedPattern {
-					return true
-				}
+			if slices.Contains(entry.IndexTemplate.IndexPatterns, expectedPattern) {
+				return true
 			}
 		}
 	}

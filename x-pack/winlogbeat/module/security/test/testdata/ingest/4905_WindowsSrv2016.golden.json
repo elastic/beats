@@ -2,7 +2,7 @@
   {
     "@timestamp": "2020-08-19T07:56:51.5792901Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "security-event-source-removed",

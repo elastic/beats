@@ -43,8 +43,8 @@ func MatchesAnyPattern(value string, patterns []string) bool {
 		return false
 	}
 	for _, pattern := range patterns {
-		if strings.HasSuffix(pattern, "*") {
-			withoutStar := strings.TrimSuffix(pattern, "*")
+		if before, ok := strings.CutSuffix(pattern, "*"); ok {
+			withoutStar := before
 			if strings.HasPrefix(value, withoutStar) {
 				return true
 			}

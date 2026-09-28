@@ -20,6 +20,18 @@ The S3 input manages SQS message visibility to prevent messages from being repro
 
 If an error occurs during the processing of the S3 object, the processing will be stopped, and the SQS message will be returned to the queue for reprocessing.
 
+::::{note}
+:applies_to: stack: ga 9.5+
+
+The `aws-s3` input can use new v2 implementation. The new implementation provides adaptive concurrency control and simplified internal architecture while remaining fully compatible with existing configurations and persistent state. You can enable it by adding the following to your beat configuration:
+
+```yaml
+features.aws_s3_v2.enabled: true
+```
+
+This option will be made the default and the legacy implementation will be deprecated in a future release.
+::::
+
 
 ## Configuration Examples [_configuration_examples]
 
@@ -536,7 +548,7 @@ Naming of the backed up files can be controlled with `backup_to_bucket_prefix`.
 
 ### `backup_to_bucket_prefix` [_backup_to_bucket_prefix]
 
-This prefix will be prepended to the object key when backing it up to another (or the same) bucket.
+This prefix is prepended to the object key using string concatenation when backing it up to another (or the same) bucket. For example, with `backup_to_bucket_prefix: processed/` and an object key `logs/data.json`, the backup key is `processed/logs/data.json`. No path separator is inserted automatically. Include a trailing `/` in the prefix if you want the backup to appear in a subdirectory.
 
 
 ### `non_aws_backup_to_bucket_name` [_non_aws_backup_to_bucket_name]

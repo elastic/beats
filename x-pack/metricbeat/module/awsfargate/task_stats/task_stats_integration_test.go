@@ -8,7 +8,7 @@ package task_stats
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"testing"
@@ -21,7 +21,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	config := map[string]interface{}{
+	config := map[string]any{
 		"period":     "10s",
 		"module":     "awsfargate",
 		"metricsets": []string{"task_stats"},
@@ -63,7 +63,7 @@ func TestData(t *testing.T) {
 		t.Skip("skip data generation tests")
 	}
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"period":     "10s",
 		"module":     "awsfargate",
 		"metricsets": []string{"task_stats"},
@@ -100,12 +100,12 @@ func TestData(t *testing.T) {
 // buildResponse is a test helper that loads the content of `filename` and returns
 // it as the body of a `http.Response`.
 func buildResponse(filename string) (*http.Response, error) {
-	fileContent, err := ioutil.ReadFile(filename)
+	fileContent, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
 
 	return &http.Response{
-		Body: ioutil.NopCloser(bytes.NewReader(fileContent)),
+		Body: io.NopCloser(bytes.NewReader(fileContent)),
 	}, nil
 }

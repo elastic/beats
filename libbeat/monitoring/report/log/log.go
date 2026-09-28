@@ -71,6 +71,13 @@ var gauges = map[string]bool{
 	"system.load.norm.1":                   true,
 	"system.load.norm.5":                   true,
 	"system.load.norm.15":                  true,
+
+	"filebeat.filestream.files_matched":          true,
+	"filebeat.filestream.files_unique":           true,
+	"filebeat.filestream.files_no_ingest_target": true,
+	"filebeat.filestream.files_ignored":          true,
+	"filebeat.filestream.files_empty":            true,
+	"filebeat.filestream.scan_errors":            true,
 }
 
 // IsGauge returns true when the given metric key name represents a gauge value.
@@ -128,11 +135,9 @@ func MakeReporter(beat beat.Info, cfg *conf.C, mon beatmonitoring.Monitoring) (r
 	r.registries["state"] = mon.StateRegistry()
 	r.registries["dataset"] = mon.InputsRegistry()
 
-	r.wg.Add(1)
-	go func() {
-		defer r.wg.Done()
+	r.wg.Go(func() {
 		r.snapshotLoop()
-	}()
+	})
 	return r, nil
 }
 

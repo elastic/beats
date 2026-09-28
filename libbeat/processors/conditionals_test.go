@@ -85,7 +85,6 @@ func TestWhenProcessor(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		test := test
 		t.Run(test.title, func(t *testing.T) {
 			makeFilter := func() beat.Processor {
 				cfg, err := conf.NewConfigFrom(test.filter)
@@ -102,14 +101,14 @@ func TestWhenProcessor(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, out)
 
-			// RunPdata path. When no condition is configured, NewConditional
-			// returns the inner processor directly, which doesn't implement
-			// PdataProcessor, so fall back to Run for that case.
+			// RunPdata path. The inner processor (addFieldsInner) is legacy-only,
+			// so neither WhenProcessor nor the bare inner implements PdataProcessor.
+			// Fall back to Run in all cases.
 			body := pcommon.NewMap()
 			require.NoError(t, otelmap.FromMapstr(body, test.input))
 			filter := makeFilter()
-			if wp, ok := filter.(*WhenProcessor); ok {
-				drop, err := wp.RunPdata(body)
+			if pp, ok := filter.(PdataProcessor); ok {
+				drop, err := pp.RunPdata(body)
 				require.NoError(t, err)
 				assert.False(t, drop)
 			} else {
@@ -396,4 +395,49 @@ func requireImplements[T any](t *testing.T, v any) T {
 	require.True(t, ok, "sanity check: expected %T, got %T", expected, v)
 
 	return result
+}
+
+func TestConditionErrorClosesProcessor(t *testing.T) {
+	cons, p := newMockCloserConstructor()
+	wrapped := NewConditional(SafeWrap("test-cond-close-on-error", cons))
+
+	cfg, err := conf.NewConfigFrom(map[string]any{"when": map[string]any{}})
+	require.NoError(t, err)
+
+	_, err = wrapped(cfg, logptest.NewTestingLogger(t, ""))
+	require.Error(t, err, "an empty condition must fail to build")
+	assert.Equal(t, 1, p.closeCount,
+		"the constructed processor must be closed when its condition fails to build")
+}
+
+func TestIfElseThenErrorClosesThenProcessors(t *testing.T) {
+	cons, p := newMockCloserConstructor()
+	RegisterPlugin("test-ifelse-close-on-error", cons)
+
+	cfg, err := conf.NewConfigFrom(map[string]any{
+		"if":   map[string]any{"equals": map[string]any{"a": "b"}},
+		"then": []any{map[string]any{"test-ifelse-close-on-error": map[string]any{}}},
+		"else": []any{map[string]any{"test-ifelse-does-not-exist": map[string]any{}}},
+	})
+	require.NoError(t, err)
+
+	_, err = NewIfElseThenProcessor(cfg, logptest.NewTestingLogger(t, ""))
+	require.Error(t, err, "building the 'else' list must fail")
+	assert.Equal(t, 1, p.closeCount,
+		"the 'then' processors must be closed when building the 'else' list fails")
+}
+
+func TestNewErrorClosesAlreadyConstructedProcessors(t *testing.T) {
+	cons, p := newMockCloserConstructor()
+	RegisterPlugin("test-new-close-on-error", cons)
+
+	first, err := conf.NewConfigFrom(map[string]any{"test-new-close-on-error": map[string]any{}})
+	require.NoError(t, err)
+	second, err := conf.NewConfigFrom(map[string]any{"test-new-does-not-exist": map[string]any{}})
+	require.NoError(t, err)
+
+	_, err = New(PluginConfig{first, second}, logptest.NewTestingLogger(t, ""))
+	require.Error(t, err, "building the processor list must fail")
+	assert.Equal(t, 1, p.closeCount,
+		"the already-constructed processors must be closed when list construction fails partway")
 }

@@ -105,9 +105,9 @@ func TestNewReceiver(t *testing.T) {
 			return getFromSocket(t, &lastError, monitorSocket, "stats")
 		}, "failed to connect to monitoring socket stats endpoint, last error was: %s", &lastError)
 
-		// Verify metrics logging started.
-		metricsStarted := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s")
-		assert.NotEmpty(c, metricsStarted.All(), "metrics logging not started")
+		// Verify the metric reporter initialized.
+		metricsSkipped := zapLogs.FilterMessageSnippet("Skipping metrics logging")
+		assert.NotEmpty(c, metricsSkipped.All(), "metric reporter did not initialize")
 
 		// Verify that packetbeat decoded and forwarded at least one event from the pcap.
 		assert.Positive(c, sink.LogRecordCount(), "expected at least one log record from pcap replay")
@@ -228,10 +228,10 @@ func TestMultipleReceivers(t *testing.T) {
 		r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "packetbeatreceiver/r2"))
 		assert.Equal(c, 1, r2StartLogs.Len(), "r2 should have a single start log")
 
-		r1StartMetricsLogs := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").FilterField(zap.String("otelcol.component.id", "packetbeatreceiver/r1"))
-		assert.Equalf(c, 1, r1StartMetricsLogs.Len(), "r1 should have a single start metrics logging every 30s")
-		r2StartMetricsLogs := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").FilterField(zap.String("otelcol.component.id", "packetbeatreceiver/r2"))
-		assert.Equalf(c, 1, r2StartMetricsLogs.Len(), "r2 should have a single start metrics logging every 30s")
+		r1StartMetricsLogs := zapLogs.FilterMessageSnippet("Skipping metrics logging").FilterField(zap.String("otelcol.component.id", "packetbeatreceiver/r1"))
+		assert.Equalf(c, 1, r1StartMetricsLogs.Len(), "r1 should have a single skipping metrics logging entry")
+		r2StartMetricsLogs := zapLogs.FilterMessageSnippet("Skipping metrics logging").FilterField(zap.String("otelcol.component.id", "packetbeatreceiver/r2"))
+		assert.Equalf(c, 1, r2StartMetricsLogs.Len(), "r2 should have a single skipping metrics logging entry")
 
 		// Verify monitoring sockets.
 		var lastError strings.Builder
@@ -326,7 +326,7 @@ func BenchmarkFactory(b *testing.B) {
 	tmpDir := b.TempDir()
 
 	cfg := &Config{
-		Beatconfig: map[string]interface{}{
+		Beatconfig: map[string]any{
 			"packetbeat": map[string]any{
 				"interfaces": map[string]any{
 					"device": "lo0",
@@ -409,6 +409,9 @@ func TestReceiverStatus(t *testing.T) {
 		Status: componentstatus.NewEvent(componentstatus.StatusOK,
 			componentstatus.WithAttributes(inputStatusAttributes(
 				componentstatus.StatusOK.String(), "running packetbeat processor"))),
+		// packetbeat replays a pcap and finishes quickly, transitioning through
+		// StatusOK before the first poll tick; historical matching is required.
+		StatusMatchHistorical: true,
 	})
 }
 

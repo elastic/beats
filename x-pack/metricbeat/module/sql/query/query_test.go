@@ -9,6 +9,7 @@ package query
 import (
 	"context"
 	"errors"
+	"maps"
 	"strings"
 	"testing"
 	"time"
@@ -16,6 +17,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -39,12 +41,12 @@ type fakeDBClient struct {
 	tableQueries     []string
 	variableQueries  []string
 	withParamQueries []string
-	withParamArgs    [][]interface{}
+	withParamArgs    [][]any
 	closed           bool
 
 	fetchTableFn          func(ctx context.Context, query string) ([]mapstr.M, error)
 	fetchVariableFn       func(ctx context.Context, query string) (mapstr.M, error)
-	fetchTableWithParamFn func(ctx context.Context, query string, args ...interface{}) ([]mapstr.M, error)
+	fetchTableWithParamFn func(ctx context.Context, query string, args ...any) ([]mapstr.M, error)
 }
 
 func (f *fakeDBClient) FetchTableMode(ctx context.Context, query string) ([]mapstr.M, error) {
@@ -55,7 +57,7 @@ func (f *fakeDBClient) FetchTableMode(ctx context.Context, query string) ([]maps
 	return f.tableRows, f.tableErr
 }
 
-func (f *fakeDBClient) FetchTableModeWithParams(ctx context.Context, query string, args ...interface{}) ([]mapstr.M, error) {
+func (f *fakeDBClient) FetchTableModeWithParams(ctx context.Context, query string, args ...any) ([]mapstr.M, error) {
 	f.withParamQueries = append(f.withParamQueries, query)
 	f.withParamArgs = append(f.withParamArgs, args)
 	if f.fetchTableWithParamFn != nil {
@@ -90,8 +92,8 @@ func (r *stopReporter) Error(_ error) bool {
 	return false
 }
 
-func testMetricSetConfig(queryText string) map[string]interface{} {
-	return map[string]interface{}{
+func testMetricSetConfig(queryText string) map[string]any {
+	return map[string]any{
 		"module":              "sql",
 		"metricsets":          []string{"query"},
 		"hosts":               []string{"postgres://user:pass@localhost:5432/mydb?sslmode=disable"},
@@ -101,12 +103,19 @@ func testMetricSetConfig(queryText string) map[string]interface{} {
 	}
 }
 
-func newTestMetricSet(t *testing.T, cfg map[string]interface{}) *MetricSet {
+func newTestMetricSet(t *testing.T, cfg map[string]any) *MetricSet {
 	t.Helper()
 
-	ms := mbtest.NewMetricSet(t, cfg)
-	qms, ok := ms.(*MetricSet)
-	require.Truef(t, ok, "expected *MetricSet, got %T", ms)
+	c, err := conf.NewConfigFrom(cfg)
+	require.NoError(t, err)
+	// Use a per-test data directory so cursor state stays isolated and the
+	// test does not depend on the (removed) global paths singleton.
+	beatPaths := &paths.Path{Data: t.TempDir()}
+	_, metricsets, err := mb.NewModule(c, mb.Registry, beat.Info{Paths: beatPaths, Logger: logptest.NewTestingLogger(t, "")})
+	require.NoError(t, err)
+	require.Len(t, metricsets, 1)
+	qms, ok := metricsets[0].(*MetricSet)
+	require.Truef(t, ok, "expected *MetricSet, got %T", metricsets[0])
 	return qms
 }
 
@@ -155,22 +164,13 @@ func withFakeDBClientFactory(t *testing.T, db dbClient) {
 	})
 }
 
-func withTempDataPath(t *testing.T) {
+func instantiateMetricSetWithConfig(t *testing.T, cfg map[string]any) error {
 	t.Helper()
-	origData := paths.Paths.Data
-	paths.Paths.Data = t.TempDir()
-	t.Cleanup(func() {
-		paths.Paths.Data = origData
-	})
-}
-
-func instantiateMetricSetWithConfig(t *testing.T, cfg map[string]interface{}) error {
-	t.Helper()
-	withTempDataPath(t)
 
 	c, err := conf.NewConfigFrom(cfg)
 	require.NoError(t, err)
-	_, metricsets, err := mb.NewModule(c, mb.Registry, paths.New(), logptest.NewTestingLogger(t, ""))
+	beatPaths := &paths.Path{Data: t.TempDir()}
+	_, metricsets, err := mb.NewModule(c, mb.Registry, beat.Info{Paths: beatPaths, Logger: logptest.NewTestingLogger(t, "")})
 	if err != nil {
 		return err
 	}
@@ -292,7 +292,7 @@ func TestFetch_CursorPath_AppliesTimeoutContext(t *testing.T) {
 
 	deadlineSeen := false
 	fakeDB := &fakeDBClient{
-		fetchTableWithParamFn: func(ctx context.Context, _ string, _ ...interface{}) ([]mapstr.M, error) {
+		fetchTableWithParamFn: func(ctx context.Context, _ string, _ ...any) ([]mapstr.M, error) {
 			_, ok := ctx.Deadline()
 			deadlineSeen = ok
 			return []mapstr.M{}, nil
@@ -493,7 +493,6 @@ func TestFetch_VariableMode_MergeResultsSuccess(t *testing.T) {
 }
 
 func TestInitCursorAndClose(t *testing.T) {
-	withTempDataPath(t)
 	ms := newTestMetricSet(t, testMetricSetConfig("SELECT id FROM t WHERE id > :cursor ORDER BY id ASC"))
 	ms.Config.Cursor = cursor.Config{
 		Enabled: true,
@@ -687,29 +686,29 @@ func TestNew_ConfigValidationErrors(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		overrides map[string]interface{}
+		overrides map[string]any
 		wantErr   string
 	}{
 		{
 			name: "invalid response format",
-			overrides: map[string]interface{}{
+			overrides: map[string]any{
 				"sql_response_format": "bad",
 			},
 			wantErr: "invalid sql_response_format value: bad",
 		},
 		{
 			name: "no query inputs",
-			overrides: map[string]interface{}{
+			overrides: map[string]any{
 				"sql_query":   "",
-				"sql_queries": []map[string]interface{}{},
+				"sql_queries": []map[string]any{},
 			},
 			wantErr: "no query input provided, must provide either sql_query or sql_queries",
 		},
 		{
 			name: "both query and queries",
-			overrides: map[string]interface{}{
+			overrides: map[string]any{
 				"sql_query": "SELECT 1",
-				"sql_queries": []map[string]interface{}{
+				"sql_queries": []map[string]any{
 					{"query": "SELECT 2", "response_format": "table"},
 				},
 			},
@@ -717,9 +716,9 @@ func TestNew_ConfigValidationErrors(t *testing.T) {
 		},
 		{
 			name: "cursor with multiple queries",
-			overrides: map[string]interface{}{
+			overrides: map[string]any{
 				"sql_query": "",
-				"sql_queries": []map[string]interface{}{
+				"sql_queries": []map[string]any{
 					{"query": "SELECT id FROM t", "response_format": "table"},
 				},
 				"cursor.enabled": true,
@@ -731,7 +730,7 @@ func TestNew_ConfigValidationErrors(t *testing.T) {
 		},
 		{
 			name: "cursor with fetch from all databases",
-			overrides: map[string]interface{}{
+			overrides: map[string]any{
 				"sql_query":                "SELECT id FROM t WHERE id > :cursor",
 				"sql_response_format":      "table",
 				"fetch_from_all_databases": true,
@@ -744,7 +743,7 @@ func TestNew_ConfigValidationErrors(t *testing.T) {
 		},
 		{
 			name: "cursor requires table format",
-			overrides: map[string]interface{}{
+			overrides: map[string]any{
 				"sql_query":           "SELECT id FROM t WHERE id > :cursor",
 				"sql_response_format": "variables",
 				"cursor.enabled":      true,
@@ -756,9 +755,9 @@ func TestNew_ConfigValidationErrors(t *testing.T) {
 		},
 		{
 			name: "invalid response format in sql_queries",
-			overrides: map[string]interface{}{
+			overrides: map[string]any{
 				"sql_query": "",
-				"sql_queries": []map[string]interface{}{
+				"sql_queries": []map[string]any{
 					{"query": "SELECT 1", "response_format": "invalid"},
 				},
 			},
@@ -766,7 +765,7 @@ func TestNew_ConfigValidationErrors(t *testing.T) {
 		},
 		{
 			name: "cursor query missing placeholder",
-			overrides: map[string]interface{}{
+			overrides: map[string]any{
 				"sql_query":           "SELECT id FROM t",
 				"sql_response_format": "table",
 				"cursor.enabled":      true,
@@ -780,13 +779,9 @@ func TestNew_ConfigValidationErrors(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cfg := make(map[string]interface{}, len(base)+len(tt.overrides))
-			for k, v := range base {
-				cfg[k] = v
-			}
-			for k, v := range tt.overrides {
-				cfg[k] = v
-			}
+			cfg := make(map[string]any, len(base)+len(tt.overrides))
+			maps.Copy(cfg, base)
+			maps.Copy(cfg, tt.overrides)
 
 			err := instantiateMetricSetWithConfig(t, cfg)
 			require.Error(t, err)
@@ -866,5 +861,5 @@ func TestInferTypeFromMetricsAndDriverHelpers(t *testing.T) {
 	assert.NotEmpty(t, queryDBNames("mssql"))
 	assert.Empty(t, queryDBNames("postgres"))
 	assert.Equal(t, "USE [mydb];", dbSelector("sqlserver", "mydb"))
-	assert.Equal(t, "", dbSelector("postgres", "mydb"))
+	assert.Empty(t, dbSelector("postgres", "mydb"))
 }

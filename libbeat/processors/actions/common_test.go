@@ -39,7 +39,6 @@ type testCase struct {
 
 func testProcessors(t *testing.T, cases map[string]testCase) {
 	for name, test := range cases {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			ps := make([]*processors.Processors, len(test.cfg))
 			for i := range test.cfg {

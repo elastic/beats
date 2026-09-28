@@ -7,6 +7,7 @@ package config
 import (
 	"errors"
 	"fmt"
+	"sort"
 )
 
 var (
@@ -18,9 +19,11 @@ var (
 	// default_native_schedule.interval and an enabled default_rrule_schedule.
 	ErrPackConflictingScheduleDefaults = errors.New("pack cannot define both default_native_schedule.interval and default_rrule_schedule")
 
-	// ErrPackMixedScheduleModes is returned when queries in a pack without schedule
-	// defaults use different schedule modes (native interval vs rrule_schedule vs unscheduled).
-	ErrPackMixedScheduleModes = errors.New("pack queries must share the same schedule mode (all native interval, all rrule_schedule, or all unscheduled)")
+	// ErrPackMixedScheduleModes is returned when a pack mixes rrule_schedule queries
+	// with native interval or unscheduled queries. Mixing native interval and
+	// unscheduled queries is tolerated for backwards compatibility; see
+	// UnscheduledQueryNamesInNativePack.
+	ErrPackMixedScheduleModes = errors.New("pack cannot mix rrule_schedule queries with native interval or unscheduled queries")
 
 	// ErrPackQueryViolatesPackScheduleDefault is returned when a query's schedule
 	// does not match the pack's default_native_schedule or default rrule_schedule.
@@ -79,7 +82,11 @@ func queryPackScheduleMode(q Query) packQueryScheduleMode {
 // ValidatePackQueriesAfterMerge checks the pack's queries after MergeQueryWithPackScheduleDefaults.
 // When the pack sets default_native_schedule.interval, every query must use native scheduling.
 // When the pack sets an enabled default rrule_schedule, every query must use RRULE scheduling.
-// Otherwise, all queries must share one mode: native, RRULE, or unscheduled.
+// Otherwise, RRULE queries must not be mixed with native or unscheduled queries.
+// A mix of native interval and unscheduled queries is accepted for backwards
+// compatibility: policies in the field contain such packs, commonly because query
+// names with dots are split into nested maps by config parsing, leaving a query
+// without interval or SQL (https://github.com/elastic/beats/issues/51450).
 func ValidatePackQueriesAfterMerge(pack Pack) error {
 	hasNativeDefault := pack.DefaultNativeSchedule.Interval > 0
 	hasRRuleDefault := pack.DefaultRRuleSchedule != nil && pack.DefaultRRuleSchedule.IsEnabled()
@@ -97,15 +104,39 @@ func ValidatePackQueriesAfterMerge(pack Pack) error {
 	for _, q := range pack.Queries {
 		modes[queryPackScheduleMode(q)] = struct{}{}
 	}
-	if len(modes) > 1 {
+	if _, hasRRule := modes[packQueryScheduleRRule]; hasRRule && len(modes) > 1 {
 		return ErrPackMixedScheduleModes
 	}
 	return nil
 }
 
+// UnscheduledQueryNamesInNativePack returns the sorted names of unscheduled queries
+// in a pack that also contains native interval queries. Such packs pass
+// ValidatePackQueriesAfterMerge for backwards compatibility, but the unscheduled
+// queries have no interval of their own; callers should warn so the misconfiguration
+// is visible. A common cause is pack query names containing dots, which config
+// parsing splits into nested maps (https://github.com/elastic/beats/issues/51450).
+func UnscheduledQueryNamesInNativePack(pack Pack) []string {
+	var unscheduled []string
+	hasNative := false
+	for qname, q := range pack.Queries {
+		switch queryPackScheduleMode(q) {
+		case packQueryScheduleNative:
+			hasNative = true
+		case packQueryScheduleUnscheduled:
+			unscheduled = append(unscheduled, qname)
+		}
+	}
+	if !hasNative || len(unscheduled) == 0 {
+		return nil
+	}
+	sort.Strings(unscheduled)
+	return unscheduled
+}
+
 // MergeQueryWithPackScheduleDefaults applies pack-level schedule defaults to a query.
 // Query-level fields take precedence for filling fields, but the merged pack must still
-// pass ValidatePackQueriesAfterMerge (same schedule mode for all queries, aligned with pack defaults).
+// pass ValidatePackQueriesAfterMerge (no RRULE mixed with other modes, aligned with pack defaults).
 // Returns an error if the merged query violates ValidateQueryScheduleMode.
 func MergeQueryWithPackScheduleDefaults(pack Pack, q Query) (Query, error) {
 	if err := ValidateQueryScheduleMode(q); err != nil {

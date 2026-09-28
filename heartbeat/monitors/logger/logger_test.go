@@ -18,6 +18,7 @@
 package logger
 
 import (
+	"maps"
 	"testing"
 	"time"
 
@@ -108,9 +109,7 @@ func TestLogRun(t *testing.T) {
 		}
 		networkInfo := generateFakeNetworkInfo()
 		// Add network info to the event
-		for key, value := range networkInfo {
-			fields[key] = value
-		}
+		maps.Copy(fields, networkInfo)
 
 		event := beat.Event{Fields: fields}
 		eventext.SetMeta(&event, META_STEP_COUNT, steps)

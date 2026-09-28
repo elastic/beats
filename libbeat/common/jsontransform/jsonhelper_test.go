@@ -18,6 +18,7 @@
 package jsontransform
 
 import (
+	"maps"
 	"testing"
 	"time"
 
@@ -47,7 +48,7 @@ func TestWriteJSONKeys(t *testing.T) {
 	}
 
 	tests := map[string]struct {
-		keys              map[string]interface{}
+		keys              map[string]any
 		expandKeys        bool
 		overwriteKeys     bool
 		expectedMetadata  mapstr.M
@@ -57,16 +58,16 @@ func TestWriteJSONKeys(t *testing.T) {
 	}{
 		"overwrite_true": {
 			overwriteKeys: true,
-			keys: map[string]interface{}{
-				"@metadata": map[string]interface{}{
+			keys: map[string]any{
+				"@metadata": map[string]any{
 					"foo": "NEW_bar",
-					"baz": map[string]interface{}{
+					"baz": map[string]any{
 						"qux":   "NEW_qux",
 						"durrr": "COMPLETELY_NEW",
 					},
 				},
 				"@timestamp": now.Format(time.RFC3339),
-				"top_b": map[string]interface{}{
+				"top_b": map[string]any{
 					"inner_d": "NEW_dee",
 					"inner_e": "COMPLETELY_NEW_e",
 				},
@@ -92,16 +93,16 @@ func TestWriteJSONKeys(t *testing.T) {
 		},
 		"overwrite_true_ISO8601": {
 			overwriteKeys: true,
-			keys: map[string]interface{}{
-				"@metadata": map[string]interface{}{
+			keys: map[string]any{
+				"@metadata": map[string]any{
 					"foo": "NEW_bar",
-					"baz": map[string]interface{}{
+					"baz": map[string]any{
 						"qux":   "NEW_qux",
 						"durrr": "COMPLETELY_NEW",
 					},
 				},
 				"@timestamp": now.Format(iso8601),
-				"top_b": map[string]interface{}{
+				"top_b": map[string]any{
 					"inner_d": "NEW_dee",
 					"inner_e": "COMPLETELY_NEW_e",
 				},
@@ -127,16 +128,16 @@ func TestWriteJSONKeys(t *testing.T) {
 		},
 		"overwrite_false": {
 			overwriteKeys: false,
-			keys: map[string]interface{}{
-				"@metadata": map[string]interface{}{
+			keys: map[string]any{
+				"@metadata": map[string]any{
 					"foo": "NEW_bar",
-					"baz": map[string]interface{}{
+					"baz": map[string]any{
 						"qux":   "NEW_qux",
 						"durrr": "COMPLETELY_NEW",
 					},
 				},
 				"@timestamp": now.Format(time.RFC3339),
-				"top_b": map[string]interface{}{
+				"top_b": map[string]any{
 					"inner_d": "NEW_dee",
 					"inner_e": "COMPLETELY_NEW_e",
 				},
@@ -157,8 +158,8 @@ func TestWriteJSONKeys(t *testing.T) {
 		"expand_true": {
 			expandKeys:    true,
 			overwriteKeys: true,
-			keys: map[string]interface{}{
-				"top_b": map[string]interface{}{
+			keys: map[string]any{
+				"top_b": map[string]any{
 					"inner_d.inner_e": "COMPLETELY_NEW_e",
 				},
 			},
@@ -177,8 +178,8 @@ func TestWriteJSONKeys(t *testing.T) {
 		"expand_false": {
 			expandKeys:    false,
 			overwriteKeys: true,
-			keys: map[string]interface{}{
-				"top_b": map[string]interface{}{
+			keys: map[string]any{
+				"top_b": map[string]any{
 					"inner_d.inner_e": "COMPLETELY_NEW_e",
 				},
 			},
@@ -197,11 +198,11 @@ func TestWriteJSONKeys(t *testing.T) {
 		"error_case": {
 			expandKeys:    false,
 			overwriteKeys: true,
-			keys: map[string]interface{}{
-				"top_b": map[string]interface{}{
+			keys: map[string]any{
+				"top_b": map[string]any{
 					"inner_d.inner_e": "COMPLETELY_NEW_e",
 				},
-				"@timestamp": map[string]interface{}{"when": "now", "another": "yesterday"},
+				"@timestamp": map[string]any{"when": "now", "another": "yesterday"},
 			},
 			expectedMetadata:  eventMetadata.Clone(),
 			expectedTimestamp: eventTimestamp,
@@ -257,7 +258,7 @@ func BenchmarkWriteJSONKeys(b *testing.B) {
 	}
 
 	tests := map[string]struct {
-		keys           map[string]interface{}
+		keys           map[string]any
 		expandKeys     bool
 		overwriteKeys  bool
 		expectedFields mapstr.M
@@ -265,16 +266,16 @@ func BenchmarkWriteJSONKeys(b *testing.B) {
 	}{
 		"overwrite_true": {
 			overwriteKeys: true,
-			keys: map[string]interface{}{
-				"@metadata": map[string]interface{}{
+			keys: map[string]any{
+				"@metadata": map[string]any{
 					"foo": "NEW_bar",
-					"baz": map[string]interface{}{
+					"baz": map[string]any{
 						"qux":   "NEW_qux",
 						"durrr": "COMPLETELY_NEW",
 					},
 				},
 				"@timestamp": now.Format(time.RFC3339),
-				"top_b": map[string]interface{}{
+				"top_b": map[string]any{
 					"inner_d": "NEW_dee",
 					"inner_e": "COMPLETELY_NEW_e",
 				},
@@ -292,16 +293,16 @@ func BenchmarkWriteJSONKeys(b *testing.B) {
 		},
 		"overwrite_true_ISO8601": {
 			overwriteKeys: true,
-			keys: map[string]interface{}{
-				"@metadata": map[string]interface{}{
+			keys: map[string]any{
+				"@metadata": map[string]any{
 					"foo": "NEW_bar",
-					"baz": map[string]interface{}{
+					"baz": map[string]any{
 						"qux":   "NEW_qux",
 						"durrr": "COMPLETELY_NEW",
 					},
 				},
 				"@timestamp": now.Format(iso8601),
-				"top_b": map[string]interface{}{
+				"top_b": map[string]any{
 					"inner_d": "NEW_dee",
 					"inner_e": "COMPLETELY_NEW_e",
 				},
@@ -319,16 +320,16 @@ func BenchmarkWriteJSONKeys(b *testing.B) {
 		},
 		"overwrite_false": {
 			overwriteKeys: false,
-			keys: map[string]interface{}{
-				"@metadata": map[string]interface{}{
+			keys: map[string]any{
+				"@metadata": map[string]any{
 					"foo": "NEW_bar",
-					"baz": map[string]interface{}{
+					"baz": map[string]any{
 						"qux":   "NEW_qux",
 						"durrr": "COMPLETELY_NEW",
 					},
 				},
 				"@timestamp": now.Format(time.RFC3339),
-				"top_b": map[string]interface{}{
+				"top_b": map[string]any{
 					"inner_d": "NEW_dee",
 					"inner_e": "COMPLETELY_NEW_e",
 				},
@@ -347,8 +348,8 @@ func BenchmarkWriteJSONKeys(b *testing.B) {
 		"expand_true": {
 			expandKeys:    true,
 			overwriteKeys: true,
-			keys: map[string]interface{}{
-				"top_b": map[string]interface{}{
+			keys: map[string]any{
+				"top_b": map[string]any{
 					"inner_d.inner_e": "COMPLETELY_NEW_e",
 				},
 			},
@@ -365,8 +366,8 @@ func BenchmarkWriteJSONKeys(b *testing.B) {
 		"expand_false": {
 			expandKeys:    false,
 			overwriteKeys: true,
-			keys: map[string]interface{}{
-				"top_b": map[string]interface{}{
+			keys: map[string]any{
+				"top_b": map[string]any{
 					"inner_d.inner_e": "COMPLETELY_NEW_e",
 				},
 			},
@@ -383,8 +384,8 @@ func BenchmarkWriteJSONKeys(b *testing.B) {
 		"error_case": {
 			expandKeys:    false,
 			overwriteKeys: true,
-			keys: map[string]interface{}{
-				"top_b": map[string]interface{}{
+			keys: map[string]any{
+				"top_b": map[string]any{
 					"inner_d.inner_e": "COMPLETELY_NEW_e",
 				},
 				"@timestamp": "invalid string",
@@ -426,10 +427,8 @@ func BenchmarkWriteJSONKeys(b *testing.B) {
 	}
 }
 
-func clone(a map[string]interface{}) map[string]interface{} {
-	newMap := make(map[string]interface{})
-	for k, v := range a {
-		newMap[k] = v
-	}
+func clone(a map[string]any) map[string]any {
+	newMap := make(map[string]any)
+	maps.Copy(newMap, a)
 	return newMap
 }

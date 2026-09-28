@@ -50,9 +50,9 @@
 // filestream's registry tracker. Queue.Done() therefore waits for the
 // FIFO to drain *and* every batch handed out by Get to be Done.
 //
-// Unlike memqueue, Get returns whatever is available immediately; there is
-// no FlushTimeout / MaxGetRequest. Batch consolidation is left to the
-// output (e.g. the exporter's own batching).
+// Get does not accumulate to a target batch size: it blocks until at least one
+// event is available, applies a short coalescing debounce so a trickle of events
+// does not produce one tiny batch per event, then returns everything currently queued.
 package slabqueue
 
 import (
@@ -68,7 +68,7 @@ import (
 // from a pipeline config (queue.slab) just like the other implementations.
 const QueueType = "slab"
 
-// Settings configures a Pool's initial capacity.
+// Settings configures a queue's initial event budget.
 type Settings struct {
 	// Events is the pool's initial slot count: the starting bound on events
 	// live (published but not yet ack'd) across every pipeline connected to the

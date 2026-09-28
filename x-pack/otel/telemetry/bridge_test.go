@@ -479,7 +479,7 @@ func TestBridgeInputMissingIDOrType(t *testing.T) {
 func TestToInt64Value(t *testing.T) {
 	tests := []struct {
 		name   string
-		input  interface{}
+		input  any
 		want   int64
 		wantOK bool
 	}{
@@ -574,7 +574,7 @@ func TestBridgeConcurrentMapAccess(t *testing.T) {
 
 	go func() {
 		defer wg.Done()
-		for i := 0; i < 100; i++ {
+		for i := range 100 {
 			bridge.mu.Lock()
 			_ = bridge.ensureStatsInt(fmt.Sprintf("pipeline.dynamic_%d", i))
 			_ = bridge.ensureStatsFloat(fmt.Sprintf("pipeline.pct_%d", i))
@@ -586,7 +586,7 @@ func TestBridgeConcurrentMapAccess(t *testing.T) {
 
 	go func() {
 		defer wg.Done()
-		for i := 0; i < 100; i++ {
+		for range 100 {
 			_ = bridge.allInstruments()
 		}
 	}()

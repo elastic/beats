@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -96,7 +97,7 @@ func newTestRegistry(t testing.TB) *mb.Register {
 	return r
 }
 
-func newConfig(t testing.TB, moduleConfig interface{}) *conf.C {
+func newConfig(t testing.TB, moduleConfig any) *conf.C {
 	config, err := conf.NewConfigFrom(moduleConfig)
 	require.NoError(t, err)
 	return config
@@ -106,13 +107,13 @@ func newConfig(t testing.TB, moduleConfig interface{}) *conf.C {
 
 func TestWrapperOfReportingFetcher(t *testing.T) {
 	hosts := []string{"alpha", "beta"}
-	c := newConfig(t, map[string]interface{}{
+	c := newConfig(t, map[string]any{
 		"module":     moduleName,
 		"metricsets": []string{reportingFetcherName},
 		"hosts":      hosts,
 	})
 
-	m, err := module.NewWrapper(c, newTestRegistry(t), logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), paths.New())
+	m, err := module.NewWrapper(c, newTestRegistry(t), &beat.Info{Logger: logptest.NewTestingLogger(t, "")}, beatmonitoring.NewMonitoring(), paths.New())
 	require.NoError(t, err)
 
 	done := make(chan struct{})
@@ -137,13 +138,13 @@ func TestWrapperOfReportingFetcher(t *testing.T) {
 
 func TestWrapperOfPushMetricSet(t *testing.T) {
 	hosts := []string{"alpha"}
-	c := newConfig(t, map[string]interface{}{
+	c := newConfig(t, map[string]any{
 		"module":     moduleName,
 		"metricsets": []string{pushMetricSetName},
 		"hosts":      hosts,
 	})
 
-	m, err := module.NewWrapper(c, newTestRegistry(t), logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), paths.New())
+	m, err := module.NewWrapper(c, newTestRegistry(t), &beat.Info{Logger: logptest.NewTestingLogger(t, "")}, beatmonitoring.NewMonitoring(), paths.New())
 	require.NoError(t, err)
 
 	done := make(chan struct{})
@@ -184,13 +185,13 @@ func TestPeriodIsAddedToEvent(t *testing.T) {
 	for title, c := range cases {
 		t.Run(title, func(t *testing.T) {
 			hosts := []string{"alpha"}
-			config := newConfig(t, map[string]interface{}{
+			config := newConfig(t, map[string]any{
 				"module":     moduleName,
 				"metricsets": []string{c.metricset},
 				"hosts":      hosts,
 			})
 
-			m, err := module.NewWrapper(config, registry, logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
+			m, err := module.NewWrapper(config, registry, &beat.Info{Logger: logptest.NewTestingLogger(t, "")}, beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
 			require.NoError(t, err)
 
 			done := make(chan struct{})
@@ -214,14 +215,14 @@ func TestPeriodIsAddedToEvent(t *testing.T) {
 
 func TestDurationIsAddedToEvent(t *testing.T) {
 	hosts := []string{"alpha"}
-	config := newConfig(t, map[string]interface{}{
+	config := newConfig(t, map[string]any{
 		"module":     moduleName,
 		"metricsets": []string{reportingFetcherName},
 		"hosts":      hosts,
 	})
 
 	registry := newTestRegistry(t)
-	m, err := module.NewWrapper(config, registry, logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
+	m, err := module.NewWrapper(config, registry, &beat.Info{Logger: logptest.NewTestingLogger(t, "")}, beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
 	require.NoError(t, err)
 
 	done := make(chan struct{})
@@ -241,15 +242,78 @@ func TestDurationIsAddedToEvent(t *testing.T) {
 	assert.Falsef(t, ok, "received unexpected event: %+v", event)
 }
 
+// blockingFetcher blocks inside Fetch() until Close() is called.
+// It is used to test that the companion goroutine unblocks a stuck first fetch.
+type blockingFetcher struct {
+	mb.BaseMetricSet
+	started chan struct{} // closed by Fetch() once it starts blocking
+	unblock chan struct{} // closed by Close() to unblock Fetch()
+}
+
+func (f *blockingFetcher) Fetch(_ mb.ReporterV2) {
+	close(f.started)
+	<-f.unblock
+}
+
+func (f *blockingFetcher) Close() error {
+	select {
+	case <-f.unblock:
+	default:
+		close(f.unblock)
+	}
+	return nil
+}
+
+// TestWrapperCompanionUnblocksStuckFetch verifies that closing done unblocks a
+// metricset whose first Fetch() call is stuck. Without the companion goroutine,
+// the wrapper goroutine never reaches the select on done and Shutdown() blocks.
+func TestWrapperCompanionUnblocksStuckFetch(t *testing.T) {
+	started := make(chan struct{})
+	unblock := make(chan struct{})
+
+	r := mb.NewRegister()
+	err := r.AddMetricSet(moduleName, "BlockingFetcher", func(base mb.BaseMetricSet) (mb.MetricSet, error) {
+		return &blockingFetcher{BaseMetricSet: base, started: started, unblock: unblock}, nil
+	})
+	require.NoError(t, err)
+
+	c := newConfig(t, map[string]any{
+		"module":     moduleName,
+		"metricsets": []string{"BlockingFetcher"},
+		"hosts":      []string{"localhost"},
+	})
+	m, err := module.NewWrapper(c, r, &beat.Info{Logger: logptest.NewTestingLogger(t, "")}, beatmonitoring.NewMonitoring(), paths.New())
+	require.NoError(t, err)
+
+	done := make(chan struct{})
+	output := m.Start(done)
+
+	// Wait until Fetch() is actually blocking before closing done.
+	select {
+	case <-started:
+	case <-time.After(5 * time.Second):
+		t.Fatal("Fetch() did not start within 5s")
+	}
+
+	close(done)
+
+	select {
+	case _, ok := <-output:
+		assert.False(t, ok, "expected output channel to be closed")
+	case <-time.After(5 * time.Second):
+		t.Fatal("wrapper did not shut down within 5s; companion goroutine may not have unblocked Fetch()")
+	}
+}
+
 func TestNewWrapperForMetricSet(t *testing.T) {
 	hosts := []string{"alpha"}
-	c := newConfig(t, map[string]interface{}{
+	c := newConfig(t, map[string]any{
 		"module":     moduleName,
 		"metricsets": []string{reportingFetcherName},
 		"hosts":      hosts,
 	})
 
-	aModule, metricSets, err := mb.NewModule(c, newTestRegistry(t), paths.New(), logp.NewNopLogger())
+	aModule, metricSets, err := mb.NewModule(c, newTestRegistry(t), beat.Info{Paths: paths.New(), Logger: logp.NewNopLogger()})
 	require.NoError(t, err)
 
 	m, err := module.NewWrapperForMetricSet(aModule, metricSets[0], beatmonitoring.NewMonitoring(), logp.NewNopLogger(), module.WithMetricSetInfo())

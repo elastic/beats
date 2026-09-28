@@ -11,8 +11,8 @@ import (
 )
 
 type codec interface {
-	Decode([]byte, interface{}) error
-	Encode(interface{}) ([]byte, error)
+	Decode([]byte, any) error
+	Encode(any) ([]byte, error)
 }
 
 type cborCodec struct {
@@ -24,7 +24,7 @@ func newCBORCodec() *cborCodec {
 }
 
 // Encode encodes an object in cbor format.
-func (c *cborCodec) Encode(v interface{}) ([]byte, error) {
+func (c *cborCodec) Encode(v any) ([]byte, error) {
 	var buf bytes.Buffer
 	enc := ugorjicodec.NewEncoder(&buf, &c.handle)
 	err := enc.Encode(v)
@@ -32,7 +32,7 @@ func (c *cborCodec) Encode(v interface{}) ([]byte, error) {
 }
 
 // Decode decodes an object from its cbor representation.
-func (c *cborCodec) Decode(d []byte, v interface{}) error {
+func (c *cborCodec) Decode(d []byte, v any) error {
 	dec := ugorjicodec.NewDecoder(bytes.NewReader(d), &c.handle)
 	return dec.Decode(v)
 }

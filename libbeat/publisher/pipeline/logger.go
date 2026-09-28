@@ -18,12 +18,12 @@
 package pipeline
 
 type logger interface {
-	Debug(vs ...interface{})
-	Debugf(fmt string, vs ...interface{})
+	Debug(vs ...any)
+	Debugf(fmt string, vs ...any)
 
-	Info(vs ...interface{})
-	Infof(fmt string, vs ...interface{})
+	Info(vs ...any)
+	Infof(fmt string, vs ...any)
 
-	Error(vs ...interface{})
-	Errorf(fmt string, vs ...interface{})
+	Error(vs ...any)
+	Errorf(fmt string, vs ...any)
 }

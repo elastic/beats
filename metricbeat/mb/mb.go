@@ -65,7 +65,7 @@ const (
 type Module interface {
 	Name() string                                           // Name returns the name of the Module.
 	Config() ModuleConfig                                   // Config returns the ModuleConfig used to create the Module.
-	UnpackConfig(to interface{}) error                      // UnpackConfig unpacks the raw module config to the given object.
+	UnpackConfig(to any) error                              // UnpackConfig unpacks the raw module config to the given object.
 	UpdateStatus(status status.Status, msg string)          // UpdateStatus updates the status of the module. Reflected on elastic-agent.
 	SetStatusReporter(statusReporter status.StatusReporter) // SetStatusReporter updates the status reporter for the given module.
 }
@@ -80,7 +80,9 @@ type BaseModule struct {
 	config         ModuleConfig
 	rawConfig      *conf.C
 	statusReporter status.StatusReporter
+	userAgent      string
 	Logger         *logp.Logger
+	Paths          *paths.Path
 }
 
 func (m *BaseModule) String() string {
@@ -96,7 +98,7 @@ func (m *BaseModule) Name() string { return m.name }
 func (m *BaseModule) Config() ModuleConfig { return m.config }
 
 // UnpackConfig unpacks the raw module config to the given object.
-func (m *BaseModule) UnpackConfig(to interface{}) error {
+func (m *BaseModule) UnpackConfig(to any) error {
 	return m.rawConfig.Unpack(to)
 }
 
@@ -110,6 +112,11 @@ func (m *BaseModule) UpdateStatus(status status.Status, msg string) {
 // SetStatusReporter sets the status repoter of the module.
 func (m *BaseModule) SetStatusReporter(statusReporter status.StatusReporter) {
 	m.statusReporter = statusReporter
+}
+
+// UserAgent returns the beat user agent string for HTTP clients created by this module.
+func (m *BaseModule) UserAgent() string {
+	return m.userAgent
 }
 
 // WithConfig re-configures the module with the given raw configuration and returns a
@@ -137,6 +144,7 @@ func (m *BaseModule) WithConfig(config conf.C) (*BaseModule, error) {
 	newBM := &BaseModule{
 		name:      m.name,
 		rawConfig: &config,
+		userAgent: m.userAgent,
 		Logger:    m.Logger,
 	}
 
@@ -367,7 +375,7 @@ func (c ModuleConfig) GoString() string { return c.String() }
 // QueryParams is a convenient map[string]interface{} wrapper to implement the String interface which returns the
 // values in common query params format (key=value&key2=value2) which is the way that the url package expects this
 // params (without the initial '?')
-type QueryParams map[string]interface{}
+type QueryParams map[string]any
 
 // String returns the values in common query params format (key=value&key2=value2) which is the way that the url
 // package expects this params (without the initial '?')
@@ -375,12 +383,12 @@ func (q QueryParams) String() (s string) {
 	u := url.Values{}
 
 	for k, v := range q {
-		if values, ok := v.([]interface{}); ok {
+		if values, ok := v.([]any); ok {
 			for _, innerValue := range values {
 				u.Add(k, fmt.Sprintf("%v", innerValue))
 			}
 		} else {
-			//nil values in YAML shouldn't be stringified anyhow
+			// nil values in YAML shouldn't be stringified anyhow
 			if v == nil {
 				u.Add(k, "")
 			} else {

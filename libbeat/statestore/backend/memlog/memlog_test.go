@@ -94,7 +94,7 @@ func testLoadVersion1Case(t *testing.T, dataPath string) {
 	expected := struct {
 		Txid     uint64
 		Datafile string
-		Entries  map[string]interface{}
+		Entries  map[string]any
 	}{}
 	if err := json.Unmarshal(raw, &expected); err != nil {
 		t.Fatalf("Failed to parse expected.json: %v", err)
@@ -122,7 +122,7 @@ func testLoadVersion1Case(t *testing.T, dataPath string) {
 	// check all keys in expected are known and do match stored values:
 	func() {
 		for key, val := range expected.Entries {
-			var tmp interface{}
+			var tmp any
 			err := store.Get(key, &tmp)
 			require.NoError(t, err, "error reading entry (key=%v)", key)
 

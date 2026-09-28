@@ -29,7 +29,7 @@ import (
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
-	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -142,7 +142,6 @@ func (d *Discovery) Events() <-chan Event {
 
 func (d *Discovery) run() {
 	for _, i := range d.Interfaces {
-		i := i
 		go func() {
 			for {
 				d.sendProbe(i)
@@ -221,11 +220,9 @@ func (d *Discovery) sendProbe(config InterfaceConfig) {
 			continue
 		}
 
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 
-			conn, err := net.ListenPacket("udp4", net.JoinHostPort(ip.String(), "0"))
+			conn, err := net.ListenPacket("udp4", net.JoinHostPort(ip.String(), "0")) //nolint:noctx // legacy UDP discovery
 			if err != nil {
 				log.Error(err.Error())
 				return
@@ -233,10 +230,7 @@ func (d *Discovery) sendProbe(config InterfaceConfig) {
 			defer conn.Close()
 
 			// Avoid having sockets open more time than needed
-			timeout := config.ProbeTimeout
-			if timeout > config.Interval {
-				timeout = config.Interval
-			}
+			timeout := min(config.ProbeTimeout, config.Interval)
 			if err := conn.SetDeadline(time.Now().Add(timeout)); err != nil {
 				log.Error(err.Error())
 			}
@@ -256,7 +250,7 @@ func (d *Discovery) sendProbe(config InterfaceConfig) {
 					}
 					return
 				}
-				m := make(map[string]interface{})
+				m := make(map[string]any)
 				err = json.Unmarshal(b[:n], &m)
 				if err != nil {
 					log.Error(err.Error())
@@ -269,7 +263,7 @@ func (d *Discovery) sendProbe(config InterfaceConfig) {
 				}
 				d.update(config, message)
 			}
-		}()
+		})
 	}
 	wg.Wait()
 }

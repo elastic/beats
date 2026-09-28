@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Add api_endpoint configuration option to gcp-pubsub input to allow overriding the default Pub/Sub API endpoint.
+component: filebeat

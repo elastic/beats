@@ -55,7 +55,7 @@ func TestProcessorsForConfig(t *testing.T) {
 			},
 		},
 		"Index with agent info + timestamp": {
-			beatInfo:  beat.Info{Beat: "TestBeat", Version: "3.9.27", Logger: logptest.NewTestingLogger(t, "")},
+			beatInfo:  beat.Info{Beat: "TestBeat", Version: "3.9.27"},
 			configStr: "index: 'beat-%{[agent.name]}-%{[agent.version]}-%{+yyyy.MM.dd}'",
 			event:     beat.Event{Timestamp: time.Date(1999, time.December, 31, 23, 0, 0, 0, time.UTC)},
 			expectedFields: map[string]string{
@@ -119,6 +119,7 @@ func TestProcessorsForConfig(t *testing.T) {
 		if test.event.Fields == nil {
 			test.event.Fields = mapstr.M{}
 		}
+		test.beatInfo.Logger = logptest.NewTestingLogger(t, "")
 		config, err := conf.NewConfigFrom(test.configStr)
 		if err != nil {
 			t.Errorf("[%s] %v", description, err)
@@ -181,7 +182,7 @@ func TestProcessorsForConfigIsFlat(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	editor, err := newCommonConfigEditor(beat.Info{}, config)
+	editor, err := newCommonConfigEditor(beat.Info{Logger: logptest.NewTestingLogger(t, "")}, config)
 	if err != nil {
 		t.Fatal(err)
 	}

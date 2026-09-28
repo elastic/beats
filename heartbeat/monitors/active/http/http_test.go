@@ -25,6 +25,7 @@ import (
 	"crypto/x509"
 	"fmt"
 	"io"
+	"maps"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -58,7 +59,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/file"
-	btesting "github.com/elastic/beats/v7/libbeat/testing"
 )
 
 func sendSimpleTLSRequest(t *testing.T, testURL string, useUrls bool) *beat.Event {
@@ -67,8 +67,8 @@ func sendSimpleTLSRequest(t *testing.T, testURL string, useUrls bool) *beat.Even
 
 // sendTLSRequest tests the given request. certPath is optional, if given
 // an empty string no cert will be set.
-func sendTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[string]interface{}) *beat.Event {
-	configSrc := map[string]interface{}{
+func sendTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[string]any) *beat.Event {
+	configSrc := map[string]any{
 		"timeout": "1s",
 	}
 
@@ -78,14 +78,12 @@ func sendTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[
 		configSrc["hosts"] = testURL
 	}
 
-	for k, v := range extraConfig {
-		configSrc[k] = v
-	}
+	maps.Copy(configSrc, extraConfig)
 
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("tls", config, logptest.NewTestingLogger(t, ""))
+	p, err := create("tls", config, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
@@ -112,7 +110,7 @@ func checkServer(t *testing.T, handlerFunc http.HandlerFunc, useUrls bool) (*htt
 // tests.
 func urlChecks(urlStr string) validator.Validator {
 	u, _ := url.Parse(urlStr)
-	return lookslike.MustCompile(map[string]interface{}{
+	return lookslike.MustCompile(map[string]any{
 		"url": wraputil.URLFields(u),
 	})
 }
@@ -126,8 +124,8 @@ func respondingHTTPChecks(url, mimeType string, statusCode int) validator.Valida
 }
 
 func respondingHTTPStatusAndTimingChecks(statusCode int) validator.Validator {
-	return lookslike.MustCompile(map[string]interface{}{
-		"http": map[string]interface{}{
+	return lookslike.MustCompile(map[string]any{
+		"http": map[string]any{
 			"response.status_code":   statusCode,
 			"rtt.content.us":         hbtestllext.IsInt64,
 			"rtt.response_header.us": hbtestllext.IsInt64,
@@ -142,8 +140,8 @@ func minimalRespondingHTTPChecks(url, mimeType string, statusCode int) validator
 	return lookslike.Compose(
 		urlChecks(url),
 		httpBodyChecks(),
-		lookslike.MustCompile(map[string]interface{}{
-			"http": map[string]interface{}{
+		lookslike.MustCompile(map[string]any{
+			"http": map[string]any{
 				"response.mime_type":   mimeType,
 				"response.status_code": statusCode,
 				"rtt.total.us":         hbtestllext.IsInt64,
@@ -153,22 +151,22 @@ func minimalRespondingHTTPChecks(url, mimeType string, statusCode int) validator
 }
 
 func httpBodyChecks() validator.Validator {
-	return lookslike.MustCompile(map[string]interface{}{
+	return lookslike.MustCompile(map[string]any{
 		"http.response.body.bytes": isdef.IsIntGt(-1),
 		"http.response.body.hash":  isdef.IsString,
 	})
 }
 
 func respondingHTTPBodyChecks(body string) validator.Validator {
-	return lookslike.MustCompile(map[string]interface{}{
+	return lookslike.MustCompile(map[string]any{
 		"http.response.body.content": body,
 		"http.response.body.bytes":   len(body),
 	})
 }
 
 func respondingHTTPHeaderChecks() validator.Validator {
-	return lookslike.MustCompile(map[string]interface{}{
-		"http.response.headers": map[string]interface{}{
+	return lookslike.MustCompile(map[string]any{
+		"http.response.headers": map[string]any{
 			"Date":           isdef.Optional(isdef.IsString),
 			"Content-Length": isdef.Optional(isdef.IsString),
 			"Content-Type":   isdef.Optional(isdef.IsString),
@@ -250,7 +248,6 @@ var downStatuses = []int{
 func TestUpStatuses(t *testing.T) {
 	for _, useURLs := range []bool{true, false} {
 		for _, status := range upStatuses {
-			status := status
 
 			field := "hosts"
 			if useURLs {
@@ -292,7 +289,6 @@ func TestHeadersDisabled(t *testing.T) {
 
 func TestDownStatuses(t *testing.T) {
 	for _, status := range downStatuses {
-		status := status
 		t.Run(fmt.Sprintf("test down status %d", status), func(t *testing.T) {
 			server, event := checkServer(t, hbtest.HelloWorldHandler(status), false)
 
@@ -316,7 +312,7 @@ func TestLargeResponse(t *testing.T) {
 	server := httptest.NewServer(hbtest.SizedResponseHandler(1024 * 1024))
 	defer server.Close()
 
-	configSrc := map[string]interface{}{
+	configSrc := map[string]any{
 		"hosts":               server.URL,
 		"timeout":             "1s",
 		"check.response.body": "x",
@@ -326,7 +322,7 @@ func TestLargeResponse(t *testing.T) {
 	require.NoError(t, err)
 
 	logger := logptest.NewTestingLogger(t, "")
-	p, err := create("largeresp", config, logger)
+	p, err := create("largeresp", config, beat.Info{Logger: logger})
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
@@ -432,7 +428,7 @@ func TestJsonBody(t *testing.T) {
 				jsonCheck["condition"] = tc.condition
 			}
 
-			configSrc := map[string]interface{}{
+			configSrc := map[string]any{
 				"hosts":                 server.URL,
 				"timeout":               "1s",
 				"response.include_body": "never",
@@ -444,7 +440,7 @@ func TestJsonBody(t *testing.T) {
 			config, err := conf.NewConfigFrom(configSrc)
 			require.NoError(t, err)
 
-			p, err := create("largeresp", config, logger)
+			p, err := create("largeresp", config, beat.Info{Logger: logger})
 			require.NoError(t, err)
 
 			sched, _ := schedule.Parse("@every 1s")
@@ -485,7 +481,7 @@ func TestJsonBody(t *testing.T) {
 func runHTTPSServerCheck(
 	t *testing.T,
 	server *httptest.Server,
-	reqExtraConfig map[string]interface{}) {
+	reqExtraConfig map[string]any) {
 
 	// Parse the cert so we can test against it.
 	cert, err := x509.ParseCertificate(server.TLS.Certificates[0].Certificate[0])
@@ -496,15 +492,13 @@ func runHTTPSServerCheck(
 	require.NoError(t, certFile.Close())
 	defer os.Remove(certFile.Name())
 
-	mergedExtraConfig := map[string]interface{}{"ssl.certificate_authorities": certFile.Name()}
-	for k, v := range reqExtraConfig {
-		mergedExtraConfig[k] = v
-	}
+	mergedExtraConfig := map[string]any{"ssl.certificate_authorities": certFile.Name()}
+	maps.Copy(mergedExtraConfig, reqExtraConfig)
 
 	// Sometimes the test server can take a while to start. Since we're only using this to test up statuses,
 	// we give it a few attempts to see if the server can come up before we run the real assertions.
 	var event *beat.Event
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		event = sendTLSRequest(t, server.URL, false, mergedExtraConfig)
 		if v, err := event.GetValue("monitor.status"); err == nil && reflect.DeepEqual(v, "up") {
 			break
@@ -514,7 +508,7 @@ func runHTTPSServerCheck(
 
 	// When connecting through a proxy, the following fields are missing.
 	if _, isProxy := reqExtraConfig["proxy_url"]; isProxy {
-		missing := map[string]interface{}{
+		missing := map[string]any{
 			"http.rtt.response_header.us": int64(0),
 			"http.rtt.content.us":         int64(0),
 			"monitor.ip":                  "127.0.0.1",
@@ -558,7 +552,7 @@ func TestExpiredHTTPSServer(t *testing.T) {
 	defer closeSrv()
 	u := &url.URL{Scheme: "https", Host: net.JoinHostPort(host, port)}
 
-	extraConfig := map[string]interface{}{"ssl.certificate_authorities": "../fixtures/expired.cert"}
+	extraConfig := map[string]any{"ssl.certificate_authorities": "../fixtures/expired.cert"}
 	event := sendTLSRequest(t, u.String(), true, extraConfig)
 
 	testslike.Test(
@@ -605,7 +599,7 @@ func TestHTTPSx509Auth(t *testing.T) {
 	runHTTPSServerCheck(
 		t,
 		server,
-		map[string]interface{}{
+		map[string]any{
 			"ssl.certificate": clientCertPath,
 			"ssl.key":         clientKeyPath,
 		},
@@ -614,10 +608,14 @@ func TestHTTPSx509Auth(t *testing.T) {
 
 func TestConnRefusedJob(t *testing.T) {
 	ip := "127.0.0.1"
-	port, err := btesting.AvailableTCP4Port()
+	var lc net.ListenConfig
+	l, err := lc.Listen(t.Context(), "tcp", net.JoinHostPort(ip, "0"))
 	require.NoError(t, err)
+	addr, ok := l.Addr().(*net.TCPAddr)
+	require.True(t, ok, "expected *net.TCPAddr from listener")
+	require.NoError(t, l.Close())
 
-	url := fmt.Sprintf("http://%s:%d", ip, port)
+	url := fmt.Sprintf("http://%s:%d", ip, addr.Port)
 	event := sendSimpleTLSRequest(t, url, false)
 
 	testslike.Test(
@@ -625,7 +623,7 @@ func TestConnRefusedJob(t *testing.T) {
 		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks(ip, "down", "http"),
 			hbtest.SummaryStateChecks(0, 1),
-			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, net.JoinHostPort(ip, strconv.Itoa(int(port)))),
+			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, net.JoinHostPort(ip, strconv.Itoa(addr.Port))),
 			urlChecks(url),
 		)),
 		event.Fields,
@@ -637,7 +635,7 @@ func TestUnreachableJob(t *testing.T) {
 	// See: https://tools.ietf.org/html/rfc6890
 	ip := "203.0.113.1"
 	// Port 80 is sometimes omitted in logs a non-standard one is easier to validate
-	port := uint16(1234)
+	const port = 1234
 	url := fmt.Sprintf("http://%s:%d", ip, port)
 
 	event := sendSimpleTLSRequest(t, url, false)
@@ -647,7 +645,7 @@ func TestUnreachableJob(t *testing.T) {
 		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks(ip, "down", "http"),
 			hbtest.SummaryStateChecks(0, 1),
-			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, net.JoinHostPort(ip, strconv.Itoa(int(port)))),
+			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, net.JoinHostPort(ip, strconv.Itoa(port))),
 			urlChecks(url),
 		)),
 		event.Fields,
@@ -664,7 +662,7 @@ func TestRedirect(t *testing.T) {
 	defer server.Close()
 
 	testURL := server.URL + "/redirect_one"
-	configSrc := map[string]interface{}{
+	configSrc := map[string]any{
 		"urls":                testURL,
 		"timeout":             "1s",
 		"check.response.body": expectedBody,
@@ -675,7 +673,7 @@ func TestRedirect(t *testing.T) {
 	require.NoError(t, err)
 
 	logger := logptest.NewTestingLogger(t, "")
-	p, err := create("redirect", config, logger)
+	p, err := create("redirect", config, beat.Info{Logger: logger})
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
@@ -693,7 +691,7 @@ func TestRedirect(t *testing.T) {
 			minimalRespondingHTTPChecks(testURL, "text/plain; charset=utf-8", 200),
 			respondingHTTPHeaderChecks(),
 			hbtest.SummaryStateChecks(1, 0),
-			lookslike.MustCompile(map[string]interface{}{
+			lookslike.MustCompile(map[string]any{
 				// For redirects that are followed we shouldn't record this header because there's no sensible
 				// value
 				"http.response.headers.Location": isdef.KeyMissing,
@@ -735,7 +733,7 @@ func TestRedirectWithTLS(t *testing.T) {
 	defer os.Remove(certFile.Name())
 
 	testURL := server.URL + "/redirect_one"
-	configSrc := map[string]interface{}{
+	configSrc := map[string]any{
 		"urls":                        testURL,
 		"timeout":                     "5s",
 		"check.response.body":         expectedBody,
@@ -747,7 +745,7 @@ func TestRedirectWithTLS(t *testing.T) {
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("redirect-tls", config, logptest.NewTestingLogger(t, ""))
+	p, err := create("redirect-tls", config, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
@@ -767,7 +765,7 @@ func TestRedirectWithTLS(t *testing.T) {
 			// Core regression assertion: TLS certificate metadata must be
 			// present even though redirects were followed over HTTPS.
 			hbtest.TLSCertChecks(cert),
-			lookslike.MustCompile(map[string]interface{}{
+			lookslike.MustCompile(map[string]any{
 				"tls.established":      true,
 				"tls.version":          isdef.IsString,
 				"tls.version_protocol": isdef.IsString,
@@ -790,7 +788,7 @@ func TestNoHeaders(t *testing.T) {
 	server := httptest.NewServer(hbtest.HelloWorldHandler(200))
 	defer server.Close()
 
-	configSrc := map[string]interface{}{
+	configSrc := map[string]any{
 		"urls":                     server.URL,
 		"response.include_headers": false,
 	}
@@ -798,7 +796,7 @@ func TestNoHeaders(t *testing.T) {
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("http", config, logptest.NewTestingLogger(t, ""))
+	p, err := create("http", config, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
@@ -816,7 +814,7 @@ func TestNoHeaders(t *testing.T) {
 			hbtest.RespondingTCPChecks(),
 			respondingHTTPStatusAndTimingChecks(200),
 			minimalRespondingHTTPChecks(server.URL, "text/plain; charset=utf-8", 200),
-			lookslike.MustCompile(map[string]interface{}{
+			lookslike.MustCompile(map[string]any{
 				"http.response.headers": isdef.KeyMissing,
 			}),
 		)),
@@ -827,7 +825,7 @@ func TestNoHeaders(t *testing.T) {
 func TestProxy(t *testing.T) {
 	server := httptest.NewTLSServer(hbtest.HelloWorldHandler(http.StatusOK))
 	proxy := httptest.NewServer(http.HandlerFunc(httpConnectTunnel))
-	runHTTPSServerCheck(t, server, map[string]interface{}{
+	runHTTPSServerCheck(t, server, map[string]any{
 		"proxy_url": proxy.URL,
 	})
 }
@@ -835,7 +833,7 @@ func TestProxy(t *testing.T) {
 func TestTLSProxy(t *testing.T) {
 	server := httptest.NewTLSServer(hbtest.HelloWorldHandler(http.StatusOK))
 	proxy := httptest.NewTLSServer(http.HandlerFunc(httpConnectTunnel))
-	runHTTPSServerCheck(t, server, map[string]interface{}{
+	runHTTPSServerCheck(t, server, map[string]any{
 		"proxy_url": proxy.URL,
 	})
 }
@@ -910,9 +908,9 @@ func TestDecodesGzip(t *testing.T) {
 	}))
 	defer server.Close()
 
-	evt := sendTLSRequest(t, server.URL, false, map[string]interface{}{
+	evt := sendTLSRequest(t, server.URL, false, map[string]any{
 		"response.include_body": "always",
-		"check.request.headers": map[string]interface{}{"Accept-Encoding": "gzip"},
+		"check.request.headers": map[string]any{"Accept-Encoding": "gzip"},
 	})
 
 	content, err := evt.Fields.GetValue("http.response.body.content")
@@ -931,9 +929,9 @@ func TestNoGzipDecodeWithoutHeader(t *testing.T) {
 	server := httptest.NewServer(hbtest.CustomResponseHandler(gzBuffer.Bytes(), 200, map[string]string{}))
 	defer server.Close()
 
-	evt := sendTLSRequest(t, server.URL, false, map[string]interface{}{
+	evt := sendTLSRequest(t, server.URL, false, map[string]any{
 		"response.include_body": "always",
-		"check.request.headers": map[string]interface{}{"Accept-Encoding": "gzip"},
+		"check.request.headers": map[string]any{"Accept-Encoding": "gzip"},
 	})
 
 	content, err := evt.Fields.GetValue("http.response.body.content")
@@ -955,7 +953,7 @@ func TestGzipDecodeWithoutRequestHeader(t *testing.T) {
 	}))
 	defer server.Close()
 
-	evt := sendTLSRequest(t, server.URL, false, map[string]interface{}{
+	evt := sendTLSRequest(t, server.URL, false, map[string]any{
 		// no header here from Heartbeat asking the server for `gzip`
 		"response.include_body": "always",
 	})
@@ -976,12 +974,12 @@ func TestUserAgentInject(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	cfg, err := conf.NewConfigFrom(map[string]interface{}{
+	cfg, err := conf.NewConfigFrom(map[string]any{
 		"urls": ts.URL,
 	})
 	require.NoError(t, err)
 
-	p, err := create("ua", cfg, logptest.NewTestingLogger(t, ""))
+	p, err := create("ua", cfg, beat.Info{Logger: logptest.NewTestingLogger(t, "")})
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")

@@ -37,7 +37,7 @@ const maxRawCopySize = 2048
 type Decoder interface {
 	// Decode takes a raw message and its metadata and returns a representation
 	// in a decoder-dependent type.
-	Decode(raw []byte, meta Metadata) (interface{}, error)
+	Decode(raw []byte, meta Metadata) (any, error)
 }
 
 type mapDecoder []Field
@@ -62,15 +62,15 @@ func NewMapDecoder(format ProbeFormat) Decoder {
 }
 
 // Decode implements the Decoder interface.
-func (f mapDecoder) Decode(raw []byte, meta Metadata) (mapIf interface{}, err error) {
+func (f mapDecoder) Decode(raw []byte, meta Metadata) (mapIf any, err error) {
 	n := len(raw)
-	m := make(map[string]interface{}, len(f)+1)
+	m := make(map[string]any, len(f)+1)
 	m["meta"] = meta
 	for _, field := range f {
 		if field.Offset+field.Size > n {
 			return nil, fmt.Errorf("perf event field %s overflows message of size %d", field.Name, n)
 		}
-		var value interface{}
+		var value any
 		ptr := unsafe.Pointer(&raw[field.Offset])
 		switch field.Type {
 		case FieldTypeInteger:
@@ -100,7 +100,7 @@ func (f mapDecoder) Decode(raw []byte, meta Metadata) (mapIf interface{}, err er
 // AllocateFn is the type of a function that allocates a custom struct
 // to be used with StructDecoder. This function must return a pointer to
 // a struct.
-type AllocateFn func() interface{}
+type AllocateFn func() any
 
 type fieldDecoder struct {
 	typ  FieldType
@@ -177,7 +177,7 @@ func NewStructDecoder(desc ProbeFormat, allocFn AllocateFn) (Decoder, error) {
 	// Validate that allocFn() returns pointers to structs.
 	sample := allocFn()
 	tSample := reflect.TypeOf(sample)
-	if tSample.Kind() != reflect.Ptr {
+	if tSample.Kind() != reflect.Pointer {
 		return nil, errors.New("allocator function doesn't return a pointer")
 	}
 	tSample = tSample.Elem()
@@ -187,8 +187,7 @@ func NewStructDecoder(desc ProbeFormat, allocFn AllocateFn) (Decoder, error) {
 
 	var inFieldsByOffset map[int]Field
 
-	for i := 0; i < tSample.NumField(); i++ {
-		outField := tSample.Field(i)
+	for outField := range tSample.Fields() {
 		values, found := outField.Tag.Lookup("kprobe")
 		if !found {
 			// Untagged field
@@ -215,7 +214,7 @@ func NewStructDecoder(desc ProbeFormat, allocFn AllocateFn) (Decoder, error) {
 
 		// Special handling for metadata field
 		if name == "metadata" {
-			if outField.Type != reflect.TypeOf(Metadata{}) {
+			if outField.Type != reflect.TypeFor[Metadata]() {
 				return nil, errors.New("bad type for meta field")
 			}
 			dec.fields = append(dec.fields, fieldDecoder{
@@ -325,7 +324,7 @@ func NewStructDecoder(desc ProbeFormat, allocFn AllocateFn) (Decoder, error) {
 }
 
 // Decode implements the decoder interface.
-func (d *structDecoder) Decode(raw []byte, meta Metadata) (s interface{}, err error) {
+func (d *structDecoder) Decode(raw []byte, meta Metadata) (s any, err error) {
 	n := uintptr(len(raw))
 
 	// Allocate a new struct to fill
@@ -413,7 +412,7 @@ func NewDumpDecoder(format ProbeFormat) (Decoder, error) {
 }
 
 // Decode implements the decoder interface.
-func (d *dumpDecoder) Decode(raw []byte, _ Metadata) (interface{}, error) {
+func (d *dumpDecoder) Decode(raw []byte, _ Metadata) (any, error) {
 	if len(raw) < d.end {
 		return nil, errors.New("record too short for dump")
 	}

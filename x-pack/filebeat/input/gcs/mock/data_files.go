@@ -385,8 +385,6 @@ var objectFileList = map[string]string{
 }
 
 // These variables are intentionally indented like this to match the output of certain tests
-//
-//nolint:stylecheck // required for edge case test scenario
 var BeatsFilesBucket_multiline_json = []string{
 	"{\n    \"@timestamp\": \"2021-05-25T17:25:42.806Z\",\n    \"log.level\": \"error\",\n    \"message\": \"error making request\"\n}",
 	"{\n    \"@timestamp\": \"2021-05-25T17:25:51.391Z\",\n    \"log.level\": \"info\",\n    \"message\": \"available space 44.3gb\"\n}",

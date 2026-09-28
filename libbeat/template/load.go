@@ -48,7 +48,7 @@ type ESLoader struct {
 // ESClient is a subset of the Elasticsearch client API capable of
 // loading the template.
 type ESClient interface {
-	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
+	Request(method, path string, pipeline string, params map[string]string, body any) (int, []byte, error)
 	GetVersion() version.V
 	IsServerless() bool
 }
@@ -174,7 +174,7 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 // loadTemplate loads a template into Elasticsearch overwriting the existing
 // template if it exists. If you wish to not overwrite an existing template
 // then use CheckTemplate prior to calling this method.
-func (l *ESLoader) loadTemplate(templateName string, template map[string]interface{}) error {
+func (l *ESLoader) loadTemplate(templateName string, template map[string]any) error {
 	l.log.Infof("Try loading template %s to Elasticsearch", templateName)
 	path := "/_index_template/" + templateName
 	status, body, err := l.client.Request("PUT", path, "", nil, template)
@@ -287,7 +287,7 @@ func (b *templateBuilder) buildBodyFromJSON(config TemplateConfig) (mapstr.M, er
 	if err != nil {
 		return nil, fmt.Errorf("error reading file %s for template: %w", jsonPath, err)
 	}
-	var body map[string]interface{}
+	var body map[string]any
 	err = json.Unmarshal(content, &body)
 	if err != nil {
 		return nil, fmt.Errorf("could not unmarshal json template: %w", err)

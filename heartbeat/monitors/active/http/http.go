@@ -24,9 +24,9 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
@@ -44,7 +44,7 @@ var userAgent = useragent.UserAgent("Heartbeat", version.GetDefaultVersion(), ve
 func create(
 	name string,
 	cfg *conf.C,
-	logger *logp.Logger,
+	info beat.Info,
 ) (p plugin.Plugin, err error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
@@ -71,36 +71,37 @@ func create(
 		body = buf.Bytes()
 	}
 
-	validator, err := makeValidateResponse(&config.Check.Response, logger)
+	validator, err := makeValidateResponse(&config.Check.Response, info.Logger)
 	if err != nil {
 		return plugin.Plugin{}, err
 	}
 
-	// Determine whether we're using a proxy or not and then use that to figure out how to
-	// run the job
 	var makeJob func(string) (jobs.Job, error)
-	// In the event that a ProxyURL is present, or redirect support is enabled
-	// we execute DNS resolution requests inline with the request, not running them as a separate job, and not returning
-	// separate DNS rtt data.
-	if (config.Transport.Proxy.URL != nil && !config.Transport.Proxy.Disable) || config.MaxRedirects > 0 {
-		transport, err := newRoundTripper(&config)
+	// Proxy, redirects, Kerberos, and NTLM need http.Transport. The per-IP
+	// SimpleTransport is one write/read with no connection reuse, so it cannot
+	// finish a 401 challenge or follow a redirect.
+	if (config.Transport.Proxy.URL != nil && !config.Transport.Proxy.Disable) ||
+		config.MaxRedirects > 0 ||
+		config.Kerberos.IsEnabled() ||
+		config.NTLM.IsEnabled() {
+		transport, err := newRoundTripper(&config, userAgent)
 		if err != nil {
 			return plugin.Plugin{}, err
 		}
 
 		makeJob = func(urlStr string) (jobs.Job, error) {
-			return newHTTPMonitorHostJob(urlStr, &config, transport, enc, body, validator)
+			return newHTTPMonitorHostJob(urlStr, &config, transport, enc, body, validator, userAgent)
 		}
 	} else {
 		// preload TLS configuration
-		tls, err := tlscommon.LoadTLSConfig(config.Transport.TLS, logger)
+		tls, err := tlscommon.LoadTLSConfig(config.Transport.TLS, info.Logger)
 		if err != nil {
 			return plugin.Plugin{}, err
 		}
 		config.Transport.TLS = nil
 
 		makeJob = func(urlStr string) (jobs.Job, error) {
-			return newHTTPMonitorIPsJob(&config, urlStr, tls, enc, body, validator)
+			return newHTTPMonitorIPsJob(&config, urlStr, tls, enc, body, validator, userAgent)
 		}
 	}
 
@@ -121,16 +122,33 @@ func create(
 		js[i] = wraputil.WithURLField(u, job)
 	}
 
-	return plugin.Plugin{Jobs: js, Endpoints: len(config.Hosts), Logger: logger}, nil
+	return plugin.Plugin{Jobs: js, Endpoints: len(config.Hosts), Logger: info.Logger}, nil
 }
 
-func newRoundTripper(config *Config) (http.RoundTripper, error) {
-	return config.Transport.RoundTripper(
+func newRoundTripper(config *Config, userAgent string) (http.RoundTripper, error) {
+	opts := []httpcommon.TransportOption{
 		httpcommon.WithAPMHTTPInstrumentation(),
 		httpcommon.WithoutProxyEnvironmentVariables(),
-		httpcommon.WithKeepaliveSettings{
-			Disable: true,
-		},
 		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}),
-	)
+	}
+
+	// NTLM keeps the TCP connection for the whole handshake. Other checks
+	// disable keep-alives so each ping uses a fresh connection.
+	if !config.NTLM.IsEnabled() {
+		opts = append(opts, httpcommon.WithKeepaliveSettings{Disable: true})
+	}
+
+	rt, err := config.Transport.RoundTripper(opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	if config.NTLM.IsEnabled() {
+		rt, err = wrapNTLMRoundTripper(rt, config.NTLM)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return rt, nil
 }

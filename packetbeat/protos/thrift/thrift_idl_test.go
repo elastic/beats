@@ -18,21 +18,21 @@
 package thrift
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func thriftIdlForTesting(t *testing.T, content string) *thriftIdl {
-	f, _ := ioutil.TempFile("", "")
+	f, _ := os.CreateTemp("", "")
 	defer os.Remove(f.Name())
 
 	f.WriteString(content)
 	f.Close()
 
-	idl, err := newThriftIdl([]string{f.Name()})
+	idl, err := newThriftIdl([]string{f.Name()}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal("Parsing failed:", err)
 	}

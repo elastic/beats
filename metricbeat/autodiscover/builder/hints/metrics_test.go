@@ -26,8 +26,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	"github.com/elastic/beats/v7/testing/testutils"
-	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -113,8 +113,8 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
-					"hosts":      []interface{}{"1.2.3.4:9090"},
-					"processors": []interface{}{},
+					"hosts":      []any{"1.2.3.4:9090"},
+					"processors": []any{},
 				},
 			},
 		},
@@ -138,8 +138,8 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
-					"hosts":      []interface{}{"1.2.3.4:9090"},
-					"processors": []interface{}{},
+					"hosts":      []any{"1.2.3.4:9090"},
+					"processors": []any{},
 				},
 			},
 		},
@@ -161,7 +161,7 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
-					"processors": []interface{}{},
+					"processors": []any{},
 				},
 			},
 		},
@@ -184,7 +184,7 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
-					"processors": []interface{}{},
+					"processors": []any{},
 				},
 			},
 		},
@@ -206,7 +206,7 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
-					"processors": []interface{}{},
+					"processors": []any{},
 				},
 			},
 		},
@@ -253,8 +253,8 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
-					"hosts":      []interface{}{"1.2.3.4:9090"},
-					"processors": []interface{}{},
+					"hosts":      []any{"1.2.3.4:9090"},
+					"processors": []any{},
 				},
 			},
 		},
@@ -284,10 +284,10 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
-					"hosts":      []interface{}{"1.2.3.4:9090"},
-					"processors": []interface{}{
-						map[string]interface{}{
-							"add_locale": map[string]interface{}{
+					"hosts":      []any{"1.2.3.4:9090"},
+					"processors": []any{
+						map[string]any{
+							"add_locale": map[string]any{
 								"abbrevation": "MST",
 							},
 						},
@@ -329,11 +329,11 @@ func TestGenerateHints(t *testing.T) {
 					"module":     "mockmoduledefaults",
 					"namespace":  "test",
 					"metricsets": []string{"default"},
-					"hosts":      []interface{}{"1.2.3.4:9090"},
+					"hosts":      []any{"1.2.3.4:9090"},
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
-					"processors": []interface{}{},
+					"processors": []any{},
 				},
 			},
 		},
@@ -374,11 +374,11 @@ func TestGenerateHints(t *testing.T) {
 					"module":     "mockmoduledefaults",
 					"namespace":  "test",
 					"metricsets": []string{"default"},
-					"hosts":      []interface{}{"tcp(1.2.3.4:3306)/"},
+					"hosts":      []any{"tcp(1.2.3.4:3306)/"},
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
-					"processors": []interface{}{},
+					"processors": []any{},
 				},
 			},
 		},
@@ -401,11 +401,11 @@ func TestGenerateHints(t *testing.T) {
 					"module":     "mockmoduledefaults",
 					"namespace":  "test",
 					"metricsets": []string{"default"},
-					"hosts":      []interface{}{"1.2.3.4:3306"},
+					"hosts":      []any{"1.2.3.4:3306"},
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
-					"processors": []interface{}{},
+					"processors": []any{},
 				},
 			},
 		},
@@ -428,11 +428,11 @@ func TestGenerateHints(t *testing.T) {
 					"module":     "mockmoduledefaults",
 					"namespace":  "test",
 					"metricsets": []string{"default"},
-					"hosts":      []interface{}{"http://1.2.3.4:3306/metrics"},
+					"hosts":      []any{"http://1.2.3.4:3306/metrics"},
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
-					"processors": []interface{}{},
+					"processors": []any{},
 				},
 			},
 		},
@@ -456,11 +456,11 @@ func TestGenerateHints(t *testing.T) {
 					"module":     "mockmoduledefaults",
 					"namespace":  "test",
 					"metricsets": []string{"default"},
-					"hosts":      []interface{}{"1.2.3.4:3306"},
+					"hosts":      []any{"1.2.3.4:3306"},
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
-					"processors": []interface{}{},
+					"processors": []any{},
 				},
 			},
 		},
@@ -492,8 +492,8 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
-					"hosts":      []interface{}{"1.2.3.4:9090"},
-					"processors": []interface{}{},
+					"hosts":      []any{"1.2.3.4:9090"},
+					"processors": []any{},
 				},
 				{
 					"module":     "mockmoduledefaults",
@@ -502,8 +502,8 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
-					"hosts":      []interface{}{"1.2.3.4:9090/fake"},
-					"processors": []interface{}{},
+					"hosts":      []any{"1.2.3.4:9090/fake"},
+					"processors": []any{},
 				},
 			},
 		},
@@ -528,8 +528,8 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
-					"hosts":      []interface{}{"1.2.3.4:9090"},
-					"processors": []interface{}{},
+					"hosts":      []any{"1.2.3.4:9090"},
+					"processors": []any{},
 				},
 				{
 					"module":     "mockmoduledefaults",
@@ -538,8 +538,8 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
-					"hosts":      []interface{}{"1.2.3.4:9091"},
-					"processors": []interface{}{},
+					"hosts":      []any{"1.2.3.4:9091"},
+					"processors": []any{},
 				},
 			},
 		},
@@ -565,8 +565,8 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
-					"hosts":      []interface{}{"1.2.3.4:9091"},
-					"processors": []interface{}{},
+					"hosts":      []any{"1.2.3.4:9091"},
+					"processors": []any{},
 				},
 			},
 		},
@@ -595,11 +595,11 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
-					"hosts":      []interface{}{"1.2.3.4:9090"},
-					"processors": []interface{}{},
-					"metrics_filters": map[string]interface{}{
-						"exclude": []interface{}{"foo", "bar"},
-						"include": []interface{}{"xxx", "yyy"},
+					"hosts":      []any{"1.2.3.4:9090"},
+					"processors": []any{},
+					"metrics_filters": map[string]any{
+						"exclude": []any{"foo", "bar"},
+						"include": []any{"xxx", "yyy"},
 					},
 				},
 			},
@@ -635,7 +635,7 @@ func TestGenerateHints(t *testing.T) {
 			}
 			// metricsets order is random, order it for tests
 			if v, err := config.GetValue("metricsets"); err == nil {
-				if msets, ok := v.([]interface{}); ok {
+				if msets, ok := v.([]any); ok {
 					metricsets := make([]string, len(msets))
 					for i, v := range msets {
 						var ok bool
@@ -684,12 +684,12 @@ func TestGenerateHintsDoesNotAccessGlobalKeystore(t *testing.T) {
 			result: mapstr.M{
 				"module":     "mockmoduledefaults",
 				"metricsets": []string{"default"},
-				"hosts":      []interface{}{"1.2.3.4:9090"},
+				"hosts":      []any{"1.2.3.4:9090"},
 				"timeout":    "3s",
 				"period":     "1m",
 				"enabled":    true,
 				"password":   "env_secret",
-				"processors": []interface{}{},
+				"processors": []any{},
 			},
 		},
 	}
@@ -711,7 +711,7 @@ func TestGenerateHintsDoesNotAccessGlobalKeystore(t *testing.T) {
 
 			// metricsets order is random, order it for tests
 			if v, err := config.GetValue("metricsets"); err == nil {
-				if msets, ok := v.([]interface{}); ok {
+				if msets, ok := v.([]any); ok {
 					metricsets := make([]string, len(msets))
 					for i, v := range msets {
 						var ok bool

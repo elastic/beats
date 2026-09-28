@@ -5,9 +5,12 @@
 package azureblobstorage
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/blob"
@@ -17,20 +20,48 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func fetchServiceClientAndCreds(cfg config, url string, log *logp.Logger) (*service.Client, *serviceCredentials, error) {
+func fetchServiceClientAndCreds(cfg config, retryCfg retryConfig, url string, log *logp.Logger) (*service.Client, *serviceCredentials, error) {
+	// storageOpts start from the (test-injected) client options and add the retry
+	// policy for requests to Azure Storage.
+	storageOpts := cfg.clientOptions
+	storageOpts.Retry = azureRetryOptions(retryCfg)
+
 	switch {
 	case cfg.Auth.SharedCredentials != nil:
-		return fetchServiceClientWithSharedKeyCreds(url, cfg.AccountName, cfg.Auth.SharedCredentials, log)
+		return fetchServiceClientWithSharedKeyCreds(url, cfg.AccountName, cfg.Auth.SharedCredentials, storageOpts, log)
 	case cfg.Auth.ConnectionString != nil:
-		return fetchServiceClientWithConnectionString(cfg.Auth.ConnectionString, log)
+		return fetchServiceClientWithConnectionString(cfg.Auth.ConnectionString, storageOpts, log)
 	case cfg.Auth.OAuth2 != nil:
-		return fetchServiceClientWithOAuth2(url, cfg.Auth.OAuth2)
+		creds, err := newClientSecretCredential(cfg.Auth.OAuth2, storageOpts)
+		if err != nil {
+			return nil, nil, err
+		}
+		return fetchServiceClientWithTokenCreds(url, creds, storageOpts, oauth2Type)
+	case cfg.Auth.ManagedIdentity.Enabled:
+		creds, err := newManagedIdentityCredential(cfg.Auth.ManagedIdentity, storageOpts, log)
+		if err != nil {
+			return nil, nil, err
+		}
+		return fetchServiceClientWithTokenCreds(url, creds, storageOpts, managedIdentityType)
 	}
 
-	return nil, nil, fmt.Errorf("no valid auth specified")
+	return nil, nil, errors.New("no valid auth specified: configure one of auth.shared_credentials, auth.connection_string, auth.oauth2 or auth.managed_identity")
 }
 
-func fetchServiceClientWithSharedKeyCreds(url string, accountName string, cfg *sharedKeyConfig, log *logp.Logger) (*service.Client, *serviceCredentials, error) {
+// azureRetryOptions translates the input's retry configuration into the Azure
+// SDK's pipeline retry policy. The policy lives in the client pipeline, so these
+// settings apply to every request the client makes — listing blobs (pagination)
+// as well as downloading them. The values are seeded with the SDK defaults in
+// defaultConfig, so a zero value here only occurs when explicitly configured.
+func azureRetryOptions(rc retryConfig) policy.RetryOptions {
+	return policy.RetryOptions{
+		MaxRetries:    rc.MaxRetries,
+		RetryDelay:    rc.InitialRetryDelay,
+		MaxRetryDelay: rc.MaxRetryDelay,
+	}
+}
+
+func fetchServiceClientWithSharedKeyCreds(url string, accountName string, cfg *sharedKeyConfig, opts azcore.ClientOptions, log *logp.Logger) (*service.Client, *serviceCredentials, error) {
 	// Creates a default request pipeline using your storage account name and account key.
 	credential, err := azblob.NewSharedKeyCredential(accountName, cfg.AccountKey)
 	if err != nil {
@@ -38,63 +69,107 @@ func fetchServiceClientWithSharedKeyCreds(url string, accountName string, cfg *s
 		return nil, nil, err
 	}
 
-	client, err := service.NewClientWithSharedKeyCredential(url, credential, nil)
+	client, err := service.NewClientWithSharedKeyCredential(url, credential, &service.ClientOptions{
+		ClientOptions: opts,
+	})
 	if err != nil {
 		log.Errorf("Invalid credentials with error: %v", err)
 		return nil, nil, err
 	}
-	return client, &serviceCredentials{sharedKeyCreds: credential, cType: sharedKeyType}, nil
+	return client, &serviceCredentials{sharedKeyCreds: credential, clientOpts: opts, cType: sharedKeyType}, nil
 }
 
-func fetchServiceClientWithConnectionString(connectionString *connectionStringConfig, log *logp.Logger) (*service.Client, *serviceCredentials, error) {
+func fetchServiceClientWithConnectionString(connectionString *connectionStringConfig, opts azcore.ClientOptions, log *logp.Logger) (*service.Client, *serviceCredentials, error) {
 	// Creates a default request pipeline using your connection string.
-	serviceClient, err := service.NewClientFromConnectionString(connectionString.URI, nil)
+	serviceClient, err := service.NewClientFromConnectionString(connectionString.URI, &service.ClientOptions{
+		ClientOptions: opts,
+	})
 	if err != nil {
 		log.Errorf("Invalid credentials with error: %v", err)
 		return nil, nil, err
 	}
 
-	return serviceClient, &serviceCredentials{connectionStrCreds: connectionString.URI, cType: connectionStringType}, nil
+	return serviceClient, &serviceCredentials{connectionStrCreds: connectionString.URI, clientOpts: opts, cType: connectionStringType}, nil
 }
 
-func fetchServiceClientWithOAuth2(url string, cfg *OAuth2Config) (*service.Client, *serviceCredentials, error) {
-	creds, err := azidentity.NewClientSecretCredential(cfg.TenantID, cfg.ClientID, cfg.ClientSecret, &azidentity.ClientSecretCredentialOptions{
-		ClientOptions: cfg.clientOptions,
-	})
+// newClientSecretCredential returns a credential for an Entra ID application.
+//
+// opts holds the input's retry policy, so the retry block also governs the token
+// requests this credential makes. newManagedIdentityCredential discards the policy
+// instead, because the SDK tunes retries for the token endpoint it uses.
+func newClientSecretCredential(cfg *OAuth2Config, opts azcore.ClientOptions) (*azidentity.ClientSecretCredential, error) {
+	creds, err := azidentity.NewClientSecretCredential(cfg.TenantID, cfg.ClientID, cfg.ClientSecret,
+		&azidentity.ClientSecretCredentialOptions{ClientOptions: opts},
+	)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create client secret credential with oauth2 config: %w", err)
+		return nil, fmt.Errorf("failed to create client secret credential with oauth2 config: %w", err)
+	}
+	return creds, nil
+}
+
+// newManagedIdentityCredential returns a credential for the managed identity of
+// the Azure host that runs Filebeat. An empty ClientID selects the
+// system-assigned identity of the host. Any retry policy in opts is discarded,
+// see below.
+func newManagedIdentityCredential(cfg managedIdentityConfig, opts azcore.ClientOptions, log *logp.Logger) (*azidentity.ManagedIdentityCredential, error) {
+	// Drop the storage retry policy so the SDK applies its own, which suits the
+	// token endpoint: 6 retries, a 2s initial delay, and 404 and 410 treated as
+	// retryable while Azure attaches an identity to a host that has just started.
+	// Nothing else covers a failed token request, because the SDK marks a credential
+	// failure as non-retriable, so the storage retry policy stops at once.
+	opts.Retry = policy.RetryOptions{}
+
+	credOpts := &azidentity.ManagedIdentityCredentialOptions{ClientOptions: opts}
+	if cfg.ClientID != "" {
+		credOpts.ID = azidentity.ClientID(cfg.ClientID)
+		log.Infow("using user-assigned managed identity", "client_id", cfg.ClientID)
+	} else {
+		log.Info("using system-assigned managed identity")
 	}
 
-	client, err := azblob.NewClient(url, creds, &azblob.ClientOptions{
-		ClientOptions: cfg.clientOptions,
-	})
+	creds, err := azidentity.NewManagedIdentityCredential(credOpts)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create managed identity credential: %w", err)
+	}
+	return creds, nil
+}
+
+// fetchServiceClientWithTokenCreds builds a service client from an Entra ID token
+// credential. The oauth2 and managed identity methods both use it.
+func fetchServiceClientWithTokenCreds(url string, creds azcore.TokenCredential, opts azcore.ClientOptions, cType string) (*service.Client, *serviceCredentials, error) {
+	client, err := service.NewClient(url, creds, &service.ClientOptions{ClientOptions: opts})
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create azblob service client: %w", err)
 	}
 
-	return client.ServiceClient(), &serviceCredentials{oauth2Creds: creds, cType: oauth2Type}, nil
+	return client, &serviceCredentials{tokenCreds: creds, clientOpts: opts, cType: cType}, nil
 }
 
-// fetchBlobClient, generic function that returns a BlobClient based on the credential type
-func fetchBlobClient(url string, credential *blobCredentials, cfg config, log *logp.Logger) (*blob.Client, error) {
+// fetchBlobClient returns a blob client for the credential type in use. The
+// client options travel with the credential, so they match the ones used for the
+// service client.
+func fetchBlobClient(url string, credential *blobCredentials, log *logp.Logger) (*blob.Client, error) {
 	if credential == nil {
-		return nil, fmt.Errorf("no valid blob credentials found")
+		return nil, errors.New("no valid blob credentials found")
 	}
 
-	switch credential.serviceCreds.cType {
+	creds := credential.serviceCreds
+	switch creds.cType {
 	case sharedKeyType:
-		return fetchBlobClientWithSharedKey(url, credential.serviceCreds.sharedKeyCreds, log)
+		return fetchBlobClientWithSharedKey(url, creds.sharedKeyCreds, creds.clientOpts, log)
 	case connectionStringType:
-		return fetchBlobClientWithConnectionString(credential.serviceCreds.connectionStrCreds, credential.containerName, credential.blobName, log)
-	case oauth2Type:
-		return fetchBlobClientWithOAuth2(url, credential.serviceCreds.oauth2Creds, cfg.Auth.OAuth2)
+		return fetchBlobClientWithConnectionString(creds.connectionStrCreds, credential.containerName, credential.blobName, creds.clientOpts, log)
+	case oauth2Type, managedIdentityType:
+		return fetchBlobClientWithTokenCreds(url, creds.tokenCreds, creds.clientOpts)
 	default:
-		return nil, fmt.Errorf("no valid service credential 'type' found: %s", credential.serviceCreds.cType)
+		return nil, fmt.Errorf("no valid service credential 'type' found: %s", creds.cType)
 	}
 }
 
-func fetchBlobClientWithSharedKey(url string, credential *azblob.SharedKeyCredential, log *logp.Logger) (*blob.Client, error) {
-	blobClient, err := blob.NewClientWithSharedKeyCredential(url, credential, nil)
+func fetchBlobClientWithSharedKey(url string, credential *azblob.SharedKeyCredential, opts azcore.ClientOptions, log *logp.Logger) (*blob.Client, error) {
+	blobClient, err := blob.NewClientWithSharedKeyCredential(url, credential, &blob.ClientOptions{
+		ClientOptions: opts,
+	})
 	if err != nil {
 		log.Errorf("Error fetching blob client for url: %s, error: %v", url, err)
 		return nil, err
@@ -103,8 +178,10 @@ func fetchBlobClientWithSharedKey(url string, credential *azblob.SharedKeyCreden
 	return blobClient, nil
 }
 
-func fetchBlobClientWithConnectionString(connectionString string, containerName string, blobName string, log *logp.Logger) (*blob.Client, error) {
-	blobClient, err := blob.NewClientFromConnectionString(connectionString, containerName, blobName, nil)
+func fetchBlobClientWithConnectionString(connectionString string, containerName string, blobName string, opts azcore.ClientOptions, log *logp.Logger) (*blob.Client, error) {
+	blobClient, err := blob.NewClientFromConnectionString(connectionString, containerName, blobName, &blob.ClientOptions{
+		ClientOptions: opts,
+	})
 	if err != nil {
 		log.Errorf("Error fetching blob client for connectionString: %s, error: %v", stripKey(connectionString), err)
 		return nil, err
@@ -129,9 +206,11 @@ func stripKey(s string) string {
 	return uri
 }
 
-func fetchBlobClientWithOAuth2(url string, credential *azidentity.ClientSecretCredential, oauth2Cfg *OAuth2Config) (*blob.Client, error) {
-	blobClient, err := blob.NewClient(url, credential, &blob.ClientOptions{
-		ClientOptions: oauth2Cfg.clientOptions,
+// fetchBlobClientWithTokenCreds builds a blob client from an Entra ID token
+// credential.
+func fetchBlobClientWithTokenCreds(url string, creds azcore.TokenCredential, opts azcore.ClientOptions) (*blob.Client, error) {
+	blobClient, err := blob.NewClient(url, creds, &blob.ClientOptions{
+		ClientOptions: opts,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch blob client for %s: %w", url, err)

@@ -21,8 +21,7 @@ package redis
 
 import (
 	"context"
-	"fmt"
-	"os"
+	"path/filepath"
 	"sync"
 	"testing"
 	"time"
@@ -32,6 +31,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/filebeat/input/redis/testutil"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -41,10 +41,7 @@ import (
 )
 
 var (
-	message  = "AUTH (redacted)"
-	hostPort = fmt.Sprintf("%s:%s",
-		getOrDefault(os.Getenv("REDIS_HOST"), "localhost"),
-		getOrDefault(os.Getenv("REDIS_PORT"), "6380"))
+	message = "AUTH (redacted)"
 )
 
 type eventCaptor struct {
@@ -85,18 +82,19 @@ func (ec *eventCaptor) Done() <-chan struct{} {
 
 func TestInput(t *testing.T) {
 	// Setup the input config.
+
 	config := conf.MustNewConfigFrom(mapstr.M{
 		"network":      "tcp",
 		"type":         "redis",
-		"hosts":        []string{hostPort},
+		"hosts":        []string{testutil.TLSHostPort()},
 		"password":     "password",
 		"maxconn":      10,
 		"idle_timeout": 60 * time.Second,
 		"ssl": mapstr.M{
 			"enabled":                 true,
-			"certificate_authorities": []string{"_meta/certs/root-ca.pem"},
-			"certificate":             "_meta/certs/server-cert.pem",
-			"key":                     "_meta/certs/server-key.pem",
+			"certificate_authorities": filepath.Join(testutil.CertDir(), "root-ca.pem"),
+			"certificate":             filepath.Join(testutil.CertDir(), "server-cert.pem"),
+			"key":                     filepath.Join(testutil.CertDir(), "server-key.pem"),
 		},
 	})
 
@@ -134,12 +132,12 @@ func TestInput(t *testing.T) {
 	input.Run()
 
 	// Create Redis Client
-	redisClient := createRedisClient(t)
+	redisClient := testutil.CreateTLSClient(t, "password")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	emitInputData(t, ctx, redisClient)
+	testutil.EmitInputData(t, ctx, redisClient)
 
 	select {
 	case event := <-eventsCh:
@@ -155,97 +153,17 @@ func TestInput(t *testing.T) {
 	}
 }
 
-func emitInputData(t *testing.T, ctx context.Context, pool *rd.Pool) {
-	script := "local i = 0 for j=1,500000 do i = i + j end return i"
-
-	go func() {
-		ticker := time.NewTicker(time.Second)
-		defer ticker.Stop()
-
-		conn := pool.Get()
-		defer func() {
-			err := conn.Close()
-			require.NoError(t, err)
-		}()
-
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-ticker.C:
-				_, err := conn.Do("EVAL", script, 0)
-				require.NoError(t, err)
-			}
-		}
-	}()
-}
-
-func createRedisClient(t *testing.T) *rd.Pool {
-	idleTimeout := 60 * time.Second
-
-	enabled := true
-
-	tlsConfig, err := tlscommon.LoadTLSConfig(&tlscommon.Config{
-		Enabled: &enabled,
-		CAs:     []string{"_meta/certs/root-ca.pem"},
-		Certificate: tlscommon.CertificateConfig{
-			Certificate: "_meta/certs/server-cert.pem",
-			Key:         "_meta/certs/server-key.pem",
-		},
-	}, logptest.NewTestingLogger(t, ""))
-	if err != nil {
-		t.Fatalf("failed to load TLS configuration: %v", err)
-	}
-
-	return &rd.Pool{
-		MaxActive:   10,
-		MaxIdle:     10,
-		Wait:        true,
-		IdleTimeout: idleTimeout,
-		Dial: func() (rd.Conn, error) {
-			dialOptions := []rd.DialOption{
-				rd.DialPassword("password"),
-				rd.DialConnectTimeout(idleTimeout),
-				rd.DialReadTimeout(idleTimeout),
-				rd.DialWriteTimeout(idleTimeout),
-				rd.DialUseTLS(true),
-				rd.DialTLSConfig(tlsConfig.ToConfig()),
-			}
-
-			c, err := rd.Dial("tcp", hostPort, dialOptions...)
-			if err != nil {
-				return nil, err
-			}
-
-			return c, err
-		},
-		TestOnBorrow: func(c rd.Conn, t time.Time) error {
-			if time.Since(t) < idleTimeout {
-				return nil
-			}
-
-			_, err := c.Do("PING")
-			return err
-		},
-	}
-}
-
-func getOrDefault(s, defaultString string) string {
-	if s == "" {
-		return defaultString
-	}
-	return s
-}
-
 func TestAuthenticate(t *testing.T) {
 	var redisConfig config
 	var pool *rd.Pool
 	var conn rd.Conn
 	var err error
 
+	tlsHostPort := testutil.TLSHostPort()
+
 	redisConfig = createRedisConfig("", "password")
 	require.NotEmpty(t, redisConfig, "redisConfig should not be empty")
-	pool = CreatePool(hostPort, redisConfig)
+	pool = CreatePool(tlsHostPort, redisConfig)
 	conn, err = pool.Dial()
 	require.NoError(t, err)
 	_, err = conn.Do("PING")
@@ -253,14 +171,14 @@ func TestAuthenticate(t *testing.T) {
 
 	redisConfig = createRedisConfig("", "password1")
 	require.NotEmpty(t, redisConfig, "redisConfig should not be empty")
-	pool = CreatePool(hostPort, redisConfig)
+	pool = CreatePool(tlsHostPort, redisConfig)
 	_, err = pool.Dial()
 	require.Error(t, err)
 	require.Equal(t, rd.Error("WRONGPASS invalid username-password pair or user is disabled."), err)
 
 	redisConfig = createRedisConfig("testuser", "testpass")
 	require.NotEmpty(t, redisConfig, "redisConfig should not be empty")
-	pool = CreatePool(hostPort, redisConfig)
+	pool = CreatePool(tlsHostPort, redisConfig)
 	conn, err = pool.Dial()
 	require.NoError(t, err)
 	_, err = conn.Do("PING")
@@ -268,7 +186,7 @@ func TestAuthenticate(t *testing.T) {
 
 	redisConfig = createRedisConfig("testuser", "testpass1")
 	require.NotEmpty(t, redisConfig, "redisConfig should not be empty")
-	pool = CreatePool(hostPort, redisConfig)
+	pool = CreatePool(tlsHostPort, redisConfig)
 	_, err = pool.Dial()
 	require.Error(t, err)
 	require.Equal(t, rd.Error("WRONGPASS invalid username-password pair or user is disabled."), err)
@@ -278,14 +196,14 @@ func createRedisConfig(username string, password string) config {
 	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"network":      "tcp",
 		"type":         "redis",
-		"hosts":        []string{hostPort},
+		"hosts":        []string{testutil.TLSHostPort()},
 		"maxconn":      10,
 		"idle_timeout": 60 * time.Second,
 		"ssl": mapstr.M{
 			"enabled":                 true,
-			"certificate_authorities": []string{"_meta/certs/root-ca.pem"},
-			"certificate":             "_meta/certs/server-cert.pem",
-			"key":                     "_meta/certs/server-key.pem",
+			"certificate_authorities": []string{filepath.Join(testutil.CertDir(), "root-ca.pem")},
+			"certificate":             filepath.Join(testutil.CertDir(), "server-cert.pem"),
+			"key":                     filepath.Join(testutil.CertDir(), "server-key.pem"),
 		},
 	})
 

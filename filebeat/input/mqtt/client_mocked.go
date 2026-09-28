@@ -18,6 +18,7 @@
 package mqtt
 
 import (
+	"context"
 	"time"
 
 	libmqtt "github.com/eclipse/paho.mqtt.golang"
@@ -77,7 +78,7 @@ type mockedBackoff struct {
 
 var _ backoff.Backoff = new(mockedBackoff)
 
-func (m *mockedBackoff) Wait() bool {
+func (m *mockedBackoff) Wait(ctx context.Context) bool {
 	wait := m.waits[m.waitIndex]
 	m.waitIndex++
 	m.last = time.Now()
@@ -154,7 +155,7 @@ func (m *mockedClient) Disconnect(quiesce uint) {
 	m.disconnectCount++
 }
 
-func (m *mockedClient) Publish(topic string, qos byte, retained bool, payload interface{}) libmqtt.Token {
+func (m *mockedClient) Publish(topic string, qos byte, retained bool, payload any) libmqtt.Token {
 	panic("implement me")
 }
 

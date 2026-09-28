@@ -22,6 +22,7 @@ package tls
 import (
 	"encoding/hex"
 	"fmt"
+	"math/big"
 	"strconv"
 	"testing"
 	"time"
@@ -31,6 +32,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -119,7 +121,7 @@ func sBuf(t *testing.T, hexString string) *streambuf.Buffer {
 	return streambuf.New(bytes)
 }
 
-func mapGet(t *testing.T, m mapstr.M, key string) interface{} {
+func mapGet(t *testing.T, m mapstr.M, key string) any {
 	value, err := m.GetValue(key)
 	assert.NoError(t, err)
 	return value
@@ -127,7 +129,6 @@ func mapGet(t *testing.T, m mapstr.M, key string) interface{} {
 
 func TestParseRecordHeader(t *testing.T) {
 	if testing.Verbose() {
-		isDebug = true
 		logp.TestingSetup(logp.WithSelectors("tls", "tlsdetailed"))
 	}
 
@@ -153,10 +154,6 @@ func TestParseRecordHeader(t *testing.T) {
 }
 
 func TestParseHandshakeHeader(t *testing.T) {
-	if testing.Verbose() {
-		isDebug = true
-		logp.TestingSetup(logp.WithSelectors("tls", "tlsdetailed"))
-	}
 
 	_, err := readHandshakeHeader(sBuf(t, ""))
 	assert.Error(t, err)
@@ -173,12 +170,8 @@ func TestParseHandshakeHeader(t *testing.T) {
 }
 
 func TestParserParse(t *testing.T) {
-	if testing.Verbose() {
-		isDebug = true
-		logp.TestingSetup(logp.WithSelectors("tls", "tlsdetailed"))
-	}
 
-	parser := &parser{}
+	parser := &parser{logger: logptest.NewTestingLogger(t, "")}
 	// An incomplete record header is ok but not complete
 	assert.Equal(t, resultMore, parser.parse(sBuf(t, "14")))
 
@@ -200,12 +193,8 @@ func TestParserParse(t *testing.T) {
 }
 
 func TestParserHello(t *testing.T) {
-	if testing.Verbose() {
-		isDebug = true
-		logp.TestingSetup(logp.WithSelectors("tls", "tlsdetailed"))
-	}
 
-	parser := &parser{}
+	parser := &parser{logger: logptest.NewTestingLogger(t, "")}
 	// An incomplete handshake header is ok and complete
 	assert.Equal(t, resultOK, parser.parse(sBuf(t, "160301000502000002FF")))
 	assert.Equal(t, 5, parser.handshakeBuf.Len())
@@ -284,7 +273,7 @@ func TestParserHello(t *testing.T) {
 }
 
 func TestCertificates(t *testing.T) {
-	parser := &parser{}
+	parser := &parser{logger: logptest.NewTestingLogger(t, "")}
 
 	// A certificates message with two certificates
 	assert.Equal(t, resultOK, parser.parse(sBuf(t, certsMsg)))
@@ -302,7 +291,7 @@ func TestCertificates(t *testing.T) {
 		"not_before":                  "2015-11-03 00:00:00 +0000 UTC",
 		"public_key_algorithm":        "RSA",
 		"public_key_size":             "2048",
-		"serial_number":               "E64C5FBC236ADE14B172AEB41C78CB0",
+		"serial_number":               "0E64C5FBC236ADE14B172AEB41C78CB0",
 		"signature_algorithm":         "SHA256-RSA",
 		"issuer.common_name":          "DigiCert SHA2 High Assurance Server CA",
 		"issuer.country":              "US",
@@ -365,7 +354,7 @@ func TestCertificates(t *testing.T) {
 }
 
 func TestRandom(t *testing.T) {
-	parser := &parser{}
+	parser := &parser{logger: logptest.NewTestingLogger(t, "")}
 
 	for i, test := range []struct {
 		msg  string
@@ -503,7 +492,7 @@ func TestRandom(t *testing.T) {
 }
 
 func TestBadCertMessage(t *testing.T) {
-	parser := &parser{}
+	parser := &parser{logger: logptest.NewTestingLogger(t, "")}
 
 	msgs := []string{
 		// empty message
@@ -524,5 +513,29 @@ func TestBadCertMessage(t *testing.T) {
 		log := fmt.Sprintf("Message %d : '%s'", idx, msg)
 		assert.Equal(t, resultOK, parser.parse(sBuf(t, msg)), log)
 		assert.Nil(t, parser.certificates, log)
+	}
+}
+
+func TestSerialHex(t *testing.T) {
+	tests := []struct {
+		serial *big.Int
+		want   string
+	}{
+		{serial: new(big.Int), want: "00"},
+		{serial: big.NewInt(1), want: "01"},
+		{serial: new(big.Int).SetBytes([]byte{0x7f}), want: "7F"},
+		// MSB set: must not acquire a spurious leading 00 byte.
+		{serial: new(big.Int).SetBytes([]byte{0x80}), want: "80"},
+		{serial: new(big.Int).SetBytes([]byte{0xff, 0x00}), want: "FF00"},
+		// Leading zero nibble: the original reported bug.
+		{serial: new(big.Int).SetBytes([]byte{0x0e, 0x64, 0xc5, 0xfb, 0xc2, 0x36, 0xad, 0xe1, 0x4b, 0x17, 0x2a, 0xeb, 0x41, 0xc7, 0x8c, 0xb0}), want: "0E64C5FBC236ADE14B172AEB41C78CB0"},
+		// Negative serial (only reachable with GODEBUG=x509negativeserial=1).
+		{serial: big.NewInt(-1), want: "-01"},
+	}
+	for _, test := range tests {
+		got := serialHex(test.serial)
+		if got != test.want {
+			t.Errorf("serialHex(%v) = %q; want %q", test.serial, got, test.want)
+		}
 	}
 }

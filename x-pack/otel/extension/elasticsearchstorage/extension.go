@@ -8,6 +8,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/es"
@@ -42,7 +43,7 @@ func (e *elasticStorage) Start(ctx context.Context, host component.Host) error {
 	if err != nil {
 		return err
 	}
-	client, err := eslegclient.NewConnectedClient(ctx, c, "Filebeat", e.logger)
+	client, err := eslegclient.NewConnectedClient(ctx, c, beat.Info{Beat: "Filebeat", Logger: e.logger})
 	if err != nil {
 		return err
 	}
@@ -94,13 +95,13 @@ func (s *lockedStore) Has(key string) (bool, error) {
 	return s.inner.Has(key)
 }
 
-func (s *lockedStore) Get(key string, to interface{}) error {
+func (s *lockedStore) Get(key string, to any) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.inner.Get(key, to)
 }
 
-func (s *lockedStore) Set(key string, value interface{}) error {
+func (s *lockedStore) Set(key string, value any) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.inner.Set(key, value)
@@ -116,10 +117,4 @@ func (s *lockedStore) Each(fn func(string, backend.ValueDecoder) (bool, error)) 
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.inner.Each(fn)
-}
-
-func (s *lockedStore) SetID(id string) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.inner.SetID(id)
 }

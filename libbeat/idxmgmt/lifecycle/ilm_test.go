@@ -193,7 +193,6 @@ func runEnsurePolicyTest(t *testing.T, testPolicy Policy, cfg LifecycleConfig) {
 	}
 
 	for name, test := range cases {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			h := newMockHandler(test.cfg, testPolicy, test.calls...)
 			m := createManager(t, h, test.enabled)

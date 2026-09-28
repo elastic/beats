@@ -29,7 +29,7 @@ class Test(BaseTest):
     def test_mysql_flow(self):
         self.render_config_template(
             flows=True,
-            shutdown_timeout="1s",
+            publish_timeout="1s",
         )
         self.run_packetbeat(
             pcap="mysql_long.pcap",
@@ -64,7 +64,7 @@ class Test(BaseTest):
     def test_memcache_udp_flow(self):
         self.render_config_template(
             flows=True,
-            shutdown_timeout="1s",
+            publish_timeout="1s",
         )
         self.run_packetbeat(
             pcap="memcache/memcache_bin_udp_counter_ops.pcap",
@@ -92,7 +92,7 @@ class Test(BaseTest):
     def test_icmp4_ping(self):
         self.render_config_template(
             flows=True,
-            shutdown_timeout="1s",
+            publish_timeout="1s",
         )
         self.run_packetbeat(
             pcap="icmp/icmp4_ping_over_vlan.pcap",
@@ -120,7 +120,7 @@ class Test(BaseTest):
     def test_icmp6_ping(self):
         self.render_config_template(
             flows=True,
-            shutdown_timeout="1s",
+            publish_timeout="1s",
         )
         self.run_packetbeat(
             pcap="icmp/icmp6_ping_over_vlan.pcap",
@@ -150,7 +150,7 @@ class Test(BaseTest):
     def test_q_in_q_flow(self):
         self.render_config_template(
             flows=True,
-            shutdown_timeout="1s",
+            publish_timeout="1s",
         )
         self.run_packetbeat(
             pcap="802.1q-q-in-q-icmp.pcap",
@@ -209,7 +209,7 @@ class Test(BaseTest):
     def check_community_id(self, pcap):
         self.render_config_template(
             flows=True,
-            shutdown_timeout="1s",
+            publish_timeout="1s",
             processors=[{
                 "drop_event": {
                     "when": "not.equals.type: flow",

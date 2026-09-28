@@ -18,6 +18,7 @@
 package slabqueue
 
 import (
+	"io"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -164,7 +165,7 @@ func TestProducerACKCallback(t *testing.T) {
 	acked := make(chan int, 4)
 	p := q.Producer(queue.ProducerConfig{ACK: func(n int) { acked <- n }})
 
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		p.Publish(i)
 	}
 	b, err := q.Get(0)
@@ -191,7 +192,7 @@ func TestACKCallbackFiresInPublishOrder(t *testing.T) {
 	ackedCounts := make(chan int, 4)
 	p := q.Producer(queue.ProducerConfig{ACK: func(n int) { ackedCounts <- n }})
 
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		p.Publish(i)
 	}
 
@@ -238,7 +239,7 @@ func TestSlotsReleasedBeforeACKOrderingResolves(t *testing.T) {
 	q := pool.Connect()
 
 	p := q.Producer(queue.ProducerConfig{ACK: func(int) {}})
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		p.Publish(i)
 	}
 	assert.Equal(t, 0, pool.Available(), "pool should be full")
@@ -311,7 +312,7 @@ func TestReleaseDrainsStrandedCompletedSuccessors(t *testing.T) {
 
 	acked := make(chan int, 4)
 	p := q.Producer(queue.ProducerConfig{ACK: func(n int) { acked <- n }})
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		p.Publish(i)
 	}
 
@@ -344,7 +345,7 @@ func TestReleaseDrainsStrandedCompletedSuccessors(t *testing.T) {
 	require.True(t, ok, "Get must return a *batch[int]")
 	bAi.Release()
 
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		select {
 		case n := <-acked:
 			assert.Equal(t, 1, n, "B and C each produced one event so each ACK should be 1")
@@ -439,6 +440,57 @@ func TestGetBlocksUntilPublish(t *testing.T) {
 	}
 }
 
+// TestGetReturnsPromptly verifies Get returns queued events shortly after they
+// arrive — only the small debounce window, never a long block.
+func TestGetReturnsPromptly(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 16}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+	defer q.Close(true)
+
+	p := q.Producer(queue.ProducerConfig{})
+	_, ok := p.Publish(1)
+	require.True(t, ok)
+
+	start := time.Now()
+	b, err := q.Get(0)
+	require.NoError(t, err)
+	assert.Equal(t, 1, b.Count())
+	assert.Less(t, time.Since(start), 200*time.Millisecond, "Get should return within the debounce window, not block")
+	b.Done()
+}
+
+// TestGetCoalescesQueuedEvents verifies Get returns all currently-queued events
+// in a single batch (capped by maxEvents) rather than one batch per event, so
+// the output worker's Publish fan-out stays bounded.
+func TestGetCoalescesQueuedEvents(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 16}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+	defer q.Close(true)
+
+	p := q.Producer(queue.ProducerConfig{})
+	for i := range 5 {
+		_, ok := p.Publish(i)
+		require.True(t, ok)
+	}
+
+	b, err := q.Get(0)
+	require.NoError(t, err)
+	assert.Equal(t, 5, b.Count(), "Get should return all queued events in one batch")
+	b.Done()
+
+	// maxEvents still caps a single Get.
+	for i := range 4 {
+		_, ok := p.Publish(i)
+		require.True(t, ok)
+	}
+	b2, err := q.Get(2)
+	require.NoError(t, err)
+	assert.Equal(t, 2, b2.Count(), "Get(2) must return at most maxEvents")
+	b2.Done()
+}
+
 // TestCloseUnblocksGet verifies a pending Get returns EOF when the queue is
 // closed.
 func TestCloseUnblocksGet(t *testing.T) {
@@ -471,7 +523,7 @@ func TestCloseForceReleasesSlots(t *testing.T) {
 	q := pool.Connect()
 
 	p := q.Producer(queue.ProducerConfig{})
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		p.Publish(i)
 	}
 	assert.Equal(t, 1, pool.Available())
@@ -671,7 +723,7 @@ func TestConcurrentPublishersAndConsumers(t *testing.T) {
 	defer pool.Shutdown()
 
 	var wg sync.WaitGroup
-	for i := 0; i < pipelines; i++ {
+	for i := range pipelines {
 		q := pool.Connect()
 		p := q.Producer(queue.ProducerConfig{})
 
@@ -679,7 +731,7 @@ func TestConcurrentPublishersAndConsumers(t *testing.T) {
 		// Producer.
 		go func(p queue.Producer[int], base int) {
 			defer wg.Done()
-			for j := 0; j < eventsPerPipe; j++ {
+			for j := range eventsPerPipe {
 				_, ok := p.Publish(base*1000 + j)
 				if !ok {
 					return
@@ -729,7 +781,7 @@ func TestSetTargetGrowsImmediately(t *testing.T) {
 	q := pool.Connect()
 	p := q.Producer(queue.ProducerConfig{})
 
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		_, ok := p.TryPublish(i)
 		require.True(t, ok)
 	}
@@ -740,7 +792,7 @@ func TestSetTargetGrowsImmediately(t *testing.T) {
 	assert.Equal(t, 4, pool.Capacity())
 	assert.Equal(t, 4, pool.Target())
 
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		_, ok := p.TryPublish(100 + i)
 		require.True(t, ok, "the two slots added by the grow must be acquirable")
 	}
@@ -831,7 +883,7 @@ func TestShrinkFlooredByLiveEvents(t *testing.T) {
 	q := pool.Connect()
 	p := q.Producer(queue.ProducerConfig{})
 
-	for i := 0; i < 8; i++ {
+	for i := range 8 {
 		_, ok := p.TryPublish(i)
 		require.True(t, ok)
 	}
@@ -870,11 +922,9 @@ func TestShrinkConvergesUnderSustainedLoad(t *testing.T) {
 
 	// Producers hammer the queue, blocking when the pool is full. With more
 	// producers than the single consumer can drain, the pool stays saturated.
-	for k := 0; k < producers; k++ {
+	for range producers {
 		p := q.Producer(queue.ProducerConfig{})
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			for {
 				select {
 				case <-stop:
@@ -885,13 +935,11 @@ func TestShrinkConvergesUnderSustainedLoad(t *testing.T) {
 					return
 				}
 			}
-		}()
+		})
 	}
 	// Consumer drains small batches continuously so slots keep being released
 	// (which is what drives the shrink) while the pool stays under pressure.
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		for {
 			select {
 			case <-stop:
@@ -904,7 +952,7 @@ func TestShrinkConvergesUnderSustainedLoad(t *testing.T) {
 			}
 			b.Done()
 		}
-	}()
+	})
 
 	// Clean up regardless of assertion outcome: stop the workers, force the
 	// pool down to unblock anyone parked, and wait for the goroutines.
@@ -963,7 +1011,7 @@ func TestPerQueueCapBlocksWhilePoolHasRoom(t *testing.T) {
 	require.Equal(t, 8, pool.Target(), "pool tracks the largest queue cap")
 
 	p := qSmall.Producer(queue.ProducerConfig{})
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		_, ok := p.TryPublish(i)
 		require.True(t, ok, "publish %d within the per-queue cap should succeed", i)
 	}
@@ -987,7 +1035,7 @@ func TestPerQueueCapsAreIndependent(t *testing.T) {
 	p2 := q2.Producer(queue.ProducerConfig{})
 
 	// q1 caps at its own 4 regardless of pool room.
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		_, ok := p1.TryPublish(i)
 		require.True(t, ok)
 	}
@@ -996,7 +1044,7 @@ func TestPerQueueCapsAreIndependent(t *testing.T) {
 
 	// q2 may use the rest of the shared 8-slot pool (4 slots remain), then the
 	// pool is full even though q2's own cap (8) is not reached.
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		_, ok := p2.TryPublish(i)
 		require.True(t, ok)
 	}
@@ -1096,7 +1144,7 @@ func TestSetTargetGrowAcrossChunkBoundaryPreservesEvents(t *testing.T) {
 	q := pool.Connect()
 	p := q.Producer(queue.ProducerConfig{})
 
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		_, ok := p.TryPublish(i)
 		require.True(t, ok)
 	}
@@ -1106,7 +1154,7 @@ func TestSetTargetGrowAcrossChunkBoundaryPreservesEvents(t *testing.T) {
 	b, err := q.Get(0)
 	require.NoError(t, err)
 	require.Equal(t, 4, b.Count())
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		assert.Equal(t, i, b.Entry(i), "event survives the grow/directory swap")
 	}
 	b.Done()
@@ -1126,14 +1174,14 @@ func TestResizeUnderConcurrentTraffic(t *testing.T) {
 	var delivered atomic.Int64
 	var wg sync.WaitGroup
 
-	for i := 0; i < pipelines; i++ {
+	for range pipelines {
 		q := pool.Connect()
 		p := q.Producer(queue.ProducerConfig{})
 
 		wg.Add(2)
 		go func() {
 			defer wg.Done()
-			for j := 0; j < perPipe; j++ {
+			for j := range perPipe {
 				if _, ok := p.Publish(j); !ok {
 					return
 				}
@@ -1179,6 +1227,83 @@ func TestResizeUnderConcurrentTraffic(t *testing.T) {
 	assert.Equal(t, int64(pipelines*perPipe), delivered.Load(),
 		"every published event must be delivered exactly once across resizes")
 	pool.Shutdown()
+}
+
+// TestTryGetEmptyAndClosed covers TryGet's two no-batch cases: (nil, nil) while
+// the queue is open but empty, and io.EOF once it is closed and drained.
+func TestTryGetEmptyAndClosed(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 4}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+
+	b, err := q.TryGet(0)
+	assert.Nil(t, b, "an empty open queue should yield no batch")
+	assert.NoError(t, err, "an empty open queue is not an error; the caller is expected to wait on ReadyChan")
+
+	p := q.Producer(queue.ProducerConfig{})
+	_, ok := p.Publish(1)
+	require.True(t, ok, "publish should succeed")
+
+	require.NoError(t, q.Close(false), "graceful close should succeed")
+
+	// A gracefully closed queue keeps delivering what is already queued.
+	b, err = q.TryGet(0)
+	require.NoError(t, err, "a closing queue should still deliver queued events")
+	require.NotNil(t, b, "a closing queue should still deliver queued events")
+	assert.Equal(t, 1, b.Count(), "the queued event should come back")
+	b.Done()
+
+	b, err = q.TryGet(0)
+	assert.Nil(t, b, "a closed and drained queue should yield no batch")
+	assert.ErrorIs(t, err, io.EOF, "a closed and drained queue should report io.EOF")
+}
+
+// TestTryGetResignalsRemainder verifies that a TryGet capped by maxEvents
+// re-arms ReadyChan for the remainder. ReadyChan is edge-triggered, so without
+// this a select-driven consumer would stall on the leftovers.
+func TestTryGetResignalsRemainder(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 8}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+	defer q.Close(true)
+
+	p := q.Producer(queue.ProducerConfig{})
+	for i := range 5 {
+		_, ok := p.Publish(i)
+		require.True(t, ok, "publish %d should succeed", i)
+	}
+
+	// Consume the publish wake-up so the only signal left is TryGet's.
+	select {
+	case <-q.ReadyChan():
+	default:
+	}
+
+	b, err := q.TryGet(2)
+	require.NoError(t, err, "TryGet on a non-empty queue should not error")
+	require.Equal(t, 2, b.Count(), "TryGet should cap the batch at maxEvents")
+
+	select {
+	case <-q.ReadyChan():
+	default:
+		t.Fatal("TryGet left 3 events behind but did not re-signal ReadyChan")
+	}
+
+	// The other half of the condition: this TryGet empties the queue, so it
+	// must not signal. A wake-up here would send the consumer back for a batch
+	// that isn't there.
+	b2, err := q.TryGet(0)
+	require.NoError(t, err, "TryGet should return the remainder")
+	require.Equal(t, 3, b2.Count(), "the remainder should still be queued")
+
+	select {
+	case <-q.ReadyChan():
+		t.Fatal("TryGet drained the queue but still re-signalled ReadyChan")
+	default:
+	}
+
+	b.Done()
+	b2.Done()
 }
 
 // drainOnce returns and acks all currently-queued events on q. It assumes at

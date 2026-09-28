@@ -72,7 +72,7 @@ var (
 
 func New(testMode bool, results protos.Reporter, watcher *procs.ProcessesWatcher, cfg *conf.C, logger *logp.Logger) (*icmpPlugin, error) {
 	p := &icmpPlugin{}
-	p.logger = logger
+	p.logger = logger.Named("icmp")
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -94,10 +94,10 @@ func (icmp *icmpPlugin) init(results protos.Reporter, watcher *procs.ProcessesWa
 		icmp.logger.Errorf("Error getting local IP addresses: %+v", err)
 		localIPs = nil
 	}
-	icmp.logger.Named("icmp").Debugf("Local IP addresses: %v", localIPs)
+	icmp.logger.Debugf("Local IP addresses: %v", localIPs)
 
 	removalListener := func(k common.Key, v common.Value) {
-		tuple, ok := k.(hashableIcmpTuple)
+		_, ok := k.(hashableIcmpTuple)
 		if !ok {
 			return
 		}
@@ -105,7 +105,7 @@ func (icmp *icmpPlugin) init(results protos.Reporter, watcher *procs.ProcessesWa
 		if !ok {
 			return
 		}
-		icmp.expireTransaction(tuple, trans)
+		icmp.expireTransaction(trans)
 	}
 
 	icmp.transactions = common.NewCacheWithRemovalListener(
@@ -249,9 +249,9 @@ func (icmp *icmpPlugin) deleteTransaction(k hashableIcmpTuple) *icmpTransaction 
 	return nil
 }
 
-func (icmp *icmpPlugin) expireTransaction(tuple hashableIcmpTuple, trans *icmpTransaction) {
+func (icmp *icmpPlugin) expireTransaction(trans *icmpTransaction) {
 	trans.notes = append(trans.notes, orphanedRequestMsg)
-	logp.Debug("icmp", orphanedRequestMsg+" %s", &trans.tuple)
+	icmp.logger.Debugf(orphanedRequestMsg+" %s", &trans.tuple)
 	unmatchedRequests.Add(1)
 	icmp.publishTransaction(trans)
 }
@@ -261,7 +261,7 @@ func (icmp *icmpPlugin) publishTransaction(trans *icmpTransaction) {
 		return
 	}
 
-	icmp.logger.Named("icmp").Debugf("Publishing transaction. %s", &trans.tuple)
+	icmp.logger.Debugf("Publishing transaction. %s", &trans.tuple)
 
 	evt, pbf := pb.NewBeatEvent(trans.ts)
 	pbf.Source = &ecs.Source{IP: trans.tuple.srcIP.String()}

@@ -96,7 +96,7 @@ func TestConfigPluginNew(t *testing.T) {
 
 func TestFlattenECSMapping(t *testing.T) {
 	const mapping = `{"user":{"custom":{"shoeSize":{"value":45}},"id":{"field":"uid"},"name":{"field":"username"}}}`
-	var m map[string]interface{}
+	var m map[string]any
 	err := json.Unmarshal([]byte(mapping), &m)
 	if err != nil {
 		t.Fatal(err)
@@ -122,13 +122,13 @@ func TestFlattenECSMapping(t *testing.T) {
 	}
 }
 
-func generateTestMapping(depth int, k string, v interface{}) map[string]interface{} {
-	m := make(map[string]interface{})
+func generateTestMapping(depth int, k string, v any) map[string]any {
+	m := make(map[string]any)
 	res := m
 	key := 'a'
 
-	for i := 0; i < depth; i++ {
-		newmap := make(map[string]interface{})
+	for range depth {
+		newmap := make(map[string]any)
 		m[string(key)] = newmap
 		m = newmap
 		key += 1
@@ -176,41 +176,41 @@ func TestFlattenECSMappingMoreEdges(t *testing.T) {
 	}
 
 	values := map[string]struct {
-		m   interface{}
+		m   any
 		err error
 	}{
 		"empty field": {
-			map[string]interface{}{
+			map[string]any{
 				"field": "",
 			},
 			ErrECSMappingIsInvalid,
 		},
 		"empty field with whitespaces": {
-			map[string]interface{}{
+			map[string]any{
 				"field": "   ",
 			},
 			ErrECSMappingIsInvalid,
 		},
 		"nil field": {
-			map[string]interface{}{
+			map[string]any{
 				"field": nil,
 			},
 			ErrECSMappingIsInvalid,
 		},
 		"empty string value": {
-			map[string]interface{}{
+			map[string]any{
 				"value": "",
 			},
 			nil,
 		},
 		"empty string value with whitespaces": {
-			map[string]interface{}{
+			map[string]any{
 				"value": "   ",
 			},
 			nil,
 		},
 		"nil value": {
-			map[string]interface{}{
+			map[string]any{
 				"value": nil,
 			},
 			nil,
@@ -265,17 +265,17 @@ func TestSet(t *testing.T) {
 					ID:       "users",
 					Query:    "select * from users limit 2",
 					Interval: 60,
-					ECSMapping: map[string]interface{}{
-						"user": map[string]interface{}{
-							"custom": map[string]interface{}{
-								"shoeSize": map[string]interface{}{
+					ECSMapping: map[string]any{
+						"user": map[string]any{
+							"custom": map[string]any{
+								"shoeSize": map[string]any{
 									"value": 45,
 								},
 							},
-							"id": map[string]interface{}{
+							"id": map[string]any{
 								"field": "uid",
 							},
-							"name": map[string]interface{}{
+							"name": map[string]any{
 								"field": "username",
 							},
 						},
@@ -428,6 +428,7 @@ func TestSetScheduledQueryProfileFlag(t *testing.T) {
 	logger := logp.NewLogger("config_test")
 	cfgp := NewConfigPlugin(logger)
 
+	profileOn := true
 	inputs := []config.InputConfig{
 		{
 			Name: "osquery-manager-1",
@@ -442,7 +443,7 @@ func TestSetScheduledQueryProfileFlag(t *testing.T) {
 						NativeSchedule: config.NativeSchedule{
 							Interval: 60,
 						},
-						Profile: true,
+						Profiling: &profileOn,
 					},
 				},
 			},
@@ -459,6 +460,102 @@ func TestSetScheduledQueryProfileFlag(t *testing.T) {
 	if !cfgp.LookupQueryProfile("scheduled_users") {
 		t.Fatal("expected scheduled query profile flag to be enabled")
 	}
+}
+
+func TestNewConfigPluginProfilingEnabledByDefault(t *testing.T) {
+	cfgp := NewConfigPlugin(logp.NewLogger("config_test"))
+	if !cfgp.GlobalProfileEnabled() {
+		t.Fatal("expected global profiling to be enabled by default before the first Set()")
+	}
+}
+
+func TestSetQueryProfileGlobalDefaultAndOverride(t *testing.T) {
+	logger := logp.NewLogger("config_test")
+
+	newInputs := func(globalProfileAll, defaultOverride, optedOut *bool) []config.InputConfig {
+		elastic := &config.ElasticOptions{Profiling: &config.ProfilingConfig{ProfilingAll: globalProfileAll}}
+		return []config.InputConfig{
+			{
+				Name: "osquery-manager-1",
+				Type: "osquery",
+				Osquery: &config.OsqueryConfig{
+					ElasticOptions: elastic,
+					Schedule: map[string]config.Query{
+						"inherits_global": {
+							Query:          "select 1",
+							NativeSchedule: config.NativeSchedule{Interval: 60},
+							Profiling:      defaultOverride,
+						},
+						"opts_out": {
+							Query:          "select 2",
+							NativeSchedule: config.NativeSchedule{Interval: 60},
+							Profiling:      optedOut,
+						},
+					},
+				},
+			},
+		}
+	}
+
+	falseVal := false
+	trueVal := true
+
+	t.Run("global on, per-query inherits and override off", func(t *testing.T) {
+		cfgp := NewConfigPlugin(logger)
+		if err := cfgp.Set(newInputs(&trueVal, nil, &falseVal)); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := cfgp.GenerateConfig(context.Background()); err != nil {
+			t.Fatal(err)
+		}
+		if !cfgp.GlobalProfileEnabled() {
+			t.Fatal("expected global profiling to be enabled")
+		}
+		if !cfgp.LookupQueryProfile("inherits_global") {
+			t.Fatal("expected query without override to inherit global profiling")
+		}
+		if cfgp.LookupQueryProfile("opts_out") {
+			t.Fatal("expected query with profile:false override to opt out of profiling")
+		}
+	})
+
+	t.Run("global off, per-query override on", func(t *testing.T) {
+		cfgp := NewConfigPlugin(logger)
+		if err := cfgp.Set(newInputs(&falseVal, &trueVal, nil)); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := cfgp.GenerateConfig(context.Background()); err != nil {
+			t.Fatal(err)
+		}
+		if cfgp.GlobalProfileEnabled() {
+			t.Fatal("expected global profiling to be disabled")
+		}
+		if !cfgp.LookupQueryProfile("inherits_global") {
+			t.Fatal("expected query with profile:true override to enable profiling")
+		}
+		if cfgp.LookupQueryProfile("opts_out") {
+			t.Fatal("expected query without override to inherit disabled global profiling")
+		}
+	})
+
+	t.Run("global unset defaults on, per-query override off", func(t *testing.T) {
+		cfgp := NewConfigPlugin(logger)
+		if err := cfgp.Set(newInputs(nil, nil, &falseVal)); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := cfgp.GenerateConfig(context.Background()); err != nil {
+			t.Fatal(err)
+		}
+		if !cfgp.GlobalProfileEnabled() {
+			t.Fatal("expected global profiling to default to enabled when unset")
+		}
+		if !cfgp.LookupQueryProfile("inherits_global") {
+			t.Fatal("expected query without override to inherit default-on global profiling")
+		}
+		if cfgp.LookupQueryProfile("opts_out") {
+			t.Fatal("expected query with profile:false override to opt out of profiling")
+		}
+	})
 }
 
 func TestSet_ScheduleMetadataIncludesSpaceID(t *testing.T) {
@@ -538,6 +635,14 @@ func TestSet_ScheduleMetadataIncludesSpaceID(t *testing.T) {
 	if diff := cmp.Diff(queryPeriod, qi.Interval); diff != "" {
 		t.Error(diff)
 	}
+	// query_name for a top-level scheduled query is the schedule config map key.
+	if diff := cmp.Diff(queryName, qi.QueryName); diff != "" {
+		t.Error(diff)
+	}
+	// Top-level schedule queries do not belong to a pack.
+	if diff := cmp.Diff("", qi.PackName); diff != "" {
+		t.Error(diff)
+	}
 }
 
 func TestSet_ScheduleMetadataIncludesPackID(t *testing.T) {
@@ -547,6 +652,7 @@ func TestSet_ScheduleMetadataIncludesPackID(t *testing.T) {
 	const (
 		packName    = "my-pack"
 		packID      = "pack-uuid-123"
+		packLabel   = "My Pack"
 		queryName   = "uptime_query"
 		querySQL    = "select * from uptime"
 		queryPeriod = 60
@@ -562,7 +668,8 @@ func TestSet_ScheduleMetadataIncludesPackID(t *testing.T) {
 			Osquery: &config.OsqueryConfig{
 				Packs: map[string]config.Pack{
 					packName: {
-						PackID: packID,
+						PackID:   packID,
+						PackName: packLabel,
 						Queries: map[string]config.Query{
 							queryName: {
 								Query: querySQL,
@@ -593,6 +700,13 @@ func TestSet_ScheduleMetadataIncludesPackID(t *testing.T) {
 	}
 
 	if diff := cmp.Diff(packID, qi.PackID); diff != "" {
+		t.Error(diff)
+	}
+	if diff := cmp.Diff(packLabel, qi.PackName); diff != "" {
+		t.Error(diff)
+	}
+	// query_name is taken from the pack's queries config map key.
+	if diff := cmp.Diff(queryName, qi.QueryName); diff != "" {
 		t.Error(diff)
 	}
 }
@@ -712,7 +826,9 @@ func TestSet_PackConflictingScheduleDefaultsRejected(t *testing.T) {
 	}
 }
 
-func TestSet_PackMixedQueryScheduleModesRejected(t *testing.T) {
+func TestSet_PackMixedNativeUnscheduledAccepted(t *testing.T) {
+	// Native interval mixed with unscheduled queries must not fail policy application;
+	// see https://github.com/elastic/beats/issues/51450
 	logger := logp.NewLogger("config_test")
 	cfgp := NewConfigPlugin(logger)
 	inputs := []config.InputConfig{
@@ -726,6 +842,37 @@ func TestSet_PackMixedQueryScheduleModesRejected(t *testing.T) {
 						Queries: map[string]config.Query{
 							"native": {Query: "select 1", NativeSchedule: config.NativeSchedule{Interval: 60}},
 							"idle":   {Query: "select 2"},
+						},
+					},
+				},
+			},
+		},
+	}
+	if err := cfgp.Set(inputs); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if cfgp.Count() != 2 {
+		t.Fatalf("expected 2 queries registered, got %d", cfgp.Count())
+	}
+}
+
+func TestSet_PackMixedRRuleScheduleModesRejected(t *testing.T) {
+	logger := logp.NewLogger("config_test")
+	cfgp := NewConfigPlugin(logger)
+	inputs := []config.InputConfig{
+		{
+			Name:       "osquery-manager-1",
+			Type:       "osquery",
+			Datastream: config.DatastreamConfig{Namespace: "default"},
+			Osquery: &config.OsqueryConfig{
+				Packs: map[string]config.Pack{
+					"mixed": {
+						Queries: map[string]config.Query{
+							"native": {Query: "select 1", NativeSchedule: config.NativeSchedule{Interval: 60}},
+							"rrule": {Query: "select 2", RRuleSchedule: &config.RRuleScheduleConfig{
+								RRule:     "FREQ=DAILY",
+								StartDate: "2024-01-01T00:00:00Z",
+							}},
 						},
 					},
 				},

@@ -54,7 +54,7 @@ func (ms *MetricSet) DB(ctx context.Context) (*sql.Conn, error) {
 }
 
 // QueryStats makes the database call for a given metric
-func (ms *MetricSet) QueryStats(ctx context.Context, query string) ([]map[string]interface{}, error) {
+func (ms *MetricSet) QueryStats(ctx context.Context, query string) ([]map[string]any, error) {
 	db, err := ms.DB(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to obtain a connection with the database: %w", err)
@@ -71,12 +71,12 @@ func (ms *MetricSet) QueryStats(ctx context.Context, query string) ([]map[string
 		return nil, fmt.Errorf("scanning columns: %w", err)
 	}
 	vals := make([][]byte, len(columns))
-	valPointers := make([]interface{}, len(columns))
+	valPointers := make([]any, len(columns))
 	for i := range vals {
 		valPointers[i] = &vals[i]
 	}
 
-	results := []map[string]interface{}{}
+	results := []map[string]any{}
 
 	for rows.Next() {
 		err = rows.Scan(valPointers...)
@@ -84,7 +84,7 @@ func (ms *MetricSet) QueryStats(ctx context.Context, query string) ([]map[string
 			return nil, fmt.Errorf("scanning row: %w", err)
 		}
 
-		result := map[string]interface{}{}
+		result := map[string]any{}
 		for i, col := range columns {
 			result[col] = string(vals[i])
 		}

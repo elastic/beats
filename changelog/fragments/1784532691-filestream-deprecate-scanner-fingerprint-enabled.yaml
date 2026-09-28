@@ -1,0 +1,45 @@
+kind: breaking-change
+
+summary: Deprecate and ignore `prospector.scanner.fingerprint.enabled` in filestream, scanner fingerprinting now follows `file_identity`
+
+description: |
+  Scanner fingerprinting is now enabled if and only if the `fingerprint`
+  file identity (the default when `file_identity` is omitted) is used.
+  Previously, setting `prospector.scanner.fingerprint.enabled: false` with
+  `file_identity` omitted caused silent data loss: every matched file
+  received the same empty fingerprint ID, so all files collapsed into a
+  single registry entry and only one of them was harvested. The same
+  setting with an explicit `file_identity.fingerprint` made the input fail
+  to start.
+
+impact: |
+  The `prospector.scanner.fingerprint.enabled` setting is ignored, and
+  Filebeat logs a deprecation warning when its value contradicts the
+  configured `file_identity`.
+
+  Inputs that set `prospector.scanner.fingerprint.enabled: false` with the
+  `fingerprint` file identity now compute real fingerprints. Files
+  previously caught in the data-loss combination have no valid registry
+  entries, so they are re-ingested from the beginning; inputs that
+  previously failed to start now run.
+
+  Inputs that combined a non-fingerprint file identity (`native`, `path`,
+  or `inode_marker`) with `prospector.scanner.fingerprint.enabled: true` no
+  longer compute fingerprints. Their file identity and registry entries are
+  unchanged, but the fingerprinting side effects stop: files smaller than
+  the fingerprint size (`offset`+`length`) are now ingested immediately
+  instead of being held back, events no longer carry the
+  `log.file.fingerprint` field (matching its documentation), files are no
+  longer deduplicated or matched across renames by content, and take_over
+  from a fingerprint-identity input no longer migrates states (changing the
+  file identity away from `fingerprint` was never supported).
+
+action: |
+  Remove `prospector.scanner.fingerprint.enabled` from your configuration
+  and choose the behavior through `file_identity`: keep the default
+  `fingerprint` identity to use fingerprinting, or configure a different
+  identity, for example `file_identity.native: ~`, to disable it.
+
+component: filebeat
+
+issue: https://github.com/elastic/beats/issues/51559

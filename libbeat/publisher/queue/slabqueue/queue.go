@@ -21,9 +21,27 @@ import (
 	"io"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
+
+// DefaultGetDebounce is the coalescing window a newly connected queue starts
+// with. Get waits this long after events first appear before draining the FIFO,
+// so a trickle of events yields one modest batch (and one downstream Publish
+// goroutine) rather than one per event. It bounds the output worker's goroutine
+// fan-out to roughly downstream_round_trip / debounce without capping batch
+// size, so throughput is largely unaffected.
+//
+// This value was tuned from the result of BenchmarkGetDebounce, which sweeps a range of
+// debounce values and reports. Based on the results, 1ms was chosen.
+//
+// debounce=0 lets the mixed receiver case spray ~430 tiny-batch Publish goroutines,
+// while any value >=~250us collapses that to ~100 with no further gain; throughput then
+// declines ~1-2% per additional ms, so 1ms keeps ~98.5% of peak throughput,
+// ~100 goroutines, and roughly halved CPU/event. The balance point before extra
+// debounce only costs throughput.
+var DefaultGetDebounce = 1 * time.Millisecond
 
 // Queue is a per-pipeline façade over a shared Pool. It owns the FIFO of slot
 // indices belonging to one pipeline; the actual event storage lives in the
@@ -53,7 +71,8 @@ type Queue[T any] struct {
 	// this list drains.
 	pendingHead, pendingTail *batch[T]
 
-	// notify wakes Get when new events arrive.
+	// notify wakes Get when new events arrive. It is also handed out by
+	// ReadyChan so a consumer can wait for events in a select instead.
 	notify chan struct{}
 
 	// Per-queue live-event cap. This bounds the events live (published but not
@@ -80,6 +99,8 @@ type Queue[T any] struct {
 	doneOnce  sync.Once
 	doneCh    chan struct{} // closed when fully drained or force-closed
 	forced    atomic.Bool
+
+	debounce time.Duration // coalescing window for Get
 }
 
 func newQueue[T any](pool *Pool[T]) *Queue[T] {
@@ -91,6 +112,7 @@ func newQueue[T any](pool *Pool[T]) *Queue[T] {
 		closeCh:   make(chan struct{}),
 		doneCh:    make(chan struct{}),
 		producers: make(map[*producer[T]]struct{}),
+		debounce:  DefaultGetDebounce,
 	}
 	q.limCond = sync.NewCond(&q.limMu)
 	return q
@@ -219,6 +241,10 @@ func (q *Queue[T]) Producer(cfg queue.ProducerConfig) queue.Producer[T] {
 	return p
 }
 
+func (q *Queue[T]) ReadyChan() <-chan struct{} {
+	return q.notify
+}
+
 // removeProducer unregisters a producer from the force-close fan-out set. Called
 // from producer.Close; safe to call for a producer that was never registered
 // (e.g. one created after the queue began closing).
@@ -228,40 +254,34 @@ func (q *Queue[T]) removeProducer(p *producer[T]) {
 	q.mu.Unlock()
 }
 
-// Get blocks until at least one event is available (or the queue is closed)
-// and returns a batch of up to maxEvents. If maxEvents <= 0, all currently
-// queued events are returned.
+// Get returns a batch of events from this pipeline's FIFO. It blocks until at
+// least one event is available, applies the queue's debounce coalescing window,
+// then returns everything currently queued. It returns io.EOF once the queue is
+// closed and drained.
 func (q *Queue[T]) Get(maxEvents int) (queue.Batch[T], error) {
+	debounced := false
 	for {
 		q.mu.Lock()
 		if q.count > 0 {
+			if !debounced && q.debounce > 0 && !q.closing && !q.forced.Load() {
+				q.mu.Unlock()
+				timer := time.NewTimer(q.debounce)
+				select {
+				case <-timer.C:
+				case <-q.closeCh:
+					timer.Stop()
+				case <-q.pool.closed:
+					timer.Stop()
+					return nil, io.EOF
+				}
+				debounced = true
+				continue
+			}
 			n := q.count
 			if maxEvents > 0 {
 				n = min(n, maxEvents)
 			}
-			// Pull a batch from the recycle pool (already fully reset; see
-			// getBatch) and append our slot indices into its retained backing
-			// array. The batch is owned solely by this Queue/consumer/worker
-			// chain until Done/Release returns it to the pool.
-			b := q.pool.getBatch()
-			b.queue = q
-			d := q.pool.dir.Load()
-			cur := q.head
-			for i := 0; i < n; i++ {
-				b.indices = append(b.indices, cur)
-				cur = d.slot(cur).next
-			}
-			q.head = cur
-			if cur == -1 {
-				q.tail = -1
-			}
-			q.count -= n
-			if q.pendingTail != nil {
-				q.pendingTail.next = b
-			} else {
-				q.pendingHead = b
-			}
-			q.pendingTail = b
+			b := q.buildBatchLocked(n)
 			q.mu.Unlock()
 			q.pool.observer.ConsumeEvents(n, 0)
 			return b, nil
@@ -273,7 +293,7 @@ func (q *Queue[T]) Get(maxEvents int) (queue.Batch[T], error) {
 		q.mu.Unlock()
 
 		select {
-		case <-q.notify:
+		case <-q.ReadyChan():
 			// Loop and try to drain.
 		case <-q.closeCh:
 			// Loop; the closing/forced flags are now set, the next iteration
@@ -282,6 +302,71 @@ func (q *Queue[T]) Get(maxEvents int) (queue.Batch[T], error) {
 			return nil, io.EOF
 		}
 	}
+}
+
+// TryGet returns up to maxEvents events from the queue without blocking. It returns
+// (nil, nil) when the queue is open but empty, and io.EOF once the queue is
+// closed and drained.
+//
+// Unlike Get it applies no debounce coalescing window, so a caller that wants
+// Get's batching behaviour has to impose the delay itself.
+//
+// When maxEvents caps the batch and events are left in the queue, TryGet
+// re-signals ReadyChan before returning.
+func (q *Queue[T]) TryGet(maxEvents int) (queue.Batch[T], error) {
+	q.mu.Lock()
+	if q.count > 0 {
+		n := q.count
+		if maxEvents > 0 {
+			n = min(n, maxEvents)
+		}
+		b := q.buildBatchLocked(n)
+		remaining := q.count
+		q.mu.Unlock()
+		q.pool.observer.ConsumeEvents(n, 0)
+		if remaining > 0 {
+			q.signal()
+		}
+		return b, nil
+	}
+	if q.forced.Load() || q.closing {
+		q.mu.Unlock()
+		return nil, io.EOF
+	}
+	q.mu.Unlock()
+
+	return nil, nil
+}
+
+func (q *Queue[T]) GetDebounce() time.Duration {
+	return q.debounce
+}
+
+// buildBatchLocked removes the first n events from this pipeline's FIFO and
+// returns them as a recycled batch, appended to the pending-ack list so
+// producer ACK callbacks still fire in publish order. It must be called with
+// q.mu held and 0 < n <= q.count.
+func (q *Queue[T]) buildBatchLocked(n int) *batch[T] {
+	b := q.pool.getBatch()
+	b.queue = q
+	d := q.pool.dir.Load()
+	cur := q.head
+	for range n {
+		b.indices = append(b.indices, cur)
+		cur = d.slot(cur).next
+	}
+	q.head = cur
+	if cur == -1 {
+		q.tail = -1
+	}
+	q.count -= n
+	if q.pendingTail != nil {
+		q.pendingTail.next = b
+	} else {
+		q.pendingHead = b
+	}
+	q.pendingTail = b
+	return b
 }
 
 // Close shuts down the queue.
@@ -413,8 +498,8 @@ func (q *Queue[T]) BufferConfig() queue.BufferConfig {
 	return queue.BufferConfig{MaxEvents: maxEvents}
 }
 
-// signal wakes a goroutine blocked in Get. Non-blocking: at most one pending
-// wake-up is buffered.
+// signal wakes a goroutine blocked in Get, or one waiting on ReadyChan.
+// Non-blocking: at most one pending wake-up is buffered.
 func (q *Queue[T]) signal() {
 	select {
 	case q.notify <- struct{}{}:

@@ -107,14 +107,14 @@ func makeMatcher(network string) (networkMatcher, error) {
 	return m, nil
 }
 
-func invalidTypeError(field string, value interface{}) error {
+func invalidTypeError(field string, value any) error {
 	return fmt.Errorf("network condition attempted to set "+
 		"'%v' -> '%v' and encountered unexpected type '%T', only "+
 		"strings or []strings are allowed", field, value, value)
 }
 
 // NewNetworkCondition builds a new Network using the given configuration.
-func NewNetworkCondition(fields map[string]interface{}, logger *logp.Logger) (*Network, error) {
+func NewNetworkCondition(fields map[string]any, logger *logp.Logger) (*Network, error) {
 	cond := &Network{
 		fields: map[string]networkMatcher{},
 		log:    logger.Named(logName),
@@ -128,7 +128,7 @@ func NewNetworkCondition(fields map[string]interface{}, logger *logp.Logger) (*N
 				return nil, err
 			}
 			cond.fields[field] = m
-		case []interface{}:
+		case []any:
 			var matchers multiNetworkMatcher
 			for _, networkIfc := range v {
 				network, ok := networkIfc.(string)
@@ -205,7 +205,7 @@ func parseCIDR(value string) (*net.IPNet, error) {
 
 // extractIP return an IP address if unk is an IP address string or a net.IP.
 // Otherwise it returns nil.
-func extractIP(unk interface{}) []net.IP {
+func extractIP(unk any) []net.IP {
 	switch v := unk.(type) {
 	case string:
 		return []net.IP{net.ParseIP(v)}

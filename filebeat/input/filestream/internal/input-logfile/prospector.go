@@ -36,7 +36,7 @@ type Prospector interface {
 	TakeOver(local StoreUpdater, newID func(Source) string) error
 	// Run starts the event loop and handles the incoming events
 	// either by starting/stopping a harvester, or updating the statestore.
-	Run(input.Context, StateMetadataUpdater, HarvesterGroup)
+	Run(input.Context, StateMetadataUpdater, HarvesterGroup, *Metrics)
 	// Test checks if the Prospector is able to run the configuration
 	// specified by the user.
 	Test() error
@@ -45,14 +45,27 @@ type Prospector interface {
 // StateMetadataUpdater updates and removes the state information for a given Source.
 type StateMetadataUpdater interface {
 	// FindCursorMeta retrieves and unpacks the cursor metadata of an entry of the given Source.
-	FindCursorMeta(s Source, v interface{}) error
+	FindCursorMeta(s Source, v any) error
 	// UpdateMetadata updates the source metadata of a registry entry of a given Source.
-	UpdateMetadata(s Source, v interface{}) error
+	UpdateMetadata(s Source, v any) error
 	// Remove marks a state for deletion of a given Source.
 	Remove(s Source) error
 	// ResetCursor resets the cursor in the registry and drops previous state
 	// updates that are not yet ACKed.
-	ResetCursor(s Source, cur interface{}) error
+	ResetCursor(s Source, cur any) error
+
+	// IterateOnPrefix iterates over all entries that match this input's prefix.
+	// The callback receives the key and cursor metadata for each entry.
+	IterateOnPrefix(fn func(key string, meta any))
+
+	// UpdateKey updates an entry from oldKey to newKey with updated metadata.
+	// This is used by the growing fingerprint migration to update the registry
+	// key when a file's fingerprint grows.
+	UpdateKey(oldKey, newKey string, meta any) error
+
+	// KeyExists returns true if the given key already has an entry in the
+	// store. This is a fast O(1) lookup with no side effects (no Retain/Release).
+	KeyExists(key string) bool
 }
 
 // StoreUpdater allows manipulation of the state store
@@ -72,7 +85,7 @@ type StoreUpdater interface {
 // Value contains the cursor metadata.
 type Value interface {
 	// UnpackCursorMeta returns the cursor metadata required by the prospector.
-	UnpackCursorMeta(to interface{}) error
+	UnpackCursorMeta(to any) error
 
 	// Key return the registry's key for this resource
 	Key() string

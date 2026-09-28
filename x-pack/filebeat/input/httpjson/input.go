@@ -31,7 +31,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/private"
@@ -41,7 +40,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/elastic-agent-libs/useragent"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 )
@@ -51,8 +49,6 @@ const (
 )
 
 var (
-	userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
-
 	// for testing
 	timeNow = time.Now
 )
@@ -69,19 +65,19 @@ func newRetryLogger(log *logp.Logger) *retryLogger {
 	}
 }
 
-func (log *retryLogger) Error(msg string, keysAndValues ...interface{}) {
+func (log *retryLogger) Error(msg string, keysAndValues ...any) {
 	log.log.Errorw(msg, keysAndValues...)
 }
 
-func (log *retryLogger) Info(msg string, keysAndValues ...interface{}) {
+func (log *retryLogger) Info(msg string, keysAndValues ...any) {
 	log.log.Infow(msg, keysAndValues...)
 }
 
-func (log *retryLogger) Debug(msg string, keysAndValues ...interface{}) {
+func (log *retryLogger) Debug(msg string, keysAndValues ...any) {
 	log.log.Debugw(msg, keysAndValues...)
 }
 
-func (log *retryLogger) Warn(msg string, keysAndValues ...interface{}) {
+func (log *retryLogger) Warn(msg string, keysAndValues ...any) {
 	log.log.Warnw(msg, keysAndValues...)
 }
 
@@ -102,7 +98,7 @@ type redact struct {
 func (r redact) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	v, err := private.Redact(r.value, "", r.fields)
 	if err != nil {
-		return fmt.Errorf("could not redact value: %v", err)
+		return fmt.Errorf("could not redact value: %w", err)
 	}
 	return v.MarshalLogObject(enc)
 }
@@ -137,11 +133,11 @@ func (m mapstrM) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	return nil
 }
 
-func tryToMapStr(v interface{}) (mapstrM, bool) {
+func tryToMapStr(v any) (mapstrM, bool) {
 	switch m := v.(type) {
 	case mapstrM:
 		return m, true
-	case map[string]interface{}:
+	case map[string]any:
 		return mapstrM(m), true
 	default:
 		return nil, false
@@ -160,7 +156,8 @@ func test(url *url.URL) error {
 		return "80"
 	}()
 
-	_, err := net.DialTimeout("tcp", net.JoinHostPort(url.Hostname(), port), time.Second)
+	d := &net.Dialer{Timeout: time.Second}
+	_, err := d.DialContext(context.Background(), "tcp", net.JoinHostPort(url.Hostname(), port))
 	if err != nil {
 		return fmt.Errorf("url %q is unreachable", url)
 	}
@@ -223,7 +220,7 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 		return err
 	}
 
-	requestFactory, err := newRequestFactory(stdCtx, cfg, ctx, log, metrics, reg)
+	requestFactory, err := newRequestFactory(stdCtx, cfg, ctx, log, metrics, reg, ctx.Agent.UserAgent)
 	if err != nil {
 		log.Errorf("Error while creating requestFactory: %v", err)
 		ctx.UpdateStatus(status.Failed, "failed to create request factory: "+err.Error())
@@ -238,7 +235,7 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 			return err
 		}
 	}
-	pagination := newPagination(cfg, client, ctx, log)
+	pagination := newPagination(cfg, client, ctx, log, ctx.Agent.UserAgent)
 	responseProcessor := newResponseProcessor(cfg, pagination, xmlDetails, metrics, ctx, log)
 	requester := newRequester(client, requestFactory, responseProcessor, metrics, ctx, log)
 
@@ -393,7 +390,7 @@ func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger,
 		traceLogger := zap.New(core)
 
 		maxBodyLen := cfg.Tracer.MaxSize * 1e6 / 10 // 10% of file max
-		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger, maxBodyLen, log)
+		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger, maxBodyLen, []string{"Authorization"}, log)
 	} else if cfg.Tracer != nil {
 		// We have a trace log name, but we are not enabled,
 		// so remove all trace logs we own.
@@ -450,7 +447,8 @@ type socketDialer struct {
 }
 
 func (d socketDialer) Dial(_, _ string) (net.Conn, error) {
-	return net.Dial("unix", d.path)
+	var nd net.Dialer
+	return nd.DialContext(context.Background(), "unix", d.path)
 }
 
 func (d socketDialer) DialContext(ctx context.Context, _, _ string) (net.Conn, error) {
@@ -474,7 +472,7 @@ func checkRedirect(config *requestConfig, log *logp.Logger) func(*http.Request, 
 		prev := via[len(via)-1] // previous request to get headers from
 
 		log.Debugf("http client: forwarding headers from previous request: %#v", prev.Header)
-		req.Header = prev.Header.Clone()
+		req.Header = prev.Header.Clone() //nolint:gosec // G119: sensitive headers are removed below for cross-origin redirects via config.RedirectSensitiveHeaders
 
 		if req.URL.Host != prev.URL.Host || (prev.URL.Scheme == "https" && req.URL.Scheme == "http") {
 			for _, k := range config.RedirectSensitiveHeaders {

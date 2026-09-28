@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-09-06T13:38:17.5566269Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "renamed-user-account",
@@ -82,7 +82,7 @@
   {
     "@timestamp": "2019-09-06T13:38:23.5161066Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "renamed-user-account",

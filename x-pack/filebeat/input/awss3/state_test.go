@@ -143,7 +143,6 @@ func TestStateIsEqual(t *testing.T) {
 	}
 
 	for name, test := range tests {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			isSame := test.states[0].IsEqual(&test.states[1])
 			assert.Equal(t, test.isSame, isSame)

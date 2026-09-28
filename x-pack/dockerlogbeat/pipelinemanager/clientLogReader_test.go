@@ -67,11 +67,9 @@ func setupTestReader(t *testing.T, logString string, containerConfig logger.Info
 	client := createNewClient(t, logString, mockConnector, containerConfig)
 
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		client.ConsumePipelineAndSend()
-	}()
+	})
 
 	return mockConnector, func() {
 		client.Close()

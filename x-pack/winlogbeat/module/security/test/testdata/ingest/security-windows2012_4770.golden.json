@@ -2,7 +2,7 @@
   {
     "@timestamp": "2020-04-01T07:32:55.0104462Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "kerberos-service-ticket-renewed",
@@ -56,8 +56,8 @@
         "TicketEncryptionTypeDescription": "AES256-CTS-HMAC-SHA1-96",
         "TicketOptions": "0x10002",
         "TicketOptionsDescription": [
-          "Renew",
-          "Name-canonicalize"
+          "Name-canonicalize",
+          "Renew"
         ]
       },
       "event_id": "4770",

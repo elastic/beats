@@ -81,7 +81,7 @@ logging.level: debug
 	// 3. Create the log file
 	integration.WriteLogFile(t, logFilePath, 10, false)
 
-	assert.NoError(t, os.WriteFile(filepath.Join(inputs, "filestream.yml"), []byte(fmt.Sprintf(inputConfig, logFilePath)), 0666))
+	assert.NoError(t, os.WriteFile(filepath.Join(inputs, "filestream.yml"), fmt.Appendf(nil, inputConfig, logFilePath), 0666))
 
 	// 4. Start
 	filebeat.Start()
@@ -107,7 +107,7 @@ logging.level: debug
 	logFilePath2 := filepath.Join(tempDir, "log2.log")
 	integration.WriteLogFile(t, logFilePath2, 10, false)
 	// bring another file up
-	assert.NoError(t, os.WriteFile(filepath.Join(inputs, "secondInput.yml"), []byte(fmt.Sprintf(inputConfig, logFilePath2)), 0666))
+	assert.NoError(t, os.WriteFile(filepath.Join(inputs, "secondInput.yml"), fmt.Appendf(nil, inputConfig, logFilePath2), 0666))
 
 	// Ensure all log lines are ingested eventually
 	integration.WaitLineCountInFile(t, outputFile, 20)

@@ -92,6 +92,7 @@ func (s *server) Test(_ input.TestContext) error {
 }
 
 func (s *server) InitMetrics(id string, reg *monitoring.Registry, logger *logp.Logger) netinput.Metrics {
+	//nolint:gosec // read_buffer is a byte size, never negative
 	s.metrics = netmetrics.NewUDP(reg, s.Host, uint64(s.ReadBuffer), time.Second, logger)
 	return s.metrics
 }
@@ -116,10 +117,13 @@ func (s *server) Run(ctx input.Context, evtChan chan<- netinput.DataMetadata, me
 			"remote_address", remoteAddr,
 			"truncated", metadata.Truncated)
 
-		evtChan <- netinput.DataMetadata{
+		select {
+		case evtChan <- netinput.DataMetadata{
 			Data:      data,
 			Metadata:  metadata,
 			Timestamp: now,
+		}:
+		case <-ctx.Cancelation.Done():
 		}
 	}, logger)
 

@@ -149,7 +149,7 @@ func TestFetch(t *testing.T) {
 	assert.True(t, found, "listener not found")
 }
 
-func getRequiredValue(t testing.TB, key string, m mapstr.M) interface{} {
+func getRequiredValue(t testing.TB, key string, m mapstr.M) any {
 	v, err := m.GetValue(key)
 	if err != nil {
 		t.Fatal(fmt.Errorf("failed to get value for key '%s': %w", key, err))
@@ -160,8 +160,8 @@ func getRequiredValue(t testing.TB, key string, m mapstr.M) interface{} {
 	return v
 }
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
+func getConfig() map[string]any {
+	return map[string]any{
 		"module":     "system",
 		"metricsets": []string{"socket"},
 	}

@@ -25,10 +25,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	"github.com/elastic/beats/v7/testing/testutils"
-	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -42,10 +43,10 @@ func TestMain(m *testing.M) {
 }
 
 func TestGenerateHints(t *testing.T) {
-	customDockerCfg := conf.MustNewConfigFrom(map[string]interface{}{
-		"default_config": map[string]interface{}{
+	customDockerCfg := conf.MustNewConfigFrom(map[string]any{
+		"default_config": map[string]any{
 			"type": "docker",
-			"containers": map[string]interface{}{
+			"containers": map[string]any{
 				"ids": []string{
 					"${data.container.id}",
 				},
@@ -54,16 +55,16 @@ func TestGenerateHints(t *testing.T) {
 		},
 	})
 
-	customContainerCfg := conf.MustNewConfigFrom(map[string]interface{}{
-		"default_config": map[string]interface{}{
+	customContainerCfg := conf.MustNewConfigFrom(map[string]any{
+		"default_config": map[string]any{
 			"type": "container",
 			"paths": []string{
 				"/var/lib/docker/containers/${data.container.id}/*-json.log",
 			},
 			"close_timeout": "true",
-			"processors": []interface{}{
-				map[string]interface{}{
-					"add_tags": map[string]interface{}{
+			"processors": []any{
+				map[string]any{
+					"add_tags": map[string]any{
 						"tags":   []string{"web"},
 						"target": "environment",
 					},
@@ -72,12 +73,12 @@ func TestGenerateHints(t *testing.T) {
 		},
 	})
 
-	customFilestreamCfg := conf.MustNewConfigFrom(map[string]interface{}{
-		"default_config": map[string]interface{}{
+	customFilestreamCfg := conf.MustNewConfigFrom(map[string]any{
+		"default_config": map[string]any{
 			"type": "filestream",
 			"id":   "kubernetes-container-logs-${data.kubernetes.container.id}",
-			"prospector": map[string]interface{}{
-				"scanner": map[string]interface{}{
+			"prospector": map[string]any{
+				"scanner": map[string]any{
 					"fingerprint.enabled": true,
 					"symlinks":            true,
 				},
@@ -86,9 +87,9 @@ func TestGenerateHints(t *testing.T) {
 			"paths": []string{
 				"/var/log/containers/*-${data.kubernetes.container.id}.log",
 			},
-			"parsers": []interface{}{
-				map[string]interface{}{
-					"container": map[string]interface{}{
+			"parsers": []any{
+				map[string]any{
+					"container": map[string]any{
 						"stream": "all",
 						"format": "auto",
 					},
@@ -99,8 +100,8 @@ func TestGenerateHints(t *testing.T) {
 
 	defaultCfg := conf.NewConfig()
 
-	defaultDisabled := conf.MustNewConfigFrom(map[string]interface{}{
-		"default_config": map[string]interface{}{
+	defaultDisabled := conf.MustNewConfigFrom(map[string]any{
+		"default_config": map[string]any{
 			"enabled": "false",
 		},
 	})
@@ -296,8 +297,8 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"type": "docker",
-					"containers": map[string]interface{}{
-						"ids": []interface{}{"abc"},
+					"containers": map[string]any{
+						"ids": []any{"abc"},
 					},
 					"close_timeout": "true",
 				},
@@ -329,11 +330,11 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"type": "docker",
-					"containers": map[string]interface{}{
-						"ids": []interface{}{"abc"},
+					"containers": map[string]any{
+						"ids": []any{"abc"},
 					},
-					"include_lines": []interface{}{"^test", "^test1"},
-					"exclude_lines": []interface{}{"^test2", "^test3"},
+					"include_lines": []any{"^test", "^test1"},
+					"exclude_lines": []any{"^test2", "^test3"},
 					"close_timeout": "true",
 				},
 			},
@@ -368,18 +369,18 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"type": "docker",
-					"containers": map[string]interface{}{
-						"ids": []interface{}{"abc"},
+					"containers": map[string]any{
+						"ids": []any{"abc"},
 					},
-					"exclude_lines": []interface{}{"^test1", "^test2"},
+					"exclude_lines": []any{"^test1", "^test2"},
 					"close_timeout": "true",
 				},
 				{
 					"type": "docker",
-					"containers": map[string]interface{}{
-						"ids": []interface{}{"abc"},
+					"containers": map[string]any{
+						"ids": []any{"abc"},
 					},
-					"include_lines": []interface{}{"^test1", "^test2"},
+					"include_lines": []any{"^test1", "^test2"},
 					"close_timeout": "true",
 				},
 			},
@@ -412,10 +413,10 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"type": "docker",
-					"containers": map[string]interface{}{
-						"ids": []interface{}{"abc"},
+					"containers": map[string]any{
+						"ids": []any{"abc"},
 					},
-					"multiline": map[string]interface{}{
+					"multiline": map[string]any{
 						"pattern": "^test",
 						"negate":  "true",
 					},
@@ -451,30 +452,30 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"id":    "kubernetes-container-logs-abc",
-					"paths": []interface{}{"/var/log/containers/*-abc.log"},
-					"parsers": []interface{}{
-						map[string]interface{}{
-							"container": map[string]interface{}{
+					"paths": []any{"/var/log/containers/*-abc.log"},
+					"parsers": []any{
+						map[string]any{
+							"container": map[string]any{
 								"format": "auto",
 								"stream": "all",
 							},
 						},
-						map[string]interface{}{
-							"multiline": map[string]interface{}{
+						map[string]any{
+							"multiline": map[string]any{
 								"pattern": "^test",
 								"negate":  "true",
 							},
 						},
 					},
-					"prospector": map[string]interface{}{
-						"scanner": map[string]interface{}{
+					"prospector": map[string]any{
+						"scanner": map[string]any{
 							"symlinks": true,
-							"fingerprint": map[string]interface{}{
+							"fingerprint": map[string]any{
 								"enabled": true,
 							},
 						},
 					},
-					"file_identity": map[string]interface{}{
+					"file_identity": map[string]any{
 						"fingerprint": nil,
 					},
 					"type": "filestream",
@@ -509,30 +510,30 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"id":    "kubernetes-container-logs-abc",
-					"paths": []interface{}{"/var/log/containers/*-abc.log"},
-					"parsers": []interface{}{
-						map[string]interface{}{
-							"container": map[string]interface{}{
+					"paths": []any{"/var/log/containers/*-abc.log"},
+					"parsers": []any{
+						map[string]any{
+							"container": map[string]any{
 								"format": "auto",
 								"stream": "all",
 							},
 						},
-						map[string]interface{}{
-							"ndjson": map[string]interface{}{
+						map[string]any{
+							"ndjson": map[string]any{
 								"add_error_key": true,
 								"expand_keys":   true,
 							},
 						},
 					},
-					"prospector": map[string]interface{}{
-						"scanner": map[string]interface{}{
+					"prospector": map[string]any{
+						"scanner": map[string]any{
 							"symlinks": true,
-							"fingerprint": map[string]interface{}{
+							"fingerprint": map[string]any{
 								"enabled": true,
 							},
 						},
 					},
-					"file_identity": map[string]interface{}{
+					"file_identity": map[string]any{
 						"fingerprint": nil,
 					},
 					"type": "filestream",
@@ -567,18 +568,18 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"type": "container",
-					"paths": []interface{}{
+					"paths": []any{
 						"/var/lib/docker/containers/abc/*-json.log",
 					},
 					"close_timeout": "true",
-					"json": map[string]interface{}{
+					"json": map[string]any{
 						"add_error_key": true,
 						"expand_keys":   true,
 					},
-					"processors": []interface{}{
-						map[string]interface{}{
-							"add_tags": map[string]interface{}{
-								"tags":   []interface{}{"web"},
+					"processors": []any{
+						map[string]any{
+							"add_tags": map[string]any{
+								"tags":   []any{"web"},
 								"target": "environment",
 							},
 						},
@@ -611,10 +612,10 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"type": "docker",
-					"containers": map[string]interface{}{
-						"ids": []interface{}{"abc"},
+					"containers": map[string]any{
+						"ids": []any{"abc"},
 					},
-					"multiline": map[string]interface{}{
+					"multiline": map[string]any{
 						"pattern": "^test",
 						"negate":  "true",
 					},
@@ -640,7 +641,7 @@ func TestGenerateHints(t *testing.T) {
 					"logs": mapstr.M{
 						"processors": mapstr.M{
 							"1": mapstr.M{
-								"dissect": mapstr.M{
+								"dissect": mapstr.M{ //nolint:gosec // test tokenizer fixture
 									"tokenizer": "%{key1} %{key2}",
 								},
 							},
@@ -653,17 +654,17 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"type": "docker",
-					"containers": map[string]interface{}{
-						"ids": []interface{}{"abc"},
+					"containers": map[string]any{
+						"ids": []any{"abc"},
 					},
 					"close_timeout": "true",
-					"processors": []interface{}{
-						map[string]interface{}{
-							"dissect": map[string]interface{}{
+					"processors": []any{
+						map[string]any{
+							"dissect": map[string]any{ //nolint:gosec // test tokenizer fixture
 								"tokenizer": "%{key1} %{key2}",
 							},
 						},
-						map[string]interface{}{
+						map[string]any{
 							"drop_event": nil,
 						},
 					},
@@ -689,7 +690,7 @@ func TestGenerateHints(t *testing.T) {
 					"logs": mapstr.M{
 						"processors": mapstr.M{
 							"1": mapstr.M{
-								"dissect": mapstr.M{
+								"dissect": mapstr.M{ //nolint:gosec // test tokenizer fixture
 									"tokenizer": "%{key1} %{key2}",
 								},
 							},
@@ -702,23 +703,23 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"type": "container",
-					"paths": []interface{}{
+					"paths": []any{
 						"/var/lib/docker/containers/abc/*-json.log",
 					},
 					"close_timeout": "true",
-					"processors": []interface{}{
-						map[string]interface{}{
-							"add_tags": map[string]interface{}{
-								"tags":   []interface{}{"web"},
+					"processors": []any{
+						map[string]any{
+							"add_tags": map[string]any{
+								"tags":   []any{"web"},
 								"target": "environment",
 							},
 						},
-						map[string]interface{}{
-							"dissect": map[string]interface{}{
+						map[string]any{
+							"dissect": map[string]any{ //nolint:gosec // test tokenizer fixture
 								"tokenizer": "%{key1} %{key2}",
 							},
 						},
-						map[string]interface{}{
+						map[string]any{
 							"drop_event": nil,
 						},
 					},
@@ -750,24 +751,24 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"module": "apache",
-					"error": map[string]interface{}{
+					"error": map[string]any{
 						"enabled": true,
-						"input": map[string]interface{}{
+						"input": map[string]any{
 							"type": "docker",
-							"containers": map[string]interface{}{
+							"containers": map[string]any{
 								"stream": "all",
-								"ids":    []interface{}{"abc"},
+								"ids":    []any{"abc"},
 							},
 							"close_timeout": "true",
 						},
 					},
-					"access": map[string]interface{}{
+					"access": map[string]any{
 						"enabled": true,
-						"input": map[string]interface{}{
+						"input": map[string]any{
 							"type": "docker",
-							"containers": map[string]interface{}{
+							"containers": map[string]any{
 								"stream": "all",
-								"ids":    []interface{}{"abc"},
+								"ids":    []any{"abc"},
 							},
 							"close_timeout": "true",
 						},
@@ -801,24 +802,24 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"module": "apache",
-					"access": map[string]interface{}{
+					"access": map[string]any{
 						"enabled": true,
-						"input": map[string]interface{}{
+						"input": map[string]any{
 							"type": "docker",
-							"containers": map[string]interface{}{
+							"containers": map[string]any{
 								"stream": "all",
-								"ids":    []interface{}{"abc"},
+								"ids":    []any{"abc"},
 							},
 							"close_timeout": "true",
 						},
 					},
-					"error": map[string]interface{}{
+					"error": map[string]any{
 						"enabled": false,
-						"input": map[string]interface{}{
+						"input": map[string]any{
 							"type": "docker",
-							"containers": map[string]interface{}{
+							"containers": map[string]any{
 								"stream": "all",
-								"ids":    []interface{}{"abc"},
+								"ids":    []any{"abc"},
 							},
 							"close_timeout": "true",
 						},
@@ -853,24 +854,24 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{
 				{
 					"module": "apache",
-					"access": map[string]interface{}{
+					"access": map[string]any{
 						"enabled": true,
-						"input": map[string]interface{}{
+						"input": map[string]any{
 							"type": "docker",
-							"containers": map[string]interface{}{
+							"containers": map[string]any{
 								"stream": "stdout",
-								"ids":    []interface{}{"abc"},
+								"ids":    []any{"abc"},
 							},
 							"close_timeout": "true",
 						},
 					},
-					"error": map[string]interface{}{
+					"error": map[string]any{
 						"enabled": true,
-						"input": map[string]interface{}{
+						"input": map[string]any{
 							"type": "docker",
-							"containers": map[string]interface{}{
+							"containers": map[string]any{
 								"stream": "stderr",
-								"ids":    []interface{}{"abc"},
+								"ids":    []any{"abc"},
 							},
 							"close_timeout": "true",
 						},
@@ -1264,8 +1265,8 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 			len:  1,
 			result: mapstr.M{
 				"type": "docker",
-				"containers": map[string]interface{}{
-					"paths": []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
+				"containers": map[string]any{
+					"paths": []any{"/var/lib/docker/containers/abc/*-json.log"},
 				},
 				"close_timeout": "true",
 			},
@@ -1292,7 +1293,7 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 					"logs": mapstr.M{
 						"processors": mapstr.M{
 							"1": mapstr.M{
-								"dissect": mapstr.M{
+								"dissect": mapstr.M{ //nolint:gosec // test tokenizer fixture
 									"tokenizer": "%{key1} %{key2}",
 								},
 							},
@@ -1305,17 +1306,17 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 			path: "/var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log",
 			result: mapstr.M{
 				"type": "docker",
-				"containers": map[string]interface{}{
-					"paths": []interface{}{"/var/log/pods/12345/foobar/*.log"},
+				"containers": map[string]any{
+					"paths": []any{"/var/log/pods/12345/foobar/*.log"},
 				},
 				"close_timeout": "true",
-				"processors": []interface{}{
-					map[string]interface{}{
-						"dissect": map[string]interface{}{
+				"processors": []any{
+					map[string]any{
+						"dissect": map[string]any{ //nolint:gosec // test tokenizer fixture
 							"tokenizer": "%{key1} %{key2}",
 						},
 					},
-					map[string]interface{}{
+					map[string]any{
 						"drop_event": nil,
 					},
 				},
@@ -1349,24 +1350,24 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 			path: "/var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log",
 			result: mapstr.M{
 				"module": "apache",
-				"error": map[string]interface{}{
+				"error": map[string]any{
 					"enabled": true,
-					"input": map[string]interface{}{
+					"input": map[string]any{
 						"type": "docker",
-						"containers": map[string]interface{}{
+						"containers": map[string]any{
 							"stream": "all",
-							"paths":  []interface{}{"/var/log/pods/12345/foobar/*.log"},
+							"paths":  []any{"/var/log/pods/12345/foobar/*.log"},
 						},
 						"close_timeout": "true",
 					},
 				},
-				"access": map[string]interface{}{
+				"access": map[string]any{
 					"enabled": true,
-					"input": map[string]interface{}{
+					"input": map[string]any{
 						"type": "docker",
-						"containers": map[string]interface{}{
+						"containers": map[string]any{
 							"stream": "all",
-							"paths":  []interface{}{"/var/log/pods/12345/foobar/*.log"},
+							"paths":  []any{"/var/log/pods/12345/foobar/*.log"},
 						},
 						"close_timeout": "true",
 					},
@@ -1402,24 +1403,24 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 			path: "/var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log",
 			result: mapstr.M{
 				"module": "apache",
-				"access": map[string]interface{}{
+				"access": map[string]any{
 					"enabled": true,
-					"input": map[string]interface{}{
+					"input": map[string]any{
 						"type": "docker",
-						"containers": map[string]interface{}{
+						"containers": map[string]any{
 							"stream": "all",
-							"paths":  []interface{}{"/var/log/pods/12345/foobar/*.log"},
+							"paths":  []any{"/var/log/pods/12345/foobar/*.log"},
 						},
 						"close_timeout": "true",
 					},
 				},
-				"error": map[string]interface{}{
+				"error": map[string]any{
 					"enabled": false,
-					"input": map[string]interface{}{
+					"input": map[string]any{
 						"type": "docker",
-						"containers": map[string]interface{}{
+						"containers": map[string]any{
 							"stream": "all",
-							"paths":  []interface{}{"/var/log/pods/12345/foobar/*.log"},
+							"paths":  []any{"/var/log/pods/12345/foobar/*.log"},
 						},
 						"close_timeout": "true",
 					},
@@ -1429,10 +1430,10 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		cfg, _ := conf.NewConfigFrom(map[string]interface{}{
-			"default_config": map[string]interface{}{
+		cfg, _ := conf.NewConfigFrom(map[string]any{
+			"default_config": map[string]any{
 				"type": "docker",
-				"containers": map[string]interface{}{
+				"containers": map[string]any{
 					"paths": []string{
 						test.path,
 					},
@@ -1508,4 +1509,307 @@ func logsTestKeystore(t *testing.T, path, secret string) keystore.Keystore {
 	require.NoError(t, w.Store("PASSWORD", []byte(secret)))
 	require.NoError(t, w.Save())
 	return ks
+}
+
+func TestInputAllowListDisabled(t *testing.T) {
+	tests := []struct {
+		name           string
+		inputAllowList mapstr.M
+	}{
+		{
+			name: "empty",
+		},
+		{
+			name: "explicitly disabled",
+			inputAllowList: mapstr.M{
+				"enabled": false,
+				"types":   []string{"filestream"},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			builder := newInputAllowListTestBuilder(t, test.inputAllowList)
+
+			configs := builder.CreateConfig(inputAllowListRawEvent(
+				`[{"type":"httpjson"}]`,
+			))
+
+			requireInputTypes(
+				t,
+				configs,
+				[]string{"httpjson"},
+				"disabled filtering should retain the disallowed input",
+			)
+		})
+	}
+}
+
+func TestInputAllowListDefaultTypes(t *testing.T) {
+	tests := []struct {
+		name           string
+		inputAllowList mapstr.M
+	}{
+		{
+			name: "omitted types",
+			inputAllowList: mapstr.M{
+				"enabled": true,
+			},
+		},
+		{
+			name: "empty types",
+			inputAllowList: mapstr.M{
+				"enabled": true,
+				"types":   []string{},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			builder := newInputAllowListTestBuilder(t, test.inputAllowList)
+
+			configs := builder.CreateConfig(inputAllowListRawEvent(
+				`[{"type":"log"},{"type":"filestream"},{"type":"container"}]`,
+			))
+
+			requireInputTypes(
+				t,
+				configs,
+				[]string{"log", "filestream", "container"},
+				"default input types should preserve their raw configuration order",
+			)
+		})
+	}
+}
+
+func TestInputAllowListCustomTypesReplaceDefaults(t *testing.T) {
+	builder := newInputAllowListTestBuilder(
+		t,
+		mapstr.M{
+			"enabled": true,
+			"types":   []string{"httpjson"},
+		},
+	)
+
+	configs := builder.CreateConfig(inputAllowListRawEvent(
+		`[{"type":"httpjson"},{"type":"filestream"}]`,
+	))
+
+	requireInputTypes(
+		t,
+		configs,
+		[]string{"httpjson"},
+		"a custom allowed direct input should be retained",
+	)
+}
+
+func TestInputAllowListFiltersMixedRawConfigs(t *testing.T) {
+	builder := newInputAllowListTestBuilder(t, mapstr.M{"enabled": true})
+
+	configs := builder.CreateConfig(inputAllowListRawEvent(
+		`[{"type":"filestream"},{"type":"httpjson"},{"type":"container"}]`,
+	))
+
+	requireInputTypes(
+		t,
+		configs,
+		[]string{"filestream", "container"},
+		"mixed raw configurations should retain only valid allowed entries",
+	)
+}
+
+func TestInputAllowListFiltersAfterTemplateInterpolation(t *testing.T) {
+	builder := newInputAllowListTestBuilder(
+		t,
+		mapstr.M{
+			"enabled": true,
+			"types":   []string{"httpjson"},
+		})
+
+	event := inputAllowListRawEvent(
+		`[{"type":"${data.input_type}"},{"type":"foo"}]`,
+	)
+	event["input_type"] = "httpjson"
+
+	configs := builder.CreateConfig(event)
+
+	requireInputTypes(
+		t,
+		configs,
+		[]string{"httpjson"},
+		"the rendered input type should be checked",
+	)
+}
+
+func TestInputAllowListEnforcesModuleFilesetTypes(t *testing.T) {
+	tests := []struct {
+		name         string
+		module       mapstr.M
+		wantFilesets []string
+	}{
+		{
+			name: "allowed fileset input types",
+			module: mapstr.M{
+				"module": "apache",
+				"access": mapstr.M{
+					"enabled": true,
+					"input":   mapstr.M{"type": "filestream"},
+				},
+				"error": mapstr.M{
+					"enabled": true,
+					"input":   mapstr.M{"type": "container"},
+				},
+			},
+			wantFilesets: []string{"access", "error"},
+		},
+		{
+			name: "disallowed fileset is removed",
+			module: mapstr.M{
+				"module": "apache",
+				"access": mapstr.M{
+					"enabled": true,
+					"input":   mapstr.M{"type": "filestream"},
+				},
+				"error": mapstr.M{
+					"enabled": true,
+					"input":   mapstr.M{"type": "httpjson"},
+				},
+			},
+			wantFilesets: []string{"access"},
+		},
+		{
+			name: "module is rejected when its only fileset has no input type",
+			module: mapstr.M{
+				"module": "apache",
+				"access": mapstr.M{
+					"enabled": true,
+					"input":   mapstr.M{"paths": []string{"/var/log/apache/access.log"}},
+				},
+			},
+		},
+		{
+			name: "module is rejected when its only fileset has an unreadable input type",
+			module: mapstr.M{
+				"module": "apache",
+				"access": mapstr.M{
+					"enabled": true,
+					"input":   mapstr.M{"type": mapstr.M{"invalid": true}},
+				},
+			},
+		},
+		{
+			name: "module is rejected when all filesets are disallowed",
+			module: mapstr.M{
+				"module": "apache",
+				"access": mapstr.M{
+					"enabled": true,
+					"input":   mapstr.M{"type": "httpjson"},
+				},
+				"error": mapstr.M{
+					"enabled": true,
+					"input":   mapstr.M{"type": "cel"},
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			builder := newInputAllowListTestBuilder(t, mapstr.M{"enabled": true})
+			config := conf.MustNewConfigFrom(test.module)
+
+			configs := builder.applyConfigTemplate(bus.Event{}, []*conf.C{config})
+
+			if len(test.wantFilesets) == 0 {
+				assert.Empty(t, configs, "a module without allowed filesets should be rejected")
+				return
+			}
+
+			require.Len(t, configs, 1, "a module with allowed filesets should be retained")
+			var gotFilesets []string
+			for _, name := range configs[0].GetFields() {
+				switch name {
+				case "module", "enabled", "path":
+					continue
+				}
+				gotFilesets = append(gotFilesets, name)
+			}
+			assert.ElementsMatch(t, test.wantFilesets, gotFilesets,
+				"the retained module should contain only allowed filesets")
+		})
+	}
+}
+
+func TestInputAllowListRejectsMissingOrUnreadableDirectType(t *testing.T) {
+	tests := []struct {
+		name   string
+		config mapstr.M
+	}{
+		{
+			name:   "missing type",
+			config: mapstr.M{"paths": []string{"/var/log/app.log"}},
+		},
+		{
+			name:   "unreadable type",
+			config: mapstr.M{"type": mapstr.M{"invalid": true}},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			builder := newInputAllowListTestBuilder(t, mapstr.M{"enabled": true})
+			config := conf.MustNewConfigFrom(test.config)
+
+			configs := builder.applyConfigTemplate(bus.Event{}, []*conf.C{config})
+
+			assert.Empty(t, configs, "missing or unreadable direct input types should be rejected")
+		})
+	}
+}
+
+func newInputAllowListTestBuilder(
+	t *testing.T,
+	inputAllowList mapstr.M,
+) *logHints {
+	t.Helper()
+
+	userConfig := mapstr.M{}
+	if inputAllowList != nil {
+		userConfig["input_allow_list"] = inputAllowList
+	}
+
+	cfg := defaultConfig()
+	require.NoError(
+		t,
+		conf.MustNewConfigFrom(userConfig).Unpack(&cfg),
+		"input allow list builder config should unpack",
+	)
+
+	return &logHints{config: &cfg, log: logp.NewNopLogger()}
+}
+
+func inputAllowListRawEvent(raw string) bus.Event {
+	return bus.Event{
+		"host": "1.2.3.4",
+		"hints": mapstr.M{
+			"logs": mapstr.M{
+				"raw": raw,
+			},
+		},
+	}
+}
+
+func requireInputTypes(t *testing.T, configs []*conf.C, expected []string, message string) {
+	t.Helper()
+
+	types := make([]string, 0, len(configs))
+	for _, config := range configs {
+		inputType, err := config.String("type", -1)
+		require.NoError(t, err, "retained input configuration should have a readable type")
+		types = append(types, inputType)
+	}
+
+	require.Equal(t, expected, types, message)
 }

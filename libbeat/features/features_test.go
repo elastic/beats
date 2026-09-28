@@ -146,7 +146,7 @@ func TestFQDNWHileCallbackBlocked(t *testing.T) {
 
 	// Start with FQDN off
 	go func() {
-		err = UpdateFromConfig(config.MustNewConfigFrom(map[string]interface{}{
+		err = UpdateFromConfig(config.MustNewConfigFrom(map[string]any{
 			"features.fqdn.enabled": true,
 		}))
 		unblockedChan <- struct{}{}

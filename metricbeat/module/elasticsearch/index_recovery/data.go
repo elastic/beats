@@ -89,7 +89,7 @@ var (
 
 func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXpack bool) error {
 
-	var data map[string]map[string][]map[string]interface{}
+	var data map[string]map[string][]map[string]any
 
 	err := json.Unmarshal(content, &data)
 	if err != nil {

@@ -37,7 +37,7 @@ var (
 	}
 )
 
-func eventMapping(health map[string]interface{}) (mapstr.M, error) {
+func eventMapping(health map[string]any) (mapstr.M, error) {
 	if averageResponseTimeSec, ok := health["average_response_time_sec"]; ok {
 		if averageResponseTimeSec, ok := averageResponseTimeSec.(float64); ok {
 			health["average_response_time_us"] = averageResponseTimeSec * 1000 * 1000
@@ -46,7 +46,7 @@ func eventMapping(health map[string]interface{}) (mapstr.M, error) {
 
 	event, _ := schema.Apply(health)
 
-	statusCodeCountMap, ok := health["total_status_code_count"].(map[string]interface{})
+	statusCodeCountMap, ok := health["total_status_code_count"].(map[string]any)
 	if !ok {
 		return event, nil
 	}

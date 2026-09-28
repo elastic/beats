@@ -44,31 +44,31 @@ func TestHostsNumWorkers(t *testing.T) {
 
 func TestReadHostList(t *testing.T) {
 	tests := map[string]struct {
-		cfg           map[string]interface{}
+		cfg           map[string]any
 		expectedHosts []string
 	}{
 		"one_host_no_worker_set": {
-			cfg: map[string]interface{}{
+			cfg: map[string]any{
 				"hosts": []string{"foo.bar"},
 			},
 			expectedHosts: []string{"foo.bar"},
 		},
 		"one_host_worker_set": {
-			cfg: map[string]interface{}{
+			cfg: map[string]any{
 				"hosts":  []string{"foo.bar"},
 				"worker": 3,
 			},
 			expectedHosts: []string{"foo.bar", "foo.bar", "foo.bar"},
 		},
 		"one_host_workers_set": {
-			cfg: map[string]interface{}{
+			cfg: map[string]any{
 				"hosts":   []string{"foo.bar"},
 				"workers": 2,
 			},
 			expectedHosts: []string{"foo.bar", "foo.bar"},
 		},
 		"one_host_worker_workers_both_set": {
-			cfg: map[string]interface{}{
+			cfg: map[string]any{
 				"hosts":   []string{"foo.bar"},
 				"worker":  3,
 				"workers": 2,

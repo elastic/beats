@@ -163,9 +163,8 @@ func newOTelOutputController(
 
 	workerChan := make(chan publisher.Batch)
 	workers := make([]outputWorker, len(out.Clients))
-	workerLogger := beatInfo.Logger.Named("otel_output_worker")
 	for i, client := range out.Clients {
-		workers[i] = makeClientWorker(workerChan, client, workerLogger, monitors.Tracer)
+		workers[i] = makeSpawningWorker(workerChan, client)
 	}
 
 	consumer := newEventConsumer(monitors.Logger, retryObserver)
@@ -392,4 +391,65 @@ func (c *otelOutputController) trackedProducerCountForTest() int {
 	c.producersMu.Lock()
 	defer c.producersMu.Unlock()
 	return len(c.producers)
+}
+
+// spawningWorker launches a new single-use goroutine for every batch it receives,
+// so the number of concurrent ConsumeLogs calls is not capped at a fixed worker
+// count. This lets a single receiver keep as many events in flight in the
+// downstream exporter as it will accept. The exporter self-limits via its
+// queue's block-on-overflow, and the beat's own shared pool bounds the total
+// in-flight events (a batch's slots are not released until its Publish ACKs).
+type spawningWorker struct {
+	qu     chan publisher.Batch
+	client outputs.Client
+	ctx    context.Context
+	cancel context.CancelFunc
+	wg     sync.WaitGroup // tracks in-flight Publish goroutines
+	done   chan struct{}  // closed when run() has fully drained
+}
+
+// makeSpawningWorker starts a spawningWorker reading from qu and returns it as
+// an outputWorker.
+func makeSpawningWorker(qu chan publisher.Batch, client outputs.Client) outputWorker {
+	ctx, cancel := context.WithCancel(context.Background())
+	w := &spawningWorker{
+		qu:     qu,
+		client: client,
+		ctx:    ctx,
+		cancel: cancel,
+		done:   make(chan struct{}),
+	}
+	go w.run()
+	return w
+}
+
+func (w *spawningWorker) run() {
+	defer close(w.done)
+	for {
+		select {
+		case <-w.ctx.Done():
+			w.wg.Wait()
+			return
+		case batch, ok := <-w.qu:
+			if !ok {
+				// workerChan closed: no more batches.
+				w.wg.Wait()
+				return
+			}
+			if batch == nil {
+				continue
+			}
+			w.wg.Add(1)
+			go func(b publisher.Batch) {
+				defer w.wg.Done()
+				_ = w.client.Publish(w.ctx, b)
+			}(batch)
+		}
+	}
+}
+
+func (w *spawningWorker) Close() error {
+	w.cancel()
+	<-w.done
+	return w.client.Close()
 }

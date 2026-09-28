@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"maps"
 	"os"
 	"os/exec"
 	"path"
@@ -68,7 +69,7 @@ func makeGoTestArgs(name string) GoTestArgs {
 		TestName:        name,
 		Race:            RaceDetector,
 		Packages:        []string{"./..."},
-		Env:             make(map[string]string),
+		Env:             fipsTestEnv(),
 		OutputFile:      fileName + ".out",
 		JUnitReportFile: fileName + ".xml",
 		Tags:            testTagsFromEnv(),
@@ -88,6 +89,7 @@ func makeGoTestArgsForPackage(name, pkg string) GoTestArgs {
 		TestName:        fmt.Sprintf("%s-%s", name, pkg),
 		Race:            RaceDetector,
 		Packages:        []string{fmt.Sprintf("./module/%s", pkg)},
+		Env:             fipsTestEnv(),
 		OutputFile:      fileName + ".out",
 		JUnitReportFile: fileName + ".xml",
 		Tags:            testTagsFromEnv(),
@@ -138,6 +140,16 @@ func testTagsFromEnv() []string {
 		tags = append(tags, "requirefips")
 	}
 	return tags
+}
+
+// fipsTestEnv returns the environment variables required to compile and run FIPS tests.
+func fipsTestEnv() map[string]string {
+	env := make(map[string]string, len(FIPSConfig.Compile.Env))
+	if !FIPSBuild {
+		return env
+	}
+	maps.Copy(env, FIPSConfig.Compile.Env)
+	return env
 }
 
 // DefaultGoTestUnitArgs returns a default set of arguments for running
@@ -271,9 +283,9 @@ func GoTestIntegrationForModule(ctx context.Context) error {
 	if modules == "" {
 		log.Printf("Warning: environment variable MODULE is empty: [%s]\n", modules)
 	}
-	moduleArr := strings.Split(modules, ",")
+	moduleArr := strings.SplitSeq(modules, ",")
 
-	for _, module := range moduleArr {
+	for module := range moduleArr {
 		err := goTestIntegrationForSingleModule(ctx, module)
 		if err != nil {
 			return err

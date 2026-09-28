@@ -22,11 +22,74 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+func TestWriteMetaFileAtomic(t *testing.T) {
+	t.Run("writes_valid_meta_and_cleans_up_temp", func(t *testing.T) {
+		dir := t.TempDir()
+
+		require.NoError(t, writeMetaFile(dir, 0o600))
+
+		meta, err := readMetaFile(dir)
+		require.NoError(t, err)
+		require.NoError(t, checkMeta(meta))
+
+		matches, err := filepath.Glob(filepath.Join(dir, "*.tmp-*"))
+		require.NoError(t, err)
+		assert.Empty(t, matches, "no temp files should remain after successful write")
+	})
+
+	t.Run("no_partial_file_on_rotate_failure", func(t *testing.T) {
+		dir := t.TempDir()
+		// Place a directory at the meta.json path so SafeFileRotate (rename) fails.
+		// This simulates a crash-safe scenario: the destination is never touched
+		// until the temp file is fully written and synced.
+		metaPath := filepath.Join(dir, metaFileName)
+		require.NoError(t, os.Mkdir(metaPath, 0o700))
+
+		err := writeMetaFile(dir, 0o600)
+		require.Error(t, err)
+
+		// The directory at the destination must be intact (not replaced or emptied).
+		fi, statErr := os.Stat(metaPath)
+		require.NoError(t, statErr)
+		assert.True(t, fi.IsDir(), "destination should still be a directory after failed rotate")
+
+		// No temp files should remain.
+		matches, globErr := filepath.Glob(filepath.Join(dir, "*.tmp-*"))
+		require.NoError(t, globErr)
+		assert.Empty(t, matches, "no temp files should remain after failed rotate")
+	})
+}
+
+// TestOpenStoreRecoversMissingMeta verifies that openStore creates meta.json when
+// the store directory already exists but meta.json is absent — the scenario that
+// arises when the process crashes after MkdirAll but before writeMetaFile on a
+// prior run.
+func TestOpenStoreRecoversMissingMeta(t *testing.T) {
+	dir := t.TempDir()
+	// Simulate a crash after MkdirAll: the directory exists but is empty.
+	storePath := filepath.Join(dir, "store")
+	require.NoError(t, os.Mkdir(storePath, 0o770))
+
+	logger := logptest.NewTestingLogger(t, "")
+	store, err := openStore(logger.Named("test"), storePath, 0o660, 4096, false, func(_ uint64) bool {
+		return false
+	})
+	require.NoError(t, err, "openStore must succeed even when meta.json was missing")
+	store.Close()
+
+	require.FileExists(t, filepath.Join(storePath, metaFileName), "meta.json must be created on recovery")
+
+	meta, err := readMetaFile(storePath)
+	require.NoError(t, err)
+	assert.NoError(t, checkMeta(meta))
+}
 
 func TestRecoverFromCorruption(t *testing.T) {
 	path := t.TempDir()

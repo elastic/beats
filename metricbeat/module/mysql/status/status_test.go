@@ -22,6 +22,7 @@ package status
 import (
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -34,12 +35,12 @@ import (
 // validated when the MetricSet is created.
 func TestConfigValidation(t *testing.T) {
 	tests := []struct {
-		in  interface{}
+		in  any
 		err string
 	}{
 		{
 			// Missing 'hosts'
-			in: map[string]interface{}{
+			in: map[string]any{
 				"module":     "mysql",
 				"metricsets": []string{"status"},
 			},
@@ -47,7 +48,7 @@ func TestConfigValidation(t *testing.T) {
 		},
 		{
 			// Invalid DSN
-			in: map[string]interface{}{
+			in: map[string]any{
 				"module":     "mysql",
 				"metricsets": []string{"status"},
 				"hosts":      []string{"127.0.0.1"},
@@ -56,7 +57,7 @@ func TestConfigValidation(t *testing.T) {
 		},
 		{
 			// Local unix socket
-			in: map[string]interface{}{
+			in: map[string]any{
 				"module":     "mysql",
 				"metricsets": []string{"status"},
 				"hosts":      []string{"user@unix(/path/to/socket)/"},
@@ -64,7 +65,7 @@ func TestConfigValidation(t *testing.T) {
 		},
 		{
 			// TCP on a remote host, e.g. Amazon RDS:
-			in: map[string]interface{}{
+			in: map[string]any{
 				"module":     "mysql",
 				"metricsets": []string{"status"},
 				"hosts":      []string{"id:password@tcp(your-amazonaws-uri.com:3306)/}"},
@@ -72,7 +73,7 @@ func TestConfigValidation(t *testing.T) {
 		},
 		{
 			// TCP on a remote host with user/pass specified separately
-			in: map[string]interface{}{
+			in: map[string]any{
 				"module":     "mysql",
 				"metricsets": []string{"status"},
 				"hosts":      []string{"tcp(your-amazonaws-uri.com:3306)/}"},
@@ -88,7 +89,7 @@ func TestConfigValidation(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		_, _, err = mb.NewModule(c, mb.Registry, paths.New(), logptest.NewTestingLogger(t, ""))
+		_, _, err = mb.NewModule(c, mb.Registry, beat.Info{Paths: paths.New(), Logger: logptest.NewTestingLogger(t, "")})
 		if err != nil && test.err == "" {
 			t.Errorf("unexpected error in testcase %d: %v", i, err)
 			continue

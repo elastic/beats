@@ -213,7 +213,7 @@ logging.level: debug
 func TestFilestreamGZIPCompressionNotSetWithGZIPFile(t *testing.T) {
 	var plainContent []byte
 	for i := range 500 {
-		plainContent = append(plainContent, []byte(fmt.Sprintf("%d: a log line\n", i))...)
+		plainContent = append(plainContent, fmt.Appendf(nil, "%d: a log line\n", i)...)
 	}
 	gzContent := gziptest.Compress(t, plainContent, gziptest.CorruptNone)
 
@@ -363,7 +363,7 @@ logging.level: debug
 func TestFilestreamGZIPCompressionGZIPWithPlainFile(t *testing.T) {
 	var content []byte
 	for i := range 100 {
-		content = append(content, []byte(fmt.Sprintf("%d: a log line\n", i))...)
+		content = append(content, fmt.Appendf(nil, "%d: a log line\n", i)...)
 	}
 
 	filebeat := integration.NewBeat(
@@ -419,7 +419,7 @@ logging.level: debug
 func TestFilestreamGZIPEOF(t *testing.T) {
 	var content []byte
 	for i := range 100 {
-		content = append(content, []byte(fmt.Sprintf("%d: a log line\n", i))...)
+		content = append(content, fmt.Appendf(nil, "%d: a log line\n", i)...)
 	}
 
 	filebeat := integration.NewBeat(
@@ -816,7 +816,7 @@ logging.level: debug
 	require.NoError(t, err, "could not write gzip file to disk")
 
 	// wait filebeat to pick up the file and see it's the same as the plain file.
-	wantLine := fmt.Sprintf("\\\"%s\\\" points to an already known ingest target \\\"%s\\\" [e64ff2da367b082e1dcc38ec48215bff55925bd408f718f107e50ecf426fe3c3==e64ff2da367b082e1dcc38ec48215bff55925bd408f718f107e50ecf426fe3c3]. Skipping",
+	wantLine := fmt.Sprintf("\\\"%s\\\" points to an already known ingest target \\\"%s\\\". Skipping",
 		logPathGZ, logPathPlain)
 	filebeat.WaitLogsContainsFromBeginning(
 		wantLine,

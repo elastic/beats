@@ -10,6 +10,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"maps"
 	"net"
 	"os"
 	"strconv"
@@ -566,9 +567,7 @@ func (s *state) ForkProcess(parentPID, childPID uint32, ts kernelTime) error {
 			createdTime: s.kernTimestampToTime(ts),
 		}
 		child.resolvedDomains = make(map[string]string, len(parent.resolvedDomains))
-		for k, v := range parent.resolvedDomains {
-			child.resolvedDomains[k] = v
-		}
+		maps.Copy(child.resolvedDomains, parent.resolvedDomains)
 		s.log.Debugf("forking process %d with %d associated domains", childPID, len(child.resolvedDomains))
 		s.processes[childPID] = child
 	}
@@ -987,7 +986,7 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 	}
 
 	var errs []error
-	rootPut := func(key string, value interface{}) {
+	rootPut := func(key string, value any) {
 		if _, err := root.Put(key, value); err != nil {
 			errs = append(errs, err)
 		}

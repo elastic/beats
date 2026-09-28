@@ -137,7 +137,7 @@ var toECS = makeToECS()
 func makeToECS() func(int) (string, error) {
 	ecsNames := make(map[int]string)
 
-	for i := 0; i < 64; i++ {
+	for i := range 64 {
 		c := cap.Value(i)
 		if i < int(cap.MaxBits()) {
 			ecsNames[i] = strings.ToUpper(c.String())

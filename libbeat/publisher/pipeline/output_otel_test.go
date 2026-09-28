@@ -286,7 +286,7 @@ func TestSharedPoolCapsPerReceiver(t *testing.T) {
 	// The small receiver (Events=4) must cap at 4 live events even though the
 	// pool has 8 slots.
 	p1 := c1.queueProducer(queue.ProducerConfig{})
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		_, ok := p1.TryPublish(testEvent(i))
 		require.True(t, ok, "publish %d within the small receiver's cap should succeed", i)
 	}
@@ -296,7 +296,7 @@ func TestSharedPoolCapsPerReceiver(t *testing.T) {
 
 	// The larger receiver (Events=8) can use the remaining pool budget.
 	p2 := c2.queueProducer(queue.ProducerConfig{})
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		_, ok := p2.TryPublish(testEvent(i))
 		require.True(t, ok, "the larger receiver can use the rest of the shared pool")
 	}
@@ -391,14 +391,13 @@ func TestConcurrentControllerCreate(t *testing.T) {
 	controllers := make([]*otelOutputController, n)
 	infos := make([]beat.Info, n)
 	mons := make([]Monitors, n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		infos[i] = beatInfoForTest(t)
 		mons[i] = monitorsForTest()
 	}
 	var wg sync.WaitGroup
 	wg.Add(n)
-	for i := 0; i < n; i++ {
-		i := i
+	for i := range n {
 		go func() {
 			defer wg.Done()
 			c, err := newOTelOutputController(infos[i], mons[i], nilObserver, nil, settings)
@@ -497,7 +496,7 @@ func TestWaitCloseIsBoundedByContext(t *testing.T) {
 
 	// Publish events into c1 that may not drain before the deadline.
 	prod := c1.queueProducer(queue.ProducerConfig{})
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		_, _ = prod.TryPublish(testEvent(i))
 	}
 	require.Equal(t, 1, c1.trackedProducerCountForTest(), "vended producer must be tracked")

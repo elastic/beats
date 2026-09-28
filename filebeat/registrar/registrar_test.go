@@ -18,6 +18,7 @@
 package registrar
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -42,8 +43,12 @@ type testStateStore struct {
 	registry *statestore.Registry
 }
 
-func (s *testStateStore) StoreFor(string) (*statestore.Store, error) {
+func (s *testStateStore) StoreFor(_, _ string) (*statestore.Store, error) {
 	return s.registry.Get(testStoreName)
+}
+
+func (s *testStateStore) StoreKey(_, _ string) string {
+	return fmt.Sprintf("test:%p", s.registry)
 }
 
 func (s *testStateStore) CleanupInterval() time.Duration {
@@ -133,9 +138,8 @@ func TestRunConcurrentShutdownAndBatch(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			for i := 0; i < iterations; i++ {
+			for i := range iterations {
 				logger := logptest.NewTestingLogger(t, "")
 				memBackend := storetest.NewMemoryStoreBackend()
 				stateStore := &testStateStore{registry: statestore.NewRegistry(memBackend)}

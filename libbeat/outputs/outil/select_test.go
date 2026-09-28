@@ -30,7 +30,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-type node map[string]interface{}
+type node map[string]any
 
 func TestSelector(t *testing.T) {
 	useLowerCase := func(s Settings) Settings {

@@ -194,7 +194,7 @@ func (c *syncClient) publishWindowed(events []publisher.Event) (int, error) {
 }
 
 func (c *syncClient) sendEvents(events []publisher.Event) (int, error) {
-	window := make([]interface{}, len(events))
+	window := make([]any, len(events))
 	for i := range events {
 		window[i] = &events[i].Content
 	}

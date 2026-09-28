@@ -25,27 +25,27 @@ func TestGroupStatus(t *testing.T) {
 	subReporter2.UpdateStatus(status.Running, "")
 	subReporter3.UpdateStatus(status.Running, "")
 
-	require.Equalf(t, componentstatus.StatusOK, m.Evt.Status(), "expected StatusOK, got %v", m.Evt.Status())
-	require.NoErrorf(t, m.Evt.Err(), "expected nil, got %v", m.Evt.Err())
+	require.Equalf(t, componentstatus.StatusOK, m.GetEvent().Status(), "expected StatusOK, got %v", m.GetEvent().Status())
+	require.NoErrorf(t, m.GetEvent().Err(), "expected nil, got %v", m.GetEvent().Err())
 
 	subReporter1.UpdateStatus(status.Degraded, "Degrade Runner1")
-	require.Equalf(t, componentstatus.StatusRecoverableError, m.Evt.Status(), "expected StatusDegraded, got %v", m.Evt.Status())
-	require.Error(t, m.Evt.Err(), "expected non-nil error, got nil")
-	require.Equalf(t, "Degrade Runner1", m.Evt.Err().Error(), "expected 'Degrade Runner1', got %v", m.Evt.Err())
+	require.Equalf(t, componentstatus.StatusRecoverableError, m.GetEvent().Status(), "expected StatusDegraded, got %v", m.GetEvent().Status())
+	require.Error(t, m.GetEvent().Err(), "expected non-nil error, got nil")
+	require.Equalf(t, "Degrade Runner1", m.GetEvent().Err().Error(), "expected 'Degrade Runner1', got %v", m.GetEvent().Err())
 
 	subReporter3.UpdateStatus(status.Degraded, "Degrade Runner3")
 	subReporter2.UpdateStatus(status.Failed, "Failed Runner2")
 
-	require.Equalf(t, componentstatus.StatusPermanentError, m.Evt.Status(), "expected StatusPermanentError, got %v", m.Evt.Status())
-	require.Error(t, m.Evt.Err(), "expected non-nil error, got nil")
-	require.Equalf(t, "Failed Runner2", m.Evt.Err().Error(), "expected 'Failed Runner1', got %v", m.Evt.Err())
+	require.Equalf(t, componentstatus.StatusPermanentError, m.GetEvent().Status(), "expected StatusPermanentError, got %v", m.GetEvent().Status())
+	require.Error(t, m.GetEvent().Err(), "expected non-nil error, got nil")
+	require.Equalf(t, "Failed Runner2", m.GetEvent().Err().Error(), "expected 'Failed Runner1', got %v", m.GetEvent().Err())
 
 	// group reporter is updated directly
 	reporter.UpdateStatus(status.Failed, "beatreceiver failed to start")
 
-	require.Equalf(t, componentstatus.StatusPermanentError, m.Evt.Status(), "expected StatusPermanentError, got %v", m.Evt.Status())
-	require.Error(t, m.Evt.Err(), "expected non-nil error, got nil")
-	require.Equalf(t, "beatreceiver failed to start", m.Evt.Err().Error(), "expected 'beatreceiver failed to start', got %v", m.Evt.Err())
+	require.Equalf(t, componentstatus.StatusPermanentError, m.GetEvent().Status(), "expected StatusPermanentError, got %v", m.GetEvent().Status())
+	require.Error(t, m.GetEvent().Err(), "expected non-nil error, got nil")
+	require.Equalf(t, "beatreceiver failed to start", m.GetEvent().Err().Error(), "expected 'beatreceiver failed to start', got %v", m.GetEvent().Err())
 }
 
 func TestToPdata(t *testing.T) {
@@ -111,10 +111,10 @@ func TestInputStatusesInEventAttributes(t *testing.T) {
 	subReporter1.UpdateStatus(status.Running, "")
 	subReporter2.UpdateStatus(status.Degraded, "some warning")
 
-	require.NotNil(t, m.Evt)
+	require.NotNil(t, m.GetEvent())
 
 	// Verify inputs attribute exists
-	attrs := m.Evt.Attributes()
+	attrs := m.GetEvent().Attributes()
 	inputsVal, ok := attrs.Get(inputStatusAttributesKey)
 	require.True(t, ok, "expected 'inputs' attribute to exist")
 

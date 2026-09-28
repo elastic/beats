@@ -229,7 +229,7 @@ func ipToStr(ip net.IP) string {
 	curRun := 0
 	bestPos := 0
 	bestRun := 0
-	for pos := 0; pos < 8; pos++ {
+	for pos := range 8 {
 		isZero := ip[2*pos] == 0 && ip[1+2*pos] == 0
 		if !isZero {
 			if curRun > bestRun {

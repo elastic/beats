@@ -30,7 +30,6 @@ import (
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 )
 
@@ -59,16 +58,25 @@ func Run(
 	defer runtime.UnlockOSThread()
 
 	reporter.UpdateStatus(status.Starting, fmt.Sprintf("Starting to read from %s", api.Channel()))
-	// setup closing the API if either the run function is signaled asynchronously
-	// to shut down or when returning after io.EOF
-	cancelCtx, cancelFn := ctxtool.WithFunc(
-		ctx,
-		func() {
-			if err := api.Close(); err != nil {
-				log.Errorw("error while closing Windows Event Log access", "error", err)
-			}
-		})
+
+	cancelCtx, cancelFn := context.WithCancel(ctx)
 	defer cancelFn()
+
+	// Close the event log on this same goroutine once the read loop has
+	// returned, rather than asynchronously from a context-cancellation
+	// callback. Closing frees native Windows Event Log handles (subscription,
+	// render contexts and publisher metadata). If that happens on another
+	// goroutine while a Read is rendering an event, the in-flight
+	// EvtRender/EvtFormatMessage calls operate on freed handles and the
+	// process crashes with an access violation (0xc0000005) during shutdown.
+	// Reads are non-blocking (EvtNext uses a zero timeout) and the loop below
+	// exits promptly when cancelCtx is cancelled, so closing here keeps
+	// shutdown responsive without racing an active render.
+	defer func() {
+		if err := api.Close(); err != nil {
+			log.Errorw("error while closing Windows Event Log access", "error", err)
+		}
+	}()
 
 	openChannelNotFoundErrDetected := false
 	logChannelNotFoundOpenRetry := func(err error) {

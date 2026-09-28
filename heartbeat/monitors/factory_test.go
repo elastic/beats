@@ -177,8 +177,8 @@ func TestPreProcessors(t *testing.T) {
 			} else {
 				t.Run("observer location data should be set", func(t *testing.T) {
 					geoM, _ := util.GeoConfigToMap(tt.location.Geo)
-					lookslike.MustCompile(map[string]interface{}{
-						"observer": map[string]interface{}{
+					lookslike.MustCompile(map[string]any{
+						"observer": map[string]any{
 							"name": tt.location.ID,
 							"geo":  geoM,
 						},
@@ -212,14 +212,14 @@ func TestPreProcessors(t *testing.T) {
 }
 
 func TestDisabledMonitor(t *testing.T) {
-	testConfigs := []map[string]interface{}{
+	testConfigs := []map[string]any{
 		{
 			"type":     "test",
 			"enabled":  "false",
 			"schedule": "@every 10s",
 		},
 		{
-			"streams": []map[string]interface{}{
+			"streams": []map[string]any{
 				{
 					"type":     "test",
 					"enabled":  "false",
@@ -264,7 +264,7 @@ func TestRunFrom(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		confMap := map[string]interface{}{
+		confMap := map[string]any{
 			"type":     "test",
 			"urls":     []string{"http://example.net"},
 			"schedule": "@every 1ms",
@@ -273,7 +273,7 @@ func TestRunFrom(t *testing.T) {
 		if tt.loc != nil {
 			geo, err := util.GeoConfigToMap(tt.loc.Geo)
 			require.NoError(t, err)
-			confMap["run_from"] = map[string]interface{}{
+			confMap["run_from"] = map[string]any{
 				"id":  tt.loc.ID,
 				"geo": geo,
 			}
@@ -334,7 +334,7 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	require.NoError(t, err)
 
 	// Ensure that an error is returned on a bad config
-	_, m0Err := newMonitor(badConf, reg, c, sched.Add, nil, nil, logptest.NewTestingLogger(t, ""))
+	_, m0Err := newMonitor(badConf, reg, c, sched.Add, nil, beat.Info{Logger: logptest.NewTestingLogger(t, "")}, nil)
 	require.Error(t, m0Err)
 
 	// Would fail if the previous newMonitor didn't free the monitor.id

@@ -13,12 +13,12 @@ import (
 	"regexp"
 	"time"
 
-	"gopkg.in/natefinch/lumberjack.v2"
 	"gopkg.in/yaml.v3"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/lumberjack"
 	"github.com/elastic/mito/lib"
 )
 
@@ -50,7 +50,7 @@ type config struct {
 	// program. If it has a cursor field, that field will
 	// be overwritten by any stored cursor, but will be
 	// available if no stored cursor exists.
-	State map[string]interface{} `config:"state"`
+	State map[string]any `config:"state"`
 	// SecretState holds secret key-value pairs that are
 	// stored encrypted by Fleet (via secret: true) and
 	// placed at state.secret before CEL program execution.
@@ -108,12 +108,12 @@ func (c config) GetPackageData(key string) string {
 // to their stored string values. See
 // https://github.com/elastic/kibana/issues/267859
 type secretState struct {
-	m map[string]interface{}
+	m map[string]any
 }
 
-func (s *secretState) Unpack(v interface{}) error {
+func (s *secretState) Unpack(v any) error {
 	switch v := v.(type) {
-	case map[string]interface{}:
+	case map[string]any:
 		s.m = v
 		return nil
 	case string:
@@ -166,7 +166,7 @@ func (c config) Validate() error {
 	}
 	wantDump := c.FailureDump.enabled() && c.FailureDump.Filename != ""
 	noEmit := lib.Emit(func() lib.Emitter { return nil })
-	_, _, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, lib.HTTPOptions{}, patterns, c.XSDs, logp.NewNopLogger(), nil, wantDump, false, noEmit)
+	_, _, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, lib.HTTPOptions{}, "", patterns, c.XSDs, logp.NewNopLogger(), nil, wantDump, false, noEmit)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}

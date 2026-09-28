@@ -25,6 +25,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
+
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
@@ -32,7 +34,7 @@ import (
 func TestMakeESClient(t *testing.T) {
 	t.Run("should not modify the timeout setting from original config", func(t *testing.T) {
 		origTimeout := 90
-		origCfg, _ := conf.NewConfigFrom(map[interface{}]interface{}{
+		origCfg, _ := conf.NewConfigFrom(map[any]any{
 			"hosts":    []string{"http://localhost:9200"},
 			"username": "anyuser",
 			"password": "anypwd",
@@ -41,7 +43,7 @@ func TestMakeESClient(t *testing.T) {
 		anyAttempt := 1
 		anyDuration := 1 * time.Second
 
-		_, _ = makeESClient(context.Background(), origCfg, anyAttempt, anyDuration, logptest.NewTestingLogger(t, ""))
+		_, _ = makeESClient(context.Background(), origCfg, anyAttempt, anyDuration, logptest.NewTestingLogger(t, ""), beat.Info{})
 
 		timeout, err := origCfg.Int("timeout", -1)
 		require.NoError(t, err)

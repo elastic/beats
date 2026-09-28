@@ -21,6 +21,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -42,6 +43,7 @@ type store struct {
 	log      *logp.Logger
 	name     string
 	notifier *Notifier
+	info     beat.Info
 
 	chReady chan struct{}
 	once    sync.Once
@@ -49,12 +51,11 @@ type store struct {
 	mx     sync.Mutex
 	cli    *eslegclient.Connection
 	cliErr error
-	id     string
 
 	base *baseStore
 }
 
-func openStore(ctx context.Context, log *logp.Logger, name string, notifier *Notifier) (*store, error) {
+func openStore(ctx context.Context, log *logp.Logger, name string, notifier *Notifier, info beat.Info) (*store, error) {
 	ctx, cn := context.WithCancel(ctx)
 	s := &store{
 		ctx:      ctx,
@@ -62,6 +63,7 @@ func openStore(ctx context.Context, log *logp.Logger, name string, notifier *Not
 		log:      log.With("name", name).With("backend", "elasticsearch"),
 		name:     name,
 		notifier: notifier,
+		info:     info,
 		chReady:  make(chan struct{}),
 	}
 
@@ -86,20 +88,6 @@ func (s *store) waitReady() error {
 	case <-s.chReady:
 		return s.cliErr
 	}
-}
-
-func (s *store) SetID(id string) {
-	s.mx.Lock()
-	s.id = id
-	s.mx.Unlock()
-
-	if err := s.waitReady(); err != nil {
-		return
-	}
-	s.mx.Lock()
-	defer s.mx.Unlock()
-
-	s.base.SetID(s.id)
 }
 
 func (s *store) Close() error {
@@ -127,7 +115,7 @@ func (s *store) Has(key string) (bool, error) {
 	return s.base.Has(key)
 }
 
-func (s *store) Get(key string, to interface{}) error {
+func (s *store) Get(key string, to any) error {
 	if err := s.waitReady(); err != nil {
 		return err
 	}
@@ -137,7 +125,7 @@ func (s *store) Get(key string, to interface{}) error {
 	return s.base.Get(key, to)
 }
 
-func (s *store) Set(key string, value interface{}) error {
+func (s *store) Set(key string, value any) error {
 	if err := s.waitReady(); err != nil {
 		return err
 	}
@@ -179,15 +167,12 @@ func (s *store) configure(ctx context.Context, c *conf.C) {
 	}
 	s.cliErr = nil
 
-	cli, err := eslegclient.NewConnectedClient(ctx, c, s.name, s.log)
+	cli, err := eslegclient.NewConnectedClient(ctx, c, s.info)
 	if err != nil {
 		s.log.Errorf("ES store, failed to create elasticsearch client: %v", err)
 		s.cliErr = err
 	} else {
 		s.base = NewStore(ctx, s.log, cli, s.name)
-		if s.id != "" {
-			s.base.SetID(s.id)
-		}
 		s.cli = cli
 	}
 

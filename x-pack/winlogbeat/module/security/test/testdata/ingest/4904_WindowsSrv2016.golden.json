@@ -2,7 +2,7 @@
   {
     "@timestamp": "2020-08-19T07:56:52.019802Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "security-event-source-added",

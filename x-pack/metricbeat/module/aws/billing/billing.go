@@ -298,9 +298,10 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 				event := m.addCostMetrics(group.Metrics, groupByOutput.GroupDefinitions[0], startDate, endDate)
 
 				// generate unique event ID for each event
-				eventID := startDate + endDate + *groupByOutput.GroupDefinitions[0].Key + string(groupByOutput.GroupDefinitions[0].Type)
+				var eventID strings.Builder
+				eventID.WriteString(startDate + endDate + *groupByOutput.GroupDefinitions[0].Key + string(groupByOutput.GroupDefinitions[0].Type))
 				for _, key := range group.Keys {
-					eventID += key
+					eventID.WriteString(key)
 					// key value like db.t2.micro or Amazon Simple Queue Service belongs to dimension
 					if !strings.Contains(key, "$") {
 						_, _ = event.MetricSetFields.Put("group_by."+groupBy.dimension, key)
@@ -325,7 +326,7 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 					event.Timestamp = t
 				}
 
-				event.ID = generateEventID(eventID)
+				event.ID = generateEventID(eventID.String())
 				events = append(events, event)
 			}
 		}

@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	logpcfg "github.com/elastic/elastic-agent-libs/logp/configure"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/service"
 )
 
@@ -51,7 +52,7 @@ func setDestroyLogsOnStop() (bool, error) {
 	return strconv.ParseBool(setting)
 }
 
-func fatal(format string, vs ...interface{}) {
+func fatal(format string, vs ...any) {
 	fmt.Fprintf(os.Stderr, format, vs...)
 	os.Exit(1)
 }
@@ -65,7 +66,7 @@ func main() {
 		fatal("error starting config: %s", err)
 	}
 
-	err = logpcfg.Logging("elastic-logging-driver", logcfg)
+	err = logpcfg.Logging("elastic-logging-driver", logcfg, paths.New())
 	if err != nil {
 		fatal("error starting log handler: %s", err)
 	}

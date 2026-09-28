@@ -5,6 +5,7 @@
 package otelmanager
 
 import (
+	"context"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
@@ -24,18 +25,44 @@ type WithDiagnosticExtension interface {
 	SetDiagnosticExtension(name string, ext DiagnosticExtension)
 }
 
+// ActionExtension exposes the ability for beat receivers to register a handler that
+// is invoked when elastic-agent routes a Fleet action to this receiver instance.
+// RegisterActionHandler returns an error if this registration could not be
+// routed safely, for example if another receiver has already registered an
+// action for the same elastic-agent component (see the elasticdiagnostics
+// extension's single_receiver documentation) — the handler is still recorded
+// so that action routing keeps failing loudly rather than succeeding silently
+// against the wrong receiver, but the caller should log the error so it is
+// visible from the beat's own process, not only when Fleet next dispatches
+// an action to it.
+// NOTE: Changing the function signature will require changes to elastic-agent's
+// elasticdiagnostics extension. Proceed with caution.
+type ActionExtension interface {
+	RegisterActionHandler(name string, handler func(ctx context.Context, params map[string]any) (map[string]any, error)) error
+	UnregisterActionHandler(name string)
+}
+
+type WithActionExtension interface {
+	// name is the beat name
+	// ext is the extension that implements the ActionExtension interface
+	SetActionExtension(name string, ext ActionExtension)
+}
+
 var _ management.Manager = (*OtelManager)(nil)
 var _ WithDiagnosticExtension = (*OtelManager)(nil)
+var _ WithActionExtension = (*OtelManager)(nil)
 
 func NewOtelManager(cfg *config.C, registry *reload.Registry, logger *logp.Logger) (management.Manager, error) {
 	management.SetUnderAgent(true)
-	return &OtelManager{}, nil
+	return &OtelManager{logger: logger}, nil
 }
 
 // OtelManager is the main manager for managing beatreceivers
 type OtelManager struct {
 	ext          DiagnosticExtension
+	actionExt    ActionExtension
 	receiverName string
+	logger       *logp.Logger
 	stopFn       func()
 	stopOnce     sync.Once
 }
@@ -57,15 +84,28 @@ func (n *OtelManager) Stop() {
 
 // Enabled returns false because many places inside beats call manager.Enabled() for various purposes
 // Returning true might lead to side effects.
-func (n *OtelManager) Enabled() bool                             { return false }
-func (n *OtelManager) AgentInfo() management.AgentInfo           { return management.AgentInfo{} }
-func (n *OtelManager) PreInit() error                            { return nil }
-func (n *OtelManager) PostInit()                                 {}
-func (n *OtelManager) Start() error                              { return nil }
-func (n *OtelManager) CheckRawConfig(cfg *config.C) error        { return nil }
-func (n *OtelManager) RegisterAction(action management.Action)   {}
-func (n *OtelManager) UnregisterAction(action management.Action) {}
-func (n *OtelManager) SetPayload(map[string]interface{})         {}
+func (n *OtelManager) Enabled() bool                      { return false }
+func (n *OtelManager) AgentInfo() management.AgentInfo    { return management.AgentInfo{} }
+func (n *OtelManager) PreInit() error                     { return nil }
+func (n *OtelManager) PostInit()                          {}
+func (n *OtelManager) Start() error                       { return nil }
+func (n *OtelManager) CheckRawConfig(cfg *config.C) error { return nil }
+func (n *OtelManager) RegisterAction(action management.Action) {
+	if n.actionExt == nil {
+		n.logger.Errorf("failed to register action %q for receiver %q: no registered action extension", action.Name(), n.receiverName)
+		return
+	}
+
+	if err := n.actionExt.RegisterActionHandler(n.receiverName, action.Execute); err != nil {
+		n.logger.Errorf("failed to register action %q for receiver %q: %v", action.Name(), n.receiverName, err)
+	}
+}
+func (n *OtelManager) UnregisterAction(action management.Action) {
+	if n.actionExt != nil {
+		n.actionExt.UnregisterActionHandler(n.receiverName)
+	}
+}
+func (n *OtelManager) SetPayload(map[string]any) {}
 func (n *OtelManager) RegisterDiagnosticHook(_ string, description string, filename string, contentType string, hook management.DiagnosticHook) {
 	if n.ext != nil {
 		n.ext.RegisterDiagnosticHook(n.receiverName, description, filename, contentType, hook)
@@ -73,5 +113,13 @@ func (n *OtelManager) RegisterDiagnosticHook(_ string, description string, filen
 }
 func (n *OtelManager) SetDiagnosticExtension(receiverName string, ext DiagnosticExtension) {
 	n.ext = ext
+	n.receiverName = receiverName
+}
+
+// SetActionExtension sets the extension used to route Fleet actions to this receiver
+// instance. receiverName is the OTel component ID for this beat receiver instance
+// (elastic-agent correlates actions back to it).
+func (n *OtelManager) SetActionExtension(receiverName string, ext ActionExtension) {
+	n.actionExt = ext
 	n.receiverName = receiverName
 }

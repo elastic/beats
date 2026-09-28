@@ -50,9 +50,9 @@ func TestLowercaseKeys(t *testing.T) {
 </person>
 `
 
-	expected := map[string]interface{}{
-		"person": map[string]interface{}{
-			"name": map[string]interface{}{
+	expected := map[string]any{
+		"person": map[string]any{
+			"name": map[string]any{
 				"#text": "John",
 				"id":    "123",
 			},
@@ -73,9 +73,9 @@ func TestPrependHyphenToAttr(t *testing.T) {
 </person>
 `
 
-	expected := map[string]interface{}{
-		"person": map[string]interface{}{
-			"Name": map[string]interface{}{
+	expected := map[string]any{
+		"person": map[string]any{
+			"Name": map[string]any{
 				"#text": "John",
 				"-ID":   "123",
 			},
@@ -102,17 +102,17 @@ func TestDecodeList(t *testing.T) {
 </people>
 `
 
-	expected := map[string]interface{}{
-		"people": map[string]interface{}{
-			"person": []interface{}{
-				map[string]interface{}{
-					"Name": map[string]interface{}{
+	expected := map[string]any{
+		"people": map[string]any{
+			"person": []any{
+				map[string]any{
+					"Name": map[string]any{
 						"#text": "John",
 						"ID":    "123",
 					},
 				},
-				map[string]interface{}{
-					"Name": map[string]interface{}{
+				map[string]any{
+					"Name": map[string]any{
 						"#text": "Jane",
 						"ID":    "456",
 					},
@@ -134,7 +134,7 @@ func TestEmptyElement(t *testing.T) {
 </people>
 `
 
-	expected := map[string]interface{}{
+	expected := map[string]any{
 		"people": "",
 	}
 
@@ -147,7 +147,7 @@ func TestEmptyElement(t *testing.T) {
 func TestDecode(t *testing.T) {
 	type testCase struct {
 		XML    string
-		Output map[string]interface{}
+		Output map[string]any
 	}
 
 	tests := []testCase{
@@ -160,9 +160,9 @@ func TestDecode(t *testing.T) {
 					<review>One of the great seminal American novels of the 20th century.</review>
 				</book>
 			</catalog>`,
-			Output: map[string]interface{}{
-				"catalog": map[string]interface{}{
-					"book": map[string]interface{}{
+			Output: map[string]any{
+				"catalog": map[string]any{
+					"book": map[string]any{
 						"author": "William H. Gaddis",
 						"review": "One of the great seminal American novels of the 20th century.",
 						"seq":    "1",
@@ -188,10 +188,10 @@ func TestDecode(t *testing.T) {
 					<description>A former architect battles corporate zombies, an evil sorceress, and her own childhood to become queen of the world.</description>
 				</book>
 			</catalog>`,
-			Output: map[string]interface{}{
-				"catalog": map[string]interface{}{
-					"book": []interface{}{
-						map[string]interface{}{
+			Output: map[string]any{
+				"catalog": map[string]any{
+					"book": []any{
+						map[string]any{
 							"author":       "Gambardella, Matthew",
 							"description":  "An in-depth look at creating applications with XML.",
 							"genre":        "Computer",
@@ -200,7 +200,7 @@ func TestDecode(t *testing.T) {
 							"publish_date": "2000-10-01",
 							"title":        "XML Developer's Guide",
 						},
-						map[string]interface{}{
+						map[string]any{
 							"author":       "Ralls, Kim",
 							"description":  "A former architect battles corporate zombies, an evil sorceress, and her own childhood to become queen of the world.",
 							"genre":        "Fantasy",
@@ -230,10 +230,10 @@ func TestDecode(t *testing.T) {
 					<description>A former architect battles corporate zombies, an evil sorceress, and her own childhood to become queen of the world.</description>
 				</book>
 			</catalog>`,
-			Output: map[string]interface{}{
-				"catalog": map[string]interface{}{
-					"book": []interface{}{
-						map[string]interface{}{
+			Output: map[string]any{
+				"catalog": map[string]any{
+					"book": []any{
+						map[string]any{
 							"author":       "Gambardella, Matthew",
 							"description":  "An in-depth look at creating applications with XML.",
 							"genre":        "Computer",
@@ -241,7 +241,7 @@ func TestDecode(t *testing.T) {
 							"price":        "44.95",
 							"publish_date": "2000-10-01",
 							"title":        "XML Developer's Guide"},
-						map[string]interface{}{
+						map[string]any{
 							"author":       "Ralls, Kim",
 							"description":  "A former architect battles corporate zombies, an evil sorceress, and her own childhood to become queen of the world.",
 							"genre":        "Fantasy",
@@ -269,9 +269,9 @@ func TestDecode(t *testing.T) {
 					</paper>
 				</secondcategory>
 			</catalog>`,
-			Output: map[string]interface{}{
-				"catalog": map[string]interface{}{
-					"book": map[string]interface{}{
+			Output: map[string]any{
+				"catalog": map[string]any{
+					"book": map[string]any{
 						"author":       "Gambardella, Matthew",
 						"description":  "An in-depth look at creating applications with XML.",
 						"genre":        "Computer",
@@ -279,8 +279,8 @@ func TestDecode(t *testing.T) {
 						"price":        "44.95",
 						"publish_date": "2000-10-01",
 						"title":        "XML Developer's Guide"},
-					"secondcategory": map[string]interface{}{
-						"paper": map[string]interface{}{
+					"secondcategory": map[string]any{
+						"paper": map[string]any{
 							"description": "A former architect battles corporate zombies, an evil sorceress, and her own childhood to become queen of the world.",
 							"id":          "bk102",
 							"test2":       "Ralls, Kim"}}}},

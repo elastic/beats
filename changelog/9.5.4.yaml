@@ -1,0 +1,215 @@
+version: 9.5.4
+entries:
+    - kind: enhancement
+      summary: Add hostname overrides for Beat events
+      description: 'The hostname can be overridden with the --hostname flag or the top-level hostname config field. The flag wins when both are set. The config field also works for beats running as OTel receivers, which never see CLI flags. The add_host_metadata and add_observer_metadata processors honor the override: host.name reflects the override value, and observer.hostname does too when add_observer_metadata is in the pipeline. The override value is trimmed of whitespace; casing is preserved as supplied.'
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/53029
+      issue:
+        - https://github.com/elastic/beats/issues/48923
+      impact: ""
+      action: ""
+      timestamp: 1784717886
+      file:
+        name: 1784717886-drosiek-9088-hostname-env-override.yaml
+        checksum: f3fd138ab91d28c26eafe704858c28a6e25c46e7
+    - kind: enhancement
+      summary: Add ingest volume enrichment fields to autoops_es module
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52914
+      issue:
+        - https://github.com/elastic/beats/issues/48923
+      impact: ""
+      action: ""
+      timestamp: 1784819509
+      file:
+        name: 1784819509-autoops-es-ingest-volume-enriched-fields.yaml
+        checksum: 70bfa42e0bf6b60ebf314d5da1f0930f3e4c6d59
+    - kind: bug-fix
+      summary: Match Kibana maintenance windows for nth-weekday, tzid, until, hourly, inclusive duration, and old dtstart.
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52957
+      issue:
+        - https://github.com/elastic/beats/issues/52571
+      impact: ""
+      action: ""
+      timestamp: 1786463939
+      file:
+        name: 1786463939-honor-nth-weekday-byweekday-in-maintenance-windows.yaml
+        checksum: 7164a4ecf1b2cdbe4ae1da6d8ff2ad826db801e6
+    - kind: bug-fix
+      summary: Restart osqueryd instead of terminating osquerybeat when the extension manager ping times out.
+      description: |
+        The osquery-go extension manager watchdog shares a single thrift socket, and a
+        single 200ms lock, with extension registration and deregistration. Losing that
+        lock race surfaces as "extension ping failed: timeout after 200ms", which is
+        indistinguishable from osqueryd actually being gone.
+
+        That error was not in osquerybeat's recoverable set, so it propagated out of
+        Run. As a supervised process the agent restarted the component and suppressed
+        the failed state, making this self-healing and effectively invisible. Running
+        as a beat receiver there is no such restart: the error is reported as
+        status.Failed, maps to an OTel PermanentError, and the osquery_manager unit
+        stays FAILED until the whole agent is restarted.
+
+        Extension ping failures and network timeouts are now treated as recoverable,
+        so the runner replays the last known inputs and restarts osqueryd.
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/52993
+      issue:
+        - https://github.com/elastic/beats/issues/48923
+      impact: ""
+      action: ""
+      timestamp: 1787086800
+      file:
+        name: 1787086800-osquerybeat-recover-extension-ping-timeout.yaml
+        checksum: 63f74eecccb4351b49ce6d318a1fc0da5179ebb8
+    - kind: enhancement
+      summary: Add hints.input_allow_list to restrict Filebeat hints-generated input types
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/53006
+      issue:
+        - https://github.com/elastic/beats/issues/52624
+      impact: ""
+      action: ""
+      timestamp: 1787783258
+      file:
+        name: 1787783258-autodiscover-filter-list.yaml
+        checksum: 8519f5196ced81ed3c64084a72d334af3a3c616f
+    - kind: bug-fix
+      summary: Wire Sarama client logs in the Filebeat Kafka input so consumer-group lifecycle is visible.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52980
+      issue:
+        - https://github.com/elastic/beats/issues/51305
+      impact: ""
+      action: ""
+      timestamp: 1787821145
+      file:
+        name: 1787821145-filebeat-kafka-input-sarama-logger.yaml
+        checksum: 55eb8e024c2b7b5ea739170dc408e97ff5f511aa
+    - kind: bug-fix
+      summary: Prevent httpjson chain pagination from advancing the cursor when a chained request fails.
+      description: |
+        When a paginated httpjson root request drives chain steps, a transient chain
+        failure (timeout, 502, connection reset) was logged and ignored after the
+        page cursor had already been committed. Later intervals then skipped the
+        failed page's chain data. The interval now fails and the cursor stays on the
+        last successfully chained page so the next run retries it.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/53063
+      issue:
+        - https://github.com/elastic/beats/issues/48923
+      impact: ""
+      action: ""
+      timestamp: 1788162891
+      file:
+        name: 1788162891-httpjson-chain-pagination-cursor.yaml
+        checksum: 6841e348b48e45743b2885875bc6898098d66867
+    - kind: bug-fix
+      summary: Follow every CrowdStrike discover resource instead of only the first feed.
+      description: |
+        FalconHose followSession iterated discovered resources but blocked in the
+        first feed's decode loop and returned on EOF, so additional feeds in the same
+        discover response were never read. Each resource is now followed
+        concurrently with a merged per-feed cursor.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/53060
+      issue:
+        - https://github.com/elastic/beats/issues/48923
+      impact: ""
+      action: ""
+      timestamp: 1788162892
+      file:
+        name: 1788162892-crowdstrike-follow-all-feeds.yaml
+        checksum: 96835a1a53142b912c2381df72e3d22d81986041
+    - kind: bug-fix
+      summary: Fix Kubernetes metadata watcher deadlock that blocked metricset shutdown
+      description: |
+        The Kubernetes metadata enricher held the shared watcher registry lock while waiting for an informer cache to synchronize. When the Kubernetes API was unreachable or RBAC denied the initial LIST, that wait never completed and Stop() could not acquire the same lock to cancel it, hanging the metricset and blocking shutdown. Watcher startup now runs outside the registry lock as a shared attempt, and each metricset can cancel its own wait independently of other owners of the same watcher. Metricsets that successfully registered all their required metadata watchers now wait for those watchers to be ready before publishing. When add_metadata is disabled or client creation fails, the enricher is a no-op and publishing continues unenriched as before. A metricset whose extra metadata watcher (such as namespace enrichment) failed to register or synchronize does not collect.
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/53040
+      issue:
+        - https://github.com/elastic/beats/issues/48923
+      impact: ""
+      action: ""
+      timestamp: 1788250398
+      file:
+        name: 1788250398-kubernetes-enricher-watcher-deadlock.yaml
+        checksum: d68c332829e3545dba603bb9cac20c899f593ad9
+    - kind: bug-fix
+      summary: Update github.com/elastic/entcollect to fix bugs in the EntraID and Okta providers.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52971
+      issue:
+        - https://github.com/elastic/beats/issues/48923
+      impact: ""
+      action: ""
+      timestamp: 1788253013
+      file:
+        name: 1788253013-52902-entityanalytics.yaml
+        checksum: 7fdf24193093a8b0ffc986fb99c360ed14b065c6
+    - kind: enhancement
+      summary: Collect logical_availability_zone and instance_configuration node attributes in the autoops_es node_stats metricset
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/53119
+      issue:
+        - https://github.com/elastic/beats/issues/48923
+      impact: ""
+      action: ""
+      timestamp: 1788703667
+      file:
+        name: 1788703667-autoops-es-node-attributes.yaml
+        checksum: ce1b1f5b07fb5c297e86093fcfdf590dd84e5c2b
+    - kind: enhancement
+      summary: Report health status from the ETW input when running under Elastic Agent.
+      description: |
+        The ETW input now reports Starting, Configuring, Running, Degraded and Failed
+        states to Elastic Agent. Failure messages include the session name, the
+        configured provider and the raw Windows error code, and access-denied errors
+        spell out the privileges ETW sessions need. The input reports Degraded after
+        `failure_threshold` consecutive unreadable events (default 3) and recovers
+        after `recovery_threshold` consecutive good events (default 1). Set
+        `failure_threshold` to 0 to disable Degraded reporting for unreadable events.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/53089
+      issue:
+        - https://github.com/elastic/beats/issues/44271
+      impact: ""
+      action: ""
+      timestamp: 1788782541
+      file:
+        name: 1788782541-etw-input-status-reporting.yaml
+        checksum: a6e48d681155349b18ee24d7a5230991cdce0496
+    - kind: enhancement
+      summary: Collect the frozen flood stage disk watermark in AutoOps cluster settings
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/53114
+      issue:
+        - https://github.com/elastic/beats/issues/52341
+      impact: ""
+      action: ""
+      timestamp: 1788795811
+      file:
+        name: 1788795811-autoops-flood-stage-frozen.yaml
+        checksum: 1bed9e1bb48e96b2deb6133e9aa7725aa72d1d31

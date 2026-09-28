@@ -71,7 +71,7 @@ func (r *SafeReader) Read(d []byte) (n int, err error) {
 		if code == utf8.RuneError || (!unicode.IsSpace(code) && unicode.IsControl(code)) {
 			n = copy(d, r.buf[:i])
 			r.buf = r.buf[n+1:]
-			r.code = []byte(fmt.Sprintf("\\u%04x", code))
+			r.code = fmt.Appendf(nil, "\\u%04x", code)
 			m := copy(d[n:], r.code)
 			r.code = r.code[m:]
 			return output(n + m)

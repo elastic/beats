@@ -31,7 +31,7 @@ const (
 // resource type, etc.).
 type KeyValuePoint struct {
 	Key           string
-	Value         interface{}
+	Value         any
 	Namespace     string
 	ResourceId    string
 	ResourceSubId string
@@ -322,16 +322,16 @@ func managePropertyName(metric string) string {
 func ReplaceUpperCase(src string) string {
 	replaceUpperCaseRegexp := regexp.MustCompile(replaceUpperCaseRegex)
 	return replaceUpperCaseRegexp.ReplaceAllStringFunc(src, func(str string) string {
-		var newStr string
+		var newStr strings.Builder
 		for _, r := range str {
 			// split into fields based on class of unicode character
 			if unicode.IsUpper(r) {
-				newStr += "_" + strings.ToLower(string(r))
+				newStr.WriteString("_" + strings.ToLower(string(r)))
 			} else {
-				newStr += string(r)
+				newStr.WriteString(string(r))
 			}
 		}
-		return newStr
+		return newStr.String()
 	})
 }
 

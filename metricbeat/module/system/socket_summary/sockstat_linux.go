@@ -26,8 +26,8 @@ import (
 
 	"github.com/shirou/gopsutil/v4/net"
 
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // SockStat contains data from /proc/net/sockstat
@@ -92,7 +92,7 @@ func parseSockstat(path string) (SockStat, error) {
 		"RAW: inuse %d",
 		"FRAG: inuse %d memory %d",
 	}
-	scanfOut := [][]interface{}{
+	scanfOut := [][]any{
 		{&ss.SocketsUsed},
 		{&ss.TCPInUse, &ss.TCPOrphan, &ss.TCPTW, &ss.TCPAlloc, &ss.TCPMem},
 		{&ss.UDPInUse, &ss.UDPMem},

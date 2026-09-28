@@ -80,11 +80,11 @@ func TestSocks5Job(t *testing.T) {
 					hbtest.SimpleURLChecks(t, "tcp", host, port),
 					hbtest.SummaryStateChecks(1, 0),
 					hbtest.ResolveChecks(ip),
-					lookslike.MustCompile(map[string]interface{}{
-						"tcp": map[string]interface{}{
+					lookslike.MustCompile(map[string]any{
+						"tcp": map[string]any{
 							"rtt.validate.us": hbtestllext.IsInt64,
 						},
-						"socks5": map[string]interface{}{
+						"socks5": map[string]any{
 							"rtt.connect.us": hbtestllext.IsInt64,
 						},
 					}),
@@ -120,13 +120,11 @@ func startSocks5Server(t *testing.T) (host string, port uint16, ip string, close
 	}
 
 	wg := sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
+	wg.Go(func() {
 		if err := server.Serve(listener); err != nil {
 			debugf("Error in SOCKS5 Test Server %v", err)
 		}
-		wg.Done()
-	}()
+	})
 
 	return host, uint16(portUint64), ip, func() error {
 		err := listener.Close()

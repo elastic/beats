@@ -58,9 +58,10 @@ func TestNetInputs(t *testing.T) {
 				"../../filebeat.test",
 			)
 
-			// DO NOT USE 'localhost', the UDP client does work when using it.
-			addr := "127.0.0.1:4242"
-			cfg := getConfig(t, map[string]any{"addr": addr}, "netInputs", tc.cfgFile)
+			cfg := getConfig(t, map[string]any{
+				"addr":     "127.0.0.1:0",
+				"httpPort": 0,
+			}, "netInputs", tc.cfgFile)
 
 			filebeat.WriteConfigFile(cfg)
 			filebeat.Start()
@@ -72,6 +73,7 @@ func TestNetInputs(t *testing.T) {
 				20*time.Second,
 				"not all workers have started",
 			)
+			addr := fmt.Sprintf("127.0.0.1:%d", filebeat.SocketListeningPort(30*time.Second))
 
 			tc.runClientFn(t, addr, tc.data)
 
@@ -96,21 +98,21 @@ func TestNetInputsCanReadWithBlockedOutput(t *testing.T) {
 		events      int
 		expectedInQ int
 		numWorkers  int
-		runClientFn func(t *testing.T, addr string, data []string)
+		runClientFn func(*testing.T, string, []string, time.Duration)
 	}{
 		"TCP": {
 			cfgFile:     "es.yml",
 			input:       "tcp",
 			events:      500, // That needs to be more than can be published
 			numWorkers:  5,
-			runClientFn: nettest.RunTCPClient,
+			runClientFn: nettest.RunTCPClientWithDelay,
 		},
 		"UDP": {
 			cfgFile:     "es.yml",
 			input:       "udp",
 			events:      500, // That needs to be more than can be published
 			numWorkers:  5,
-			runClientFn: nettest.RunUDPClient,
+			runClientFn: nettest.RunUDPClientWithDelay,
 		},
 	}
 	for name, tc := range testCases {
@@ -138,14 +140,13 @@ func TestNetInputsCanReadWithBlockedOutput(t *testing.T) {
 			proxy, proxyURL := integration.NewDisablingProxy(t, esAddr)
 			proxy.Disable()
 
-			// DO NOT USE 'localhost', the UDP client does work when using it.
-			addr := "127.0.0.1:4242"
 			cfg := getConfig(t, map[string]any{
 				"id":         id,
 				"input":      tc.input,
-				"addr":       addr,
+				"addr":       "127.0.0.1:0",
 				"esHost":     proxyURL,
 				"numWorkers": tc.numWorkers,
+				"httpPort":   0,
 			}, "netInputs", tc.cfgFile)
 
 			filebeat.WriteConfigFile(cfg)
@@ -155,8 +156,10 @@ func TestNetInputsCanReadWithBlockedOutput(t *testing.T) {
 				5*time.Second,
 				"not all workers have started",
 			)
+			addr := fmt.Sprintf("127.0.0.1:%d", filebeat.SocketListeningPort(30*time.Second))
+			httpPort := filebeat.MonitoringPort(30 * time.Second)
 
-			tc.runClientFn(t, addr, data)
+			tc.runClientFn(t, addr, data, 5*time.Millisecond)
 
 			// Ensure the events are in the publishing pipeline.
 			// The events are logged when they enter the publishing pipeline.
@@ -171,7 +174,7 @@ func TestNetInputsCanReadWithBlockedOutput(t *testing.T) {
 				time.Second,
 				"cannot find output error in the logs")
 
-			m := nettest.GetHTTPInputMetrics(t, id.String(), "http://127.0.0.1:5066")
+			m := nettest.GetHTTPInputMetrics(t, id.String(), fmt.Sprintf("http://127.0.0.1:%d", httpPort))
 
 			// The number of events published is equal to the queue size
 			expectPublished := 32

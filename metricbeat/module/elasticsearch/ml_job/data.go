@@ -49,7 +49,7 @@ var (
 )
 
 type jobsStruct struct {
-	Jobs []map[string]interface{} `json:"jobs"`
+	Jobs []map[string]any `json:"jobs"`
 }
 
 func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXpack bool) error {
@@ -82,7 +82,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 		event.ModuleFields.Put("cluster.id", info.ClusterID)
 
 		if node, exists := job["node"]; exists {
-			nodeHash, ok := node.(map[string]interface{})
+			nodeHash, ok := node.(map[string]any)
 			if !ok {
 				errs = append(errs, errors.New("job[node] is not a map"))
 				continue

@@ -20,13 +20,18 @@ package actions
 import (
 	"fmt"
 
+	"go.opentelemetry.io/collector/pdata/pcommon"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/mime"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+var _ processors.PdataProcessor = (*mimeTypeProcessor)(nil)
 
 func init() {
 	processors.RegisterPlugin("detect_mime_type",
@@ -65,6 +70,21 @@ func (m *mimeTypeProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		_, err = event.PutValue(m.Target, mimeType)
 	}
 	return event, err
+}
+
+func (m *mimeTypeProcessor) RunPdata(body pcommon.Map) (bool, error) {
+	val, ok := otelmap.GetAtPath(m.Field, body)
+	if !ok || val.Type() != pcommon.ValueTypeStr {
+		return false, nil
+	}
+	s := val.Str()
+	if s == "" {
+		return false, nil
+	}
+	if mimeType := mime.Detect(s); mimeType != "" {
+		return false, otelmap.PutAtPath(m.Target, mimeType, body)
+	}
+	return false, nil
 }
 
 func (m *mimeTypeProcessor) String() string {

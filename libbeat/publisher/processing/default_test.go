@@ -271,7 +271,6 @@ func TestProcessorsConfigs(t *testing.T) {
 	}
 
 	for name, test := range cases {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -348,15 +347,16 @@ func TestEventNormalizationOverride(t *testing.T) {
 func TestNormalization(t *testing.T) {
 	cases := map[string]struct {
 		normalize bool
+		inPlace   bool
 		in        mapstr.M
 		mod       mapstr.M
 		want      mapstr.M
 	}{
 		"no sharing if normalized": {
 			normalize: true,
-			in:        mapstr.M{"a": "b"},
-			mod:       mapstr.M{"change": "x"},
-			want:      mapstr.M{"a": "b"},
+			in:        mapstr.M{"a": "b", "nested": mapstr.M{"n": "1"}},
+			mod:       mapstr.M{"change": "x", "nested": mapstr.M{"deep": "y"}},
+			want:      mapstr.M{"a": "b", "nested": mapstr.M{"n": "1"}},
 		},
 		"data sharing if not normalized": {
 			normalize: false,
@@ -364,17 +364,23 @@ func TestNormalization(t *testing.T) {
 			mod:       mapstr.M{"change": "x"},
 			want:      mapstr.M{"a": "b", "change": "x"},
 		},
+		"data sharing if normalized in place": {
+			normalize: true,
+			inPlace:   true,
+			in:        mapstr.M{"a": "b", "drop": nil, "nested": mapstr.M{"n": "1", "drop": nil}},
+			mod:       mapstr.M{"change": "x", "nested": mapstr.M{"deep": "y"}},
+			want:      mapstr.M{"a": "b", "change": "x", "nested": mapstr.M{"n": "1", "deep": "y"}},
+		},
 	}
 
 	for name, test := range cases {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
 			s, err := MakeDefaultSupport(test.normalize, nil)(beat.Info{Paths: tmpPaths(t)}, logp.L(), config.NewConfig())
 			require.NoError(t, err)
 
-			prog, err := s.Create(beat.ProcessingConfig{}, false)
+			prog, err := s.Create(beat.ProcessingConfig{NormalizeInPlace: test.inPlace}, false)
 			require.NoError(t, err)
 
 			fields := test.in.Clone()

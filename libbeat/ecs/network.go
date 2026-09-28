@@ -105,5 +105,5 @@ type Network struct {
 	// fields include vlan.id and vlan.name. Inner vlan fields are typically
 	// used when sending traffic with multiple 802.1q encapsulations to a
 	// network sensor (e.g. Zeek, Wireshark.)
-	Inner map[string]interface{} `ecs:"inner"`
+	Inner map[string]any `ecs:"inner"`
 }

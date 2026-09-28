@@ -32,7 +32,7 @@ import (
 
 func TestDataNameFilter(t *testing.T) {
 	sysinit.InitModule("./_meta/testdata", logptest.NewTestingLogger(t, ""))
-	conf := map[string]interface{}{
+	conf := map[string]any{
 		"module":                 "system",
 		"metricsets":             []string{"diskio"},
 		"diskio.include_devices": []string{"sdb", "sdb1", "sdb2"},
@@ -46,7 +46,7 @@ func TestDataNameFilter(t *testing.T) {
 }
 
 func TestDataEmptyFilter(t *testing.T) {
-	conf := map[string]interface{}{
+	conf := map[string]any{
 		"module":     "system",
 		"metricsets": []string{"diskio"},
 		"hostfs":     "./_meta/testdata",
@@ -84,8 +84,8 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
+func getConfig() map[string]any {
+	return map[string]any{
 		"module":     "system",
 		"metricsets": []string{"diskio"},
 	}

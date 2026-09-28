@@ -49,14 +49,9 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/go-concert/unison"
 
 	// Add filebeat level processors
-	_ "github.com/elastic/beats/v7/filebeat/processor/add_kubernetes_metadata"
 	_ "github.com/elastic/beats/v7/libbeat/processors/decode_csv_fields"
-
-	// include all filebeat specific autodiscover features
-	_ "github.com/elastic/beats/v7/filebeat/autodiscover"
 )
 
 const pipelinesWarning = "Filebeat is unable to load the ingest pipelines for the configured" +
@@ -83,9 +78,12 @@ type Filebeat struct {
 	pipeline                 beat.PipelineConnector
 	logger                   *logp.Logger
 	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
+	runReady                 *closeOnce
+	ctx                      context.Context
+	cancelCtx                context.CancelFunc
 }
 
-type PluginFactory func(beat.Info, *logp.Logger, statestore.States) []v2.Plugin
+type PluginFactory func(beat.Info, statestore.States) []v2.Plugin
 
 var _ backend.WithESStateStoreExtension = (*Filebeat)(nil)
 
@@ -172,12 +170,17 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		return nil, fmt.Errorf("stdin requires to be run in exclusive mode, configured inputs: %s", strings.Join(enabledInputs, ", "))
 	}
 
+	ctx, cn := context.WithCancel(context.Background())
+
 	fb := &Filebeat{
 		done:           make(chan struct{}),
+		runReady:       &closeOnce{ch: make(chan struct{})},
 		config:         &config,
 		moduleRegistry: moduleRegistry,
 		pluginFactory:  plugins,
 		logger:         b.Info.Logger,
+		ctx:            ctx,
+		cancelCtx:      cn,
 	}
 
 	err = fb.setupPipelineLoaderCallback(b)
@@ -199,14 +202,14 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 	b.OverwritePipelinesCallback = func(esConfig *conf.C) error {
 		ctx, cancel := context.WithCancel(context.TODO())
 		defer cancel()
-		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Filebeat", fb.logger)
+		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, b.Info)
 		if err != nil {
 			return err
 		}
 
 		// When running the subcommand setup, configuration from modules.d directories
 		// have to be loaded using cfg.Reloader. Otherwise those configurations are skipped.
-		pipelineLoaderFactory := newPipelineLoaderFactory(ctx, b.Config.Output.Config(), fb.logger)
+		pipelineLoaderFactory := newPipelineLoaderFactory(ctx, b.Config.Output.Config(), b.Info)
 		enableAllFilesets, _ := b.BeatConfig.Bool("config.modules.enable_all_filesets", -1)
 		forceEnableModuleFilesets, _ := b.BeatConfig.Bool("config.modules.force_enable_module_filesets", -1)
 		filesetOverrides := fileset.FilesetOverrides{
@@ -270,7 +273,6 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 func (fb *Filebeat) Run(b *beat.Beat) error {
 	var err error
 	config := fb.config
-
 	if b.Manager != nil {
 		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
 			"input_metrics.json", "application/json", func() []byte {
@@ -290,7 +292,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			gzipRegistry(b.Info.Logger, b.Info.Paths))
 	}
 
-	if !fb.moduleRegistry.Empty() {
+	if !fb.moduleRegistry.Empty() && beat.SetupPipelinesEnabled(b.BeatConfig) {
 		err = fb.loadModulesPipelines(b)
 		if err != nil {
 			return err
@@ -311,6 +313,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// Start the check-in loop, so Filebeat can respond to Elastic Agent,
 	// but it won't start any inputs/output
 	if err := b.Manager.PreInit(); err != nil {
+		fb.runReady.Close()
 		return err
 	}
 
@@ -323,20 +326,21 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		}
 	}()
 
+	// Close runReady so that Stop does not block waiting for Run to reach its
+	// ready state, regardless of how Run exits. This must be deferred after
+	// the managerEarlyStop defer above so that it runs first in LIFO order:
+	// managerEarlyStop calls Stop, which waits on runReady.ch, so runReady
+	// must be closed before Stop is called to avoid a 5-second timeout on
+	// every early-exit error path.
+	defer fb.runReady.Close()
+
 	registryMigrator := registrar.NewMigrator(config.Registry, fb.logger, b.Info.Paths)
 	if err := registryMigrator.Run(); err != nil {
 		fb.logger.Errorf("Failed to migrate registry file: %+v", err)
 		return err
 	}
 
-	// Use context, like normal people do, hooking up to the beat.done channel
-	ctx, cn := context.WithCancel(context.Background())
-	go func() {
-		<-fb.done
-		cn()
-	}()
-
-	stateStore, err := openStateStore(ctx, b.Info, fb.logger.Named("filebeat"), config.Registry)
+	stateStore, err := openStateStore(fb.ctx, b.Info, fb.logger.Named("filebeat"), config.Registry)
 	if err != nil {
 		fb.logger.Errorf("Failed to open state store: %+v", err)
 		return err
@@ -405,27 +409,19 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	outDone := make(chan struct{}) // outDone closes down all active pipeline connections
 	pipelineConnector := channel.NewOutletFactory(outDone).Create
 
-	inputsLogger := fb.logger.Named("input")
-	v2Inputs := fb.pluginFactory(b.Info, inputsLogger, stateStore)
-	v2InputLoader, err := v2.NewLoader(inputsLogger, v2Inputs, "type", cfg.DefaultType)
+	inputInfo := b.Info
+	inputInfo.Logger = b.Info.Logger.Named("input")
+	v2Inputs := fb.pluginFactory(inputInfo, stateStore)
+	v2InputLoader, err := v2.NewLoader(inputInfo.Logger, v2Inputs, "type", cfg.DefaultType)
 	if err != nil {
 		panic(err) // loader detected invalid state.
 	}
 
-	var inputTaskGroup unison.TaskGroup
-	defer func() {
-		_ = inputTaskGroup.Stop()
-	}()
-
-	// Store needs to be fully configured at this point
-	if err := v2InputLoader.Init(&inputTaskGroup); err != nil {
-		fb.logger.Errorf("Failed to initialize the input managers: %v", err)
-		return err
-	}
+	defer v2InputLoader.Close()
 
 	inputLoader := channel.RunnerFactoryWithCommonInputSettings(b.Info, compat.Combine(
-		compat.RunnerFactory(inputsLogger, b.Info, b.Monitoring.InputsRegistry(), v2InputLoader),
-		input.NewRunnerFactory(pipelineConnector, registrar, fb.done, fb.logger),
+		compat.RunnerFactory(inputInfo, b.Monitoring.InputsRegistry(), v2InputLoader),
+		input.NewRunnerFactory(pipelineConnector, registrar, fb.done, b.Info),
 	))
 
 	if fb.otelStatusFactoryWrapper != nil {
@@ -441,11 +437,13 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// the context.
 	pipelineFactoryCtx, cancelPipelineFactoryCtx := context.WithCancel(context.Background())
 	defer cancelPipelineFactoryCtx()
-	if b.Config.Output.Name() == "elasticsearch" {
-		pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config(), fb.logger)
-	} else {
-		if !b.Manager.Enabled() {
-			fb.logger.Warn(pipelinesWarning)
+	if beat.SetupPipelinesEnabled(b.BeatConfig) {
+		if b.Config.Output.Name() == "elasticsearch" {
+			pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config(), b.Info)
+		} else {
+			if !b.Manager.Enabled() {
+				fb.logger.Warn(pipelinesWarning)
+			}
 		}
 	}
 	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines)
@@ -529,6 +527,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	// Add done channel to wait for shutdown signal
 	waitFinished.AddChan(fb.done)
+	// Safe for Shutdown to be called
+	fb.runReady.Close()
 	waitFinished.Wait()
 
 	// Stop reloadable lists, autodiscover -> Stop crawler -> stop inputs -> stop harvesters.
@@ -587,20 +587,49 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 // Stop is called on exit to stop the crawling, spooling and registration processes.
 func (fb *Filebeat) Stop() {
+	fb.StopWithContext(context.Background())
+}
+
+// StopWithContext is like Stop but respects ctx when waiting for Run to reach
+// its ready state, so the caller's deadline is not consumed by the wait.
+func (fb *Filebeat) StopWithContext(ctx context.Context) {
 	fb.logger.Info("Stopping filebeat")
 
-	// Stop Filebeat
-	fb.stopOnce.Do(func() { close(fb.done) })
+	// Wait for Run to reach waitFinished.Wait() before closing done, so that
+	// Stop is never delivered before the beater is ready to handle it.
+	select {
+	case <-fb.runReady.ch:
+	case <-ctx.Done():
+		fb.logger.Warn("Context cancelled waiting for Run to reach ready state; stopping anyway")
+	case <-time.After(5 * time.Second):
+		fb.logger.Warn("Timed out waiting for Run to reach ready state; stopping anyway")
+	}
+
+	fb.stopOnce.Do(func() {
+		close(fb.done)
+		fb.cancelCtx()
+	})
 }
 
 // Create a new pipeline loader (es client) factory
-func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C, logger *logp.Logger) fileset.PipelineLoaderFactory {
+func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C, info beat.Info) fileset.PipelineLoaderFactory {
 	pipelineLoaderFactory := func() (fileset.PipelineLoader, error) {
-		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Filebeat", logger)
+		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, info)
 		if err != nil {
 			return nil, fmt.Errorf("Error creating Elasticsearch client: %w", err) //nolint:staticcheck //Keep old behavior
 		}
 		return esClient, nil
 	}
 	return pipelineLoaderFactory
+}
+
+type closeOnce struct {
+	ch   chan struct{}
+	once sync.Once
+}
+
+func (coc *closeOnce) Close() {
+	coc.once.Do(func() {
+		close(coc.ch)
+	})
 }

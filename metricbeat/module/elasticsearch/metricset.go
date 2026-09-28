@@ -197,7 +197,7 @@ func (m *MetricSet) GetMasterNodeID() (string, error) {
 	}
 
 	var response struct {
-		Nodes map[string]interface{} `json:"nodes"`
+		Nodes map[string]any `json:"nodes"`
 	}
 
 	if err := json.Unmarshal(content, &response); err != nil {

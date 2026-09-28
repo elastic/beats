@@ -149,7 +149,7 @@ func TestRegionSelection(t *testing.T) {
 				MetricsRegistry: monitoring.NewRegistry(),
 			}
 
-			in.status = &statusReporterHelperMock{}
+			in.health = newSQSHealth(&statusReporterHelperMock{}, logp.NewNopLogger())
 			// Run setup and verify that it put the correct region in awsConfig.Region
 			err := in.setup(inputCtx, &fakePipeline{})
 			in.cleanup()

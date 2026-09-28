@@ -58,8 +58,8 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string) map[string]any {
+	return map[string]any{
 		"module":     "mongodb",
 		"metricsets": []string{"metrics"},
 		"hosts":      []string{host},

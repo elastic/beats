@@ -7,7 +7,6 @@
 package processdb
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -43,8 +42,7 @@ func TestProcessOrphanResolve(t *testing.T) {
 
 	// uncomment if you want some logs
 	//_ = logp.DevelopmentSetup()
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	reader := procfs.NewProcfsReader(*logger)
 	testDB, err := NewDB(ctx, monitoring.NewRegistry(), reader, logp.L(), -1, false)
 	require.NoError(t, err)
@@ -87,8 +85,7 @@ func TestProcessOrphanResolve(t *testing.T) {
 
 func TestReapExitOrphans(t *testing.T) {
 	// test to make sure that orphaned exit events are still cleaned up
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	reader := procfs.NewProcfsReader(*logger)
 	testDB, err := NewDB(ctx, monitoring.NewRegistry(), reader, logp.L(), -1, false)
 	require.NoError(t, err)
@@ -108,8 +105,7 @@ func TestReapExitOrphans(t *testing.T) {
 
 func TestReapProcesses(t *testing.T) {
 	reader := procfs.NewProcfsReader(*logger)
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	testDB, err := NewDB(ctx, monitoring.NewRegistry(), reader, logp.L(), -1, true)
 	require.NoError(t, err)
 	testDB.processReapAfter = time.Duration(0)
@@ -145,8 +141,7 @@ func TestReapProcesses(t *testing.T) {
 
 func TestReapProcessesWithProcFS(t *testing.T) {
 	mockReader := procfs.NewMockReader()
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	testDB, err := NewDB(ctx, monitoring.NewRegistry(), mockReader, logp.L(), -1, false)
 	require.NoError(t, err)
 	testDB.reapProcesses = true
@@ -187,8 +182,7 @@ func TestReapProcessesWithProcFS(t *testing.T) {
 func TestReapingProcessesOrphanResolvedRace(t *testing.T) {
 	// test to make sure that if we resolve a process in between mutex holds, we won't prematurely reap it
 	mockReader := procfs.NewMockReader()
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	testDB, err := NewDB(ctx, monitoring.NewRegistry(), mockReader, logp.L(), -1, false)
 	require.NoError(t, err)
 	testDB.reapProcesses = true

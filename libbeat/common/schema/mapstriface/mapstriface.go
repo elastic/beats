@@ -90,7 +90,7 @@ type ConvMap struct {
 }
 
 // Map drills down in the data dictionary by using the key
-func (convMap ConvMap) Map(key string, event mapstr.M, data map[string]interface{}) []error {
+func (convMap ConvMap) Map(key string, event mapstr.M, data map[string]any) []error {
 	d, err := mapstr.M(data).GetValue(convMap.Key)
 	if err != nil {
 		err := schema.NewKeyNotFoundError(convMap.Key)
@@ -99,9 +99,9 @@ func (convMap ConvMap) Map(key string, event mapstr.M, data map[string]interface
 		return []error{err}
 	}
 	switch subData := d.(type) {
-	case map[string]interface{}, mapstr.M:
+	case map[string]any, mapstr.M:
 		subEvent := mapstr.M{}
-		convertedSubData, _ := subData.(map[string]interface{})
+		convertedSubData, _ := subData.(map[string]any)
 		_, errs := convMap.Schema.ApplyTo(subEvent, convertedSubData)
 		for _, err := range errs {
 			var keyErr schema.KeyError
@@ -131,7 +131,7 @@ func Dict(key string, s schema.Schema, opts ...DictSchemaOption) ConvMap {
 	return dictSetOptions(ConvMap{Key: key, Schema: s}, opts)
 }
 
-func toStrFromNum(key string, data map[string]interface{}) (interface{}, error) {
+func toStrFromNum(key string, data map[string]any) (any, error) {
 	emptyIface, err := mapstr.M(data).GetValue(key)
 	if err != nil {
 		return "", schema.NewKeyNotFoundError(key)
@@ -152,7 +152,7 @@ func StrFromNum(key string, opts ...schema.SchemaOption) schema.Conv {
 	return schema.SetOptions(schema.Conv{Key: key, Func: toStrFromNum}, opts)
 }
 
-func toStr(key string, data map[string]interface{}) (interface{}, error) {
+func toStr(key string, data map[string]any) (any, error) {
 	emptyIface, err := mapstr.M(data).GetValue(key)
 	if err != nil {
 		return "", schema.NewKeyNotFoundError(key)
@@ -170,7 +170,7 @@ func Str(key string, opts ...schema.SchemaOption) schema.Conv {
 	return schema.SetOptions(schema.Conv{Key: key, Func: toStr}, opts)
 }
 
-func toIfc(key string, data map[string]interface{}) (interface{}, error) {
+func toIfc(key string, data map[string]any) (any, error) {
 	intf, err := mapstr.M(data).GetValue(key)
 	if err != nil {
 		e := schema.NewKeyNotFoundError(key)
@@ -185,7 +185,7 @@ func Ifc(key string, opts ...schema.SchemaOption) schema.Conv {
 	return schema.SetOptions(schema.Conv{Key: key, Func: toIfc}, opts)
 }
 
-func toBool(key string, data map[string]interface{}) (interface{}, error) {
+func toBool(key string, data map[string]any) (any, error) {
 	emptyIface, err := mapstr.M(data).GetValue(key)
 	if err != nil {
 		return false, schema.NewKeyNotFoundError(key)
@@ -203,7 +203,7 @@ func Bool(key string, opts ...schema.SchemaOption) schema.Conv {
 	return schema.SetOptions(schema.Conv{Key: key, Func: toBool}, opts)
 }
 
-func toInteger(key string, data map[string]interface{}) (interface{}, error) {
+func toInteger(key string, data map[string]any) (any, error) {
 	emptyIface, err := mapstr.M(data).GetValue(key)
 	if err != nil {
 		return 0, schema.NewKeyNotFoundError(key)
@@ -238,7 +238,7 @@ func Float(key string, opts ...schema.SchemaOption) schema.Conv {
 	return schema.SetOptions(schema.Conv{Key: key, Func: toFloat}, opts)
 }
 
-func toFloat(key string, data map[string]interface{}) (interface{}, error) {
+func toFloat(key string, data map[string]any) (any, error) {
 	emptyIface, err := mapstr.M(data).GetValue(key)
 	if err != nil {
 		return 0.0, schema.NewKeyNotFoundError(key)
@@ -273,7 +273,7 @@ func Int(key string, opts ...schema.SchemaOption) schema.Conv {
 	return schema.SetOptions(schema.Conv{Key: key, Func: toInteger}, opts)
 }
 
-func toTime(key string, data map[string]interface{}) (interface{}, error) {
+func toTime(key string, data map[string]any) (any, error) {
 	emptyIface, err := mapstr.M(data).GetValue(key)
 	if err != nil {
 		return common.Time(time.Unix(0, 0)), schema.NewKeyNotFoundError(key)

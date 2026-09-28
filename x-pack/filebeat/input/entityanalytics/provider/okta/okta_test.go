@@ -18,10 +18,9 @@ import (
 	"testing"
 	"time"
 
-	"gopkg.in/natefinch/lumberjack.v2"
-
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta/internal/okta"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/lumberjack"
 )
 
 var trace = flag.Bool("request_trace", false, "enable request tracing during tests")

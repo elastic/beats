@@ -148,7 +148,7 @@ func TestReplaceIndexInIndexPattern(t *testing.T) {
 			input: mapstr.M{
 				"id":   "phonybeat-*",
 				"type": "index-pattern",
-				"attributes": interface{}(mapstr.M{
+				"attributes": any(mapstr.M{
 					"title":         "phonybeat-*",
 					"timeFieldName": "@timestamp",
 				})},
@@ -156,7 +156,7 @@ func TestReplaceIndexInIndexPattern(t *testing.T) {
 			expected: mapstr.M{
 				"id":   "otherindex-*",
 				"type": "index-pattern",
-				"attributes": interface{}(mapstr.M{
+				"attributes": any(mapstr.M{
 					"title":         "otherindex-*",
 					"timeFieldName": "@timestamp",
 				})},

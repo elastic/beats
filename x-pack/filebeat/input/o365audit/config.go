@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/auth"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
@@ -163,13 +164,13 @@ func (c *Config) Validate() (err error) {
 type stringList []string
 
 // Unpack populates the stringList with either a single string value or an array.
-func (s *stringList) Unpack(value interface{}) error {
+func (s *stringList) Unpack(value any) error {
 	switch v := value.(type) {
 	case string:
 		*s = []string{v}
 	case []string:
 		*s = v
-	case []interface{}:
+	case []any:
 		*s = make([]string, len(v))
 		for idx, ival := range v {
 			str, ok := ival.(string)
@@ -186,7 +187,7 @@ func (s *stringList) Unpack(value interface{}) error {
 }
 
 // NewTokenProvider returns an auth.TokenProvider for the given tenantID.
-func (c *Config) NewTokenProvider(tenantID string) (auth.TokenProvider, error) {
+func (c *Config) NewTokenProvider(tenantID string, logger *logp.Logger) (auth.TokenProvider, error) {
 	if c.ClientSecret != "" {
 		return auth.NewProviderFromClientSecret(
 			c.API.AuthenticationEndpoint,
@@ -201,6 +202,7 @@ func (c *Config) NewTokenProvider(tenantID string) (auth.TokenProvider, error) {
 		c.ApplicationID,
 		tenantID,
 		c.CertificateConfig,
+		logger,
 	)
 }
 

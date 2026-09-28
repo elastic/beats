@@ -309,7 +309,7 @@ func addIndexSettings(idx *Index, indicesSettings mapstr.M) error {
 		return fmt.Errorf("failed to get index settings for index %s: %w", idx.Index, err)
 	}
 
-	indexSettings, ok := indexSettingsValue.(map[string]interface{})
+	indexSettings, ok := indexSettingsValue.(map[string]any)
 	if !ok {
 		return fmt.Errorf("index settings is not a map for index: %s", idx.Index)
 	}
@@ -369,14 +369,14 @@ func getClusterStateMetricForIndex(clusterState mapstr.M, index, metricKey strin
 		return nil, fmt.Errorf("'"+fieldKey+"': %w", err)
 	}
 
-	metric, ok := value.(map[string]interface{})
+	metric, ok := value.(map[string]any)
 	if !ok {
 		return nil, elastic.MakeErrorForMissingField(fieldKey, elastic.Elasticsearch)
 	}
 	return mapstr.M(metric), nil
 }
 
-func getIndexStatus(shards map[string]interface{}) (string, error) {
+func getIndexStatus(shards map[string]any) (string, error) {
 	if len(shards) == 0 {
 		// No shards, index is red
 		return "red", nil
@@ -386,13 +386,13 @@ func getIndexStatus(shards map[string]interface{}) (string, error) {
 	areAllReplicasStarted := true
 
 	for indexName, indexShard := range shards {
-		is, ok := indexShard.([]interface{})
+		is, ok := indexShard.([]any)
 		if !ok {
 			return "", fmt.Errorf("shards is not an array")
 		}
 
 		for shardIdx, shard := range is {
-			s, ok := shard.(map[string]interface{})
+			s, ok := shard.(map[string]any)
 			if !ok {
 				return "", fmt.Errorf("%v.shards[%v] is not a map", indexName, shardIdx)
 			}
@@ -442,13 +442,13 @@ func getIndexShardStats(shards mapstr.M) (*shardStats, error) {
 	relocating := 0
 
 	for indexName, indexShard := range shards {
-		is, ok := indexShard.([]interface{})
+		is, ok := indexShard.([]any)
 		if !ok {
 			return nil, fmt.Errorf("shards is not an array")
 		}
 
 		for shardIdx, shard := range is {
-			s, ok := shard.(map[string]interface{})
+			s, ok := shard.(map[string]any)
 			if !ok {
 				return nil, fmt.Errorf("%v.shards[%v] is not a map", indexName, shardIdx)
 			}
@@ -507,13 +507,13 @@ func getIndexShardStats(shards mapstr.M) (*shardStats, error) {
 	}, nil
 }
 
-func getShardsFromRoutingTable(indexRoutingTable mapstr.M) (map[string]interface{}, error) {
+func getShardsFromRoutingTable(indexRoutingTable mapstr.M) (map[string]any, error) {
 	s, err := indexRoutingTable.GetValue("shards")
 	if err != nil {
 		return nil, err
 	}
 
-	shards, ok := s.(map[string]interface{})
+	shards, ok := s.(map[string]any)
 	if !ok {
 		return nil, elastic.MakeErrorForMissingField("shards", elastic.Elasticsearch)
 	}

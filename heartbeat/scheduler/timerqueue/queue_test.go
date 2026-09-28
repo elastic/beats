@@ -35,7 +35,7 @@ func TestRunsInOrder(t *testing.T) {
 
 // TestStress tries to figure out if we have any deadlocks that show up under concurrency
 func TestStress(t *testing.T) {
-	for i := 0; i < 120000; i++ {
+	for range 120000 {
 		failed := make(chan bool)
 		succeeded := make(chan bool)
 
@@ -110,8 +110,7 @@ Reader:
 }
 
 func TestQueueRunsTasksAddedAfterStart(t *testing.T) {
-	ctx, ctxCancel := context.WithCancel(context.Background())
-	defer ctxCancel()
+	ctx := t.Context()
 	tq := NewTimerQueue(ctx)
 
 	tq.Start()

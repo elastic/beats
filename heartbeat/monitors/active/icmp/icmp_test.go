@@ -55,7 +55,7 @@ func TestICMPFields(t *testing.T) {
 			hbtest.SummaryStateChecks(1, 0),
 			hbtest.URLChecks(t, hostURL),
 			hbtest.ResolveChecks(ip),
-			lookslike.MustCompile(map[string]interface{}{
+			lookslike.MustCompile(map[string]any{
 				"icmp.requests": 1,
 				"icmp.rtt":      look.RTT(testMockLoop.pingRtt),
 			}),

@@ -25,7 +25,7 @@ import (
 )
 
 type valueConverter interface {
-	Convert(i interface{}) interface{}
+	Convert(i any) any
 }
 
 type keyRenamer interface {
@@ -54,7 +54,7 @@ type boolValue struct {
 	valueHelper
 }
 
-func (v *boolValue) Convert(i interface{}) interface{} {
+func (v *boolValue) Convert(i any) any {
 	value, ok := i.(float64)
 	if !ok {
 		return nil
@@ -67,7 +67,7 @@ type noConversionValue struct {
 	valueHelper
 }
 
-func (v *noConversionValue) Convert(i interface{}) interface{} {
+func (v *noConversionValue) Convert(i any) any {
 	return i
 }
 
@@ -119,7 +119,7 @@ func eventMapping(content []byte) ([]mapstr.M, error) {
 	return data, nil
 }
 
-func metricApply(labels map[string]mapstr.M, m consulMetric, v interface{}) {
+func metricApply(labels map[string]mapstr.M, m consulMetric, v any) {
 	prettyName := prettyName(m.Name)
 	if prettyName == nil {
 		//omitting unwanted metric
@@ -133,7 +133,7 @@ func metricApply(labels map[string]mapstr.M, m consulMetric, v interface{}) {
 		temp.Put("labels", m.Labels)
 	}
 
-	var value interface{}
+	var value any
 	switch v := v.(type) {
 	case consulDetailedValue:
 		value = v.Mean

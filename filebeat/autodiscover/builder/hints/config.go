@@ -22,16 +22,22 @@ import (
 )
 
 type config struct {
-	Key           string  `config:"key"`
-	DefaultConfig *conf.C `config:"default_config"`
+	Key            string               `config:"key"`
+	DefaultConfig  *conf.C              `config:"default_config"`
+	InputAllowList inputAllowListConfig `config:"input_allow_list"`
+}
+
+type inputAllowListConfig struct {
+	Enabled bool     `config:"enabled"`
+	Types   []string `config:"types"`
 }
 
 func defaultConfig() config {
-	defaultCfgRaw := map[string]interface{}{
+	defaultCfgRaw := map[string]any{
 		"type": "filestream",
 		"id":   "container-logs-${data.container.id}",
-		"prospector": map[string]interface{}{
-			"scanner": map[string]interface{}{
+		"prospector": map[string]any{
+			"scanner": map[string]any{
 				"fingerprint.enabled": true,
 				"symlinks":            true,
 			},
@@ -51,9 +57,9 @@ func defaultConfig() config {
 				"kubernetes-container-logs-${data.container.id}",
 			},
 		},
-		"parsers": []interface{}{
-			map[string]interface{}{
-				"container": map[string]interface{}{
+		"parsers": []any{
+			map[string]any{
+				"container": map[string]any{
 					"stream": "all",
 					"format": "auto",
 				},
@@ -73,9 +79,11 @@ func defaultConfig() config {
 
 func (c *config) Unpack(from *conf.C) error {
 	tmpConfig := struct {
-		Key string `config:"key"`
+		Key            string               `config:"key"`
+		InputAllowList inputAllowListConfig `config:"input_allow_list"`
 	}{
-		Key: c.Key,
+		Key:            c.Key,
+		InputAllowList: c.InputAllowList,
 	}
 	if err := from.Unpack(&tmpConfig); err != nil {
 		return err
@@ -96,5 +104,10 @@ func (c *config) Unpack(from *conf.C) error {
 	}
 
 	c.Key = tmpConfig.Key
+	c.InputAllowList = tmpConfig.InputAllowList
+	if c.InputAllowList.Enabled && len(c.InputAllowList.Types) == 0 {
+		c.InputAllowList.Types = []string{"log", "filestream", "container"}
+	}
+
 	return nil
 }

@@ -24,7 +24,7 @@ import (
 )
 
 // ExtractFloat extracts a float from an unknown type.
-func ExtractFloat(unk interface{}) (float64, error) {
+func ExtractFloat(unk any) (float64, error) {
 	switch i := unk.(type) {
 	case float64:
 		return float64(i), nil
@@ -62,7 +62,7 @@ func ExtractFloat(unk interface{}) (float64, error) {
 }
 
 // ExtractInt extracts an int from an unknown type.
-func ExtractInt(unk interface{}) (uint64, error) {
+func ExtractInt(unk any) (uint64, error) {
 	switch i := unk.(type) {
 	case int64:
 		return uint64(i), nil
@@ -90,7 +90,7 @@ func ExtractInt(unk interface{}) (uint64, error) {
 }
 
 // ExtractString extracts a string from an unknown type.
-func ExtractString(unk interface{}) (string, error) {
+func ExtractString(unk any) (string, error) {
 	switch s := unk.(type) {
 	case string:
 		return s, nil
@@ -100,7 +100,7 @@ func ExtractString(unk interface{}) (string, error) {
 }
 
 // ExtractBool extracts a bool from an unknown type.
-func ExtractBool(unk interface{}) (bool, error) {
+func ExtractBool(unk any) (bool, error) {
 	switch b := unk.(type) {
 	case bool:
 		return b, nil

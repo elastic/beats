@@ -104,11 +104,9 @@ func TestPublishLoop(t *testing.T) {
 	}
 
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		w.publishLoop(v2Ctx, 0, client, metrics)
-	}()
+	})
 
 	events := [][]byte{
 		[]byte("test1"),

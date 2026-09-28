@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build windows && !securityonly
+
 package inputs
 
 import (
@@ -22,11 +24,10 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/winlog"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func osInputs(info beat.Info, log *logp.Logger, components statestore.States) []v2.Plugin {
+func osInputs(info beat.Info, components statestore.States) []v2.Plugin {
 	return []v2.Plugin{
-		winlog.Plugin(log, components),
+		winlog.Plugin(info.Logger, components),
 	}
 }

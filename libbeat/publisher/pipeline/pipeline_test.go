@@ -43,7 +43,7 @@ func TestPipelineAcceptsAnyNumberOfClients(t *testing.T) {
 
 	n := 66000
 	clients := []beat.Client{}
-	for i := 0; i < n; i++ {
+	for range n {
 		c, err := pipeline.ConnectWith(beat.ClientConfig{})
 		if err != nil {
 			t.Fatalf("Could not connect to pipeline: %s", err)

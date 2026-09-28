@@ -41,13 +41,13 @@ type ErrNotFound struct {
 // Error returns the human readable error.
 func (e *ErrNotFound) Error() string { return e.ErrorString }
 
-func newErrNotFound(s string, a ...interface{}) *ErrNotFound {
+func newErrNotFound(s string, a ...any) *ErrNotFound {
 	return &ErrNotFound{fmt.Sprintf(s, a...)}
 }
 
 // MessageOutputter is a function type for injecting status logging
 // into this module.
-type MessageOutputter func(msg string, a ...interface{})
+type MessageOutputter func(msg string, a ...any)
 
 // Importer is a type to import dashboards
 type Importer struct {
@@ -197,7 +197,7 @@ func (imp Importer) unzip(archive, target string) error {
 func (imp Importer) ImportArchive() error {
 	var archive string
 
-	target, err := ioutil.TempDir("", "tmp")
+	target, err := os.MkdirTemp("", "tmp")
 	if err != nil {
 		return fmt.Errorf("Failed to generate a temporary directory name: %v", err)
 	}

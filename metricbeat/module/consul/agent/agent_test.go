@@ -248,10 +248,10 @@ func TestEventMapping(t *testing.T) {
 
 	//2 events should be here, one with runtime.heap_objects only and one with everything else
 	heapObjectsFound := false
-	var heapObjects interface{}
+	var heapObjects any
 
 	goroutinesFound := false
-	var goroutines interface{}
+	var goroutines any
 
 	for _, event := range events {
 		runtimeI, ok := event["runtime"]

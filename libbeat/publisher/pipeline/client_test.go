@@ -46,8 +46,9 @@ import (
 
 func makePipeline(t *testing.T, settings Settings, qu queue.Queue[publisher.Event]) *Pipeline {
 	t.Helper()
-	logger := logptest.NewTestingLogger(t, "")
-	p, err := New(beat.Info{Logger: logger},
+	// Use a nop logger so the async queueReader goroutine (which is intentionally
+	// not tracked in the shutdown WaitGroup) cannot race with *testing.T cleanup.
+	p, err := New(beat.Info{Logger: logp.NewNopLogger()},
 		Monitors{},
 		conf.Namespace{},
 		outputs.Group{},
@@ -79,11 +80,9 @@ func TestClient(t *testing.T) {
 		}
 
 		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			client.Publish(beat.Event{})
-		}()
+		})
 
 		client.Close()
 		wg.Wait()
@@ -428,7 +427,7 @@ func TestMonitoring(t *testing.T) {
 			numClients = 42
 		)
 		var config Config
-		err := conf.MustNewConfigFrom(map[string]interface{}{
+		err := conf.MustNewConfigFrom(map[string]any{
 			"queue.mem.events":           maxEvents,
 			"queue.mem.flush.min_events": 1,
 		}).Unpack(&config)
@@ -484,7 +483,7 @@ func TestMonitoring(t *testing.T) {
 func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientConfig) {
 
 	var config Config
-	err := conf.MustNewConfigFrom(map[string]interface{}{
+	err := conf.MustNewConfigFrom(map[string]any{
 		"queue.mem.events":           32,
 		"queue.mem.flush.min_events": 1,
 		"queue.mem.flush.timeout":    time.Millisecond,
@@ -495,7 +494,9 @@ func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientCon
 
 	metrics := monitoring.NewRegistry()
 	telemetry := monitoring.NewRegistry()
-	logger := logptest.NewTestingLogger(t, "")
+	// Use a nop logger to avoid a race between the async queueReader goroutine
+	// (which logs on shutdown) and the sub-test's *testing.T being cleaned up.
+	logger := logp.NewNopLogger()
 	pipeline, err := Load(
 		beat.Info{
 			Logger: logger,
@@ -534,6 +535,7 @@ func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientCon
 		},
 	)
 	require.NoError(t, err)
+	defer func() { _ = pipeline.Disconnect(t.Context()) }()
 
 	c, err := pipeline.ConnectWith(clientCfg)
 	require.NoError(t, err, "pipeline.ConnectWith failed")

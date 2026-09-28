@@ -312,11 +312,9 @@ func (h *Harvester) Run() error {
 
 	logger.Infof("Harvester started for paths: %v", h.config.Paths)
 
-	h.doneWg.Add(1)
-	go func() {
+	h.doneWg.Go(func() {
 		h.monitorFileSize()
-		h.doneWg.Done()
-	}()
+	})
 
 	for {
 		select {

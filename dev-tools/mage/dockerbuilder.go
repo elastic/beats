@@ -127,7 +127,7 @@ func (b *dockerBuilder) prepareBuild() error {
 	}
 	templatesDir := filepath.Join(elasticBeatsDir, "dev-tools/packaging/templates/docker")
 
-	data := map[string]interface{}{
+	data := map[string]any{
 		"ExposePorts": b.exposePorts(),
 		"ModulesDirs": b.modulesDirs(),
 	}
@@ -159,7 +159,7 @@ func isDockerFile(path string) bool {
 	return strings.HasPrefix(path, "Dockerfile") || strings.HasPrefix(path, "docker-entrypoint")
 }
 
-func (b *dockerBuilder) expandDockerfile(templatesDir string, data map[string]interface{}) error {
+func (b *dockerBuilder) expandDockerfile(templatesDir string, data map[string]any) error {
 	dockerfile := "Dockerfile.tmpl"
 	if f, found := b.ExtraVars["dockerfile"]; found {
 		dockerfile = f
@@ -213,7 +213,7 @@ func (b *dockerBuilder) dockerSave(tag string) error {
 	// Save the container as artifact
 	outputFile := b.OutputFile
 	if outputFile == "" {
-		outputTar, err := b.Expand(defaultBinaryName+".docker.tar.gz", map[string]interface{}{
+		outputTar, err := b.Expand(defaultBinaryName+".docker.tar.gz", map[string]any{
 			"Name": b.imageName,
 		})
 		if err != nil {

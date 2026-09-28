@@ -6,11 +6,11 @@ package config
 
 import (
 	"testing"
+	"time"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
-
-func boolPtr(v bool) *bool { return &v }
 
 func TestInstallConfigNormalizeAndValidate(t *testing.T) {
 	tests := []struct {
@@ -76,7 +76,7 @@ func TestInstallConfigNormalizeAndValidate(t *testing.T) {
 					AMD64: &InstallArtifactConfig{
 						ArtifactURL:      "http://example.com/osquery.tar.gz",
 						SHA256:           "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-						AllowInsecureURL: boolPtr(true),
+						AllowInsecureURL: new(true),
 					},
 				},
 			},
@@ -88,7 +88,7 @@ func TestInstallConfigNormalizeAndValidate(t *testing.T) {
 					AMD64: &InstallArtifactConfig{
 						ArtifactURL:      "http://example.com/osquery.tar.gz",
 						SHA256:           "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-						AllowInsecureURL: boolPtr(false),
+						AllowInsecureURL: new(false),
 					},
 				},
 				AllowInsecureURL: true,
@@ -271,7 +271,7 @@ func TestInstallConfigPlatformOverrides(t *testing.T) {
 			AMD64: &InstallArtifactConfig{
 				ArtifactURL:      "https://example.org/osquery-linux.tar.gz",
 				SHA256:           "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-				AllowInsecureURL: boolPtr(true),
+				AllowInsecureURL: new(true),
 			},
 		},
 	}
@@ -303,7 +303,7 @@ func TestInstallConfigOverridePrecedence(t *testing.T) {
 			AMD64: &InstallArtifactConfig{
 				ArtifactURL:      "https://example.org/osquery-linux-amd64.tar.gz",
 				SHA256:           "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-				AllowInsecureURL: boolPtr(true),
+				AllowInsecureURL: new(true),
 				SSL:              archSSL,
 			},
 		},
@@ -386,6 +386,163 @@ func TestGetOsqueryInstallConfig(t *testing.T) {
 		}
 		if selected.ArtifactURL != installCfg.Linux.AMD64.ArtifactURL {
 			t.Fatalf("unexpected artifact_url: %s", selected.ArtifactURL)
+		}
+	})
+}
+
+func TestGetOsqueryExtensions(t *testing.T) {
+	t.Run("missing input returns empty", func(t *testing.T) {
+		cfg := GetOsqueryExtensions(nil)
+		if len(cfg.Paths) != 0 || cfg.Timeout != 0 {
+			t.Fatalf("expected empty extensions config, got %+v", cfg)
+		}
+	})
+
+	t.Run("returns first input osquery extensions", func(t *testing.T) {
+		inputs := []InputConfig{
+			{
+				Osquery: &OsqueryConfig{
+					ElasticOptions: &ElasticOptions{
+						Extensions: &ExtensionsConfig{
+							Paths:   []string{"/opt/ext", "/opt/other/*.ext"},
+							Timeout: 30,
+						},
+					},
+				},
+			},
+		}
+		cfg := GetOsqueryExtensions(inputs)
+		if cfg.Timeout != 30 {
+			t.Fatalf("unexpected timeout: %d", cfg.Timeout)
+		}
+		if len(cfg.Paths) != 2 || cfg.Paths[0] != "/opt/ext" || cfg.Paths[1] != "/opt/other/*.ext" {
+			t.Fatalf("unexpected paths: %v", cfg.Paths)
+		}
+	})
+
+	t.Run("unpacks config tags from yaml", func(t *testing.T) {
+		c, err := conf.NewConfigFrom(map[string]any{
+			"inputs": []map[string]any{
+				{
+					"osquery": map[string]any{
+						"elastic_options": map[string]any{
+							"extensions": map[string]any{
+								"paths":   []string{"/opt/ext"},
+								"timeout": 15,
+								"require": []string{"my_extension"},
+							},
+						},
+					},
+				},
+			},
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		var parsed Config
+		if err := c.Unpack(&parsed); err != nil {
+			t.Fatal(err)
+		}
+		cfg := GetOsqueryExtensions(parsed.Inputs)
+		if cfg.Timeout != 15 {
+			t.Fatalf("unexpected timeout: %d", cfg.Timeout)
+		}
+		if len(cfg.Paths) != 1 || cfg.Paths[0] != "/opt/ext" {
+			t.Fatalf("unexpected paths: %v", cfg.Paths)
+		}
+		if len(cfg.Require) != 1 || cfg.Require[0] != "my_extension" {
+			t.Fatalf("unexpected require: %v", cfg.Require)
+		}
+	})
+}
+
+func TestGetOsqueryCheckTimeout(t *testing.T) {
+	t.Run("missing input returns default", func(t *testing.T) {
+		got, err := GetOsqueryCheckTimeout(nil)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if got != DefaultCheckTimeout {
+			t.Fatalf("expected default %s, got %s", DefaultCheckTimeout, got)
+		}
+	})
+
+	t.Run("returns first input check timeout", func(t *testing.T) {
+		inputs := []InputConfig{
+			{
+				Osquery: &OsqueryConfig{
+					ElasticOptions: &ElasticOptions{
+						CheckTimeout: "30s",
+					},
+				},
+			},
+		}
+		got, err := GetOsqueryCheckTimeout(inputs)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if got != 30*time.Second {
+			t.Fatalf("unexpected timeout: %s", got)
+		}
+	})
+
+	t.Run("unpacks config tags from yaml", func(t *testing.T) {
+		c, err := conf.NewConfigFrom(map[string]any{
+			"inputs": []map[string]any{
+				{
+					"osquery": map[string]any{
+						"elastic_options": map[string]any{
+							"check_timeout": "45s",
+						},
+					},
+				},
+			},
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		var parsed Config
+		if err := c.Unpack(&parsed); err != nil {
+			t.Fatal(err)
+		}
+		got, err := GetOsqueryCheckTimeout(parsed.Inputs)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if got != 45*time.Second {
+			t.Fatalf("unexpected timeout: %s", got)
+		}
+	})
+
+	t.Run("invalid duration returns error", func(t *testing.T) {
+		inputs := []InputConfig{
+			{
+				Osquery: &OsqueryConfig{
+					ElasticOptions: &ElasticOptions{
+						CheckTimeout: "not-a-duration",
+					},
+				},
+			},
+		}
+		_, err := GetOsqueryCheckTimeout(inputs)
+		if err == nil {
+			t.Fatal("expected error for invalid check_timeout")
+		}
+	})
+
+	t.Run("non-positive duration returns error", func(t *testing.T) {
+		inputs := []InputConfig{
+			{
+				Osquery: &OsqueryConfig{
+					ElasticOptions: &ElasticOptions{
+						CheckTimeout: "0s",
+					},
+				},
+			},
+		}
+		_, err := GetOsqueryCheckTimeout(inputs)
+		if err == nil {
+			t.Fatal("expected error for non-positive check_timeout")
 		}
 	})
 }

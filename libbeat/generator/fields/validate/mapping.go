@@ -47,11 +47,11 @@ func NewMapping(fieldsYAML []byte) (Mapping, error) {
 		Fields: make(map[string]Field),
 	}
 
-	var fields interface{}
+	var fields any
 	if err := yaml.Unmarshal(fieldsYAML, &fields); err != nil {
 		return result, fmt.Errorf("decoding fields YAML: %w", err)
 	}
-	subFields, ok := fields.([]interface{})
+	subFields, ok := fields.([]any)
 	if !ok {
 		return result, fmt.Errorf("top-level fields is not an array, but %T", fields)
 	}
@@ -64,7 +64,7 @@ func NewMapping(fieldsYAML []byte) (Mapping, error) {
 }
 
 // Validate takes a document map and validates it against the mapping.
-func (m *Mapping) Validate(dict map[string]interface{}) error {
+func (m *Mapping) Validate(dict map[string]any) error {
 	seen, err := m.validateFields(dict, "")
 	if err != nil {
 		return err
@@ -81,7 +81,7 @@ func (m *Mapping) Validate(dict map[string]interface{}) error {
 	return nil
 }
 
-func (m *Mapping) validateFields(dict map[string]interface{}, prefix Prefix) (seen []string, err error) {
+func (m *Mapping) validateFields(dict map[string]any, prefix Prefix) (seen []string, err error) {
 	for key, value := range dict {
 		name := prefix.Append(key)
 		field, found := m.Fields[name.String()]
@@ -140,8 +140,8 @@ func (m *Mapping) storeField(path string, field Field) error {
 	return nil
 }
 
-func recursiveFattenFields(fields interface{}, prefix Prefix, mapping *Mapping, key string) error {
-	dict, ok := fields.(map[interface{}]interface{})
+func recursiveFattenFields(fields any, prefix Prefix, mapping *Mapping, key string) error {
+	dict, ok := fields.(map[any]any)
 	if !ok {
 		return fmt.Errorf("fields entry [%s](%s) is not a dictionary", key, prefix)
 	}
@@ -233,7 +233,7 @@ func recursiveFattenFields(fields interface{}, prefix Prefix, mapping *Mapping, 
 	}
 
 	if fieldsIf != nil {
-		innerFields, ok := fieldsIf.([]interface{})
+		innerFields, ok := fieldsIf.([]any)
 		if !ok {
 			return fmt.Errorf("field [%s](%s) has a 'fields' tag of unexpected type (type=%T value=%v)", key, prefix, nameIf, nameIf)
 		}

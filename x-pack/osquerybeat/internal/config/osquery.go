@@ -15,6 +15,9 @@ const (
 	MaxSplay = 12 * time.Hour
 	// DefaultSplay is the default splay duration (disabled)
 	DefaultSplay = 0
+	// DefaultCheckTimeout is the osqueryd --version startup check deadline
+	// when elastic_options.check_timeout is unset.
+	DefaultCheckTimeout = 15 * time.Second
 )
 
 // RRuleScheduleConfig represents an RRULE-based schedule configuration
@@ -99,8 +102,106 @@ func (c *RRuleScheduleConfig) IsEnabled() bool {
 // ElasticOptions contains Beat-specific options that are not part of
 // osquery's native config schema.
 type ElasticOptions struct {
-	Install             *InstallConfig             `config:"install" json:"-"`
-	QueryProfileStorage *QueryProfileStorageConfig `config:"query_profile_storage" json:"-"`
+	Install *InstallConfig `config:"install" json:"-"`
+	// Profiling groups all query profiling settings (global publish default and local storage).
+	Profiling *ProfilingConfig `config:"profiling" json:"-"`
+	// Extensions configures loading of customer-managed osquery extensions.
+	Extensions *ExtensionsConfig `config:"extensions" json:"-"`
+	// CheckTimeout optionally overrides the osqueryd --version startup check
+	// deadline. Go duration format ("15s", "30s", "1m"). Default: 15s.
+	CheckTimeout string `config:"check_timeout" json:"-"`
+}
+
+// ParseCheckTimeout parses elastic_options.check_timeout. An empty value
+// returns DefaultCheckTimeout. The duration must be greater than zero.
+func ParseCheckTimeout(raw string) (time.Duration, error) {
+	if raw == "" {
+		return DefaultCheckTimeout, nil
+	}
+	d, err := time.ParseDuration(raw)
+	if err != nil {
+		return 0, fmt.Errorf("invalid osquery.elastic_options.check_timeout %q: %w", raw, err)
+	}
+	if d <= 0 {
+		return 0, fmt.Errorf("osquery.elastic_options.check_timeout must be greater than 0, got %s", raw)
+	}
+	return d, nil
+}
+
+// ExtensionsConfig configures loading of customer-managed (third-party or
+// customer-built) osquery extensions. These extensions are NOT developed,
+// validated, or supported by Elastic; customers are fully responsible for
+// their security, maintenance, and stability.
+//
+// Paths lists absolute entries on the endpoint, where each entry may be:
+//   - a directory: every extension binary found directly in it is autoloaded
+//     (files ending in ".ext" on Unix or ".exe" on Windows);
+//   - a file: that specific extension binary is autoloaded;
+//   - a glob pattern (containing *, ? or [ ]): each match is resolved as a
+//     directory or file per the rules above.
+//
+// Symlinks are rejected (entries, glob matches, and directory contents) so the
+// binary that is validated is the one osqueryd executes.
+//
+// Entries are resolved when osqueryd is (re)started, which happens when the
+// extension configuration (or other osquery options) change. Adding or removing
+// binaries in a configured directory does NOT trigger a reload by itself.
+//
+// osquerybeat never copies these binaries and never writes into the Elastic
+// Agent install tree; it only appends the resolved paths to the osquery
+// extensions autoload file that lives in the runtime data directory. osqueryd
+// enforces safe file permissions on autoloaded extensions (owned by the running
+// user, not writable by group or others); unsafe, non-executable, or otherwise
+// invalid binaries are skipped and logged rather than aborting startup.
+type ExtensionsConfig struct {
+	// Paths lists absolute directories, files, or glob patterns to resolve into
+	// extension binaries.
+	Paths []string `config:"paths" json:"-"`
+	// Timeout optionally overrides osquery's extensions_timeout (seconds), the
+	// time osqueryd waits for autoloaded extensions to register.
+	Timeout int `config:"timeout" json:"-"`
+	// Require lists extension names osqueryd must wait for at startup
+	// (osquery's extensions_require); queries do not run until the named
+	// extensions have registered or extensions_timeout elapses. Use this to
+	// avoid "no such table" races against slow-registering extensions.
+	Require []string `config:"require" json:"-"`
+}
+
+// PathsOrEmpty returns the configured extension paths, or an empty slice when no
+// extensions are configured.
+func (c *ExtensionsConfig) PathsOrEmpty() []string {
+	if c == nil {
+		return nil
+	}
+	return c.Paths
+}
+
+// ProfilingConfig groups all query profiling settings. When ProfilingAll is enabled (the default),
+// profiles are collected and published to the osquery_manager.query_profile data stream for all
+// queries that do not set their own profiling flag. It still requires the query_profile input stream
+// to be present for events to be published. Storage controls local retention of live profiles
+// for diagnostics, independent of publishing.
+type ProfilingConfig struct {
+	ProfilingAll *bool                      `config:"profiling_all" json:"-"`
+	Storage      *QueryProfileStorageConfig `config:"storage" json:"-"`
+}
+
+// ProfilingAllOrDefault returns the global profiling default, which is enabled unless
+// explicitly set to false.
+func (c ProfilingConfig) ProfilingAllOrDefault() bool {
+	if c.ProfilingAll == nil {
+		return true
+	}
+	return *c.ProfilingAll
+}
+
+// ResolveProfiling returns the effective profiling decision for a query: a per-query
+// override wins when set, otherwise the global default applies.
+func ResolveProfiling(globalDefault bool, override *bool) bool {
+	if override != nil {
+		return *override
+	}
+	return globalDefault
 }
 
 // QueryProfileStorageConfig controls local storage of live query profiles.
@@ -153,7 +254,7 @@ type Query struct {
 	Description int    `config:"description" json:"description,omitempty"`
 
 	// Optional ECS mapping for the query, not rendered into osqueryd configuration
-	ECSMapping map[string]interface{} `config:"ecs_mapping" json:"-"`
+	ECSMapping map[string]any `config:"ecs_mapping" json:"-"`
 
 	// A boolean to set 'snapshot' mode, default true
 	// This is different from the default osquery behavior where the missing value defaults to false
@@ -163,17 +264,21 @@ type Query struct {
 	// This is the same as osquery behavior
 	Removed *bool `config:"removed,omitempty" json:"removed,omitempty"`
 
-	// Optional internal flag to emit per-query profiling for this scheduled query
+	// Optional per-query override to emit profiling for this scheduled query
 	// (native: osquery_schedule metrics; RRULE: process-level deltas like live queries).
+	// When nil the global elastic_options.profiling.profiling_all default applies (see ResolveProfiling).
 	// RRULE/live profiling uses the same serialized osquery client; native osqueryd schedules
 	// can still add process load outside that bracket. Not rendered into osqueryd configuration.
-	Profile bool `config:"profile" json:"-"`
+	Profiling *bool `config:"profiling" json:"-"`
 }
 
 type Pack struct {
 	// PackID is the policy-defined pack identifier; used in result/response documents for correlation.
 	// If empty, the pack map key (pack name) is used when publishing.
-	PackID    string   `config:"pack_id,omitempty" json:"pack_id,omitempty"`
+	PackID string `config:"pack_id,omitempty" json:"pack_id,omitempty"`
+	// PackName is the policy-defined human-readable pack name; emitted as pack_name in
+	// result/response documents alongside pack_id. Optional and not sent to osqueryd.
+	PackName  string   `config:"pack_name,omitempty" json:"-"`
 	Discovery []string `config:"discovery" json:"discovery,omitempty"`
 	Platform  string   `config:"platform" json:"platform,omitempty"`
 	Version   string   `config:"version" json:"version,omitempty"`
@@ -230,16 +335,16 @@ type Events struct {
 }
 
 type OsqueryConfig struct {
-	Options               map[string]interface{} `config:"options" json:"options,omitempty"`
-	ElasticOptions        *ElasticOptions        `config:"elastic_options" json:"-"`
-	Schedule              map[string]Query       `config:"schedule" json:"schedule,omitempty"`
-	Packs                 map[string]Pack        `config:"packs" json:"packs,omitempty"`
-	Filepaths             map[string][]string    `config:"file_paths" json:"file_paths,omitempty"`
-	Views                 map[string]string      `config:"views" json:"views,omitempty"`
-	Events                *Events                `config:"events" json:"events,omitempty"`
-	Yara                  map[string]interface{} `config:"yara" json:"yara,omitempty"`
-	PrometheusTargets     map[string]interface{} `config:"prometheus_targets" json:"prometheus_targets,omitempty"`
-	AutoTableConstruction map[string]interface{} `config:"auto_table_construction" json:"auto_table_construction,omitempty"`
+	Options               map[string]any      `config:"options" json:"options,omitempty"`
+	ElasticOptions        *ElasticOptions     `config:"elastic_options" json:"-"`
+	Schedule              map[string]Query    `config:"schedule" json:"schedule,omitempty"`
+	Packs                 map[string]Pack     `config:"packs" json:"packs,omitempty"`
+	Filepaths             map[string][]string `config:"file_paths" json:"file_paths,omitempty"`
+	Views                 map[string]string   `config:"views" json:"views,omitempty"`
+	Events                *Events             `config:"events" json:"events,omitempty"`
+	Yara                  map[string]any      `config:"yara" json:"yara,omitempty"`
+	PrometheusTargets     map[string]any      `config:"prometheus_targets" json:"prometheus_targets,omitempty"`
+	AutoTableConstruction map[string]any      `config:"auto_table_construction" json:"auto_table_construction,omitempty"`
 }
 
 // forOsqueryd returns a copy of c without queries that osquerybeat runs via RRULE (they would

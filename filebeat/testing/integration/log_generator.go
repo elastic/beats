@@ -121,7 +121,7 @@ func generateLogFiles(
 	}
 
 	filenames := make([]string, 0, files)
-	for i := 0; i < files; i++ {
+	for range files {
 		id, err := uuid.NewV4()
 		if err != nil {
 			t.Fatalf("failed to generate a unique filename: %s", err)
@@ -205,5 +205,29 @@ func WriteLines(t *testing.T, w io.Writer, filename string, offset, lines int, g
 			t.Fatalf("cannot write a generated log line to %s: %s", filename, err)
 			return
 		}
+	}
+}
+
+// RotateFile renames src to dst, simulating a log rotation.
+func RotateFile(t *testing.T, src, dst string) {
+	t.Helper()
+	if err := os.Rename(src, dst); err != nil {
+		t.Fatalf("RotateFile(%q -> %q): %v", src, dst, err)
+	}
+}
+
+// TruncateFile truncates path to zero bytes.
+func TruncateFile(t *testing.T, path string) {
+	t.Helper()
+	if err := os.Truncate(path, 0); err != nil {
+		t.Fatalf("TruncateFile(%q): %v", path, err)
+	}
+}
+
+// CreateSymlink creates a symbolic link at linkPath pointing to target.
+func CreateSymlink(t *testing.T, target, linkPath string) {
+	t.Helper()
+	if err := os.Symlink(target, linkPath); err != nil {
+		t.Fatalf("CreateSymlink(%q -> %q): %v", target, linkPath, err)
 	}
 }

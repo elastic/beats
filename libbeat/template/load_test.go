@@ -193,7 +193,7 @@ func TestFileLoader_Load(t *testing.T) {
 						},
 						"analysis": mapstr.M{
 							"analyzer": mapstr.M{
-								"test_powershell": map[string]interface{}{
+								"test_powershell": map[string]any{
 									"type":    "pattern",
 									"pattern": "[\\W&&[^-]]+",
 								},

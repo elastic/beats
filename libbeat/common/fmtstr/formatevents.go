@@ -88,7 +88,7 @@ var (
 )
 
 var eventCtxPool = &sync.Pool{
-	New: func() interface{} { return &eventEvalContext{} },
+	New: func() any { return &eventEvalContext{} },
 }
 
 func newEventCtx(sz int) *eventEvalContext {
@@ -153,7 +153,7 @@ func CompileEvent(in string) (*EventFormatString, error) {
 // (which must be a string). Unpack method satisfies go-ucfg.Unpacker interface
 // required by config.C, in order to use EventFormatString with
 // `common.(*Config).Unpack()`.
-func (fs *EventFormatString) Unpack(v interface{}) error {
+func (fs *EventFormatString) Unpack(v any) error {
 	s, err := tryConvString(v)
 	if err != nil {
 		return fmt.Errorf("error converting type %T to event formatter: %w", v, err)
@@ -359,14 +359,14 @@ func (e *eventFieldCompiler) compileTimestamp(
 	return &eventTimestampEvaler{formatter}, nil
 }
 
-func (e *eventFieldEvaler) Eval(c interface{}, out *bytes.Buffer) error {
+func (e *eventFieldEvaler) Eval(c any, out *bytes.Buffer) error {
 	ctx := c.(*eventEvalContext)
 	s := ctx.keys[e.index]
 	_, err := out.WriteString(s)
 	return err
 }
 
-func (e *defaultEventFieldEvaler) Eval(c interface{}, out *bytes.Buffer) error {
+func (e *defaultEventFieldEvaler) Eval(c any, out *bytes.Buffer) error {
 	ctx := c.(*eventEvalContext)
 	s := ctx.keys[e.index]
 	if s == "" {
@@ -376,7 +376,7 @@ func (e *defaultEventFieldEvaler) Eval(c interface{}, out *bytes.Buffer) error {
 	return err
 }
 
-func (e *eventTimestampEvaler) Eval(c interface{}, out *bytes.Buffer) error {
+func (e *eventTimestampEvaler) Eval(c any, out *bytes.Buffer) error {
 	ctx := c.(*eventEvalContext)
 	_, err := e.formatter.Write(out, ctx.ts)
 	return err
@@ -423,7 +423,7 @@ func fieldString(event *beat.Event, field string) (string, error) {
 	return s, nil
 }
 
-func tryConvString(v interface{}) (string, error) {
+func tryConvString(v any) (string, error) {
 	type stringer interface {
 		String() string
 	}

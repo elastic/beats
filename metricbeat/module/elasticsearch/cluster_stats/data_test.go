@@ -97,7 +97,7 @@ func TestMapper(t *testing.T) {
 		URI:          server.URL,
 		SanitizedURI: server.URL,
 		Host:         server.URL,
-	}, logptest.NewTestingLogger(t, ""))
+	}, logptest.NewTestingLogger(t, ""), "")
 	require.NoError(t, err)
 
 	elasticsearch.TestMapperWithHttpHelper(t, "./_meta/test/cluster_stats.*.json",
@@ -115,8 +115,8 @@ func TestData(t *testing.T) {
 		t.Fatal("write", err)
 	}
 }
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string) map[string]any {
+	return map[string]any{
 		"module":     elasticsearch.ModuleName,
 		"metricsets": []string{"cluster_stats"},
 		"hosts":      []string{host},

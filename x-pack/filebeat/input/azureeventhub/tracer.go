@@ -41,12 +41,12 @@ type logsOnlyTracer struct {
 // ----------------------------------------------------------------------------
 
 // StartSpan returns the input context and a no-op Spanner
-func (nt *logsOnlyTracer) StartSpan(ctx context.Context, operationName string, opts ...interface{}) (context.Context, tab.Spanner) {
+func (nt *logsOnlyTracer) StartSpan(ctx context.Context, operationName string, opts ...any) (context.Context, tab.Spanner) {
 	return ctx, &logsOnlySpanner{nt.logger}
 }
 
 // StartSpanWithRemoteParent returns the input context and a no-op Spanner
-func (nt *logsOnlyTracer) StartSpanWithRemoteParent(ctx context.Context, operationName string, carrier tab.Carrier, opts ...interface{}) (context.Context, tab.Spanner) {
+func (nt *logsOnlyTracer) StartSpanWithRemoteParent(ctx context.Context, operationName string, carrier tab.Carrier, opts ...any) (context.Context, tab.Spanner) {
 	return ctx, &logsOnlySpanner{nt.logger}
 }
 
@@ -87,7 +87,7 @@ func (ns *logsOnlySpanner) Inject(carrier tab.Carrier) error {
 }
 
 // InternalSpan returns nil
-func (ns *logsOnlySpanner) InternalSpan() interface{} {
+func (ns *logsOnlySpanner) InternalSpan() any {
 	return nil
 }
 
