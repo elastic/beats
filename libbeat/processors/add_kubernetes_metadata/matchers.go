@@ -37,12 +37,11 @@ const (
 	regexKeyGroupName      = "key"
 )
 
-// Matcher takes a new event and returns the index
+// Matcher takes a new event and returns the indexes to look it up under.
 type Matcher interface {
-	// MetadataIndex returns the index string to use in annotation lookups for the given
-	// event. A previous indexer should have generated that index for this to work
-	// This function can return "" if the event doesn't match
-	MetadataIndex(event mapstr.M) string
+	// MetadataIndexCandidates returns lookup indexes ordered most-to-least specific;
+	// the first cache hit wins. Returns nil if the event doesn't match.
+	MetadataIndexCandidates(event mapstr.M) []string
 }
 
 type Matchers struct {
@@ -76,19 +75,46 @@ func NewMatchers(configs PluginConfig, logger *logp.Logger) *Matchers {
 	}
 }
 
-// MetadataIndex returns the index string for the first matcher from the Registry returning one
-func (m *Matchers) MetadataIndex(event mapstr.M) string {
+// MetadataIndexCandidates returns the candidate indexes from the first matcher that yields one.
+func (m *Matchers) MetadataIndexCandidates(event mapstr.M) []string {
 	for _, matcher := range m.matchers {
-		index := matcher.MetadataIndex(event)
-		if index != "" {
-			return index
+		candidates := matcher.MetadataIndexCandidates(event)
+		if len(candidates) > 0 {
+			return candidates
 		}
 	}
-
-	// No index returned
-	return ""
+	return nil
 }
 
+<<<<<<< HEAD
+=======
+// pdataMatcher is an optional Matcher extension for native pcommon.Map lookups, avoiding mapstr.M conversion.
+type pdataMatcher interface {
+	MetadataIndexCandidatesPdata(body pcommon.Map) []string
+}
+
+// MetadataIndexCandidatesPdata is the pdata-native variant of MetadataIndexCandidates;
+// converts to mapstr.M lazily and only once for matchers that don't implement pdataMatcher.
+func (m *Matchers) MetadataIndexCandidatesPdata(body pcommon.Map) []string {
+	var fallback mapstr.M
+	for _, matcher := range m.matchers {
+		if pm, ok := matcher.(pdataMatcher); ok {
+			if candidates := pm.MetadataIndexCandidatesPdata(body); len(candidates) > 0 {
+				return candidates
+			}
+		} else {
+			if fallback == nil {
+				fallback = otelmap.ToMapstr(body)
+			}
+			if candidates := matcher.MetadataIndexCandidates(fallback); len(candidates) > 0 {
+				return candidates
+			}
+		}
+	}
+	return nil
+}
+
+>>>>>>> 352e67a (add_kubernetes_metadata: enrich /var/log/pods events with container id/runtime (#53300))
 func (m *Matchers) Empty() bool {
 	return len(m.matchers) == 0
 }
@@ -129,7 +155,7 @@ func NewFieldMatcher(cfg config.C, _ *logp.Logger) (Matcher, error) {
 	return &FieldMatcher{MatchFields: matcherConfig.LookupFields, Regexp: regex}, nil
 }
 
-func (f *FieldMatcher) MetadataIndex(event mapstr.M) string {
+func (f *FieldMatcher) MetadataIndexCandidates(event mapstr.M) []string {
 	for _, field := range f.MatchFields {
 		fieldIface, err := event.GetValue(field)
 		if err != nil {
@@ -140,7 +166,10 @@ func (f *FieldMatcher) MetadataIndex(event mapstr.M) string {
 			continue
 		}
 		if f.Regexp == nil {
-			return fieldValue
+			if fieldValue == "" {
+				continue
+			}
+			return []string{fieldValue}
 		}
 
 		matches := f.Regexp.FindStringSubmatch(fieldValue)
@@ -150,13 +179,41 @@ func (f *FieldMatcher) MetadataIndex(event mapstr.M) string {
 		keyIndex := f.Regexp.SubexpIndex(regexKeyGroupName)
 		key := matches[keyIndex]
 		if key != "" {
-			return key
+			return []string{key}
 		}
 	}
 
-	return ""
+	return nil
 }
 
+<<<<<<< HEAD
+=======
+func (f *FieldMatcher) MetadataIndexCandidatesPdata(body pcommon.Map) []string {
+	for _, field := range f.MatchFields {
+		v, ok := otelmap.GetAtPath(field, body)
+		if !ok || v.Type() != pcommon.ValueTypeStr {
+			continue
+		}
+		fieldValue := v.Str()
+		if f.Regexp == nil {
+			if fieldValue == "" {
+				continue
+			}
+			return []string{fieldValue}
+		}
+		matches := f.Regexp.FindStringSubmatch(fieldValue)
+		if matches == nil {
+			continue
+		}
+		key := matches[f.Regexp.SubexpIndex(regexKeyGroupName)]
+		if key != "" {
+			return []string{key}
+		}
+	}
+	return nil
+}
+
+>>>>>>> 352e67a (add_kubernetes_metadata: enrich /var/log/pods events with container id/runtime (#53300))
 type FieldFormatMatcher struct {
 	Codec codec.Codec
 }
@@ -181,7 +238,7 @@ func NewFieldFormatMatcher(cfg config.C, _ *logp.Logger) (Matcher, error) {
 
 }
 
-func (f *FieldFormatMatcher) MetadataIndex(event mapstr.M) string {
+func (f *FieldFormatMatcher) MetadataIndexCandidates(event mapstr.M) []string {
 	bytes, err := f.Codec.Encode("", &beat.Event{
 		Fields: event,
 	})
@@ -191,8 +248,8 @@ func (f *FieldFormatMatcher) MetadataIndex(event mapstr.M) string {
 	}
 
 	if len(bytes) == 0 {
-		return ""
+		return nil
 	}
 
-	return string(bytes)
+	return []string{string(bytes)}
 }

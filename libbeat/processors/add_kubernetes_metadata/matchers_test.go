@@ -53,15 +53,21 @@ func TestFieldMatcher(t *testing.T) {
 		"foo": "bar",
 	}
 
-	out := matcher.MetadataIndex(input)
-	assert.Equal(t, "bar", out)
+	out := matcher.MetadataIndexCandidates(input)
+	assert.Equal(t, []string{"bar"}, out)
 
 	nonMatchInput := mapstr.M{
 		"not": "match",
 	}
 
-	out = matcher.MetadataIndex(nonMatchInput)
+	out = matcher.MetadataIndexCandidates(nonMatchInput)
 	assert.Empty(t, out)
+
+	// An empty-string field value must be skipped, not returned as a candidate.
+	// Without this guard, [""] would block all subsequent matchers in the chain.
+	emptyInput := mapstr.M{"foo": ""}
+	out = matcher.MetadataIndexCandidates(emptyInput)
+	assert.Empty(t, out, "empty-string field value must not produce a candidate")
 }
 
 func TestFieldMatcherRegex(t *testing.T) {
@@ -94,16 +100,31 @@ func TestFieldMatcherRegex(t *testing.T) {
 		"foo": "bar-keyvalue-suffix",
 	}
 
-	out := matcher.MetadataIndex(input)
-	assert.Equal(t, "keyvalue", out)
+	out := matcher.MetadataIndexCandidates(input)
+	assert.Equal(t, []string{"keyvalue"}, out)
 
 	nonMatchInput := mapstr.M{
 		"not": "match",
 		"foo": "nomatch",
 	}
 
-	out = matcher.MetadataIndex(nonMatchInput)
+	out = matcher.MetadataIndexCandidates(nonMatchInput)
 	assert.Empty(t, out)
+<<<<<<< HEAD
+=======
+
+	// MetadataIndexCandidatesPdata parity for the regex path.
+	pm, ok := matcher.(pdataMatcher)
+	require.True(t, ok, "FieldMatcher must implement pdataMatcher")
+
+	matchBody := pcommon.NewMap()
+	require.NoError(t, otelmap.FromMapstr(matchBody, input))
+	assert.Equal(t, []string{"keyvalue"}, pm.MetadataIndexCandidatesPdata(matchBody))
+
+	noMatchBody := pcommon.NewMap()
+	require.NoError(t, otelmap.FromMapstr(noMatchBody, nonMatchInput))
+	assert.Empty(t, pm.MetadataIndexCandidatesPdata(noMatchBody))
+>>>>>>> 352e67a (add_kubernetes_metadata: enrich /var/log/pods events with container id/runtime (#53300))
 }
 
 func TestFieldFormatMatcher(t *testing.T) {
@@ -129,13 +150,13 @@ func TestFieldFormatMatcher(t *testing.T) {
 		"pod":       "bar",
 	}
 
-	out := matcher.MetadataIndex(event)
-	assert.Equal(t, "foo/bar", out)
+	out := matcher.MetadataIndexCandidates(event)
+	assert.Equal(t, []string{"foo/bar"}, out)
 
 	event = mapstr.M{
 		"foo": "bar",
 	}
-	out = matcher.MetadataIndex(event)
+	out = matcher.MetadataIndexCandidates(event)
 	assert.Empty(t, out)
 
 	testCfg["format"] = `%{[dimensions.namespace]}/%{[dimensions.pod]}`
@@ -151,6 +172,60 @@ func TestFieldFormatMatcher(t *testing.T) {
 		},
 	}
 
-	out = matcher.MetadataIndex(event)
-	assert.Equal(t, "foo/bar", out)
+	out = matcher.MetadataIndexCandidates(event)
+	assert.Equal(t, []string{"foo/bar"}, out)
 }
+<<<<<<< HEAD
+=======
+
+// TestMetadataIndexCandidatesPdataFieldMatcherParity verifies that
+// MetadataIndexCandidatesPdata and MetadataIndexCandidates return the same result for
+// FieldMatcher, which implements pdataMatcher.
+func TestMetadataIndexCandidatesPdataFieldMatcherParity(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	cfg, err := config.NewConfigFrom(map[string]any{"lookup_fields": []string{"container.id"}})
+	require.NoError(t, err)
+	matcher, err := NewFieldMatcher(*cfg, logger)
+	require.NoError(t, err)
+
+	matchers := &Matchers{matchers: []Matcher{matcher}}
+
+	t.Run("match", func(t *testing.T) {
+		input := mapstr.M{"container": mapstr.M{"id": "abc123"}}
+		body := pcommon.NewMap()
+		require.NoError(t, otelmap.FromMapstr(body, input))
+		assert.Equal(t, matcher.MetadataIndexCandidates(input), matchers.MetadataIndexCandidatesPdata(body))
+	})
+
+	t.Run("no match", func(t *testing.T) {
+		input := mapstr.M{"unrelated": "field"}
+		body := pcommon.NewMap()
+		require.NoError(t, otelmap.FromMapstr(body, input))
+		assert.Empty(t, matchers.MetadataIndexCandidatesPdata(body))
+	})
+}
+
+// TestMetadataIndexCandidatesPdataFieldFormatMatcherFallback verifies that
+// MetadataIndexCandidatesPdata falls back to a ToMapstr conversion for FieldFormatMatcher,
+// which does not implement pdataMatcher, and still returns the correct candidates.
+func TestMetadataIndexCandidatesPdataFieldFormatMatcherFallback(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	cfg, err := config.NewConfigFrom(map[string]any{"format": `%{[namespace]}/%{[pod]}`})
+	require.NoError(t, err)
+	matcher, err := NewFieldFormatMatcher(*cfg, logger)
+	require.NoError(t, err)
+
+	// FieldFormatMatcher must NOT implement pdataMatcher — the fallback path is what we are testing.
+	_, isPdata := matcher.(pdataMatcher)
+	require.False(t, isPdata, "FieldFormatMatcher must not implement pdataMatcher so the fallback is exercised")
+
+	matchers := &Matchers{matchers: []Matcher{matcher}}
+	input := mapstr.M{"namespace": "myns", "pod": "mypod"}
+
+	body := pcommon.NewMap()
+	require.NoError(t, otelmap.FromMapstr(body, input))
+
+	assert.Equal(t, []string{"myns/mypod"}, matchers.MetadataIndexCandidatesPdata(body),
+		"FieldFormatMatcher fallback must return the same candidates as MetadataIndexCandidates")
+}
+>>>>>>> 352e67a (add_kubernetes_metadata: enrich /var/log/pods events with container id/runtime (#53300))

@@ -58,10 +58,21 @@ type initializedState struct {
 }
 
 type kubernetesAnnotator struct {
+<<<<<<< HEAD
 	log      *logp.Logger
 	state    atomic.Pointer[initializedState]
 	cache    *cache
 	initOnce sync.Once
+=======
+	log          *logp.Logger
+	state        atomic.Pointer[initializedState]
+	cache        *cache
+	indexed      sync.Map
+	initOnce     sync.Once
+	wg           sync.WaitGroup
+	cancelCtx    context.CancelFunc
+	appendFields bool
+>>>>>>> 352e67a (add_kubernetes_metadata: enrich /var/log/pods events with container id/runtime (#53300))
 }
 
 func init() {
@@ -302,30 +313,30 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 		// be populated before trying to generate metadata for Pods.
 		if nodeWatcher != nil {
 			if err := nodeWatcher.Start(); err != nil {
-				k.log.Debugf("Couldn't start node watcher: %v", err)
+				k.log.Errorf("Couldn't start node watcher: %v", err)
 				return
 			}
 		}
 		if namespaceWatcher != nil {
 			if err := namespaceWatcher.Start(); err != nil {
-				k.log.Debugf("Couldn't start namespace watcher: %v", err)
+				k.log.Errorf("Couldn't start namespace watcher: %v", err)
 				return
 			}
 		}
 		if replicaSetWatcher != nil {
 			if err := replicaSetWatcher.Start(); err != nil {
-				k.log.Debugf("Couldn't start replicaSet watcher: %v", err)
+				k.log.Errorf("Couldn't start replicaSet watcher: %v", err)
 				return
 			}
 		}
 		if jobWatcher != nil {
 			if err := jobWatcher.Start(); err != nil {
-				k.log.Debugf("Couldn't start job watcher: %v", err)
+				k.log.Errorf("Couldn't start job watcher: %v", err)
 				return
 			}
 		}
 		if err := watcher.Start(); err != nil {
-			k.log.Debugf("Couldn't start pod watcher: %v", err)
+			k.log.Errorf("Couldn't start pod watcher: %v", err)
 			return
 		}
 	})
@@ -345,14 +356,14 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 
-	index := state.matchers.MetadataIndex(event.Fields)
-	if index == "" {
+	candidates := state.matchers.MetadataIndexCandidates(event.Fields)
+	if len(candidates) == 0 {
 		k.log.Debug("No container match string, not adding kubernetes data")
 		return event, nil
 	}
-
-	metadata := k.cache.get(index)
+	metadata := k.cache.getFirstMatch(candidates)
 	if metadata == nil {
+		k.log.Debugf("Candidates %v found but none matched in cache, not adding kubernetes data", candidates)
 		return event, nil
 	}
 
@@ -360,9 +371,56 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	// container field. This replaces the original three full clones.
 	kubeMeta := metadata.Clone()
 
+<<<<<<< HEAD
 	// Build the OCI container field by cloning only the container sub-map —
 	// much cheaper than cloning the full metadata. Transform it in place:
 	// drop container.name and rewrite container.image -> container.image.name.
+=======
+	return event, nil
+}
+
+// RunPdata enriches the given pcommon.Map directly with Kubernetes metadata
+func (k *kubernetesAnnotator) RunPdata(body pcommon.Map) (bool, error) {
+	if _, ok := body.Get("kubernetes"); ok && !k.appendFields {
+		return false, nil
+	}
+
+	// A nil state means init has not published yet (still running or kubernetes unavailable); the
+	// load pairs with the Store in init for a race-free read.
+	state := k.state.Load()
+	if state == nil {
+		return false, nil
+	}
+
+	candidates := state.matchers.MetadataIndexCandidatesPdata(body)
+	if len(candidates) == 0 {
+		k.log.Debug("No container match string, not adding kubernetes data")
+		return false, nil
+	}
+	metadata := k.cache.getFirstMatch(candidates)
+	if metadata == nil {
+		k.log.Debugf("Candidates %v found but none matched in cache, not adding kubernetes data", candidates)
+		return false, nil
+	}
+
+	kubeMeta, ociContainer := prepareKubeMetadata(metadata)
+	overwrite := !k.appendFields
+	if ociContainer != nil {
+		if err := otelmap.MergeMapstrIntoPdata(mapstr.M{"container": ociContainer}, body, overwrite); err != nil {
+			return false, err
+		}
+	}
+	return false, otelmap.MergeMapstrIntoPdata(kubeMeta, body, overwrite)
+}
+
+// prepareKubeMetadata clones the cached metadata, builds the OCI container
+// sub-map from kubernetes.container (dropping name, rewriting image), and
+// strips the kubernetes-only container fields. container.name is kept in
+// kubeMeta to match original behaviour.
+// ociContainer is nil when the kubernetes.container sub-map is absent.
+func prepareKubeMetadata(metadata mapstr.M) (kubeMeta mapstr.M, ociContainer mapstr.M) {
+	kubeMeta = metadata.Clone()
+>>>>>>> 352e67a (add_kubernetes_metadata: enrich /var/log/pods events with container id/runtime (#53300))
 	if containerVal, err := kubeMeta.GetValue("kubernetes.container"); err == nil {
 		if cm, ok := containerVal.(mapstr.M); ok {
 			ociContainer := cm.Clone()
@@ -374,10 +432,15 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 			event.Fields.DeepUpdate(mapstr.M{"container": ociContainer})
 		}
 	}
+<<<<<<< HEAD
 
 	// Remove container fields that belong only in the OCI section before writing
 	// kubernetes metadata to the event. container.name is intentionally kept here
 	// to match original behaviour.
+=======
+	// Prevent these fields from leaking into kubernetes.container.*; add new container.*
+	// fields from PodUIDIndexer.GetMetadata here too.
+>>>>>>> 352e67a (add_kubernetes_metadata: enrich /var/log/pods events with container id/runtime (#53300))
 	_ = kubeMeta.Delete("kubernetes.container.id")
 	_ = kubeMeta.Delete("kubernetes.container.runtime")
 	_ = kubeMeta.Delete("kubernetes.container.image")
@@ -414,28 +477,49 @@ func (k *kubernetesAnnotator) Close() error {
 }
 
 func (k *kubernetesAnnotator) addPod(indexers *Indexers, pod *kubernetes.Pod) {
-	metadata := indexers.GetMetadata(pod)
-	for _, m := range metadata {
-		k.cache.set(m.Index, m.Data)
+	uid := string(pod.GetObjectMeta().GetUID())
+	// Load old keys before computing new metadata so the swap is atomic.
+	var oldKeys []string
+	if prev, ok := k.indexed.LoadAndDelete(uid); ok {
+		oldKeys, _ = prev.([]string)
+	}
+	// Compute new metadata outside the lock — may be slow for pods with many containers.
+	metadatas := indexers.GetMetadata(pod)
+	// Atomically evict old entries and write new ones; readers see old state or new, never partial.
+	k.cache.batchUpdate(oldKeys, metadatas)
+	newKeys := make([]string, 0, len(metadatas))
+	for _, m := range metadatas {
+		newKeys = append(newKeys, m.Index)
+	}
+	k.indexed.Store(uid, newKeys)
+}
+
+// deleteRecordedIndexes evicts all cache keys previously stored for uid by addPod.
+// Keys are tracked because they change between updates (e.g. restart-count indexes).
+func (k *kubernetesAnnotator) deleteRecordedIndexes(uid string) {
+	if prev, ok := k.indexed.LoadAndDelete(uid); ok {
+		idxs, _ := prev.([]string)
+		for _, idx := range idxs {
+			k.cache.delete(idx)
+		}
 	}
 }
 
 func (k *kubernetesAnnotator) updatePod(indexers *Indexers, pod *kubernetes.Pod) {
-	k.removePod(indexers, pod)
-
-	// Add it again only if it is not being deleted
+	// For a deletion, evict and stop. For a normal update, addPod handles eviction
+	// atomically — calling deleteRecordedIndexes here would create an empty-cache window.
 	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
+		uid := string(pod.GetObjectMeta().GetUID())
+		k.deleteRecordedIndexes(uid)
 		return
 	}
 
 	k.addPod(indexers, pod)
 }
 
-func (k *kubernetesAnnotator) removePod(indexers *Indexers, pod *kubernetes.Pod) {
-	indexes := indexers.GetIndexes(pod)
-	for _, idx := range indexes {
-		k.cache.delete(idx)
-	}
+func (k *kubernetesAnnotator) removePod(_ *Indexers, pod *kubernetes.Pod) {
+	uid := string(pod.GetObjectMeta().GetUID())
+	k.deleteRecordedIndexes(uid)
 }
 
 func (*kubernetesAnnotator) String() string {
