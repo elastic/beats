@@ -298,7 +298,9 @@ func TestManager_CreateConcurrentCleanTimeout(t *testing.T) {
 			if !assert.NoError(t, err) {
 				return
 			}
-			timeouts[i] = inp.(*managedInput).cleanTimeout
+			managed, ok := inp.(*managedInput)
+			require.True(t, ok, "Create must return a *managedInput, got %T", inp)
+			timeouts[i] = managed.cleanTimeout
 		})
 	}
 	close(start)
