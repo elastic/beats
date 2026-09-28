@@ -19,5 +19,5 @@ func init() {
 // AssetStatsd returns asset data.
 // This is the base64 encoded zlib format compressed contents of module/statsd.
 func AssetStatsd() string {
-	return "eJyUkUuKhTAUROdZRZGJINgLyKA30QuQdHKVdOdHch24+4e/RwYOnjirOiXnkgH/tCpU1lytANixJwX5swdSAJaqKS6zS1HhWwDAUSIku3gSQCFPupLCrAUwOfK2qp0cEHWg5v9byGve2JKWfCbtpJ11/ZdJS+Tu3Vzr9PtHhpv4CMaj9SnO990YdM4uzicoN1I26M2113devQtRqXey/VPRySfNn5n2zzQDcXGmtWxf6TUABjCLZg=="
+	return "eJyUkTtqxTAQRXut4qLGYHAWoCKbyAKMIo2NEv2QxoV3H/wL4uFXeMp7z4gzaMAvrQqVNVcrAHbsSUF+7YEUgKVqisvsUlT4FABwlAjJLp4EUMiTrqQwawFMjrytaicHRB2oeX8bXvPGlrTkM2lX2rWu/zBpidz9N9d2+v4hw018BOPR+hTn+24MOmcX5xOUGykb9Obaa86rdyEq9U62fyo6+aTflK+m/TPNQFycaS3bX/oLAAD//wYwi2Y="
 }

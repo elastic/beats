@@ -32,5 +32,5 @@ func init() {
 // AssetRedis returns asset data.
 // This is the base64 encoded zlib format compressed contents of protos/redis.
 func AssetRedis() string {
-	return "eJyMkL1uwzAMhHc9xSFzkwfw0L1r0b1grHMs1JIMkg7gty/8kzZBMxRcJJHf3YlHfHFuoIzJAuDJBzY4vC/3QwAirdU0eqqlwWsAgLV3tJFt6lILXlkcXeIQ7RSwn5p19Igimb/yS/k8ssFF6zTuL/fEI+WTls+rDBN/mk8j3eqj505hpVA7eM8tMtqas5SIVCDopywFSolyHoiuahY/hT8hqFr1f+5vz8x6MShtGpybc9kkX+B9sm1baGtxScUW/kFyHUWmmVxuX2PEeb5zMuqVegrhewDBP4pi"
+	return "eJyMj71uwzAMhHc9xSFzkwfw0L1r0b1grHMs1JIMkg7gty/8kzZBM5STRPK7Ox7xxbmBMiYLgCcf2ODwvvwPAYi0VtPoqZYGrwEA1tnRRrapSy14ZXF0iUO0U8D+atbVI4pk/sov5fPIBhet07h37olHyictn1cZJv4Mn0a61UfPncJKoXbwnltktDVnKRGpQNBPWQqUEuU8EF3VLH4Kf0JQter/3N+emfViUNo0ODfnskm+wPtk2+1oa3FJxRb+QXJdRaaZXG6nMeI83zkZ9Uo9hfAdAAD//8E/imI="
 }
