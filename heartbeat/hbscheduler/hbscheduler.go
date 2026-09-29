@@ -95,12 +95,20 @@ type sharedScheduler struct {
 	users    int
 }
 
-var (
+// groups holds the scheduler handed out for each group.
+type groups struct {
 	mtx sync.Mutex
-	// schedulers holds the scheduler handed out for each group. Entries are
-	// removed when their last consumer releases them.
-	schedulers = map[string]*sharedScheduler{}
-)
+	// schedulers is keyed by group. Entries are removed when their last
+	// consumer releases them.
+	schedulers map[string]*sharedScheduler
+}
+
+func newGroups() *groups {
+	return &groups{schedulers: map[string]*sharedScheduler{}}
+}
+
+// processGroups are the groups shared by every Heartbeat in this process.
+var processGroups = newGroups()
 
 // Acquire returns the scheduler shared by the given group, creating it from
 // params if the group does not have one yet. Later callers for the same group
@@ -117,12 +125,16 @@ var (
 // scheduler. A group's scheduler is stopped when its last consumer releases it,
 // and the next Acquire for the group creates a new one.
 func Acquire(logger *logp.Logger, group string, params Params) (*scheduler.Scheduler, ReleaseFunc, error) {
+	return processGroups.acquire(logger, group, params)
+}
+
+func (g *groups) acquire(logger *logp.Logger, group string, params Params) (*scheduler.Scheduler, ReleaseFunc, error) {
 	logger = logger.Named("hbscheduler").With("scheduler_group", group)
 
-	mtx.Lock()
-	defer mtx.Unlock()
+	g.mtx.Lock()
+	defer g.mtx.Unlock()
 
-	shared, ok := schedulers[group]
+	shared, ok := g.schedulers[group]
 	if !ok {
 		shared = &sharedScheduler{
 			group: group,
@@ -137,7 +149,7 @@ func Acquire(logger *logp.Logger, group string, params Params) (*scheduler.Sched
 			settings: params.settings(),
 			runOnce:  params.RunOnce,
 		}
-		schedulers[group] = shared
+		g.schedulers[group] = shared
 	} else if shared.runOnce != params.RunOnce {
 		return nil, nil, fmt.Errorf(
 			"scheduler group %q already has run_once=%t, a consumer with run_once=%t cannot join it; "+
@@ -156,13 +168,13 @@ func Acquire(logger *logp.Logger, group string, params Params) (*scheduler.Sched
 
 	var once sync.Once
 	return shared.sched, func() {
-		once.Do(func() { release(logger, shared) })
+		once.Do(func() { g.release(logger, shared) })
 	}, nil
 }
 
-func release(logger *logp.Logger, shared *sharedScheduler) {
-	mtx.Lock()
-	defer mtx.Unlock()
+func (g *groups) release(logger *logp.Logger, shared *sharedScheduler) {
+	g.mtx.Lock()
+	defer g.mtx.Unlock()
 
 	shared.users--
 	if shared.users > 0 {
@@ -170,7 +182,7 @@ func release(logger *logp.Logger, shared *sharedScheduler) {
 		return
 	}
 
-	delete(schedulers, shared.group)
+	delete(g.schedulers, shared.group)
 	logger.Debug("released shared scheduler, stopping it as it has no consumers left")
 	shared.sched.Stop()
 }
