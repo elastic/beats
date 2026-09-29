@@ -42,6 +42,7 @@ steps:
           upload: ${DRA_UPLOAD}
 
   - label: ":memo: Annotate DRA build (${WORKFLOW})"
+    if: build.env('DRY_RUN') != "true"
     depends_on: "dra-prep-${WORKFLOW}"
     command: ".buildkite/scripts/dra-annotate.sh ${WORKFLOW}"
     agents:
