@@ -28,7 +28,8 @@
 //
 // Acquire hands out reference counted schedulers grouped by an opaque key, so
 // that instances which should share concurrency bounds also share a scheduler.
-// Callers that want the standalone Heartbeat behavior pass an empty group.
+// A standalone Heartbeat uses the empty, default, group, of which it is the
+// only member.
 package hbscheduler
 
 import (

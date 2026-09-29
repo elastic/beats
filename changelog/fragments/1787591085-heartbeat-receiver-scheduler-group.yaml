@@ -28,6 +28,11 @@ description: |
   single Heartbeat process they were split out of. The setting defaults to the
   receiver's own id, so behavior is unchanged unless a group is configured.
 
+  The scheduler of a group is configured by the first receiver of the group to
+  start. Conflicting scheduler and job limits of later receivers are logged and
+  ignored. Receivers of one group must agree on `run_once`: a receiver that
+  does not fails to start.
+
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
 component: heartbeat
 
