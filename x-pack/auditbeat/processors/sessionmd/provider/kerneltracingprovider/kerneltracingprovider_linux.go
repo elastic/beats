@@ -130,12 +130,13 @@ func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Regis
 				stats.Lost.Set(metrics.Lost)
 				stats.NonAggregations.Set(metrics.NonAggregations)
 				stats.Removals.Set(metrics.Removals)
+				stats.Stalls.Set(metrics.Stalls)
 				lastUpdate = time.Now()
 			}
 
 			// Quark is idle, Block for a bit
 			if !ok {
-				err = qq.Block()
+				err := qq.Block()
 				if err != nil {
 					logger.Errorw("quark block, no more process enrichment from this processor will be done", "error", err)
 					break
@@ -354,7 +355,7 @@ func (p *prvdr) fillParent(process *types.Process, ppid uint32, epoch uint64) {
 	if ok {
 		process.Parent.Group.Name = groupname
 	}
-	process.Parent.EntityID = calculateEntityIDv1(ppid, *process.Start)
+	process.Parent.EntityID = calculateEntityIDv1(ppid, *process.Parent.Start)
 }
 
 // fillGroupLeader populates the process group leader fields with the attributes of the process with PID `pgid`

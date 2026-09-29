@@ -29,6 +29,7 @@ var quarkMetrics = struct {
 	nonAggregations    *monitoring.Uint
 	garbageCollections *monitoring.Uint
 	lost               *monitoring.Uint
+	stalls             *monitoring.Uint
 	backend            *monitoring.String
 }{}
 
@@ -40,6 +41,7 @@ func init() {
 	quarkMetrics.nonAggregations = monitoring.NewUint(reg, "non_aggregations")
 	quarkMetrics.garbageCollections = monitoring.NewUint(reg, "garbage_collections")
 	quarkMetrics.lost = monitoring.NewUint(reg, "lost")
+	quarkMetrics.stalls = monitoring.NewUint(reg, "stalls")
 	quarkMetrics.backend = monitoring.NewString(reg, "backend", monitoring.Report)
 }
 
@@ -344,6 +346,7 @@ func (ms *QuarkMetricSet) maybeUpdateMetrics(stamp *time.Time) {
 	quarkMetrics.nonAggregations.Set(stats.NonAggregations)
 	quarkMetrics.garbageCollections.Set(stats.GarbageCollections)
 	quarkMetrics.lost.Set(stats.Lost)
+	quarkMetrics.stalls.Set(stats.Stalls)
 	switch stats.Backend {
 	case quark.QQ_EBPF:
 		quarkMetrics.backend.Set("ebpf")
