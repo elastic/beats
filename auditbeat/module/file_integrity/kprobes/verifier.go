@@ -153,10 +153,21 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 
 	m, err := newMonitor(ctx, true, pChannel, exec)
 	if err != nil {
+<<<<<<< HEAD
 		return err
+=======
+		if closeErr := pChannel.Close(); closeErr != nil {
+			logger.Warnf("error closing perf channel after monitor creation failure: %v", closeErr)
+		}
+		return fmt.Errorf("error creating events monitor: %w", err)
+>>>>>>> a6ff8d8 (auditbeat/module/file_integrity/kprobes: remove kprobes on teardown (#53253))
 	}
 
-	defer m.Close()
+	defer func() {
+		if closeErr := m.Close(); closeErr != nil {
+			logger.Warnf("error closing verification monitor: %v", closeErr)
+		}
+	}()
 
 	// start the monitor
 	if err := m.Start(); err != nil {

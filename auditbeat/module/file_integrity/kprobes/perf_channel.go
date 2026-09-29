@@ -20,6 +20,12 @@
 package kprobes
 
 import (
+<<<<<<< HEAD
+=======
+	"errors"
+	"fmt"
+	"sync"
+>>>>>>> a6ff8d8 (auditbeat/module/file_integrity/kprobes: remove kprobes on teardown (#53253))
 	"time"
 
 	"github.com/elastic/beats/v7/auditbeat/tracing"
@@ -33,7 +39,50 @@ type perfChannel interface {
 	Close() error
 }
 
-func newPerfChannel(probes map[tracing.Probe]tracing.AllocateFn, ringSizeExponent int, bufferSize int, pid int) (*tracing.PerfChannel, error) {
+// probeChannel wraps a PerfChannel and takes ownership of the kprobes it
+// registers in tracefs. Its Close method deregisters the probes after closing
+// perf event fds, which is the order the kernel requires: a kprobe cannot be
+// removed while a perf event still holds a reference to it (EBUSY).
+type probeChannel struct {
+	*tracing.PerfChannel
+	tfs       *tracing.TraceFS
+	installed []tracing.Probe
+
+	once sync.Once
+	err  error
+}
+
+var _ perfChannel = (*probeChannel)(nil)
+
+// Close closes the perf event fds and then removes the registered kprobes.
+// The sync.Once makes repeated and concurrent calls safe: PerfChannel.Close
+// panics on a second call (it closes an already-closed channel internally).
+//
+// Close is idempotent and safe for concurrent use.
+func (c *probeChannel) Close() error {
+	c.once.Do(func() {
+		// Uninstall even if PerfChannel.Close failed, so cleanup is
+		// always attempted regardless of perf errors.
+		c.err = errors.Join(c.PerfChannel.Close(), c.uninstall())
+	})
+	return c.err
+}
+
+func (c *probeChannel) uninstall() error {
+	var errs []error
+	for _, p := range c.installed {
+		if err := c.tfs.RemoveKProbe(p); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	c.installed = nil
+	return errors.Join(errs...)
+}
+
+// newPerfChannel creates a probeChannel for the given probes. If any step
+// fails, probes that were already registered are removed and the channel is
+// closed before returning, leaving the kernel in a clean state.
+func newPerfChannel(probes map[tracing.Probe]tracing.AllocateFn, ringSizeExponent int, bufferSize int, pid int) (_ *probeChannel, retErr error) {
 	tfs, err := tracing.NewTraceFS()
 	if err != nil {
 		return nil, err
@@ -51,13 +100,56 @@ func newPerfChannel(probes map[tracing.Probe]tracing.AllocateFn, ringSizeExponen
 		return nil, err
 	}
 
+<<<<<<< HEAD
 	for probe, allocFn := range probes {
 		_ = tfs.RemoveKProbe(probe)
 
 		err := tfs.AddKProbe(probe)
 		if err != nil {
 			return nil, err
+=======
+	pc := &probeChannel{
+		PerfChannel: pChannel,
+		tfs:         tfs,
+	}
+
+	defer func() {
+		if retErr != nil {
+			// Close removes registered probes after closing fds. The
+			// rollback error is not joined to retErr: the original
+			// cause is what the caller needs to see.
+			_ = pc.Close()
 		}
+	}()
+
+	// List existing probes before touching anything. If a probe from our
+	// group is already present, remove it explicitly; treat failure (e.g.
+	// EBUSY from a live concurrent instance) as fatal and surface it rather
+	// than converting it to a confusing EEXIST from AddKProbe.
+	existing, err := tfs.ListKProbes()
+	if err != nil {
+		return nil, fmt.Errorf("error listing existing kprobes: %w", err)
+	}
+	existingSet := make(map[[2]string]struct{}, len(existing))
+	for _, p := range existing {
+		existingSet[[2]string{p.Group, p.Name}] = struct{}{}
+	}
+
+	for probe, allocFn := range probes {
+		if _, ok := existingSet[[2]string{probe.Group, probe.Name}]; ok {
+			if err := tfs.RemoveKProbe(probe); err != nil {
+				return nil, fmt.Errorf("error removing stale %s probe: %w", probe.Name, err)
+			}
+		}
+
+		if err := tfs.AddKProbe(probe); err != nil {
+			return nil, fmt.Errorf("error adding %s probe: %w", probe.Name, err)
+>>>>>>> a6ff8d8 (auditbeat/module/file_integrity/kprobes: remove kprobes on teardown (#53253))
+		}
+		// Record the probe immediately after a successful add, before any
+		// fallible step, so the defer rollback can remove it on failure.
+		pc.installed = append(pc.installed, probe)
+
 		desc, err := tfs.LoadProbeFormat(probe)
 		if err != nil {
 			return nil, err
@@ -73,5 +165,5 @@ func newPerfChannel(probes map[tracing.Probe]tracing.AllocateFn, ringSizeExponen
 		}
 	}
 
-	return pChannel, nil
+	return pc, nil
 }
