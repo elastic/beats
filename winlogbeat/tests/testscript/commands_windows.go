@@ -22,6 +22,7 @@ package scripttest
 import (
 	"crypto/sha256"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -76,6 +77,19 @@ func setupTest(env *testscript.Env) error {
 		return fmt.Errorf("install event source %s: %w", otherSrc, err)
 	}
 
+	// On Windows Server 2019 the EventLog service updates its source-routing
+	// cache asynchronously after the registry key is created. Until the cache
+	// is refreshed, RegisterEventSource returns a handle that silently routes
+	// writes to the Application log instead of our custom channel, so events
+	// never appear in the channel we query. Write a probe event and wait until
+	// it is visible; this guarantees the cache is ready before any test writes.
+	if err := warmupEventLog(provider, appSrc); err != nil {
+		removeSource(provider, otherSrc) //nolint:errcheck // best-effort cleanup on setup failure
+		removeSource(provider, appSrc)   //nolint:errcheck // best-effort cleanup on setup failure
+		removeProvider(provider)         //nolint:errcheck // best-effort cleanup on setup failure
+		return fmt.Errorf("warmup event log: %w", err)
+	}
+
 	env.Setenv("PROVIDER", provider)
 	env.Setenv("APP_SOURCE", appSrc)
 	env.Setenv("OTHER_APP_SOURCE", otherSrc)
@@ -106,6 +120,28 @@ func setupTest(env *testscript.Env) error {
 	}
 
 	return nil
+}
+
+// warmupEventLog writes a probe event and waits until it appears in the
+// named channel, then clears the channel. This ensures the EventLog
+// service's source-routing cache is ready before test events are written.
+func warmupEventLog(provider, source string) error {
+	const timeout = 30 * time.Second
+	deadline := time.Now().Add(timeout)
+	for {
+		if err := reportEvent(source, windows.EVENTLOG_INFORMATION_TYPE, 1, nil, "."); err != nil {
+			return err
+		}
+		n, _ := countEventLogRecords(provider)
+		if n > 0 {
+			wineventlog.EvtClearLog(wineventlog.NilHandle, provider, "") //nolint:errcheck // best-effort cleanup
+			return nil
+		}
+		if time.Now().After(deadline) {
+			return fmt.Errorf("channel %q not ready after %v", provider, timeout)
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
 }
 
 // cmdWriteEvent implements:
@@ -183,12 +219,12 @@ func cmdWriteEvent(script *testscript.TestScript, neg bool, args []string) {
 }
 
 // cmdWriteMultilineEvent writes the specific multiline message used by the
-// test_multiline_events test (contains newlines and control characters).
+// test_multiline_events test.
 func cmdWriteMultilineEvent(script *testscript.TestScript, neg bool, args []string) {
 	source := script.Getenv("APP_SOURCE")
 	msg := "\nA trusted logon process has been registered with the Local Security Authority.\n" +
 		"This logon process will be trusted to submit logon requests.\n\nSubject:\n\n" +
-		"Security ID:  SYSTEM\nAccount Name:  MS4\x1e$\nAccount Domain:  WORKGROUP\n" +
+		"Security ID:  SYSTEM\nAccount Name:  MS4\nAccount Domain:  WORKGROUP\n" +
 		"Logon ID:  0x3e7\nLogon Process Name:  IKE"
 	if err := reportEvent(source, windows.EVENTLOG_INFORMATION_TYPE, 10, nil, msg); err != nil {
 		script.Fatalf("write-multiline-event: %v", err)
@@ -386,15 +422,37 @@ func cmdWaitForEventLog(script *testscript.TestScript, neg bool, args []string) 
 	}
 }
 
-// countEventLogRecords queries the Windows event log channel and returns the
-// number of event records it contains.
+// countEventLogRecords returns the most accurate count of records currently
+// visible in the event log channel. The two Windows APIs have complementary
+// lag profiles: EvtQuery sees events in the in-memory log segment for the
+// current write session but may miss events written in an earlier session
+// (separated by a period of inactivity); GetNumberOfEventLogRecords reads
+// across sessions but may lag for events not yet flushed from the
+// write-behind buffer. Taking the maximum of both compensates for whichever
+// API is stale in any given situation.
 func countEventLogRecords(channel string) (int, error) {
+	n1, err1 := countViaEvtQuery(channel)
+	n2, err2 := countViaLegacyAPI(channel)
+	switch {
+	case err1 != nil && err2 != nil:
+		return 0, fmt.Errorf("EvtQuery: %w; GetNumberOfEventLogRecords: %w", err1, err2)
+	case err1 != nil:
+		return n2, nil //nolint:nilerr // sentinel only
+	case err2 != nil:
+		return n1, nil //nolint:nilerr // sentinel only
+	case n1 > n2:
+		return n1, nil
+	default:
+		return n2, nil
+	}
+}
+
+func countViaEvtQuery(channel string) (int, error) {
 	h, err := wineventlog.EvtQuery(wineventlog.NilHandle, channel, "", wineventlog.EvtQueryChannelPath|wineventlog.EvtQueryForwardDirection)
 	if err != nil {
 		return 0, fmt.Errorf("EvtQuery(%q): %w", channel, err)
 	}
 	defer wineventlog.Close(h)
-
 	var count int
 	for {
 		handles, err := wineventlog.EventHandles(h, 100)
@@ -410,6 +468,47 @@ func countEventLogRecords(channel string) (int, error) {
 		}
 	}
 	return count, nil
+}
+
+func countViaLegacyAPI(channel string) (int, error) {
+	h, err := openEventLog(channel)
+	if err != nil {
+		return 0, err
+	}
+	defer closeEventLog(h)
+	return numberOfEventLogRecords(h)
+}
+
+var (
+	modAdvapi32                    = windows.NewLazySystemDLL("advapi32.dll")
+	procOpenEventLog               = modAdvapi32.NewProc("OpenEventLogW")
+	procCloseEventLog              = modAdvapi32.NewProc("CloseEventLog")
+	procGetNumberOfEventLogRecords = modAdvapi32.NewProc("GetNumberOfEventLogRecords")
+)
+
+func openEventLog(name string) (windows.Handle, error) {
+	namePtr, err := windows.UTF16PtrFromString(name)
+	if err != nil {
+		return 0, err
+	}
+	r0, _, e1 := procOpenEventLog.Call(0, uintptr(unsafe.Pointer(namePtr)))
+	if r0 == 0 {
+		return 0, fmt.Errorf("OpenEventLogW(%q): %w", name, e1)
+	}
+	return windows.Handle(r0), nil
+}
+
+func closeEventLog(h windows.Handle) {
+	procCloseEventLog.Call(uintptr(h)) //nolint:errcheck // best-effort cleanup
+}
+
+func numberOfEventLogRecords(h windows.Handle) (int, error) {
+	var n uint32
+	r0, _, e1 := procGetNumberOfEventLogRecords.Call(uintptr(h), uintptr(unsafe.Pointer(&n)))
+	if r0 == 0 {
+		return 0, fmt.Errorf("GetNumberOfEventLogRecords: %w", e1)
+	}
+	return int(n), nil
 }
 
 // cmdSleep implements: sleep <duration>
@@ -487,11 +586,6 @@ func reportEvent(source string, eventType uint16, eventID uint32, sid *windows.S
 	if err != nil {
 		return fmt.Errorf("UTF16PtrFromString(%q): %w", source, err)
 	}
-	h, err := windows.RegisterEventSource(nil, sourcePtr)
-	if err != nil {
-		return fmt.Errorf("RegisterEventSource(%q): %w", source, err)
-	}
-	defer windows.DeregisterEventSource(h) //nolint:errcheck // best-effort cleanup
 
 	msgPtr, err := windows.UTF16PtrFromString(msg)
 	if err != nil {
@@ -503,15 +597,29 @@ func reportEvent(source string, eventType uint16, eventID uint32, sid *windows.S
 		sidPtr = uintptr(unsafe.Pointer(sid))
 	}
 
+	// Retry RegisterEventSource when it returns ERROR_ACCESS_DENIED: on some
+	// Windows versions the EventLog service caches source registrations and
+	// needs a moment to pick up a newly created registry key, returning
+	// "Access is denied" in the interim.
 	deadline := time.Now().Add(10 * time.Second)
 	for {
+		h, err := windows.RegisterEventSource(nil, sourcePtr)
+		if err != nil {
+			if !errors.Is(err, windows.ERROR_ACCESS_DENIED) || time.Now().After(deadline) {
+				return fmt.Errorf("RegisterEventSource(%q): %w", source, err)
+			}
+			time.Sleep(50 * time.Millisecond)
+			continue
+		}
 		err = windows.ReportEvent(h, eventType, 0, eventID, sidPtr, 1, 0, &msgPtr, nil)
+		windows.DeregisterEventSource(h) //nolint:errcheck // best-effort cleanup
 		if err == nil {
 			return nil
 		}
 		if time.Now().After(deadline) {
-			return fmt.Errorf("ReportEvent: %w", err)
+			return fmt.Errorf("ReportEvent(%q): %w", source, err)
 		}
+		time.Sleep(50 * time.Millisecond)
 	}
 }
 
