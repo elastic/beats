@@ -71,7 +71,7 @@ else
     -exec mv {} artifacts/ \;
 fi
 
-if ! find artifacts -type f ! -name 'dependencies-*.csv' | grep -q .; then
+if [[ -z "$(find artifacts -type f ! -name 'dependencies-*.csv' -print -quit)" ]]; then
   echo "ERROR: no ${WORKFLOW} artifacts found in artifacts/" >&2
   exit 1
 fi
