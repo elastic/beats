@@ -21,7 +21,7 @@ steps:
       VERSION_QUALIFIER: "${VERSION_QUALIFIER:-}"
     agents:
       provider: k8s
-      ephemeralStorage: "40G"
+      ephemeralStorage: "80Gi"
     timeout_in_minutes: 30
     artifact_paths:
       - "artifacts/dra/beats/*/manifest-*.json"
