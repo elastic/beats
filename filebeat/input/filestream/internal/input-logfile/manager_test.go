@@ -466,7 +466,7 @@ func TestInputManager_ShutdownKeepsSharedStoreForOtherManager(t *testing.T) {
 
 	require.NoError(t, firstGroup.Stop())
 	first.Close()
-	entry := snapshotStoreCacheEntry(states.StoreKey())
+	entry := snapshotStoreCacheEntry(states.StoreKey("", ""))
 	require.True(t, entry.found)
 	require.Equal(t, storeActive, entry.state)
 	require.Equal(t, 1, entry.users)
@@ -505,7 +505,7 @@ func TestInputManager_InitOnlyAcquiresOneStoreReference(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	entry := snapshotStoreCacheEntry(states.StoreKey())
+	entry := snapshotStoreCacheEntry(states.StoreKey("", ""))
 	require.True(t, entry.found)
 	require.Equal(t, 1, entry.users)
 	require.Same(t, manager.store, entry.store)
@@ -530,7 +530,7 @@ func TestInputManager_CreateBeforeInitDoesNotAcquireStore(t *testing.T) {
 	require.Nil(t, manager.store)
 	require.Nil(t, manager.ackCH)
 
-	require.False(t, snapshotStoreCacheEntry(states.StoreKey()).found)
+	require.False(t, snapshotStoreCacheEntry(states.StoreKey("", "")).found)
 }
 
 func initInputManager(t *testing.T, cim *InputManager) {
