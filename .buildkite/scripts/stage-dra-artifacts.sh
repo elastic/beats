@@ -65,10 +65,10 @@ mkdir -p artifacts
 
 if [[ "${WORKFLOW}" == "snapshot" ]]; then
   find build/distributions -type f -name "*-SNAPSHOT*" \
-    -exec cp {} artifacts/ \;
+    -exec mv {} artifacts/ \;
 else
   find build/distributions -type f ! -name "*-SNAPSHOT*" \
-    -exec cp {} artifacts/ \;
+    -exec mv {} artifacts/ \;
 fi
 
 if ! find artifacts -type f ! -name 'dependencies-*.csv' | grep -q .; then
