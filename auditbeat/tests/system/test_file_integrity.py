@@ -96,15 +96,9 @@ class Test(BaseTest):
 
     def wait_startup(self, backend, dir):
         if backend == "ebpf":
-<<<<<<< HEAD
             self.wait_log_contains("started ebpf watcher", max_timeout=90, ignore_case=True)
-        if backend == "kprobes":
-            self.wait_log_contains("Started kprobes watcher", max_timeout=90, ignore_case=True)
-=======
-            self.wait_log_contains("started ebpf watcher", max_timeout=30, ignore_case=True)
         elif backend == "kprobes":
-            self.wait_log_contains("Started kprobes watcher", max_timeout=30, ignore_case=True)
->>>>>>> fda8f0b (auditbeat/file_integrity: fix flaky test_{,non_}recursive__kprobes (#53420))
+            self.wait_log_contains("Started kprobes watcher", max_timeout=90, ignore_case=True)
         else:
             # wait until the directories to watch are printed in the logs
             # this happens when the file_integrity module starts.
