@@ -12,6 +12,14 @@
 # .buildkite/scripts/packaging/resolve-dra-version.sh immediately before this
 # file is uploaded.
 
+common:
+  - google_oidc_plugin: &google_oidc_plugin
+      # Must match the google_oidc_plugin anchor in packaging.pipeline.yml
+      elastic/oblt-google-auth#v1.3.1:
+        lifetime: 10800 # seconds
+        project-id: "elastic-observability-ci"
+        project-number: "911195782929"
+
 steps:
   - label: ":package: DRA Prep (${WORKFLOW})"
     key: "dra-prep-${WORKFLOW}"
@@ -26,24 +34,22 @@ steps:
     artifact_paths:
       - "artifacts/dra/beats/*/manifest-*.json"
     plugins:
-      # Must match the google_oidc_plugin anchor in packaging.pipeline.yml
-      - elastic/oblt-google-auth#v1.3.1:
-          lifetime: 10800 # seconds
-          project-id: "elastic-observability-ci"
-          project-number: "911195782929"
+      - *google_oidc_plugin
       - elastic/dra-prep#v0.1.6:
           product_id: "beats"
           stack_version: "${STACK_VERSION}"
           workflow: "${WORKFLOW}"
           upload: ${DRA_UPLOAD}
 
-  - label: ":memo: Annotate DRA build"
+  - label: ":memo: Annotate DRA build (${WORKFLOW})"
     if: build.env('DRY_RUN') != "true"
     depends_on: "dra-prep-${WORKFLOW}"
     command: ".buildkite/scripts/dra-annotate.sh ${WORKFLOW}"
     agents:
       provider: k8s
     timeout_in_minutes: 5
+    plugins:
+      - *google_oidc_plugin
 
   - label: ":pipeline: DRA processing for beats (${WORKFLOW})"
     if: build.env('DRY_RUN') != "true"
