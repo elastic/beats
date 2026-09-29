@@ -82,6 +82,13 @@ func blockingJob(t *testing.T, sched *scheduler.Scheduler, id string, started ch
 	require.NoError(t, err)
 }
 
+func mustAcquire(t *testing.T, logger *logp.Logger, group string, params Params) (*scheduler.Scheduler, ReleaseFunc) {
+	t.Helper()
+	sched, release, err := Acquire(logger, group, params)
+	require.NoError(t, err)
+	return sched, release
+}
+
 // neverSchedule never runs its job, it is only used to probe the scheduler.
 type neverSchedule struct{}
 
@@ -106,8 +113,8 @@ func TestAcquireSharesOneSchedulerPerGroup(t *testing.T) {
 	resetShared(t)
 	logger := logptest.NewTestingLogger(t, "")
 
-	first, releaseFirst := Acquire(logger, "group", testParams())
-	second, releaseSecond := Acquire(logger, "group", testParams())
+	first, releaseFirst := mustAcquire(t, logger, "group", testParams())
+	second, releaseSecond := mustAcquire(t, logger, "group", testParams())
 
 	assert.Same(t, first, second, "consumers of a group must get the same scheduler")
 	assert.False(t, stopped(t, first))
@@ -124,9 +131,9 @@ func TestGroupsAreIsolated(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 
 	// The empty group is the default one, used by a standalone Heartbeat.
-	defaultSched, releaseDefault := Acquire(logger, "", testParams())
-	first, releaseFirst := Acquire(logger, "first", testParams())
-	second, releaseSecond := Acquire(logger, "second", testParams())
+	defaultSched, releaseDefault := mustAcquire(t, logger, "", testParams())
+	first, releaseFirst := mustAcquire(t, logger, "first", testParams())
+	second, releaseSecond := mustAcquire(t, logger, "second", testParams())
 	defer releaseSecond()
 
 	assert.NotSame(t, defaultSched, first)
@@ -144,8 +151,8 @@ func TestReleaseIsIdempotent(t *testing.T) {
 	resetShared(t)
 	logger := logptest.NewTestingLogger(t, "")
 
-	sched, releaseFirst := Acquire(logger, "group", testParams())
-	_, releaseSecond := Acquire(logger, "group", testParams())
+	sched, releaseFirst := mustAcquire(t, logger, "group", testParams())
+	_, releaseSecond := mustAcquire(t, logger, "group", testParams())
 
 	releaseFirst()
 	releaseFirst()
@@ -160,11 +167,11 @@ func TestAcquireAfterLastReleaseCreatesNewScheduler(t *testing.T) {
 	resetShared(t)
 	logger := logptest.NewTestingLogger(t, "")
 
-	first, releaseFirst := Acquire(logger, "group", testParams())
+	first, releaseFirst := mustAcquire(t, logger, "group", testParams())
 	releaseFirst()
 	require.True(t, stopped(t, first))
 
-	second, releaseSecond := Acquire(logger, "group", testParams())
+	second, releaseSecond := mustAcquire(t, logger, "group", testParams())
 	defer releaseSecond()
 
 	assert.NotSame(t, first, second, "a stopped scheduler cannot be restarted, so a new one is needed")
@@ -175,41 +182,58 @@ func TestAcquireWarnsAboutConflictingParams(t *testing.T) {
 	resetShared(t)
 	logger, observed := logptest.NewTestingLoggerWithObserver(t, "")
 
-	_, release := Acquire(logger, "group", testParams())
+	_, release := mustAcquire(t, logger, "group", testParams())
 	defer release()
 
 	conflicting := testParams()
 	conflicting.Limit = 20
 	conflicting.Location = time.FixedZone("Fake", 3600)
 	conflicting.JobLimitByType = map[string]*config.JobLimit{"http": {Limit: 4}}
-	conflicting.RunOnce = true
 
-	_, releaseConflicting := Acquire(logger, "group", conflicting)
+	_, releaseConflicting := mustAcquire(t, logger, "group", conflicting)
 	defer releaseConflicting()
 
 	warnings := observed.FilterLevelExact(logp.WarnLevel.ZapLevel()).All()
 	require.Len(t, warnings, 1, "a conflicting consumer must be warned about once")
 	assert.Contains(t, warnings[0].Message,
-		"running with {Limit:10 Location:UTC JobLimits:map[browser:2] RunOnce:false}, "+
-			"requested {Limit:20 Location:Fake JobLimits:map[http:4] RunOnce:true}",
+		"running with {Limit:10 Location:UTC JobLimits:map[browser:2]}, "+
+			"requested {Limit:20 Location:Fake JobLimits:map[http:4]}",
 		"the warning must describe both the running and the requested settings")
+}
+
+func TestAcquireErrorsOnRunOnceConflict(t *testing.T) {
+	resetShared(t)
+	logger := logptest.NewTestingLogger(t, "")
+
+	_, release := mustAcquire(t, logger, "group", testParams()) // run_once=false
+	defer release()
+
+	runOnce := testParams()
+	runOnce.RunOnce = true
+	_, _, err := Acquire(logger, "group", runOnce)
+	require.Error(t, err, "a run_once consumer must not join a group without run_once")
+	assert.Contains(t, err.Error(), "run_once", "the error must name the conflicting setting")
+
+	// A separate group is fine.
+	_, releaseOther := mustAcquire(t, logger, "other", runOnce)
+	releaseOther()
 }
 
 func TestAcquireDoesNotWarnAboutMatchingParams(t *testing.T) {
 	resetShared(t)
 	logger, observed := logptest.NewTestingLoggerWithObserver(t, "")
 
-	_, releaseFirst := Acquire(logger, "group", testParams())
+	_, releaseFirst := mustAcquire(t, logger, "group", testParams())
 	defer releaseFirst()
 	// The registry is only used by the consumer that creates the scheduler, so
 	// a different one must not count as a conflict.
-	_, releaseSecond := Acquire(logger, "group", testParams())
+	_, releaseSecond := mustAcquire(t, logger, "group", testParams())
 	defer releaseSecond()
 
 	// Params of a different group are unrelated and must not be compared.
 	otherGroup := testParams()
 	otherGroup.Limit = 20
-	_, releaseOther := Acquire(logger, "other", otherGroup)
+	_, releaseOther := mustAcquire(t, logger, "other", otherGroup)
 	defer releaseOther()
 
 	assert.Empty(t, observed.FilterLevelExact(logp.WarnLevel.ZapLevel()).All())
@@ -231,7 +255,7 @@ func TestAcquireIsConcurrencySafe(t *testing.T) {
 	for range consumers {
 		go func() {
 			defer wg.Done()
-			sched, release := Acquire(logger, "group", testParams())
+			sched, release := mustAcquire(t, logger, "group", testParams())
 
 			mu.Lock()
 			defer mu.Unlock()
@@ -269,9 +293,9 @@ func TestJobLimitsAreSharedWithinGroup(t *testing.T) {
 	params := testParams()
 	params.JobLimitByType = map[string]*config.JobLimit{"browser": {Limit: 1}}
 
-	first, releaseFirst := Acquire(logger, "group", params)
+	first, releaseFirst := mustAcquire(t, logger, "group", params)
 	defer releaseFirst()
-	second, releaseSecond := Acquire(logger, "group", params)
+	second, releaseSecond := mustAcquire(t, logger, "group", params)
 	defer releaseSecond()
 
 	started := make(chan string)
@@ -306,9 +330,9 @@ func TestJobLimitsAreNotSharedAcrossGroups(t *testing.T) {
 	params := testParams()
 	params.JobLimitByType = map[string]*config.JobLimit{"browser": {Limit: 1}}
 
-	first, releaseFirst := Acquire(logger, "first", params)
+	first, releaseFirst := mustAcquire(t, logger, "first", params)
 	defer releaseFirst()
-	second, releaseSecond := Acquire(logger, "second", params)
+	second, releaseSecond := mustAcquire(t, logger, "second", params)
 	defer releaseSecond()
 
 	started := make(chan string)

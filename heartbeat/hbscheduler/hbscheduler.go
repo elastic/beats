@@ -32,6 +32,7 @@
 package hbscheduler
 
 import (
+	"fmt"
 	"reflect"
 	"sync"
 	"time"
@@ -58,13 +59,13 @@ type Params struct {
 	RunOnce bool
 }
 
-// settings are the Params that shape the scheduler's behavior, in a comparable
-// form. The registry is left out as it only matters to whoever creates it.
+// settings are the Params a later consumer of a group may disagree with, in a
+// comparable form. The registry only matters to whoever creates the scheduler,
+// and RunOnce has to match, see Acquire.
 type settings struct {
 	Limit     int64
 	Location  string
 	JobLimits map[string]int64
-	RunOnce   bool
 }
 
 func (p Params) settings() settings {
@@ -78,7 +79,7 @@ func (p Params) settings() settings {
 	if p.Location != nil {
 		location = p.Location.String()
 	}
-	return settings{Limit: p.Limit, Location: location, JobLimits: jobLimits, RunOnce: p.RunOnce}
+	return settings{Limit: p.Limit, Location: location, JobLimits: jobLimits}
 }
 
 // ReleaseFunc gives up a scheduler acquired with Acquire. It is safe to call
@@ -90,6 +91,7 @@ type sharedScheduler struct {
 	group    string
 	sched    *scheduler.Scheduler
 	settings settings
+	runOnce  bool
 	users    int
 }
 
@@ -103,7 +105,9 @@ var (
 // Acquire returns the scheduler shared by the given group, creating it from
 // params if the group does not have one yet. Later callers for the same group
 // reuse its running scheduler; their params are only used to warn about
-// settings that cannot be honored.
+// settings that cannot be honored, with one exception: joining a group with a
+// different run_once setting is an error, as WaitForRunOnce would then be wrong
+// for one side or the other.
 //
 // The group is an opaque key. An empty group is the default group, which is
 // what a standalone Heartbeat process, the only Heartbeat instance in its
@@ -112,7 +116,7 @@ var (
 // The caller must invoke the returned ReleaseFunc once it is done with the
 // scheduler. A group's scheduler is stopped when its last consumer releases it,
 // and the next Acquire for the group creates a new one.
-func Acquire(logger *logp.Logger, group string, params Params) (*scheduler.Scheduler, ReleaseFunc) {
+func Acquire(logger *logp.Logger, group string, params Params) (*scheduler.Scheduler, ReleaseFunc, error) {
 	logger = logger.Named("hbscheduler").With("scheduler_group", group)
 
 	mtx.Lock()
@@ -131,8 +135,15 @@ func Acquire(logger *logp.Logger, group string, params Params) (*scheduler.Sched
 				logger,
 			),
 			settings: params.settings(),
+			runOnce:  params.RunOnce,
 		}
 		schedulers[group] = shared
+	} else if shared.runOnce != params.RunOnce {
+		return nil, nil, fmt.Errorf(
+			"scheduler group %q already has run_once=%t, a consumer with run_once=%t cannot join it; "+
+				"assign receivers with different run_once settings to separate scheduler groups",
+			group, shared.runOnce, params.RunOnce,
+		)
 	} else if requested := params.settings(); !reflect.DeepEqual(shared.settings, requested) {
 		logger.Warnf(
 			"reusing the scheduler already running for this group, ignoring its conflicting settings: running with %+v, requested %+v",
@@ -146,7 +157,7 @@ func Acquire(logger *logp.Logger, group string, params Params) (*scheduler.Sched
 	var once sync.Once
 	return shared.sched, func() {
 		once.Do(func() { release(logger, shared) })
-	}
+	}, nil
 }
 
 func release(logger *logp.Logger, shared *sharedScheduler) {
