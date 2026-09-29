@@ -35,7 +35,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	hbrunner "github.com/elastic/beats/v7/heartbeat/reload"
-	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	_ "github.com/elastic/beats/v7/heartbeat/security"
 	"github.com/elastic/beats/v7/heartbeat/tracer"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
@@ -53,17 +52,13 @@ type Heartbeat struct {
 	stopOnce sync.Once
 	// config is used for iterating over elements of the config.
 	config *config.Config
-	// scheduler is shared with the other Heartbeat instances in this process
-	// that use the same scheduler group, see hbscheduler.Acquire. It is released
-	// by whichever of Run and Stop is responsible for it, see schedMu.
-	scheduler        *scheduler.Scheduler
-	releaseScheduler hbscheduler.ReleaseFunc
-	// schedMu guards the handover of the scheduler between Run and Stop. Run
-	// releases the scheduler when it returns, but a Heartbeat may be stopped
-	// without ever being run, in which case Stop has to release it.
-	schedMu            sync.Mutex
-	runStarted         bool
-	stopped            bool
+	// The scheduler is acquired by Run, as it may be shared with the other
+	// Heartbeat instances in this process that use the same scheduler group, see
+	// hbscheduler.Acquire. Acquiring it any earlier would pin it for Heartbeats
+	// that are created but never run.
+	schedulerGroup     string
+	schedulerParams    hbscheduler.Params
+	stateLoader        monitorstate.StateLoader
 	monitorReloader    *cfgfile.Reloader
 	monitorFactory     cfgfile.RunnerFactory
 	autodiscover       *autodiscover.Autodiscover
@@ -74,8 +69,8 @@ type Heartbeat struct {
 	logger                   *logp.Logger
 }
 
-// New creates a new heartbeat with its own scheduler, which is what a Heartbeat
-// process wants: it is the only Heartbeat instance in the process.
+// New creates a new heartbeat in the default scheduler group. That is what a
+// Heartbeat process wants, as it is the only Heartbeat instance in the process.
 func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	return newHeartbeat(b, rawConfig, "")
 }
@@ -146,43 +141,21 @@ func newHeartbeat(b *beat.Beat, rawConfig *conf.C, schedulerGroup string) (beat.
 	}
 	jobConfig := parsedConfig.Jobs
 
-	// The scheduler, and so its limits, may be shared with the other Heartbeat
-	// instances in this process that belong to the same scheduler group. It is
-	// released by Run, or by Stop if this Heartbeat never runs.
-	sched, releaseSched, err := hbscheduler.Acquire(logger, schedulerGroup, hbscheduler.Params{
-		Limit:          limit,
-		Registry:       hbregistry.SchedulerRegistry,
-		Location:       location,
-		JobLimitByType: jobConfig,
-		RunOnce:        parsedConfig.RunOnce,
-	})
-	if err != nil {
-		trace.Abort()
-		return nil, err
-	}
-
-	pipelineClientFactory := func(p beat.Pipeline) (beat.Client, error) {
-		return p.Connect()
-	}
-
 	bt := &Heartbeat{
-		done:               make(chan struct{}),
-		config:             parsedConfig,
-		scheduler:          sched,
-		releaseScheduler:   releaseSched,
+		done:           make(chan struct{}),
+		config:         parsedConfig,
+		schedulerGroup: schedulerGroup,
+		schedulerParams: hbscheduler.Params{
+			Limit:          limit,
+			Registry:       hbregistry.SchedulerRegistry,
+			Location:       location,
+			JobLimitByType: jobConfig,
+			RunOnce:        parsedConfig.RunOnce,
+		},
+		stateLoader:        stateLoader,
 		replaceStateLoader: replaceStateLoader,
-		// monitorFactory is the factory used for creating all monitor instances,
-		// wiring them up to everything needed to actually execute.
-		monitorFactory: monitors.NewFactory(monitors.FactoryParams{
-			BeatInfo:              b.Info,
-			AddTask:               sched.Add,
-			StateLoader:           stateLoader,
-			PluginsReg:            plugin.GlobalPluginsReg,
-			PipelineClientFactory: pipelineClientFactory,
-			BeatRunFrom:           parsedConfig.RunFrom,
-		}),
-		trace:  trace,
-		logger: logger,
+		trace:              trace,
+		logger:             logger,
 	}
 	runFromID := "<unknown location>"
 	if parsedConfig.RunFrom != nil {
@@ -194,23 +167,6 @@ func newHeartbeat(b *beat.Beat, rawConfig *conf.C, schedulerGroup string) (beat.
 
 // Run executes the beat.
 func (bt *Heartbeat) Run(b *beat.Beat) error {
-	// Take responsibility for releasing the scheduler, unless Stop got here first
-	// and already released it. There is nothing left to run in that case.
-	bt.schedMu.Lock()
-	if bt.stopped {
-		bt.schedMu.Unlock()
-		bt.logger.Debug("not running heartbeat, it was stopped before it started")
-		// This run never happens, so the trace is aborted instead of being
-		// started and closed, matching how New gives up on a trace.
-		bt.trace.Abort()
-		return nil
-	}
-	bt.runStarted = true
-	bt.schedMu.Unlock()
-	// Release here so that an early return below does not leave a permanent reference.
-	// The sync.Once inside releaseScheduler makes any later call from Stop a no-op.
-	defer bt.releaseScheduler()
-
 	bt.trace.Start()
 	defer bt.trace.Close()
 
@@ -228,6 +184,22 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	groups, _ := syscall.Getgroups()
 	bt.logger.Infof("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
 
+	sched, releaseSched := hbscheduler.Acquire(bt.logger, bt.schedulerGroup, bt.schedulerParams)
+	defer releaseSched()
+
+	// monitorFactory is the factory used for creating all monitor instances,
+	// wiring them up to everything needed to actually execute.
+	bt.monitorFactory = monitors.NewFactory(monitors.FactoryParams{
+		BeatInfo:    b.Info,
+		AddTask:     sched.Add,
+		StateLoader: bt.stateLoader,
+		PluginsReg:  plugin.GlobalPluginsReg,
+		PipelineClientFactory: func(p beat.Pipeline) (beat.Client, error) {
+			return p.Connect()
+		},
+		BeatRunFrom: bt.config.RunFrom,
+	})
+
 	if bt.otelStatusFactoryWrapper != nil {
 		bt.monitorFactory = bt.otelStatusFactoryWrapper(bt.monitorFactory)
 	}
@@ -244,7 +216,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	defer stopStaticMonitors()
 
 	if bt.config.RunOnce {
-		waitMonitors.Add(monitors.WithLog(bt.scheduler.WaitForRunOnce, "Ending run_once run.", bt.logger))
+		waitMonitors.Add(monitors.WithLog(sched.WaitForRunOnce, "Ending run_once run.", bt.logger))
 	}
 
 	if b.Manager.Enabled() {
@@ -378,23 +350,7 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 
 // Stop stops the beat.
 func (bt *Heartbeat) Stop() {
-	bt.stopOnce.Do(func() {
-		close(bt.done)
-
-		// Run releases the scheduler when it returns, so it only has to be
-		// released here if Run never started. Otherwise a Heartbeat that is
-		// created and stopped without ever running, which is what a collector
-		// does to a receiver it gives up on, would hold on to its group's
-		// scheduler until the process exits.
-		bt.schedMu.Lock()
-		bt.stopped = true
-		runStarted := bt.runStarted
-		bt.schedMu.Unlock()
-
-		if !runStarted {
-			bt.releaseScheduler()
-		}
-	})
+	bt.stopOnce.Do(func() { close(bt.done) })
 }
 
 func (bt *Heartbeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {

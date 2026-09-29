@@ -6,10 +6,12 @@ package hbreceiver
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/component/componenttest"
 	"go.opentelemetry.io/collector/consumer/consumertest"
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
@@ -23,8 +25,6 @@ import (
 // Whether Heartbeats of a group then actually share concurrency limits is
 // covered by the heartbeat/hbscheduler tests.
 func TestSchedulerGroup(t *testing.T) {
-	// A receiver that is shut down without ever being started must still give up
-	// the scheduler it acquired.
 	defer oteltest.VerifyNoLeaks(t)
 
 	newReceiver := func(t *testing.T, name, schedulerGroup string) *observer.ObservedLogs {
@@ -61,41 +61,40 @@ func TestSchedulerGroup(t *testing.T) {
 
 		r, err := factory.CreateLogs(t.Context(), set, cfg, consumertest.NewNop())
 		require.NoError(t, err)
+		require.NoError(t, r.Start(t.Context(), componenttest.NewNopHost()))
 		t.Cleanup(func() { require.NoError(t, r.Shutdown(t.Context())) })
 
 		return logs
 	}
 
-	// groupsOf returns the scheduler groups the receiver acquired a scheduler for.
-	groupsOf := func(t *testing.T, logs *observer.ObservedLogs) []string {
+	// assertGroup checks that the receiver acquired a scheduler for group, and
+	// for no other group. The scheduler is acquired once Heartbeat runs, which
+	// happens asynchronously after the receiver started.
+	assertGroup := func(t *testing.T, logs *observer.ObservedLogs, group string) {
 		t.Helper()
 
-		var groups []string
-		for _, entry := range logs.All() {
-			if group, ok := entry.ContextMap()["scheduler_group"]; ok {
-				if s, ok := group.(string); ok {
-					groups = append(groups, s)
+		require.EventuallyWithT(t, func(c *assert.CollectT) {
+			var groups []string
+			for _, entry := range logs.All() {
+				if got, ok := entry.ContextMap()["scheduler_group"].(string); ok {
+					groups = append(groups, got)
 				}
 			}
-		}
-		require.NotEmpty(t, groups, "receiver logged no scheduler group")
-		return groups
+			require.NotEmpty(c, groups, "receiver logged no scheduler group")
+			for _, got := range groups {
+				assert.Equal(c, group, got, "receiver acquired a scheduler for the wrong group")
+			}
+		}, 30*time.Second, 100*time.Millisecond)
 	}
 
 	t.Run("defaults to the receiver id", func(t *testing.T) {
 		logs := newReceiver(t, "no-group", "")
-
-		for _, group := range groupsOf(t, logs) {
-			assert.Equal(t, "heartbeatreceiver/no-group", group)
-		}
+		assertGroup(t, logs, "heartbeatreceiver/no-group")
 	})
 
 	t.Run("uses the configured group", func(t *testing.T) {
 		const group = "synthetics/synthetics-browser-default"
 		logs := newReceiver(t, "with-group", group)
-
-		for _, got := range groupsOf(t, logs) {
-			assert.Equal(t, group, got)
-		}
+		assertGroup(t, logs, group)
 	})
 }

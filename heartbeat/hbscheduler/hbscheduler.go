@@ -32,10 +32,7 @@
 package hbscheduler
 
 import (
-	"fmt"
-	"sort"
-	"strconv"
-	"strings"
+	"reflect"
 	"sync"
 	"time"
 
@@ -61,16 +58,39 @@ type Params struct {
 	RunOnce bool
 }
 
+// settings are the Params that shape the scheduler's behavior, in a comparable
+// form. The registry is left out as it only matters to whoever creates it.
+type settings struct {
+	Limit     int64
+	Location  string
+	JobLimits map[string]int64
+	RunOnce   bool
+}
+
+func (p Params) settings() settings {
+	jobLimits := make(map[string]int64, len(p.JobLimitByType))
+	for jobType, jobLimit := range p.JobLimitByType {
+		if jobLimit != nil {
+			jobLimits[jobType] = jobLimit.Limit
+		}
+	}
+	location := "Local"
+	if p.Location != nil {
+		location = p.Location.String()
+	}
+	return settings{Limit: p.Limit, Location: location, JobLimits: jobLimits, RunOnce: p.RunOnce}
+}
+
 // ReleaseFunc gives up a scheduler acquired with Acquire. It is safe to call
 // more than once, and from multiple goroutines. A group's scheduler is stopped
 // once every acquisition of it has been released.
 type ReleaseFunc func()
 
 type sharedScheduler struct {
-	group  string
-	sched  *scheduler.Scheduler
-	params Params
-	users  int
+	group    string
+	sched    *scheduler.Scheduler
+	settings settings
+	users    int
 }
 
 var (
@@ -83,28 +103,20 @@ var (
 // Acquire returns the scheduler shared by the given group, creating it from
 // params if the group does not have one yet. Later callers for the same group
 // reuse its running scheduler; their params are only used to warn about
-// settings that cannot be honored, with one exception: a run_once mismatch
-// returns an error because mixing run_once and non-run_once consumers in a
-// group causes WaitForRunOnce to behave incorrectly for both sides.
+// settings that cannot be honored.
 //
 // The group is an opaque key. An empty group is the default group, which is
-// what a standalone Heartbeat process uses.
+// what a standalone Heartbeat process, the only Heartbeat instance in its
+// process, uses.
 //
 // The caller must invoke the returned ReleaseFunc once it is done with the
-// scheduler. A group's scheduler is stopped when its last consumer releases it.
-func Acquire(logger *logp.Logger, group string, params Params) (*scheduler.Scheduler, ReleaseFunc, error) {
+// scheduler. A group's scheduler is stopped when its last consumer releases it,
+// and the next Acquire for the group creates a new one.
+func Acquire(logger *logp.Logger, group string, params Params) (*scheduler.Scheduler, ReleaseFunc) {
 	logger = logger.Named("hbscheduler").With("scheduler_group", group)
 
 	mtx.Lock()
 	defer mtx.Unlock()
-
-	// A stopped scheduler cannot be restarted, so it must not be handed out
-	// again. This is defensive: a caller that invokes s.Stop() directly rather
-	// than going through Release would leave a stopped scheduler in the map.
-	if shared, ok := schedulers[group]; ok && shared.sched.Stopped() {
-		logger.Debug("discarding stopped shared scheduler")
-		delete(schedulers, group)
-	}
 
 	shared, ok := schedulers[group]
 	if !ok {
@@ -118,25 +130,14 @@ func Acquire(logger *logp.Logger, group string, params Params) (*scheduler.Sched
 				params.RunOnce,
 				logger,
 			),
-			params: params,
+			settings: params.settings(),
 		}
 		schedulers[group] = shared
-	} else {
-		if shared.params.RunOnce != params.RunOnce {
-			return nil, nil, fmt.Errorf(
-				"scheduler group %q already has run_once=%t; "+
-					"a consumer with run_once=%t cannot join it — "+
-					"assign receivers with different run_once settings to separate scheduler groups",
-				group, shared.params.RunOnce, params.RunOnce,
-			)
-		}
-		if diffs := paramsDiff(shared.params, params); len(diffs) > 0 {
-			logger.Warnf(
-				"reusing the scheduler already running for this group, "+
-					"ignoring conflicting scheduler settings: %s",
-				strings.Join(diffs, ", "),
-			)
-		}
+	} else if requested := params.settings(); !reflect.DeepEqual(shared.settings, requested) {
+		logger.Warnf(
+			"reusing the scheduler already running for this group, ignoring its conflicting settings: running with %+v, requested %+v",
+			shared.settings, requested,
+		)
 	}
 
 	shared.users++
@@ -145,7 +146,7 @@ func Acquire(logger *logp.Logger, group string, params Params) (*scheduler.Sched
 	var once sync.Once
 	return shared.sched, func() {
 		once.Do(func() { release(logger, shared) })
-	}, nil
+	}
 }
 
 func release(logger *logp.Logger, shared *sharedScheduler) {
@@ -158,77 +159,7 @@ func release(logger *logp.Logger, shared *sharedScheduler) {
 		return
 	}
 
-	// The scheduler this consumer held may already have been replaced, in which
-	// case the group's new one must be left alone.
-	if schedulers[shared.group] == shared {
-		delete(schedulers, shared.group)
-	}
+	delete(schedulers, shared.group)
 	logger.Debug("released shared scheduler, stopping it as it has no consumers left")
 	shared.sched.Stop()
-}
-
-// paramsDiff describes the settings in requested that the already running
-// scheduler, configured with active, does not honor.
-func paramsDiff(active, requested Params) []string {
-	var diffs []string
-
-	if limitName(active.Limit) != limitName(requested.Limit) {
-		diffs = append(diffs, fmt.Sprintf("scheduler.limit: running with %s, requested %s", limitName(active.Limit), limitName(requested.Limit)))
-	}
-	if locationName(active.Location) != locationName(requested.Location) {
-		diffs = append(diffs, fmt.Sprintf("scheduler.location: running with %s, requested %s", locationName(active.Location), locationName(requested.Location)))
-	}
-	for _, jobType := range jobTypes(active.JobLimitByType, requested.JobLimitByType) {
-		activeLimit, requestedLimit := jobLimit(active.JobLimitByType, jobType), jobLimit(requested.JobLimitByType, jobType)
-		if limitName(activeLimit) != limitName(requestedLimit) {
-			diffs = append(diffs, fmt.Sprintf("jobs.%s.limit: running with %s, requested %s", jobType, limitName(activeLimit), limitName(requestedLimit)))
-		}
-	}
-
-	return diffs
-}
-
-// limitName renders a concurrency limit, where anything below one is unlimited.
-// Normalizing keeps equivalent limits, e.g. an unset and an explicit zero, from
-// being reported as a conflict.
-func limitName(limit int64) string {
-	if limit < 1 {
-		return "unlimited"
-	}
-	return strconv.FormatInt(limit, 10)
-}
-
-func locationName(location *time.Location) string {
-	if location == nil {
-		return "Local"
-	}
-	return location.String()
-}
-
-// jobLimit returns the limit configured for jobType, zero (unlimited) if there
-// is none.
-func jobLimit(jobLimitByType map[string]*config.JobLimit, jobType string) int64 {
-	limit := jobLimitByType[jobType]
-	if limit == nil {
-		return 0
-	}
-	return limit.Limit
-}
-
-// jobTypes returns the sorted union of the job types in the given maps, so that
-// diffs are reported in a stable order.
-func jobTypes(maps ...map[string]*config.JobLimit) []string {
-	seen := map[string]struct{}{}
-	for _, m := range maps {
-		for jobType := range m {
-			seen[jobType] = struct{}{}
-		}
-	}
-
-	types := make([]string, 0, len(seen))
-	for jobType := range seen {
-		types = append(types, jobType)
-	}
-	sort.Strings(types)
-	return types
 }
