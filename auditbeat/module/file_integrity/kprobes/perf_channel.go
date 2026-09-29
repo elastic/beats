@@ -20,12 +20,9 @@
 package kprobes
 
 import (
-<<<<<<< HEAD
-=======
 	"errors"
 	"fmt"
 	"sync"
->>>>>>> a6ff8d8 (auditbeat/module/file_integrity/kprobes: remove kprobes on teardown (#53253))
 	"time"
 
 	"github.com/elastic/beats/v7/auditbeat/tracing"
@@ -100,14 +97,6 @@ func newPerfChannel(probes map[tracing.Probe]tracing.AllocateFn, ringSizeExponen
 		return nil, err
 	}
 
-<<<<<<< HEAD
-	for probe, allocFn := range probes {
-		_ = tfs.RemoveKProbe(probe)
-
-		err := tfs.AddKProbe(probe)
-		if err != nil {
-			return nil, err
-=======
 	pc := &probeChannel{
 		PerfChannel: pChannel,
 		tfs:         tfs,
@@ -144,7 +133,6 @@ func newPerfChannel(probes map[tracing.Probe]tracing.AllocateFn, ringSizeExponen
 
 		if err := tfs.AddKProbe(probe); err != nil {
 			return nil, fmt.Errorf("error adding %s probe: %w", probe.Name, err)
->>>>>>> a6ff8d8 (auditbeat/module/file_integrity/kprobes: remove kprobes on teardown (#53253))
 		}
 		// Record the probe immediately after a successful add, before any
 		// fallible step, so the defer rollback can remove it on failure.
