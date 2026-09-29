@@ -111,7 +111,7 @@ var (
 	errUnexpectedOperator = errors.New("unexpected formatter operator")
 	errMissingClose       = errors.New("missing closing '}'")
 	errEmptyFormat        = errors.New("empty format expansion")
-	errParamsOpsMismatch  = errors.New("more parameters then ops parsed")
+	errParamsOpsMismatch  = errors.New("more parameters than ops parsed")
 )
 
 // Compile compiles an input format string into a StringFormatter. The variable
