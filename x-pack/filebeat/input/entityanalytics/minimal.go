@@ -215,12 +215,11 @@ type esSyncer struct {
 }
 
 func (n *minimalStateInput) newESSyncer(runCtx v2.Context, log *logp.Logger) (*esSyncer, error) {
-	s, err := n.store.StoreFor(Name)
+	s, err := n.store.StoreFor(Name, runCtx.ID)
 	if err != nil {
 		return nil, fmt.Errorf("unable to open ES state store: %w", err)
 	}
-	s.SetID(runCtx.ID)
-	log.Infof("Using Elasticsearch-backed state store (index: agentless-state-%s)", runCtx.ID)
+	log.Info("Using Elasticsearch-backed state store")
 	return &esSyncer{store: s}, nil
 }
 
