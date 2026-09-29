@@ -23,6 +23,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 	"syscall"
@@ -329,7 +331,19 @@ func TestLoginType(t *testing.T) {
 
 // assertFieldsAreDocumented mimics assert_fields_are_documented in Python system tests.
 func assertFieldsAreDocumented(t *testing.T, events []mb.Event) {
-	fieldsYml, err := mapping.LoadFieldsYaml("../../fields.yml")
+	_, thisFile, _, ok := runtime.Caller(0)
+	if !ok {
+		t.Fatal("failed to resolve test file path")
+	}
+	fieldsPath := filepath.Join(filepath.Dir(thisFile), "..", "..", "fields.yml")
+	if _, err := os.Stat(fieldsPath); err != nil {
+		if os.IsNotExist(err) {
+			t.Skipf("generated fields file not found (%s); run `mage update` in auditbeat to enable field documentation assertions", fieldsPath)
+		}
+		t.Fatal(err)
+	}
+
+	fieldsYml, err := mapping.LoadFieldsYaml(fieldsPath)
 	if err != nil {
 		t.Fatal(err)
 	}
