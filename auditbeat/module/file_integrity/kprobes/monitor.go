@@ -139,31 +139,12 @@ func (w *Monitor) Add(path string) error {
 }
 
 func (w *Monitor) Close() error {
-<<<<<<< HEAD
-	if !atomic.CompareAndSwapUint32(&w.running, 1, 2) {
-		switch atomic.LoadUint32(&w.running) {
-		case 0:
-			// monitor hasn't started yet
-			atomic.StoreUint32(&w.running, 2)
-		default:
-			return nil
-		}
-	}
-
-	w.cancelFn()
-	var allErr error
-	allErr = errors.Join(allErr, w.pathMonitor.Close())
-	allErr = errors.Join(allErr, w.perfChannel.Close())
-
-	return allErr
-=======
 	w.closeOnce.Do(func() {
-		w.running.Store(2)
+		atomic.StoreUint32(&w.running, 2)
 		w.cancelFn()
 		w.closeErr = errors.Join(w.pathMonitor.Close(), w.perfChannel.Close())
 	})
 	return w.closeErr
->>>>>>> a6ff8d8 (auditbeat/module/file_integrity/kprobes: remove kprobes on teardown (#53253))
 }
 
 func (w *Monitor) EventChannel() <-chan MonitorEvent {
