@@ -887,3 +887,36 @@ func TestProcessDNSRace(t *testing.T) {
 	}()
 	wg.Wait()
 }
+
+func TestMutualEnrichSoftirqFlow(t *testing.T) {
+	st := makeTestingState(t, time.Second, time.Second, 0, time.Second)
+	owner := &process{pid: 1234}
+	sock := &socket{pid: 1234, process: owner}
+
+	f := flow{pid: 0}
+	st.mutualEnrich(sock, &f)
+
+	assert.Equal(t, uint32(1234), f.pid, "flow should inherit socket owner pid")
+	assert.Equal(t, owner, f.process, "flow should inherit socket owner process")
+}
+
+func TestOnSockDestroyedUsesOwnerPID(t *testing.T) {
+	const (
+		ownerPID  = uint32(1000)
+		closerPID = uint32(2000)
+		sockPtr   = uintptr(0xdeadbeef)
+	)
+	st := makeTestingState(t, time.Second, time.Second, 0, time.Second)
+	owner := &process{pid: ownerPID}
+	st.processes[ownerPID] = owner
+
+	sock := &socket{
+		sock: sockPtr,
+		pid:  ownerPID,
+	}
+	st.socks[sockPtr] = sock
+
+	st.onSockDestroyed(sockPtr, sock, closerPID)
+
+	assert.Equal(t, owner, sock.process, "onSockDestroyed should resolve process from owner pid, not closer pid")
+}
