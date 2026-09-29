@@ -80,7 +80,7 @@ type filestream struct {
 	// continuously-busy file.
 	sliceBudget time.Duration
 
-	// harvesterState records the identity of this input's open files.
+	// harvesterState shares file state with this input's prospector.
 	harvesterState *fileStateTable
 
 	// Function references for testing
@@ -167,7 +167,7 @@ func configure(
 	c.TakeOver.LogWarnings(log)
 
 	harvesterState := newFileStateTable()
-	prospector, err := newProspector(c, log, src, dc)
+	prospector, err := newProspector(c, log, src, dc, harvesterState)
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
 	}
@@ -186,7 +186,7 @@ func configure(
 		compression:               c.Compression,
 		includeFileOwnerName:      c.IncludeFileOwnerName,
 		includeFileOwnerGroupName: c.IncludeFileOwnerGroupName,
-		includeFileFingerprint:    c.IncludeFileFingerprint,
+		includeFileFingerprint:    c.IncludeFileFingerprint && c.FileWatcher.Scanner.Fingerprint.Enabled,
 		hasLineFilter:             len(c.Reader.IncludeLines) > 0 || len(c.Reader.ExcludeLines) > 0,
 		deleterConfig:             c.Delete,
 		harvesterState:            harvesterState,
@@ -258,7 +258,7 @@ func (inp *filestream) Test(src loginp.Source, ctx input.TestContext) error {
 	}
 	defer f.Close()
 
-	r, _, err := inp.buildPipeline(ctx.Logger, ctx.Cancelation, f, enc, fs, 0)
+	r, _, err := inp.buildPipeline(ctx.Logger, ctx.Cancelation, f, enc, fs, 0, nil)
 	if err != nil {
 		return err
 	}
@@ -455,6 +455,7 @@ func (inp *filestream) buildPipeline(
 	encoding encoding.Encoding,
 	fs fileSource,
 	offset int64,
+	h *openFileState,
 ) (reader.Reader, *logFile, error) {
 	log.Debug("newLogFileReader with config.MaxBytes:", inp.readerConfig.MaxBytes)
 
@@ -502,14 +503,11 @@ func (inp *filestream) buildPipeline(
 	var r reader.Reader = encReader
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
-	// Only publish the completed SHA-256. A still-growing fingerprint's material
-	// is the raw hex of the file header, not a hash, so publishing it would
-	// expose file content.
-	var fingerprint string
-	if inp.includeFileFingerprint && fs.desc.Fingerprint.Complete() {
-		fingerprint = fs.desc.Fingerprint.Sum
+	var fingerprintFn func() string
+	if inp.includeFileFingerprint {
+		fingerprintFn = h.FingerprintSum
 	}
-	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fingerprint, offset)
+	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fingerprintFn, offset)
 
 	r = inp.parsers.Create(r, log)
 
