@@ -216,7 +216,7 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		return nil, errNoInputRunner
 	}
 
-	var previousSrcIdentifiers []*SourceIdentifier
+	var previousMatchers []InputMatcher
 	if settings.TakeOver.Enabled {
 		for _, id := range settings.TakeOver.FromIDs {
 			si, err := NewSourceIdentifier(cim.Type, id)
@@ -226,15 +226,14 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 						"[ID: %q] error while creating source identifier for previous ID %q: %w",
 						settings.ID, id, err)
 			}
-
-			previousSrcIdentifiers = append(previousSrcIdentifiers, si)
+			previousMatchers = append(previousMatchers, si)
 		}
 	}
 
 	pStore := cim.getRetainedStore()
 	defer pStore.Release()
 
-	prospectorStore := newSourceStore(pStore, srcIdentifier, previousSrcIdentifiers)
+	prospectorStore := newSourceStore(pStore, srcIdentifier, previousMatchers, settings.TakeOver.FromAnyID)
 
 	// create a store with the deprecated global ID. This will be used to
 	// migrate the entries in the registry to use the new input ID.
@@ -242,7 +241,7 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 	if err != nil {
 		return nil, fmt.Errorf("cannot create global identifier for input: %w", err)
 	}
-	globalStore := newSourceStore(pStore, globalIdentifier, nil)
+	globalStore := newSourceStore(pStore, globalIdentifier, nil, false)
 
 	err = prospector.Init(prospectorStore, globalStore, srcIdentifier.ID)
 	if err != nil {
@@ -250,16 +249,17 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 	}
 
 	return &managedInput{
-		manager:                cim,
-		ackCH:                  cim.ackCH,
-		id:                     settings.ID,
-		prospector:             prospector,
-		harvester:              harvester,
-		readUntilEOF:           settings.ReadUntilEOF,
-		sourceIdentifier:       srcIdentifier,
-		previousSrcIdentifiers: previousSrcIdentifiers,
-		cleanTimeout:           settings.CleanInactive,
-		harvesterLimit:         settings.HarvesterLimit,
+		manager:          cim,
+		ackCH:            cim.ackCH,
+		id:               settings.ID,
+		prospector:       prospector,
+		harvester:        harvester,
+		readUntilEOF:     settings.ReadUntilEOF,
+		sourceIdentifier: srcIdentifier,
+		previousMatchers: previousMatchers,
+		takeOverAnyID:    settings.TakeOver.FromAnyID,
+		cleanTimeout:     settings.CleanInactive,
+		harvesterLimit:   settings.HarvesterLimit,
 	}, nil
 }
 
@@ -321,13 +321,21 @@ func (i *SourceIdentifier) MatchesInput(id string) bool {
 	return strings.HasPrefix(id, i.prefix)
 }
 
+// InputMatcher reports whether a registry key belongs to a given input.
+type InputMatcher interface {
+	MatchesInput(key string) bool
+}
+
 // TakeOverConfig is the configuration for the take over mode.
 // It allows the Filestream input to take over states from the log
 // input or other Filestream inputs
 type TakeOverConfig struct {
 	Enabled bool `config:"enabled"`
-	// Filestream IDs to take over states
+	// Filestream IDs to take over states (exact match).
 	FromIDs []string `config:"from_ids"`
+	// FromAnyID, when true, takes over states from any previous filestream
+	// input ID, regardless of what that ID was. Mutually exclusive with FromIDs.
+	FromAnyID bool `config:"from_any_id"`
 	// Stream from the container input to take over from.
 	// Valid values: stderr, stdout or it can be empty. An empty stream means
 	// all streams.
@@ -357,20 +365,31 @@ func (t *TakeOverConfig) Unpack(value any) error {
 		}
 
 		rawFromIDs, exists := v["from_ids"]
-		if !exists {
-			return nil
+		if exists {
+			fromIDs, ok := rawFromIDs.([]any)
+			if !ok {
+				return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as []any", rawFromIDs)
+			}
+			for _, el := range fromIDs {
+				strEl, ok := el.(string)
+				if !ok {
+					return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as string", el)
+				}
+				t.FromIDs = append(t.FromIDs, strEl)
+			}
 		}
 
-		fromIDs, ok := rawFromIDs.([]any)
-		if !ok {
-			return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as []any", rawFromIDs)
-		}
-		for _, el := range fromIDs {
-			strEl, ok := el.(string)
+		rawFromAnyID, exists := v["from_any_id"]
+		if exists {
+			fromAnyID, ok := rawFromAnyID.(bool)
 			if !ok {
-				return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as string", el)
+				return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as bool", rawFromAnyID)
 			}
-			t.FromIDs = append(t.FromIDs, strEl)
+			t.FromAnyID = fromAnyID
+		}
+
+		if t.FromAnyID && len(t.FromIDs) > 0 {
+			return fmt.Errorf("'from_any_id' and 'from_ids' are mutually exclusive")
 		}
 
 	default:
@@ -387,7 +406,7 @@ func (t *TakeOverConfig) LogWarnings(logger *logp.Logger) {
 }
 
 func (t *TakeOverConfig) FromFilestream() bool {
-	return len(t.FromIDs) != 0
+	return len(t.FromIDs) != 0 || t.FromAnyID
 }
 
 // ReadUntilEOFConfig configures the behaviour to keep reading the current
