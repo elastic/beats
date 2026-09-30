@@ -23,7 +23,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -276,4 +278,15 @@ func normalizeEvent(t testing.TB, event beat.Event) any {
 		t.Fatal(err)
 	}
 	return out
+}
+
+func TestOptionsToMapRejectsShortTimeOffsetOption(t *testing.T) {
+	v4, err := dhcpv4.New(
+		dhcpv4.WithOption(dhcpv4.OptGeneric(dhcpv4.OptionTimeOffset, []byte{0x00})),
+	)
+	require.NoError(t, err)
+
+	assert.NotPanics(t, func() {
+		_, _ = optionsToMap(v4)
+	}, "malformed OptionTimeOffset must not panic")
 }
