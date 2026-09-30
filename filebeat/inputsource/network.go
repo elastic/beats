@@ -43,5 +43,4 @@ type TLSMetadata struct {
 }
 
 // NetworkFunc defines callback executed when a new event is received from a network source.
-// The callback owns data; it is never aliased to an internal read buffer.
 type NetworkFunc = func(data []byte, metadata NetworkMetadata)
