@@ -75,6 +75,7 @@ conditions:
     sourceid: npcapImageTag
     spec:
       image: docker.elastic.co/observability-ci/golang-crossbuild
+      tag: '{{ source "npcapImageTag" }}'
 
   isNewVersion:
     name: 'Is NpcapVersion already {{ source "npcapVersion" }} in pcap.go?'
