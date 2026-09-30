@@ -301,7 +301,7 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 			// reconnect and resume from the cursor without counting it
 			// toward the attempt limit or DEGRADED reporting.
 			var interrupted interruptedError
-			if errors.As(err, &interrupted) {
+			if errors.As(err, &interrupted) && interrupted.events > 0 {
 				attempt = 0
 				failures = 0
 				waitTime := time.Second
@@ -641,7 +641,7 @@ func (s *falconHoseStream) consumeFeed(ctx context.Context, cli *http.Client, r 
 			interrupted := errors.Is(err, io.ErrUnexpectedEOF) || errors.As(err, &netErr)
 			s.log.Warnw("feed stream read failed", "url", feedName, "error", err, "interrupted", interrupted, "events", events, "duration", duration)
 			err = fmt.Errorf("error decoding event: %w", err)
-			if interrupted && events > 0 {
+			if interrupted {
 				return interruptedError{error: err, events: events}
 			}
 			return err
@@ -742,10 +742,9 @@ func (e transientError) Unwrap() error {
 	return e.error
 }
 
-// interruptedError is a firehose read failure after the feed delivered
-// events, for example a connection dropped by the upstream or a network
-// device. The retry loop reconnects and resumes from the cursor without
-// counting it toward the attempt limit.
+// interruptedError is a firehose read failure caused by the connection
+// being cut, for example by the upstream or a network device, rather than
+// by the data.
 type interruptedError struct {
 	error
 	events int // Events delivered by the feed before the interruption.
