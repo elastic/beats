@@ -259,14 +259,10 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		}
 	}
 
-<<<<<<< HEAD
 	pStore := cim.getRetainedStore()
 	defer pStore.Release()
 
-	prospectorStore := newSourceStore(pStore, srcIdentifier, previousSrcIdentifiers)
-=======
 	prospectorStore := newSourceStore(pStore, srcIdentifier, previousMatchers, settings.TakeOver.FromAnyID)
->>>>>>> e3e6669 (filestream: add take_over.from_any_id for ID-agnostic state takeover (#53122))
 
 	// create a store with the deprecated global ID. This will be used to
 	// migrate the entries in the registry to use the new input ID.
@@ -282,32 +278,17 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 	}
 
 	return &managedInput{
-<<<<<<< HEAD
-		manager:                cim,
-		ackCH:                  cim.ackCH,
-		id:                     settings.ID,
-		prospector:             prospector,
-		harvester:              harvester,
-		readUntilEOF:           settings.ReadUntilEOF,
-		sourceIdentifier:       srcIdentifier,
-		previousSrcIdentifiers: previousSrcIdentifiers,
-		cleanTimeout:           settings.CleanInactive,
-		harvesterLimit:         settings.HarvesterLimit,
-=======
-		manager:            cim,
-		ackCH:              entry.ackCH,
-		id:                 settings.ID,
-		prospector:         prospector,
-		harvester:          harvester,
-		readUntilEOF:       settings.ReadUntilEOF,
-		backoff:            settings.Backoff,
-		stateCheckInterval: settings.Close.OnStateChange.CheckInterval,
-		sourceIdentifier:   srcIdentifier,
-		previousMatchers:   previousMatchers,
-		takeOverAnyID:      settings.TakeOver.FromAnyID,
-		cleanTimeout:       settings.CleanInactive,
-		harvesterLimit:     settings.HarvesterLimit,
->>>>>>> e3e6669 (filestream: add take_over.from_any_id for ID-agnostic state takeover (#53122))
+		manager:          cim,
+		ackCH:            cim.ackCH,
+		id:               settings.ID,
+		prospector:       prospector,
+		harvester:        harvester,
+		readUntilEOF:     settings.ReadUntilEOF,
+		sourceIdentifier: srcIdentifier,
+		previousMatchers: previousMatchers,
+		takeOverAnyID:    settings.TakeOver.FromAnyID,
+		cleanTimeout:     settings.CleanInactive,
+		harvesterLimit:   settings.HarvesterLimit,
 	}, nil
 }
 
