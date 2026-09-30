@@ -7,8 +7,8 @@ extensions:
     endpoints:
       - http://localhost:9200
   elasticsearch_storage:
-    hosts:
-      - http://localhost:9200
+    auth:
+      authenticator: elasticsearchauth
   kafkapartitioner:
 
 receivers:
