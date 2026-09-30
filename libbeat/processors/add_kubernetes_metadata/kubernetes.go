@@ -62,23 +62,13 @@ type initializedState struct {
 }
 
 type kubernetesAnnotator struct {
-<<<<<<< HEAD
 	log       *logp.Logger
 	state     atomic.Pointer[initializedState]
 	cache     *cache
+	indexed   sync.Map
 	initOnce  sync.Once
 	wg        sync.WaitGroup
 	cancelCtx context.CancelFunc
-=======
-	log          *logp.Logger
-	state        atomic.Pointer[initializedState]
-	cache        *cache
-	indexed      sync.Map
-	initOnce     sync.Once
-	wg           sync.WaitGroup
-	cancelCtx    context.CancelFunc
-	appendFields bool
->>>>>>> 352e67a (add_kubernetes_metadata: enrich /var/log/pods events with container id/runtime (#53300))
 }
 
 func init() {
