@@ -9,7 +9,8 @@
 set -euo pipefail
 
 VERSION="${NEW_NPCAP_VERSION:?NEW_NPCAP_VERSION must be set}"
-BRANCH="automation/bump-npcap-${VERSION}"
+DATESTAMP=$(date -u '+%Y%m%d%H%M')
+BRANCH="automation/bump-npcap-${VERSION}-${DATESTAMP}"
 PCAP_GO="x-pack/packetbeat/scripts/mage/pcap.go"
 LICENSE_FILE="x-pack/packetbeat/npcap/installer/LICENSE"
 
