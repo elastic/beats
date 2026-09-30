@@ -25,33 +25,18 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-<<<<<<< HEAD
-
-	"github.com/elastic/beats/v7/libbeat/beat"
-=======
-	"go.opentelemetry.io/collector/pdata/pcommon"
-	"go.uber.org/goleak"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
-	k8sclient "k8s.io/client-go/kubernetes"
-	k8sfake "k8s.io/client-go/kubernetes/fake"
-	k8stesting "k8s.io/client-go/testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
-	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
 	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes/metadata"
->>>>>>> 352e67a (add_kubernetes_metadata: enrich /var/log/pods events with container id/runtime (#53300))
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-<<<<<<< HEAD
-=======
 // funcMatcher is a test-only Matcher that delegates to a function.
 type funcMatcher struct {
 	fn func(mapstr.M) []string
@@ -61,27 +46,6 @@ func (f funcMatcher) MetadataIndexCandidates(event mapstr.M) []string {
 	return f.fn(event)
 }
 
-// assertRunPdataEquivalent verifies that RunPdata, given the same input fields
-// used to produce result via Run, enriches a pcommon.Map with identical output.
-func assertRunPdataEquivalent(t *testing.T, p beat.Processor, input, result mapstr.M) {
-	t.Helper()
-
-	pp, ok := p.(processors.PdataProcessor)
-	require.True(t, ok, "processor must implement PdataProcessor")
-
-	body := pcommon.NewMap()
-	require.NoError(t, otelmap.FromMapstr(body, input))
-	drop, err := pp.RunPdata(body)
-	require.NoError(t, err)
-	require.False(t, drop)
-
-	legacyNorm := pcommon.NewMap()
-	require.NoError(t, otelmap.FromMapstr(legacyNorm, result))
-	assert.Equal(t, otelmap.ToMapstr(legacyNorm), otelmap.ToMapstr(body),
-		"Run and RunPdata must produce identical output")
-}
-
->>>>>>> 352e67a (add_kubernetes_metadata: enrich /var/log/pods events with container id/runtime (#53300))
 // Test Annotator is skipped if kubernetes metadata already exist
 func TestAnnotatorSkipped(t *testing.T) {
 	cfg := config.MustNewConfigFrom(map[string]any{
@@ -662,164 +626,6 @@ func BenchmarkKubernetesAnnotatorRun(b *testing.B) {
 		}
 	}
 }
-<<<<<<< HEAD
-=======
-
-// unavailableK8sClient returns a client whose discovery always fails, so
-// isKubernetesAvailableWithTimeout loops until timeout or context cancel.
-func unavailableK8sClient() k8sclient.Interface {
-	client := k8sfake.NewSimpleClientset()
-	client.PrependReactor("get", "version", func(k8stesting.Action) (bool, runtime.Object, error) {
-		return true, nil, errors.New("kubernetes unavailable")
-	})
-	return client
-}
-
-// TestCloseUnblocksAsyncInit verifies that Close cancels an async init stuck in the
-// indefinite kubernetes availability wait (timeout=0) and does not leak goroutines.
-func TestCloseUnblocksAsyncInit(t *testing.T) {
-	// Ignore cache.cleanup goroutines from other tests in this package that never call cache.stop().
-	defer goleak.VerifyNone(t, goleak.IgnoreCurrent())
-
-	logger := logptest.NewTestingLogger(t, selector)
-	ctx, cancel := context.WithCancel(context.Background())
-
-	proc := &kubernetesAnnotator{
-		log:       logger,
-		cache:     newCache(10 * time.Second),
-		cancelCtx: cancel,
-	}
-
-	proc.wg.Add(1)
-	initStarted := make(chan struct{})
-	go func() {
-		defer proc.wg.Done()
-		proc.initOnce.Do(func() {
-			close(initStarted)
-			_, _ = isKubernetesAvailableWithTimeout(
-				ctx,
-				unavailableK8sClient(),
-				0, // wait indefinitely (same as wait_for_metadata_timeout: 0)
-				10*time.Millisecond,
-				logger,
-			)
-		})
-	}()
-
-	<-initStarted
-	// Ensure we are past the first failed discovery and inside the select/wait loop.
-	time.Sleep(30 * time.Millisecond)
-
-	closeDone := make(chan error, 1)
-	go func() {
-		closeDone <- proc.Close()
-	}()
-
-	select {
-	case err := <-closeDone:
-		require.NoError(t, err, "Close must return after cancelling the availability wait")
-	case <-time.After(500 * time.Millisecond):
-		t.Fatal("Close blocked: on main Close() waits on initOnce while init is stuck in the availability loop")
-	}
-}
-
-func TestIsKubernetesAvailableWithTimeout(t *testing.T) {
-	logger := logptest.NewTestingLogger(t, selector)
-	unavailable := unavailableK8sClient()
-	available := k8sfake.NewSimpleClientset()
-
-	t.Run("success", func(t *testing.T) {
-		ctx := context.Background()
-		ok, err := isKubernetesAvailableWithTimeout(ctx, available, 0, time.Millisecond, logger)
-		require.NoError(t, err)
-		assert.True(t, ok)
-	})
-
-	t.Run("timeout", func(t *testing.T) {
-		ctx := context.Background()
-		start := time.Now()
-		ok, err := isKubernetesAvailableWithTimeout(ctx, unavailable, 80*time.Millisecond, 10*time.Millisecond, logger)
-		elapsed := time.Since(start)
-
-		require.Error(t, err)
-		assert.False(t, ok)
-		assert.Contains(t, err.Error(), "timeout waiting for kubernetes")
-		assert.GreaterOrEqual(t, elapsed, 80*time.Millisecond)
-	})
-
-	t.Run("context cancelled", func(t *testing.T) {
-		ctx, cancel := context.WithCancel(context.Background())
-		cancel()
-
-		ok, err := isKubernetesAvailableWithTimeout(ctx, unavailable, 0, 10*time.Millisecond, logger)
-		require.Error(t, err)
-		assert.False(t, ok)
-		assert.Contains(t, err.Error(), "context cancelled")
-		assert.ErrorIs(t, err, context.Canceled)
-	})
-}
-
-// TestAnnotatorAppendFields verifies that when append_fields is true the processor
-// merges metadata into an event that already has a kubernetes field without
-// overwriting any existing keys, and that it is a no-op by default.
-func TestAnnotatorAppendFields(t *testing.T) {
-	cacheMeta := mapstr.M{
-		"kubernetes": mapstr.M{
-			"pod":       mapstr.M{"name": "mypod"},
-			"namespace": "kube-system",
-			"labels":    mapstr.M{"app": "myapp"},
-		},
-	}
-	existingKubernetes := mapstr.M{
-		"pod":       mapstr.M{"name": "existing-pod"},
-		"namespace": "existing-ns",
-	}
-
-	t.Run("default skips when kubernetes field present", func(t *testing.T) {
-		processor := newAnnotatorForTest(t, "abc000", cacheMeta)
-
-		event := baseEvent("abc000")
-		event.Fields["kubernetes"] = existingKubernetes.Clone()
-		inputFields := event.Fields.Clone()
-
-		result, err := processor.Run(event)
-		require.NoError(t, err)
-
-		k8sRaw, _ := result.Fields.GetValue("kubernetes")
-		assert.Equal(t, existingKubernetes, k8sRaw, "kubernetes field must be unchanged when append_fields is false")
-
-		// RunPdata path: assert Run == RunPdata.
-		assertRunPdataEquivalent(t, processor, inputFields, result.Fields)
-	})
-
-	t.Run("append_fields merges without overwriting existing keys", func(t *testing.T) {
-		processor := newAnnotatorForTest(t, "abc001", cacheMeta)
-		processor.appendFields = true
-
-		event := baseEvent("abc001")
-		event.Fields["kubernetes"] = existingKubernetes.Clone()
-		inputFields := event.Fields.Clone()
-
-		result, err := processor.Run(event)
-		require.NoError(t, err)
-
-		k8sRaw, err := result.Fields.GetValue("kubernetes")
-		require.NoError(t, err)
-		k8s, ok := k8sRaw.(mapstr.M)
-		require.True(t, ok)
-
-		// Conflicting keys must keep the pre-existing value.
-		podMap, ok := k8s["pod"].(mapstr.M)
-		require.True(t, ok, "kubernetes.pod must be a mapstr.M")
-		assert.Equal(t, "existing-pod", podMap["name"], "pod.name must not be overwritten")
-		assert.Equal(t, "existing-ns", k8s["namespace"], "namespace must not be overwritten")
-		// Keys absent from the event must be appended from the cache.
-		assert.Equal(t, mapstr.M{"app": "myapp"}, k8s["labels"], "labels should be appended from cache metadata")
-
-		// RunPdata path: assert Run == RunPdata.
-		assertRunPdataEquivalent(t, processor, inputFields, result.Fields)
-	})
-}
 
 // TestAnnotatorRunCandidateFallback verifies that when a matcher returns multiple
 // candidate indexes, the processor walks them in order and uses the first hit.
@@ -1012,4 +818,3 @@ func TestAnnotatorCacheEvictionOnUpdate(t *testing.T) {
 	assert.Contains(t, tracked, liveIdx)
 	assert.Contains(t, tracked, newRestartIdx, "re-added previous-restart index must be tracked")
 }
->>>>>>> 352e67a (add_kubernetes_metadata: enrich /var/log/pods events with container id/runtime (#53300))

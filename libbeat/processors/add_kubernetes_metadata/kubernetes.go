@@ -58,21 +58,11 @@ type initializedState struct {
 }
 
 type kubernetesAnnotator struct {
-<<<<<<< HEAD
 	log      *logp.Logger
 	state    atomic.Pointer[initializedState]
 	cache    *cache
+	indexed  sync.Map
 	initOnce sync.Once
-=======
-	log          *logp.Logger
-	state        atomic.Pointer[initializedState]
-	cache        *cache
-	indexed      sync.Map
-	initOnce     sync.Once
-	wg           sync.WaitGroup
-	cancelCtx    context.CancelFunc
-	appendFields bool
->>>>>>> 352e67a (add_kubernetes_metadata: enrich /var/log/pods events with container id/runtime (#53300))
 }
 
 func init() {
@@ -371,56 +361,9 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	// container field. This replaces the original three full clones.
 	kubeMeta := metadata.Clone()
 
-<<<<<<< HEAD
 	// Build the OCI container field by cloning only the container sub-map —
 	// much cheaper than cloning the full metadata. Transform it in place:
 	// drop container.name and rewrite container.image -> container.image.name.
-=======
-	return event, nil
-}
-
-// RunPdata enriches the given pcommon.Map directly with Kubernetes metadata
-func (k *kubernetesAnnotator) RunPdata(body pcommon.Map) (bool, error) {
-	if _, ok := body.Get("kubernetes"); ok && !k.appendFields {
-		return false, nil
-	}
-
-	// A nil state means init has not published yet (still running or kubernetes unavailable); the
-	// load pairs with the Store in init for a race-free read.
-	state := k.state.Load()
-	if state == nil {
-		return false, nil
-	}
-
-	candidates := state.matchers.MetadataIndexCandidatesPdata(body)
-	if len(candidates) == 0 {
-		k.log.Debug("No container match string, not adding kubernetes data")
-		return false, nil
-	}
-	metadata := k.cache.getFirstMatch(candidates)
-	if metadata == nil {
-		k.log.Debugf("Candidates %v found but none matched in cache, not adding kubernetes data", candidates)
-		return false, nil
-	}
-
-	kubeMeta, ociContainer := prepareKubeMetadata(metadata)
-	overwrite := !k.appendFields
-	if ociContainer != nil {
-		if err := otelmap.MergeMapstrIntoPdata(mapstr.M{"container": ociContainer}, body, overwrite); err != nil {
-			return false, err
-		}
-	}
-	return false, otelmap.MergeMapstrIntoPdata(kubeMeta, body, overwrite)
-}
-
-// prepareKubeMetadata clones the cached metadata, builds the OCI container
-// sub-map from kubernetes.container (dropping name, rewriting image), and
-// strips the kubernetes-only container fields. container.name is kept in
-// kubeMeta to match original behaviour.
-// ociContainer is nil when the kubernetes.container sub-map is absent.
-func prepareKubeMetadata(metadata mapstr.M) (kubeMeta mapstr.M, ociContainer mapstr.M) {
-	kubeMeta = metadata.Clone()
->>>>>>> 352e67a (add_kubernetes_metadata: enrich /var/log/pods events with container id/runtime (#53300))
 	if containerVal, err := kubeMeta.GetValue("kubernetes.container"); err == nil {
 		if cm, ok := containerVal.(mapstr.M); ok {
 			ociContainer := cm.Clone()
@@ -432,15 +375,8 @@ func prepareKubeMetadata(metadata mapstr.M) (kubeMeta mapstr.M, ociContainer map
 			event.Fields.DeepUpdate(mapstr.M{"container": ociContainer})
 		}
 	}
-<<<<<<< HEAD
-
-	// Remove container fields that belong only in the OCI section before writing
-	// kubernetes metadata to the event. container.name is intentionally kept here
-	// to match original behaviour.
-=======
 	// Prevent these fields from leaking into kubernetes.container.*; add new container.*
 	// fields from PodUIDIndexer.GetMetadata here too.
->>>>>>> 352e67a (add_kubernetes_metadata: enrich /var/log/pods events with container id/runtime (#53300))
 	_ = kubeMeta.Delete("kubernetes.container.id")
 	_ = kubeMeta.Delete("kubernetes.container.runtime")
 	_ = kubeMeta.Delete("kubernetes.container.image")

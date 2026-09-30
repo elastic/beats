@@ -86,35 +86,6 @@ func (m *Matchers) MetadataIndexCandidates(event mapstr.M) []string {
 	return nil
 }
 
-<<<<<<< HEAD
-=======
-// pdataMatcher is an optional Matcher extension for native pcommon.Map lookups, avoiding mapstr.M conversion.
-type pdataMatcher interface {
-	MetadataIndexCandidatesPdata(body pcommon.Map) []string
-}
-
-// MetadataIndexCandidatesPdata is the pdata-native variant of MetadataIndexCandidates;
-// converts to mapstr.M lazily and only once for matchers that don't implement pdataMatcher.
-func (m *Matchers) MetadataIndexCandidatesPdata(body pcommon.Map) []string {
-	var fallback mapstr.M
-	for _, matcher := range m.matchers {
-		if pm, ok := matcher.(pdataMatcher); ok {
-			if candidates := pm.MetadataIndexCandidatesPdata(body); len(candidates) > 0 {
-				return candidates
-			}
-		} else {
-			if fallback == nil {
-				fallback = otelmap.ToMapstr(body)
-			}
-			if candidates := matcher.MetadataIndexCandidates(fallback); len(candidates) > 0 {
-				return candidates
-			}
-		}
-	}
-	return nil
-}
-
->>>>>>> 352e67a (add_kubernetes_metadata: enrich /var/log/pods events with container id/runtime (#53300))
 func (m *Matchers) Empty() bool {
 	return len(m.matchers) == 0
 }
@@ -186,34 +157,6 @@ func (f *FieldMatcher) MetadataIndexCandidates(event mapstr.M) []string {
 	return nil
 }
 
-<<<<<<< HEAD
-=======
-func (f *FieldMatcher) MetadataIndexCandidatesPdata(body pcommon.Map) []string {
-	for _, field := range f.MatchFields {
-		v, ok := otelmap.GetAtPath(field, body)
-		if !ok || v.Type() != pcommon.ValueTypeStr {
-			continue
-		}
-		fieldValue := v.Str()
-		if f.Regexp == nil {
-			if fieldValue == "" {
-				continue
-			}
-			return []string{fieldValue}
-		}
-		matches := f.Regexp.FindStringSubmatch(fieldValue)
-		if matches == nil {
-			continue
-		}
-		key := matches[f.Regexp.SubexpIndex(regexKeyGroupName)]
-		if key != "" {
-			return []string{key}
-		}
-	}
-	return nil
-}
-
->>>>>>> 352e67a (add_kubernetes_metadata: enrich /var/log/pods events with container id/runtime (#53300))
 type FieldFormatMatcher struct {
 	Codec codec.Codec
 }
