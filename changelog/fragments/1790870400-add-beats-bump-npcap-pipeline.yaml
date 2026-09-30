@@ -1,3 +1,0 @@
-kind: enhancement
-summary: Add automated Buildkite pipeline for bumping the npcap OEM installer version.
-component: packetbeat
