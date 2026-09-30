@@ -89,7 +89,7 @@ func newFileWatcher(
 	fi fileIdentifier,
 	srci *loginp.SourceIdentifier,
 ) (*fileWatcher, error) {
-	return newFileWatcherWithDirReader(logger, paths, config, compression, sendNotChanged, fi, srci, nil, 0)
+	return newFileWatcherWithDirReader(logger, paths, config, compression, sendNotChanged, fi, srci, nil, 0, nil)
 }
 
 // newFileWatcherWithDirReader is like newFileWatcher but accepts a shared dirCache
@@ -104,10 +104,11 @@ func newFileWatcherWithDirReader(
 	srci *loginp.SourceIdentifier,
 	dc *dirCache,
 	maxAge time.Duration,
+	harvesterState *fileStateTable,
 ) (*fileWatcher, error) {
 
 	config.SendNotChanged = sendNotChanged
-	scanner, err := newFileScannerWithCache(logger, paths, config.Scanner, compression, dc, maxAge)
+	scanner, err := newFileScannerWithCache(logger, paths, config.Scanner, compression, dc, maxAge, harvesterState)
 	if err != nil {
 		return nil, err
 	}

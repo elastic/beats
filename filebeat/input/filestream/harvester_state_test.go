@@ -232,6 +232,66 @@ func TestFileStateTable_NilSafety(t *testing.T) {
 	tbl.Deregister(realHandle) // nil table, real handle: still a no-op, no panic
 }
 
+func TestFileStateTable_PinnedDescriptor(t *testing.T) {
+	tbl := newFileStateTable()
+	pin := nonZeroOSState(t)
+	descAt := func(path, sum string) loginp.FileDescriptor {
+		return loginp.FileDescriptor{Filename: path, Fingerprint: completeFP(sum)}
+	}
+
+	_, _, ok := tbl.PinnedDescriptor("/logs/a.log")
+	assert.False(t, ok, "PinnedDescriptor must fail before any Publish")
+
+	h := publishHandle(tbl, "id-1", descAt("/logs/a.log", "sum-1"))
+	_, _, ok = tbl.PinnedDescriptor("/logs/a.log")
+	assert.False(t, ok, "PinnedDescriptor must fail before PinOSState")
+
+	// A zero StateOS is not a usable identity: still no candidate.
+	h.PinOSState(file.StateOS{})
+	_, _, ok = tbl.PinnedDescriptor("/logs/a.log")
+	assert.False(t, ok, "a zero pin must not make the handle a candidate")
+
+	h.PinOSState(pin)
+	got, gotPin, ok := tbl.PinnedDescriptor("/logs/a.log")
+	assert.True(t, ok, "PinnedDescriptor must resolve the pinned handle at its path")
+	assert.Equal(t, "sum-1", got.Fingerprint.Sum, "PinnedDescriptor must return the handle's descriptor")
+	assert.Equal(t, pin, gotPin, "PinnedDescriptor must return the handle's pin")
+
+	// The scanner reports the file at a new path (rename): the index follows.
+	tbl.UpdateDescriptor("id-1", descAt("/logs/b.log", "sum-1"))
+	_, _, ok = tbl.PinnedDescriptor("/logs/a.log")
+	assert.False(t, ok, "the old path must no longer resolve after the descriptor moved")
+	got, _, ok = tbl.PinnedDescriptor("/logs/b.log")
+	assert.True(t, ok, "the new path must resolve after the descriptor moved")
+	assert.Equal(t, "sum-1", got.Fingerprint.Sum, "the moved entry must keep its descriptor")
+
+	tbl.Deregister(h)
+	_, _, ok = tbl.PinnedDescriptor("/logs/b.log")
+	assert.False(t, ok, "PinnedDescriptor must fail after Deregister clears the index")
+}
+
+func TestFileStateTable_PinnedDescriptorDisplacedHandle(t *testing.T) {
+	tbl := newFileStateTable()
+	desc := loginp.FileDescriptor{Filename: "/logs/a.log", Fingerprint: completeFP("old")}
+
+	// A replacement harvester takes ownership of both indexes before the old
+	// harvester closes.
+	old := publishHandle(tbl, "id-old", desc)
+	old.PinOSState(nonZeroOSState(t))
+	desc.Fingerprint = completeFP("new")
+	newer := publishHandle(tbl, "id-new", desc)
+	newer.PinOSState(nonZeroOSState(t))
+
+	tbl.Deregister(old)
+	got, _, ok := tbl.PinnedDescriptor("/logs/a.log")
+	assert.True(t, ok, "the newer handle must keep the path index after the displaced one deregisters")
+	assert.Equal(t, "new", got.Fingerprint.Sum, "the surviving index entry must be the newer handle's")
+
+	tbl.Deregister(newer)
+	_, _, ok = tbl.PinnedDescriptor("/logs/a.log")
+	assert.False(t, ok, "the newer handle's Deregister must clear the path index")
+}
+
 // TestFileStateTable_ConcurrentAccess runs readers and writers concurrently.
 func TestFileStateTable_ConcurrentAccess(t *testing.T) {
 	tbl := newFileStateTable()
@@ -247,7 +307,7 @@ func TestFileStateTable_ConcurrentAccess(t *testing.T) {
 
 		wg.Go(func() {
 			for range ops {
-				h := publishHandle(tbl, key, growingDesc("dead"))
+				h := publishHandle(tbl, key, loginp.FileDescriptor{Filename: "/logs/" + key, Fingerprint: loginp.FingerprintID{Raw: "dead"}})
 				current.Store(h)
 				h.PinOSState(pinned)
 				_ = h.FingerprintSum()
@@ -257,8 +317,10 @@ func TestFileStateTable_ConcurrentAccess(t *testing.T) {
 
 		wg.Go(func() {
 			for range ops {
-				tbl.UpdateDescriptor(key, completeDesc("sum"))
+				tbl.UpdateDescriptor(key, loginp.FileDescriptor{Filename: "/logs/" + key + ".1", Fingerprint: completeFP("sum")})
 				_, _ = tbl.LookupOSState(key)
+				_, _, _ = tbl.PinnedDescriptor("/logs/" + key)
+				_, _, _ = tbl.PinnedDescriptor("/logs/" + key + ".1")
 			}
 		})
 

@@ -152,6 +152,8 @@ type fileScanner struct {
 	dirCache       *dirCache
 	dirCacheMaxAge time.Duration
 
+	harvesterState *fileStateTable
+
 	// Everything below exists only to avoid per-file allocations
 
 	hasher       hash.Hash
@@ -163,13 +165,13 @@ type fileScanner struct {
 }
 
 func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, compression string) (*fileScanner, error) {
-	return newFileScannerWithCache(logger, paths, config, compression, nil, 0)
+	return newFileScannerWithCache(logger, paths, config, compression, nil, 0, nil)
 }
 
 // newFileScannerWithCache is like newFileScanner but accepts a shared dirCache
 // and the per-call maxAge (typically min(check_interval, maxDirCacheAge)).
 // dc=nil means directory reads go directly to the OS without caching.
-func newFileScannerWithCache(logger *logp.Logger, paths []string, config fileScannerConfig, compression string, dc *dirCache, maxAge time.Duration) (*fileScanner, error) {
+func newFileScannerWithCache(logger *logp.Logger, paths []string, config fileScannerConfig, compression string, dc *dirCache, maxAge time.Duration, harvesterState *fileStateTable) (*fileScanner, error) {
 	s := fileScanner{
 		paths:          paths,
 		cfg:            config,
@@ -178,6 +180,7 @@ func newFileScannerWithCache(logger *logp.Logger, paths []string, config fileSca
 		compression:    compression,
 		dirCache:       dc,
 		dirCacheMaxAge: maxAge,
+		harvesterState: harvesterState,
 	}
 
 	if s.cfg.Fingerprint.Enabled {
@@ -896,6 +899,31 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 	return it, nil
 }
 
+// cachedFingerprint returns a reusable descriptor for the open file at
+// it.filename. Its device and inode must match the open file, its fingerprint
+// must be complete, and its size, modification time, and change time must match.
+func (s *fileScanner) cachedFingerprint(it *ingestTarget) (loginp.FileDescriptor, bool) {
+	cached, pin, ok := s.harvesterState.PinnedDescriptor(it.filename)
+	if !ok || cached.Info == nil || !cached.Fingerprint.Complete() {
+		return loginp.FileDescriptor{}, false
+	}
+
+	// A same-size rewrite can leave a stale fingerprint if both timestamps
+	// stay the same. Coarse timestamp precision can allow this.
+	// Filestream does not support editing existing file contents in place.
+	ctime := changeTime(it.info)
+	if ctime == 0 {
+		return loginp.FileDescriptor{}, false
+	}
+	if !pin.IsSame(commonfile.GetOSState(it.info)) ||
+		cached.Info.Size() != it.info.Size() ||
+		!cached.Info.ModTime().Equal(it.info.ModTime()) ||
+		changeTime(cached.Info) != ctime {
+		return loginp.FileDescriptor{}, false
+	}
+	return cached, true
+}
+
 // toFileDescriptor builds a FileDescriptor for the given ingest target.
 // With fingerprinting enabled, it computes the file's identity according to
 // the threshold rules:
@@ -918,6 +946,12 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 	fd.Info = it.info
 
 	if !s.cfg.Fingerprint.Enabled {
+		return fd, nil
+	}
+
+	if cached, ok := s.cachedFingerprint(it); ok {
+		fd.Fingerprint = cached.Fingerprint
+		fd.GZIP = cached.GZIP
 		return fd, nil
 	}
 

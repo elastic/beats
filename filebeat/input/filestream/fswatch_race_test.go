@@ -118,7 +118,7 @@ func TestFileWatcherRenameDuringScan(t *testing.T) {
 				}
 				paths := []string{filepath.Join(dir, "*.log*")}
 				cfg := fileScannerConfig{Fingerprint: identity.fingerprint}
-				s, err := newFileScannerWithCache(logptest.NewTestingLogger(t, ""), paths, cfg, CompressionNone, dc, time.Hour)
+				s, err := newFileScannerWithCache(logptest.NewTestingLogger(t, ""), paths, cfg, CompressionNone, dc, time.Hour, nil)
 				require.NoError(t, err, "create scanner")
 				w := trackedWatcher(t, s, oldPath)
 				w.growingFingerprint = identity.fingerprint.Growing
@@ -127,7 +127,7 @@ func TestFileWatcherRenameDuringScan(t *testing.T) {
 					// A listing fetched by a different scanner can still predate the
 					// rename, even if it is newer than this watcher's last scan.
 					dc.entry(dir).fetched.Store(0)
-					other, err := newFileScannerWithCache(logptest.NewTestingLogger(t, ""), paths, cfg, CompressionNone, dc, time.Hour)
+					other, err := newFileScannerWithCache(logptest.NewTestingLogger(t, ""), paths, cfg, CompressionNone, dc, time.Hour, nil)
 					require.NoError(t, err, "create another scanner sharing the cache")
 					assert.Contains(t, other.GetFiles(loginp.FileScanOptions{}).Files, oldPath, "other scanner must refresh before the rename")
 				}
@@ -189,7 +189,7 @@ func TestFileWatcherDeleteDuringScan(t *testing.T) {
 			if mode.cached {
 				dc = newDirCache()
 			}
-			s, err := newFileScannerWithCache(logptest.NewTestingLogger(t, ""), []string{filepath.Join(dir, "*.log")}, fileScannerConfig{}, CompressionNone, dc, time.Hour)
+			s, err := newFileScannerWithCache(logptest.NewTestingLogger(t, ""), []string{filepath.Join(dir, "*.log")}, fileScannerConfig{}, CompressionNone, dc, time.Hour, nil)
 			require.NoError(t, err, "create scanner")
 			w := trackedWatcher(t, s, path)
 

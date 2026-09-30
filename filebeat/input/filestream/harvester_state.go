@@ -28,6 +28,7 @@ import (
 type fileStateTable struct {
 	mu      sync.Mutex
 	entries map[string]*openFileState
+	byPath  map[string]*openFileState
 }
 
 // openFileState shares one open file's state with the scanner.
@@ -47,6 +48,7 @@ type openFileState struct {
 func newFileStateTable() *fileStateTable {
 	return &fileStateTable{
 		entries: make(map[string]*openFileState),
+		byPath:  make(map[string]*openFileState),
 	}
 }
 
@@ -68,6 +70,9 @@ func (t *fileStateTable) Deregister(h *openFileState) {
 	if t.entries[h.name] == h {
 		delete(t.entries, h.name)
 	}
+	if t.byPath[h.desc.Filename] == h {
+		delete(t.byPath, h.desc.Filename)
+	}
 	t.mu.Unlock()
 }
 
@@ -82,8 +87,22 @@ func (t *fileStateTable) UpdateDescriptor(name string, desc loginp.FileDescripto
 	defer t.mu.Unlock()
 
 	if h, ok := t.entries[name]; ok {
-		h.desc = desc
+		t.setDesc(h, desc)
 	}
+}
+
+// setDesc stores desc on h and moves h's path entry if the file name
+// changed. The caller holds t.mu.
+func (t *fileStateTable) setDesc(h *openFileState, desc loginp.FileDescriptor) {
+	if old := h.desc.Filename; old != desc.Filename {
+		if t.byPath[old] == h {
+			delete(t.byPath, old)
+		}
+		if desc.Filename != "" {
+			t.byPath[desc.Filename] = h
+		}
+	}
+	h.desc = desc
 }
 
 // LookupOSState returns the open file identity for name.
@@ -102,6 +121,22 @@ func (t *fileStateTable) LookupOSState(name string) (file.StateOS, bool) {
 		return file.StateOS{}, false
 	}
 	return h.os, true
+}
+
+// PinnedDescriptor returns the descriptor and file identity for an open harvester.
+// It returns ok=false if the path has no pinned harvester.
+func (t *fileStateTable) PinnedDescriptor(path string) (desc loginp.FileDescriptor, pin file.StateOS, ok bool) {
+	if t == nil {
+		return loginp.FileDescriptor{}, file.StateOS{}, false
+	}
+
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	h, ok := t.byPath[path]
+	if !ok || h.os == (file.StateOS{}) {
+		return loginp.FileDescriptor{}, file.StateOS{}, false
+	}
+	return h.desc, h.os, true
 }
 
 // PinOSState records the open file identity from fstat.
@@ -126,7 +161,7 @@ func (h *openFileState) Publish(name string, desc loginp.FileDescriptor) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
-	h.desc = desc
+	t.setDesc(h, desc)
 	if t.entries[h.name] == h {
 		delete(t.entries, h.name)
 	}
