@@ -2,6 +2,25 @@
 
 This is how we manage dependency updates using `updatecli`.
 
+## Bump Golang
+
+Tracks the latest Go patch release for the minor version in use (from `.go-version`) and opens a PR updating `.go-version`, `go.mod`, and associated Dockerfiles.
+
+- **Config**: `bump-golang.yml`
+- **Workflow**: `.github/workflows/bump-golang.yml` (runs Mon–Sat at 20:00 UTC)
+- **Source**: latest release from `elastic/golang-crossbuild` matching the current minor version
+- **Gate**: `dockerimage` condition confirms the `golang:{version}-bookworm` image is published before opening a PR
+
+## Bump npcap
+
+Tracks `NPCAP_VERSION` in `elastic/golang-crossbuild/Makefile.common` and opens a PR updating the npcap OEM installer version used by Packetbeat.
+
+- **Config**: `bump-npcap.yml`
+- **Workflow**: `.github/workflows/bump-npcap.yml` (runs daily at 06:00 UTC)
+- **Source**: `NPCAP_VERSION` read directly from `golang-crossbuild/Makefile.common` via `githubcontent`
+- **Gate**: `dockerimage` condition confirms `observability-ci/golang-crossbuild:{go-version}-npcap-{version}-debian9` is published before opening a PR, ensuring beats CI won't fail due to a missing crossbuild image
+- **Files updated**: `x-pack/packetbeat/scripts/mage/pcap.go`, `x-pack/packetbeat/npcap/installer/LICENSE`
+
 ## Bump VM Images
 
 This directory contains updatecli configuration to automatically update VM image versions in Buildkite pipeline files across the beats repository.
