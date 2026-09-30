@@ -2,6 +2,15 @@
 
 This is how we manage dependency updates using `updatecli`.
 
+## Bump osquery
+
+Tracks the latest osquery release on `osquery/osquery` and opens a PR updating the bundled osquery runtime used by osquerybeat.
+
+- **Config**: `bump-osquery.yml`
+- **Workflow**: `.github/workflows/bump-osquery.yml` (runs daily at 07:00 UTC)
+- **Source**: latest release from `osquery/osquery` GitHub releases
+- **Files updated**: `x-pack/osquerybeat/internal/distro/distro.json` (version + SHA256 checksums for all platforms), `x-pack/osquerybeat/changelog/fragments/` (new fragment)
+
 ## Bump VM Images
 
 This directory contains updatecli configuration to automatically update VM image versions in Buildkite pipeline files across the beats repository.
