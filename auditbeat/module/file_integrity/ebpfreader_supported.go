@@ -15,11 +15,34 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux && (amd64 || arm64)
+//go:build linux && (amd64 || arm64) && cgo
 
 package file_integrity
 
-import "github.com/elastic/elastic-agent-libs/logp"
+import (
+	"runtime"
+
+	"github.com/elastic/beats/v7/libbeat/common/seccomp"
+
+	"github.com/elastic/elastic-agent-libs/logp"
+)
+
+func init() {
+	// quark's eBPF backend loads programs and reads perf ring buffers, which
+	// the default seccomp policy does not allow. This package is linked into
+	// both the OSS and x-pack auditbeat binaries, so the x-pack quark
+	// consumers rely on this policy extension as well.
+	if runtime.GOARCH == "amd64" {
+		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall,
+			"bpf",
+			"eventfd2",        // needed by ring buffers
+			"memfd_create",    // needed when quark loads its embedded BTF
+			"perf_event_open", // needed by tracepoints and kprobes
+		); err != nil {
+			panic(err)
+		}
+	}
+}
 
 func newEBPFReader(c Config, l *logp.Logger) (EventProducer, error) {
 	paths := make(map[string]struct{})
