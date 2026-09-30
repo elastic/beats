@@ -16,16 +16,13 @@ summary: Reject RESP bulk-string lengths other than -1 (nil) and >=0 in the pack
 
 # REQUIRED for breaking-change, deprecation, known-issue
 description: |
-  The Redis RESP parser accepted arbitrary negative bulk-string lengths (e.g. `$-2\r\n`)
-  and forwarded them into streambuf.Buffer.CollectWithSuffix, which sliced the
-  underlying buffer with a negative index and crashed the parser goroutine with
-  "slice bounds out of range". A malformed on-the-wire Redis packet was enough
-  to take out a packetbeat scrape.
+  The Redis RESP parser forwarded invalid negative bulk-string lengths to
+  streambuf.Buffer.CollectWithSuffix, which can panic on invalid slice bounds.
+  These lengths are now rejected before buffer collection.
 
 # REQUIRED (List of components affected):
 component: packetbeat
 
 # AUTHOR
 # Name of the contributor submitting the fragment
-pr: https://github.com/elastic/beats/issues/50205
 issue: https://github.com/elastic/beats/issues/50205
