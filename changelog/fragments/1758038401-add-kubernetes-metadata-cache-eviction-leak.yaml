@@ -1,0 +1,11 @@
+kind: bug-fix
+
+summary: >
+  add_kubernetes_metadata: fix memory leak where old restart-count cache entries
+  (e.g. uid/container/N) were never scheduled for eviction when a pod's restart count
+  changed. The annotator now records all keys written per pod and deletes exactly that
+  set on the next update.
+
+component: libbeat
+
+issue: https://github.com/elastic/beats/issues/48922

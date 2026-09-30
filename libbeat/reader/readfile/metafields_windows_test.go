@@ -92,10 +92,10 @@ func TestCachedMetaSizing(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			r := &FileMetaReader{
-				reader:      msgReader([]reader.Message{msg}),
-				path:        "test/path",
-				fi:          fi,
-				fingerprint: tc.fingerprint,
+				reader:        msgReader([]reader.Message{msg}),
+				path:          "test/path",
+				fi:            fi,
+				fingerprintFn: fingerprintFnFor(tc.fingerprint),
 			}
 			_, err := r.Next()
 			require.NoError(t, err)

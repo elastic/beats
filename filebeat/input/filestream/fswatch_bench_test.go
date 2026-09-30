@@ -21,8 +21,10 @@ package filestream
 
 import (
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"testing"
 
@@ -419,39 +421,50 @@ func BenchmarkGetFilesIdentityCollision(b *testing.B) {
 }
 
 // BenchmarkGetFilesSharedDir models N filestream inputs each watching the same
-// base directory with a different leaf glob.
+// base directory with a different leaf glob, with and without a shared cache.
+// The two glob shapes exercise one end of the leaf prefilter each: literal text
+// then a wildcard, and a wildcard then literal text.
 func BenchmarkGetFilesSharedDir(b *testing.B) {
-	for _, inputs := range []int{10, 100, 400} {
-		b.Run(fmt.Sprintf("inputs%d", inputs), func(b *testing.B) {
-			base := b.TempDir()
-			total := benchEnvInt(b, "BENCH_SHARED_FILES", 500)
+	shapes := map[string]string{
+		"prefix": "pod-%04d-container-*.log",
+		"suffix": "*-container-%04d.log",
+	}
+	for _, shape := range slices.Sorted(maps.Keys(shapes)) {
+		for _, cached := range []bool{false, true} {
+			for _, inputs := range []int{10, 100, 400} {
+				b.Run(fmt.Sprintf("glob=%s/cached=%t/inputs=%d", shape, cached, inputs), func(b *testing.B) {
+					base := b.TempDir()
+					total := benchEnvInt(b, "BENCH_SHARED_FILES", 500)
 
-			for i := range total {
-				require.NoError(b, os.WriteFile(
-					filepath.Join(base, fmt.Sprintf("pod-%04d-container-abc123.log", i)), []byte("x"), 0o660))
-			}
+					for i := range total {
+						require.NoError(b, os.WriteFile(
+							filepath.Join(base, fmt.Sprintf("pod-%04d-container-%04d.log", i, i)), []byte("x"), 0o660))
+					}
 
-			cfg := fileScannerConfig{
-				RecursiveGlob: true,
-				Fingerprint:   fingerprintConfig{Enabled: false},
-			}
-			scanners := make([]*fileScanner, inputs)
-			dc := newDirCache()
-			b.Cleanup(func() { dc.reset() })
-			for i := range inputs {
-				glob := filepath.Join(base, fmt.Sprintf("pod-%04d-container-*.log", i%total))
-				var err error
-				scanners[i], err = newFileScannerWithCache(logp.NewNopLogger(), []string{glob}, cfg, CompressionNone, dc, maxDirCacheAge)
-				require.NoError(b, err)
-			}
+					cfg := fileScannerConfig{
+						RecursiveGlob: true,
+						Fingerprint:   fingerprintConfig{Enabled: false},
+					}
+					var dc *dirCache
+					if cached {
+						dc = newDirCache()
+					}
+					scanners := make([]*fileScanner, inputs)
+					for i := range inputs {
+						glob := filepath.Join(base, fmt.Sprintf(shapes[shape], i%total))
+						var err error
+						scanners[i], err = newFileScannerWithCache(logp.NewNopLogger(), []string{glob}, cfg, CompressionNone, dc, maxDirCacheAge)
+						require.NoError(b, err)
+					}
 
-			b.ReportAllocs()
-			b.ResetTimer()
-			for b.Loop() {
-				for _, s := range scanners {
-					s.GetFiles(loginp.FileScanOptions{})
-				}
+					b.ReportAllocs()
+					for b.Loop() {
+						for _, s := range scanners {
+							s.GetFiles(loginp.FileScanOptions{})
+						}
+					}
+				})
 			}
-		})
+		}
 	}
 }
