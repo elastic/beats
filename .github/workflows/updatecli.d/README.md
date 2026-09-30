@@ -9,7 +9,7 @@ Tracks the latest osquery release on `osquery/osquery` and opens a PR updating t
 - **Config**: `bump-osquery.yml`
 - **Workflow**: `.github/workflows/bump-osquery.yml` (runs daily at 07:00 UTC)
 - **Source**: latest release from `osquery/osquery` GitHub releases
-- **Files updated**: `x-pack/osquerybeat/internal/distro/distro.json` (version + SHA256 checksums for all platforms), `x-pack/osquerybeat/changelog/fragments/` (new fragment)
+- **Files updated**: `x-pack/osquerybeat/internal/distro/distro.json` (version + SHA256 checksums for all platforms), `changelog/fragments/` (new fragment)
 
 ## Bump VM Images
 

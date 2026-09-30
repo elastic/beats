@@ -66,6 +66,6 @@ targets:
     scmid: githubConfig
     kind: shell
     spec:
-      command: go run ./x-pack/osquerybeat/scripts/update_osquery/main.go --version {{ source "latestOsqueryVersion" }} --distro-file x-pack/osquerybeat/internal/distro/distro.json --changelog-dir x-pack/osquerybeat/changelog/fragments
+      command: go run ./x-pack/osquerybeat/scripts/update_osquery/main.go --version {{ source "latestOsqueryVersion" }} --distro-file x-pack/osquerybeat/internal/distro/distro.json --changelog-dir changelog/fragments
       environments:
         - name: GITHUB_TOKEN
