@@ -20,4 +20,12 @@ Generates `build/distributions/dependencies.csv` and `tar.gz` and adds them to t
 #### DRA publish
 Downloads the artifacts from the `packaging snapshot/staging` step and publishes them to the Elastic DRA registry.
 
+#### Testing the DRA steps in isolation
 
+The DRA scripts and the generated `dra-prep-pipeline.yml` are covered by Bats suites in `.buildkite/scripts/tests/`. They stub `make`, `curl`, and `buildkite-agent`, so no packaging, network access, plugins, or publishing are involved. They run in `.github/workflows/dra-pipeline-tests.yml` on pull requests touching the DRA files. Run locally with:
+
+```bash
+bats .buildkite/scripts/tests/
+```
+
+Requires `bats`, `jq`, and `yq` (mikefarah v4).
