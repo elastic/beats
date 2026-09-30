@@ -23,7 +23,7 @@ func NewFactory() extension.Factory {
 func newExtension(ctx context.Context, set extension.Settings, cfg component.Config) (extension.Extension, error) {
 	config, ok := cfg.(*Config)
 	if !ok {
-		return nil, fmt.Errorf("could not convert otel config to elasticstorage config")
+		return nil, fmt.Errorf("could not convert OTel config to elasticsearch_storage config")
 	}
 	logger := logp.NewLogger("", zap.WrapCore(func(zapcore.Core) zapcore.Core {
 		return set.Logger.Named("elasticstorage").Core()

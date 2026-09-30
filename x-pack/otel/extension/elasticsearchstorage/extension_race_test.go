@@ -18,7 +18,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"go.opentelemetry.io/collector/component/componenttest"
 
 	"github.com/elastic/entcollect"
 
@@ -65,18 +64,20 @@ func TestElasticStorage_Access_Concurrent_Race(t *testing.T) {
 	srv := newFakeES(t)
 	defer srv.Close()
 
-	cfg := &Config{
-		ElasticsearchConfig: map[string]any{
-			"hosts":    []string{srv.URL},
-			"username": "elastic",
-			"password": "changeme",
-		},
-	}
+	authenticatorID, authenticator := newTestElasticsearchAuthenticator(t, srv.URL, "elastic", "changeme")
+	cfg := newTestStorageConfig(authenticatorID)
 	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, "")}
 
 	ctx := t.Context()
 
-	require.NoError(t, ext.Start(ctx, componenttest.NewNopHost()))
+	require.NoError(
+		t,
+		ext.Start(
+			ctx,
+			storageTestHost{authenticatorID: authenticator},
+		),
+		"storage must start with Elasticsearch authentication",
+	)
 	t.Cleanup(func() { _ = ext.Shutdown(context.Background()) })
 
 	const (
@@ -163,18 +164,20 @@ func TestElasticStorage_MixedRegistry_Concurrent_Race(t *testing.T) {
 	srv := newFakeES(t)
 	defer srv.Close()
 
-	cfg := &Config{
-		ElasticsearchConfig: map[string]any{
-			"hosts":    []string{srv.URL},
-			"username": "elastic",
-			"password": "changeme",
-		},
-	}
+	authenticatorID, authenticator := newTestElasticsearchAuthenticator(t, srv.URL, "elastic", "changeme")
+	cfg := newTestStorageConfig(authenticatorID)
 	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, "")}
 
 	ctx := t.Context()
 
-	require.NoError(t, ext.Start(ctx, componenttest.NewNopHost()))
+	require.NoError(
+		t,
+		ext.Start(
+			ctx,
+			storageTestHost{authenticatorID: authenticator},
+		),
+		"storage must start with Elasticsearch authentication",
+	)
 	t.Cleanup(func() { _ = ext.Shutdown(context.Background()) })
 
 	// Compile-time check that the extension still satisfies the two
