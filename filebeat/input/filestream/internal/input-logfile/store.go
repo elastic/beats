@@ -436,9 +436,13 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 	defer s.store.ephemeralStore.mu.Unlock()
 
 	matchPreviousFilestreamIDs := func(key string) bool {
+		// Never take over the current input's own states, a from_id_pattern
+		// can match the current input ID.
+		if s.identifier.MatchesInput(key) {
+			return false
+		}
 		if s.takeOverAnyID {
-			// Match any filestream key that isn't from the current input.
-			return strings.HasPrefix(key, "filestream::") && !s.identifier.MatchesInput(key)
+			return strings.HasPrefix(key, "filestream::")
 		}
 		for _, identifier := range s.identifiersToTakeOver {
 			if identifier.MatchesInput(key) {

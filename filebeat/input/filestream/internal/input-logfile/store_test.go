@@ -21,6 +21,7 @@ package input_logfile
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -466,6 +467,37 @@ func TestSourceStoreTakeOver(t *testing.T) {
 	s.ephemeralStore.mu.Unlock()
 
 	checkEqualStoreState(t, want, backend.snapshot())
+}
+
+func TestSourceStoreTakeOverPatternSkipsOwnID(t *testing.T) {
+	backend := createSampleStore(t, map[string]state{
+		"filestream::previous-id::key1": {
+			TTL:  60 * time.Second,
+			Meta: testMeta{IdentifierName: "test-file-identity"},
+		},
+		"filestream::current-id::key2": {
+			TTL:  60 * time.Second,
+			Meta: testMeta{IdentifierName: "test-file-identity"},
+		},
+	})
+	s := testOpenStore(t, "filestream", backend)
+	defer s.Release()
+	store := &sourceStore{
+		identifier: &SourceIdentifier{"filestream::current-id::"},
+		identifiersToTakeOver: []InputMatcher{
+			NewRegexpMatcher("filestream", regexp.MustCompile(`-id$`)),
+		},
+		store: s,
+	}
+
+	var seen []string
+	store.TakeOver(func(v TakeOverState) (string, any) {
+		seen = append(seen, v.Key)
+		return "", nil
+	})
+
+	assert.Equal(t, []string{"filestream::previous-id::key1"}, seen,
+		"TakeOver must not offer the current input's own states even when the pattern matches its ID")
 }
 
 func TestSourceStoreTakeOverAnyID(t *testing.T) {

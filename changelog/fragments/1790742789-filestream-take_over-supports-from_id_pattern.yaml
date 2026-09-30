@@ -1,0 +1,7 @@
+kind: enhancement
+
+summary: filestream take_over supports from_id_pattern to migrate states from previous filestream inputs whose ID matches a regular expression
+
+component: filebeat
+
+issue: https://github.com/elastic/beats/issues/53096

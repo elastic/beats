@@ -20,6 +20,7 @@ package input_logfile
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -272,6 +273,10 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 			}
 			previousMatchers = append(previousMatchers, si)
 		}
+
+		for _, pattern := range settings.TakeOver.FromIDPattern {
+			previousMatchers = append(previousMatchers, NewRegexpMatcher(cim.Type, pattern))
+		}
 	}
 
 	prospectorStore := newSourceStore(pStore, srcIdentifier, previousMatchers, settings.TakeOver.FromAnyID)
@@ -388,6 +393,28 @@ type InputMatcher interface {
 	MatchesInput(key string) bool
 }
 
+// RegexpMatcher matches registry keys whose input ID matches a regular
+// expression.
+type RegexpMatcher struct {
+	pluginName string
+	re         *regexp.Regexp
+}
+
+func NewRegexpMatcher(pluginName string, re *regexp.Regexp) *RegexpMatcher {
+	return &RegexpMatcher{pluginName: pluginName, re: re}
+}
+
+// MatchesInput applies the regular expression only to the input ID segment
+// of key
+func (m *RegexpMatcher) MatchesInput(key string) bool {
+	plugin, rest, ok := strings.Cut(key, "::")
+	if !ok || plugin != m.pluginName {
+		return false
+	}
+	inputID, _, ok := strings.Cut(rest, "::")
+	return ok && m.re.MatchString(inputID)
+}
+
 // TakeOverConfig is the configuration for the take over mode.
 // It allows the Filestream input to take over states from the log
 // input or other Filestream inputs
@@ -396,8 +423,12 @@ type TakeOverConfig struct {
 	// Filestream IDs to take over states (exact match).
 	FromIDs []string `config:"from_ids"`
 	// FromAnyID, when true, takes over states from any previous filestream
-	// input ID, regardless of what that ID was. Mutually exclusive with FromIDs.
+	// input ID, regardless of what that ID was. Mutually exclusive with FromIDs and FromIDPattern.
 	FromAnyID bool `config:"from_any_id"`
+
+	// FromIDPattern is a regex pattern to match the input ID.
+	FromIDPattern []*regexp.Regexp `config:"from_id_pattern"`
+
 	// Stream from the container input to take over from.
 	// Valid values: stderr, stdout or it can be empty. An empty stream means
 	// all streams.
@@ -426,19 +457,12 @@ func (t *TakeOverConfig) Unpack(value any) error {
 			t.Stream = stream
 		}
 
-		rawFromIDs, exists := v["from_ids"]
-		if exists {
-			fromIDs, ok := rawFromIDs.([]any)
-			if !ok {
-				return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as []any", rawFromIDs)
+		if rawFromIDs, exists := v["from_ids"]; exists {
+			fromIDs, err := parseStringList(rawFromIDs)
+			if err != nil {
+				return err
 			}
-			for _, el := range fromIDs {
-				strEl, ok := el.(string)
-				if !ok {
-					return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as string", el)
-				}
-				t.FromIDs = append(t.FromIDs, strEl)
-			}
+			t.FromIDs = append(t.FromIDs, fromIDs...)
 		}
 
 		rawFromAnyID, exists := v["from_any_id"]
@@ -450,8 +474,23 @@ func (t *TakeOverConfig) Unpack(value any) error {
 			t.FromAnyID = fromAnyID
 		}
 
-		if t.FromAnyID && len(t.FromIDs) > 0 {
-			return fmt.Errorf("'from_any_id' and 'from_ids' are mutually exclusive")
+		if rawFromIDPattern, exists := v["from_id_pattern"]; exists {
+			fromIDPattern, err := parseStringList(rawFromIDPattern)
+			if err != nil {
+				return err
+			}
+
+			for _, pattern := range fromIDPattern {
+				re, err := regexp.Compile(pattern)
+				if err != nil {
+					return fmt.Errorf("cannot compile regex '%[1]v': %w", pattern, err)
+				}
+				t.FromIDPattern = append(t.FromIDPattern, re)
+			}
+		}
+
+		if t.FromAnyID && (len(t.FromIDs) > 0 || len(t.FromIDPattern) > 0) {
+			return fmt.Errorf("'from_any_id' is mutually exclusive with 'from_ids' or 'from_id_pattern'")
 		}
 
 	default:
@@ -461,6 +500,24 @@ func (t *TakeOverConfig) Unpack(value any) error {
 	return nil
 }
 
+// parseStringList converts a raw config list, which go-ucfg passes to
+// Unpack as []any, into a []string.
+func parseStringList(raw any) ([]string, error) {
+	list, ok := raw.([]any)
+	if !ok {
+		return nil, fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as []any", raw)
+	}
+	out := make([]string, 0, len(list))
+	for _, el := range list {
+		s, ok := el.(string)
+		if !ok {
+			return nil, fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as string", el)
+		}
+		out = append(out, s)
+	}
+	return out, nil
+}
+
 func (t *TakeOverConfig) LogWarnings(logger *logp.Logger) {
 	if t.legacyFormat {
 		logger.Warn("using 'take_over: true' is deprecated, use the new format: 'take_over.enabled: true'")
@@ -468,7 +525,7 @@ func (t *TakeOverConfig) LogWarnings(logger *logp.Logger) {
 }
 
 func (t *TakeOverConfig) FromFilestream() bool {
-	return len(t.FromIDs) != 0 || t.FromAnyID
+	return len(t.FromIDs) != 0 || len(t.FromIDPattern) != 0 || t.FromAnyID
 }
 
 // ReadUntilEOFConfig configures the behaviour to keep reading the current

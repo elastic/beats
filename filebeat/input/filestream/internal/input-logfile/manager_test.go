@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 	"sync"
 	"testing"
@@ -186,6 +187,42 @@ func TestSourceIdentifierNoAccidentalMatches(t *testing.T) {
 	assert.NotEqual(t, noIDIdentifier.ID(src), withIDIdentifier.ID(src))
 	assert.False(t, noIDIdentifier.MatchesInput(withIDIdentifier.ID(src)))
 	assert.False(t, withIDIdentifier.MatchesInput(noIDIdentifier.ID(src)))
+}
+
+func TestRegexpMatcher_MatchesInput(t *testing.T) {
+	matcher := NewRegexpMatcher("filestream", regexp.MustCompile(`^nginx-.*$`))
+
+	testCases := map[string]struct {
+		key      string
+		expected bool
+	}{
+		"matching input ID": {
+			key:      "filestream::nginx-access::native::1234-66305",
+			expected: true,
+		},
+		"non matching input ID": {
+			key:      "filestream::apache::native::1234-66305",
+			expected: false,
+		},
+		"pattern only in file path": {
+			key:      "filestream::other::path::/var/log/nginx-access.log",
+			expected: false,
+		},
+		"different plugin": {
+			key:      "filebeat::logs::nginx-access::native::1234-66305",
+			expected: false,
+		},
+		"malformed key": {
+			key:      "filestream::nginx-access",
+			expected: false,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			assert.Equal(t, tc.expected, matcher.MatchesInput(tc.key), "unexpected match result for key %q", tc.key)
+		})
+	}
 }
 
 func TestInputManager_Create(t *testing.T) {
