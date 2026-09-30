@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+# Triggered by the elastic/golang-crossbuild bump-npcap pipeline to open a PR
+# in elastic/beats with the new npcap OEM installer version.
+
+env:
+  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1785316988"
+  GCP_MACHINE_TYPE: "n2-standard-4"
+
+steps:
+
+  - label: ":npcap: Bump npcap version in elastic/beats"
+    key: "bump-beats-npcap"
+    command: ".buildkite/scripts/bump-beats-npcap.sh"
+    agents:
+      provider: "gcp"
+      image: "${IMAGE_UBUNTU_X86_64}"
+      machineType: "${GCP_MACHINE_TYPE}"
+    plugins:
+      - elastic/vault-github-token#v0.2.1:
+          configure-git-user: true
+
+notify:
+  - slack: "#ingest-notifications"
+    if: build.state == "failed"
