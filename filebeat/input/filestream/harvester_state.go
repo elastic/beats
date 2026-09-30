@@ -20,25 +20,28 @@ package filestream
 import (
 	"sync"
 
+	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 )
 
-// fileStateTable records the identity of each open harvester file.
-// Each input has its own table.
+// fileStateTable shares file state between an input's scanner and harvesters.
 type fileStateTable struct {
 	mu      sync.Mutex
 	entries map[string]*openFileState
 }
 
-// openFileState records one open harvester file.
+// openFileState shares one open file's state with the scanner.
 type openFileState struct {
 	table *fileStateTable
 
+	// name is the entry key. "" until Publish.
 	name string
 
-	// os is the open file identity from fstat, guarded by table.mu.
-	// A zero value means that the identity is unknown.
+	// os is the open file identity from fstat. Zero means unknown.
 	os file.StateOS
+
+	// desc is the latest scanner descriptor.
+	desc loginp.FileDescriptor
 }
 
 func newFileStateTable() *fileStateTable {
@@ -47,22 +50,12 @@ func newFileStateTable() *fileStateTable {
 	}
 }
 
-// Register records a newly opened harvester and returns its handle. A newer
-// handle replaces an older entry for the same name.
-func (t *fileStateTable) Register(name string) *openFileState {
+// NewHandle returns a handle for a newly opened harvester file.
+func (t *fileStateTable) NewHandle() *openFileState {
 	if t == nil {
 		return nil
 	}
-
-	h := &openFileState{
-		table: t,
-		name:  name,
-	}
-	t.mu.Lock()
-	t.entries[name] = h
-	t.mu.Unlock()
-
-	return h
+	return &openFileState{table: t}
 }
 
 // Deregister removes h only if it still owns its current key.
@@ -76,6 +69,21 @@ func (t *fileStateTable) Deregister(h *openFileState) {
 		delete(t.entries, h.name)
 	}
 	t.mu.Unlock()
+}
+
+// UpdateDescriptor updates an open harvester's scanner descriptor. It does not
+// create entries for files without an open harvester.
+func (t *fileStateTable) UpdateDescriptor(name string, desc loginp.FileDescriptor) {
+	if t == nil {
+		return
+	}
+
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	if h, ok := t.entries[name]; ok {
+		h.desc = desc
+	}
 }
 
 // LookupOSState returns the open file identity for name.
@@ -105,4 +113,38 @@ func (h *openFileState) PinOSState(st file.StateOS) {
 	h.table.mu.Lock()
 	h.os = st
 	h.table.mu.Unlock()
+}
+
+// Publish lists h under name with that identity's descriptor and removes h's
+// previous entry if h still owns it.
+func (h *openFileState) Publish(name string, desc loginp.FileDescriptor) {
+	if h == nil {
+		return
+	}
+
+	t := h.table
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	h.desc = desc
+	if t.entries[h.name] == h {
+		delete(t.entries, h.name)
+	}
+	h.name = name
+	t.entries[name] = h
+}
+
+// FingerprintSum returns the completed SHA-256 fingerprint or "".
+func (h *openFileState) FingerprintSum() string {
+	if h == nil {
+		return ""
+	}
+
+	h.table.mu.Lock()
+	defer h.table.mu.Unlock()
+
+	if h.desc.Fingerprint.Complete() {
+		return h.desc.Fingerprint.Sum
+	}
+	return ""
 }

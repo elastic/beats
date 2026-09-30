@@ -680,11 +680,12 @@ type harvesterGroupStop struct{}
 func (h harvesterGroupStop) String() string { return "stop" }
 
 type testHarvesterGroup struct {
-	events []harvesterEvent
+	events   []harvesterEvent
+	migrated func(next loginp.Source)
 }
 
 func newTestHarvesterGroup() *testHarvesterGroup {
-	return &testHarvesterGroup{make([]harvesterEvent, 0)}
+	return &testHarvesterGroup{events: make([]harvesterEvent, 0)}
 }
 
 func (t *testHarvesterGroup) Start(_ input.Context, s loginp.Source) {
@@ -713,6 +714,9 @@ func (t *testHarvesterGroup) Migrate(oldID string, next loginp.Source, updateSto
 		return err
 	}
 	t.events = append(t.events, harvesterMigrate(oldID+" -> "+newID))
+	if t.migrated != nil {
+		t.migrated(next)
+	}
 	return nil
 }
 
@@ -1747,11 +1751,14 @@ func TestOnFSEvent_GrowingFingerprintMigration(t *testing.T) {
 
 		store := newMockMetadataUpdater()
 		store.table[oldKey] = growingMeta(path, oldFingerprint)
+		tbl := newFileStateTable()
+		h := publishHandle(tbl, "fingerprint::"+oldFingerprint, growingDesc(oldFingerprint))
 		p := &fileProspector{
 			logger:             log,
 			identifier:         identifier,
 			shortFingerprints:  newShortFingerprintSet(),
 			growingFingerprint: true,
+			harvesterState:     tbl,
 		}
 		p.shortFingerprints.AddRaw(oldKey, oldFingerprint, path)
 
@@ -1770,6 +1777,8 @@ func TestOnFSEvent_GrowingFingerprintMigration(t *testing.T) {
 		src := identifier.GetSource(event)
 
 		hg := newTestHarvesterGroup()
+		// The runner tells the open session about the migration.
+		hg.migrated = (&harvestSession{harvesterState: h}).TrackSource
 		p.onFSEvent(log, input.Context{}, event, src, store, hg, time.Time{})
 
 		assert.False(t, store.has(oldKey), "old key should have been removed by migration")
@@ -1791,6 +1800,12 @@ func TestOnFSEvent_GrowingFingerprintMigration(t *testing.T) {
 		// The running harvester's registration is re-keyed along with the entry.
 		assert.Contains(t, hg.events, harvesterMigrate(oldKey+" -> "+newKey),
 			"migration must re-key the running harvester's registration")
+
+		// So is the open file's state table entry.
+		assert.Len(t, tbl.entries, 1, "the state table must hold only the migrated entry")
+		assert.Same(t, h, tbl.entries[src.Name()], "the open file must be listed under its new identity")
+		assert.Equal(t, sha256Fingerprint, h.FingerprintSum(),
+			"the open file must expose the completed fingerprint")
 	})
 
 	// runGrowthEvent drives one below-threshold OpWrite growth event for the
@@ -1853,6 +1868,43 @@ func TestOnFSEvent_GrowingFingerprintMigration(t *testing.T) {
 		assert.Contains(t, hg.events, harvesterStart(src.Name()),
 			"the file must be started under its current identity")
 	})
+}
+
+// TestOnFSEvent_HarvesterStateTable covers descriptor updates for open files.
+func TestOnFSEvent_HarvesterStateTable(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "")
+	path := "/var/log/app.log"
+
+	for _, tc := range []struct {
+		op      loginp.Operation
+		newPath string
+		wantSum string
+	}{
+		{op: loginp.OpWrite, newPath: path, wantSum: "the-sum"},
+		{op: loginp.OpDelete, wantSum: ""},
+	} {
+		t.Run(tc.op.String(), func(t *testing.T) {
+			tbl := newFileStateTable()
+			h := publishHandle(tbl, "path::"+path, growingDesc(""))
+			p := &fileProspector{
+				logger:         log,
+				identifier:     mustPathIdentifier(false),
+				harvesterState: tbl,
+			}
+			event := loginp.FSEvent{
+				Op:         tc.op,
+				OldPath:    path,
+				NewPath:    tc.newPath,
+				Descriptor: completeDesc("the-sum"),
+			}
+			src := p.identifier.GetSource(event)
+
+			p.onFSEvent(log, input.Context{}, event, src, newMockMetadataUpdater(), newTestHarvesterGroup(), time.Time{})
+
+			assert.Equal(t, tc.wantSum, h.FingerprintSum(),
+				"only non-delete events must refresh the open file's descriptor")
+		})
+	}
 }
 
 func TestBuildShortFingerprintSet(t *testing.T) {

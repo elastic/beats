@@ -377,21 +377,20 @@ func (g *harvesterRunner) readOnce(state *sourceState) {
 	}
 }
 
-// currentResource atomically returns state's current registration key and the
-// store resource for it, serialized against Migrate so a reader never pairs a
-// stale key with a resource that already moved under it (see Migrate).
-func (g *harvesterRunner) currentResource(state *sourceState) (string, *resource) {
+// currentResource reads the key, source, and store resource under the same
+// lock as Migrate, so setup receives a consistent snapshot.
+func (g *harvesterRunner) currentResource(state *sourceState) (string, Source, *resource) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 
-	return state.srcID, g.store.Get(state.srcID)
+	return state.srcID, state.src, g.store.Get(state.srcID)
 }
 
 // setup acquires the per-source resources: registry lock, pipeline client,
 // cursor/publisher and the reading session, populating state. On error it releases
 // whatever it acquired and leaves state's resource fields nil.
 func (g *harvesterRunner) setup(state *sourceState) error {
-	id, resource := g.currentResource(state)
+	id, src, resource := g.currentResource(state)
 	if err := lockResource(state.ctx, resource, id); err != nil {
 		return err
 	}
@@ -418,7 +417,7 @@ func (g *harvesterRunner) setup(state *sourceState) error {
 	state.cursor = makeCursor(resource)
 	state.publisher = &cursorPublisher{canceler: state.ctx.Cancelation, client: client, cursor: &state.cursor}
 
-	session, err := g.harvester.OpenSession(state.ctx, state.src, id, state.cursor, g.metrics)
+	session, err := g.harvester.OpenSession(state.ctx, src, id, state.cursor, g.metrics)
 	if err != nil {
 		// Unnotified, the watcher never emits another event for an unchanged
 		// file, so a transient open failure (fd exhaustion) strands it. Notify
@@ -433,7 +432,7 @@ func (g *harvesterRunner) setup(state *sourceState) error {
 		state.publisher = nil
 		return err
 	}
-	state.session = session
+	g.publishSession(state, session)
 	state.isGZIP = session.IsGZIP()
 
 	g.metrics.FilesActive.Inc()
@@ -913,7 +912,8 @@ func (g *harvesterRunner) Continue(ctx inputv2.Context, previous, next Source) {
 // or after it (Start sees the migrated registration and no-ops), never both
 // spawning a harvester for the same source. It is also safe to call when
 // nothing is registered under oldID (or the registration is already tearing
-// down): only the store is updated then.
+// down): only the store is updated then. An open session is told its new
+// source.
 func (g *harvesterRunner) Migrate(oldID string, next Source, updateStore func(newID string) error) error {
 	newID := g.identifier.ID(next)
 
@@ -942,7 +942,19 @@ func (g *harvesterRunner) Migrate(oldID string, next Source, updateStore func(ne
 	state.srcID = newID
 	state.src = next
 	g.states[newID] = state
+	if state.session != nil {
+		state.session.TrackSource(next)
+	}
 	return nil
+}
+
+// publishSession makes the open session visible to Migrate.
+func (g *harvesterRunner) publishSession(state *sourceState, session HarvesterSession) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
+	state.session = session
+	session.TrackSource(state.src)
 }
 
 // StopHarvesters tears down this input's harvesters and drops its reference to
