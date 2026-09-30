@@ -430,6 +430,22 @@ func TestEnrichNodeStatsCgroupCpuUsagePercent(t *testing.T) {
 			curr:          makeCgroupWithout(1_500_000_000, 100, 100_000, "os.cgroup.cpu.cfs_quota_micros"),
 			expectPresent: false,
 		},
+		// The following two cases pin truncation-to-floor: all other happy-path cases
+		// divide exactly, so they would pass even with math.Round or a float64 emitter.
+		"fractional 50.5% truncates to 50 not 51": {
+			// Δusage=505_000_000, Δperiods=10, quota=100_000 → 50.5 → truncated 50
+			prev:          makeCgroupNodeStats(1_000_000_000, 90, 100_000),
+			curr:          makeCgroupNodeStats(1_505_000_000, 100, 100_000),
+			expectPresent: true,
+			expected:      50,
+		},
+		"fractional 49.9% truncates to 49 not 50": {
+			// Δusage=499_000_000, Δperiods=10, quota=100_000 → 49.9 → truncated 49
+			prev:          makeCgroupNodeStats(1_000_000_000, 90, 100_000),
+			curr:          makeCgroupNodeStats(1_499_000_000, 100, 100_000),
+			expectPresent: true,
+			expected:      49,
+		},
 	}
 
 	for name, tt := range tests {
