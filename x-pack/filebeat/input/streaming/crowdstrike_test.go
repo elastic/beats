@@ -484,12 +484,11 @@ func TestFollowStreamTransientFailuresDoNotConsumeAttemptCap(t *testing.T) {
 	}
 }
 
-// TestFollowStreamDroppedStreamsDoNotExhaustAttempts verifies that firehose
-// connections that deliver events and are then dropped, as network devices
-// and the upstream do to long-lived connections, do not accumulate toward
-// MaxAttempts. Each dropped session made progress, so the input must keep
-// reconnecting rather than terminating after MaxAttempts drops spread over
-// the lifetime of the input.
+// TestFollowStreamDroppedStreamsDoNotExhaustAttempts verifies that MaxAttempts
+// is not incremented when a firehose connection that delivered events is
+// dropped. Long-lived connections are often dropped by upstream servers or
+// intermediate network devices. Dropped sessions that made progress should be
+// reconnected and not count towards an attempt limit.
 func TestFollowStreamDroppedStreamsDoNotExhaustAttempts(t *testing.T) {
 	log, logs := logptest.NewTestingLoggerWithObserver(t, t.Name())
 
