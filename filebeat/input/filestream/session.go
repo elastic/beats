@@ -70,6 +70,9 @@ type harvestSession struct {
 	// their progress can't be represented by a plain offset/size comparison.
 	metricsOffset        *atomic.Int64
 	cleanupMetricsOffset func()
+
+	// harvesterState is this session's entry in the input's fileStateTable.
+	harvesterState *openFileState
 }
 
 // OpenSession opens (or resumes) a reading session for the source. id is the
@@ -113,6 +116,12 @@ func (inp *filestream) OpenSession(
 	if err != nil {
 		log.Errorf("File could not be opened for reading: %v", err)
 		return nil, err
+	}
+
+	s.harvesterState = inp.harvesterState.NewHandle()
+	// If fstat fails, the entry has no usable open file identity.
+	if fi, err := f.Stat(); err == nil {
+		s.harvesterState.PinOSState(file.GetOSState(fi))
 	}
 	if truncated {
 		s.state.Offset = 0
@@ -160,7 +169,7 @@ func (s *harvestSession) ReadSlice(
 		return loginp.SliceDone,
 			fmt.Errorf("cannot seek '%s' to offset %d: %w", s.src.newPath, s.state.Offset, err)
 	}
-	r, logReader, err := s.inp.buildPipeline(s.log, ctx.Cancelation, s.file, s.enc, s.src, s.state.Offset)
+	r, logReader, err := s.inp.buildPipeline(s.log, ctx.Cancelation, s.file, s.enc, s.src, s.state.Offset, s.harvesterState)
 	if err != nil {
 		return loginp.SliceDone,
 			fmt.Errorf("cannot build reader pipeline for '%s': %w", s.src.newPath, err)
@@ -344,6 +353,16 @@ func (s *harvestSession) Poll() loginp.PollResult {
 	return loginp.PollPark
 }
 
+// TrackSource lists the open file under the source's current identity with
+// that identity's scanner descriptor.
+func (s *harvestSession) TrackSource(current loginp.Source) {
+	fs, ok := current.(fileSource)
+	if !ok {
+		return
+	}
+	s.harvesterState.Publish(fs.Name(), fs.desc)
+}
+
 // Offset returns the current read offset.
 func (s *harvestSession) Offset() int64 { return s.state.Offset }
 
@@ -359,6 +378,9 @@ func (s *harvestSession) Close() error {
 	if s.cleanupMetricsOffset != nil {
 		s.cleanupMetricsOffset()
 	}
+	// Remove the recorded identity before closing its file.
+	s.inp.harvesterState.Deregister(s.harvesterState)
+	s.harvesterState = nil
 	if s.file != nil {
 		err := s.file.Close()
 		s.file = nil

@@ -87,6 +87,7 @@ type rebalanceStrategy int
 const (
 	rebalanceStrategyRange rebalanceStrategy = iota
 	rebalanceStrategyRoundRobin
+	rebalanceStrategySticky
 )
 
 type isolationLevel int
@@ -104,6 +105,7 @@ var (
 	rebalanceStrategies = map[string]rebalanceStrategy{
 		"range":      rebalanceStrategyRange,
 		"roundrobin": rebalanceStrategyRoundRobin,
+		"sticky":     rebalanceStrategySticky,
 	}
 	isolationLevels = map[string]isolationLevel{
 		"read_uncommitted": isolationLevelReadUncommitted,
@@ -155,8 +157,11 @@ func (c *kafkaInputConfig) Validate() error {
 
 	if c.Username != "" && c.Password == "" {
 		return fmt.Errorf("password must be set when username is configured")
+	} else if c.Username == "" && c.Password != "" {
+		return fmt.Errorf("username must be set when password is configured")
 	}
-	return nil
+
+	return c.Sasl.ValidateWithUsernameAndPassword(c.Username != "")
 }
 
 func newSaramaConfig(config kafkaInputConfig, logger *logp.Logger) (*sarama.Config, error) {
@@ -275,6 +280,7 @@ func (st rebalanceStrategy) asSaramaStrategy() sarama.BalanceStrategy {
 	return map[rebalanceStrategy]sarama.BalanceStrategy{
 		rebalanceStrategyRange:      sarama.NewBalanceStrategyRange(),
 		rebalanceStrategyRoundRobin: sarama.NewBalanceStrategyRoundRobin(),
+		rebalanceStrategySticky:     sarama.NewBalanceStrategySticky(),
 	}[st]
 }
 

@@ -89,6 +89,7 @@ type fileProspector struct {
 	logIdentifiers        map[string]file.StateIdentifier
 	shortFingerprints     *shortFingerprintSet
 	growingFingerprint    bool
+	harvesterState        *fileStateTable
 }
 
 func (p *fileProspector) previousID(name string, fd loginp.FileDescriptor, v loginp.TakeOverState) string {
@@ -486,6 +487,11 @@ func (p *fileProspector) onFSEvent(
 
 	default:
 		log.Errorf("Unknown operation '%s'", event.Op.String())
+	}
+
+	// Update the descriptor after any migration moves the table entry.
+	if event.Op != loginp.OpDelete {
+		p.harvesterState.UpdateDescriptor(src.Name(), event.Descriptor)
 	}
 }
 

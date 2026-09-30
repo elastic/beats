@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix httpjson rate limiter marking input Degraded when rate-limit headers are absent.
+component: filebeat

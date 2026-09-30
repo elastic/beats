@@ -13,10 +13,10 @@ import (
 	"time"
 
 	"go.uber.org/zap/zapcore"
+	"go.yaml.in/yaml/v2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	gproto "google.golang.org/protobuf/proto"
-	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -773,7 +773,6 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 						delete(healthyInputs, unitErr.UnitID)
 					}
 				}
-				return
 
 			default:
 				// That is not one of the cases we know how to handle, hard stop

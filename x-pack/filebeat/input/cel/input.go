@@ -38,10 +38,10 @@ import (
 	"go.uber.org/zap/zapcore"
 	"golang.org/x/time/rate"
 
-	"github.com/google/cel-go/cel"
-	"github.com/google/cel-go/common/decls"
-	"github.com/google/cel-go/common/types"
-	"github.com/google/cel-go/ext"
+	"cel.dev/cel-go/cel"
+	"cel.dev/cel-go/common/decls"
+	"cel.dev/cel-go/common/types"
+	"cel.dev/cel-go/ext"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"

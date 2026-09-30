@@ -1357,7 +1357,7 @@ cgroupv2 stats
 
 
 **`system.process.cgroup.cpu.stats.throttled.us`**
-:   The total time duration (in microseconds) for which tasks in a cgroup have been throttled, as reported by cgroupsv2
+:   The total time duration (in microseconds) for which tasks in a cgroup have been throttled.
 
     type: long
 
