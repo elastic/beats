@@ -80,6 +80,9 @@ type filestream struct {
 	// continuously-busy file.
 	sliceBudget time.Duration
 
+	// harvesterState records the identity of this input's open files.
+	harvesterState *fileStateTable
+
 	// Function references for testing
 	waitGracePeriodFn func(
 		ctx input.Context,
@@ -163,6 +166,7 @@ func configure(
 
 	c.TakeOver.LogWarnings(log)
 
+	harvesterState := newFileStateTable()
 	prospector, err := newProspector(c, log, src, dc)
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
@@ -185,6 +189,7 @@ func configure(
 		includeFileFingerprint:    c.IncludeFileFingerprint,
 		hasLineFilter:             len(c.Reader.IncludeLines) > 0 || len(c.Reader.ExcludeLines) > 0,
 		deleterConfig:             c.Delete,
+		harvesterState:            harvesterState,
 		waitGracePeriodFn:         waitGracePeriod,
 		tickFn:                    time.Tick,
 		removeFn:                  os.Remove,
