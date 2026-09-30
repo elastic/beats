@@ -169,7 +169,6 @@ require (
 	github.com/brianvoe/gofakeit v3.18.0+incompatible
 	github.com/dgraph-io/badger/v4 v4.6.0
 	github.com/elastic/bayeux v1.0.5
-	github.com/elastic/ebpfevents v0.10.0
 	github.com/elastic/elastic-agent-libs v0.47.0
 	github.com/elastic/go-elasticsearch/v8 v8.19.7
 	github.com/elastic/go-freelru v0.16.0
