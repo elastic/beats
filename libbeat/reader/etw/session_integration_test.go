@@ -37,6 +37,7 @@ import (
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 var (
@@ -286,7 +287,7 @@ func TestETLGoldenFile(t *testing.T) {
 
 	// Create and configure session for ETL file reading
 	sessionConfig := createETLSessionConfig(uniqueSessionName("GoldenTestETW"))
-	session, err := NewSession(sessionConfig, logp.NewNopLogger())
+	session, err := NewSession(sessionConfig, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("Failed to create ETW session: %v", err)
 	}

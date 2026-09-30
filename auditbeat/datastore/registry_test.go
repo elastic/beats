@@ -27,6 +27,7 @@ import (
 	bolt "go.etcd.io/bbolt"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 // snapshotEntry returns refCount and existence for path in r under the
@@ -49,9 +50,9 @@ func TestRegistryRefCount(t *testing.T) {
 	p := pathsAt(t)
 	path := resolvedDBPath(p)
 
-	b1, err := OpenBucket("a", p, logp.NewNopLogger())
+	b1, err := OpenBucket("a", p, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err, "first OpenBucket")
-	b2, err := OpenBucket("b", p, logp.NewNopLogger())
+	b2, err := OpenBucket("b", p, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err, "second OpenBucket on same path")
 
 	rc, ok := snapshotEntry(defaultRegistry, path)
@@ -77,14 +78,14 @@ func TestRegistryReopenAfterFullClose(t *testing.T) {
 	p := pathsAt(t)
 	path := resolvedDBPath(p)
 
-	b, err := OpenBucket("a", p, logp.NewNopLogger())
+	b, err := OpenBucket("a", p, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err, "first OpenBucket")
 	require.NoError(t, b.Close(), "Close before reopen")
 
 	_, ok := snapshotEntry(defaultRegistry, path)
 	require.False(t, ok, "entry must be cleaned up before reopen")
 
-	b, err = OpenBucket("a", p, logp.NewNopLogger())
+	b, err = OpenBucket("a", p, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err, "OpenBucket after full close must succeed")
 	t.Cleanup(func() { assert.NoError(t, b.Close(), "Close on reopened bucket") })
 
@@ -101,7 +102,7 @@ func TestRegistryMigrationFailureReleasesRef(t *testing.T) {
 	p := pathsAt(t)
 	path := resolvedDBPath(p)
 
-	_, err := OpenBucketWithMigration("a", p, logp.NewNopLogger(), func(*bolt.Tx, *logp.Logger) error {
+	_, err := OpenBucketWithMigration("a", p, logptest.NewTestingLogger(t, ""), func(*bolt.Tx, *logp.Logger) error {
 		return errors.New("boom")
 	})
 	require.Error(t, err, "failing migration must surface an error")
@@ -109,7 +110,7 @@ func TestRegistryMigrationFailureReleasesRef(t *testing.T) {
 	_, ok := snapshotEntry(defaultRegistry, path)
 	assert.False(t, ok, "failed migration must not leave a registry entry")
 
-	b, err := OpenBucket("a", p, logp.NewNopLogger())
+	b, err := OpenBucket("a", p, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err, "post-failure OpenBucket must succeed on the same path")
 	t.Cleanup(func() { assert.NoError(t, b.Close(), "Close on post-failure bucket") })
 
@@ -125,7 +126,7 @@ func TestRegistryMigrationFailureReleasesRef(t *testing.T) {
 func TestRegistryDeleteBucketReleasesRef(t *testing.T) {
 	p := pathsAt(t)
 
-	b, err := OpenBucket("a", p, logp.NewNopLogger())
+	b, err := OpenBucket("a", p, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err, "OpenBucket")
 	require.NoError(t, b.DeleteBucket(), "DeleteBucket must succeed and release the bucket's reference")
 
@@ -140,10 +141,10 @@ func TestDoubleCloseDoesNotStealSiblingRef(t *testing.T) {
 	p := pathsAt(t)
 	path := resolvedDBPath(p)
 
-	b1, err := OpenBucket("a", p, logp.NewNopLogger())
+	b1, err := OpenBucket("a", p, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err, "first OpenBucket")
 	t.Cleanup(func() { _ = b1.Close() })
-	b2, err := OpenBucket("b", p, logp.NewNopLogger())
+	b2, err := OpenBucket("b", p, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err, "second OpenBucket on the same path")
 
 	require.NoError(t, b2.Close(), "first Close on b2 must succeed")
@@ -164,11 +165,11 @@ func TestDeleteBucketThenDeferredCloseDoesNotStealSiblingRef(t *testing.T) {
 	p := pathsAt(t)
 	path := resolvedDBPath(p)
 
-	sibling, err := OpenBucket("keep", p, logp.NewNopLogger())
+	sibling, err := OpenBucket("keep", p, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err, "OpenBucket for sibling")
 	t.Cleanup(func() { assert.NoError(t, sibling.Close(), "sibling Close") })
 
-	victim, err := OpenBucket("drop", p, logp.NewNopLogger())
+	victim, err := OpenBucket("drop", p, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err, "OpenBucket for victim")
 
 	assert.NoError(t, victim.DeleteBucket(), "DeleteBucket on victim")
@@ -199,7 +200,7 @@ func TestRegistryConcurrentOpenClose(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for range iters {
-				b, err := OpenBucket("a", p, logp.NewNopLogger())
+				b, err := OpenBucket("a", p, logptest.NewTestingLogger(t, ""))
 				if err != nil {
 					t.Errorf("concurrent OpenBucket: %v", err)
 					return
