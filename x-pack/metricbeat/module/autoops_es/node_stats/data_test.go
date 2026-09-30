@@ -142,6 +142,8 @@ func expectValidParsedDetailedWithNoCache(t *testing.T, data metricset.FetcherDa
 	require.Nil(t, node1MetricSet["index_latency_in_millis"])
 	require.Nil(t, node1MetricSet["merge_latency_in_millis"])
 	require.Nil(t, node1MetricSet["search_latency_in_millis"])
+	// no previous sample → cgroup CPU percent must be absent
+	require.Nil(t, auto_ops_testing.GetObjectValue(node1MetricSet, "os.cgroup.cpu.usage_percent"))
 }
 
 func expectValidParsedDetailedWithCache(t *testing.T, data metricset.FetcherData[NodesStats]) {
@@ -159,6 +161,27 @@ func expectValidParsedDetailedWithCache(t *testing.T, data metricset.FetcherData
 	require.NotNil(t, node1MetricSet["index_latency_in_millis"])
 	require.NotNil(t, node1MetricSet["merge_latency_in_millis"])
 	require.NotNil(t, node1MetricSet["search_latency_in_millis"])
+<<<<<<< HEAD
+=======
+
+	// ingest rates use docs/store which are present on all ES versions
+	require.NotNil(t, node1MetricSet["ingest_docs_per_second"])
+	require.NotNil(t, node1MetricSet["ingest_bytes_per_second"])
+	// bulk rates require indices.bulk which is only present on ES 8+
+	if data.Version == "7.17.0" {
+		require.Nil(t, node1MetricSet["bulk_bytes_per_second"])
+		require.Nil(t, node1MetricSet["bulk_operations_per_second"])
+	} else {
+		require.NotNil(t, node1MetricSet["bulk_bytes_per_second"])
+		require.NotNil(t, node1MetricSet["bulk_operations_per_second"])
+	}
+	// all three fixture versions carry cgroup counters with a positive quota; the cache
+	// is seeded with zero prev-counters (getNodeStatsForNode), so the delta equals the
+	// fixture value and the enricher always emits a positive percentage.
+	cgroupCpuPct := auto_ops_testing.GetObjectValue(node1MetricSet, "os.cgroup.cpu.usage_percent")
+	require.NotNil(t, cgroupCpuPct, "expected os.cgroup.cpu.usage_percent to be set")
+	require.Greater(t, cgroupCpuPct.(int64), int64(0))
+>>>>>>> c8c9915 (autoops_es/node_stats: derive os.cgroup.cpu.usage_percent from CFS quota counters (#53140))
 }
 
 // Expect a valid response from Elasticsearch to create N events
