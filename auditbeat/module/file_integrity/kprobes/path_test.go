@@ -38,17 +38,23 @@ func Test_PathTraverser_newPathMonitor(t *testing.T) {
 
 	pTrav, err := newPathMonitor(ctx, newFixedThreadExecutor(ctx), 0, true)
 	require.NoError(t, err)
-	require.Equal(t, pTrav.sMatchTimeout, 5*time.Second)
+	require.Equal(t, 5*time.Second, pTrav.sMatchTimeout)
 	require.NoError(t, pTrav.Close())
 
 	pTrav, err = newPathMonitor(ctx, newFixedThreadExecutor(ctx), 2*time.Second, true)
 	require.NoError(t, err)
-	require.Equal(t, pTrav.sMatchTimeout, 2*time.Second)
+	require.Equal(t, 2*time.Second, pTrav.sMatchTimeout)
 	require.NoError(t, pTrav.Close())
 }
 
 type pathTestSuite struct {
 	suite.Suite
+}
+
+func (p *pathTestSuite) requireEmptyStatQueue(trav *pTraverser) {
+	trav.mtx.RLock()
+	defer trav.mtx.RUnlock()
+	p.Require().Empty(trav.statQueue, "statQueue should be empty after walk completes")
 }
 
 func Test_PathTraverser(t *testing.T) {
@@ -118,7 +124,7 @@ func (p *pathTestSuite) TestRecursiveWalkAsync() {
 	mounts, err := getAllMountPoints()
 	p.Require().NoError(err)
 
-	p.Require().Equal(len(createdPathsOrder), len(createdPathsWithDepth))
+	p.Require().Len(createdPathsWithDepth, len(createdPathsOrder))
 
 	expectedStatQueue := make([]statMatch, 0, len(createdPathsOrder))
 	for _, path := range createdPathsOrder {
@@ -128,10 +134,12 @@ func (p *pathTestSuite) TestRecursiveWalkAsync() {
 
 		info, err := os.Lstat(path)
 		p.Require().NoError(err)
+		stat, ok := info.Sys().(*syscall.Stat_t)
+		p.Require().True(ok, "expected *syscall.Stat_t from Lstat on %q", path)
 		mnt := mounts.getMountByPath(path)
 		p.Require().NotNil(mnt)
 		expectedStatQueue = append(expectedStatQueue, statMatch{
-			ino:        info.Sys().(*syscall.Stat_t).Ino,
+			ino:        stat.Ino,
 			major:      mnt.DeviceMajor,
 			minor:      mnt.DeviceMinor,
 			depth:      depth,
@@ -186,7 +194,7 @@ func (p *pathTestSuite) TestRecursiveWalkAsync() {
 	}
 
 	p.Require().NoError(err)
-	p.Require().Empty(pTrav.statQueue)
+	p.requireEmptyStatQueue(pTrav)
 }
 
 func (p *pathTestSuite) TestWalkAsyncTimeoutErr() {
@@ -239,7 +247,7 @@ func (p *pathTestSuite) TestNonRecursiveWalkAsync() {
 	mounts, err := getAllMountPoints()
 	p.Require().NoError(err)
 
-	p.Require().Equal(len(createdPathsOrder), len(createdPathsWithDepth))
+	p.Require().Len(createdPathsWithDepth, len(createdPathsOrder))
 
 	expectedStatQueue := make([]statMatch, 0, len(createdPathsOrder))
 	for _, path := range createdPathsOrder {
@@ -249,10 +257,12 @@ func (p *pathTestSuite) TestNonRecursiveWalkAsync() {
 
 		info, err := os.Lstat(path)
 		p.Require().NoError(err)
+		stat, ok := info.Sys().(*syscall.Stat_t)
+		p.Require().True(ok, "expected *syscall.Stat_t from Lstat on %q", path)
 		mnt := mounts.getMountByPath(path)
 		p.Require().NotNil(mnt)
 		expectedStatQueue = append(expectedStatQueue, statMatch{
-			ino:        info.Sys().(*syscall.Stat_t).Ino,
+			ino:        stat.Ino,
 			major:      mnt.DeviceMajor,
 			minor:      mnt.DeviceMinor,
 			depth:      depth,
@@ -307,7 +317,7 @@ func (p *pathTestSuite) TestNonRecursiveWalkAsync() {
 	}
 
 	p.Require().NoError(err)
-	p.Require().Empty(pTrav.statQueue)
+	p.requireEmptyStatQueue(pTrav)
 }
 
 func (p *pathTestSuite) TestAddTraverserContextCancel() {
@@ -337,7 +347,10 @@ func (p *pathTestSuite) TestAddTraverserContextCancel() {
 		if tries >= 4 {
 			p.Require().Fail("no path was added in 5 tries")
 		}
-		if len(pTrav.statQueue) == 0 {
+		pTrav.mtx.RLock()
+		statQueueEmpty := len(pTrav.statQueue) == 0
+		pTrav.mtx.RUnlock()
+		if statQueueEmpty {
 			tries++
 			time.Sleep(1 * time.Second)
 			continue
@@ -413,7 +426,7 @@ func (p *pathTestSuite) TestRecursiveAdd() {
 	mounts, err := getAllMountPoints()
 	p.Require().NoError(err)
 
-	p.Require().Equal(len(createdPathsOrder), len(createdPathsWithDepth))
+	p.Require().Len(createdPathsWithDepth, len(createdPathsOrder))
 
 	expectedStatQueue := make([]statMatch, 0, len(createdPathsOrder))
 	for _, path := range createdPathsOrder {
@@ -423,10 +436,12 @@ func (p *pathTestSuite) TestRecursiveAdd() {
 
 		info, err := os.Lstat(path)
 		p.Require().NoError(err)
+		stat, ok := info.Sys().(*syscall.Stat_t)
+		p.Require().True(ok, "expected *syscall.Stat_t from Lstat on %q", path)
 		mnt := mounts.getMountByPath(path)
 		p.Require().NotNil(mnt)
 		expectedStatQueue = append(expectedStatQueue, statMatch{
-			ino:        info.Sys().(*syscall.Stat_t).Ino,
+			ino:        stat.Ino,
 			major:      mnt.DeviceMajor,
 			minor:      mnt.DeviceMinor,
 			depth:      depth,
@@ -484,7 +499,7 @@ func (p *pathTestSuite) TestRecursiveAdd() {
 
 	err = <-errChan
 	p.Require().NoError(err)
-	p.Require().Empty(pTrav.statQueue)
+	p.requireEmptyStatQueue(pTrav)
 }
 
 func (p *pathTestSuite) TestNonRecursiveAdd() {
@@ -518,7 +533,7 @@ func (p *pathTestSuite) TestNonRecursiveAdd() {
 	mounts, err := getAllMountPoints()
 	p.Require().NoError(err)
 
-	p.Require().Equal(len(createdPathsOrder), len(createdPathsWithDepth))
+	p.Require().Len(createdPathsWithDepth, len(createdPathsOrder))
 
 	expectedStatQueue := make([]statMatch, 0, len(createdPathsOrder))
 	for _, path := range createdPathsOrder {
@@ -528,10 +543,12 @@ func (p *pathTestSuite) TestNonRecursiveAdd() {
 
 		info, err := os.Lstat(path)
 		p.Require().NoError(err)
+		stat, ok := info.Sys().(*syscall.Stat_t)
+		p.Require().True(ok, "expected *syscall.Stat_t from Lstat on %q", path)
 		mnt := mounts.getMountByPath(path)
 		p.Require().NotNil(mnt)
 		expectedStatQueue = append(expectedStatQueue, statMatch{
-			ino:        info.Sys().(*syscall.Stat_t).Ino,
+			ino:        stat.Ino,
 			major:      mnt.DeviceMajor,
 			minor:      mnt.DeviceMinor,
 			depth:      depth,
@@ -589,7 +606,7 @@ func (p *pathTestSuite) TestNonRecursiveAdd() {
 
 	err = <-errChan
 	p.Require().NoError(err)
-	p.Require().Empty(pTrav.statQueue)
+	p.requireEmptyStatQueue(pTrav)
 }
 
 func (p *pathTestSuite) TestStatErrAtRootAdd() {
@@ -659,7 +676,11 @@ func (p *pathTraverserMock) AddPathToMonitor(ctx context.Context, path string) e
 
 func (p *pathTraverserMock) GetMonitorPath(ino uint64, major uint32, minor uint32, name string) (MonitorPath, bool) {
 	args := p.Called(ino, major, minor, name)
-	return args.Get(0).(MonitorPath), args.Bool(1)
+	mPath, ok := args.Get(0).(MonitorPath)
+	if !ok {
+		panic("unexpected mock return type for MonitorPath")
+	}
+	return mPath, args.Bool(1)
 }
 
 func (p *pathTraverserMock) WalkAsync(path string, depth uint32, tid uint32) {
@@ -668,7 +689,11 @@ func (p *pathTraverserMock) WalkAsync(path string, depth uint32, tid uint32) {
 
 func (p *pathTraverserMock) ErrC() <-chan error {
 	args := p.Called()
-	return args.Get(0).(<-chan error)
+	errC, ok := args.Get(0).(<-chan error)
+	if !ok {
+		panic("unexpected mock return type for ErrC")
+	}
+	return errC
 }
 
 func (p *pathTraverserMock) Close() error {
