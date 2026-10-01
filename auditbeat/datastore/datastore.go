@@ -23,6 +23,7 @@ import (
 
 	bolt "go.etcd.io/bbolt"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
@@ -34,16 +35,16 @@ const (
 // OpenBucket returns a Bucket that stores data in {path.data}/beat.db.
 // The returned Bucket must be closed when no longer needed; the underlying
 // database is closed when the last bucket for a given path is closed.
-func OpenBucket(name string, p *paths.Path) (Bucket, error) {
-	return defaultRegistry.openBucket(name, p, nil)
+func OpenBucket(name string, p *paths.Path, logger *logp.Logger) (Bucket, error) {
+	return defaultRegistry.openBucket(name, p, logger, nil)
 }
 
 // OpenBucketWithMigration is like OpenBucket but runs migrate in a
 // read-write transaction before the named bucket is ensured to exist.
 // migrate must be idempotent: it will run on every call, including after
 // process restarts.
-func OpenBucketWithMigration(name string, p *paths.Path, migrate func(tx *bolt.Tx) error) (Bucket, error) {
-	return defaultRegistry.openBucket(name, p, migrate)
+func OpenBucketWithMigration(name string, p *paths.Path, logger *logp.Logger, migrate func(tx *bolt.Tx, logger *logp.Logger) error) (Bucket, error) {
+	return defaultRegistry.openBucket(name, p, logger, migrate)
 }
 
 // Bucket is a key-value bucket within the datastore.

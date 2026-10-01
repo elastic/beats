@@ -42,7 +42,7 @@ type fsNotifyReader struct {
 }
 
 func (r *fsNotifyReader) Start(done <-chan struct{}) (<-chan Event, error) {
-	watcher, err := monitor.New(r.config.Recursive, r.config.IsExcludedPath)
+	watcher, err := monitor.New(r.config.Recursive, r.config.IsExcludedPath, r.log)
 	if err != nil {
 		return nil, err
 	}
