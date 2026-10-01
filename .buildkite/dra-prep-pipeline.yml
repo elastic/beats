@@ -35,7 +35,7 @@ steps:
       - "artifacts/dra/beats/*/manifest-*.json"
     plugins:
       - *google_oidc_plugin
-      - elastic/dra-prep#v0.1.6:
+      - elastic/dra-prep#v0.1.7:
           product_id: "beats"
           stack_version: "${STACK_VERSION}"
           workflow: "${WORKFLOW}"
