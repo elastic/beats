@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix process misattribution in system/socket where TCP/UDP flows were attributed to wrong processes
+component: auditbeat

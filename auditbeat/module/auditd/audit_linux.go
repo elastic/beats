@@ -105,7 +105,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("failed to unpack the auditd config: %w", err)
 	}
 
-	log := logp.NewLogger(moduleName)
+	log := base.Logger().Named(moduleName)
 	_, _, kernel, _ := kernelVersion()
 	log.Infof("auditd module is running as euid=%v on kernel=%v", os.Geteuid(), kernel)
 

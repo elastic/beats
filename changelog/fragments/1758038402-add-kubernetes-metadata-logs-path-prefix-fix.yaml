@@ -1,0 +1,9 @@
+kind: bug-fix
+summary: >
+  add_kubernetes_metadata: the logs_path matcher now requires logs_path to be a true
+  prefix of the log file path (HasPrefix). Previously it used a substring check
+  (Contains), which would accept paths like /mnt/host/var/log/pods/... and then index
+  into the wrong path segments. Users relying on the old behavior should update their
+  logs_path to match the full path prefix of their log files.
+component: filebeat
+issue: https://github.com/elastic/beats/issues/48922

@@ -14,7 +14,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 	"github.com/elastic/elastic-agent-libs/logp"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption"
@@ -48,27 +47,27 @@ type UsageService struct {
 
 // NewService builds a new UsageService using the given config.
 func NewService(config azure.Config, logger *logp.Logger) (*UsageService, error) {
-	clientOptions := policy.ClientOptions{
-		Cloud: azure.BuildCloudConfig(config),
-	}
-
 	credential, err := azidentity.NewClientSecretCredential(config.TenantId, config.ClientId, config.ClientSecret, &azidentity.ClientSecretCredentialOptions{
-		ClientOptions: clientOptions,
+		ClientOptions: policy.ClientOptions{
+			Cloud: azure.BuildCloudConfig(config),
+		},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create client credentials: %w", err)
 	}
 
-	usageDetailsClient, err := armconsumption.NewUsageDetailsClient(credential, &arm.ClientOptions{
-		ClientOptions: clientOptions,
-	})
+	// Both billing clients share the same throttling mitigations: a ClientType
+	// header, a retry budget sized for Cost Management's per-minute quotas, and a
+	// policy that translates Azure's vendor specific rate limit hints into the
+	// Retry-After header azcore understands. See retry.go.
+	clientOptions := newClientOptions(config, logger)
+
+	usageDetailsClient, err := armconsumption.NewUsageDetailsClient(credential, &clientOptions)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create usage details client: %w", err)
 	}
 
-	forecastsClient, err := armcostmanagement.NewForecastClient(credential, &arm.ClientOptions{
-		ClientOptions: clientOptions,
-	})
+	forecastsClient, err := armcostmanagement.NewForecastClient(credential, &clientOptions)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create forecast client: %w", err)
 	}
