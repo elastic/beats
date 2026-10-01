@@ -110,15 +110,35 @@ type Beat struct {
 	ShutdownTimeout time.Duration
 }
 
+// agentInfo returns the Elastic Agent information and whether it is known.
+// Beat receivers don't use the control protocol, so their manager is not
+// enabled and Elastic Agent passes the information in their configuration.
+func (beat *Beat) agentInfo() (management.AgentInfo, bool) {
+	if beat.Manager == nil {
+		return management.AgentInfo{}, false
+	}
+	if beat.Manager.Enabled() {
+		return beat.Manager.AgentInfo(), true
+	}
+	if management.UnderAgent() {
+		info := beat.Manager.AgentInfo()
+		return info, info.Version != ""
+	}
+	return management.AgentInfo{}, false
+}
+
 func (beat *Beat) userAgentMode() useragent.AgentManagementMode {
 	if beat.Manager == nil {
 		return useragent.AgentManagementModeUnknown
 	}
-	if !beat.Manager.Enabled() {
+	info, ok := beat.agentInfo()
+	if !ok {
+		if management.UnderAgent() {
+			return useragent.AgentManagementModeUnknown
+		}
 		return useragent.AgentManagementModeStandalone
 	}
 
-	info := beat.Manager.AgentInfo()
 	switch info.ManagedMode {
 	case management.AgentManagedMode_MANAGED:
 		return useragent.AgentManagementModeManaged
@@ -130,10 +150,11 @@ func (beat *Beat) userAgentMode() useragent.AgentManagementMode {
 }
 
 func (beat *Beat) userAgentUnprivilegedMode() useragent.AgentUnprivilegedMode {
-	if beat.Manager == nil || !beat.Manager.Enabled() {
+	info, ok := beat.agentInfo()
+	if !ok {
 		return useragent.AgentUnprivilegedModeUnknown
 	}
-	if beat.Manager.AgentInfo().Unprivileged {
+	if info.Unprivileged {
 		return useragent.AgentUnprivilegedModeUnprivileged
 	}
 	return useragent.AgentUnprivilegedModePrivileged

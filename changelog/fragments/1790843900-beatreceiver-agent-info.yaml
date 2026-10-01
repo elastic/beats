@@ -1,0 +1,12 @@
+kind: bug-fix
+
+summary: Report Elastic Agent managed and privilege mode correctly in the User-Agent of beat receivers
+
+description: |
+  Beat receivers read Elastic Agent information from `management.otel.agent` in their configuration.
+  Previously they always reported `Standalone` in the User-Agent. When the information is not provided,
+  the managed and privilege modes are now omitted instead.
+
+component: all
+
+issue: https://github.com/elastic/beats/issues/53390
