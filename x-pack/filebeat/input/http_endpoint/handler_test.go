@@ -113,6 +113,35 @@ func Test_httpReadJSON(t *testing.T) {
 			wantStatus: http.StatusOK,
 		},
 		{
+			// An empty batch is a well-formed request with no events; it
+			// must not be treated as an error. See also the empty batch
+			// cases in Test_apiResponse.
+			name:       "empty array accepted",
+			body:       `[]`,
+			wantStatus: http.StatusOK,
+		},
+		{
+			name:       "nested empty array accepted",
+			body:       `[[]]`,
+			wantStatus: http.StatusOK,
+		},
+		{
+			name:       "array of non-objects accepted and dropped",
+			body:       `[1,null]`,
+			wantStatus: http.StatusOK,
+		},
+		{
+			name:       "whitespace only accepted",
+			body:       "  \n\t ",
+			wantStatus: http.StatusOK,
+		},
+		{
+			name:       "program returning empty array accepted",
+			body:       `{"records":[]}`,
+			program:    `obj.records.map(r, {"event": r})`,
+			wantStatus: http.StatusOK,
+		},
+		{
 			name: "numbers",
 			body: `{"a":1} [{"a":false},{"a":3.14}] {"a":-4}`,
 			wantObjs: []mapstr.M{
@@ -184,6 +213,19 @@ func Test_httpReadJSON(t *testing.T) {
 				t.Errorf("httpReadJSON() gotStatus = %v, want %v", gotStatus, tt.wantStatus)
 			}
 		})
+	}
+}
+
+func Test_httpReadJSONEmptyBody(t *testing.T) {
+	objs, status, err := httpReadJSON(http.NoBody, nil)
+	if !errors.Is(err, errBodyEmpty) {
+		t.Errorf("unexpected error: got:%v want:%v", err, errBodyEmpty)
+	}
+	if status != http.StatusNotAcceptable {
+		t.Errorf("unexpected status: got:%d want:%d", status, http.StatusNotAcceptable)
+	}
+	if objs != nil {
+		t.Errorf("unexpected objects: %v", objs)
 	}
 }
 
@@ -515,6 +557,107 @@ func Test_apiResponse(t *testing.T) {
 			},
 			wantStatus:   http.StatusOK,
 			wantResponse: `{"message": "success"}`,
+		},
+		{
+			// empty_array is the primary regression test for SDH-7605. Without
+			// the fix, httptest.ResponseRecorder.WriteHeader panics with
+			// "invalid WriteHeader code 0".
+			name: "empty_array",
+			conf: defaultConfig(),
+			request: func() *http.Request {
+				req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", bytes.NewBufferString(`[]`))
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       nil,
+			wantStatus:   http.StatusOK,
+			wantResponse: `{"message": "success"}`,
+		},
+		{
+			name: "nested_empty_array",
+			conf: defaultConfig(),
+			request: func() *http.Request {
+				req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", bytes.NewBufferString(`[[]]`))
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       nil,
+			wantStatus:   http.StatusOK,
+			wantResponse: `{"message": "success"}`,
+		},
+		{
+			// Non-object array elements are dropped by decodeJSONArray, so
+			// this is a well-formed request that yields no events.
+			name: "array_of_non_objects",
+			conf: defaultConfig(),
+			request: func() *http.Request {
+				req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", bytes.NewBufferString(`[1,null]`))
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       nil,
+			wantStatus:   http.StatusOK,
+			wantResponse: `{"message": "success"}`,
+		},
+		{
+			name: "whitespace_only_body",
+			conf: defaultConfig(),
+			request: func() *http.Request {
+				req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", bytes.NewBufferString("  \n  "))
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       nil,
+			wantStatus:   http.StatusOK,
+			wantResponse: `{"message": "success"}`,
+		},
+		{
+			// The ACK path has its own call to sendResponse, so an empty
+			// batch must be covered there too.
+			name: "empty_array_wait_for_completion",
+			conf: defaultConfig(),
+			request: func() *http.Request {
+				req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/?wait_for_completion_timeout=1s", bytes.NewBufferString(`[]`))
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       nil,
+			wantStatus:   http.StatusOK,
+			wantResponse: `{"message": "success"}`,
+		},
+		{
+			// A request with no body at all is rejected, unlike a request
+			// whose body holds no events. httptest.NewRequestWithContext only
+			// yields http.NoBody when it is passed explicitly.
+			name: "no_body",
+			conf: defaultConfig(),
+			request: func() *http.Request {
+				req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", http.NoBody)
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       nil,
+			wantStatus:   http.StatusNotAcceptable,
+			wantResponse: `{"message":"body cannot be empty"}`,
+		},
+		{
+			// The empty body check must not be defeated by the body size
+			// limit wrapper.
+			name: "no_body_with_max_body_bytes",
+			conf: func() config {
+				c := defaultConfig()
+				n := int64(1 << 20)
+				c.MaxBodySize = &n
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", http.NoBody)
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       nil,
+			wantStatus:   http.StatusNotAcceptable,
+			wantResponse: `{"message":"body cannot be empty"}`,
 		},
 		{
 			name: "validate_CRC_request",

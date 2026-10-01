@@ -61,7 +61,8 @@ type adInput struct {
 // New creates a new instance of an Active Directory identity provider.
 func New(logger *logp.Logger, path *paths.Path) (provider.Provider, error) {
 	p := adInput{
-		cfg: defaultConfig(),
+		cfg:    defaultConfig(),
+		logger: logger,
 	}
 	p.Manager = &kvstore.Manager{
 		Logger:    logger,

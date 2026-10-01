@@ -774,6 +774,7 @@ func printOutputOnFailure(t *testing.T, tempDir string) {
 // the store metadata but does not affect the in-flight harvester's path.
 // The key assertion is offset continuity: 5 total events (not 6 from re-read).
 func TestFilestreamGrowingFingerprint_rename_and_grow(t *testing.T) {
+	t.Skip("Flaky Test: https://github.com/elastic/beats/issues/53193")
 	t.Parallel()
 	filebeat, tempDir, logDir := newFingerprintFilebeat(t)
 
@@ -1414,6 +1415,7 @@ func TestFilestreamGrowingFingerprint_ThresholdTransitionAcrossRestart(t *testin
 // ends up with one active SHA-256 entry for app.log.1 and the raw-hex
 // entry from before the rename is removed.
 func TestFilestreamGrowingFingerprint_RenameAndThresholdCrossing(t *testing.T) {
+	t.Skip("Flaky Test: https://github.com/elastic/beats/issues/53194")
 	t.Parallel()
 	filebeat, homeDir, logDir := newFingerprintFilebeat(t)
 

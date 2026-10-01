@@ -466,7 +466,7 @@ func TestInputManager_ShutdownKeepsSharedStoreForOtherManager(t *testing.T) {
 
 	require.NoError(t, firstGroup.Stop())
 	first.Close()
-	entry := snapshotStoreCacheEntry(states.StoreKey())
+	entry := snapshotStoreCacheEntry(states.StoreKey("", ""))
 	require.True(t, entry.found)
 	require.Equal(t, storeActive, entry.state)
 	require.Equal(t, 1, entry.users)
@@ -505,7 +505,7 @@ func TestInputManager_InitOnlyAcquiresOneStoreReference(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	entry := snapshotStoreCacheEntry(states.StoreKey())
+	entry := snapshotStoreCacheEntry(states.StoreKey("", ""))
 	require.True(t, entry.found)
 	require.Equal(t, 1, entry.users)
 	require.Same(t, manager.store, entry.store)
@@ -530,7 +530,7 @@ func TestInputManager_CreateBeforeInitDoesNotAcquireStore(t *testing.T) {
 	require.Nil(t, manager.store)
 	require.Nil(t, manager.ackCH)
 
-	require.False(t, snapshotStoreCacheEntry(states.StoreKey()).found)
+	require.False(t, snapshotStoreCacheEntry(states.StoreKey("", "")).found)
 }
 
 func initInputManager(t *testing.T, cim *InputManager) {
@@ -638,6 +638,38 @@ take_over:
 		},
 		"invalid legacy config": {
 			cfgYAML:   "take_over: 42",
+			expectErr: true,
+		},
+		"from_any_id enabled": {
+			cfgYAML: `
+take_over:
+  enabled: true
+  from_any_id: true`,
+			expected: TakeOverConfig{
+				Enabled:   true,
+				FromAnyID: true,
+			},
+		},
+		"from_any_id disabled": {
+			cfgYAML: `
+take_over:
+  enabled: true
+  from_any_id: false`,
+			expected: TakeOverConfig{
+				Enabled:   true,
+				FromAnyID: false,
+			},
+		},
+		"from_any_id invalid type": {
+			cfgYAML:   `take_over.from_any_id: "yes"`,
+			expectErr: true,
+		},
+		"from_any_id and from_ids are mutually exclusive": {
+			cfgYAML: `
+take_over:
+  enabled: true
+  from_any_id: true
+  from_ids: ["foo"]`,
 			expectErr: true,
 		},
 	}

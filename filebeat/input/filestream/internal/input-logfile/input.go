@@ -33,16 +33,17 @@ import (
 type managedInput struct {
 	// id is the input ID, it is defined by setting 'id'
 	// in the input configuration
-	id                     string
-	manager                *InputManager
-	ackCH                  *updateChan
-	sourceIdentifier       *SourceIdentifier
-	previousSrcIdentifiers []*SourceIdentifier
-	prospector             Prospector
-	harvester              Harvester
-	cleanTimeout           time.Duration
-	harvesterLimit         uint64
-	readUntilEOF           ReadUntilEOFConfig
+	id               string
+	manager          *InputManager
+	ackCH            *updateChan
+	sourceIdentifier *SourceIdentifier
+	previousMatchers []InputMatcher
+	takeOverAnyID    bool
+	prospector       Prospector
+	harvester        Harvester
+	cleanTimeout     time.Duration
+	harvesterLimit   uint64
+	readUntilEOF     ReadUntilEOFConfig
 }
 
 // Name is required to implement the v2.Input interface
@@ -66,7 +67,7 @@ func (inp *managedInput) Run(
 	groupStore := inp.manager.getRetainedStore()
 	defer groupStore.Release()
 
-	// Setup cancellation using a custom cancel context. All workers will be
+	// Setup cancellation using a custom cancel context. All harvesters will be
 	// stopped if one failed badly by returning an error.
 	cancelCtx, cancel := context.WithCancel(ctxtool.FromCanceller(ctx.Cancelation))
 	defer cancel()
@@ -99,7 +100,7 @@ func (inp *managedInput) Run(
 
 	prospectorStore := inp.manager.getRetainedStore()
 	defer prospectorStore.Release()
-	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier, inp.previousSrcIdentifiers)
+	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier, inp.previousMatchers, inp.takeOverAnyID)
 
 	if err := inp.prospector.TakeOver(sourceStore, inp.sourceIdentifier.ID); err != nil {
 		return fmt.Errorf("prospector failed to take over states: %w", err)
