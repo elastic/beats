@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/beater"
 	"github.com/elastic/beats/v7/heartbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 
 	// Import OSS monitor types.
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
@@ -93,7 +94,8 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 			cfg.ElasticsearchAuth,
 			creator.heartbeat,
 			b.Info.UserAgent,
-			func(requester *esClient) {
+			b.Info.Logger,
+			func(requester *eslegclient.Connection) {
 				hbReceiver.elasticsearchAuthRequester = requester
 			},
 		),
