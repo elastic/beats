@@ -419,11 +419,9 @@ func (d *spawningDispatcher) dispatch(batch publisher.Batch) {
 	if batch == nil {
 		return
 	}
-	d.wg.Add(1)
-	go func() {
-		defer d.wg.Done()
+	d.wg.Go(func() {
 		_ = d.client.Publish(d.ctx, batch)
-	}()
+	})
 }
 
 func (d *spawningDispatcher) Close() error {
