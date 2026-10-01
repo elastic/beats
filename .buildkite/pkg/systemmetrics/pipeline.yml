@@ -1,0 +1,140 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+name: "beats-pkg-systemmetrics"
+
+env:
+  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
+  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
+  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1782878510"
+  IMAGE_UBUNTU_2004_X86_64: "platform-ingest-beats-ubuntu-2004-1782878510"
+  IMAGE_RHEL9_X86_64: "platform-ingest-beats-rhel-9-1782878510"
+  IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1782878510"
+  IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
+
+  #Deps
+  ASDF_MAGE_VERSION: 1.15.0
+
+  # Unit tests
+  RACE_DETECTOR: "true"
+  TEST_COVERAGE: "true"
+
+steps:
+  - group: "Check/Update"
+    key: "systemmetrics-check-update"
+
+    steps:
+      - label: "pkg/systemmetrics: Run check"
+        command: |
+          set -eo pipefail
+          make -C pkg/systemmetrics check
+          make check-no-changes
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
+          cpu: "4000m"
+          memory: "8Gi"
+          useCustomGlobalHooks: true
+        notify:
+          - github_commit_status:
+              context: "pkg/systemmetrics: check"
+
+  - wait: ~
+    # with PRs, we want to run mandatory tests only if check/update step succeed
+    # for other cases, e.g. merge commits, we want to run mandatory test independently of other tests
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+    depends_on: "systemmetrics-check-update"
+
+  - group: "Mandatory Tests"
+    key: "mandatory-tests"
+
+    steps:
+      - label: ":ubuntu: pkg/systemmetrics: Ubuntu x86_64 Unit Tests"
+        key: "mandatory-systemmetrics-unit-test"
+        command: |
+          set -euo pipefail
+          cd pkg/systemmetrics
+          mage goUnitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "pkg/systemmetrics/build/*.xml"
+          - "pkg/systemmetrics/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "pkg/systemmetrics/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "pkg/systemmetrics: Ubuntu x86_64 Unit Tests"
+
+      - label: ":windows: pkg/systemmetrics: Win 2022 Unit Tests"
+        key: "mandatory-systemmetrics-win-2022-unit-test"
+        command: |
+          Set-Location -Path pkg\systemmetrics
+          mage goUnitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "pkg/systemmetrics/build/*.xml"
+          - "pkg/systemmetrics/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "pkg/systemmetrics: Win 2022 Unit Tests"
+
+      # Container-System tests spin up their own Docker containers under
+      # ./tests/... via `mage goIntegTest` and only need a Docker daemon (no
+      # Elasticsearch compose stack). Run across images to keep coverage of:
+      #   - RHEL 9
+      #   - Ubuntu 20.04 (cgroup v1 host exercising metric/system/cgroup/cgv1)
+      #   - Ubuntu 22.04 (cgroup v2)
+      - label: ":linux: pkg/systemmetrics: Container-System Tests -- {{matrix.image}}"
+        key: "mandatory-systemmetrics-container-tests"
+        # Matrix values are not exposed in the environment; the memory
+        # integration test needs the host image to pick the right zswap
+        # expectations (see ciExpectations in metric/memory).
+        env:
+          HOST_OS_IMAGE: "{{matrix.image}}"
+        command: |
+          set -euo pipefail
+          cd pkg/systemmetrics
+          mage goIntegTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "{{matrix.image}}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "pkg/systemmetrics/build/*.xml"
+          - "pkg/systemmetrics/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "pkg/systemmetrics/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "pkg/systemmetrics: Container-System Tests"
+        matrix:
+          setup:
+            image:
+              - "${IMAGE_UBUNTU_X86_64}"
+              - "${IMAGE_RHEL9_X86_64}"
+              - "${IMAGE_UBUNTU_2004_X86_64}"
