@@ -15,6 +15,18 @@ scms:
       commitusingapi: true
       force: false
 
+  githubConfigLocal:
+    kind: github
+    spec:
+      owner: '{{ .scm.owner }}'
+      repository: '{{ .scm.repository }}'
+      user: '{{ requiredEnv "GITHUB_ACTOR" }}'
+      username: '{{ requiredEnv "GITHUB_ACTOR" }}'
+      token: '{{ requiredEnv "GITHUB_TOKEN" }}'
+      branch: '{{ .scm.branch }}'
+      commitusingapi: false
+      force: false
+
 actions:
   default:
     title: 'Bump npcap OEM installer to version {{ source "npcapVersion" }}'
@@ -104,3 +116,20 @@ targets:
       file: x-pack/packetbeat/npcap/installer/LICENSE
       line: 3
       content: 'Version: {{ source "npcapVersion" }}'
+
+  create-changelog-fragment:
+    name: 'Create changelog fragment for npcap {{ source "npcapVersion" }}'
+    disablesourceinput: true
+    scmid: githubConfigLocal
+    kind: shell
+    dependson:
+      - update-pcap-go
+      - update-license
+    spec:
+      command: |
+        ts=$(date +%s)
+        printf 'kind: enhancement\nsummary: bump npcap OEM installer to {{ source "npcapVersion" }}\ndescription: Bump the npcap OEM installer version used by Packetbeat to {{ source "npcapVersion" }}.\ncomponent: packetbeat\n' \
+          > "changelog/fragments/${ts}-bump-npcap-{{ source "npcapVersion" }}.yaml"
+      environments:
+        - name: HOME
+        - name: PATH
