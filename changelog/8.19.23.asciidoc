@@ -1,0 +1,67 @@
+// begin 8.19.23 relnotes
+
+[[release-notes-8.19.23]]
+==  8.19.23
+
+Review important information about the  8.19.23 release.
+
+
+
+
+
+
+
+
+
+
+
+
+[discrete]
+[[enhancements-8.19.23]]
+=== Enhancements
+
+
+
+
+**All**
+
+* Update Go to 1.26.8. https://github.com/elastic/beats/pull/53026[#53026] 
+
+
+**Filebeat**
+
+* Reuse the UDP and unix datagram read buffer so each packet allocates only its own length. https://github.com/elastic/beats/pull/53378[#53378] https://github.com/elastic/beats/pull/53380[#53380] https://github.com/elastic/beats/pull/53381[#53381] https://github.com/elastic/beats/pull/53419[#53419] https://github.com/elastic/beats/pull/53545[#53545] https://github.com/elastic/beats/pull/53521[#53521] https://github.com/elastic/beats/issues/53330[#53330]
+
+
+
+
+[discrete]
+[[bug-fixes-8.19.23]]
+=== Bug fixes
+
+
+
+
+**Auditbeat**
+
+* Fix auditbeat file_integrity kprobe leak that could prevent FIM from starting when the running kernel does not match the first candidate BTF spec. https://github.com/elastic/beats/pull/53378[#53378] https://github.com/elastic/beats/pull/53380[#53380] https://github.com/elastic/beats/pull/53381[#53381] https://github.com/elastic/beats/pull/53419[#53419] https://github.com/elastic/beats/pull/53545[#53545] https://github.com/elastic/beats/pull/53521[#53521] https://github.com/elastic/beats/issues/53330[#53330]
+* Fix process misattribution in system/socket where TCP/UDP flows were attributed to wrong processes. https://github.com/elastic/beats/pull/53378[#53378] https://github.com/elastic/beats/pull/53380[#53380] https://github.com/elastic/beats/pull/53381[#53381] https://github.com/elastic/beats/pull/53419[#53419] https://github.com/elastic/beats/pull/53545[#53545] https://github.com/elastic/beats/pull/53521[#53521] https://github.com/elastic/beats/issues/53330[#53330]
+
+
+**Filebeat**
+
+* Wire Sarama client logs in the Filebeat Kafka input so consumer-group lifecycle is visible. https://github.com/elastic/beats/pull/53378[#53378] https://github.com/elastic/beats/pull/53380[#53380] https://github.com/elastic/beats/pull/53381[#53381] https://github.com/elastic/beats/pull/53419[#53419] https://github.com/elastic/beats/pull/53545[#53545] https://github.com/elastic/beats/pull/53521[#53521] https://github.com/elastic/beats/issues/51305[#51305]
+* Respond to http_endpoint requests that contain no events instead of closing the connection. https://github.com/elastic/beats/pull/53378[#53378] https://github.com/elastic/beats/pull/53380[#53380] https://github.com/elastic/beats/pull/53381[#53381] https://github.com/elastic/beats/pull/53419[#53419] https://github.com/elastic/beats/pull/53545[#53545] https://github.com/elastic/beats/pull/53521[#53521] https://github.com/elastic/beats/issues/53330[#53330]
+* Fix httpjson rate limiter marking input Degraded when rate-limit headers are absent. https://github.com/elastic/beats/pull/53378[#53378] https://github.com/elastic/beats/pull/53380[#53380] https://github.com/elastic/beats/pull/53381[#53381] https://github.com/elastic/beats/pull/53419[#53419] https://github.com/elastic/beats/pull/53545[#53545] https://github.com/elastic/beats/pull/53521[#53521] https://github.com/elastic/beats/issues/53330[#53330]
+
+
+**Packetbeat**
+
+* Fix panic in DHCPv4 parser when OptionTimeOffset value is shorter than 4 bytes. https://github.com/elastic/beats/pull/53378[#53378] https://github.com/elastic/beats/pull/53380[#53380] https://github.com/elastic/beats/pull/53381[#53381] https://github.com/elastic/beats/pull/53419[#53419] https://github.com/elastic/beats/pull/53545[#53545] https://github.com/elastic/beats/pull/53521[#53521] https://github.com/elastic/beats/issues/53330[#53330]
+
+
+**Winlogbeat**
+
+* Fix binary event data fields being overread into subsequent buffer contents. https://github.com/elastic/beats/pull/53378[#53378] https://github.com/elastic/beats/pull/53380[#53380] https://github.com/elastic/beats/pull/53381[#53381] https://github.com/elastic/beats/pull/53419[#53419] https://github.com/elastic/beats/pull/53545[#53545] https://github.com/elastic/beats/pull/53521[#53521] https://github.com/elastic/beats/issues/53330[#53330]
+
+// end 8.19.23 relnotes
