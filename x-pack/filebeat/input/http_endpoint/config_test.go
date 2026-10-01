@@ -50,29 +50,6 @@ func Test_validateConfig(t *testing.T) {
 			wantError: errors.New("response_body must be valid JSON accessing config"),
 		},
 		{
-<<<<<<< HEAD
-			name: "valid log destination",
-			config: config{
-				URL:          "/",
-				ResponseBody: `{"message": "success"}`,
-				Method:       http.MethodPost,
-				ResponseCode: http.StatusOK,
-				Tracer:       &tracerConfig{Enabled: ptrTo(true), Logger: lumberjack.Logger{Filename: "http_endpoint/log"}},
-			},
-		},
-		{
-			name: "invalid_log_destination_accepted_at_config_time",
-			config: config{
-				URL:          "/",
-				ResponseBody: `{"message": "success"}`,
-				Method:       http.MethodPost,
-				ResponseCode: http.StatusOK,
-				Tracer:       &tracerConfig{Enabled: ptrTo(true), Logger: lumberjack.Logger{Filename: "/var/log"}},
-			},
-		},
-		{
-=======
->>>>>>> c24f8ab (x-pack/filebeat/input/http_endpoint: validate OPTIONS config at startup (#53417))
 			name: "response_code_zero_rejected",
 			config: config{
 				URL:          "/",
