@@ -37,12 +37,11 @@ const (
 	regexKeyGroupName      = "key"
 )
 
-// Matcher takes a new event and returns the index
+// Matcher takes a new event and returns the indexes to look it up under.
 type Matcher interface {
-	// MetadataIndex returns the index string to use in annotation lookups for the given
-	// event. A previous indexer should have generated that index for this to work
-	// This function can return "" if the event doesn't match
-	MetadataIndex(event mapstr.M) string
+	// MetadataIndexCandidates returns lookup indexes ordered most-to-least specific;
+	// the first cache hit wins. Returns nil if the event doesn't match.
+	MetadataIndexCandidates(event mapstr.M) []string
 }
 
 type Matchers struct {
@@ -76,17 +75,15 @@ func NewMatchers(configs PluginConfig, logger *logp.Logger) *Matchers {
 	}
 }
 
-// MetadataIndex returns the index string for the first matcher from the Registry returning one
-func (m *Matchers) MetadataIndex(event mapstr.M) string {
+// MetadataIndexCandidates returns the candidate indexes from the first matcher that yields one.
+func (m *Matchers) MetadataIndexCandidates(event mapstr.M) []string {
 	for _, matcher := range m.matchers {
-		index := matcher.MetadataIndex(event)
-		if index != "" {
-			return index
+		candidates := matcher.MetadataIndexCandidates(event)
+		if len(candidates) > 0 {
+			return candidates
 		}
 	}
-
-	// No index returned
-	return ""
+	return nil
 }
 
 func (m *Matchers) Empty() bool {
@@ -129,7 +126,7 @@ func NewFieldMatcher(cfg config.C, _ *logp.Logger) (Matcher, error) {
 	return &FieldMatcher{MatchFields: matcherConfig.LookupFields, Regexp: regex}, nil
 }
 
-func (f *FieldMatcher) MetadataIndex(event mapstr.M) string {
+func (f *FieldMatcher) MetadataIndexCandidates(event mapstr.M) []string {
 	for _, field := range f.MatchFields {
 		fieldIface, err := event.GetValue(field)
 		if err != nil {
@@ -140,7 +137,10 @@ func (f *FieldMatcher) MetadataIndex(event mapstr.M) string {
 			continue
 		}
 		if f.Regexp == nil {
-			return fieldValue
+			if fieldValue == "" {
+				continue
+			}
+			return []string{fieldValue}
 		}
 
 		matches := f.Regexp.FindStringSubmatch(fieldValue)
@@ -150,11 +150,11 @@ func (f *FieldMatcher) MetadataIndex(event mapstr.M) string {
 		keyIndex := f.Regexp.SubexpIndex(regexKeyGroupName)
 		key := matches[keyIndex]
 		if key != "" {
-			return key
+			return []string{key}
 		}
 	}
 
-	return ""
+	return nil
 }
 
 type FieldFormatMatcher struct {
@@ -181,7 +181,7 @@ func NewFieldFormatMatcher(cfg config.C, _ *logp.Logger) (Matcher, error) {
 
 }
 
-func (f *FieldFormatMatcher) MetadataIndex(event mapstr.M) string {
+func (f *FieldFormatMatcher) MetadataIndexCandidates(event mapstr.M) []string {
 	bytes, err := f.Codec.Encode("", &beat.Event{
 		Fields: event,
 	})
@@ -191,8 +191,8 @@ func (f *FieldFormatMatcher) MetadataIndex(event mapstr.M) string {
 	}
 
 	if len(bytes) == 0 {
-		return ""
+		return nil
 	}
 
-	return string(bytes)
+	return []string{string(bytes)}
 }
