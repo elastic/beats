@@ -25,6 +25,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sys/windows"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestEventIterator(t *testing.T) {
@@ -61,7 +63,7 @@ func TestEventIterator(t *testing.T) {
 	})
 
 	t.Run("no_subscription", func(t *testing.T) {
-		_, err := NewEventIterator()
+		_, err := NewEventIterator(logptest.NewTestingLogger(t, ""))
 		assert.Error(t, err)
 	})
 
@@ -69,7 +71,7 @@ func TestEventIterator(t *testing.T) {
 		log := openLog(t, winlogbeatTestLogName)
 		defer log.Close()
 
-		itr, err := NewEventIterator(WithSubscription(log))
+		itr, err := NewEventIterator(logptest.NewTestingLogger(t, ""), WithSubscription(log))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -83,7 +85,7 @@ func TestEventIterator(t *testing.T) {
 		factory := func() (handle EvtHandle, err error) {
 			return openLog(t, winlogbeatTestLogName), nil
 		}
-		itr, err := NewEventIterator(WithSubscriptionFactory(factory))
+		itr, err := NewEventIterator(logptest.NewTestingLogger(t, ""), WithSubscriptionFactory(factory))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -98,7 +100,7 @@ func TestEventIterator(t *testing.T) {
 		defer log.Close()
 
 		t.Run("default", func(t *testing.T) {
-			itr, err := NewEventIterator(WithSubscription(log))
+			itr, err := NewEventIterator(logptest.NewTestingLogger(t, ""), WithSubscription(log))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -106,7 +108,7 @@ func TestEventIterator(t *testing.T) {
 		})
 
 		t.Run("custom", func(t *testing.T) {
-			itr, err := NewEventIterator(WithSubscription(log), WithBatchSize(128))
+			itr, err := NewEventIterator(logptest.NewTestingLogger(t, ""), WithSubscription(log), WithBatchSize(128))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -114,7 +116,7 @@ func TestEventIterator(t *testing.T) {
 		})
 
 		t.Run("too_small", func(t *testing.T) {
-			itr, err := NewEventIterator(WithSubscription(log), WithBatchSize(0))
+			itr, err := NewEventIterator(logptest.NewTestingLogger(t, ""), WithSubscription(log), WithBatchSize(0))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -122,7 +124,7 @@ func TestEventIterator(t *testing.T) {
 		})
 
 		t.Run("too_big", func(t *testing.T) {
-			itr, err := NewEventIterator(WithSubscription(log), WithBatchSize(evtNextMaxHandles+1))
+			itr, err := NewEventIterator(logptest.NewTestingLogger(t, ""), WithSubscription(log), WithBatchSize(evtNextMaxHandles+1))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -134,7 +136,7 @@ func TestEventIterator(t *testing.T) {
 		log := openLog(t, winlogbeatTestLogName)
 		defer log.Close()
 
-		itr, err := NewEventIterator(WithSubscription(log), WithBatchSize(13))
+		itr, err := NewEventIterator(logptest.NewTestingLogger(t, ""), WithSubscription(log), WithBatchSize(13))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -178,7 +180,7 @@ func TestEventIterator(t *testing.T) {
 			log := openLog(t, winlogbeatTestLogName)
 			defer log.Close()
 
-			itr, err := NewEventIterator(WithSubscription(log))
+			itr, err := NewEventIterator(logptest.NewTestingLogger(t, ""), WithSubscription(log))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -221,7 +223,7 @@ func TestEventIterator(t *testing.T) {
 				return log, err
 			}
 
-			itr, err := NewEventIterator(WithSubscriptionFactory(factory), WithBatchSize(10))
+			itr, err := NewEventIterator(logptest.NewTestingLogger(t, ""), WithSubscriptionFactory(factory), WithBatchSize(10))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -265,7 +267,7 @@ func TestEventIterator(t *testing.T) {
 			log := openLog(t, winlogbeatTestLogName)
 			defer log.Close()
 
-			itr, err := NewEventIterator(WithSubscription(log), WithBatchSize(10))
+			itr, err := NewEventIterator(logptest.NewTestingLogger(t, ""), WithSubscription(log), WithBatchSize(10))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -289,7 +291,7 @@ func TestEventIterator(t *testing.T) {
 				return openLog(t, winlogbeatTestLogName), nil
 			}
 
-			itr, err := NewEventIterator(WithSubscriptionFactory(factory), WithBatchSize(10))
+			itr, err := NewEventIterator(logptest.NewTestingLogger(t, ""), WithSubscriptionFactory(factory), WithBatchSize(10))
 			if err != nil {
 				t.Fatal(err)
 			}
