@@ -1,0 +1,6 @@
+kind: bug-fix
+summary: >
+  HTTP Endpoint options_headers must be non-empty and options_response_code
+  must be valid when options_headers is configured. A previously accepted
+  empty options_headers: {} now fails at startup.
+component: filebeat
