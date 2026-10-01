@@ -9,21 +9,21 @@ import (
 	"context"
 	"io"
 	"net/http"
-	"net/http/httptest"
+	"strings"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.elastic.co/apm/v2/apmtest"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer/consumertest"
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
 
-	"github.com/elastic/beats/v7/libbeat/common/productorigin"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type elasticsearchAuthTestHost struct {
@@ -113,7 +113,7 @@ func TestElasticsearchAuthStartHookErrors(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			err := elasticsearchAuthStartHook(t.Context(), test.reference, nil, "", func(*esClient) {})(test.host)
+			err := elasticsearchAuthStartHook(t.Context(), test.reference, nil, "", logp.NewNopLogger(), func(*eslegclient.Connection) {})(test.host)
 			require.Error(t, err, "start hook should reject an invalid Elasticsearch authentication extension")
 			assert.Contains(t, err.Error(), test.wantError, "start hook should return the expected resolver error")
 		})
@@ -121,128 +121,7 @@ func TestElasticsearchAuthStartHookErrors(t *testing.T) {
 }
 
 func TestElasticsearchAuthStartHookEmptyReference(t *testing.T) {
-	require.NoError(t, elasticsearchAuthStartHook(t.Context(), "", nil, "", func(*esClient) {})(nil), "empty Elasticsearch auth reference should be a no-op")
-}
-
-func TestESClientTransportComposition(t *testing.T) {
-	returnedTransport := &closableRoundTripper{
-		roundTripperFunc: func(*http.Request) (*http.Response, error) {
-			return nil, nil
-		},
-		closed: make(chan struct{}),
-	}
-	auth := &fakeElasticsearchAuthExtension{
-		endpoints:    []string{"http://example.test"},
-		roundTripper: returnedTransport,
-	}
-
-	client, err := newESClient(t.Context(), auth, "Heartbeat/test-agent")
-	require.NoError(t, err, "client creation")
-	require.NotNil(t, auth.baseRoundTripper, "elasticsearchauth should receive a base transport")
-	assert.NotSame(t, http.DefaultTransport, auth.baseRoundTripper, "the base transport should be wrapped")
-	assert.Same(t, returnedTransport, client.client.Transport, "the transport returned by elasticsearchauth should be installed directly")
-
-	server := httptest.NewServer(http.HandlerFunc(func(http.ResponseWriter, *http.Request) {}))
-	defer server.Close()
-
-	_, spans, apmErrors := apmtest.WithTransaction(func(ctx context.Context) {
-		request, requestErr := http.NewRequestWithContext(ctx, http.MethodGet, server.URL+"/_search", nil)
-		require.NoError(t, requestErr, "creating request for the base transport")
-		response, roundTripErr := auth.baseRoundTripper.RoundTrip(request)
-		require.NoError(t, roundTripErr, "APM-wrapped base transport should complete the request")
-		require.NoError(t, response.Body.Close(), "closing the instrumented response body")
-	})
-	assert.Empty(t, apmErrors, "APM instrumentation should not report errors")
-	require.Len(t, spans, 1, "the base transport should create exactly one APM span")
-	assert.Equal(t, "db", spans[0].Type, "the base transport should create a database span")
-	assert.Equal(t, "elasticsearch", spans[0].Subtype, "the base transport should use Elasticsearch APM instrumentation")
-}
-
-func TestESClientRequest(t *testing.T) {
-	var receivedRequest *http.Request
-	auth := &fakeElasticsearchAuthExtension{
-		endpoints: []string{"http://example.test/base"},
-		roundTripper: roundTripperFunc(func(request *http.Request) (*http.Response, error) {
-			receivedRequest = request.Clone(request.Context())
-			return &http.Response{
-				StatusCode: http.StatusOK,
-				Status:     "200 OK",
-				Body:       io.NopCloser(bytes.NewBufferString(`{"hits":{"hits":[]}}`)),
-				Header:     make(http.Header),
-			}, nil
-		}),
-	}
-
-	client, err := newESClient(t.Context(), auth, "Heartbeat/test-agent")
-	require.NoError(t, err, "client creation")
-	assert.Equal(t, elasticsearchRequestTimeout, client.client.Timeout, "Heartbeat must own the Elasticsearch request deadline")
-	status, body, err := client.Request(http.MethodPost, "/_search?size=1", "pipeline", map[string]string{"routing": "monitor"}, map[string]string{"query": "state"})
-	require.NoError(t, err, "request should succeed")
-	assert.Equal(t, http.StatusOK, status, "status")
-	assert.JSONEq(t, `{"hits":{"hits":[]}}`, string(body), "unexpected body")
-	require.NotNil(t, receivedRequest, "returned request should be valid")
-	assert.Equal(t, http.MethodPost, receivedRequest.Method, "unexpected method")
-	assert.Equal(t, "/base/_search", receivedRequest.URL.Path, "unexpected path")
-	assert.Equal(t, "1", receivedRequest.URL.Query().Get("size"), "unexpected size query")
-	assert.Equal(t, "pipeline", receivedRequest.URL.Query().Get("pipeline"), "unexpected pipeline query")
-	assert.Equal(t, "monitor", receivedRequest.URL.Query().Get("routing"), "unexpected routing query")
-	assert.Equal(t, "application/json", receivedRequest.Header.Get("Content-Type"), "unexpected content type")
-	assert.Equal(t, "application/json", receivedRequest.Header.Get("Accept"), "unexpected Accept header")
-	assert.Equal(t, productorigin.Beats, receivedRequest.Header.Get(productorigin.Header), "unexpected product origin header")
-	assert.Equal(t, "Heartbeat/test-agent", receivedRequest.Header.Get("User-Agent"), "unexpected User-Agent")
-}
-
-func TestESClientRequestConfiguredHeadersOverrideDefaults(t *testing.T) {
-	var receivedRequest *http.Request
-	auth := &fakeElasticsearchAuthExtension{
-		endpoints: []string{"http://example.test"},
-		roundTripper: roundTripperFunc(func(request *http.Request) (*http.Response, error) {
-			// elasticsearchauth applies configured headers in its transport, after
-			// the requester has supplied its defaults.
-			request = request.Clone(request.Context())
-			request.Header.Set("Accept", "application/vnd.elasticsearch+json;compatible-with=8")
-			request.Header.Set(productorigin.Header, "custom-origin")
-			receivedRequest = request
-			return &http.Response{
-				StatusCode: http.StatusOK,
-				Status:     "200 OK",
-				Body:       io.NopCloser(bytes.NewBufferString(`{}`)),
-				Header:     make(http.Header),
-			}, nil
-		}),
-	}
-
-	client, err := newESClient(t.Context(), auth, "Heartbeat/test-agent")
-	require.NoError(t, err, "client creation")
-	_, _, err = client.Request(http.MethodGet, "/", "", nil, nil)
-	require.NoError(t, err, "request should succeed")
-	require.NotNil(t, receivedRequest, "returned request should be valid")
-	assert.Equal(t, "application/vnd.elasticsearch+json;compatible-with=8", receivedRequest.Header.Get("Accept"), "configured Accept header should override the default")
-	assert.Equal(t, "custom-origin", receivedRequest.Header.Get(productorigin.Header), "configured product origin should override the default")
-}
-
-func TestESClientRequestNon2xx(t *testing.T) {
-	var receivedUserAgent string
-	auth := &fakeElasticsearchAuthExtension{
-		endpoints: []string{"http://example.test"},
-		roundTripper: roundTripperFunc(func(request *http.Request) (*http.Response, error) {
-			receivedUserAgent = request.Header.Get("User-Agent")
-			return &http.Response{
-				StatusCode: http.StatusTeapot,
-				Status:     "418 I'm a teapot",
-				Body:       io.NopCloser(bytes.NewBufferString(`Brewing error`)),
-				Header:     make(http.Header),
-			}, nil
-		}),
-	}
-
-	client, err := newESClient(t.Context(), auth, "")
-	require.NoError(t, err, "client creation")
-	status, body, err := client.Request(http.MethodGet, "/", "", nil, nil)
-	require.EqualError(t, err, `418 I'm a teapot: Brewing error`, "unexpected error message")
-	assert.Equal(t, http.StatusTeapot, status, "unexpected status code")
-	assert.Equal(t, "Brewing error", string(body), "unexpected response body")
-	assert.Contains(t, receivedUserAgent, "Heartbeat/", "fallback User-Agent should identify Heartbeat")
+	require.NoError(t, elasticsearchAuthStartHook(t.Context(), "", nil, "", logp.NewNopLogger(), func(*eslegclient.Connection) {})(nil), "empty Elasticsearch auth reference should be a no-op")
 }
 
 func TestElasticsearchAuthStartHookInjectsBeforeRun(t *testing.T) {
@@ -255,11 +134,20 @@ func TestElasticsearchAuthStartHookInjectsBeforeRun(t *testing.T) {
 	var once sync.Once
 	transport := &closableRoundTripper{
 		closed: make(chan struct{}),
-		roundTripperFunc: func(*http.Request) (*http.Response, error) {
-			once.Do(func() { close(requested) })
+		roundTripperFunc: func(request *http.Request) (*http.Response, error) {
+			if strings.HasSuffix(request.URL.Path, "_search") {
+				once.Do(func() { close(requested) })
+				return &http.Response{
+					StatusCode: http.StatusOK,
+					Status:     "200 OK",
+					Body:       io.NopCloser(bytes.NewBufferString(`{"hits":{"hits":[]}}`)),
+					Header:     make(http.Header),
+				}, nil
+			}
 			return &http.Response{
 				StatusCode: http.StatusOK,
-				Body:       io.NopCloser(bytes.NewBufferString(`{"hits":{"hits":[]}}`)),
+				Status:     "200 OK",
+				Body:       io.NopCloser(bytes.NewBufferString(`{"version":{"number":"8.10.0","build_flavor":"default"}}`)),
 				Header:     make(http.Header),
 			}, nil
 		},
@@ -325,6 +213,14 @@ func TestElasticsearchAuthShutdownCancelsInFlightRequest(t *testing.T) {
 	transport := &closableRoundTripper{
 		closed: make(chan struct{}),
 		roundTripperFunc: func(req *http.Request) (*http.Response, error) {
+			if !strings.HasSuffix(req.URL.Path, "_search") {
+				return &http.Response{
+					StatusCode: http.StatusOK,
+					Status:     "200 OK",
+					Body:       io.NopCloser(bytes.NewBufferString(`{"version":{"number":"8.10.0","build_flavor":"default"}}`)),
+					Header:     make(http.Header),
+				}, nil
+			}
 			startOnce.Do(func() { close(requestStarted) })
 			<-req.Context().Done()
 			select {
