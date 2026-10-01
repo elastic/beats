@@ -43,6 +43,7 @@ type kubeAnnotatorConfig struct {
 	DefaultIndexers Enabled       `config:"default_indexers"`
 
 	AddResourceMetadata *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
+	AppendFields        bool                                `config:"append_fields"`
 }
 
 type Enabled struct {
