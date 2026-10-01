@@ -58,6 +58,7 @@ sources:
       command: gh api repos/elastic/golang-crossbuild/contents/Makefile.common --jq '.content | @base64d'
       environments:
         - name: GITHUB_TOKEN
+        - name: PATH
 
   goVersion:
     name: Get Go version from .go-version
