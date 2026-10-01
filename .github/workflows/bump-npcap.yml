@@ -18,6 +18,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ${{ secrets.ELASTIC_DOCKER_REGISTRY }}
+          username: ${{ secrets.ELASTIC_DOCKER_USERNAME }}
+          password: ${{ secrets.ELASTIC_DOCKER_PASSWORD }}
+
       - uses: elastic/oblt-actions/updatecli/run@v1
         with:
           command: pipeline apply -config .github/workflows/updatecli.d/bump-npcap.yml --values .github/workflows/updatecli.d/values.d/scm.yml

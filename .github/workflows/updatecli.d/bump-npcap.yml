@@ -21,11 +21,10 @@ actions:
     kind: github/pullrequest
     scmid: githubConfig
     spec:
-      automerge: false
       labels:
         - automation
         - dependencies
-        - backport-skip
+        - backport-active-all
       description: |
         Bumps the npcap OEM installer to v{{ source "npcapVersion" }}.
 
@@ -38,16 +37,15 @@ actions:
 sources:
   npcapVersion:
     name: Get NPCAP_VERSION from golang-crossbuild/Makefile.common
-    kind: githubcontent
+    kind: shell
     transformers:
       - findsubmatch:
           pattern: 'NPCAP_VERSION := (\d+\.\d+)'
           captureindex: 1
     spec:
-      owner: elastic
-      repository: golang-crossbuild
-      file: Makefile.common
-      token: '{{ requiredEnv "GITHUB_TOKEN" }}'
+      command: gh api repos/elastic/golang-crossbuild/contents/Makefile.common --jq '.content' | base64 -d
+      environments:
+        - name: GITHUB_TOKEN
 
   goVersion:
     name: Get Go version from .go-version
