@@ -49,8 +49,8 @@ func TestSafeFileRotateExistingFile(t *testing.T) {
 	assert.Equal(t, []byte("new filebeat"), contents)
 
 	// do it twice to make sure we deal with deleting the old file
-	for i := 0; i < 2; i++ {
-		expectedContents := []byte(fmt.Sprintf("new filebeat %d", i))
+	for i := range 2 {
+		expectedContents := fmt.Appendf(nil, "new filebeat %d", i)
 		err = os.WriteFile(filepath.Join(tempdir, "registry.new"),
 			expectedContents, 0x777)
 		assert.NoError(t, err)

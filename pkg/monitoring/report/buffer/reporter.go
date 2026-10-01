@@ -61,11 +61,9 @@ func MakeReporter(cfg *c.C) (*reporter, error) {
 		r.entries[ns] = newBuffer(r.Size)
 	}
 
-	r.wg.Add(1)
-	go func() {
-		defer r.wg.Done()
+	r.wg.Go(func() {
 		r.snapshotLoop()
-	}()
+	})
 	return r, nil
 }
 

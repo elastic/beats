@@ -18,7 +18,6 @@
 package kibana
 
 import (
-	"context"
 	_ "embed"
 	"fmt"
 	"net/http"
@@ -68,8 +67,7 @@ func TestFleetCreatePolicy(t *testing.T) {
 		policyDescription = "a policy used for testing"
 	)
 
-	ctx, cn := context.WithCancel(context.Background())
-	defer cn()
+	ctx := t.Context()
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
@@ -106,8 +104,7 @@ func TestFleetCreatePolicy(t *testing.T) {
 func TestFleetGetPolicy(t *testing.T) {
 	const id = "elastic-agent-managed-ep"
 
-	ctx, cn := context.WithCancel(context.Background())
-	defer cn()
+	ctx := t.Context()
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
@@ -138,8 +135,7 @@ func TestFleetUpdatePolicy(t *testing.T) {
 		policyName = "test-fqdn"
 	)
 
-	ctx, cn := context.WithCancel(context.Background())
-	defer cn()
+	ctx := t.Context()
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
@@ -188,8 +184,7 @@ func TestFleetCreateEnrollmentAPIKey(t *testing.T) {
 		policyID = "a580c680-ea40-11ed-aae7-4b4fd4906b3d"
 	)
 
-	ctx, cn := context.WithCancel(context.Background())
-	defer cn()
+	ctx := t.Context()
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
@@ -218,8 +213,7 @@ func TestFleetCreateEnrollmentAPIKey(t *testing.T) {
 }
 
 func TestFleetListAgents(t *testing.T) {
-	ctx, cn := context.WithCancel(context.Background())
-	defer cn()
+	ctx := t.Context()
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
@@ -248,8 +242,7 @@ func TestFleetListAgents(t *testing.T) {
 func TestFleetGetAgent(t *testing.T) {
 	const id = "26802301-8996-457a-ab6a-8ea955ef2723"
 
-	ctx, cn := context.WithCancel(context.Background())
-	defer cn()
+	ctx := t.Context()
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
@@ -282,8 +275,7 @@ func TestFleetGetAgent(t *testing.T) {
 func TestFleetUnEnrollAgent(t *testing.T) {
 	const agentID = "f512f36f-bf78-4285-aff0-baeafbcdf21e"
 
-	ctx, cn := context.WithCancel(context.Background())
-	defer cn()
+	ctx := t.Context()
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
@@ -308,8 +300,7 @@ func TestFleetUnEnrollAgent(t *testing.T) {
 func TestFleetUpgradeAgent(t *testing.T) {
 	const agentID = "f512f36f-bf78-4285-aff0-baeafbcdf21e"
 
-	ctx, cn := context.WithCancel(context.Background())
-	defer cn()
+	ctx := t.Context()
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
@@ -330,8 +321,7 @@ func TestFleetUpgradeAgent(t *testing.T) {
 func TestFleetPrivilegeLevelChange(t *testing.T) {
 	const agentID = "f512f36f-bf78-4285-aff0-baeafbcdf21e"
 
-	ctx, cn := context.WithCancel(context.Background())
-	defer cn()
+	ctx := t.Context()
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
@@ -354,8 +344,7 @@ func TestFleetPrivilegeLevelChange(t *testing.T) {
 }
 
 func TestFleetListFleetServerHosts(t *testing.T) {
-	ctx, cn := context.WithCancel(context.Background())
-	defer cn()
+	ctx := t.Context()
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
@@ -385,8 +374,7 @@ func TestFleetListFleetServerHosts(t *testing.T) {
 func TestFleetGetFleetServerHost(t *testing.T) {
 	const id = "fleet-default-fleet-server-host"
 
-	ctx, cn := context.WithCancel(context.Background())
-	defer cn()
+	ctx := t.Context()
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {

@@ -179,7 +179,7 @@ func NewClientWithConfigDefault(config *ClientConfig, defaultPort int, binaryNam
 		kibanaURL = u.String()
 	}
 
-	log := logp.NewLogger("kibana")
+	log := logp.NewLogger("kibana") //nolint:forbidigo // public API without a logger parameter; threading one through is out of scope
 	log.Infof("Kibana url: %s", kibanaURL)
 
 	headers := make(http.Header)

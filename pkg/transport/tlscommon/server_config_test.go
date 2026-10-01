@@ -80,7 +80,6 @@ func Test_ServerConfig_Serialization_ClientAuth(t *testing.T) {
 		clientAuth: &none,
 	}}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			p, err := yaml.Marshal(&tc.cfg)
 			require.NoError(t, err)

@@ -18,7 +18,6 @@
 package httpcommon
 
 import (
-	"context"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
@@ -59,8 +58,7 @@ func Test_HTTPTransportSettings_DiagRequests(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 		}))
 		defer srv.Close()
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		ctx := t.Context()
 
 		settings := DefaultHTTPTransportSettings()
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, srv.URL, nil)
@@ -76,8 +74,7 @@ func Test_HTTPTransportSettings_DiagRequests(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 		}))
 		defer srv.Close()
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		ctx := t.Context()
 
 		settings := DefaultHTTPTransportSettings()
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, srv.URL, nil)
@@ -93,8 +90,7 @@ func Test_HTTPTransportSettings_DiagRequests(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 		}))
 		defer srv.Close()
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		ctx := t.Context()
 
 		ca := pem.EncodeToMemory(&pem.Block{
 			Type:  "CERTIFICATE",
@@ -119,8 +115,7 @@ func Test_isGoHTTPResp(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 	}))
 	defer srv.Close()
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 
 	t.Run("http request", func(t *testing.T) {
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, strings.Replace(srv.URL, "https", "http", 1), nil)
@@ -144,8 +139,7 @@ func Test_HTTPRequestOnHTTPSPort(t *testing.T) {
 	// This checks if HTTP was use used to communicate with an HTTPS server resulting in an error
 	// isGoHTTPResp does the same but requires that the responding server is a go http.Server
 	t.Skip("test used to validate behaviour of http.Client on external servers")
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://google.com:443", nil)
 	require.NoError(t, err)
 	_, err = (&http.Client{}).Do(req)
@@ -162,8 +156,7 @@ func Test_diagError(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 		}))
 		defer srv.Close()
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		ctx := t.Context()
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, srv.URL, nil)
 		require.NoError(t, err)
 
@@ -177,8 +170,7 @@ func Test_diagError(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 		}))
 		defer srv.Close()
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		ctx := t.Context()
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, strings.Replace(srv.URL, "http", "https", 1), nil)
 		require.NoError(t, err)
 
@@ -201,8 +193,7 @@ func Test_diagError(t *testing.T) {
 		}
 		srv.StartTLS()
 		defer srv.Close()
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		ctx := t.Context()
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, srv.URL, nil)
 		require.NoError(t, err)
 
@@ -233,8 +224,7 @@ func Test_diagError(t *testing.T) {
 		}
 		srv.StartTLS()
 		defer srv.Close()
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		ctx := t.Context()
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, srv.URL, nil)
 		require.NoError(t, err)
 
@@ -270,8 +260,7 @@ func Test_diagError(t *testing.T) {
 		}
 		srv.StartTLS()
 		defer srv.Close()
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		ctx := t.Context()
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, srv.URL, nil)
 		require.NoError(t, err)
 

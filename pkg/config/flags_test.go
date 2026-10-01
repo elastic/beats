@@ -48,7 +48,6 @@ func TestStringArrFlag(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		test := test
 		name := fmt.Sprintf("init=%v,default=%v,in=%v,out=%v", test.init, test.def, test.in, test.expected)
 
 		t.Run(name, func(t *testing.T) {
@@ -100,7 +99,6 @@ func TestSettingsFlag(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		test := test
 		name := strings.Join(test.in, ",")
 
 		t.Run(name, func(t *testing.T) {

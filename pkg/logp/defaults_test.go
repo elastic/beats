@@ -57,7 +57,7 @@ func TestDefaultConfig(t *testing.T) {
 	}
 
 	// Get the logger and log anything
-	logger := logp.L()
+	logger := logp.L() //nolint:forbidigo // the test exercises the global logger set up by logp.Configure
 	defer logger.Close()
 
 	logger.Info("foo")
@@ -172,7 +172,7 @@ func runTestEnvStderr(t *testing.T, envType logp.Environment) {
 	// This is running in a separate process to make sure we capture stderr.
 	cfg := logp.DefaultConfig(envType)
 	assert.NoError(t, logp.Configure(cfg))
-	logger := logp.L()
+	logger := logp.L() //nolint:forbidigo // the test exercises the global logger set up by logp.Configure
 	defer logger.Close()
 	logger.Info("foo")
 }
@@ -222,7 +222,7 @@ func TestWith(t *testing.T) {
 		`{"log.level":"info","message":"another message without any extra fields"}`,
 	}
 
-	logger := logp.L()
+	logger := logp.L() //nolint:forbidigo // the test exercises the global logger set up by logp.Configure
 	defer logger.Close()
 
 	logger.Info("Very first message")
@@ -359,10 +359,10 @@ func TestConcurrency(t *testing.T) {
 	for i := 0; i < 500; i += 100 {
 		wg.Add(1)
 		go func(id int) {
-			logger := logp.L().With("id", id)
+			logger := logp.L().With("id", id) //nolint:forbidigo // the test exercises the global logger set up by logp.Configure
 			defer wg.Done()
 			time.Sleep(time.Millisecond * 100)
-			for j := 0; j < 10; j++ {
+			for j := range 10 {
 				logger.Infow(fmt.Sprintf("count: %03d", id+j), "sort_field", (id+j)*10000)
 			}
 		}(i)
@@ -402,7 +402,7 @@ func TestConcurrency(t *testing.T) {
 
 	// Get a logger and close it so the file descriptors are released.
 	// This is specially important on Windows
-	logp.L().Close()
+	logp.L().Close() //nolint:forbidigo // the test exercises the global logger set up by logp.Configure
 }
 
 func strField(key, val string) zapcore.Field {
@@ -466,7 +466,7 @@ func TestLoggerRotateSymlink(t *testing.T) {
 	require.NoError(t, err)
 
 	logLine := "a info message"
-	logp.L().Info(logLine)
+	logp.L().Info(logLine) //nolint:forbidigo // the test exercises the global logger set up by logp.Configure
 
 	// The file rotation should have detected the destination is a symlink and rotated before writing.
 	rotatedFilename := filepath.Join(dir, fmt.Sprintf("%s-%s-1.ndjson", logname, time.Now().Format(file.DateFormat)))
@@ -480,7 +480,7 @@ func TestLoggerRotateSymlink(t *testing.T) {
 	require.NoError(t, err)
 	assert.Contains(t, string(got), logLine, "The rotated file should contain the log message")
 
-	assert.NoError(t, logp.L().Close())
+	assert.NoError(t, logp.L().Close()) //nolint:forbidigo // the test exercises the global logger set up by logp.Configure
 
 	// Error: TempDir RemoveAll cleanup: remove t.TempDir() The process cannot access the file because it is being used by another process.
 	require.NoError(t, os.RemoveAll(dir))

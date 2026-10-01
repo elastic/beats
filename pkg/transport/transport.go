@@ -45,7 +45,7 @@ func (d DialerFunc) DialContext(ctx context.Context, network, address string) (n
 }
 
 func DialContext(ctx context.Context, c Config, network, address string) (net.Conn, error) {
-	d, err := MakeDialer(c, logp.NewLogger(""))
+	d, err := MakeDialer(c, logp.NewLogger("")) //nolint:forbidigo // public API without a logger parameter; threading one through is out of scope
 	if err != nil {
 		return nil, err
 	}

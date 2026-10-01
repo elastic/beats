@@ -19,6 +19,7 @@ package config
 
 import (
 	"flag"
+	"slices"
 	"strings"
 
 	ucfg "github.com/elastic/go-ucfg"
@@ -134,10 +135,8 @@ func (f *StringsFlag) Set(v string) error {
 	if f.isDefault {
 		*f.list = []string{v}
 	} else {
-		for _, old := range *f.list {
-			if old == v {
-				return nil
-			}
+		if slices.Contains(*f.list, v) {
+			return nil
 		}
 		*f.list = append(*f.list, v)
 	}

@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"regexp"
 	"runtime"
+	"slices"
 	"strings"
 	"syscall"
 	"unsafe"
@@ -120,12 +121,12 @@ func (q *Query) GetCounterPaths(counterPath string) ([]string, error) {
 		return paths, err
 	}
 	//check if Windows installed language is not ENG, the ExpandWildCardPath will return either one of the errors below.
-	if err == PDH_CSTATUS_NO_OBJECT || err == PDH_CSTATUS_NO_COUNTER {
+	if errors.Is(err, PDH_CSTATUS_NO_OBJECT) || errors.Is(err, PDH_CSTATUS_NO_COUNTER) {
 		handle, err := q.AddEnglishCounter(counterPath)
 		if err != nil {
 			return nil, err
 		}
-		defer PdhRemoveCounter(handle)
+		defer PdhRemoveCounter(handle) //nolint:errcheck // best-effort cleanup of the temporary counter
 		info, err := PdhGetCounterInfo(handle)
 		if err != nil {
 			return nil, err
@@ -166,12 +167,7 @@ func (q *Query) RemoveUnusedCounters(counters []string) error {
 }
 
 func matchCounter(counterPath string, counterList []string) bool {
-	for _, cn := range counterList {
-		if cn == counterPath {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(counterList, counterPath)
 }
 
 // CollectData collects the value for all counters in the query.
@@ -186,7 +182,7 @@ func (q *Query) CollectDataEx(interval uint32, event windows.Handle) error {
 
 // GetFormattedCounterValues returns an array of formatted values for a query.
 func (q *Query) GetFormattedCounterValues() (map[string][]CounterValue, error) {
-	if q.Counters == nil || len(q.Counters) == 0 {
+	if len(q.Counters) == 0 {
 		return nil, errors.New("no counter list found")
 	}
 	rtn := make(map[string][]CounterValue, len(q.Counters))
@@ -200,10 +196,10 @@ func (q *Query) GetFormattedCounterValues() (map[string][]CounterValue, error) {
 func (q *Query) GetCountersAndInstances(objectName string) ([]string, []string, error) {
 	counters, instances, err := PdhEnumObjectItems(objectName)
 	if err != nil {
-		return nil, nil, fmt.Errorf("Unable to retrieve counter and instance list for %s: %w", objectName, err)
+		return nil, nil, fmt.Errorf("unable to retrieve counter and instance list for %s: %w", objectName, err)
 	}
 	if len(counters) == 0 && len(instances) == 0 {
-		return nil, nil, fmt.Errorf("Unable to retrieve counter and instance list for %s", objectName)
+		return nil, nil, fmt.Errorf("unable to retrieve counter and instance list for %s", objectName)
 	}
 	return UTF16ToStringArray(counters), UTF16ToStringArray(instances), nil
 }
@@ -252,7 +248,7 @@ func (q *Query) ExpandWildCardPath(wildCardPath string) ([]string, error) {
 		return UTF16ToStringArray(expdPaths), nil
 	} else {
 		if expdPaths, err = PdhExpandWildCardPath(utfPath); err != nil {
-			if err == PDH_MORE_DATA {
+			if errors.Is(err, PDH_MORE_DATA) {
 				if expdPaths, err = PdhExpandWildCardPath(utfPath); err != nil {
 					return nil, err
 				}
@@ -264,9 +260,10 @@ func (q *Query) ExpandWildCardPath(wildCardPath string) ([]string, error) {
 		// in several cases ExpandWildCardPath win32 api seems to return initial wildcard without any errors, adding some waiting time between the 2 ExpandWildCardPath api calls seems to be succesfull but that will delay data retrieval
 		// A call is triggered again
 		if len(paths) == 1 && strings.Contains(paths[0], "*") && paths[0] == wildCardPath {
-			expdPaths, err = PdhExpandWildCardPath(utfPath)
+			// The result of the retried expansion is not used; only its error is checked.
+			_, err = PdhExpandWildCardPath(utfPath)
 			if err == nil {
-				return paths, err
+				return paths, nil
 			}
 		} else {
 			return paths, err
@@ -300,7 +297,7 @@ func returnLastInstance(match string) string {
 	var innerMatch string
 	var matches []string
 	runeMatch := []rune(match)
-	for i := 0; i < len(runeMatch); i++ {
+	for i := range runeMatch {
 		char := string(runeMatch[i])
 
 		// check if string ends between parentheses

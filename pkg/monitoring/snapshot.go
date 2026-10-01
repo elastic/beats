@@ -17,7 +17,10 @@
 
 package monitoring
 
-import "strings"
+import (
+	"maps"
+	"strings"
+)
 
 // FlatSnapshot represents a flatten snapshot of all metrics.
 // Names in the tree will be joined with `.` .
@@ -92,9 +95,7 @@ func CollectStructSnapshot(r *Registry, mode Mode, expvar bool) map[string]any {
 	if expvar {
 		vs := newStructSnapshotVisitor()
 		VisitExpvars(vs)
-		for k, v := range vs.event.current {
-			snapshot[k] = v
-		}
+		maps.Copy(snapshot, vs.event.current)
 	}
 
 	return snapshot

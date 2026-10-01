@@ -150,9 +150,10 @@ func (d *ConsoleDriver) printf(format string, args ...any) {
 }
 
 func (d *ConsoleDriver) indent(data string) string {
-	res := "\n"
-	for _, line := range strings.Split(data, "\n") {
-		res += strings.Repeat(" ", d.level+2) + line + "\n"
+	var res strings.Builder
+	res.WriteString("\n")
+	for line := range strings.SplitSeq(data, "\n") {
+		res.WriteString(strings.Repeat(" ", d.level+2) + line + "\n")
 	}
-	return res
+	return res.String()
 }

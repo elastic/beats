@@ -82,8 +82,8 @@ func main() {
 
 	var netIPs []net.IP
 	if !noip {
-		ips := strings.Split(ipList, ",")
-		for _, ip := range ips {
+		ips := strings.SplitSeq(ipList, ",")
+		for ip := range ips {
 			netIPs = append(netIPs, net.ParseIP(ip))
 		}
 	}

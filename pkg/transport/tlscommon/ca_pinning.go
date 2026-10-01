@@ -22,6 +22,7 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"errors"
+	"slices"
 )
 
 // ErrCAPinMissmatch is returned when no pin is matched in the verified chain.
@@ -51,10 +52,5 @@ func Fingerprint(certificate *x509.Certificate) string {
 }
 
 func matches(pins []string, candidate string) bool {
-	for _, pin := range pins {
-		if pin == candidate {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(pins, candidate)
 }

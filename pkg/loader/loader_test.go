@@ -23,7 +23,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 func TestExternalConfigLoading(t *testing.T) {
@@ -168,7 +168,7 @@ func TestExternalConfigLoading(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			test := test
 
-			l := mustNewLoader(test.inputsFolder)
+			l := mustNewLoader(t, test.inputsFolder)
 			c, err := l.Load(test.configs)
 			if test.err {
 				require.Error(t, err)
@@ -183,7 +183,7 @@ func TestExternalConfigLoading(t *testing.T) {
 	}
 }
 
-func mustNewLoader(inputsFolder string) *Loader {
-	log := logp.L()
+func mustNewLoader(t testing.TB, inputsFolder string) *Loader {
+	log := logptest.NewTestingLogger(t, "")
 	return NewLoader(log, inputsFolder)
 }

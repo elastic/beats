@@ -32,8 +32,8 @@ func fullAddress(host string, defaultPort int) string {
 		return host
 	}
 
-	idx := strings.Index(host, ":")
-	if idx >= 0 {
+	found := strings.Contains(host, ":")
+	if found {
 		// IPv6 address detected
 		return fmt.Sprintf("[%v]:%v", host, defaultPort)
 	}

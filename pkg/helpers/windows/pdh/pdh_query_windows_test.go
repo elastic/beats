@@ -50,7 +50,7 @@ func TestGetFormattedCounterValuesEmptyCounterList(t *testing.T) {
 	var q Query
 	list, err := q.GetFormattedCounterValues()
 	assert.Nil(t, list)
-	assert.EqualValues(t, err.Error(), "no counter list found")
+	assert.Equal(t, "no counter list found", err.Error())
 }
 
 // TestExpandWildCardPathWithEmptyString will check for a valid path string.
@@ -58,7 +58,7 @@ func TestExpandWildCardPathWithEmptyString(t *testing.T) {
 	var q Query
 	list, err := q.ExpandWildCardPath("")
 	assert.Nil(t, list)
-	assert.EqualValues(t, err.Error(), "no query path given")
+	assert.Equal(t, "no query path given", err.Error())
 }
 
 // TestSuccessfulQuery retrieves a per counter successfully.
@@ -79,9 +79,10 @@ func TestSuccessfulQuery(t *testing.T) {
 	}
 	//Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
-	err = q.CollectData()
-	err = q.CollectData()
-	if err != nil {
+	if err = q.CollectData(); err != nil {
+		t.Fatal(err)
+	}
+	if err = q.CollectData(); err != nil {
 		t.Fatal(err)
 	}
 	list, err := q.GetFormattedCounterValues()
@@ -93,42 +94,42 @@ func TestMatchInstanceName(t *testing.T) {
 	query := "\\SQLServer:Databases(*)\\Log File(s) Used Size (KB)"
 	match, err := MatchInstanceName(query)
 	assert.NoError(t, err)
-	assert.Equal(t, match, "*")
+	assert.Equal(t, "*", match)
 
 	query = " \\\\desktop-rfooe09\\per processor network interface card activity(3, microsoft wi-fi directvirtual (gyfyg) adapter #2)\\dpcs queued/sec"
 	match, err = MatchInstanceName(query)
 	assert.NoError(t, err)
-	assert.Equal(t, match, "3, microsoft wi-fi directvirtual (gyfyg) adapter #2")
+	assert.Equal(t, "3, microsoft wi-fi directvirtual (gyfyg) adapter #2", match)
 
 	query = " \\\\desktop-rfooe09\\ (test this scenario) per processor network interface card activity(3, microsoft wi-fi directvirtual (gyfyg) adapter #2)\\dpcs queued/sec"
 	match, err = MatchInstanceName(query)
 	assert.NoError(t, err)
-	assert.Equal(t, match, "3, microsoft wi-fi directvirtual (gyfyg) adapter #2")
+	assert.Equal(t, "3, microsoft wi-fi directvirtual (gyfyg) adapter #2", match)
 
 	query = "\\RAS\\Bytes Received By Disconnected Clients"
 	match, err = MatchInstanceName(query)
 	assert.NoError(t, err)
-	assert.Equal(t, match, "RAS")
+	assert.Equal(t, "RAS", match)
 
 	query = `\\Process (chrome.exe#4)\\Bytes Received By Disconnected Clients`
 	match, err = MatchInstanceName(query)
 	assert.NoError(t, err)
-	assert.Equal(t, match, "chrome.exe#4")
+	assert.Equal(t, "chrome.exe#4", match)
 
 	query = "\\BranchCache\\Local Cache: Cache complete file segments"
 	match, err = MatchInstanceName(query)
 	assert.NoError(t, err)
-	assert.Equal(t, match, "BranchCache")
+	assert.Equal(t, "BranchCache", match)
 
 	query = `\Synchronization(*)\Exec. Resource no-Waits AcqShrdStarveExcl/sec`
 	match, err = MatchInstanceName(query)
 	assert.NoError(t, err)
-	assert.Equal(t, match, "*")
+	assert.Equal(t, "*", match)
 
 	query = `\.NET CLR Exceptions(test hellp (dsdsd) #rfsfs #3)\# of Finallys / sec`
 	match, err = MatchInstanceName(query)
 	assert.NoError(t, err)
-	assert.Equal(t, match, "test hellp (dsdsd) #rfsfs #3")
+	assert.Equal(t, "test hellp (dsdsd) #rfsfs #3", match)
 }
 
 // TestInstanceNameRegexp tests regular expression for instance.
@@ -138,7 +139,7 @@ func TestInstanceNameRegexp(t *testing.T) {
 	for _, path := range queryPaths {
 		matches := instanceNameRegexp.FindStringSubmatch(path)
 		if assert.Len(t, matches, 2, "regular expression did not return any matches") {
-			assert.Equal(t, matches[1], "(*)")
+			assert.Equal(t, "(*)", matches[1])
 		}
 	}
 }
@@ -151,7 +152,7 @@ func TestObjectNameRegexp(t *testing.T) {
 	for _, path := range queryPaths {
 		matches := objectNameRegexp.FindStringSubmatch(path)
 		if assert.Len(t, matches, 2, "regular expression did not return any matches") {
-			assert.Equal(t, matches[1], "Web Service Cache")
+			assert.Equal(t, "Web Service Cache", matches[1])
 		}
 	}
 }
@@ -159,23 +160,23 @@ func TestObjectNameRegexp(t *testing.T) {
 func TestReturnLastInstance(t *testing.T) {
 	query := "(*)"
 	match := returnLastInstance(query)
-	assert.Equal(t, match, "*")
+	assert.Equal(t, "*", match)
 
 	query = "(3, microsoft wi-fi directvirtual (gyfyg) adapter #2)"
 	match = returnLastInstance(query)
-	assert.Equal(t, match, "3, microsoft wi-fi directvirtual (gyfyg) adapter #2")
+	assert.Equal(t, "3, microsoft wi-fi directvirtual (gyfyg) adapter #2", match)
 
 	query = "(test this scenario) per processor network interface card activity(3, microsoft wi-fi directvirtual (gyfyg) adapter #2)"
 	match = returnLastInstance(query)
-	assert.Equal(t, match, "3, microsoft wi-fi directvirtual (gyfyg) adapter #2")
+	assert.Equal(t, "3, microsoft wi-fi directvirtual (gyfyg) adapter #2", match)
 
 	query = `(chrome.exe#4)`
 	match = returnLastInstance(query)
-	assert.Equal(t, match, "chrome.exe#4")
+	assert.Equal(t, "chrome.exe#4", match)
 
 	query = `(test hellp (dsdsd) #rfsfs #3)`
 	match = returnLastInstance(query)
-	assert.Equal(t, match, "test hellp (dsdsd) #rfsfs #3")
+	assert.Equal(t, "test hellp (dsdsd) #rfsfs #3", match)
 }
 
 func TestUTF16ToStringArray(t *testing.T) {
@@ -188,7 +189,7 @@ func TestUTF16ToStringArray(t *testing.T) {
 	}
 	response := UTF16ToStringArray(unicode)
 	assert.NotNil(t, response)
-	assert.Equal(t, len(response), 2)
+	assert.Len(t, response, 2)
 	for _, res := range response {
 		assert.Contains(t, array, res)
 	}
@@ -228,7 +229,7 @@ func TestSortOrder(t *testing.T) {
 				rawCounters = append(rawCounters, arr)
 			}
 			for i := 0; i < len(rawCounters)-1; i++ {
-				assert.Equalf(t, len(rawCounters[i]), len(rawCounters[i+1]), "returned counters should be equal")
+				assert.Lenf(t, rawCounters[i+1], len(rawCounters[i]), "returned counters should be equal")
 			}
 			// confirm that each index corresponds to one particular instance (i.e. core)
 			for i := 0; i < len(rawCounters)-1; i++ {

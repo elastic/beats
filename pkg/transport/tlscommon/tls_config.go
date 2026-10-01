@@ -26,6 +26,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"slices"
 	"sync"
 	"time"
 
@@ -216,7 +217,7 @@ func (c *TLSConfig) BuildModuleClientConfig(host string, options ...TLSOption) *
 	}
 
 	if settings.logger == nil {
-		settings.logger = logp.NewLogger("")
+		settings.logger = logp.NewLogger("") //nolint:forbidigo // fallback for callers that do not pass a logger option
 	}
 
 	if c == nil {
@@ -551,10 +552,8 @@ func verifyHostname(cert *x509.Certificate, hostname string) error {
 	}
 	parsedIP := net.ParseIP(ip)
 	if parsedIP != nil {
-		for _, certIP := range cert.IPAddresses {
-			if parsedIP.Equal(certIP) {
-				return nil
-			}
+		if slices.ContainsFunc(cert.IPAddresses, parsedIP.Equal) {
+			return nil
 		}
 
 		parsedCNIP := net.ParseIP(cert.Subject.CommonName)

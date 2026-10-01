@@ -47,7 +47,7 @@ func (m *beatService) Execute(args []string, r <-chan svc.ChangeRequest, changes
 	changes <- svc.Status{State: svc.StartPending}
 	changes <- svc.Status{State: svc.Running, Accepts: cmdsAccepted}
 
-	log := logp.NewLogger("service_windows")
+	log := logp.NewLogger("service_windows") //nolint:forbidigo // svc.Handler.Execute has a fixed signature with no logger parameter
 	combinedChan := make(chan svc.ChangeRequest)
 	go func() {
 		for {

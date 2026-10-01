@@ -622,7 +622,7 @@ func BenchmarkHeavyPipeline(b *testing.B) {
 	// 6 addFields (agent info)
 	manyShared = append(manyShared, benchShared...)
 	// Add 15 more processors simulating integration-specific metadata
-	for i := 0; i < 15; i++ {
+	for i := range 15 {
 		manyShared = append(manyShared, M{
 			fmt.Sprintf("integration_%d", i): M{
 				"name":    fmt.Sprintf("integration-%d", i),

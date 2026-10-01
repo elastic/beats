@@ -29,7 +29,7 @@ const selector = "cfgwarn"
 
 // Beta logs the usage of an beta feature.
 func Beta(format string, v ...any) {
-	logp.NewLogger(selector, zap.AddCallerSkip(1)).Warnf("BETA: "+format, v...)
+	logp.NewLogger(selector, zap.AddCallerSkip(1)).Warnf("BETA: "+format, v...) //nolint:forbidigo // package-level helper without a logger parameter
 }
 
 // Deprecate logs a deprecation message.
@@ -40,10 +40,10 @@ func Deprecate(version string, format string, v ...any) {
 	if version != "" {
 		postfix = fmt.Sprintf(" Will be removed in version: %s", version)
 	}
-	logp.NewLogger(selector, zap.AddCallerSkip(1)).Warnf("DEPRECATED: "+format+postfix, v...)
+	logp.NewLogger(selector, zap.AddCallerSkip(1)).Warnf("DEPRECATED: "+format+postfix, v...) //nolint:forbidigo // package-level helper without a logger parameter
 }
 
 // Experimental logs the usage of an experimental feature.
 func Experimental(format string, v ...any) {
-	logp.NewLogger(selector, zap.AddCallerSkip(1)).Warnf("EXPERIMENTAL: "+format, v...)
+	logp.NewLogger(selector, zap.AddCallerSkip(1)).Warnf("EXPERIMENTAL: "+format, v...) //nolint:forbidigo // package-level helper without a logger parameter
 }

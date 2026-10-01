@@ -82,9 +82,7 @@ func (r *Doer) Start() {
 	r.lastDone = r.nowFn()
 	r.ticker = r.newTickerFn(r.period)
 
-	r.wg.Add(1)
-	go func() {
-		defer r.wg.Done()
+	r.wg.Go(func() {
 		defer r.ticker.Stop()
 
 		for {
@@ -96,7 +94,7 @@ func (r *Doer) Start() {
 				return
 			}
 		}
-	}()
+	})
 }
 
 func (r *Doer) Stop() {

@@ -20,6 +20,7 @@ package loader
 import (
 	"fmt"
 	"io"
+	"maps"
 	"os"
 
 	"gopkg.in/yaml.v2"
@@ -131,9 +132,7 @@ func NewConfigFrom(from any, opts ...any) (*Config, error) {
 
 		// we modified incoming object
 		// cleanup so skipped keys are not missing
-		for k, v := range skippedKeys {
-			data[k] = v
-		}
+		maps.Copy(data, skippedKeys)
 	}
 	return newConfigFrom(cfg), err
 }

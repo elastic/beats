@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"sort"
 	"strings"
 
@@ -63,9 +64,7 @@ type M map[string]any
 // already exists then it is overwritten. This method does not merge nested
 // maps.
 func (m M) Update(d M) {
-	for k, v := range d {
-		m[k] = v
-	}
+	maps.Copy(m, d)
 }
 
 // DeepUpdate recursively copies the key-value pairs from d to this map.
@@ -629,13 +628,9 @@ func flattenKeys(prefix string, in M, out *[]string) {
 func Union(dict1 M, dict2 M) M {
 	dict := M{}
 
-	for k, v := range dict1 {
-		dict[k] = v
-	}
+	maps.Copy(dict, dict1)
 
-	for k, v := range dict2 {
-		dict[k] = v
-	}
+	maps.Copy(dict, dict2)
 	return dict
 }
 
@@ -657,9 +652,7 @@ func MergeFields(target, from M, underRoot bool) error {
 	}
 
 	// Add fields and override.
-	for k, v := range from {
-		destMap[k] = v
-	}
+	maps.Copy(destMap, from)
 
 	return nil
 }

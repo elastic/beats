@@ -19,6 +19,7 @@ package monitoring
 
 import (
 	"errors"
+	"slices"
 
 	"github.com/elastic/beats/v7/pkg/config"
 )
@@ -115,11 +116,9 @@ func IsBufferEnabled(monitoringCfg *config.C) bool {
 		return false
 	}
 	fields := monitoringCfg.GetFields()
-	for _, field := range fields {
-		if field == "enabled" {
-			// default Enabled will return true, so we only return the value if it's defined.
-			return monitoringCfg.Enabled()
-		}
+	if slices.Contains(fields, "enabled") {
+		// default Enabled will return true, so we only return the value if it's defined.
+		return monitoringCfg.Enabled()
 	}
 	return false
 }

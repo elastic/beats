@@ -247,7 +247,7 @@ func (settings *HTTPTransportSettings) RoundTripper(opts ...TransportOption) (ht
 	}
 
 	if extra.logger == nil {
-		extra.logger = logp.NewLogger("")
+		extra.logger = logp.NewLogger("") //nolint:forbidigo // fallback for callers that do not pass a logger option
 	}
 
 	for _, opt := range opts {

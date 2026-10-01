@@ -58,13 +58,13 @@ func TestStat(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	require.EqualValues(t, os.Geteuid(), uid)
+	require.Equal(t, os.Geteuid(), uid)
 
 	gid, err := info.GID()
 	if err != nil {
 		t.Fatal(err)
 	}
-	require.EqualValues(t, os.Getegid(), gid)
+	require.Equal(t, os.Getegid(), gid)
 }
 
 func TestLstat(t *testing.T) {
@@ -79,17 +79,17 @@ func TestLstat(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	require.True(t, info.Mode()&os.ModeSymlink > 0)
+	require.Positive(t, info.Mode()&os.ModeSymlink)
 
 	uid, err := info.UID()
 	if err != nil {
 		t.Fatal(err)
 	}
-	require.EqualValues(t, os.Geteuid(), uid)
+	require.Equal(t, os.Geteuid(), uid)
 
 	gid, err := info.GID()
 	if err != nil {
 		t.Fatal(err)
 	}
-	require.EqualValues(t, os.Getegid(), gid)
+	require.Equal(t, os.Getegid(), gid)
 }

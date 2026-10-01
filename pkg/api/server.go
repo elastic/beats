@@ -48,7 +48,7 @@ type Server struct {
 // New creates a new API Server.
 func New(log *logp.Logger, mux *http.ServeMux, c *config.C) (*Server, error) {
 	if log == nil {
-		log = logp.NewLogger("")
+		log = logp.NewLogger("") //nolint:forbidigo // fallback for callers that pass a nil logger
 	}
 
 	cfg := DefaultConfig()

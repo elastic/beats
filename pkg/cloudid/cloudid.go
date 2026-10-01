@@ -132,13 +132,13 @@ func (c *CloudID) decodeCloudID() error {
 // decodeCloudAuth splits the c.auth into c.username and c.password.
 func (c *CloudID) decodeCloudAuth() error {
 	cloudAuth := c.auth
-	idx := strings.Index(cloudAuth, ":")
-	if idx < 0 {
+	before, after, ok := strings.Cut(cloudAuth, ":")
+	if !ok {
 		return errors.New("cloud.auth setting doesn't contain `:` to split between username and password")
 	}
 
-	c.username = cloudAuth[0:idx]
-	c.password = cloudAuth[idx+1:]
+	c.username = before
+	c.password = after
 	return nil
 }
 
@@ -148,7 +148,7 @@ func (c *CloudID) decodeCloudAuth() error {
 // settings.
 func OverwriteSettings(cfg *config.C) error {
 
-	logger := logp.NewLogger("cloudid")
+	logger := logp.NewLogger("cloudid") //nolint:forbidigo // public API without a logger parameter; threading one through is out of scope
 	cloudID, _ := cfg.String("cloud.id", -1)
 	cloudAuth, _ := cfg.String("cloud.auth", -1)
 

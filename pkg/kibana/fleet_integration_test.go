@@ -71,8 +71,7 @@ Just set the env vars listed in mustGetEnv().
 func TestGetPolicyKibana(t *testing.T) {
 	cfg := mustGetEnv(t)
 
-	ctx, cn := context.WithCancel(context.Background())
-	defer cn()
+	ctx := t.Context()
 
 	client, err := NewClientWithConfig(&cfg, "", "", "", "")
 	require.NoError(t, err)
@@ -107,8 +106,7 @@ func TestGetPolicyKibana(t *testing.T) {
 func TestCreatePolicyKibana(t *testing.T) {
 	cfg := mustGetEnv(t)
 
-	ctx, cn := context.WithCancel(context.Background())
-	defer cn()
+	ctx := t.Context()
 
 	client, err := NewClientWithConfig(&cfg, "", "", "", "")
 	require.NoError(t, err)
@@ -235,8 +233,7 @@ const endpointPackageVersion = "8.9.0"
 func TestFleetPackage(t *testing.T) {
 	cfg := mustGetEnv(t)
 
-	ctx, cn := context.WithCancel(context.Background())
-	defer cn()
+	ctx := t.Context()
 
 	client, err := NewClientWithConfig(&cfg, "", "", "", "")
 	require.NoError(t, err)
@@ -319,8 +316,7 @@ func installElasticDefendPackage(t *testing.T, client *Client, policyID, package
 func TestCreateEnrollmentAPIKey(t *testing.T) {
 	cfg := mustGetEnv(t)
 
-	ctx, cn := context.WithCancel(context.Background())
-	defer cn()
+	ctx := t.Context()
 
 	client, err := NewClientWithConfig(&cfg, "", "", "", "")
 	require.NoError(t, err)
@@ -349,8 +345,7 @@ func TestCreateEnrollmentAPIKey(t *testing.T) {
 func TestListAgents(t *testing.T) {
 	cfg := mustGetEnv(t)
 
-	ctx, cn := context.WithCancel(context.Background())
-	defer cn()
+	ctx := t.Context()
 
 	client, err := NewClientWithConfig(&cfg, "", "", "", "")
 	require.NoError(t, err)
@@ -363,8 +358,7 @@ func TestListAgents(t *testing.T) {
 func TestGetAgent(t *testing.T) {
 	cfg := mustGetEnv(t)
 
-	ctx, cn := context.WithCancel(context.Background())
-	defer cn()
+	ctx := t.Context()
 
 	client, err := NewClientWithConfig(&cfg, "", "", "", "")
 	require.NoError(t, err)
@@ -390,8 +384,7 @@ func TestGetAgent(t *testing.T) {
 func TestUnenrollAgent(t *testing.T) {
 	cfg := mustGetEnv(t)
 
-	ctx, cn := context.WithCancel(context.Background())
-	defer cn()
+	ctx := t.Context()
 
 	client, err := NewClientWithConfig(&cfg, "", "", "", "")
 	require.NoError(t, err)
@@ -407,8 +400,7 @@ func TestUnenrollAgent(t *testing.T) {
 func TestListFleetServerHosts(t *testing.T) {
 	cfg := mustGetEnv(t)
 
-	ctx, cn := context.WithCancel(context.Background())
-	defer cn()
+	ctx := t.Context()
 
 	client, err := NewClientWithConfig(&cfg, "", "", "", "")
 	require.NoError(t, err)
@@ -420,8 +412,7 @@ func TestListFleetServerHosts(t *testing.T) {
 
 func TestCreateFleetServerHosts(t *testing.T) {
 	cfg := mustGetEnv(t)
-	ctx, cn := context.WithCancel(context.Background())
-	defer cn()
+	ctx := t.Context()
 
 	client, err := NewClientWithConfig(&cfg, "", "", "", "")
 	require.NoError(t, err)
@@ -442,8 +433,7 @@ func TestCreateFleetServerHosts(t *testing.T) {
 
 func TestCreateFleetProxy(t *testing.T) {
 	cfg := mustGetEnv(t)
-	ctx, cn := context.WithCancel(context.Background())
-	defer cn()
+	ctx := t.Context()
 
 	client, err := NewClientWithConfig(&cfg, "", "", "", "")
 	require.NoError(t, err)
@@ -496,8 +486,7 @@ func TestCreateFleetProxy(t *testing.T) {
 func TestGetFleetServerHost(t *testing.T) {
 	cfg := mustGetEnv(t)
 
-	ctx, cn := context.WithCancel(context.Background())
-	defer cn()
+	ctx := t.Context()
 
 	client, err := NewClientWithConfig(&cfg, "", "", "", "")
 	require.NoError(t, err)

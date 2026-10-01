@@ -319,7 +319,7 @@ func BenchmarkTLSConfigMemoryFootprint(b *testing.B) {
 			var before runtime.MemStats
 			runtime.ReadMemStats(&before)
 
-			for j := 0; j < n; j++ {
+			for range n {
 				tlsCfg, err := LoadTLSConfig(cfg, logger)
 				if err != nil {
 					b.Fatal(err)
@@ -374,7 +374,7 @@ func BenchmarkCertReloader_HeapAfterManyReloadCycles(b *testing.B) {
 			b.Fatal(err)
 		}
 
-		for c := 0; c < warmupCycles; c++ {
+		for range warmupCycles {
 			if _, err := r.GetCertificate(nil); err != nil {
 				b.Fatal(err)
 			}
@@ -383,7 +383,7 @@ func BenchmarkCertReloader_HeapAfterManyReloadCycles(b *testing.B) {
 		var early runtime.MemStats
 		runtime.ReadMemStats(&early)
 
-		for c := 0; c < measuredCycles; c++ {
+		for range measuredCycles {
 			if _, err := r.GetCertificate(nil); err != nil {
 				b.Fatal(err)
 			}
@@ -412,14 +412,14 @@ func BenchmarkCAReloader_HeapAfterManyReloadCycles(b *testing.B) {
 			b.Fatal(err)
 		}
 
-		for c := 0; c < warmupCycles; c++ {
+		for range warmupCycles {
 			_ = r.GetCertPool()
 		}
 		runtime.GC()
 		var early runtime.MemStats
 		runtime.ReadMemStats(&early)
 
-		for c := 0; c < measuredCycles; c++ {
+		for range measuredCycles {
 			_ = r.GetCertPool()
 		}
 		runtime.GC()
@@ -446,7 +446,7 @@ func setupBenchEndpoints(b *testing.B, n int) []benchEndpoint {
 	b.Helper()
 	root := b.TempDir()
 	eps := make([]benchEndpoint, n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		dir := filepath.Join(root, fmt.Sprintf("ep%d", i))
 		if err := os.MkdirAll(dir, 0o700); err != nil {
 			b.Fatalf("creating endpoint dir: %v", err)

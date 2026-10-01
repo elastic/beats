@@ -42,7 +42,7 @@ import (
 // the service shuts down gracefully.
 func HandleSignals(stopFunction func(), cancel context.CancelFunc) {
 	var callback sync.Once
-	logger := logp.NewLogger("service")
+	logger := logp.NewLogger("service") //nolint:forbidigo // public API without a logger parameter; threading one through is out of scope
 
 	// On termination signals, gracefully stop the Beat
 	sigc := make(chan os.Signal, 1)
@@ -88,7 +88,7 @@ func withCPUProfile() bool { return *cpuprofile != "" }
 // BeforeRun takes care of necessary actions such as creating files
 // before the beat should run.
 func BeforeRun() {
-	logger := logp.NewLogger("service")
+	logger := logp.NewLogger("service") //nolint:forbidigo // public API without a logger parameter; threading one through is out of scope
 	if withCPUProfile() {
 		cpuOut, err := os.Create(*cpuprofile)
 		if err != nil {
@@ -160,7 +160,7 @@ func metricsHandler(w http.ResponseWriter, r *http.Request) {
 // Cleanup handles cleaning up the runtime and OS environments. This includes
 // tasks such as stopping the CPU profile if it is running.
 func Cleanup() {
-	logger := logp.NewLogger("service")
+	logger := logp.NewLogger("service") //nolint:forbidigo // public API without a logger parameter; threading one through is out of scope
 	if withCPUProfile() {
 		pprof.StopCPUProfile()
 		cpuOut.Close()
@@ -186,7 +186,7 @@ func debugMemStats(logger *logp.Logger) {
 }
 
 func writeHeapProfile(filename string) {
-	logger := logp.NewLogger("service")
+	logger := logp.NewLogger("service") //nolint:forbidigo // public API without a logger parameter; threading one through is out of scope
 	f, err := os.Create(filename)
 	if err != nil {
 		logger.Errorf("Failed creating file %s: %s", filename, err)

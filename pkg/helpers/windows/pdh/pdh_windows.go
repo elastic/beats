@@ -20,6 +20,7 @@
 package pdh
 
 import (
+	"errors"
 	"sort"
 	"strconv"
 	"strings"
@@ -149,16 +150,27 @@ func PdhOpenQuery(dataSource string, userData uintptr) (PdhQueryHandle, error) {
 
 	var handle PdhQueryHandle
 	if err := _PdhOpenQuery(dataSourcePtr, userData, &handle); err != nil {
-		return InvalidQueryHandle, PdhErrno(err.(syscall.Errno))
+		return InvalidQueryHandle, pdhErrno(err)
 	}
 	return handle, nil
+}
+
+// pdhErrno converts an error returned by the generated syscall wrappers into
+// a PdhErrno. The wrappers only ever return syscall.Errno values, so any other
+// error is passed through unchanged.
+func pdhErrno(err error) error {
+	var errno syscall.Errno
+	if errors.As(err, &errno) {
+		return PdhErrno(errno)
+	}
+	return err
 }
 
 // PdhAddEnglishCounter adds the specified counter to the query.
 func PdhAddEnglishCounter(query PdhQueryHandle, counterPath string, userData uintptr) (PdhCounterHandle, error) {
 	var handle PdhCounterHandle
 	if err := _PdhAddEnglishCounter(query, counterPath, userData, &handle); err != nil {
-		return InvalidCounterHandle, PdhErrno(err.(syscall.Errno))
+		return InvalidCounterHandle, pdhErrno(err)
 	}
 
 	return handle, nil
@@ -168,7 +180,7 @@ func PdhAddEnglishCounter(query PdhQueryHandle, counterPath string, userData uin
 func PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr) (PdhCounterHandle, error) {
 	var handle PdhCounterHandle
 	if err := _PdhAddCounter(query, counterPath, userData, &handle); err != nil {
-		return InvalidCounterHandle, PdhErrno(err.(syscall.Errno))
+		return InvalidCounterHandle, pdhErrno(err)
 	}
 
 	return handle, nil
@@ -177,7 +189,7 @@ func PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr) (
 // PdhRemoveCounter removes the specified counter to the query.
 func PdhRemoveCounter(counter PdhCounterHandle) error {
 	if err := _PdhRemoveCounter(counter); err != nil {
-		return PdhErrno(err.(syscall.Errno))
+		return pdhErrno(err)
 	}
 
 	return nil
@@ -186,7 +198,7 @@ func PdhRemoveCounter(counter PdhCounterHandle) error {
 // PdhCollectQueryData collects the current raw data value for all counters in the specified query.
 func PdhCollectQueryData(query PdhQueryHandle) error {
 	if err := _PdhCollectQueryData(query); err != nil {
-		return PdhErrno(err.(syscall.Errno))
+		return pdhErrno(err)
 	}
 
 	return nil
@@ -195,7 +207,7 @@ func PdhCollectQueryData(query PdhQueryHandle) error {
 // PdhCollectQueryDataEx collects the current raw data value for all counters in the specified query.
 func PdhCollectQueryDataEx(query PdhQueryHandle, interval uint32, event windows.Handle) error {
 	if err := _PdhCollectQueryDataEx(query, interval, event); err != nil {
-		return PdhErrno(err.(syscall.Errno))
+		return pdhErrno(err)
 	}
 	return nil
 }
@@ -205,7 +217,7 @@ func PdhGetFormattedCounterValueDouble(counter PdhCounterHandle) (uint32, *PdhCo
 	var counterType uint32
 	var value PdhCounterValueDouble
 	if err := _PdhGetFormattedCounterValueDouble(counter, PdhFmtDouble|PdhFmtNoCap100, &counterType, &value); err != nil {
-		return 0, &value, PdhErrno(err.(syscall.Errno))
+		return 0, &value, pdhErrno(err)
 	}
 
 	return counterType, &value, nil
@@ -216,7 +228,7 @@ func PdhGetFormattedCounterValueLarge(counter PdhCounterHandle) (uint32, *PdhCou
 	var counterType uint32
 	var value PdhCounterValueLarge
 	if err := _PdhGetFormattedCounterValueLarge(counter, PdhFmtLarge|PdhFmtNoCap100, &counterType, &value); err != nil {
-		return 0, &value, PdhErrno(err.(syscall.Errno))
+		return 0, &value, pdhErrno(err)
 	}
 
 	return counterType, &value, nil
@@ -227,7 +239,7 @@ func PdhGetFormattedCounterValueLong(counter PdhCounterHandle) (uint32, *PdhCoun
 	var counterType uint32
 	var value PdhCounterValueLong
 	if err := _PdhGetFormattedCounterValueLong(counter, PdhFmtLong|PdhFmtNoCap100, &counterType, &value); err != nil {
-		return 0, &value, PdhErrno(err.(syscall.Errno))
+		return 0, &value, pdhErrno(err)
 	}
 
 	return counterType, &value, nil
@@ -237,7 +249,7 @@ func PdhGetFormattedCounterValueLong(counter PdhCounterHandle) (uint32, *PdhCoun
 func PdhGetRawCounterValue(counter PdhCounterHandle) (PdhRawCounter, error) {
 	var value PdhRawCounter
 	if err := _PdhGetRawCounter(counter, uintptr(unsafe.Pointer(&value))); err != nil {
-		return value, PdhErrno(err.(syscall.Errno))
+		return value, pdhErrno(err)
 	}
 
 	return value, nil
@@ -246,12 +258,12 @@ func PdhGetRawCounterValue(counter PdhCounterHandle) (PdhRawCounter, error) {
 func PdhGetRawCounterArray(counter PdhCounterHandle, filterTotal bool) (RawCounterArray, error) {
 	var bufferSize, itemCount uint32
 	if err := _PdhGetRawCounterArray(counter, &bufferSize, &itemCount, nil); err != nil {
-		if PdhErrno(err.(syscall.Errno)) != PDH_MORE_DATA {
-			return nil, PdhErrno(err.(syscall.Errno))
+		if !errors.Is(pdhErrno(err), PDH_MORE_DATA) {
+			return nil, pdhErrno(err)
 		}
 		buf := make([]byte, bufferSize)
 		if err := _PdhGetRawCounterArray(counter, &bufferSize, &itemCount, &buf[0]); err != nil {
-			return nil, PdhErrno(err.(syscall.Errno))
+			return nil, pdhErrno(err)
 		}
 		items := unsafe.Slice((*pdhRawCounterItem)(unsafe.Pointer(&buf[0])), itemCount)
 		ret := make([]PdhRawCounterItem, 0, len(items))
@@ -277,12 +289,12 @@ func PdhGetRawCounterArray(counter PdhCounterHandle, filterTotal bool) (RawCount
 func PdhExpandWildCardPath(utfPath *uint16) ([]uint16, error) {
 	var bufferSize uint32
 	if err := _PdhExpandWildCardPath(nil, utfPath, nil, &bufferSize); err != nil {
-		if PdhErrno(err.(syscall.Errno)) != PDH_MORE_DATA {
-			return nil, PdhErrno(err.(syscall.Errno))
+		if !errors.Is(pdhErrno(err), PDH_MORE_DATA) {
+			return nil, pdhErrno(err)
 		}
 		expandPaths := make([]uint16, bufferSize)
 		if err = _PdhExpandWildCardPath(nil, utfPath, &expandPaths[0], &bufferSize); err != nil {
-			return nil, PdhErrno(err.(syscall.Errno))
+			return nil, pdhErrno(err)
 		}
 		return expandPaths, err
 	}
@@ -293,12 +305,12 @@ func PdhExpandWildCardPath(utfPath *uint16) ([]uint16, error) {
 func PdhExpandCounterPath(utfPath *uint16) ([]uint16, error) {
 	var bufferSize uint32
 	if err := _PdhExpandCounterPath(utfPath, nil, &bufferSize); err != nil {
-		if PdhErrno(err.(syscall.Errno)) != PDH_MORE_DATA {
-			return nil, PdhErrno(err.(syscall.Errno))
+		if !errors.Is(pdhErrno(err), PDH_MORE_DATA) {
+			return nil, pdhErrno(err)
 		}
 		expandPaths := make([]uint16, bufferSize)
 		if err := _PdhExpandCounterPath(utfPath, &expandPaths[0], &bufferSize); err != nil {
-			return nil, PdhErrno(err.(syscall.Errno))
+			return nil, pdhErrno(err)
 		}
 		return expandPaths, nil
 	}
@@ -310,11 +322,10 @@ func PdhGetCounterInfo(handle PdhCounterHandle) (*PdhCounterInfo, error) {
 	var bufSize uint32
 	var buff []byte
 	if err := _PdhGetCounterInfo(handle, 0, &bufSize, nil); err != nil {
-		if PdhErrno(err.(syscall.Errno)) != PDH_MORE_DATA {
-			return nil, PdhErrno(err.(syscall.Errno))
+		if !errors.Is(pdhErrno(err), PDH_MORE_DATA) {
+			return nil, pdhErrno(err)
 		}
 		buff = make([]byte, bufSize)
-		bufSize = uint32(len(buff))
 
 		if err = _PdhGetCounterInfo(handle, 0, &bufSize, &buff[0]); err == nil {
 			counterInfo := (*PdhCounterInfo)(unsafe.Pointer(&buff[0]))
@@ -329,7 +340,7 @@ func PdhGetCounterInfo(handle PdhCounterHandle) (*PdhCounterInfo, error) {
 // PdhCloseQuery closes all counters contained in the specified query.
 func PdhCloseQuery(query PdhQueryHandle) error {
 	if err := _PdhCloseQuery(query); err != nil {
-		return PdhErrno(err.(syscall.Errno))
+		return pdhErrno(err)
 	}
 
 	return nil
@@ -354,8 +365,8 @@ func PdhEnumObjectItems(objectName string) ([]uint16, []uint16, error) {
 		&iBuffSize,
 		PerformanceDetailWizard,
 		0); err != nil {
-		if PdhErrno(err.(syscall.Errno)) != PDH_MORE_DATA {
-			return nil, nil, PdhErrno(err.(syscall.Errno))
+		if !errors.Is(pdhErrno(err), PDH_MORE_DATA) {
+			return nil, nil, pdhErrno(err)
 		}
 		cBuff = make([]uint16, cBuffSize)
 		iBuff = make([]uint16, iBuffSize)
@@ -389,7 +400,7 @@ func (e PdhErrno) Error() string {
 	// Example: https://msdn.microsoft.com/en-us/library/windows/desktop/aa373046(v=vs.85).aspx
 	var flags uint32 = windows.FORMAT_MESSAGE_FROM_HMODULE | windows.FORMAT_MESSAGE_ARGUMENT_ARRAY | windows.FORMAT_MESSAGE_IGNORE_INSERTS
 	b := make([]uint16, 300)
-	n, err := windows.FormatMessage(flags, modpdh.Handle(), uint32(e), 0, b, nil)
+	n, err := windows.FormatMessage(flags, modpdh.Handle(), uint32(e), 0, b, nil) //nolint:gosec // PDH error codes are 32-bit HRESULT values
 	if err != nil {
 		return "pdh error #" + strconv.Itoa(int(e))
 	}

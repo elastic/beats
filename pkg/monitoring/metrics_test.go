@@ -48,12 +48,10 @@ func TestSafeVars(t *testing.T) {
 
 			wg := sync.WaitGroup{}
 			assert.NotPanics(t, func() {
-				for i := 0; i < 1000; i++ {
-					wg.Add(1)
-					go func() {
-						defer wg.Done()
+				for range 1000 {
+					wg.Go(func() {
 						NewInt(reg, name)
-					}()
+					})
 				}
 			})
 			wg.Wait()
@@ -65,12 +63,10 @@ func TestSafeVars(t *testing.T) {
 
 			wg := sync.WaitGroup{}
 			assert.NotPanics(t, func() {
-				for i := 0; i < 1000; i++ {
-					wg.Add(1)
-					go func() {
-						defer wg.Done()
+				for range 1000 {
+					wg.Go(func() {
 						NewUint(reg, name)
-					}()
+					})
 				}
 			})
 			wg.Wait()
@@ -82,12 +78,10 @@ func TestSafeVars(t *testing.T) {
 
 			wg := sync.WaitGroup{}
 			assert.NotPanics(t, func() {
-				for i := 0; i < 1000; i++ {
-					wg.Add(1)
-					go func() {
-						defer wg.Done()
+				for range 1000 {
+					wg.Go(func() {
 						NewFloat(reg, name)
-					}()
+					})
 				}
 			})
 			wg.Wait()
@@ -99,12 +93,10 @@ func TestSafeVars(t *testing.T) {
 
 			wg := sync.WaitGroup{}
 			assert.NotPanics(t, func() {
-				for i := 0; i < 1000; i++ {
-					wg.Add(1)
-					go func() {
-						defer wg.Done()
+				for range 1000 {
+					wg.Go(func() {
 						NewBool(reg, name)
-					}()
+					})
 				}
 			})
 			wg.Wait()
@@ -116,12 +108,10 @@ func TestSafeVars(t *testing.T) {
 
 			wg := sync.WaitGroup{}
 			assert.NotPanics(t, func() {
-				for i := 0; i < 1000; i++ {
-					wg.Add(1)
-					go func() {
-						defer wg.Done()
+				for range 1000 {
+					wg.Go(func() {
 						NewString(reg, name)
-					}()
+					})
 				}
 			})
 			wg.Wait()
@@ -134,12 +124,10 @@ func TestSafeVars(t *testing.T) {
 
 			wg := sync.WaitGroup{}
 			assert.NotPanics(t, func() {
-				for i := 0; i < 1000; i++ {
-					wg.Add(1)
-					go func() {
-						defer wg.Done()
+				for range 1000 {
+					wg.Go(func() {
 						NewFunc(reg, name, dummyFunc)
-					}()
+					})
 				}
 			})
 			wg.Wait()
@@ -151,12 +139,10 @@ func TestSafeVars(t *testing.T) {
 
 			wg := sync.WaitGroup{}
 			assert.NotPanics(t, func() {
-				for i := 0; i < 1000; i++ {
-					wg.Add(1)
-					go func() {
-						defer wg.Done()
+				for range 1000 {
+					wg.Go(func() {
 						NewTimestamp(reg, name)
-					}()
+					})
 				}
 			})
 			wg.Wait()

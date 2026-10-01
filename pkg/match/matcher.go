@@ -17,7 +17,10 @@
 
 package match
 
-import "regexp/syntax"
+import (
+	"regexp/syntax"
+	"slices"
+)
 
 type Matcher struct {
 	stringMatcher
@@ -158,10 +161,8 @@ func matchAnyStrings(m stringMatcher, strs any) bool {
 			}
 		}
 	case []string:
-		for _, s := range v {
-			if m.MatchString(s) {
-				return true
-			}
+		if slices.ContainsFunc(v, m.MatchString) {
+			return true
 		}
 	}
 	return false

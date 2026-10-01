@@ -114,7 +114,7 @@ func NewFileLogger(t testing.TB, dir string) *Logger {
 		}
 	})
 
-	logger := logp.NewLogger(
+	logger := logp.NewLogger( //nolint:forbidigo // this is the helper that constructs loggers for tests
 		"",
 		zap.WrapCore(func(in zapcore.Core) zapcore.Core {
 			return core
