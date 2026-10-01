@@ -101,7 +101,7 @@ func create(
 		config.Transport.TLS = nil
 
 		makeJob = func(urlStr string) (jobs.Job, error) {
-			return newHTTPMonitorIPsJob(&config, urlStr, tls, enc, body, validator, userAgent)
+			return newHTTPMonitorIPsJob(&config, urlStr, tls, enc, body, validator, userAgent, info.Logger)
 		}
 	}
 

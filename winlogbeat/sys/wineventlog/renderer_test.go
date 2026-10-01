@@ -276,7 +276,7 @@ func BenchmarkRenderer(b *testing.B) {
 	setup := func() (*EventIterator, *Renderer) {
 		log := openLog(b, winlogbeatTestLogName)
 
-		itr, err := NewEventIterator(WithSubscription(log), WithBatchSize(1024))
+		itr, err := NewEventIterator(logp.NewNopLogger(), WithSubscription(log), WithBatchSize(1024))
 		if err != nil {
 			log.Close()
 			b.Fatal(err)

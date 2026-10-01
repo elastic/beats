@@ -40,14 +40,14 @@ type recursiveWatcher struct {
 	isExcludedPath func(path string) bool
 }
 
-func newRecursiveWatcher(inner *fsnotify.Watcher, isExcludedPath func(path string) bool) *recursiveWatcher {
+func newRecursiveWatcher(inner *fsnotify.Watcher, isExcludedPath func(path string) bool, logger *logp.Logger) *recursiveWatcher {
 	return &recursiveWatcher{
 		inner:          inner,
 		tree:           FileTree{},
 		eventC:         make(chan fsnotify.Event, 1),
 		addC:           make(chan string),
 		addErrC:        make(chan error),
-		log:            logp.NewLogger(moduleName),
+		log:            logger.Named(moduleName),
 		isExcludedPath: isExcludedPath,
 	}
 }

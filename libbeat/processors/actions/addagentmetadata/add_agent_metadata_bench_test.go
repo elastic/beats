@@ -50,32 +50,40 @@ func makePopulatedEvent() *beat.Event {
 	}
 }
 
+type eventRunner interface {
+	Run(*beat.Event) (*beat.Event, error)
+}
+
+const benchBatchSize = 512
+
+func benchColdEvents(b *testing.B, p eventRunner, makeEvent func() *beat.Event) {
+	batch := make([]*beat.Event, benchBatchSize)
+	b.ReportAllocs()
+	b.ResetTimer()
+	for remaining := b.N; remaining > 0; remaining -= len(batch) {
+		b.StopTimer()
+		n := min(remaining, benchBatchSize)
+		batch = batch[:n]
+		for i := range batch {
+			batch[i] = makeEvent()
+		}
+		b.StartTimer()
+		for _, event := range batch {
+			if _, err := p.Run(event); err != nil {
+				b.Fatal(err)
+			}
+		}
+	}
+}
+
 // BenchmarkAddAgentMetadata measures the throughput of the single combined
-// add_agent_metadata processor across several realistic event shapes.
+// add_agent_metadata processor across several realistic event shapes. Every
+// iteration runs against a freshly created event.
 func BenchmarkAddAgentMetadata(b *testing.B) {
 	p := New(testCfg)
 
-	b.Run("empty_event", func(b *testing.B) {
-		event := makeEmptyEvent()
-		b.ReportAllocs()
-		b.ResetTimer()
-		for i := 0; i < b.N; i++ {
-			if _, err := p.Run(event); err != nil {
-				b.Fatal(err)
-			}
-		}
-	})
-
-	b.Run("populated_event", func(b *testing.B) {
-		event := makePopulatedEvent()
-		b.ReportAllocs()
-		b.ResetTimer()
-		for i := 0; i < b.N; i++ {
-			if _, err := p.Run(event); err != nil {
-				b.Fatal(err)
-			}
-		}
-	})
+	b.Run("empty_event", func(b *testing.B) { benchColdEvents(b, p, makeEmptyEvent) })
+	b.Run("populated_event", func(b *testing.B) { benchColdEvents(b, p, makePopulatedEvent) })
 }
 
 // BenchmarkAddFieldsChain measures the throughput of the equivalent chain of
@@ -84,25 +92,6 @@ func BenchmarkAddAgentMetadata(b *testing.B) {
 func BenchmarkAddFieldsChain(b *testing.B) {
 	chain := equivalentAddFieldsProcessors(testCfg)
 
-	b.Run("empty_event", func(b *testing.B) {
-		event := makeEmptyEvent()
-		b.ReportAllocs()
-		b.ResetTimer()
-		for i := 0; i < b.N; i++ {
-			if _, err := chain.Run(event); err != nil {
-				b.Fatal(err)
-			}
-		}
-	})
-
-	b.Run("populated_event", func(b *testing.B) {
-		event := makePopulatedEvent()
-		b.ReportAllocs()
-		b.ResetTimer()
-		for i := 0; i < b.N; i++ {
-			if _, err := chain.Run(event); err != nil {
-				b.Fatal(err)
-			}
-		}
-	})
+	b.Run("empty_event", func(b *testing.B) { benchColdEvents(b, chain, makeEmptyEvent) })
+	b.Run("populated_event", func(b *testing.B) { benchColdEvents(b, chain, makePopulatedEvent) })
 }

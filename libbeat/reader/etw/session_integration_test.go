@@ -35,6 +35,9 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 var (
@@ -152,7 +155,7 @@ func BenchmarkETWCallbackRate(b *testing.B) {
 func setupBenchmarkSession(b *testing.B, callbackFactory func(session *Session) func(record *EventRecord) uintptr) (*Session, *ETWEventGenerator, chan struct{}) {
 	sessionConfig := createTestSessionConfig(uniqueSessionName("BenchmarkETW"))
 
-	session, err := NewSession(sessionConfig)
+	session, err := NewSession(sessionConfig, logp.NewNopLogger())
 	if err != nil {
 		b.Fatalf("Failed to create ETW session: %v", err)
 	}
@@ -284,7 +287,7 @@ func TestETLGoldenFile(t *testing.T) {
 
 	// Create and configure session for ETL file reading
 	sessionConfig := createETLSessionConfig(uniqueSessionName("GoldenTestETW"))
-	session, err := NewSession(sessionConfig)
+	session, err := NewSession(sessionConfig, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("Failed to create ETW session: %v", err)
 	}

@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/reader/etw"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/pkg/monitoring"
@@ -45,7 +46,7 @@ func (m *mockSessionOperator) resetSession(*etw.Session) {
 	m.resets.Add(1)
 }
 
-func (m *mockSessionOperator) newSession(config config) (*etw.Session, error) {
+func (m *mockSessionOperator) newSession(config config, _ *logp.Logger) (*etw.Session, error) {
 	if m.newSessionFunc != nil {
 		return m.newSessionFunc(config)
 	}

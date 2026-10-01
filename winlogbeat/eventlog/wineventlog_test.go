@@ -35,6 +35,7 @@ import (
 	"golang.org/x/sys/windows/svc/eventlog"
 
 	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
@@ -380,7 +381,7 @@ func openLog(t testing.TB, state *checkpoint.EventLogState, config map[string]an
 		t.Fatal(err)
 	}
 
-	log, err := newWinEventLog(cfg)
+	log, err := newWinEventLog(cfg, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}

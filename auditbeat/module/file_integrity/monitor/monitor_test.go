@@ -29,6 +29,8 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 func alwaysInclude(path string) bool {
@@ -38,7 +40,7 @@ func alwaysInclude(path string) bool {
 func TestNonRecursive(t *testing.T) {
 	dir := t.TempDir()
 
-	watcher, err := New(false, alwaysInclude)
+	watcher, err := New(false, alwaysInclude, logptest.NewTestingLogger(t, ""))
 	assertNoError(t, err)
 	assertNoError(t, watcher.Add(dir))
 	assertNoError(t, watcher.Start())
@@ -75,7 +77,7 @@ func TestRecursive(t *testing.T) {
 	}
 	dir := t.TempDir()
 
-	watcher, err := New(true, alwaysInclude)
+	watcher, err := New(true, alwaysInclude, logptest.NewTestingLogger(t, ""))
 	assertNoError(t, err)
 
 	assertNoError(t, watcher.Add(dir))
@@ -119,7 +121,7 @@ func TestRecursiveNoFollowSymlink(t *testing.T) {
 
 	// Start the watcher
 
-	watcher, err := New(true, alwaysInclude)
+	watcher, err := New(true, alwaysInclude, logptest.NewTestingLogger(t, ""))
 	assertNoError(t, err)
 
 	assertNoError(t, watcher.Add(dir))
@@ -178,7 +180,7 @@ func TestRecursiveSubdirPermissions(t *testing.T) {
 
 	// Setup watches on watched dir
 
-	watcher, err := New(true, alwaysInclude)
+	watcher, err := New(true, alwaysInclude, logptest.NewTestingLogger(t, ""))
 	assertNoError(t, err)
 
 	assertNoError(t, watcher.Start())
@@ -263,7 +265,7 @@ func TestRecursiveExcludedPaths(t *testing.T) {
 
 	// Setup watches on watched dir
 
-	watcher, err := New(true, selectiveExclude)
+	watcher, err := New(true, selectiveExclude, logptest.NewTestingLogger(t, ""))
 	assertNoError(t, err)
 
 	assertNoError(t, watcher.Start())
