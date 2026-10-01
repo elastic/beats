@@ -55,7 +55,7 @@ sources:
           pattern: 'NPCAP_VERSION := (\d+\.\d+)'
           captureindex: 1
     spec:
-      command: gh api repos/elastic/golang-crossbuild/contents/Makefile.common --jq '.content' | base64 -d
+      command: gh api repos/elastic/golang-crossbuild/contents/Makefile.common --jq '.content | @base64d'
       environments:
         - name: GITHUB_TOKEN
 
