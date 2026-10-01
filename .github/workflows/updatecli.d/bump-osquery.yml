@@ -21,7 +21,6 @@ actions:
     kind: github/pullrequest
     scmid: githubConfig
     spec:
-      automerge: false
       labels:
         - automation
         - dependencies

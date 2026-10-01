@@ -18,19 +18,21 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v7
         with:
           go-version-file: .go-version
           cache: false
 
-      - uses: elastic/oblt-actions/updatecli/run-and-notify@v1
+      - uses: elastic/oblt-actions/updatecli/run@v1
         with:
-          command: --experimental apply --config .github/workflows/updatecli.d/bump-osquery.yml --values .github/workflows/updatecli.d/values.d/scm.yml
-          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
-          slack-channel-id: "#ingest-notifications"
-          slack-message: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, please look what's going on <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>"
-          slack-send-when: "failure"
+          command: pipeline apply --config .github/workflows/updatecli.d/bump-osquery.yml --values .github/workflows/updatecli.d/values.d/scm.yml
           version-file: .updatecli-version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTOR: ${{ github.actor }}
+
+      - if: ${{ failure() }}
+        uses: elastic/oblt-actions/slack/send@v1
+        with:
+          bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel-id: "#ingest-notifications"
+          message: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, please look what's going on <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>"
