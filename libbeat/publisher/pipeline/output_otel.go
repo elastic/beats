@@ -61,8 +61,7 @@ type otelOutputController struct {
 
 	consumer *eventConsumer
 
-	workers    []outputWorker
-	workerChan chan publisher.Batch
+	dispatcher *spawningDispatcher
 
 	// producers tracks every queue producer vended through queueProducer
 	// that has not yet been closed. Each pipeline's clients normally close
@@ -153,6 +152,14 @@ func newOTelOutputController(
 		grp, err := otelconsumer.MakeOtelConsumer(beatInfo, outStats)
 		return "otelconsumer", grp, err
 	})
+	if err == nil && len(out.Clients) != 1 {
+		// MakeOtelConsumer always returns exactly one client, and the
+		// dispatcher feeds only one.
+		for _, client := range out.Clients {
+			_ = client.Close()
+		}
+		err = fmt.Errorf("otel output must have exactly one client, got %d", len(out.Clients))
+	}
 	if err != nil {
 		closePipelineQueue(pipelineQueue)
 		if pool != nil {
@@ -161,16 +168,11 @@ func newOTelOutputController(
 		return nil, err
 	}
 
-	workerChan := make(chan publisher.Batch)
-	workers := make([]outputWorker, len(out.Clients))
-	for i, client := range out.Clients {
-		workers[i] = makeSpawningWorker(workerChan, client)
-	}
-
+	dispatcher := newSpawningDispatcher(out.Clients[0])
 	consumer := newEventConsumer(monitors.Logger, retryObserver)
 	consumer.setTarget(consumerTarget{
 		queue:      pipelineQueue,
-		ch:         workerChan,
+		dispatch:   dispatcher.dispatch,
 		batchSize:  out.BatchSize,
 		timeToLive: out.Retry + 1,
 	})
@@ -182,8 +184,7 @@ func newOTelOutputController(
 		queue:      pipelineQueue,
 		pool:       pool,
 		consumer:   consumer,
-		workers:    workers,
-		workerChan: workerChan,
+		dispatcher: dispatcher,
 		producers:  make(map[*trackedProducer]struct{}),
 	}, nil
 }
@@ -287,11 +288,7 @@ func (c *otelOutputController) waitClose(ctx context.Context, _ bool) error {
 	}
 
 	c.consumer.close()
-	close(c.workerChan)
-
-	for _, out := range c.workers {
-		out.Close()
-	}
+	c.dispatcher.Close()
 
 	// Release this pipeline's claim on the shared pool. Ref-counting means only
 	// the LAST connected pipeline actually shuts the pool down (Pool.Shutdown
@@ -393,63 +390,44 @@ func (c *otelOutputController) trackedProducerCountForTest() int {
 	return len(c.producers)
 }
 
-// spawningWorker launches a new single-use goroutine for every batch it receives,
-// so the number of concurrent ConsumeLogs calls is not capped at a fixed worker
-// count. This lets a single receiver keep as many events in flight in the
-// downstream exporter as it will accept. The exporter self-limits via its
-// queue's block-on-overflow, and the beat's own shared pool bounds the total
-// in-flight events (a batch's slots are not released until its Publish ACKs).
-type spawningWorker struct {
-	qu     chan publisher.Batch
+// spawningDispatcher launches a new single-use goroutine for every batch the
+// consumer hands it, so the number of concurrent ConsumeLogs calls is not
+// capped at a fixed worker count. This lets a single receiver keep as many
+// events in flight in the downstream exporter as it will accept. The exporter
+// self-limits via its queue's block-on-overflow, and the beat's own shared pool
+// bounds the total in-flight events (a batch's slots are not released until its
+// Publish ACKs).
+//
+// The consumer calls dispatch inline, so there is no channel or resident
+// goroutine. It owns the publish context and the WaitGroup that shutdown waits
+// on.
+type spawningDispatcher struct {
 	client outputs.Client
 	ctx    context.Context
 	cancel context.CancelFunc
 	wg     sync.WaitGroup // tracks in-flight Publish goroutines
-	done   chan struct{}  // closed when run() has fully drained
 }
 
-// makeSpawningWorker starts a spawningWorker reading from qu and returns it as
-// an outputWorker.
-func makeSpawningWorker(qu chan publisher.Batch, client outputs.Client) outputWorker {
+func newSpawningDispatcher(client outputs.Client) *spawningDispatcher {
 	ctx, cancel := context.WithCancel(context.Background())
-	w := &spawningWorker{
-		qu:     qu,
-		client: client,
-		ctx:    ctx,
-		cancel: cancel,
-		done:   make(chan struct{}),
-	}
-	go w.run()
-	return w
+	return &spawningDispatcher{client: client, ctx: ctx, cancel: cancel}
 }
 
-func (w *spawningWorker) run() {
-	defer close(w.done)
-	for {
-		select {
-		case <-w.ctx.Done():
-			w.wg.Wait()
-			return
-		case batch, ok := <-w.qu:
-			if !ok {
-				// workerChan closed: no more batches.
-				w.wg.Wait()
-				return
-			}
-			if batch == nil {
-				continue
-			}
-			w.wg.Add(1)
-			go func(b publisher.Batch) {
-				defer w.wg.Done()
-				_ = w.client.Publish(w.ctx, b)
-			}(batch)
-		}
+// dispatch publishes batch on a new goroutine and never blocks. It must not be
+// called after Close; the consumer is stopped first, which guarantees that.
+func (d *spawningDispatcher) dispatch(batch publisher.Batch) {
+	if batch == nil {
+		return
 	}
+	d.wg.Add(1)
+	go func() {
+		defer d.wg.Done()
+		_ = d.client.Publish(d.ctx, batch)
+	}()
 }
 
-func (w *spawningWorker) Close() error {
-	w.cancel()
-	<-w.done
-	return w.client.Close()
+func (d *spawningDispatcher) Close() error {
+	d.cancel()
+	d.wg.Wait()
+	return d.client.Close()
 }
