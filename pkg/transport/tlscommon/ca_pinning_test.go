@@ -43,7 +43,7 @@ func TestCAPinning(t *testing.T) {
 	)
 
 	t.Run("when the ca_sha256 field is not defined we use normal certificate validation", func(t *testing.T) {
-		cfg := config.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]any{
 			"verification_mode":       "strict",
 			"certificate_authorities": []string{"testdata/ca_test.pem"},
 		})
@@ -63,7 +63,7 @@ func TestCAPinning(t *testing.T) {
 	})
 
 	t.Run("when the ca_sha256 field is defined we use CA cert pinning", func(t *testing.T) {
-		cfg := config.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]any{
 			"ca_sha256": "hello",
 		})
 

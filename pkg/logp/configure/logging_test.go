@@ -44,8 +44,8 @@ func TestBuildTypedOutputConfigsResolvesFilePaths(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := config.MustNewConfigFrom(map[string]interface{}{"files.path": tc.path})
-			typedCfg := config.MustNewConfigFrom(map[string]interface{}{"files.path": tc.path})
+			cfg := config.MustNewConfigFrom(map[string]any{"files.path": tc.path})
+			typedCfg := config.MustNewConfigFrom(map[string]any{"files.path": tc.path})
 			p := &paths.Path{Logs: logsDir}
 
 			logpCfg, typedLogpCfg, err := buildTypedOutputConfigs("testbeat", cfg, typedCfg, p)
@@ -74,7 +74,7 @@ func TestLoggerOutputEnvironment(t *testing.T) {
 	}{
 		{
 			name: "no logging config - output should be to_files",
-			cfg:  config.MustNewConfigFrom(map[string]interface{}{}),
+			cfg:  config.MustNewConfigFrom(map[string]any{}),
 			expectedCfg: &logp.Config{
 				ToFiles:  true,
 				ToStderr: false,
@@ -83,7 +83,7 @@ func TestLoggerOutputEnvironment(t *testing.T) {
 		},
 		{
 			name: "output should be to_files",
-			cfg: config.MustNewConfigFrom(map[string]interface{}{
+			cfg: config.MustNewConfigFrom(map[string]any{
 				"to_files": true,
 			}),
 			expectedCfg: &logp.Config{
@@ -94,7 +94,7 @@ func TestLoggerOutputEnvironment(t *testing.T) {
 		},
 		{
 			name: "output should be to_stderr",
-			cfg: config.MustNewConfigFrom(map[string]interface{}{
+			cfg: config.MustNewConfigFrom(map[string]any{
 				"to_stderr": true,
 			}),
 			expectedCfg: &logp.Config{
@@ -105,7 +105,7 @@ func TestLoggerOutputEnvironment(t *testing.T) {
 		},
 		{
 			name: "output should be to_stderr - systemd",
-			cfg:  config.MustNewConfigFrom(map[string]interface{}{}),
+			cfg:  config.MustNewConfigFrom(map[string]any{}),
 			expectedCfg: &logp.Config{
 				ToFiles:  false,
 				ToStderr: true,
@@ -114,7 +114,7 @@ func TestLoggerOutputEnvironment(t *testing.T) {
 		},
 		{
 			name: "output should be to_stderr - systemd",
-			cfg: config.MustNewConfigFrom(map[string]interface{}{
+			cfg: config.MustNewConfigFrom(map[string]any{
 				"to_stderr": true,
 			}),
 			expectedCfg: &logp.Config{
@@ -125,7 +125,7 @@ func TestLoggerOutputEnvironment(t *testing.T) {
 		},
 		{
 			name: "output should be to_files - systemd",
-			cfg: config.MustNewConfigFrom(map[string]interface{}{
+			cfg: config.MustNewConfigFrom(map[string]any{
 				"to_files": true,
 			}),
 			expectedCfg: &logp.Config{

@@ -39,7 +39,7 @@ func TestIterExpvarIgnoringMonitoringVars(t *testing.T) {
 		i.Add(v)
 	}
 
-	DoExpvars(func(name string, v interface{}) {
+	DoExpvars(func(name string, v any) {
 		if _, exists := vars[name]; exists {
 			var ok bool
 			collected[name], ok = v.(int64)
@@ -66,15 +66,15 @@ func TestIterExpvarCaptureVars(t *testing.T) {
 		m.Add("i2", 2)
 	}
 
-	expected := map[string]interface{}{
+	expected := map[string]any{
 		"test.integer": int64(42),
 		"test.string":  "testing",
 		"test.map.i1":  int64(1),
 		"test.map.i2":  int64(2),
 	}
 
-	collected := map[string]interface{}{}
-	DoExpvars(func(name string, v interface{}) {
+	collected := map[string]any{}
+	DoExpvars(func(name string, v any) {
 		if _, exists := expected[name]; exists {
 			collected[name] = v
 		}

@@ -20,11 +20,11 @@ package monitoring
 import "strings"
 
 type KeyValueVisitor struct {
-	cb    func(key string, value interface{})
+	cb    func(key string, value any)
 	level []string
 }
 
-func NewKeyValueVisitor(cb func(string, interface{})) *KeyValueVisitor {
+func NewKeyValueVisitor(cb func(string, any)) *KeyValueVisitor {
 	return &KeyValueVisitor{cb: cb}
 }
 

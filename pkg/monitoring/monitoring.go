@@ -57,7 +57,7 @@ func Visit(vs Visitor) {
 	Default.Visit(Full, vs)
 }
 
-func Do(mode Mode, f func(string, interface{})) {
+func Do(mode Mode, f func(string, any)) {
 	Default.Do(mode, f)
 }
 

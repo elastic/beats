@@ -71,7 +71,7 @@ type Rotator struct {
 
 // Logger allows the rotator to write debug information.
 type Logger interface {
-	Debugw(msg string, keysAndValues ...interface{}) // Debug
+	Debugw(msg string, keysAndValues ...any) // Debug
 }
 
 // RotatorOption is a configuration option for Rotator.

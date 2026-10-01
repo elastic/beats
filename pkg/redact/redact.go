@@ -140,7 +140,7 @@ func redactMap[K comparable](obj map[K]any, ro *redactOptions) {
 						newMap[k] = REDACTED
 						continue
 					}
-					newSlice := make([]interface{}, len(v))
+					newSlice := make([]any, len(v))
 					for i, s := range v {
 						newSlice[i] = s
 					}
@@ -154,8 +154,8 @@ func redactMap[K comparable](obj map[K]any, ro *redactOptions) {
 				redactMap(cast, ro)
 			case map[int]any:
 				redactMap(cast, ro)
-			case []map[string]interface{}:
-				updatedRootValue := make([]map[string]interface{}, len(cast))
+			case []map[string]any:
+				updatedRootValue := make([]map[string]any, len(cast))
 				for _, item := range cast {
 					redactMap(item, ro)
 				}

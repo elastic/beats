@@ -84,11 +84,11 @@ func newGoMetrics(reg *monitoring.Registry, logger *logp.Logger, filters ...Metr
 
 // Each only iterates the shadowed metrics, not registered to the monitoring package,
 // as those metrics are owned by monitoring.Registry only.
-func (r *GoMetricsRegistry) Each(f func(string, interface{})) {
+func (r *GoMetricsRegistry) Each(f func(string, any)) {
 	r.shadow.Each(f)
 }
 
-func (r *GoMetricsRegistry) find(name string) interface{} {
+func (r *GoMetricsRegistry) find(name string) any {
 	st := r.findState(name)
 	if st.action == actIgnore {
 		return nil
@@ -104,18 +104,18 @@ func (r *GoMetricsRegistry) find(name string) interface{} {
 //	a variable satisfying any of go-metrics interfaces is returned.
 //	It's recommended to not mix go-metrics with other metrics types in one
 //	namespace.
-func (r *GoMetricsRegistry) Get(name string) interface{} {
+func (r *GoMetricsRegistry) Get(name string) any {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 	return r.get(name)
 }
 
 // GetAll retrieves all registered metrics.
-func (r *GoMetricsRegistry) GetAll() map[string]map[string]interface{} {
+func (r *GoMetricsRegistry) GetAll() map[string]map[string]any {
 	return r.shadow.GetAll()
 }
 
-func (r *GoMetricsRegistry) get(name string) interface{} {
+func (r *GoMetricsRegistry) get(name string) any {
 	m := r.find(name)
 	if m == nil {
 		return r.shadow.Get(name)
@@ -130,7 +130,7 @@ func (r *GoMetricsRegistry) get(name string) interface{} {
 
 // GetOrRegister retries an existing metric via `Get` or registers a new one
 // if the metric is unknown. For lazy instantiation metric can be a function.
-func (r *GoMetricsRegistry) GetOrRegister(name string, metric interface{}) interface{} {
+func (r *GoMetricsRegistry) GetOrRegister(name string, metric any) any {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
@@ -144,7 +144,7 @@ func (r *GoMetricsRegistry) GetOrRegister(name string, metric interface{}) inter
 
 // Register adds a new metric.
 // An error is returned if the metric is already known.
-func (r *GoMetricsRegistry) Register(name string, metric interface{}) error {
+func (r *GoMetricsRegistry) Register(name string, metric any) error {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
@@ -156,7 +156,7 @@ func (r *GoMetricsRegistry) Register(name string, metric interface{}) error {
 	return nil
 }
 
-func (r *GoMetricsRegistry) doRegister(name string, metric interface{}) interface{} {
+func (r *GoMetricsRegistry) doRegister(name string, metric any) any {
 	if v := reflect.ValueOf(metric); v.Kind() == reflect.Func {
 		metric = v.Call(nil)[0].Interface()
 	}
@@ -205,7 +205,7 @@ func (r *GoMetricsRegistry) findState(name string) state {
 	return r.stateWith(kndFind, name, nil)
 }
 
-func (r *GoMetricsRegistry) addState(name string, metric interface{}) state {
+func (r *GoMetricsRegistry) addState(name string, metric any) state {
 	return r.stateWith(kndAdd, name, metric)
 }
 
@@ -213,7 +213,7 @@ func (r *GoMetricsRegistry) rmState(name string) state {
 	return r.stateWith(kndRemove, name, nil)
 }
 
-func (r *GoMetricsRegistry) stateWith(k kind, name string, metric interface{}) state {
+func (r *GoMetricsRegistry) stateWith(k kind, name string, metric any) state {
 	return r.filters.apply(state{
 		kind:   k,
 		action: actIgnore,

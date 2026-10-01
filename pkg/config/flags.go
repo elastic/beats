@@ -147,7 +147,7 @@ func (f *StringsFlag) Set(v string) error {
 
 // Get returns the backing slice its contents as interface{}. The type used is
 // `[]string`.
-func (f *StringsFlag) Get() interface{} {
+func (f *StringsFlag) Get() any {
 	return f.List()
 }
 
@@ -212,7 +212,7 @@ func (f *SettingsFlag) Set(s string) error {
 }
 
 // Get returns the Config object used to store values.
-func (f *SettingsFlag) Get() interface{} {
+func (f *SettingsFlag) Get() any {
 	return f.Config()
 }
 
@@ -283,7 +283,7 @@ func (f *flagOverwrite) Set(v string) error {
 	return nil
 }
 
-func (f *flagOverwrite) Get() interface{} {
+func (f *flagOverwrite) Get() any {
 	return f.value
 }
 

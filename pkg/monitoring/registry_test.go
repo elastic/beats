@@ -147,7 +147,7 @@ func TestRegistryIter(t *testing.T) {
 	}
 
 	collected := map[string]int64{}
-	Do(Full, func(name string, v interface{}) {
+	Do(Full, func(name string, v any) {
 		var ok bool
 		collected[name], ok = v.(int64)
 		require.True(t, ok)

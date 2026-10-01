@@ -162,7 +162,7 @@ func (l *Logger) WithOptions(options ...LogOption) *Logger {
 
 // With creates a child logger and adds structured context to it. Fields added
 // to the child don't affect the parent, and vice versa.
-func (l *Logger) With(args ...interface{}) *Logger {
+func (l *Logger) With(args ...any) *Logger {
 	sugar := l.sugar.With(args...)
 	return &Logger{sugar.Desugar(), sugar, l.selectors}
 }
@@ -193,38 +193,38 @@ func (l *Logger) Named(name string) *Logger {
 // Sprint
 
 // Debug uses fmt.Sprint to construct and log a message.
-func (l *Logger) Debug(args ...interface{}) {
+func (l *Logger) Debug(args ...any) {
 	l.sugar.Debug(args...)
 }
 
 // Info uses fmt.Sprint to construct and log a message.
-func (l *Logger) Info(args ...interface{}) {
+func (l *Logger) Info(args ...any) {
 	l.sugar.Info(args...)
 }
 
 // Warn uses fmt.Sprint to construct and log a message.
-func (l *Logger) Warn(args ...interface{}) {
+func (l *Logger) Warn(args ...any) {
 	l.sugar.Warn(args...)
 }
 
 // Error uses fmt.Sprint to construct and log a message.
-func (l *Logger) Error(args ...interface{}) {
+func (l *Logger) Error(args ...any) {
 	l.sugar.Error(args...)
 }
 
 // Fatal uses fmt.Sprint to construct and log a message, then calls os.Exit(1).
-func (l *Logger) Fatal(args ...interface{}) {
+func (l *Logger) Fatal(args ...any) {
 	l.sugar.Fatal(args...)
 }
 
 // Panic uses fmt.Sprint to construct and log a message, then panics.
-func (l *Logger) Panic(args ...interface{}) {
+func (l *Logger) Panic(args ...any) {
 	l.sugar.Panic(args...)
 }
 
 // DPanic uses fmt.Sprint to construct and log a message. In development, the
 // logger then panics.
-func (l *Logger) DPanic(args ...interface{}) {
+func (l *Logger) DPanic(args ...any) {
 	l.sugar.DPanic(args...)
 }
 
@@ -236,7 +236,7 @@ func (l *Logger) IsDebug() bool {
 // Sprintf
 
 // Debugf uses fmt.Sprintf to construct and log a message.
-func (l *Logger) Debugf(format string, args ...interface{}) {
+func (l *Logger) Debugf(format string, args ...any) {
 	if false {
 		_ = fmt.Sprintf(format, args...) // enable printf checking
 	}
@@ -244,7 +244,7 @@ func (l *Logger) Debugf(format string, args ...interface{}) {
 }
 
 // Infof uses fmt.Sprintf to log a templated message.
-func (l *Logger) Infof(format string, args ...interface{}) {
+func (l *Logger) Infof(format string, args ...any) {
 	if false {
 		_ = fmt.Sprintf(format, args...) // enable printf checking
 	}
@@ -252,7 +252,7 @@ func (l *Logger) Infof(format string, args ...interface{}) {
 }
 
 // Warnf uses fmt.Sprintf to log a templated message.
-func (l *Logger) Warnf(format string, args ...interface{}) {
+func (l *Logger) Warnf(format string, args ...any) {
 	if false {
 		_ = fmt.Sprintf(format, args...) // enable printf checking
 	}
@@ -260,7 +260,7 @@ func (l *Logger) Warnf(format string, args ...interface{}) {
 }
 
 // Errorf uses fmt.Sprintf to log a templated message.
-func (l *Logger) Errorf(format string, args ...interface{}) {
+func (l *Logger) Errorf(format string, args ...any) {
 	if false {
 		_ = fmt.Sprintf(format, args...) // enable printf checking
 	}
@@ -268,7 +268,7 @@ func (l *Logger) Errorf(format string, args ...interface{}) {
 }
 
 // Fatalf uses fmt.Sprintf to log a templated message, then calls os.Exit(1).
-func (l *Logger) Fatalf(format string, args ...interface{}) {
+func (l *Logger) Fatalf(format string, args ...any) {
 	if false {
 		_ = fmt.Sprintf(format, args...) // enable printf checking
 	}
@@ -276,7 +276,7 @@ func (l *Logger) Fatalf(format string, args ...interface{}) {
 }
 
 // Panicf uses fmt.Sprintf to log a templated message, then panics.
-func (l *Logger) Panicf(format string, args ...interface{}) {
+func (l *Logger) Panicf(format string, args ...any) {
 	if false {
 		_ = fmt.Sprintf(format, args...) // enable printf checking
 	}
@@ -285,7 +285,7 @@ func (l *Logger) Panicf(format string, args ...interface{}) {
 
 // DPanicf uses fmt.Sprintf to log a templated message. In development, the
 // logger then panics.
-func (l *Logger) DPanicf(format string, args ...interface{}) {
+func (l *Logger) DPanicf(format string, args ...any) {
 	if false {
 		_ = fmt.Sprintf(format, args...) // enable printf checking
 	}
@@ -298,7 +298,7 @@ func (l *Logger) DPanicf(format string, args ...interface{}) {
 // is added in the form of key-value pairs. The optimal way to write the value
 // to the log message will be inferred by the value's type. To explicitly
 // specify a type you can pass a Field such as logp.Stringer.
-func (l *Logger) Debugw(msg string, keysAndValues ...interface{}) {
+func (l *Logger) Debugw(msg string, keysAndValues ...any) {
 	l.sugar.Debugw(msg, keysAndValues...)
 }
 
@@ -306,7 +306,7 @@ func (l *Logger) Debugw(msg string, keysAndValues ...interface{}) {
 // is added in the form of key-value pairs. The optimal way to write the value
 // to the log message will be inferred by the value's type. To explicitly
 // specify a type you can pass a Field such as logp.Stringer.
-func (l *Logger) Infow(msg string, keysAndValues ...interface{}) {
+func (l *Logger) Infow(msg string, keysAndValues ...any) {
 	l.sugar.Infow(msg, keysAndValues...)
 }
 
@@ -314,7 +314,7 @@ func (l *Logger) Infow(msg string, keysAndValues ...interface{}) {
 // is added in the form of key-value pairs. The optimal way to write the value
 // to the log message will be inferred by the value's type. To explicitly
 // specify a type you can pass a Field such as logp.Stringer.
-func (l *Logger) Warnw(msg string, keysAndValues ...interface{}) {
+func (l *Logger) Warnw(msg string, keysAndValues ...any) {
 	l.sugar.Warnw(msg, keysAndValues...)
 }
 
@@ -322,7 +322,7 @@ func (l *Logger) Warnw(msg string, keysAndValues ...interface{}) {
 // is added in the form of key-value pairs. The optimal way to write the value
 // to the log message will be inferred by the value's type. To explicitly
 // specify a type you can pass a Field such as logp.Stringer.
-func (l *Logger) Errorw(msg string, keysAndValues ...interface{}) {
+func (l *Logger) Errorw(msg string, keysAndValues ...any) {
 	l.sugar.Errorw(msg, keysAndValues...)
 }
 
@@ -331,7 +331,7 @@ func (l *Logger) Errorw(msg string, keysAndValues ...interface{}) {
 // way to write the value to the log message will be inferred by the value's
 // type. To explicitly specify a type you can pass a Field such as
 // logp.Stringer.
-func (l *Logger) Fatalw(msg string, keysAndValues ...interface{}) {
+func (l *Logger) Fatalw(msg string, keysAndValues ...any) {
 	l.sugar.Fatalw(msg, keysAndValues...)
 }
 
@@ -339,7 +339,7 @@ func (l *Logger) Fatalw(msg string, keysAndValues ...interface{}) {
 // additional context is added in the form of key-value pairs. The optimal way
 // to write the value to the log message will be inferred by the value's type.
 // To explicitly specify a type you can pass a Field such as logp.Stringer.
-func (l *Logger) Panicw(msg string, keysAndValues ...interface{}) {
+func (l *Logger) Panicw(msg string, keysAndValues ...any) {
 	l.sugar.Panicw(msg, keysAndValues...)
 }
 
@@ -348,7 +348,7 @@ func (l *Logger) Panicw(msg string, keysAndValues ...interface{}) {
 // key-value pairs. The optimal way to write the value to the log message will
 // be inferred by the value's type. To explicitly specify a type you can pass a
 // Field such as logp.Stringer.
-func (l *Logger) DPanicw(msg string, keysAndValues ...interface{}) {
+func (l *Logger) DPanicw(msg string, keysAndValues ...any) {
 	l.sugar.DPanicw(msg, keysAndValues...)
 }
 

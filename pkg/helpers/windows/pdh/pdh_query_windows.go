@@ -52,7 +52,7 @@ type Query struct {
 // CounterValue contains the performance counter values.
 type CounterValue struct {
 	Instance    string
-	Measurement interface{}
+	Measurement any
 	Err         CounterValueError
 }
 

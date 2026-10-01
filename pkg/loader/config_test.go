@@ -34,21 +34,21 @@ func TestConfig(t *testing.T) {
 }
 
 func TestInputsResolveNOOP(t *testing.T) {
-	contents := map[string]interface{}{
-		"outputs": map[string]interface{}{
-			"default": map[string]interface{}{
+	contents := map[string]any{
+		"outputs": map[string]any{
+			"default": map[string]any{
 				"type":     "elasticsearch",
-				"hosts":    []interface{}{"127.0.0.1:9200"},
+				"hosts":    []any{"127.0.0.1:9200"},
 				"username": "elastic",
 				"password": "changeme",
 			},
 		},
-		"inputs": []interface{}{
-			map[string]interface{}{
+		"inputs": []any{
+			map[string]any{
 				"type": "logfile",
-				"streams": []interface{}{
-					map[string]interface{}{
-						"paths": []interface{}{"/var/log/${host.name}"},
+				"streams": []any{
+					map[string]any{
+						"paths": []any{"/var/log/${host.name}"},
 					},
 				},
 			},
@@ -68,8 +68,8 @@ func TestInputsResolveNOOP(t *testing.T) {
 }
 
 func testToMapStr(t *testing.T) {
-	m := map[string]interface{}{
-		"hello": map[string]interface{}{
+	m := map[string]any{
+		"hello": map[string]any{
 			"what": "who",
 		},
 	}
@@ -85,22 +85,22 @@ func testLoadFiles(t *testing.T) {
 	tmp := t.TempDir()
 
 	f1 := filepath.Join(tmp, "1.yml")
-	dumpToYAML(t, f1, map[string]interface{}{
-		"hello": map[string]interface{}{
+	dumpToYAML(t, f1, map[string]any{
+		"hello": map[string]any{
 			"what": "1",
 		},
 	})
 
 	f2 := filepath.Join(tmp, "2.yml")
-	dumpToYAML(t, f2, map[string]interface{}{
-		"hello": map[string]interface{}{
+	dumpToYAML(t, f2, map[string]any{
+		"hello": map[string]any{
 			"where": "2",
 		},
 	})
 
 	f3 := filepath.Join(tmp, "3.yml")
-	dumpToYAML(t, f3, map[string]interface{}{
-		"super": map[string]interface{}{
+	dumpToYAML(t, f3, map[string]any{
+		"super": map[string]any{
 			"awesome": "cool",
 		},
 	})
@@ -111,18 +111,18 @@ func testLoadFiles(t *testing.T) {
 	r, err := c.ToMapStr()
 	require.NoError(t, err)
 
-	assert.Equal(t, map[string]interface{}{
-		"hello": map[string]interface{}{
+	assert.Equal(t, map[string]any{
+		"hello": map[string]any{
 			"what":  "1",
 			"where": "2",
 		},
-		"super": map[string]interface{}{
+		"super": map[string]any{
 			"awesome": "cool",
 		},
 	}, r)
 }
 
-func dumpToYAML(t *testing.T, out string, in interface{}) {
+func dumpToYAML(t *testing.T, out string, in any) {
 	b, err := yaml.Marshal(in)
 	require.NoError(t, err)
 	err = os.WriteFile(out, b, 0600)

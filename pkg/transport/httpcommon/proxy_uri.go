@@ -49,7 +49,7 @@ func NewProxyURIFromURL(u url.URL) *ProxyURI {
 }
 
 // MarshalYAML serializes URI as a string.
-func (p *ProxyURI) MarshalYAML() (interface{}, error) {
+func (p *ProxyURI) MarshalYAML() (any, error) {
 	u := url.URL(*p)
 	return u.String(), nil
 }
@@ -83,7 +83,7 @@ func (p *ProxyURI) UnmarshalJSON(b []byte) error {
 }
 
 // UnmarshalYAML unpacks string into an proxy URI.
-func (p *ProxyURI) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (p *ProxyURI) UnmarshalYAML(unmarshal func(any) error) error {
 	rawURI := ""
 	if err := unmarshal(&rawURI); err != nil {
 		return err

@@ -83,9 +83,9 @@ type TotalDocCount struct {
 
 // ESDoc contains the documents returned by an ES query
 type ESDoc struct {
-	Index  string                 `json:"_index"`
-	Score  float64                `json:"_score"`
-	Source map[string]interface{} `json:"_source"`
+	Index  string         `json:"_index"`
+	Score  float64        `json:"_score"`
+	Source map[string]any `json:"_source"`
 }
 
 // TemplateResponse is the body of a template data request
@@ -95,14 +95,14 @@ type TemplateResponse struct {
 
 // Template is an individual template
 type Template struct {
-	Name          string                 `json:"name"`
-	IndexTemplate map[string]interface{} `json:"index_template"`
+	Name          string         `json:"name"`
+	IndexTemplate map[string]any `json:"index_template"`
 }
 
 // Pipeline is an individual pipeline
 type Pipeline struct {
-	Description string                   `json:"description"`
-	Processors  []map[string]interface{} `json:"processors"`
+	Description string           `json:"description"`
+	Processors  []map[string]any `json:"processors"`
 }
 
 // Ping returns basic ES info
@@ -252,10 +252,10 @@ func FindMatchingLogLines(ctx context.Context, client elastictransport.Interface
 
 // GetLatestDocumentMatchingQuery returns the last document that matches the given query.
 // the query field is inserted into a simple `query` POST request
-func GetLatestDocumentMatchingQuery(ctx context.Context, client elastictransport.Interface, query map[string]interface{}, indexPattern string) (Documents, error) {
-	queryRaw := map[string]interface{}{
+func GetLatestDocumentMatchingQuery(ctx context.Context, client elastictransport.Interface, query map[string]any, indexPattern string) (Documents, error) {
+	queryRaw := map[string]any{
 		"query": query,
-		"sort": map[string]interface{}{
+		"sort": map[string]any{
 			"@timestamp": "desc",
 		},
 		"size": 1,
@@ -379,18 +379,18 @@ func DeletePipelines(ctx context.Context, client elastictransport.Interface, nam
 
 // FindMatchingLogLinesWithContext returns any logs with message fields that match the given line
 func FindMatchingLogLinesWithContext(ctx context.Context, client elastictransport.Interface, namespace, line string) (Documents, error) {
-	queryRaw := map[string]interface{}{
-		"query": map[string]interface{}{
-			"bool": map[string]interface{}{
-				"must": []map[string]interface{}{
+	queryRaw := map[string]any{
+		"query": map[string]any{
+			"bool": map[string]any{
+				"must": []map[string]any{
 					{
-						"match_phrase": map[string]interface{}{
+						"match_phrase": map[string]any{
 							"message": line,
 						},
 					},
 					{
-						"term": map[string]interface{}{
-							"data_stream.namespace": map[string]interface{}{
+						"term": map[string]any{
+							"data_stream.namespace": map[string]any{
 								"value": namespace,
 							},
 						},
@@ -419,16 +419,16 @@ func CheckForErrorsInLogs(ctx context.Context, client elastictransport.Interface
 // CheckForErrorsInLogsWithContext checks to see if any error-level lines exist
 // excludeStrings can be used to remove any particular error strings from logs
 func CheckForErrorsInLogsWithContext(ctx context.Context, client elastictransport.Interface, namespace string, excludeStrings []string) (Documents, error) {
-	filters := map[string]interface{}{
-		"must": []map[string]interface{}{
+	filters := map[string]any{
+		"must": []map[string]any{
 			{
-				"match": map[string]interface{}{
+				"match": map[string]any{
 					"log.level": "error",
 				},
 			},
 			{
-				"term": map[string]interface{}{
-					"data_stream.namespace": map[string]interface{}{
+				"term": map[string]any{
+					"data_stream.namespace": map[string]any{
 						"value": namespace,
 					},
 				},
@@ -437,10 +437,10 @@ func CheckForErrorsInLogsWithContext(ctx context.Context, client elastictranspor
 	}
 
 	if len(excludeStrings) > 0 {
-		excludeStatements := []map[string]interface{}{}
+		excludeStatements := []map[string]any{}
 		for _, ex := range excludeStrings {
-			excludeStatements = append(excludeStatements, map[string]interface{}{
-				"match_phrase": map[string]interface{}{
+			excludeStatements = append(excludeStatements, map[string]any{
+				"match_phrase": map[string]any{
 					"message": ex,
 				},
 			})
@@ -449,8 +449,8 @@ func CheckForErrorsInLogsWithContext(ctx context.Context, client elastictranspor
 		filters["must_not"] = excludeStatements
 	}
 
-	queryRaw := map[string]interface{}{
-		"query": map[string]interface{}{
+	queryRaw := map[string]any{
+		"query": map[string]any{
 			"bool": filters,
 		},
 	}
@@ -471,9 +471,9 @@ func GetLogsForDataset(ctx context.Context, client elastictransport.Interface, i
 
 // GetLogsForAgentID returns any logs associated with the agent ID
 func GetLogsForAgentID(ctx context.Context, client elastictransport.Interface, id string) (Documents, error) {
-	indexQuery := map[string]interface{}{
-		"query": map[string]interface{}{
-			"match": map[string]interface{}{
+	indexQuery := map[string]any{
+		"query": map[string]any{
+			"match": map[string]any{
 				"data_stream.dataset": "elastic_agent.*",
 			},
 		},
@@ -506,15 +506,15 @@ func GetLogsForAgentID(ctx context.Context, client elastictransport.Interface, i
 
 // GetResultsForAgentAndDatastream returns any documents match both the given agent ID and data stream
 func GetResultsForAgentAndDatastream(ctx context.Context, client elastictransport.Interface, dataset string, agentID string) (Documents, error) {
-	indexQuery := map[string]interface{}{
-		"query": map[string]interface{}{
-			"bool": map[string]interface{}{
-				"must": []map[string]interface{}{
+	indexQuery := map[string]any{
+		"query": map[string]any{
+			"bool": map[string]any{
+				"must": []map[string]any{
 					{
-						"match": map[string]interface{}{"data_stream.dataset": dataset},
+						"match": map[string]any{"data_stream.dataset": dataset},
 					},
 					{
-						"match": map[string]interface{}{"agent.id": agentID},
+						"match": map[string]any{"agent.id": agentID},
 					},
 				},
 			},
@@ -544,9 +544,9 @@ func GetResultsForAgentAndDatastream(ctx context.Context, client elastictranspor
 
 // GetLogsForDatasetWithContext returns any logs associated with the datastream
 func GetLogsForDatasetWithContext(ctx context.Context, client elastictransport.Interface, index string) (Documents, error) {
-	indexQuery := map[string]interface{}{
-		"query": map[string]interface{}{
-			"match": map[string]interface{}{
+	indexQuery := map[string]any{
+		"query": map[string]any{
+			"match": map[string]any{
 				"data_stream.dataset": index,
 			},
 		},
@@ -556,9 +556,9 @@ func GetLogsForDatasetWithContext(ctx context.Context, client elastictransport.I
 }
 
 // GetLogsForIndexWithContext returns any logs that match the given condition
-func GetLogsForIndexWithContext(ctx context.Context, client elastictransport.Interface, index string, match map[string]interface{}) (Documents, error) {
-	indexQuery := map[string]interface{}{
-		"query": map[string]interface{}{
+func GetLogsForIndexWithContext(ctx context.Context, client elastictransport.Interface, index string, match map[string]any) (Documents, error) {
+	indexQuery := map[string]any{
+		"query": map[string]any{
 			"match": match,
 		},
 	}
@@ -568,9 +568,9 @@ func GetLogsForIndexWithContext(ctx context.Context, client elastictransport.Int
 
 // GetAllLogsForIndexWithContext returns all logs for a given index
 func GetAllLogsForIndexWithContext(ctx context.Context, client elastictransport.Interface, index string) (Documents, error) {
-	indexQuery := map[string]interface{}{
-		"query": map[string]interface{}{
-			"match_all": map[string]interface{}{},
+	indexQuery := map[string]any{
+		"query": map[string]any{
+			"match_all": map[string]any{},
 		},
 	}
 
@@ -600,7 +600,7 @@ func GetPing(ctx context.Context, client elastictransport.Interface) (Ping, erro
 }
 
 // PerformQueryForRawQuery executes the ES query specified by queryRaw
-func PerformQueryForRawQuery(ctx context.Context, queryRaw map[string]interface{}, index string, client elastictransport.Interface) (Documents, error) {
+func PerformQueryForRawQuery(ctx context.Context, queryRaw map[string]any, index string, client elastictransport.Interface) (Documents, error) {
 	var buf bytes.Buffer
 	err := json.NewEncoder(&buf).Encode(queryRaw)
 	if err != nil {
@@ -627,18 +627,18 @@ func PerformQueryForRawQuery(ctx context.Context, queryRaw map[string]interface{
 
 // FindMatchingLogLinesForAgentWithContext returns the matching `message` line field for an agent with the matching ID
 func FindMatchingLogLinesForAgentWithContext(ctx context.Context, client elastictransport.Interface, agentID, line string) (Documents, error) {
-	queryRaw := map[string]interface{}{
-		"query": map[string]interface{}{
-			"bool": map[string]interface{}{
-				"must": []map[string]interface{}{
+	queryRaw := map[string]any{
+		"query": map[string]any{
+			"bool": map[string]any{
+				"must": []map[string]any{
 					{
-						"match_phrase": map[string]interface{}{
+						"match_phrase": map[string]any{
 							"message": line,
 						},
 					},
 					{
-						"term": map[string]interface{}{
-							"agent.id": map[string]interface{}{
+						"term": map[string]any{
+							"agent.id": map[string]any{
 								"value": agentID,
 							},
 						},

@@ -152,7 +152,7 @@ func TestFleetUpdatePolicy(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, client)
 
-	agentFeatures := []map[string]interface{}{
+	agentFeatures := []map[string]any{
 		{
 			"name":    "fqdn",
 			"enabled": true,

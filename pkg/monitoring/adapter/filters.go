@@ -47,7 +47,7 @@ type state struct {
 	mode   monitoring.Mode
 	reg    *monitoring.Registry
 	name   string
-	metric interface{}
+	metric any
 }
 
 // action defines the action to be

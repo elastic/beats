@@ -81,7 +81,7 @@ func (l *Level) Unpack(str string) error {
 }
 
 // MarshalYAML marshals level in a correct form
-func (l Level) MarshalYAML() (interface{}, error) {
+func (l Level) MarshalYAML() (any, error) {
 	s, found := levelStrings[l]
 	if found {
 		return s, nil

@@ -27,51 +27,51 @@ import (
 )
 
 func TestExternalConfigLoading(t *testing.T) {
-	authCfg := map[string]interface{}{
-		"data_stream": map[string]interface{}{
+	authCfg := map[string]any{
+		"data_stream": map[string]any{
 			"dataset": "system.auth",
 			"type":    "logs",
 		},
-		"exclude_files": []interface{}{".gz$"},
+		"exclude_files": []any{".gz$"},
 		"id":            "logfile-system.auth-my-id",
-		"paths":         []interface{}{"/var/log/auth.log*", "/var/log/secure*"},
+		"paths":         []any{"/var/log/auth.log*", "/var/log/secure*"},
 		"use_output":    "default",
 	}
-	syslogCfg := map[string]interface{}{
-		"data_stream": map[string]interface{}{
+	syslogCfg := map[string]any{
+		"data_stream": map[string]any{
 			"dataset": "system.syslog",
 			"type":    "logs",
 		},
 		"type":          "logfile",
 		"id":            "logfile-system.syslog-my-id",
-		"exclude_files": []interface{}{".gz$"},
-		"paths":         []interface{}{"/var/log/messages*", "/var/log/syslog*"},
+		"exclude_files": []any{".gz$"},
+		"paths":         []any{"/var/log/messages*", "/var/log/syslog*"},
 		"use_output":    "default",
 	}
 
-	diskioCfg := map[string]interface{}{
-		"data_stream": map[string]interface{}{
+	diskioCfg := map[string]any{
+		"data_stream": map[string]any{
 			"dataset": "system.diskio",
 			"type":    "metrics",
 		},
 		"id":         "system/metrics-system.diskio-my-id",
-		"metricsets": []interface{}{"diskio"},
+		"metricsets": []any{"diskio"},
 		"period":     "10s",
 	}
-	filesystemCfg := map[string]interface{}{
-		"data_stream": map[string]interface{}{
+	filesystemCfg := map[string]any{
+		"data_stream": map[string]any{
 			"dataset": "system.filesystem",
 			"type":    "metrics",
 		},
 		"id":         "system/metrics-system.filesystem-my-id",
-		"metricsets": []interface{}{"filesystem"},
+		"metricsets": []any{"filesystem"},
 		"period":     "30s",
 	}
 
-	outputCfg := map[string]interface{}{
-		"default": map[string]interface{}{
+	outputCfg := map[string]any{
+		"default": map[string]any{
 			"type":    "elasticsearch",
-			"hosts":   []interface{}{"127.0.0.1:9201"},
+			"hosts":   []any{"127.0.0.1:9201"},
 			"api-key": "my-secret-key",
 		},
 	}
@@ -79,7 +79,7 @@ func TestExternalConfigLoading(t *testing.T) {
 	cases := map[string]struct {
 		configs        []string
 		inputsFolder   string
-		expectedConfig map[string]interface{}
+		expectedConfig map[string]any
 		err            bool
 	}{
 		"non-existent config files lead to error": {
@@ -99,12 +99,12 @@ func TestExternalConfigLoading(t *testing.T) {
 				filepath.Join("testdata", "standalone2.yml"),
 			},
 			inputsFolder: "",
-			expectedConfig: map[string]interface{}{
+			expectedConfig: map[string]any{
 				"outputs": outputCfg,
-				"agent": map[string]interface{}{
-					"logging": map[string]interface{}{
+				"agent": map[string]any{
+					"logging": map[string]any{
 						"level": "debug",
-						"metrics": map[string]interface{}{
+						"metrics": map[string]any{
 							"enabled": false,
 						},
 					},
@@ -118,15 +118,15 @@ func TestExternalConfigLoading(t *testing.T) {
 				filepath.Join("testdata", "inputs", "metrics-inputs.yml"),
 			},
 			inputsFolder: filepath.Join("testdata", "inputs", "*.yml"),
-			expectedConfig: map[string]interface{}{
-				"outputs": map[string]interface{}{
-					"default": map[string]interface{}{
+			expectedConfig: map[string]any{
+				"outputs": map[string]any{
+					"default": map[string]any{
 						"type":    "elasticsearch",
-						"hosts":   []interface{}{"127.0.0.1:9201"},
+						"hosts":   []any{"127.0.0.1:9201"},
 						"api-key": "my-secret-key",
 					},
 				},
-				"inputs": []interface{}{
+				"inputs": []any{
 					authCfg,
 					syslogCfg,
 					diskioCfg,
@@ -141,15 +141,15 @@ func TestExternalConfigLoading(t *testing.T) {
 				filepath.Join("testdata", "inputs", "metrics-inputs.yml"),
 			},
 			inputsFolder: filepath.Join("testdata", "inputs", "*.yml"),
-			expectedConfig: map[string]interface{}{
+			expectedConfig: map[string]any{
 				"outputs": outputCfg,
-				"inputs": []interface{}{
-					map[string]interface{}{
+				"inputs": []any{
+					map[string]any{
 						"type":                  "system/metrics",
 						"data_stream.namespace": "default",
 						"use_output":            "default",
-						"streams": []interface{}{
-							map[string]interface{}{
+						"streams": []any{
+							map[string]any{
 								"metricset":           "cpu",
 								"data_stream.dataset": "system.cpu",
 							},

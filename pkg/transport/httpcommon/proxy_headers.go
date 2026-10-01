@@ -28,7 +28,7 @@ import (
 type ProxyHeaders map[string]string
 
 // MarshalYAML serializes URI as a string.
-func (p ProxyHeaders) MarshalYAML() (interface{}, error) {
+func (p ProxyHeaders) MarshalYAML() (any, error) {
 	return p, nil
 }
 
@@ -62,7 +62,7 @@ func (p *ProxyHeaders) UnmarshalJSON(b []byte) error {
 }
 
 // UnmarshalYAML unpacks string into an proxy URI.
-func (p *ProxyHeaders) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (p *ProxyHeaders) UnmarshalYAML(unmarshal func(any) error) error {
 	m := make(map[string]string)
 	if err := unmarshal(&m); err != nil {
 		return err

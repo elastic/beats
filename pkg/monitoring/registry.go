@@ -57,7 +57,7 @@ func NewRegistry(opts ...Option) *Registry {
 	}
 }
 
-func (r *Registry) Do(mode Mode, f func(string, interface{})) {
+func (r *Registry) Do(mode Mode, f func(string, any)) {
 	r.doVisit(mode, NewKeyValueVisitor(f))
 }
 

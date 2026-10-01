@@ -167,7 +167,7 @@ func TestSafeVars(t *testing.T) {
 func TestVarsTypes(t *testing.T) {
 	testReg := Default.NewRegistry("test_type_reg")
 
-	expected := map[string]interface{}{
+	expected := map[string]any{
 		"string_key": "string_val",
 		"bool_key":   false,
 		"int_key":    int64(42),

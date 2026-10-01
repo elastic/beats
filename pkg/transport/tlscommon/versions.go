@@ -41,7 +41,7 @@ func (v TLSVersion) Details() *TLSVersionDetails {
 }
 
 // Unpack transforms the string into a constant.
-func (v *TLSVersion) Unpack(i interface{}) error {
+func (v *TLSVersion) Unpack(i any) error {
 	switch o := i.(type) {
 	case string:
 		version, found := tlsProtocolVersions[o]

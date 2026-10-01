@@ -142,7 +142,7 @@ func (d *ConsoleDriver) error(field string, err error) {
 	d.reported = true
 }
 
-func (d *ConsoleDriver) printf(format string, args ...interface{}) {
+func (d *ConsoleDriver) printf(format string, args ...any) {
 	for i := 0; i < d.level; i++ {
 		fmt.Fprint(d.Stdout, "  ")
 	}

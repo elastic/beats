@@ -274,7 +274,7 @@ func TestDeepCloneUpdateMapStringInterfaceDst(t *testing.T) {
 	// Simulates an event where "event" subtree is map[string]interface{} (as
 	// decoded from JSON/wire), and a processor adds "event.dataset".
 	dst := M{
-		"event": map[string]interface{}{
+		"event": map[string]any{
 			"start": "2024-01-01T00:00:00Z",
 			"end":   "2024-01-01T01:00:00Z",
 		},
@@ -302,7 +302,7 @@ func TestDeepCloneUpdateMapStringInterfaceDst(t *testing.T) {
 
 func TestDeepCloneUpdateNoOverwriteMapStringInterfaceDst(t *testing.T) {
 	dst := M{
-		"process": map[string]interface{}{
+		"process": map[string]any{
 			"start": "2024-01-01T00:00:00Z",
 			"pid":   1234,
 		},
@@ -337,11 +337,11 @@ func TestDeepCloneUpdateNoOverwriteMapStringInterfaceDst(t *testing.T) {
 func TestDeepCloneUpdateMapStringInterfaceDstEquivalence(t *testing.T) {
 	makeDst := func() M {
 		return M{
-			"event": map[string]interface{}{
+			"event": map[string]any{
 				"start": "2024-01-01T00:00:00Z",
 				"end":   "2024-01-01T01:00:00Z",
 			},
-			"process": map[string]interface{}{
+			"process": map[string]any{
 				"start": "2024-01-01T00:00:00Z",
 				"pid":   1234,
 			},
@@ -366,11 +366,11 @@ func TestDeepCloneUpdateMapStringInterfaceDstEquivalence(t *testing.T) {
 func TestDeepCloneUpdateNoOverwriteMapStringInterfaceDstEquivalence(t *testing.T) {
 	makeDst := func() M {
 		return M{
-			"event": map[string]interface{}{
+			"event": map[string]any{
 				"start":   "2024-01-01T00:00:00Z",
 				"dataset": "original",
 			},
-			"process": map[string]interface{}{
+			"process": map[string]any{
 				"start": "2024-01-01T00:00:00Z",
 				"pid":   1234,
 			},
@@ -406,7 +406,7 @@ func TestDeepCloneUpdateEmptySource(t *testing.T) {
 // holds a nil map[string]interface{} value, DeepCloneUpdateNoOverwrite does not
 // panic and instead replaces it with a fresh copy of the source map.
 func TestDeepCloneUpdateNoOverwriteNilMapDst(t *testing.T) {
-	var nilMap map[string]interface{}
+	var nilMap map[string]any
 	dst := M{"host": nilMap}
 	src := M{"host": M{"name": "server1"}}
 
@@ -431,7 +431,7 @@ func TestDeepCloneUpdateNilDsts(t *testing.T) {
 		{
 			name: "nil map[string]interface{}",
 			dst: func() M {
-				var nilMap map[string]interface{}
+				var nilMap map[string]any
 				return M{"host": nilMap}
 			},
 		},
@@ -474,7 +474,7 @@ func TestDeepCloneUpdateNilDsts(t *testing.T) {
 func TestDeepCloneUpdateMapStringInterface(t *testing.T) {
 	// Test that map[string]interface{} values are handled.
 	src := M{
-		"data": map[string]interface{}{"key": "value"},
+		"data": map[string]any{"key": "value"},
 	}
 	dst := M{}
 	dst.DeepCloneUpdate(src)
@@ -680,18 +680,18 @@ func BenchmarkMixedTypePipeline(b *testing.B) {
 	makeDst := func() M {
 		return M{
 			"message": "request completed in 42ms",
-			"event": map[string]interface{}{
+			"event": map[string]any{
 				"start": "2024-01-01T00:00:00Z",
 				"end":   "2024-01-01T00:00:01Z",
 			},
-			"process": map[string]interface{}{
+			"process": map[string]any{
 				"start": "2024-01-01T00:00:00Z",
 				"pid":   1234,
 				"name":  "myapp",
 			},
-			"host": map[string]interface{}{
+			"host": map[string]any{
 				"name": "prod-server-01",
-				"os":   map[string]interface{}{"type": "linux", "version": "22.04"},
+				"os":   map[string]any{"type": "linux", "version": "22.04"},
 			},
 		}
 	}

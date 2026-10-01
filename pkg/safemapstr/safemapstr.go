@@ -37,7 +37,7 @@ const alternativeKey = "value"
 //
 // Put detects this scenario and renames the common base key, by appending
 // `.value`
-func Put(data mapstr.M, key string, value interface{}) error {
+func Put(data mapstr.M, key string, value any) error {
 	// XXX This implementation mimics `mapstr.M.Put`, both should be updated to have similar behavior
 
 	d, k := mapFind(data, key, alternativeKey)
@@ -101,11 +101,11 @@ func mapFind(data mapstr.M, key, alternativeKey string) (subMap mapstr.M, subKey
 	}
 }
 
-func tryToM(v interface{}) (mapstr.M, bool) {
+func tryToM(v any) (mapstr.M, bool) {
 	switch m := v.(type) {
 	case mapstr.M:
 		return m, true
-	case map[string]interface{}:
+	case map[string]any:
 		return mapstr.M(m), true
 	default:
 		return nil, false

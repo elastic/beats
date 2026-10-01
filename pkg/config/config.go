@@ -86,7 +86,7 @@ func NewConfig() *C {
 // If from is a string, the contents is treated like raw YAML input. The string
 // will be parsed and a structure config object is build from the parsed
 // result.
-func NewConfigFrom(from interface{}) (*C, error) {
+func NewConfigFrom(from any) (*C, error) {
 	if str, ok := from.(string); ok {
 		c, err := yaml.NewConfig([]byte(str), getGlobalConfigOpts()...)
 		return fromConfig(c), err
@@ -104,7 +104,7 @@ func NewConfigFrom(from interface{}) (*C, error) {
 // result.
 //
 // MustNewConfigFrom panics if an error occurs.
-func MustNewConfigFrom(from interface{}) *C {
+func MustNewConfigFrom(from any) *C {
 	cfg, err := NewConfigFrom(from)
 	if err != nil {
 		panic(err)
@@ -156,12 +156,12 @@ func OverwriteConfigOpts(options []ucfg.Option) {
 }
 
 // Merge merges the parameter into the C object.
-func (c *C) Merge(from interface{}) error {
+func (c *C) Merge(from any) error {
 	return c.access().Merge(from, getGlobalConfigOpts()...)
 }
 
 // Merge merges the parameter into the C object based on the provided options.
-func (c *C) MergeWithOpts(from interface{}, opts ...ucfg.Option) error {
+func (c *C) MergeWithOpts(from any, opts ...ucfg.Option) error {
 	o := getGlobalConfigOpts()
 	if opts != nil {
 		o = append(o, opts...)
@@ -169,7 +169,7 @@ func (c *C) MergeWithOpts(from interface{}, opts ...ucfg.Option) error {
 	return c.access().Merge(from, o...)
 }
 
-func (c *C) Unpack(to interface{}) error {
+func (c *C) Unpack(to any) error {
 	return c.access().Unpack(to, getGlobalConfigOpts()...)
 }
 
@@ -345,7 +345,7 @@ func DebugString(c *C, filterPrivate bool) string {
 	var bufs []string
 
 	if c.IsDict() {
-		var content map[string]interface{}
+		var content map[string]any
 		if err := c.Unpack(&content); err != nil {
 			return fmt.Sprintf("<config error> %v", err)
 		}
@@ -356,7 +356,7 @@ func DebugString(c *C, filterPrivate bool) string {
 		bufs = append(bufs, string(j))
 	}
 	if c.IsArray() {
-		var content []interface{}
+		var content []any
 		if err := c.Unpack(&content); err != nil {
 			return fmt.Sprintf("<config error> %v", err)
 		}
@@ -375,12 +375,12 @@ func DebugString(c *C, filterPrivate bool) string {
 
 // ApplyLoggingMask redacts the values of keys that might
 // contain sensitive data (password, passphrase, etc.).
-func ApplyLoggingMask(c interface{}) {
+func ApplyLoggingMask(c any) {
 	switch cfg := c.(type) {
-	case map[string]interface{}:
+	case map[string]any:
 		for k, v := range cfg {
 			if maskList.Has(strings.ToLower(k)) {
-				if arr, ok := v.([]interface{}); ok {
+				if arr, ok := v.([]any); ok {
 					for i := range arr {
 						arr[i] = mask
 					}
@@ -392,7 +392,7 @@ func ApplyLoggingMask(c interface{}) {
 			}
 		}
 
-	case []interface{}:
+	case []any:
 		for _, elem := range cfg {
 			ApplyLoggingMask(elem)
 		}

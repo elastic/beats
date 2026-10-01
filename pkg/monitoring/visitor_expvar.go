@@ -32,7 +32,7 @@ func VisitExpvars(vs Visitor) {
 	vs.OnRegistryFinished()
 }
 
-func DoExpvars(f func(string, interface{})) {
+func DoExpvars(f func(string, any)) {
 	VisitExpvars(NewKeyValueVisitor(f))
 }
 

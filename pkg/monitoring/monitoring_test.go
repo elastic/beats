@@ -29,23 +29,23 @@ import (
 func TestIsBufferEnabled(t *testing.T) {
 	tests := []struct {
 		name   string
-		input  map[string]interface{}
+		input  map[string]any
 		expect bool
 	}{{
 		name: "enabled",
-		input: map[string]interface{}{
+		input: map[string]any{
 			"enabled": true,
 		},
 		expect: true,
 	}, {
 		name: "disabled",
-		input: map[string]interface{}{
+		input: map[string]any{
 			"enabled": false,
 		},
 		expect: false,
 	}, {
 		name: "missing",
-		input: map[string]interface{}{
+		input: map[string]any{
 			"size": 10,
 		},
 		expect: false,

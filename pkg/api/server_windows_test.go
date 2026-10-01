@@ -34,7 +34,7 @@ import (
 func TestNamedPipe(t *testing.T) {
 	p := "npipe:///hello"
 
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
 		"host": p,
 	})
 

@@ -76,7 +76,7 @@ func Test_TLSVersion_Unpack(t *testing.T) {
 	tests := []struct {
 		name   string
 		hasErr bool
-		in     interface{}
+		in     any
 		exp    TLSVersion
 	}{{
 		name:   "unknown string",

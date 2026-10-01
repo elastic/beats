@@ -27,8 +27,8 @@ import (
 
 // MakeDebug returns a function that logs at debug level.
 // Deprecated: Use logp.NewLogger.
-func MakeDebug(selector string) func(string, ...interface{}) {
-	return func(format string, v ...interface{}) {
+func MakeDebug(selector string) func(string, ...any) {
+	return func(format string, v ...any) {
 		log := globalLogger().Named(selector)
 		if log.Core().Enabled(zap.DebugLevel) {
 			log.Debug(fmt.Sprintf(format, v...))
@@ -44,7 +44,7 @@ func IsDebug(selector string) bool {
 
 // Debug uses fmt.Sprintf to construct and log a message.
 // Deprecated: Use logp.NewLogger.
-func Debug(selector string, format string, v ...interface{}) {
+func Debug(selector string, format string, v ...any) {
 	log := globalLogger()
 	if log.Core().Enabled(zap.DebugLevel) {
 		log.Named(selector).Debug(fmt.Sprintf(format, v...))
@@ -53,7 +53,7 @@ func Debug(selector string, format string, v ...interface{}) {
 
 // Info uses fmt.Sprintf to construct and log a message.
 // Deprecated: Use logp.NewLogger.
-func Info(format string, v ...interface{}) {
+func Info(format string, v ...any) {
 	log := globalLogger()
 	if log.Core().Enabled(zap.InfoLevel) {
 		log.Info(fmt.Sprintf(format, v...))
@@ -62,7 +62,7 @@ func Info(format string, v ...interface{}) {
 
 // Warn uses fmt.Sprintf to construct and log a message.
 // Deprecated: Use logp.NewLogger.
-func Warn(format string, v ...interface{}) {
+func Warn(format string, v ...any) {
 	log := globalLogger()
 	if log.Core().Enabled(zap.WarnLevel) {
 		globalLogger().Warn(fmt.Sprintf(format, v...))
@@ -71,7 +71,7 @@ func Warn(format string, v ...interface{}) {
 
 // Err uses fmt.Sprintf to construct and log a message.
 // Deprecated: Use logp.NewLogger.
-func Err(format string, v ...interface{}) {
+func Err(format string, v ...any) {
 	log := globalLogger()
 	if log.Core().Enabled(zap.ErrorLevel) {
 		globalLogger().Error(fmt.Sprintf(format, v...))
@@ -81,7 +81,7 @@ func Err(format string, v ...interface{}) {
 // Critical uses fmt.Sprintf to construct and log a message. It's an alias for
 // Error.
 // Deprecated: Use logp.NewLogger.
-func Critical(format string, v ...interface{}) {
+func Critical(format string, v ...any) {
 	log := globalLogger()
 	if log.Core().Enabled(zap.ErrorLevel) {
 		globalLogger().Error(fmt.Sprintf(format, v...))
@@ -92,7 +92,7 @@ func Critical(format string, v ...interface{}) {
 // message.
 //
 // Deprecated: Use logp.NewLogger and its Panic or DPanic methods.
-func WTF(format string, v ...interface{}) {
+func WTF(format string, v ...any) {
 	globalLogger().Panic(fmt.Sprintf(format, v...))
 }
 

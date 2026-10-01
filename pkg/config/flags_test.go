@@ -90,13 +90,13 @@ func TestStringArrFlag(t *testing.T) {
 func TestSettingsFlag(t *testing.T) {
 	tests := []struct {
 		in       []string
-		expected map[string]interface{}
+		expected map[string]any
 	}{
-		{nil, map[string]interface{}{}},
-		{[]string{"a=1"}, map[string]interface{}{"a": uint64(1)}},
-		{[]string{"a=1", "b=false"}, map[string]interface{}{"a": uint64(1), "b": false}},
-		{[]string{"a=1", "b"}, map[string]interface{}{"a": uint64(1), "b": true}},
-		{[]string{"a=1", "c=${a}"}, map[string]interface{}{"a": uint64(1), "c": uint64(1)}},
+		{nil, map[string]any{}},
+		{[]string{"a=1"}, map[string]any{"a": uint64(1)}},
+		{[]string{"a=1", "b=false"}, map[string]any{"a": uint64(1), "b": false}},
+		{[]string{"a=1", "b"}, map[string]any{"a": uint64(1), "b": true}},
+		{[]string{"a=1", "c=${a}"}, map[string]any{"a": uint64(1), "c": uint64(1)}},
 	}
 
 	for _, test := range tests {
@@ -125,7 +125,7 @@ func TestSettingsFlag(t *testing.T) {
 				}
 			}
 
-			var result map[string]interface{}
+			var result map[string]any
 			err := config.Unpack(&result)
 			if err != nil {
 				t.Fatal(err)
@@ -139,7 +139,7 @@ func TestSettingsFlag(t *testing.T) {
 }
 
 func TestOverwriteFlag(t *testing.T) {
-	config, err := NewConfigFrom(map[string]interface{}{
+	config, err := NewConfigFrom(map[string]any{
 		"a": "test",
 	})
 	if err != nil {

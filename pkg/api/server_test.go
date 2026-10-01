@@ -43,7 +43,7 @@ func TestConfiguration(t *testing.T) {
 		return
 	}
 	t.Run("when user is set", func(t *testing.T) {
-		cfg := config.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]any{
 			"host": "unix:///tmp/ok",
 			"user": "admin",
 		})
@@ -53,7 +53,7 @@ func TestConfiguration(t *testing.T) {
 	})
 
 	t.Run("when security descriptor is set", func(t *testing.T) {
-		cfg := config.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]any{
 			"host":                "unix:///tmp/ok",
 			"security_descriptor": "D:P(A;;GA;;;1234)",
 		})
@@ -72,7 +72,7 @@ func TestSocket(t *testing.T) {
 	t.Run("socket doesn't exist before", func(t *testing.T) {
 		sockFile := shortTempDir(t) + "/test.sock"
 
-		cfg := config.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]any{
 			"host": "unix://" + sockFile,
 		})
 
@@ -104,7 +104,7 @@ func TestSocket(t *testing.T) {
 		require.NoError(t, err, "error creating test socket")
 		f.Close()
 
-		cfg := config.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]any{
 			"host": "unix://" + sockFile,
 		})
 
@@ -173,7 +173,7 @@ func getResponse(t *testing.T, sockFile, url string) string {
 }
 
 func TestHTTP(t *testing.T) {
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
 		"host": localhostURL,
 	})
 
@@ -209,7 +209,7 @@ func simpleMux() *http.ServeMux {
 }
 
 func TestAttachHandler(t *testing.T) {
-	cfg := config.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]any{
 		"host": localhostURL,
 	})
 

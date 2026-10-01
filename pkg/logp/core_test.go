@@ -740,7 +740,7 @@ func TestConfigureWithCore(t *testing.T) {
 			t.Fatalf("Unexpected err: %s", err)
 		}
 		Info("The quick brown %s jumped over the lazy %s.", "fox", "dog")
-		var r map[string]interface{}
+		var r map[string]any
 
 		err = json.Unmarshal(b.Bytes(), &r)
 		if err != nil {
@@ -775,7 +775,7 @@ func TestConfigureWithCore(t *testing.T) {
 			t.Fatalf("Unexpected err: %s", err)
 		}
 		Info("The quick brown %s jumped over the lazy %s.", "fox", "dog")
-		var r map[string]interface{}
+		var r map[string]any
 
 		err = json.Unmarshal(b.Bytes(), &r)
 		if err != nil {

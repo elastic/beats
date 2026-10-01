@@ -26,7 +26,7 @@ import (
 func TestSnapshot(t *testing.T) {
 	tests := []struct {
 		name     string
-		expected map[string]interface{}
+		expected map[string]any
 		build    func(R *Registry)
 	}{
 		{
@@ -43,14 +43,14 @@ func TestSnapshot(t *testing.T) {
 		},
 		{
 			"collect exposed metric",
-			map[string]interface{}{"test": int64(1)},
+			map[string]any{"test": int64(1)},
 			func(R *Registry) {
 				NewInt(R, "test", Report).Set(1)
 			},
 		},
 		{
 			"do not report unexported namespace",
-			map[string]interface{}{"test": int64(0)},
+			map[string]any{"test": int64(0)},
 			func(R *Registry) {
 				NewInt(R, "test", Report)
 				NewInt(R, "unexported.test")
@@ -58,7 +58,7 @@ func TestSnapshot(t *testing.T) {
 		},
 		{
 			"do not report empty nested exported",
-			map[string]interface{}{"test": int64(0)},
+			map[string]any{"test": int64(0)},
 			func(R *Registry) {
 				metrics := R.NewRegistry("exported", Report)
 				NewInt(metrics, "unexported", DoNotReport)
@@ -67,7 +67,7 @@ func TestSnapshot(t *testing.T) {
 		},
 		{
 			"export namespaced as nested-document from registry instance",
-			map[string]interface{}{"exported": map[string]interface{}{"test": int64(0)}},
+			map[string]any{"exported": map[string]any{"test": int64(0)}},
 			func(R *Registry) {
 				metrics := R.NewRegistry("exported", Report)
 				NewInt(metrics, "test", Report)
@@ -76,7 +76,7 @@ func TestSnapshot(t *testing.T) {
 		},
 		{
 			"export unmarked namespaced as nested-document from registry instance",
-			map[string]interface{}{"exported": map[string]interface{}{"test": int64(0)}},
+			map[string]any{"exported": map[string]any{"test": int64(0)}},
 			func(R *Registry) {
 				metrics := R.NewRegistry("exported", Report)
 				NewInt(metrics, "test")
@@ -85,7 +85,7 @@ func TestSnapshot(t *testing.T) {
 		},
 		{
 			"export namespaced as nested-document without intermediate registry instance",
-			map[string]interface{}{"exported": map[string]interface{}{"test": int64(0)}},
+			map[string]any{"exported": map[string]any{"test": int64(0)}},
 			func(R *Registry) {
 				NewInt(R, "exported.test", Report)
 				NewInt(R, "unexported.test")

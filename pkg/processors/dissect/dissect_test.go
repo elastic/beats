@@ -37,14 +37,14 @@ func TestDissectConversion(t *testing.T) {
 		Name     string
 		Tok      string
 		Msg      string
-		Expected map[string]interface{}
+		Expected map[string]any
 		Fail     bool
 	}{
 		{
 			Name: "Convert 1 value",
 			Tok:  "id=%{id|integer} msg=\"%{message}\"",
 			Msg:  "id=7736 msg=\"Single value OK\"}",
-			Expected: map[string]interface{}{
+			Expected: map[string]any{
 				"id":      int32(7736),
 				"message": "Single value OK",
 			},
@@ -54,7 +54,7 @@ func TestDissectConversion(t *testing.T) {
 			Name: "Convert multiple values values",
 			Tok:  "id=%{id|integer} status=%{status|integer} duration=%{duration|float} uptime=%{uptime|long} success=%{success|boolean} msg=\"%{message}\"",
 			Msg:  "id=7736 status=202 duration=0.975 uptime=1588975628 success=true msg=\"Request accepted\"}",
-			Expected: map[string]interface{}{
+			Expected: map[string]any{
 				"id":       int32(7736),
 				"status":   int32(202),
 				"duration": float32(0.975),
@@ -68,7 +68,7 @@ func TestDissectConversion(t *testing.T) {
 			Name: "Convert 1 indirect field value",
 			Tok:  "%{?k1}=%{&k1|integer} msg=\"%{message}\"",
 			Msg:  "id=8268 msg=\"Single value indirect field\"}",
-			Expected: map[string]interface{}{
+			Expected: map[string]any{
 				"id":      int32(8268),
 				"message": "Single value indirect field",
 			},
@@ -78,7 +78,7 @@ func TestDissectConversion(t *testing.T) {
 			Name: "Greedy padding skip test ->",
 			Tok:  "id=%{id->|integer} padding_removed=%{padding_removed->|boolean} length=%{length->|long} msg=\"%{message}\"",
 			Msg:  "id=1945     padding_removed=true    length=123456789    msg=\"Testing for padding\"}",
-			Expected: map[string]interface{}{
+			Expected: map[string]any{
 				"id":              int32(1945),
 				"padding_removed": true,
 				"length":          int64(123456789),

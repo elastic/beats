@@ -84,7 +84,7 @@ func TestOverrideWithCloudSettings(t *testing.T) {
 			mapstr.M{
 				"cloud.auth": "elastic:changeme",
 			},
-			func(t assert.TestingT, err error, _ ...interface{}) bool {
+			func(t assert.TestingT, err error, _ ...any) bool {
 				return assert.EqualError(t, cfgError(errCloudCfgIncomplete), err.Error())
 			},
 		}}

@@ -101,7 +101,7 @@ func (r *reporter) snapshotLoop() {
 
 // ServeHTTP is an http.Handler that will respond with the monitored registries buffer's contents in JSON.
 func (r *reporter) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	resp := make(map[string][]interface{}, len(r.entries))
+	resp := make(map[string][]any, len(r.entries))
 	for name, entries := range r.entries {
 		resp[name] = entries.getAll()
 	}

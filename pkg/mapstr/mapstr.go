@@ -57,7 +57,7 @@ type EventMetadata struct {
 
 // M is a map[string]interface{} wrapper with utility methods for common
 // map operations like converting to JSON.
-type M map[string]interface{}
+type M map[string]any
 
 // Update copies all the key-value pairs from d to this map. If the key
 // already exists then it is overwritten. This method does not merge nested
@@ -147,7 +147,7 @@ func (m M) deepCloneUpdateMap(d M, overwrite bool) {
 func (m M) deepUpdateMap(d M, overwrite bool) {
 	for k, v := range d {
 		switch val := v.(type) {
-		case map[string]interface{}:
+		case map[string]any:
 			m[k] = deepUpdateValue(m[k], M(val), overwrite)
 		case M:
 			m[k] = deepUpdateValue(m[k], val, overwrite)
@@ -161,7 +161,7 @@ func (m M) deepUpdateMap(d M, overwrite bool) {
 	}
 }
 
-func deepUpdateValue(old interface{}, val M, overwrite bool) interface{} {
+func deepUpdateValue(old any, val M, overwrite bool) any {
 	switch sub := old.(type) {
 	case M:
 		if sub == nil {
@@ -170,7 +170,7 @@ func deepUpdateValue(old interface{}, val M, overwrite bool) interface{} {
 
 		sub.deepUpdateMap(val, overwrite)
 		return sub
-	case map[string]interface{}:
+	case map[string]any:
 		if sub == nil {
 			return val
 		}
@@ -279,7 +279,7 @@ func cloneMap(dst, src M) {
 			d := make(M, len(v))
 			dst[k] = d
 			cloneMap(d, v)
-		case map[string]interface{}:
+		case map[string]any:
 			d := make(M, len(v))
 			dst[k] = d
 			cloneMap(d, v)
@@ -291,7 +291,7 @@ func cloneMap(dst, src M) {
 				a = append(a, d)
 			}
 			dst[k] = a
-		case []map[string]interface{}:
+		case []map[string]any:
 			a := make([]M, 0, len(v))
 			for _, m := range v {
 				d := make(M, len(m))
@@ -318,7 +318,7 @@ func (m M) HasKey(key string) (bool, error) {
 // Returns `ErrKeyCollision` if multiple keys match the same request.
 // Returns `ErrNotMapType` when one of the values on the path is not a map and cannot be traversed.
 // Returns `ErrKeyNotFound` when the path does not exist
-func (m M) FindFold(path string) (matchedKey string, value interface{}, err error) {
+func (m M) FindFold(path string) (matchedKey string, value any, err error) {
 	segmentCount := strings.Count(path, ".") + 1
 	err = m.Traverse(path, CaseInsensitiveMode, func(level M, key string) error {
 		segmentCount--
@@ -408,7 +408,7 @@ func (m M) Traverse(path string, mode TraversalMode, visitor TraversalVisitor) (
 	// allocate only once
 	var (
 		mapType bool
-		next    interface{}
+		next    any
 	)
 
 	for i, segment := range segments {
@@ -466,7 +466,7 @@ func (m M) Traverse(path string, mode TraversalMode, visitor TraversalVisitor) (
 
 // GetValue gets a value from the map. If the key does not exist then an error
 // is returned.
-func (m M) GetValue(key string) (interface{}, error) {
+func (m M) GetValue(key string) (any, error) {
 	_, _, v, found, err := mapFind(key, m, false)
 	if err != nil {
 		return nil, err
@@ -484,7 +484,7 @@ func (m M) GetValue(key string) (interface{}, error) {
 //
 // If you need insert keys containing dots then you must use bracket notation
 // to insert values (e.g. m[key] = value).
-func (m M) Put(key string, value interface{}) (interface{}, error) {
+func (m M) Put(key string, value any) (any, error) {
 	// XXX `safemapstr.Put` mimics this implementation, both should be updated to have similar behavior
 	k, d, old, _, err := mapFind(key, m, true)
 	if err != nil {
@@ -521,7 +521,7 @@ func (m M) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	}
 
 	debugM := m.Clone()
-	config.ApplyLoggingMask(map[string]interface{}(debugM))
+	config.ApplyLoggingMask(map[string]any(debugM))
 
 	keys := make([]string, 0, len(debugM))
 	for k := range debugM {
@@ -550,7 +550,7 @@ func (m M) Format(f fmt.State, c rune) {
 	}
 
 	debugM := m.Clone()
-	config.ApplyLoggingMask(map[string]interface{}(debugM))
+	config.ApplyLoggingMask(map[string]any(debugM))
 
 	_, _ = io.WriteString(f, debugM.String())
 }
@@ -732,7 +732,7 @@ func AddTagsWithKey(ms M, key string, tags []string) error {
 	switch arr := oldTags.(type) {
 	case []string:
 		subMap[k] = append(arr, tags...)
-	case []interface{}:
+	case []any:
 		for _, tag := range tags {
 			arr = append(arr, tag)
 		}
@@ -747,7 +747,7 @@ func AddTagsWithKey(ms M, key string, tags []string) error {
 // toMapStr performs a type assertion on v and returns a MapStr. v can be either
 // a MapStr or a map[string]interface{}. If it's any other type or nil then
 // an error is returned.
-func toMapStr(v interface{}) (M, error) {
+func toMapStr(v any) (M, error) {
 	m, ok := tryToMapStr(v)
 	if !ok {
 		return nil, fmt.Errorf("expected map but type is %T", v)
@@ -755,11 +755,11 @@ func toMapStr(v interface{}) (M, error) {
 	return m, nil
 }
 
-func tryToMapStr(v interface{}) (M, bool) {
+func tryToMapStr(v any) (M, bool) {
 	switch m := v.(type) {
 	case M:
 		return m, true
-	case map[string]interface{}:
+	case map[string]any:
 		return M(m), true
 	default:
 		return nil, false
@@ -778,7 +778,7 @@ func mapFind(
 	key string,
 	data M,
 	createMissing bool,
-) (subKey string, subMap M, oldValue interface{}, present bool, err error) {
+) (subKey string, subMap M, oldValue any, present bool, err error) {
 	// XXX `safemapstr.mapFind` mimics this implementation, both should be updated to have similar behavior
 
 	for {

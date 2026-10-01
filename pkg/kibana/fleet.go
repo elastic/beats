@@ -87,7 +87,7 @@ type AgentPolicy struct {
 	Name string `json:"name"`
 	// Namespace of the policy. Required to create a policy.
 	Namespace          string                    `json:"namespace"`
-	AdvancedSettings   map[string]interface{}    `json:"advanced_settings,omitempty"`
+	AdvancedSettings   map[string]any            `json:"advanced_settings,omitempty"`
 	Description        string                    `json:"description,omitempty"`
 	MonitoringEnabled  []MonitoringEnabledOption `json:"monitoring_enabled,omitempty"`
 	DataOutputID       string                    `json:"data_output_id,omitempty"`
@@ -96,18 +96,18 @@ type AgentPolicy struct {
 	DownloadSourceID   string                    `json:"download_source_id,omitempty"`
 	UnenrollTimeout    int                       `json:"unenroll_timeout,omitempty"`
 	InactivityTImeout  int                       `json:"inactivity_timeout,omitempty"`
-	AgentFeatures      []map[string]interface{}  `json:"agent_features,omitempty"`
-	Overrides          map[string]interface{}    `json:"overrides,omitempty"`
+	AgentFeatures      []map[string]any          `json:"agent_features,omitempty"`
+	Overrides          map[string]any            `json:"overrides,omitempty"`
 	IsProtected        bool                      `json:"is_protected"`
 }
 
 type PolicyResponse struct {
 	AgentPolicy     `json:",inline"`
-	UpdatedOn       time.Time                `json:"updated_on"`
-	UpdatedBy       string                   `json:"updated_by"`
-	Revision        int                      `json:"revision"`
-	IsProtected     bool                     `json:"is_protected"`
-	PackagePolicies []map[string]interface{} `json:"package_policies"`
+	UpdatedOn       time.Time        `json:"updated_on"`
+	UpdatedBy       string           `json:"updated_by"`
+	Revision        int              `json:"revision"`
+	IsProtected     bool             `json:"is_protected"`
+	PackagePolicies []map[string]any `json:"package_policies"`
 }
 
 // AgentPolicyUpdateRequest is the JSON object for requesting an updated policy
@@ -117,7 +117,7 @@ type AgentPolicyUpdateRequest struct {
 	Name string `json:"name"`
 	// Namespace of the policy. Required in an update request.
 	Namespace          string                    `json:"namespace"`
-	AdvancedSettings   map[string]interface{}    `json:"advanced_settings,omitempty"`
+	AdvancedSettings   map[string]any            `json:"advanced_settings,omitempty"`
 	Description        string                    `json:"description,omitempty"`
 	MonitoringEnabled  []MonitoringEnabledOption `json:"monitoring_enabled,omitempty"`
 	DataOutputID       string                    `json:"data_output_id,omitempty"`
@@ -126,8 +126,8 @@ type AgentPolicyUpdateRequest struct {
 	DownloadSourceID   string                    `json:"download_source_id,omitempty"`
 	UnenrollTimeout    int                       `json:"unenroll_timeout,omitempty"`
 	InactivityTImeout  int                       `json:"inactivity_timeout,omitempty"`
-	AgentFeatures      []map[string]interface{}  `json:"agent_features,omitempty"`
-	Overrides          map[string]interface{}    `json:"overrides,omitempty"`
+	AgentFeatures      []map[string]any          `json:"agent_features,omitempty"`
+	Overrides          map[string]any            `json:"overrides,omitempty"`
 	IsProtected        *bool                     `json:"is_protected,omitempty"` // Optional bool for compatibility with the older pre 8.9.0 stack
 }
 
@@ -149,17 +149,17 @@ func (client *Client) CreatePolicy(ctx context.Context, request AgentPolicy) (r 
 }
 
 type DownloadSourceAuth struct {
-	APIKey   string      `json:"api_key,omitempty"`
-	Headers  interface{} `json:"headers,omitempty"`
-	Username string      `json:"username,omitempty"`
-	Password string      `json:"password,omitempty"`
+	APIKey   string `json:"api_key,omitempty"`
+	Headers  any    `json:"headers,omitempty"`
+	Username string `json:"username,omitempty"`
+	Password string `json:"password,omitempty"`
 }
 
 type DownloadSource struct {
 	Name      string              `json:"name"`
 	Host      string              `json:"host"`
 	IsDefault bool                `json:"is_default"`
-	ProxyID   interface{}         `json:"proxy_id"`
+	ProxyID   any                 `json:"proxy_id"`
 	Auth      *DownloadSourceAuth `json:"auth,omitempty"`
 }
 
@@ -710,8 +710,8 @@ type PackagePolicyRequest struct {
 	Namespace string                      `json:"namespace"`
 	PolicyID  string                      `json:"policy_id"`
 	Package   PackagePolicyRequestPackage `json:"package"`
-	Vars      map[string]interface{}      `json:"vars"`
-	Inputs    []map[string]interface{}    `json:"inputs"`
+	Vars      map[string]any              `json:"vars"`
+	Inputs    []map[string]any            `json:"inputs"`
 	Force     bool                        `json:"force"`
 }
 
@@ -728,7 +728,7 @@ type PackagePolicy struct {
 	ID          string                      `json:"id,omitempty"`
 	Revision    int                         `json:"revision"`
 	Enabled     bool                        `json:"enabled"`
-	Inputs      []map[string]interface{}    `json:"inputs"`
+	Inputs      []map[string]any            `json:"inputs"`
 	Package     PackagePolicyRequestPackage `json:"package"`
 	Namespace   string                      `json:"namespace"`
 	OutputID    string                      `json:"output_id"`

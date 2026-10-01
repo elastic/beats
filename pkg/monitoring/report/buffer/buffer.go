@@ -25,7 +25,7 @@ import "sync"
 // the buffer should be thread-safe.
 type ringBuffer struct {
 	mu      sync.Mutex
-	entries []interface{}
+	entries []any
 	i       int
 	full    bool
 }
@@ -33,12 +33,12 @@ type ringBuffer struct {
 // newBuffer returns a reference to a new ringBuffer with set size.
 func newBuffer(size int) *ringBuffer {
 	return &ringBuffer{
-		entries: make([]interface{}, size),
+		entries: make([]any, size),
 	}
 }
 
 // add will add the passed entry to the buffer.
-func (r *ringBuffer) add(entry interface{}) {
+func (r *ringBuffer) add(entry any) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.entries[r.i] = entry
@@ -49,11 +49,11 @@ func (r *ringBuffer) add(entry interface{}) {
 }
 
 // getAll returns all entries in the buffer in order
-func (r *ringBuffer) getAll() []interface{} {
+func (r *ringBuffer) getAll() []any {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if r.i == 0 && !r.full {
-		return []interface{}{}
+		return []any{}
 	}
 	if !r.full {
 		return r.entries[:r.i]

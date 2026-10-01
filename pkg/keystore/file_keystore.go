@@ -190,7 +190,7 @@ func (k *FileKeystore) GetConfig() (*config.C, error) {
 	k.RLock()
 	defer k.RUnlock()
 
-	configHash := make(map[string]interface{})
+	configHash := make(map[string]any)
 	for key, secret := range k.secrets {
 		configHash[key] = string(secret.Value)
 	}

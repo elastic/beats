@@ -28,14 +28,14 @@ import (
 const selector = "cfgwarn"
 
 // Beta logs the usage of an beta feature.
-func Beta(format string, v ...interface{}) {
+func Beta(format string, v ...any) {
 	logp.NewLogger(selector, zap.AddCallerSkip(1)).Warnf("BETA: "+format, v...)
 }
 
 // Deprecate logs a deprecation message.
 // The version string contains the version when the future will be removed.
 // If version is empty, the message  will not mention the removal of the feature.
-func Deprecate(version string, format string, v ...interface{}) {
+func Deprecate(version string, format string, v ...any) {
 	var postfix string
 	if version != "" {
 		postfix = fmt.Sprintf(" Will be removed in version: %s", version)
@@ -44,6 +44,6 @@ func Deprecate(version string, format string, v ...interface{}) {
 }
 
 // Experimental logs the usage of an experimental feature.
-func Experimental(format string, v ...interface{}) {
+func Experimental(format string, v ...any) {
 	logp.NewLogger(selector, zap.AddCallerSkip(1)).Warnf("EXPERIMENTAL: "+format, v...)
 }

@@ -46,7 +46,7 @@ func VarSkipKeys(keys ...string) Option {
 }
 
 // DefaultOptions defaults options used to read the configuration
-var DefaultOptions = []interface{}{
+var DefaultOptions = []any{
 	ucfg.PathSep("."),
 	ucfg.ResolveEnv,
 	ucfg.VarExp,
@@ -62,7 +62,7 @@ func New() *Config {
 }
 
 // NewConfigFrom takes a interface and read the configuration like it was YAML.
-func NewConfigFrom(from interface{}, opts ...interface{}) (*Config, error) {
+func NewConfigFrom(from any, opts ...any) (*Config, error) {
 	if len(opts) == 0 {
 		opts = DefaultOptions
 	}
@@ -83,7 +83,7 @@ func NewConfigFrom(from interface{}, opts ...interface{}) (*Config, error) {
 		o(local)
 	}
 
-	var data map[string]interface{}
+	var data map[string]any
 	var err error
 	if bytes, ok := from.([]byte); ok {
 		err = yaml.Unmarshal(bytes, &data)
@@ -107,14 +107,14 @@ func NewConfigFrom(from interface{}, opts ...interface{}) (*Config, error) {
 		if err != nil {
 			return nil, err
 		}
-	} else if contents, ok := from.(map[string]interface{}); ok {
+	} else if contents, ok := from.(map[string]any); ok {
 		data = contents
 	} else {
 		c, err := ucfg.NewFrom(from, ucfgOpts...)
 		return newConfigFrom(c), err
 	}
 
-	skippedKeys := map[string]interface{}{}
+	skippedKeys := map[string]any{}
 	for _, skip := range local.skipKeys {
 		val, ok := data[skip]
 		if ok {
@@ -140,7 +140,7 @@ func NewConfigFrom(from interface{}, opts ...interface{}) (*Config, error) {
 
 // MustNewConfigFrom try to create a configuration based on the type passed as arguments and panic
 // on failures.
-func MustNewConfigFrom(from interface{}) *Config {
+func MustNewConfigFrom(from any) *Config {
 	c, err := NewConfigFrom(from)
 	if err != nil {
 		panic(fmt.Sprintf("could not read configuration %+v", err))
@@ -153,7 +153,7 @@ func newConfigFrom(in *ucfg.Config) *Config {
 }
 
 // Unpack unpacks a struct to Config.
-func (c *Config) Unpack(to interface{}, opts ...interface{}) error {
+func (c *Config) Unpack(to any, opts ...any) error {
 	ucfgOpts, err := getUcfgOptions(opts...)
 	if err != nil {
 		return err
@@ -166,7 +166,7 @@ func (c *Config) access() *ucfg.Config {
 }
 
 // Merge merges two configuration together.
-func (c *Config) Merge(from interface{}, opts ...interface{}) error {
+func (c *Config) Merge(from any, opts ...any) error {
 	ucfgOpts, err := getUcfgOptions(opts...)
 	if err != nil {
 		return err
@@ -175,8 +175,8 @@ func (c *Config) Merge(from interface{}, opts ...interface{}) error {
 }
 
 // ToMapStr takes the config and transform it into a map[string]interface{}
-func (c *Config) ToMapStr() (map[string]interface{}, error) {
-	var m map[string]interface{}
+func (c *Config) ToMapStr() (map[string]any, error) {
+	var m map[string]any
 	if err := c.Unpack(&m); err != nil {
 		return nil, err
 	}
@@ -220,7 +220,7 @@ func LoadFiles(paths ...string) (*Config, error) {
 	return newConfigFrom(merger.Config()), nil
 }
 
-func getUcfgOptions(opts ...interface{}) ([]ucfg.Option, error) {
+func getUcfgOptions(opts ...any) ([]ucfg.Option, error) {
 	if len(opts) == 0 {
 		opts = DefaultOptions
 	}

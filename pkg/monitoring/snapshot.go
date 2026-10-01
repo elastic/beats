@@ -47,9 +47,9 @@ type keyStack struct {
 }
 
 type eventStack struct {
-	current map[string]interface{}
-	stack   []map[string]interface{}
-	stack0  [32]map[string]interface{}
+	current map[string]any
+	stack   []map[string]any
+	stack0  [32]map[string]any
 }
 
 // CollectFlatSnapshot collects a flattened snapshot of
@@ -80,7 +80,7 @@ func MakeFlatSnapshot() FlatSnapshot {
 // CollectStructSnapshot collects a structured metrics snaphot of
 // a metrics tree starting with the given registry.
 // Empty namespaces will be omitted.
-func CollectStructSnapshot(r *Registry, mode Mode, expvar bool) map[string]interface{} {
+func CollectStructSnapshot(r *Registry, mode Mode, expvar bool) map[string]any {
 	if r == nil {
 		r = Default
 	}
@@ -191,9 +191,9 @@ func (s *structSnapshotVisitor) OnStringSlice(f []string) {
 	s.setValue(c)
 }
 
-func (s *structSnapshotVisitor) setValue(v interface{}) {
+func (s *structSnapshotVisitor) setValue(v any) {
 	if s.event.current == nil {
-		s.event.current = map[string]interface{}{}
+		s.event.current = map[string]any{}
 	}
 
 	s.event.current[s.key.current] = v
@@ -216,7 +216,7 @@ func (s *eventStack) push() {
 	s.current = nil
 }
 
-func (s *eventStack) pop() map[string]interface{} {
+func (s *eventStack) pop() map[string]any {
 	event := s.current
 	last := len(s.stack) - 1
 	s.current = s.stack[last]

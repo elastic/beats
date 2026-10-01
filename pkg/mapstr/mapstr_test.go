@@ -375,7 +375,7 @@ func TestMapStrGetValue(t *testing.T) {
 	tests := []struct {
 		input  M
 		key    string
-		output interface{}
+		output any
 		error  bool
 	}{
 		{
@@ -451,8 +451,8 @@ func TestClone(t *testing.T) {
 			"c32": 2,
 		},
 		"c4": []M{{"c41": 1}},
-		"c5": map[string]interface{}{"c51": 1},
-		"c6": []map[string]interface{}{{"c61": 1}},
+		"c5": map[string]any{"c51": 1},
+		"c6": []map[string]any{{"c61": 1}},
 	}
 
 	// Clone the original mapstr and then increment every value in it. Ensures the test will fail if
@@ -869,11 +869,11 @@ func TestAddTag(t *testing.T) {
 		// Existing tags is a []interface{}, appends
 		{
 			Event: M{
-				"tags": []interface{}{"json"},
+				"tags": []any{"json"},
 			},
 			Tags: []string{"docker"},
 			Output: M{
-				"tags": []interface{}{"json", "docker"},
+				"tags": []any{"json", "docker"},
 			},
 		},
 		// Existing tags is not a []string or []interface{}
@@ -933,14 +933,14 @@ func TestAddTagsWithKey(t *testing.T) {
 		{
 			Event: M{
 				"log": M{
-					"flags": []interface{}{"json"},
+					"flags": []any{"json"},
 				},
 			},
 			Key:  "log.flags",
 			Tags: []string{"docker"},
 			Output: M{
 				"log": M{
-					"flags": []interface{}{"json", "docker"},
+					"flags": []any{"json", "docker"},
 				},
 			},
 		},
@@ -1255,7 +1255,7 @@ func TestFindFold(t *testing.T) {
 		name   string
 		key    string
 		expKey string
-		expVal interface{}
+		expVal any
 		expErr string
 	}{
 		{
