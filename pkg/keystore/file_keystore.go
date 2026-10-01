@@ -31,8 +31,8 @@ import (
 	"runtime"
 	"sync"
 
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/file"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/file"
 )
 
 const (

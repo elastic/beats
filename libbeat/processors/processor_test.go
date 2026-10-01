@@ -35,10 +35,10 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/processors/dissect"
 	_ "github.com/elastic/beats/v7/libbeat/processors/extract_array"
 	_ "github.com/elastic/beats/v7/libbeat/processors/urldecode"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func GetProcessors(t testing.TB, yml []map[string]any) *processors.Processors {

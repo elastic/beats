@@ -32,7 +32,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/testing/certutil"
+	"github.com/elastic/beats/v7/pkg/testing/certutil"
 )
 
 // TestRunHTTPSProxy is an example of how to use the proxytest outside tests,

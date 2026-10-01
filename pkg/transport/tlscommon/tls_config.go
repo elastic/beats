@@ -29,7 +29,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // certPoolProvider abstracts over static and dynamically-reloaded CA pools.

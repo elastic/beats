@@ -27,7 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 const windowErrBuffer = "A message sent on a datagram socket was larger than the internal message" +

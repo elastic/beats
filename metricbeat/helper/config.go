@@ -20,7 +20,7 @@ package helper
 import (
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 )
 
 // Config for an HTTP helper

@@ -24,7 +24,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/elastic/elastic-agent-libs/api/npipe"
+	"github.com/elastic/beats/v7/pkg/api/npipe"
 )
 
 func makeListener(cfg Config) (net.Listener, error) {

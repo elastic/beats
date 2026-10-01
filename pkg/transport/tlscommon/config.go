@@ -21,7 +21,7 @@ import (
 	"crypto/tls"
 	"errors"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // Config defines the user configurable options in the yaml file.

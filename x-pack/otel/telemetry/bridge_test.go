@@ -19,7 +19,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 func newTestBridge(t *testing.T, reader *metric.ManualReader, statsReg, inputsReg *monitoring.Registry) *RegistryBridge {

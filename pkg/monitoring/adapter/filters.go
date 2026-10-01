@@ -20,8 +20,8 @@ package adapter
 import (
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/str"
+	"github.com/elastic/beats/v7/pkg/monitoring"
+	"github.com/elastic/beats/v7/pkg/str"
 )
 
 // provide filters for filtering and adapting a metric type

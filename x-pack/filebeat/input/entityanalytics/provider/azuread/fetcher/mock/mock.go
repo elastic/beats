@@ -10,8 +10,8 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // MFAResponse is the set of MFA registration details returned by the mock fetcher.

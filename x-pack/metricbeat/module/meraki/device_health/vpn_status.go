@@ -7,8 +7,8 @@ package device_health
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/meraki"
-	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/go-resty/resty/v2"
 	sdk "github.com/meraki/dashboard-api-go/v3/sdk"

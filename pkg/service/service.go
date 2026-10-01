@@ -33,8 +33,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 // HandleSignals manages OS signals that ask the service/daemon to stop.

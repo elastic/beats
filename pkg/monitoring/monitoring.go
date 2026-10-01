@@ -20,7 +20,7 @@ package monitoring
 import (
 	"errors"
 
-	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/pkg/config"
 )
 
 // BeatConfig represents the part of the $BEAT.yml to do with monitoring settings

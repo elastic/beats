@@ -34,7 +34,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/testing/certutil"
+	"github.com/elastic/beats/v7/pkg/testing/certutil"
 )
 
 func main() {

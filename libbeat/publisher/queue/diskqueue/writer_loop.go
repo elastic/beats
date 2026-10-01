@@ -22,8 +22,8 @@ import (
 	"encoding/binary"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/paths"
 )
 
 // A segmentedFrame is a data frame waiting to be written to disk along with

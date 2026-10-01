@@ -19,7 +19,7 @@ import (
 	"github.com/osquery/osquery-go"
 	genosquery "github.com/osquery/osquery-go/gen/osquery"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 const (

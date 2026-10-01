@@ -35,8 +35,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/elastic/elastic-agent-libs/file"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/file"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // TestDefaultConfig tests the default config ensuring the default

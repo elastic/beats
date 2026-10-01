@@ -24,7 +24,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // OutputWatcher describes operations for watching output.

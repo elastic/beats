@@ -26,7 +26,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/transport/tlscommontest"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommontest"
 )
 
 const verificationDefault = "verification_mode=full"

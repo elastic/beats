@@ -22,7 +22,7 @@ package memory
 import (
 	"fmt"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 
 	dockerclient "github.com/moby/moby/client"
 

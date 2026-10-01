@@ -24,7 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/kibana"
-	libversion "github.com/elastic/elastic-agent-libs/version"
+	libversion "github.com/elastic/beats/v7/pkg/version"
 )
 
 // GenIndexPatternConfigCmd generates an index pattern for Kibana

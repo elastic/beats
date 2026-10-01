@@ -25,7 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 	bolt "go.etcd.io/bbolt"
 
-	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/beats/v7/pkg/paths"
 )
 
 // pathsAt returns a *paths.Path whose Data dir is a fresh per-test temp dir.

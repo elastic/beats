@@ -23,7 +23,7 @@ import (
 	"encoding/binary"
 	"net"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // FlowID records flow details and statistics.

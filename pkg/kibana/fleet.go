@@ -27,7 +27,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/upgrade/details"
+	"github.com/elastic/beats/v7/pkg/upgrade/details"
 )
 
 // The full documentation for the Kibana API can be found on

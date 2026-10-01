@@ -24,7 +24,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/elastic/elastic-agent-libs/str"
+	"github.com/elastic/beats/v7/pkg/str"
 	ucfg "github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/yaml"
 )

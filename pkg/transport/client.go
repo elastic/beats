@@ -25,9 +25,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/testing"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/testing"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 )
 
 type Client struct {

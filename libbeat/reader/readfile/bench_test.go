@@ -28,7 +28,7 @@ import (
 
 	"golang.org/x/text/encoding"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 func BenchmarkEncoderReader(b *testing.B) {

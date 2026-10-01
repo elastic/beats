@@ -31,7 +31,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/testing/certutil"
+	"github.com/elastic/beats/v7/pkg/testing/certutil"
 )
 
 func (p *Proxy) serveHTTPS(w http.ResponseWriter, r *http.Request) {

@@ -9,8 +9,8 @@ import (
 	"sync"
 	"unicode"
 
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var fieldNameConverter = caseConverter{

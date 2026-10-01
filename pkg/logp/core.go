@@ -34,7 +34,7 @@ import (
 
 	"go.elastic.co/ecszap"
 
-	"github.com/elastic/elastic-agent-libs/file"
+	"github.com/elastic/beats/v7/pkg/file"
 )
 
 var (

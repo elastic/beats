@@ -21,8 +21,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/elastic/elastic-agent-libs/cloudid"
-	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/pkg/cloudid"
+	"github.com/elastic/beats/v7/pkg/config"
 )
 
 type cloudConfig struct {

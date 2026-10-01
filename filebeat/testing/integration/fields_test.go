@@ -28,7 +28,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/testing/integration"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func TestCustomFields(t *testing.T) {

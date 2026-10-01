@@ -24,8 +24,8 @@ import (
 	"sync"
 	"time"
 
-	c "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	c "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 // reporter is a struct that will fill a ring buffer for each monitored registry.

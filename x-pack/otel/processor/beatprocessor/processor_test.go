@@ -14,8 +14,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	_ "github.com/elastic/beats/v7/libbeat/cmd/instance" // needed for registering processors
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

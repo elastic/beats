@@ -15,7 +15,7 @@ steps:
         - pytest.ini
         - dev-tools/**
         - libbeat/**
-        - pkg/systemmetrics/**
+        - pkg/**
         - testing/**
         # Shared CI infrastructure
         - .buildkite/pipeline.yml
@@ -43,7 +43,7 @@ steps:
         - pytest.ini
         - dev-tools/**
         - libbeat/**
-        - pkg/systemmetrics/**
+        - pkg/**
         - testing/**
         # Shared CI infrastructure
         - .buildkite/pipeline.yml
@@ -71,7 +71,7 @@ steps:
         - pytest.ini
         - dev-tools/**
         - libbeat/**
-        - pkg/systemmetrics/**
+        - pkg/**
         - testing/**
         # Shared CI infrastructure
         - .buildkite/pipeline.yml
@@ -103,7 +103,7 @@ steps:
         - pytest.ini
         - dev-tools/**
         - libbeat/**
-        - pkg/systemmetrics/**
+        - pkg/**
         - testing/**
         # Shared CI infrastructure
         - .buildkite/pipeline.yml
@@ -134,7 +134,7 @@ steps:
         - pytest.ini
         - dev-tools/**
         - libbeat/**
-        - pkg/systemmetrics/**
+        - pkg/**
         - testing/**
         # Shared CI infrastructure
         - .buildkite/pipeline.yml
@@ -162,7 +162,7 @@ steps:
         - pytest.ini
         - dev-tools/**
         - libbeat/**
-        - pkg/systemmetrics/**
+        - pkg/**
         - testing/**
         # Shared CI infrastructure
         - .buildkite/pipeline.yml
@@ -194,7 +194,7 @@ steps:
         - pytest.ini
         - dev-tools/**
         - libbeat/**
-        - pkg/systemmetrics/**
+        - pkg/**
         - testing/**
         # Shared CI infrastructure
         - .buildkite/pipeline.yml
@@ -225,7 +225,7 @@ steps:
         - pytest.ini
         - dev-tools/**
         - libbeat/**
-        - pkg/systemmetrics/**
+        - pkg/**
         - testing/**
         # Shared CI infrastructure
         - .buildkite/pipeline.yml
@@ -256,7 +256,7 @@ steps:
         - pytest.ini
         - dev-tools/**
         - libbeat/**
-        - pkg/systemmetrics/**
+        - pkg/**
         - testing/**
         # Shared CI infrastructure
         - .buildkite/pipeline.yml
@@ -307,7 +307,7 @@ steps:
         - go.mod
         - pytest.ini
         - dev-tools/**
-        - pkg/systemmetrics/**
+        - pkg/**
         - testing/**
         # Shared CI infrastructure
         - .buildkite/pipeline.yml
@@ -359,7 +359,7 @@ steps:
         - go.mod
         - pytest.ini
         - dev-tools/**
-        - pkg/systemmetrics/**
+        - pkg/**
         - testing/**
         # Shared CI infrastructure
         - .buildkite/pipeline.yml
@@ -385,7 +385,7 @@ steps:
         - .go-version
         - go.mod
         - dev-tools/**
-        - pkg/systemmetrics/**
+        - pkg/**
         - testing/**
         # Shared CI infrastructure
         - .buildkite/pipeline.yml
@@ -416,7 +416,7 @@ steps:
         - pytest.ini
         - dev-tools/**
         - libbeat/**
-        - pkg/systemmetrics/**
+        - pkg/**
         - testing/**
         # Shared CI infrastructure
         - .buildkite/pipeline.yml
@@ -447,7 +447,7 @@ steps:
         - pytest.ini
         - dev-tools/**
         - libbeat/**
-        - pkg/systemmetrics/**
+        - pkg/**
         - testing/**
         # Shared CI infrastructure
         - .buildkite/pipeline.yml
@@ -478,7 +478,7 @@ steps:
         - pytest.ini
         - dev-tools/**
         - libbeat/**
-        - pkg/systemmetrics/**
+        - pkg/**
         - testing/**
         # Shared CI infrastructure
         - .buildkite/pipeline.yml
@@ -506,7 +506,7 @@ steps:
         - pytest.ini
         - dev-tools/**
         - libbeat/**
-        - pkg/systemmetrics/**
+        - pkg/**
         - testing/**
         # Shared CI infrastructure
         - .buildkite/pipeline.yml
@@ -534,7 +534,7 @@ steps:
         - pytest.ini
         - dev-tools/**
         - libbeat/**
-        - pkg/systemmetrics/**
+        - pkg/**
         - testing/**
         # Shared CI infrastructure
         - .buildkite/pipeline.yml

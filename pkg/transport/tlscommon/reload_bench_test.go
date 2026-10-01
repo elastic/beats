@@ -26,7 +26,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // These benchmarks quantify the memory/allocation impact of the

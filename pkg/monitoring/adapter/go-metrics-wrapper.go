@@ -20,7 +20,7 @@ package adapter
 import (
 	metrics "github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 // go-metrics wrapper interface required to unpack the original metric

@@ -24,7 +24,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // CAReloader periodically reloads CA certificate files from disk.

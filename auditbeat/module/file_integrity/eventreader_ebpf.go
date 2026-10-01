@@ -25,8 +25,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/ebpf"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/ebpfevents"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const clientName = "fim"

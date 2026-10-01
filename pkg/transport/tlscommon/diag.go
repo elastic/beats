@@ -26,7 +26,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // DiagCerts returns a diagnostics hook callback that will validate if the certifiactes (cert + key, and CAs) present in the config are valid.

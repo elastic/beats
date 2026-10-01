@@ -5,7 +5,7 @@
 package utils
 
 import (
-	"github.com/elastic/elastic-agent-libs/version"
+	"github.com/elastic/beats/v7/pkg/version"
 )
 
 type ClusterInfoVersion struct {

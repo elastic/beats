@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 )
 
 // Config is the root of the Metricbeat configuration hierarchy.

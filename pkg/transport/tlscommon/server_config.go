@@ -23,8 +23,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // CertificateReload is the configuration for hot-reloading TLS certificates.

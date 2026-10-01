@@ -19,7 +19,7 @@ package publisher
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // Batch is used to pass a batch of events to the outputs and asynchronously listening

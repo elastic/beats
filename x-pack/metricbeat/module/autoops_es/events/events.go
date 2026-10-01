@@ -6,8 +6,8 @@ package events
 
 import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Create a new Metricbeat Event object without a Transaction ID (so it has no predictable relationship to other events outside of @timestamp).
