@@ -24,9 +24,9 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cpu"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/numcpu"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/cpu"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/numcpu"
 )
 
 func init() {
@@ -59,7 +59,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	normAvgs := load.NormalizedAverages()
 
 	event := mapstr.M{
-		"cores": numcpu.NumCPU(),
+		"cores": numcpu.NumCPUWithLogger(m.Logger()),
 		"1":     avgs.OneMinute,
 		"5":     avgs.FiveMinute,
 		"15":    avgs.FifteenMinute,

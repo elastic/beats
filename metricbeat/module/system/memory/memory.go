@@ -26,10 +26,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	metrics "github.com/elastic/beats/v7/pkg/systemmetrics/metric/memory"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transform/typeconv"
-	metrics "github.com/elastic/elastic-agent-system-metrics/metric/memory"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 func init() {
@@ -47,7 +47,10 @@ type MetricSet struct {
 
 // New is a mb.MetricSetFactory that returns a memory.MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	sys := base.Module().(resolve.Resolver)
+	sys, ok := base.Module().(resolve.Resolver)
+	if !ok {
+		return nil, fmt.Errorf("module %T does not implement resolve.Resolver", base.Module())
+	}
 	return &MetricSet{BaseMetricSet: base, mod: sys}, nil
 }
 
@@ -86,6 +89,9 @@ func (m *MetricSet) Diagnostics() []diagnostics.DiagnosticSetup {
 }
 
 func (m *MetricSet) getMemDiagnostic() []byte {
-	sys := m.BaseMetricSet.Module().(resolve.Resolver)
+	sys, ok := m.Module().(resolve.Resolver)
+	if !ok {
+		return fmt.Appendf(nil, "Error fetching data: module %T does not implement resolve.Resolver", m.Module())
+	}
 	return diagnostics.GetRawFileOrErrorString(sys, "/proc/meminfo")
 }

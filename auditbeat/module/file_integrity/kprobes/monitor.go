@@ -23,6 +23,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -73,6 +74,7 @@ type Monitor struct {
 	cancelFn    context.CancelFunc
 	running     uint32
 	isRecursive bool
+	closeOnce   sync.Once
 	closeErr    error
 }
 
@@ -89,7 +91,14 @@ func New(isRecursive bool) (*Monitor, error) {
 		return nil, err
 	}
 
-	return newMonitor(ctx, isRecursive, pChannel, exec)
+	m, err := newMonitor(ctx, isRecursive, pChannel, exec)
+	if err != nil {
+		if closeErr := pChannel.Close(); closeErr != nil {
+			logp.NewLogger("file_integrity").Warnf("error closing perf channel after monitor creation failure: %v", closeErr)
+		}
+		return nil, err
+	}
+	return m, nil
 }
 
 func newMonitor(ctx context.Context, isRecursive bool, pChannel perfChannel, exec executor) (*Monitor, error) {
@@ -114,7 +123,6 @@ func newMonitor(ctx context.Context, isRecursive bool, pChannel perfChannel, exe
 		ctx:         mCtx,
 		cancelFn:    cancelFunc,
 		isRecursive: isRecursive,
-		closeErr:    nil,
 	}, nil
 }
 
@@ -130,22 +138,12 @@ func (w *Monitor) Add(path string) error {
 }
 
 func (w *Monitor) Close() error {
-	if !atomic.CompareAndSwapUint32(&w.running, 1, 2) {
-		switch atomic.LoadUint32(&w.running) {
-		case 0:
-			// monitor hasn't started yet
-			atomic.StoreUint32(&w.running, 2)
-		default:
-			return nil
-		}
-	}
-
-	w.cancelFn()
-	var allErr error
-	allErr = errors.Join(allErr, w.pathMonitor.Close())
-	allErr = errors.Join(allErr, w.perfChannel.Close())
-
-	return allErr
+	w.closeOnce.Do(func() {
+		atomic.StoreUint32(&w.running, 2)
+		w.cancelFn()
+		w.closeErr = errors.Join(w.pathMonitor.Close(), w.perfChannel.Close())
+	})
+	return w.closeErr
 }
 
 func (w *Monitor) EventChannel() <-chan MonitorEvent {

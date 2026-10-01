@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix binary event data fields being overread into subsequent buffer contents.
+component: winlogbeat
