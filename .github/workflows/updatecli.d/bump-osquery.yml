@@ -12,6 +12,18 @@ scms:
       username: '{{ requiredEnv "GITHUB_ACTOR" }}'
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
       branch: '{{ .scm.branch }}'
+      commitusingapi: true
+      force: false
+
+  githubConfigLocal:
+    kind: github
+    spec:
+      owner: '{{ .scm.owner }}'
+      repository: '{{ .scm.repository }}'
+      user: '{{ requiredEnv "GITHUB_ACTOR" }}'
+      username: '{{ requiredEnv "GITHUB_ACTOR" }}'
+      token: '{{ requiredEnv "GITHUB_TOKEN" }}'
+      branch: '{{ .scm.branch }}'
       commitusingapi: false
       force: false
 
@@ -19,7 +31,7 @@ actions:
   default:
     title: 'Bump bundled osquery to version {{ source "latestOsqueryVersion" }}'
     kind: github/pullrequest
-    scmid: githubConfig
+    scmid: githubConfigLocal
     spec:
       labels:
         - automation
@@ -62,7 +74,7 @@ targets:
   update-distro-json:
     name: 'Update distro.json to osquery {{ source "latestOsqueryVersion" }}'
     disablesourceinput: true
-    scmid: githubConfig
+    scmid: githubConfigLocal
     kind: shell
     spec:
       command: go run ./x-pack/osquerybeat/scripts/update_osquery/main.go --version {{ source "latestOsqueryVersion" }} --distro-file x-pack/osquerybeat/internal/distro/distro.json --changelog-dir changelog/fragments
