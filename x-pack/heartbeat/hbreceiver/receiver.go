@@ -6,8 +6,10 @@ package hbreceiver
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
 
 	"go.opentelemetry.io/collector/component"
@@ -17,7 +19,7 @@ type heartbeatReceiver struct {
 	xpInstance.BeatReceiver
 	ctx                        context.Context
 	cancel                     context.CancelFunc
-	elasticsearchAuthRequester *esClient
+	elasticsearchAuthRequester *eslegclient.Connection
 }
 
 func newHeartbeatReceiver(br xpInstance.BeatReceiver) *heartbeatReceiver {
@@ -39,16 +41,20 @@ func (hb *heartbeatReceiver) Start(_ context.Context, host component.Host) error
 	return nil
 }
 
-func (hb *heartbeatReceiver) Shutdown(ctx context.Context) error {
+func (hb *heartbeatReceiver) Shutdown(ctx context.Context) (err error) {
 	hb.Logger.Info("stopping heartbeat receiver")
 	if hb.cancel != nil {
 		hb.cancel()
 	}
+
 	defer func() {
 		if hb.elasticsearchAuthRequester != nil {
-			hb.elasticsearchAuthRequester.CloseIdleConnections()
+			if closeErr := hb.elasticsearchAuthRequester.Close(); closeErr != nil {
+				err = errors.Join(err, fmt.Errorf("closing Elasticsearch client: %w", closeErr))
+			}
 		}
 	}()
+
 	if err := hb.BeatReceiver.Shutdown(ctx); err != nil {
 		return fmt.Errorf("error stopping heartbeat receiver: %w", err)
 	}
