@@ -44,6 +44,7 @@
 
 ### Extensions
 - **beatsauth** - Beats authentication extension
+- **elasticsearchauth** - Elasticsearch HTTP authentication extension
 - **elasticsearch_storage** - Elasticsearch storage extension
 - **kafkapartitioner** - Kafka partitioner extension
 - **basicauth** - Basic auth extension
