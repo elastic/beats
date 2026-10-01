@@ -46,7 +46,7 @@ const (
 // It abstracts the underlying operations needed to work with ETW, allowing for easier
 // testing and decoupling from the Windows-specific ETW API.
 type sessionOperator interface {
-	newSession(config config) (*etw.Session, error)
+	newSession(config config, logger *logp.Logger) (*etw.Session, error)
 	attachToExistingSession(session *etw.Session) error
 	createRealtimeSession(session *etw.Session) error
 	startConsumer(session *etw.Session) error
@@ -56,8 +56,8 @@ type sessionOperator interface {
 
 type realSessionOperator struct{}
 
-func (op *realSessionOperator) newSession(config config) (*etw.Session, error) {
-	return etw.NewSession(convertConfig(config))
+func (op *realSessionOperator) newSession(config config, logger *logp.Logger) (*etw.Session, error) {
+	return etw.NewSession(convertConfig(config), logger)
 }
 
 func (op *realSessionOperator) attachToExistingSession(session *etw.Session) error {
@@ -145,7 +145,7 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	}
 
 	// Initialize a new ETW session with the provided configuration
-	e.etwSession, err = e.operator.newSession(e.config)
+	e.etwSession, err = e.operator.newSession(e.config, ctx.Logger)
 	if err != nil {
 		ctx.UpdateStatus(status.Failed, "failed to initialize ETW session: "+errDetail(err))
 		return fmt.Errorf("error initializing ETW session: %w", err)
