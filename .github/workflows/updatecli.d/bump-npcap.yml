@@ -13,18 +13,7 @@ scms:
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
       branch: '{{ .scm.branch }}'
       commitusingapi: true
-      force: false
-
-  githubConfigLocal:
-    kind: github
-    spec:
-      owner: '{{ .scm.owner }}'
-      repository: '{{ .scm.repository }}'
-      user: '{{ requiredEnv "GITHUB_ACTOR" }}'
-      username: '{{ requiredEnv "GITHUB_ACTOR" }}'
-      token: '{{ requiredEnv "GITHUB_TOKEN" }}'
-      branch: '{{ .scm.branch }}'
-      commitusingapi: false
+      singlebranch: true
       force: false
 
 actions:
@@ -79,6 +68,12 @@ sources:
     spec:
       command: echo "{{ source "goVersion" }}-npcap-{{ source "npcapVersion" }}-debian9"
 
+  timestamp:
+    name: Current Unix timestamp for changelog fragment filename
+    kind: shell
+    spec:
+      command: date +%s
+
 conditions:
   npcapImageAvailable:
     name: 'Is docker image observability-ci/golang-crossbuild:{{ source "npcapImageTag" }} published?'
@@ -108,6 +103,7 @@ targets:
       file: x-pack/packetbeat/scripts/mage/pcap.go
       matchpattern: 'NpcapVersion = "\d+\.\d+"'
       content: 'NpcapVersion = "{{ source "npcapVersion" }}"'
+
   update-license:
     name: "Update Version in x-pack/packetbeat/npcap/installer/LICENSE"
     sourceid: npcapVersion
@@ -121,16 +117,16 @@ targets:
   create-changelog-fragment:
     name: 'Create changelog fragment for npcap {{ source "npcapVersion" }}'
     disablesourceinput: true
-    scmid: githubConfigLocal
-    kind: shell
+    scmid: githubConfig
+    kind: file
     dependson:
       - update-pcap-go
       - update-license
     spec:
-      command: |
-        ts=$(date +%s)
-        printf 'kind: enhancement\nsummary: bump npcap OEM installer to {{ source "npcapVersion" }}\ndescription: Bump the npcap OEM installer version used by Packetbeat to {{ source "npcapVersion" }}.\ncomponent: packetbeat\n' \
-          > "changelog/fragments/${ts}-bump-npcap-{{ source "npcapVersion" }}.yaml"
-      environments:
-        - name: HOME
-        - name: PATH
+      file: 'changelog/fragments/{{ source "timestamp" }}-bump-npcap-{{ source "npcapVersion" }}.yaml'
+      forcecreate: true
+      content: |
+        kind: enhancement
+        summary: bump npcap OEM installer to {{ source "npcapVersion" }}
+        description: Bump the npcap OEM installer version used by Packetbeat to {{ source "npcapVersion" }}.
+        component: packetbeat
