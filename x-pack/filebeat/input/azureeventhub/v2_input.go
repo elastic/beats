@@ -12,7 +12,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"net"
 	"strings"
 	"time"
@@ -643,12 +642,10 @@ func newWebSocketDialer(proxy httpcommon.HTTPClientProxySettings) func(ctx conte
 			HTTPClient:   client,
 		}
 
-		wssConn, resp, err := websocket.Dial(ctx, args.Host, opts)
+		wssConn, _, err := websocket.Dial(ctx, args.Host, opts) //nolint:bodyclose // resp.Body is nil on success; coder/websocket hijacks the conn and nils the body (dial.go:148).
 		if err != nil {
 			return nil, err
 		}
-		_, _ = io.Copy(io.Discard, resp.Body)
-		_ = resp.Body.Close()
 
 		return websocket.NetConn(ctx, wssConn, websocket.MessageBinary), nil
 	}

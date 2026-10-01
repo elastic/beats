@@ -276,7 +276,7 @@ This option applies to processor v1 only. Processor v2 derives the storage endpo
 ### `transport` [_transport]
 
 ```{applies_to}
-stack: ga 9.4.9+, ga 9.5.6+, ga 9.6.0+
+stack: ga 9.4+
 ```
 
 The transport protocol for the Event Hub connection. Default is `amqp`.
@@ -290,7 +290,7 @@ WebSocket transport requires processor v2. If `processor_version` is set to `v1`
 ### `proxy_url` [_proxy_url]
 
 ```{applies_to}
-stack: ga 9.4.9+, ga 9.5.6+, ga 9.6.0+
+stack: ga 9.4+
 ```
 
 URL of the HTTP proxy to use for outbound connections. Applies to the WebSocket Event Hub connection (when `transport` is `websocket`), blob storage requests, and Entra ID credential requests. When unset, proxy configuration falls back to the `HTTPS_PROXY` and `NO_PROXY` environment variables.
@@ -302,7 +302,7 @@ When `transport` is `amqp`, the AMQP connection to Event Hub on port 5671 does n
 ### `proxy_disable` [_proxy_disable]
 
 ```{applies_to}
-stack: ga 9.4.9+, ga 9.5.6+, ga 9.6.0+
+stack: ga 9.4+
 ```
 
 If `true`, all proxy settings are ignored, including `proxy_url` and the `HTTPS_PROXY` environment variable. Default is `false`.
@@ -318,6 +318,10 @@ Valid values:
 Switching from v1 to v2 changes the checkpoint storage layout. Existing v1 checkpoints are migrated automatically on first v2 start. Going back to v1 afterwards resumes from stale v1 checkpoints and may cause duplicate events.
 
 ### `storage_account_connection_string` [_storage_account_connection_string]
+
+```{applies_to}
+stack: ga 9.4+
+```
 
 The connection string for the storage account used for checkpoint storage (processor v2 only). When not set, the input attempts to construct it from `storage_account` and `storage_account_key` if both are present.
 
