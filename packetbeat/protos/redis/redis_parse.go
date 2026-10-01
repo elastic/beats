@@ -348,6 +348,12 @@ func (p *parser) parseString(buf *streambuf.Buffer) (common.NetString, bool, boo
 		return empty, false, false
 	}
 
+	// RESP defines -1 as nil (handled above). Other negative lengths
+	// are malformed and can cause invalid slice bounds in CollectWithSuffix.
+	if length < 0 {
+		return empty, false, false
+	}
+
 	content, err := buf.CollectWithSuffix(int(length), []byte("\r\n"))
 	if err != nil {
 		if err != streambuf.ErrNoMoreBytes {
