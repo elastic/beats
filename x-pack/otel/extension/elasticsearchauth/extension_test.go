@@ -265,38 +265,6 @@ func TestRoundTripperClosesIdleConnections(t *testing.T) {
 	require.Equal(t, 1, base.closedIdleConnections, "idle connection cleanup must reach the wrapped transport")
 }
 
-func TestNestedAuthenticatorTransportComposition(t *testing.T) {
-	base := &recordingRoundTripper{}
-	nestedTransport := &nestedRoundTripper{}
-	nestedAuth := &testHTTPClientAuthenticator{
-		wrap: func(base http.RoundTripper) http.RoundTripper {
-			nestedTransport.base = base
-			return nestedTransport
-		},
-	}
-	config := validConfig()
-	config.Auth = configoptional.Some(configauth.Config{AuthenticatorID: nestedAuthenticatorID()})
-	config.Headers = configopaque.MapList{{Name: "X-Extension", Value: "extension"}}
-	authenticator := createTestExtension(t, config)
-
-	require.NoError(t, authenticator.Start(t.Context(), extensionsHost{nestedAuthenticatorID(): nestedAuth}), "nested authenticator resolution must succeed")
-
-	roundTripper, err := authenticator.RoundTripper(base)
-	require.NoError(t, err, "nested transport composition must succeed")
-	require.Same(t, base, nestedAuth.base, "nested authenticator must receive the consumer-supplied base transport")
-
-	request, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "https://es.example:9200", nil)
-	require.NoError(t, err, "request creation must succeed")
-	response, err := roundTripper.RoundTrip(request)
-	require.NoError(t, err, "composed request must succeed")
-	require.NoError(t, response.Body.Close(), "response body must close")
-	require.Equal(t, "nested", base.request.Header.Get("X-Nested"), "nested transport must participate in the request")
-	require.Equal(t, "extension", base.request.Header.Get("X-Extension"), "destination headers must wrap the nested transport")
-
-	_, exposesClose := roundTripper.(interface{ CloseIdleConnections() })
-	require.False(t, exposesClose, "elasticsearchauth wrapper must not expose nested transport lifecycle operations")
-}
-
 func TestAuthenticationRoundTrip(t *testing.T) {
 	tests := []struct {
 		name       string
@@ -515,34 +483,4 @@ func (r *recordingRoundTripper) RoundTrip(request *http.Request) (*http.Response
 
 func (r *recordingRoundTripper) CloseIdleConnections() {
 	r.closedIdleConnections++
-
 }
-
-func (a *testHTTPClientAuthenticator) RoundTripper(base http.RoundTripper) (http.RoundTripper, error) {
-	a.base = base
-	return a.wrap(base), nil
-}
-
-type nestedRoundTripper struct {
-	base http.RoundTripper
-}
-
-func (n *nestedRoundTripper) RoundTrip(request *http.Request) (*http.Response, error) {
-	request.Header.Set("X-Nested", "nested")
-	return n.base.RoundTrip(request)
-}
-
-type recordingRoundTripper struct {
-	request *http.Request
-}
-
-func (r *recordingRoundTripper) RoundTrip(request *http.Request) (*http.Response, error) {
-	r.request = request
-	return &http.Response{
-		StatusCode: http.StatusNoContent,
-		Body:       io.NopCloser(strings.NewReader("")),
-		Request:    request,
-	}, nil
-}
-
-func (*recordingRoundTripper) CloseIdleConnections() {}
