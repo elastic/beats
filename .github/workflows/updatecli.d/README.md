@@ -17,9 +17,18 @@ Tracks `NPCAP_VERSION` in `elastic/golang-crossbuild/Makefile.common` and opens 
 
 - **Config**: `bump-npcap.yml`
 - **Workflow**: `.github/workflows/bump-npcap.yml` (runs daily at 06:00 UTC)
-- **Source**: `NPCAP_VERSION` read directly from `golang-crossbuild/Makefile.common` via `githubcontent`
+- **Source**: `NPCAP_VERSION` fetched from `golang-crossbuild/Makefile.common` via `gh api`
 - **Gate**: `dockerimage` condition confirms `observability-ci/golang-crossbuild:{go-version}-npcap-{version}-debian9` is published before opening a PR, ensuring beats CI won't fail due to a missing crossbuild image
-- **Files updated**: `x-pack/packetbeat/scripts/mage/pcap.go`, `x-pack/packetbeat/npcap/installer/LICENSE`
+- **Files updated**: `x-pack/packetbeat/scripts/mage/pcap.go`, `x-pack/packetbeat/npcap/installer/LICENSE`, `changelog/fragments/`
+
+## Bump osquery
+
+Tracks the latest osquery release on `osquery/osquery` and opens a PR updating the bundled osquery runtime used by osquerybeat.
+
+- **Config**: `bump-osquery.yml`
+- **Workflow**: `.github/workflows/bump-osquery.yml` (runs daily at 07:00 UTC)
+- **Source**: latest release from `osquery/osquery` GitHub releases
+- **Files updated**: `x-pack/osquerybeat/internal/distro/distro.json` (version + SHA256 checksums for all platforms), `changelog/fragments/`
 
 ## Bump VM Images
 
