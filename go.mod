@@ -192,7 +192,7 @@ require (
 	github.com/icholy/digest v0.1.22
 	github.com/klauspost/compress v1.20.0
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
-	github.com/microsoft/go-mssqldb v1.11.0
+	github.com/microsoft/go-mssqldb v1.11.2
 	github.com/microsoft/wmi v0.44.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.161.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.161.0
