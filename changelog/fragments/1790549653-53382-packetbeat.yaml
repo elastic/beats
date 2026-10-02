@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix contact fields handling to use Contact instead of To header.
+component: packetbeat
