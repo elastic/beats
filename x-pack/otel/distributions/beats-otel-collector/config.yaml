@@ -7,7 +7,8 @@ extensions:
   elasticsearchauth:
     endpoints:
       - http://localhost:9200
-    auth: beatsauth
+    auth:
+      authenticator: beatsauth
   elasticsearch_storage:
     hosts:
       - http://localhost:9200
