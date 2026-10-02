@@ -62,6 +62,26 @@ certificate behavior, proxies, dialing, keepalive, Kerberos, and every other
 transport concern on `beatsauth`; transport fields on `elasticsearchauth` are
 rejected by strict configuration decoding.
 
+## Elasticsearch storage configuration
+
+`elasticsearch_storage` uses an `elasticsearchauth` extension for both its
+destination endpoints and its HTTP transport:
+
+```yaml
+extensions:
+  elasticsearchauth/state:
+    endpoints: [https://es.example:9200]
+    api_key: <base64-encoded-id:key>
+
+  elasticsearch_storage:
+    auth:
+      authenticator: elasticsearchauth/state
+```
+
+Configure destination and authentication settings on `elasticsearchauth`;
+`elasticsearch_storage` no longer accepts independent Elasticsearch connection
+settings.
+
 ## Elasticsearch output compatibility
 
 | Output setting | Extension behavior or required configuration |
