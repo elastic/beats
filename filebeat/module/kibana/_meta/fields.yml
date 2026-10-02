@@ -39,6 +39,33 @@
           description: "The set of space ids that a saved object was removed from."
           example: "['default', 'marketing']"
           type: keyword
+        - name: diff.format
+          description: "The schema of the saved object attribute diff attached to this event."
+          example: "json_patch_extended"
+          type: keyword
+        - name: diff.ops
+          type: object
+          dynamic: false
+          description: >
+            JSON Patch operations describing the saved object attributes changed by this event, emitted when saved object diff auditing is enabled in Kibana.
+            Each operation may include `value` and `oldValue` whose JSON type varies by attribute (string, number, boolean, array, or object).
+            Those two fields are intentionally not declared: `dynamic: false` on this object stores them in `_source` without adding a mapping,
+            so the first event to arrive can never fix their type and later events with a different type are never rejected.
+        - name: diff.ops.op
+          description: "The operation performed on the attribute."
+          example: "replace"
+          type: keyword
+        - name: diff.ops.path
+          description: "RFC 6901 JSON Pointer to the changed attribute."
+          example: "/title"
+          type: keyword
+        - name: diff.noOps
+          type: object
+          description: "Attributes present in the saved object but not changed by this event."
+        - name: diff.noOps.path
+          description: "RFC 6901 JSON Pointer to an attribute that was not changed by this event."
+          example: "/description"
+          type: keyword
         - name: authentication_provider
           description: "The authentication provider associated with a login event."
           example: "basic1"
