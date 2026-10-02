@@ -543,7 +543,6 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 https://github.com/elastic/beats/compare/v8.19.14\...v8.19.15[View commits]
 
 [discrete]
-<<<<<<< HEAD
 ==== Known issues
 
 **All**
@@ -557,10 +556,6 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 [discrete]
 [[security-updates-8.19.15]]
 ==== Security updates
-=======
-[[security-updates-8.19.15]]
-=== Security updates
->>>>>>> 9d8c81fc4e (Add 8.19.15 release notes to CHANGELOG.asciidoc)
 
 **Agentbeat**
 
@@ -568,11 +563,7 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[new-features-8.19.15]]
-<<<<<<< HEAD
 ==== New features
-=======
-=== New features
->>>>>>> 9d8c81fc4e (Add 8.19.15 release notes to CHANGELOG.asciidoc)
 
 **Filebeat**
 
@@ -580,11 +571,7 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[enhancements-8.19.15]]
-<<<<<<< HEAD
 ==== Enhancements
-=======
-=== Enhancements
->>>>>>> 9d8c81fc4e (Add 8.19.15 release notes to CHANGELOG.asciidoc)
 
 **All**
 
@@ -596,11 +583,7 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[upgrades-8.19.15]]
-<<<<<<< HEAD
 ==== Upgrades
-=======
-=== Upgrades
->>>>>>> 9d8c81fc4e (Add 8.19.15 release notes to CHANGELOG.asciidoc)
 
 **Filebeat**
 
@@ -608,20 +591,12 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[bug-fixes-8.19.15]]
-<<<<<<< HEAD
 ==== Bug fixes
-=======
-=== Bug fixes
->>>>>>> 9d8c81fc4e (Add 8.19.15 release notes to CHANGELOG.asciidoc)
 
 **Filebeat**
 
 * Fix `http_endpoint` input shared server lifecycle causing joiner deadlock and creator killing unrelated inputs. https://github.com/elastic/beats/pull/49415[#49415] https://github.com/elastic/beats/issues/47770[#47770]
-<<<<<<< HEAD
 * Fix `container` input not respecting `max_bytes` when parsing CRI partial lines. https://github.com/elastic/beats/pull/49743[#49743] https://github.com/elastic/beats/issues/49259[#49259]
-=======
-* Fix `container` input not respecting `max_bytes` when parsing CRI partial lines. ttps://github.com/elastic/beats/pull/49743[#49743] https://github.com/elastic/beats/issues/49259[#49259]
->>>>>>> 9d8c81fc4e (Add 8.19.15 release notes to CHANGELOG.asciidoc)
 * Fix CSV decoder producing malformed JSON when field values contain double quotes in `azure-blob-storage` input. https://github.com/elastic/beats/pull/50097[#50097] https://github.com/elastic/beats/issues/50097[#50097]
 * Update mito to v1.23.2, fixing runtime error location reporting. https://github.com/elastic/beats/pull/50221[#50221]
 
