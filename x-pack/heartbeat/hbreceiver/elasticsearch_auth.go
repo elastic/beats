@@ -95,6 +95,7 @@ func newESClient(
 	}
 
 	connectionErrors := make([]string, 0, len(endpoints))
+	var fallbackClient *eslegclient.Connection
 	for _, endpoint := range endpoints {
 		client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 			URL:       endpoint,
@@ -114,10 +115,23 @@ func newESClient(
 		}
 		if err := client.Connect(ctx); err != nil {
 			connectionErrors = append(connectionErrors, err.Error())
+			if fallbackClient == nil {
+				fallbackClient = client
+			}
 			continue
 		}
 
 		return client, nil
+	}
+
+	if fallbackClient != nil {
+		logger.Warnf(
+			"couldn't connect to any Elasticsearch authenticator endpoint; "+
+				"Heartbeat will continue without previous monitor state until "+
+				"connectivity returns: %s",
+			strings.Join(connectionErrors, "; "),
+		)
+		return fallbackClient, nil
 	}
 
 	return nil, fmt.Errorf(

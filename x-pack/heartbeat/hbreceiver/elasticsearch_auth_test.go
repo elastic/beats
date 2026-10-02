@@ -7,6 +7,7 @@ package hbreceiver
 import (
 	"bytes"
 	"context"
+	"errors"
 	"io"
 	"net/http"
 	"strings"
@@ -122,6 +123,23 @@ func TestElasticsearchAuthStartHookErrors(t *testing.T) {
 
 func TestElasticsearchAuthStartHookEmptyReference(t *testing.T) {
 	require.NoError(t, elasticsearchAuthStartHook(t.Context(), "", nil, "", logp.NewNopLogger(), func(*eslegclient.Connection) {})(nil), "empty Elasticsearch auth reference should be a no-op")
+}
+
+func TestNewESClientConnectivityFailureIsBestEffort(t *testing.T) {
+	transport := roundTripperFunc(func(*http.Request) (*http.Response, error) {
+		return nil, errors.New("Elasticsearch is unavailable")
+	})
+	extension := &fakeElasticsearchAuthExtension{
+		endpoints:    []string{"http://example.test"},
+		roundTripper: transport,
+	}
+
+	client, err := newESClient(t.Context(), extension, "", logp.NewNopLogger())
+	require.NoError(t, err, "temporary Elasticsearch connectivity failures must not prevent client creation")
+	require.NotNil(t, client, "a client must be returned so state loading can retry after connectivity returns")
+
+	_, _, err = client.Request("GET", "/_search", "", nil, nil)
+	require.Error(t, err, "the fallback client must preserve the connectivity error for state loading")
 }
 
 func TestElasticsearchAuthStartHookInjectsBeforeRun(t *testing.T) {
