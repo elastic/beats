@@ -1311,7 +1311,7 @@ The number of connected clients and the read and write operations performed by t
 
 ## locks [_locks]
 
-A document that reports for each lock <type>, data on lock <mode>s. The possible lock <type>s are global, database, collection, metadata and oplog. The possible <mode>s are r, w, R and W which respresent shared, exclusive, intent shared and intent exclusive.
+A document that reports for each lock <type>, data on lock <mode>s. The possible lock <type>s are global, database, collection, metadata and oplog. The possible <mode>s are r, w, R and W which represent shared, exclusive, intent shared and intent exclusive.
 locks.<type>.acquire.count.<mode> shows the number of times the lock was acquired in the specified mode. locks.<type>.wait.count.<mode> shows the number of times the locks.acquireCount lock acquisitions encountered waits because the locks were held in a conflicting mode. locks.<type>.wait.us.<mode> shows the cumulative wait time in microseconds for the lock acquisitions. locks.<type>.deadlock.count.<mode> shows the number of times the lock acquisitions encountered deadlocks.
 
 **`mongodb.status.locks.global.acquire.count.r`**
