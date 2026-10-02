@@ -1,0 +1,19 @@
+kind: enhancement
+
+summary: Add OpenTelemetry storage.Extension support to the elasticsearch_storage extension.
+
+description: |
+  The elasticsearch_storage extension now implements the OpenTelemetry
+  storage.Extension interface (GetClient), so OTel receivers can persist state
+  in Elasticsearch when running agentless without a durable local disk. Each
+  component identity maps to its own sanitized index, values are stored in a
+  self-describing {v, enc, updated_at} envelope that round-trips arbitrary
+  bytes as well as verbatim JSON, and every client shares the extension's
+  single connection and mutex so the OTel path, the Beats Access path, and the
+  entcollect path stay serialized.
+
+component: filebeat
+
+pr: https://github.com/elastic/beats/pull/51805
+
+issue: https://github.com/elastic/beats/issues/50223
