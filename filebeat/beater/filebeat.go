@@ -153,7 +153,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		haveEnabledInputs = true
 	}
 
-	if !config.ConfigInput.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledInputs && config.Autodiscover == nil && !b.Manager.Enabled() {
+	if !config.ConfigInput.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledInputs && config.Autodiscover == nil && !management.UnderAgent() {
 		if !b.InSetupCmd {
 			return nil, fmt.Errorf("no modules or inputs enabled and configuration reloading disabled. What files do you want me to watch?")
 		}
@@ -193,7 +193,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 
 // setupPipelineLoaderCallback sets the callback function for loading pipelines during setup.
 func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
-	if b.Config.Output.Name() != "elasticsearch" && !b.Manager.Enabled() {
+	if b.Config.Output.Name() != "elasticsearch" && !management.UnderAgent() {
 		fb.logger.Warn(pipelinesWarning)
 		return nil
 	}
@@ -248,7 +248,7 @@ func (fb *Filebeat) WithESStateStoreExtension(esStateStoreExtension backend.Regi
 // setup.
 func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 	if b.Config.Output.Name() != "elasticsearch" {
-		if !b.Manager.Enabled() {
+		if !management.UnderAgent() {
 			fb.logger.Warn(pipelinesWarning)
 		}
 		return nil
@@ -441,7 +441,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		if b.Config.Output.Name() == "elasticsearch" {
 			pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config(), b.Info)
 		} else {
-			if !b.Manager.Enabled() {
+			if !management.UnderAgent() {
 				fb.logger.Warn(pipelinesWarning)
 			}
 		}
