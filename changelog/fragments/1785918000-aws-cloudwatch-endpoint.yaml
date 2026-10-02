@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Honor the AWS endpoint setting in the aws-cloudwatch input
+component: filebeat
