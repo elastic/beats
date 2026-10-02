@@ -30,7 +30,7 @@ Review important information about the  8.19.23 release.
 
 **Filebeat**
 
-* Reuse the UDP and unix datagram read buffer so each packet allocates only its own length. https://github.com/elastic/beats/pull/53490[#53490] 
+* Reuse the UDP and Unix datagram read buffer so each packet allocates only its own length. https://github.com/elastic/beats/pull/53490[#53490] 
 
 
 
@@ -44,20 +44,20 @@ Review important information about the  8.19.23 release.
 
 **Auditbeat**
 
-* Fix auditbeat file_integrity kprobe leak that could prevent FIM from starting when the running kernel does not match the first candidate BTF spec. https://github.com/elastic/beats/pull/53253[#53253] https://github.com/elastic/beats/issues/45827[#45827]
-* Fix process misattribution in system/socket where TCP/UDP flows were attributed to wrong processes. https://github.com/elastic/beats/pull/53421[#53421] https://github.com/elastic/beats/issues/44741[#44741]
+* Fix Auditbeat `file_integrity` kprobe leak that could prevent FIM from starting when the running kernel does not match the first candidate BTF spec. https://github.com/elastic/beats/pull/53253[#53253] https://github.com/elastic/beats/issues/45827[#45827]
+* Fix process misattribution in `system/socket` where TCP/UDP flows were attributed to wrong processes. https://github.com/elastic/beats/pull/53421[#53421] https://github.com/elastic/beats/issues/44741[#44741]
 
 
 **Filebeat**
 
 * Wire Sarama client logs in the Filebeat Kafka input so consumer-group lifecycle is visible. https://github.com/elastic/beats/pull/52871[#52871] https://github.com/elastic/beats/issues/51305[#51305]
-* Respond to http_endpoint requests that contain no events instead of closing the connection. https://github.com/elastic/beats/pull/53261[#53261] 
-* Fix httpjson rate limiter marking input Degraded when rate-limit headers are absent. https://github.com/elastic/beats/pull/53326[#53326] https://github.com/elastic/beats/issues/53185[#53185]
+* Respond to `http_endpoint` requests that contain no events instead of closing the connection. https://github.com/elastic/beats/pull/53261[#53261] 
+* Fix `httpjson` rate limiter marking the input "Degraded" when rate-limit headers are absent. https://github.com/elastic/beats/pull/53326[#53326] https://github.com/elastic/beats/issues/53185[#53185]
 
 
 **Packetbeat**
 
-* Fix panic in DHCPv4 parser when OptionTimeOffset value is shorter than 4 bytes. https://github.com/elastic/beats/pull/53419[#53419] https://github.com/elastic/beats/issues/53330[#53330]
+* Fix panic in DHCPv4 parser when the `OptionTimeOffset` value is shorter than 4 bytes. https://github.com/elastic/beats/pull/53419[#53419] https://github.com/elastic/beats/issues/53330[#53330]
 
 
 **Winlogbeat**
