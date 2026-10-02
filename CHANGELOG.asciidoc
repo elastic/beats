@@ -3,6 +3,59 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+// begin 8.19.22 relnotes
+
+[[release-notes-8.19.22]]
+== Beats version 8.19.22
+
+https://github.com/elastic/beats/compare/v8.19.21\...v8.19.22[View commits]
+
+[discrete]
+[[enhancements-8.19.22]]
+=== Enhancements
+
+**Filebeat**
+
+* Add `api_endpoint` configuration option to `gcp-pubsub` input to allow overriding the default Pub/Sub API endpoint. https://github.com/elastic/beats/pull/53080[#53080]
+* Add `hints.input_allow_list` to restrict Filebeat hints-generated input types.  https://github.com/elastic/beats/issues/52624[#52624]
+
+**Packetbeat**
+
+* Log Npcap installer diagnostic files on installation failure. https://github.com/elastic/beats/pull/52667[#52667]
+
+[discrete]
+[[bug-fixes-8.19.22]]
+=== Bug fixes
+
+**All**
+
+* Revert non-Ironbank container images to UBI9. https://github.com/elastic/beats/pull/52823[#52823]
+
+**Filebeat**
+
+* Scope the `aws-s3` polling state registry to the input&#39;s bucket. https://github.com/elastic/beats/pull/52728[#52728] https://github.com/elastic/beats/issues/52721[#52721]
+* Prevent `httpjson` chain pagination from advancing the cursor when a chained request fails.
+* Follow every CrowdStrike discover resource instead of only the first feed.
+* Fix race condition in Kafka input when multiple inputs are configured.  https://github.com/elastic/beats/issues/34919[#34919]
+* Fix Azure AD entity analytics accumulating stale registered owners and users on devices.
+* Fix Active Directory entity analytics panic when `ssl.certificate_authorities` is set.
+
+**Heartbeat**
+
+* Align maintenance window recurrence handling with Kibana, including nth-weekday rules, `tzid` timezone evaluation, `until` end bounds, hourly recurrences, inclusive duration behavior, and legacy `dtstart` formats. https://github.com/elastic/beats/pull/52572[#52572] https://github.com/elastic/beats/issues/52571[#52571]
+
+**Metricbeat**
+
+* Fix Kubernetes metadata watcher deadlock that blocked metricset shutdown.
+
+**Packetbeat**
+
+* Censor HTTP parameters for mixed-case `hide_keywords` entries. https://github.com/elastic/beats/pull/52650[#52650]
+* Fix bounds-check panics in Packetbeat TLS and Cassandra protocol parsers.
+* Fix rendering of TLS certificate serial numbers so each byte is always represented as two hex digits, matching OpenSSL output.
+
+// end 8.19.22 relnotes
+
 // begin 8.19.21 relnotes
 
 [[release-notes-8.19.21]]
@@ -490,6 +543,7 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 https://github.com/elastic/beats/compare/v8.19.14\...v8.19.15[View commits]
 
 [discrete]
+<<<<<<< HEAD
 ==== Known issues
 
 **All**
@@ -503,6 +557,10 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 [discrete]
 [[security-updates-8.19.15]]
 ==== Security updates
+=======
+[[security-updates-8.19.15]]
+=== Security updates
+>>>>>>> 9d8c81fc4e (Add 8.19.15 release notes to CHANGELOG.asciidoc)
 
 **Agentbeat**
 
@@ -510,7 +568,11 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[new-features-8.19.15]]
+<<<<<<< HEAD
 ==== New features
+=======
+=== New features
+>>>>>>> 9d8c81fc4e (Add 8.19.15 release notes to CHANGELOG.asciidoc)
 
 **Filebeat**
 
@@ -518,7 +580,11 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[enhancements-8.19.15]]
+<<<<<<< HEAD
 ==== Enhancements
+=======
+=== Enhancements
+>>>>>>> 9d8c81fc4e (Add 8.19.15 release notes to CHANGELOG.asciidoc)
 
 **All**
 
@@ -530,7 +596,11 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[upgrades-8.19.15]]
+<<<<<<< HEAD
 ==== Upgrades
+=======
+=== Upgrades
+>>>>>>> 9d8c81fc4e (Add 8.19.15 release notes to CHANGELOG.asciidoc)
 
 **Filebeat**
 
@@ -538,12 +608,20 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-take-over]
 
 [discrete]
 [[bug-fixes-8.19.15]]
+<<<<<<< HEAD
 ==== Bug fixes
+=======
+=== Bug fixes
+>>>>>>> 9d8c81fc4e (Add 8.19.15 release notes to CHANGELOG.asciidoc)
 
 **Filebeat**
 
 * Fix `http_endpoint` input shared server lifecycle causing joiner deadlock and creator killing unrelated inputs. https://github.com/elastic/beats/pull/49415[#49415] https://github.com/elastic/beats/issues/47770[#47770]
+<<<<<<< HEAD
 * Fix `container` input not respecting `max_bytes` when parsing CRI partial lines. https://github.com/elastic/beats/pull/49743[#49743] https://github.com/elastic/beats/issues/49259[#49259]
+=======
+* Fix `container` input not respecting `max_bytes` when parsing CRI partial lines. ttps://github.com/elastic/beats/pull/49743[#49743] https://github.com/elastic/beats/issues/49259[#49259]
+>>>>>>> 9d8c81fc4e (Add 8.19.15 release notes to CHANGELOG.asciidoc)
 * Fix CSV decoder producing malformed JSON when field values contain double quotes in `azure-blob-storage` input. https://github.com/elastic/beats/pull/50097[#50097] https://github.com/elastic/beats/issues/50097[#50097]
 * Update mito to v1.23.2, fixing runtime error location reporting. https://github.com/elastic/beats/pull/50221[#50221]
 
