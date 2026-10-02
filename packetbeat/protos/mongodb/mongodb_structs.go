@@ -129,6 +129,9 @@ const (
 	opGetMore    opCode = 2005
 	opDelete     opCode = 2006
 	opKillCursor opCode = 2007
+	opCommand    opCode = 2010
+	opCommandRep opCode = 2011
+	opCompressed opCode = 2012
 	opMsg        opCode = 2013
 )
 
@@ -144,6 +147,9 @@ var opCodeNames = map[opCode]string{
 	2005: "OP_GET_MORE",
 	2006: "OP_DELETE",
 	2007: "OP_KILL_CURSORS",
+	2010: "OP_COMMAND",
+	2011: "OP_COMMANDREPLY",
+	2012: "OP_COMPRESSED",
 	2013: "OP_MSG",
 }
 
