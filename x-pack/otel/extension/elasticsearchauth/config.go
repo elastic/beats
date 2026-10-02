@@ -6,7 +6,6 @@
 package elasticsearchauth
 
 import (
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/url"
@@ -34,8 +33,8 @@ type Config struct {
 	User string `mapstructure:"user"`
 	// Password configures HTTP Basic authentication with User.
 	Password configopaque.String `mapstructure:"password"`
-	// APIKey configures Elasticsearch ApiKey authentication. It must be the
-	// base64-encoded id:key representation accepted by Elasticsearch.
+	// APIKey configures Elasticsearch ApiKey authentication as a raw, non-empty
+	// id:key pair. The extension encodes it when constructing the request header.
 	APIKey configopaque.String `mapstructure:"api_key"`
 }
 
@@ -115,13 +114,11 @@ func validateAuthentication(user string, password, apiKey configopaque.String) e
 	if !hasAPIKey {
 		return nil
 	}
-	decoded, err := base64.StdEncoding.DecodeString(string(apiKey))
-	if err != nil {
-		return errors.New("api_key must be base64-encoded id:key")
-	}
-	id, key, found := strings.Cut(string(decoded), ":")
+
+	id, key, found := strings.Cut(string(apiKey), ":")
 	if !found || id == "" || key == "" {
-		return errors.New("api_key must be base64-encoded id:key")
+		return errors.New("api_key must be raw non-empty id:key")
 	}
+
 	return nil
 }

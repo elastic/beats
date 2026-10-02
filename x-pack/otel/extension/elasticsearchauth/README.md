@@ -28,7 +28,7 @@ extensions:
 
   elasticsearchauth/default:
     endpoints: [https://es.example:9200]
-    api_key: <base64-encoded-id:key>
+    api_key: <id>:<key>
     headers:
       X-Elastic-Product-Origin: custom
     auth:
@@ -36,9 +36,10 @@ extensions:
 ```
 
 Only plural `endpoints` is accepted. Each must be a fully resolved HTTP(S) URL.
-`api_key` is base64-encoded `id:key`; alternatively configure both `user` and
-`password`. Endpoint userinfo cannot be combined with explicit
-credentials or an `Authorization` destination header.
+`api_key` is the raw, non-empty Beats-style `id:key`; the extension base64-encodes
+it exactly once when constructing `Authorization: ApiKey <base64(id:key)>`.
+Alternatively configure both `user` and `password`. Endpoint userinfo cannot be
+combined with explicit credentials or an `Authorization` destination header.
 
 When `auth.authenticator` performs HTTP authentication, do not also configure
 `user`, `password`, `api_key`, or an `Authorization` header on
@@ -66,7 +67,7 @@ rejected by strict configuration decoding.
 | Output setting | Extension behavior or required configuration |
 | --- | --- |
 | `hosts`, `protocol`, `path`, query parameters, Cloud ID, env substitutions | Configure their fully resolved results as plural `endpoints`; the extension does not perform endpoint resolution. |
-| `username`/`password`, `api_key` | Configure either `user` and `password`, or a base64-encoded `api_key`; the mechanisms are mutually exclusive. |
+| `username`/`password`, `api_key` | Configure either `user` and `password`, or a raw, non-empty Beats-style `id:key` as `api_key`; the mechanisms are mutually exclusive, and the extension owns base64 encoding for the authorization header. |
 | `headers` | Configure `headers` directly on `elasticsearchauth`; an `Authorization` header cannot be combined with Basic/API-key credentials. |
 | TLS, certificate reload, `ca_trusted_fingerprint`, verification modes | Configure on an optional `beatsauth` extension and reference it through `auth.authenticator`. |
 | `proxy_url`, `proxy_headers`, `proxy_disable` | Configure on an optional `beatsauth` extension and reference it through `auth.authenticator`. |

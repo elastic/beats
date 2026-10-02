@@ -6,6 +6,7 @@ package elasticsearchauth
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/http"
@@ -112,6 +113,7 @@ type authenticatedRoundTripper struct {
 
 func (a *authenticatedRoundTripper) RoundTrip(request *http.Request) (*http.Response, error) {
 	clonedRequest := request.Clone(request.Context())
+
 	if clonedRequest.Header == nil {
 		clonedRequest.Header = make(http.Header)
 	}
@@ -121,11 +123,14 @@ func (a *authenticatedRoundTripper) RoundTrip(request *http.Request) (*http.Resp
 	for name, value := range a.config.Headers.Iter {
 		clonedRequest.Header.Set(name, string(value))
 	}
+
 	if a.config.APIKey != "" {
-		clonedRequest.Header.Set("Authorization", "ApiKey "+string(a.config.APIKey))
+		encodedAPIKey := base64.StdEncoding.EncodeToString([]byte(a.config.APIKey))
+		clonedRequest.Header.Set("Authorization", "ApiKey "+encodedAPIKey)
 	} else if a.config.User != "" {
 		clonedRequest.SetBasicAuth(a.config.User, string(a.config.Password))
 	}
+
 	return a.transport.RoundTrip(clonedRequest)
 }
 
