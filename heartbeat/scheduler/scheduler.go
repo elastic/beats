@@ -162,9 +162,9 @@ func (s *Scheduler) Stop() {
 // Wait until all tasks are done if run in runOnce mode. Will block forever
 // if this scheduler does not have the runOnce option set.
 // Adding new tasks after this method is invoked is not supported.
+// It does not stop the scheduler, as other users may share it; see hbscheduler.
 func (s *Scheduler) WaitForRunOnce() {
 	s.runOnceWg.Wait()
-	s.Stop()
 }
 
 // ErrAlreadyStopped is returned when an Add operation is attempted after the scheduler

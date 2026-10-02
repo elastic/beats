@@ -13,8 +13,24 @@ import (
 )
 
 // Config is config settings for heartbeat receiver.  The structure of
-// which is the same as the heartbeat.yml configuration file.
+// which is the same as the heartbeat.yml configuration file, except for the
+// receiver specific settings declared as fields below.
 type Config struct {
+	// SchedulerGroup makes this receiver share its scheduler, and therefore its
+	// `heartbeat.scheduler.limit` and `heartbeat.jobs.<type>.limit` concurrency
+	// bounds, with every other heartbeat receiver in this collector configured
+	// with the same group. A Heartbeat process only ever has one scheduler, so
+	// grouping the receivers that were split out of one Heartbeat process keeps
+	// those limits meaningful.
+	//
+	// The first receiver of a group to start configures its scheduler, later
+	// receivers with conflicting limits log a warning. Receivers of a group must
+	// agree on `run_once`, a receiver that does not fails to start.
+	//
+	// Defaults to the receiver's own id, giving each receiver a scheduler of its
+	// own.
+	SchedulerGroup string `mapstructure:"scheduler_group"`
+
 	Beatconfig map[string]any `mapstructure:",remain"`
 }
 
