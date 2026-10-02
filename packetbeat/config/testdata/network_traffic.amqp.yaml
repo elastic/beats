@@ -1,0 +1,18 @@
+# Source: network_traffic/data_stream/amqp/agent/stream/amqp.yml.hbs
+type: amqp
+ports:
+  - 5672
+fields_under_root: true
+fields:
+  _conf:
+    geoip_enrich: false
+    map_to_ecs: true
+processors:
+  - add_host_metadata: ~
+interface:
+  device: default_route
+procs:
+  enabled: true
+data_stream:
+  dataset: network_traffic.amqp
+  type: logs

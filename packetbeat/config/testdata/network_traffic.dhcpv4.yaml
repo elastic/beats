@@ -1,0 +1,16 @@
+# Source: network_traffic/data_stream/dhcpv4/agent/stream/dhcpv4.yml.hbs
+type: dhcpv4
+fields_under_root: true
+fields:
+  _conf:
+    geoip_enrich: false
+    map_to_ecs: true
+processors:
+  - add_host_metadata: ~
+interface:
+  device: default_route
+procs:
+  enabled: true
+data_stream:
+  dataset: network_traffic.dhcpv4
+  type: logs
