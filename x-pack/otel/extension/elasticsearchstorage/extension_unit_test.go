@@ -11,10 +11,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/confmap"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestConfigValidate(t *testing.T) {
@@ -25,7 +26,7 @@ func TestConfigValidate(t *testing.T) {
 }
 
 func TestConfigDecode(t *testing.T) {
-	config := createDefaultConfig().(*Config)
+	config := createDefaultConfig().(*Config) //nolint:errcheck // we know the type
 	require.NoError(t, confmap.NewFromStringMap(map[string]any{
 		"auth": map[string]any{
 			"authenticator": "elasticsearchauth/state",
