@@ -11,9 +11,80 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
+
+func TestNewOtelManager_AgentInfo(t *testing.T) {
+	t.Cleanup(func() { management.SetUnderAgent(false) })
+
+	tests := []struct {
+		name     string
+		cfg      map[string]any
+		expected management.AgentInfo
+		wantErr  bool
+	}{
+		{
+			name: "managed unprivileged",
+			cfg: map[string]any{
+				"enabled": true,
+				"agent": map[string]any{
+					"id":           "agent-id",
+					"version":      "9.6.0",
+					"snapshot":     true,
+					"mode":         "managed",
+					"unprivileged": true,
+				},
+			},
+			expected: management.AgentInfo{
+				ID:           "agent-id",
+				Version:      "9.6.0",
+				Snapshot:     true,
+				ManagedMode:  management.AgentManagedMode_MANAGED,
+				Unprivileged: true,
+			},
+		},
+		{
+			name: "standalone privileged",
+			cfg: map[string]any{
+				"enabled": true,
+				"agent":   map[string]any{"version": "9.6.0", "mode": "standalone"},
+			},
+			expected: management.AgentInfo{
+				Version:     "9.6.0",
+				ManagedMode: management.AgentManagedMode_STANDALONE,
+			},
+		},
+		{
+			name:     "no agent info",
+			cfg:      map[string]any{"enabled": true},
+			expected: management.AgentInfo{},
+		},
+		{
+			name: "invalid mode",
+			cfg: map[string]any{
+				"enabled": true,
+				"agent":   map[string]any{"version": "9.6.0", "mode": "fleet"},
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			m, err := NewOtelManager(config.MustNewConfigFrom(tc.cfg), nil, logp.NewNopLogger())
+			if tc.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			assert.False(t, m.Enabled(), "Enabled must stay false for beat receivers")
+			assert.Equal(t, tc.expected, m.AgentInfo())
+		})
+	}
+}
 
 // fakeActionExtension implements ActionExtension for testing OtelManager's
 // forwarding of RegisterAction/UnregisterAction.

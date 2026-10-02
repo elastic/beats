@@ -6,6 +6,7 @@ package otelmanager
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
@@ -52,9 +53,60 @@ var _ management.Manager = (*OtelManager)(nil)
 var _ WithDiagnosticExtension = (*OtelManager)(nil)
 var _ WithActionExtension = (*OtelManager)(nil)
 
+// agentConfig is the Elastic Agent information passed by Elastic Agent under
+// management.otel.agent, as beat receivers don't use the control protocol.
+type agentConfig struct {
+	ID           string `config:"id"`
+	Version      string `config:"version"`
+	Snapshot     bool   `config:"snapshot"`
+	Mode         string `config:"mode"`
+	Unprivileged bool   `config:"unprivileged"`
+}
+
+type otelManagerConfig struct {
+	Agent *agentConfig `config:"agent"`
+}
+
 func NewOtelManager(cfg *config.C, registry *reload.Registry, logger *logp.Logger) (management.Manager, error) {
 	management.SetUnderAgent(true)
-	return &OtelManager{logger: logger}, nil
+	agentInfo, err := agentInfoFromConfig(cfg)
+	if err != nil {
+		return nil, err
+	}
+	return &OtelManager{logger: logger, agentInfo: agentInfo}, nil
+}
+
+// agentInfoFromConfig returns an empty AgentInfo when Elastic Agent didn't pass
+// any agent information, for example in a hand-written collector configuration.
+func agentInfoFromConfig(cfg *config.C) (management.AgentInfo, error) {
+	if cfg == nil {
+		return management.AgentInfo{}, nil
+	}
+	var c otelManagerConfig
+	if err := cfg.Unpack(&c); err != nil {
+		return management.AgentInfo{}, fmt.Errorf("error unpacking management.otel config: %w", err)
+	}
+	if c.Agent == nil {
+		return management.AgentInfo{}, nil
+	}
+
+	var mode management.AgentManagedMode
+	switch c.Agent.Mode {
+	case "managed":
+		mode = management.AgentManagedMode_MANAGED
+	case "standalone":
+		mode = management.AgentManagedMode_STANDALONE
+	default:
+		return management.AgentInfo{}, fmt.Errorf("invalid management.otel.agent.mode %q: must be 'managed' or 'standalone'", c.Agent.Mode)
+	}
+
+	return management.AgentInfo{
+		ID:           c.Agent.ID,
+		Version:      c.Agent.Version,
+		Snapshot:     c.Agent.Snapshot,
+		ManagedMode:  mode,
+		Unprivileged: c.Agent.Unprivileged,
+	}, nil
 }
 
 // OtelManager is the main manager for managing beatreceivers
@@ -65,6 +117,7 @@ type OtelManager struct {
 	logger       *logp.Logger
 	stopFn       func()
 	stopOnce     sync.Once
+	agentInfo    management.AgentInfo
 }
 
 func (n *OtelManager) UpdateStatus(_ status.Status, _ string) {
@@ -85,7 +138,7 @@ func (n *OtelManager) Stop() {
 // Enabled returns false because many places inside beats call manager.Enabled() for various purposes
 // Returning true might lead to side effects.
 func (n *OtelManager) Enabled() bool                      { return false }
-func (n *OtelManager) AgentInfo() management.AgentInfo    { return management.AgentInfo{} }
+func (n *OtelManager) AgentInfo() management.AgentInfo    { return n.agentInfo }
 func (n *OtelManager) PreInit() error                     { return nil }
 func (n *OtelManager) PostInit()                          {}
 func (n *OtelManager) Start() error                       { return nil }

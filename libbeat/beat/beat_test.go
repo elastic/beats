@@ -34,6 +34,7 @@ type testManager struct {
 	isUnpriv  bool
 	mgmtMode  management.AgentManagedMode
 	isEnabled bool
+	version   string
 }
 
 func (tm testManager) UpdateStatus(_ status.Status, _ string) {}
@@ -43,7 +44,7 @@ func (tm testManager) PreInit() error                         { return nil }
 func (tm testManager) PostInit()                              {}
 func (tm testManager) Stop()                                  {}
 func (tm testManager) AgentInfo() management.AgentInfo {
-	return management.AgentInfo{Unprivileged: tm.isUnpriv, ManagedMode: tm.mgmtMode}
+	return management.AgentInfo{Unprivileged: tm.isUnpriv, ManagedMode: tm.mgmtMode, Version: tm.version}
 }
 func (tm testManager) SetStopCallback(_ func())             {}
 func (tm testManager) CheckRawConfig(_ *config.C) error     { return nil }
@@ -56,9 +57,31 @@ func (tm testManager) RegisterDiagnosticHook(_ string, _ string, _ string, _ str
 func TestUserAgentString(t *testing.T) {
 	tests := []struct {
 		beat             *Beat
+		underAgent       bool
 		expectedComments []string
 		name             string
 	}{
+		{
+			name: "otel-managed-unprivileged",
+			beat: &Beat{Info: Info{Beat: "testbeat"},
+				Manager: testManager{isEnabled: false, isUnpriv: true, mgmtMode: management.AgentManagedMode_MANAGED, version: "9.6.0"}},
+			underAgent:       true,
+			expectedComments: []string{"Managed", "Unprivileged"},
+		},
+		{
+			name: "otel-unmanaged-privileged",
+			beat: &Beat{Info: Info{Beat: "testbeat"},
+				Manager: testManager{isEnabled: false, isUnpriv: false, mgmtMode: management.AgentManagedMode_STANDALONE, version: "9.6.0"}},
+			underAgent:       true,
+			expectedComments: []string{"Unmanaged"},
+		},
+		{
+			name: "otel-without-agent-info",
+			beat: &Beat{Info: Info{Beat: "testbeat"},
+				Manager: testManager{isEnabled: false}},
+			underAgent:       true,
+			expectedComments: []string{},
+		},
 		{
 			name: "managed-unprivileged",
 			beat: &Beat{Info: Info{Beat: "testbeat"},
@@ -114,6 +137,8 @@ func TestUserAgentString(t *testing.T) {
 	uaReg := regexp.MustCompile(`Elastic-testbeat/([\d.]+) \(([\w-:+; ]+)\)`)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			management.SetUnderAgent(test.underAgent)
+			t.Cleanup(func() { management.SetUnderAgent(false) })
 			test.beat.GenerateUserAgent()
 			res := uaReg.FindAllStringSubmatch(test.beat.Info.UserAgent, -1)
 			// check to make sure the regex passed, then verify the comments section

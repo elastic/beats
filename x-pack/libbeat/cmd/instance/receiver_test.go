@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -200,6 +201,32 @@ func (a *fakeAction) Name() string { return a.name }
 func (a *fakeAction) Execute(_ context.Context, _ map[string]any) (map[string]any, error) {
 	a.executed.Store(true)
 	return map[string]any{"ok": true}, nil
+}
+
+func TestNewBeatForReceiver_AgentInfo(t *testing.T) {
+	cfg := map[string]any{
+		"path.home":               t.TempDir(),
+		"management.otel.enabled": true,
+		"management.otel.agent": map[string]any{
+			"id":           "agent-id",
+			"version":      version.GetDefaultVersion(),
+			"mode":         "managed",
+			"unprivileged": true,
+		},
+	}
+	defer management.SetUnderAgent(false) // reset global state set by NewBeatForReceiver
+	b, err := NewBeatForReceiver(
+		cmd.FilebeatSettings("filebeat"),
+		cfg,
+		consumertest.NewNop(),
+		"test-receiver",
+		zapcore.NewNopCore(),
+	)
+	require.NoError(t, err)
+
+	assert.False(t, b.Manager.Enabled())
+	assert.Equal(t, "agent-id", b.Manager.AgentInfo().ID)
+	assert.Contains(t, b.Info.UserAgent, "; Managed; Unprivileged)")
 }
 
 // TestBeatReceiverStart_WiresActionAndDiagnosticExtensions verifies that Start
