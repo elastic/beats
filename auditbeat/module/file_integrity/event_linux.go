@@ -15,160 +15,118 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux
+//go:build linux && (amd64 || arm64) && cgo
 
 package file_integrity
 
 import (
+	"fmt"
 	"os"
 	"os/user"
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"syscall"
 	"time"
 
+	quark "github.com/elastic/go-quark"
+
 	"github.com/elastic/beats/v7/libbeat/ebpf/sys"
-	"github.com/elastic/ebpfevents"
 )
 
 // cgroupRegex captures 64-character lowercase hexadecimal container IDs found in cgroup paths.
 var cgroupRegex = regexp.MustCompile(`[-/]([0-9a-f]{64})(\.scope)?$`)
 
-// NewEventFromEbpfEvent creates a new Event from an ebpfevents.Event.
-func NewEventFromEbpfEvent(
-	ee ebpfevents.Event,
+// NewEventFromQuarkEvent creates an Event from a quark file event. It returns
+// false when the event has no file payload, targets an excluded path, or does
+// not describe a file operation the module reports on.
+func NewEventFromQuarkEvent(
+	qe quark.Event,
 	maxFileSize uint64,
 	hashTypes []HashType,
 	fileParsers []FileParser,
 	isExcludedPath func(string) bool,
 ) (Event, bool) {
-	var (
-		path, target, cgroupPath string
-		action                   Action
-		metadata                 Metadata
-		process                  Process
-		err                      error
-		errors                   []error
-	)
-	switch ee.Type {
-	case ebpfevents.EventTypeFileCreate:
-		action = Created
+	file := qe.File
+	if file == nil || file.Path == "" {
+		return Event{}, false
+	}
+	if isExcludedPath(file.Path) {
+		return Event{Path: file.Path}, false
+	}
 
-		fileCreateEvent := ee.Body.(*ebpfevents.FileCreate)
-		path = fileCreateEvent.Path
-		if isExcludedPath(path) {
-			event := Event{Path: path}
-			return event, false
-		}
-		target = fileCreateEvent.SymlinkTargetPath
+	action := actionFromQuarkFile(file)
+	if action == None {
+		return Event{Path: file.Path}, false
+	}
 
-		metadata, err = metadataFromFileCreate(fileCreateEvent)
-		if err != nil {
-			errors = append(errors, err)
-		}
-
-		process, err = processFromFileCreate(fileCreateEvent)
-		if err != nil {
-			errors = append(errors, err)
-		}
-
-		cgroupPath = fileCreateEvent.CgroupPath
-	case ebpfevents.EventTypeFileRename:
-		action = Moved
-
-		fileRenameEvent := ee.Body.(*ebpfevents.FileRename)
-		path = fileRenameEvent.NewPath
-		if isExcludedPath(path) {
-			event := Event{Path: path}
-			return event, false
-		}
-		target = fileRenameEvent.SymlinkTargetPath
-
-		metadata, err = metadataFromFileRename(fileRenameEvent)
-		if err != nil {
-			errors = append(errors, err)
-		}
-
-		process, err = processFromFileRename(fileRenameEvent)
-		if err != nil {
-			errors = append(errors, err)
-		}
-
-		cgroupPath = fileRenameEvent.CgroupPath
-	case ebpfevents.EventTypeFileDelete:
-		action = Deleted
-
-		fileDeleteEvent := ee.Body.(*ebpfevents.FileDelete)
-		path = fileDeleteEvent.Path
-		if isExcludedPath(path) {
-			event := Event{Path: path}
-			return event, false
-		}
-		target = fileDeleteEvent.SymlinkTargetPath
-
-		process, err = processFromFileDelete(fileDeleteEvent)
-		if err != nil {
-			errors = append(errors, err)
-		}
-
-		cgroupPath = fileDeleteEvent.CgroupPath
-	case ebpfevents.EventTypeFileModify:
-		fileModifyEvent := ee.Body.(*ebpfevents.FileModify)
-
-		switch fileModifyEvent.ChangeType {
-		case ebpfevents.FileChangeTypeContent:
-			action = Updated
-		case ebpfevents.FileChangeTypePermissions, ebpfevents.FileChangeTypeOwner, ebpfevents.FileChangeTypeXattrs:
-			action = AttributesModified
-		}
-
-		path = fileModifyEvent.Path
-		if isExcludedPath(path) {
-			event := Event{Path: path}
-			return event, false
-		}
-		target = fileModifyEvent.SymlinkTargetPath
-
-		metadata, err = metadataFromFileModify(fileModifyEvent)
-		if err != nil {
-			errors = append(errors, err)
-		}
-
-		process, err = processFromFileModify(fileModifyEvent)
-		if err != nil {
-			errors = append(errors, err)
-		}
-
-		cgroupPath = fileModifyEvent.CgroupPath
+	var errs []error
+	process, err := processFromQuark(qe.Process)
+	if err != nil {
+		errs = append(errs, err)
 	}
 
 	event := Event{
 		Timestamp:   time.Now().UTC(),
-		Path:        path,
-		TargetPath:  target,
-		Info:        &metadata,
+		Path:        file.Path,
+		TargetPath:  file.SymTarget,
 		Source:      SourceEBPF,
 		Action:      action,
 		Process:     &process,
-		ContainerID: containerIDFromCgroupPath(cgroupPath),
-		errors:      errors,
+		ContainerID: containerIDFromCgroupPath(qe.Process.Cgroup),
 	}
 
-	if event.Action == Deleted {
-		event.Info = nil
-	} else {
-		switch event.Info.Type {
+	// A removed file has no metadata to report, mirroring the other backends.
+	if action&Deleted == 0 {
+		md, err := metadataFromQuarkFile(file)
+		if err != nil {
+			errs = append(errs, err)
+		}
+		event.Info = &md
+
+		switch md.Type {
 		case FileType:
-			fillHashes(&event, path, maxFileSize, hashTypes, fileParsers)
+			fillHashes(&event, file.Path, maxFileSize, hashTypes, fileParsers)
 		case SymlinkType:
 			event.TargetPath, err = filepath.EvalSymlinks(event.Path)
 			if err != nil {
-				event.errors = append(event.errors, err)
+				errs = append(errs, err)
 			}
 		}
 	}
 
+	event.errors = errs
 	return event, true
+}
+
+// actionFromQuarkFile maps quark's operation and change masks to an Action.
+// quark aggregates operations on the same inode that happen close together, so
+// several bits can be set at once. The final state of the file wins: a removal
+// or move outranks the create or modifications that preceded it.
+func actionFromQuarkFile(file *quark.File) Action {
+	switch {
+	case file.OpMask&quark.QUARK_FILE_OP_REMOVE != 0:
+		return Deleted
+	case file.OpMask&quark.QUARK_FILE_OP_MOVE != 0:
+		return Moved
+	case file.OpMask&quark.QUARK_FILE_OP_CREATE != 0:
+		return Created
+	case file.OpMask&quark.QUARK_FILE_OP_MODIFY != 0:
+		var action Action
+		if file.ChangeMask&quark.QUARK_FILE_CH_CONTENT != 0 {
+			action |= Updated
+		}
+		if file.ChangeMask&(quark.QUARK_FILE_CH_PERMS|quark.QUARK_FILE_CH_OWNER|quark.QUARK_FILE_CH_XATTRS) != 0 {
+			action |= AttributesModified
+		}
+		if action == None {
+			// quark reported a modification without saying what changed.
+			action = Updated
+		}
+		return action
+	default:
+		return None
+	}
 }
 
 func containerIDFromCgroupPath(path string) string {
@@ -179,127 +137,98 @@ func containerIDFromCgroupPath(path string) string {
 	return ""
 }
 
-func metadataFromFileCreate(evt *ebpfevents.FileCreate) (Metadata, error) {
-	var md Metadata
-	fillExtendedAttributes(&md, evt.Path)
-	err := fillFileInfo(&md, evt.Finfo)
-	return md, err
-}
-
-func metadataFromFileRename(evt *ebpfevents.FileRename) (Metadata, error) {
-	var md Metadata
-	fillExtendedAttributes(&md, evt.NewPath)
-	err := fillFileInfo(&md, evt.Finfo)
-	return md, err
-}
-
-func metadataFromFileModify(evt *ebpfevents.FileModify) (Metadata, error) {
-	var md Metadata
-	fillExtendedAttributes(&md, evt.Path)
-	err := fillFileInfo(&md, evt.Finfo)
-	return md, err
-}
-
-func newProcess(pid uint32, start uint64, comm string, euid, egid uint32) (Process, error) {
-	var (
-		p   Process
-		err error
-	)
-
-	t, err := sys.TimeFromNsSinceBoot(start)
-	if err != nil {
-		return p, err
+// metadataFromQuarkFile fills Metadata from the stat data quark captured in
+// the kernel at the time of the event. Mode keeps only the permission bits so
+// that file.mode matches what the fsnotify backend reports.
+func metadataFromQuarkFile(file *quark.File) (Metadata, error) {
+	md := Metadata{
+		Inode:  file.Inode,
+		UID:    file.Uid,
+		GID:    file.Gid,
+		Size:   file.Size,
+		MTime:  time.Unix(0, int64(file.Mtime)), //nolint:gosec // nanosecond timestamps fit in int64
+		CTime:  time.Unix(0, int64(file.Ctime)), //nolint:gosec // nanosecond timestamps fit in int64
+		Type:   typeFromStatMode(file.Mode),
+		Mode:   os.FileMode(file.Mode) & os.ModePerm,
+		SetUID: file.Mode&syscall.S_ISUID != 0,
+		SetGID: file.Mode&syscall.S_ISGID != 0,
 	}
+	fillExtendedAttributes(&md, file.Path)
 
-	p.EntityID, err = sys.EntityID(pid, t)
-	if err != nil {
-		return p, err
-	}
-	p.Name = comm
-	p.PID = pid
-
-	p.User.ID = strconv.FormatUint(uint64(euid), 10)
-	u, err := user.LookupId(p.User.ID)
-	if err == nil {
-		p.User.Name = u.Username
-	} else {
-		p.User.Name = "n/a"
-	}
-
-	p.Group.ID = strconv.FormatUint(uint64(egid), 10)
-	g, err := user.LookupGroupId(p.Group.ID)
-	if err == nil {
-		p.Group.Name = g.Name
-	} else {
-		p.Group.Name = "n/a"
-	}
-
-	return p, nil
-}
-
-func processFromFileCreate(evt *ebpfevents.FileCreate) (Process, error) {
-	return newProcess(evt.Pids.Tgid, evt.Pids.StartTimeNs, evt.Comm, evt.Creds.Euid, evt.Creds.Egid)
-}
-
-func processFromFileRename(evt *ebpfevents.FileRename) (Process, error) {
-	return newProcess(evt.Pids.Tgid, evt.Pids.StartTimeNs, evt.Comm, evt.Creds.Euid, evt.Creds.Egid)
-}
-
-func processFromFileModify(evt *ebpfevents.FileModify) (Process, error) {
-	return newProcess(evt.Pids.Tgid, evt.Pids.StartTimeNs, evt.Comm, evt.Creds.Euid, evt.Creds.Egid)
-}
-
-func processFromFileDelete(evt *ebpfevents.FileDelete) (Process, error) {
-	return newProcess(evt.Pids.Tgid, evt.Pids.StartTimeNs, evt.Comm, evt.Creds.Euid, evt.Creds.Egid)
-}
-
-func fillFileInfo(md *Metadata, finfo ebpfevents.FileInfo) error {
-	md.Inode = finfo.Inode
-	md.UID = finfo.Uid
-	md.GID = finfo.Gid
-	md.Size = finfo.Size
-	md.MTime = finfo.Mtime
-	md.CTime = finfo.Ctime
-	md.Type = typeFromEbpfType(finfo.Type)
-	md.Mode = finfo.Mode
-	md.SetUID = finfo.Mode&os.ModeSetuid != 0
-	md.SetGID = finfo.Mode&os.ModeSetgid != 0
-
-	u, err := user.LookupId(strconv.FormatUint(uint64(finfo.Uid), 10))
+	u, err := user.LookupId(strconv.FormatUint(uint64(file.Uid), 10))
 	if err != nil {
 		md.Owner = "n/a"
 		md.Group = "n/a"
-		return err
+		return md, err
 	}
 	md.Owner = u.Username
 
-	g, err := user.LookupGroupId(strconv.FormatUint(uint64(finfo.Gid), 10))
+	g, err := user.LookupGroupId(strconv.FormatUint(uint64(file.Gid), 10))
 	if err != nil {
 		md.Group = "n/a"
-		return err
+		return md, err
 	}
 	md.Group = g.Name
 
-	return nil
+	return md, nil
 }
 
-func typeFromEbpfType(typ ebpfevents.FileType) Type {
-	switch typ {
-	case ebpfevents.FileTypeFile:
+// typeFromStatMode maps the file type bits of a stat(2) st_mode to a Type.
+func typeFromStatMode(mode uint32) Type {
+	switch mode & syscall.S_IFMT {
+	case syscall.S_IFREG:
 		return FileType
-	case ebpfevents.FileTypeDir:
+	case syscall.S_IFDIR:
 		return DirType
-	case ebpfevents.FileTypeSymlink:
+	case syscall.S_IFLNK:
 		return SymlinkType
-	case ebpfevents.FileTypeCharDevice:
+	case syscall.S_IFCHR:
 		return CharDeviceType
-	case ebpfevents.FileTypeBlockDevice:
+	case syscall.S_IFBLK:
 		return BlockDeviceType
-	case ebpfevents.FileTypeNamedPipe:
+	case syscall.S_IFIFO:
 		return FIFOType
-	case ebpfevents.FileTypeSocket:
+	case syscall.S_IFSOCK:
 		return SocketType
 	default:
 		return UnknownType
 	}
+}
+
+// processFromQuark builds the Process attached to a file event from quark's
+// process cache entry. The entity ID uses the same boot-relative start time
+// reduction as the rest of auditbeat so IDs stay consistent across sources.
+func processFromQuark(p quark.Process) (Process, error) {
+	proc := Process{
+		PID:  p.Pid,
+		Name: p.Comm,
+	}
+	if !p.Proc.Valid {
+		return proc, fmt.Errorf("quark has no process state for pid %d", p.Pid)
+	}
+
+	start, err := sys.TimeFromNsSinceBoot(p.Proc.TimeBoot)
+	if err != nil {
+		return proc, err
+	}
+	proc.EntityID, err = sys.EntityID(p.Pid, start)
+	if err != nil {
+		return proc, err
+	}
+
+	proc.User.ID = strconv.FormatUint(uint64(p.Proc.Euid), 10)
+	if u, err := user.LookupId(proc.User.ID); err == nil {
+		proc.User.Name = u.Username
+	} else {
+		proc.User.Name = "n/a"
+	}
+
+	proc.Group.ID = strconv.FormatUint(uint64(p.Proc.Egid), 10)
+	if g, err := user.LookupGroupId(proc.Group.ID); err == nil {
+		proc.Group.Name = g.Name
+	} else {
+		proc.Group.Name = "n/a"
+	}
+
+	return proc, nil
 }
