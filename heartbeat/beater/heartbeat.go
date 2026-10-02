@@ -84,13 +84,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		if err == nil {
 			trace = sockTrace
 		} else {
-			logger.Warnf(
-				"could not connect to socket trace at path %s after %s "+
-					"timeout: %v",
-				stConfig.Path,
-				stConfig.Wait,
-				err,
-			)
+			logger.Warnf("could not connect to socket trace at path %s after %s timeout: %v", stConfig.Path, stConfig.Wait, err)
 		}
 	}
 
@@ -335,21 +329,11 @@ func (bt *Heartbeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
 	bt.otelStatusFactoryWrapper = wrapper
 }
 
-// WithElasticsearchStateLoader atomically installs a monitor state loader that
-// reads prior monitor state from Elasticsearch using requester. Callers such as
-// the OTel Heartbeat receiver invoke this before Run so monitors use the
-// injected client.
-func (bt *Heartbeat) WithElasticsearchStateLoader(
-	requester monitorstate.ElasticsearchRequester,
-) {
-	bt.replaceStateLoader(
-		monitorstate.MakeESLoader(
-			requester,
-			monitorstate.DefaultDataStreams,
-			bt.config.RunFrom,
-			bt.logger,
-		),
-	)
+// WithElasticsearchStateLoader atomically installs a monitor state loader that reads
+// prior monitor state from Elasticsearch using requester. Callers such as the OTel
+// Heartbeat receiver invoke this before Run so monitors use the injected client.
+func (bt *Heartbeat) WithElasticsearchStateLoader(requester monitorstate.ElasticsearchRequester) {
+	bt.replaceStateLoader(monitorstate.MakeESLoader(requester, monitorstate.DefaultDataStreams, bt.config.RunFrom, bt.logger))
 }
 
 // makeESClient establishes an ES connection meant to load monitors' state

@@ -52,10 +52,7 @@ func (c *heartbeatCreator) create(b *beat.Beat, cfg *conf.C) (beat.Beater, error
 
 	heartbeat, ok := created.(*beater.Heartbeat)
 	if !ok || heartbeat == nil {
-		return nil, fmt.Errorf(
-			"heartbeat creator returned %T, expected *beater.Heartbeat",
-			created,
-		)
+		return nil, fmt.Errorf("heartbeat creator returned %T, expected *beater.Heartbeat", created)
 	}
 	c.heartbeat = heartbeat
 	return created, nil

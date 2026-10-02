@@ -65,12 +65,7 @@ func TestHeartbeatWithElasticsearchStateLoader(t *testing.T) {
 
 	_, err := stateLoader(stdfields.StdMonitorFields{ID: "mon-1", Type: "http"})
 	require.NoError(t, err, "installed ES loader should succeed with empty hits")
-	assert.Equal(
-		t,
-		1,
-		requestCount,
-		"installed loader should call the injected requester",
-	)
+	assert.Equal(t, 1, requestCount, "installed loader should call the injected requester")
 }
 
 func TestMakeESClient(t *testing.T) {

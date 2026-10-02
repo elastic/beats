@@ -46,45 +46,29 @@ func elasticsearchAuthStartHook(
 
 		var extensionID component.ID
 		if err := extensionID.UnmarshalText([]byte(reference)); err != nil {
-			return fmt.Errorf(
-				"invalid elasticsearch_auth component ID %q: %w",
-				reference,
-				err,
-			)
+			return fmt.Errorf("invalid elasticsearch_auth component ID %q: %w", reference, err)
 		}
 
 		extension, ok := host.GetExtensions()[extensionID]
 		if !ok {
-			return fmt.Errorf(
-				"elasticsearch_auth extension %q not found",
-				extensionID.String(),
-			)
+			return fmt.Errorf("elasticsearch_auth extension %q not found", extensionID.String())
 		}
 		auth, ok := extension.(elasticsearchAuthExtension)
 		if !ok {
 			return fmt.Errorf(
-				"elasticsearch_auth extension %q has type %T, which does not "+
-					"implement HTTP authentication and endpoint discovery",
+				"elasticsearch_auth extension %q has type %T, which does not implement HTTP authentication and endpoint discovery",
 				extensionID.String(),
 				extension,
 			)
 		}
 
 		if heartbeat == nil {
-			return fmt.Errorf(
-				"heartbeat instance was not captured for "+
-					"elasticsearch_auth extension %q",
-				extensionID.String(),
-			)
+			return fmt.Errorf("heartbeat instance was not captured for elasticsearch_auth extension %q", extensionID.String())
 		}
 
 		requester, err := newESClient(ctx, auth, userAgent, logger)
 		if err != nil {
-			return fmt.Errorf(
-				"creating Elasticsearch requester from extension %q: %w",
-				extensionID.String(),
-				err,
-			)
+			return fmt.Errorf("creating Elasticsearch requester from extension %q: %w", extensionID.String(), err)
 		}
 		heartbeat.WithElasticsearchStateLoader(requester)
 		setRequester(requester)
@@ -119,11 +103,7 @@ func newESClient(
 			UserAgent: userAgent,
 		}, logger)
 		if err != nil {
-			return nil, fmt.Errorf(
-				"create Elasticsearch client for endpoint %q: %w",
-				endpoint,
-				err,
-			)
+			return nil, fmt.Errorf("create Elasticsearch client for endpoint %q: %w", endpoint, err)
 		}
 		client.Headers["User-Agent"] = client.UserAgent
 
