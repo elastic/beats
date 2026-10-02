@@ -31,8 +31,11 @@ func newHeartbeatReceiver(br xpInstance.BeatReceiver) *heartbeatReceiver {
 	}
 }
 
-func (hb *heartbeatReceiver) Start(_ context.Context, host component.Host) error {
+func (hb *heartbeatReceiver) Start(ctx context.Context, host component.Host) error {
 	hb.Logger.Info("starting heartbeat receiver")
+
+	releaseCancellation := context.AfterFunc(ctx, hb.cancel)
+	defer releaseCancellation()
 
 	if err := hb.BeatReceiver.Start(host); err != nil {
 		return fmt.Errorf("starting heartbeat receiver: %w", err)
