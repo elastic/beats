@@ -46,7 +46,7 @@ https://github.com/elastic/beats/compare/v8.19.22\...v8.19.23[View commits]
 * Fix binary event data fields being overread into subsequent buffer contents. https://github.com/elastic/beats/pull/53327[#53327] https://github.com/elastic/beats/issues/53260[#53260]
 
 // end 8.19.23 relnotes
-=======
+
 // begin 8.19.22 relnotes
 
 [[release-notes-8.19.22]]
