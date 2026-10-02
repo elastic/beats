@@ -28,6 +28,7 @@ import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	commonfile "github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
@@ -480,6 +481,8 @@ func (p *fileProspector) onFSEvent(
 		}
 
 		p.onRename(log, ctx, event, src, updater, group)
+		// intentionally not called by copytruncate
+		p.rebindHarvesterOnInodeMismatch(log, ctx, event, src, group)
 
 		// Update source path for non-migrated short fingerprint entries
 		// (e.g., rename without fingerprint growth, or non-growing identities).
@@ -565,6 +568,43 @@ func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp
 			hg.Stop(srcToClose)
 		}
 	}
+}
+
+// rebindHarvesterOnInodeMismatch restarts a harvester when the scanned
+// destination is a different file from the one it holds open.
+//
+// A deleted file and a new file can share a fingerprint.
+// The scanner treats this as OpRename. The fingerprint still determines the
+// identity and offset. The open file identity determines whether to reopen.
+// A rename of the same file preserves the device and inode.
+func (p *fileProspector) rebindHarvesterOnInodeMismatch(
+	log *logp.Logger,
+	ctx input.Context,
+	fe loginp.FSEvent,
+	src loginp.Source,
+	hg loginp.HarvesterGroup,
+) {
+	// Path identities already restart the harvester in onRename, and with
+	// close.on_state_change.renamed onRename has stopped it.
+	if !p.identifier.Supports(trackRename) || p.stateChangeCloser.Renamed {
+		return
+	}
+
+	pinned, ok := p.harvesterState.LookupOSState(src.Name())
+	if !ok {
+		return
+	}
+
+	newOS := fe.Descriptor.Info.GetOSState()
+	// A zero scan-time StateOS is "unknown": never force a restart on it.
+	if newOS == (commonfile.StateOS{}) || pinned.IsSame(newOS) {
+		return
+	}
+
+	log.Debugf("Identity %s moved to %s backed by a different file; restarting harvester at stored offset",
+		src.Name(), fe.NewPath)
+	// Restart fe.NewPath at the acknowledged offset without resetting it.
+	hg.Restart(ctx, src)
 }
 
 // indexGrowingFingerprint adds an entry to the prefix-matching index, but only

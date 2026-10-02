@@ -1585,3 +1585,106 @@ func eventStringField(evt beat.Event, key string) string {
 	s, _ := v.(string)
 	return s
 }
+
+// TestFilestreamFingerprintDistinctFilesRebindOnRename reads a replacement
+// from the stored offset when it shares the original file's fingerprint.
+func TestFilestreamFingerprintDistinctFilesRebindOnRename(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("removing/replacing files while Filebeat is running is not supported on Windows")
+	}
+
+	env := newInputTestingEnvironment(t)
+
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	inp := env.mustCreateInput(map[string]any{
+		"id":                                    id,
+		"paths":                                 []string{env.abspath("log") + "*"},
+		"file_identity.fingerprint":             map[string]any{},
+		"prospector.scanner.fingerprint.offset": 0,
+		"prospector.scanner.fingerprint.length": 64, // the minimum fingerprint length
+		"prospector.scanner.check_interval":     "100ms",
+		"backoff.init":                          "10ms",
+		"backoff.max":                           "50ms",
+	})
+
+	commonHeader := "COMMON-HEADER-" + strings.Repeat("=", 60) + "\n"
+	const (
+		aLine = "A-ONLY-LINE\n"
+		bMid  = "B-LOST-LINE\n"
+		bTail = "B-TAIL-RECOVERED-LINE\n"
+	)
+
+	contentA := []byte(commonHeader + aLine)
+	contentB := []byte(commonHeader + bMid + bTail)
+	require.Len(t, contentA, len(commonHeader+bMid), "the stored offset must point to the start of the replacement tail")
+
+	env.mustWriteToFile("logA", contentA)
+
+	ctx, cancelInput := context.WithCancel(t.Context())
+	defer func() {
+		cancelInput()
+		env.waitUntilInputStops()
+	}()
+	env.startInput(ctx, id, inp)
+
+	// A is fully read and its harvester waits at EOF with the file open.
+	// Removing A keeps it open because close.on_state_change.removed is disabled.
+	env.waitUntilEventCount(2)
+
+	// Replace A with a different file B that has the same fingerprint window.
+	env.mustRemoveFile("logA")
+	env.mustWriteToFile("logB", contentB)
+
+	want := []string{strings.TrimSuffix(commonHeader, "\n"), strings.TrimSuffix(aLine, "\n"), strings.TrimSuffix(bTail, "\n")}
+	require.EventuallyWithT(t, func(c *assert.CollectT) {
+		assert.Equal(c, want, env.getOutputMessages(), "ingested messages")
+	}, 15*time.Second, 100*time.Millisecond,
+		"B's tail must be ingested promptly after the rebind, exactly once")
+}
+
+// TestFilestreamFingerprintRenameContinuesWithoutRestart reads through a
+// rename without restarting the harvester or duplicating events.
+func TestFilestreamFingerprintRenameContinuesWithoutRestart(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("renaming files while Filebeat is running is not supported on Windows")
+	}
+
+	env := newInputTestingEnvironment(t)
+
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	inp := env.mustCreateInput(map[string]any{
+		"id":                                    id,
+		"paths":                                 []string{env.abspath("log") + "*"},
+		"file_identity.fingerprint":             map[string]any{},
+		"prospector.scanner.fingerprint.offset": 0,
+		"prospector.scanner.fingerprint.length": 64,
+		"prospector.scanner.check_interval":     "100ms",
+		"backoff.init":                          "10ms",
+		"backoff.max":                           "50ms",
+	})
+
+	// header is longer than the fingerprint window so the file is trackable.
+	header := "COMMON-HEADER-" + strings.Repeat("=", 60) + "\n"
+	env.mustWriteToFile("logsrc", []byte(header+"line-1\n"))
+
+	ctx, cancelInput := context.WithCancel(t.Context())
+	defer func() {
+		cancelInput()
+		env.waitUntilInputStops()
+	}()
+	env.startInput(ctx, id, inp)
+
+	env.waitUntilEventCount(2) // header line + line-1
+
+	// Renaming the same file preserves its inode, so the harvester keeps its
+	// open file and continues reading.
+	env.mustRenameFile("logsrc", "logdst")
+	env.mustAppendToFile("logdst", []byte("line-2\n"))
+
+	// A restart must not duplicate events.
+	want := []string{strings.TrimSuffix(header, "\n"), "line-1", "line-2"}
+	require.EventuallyWithT(t, func(c *assert.CollectT) {
+		assert.Equal(c, want, env.getOutputMessages(), "ingested messages")
+	}, 15*time.Second, 100*time.Millisecond,
+		"the line appended after a same-inode rename must be ingested, exactly once")
+}

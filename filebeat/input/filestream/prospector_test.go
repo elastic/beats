@@ -25,6 +25,7 @@ import (
 	"maps"
 	"os"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strings"
 	"sync"
@@ -1903,6 +1904,102 @@ func TestOnFSEvent_HarvesterStateTable(t *testing.T) {
 
 			assert.Equal(t, tc.wantSum, h.FingerprintSum(),
 				"only non-delete events must refresh the open file's descriptor")
+		})
+	}
+}
+
+// TestOnRenameRebindHarvester covers the decision to restart after a rename.
+// A matching fingerprint needs a restart only when the open file differs
+// from the scanned destination.
+func TestOnRenameRebindHarvester(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "")
+
+	identifier, err := newFingerprintIdentifier(nil, nil)
+	require.NoError(t, err, "newFingerprintIdentifier failed")
+
+	makeEvent := func(info file.ExtendedFileInfo) loginp.FSEvent {
+		return loginp.FSEvent{
+			Op:      loginp.OpRename,
+			OldPath: "/var/log/A.log",
+			NewPath: "/var/log/B.log",
+			Descriptor: loginp.FileDescriptor{
+				Info:        info,
+				Fingerprint: completeFP("renamed-fingerprint-sum"),
+			},
+		}
+	}
+
+	type seed int
+	const (
+		seedNone        seed = iota // no table entry (no open harvester)
+		seedUnpinned                // entry exists but the fd was never pinned
+		seedPinnedSame              // pinned to the SAME file the event carries
+		seedPinnedOther             // pinned to a DIFFERENT file
+	)
+
+	tests := []struct {
+		name         string
+		seed         seed
+		zeroEventOS  bool
+		closeRenamed bool
+		copyTruncate bool
+		wantRestart  bool
+	}{
+		{"rebinds on inode mismatch", seedPinnedOther, false, false, false, true},
+		{"no rebind on inode match", seedPinnedSame, false, false, false, false},
+		{"no rebind when no open harvester", seedNone, false, false, false, false},
+		{"no rebind when unpinned", seedUnpinned, false, false, false, false},
+		{"no rebind on zero scan-time StateOS", seedPinnedOther, true, false, false, false},
+		{"no rebind when close.on_state_change.renamed", seedPinnedOther, false, true, false, false},
+		{"no rebind for the copytruncate prospector", seedPinnedOther, false, false, true, false},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			eventInfo := tempFileInfo(t)
+			if tc.zeroEventOS {
+				eventInfo = file.ExtendFileInfo(&testFileInfo{}) // Sys()==nil -> zero StateOS
+			}
+			event := makeEvent(eventInfo)
+			src := identifier.GetSource(event)
+
+			tbl := newFileStateTable()
+			switch tc.seed {
+			case seedUnpinned:
+				publishHandle(tbl, src.Name(), event.Descriptor)
+			case seedPinnedSame:
+				h := publishHandle(tbl, src.Name(), event.Descriptor)
+				h.PinOSState(eventInfo.GetOSState())
+			case seedPinnedOther:
+				h := publishHandle(tbl, src.Name(), event.Descriptor)
+				h.PinOSState(nonZeroOSState(t))
+			}
+
+			p := fileProspector{
+				logger:            log,
+				identifier:        identifier,
+				harvesterState:    tbl,
+				stateChangeCloser: stateChangeCloserConfig{Renamed: tc.closeRenamed},
+			}
+
+			store := newMockMetadataUpdater()
+			store.setRaw(src.Name(), fileMeta{Source: event.OldPath, IdentifierName: fingerprintName})
+			hg := newTestHarvesterGroup()
+
+			if tc.copyTruncate {
+				ctp := &copyTruncateFileProspector{fileProspector: p, rotatedSuffix: regexp.MustCompile(`\.\d+$`)}
+				ctp.onFSEvent(log, input.Context{}, event, src, store, hg, time.Time{})
+			} else {
+				p.onFSEvent(log, input.Context{}, event, src, store, hg, time.Time{})
+			}
+
+			if tc.wantRestart {
+				assert.Contains(t, hg.events, harvesterRestart(src.Name()),
+					"expected the harvester to be restarted on inode mismatch; events=%v", hg.events)
+			} else {
+				assert.NotContains(t, hg.events, harvesterRestart(src.Name()),
+					"did not expect a harvester restart; events=%v", hg.events)
+			}
 		})
 	}
 }
