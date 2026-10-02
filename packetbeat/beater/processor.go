@@ -54,6 +54,7 @@ type processor struct {
 	publisher      *publish.TransactionPublisher
 	flows          *flows.Flows
 	sniffer        *sniffer.Sniffer
+	watcher        *procs.ProcessesWatcher
 	err            chan error
 	statusMu       sync.RWMutex
 	status         status.StatusReporter
@@ -65,11 +66,12 @@ type processor struct {
 	degradedReason string
 }
 
-func newProcessor(publishTimeout time.Duration, publisher *publish.TransactionPublisher, flows *flows.Flows, sniffer *sniffer.Sniffer, err chan error, degradedReason string, status status.StatusReporter) *processor {
+func newProcessor(publishTimeout time.Duration, publisher *publish.TransactionPublisher, flows *flows.Flows, sniffer *sniffer.Sniffer, watcher *procs.ProcessesWatcher, err chan error, degradedReason string, status status.StatusReporter) *processor {
 	return &processor{
 		publisher:      publisher,
 		flows:          flows,
 		sniffer:        sniffer,
+		watcher:        watcher,
 		err:            err,
 		status:         status,
 		publishTimeout: publishTimeout,
@@ -111,6 +113,12 @@ func (p *processor) Stop() {
 		p.flows.Stop()
 	}
 	p.wg.Wait()
+
+	// Stop the process watcher only after the sniffer and flows are
+	// done, since both perform process lookups until they stop.
+	if p.watcher != nil {
+		p.watcher.Close()
+	}
 
 	// wait for publish timeout to let the publisher flush
 	// whatever pending events
@@ -165,11 +173,11 @@ func (p *processorFactory) CreateWithReporter(pipeline beat.PipelineConnector, c
 		statusReporter = noopReporter{}
 	}
 	statusReporter.UpdateStatus(status.Configuring, "starting packetbeat processor configuration")
-	publishTimeout, publisher, flows, sniffer, errChan, degradedReason, err := p.create(pipeline, cfg, statusReporter)
+	publishTimeout, publisher, flows, sniffer, watcher, errChan, degradedReason, err := p.create(pipeline, cfg, statusReporter)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create packetbeat processor: %w", err)
 	}
-	return newProcessor(publishTimeout, publisher, flows, sniffer, errChan, degradedReason, statusReporter), nil
+	return newProcessor(publishTimeout, publisher, flows, sniffer, watcher, errChan, degradedReason, statusReporter), nil
 }
 
 // Create returns a new module runner that publishes to the provided pipeline, configured from cfg.
@@ -177,20 +185,20 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 	return p.CreateWithReporter(pipeline, cfg, nil)
 }
 
-func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C, reporter status.StatusReporter) (time.Duration, *publish.TransactionPublisher, *flows.Flows, *sniffer.Sniffer, chan error, string, error) {
+func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C, reporter status.StatusReporter) (time.Duration, *publish.TransactionPublisher, *flows.Flows, *sniffer.Sniffer, *procs.ProcessesWatcher, chan error, string, error) {
 	config, err := p.configurator(cfg, p.logger)
 	if err != nil {
 		p.logger.Errorf("Failed to read the beat config: %v, %v", err, config)
-		return 0, nil, nil, nil, nil, "", err
+		return 0, nil, nil, nil, nil, nil, "", err
 	}
 	degradedReason, err := unknownProtocolsReason(config)
 	if err != nil {
-		return 0, nil, nil, nil, nil, "", err
+		return 0, nil, nil, nil, nil, nil, "", err
 	}
 	id, err := configID(cfg)
 	if err != nil {
 		p.logger.Errorf("Failed to generate ID from config: %v, %v", err, config)
-		return 0, nil, nil, nil, nil, "", err
+		return 0, nil, nil, nil, nil, nil, "", err
 	}
 	if len(config.Interfaces) != 0 {
 		// Install Npcap if needed. This needs to happen before any other
@@ -207,13 +215,13 @@ func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C, 
 		// interface.
 		err := installNpcap(p.beat, cfg)
 		if err != nil {
-			return 0, nil, nil, nil, nil, "", err
+			return 0, nil, nil, nil, nil, nil, "", err
 		}
 		// Ensure the DLL is loaded whether Npcap was just installed above
 		// or was already present from a previous run.
 		err = npcap.LoadNpcap()
 		if err != nil {
-			return 0, nil, nil, nil, nil, "", err
+			return 0, nil, nil, nil, nil, nil, "", err
 		}
 	}
 
@@ -226,16 +234,27 @@ func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C, 
 		p.logger,
 	)
 	if err != nil {
-		return 0, nil, nil, nil, nil, "", err
+		return 0, nil, nil, nil, nil, nil, "", err
 	}
 
 	var watch procs.ProcessesWatcher
 	// Enable the process watcher only if capturing live traffic
 	if config.Interfaces[0].File == "" {
+		// Flows look processes up when a flow is reported, which
+		// happens up to timeout+period after its last packet; the
+		// kernel_tracing backend must remember closed connections
+		// at least that long.
+		if config.Flows.IsEnabled() {
+			timeout, period, err := flows.Durations(config.Flows)
+			if err != nil {
+				return 0, nil, nil, nil, nil, nil, "", err
+			}
+			config.Procs.KernelTracingGraceTime = procs.GraceTimeForFlows(timeout, period)
+		}
 		err = watch.Init(config.Procs, p.logger)
 		if err != nil {
 			p.logger.Errorf("%s", err.Error())
-			return 0, nil, nil, nil, nil, "", err
+			return 0, nil, nil, nil, nil, nil, "", err
 		}
 	} else {
 		p.logger.Info("Process watcher disabled when file input is used")
@@ -243,14 +262,16 @@ func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C, 
 
 	flows, err := setupFlows(pipeline, &watch, config, p.beat.Info.Logger)
 	if err != nil {
-		return 0, nil, nil, nil, nil, "", err
+		watch.Close()
+		return 0, nil, nil, nil, nil, nil, "", err
 	}
 	sniffer, err := setupSniffer(id, config, publisher, &watch, flows, reporter, p.logger)
 	if err != nil {
-		return 0, nil, nil, nil, nil, "", err
+		watch.Close()
+		return 0, nil, nil, nil, nil, nil, "", err
 	}
 
-	return config.PublishTimeout, publisher, flows, sniffer, p.err, degradedReason, nil
+	return config.PublishTimeout, publisher, flows, sniffer, &watch, p.err, degradedReason, nil
 }
 
 // unknownProtocolsReason returns a status message if the configuration holds
