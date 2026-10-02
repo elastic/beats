@@ -24,7 +24,7 @@ import (
 )
 
 func TestConfigValidate(t *testing.T) {
-	validAPIKey := configopaque.String(base64.StdEncoding.EncodeToString([]byte("id:key")))
+	validAPIKey := configopaque.String("id:key")
 	tests := []struct {
 		name    string
 		config  func() *Config
@@ -96,13 +96,40 @@ func TestConfigValidate(t *testing.T) {
 			errText: "fragments",
 		},
 		{
-			name: "invalid API key",
+			name: "API key without separator",
 			config: func() *Config {
 				config := validConfig()
-				config.APIKey = "not-base64"
+				config.APIKey = "malformed-api-key"
 				return config
 			},
-			errText: "base64-encoded id:key",
+			errText: "raw non-empty id:key",
+		},
+		{
+			name: "API key without ID",
+			config: func() *Config {
+				config := validConfig()
+				config.APIKey = ":key"
+				return config
+			},
+			errText: "raw non-empty id:key",
+		},
+		{
+			name: "API key without key",
+			config: func() *Config {
+				config := validConfig()
+				config.APIKey = "id:"
+				return config
+			},
+			errText: "raw non-empty id:key",
+		},
+		{
+			name: "base64-encoded API key",
+			config: func() *Config {
+				config := validConfig()
+				config.APIKey = configopaque.String(base64.StdEncoding.EncodeToString([]byte("id:key")))
+				return config
+			},
+			errText: "raw non-empty id:key",
 		},
 		{
 			name: "user without password",
@@ -274,7 +301,7 @@ func TestAuthenticationRoundTrip(t *testing.T) {
 		{
 			name: "API key",
 			configure: func(config *Config) {
-				config.APIKey = configopaque.String(base64.StdEncoding.EncodeToString([]byte("id:key")))
+				config.APIKey = "id:key"
 			},
 			expectAuth: "ApiKey " + base64.StdEncoding.EncodeToString([]byte("id:key")),
 		},
