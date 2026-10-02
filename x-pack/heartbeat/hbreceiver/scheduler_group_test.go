@@ -87,9 +87,9 @@ func TestSchedulerGroup(t *testing.T) {
 		}, 30*time.Second, 100*time.Millisecond)
 	}
 
-	t.Run("defaults to the receiver id", func(t *testing.T) {
+	t.Run("defaults to the empty group", func(t *testing.T) {
 		logs := newReceiver(t, "no-group", "")
-		assertGroup(t, logs, "heartbeatreceiver/no-group")
+		assertGroup(t, logs, "")
 	})
 
 	t.Run("uses the configured group", func(t *testing.T) {

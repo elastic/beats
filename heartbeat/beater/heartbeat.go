@@ -184,10 +184,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	groups, _ := syscall.Getgroups()
 	bt.logger.Infof("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
 
-	sched, releaseSched, err := hbscheduler.Acquire(bt.logger, bt.schedulerGroup, bt.schedulerParams)
-	if err != nil {
-		return err
-	}
+	sched, releaseSched := hbscheduler.Acquire(bt.logger, bt.schedulerGroup, bt.schedulerParams)
 	defer releaseSched()
 
 	// monitorFactory is the factory used for creating all monitor instances,

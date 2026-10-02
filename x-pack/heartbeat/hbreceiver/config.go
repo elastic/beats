@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
+	conf "github.com/elastic/elastic-agent-libs/config"
 
 	"go.opentelemetry.io/collector/confmap"
 )
@@ -24,11 +25,10 @@ type Config struct {
 	// those limits meaningful.
 	//
 	// The first receiver of a group to start configures its scheduler, later
-	// receivers with conflicting limits log a warning. Receivers of a group must
-	// agree on `run_once`, a receiver that does not fails to start.
+	// receivers with conflicting limits log a warning.
 	//
-	// Defaults to the receiver's own id, giving each receiver a scheduler of its
-	// own.
+	// Defaults to the empty group, which every receiver without an explicit
+	// group shares.
 	SchedulerGroup string `mapstructure:"scheduler_group"`
 
 	Beatconfig map[string]any `mapstructure:",remain"`
@@ -66,8 +66,27 @@ func (c *Config) Validate() error {
 		return fmt.Errorf("configuration is required")
 	}
 
-	if _, prs := c.Beatconfig["heartbeat"]; !prs {
+	hb, prs := c.Beatconfig["heartbeat"]
+	if !prs {
 		return fmt.Errorf("configuration key 'heartbeat' is required")
+	}
+
+	// A run_once scheduler waits for every job added to it, which is not
+	// meaningful for receivers that share one, or that a collector restarts.
+	if hbMap, ok := hb.(map[string]any); ok {
+		runOnce, err := conf.NewConfigFrom(hbMap)
+		if err != nil {
+			return fmt.Errorf("error reading 'heartbeat' configuration: %w", err)
+		}
+		var parsed struct {
+			RunOnce bool `config:"run_once"`
+		}
+		if err := runOnce.Unpack(&parsed); err != nil {
+			return fmt.Errorf("error reading 'heartbeat.run_once': %w", err)
+		}
+		if parsed.RunOnce {
+			return fmt.Errorf("'heartbeat.run_once' is not supported by the heartbeat receiver")
+		}
 	}
 	return nil
 }
