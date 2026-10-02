@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: Fix OTel stream binding by dataset instead of position to prevent misrouted data.
+component: osquerybeat
+issue: https://github.com/elastic/elastic-agent/issues/15964

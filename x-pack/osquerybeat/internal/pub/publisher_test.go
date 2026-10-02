@@ -16,6 +16,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
@@ -427,6 +429,51 @@ func TestQueryProfileToEvent_SpaceID(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+// TestConfigureByDataset verifies that Configure locates streams by dataset
+// rather than position, so out-of-order delivery does not break client binding.
+func TestConfigureByDataset(t *testing.T) {
+	b := &beat.Beat{
+		Publisher: pipeline.NewNilPipeline(),
+	}
+	p := New(b, logptest.NewTestingLogger(t, "pub"))
+
+	// Deliver streams in reverse order: profile, action_responses, result.
+	inputs := []config.InputConfig{
+		{Datastream: config.DatastreamConfig{Dataset: config.DefaultQueryProfileDataset, Type: "logs", Namespace: "default"}},
+		{Datastream: config.DatastreamConfig{Dataset: config.DefaultActionResponsesDataset, Type: "logs", Namespace: "default"}},
+		{Datastream: config.DatastreamConfig{Dataset: config.DefaultDataset, Type: "logs", Namespace: "default"}},
+	}
+	if err := p.Configure(inputs); err != nil {
+		t.Fatalf("Configure: %v", err)
+	}
+	if p.client == nil {
+		t.Error("p.client is nil; result stream was not bound")
+	}
+	if p.actionResponsesClient == nil {
+		t.Error("p.actionResponsesClient is nil; action_responses stream was not bound")
+	}
+}
+
+// TestConfigureEmptyDataset verifies that an input with no explicit dataset is
+// treated as the result stream, matching standalone osquerybeat configs where
+// data_stream.dataset is not set.
+func TestConfigureEmptyDataset(t *testing.T) {
+	b := &beat.Beat{
+		Publisher: pipeline.NewNilPipeline(),
+	}
+	p := New(b, logptest.NewTestingLogger(t, "pub"))
+
+	inputs := []config.InputConfig{
+		{Datastream: config.DatastreamConfig{Type: "logs", Namespace: "default"}},
+	}
+	if err := p.Configure(inputs); err != nil {
+		t.Fatalf("Configure: %v", err)
+	}
+	if p.client == nil {
+		t.Error("p.client is nil; empty-dataset input was not bound as result stream")
 	}
 }
 

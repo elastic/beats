@@ -1,0 +1,6 @@
+# Source: osquery_manager/data_stream/action_responses/agent/stream/stream.yml.hbs
+type: osquery_manager
+data_stream:
+  dataset: osquery_manager.action.responses
+  type: logs
+  namespace: default
