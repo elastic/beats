@@ -44,13 +44,7 @@ func (e LoaderError) Error() string {
 //
 // The interface matches eslegclient.Connection.Request.
 type ElasticsearchRequester interface {
-	Request(
-		method,
-		path,
-		pipeline string,
-		params map[string]string,
-		body any,
-	) (int, []byte, error)
+	Request(method, path, pipeline string, params map[string]string, body any) (int, []byte, error)
 }
 
 func MakeESLoader(
@@ -99,20 +93,9 @@ func MakeESLoader(
 				},
 			},
 		}
-		status, body, err := esc.Request(
-			"POST",
-			strings.Join([]string{"/", indexPattern, "/", "_search", "?size=1"}, ""),
-			"",
-			nil,
-			reqBody,
-		)
+		status, body, err := esc.Request("POST", strings.Join([]string{"/", indexPattern, "/", "_search", "?size=1"}, ""), "", nil, reqBody)
 		if err != nil || status > 299 {
-			sErr := fmt.Errorf(
-				"error executing state search for %s in loc=%s: %w",
-				sf.ID,
-				runFromID,
-				err,
-			)
+			sErr := fmt.Errorf("error executing state search for %s in loc=%s: %w", sf.ID, runFromID, err)
 			retry := shouldRetry(status)
 			return nil, LoaderError{err: sErr, Retry: retry}
 		}
@@ -136,12 +119,7 @@ func MakeESLoader(
 		}
 
 		if len(sh.Hits.Hits) == 0 {
-			logger.Infof(
-				"no previous state found for monitor %s in Elasticsearch "+
-					"(loc=%s)",
-				sf.ID,
-				runFromID,
-			)
+			logger.Infof("no previous state found for monitor %s in Elasticsearch (loc=%s)", sf.ID, runFromID)
 			return nil, nil
 		}
 
