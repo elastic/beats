@@ -1,0 +1,132 @@
+---
+name: Bump npcap version in elastic/beats
+pipelineid: 'bump-npcap-beats-{{ source "npcapVersion" }}'
+
+scms:
+  githubConfig:
+    kind: github
+    spec:
+      owner: '{{ .scm.owner }}'
+      repository: '{{ .scm.repository }}'
+      user: '{{ requiredEnv "GITHUB_ACTOR" }}'
+      username: '{{ requiredEnv "GITHUB_ACTOR" }}'
+      token: '{{ requiredEnv "GITHUB_TOKEN" }}'
+      branch: '{{ .scm.branch }}'
+      commitusingapi: true
+      singlebranch: true
+      force: false
+
+actions:
+  default:
+    title: 'Bump npcap OEM installer to version {{ source "npcapVersion" }}'
+    kind: github/pullrequest
+    scmid: githubConfig
+    spec:
+      labels:
+        - automation
+        - dependencies
+        - backport-active-all
+      description: |
+        Bumps the npcap OEM installer to v{{ source "npcapVersion" }}.
+
+        The OEM installer artifact and the crossbuild docker image
+        `docker.elastic.co/observability-ci/golang-crossbuild:{{ source "npcapImageTag" }}`
+        are confirmed available before this PR is created.
+
+        https://github.com/nmap/npcap/releases/tag/v{{ source "npcapVersion" }}
+
+sources:
+  npcapVersion:
+    name: Get NPCAP_VERSION from golang-crossbuild/Makefile.common
+    kind: shell
+    transformers:
+      - findsubmatch:
+          pattern: 'NPCAP_VERSION := (\d+\.\d+)'
+          captureindex: 1
+    spec:
+      command: gh api repos/elastic/golang-crossbuild/contents/Makefile.common --jq '.content | @base64d'
+      environments:
+        - name: GITHUB_TOKEN
+        - name: PATH
+
+  goVersion:
+    name: Get Go version from .go-version
+    kind: shell
+    transformers:
+      - findsubmatch:
+          pattern: '^(\d+\.\d+\.\d+)'
+          captureindex: 1
+    spec:
+      command: cat .go-version
+
+  npcapImageTag:
+    name: Construct npcap crossbuild image tag
+    kind: shell
+    dependson:
+      - npcapVersion
+      - goVersion
+    spec:
+      command: echo "{{ source "goVersion" }}-npcap-{{ source "npcapVersion" }}-debian9"
+
+  timestamp:
+    name: Current Unix timestamp for changelog fragment filename
+    kind: shell
+    spec:
+      command: date +%s
+
+conditions:
+  npcapImageAvailable:
+    name: 'Is docker image observability-ci/golang-crossbuild:{{ source "npcapImageTag" }} published?'
+    kind: dockerimage
+    sourceid: npcapImageTag
+    spec:
+      image: docker.elastic.co/observability-ci/golang-crossbuild
+      tag: '{{ source "npcapImageTag" }}'
+
+  isNewVersion:
+    name: 'Is NpcapVersion already {{ source "npcapVersion" }} in pcap.go?'
+    disablesourceinput: true
+    scmid: githubConfig
+    kind: file
+    spec:
+      file: x-pack/packetbeat/scripts/mage/pcap.go
+      matchpattern: 'NpcapVersion = "{{ source "npcapVersion" }}"'
+    failwhen: true
+
+targets:
+  update-pcap-go:
+    name: "Update NpcapVersion in x-pack/packetbeat/scripts/mage/pcap.go"
+    sourceid: npcapVersion
+    scmid: githubConfig
+    kind: file
+    spec:
+      file: x-pack/packetbeat/scripts/mage/pcap.go
+      matchpattern: 'NpcapVersion = "\d+\.\d+"'
+      content: 'NpcapVersion = "{{ source "npcapVersion" }}"'
+
+  update-license:
+    name: "Update Version in x-pack/packetbeat/npcap/installer/LICENSE"
+    sourceid: npcapVersion
+    scmid: githubConfig
+    kind: file
+    spec:
+      file: x-pack/packetbeat/npcap/installer/LICENSE
+      line: 3
+      content: 'Version: {{ source "npcapVersion" }}'
+
+  create-changelog-fragment:
+    name: 'Create changelog fragment for npcap {{ source "npcapVersion" }}'
+    disablesourceinput: true
+    scmid: githubConfig
+    kind: file
+    dependson:
+      - update-pcap-go
+      - update-license
+    spec:
+      file: 'changelog/fragments/{{ source "timestamp" }}-bump-npcap-{{ source "npcapVersion" }}.yaml'
+      forcecreate: true
+      content: |
+        kind: enhancement
+        summary: bump npcap OEM installer to {{ source "npcapVersion" }}
+        description: Bump the npcap OEM installer version used by Packetbeat to {{ source "npcapVersion" }}.
+        component: packetbeat
