@@ -1548,6 +1548,16 @@ metricbeat.modules:
   # This will change the default layout and put metric type in the field name
   #use_types: true
 
+  # Assemble histogram buckets that arrive in separate remote write requests.
+  # histogram_assembly.enabled defaults to false and requires use_types.
+  # The other histogram_assembly settings apply only when enabled.
+  #histogram_assembly:
+  #  enabled: false
+  #  quiet_period: 5s
+  #  hard_timeout: 30s
+  #  max_pending_histograms: 10000
+  #  max_pending_buckets: 100000
+
   # Store counter rates instead of original cumulative counters (experimental, default: false)
   #rate_counters: true
 
