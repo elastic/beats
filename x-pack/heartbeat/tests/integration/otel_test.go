@@ -80,8 +80,17 @@ func TestHeartbeatOTelElasticsearchAuthLoadsMonitorState(t *testing.T) {
 		es.Index.WithRefresh("true"),
 	)
 	require.NoError(t, err, "failed to seed monitor state")
-	require.False(t, indexResponse.IsError(), "seeding monitor state returned %s", indexResponse.Status())
-	require.NoError(t, indexResponse.Body.Close(), "failed to close state indexing response")
+	require.False(
+		t,
+		indexResponse.IsError(),
+		"seeding monitor state returned %s",
+		indexResponse.Status(),
+	)
+	require.NoError(
+		t,
+		indexResponse.Body.Close(),
+		"failed to close state indexing response",
+	)
 
 	target := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -192,7 +201,12 @@ service:
 		findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
 		defer findCancel()
 
-		docs, err := estools.PerformQueryForRawQuery(findCtx, query, ".ds-"+eventIndex+"*", es)
+		docs, err := estools.PerformQueryForRawQuery(
+			findCtx,
+			query,
+			".ds-"+eventIndex+"*",
+			es,
+		)
 		if !assert.NoError(ct, err, "failed to query emitted Heartbeat events") {
 			return
 		}
@@ -211,7 +225,8 @@ service:
 		assert.True(
 			ct,
 			found,
-			"expected an emitted Heartbeat event to contain the loaded previous state in state.ends; got %v",
+			"expected an emitted Heartbeat event to contain the loaded "+
+				"previous state in state.ends; got %v",
 			docs.Hits.Hits,
 		)
 	},
@@ -220,7 +235,12 @@ service:
 		"timed out waiting for Heartbeat to load and use monitor state",
 	)
 
-	assert.Positive(t, proxy.connects.Load(), "Heartbeat state loading must connect to Elasticsearch through beatsauth's configured proxy")
+	assert.Positive(
+		t,
+		proxy.connects.Load(),
+		"Heartbeat state loading must connect to Elasticsearch through "+
+			"beatsauth's configured proxy",
+	)
 }
 
 type recordingConnectProxy struct {
@@ -254,7 +274,9 @@ func (p *recordingConnectProxy) ServeHTTP(writer http.ResponseWriter, request *h
 		return
 	}
 
-	if _, err := bufferedClient.WriteString("HTTP/1.1 200 Connection Established\r\n\r\n"); err != nil {
+	if _, err := bufferedClient.WriteString(
+		"HTTP/1.1 200 Connection Established\r\n\r\n",
+	); err != nil {
 		_ = client.Close()
 		_ = destination.Close()
 		return
