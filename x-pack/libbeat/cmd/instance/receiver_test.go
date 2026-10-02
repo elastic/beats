@@ -188,26 +188,14 @@ func TestBeatReceiverStartHookRunsBeforeRun(t *testing.T) {
 		return nil
 	})
 
-	require.NoError(
-		t,
-		br.Start(host),
-		"starting the Beat receiver should succeed",
-	)
+	require.NoError(t, br.Start(host), "starting the Beat receiver should succeed")
 	select {
 	case observed := <-runObservedHook:
-		assert.True(
-			t,
-			observed,
-			"start hook should complete before beater.Run begins",
-		)
+		assert.True(t, observed, "start hook should complete before beater.Run begins")
 	case <-time.After(5 * time.Second):
 		t.Fatal("beater.Run did not begin")
 	}
-	require.NoError(
-		t,
-		br.Shutdown(t.Context()),
-		"shutting down the Beat receiver should succeed",
-	)
+	require.NoError(t, br.Shutdown(t.Context()), "shutting down the Beat receiver should succeed")
 }
 
 // fakeActionDiagExtension implements both otelmanager.DiagnosticExtension and
@@ -323,12 +311,7 @@ func TestBeatReceiverStart_WiresActionAndDiagnosticExtensions(t *testing.T) {
 
 	// The diagnostic hook is registered eagerly by Start itself.
 	ext.mu.Lock()
-	assert.Equal(
-		t,
-		"test-receiver",
-		ext.registeredDiagName,
-		"diagnostic hook should be registered under the receiver's component ID",
-	)
+	assert.Equal(t, "test-receiver", ext.registeredDiagName, "diagnostic hook should be registered under the receiver's component ID")
 	ext.mu.Unlock()
 
 	// The action extension is only set on the manager by Start; the actual
@@ -338,28 +321,15 @@ func TestBeatReceiverStart_WiresActionAndDiagnosticExtensions(t *testing.T) {
 	b.Manager.RegisterAction(act)
 
 	ext.mu.Lock()
-	assert.Equal(
-		t,
-		"test-receiver",
-		ext.registeredActionFor,
-		"action handler should be registered under the receiver's component ID",
-	)
+	assert.Equal(t, "test-receiver", ext.registeredActionFor, "action handler should be registered under the receiver's component ID")
 	handler := ext.actionHandler
 	ext.mu.Unlock()
-	require.NotNil(
-		t,
-		handler,
-		"action handler should have been registered with the extension",
-	)
+	require.NotNil(t, handler, "action handler should have been registered with the extension")
 
 	res, err := handler(t.Context(), map[string]any{"id": "abc"})
 	require.NoError(t, err)
 	assert.Equal(t, map[string]any{"ok": true}, res)
-	assert.True(
-		t,
-		act.executed.Load(),
-		"invoking the registered handler should execute the underlying action",
-	)
+	assert.True(t, act.executed.Load(), "invoking the registered handler should execute the underlying action")
 
 	b.Manager.UnregisterAction(act)
 	ext.mu.Lock()
@@ -447,9 +417,7 @@ func TestBeatReceiverStartFailureShutdownDoesNotHang(t *testing.T) {
 	select {
 	case <-done:
 	case <-time.After(5 * time.Second):
-		t.Fatal(
-			"Shutdown hung after BeatReceiver.Start failed — nil runDone not fixed",
-		)
+		t.Fatal("Shutdown hung after BeatReceiver.Start failed — nil runDone not fixed")
 	}
 }
 
@@ -485,12 +453,7 @@ func TestBeatReceiverStartHookFailureShutdownDoesNotHang(t *testing.T) {
 	})
 
 	startErr := br.Start(componenttest.NewNopHost())
-	require.ErrorIs(
-		t,
-		startErr,
-		hookErr,
-		"Start should return the start hook failure",
-	)
+	require.ErrorIs(t, startErr, hookErr, "Start should return the start hook failure")
 
 	// Shutdown must complete promptly even though Start failed before launching
 	// beater.Run. Use t.Context() (no deadline during test execution) so that a
@@ -499,11 +462,7 @@ func TestBeatReceiverStartHookFailureShutdownDoesNotHang(t *testing.T) {
 	go func() { done <- br.Shutdown(t.Context()) }()
 	select {
 	case err := <-done:
-		require.NoError(
-			t,
-			err,
-			"Shutdown should consume the start failure signal without error",
-		)
+		require.NoError(t, err, "Shutdown should consume the start failure signal without error")
 	case <-time.After(5 * time.Second):
 		t.Fatal("Shutdown hung after BeatReceiver.Start failed")
 	}
