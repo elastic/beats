@@ -20,7 +20,11 @@ func TestUnmarshal(t *testing.T) {
 			"heartbeat":          map[string]any{"monitors": []any{}},
 		})
 
-		require.NoError(t, cfg.Unmarshal(userConf), "receiver config should unmarshal")
+		require.NoError(
+			t,
+			cfg.Unmarshal(userConf),
+			"receiver config should unmarshal",
+		)
 		assert.Equal(
 			t,
 			"elasticsearchauth/_agent-component/default",
@@ -31,7 +35,8 @@ func TestUnmarshal(t *testing.T) {
 			t,
 			cfg.Beatconfig,
 			"elasticsearch_auth",
-			"receiver-only Elasticsearch auth reference should not reach the Beat config",
+			"receiver-only Elasticsearch auth reference should not "+
+				"reach the Beat config",
 		)
 	})
 
@@ -55,7 +60,12 @@ func TestUnmarshal(t *testing.T) {
 		pathMap, ok := cfg.Beatconfig["path"].(map[string]any)
 		require.True(t, ok, "path should be a map")
 		assert.Equal(t, "/custom/home", pathMap["home"], "user override should win")
-		assert.Equal(t, "/default/data", pathMap["data"], "unspecified default should be preserved")
+		assert.Equal(
+			t,
+			"/default/data",
+			pathMap["data"],
+			"unspecified default should be preserved",
+		)
 		assert.Contains(t, cfg.Beatconfig, "heartbeat")
 	})
 
@@ -123,7 +133,13 @@ func TestValidate(t *testing.T) {
 		err := tc.c.Validate()
 		if tc.hasError {
 			assert.Errorf(t, err, "%s failed, should have had error", name)
-			assert.Equalf(t, err.Error(), tc.errorString, "%s failed, error not equal", name)
+			assert.Equalf(
+				t,
+				err.Error(),
+				tc.errorString,
+				"%s failed, error not equal",
+				name,
+			)
 		} else {
 			assert.NoErrorf(t, err, "%s failed, should not have error", name)
 		}

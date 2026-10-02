@@ -53,7 +53,10 @@ func (hb *heartbeatReceiver) Shutdown(ctx context.Context) (err error) {
 	defer func() {
 		if hb.elasticsearchAuthRequester != nil {
 			if closeErr := hb.elasticsearchAuthRequester.Close(); closeErr != nil {
-				err = errors.Join(err, fmt.Errorf("closing Elasticsearch client: %w", closeErr))
+				err = errors.Join(
+					err,
+					fmt.Errorf("closing Elasticsearch client: %w", closeErr),
+				)
 			}
 		}
 	}()

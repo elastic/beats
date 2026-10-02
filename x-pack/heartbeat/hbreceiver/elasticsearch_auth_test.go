@@ -92,7 +92,8 @@ func TestElasticsearchAuthStartHookErrors(t *testing.T) {
 			name:      "missing extension",
 			reference: missingID.String(),
 			host:      elasticsearchAuthTestHost{},
-			wantError: `elasticsearch_auth extension "elasticsearchauth/missing" not found`,
+			wantError: `elasticsearch_auth extension "elasticsearchauth/missing" ` +
+				`not found`,
 		},
 		{
 			name:      "wrong extension type",
@@ -108,21 +109,50 @@ func TestElasticsearchAuthStartHookErrors(t *testing.T) {
 			host: elasticsearchAuthTestHost{extensions: map[component.ID]component.Component{
 				authID: &fakeElasticsearchAuthExtension{endpoints: []string{"http://localhost:9200"}},
 			}},
-			wantError: `heartbeat instance was not captured for elasticsearch_auth extension "elasticsearchauth/auth"`,
+			wantError: `heartbeat instance was not captured for ` +
+				`elasticsearch_auth extension "elasticsearchauth/auth"`,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			err := elasticsearchAuthStartHook(t.Context(), test.reference, nil, "", logp.NewNopLogger(), func(*eslegclient.Connection) {})(test.host)
-			require.Error(t, err, "start hook should reject an invalid Elasticsearch authentication extension")
-			assert.Contains(t, err.Error(), test.wantError, "start hook should return the expected resolver error")
+			err := elasticsearchAuthStartHook(
+				t.Context(),
+				test.reference,
+				nil,
+				"",
+				logp.NewNopLogger(),
+				func(*eslegclient.Connection) {},
+			)(test.host)
+			require.Error(
+				t,
+				err,
+				"start hook should reject an invalid Elasticsearch "+
+					"authentication extension",
+			)
+			assert.Contains(
+				t,
+				err.Error(),
+				test.wantError,
+				"start hook should return the expected resolver error",
+			)
 		})
 	}
 }
 
 func TestElasticsearchAuthStartHookEmptyReference(t *testing.T) {
-	require.NoError(t, elasticsearchAuthStartHook(t.Context(), "", nil, "", logp.NewNopLogger(), func(*eslegclient.Connection) {})(nil), "empty Elasticsearch auth reference should be a no-op")
+	require.NoError(
+		t,
+		elasticsearchAuthStartHook(
+			t.Context(),
+			"",
+			nil,
+			"",
+			logp.NewNopLogger(),
+			func(*eslegclient.Connection) {},
+		)(nil),
+		"empty Elasticsearch auth reference should be a no-op",
+	)
 }
 
 func TestNewESClientConnectivityFailureIsBestEffort(t *testing.T) {
@@ -135,11 +165,26 @@ func TestNewESClientConnectivityFailureIsBestEffort(t *testing.T) {
 	}
 
 	client, err := newESClient(t.Context(), extension, "", logp.NewNopLogger())
-	require.NoError(t, err, "temporary Elasticsearch connectivity failures must not prevent client creation")
-	require.NotNil(t, client, "a client must be returned so state loading can retry after connectivity returns")
+	require.NoError(
+		t,
+		err,
+		"temporary Elasticsearch connectivity failures must not "+
+			"prevent client creation",
+	)
+	require.NotNil(
+		t,
+		client,
+		"a client must be returned so state loading can retry "+
+			"after connectivity returns",
+	)
 
 	_, _, err = client.Request("GET", "/_search", "", nil, nil)
-	require.Error(t, err, "the fallback client must preserve the connectivity error for state loading")
+	require.Error(
+		t,
+		err,
+		"the fallback client must preserve the connectivity error "+
+			"for state loading",
+	)
 }
 
 func TestElasticsearchAuthStartHookInjectsBeforeRun(t *testing.T) {
@@ -204,10 +249,19 @@ func TestElasticsearchAuthStartHookInjectsBeforeRun(t *testing.T) {
 		},
 	}
 
-	rec, err := factory.CreateLogs(t.Context(), settings, cfg, consumertest.NewNop())
+	rec, err := factory.CreateLogs(
+		t.Context(),
+		settings,
+		cfg,
+		consumertest.NewNop(),
+	)
 	require.NoError(t, err, "creating the Heartbeat receiver should succeed")
 
-	require.NoError(t, rec.Start(t.Context(), host), "starting the Heartbeat receiver should succeed")
+	require.NoError(
+		t,
+		rec.Start(t.Context(), host),
+		"starting the Heartbeat receiver should succeed",
+	)
 	select {
 	case <-requested:
 	case <-time.After(10 * time.Second):
@@ -216,7 +270,11 @@ func TestElasticsearchAuthStartHookInjectsBeforeRun(t *testing.T) {
 
 	shutdownCtx, cancel := context.WithTimeout(t.Context(), 10*time.Second)
 	defer cancel()
-	require.NoError(t, rec.Shutdown(shutdownCtx), "shutting down the Heartbeat receiver should succeed")
+	require.NoError(
+		t,
+		rec.Shutdown(shutdownCtx),
+		"shutting down the Heartbeat receiver should succeed",
+	)
 	select {
 	case <-transport.closed:
 	case <-time.After(time.Second):
@@ -282,10 +340,19 @@ func TestElasticsearchAuthShutdownCancelsInFlightRequest(t *testing.T) {
 		},
 	}
 
-	rec, err := factory.CreateLogs(t.Context(), settings, cfg, consumertest.NewNop())
+	rec, err := factory.CreateLogs(
+		t.Context(),
+		settings,
+		cfg,
+		consumertest.NewNop(),
+	)
 	require.NoError(t, err, "creating the Heartbeat receiver should succeed")
 
-	require.NoError(t, rec.Start(t.Context(), host), "starting the Heartbeat receiver should succeed")
+	require.NoError(
+		t,
+		rec.Start(t.Context(), host),
+		"starting the Heartbeat receiver should succeed",
+	)
 	select {
 	case <-requestStarted:
 	case <-time.After(10 * time.Second):
@@ -295,14 +362,29 @@ func TestElasticsearchAuthShutdownCancelsInFlightRequest(t *testing.T) {
 	shutdownStart := time.Now()
 	shutdownCtx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
 	defer cancel()
-	require.NoError(t, rec.Shutdown(shutdownCtx), "shutting down the Heartbeat receiver should succeed")
+	require.NoError(
+		t,
+		rec.Shutdown(shutdownCtx),
+		"shutting down the Heartbeat receiver should succeed",
+	)
 	shutdownDuration := time.Since(shutdownStart)
 
-	assert.Less(t, shutdownDuration, 5*time.Second, "shutdown should release the request promptly rather than waiting for the HTTP timeout")
+	assert.Less(
+		t,
+		shutdownDuration,
+		5*time.Second,
+		"shutdown should release the request promptly rather than waiting "+
+			"for the HTTP timeout",
+	)
 
 	select {
 	case err := <-requestDone:
-		assert.ErrorIs(t, err, context.Canceled, "in-flight request should be released due to context cancellation")
+		assert.ErrorIs(
+			t,
+			err,
+			context.Canceled,
+			"in-flight request should be released due to context cancellation",
+		)
 	case <-time.After(time.Second):
 		t.Fatal("in-flight request did not record completion")
 	}
