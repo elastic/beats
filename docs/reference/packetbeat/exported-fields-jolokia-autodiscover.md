@@ -19,7 +19,7 @@ Metadata from Jolokia Discovery added by the jolokia provider.
 
 
 **`jolokia.agent.id`**
-:   Each agent has a unique id which can be either provided during startup of the agent in form of a configuration parameter or being autodetected. If autodected, the id has several parts: The IP, the process id, hashcode of the agent and its type.
+:   Each agent has a unique id which can be either provided during startup of the agent in form of a configuration parameter or being autodetected. If autodetected, the id has several parts: The IP, the process id, hashcode of the agent and its type.
 
     type: keyword
 
