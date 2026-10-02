@@ -13,13 +13,13 @@ import (
 	"github.com/stretchr/testify/require"
 
 	confpkg "github.com/elastic/beats/v7/pkg/config"
-	"github.com/elastic/lumberjack"
 )
 
 func Test_validateConfig(t *testing.T) {
 	testCases := []struct {
 		name      string // Sub-test name.
-		config    config // Load config parameters.
+		config    config // Load config parameters (mutually exclusive with yaml).
+		yaml      string // Load config from YAML (mutually exclusive with config).
 		wantError error  // Expected error
 	}{
 		{
@@ -50,26 +50,6 @@ func Test_validateConfig(t *testing.T) {
 			wantError: errors.New("response_body must be valid JSON accessing config"),
 		},
 		{
-			name: "valid log destination",
-			config: config{
-				URL:          "/",
-				ResponseBody: `{"message": "success"}`,
-				Method:       http.MethodPost,
-				ResponseCode: http.StatusOK,
-				Tracer:       &tracerConfig{Enabled: new(true), Logger: lumberjack.Logger{Filename: "http_endpoint/log"}},
-			},
-		},
-		{
-			name: "invalid_log_destination_accepted_at_config_time",
-			config: config{
-				URL:          "/",
-				ResponseBody: `{"message": "success"}`,
-				Method:       http.MethodPost,
-				ResponseCode: http.StatusOK,
-				Tracer:       &tracerConfig{Enabled: new(true), Logger: lumberjack.Logger{Filename: "/var/log"}},
-			},
-		},
-		{
 			name: "response_code_zero_rejected",
 			config: config{
 				URL:          "/",
@@ -89,13 +69,51 @@ func Test_validateConfig(t *testing.T) {
 			},
 			wantError: errors.New("response_code must be a valid HTTP status code: 1000 accessing config"),
 		},
+
+		// Use YAML to avoid the struct→ucfg→struct roundtrip, which
+		// converts nil map fields to non-nil empty maps.
+		{
+			name: "valid log destination",
+			yaml: `
+url: /
+response_body: '{"message": "success"}'
+method: POST
+response_code: 200
+tracer:
+  enabled: true
+  filename: http_endpoint/log
+`,
+		},
+		{
+			name: "invalid_log_destination_accepted_at_config_time",
+			yaml: `
+url: /
+response_body: '{"message": "success"}'
+method: POST
+response_code: 200
+tracer:
+  enabled: true
+  filename: /var/log
+`,
+		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			c := confpkg.MustNewConfigFrom(tc.config)
+			var (
+				c   *confpkg.C
+				err error
+			)
+			if tc.yaml != "" {
+				c, err = confpkg.NewConfigWithYAML([]byte(tc.yaml), tc.name)
+				if err != nil {
+					t.Fatalf("failed to parse YAML config: %v", err)
+				}
+			} else {
+				c = confpkg.MustNewConfigFrom(tc.config)
+			}
 			config := defaultConfig()
-			err := c.Unpack(&config)
+			err = c.Unpack(&config)
 
 			if !sameError(err, tc.wantError) {
 				t.Errorf("unexpected error from validation: got:%s want:%s", err, tc.wantError)
@@ -106,31 +124,49 @@ func Test_validateConfig(t *testing.T) {
 
 func TestValidateOptionsResponseCode(t *testing.T) {
 	tests := []struct {
-		name          string
-		optionsStatus int
-		wantError     string
+		name           string
+		optionsHeaders http.Header
+		optionsStatus  int
+		wantError      string
 	}{
 		{
-			name:          "valid options response code",
-			optionsStatus: http.StatusOK,
+			name:           "valid options response code",
+			optionsStatus:  http.StatusOK,
+			optionsHeaders: http.Header{"Content-Type": {"application/json"}},
 		},
 		{
-			name:          "options_response_code zero rejected",
+			name:           "options_response_code zero rejected",
+			optionsStatus:  0,
+			optionsHeaders: http.Header{"Content-Type": {"application/json"}},
+			wantError:      "options_response_code must be a valid HTTP status code: 0",
+		},
+		{
+			name:           "options_response_code out of range rejected",
+			optionsStatus:  1000,
+			optionsHeaders: http.Header{"Content-Type": {"application/json"}},
+			wantError:      "options_response_code must be a valid HTTP status code: 1000",
+		},
+		{
+			name:          "options_response_code zero allowed with nil options headers",
 			optionsStatus: 0,
-			wantError:     "options_response_code must be a valid HTTP status code: 0",
 		},
 		{
-			name:          "options_response_code out of range rejected",
-			optionsStatus: 1000,
-			wantError:     "options_response_code must be a valid HTTP status code: 1000",
+			name:           "empty options_headers not allowed",
+			optionsStatus:  0,
+			optionsHeaders: http.Header{},
+			wantError:      "options_headers must be non-empty if configured",
+		},
+		{
+			name:           "options_response_code zero not allowed with non-empty options headers",
+			optionsStatus:  0,
+			optionsHeaders: http.Header{"Header": {"Value"}},
+			wantError:      "options_response_code must be a valid HTTP status code: 0",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := defaultConfig()
-			// Use a non-empty header to trigger the options_response_code check;
-			// a nil or empty OptionsHeaders means the feature is not configured.
-			c.OptionsHeaders = http.Header{"Content-Type": {"application/json"}}
+			c.OptionsHeaders = tt.optionsHeaders
 			c.OptionsStatus = tt.optionsStatus
 			err := c.Validate()
 			if tt.wantError == "" {
