@@ -22,8 +22,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/kibana"
-	"github.com/elastic/elastic-agent-libs/version"
+	"github.com/elastic/beats/v7/pkg/kibana"
+	"github.com/elastic/beats/v7/pkg/version"
 )
 
 var (

@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/auditbeat/tracing"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Context shared with guesses.

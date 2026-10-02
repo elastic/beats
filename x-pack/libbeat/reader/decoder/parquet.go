@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/parquet"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // parquetDecoder is a decoder for parquet data.

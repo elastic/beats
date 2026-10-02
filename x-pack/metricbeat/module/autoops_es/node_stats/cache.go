@@ -5,8 +5,8 @@
 package node_stats
 
 import (
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (

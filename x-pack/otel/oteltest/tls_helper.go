@@ -15,7 +15,7 @@ import (
 
 	"github.com/youmark/pkcs8"
 
-	"github.com/elastic/elastic-agent-libs/transport/tlscommontest"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommontest"
 )
 
 // GetClientCerts creates client certificates, writes them to a file and return the path of certificate and key

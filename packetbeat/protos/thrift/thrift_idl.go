@@ -20,7 +20,7 @@ package thrift
 import (
 	"fmt"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 
 	"github.com/samuel/go-thrift/parser"
 )

@@ -18,7 +18,7 @@
 package queue
 
 import (
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 // Observer is an interface for queues to send state updates to a metrics

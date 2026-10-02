@@ -18,7 +18,7 @@
 package network
 
 import (
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	sysinfotypes "github.com/elastic/go-sysinfo/types"
 )
 

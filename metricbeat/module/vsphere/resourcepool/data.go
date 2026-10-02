@@ -20,7 +20,7 @@ package resourcepool
 import (
 	"github.com/vmware/govmomi/vim25/mo"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 const (

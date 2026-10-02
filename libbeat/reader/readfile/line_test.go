@@ -38,7 +38,7 @@ import (
 	"golang.org/x/text/transform"
 
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 const unlimited = 0

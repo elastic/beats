@@ -8,8 +8,8 @@ package mock
 import (
 	"context"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // DefaultTokenValue provides a default token value.

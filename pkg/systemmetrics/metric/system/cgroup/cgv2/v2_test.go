@@ -28,11 +28,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/opt"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cgroup/cgcommon"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cgroup/testhelpers"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/opt"
-	"github.com/elastic/elastic-agent-libs/transform/typeconv"
+	"github.com/elastic/beats/v7/pkg/transform/typeconv"
 )
 
 const v2Path = "../testdata/docker/sys/fs/cgroup/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope"

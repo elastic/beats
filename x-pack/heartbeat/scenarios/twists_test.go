@@ -10,8 +10,8 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/libbeat/processors/util"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/scenarios/framework"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var TestLocationDefault = TestLocationMpls

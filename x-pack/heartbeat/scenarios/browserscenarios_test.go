@@ -13,9 +13,9 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	_ "github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/scenarios/framework"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {

@@ -11,7 +11,7 @@ import (
 
 	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // NewStackdriverCollectorInputData returns a ready to use MetadataCollectorInputData to be sent to Metadata collectors

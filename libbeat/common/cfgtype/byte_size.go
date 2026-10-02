@@ -23,7 +23,7 @@ import (
 	"github.com/dustin/go-humanize"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // ByteSize defines a new configuration option that will parse `go-humanize` compatible values into a

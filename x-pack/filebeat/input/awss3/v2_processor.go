@@ -20,10 +20,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	x_reader "github.com/elastic/beats/v7/x-pack/libbeat/reader"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // objectProcessorV2 downloads and decodes an S3 object into beat.Events.

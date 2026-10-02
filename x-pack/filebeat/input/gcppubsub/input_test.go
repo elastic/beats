@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/filebeat/input/inputtest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func TestNewInputDone(t *testing.T) {

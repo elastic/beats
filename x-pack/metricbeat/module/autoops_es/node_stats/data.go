@@ -15,8 +15,8 @@ import (
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (

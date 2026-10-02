@@ -20,7 +20,7 @@ import (
 	"syscall"
 
 	"github.com/elastic/beats/v7/auditbeat/datastore"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 const (

@@ -9,7 +9,7 @@ package app_insights
 import (
 	"github.com/stretchr/testify/mock"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // Service is the abstraction over the Application Insights metrics API used

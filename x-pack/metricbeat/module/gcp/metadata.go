@@ -10,7 +10,7 @@ import (
 
 	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // MetadataService must be implemented by GCP services that requires non out-of-the box code that is not fulfil by the Stackdriver

@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 // concurrencyObserver tracks the effective concurrency level based on pipeline

@@ -22,8 +22,8 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // InputRegName is the registation name for V2 inputs

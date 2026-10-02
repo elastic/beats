@@ -19,8 +19,8 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
 	"github.com/elastic/beats/v7/libbeat/common/capabilities"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/cache"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 )

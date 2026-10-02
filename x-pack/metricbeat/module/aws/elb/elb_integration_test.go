@@ -11,8 +11,8 @@ import (
 	"testing"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestData(t *testing.T) {

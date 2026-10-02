@@ -33,7 +33,7 @@ import (
 
 	"github.com/elastic/go-freelru"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // Utilities related to Type conversion

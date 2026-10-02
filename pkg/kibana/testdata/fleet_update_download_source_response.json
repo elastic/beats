@@ -1,0 +1,9 @@
+{
+    "item": {
+        "id": "test-id",
+        "name": "test-name",
+        "host": "http://newtest.local",
+        "is_default": false
+    }
+}
+

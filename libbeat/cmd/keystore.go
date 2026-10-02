@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common/cli"
 	"github.com/elastic/beats/v7/libbeat/common/terminal"
-	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/beats/v7/pkg/keystore"
 )
 
 func getKeystore(settings instance.Settings) (keystore.Keystore, error) {

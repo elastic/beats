@@ -20,8 +20,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type describeRegionsClient interface {

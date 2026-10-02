@@ -20,15 +20,15 @@ package template
 import (
 	"fmt"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/parse"
 
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
-	"github.com/elastic/elastic-agent-libs/keystore"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/keystore"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // Mapper maps config templates with conditions in ConditionMaps, if a match happens on a discover event

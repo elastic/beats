@@ -27,7 +27,7 @@ import (
 
 	"github.com/elastic/go-concert/unison"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 func init() {

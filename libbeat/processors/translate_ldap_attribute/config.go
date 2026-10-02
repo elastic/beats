@@ -23,7 +23,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 )
 
 const (

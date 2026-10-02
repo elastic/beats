@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/elastic/elastic-agent-libs/opt"
+	"github.com/elastic/beats/v7/pkg/opt"
 )
 
 // CPUUsage wraps the CPU usage time values for the CPU controller metrics

@@ -54,7 +54,7 @@ import (
 
 	"github.com/elastic/beats/v7/dev-tools/testbin"
 	"github.com/elastic/beats/v7/libbeat/common/proc"
-	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/mock-es/pkg/api"
 )

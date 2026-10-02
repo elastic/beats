@@ -19,7 +19,7 @@ package network
 
 import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func eventsMapping(r mb.ReporterV2, netsStatsList []NetStats) {

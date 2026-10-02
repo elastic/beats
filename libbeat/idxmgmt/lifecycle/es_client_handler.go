@@ -23,7 +23,7 @@ import (
 	"net/http"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // ESClientHandler implements the Loader interface for talking to ES.

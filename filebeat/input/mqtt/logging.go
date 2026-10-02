@@ -22,7 +22,7 @@ import (
 
 	libmqtt "github.com/eclipse/paho.mqtt.golang"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 var setupLoggingOnce sync.Once

@@ -29,7 +29,7 @@ import (
 
 	"github.com/go-ldap/ldap/v3"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // ldapClient manages a single reusable LDAP connection

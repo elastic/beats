@@ -11,10 +11,10 @@ import (
 	"net/url"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/version"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/version"
 )
 
 // LogAndSendErrorEventWithoutTransactionId sends an error event without a transaction id to the reporter with the provided details.

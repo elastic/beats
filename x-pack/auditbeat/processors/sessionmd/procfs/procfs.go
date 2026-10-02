@@ -14,9 +14,9 @@ import (
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/auditbeat/helper/tty"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/timeutils"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func MajorTTY(ttyNr uint32) uint32 {

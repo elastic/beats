@@ -24,7 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/elastic-agent-libs/testing"
+	"github.com/elastic/beats/v7/pkg/testing"
 )
 
 // receiveOneEvent receives one event from the events channel then closes the

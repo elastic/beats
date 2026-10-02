@@ -15,9 +15,9 @@ import (
 	sqladmin "google.golang.org/api/sqladmin/v1"
 
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // NewMetadataService returns the specific Metadata service for a GCP CloudSQL resource.
