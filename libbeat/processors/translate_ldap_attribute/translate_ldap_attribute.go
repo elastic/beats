@@ -22,6 +22,15 @@ package translate_ldap_attribute
 import (
 	"errors"
 	"fmt"
+<<<<<<< HEAD
+=======
+	"strings"
+	"sync"
+	"sync/atomic"
+	"time"
+
+	"github.com/go-ldap/ldap/v3"
+>>>>>>> b670dd6 (translate_ldap_attribute: fix String race during LDAP init (#51690))
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -45,6 +54,17 @@ type processor struct {
 	config
 	client *ldapClient
 	log    *logp.Logger
+<<<<<<< HEAD
+=======
+
+	// description stores the processor's String output. It must remain lock-free because the logger
+	// evaluates this Stringer while client initialization is running.
+	description atomic.Value // stores string
+
+	clientMu          sync.Mutex
+	clientErr         error
+	nextClientAttempt time.Time
+>>>>>>> b670dd6 (translate_ldap_attribute: fix String race during LDAP init (#51690))
 }
 
 func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
@@ -57,6 +77,37 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 }
 
 func newFromConfig(c config, logger *logp.Logger) (*processor, error) {
+<<<<<<< HEAD
+=======
+	p := &processor{config: c}
+	p.storeDescription(c)
+	p.log = logger.Named(logName).With(logp.Stringer("processor", p))
+	return p, nil
+}
+
+func (p *processor) storeDescription(c config) {
+	p.description.Store(fmt.Sprintf("translate_ldap_attribute=[field=%s, ldap_address=%s, ldap_base_dn=%s, ldap_bind_user=%s, ldap_search_attribute=%s, ldap_mapped_attribute=%s]",
+		c.Field, c.LDAPAddress, c.LDAPBaseDN, c.LDAPBindUser, c.LDAPSearchAttribute, c.LDAPMappedAttribute))
+}
+
+// newClient creates a new LDAP client by discovering and connecting to available servers.
+func newClient(c config, log *logp.Logger) (*ldapClient, error) {
+	// Auto-discover LDAP addresses if not provided
+	var addresses []string
+	if c.LDAPAddress != "" {
+		addresses = []string{c.LDAPAddress}
+	} else {
+		log.Info("LDAP address not configured, attempting auto-discovery")
+		discoveredAddresses, err := discoverLDAPAddress(c.LDAPDomain, log)
+		if err != nil {
+			return nil, fmt.Errorf("failed to auto-discover LDAP server: %w", err)
+		}
+		addresses = discoveredAddresses
+		log.Infow("discovered LDAP servers", "count", len(addresses), "addresses", addresses)
+	}
+
+	// Prepare base LDAP config
+>>>>>>> b670dd6 (translate_ldap_attribute: fix String race during LDAP init (#51690))
 	ldapConfig := &ldapConfig{
 		address:         c.LDAPAddress,
 		baseDN:          c.LDAPBaseDN,
@@ -84,8 +135,8 @@ func newFromConfig(c config, logger *logp.Logger) (*processor, error) {
 }
 
 func (p *processor) String() string {
-	return fmt.Sprintf("translate_ldap_attribute=[field=%s, ldap_address=%s, ldap_base_dn=%s, ldap_bind_user=%s, ldap_search_attribute=%s, ldap_mapped_attribute=%s]",
-		p.Field, p.LDAPAddress, p.LDAPBaseDN, p.LDAPBindUser, p.LDAPSearchAttribute, p.LDAPMappedAttribute)
+	description, _ := p.description.Load().(string)
+	return description
 }
 
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
@@ -134,3 +185,36 @@ func (p *processor) Close() error {
 	p.client.close()
 	return nil
 }
+<<<<<<< HEAD
+=======
+
+func (p *processor) ensureClient() (*ldapClient, error) {
+	p.clientMu.Lock()
+	defer p.clientMu.Unlock()
+
+	if p.client != nil {
+		return p.client, nil
+	}
+
+	now := time.Now()
+	if !p.nextClientAttempt.IsZero() && now.Before(p.nextClientAttempt) && p.clientErr != nil {
+		return nil, fmt.Errorf("ldap client initialization paused until %s: %w", p.nextClientAttempt.Format(time.RFC3339), p.clientErr)
+	}
+
+	client, err := newClient(p.config, p.log)
+	if err != nil {
+		p.clientErr = err
+		p.nextClientAttempt = now.Add(clientRetryBackoff)
+		return nil, err
+	}
+
+	// Update config with discovered values for logging/debugging.
+	p.client = client
+	p.LDAPBaseDN = client.baseDN
+	p.LDAPAddress = client.address
+	p.storeDescription(p.config)
+	p.clientErr = nil
+	p.nextClientAttempt = time.Time{}
+	return client, nil
+}
+>>>>>>> b670dd6 (translate_ldap_attribute: fix String race during LDAP init (#51690))
