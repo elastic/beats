@@ -19,11 +19,10 @@ package file_integrity
 
 import (
 	"os"
-	"syscall"
 	"testing"
-	"unsafe"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/sys/windows"
 )
 
 func TestGetNamedSecurityInfo(t *testing.T) {
@@ -35,27 +34,13 @@ func TestGetNamedSecurityInfo(t *testing.T) {
 	defer os.Remove(file.Name())
 	defer file.Close()
 
-	name, err := syscall.UTF16PtrFromString(file.Name())
+	securityDescriptor, err := windows.GetNamedSecurityInfo(file.Name(), windows.SE_FILE_OBJECT, windows.OWNER_SECURITY_INFORMATION)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// Get the file owner.
-	var securityID *syscall.SID
-	var securityDescriptor *SecurityDescriptor
-	if err = GetNamedSecurityInfo(name, FileObject,
-		OwnerSecurityInformation, &securityID, nil, nil, nil, &securityDescriptor); err != nil {
-		t.Fatal(err)
-	}
-
-	_, err = securityID.String()
+	securityID, _, err := securityDescriptor.Owner()
 	assert.NoError(t, err)
 	_, _, _, err = securityID.LookupAccount("")
 	assert.NoError(t, err)
-
-	// Freeing the security descriptor releases the memory used by the SID.
-	_, err = syscall.LocalFree((syscall.Handle)(unsafe.Pointer(securityDescriptor)))
-	if err != nil {
-		t.Fatal(err)
-	}
 }
