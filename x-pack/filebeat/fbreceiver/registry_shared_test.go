@@ -26,7 +26,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-const registryStatePrefix = "filebeat::logs::"
+const logInputStatePrefix = "filebeat::logs::"
 
 // TestLogInputReceiversShareRegistry runs two receivers with log inputs over
 // one path.data, as Elastic Agent does for the streams of one component, with
