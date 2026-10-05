@@ -170,8 +170,11 @@ func addrPort(ip net.IP, port uint16) (netip.AddrPort, bool) {
 	if !ok {
 		return netip.AddrPort{}, false
 	}
-	// Quark tracks IPv4 connections under AF_INET, so unmap
-	// IPv4-mapped IPv6 addresses.
+	// net.IP usually holds IPv4 addresses in 16-byte form, which
+	// AddrFromSlice turns into an IPv4-mapped IPv6 address. Unmap so
+	// quark gets a plain IPv4 endpoint; it tries the AF_INET key
+	// first and the IPv4-mapped AF_INET6 key (dual-stack sockets)
+	// second.
 	return netip.AddrPortFrom(addr.Unmap(), port), true
 }
 

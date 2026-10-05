@@ -72,12 +72,23 @@ func (q *fakeQuarkQueue) Lookup(pid int) (quark.Process, bool) {
 	return p, ok
 }
 
+// SocketLookup mirrors quark.Queue.SocketLookup: sockets are keyed in
+// the exact form quark caches them (AF_INET, or IPv4-mapped AF_INET6
+// for IPv4 traffic on dual-stack sockets); the AF_INET key is tried
+// first and the IPv4-mapped key second.
 func (q *fakeQuarkQueue) SocketLookup(local, remote netip.AddrPort) (quark.Socket, bool) {
-	key := socketKey{
-		netip.AddrPortFrom(local.Addr().Unmap(), local.Port()),
-		netip.AddrPortFrom(remote.Addr().Unmap(), remote.Port()),
+	l, r := local.Addr().Unmap(), remote.Addr().Unmap()
+	s, ok := q.sockets[socketKey{
+		netip.AddrPortFrom(l, local.Port()),
+		netip.AddrPortFrom(r, remote.Port()),
+	}]
+	if ok || !l.Is4() || !r.Is4() {
+		return s, ok
 	}
-	s, ok := q.sockets[key]
+	s, ok = q.sockets[socketKey{
+		netip.AddrPortFrom(netip.AddrFrom16(l.As16()), local.Port()),
+		netip.AddrPortFrom(netip.AddrFrom16(r.As16()), remote.Port()),
+	}]
 	return s, ok
 }
 
@@ -87,12 +98,13 @@ func TestQuarkFindProcessTuple(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "procs")
 
 	const (
-		curlPid    = 4242
-		curlPpid   = 4000
-		serverPid  = 5252
-		legacyPid  = 6262
-		udpPid     = 7272
-		unnamedPid = 8282
+		curlPid      = 4242
+		curlPpid     = 4000
+		serverPid    = 5252
+		legacyPid    = 6262
+		udpPid       = 7272
+		unnamedPid   = 8282
+		dualStackPid = 9292
 	)
 
 	fake := newFakeQuarkQueue()
@@ -120,6 +132,12 @@ func TestQuarkFindProcessTuple(t *testing.T) {
 		// so the name must come from argv[0].
 		Comm:    "verylongprocess",
 		Cmdline: []string{"/opt/bin/verylongprocessname", "-d"},
+	}
+	fake.procs[dualStackPid] = quark.Process{
+		Pid:     dualStackPid,
+		Comm:    "goserver",
+		Exe:     "/usr/bin/goserver",
+		Cmdline: []string{"goserver"},
 	}
 
 	// A closed short-lived IPv4 connection, still within quark's cache
@@ -153,6 +171,17 @@ func TestQuarkFindProcessTuple(t *testing.T) {
 		quark.Socket{
 			PidOrigin:  unnamedPid,
 			PidLastUse: unnamedPid,
+		},
+	)
+	// An IPv4 connection accepted by a dual-stack [::] listener. The
+	// kernel reports it as AF_INET6 with IPv4-mapped addresses, and
+	// quark caches it that way; the capture sees plain IPv4 packets.
+	fake.addSocket(
+		netip.MustParseAddrPort("[::ffff:192.168.1.1]:8080"),
+		netip.MustParseAddrPort("[::ffff:10.0.0.5]:41000"),
+		quark.Socket{
+			PidOrigin:  dualStackPid,
+			PidLastUse: dualStackPid,
 		},
 	)
 	// A connection quark knows, but whose process it does not: the
@@ -236,6 +265,22 @@ func TestQuarkFindProcessTuple(t *testing.T) {
 				Name: "myv6_service",
 				Args: []string{"myv6_service"},
 				Exe:  "/usr/bin/myv6_service",
+			},
+		},
+		{
+			name: "IPv4 connection on dual-stack listener resolved via IPv4-mapped key",
+			tuple: common.IPPortTuple{
+				BaseTuple: common.BaseTuple{
+					SrcIP: net.ParseIP("10.0.0.5"), SrcPort: 41000,
+					DstIP: net.ParseIP("192.168.1.1"), DstPort: 8080,
+				},
+			},
+			transport: "tcp",
+			dst: common.Process{
+				PID:  dualStackPid,
+				Name: "goserver",
+				Args: []string{"goserver"},
+				Exe:  "/usr/bin/goserver",
 			},
 		},
 		{
