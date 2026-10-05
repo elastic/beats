@@ -112,7 +112,7 @@ func seedRegistry(t *testing.T, dataDir string, files []string) {
 		require.NoError(t, err, "log file must exist")
 		st := file.State{Source: f, Finished: true, TTL: -1, Timestamp: time.Now(), FileStateOS: commonfile.GetOSState(info)}
 		st.Id, st.IdentifierName = identifier.GenerateID(st)
-		require.NoError(t, store.Set(registryStatePrefix+st.Id, st), "seed state for %s must be written", f)
+		require.NoError(t, store.Set(logInputStatePrefix+st.Id, st), "seed state for %s must be written", f)
 	}
 	require.NoError(t, store.Close(), "seed store must close")
 	require.NoError(t, registry.Close(), "seed registry must close")
@@ -125,7 +125,7 @@ func registryOffsets(t *testing.T, dataDir string) map[string]int64 {
 	defer store.Close()
 	offsets := map[string]int64{}
 	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
-		if !strings.HasPrefix(key, registryStatePrefix) {
+		if !strings.HasPrefix(key, logInputStatePrefix) {
 			return true, nil
 		}
 		var st file.State
