@@ -381,7 +381,7 @@ func TestSharedRegistrarLoweredTimeoutFlushesArmedBatch(t *testing.T) {
 	require.Eventually(t, func() bool { return inMemoryOffset(regA, fileA.Id) == 5000 }, 5*time.Second, 10*time.Millisecond, "A's batch must be applied and waiting on its hour-long timer")
 	assert.Equal(t, 0, spyA.count(), "A must not be acked while its timer is armed")
 
-	regB, err := New(stateStore, &atomicSpy{}, 0, logger)
+	regB, err := New(stateStore, &atomicSpy{}, time.Millisecond, logger)
 	require.NoError(t, err, "registrar B must be created")
 	require.NoError(t, regB.Start(), "registrar B must start")
 
