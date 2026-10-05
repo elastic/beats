@@ -1029,12 +1029,15 @@ func TestReloadInputsReusesConfigsOfUnchangedUnits(t *testing.T) {
 	mm, ok := m.(*BeatV2Manager)
 	require.True(t, ok)
 
+	policyRevision := 0
 	newExpected := func(stream string) *proto.UnitExpectedConfig {
+		// the agent bumps the policy revision in the source of every unit on each policy change
+		policyRevision++
 		return &proto.UnitExpectedConfig{
 			Id:      "input-1",
 			Type:    "mock",
 			Name:    "mock",
-			Source:  integration.RequireNewStruct(t, map[string]any{"id": "input-1"}),
+			Source:  integration.RequireNewStruct(t, map[string]any{"id": "input-1", "policy": map[string]any{"revision": policyRevision}}),
 			Streams: []*proto.Stream{{Id: stream, Source: integration.RequireNewStruct(t, map[string]any{"id": stream})}},
 		}
 	}
@@ -1049,7 +1052,7 @@ func TestReloadInputsReusesConfigsOfUnchangedUnits(t *testing.T) {
 
 	first := reloadWith(unit)
 
-	// the client replaces a unit's config with a new, equal protobuf
+	// the client replaces a unit's config with a new protobuf that only differs in the policy revision
 	clientUnit.expected.Config = newExpected("stream-1")
 	assert.Same(t, first[0], reloadWith(unit)[0], "unchanged unit must reuse its generated config")
 

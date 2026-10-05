@@ -1188,7 +1188,7 @@ type cachedUnitConfig struct {
 }
 
 func (c cachedUnitConfig) matches(expected *proto.UnitExpectedConfig) bool {
-	return c.expected == expected || gproto.Equal(c.expected, expected)
+	return equalIgnoringPolicy(c.expected, expected)
 }
 
 func featuresEqual(applied, expected *proto.Features) bool {
