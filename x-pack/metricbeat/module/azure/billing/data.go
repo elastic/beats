@@ -28,6 +28,7 @@ func EventsMapping(
 	subscriptionId string,
 	results Usage,
 	timeOpts TimeIntervalOptions,
+	fetch FetchContext,
 	logger *logp.Logger,
 ) ([]mb.Event, error) {
 	events := make([]mb.Event, 0, len(results.UsageDetails))
@@ -38,7 +39,9 @@ func EventsMapping(
 
 	if len(results.UsageDetails) > 0 {
 		for _, ud := range results.UsageDetails {
-			event := mb.Event{Timestamp: time.Now().UTC()}
+			// All events of a fetch share its timestamp, so that they can be
+			// grouped back into the fetch they came from.
+			event := mb.Event{Timestamp: fetch.Time}
 
 			// shared fields
 			event.RootFields = mapstr.M{
@@ -128,6 +131,11 @@ func EventsMapping(
 				return events, errors.New("unsupported usage details format: not legacy nor modern")
 			}
 
+			// Fetch identity and the scope the data was queried for, shared by
+			// every event of the run.
+			_, _ = event.MetricSetFields.Put("fetch_id", fetch.ID)
+			_, _ = event.MetricSetFields.Put("scope", results.Scope)
+
 			events = append(events, event)
 		}
 	}
@@ -136,7 +144,7 @@ func EventsMapping(
 	// Forecasts
 	//
 
-	forecastsEvents, err := getEventsFromQueryResult(results.Forecasts, subscriptionId, logger)
+	forecastsEvents, err := getEventsFromQueryResult(results.Forecasts, subscriptionId, results.Scope, fetch, logger)
 	if err != nil {
 		return events, err
 	}
@@ -172,7 +180,7 @@ func getResourceNameFromPath(path string) string {
 // .Rows:
 // 0: []interface {}{0.11, 2.0200807e+07, "Actual", "USD"}
 // 1: []interface {}{0.11, 2.0200808e+07, "Forecast", "USD"}
-func getEventsFromQueryResult(result armcostmanagement.QueryResult, subscriptionID string, logger *logp.Logger) ([]mb.Event, error) {
+func getEventsFromQueryResult(result armcostmanagement.QueryResult, subscriptionID string, scope string, fetch FetchContext, logger *logp.Logger) ([]mb.Event, error) {
 	// The number of columns expected in the QueryResult supported by this input.
 	// The structure of the QueryResult is determined by the value we set in
 	// the `costmanagement.ForecastDefinition` struct at query time.
@@ -263,9 +271,6 @@ func getEventsFromQueryResult(result armcostmanagement.QueryResult, subscription
 			continue
 		}
 
-		// test: trying to make the linter happy
-		_ = costFieldName
-
 		event := mb.Event{
 			RootFields: mapstr.M{
 				"cloud.provider": "azure",
@@ -277,8 +282,15 @@ func getEventsFromQueryResult(result armcostmanagement.QueryResult, subscription
 				costFieldName: cost,
 				"usage_date":  usageDate,
 				"currency":    currency,
+				// Fetch identity and the scope the forecast was queried for. The
+				// forecast rows carry no scope of their own, and the subscription
+				// ID above is the configured one even for department and billing
+				// account scopes, so this is what tells forecasts of different
+				// scopes apart.
+				"fetch_id": fetch.ID,
+				"scope":    scope,
 			},
-			Timestamp: time.Now().UTC(),
+			Timestamp: fetch.Time,
 		}
 
 		events = append(events, event)
