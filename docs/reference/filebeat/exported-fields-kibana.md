@@ -85,7 +85,7 @@ Module for parsing Kibana logs.
 
 
 **`kibana.diff.ops`**
-:   JSON Patch operations describing the saved object attributes changed by this event, emitted when saved object diff auditing is enabled in Kibana. Each operation may include `value` and `oldValue` whose JSON type varies by attribute (string, number, boolean, array, or object). Those two fields are intentionally not declared: `dynamic: false` on this object stores them in `_source` without adding a mapping, so the first event to arrive can never fix their type and later events with a different type are never rejected.
+:   JSON Patch operations describing the saved object attributes changed by this event, emitted when saved object diff auditing is enabled in Kibana. Each operation can include `value` and `oldValue` whose JSON type varies by attribute (string, number, boolean, array, or object). Those two fields are intentionally not declared: `dynamic: false` on this object stores them in `_source` without adding a mapping, so the first event to arrive can never fix their type and later events with a different type are never rejected.
 
     type: object
 
