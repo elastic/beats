@@ -432,8 +432,15 @@ filebeat.inputs:
 
 The maximum number of times the input should attempt to reconnect to the streaming data source in the event of a connection failure. The default value is `5` which means a maximum of 5 retries will be attempted.
 
+<<<<<<< HEAD:x-pack/filebeat/docs/inputs/input-streaming.asciidoc
 [float]
 ==== `retry.wait_min`
+=======
+{applies_to}`stack: ga 9.4+` For the `crowdstrike` stream type, a firehose connection that is dropped after delivering events is resumed from the cursor without counting as an attempt, and the attempt count resets. Only consecutive failures that deliver no events count toward `max_attempts`.
+
+
+### `retry.wait_min` [_retry_wait_min]
+>>>>>>> 5c9eefe (x-pack/filebeat/input/streaming: resume CrowdStrike firehose after dropped connections (#53416)):docs/reference/filebeat/filebeat-input-streaming.md
 
 The minimum time to wait between retries. This ensures that retries are spaced out enough to give the system time to recover or resolve transient issues, rather than bombarding the system with rapid retries. For example, `wait_min` might be set to 1 second, meaning that even if the calculated backoff is less than this, the client will wait at least 1 second before retrying. The default value is `1` second.
 
