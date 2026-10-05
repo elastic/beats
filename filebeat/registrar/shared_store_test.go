@@ -65,7 +65,7 @@ func TestSharedRegistrarPreservesOtherOwnersOffsets(t *testing.T) {
 	require.NoError(t, regA.Start(), "registrar A must start")
 	require.NoError(t, regB.Start(), "registrar B must start")
 	assert.Same(t, regA.shared, regB.shared, "owners with the same store key must share one registrar")
-	assert.Len(t, regA.GetStates(), 2, "both owners must see the previously persisted states")
+	assert.Len(t, regA.GetStates(), 2, "regA must see the previously persisted states")
 
 	fileA.Offset = 5000
 	regA.Channel <- []file.State{fileA}
