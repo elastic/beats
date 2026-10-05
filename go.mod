@@ -25,15 +25,15 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.33.6
 	github.com/aws/aws-sdk-go-v2/credentials v1.20.6
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.73.0
-	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.88.1
+	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.89.0
 	github.com/aws/aws-sdk-go-v2/service/costexplorer v1.73.1
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.336.1
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.338.1
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.63.1
 	github.com/aws/aws-sdk-go-v2/service/iam v1.64.1
-	github.com/aws/aws-sdk-go-v2/service/organizations v1.60.1
-	github.com/aws/aws-sdk-go-v2/service/rds v1.129.1
+	github.com/aws/aws-sdk-go-v2/service/organizations v1.61.0
+	github.com/aws/aws-sdk-go-v2/service/rds v1.130.0
 	github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.41.1
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.113.4
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.114.0
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.52.1
 	github.com/aws/aws-sdk-go-v2/service/sts v1.51.1
 	github.com/blakesmith/ar v0.0.0-20150311145944-8bd4349a67f2
@@ -160,10 +160,10 @@ require (
 	github.com/Azure/azure-storage-blob-go v0.15.0
 	github.com/aerospike/aerospike-client-go/v7 v7.7.1
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.20.1
-	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.23.10
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.23.11
 	github.com/aws/aws-sdk-go-v2/service/apigateway v1.50.0
 	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.44.0
-	github.com/aws/aws-sdk-go-v2/service/health v1.47.0
+	github.com/aws/aws-sdk-go-v2/service/health v1.48.0
 	github.com/aws/smithy-go v1.28.1
 	github.com/beevik/ntp v1.4.3
 	github.com/brianvoe/gofakeit v3.18.0+incompatible
