@@ -18,7 +18,7 @@ summary: Fix Log input file re-ingestion after restart when multiple inputs run 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-description: When several Filebeat receivers in one process used the same registry, each one loaded every log input state and rewrote all of them on every flush, so a receiver could persist a stale offset for a file harvested by another receiver. On restart that file was re-read from the stale offset and its events were ingested again. Receivers that share a registry now share a single registrar, matching how Filestream shares its state store.
+description: When multiple Log inputs used the same registry, each registrar loaded every log input state and rewrote all of them on every flush. A registrar could therefore persist a stale offset for a file harvested by another Log input, causing events to be ingested again after restart. Log inputs that use the same registry now share a single registrar.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:
