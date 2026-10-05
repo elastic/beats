@@ -1954,11 +1954,11 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-event-hubs
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-sdk-for-go/sdk/azcore
-Version: v1.23.1
+Version: v1.23.2
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/azcore@v1.23.1/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/azcore@v1.23.2/LICENSE.txt:
 
 MIT License
 
