@@ -57,7 +57,6 @@ func TestLogInputReceiversShareRegistry(t *testing.T) {
 						"inputs": []map[string]any{
 							{
 								"type":                 "log",
-								"enabled":              true,
 								"allow_deprecated_use": true,
 								"paths":                []string{f},
 								"scan_frequency":       "1s",
