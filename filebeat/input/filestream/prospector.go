@@ -79,6 +79,7 @@ func init() {
 type fileProspector struct {
 	logger                *logp.Logger
 	filewatcher           loginp.FSWatcher
+	checkInterval         time.Duration
 	identifier            fileIdentifier
 	ignoreOlder           time.Duration
 	ignoreInactiveSince   ignoreInactiveType
@@ -347,35 +348,43 @@ func (p *fileProspector) Run(
 	// we use this logger instead of the prospector logger.
 	defer p.stopHarvesterGroup(ctx.Logger, hg)
 
-	var tg unison.MultiErrGroup
-
 	// The harvester needs to notify the FileWatcher
 	// when it closes
-	hg.SetObserver(p.filewatcher.NotifyChan())
+	hg.SetObserver(p.filewatcher)
 
 	ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
-	tg.Go(func() error {
-		p.filewatcher.Run(ctx.Cancelation, metrics, p.ignoreOlder, ignoreInactiveSince)
-		return nil
+	p.scanLoop(ctx.Cancelation, metrics, ignoreInactiveSince, func(fe loginp.FSEvent) {
+		src := p.identifier.GetSource(fe)
+		p.onFSEvent(loggerWithEvent(p.logger, fe), ctx, fe, src, s, hg, ignoreInactiveSince)
 	})
+}
 
-	tg.Go(func() error {
-		for ctx.Cancelation.Err() == nil {
-			fe := p.filewatcher.Event()
+// scanLoop scans the file system on the calling goroutine, handing each event
+// to sink, until ctx is cancelled. A non-positive checkInterval disables
+// re-scanning after the initial scan.
+func (p *fileProspector) scanLoop(
+	ctx unison.Canceler,
+	metrics *loginp.Metrics,
+	ignoreInactiveSince time.Time,
+	sink loginp.FSEventSink,
+) {
+	defer metrics.Cleanup()
 
-			if fe.Op == loginp.OpDone {
-				return nil
-			}
+	p.filewatcher.ScanOnce(ctx, sink, metrics, p.ignoreOlder, ignoreInactiveSince)
+	if p.checkInterval <= 0 {
+		<-ctx.Done()
+		return
+	}
 
-			src := p.identifier.GetSource(fe)
-			p.onFSEvent(loggerWithEvent(p.logger, fe), ctx, fe, src, s, hg, ignoreInactiveSince)
+	ticker := time.NewTicker(p.checkInterval)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ticker.C:
+			p.filewatcher.ScanOnce(ctx, sink, metrics, p.ignoreOlder, ignoreInactiveSince)
+		case <-ctx.Done():
+			return
 		}
-		return nil
-	})
-
-	errs := tg.Wait()
-	if len(errs) > 0 {
-		p.logger.Errorf("running prospector failed: %v", errors.Join(errs...))
 	}
 }
 
