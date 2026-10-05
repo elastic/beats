@@ -34,8 +34,8 @@
 
 **Auditbeat**
 
-* Fix auditbeat file_integrity kprobe leak that could prevent FIM from starting when the running kernel does not match the first candidate BTF spec.  
-* Fix process misattribution in system/socket where TCP/UDP flows were attributed to wrong processes.  
+* Fix Auditbeat `file_integrity` kprobe leak that could prevent FIM from starting when the running kernel does not match the first candidate BTF spec.
+* Fix process misattribution in `system/socket` where TCP/UDP flows were attributed to wrong processes.
 
 **Filebeat**
 
@@ -44,7 +44,7 @@
 * Reconnect the ETW input when its real-time session is stopped and restarted. [#49984](https://github.com/elastic/beats/issues/49984)
 * Fix race condition in Kafka input when multiple inputs are configured.  [#34919](https://github.com/elastic/beats/issues/34919)
 * Fix Azure AD entity analytics accumulating stale registered owners and users on devices.
-* Fix Active Directory entity analytics panic when ssl.certificate_authorities is set.  
+* Fix Active Directory entity analytics panic when `ssl.certificate_authorities` is set.  
 * Respond to `http_endpoint` requests that contain no events instead of closing the connection.
 * Fix `httpjson` rate limiter marking the input "Degraded" when rate-limit headers are absent.
 * Scope the `aws-s3` lexicographical polling tail to the input's bucket and key prefix. [#53195](https://github.com/elastic/beats/issues/53195)
