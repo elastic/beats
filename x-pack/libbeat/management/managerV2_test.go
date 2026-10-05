@@ -980,6 +980,95 @@ func TestReloadNilOutputUnit(t *testing.T) {
 	}, "reload must not panic when there is no output unit")
 }
 
+func TestReloadConvertsFeaturesOnlyWhenChanged(t *testing.T) {
+	r := reload.NewRegistry()
+	r.MustRegisterOutput(&mockOutput{ReloadFn: func(*reload.ConfigWithMeta) error { return nil }})
+	m, err := NewV2AgentManagerWithClient(&Config{Enabled: false}, r, nil, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+	mm, ok := m.(*BeatV2Manager)
+	require.True(t, ok)
+	t.Cleanup(func() { require.NoError(t, features.UpdateFromConfig(nil)) })
+
+	reloadWith := func(f *proto.Features) {
+		unit := newAgentUnit(&mockClientUnit{expected: client.Expected{State: client.UnitStateStopped, Features: f}}, nil)
+		mm.reload(map[unitKey]*agentUnit{{Type: client.UnitTypeInput, ID: unit.ID()}: unit})
+	}
+
+	reloadWith(&proto.Features{Fqdn: &proto.FQDNFeature{Enabled: true}})
+	applied := mm.lastBeatFeaturesCfg
+	require.NotNil(t, applied)
+	assert.True(t, features.FQDN())
+
+	reloadWith(&proto.Features{Fqdn: &proto.FQDNFeature{Enabled: true}})
+	assert.Same(t, applied, mm.lastBeatFeaturesCfg, "equal features must not be converted again")
+
+	reloadWith(&proto.Features{Fqdn: &proto.FQDNFeature{Enabled: false}})
+	assert.NotSame(t, applied, mm.lastBeatFeaturesCfg)
+	assert.False(t, features.FQDN())
+}
+
+// agentInfoClient is a client.V2 that only knows its AgentInfo.
+type agentInfoClient struct {
+	client.V2
+	info *client.AgentInfo
+}
+
+func (c *agentInfoClient) AgentInfo() *client.AgentInfo { return c.info }
+
+func TestReloadInputsReusesConfigsOfUnchangedUnits(t *testing.T) {
+	var applied []*reload.ConfigWithMeta
+	r := reload.NewRegistry()
+	r.MustRegisterInput(&mockReloadable{ReloadFn: func(configs []*reload.ConfigWithMeta) error {
+		applied = configs
+		return nil
+	}})
+
+	agentInfo := &client.AgentInfo{ID: "agent-1", Version: "9.0.0"}
+	m, err := NewV2AgentManagerWithClient(&Config{Enabled: true}, r, &agentInfoClient{info: agentInfo}, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+	mm, ok := m.(*BeatV2Manager)
+	require.True(t, ok)
+
+	newExpected := func(stream string) *proto.UnitExpectedConfig {
+		return &proto.UnitExpectedConfig{
+			Id:      "input-1",
+			Type:    "mock",
+			Name:    "mock",
+			Source:  integration.RequireNewStruct(t, map[string]any{"id": "input-1"}),
+			Streams: []*proto.Stream{{Id: stream, Source: integration.RequireNewStruct(t, map[string]any{"id": stream})}},
+		}
+	}
+	clientUnit := &mockClientUnit{expected: client.Expected{State: client.UnitStateHealthy, Config: newExpected("stream-1")}}
+	unit := newAgentUnit(clientUnit, nil)
+	reloadWith := func(unit *agentUnit) []*reload.ConfigWithMeta {
+		mm.forceReload = true // reload even when the expected configs are equal
+		require.NoError(t, mm.reloadInputs([]*agentUnit{unit}))
+		require.NotEmpty(t, applied)
+		return applied
+	}
+
+	first := reloadWith(unit)
+
+	// the client replaces a unit's config with a new, equal protobuf
+	clientUnit.expected.Config = newExpected("stream-1")
+	assert.Same(t, first[0], reloadWith(unit)[0], "unchanged unit must reuse its generated config")
+
+	// a unit with the same ID and config but a different agentUnit
+	assert.NotSame(t, first[0], reloadWith(newAgentUnit(clientUnit, nil))[0], "configs are bound to their agent unit")
+	reloadWith(unit)
+
+	before := reloadWith(unit)
+	clientUnit.expected.Config = newExpected("stream-2")
+	changed := reloadWith(unit)
+	assert.NotSame(t, before[0], changed[0], "changed config must be regenerated")
+	assert.Same(t, changed[0], reloadWith(unit)[0])
+
+	agentInfo.ID = "agent-2"
+	afterInfoChange := reloadWith(unit)
+	assert.NotSame(t, changed[0], afterInfoChange[0], "changed agent info must invalidate the cache")
+	assert.Same(t, afterInfoChange[0], reloadWith(unit)[0])
+}
+
 type reloadable struct {
 	mx          sync.Mutex
 	config      *reload.ConfigWithMeta

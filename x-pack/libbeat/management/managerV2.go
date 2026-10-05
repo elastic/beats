@@ -108,6 +108,11 @@ type BeatV2Manager struct {
 	// set with the last applied input configs
 	lastInputCfgs map[string]*proto.UnitExpectedConfig
 
+	// generated beat configs per input unit, reused while the unit's expected
+	// config and the agent info are unchanged
+	inputCfgCache     map[string]cachedUnitConfig
+	inputCfgCacheInfo client.AgentInfo
+
 	// set with the last applied APM config
 	lastAPMCfg *proto.APMConfig
 
@@ -116,6 +121,10 @@ type BeatV2Manager struct {
 	lastBeatInputCfgs   []*reload.ConfigWithMeta
 	lastBeatFeaturesCfg *conf.C
 	lastBeatAPMCfg      *reload.ConfigWithMeta
+
+	// every unit carries the component's features; converting them per unit on
+	// each reload dominated allocations with thousands of units
+	lastFeatures *proto.Features
 
 	// changeDebounce is the debounce time for a configuration change
 	changeDebounce time.Duration
@@ -449,6 +458,8 @@ func (cm *BeatV2Manager) updateStatuses() {
 // ================================
 
 func (cm *BeatV2Manager) upsertUnit(unit *client.Unit) {
+	shareExpectedSources(unit.Expected().Config)
+
 	cm.mx.Lock()
 	defer cm.mx.Unlock()
 
@@ -473,6 +484,8 @@ func (cm *BeatV2Manager) upsertUnit(unit *client.Unit) {
 func (cm *BeatV2Manager) updateUnit(unit *client.Unit) {
 	// `unit` is already in `cm.units` no need to add it to the map again
 	// but the lock still needs to be held so reload can be triggered
+	shareExpectedSources(unit.Expected().Config)
+
 	cm.mx.Lock()
 	defer cm.mx.Unlock()
 
@@ -545,7 +558,8 @@ func (cm *BeatV2Manager) unitListen() {
 			cm.stopBeat()
 			return
 		case change := <-cm.client.UnitChanges():
-			cm.logger.Infof(
+			// Debug: one line per unit floods the logs for policies with thousands of inputs.
+			cm.logger.Debugf(
 				"BeatV2Manager.unitListen UnitChanged.ID(%s), UnitChanged.Type(%s), UnitChanged.Trigger(%d): %s/%s",
 				change.Unit.ID(),
 				change.Type, int64(change.Triggers), change.Type, change.Triggers) //nolint:gosec // It's just logging
@@ -647,8 +661,9 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 			// the unit is completely removed (aka. fully stopped)
 			lowestLevel = expected.LogLevel
 		}
-		if expected.Features != nil {
+		if expected.Features != nil && !featuresEqual(cm.lastFeatures, expected.Features) {
 			// unit is expected to update its feature flags
+			cm.lastFeatures = nil
 			featuresCfg, err := NewConfigFromProto(expected.Features)
 			if err != nil {
 				unitErrors[unit.ID()] = append(unitErrors[unit.ID()], err)
@@ -659,6 +674,9 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 			}
 
 			cm.lastBeatFeaturesCfg = featuresCfg
+			if len(unitErrors[unit.ID()]) == 0 {
+				cm.lastFeatures = expected.Features
+			}
 		}
 		if expected.State == client.UnitStateStopped {
 			// unit is being stopped
@@ -887,6 +905,17 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 	inputBeatCfgs := make([]*reload.ConfigWithMeta, 0, len(inputUnits))
 	agentInfo := cm.client.AgentInfo()
 
+	// Regenerating every unit on each change is O(units) of protobuf -> ucfg
+	// conversions, which dominates memory when policies with thousands of
+	// inputs change in quick succession.
+	if agentInfo == nil || cm.inputCfgCache == nil || *agentInfo != cm.inputCfgCacheInfo {
+		cm.inputCfgCache = make(map[string]cachedUnitConfig, len(inputUnits))
+		if agentInfo != nil {
+			cm.inputCfgCacheInfo = *agentInfo
+		}
+	}
+	nextCache := make(map[string]cachedUnitConfig, len(inputUnits))
+
 	for _, unit := range inputUnits {
 		expected := unit.Expected()
 		if expected.Config == nil {
@@ -897,23 +926,31 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 			}
 		}
 
-		inputCfg, err := generateBeatConfig(expected.Config, agentInfo)
-		if err != nil {
-			return cfgfile.UnitError{
-				UnitID: unit.ID(),
-				Err:    fmt.Errorf("failed to generate configuration for unit %q: %w", unit.ID(), err),
+		var inputCfg []*reload.ConfigWithMeta
+		if cached, ok := cm.inputCfgCache[unit.ID()]; ok && cached.unit == unit && cached.matches(expected.Config) {
+			inputCfg = cached.cfgs
+		} else {
+			var err error
+			inputCfg, err = generateBeatConfig(expected.Config, agentInfo)
+			if err != nil {
+				return cfgfile.UnitError{
+					UnitID: unit.ID(),
+					Err:    fmt.Errorf("failed to generate configuration for unit %q: %w", unit.ID(), err),
+				}
+			}
+			// add diag callbacks for unit
+			// we want to add the diagnostic handler that's specific to the unit, and not the gobal diagnostic handler
+			for idx, in := range inputCfg {
+				in.DiagCallback = diagnosticHandler{client: unit, log: cm.logger.Named("diagnostic-manager")}
+				in.InputUnitID = unit.ID()
+				in.StatusReporter = unit.GetReporterForStreamByIndex(idx)
 			}
 		}
-		// add diag callbacks for unit
-		// we want to add the diagnostic handler that's specific to the unit, and not the gobal diagnostic handler
-		for idx, in := range inputCfg {
-			in.DiagCallback = diagnosticHandler{client: unit, log: cm.logger.Named("diagnostic-manager")}
-			in.InputUnitID = unit.ID()
-			in.StatusReporter = unit.GetReporterForStreamByIndex(idx)
-		}
+		nextCache[unit.ID()] = cachedUnitConfig{unit: unit, expected: expected.Config, cfgs: inputCfg}
 		inputCfgs[unit.ID()] = expected.Config
 		inputBeatCfgs = append(inputBeatCfgs, inputCfg...)
 	}
+	cm.inputCfgCache = nextCache
 
 	if !didChange(cm.lastInputCfgs, inputCfgs) && !cm.forceReload {
 		cm.logger.Debug("Skipped reloading input units; configuration didn't change")
@@ -1135,9 +1172,25 @@ func didChange(previous map[string]*proto.UnitExpectedConfig, latest map[string]
 		if !ok {
 			return true
 		}
-		if !gproto.Equal(p, v) {
+		if p != v && !gproto.Equal(p, v) {
 			return true
 		}
 	}
 	return false
+}
+
+// cachedUnitConfig is the beat config generated for an input unit, together with
+// the expected config it was generated from.
+type cachedUnitConfig struct {
+	unit     *agentUnit
+	expected *proto.UnitExpectedConfig
+	cfgs     []*reload.ConfigWithMeta
+}
+
+func (c cachedUnitConfig) matches(expected *proto.UnitExpectedConfig) bool {
+	return c.expected == expected || gproto.Equal(c.expected, expected)
+}
+
+func featuresEqual(applied, expected *proto.Features) bool {
+	return applied != nil && (applied == expected || gproto.Equal(applied, expected))
 }
