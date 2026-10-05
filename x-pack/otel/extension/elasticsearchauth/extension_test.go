@@ -96,6 +96,15 @@ func TestConfigValidate(t *testing.T) {
 			errText: "fragments",
 		},
 		{
+			name: "endpoint userinfo",
+			config: func() *Config {
+				config := validConfig()
+				config.Endpoints = []string{"https://url-user:url-password@es.example:9200"}
+				return config
+			},
+			errText: "endpoint userinfo is unsupported",
+		},
+		{
 			name: "API key without separator",
 			config: func() *Config {
 				config := validConfig()
@@ -169,27 +178,6 @@ func TestConfigValidate(t *testing.T) {
 				return config
 			},
 			errText: "authorization header cannot be combined",
-		},
-		{
-			name: "endpoint userinfo and basic authentication conflict",
-			config: func() *Config {
-				config := validConfig()
-				config.Endpoints = []string{"https://url-user:url-password@es.example:9200"}
-				config.User = "elastic"
-				config.Password = "password"
-				return config
-			},
-			errText: "userinfo cannot be combined",
-		},
-		{
-			name: "endpoint userinfo and authorization header conflict",
-			config: func() *Config {
-				config := validConfig()
-				config.Endpoints = []string{"https://url-user:url-password@es.example:9200"}
-				config.Headers = configopaque.MapList{{Name: "Authorization", Value: "Bearer token"}}
-				return config
-			},
-			errText: "userinfo cannot be combined",
 		},
 	}
 

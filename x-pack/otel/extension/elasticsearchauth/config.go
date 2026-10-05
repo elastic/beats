@@ -60,8 +60,8 @@ func (c *Config) Validate() error {
 			return fmt.Errorf("invalid endpoint: %w", err)
 		}
 
-		if u.User != nil && (hasExplicitCredentials || hasAuthorizationHeader) {
-			return errors.New("endpoint userinfo cannot be combined with configured authentication")
+		if u.User != nil {
+			return errors.New("endpoint userinfo is unsupported; configure user and password instead")
 		}
 	}
 

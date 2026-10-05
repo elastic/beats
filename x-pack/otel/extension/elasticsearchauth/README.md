@@ -39,7 +39,7 @@ Only plural `endpoints` is accepted. Each must be a fully resolved HTTP(S) URL.
 `api_key` is the raw, non-empty Beats-style `id:key`; the extension base64-encodes
 it exactly once when constructing `Authorization: ApiKey <base64(id:key)>`.
 Alternatively configure both `user` and `password`. Endpoint userinfo cannot be
-combined with explicit credentials or an `Authorization` destination header.
+used; configure `user` and `password` instead.
 
 When `auth.authenticator` performs HTTP authentication, do not also configure
 `user`, `password`, `api_key`, or an `Authorization` header on
