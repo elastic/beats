@@ -5,7 +5,6 @@
 package management
 
 import (
-	gproto "google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
@@ -55,7 +54,7 @@ func shared(current, candidate *structpb.Struct) *structpb.Struct {
 	if current == nil || candidate == nil || current == candidate {
 		return current
 	}
-	if !gproto.Equal(current, candidate) {
+	if !equalStructs(current, candidate, "") {
 		return current
 	}
 	return candidate
