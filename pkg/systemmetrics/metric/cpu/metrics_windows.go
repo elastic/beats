@@ -26,8 +26,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/helpers/windows/pdh"
-	"github.com/elastic/elastic-agent-libs/opt"
+	"github.com/elastic/beats/v7/pkg/helpers/windows/pdh"
+	"github.com/elastic/beats/v7/pkg/opt"
 	"github.com/elastic/gosigar/sys/windows"
 )
 

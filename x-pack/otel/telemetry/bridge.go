@@ -18,7 +18,7 @@ import (
 	"go.uber.org/zap"
 
 	logreport "github.com/elastic/beats/v7/libbeat/monitoring/report/log"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 const scopeName = "github.com/elastic/beats/v7/x-pack/otel/telemetry"

@@ -30,9 +30,9 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/opt"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/opt"
 )
 
 // Indulging in one non-const global variable for the sake of storing boot time

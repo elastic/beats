@@ -25,7 +25,7 @@ import (
 	"strconv"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 var capturer = regexp.MustCompile(`/(?P<ip>.*):(?P<port>\d+)\[(?P<interest_ops>\d*)]\(queued=(?P<queued>\d*),recved=(?P<received>\d*),sent=(?P<sent>\d*)\)`)

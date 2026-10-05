@@ -20,8 +20,8 @@ package mqtt
 import (
 	libmqtt "github.com/eclipse/paho.mqtt.golang"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 )
 
 func createClientOptions(config mqttInputConfig, onConnectHandler func(client libmqtt.Client), logger *logp.Logger) (*libmqtt.ClientOptions, error) {

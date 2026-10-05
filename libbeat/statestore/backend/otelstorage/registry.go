@@ -32,7 +32,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // Settings configures a Registry for a storage extension built from the given factory output.

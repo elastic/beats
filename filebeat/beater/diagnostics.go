@@ -29,8 +29,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/paths"
 )
 
 func getRegexpsForRegistryFiles() ([]*regexp.Regexp, error) {

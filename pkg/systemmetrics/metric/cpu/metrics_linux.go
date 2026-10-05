@@ -23,7 +23,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/opt"
+	"github.com/elastic/beats/v7/pkg/opt"
 )
 
 func scanStatFile(scanner *bufio.Scanner) (CPUMetrics, error) {

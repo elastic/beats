@@ -19,7 +19,7 @@ package registry
 
 import (
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // Create constructors for most of the Beat processors.

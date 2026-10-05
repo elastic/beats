@@ -22,8 +22,8 @@ package instance
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/paths"
 )
 
 func TestLoadKeystore(t *testing.T) {

@@ -22,7 +22,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // wakerIdleWait caps how long the waker sleeps when nothing is due sooner, so a

@@ -26,7 +26,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/include"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/scripts/msetlists"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 func main() {

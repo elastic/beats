@@ -13,9 +13,9 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	_ "github.com/elastic/beats/v7/x-pack/heartbeat/monitors/api"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/scenarios/framework"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // A module-style inline source (leading import) is loaded as-is by the agent,

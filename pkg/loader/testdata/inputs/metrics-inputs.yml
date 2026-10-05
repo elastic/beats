@@ -1,0 +1,16 @@
+inputs:
+- data_stream:
+    dataset: system.diskio
+    type: metrics
+  id: system/metrics-system.diskio-my-id
+  metricsets:
+  - diskio
+  period: 10s
+- data_stream:
+    dataset: system.filesystem
+    type: metrics
+  id: system/metrics-system.filesystem-my-id
+  metricsets:
+  - filesystem
+  period: 30s
+

@@ -20,7 +20,7 @@ package query
 import (
 	"errors"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // Config defines the "query" metricset's configuration

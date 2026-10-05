@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	helpers "github.com/elastic/beats/v7/pkg/autodiscover/docker"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func TestDeDotLabels(t *testing.T) {

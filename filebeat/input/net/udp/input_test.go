@@ -35,9 +35,9 @@ import (
 	netinput "github.com/elastic/beats/v7/filebeat/input/net"
 	"github.com/elastic/beats/v7/filebeat/input/net/nettest"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 func TestInput(t *testing.T) {

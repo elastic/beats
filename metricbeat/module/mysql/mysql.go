@@ -28,7 +28,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 
 	"github.com/go-sql-driver/mysql"
 )

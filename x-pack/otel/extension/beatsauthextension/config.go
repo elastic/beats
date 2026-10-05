@@ -8,7 +8,7 @@ import (
 	"go.opentelemetry.io/collector/component"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 )
 
 type Config struct {

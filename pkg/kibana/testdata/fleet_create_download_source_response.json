@@ -1,0 +1,8 @@
+{
+    "item": {
+        "id": "test-id",
+        "name": "test-name",
+        "host": "http://test.local",
+        "is_default": false
+    }
+}

@@ -7,7 +7,7 @@ package streaming
 import (
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // redactor implements lazy field redaction of sets of a mapstr.M.

@@ -25,7 +25,7 @@ import (
 
 	"github.com/elastic/toutoumomoma"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // exeObjParser performs a number of analyses on executable objects

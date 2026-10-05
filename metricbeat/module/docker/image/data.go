@@ -24,7 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/pkg/autodiscover/docker"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func eventsMapping(imagesList []image.Summary, dedot bool) []mapstr.M {

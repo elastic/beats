@@ -9,8 +9,8 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func getKeyValue(m mapstr.M, field string) string {

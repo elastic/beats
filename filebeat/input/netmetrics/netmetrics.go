@@ -31,8 +31,8 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 // addrs returns the linux /proc/net/tcp or /proc/net/udp addresses for the

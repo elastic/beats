@@ -20,9 +20,9 @@ package memory
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/pkg/opt"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
-	"github.com/elastic/elastic-agent-libs/opt"
 )
 
 // Memory holds os-specifc memory usage data

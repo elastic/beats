@@ -22,10 +22,10 @@ import (
 
 	"github.com/elastic/beats/v7/auditbeat/helper/tty"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type prvdr struct {

@@ -44,9 +44,9 @@ import (
 	"time"
 	"unsafe"
 
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/opt"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/opt"
 )
 
 // GetSelfPid is the darwin implementation; see the linux version in

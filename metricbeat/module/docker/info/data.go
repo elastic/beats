@@ -20,7 +20,7 @@ package info
 import (
 	"github.com/moby/moby/api/types/system"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func eventMapping(info *system.Info) mapstr.M {

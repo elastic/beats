@@ -13,7 +13,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/cloudfoundry"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // init registers the MetricSet with the central registry.
