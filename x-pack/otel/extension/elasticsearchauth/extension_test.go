@@ -323,7 +323,7 @@ func TestAuthenticationRoundTrip(t *testing.T) {
 			base := &recordingRoundTripper{}
 			config := validConfig()
 			config.Headers = configopaque.MapList{
-				{Name: "Host", Value: "destination.example"},
+				{Name: "host", Value: "destination.example"},
 				{Name: "X-Extension", Value: "extension"},
 			}
 			if test.configure != nil {

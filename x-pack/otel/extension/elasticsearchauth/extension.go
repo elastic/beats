@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"net/http"
 	"slices"
+	"strings"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/extension"
@@ -117,10 +118,10 @@ func (a *authenticatedRoundTripper) RoundTrip(request *http.Request) (*http.Resp
 	if clonedRequest.Header == nil {
 		clonedRequest.Header = make(http.Header)
 	}
-	if host, found := a.config.Headers.Get("Host"); found && host != "" {
-		clonedRequest.Host = string(host)
-	}
 	for name, value := range a.config.Headers.Iter {
+		if strings.EqualFold(name, "Host") && value != "" {
+			clonedRequest.Host = string(value)
+		}
 		clonedRequest.Header.Set(name, string(value))
 	}
 
