@@ -334,6 +334,80 @@ func TestMultipleReceivers(t *testing.T) {
 	})
 }
 
+// TestRegistrarLazyStart verifies that a receiver only starts the registrar
+// (and loads its states) when it runs a V1 input, and that each receiver
+// decides on its own.
+func TestRegistrarLazyStart(t *testing.T) {
+	const loadedMsg = "States Loaded from registrar"
+
+	factory := NewFactoryWithSettings(Settings{Home: t.TempDir()})
+
+	newConfig := func(inputType string, ingest string, home string) *Config {
+		input := map[string]any{
+			"type":    inputType,
+			"enabled": true,
+			"id":      "lazy-" + inputType,
+			"paths":   []string{ingest},
+		}
+		if inputType == "filestream" {
+			input["file_identity.native"] = nil
+		} else {
+			input["allow_deprecated_use"] = true
+		}
+		return &Config{
+			Beatconfig: map[string]any{
+				"queue.mem.flush.timeout": "0s",
+				"filebeat": map[string]any{
+					"inputs": []map[string]any{input},
+				},
+				"logging": map[string]any{
+					"level":     "info",
+					"selectors": []string{"*"},
+				},
+				"path.home": home,
+			},
+		}
+	}
+
+	type receiverCase struct {
+		name, inputType, ingest, home string
+		wantLoaded                    int
+	}
+	cases := []receiverCase{
+		{name: "fs", inputType: "filestream", wantLoaded: 0},
+		{name: "log", inputType: "log", wantLoaded: 1},
+	}
+	configs := make([]oteltest.ReceiverConfig, len(cases))
+	for i := range cases {
+		cases[i].ingest = filepath.Join(t.TempDir(), cases[i].name+".log")
+		cases[i].home = t.TempDir()
+		configs[i] = oteltest.ReceiverConfig{
+			Name:    cases[i].name,
+			Beat:    "filebeat",
+			Config:  newConfig(cases[i].inputType, cases[i].ingest, cases[i].home),
+			Factory: factory,
+		}
+	}
+
+	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
+		T:           t,
+		NumRestarts: 1,
+		Receivers:   configs,
+		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
+			for _, tc := range cases {
+				writeFile(c, tc.ingest, "A log line")
+				require.NotEmptyf(c, logs[tc.name], "receiver %s does not have any logs", tc.name)
+
+				loaded := zapLogs.
+					FilterMessageSnippet(loadedMsg).
+					FilterField(zap.String("otelcol.component.id", "filebeatreceiver/"+tc.name))
+				assert.Equalf(c, tc.wantLoaded, loaded.Len(),
+					"receiver %s (%s input) should log %q %d time(s)", tc.name, tc.inputType, loadedMsg, tc.wantLoaded)
+			}
+		},
+	})
+}
+
 func TestReceiverStatus(t *testing.T) {
 	benchmarkInputId := "benchmark-id"
 	inputStatusAttributes := func(state string, msg string) pcommon.Map {

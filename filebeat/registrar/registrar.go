@@ -42,12 +42,15 @@ type Registrar struct {
 	done chan struct{}
 	wg   sync.WaitGroup
 
-	// he first log-family input to be created can start the registrar
-	// without knowing whether another already did.
+	// The registrar is started lazily by the first V1 input to be created, which
+	// cannot know whether another already did. startOnce makes Start safe to
+	// call repeatedly; startErr is kept so every call reports a failed start.
 	startOnce sync.Once
-	// started reports whether startOnce ran Run rather than being claimed by
-	// Stop, which is what tells Stop whether anything will close the store.
-	started bool
+	startErr  error
+	// started is true once Run was launched. The store is only closed by Run,
+	// so Stop must close it itself when the registrar never ran.
+	started  bool
+	stopOnce sync.Once
 
 	// state storage
 	states       *file.States      // Map with all file paths inside and the corresponding state
@@ -113,14 +116,14 @@ func (r *Registrar) loadStates() error {
 }
 
 // Start loads the previous log file locations and runs the registrar. It is
-// called when the first input that produces file.State values is created, and
-// is safe to call any number of times: only the first call does anything.
+// called when a V1 input is created (see input.RunnerFactory.Create), and is
+// safe to call any number of times: only the first call does anything. If that
+// first start fails, every later call returns the same error.
 func (r *Registrar) Start() error {
-	var err error
 	r.startOnce.Do(func() {
 		// Load the previous log file locations now, for use in input
-		if err = r.loadStates(); err != nil {
-			err = fmt.Errorf("error loading state: %w", err)
+		if err := r.loadStates(); err != nil {
+			r.startErr = fmt.Errorf("error loading state: %w", err)
 			return
 		}
 
@@ -130,11 +133,16 @@ func (r *Registrar) Start() error {
 		})
 	})
 
-	return err
+	return r.startErr
 }
 
-// Stop stops the registry. It waits until Run function finished.
+// Stop stops the registry. It waits until Run function finished. It is safe to
+// call more than once.
 func (r *Registrar) Stop() {
+	r.stopOnce.Do(r.stop)
+}
+
+func (r *Registrar) stop() {
 	r.log.Info("Stopping Registrar")
 	defer r.log.Info("Registrar stopped")
 
@@ -145,6 +153,7 @@ func (r *Registrar) Stop() {
 	close(r.done)
 	r.wg.Wait()
 
+	// Run closes the store when it exits; if it never ran, close it here.
 	if !r.started {
 		if err := r.store.Close(); err != nil {
 			r.log.Errorf("Error closing the registry store: %v", err)

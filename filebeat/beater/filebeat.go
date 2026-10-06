@@ -472,10 +472,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// The current order is: registrar, publisher, spooler, crawler
 	// That means, crawler is stopped first.
 
-	// The registrar is started by the first log-family input to be created (see
-	// input.RunnerFactory.Create), because those inputs are the only source of
-	// the states it persists. When configured with none of them (eg. filestream),
-	// never starts it and never scans the registry for state that cannot arrive.
+	// The registrar is started by the first V1 input to be created (see
+	// input.RunnerFactory.Create), which includes any input that fell back to
+	// the V1 loader after a V2 creation error. When only V2 inputs (eg.
+	// filestream) are running it is never started, so the registry is not
+	// scanned for state that cannot arrive.
 	//
 	// Stopping registrar will write last state in cases where a registrar was actually
 	// started. When nothing is started this is a no-op.

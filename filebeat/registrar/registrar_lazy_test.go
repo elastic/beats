@@ -24,6 +24,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -39,7 +40,7 @@ import (
 func TestRegistrarNotStarted(t *testing.T) {
 	goroutines := resources.NewGoroutinesChecker()
 
-	memBackend, r := newLazyTestRegistrar(t, file.State{Id: "on-disk", Source: "/a.log", TTL: -1})
+	memBackend, r, _ := newLazyTestRegistrar(t, file.State{Id: "on-disk", Source: "/a.log", TTL: -1})
 
 	assert.Empty(t, r.GetStates(),
 		"a registrar that was never started must not have scanned the registry")
@@ -56,7 +57,7 @@ func TestRegistrarNotStarted(t *testing.T) {
 func TestRegistrarStartIsIdempotent(t *testing.T) {
 	goroutines := resources.NewGoroutinesChecker()
 
-	memBackend, r := newLazyTestRegistrar(t, file.State{Id: "on-disk", Source: "/a.log", TTL: -1})
+	memBackend, r, logs := newLazyTestRegistrar(t, file.State{Id: "on-disk", Source: "/a.log", TTL: -1})
 
 	var wg sync.WaitGroup
 	for range 8 {
@@ -64,7 +65,10 @@ func TestRegistrarStartIsIdempotent(t *testing.T) {
 	}
 	wg.Wait()
 
-	assert.Len(t, r.GetStates(), 1, "the registry must be loaded exactly once")
+	assert.Len(t, r.GetStates(), 1, "the registry states must be loaded")
+	// SetStates replaces the states, so the log line is what counts the loads.
+	assert.Equal(t, 1, logs.FilterMessageSnippet("States Loaded from registrar").Len(),
+		"the registry must be loaded exactly once")
 
 	r.Stop()
 
@@ -78,20 +82,49 @@ func TestRegistrarStartIsIdempotent(t *testing.T) {
 func TestRegistrarStartAfterStop(t *testing.T) {
 	goroutines := resources.NewGoroutinesChecker()
 
-	_, r := newLazyTestRegistrar(t)
+	_, r, logs := newLazyTestRegistrar(t, file.State{Id: "on-disk", Source: "/a.log", TTL: -1})
 	r.Stop()
 
 	require.NoError(t, r.Start(), "a Start after Stop must be a no-op, not an error")
 	assert.Empty(t, r.GetStates(), "a Start after Stop must not load the registry")
+	assert.Zero(t, logs.FilterMessageSnippet("States Loaded from registrar").Len(),
+		"a Start after Stop must not load the registry")
 
 	requireNoLeakedGoroutines(t, goroutines)
+}
+
+// TestRegistrarStartErrorIsSticky pins that a failed start is reported to every
+// caller. Otherwise an input created on a later config reload would get a
+// registrar nothing reads from and block publishing states.
+func TestRegistrarStartErrorIsSticky(t *testing.T) {
+	goroutines := resources.NewGoroutinesChecker()
+
+	memBackend, r, _ := newLazyTestRegistrar(t, file.State{Id: "on-disk", Source: "/a.log", TTL: -1})
+	// Closing the store makes loading the states fail.
+	require.NoError(t, memBackend.Stores[testStoreName].Close())
+
+	first := r.Start()
+	require.Error(t, first, "Start must fail when the states cannot be loaded")
+	assert.EqualError(t, r.Start(), first.Error(), "every later Start must report the same failure")
+
+	r.Stop()
+	requireNoLeakedGoroutines(t, goroutines)
+}
+
+// TestRegistrarStopIsIdempotent pins that Stop can be called more than once.
+func TestRegistrarStopIsIdempotent(t *testing.T) {
+	_, r, _ := newLazyTestRegistrar(t)
+	require.NoError(t, r.Start())
+
+	r.Stop()
+	assert.NotPanics(t, r.Stop, "a second Stop must be a no-op")
 }
 
 // TestRegistrarStartedStillPersists is the other half of TestRegistrarNotStarted:
 // once an input starts it, the registrar behaves exactly as it did when it was
 // started unconditionally.
 func TestRegistrarStartedStillPersists(t *testing.T) {
-	memBackend, r := newLazyTestRegistrar(t)
+	memBackend, r, _ := newLazyTestRegistrar(t)
 
 	require.NoError(t, r.Start())
 
@@ -115,8 +148,8 @@ func requireNoLeakedGoroutines(t *testing.T, c *resources.GoroutinesChecker) {
 
 // newLazyTestRegistrar returns a registrar over a memory-backed store
 // pre-populated with states, so a test can tell whether the registry was
-// scanned. The registrar is not started.
-func newLazyTestRegistrar(t *testing.T, states ...file.State) (*storetest.MemoryStore, *Registrar) {
+// scanned. The registrar is not started. The returned logs are the registrar's.
+func newLazyTestRegistrar(t *testing.T, states ...file.State) (*storetest.MemoryStore, *Registrar, *observer.ObservedLogs) {
 	t.Helper()
 
 	memBackend := storetest.NewMemoryStoreBackend()
@@ -129,7 +162,8 @@ func newLazyTestRegistrar(t *testing.T, states ...file.State) (*storetest.Memory
 		store.Close()
 	}
 
-	r, err := New(stateStore, &spyLogger{}, time.Second, logptest.NewTestingLogger(t, ""))
+	logger, logs := logptest.NewTestingLoggerWithObserver(t, "")
+	r, err := New(stateStore, &spyLogger{}, time.Second, logger)
 	require.NoError(t, err)
-	return memBackend, r
+	return memBackend, r, logs
 }
