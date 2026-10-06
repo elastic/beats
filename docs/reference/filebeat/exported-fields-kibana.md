@@ -76,7 +76,7 @@ Module for parsing Kibana logs.
     example: ['default', 'marketing']
 
 
-**`kibana.diff.format`**
+**`kibana.diff.format`** {applies_to}`stack: ga 9.7.0`
 :   The schema of the saved object attribute diff attached to this event.
 
     type: keyword
@@ -84,13 +84,13 @@ Module for parsing Kibana logs.
     example: json_patch_extended
 
 
-**`kibana.diff.ops`**
+**`kibana.diff.ops`** {applies_to}`stack: ga 9.7.0`
 :   JSON Patch operations describing the saved object attributes changed by this event, emitted when saved object diff auditing is enabled in Kibana. Each operation can include `value` and `oldValue` whose JSON type varies by attribute (string, number, boolean, array, or object). Those two fields are intentionally not declared: `dynamic: false` on this object stores them in `_source` without adding a mapping, so the first event to arrive can never fix their type and later events with a different type are never rejected.
 
     type: object
 
 
-**`kibana.diff.ops.op`**
+**`kibana.diff.ops.op`** {applies_to}`stack: ga 9.7.0`
 :   The operation performed on the attribute.
 
     type: keyword
@@ -98,7 +98,7 @@ Module for parsing Kibana logs.
     example: replace
 
 
-**`kibana.diff.ops.path`**
+**`kibana.diff.ops.path`** {applies_to}`stack: ga 9.7.0`
 :   RFC 6901 JSON Pointer to the changed attribute.
 
     type: keyword
@@ -106,13 +106,13 @@ Module for parsing Kibana logs.
     example: /title
 
 
-**`kibana.diff.noOps`**
+**`kibana.diff.noOps`** {applies_to}`stack: ga 9.7.0`
 :   Attributes present in the saved object but not changed by this event.
 
     type: object
 
 
-**`kibana.diff.noOps.path`**
+**`kibana.diff.noOps.path`** {applies_to}`stack: ga 9.7.0`
 :   RFC 6901 JSON Pointer to an attribute that was not changed by this event.
 
     type: keyword
