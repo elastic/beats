@@ -127,6 +127,10 @@ OSS code (Apache 2.0) **cannot** import from `x-pack/` or `elastic-agent-client`
 - Keep comments concise, focused on "why" not "what"
 - Update documentation when changing behavior
 
+## Documentation
+
+When a change adds or edits a published doc page, read `docs-authoring` (`.agents/skills/docs-authoring`) and `beats-docs` (`.agents/skills/beats-docs`) before writing. Published docs live in `docs/` and are built by docs-builder. Pages marked `% This file is generated!` are built from `fields.yml` and `docs.md` under `_meta`; edit those and run `make update` rather than the generated page. Guide: `docs/extend/contributing-docs.md`.
+
 ## Code References
 
 When referencing code, always use exact locations and names:
