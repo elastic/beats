@@ -7,15 +7,17 @@
 package monitor
 
 import (
+	"fmt"
+	"io"
+	"net/http"
+	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/mock"
-
-	"fmt"
-
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -325,4 +327,107 @@ func TestGetMetricDefinitionsByNames(t *testing.T) {
 	result := getMetricDefinitionsByNames(MockMetricDefinitions(), metrics)
 	assert.Equal(t, len(result), 1)
 	assert.Equal(t, *result[0].Name.Value, "TotalRequests")
+}
+
+func TestMapMetricsSkipsUnsupportedPlatformMetricNamespace(t *testing.T) {
+	unsupported := resourceExpanded("activity-log-alert")
+	supported := resourceExpanded("key-vault")
+	metricDefinitions := armmonitor.MetricDefinitionCollection{Value: MockMetricDefinitions()}
+	metricConfig := azure.MetricConfig{
+		Name:              []string{"*"},
+		Namespace:         "Microsoft.Insights/activityLogAlerts",
+		Timegrain:         oneHrDuration,
+		IgnoreUnsupported: true,
+	}
+	resourceConfig := azure.ResourceConfig{Metrics: []azure.MetricConfig{metricConfig}}
+	client := azure.NewMockClient(logptest.NewTestingLogger(t, ""))
+	service := &azure.MockService{}
+	service.On("GetMetricDefinitionsWithRetry", "activity-log-alert", metricConfig.Namespace).
+		Return(armmonitor.MetricDefinitionCollection{}, unsupportedPlatformMetricNamespaceError(metricConfig.Namespace)).Once()
+	service.On("GetMetricDefinitionsWithRetry", "key-vault", metricConfig.Namespace).
+		Return(metricDefinitions, nil).Once()
+	client.AzureMonitorService = service
+
+	metrics, err := mapMetrics(client, []*armresources.GenericResourceExpanded{unsupported, supported}, resourceConfig)
+
+	assert.NoError(t, err, "HTTP 400 for an unsupported platform metric namespace should be skipped when ignore_unsupported is true")
+	assert.NotEmpty(t, metrics, "metrics for the supported resource should still be collected")
+	for _, metric := range metrics {
+		assert.Equal(t, "key-vault", metric.ResourceId, "only the supported resource should be mapped")
+	}
+	service.AssertExpectations(t)
+}
+
+func resourceExpanded(id string) *armresources.GenericResourceExpanded {
+	name := "resourceName"
+	location := "resourceLocation"
+	resourceType := "resourceType"
+	return &armresources.GenericResourceExpanded{
+		ID:       &id,
+		Name:     &name,
+		Location: &location,
+		Type:     &resourceType,
+	}
+}
+
+func unsupportedPlatformMetricNamespaceError(namespace string) error {
+	return azureBadRequest(fmt.Sprintf("%s is not a supported platform metric namespace", namespace))
+}
+
+func azureBadRequest(message string) error {
+	body := fmt.Sprintf(`{"code":"BadRequest","message":"%s"}`, message)
+	req, err := http.NewRequest(http.MethodGet, "https://management.azure.com/metricDefinitions", nil)
+	if err != nil {
+		panic(err)
+	}
+	resp := &http.Response{
+		Status:        "400 Bad Request",
+		StatusCode:    http.StatusBadRequest,
+		Body:          io.NopCloser(strings.NewReader(body)),
+		Header:        make(http.Header),
+		Request:       req,
+		ContentLength: int64(len(body)),
+	}
+	return runtime.NewResponseError(resp)
+}
+
+func TestMapMetricsUnsupportedNamespaceStaysFatalWithoutIgnoreUnsupported(t *testing.T) {
+	resource := resourceExpanded("activity-log-alert")
+	metricConfig := azure.MetricConfig{
+		Name:      []string{"*"},
+		Namespace: "Microsoft.Insights/activityLogAlerts",
+		Timegrain: oneHrDuration,
+	}
+	client := azure.NewMockClient(logptest.NewTestingLogger(t, ""))
+	service := &azure.MockService{}
+	service.On("GetMetricDefinitionsWithRetry", "activity-log-alert", metricConfig.Namespace).
+		Return(armmonitor.MetricDefinitionCollection{}, unsupportedPlatformMetricNamespaceError(metricConfig.Namespace)).Once()
+	client.AzureMonitorService = service
+
+	metrics, err := mapMetrics(client, []*armresources.GenericResourceExpanded{resource}, azure.ResourceConfig{Metrics: []azure.MetricConfig{metricConfig}})
+
+	assert.Error(t, err, "unsupported namespace HTTP 400 should still fail when ignore_unsupported is false")
+	assert.Empty(t, metrics, "no metrics should be returned when mapping fails")
+	service.AssertExpectations(t)
+}
+
+func TestMapMetricsDoesNotSkipOtherDefinitionErrors(t *testing.T) {
+	resource := resourceExpanded("activity-log-alert")
+	metricConfig := azure.MetricConfig{
+		Name:              []string{"*"},
+		Namespace:         "Microsoft.Insights/activityLogAlerts",
+		Timegrain:         oneHrDuration,
+		IgnoreUnsupported: true,
+	}
+	client := azure.NewMockClient(logptest.NewTestingLogger(t, ""))
+	service := &azure.MockService{}
+	service.On("GetMetricDefinitionsWithRetry", "activity-log-alert", metricConfig.Namespace).
+		Return(armmonitor.MetricDefinitionCollection{}, azureBadRequest("The resource id is invalid")).Once()
+	client.AzureMonitorService = service
+
+	metrics, err := mapMetrics(client, []*armresources.GenericResourceExpanded{resource}, azure.ResourceConfig{Metrics: []azure.MetricConfig{metricConfig}})
+
+	assert.Error(t, err, "ignore_unsupported should not skip a 400 that is not an unsupported platform metric namespace")
+	assert.Empty(t, metrics, "no metrics should be returned when mapping fails")
+	service.AssertExpectations(t)
 }
