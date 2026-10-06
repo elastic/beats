@@ -196,6 +196,15 @@ func (conf *azureInputConfig) Validate() error {
 		)
 	}
 
+	// Proxy settings require processor v2; v1 uses a legacy SDK that
+	// does not support proxy configuration.
+	if conf.ProcessorVersion == processorV1 && (conf.Proxy.URL != nil || conf.Proxy.Disable) {
+		return fmt.Errorf(
+			"proxy_url and proxy_disable require processor_version %q",
+			processorV2,
+		)
+	}
+
 	// Validate authentication configuration
 	if err := conf.validateAuth(); err != nil {
 		return err

@@ -293,7 +293,7 @@ WebSocket transport requires processor v2. If `processor_version` is set to `v1`
 stack: ga 9.4+
 ```
 
-URL of the HTTP proxy to use for outbound connections. Applies to the WebSocket Event Hub connection (when `transport` is `websocket`), blob storage requests, and Entra ID credential requests. When unset, proxy configuration falls back to the `HTTPS_PROXY` and `NO_PROXY` environment variables.
+URL of the HTTP proxy to use for outbound connections. Requires processor v2. Applies to the WebSocket Event Hub connection (when `transport` is `websocket`), blob storage requests, and Entra ID credential requests. When unset, proxy configuration falls back to the `HTTPS_PROXY` and `NO_PROXY` environment variables.
 
 :::{note}
 When `transport` is `amqp`, the AMQP connection to Event Hub on port 5671 does not use the proxy. Blob storage and Entra ID requests still use it. Set `transport` to `websocket` for full proxy support.
@@ -305,7 +305,7 @@ When `transport` is `amqp`, the AMQP connection to Event Hub on port 5671 does n
 stack: ga 9.4+
 ```
 
-If `true`, all proxy settings are ignored, including `proxy_url` and the `HTTPS_PROXY` environment variable. Default is `false`.
+If `true`, all proxy settings are ignored, including `proxy_url` and the `HTTPS_PROXY` environment variable. Requires processor v2. Default is `false`.
 
 ### `processor_version` [_processor_version]
 
