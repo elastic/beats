@@ -24,20 +24,24 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	ucfgyaml "github.com/elastic/go-ucfg/yaml"
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
-// TestFromStaticOTelParity proves that FromStatic correctly extracts per-stream
-// interface and procs settings from the OTel receiver hybrid config format.
-// elastic-agent nests these settings inside individual protocol entries rather
-// than at the top level; without the fix they are silently dropped.
+// TestFromStaticOTelParity checks that FromStatic, which is used when
+// packetbeat runs as an OTel receiver, extracts the same per-stream interface
+// and procs settings as NewAgentConfig, which is used by the process runtime.
+// elastic-agent nests these settings inside individual protocol entries
+// rather than at the top level.
 //
 // The corpus fixtures under testdata/ are pre-rendered from the network_traffic
 // integration templates using default variable values and represent what
-// elastic-agent actually delivers.
+// elastic-agent delivers. The Source comment at the top of each fixture names
+// the template to re-render it from.
 func TestFromStaticOTelParity(t *testing.T) {
 	entries, err := loadCorpus()
 	if err != nil {
@@ -60,50 +64,139 @@ func TestFromStaticOTelParity(t *testing.T) {
 			if err := stream.Unpack(&streamMap); err != nil {
 				t.Fatalf("unpacking corpus entry %s: %v", e.DataStream, err)
 			}
-			cfg, err := config.NewConfigFrom(map[string]any{
+
+			// The process runtime receives the stream under streams.
+			agentCfg, err := config.NewConfigFrom(map[string]any{
+				"streams": []any{streamMap},
+			})
+			if err != nil {
+				t.Fatalf("building agent config for %s: %v", e.DataStream, err)
+			}
+			want, err := NewAgentConfig(agentCfg, logptest.NewTestingLogger(t, ""))
+			if err != nil {
+				t.Fatalf("NewAgentConfig(%s): %v", e.DataStream, err)
+			}
+
+			// The OTel receiver receives it under protocols.
+			otelCfg, err := config.NewConfigFrom(map[string]any{
 				"protocols": []any{streamMap},
 			})
 			if err != nil {
-				t.Fatalf("building config for %s: %v", e.DataStream, err)
+				t.Fatalf("building OTel config for %s: %v", e.DataStream, err)
 			}
-			got, err := Config{}.FromStatic(cfg, logptest.NewTestingLogger(t, ""))
+			got, err := seededConfig().FromStatic(otelCfg, logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Fatalf("FromStatic(%s): %v", e.DataStream, err)
 			}
-			if len(got.Interfaces) == 0 {
-				t.Errorf("%s: Interfaces is empty; per-stream interface was dropped", e.DataStream)
-			} else if got.Interfaces[0].Device == "" {
-				t.Errorf("%s: Interfaces[0].Device is empty; device was not preserved", e.DataStream)
-			}
-			if e.DataStream == "network_traffic.flow" {
-				if got.Flows == nil {
-					t.Errorf("%s: Flows is nil; flow entry was not routed", e.DataStream)
-				}
-			}
+
+			assert.Equal(t, want.Interfaces, got.Interfaces, "interfaces for %s", e.DataStream)
+			assert.Equal(t, want.Procs, got.Procs, "procs for %s", e.DataStream)
+			assert.Equal(t, want.Flows != nil, got.Flows != nil, "flows routing for %s", e.DataStream)
 		})
 	}
+}
 
-	// This case has no corpus equivalent: all corpus entries include a per-stream
-	// interface, but when none is present FromStatic must fall back to defaultDevice().
-	t.Run("no_stream_interface_fallback", func(t *testing.T) {
-		cfg, err := config.NewConfigFrom(`
+// TestFromStaticStreamInterfaces checks the handling of per-stream interfaces
+// when FromStatic starts from the placeholder interface that packetbeat seeds
+// its configuration with.
+func TestFromStaticStreamInterfaces(t *testing.T) {
+	tests := []struct {
+		name string
+		yaml string
+		want []InterfaceConfig
+		err  string
+	}{
+		{
+			name: "any_device",
+			yaml: `
 protocols:
 - type: http
   ports: [80]
-`)
-		if err != nil {
-			t.Fatalf("parsing config: %v", err)
-		}
-		got, err := Config{}.FromStatic(cfg, logptest.NewTestingLogger(t, ""))
-		if err != nil {
-			t.Fatalf("FromStatic: %v", err)
-		}
-		if len(got.Interfaces) == 0 {
-			t.Error("Interfaces is empty, want defaultDevice() fallback")
-		} else if got.Interfaces[0].Device != defaultDevice() {
-			t.Errorf("Interfaces[0].Device = %q, want %q", got.Interfaces[0].Device, defaultDevice())
-		}
-	})
+  interface:
+    device: any
+    bpf_filter: port 80
+    internal_networks: [private]
+`,
+			want: []InterfaceConfig{{Device: "any", BpfFilter: "port 80", InternalNetworks: []string{"private"}}},
+		},
+		{
+			name: "named_device",
+			yaml: `
+protocols:
+- type: http
+  ports: [80]
+  interface:
+    device: eth0
+    snaplen: 1500
+`,
+			want: []InterfaceConfig{{Device: "eth0", Snaplen: 1500}},
+		},
+		{
+			name: "top_level_interfaces_take_precedence",
+			yaml: `
+interfaces:
+- device: lo
+protocols:
+- type: http
+  ports: [80]
+  interface:
+    device: eth0
+`,
+			want: []InterfaceConfig{{Device: "lo", Loop: 1}},
+		},
+		{
+			name: "no_stream_interface_keeps_placeholder",
+			yaml: `
+protocols:
+- type: http
+  ports: [80]
+`,
+			want: []InterfaceConfig{{Loop: 1}},
+		},
+		{
+			name: "duplicate_devices",
+			yaml: `
+protocols:
+- type: http
+  ports: [80]
+  interface:
+    device: eth0
+- type: dns
+  ports: [53]
+  interface:
+    device: eth0
+`,
+			err: "duplicated device configurations: eth0",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			cfg, err := config.NewConfigFrom(test.yaml)
+			if err != nil {
+				t.Fatalf("parsing config: %v", err)
+			}
+			got, err := seededConfig().FromStatic(cfg, logptest.NewTestingLogger(t, ""))
+			if test.err != "" {
+				assert.ErrorContains(t, err, test.err, "FromStatic error")
+				return
+			}
+			if err != nil {
+				t.Fatalf("FromStatic: %v", err)
+			}
+			assert.Equal(t, test.want, got.Interfaces, "interfaces")
+			assert.Nil(t, got.Interface, "singular interface should be cleared")
+		})
+	}
+}
+
+// seededConfig returns a Config shaped like the initial configuration that
+// packetbeat passes to FromStatic: a single interface with no device, holding
+// the command line settings.
+func seededConfig() Config {
+	c := Config{Interfaces: []InterfaceConfig{{Loop: 1}}}
+	c.Interface = &c.Interfaces[0]
+	return c
 }
 
 func loadCorpus() ([]corpusEntry, error) {

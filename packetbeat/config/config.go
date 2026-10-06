@@ -77,11 +77,13 @@ func (c Config) FromStatic(cfg *conf.C, _ *logp.Logger) (Config, error) {
 	// type "flow". Route it to the flows configuration, consistent with
 	// NewAgentConfig.
 	//
-	// When running as an OTel receiver, elastic-agent delivers per-stream
-	// interface and procs settings inside each protocol entry rather than
-	// at the top level. Extract them here so they are not silently dropped.
+	// When running as an OTel receiver, elastic-agent also delivers
+	// per-stream interface and procs settings inside each protocol entry
+	// rather than at the top level. Collect them here, as NewAgentConfig
+	// does for the process runtime. As there, any procs block enables
+	// process monitoring.
+	var streamInterfaces []InterfaceConfig
 	protocols := c.ProtocolsList[:0]
-	perStreamDevices := make(map[string]bool)
 	for _, protocol := range c.ProtocolsList {
 		stream := struct {
 			Type      string             `config:"type"`
@@ -91,9 +93,8 @@ func (c Config) FromStatic(cfg *conf.C, _ *logp.Logger) (Config, error) {
 		if err := protocol.Unpack(&stream); err != nil {
 			return c, err
 		}
-		if stream.Interface != nil && !perStreamDevices[stream.Interface.Device] {
-			perStreamDevices[stream.Interface.Device] = true
-			c.Interfaces = append(c.Interfaces, *stream.Interface)
+		if stream.Interface != nil {
+			streamInterfaces = append(streamInterfaces, *stream.Interface)
 		}
 		if stream.Procs != nil {
 			c.Procs = mergeProcsConfig(c.Procs, *stream.Procs)
@@ -108,15 +109,18 @@ func (c Config) FromStatic(cfg *conf.C, _ *logp.Logger) (Config, error) {
 	}
 	c.ProtocolsList = protocols
 	iface, err := cfg.Child("interfaces", -1)
-	if err == nil {
+	switch {
+	case err == nil:
+		// Top-level interfaces take precedence over per-stream settings.
 		if !iface.IsArray() {
 			c.Interfaces = []InterfaceConfig{*c.Interface}
 		}
+	case len(streamInterfaces) != 0:
+		// The receiver is started from a config that holds a placeholder
+		// interface, so replace it rather than appending to it.
+		c.Interfaces = streamInterfaces
 	}
 	c.Interface = nil
-	if len(c.Interfaces) == 0 {
-		c.Interfaces = []InterfaceConfig{{Device: defaultDevice()}}
-	}
 	counts := make(map[string]int)
 	for i, iface := range c.Interfaces {
 		name := iface.Device
