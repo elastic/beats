@@ -6,6 +6,9 @@ description: >
   Decides whether a change needs docs, where the content goes, what must be
   verified against the product, and how to scope it with applies_to. Does not
   cover changelog fragments or release-note entries.
+metadata:
+  source: elastic-docs-authoring
+  source_version: "1.0.0"
 ---
 
 # Documentation
@@ -25,7 +28,7 @@ Ask when the change does not tell you who it is for or what they can now do. Nev
 | A page is deliberately general and the request adds specifics | Usually not a gap. Say so |
 | Something the page documents was removed | Keep the content and scope it. Do not delete it |
 
-"Remove X" describes the product change, not the edit. The docs are cumulative, and readers on versions that still have the feature still need the page. Keep it and scope it with `applies_to`. Deleting is reasonable only when the feature was only ever a preview or beta, or only ever existed in a product that has no versions. When the lifecycle is anything else, scope it and say which reading you took.
+"Remove X" describes the product change, not the edit. The docs are cumulative, and readers on versions that still have the feature still need the page. For a GA or deprecated feature in a versioned product, keep the content and mark it `removed <version>` with `applies_to`. Deleting is reasonable only when the feature was only ever a preview or beta, or only ever existed in a product that has no versions. Say which reading you took.
 
 Concluding that nothing needs documenting is a valid result. Report it and stop.
 
@@ -47,7 +50,7 @@ Anything you cannot verify goes back to the author as a question. It does not go
 
 Because the page covers every supported version, a statement that is true only in the latest code is wrong for most readers. Confirm each claim for the versions the page covers, or scope it.
 
-The product's own lifecycle field outranks the request. A release-note label, a bare version number, and "on by default" all mean something shipped. None of them means generally available. A backport label is not a released version, and neither is a merged pull request. A patch number (`9.2.3`) does not go on the page as written; ask which minor it belongs to, because the answer sometimes removes the need for a tag.
+The product's own lifecycle field outranks the request. A release-note label, a bare version number, and "on by default" all mean something shipped. None of them means generally available. A backport label is not a released version, and neither is a merged pull request. Use the minor version in an `applies_to` badge. When a critical difference really is patch-specific, explain the exact patch in prose.
 
 ## Versioning
 
@@ -59,7 +62,7 @@ applies_to:
   serverless: ga
 ```
 
-A feature that exists only in some versions gets `applies_to` on that section. Removing a version from `applies_to` is how a feature drops out of the docs. When the page is generated, the repository skill says where the version is set. Do not hand-edit `applies_to` in a generated page.
+A feature that exists only in some versions gets `applies_to` on that section. When it is removed from a versioned product, keep the section and add the removal, for example `stack: removed 9.1`. When the page is generated, the repository contributing guide says where the version is set. Do not hand-edit `applies_to` in a generated page.
 
 If `docs-applies-to-tagging` is installed, let it choose the values and the placement. Collect the version, lifecycle, and deployment answers and hand them over.
 
@@ -67,9 +70,9 @@ If `docs-applies-to-tagging` is installed, let it choose the values and the plac
 
 Write what the reader can now do, see, configure, or avoid. The notes you were given describe an implementation. Nothing later will translate them for you, so do it as you draft. Cut anything that does not serve the task, including a detail that is there only because the issue mentioned it.
 
-Order the page for the task: what it is, then how to do it, then the edge cases. Open a new option or mode on the outcome, not the control. "View documents as JSON", then the sentence that names the control. The labels and defaults you verified are a checklist the page must not contradict. They are not an outline.
+Order the page for the task: what it is, then how to do it, then the edge cases. Open a new option or mode on the outcome, not the control. For example, use **View documents as JSON**, then write the sentence that names the control. The labels and defaults you verified are a checklist the page must not contradict. They are not an outline.
 
-- Second person: "you". Never "users" or "customers".
+- Address the reader as you. Do not call them users or customers.
 - Present tense. Active voice. One idea per sentence.
 - Sentence case for headings. No trailing period on a heading.
 - Name the product, feature, page, or setting on first mention. No internal names: packages, functions, struct fields, ticket numbers, or team names.
@@ -83,7 +86,7 @@ Use the substitutions the repository defines (`{{kib}}`, `{{es}}`, and the produ
 
 A new page goes in the `toc.yml` for its section. Navigation is per docset, and some sections nest their toc, so copy the shape of the section you are adding to rather than inventing one.
 
-Link with descriptive text, never a bare URL and never "click here". A link to a page in another Elastic docset uses that docset's form (`docs-content://...`, `integration-docs://...`), not `https://www.elastic.co/docs/...`.
+Use descriptive link text rather than a bare URL or generic call to action. A link to a page in another Elastic docset uses that docset's form (`docs-content://...`, `integration-docs://...`), not `https://www.elastic.co/docs/...`.
 
 A page you moved, renamed, or deleted needs an entry in `redirects.yml`. If `docs-redirects` is installed, hand it the old path and the new one.
 
@@ -91,10 +94,10 @@ A link to a page being added in another repository cannot resolve until that cha
 
 ## Generated pages
 
-If a page says it is generated, edit the source it names and regenerate. An edit to the generated file is overwritten on the next run. The repository skill names the source and the command.
+If a page says it is generated, edit the source it names and regenerate. An edit to the generated file is overwritten on the next run. The repository contributing guide names the source and the command.
 
 ## Checks
 
-Apply these rules while you write, not after. If the `elastic-docs-skills` plugin is installed, hand the changed pages to `docs-draft-feature-docs` and let it run its checks for content type, `applies_to`, style, frontmatter, jargon, syntax, and redirects. Do not restate those checks here, and do not copy those skills into this repository. If the plugin is not installed, the rules in this file are the whole bar.
+Apply these rules while you write, not after. Run the repository's docs build and Vale checks. If the `elastic-docs-skills` plugin is installed, run the individual checks that apply for content type, `applies_to`, style, frontmatter, jargon, syntax, and redirects. `docs-draft-feature-docs` is an end-to-end drafting workflow, not a post-edit checker. Do not copy its companion skills into this repository.
 
 Reference: [Elastic style guide](https://www.elastic.co/docs/contribute-docs/style-guide), [cumulative docs](https://www.elastic.co/docs/contribute-docs/how-to/cumulative-docs), [`applies_to` reference](https://www.elastic.co/docs/contribute-docs/how-to/cumulative-docs/reference), [content types](https://www.elastic.co/docs/contribute-docs/content-types).
