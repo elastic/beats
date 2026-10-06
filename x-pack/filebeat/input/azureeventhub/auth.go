@@ -62,7 +62,7 @@ func CreateEventHubConsumerClient(cfg *azureInputConfig, log *logp.Logger) (*aze
 		// This allows connectivity through HTTP proxies and firewalls
 		// that block AMQP port 5671 but allow HTTPS on port 443.
 		log.Infow("using AMQP-over-WebSocket transport for Event Hub connection")
-		options.NewWebSocketConn = newWebSocketConn
+		options.NewWebSocketConn = newWebSocketDialer(cfg.Proxy)
 	default:
 		// Default transport, nothing to do.
 		log.Infow("using AMQP transport for Event Hub connection")
@@ -143,17 +143,18 @@ func CreateEventHubConsumerClient(cfg *azureInputConfig, log *logp.Logger) (*aze
 // CreateStorageAccountContainerClient creates a Storage Account container client
 // using the configured authentication method from the provided config.
 func CreateStorageAccountContainerClient(cfg *azureInputConfig, log *logp.Logger) (*container.Client, error) {
-	if cfg.AuthType == AuthTypeConnectionString {
-		// Use connection string authentication
-		cloudConfig := getAzureCloud(cfg.AuthorityHost)
+	clientOpts := azcore.ClientOptions{Cloud: getAzureCloud(cfg.AuthorityHost)}
+	if httpClient := proxyHTTPClient(cfg.Proxy); httpClient != nil {
+		clientOpts.Transport = httpClient
+	}
 
+	if cfg.AuthType == AuthTypeConnectionString {
+		// Use connection string authentication.
 		containerClient, err := container.NewClientFromConnectionString(
 			cfg.SAConnectionString,
 			cfg.SAContainer,
 			&container.ClientOptions{
-				ClientOptions: azcore.ClientOptions{
-					Cloud: cloudConfig,
-				},
+				ClientOptions: clientOpts,
 			},
 		)
 		if err != nil {
@@ -176,7 +177,9 @@ func CreateStorageAccountContainerClient(cfg *azureInputConfig, log *logp.Logger
 
 	// Build the storage account URL using the correct endpoint suffix for the cloud environment
 	storageAccountURL := fmt.Sprintf("https://%s.blob.%s/%s", cfg.SAName, storageEndpointSuffix, cfg.SAContainer)
-	containerClient, err := container.NewClient(storageAccountURL, credential, nil)
+	containerClient, err := container.NewClient(storageAccountURL, credential, &container.ClientOptions{
+		ClientOptions: clientOpts,
+	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create container client with credential: %w", err)
 	}
