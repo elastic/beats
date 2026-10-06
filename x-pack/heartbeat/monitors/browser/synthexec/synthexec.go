@@ -220,11 +220,11 @@ func runCmd(
 	cmd.Args = append(cmd.Args, "--outfd", "3")
 
 	//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-	logp.L().Info("Running command: %s in directory: '%s'", cmd, cmd.Dir)
+	logp.L().Infof("Running command: %s in directory: '%s'", cmd, cmd.Dir)
 
 	if stdinStr != nil {
 		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-		logp.L().Debug(debugSelector, "Using stdin str %s", *stdinStr)
+		logp.L().Named(debugSelector).Debugf("Using stdin str %s", *stdinStr)
 		cmd.Stdin = strings.NewReader(*stdinStr)
 	}
 
@@ -239,7 +239,7 @@ func runCmd(
 		err := scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
 		if err != nil {
 			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-			logp.L().Warn("could not scan stdout events from synthetics: %s", err)
+			logp.L().Warnf("could not scan stdout events from synthetics: %s", err)
 		}
 
 	})
@@ -252,7 +252,7 @@ func runCmd(
 		err := scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)
 		if err != nil {
 			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-			logp.L().Warn("could not scan stderr events from synthetics: %s", err)
+			logp.L().Warnf("could not scan stderr events from synthetics: %s", err)
 		}
 	})
 
@@ -300,7 +300,7 @@ func runCmd(
 	err = <-cmdStarted
 	if err != nil {
 		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-		logp.L().Warn("Could not start command %s: %s", cmd, err)
+		logp.L().Warnf("Could not start command %s: %s", cmd, err)
 		return nil, err
 	}
 
@@ -318,7 +318,7 @@ func runCmd(
 		err := cmd.Process.Kill()
 		if err != nil {
 			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-			logp.L().Warn("could not kill synthetics process: %s", err)
+			logp.L().Warnf("could not kill synthetics process: %s", err)
 		}
 	}()
 
@@ -327,14 +327,14 @@ func runCmd(
 		err := <-cmdDone
 		_ = jsonWriter.Close()
 		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-		logp.L().Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), cmd)
+		logp.L().Infof("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), cmd)
 
 		var cmdError *SynthError = nil
 		if err != nil {
 			// err could be generic or it could have been killed by context timeout, log and check context
 			// to decide which error to stream
 			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-			logp.L().Warn("Error executing command '%s' (%d): %s", cmd, cmd.ProcessState.ExitCode(), err)
+			logp.L().Warnf("Error executing command '%s' (%d): %s", cmd, cmd.ProcessState.ExitCode(), err)
 
 			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 				timeout, _ := ctx.Value(SynthexecTimeoutKey).(time.Duration)
@@ -372,7 +372,7 @@ func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text stri
 		se, err := transform(scanner.Bytes(), scanner.Text())
 		if err != nil {
 			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-			logp.L().Warn("error parsing line: %s for line: %s", err, scanner.Text())
+			logp.L().Warnf("error parsing line: %s for line: %s", err, scanner.Text())
 			continue
 		}
 		if se != nil {
@@ -382,7 +382,7 @@ func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text stri
 
 	if scanner.Err() != nil {
 		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-		logp.L().Warn("error scanning synthetics runner results %s", scanner.Err())
+		logp.L().Warnf("error scanning synthetics runner results %s", scanner.Err())
 		return scanner.Err()
 	}
 
@@ -396,7 +396,7 @@ var stderrToSynthEvent = lineToSynthEventFactory(Stderr)
 func lineToSynthEventFactory(typ string) func(bytes []byte, text string) (res *SynthEvent, err error) {
 	return func(bytes []byte, text string) (res *SynthEvent, err error) {
 		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-		logp.L().Info("%s: %s", typ, text)
+		logp.L().Infof("%s: %s", typ, text)
 		return &SynthEvent{
 			Type:                 typ,
 			TimestampEpochMicros: float64(time.Now().UnixMicro()),
