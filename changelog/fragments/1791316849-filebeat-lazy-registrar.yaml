@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Filebeat no longer reads the registry or runs the registrar when only filestream and other non-legacy inputs are configured, reducing startup work and resource use
+component: filebeat
