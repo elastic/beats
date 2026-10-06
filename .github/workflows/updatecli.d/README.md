@@ -2,6 +2,25 @@
 
 This is how we manage dependency updates using `updatecli`.
 
+## Bump Golang
+
+Tracks the latest Go patch release for the minor version in use (from `.go-version`) and opens a PR updating `.go-version`, `go.mod`, and associated Dockerfiles.
+
+- **Config**: `bump-golang.yml`
+- **Workflow**: `.github/workflows/bump-golang.yml` (runs Mon–Sat at 20:00 UTC)
+- **Source**: latest release from `elastic/golang-crossbuild` matching the current minor version
+- **Gate**: `dockerimage` condition confirms the `golang:{version}-bookworm` image is published before opening a PR
+
+## Bump npcap
+
+Tracks `NPCAP_VERSION` in `elastic/golang-crossbuild/Makefile.common` and opens a PR updating the npcap OEM installer version used by Packetbeat.
+
+- **Config**: `bump-npcap.yml`
+- **Workflow**: `.github/workflows/bump-npcap.yml` (runs daily at 06:00 UTC)
+- **Source**: `NPCAP_VERSION` fetched from `golang-crossbuild/Makefile.common` via `gh api`
+- **Gate**: `dockerimage` condition confirms `observability-ci/golang-crossbuild:{go-version}-npcap-{version}-debian9` is published before opening a PR, ensuring beats CI won't fail due to a missing crossbuild image
+- **Files updated**: `x-pack/packetbeat/scripts/mage/pcap.go`, `x-pack/packetbeat/npcap/installer/LICENSE`, `changelog/fragments/`
+
 ## Bump osquery
 
 Tracks the latest osquery release on `osquery/osquery` and opens a PR updating the bundled osquery runtime used by osquerybeat.
@@ -9,7 +28,7 @@ Tracks the latest osquery release on `osquery/osquery` and opens a PR updating t
 - **Config**: `bump-osquery.yml`
 - **Workflow**: `.github/workflows/bump-osquery.yml` (runs daily at 07:00 UTC)
 - **Source**: latest release from `osquery/osquery` GitHub releases
-- **Files updated**: `x-pack/osquerybeat/internal/distro/distro.json` (version + SHA256 checksums for all platforms), `changelog/fragments/` (new fragment)
+- **Files updated**: `x-pack/osquerybeat/internal/distro/distro.json` (version + SHA256 checksums for all platforms), `changelog/fragments/`
 
 ## Bump VM Images
 
