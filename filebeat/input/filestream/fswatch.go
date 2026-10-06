@@ -56,8 +56,6 @@ type fileWatcher struct {
 	prev             map[string]loginp.FileDescriptor
 	scanner          loginp.FSScanner
 	log              *logp.Logger
-	events           chan loginp.FSEvent
-	notifyChan       chan loginp.HarvesterStatus
 	fileIdentifier   fileIdentifier
 	sourceIdentifier *loginp.SourceIdentifier
 
@@ -113,15 +111,11 @@ func newFileWatcherWithDirReader(
 	}
 
 	return &fileWatcher{
-		log:              logger.Named(watcherDebugKey),
-		cfg:              config,
-		prev:             make(map[string]loginp.FileDescriptor, 0),
-		scanner:          scanner,
-		events:           make(chan loginp.FSEvent),
-		closedHarvesters: map[string]int64{},
-		// notifyChan is a buffered channel to prevent the harvester from
-		// blocking while waiting for the fileWatcher to read from the channel
-		notifyChan:         make(chan loginp.HarvesterStatus, 5), // magic number
+		log:                logger.Named(watcherDebugKey),
+		cfg:                config,
+		prev:               make(map[string]loginp.FileDescriptor, 0),
+		scanner:            scanner,
+		closedHarvesters:   map[string]int64{},
 		fileIdentifier:     fi,
 		sourceIdentifier:   srci,
 		growingFingerprint: config.Scanner.Fingerprint.Growing,
@@ -137,61 +131,36 @@ func defaultFileWatcherConfig() fileWatcherConfig {
 	}
 }
 
-func (w *fileWatcher) NotifyChan() chan loginp.HarvesterStatus {
-	return w.notifyChan
-}
-
-func (w *fileWatcher) Run(
-	ctx unison.Canceler,
-	metrics *loginp.Metrics,
-	ignoreOlder time.Duration,
-	ignoreInactiveSince time.Time,
-) {
-	defer close(w.events)
-	defer metrics.Cleanup()
-
-	// run initial scan before starting regular
-	w.watch(ctx, metrics, ignoreOlder, ignoreInactiveSince)
-
-	// Read from notifyChan in a separate goroutine becase
-	// there are cases when w.watch can take minutes or even
-	// hours, so we do not want to block the harvesters
-	go func() {
-		for {
-			select {
-			case evt := <-w.notifyChan:
-				w.processNotification(evt)
-			case <-ctx.Done():
-				return
-			}
-		}
-	}()
-
-	tick := time.Tick(w.cfg.Interval)
-	for {
-		select {
-		case <-tick:
-			w.watch(ctx, metrics, ignoreOlder, ignoreInactiveSince)
-		case <-ctx.Done():
-			return
-		}
-	}
-}
-
-func (w *fileWatcher) processNotification(evt loginp.HarvesterStatus) {
+// HarvesterClosed records the offset a closing harvester reached. It is called
+// directly from the harvester's goroutine and only takes a mutex, so it never
+// waits on a running scan, which can last minutes.
+func (w *fileWatcher) HarvesterClosed(evt loginp.HarvesterStatus) {
 	w.log.Debugf("Harvester Closed notification received. ID: %s, Size: %d", evt.ID, evt.Size)
 	w.closedHarvestersMutex.Lock()
 	w.closedHarvesters[evt.ID] = evt.Size
 	w.closedHarvestersMutex.Unlock()
 }
 
-func (w *fileWatcher) watch(
+// ScanOnce scans the file system once and hands every resulting event to sink,
+// on the calling goroutine. It stops early, dropping the remaining events,
+// once ctx is cancelled.
+func (w *fileWatcher) ScanOnce(
 	ctx unison.Canceler,
+	sink loginp.FSEventSink,
 	metrics *loginp.Metrics,
 	ignoreOlder time.Duration,
 	ignoreInactiveSince time.Time,
 ) {
 	w.log.Debug("Start next scan")
+
+	// emit reports whether the scan may continue.
+	emit := func(e loginp.FSEvent) bool {
+		if ctx.Err() != nil {
+			return false
+		}
+		sink(e)
+		return true
+	}
 
 	// file identity is updated in GetFiles
 	now := time.Now()
@@ -271,10 +240,8 @@ func (w *fileWatcher) watch(
 
 		// if none of the conditions were true, the file remained unchanged and we don't need to create an event
 		if e.Op != loginp.OpDone {
-			select {
-			case <-ctx.Done():
+			if !emit(e) {
 				return
-			case w.events <- e:
 			}
 		}
 
@@ -313,13 +280,11 @@ func (w *fileWatcher) watch(
 		}
 
 		srcID := w.getFileIdentity(remainingDesc)
-		select {
-		case <-ctx.Done():
+		if !emit(renamedEvent(
+			remainingPath, newDesc.Filename, *newDesc, srcID)) {
 			return
-		case w.events <- renamedEvent(
-			remainingPath, newDesc.Filename, *newDesc, srcID):
-			renamedCount++
 		}
+		renamedCount++
 
 		delete(newFilesByName, newDesc.Filename)
 		delete(newFilesByID, remainingDesc.FileID())
@@ -380,12 +345,10 @@ func (w *fileWatcher) watch(
 		for _, m := range matches {
 			remainingDesc := w.prev[m.oldPath]
 			srcID := w.getFileIdentity(remainingDesc)
-			select {
-			case <-ctx.Done():
+			if !emit(renamedEvent(m.oldPath, m.newPath, *m.newDesc, srcID)) {
 				return
-			case w.events <- renamedEvent(m.oldPath, m.newPath, *m.newDesc, srcID):
-				renamedCount++
 			}
+			renamedCount++
 
 			delete(newFilesByName, m.newPath)
 			delete(newFilesByID, m.newDesc.FileID())
@@ -421,12 +384,10 @@ func (w *fileWatcher) watch(
 	// not postponed above are genuinely gone.
 	for remainingPath, remainingDesc := range w.prev {
 		srcID := w.getFileIdentity(remainingDesc)
-		select {
-		case <-ctx.Done():
+		if !emit(deleteEvent(remainingPath, remainingDesc, srcID)) {
 			return
-		case w.events <- deleteEvent(remainingPath, remainingDesc, srcID):
-			removedCount++
 		}
+		removedCount++
 
 		w.closedHarvestersMutex.Lock()
 		delete(w.closedHarvesters, srcID)
@@ -437,12 +398,10 @@ func (w *fileWatcher) watch(
 	for path, fd := range newFilesByName {
 		srcID := w.getFileIdentity(*fd)
 
-		select {
-		case <-ctx.Done():
+		if !emit(createEvent(path, *fd, srcID)) {
 			return
-		case w.events <- createEvent(path, *fd, srcID):
-			createdCount++
 		}
+		createdCount++
 
 		// New files skip the main loop via early continue, so collect their metrics here.
 		if tracksHarvesterProgress(fd, scanOpts) {
@@ -603,10 +562,6 @@ func deleteEvent(path string, fd loginp.FileDescriptor, srcID string) loginp.FSE
 
 func notChangedEvent(path string, fd loginp.FileDescriptor, srcID string) loginp.FSEvent {
 	return loginp.FSEvent{Op: loginp.OpNotChanged, OldPath: path, NewPath: path, Descriptor: fd, SrcID: srcID}
-}
-
-func (w *fileWatcher) Event() loginp.FSEvent {
-	return <-w.events
 }
 
 // GetFiles runs a one-off enumeration scan for the prospector's Init and

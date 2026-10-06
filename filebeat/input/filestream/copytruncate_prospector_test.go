@@ -18,7 +18,6 @@
 package filestream
 
 import (
-	"context"
 	"regexp"
 	"testing"
 	"time"
@@ -27,8 +26,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestCopyTruncateProspector_Create(t *testing.T) {
@@ -131,7 +128,7 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 				regexp.MustCompile(`\.\d$`),
 				&rotatedFilestreams{make(map[string]*rotatedFilestream), newNumericSorter()},
 			}
-			ctx := input.Context{Logger: logp.NewNopLogger(), Cancelation: context.Background()}
+			ctx := newDrainContext(t, p.filewatcher)
 			hg := newTestHarvesterGroup()
 
 			p.Run(ctx, newMockMetadataUpdater(), hg, nil)

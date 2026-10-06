@@ -19,10 +19,12 @@ package filestream
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -30,6 +32,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
@@ -55,7 +58,7 @@ func scanDuringChange(s *fileScanner, around func(path string, process func())) 
 }
 
 // watchScan feeds one scan result through the watcher's event logic.
-func watchScan(w *fileWatcher, result loginp.ScanResults) []loginp.FSEvent {
+func watchScan(w *testWatcher, result loginp.ScanResults) []loginp.FSEvent {
 	w.scanner = &queuedScanner{scans: []scanResult{{
 		files:        result.Files,
 		unobservable: result.Unobservable,
@@ -68,7 +71,7 @@ func watchScan(w *fileWatcher, result loginp.ScanResults) []loginp.FSEvent {
 }
 
 // trackedWatcher returns a watcher that has already seen want created by s.
-func trackedWatcher(t *testing.T, s *fileScanner, want ...string) *fileWatcher {
+func trackedWatcher(t *testing.T, s *fileScanner, want ...string) *testWatcher {
 	t.Helper()
 	w := newStubWatcher(s)
 	expected := make([]loginp.FSEvent, len(want))
@@ -294,4 +297,27 @@ func TestFileScannerMissingLiteralIsRemoved(t *testing.T) {
 	assert.Empty(t, result.Unobservable, "an absent literal is not an observation failure")
 	assert.Zero(t, result.Metrics.ScanErrors, "an absent literal is not an inconsistent observation")
 	requireEventSignatures(t, watchScan(w, result), []loginp.FSEvent{{Op: loginp.OpDelete, OldPath: path}})
+}
+
+// TestHarvesterClosedDuringScan runs HarvesterClosed from other goroutines while
+// scans are in progress, as closing harvesters do, and relies on -race.
+func TestHarvesterClosedDuringScan(t *testing.T) {
+	dir := t.TempDir()
+	for i := range 20 {
+		require.NoError(t, os.WriteFile(filepath.Join(dir, fmt.Sprintf("%d.log", i)), []byte("hello"), 0o644))
+	}
+	fw := createWatcherWithConfig(t, logp.NewNopLogger(), []string{filepath.Join(dir, "*.log")}, "scanner:\n  fingerprint.enabled: false\n")
+
+	var wg sync.WaitGroup
+	for g := range 4 {
+		wg.Go(func() {
+			for i := range 200 {
+				fw.HarvesterClosed(loginp.HarvesterStatus{ID: fmt.Sprintf("%d-%d", g, i%20), Size: 5})
+			}
+		})
+	}
+	for range 20 {
+		fw.ScanOnce(t.Context(), func(loginp.FSEvent) {}, newTestMetrics(), 0, time.Time{})
+	}
+	wg.Wait()
 }
