@@ -1902,6 +1902,67 @@ func TestScannerStablePathWithDuplicateFingerprint(t *testing.T) {
 	assert.Contains(t, files, filepath.Join(dir, "a.json"), "must keep the shallowest path")
 }
 
+func TestMatchedEarlierTieBreak(t *testing.T) {
+	tests := []struct {
+		name string
+		a, b string
+		want bool
+	}{
+		{
+			name: "differing leaf",
+			a:    "/logs/d/a.log",
+			b:    "/logs/d/b.log",
+			want: true,
+		},
+		{
+			name: "sibling that is a byte-prefix of another visits first",
+			a:    "/logs/d/z.log",
+			b:    "/logs/d-x/a.log",
+			want: true,
+		},
+		{
+			name: "first differing component decides over later ones",
+			a:    "/logs/a/z/z.log",
+			b:    "/logs/b/a/a.log",
+			want: true,
+		},
+		{
+			name: "component prefix visits first",
+			a:    "/logs/d",
+			b:    "/logs/d/a.log",
+			want: true,
+		},
+		{
+			name: "trailing separator adds an empty component",
+			a:    "/logs/d",
+			b:    "/logs/d/",
+			want: true,
+		},
+		{
+			name: "relative paths",
+			a:    "d/a.log",
+			b:    "d/b.log",
+			want: true,
+		},
+		{
+			name: "identical paths",
+			a:    "/logs/d/a.log",
+			b:    "/logs/d/a.log",
+			want: false,
+		},
+	}
+
+	s := &fileScanner{}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			a, b := filepath.FromSlash(tc.a), filepath.FromSlash(tc.b)
+			assert.Equalf(t, tc.want, s.matchedEarlier(a, 0, b, 0), "matchedEarlier(%q, %q)", a, b)
+			wantReverse := !tc.want && a != b
+			assert.Equalf(t, wantReverse, s.matchedEarlier(b, 0, a, 0), "matchedEarlier(%q, %q)", b, a)
+		})
+	}
+}
+
 func TestGlobRoot(t *testing.T) {
 	base := t.TempDir()
 
