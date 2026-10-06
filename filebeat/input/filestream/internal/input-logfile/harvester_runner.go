@@ -134,8 +134,8 @@ type harvesterRunner struct {
 	// open files. Sources that cannot get an open slot are queued (see waiting).
 	harvesterLimit uint64
 
-	ctx        inputv2.Context // input lifetime context, for the waker
-	notifyChan chan HarvesterStatus
+	ctx      inputv2.Context // input lifetime context, for the waker
+	observer HarvesterObserver
 
 	// readUntilEOF, when enabled, makes StopHarvesters drain every source to EOF
 	// (bounded by its Timeout) before tearing it down, instead of cancelling
@@ -250,7 +250,7 @@ func (g *harvesterRunner) start() {
 	}
 }
 
-func (g *harvesterRunner) SetObserver(c chan HarvesterStatus) { g.notifyChan = c }
+func (g *harvesterRunner) SetObserver(o HarvesterObserver) { g.observer = o }
 
 // run spawns a reader goroutine for state unless one is already reading it (or it is
 // being torn down, or the group is shutting down). While draining (read_until_eof
@@ -847,13 +847,10 @@ func (g *harvesterRunner) finish(state *sourceState) {
 }
 
 func (g *harvesterRunner) notifyObserver(state *sourceState, offset int64) {
-	if g.notifyChan == nil {
+	if g.observer == nil {
 		return
 	}
-	select {
-	case g.notifyChan <- HarvesterStatus{ID: state.srcID, Size: offset}:
-	case <-g.ctx.Cancelation.Done():
-	}
+	g.observer.HarvesterClosed(HarvesterStatus{ID: state.srcID, Size: offset})
 }
 
 // cursorOffset returns the offset cursor holds in the registry, which is how much

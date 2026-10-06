@@ -746,7 +746,7 @@ func TestFileWatcherCopyTruncateWithFingerprint(t *testing.T) {
 
 // newFileWatcherForCopyTruncateTests returns a file watcher configured to
 // harvest rotated files and two file paths used for rotation.
-func newFileWatcherForCopyTruncateTests(t *testing.T) (watcher *fileWatcher, activePath string, rotatedPath string) {
+func newFileWatcherForCopyTruncateTests(t *testing.T) (watcher *testWatcher, activePath string, rotatedPath string) {
 	dir := fs.TempDir(t, "..", "..", "build")
 	activePath = filepath.Join(dir, "foo.log")
 	rotatedPath = filepath.Join(dir, "foo.log.1")
@@ -1377,7 +1377,7 @@ scanner:
 					Length:  1,
 				},
 			}}
-		_, err = newFileWatcher(
+		_, err = newTestFileWatcher(
 			logptest.NewTestingLogger(t, ""),
 			paths,
 			cfg,
@@ -1902,6 +1902,67 @@ func TestScannerStablePathWithDuplicateFingerprint(t *testing.T) {
 	assert.Contains(t, files, filepath.Join(dir, "a.json"), "must keep the shallowest path")
 }
 
+func TestMatchedEarlierTieBreak(t *testing.T) {
+	tests := []struct {
+		name string
+		a, b string
+		want bool
+	}{
+		{
+			name: "differing leaf",
+			a:    "/logs/d/a.log",
+			b:    "/logs/d/b.log",
+			want: true,
+		},
+		{
+			name: "sibling that is a byte-prefix of another visits first",
+			a:    "/logs/d/z.log",
+			b:    "/logs/d-x/a.log",
+			want: true,
+		},
+		{
+			name: "first differing component decides over later ones",
+			a:    "/logs/a/z/z.log",
+			b:    "/logs/b/a/a.log",
+			want: true,
+		},
+		{
+			name: "component prefix visits first",
+			a:    "/logs/d",
+			b:    "/logs/d/a.log",
+			want: true,
+		},
+		{
+			name: "trailing separator adds an empty component",
+			a:    "/logs/d",
+			b:    "/logs/d/",
+			want: true,
+		},
+		{
+			name: "relative paths",
+			a:    "d/a.log",
+			b:    "d/b.log",
+			want: true,
+		},
+		{
+			name: "identical paths",
+			a:    "/logs/d/a.log",
+			b:    "/logs/d/a.log",
+			want: false,
+		},
+	}
+
+	s := &fileScanner{}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			a, b := filepath.FromSlash(tc.a), filepath.FromSlash(tc.b)
+			assert.Equalf(t, tc.want, s.matchedEarlier(a, 0, b, 0), "matchedEarlier(%q, %q)", a, b)
+			wantReverse := !tc.want && a != b
+			assert.Equalf(t, wantReverse, s.matchedEarlier(b, 0, a, 0), "matchedEarlier(%q, %q)", b, a)
+		})
+	}
+}
+
 func TestGlobRoot(t *testing.T) {
 	base := t.TempDir()
 
@@ -2186,12 +2247,11 @@ func TestFileScannerDoesNotReportNotDirectoryAsUnobservable(t *testing.T) {
 func TestFileWatcherHarvesterMetrics(t *testing.T) {
 	identifier, err := newFingerprintIdentifier(nil, logp.NewNopLogger())
 	require.NoError(t, err, "failed to create fingerprint identifier")
-	fw := &fileWatcher{
+	fw := wrapTestWatcher(&fileWatcher{
 		fileIdentifier:   identifier,
 		sourceIdentifier: mustSourceIdentifier("foo-id"),
 		log:              logp.NewNopLogger(),
-		events:           make(chan loginp.FSEvent, 10),
-	}
+	})
 
 	now := time.Now()
 	oldModTime := now.Add(-2 * time.Hour)
@@ -2295,17 +2355,15 @@ func TestFileWatcherRunCleansHarvesterMetricsOnShutdown(t *testing.T) {
 		"complete": fd,
 	}
 
-	fw := &fileWatcher{
+	fw := wrapTestWatcher(&fileWatcher{
 		cfg:              fileWatcherConfig{Interval: time.Hour},
 		prev:             map[string]loginp.FileDescriptor{"complete": fd},
 		scanner:          &testFileScanner{files: paths},
 		log:              logp.NewNopLogger(),
-		events:           make(chan loginp.FSEvent, 1),
-		notifyChan:       make(chan loginp.HarvesterStatus, 1),
 		closedHarvesters: map[string]int64{},
 		fileIdentifier:   identifier,
 		sourceIdentifier: mustSourceIdentifier("foo-id"),
-	}
+	})
 
 	metrics := loginp.NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
 	sourceID := fw.getFileIdentity(fd)
@@ -2347,17 +2405,15 @@ func (q *queuedScanner) GetFiles(loginp.FileScanOptions) loginp.ScanResults {
 	}
 }
 
-func newStubWatcher(scanner loginp.FSScanner) *fileWatcher {
-	return &fileWatcher{
+func newStubWatcher(scanner loginp.FSScanner) *testWatcher {
+	return wrapTestWatcher(&fileWatcher{
 		log:              logp.NewNopLogger(),
 		prev:             map[string]loginp.FileDescriptor{},
 		scanner:          scanner,
-		events:           make(chan loginp.FSEvent, 128),
 		closedHarvesters: map[string]int64{},
-		notifyChan:       make(chan loginp.HarvesterStatus, 5),
 		fileIdentifier:   mustPathIdentifier(false),
 		sourceIdentifier: mustSourceIdentifier("test-id"),
-	}
+	})
 }
 
 // TestFileWatcherThrottlesPostponedWarning verifies the "postponing delete
@@ -2450,7 +2506,7 @@ func TestFileWatcherPostponesDeletesUnderUnobservablePaths(t *testing.T) {
 			Info:        file.ExtendFileInfo(&testFileInfo{name: filepath.Base(path), size: size}),
 		}
 	}
-	run := func(w *fileWatcher, m *loginp.Metrics) []loginp.FSEvent {
+	run := func(w *testWatcher, m *loginp.Metrics) []loginp.FSEvent {
 		w.watch(context.Background(), m, 0, time.Time{})
 		return drainPendingFSEvents(w.events)
 	}
@@ -2801,7 +2857,7 @@ func BenchmarkWatchIdle(b *testing.B) {
 					cfg.Scanner.Fingerprint.Enabled = id.fingerprint
 					cfg.Scanner.Fingerprint.Growing = id.fingerprint
 
-					fw, err := newFileWatcher(
+					fw, err := newTestFileWatcher(
 						logp.NewNopLogger(),
 						paths,
 						cfg,
@@ -2840,7 +2896,7 @@ func BenchmarkWatchIdle(b *testing.B) {
 	}
 }
 
-func createWatcherWithConfig(t *testing.T, logger *logp.Logger, paths []string, cfgStr string) *fileWatcher {
+func createWatcherWithConfig(t *testing.T, logger *logp.Logger, paths []string, cfgStr string) *testWatcher {
 	tmpCfg := struct {
 		Scaner fileWatcherConfig `config:"scanner"`
 	}{
@@ -2852,7 +2908,7 @@ func createWatcherWithConfig(t *testing.T, logger *logp.Logger, paths []string, 
 	err = cfg.Unpack(&tmpCfg)
 	require.NoError(t, err, "cannot unpack file watcher config")
 
-	fw, err := newFileWatcher(
+	fw, err := newTestFileWatcher(
 		logger,
 		paths,
 		tmpCfg.Scaner,

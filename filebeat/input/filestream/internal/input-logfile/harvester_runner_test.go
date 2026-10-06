@@ -315,7 +315,7 @@ func TestHarvesterRunner_OpenSessionErrorNotifiesObserver(t *testing.T) {
 	h := &fakeHarvester{openErr: errHarvester}
 	g := testHarvesterRunner(t, h, 0)
 	notify := make(chan HarvesterStatus, 1)
-	g.SetObserver(notify)
+	g.SetObserver(chanObserver(notify))
 
 	goroutines := resources.NewGoroutinesChecker()
 	defer goroutines.WaitUntilOriginalCount()
@@ -354,7 +354,7 @@ func TestHarvesterRunner_TeardownNotifiesObserverWithSessionOffset(t *testing.T)
 	}
 	g := testHarvesterRunner(t, h, 0)
 	notify := make(chan HarvesterStatus, 1)
-	g.SetObserver(notify)
+	g.SetObserver(chanObserver(notify))
 
 	g.start()
 	src := &testSource{name: "/path/to/test"}
@@ -383,7 +383,7 @@ func TestHarvesterRunner_ConnectErrorDoesNotNotifyObserver(t *testing.T) {
 	g := testHarvesterRunner(t, h, 0)
 	g.pipeline = &MockPipeline{connectErr: errPipelineConnect}
 	notify := make(chan HarvesterStatus, 1)
-	g.SetObserver(notify)
+	g.SetObserver(chanObserver(notify))
 
 	g.start()
 	src := &testSource{name: "/path/to/test"}
@@ -1839,3 +1839,8 @@ func (r *recordingStatusReporter) lastMsg() string {
 	defer r.mu.Unlock()
 	return r.msg
 }
+
+// chanObserver is a HarvesterObserver that forwards notifications to a channel.
+type chanObserver chan HarvesterStatus
+
+func (c chanObserver) HarvesterClosed(s HarvesterStatus) { c <- s }
