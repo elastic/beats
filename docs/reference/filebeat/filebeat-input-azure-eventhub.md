@@ -312,8 +312,8 @@ If `true`, all proxy settings are ignored, including `proxy_url` and the `HTTPS_
 Controls which event processor implementation to use. Default is `v2`.
 
 Valid values:
-- `v1`: legacy processor based on the older Azure Event Hub SDK.
-- `v2` (default): modern processor based on the current Azure Event Hub SDK.
+- `v1` (default): legacy processor based on the older Azure Event Hub SDK.
+- `v2`: modern processor based on the current Azure Event Hub SDK.
 
 Switching from v1 to v2 changes the checkpoint storage layout. Existing v1 checkpoints are migrated automatically on first v2 start. Going back to v1 afterwards resumes from stale v1 checkpoints and may cause duplicate events.
 
