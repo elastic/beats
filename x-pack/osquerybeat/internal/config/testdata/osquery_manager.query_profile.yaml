@@ -1,4 +1,4 @@
-# Source: osquery_manager/data_stream/query_profile/agent/stream/stream.yml.hbs
+# Source: elastic/integrations packages/osquery_manager/data_stream/query_profile/agent/stream/stream.yml.hbs
 type: osquery_manager
 data_stream:
   dataset: osquery_manager.query_profile

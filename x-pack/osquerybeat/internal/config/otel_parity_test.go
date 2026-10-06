@@ -5,9 +5,9 @@
 package config
 
 import (
-	"embed"
 	"fmt"
-	"io/fs"
+	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 	"testing"
@@ -15,48 +15,52 @@ import (
 	ucfgyaml "github.com/elastic/go-ucfg/yaml"
 )
 
-// TestOTelParityConfig proves that osquerybeat's InputConfig parser correctly
-// consumes each corpus stream fixture, including the osquery block that
-// elastic-agent injects into the result stream. This documents the contract
-// that the OTel translation in elastic-agent must satisfy.
+// TestOTelParityConfig checks that osquerybeat's InputConfig parser consumes
+// each fixture stream, including the osquery key that elastic-agent puts on
+// the result stream. This documents what the OTel translation in
+// elastic-agent must produce.
 func TestOTelParityConfig(t *testing.T) {
 	inputs := parseInputs(t)
 
-	result := findInput(inputs, DefaultDataset)
-	if result == nil {
-		t.Errorf("result stream (%s) not found in corpus", DefaultDataset)
-	} else {
-		if result.Osquery == nil {
-			t.Errorf("result stream: Osquery is nil; osquery block was dropped")
-		} else if len(result.Osquery.Schedule) == 0 {
-			t.Errorf("result stream: Osquery.Schedule is empty; no queries present")
-		}
+	result := ResultInput(inputs)
+	if result.Datastream.Dataset != DefaultDataset {
+		t.Fatalf("ResultInput dataset = %q; want %q", result.Datastream.Dataset, DefaultDataset)
+	}
+	if result.Osquery == nil {
+		t.Fatal("result stream: Osquery is nil; osquery key was dropped")
+	}
+	if len(result.Osquery.Schedule) == 0 {
+		t.Error("result stream: Osquery.Schedule is empty; no queries present")
 	}
 
-	if findInput(inputs, DefaultActionResponsesDataset) == nil {
-		t.Errorf("action responses stream (%s) not found in corpus", DefaultActionResponsesDataset)
+	datasets := make(map[string]bool)
+	for _, in := range inputs {
+		datasets[in.Datastream.Dataset] = true
 	}
-	if findInput(inputs, DefaultQueryProfileDataset) == nil {
-		t.Errorf("query profile stream (%s) not found in corpus", DefaultQueryProfileDataset)
+	for _, want := range []string{DefaultDataset, DefaultActionResponsesDataset, DefaultQueryProfileDataset} {
+		if !datasets[want] {
+			t.Errorf("stream with dataset %q not found in fixtures", want)
+		}
 	}
 }
 
-// TestOTelParityOrdering checks that all three osquerybeat corpus streams are
-// present and found by dataset regardless of their order in the slice.
+// TestOTelParityOrdering checks that ResultInput finds the result stream, and
+// so the osquery key, wherever it is in the delivery order.
 func TestOTelParityOrdering(t *testing.T) {
 	inputs := parseInputs(t)
 
-	// Reverse the order to simulate a non-standard delivery sequence.
-	slices.Reverse(inputs)
-
-	if findInput(inputs, DefaultDataset) == nil {
-		t.Errorf("result stream (%s) not found after reordering", DefaultDataset)
-	}
-	if findInput(inputs, DefaultActionResponsesDataset) == nil {
-		t.Errorf("action responses stream (%s) not found after reordering", DefaultActionResponsesDataset)
-	}
-	if findInput(inputs, DefaultQueryProfileDataset) == nil {
-		t.Errorf("query profile stream (%s) not found after reordering", DefaultQueryProfileDataset)
+	for _, order := range []string{"as read", "reversed"} {
+		if order == "reversed" {
+			slices.Reverse(inputs)
+		}
+		result := ResultInput(inputs)
+		if result.Datastream.Dataset != DefaultDataset {
+			t.Errorf("%s: ResultInput dataset = %q; want %q", order, result.Datastream.Dataset, DefaultDataset)
+			continue
+		}
+		if result.Osquery == nil || len(result.Osquery.Schedule) == 0 {
+			t.Errorf("%s: result stream has no osquery schedule", order)
+		}
 	}
 }
 
@@ -83,19 +87,8 @@ func parseInputs(t *testing.T) []InputConfig {
 	return inputs
 }
 
-// findInput returns the first InputConfig whose Datastream.Dataset equals dataset,
-// or nil if none is found.
-func findInput(inputs []InputConfig, dataset string) *InputConfig {
-	for i := range inputs {
-		if inputs[i].Datastream.Dataset == dataset {
-			return &inputs[i]
-		}
-	}
-	return nil
-}
-
 func loadCorpus() ([]corpusEntry, error) {
-	dirEntries, err := fs.ReadDir(testdata, "testdata")
+	dirEntries, err := os.ReadDir("testdata")
 	if err != nil {
 		return nil, fmt.Errorf("reading corpus: %w", err)
 	}
@@ -104,7 +97,7 @@ func loadCorpus() ([]corpusEntry, error) {
 		if e.IsDir() || !strings.HasSuffix(e.Name(), ".yaml") {
 			continue
 		}
-		data, err := fs.ReadFile(testdata, "testdata/"+e.Name())
+		data, err := os.ReadFile(filepath.Join("testdata", e.Name()))
 		if err != nil {
 			return nil, fmt.Errorf("reading corpus entry %s: %w", e.Name(), err)
 		}
@@ -120,6 +113,3 @@ type corpusEntry struct {
 	dataStream string
 	yaml       []byte
 }
-
-//go:embed testdata/*.yaml
-var testdata embed.FS
