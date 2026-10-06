@@ -185,12 +185,8 @@ require (
 	github.com/go-resty/resty/v2 v2.17.2
 	github.com/gofrs/uuid/v5 v5.3.2
 	github.com/golang-jwt/jwt/v5 v5.3.1
-<<<<<<< HEAD
 	github.com/google/cel-go v0.28.0
-	github.com/googleapis/gax-go/v2 v2.23.0
-=======
 	github.com/googleapis/gax-go/v2 v2.26.2
->>>>>>> 437055f (build(deps): bump the gcp-sdks group across 1 directory with 2 updates (#53574))
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
 	github.com/hashicorp/golang-lru/v2 v2.0.7
