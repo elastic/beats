@@ -1,4 +1,4 @@
-# Source: network_traffic/data_stream/mysql/agent/stream/mysql.yml.hbs
+# Source: elastic/integrations packages/network_traffic/data_stream/mysql/agent/stream/mysql.yml.hbs
 type: mysql
 ports:
   - 3306

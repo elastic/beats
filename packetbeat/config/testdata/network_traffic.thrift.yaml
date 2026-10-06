@@ -1,4 +1,4 @@
-# Source: network_traffic/data_stream/thrift/agent/stream/thrift.yml.hbs
+# Source: elastic/integrations packages/network_traffic/data_stream/thrift/agent/stream/thrift.yml.hbs
 type: thrift
 ports:
   - 9090

@@ -1,4 +1,4 @@
-# Source: network_traffic/data_stream/dhcpv4/agent/stream/dhcpv4.yml.hbs
+# Source: elastic/integrations packages/network_traffic/data_stream/dhcpv4/agent/stream/dhcpv4.yml.hbs
 type: dhcpv4
 fields_under_root: true
 fields:

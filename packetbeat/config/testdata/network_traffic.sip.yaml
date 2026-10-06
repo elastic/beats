@@ -1,4 +1,4 @@
-# Source: network_traffic/data_stream/sip/agent/stream/sip.yml.hbs
+# Source: elastic/integrations packages/network_traffic/data_stream/sip/agent/stream/sip.yml.hbs
 type: sip
 ports:
   - 5060

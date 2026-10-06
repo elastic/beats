@@ -1,4 +1,4 @@
-# Source: network_traffic/data_stream/pgsql/agent/stream/pgsql.yml.hbs
+# Source: elastic/integrations packages/network_traffic/data_stream/pgsql/agent/stream/pgsql.yml.hbs
 type: pgsql
 ports:
   - 5432

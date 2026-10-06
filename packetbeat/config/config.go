@@ -68,11 +68,11 @@ func GetShutDownTimeOut(cfg *conf.C) (time.Duration, error) {
 
 // FromStatic initializes a configuration given a config.C.
 //
-// Per-stream interface settings in the protocols list replace any interfaces
-// already held by c, unless cfg has top-level interfaces, which take
-// precedence. If neither is present, c.Interfaces is left as it was, so
-// packetbeat's seeded placeholder interface is kept, and a zero Config
-// results in no interfaces. No default device is added here.
+// The interface keys of the protocols entries in cfg replace c.Interfaces,
+// unless cfg has a top-level interfaces key, which takes precedence. If
+// neither is present, c.Interfaces is unchanged: the placeholder interface
+// from initialConfig in the beater package is kept, and a zero Config has no
+// interfaces. FromStatic does not add a default device.
 func (c Config) FromStatic(cfg *conf.C, _ *logp.Logger) (Config, error) {
 	err := cfg.Unpack(&c)
 	if err != nil {
@@ -83,11 +83,11 @@ func (c Config) FromStatic(cfg *conf.C, _ *logp.Logger) (Config, error) {
 	// type "flow". Route it to the flows configuration, consistent with
 	// NewAgentConfig.
 	//
-	// When running as an OTel receiver, elastic-agent also delivers
-	// per-stream interface and procs settings inside each protocol entry
-	// rather than at the top level. Collect them here, as NewAgentConfig
-	// does for the process runtime. As there, any procs block enables
-	// process monitoring.
+	// When running as an OTel receiver, elastic-agent also puts interface
+	// and procs keys in each protocols entry instead of at the top level.
+	// Collect them here, as NewAgentConfig does for its streams entries.
+	// As in NewAgentConfig, an entry with a procs key is merged with
+	// mergeProcsConfig, which always sets Enabled to true.
 	var streamInterfaces []InterfaceConfig
 	protocols := c.ProtocolsList[:0]
 	for _, protocol := range c.ProtocolsList {
@@ -117,13 +117,14 @@ func (c Config) FromStatic(cfg *conf.C, _ *logp.Logger) (Config, error) {
 	iface, err := cfg.Child("interfaces", -1)
 	switch {
 	case err == nil:
-		// Top-level interfaces take precedence over per-stream settings.
+		// The top-level interfaces key takes precedence, so the interface
+		// keys of the protocols entries are ignored.
 		if !iface.IsArray() {
 			c.Interfaces = []InterfaceConfig{*c.Interface}
 		}
 	case len(streamInterfaces) != 0:
-		// The receiver is started from a config that holds a placeholder
-		// interface, so replace it rather than appending to it.
+		// c.Interfaces holds the placeholder interface from initialConfig.
+		// Replace it, since appending would also capture on its default device.
 		c.Interfaces = streamInterfaces
 	}
 	c.Interface = nil

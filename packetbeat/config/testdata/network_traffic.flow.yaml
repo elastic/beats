@@ -1,4 +1,4 @@
-# Source: network_traffic/data_stream/flow/agent/stream/flow.yml.hbs
+# Source: elastic/integrations packages/network_traffic/data_stream/flow/agent/stream/flow.yml.hbs
 type: flow
 timeout: 30s
 period: -1s

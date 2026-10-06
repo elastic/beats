@@ -1,4 +1,4 @@
-# Source: network_traffic/data_stream/amqp/agent/stream/amqp.yml.hbs
+# Source: elastic/integrations packages/network_traffic/data_stream/amqp/agent/stream/amqp.yml.hbs
 type: amqp
 ports:
   - 5672

@@ -1,4 +1,4 @@
-# Source: network_traffic/data_stream/memcached/agent/stream/memcached.yml.hbs
+# Source: elastic/integrations packages/network_traffic/data_stream/memcached/agent/stream/memcached.yml.hbs
 type: memcached
 ports:
   - 11211

@@ -1,4 +1,4 @@
-# Source: network_traffic/data_stream/nfs/agent/stream/nfs.yml.hbs
+# Source: elastic/integrations packages/network_traffic/data_stream/nfs/agent/stream/nfs.yml.hbs
 type: nfs
 ports:
   - 2049

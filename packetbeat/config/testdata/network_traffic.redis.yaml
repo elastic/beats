@@ -1,4 +1,4 @@
-# Source: network_traffic/data_stream/redis/agent/stream/redis.yml.hbs
+# Source: elastic/integrations packages/network_traffic/data_stream/redis/agent/stream/redis.yml.hbs
 type: redis
 ports:
   - 6379

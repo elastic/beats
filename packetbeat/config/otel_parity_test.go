@@ -33,15 +33,16 @@ import (
 )
 
 // TestFromStaticOTelParity checks that FromStatic, which is used when
-// packetbeat runs as an OTel receiver, extracts the same per-stream interface
-// and procs settings as NewAgentConfig, which is used by the process runtime.
-// elastic-agent nests these settings inside individual protocol entries
-// rather than at the top level.
+// packetbeat runs as an OTel receiver, reads the interface and procs keys of a
+// protocols entry in the same way that NewAgentConfig reads them from a
+// streams entry.
 //
-// The corpus fixtures under testdata/ are pre-rendered from the network_traffic
-// integration templates using default variable values and represent what
-// elastic-agent delivers. The Source comment at the top of each fixture names
-// the template to re-render it from.
+// The fixtures under testdata/ are written by hand, modelled on the output of
+// the elastic/integrations templates named in their Source comments. They are
+// not generated, and their values are not the template defaults. Fleet adds
+// the data_stream key when it builds the agent policy. elastic-agent adds an
+// index key and an add_agent_metadata processor for a receiver. The fixtures
+// include data_stream but have neither index nor add_agent_metadata.
 func TestFromStaticOTelParity(t *testing.T) {
 	entries, err := loadCorpus()
 	if err != nil {
@@ -53,9 +54,9 @@ func TestFromStaticOTelParity(t *testing.T) {
 
 	for _, e := range entries {
 		t.Run(e.DataStream, func(t *testing.T) {
-			// Parse the stream fixture, then build an outer config that wraps it
-			// in a protocols list — the hybrid format elastic-agent delivers to
-			// the packetbeat OTel receiver.
+			// Parse the stream fixture, then wrap it in a protocols list, as
+			// elastic-agent does when it delivers a stream to the packetbeat
+			// OTel receiver. The interface and procs keys stay inside the entry.
 			stream, err := ucfgyaml.NewConfig(e.YAML)
 			if err != nil {
 				t.Fatalf("parsing corpus entry %s: %v", e.DataStream, err)
@@ -65,7 +66,7 @@ func TestFromStaticOTelParity(t *testing.T) {
 				t.Fatalf("unpacking corpus entry %s: %v", e.DataStream, err)
 			}
 
-			// The process runtime receives the stream under streams.
+			// NewAgentConfig reads the stream from a streams list.
 			agentCfg, err := config.NewConfigFrom(map[string]any{
 				"streams": []any{streamMap},
 			})
@@ -77,7 +78,7 @@ func TestFromStaticOTelParity(t *testing.T) {
 				t.Fatalf("NewAgentConfig(%s): %v", e.DataStream, err)
 			}
 
-			// The OTel receiver receives it under protocols.
+			// FromStatic reads the same stream from a protocols list.
 			otelCfg, err := config.NewConfigFrom(map[string]any{
 				"protocols": []any{streamMap},
 			})
@@ -96,15 +97,14 @@ func TestFromStaticOTelParity(t *testing.T) {
 	}
 }
 
-// TestFromStaticStreamInterfaces checks the handling of per-stream interfaces
-// when FromStatic starts from the placeholder interface that packetbeat seeds
-// its configuration with.
+// TestFromStaticStreamInterfaces checks how FromStatic combines the interface
+// keys of protocols entries with the interfaces it starts with. Unless a case
+// sets zero, that is the placeholder interface from seededConfig.
 func TestFromStaticStreamInterfaces(t *testing.T) {
 	tests := []struct {
 		name string
 		yaml string
-		// zero starts from a zero Config instead of a seeded one.
-		zero bool
+		zero bool // zero starts from a zero Config instead of seededConfig.
 		want []InterfaceConfig
 		err  string
 	}{
@@ -218,9 +218,9 @@ protocols:
 	}
 }
 
-// seededConfig returns a Config shaped like the initial configuration that
-// packetbeat passes to FromStatic: a single interface with no device, holding
-// the command line settings.
+// seededConfig returns a Config like the one initialConfig in the beater
+// package passes to FromStatic: one interface with no device, with Loop set to
+// the default of the -l flag, and Interface pointing at it.
 func seededConfig() Config {
 	c := Config{Interfaces: []InterfaceConfig{{Loop: 1}}}
 	c.Interface = &c.Interfaces[0]
