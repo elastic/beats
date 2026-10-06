@@ -55,16 +55,19 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 	defer p.mx.Unlock()
 
 	// Locate each stream by dataset so that delivery order does not affect
-	// which client handles which data stream.
-	var resultInput, actionResponsesInput, profileInput *config.InputConfig
+	// which client handles which data stream. The first input for a dataset wins.
+	resultInput := config.ResultInput(inputs)
+	var actionResponsesInput, profileInput *config.InputConfig
 	for i := range inputs {
 		switch inputs[i].Datastream.Dataset {
-		case config.DefaultDataset, "":
-			resultInput = &inputs[i]
 		case config.DefaultActionResponsesDataset:
-			actionResponsesInput = &inputs[i]
+			if actionResponsesInput == nil {
+				actionResponsesInput = &inputs[i]
+			}
 		case config.DefaultQueryProfileDataset:
-			profileInput = &inputs[i]
+			if profileInput == nil {
+				profileInput = &inputs[i]
+			}
 		}
 	}
 
