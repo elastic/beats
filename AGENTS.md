@@ -129,7 +129,7 @@ OSS code (Apache 2.0) **cannot** import from `x-pack/` or `elastic-agent-client`
 
 ## Documentation
 
-When a change adds or edits a published doc page, read `docs-authoring` (`.agents/skills/docs-authoring`) and `docs/extend/contributing-docs.md` before writing. The skill holds the rules that apply in every docs repository. The page holds the Beats facts: where the docset lives, which branch publishes, and which pages are generated.
+When a change adds or edits a published doc page, read `docs-authoring` (`.agents/skills/docs-authoring`) before writing. Read `docs/extend/contributing-docs.md` for where these docs live, which branch publishes them, and which pages are generated.
 
 ## Code References
 
