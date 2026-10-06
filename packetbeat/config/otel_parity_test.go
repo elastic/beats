@@ -18,9 +18,9 @@
 package config
 
 import (
-	"embed"
 	"fmt"
-	"io/fs"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -228,7 +228,7 @@ func seededConfig() Config {
 }
 
 func loadCorpus() ([]corpusEntry, error) {
-	dirEntries, err := fs.ReadDir(testdata, "testdata")
+	dirEntries, err := os.ReadDir("testdata")
 	if err != nil {
 		return nil, fmt.Errorf("reading corpus: %w", err)
 	}
@@ -237,7 +237,7 @@ func loadCorpus() ([]corpusEntry, error) {
 		if e.IsDir() || !strings.HasSuffix(e.Name(), ".yaml") {
 			continue
 		}
-		data, err := fs.ReadFile(testdata, "testdata/"+e.Name())
+		data, err := os.ReadFile(filepath.Join("testdata", e.Name()))
 		if err != nil {
 			return nil, fmt.Errorf("reading corpus entry %s: %w", e.Name(), err)
 		}
@@ -253,6 +253,3 @@ type corpusEntry struct {
 	DataStream string
 	YAML       []byte
 }
-
-//go:embed testdata/*.yaml
-var testdata embed.FS
