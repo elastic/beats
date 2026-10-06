@@ -275,7 +275,8 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 	// non-transient ones. failures counts every consecutive failure and drives
 	// the back-off and DEGRADED reporting, so a persistent transient outage
 	// still backs off and is surfaced as DEGRADED without ever terminating the
-	// input.
+	// input. Both reset when a session ends cleanly or is interrupted after
+	// delivering events.
 	attempt := 0
 	failures := 0
 	const maxAttemptsUnconfigured = 10
@@ -293,6 +294,27 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 			s.metrics.errorsTotal.Inc()
 			if errors.Is(err, hardError{}) {
 				return err
+			}
+
+			// A feed that delivered events and was then cut off is a
+			// normal way for a long-lived firehose connection to end, so
+			// reconnect and resume from the cursor without counting it
+			// toward the attempt limit or DEGRADED reporting.
+			var interrupted interruptedError
+			if errors.As(err, &interrupted) && interrupted.events > 0 {
+				attempt = 0
+				failures = 0
+				waitTime := time.Second
+				if s.cfg.Retry != nil {
+					waitTime = s.cfg.Retry.WaitMin
+				}
+				s.log.Infow("reconnecting after interrupted session", "error", err, "events", interrupted.events, "wait", waitTime.String())
+				select {
+				case <-ctx.Done():
+					return nil
+				case <-time.After(waitTime):
+				}
+				continue
 			}
 
 			failures++
@@ -509,6 +531,10 @@ type resource struct {
 type feedCursors struct {
 	mu     sync.Mutex
 	cursor map[string]any
+	// running records that the session has reported RUNNING, which it
+	// does on its first event since a healthy session may stay open for
+	// hours.
+	running bool
 }
 
 func (c *feedCursors) evalAndPublish(s *falconHoseStream, ctx context.Context, state map[string]any) error {
@@ -525,6 +551,10 @@ func (c *feedCursors) evalAndPublish(s *falconHoseStream, ctx context.Context, s
 	if newCursor != nil {
 		c.cursor = newCursor
 		state["cursor"] = newCursor
+	}
+	if err == nil && !c.running {
+		c.running = true
+		s.status.UpdateStatus(status.Running, "")
 	}
 	return err
 }
@@ -546,29 +576,7 @@ func (s *falconHoseStream) consumeFeed(ctx context.Context, cli *http.Client, r 
 	refreshAfter := time.Duration(r.RefreshAfter) * time.Second
 	go func() {
 		runRefreshLoopWithAfter(ctx, refreshSessionWait(refreshAfter), time.After, func() error {
-			s.log.Debugw("session refresh", "url", r.RefreshURL)
-			req, err := http.NewRequestWithContext(ctx, http.MethodPost, r.RefreshURL, nil)
-			if err != nil {
-				s.metrics.errorsTotal.Inc()
-				s.status.UpdateStatus(status.Failed, "failed to prepare refresh stream request: "+err.Error())
-				s.log.Errorw("failed to prepare refresh stream request", "error", err)
-				return err
-			}
-			req.Header.Set("Content-Type", "application/json")
-			resp, err := cli.Do(req)
-			if err != nil {
-				s.metrics.errorsTotal.Inc()
-				s.status.UpdateStatus(status.Failed, "failed to refresh stream connection: "+err.Error())
-				s.log.Errorw("failed to refresh stream connection", "error", err)
-				return err
-			}
-			err = resp.Body.Close()
-			if err != nil {
-				s.metrics.errorsTotal.Inc()
-				s.status.UpdateStatus(status.Failed, "failed to close refresh response body: "+err.Error())
-				s.log.Warnw("failed to close refresh response body", "error", err)
-			}
-			return nil
+			return s.refreshSession(ctx, cli, r.RefreshURL)
 		})
 	}()
 
@@ -607,21 +615,37 @@ func (s *falconHoseStream) consumeFeed(ctx context.Context, cli *http.Client, r 
 		s.log.Errorw("unsuccessful firehose request", "status_code", resp.StatusCode, "status", resp.Status, "body", buf.String())
 		return fmt.Errorf("unsuccessful firehose request: %s: %s", resp.Status, &buf)
 	}
+	s.log.Infow("feed stream connected", "url", feedName, "offset", offset)
 
+	start := s.now()
+	events := 0
 	dec := json.NewDecoder(resp.Body)
 	for {
 		var msg json.RawMessage
 		err := dec.Decode(&msg)
 		if err != nil {
-			s.metrics.errorsTotal.Inc()
+			// Errors returned here are counted in errors_total by the
+			// retry loop. A clean end of stream and cancellation are
+			// not errors.
 			if errors.Is(err, context.Canceled) || errors.Is(ctx.Err(), context.Canceled) {
 				return ctx.Err()
 			}
+			duration := s.now().Sub(start).String()
 			if errors.Is(err, io.EOF) {
-				s.log.Infow("feed stream ended", "url", feedName)
+				s.log.Infow("feed stream ended", "url", feedName, "events", events, "duration", duration)
 				return nil
 			}
-			return fmt.Errorf("error decoding event: %w", err)
+			// A truncated body or a network error means the connection
+			// was cut. Anything else, such as a syntax error, is a
+			// problem with the data and is not treated as an interruption.
+			var netErr net.Error
+			interrupted := errors.Is(err, io.ErrUnexpectedEOF) || errors.As(err, &netErr)
+			s.log.Warnw("feed stream read failed", "url", feedName, "error", err, "interrupted", interrupted, "events", events, "duration", duration)
+			err = fmt.Errorf("error decoding event: %w", err)
+			if interrupted {
+				return interruptedError{error: err, events: events}
+			}
+			return err
 		}
 		s.metrics.receivedBytesTotal.Add(uint64(len(msg)))
 		if len(msg) == 0 || msg[0] != '{' {
@@ -638,7 +662,42 @@ func (s *falconHoseStream) consumeFeed(ctx context.Context, cli *http.Client, r 
 			// while dropping data on the floor.
 			return hardError{err}
 		}
+		events++
 	}
+}
+
+// refreshSession asks the upstream to extend the stream session. A non-2xx
+// response is logged and counted but does not stop the refresh loop.
+func (s *falconHoseStream) refreshSession(ctx context.Context, cli *http.Client, refreshURL string) error {
+	s.log.Debugw("session refresh", "url", refreshURL)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, refreshURL, nil)
+	if err != nil {
+		s.metrics.errorsTotal.Inc()
+		s.status.UpdateStatus(status.Failed, "failed to prepare refresh stream request: "+err.Error())
+		s.log.Errorw("failed to prepare refresh stream request", "error", err)
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := cli.Do(req)
+	if err != nil {
+		s.metrics.errorsTotal.Inc()
+		s.status.UpdateStatus(status.Failed, "failed to refresh stream connection: "+err.Error())
+		s.log.Errorw("failed to refresh stream connection", "error", err)
+		return err
+	}
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		var buf bytes.Buffer
+		_, _ = io.Copy(&buf, io.LimitReader(resp.Body, 4096))
+		s.metrics.errorsTotal.Inc()
+		s.log.Warnw("unsuccessful session refresh", "url", refreshURL, "status_code", resp.StatusCode, "status", resp.Status, "body", buf.String())
+	}
+	err = resp.Body.Close()
+	if err != nil {
+		s.metrics.errorsTotal.Inc()
+		s.status.UpdateStatus(status.Failed, "failed to close refresh response body: "+err.Error())
+		s.log.Warnw("failed to close refresh response body", "error", err)
+	}
+	return nil
 }
 
 // rateLimitError carries a retry-after duration from a 429 response so
@@ -681,6 +740,18 @@ func (e transientError) Is(target error) bool {
 }
 
 func (e transientError) Unwrap() error {
+	return e.error
+}
+
+// interruptedError is a firehose read failure caused by the connection
+// being cut, for example by the upstream or a network device, rather than
+// by the data.
+type interruptedError struct {
+	error
+	events int // Events delivered by the feed before the interruption.
+}
+
+func (e interruptedError) Unwrap() error {
 	return e.error
 }
 
