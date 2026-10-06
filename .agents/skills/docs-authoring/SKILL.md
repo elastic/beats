@@ -1,11 +1,11 @@
 ---
 name: docs-authoring
 description: >
-  Write or edit user-facing documentation in an Elastic docs-builder repository.
-  Use when a change adds or edits a published doc page, a snippet, navigation, or
-  the source that generates a page. Decides whether a change needs docs, where
-  the content goes, what must be verified against the product, and how to scope
-  it with applies_to. Does not cover changelog fragments or release-note entries.
+  Write or edit user-facing documentation. Use when a change adds or edits a
+  published doc page, a snippet, navigation, or the source that generates a page.
+  Decides whether a change needs docs, where the content goes, what must be
+  verified against the product, and how to scope it with applies_to. Does not
+  cover changelog fragments or release-note entries.
 ---
 
 # Documentation
