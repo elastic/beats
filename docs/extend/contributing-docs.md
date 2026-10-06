@@ -9,7 +9,7 @@ applies_to:
 
 The Beats documentation is Markdown in `docs/`, built by [docs-builder](https://github.com/elastic/docs-builder). `docs/docset.yml` defines the docset.
 
-Beats publishes on a version branch, not from `main`. In [docs-builder `assembler.yml`](https://github.com/elastic/docs-builder/blob/main/config/assembler.yml), `beats` uses the stack configuration: production (`current`) builds the version branch, and staging and edge (`next` and `edge`) build `main`. That version branch is `9.5` today. A docs change is on the live site only once it is on the `current` branch. Merging to `main` updates staging and edge, and it does not update production until `current` moves. Open the pull request against `main`, as [Contribute to Beats](/extend/index.md#contribution-steps) describes, and backport it to the `current` branch when it should be live now.
+Beats does not publish production docs from `main`. The branch each environment builds is the `beats` entry in [docs-builder `assembler.yml`](https://github.com/elastic/docs-builder/blob/main/config/assembler.yml): production builds `current`, and the other environments build `next` and `edge`. Read those three refs there. A docs change is on the live site only once it is on the `current` branch. Open the pull request against `main`, as [Contribute to Beats](/extend/index.md#contribution-steps) describes, and backport it to the `current` branch when it should be live now.
 
 * `docs/reference/<beat>/` is the reference for that Beat. `docs/reference/libbeat/` is shared by all of them.
 * `docs/extend/` is this developer guide.
@@ -81,12 +81,6 @@ After you edit `fields.yml` or `docs.md`, regenerate from the repository root:
 `make update` overwrites generated files in `docs/` with no prompt. A hand edit to a generated file is lost the next time it runs.
 ::::
 
-`make update` runs these scripts:
-
-* [`auditbeat/scripts/mage/docs.go`](https://github.com/elastic/beats/blob/main/auditbeat/scripts/mage/docs.go) writes `docs/reference/auditbeat/auditbeat-modules.md` and `docs/reference/auditbeat/auditbeat-module-*.md`.
-* [`filebeat/scripts/mage/docs.go`](https://github.com/elastic/beats/blob/main/filebeat/scripts/mage/docs.go) writes `docs/reference/filebeat/filebeat-modules.md` and `docs/reference/filebeat/filebeat-module-*.md`.
-* [`winlogbeat/scripts/mage/docs.go`](https://github.com/elastic/beats/blob/main/winlogbeat/scripts/mage/docs.go) writes the Winlogbeat module pages.
-* [`metricbeat/scripts/mage/docs_collector.go`](https://github.com/elastic/beats/blob/main/metricbeat/scripts/mage/docs_collector.go) writes `docs/reference/metricbeat/metricbeat-modules.md` and `docs/reference/metricbeat/metricbeat-module-*.md`.
-* [`dev-tools/mage/generate_fields_docs.go`](https://github.com/elastic/beats/blob/main/dev-tools/mage/generate_fields_docs.go) writes `docs/reference/<beat>/exported-fields.md` for Auditbeat, Filebeat, Heartbeat, Metricbeat, Packetbeat, and Winlogbeat.
+Each generated file names the script that writes it in the `% This file is generated!` comment. That comment is the list. It stays right when a script moves, and a list kept here would not.
 
 To format the files afterward, run `make fmt`.

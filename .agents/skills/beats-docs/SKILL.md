@@ -15,9 +15,9 @@ Read `docs-authoring` first. This file adds only what is specific to the beats r
 
 `docs/` is the docset (`docs/docset.yml`, product `beats`). It is Markdown, built by docs-builder.
 
-Production does not build `main`. In docs-builder `config/assembler.yml`, `beats` uses the stack refs: `current` is the version branch production publishes (`9.5` today), and `next` and `edge` are `main`. A change is on the live site only once it is on the `current` branch. Open the pull request against `main` and backport it to that branch when it should be live now. Read `current` from `assembler.yml` rather than trusting the version in this sentence.
+Production does not build `main`. Read the `beats` entry in docs-builder `config/assembler.yml`: production publishes the `current` ref, and the other environments publish `next` and `edge`. A change is on the live site only once it is on the `current` ref. Open the pull request against `main` and backport it to that ref when it should be live now. Do not write the ref into a doc or a skill. Look it up.
 
-- `docs/reference/<beat>/` is the reference for that Beat: `auditbeat`, `filebeat`, `heartbeat`, `metricbeat`, `packetbeat`, `winlogbeat`, `libbeat`.
+- `docs/reference/<beat>/` is the reference for that Beat, and `docs/reference/libbeat/` is shared by all of them. The directories there are the list of Beats.
 - `docs/extend/` is the developer guide, including how to contribute to the docs.
 - `docs/release-notes/` is the breaking changes, deprecations, and known issues. These pages are hand-written. A changelog fragment is not one of them.
 - `docs/reference/_snippets/` holds text included by more than one page. Change a snippet only when every page that includes it should change.
