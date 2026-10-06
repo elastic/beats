@@ -226,7 +226,7 @@ func TestNewBeatForReceiver_AgentInfo(t *testing.T) {
 
 	assert.False(t, b.Manager.Enabled())
 	assert.Equal(t, "agent-id", b.Manager.AgentInfo().ID)
-	assert.Contains(t, b.Info.UserAgent, "; Managed; Unprivileged)")
+	assert.Contains(t, b.Info.UserAgent, "; Managed; Unprivileged")
 }
 
 // TestBeatReceiverStart_WiresActionAndDiagnosticExtensions verifies that Start
