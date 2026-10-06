@@ -13,7 +13,7 @@ Beats does not publish production docs from `main`. The branch each environment 
 
 * `docs/reference/<beat>/` is the reference for that Beat. `docs/reference/libbeat/` is shared by all of them.
 * `docs/extend/` is this developer guide.
-* `docs/release-notes/` holds the breaking changes, deprecations, and known issues.
+* `docs/release-notes/` holds the breaking changes, deprecations, and known issues. These pages are written by hand. A changelog fragment does not update them.
 * `docs/reference/_snippets/` holds text included by more than one page. Edit a snippet only when every page that includes it should change.
 
 For wording, follow the [Elastic style guide](https://www.elastic.co/docs/contribute-docs/style-guide). Write what you can now do, see, or configure. Use "you", present tense, and sentence case headings. Put settings, field names, and file names in backticks.
@@ -36,7 +36,7 @@ Since Elastic Stack 9.0.0, one page stays valid across versions. Mark a version 
 
 When a feature, field, or setting is removed, keep the content and scope it with `applies_to`. Readers on versions that still have it need the page. Delete it only when it was only ever a preview or beta, or only ever existed in a product that has no versions.
 
-For generated content, the version label comes from `fields.yml`. See [Update `fields.yml`](#update-fields).
+For generated content, the version label comes from `fields.yml`. See [Update `fields.yml`](#update-fields). Do not edit `applies_to` in the generated Markdown. The next `make update` overwrites it.
 
 ## Generated docs [generated-docs]
 
@@ -84,3 +84,5 @@ After you edit `fields.yml` or `docs.md`, regenerate from the repository root:
 Each generated file names the script that writes it in the `% This file is generated!` comment. That comment is the list. It stays right when a script moves, and a list kept here would not.
 
 To format the files afterward, run `make fmt`.
+
+A docs-only change does not get a changelog fragment. Add the `skip-changelog` label. A user-visible behavior change still gets a fragment, as `AGENTS.md` describes, and the fragment stays out of the doc page.
