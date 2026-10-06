@@ -103,6 +103,8 @@ func TestFromStaticStreamInterfaces(t *testing.T) {
 	tests := []struct {
 		name string
 		yaml string
+		// zero starts from a zero Config instead of a seeded one.
+		zero bool
 		want []InterfaceConfig
 		err  string
 	}{
@@ -154,6 +156,28 @@ protocols:
 			want: []InterfaceConfig{{Loop: 1}},
 		},
 		{
+			name: "zero_config_with_stream_interface",
+			yaml: `
+protocols:
+- type: http
+  ports: [80]
+  interface:
+    device: eth0
+`,
+			zero: true,
+			want: []InterfaceConfig{{Device: "eth0"}},
+		},
+		{
+			name: "zero_config_without_interface_has_none",
+			yaml: `
+protocols:
+- type: http
+  ports: [80]
+`,
+			zero: true,
+			want: nil,
+		},
+		{
 			name: "duplicate_devices",
 			yaml: `
 protocols:
@@ -176,7 +200,11 @@ protocols:
 			if err != nil {
 				t.Fatalf("parsing config: %v", err)
 			}
-			got, err := seededConfig().FromStatic(cfg, logptest.NewTestingLogger(t, ""))
+			start := seededConfig()
+			if test.zero {
+				start = Config{}
+			}
+			got, err := start.FromStatic(cfg, logptest.NewTestingLogger(t, ""))
 			if test.err != "" {
 				assert.ErrorContains(t, err, test.err, "FromStatic error")
 				return

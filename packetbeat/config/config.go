@@ -66,7 +66,13 @@ func GetShutDownTimeOut(cfg *conf.C) (time.Duration, error) {
 
 }
 
-// FromStatic initializes a configuration given a config.C
+// FromStatic initializes a configuration given a config.C.
+//
+// Per-stream interface settings in the protocols list replace any interfaces
+// already held by c, unless cfg has top-level interfaces, which take
+// precedence. If neither is present, c.Interfaces is left as it was, so
+// packetbeat's seeded placeholder interface is kept, and a zero Config
+// results in no interfaces. No default device is added here.
 func (c Config) FromStatic(cfg *conf.C, _ *logp.Logger) (Config, error) {
 	err := cfg.Unpack(&c)
 	if err != nil {
