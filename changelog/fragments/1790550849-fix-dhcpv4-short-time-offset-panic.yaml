@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix panic in DHCPv4 parser when OptionTimeOffset value is shorter than 4 bytes.
+component: packetbeat

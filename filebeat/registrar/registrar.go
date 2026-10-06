@@ -68,7 +68,7 @@ const fileStatePrefix = "filebeat::logs::"
 // New creates a new Registrar instance, updating the registry file on
 // `file.State` updates. New fails if the file can not be opened or created.
 func New(stateStore statestore.States, out successLogger, flushTimeout time.Duration, logger *logp.Logger) (*Registrar, error) {
-	store, err := stateStore.StoreFor("")
+	store, err := stateStore.StoreFor("", "")
 	if err != nil {
 		return nil, err
 	}

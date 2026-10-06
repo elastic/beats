@@ -1,0 +1,7 @@
+kind: enhancement
+summary: >
+  add_kubernetes_metadata: compressed rotated log files (e.g. 0.log.gz) matched via
+  /var/log/pods/ with resource_type:pod are now enriched with pod and container metadata.
+  Previously they were excluded from enrichment entirely.
+component: filebeat
+issue: https://github.com/elastic/beats/issues/48922
