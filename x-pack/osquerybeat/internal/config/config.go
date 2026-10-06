@@ -299,70 +299,84 @@ func QueryProfileDatastream(namespace string) string {
 	return queryProfileDatastreamPrefix + namespace
 }
 
-// GetOsqueryOptions Returns options from the first input if available
-func GetOsqueryOptions(inputs []InputConfig) map[string]any {
+// ResultInput returns the input for the DefaultDataset data stream, which
+// carries the osquery configuration. This is the first input whose dataset is
+// DefaultDataset or unset; an unset dataset is treated as DefaultDataset when
+// processors are built. If there is none, it returns the first input, which is
+// where the result stream was previously assumed to be. It returns nil if
+// inputs is empty.
+//
+// elastic-agent does not document the order of inputs, so the result stream is
+// looked up by dataset instead of being assumed to be first.
+func ResultInput(inputs []InputConfig) *InputConfig {
+	for i := range inputs {
+		switch inputs[i].Datastream.Dataset {
+		case DefaultDataset, "":
+			return &inputs[i]
+		}
+	}
 	if len(inputs) == 0 {
 		return nil
 	}
-	if inputs[0].Osquery == nil {
-		return nil
-	}
-	return inputs[0].Osquery.Options
+	return &inputs[0]
 }
 
-// GetOsqueryInstallConfig returns custom osquery install settings from the first input if available.
+// GetOsqueryOptions returns options from the result input if available.
+func GetOsqueryOptions(inputs []InputConfig) map[string]any {
+	in := ResultInput(inputs)
+	if in == nil || in.Osquery == nil {
+		return nil
+	}
+	return in.Osquery.Options
+}
+
+// GetOsqueryInstallConfig returns custom osquery install settings from the result input if available.
 func GetOsqueryInstallConfig(inputs []InputConfig) InstallConfig {
-	if len(inputs) == 0 {
+	in := ResultInput(inputs)
+	if in == nil || in.Osquery == nil || in.Osquery.ElasticOptions == nil || in.Osquery.ElasticOptions.Install == nil {
 		return InstallConfig{}
 	}
-	if inputs[0].Osquery == nil || inputs[0].Osquery.ElasticOptions == nil || inputs[0].Osquery.ElasticOptions.Install == nil {
-		return InstallConfig{}
-	}
-	return *inputs[0].Osquery.ElasticOptions.Install
+	return *in.Osquery.ElasticOptions.Install
 }
 
 // GetOsqueryCheckTimeout returns the osqueryd --version startup check deadline
-// from elastic_options.check_timeout on the first input. Unset values use
+// from elastic_options.check_timeout on the result input. Unset values use
 // DefaultCheckTimeout.
 func GetOsqueryCheckTimeout(inputs []InputConfig) (time.Duration, error) {
-	if len(inputs) == 0 || inputs[0].Osquery == nil || inputs[0].Osquery.ElasticOptions == nil {
+	in := ResultInput(inputs)
+	if in == nil || in.Osquery == nil || in.Osquery.ElasticOptions == nil {
 		return DefaultCheckTimeout, nil
 	}
-	return ParseCheckTimeout(inputs[0].Osquery.ElasticOptions.CheckTimeout)
+	return ParseCheckTimeout(in.Osquery.ElasticOptions.CheckTimeout)
 }
 
 // GetOsqueryExtensions returns customer-managed osquery extension settings
-// (elastic_options.extensions) from the first input if available.
+// (elastic_options.extensions) from the result input if available.
 func GetOsqueryExtensions(inputs []InputConfig) ExtensionsConfig {
-	if len(inputs) == 0 {
+	in := ResultInput(inputs)
+	if in == nil || in.Osquery == nil || in.Osquery.ElasticOptions == nil || in.Osquery.ElasticOptions.Extensions == nil {
 		return ExtensionsConfig{}
 	}
-	o := inputs[0].Osquery
-	if o == nil || o.ElasticOptions == nil || o.ElasticOptions.Extensions == nil {
-		return ExtensionsConfig{}
-	}
-	return *o.ElasticOptions.Extensions
+	return *in.Osquery.ElasticOptions.Extensions
 }
 
-// GetProfilingEnabled returns the global query profiling default from the first input.
+// GetProfilingEnabled returns the global query profiling default from the result input.
 // This is the fleet-wide on/off switch; individual queries may override it (see ResolveProfiling).
 // Profiling is enabled by default unless elastic_options.profiling.profiling_all is explicitly false.
 func GetProfilingEnabled(inputs []InputConfig) bool {
-	if len(inputs) == 0 || inputs[0].Osquery == nil || inputs[0].Osquery.ElasticOptions == nil || inputs[0].Osquery.ElasticOptions.Profiling == nil {
+	in := ResultInput(inputs)
+	if in == nil || in.Osquery == nil || in.Osquery.ElasticOptions == nil || in.Osquery.ElasticOptions.Profiling == nil {
 		return ProfilingConfig{}.ProfilingAllOrDefault()
 	}
-	return inputs[0].Osquery.ElasticOptions.Profiling.ProfilingAllOrDefault()
+	return in.Osquery.ElasticOptions.Profiling.ProfilingAllOrDefault()
 }
 
 // GetQueryProfileStorageConfig returns live query profile storage settings
-// (elastic_options.profiling.storage) from the first input if available.
+// (elastic_options.profiling.storage) from the result input if available.
 func GetQueryProfileStorageConfig(inputs []InputConfig) QueryProfileStorageConfig {
-	if len(inputs) == 0 {
+	in := ResultInput(inputs)
+	if in == nil || in.Osquery == nil || in.Osquery.ElasticOptions == nil || in.Osquery.ElasticOptions.Profiling == nil || in.Osquery.ElasticOptions.Profiling.Storage == nil {
 		return QueryProfileStorageConfig{}
 	}
-	o := inputs[0].Osquery
-	if o == nil || o.ElasticOptions == nil || o.ElasticOptions.Profiling == nil || o.ElasticOptions.Profiling.Storage == nil {
-		return QueryProfileStorageConfig{}
-	}
-	return *o.ElasticOptions.Profiling.Storage
+	return *in.Osquery.ElasticOptions.Profiling.Storage
 }
