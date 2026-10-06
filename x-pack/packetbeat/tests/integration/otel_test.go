@@ -73,7 +73,7 @@ func serverPort(t *testing.T, srv *httptest.Server) int {
 // sendHTTPRequests sends numRequests GET requests to url, ignoring errors.
 func sendHTTPRequests(url string, numRequests int) {
 	client := &http.Client{Timeout: 5 * time.Second}
-	for i := 0; i < numRequests; i++ {
+	for range numRequests {
 		resp, err := client.Get(url) //nolint:noctx // fine for tests
 		if err == nil {
 			resp.Body.Close()
@@ -364,6 +364,7 @@ output.elasticsearch:
   index: %s
 setup.template.enabled: false
 queue.mem.flush.timeout: 0s
+shutdown_timeout: 30s
 `, pbIndex)
 
 	pb := integration.NewBeat(t, "packetbeat", "../../packetbeat.test")

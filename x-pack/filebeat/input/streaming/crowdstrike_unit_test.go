@@ -9,10 +9,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -172,6 +174,174 @@ func TestFollowSession_NonObjectMessage(t *testing.T) {
 	}
 }
 
+func TestFollowSession_CleanEndIsNotAnError(t *testing.T) {
+	firehoseSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, `{"metadata":{"eventType":"Test","offset":1},"event":{"field":"value"}}`)
+	}))
+	defer firehoseSrv.Close()
+
+	discoverSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, discoverResponse(t, firehoseSrv.URL+"/firehose", firehoseSrv.URL+"/refresh"))
+	}))
+	defer discoverSrv.Close()
+
+	pub := new(countingPublisher)
+	s := newTestStreamWithPublisher(t, discoverSrv.URL, firehoseSrv.Client(), pub)
+	if _, err := s.followSession(context.Background(), discoverSrv.Client(), map[string]any{}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got := pub.published(); got != 1 {
+		t.Errorf("published events = %d; want 1", got)
+	}
+	// The stream ending after the last event is how a session normally
+	// finishes and must not be counted in errors_total.
+	if got := s.metrics.errorsTotal.Get(); got != 0 {
+		t.Errorf("errors_total = %d; want 0", got)
+	}
+}
+
+func TestFollowSession_FirehoseConnectionDropped(t *testing.T) {
+	tests := []struct {
+		name    string
+		trailer string // Bytes written after the complete events, before the drop.
+	}{
+		{name: "between_events"},
+		{name: "mid_event", trailer: `{"metadata":{"eventType":"Test","off`},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			firehoseSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				writeFeedEvents(t, w, 1, 2)
+				if tt.trailer != "" {
+					fmt.Fprint(w, tt.trailer)
+					if err := http.NewResponseController(w).Flush(); err != nil {
+						t.Logf("failed to flush trailer: %v", err)
+					}
+				}
+				dropConnection(t, w)
+			}))
+			defer firehoseSrv.Close()
+
+			discoverSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				fmt.Fprint(w, discoverResponse(t, firehoseSrv.URL+"/firehose", firehoseSrv.URL+"/refresh"))
+			}))
+			defer discoverSrv.Close()
+
+			pub := new(countingPublisher)
+			s := newTestStreamWithPublisher(t, discoverSrv.URL, firehoseSrv.Client(), pub)
+			state, err := s.followSession(context.Background(), discoverSrv.Client(), map[string]any{})
+			if err == nil {
+				t.Fatal("expected error from followSession, got nil")
+			}
+			if !errors.Is(err, io.ErrUnexpectedEOF) {
+				t.Errorf("followSession() error = %v; want io.ErrUnexpectedEOF", err)
+			}
+			if errors.Is(err, hardError{}) {
+				t.Errorf("followSession() error = %v; want non-hard error", err)
+			}
+			var interrupted interruptedError
+			if !errors.As(err, &interrupted) {
+				t.Errorf("followSession() error = %v; want interruptedError", err)
+			} else if interrupted.events != 2 {
+				t.Errorf("interruptedError events = %d; want 2", interrupted.events)
+			}
+			if state == nil {
+				t.Fatal("expected non-nil state on non-hard error")
+			}
+			if got := pub.published(); got != 2 {
+				t.Errorf("published events = %d; want 2", got)
+			}
+			// The cursor must hold the last published offset so the
+			// reconnect resumes after the delivered events.
+			crsr, _ := state["cursor"].(map[string]any)
+			feed, _ := crsr[firehoseSrv.URL+"/firehose"].(map[string]any)
+			if got := fmt.Sprint(feed["offset"]); got != "2" {
+				t.Errorf("cursor offset = %s; want 2", got)
+			}
+		})
+	}
+}
+
+func TestFollowSession_FirehoseMalformedAfterEventsIsNotInterruption(t *testing.T) {
+	firehoseSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		writeFeedEvents(t, w, 1, 2)
+		fmt.Fprint(w, `{"metadata":}`)
+	}))
+	defer firehoseSrv.Close()
+
+	discoverSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, discoverResponse(t, firehoseSrv.URL+"/firehose", firehoseSrv.URL+"/refresh"))
+	}))
+	defer discoverSrv.Close()
+
+	s := newTestStream(t, discoverSrv.URL, firehoseSrv.Client())
+	_, err := s.followSession(context.Background(), discoverSrv.Client(), map[string]any{})
+	if err == nil || !strings.Contains(err.Error(), "error decoding event") {
+		t.Fatalf("followSession() error = %v; want decode error", err)
+	}
+	// Malformed data would be served again from the same offset, so it
+	// must keep counting toward the attempt limit.
+	if errors.As(err, new(interruptedError)) {
+		t.Errorf("followSession() error = %v; want non-interrupted error", err)
+	}
+}
+
+func TestRefreshSession(t *testing.T) {
+	tests := []struct {
+		name       string
+		statusCode int
+		body       string
+		wantLog    bool
+	}{
+		{name: "ok", statusCode: http.StatusOK},
+		{name: "unauthorized", statusCode: http.StatusUnauthorized, body: `{"errors":[{"code":401,"message":"access denied, authorization failed"}]}`, wantLog: true},
+		{name: "server_error", statusCode: http.StatusInternalServerError, body: "internal server error", wantLog: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(tt.statusCode)
+				fmt.Fprint(w, tt.body)
+			}))
+			defer srv.Close()
+
+			s := newTestStream(t, "", srv.Client())
+			log, logs := logptest.NewTestingLoggerWithObserver(t, t.Name())
+			s.log = log
+
+			// A rejected refresh must not stop the refresh loop.
+			if err := s.refreshSession(context.Background(), srv.Client(), srv.URL+"/refresh"); err != nil {
+				t.Fatalf("refreshSession() error = %v; want nil", err)
+			}
+			entries := logs.FilterMessage("unsuccessful session refresh").All()
+			if tt.wantLog != (len(entries) != 0) {
+				t.Fatalf(`"unsuccessful session refresh" log entries = %d; want logged = %t`, len(entries), tt.wantLog)
+			}
+			if !tt.wantLog {
+				if got := s.metrics.errorsTotal.Get(); got != 0 {
+					t.Errorf("errors_total = %d; want 0", got)
+				}
+				return
+			}
+			fields := entries[0].ContextMap()
+			if got := fields["status_code"]; got != int64(tt.statusCode) {
+				t.Errorf("status_code = %v; want %d", got, tt.statusCode)
+			}
+			if got := fields["body"]; got != tt.body {
+				t.Errorf("body = %v; want %q", got, tt.body)
+			}
+			if got := s.metrics.errorsTotal.Get(); got != 1 {
+				t.Errorf("errors_total = %d; want 1", got)
+			}
+		})
+	}
+}
+
 func TestUserAgentTransport(t *testing.T) {
 	const want = "Elastic-crowdstrike/4.0.0"
 
@@ -295,6 +465,120 @@ func TestFollowSession_UserAgent(t *testing.T) {
 	}
 }
 
+func TestFollowSessionProcessesAllDiscoveredResources(t *testing.T) {
+	// Hold the first feed open after one event so a sequential follower
+	// would starve the second resource. Concurrent following should
+	// still publish both events within a bounded time.
+	release := make(chan struct{})
+
+	feed1 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		flusher, ok := w.(http.Flusher)
+		if !ok {
+			t.Error("ResponseWriter does not implement http.Flusher")
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintln(w, `{"metadata":{"eventType":"Test","offset":1},"event":{"feed":"one"}}`)
+		flusher.Flush()
+		<-release
+	}))
+	t.Cleanup(func() {
+		close(release)
+		feed1.Close()
+	})
+
+	feed2 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintln(w, `{"metadata":{"eventType":"Test","offset":2},"event":{"feed":"two"}}`)
+	}))
+	defer feed2.Close()
+
+	refreshSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer refreshSrv.Close()
+
+	discoverSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		resp := map[string]any{
+			"resources": []map[string]any{
+				{
+					"dataFeedURL": feed1.URL + "/firehose",
+					"sessionToken": map[string]any{
+						"token":      "test-token",
+						"expiration": "2099-01-01T00:00:00Z",
+					},
+					"refreshActiveSessionURL":      refreshSrv.URL + "/refresh",
+					"refreshActiveSessionInterval": 1800,
+				},
+				{
+					"dataFeedURL": feed2.URL + "/firehose",
+					"sessionToken": map[string]any{
+						"token":      "test-token",
+						"expiration": "2099-01-01T00:00:00Z",
+					},
+					"refreshActiveSessionURL":      refreshSrv.URL + "/refresh",
+					"refreshActiveSessionInterval": 1800,
+				},
+			},
+			"meta": map[string]any{},
+		}
+		b, err := json.Marshal(resp)
+		if err != nil {
+			t.Errorf("failed to marshal discover response: %v", err)
+			return
+		}
+		_, _ = w.Write(b)
+	}))
+	defer discoverSrv.Close()
+
+	pub := new(recordingPublisher)
+	s := newTestStreamWithPublisher(t, discoverSrv.URL, http.DefaultClient, pub)
+
+	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
+	defer cancel()
+
+	done := make(chan error, 1)
+	go func() {
+		_, err := s.followSession(ctx, discoverSrv.Client(), map[string]any{})
+		done <- err
+	}()
+
+	deadline := time.After(3 * time.Second)
+	for pub.published() < 2 {
+		select {
+		case <-deadline:
+			t.Fatalf("expected events from both feeds within 3s, got %d", pub.published())
+		case err := <-done:
+			if pub.published() < 2 {
+				t.Fatalf("followSession returned before both feeds published: err=%v published=%d", err, pub.published())
+			}
+		case <-time.After(10 * time.Millisecond):
+		}
+	}
+
+	got := map[string]bool{}
+	for _, e := range pub.snapshot() {
+		ev, _ := e.Fields["event"].(map[string]any)
+		if ev == nil {
+			continue
+		}
+		if name, ok := ev["feed"].(string); ok {
+			got[name] = true
+		}
+	}
+	if !got["one"] || !got["two"] {
+		t.Errorf("expected events from feeds one and two, got %v", got)
+	}
+
+	cancel()
+	select {
+	case <-done:
+	case <-time.After(2 * time.Second):
+		t.Fatal("followSession did not return after context cancel")
+	}
+}
+
 func discoverResponse(t *testing.T, feedURL, refreshURL string) string {
 	t.Helper()
 	resp := map[string]any{
@@ -333,7 +617,12 @@ func newTestStreamWithPublisher(t *testing.T, discoverURL string, firehoseClient
 	prg, ast, err := newProgram(ctx, `
 		state.response.decode_json().as(body, {
 			"events": [body],
-			?"cursor": body.?metadata.optMap(m, {"offset": m.offset}),
+			?"cursor": has(body.metadata) ?
+				optional.of(state.?cursor.orValue({}).with({
+					?state.feed: body.?metadata.optMap(m, {"offset": m.offset}),
+				}))
+			:
+				state.?cursor,
 		})
 	`, root, nil, "", log)
 	if err != nil {
@@ -357,13 +646,41 @@ func newTestStreamWithPublisher(t *testing.T, discoverURL string, firehoseClient
 	}
 }
 
-type countingPublisher int
+type countingPublisher struct {
+	n atomic.Int64
+}
 
 func (p *countingPublisher) Publish(beat.Event, any) error {
-	*p++
+	p.n.Add(1)
 	return nil
 }
 
 func (p *countingPublisher) published() int {
-	return int(*p)
+	return int(p.n.Load())
+}
+
+type recordingPublisher struct {
+	mu     sync.Mutex
+	events []beat.Event
+}
+
+func (p *recordingPublisher) Publish(e beat.Event, _ any) error {
+	p.mu.Lock()
+	p.events = append(p.events, e)
+	p.mu.Unlock()
+	return nil
+}
+
+func (p *recordingPublisher) published() int {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	return len(p.events)
+}
+
+func (p *recordingPublisher) snapshot() []beat.Event {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	out := make([]beat.Event, len(p.events))
+	copy(out, p.events)
+	return out
 }

@@ -26,6 +26,7 @@ import (
 	"io"
 	"maps"
 	"os"
+	"path"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -65,13 +66,18 @@ func (e ignoredFileError) Unwrap() error {
 	return errFileIgnored
 }
 
+// isMissing reports whether err means the path is no longer there.
+func isMissing(err error) bool {
+	return errors.Is(err, os.ErrNotExist) || errors.Is(err, syscall.ENOTDIR)
+}
+
 // isObservationError reports whether err means the scanner could not observe a
 // path this scan (a filesystem syscall failure such as EMFILE/ENFILE, EACCES or
 // EIO), as opposed to the path being genuinely gone. It is false for a missing
-// file/dir (os.ErrNotExist/ENOTDIR) and for logical rejections that carry no
-// *os.PathError (e.g. "file is a directory", "symlinks disabled").
+// path and for logical rejections that carry no *os.PathError (e.g. "file is a
+// directory", "symlinks disabled").
 func isObservationError(err error) bool {
-	if err == nil || errors.Is(err, os.ErrNotExist) || errors.Is(err, syscall.ENOTDIR) {
+	if err == nil || isMissing(err) {
 		return false
 	}
 	var pathErr *os.PathError
@@ -79,14 +85,15 @@ func isObservationError(err error) bool {
 }
 
 type fingerprintConfig struct {
+	// Enabled is deprecated and ignored; normalizeConfig in input.go derives it
+	// from the file identity.
 	Enabled bool  `config:"enabled"`
 	Offset  int64 `config:"offset"`
 	Length  int64 `config:"length"`
-	// Growing enables Enhanced Fingerprint behaviour: files smaller than
-	// Offset+Length are tracked using the raw bytes from Offset to the file's
-	// end (hex-encoded). When a file reaches the threshold, its registry key
-	// migrates to the same SHA-256 hex the static fingerprint produces, so
-	// existing static-fingerprint state is preserved.
+	// Growing tracks files smaller than Offset+Length using the raw bytes
+	// from Offset to the file's end (hex-encoded). When a file reaches the
+	// threshold, its registry key migrates to the same SHA-256 hex the static
+	// fingerprint produces, so existing static-fingerprint state is preserved.
 	//
 	// Not user-configurable here: the YAML key under prospector.scanner.fingerprint
 	// is silently ignored. The user-facing knob is file_identity.fingerprint.growing;
@@ -110,8 +117,6 @@ func defaultFileScannerConfig() fileScannerConfig {
 			Enabled: true,
 			Offset:  0,
 			Length:  DefaultFingerprintSize,
-			// false by default: the file identity config will set it to true if
-			// fingerprint is used
 			Growing: false,
 		},
 	}
@@ -124,8 +129,6 @@ type fileScanner struct {
 	paths            []string
 	cfg              fileScannerConfig
 	log              *logp.Logger
-	hasher           hash.Hash
-	readBuffer       []byte
 	compression      string
 	// completedFingerprints holds paths already complete on the previous watch scan
 	// (growing mode), so attachBridgingRaw can skip re-encoding their bridging header.
@@ -145,17 +148,37 @@ type fileScanner struct {
 	pathIndex       map[string]int
 	pathsCanOverlap bool
 
+	// dirCache is the shared process-wide directory cache; nil means read directly.
+	// dirCacheMaxAge is min(check_interval, maxDirCacheAge) and is passed per call.
+	dirCache       *dirCache
+	dirCacheMaxAge time.Duration
+
+	// Everything below exists only to avoid per-file allocations
+
+	hasher       hash.Hash
+	readBuffer   []byte
+	sumBuffer    [sha256.Size]byte
+	rawHexBuffer []byte
 	// lastCount is the number of unique files the previous scan produced.
 	lastCount int
 }
 
 func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, compression string) (*fileScanner, error) {
+	return newFileScannerWithCache(logger, paths, config, compression, nil, 0)
+}
+
+// newFileScannerWithCache is like newFileScanner but accepts a shared dirCache
+// and the per-call maxAge (typically min(check_interval, maxDirCacheAge)).
+// dc=nil means directory reads go directly to the OS without caching.
+func newFileScannerWithCache(logger *logp.Logger, paths []string, config fileScannerConfig, compression string, dc *dirCache, maxAge time.Duration) (*fileScanner, error) {
 	s := fileScanner{
-		paths:       paths,
-		cfg:         config,
-		log:         logger.Named("scanner"),
-		hasher:      sha256.New(),
-		compression: compression,
+		paths:          paths,
+		cfg:            config,
+		log:            logger.Named("scanner"),
+		hasher:         sha256.New(),
+		compression:    compression,
+		dirCache:       dc,
+		dirCacheMaxAge: maxAge,
 	}
 
 	if s.cfg.Fingerprint.Enabled {
@@ -171,6 +194,9 @@ func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfi
 		s.log.Debugf("fingerprint mode enabled: offset %d, length %d, growing %t",
 			s.cfg.Fingerprint.Offset, s.cfg.Fingerprint.Length, s.cfg.Fingerprint.Growing)
 		s.readBuffer = make([]byte, s.cfg.Fingerprint.Length)
+		if s.cfg.Fingerprint.Growing {
+			s.rawHexBuffer = make([]byte, hex.EncodedLen(int(s.cfg.Fingerprint.Length)))
+		}
 	}
 
 	err := s.resolveRecursiveGlobs(config)
@@ -235,7 +261,8 @@ type matchedTarget struct {
 
 // GetFiles walks each configured pattern's base directory a single time,
 // filtering inline so files are excluded as they are discovered, and returns
-// the matched descriptors, per-scan metrics, and unobservable prefixes.
+// the matched descriptors, per-scan metrics, and the prefixes this scan could
+// not resolve.
 func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) loginp.ScanResults {
 	if opts.CurrentTime.IsZero() {
 		opts.CurrentTime = time.Now()
@@ -254,29 +281,14 @@ func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) loginp.ScanResults {
 	}
 
 	for _, g := range s.walkGroups {
-		s.walk(g, st.process, st.recordUnobservable)
+		s.walk(g, st)
 	}
 
-	st.metrics.FilesUnique = int64(len(st.fdByName))
-
-	// prefixes is returned to the watcher, so it is built unconditionally.
-	var prefixes []string
-	if len(st.unobservable) > 0 {
-		prefixes = slices.Sorted(maps.Keys(st.unobservable))
-		s.debugLogUnobservable(prefixes)
-	}
-
-	s.lastCount = len(st.fdByName)
-	return loginp.ScanResults{
-		Files:        st.fdByName,
-		Metrics:      st.metrics,
-		Unobservable: prefixes,
-	}
+	return st.results()
 }
 
-// scanState is the mutable state of a single GetFiles scan. process and
-// recordUnobservable mutate it as the literal paths and the directory walk yield
-// entries.
+// scanState is the mutable state of a single GetFiles scan. It is the walkSink
+// the directory walk reports to, and the literal-path loop feeds it the same way.
 type scanState struct {
 	s    *fileScanner
 	opts loginp.FileScanOptions
@@ -294,6 +306,10 @@ type scanState struct {
 	// uses them to postpone delete detection so a transient failure does not wipe
 	// registry state and re-ingest files.
 	unobservable map[string]struct{}
+	// vanished collects paths that were listed but had disappeared by the time
+	// the scan inspected them, which happens for a delete but also for a rename
+	// between listing a directory and reading its contents.
+	vanished map[string]struct{}
 
 	metrics loginp.FileScanMetrics
 }
@@ -308,11 +324,12 @@ func (s *fileScanner) newScanState(opts loginp.FileScanOptions) *scanState {
 		uniqueIDs:    make(map[string]matchedTarget, s.lastCount),
 		uniqueFiles:  make(map[string]struct{}, s.lastCount),
 		unobservable: map[string]struct{}{},
+		vanished:     map[string]struct{}{},
 	}
 }
 
 // recordUnobservable marks path as a prefix the scan could not observe, counting
-// it once. Passed to walk as the recordUnobservable callback.
+// it once.
 func (st *scanState) recordUnobservable(path string) {
 	if _, ok := st.unobservable[path]; ok {
 		return
@@ -321,12 +338,42 @@ func (st *scanState) recordUnobservable(path string) {
 	st.metrics.ScanErrors++
 }
 
+// recordVanished marks path as listed but no longer there.
+func (st *scanState) recordVanished(path string) {
+	st.vanished[path] = struct{}{}
+}
+
+func (st *scanState) recordPathError(path string, err error) {
+	switch {
+	case isObservationError(err):
+		st.recordUnobservable(path)
+	case isMissing(err):
+		st.recordVanished(path)
+	}
+}
+
+// results assembles the scan outcome and records the descriptor count as the
+// size hint for the next scan's maps.
+func (st *scanState) results() loginp.ScanResults {
+	st.metrics.FilesUnique = int64(len(st.fdByName))
+	st.s.lastCount = len(st.fdByName)
+
+	unobservable := slices.Sorted(maps.Keys(st.unobservable))
+	st.s.debugLogUnobservable(unobservable)
+
+	return loginp.ScanResults{
+		Files:        st.fdByName,
+		Metrics:      st.metrics,
+		Unobservable: unobservable,
+		Vanished:     slices.Sorted(maps.Keys(st.vanished)),
+	}
+}
+
 // process evaluates one matched filename: it filters duplicates, builds an ingest
 // target and file descriptor, resolves file-identity collisions against paths
 // already matched this scan, and records the descriptor (or the relevant metric)
 // in the scan state. orderIndex is the position in s.paths of the pattern that
 // matched filename, used to resolve identity collisions deterministically.
-// Passed to walk as the process callback.
 func (st *scanState) process(filename string, orderIndex int) {
 	s, opts := st.s, st.opts
 	st.metrics.FilesMatched++
@@ -351,12 +398,13 @@ func (st *scanState) process(filename string, orderIndex int) {
 			return
 		}
 
-		// A stat/lstat that failed for a reason other than the file being
-		// gone (e.g. EMFILE) means we could not observe this path this scan.
-		if isObservationError(err) {
-			st.recordUnobservable(filename)
-		}
 		st.metrics.FilesNoIngestTarget++
+		if it.symlink && isMissing(err) {
+			// A dangling symlink stays listed indefinitely, so holding its state
+			// would defer the delete forever.
+			return
+		}
+		st.recordPathError(filename, err)
 		return
 	}
 
@@ -376,11 +424,9 @@ func (st *scanState) process(filename string, orderIndex int) {
 	}
 	if err != nil {
 		st.metrics.FilesNoIngestTarget++
-		// Fingerprinting opens the file; under fd exhaustion the open fails
-		// with EMFILE, which is an observation failure, not a missing file.
-		if isObservationError(err) {
-			st.recordUnobservable(filename)
-		}
+		// The path can disappear between getIngestTarget's stat and opening it
+		// for fingerprinting, even if the directory listing was fresh.
+		st.recordPathError(filename, err)
 		s.log.Warnf("cannot create a file descriptor for an ingest target %q: %s", filename, err)
 		return
 	}
@@ -417,7 +463,7 @@ func (st *scanState) process(filename string, orderIndex int) {
 // debugLogUnobservable logs a sample of the path prefixes a scan could not
 // observe (permissions or file-descriptor exhaustion). prefixes must be sorted.
 func (s *fileScanner) debugLogUnobservable(prefixes []string) {
-	if !s.log.IsDebug() {
+	if len(prefixes) == 0 || !s.log.IsDebug() {
 		return
 	}
 	const maxSamples = 5
@@ -430,46 +476,17 @@ func (s *fileScanner) debugLogUnobservable(prefixes []string) {
 // base directory, indexed by their depth below that directory so the walker only
 // tests a file against the patterns that can possibly match it.
 type walkGroup struct {
-	root     string
-	maxDepth int
-	byDepth  map[int][]string
+	root string
+	// patterns is in ascending depth order, then configured order, so that
+	// matchLeaf's first-match break is deterministic.
+	patterns []walkPattern
 }
 
 // buildWalkGroups partitions s.paths into literal paths and walk groups keyed by
 // their base directory, so patterns sharing a base read the tree only once.
-// Patterns invalid upfront are dropped and reported here; ones that escape this
-// check (a bad token behind a literal prefix never reaches the parser when
-// matching "") are reported once per scan by walk.
+// A pattern with a malformed component can match nothing; it is reported and
+// dropped here.
 func (s *fileScanner) buildWalkGroups() {
-	groups := map[string]*walkGroup{}
-	var literals []string
-
-	for _, path := range s.paths {
-		if !hasGlobMeta(path) {
-			literals = append(literals, path)
-			continue
-		}
-
-		if _, err := filepath.Match(path, ""); err != nil {
-			s.log.Errorf("invalid glob pattern %q: %v", path, err)
-			continue
-		}
-
-		root := globRoot(path)
-		g := groups[root]
-		if g == nil {
-			g = &walkGroup{root: root, byDepth: map[int][]string{}}
-			groups[root] = g
-		}
-		d := depthBelow(root, path)
-		g.byDepth[d] = append(g.byDepth[d], path)
-		if d > g.maxDepth {
-			g.maxDepth = d
-		}
-	}
-	s.walkGroups = groups
-	s.literals = literals
-
 	// Index every pattern by its position, and record whether any two patterns can
 	// match the same file. When none can, the walk's matched pattern is the file's
 	// scan-order position, so matchedEarlier resolves collisions from these indices
@@ -481,6 +498,35 @@ func (s *fileScanner) buildWalkGroups() {
 		}
 	}
 	s.pathsCanOverlap = pathsCanOverlap(s.paths)
+
+	groups := map[string]*walkGroup{}
+	var literals []string
+	for _, path := range s.paths {
+		if !hasGlobMeta(path) {
+			literals = append(literals, path)
+			continue
+		}
+
+		root := globRoot(path)
+		wp, err := newWalkPattern(root, path, s.pathIndex[path])
+		if err != nil {
+			s.log.Errorf("invalid glob pattern %q: %v", path, err)
+			continue
+		}
+		g := groups[root]
+		if g == nil {
+			g = &walkGroup{root: root}
+			groups[root] = g
+		}
+		g.patterns = append(g.patterns, wp)
+	}
+	for _, g := range groups {
+		slices.SortStableFunc(g.patterns, func(a, b walkPattern) int {
+			return len(a.comps) - len(b.comps)
+		})
+	}
+	s.walkGroups = groups
+	s.literals = literals
 }
 
 // walkPattern is a group pattern together with its path components below the
@@ -489,36 +535,98 @@ func (s *fileScanner) buildWalkGroups() {
 type walkPattern struct {
 	pattern string
 	comps   []string
+	// leafPrefix and leafSuffix are the literal text at either end of the last
+	// component. Every file the pattern matches starts and ends with them, so a
+	// name failing either is rejected without running filepath.Match.
+	leafPrefix, leafSuffix string
 	// orderIndex is the pattern's position in s.paths, carried through to process
 	// so a matched file's scan order is known without rescanning s.paths.
 	orderIndex int
 }
 
-// walk traverses g.root once and invokes process for every entry matching one of
-// the group's patterns. A directory is only descended into when its name matches
+// newWalkPattern splits pattern below root and validates every component with
+// path.Match, which unlike filepath.Match parses the whole component whatever
+// the name. On a separator-free component the two agree on whether a name
+// matches, so a component accepted here never makes filepath.Match fail.
+func newWalkPattern(root, pattern string, orderIndex int) (walkPattern, error) {
+	comps := patternComponents(root, pattern)
+	if len(comps) == 0 {
+		return walkPattern{}, fmt.Errorf("no path component below base directory %q", root)
+	}
+	for _, c := range comps {
+		if _, err := path.Match(c, ""); err != nil {
+			return walkPattern{}, err
+		}
+	}
+	leaf := comps[len(comps)-1]
+	return walkPattern{
+		pattern:    pattern,
+		comps:      comps,
+		leafPrefix: literalPrefix(leaf),
+		leafSuffix: literalSuffix(leaf),
+		orderIndex: orderIndex,
+	}, nil
+}
+
+// matchName reports whether name matches comp. comp was validated by
+// newWalkPattern, so filepath.Match cannot fail.
+func matchName(comp, name string) bool {
+	matched, _ := filepath.Match(comp, name)
+	return matched
+}
+
+// leafCandidates narrows sorted names to those that can match at least one
+// pattern: a match must start with its pattern's literal prefix, and names
+// sharing a prefix are contiguous when sorted, so each pattern selects one
+// block. The enclosing span of every block is returned; a pattern without a
+// literal prefix widens it to the whole slice. matchLeaf's per-pattern check
+// covers names inside the span but outside a block.
+func leafCandidates(names []string, exact []walkPattern) []string {
+	lo, hi := len(names), 0
+	for _, p := range exact {
+		if p.leafPrefix == "" {
+			return names
+		}
+		start, _ := slices.BinarySearch(names, p.leafPrefix)
+		end := start
+		for end < len(names) && strings.HasPrefix(names[end], p.leafPrefix) {
+			end++
+		}
+		lo, hi = min(lo, start), max(hi, end)
+	}
+	if lo >= hi {
+		return nil
+	}
+	return names[lo:hi]
+}
+
+func (s *fileScanner) readNames(dir string, shared bool) ([]string, error) {
+	if s.dirCache != nil {
+		return s.dirCache.readDirNames(dir, s.dirCacheMaxAge, shared)
+	}
+	return osDirNames(dir)
+}
+
+func (s *fileScanner) readEntries(dir string, shared bool) ([]os.DirEntry, error) {
+	if s.dirCache != nil {
+		return s.dirCache.readDirEntries(dir, s.dirCacheMaxAge, shared)
+	}
+	return os.ReadDir(dir)
+}
+
+// walkSink receives what a walk finds: every entry matching one of the group's
+// patterns, and the prefixes it could not read.
+type walkSink interface {
+	process(filename string, orderIndex int)
+	recordUnobservable(prefix string)
+	recordVanished(prefix string)
+}
+
+// walk traverses g.root once and hands sink every entry matching one of the
+// group's patterns. A directory is only descended into when its name matches
 // the next component of some pattern. Pattern depth bounds the recursion, which
 // preserves the RecursiveGlobDepth cap and makes symlink cycles safe.
-func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderIndex int), recordUnobservable func(prefix string)) {
-	// Flatten the group's patterns in ascending depth order, not map order, so
-	// malformed-pattern logging and matchLeaf's first-match break are deterministic
-	// rather than dependent on Go's map iteration.
-	patterns := make([]walkPattern, 0, len(g.byDepth))
-	for d := 0; d <= g.maxDepth; d++ {
-		for _, p := range g.byDepth[d] {
-			patterns = append(patterns, walkPattern{pattern: p, comps: patternComponents(g.root, p), orderIndex: s.pathIndex[p]})
-		}
-	}
-
-	// badPatterns dedups ErrBadPattern logs: filepath.Match reports a malformed
-	// pattern for every candidate name, but one line per scan is enough.
-	badPatterns := map[string]struct{}{}
-	logBadPattern := func(pattern string, err error) {
-		if _, seen := badPatterns[pattern]; !seen {
-			badPatterns[pattern] = struct{}{}
-			s.log.Errorf("glob match(%q) failed: %v", pattern, err)
-		}
-	}
-
+func (s *fileScanner) walk(g *walkGroup, sink walkSink) {
 	// rec reads dir, whose entries are at childDepth below the root. alive holds
 	// the patterns whose components matched every ancestor directory of dir.
 	var rec func(dir string, depth int, alive []walkPattern)
@@ -537,9 +645,15 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 			}
 		}
 
+		// Only a path this scan already saw listed can vanish. The walk root
+		// coming from config missing should not be in 'vanished'.
+		listed := depth > 0
 		onReadError := func(err error) {
-			if isObservationError(err) {
-				recordUnobservable(dir)
+			switch {
+			case isObservationError(err):
+				sink.recordUnobservable(dir)
+			case listed && isMissing(err):
+				sink.recordVanished(dir)
 			}
 			s.log.Debugf("cannot read directory %q: %s", dir, err)
 		}
@@ -549,33 +663,33 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 		// checked here, and the full path is built only on a match.
 		matchLeaf := func(name string) {
 			for _, p := range exact {
-				matched, matchErr := filepath.Match(p.comps[childDepth-1], name)
-				if matchErr != nil {
-					logBadPattern(p.pattern, matchErr)
+				if !strings.HasPrefix(name, p.leafPrefix) || !strings.HasSuffix(name, p.leafSuffix) {
 					continue
 				}
-				if matched {
-					process(filepath.Join(dir, name), p.orderIndex)
+				if matchName(p.comps[childDepth-1], name) {
+					sink.process(filepath.Join(dir, name), p.orderIndex)
 					break
 				}
 			}
 		}
 
-		// With nothing deeper to descend into, entry types are irrelevant: read
-		// only the names, avoiding os.ReadDir's per-entry os.DirEntry allocation.
+		shared := depth == 0 // only cache the walk root
+
 		if len(deeper) == 0 {
-			names, err := readDirNames(dir)
+			// Leaf: names only; Readdirnames avoids DirEntry allocation.
+			names, err := s.readNames(dir, shared)
 			if err != nil {
 				onReadError(err)
 				return
 			}
-			for _, name := range names {
+			for _, name := range leafCandidates(names, exact) {
 				matchLeaf(name)
 			}
 			return
 		}
 
-		entries, err := os.ReadDir(dir)
+		// Non-leaf: DirEntry values needed for IsDir / IsSymlink checks.
+		entries, err := s.readEntries(dir, shared)
 		if err != nil {
 			onReadError(err)
 			return
@@ -593,12 +707,7 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 			// none matching means nothing below this directory can ever match.
 			var childAlive []walkPattern
 			for _, p := range deeper {
-				ok, matchErr := filepath.Match(p.comps[childDepth-1], e.Name())
-				if matchErr != nil {
-					logBadPattern(p.pattern, matchErr)
-					continue
-				}
-				if ok {
+				if matchName(p.comps[childDepth-1], e.Name()) {
 					childAlive = append(childAlive, p)
 				}
 			}
@@ -611,7 +720,7 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 				info, statErr := os.Stat(full)
 				if statErr != nil {
 					if isObservationError(statErr) {
-						recordUnobservable(full)
+						sink.recordUnobservable(full)
 					}
 					continue
 				}
@@ -622,34 +731,40 @@ func (s *fileScanner) walk(g *walkGroup, process func(filename string, orderInde
 			}
 		}
 	}
-	rec(g.root, 0, patterns)
+	rec(g.root, 0, g.patterns)
 }
 
-// readDirNames returns the sorted entry names of dir, reading names only to avoid
-// os.ReadDir's per-entry os.DirEntry allocation. Used for leaf directories, where
-// entry types are not needed. Sorted to keep traversal order stable.
-func readDirNames(dir string) ([]string, error) {
-	f, err := os.Open(dir)
-	if err != nil {
-		return nil, err
+// globMagic is the set of glob metacharacters filepath.Match recognises. On
+// Windows the backslash is the path separator, so it does not escape there.
+var globMagic = func() string {
+	if filepath.Separator == '\\' {
+		return `*?[`
 	}
-	names, err := f.Readdirnames(-1)
-	_ = f.Close()
-	if err != nil {
-		return nil, err
-	}
-	slices.Sort(names)
-	return names, nil
-}
+	return `*?[\`
+}()
 
-// hasGlobMeta reports whether path contains any glob metacharacter, mirroring the
-// unexported path/filepath.hasMeta.
+// hasGlobMeta reports whether path contains any glob metacharacter.
 func hasGlobMeta(path string) bool {
-	magic := `*?[`
-	if filepath.Separator != '\\' {
-		magic = `*?[\`
+	return strings.ContainsAny(path, globMagic)
+}
+
+// literalPrefix returns the leading part of a glob component that has no
+// metacharacter.
+func literalPrefix(comp string) string {
+	if i := strings.IndexAny(comp, globMagic); i >= 0 {
+		return comp[:i]
 	}
-	return strings.ContainsAny(path, magic)
+	return comp
+}
+
+// literalSuffix returns the trailing part of a glob component that has no
+// metacharacter. A ']' counts as one so that the body of a character class is
+// never taken for literal text.
+func literalSuffix(comp string) string {
+	if i := strings.LastIndexAny(comp, globMagic+"]"); i >= 0 {
+		return comp[i+1:]
+	}
+	return comp
 }
 
 // globRoot returns the longest leading directory of pattern that has no glob
@@ -664,12 +779,6 @@ func globRoot(pattern string) string {
 		dir = parent
 	}
 	return dir
-}
-
-// depthBelow returns the number of path segments of pattern below root, including
-// the trailing filename segment. root must be an ancestor of pattern.
-func depthBelow(root, pattern string) int {
-	return len(patternComponents(root, pattern))
 }
 
 // patternComponents returns pattern's path segments below root. root must be an
@@ -717,14 +826,18 @@ func (s *fileScanner) matchedEarlier(a string, aIndex int, b string, bIndex int)
 	// path components, not full-path bytes. The two diverge when a sibling name is
 	// a byte-prefix of another and the next byte sorts before '/' (e.g. Glob visits
 	// "d" before "d-x", yet "d-x/a" < "d/z").
-	as := strings.Split(a, string(filepath.Separator))
-	bs := strings.Split(b, string(filepath.Separator))
-	for i := range min(len(as), len(bs)) {
-		if as[i] != bs[i] {
-			return as[i] < bs[i]
+	sep := string(filepath.Separator)
+	for {
+		ac, aRest, aMore := strings.Cut(a, sep)
+		bc, bRest, bMore := strings.Cut(b, sep)
+		if ac != bc {
+			return ac < bc
 		}
+		if !aMore || !bMore {
+			return !aMore && bMore
+		}
+		a, b = aRest, bRest
 	}
-	return len(as) < len(bs)
 }
 
 // pathsCanOverlap reports whether any two patterns can match the same file. It is
@@ -867,86 +980,23 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 	length := s.cfg.Fingerprint.Length
 	threshold := offset + length
 
-	// opener is used to open the file only once
-	opener := struct {
-		Open func() (*os.File, error)
-		f    *os.File
-	}{}
-	opener.Open = func() (*os.File, error) {
-		if opener.f != nil {
-			return opener.f, nil
-		}
-
-		opener.f, err = os.Open(it.originalFilename)
-		if err != nil {
-			return nil, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
-		}
-		return opener.f, err
+	var osFile *os.File
+	osFile, fd.GZIP, err = s.openFingerprintSource(it)
+	if osFile != nil {
+		defer osFile.Close()
+	}
+	if err != nil {
+		return fd, err
 	}
 
-	defer func() {
-		if opener.f != nil {
-			opener.f.Close()
-		}
-	}()
-
-	switch s.compression {
-	case CompressionNone:
-		// fd.GZIP stays false
-	case CompressionGZIP:
-		fd.GZIP = true
-	case CompressionAuto:
-		osFile, err := opener.Open()
-		if err != nil {
-			return fd, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
-		}
-
-		fd.GZIP, err = IsGZIP(osFile)
-		if err != nil {
-			return fd, fmt.Errorf("failed to check if %q is gzip: %w",
-				it.originalFilename, err)
-		}
-	}
-
-	// Fast path for non-GZIP files we know the size from lstat and can
-	// reject too-small files in static mode without opening the file. This
-	// preserves the no-open guarantee for static fingerprint on
-	// unreadable/permission-denied small files.
-	if !fd.GZIP {
-		// size <= offset we cannot read anything from the offset, regardless of mode.
-		if it.info.Size() <= offset {
-			return fd, fmt.Errorf(
-				"filesize of %q is %d bytes, less than fingerprint offset %d: %w",
-				fd.Filename, it.info.Size(), offset, errFileTooSmall)
-		}
-		if !s.cfg.Fingerprint.Growing && it.info.Size() < threshold {
-			return fd, fmt.Errorf(
-				"filesize of %q is %d bytes, expected at least %d bytes for fingerprinting: %w",
-				fd.Filename, it.info.Size(), threshold, errFileTooSmall)
-		}
-	}
-
-	// Wrap the open file (plain or GZIP) so subsequent reads/seeks operate
-	// on the decompressed stream when applicable.
-	var file File
+	var file io.ReadSeeker = osFile
 	if fd.GZIP {
-		osFile, err := opener.Open()
-		if err != nil {
-			return fd, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
-		}
-
-		// Check if there is enough *decompressed* data for fingerprint
-		file, err = newGzipSeekerReader(osFile, int(threshold))
+		gzFile, err := newGzipSeekerReader(osFile, int(threshold))
 		if err != nil {
 			return fd, fmt.Errorf("failed to create gzip seeker: %w", err)
 		}
-		defer file.Close()
-	} else {
-		osFile, err := opener.Open()
-		if err != nil {
-			return fd, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
-		}
-		file = newPlainFile(osFile)
+		defer gzFile.Close()
+		file = gzFile
 	}
 
 	// Seek to offset (for both growing and static paths).
@@ -985,7 +1035,7 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 		}
 
 		// Growing mode small file: hex of bytes[offset:offset+n].
-		fd.Fingerprint = loginp.FingerprintID{Raw: hex.EncodeToString(s.readBuffer[:n])}
+		fd.Fingerprint = loginp.FingerprintID{Raw: s.rawHex(s.readBuffer[:n])}
 
 		return fd, nil
 	}
@@ -993,11 +1043,80 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 	// File at or above threshold: compute SHA-256 of bytes[offset:offset+length].
 	s.hasher.Reset()
 	s.hasher.Write(s.readBuffer[:length])
-	fd.Fingerprint = loginp.FingerprintID{
-		Sum: hex.EncodeToString(s.hasher.Sum(nil)),
-	}
+	// hexBuffer is allocated on the stack. sumBuffer can't because Sum() is an
+	// interface call
+	var hexBuffer [2 * sha256.Size]byte
+	hex.Encode(hexBuffer[:], s.hasher.Sum(s.sumBuffer[:0]))
+	fd.Fingerprint = loginp.FingerprintID{Sum: string(hexBuffer[:])}
 
 	return fd, nil
+}
+
+// rawHex returns hex(b) with the reusable buffer
+func (s *fileScanner) rawHex(b []byte) string {
+	n := hex.Encode(s.rawHexBuffer, b)
+	return string(s.rawHexBuffer[:n])
+}
+
+// openFingerprintSource opens the file the fingerprint is read from and reports
+// whether that file is GZIP. Callers must close a non-nil *os.File.
+func (s *fileScanner) openFingerprintSource(it *ingestTarget) (osFile *os.File, isGZIP bool, err error) {
+	switch s.compression {
+	case CompressionNone:
+		if err = s.checkFingerprintSize(it); err != nil {
+			return nil, false, err
+		}
+
+	case CompressionGZIP:
+		isGZIP = true
+
+	case CompressionAuto:
+		// Open the file to check its magic bytes
+		osFile, err = openIngestTarget(it)
+		if err != nil {
+			return osFile, false, err
+		}
+		isGZIP, err = IsGZIP(osFile)
+		if err != nil {
+			return osFile, false, fmt.Errorf("failed to check if %q is gzip: %w",
+				it.originalFilename, err)
+		}
+		if !isGZIP {
+			err = s.checkFingerprintSize(it)
+		}
+		return osFile, isGZIP, err
+	}
+
+	osFile, err = openIngestTarget(it)
+	return osFile, isGZIP, err
+}
+
+func openIngestTarget(it *ingestTarget) (*os.File, error) {
+	osFile, err := os.Open(it.originalFilename)
+	if err != nil {
+		return nil, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
+	}
+	return osFile, nil
+}
+
+// checkFingerprintSize reports errFileTooSmall when the stat size cannot yield
+// a fingerprint. Not applicable to GZIP files.
+func (s *fileScanner) checkFingerprintSize(it *ingestTarget) error {
+	offset := s.cfg.Fingerprint.Offset
+	threshold := offset + s.cfg.Fingerprint.Length
+
+	// At or below the offset nothing is readable from it, regardless of mode.
+	if it.info.Size() <= offset {
+		return fmt.Errorf(
+			"filesize of %q is %d bytes, less than fingerprint offset %d: %w",
+			it.filename, it.info.Size(), offset, errFileTooSmall)
+	}
+	if !s.cfg.Fingerprint.Growing && it.info.Size() < threshold {
+		return fmt.Errorf(
+			"filesize of %q is %d bytes, expected at least %d bytes for fingerprinting: %w",
+			it.filename, it.info.Size(), threshold, errFileTooSmall)
+	}
+	return nil
 }
 
 // attachBridgingRaw sets a complete descriptor's raw header.
@@ -1008,7 +1127,7 @@ func (s *fileScanner) attachBridgingRaw(fd *loginp.FileDescriptor) {
 	if _, done := s.completedFingerprints[fd.Filename]; done {
 		return
 	}
-	fd.Fingerprint.Raw = hex.EncodeToString(s.readBuffer[:s.cfg.Fingerprint.Length])
+	fd.Fingerprint.Raw = s.rawHex(s.readBuffer[:s.cfg.Fingerprint.Length])
 }
 
 func (s *fileScanner) isFileExcluded(file string) bool {

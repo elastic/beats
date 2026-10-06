@@ -181,11 +181,9 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 
 	// Start SQS keepalive worker.
 	var keepaliveWg sync.WaitGroup
-	keepaliveWg.Add(1)
-	go func() {
-		defer keepaliveWg.Done()
+	keepaliveWg.Go(func() {
 		p.keepalive(keepaliveCtx, log, msg)
-	}()
+	})
 
 	receiveCount := getSQSReceiveCount(msg.Attributes)
 	if receiveCount == 1 {

@@ -262,6 +262,11 @@ type ScanResults struct {
 	// its subtree, a file covers itself) the scan could not observe because of a
 	// resource or permission error, as opposed to being gone.
 	Unobservable []string
+	// Vanished is the list of paths the scan listed but could no longer find when
+	// it inspected them, typically because of a concurrent rename or delete.
+	// Their state must be held until a later, consistent scan can tell a
+	// rename from a deletion.
+	Vanished []string
 }
 
 // FSScanner retrieves a list of files from the file system.
@@ -270,18 +275,20 @@ type FSScanner interface {
 	GetFiles(FileScanOptions) ScanResults
 }
 
+// FSEventSink receives the events produced by [FSWatcher.ScanOnce]. It is
+// called on the goroutine running the scan.
+type FSEventSink func(FSEvent)
+
 // FSWatcher returns file events of the monitored files.
 type FSWatcher interface {
 	FSScanner
+	// HarvesterObserver is how closing harvesters report the offset they
+	// reached, so the next scan does not lose lines on a restart.
+	HarvesterObserver
 
-	// Run is the event loop which watches for changes
-	// in the file system and returns events based on the data.
-	// Aside from the metrics struct it also has ignore older
-	// and ignore inactive as arguments.
-	Run(ctx unison.Canceler, metrics *Metrics, ignoreOlder time.Duration, ignoreInactiveSince time.Time)
-	// Event returns the next event captured by FSWatcher.
-	Event() FSEvent
-	// NotifyChan returns the channel used to listen for
-	// harvester closing notifications
-	NotifyChan() chan HarvesterStatus
+	// ScanOnce scans the file system once and calls sink synchronously for
+	// every event, so the caller owns the scan loop. Aside from the metrics
+	// struct it also has ignore older and ignore inactive as arguments.
+	// It stops early when ctx is cancelled.
+	ScanOnce(ctx unison.Canceler, sink FSEventSink, metrics *Metrics, ignoreOlder time.Duration, ignoreInactiveSince time.Time)
 }

@@ -21,7 +21,8 @@ package logstash_test
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
+
 	"net/http"
 	"testing"
 	"time"
@@ -80,16 +81,16 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig(metricSet string, host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(metricSet string, host string) map[string]any {
+	return map[string]any{
 		"module":     logstash.ModuleName,
 		"metricsets": []string{metricSet},
 		"hosts":      []string{host},
 	}
 }
 
-func getXPackConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getXPackConfig(host string) map[string]any {
+	return map[string]any{
 		"module":     logstash.ModuleName,
 		"metricsets": metricSets,
 		"hosts":      []string{host},
@@ -105,7 +106,7 @@ func getESClusterUUID(t *testing.T, host string) string {
 		ClusterUUID string `json:"cluster_uuid"`
 	}
 
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	require.NoError(t, err)
 	json.Unmarshal(data, &body)
 

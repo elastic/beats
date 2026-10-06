@@ -88,10 +88,15 @@ func readPIDNsInode() (uint64, error) {
 // NewProvider returns a new instance of kerneltracingprovider
 func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Registry) (provider.Provider, error) {
 	attr := quark.DefaultQueueAttr()
-	attr.Flags = quark.QQ_ALL_BACKENDS | quark.QQ_ENTRY_LEADER
+	attr.Flags = quark.QQ_EBPF | quark.QQ_ENTRY_LEADER
 	qq, err := quark.OpenQueue(attr)
 	if err != nil {
-		return nil, fmt.Errorf("open queue: %w", err)
+		logger.Warnw("failed to use ebpf, attempting to use kprobe", "error", err)
+		attr.Flags = quark.QQ_KPROBE | quark.QQ_ENTRY_LEADER
+		qq, err = quark.OpenQueue(attr)
+		if err != nil {
+			return nil, fmt.Errorf("open queue: %w", err)
+		}
 	}
 
 	procMetrics := NewStats(reg)
@@ -125,12 +130,13 @@ func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Regis
 				stats.Lost.Set(metrics.Lost)
 				stats.NonAggregations.Set(metrics.NonAggregations)
 				stats.Removals.Set(metrics.Removals)
+				stats.Stalls.Set(metrics.Stalls)
 				lastUpdate = time.Now()
 			}
 
 			// Quark is idle, Block for a bit
 			if !ok {
-				err = qq.Block()
+				err := qq.Block()
 				if err != nil {
 					logger.Errorw("quark block, no more process enrichment from this processor will be done", "error", err)
 					break
@@ -256,7 +262,11 @@ func (p *prvdr) GetProcess(pid uint32) (*types.Process, error) {
 		Minor: proc.Proc.TtyMinor,
 	})
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
+	// Quark hands out timestamps in nanoseconds since boot, fetch
+	// the boottime epoch once for the process and all its leaders,
+	// see wallclock().
+	epoch := quark.Boottime()
+	start := wallclock(epoch, proc.Proc.TimeBoot)
 
 	ret := types.Process{
 		PID:              proc.Pid,
@@ -283,16 +293,16 @@ func (p *prvdr) GetProcess(pid uint32) (*types.Process, error) {
 	ret.TTY.CharDevice.Major = uint16(proc.Proc.TtyMajor) //nolint:gosec // tty major/minor numbers fit in uint16
 	ret.TTY.CharDevice.Minor = uint16(proc.Proc.TtyMinor) //nolint:gosec // tty major/minor numbers fit in uint16
 	if proc.Exit.Valid {
-		end := time.Unix(0, int64(proc.Exit.ExitTimeProcess)) //nolint:gosec // ExitTimeProcess is a nanosecond timestamp that fits in int64
+		end := wallclock(epoch, proc.Exit.ExitTimeProcess)
 		ret.ExitCode = proc.Exit.ExitCode
 		ret.End = &end
 	}
 	ret.EntityID = calculateEntityIDv1(pid, *ret.Start)
 
-	p.fillParent(&ret, proc.Proc.Ppid)
-	p.fillGroupLeader(&ret, proc.Proc.Pgid)
-	p.fillSessionLeader(&ret, proc.Proc.Sid)
-	p.fillEntryLeader(&ret, proc.Proc.EntryLeader)
+	p.fillParent(&ret, proc.Proc.Ppid, epoch)
+	p.fillGroupLeader(&ret, proc.Proc.Pgid, epoch)
+	p.fillSessionLeader(&ret, proc.Proc.Sid, epoch)
+	p.fillEntryLeader(&ret, proc.Proc.EntryLeader, epoch)
 	setEntityID(&ret)
 	setSameAsProcess(&ret)
 	return &ret, nil
@@ -305,14 +315,23 @@ func (p *prvdr) lookupLocked(pid uint32) (quark.Process, bool) {
 	return p.qq.Lookup(int(pid))
 }
 
+// wallclock translates sinceBoot, nanoseconds since boot as handed out
+// by quark, to wallclock by adding epoch, the boottime epoch from
+// quark.Boottime(). Since-boot times are immune to system clock
+// changes: the translation happens at the last moment and the epoch
+// is fetched once per GetProcess to reduce the frequency of cgo calls.
+func wallclock(epoch, sinceBoot uint64) time.Time {
+	return time.Unix(0, int64(sinceBoot+epoch)) //nolint:gosec // nanosecond timestamps fit in int64
+}
+
 // fillParent populates the parent process fields with the attributes of the process with PID `ppid`
-func (p *prvdr) fillParent(process *types.Process, ppid uint32) {
+func (p *prvdr) fillParent(process *types.Process, ppid uint32, epoch uint64) {
 	proc, found := p.lookupLocked(ppid)
 	if !found {
 		return
 	}
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
+	start := wallclock(epoch, proc.Proc.TimeBoot)
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
 		Minor: proc.Proc.TtyMinor,
@@ -336,17 +355,17 @@ func (p *prvdr) fillParent(process *types.Process, ppid uint32) {
 	if ok {
 		process.Parent.Group.Name = groupname
 	}
-	process.Parent.EntityID = calculateEntityIDv1(ppid, *process.Start)
+	process.Parent.EntityID = calculateEntityIDv1(ppid, *process.Parent.Start)
 }
 
 // fillGroupLeader populates the process group leader fields with the attributes of the process with PID `pgid`
-func (p *prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
+func (p *prvdr) fillGroupLeader(process *types.Process, pgid uint32, epoch uint64) {
 	proc, found := p.lookupLocked(pgid)
 	if !found {
 		return
 	}
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
+	start := wallclock(epoch, proc.Proc.TimeBoot)
 
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
@@ -375,13 +394,13 @@ func (p *prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 }
 
 // fillSessionLeader populates the session leader fields with the attributes of the process with PID `sid`
-func (p *prvdr) fillSessionLeader(process *types.Process, sid uint32) {
+func (p *prvdr) fillSessionLeader(process *types.Process, sid uint32, epoch uint64) {
 	proc, found := p.lookupLocked(sid)
 	if !found {
 		return
 	}
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
+	start := wallclock(epoch, proc.Proc.TimeBoot)
 
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
@@ -410,13 +429,13 @@ func (p *prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 }
 
 // fillEntryLeader populates the entry leader fields with the attributes of the process with PID `elid`
-func (p *prvdr) fillEntryLeader(process *types.Process, elid uint32) {
+func (p *prvdr) fillEntryLeader(process *types.Process, elid uint32, epoch uint64) {
 	proc, found := p.lookupLocked(elid)
 	if !found {
 		return
 	}
 
-	start := time.Unix(0, int64(proc.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
+	start := wallclock(epoch, proc.Proc.TimeBoot)
 
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
@@ -489,13 +508,11 @@ func setSameAsProcess(process *types.Process) {
 // This is a globally unique identifier for the process.
 func calculateEntityIDv1(pid uint32, startTime time.Time) string {
 	return base64.StdEncoding.EncodeToString(
-		[]byte(
-			fmt.Sprintf("%d__%s__%d__%d",
-				pidNsInode,
-				bootID,
-				uint64(pid),
-				uint64(startTime.Unix()), //nolint:gosec // process start times are always positive
-			),
+		fmt.Appendf(nil, "%d__%s__%d__%d",
+			pidNsInode,
+			bootID,
+			uint64(pid),
+			uint64(startTime.Unix()), //nolint:gosec // process start times are always positive
 		),
 	)
 }

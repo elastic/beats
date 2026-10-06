@@ -10,9 +10,9 @@ applies_to:
 # Configure index lifecycle management [ilm]
 
 
-Use the [index lifecycle management](docs-content://manage-data/lifecycle/index-lifecycle-management/tutorial-automate-rollover.md) (ILM) feature in {{es}} to manage your Metricbeat their backing indices of your data streams as they age. Metricbeat loads the default policy automatically and applies it to any data streams created by Metricbeat.
+Use the [index lifecycle management](docs-content://manage-data/lifecycle/index-lifecycle-management/tutorial-automate-rollover.md) (ILM) feature in {{es}} to manage the backing indices of your Metricbeat data streams as they age. Metricbeat loads the default policy automatically and applies it to any data streams created by Metricbeat.
 
-You can view and edit the policy in the **Index lifecycle policies** UI in {{kib}}. For more information about working with the UI, see [Index lifecyle policies](docs-content://manage-data/lifecycle/index-lifecycle-management.md).
+You can view and edit the policy in the **Index lifecycle policies** UI in {{kib}}. For more information about working with the UI, see [Index lifecycle policies](docs-content://manage-data/lifecycle/index-lifecycle-management.md).
 
 Example configuration:
 

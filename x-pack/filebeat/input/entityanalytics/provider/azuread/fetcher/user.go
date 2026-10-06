@@ -5,6 +5,8 @@
 package fetcher
 
 import (
+	"maps"
+
 	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
@@ -76,9 +78,7 @@ func (u *User) Merge(other *User) {
 	if u.ID != other.ID {
 		return
 	}
-	for k, v := range other.Fields {
-		u.Fields[k] = v
-	}
+	maps.Copy(u.Fields, other.Fields)
 	other.MemberOf.ForEach(func(elem uuid.UUID) {
 		u.MemberOf.Add(elem)
 	})

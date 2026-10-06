@@ -132,7 +132,7 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupConfig{}, logp.NewNopLogger())
-		registry, err := newStateRegistry(nil, store, listPrefix, false, 0)
+		registry, err := newStateRegistry(nil, store, "", listPrefix, false, 0)
 		require.NoError(t, err, "registry creation must succeed")
 
 		cfg := config{
@@ -249,7 +249,7 @@ func TestS3Poller(t *testing.T) {
 		log := logptest.NewTestingLogger(t, inputName)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupCfg, logp.NewNopLogger())
-		registry, err := newStateRegistry(nil, store, listPrefix, cfg.LexicographicalOrdering, cfg.LexicographicalLookbackKeys)
+		registry, err := newStateRegistry(nil, store, "", listPrefix, cfg.LexicographicalOrdering, cfg.LexicographicalLookbackKeys)
 		require.NoError(t, err, "registry creation must succeed")
 
 		poller := &s3PollerInput{
@@ -366,7 +366,7 @@ func TestS3Poller(t *testing.T) {
 		log := logptest.NewTestingLogger(t, inputName)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupCfg, logp.NewNopLogger())
-		registry, err := newStateRegistry(nil, store, "", cfg.LexicographicalOrdering, cfg.LexicographicalLookbackKeys)
+		registry, err := newStateRegistry(nil, store, "", "", cfg.LexicographicalOrdering, cfg.LexicographicalLookbackKeys)
 		require.NoError(t, err, "registry creation must succeed")
 
 		poller := &s3PollerInput{
@@ -504,7 +504,7 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3, nil, backupConfig{}, logp.NewNopLogger())
-		registry, err := newStateRegistry(nil, store, listPrefix, false, 0)
+		registry, err := newStateRegistry(nil, store, "", listPrefix, false, 0)
 		require.NoError(t, err, "registry creation must succeed")
 
 		cfg := config{
@@ -550,7 +550,7 @@ func TestS3Poller(t *testing.T) {
 		mockPager := NewMockS3Pager(ctrl)
 		pipeline := newFakePipeline()
 
-		registry, err := newStateRegistry(nil, store, "", true, 100)
+		registry, err := newStateRegistry(nil, store, "", "", true, 100)
 		require.NoError(t, err, "registry creation must succeed")
 
 		// This will be used as startAfterKey
@@ -651,7 +651,7 @@ func TestS3Poller(t *testing.T) {
 		pipeline := newFakePipeline()
 
 		// Create empty registry
-		registry, err := newStateRegistry(nil, store, "", true, 100)
+		registry, err := newStateRegistry(nil, store, "", "", true, 100)
 		require.NoError(t, err, "registry creation must succeed")
 
 		startAfterKey := registry.GetStartAfterKey()
@@ -740,7 +740,7 @@ func TestS3Poller(t *testing.T) {
 		pipeline := newFakePipeline()
 
 		// Non-lexicographical mode
-		registry, err := newStateRegistry(nil, store, "", false, 0)
+		registry, err := newStateRegistry(nil, store, "", "", false, 0)
 		require.NoError(t, err, "registry creation must succeed")
 
 		// Expect ListObjectsPaginator to be called with empty startAfterKey
@@ -824,7 +824,7 @@ func TestS3Poller(t *testing.T) {
 		mockPager := NewMockS3Pager(ctrl)
 		pipeline := newFakePipeline()
 
-		registry, err := newStateRegistry(nil, store, "", false, 0)
+		registry, err := newStateRegistry(nil, store, "", "", false, 0)
 		require.NoError(t, err, "registry creation must succeed")
 
 		// Expect ListObjectsPaginator to be called
@@ -1181,7 +1181,7 @@ func Test_S3StateHandling(t *testing.T) {
 			mockS3ObjectHandler.EXPECT().FinalizeS3Object().AnyTimes().Return(nil)
 
 			store := openTestStatestore()
-			s3Registry, err := newStateRegistry(logger, store, "", false, 0)
+			s3Registry, err := newStateRegistry(logger, store, "", "", false, 0)
 			require.NoError(t, err, "Registry creation must succeed")
 
 			// Note - add init states as if we are deriving them from registry

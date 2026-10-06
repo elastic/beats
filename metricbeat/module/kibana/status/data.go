@@ -68,7 +68,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	event.RootFields = mapstr.M{}
 	event.RootFields.Put("service.name", kibana.ModuleName)
 
-	var data map[string]interface{}
+	var data map[string]any
 	err := json.Unmarshal(content, &data)
 	if err != nil {
 		return fmt.Errorf("failure parsing Kibana Status API response: %w", err)

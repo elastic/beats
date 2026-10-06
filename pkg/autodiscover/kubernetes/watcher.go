@@ -19,6 +19,7 @@ package kubernetes
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -47,6 +48,8 @@ const (
 var (
 	accessor = meta.NewAccessor()
 )
+
+var ErrWatcherStopped = errors.New("kubernetes watcher has been stopped and cannot be restarted")
 
 // Watcher watches Kubernetes resources events
 type Watcher interface {
@@ -282,6 +285,18 @@ func (w *watcher) CachedObject() runtime.Object {
 
 // Start watching pods
 func (w *watcher) Start() error {
+	// A stopped SharedInformer cannot be restarted, and its watch options cannot
+	// be changed. Reject it so callers construct a fresh watcher.
+	if w.informer.IsStopped() || w.queue.ShuttingDown() || w.ctx.Err() != nil {
+		return fmt.Errorf(
+			"%w (informer_stopped=%t, queue_shutting_down=%t, context_error=%w)",
+			ErrWatcherStopped,
+			w.informer.IsStopped(),
+			w.queue.ShuttingDown(),
+			w.ctx.Err(),
+		)
+	}
+
 	go w.informer.Run(w.ctx.Done())
 
 	if !cache.WaitForCacheSync(w.ctx.Done(), w.informer.HasSynced) {
@@ -289,6 +304,14 @@ func (w *watcher) Start() error {
 	}
 
 	w.logger.Debugf("cache sync done")
+
+	// Drain the initial queue items synchronously so all registered event handlers
+	// have processed the initial list before Start() returns. This closes the gap
+	// where WaitForCacheSync guarantees the informer store is populated but the
+	// work queue (and therefore dependent caches) is not yet.
+	for n := w.queue.Len(); n > 0; n-- {
+		w.process(w.ctx)
+	}
 
 	// Wrap the process function with wait.Until so that if the controller crashes, it starts up again after a second.
 	go wait.Until(func() {

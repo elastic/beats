@@ -22,6 +22,7 @@ package integration
 import (
 	"bufio"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -107,6 +108,76 @@ func TestHintsKubernetes(t *testing.T) {
 		),
 		30*time.Second,
 		"Filestream did not start for the test container")
+}
+
+func TestHintsKubernetesInputAllowList(t *testing.T) {
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+
+	kubeConfigPath, _ := createKindCluster(t, filebeat.TempDir())
+	nodeName, _, filestreamContainerID := startFlogKubernetes(t, kubeConfigPath)
+	startFlogKubernetesWithAnnotations(
+		t,
+		kubeConfigPath,
+		map[string]string{
+			"co.elastic.logs/raw": `[{"type":"httpjson","id":"disallowed-httpjson"}]`,
+		},
+	)
+
+	cfgYAML := getConfig(
+		t,
+		map[string]any{
+			"kubeConfig": kubeConfigPath,
+			"nodeName":   nodeName,
+		},
+		"autodiscover",
+		"k8s-input-allow-list.yml")
+	filebeat.WriteConfigFile(cfgYAML)
+	filebeat.Start()
+
+	const (
+		rejectionLogPrefix = "Rejecting autodiscover hints configuration."
+		rejectionMessage   = `Rejecting autodiscover hints configuration. ` +
+			`input.type: httpjson, reason: disallowed input type, allowed ` +
+			`inputs are: log filestream container`
+	)
+	filestreamStart := fmt.Sprintf(
+		`"message":"Input 'filestream' starting","service.name":"filebeat","id":"container-logs-%s"`,
+		filestreamContainerID,
+	)
+
+	// The other pods in the K8s cluster will start Filestream inputs because
+	// this is the default config, so we ensure they start and httpjson is rejected.
+	filebeat.WaitLogsContainsAnyOrder(
+		[]string{filestreamStart, rejectionLogPrefix},
+		30*time.Second,
+		"default filestream input did not start or httpjson raw hints configuration was not rejected",
+	)
+
+	warningLine := filebeat.GetLogLine(rejectionLogPrefix)
+	require.NotEmpty(t, warningLine, "rejection warning log line should be available from the beginning of the logs")
+
+	var warning map[string]any
+	require.NoError(t, json.Unmarshal([]byte(warningLine), &warning), "log entries must be valid JSON")
+	assert.Equal(t, "warn", warning["log.level"], "rejection should be logged at warning level")
+	assert.Equal(t, rejectionMessage, warning["message"], "rejection warning should describe the rejected input")
+
+	// Stop Filebeat after the rejection has been observed so all logs produced
+	// while processing the annotated pod can be checked deterministically.
+	filebeat.Stop()
+	assert.Empty(
+		t,
+		filebeat.GetLogLine("Input 'httpjson' starting"),
+		"the rejected httpjson input should not start",
+	)
+	assert.Empty(
+		t,
+		filebeat.GetLogLine("Auto discover config check failed for config"),
+		"the rejected configuration should be filtered before CheckConfig",
+	)
 }
 
 func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
@@ -312,13 +383,22 @@ func createKindCluster(
 }
 
 func startFlogKubernetes(t *testing.T, kubeConfigPath string) (nodeName, podName, containerID string) {
+	return startFlogKubernetesWithAnnotations(t, kubeConfigPath, nil)
+}
+
+func startFlogKubernetesWithAnnotations(
+	t *testing.T,
+	kubeConfigPath string,
+	annotations map[string]string,
+) (nodeName, podName, containerID string) {
 	clientset := newK8sClientsetFromKubeConfigPath(t, kubeConfigPath)
 
 	podName = "flog-pod-" + uuid.Must(uuid.NewV4()).String()
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      podName,
-			Namespace: "default",
+			Name:        podName,
+			Namespace:   "default",
+			Annotations: annotations,
 		},
 		Spec: corev1.PodSpec{
 			Containers: []corev1.Container{

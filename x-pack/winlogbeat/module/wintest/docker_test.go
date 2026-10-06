@@ -93,6 +93,7 @@ func TestDocker(t *testing.T) {
 		info := beat.Info{
 			IndexPrefix: indexPrefix,
 			Version:     version.GetDefaultVersion(),
+			Logger:      logptest.NewTestingLogger(t, ""),
 		}
 		loaded, err := module.UploadPipelines(info, conn, true)
 		if err != nil {

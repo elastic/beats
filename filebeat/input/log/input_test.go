@@ -333,7 +333,7 @@ func (t TestFileInfo) Size() int64        { return 0 }
 func (t TestFileInfo) Mode() os.FileMode  { return 0 }
 func (t TestFileInfo) ModTime() time.Time { return t.time }
 func (t TestFileInfo) IsDir() bool        { return false }
-func (t TestFileInfo) Sys() interface{}   { return nil }
+func (t TestFileInfo) Sys() any           { return nil }
 
 type eventCapturer struct {
 	closed    bool

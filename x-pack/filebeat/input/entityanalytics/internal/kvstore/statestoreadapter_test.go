@@ -174,7 +174,7 @@ func (s *testBackendStore) Has(key string) (bool, error) {
 	return ok, nil
 }
 
-func (s *testBackendStore) Get(key string, value interface{}) error {
+func (s *testBackendStore) Get(key string, value any) error {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	raw, ok := s.data[key]
@@ -184,7 +184,7 @@ func (s *testBackendStore) Get(key string, value interface{}) error {
 	return json.Unmarshal(raw, value)
 }
 
-func (s *testBackendStore) Set(key string, value interface{}) error {
+func (s *testBackendStore) Set(key string, value any) error {
 	raw, err := json.Marshal(value)
 	if err != nil {
 		return err
@@ -218,13 +218,11 @@ func (s *testBackendStore) Each(fn func(string, backend.ValueDecoder) (bool, err
 	return nil
 }
 
-func (s *testBackendStore) SetID(_ string) {}
-
 type jsonDecoder struct {
 	raw []byte
 }
 
-func (d *jsonDecoder) Decode(to interface{}) error {
+func (d *jsonDecoder) Decode(to any) error {
 	return json.Unmarshal(d.raw, to)
 }
 

@@ -15,39 +15,40 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type mockExecutor struct {
-	result []map[string]interface{}
+	result []map[string]any
 	err    error
 
 	receivedSql string
 }
 
-func (e *mockExecutor) Query(ctx context.Context, sql string, to time.Duration) ([]map[string]interface{}, error) {
+func (e *mockExecutor) Query(ctx context.Context, sql string, to time.Duration) ([]map[string]any, error) {
 	e.receivedSql = sql
 
 	return e.result, e.err
 }
 
 type mockPublisher struct {
-	index      string
-	idValue    string
-	idFieldKey string
-	responseID string
-	spaceID    string
-	packID     string
-	packName   string
-	queryName  string
-	meta       map[string]interface{}
-	hits       []map[string]interface{}
-	ecsm       ecs.Mapping
-	reqData    interface{}
-	profile    map[string]interface{}
+	index          string
+	idValue        string
+	idFieldKey     string
+	responseID     string
+	spaceID        string
+	packID         string
+	packName       string
+	queryName      string
+	meta           map[string]any
+	hits           []map[string]any
+	ecsm           ecs.Mapping
+	reqData        any
+	profile        map[string]any
+	profileSpaceID string
 }
 
-func (p *mockPublisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
+func (p *mockPublisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any) {
 	p.index = index
 	p.idValue = idValue
 	p.idFieldKey = idFieldKey
@@ -62,12 +63,13 @@ func (p *mockPublisher) Publish(index, idValue, idFieldKey, responseID, spaceID,
 	p.reqData = reqData
 }
 
-func (p *mockPublisher) PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]interface{}, reqData interface{}) {
+func (p *mockPublisher) PublishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) {
 	p.profile = profile
+	p.profileSpaceID = spaceID
 }
 
 func TestActionHandlerExecute(t *testing.T) {
-	validLogger := logp.NewLogger("action_test")
+	validLogger := logptest.NewTestingLogger(t, t.Name())
 	inputType := osqueryInputType
 
 	ctx := context.Background()
@@ -78,9 +80,9 @@ func TestActionHandlerExecute(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		nonMatchingPlatform = "linux"
 	}
-	request := map[string]interface{}{
+	request := map[string]any{
 		"id": actionID,
-		"data": map[string]interface{}{
+		"data": map[string]any{
 			"query": actionSQL,
 		},
 	}
@@ -90,7 +92,7 @@ func TestActionHandlerExecute(t *testing.T) {
 		QueryExecutor queryExecutor
 		Publisher     actionQueryPublisher
 
-		Request map[string]interface{}
+		Request map[string]any
 		Err     error
 		Skipped bool
 	}{
@@ -115,9 +117,9 @@ func TestActionHandlerExecute(t *testing.T) {
 			Name:          "skips non matching platform",
 			QueryExecutor: &mockExecutor{},
 			Publisher:     &mockPublisher{},
-			Request: map[string]interface{}{
+			Request: map[string]any{
 				"id": actionID,
-				"data": map[string]interface{}{
+				"data": map[string]any{
 					"query":    actionSQL,
 					"platform": nonMatchingPlatform,
 				},
@@ -212,5 +214,49 @@ func TestActionHandlerExecute(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestActionHandlerExecuteSpaceID(t *testing.T) {
+	// collectRuntimeSnapshot issues its own Query calls, so the executor must
+	// return non-empty results or the snapshot will fail and no profile is collected.
+	osqueryInfoRow := map[string]any{
+		"pid":           "1",
+		"resident_size": "1000",
+		"user_time":     "10",
+		"system_time":   "5",
+	}
+	exec := &mockExecutor{result: []map[string]any{osqueryInfoRow}}
+	pub := &mockPublisher{}
+
+	id, err := uuid.NewV4()
+	if err != nil {
+		t.Fatal(err)
+	}
+	req := map[string]any{
+		"id":       id.String(),
+		"space_id": "my-space",
+		"data": map[string]any{
+			"query":   "select * from uptime",
+			"profile": true,
+		},
+	}
+
+	ac := &actionHandler{
+		log:       logptest.NewTestingLogger(t, t.Name()),
+		inputType: osqueryInputType,
+		queryExec: exec,
+		publisher: pub,
+	}
+
+	if _, err := ac.Execute(t.Context(), req); err != nil {
+		t.Fatalf("Execute: %v", err)
+	}
+
+	if pub.spaceID != "my-space" {
+		t.Errorf("Publish spaceID = %q; want %q", pub.spaceID, "my-space")
+	}
+	if pub.profileSpaceID != "my-space" {
+		t.Errorf("PublishQueryProfile spaceID = %q; want %q", pub.profileSpaceID, "my-space")
 	}
 }

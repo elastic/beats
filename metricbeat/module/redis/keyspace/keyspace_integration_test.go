@@ -99,7 +99,7 @@ func TestSubExpiryField(t *testing.T) {
 	// Make sure at least 1 db keyspace exists
 	assert.True(t, len(events) > 0)
 
-	var keyspace map[string]interface{}
+	var keyspace map[string]any
 	for _, event := range events {
 		if id, ok := event.MetricSetFields["id"].(string); ok && id == "db0" {
 			keyspace = event.MetricSetFields
@@ -127,8 +127,8 @@ func getRedisVersion(t *testing.T, host string) (int, int) {
 		t.Fatal("INFO", err)
 	}
 	var version string
-	lines := strings.Split(info, "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(info, "\n")
+	for line := range lines {
 		if strings.HasPrefix(line, "redis_version:") {
 			version = strings.TrimSpace(strings.SplitN(line, ":", 2)[1])
 			break
@@ -193,8 +193,8 @@ func addEntry(t *testing.T, host string) {
 	}
 }
 
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string) map[string]any {
+	return map[string]any{
 		"module":     "redis",
 		"metricsets": []string{"keyspace"},
 		"hosts":      []string{host},

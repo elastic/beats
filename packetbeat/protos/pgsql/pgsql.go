@@ -201,14 +201,14 @@ func (pgsql *pgsqlPlugin) getTransaction(k common.HashableTCPTuple) []*pgsqlTran
 }
 
 //go:inline
-func (pgsql *pgsqlPlugin) debugf(format string, v ...interface{}) {
+func (pgsql *pgsqlPlugin) debugf(format string, v ...any) {
 	if pgsql.isDebug {
 		pgsql.debug.Debugf(format, v...)
 	}
 }
 
 //go:inline
-func (pgsql *pgsqlPlugin) detailf(format string, v ...interface{}) {
+func (pgsql *pgsqlPlugin) detailf(format string, v ...any) {
 	if pgsql.isDetail {
 		pgsql.detail.Debugf(format, v...)
 	}

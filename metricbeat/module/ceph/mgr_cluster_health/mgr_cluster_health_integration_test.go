@@ -39,8 +39,8 @@ func TestData(t *testing.T) {
 	err := mbtest.WriteEventsReporterV2Error(f, t, "")
 	require.NoError(t, err)
 }
-func getConfig(host, password string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host, password string) map[string]any {
+	return map[string]any{
 		"module":                "ceph",
 		"metricsets":            []string{"mgr_cluster_health"},
 		"hosts":                 []string{host},

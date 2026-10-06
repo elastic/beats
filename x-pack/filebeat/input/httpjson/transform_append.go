@@ -32,7 +32,7 @@ type appendt struct {
 	doNotLogFailure     bool
 	valueType           valueType
 
-	runFunc func(ctx *transformContext, transformable transformable, key string, val interface{}) error
+	runFunc func(ctx *transformContext, transformable transformable, key string, val any) error
 
 	status status.StatusReporter
 	log    *logp.Logger
@@ -149,8 +149,8 @@ func (append *appendt) run(ctx *transformContext, tr transformable) (transformab
 	return tr, nil
 }
 
-func appendToCommonMap(m mapstr.M, key string, val interface{}) error {
-	var value interface{}
+func appendToCommonMap(m mapstr.M, key string, val any) error {
+	var value any
 	strVal, isString := val.(string)
 	if found, _ := m.HasKey(key); found {
 		prev, _ := m.GetValue(key)
@@ -160,14 +160,14 @@ func appendToCommonMap(m mapstr.M, key string, val interface{}) error {
 				return fmt.Errorf("can't append a %T value to a string list", val)
 			}
 			value = append(t, strVal)
-		case []interface{}:
+		case []any:
 			value = append(t, val)
 		default:
-			value = []interface{}{prev, val}
+			value = []any{prev, val}
 		}
 
 	} else {
-		value = []interface{}{val}
+		value = []any{val}
 	}
 	if _, err := m.Put(key, value); err != nil {
 		return err
@@ -175,11 +175,11 @@ func appendToCommonMap(m mapstr.M, key string, val interface{}) error {
 	return nil
 }
 
-func appendBody(ctx *transformContext, transformable transformable, key string, value interface{}) error {
+func appendBody(ctx *transformContext, transformable transformable, key string, value any) error {
 	return appendToCommonMap(transformable.body(), key, value)
 }
 
-func appendHeader(ctx *transformContext, transformable transformable, key string, value interface{}) error {
+func appendHeader(ctx *transformContext, transformable transformable, key string, value any) error {
 	v, ok := value.(string)
 	if !ok {
 		return fmt.Errorf("headers can only contain string values, but got: %T", value)
@@ -188,7 +188,7 @@ func appendHeader(ctx *transformContext, transformable transformable, key string
 	return nil
 }
 
-func appendURLParams(ctx *transformContext, transformable transformable, key string, value interface{}) error {
+func appendURLParams(ctx *transformContext, transformable transformable, key string, value any) error {
 	v, ok := value.(string)
 	if !ok {
 		return fmt.Errorf("URL params can only contain string values, but got: %T", value)

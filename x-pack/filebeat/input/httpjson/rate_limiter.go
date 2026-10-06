@@ -122,7 +122,11 @@ func (r *rateLimiter) getRateLimit(resp *http.Response) (bool, int64, error) {
 	ctx := emptyTransformContext()
 	ctx.updateLastResponse(response{header: resp.Header.Clone()})
 
-	remaining, _ := r.remaining.Execute(ctx, tr, "rate-limit_remaining", nil, r.status, r.log)
+	// Wrap the status reporter so that an absent header (empty template
+	// result) does not mark the input as Degraded. A missing remaining
+	// header disables rate-limiting for that response.
+	stat := ignoreEmptyValueReporter{r.status}
+	remaining, _ := r.remaining.Execute(ctx, tr, "rate-limit_remaining", nil, stat, r.log)
 	if remaining == "" {
 		r.log.Infow("get rate limit", "error", errors.New("remaining value is empty"))
 		return false, 0, nil
@@ -160,7 +164,7 @@ func (r *rateLimiter) getRateLimit(resp *http.Response) (bool, int64, error) {
 		return false, 0, nil
 	}
 
-	reset, _ := r.reset.Execute(ctx, tr, "rate-limit_reset", nil, r.status, r.log)
+	reset, _ := r.reset.Execute(ctx, tr, "rate-limit_reset", nil, stat, r.log)
 	if reset == "" {
 		r.log.Infow("get rate limit", "error", errors.New("reset value is empty"))
 		return false, 0, nil

@@ -164,14 +164,14 @@ func (o *oAuth2Config) Validate() error {
 		if o.OktaJWKJSON != nil {
 			// Validate JWK format by attempting to parse it
 			var jwkData struct {
-				N    interface{} `json:"n"`
-				E    interface{} `json:"e"`
-				D    interface{} `json:"d"`
-				P    interface{} `json:"p"`
-				Q    interface{} `json:"q"`
-				Dp   interface{} `json:"dp"`
-				Dq   interface{} `json:"dq"`
-				Qinv interface{} `json:"qi"`
+				N    any `json:"n"`
+				E    any `json:"e"`
+				D    any `json:"d"`
+				P    any `json:"p"`
+				Q    any `json:"q"`
+				Dp   any `json:"dp"`
+				Dq   any `json:"dq"`
+				Qinv any `json:"qi"`
 			}
 			if err := json.Unmarshal(o.OktaJWKJSON, &jwkData); err != nil {
 				return fmt.Errorf("oauth2 validation error: invalid JWK JSON format: %w", err)

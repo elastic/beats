@@ -20,6 +20,7 @@ package readfile
 import (
 	"fmt"
 	"maps"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/reader"
@@ -35,22 +36,23 @@ type FileMetaReader struct {
 	fi           file.ExtendedFileInfo
 	includeOwner bool
 	includeGroup bool
-	fingerprint  string
-	offset       int64
-	cachedMeta   mapstr.M // lazily populated on first Next()
+	// fingerprintFn returns "" until the final fingerprint is available.
+	// Its first non-empty result is cached and the callback is dropped.
+	fingerprintFn func() string
+	offset        int64
+	cachedMeta    mapstr.M // lazily populated on first Next()
 }
 
-// New creates a new Encode reader from input reader by applying
-// the given codec.
-func NewFilemeta(r reader.Reader, path string, fi file.ExtendedFileInfo, includeOwner bool, includeGroup bool, fingerprint string, offset int64) reader.Reader {
+// NewFilemeta creates a reader that enriches messages with per-file metadata.
+func NewFilemeta(r reader.Reader, path string, fi file.ExtendedFileInfo, includeOwner bool, includeGroup bool, fingerprintFn func() string, offset int64) reader.Reader {
 	return &FileMetaReader{
-		reader:       r,
-		path:         path,
-		fi:           fi,
-		includeOwner: includeOwner,
-		includeGroup: includeGroup,
-		fingerprint:  fingerprint,
-		offset:       offset,
+		reader:        r,
+		path:          path,
+		fi:            fi,
+		includeOwner:  includeOwner,
+		includeGroup:  includeGroup,
+		fingerprintFn: fingerprintFn,
+		offset:        offset,
 	}
 }
 
@@ -81,23 +83,26 @@ func (r *FileMetaReader) Next() (reader.Message, error) {
 		if r.includeGroup {
 			size++
 		}
-		if r.fingerprint != "" {
-			size++
+		if r.fingerprintFn != nil {
+			size++ // filled in once fingerprintFn resolves a fingerprint
 		}
 		m := make(mapstr.M, size)
 		m["path"] = r.path
 		if err := setFileSystemMetadata(r.fi, m, r.includeOwner, r.includeGroup); err != nil {
 			return message, fmt.Errorf("failed to set file system metadata: %w", err)
 		}
-		if r.fingerprint != "" {
-			m["fingerprint"] = r.fingerprint
-		}
 		r.cachedMeta = m
 	}
 
+	if r.fingerprintFn != nil {
+		if fp := r.fingerprintFn(); fp != "" {
+			r.cachedMeta["fingerprint"] = fp
+			r.fingerprintFn = nil
+		}
+	}
+
 	// Copy cached fields into a fresh map for this event.
-	fileMap := make(mapstr.M, len(r.cachedMeta))
-	maps.Copy(fileMap, r.cachedMeta)
+	fileMap := maps.Clone(r.cachedMeta)
 	// Direct assignment replaces any existing "log" key rather than merging.
 	// This is intentional and safe: FileMetaReader is always the first component
 	// in the pipeline to write log.* fields. Downstream readers (parsers,
@@ -114,4 +119,10 @@ func (r *FileMetaReader) Next() (reader.Message, error) {
 
 func (r *FileMetaReader) Close() error {
 	return r.reader.Close()
+}
+
+// SetReadDeadline delegates to the wrapped reader so a synchronous timeout can
+// bound the underlying blocking read (see reader.DeadlineSetter).
+func (r *FileMetaReader) SetReadDeadline(t time.Time) bool {
+	return reader.SetReadDeadline(r.reader, t)
 }

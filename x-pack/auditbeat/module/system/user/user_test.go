@@ -75,8 +75,8 @@ func testUser() *User {
 	}
 }
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
+func getConfig() map[string]any {
+	return map[string]any{
 		"module":     system.ModuleName,
 		"metricsets": []string{"user"},
 

@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !integration
-// +build !integration
 
 package cluster_health
 
@@ -18,7 +17,7 @@ import (
 )
 
 // Tests that Cluster Info is consistently reported, the Cluster Name, and the dynamic status from the filename
-func expectValidParsedData(t *testing.T, data metricset.FetcherData[map[string]interface{}]) {
+func expectValidParsedData(t *testing.T, data metricset.FetcherData[map[string]any]) {
 	require.NoError(t, data.Error)
 	require.Equal(t, 0, len(data.Reporter.GetErrors()))
 	require.Equal(t, 1, len(data.Reporter.GetEvents()))

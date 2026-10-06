@@ -33,9 +33,9 @@ var (
 
 // Field is CEF extension field value.
 type Field struct {
-	String    string      // Raw value.
-	Type      DataType    // Data type from CEF guide.
-	Interface interface{} // Converted value.
+	String    string   // Raw value.
+	Type      DataType // Data type from CEF guide.
+	Interface any      // Converted value.
 }
 
 // Event is a single CEF message.
@@ -187,7 +187,7 @@ func replaceEscapes(v string, startOffset int, escapes []escapePosition) string 
 	}
 
 	// Adjust escape offsets relative to the start offset of v.
-	for i := 0; i < len(escapes); i++ {
+	for i := range escapes {
 		escapes[i].start = escapes[i].start - startOffset
 		escapes[i].end = escapes[i].end - startOffset
 	}

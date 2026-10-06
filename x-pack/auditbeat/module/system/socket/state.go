@@ -10,6 +10,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"maps"
 	"net"
 	"os"
 	"strconv"
@@ -566,9 +567,7 @@ func (s *state) ForkProcess(parentPID, childPID uint32, ts kernelTime) error {
 			createdTime: s.kernTimestampToTime(ts),
 		}
 		child.resolvedDomains = make(map[string]string, len(parent.resolvedDomains))
-		for k, v := range parent.resolvedDomains {
-			child.resolvedDomains[k] = v
-		}
+		maps.Copy(child.resolvedDomains, parent.resolvedDomains)
 		s.log.Debugf("forking process %d with %d associated domains", childPID, len(child.resolvedDomains))
 		s.processes[childPID] = child
 	}
@@ -702,6 +701,12 @@ func (s *state) mutualEnrich(sock *socket, f *flow) {
 	if sock.pid == 0 {
 		sock.pid = f.pid
 		sock.process = f.process
+	} else if f.pid == 0 {
+		// Receive-path kprobes fire in softirq context where Meta.PID is an
+		// unrelated process. Those asFlow() methods set pid=0 to signal that the
+		// PID is unreliable; propagate the socket's recorded owner instead.
+		f.pid = sock.pid
+		f.process = sock.process
 	}
 	if sock.pid == f.pid && sock.pid != 0 {
 		if sockNoProcess := sock.process == nil; sockNoProcess != (f.process == nil) {
@@ -768,7 +773,7 @@ func (s *state) onSockDestroyed(ptr uintptr, sock *socket, pid uint32) {
 		sock.pid = pid
 	}
 	if sock.process == nil && sock.pid != 0 {
-		sock.process = s.getProcess(pid)
+		sock.process = s.getProcess(sock.pid)
 	}
 	// Keep the sock around in case it's a connected TCP socket, as still some
 	// packets can be received shortly after/during inet_release.
@@ -987,7 +992,7 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 	}
 
 	var errs []error
-	rootPut := func(key string, value interface{}) {
+	rootPut := func(key string, value any) {
 		if _, err := root.Put(key, value); err != nil {
 			errs = append(errs, err)
 		}

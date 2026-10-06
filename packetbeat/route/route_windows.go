@@ -58,7 +58,7 @@ func Default(af int) (name string, index int, err error) {
 	)
 	outBufLen := uint32(workingBufferSize)
 loop:
-	for i := 0; i < maxTries; i++ {
+	for range maxTries {
 		buf := make([]byte, outBufLen)
 		addresses = (*windows.IpAdapterAddresses)(unsafe.Pointer(&buf[0]))
 		err = windows.GetAdaptersAddresses(uint32(af), 0, 0, addresses, &outBufLen)

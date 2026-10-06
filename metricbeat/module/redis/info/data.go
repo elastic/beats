@@ -275,7 +275,7 @@ func buildCommandstatsSchema(key string, schema s.Schema) {
 // Map data to MapStr
 func eventMapping(r mb.ReporterV2, info map[string]string) {
 	// Full mapping from info
-	source := map[string]interface{}{}
+	source := map[string]any{}
 	commandstatsSchema := s.Schema{}
 	for key, val := range info {
 		source[key] = val

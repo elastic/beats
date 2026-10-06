@@ -365,7 +365,7 @@ func normalize(t testing.TB, m mapstr.M) mapstr.M {
 
 // assertEqual asserts that the two objects are deeply equal. If not it will
 // error the test and output a diff of the two objects' JSON representation.
-func assertEqual(t testing.TB, expected, actual interface{}) bool {
+func assertEqual(t testing.TB, expected, actual any) bool {
 	t.Helper()
 
 	if reflect.DeepEqual(expected, actual) {
@@ -390,7 +390,7 @@ func BenchmarkProcessorRun(b *testing.B) {
 	b.Run("short_msg", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			_, err := dec.Run(&beat.Event{
-				Fields: map[string]interface{}{
+				Fields: map[string]any{
 					"message": msg,
 				},
 			})
@@ -404,7 +404,7 @@ func BenchmarkProcessorRun(b *testing.B) {
 	b.Run("long_msg", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			_, err := dec.Run(&beat.Event{
-				Fields: map[string]interface{}{
+				Fields: map[string]any{
 					"message": longMsg,
 				},
 			})

@@ -27,7 +27,7 @@ func TestDevice_Merge(t *testing.T) {
 		"ok": {
 			In: &Device{
 				ID: uuid.Must(uuid.FromString("187f924c-e867-477e-8d74-dd762d6379dd")),
-				Fields: map[string]interface{}{
+				Fields: map[string]any{
 					"a": "alpha",
 				},
 				MemberOf:           collections.NewUUIDSet(uuid.Must(uuid.FromString("fcda226a-c920-4d99-81bc-d2d691a6c212"))),
@@ -40,7 +40,7 @@ func TestDevice_Merge(t *testing.T) {
 			},
 			InOther: &Device{
 				ID: uuid.Must(uuid.FromString("187f924c-e867-477e-8d74-dd762d6379dd")),
-				Fields: map[string]interface{}{
+				Fields: map[string]any{
 					"b": "beta",
 				},
 				MemberOf:           collections.NewUUIDSet(uuid.Must(uuid.FromString("a77e8cbb-27a5-49d3-9d5e-801997621f87"))),
@@ -50,10 +50,11 @@ func TestDevice_Merge(t *testing.T) {
 					uuid.Must(uuid.FromString("5e6d279a-ce2b-43b8-a38f-3110907e1974")),
 					uuid.Must(uuid.FromString("c59fbdb8-e442-46b1-8d72-c8ac0b78ec0a")),
 				),
+				RegisteredFetched: true,
 			},
 			Want: &Device{
 				ID: uuid.Must(uuid.FromString("187f924c-e867-477e-8d74-dd762d6379dd")),
-				Fields: map[string]interface{}{
+				Fields: map[string]any{
 					"a": "alpha",
 					"b": "beta",
 				},
@@ -67,19 +68,48 @@ func TestDevice_Merge(t *testing.T) {
 				),
 				RegisteredOwners: collections.NewUUIDSet(
 					uuid.Must(uuid.FromString("81d1b5cd-7cd6-469d-9fe8-0a5c6cf2a7b6")),
-					uuid.Must(uuid.FromString("c59fbdb8-e442-46b1-8d72-c8ac0b78ec0a")),
 				),
 				RegisteredUsers: collections.NewUUIDSet(
-					uuid.Must(uuid.FromString("27cea005-7377-4175-b2ef-e9d64c977f4d")),
 					uuid.Must(uuid.FromString("5e6d279a-ce2b-43b8-a38f-3110907e1974")),
 					uuid.Must(uuid.FromString("c59fbdb8-e442-46b1-8d72-c8ac0b78ec0a")),
+				),
+			},
+		},
+		"registered-fetch-failed": {
+			In: &Device{
+				ID: uuid.Must(uuid.FromString("187f924c-e867-477e-8d74-dd762d6379dd")),
+				Fields: map[string]any{
+					"a": "alpha",
+				},
+				RegisteredOwners: collections.NewUUIDSet(uuid.Must(uuid.FromString("c59fbdb8-e442-46b1-8d72-c8ac0b78ec0a"))),
+				RegisteredUsers: collections.NewUUIDSet(
+					uuid.Must(uuid.FromString("27cea005-7377-4175-b2ef-e9d64c977f4d")),
+				),
+			},
+			InOther: &Device{
+				ID: uuid.Must(uuid.FromString("187f924c-e867-477e-8d74-dd762d6379dd")),
+				Fields: map[string]any{
+					"b": "beta",
+				},
+				// RegisteredFetched is false (zero value): fetch failed.
+				// RegisteredOwners and RegisteredUsers are empty.
+			},
+			Want: &Device{
+				ID: uuid.Must(uuid.FromString("187f924c-e867-477e-8d74-dd762d6379dd")),
+				Fields: map[string]any{
+					"a": "alpha",
+					"b": "beta",
+				},
+				// Existing owners/users are preserved because the fetch failed.
+				RegisteredOwners: collections.NewUUIDSet(uuid.Must(uuid.FromString("c59fbdb8-e442-46b1-8d72-c8ac0b78ec0a"))),
+				RegisteredUsers: collections.NewUUIDSet(
+					uuid.Must(uuid.FromString("27cea005-7377-4175-b2ef-e9d64c977f4d")),
 				),
 			},
 		},
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 

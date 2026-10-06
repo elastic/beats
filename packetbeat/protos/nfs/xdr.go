@@ -110,7 +110,7 @@ func (r *xdr) getUIntVector() ([]uint32, error) {
 		return nil, fmt.Errorf("xdr: vector length %d exceeds limit", l)
 	}
 	v := make([]uint32, int(l))
-	for i := 0; i < len(v); i++ {
+	for i := range v {
 		vi, err := r.getUInt()
 		if err != nil {
 			return nil, err

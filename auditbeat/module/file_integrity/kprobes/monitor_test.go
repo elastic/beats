@@ -96,7 +96,7 @@ func (p *monitorTestSuite) TestRunPerfChannelLost() {
 	ctx := context.Background()
 
 	perfLost := make(chan uint64)
-	perfEvent := make(chan interface{})
+	perfEvent := make(chan any)
 	perfErr := make(chan error)
 
 	mockPerfChannel := &perfChannelMock{}
@@ -133,7 +133,7 @@ func (p *monitorTestSuite) TestRunPerfChannelErr() {
 	ctx := context.Background()
 
 	perfLost := make(chan uint64)
-	perfEvent := make(chan interface{})
+	perfEvent := make(chan any)
 	perfErr := make(chan error)
 
 	mockPerfChannel := &perfChannelMock{}
@@ -171,7 +171,7 @@ func (p *monitorTestSuite) TestRunPathErr() {
 	ctx := context.Background()
 
 	perfLost := make(chan uint64)
-	perfEvent := make(chan interface{})
+	perfEvent := make(chan any)
 	perfErr := make(chan error)
 
 	mockPerfChannel := &perfChannelMock{}
@@ -211,7 +211,7 @@ func (p *monitorTestSuite) TestRunUnknownEventType() {
 	type Unknown struct{}
 
 	perfLost := make(chan uint64)
-	perfEvent := make(chan interface{})
+	perfEvent := make(chan any)
 	perfErr := make(chan error)
 
 	mockPerfChannel := &perfChannelMock{}
@@ -248,7 +248,7 @@ func (p *monitorTestSuite) TestRunPerfCloseEventChan() {
 	ctx := context.Background()
 
 	perfLost := make(chan uint64)
-	perfEvent := make(chan interface{})
+	perfEvent := make(chan any)
 	perfErr := make(chan error)
 
 	mockPerfChannel := &perfChannelMock{}
@@ -281,7 +281,7 @@ func (p *monitorTestSuite) TestDoubleStart() {
 	ctx := context.Background()
 
 	perfLost := make(chan uint64)
-	perfEvent := make(chan interface{})
+	perfEvent := make(chan any)
 	perfErr := make(chan error)
 
 	mockPerfChannel := &perfChannelMock{}
@@ -318,7 +318,7 @@ func (p *monitorTestSuite) TestAddPathNotClosed() {
 	ctx := context.Background()
 
 	perfLost := make(chan uint64)
-	perfEvent := make(chan interface{})
+	perfEvent := make(chan any)
 	perfErr := make(chan error)
 
 	mockPerfChannel := &perfChannelMock{}
@@ -343,7 +343,7 @@ func (p *monitorTestSuite) TestRunNoError() {
 	ctx := context.Background()
 
 	perfLost := make(chan uint64)
-	perfEvent := make(chan interface{})
+	perfEvent := make(chan any)
 	perfErr := make(chan error)
 
 	mockPerfChannel := &perfChannelMock{}
@@ -412,7 +412,7 @@ func (p *monitorTestSuite) TestRunEmitError() {
 	ctx := context.Background()
 
 	perfLost := make(chan uint64)
-	perfEvent := make(chan interface{})
+	perfEvent := make(chan any)
 	perfErr := make(chan error)
 
 	mockPerfChannel := &perfChannelMock{}
@@ -579,6 +579,19 @@ func (p *monitorTestSuite) TestNew() {
 	}
 
 	p.Require().Equal(expectedEvents, seenEvents)
+
+	p.Require().NoError(m.Close())
+
+	// Confirm the kernel is left clean: no auditbeat_fim probes should
+	// remain after Close.
+	tfs, err := tracing.NewTraceFS()
+	p.Require().NoError(err)
+	kps, err := tfs.ListKProbes()
+	p.Require().NoError(err)
+	for _, kp := range kps {
+		p.NotEqual("auditbeat_fim", kp.Group,
+			"kprobe %s/%s was not removed on Close", kp.Group, kp.Name)
+	}
 }
 
 const kernelURL string = "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.6.7.tar.xz"

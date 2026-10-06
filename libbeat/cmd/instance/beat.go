@@ -21,7 +21,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"net"
@@ -65,9 +64,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/host"
+	metricreport "github.com/elastic/beats/v7/pkg/systemmetrics/report"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
-
 	"github.com/elastic/elastic-agent-libs/keystore"
 	kbn "github.com/elastic/elastic-agent-libs/kibana"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -79,8 +79,6 @@ import (
 	svc "github.com/elastic/elastic-agent-libs/service"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 	libversion "github.com/elastic/elastic-agent-libs/version"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/host"
-	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 	"github.com/elastic/go-ucfg"
@@ -115,6 +113,8 @@ type Beat struct {
 	keystore   keystore.Keystore
 	processors processing.Supporter
 
+	hostnameOverride string
+
 	InputQueueSize int // Size of the producer queue used by most queues.
 
 	// shouldReexec is a flag to indicate the Beat should restart
@@ -128,6 +128,7 @@ type beatConfig struct {
 
 	// beat top-level settings
 	Name      string `config:"name"`
+	Hostname  string `config:"hostname"`
 	MaxProcs  int    `config:"max_procs"`
 	GCPercent int    `config:"gc_percent"`
 
@@ -398,10 +399,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	}
 	outputFactory := b.MakeOutputFactory(b.Config.Output)
 	settings := pipeline.Settings{
-		// Since now publisher is closed on Stop, we want to give some
-		// time to ack any pending events by default to avoid
-		// changing on stop behavior too much.
-		WaitClose:      time.Second,
+		WaitClose:      beaterStopGraceMargin,
 		Processors:     b.processors,
 		InputQueueSize: b.InputQueueSize,
 	}
@@ -589,8 +587,20 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// acknowledge any outstanding events before we exit. Disconnect is
 	// idempotent, so a beater that already drained the pipeline itself with its
 	// own bounded timeout reaches this as a harmless no-op.
+	//
+	// Pass the beater's declared drain bound as the context deadline when one
+	// is set, so shutdown_timeout (or a beater-supplied default) controls how
+	// long we wait for the queue to flush. When no drain bound is declared,
+	// Disconnect falls back to the pipeline's own waitCloseTimeout
+	// (beaterStopGraceMargin = 1s).
 	if b.Publisher != nil {
-		if derr := b.Publisher.Disconnect(context.Background()); derr != nil {
+		ctx := context.Background()
+		if b.ShutdownTimeout > 0 {
+			var cancel context.CancelFunc
+			ctx, cancel = context.WithTimeout(context.Background(), b.ShutdownTimeout)
+			defer cancel()
+		}
+		if derr := b.Publisher.Disconnect(ctx); derr != nil {
 			logger.Errorf("error disconnecting publisher pipeline: %v", derr)
 		}
 	}
@@ -796,12 +806,34 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 	}())
 }
 
-// handleFlags converts -flag to --flags, parses the command line
-// flags, and it invokes the HandleFlags callback if implemented by
-// the Beat.
+// HostnameFlag holds the value of the --hostname flag.
+var HostnameFlag string
+
+// handleFlags invokes the HandleFlags callback if implemented by the Beat.
 func (b *Beat) handleFlags() error {
-	flag.Parse()
 	return cfgfile.HandleFlags()
+}
+
+// ApplyHostname sets Info.Hostname and Info.FQDN to h and updates the process-wide
+// hostname override used by processors (add_host_metadata, add_observer_metadata).
+// It is a no-op when h is empty or blank.
+func (b *Beat) ApplyHostname(h, source string) {
+	if strings.TrimSpace(h) == "" {
+		return
+	}
+	beat.SetHostnameOverride(h)
+	h = beat.GetHostnameOverride()
+	b.Info.Hostname = h
+	b.Info.FQDN = h
+	b.hostnameOverride = h
+	if b.Info.Logger != nil {
+		b.Info.Logger.Infof("hostname overridden to %q via %s", h, source)
+	}
+}
+
+// HostnameOverride returns the hostname override of this beat, or "" when it has none.
+func (b *Beat) HostnameOverride() string {
+	return b.hostnameOverride
 }
 
 // config reads the configuration file from disk, parses the common options
@@ -819,10 +851,10 @@ func (b *Beat) configure(settings Settings) error {
 
 	b.Monitoring = beatmonitoring.NewGlobalMonitoring()
 
-	if err := InitPaths(cfg); err != nil {
+	b.Info.Paths, err = InitPaths(cfg)
+	if err != nil {
 		return err
 	}
-	b.Info.Paths = paths.Paths //nolint:forbidigo // existing global paths initialization for the standalone beat entry point.
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
@@ -852,7 +884,7 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error unpacking config data: %w", err)
 	}
 
-	b.Info.Logger, err = configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType)
+	b.Info.Logger, err = configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, b.Info.Paths, logp.TypeKey, logp.EventType)
 	if err != nil {
 		return fmt.Errorf("error initializing logging: %w", err)
 	}
@@ -867,6 +899,13 @@ func (b *Beat) configure(settings Settings) error {
 	if err := features.UpdateFromConfig(b.RawConfig); err != nil {
 		return fmt.Errorf("could not parse features: %w", err)
 	}
+
+	hostname := b.Config.Hostname
+	if HostnameFlag != "" {
+		hostname = HostnameFlag
+	}
+	b.ApplyHostname(hostname, "hostname config")
+
 	b.RegisterHostname(features.FQDN())
 
 	b.Beat.Config = &b.Config.BeatConfig
@@ -896,23 +935,25 @@ func (b *Beat) configure(settings Settings) error {
 
 	logger.Infof("Beat ID: %v", b.Info.ID)
 
-	// Try to get the host's FQDN and set it.
-	h, err := sysinfo.Host()
-	if err != nil {
-		return fmt.Errorf("failed to get host information: %w", err)
-	}
+	if b.hostnameOverride == "" {
+		// Try to get the host's FQDN and set it.
+		h, err := sysinfo.Host()
+		if err != nil {
+			return fmt.Errorf("failed to get host information: %w", err)
+		}
 
-	fqdnLookupCtx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
-	defer cancel()
+		fqdnLookupCtx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+		defer cancel()
 
-	fqdn, err := h.FQDNWithContext(fqdnLookupCtx)
-	if err != nil {
-		// FQDN lookup is "best effort".  We log the error, fallback to
-		// the OS-reported hostname, and move on.
-		logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
-		b.Info.FQDN = b.Info.Hostname
-	} else {
-		b.Info.FQDN = fqdn
+		fqdn, err := h.FQDNWithContext(fqdnLookupCtx)
+		if err != nil {
+			// FQDN lookup is "best effort".  We log the error, fallback to
+			// the OS-reported hostname, and move on.
+			logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
+			b.Info.FQDN = b.Info.Hostname
+		} else {
+			b.Info.FQDN = fqdn
+		}
 	}
 
 	// initialize config manager
@@ -1494,7 +1535,7 @@ func isElasticsearchOutput(name string) bool {
 	return name == "elasticsearch"
 }
 
-func InitPaths(cfg *config.C) error {
+func InitPaths(cfg *config.C) (*paths.Path, error) {
 	// To Fix the chicken-egg problem with the Keystore and the loading of the configuration
 	// files we are doing a partial unpack of the configuration file and only take into consideration
 	// the paths field. After we will unpack the complete configuration and keystore reference
@@ -1504,14 +1545,14 @@ func InitPaths(cfg *config.C) error {
 	}{}
 
 	if err := cfg.Unpack(&partialConfig); err != nil {
-		return fmt.Errorf("error extracting default paths: %w", err)
+		return nil, fmt.Errorf("error extracting default paths: %w", err)
 	}
 
-	//nolint:forbidigo // existing global paths initialization for the standalone beat entry point.
-	if err := paths.InitPaths(&partialConfig.Path); err != nil {
-		return fmt.Errorf("error setting default paths: %w", err)
+	p := paths.New()
+	if err := p.InitPaths(&partialConfig.Path); err != nil {
+		return nil, fmt.Errorf("error setting default paths: %w", err)
 	}
-	return nil
+	return p, nil
 }
 
 // every IP address received from `Info()` has a netmask suffix

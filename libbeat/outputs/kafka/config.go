@@ -75,8 +75,8 @@ type KafkaConfig struct {
 	Password           string                    `config:"password"`
 	Codec              codec.Config              `config:"codec"`
 	Sasl               kafka.SaslConfig          `config:"sasl"`
-	EnableFAST         bool                      `config:"enable_krb5_fast"`
 	Queue              config.Namespace          `config:"queue"`
+	Idempotent         bool                      `config:"idempotent"`
 
 	// Currently only used for validation. Those values are later
 	// unpacked into temporary structs whenever they're necessary.
@@ -172,6 +172,10 @@ func (c *KafkaConfig) Validate() error {
 
 	if c.Username != "" && c.Password == "" {
 		return fmt.Errorf("password must be set when username is configured")
+	} else if c.Username == "" && c.Password != "" {
+		return fmt.Errorf("username must be set when password is configured")
+	} else if err := c.Sasl.ValidateWithUsernameAndPassword(c.Username != ""); err != nil {
+		return err
 	}
 
 	if c.Compression == "gzip" {
@@ -187,6 +191,18 @@ func (c *KafkaConfig) Validate() error {
 
 	if len(c.Headers) != 0 && c.Version < kafka.Version("0.11") {
 		return errors.New("including headers is not supported for kafka versions < 0.11")
+	}
+
+	if c.Idempotent {
+		if c.RequiredACKs == nil || *c.RequiredACKs != -1 {
+			return errors.New("idempotent mode requires required_acks to be set to -1")
+		}
+		if c.MaxRetries == 0 {
+			return errors.New("idempotent mode requires max_retries to be greater than 0")
+		}
+		if c.Version < kafka.Version("0.11.0.0") {
+			return errors.New("idempotent mode requires kafka version to be >= 0.11.0.0")
+		}
 	}
 
 	// When running under Elastic-Agent we do not support dynamic topic
@@ -221,6 +237,11 @@ func newSaramaConfig(log *logp.Logger, config *KafkaConfig) (*sarama.Config, err
 	k.Net.KeepAlive = config.KeepAlive
 	k.Producer.Timeout = config.BrokerTimeout
 	k.Producer.CompressionLevel = config.CompressionLevel
+	k.Producer.Idempotent = config.Idempotent
+	// If idempotent is enabled, we need to set `MaxOpenRequests` to 1. See https://github.com/IBM/sarama/blob/3e29cc9573c6da854915f8c0952017eca622eec1/config.go#L210-L212
+	if k.Producer.Idempotent {
+		k.Net.MaxOpenRequests = 1
+	}
 
 	tls, err := tlscommon.LoadTLSConfig(config.TLS, log)
 	if err != nil {
@@ -236,12 +257,7 @@ func newSaramaConfig(log *logp.Logger, config *KafkaConfig) (*sarama.Config, err
 	case config.Kerberos.IsEnabled():
 		log.Warn(cfgwarn.Beta("Kerberos authentication for Kafka is beta."))
 
-		// Due to a regrettable past decision, the flag controlling Kerberos
-		// FAST authentication was initially added to the output configuration
-		// rather than the shared Kerberos configuration. To avoid a breaking
-		// change, we still check for the old flag, but it is deprecated and
-		// should be removed in a future version.
-		enableFAST := config.Kerberos.EnableFAST || config.EnableFAST
+		enableFAST := config.Kerberos.EnableFAST
 
 		k.Net.SASL.Enable = true
 		k.Net.SASL.Mechanism = sarama.SASLTypeGSSAPI

@@ -33,8 +33,8 @@ import (
 
 var testCases = []struct {
 	name                    string
-	setupServer             func(testing.TB, http.HandlerFunc, map[string]interface{})
-	baseConfig              map[string]interface{}
+	setupServer             func(testing.TB, http.HandlerFunc, map[string]any)
+	baseConfig              map[string]any
 	handler                 http.HandlerFunc
 	expected                []string
 	expectedFile            string
@@ -47,7 +47,7 @@ var testCases = []struct {
 	{
 		name:        "simple_GET_request",
 		setupServer: newTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
 		},
@@ -57,7 +57,7 @@ var testCases = []struct {
 	{
 		name:        "simple_HTTPS_GET_request",
 		setupServer: newTestServer(httptest.NewTLSServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":                      1,
 			"request.method":                http.MethodGet,
 			"request.ssl.verification_mode": "none",
@@ -68,7 +68,7 @@ var testCases = []struct {
 	{
 		name:        "simple_GET_request_returns_an_array_of_strings_no_events",
 		setupServer: newTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
 		},
@@ -78,7 +78,7 @@ var testCases = []struct {
 	{
 		name:        "request_honors_rate_limit",
 		setupServer: newTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":                     1,
 			"http_method":                  http.MethodGet,
 			"request.rate_limit.limit":     `[[.last_response.header.Get "X-Rate-Limit-Limit"]]`,
@@ -91,7 +91,7 @@ var testCases = []struct {
 	{
 		name:        "request_retries_when_failed",
 		setupServer: newTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
 		},
@@ -101,10 +101,10 @@ var testCases = []struct {
 	{
 		name:        "POST_request_with_body",
 		setupServer: newTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodPost,
-			"request.body": map[string]interface{}{
+			"request.body": map[string]any{
 				"test": "abc",
 			},
 		},
@@ -114,10 +114,10 @@ var testCases = []struct {
 	{
 		name:        "POST_request_with_empty_object_body",
 		setupServer: newTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodPost,
-			"request.body":   map[string]interface{}{},
+			"request.body":   map[string]any{},
 		},
 		handler:  defaultHandler(http.MethodPost, `{}`, ""),
 		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
@@ -125,7 +125,7 @@ var testCases = []struct {
 	{
 		name:        "repeated_POST_requests",
 		setupServer: newTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       "100ms",
 			"request.method": http.MethodPost,
 		},
@@ -138,10 +138,10 @@ var testCases = []struct {
 	{
 		name:        "split_by_json_objects_array",
 		setupServer: newTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"response.split": map[string]interface{}{
+			"response.split": map[string]any{
 				"target": "body.hello",
 			},
 		},
@@ -151,10 +151,10 @@ var testCases = []struct {
 	{
 		name:        "split_by_json_objects_array_with_keep_parent",
 		setupServer: newTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"response.split": map[string]interface{}{
+			"response.split": map[string]any{
 				"target":      "body.hello",
 				"keep_parent": true,
 			},
@@ -168,10 +168,10 @@ var testCases = []struct {
 	{
 		name:        "split_on_empty_array_without_ignore_empty_value",
 		setupServer: newTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"response.split": map[string]interface{}{
+			"response.split": map[string]any{
 				"target": "body.response.empty",
 			},
 		},
@@ -181,10 +181,10 @@ var testCases = []struct {
 	{
 		name:        "split_on_empty_array_with_ignore_empty_value",
 		setupServer: newTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"response.split": map[string]interface{}{
+			"response.split": map[string]any{
 				"target":             "body.response.empty",
 				"ignore_empty_value": true,
 			},
@@ -195,10 +195,10 @@ var testCases = []struct {
 	{
 		name:        "split_on_null_field_with_ignore_empty_value_keeping_parent",
 		setupServer: newTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"response.split": map[string]interface{}{
+			"response.split": map[string]any{
 				"target":             "body.response.empty",
 				"ignore_empty_value": true,
 				"keep_parent":        true,
@@ -210,10 +210,10 @@ var testCases = []struct {
 	{
 		name:        "split_on_empty_array_with_ignore_empty_value_keeping_parent",
 		setupServer: newTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"response.split": map[string]interface{}{
+			"response.split": map[string]any{
 				"target":             "body.response.empty",
 				"ignore_empty_value": true,
 				"keep_parent":        true,
@@ -225,10 +225,10 @@ var testCases = []struct {
 	{
 		name:        "split_on_null_field_at_root_with_ignore_empty_value_keeping_parent",
 		setupServer: newTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"response.split": map[string]interface{}{
+			"response.split": map[string]any{
 				"target":             "body.response",
 				"ignore_empty_value": true,
 				"keep_parent":        true,
@@ -240,10 +240,10 @@ var testCases = []struct {
 	{
 		name:        "split_on_empty_array_at_root_with_ignore_empty_value_keeping_parent",
 		setupServer: newTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"response.split": map[string]interface{}{
+			"response.split": map[string]any{
 				"target":             "body.response",
 				"ignore_empty_value": true,
 				"keep_parent":        true,
@@ -255,12 +255,12 @@ var testCases = []struct {
 	{
 		name:        "nested_split",
 		setupServer: newTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"response.split": map[string]interface{}{
+			"response.split": map[string]any{
 				"target": "body.hello",
-				"split": map[string]interface{}{
+				"split": map[string]any{
 					"target":      "body.space",
 					"keep_parent": true,
 				},
@@ -275,10 +275,10 @@ var testCases = []struct {
 	{
 		name:        "split_events_by_not_found",
 		setupServer: newTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"response.split": map[string]interface{}{
+			"response.split": map[string]any{
 				"target": "body.unknown",
 			},
 		},
@@ -287,7 +287,7 @@ var testCases = []struct {
 	},
 	{
 		name: "date_cursor",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			// mock timeNow func to return a fixed value
 			timeNow = func() time.Time {
 				t, _ := time.Parse(time.RFC3339, "2002-10-02T15:00:00Z")
@@ -299,20 +299,20 @@ var testCases = []struct {
 			t.Cleanup(server.Close)
 			t.Cleanup(func() { timeNow = time.Now })
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"request.transforms": []interface{}{
-				map[string]interface{}{
-					"set": map[string]interface{}{
+			"request.transforms": []any{
+				map[string]any{
+					"set": map[string]any{
 						"target":  "url.params.$filter",
 						"value":   "alertCreationTime ge [[.cursor.timestamp]]",
 						"default": `alertCreationTime ge [[formatDate (now (parseDuration "-10m")) "2006-01-02T15:04:05Z"]]`,
 					},
 				},
 			},
-			"cursor": map[string]interface{}{
-				"timestamp": map[string]interface{}{
+			"cursor": map[string]any{
+				"timestamp": map[string]any{
 					"value": `[[index .last_response.body "@timestamp"]]`,
 				},
 			},
@@ -326,7 +326,7 @@ var testCases = []struct {
 	},
 	{
 		name: "tracer_filename_sanitization",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			// mock timeNow func to return a fixed value
 			timeNow = func() time.Time {
 				t, _ := time.Parse(time.RFC3339, "2002-10-02T15:00:00Z")
@@ -338,20 +338,20 @@ var testCases = []struct {
 			t.Cleanup(server.Close)
 			t.Cleanup(func() { timeNow = time.Now })
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"request.transforms": []interface{}{
-				map[string]interface{}{
-					"set": map[string]interface{}{
+			"request.transforms": []any{
+				map[string]any{
+					"set": map[string]any{
 						"target":  "url.params.$filter",
 						"value":   "alertCreationTime ge [[.cursor.timestamp]]",
 						"default": `alertCreationTime ge [[formatDate (now (parseDuration "-10m")) "2006-01-02T15:04:05Z"]]`,
 					},
 				},
 			},
-			"cursor": map[string]interface{}{
-				"timestamp": map[string]interface{}{
+			"cursor": map[string]any{
+				"timestamp": map[string]any{
 					"value": `[[index .last_response.body "@timestamp"]]`,
 				},
 			},
@@ -367,7 +367,7 @@ var testCases = []struct {
 	},
 	{
 		name: "tracer_filename_sanitization_enabled",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			// mock timeNow func to return a fixed value
 			timeNow = func() time.Time {
 				t, _ := time.Parse(time.RFC3339, "2002-10-02T15:00:00Z")
@@ -379,20 +379,20 @@ var testCases = []struct {
 			t.Cleanup(server.Close)
 			t.Cleanup(func() { timeNow = time.Now })
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"request.transforms": []interface{}{
-				map[string]interface{}{
-					"set": map[string]interface{}{
+			"request.transforms": []any{
+				map[string]any{
+					"set": map[string]any{
 						"target":  "url.params.$filter",
 						"value":   "alertCreationTime ge [[.cursor.timestamp]]",
 						"default": `alertCreationTime ge [[formatDate (now (parseDuration "-10m")) "2006-01-02T15:04:05Z"]]`,
 					},
 				},
 			},
-			"cursor": map[string]interface{}{
-				"timestamp": map[string]interface{}{
+			"cursor": map[string]any{
+				"timestamp": map[string]any{
 					"value": `[[index .last_response.body "@timestamp"]]`,
 				},
 			},
@@ -409,7 +409,7 @@ var testCases = []struct {
 	},
 	{
 		name: "tracer_filename_sanitization_disabled",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			// mock timeNow func to return a fixed value
 			timeNow = func() time.Time {
 				t, _ := time.Parse(time.RFC3339, "2002-10-02T15:00:00Z")
@@ -421,20 +421,20 @@ var testCases = []struct {
 			t.Cleanup(server.Close)
 			t.Cleanup(func() { timeNow = time.Now })
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"request.transforms": []interface{}{
-				map[string]interface{}{
-					"set": map[string]interface{}{
+			"request.transforms": []any{
+				map[string]any{
+					"set": map[string]any{
 						"target":  "url.params.$filter",
 						"value":   "alertCreationTime ge [[.cursor.timestamp]]",
 						"default": `alertCreationTime ge [[formatDate (now (parseDuration "-10m")) "2006-01-02T15:04:05Z"]]`,
 					},
 				},
 			},
-			"cursor": map[string]interface{}{
-				"timestamp": map[string]interface{}{
+			"cursor": map[string]any{
+				"timestamp": map[string]any{
 					"value": `[[index .last_response.body "@timestamp"]]`,
 				},
 			},
@@ -456,12 +456,12 @@ var testCases = []struct {
 	// case can exercise an out-of-tree path at the input level.
 	{
 		name: "tracer_disabled_escaping_logs",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			server := httptest.NewServer(h)
 			config["request.url"] = server.URL
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":                1,
 			"request.method":          http.MethodGet,
 			"request.tracer.enabled":  false,
@@ -472,28 +472,28 @@ var testCases = []struct {
 	},
 	{
 		name: "pagination",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			server := httptest.NewServer(h)
 			config["request.url"] = server.URL
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       time.Millisecond,
 			"request.method": http.MethodGet,
-			"response.split": map[string]interface{}{
+			"response.split": map[string]any{
 				"target": "body.items",
-				"transforms": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+				"transforms": []any{
+					map[string]any{
+						"set": map[string]any{
 							"target": "body.page",
 							"value":  "[[.last_response.page]]",
 						},
 					},
 				},
 			},
-			"response.pagination": []interface{}{
-				map[string]interface{}{
-					"set": map[string]interface{}{
+			"response.pagination": []any{
+				map[string]any{
+					"set": map[string]any{
 						"target":                 "url.params.page",
 						"value":                  "[[.last_response.body.nextPageToken]]",
 						"fail_on_template_error": true,
@@ -509,28 +509,28 @@ var testCases = []struct {
 	},
 	{
 		name: "pagination_not_log_fail",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			server := httptest.NewServer(h)
 			config["request.url"] = server.URL
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       time.Millisecond,
 			"request.method": http.MethodGet,
-			"response.split": map[string]interface{}{
+			"response.split": map[string]any{
 				"target": "body.items",
-				"transforms": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+				"transforms": []any{
+					map[string]any{
+						"set": map[string]any{
 							"target": "body.page",
 							"value":  "[[.last_response.page]]",
 						},
 					},
 				},
 			},
-			"response.pagination": []interface{}{
-				map[string]interface{}{
-					"set": map[string]interface{}{
+			"response.pagination": []any{
+				map[string]any{
+					"set": map[string]any{
 						"target":                 "url.params.page",
 						"value":                  "[[.last_response.body.nextPageToken]]",
 						"fail_on_template_error": true,
@@ -547,19 +547,19 @@ var testCases = []struct {
 	},
 	{
 		name: "first_event",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			server := httptest.NewServer(h)
 			config["request.url"] = server.URL
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"response.split": map[string]interface{}{
+			"response.split": map[string]any{
 				"target": "body.items",
-				"transforms": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
+				"transforms": []any{
+					map[string]any{
+						"set": map[string]any{
 							"target":  "body.first",
 							"value":   "[[.cursor.first]]",
 							"default": "none",
@@ -567,17 +567,17 @@ var testCases = []struct {
 					},
 				},
 			},
-			"response.pagination": []interface{}{
-				map[string]interface{}{
-					"set": map[string]interface{}{
+			"response.pagination": []any{
+				map[string]any{
+					"set": map[string]any{
 						"target":                 "url.params.page",
 						"value":                  "[[.last_response.body.nextPageToken]]",
 						"fail_on_template_error": true,
 					},
 				},
 			},
-			"cursor": map[string]interface{}{
-				"first": map[string]interface{}{
+			"cursor": map[string]any{
+				"first": map[string]any{
 					"value": "[[.first_event.foo]]",
 				},
 			},
@@ -587,17 +587,17 @@ var testCases = []struct {
 	},
 	{
 		name: "pagination_with_array_response",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			server := httptest.NewServer(h)
 			config["request.url"] = server.URL
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"response.pagination": []interface{}{
-				map[string]interface{}{
-					"set": map[string]interface{}{
+			"response.pagination": []any{
+				map[string]any{
+					"set": map[string]any{
 						"target": "url.params.page",
 						"value":  `[[index (index .last_response.body 0) "nextPageToken"]]`,
 					},
@@ -609,18 +609,18 @@ var testCases = []struct {
 	},
 	{
 		name: "oauth2",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			server := httptest.NewServer(h)
 			config["request.url"] = server.URL
 			config["auth.oauth2.token_url"] = server.URL + "/token"
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":                  1,
 			"request.method":            http.MethodPost,
 			"auth.oauth2.client.id":     "a_client_id",
 			"auth.oauth2.client.secret": "a_client_secret",
-			"auth.oauth2.endpoint_params": map[string]interface{}{
+			"auth.oauth2.endpoint_params": map[string]any{
 				"param1": "v1",
 			},
 			"auth.oauth2.scopes": []string{"scope1", "scope2"},
@@ -630,12 +630,12 @@ var testCases = []struct {
 	},
 	{
 		name: "aws auth",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			server := httptest.NewServer(h)
 			config["request.url"] = server.URL
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":                   1,
 			"request.method":             http.MethodGet,
 			"auth.aws.access_key_id":     "AKIAIOSFODNN7EXAMPLE",
@@ -648,7 +648,7 @@ var testCases = []struct {
 	},
 	{
 		name: "file_auth_default_header",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			dir := t.TempDir()
 			secret := "file-secret"
 			path := filepath.Join(dir, "auth_token")
@@ -662,7 +662,7 @@ var testCases = []struct {
 			config["request.url"] = server.URL
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
 		},
@@ -671,7 +671,7 @@ var testCases = []struct {
 	},
 	{
 		name: "file_auth_custom_header",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			dir := t.TempDir()
 			tokenPath := filepath.Join(dir, "api_token")
 			if err := os.WriteFile(tokenPath, []byte("secret-api-token\n"), 0o600); err != nil {
@@ -684,7 +684,7 @@ var testCases = []struct {
 			config["request.url"] = server.URL
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
 		},
@@ -695,12 +695,12 @@ var testCases = []struct {
 	// Auth header sanitization in trace logs.
 	{
 		name: "trace_sanitize_basic_auth",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			server := httptest.NewServer(h)
 			config["request.url"] = server.URL
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":                1,
 			"request.method":          http.MethodGet,
 			"auth.basic.user":         "test_user",
@@ -715,18 +715,18 @@ var testCases = []struct {
 	},
 	{
 		name: "trace_sanitize_oauth2",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			server := httptest.NewServer(h)
 			config["request.url"] = server.URL
 			config["auth.oauth2.token_url"] = server.URL + "/token"
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":                  1,
 			"request.method":            http.MethodPost,
 			"auth.oauth2.client.id":     "a_client_id",
 			"auth.oauth2.client.secret": "a_client_secret",
-			"auth.oauth2.endpoint_params": map[string]interface{}{
+			"auth.oauth2.endpoint_params": map[string]any{
 				"param1": "v1",
 			},
 			"auth.oauth2.scopes":      []string{"scope1", "scope2"},
@@ -740,12 +740,12 @@ var testCases = []struct {
 	},
 	{
 		name: "trace_sanitize_aws_auth",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			server := httptest.NewServer(h)
 			config["request.url"] = server.URL
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":                   1,
 			"request.method":             http.MethodGet,
 			"auth.aws.access_key_id":     "AKIAIOSFODNN7EXAMPLE",
@@ -762,7 +762,7 @@ var testCases = []struct {
 	},
 	{
 		name: "trace_sanitize_file_auth",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			dir := t.TempDir()
 			secret := "file-secret"
 			path := filepath.Join(dir, "auth_token")
@@ -776,7 +776,7 @@ var testCases = []struct {
 			config["request.url"] = server.URL
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":                1,
 			"request.method":          http.MethodGet,
 			"request.tracer.enabled":  true,
@@ -789,29 +789,29 @@ var testCases = []struct {
 	},
 	{
 		name: "request_transforms_can_access_state_from_previous_transforms",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			server := httptest.NewServer(h)
 			config["request.url"] = server.URL + "/test-path"
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodPost,
-			"request.transforms": []interface{}{
-				map[string]interface{}{
-					"set": map[string]interface{}{
+			"request.transforms": []any{
+				map[string]any{
+					"set": map[string]any{
 						"target": "header.X-Foo",
 						"value":  "foo",
 					},
 				},
-				map[string]interface{}{
-					"set": map[string]interface{}{
+				map[string]any{
+					"set": map[string]any{
 						"target": "body.bar",
 						"value":  `[[.header.Get "X-Foo"]]`,
 					},
 				},
-				map[string]interface{}{
-					"set": map[string]interface{}{
+				map[string]any{
+					"set": map[string]any{
 						"target": "body.url.path",
 						"value":  `[[.url.Path]]`,
 					},
@@ -823,25 +823,25 @@ var testCases = []struct {
 	},
 	{
 		name: "response_transforms_can't_access_request_state_from_previous_transforms",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			server := httptest.NewServer(h)
 			config["request.url"] = server.URL
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       10,
 			"request.method": http.MethodGet,
-			"request.transforms": []interface{}{
-				map[string]interface{}{
-					"set": map[string]interface{}{
+			"request.transforms": []any{
+				map[string]any{
+					"set": map[string]any{
 						"target": "header.X-Foo",
 						"value":  "foo",
 					},
 				},
 			},
-			"response.transforms": []interface{}{
-				map[string]interface{}{
-					"set": map[string]interface{}{
+			"response.transforms": []any{
+				map[string]any{
+					"set": map[string]any{
 						"target": "body.bar",
 						"value":  `[[.header.Get "X-Foo"]]`,
 					},
@@ -854,12 +854,12 @@ var testCases = []struct {
 	{
 		name:        "simple_Chain_GET_request",
 		setupServer: newChainTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       10,
 			"request.method": http.MethodGet,
-			"chain": []interface{}{
-				map[string]interface{}{
-					"step": map[string]interface{}{
+			"chain": []any{
+				map[string]any{
+					"step": map[string]any{
 						"request.method": http.MethodGet,
 						"replace":        "$.records[:].id",
 					},
@@ -872,12 +872,12 @@ var testCases = []struct {
 	{
 		name:        "simple_naked_Chain_GET_request",
 		setupServer: newNakedChainTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       10,
 			"request.method": http.MethodGet,
-			"chain": []interface{}{
-				map[string]interface{}{
-					"step": map[string]interface{}{
+			"chain": []any{
+				map[string]any{
+					"step": map[string]any{
 						"request.url":    "placeholder:$.records[:]",
 						"request.method": http.MethodGet,
 						"replace":        "$.records[:]",
@@ -890,7 +890,7 @@ var testCases = []struct {
 	},
 	{
 		name: "multiple_Chain_GET_request",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				switch r.URL.Path {
 				case "/":
@@ -907,18 +907,18 @@ var testCases = []struct {
 			config["chain.1.step.request.url"] = server.URL + "/$.file_name"
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       10,
 			"request.method": http.MethodGet,
-			"chain": []interface{}{
-				map[string]interface{}{
-					"step": map[string]interface{}{
+			"chain": []any{
+				map[string]any{
+					"step": map[string]any{
 						"request.method": http.MethodGet,
 						"replace":        "$.records[:].id",
 					},
 				},
-				map[string]interface{}{
-					"step": map[string]interface{}{
+				map[string]any{
+					"step": map[string]any{
 						"request.method": http.MethodGet,
 						"replace":        "$.file_name",
 					},
@@ -930,7 +930,7 @@ var testCases = []struct {
 	},
 	{
 		name: "date_cursor_while_using_chain",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			// mock timeNow func to return a fixed value
 			timeNow = func() time.Time {
 				t, _ := time.Parse(time.RFC3339, "2002-10-02T15:00:00Z")
@@ -951,28 +951,28 @@ var testCases = []struct {
 			t.Cleanup(server.Close)
 			t.Cleanup(func() { timeNow = time.Now })
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"request.transforms": []interface{}{
-				map[string]interface{}{
-					"set": map[string]interface{}{
+			"request.transforms": []any{
+				map[string]any{
+					"set": map[string]any{
 						"target":  "url.params.$filter",
 						"value":   "alertCreationTime ge [[.cursor.timestamp]]",
 						"default": `alertCreationTime ge [[formatDate (now (parseDuration "-10m")) "2006-01-02T15:04:05Z"]]`,
 					},
 				},
 			},
-			"chain": []interface{}{
-				map[string]interface{}{
-					"step": map[string]interface{}{
+			"chain": []any{
+				map[string]any{
+					"step": map[string]any{
 						"request.method": http.MethodGet,
 						"replace":        "$.records[:].id",
 					},
 				},
 			},
-			"cursor": map[string]interface{}{
-				"timestamp": map[string]interface{}{
+			"cursor": map[string]any{
+				"timestamp": map[string]any{
 					"value": `[[index .last_response.body "@timestamp"]]`,
 				},
 			},
@@ -983,15 +983,15 @@ var testCases = []struct {
 	{
 		name:        "split_by_json_objects_array_in_chain",
 		setupServer: newChainTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"chain": []interface{}{
-				map[string]interface{}{
-					"step": map[string]interface{}{
+			"chain": []any{
+				map[string]any{
+					"step": map[string]any{
 						"request.method": http.MethodGet,
 						"replace":        "$.records[:].id",
-						"response.split": map[string]interface{}{
+						"response.split": map[string]any{
 							"target": "body.hello",
 						},
 					},
@@ -1004,15 +1004,15 @@ var testCases = []struct {
 	{
 		name:        "split_by_json_objects_array_with_keep_parent_in_chain",
 		setupServer: newChainTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"chain": []interface{}{
-				map[string]interface{}{
-					"step": map[string]interface{}{
+			"chain": []any{
+				map[string]any{
+					"step": map[string]any{
 						"request.method": http.MethodGet,
 						"replace":        "$.records[:].id",
-						"response.split": map[string]interface{}{
+						"response.split": map[string]any{
 							"target":      "body.hello",
 							"keep_parent": true,
 						},
@@ -1029,20 +1029,20 @@ var testCases = []struct {
 	{
 		name:        "nested_split_in_chain",
 		setupServer: newChainTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"response.split": map[string]interface{}{
+			"response.split": map[string]any{
 				"target": "body.hello",
 			},
-			"chain": []interface{}{
-				map[string]interface{}{
-					"step": map[string]interface{}{
+			"chain": []any{
+				map[string]any{
+					"step": map[string]any{
 						"request.method": http.MethodGet,
 						"replace":        "$.records[:].id",
-						"response.split": map[string]interface{}{
+						"response.split": map[string]any{
 							"target": "body.hello",
-							"split": map[string]interface{}{
+							"split": map[string]any{
 								"target":      "body.space",
 								"keep_parent": true,
 							},
@@ -1060,21 +1060,21 @@ var testCases = []struct {
 	{
 		name:        "pagination_when_used_with_chaining",
 		setupServer: newChainPaginationTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"response.pagination": []interface{}{
-				map[string]interface{}{
-					"set": map[string]interface{}{
+			"response.pagination": []any{
+				map[string]any{
+					"set": map[string]any{
 						"target":                 "url.value",
 						"value":                  "[[.last_response.body.nextLink]]",
 						"fail_on_template_error": true,
 					},
 				},
 			},
-			"chain": []interface{}{
-				map[string]interface{}{
-					"step": map[string]interface{}{
+			"chain": []any{
+				map[string]any{
+					"step": map[string]any{
 						"request.method": http.MethodGet,
 						"replace":        "$.records[:].id",
 					},
@@ -1090,12 +1090,12 @@ var testCases = []struct {
 	{
 		name:        "pagination_when_used_with_chaining_not_log_fail",
 		setupServer: newChainPaginationTestServer(httptest.NewServer),
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"response.pagination": []interface{}{
-				map[string]interface{}{
-					"set": map[string]interface{}{
+			"response.pagination": []any{
+				map[string]any{
+					"set": map[string]any{
 						"target":                 "url.value",
 						"value":                  "[[.last_response.body.nextLink]]",
 						"fail_on_template_error": true,
@@ -1103,9 +1103,9 @@ var testCases = []struct {
 					},
 				},
 			},
-			"chain": []interface{}{
-				map[string]interface{}{
-					"step": map[string]interface{}{
+			"chain": []any{
+				map[string]any{
+					"step": map[string]any{
 						"request.method": http.MethodGet,
 						"replace":        "$.records[:].id",
 					},
@@ -1120,7 +1120,7 @@ var testCases = []struct {
 	},
 	{
 		name: "replace_with_clause_and_first_response_object",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				switch r.URL.Path {
 				case "/":
@@ -1139,19 +1139,19 @@ var testCases = []struct {
 			config["chain.1.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":                     1,
 			"request.method":               http.MethodGet,
 			"response.save_first_response": true,
-			"chain": []interface{}{
-				map[string]interface{}{
-					"step": map[string]interface{}{
+			"chain": []any{
+				map[string]any{
+					"step": map[string]any{
 						"request.method": http.MethodGet,
 						"replace":        "$.exportId",
 					},
 				},
-				map[string]interface{}{
-					"step": map[string]interface{}{
+				map[string]any{
+					"step": map[string]any{
 						"request.method": http.MethodGet,
 						"replace":        "$.files[:].id",
 						"replace_with":   "$.exportId,.first_response.body.exportId",
@@ -1166,7 +1166,7 @@ var testCases = []struct {
 	},
 	{
 		name: "replace_with_clause_with_values_from_string_array",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				switch r.URL.Path {
 				case "/":
@@ -1182,12 +1182,12 @@ var testCases = []struct {
 			config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.text[:]"
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"chain": []interface{}{
-				map[string]interface{}{
-					"step": map[string]interface{}{
+			"chain": []any{
+				map[string]any{
+					"step": map[string]any{
 						"request.method": http.MethodGet,
 						"replace":        "$.text[:]",
 						"replace_with":   "$.exportId,2212",
@@ -1202,7 +1202,7 @@ var testCases = []struct {
 	},
 	{
 		name: "replace_clause_with_string_from_string_array",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				switch r.URL.Path {
 				case "/":
@@ -1218,12 +1218,12 @@ var testCases = []struct {
 			config["chain.0.step.request.url"] = server.URL + "/$.exportId/$[:]"
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"chain": []interface{}{
-				map[string]interface{}{
-					"step": map[string]interface{}{
+			"chain": []any{
+				map[string]any{
+					"step": map[string]any{
 						"request.method": http.MethodGet,
 						"replace":        "$[:]",
 						"replace_with":   "$.exportId,2212",
@@ -1238,7 +1238,7 @@ var testCases = []struct {
 	},
 	{
 		name: "replace_clause_with_int_from_int_array",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				switch r.URL.Path {
 				case "/":
@@ -1254,12 +1254,12 @@ var testCases = []struct {
 			config["chain.0.step.request.url"] = server.URL + "/$.exportId/$[:]"
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"chain": []interface{}{
-				map[string]interface{}{
-					"step": map[string]interface{}{
+			"chain": []any{
+				map[string]any{
+					"step": map[string]any{
 						"request.method": http.MethodGet,
 						"replace":        "$[:]",
 						"replace_with":   "$.exportId,2212",
@@ -1274,7 +1274,7 @@ var testCases = []struct {
 	},
 	{
 		name: "replace_with_clause_with_hardcoded_value_1",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				switch r.URL.Path {
 				case "/":
@@ -1290,12 +1290,12 @@ var testCases = []struct {
 			config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"chain": []interface{}{
-				map[string]interface{}{
-					"step": map[string]interface{}{
+			"chain": []any{
+				map[string]any{
+					"step": map[string]any{
 						"request.method": http.MethodGet,
 						"replace":        "$.files[:].id",
 						"replace_with":   "$.exportId,2212",
@@ -1310,7 +1310,7 @@ var testCases = []struct {
 	},
 	{
 		name: "replace_with_clause_with_hardcoded_value_(no_dot_prefix)",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				switch r.URL.Path {
 				case "/":
@@ -1326,13 +1326,13 @@ var testCases = []struct {
 			config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":                     1,
 			"request.method":               http.MethodGet,
 			"response.save_first_response": true,
-			"chain": []interface{}{
-				map[string]interface{}{
-					"step": map[string]interface{}{
+			"chain": []any{
+				map[string]any{
+					"step": map[string]any{
 						"request.method": http.MethodGet,
 						"replace":        "$.files[:].id",
 						"replace_with":   "$.exportId,first_response.body.id",
@@ -1347,7 +1347,7 @@ var testCases = []struct {
 	},
 	{
 		name: "replace_with_clause_with_hardcoded_value_(more_than_one_dot_prefix)",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				switch r.URL.Path {
 				case "/":
@@ -1363,13 +1363,13 @@ var testCases = []struct {
 			config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":                     1,
 			"request.method":               http.MethodGet,
 			"response.save_first_response": true,
-			"chain": []interface{}{
-				map[string]interface{}{
-					"step": map[string]interface{}{
+			"chain": []any{
+				map[string]any{
+					"step": map[string]any{
 						"request.method": http.MethodGet,
 						"replace":        "$.files[:].id",
 						"replace_with":   "$.exportId,..first_response.body.id",
@@ -1384,7 +1384,7 @@ var testCases = []struct {
 	},
 	{
 		name: "replace_with_clause_with_hardcoded_value_containing_'.'_(dots)",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				switch r.URL.Path {
 				case "/":
@@ -1400,12 +1400,12 @@ var testCases = []struct {
 			config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
-			"chain": []interface{}{
-				map[string]interface{}{
-					"step": map[string]interface{}{
+			"chain": []any{
+				map[string]any{
+					"step": map[string]any{
 						"request.method": http.MethodGet,
 						"replace":        "$.files[:].id",
 						"replace_with":   "$.exportId,.xyz.2212.abc.",
@@ -1420,7 +1420,7 @@ var testCases = []struct {
 	},
 	{
 		name: "global_transform_context_separation_with_parent_last_response_object",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			var serverURL string
 			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				switch r.URL.Path {
@@ -1444,28 +1444,28 @@ var testCases = []struct {
 			config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":                            1,
 			"request.method":                      http.MethodPost,
 			"response.request_body_on_pagination": true,
-			"response.pagination": []interface{}{
-				map[string]interface{}{
-					"set": map[string]interface{}{
+			"response.pagination": []any{
+				map[string]any{
+					"set": map[string]any{
 						"target":                 "url.value",
 						"value":                  "[[.last_response.body.nextLink]]",
 						"fail_on_template_error": true,
 					},
 				},
 			},
-			"chain": []interface{}{
-				map[string]interface{}{
-					"step": map[string]interface{}{
+			"chain": []any{
+				map[string]any{
+					"step": map[string]any{
 						"request.method": http.MethodPost,
 						"replace":        "$.files[:].id",
 						"replace_with":   "$.exportId,.parent_last_response.body.exportId",
-						"request.transforms": []interface{}{
-							map[string]interface{}{
-								"set": map[string]interface{}{
+						"request.transforms": []any{
+							map[string]any{
+								"set": map[string]any{
 									"target": "body.exportId",
 									"value":  "[[ .parent_last_response.body.exportId ]]",
 								},
@@ -1484,7 +1484,7 @@ var testCases = []struct {
 	},
 	{
 		name: "cursor_value_is_updated_for_root_response_with_chaining_&_pagination",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			var serverURL string
 			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				switch r.URL.Path {
@@ -1509,34 +1509,34 @@ var testCases = []struct {
 			config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":                            1,
 			"request.method":                      http.MethodPost,
 			"response.request_body_on_pagination": true,
-			"response.pagination": []interface{}{
-				map[string]interface{}{
-					"set": map[string]interface{}{
+			"response.pagination": []any{
+				map[string]any{
+					"set": map[string]any{
 						"target":                 "url.value",
 						"value":                  "[[.last_response.body.nextLink]]",
 						"fail_on_template_error": true,
 					},
 				},
 			},
-			"chain": []interface{}{
-				map[string]interface{}{
-					"step": map[string]interface{}{
+			"chain": []any{
+				map[string]any{
+					"step": map[string]any{
 						"request.method": http.MethodPost,
 						"replace":        "$.files[:].id",
 						"replace_with":   "$.exportId,.parent_last_response.body.exportId",
-						"request.transforms": []interface{}{
-							map[string]interface{}{
-								"set": map[string]interface{}{
+						"request.transforms": []any{
+							map[string]any{
+								"set": map[string]any{
 									"target": "body.exportId",
 									"value":  "[[ .parent_last_response.body.exportId ]]",
 								},
 							},
-							map[string]interface{}{
-								"set": map[string]interface{}{
+							map[string]any{
+								"set": map[string]any{
 									"target": "body.createdAt",
 									"value":  "[[ .cursor.last_published_login ]]",
 								},
@@ -1545,8 +1545,8 @@ var testCases = []struct {
 					},
 				},
 			},
-			"cursor": map[string]interface{}{
-				"last_published_login": map[string]interface{}{
+			"cursor": map[string]any{
+				"last_published_login": map[string]any{
 					"value": "[[ .last_event.createdAt ]]",
 				},
 			},
@@ -1560,7 +1560,7 @@ var testCases = []struct {
 	},
 	{
 		name: "cursor_value_is_updated_for_root_response_with_chaining_&_pagination_along_with_split_operator",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			var serverURL string
 			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				switch r.URL.Path {
@@ -1585,39 +1585,39 @@ var testCases = []struct {
 			config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":                            1,
 			"request.method":                      http.MethodPost,
 			"response.request_body_on_pagination": true,
-			"response.pagination": []interface{}{
-				map[string]interface{}{
-					"set": map[string]interface{}{
+			"response.pagination": []any{
+				map[string]any{
+					"set": map[string]any{
 						"target":                 "url.value",
 						"value":                  "[[.last_response.body.nextLink]]",
 						"fail_on_template_error": true,
 					},
 				},
 			},
-			"response.split": map[string]interface{}{
+			"response.split": map[string]any{
 				"target":      "body.time",
 				"type":        "array",
 				"keep_parent": true,
 			},
-			"chain": []interface{}{
-				map[string]interface{}{
-					"step": map[string]interface{}{
+			"chain": []any{
+				map[string]any{
+					"step": map[string]any{
 						"request.method": http.MethodPost,
 						"replace":        "$.files[:].id",
 						"replace_with":   "$.exportId,.parent_last_response.body.exportId",
-						"request.transforms": []interface{}{
-							map[string]interface{}{
-								"set": map[string]interface{}{
+						"request.transforms": []any{
+							map[string]any{
+								"set": map[string]any{
 									"target": "body.exportId",
 									"value":  "[[ .parent_last_response.body.exportId ]]",
 								},
 							},
-							map[string]interface{}{
-								"set": map[string]interface{}{
+							map[string]any{
+								"set": map[string]any{
 									"target": "body.createdAt",
 									"value":  "[[ .cursor.last_published_login ]]",
 								},
@@ -1626,8 +1626,8 @@ var testCases = []struct {
 					},
 				},
 			},
-			"cursor": map[string]interface{}{
-				"last_published_login": map[string]interface{}{
+			"cursor": map[string]any{
+				"last_published_login": map[string]any{
 					"value": "[[ .last_event.time.timeStamp ]]",
 				},
 			},
@@ -1641,7 +1641,7 @@ var testCases = []struct {
 	},
 	{
 		name: "Test simple XML decode",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				const text = `<?xml version="1.0" encoding="UTF-8"?>
 <order orderid="56733" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="sales.xsd">
@@ -1670,7 +1670,7 @@ var testCases = []struct {
 			config["request.url"] = server.URL
 			t.Cleanup(server.Close)
 		},
-		baseConfig: map[string]interface{}{
+		baseConfig: map[string]any{
 			"interval":       1,
 			"request.method": http.MethodGet,
 			"response.xsd": `<?xml version="1.0" encoding="UTF-8" ?>
@@ -1710,16 +1710,16 @@ var testCases = []struct {
 		},
 		handler: defaultHandler(http.MethodGet, "", ""),
 		expected: []string{mapstr.M{
-			"order": map[string]interface{}{
-				"address": map[string]interface{}{
+			"order": map[string]any{
+				"address": map[string]any{
 					"address": "Beekplantsoen 594, 2 hoog, 6849 IG",
 					"city":    "Boekend",
 					"company": "Sydøstlige Gruppe",
 					"country": "Netherlands",
 					"name":    "Joord Lennart",
 				},
-				"item": []interface{}{
-					map[string]interface{}{
+				"item": []any{
+					map[string]any{
 						"cost":   99.95,
 						"name":   "Egil's Saga",
 						"note":   "Free Sample",
@@ -1928,8 +1928,8 @@ func BenchmarkInput(b *testing.B) {
 
 func newTestServer(
 	newServer func(http.Handler) *httptest.Server,
-) func(testing.TB, http.HandlerFunc, map[string]interface{}) {
-	return func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+) func(testing.TB, http.HandlerFunc, map[string]any) {
+	return func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 		server := newServer(h)
 		config["request.url"] = server.URL
 		t.Cleanup(server.Close)
@@ -1938,8 +1938,8 @@ func newTestServer(
 
 func newChainTestServer(
 	newServer func(http.Handler) *httptest.Server,
-) func(testing.TB, http.HandlerFunc, map[string]interface{}) {
-	return func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+) func(testing.TB, http.HandlerFunc, map[string]any) {
+	return func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 		r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			switch r.URL.Path {
 			case "/":
@@ -1957,8 +1957,8 @@ func newChainTestServer(
 
 func newNakedChainTestServer(
 	newServer func(http.Handler) *httptest.Server,
-) func(testing.TB, http.HandlerFunc, map[string]interface{}) {
-	return func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+) func(testing.TB, http.HandlerFunc, map[string]any) {
+	return func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 		var server *httptest.Server
 		r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			switch r.URL.Path {
@@ -1976,8 +1976,8 @@ func newNakedChainTestServer(
 
 func newChainPaginationTestServer(
 	newServer func(http.Handler) *httptest.Server,
-) func(testing.TB, http.HandlerFunc, map[string]interface{}) {
-	return func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+) func(testing.TB, http.HandlerFunc, map[string]any) {
+	return func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 		var serverURL string
 		r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			switch r.URL.Path {

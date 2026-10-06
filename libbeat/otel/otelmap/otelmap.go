@@ -118,6 +118,12 @@ func FromValue(dst pcommon.Value, value any) error {
 		return FromMapstr(dst.SetEmptyMap(), v)
 	case map[string]any:
 		return FromMapstr(dst.SetEmptyMap(), v)
+	case map[string]string:
+		fromStringMap(dst.SetEmptyMap(), v)
+		return nil
+	case map[string]int:
+		fromIntMap(dst.SetEmptyMap(), v)
+		return nil
 	case []mapstr.M:
 		return fromMapSlice(dst.SetEmptySlice(), v)
 	case []map[string]any:
@@ -225,6 +231,10 @@ func putIntoMap(key string, val any, dst pcommon.Map) error {
 		return FromMapstr(dst.PutEmptyMap(key), v)
 	case map[string]any:
 		return FromMapstr(dst.PutEmptyMap(key), v)
+	case map[string]string:
+		fromStringMap(dst.PutEmptyMap(key), v)
+	case map[string]int:
+		fromIntMap(dst.PutEmptyMap(key), v)
 	default:
 		return FromValue(dst.PutEmpty(key), val)
 	}
@@ -403,6 +413,12 @@ func fromReflective(dst pcommon.Value, value any) error {
 		return FromMapstr(dst.SetEmptyMap(), m)
 	case reflect.Slice, reflect.Array:
 		return fromReflectiveSlice(dst.SetEmptySlice(), ref)
+	case reflect.Map:
+		if ref.Type().Key().Kind() != reflect.String {
+			dst.SetStr(fmt.Sprintf("unknown type: %T", value))
+			return nil
+		}
+		return fromReflectiveMap(dst.SetEmptyMap(), ref)
 	case reflect.Pointer, reflect.Interface:
 		if ref.IsNil() {
 			return nil
@@ -419,6 +435,31 @@ func fromReflectiveSlice(dst pcommon.Slice, ref reflect.Value) error {
 	dst.EnsureCapacity(n)
 	for i := range n {
 		if err := FromValue(dst.AppendEmpty(), ref.Index(i).Interface()); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func fromStringMap(dst pcommon.Map, src map[string]string) {
+	dst.EnsureCapacity(len(src))
+	for k, v := range src {
+		dst.PutStr(k, v)
+	}
+}
+
+func fromIntMap(dst pcommon.Map, src map[string]int) {
+	dst.EnsureCapacity(len(src))
+	for k, v := range src {
+		dst.PutInt(k, int64(v))
+	}
+}
+
+func fromReflectiveMap(dst pcommon.Map, ref reflect.Value) error {
+	dst.EnsureCapacity(ref.Len())
+	iter := ref.MapRange()
+	for iter.Next() {
+		if err := putIntoMap(iter.Key().String(), iter.Value().Interface(), dst); err != nil {
 			return err
 		}
 	}

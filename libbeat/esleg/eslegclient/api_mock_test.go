@@ -55,7 +55,7 @@ func TestOneHostSuccessResp(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
-	body := map[string]interface{}{
+	body := map[string]any{
 		"user":      "test",
 		"post_date": "2009-11-15T14:12:12",
 		"message":   "trying out",
@@ -82,7 +82,7 @@ func TestOneHost500Resp(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
-	body := map[string]interface{}{
+	body := map[string]any{
 		"user":      "test",
 		"post_date": "2009-11-15T14:12:12",
 		"message":   "trying out",
@@ -116,7 +116,7 @@ func TestOneHost503Resp(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
-	body := map[string]interface{}{
+	body := map[string]any{
 		"user":      "test",
 		"post_date": "2009-11-15T14:12:12",
 		"message":   "trying out",

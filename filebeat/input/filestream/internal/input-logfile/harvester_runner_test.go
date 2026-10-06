@@ -21,6 +21,7 @@ package input_logfile
 import (
 	"context"
 	"fmt"
+	"slices"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -314,7 +315,7 @@ func TestHarvesterRunner_OpenSessionErrorNotifiesObserver(t *testing.T) {
 	h := &fakeHarvester{openErr: errHarvester}
 	g := testHarvesterRunner(t, h, 0)
 	notify := make(chan HarvesterStatus, 1)
-	g.SetObserver(notify)
+	g.SetObserver(chanObserver(notify))
 
 	goroutines := resources.NewGoroutinesChecker()
 	defer goroutines.WaitUntilOriginalCount()
@@ -353,7 +354,7 @@ func TestHarvesterRunner_TeardownNotifiesObserverWithSessionOffset(t *testing.T)
 	}
 	g := testHarvesterRunner(t, h, 0)
 	notify := make(chan HarvesterStatus, 1)
-	g.SetObserver(notify)
+	g.SetObserver(chanObserver(notify))
 
 	g.start()
 	src := &testSource{name: "/path/to/test"}
@@ -382,7 +383,7 @@ func TestHarvesterRunner_ConnectErrorDoesNotNotifyObserver(t *testing.T) {
 	g := testHarvesterRunner(t, h, 0)
 	g.pipeline = &MockPipeline{connectErr: errPipelineConnect}
 	notify := make(chan HarvesterStatus, 1)
-	g.SetObserver(notify)
+	g.SetObserver(chanObserver(notify))
 
 	g.start()
 	src := &testSource{name: "/path/to/test"}
@@ -591,13 +592,15 @@ func TestHarvesterRunner_ParkPollGrowsBackoff(t *testing.T) {
 
 // TestHarvesterRunner_PollGracePeriod_SlowPollDoesNotBlockOthers asserts a
 // slow Poll on one source (e.g. a stat() stuck on an unresponsive network
-// filesystem) does not delay another due source's Poll beyond pollGracePeriod.
-// Before this fix, the waker polled due sources sequentially with no bound, so
-// one slow Poll starved every other file indefinitely.
+// filesystem) does not hold up another due source's Poll: unbounded sequential
+// polling would let one slow Poll starve every other file indefinitely.
 func TestHarvesterRunner_PollGracePeriod_SlowPollDoesNotBlockOthers(t *testing.T) {
 	var callCount atomic.Int32
 	blockFirst := make(chan struct{})
 	secondDone := make(chan struct{})
+	// The unblocked source parks and is polled again, so this is reached more
+	// than once.
+	reportSecond := sync.OnceFunc(func() { close(secondDone) })
 	start := time.Now()
 
 	h := &fakeHarvester{
@@ -606,7 +609,7 @@ func TestHarvesterRunner_PollGracePeriod_SlowPollDoesNotBlockOthers(t *testing.T
 			if callCount.Add(1) == 1 {
 				<-blockFirst // simulate a stat() stuck on a slow/unresponsive filesystem
 			} else {
-				close(secondDone)
+				reportSecond()
 			}
 			return PollPark
 		},
@@ -627,10 +630,11 @@ func TestHarvesterRunner_PollGracePeriod_SlowPollDoesNotBlockOthers(t *testing.T
 
 	select {
 	case <-secondDone:
-		// The waker only moves on once it gives up waiting on the first
-		// (blocked) source, so this must take at least one grace period —
-		// otherwise the test isn't actually exercising the timeout path.
-		assert.GreaterOrEqual(t, time.Since(start), pollGracePeriod)
+		// The blocked source costs the other nothing when they come due in one
+		// batch, and at most the batch's grace period when they do not. Anything
+		// beyond that is the blocked Poll being waited on.
+		assert.Less(t, time.Since(start), 2*pollGracePeriod,
+			"a source must not wait on another source's stuck Poll")
 	case <-time.After(eventuallyTimeout):
 		t.Fatal("a slow Poll on one source must not block another source's Poll")
 	}
@@ -638,8 +642,8 @@ func TestHarvesterRunner_PollGracePeriod_SlowPollDoesNotBlockOthers(t *testing.T
 
 // TestHarvesterRunner_PollGracePeriod_FastPollDoesNotWait asserts a Poll that
 // returns quickly (the common case, e.g. a healthy local filesystem) is not
-// delayed by the grace period: the waker moves on as soon as it completes,
-// well under pollGracePeriod, rather than always waiting out the full window.
+// delayed by the grace period: the chain moves to the next source as soon as it
+// completes, rather than always waiting out the full window.
 func TestHarvesterRunner_PollGracePeriod_FastPollDoesNotWait(t *testing.T) {
 	state := &sourceState{srcID: "x", ctx: startContext(t), status: statusPolling, done: make(chan struct{})}
 	session := &fakeSession{pollFn: func(_ int) PollResult { return PollPark }}
@@ -656,13 +660,11 @@ func TestHarvesterRunner_PollGracePeriod_FastPollDoesNotWait(t *testing.T) {
 	assert.Equal(t, 1, session.pollCount())
 }
 
-// TestHarvesterRunner_PollGracePeriod_ReturnsImmediatelyWhenClosed asserts
-// pollWithGracePeriod does not wait out the grace period when the runner is
-// already closed: spawn silently declines to run the closure in that case, so
-// without this check the waker would wait a full pollGracePeriod per due
-// source collected just before shutdown instead of returning immediately —
-// with enough due sources this can exceed the stuck grace and skip
-// finishRemaining's cleanup entirely.
+// TestHarvesterRunner_PollGracePeriod_ReturnsImmediatelyWhenClosed asserts a
+// closed runner runs no poll and does not wait: spawn silently declines to run
+// the closure, so without the check the chain would wait out the grace period
+// for a poll that is never going to happen, delaying shutdown past the stuck
+// grace and skipping finishRemaining's cleanup.
 func TestHarvesterRunner_PollGracePeriod_ReturnsImmediatelyWhenClosed(t *testing.T) {
 	state := &sourceState{srcID: "x", ctx: startContext(t), status: statusPolling, done: make(chan struct{})}
 	state.session = &fakeSession{pollFn: func(_ int) PollResult {
@@ -678,7 +680,7 @@ func TestHarvesterRunner_PollGracePeriod_ReturnsImmediatelyWhenClosed(t *testing
 	start := time.Now()
 	g.pollWithGracePeriod(state)
 	assert.Less(t, time.Since(start), pollGracePeriod,
-		"pollWithGracePeriod must return immediately, not wait out the grace period, when closed")
+		"a closed runner must not wait out the grace period for a poll it never started")
 }
 
 // TestHarvesterRunner_ParkCapsDueAtStateCheckInterval asserts park schedules the
@@ -948,6 +950,102 @@ func TestHarvesterRunner_MigrateSkipsFinishedSource(t *testing.T) {
 
 	assert.True(t, g.hasID("old-id"), "the finishing registration must be left for finish to remove")
 	assert.False(t, g.hasID(g.identifier.ID(next)), "no new registration must be created for a finishing source")
+}
+
+func TestHarvesterRunner_MigrateNotifiesOpenSession(t *testing.T) {
+	h := &fakeHarvester{readFn: blockUntilCancelled}
+	g := testHarvesterRunner(t, h, 0)
+
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.WaitUntilOriginalCount()
+
+	g.start()
+	oldSrc := &testSource{name: "/path/to/old"}
+	newSrc := &testSource{name: "/path/to/new"}
+	oldID := g.identifier.ID(oldSrc)
+
+	g.Start(startContext(t), oldSrc)
+	requireEventually(t, func() bool { return h.opens() == 1 && h.lastSession().readCount() == 1 },
+		"the session must be open and reading")
+
+	require.NoError(t, g.Migrate(oldID, newSrc, func(string) error { return nil }), "Migrate")
+	assert.Equal(t, []Source{oldSrc, newSrc}, h.lastSession().trackedSources(),
+		"the open session must receive its source when published and after the migration")
+
+	g.Stop(newSrc)
+	require.NoError(t, g.StopHarvesters())
+}
+
+func TestHarvesterRunner_MigrateWhileOpeningNotifiesSession(t *testing.T) {
+	opening := make(chan struct{})
+	release := make(chan struct{})
+	h := &fakeHarvester{readFn: blockUntilCancelled}
+	h.openFn = func() {
+		close(opening)
+		<-release
+	}
+	g := testHarvesterRunner(t, h, 0)
+
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.WaitUntilOriginalCount()
+
+	g.start()
+	oldSrc := &testSource{name: "/path/to/old"}
+	newSrc := &testSource{name: "/path/to/new"}
+	oldID := g.identifier.ID(oldSrc)
+
+	g.Start(startContext(t), oldSrc)
+	select {
+	case <-opening:
+	case <-time.After(eventuallyTimeout):
+		t.Fatal("the source was never opened")
+	}
+	require.NoError(t, g.Migrate(oldID, newSrc, func(string) error { return nil }), "Migrate")
+	close(release)
+
+	requireEventually(t, func() bool { return h.opens() == 1 && h.lastSession().readCount() == 1 },
+		"the session must finish opening and start reading")
+	s := h.lastSession()
+	assert.Same(t, oldSrc, s.openedAs, "the session must open before the migration")
+	assert.Equal(t, []Source{newSrc}, s.trackedSources(),
+		"the session must be published with the source migrated while it opened")
+
+	g.Stop(newSrc)
+	require.NoError(t, g.StopHarvesters())
+}
+
+func TestHarvesterRunner_MigrateQueuedSourceOpensAsNext(t *testing.T) {
+	h := &fakeHarvester{readFn: blockUntilCancelled}
+	g := testHarvesterRunner(t, h, 1)
+
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.WaitUntilOriginalCount()
+
+	g.start()
+	blocker := &testSource{name: "/path/to/blocker"}
+	oldSrc := &testSource{name: "/path/to/old"}
+	newSrc := &testSource{name: "/path/to/new"}
+	oldID := g.identifier.ID(oldSrc)
+
+	g.Start(startContext(t), blocker)
+	requireEventually(t, func() bool { return h.opens() == 1 }, "the blocker must take the only slot")
+	g.Start(startContext(t), oldSrc)
+	requireEventually(t, func() bool {
+		st, ok := g.statusOf(oldID)
+		return ok && st == statusWaiting
+	}, "the second source must be queued")
+
+	require.NoError(t, g.Migrate(oldID, newSrc, func(string) error { return nil }), "Migrate")
+	g.Stop(blocker)
+
+	requireEventually(t, func() bool { return h.opens() == 2 }, "the queued source must open when the slot is free")
+	s := h.session(1)
+	assert.Same(t, newSrc, s.openedAs, "the migrated source must open with its new identity")
+	assert.Equal(t, []Source{newSrc}, s.trackedSources(),
+		"the session must be published once with its new identity")
+
+	g.Stop(newSrc)
+	require.NoError(t, g.StopHarvesters())
 }
 
 // TestHarvesterRunner_StopUnknownSourceIsNoop asserts Stop on a source that is
@@ -1360,11 +1458,38 @@ func testHarvesterRunner(t *testing.T, h Harvester, limit uint64) *harvesterRunn
 func testHarvesterRunnerEOF(t *testing.T, h Harvester, limit uint64, eof ReadUntilEOFConfig) *harvesterRunner {
 	t.Helper()
 	logger := logptest.NewTestingLogger(t, "")
+
+	// A private engine per test rather than the process-global one, so tests
+	// never share a scheduler or leak sources into each other's waker. Passing
+	// stop as the release func confines the waker to this runner's lifetime,
+	// which the goroutine-leak assertions in these tests depend on; Cleanup
+	// covers tests that never stop the runner, and stop is idempotent.
+	engine := newEngine(logger)
+	t.Cleanup(engine.stop)
+
+	return newHarvesterRunnerOn(t, engine, engine.stop, h, limit, eof)
+}
+
+// newHarvesterRunnerOn builds a runner on a caller-supplied engine, so a test
+// can put more than one runner on one scheduler. See engine_cotenancy_test.go.
+func newHarvesterRunnerOn(
+	t *testing.T,
+	engine *engine,
+	release func(),
+	h Harvester,
+	limit uint64,
+	eof ReadUntilEOFConfig,
+) *harvesterRunner {
+	t.Helper()
+	logger := logptest.NewTestingLogger(t, "")
 	ident, err := NewSourceIdentifier("filestream", "")
 	require.NoError(t, err)
 
 	runnerCtx := v2.Context{Logger: logger, Cancelation: context.Background()}
+
 	return newHarvesterRunner(
+		engine,
+		release,
 		runnerCtx,
 		limit,
 		&MockPipeline{},
@@ -1428,20 +1553,25 @@ type fakeHarvester struct {
 	readFn   func(call int, ctx v2.Context) (SliceVerdict, error)
 	pollFn   func(call int) PollResult
 	sessions []*fakeSession
+
+	openFn func()
 }
 
 func (h *fakeHarvester) Name() string                          { return "fake" }
 func (h *fakeHarvester) Test(_ Source, _ v2.TestContext) error { return nil }
 
 func (h *fakeHarvester) OpenSession(
-	_ v2.Context, _ Source, _ string, _ Cursor, _ *Metrics,
+	_ v2.Context, src Source, _ string, _ Cursor, _ *Metrics,
 ) (HarvesterSession, error) {
+	if h.openFn != nil {
+		h.openFn()
+	}
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	if h.openErr != nil {
 		return nil, h.openErr
 	}
-	s := &fakeSession{readFn: h.readFn, pollFn: h.pollFn, gzip: h.gzip}
+	s := &fakeSession{readFn: h.readFn, pollFn: h.pollFn, gzip: h.gzip, openedAs: src}
 	h.sessions = append(h.sessions, s)
 	return s, nil
 }
@@ -1477,6 +1607,21 @@ type fakeSession struct {
 
 	readFn func(call int, ctx v2.Context) (SliceVerdict, error)
 	pollFn func(call int) PollResult
+
+	openedAs Source
+	tracked  []Source
+}
+
+func (s *fakeSession) TrackSource(current Source) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.tracked = append(s.tracked, current)
+}
+
+func (s *fakeSession) trackedSources() []Source {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return slices.Clone(s.tracked)
 }
 
 func (s *fakeSession) ReadSlice(ctx v2.Context, _ Publisher) (SliceVerdict, error) {
@@ -1565,7 +1710,7 @@ func (g *harvesterRunner) statusOf(id string) (sourceStatus, bool) {
 func (g *harvesterRunner) parkedLen() int {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	return g.parked.Len()
+	return g.engine.parked.Len()
 }
 
 func (g *harvesterRunner) counts() (active, parked int) {
@@ -1593,7 +1738,7 @@ func (g *harvesterRunner) popDueNow() *sourceState {
 	defer g.mu.Unlock()
 	// Far enough in the future that any real backoff config is due, regardless
 	// of how the runner under test was configured.
-	due := g.popDue(time.Now().Add(24 * time.Hour))
+	due := g.engine.popDue(time.Now().Add(24 * time.Hour))
 	if len(due) == 0 {
 		return nil
 	}
@@ -1694,3 +1839,8 @@ func (r *recordingStatusReporter) lastMsg() string {
 	defer r.mu.Unlock()
 	return r.msg
 }
+
+// chanObserver is a HarvesterObserver that forwards notifications to a channel.
+type chanObserver chan HarvesterStatus
+
+func (c chanObserver) HarvesterClosed(s HarvesterStatus) { c <- s }

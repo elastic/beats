@@ -1,0 +1,82 @@
+---
+name: Bump osquery version in elastic/beats
+pipelineid: 'bump-osquery-beats-{{ source "latestOsqueryVersion" }}'
+
+scms:
+  githubConfig:
+    kind: github
+    spec:
+      owner: '{{ .scm.owner }}'
+      repository: '{{ .scm.repository }}'
+      user: '{{ requiredEnv "GITHUB_ACTOR" }}'
+      username: '{{ requiredEnv "GITHUB_ACTOR" }}'
+      token: '{{ requiredEnv "GITHUB_TOKEN" }}'
+      branch: '{{ .scm.branch }}'
+      commitusingapi: true
+      force: false
+
+  githubConfigLocal:
+    kind: github
+    spec:
+      owner: '{{ .scm.owner }}'
+      repository: '{{ .scm.repository }}'
+      user: '{{ requiredEnv "GITHUB_ACTOR" }}'
+      username: '{{ requiredEnv "GITHUB_ACTOR" }}'
+      token: '{{ requiredEnv "GITHUB_TOKEN" }}'
+      branch: '{{ .scm.branch }}'
+      commitusingapi: false
+      force: false
+
+actions:
+  default:
+    title: 'Bump bundled osquery to version {{ source "latestOsqueryVersion" }}'
+    kind: github/pullrequest
+    scmid: githubConfigLocal
+    spec:
+      labels:
+        - automation
+        - dependencies
+        - backport-skip
+      description: |
+        Bumps the bundled osquery runtime to v{{ source "latestOsqueryVersion" }}.
+
+        Version and SHA256 checksums are updated in
+        `x-pack/osquerybeat/internal/distro/distro.json`.
+
+        https://github.com/osquery/osquery/releases/tag/v{{ source "latestOsqueryVersion" }}
+
+sources:
+  latestOsqueryVersion:
+    name: Get latest osquery release version
+    kind: githubrelease
+    transformers:
+      - trimprefix: v
+    spec:
+      owner: osquery
+      repository: osquery
+      token: '{{ requiredEnv "GITHUB_TOKEN" }}'
+      username: '{{ requiredEnv "GITHUB_ACTOR" }}'
+      versionfilter:
+        kind: latest
+
+conditions:
+  isNewVersion:
+    name: 'Is distro.json already at osquery {{ source "latestOsqueryVersion" }}?'
+    disablesourceinput: true
+    scmid: githubConfig
+    kind: file
+    spec:
+      file: x-pack/osquerybeat/internal/distro/distro.json
+      matchpattern: '"version": "{{ source "latestOsqueryVersion" }}"'
+    failwhen: true
+
+targets:
+  update-distro-json:
+    name: 'Update distro.json to osquery {{ source "latestOsqueryVersion" }}'
+    disablesourceinput: true
+    scmid: githubConfigLocal
+    kind: shell
+    spec:
+      command: go run ./x-pack/osquerybeat/scripts/update_osquery/main.go --version {{ source "latestOsqueryVersion" }} --distro-file x-pack/osquerybeat/internal/distro/distro.json --changelog-dir changelog/fragments
+      environments:
+        - name: GITHUB_TOKEN

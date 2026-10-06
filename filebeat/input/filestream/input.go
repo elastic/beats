@@ -28,6 +28,7 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/match"
@@ -79,6 +80,9 @@ type filestream struct {
 	// continuously-busy file.
 	sliceBudget time.Duration
 
+	// harvesterState shares file state with this input's prospector.
+	harvesterState *fileStateTable
+
 	// Function references for testing
 	waitGracePeriodFn func(
 		ctx input.Context,
@@ -93,35 +97,59 @@ type filestream struct {
 	statFn   func(string) (os.FileInfo, error)
 }
 
+// filestreamInputManager wraps loginp.InputManager and releases the shared
+// directory cache when all inputs have stopped (on Close).
+type filestreamInputManager struct {
+	*loginp.InputManager
+	releaseDirReader func()
+}
+
+func (m *filestreamInputManager) Close() {
+	m.InputManager.Close()
+	m.releaseDirReader()
+}
+
 // Plugin creates a new filestream input plugin for creating a stateful input.
 func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
+	dc, releaseDR := acquireSharedDirReader()
+	mgr := &filestreamInputManager{releaseDirReader: releaseDR}
+	mgr.InputManager = &loginp.InputManager{
+		Logger:              log,
+		StateStore:          store,
+		Type:                pluginName,
+		Configure:           makeConfigureFunc(dc),
+		DefaultCleanTimeout: -1,
+	}
 	return input.Plugin{
 		Name:       pluginName,
 		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "filestream input",
 		Doc:        "The filestream input collects logs from the local filestream service",
-		Manager: &loginp.InputManager{
-			Logger:              log,
-			StateStore:          store,
-			Type:                pluginName,
-			Configure:           configure,
-			DefaultCleanTimeout: -1,
-		},
+		Manager:    mgr,
+	}
+}
+
+// makeConfigureFunc returns a configure function that closes over dc so the
+// shared dir cache flows into every prospector created by this plugin instance.
+func makeConfigureFunc(dc *dirCache) func(*conf.C, *logp.Logger, *loginp.SourceIdentifier) (loginp.Prospector, loginp.Harvester, error) {
+	return func(cfg *conf.C, log *logp.Logger, src *loginp.SourceIdentifier) (loginp.Prospector, loginp.Harvester, error) {
+		return configure(cfg, log, src, dc)
 	}
 }
 
 func configure(
 	cfg *conf.C,
 	log *logp.Logger,
-	src *loginp.SourceIdentifier) (loginp.Prospector, loginp.Harvester, error) {
+	src *loginp.SourceIdentifier,
+	dc *dirCache) (loginp.Prospector, loginp.Harvester, error) {
 
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, nil, err
 	}
 
-	if err := normalizeConfig(cfg, &c); err != nil {
+	if err := normalizeConfig(cfg, &c, log); err != nil {
 		return nil, nil, err
 	}
 
@@ -138,7 +166,8 @@ func configure(
 
 	c.TakeOver.LogWarnings(log)
 
-	prospector, err := newProspector(c, log, src)
+	harvesterState := newFileStateTable()
+	prospector, err := newProspector(c, log, src, dc, harvesterState)
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
 	}
@@ -157,9 +186,10 @@ func configure(
 		compression:               c.Compression,
 		includeFileOwnerName:      c.IncludeFileOwnerName,
 		includeFileOwnerGroupName: c.IncludeFileOwnerGroupName,
-		includeFileFingerprint:    c.IncludeFileFingerprint,
+		includeFileFingerprint:    c.IncludeFileFingerprint && c.FileWatcher.Scanner.Fingerprint.Enabled,
 		hasLineFilter:             len(c.Reader.IncludeLines) > 0 || len(c.Reader.ExcludeLines) > 0,
 		deleterConfig:             c.Delete,
+		harvesterState:            harvesterState,
 		waitGracePeriodFn:         waitGracePeriod,
 		tickFn:                    time.Tick,
 		removeFn:                  os.Remove,
@@ -180,32 +210,33 @@ func configure(
 }
 
 // normalizeConfig reconciles filestream defaults with file_identity semantics.
-// In 9.x, scanner fingerprinting defaults to enabled, but non-fingerprint
-// identities should turn it off unless the user explicitly sets it.
-func normalizeConfig(cfg *conf.C, c *config) error {
-	if c.FileIdentity == nil {
-		c.FileWatcher.Scanner.Fingerprint.Growing = defaultFingerprintIdentityConfig().Growing
-		return nil
-	}
+// Scanner fingerprinting is derived from the file identity: enabled for
+// fingerprint, disabled otherwise. The deprecated
+// 'prospector.scanner.fingerprint.enabled' setting is ignored.
+func normalizeConfig(cfg *conf.C, c *config, logger *logp.Logger) error {
+	fingerprintIdentity := c.FileIdentity == nil || c.FileIdentity.Name() == fingerprintName
 
-	name := c.FileIdentity.Name()
-	if name == fingerprintName {
+	if fingerprintIdentity {
 		fingerprintCfg := defaultFingerprintIdentityConfig()
-		if sub := c.FileIdentity.Config(); sub != nil {
-			if err := sub.Unpack(&fingerprintCfg); err != nil {
+		if c.FileIdentity != nil && c.FileIdentity.Config() != nil {
+			if err := c.FileIdentity.Config().Unpack(&fingerprintCfg); err != nil {
 				return fmt.Errorf("cannot read 'file_identity.fingerprint' config: %w", err)
 			}
 		}
 		c.FileWatcher.Scanner.Fingerprint.Growing = fingerprintCfg.Growing
-		return nil
 	}
 
-	hasScannerFingerprint, err := cfg.Has("prospector.scanner.fingerprint.enabled", -1)
-	if err != nil {
-		return fmt.Errorf("cannot read 'prospector.scanner.fingerprint.enabled': %w", err)
-	}
-	if !hasScannerFingerprint {
-		c.FileWatcher.Scanner.Fingerprint.Enabled = false
+	if c.FileWatcher.Scanner.Fingerprint.Enabled != fingerprintIdentity {
+		set, err := cfg.Has("prospector.scanner.fingerprint.enabled", -1)
+		if err != nil {
+			return fmt.Errorf("cannot read 'prospector.scanner.fingerprint.enabled': %w", err)
+		}
+		if set {
+			logger.Named("filestream").Warn(cfgwarn.Deprecate("",
+				"'prospector.scanner.fingerprint.enabled' is deprecated and ignored: scanner "+
+					"fingerprinting is enabled if and only if the 'fingerprint' file identity is used"))
+		}
+		c.FileWatcher.Scanner.Fingerprint.Enabled = fingerprintIdentity
 	}
 
 	return nil
@@ -227,7 +258,7 @@ func (inp *filestream) Test(src loginp.Source, ctx input.TestContext) error {
 	}
 	defer f.Close()
 
-	r, _, err := inp.buildPipeline(ctx.Logger, ctx.Cancelation, f, enc, fs, 0)
+	r, _, err := inp.buildPipeline(ctx.Logger, ctx.Cancelation, f, enc, fs, 0, nil)
 	if err != nil {
 		return err
 	}
@@ -424,6 +455,7 @@ func (inp *filestream) buildPipeline(
 	encoding encoding.Encoding,
 	fs fileSource,
 	offset int64,
+	h *openFileState,
 ) (reader.Reader, *logFile, error) {
 	log.Debug("newLogFileReader with config.MaxBytes:", inp.readerConfig.MaxBytes)
 
@@ -458,8 +490,7 @@ func (inp *filestream) buildPipeline(
 	// The further size limiting is performed by LimitReader at the end of the readers pipeline as needed.
 	encReaderMaxBytes := inp.readerConfig.MaxBytes * 4
 
-	var r reader.Reader
-	r, err = readfile.NewEncodeReader(dbgReader, readfile.Config{
+	encReader, err := readfile.NewEncodeReader(dbgReader, readfile.Config{
 		Codec:      encoding,
 		BufferSize: inp.readerConfig.BufferSize,
 		Terminator: inp.readerConfig.LineTerminator,
@@ -469,16 +500,14 @@ func (inp *filestream) buildPipeline(
 		return nil, nil, err
 	}
 
+	var r reader.Reader = encReader
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
-	// Only publish the completed SHA-256. A still-growing fingerprint's material
-	// is the raw hex of the file header, not a hash, so publishing it would
-	// expose file content.
-	var fingerprint string
-	if inp.includeFileFingerprint && fs.desc.Fingerprint.Complete() {
-		fingerprint = fs.desc.Fingerprint.Sum
+	var fingerprintFn func() string
+	if inp.includeFileFingerprint {
+		fingerprintFn = h.FingerprintSum
 	}
-	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fingerprint, offset)
+	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fingerprintFn, offset)
 
 	r = inp.parsers.Create(r, log)
 

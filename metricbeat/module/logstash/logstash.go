@@ -55,8 +55,8 @@ type MetricSet struct {
 }
 
 type Graph struct {
-	Vertices []map[string]interface{} `json:"vertices"`
-	Edges    []map[string]interface{} `json:"edges"`
+	Vertices []map[string]any `json:"vertices"`
+	Edges    []map[string]any `json:"edges"`
 }
 
 type GraphContainer struct {
@@ -151,7 +151,7 @@ func (m *MetricSet) CheckPipelineGraphAPIsAvailable() error {
 // GetVertexClusterUUID returns the correct cluster UUID value for the given Elasticsearch
 // vertex from a Logstash pipeline. If the vertex has no cluster UUID associated with it,
 // the given override cluster UUID is returned.
-func GetVertexClusterUUID(vertex map[string]interface{}, overrideClusterUUID string) string {
+func GetVertexClusterUUID(vertex map[string]any, overrideClusterUUID string) string {
 	c, ok := vertex["cluster_uuid"]
 	if !ok {
 		return overrideClusterUUID

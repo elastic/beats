@@ -56,8 +56,6 @@ type fileWatcher struct {
 	prev             map[string]loginp.FileDescriptor
 	scanner          loginp.FSScanner
 	log              *logp.Logger
-	events           chan loginp.FSEvent
-	notifyChan       chan loginp.HarvesterStatus
 	fileIdentifier   fileIdentifier
 	sourceIdentifier *loginp.SourceIdentifier
 
@@ -89,23 +87,35 @@ func newFileWatcher(
 	fi fileIdentifier,
 	srci *loginp.SourceIdentifier,
 ) (*fileWatcher, error) {
+	return newFileWatcherWithDirReader(logger, paths, config, compression, sendNotChanged, fi, srci, nil, 0)
+}
+
+// newFileWatcherWithDirReader is like newFileWatcher but accepts a shared dirCache
+// and the per-call maxAge for the directory listing cache. dc=nil disables caching.
+func newFileWatcherWithDirReader(
+	logger *logp.Logger,
+	paths []string,
+	config fileWatcherConfig,
+	compression string,
+	sendNotChanged bool,
+	fi fileIdentifier,
+	srci *loginp.SourceIdentifier,
+	dc *dirCache,
+	maxAge time.Duration,
+) (*fileWatcher, error) {
 
 	config.SendNotChanged = sendNotChanged
-	scanner, err := newFileScanner(logger, paths, config.Scanner, compression)
+	scanner, err := newFileScannerWithCache(logger, paths, config.Scanner, compression, dc, maxAge)
 	if err != nil {
 		return nil, err
 	}
 
 	return &fileWatcher{
-		log:              logger.Named(watcherDebugKey),
-		cfg:              config,
-		prev:             make(map[string]loginp.FileDescriptor, 0),
-		scanner:          scanner,
-		events:           make(chan loginp.FSEvent),
-		closedHarvesters: map[string]int64{},
-		// notifyChan is a buffered channel to prevent the harvester from
-		// blocking while waiting for the fileWatcher to read from the channel
-		notifyChan:         make(chan loginp.HarvesterStatus, 5), // magic number
+		log:                logger.Named(watcherDebugKey),
+		cfg:                config,
+		prev:               make(map[string]loginp.FileDescriptor, 0),
+		scanner:            scanner,
+		closedHarvesters:   map[string]int64{},
 		fileIdentifier:     fi,
 		sourceIdentifier:   srci,
 		growingFingerprint: config.Scanner.Fingerprint.Growing,
@@ -121,61 +131,36 @@ func defaultFileWatcherConfig() fileWatcherConfig {
 	}
 }
 
-func (w *fileWatcher) NotifyChan() chan loginp.HarvesterStatus {
-	return w.notifyChan
-}
-
-func (w *fileWatcher) Run(
-	ctx unison.Canceler,
-	metrics *loginp.Metrics,
-	ignoreOlder time.Duration,
-	ignoreInactiveSince time.Time,
-) {
-	defer close(w.events)
-	defer metrics.Cleanup()
-
-	// run initial scan before starting regular
-	w.watch(ctx, metrics, ignoreOlder, ignoreInactiveSince)
-
-	// Read from notifyChan in a separate goroutine becase
-	// there are cases when w.watch can take minutes or even
-	// hours, so we do not want to block the harvesters
-	go func() {
-		for {
-			select {
-			case evt := <-w.notifyChan:
-				w.processNotification(evt)
-			case <-ctx.Done():
-				return
-			}
-		}
-	}()
-
-	tick := time.Tick(w.cfg.Interval)
-	for {
-		select {
-		case <-tick:
-			w.watch(ctx, metrics, ignoreOlder, ignoreInactiveSince)
-		case <-ctx.Done():
-			return
-		}
-	}
-}
-
-func (w *fileWatcher) processNotification(evt loginp.HarvesterStatus) {
+// HarvesterClosed records the offset a closing harvester reached. It is called
+// directly from the harvester's goroutine and only takes a mutex, so it never
+// waits on a running scan, which can last minutes.
+func (w *fileWatcher) HarvesterClosed(evt loginp.HarvesterStatus) {
 	w.log.Debugf("Harvester Closed notification received. ID: %s, Size: %d", evt.ID, evt.Size)
 	w.closedHarvestersMutex.Lock()
 	w.closedHarvesters[evt.ID] = evt.Size
 	w.closedHarvestersMutex.Unlock()
 }
 
-func (w *fileWatcher) watch(
+// ScanOnce scans the file system once and hands every resulting event to sink,
+// on the calling goroutine. It stops early, dropping the remaining events,
+// once ctx is cancelled.
+func (w *fileWatcher) ScanOnce(
 	ctx unison.Canceler,
+	sink loginp.FSEventSink,
 	metrics *loginp.Metrics,
 	ignoreOlder time.Duration,
 	ignoreInactiveSince time.Time,
 ) {
 	w.log.Debug("Start next scan")
+
+	// emit reports whether the scan may continue.
+	emit := func(e loginp.FSEvent) bool {
+		if ctx.Err() != nil {
+			return false
+		}
+		sink(e)
+		return true
+	}
 
 	// file identity is updated in GetFiles
 	now := time.Now()
@@ -255,10 +240,8 @@ func (w *fileWatcher) watch(
 
 		// if none of the conditions were true, the file remained unchanged and we don't need to create an event
 		if e.Op != loginp.OpDone {
-			select {
-			case <-ctx.Done():
+			if !emit(e) {
 				return
-			case w.events <- e:
 			}
 		}
 
@@ -277,8 +260,8 @@ func (w *fileWatcher) watch(
 	//   1. Exact-FileID rename match — works for every identity including
 	//      static fingerprint. Catches a plain rename where the file's
 	//      content (and so its fingerprint) is unchanged.
-	//   2. Prefix-match rename detection (Enhanced Fingerprint / growing
-	//      mode only) — catches rename + content growth in the same scan.
+	//   2. Prefix-match rename detection (growing fingerprint only) —
+	//      catches rename + content growth in the same scan.
 	//   3. Postpone deletes for entries under an unobservable prefix. Runs
 	//      AFTER both rename passes so a file renamed out of a directory that
 	//      became unobservable this scan is still detected as a rename, instead
@@ -297,13 +280,11 @@ func (w *fileWatcher) watch(
 		}
 
 		srcID := w.getFileIdentity(remainingDesc)
-		select {
-		case <-ctx.Done():
+		if !emit(renamedEvent(
+			remainingPath, newDesc.Filename, *newDesc, srcID)) {
 			return
-		case w.events <- renamedEvent(
-			remainingPath, newDesc.Filename, *newDesc, srcID):
-			renamedCount++
 		}
+		renamedCount++
 
 		delete(newFilesByName, newDesc.Filename)
 		delete(newFilesByID, remainingDesc.FileID())
@@ -364,12 +345,10 @@ func (w *fileWatcher) watch(
 		for _, m := range matches {
 			remainingDesc := w.prev[m.oldPath]
 			srcID := w.getFileIdentity(remainingDesc)
-			select {
-			case <-ctx.Done():
+			if !emit(renamedEvent(m.oldPath, m.newPath, *m.newDesc, srcID)) {
 				return
-			case w.events <- renamedEvent(m.oldPath, m.newPath, *m.newDesc, srcID):
-				renamedCount++
 			}
+			renamedCount++
 
 			delete(newFilesByName, m.newPath)
 			delete(newFilesByID, m.newDesc.FileID())
@@ -377,19 +356,23 @@ func (w *fileWatcher) watch(
 		}
 	}
 
-	// Postpone deletes for unmatched entries under a prefix this scan could not
-	// observe (e.g. a directory that hit EMFILE). We cannot tell whether they are
-	// really gone; treating them as deleted would wipe registry state and
-	// re-ingest from offset 0 once the resource frees up.
+	// Postpone deletes for unmatched entries the scan could not resolve. An
+	// unobservable prefix (e.g. a directory that hit EMFILE) and a path that
+	// vanished mid-scan (a concurrent rename or delete) are both inconclusive:
+	// treating them as deleted would wipe registry state and re-ingest from
+	// offset 0 once the next scan sees the file again.
 	postponed := 0
-	if len(scanResults.Unobservable) > 0 {
-		unobservableSet := make(map[string]struct{}, len(scanResults.Unobservable))
-		for _, p := range scanResults.Unobservable {
-			unobservableSet[p] = struct{}{}
-		}
+	postponedUnobservable := 0
+	if len(scanResults.Unobservable) > 0 || len(scanResults.Vanished) > 0 {
+		unobservable := pathSet(scanResults.Unobservable)
+		vanished := pathSet(scanResults.Vanished)
 		for remainingPath, remainingDesc := range w.prev {
-			if !underAnyUnobservable(remainingPath, unobservableSet) {
+			failedObservation := underAnyPrefix(remainingPath, unobservable)
+			if !failedObservation && !underAnyPrefix(remainingPath, vanished) {
 				continue
+			}
+			if failedObservation {
+				postponedUnobservable++
 			}
 			scanResults.Files[remainingPath] = remainingDesc
 			delete(w.prev, remainingPath)
@@ -398,15 +381,13 @@ func (w *fileWatcher) watch(
 	}
 
 	// Unmatched-leftover deletes: prev files matched by neither rename pass and
-	// not under an unobservable prefix are genuinely gone.
+	// not postponed above are genuinely gone.
 	for remainingPath, remainingDesc := range w.prev {
 		srcID := w.getFileIdentity(remainingDesc)
-		select {
-		case <-ctx.Done():
+		if !emit(deleteEvent(remainingPath, remainingDesc, srcID)) {
 			return
-		case w.events <- deleteEvent(remainingPath, remainingDesc, srcID):
-			removedCount++
 		}
+		removedCount++
 
 		w.closedHarvestersMutex.Lock()
 		delete(w.closedHarvesters, srcID)
@@ -417,12 +398,10 @@ func (w *fileWatcher) watch(
 	for path, fd := range newFilesByName {
 		srcID := w.getFileIdentity(*fd)
 
-		select {
-		case <-ctx.Done():
+		if !emit(createEvent(path, *fd, srcID)) {
 			return
-		case w.events <- createEvent(path, *fd, srcID):
-			createdCount++
 		}
+		createdCount++
 
 		// New files skip the main loop via early continue, so collect their metrics here.
 		if tracksHarvesterProgress(fd, scanOpts) {
@@ -430,7 +409,10 @@ func (w *fileWatcher) watch(
 		}
 	}
 
-	if postponed > 0 && now.Sub(w.lastPostponedWarn) >= postponedWarnInterval {
+	// Only a genuine observation failure is worth warning about. A path that
+	// vanished mid-scan is an ordinary rename or delete and resolves itself on
+	// the next scan.
+	if postponedUnobservable > 0 && now.Sub(w.lastPostponedWarn) >= postponedWarnInterval {
 		w.lastPostponedWarn = now
 		w.log.Warnf("some previously seen files could not be observed (e.g. file-descriptor exhaustion) in the last %s, postponing their delete detection to avoid re-ingestion. See the filebeat.filestream.scan_errors metric for the current count.",
 			postponedWarnInterval)
@@ -530,9 +512,21 @@ func (w *fileWatcher) getFileIdentity(d loginp.FileDescriptor) string {
 	return w.sourceIdentifier.ID(src)
 }
 
-// underAnyUnobservable reports whether path equals, or is nested under, any of
+// pathSet indexes paths for underAnyPrefix lookups.
+func pathSet(paths []string) map[string]struct{} {
+	set := make(map[string]struct{}, len(paths))
+	for _, p := range paths {
+		set[p] = struct{}{}
+	}
+	return set
+}
+
+// underAnyPrefix reports whether path equals, or is nested under, any of
 // the prefixes. Separator-aware, so "/a/b" is not a prefix of "/a/bc".
-func underAnyUnobservable(path string, prefixes map[string]struct{}) bool {
+func underAnyPrefix(path string, prefixes map[string]struct{}) bool {
+	if len(prefixes) == 0 {
+		return false
+	}
 	if _, ok := prefixes[path]; ok {
 		return true
 	}
@@ -570,15 +564,19 @@ func notChangedEvent(path string, fd loginp.FileDescriptor, srcID string) loginp
 	return loginp.FSEvent{Op: loginp.OpNotChanged, OldPath: path, NewPath: path, Descriptor: fd, SrcID: srcID}
 }
 
-func (w *fileWatcher) Event() loginp.FSEvent {
-	return <-w.events
-}
-
 // GetFiles runs a one-off enumeration scan for the prospector's Init and
 // TakeOver phases. Unlike the watch loop it does not advance the scanner's
 // completedFingerprints set, so these pre-watch scans cannot suppress the
 // bridging raw header a still-growing entry needs to migrate its registry key
 // after a restart.
+//
+// The dir-cache is bypassed: Init scans happen before the watch loop writes
+// any files, so caching their results would stale-serve the first watch scan.
 func (w *fileWatcher) GetFiles(opts loginp.FileScanOptions) loginp.ScanResults {
+	if fs, ok := w.scanner.(*fileScanner); ok {
+		dc := fs.dirCache
+		fs.dirCache = nil
+		defer func() { fs.dirCache = dc }()
+	}
 	return w.scanner.GetFiles(opts)
 }

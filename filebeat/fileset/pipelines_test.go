@@ -58,7 +58,6 @@ func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
 	}
 
 	for _, test := range cases {
-		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 			testFilesetManifest := &manifest{
@@ -73,8 +72,8 @@ func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
 				name:       "fls",
 				modulePath: "./test/mod",
 				manifest:   testFilesetManifest,
-				vars: map[string]interface{}{
-					"builtin": map[string]interface{}{},
+				vars: map[string]any{
+					"builtin": map[string]any{},
 				},
 				pipelineIDs: []string{"filebeat-7.0.0-mod-fls-pipeline-plain", "filebeat-7.0.0-mod-fls-pipeline-json"},
 			}

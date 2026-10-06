@@ -35,6 +35,9 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 var (
@@ -152,7 +155,7 @@ func BenchmarkETWCallbackRate(b *testing.B) {
 func setupBenchmarkSession(b *testing.B, callbackFactory func(session *Session) func(record *EventRecord) uintptr) (*Session, *ETWEventGenerator, chan struct{}) {
 	sessionConfig := createTestSessionConfig(uniqueSessionName("BenchmarkETW"))
 
-	session, err := NewSession(sessionConfig)
+	session, err := NewSession(sessionConfig, logp.NewNopLogger())
 	if err != nil {
 		b.Fatalf("Failed to create ETW session: %v", err)
 	}
@@ -284,7 +287,7 @@ func TestETLGoldenFile(t *testing.T) {
 
 	// Create and configure session for ETL file reading
 	sessionConfig := createETLSessionConfig(uniqueSessionName("GoldenTestETW"))
-	session, err := NewSession(sessionConfig)
+	session, err := NewSession(sessionConfig, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("Failed to create ETW session: %v", err)
 	}
@@ -526,7 +529,7 @@ func compareRenderedEvents(actual, expected RenderedEtwEvent, eventIndex int) []
 }
 
 // comparePropertyValues compares two property values recursively
-func comparePropertyValues(actual, expected interface{}) bool {
+func comparePropertyValues(actual, expected any) bool {
 	actualJSON, err1 := json.Marshal(actual)
 	expectedJSON, err2 := json.Marshal(expected)
 	return err1 == nil && err2 == nil && string(actualJSON) == string(expectedJSON)

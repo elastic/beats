@@ -79,7 +79,7 @@ func (r *registry) GetBuilder(name string) BuilderConstructor {
 }
 
 // BuildBuilder reads provider configuration and instantiate one
-func (r *registry) BuildBuilder(c *config.C, paths *paths.Path) (Builder, error) {
+func (r *registry) BuildBuilder(logger *logp.Logger, c *config.C, paths *paths.Path) (Builder, error) {
 	var config BuilderConfig
 	err := c.Unpack(&config)
 	if err != nil {
@@ -91,7 +91,7 @@ func (r *registry) BuildBuilder(c *config.C, paths *paths.Path) (Builder, error)
 		return nil, fmt.Errorf("unknown autodiscover builder %s", config.Type)
 	}
 
-	return builder(c, r.logger, paths)
+	return builder(c, logger, paths)
 }
 
 // GetConfig creates configs for all builders initialized.
@@ -119,6 +119,7 @@ func (b Builders) GetConfig(event bus.Event) []*config.C {
 // NewBuilders instances the given list of builders. hintsCfg holds `hints` settings
 // for simplified mode (single 'hints' builder), `keystoreProvider` has access to keystore registry
 func NewBuilders(
+	logger *logp.Logger,
 	bConfigs []*config.C,
 	hintsCfg *config.C,
 	keystoreProvider bus.KeystoreProvider,
@@ -139,7 +140,7 @@ func NewBuilders(
 	}
 
 	for _, bcfg := range bConfigs {
-		builder, err := Registry.BuildBuilder(bcfg, paths)
+		builder, err := Registry.BuildBuilder(logger, bcfg, paths)
 		if err != nil {
 			return Builders{}, err
 		}

@@ -18,11 +18,11 @@ func TestResolveHitTypes(t *testing.T) {
 	tests := []struct {
 		name          string
 		hit, colTypes map[string]string
-		res           map[string]interface{}
+		res           map[string]any
 	}{
 		{
 			name: "empty",
-			res:  map[string]interface{}{},
+			res:  map[string]any{},
 		},
 		{
 			name: "resolvable",
@@ -39,7 +39,7 @@ func TestResolveHitTypes(t *testing.T) {
 				"pid_uint": "UNSIGNED_BIGINT",
 				"pid_text": "TEXT",
 			},
-			res: map[string]interface{}{
+			res: map[string]any{
 				"pid":      int64(5551),
 				"pid_int":  int64(5552),
 				"pid_uint": uint64(5553),
@@ -55,7 +55,7 @@ func TestResolveHitTypes(t *testing.T) {
 				"foo":  "bar",
 			},
 			colTypes: map[string]string{"data": "BIGINT"},
-			res: map[string]interface{}{
+			res: map[string]any{
 				"data": "0,22,137,138,29754,49154,49155",
 				"foo":  "bar",
 			},

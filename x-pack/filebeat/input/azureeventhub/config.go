@@ -14,6 +14,7 @@ import (
 	"unicode"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 const ephContainerName = "filebeat"
@@ -135,6 +136,12 @@ type azureInputConfig struct {
 	// Possible values are "amqp" (default) and "websocket".
 	// Use "websocket" when connecting through HTTP proxies or when port 5671 is blocked.
 	Transport string `config:"transport"`
+
+	// Proxy configures HTTP proxy settings for the WebSocket Event Hub
+	// connection, blob storage, and Entra ID credential requests.
+	// When unset, proxy configuration falls back to environment
+	// variables (HTTPS_PROXY, NO_PROXY).
+	Proxy httpcommon.HTTPClientProxySettings `config:",inline"`
 }
 
 func defaultConfig() azureInputConfig {
@@ -179,6 +186,23 @@ func (conf *azureInputConfig) Validate() error {
 	// Validate the processor version first to ensure it's valid
 	if err := conf.validateProcessorVersion(); err != nil {
 		return err
+	}
+
+	// WebSocket transport requires processor v2.
+	if conf.Transport == transportWebsocket && conf.ProcessorVersion == processorV1 {
+		return fmt.Errorf(
+			"transport %q requires processor_version %q; v1 does not support WebSocket transport",
+			transportWebsocket, processorV2,
+		)
+	}
+
+	// Proxy settings require processor v2; v1 uses a legacy SDK that
+	// does not support proxy configuration.
+	if conf.ProcessorVersion == processorV1 && (conf.Proxy.URL != nil || conf.Proxy.Disable) {
+		return fmt.Errorf(
+			"proxy_url and proxy_disable require processor_version %q",
+			processorV2,
+		)
 	}
 
 	// Validate authentication configuration
@@ -504,6 +528,9 @@ func (conf *azureInputConfig) checkUnsupportedParams(logger *logp.Logger) {
 			logger.Warnf("storage_account_key is not used in processor v2, please remove it from the configuration (config: storage_account_key)")
 		}
 	}
+	if conf.Transport == transportAmqp && conf.Proxy.URL != nil {
+		logger.Warnf("proxy_url is configured but transport is %q; the Event Hub AMQP connection on port 5671 will not use the proxy — set transport to %q for full proxy support", transportAmqp, transportWebsocket)
+	}
 }
 
 // storageContainerValidate validated the storage_account_container to make sure it is conforming to all the Azure
@@ -526,7 +553,7 @@ func storageContainerValidate(name string) error {
 	if !unicode.IsLower(runes[length-1]) && !unicode.IsNumber(runes[length-1]) {
 		return fmt.Errorf("storage_account_container (%s) must end with a lowercase letter or number", name)
 	}
-	for i := 0; i < length; i++ {
+	for i := range length {
 		if !unicode.IsLower(runes[i]) && !unicode.IsNumber(runes[i]) && runes[i] != '-' {
 			return fmt.Errorf("rune (%d) of storage_account_container (%s) is not a lowercase letter, number or dash", i, name)
 		}

@@ -3,12 +3,12 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !integration
-// +build !integration
 
 package node_stats
 
 import (
 	"testing"
+	"testing/quick"
 	"time"
 
 	"github.com/stretchr/testify/require"
@@ -31,6 +31,12 @@ func initCache(previousCache map[string]mapstr.M, previousSeconds int64) {
 func getNodeStatsForNode(nodeIndex int64) mapstr.M {
 	return mapstr.M{
 		"indices": mapstr.M{
+			"docs": mapstr.M{
+				"count": 100 + nodeIndex,
+			},
+			"store": mapstr.M{
+				"size_in_bytes": 200 + nodeIndex,
+			},
 			"indexing": mapstr.M{
 				"index_failed":         10 + nodeIndex,
 				"index_total":          20 + nodeIndex,
@@ -43,6 +49,25 @@ func getNodeStatsForNode(nodeIndex int64) mapstr.M {
 			"search": mapstr.M{
 				"query_time_in_millis": 70 + nodeIndex,
 				"query_total":          40 + nodeIndex,
+			},
+			"bulk": mapstr.M{
+				"total_size_in_bytes": 300 + nodeIndex,
+				"total_operations":    400 + nodeIndex,
+			},
+		},
+		// Cgroup counters at zero so that fixture-driven cache tests produce a positive
+		// delta (curr_fixture_value − 0). The enricher only reads prev usage_nanos and
+		// prev number_of_elapsed_periods; quota is always taken from the current sample.
+		"os": mapstr.M{
+			"cgroup": mapstr.M{
+				"cpuacct": mapstr.M{
+					"usage_nanos": int64(0),
+				},
+				"cpu": mapstr.M{
+					"stat": mapstr.M{
+						"number_of_elapsed_periods": int64(0),
+					},
+				},
 			},
 		},
 	}
@@ -68,6 +93,10 @@ func TestEnrichNodeStatsWithoutCache(t *testing.T) {
 	require.Nil(t, nodeStatsNode1["index_rate_per_second"])
 	require.Nil(t, nodeStatsNode1["merge_rate_per_second"])
 	require.Nil(t, nodeStatsNode1["search_rate_per_second"])
+	require.Nil(t, nodeStatsNode1["ingest_docs_per_second"])
+	require.Nil(t, nodeStatsNode1["ingest_bytes_per_second"])
+	require.Nil(t, nodeStatsNode1["bulk_bytes_per_second"])
+	require.Nil(t, nodeStatsNode1["bulk_operations_per_second"])
 	require.Nil(t, nodeStatsNode1["index_latency_in_millis"])
 	require.Nil(t, nodeStatsNode1["merge_latency_in_millis"])
 	require.Nil(t, nodeStatsNode1["search_latency_in_millis"])
@@ -87,6 +116,10 @@ func TestEnrichNodeStatsWithoutCachedValues(t *testing.T) {
 	require.Nil(t, nodeStatsNode1["index_rate_per_second"])
 	require.Nil(t, nodeStatsNode1["merge_rate_per_second"])
 	require.Nil(t, nodeStatsNode1["search_rate_per_second"])
+	require.Nil(t, nodeStatsNode1["ingest_docs_per_second"])
+	require.Nil(t, nodeStatsNode1["ingest_bytes_per_second"])
+	require.Nil(t, nodeStatsNode1["bulk_bytes_per_second"])
+	require.Nil(t, nodeStatsNode1["bulk_operations_per_second"])
 	require.Nil(t, nodeStatsNode1["index_latency_in_millis"])
 	require.Nil(t, nodeStatsNode1["merge_latency_in_millis"])
 	require.Nil(t, nodeStatsNode1["search_latency_in_millis"])
@@ -106,6 +139,10 @@ func TestEnrichNodeStatsWithCachedValues(t *testing.T) {
 		nodeStats["indices.merges.total_time_in_millis"] = getValue(&nodeStats, "indices.merges.total_time_in_millis") + 40
 		nodeStats["indices.search.query_total"] = getValue(&nodeStats, "indices.search.query_total") + 60
 		nodeStats["indices.search.query_time_in_millis"] = getValue(&nodeStats, "indices.search.query_time_in_millis") + 120
+		nodeStats["indices.docs.count"] = getValue(&nodeStats, "indices.docs.count") + 10
+		nodeStats["indices.store.size_in_bytes"] = getValue(&nodeStats, "indices.store.size_in_bytes") + 20
+		nodeStats["indices.bulk.total_size_in_bytes"] = getValue(&nodeStats, "indices.bulk.total_size_in_bytes") + 100
+		nodeStats["indices.bulk.total_operations"] = getValue(&nodeStats, "indices.bulk.total_operations") + 50
 
 		nodeStatsMap[key] = nodeStats
 	}
@@ -124,6 +161,10 @@ func TestEnrichNodeStatsWithCachedValues(t *testing.T) {
 		require.EqualValues(t, 3, nodeStats["index_failed_rate_per_second"])
 		require.EqualValues(t, 4, nodeStats["merge_rate_per_second"])
 		require.EqualValues(t, 6, nodeStats["search_rate_per_second"])
+		require.EqualValues(t, 1, nodeStats["ingest_docs_per_second"])
+		require.EqualValues(t, 2, nodeStats["ingest_bytes_per_second"])
+		require.EqualValues(t, 10, nodeStats["bulk_bytes_per_second"])
+		require.EqualValues(t, 5, nodeStats["bulk_operations_per_second"])
 		// latencies
 		require.EqualValues(t, 0.5, nodeStats["index_latency_in_millis"])
 		require.EqualValues(t, 1, nodeStats["merge_latency_in_millis"])
@@ -169,6 +210,12 @@ func TestEnrichNodeStatsSearchLatencyClampsToInterval(t *testing.T) {
 			"index latency below interval should not be clamped")
 		require.InDelta(t, 10, nodeStats["merge_latency_in_millis"], 0.01,
 			"merge latency below interval should not be clamped")
+
+		// No increments for ingest/bulk counters → rates are zero
+		require.EqualValues(t, 0, nodeStats["ingest_docs_per_second"])
+		require.EqualValues(t, 0, nodeStats["ingest_bytes_per_second"])
+		require.EqualValues(t, 0, nodeStats["bulk_bytes_per_second"])
+		require.EqualValues(t, 0, nodeStats["bulk_operations_per_second"])
 	}
 }
 
@@ -192,6 +239,10 @@ func TestEnrichNodeStatsWithCachedValuesWithNoChange(t *testing.T) {
 		require.EqualValues(t, 0, nodeStats["index_failed_rate_per_second"])
 		require.EqualValues(t, 0, nodeStats["merge_rate_per_second"])
 		require.EqualValues(t, 0, nodeStats["search_rate_per_second"])
+		require.EqualValues(t, 0, nodeStats["ingest_docs_per_second"])
+		require.EqualValues(t, 0, nodeStats["ingest_bytes_per_second"])
+		require.EqualValues(t, 0, nodeStats["bulk_bytes_per_second"])
+		require.EqualValues(t, 0, nodeStats["bulk_operations_per_second"])
 		// latencies
 		require.EqualValues(t, 0, nodeStats["index_latency_in_millis"])
 		require.EqualValues(t, 0, nodeStats["merge_latency_in_millis"])
@@ -221,6 +272,10 @@ func TestEnrichNodeStatsWithCachedValuesWithHoles(t *testing.T) {
 		nodeStats["indices.merges.total_time_in_millis"] = getValue(&nodeStats, "indices.merges.total_time_in_millis") + 40
 		nodeStats["indices.search.query_total"] = getValue(&nodeStats, "indices.search.query_total") + 60
 		nodeStats["indices.search.query_time_in_millis"] = getValue(&nodeStats, "indices.search.query_time_in_millis") + 120
+		nodeStats["indices.docs.count"] = getValue(&nodeStats, "indices.docs.count") + 10
+		nodeStats["indices.store.size_in_bytes"] = getValue(&nodeStats, "indices.store.size_in_bytes") + 20
+		nodeStats["indices.bulk.total_size_in_bytes"] = getValue(&nodeStats, "indices.bulk.total_size_in_bytes") + 100
+		nodeStats["indices.bulk.total_operations"] = getValue(&nodeStats, "indices.bulk.total_operations") + 50
 
 		nodeStatsMap[key] = nodeStats
 	}
@@ -244,6 +299,10 @@ func TestEnrichNodeStatsWithCachedValuesWithHoles(t *testing.T) {
 		require.EqualValues(t, 3, nodeStats["index_failed_rate_per_second"])
 		require.EqualValues(t, 4, nodeStats["merge_rate_per_second"])
 		require.EqualValues(t, 6, nodeStats["search_rate_per_second"])
+		require.EqualValues(t, 1, nodeStats["ingest_docs_per_second"])
+		require.EqualValues(t, 2, nodeStats["ingest_bytes_per_second"])
+		require.EqualValues(t, 10, nodeStats["bulk_bytes_per_second"])
+		require.EqualValues(t, 5, nodeStats["bulk_operations_per_second"])
 
 		// latencies
 		if key == "node2" {
@@ -253,6 +312,213 @@ func TestEnrichNodeStatsWithCachedValuesWithHoles(t *testing.T) {
 		}
 		require.EqualValues(t, 1, nodeStats["merge_latency_in_millis"])
 		require.EqualValues(t, 2, nodeStats["search_latency_in_millis"])
+	}
+}
+
+func makeCgroupNodeStats(usageNanos, periods, quotaMicros int64) mapstr.M {
+	return mapstr.M{
+		"os": mapstr.M{
+			"cgroup": mapstr.M{
+				"cpuacct": mapstr.M{
+					"usage_nanos": usageNanos,
+				},
+				"cpu": mapstr.M{
+					"cfs_quota_micros": quotaMicros,
+					"stat": mapstr.M{
+						"number_of_elapsed_periods": periods,
+					},
+				},
+			},
+		},
+	}
+}
+
+// makeCgroupWithout returns a cgroup mapstr.M with the given key path deleted.
+func makeCgroupWithout(usageNanos, periods, quotaMicros int64, deletePath string) mapstr.M {
+	m := makeCgroupNodeStats(usageNanos, periods, quotaMicros)
+	_ = m.Delete(deletePath)
+	return m
+}
+
+func TestEnrichNodeStatsCgroupCpuUsagePercent(t *testing.T) {
+	tests := map[string]struct {
+		prev          mapstr.M // if nil, cache is cleared (first sample)
+		curr          mapstr.M
+		expectPresent bool
+		expected      int64
+	}{
+		"happy path 50%": {
+			// Δusage=500_000_000 ns, Δperiods=10, quota=100_000 µs → 50%
+			prev:          makeCgroupNodeStats(1_000_000_000, 90, 100_000),
+			curr:          makeCgroupNodeStats(1_500_000_000, 100, 100_000),
+			expectPresent: true,
+			expected:      50,
+		},
+		"burst above quota emits >100%": {
+			// Δusage=3_000_000_000 ns, Δperiods=10, quota=100_000 µs → 300%
+			prev:          makeCgroupNodeStats(1_000_000_000, 90, 100_000),
+			curr:          makeCgroupNodeStats(4_000_000_000, 100, 100_000),
+			expectPresent: true,
+			expected:      300,
+		},
+		"zero usage delta emits 0%": {
+			prev:          makeCgroupNodeStats(1_000_000_000, 90, 100_000),
+			curr:          makeCgroupNodeStats(1_000_000_000, 100, 100_000),
+			expectPresent: true,
+			expected:      0,
+		},
+		"quota changed uses current quota": {
+			// Even if prev had a different quota, current sample's quota is authoritative.
+			// Δusage=500_000_000, Δperiods=10, current quota=200_000 → 25%
+			prev:          makeCgroupNodeStats(1_000_000_000, 90, 100_000),
+			curr:          makeCgroupNodeStats(1_500_000_000, 100, 200_000),
+			expectPresent: true,
+			expected:      25,
+		},
+		"unlimited quota (-1)": {
+			prev:          makeCgroupNodeStats(1_000_000_000, 90, -1),
+			curr:          makeCgroupNodeStats(1_500_000_000, 100, -1),
+			expectPresent: false,
+		},
+		"zero quota": {
+			prev:          makeCgroupNodeStats(1_000_000_000, 90, 0),
+			curr:          makeCgroupNodeStats(1_500_000_000, 100, 0),
+			expectPresent: false,
+		},
+		"first sample no previous": {
+			prev:          nil,
+			curr:          makeCgroupNodeStats(1_500_000_000, 100, 100_000),
+			expectPresent: false,
+		},
+		"zero periods delta": {
+			prev:          makeCgroupNodeStats(1_000_000_000, 100, 100_000),
+			curr:          makeCgroupNodeStats(1_500_000_000, 100, 100_000),
+			expectPresent: false,
+		},
+		"usage counter reset (negative delta)": {
+			prev:          makeCgroupNodeStats(2_000_000_000, 90, 100_000),
+			curr:          makeCgroupNodeStats(500_000_000, 100, 100_000),
+			expectPresent: false,
+		},
+		"periods counter reset (negative delta)": {
+			prev:          makeCgroupNodeStats(1_000_000_000, 100, 100_000),
+			curr:          makeCgroupNodeStats(1_500_000_000, 50, 100_000),
+			expectPresent: false,
+		},
+		"missing usage_nanos on previous": {
+			prev:          makeCgroupWithout(1_000_000_000, 90, 100_000, "os.cgroup.cpuacct.usage_nanos"),
+			curr:          makeCgroupNodeStats(1_500_000_000, 100, 100_000),
+			expectPresent: false,
+		},
+		"missing usage_nanos on current": {
+			prev:          makeCgroupNodeStats(1_000_000_000, 90, 100_000),
+			curr:          makeCgroupWithout(1_500_000_000, 100, 100_000, "os.cgroup.cpuacct.usage_nanos"),
+			expectPresent: false,
+		},
+		"missing periods on previous": {
+			prev:          makeCgroupWithout(1_000_000_000, 90, 100_000, "os.cgroup.cpu.stat.number_of_elapsed_periods"),
+			curr:          makeCgroupNodeStats(1_500_000_000, 100, 100_000),
+			expectPresent: false,
+		},
+		"missing periods on current": {
+			prev:          makeCgroupNodeStats(1_000_000_000, 90, 100_000),
+			curr:          makeCgroupWithout(1_500_000_000, 100, 100_000, "os.cgroup.cpu.stat.number_of_elapsed_periods"),
+			expectPresent: false,
+		},
+		"missing cfs_quota_micros on current": {
+			prev:          makeCgroupNodeStats(1_000_000_000, 90, 100_000),
+			curr:          makeCgroupWithout(1_500_000_000, 100, 100_000, "os.cgroup.cpu.cfs_quota_micros"),
+			expectPresent: false,
+		},
+		// The following two cases pin truncation-to-floor: all other happy-path cases
+		// divide exactly, so they would pass even with math.Round or a float64 emitter.
+		"fractional 50.5% truncates to 50 not 51": {
+			// Δusage=505_000_000, Δperiods=10, quota=100_000 → 50.5 → truncated 50
+			prev:          makeCgroupNodeStats(1_000_000_000, 90, 100_000),
+			curr:          makeCgroupNodeStats(1_505_000_000, 100, 100_000),
+			expectPresent: true,
+			expected:      50,
+		},
+		"fractional 49.9% truncates to 49 not 50": {
+			// Δusage=499_000_000, Δperiods=10, quota=100_000 → 49.9 → truncated 49
+			prev:          makeCgroupNodeStats(1_000_000_000, 90, 100_000),
+			curr:          makeCgroupNodeStats(1_499_000_000, 100, 100_000),
+			expectPresent: true,
+			expected:      49,
+		},
+	}
+
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			if tt.prev != nil {
+				initCache(map[string]mapstr.M{"n1": tt.prev}, 10)
+			} else {
+				clearCache()
+			}
+			curr := tt.curr
+
+			enrichNodeStats("n1", &curr, 10_000)
+
+			if tt.expectPresent {
+				v, err := curr.GetValue(cgroupCpuPercentKey)
+				require.NoError(t, err, "expected %s to be set", cgroupCpuPercentKey)
+				require.Equal(t, tt.expected, v.(int64))
+			} else {
+				ok, _ := curr.HasKey(cgroupCpuPercentKey)
+				require.False(t, ok, "expected %s to be absent", cgroupCpuPercentKey)
+			}
+		})
+	}
+}
+
+// TestEnrichNodeStatsCgroupCpuUsagePercentQuickCheck fuzzes the enricher with
+// randomly-generated positive counter deltas and quota. For any valid input
+// the emitted percent must be finite and non-negative.
+func TestEnrichNodeStatsCgroupCpuUsagePercentQuickCheck(t *testing.T) {
+	property := func(prevUsage uint32, usageDelta uint32, prevPeriods uint16, periodsDelta uint16, quotaMicros uint32) bool {
+		// Guarantee the two counter deltas and quota are strictly positive so
+		// the enricher can compute a value. Otherwise we assert only the skip.
+		periodsDelta = (periodsDelta % 1000) + 1 // 1..1000
+		quotaMicros = (quotaMicros % 500_000) + 1
+		prev := makeCgroupNodeStats(int64(prevUsage), int64(prevPeriods), int64(quotaMicros))
+		curr := makeCgroupNodeStats(int64(prevUsage)+int64(usageDelta), int64(prevPeriods)+int64(periodsDelta), int64(quotaMicros))
+		initCache(map[string]mapstr.M{"n1": prev}, 10)
+
+		enrichNodeStats("n1", &curr, 10_000)
+
+		raw, err := curr.GetValue(cgroupCpuPercentKey)
+		if err != nil {
+			return false
+		}
+		v, ok := raw.(int64)
+		if !ok {
+			return false
+		}
+		return v >= 0
+	}
+	require.NoError(t, quick.Check(property, nil))
+}
+
+func TestEnrichNodeStatsGaugeDecreaseWritesNilIngestRate(t *testing.T) {
+	initCache(getNodeStats(), 10)
+
+	nodeStatsMap := getNodeStats()
+	for key, nodeStats := range nodeStatsMap {
+		nodeStats["indices.docs.count"] = getValue(&nodeStats, "indices.docs.count") - 10
+		nodeStats["indices.store.size_in_bytes"] = getValue(&nodeStats, "indices.store.size_in_bytes") - 20
+		nodeStats["indices.bulk.total_operations"] = getValue(&nodeStats, "indices.bulk.total_operations") + 50
+		nodeStats["indices.bulk.total_size_in_bytes"] = getValue(&nodeStats, "indices.bulk.total_size_in_bytes") + 100
+		nodeStatsMap[key] = nodeStats
+	}
+
+	for key, nodeStats := range nodeStatsMap {
+		enrichNodeStats(key, &nodeStats, 10_000)
+		// gauge-backed rates are nil on decrease (not written)
+		require.Nil(t, nodeStats["ingest_docs_per_second"])
+		require.Nil(t, nodeStats["ingest_bytes_per_second"])
+		// counter-backed rates still report correctly
+		require.EqualValues(t, 5, nodeStats["bulk_operations_per_second"])
+		require.EqualValues(t, 10, nodeStats["bulk_bytes_per_second"])
 	}
 }
 
@@ -270,6 +536,10 @@ func TestEnrichNodeIndexShardsWithCachedValuesWithNewNodeAndIndex(t *testing.T) 
 		nodeStats["indices.merges.total_time_in_millis"] = getValue(&nodeStats, "indices.merges.total_time_in_millis") + 40
 		nodeStats["indices.search.query_total"] = getValue(&nodeStats, "indices.search.query_total") + 60
 		nodeStats["indices.search.query_time_in_millis"] = getValue(&nodeStats, "indices.search.query_time_in_millis") + 120
+		nodeStats["indices.docs.count"] = getValue(&nodeStats, "indices.docs.count") + 10
+		nodeStats["indices.store.size_in_bytes"] = getValue(&nodeStats, "indices.store.size_in_bytes") + 20
+		nodeStats["indices.bulk.total_size_in_bytes"] = getValue(&nodeStats, "indices.bulk.total_size_in_bytes") + 100
+		nodeStats["indices.bulk.total_operations"] = getValue(&nodeStats, "indices.bulk.total_operations") + 50
 
 		nodeStatsMap[key] = nodeStats
 	}
@@ -295,6 +565,10 @@ func TestEnrichNodeIndexShardsWithCachedValuesWithNewNodeAndIndex(t *testing.T) 
 			require.EqualValues(t, 3, nodeStats["index_failed_rate_per_second"])
 			require.EqualValues(t, 4, nodeStats["merge_rate_per_second"])
 			require.EqualValues(t, 6, nodeStats["search_rate_per_second"])
+			require.EqualValues(t, 1, nodeStats["ingest_docs_per_second"])
+			require.EqualValues(t, 2, nodeStats["ingest_bytes_per_second"])
+			require.EqualValues(t, 10, nodeStats["bulk_bytes_per_second"])
+			require.EqualValues(t, 5, nodeStats["bulk_operations_per_second"])
 			// latencies
 			require.EqualValues(t, 0.5, nodeStats["index_latency_in_millis"])
 			require.EqualValues(t, 1, nodeStats["merge_latency_in_millis"])
@@ -305,6 +579,10 @@ func TestEnrichNodeIndexShardsWithCachedValuesWithNewNodeAndIndex(t *testing.T) 
 			require.Nil(t, nodeStats["index_rate_per_second"])
 			require.Nil(t, nodeStats["merge_rate_per_second"])
 			require.Nil(t, nodeStats["search_rate_per_second"])
+			require.Nil(t, nodeStats["ingest_docs_per_second"])
+			require.Nil(t, nodeStats["ingest_bytes_per_second"])
+			require.Nil(t, nodeStats["bulk_bytes_per_second"])
+			require.Nil(t, nodeStats["bulk_operations_per_second"])
 			require.Nil(t, nodeStats["index_latency_in_millis"])
 			require.Nil(t, nodeStats["merge_latency_in_millis"])
 			require.Nil(t, nodeStats["search_latency_in_millis"])

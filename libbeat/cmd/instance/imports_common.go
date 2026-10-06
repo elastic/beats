@@ -15,11 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !securityonly
+
 package instance
 
 import (
-	_ "github.com/elastic/beats/v7/libbeat/autodiscover/appenders/config" // Register autodiscover appenders
-	_ "github.com/elastic/beats/v7/libbeat/autodiscover/providers/jolokia"
 	_ "github.com/elastic/beats/v7/libbeat/monitoring/report/elasticsearch" // Register default monitoring reporting
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions"              // Register default processors.
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"

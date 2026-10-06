@@ -191,9 +191,9 @@ func TestNextObjectBatchWindow(t *testing.T) {
 					EventMonitoringMethod: &eventMonitoringMethod{
 						Object: EventMonitoringConfig{
 							Batch: &batchConfig{
-								Enabled:          pointer(true),
+								Enabled:          new(true),
 								InitialInterval:  15 * time.Minute,
-								MaxWindowsPerRun: pointer(1),
+								MaxWindowsPerRun: new(1),
 								Window:           5 * time.Minute,
 							},
 						},
