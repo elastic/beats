@@ -54,7 +54,7 @@ func TestElasticStorage_Access_Concurrent_Race(t *testing.T) {
 	srv := newFakeES(t)
 	defer srv.Close()
 
-	authenticatorID, authenticator := newTestElasticsearchAuthenticator(t, srv.URL, "elastic", "changeme")
+	authenticatorID, authenticator := newTestBeatsAuthenticator(t, srv.URL, "elastic", "changeme")
 	cfg := newTestStorageConfig(authenticatorID)
 	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, "")}
 
@@ -154,7 +154,7 @@ func TestElasticStorage_MixedRegistry_Concurrent_Race(t *testing.T) {
 	srv := newFakeES(t)
 	defer srv.Close()
 
-	authenticatorID, authenticator := newTestElasticsearchAuthenticator(t, srv.URL, "elastic", "changeme")
+	authenticatorID, authenticator := newTestBeatsAuthenticator(t, srv.URL, "elastic", "changeme")
 	cfg := newTestStorageConfig(authenticatorID)
 	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, "")}
 

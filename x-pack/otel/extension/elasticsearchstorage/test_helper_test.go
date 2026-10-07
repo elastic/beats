@@ -11,40 +11,46 @@ import (
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/component/componenttest"
 	"go.opentelemetry.io/collector/config/configauth"
-	"go.opentelemetry.io/collector/config/configopaque"
 	"go.opentelemetry.io/collector/config/configoptional"
 	"go.opentelemetry.io/collector/extension"
 
-	"github.com/elastic/beats/v7/x-pack/otel/extension/elasticsearchauth"
+	"github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension"
 )
 
-func newTestElasticsearchAuthenticator(
+func newTestBeatsAuthenticator(
 	t *testing.T,
 	endpoint, user, password string,
 ) (component.ID, extension.Extension) {
 
 	t.Helper()
 
-	id := component.MustNewID("elasticsearchauth")
-	authenticator, err := elasticsearchauth.NewFactory().Create(
+	id := component.MustNewID("beatsauth")
+	authenticator, err := beatsauthextension.NewFactory().Create(
 		t.Context(),
-		extension.Settings{ID: id},
-		&elasticsearchauth.Config{
+		extension.Settings{
+			ID:                id,
+			TelemetrySettings: componenttest.NewNopTelemetrySettings(),
+		},
+		&beatsauthextension.Config{
 			Endpoints: []string{endpoint},
-			User:      user,
-			Password:  configopaque.String(password),
+			BeatAuthConfig: map[string]any{
+				"auth": map[string]any{
+					"username": user,
+					"password": password,
+				},
+			},
 		})
-	require.NoError(t, err, "Elasticsearch authenticator must be created")
+	require.NoError(t, err, "Beats authenticator must be created")
 	require.NoError(
 		t,
 		authenticator.Start(t.Context(), componenttest.NewNopHost()),
-		"Elasticsearch authenticator must start",
+		"Beats authenticator must start",
 	)
 	t.Cleanup(func() {
 		require.NoError(
 			t,
 			authenticator.Shutdown(t.Context()),
-			"Elasticsearch authenticator must shut down",
+			"Beats authenticator must shut down",
 		)
 	})
 

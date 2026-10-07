@@ -21,7 +21,7 @@ import (
 func TestConfigValidate(t *testing.T) {
 	require.ErrorIs(t, (&Config{}).Validate(), errMissingAuthenticator, "storage configuration without an authenticator must fail")
 
-	authenticatorID, _ := newTestElasticsearchAuthenticator(t, "http://localhost:9200", "", "")
+	authenticatorID, _ := newTestBeatsAuthenticator(t, "http://localhost:9200", "", "")
 	require.NoError(t, newTestStorageConfig(authenticatorID).Validate(), "storage configuration with an authenticator must validate")
 }
 
@@ -29,15 +29,15 @@ func TestConfigDecode(t *testing.T) {
 	config := createDefaultConfig().(*Config) //nolint:errcheck // we know the type
 	require.NoError(t, confmap.NewFromStringMap(map[string]any{
 		"auth": map[string]any{
-			"authenticator": "elasticsearchauth/state",
+			"authenticator": "beatsauth/state",
 		},
 	}).Unmarshal(config), "storage authenticator configuration must decode")
 	require.NoError(t, config.Validate(), "decoded storage configuration must validate")
 	require.True(t, config.Auth.HasValue(), "decoded configuration must contain an authenticator")
-	require.Equal(t, component.MustNewIDWithName("elasticsearchauth", "state"), config.Auth.Get().AuthenticatorID, "decoded configuration must preserve the authenticator ID")
+	require.Equal(t, component.MustNewIDWithName("beatsauth", "state"), config.Auth.Get().AuthenticatorID, "decoded configuration must preserve the authenticator ID")
 }
 
-func TestElasticStorageStartUsesElasticsearchAuthenticator(t *testing.T) {
+func TestElasticStorageStartUsesBeatsAuth(t *testing.T) {
 	var authorization string
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authorization = r.Header.Get("Authorization")
@@ -46,7 +46,7 @@ func TestElasticStorageStartUsesElasticsearchAuthenticator(t *testing.T) {
 	}))
 	t.Cleanup(server.Close)
 
-	authenticatorID, authenticator := newTestElasticsearchAuthenticator(t, server.URL, "elastic", "password")
+	authenticatorID, authenticator := newTestBeatsAuthenticator(t, server.URL, "elastic", "password")
 	storage := &elasticStorage{
 		cfg:    newTestStorageConfig(authenticatorID),
 		logger: logptest.NewTestingLogger(t, ""),
