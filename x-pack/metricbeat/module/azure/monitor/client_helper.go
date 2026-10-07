@@ -108,7 +108,7 @@ func isUnsupportedPlatformMetricNamespace(err error) bool {
 	if respErr.StatusCode != http.StatusBadRequest {
 		return false
 	}
-	return strings.Contains(err.Error(), unsupportedPlatformMetricNamespaceMessage)
+	return strings.Contains(respErr.Error(), unsupportedPlatformMetricNamespaceMessage)
 }
 
 // filterMetricNames func will verify if the metric names entered are valid and will also return the corresponding list of metrics
