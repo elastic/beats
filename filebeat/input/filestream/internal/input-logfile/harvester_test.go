@@ -716,7 +716,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		// The file crosses the fingerprint threshold: the prospector migrates
 		// the registry key and bookkeeping, then starts the new identity.
-		srcStore := newSourceStore(hg.store, hg.identifier, nil)
+		srcStore := newSourceStore(hg.store, hg.identifier, nil, false)
 		liveResource := hg.store.Get(growingID)
 		defer liveResource.Release()
 		require.NoError(t, hg.Migrate(growingID, grown, func(newID string) error {
@@ -770,7 +770,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		newSrc := &testSource{name: "/path/to/growing/new"}
 		oldID := hg.identifier.ID(oldSrc)
 		newID := hg.identifier.ID(newSrc)
-		srcStore := newSourceStore(hg.store, hg.identifier, nil)
+		srcStore := newSourceStore(hg.store, hg.identifier, nil, false)
 
 		// Pre-lock the resource so the starting harvester blocks in lock()
 		// after registering.

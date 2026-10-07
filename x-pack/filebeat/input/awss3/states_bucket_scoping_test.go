@@ -24,8 +24,10 @@ type diskBackedStatestore struct {
 	registry *statestore.Registry
 }
 
-func (s *diskBackedStatestore) StoreKey() string { return fmt.Sprintf("disk:%p", s.registry) }
-func (s *diskBackedStatestore) StoreFor(string) (*statestore.Store, error) {
+func (s *diskBackedStatestore) StoreKey(_, _ string) string {
+	return fmt.Sprintf("disk:%p", s.registry)
+}
+func (s *diskBackedStatestore) StoreFor(_, _ string) (*statestore.Store, error) {
 	return s.registry.Get("filebeat")
 }
 func (s *diskBackedStatestore) CleanupInterval() time.Duration { return 24 * time.Hour }
@@ -326,7 +328,7 @@ func TestLexicographicalLegacyTailIsDropped(t *testing.T) {
 
 	// Seed the store as an older version would have left it: one completed
 	// state for bucket-a and an unscoped tail written by some other input.
-	raw, err := store.StoreFor(inputName)
+	raw, err := store.StoreFor(inputName, "")
 	require.NoError(t, err)
 	defer raw.Close()
 	stA := newState("bucket-a", "logs/obj-a", "etag-a", lastModified)

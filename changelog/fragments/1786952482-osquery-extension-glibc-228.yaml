@@ -9,16 +9,19 @@
 # - security: impacts on the security of a product or a user’s deployment.
 # - upgrade: important information for someone upgrading from a prior version
 # - other: does not fit into any of the other categories
-kind: enhancement
+kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Update Go to 1.26.8
+summary: Restore osquery-extension compatibility with Linux systems on glibc before 2.28.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-# description:
+description: |
+  Building SQLite with SQLITE_DISABLE_LFS on 64-bit Linux avoids a dependency
+  on glibc 2.28. Functionality is unchanged but compatibility is restored for
+  glibc 2.27 systems, such as Ubuntu 18.04.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:
@@ -28,7 +31,7 @@ summary: Update Go to 1.26.8
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: all
+component: osquerybeat
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs
@@ -36,7 +39,7 @@ component: all
 # If not present is automatically filled by the tooling finding the PR where this changelog fragment has been added.
 # NOTE: the tooling supports backports, so it's able to fill the original PR number instead of the backport PR number.
 # Please provide it if you are adding a fragment for a different PR.
-pr: https://github.com/elastic/beats/pull/53026
+# pr: https://github.com/owner/repo/1234
 
 # AUTOMATED
 # OPTIONAL to manually add other issue URLs

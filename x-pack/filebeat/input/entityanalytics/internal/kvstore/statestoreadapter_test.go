@@ -218,8 +218,6 @@ func (s *testBackendStore) Each(fn func(string, backend.ValueDecoder) (bool, err
 	return nil
 }
 
-func (s *testBackendStore) SetID(_ string) {}
-
 type jsonDecoder struct {
 	raw []byte
 }

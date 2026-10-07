@@ -389,6 +389,30 @@ take_over:
   from_ids: ["foo", "bar"]
 ```
 
+```{applies_to}
+stack: beta 9.6.0
+```
+When the previous input IDs are unknown — for example when migrating from many
+dynamically-created autodiscover inputs to a single static `filestream` input —
+use `take_over.from_any_id: true` instead of listing individual IDs.
+This takes over states from every previous `filestream` input, regardless of ID.
+`from_any_id` is mutually exclusive with `from_ids`.
+
+```yaml
+take_over:
+  enabled: true
+  from_any_id: true
+```
+
+When `from_ids` or `from_any_id` is set, files are not taken over from `log` inputs.
+
+::::{warning}
+`from_any_id` assumes each file is tracked by only one previous input. If multiple
+inputs have registry state for the same file, it is non-deterministic which state
+will be migrated. Use `from_ids` instead when multiple inputs may have tracked the
+same files.
+::::
+
 This take over mode was created to enable smooth migration from
 deprecated `log` inputs to the new `filestream` inputs and to allow
 changing `filestream` input IDs without data re-ingestion.
