@@ -250,3 +250,57 @@ func TestDrainingQueueReferencesAreReleased(t *testing.T) {
 		})
 	}
 }
+
+func TestStaleReservationRetriesAfterConcurrentAcknowledgments(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 4}, nil)
+	t.Cleanup(pool.Shutdown)
+	q := pool.Connect()
+	q.SetTarget(4)
+	p := q.Producer(queue.ProducerConfig{})
+	for i := range 2 {
+		_, ok := p.TryPublish(i)
+		require.True(t, ok, "the receiver should admit its backlog under the original cap")
+	}
+	b1, err := q.Get(1)
+	require.NoError(t, err, "the first event should be retained in an output batch")
+	b2, err := q.Get(1)
+	require.NoError(t, err, "the second event should be retained in an output batch")
+	q.SetTarget(1)
+	// A producer already read the old cap before the reduction; its stale
+	// increment precedes validation. Meanwhile a sibling producer parks.
+	staleLive := q.live.Add(1)
+	waiting := q.Producer(queue.ProducerConfig{})
+	done := make(chan bool, 1)
+	go func() {
+		_, ok := waiting.Publish(100)
+		done <- ok
+	}()
+	require.Eventually(t, func() bool { return q.limWaiters.Load() == 1 }, time.Second, time.Millisecond,
+		"the sibling producer should park behind the over-cap backlog")
+	b1.Done()
+	b2.Done()
+	require.Equal(t, int64(1), q.live.Load(), "ACKs should leave only the stale reservation live")
+
+	// The ACK wakeups can send the waiter back to sleep while live == limit.
+	// Rollback then frees the final unit. Validation must immediately retry
+	// rather than returning false and leaving that unit idle without a wake.
+	var accepted bool
+	require.Eventually(t, func() bool {
+		q.limMu.Lock()
+		defer q.limMu.Unlock()
+		if q.limWaiters.Load() != 1 {
+			return false
+		}
+		accepted = q.validateReservation(staleLive)
+		return true
+	}, time.Second, time.Millisecond, "the producer should repark at the current cap before the stale validation rolls back")
+	require.True(t, accepted, "stale validation should retry and reserve capacity freed by concurrent ACKs")
+	assert.Equal(t, int64(1), q.live.Load(), "the retry should use the free unit under the current cap")
+	q.releaseLive(1)
+	select {
+	case ok := <-done:
+		assert.True(t, ok, "releasing the retried reservation should wake the blocking sibling producer")
+	case <-time.After(time.Second):
+		t.Fatal("the blocking sibling producer remained asleep after capacity was released")
+	}
+}

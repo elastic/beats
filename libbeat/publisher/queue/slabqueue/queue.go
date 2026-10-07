@@ -143,17 +143,24 @@ func (q *Queue[T]) SetTarget(n int) {
 // cap, without blocking. It is the lock-free fast path: a CAS on the live
 // counter, with limit==0 meaning unlimited.
 func (q *Queue[T]) tryReserve() bool {
+	live, ok := q.tryReserveLive()
+	return ok && q.validateReservation(live)
+}
+
+// tryReserveLive records a candidate under the sampled cap. Callers must
+// validate the resulting count before acquiring a pool slot.
+func (q *Queue[T]) tryReserveLive() (int64, bool) {
 	for {
 		lim := q.limit.Load()
 		if lim <= 0 {
-			return q.validateReservation(q.live.Add(1))
+			return q.live.Add(1), true
 		}
 		cur := q.live.Load()
 		if cur >= lim {
-			return false
+			return 0, false
 		}
 		if q.live.CompareAndSwap(cur, cur+1) {
-			return q.validateReservation(cur + 1)
+			return cur + 1, true
 		}
 	}
 }
@@ -163,14 +170,23 @@ func (q *Queue[T]) tryReserve() bool {
 // cannot use capacity reserved for another queue. Conversely, a reduction
 // after this check sees the increment when it computes retained backlog.
 func (q *Queue[T]) validateReservation(live int64) bool {
-	if limit := q.limit.Load(); limit > 0 && live > limit {
+	for {
+		if limit := q.limit.Load(); limit <= 0 || live <= limit {
+			return true
+		}
 		q.live.Add(-1)
 		q.pool.syncTargetToQueues()
-		// reserve's slow path may hold limMu. An excess reservation does not
-		// free usable capacity at this limit, so there is no waiter to wake.
-		return false
+		// Concurrent ACKs may have freed capacity since the rejected live
+		// snapshot. Retry so that we either use that capacity or observe an
+		// actually full cap; returning now could leave another waiter asleep
+		// while capacity is idle. reserve's slow path may hold limMu, so
+		// waking waiters here would reenter that mutex.
+		var ok bool
+		live, ok = q.tryReserveLive()
+		if !ok {
+			return false
+		}
 	}
-	return true
 }
 
 // reserve takes one unit of this queue's live-event budget, blocking until the
