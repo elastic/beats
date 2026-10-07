@@ -1,0 +1,314 @@
+[role="xpack"]
+
+:type: azure-eventhub
+
+[id="{beatname_lc}-input-{type}"]
+=== Azure eventhub input
+
+++++
+<titleabbrev>Azure Event Hub</titleabbrev>
+++++
+
+Users can make use of the `azure-eventhub` input in order to read messages from an azure eventhub.
+The azure-eventhub input implementation is based on the the event processor host (EPH is intended to be run across multiple processes and machines while load balancing message consumers more on this here https://github.com/Azure/azure-event-hubs-go#event-processor-host, https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-event-processor-host).
+State such as leases on partitions and checkpoints in the event stream are shared between receivers using an Azure Storage container. For this reason, as a prerequisite to using this input, users will have to create or use an existing storage account.
+
+Users can enable internal logs tracing for this input by setting the environment
+variable `BEATS_AZURE_EVENTHUB_INPUT_TRACING_ENABLED: true`. When enabled,
+this input will log additional information to the logs. Additional information
+includes partition ownership, blob lease information, and other internal state.
+
+
+== Example configurations
+
+=== Connection string authentication (processor v1)
+
+NOTE: Processor v1 only supports connection string authentication.
+
+Example configuration using connection string authentication with processor v1:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: azure-eventhub
+  eventhub: "insights-operational-logs"
+  consumer_group: "$Default"
+  connection_string: "Endpoint=sb://your-namespace.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=your-shared-access-key"
+  storage_account: "your-storage-account"
+  storage_account_key: "your-storage-account-key"
+  storage_account_container: "your-storage-container"
+  processor_version: "v1"
+----
+
+=== Connection string authentication (processor v2)
+
+Example configuration using connection string authentication with processor v2:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: azure-eventhub
+  eventhub: "insights-operational-logs"
+  consumer_group: "$Default"
+  auth_type: "connection_string"
+  connection_string: "Endpoint=sb://your-namespace.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=your-shared-access-key"
+  storage_account: "your-storage-account"
+  storage_account_connection_string: "DefaultEndpointsProtocol=https;AccountName=your-storage-account;AccountKey=your-storage-account-key;EndpointSuffix=core.windows.net"
+  storage_account_container: "your-storage-container"
+----
+
+=== Client secret authentication (processor v2)
+
+Available since 8.19.10.
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: azure-eventhub
+  eventhub: "insights-operational-logs"
+  consumer_group: "$Default"
+  auth_type: "client_secret"
+  eventhub_namespace: "your-namespace.servicebus.windows.net"
+  tenant_id: "your-tenant-id"
+  client_id: "your-client-id"
+  client_secret: "your-client-secret"
+  storage_account: "your-storage-account"
+  storage_account_container: "your-storage-container"
+----
+
+NOTE: When using `client_secret` authentication, the service principal must have the appropriate Azure RBAC permissions. See <<_required_permissions,Required permissions>> for details.
+
+=== Managed identity authentication (processor v2)
+
+Available since 8.19.12.
+
+Example configuration using Azure Managed Identity authentication with processor v2. This is ideal for workloads running on Azure VMs, Azure Container Apps, Azure Kubernetes Service (AKS), or other Azure services that support managed identities.
+
+*System-assigned managed identity:*
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: azure-eventhub
+  eventhub: "insights-operational-logs"
+  consumer_group: "$Default"
+  auth_type: "managed_identity"
+  eventhub_namespace: "your-namespace.servicebus.windows.net"
+  storage_account: "your-storage-account"
+  storage_account_container: "your-storage-container"
+----
+
+*User-assigned managed identity:*
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: azure-eventhub
+  eventhub: "insights-operational-logs"
+  consumer_group: "$Default"
+  auth_type: "managed_identity"
+  eventhub_namespace: "your-namespace.servicebus.windows.net"
+  managed_identity_client_id: "your-user-assigned-identity-client-id"
+  storage_account: "your-storage-account"
+  storage_account_container: "your-storage-container"
+----
+
+NOTE: When using `managed_identity` authentication, the managed identity must have the appropriate Azure RBAC permissions. Refer to <<_required_permissions,Required permissions>> for details.
+
+== Authentication
+
+The azure-eventhub input supports multiple authentication methods. The <<_auth_type,`auth_type` configuration option>> controls the authentication method used for both Event Hub and Storage Account.
+
+=== Authentication types
+
+The following authentication types are supported:
+
+- *`connection_string`* (default if `auth_type` is not specified): Uses Azure Event Hubs and Storage Account connection strings.
+
+- *`client_secret`*: Uses Azure Active Directory service principal with client secret credentials. Available since 8.19.10.
+
+- *`managed_identity`*: Uses Azure Managed Identity. Supports both system-assigned and user-assigned managed identities. Available since 8.19.12.
+
+=== Required permissions
+
+When using `client_secret` or `managed_identity` authentication, the identity (service principal or managed identity) needs the following Azure RBAC permissions:
+
+**For Azure Event Hubs:**
+
+- `Azure Event Hubs Data Receiver` role on the Event Hubs namespace or Event Hub
+
+- Alternatively, a custom role with the following permissions:
+
+  - `Microsoft.EventHub/namespaces/eventhubs/read`
+
+  - `Microsoft.EventHub/namespaces/eventhubs/consumergroups/read`
+
+**For Azure Storage Account:**
+
+- `Storage Blob Data Contributor` role on the Storage Account or container
+
+- Alternatively, a custom role with the following permissions:
+
+  - `Microsoft.Storage/storageAccounts/blobServices/containers/read`
+
+  - `Microsoft.Storage/storageAccounts/blobServices/containers/write`
+
+  - `Microsoft.Storage/storageAccounts/blobServices/containers/delete`
+
+  - `Microsoft.Storage/storageAccounts/blobServices/generateUserDelegationKey/action`
+
+For detailed instructions on how to set up an Azure AD service principal and configure permissions, refer to the official Microsoft documentation:
+
+- https://learn.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli[Create an Azure service principal with Azure CLI]
+
+- https://learn.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal[Create an Azure AD app registration using the Azure portal]
+
+- https://learn.microsoft.com/en-us/azure/role-based-access-control/role-assignments-cli[Assign Azure roles using Azure CLI]
+
+- https://learn.microsoft.com/en-us/azure/event-hubs/authorize-access-azure-active-directory[Azure Event Hubs authentication and authorization]
+
+- https://learn.microsoft.com/en-us/azure/storage/blobs/authorize-access-azure-active-directory[Authorize access to blobs using Azure Active Directory]
+
+== Configuration options
+
+The `azure-eventhub` input supports the following configuration options:
+
+=== `eventhub`
+
+The name of the eventhub users would like to read from, field required.
+
+=== `consumer_group`
+
+Optional, we recommend using a dedicated consumer group for the azure input. Reusing consumer groups among non-related consumers can cause unexpected behavior and possibly lost events.
+
+=== `auth_type`
+Specifies the authentication method to use for both Event Hub and Storage Account. If not specified, defaults to `connection_string` for backwards compatibility.
+
+Valid values include:
+
+-  *`connection_string`* (default): Uses connection string authentication. You _must_ provide a `connection_string`.
+-  *`client_secret`*: Uses Azure Active Directory service principal with client secret credentials. Available since 8.19.10.
+-  *`managed_identity`*: Uses Azure Managed Identity. Ideal for workloads running on Azure infrastructure. Available since 8.19.12.
+
+=== `connection_string`
+
+The connection string required to communicate with Event Hubs when using `connection_string` authentication. For more information, refer to https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string[Get an Azure Event Hubs connection string].
+
+This option is required if:
+
+* `auth_type` is set to `connection_string`
+* `auth_type` is not specified (in which case it defaults to `connection_string` for backwards compatibility)
+
+=== `eventhub_namespace`
+The fully qualified namespace for the Event Hub. Required when using credential-based authentication methods (such as `client_secret` or `managed_identity`). Not required when using `connection_string` authentication, as the namespace is embedded in the connection string. Format: `your-eventhub-namespace.servicebus.windows.net`
+
+=== `tenant_id`
+The Azure Active Directory tenant ID. Required when using `client_secret` authentication for Event Hub or Storage Account.
+
+=== `client_id`
+The Azure Active Directory application (client) ID. Required when using `client_secret` authentication for Event Hub or Storage Account.
+
+=== `client_secret`
+The Azure Active Directory application client secret. Required when using `client_secret` authentication for Event Hub or Storage Account.
+
+=== `managed_identity_client_id`
+
+Available since 8.19.12.
+
+The client ID of a user-assigned managed identity. Optional when using `managed_identity` authentication. If not specified, the system-assigned managed identity is used.
+
+Use this option when:
+
+* Your Azure resource has multiple user-assigned managed identities and you need to specify which one to use.
+* You want to use a user-assigned managed identity instead of the system-assigned managed identity.
+
+=== `authority_host`
+The Azure Active Directory authority host. Optional when using `client_secret` or `managed_identity` authentication. Defaults to Azure Public Cloud (`https://login.microsoftonline.com`).
+
+Supported values:
+
+* `https://login.microsoftonline.com` (Azure Public Cloud - default)
+* `https://login.microsoftonline.us` (Azure Government)
+* `https://login.chinacloudapi.cn` (Azure China)
+
+==== `storage_account`
+
+The name of the storage account. Required.
+
+==== `storage_account_key`
+
+The storage account key, this key will be used to authorize access to data in your storage account, option is required.
+
+==== `storage_account_container`
+
+Optional, the name of the storage account container you would like to store the offset information in.
+
+==== `resource_manager_endpoint`
+
+Optional, by default we are using the azure public environment, to override, users can provide a specific resource manager endpoint in order to use a different azure environment.
+Ex:
+https://management.chinacloudapi.cn/ for azure ChinaCloud
+https://management.microsoftazure.de/ for azure GermanCloud
+https://management.azure.com/ for azure PublicCloud
+https://management.usgovcloudapi.net/ for azure USGovernmentCloud
+Users can also use this in case of a Hybrid Cloud model, where one may define their own endpoints.
+
+This option applies to processor v1 only. Processor v2 derives the storage endpoint suffix from `authority_host` instead.
+
+==== `transport`
+
+The transport protocol for the Event Hub connection. Default is `amqp`.
+
+Valid values:
+
+* `amqp` (default): standard AMQP 1.0 over TCP port 5671.
+* `websocket`: AMQP-over-WebSocket on port 443. Use this when connecting through HTTP proxies or firewalls that block port 5671.
+
+WebSocket transport requires processor v2. If `processor_version` is set to `v1`, validation rejects the configuration.
+
+==== `proxy_url`
+
+URL of the HTTP proxy to use for outbound connections. Requires processor v2. Applies to the WebSocket Event Hub connection (when `transport` is `websocket`), blob storage requests, and Entra ID credential requests. When unset, proxy configuration falls back to the `HTTPS_PROXY` and `NO_PROXY` environment variables.
+
+NOTE: When `transport` is `amqp`, the AMQP connection to Event Hub on port 5671 does not use the proxy. Blob storage and Entra ID requests still use it. Set `transport` to `websocket` for full proxy support.
+
+==== `proxy_disable`
+
+If `true`, all proxy settings are ignored, including `proxy_url` and the `HTTPS_PROXY` environment variable. Requires processor v2. Default is `false`.
+
+==== `processor_version`
+
+Controls which event processor implementation to use. Default is `v1`.
+
+Valid values:
+
+* `v1` (default): legacy processor based on the older Azure Event Hub SDK.
+* `v2`: modern processor based on the current Azure Event Hub SDK.
+
+Switching from v1 to v2 changes the checkpoint storage layout. Existing v1 checkpoints are migrated automatically on first v2 start. Going back to v1 afterwards resumes from stale v1 checkpoints and may cause duplicate events.
+
+==== `storage_account_connection_string`
+
+The connection string for the storage account used for checkpoint storage (processor v2 only). When not set, the input attempts to construct it from `storage_account` and `storage_account_key` if both are present.
+
+When using `client_secret` or `managed_identity` authentication with processor v2, this option is not needed — the storage account uses the same credentials as Event Hub.
+
+[float]
+=== Metrics
+
+This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/inputs` path. They can be used to
+observe the activity of the input.
+
+[options="header"]
+|=======
+| Metric                       | Description
+| `received_messages_total`    | Number of messages received from the event hub.
+| `received_bytes_total`       | Number of bytes received from the event hub.
+| `sanitized_messages_total`   | Number of messages that were sanitized successfully.
+| `processed_messages_total`   | Number of messages that were processed successfully.
+| `received_events_total`      | Number of events received decoding messages.
+| `sent_events_total`          | Number of events that were sent successfully. 
+| `processing_time`            | Histogram of the elapsed processing times in nanoseconds.
+| `decode_errors_total`        | Number of errors that occurred while decoding a message.
+|=======
