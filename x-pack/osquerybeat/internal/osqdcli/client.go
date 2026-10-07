@@ -16,8 +16,9 @@ import (
 
 	"golang.org/x/sync/semaphore"
 
-	"github.com/osquery/osquery-go"
+	"github.com/apache/thrift/lib/go/thrift"
 	genosquery "github.com/osquery/osquery-go/gen/osquery"
+	"github.com/osquery/osquery-go/transport"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -67,7 +68,7 @@ type Client struct {
 
 	log *logp.Logger
 
-	cli *osquery.ExtensionManagerClient
+	cli *rpcClient
 	mx  sync.Mutex
 
 	cache Cache[string, map[string]string]
@@ -156,7 +157,7 @@ func (c *Client) reconnect(ctx context.Context) error {
 	return nil
 }
 
-func (c *Client) connectWithRetry(ctx context.Context, timeout time.Duration) (cli *osquery.ExtensionManagerClient, err error) {
+func (c *Client) connectWithRetry(ctx context.Context, timeout time.Duration) (cli *rpcClient, err error) {
 	var retryLog *logp.Logger
 	if c.log != nil {
 		retryLog = c.log.With("context", "osquery client connect")
@@ -175,7 +176,7 @@ func (c *Client) connectWithRetry(ctx context.Context, timeout time.Duration) (c
 			return err
 		}
 		var connErr error
-		cli, connErr = osquery.NewClient(c.socketPath, timeout)
+		cli, connErr = newRPCClient(c.socketPath, timeout)
 		if connErr != nil {
 			if r.log != nil {
 				r.log.Warnf("failed to connect, reconnect might be attempted, err: %v", connErr)
@@ -389,7 +390,7 @@ func resolveHitTypes(hit, colTypes map[string]string) map[string]any {
 // closeOnCancellation interrupts an RPC transport read, which thrift does not
 // otherwise cancel when its context ends. Joining the callback keeps the normal
 // deferred Close from racing with the cancellation Close.
-func closeOnCancellation(ctx context.Context, cli *osquery.ExtensionManagerClient) func() {
+func closeOnCancellation(ctx context.Context, cli *rpcClient) func() {
 	done := make(chan struct{})
 	stop := context.AfterFunc(ctx, func() { cli.Close(); close(done) })
 	return func() {
@@ -397,4 +398,29 @@ func closeOnCancellation(ctx context.Context, cli *osquery.ExtensionManagerClien
 			<-done
 		}
 	}
+}
+
+// rpcClient owns its transport so cancellation can close it directly. The
+// osquery-go Close method probes IsOpen first, which can wait behind the very
+// transport read cancellation needs to interrupt. Client's semaphore and mutex
+// already serialize these RPC calls, so an additional socket locker is unneeded.
+type rpcClient struct {
+	client    *genosquery.ExtensionManagerClient
+	transport thrift.TTransport
+}
+
+func newRPCClient(socketPath string, timeout time.Duration) (*rpcClient, error) {
+	conn, err := transport.Open(socketPath, timeout)
+	if err != nil {
+		return nil, err
+	}
+	return &rpcClient{client: genosquery.NewExtensionManagerClientFactory(conn, thrift.NewTBinaryProtocolFactoryDefault()), transport: conn}, nil
+}
+
+func (c *rpcClient) Close() { _ = c.transport.Close() }
+func (c *rpcClient) QueryContext(ctx context.Context, sql string) (*genosquery.ExtensionResponse, error) {
+	return c.client.Query(ctx, sql)
+}
+func (c *rpcClient) GetQueryColumnsContext(ctx context.Context, sql string) (*genosquery.ExtensionResponse, error) {
+	return c.client.GetQueryColumns(ctx, sql)
 }
