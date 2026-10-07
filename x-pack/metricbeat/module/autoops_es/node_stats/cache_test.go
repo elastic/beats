@@ -272,8 +272,6 @@ func TestEnrichNodeStatsWithCachedValuesWithHoles(t *testing.T) {
 	}
 }
 
-<<<<<<< HEAD
-=======
 func makeCgroupNodeStats(usageNanos, periods, quotaMicros int64) mapstr.M {
 	return mapstr.M{
 		"os": mapstr.M{
@@ -458,30 +456,6 @@ func TestEnrichNodeStatsCgroupCpuUsagePercentQuickCheck(t *testing.T) {
 	require.NoError(t, quick.Check(property, nil))
 }
 
-func TestEnrichNodeStatsGaugeDecreaseWritesNilIngestRate(t *testing.T) {
-	initCache(getNodeStats(), 10)
-
-	nodeStatsMap := getNodeStats()
-	for key, nodeStats := range nodeStatsMap {
-		nodeStats["indices.docs.count"] = getValue(&nodeStats, "indices.docs.count") - 10
-		nodeStats["indices.store.size_in_bytes"] = getValue(&nodeStats, "indices.store.size_in_bytes") - 20
-		nodeStats["indices.bulk.total_operations"] = getValue(&nodeStats, "indices.bulk.total_operations") + 50
-		nodeStats["indices.bulk.total_size_in_bytes"] = getValue(&nodeStats, "indices.bulk.total_size_in_bytes") + 100
-		nodeStatsMap[key] = nodeStats
-	}
-
-	for key, nodeStats := range nodeStatsMap {
-		enrichNodeStats(key, &nodeStats, 10_000)
-		// gauge-backed rates are nil on decrease (not written)
-		require.Nil(t, nodeStats["ingest_docs_per_second"])
-		require.Nil(t, nodeStats["ingest_bytes_per_second"])
-		// counter-backed rates still report correctly
-		require.EqualValues(t, 5, nodeStats["bulk_operations_per_second"])
-		require.EqualValues(t, 10, nodeStats["bulk_bytes_per_second"])
-	}
-}
-
->>>>>>> c8c9915 (autoops_es/node_stats: derive os.cgroup.cpu.usage_percent from CFS quota counters (#53140))
 func TestEnrichNodeIndexShardsWithCachedValuesWithNewNodeAndIndex(t *testing.T) {
 	// 10s ago cache
 	initCache(getNodeStats(), 10)
