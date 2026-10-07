@@ -9,10 +9,14 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"os"
+	"os/exec"
+	"strconv"
 	"syscall"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestIsRecoverableOsqueryError(t *testing.T) {
@@ -93,4 +97,33 @@ func TestIsRecoverableOsqueryError(t *testing.T) {
 			assert.Equal(t, tc.want, isRecoverableOsqueryError(tc.err), "unexpected recoverability for %v", tc.err)
 		})
 	}
+}
+
+func TestOsqueryExitHelper(t *testing.T) {
+	if code := os.Getenv("OSQUERY_TEST_EXIT"); code != "" {
+		value, err := strconv.Atoi(code)
+		if err != nil {
+			os.Exit(2)
+		}
+		os.Exit(value)
+	}
+}
+
+func osqueryExitError(t *testing.T, code int) error {
+	t.Helper()
+	command := exec.Command(os.Args[0], "-test.run=^TestOsqueryExitHelper$")
+	command.Env = append(os.Environ(), "OSQUERY_TEST_EXIT="+strconv.Itoa(code))
+	err := command.Run()
+	require.Error(t, err, "helper must exit unsuccessfully")
+	var exitError *exec.ExitError
+	require.ErrorAs(t, err, &exitError, "helper must produce a real process exit error")
+	return err
+}
+
+func TestRecoverableOsqueryProcessExit(t *testing.T) {
+	exit78 := osqueryExitError(t, 78)
+	assert.True(t, isRecoverableOsqueryError(fmt.Errorf("run: %w", exit78)), "wrapped EX_CONFIG logger shutdown must recover")
+	assert.False(t, isRecoverableOsqueryError(osqueryExitError(t, 1)), "unclassified process exits must remain terminal")
+	assert.False(t, isRecoverableOsqueryError(errors.Join(context.Canceled, exit78)), "cancellation must take precedence over process exit")
+	assert.True(t, isRecoverableOsqueryError(ErrOsquerydExited), "unexpected successful process exit must recover")
 }

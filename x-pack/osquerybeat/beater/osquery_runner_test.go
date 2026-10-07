@@ -7,6 +7,7 @@ package beater
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -18,6 +19,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -382,4 +384,165 @@ func TestOsqueryRunnerReturnsUnrecoverableError(t *testing.T) {
 
 	err := waitGroupWithTimeout(t.Context(), g, 10*time.Second)
 	require.ErrorIs(t, err, wantErr, "runner did not return the unrecoverable error")
+}
+
+func TestOsqueryRunnerBackoffKeepsLatestConfigurationAndStatus(t *testing.T) {
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+	runner := newOsqueryRunner(logptest.NewTestingLogger(t, "runner"))
+	runner.retryInitial = 100 * time.Millisecond
+	runner.retryMax = 200 * time.Millisecond
+	reports := make(chan status.Status, 10)
+	runner.reportStatus = func(s status.Status, _ string) { reports <- s }
+	second := make(chan runnerInput, 1)
+	releaseReady := make(chan struct{})
+	var runs atomic.Int32
+	exitErr := osqueryExitError(t, 78)
+	run := func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, inputs <-chan runnerInput) error {
+		if runs.Add(1) == 1 {
+			return fmt.Errorf("osqueryd: %w", exitErr)
+		}
+		select {
+		case input := <-inputs:
+			second <- input
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+		select {
+		case <-releaseReady:
+			notifyOsqueryReady(ctx)
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+		<-ctx.Done()
+		return ctx.Err()
+	}
+	done := make(chan error, 1)
+	go func() { done <- runner.Run(ctx, run) }()
+	require.NoError(t, runner.Update(ctx, []config.InputConfig{{Name: "old"}}), "first run must start")
+	require.Equal(t, status.Configuring, <-reports, "initial start must be configuring")
+	require.Equal(t, status.Degraded, <-reports, "recoverable exit must report degradation")
+	require.NoError(t, runner.updateGeneration(ctx, []config.InputConfig{{Name: "latest"}}, 42), "policy update must remain available during backoff")
+	select {
+	case input := <-second:
+		assert.Equal(t, "latest", input.inputs[0].Name, "restart must use the latest policy")
+		assert.Equal(t, uint64(42), input.generation, "restart must preserve the policy generation")
+	case <-time.After(time.Second):
+		t.Fatal("osquery was not restarted")
+	}
+	select {
+	case s := <-reports:
+		t.Errorf("status changed before readiness: %v", s)
+	default:
+	}
+	close(releaseReady)
+	select {
+	case s := <-reports:
+		assert.Equal(t, status.Running, s, "running must follow successful configuration application")
+	case <-time.After(time.Second):
+		t.Fatal("ready run did not restore running status")
+	}
+	cancel()
+	select {
+	case err := <-done:
+		assert.ErrorIs(t, err, context.Canceled, "shutdown must cancel the runner")
+	case <-time.After(time.Second):
+		t.Fatal("runner did not shut down")
+	}
+}
+
+func TestOsqueryRunnerRepeatedCrashesBackOff(t *testing.T) {
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+	runner := newOsqueryRunner(logptest.NewTestingLogger(t, "runner"))
+	runner.retryInitial = 20 * time.Millisecond
+	runner.retryMax = 80 * time.Millisecond
+	started := make(chan time.Time, 4)
+	done := make(chan error, 1)
+	go func() {
+		done <- runner.Run(ctx, func(context.Context, osqd.Flags, config.ExtensionsConfig, <-chan runnerInput) error {
+			started <- time.Now()
+			return errors.New("write: broken pipe")
+		})
+	}()
+	require.NoError(t, runner.Update(ctx, nil), "runner must start")
+	var previous time.Time
+	for i, minimum := range []time.Duration{0, 15 * time.Millisecond, 30 * time.Millisecond, 60 * time.Millisecond} {
+		select {
+		case now := <-started:
+			if i > 0 {
+				assert.GreaterOrEqual(t, now.Sub(previous), minimum, "repeated failures must increase restart delay")
+			}
+			previous = now
+		case <-time.After(time.Second):
+			t.Fatal("backoff run did not start")
+		}
+	}
+	cancel()
+	select {
+	case err := <-done:
+		assert.ErrorIs(t, err, context.Canceled, "backoff must be cancellable")
+	case <-time.After(time.Second):
+		t.Fatal("shutdown waited for the retry timer")
+	}
+}
+
+func TestOsqueryRunnerIgnoresReadinessFromPreviousRun(t *testing.T) {
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+	runner := newOsqueryRunner(logptest.NewTestingLogger(t, "runner"))
+	reports := make(chan status.Status, 10)
+	runner.reportStatus = func(s status.Status, _ string) { reports <- s }
+	firstReady := make(chan func(), 1)
+	second := make(chan struct{})
+	secondReady := make(chan func(), 1)
+	var runs atomic.Int32
+	done := make(chan error, 1)
+	go func() {
+		done <- runner.Run(ctx, func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, inputs <-chan runnerInput) error {
+			if runs.Add(1) == 1 {
+				firstReady <- ctx.Value(osqueryReadyKey{}).(func())
+			} else {
+				secondReady <- ctx.Value(osqueryReadyKey{}).(func())
+				close(second)
+			}
+			for {
+				select {
+				case <-ctx.Done():
+					return ctx.Err()
+				case <-inputs:
+				}
+			}
+		})
+	}()
+	require.NoError(t, runner.Update(ctx, []config.InputConfig{{Osquery: &config.OsqueryConfig{Options: map[string]any{"thrift_timeout": 3}}}}), "first run must start")
+	staleReady := <-firstReady
+	require.NoError(t, runner.Update(ctx, []config.InputConfig{{Osquery: &config.OsqueryConfig{Options: map[string]any{"thrift_timeout": 4}}}}), "changed options must restart osquery")
+	select {
+	case <-second:
+	case <-time.After(time.Second):
+		t.Fatal("replacement run did not start")
+	}
+	staleReady()
+	time.Sleep(20 * time.Millisecond)
+	for len(reports) > 0 {
+		assert.NotEqual(t, status.Running, <-reports, "old readiness must not mark replacement healthy")
+	}
+	(<-secondReady)()
+	select {
+	case s := <-reports:
+		assert.Equal(t, status.Running, s, "current readiness must not be lost behind stale notification")
+	case <-time.After(time.Second):
+		t.Fatal("current readiness notification was lost")
+	}
+	cancel()
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+		t.Fatal("runner did not stop")
+	}
+	close(reports)
+	for s := range reports {
+		assert.NotEqual(t, status.Running, s, "old run readiness must not mark the replacement healthy")
+	}
 }

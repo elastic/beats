@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"net"
+	"os/exec"
 	"strings"
 	"syscall"
 )
@@ -35,6 +36,13 @@ const extensionPingFailed = "extension ping failed"
 func isRecoverableOsqueryError(err error) bool {
 	if err == nil || errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 		return false
+	}
+	var exitErr *exec.ExitError
+	if errors.As(err, &exitErr) {
+		return exitErr.ExitCode() == 78
+	}
+	if errors.Is(err, ErrOsquerydExited) {
+		return true
 	}
 	if isBrokenPipeOrEOFError(err) {
 		return true
