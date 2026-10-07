@@ -643,9 +643,8 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 	cache.Resize(configPlugin.Count())
 
 	// Create osquery logger plugin
-	loggerPlugin := NewLoggerPlugin(bt.log, func(res QueryResult) {
-		bt.handleQueryResult(ctx, cli, configPlugin, res)
-	})
+	loggerPlugin, stopResults := bt.newScheduledLogger(ctx, cli, configPlugin)
+	defer stopResults()
 
 	// Create recurrence query handler for scheduling queries with RRULE expressions
 	var rruleHandler *recurrenceQueryHandler
@@ -809,7 +808,7 @@ func (bt *osquerybeat) shouldLogClockSkewWarn(scheduleName string) bool {
 	return true
 }
 
-func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Client, configPlugin *ConfigPlugin, res QueryResult) {
+func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli scheduledQueryClient, configPlugin *ConfigPlugin, res QueryResult) {
 	ns, ok := configPlugin.LookupNamespace(res.Name)
 	if !ok {
 		bt.log.Debugf("failed to lookup query namespace: %s, the query was possibly removed recently from the schedule", res.Name)
@@ -997,4 +996,17 @@ func (bt *osquerybeat) unregisterActionHandler(b *beat.Beat, rah *resetableActio
 	if b.Manager != nil && rah != nil {
 		b.Manager.UnregisterAction(rah)
 	}
+}
+
+// scheduledQueryClient allows result handling to be exercised independently of
+// the transport while using the same osquery client in production.
+type scheduledQueryClient interface {
+	queryExecutor
+	ResolveResult(context.Context, string, []map[string]string) ([]map[string]any, error)
+}
+
+func (bt *osquerybeat) newScheduledLogger(ctx context.Context, cli scheduledQueryClient, configPlugin *ConfigPlugin) (*LoggerPlugin, func()) {
+	return NewLoggerPlugin(bt.log, func(res QueryResult) {
+		bt.handleQueryResult(ctx, cli, configPlugin, res)
+	}), func() {}
 }
