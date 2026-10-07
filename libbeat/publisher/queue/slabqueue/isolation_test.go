@@ -225,3 +225,28 @@ func TestReservationRechecksConcurrentCapReduction(t *testing.T) {
 		})
 	}
 }
+
+func TestDrainingQueueReferencesAreReleased(t *testing.T) {
+	for _, shutdown := range []bool{false, true} {
+		t.Run(map[bool]string{false: "last capped queue drains", true: "pool shuts down"}[shutdown], func(t *testing.T) {
+			pool := NewPool[int](Settings{Events: 2}, nil)
+			t.Cleanup(pool.Shutdown)
+			q := pool.Connect()
+			q.SetTarget(2)
+			p := q.Producer(queue.ProducerConfig{})
+			_, ok := p.TryPublish(1)
+			require.True(t, ok, "the receiver should admit its event")
+			b, err := q.Get(0)
+			require.NoError(t, err, "the event should remain in an output batch")
+			require.NoError(t, q.Close(false), "the last capped queue should begin draining")
+			require.Len(t, pool.draining, 1, "the pool should retain the draining contribution while output holds its event")
+			if shutdown {
+				pool.Shutdown()
+				assert.Empty(t, pool.draining, "shutdown should release capacity-accounting references even while output retains a batch")
+			}
+			assert.Equal(t, 1, b.Entry(0), "removing accounting references must preserve the output-owned event")
+			b.Done()
+			assert.Empty(t, pool.draining, "releasing the last batch should remove the draining reference even with no caps left")
+		})
+	}
+}

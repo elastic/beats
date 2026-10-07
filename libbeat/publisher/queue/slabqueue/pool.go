@@ -374,6 +374,9 @@ func (p *Pool[T]) Shutdown() {
 		// state and return instead of blocking forever.
 		p.free.wakeAll()
 		p.mu.Lock()
+		// Once shutdown stops admission there is no remaining capacity to
+		// reserve. Output batches own any live queues until they release.
+		clear(p.draining)
 		queues := make([]*Queue[T], 0, len(p.queues))
 		for q := range p.queues {
 			queues = append(queues, q)
@@ -411,11 +414,13 @@ func (p *Pool[T]) ConnectedQueues() int {
 func (p *Pool[T]) disconnect(q *Queue[T]) {
 	p.mu.Lock()
 	delete(p.queues, q)
-	if q.live.Load() > 0 {
+	if q.live.Load() > 0 && !p.isClosed() {
 		// A graceful close can still hold output batches or queued events.
 		// Keep their budget until they drain so they cannot consume the
 		// remaining receivers' configured capacity.
 		p.draining[q] = struct{}{}
+	} else {
+		delete(p.draining, q)
 	}
 	p.mu.Unlock()
 	p.syncTargetToQueues()
