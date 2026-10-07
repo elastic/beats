@@ -18,6 +18,7 @@
 package addagentmetadata
 
 import (
+	"sync"
 	"testing"
 	"time"
 
@@ -192,6 +193,42 @@ func TestAddAgentMetadata_PreservesExistingSubMaps(t *testing.T) {
 	assert.Equal(t, testCfg.DataStream.Dataset, ev["dataset"])
 }
 
+func TestAddAgentMetadata_EventsDoNotAliasCachedMaps(t *testing.T) {
+	p := New(testCfg)
+
+	first, err := p.Run(&beat.Event{Timestamp: time.Now(), Fields: mapstr.M{}})
+	require.NoError(t, err)
+	first.Fields["elastic_agent"].(mapstr.M)["id"] = "tampered" //nolint:errcheck //it's a test
+	first.Fields["data_stream"].(mapstr.M)["extra"] = "x"       //nolint:errcheck //it's a test
+	first.Meta["input_id"] = "tampered"
+
+	second, err := p.Run(&beat.Event{Timestamp: time.Now(), Fields: mapstr.M{}})
+	require.NoError(t, err)
+	assert.Equal(t, testCfg.ElasticAgent.ID, second.Fields["elastic_agent"].(mapstr.M)["id"]) //nolint:errcheck //it's a test
+	_, hasExtra := second.Fields["data_stream"].(mapstr.M)["extra"]                           //nolint:errcheck //it's a test
+	assert.False(t, hasExtra)
+	assert.Equal(t, testCfg.InputID, second.Meta["input_id"])
+}
+
+func TestAddAgentMetadata_ConcurrentRun(t *testing.T) {
+	p := New(testCfg)
+
+	var wg sync.WaitGroup
+	for range 8 {
+		wg.Go(func() {
+			for range 100 {
+				result, err := p.Run(&beat.Event{Timestamp: time.Now(), Fields: mapstr.M{}})
+				if !assert.NoError(t, err) {
+					return
+				}
+				result.Fields["elastic_agent"].(mapstr.M)["id"] = "tampered" //nolint:errcheck //it's a test
+				assert.Equal(t, testCfg.StreamID, result.Meta["stream_id"])
+			}
+		})
+	}
+	wg.Wait()
+}
+
 func TestAddAgentMetadata_FromConfig(t *testing.T) {
 	c, err := conf.NewConfigFrom(map[string]any{
 		"input_id":  "test-input",
@@ -241,31 +278,35 @@ func equivalentAddFieldsProcessors(cfg Config) *processors.Processors {
 			addfields.MakeFieldsProcessor("@metadata", mapstr.M{"input_id": cfg.InputID}, true))
 	}
 
-	procs.List = append(procs.List,
-		addfields.MakeFieldsProcessor("data_stream", mapstr.M{
-			"dataset":   cfg.DataStream.Dataset,
-			"namespace": cfg.DataStream.Namespace,
-			"type":      cfg.DataStream.Type,
-		}, true),
-		addfields.MakeFieldsProcessor("event", mapstr.M{
-			"dataset": cfg.DataStream.Dataset,
-		}, true),
-	)
+	if cfg.DataStream != nil {
+		procs.List = append(procs.List,
+			addfields.MakeFieldsProcessor("data_stream", mapstr.M{
+				"dataset":   cfg.DataStream.Dataset,
+				"namespace": cfg.DataStream.Namespace,
+				"type":      cfg.DataStream.Type,
+			}, true),
+			addfields.MakeFieldsProcessor("event", mapstr.M{
+				"dataset": cfg.DataStream.Dataset,
+			}, true),
+		)
+	}
 
 	if cfg.StreamID != "" {
 		procs.List = append(procs.List,
 			addfields.MakeFieldsProcessor("@metadata", mapstr.M{"stream_id": cfg.StreamID}, true))
 	}
 
-	procs.List = append(procs.List,
-		addfields.MakeFieldsProcessor("elastic_agent", mapstr.M{
-			"id":       cfg.ElasticAgent.ID,
-			"snapshot": cfg.ElasticAgent.Snapshot,
-			"version":  cfg.ElasticAgent.Version,
-		}, true),
-		addfields.MakeFieldsProcessor("agent", mapstr.M{
-			"id": cfg.ElasticAgent.ID,
-		}, true))
+	if cfg.ElasticAgent != nil {
+		procs.List = append(procs.List,
+			addfields.MakeFieldsProcessor("elastic_agent", mapstr.M{
+				"id":       cfg.ElasticAgent.ID,
+				"snapshot": cfg.ElasticAgent.Snapshot,
+				"version":  cfg.ElasticAgent.Version,
+			}, true),
+			addfields.MakeFieldsProcessor("agent", mapstr.M{
+				"id": cfg.ElasticAgent.ID,
+			}, true))
+	}
 
 	return procs
 }

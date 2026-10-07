@@ -18,6 +18,7 @@
 package dgram
 
 import (
+	"bytes"
 	"context"
 	"net"
 	"runtime"
@@ -40,9 +41,8 @@ type MetadataFunc func(net.Conn) inputsource.NetworkMetadata
 func DatagramReaderFactory(family inputsource.Family, logger *logp.Logger, callback inputsource.NetworkFunc) HandlerFactory {
 	return func(config ListenerConfig) ConnectionHandler {
 		return ConnectionHandler(func(ctx context.Context, conn net.PacketConn) error {
+			buffer := make([]byte, config.MaxMessageSize)
 			for ctx.Err() == nil {
-
-				buffer := make([]byte, config.MaxMessageSize)
 				// conn.SetDeadline(time.Now().Add(config.Timeout))
 
 				// If you are using Windows and you are using a fixed buffer and you get a datagram which
@@ -74,13 +74,13 @@ func DatagramReaderFactory(family inputsource.Family, logger *logp.Logger, callb
 					// On Windows send the current buffer and mark it as truncated.
 					// The buffer will have content but length will return 0, addr will be nil.
 					if family == inputsource.FamilyUDP && isLargerThanBuffer(err) {
-						callback(buffer, inputsource.NetworkMetadata{RemoteAddr: addr, Truncated: true})
+						callback(bytes.Clone(buffer), inputsource.NetworkMetadata{RemoteAddr: addr, Truncated: true})
 						continue
 					}
 				}
 
 				if length > 0 {
-					callback(buffer[:length], inputsource.NetworkMetadata{RemoteAddr: addr})
+					callback(bytes.Clone(buffer[:length]), inputsource.NetworkMetadata{RemoteAddr: addr})
 				}
 			}
 			logger.Debug("end of connection handling")
