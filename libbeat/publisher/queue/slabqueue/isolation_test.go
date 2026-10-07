@@ -195,3 +195,33 @@ func TestCappedQueuesResizeAndShutdownConcurrently(t *testing.T) {
 	assert.LessOrEqual(t, consumed.Load(), published.Load(), "shutdown must never deliver unpublished events")
 	assert.Equal(t, 0, pool.ConnectedQueues(), "shutdown should disconnect every receiver")
 }
+
+func TestReservationRechecksConcurrentCapReduction(t *testing.T) {
+	for _, oldCap := range []int{0, 4} {
+		t.Run(map[int]string{0: "uncapped", 4: "capped"}[oldCap], func(t *testing.T) {
+			pool := NewPool[int](Settings{Events: 4}, nil)
+			t.Cleanup(pool.Shutdown)
+			q := pool.Connect()
+			q.SetTarget(oldCap)
+			healthy := pool.Connect()
+			healthy.SetTarget(2)
+			p := q.Producer(queue.ProducerConfig{})
+			_, ok := p.TryPublish(1)
+			require.True(t, ok, "the first event should be admitted before the cap changes")
+
+			// Reproduce a producer that already read oldCap: SetTarget scans
+			// the old live count, then that producer increments it. Neither
+			// the CAS nor the uncapped Add path may acquire a pool slot now.
+			q.SetTarget(1)
+			reserved := q.live.Add(1)
+			assert.False(t, q.validateReservation(reserved), "a stale admission above the new cap must roll back")
+			assert.Equal(t, int64(1), q.live.Load(), "rollback should restore the original live count")
+			assert.Equal(t, 3, pool.Target(), "the rolled-back reservation must not leave an inflated budget")
+			p2 := healthy.Producer(queue.ProducerConfig{})
+			for i := range 2 {
+				_, ok := p2.TryPublish(100 + i)
+				assert.True(t, ok, "the sibling should retain every configured slot after the stale reservation")
+			}
+		})
+	}
+}

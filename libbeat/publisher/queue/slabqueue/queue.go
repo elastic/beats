@@ -146,17 +146,31 @@ func (q *Queue[T]) tryReserve() bool {
 	for {
 		lim := q.limit.Load()
 		if lim <= 0 {
-			q.live.Add(1)
-			return true
+			return q.validateReservation(q.live.Add(1))
 		}
 		cur := q.live.Load()
 		if cur >= lim {
 			return false
 		}
 		if q.live.CompareAndSwap(cur, cur+1) {
-			return true
+			return q.validateReservation(cur + 1)
 		}
 	}
+}
+
+// SetTarget can lower the cap after tryReserve reads it but before its live
+// increment. Recheck before acquiring a pool slot, so that stale admission
+// cannot use capacity reserved for another queue. Conversely, a reduction
+// after this check sees the increment when it computes retained backlog.
+func (q *Queue[T]) validateReservation(live int64) bool {
+	if limit := q.limit.Load(); limit > 0 && live > limit {
+		q.live.Add(-1)
+		q.pool.syncTargetToQueues()
+		// reserve's slow path may hold limMu. An excess reservation does not
+		// free usable capacity at this limit, so there is no waiter to wake.
+		return false
+	}
+	return true
 }
 
 // reserve takes one unit of this queue's live-event budget, blocking until the
