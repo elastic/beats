@@ -207,12 +207,12 @@ func (bt *osquerybeat) init() (context.Context, error) {
 func (bt *osquerybeat) close() {
 	bt.mx.Lock()
 	defer bt.mx.Unlock()
-	if bt.pub != nil {
-		bt.pub.Close()
-	}
 	if bt.cancel != nil {
 		bt.cancel()
 		bt.cancel = nil
+	}
+	if bt.pub != nil {
+		bt.pub.Close()
 	}
 
 	// Start watching the parent process.

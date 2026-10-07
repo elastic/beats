@@ -42,3 +42,23 @@ func TestPublisherAllStreamsUseNonblockingAdmission(t *testing.T) {
 		assert.Equal(t, beat.DropIfFull, cfg.PublishMode, "no osquery stream may block on output queue admission")
 	}
 }
+
+func TestPublisherAdmissionLossIsObservable(t *testing.T) {
+	pipeline := &publisherTestPipeline{}
+	p := New(&beat.Beat{Publisher: pipeline}, logptest.NewTestingLogger(t, "publisher"))
+	defer p.Close()
+	require.NoError(t, p.Configure([]config.InputConfig{
+		{Datastream: config.DatastreamConfig{Dataset: config.DefaultDataset}},
+		{Datastream: config.DatastreamConfig{Dataset: config.DefaultActionResponsesDataset}},
+		{Datastream: config.DatastreamConfig{Dataset: config.DefaultQueryProfileDataset}},
+	}), "all publisher streams must be configured")
+	for i, stream := range []string{config.DefaultDataset, config.DefaultActionResponsesDataset, config.DefaultQueryProfileDataset} {
+		listener := pipeline.configs[i].ClientListener
+		require.NotNil(t, listener, "queue admission outcomes must be observed for %s", stream)
+		listener.Published()
+		listener.DroppedOnPublish(beat.Event{})
+		listener.DroppedOnPublish(beat.Event{})
+		assert.Equal(t, uint64(1), p.listeners[stream].published.Get(), "accepted events must be counted")
+		assert.Equal(t, uint64(2), p.listeners[stream].dropped.Get(), "rejected events must be counted separately")
+	}
+}

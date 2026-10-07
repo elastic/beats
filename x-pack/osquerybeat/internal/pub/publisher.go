@@ -6,6 +6,7 @@ package pub
 
 import (
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -16,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -37,13 +39,21 @@ type Publisher struct {
 	// client for osquery_manager.query_profile
 	queryProfileClient    beat.Client
 	profileDropWarnLogged bool
+	listeners             map[string]*publicationListener
 }
 
 func New(b *beat.Beat, log *logp.Logger) *Publisher {
-	return &Publisher{
-		b:   b,
-		log: log,
+	reg := monitoring.NewRegistry()
+	if b.Monitoring.StatsRegistry() != nil {
+		reg = b.Monitoring.StatsRegistry()
 	}
+	reg = reg.GetOrCreateRegistry("osquerybeat.publishing")
+	p := &Publisher{b: b, log: log, listeners: make(map[string]*publicationListener)}
+	for _, stream := range []string{config.DefaultDataset, config.DefaultActionResponsesDataset, config.DefaultQueryProfileDataset} {
+		streamReg := reg.GetOrCreateRegistry(stream)
+		p.listeners[stream] = &publicationListener{log: log, stream: stream, published: monitoring.NewUint(streamReg, "accepted"), dropped: monitoring.NewUint(streamReg, "dropped")}
+	}
+	return p
 }
 
 func (p *Publisher) Configure(inputs []config.InputConfig) error {
@@ -66,6 +76,8 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 		p.log.Debugf("Connect publisher for %s with processors: %d", config.DefaultDataset, len(processors.All()))
 		// Connect publisher
 		client, err := p.b.Publisher.ConnectWith(beat.ClientConfig{
+			PublishMode:    beat.DropIfFull,
+			ClientListener: p.listeners[config.DefaultDataset],
 			Processing: beat.ProcessingConfig{
 				Processor: processors,
 			},
@@ -93,6 +105,8 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 		p.log.Debugf("Connect publisher for %s with processors: %d", config.DefaultActionResponsesDataset, len(processors.All()))
 		// Connect publisher
 		client, err := p.b.Publisher.ConnectWith(beat.ClientConfig{
+			PublishMode:    beat.DropIfFull,
+			ClientListener: p.listeners[config.DefaultActionResponsesDataset],
 			Processing: beat.ProcessingConfig{
 				Processor: processors,
 			},
@@ -131,6 +145,8 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 		}
 		p.log.Debugf("Connect publisher for %s with processors: %d", config.DefaultQueryProfileDataset, len(processors.All()))
 		client, err := p.b.Publisher.ConnectWith(beat.ClientConfig{
+			PublishMode:    beat.DropIfFull,
+			ClientListener: p.listeners[config.DefaultQueryProfileDataset],
 			Processing: beat.ProcessingConfig{
 				Processor: processors,
 			},
@@ -157,11 +173,15 @@ func (p *Publisher) Publish(index, idValue, idFieldKey, responseID, spaceID, pac
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
+	if p.client == nil {
+		return
+	}
+
 	for _, hit := range hits {
 		event := hitToEvent(index, p.b.Info.Name, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName, meta, hit, ecsm, reqData)
 		p.client.Publish(event)
 	}
-	p.log.Infof("%d events sent to index %s", len(hits), index)
+	p.log.Debugf("%d events submitted to publisher for index %s", len(hits), index)
 }
 
 func (p *Publisher) Close() {
@@ -193,7 +213,7 @@ func (p *Publisher) PublishActionResult(req map[string]any, res map[string]any) 
 
 	fields := actionResultToEvent(req, res)
 
-	p.log.Debugf("Action response event is sent, fields: %#v", fields)
+	p.log.Debugf("Action response event submitted, fields: %#v", fields)
 
 	p.publishActionResponseEvent(fields, time.Now())
 }
@@ -238,7 +258,7 @@ func (p *Publisher) PublishScheduledResponse(scheduleID, packID, packName, query
 		fields["space_id"] = spaceID
 	}
 
-	p.log.Debugf("Scheduled response event sent, schedule_id=%s, schedule_execution_count=%d", scheduleID, scheduleExecutionCount)
+	p.log.Debugf("Scheduled response event submitted, schedule_id=%s, schedule_execution_count=%d", scheduleID, scheduleExecutionCount)
 	eventTimestamp := completedAt
 	if eventTimestamp.Before(plannedScheduleTime) {
 		eventTimestamp = plannedScheduleTime
@@ -276,7 +296,7 @@ func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID, 
 		event.Meta = mapstr.M{events.FieldMetaRawIndex: index}
 	}
 
-	p.log.Debugf("Query profile event is sent, fields: %#v", fields)
+	p.log.Debugf("Query profile event submitted, fields: %#v", fields)
 
 	p.queryProfileClient.Publish(event)
 }
@@ -446,4 +466,27 @@ func hitToEvent(index, eventType, idValue, idFieldKey, responseID, spaceID, pack
 	}
 
 	return event
+}
+
+// publicationListener reports queue admission, which Client.Publish cannot
+// return to its caller. Accepted events may still fail downstream delivery.
+type publicationListener struct {
+	log                *logp.Logger
+	stream             string
+	published, dropped *monitoring.Uint
+	lastWarning        atomic.Int64
+}
+
+func (*publicationListener) Closing()     {}
+func (*publicationListener) Closed()      {}
+func (*publicationListener) NewEvent()    {}
+func (*publicationListener) Filtered()    {}
+func (l *publicationListener) Published() { l.published.Inc() }
+func (l *publicationListener) DroppedOnPublish(beat.Event) {
+	l.dropped.Inc()
+	now := time.Now().UnixNano()
+	last := l.lastWarning.Load()
+	if now-last >= int64(time.Minute) && l.lastWarning.CompareAndSwap(last, now) {
+		l.log.Warnf("Osquery event dropped during publisher queue admission for %s; see osquerybeat.publishing monitoring counters", l.stream)
+	}
 }
