@@ -39,9 +39,9 @@ var _ outputController = (*otelOutputController)(nil)
 
 // otelOutputController is the per-pipeline outputController for a Beat
 // receiver. By default the receiver path uses the slabqueue pool: every
-// receiver joins a single process-global pool, keeping one in-memory event
-// budget shared across all of them while keeping each receiver's FIFO
-// independent (so a slow consumer on one receiver doesn't block others).
+// receiver joins a single process-global pool that reserves its configured
+// in-memory event budget and keeps its FIFO independent. A stalled receiver
+// therefore cannot consume another receiver's queue capacity.
 //
 // The only escape hatch from slabqueue is an explicit disk queue
 // configuration (queue.disk). In that case the receiver builds its own
@@ -96,14 +96,15 @@ func (p *trackedProducer) Close() {
 }
 
 // otelSharedPool is the process-global slabqueue.Pool shared by every Beat
-// receiver that uses the in-memory queue. A single pool gives all receivers one
-// shared in-memory event budget while each keeps its own FIFO Queue, so a slow
-// consumer on one receiver can't block others.
+// receiver that uses the in-memory queue. The pool provides every receiver's
+// configured capacity while each keeps its own FIFO Queue, so a slow consumer
+// on one receiver cannot consume another receiver's budget.
 //
 // Connected receivers may ask for different queue.mem.events sizes. Rather than
 // rejecting a size mismatch, each receiver's own Queue is capped at its
-// requested size (Queue.SetTarget), and the pool sizes itself to the largest of
-// those caps — the queues drive the pool size, so the two cannot drift. The
+// requested size (Queue.SetTarget), and the pool sizes itself to their sum.
+// Retained backlog on closing or shrinking queues keeps its capacity until
+// released, without consuming the budgets of other receivers. The
 // pool is ref-counted: created on the first connect and shut down once the last
 // receiver leaves.
 //
@@ -203,10 +204,9 @@ func closePipelineQueue(q queue.Queue[publisher.Event]) {
 //
 // Connections may request different event budgets. Instead of rejecting a
 // mismatch, this connection's own Queue is capped at its requested size, which
-// in turn sizes the shared pool to the largest cap among connected queues
-// (Queue.SetTarget drives the pool). A smaller receiver therefore cannot exceed
-// its own size even though the shared pool is larger, and the pool grows and
-// shrinks as receivers join and leave.
+// in turn contributes its budget to the shared pool (Queue.SetTarget drives
+// the pool). Each receiver can use its whole budget independently, and the
+// pool grows and shrinks as receivers join and their events drain.
 func acquireOTelPool(settings memqueue.Settings, monitors Monitors) (*slabqueue.Pool[publisher.Event], *slabqueue.Queue[publisher.Event]) {
 	otelSharedPool.Lock()
 	defer otelSharedPool.Unlock()
@@ -217,8 +217,8 @@ func acquireOTelPool(settings memqueue.Settings, monitors Monitors) (*slabqueue.
 	otelSharedPool.refs++
 	q := otelSharedPool.pool.Connect()
 	// Cap this connection's own queue at its requested budget. This also resizes
-	// the shared pool to the largest cap among connected queues, so the pool
-	// always tracks the queues and the two cannot drift.
+	// the shared pool to the sum of connected caps, reserving this receiver's
+	// capacity independently of the other receivers.
 	q.SetTarget(settings.Events)
 	monitors.Logger.Debugf("newOTelOutputController: joined shared pool (%v connections, pool budget %v)", otelSharedPool.refs, otelSharedPool.pool.Target())
 	return otelSharedPool.pool, q
