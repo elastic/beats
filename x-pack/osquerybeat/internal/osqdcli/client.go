@@ -320,9 +320,15 @@ func (c *Client) queryColumnTypes(ctx context.Context, sql string) (map[string]s
 			err   error
 		)
 
-		stopCancellation := closeOnCancellation(ctx, c.cli)
-		exres, err = c.cli.GetQueryColumnsContext(ctx, sql)
-		stopCancellation()
+		// A column lookup can use an action's shorter context. Cancelling it
+		// must not close the connection retained for daemon lifecycle tracking.
+		cli, err := c.connectWithRetry(ctx, c.timeout)
+		if err != nil {
+			return nil, err
+		}
+		defer cli.Close()
+		defer closeOnCancellation(ctx, cli)()
+		exres, err = cli.GetQueryColumnsContext(ctx, sql)
 		if ctx.Err() != nil {
 			return nil, ctx.Err()
 		}
