@@ -81,19 +81,6 @@ var (
 	errNoInputRunner      = errors.New("no input runner available")
 )
 
-<<<<<<< HEAD
-// init initializes the state store with a full init (reading all states).
-// For ES-backed inputs, this is deferred until Create() where the inputID is known.
-func (cim *InputManager) init(inputID string) error {
-	if cim.initedFull {
-		return nil
-	}
-
-	if cim.DefaultCleanTimeout <= 0 {
-		cim.DefaultCleanTimeout = 30 * time.Minute
-	}
-
-=======
 func (cim *InputManager) defaultCleanTimeout() time.Duration {
 	if cim.DefaultCleanTimeout <= 0 {
 		return 30 * time.Minute
@@ -101,27 +88,13 @@ func (cim *InputManager) defaultCleanTimeout() time.Duration {
 	return cim.DefaultCleanTimeout
 }
 
-// cacheKey identifies the cursor store for this input type and ID.
-// The key includes the type because each cursor store loads state for one type.
-func (cim *InputManager) cacheKey(inputID string) string {
-	return cim.StateStore.StoreKey(cim.Type, inputID) + "::" + cim.Type
-}
+// init initializes the state store with a full init (reading all states).
+// For ES-backed inputs, this is deferred until Create() where the inputID is known.
+func (cim *InputManager) init(inputID string) error {
+	if cim.initedFull {
+		return nil
+	}
 
-// ensureSetup opens or reuses the store for inputID and returns its cache key.
-// Call ensureSetup without holding cim.mu.
-// It unlocks cim.mu before globalCache.Acquire, so Close can proceed while Acquire waits.
-func (cim *InputManager) ensureSetup(inputID string) (string, error) {
-	cim.mu.Lock()
-	if cim.closed {
-		cim.mu.Unlock()
-		return "", errors.New("input manager is closed")
-	}
-	key := cim.cacheKey(inputID)
-	if _, ok := cim.releases[key]; ok {
-		cim.mu.Unlock()
-		return key, nil
-	}
->>>>>>> f32cdc9 (input-cursor: apply default clean timeout to every input (#53204))
 	log := cim.Logger.With("input_type", cim.Type)
 	cim.store, cim.initErr = openStore(log, cim.StateStore, cim.Type, inputID, true)
 	if cim.initErr != nil {

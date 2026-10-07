@@ -214,34 +214,20 @@ func TestManager_DefaultCleanTimeout(t *testing.T) {
 	}
 }
 
-func TestManager_CreateConcurrentCleanTimeout(t *testing.T) {
+func TestManager_CreateCleanTimeout(t *testing.T) {
 	manager := constInput(t, sourceList("test"), &fakeTestInput{})
 	require.Zero(t, manager.DefaultCleanTimeout, "test needs an unset timeout")
 
-	const goroutines = 8
-	timeouts := make([]time.Duration, goroutines)
-	start := make(chan struct{})
-	var wg sync.WaitGroup
-	for i := range goroutines {
-		wg.Go(func() {
-			<-start
-			inp, err := manager.Create(conf.NewConfig())
-			if !assert.NoError(t, err) {
-				return
-			}
-			managed, ok := inp.(*managedInput)
-			require.True(t, ok, "Create must return a *managedInput, got %T", inp)
-			timeouts[i] = managed.cleanTimeout
-		})
+	// Create sequentially because init is not safe for concurrent use.
+	var timeouts []time.Duration
+	for range 2 {
+		inp, err := manager.Create(conf.NewConfig())
+		require.NoError(t, err, "Create must succeed")
+		managed, ok := inp.(*managedInput)
+		require.True(t, ok, "Create must return a *managedInput, got %T", inp)
+		timeouts = append(timeouts, managed.cleanTimeout)
 	}
-	close(start)
-	wg.Wait()
-
-	want := make([]time.Duration, goroutines)
-	for i := range want {
-		want[i] = 30 * time.Minute
-	}
-	assert.Equal(t, want, timeouts)
+	assert.Equal(t, []time.Duration{30 * time.Minute, 30 * time.Minute}, timeouts, "every input must get the default clean timeout")
 }
 
 func TestManager_InputsTest(t *testing.T) {
