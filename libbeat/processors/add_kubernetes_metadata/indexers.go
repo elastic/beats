@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"strings"
 
 	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
 	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes/metadata"
@@ -41,11 +42,12 @@ const (
 // checked when matching events
 type Indexer interface {
 	// GetMetadata generates event metadata for the given pod, then returns the
-	// list of indexes to create, with the metadata to put on them
+	// list of indexes to create, with the metadata to put on them.
 	GetMetadata(pod *kubernetes.Pod) []MetadataIndex
 
-	// GetIndexes return the list of indexes the given pod belongs to. This function
-	// must return the same indexes than GetMetadata
+	// GetIndexes returns the list of indexes the given pod belongs to.
+	// Must return the same set as the Index fields in GetMetadata.
+	// Not called by the annotator in production; exists for tests and out-of-tree implementors.
 	GetIndexes(pod *kubernetes.Pod) []string
 }
 
@@ -86,15 +88,6 @@ func NewIndexers(configs PluginConfig, metaGen metadata.MetaGen) *Indexers {
 	return &Indexers{
 		indexers: indexers,
 	}
-}
-
-// GetIndexes returns the composed index list from all registered indexers
-func (i *Indexers) GetIndexes(pod *kubernetes.Pod) []string {
-	var indexes []string
-	for _, indexer := range i.indexers {
-		indexes = append(indexes, indexer.GetIndexes(pod)...)
-	}
-	return indexes
 }
 
 // GetMetadata returns the composed metadata list from all registered indexers
@@ -147,20 +140,70 @@ func NewPodUIDIndexer(_ config.C, metaGen metadata.MetaGen) (Indexer, error) {
 	return &PodUIDIndexer{metaGen: metaGen}, nil
 }
 
-// GetMetadata returns the composed metadata from PodNameIndexer and the pod UID
+// GetMetadata returns entries for uid, uid/container, and uid/container/restartCount
+// so the logs_path matcher (resource_type:pod) can resolve container-level fields.
 func (p *PodUIDIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
-	data := p.metaGen.Generate(pod)
-	return []MetadataIndex{
-		{
-			Index: string(pod.GetObjectMeta().GetUID()),
-			Data:  data,
-		},
+	uid := string(pod.GetObjectMeta().GetUID())
+
+	baseMeta := p.metaGen.Generate(pod)
+	m := []MetadataIndex{{Index: uid, Data: baseMeta}}
+
+	for _, c := range kubernetes.GetContainersInPod(pod) {
+		// status image includes the digest; spec is the fallback
+		image := c.Spec.Image
+		if c.Status.Image != "" {
+			image = c.Status.Image
+		}
+		containerIdx := uid + "/" + c.Spec.Name
+
+		// <uid>/<container>: name + image, valid across all restarts
+		containerMeta := baseMeta.Clone()
+		_, _ = containerMeta.Put("kubernetes.container.name", c.Spec.Name)
+		_, _ = containerMeta.Put("kubernetes.container.image", image)
+		m = append(m, MetadataIndex{Index: containerIdx, Data: containerMeta})
+
+		// <uid>/<container>/<restartCount>: also includes container id and runtime
+		if c.ID != "" {
+			idMeta := containerMeta.Clone()
+			_, _ = idMeta.Put("kubernetes.container.id", c.ID)
+			_, _ = idMeta.Put("kubernetes.container.runtime", c.Runtime)
+			m = append(m, MetadataIndex{
+				Index: fmt.Sprintf("%s/%d", containerIdx, c.Status.RestartCount),
+				Data:  idMeta,
+			})
+		}
+
+		// <uid>/<container>/<restartCount-1>: previous container id/runtime for rotated log files
+		if c.Status.RestartCount > 0 {
+			if term := c.Status.LastTerminationState.Terminated; term != nil && term.ContainerID != "" {
+				parts := strings.SplitN(term.ContainerID, "://", 2)
+				if len(parts) == 2 {
+					prevID, prevRuntime := parts[1], parts[0]
+					// container.image here is the current image; k8s doesn't expose the previous image
+					prevMeta := containerMeta.Clone()
+					_, _ = prevMeta.Put("kubernetes.container.id", prevID)
+					_, _ = prevMeta.Put("kubernetes.container.runtime", prevRuntime)
+					m = append(m, MetadataIndex{
+						Index: fmt.Sprintf("%s/%d", containerIdx, c.Status.RestartCount-1),
+						Data:  prevMeta,
+					})
+				}
+			}
+		}
 	}
+
+	return m
 }
 
-// GetIndexes returns the indexes for the given Pod
+// GetIndexes returns the indexes for the given Pod.
+// Derived from GetMetadata to guarantee the two sets stay in sync.
 func (p *PodUIDIndexer) GetIndexes(pod *kubernetes.Pod) []string {
-	return []string{string(pod.GetObjectMeta().GetUID())}
+	m := p.GetMetadata(pod)
+	indexes := make([]string, 0, len(m))
+	for _, mi := range m {
+		indexes = append(indexes, mi.Index)
+	}
+	return indexes
 }
 
 // ContainerIndexer indexes pods based on all their containers IDs

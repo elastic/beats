@@ -53,15 +53,21 @@ func TestFieldMatcher(t *testing.T) {
 		"foo": "bar",
 	}
 
-	out := matcher.MetadataIndex(input)
-	assert.Equal(t, "bar", out)
+	out := matcher.MetadataIndexCandidates(input)
+	assert.Equal(t, []string{"bar"}, out)
 
 	nonMatchInput := mapstr.M{
 		"not": "match",
 	}
 
-	out = matcher.MetadataIndex(nonMatchInput)
+	out = matcher.MetadataIndexCandidates(nonMatchInput)
 	assert.Empty(t, out)
+
+	// An empty-string field value must be skipped, not returned as a candidate.
+	// Without this guard, [""] would block all subsequent matchers in the chain.
+	emptyInput := mapstr.M{"foo": ""}
+	out = matcher.MetadataIndexCandidates(emptyInput)
+	assert.Empty(t, out, "empty-string field value must not produce a candidate")
 }
 
 func TestFieldMatcherRegex(t *testing.T) {
@@ -94,15 +100,15 @@ func TestFieldMatcherRegex(t *testing.T) {
 		"foo": "bar-keyvalue-suffix",
 	}
 
-	out := matcher.MetadataIndex(input)
-	assert.Equal(t, "keyvalue", out)
+	out := matcher.MetadataIndexCandidates(input)
+	assert.Equal(t, []string{"keyvalue"}, out)
 
 	nonMatchInput := mapstr.M{
 		"not": "match",
 		"foo": "nomatch",
 	}
 
-	out = matcher.MetadataIndex(nonMatchInput)
+	out = matcher.MetadataIndexCandidates(nonMatchInput)
 	assert.Empty(t, out)
 }
 
@@ -129,13 +135,13 @@ func TestFieldFormatMatcher(t *testing.T) {
 		"pod":       "bar",
 	}
 
-	out := matcher.MetadataIndex(event)
-	assert.Equal(t, "foo/bar", out)
+	out := matcher.MetadataIndexCandidates(event)
+	assert.Equal(t, []string{"foo/bar"}, out)
 
 	event = mapstr.M{
 		"foo": "bar",
 	}
-	out = matcher.MetadataIndex(event)
+	out = matcher.MetadataIndexCandidates(event)
 	assert.Empty(t, out)
 
 	testCfg["format"] = `%{[dimensions.namespace]}/%{[dimensions.pod]}`
@@ -151,6 +157,6 @@ func TestFieldFormatMatcher(t *testing.T) {
 		},
 	}
 
-	out = matcher.MetadataIndex(event)
-	assert.Equal(t, "foo/bar", out)
+	out = matcher.MetadataIndexCandidates(event)
+	assert.Equal(t, []string{"foo/bar"}, out)
 }

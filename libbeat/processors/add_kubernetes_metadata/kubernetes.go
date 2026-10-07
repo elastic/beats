@@ -58,10 +58,12 @@ type initializedState struct {
 }
 
 type kubernetesAnnotator struct {
-	log      *logp.Logger
-	state    atomic.Pointer[initializedState]
-	cache    *cache
-	initOnce sync.Once
+	log          *logp.Logger
+	state        atomic.Pointer[initializedState]
+	cache        *cache
+	indexed      sync.Map
+	initOnce     sync.Once
+	appendFields bool
 }
 
 func init() {
@@ -118,8 +120,9 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 
 	log = log.Named(selector).With("libbeat.processor", "add_kubernetes_metadata")
 	processor := &kubernetesAnnotator{
-		log:   log,
-		cache: newCache(config.CleanupTimeout),
+		log:          log,
+		cache:        newCache(config.CleanupTimeout),
+		appendFields: config.AppendFields,
 	}
 
 	// complete processor's initialisation asynchronously to re-try on failing k8s client initialisations in case
@@ -302,30 +305,30 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 		// be populated before trying to generate metadata for Pods.
 		if nodeWatcher != nil {
 			if err := nodeWatcher.Start(); err != nil {
-				k.log.Debugf("Couldn't start node watcher: %v", err)
+				k.log.Errorf("Couldn't start node watcher: %v", err)
 				return
 			}
 		}
 		if namespaceWatcher != nil {
 			if err := namespaceWatcher.Start(); err != nil {
-				k.log.Debugf("Couldn't start namespace watcher: %v", err)
+				k.log.Errorf("Couldn't start namespace watcher: %v", err)
 				return
 			}
 		}
 		if replicaSetWatcher != nil {
 			if err := replicaSetWatcher.Start(); err != nil {
-				k.log.Debugf("Couldn't start replicaSet watcher: %v", err)
+				k.log.Errorf("Couldn't start replicaSet watcher: %v", err)
 				return
 			}
 		}
 		if jobWatcher != nil {
 			if err := jobWatcher.Start(); err != nil {
-				k.log.Debugf("Couldn't start job watcher: %v", err)
+				k.log.Errorf("Couldn't start job watcher: %v", err)
 				return
 			}
 		}
 		if err := watcher.Start(); err != nil {
-			k.log.Debugf("Couldn't start pod watcher: %v", err)
+			k.log.Errorf("Couldn't start pod watcher: %v", err)
 			return
 		}
 	})
@@ -341,18 +344,18 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	if state == nil {
 		return event, nil
 	}
-	if kubernetesMetadataExist(event) {
+	if kubernetesMetadataExist(event) && !k.appendFields {
 		return event, nil
 	}
 
-	index := state.matchers.MetadataIndex(event.Fields)
-	if index == "" {
+	candidates := state.matchers.MetadataIndexCandidates(event.Fields)
+	if len(candidates) == 0 {
 		k.log.Debug("No container match string, not adding kubernetes data")
 		return event, nil
 	}
-
-	metadata := k.cache.get(index)
+	metadata := k.cache.getFirstMatch(candidates)
 	if metadata == nil {
+		k.log.Debugf("Candidates %v found but none matched in cache, not adding kubernetes data", candidates)
 		return event, nil
 	}
 
@@ -371,17 +374,23 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 				_ = ociContainer.Delete("image")
 				ociContainer["image"] = mapstr.M{"name": img}
 			}
-			event.Fields.DeepUpdate(mapstr.M{"container": ociContainer})
+			if k.appendFields {
+				event.Fields.DeepUpdateNoOverwrite(mapstr.M{"container": ociContainer})
+			} else {
+				event.Fields.DeepUpdate(mapstr.M{"container": ociContainer})
+			}
 		}
 	}
-
-	// Remove container fields that belong only in the OCI section before writing
-	// kubernetes metadata to the event. container.name is intentionally kept here
-	// to match original behaviour.
+	// Prevent these fields from leaking into kubernetes.container.*; add new container.*
+	// fields from PodUIDIndexer.GetMetadata here too.
 	_ = kubeMeta.Delete("kubernetes.container.id")
 	_ = kubeMeta.Delete("kubernetes.container.runtime")
 	_ = kubeMeta.Delete("kubernetes.container.image")
-	event.Fields.DeepUpdate(kubeMeta)
+	if k.appendFields {
+		event.Fields.DeepUpdateNoOverwrite(kubeMeta)
+	} else {
+		event.Fields.DeepUpdate(kubeMeta)
+	}
 
 	return event, nil
 }
@@ -414,28 +423,49 @@ func (k *kubernetesAnnotator) Close() error {
 }
 
 func (k *kubernetesAnnotator) addPod(indexers *Indexers, pod *kubernetes.Pod) {
-	metadata := indexers.GetMetadata(pod)
-	for _, m := range metadata {
-		k.cache.set(m.Index, m.Data)
+	uid := string(pod.GetObjectMeta().GetUID())
+	// Load old keys before computing new metadata so the swap is atomic.
+	var oldKeys []string
+	if prev, ok := k.indexed.LoadAndDelete(uid); ok {
+		oldKeys, _ = prev.([]string)
+	}
+	// Compute new metadata outside the lock — may be slow for pods with many containers.
+	metadatas := indexers.GetMetadata(pod)
+	// Atomically evict old entries and write new ones; readers see old state or new, never partial.
+	k.cache.batchUpdate(oldKeys, metadatas)
+	newKeys := make([]string, 0, len(metadatas))
+	for _, m := range metadatas {
+		newKeys = append(newKeys, m.Index)
+	}
+	k.indexed.Store(uid, newKeys)
+}
+
+// deleteRecordedIndexes evicts all cache keys previously stored for uid by addPod.
+// Keys are tracked because they change between updates (e.g. restart-count indexes).
+func (k *kubernetesAnnotator) deleteRecordedIndexes(uid string) {
+	if prev, ok := k.indexed.LoadAndDelete(uid); ok {
+		idxs, _ := prev.([]string)
+		for _, idx := range idxs {
+			k.cache.delete(idx)
+		}
 	}
 }
 
 func (k *kubernetesAnnotator) updatePod(indexers *Indexers, pod *kubernetes.Pod) {
-	k.removePod(indexers, pod)
-
-	// Add it again only if it is not being deleted
+	// For a deletion, evict and stop. For a normal update, addPod handles eviction
+	// atomically — calling deleteRecordedIndexes here would create an empty-cache window.
 	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
+		uid := string(pod.GetObjectMeta().GetUID())
+		k.deleteRecordedIndexes(uid)
 		return
 	}
 
 	k.addPod(indexers, pod)
 }
 
-func (k *kubernetesAnnotator) removePod(indexers *Indexers, pod *kubernetes.Pod) {
-	indexes := indexers.GetIndexes(pod)
-	for _, idx := range indexes {
-		k.cache.delete(idx)
-	}
+func (k *kubernetesAnnotator) removePod(_ *Indexers, pod *kubernetes.Pod) {
+	uid := string(pod.GetObjectMeta().GetUID())
+	k.deleteRecordedIndexes(uid)
 }
 
 func (*kubernetesAnnotator) String() string {

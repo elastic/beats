@@ -1,3 +1,4 @@
+# REQUIRED
 # Kind can be one of:
 # - breaking-change: a change to previously-documented behavior
 # - deprecation: functionality that is being removed in a later release
@@ -10,31 +11,38 @@
 # - other: does not fit into any of the other categories
 kind: bug-fix
 
+# REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Stop losing a day of azure/billing data when Cost Management returns HTTP 429
+summary: Restore osquery-extension compatibility with Linux systems on glibc before 2.28.
 
+# REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-description: >
-  The azure/billing metricset now honours the throttling hints Azure Cost
-  Management and Consumption return on HTTP 429. Those hints arrive in
-  "x-ms-ratelimit-microsoft.*-retry-after" headers, which the Azure SDK retry
-  policy ignores, so a throttled fetch used to fail after a few seconds of
-  backoff and, with no cursor and a 1440m period, the whole day of billing data
-  was lost. The longest wait advertised by those hints or by the standard
-  Retry-After headers is now honoured before retrying, the retry budget was
-  raised so a per-minute quota window can clear (up to 5 retries, 10s base
-  delay, 5m cap), and every request carries a ClientType
-  header so the calls no longer share the default Cost Management quota pool
-  with all unidentified callers in the tenant.
+description: |
+  Building SQLite with SQLITE_DISABLE_LFS on 64-bit Linux avoids a dependency
+  on glibc 2.28. Functionality is unchanged but compatibility is restored for
+  glibc 2.27 systems, such as Ubuntu 18.04.
 
+# REQUIRED for breaking-change, deprecation, known-issue
+# impact:
+
+# REQUIRED for breaking-change, deprecation, known-issue
+# action:
+
+# REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: metricbeat
+component: osquerybeat
 
-# PR URL; optional; the PR number that added the changeset.
+# AUTOMATED
+# OPTIONAL to manually add other PR URLs
+# PR URL: A link the PR that added the changeset.
 # If not present is automatically filled by the tooling finding the PR where this changelog fragment has been added.
+# NOTE: the tooling supports backports, so it's able to fill the original PR number instead of the backport PR number.
+# Please provide it if you are adding a fragment for a different PR.
 # pr: https://github.com/owner/repo/1234
 
+# AUTOMATED
+# OPTIONAL to manually add other issue URLs
 # Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
 # If not present is automatically filled by the tooling with the issue linked to the PR number.
 # issue: https://github.com/owner/repo/1234
