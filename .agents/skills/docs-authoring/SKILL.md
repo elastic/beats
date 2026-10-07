@@ -13,6 +13,8 @@ metadata:
 
 # Documentation
 
+Use `docs/extend/contributing-docs.md` for the repository-specific publishing, placement, and generation instructions.
+
 A page is published as written. Write for the person doing the task, and write it as the final text they will read.
 
 Ask when the change does not tell you who it is for or what they can now do. Never invent a UI label, a default, a limit, a permission, or a behavior, and never generate a screenshot. Name the screenshot that is needed and where it goes.
