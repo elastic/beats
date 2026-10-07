@@ -179,7 +179,7 @@ func TestElasticStorage_Lifecycle(t *testing.T) {
 	user := esURL.User.Username()
 	pass, _ := esURL.User.Password()
 
-	authenticatorID, authenticator := newTestElasticsearchAuthenticator(
+	authenticatorID, authenticator := newTestBeatsAuthenticator(
 		t,
 		fmt.Sprintf("%s://%s", esURL.Scheme, esURL.Host),
 		user,
@@ -216,7 +216,7 @@ func TestElasticStorage_Start_BadCredentials(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 	esURL := integration.GetESURL(t, "http")
 
-	authenticatorID, authenticator := newTestElasticsearchAuthenticator(
+	authenticatorID, authenticator := newTestBeatsAuthenticator(
 		t,
 		fmt.Sprintf("%s://%s", esURL.Scheme, esURL.Host),
 		"invaliduser",

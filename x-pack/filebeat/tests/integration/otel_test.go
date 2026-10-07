@@ -1649,19 +1649,20 @@ func TestFilebeatOTelHTTPJSONStateStoreIsPerInputID(t *testing.T) {
     path.home: {{ $.PathHome }}
 {{- end }}
 extensions:
-  elasticsearchauth/state:
+  beatsauth/state:
     endpoints:
       - {{ .ESURL }}
-    user: {{ .Username }}
-    password: {{ .Password }}
+    auth:
+      username: {{ .Username }}
+      password: {{ .Password }}
   elasticsearch_storage:
     auth:
-      authenticator: elasticsearchauth/state
+      authenticator: beatsauth/state
 exporters:
   debug:
 service:
   extensions:
-    - elasticsearchauth/state
+    - beatsauth/state
     - elasticsearch_storage
   pipelines:
     logs:
