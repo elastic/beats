@@ -31,7 +31,8 @@ receivers:
           count: 1
 
   heartbeatreceiver:
-    elasticsearch_auth: elasticsearchauth
+    monitor_state:
+      elasticsearch: beatsauth
     heartbeat:
       monitors:
         - type: tcp

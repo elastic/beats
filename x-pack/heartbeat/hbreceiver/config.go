@@ -15,8 +15,13 @@ import (
 // Config contains explicit receiver-only settings and the remaining Heartbeat
 // Beat configuration.
 type Config struct {
-	ElasticsearchAuth string         `mapstructure:"elasticsearch_auth"`
-	Beatconfig        map[string]any `mapstructure:",remain"`
+	MonitorState MonitorStateConfig `mapstructure:"monitor_state"`
+	Beatconfig   map[string]any     `mapstructure:",remain"`
+}
+
+// MonitorStateConfig configures monitor state restoration.
+type MonitorStateConfig struct {
+	Elasticsearch string `mapstructure:"elasticsearch"`
 }
 
 // Unmarshal implements confmap.Unmarshaler for custom unmarshaling logic.

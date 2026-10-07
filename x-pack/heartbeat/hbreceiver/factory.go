@@ -89,9 +89,9 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 
 	hbReceiver := newHeartbeatReceiver(br)
 	hbReceiver.SetStartHook(
-		elasticsearchAuthStartHook(
+		beatsAuthStartHook(
 			hbReceiver.ctx,
-			cfg.ElasticsearchAuth,
+			cfg.MonitorState.Elasticsearch,
 			creator.heartbeat,
 			b.Info.UserAgent,
 			b.Info.Logger,

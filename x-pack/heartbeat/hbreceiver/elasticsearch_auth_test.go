@@ -56,25 +56,23 @@ func (r *closableRoundTripper) CloseIdleConnections() {
 	r.once.Do(func() { close(r.closed) })
 }
 
-type fakeElasticsearchAuthExtension struct {
-	endpoints        []string
-	roundTripper     http.RoundTripper
-	roundTripErr     error
-	baseRoundTripper http.RoundTripper
+type fakeBeatsAuthExtension struct {
+	endpoints    []string
+	roundTripper http.RoundTripper
+	roundTripErr error
 }
 
-func (f *fakeElasticsearchAuthExtension) Start(context.Context, component.Host) error { return nil }
-func (f *fakeElasticsearchAuthExtension) Shutdown(context.Context) error              { return nil }
-func (f *fakeElasticsearchAuthExtension) Endpoints() []string                         { return f.endpoints }
-func (f *fakeElasticsearchAuthExtension) RoundTripper(base http.RoundTripper) (http.RoundTripper, error) {
-	f.baseRoundTripper = base
+func (f *fakeBeatsAuthExtension) Start(context.Context, component.Host) error { return nil }
+func (f *fakeBeatsAuthExtension) Shutdown(context.Context) error              { return nil }
+func (f *fakeBeatsAuthExtension) Endpoints() []string                         { return f.endpoints }
+func (f *fakeBeatsAuthExtension) RoundTripper(_ http.RoundTripper) (http.RoundTripper, error) {
 	return f.roundTripper, f.roundTripErr
 }
 
-func TestElasticsearchAuthStartHookErrors(t *testing.T) {
-	missingID := component.MustNewIDWithName("elasticsearchauth", "missing")
-	wrongTypeID := component.MustNewIDWithName("elasticsearchauth", "wrong-type")
-	authID := component.MustNewIDWithName("elasticsearchauth", "auth")
+func TestBeatsAuthStartHookErrors(t *testing.T) {
+	missingID := component.MustNewIDWithName("beatsauth", "missing")
+	wrongTypeID := component.MustNewIDWithName("beatsauth", "wrong-type")
+	authID := component.MustNewIDWithName("beatsauth", "auth")
 
 	tests := []struct {
 		name      string
@@ -86,13 +84,13 @@ func TestElasticsearchAuthStartHookErrors(t *testing.T) {
 			name:      "malformed component ID",
 			reference: "/missing-type",
 			host:      elasticsearchAuthTestHost{},
-			wantError: `invalid elasticsearch_auth component ID "/missing-type"`,
+			wantError: `invalid monitor_state.elasticsearch component ID "/missing-type"`,
 		},
 		{
 			name:      "missing extension",
 			reference: missingID.String(),
 			host:      elasticsearchAuthTestHost{},
-			wantError: `elasticsearch_auth extension "elasticsearchauth/missing" not found`,
+			wantError: `monitor_state.elasticsearch extension "beatsauth/missing" not found`,
 		},
 		{
 			name:      "wrong extension type",
@@ -106,30 +104,30 @@ func TestElasticsearchAuthStartHookErrors(t *testing.T) {
 			name:      "missing captured heartbeat",
 			reference: authID.String(),
 			host: elasticsearchAuthTestHost{extensions: map[component.ID]component.Component{
-				authID: &fakeElasticsearchAuthExtension{endpoints: []string{"http://localhost:9200"}},
+				authID: &fakeBeatsAuthExtension{endpoints: []string{"http://localhost:9200"}},
 			}},
-			wantError: `heartbeat instance was not captured for elasticsearch_auth extension "elasticsearchauth/auth"`,
+			wantError: `heartbeat instance was not captured for monitor_state.elasticsearch extension "beatsauth/auth"`,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			err := elasticsearchAuthStartHook(t.Context(), test.reference, nil, "", logp.NewNopLogger(), func(*eslegclient.Connection) {})(test.host)
+			err := beatsAuthStartHook(t.Context(), test.reference, nil, "", logp.NewNopLogger(), func(*eslegclient.Connection) {})(test.host)
 			require.Error(t, err, "start hook should reject an invalid Elasticsearch authentication extension")
 			assert.Contains(t, err.Error(), test.wantError, "start hook should return the expected resolver error")
 		})
 	}
 }
 
-func TestElasticsearchAuthStartHookEmptyReference(t *testing.T) {
-	require.NoError(t, elasticsearchAuthStartHook(t.Context(), "", nil, "", logp.NewNopLogger(), func(*eslegclient.Connection) {})(nil), "empty Elasticsearch auth reference should be a no-op")
+func TestBeatsAuthStartHookEmptyReference(t *testing.T) {
+	require.NoError(t, beatsAuthStartHook(t.Context(), "", nil, "", logp.NewNopLogger(), func(*eslegclient.Connection) {})(nil), "empty Beats auth reference should be a no-op")
 }
 
 func TestNewESClientConnectivityFailureIsBestEffort(t *testing.T) {
 	transport := roundTripperFunc(func(*http.Request) (*http.Response, error) {
 		return nil, errors.New("Elasticsearch is unavailable")
 	})
-	extension := &fakeElasticsearchAuthExtension{
+	extension := &fakeBeatsAuthExtension{
 		endpoints:    []string{"http://example.test"},
 		roundTripper: transport,
 	}
@@ -142,7 +140,7 @@ func TestNewESClientConnectivityFailureIsBestEffort(t *testing.T) {
 	require.Error(t, err, "the fallback client must preserve the connectivity error for state loading")
 }
 
-func TestElasticsearchAuthStartHookInjectsBeforeRun(t *testing.T) {
+func TestBeatsAuthStartHookInjectsBeforeRun(t *testing.T) {
 	previousUnderAgent := management.UnderAgent()
 	t.Cleanup(func() {
 		management.SetUnderAgent(previousUnderAgent)
@@ -170,8 +168,8 @@ func TestElasticsearchAuthStartHookInjectsBeforeRun(t *testing.T) {
 			}, nil
 		},
 	}
-	extensionID := component.MustNewIDWithName("elasticsearchauth", "_agent-component/default")
-	extension := &fakeElasticsearchAuthExtension{
+	extensionID := component.MustNewIDWithName("beatsauth", "_agent-component/default")
+	extension := &fakeBeatsAuthExtension{
 		endpoints:    []string{"http://example.test"},
 		roundTripper: transport,
 	}
@@ -179,7 +177,9 @@ func TestElasticsearchAuthStartHookInjectsBeforeRun(t *testing.T) {
 		extensionID: extension,
 	}}
 	cfg := &Config{
-		ElasticsearchAuth: extensionID.String(),
+		MonitorState: MonitorStateConfig{
+			Elasticsearch: extensionID.String(),
+		},
 		Beatconfig: map[string]any{
 			"heartbeat": map[string]any{
 				"monitors": []map[string]any{
@@ -224,7 +224,7 @@ func TestElasticsearchAuthStartHookInjectsBeforeRun(t *testing.T) {
 	}
 }
 
-func TestElasticsearchAuthShutdownCancelsInFlightRequest(t *testing.T) {
+func TestBeatsAuthShutdownCancelsInFlightRequest(t *testing.T) {
 	requestStarted := make(chan struct{})
 	requestDone := make(chan error, 1)
 	var startOnce sync.Once
@@ -248,8 +248,8 @@ func TestElasticsearchAuthShutdownCancelsInFlightRequest(t *testing.T) {
 			return nil, req.Context().Err()
 		},
 	}
-	extensionID := component.MustNewIDWithName("elasticsearchauth", "_agent-component/default")
-	extension := &fakeElasticsearchAuthExtension{
+	extensionID := component.MustNewIDWithName("beatsauth", "_agent-component/default")
+	extension := &fakeBeatsAuthExtension{
 		endpoints:    []string{"http://example.test"},
 		roundTripper: transport,
 	}
@@ -257,7 +257,9 @@ func TestElasticsearchAuthShutdownCancelsInFlightRequest(t *testing.T) {
 		extensionID: extension,
 	}}
 	cfg := &Config{
-		ElasticsearchAuth: extensionID.String(),
+		MonitorState: MonitorStateConfig{
+			Elasticsearch: extensionID.String(),
+		},
 		Beatconfig: map[string]any{
 			"heartbeat": map[string]any{
 				"monitors": []map[string]any{

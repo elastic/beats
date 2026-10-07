@@ -30,7 +30,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 )
 
-func TestHeartbeatOTelElasticsearchAuthLoadsMonitorState(t *testing.T) {
+func TestHeartbeatOTelBeatsAuthLoadsMonitorState(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 
 	esHost := integration.GetESAdminURL(t, "http")
@@ -99,20 +99,19 @@ func TestHeartbeatOTelElasticsearchAuthLoadsMonitorState(t *testing.T) {
 
 	collectorConfig := fmt.Sprintf(`extensions:
   beatsauth/state:
+    endpoints:
+      - %s
     proxy_url: %s
     idle_connection_timeout: 1s
     ssl:
       verification_mode: none
-  elasticsearchauth/state:
-    endpoints:
-      - %s
-    user: %s
-    password: %s
     auth:
-      authenticator: beatsauth/state
+      username: %s
+      password: %s
 receivers:
   heartbeatreceiver:
-    elasticsearch_auth: elasticsearchauth/state
+    monitor_state:
+      elasticsearch: beatsauth/state
     heartbeat:
       monitors:
         - type: http
@@ -145,7 +144,6 @@ exporters:
 service:
   extensions:
     - beatsauth/state
-    - elasticsearchauth/state
   pipelines:
     logs:
       receivers:
@@ -158,8 +156,8 @@ service:
     metrics:
       level: none
 `,
-		proxyServer.URL,
 		tlsElasticsearch.URL,
+		proxyServer.URL,
 		esUser,
 		esPassword,
 		monitorID,
