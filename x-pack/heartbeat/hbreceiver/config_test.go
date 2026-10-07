@@ -13,25 +13,27 @@ import (
 )
 
 func TestUnmarshal(t *testing.T) {
-	t.Run("elasticsearch auth is receiver-only", func(t *testing.T) {
+	t.Run("monitor state is receiver-only", func(t *testing.T) {
 		cfg := &Config{}
 		userConf := confmap.NewFromStringMap(map[string]any{
-			"elasticsearch_auth": "elasticsearchauth/_agent-component/default",
-			"heartbeat":          map[string]any{"monitors": []any{}},
+			"monitor_state": map[string]any{
+				"elasticsearch": "beatsauth/_agent-component/default",
+			},
+			"heartbeat": map[string]any{"monitors": []any{}},
 		})
 
 		require.NoError(t, cfg.Unmarshal(userConf), "receiver config should unmarshal")
 		assert.Equal(
 			t,
-			"elasticsearchauth/_agent-component/default",
-			cfg.ElasticsearchAuth,
-			"receiver should decode the Elasticsearch auth extension reference",
+			"beatsauth/_agent-component/default",
+			cfg.MonitorState.Elasticsearch,
+			"receiver should decode the Elasticsearch monitor-state extension reference",
 		)
 		assert.NotContains(
 			t,
 			cfg.Beatconfig,
-			"elasticsearch_auth",
-			"receiver-only Elasticsearch auth reference should not reach the Beat config",
+			"monitor_state",
+			"receiver-only monitor-state configuration should not reach the Beat config",
 		)
 	})
 

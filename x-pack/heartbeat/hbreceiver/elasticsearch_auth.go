@@ -11,7 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"go.elastic.co/apm/module/apmelasticsearch/v2"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/extension/extensionauth"
 
@@ -23,14 +22,14 @@ import (
 
 const elasticsearchRequestTimeout = 10 * time.Second
 
-type elasticsearchAuthExtension interface {
+type beatsAuthExtension interface {
 	extensionauth.HTTPClient
 	Endpoints() []string
 }
 
 var _ monitorstate.ElasticsearchRequester = (*eslegclient.Connection)(nil)
 
-func elasticsearchAuthStartHook(
+func beatsAuthStartHook(
 	ctx context.Context,
 	reference string,
 	heartbeat *beater.Heartbeat,
@@ -46,24 +45,24 @@ func elasticsearchAuthStartHook(
 
 		var extensionID component.ID
 		if err := extensionID.UnmarshalText([]byte(reference)); err != nil {
-			return fmt.Errorf("invalid elasticsearch_auth component ID %q: %w", reference, err)
+			return fmt.Errorf("invalid monitor_state.elasticsearch component ID %q: %w", reference, err)
 		}
 
 		extension, ok := host.GetExtensions()[extensionID]
 		if !ok {
-			return fmt.Errorf("elasticsearch_auth extension %q not found", extensionID.String())
+			return fmt.Errorf("monitor_state.elasticsearch extension %q not found", extensionID.String())
 		}
-		auth, ok := extension.(elasticsearchAuthExtension)
+		auth, ok := extension.(beatsAuthExtension)
 		if !ok {
 			return fmt.Errorf(
-				"elasticsearch_auth extension %q has type %T, which does not implement HTTP authentication and endpoint discovery",
+				"monitor_state.elasticsearch extension %q has type %T, which does not implement HTTP authentication and endpoint discovery",
 				extensionID.String(),
 				extension,
 			)
 		}
 
 		if heartbeat == nil {
-			return fmt.Errorf("heartbeat instance was not captured for elasticsearch_auth extension %q", extensionID.String())
+			return fmt.Errorf("heartbeat instance was not captured for monitor_state.elasticsearch extension %q", extensionID.String())
 		}
 
 		requester, err := newESClient(ctx, auth, userAgent, logger)
@@ -78,18 +77,13 @@ func elasticsearchAuthStartHook(
 
 func newESClient(
 	ctx context.Context,
-	auth elasticsearchAuthExtension,
+	auth beatsAuthExtension,
 	userAgent string,
 	logger *logp.Logger,
 ) (*eslegclient.Connection, error) {
 	endpoints := auth.Endpoints()
 
-	// Keep Elasticsearch requests instrumented the same way as eslegclient.
-	// When elasticsearchauth delegates to beatsauth, beatsauth ignores this base
-	// and returns its own APM-instrumented transport, avoiding double
-	// instrumentation in the delegated path.
-	baseTransport := apmelasticsearch.WrapRoundTripper(http.DefaultTransport)
-	roundTripper, err := auth.RoundTripper(baseTransport)
+	roundTripper, err := auth.RoundTripper(nil)
 	if err != nil {
 		return nil, fmt.Errorf("creating authenticated transport: %w", err)
 	}
@@ -107,7 +101,7 @@ func newESClient(
 		}
 		client.Headers["User-Agent"] = client.UserAgent
 
-		// elasticsearchauth owns authentication and transport configuration.
+		// beatsauth owns authentication and transport configuration.
 		// Heartbeat owns the request deadline that applied to its prior client.
 		client.HTTP = &http.Client{
 			Transport: roundTripper,
