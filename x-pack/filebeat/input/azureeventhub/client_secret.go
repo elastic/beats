@@ -36,6 +36,9 @@ func newClientSecretCredential(config *azureInputConfig, log *logp.Logger) (azco
 			Cloud: getAzureCloud(config.AuthorityHost),
 		},
 	}
+	if httpClient := proxyHTTPClient(config.Proxy); httpClient != nil {
+		credentialOptions.Transport = httpClient
+	}
 
 	// Create the credential
 	credential, err := azidentity.NewClientSecretCredential(
