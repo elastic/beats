@@ -1,0 +1,695 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+package release
+
+import (
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+)
+
+func TestUpdateVersion(t *testing.T) {
+	// Create a temporary directory
+	tmpDir := t.TempDir()
+
+	// Create libbeat/version directory
+	versionDir := filepath.Join(tmpDir, "libbeat", "version")
+	err := os.MkdirAll(versionDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create version dir: %v", err)
+	}
+
+	// Create version.go file
+	versionFile := filepath.Join(versionDir, "version.go")
+	initialContent := `package version
+
+const defaultBeatVersion = "9.3.0"
+`
+	err = os.WriteFile(versionFile, []byte(initialContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create version file: %v", err)
+	}
+
+	// Change to temp directory
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("Failed to restore directory: %v", err)
+		}
+	}()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("Failed to change to temp directory: %v", err)
+	}
+
+	got, err := ReadBeatVersion()
+	if err != nil {
+		t.Fatalf("ReadBeatVersion failed: %v", err)
+	}
+	if got != "9.3.0" {
+		t.Fatalf("ReadBeatVersion = %q, want 9.3.0", got)
+	}
+
+	// Test updating version
+	err = UpdateVersion("9.4.0")
+	if err != nil {
+		t.Fatalf("UpdateVersion failed: %v", err)
+	}
+
+	// Verify the file was updated
+	content, err := os.ReadFile(versionFile)
+	if err != nil {
+		t.Fatalf("Failed to read updated file: %v", err)
+	}
+
+	if !strings.Contains(string(content), `const defaultBeatVersion = "9.4.0"`) {
+		t.Errorf("Version not updated correctly. Got:\n%s", string(content))
+	}
+
+	got, err = ReadBeatVersion()
+	if err != nil {
+		t.Fatalf("ReadBeatVersion after update failed: %v", err)
+	}
+	if got != "9.4.0" {
+		t.Fatalf("ReadBeatVersion after update = %q, want 9.4.0", got)
+	}
+}
+
+func TestUpdateVersionIdempotent(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	versionDir := filepath.Join(tmpDir, "libbeat", "version")
+	err := os.MkdirAll(versionDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create version dir: %v", err)
+	}
+
+	versionFile := filepath.Join(versionDir, "version.go")
+	initialContent := `package version
+
+const defaultBeatVersion = "9.4.0"
+`
+	err = os.WriteFile(versionFile, []byte(initialContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create version file: %v", err)
+	}
+
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("Failed to restore directory: %v", err)
+		}
+	}()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("Failed to change to temp directory: %v", err)
+	}
+
+	err = UpdateVersion("9.4.0")
+	if err != nil {
+		t.Fatalf("UpdateVersion should succeed when version is already set: %v", err)
+	}
+
+	content, err := os.ReadFile(versionFile)
+	if err != nil {
+		t.Fatalf("Failed to read version file: %v", err)
+	}
+	if string(content) != initialContent {
+		t.Errorf("Idempotent UpdateVersion should not modify file. Got:\n%s", string(content))
+	}
+}
+
+func TestUpdateDocs(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	// Create necessary directories
+	dirs := []string{
+		"libbeat/docs",
+		"deploy/kubernetes",
+	}
+	for _, dir := range dirs {
+		err := os.MkdirAll(filepath.Join(tmpDir, dir), 0755)
+		if err != nil {
+			t.Fatalf("Failed to create dir %s: %v", dir, err)
+		}
+	}
+
+	// Create version.asciidoc
+	versionAsciidoc := filepath.Join(tmpDir, "libbeat/docs/version.asciidoc")
+	versionContent := `:stack-version: 9.3.0
+:doc-branch: 9.3
+`
+	err := os.WriteFile(versionAsciidoc, []byte(versionContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create version.asciidoc: %v", err)
+	}
+
+	// Create K8s manifest with wolfi image tag (matches production manifests)
+	k8sFile := filepath.Join(tmpDir, "deploy/kubernetes/metricbeat-kubernetes.yaml")
+	k8sContent := `image: docker.elastic.co/beats/metricbeat-wolfi:9.3.0
+`
+	err = os.WriteFile(k8sFile, []byte(k8sContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create K8s file: %v", err)
+	}
+
+	heartbeatFile := filepath.Join(tmpDir, "deploy/kubernetes/heartbeat-kubernetes.yaml")
+	heartbeatContent := `image: docker.elastic.co/beats/heartbeat-wolfi:9.3.0
+`
+	err = os.WriteFile(heartbeatFile, []byte(heartbeatContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create heartbeat K8s file: %v", err)
+	}
+
+	// Change to temp directory
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("Failed to restore directory: %v", err)
+		}
+	}()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("Failed to change to temp directory: %v", err)
+	}
+
+	// Test updating docs
+	err = UpdateDocs("9.4.0")
+	if err != nil {
+		t.Fatalf("UpdateDocs failed: %v", err)
+	}
+
+	// Verify version.asciidoc was updated
+	content, _ := os.ReadFile(versionAsciidoc)
+	if !strings.Contains(string(content), ":stack-version: 9.4.0") {
+		t.Errorf("version.asciidoc stack-version not updated. Got:\n%s", string(content))
+	}
+	if !strings.Contains(string(content), ":doc-branch: 9.4") {
+		t.Errorf("version.asciidoc doc-branch not updated. Got:\n%s", string(content))
+	}
+
+	// Verify K8s files were updated
+	content, _ = os.ReadFile(k8sFile)
+	if !strings.Contains(string(content), "docker.elastic.co/beats/metricbeat-wolfi:9.4.0") {
+		t.Errorf("K8s file not updated. Got:\n%s", string(content))
+	}
+	// beats.mak update-docs does not touch heartbeat; make update does on ff-release.
+	content, _ = os.ReadFile(heartbeatFile)
+	if !strings.Contains(string(content), "docker.elastic.co/beats/heartbeat-wolfi:9.3.0") {
+		t.Errorf("Heartbeat K8s file should remain unchanged by UpdateDocs. Got:\n%s", string(content))
+	}
+}
+
+func TestUpdateStackVersion(t *testing.T) {
+	tmpDir := t.TempDir()
+	docsDir := filepath.Join(tmpDir, "libbeat/docs")
+	err := os.MkdirAll(docsDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create docs dir: %v", err)
+	}
+
+	versionAsciidoc := filepath.Join(docsDir, "version.asciidoc")
+	versionContent := `:stack-version: 9.3.0
+:doc-branch: current
+`
+	err = os.WriteFile(versionAsciidoc, []byte(versionContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create version.asciidoc: %v", err)
+	}
+
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("Failed to restore directory: %v", err)
+		}
+	}()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("Failed to change to temp directory: %v", err)
+	}
+
+	err = UpdateStackVersion("9.5.1")
+	if err != nil {
+		t.Fatalf("UpdateStackVersion failed: %v", err)
+	}
+
+	content, err := os.ReadFile(versionAsciidoc)
+	if err != nil {
+		t.Fatalf("Failed to read version.asciidoc: %v", err)
+	}
+	if !strings.Contains(string(content), ":stack-version: 9.5.1") {
+		t.Errorf("stack-version not updated. Got:\n%s", string(content))
+	}
+	if !strings.Contains(string(content), ":doc-branch: current") {
+		t.Errorf("doc-branch should remain unchanged. Got:\n%s", string(content))
+	}
+}
+
+func TestUpdateDocsDocBranchCurrent(t *testing.T) {
+	tmpDir := t.TempDir()
+	docsDir := filepath.Join(tmpDir, "libbeat/docs")
+	err := os.MkdirAll(docsDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create docs dir: %v", err)
+	}
+
+	versionAsciidoc := filepath.Join(docsDir, "version.asciidoc")
+	versionContent := `:stack-version: 9.3.0
+:doc-branch: current
+`
+	err = os.WriteFile(versionAsciidoc, []byte(versionContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create version.asciidoc: %v", err)
+	}
+
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("Failed to restore directory: %v", err)
+		}
+	}()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("Failed to change to temp directory: %v", err)
+	}
+
+	err = UpdateDocsWithOptions(DocsUpdateOptions{
+		BaseBranch:     "9.5",
+		CurrentVersion: "9.5.1",
+		ReleaseBranch:  "9.5",
+	})
+	if err != nil {
+		t.Fatalf("UpdateDocsWithOptions failed: %v", err)
+	}
+
+	content, err := os.ReadFile(versionAsciidoc)
+	if err != nil {
+		t.Fatalf("Failed to read version.asciidoc: %v", err)
+	}
+	if !strings.Contains(string(content), ":stack-version: 9.5.1") {
+		t.Errorf("stack-version not updated. Got:\n%s", string(content))
+	}
+	if !strings.Contains(string(content), ":doc-branch: 9.5") {
+		t.Errorf("doc-branch not updated for patch docs. Got:\n%s", string(content))
+	}
+}
+
+func TestUpdateDocsIncludeHeartbeat(t *testing.T) {
+	tmpDir := t.TempDir()
+	for _, dir := range []string{"libbeat/docs", "deploy/kubernetes"} {
+		if err := os.MkdirAll(filepath.Join(tmpDir, dir), 0755); err != nil {
+			t.Fatalf("Failed to create dir %s: %v", dir, err)
+		}
+	}
+	if err := os.WriteFile(filepath.Join(tmpDir, "libbeat/docs/version.asciidoc"), []byte(`:stack-version: 9.4.0
+:doc-branch: 9.4
+`), 0644); err != nil {
+		t.Fatalf("Failed to write version.asciidoc: %v", err)
+	}
+	heartbeat := filepath.Join(tmpDir, "deploy/kubernetes/heartbeat-kubernetes.yaml")
+	if err := os.WriteFile(heartbeat, []byte("image: docker.elastic.co/beats/heartbeat-wolfi:9.4.0\n"), 0644); err != nil {
+		t.Fatalf("Failed to write heartbeat yaml: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(tmpDir, "README.md"), []byte("Docs: /9.4/\n"), 0644); err != nil {
+		t.Fatalf("Failed to write README: %v", err)
+	}
+
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get cwd: %v", err)
+	}
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("Failed to restore cwd: %v", err)
+		}
+	}()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("Failed to chdir: %v", err)
+	}
+
+	if err := UpdateDocsWithOptions(DocsUpdateOptions{
+		BaseBranch:       "9.4",
+		CurrentVersion:   "9.4.1",
+		ReleaseBranch:    "9.4",
+		IncludeHeartbeat: true,
+	}); err != nil {
+		t.Fatalf("UpdateDocsWithOptions failed: %v", err)
+	}
+
+	content, err := os.ReadFile(heartbeat)
+	if err != nil {
+		t.Fatalf("Failed to read heartbeat yaml: %v", err)
+	}
+	if !strings.Contains(string(content), "heartbeat-wolfi:9.4.1") {
+		t.Errorf("heartbeat image not updated. Got:\n%s", string(content))
+	}
+}
+
+func TestUpdateDocsDocBranchExplicitMain(t *testing.T) {
+	tmpDir := t.TempDir()
+	docsDir := filepath.Join(tmpDir, "libbeat/docs")
+	err := os.MkdirAll(docsDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create docs dir: %v", err)
+	}
+
+	versionAsciidoc := filepath.Join(docsDir, "version.asciidoc")
+	versionContent := `:stack-version: 9.4.3
+:doc-branch: 9.4
+`
+	err = os.WriteFile(versionAsciidoc, []byte(versionContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create version.asciidoc: %v", err)
+	}
+
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("Failed to restore directory: %v", err)
+		}
+	}()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("Failed to change to temp directory: %v", err)
+	}
+
+	// PR-B: ff-release keeps :doc-branch: main for 9.x cumulative docs
+	err = UpdateDocsWithOptions(DocsUpdateOptions{
+		BaseBranch:     "main",
+		CurrentVersion: "9.5.0",
+		ReleaseBranch:  "9.5",
+		DocBranch:      "main",
+	})
+	if err != nil {
+		t.Fatalf("UpdateDocsWithOptions failed: %v", err)
+	}
+
+	content, err := os.ReadFile(versionAsciidoc)
+	if err != nil {
+		t.Fatalf("Failed to read version.asciidoc: %v", err)
+	}
+	if !strings.Contains(string(content), ":stack-version: 9.5.0") {
+		t.Errorf("stack-version not updated. Got:\n%s", string(content))
+	}
+	if !strings.Contains(string(content), ":doc-branch: main") {
+		t.Errorf("doc-branch should remain main for ff-release. Got:\n%s", string(content))
+	}
+}
+
+func TestUpdateDocsDocBranchExplicitMainNextMinor(t *testing.T) {
+	tmpDir := t.TempDir()
+	docsDir := filepath.Join(tmpDir, "libbeat/docs")
+	err := os.MkdirAll(docsDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create docs dir: %v", err)
+	}
+
+	versionAsciidoc := filepath.Join(docsDir, "version.asciidoc")
+	versionContent := `:stack-version: 9.5.0
+:doc-branch: main
+`
+	err = os.WriteFile(versionAsciidoc, []byte(versionContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create version.asciidoc: %v", err)
+	}
+
+	readmePath := filepath.Join(tmpDir, "README.md")
+	readmeContent := "# Beats\n\nhttps://github.com/elastic/beats/tree/main/libbeat\n"
+	err = os.WriteFile(readmePath, []byte(readmeContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create README.md: %v", err)
+	}
+
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("Failed to restore directory: %v", err)
+		}
+	}()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("Failed to change to temp directory: %v", err)
+	}
+
+	// PR-C: prepare-next-dev-minor uses BASE=main RELEASE=main (README no-op).
+	err = UpdateDocsWithOptions(DocsUpdateOptions{
+		BaseBranch:     "main",
+		CurrentVersion: "9.6.0",
+		ReleaseBranch:  "main",
+		DocBranch:      "main",
+	})
+	if err != nil {
+		t.Fatalf("UpdateDocsWithOptions failed: %v", err)
+	}
+
+	content, err := os.ReadFile(versionAsciidoc)
+	if err != nil {
+		t.Fatalf("Failed to read version.asciidoc: %v", err)
+	}
+	if !strings.Contains(string(content), ":stack-version: 9.6.0") {
+		t.Errorf("stack-version not updated. Got:\n%s", string(content))
+	}
+	if !strings.Contains(string(content), ":doc-branch: main") {
+		t.Errorf("doc-branch should remain main for next minor docs PR. Got:\n%s", string(content))
+	}
+
+	readme, err := os.ReadFile(readmePath)
+	if err != nil {
+		t.Fatalf("Failed to read README.md: %v", err)
+	}
+	if string(readme) != readmeContent {
+		t.Errorf("README.md should be unchanged when ReleaseBranch equals BaseBranch. Got:\n%s", string(readme))
+	}
+}
+
+func TestUpdateTestEnv(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	// Create test env directory
+	testEnvDir := filepath.Join(tmpDir, "testing/environments")
+	err := os.MkdirAll(testEnvDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create test env dir: %v", err)
+	}
+
+	// Create latest.yml
+	latestYml := filepath.Join(testEnvDir, "latest.yml")
+	latestContent := `services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.2.2
+`
+	err = os.WriteFile(latestYml, []byte(latestContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create latest.yml: %v", err)
+	}
+
+	composeDir := filepath.Join(tmpDir, "metricbeat")
+	err = os.MkdirAll(composeDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create metricbeat dir: %v", err)
+	}
+	composeFile := filepath.Join(composeDir, "docker-compose.yml")
+	composeContent := `image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-9.2.2}-1
+`
+	err = os.WriteFile(composeFile, []byte(composeContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create docker-compose.yml: %v", err)
+	}
+
+	// Change to temp directory
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("Failed to restore directory: %v", err)
+		}
+	}()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("Failed to change to temp directory: %v", err)
+	}
+
+	// LATEST=9.3.0, CURRENT=9.4.0 per beats.mak semantics
+	err = UpdateTestEnv("9.3.0", "9.4.0")
+	if err != nil {
+		t.Fatalf("UpdateTestEnv failed: %v", err)
+	}
+
+	// latest.yml uses LATEST version
+	content, _ := os.ReadFile(latestYml)
+	if !strings.Contains(string(content), "docker.elastic.co/elasticsearch/elasticsearch:9.3.0") {
+		t.Errorf("latest.yml should use latest version. Got:\n%s", string(content))
+	}
+
+	// docker-compose defaults use LATEST version
+	content, _ = os.ReadFile(composeFile)
+	if !strings.Contains(string(content), "${ELASTICSEARCH_VERSION:-9.3.0}") {
+		t.Errorf("docker-compose default not updated. Got:\n%s", string(content))
+	}
+}
+
+func TestCheckRequirements(t *testing.T) {
+	tests := []struct {
+		name        string
+		version     string
+		shouldError bool
+		errorMsg    string
+	}{
+		{
+			name:        "6.x minor release blocked",
+			version:     "6.5.0",
+			shouldError: true,
+			errorMsg:    "deprecated and blocked",
+		},
+		{
+			name:        "7.x minor release blocked",
+			version:     "7.5.0",
+			shouldError: true,
+			errorMsg:    "deprecated and blocked",
+		},
+		{
+			name:        "8.x minor release blocked",
+			version:     "8.5.0",
+			shouldError: true,
+			errorMsg:    "deprecated and blocked",
+		},
+		{
+			name:        "9.x minor release allowed",
+			version:     "9.3.0",
+			shouldError: false,
+		},
+		{
+			name:        "6.x patch release allowed",
+			version:     "6.5.1",
+			shouldError: false,
+		},
+		{
+			name:        "7.x patch release allowed",
+			version:     "7.5.1",
+			shouldError: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create a temporary git repository for testing
+			tmpDir := t.TempDir()
+
+			cfg := &ReleaseConfig{
+				CurrentRelease: tt.version,
+				BaseBranch:     "main",
+			}
+
+			// Change to temp directory
+			origDir, err := os.Getwd()
+			if err != nil {
+				t.Fatalf("Failed to get current directory: %v", err)
+			}
+			defer func() {
+				if err := os.Chdir(origDir); err != nil {
+					t.Errorf("Failed to restore directory: %v", err)
+				}
+			}()
+			if err := os.Chdir(tmpDir); err != nil {
+				t.Fatalf("Failed to change to temp directory: %v", err)
+			}
+
+			// Initialize git repo (this will fail if git is not available, but that's ok for this test)
+			// We're mainly testing the version validation logic
+			err = checkRequirements(cfg)
+
+			if tt.shouldError {
+				if err == nil {
+					t.Errorf("Expected error for version %s, got nil", tt.version)
+				} else if tt.errorMsg != "" && !strings.Contains(err.Error(), tt.errorMsg) {
+					t.Errorf("Expected error containing '%s', got: %v", tt.errorMsg, err)
+				}
+			} else if err != nil && !strings.Contains(err.Error(), "repository") {
+				// Allow errors about repository not existing, but not version validation errors
+				if strings.Contains(err.Error(), "deprecated") {
+					t.Errorf("Unexpected error for version %s: %v", tt.version, err)
+				}
+			}
+		})
+	}
+}
+
+func TestUpdateTestEnvNoChanges(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	// Create test env directory
+	testEnvDir := filepath.Join(tmpDir, "testing/environments")
+	err := os.MkdirAll(testEnvDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create test env dir: %v", err)
+	}
+
+	// Create latest.yml with a version that won't match
+	latestYml := filepath.Join(testEnvDir, "latest.yml")
+	latestContent := `services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.1.0
+`
+	err = os.WriteFile(latestYml, []byte(latestContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create latest.yml: %v", err)
+	}
+
+	// Change to temp directory
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("Failed to restore directory: %v", err)
+		}
+	}()
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("Failed to change to temp directory: %v", err)
+	}
+
+	// TestUpdateTestEnvNoChanges - uses non-matching file content; latest.yml keeps 9.1.0
+	// Same latest version already present — should not modify latest.yml
+	err = UpdateTestEnv("9.1.0", "9.3.0")
+	if err != nil {
+		t.Fatalf("UpdateTestEnv should not fail when no matches found: %v", err)
+	}
+
+	// Verify file was NOT updated (version should still be 9.1.0)
+	content, _ := os.ReadFile(latestYml)
+	if !strings.Contains(string(content), "docker.elastic.co/elasticsearch/elasticsearch:9.1.0") {
+		t.Errorf("Test env file should not be updated when version doesn't match. Got:\n%s", string(content))
+	}
+}
