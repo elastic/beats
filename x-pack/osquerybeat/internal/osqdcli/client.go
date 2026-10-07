@@ -224,14 +224,17 @@ func (c *Client) close() {
 // that doesn't cancel the query execution itself.
 // This also makes the client RPC unusable until the long running query finishes, returning errors for each subsequent query.
 func (c *Client) Query(ctx context.Context, sql string, timeout time.Duration) ([]map[string]any, error) {
-	c.mx.Lock()
-	defer c.mx.Unlock()
-
 	err := c.cliLimiter.Acquire(ctx, limit)
 	if err != nil {
 		return nil, err
 	}
 	defer c.cliLimiter.Release(limit)
+
+	c.mx.Lock()
+	defer c.mx.Unlock()
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
+	}
 
 	// If query timeout is <= 0, then use client timeout (default is 1 minute)
 	if timeout <= 0 {
@@ -253,10 +256,14 @@ func (c *Client) Query(ctx context.Context, sql string, timeout time.Duration) (
 		return nil, err
 	}
 	defer cli.Close()
+	defer closeOnCancellation(ctx, cli)()
 
 	var res *genosquery.ExtensionResponse
 	res, err = cli.QueryContext(ctx, sql)
 	if err != nil {
+		if ctx.Err() != nil {
+			return nil, ctx.Err()
+		}
 		return nil, fmt.Errorf("osquery failed: %w", err)
 	}
 
@@ -273,18 +280,21 @@ func (c *Client) Query(ctx context.Context, sql string, timeout time.Duration) (
 // ResolveResult types for a give query
 // The API is public to allow resolution of scheduled queries results captured by custom logger plugin
 func (c *Client) ResolveResult(ctx context.Context, sql string, hits []map[string]string) ([]map[string]any, error) {
-	c.mx.Lock()
-	defer c.mx.Unlock()
-	if c.cli == nil {
-		return nil, ErrClientClosed
-	}
-
 	err := c.cliLimiter.Acquire(ctx, limit)
 	if err != nil {
 		return nil, err
 	}
 	defer c.cliLimiter.Release(limit)
 
+	c.mx.Lock()
+	defer c.mx.Unlock()
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
+	}
+
+	if c.cli == nil {
+		return nil, ErrClientClosed
+	}
 	return c.resolveResult(ctx, sql, hits)
 }
 
@@ -309,7 +319,12 @@ func (c *Client) queryColumnTypes(ctx context.Context, sql string) (map[string]s
 			err   error
 		)
 
+		stopCancellation := closeOnCancellation(ctx, c.cli)
 		exres, err = c.cli.GetQueryColumnsContext(ctx, sql)
+		stopCancellation()
+		if ctx.Err() != nil {
+			return nil, ctx.Err()
+		}
 
 		if err != nil {
 			return nil, fmt.Errorf("osquery get query columns failed: %w", err)
@@ -369,4 +384,17 @@ func resolveHitTypes(hit, colTypes map[string]string) map[string]any {
 		m[k] = v
 	}
 	return m
+}
+
+// closeOnCancellation interrupts an RPC transport read, which thrift does not
+// otherwise cancel when its context ends. Joining the callback keeps the normal
+// deferred Close from racing with the cancellation Close.
+func closeOnCancellation(ctx context.Context, cli *osquery.ExtensionManagerClient) func() {
+	done := make(chan struct{})
+	stop := context.AfterFunc(ctx, func() { cli.Close(); close(done) })
+	return func() {
+		if !stop() {
+			<-done
+		}
+	}
 }

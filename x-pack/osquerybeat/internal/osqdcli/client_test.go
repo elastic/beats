@@ -11,6 +11,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestResolveHitTypes(t *testing.T) {
@@ -126,4 +127,27 @@ func TestRetry_NilLogger(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, 2, callCount, "should have retried once")
+}
+
+func TestQueryAndResolveCancellationWhileClientBusy(t *testing.T) {
+	c := New("unused")
+	require.NoError(t, c.cliLimiter.Acquire(t.Context(), limit), "test must reserve the in-flight query slot")
+	defer c.cliLimiter.Release(limit)
+	c.mx.Lock()
+	defer c.mx.Unlock()
+	ctx, cancel := context.WithCancel(t.Context())
+	cancel()
+	for _, operation := range []func() error{
+		func() error { _, err := c.Query(ctx, "SELECT 1", time.Minute); return err },
+		func() error { _, err := c.ResolveResult(ctx, "SELECT 1", nil); return err },
+	} {
+		done := make(chan error, 1)
+		go func() { done <- operation() }()
+		select {
+		case err := <-done:
+			assert.ErrorIs(t, err, context.Canceled, "pending operation must respect cancellation without acquiring the client mutex")
+		case <-time.After(time.Second):
+			t.Fatal("operation waited for a busy client despite cancellation")
+		}
+	}
 }

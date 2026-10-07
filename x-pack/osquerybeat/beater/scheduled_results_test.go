@@ -156,3 +156,54 @@ func TestScheduledResultWorkerPreservesFIFO(t *testing.T) {
 		}
 	}
 }
+
+type pendingProfileClient struct {
+	scheduledResultClient
+	entered chan struct{}
+}
+
+func (c pendingProfileClient) Query(ctx context.Context, _ string, _ time.Duration) ([]map[string]any, error) {
+	close(c.entered)
+	<-ctx.Done()
+	return nil, ctx.Err()
+}
+
+type notifiedResponsePublisher struct {
+	mockBeatPublisher
+	response chan struct{}
+}
+
+func (p *notifiedResponsePublisher) PublishScheduledResponse(string, string, string, string, string, string, time.Time, time.Time, time.Time, int, int64) {
+	p.response <- struct{}{}
+}
+
+func TestScheduledLoggerProfilingDoesNotHoldResponseOrShutdown(t *testing.T) {
+	p := scheduledTestConfig(t)
+	qi := p.queryInfoMap["test"]
+	qi.Profile = true
+	p.queryInfoMap["test"] = qi
+	cli := pendingProfileClient{entered: make(chan struct{})}
+	publisher := &notifiedResponsePublisher{response: make(chan struct{}, 1)}
+	bt := &osquerybeat{pub: publisher, log: logptest.NewTestingLogger(t, "profile")}
+	bt.qp = newQueryProfiler(bt.log)
+	plugin, stop := bt.newScheduledLogger(t.Context(), cli, p)
+	defer stop()
+	require.NoError(t, plugin.Log(t.Context(), logger.LogTypeSnapshot, `{"name":"test","action":"snapshot","snapshot":[]}`), "logger must return while scheduled profiling is pending")
+	select {
+	case <-cli.entered:
+	case <-time.After(time.Second):
+		t.Fatal("scheduled profile was not queried")
+	}
+	select {
+	case <-publisher.response:
+	default:
+		t.Error("scheduled response waited for the profiling query")
+	}
+	done := make(chan struct{})
+	go func() { stop(); close(done) }()
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+		t.Fatal("shutdown did not cancel the pending profile")
+	}
+}

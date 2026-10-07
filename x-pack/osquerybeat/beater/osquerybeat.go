@@ -893,6 +893,12 @@ func (bt *osquerybeat) handleScheduledResult(ctx context.Context, cli scheduledQ
 		}
 	}
 
+	if !publish(func() {
+		bt.pub.PublishScheduledResponse(scheduleID, qi.PackID, qi.PackName, qi.QueryName, qi.SpaceID, responseID, runTime, runTime, plannedScheduleTime, totalHits, scheduleExecutionCount)
+	}) {
+		return
+	}
+
 	if qi.Profile {
 		profile, err := bt.qp.profileScheduledQuery(ctx, cli, res.Name)
 		if err != nil {
@@ -906,9 +912,6 @@ func (bt *osquerybeat) handleScheduledResult(ctx context.Context, cli scheduledQ
 		}
 	}
 
-	publish(func() {
-		bt.pub.PublishScheduledResponse(scheduleID, qi.PackID, qi.PackName, qi.QueryName, qi.SpaceID, responseID, runTime, runTime, plannedScheduleTime, totalHits, scheduleExecutionCount)
-	})
 }
 
 func queryResultMeta(typ, action string, res QueryResult, scheduleExecutionCount int64, plannedScheduleTime time.Time) map[string]any {

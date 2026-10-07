@@ -52,6 +52,9 @@ func newQueryProfiler(log *logp.Logger) *queryProfiler {
 	}
 }
 
+// profileScheduledQuery samples the latest osquery_schedule row after the logger
+// callback returns. A subsequent execution can update this row before collection;
+// response_id links the triggering result, not an exact historical measurement.
 func (p *queryProfiler) profileScheduledQuery(ctx context.Context, qe queryExecutor, queryName string) (map[string]any, error) {
 	escapedName := strings.ReplaceAll(queryName, "'", "''")
 	query := osqueryScheduleProfileQueryPrefix + escapedName + osqueryScheduleProfileQuerySuffix
