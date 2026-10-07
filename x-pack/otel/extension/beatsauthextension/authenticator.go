@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"slices"
 	"time"
 
 	"go.elastic.co/apm/module/apmelasticsearch/v2"
@@ -31,6 +32,7 @@ import (
 )
 
 var (
+	_                  EndpointsProvider        = (*authenticator)(nil)
 	_                  extensionauth.HTTPClient = (*authenticator)(nil)
 	_                  extensionauth.GRPCClient = (*authenticator)(nil)
 	_                  extension.Extension      = (*authenticator)(nil)
@@ -40,6 +42,11 @@ var (
 // roundTripperProvider is an interface that provides a RoundTripper
 type roundTripperProvider interface {
 	RoundTripper() http.RoundTripper
+}
+
+// EndpointsProvider provides optional configured Elasticsearch endpoints.
+type EndpointsProvider interface {
+	Endpoints() []string
 }
 
 type authenticator struct {
@@ -100,6 +107,11 @@ func (a *authenticator) RoundTripper(_ http.RoundTripper) (http.RoundTripper, er
 		return nil, fmt.Errorf("authenticator not started")
 	}
 	return a.rtProvider.RoundTripper(), nil
+}
+
+// Endpoints returns a copy of the configured endpoints.
+func (a *authenticator) Endpoints() []string {
+	return slices.Clone(a.cfg.Endpoints)
 }
 
 // getHTTPOptions returns a list of http transport options

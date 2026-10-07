@@ -4,11 +4,8 @@ extensions:
   pprof:
     endpoint: 0.0.0.0:1777
   beatsauth:
-  elasticsearchauth:
     endpoints:
       - http://localhost:9200
-    auth:
-      authenticator: beatsauth
   elasticsearch_storage:
     hosts:
       - http://localhost:9200
@@ -122,7 +119,7 @@ exporters:
 connectors:
 
 service:
-  extensions: [health_check, pprof, beatsauth, elasticsearchauth, elasticsearch_storage, kafkapartitioner]
+  extensions: [health_check, pprof, beatsauth, elasticsearch_storage, kafkapartitioner]
   
   pipelines:
     logs:
