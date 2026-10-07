@@ -156,7 +156,7 @@ func newLazyTestRegistrar(t *testing.T, states ...file.State) (*storetest.Memory
 	stateStore := &testStateStore{registry: statestore.NewRegistry(memBackend)}
 
 	if len(states) > 0 {
-		store, err := stateStore.StoreFor("")
+		store, err := stateStore.StoreFor("", "")
 		require.NoError(t, err)
 		require.NoError(t, writeStates(store, states))
 		store.Close()
