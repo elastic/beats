@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: Keep osquerybeat responsive during output outages and recover osqueryd logger failures.
+component: osquerybeat
+issue: https://github.com/elastic/beats/issues/53645
