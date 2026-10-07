@@ -134,15 +134,10 @@ func (a *authenticator) PerRPCCredentials() (credentials.PerRPCCredentials, erro
 }
 
 func getHttpClient(a *authenticator) (roundTripperProvider, error) {
-	parsedCfg, err := config.NewConfigFrom(a.cfg.BeatAuthConfig)
+	beatAuthConfig, parsedCfg, err := a.cfg.beatsAuthConfig()
 	if err != nil {
+		// This should never fail because the config has been validated already.
 		return nil, fmt.Errorf("failed creating config: %w", err)
-	}
-
-	beatAuthConfig := BeatsAuthConfig{}
-	err = parsedCfg.Unpack(&beatAuthConfig)
-	if err != nil {
-		return nil, fmt.Errorf("failed unpacking config: %w", err)
 	}
 
 	applyRestartOnCertChangeAlias(parsedCfg, &beatAuthConfig, a.logger)

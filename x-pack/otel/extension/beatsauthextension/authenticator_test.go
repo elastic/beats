@@ -698,6 +698,80 @@ func TestConfigValidation(t *testing.T) {
 			config:    func() *Config { return &Config{Endpoints: []string{"https://user:password@es.example:9200"}} },
 			errString: "endpoint userinfo is unsupported",
 		},
+		{
+			name: "API key and basic authentication",
+			config: func() *Config {
+				return &Config{BeatAuthConfig: map[string]any{
+					"auth": map[string]any{
+						"api_key":  "api-key",
+						"username": "elastic",
+						"password": "password",
+					},
+				}}
+			},
+			errString: "cannot set both api_key and username/password",
+		},
+		{
+			name: "API key and Authorization header",
+			config: func() *Config {
+				return &Config{BeatAuthConfig: map[string]any{
+					"auth": map[string]any{
+						"api_key": "api-key",
+						"headers": []map[string]any{
+							{"key": "authorization", "value": "Bearer token"},
+						},
+					},
+				}}
+			},
+			errString: "cannot configure multiple HTTP authorization methods",
+		},
+		{
+			name: "basic authentication and Authorization header",
+			config: func() *Config {
+				return &Config{BeatAuthConfig: map[string]any{
+					"auth": map[string]any{
+						"username": "elastic",
+						"password": "password",
+						"headers": []map[string]any{
+							{"key": "Authorization", "value": "Bearer token"},
+						},
+					},
+				}}
+			},
+			errString: "cannot configure multiple HTTP authorization methods",
+		},
+		{
+			name: "multiple Authorization headers",
+			config: func() *Config {
+				return &Config{BeatAuthConfig: map[string]any{
+					"auth": map[string]any{
+						"headers": []map[string]any{
+							{"key": "Authorization", "value": "Bearer token"},
+							{"key": "authorization", "value": "ApiKey api-key"},
+						},
+					},
+				}}
+			},
+			errString: "cannot configure multiple Authorization headers",
+		},
+		{
+			name: "Kerberos and HTTP authorization",
+			config: func() *Config {
+				return &Config{BeatAuthConfig: map[string]any{
+					"kerberos": map[string]any{
+						"auth_type":   "password",
+						"config_path": "../../../../libbeat/outputs/elasticsearch/testdata/krb5.conf",
+						"username":    "user",
+						"password":    "pass",
+						"realm":       "elastic",
+					},
+					"auth": map[string]any{
+						"api_key": "api-key",
+					},
+				}}
+			},
+			errString: "cannot combine Kerberos with HTTP authorization",
+		},
 	}
 
 	for _, test := range tests {
