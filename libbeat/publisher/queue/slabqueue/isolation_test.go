@@ -18,7 +18,10 @@
 package slabqueue
 
 import (
+	"sync"
+	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -135,4 +138,60 @@ func TestAggregateCapacityOverflow(t *testing.T) {
 		addQueueCapacity(maxInt-2, 3)
 	}, "an unrepresentable aggregate must not wrap into a small pool budget")
 	assert.Equal(t, ((maxInt-1)>>slabChunkShift)+1, numChunks(maxInt), "chunk rounding must not overflow at the integer limit")
+}
+
+func TestCappedQueuesResizeAndShutdownConcurrently(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 4}, nil)
+	t.Cleanup(pool.Shutdown)
+	const receivers = 4
+	queues := make([]*Queue[int], receivers)
+	var workers sync.WaitGroup
+	var published, consumed atomic.Int64
+	for i := range receivers {
+		q := pool.Connect()
+		q.SetTarget(4)
+		queues[i] = q
+		p := q.Producer(queue.ProducerConfig{})
+		workers.Go(func() {
+			for event := 0; ; event++ {
+				if _, ok := p.Publish(event); !ok {
+					return
+				}
+				published.Add(1)
+			}
+		})
+		workers.Go(func() {
+			for {
+				b, err := q.Get(2)
+				if err != nil {
+					return
+				}
+				consumed.Add(int64(b.Count()))
+				b.Done()
+			}
+		})
+	}
+	require.Eventually(t, func() bool { return published.Load() >= receivers*4 }, time.Second, time.Millisecond,
+		"all receivers should have live traffic before concurrent resize and shutdown")
+	for _, q := range queues {
+		workers.Go(func() {
+			for i := range 100 {
+				q.SetTarget(1 + i%8)
+			}
+			_ = q.Close(false)
+		})
+	}
+	workers.Go(pool.Shutdown)
+	done := make(chan struct{})
+	go func() {
+		workers.Wait()
+		close(done)
+	}()
+	select {
+	case <-done:
+	case <-time.After(10 * time.Second):
+		t.Fatal("capped receiver traffic, resizing, and shutdown must complete without deadlocking")
+	}
+	assert.LessOrEqual(t, consumed.Load(), published.Load(), "shutdown must never deliver unpublished events")
+	assert.Equal(t, 0, pool.ConnectedQueues(), "shutdown should disconnect every receiver")
 }
