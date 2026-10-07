@@ -81,15 +81,18 @@ var (
 	errNoInputRunner      = errors.New("no input runner available")
 )
 
+func (cim *InputManager) defaultCleanTimeout() time.Duration {
+	if cim.DefaultCleanTimeout <= 0 {
+		return 30 * time.Minute
+	}
+	return cim.DefaultCleanTimeout
+}
+
 // init initializes the state store with a full init (reading all states).
 // For ES-backed inputs, this is deferred until Create() where the inputID is known.
 func (cim *InputManager) init(inputID string) error {
 	if cim.initedFull {
 		return nil
-	}
-
-	if cim.DefaultCleanTimeout <= 0 {
-		cim.DefaultCleanTimeout = 30 * time.Minute
 	}
 
 	log := cim.Logger.With("input_type", cim.Type)
@@ -164,7 +167,7 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	settings := struct {
 		ID            string        `config:"id"`
 		CleanInactive time.Duration `config:"clean_inactive"`
-	}{ID: "", CleanInactive: cim.DefaultCleanTimeout}
+	}{ID: "", CleanInactive: cim.defaultCleanTimeout()}
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
 	}
