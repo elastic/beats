@@ -123,7 +123,7 @@ func parseHTTPURL(rawURL string) (*url.URL, error) {
 	if u.Scheme != "http" && u.Scheme != "https" {
 		return nil, errors.New("URL scheme must be http or https")
 	}
-	if u.Host == "" {
+	if u.Hostname() == "" {
 		return nil, errors.New("URL host must not be empty")
 	}
 	if u.Fragment != "" {
