@@ -7,6 +7,7 @@
 package monitor
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -376,7 +377,7 @@ func unsupportedPlatformMetricNamespaceError(namespace string) error {
 
 func azureBadRequest(message string) error {
 	body := fmt.Sprintf(`{"code":"BadRequest","message":"%s"}`, message)
-	req, err := http.NewRequest(http.MethodGet, "https://management.azure.com/metricDefinitions", nil)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "https://management.azure.com/metricDefinitions", nil)
 	if err != nil {
 		panic(err)
 	}
