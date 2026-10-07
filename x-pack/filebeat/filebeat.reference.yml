@@ -2623,6 +2623,10 @@ filebeat.inputs:
   #  from `filestream` inputs that were assigned these IDs.
   #  Taking over from `log` inputs is disabled when `from_ids` is set.
   #  from_ids: ["foo", "bar"]
+  #  If `from_any_id` is true, files are taken over from any previous
+  #  `filestream` input, regardless of its ID. Mutually exclusive with `from_ids`.
+  #  Taking over from `log` inputs is disabled when `from_any_id` is set.
+  #  from_any_id: false
 
   # Defines the buffer size every harvester uses when fetching the file
   #harvester_buffer_size: 16384
