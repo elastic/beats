@@ -64,7 +64,8 @@ type ConfigPlugin struct {
 
 	mx sync.RWMutex
 
-	queriesCount int
+	queriesCount     int
+	resultGeneration uint64
 
 	// A map that allows to look up the queryInfo by query name
 	queryInfoMap queryInfoMap
@@ -478,4 +479,27 @@ func traverseTree(depth int, ecsm ecs.Mapping, path []string, v any) error {
 		}
 	}
 	return nil
+}
+
+func (p *ConfigPlugin) setGeneration(inputs []config.InputConfig, generation uint64) error {
+	p.mx.Lock()
+	defer p.mx.Unlock()
+	if err := p.set(inputs); err != nil {
+		return err
+	}
+	p.resultGeneration = generation
+	return nil
+}
+
+// lookupResultMetadata captures one coherent policy snapshot. The lookup maps
+// are replaced rather than mutated, so accepted work can retain its QueryInfo.
+func (p *ConfigPlugin) lookupResultMetadata(name string) (string, QueryInfo, uint64, bool) {
+	p.mx.RLock()
+	defer p.mx.RUnlock()
+	ns, nsOK := p.namespaces[name]
+	qi, qiOK := p.queryInfoMap[name]
+	if pending, ok := p.newQueryInfoMap[name]; ok {
+		qi.Profile = pending.Profile
+	}
+	return ns, qi, p.resultGeneration, nsOK && qiOK
 }

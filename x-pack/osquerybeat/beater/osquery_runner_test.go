@@ -64,7 +64,7 @@ func TestOsqueryRunnerCancellable(t *testing.T) {
 	runCh := make(chan struct{}, 1)
 
 	//nolint:unparam // false positive on returning nil error, need this signature
-	runfn := func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan []config.InputConfig) error {
+	runfn := func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan runnerInput) error {
 		runCh <- struct{}{}
 		<-ctx.Done()
 		return nil
@@ -114,7 +114,7 @@ func TestOsqueryRunnerRestart(t *testing.T) {
 	var runs int
 
 	//nolint:unparam // false positive on returning nil error, need this signature
-	runfn := func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan []config.InputConfig) error {
+	runfn := func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan runnerInput) error {
 		runs++
 		runCh <- struct{}{}
 		<-ctx.Done()
@@ -211,7 +211,7 @@ func TestOsqueryRunnerRestartOnExtensionsChange(t *testing.T) {
 	// Drain inputCh like the real runOsquery does, so no-restart updates do not
 	// block the runner loop.
 	//nolint:unparam // false positive on returning nil error, need this signature
-	runfn := func(ctx context.Context, _ osqd.Flags, exts config.ExtensionsConfig, inputCh <-chan []config.InputConfig) error {
+	runfn := func(ctx context.Context, _ osqd.Flags, exts config.ExtensionsConfig, inputCh <-chan runnerInput) error {
 		mx.Lock()
 		runs++
 		lastExts = exts
@@ -330,7 +330,7 @@ func TestOsqueryRunnerRecoversFromTransientErrors(t *testing.T) {
 
 			started := make(chan struct{}, 2)
 			var runs atomic.Int32
-			runfn := func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan []config.InputConfig) error {
+			runfn := func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan runnerInput) error {
 				run := runs.Add(1)
 				started <- struct{}{}
 				if run == 1 {
@@ -365,7 +365,7 @@ func TestOsqueryRunnerReturnsUnrecoverableError(t *testing.T) {
 
 	wantErr := errors.New("invalid configuration")
 	started := make(chan struct{}, 1)
-	runfn := func(context.Context, osqd.Flags, config.ExtensionsConfig, <-chan []config.InputConfig) error {
+	runfn := func(context.Context, osqd.Flags, config.ExtensionsConfig, <-chan runnerInput) error {
 		started <- struct{}{}
 		return wantErr
 	}

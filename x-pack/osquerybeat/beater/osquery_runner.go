@@ -19,18 +19,18 @@ import (
 
 type osqueryRunner struct {
 	log     *logp.Logger
-	inputCh chan []config.InputConfig
+	inputCh chan runnerInput
 }
 
 func newOsqueryRunner(log *logp.Logger) *osqueryRunner {
 	r := &osqueryRunner{
 		log:     log,
-		inputCh: make(chan []config.InputConfig, 1),
+		inputCh: make(chan runnerInput, 1),
 	}
 	return r
 }
 
-type osqueryRunFunc func(ctx context.Context, flags osqd.Flags, extensions config.ExtensionsConfig, inputCh <-chan []config.InputConfig) error
+type osqueryRunFunc func(ctx context.Context, flags osqd.Flags, extensions config.ExtensionsConfig, inputCh <-chan runnerInput) error
 
 // Run manages osqueryd lifecycle, processes inputs changes, restarts osquery if needed
 func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) error {
@@ -42,7 +42,7 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 		cn  context.CancelFunc
 		wg  sync.WaitGroup
 
-		inputCh chan []config.InputConfig
+		inputCh chan runnerInput
 	)
 
 	var mx sync.Mutex
@@ -64,12 +64,13 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 	errCh := make(chan error, 1)
 
 	// lastKnownInputs is used for recovery after a recoverable osquery error
-	var lastKnownInputs []config.InputConfig
+	var lastKnownInputs *runnerInput
 
 	logLevel := zapcore.LevelOf(r.log.Core())
 
-	process := func(inputs []config.InputConfig) {
-		lastKnownInputs = inputs
+	process := func(input runnerInput) {
+		lastKnownInputs = &input
+		inputs := input.inputs
 		newFlags := config.GetOsqueryOptions(inputs)
 		newExtensions := config.GetOsqueryExtensions(inputs)
 		newLogLevel := zapcore.LevelOf(r.log.Core())
@@ -99,7 +100,7 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 			flags = newFlags
 			extensions = newExtensions
 			logLevel = newLogLevel
-			inputCh = make(chan []config.InputConfig, 1)
+			inputCh = make(chan runnerInput, 1)
 			ctx, cn = context.WithCancel(parentCtx) //nolint:gosec // G118: cn is stored and invoked via the cancel() helper
 
 			wg.Go(func() {
@@ -116,7 +117,7 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 		mx.Unlock()
 
 		select {
-		case inputCh <- inputs:
+		case inputCh <- input:
 		case <-ctx.Done():
 		}
 	}
@@ -135,7 +136,7 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 					r.log.Infof("Recover osquery after recoverable error: %v", err)
 					if lastKnownInputs != nil {
 						select {
-						case r.inputCh <- lastKnownInputs:
+						case r.inputCh <- *lastKnownInputs:
 						case <-parentCtx.Done():
 							return parentCtx.Err()
 						}
@@ -163,11 +164,20 @@ func extensionsAreSame(a, b config.ExtensionsConfig) bool {
 	return slices.Equal(a.Require, b.Require)
 }
 
+type runnerInput struct {
+	inputs     []config.InputConfig
+	generation uint64
+}
+
 func (r *osqueryRunner) Update(ctx context.Context, inputs []config.InputConfig) error {
+	return r.updateGeneration(ctx, inputs, 0)
+}
+
+func (r *osqueryRunner) updateGeneration(ctx context.Context, inputs []config.InputConfig, generation uint64) error {
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
-	case r.inputCh <- inputs:
+	case r.inputCh <- runnerInput{inputs: inputs, generation: generation}:
 	}
 	return nil
 }
