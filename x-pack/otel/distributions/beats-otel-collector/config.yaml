@@ -8,7 +8,7 @@ extensions:
       - http://localhost:9200
   elasticsearch_storage:
     auth:
-      authenticator: elasticsearchauth
+      authenticator: beatsauth
   kafkapartitioner:
 
 receivers:
