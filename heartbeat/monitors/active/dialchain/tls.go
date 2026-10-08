@@ -33,7 +33,7 @@ import (
 // TLSLayer configures the TLS layer in a DialerChain.
 // The layer will update the active event with the TLS RTT and
 // crypto/cert details.
-func TLSLayer(cfg *tlscommon.TLSConfig, to time.Duration) Layer {
+func TLSLayer(cfg *tlscommon.TLSConfig, to time.Duration, logger *logp.Logger) Layer {
 	return func(event *beat.Event, next transport.Dialer) (transport.Dialer, error) {
 		var timer timer
 
@@ -41,7 +41,7 @@ func TLSLayer(cfg *tlscommon.TLSConfig, to time.Duration) Layer {
 		// This gets us the timestamp for when the TLS layer will start the handshake.
 		next = startTimerAfterDial(&timer, next)
 
-		dialer := transport.TLSDialer(next, cfg, to, logp.NewLogger(""))
+		dialer := transport.TLSDialer(next, cfg, to, logger)
 		return afterDial(dialer, func(conn net.Conn) (net.Conn, error) {
 			tlsConn, ok := conn.(*cryptoTLS.Conn)
 			if !ok {
