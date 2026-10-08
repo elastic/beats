@@ -420,7 +420,8 @@ func newRPCClient(socketPath string, timeout time.Duration) (*rpcClient, error) 
 	if err != nil {
 		return nil, err
 	}
-	return &rpcClient{client: genosquery.NewExtensionManagerClientFactory(conn, thrift.NewTBinaryProtocolFactoryDefault()), transport: conn}, nil
+	// A nil protocol configuration preserves the socket timeouts set by Open.
+	return &rpcClient{client: genosquery.NewExtensionManagerClientFactory(conn, thrift.NewTBinaryProtocolFactoryConf(nil)), transport: conn}, nil
 }
 
 func (c *rpcClient) Close() { _ = c.transport.Close() }

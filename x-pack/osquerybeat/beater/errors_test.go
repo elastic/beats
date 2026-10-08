@@ -111,9 +111,11 @@ func TestOsqueryExitHelper(t *testing.T) {
 
 func osqueryExitError(t *testing.T, code int) error {
 	t.Helper()
-	command := exec.Command(os.Args[0], "-test.run=^TestOsqueryExitHelper$")
+	executable, err := os.Executable()
+	require.NoError(t, err, "locate the test executable")
+	command := exec.CommandContext(t.Context(), executable, "-test.run=^TestOsqueryExitHelper$")
 	command.Env = append(os.Environ(), "OSQUERY_TEST_EXIT="+strconv.Itoa(code))
-	err := command.Run()
+	err = command.Run()
 	require.Error(t, err, "helper must exit unsuccessfully")
 	var exitError *exec.ExitError
 	require.ErrorAs(t, err, &exitError, "helper must produce a real process exit error")

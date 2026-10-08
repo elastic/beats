@@ -106,7 +106,10 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 		r.log.Info("Start osqueryd")
 		// Capture per-run values; configuration can change while teardown completes.
 		runFlags, runExtensions, runInputs := flags, extensions, inputs
-		go func() { done <- runfn(childCtx, runFlags, runExtensions, runInputs) }()
+		go func() {
+			defer childCancel()
+			done <- runfn(childCtx, runFlags, runExtensions, runInputs)
+		}()
 	}
 	for {
 		var send chan runnerInput

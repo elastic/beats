@@ -500,10 +500,14 @@ func TestOsqueryRunnerIgnoresReadinessFromPreviousRun(t *testing.T) {
 	done := make(chan error, 1)
 	go func() {
 		done <- runner.Run(ctx, func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, inputs <-chan runnerInput) error {
+			ready, ok := ctx.Value(osqueryReadyKey{}).(func())
+			if !assert.True(t, ok, "each run must have a readiness callback") {
+				return errors.New("missing readiness callback")
+			}
 			if runs.Add(1) == 1 {
-				firstReady <- ctx.Value(osqueryReadyKey{}).(func())
+				firstReady <- ready
 			} else {
-				secondReady <- ctx.Value(osqueryReadyKey{}).(func())
+				secondReady <- ready
 				close(second)
 			}
 			for {

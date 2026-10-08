@@ -9,6 +9,7 @@ package osqdcli
 import (
 	"context"
 	"net"
+	"os"
 	"path/filepath"
 	"sync"
 	"testing"
@@ -20,9 +21,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func cancellationTestSocket(t *testing.T) string {
+	t.Helper()
+	// macOS's default temporary directory plus the test name exceeds its
+	// 104-byte Unix socket path limit. Keep the directory and filename short.
+	dir, err := os.MkdirTemp("/tmp", "osqd-")
+	require.NoError(t, err, "create short socket directory")
+	t.Cleanup(func() { assert.NoError(t, os.RemoveAll(dir), "remove socket directory") })
+	return filepath.Join(dir, "rpc.sock")
+}
+
 func TestQueryCancellationInterruptsTransportRead(t *testing.T) {
-	socket := filepath.Join(t.TempDir(), "query.sock")
-	listener, err := net.Listen("unix", socket)
+	socket := cancellationTestSocket(t)
+	listener, err := (&net.ListenConfig{}).Listen(t.Context(), "unix", socket)
 	require.NoError(t, err, "test RPC server must listen")
 	defer listener.Close()
 	request := make(chan struct{})
@@ -85,8 +96,8 @@ func (s *cancellationColumnServer) GetQueryColumns(_ context.Context, sql string
 }
 
 func TestCancelledColumnLookupDoesNotPoisonScheduledResolution(t *testing.T) {
-	socket := filepath.Join(t.TempDir(), "columns.sock")
-	listener, err := net.Listen("unix", socket)
+	socket := cancellationTestSocket(t)
+	listener, err := (&net.ListenConfig{}).Listen(t.Context(), "unix", socket)
 	require.NoError(t, err, "test column server must listen")
 	handler := &cancellationColumnServer{entered: make(chan struct{}), release: make(chan struct{})}
 	var releaseOnce sync.Once
@@ -101,10 +112,10 @@ func TestCancelledColumnLookupDoesNotPoisonScheduledResolution(t *testing.T) {
 				return
 			}
 			serving.Go(func() {
-				transport := thrift.NewTSocketFromConnTimeout(conn, time.Minute)
+				transport := thrift.NewTSocketFromConnConf(conn, &thrift.TConfiguration{SocketTimeout: time.Minute})
 				defer transport.Close()
-				input := thrift.NewTBinaryProtocolFactoryDefault().GetProtocol(transport)
-				output := thrift.NewTBinaryProtocolFactoryDefault().GetProtocol(transport)
+				input := thrift.NewTBinaryProtocolConf(transport, nil)
+				output := thrift.NewTBinaryProtocolConf(transport, nil)
 				processor := genosquery.NewExtensionManagerProcessor(handler)
 				for {
 					if _, err := processor.Process(t.Context(), input, output); err != nil {
@@ -115,7 +126,7 @@ func TestCancelledColumnLookupDoesNotPoisonScheduledResolution(t *testing.T) {
 		}
 	}()
 	client := New(socket)
-	defer func() { client.Close(); listener.Close(); <-stopped; serving.Wait() }()
+	defer func() { release(); client.Close(); listener.Close(); <-stopped; serving.Wait() }()
 	require.NoError(t, client.Connect(t.Context()), "daemon client must connect once")
 	ctx, cancel := context.WithCancel(t.Context())
 	defer cancel()
