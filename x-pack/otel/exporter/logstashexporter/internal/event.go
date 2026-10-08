@@ -14,6 +14,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func parseEvent(logRecord *plog.LogRecord) (beat.Event, error) {
@@ -22,15 +23,17 @@ func parseEvent(logRecord *plog.LogRecord) (beat.Event, error) {
 		return beat.Event{}, consumererror.NewPermanent(errors.New("invalid beats event body, expected a map, got: " + logRecord.Body().Type().String()))
 	}
 
-	removeRedundantMetadataFields(fields)
-
 	timestamp, ok := parseEventTimestamp(fields)
-	if !ok {
+	if ok {
+		// written again by the json codec when the event is serialized
+		delete(fields, beat.TimestampFieldKey)
+	} else {
 		timestamp = logRecord.ObservedTimestamp().AsTime()
 	}
 
 	return beat.Event{
 		Timestamp: timestamp,
+		Meta:      extractMetadataFields(fields),
 		Fields:    fields,
 	}, nil
 }
@@ -57,11 +60,20 @@ func parseEventTimestamp(logRecordBody map[string]any) (time.Time, bool) {
 	return time.Time{}, false
 }
 
-// removeRedundantMetadataFields removes certain metadata fields that will be generated again when the event is serialized.
+// extractMetadataFields removes `@metadata` (present when the receiver runs with include_metadata)
+// from the event fields and returns it as the event metadata, minus `beat`, `version` and `type`.
+// The json codec writes `@metadata` with these keys itself when the event is serialized, so leaving
+// them in the fields would duplicate them.
 // See https://github.com/elastic/beats/blob/v9.3.3/libbeat/outputs/codec/json/event.go#L43-L54
-// Not removing these fields would create duplicates and bloat the final event size
-func removeRedundantMetadataFields(fields map[string]any) {
-	delete(fields, otelctx.MetadataBeatKey)
-	delete(fields, otelctx.MetadataVersionKey)
-	delete(fields, "type")
+// Top-level fields with these names are event data and are left alone.
+func extractMetadataFields(fields map[string]any) mapstr.M {
+	meta, ok := fields[beat.MetadataFieldKey].(map[string]any)
+	if !ok {
+		return nil
+	}
+	delete(fields, beat.MetadataFieldKey)
+	delete(meta, otelctx.MetadataBeatKey)
+	delete(meta, otelctx.MetadataVersionKey)
+	delete(meta, "type")
+	return meta
 }
