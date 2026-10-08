@@ -108,6 +108,9 @@ func newESClient(
 			Timeout:   elasticsearchRequestTimeout,
 		}
 		if err := client.Connect(ctx); err != nil {
+			if ctx.Err() != nil {
+				return nil, ctx.Err()
+			}
 			connectionErrors = append(connectionErrors, err.Error())
 			if fallbackClient == nil {
 				fallbackClient = client

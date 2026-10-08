@@ -140,6 +140,25 @@ func TestNewESClientConnectivityFailureIsBestEffort(t *testing.T) {
 	require.Error(t, err, "the fallback client must preserve the connectivity error for state loading")
 }
 
+func TestNewESClientStartupCancellationReturnsContextError(t *testing.T) {
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+
+	transport := roundTripperFunc(func(request *http.Request) (*http.Response, error) {
+		cancel()
+		<-request.Context().Done()
+		return nil, request.Context().Err()
+	})
+	extension := &fakeBeatsAuthExtension{
+		endpoints:    []string{"http://example.test"},
+		roundTripper: transport,
+	}
+
+	client, err := newESClient(ctx, extension, "", logp.NewNopLogger())
+	require.ErrorIs(t, err, context.Canceled, "startup cancellation must be returned instead of creating a fallback client")
+	assert.Nil(t, client, "a canceled startup must not install an Elasticsearch client that retains the canceled context")
+}
+
 func TestBeatsAuthStartHookInjectsBeforeRun(t *testing.T) {
 	previousUnderAgent := management.UnderAgent()
 	t.Cleanup(func() {
