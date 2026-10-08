@@ -263,8 +263,9 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		otelFactory cfgfile.RunnerFactory
 		otelRunners = make(map[string]cfgfile.Runner)
 	)
+	otelStatus := &osqueryInputRunnerFactory{}
 	if bt.otelStatusFactoryWrapper != nil {
-		otelFactory = bt.otelStatusFactoryWrapper(&osqueryInputRunnerFactory{})
+		otelFactory = bt.otelStatusFactoryWrapper(otelStatus)
 	}
 	inputKey := func(idx int, ic config.InputConfig) string {
 		if ic.ID != "" {
@@ -377,7 +378,10 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	// It restarts osquery on configuration options change
 	// It exits if osqueryd fails to run for any reason, like a bad configuration for example
 	runner := newOsqueryRunner(bt.log)
-	runner.reportStatus = b.Manager.UpdateStatus
+	runner.reportStatus = func(state status.Status, message string) {
+		b.Manager.UpdateStatus(state, message)
+		otelStatus.UpdateStatus(state, message)
+	}
 	b.Manager.UpdateStatus(status.Configuring, "Initial configuration")
 	if len(bt.config.Inputs) == 0 {
 		b.Manager.UpdateStatus(status.Running, "Waiting for osquery input configuration")
