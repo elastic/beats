@@ -676,11 +676,7 @@ func (p *pathTraverserMock) AddPathToMonitor(ctx context.Context, path string) e
 
 func (p *pathTraverserMock) GetMonitorPath(ino uint64, major uint32, minor uint32, name string) (MonitorPath, bool) {
 	args := p.Called(ino, major, minor, name)
-	mPath, ok := args.Get(0).(MonitorPath)
-	if !ok {
-		panic("unexpected mock return type for MonitorPath")
-	}
-	return mPath, args.Bool(1)
+	return args.Get(0).(MonitorPath), args.Bool(1) //nolint:errcheck // mock, panic is fine
 }
 
 func (p *pathTraverserMock) WalkAsync(path string, depth uint32, tid uint32) {
@@ -689,11 +685,7 @@ func (p *pathTraverserMock) WalkAsync(path string, depth uint32, tid uint32) {
 
 func (p *pathTraverserMock) ErrC() <-chan error {
 	args := p.Called()
-	errC, ok := args.Get(0).(<-chan error)
-	if !ok {
-		panic("unexpected mock return type for ErrC")
-	}
-	return errC
+	return args.Get(0).(<-chan error) //nolint:errcheck // mock, panic is fine
 }
 
 func (p *pathTraverserMock) Close() error {
