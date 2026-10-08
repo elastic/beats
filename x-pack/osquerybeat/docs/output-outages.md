@@ -51,3 +51,34 @@ received during backoff apply to the next run. The status returns to `Running`
 when that run applies its generated configuration. Backoff resets after a ready
 run remains stable for one minute. Invalid configuration, failed installation,
 and unclassified process exits remain terminal errors.
+
+## Integration validation
+
+The receiver integration tests require the packaged osqueryd and companion
+osquery-extension binaries for the host platform. Set `OSQUERYBEAT_BINARY_DIR`
+to their installation directory and provide the native build dependencies
+required by osquerybeat on the host. From the repository root, run:
+
+```sh
+go test -race -tags integration \
+  -run '^(TestReceiverOutputOutage|TestReceiverRestartsAfterOsqueryExit78)$' \
+  -count=1 -timeout 8m ./x-pack/osquerybeat/tests/integration
+```
+
+`TestReceiverOutputOutage` holds admitted output batches longer than two native
+Thrift deadlines with a small publisher queue and profiling enabled by default.
+It checks fresh scheduled results and profiles after recovery, the same daemon
+PID, and shutdown while output is still unavailable.
+`TestReceiverRestartsAfterOsqueryExit78` deregisters the live logger extension so
+native scheduled-result logging fails. It requires an actual osqueryd exit with
+status 78, a replacement daemon PID, fresh results, and receiver status recovery
+from degraded to running.
+
+These tests exercise real osqueryd processes through the receiver with an
+in-process output consumer. Validation of the original macOS Elastic Agent and
+Elasticsearch deployment remains necessary: block Elasticsearch long enough to
+fill its publisher queue with default profiling enabled, restore it, and verify
+fresh scheduled results and profiles in Elasticsearch together with Agent
+component health. Also verify Agent shutdown during the outage and recovery
+after a native exit 78 on macOS. Linux receiver test results do not establish
+those platform and deployment behaviors.
