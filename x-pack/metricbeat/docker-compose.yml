@@ -1,4 +1,4 @@
-ervices:
+services:
   # This is a proxy used to block "docker compose up" until all services are healthy.
   # See: https://github.com/docker/compose/issues/4369
   proxy_dep:
