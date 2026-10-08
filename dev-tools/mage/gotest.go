@@ -537,6 +537,33 @@ func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
 	return err
 }
 
+// DefaultServerlessTestArgs returns the arguments for the tests that run a
+// packaged Beat against an Elastic Cloud serverless project.
+func DefaultServerlessTestArgs() GoTestArgs {
+	args := makeGoTestArgs("Serverless")
+	args.Tags = append(args.Tags, "serverless", "integration")
+	args.Dir = "tests/serverless"
+	// The tests run the packaged Beat as a separate process, so the race
+	// detector has nothing to observe, and one project is shared by all tests.
+	args.Race = false
+	// Creating the project alone can take 15 minutes, more than go test's default of 10.
+	args.Timeout = "45m"
+
+	// The tests run from args.Dir, so the output files need absolute paths.
+	path, err := os.Getwd()
+	if err != nil {
+		log.Printf("Unable to get working dir, using value: .")
+		path = "."
+	}
+	fileName := path + "/build/TEST-go-serverless"
+	args.OutputFile = fileName + ".out"
+	args.JUnitReportFile = fileName + ".xml"
+	if TestCoverage {
+		args.CoverageProfileFile = fileName + ".cov"
+	}
+	return args
+}
+
 func DefaultECHTestArgs() GoTestArgs {
 	args := makeGoTestArgs("ECH")
 	args.Tags = append(args.Tags, "ech", "integration")
