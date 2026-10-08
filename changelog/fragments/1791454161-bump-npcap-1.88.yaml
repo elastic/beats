@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Bump bundled Windows Npcap OEM installer to v1.88.
+component: packetbeat
