@@ -85,7 +85,7 @@ func TestRegistrarStartAfterStop(t *testing.T) {
 	_, r, logs := newLazyTestRegistrar(t, file.State{Id: "on-disk", Source: "/a.log", TTL: -1})
 	r.Stop()
 
-	require.NoError(t, r.Start(), "a Start after Stop must be a no-op, not an error")
+	require.ErrorIs(t, r.Start(), ErrStopped, "a Start after Stop must report that nothing was started")
 	assert.Empty(t, r.GetStates(), "a Start after Stop must not load the registry")
 	assert.Zero(t, logs.FilterMessageSnippet("States Loaded from registrar").Len(),
 		"a Start after Stop must not load the registry")
@@ -108,6 +108,7 @@ func TestRegistrarStartErrorIsSticky(t *testing.T) {
 	assert.EqualError(t, r.Start(), first.Error(), "every later Start must report the same failure")
 
 	r.Stop()
+	assert.EqualError(t, r.Start(), first.Error(), "Stop must not replace the original start failure")
 	requireNoLeakedGoroutines(t, goroutines)
 }
 

@@ -18,6 +18,7 @@
 package registrar
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -29,6 +30,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
+
+// ErrStopped is returned by Start when the registrar was already stopped, so
+// callers do not build inputs on a registrar that will never run.
+var ErrStopped = errors.New("registrar stopped")
 
 type Registrar struct {
 	log *logp.Logger
@@ -118,7 +123,8 @@ func (r *Registrar) loadStates() error {
 // Start loads the previous log file locations and runs the registrar. It is
 // called when a V1 input is created (see input.RunnerFactory.Create), and is
 // safe to call any number of times: only the first call does anything. If that
-// first start fails, every later call returns the same error.
+// first start fails, every later call returns the same error, and after Stop
+// every call returns ErrStopped.
 func (r *Registrar) Start() error {
 	r.startOnce.Do(func() {
 		// Load the previous log file locations now, for use in input
@@ -147,8 +153,9 @@ func (r *Registrar) stop() {
 	defer r.log.Info("Registrar stopped")
 
 	// Claim startOnce so an input created concurrently with shutdown cannot
-	// start a registrar after this point.
-	r.startOnce.Do(func() {})
+	// start a registrar after this point. Start then reports ErrStopped
+	// instead of success, unless an earlier start already failed.
+	r.startOnce.Do(func() { r.startErr = ErrStopped })
 
 	close(r.done)
 	r.wg.Wait()
