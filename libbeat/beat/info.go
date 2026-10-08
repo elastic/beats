@@ -18,6 +18,7 @@
 package beat
 
 import (
+	"net/http"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -65,6 +66,14 @@ type Info struct {
 	StartTime        time.Time // The time of last start of the Beat. Updated when the Beat is started or restarted.
 	UserAgent        string    // A string of the user-agent that can be passed to any outputs or network connections
 	FIPSDistribution bool      // If the beat was compiled as a FIPS distribution.
+
+	// HTTPTransportWrapper, when set, is applied to the transport of the HTTP
+	// clients inputs and modules create for their outgoing requests. It is
+	// nil in standalone mode. In OTel receiver mode it carries the
+	// RoundTripper of a headers_setter extension found on the collector host,
+	// so headers configured there (notably User-Agent) are added to those
+	// requests. See x-pack/libbeat/cmd/instance/headers_extension.go.
+	HTTPTransportWrapper func(http.RoundTripper) http.RoundTripper
 
 	LogConsumer     consumer.Logs // otel log consumer
 	ComponentID     string        // otel component id from the collector config e.g. "filebeatreceiver/logs"

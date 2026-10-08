@@ -1299,6 +1299,16 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		}
 	}
 
+	if env.Agent.HTTPTransportWrapper != nil {
+		// Outermost on purpose: it runs before userAgentDecorator above, which
+		// only fills User-Agent when missing, so the headers configured on
+		// the collector-side extension win over the generated user agent. A
+		// User-Agent set by the CEL program is already on the request by the
+		// time any RoundTripper runs, so it is only replaced if the extension
+		// uses the upsert action.
+		c.Transport = env.Agent.HTTPTransportWrapper(c.Transport)
+	}
+
 	return c, trace, otelMetrics, contextInjector, nil
 }
 

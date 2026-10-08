@@ -216,8 +216,21 @@ func NewFalconHoseFollower(ctx context.Context, env v2.Context, cfg config, curs
 	if now == nil {
 		now = time.Now
 	}
+
+	// In OTel receiver mode this carries the headers_setter extension's
+	// RoundTripper. It is placed *inside* userAgentTransport, which
+	// unconditionally overwrites User-Agent: the inner RoundTripper runs
+	// later, so headers from the extension using the upsert action take
+	// precedence over both cfg.UserAgent and the generated user agent. With
+	// the insert action the extension cannot win here, because by the time
+	// it runs the header is always present.
+	wrapTransport := func(rt http.RoundTripper) http.RoundTripper { return rt }
+	if env.Agent.HTTPTransportWrapper != nil {
+		wrapTransport = env.Agent.HTTPTransportWrapper
+	}
+
 	s.authTransport = &rateLimitTransport{
-		base:     userAgentTransport{ua: ua, base: authClient.Transport},
+		base:     userAgentTransport{ua: ua, base: wrapTransport(authClient.Transport)},
 		timeout:  authClient.Timeout,
 		maxRetry: 3,
 		wait:     60 * time.Second,
@@ -232,7 +245,7 @@ func NewFalconHoseFollower(ctx context.Context, env v2.Context, cfg config, curs
 		stat.UpdateStatus(status.Failed, "failed to configure client: "+err.Error())
 		return nil, err
 	}
-	s.plainClient.Transport = userAgentTransport{ua: ua, base: s.plainClient.Transport}
+	s.plainClient.Transport = userAgentTransport{ua: ua, base: wrapTransport(s.plainClient.Transport)}
 
 	return &s, nil
 }

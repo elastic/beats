@@ -179,6 +179,15 @@ func (br *BeatReceiver) Start(host component.Host) (retErr error) {
 		}
 	}
 
+	// In receiver mode the beat does not know how it is being run (managed,
+	// privileged, agent version...), so the User-Agent it generates says
+	// "Standalone" (#53390). If the collector ships a headers_setter
+	// extension, inputs and modules wrap their outgoing HTTP clients with its
+	// RoundTripper so the headers configured there are sent instead. This has
+	// to be set before beater.Run, which is when they copy beat.Info.
+	// See headers_extension.go for what this does and does not cover.
+	br.beat.Info.HTTPTransportWrapper = httpTransportWrapperFromExtensions(extensions, br.Logger)
+
 	if w, ok := br.beater.(backend.WithESStateStoreExtension); ok {
 		if present, err := br.beat.RawConfig.Has("storage", -1); present && err == nil {
 			storageID, err := br.beat.RawConfig.String("storage", -1)

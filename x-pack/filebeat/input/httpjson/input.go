@@ -219,8 +219,9 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 		ctx.UpdateStatus(status.Failed, "failed to create HTTP client: "+err.Error())
 		return err
 	}
+	client.wrapTransport(ctx.Agent.HTTPTransportWrapper)
 
-	requestFactory, err := newRequestFactory(stdCtx, cfg, ctx, log, metrics, reg, ctx.Agent.UserAgent)
+	requestFactory, err := newRequestFactory(stdCtx, cfg, ctx, log, metrics, reg, ctx.Agent.UserAgent, ctx.Agent.HTTPTransportWrapper)
 	if err != nil {
 		log.Errorf("Error while creating requestFactory: %v", err)
 		ctx.UpdateStatus(status.Failed, "failed to create request factory: "+err.Error())

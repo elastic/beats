@@ -66,7 +66,7 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	client, err := newHTTPClient(ctx, config.Auth, config.Request, noopReporter{}, log, nil, nil)
 	assert.NoError(t, err)
 
-	requestFactory, err := newRequestFactory(ctx, config, noopReporter{}, log, nil, nil, "")
+	requestFactory, err := newRequestFactory(ctx, config, noopReporter{}, log, nil, nil, "", nil)
 	assert.NoError(t, err)
 	pagination := newPagination(config, client, noopReporter{}, log, "")
 	responseProcessor := newResponseProcessor(config, pagination, nil, nil, noopReporter{}, log)
@@ -199,7 +199,7 @@ func Test_newRequestFactory_UsesBasicAuthInChainedRequests(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.args.cfg.Chain[0].Step = tt.args.step
 			tt.args.cfg.Chain[0].While = tt.args.while
-			requestFactories, err := newRequestFactory(ctx, tt.args.cfg, noopReporter{}, log, nil, nil, "")
+			requestFactories, err := newRequestFactory(ctx, tt.args.cfg, noopReporter{}, log, nil, nil, "", nil)
 			assert.NoError(t, err)
 			assert.NotNil(t, requestFactories)
 			for _, rf := range requestFactories {
@@ -663,7 +663,7 @@ func newChainPaginationTestRequester(t *testing.T, chainTransforms []any) (*requ
 	client, err := newHTTPClient(t.Context(), config.Auth, config.Request, noopReporter{}, log, nil, nil)
 	require.NoError(t, err, "creating http client should succeed")
 
-	requestFactory, err := newRequestFactory(t.Context(), config, noopReporter{}, log, nil, nil, "")
+	requestFactory, err := newRequestFactory(t.Context(), config, noopReporter{}, log, nil, nil, "", nil)
 	require.NoError(t, err, "creating request factory should succeed")
 	pagination := newPagination(config, client, noopReporter{}, log, "")
 	responseProcessor := newResponseProcessor(config, pagination, nil, nil, noopReporter{}, log)
