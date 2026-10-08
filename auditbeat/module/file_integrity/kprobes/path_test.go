@@ -134,12 +134,10 @@ func (p *pathTestSuite) TestRecursiveWalkAsync() {
 
 		info, err := os.Lstat(path)
 		p.Require().NoError(err)
-		stat, ok := info.Sys().(*syscall.Stat_t)
-		p.Require().True(ok, "expected *syscall.Stat_t from Lstat on %q", path)
 		mnt := mounts.getMountByPath(path)
 		p.Require().NotNil(mnt)
 		expectedStatQueue = append(expectedStatQueue, statMatch{
-			ino:        stat.Ino,
+			ino:        info.Sys().(*syscall.Stat_t).Ino, //nolint:errcheck // always *syscall.Stat_t on Linux
 			major:      mnt.DeviceMajor,
 			minor:      mnt.DeviceMinor,
 			depth:      depth,
@@ -257,12 +255,10 @@ func (p *pathTestSuite) TestNonRecursiveWalkAsync() {
 
 		info, err := os.Lstat(path)
 		p.Require().NoError(err)
-		stat, ok := info.Sys().(*syscall.Stat_t)
-		p.Require().True(ok, "expected *syscall.Stat_t from Lstat on %q", path)
 		mnt := mounts.getMountByPath(path)
 		p.Require().NotNil(mnt)
 		expectedStatQueue = append(expectedStatQueue, statMatch{
-			ino:        stat.Ino,
+			ino:        info.Sys().(*syscall.Stat_t).Ino, //nolint:errcheck // always *syscall.Stat_t on Linux
 			major:      mnt.DeviceMajor,
 			minor:      mnt.DeviceMinor,
 			depth:      depth,
@@ -436,12 +432,10 @@ func (p *pathTestSuite) TestRecursiveAdd() {
 
 		info, err := os.Lstat(path)
 		p.Require().NoError(err)
-		stat, ok := info.Sys().(*syscall.Stat_t)
-		p.Require().True(ok, "expected *syscall.Stat_t from Lstat on %q", path)
 		mnt := mounts.getMountByPath(path)
 		p.Require().NotNil(mnt)
 		expectedStatQueue = append(expectedStatQueue, statMatch{
-			ino:        stat.Ino,
+			ino:        info.Sys().(*syscall.Stat_t).Ino, //nolint:errcheck // always *syscall.Stat_t on Linux
 			major:      mnt.DeviceMajor,
 			minor:      mnt.DeviceMinor,
 			depth:      depth,
@@ -543,12 +537,10 @@ func (p *pathTestSuite) TestNonRecursiveAdd() {
 
 		info, err := os.Lstat(path)
 		p.Require().NoError(err)
-		stat, ok := info.Sys().(*syscall.Stat_t)
-		p.Require().True(ok, "expected *syscall.Stat_t from Lstat on %q", path)
 		mnt := mounts.getMountByPath(path)
 		p.Require().NotNil(mnt)
 		expectedStatQueue = append(expectedStatQueue, statMatch{
-			ino:        stat.Ino,
+			ino:        info.Sys().(*syscall.Stat_t).Ino, //nolint:errcheck // always *syscall.Stat_t on Linux
 			major:      mnt.DeviceMajor,
 			minor:      mnt.DeviceMinor,
 			depth:      depth,
