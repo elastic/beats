@@ -38,11 +38,13 @@ func TestReceiverOutputOutage(t *testing.T) {
 		}
 		t.Run(name, func(t *testing.T) {
 			t.Cleanup(func() { oteltest.VerifyNoLeaks(t) })
+			home := receiverTestHome(t)
 			core, observed := observer.New(zapcore.DebugLevel)
 			host := &mockActionHost{MockHost: &oteltest.MockHost{}}
 			var unavailable atomic.Bool
 			var delivered atomic.Int64
 			var lastResultTime atomic.Int64
+			var profiles, lastProfileTime, lastProfileExecutions atomic.Int64
 			var blockedOnce, restoreOnce sync.Once
 			blocked, restored := make(chan struct{}), make(chan struct{})
 			restore := func() { restoreOnce.Do(func() { close(restored) }) }
@@ -61,6 +63,13 @@ func TestReceiverOutputOutage(t *testing.T) {
 					for _, scope := range resource.ScopeLogs().All() {
 						for _, record := range scope.LogRecords().All() {
 							fields := record.Body().Map().AsRaw()
+							if profile, ok := fields["osquery_profile"].(map[string]any); ok {
+								if executions, ok := profile["executions"].(int64); ok && executions > 0 && profile["source"] == "scheduled" && profile["query_name"] == "outage" {
+									profiles.Add(1)
+									lastProfileTime.Store(record.Timestamp().AsTime().Unix())
+									lastProfileExecutions.Store(executions)
+								}
+							}
 							if result, ok := fields["osquery"].(map[string]any); ok {
 								if pid, ok := result["pid"]; ok {
 									pidMu.Lock()
@@ -80,11 +89,11 @@ func TestReceiverOutputOutage(t *testing.T) {
 				return nil
 			})
 			require.NoError(t, err, "create outage consumer")
-			factory := osqreceiver.NewFactoryWithSettings(osqreceiver.Settings{Home: t.TempDir()})
+			factory := osqreceiver.NewFactoryWithSettings(osqreceiver.Settings{Home: home})
 			const values = "(SELECT 1 AS value UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 " +
 				"UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8)"
 			cfg := &osqreceiver.Config{Beatconfig: map[string]any{
-				"path.home":                  t.TempDir(),
+				"path.home":                  home,
 				"http.enabled":               false,
 				"management.otel.enabled":    true,
 				"queue.mem.events":           32,
@@ -95,8 +104,7 @@ func TestReceiverOutputOutage(t *testing.T) {
 						"id": "outage-result", "type": "osquery",
 						"data_stream": map[string]any{"dataset": "osquery_manager.result"},
 						"osquery": map[string]any{
-							"options":         map[string]any{"thrift_timeout": 3, "schedule_splay_percent": 0},
-							"elastic_options": map[string]any{"profiling": map[string]any{"profiling_all": false}},
+							"options": map[string]any{"thrift_timeout": 3, "schedule_splay_percent": 0},
 							"schedule": map[string]any{"outage": map[string]any{
 								"query":    fmt.Sprintf("SELECT pid, a.value * 8 + b.value AS value FROM osquery_info CROSS JOIN %s a CROSS JOIN %s b", values, values),
 								"interval": 1, "snapshot": true,
@@ -106,6 +114,10 @@ func TestReceiverOutputOutage(t *testing.T) {
 					map[string]any{
 						"id": "outage-response", "type": "osquery",
 						"data_stream": map[string]any{"dataset": "osquery_manager.action.responses"},
+					},
+					map[string]any{
+						"id": "outage-profile", "type": "osquery",
+						"data_stream": map[string]any{"dataset": "osquery_manager.query_profile"},
 					},
 				}},
 			}}
@@ -143,6 +155,9 @@ func TestReceiverOutputOutage(t *testing.T) {
 			})
 			require.Eventually(t, func() bool { return delivered.Load() > 0 }, time.Minute, 100*time.Millisecond,
 				"receiver must publish before the output outage")
+			require.Eventually(t, func() bool { return profiles.Load() > 0 }, time.Minute, 100*time.Millisecond,
+				"default profiling must publish a valid scheduled profile before the output outage")
+			initialProfileExecutions := lastProfileExecutions.Load()
 			pidMu.Lock()
 			initialPID := lastPID
 			pidMu.Unlock()
@@ -172,6 +187,10 @@ func TestReceiverOutputOutage(t *testing.T) {
 				restore()
 				require.Eventually(t, func() bool { return lastResultTime.Load() > recoveredAt }, 20*time.Second, 100*time.Millisecond,
 					"fresh scheduled results must arrive after output recovery")
+				require.Eventually(t, func() bool {
+					return lastProfileTime.Load() > recoveredAt && lastProfileExecutions.Load() > initialProfileExecutions
+				}, 20*time.Second, 100*time.Millisecond,
+					"fresh scheduled profiles must arrive after output recovery with profiling enabled by default")
 				pidMu.Lock()
 				assert.Equal(t, initialPID, lastPID, "osqueryd must remain alive through the outage")
 				pidMu.Unlock()
