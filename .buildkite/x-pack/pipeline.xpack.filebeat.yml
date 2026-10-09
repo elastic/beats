@@ -265,6 +265,8 @@ steps:
       # Replaces the Serverless Beats Tests that elastic-agent used to run against this repository.
       - label: ":ubuntu: x-pack/filebeat: Serverless Integration Tests"
         key: "x-pack-filebeat-mandatory-serverless-int-test"
+        env:
+          ASDF_TERRAFORM_VERSION: "1.9.3"
         command: |
           .buildkite/scripts/serverless_tests.sh x-pack/filebeat
         retry:
@@ -276,6 +278,7 @@ steps:
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/filebeat/build/TEST-go-serverless.*"
+          - "x-pack/filebeat/build/integration-tests/**"
         plugins:
           - test-collector#v1.10.2:
               files: "x-pack/filebeat/build/TEST-go-serverless.xml"

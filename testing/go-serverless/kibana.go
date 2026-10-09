@@ -17,7 +17,7 @@
 
 //go:build integration
 
-package beatsuite
+package serverless
 
 import (
 	"context"

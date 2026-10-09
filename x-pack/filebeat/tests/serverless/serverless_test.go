@@ -9,12 +9,12 @@ package serverless
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/testing/go-serverless/beatsuite"
+	"github.com/elastic/beats/v7/testing/go-serverless"
 )
 
 // TestFilebeatServerless runs Filebeat's setup and export commands, and a
-// short run, against a serverless project. It needs EC_API_KEY and BEAT_HOME,
-// see .buildkite/scripts/serverless_tests.sh.
+// short run, against a serverless project. See .buildkite/scripts/serverless_tests.sh
+// for the environment it needs.
 func TestFilebeatServerless(t *testing.T) {
-	beatsuite.Run(t, beatsuite.Config{BeatName: "filebeat"})
+	serverless.Run(t, "filebeat")
 }

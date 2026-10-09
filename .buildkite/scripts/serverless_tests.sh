@@ -1,20 +1,17 @@
 #!/usr/bin/env bash
-#
-# Packages a Beat and runs its serverless integration tests against a
-# short-lived Elastic Cloud serverless project, which the tests create and delete.
-# Requires EC_API_KEY.
-#
-# Usage: serverless_tests.sh <beat_path>   (for example x-pack/filebeat)
 set -euo pipefail
+
+source .buildkite/scripts/serverless.sh
 
 BEAT_PATH=${1:?"Error: Specify the beat path: serverless_tests.sh [beat_path]"}
 BEAT_NAME=$(basename "${BEAT_PATH}")
-: "${EC_API_KEY:?"Error: EC_API_KEY must be set"}"
 
-pushd "${BEAT_PATH}"
+trap 'serverless_down' EXIT
 
-echo "~~~ Packaging ${BEAT_NAME}"
+# Package before creating the project, so it isn't kept around while packaging runs.
 # The package carries the kibana dashboards and modules the setup commands need.
+echo "~~~ Packaging ${BEAT_NAME}"
+pushd "${BEAT_PATH}"
 SNAPSHOT=true PLATFORMS=linux/amd64 PACKAGES=tar.gz mage package
 
 # Match exactly one tarball: a stale or extra package must not be picked up silently.
@@ -31,8 +28,12 @@ rm -rf "${BEAT_HOME}"
 mkdir -p "${BEAT_HOME}"
 tar -xzf "${tarballs[0]}" -C "${BEAT_HOME}" --strip-components=1
 export BEAT_HOME
+popd
 
-echo "~~~ Running serverless tests for ${BEAT_NAME}"
+serverless_up
+
+echo "~~~ Running serverless tests"
+
+pushd "${BEAT_PATH}"
 mage serverlessTest
-
 popd

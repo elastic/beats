@@ -537,37 +537,25 @@ func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
 	return err
 }
 
+// DefaultECHTestArgs returns the arguments for the tests that run a Beat
+// against an Elastic Cloud Hosted deployment.
+func DefaultECHTestArgs() GoTestArgs {
+	return cloudTestArgs("ECH", "ech")
+}
+
 // DefaultServerlessTestArgs returns the arguments for the tests that run a
 // packaged Beat against an Elastic Cloud serverless project.
 func DefaultServerlessTestArgs() GoTestArgs {
-	args := makeGoTestArgs("Serverless")
-	args.Tags = append(args.Tags, "serverless", "integration")
-	args.Dir = "tests/serverless"
-	// The tests run the packaged Beat as a separate process, so the race
-	// detector has nothing to observe, and one project is shared by all tests.
-	args.Race = false
-	// Creating the project alone can take 15 minutes, more than go test's default of 10.
-	args.Timeout = "45m"
-
-	// The tests run from args.Dir, so the output files need absolute paths.
-	path, err := os.Getwd()
-	if err != nil {
-		log.Printf("Unable to get working dir, using value: .")
-		path = "."
-	}
-	fileName := path + "/build/TEST-go-serverless"
-	args.OutputFile = fileName + ".out"
-	args.JUnitReportFile = fileName + ".xml"
-	if TestCoverage {
-		args.CoverageProfileFile = fileName + ".cov"
-	}
-	return args
+	return cloudTestArgs("Serverless", "serverless")
 }
 
-func DefaultECHTestArgs() GoTestArgs {
-	args := makeGoTestArgs("ECH")
-	args.Tags = append(args.Tags, "ech", "integration")
-	args.Dir = "tests/ech"
+// cloudTestArgs returns the arguments for tests against an Elastic Cloud
+// stack provisioned beforehand. They live in tests/<tag> and need the <tag>
+// build tag, so the regular integration tests don't pick them up.
+func cloudTestArgs(name, tag string) GoTestArgs {
+	args := makeGoTestArgs(name)
+	args.Tags = append(args.Tags, tag, "integration")
+	args.Dir = "tests/" + tag
 
 	// attempt to use absolute paths for filenames
 	path, err := os.Getwd()
@@ -575,7 +563,7 @@ func DefaultECHTestArgs() GoTestArgs {
 		log.Printf("Unable to get working dir, using value: .")
 		path = "."
 	}
-	fileName := path + "/build/TEST-go-ech"
+	fileName := path + "/build/TEST-go-" + tag
 	args.OutputFile = fileName + ".out"
 	args.JUnitReportFile = fileName + ".xml"
 	if TestCoverage {
