@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: "logstash exporter: keep top-level type, version and beat event fields, and stop sending duplicate @timestamp and @metadata keys"
+component: libbeat
+issue: https://github.com/elastic/beats/issues/53665
