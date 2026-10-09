@@ -183,7 +183,7 @@ func (br *BeatReceiver) Start(host component.Host) (retErr error) {
 	}
 
 	if ua := userAgentFromHeaders(headersFromExtensions(context.Background(), extensions, br.Logger)); ua != "" {
-		br.Logger.Infof("using User-Agent from headers_setter extension: %q", ua)
+		br.Logger.Debugf("using User-Agent from headers_setter extension: %q", ua)
 		br.beat.Info.UserAgent = ua
 	}
 
@@ -316,24 +316,13 @@ func (br *BeatReceiver) getESStateStoreExtension(host component.Host, storageExt
 }
 
 const (
-	// headersSetterType is the component type of the contrib headers_setter
-	// extension. It is matched by name so Beats does not depend on the
-	// extension module; only extensionauth.GRPCClient is needed.
-	headersSetterType = "headers_setter"
-	// agentComponentPrefix starts the name of every extension Elastic Agent
-	// generates, e.g. "headers_setter/_agent-component/default".
+	headersSetterType    = "headers_setter"
 	agentComponentPrefix = "_agent-component/"
 )
 
-// headersFromExtensions returns the headers configured on the Elastic Agent
-// generated headers_setter extension on the host, or nil if there is none.
+// headersFromExtensions returns the headers configured on headers_setter extension.
 // Elastic Agent adds one per collector, shared by all receivers.
-//
-// The headers are read through PerRPCCredentials.GetRequestMetadata, which
-// resolves every configured header to a plain map without sending a request.
-// Only `value` and `value_file` sources resolve to something useful;
-// `from_context` and `from_attribute` have no incoming request to read and
-// yield their default_value.
+
 func headersFromExtensions(ctx context.Context, extensions map[component.ID]component.Component, log *logp.Logger) map[string]string {
 	var ids []component.ID
 	for id := range extensions {
@@ -346,7 +335,7 @@ func headersFromExtensions(ctx context.Context, extensions map[component.ID]comp
 	}
 	sort.Slice(ids, func(i, j int) bool { return ids[i].String() < ids[j].String() })
 	if len(ids) > 1 {
-		log.Warnf("found %d headers_setter extensions (%v); using %s", len(ids), ids, ids[0])
+		log.Debugf("found %d headers_setter extensions (%v); using %s", len(ids), ids, ids[0])
 	}
 	id := ids[0]
 

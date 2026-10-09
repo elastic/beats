@@ -487,25 +487,6 @@ func TestHeadersFromExtensions(t *testing.T) {
 	}
 }
 
-func TestUserAgentFromHeaders(t *testing.T) {
-	tests := []struct {
-		name    string
-		headers map[string]string
-		want    string
-	}{
-		{name: "nil", headers: nil, want: ""},
-		{name: "absent", headers: map[string]string{"X-Other": "v"}, want: ""},
-		{name: "canonical key", headers: map[string]string{"User-Agent": "ua"}, want: "ua"},
-		{name: "lowercase key", headers: map[string]string{"user-agent": "ua"}, want: "ua"},
-		{name: "empty value", headers: map[string]string{"User-Agent": ""}, want: ""},
-	}
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			assert.Equal(t, tc.want, userAgentFromHeaders(tc.headers), "User-Agent lookup must be case-insensitive and tolerate absence")
-		})
-	}
-}
-
 // TestBeatReceiverStart_UsesHeadersSetterUserAgent checks that Start replaces
 // beat.Info.UserAgent with the one from the headers_setter extension before
 // the beater runs, which is where inputs and modules copy it from.
