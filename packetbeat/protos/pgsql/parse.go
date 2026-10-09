@@ -774,7 +774,7 @@ const nullColumnLength = -1
 // message length it is signed, so that nullColumnLength can be distinguished
 // from a very long value.
 func readColumnLength(b []byte) int {
-	return int(int32(binary.BigEndian.Uint32(b)))
+	return int(int32(binary.BigEndian.Uint32(b))) //nolint:gosec // G115 reinterpreting the bits as signed is intended
 }
 
 func pgsqlString(b []byte, sz int) (string, error) {
