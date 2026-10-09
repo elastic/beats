@@ -283,3 +283,6 @@ changelog/fragments/
 /x-pack/packetbeat/ @elastic/security-service-integrations
 /x-pack/packetbeat/pbreceiver/ @elastic/elastic-agent-data-plane
 /x-pack/winlogbeat/ @elastic/security-service-integrations
+
+# Agentic workflow client triggers (elastic/oblt-aw distribution)
+/.github/workflows/trigger-obs-aw-* @elastic/observablt-ci
