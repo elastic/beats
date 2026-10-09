@@ -127,6 +127,10 @@ OSS code (Apache 2.0) **cannot** import from `x-pack/` or `elastic-agent-client`
 - Keep comments concise, focused on "why" not "what"
 - Update documentation when changing behavior
 
+## Documentation
+
+For changes that affect published documentation or documentation generation, use the `docs-authoring` skill (`.agents/skills/docs-authoring/SKILL.md`).
+
 ## Code References
 
 When referencing code, always use exact locations and names:
