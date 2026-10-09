@@ -211,6 +211,12 @@ func PythonIntegTest(ctx context.Context) error {
 	return devtools.PythonIntegTestFromHost(devtools.DefaultPythonTestIntegrationFromHostArgs())
 }
 
+// ServerlessTest runs the packaged Beat against an Elastic Cloud serverless project.
+// It needs EC_API_KEY and BEAT_HOME, see .buildkite/scripts/serverless_tests.sh.
+func ServerlessTest(ctx context.Context) error {
+	return devtools.GoTest(ctx, devtools.DefaultServerlessTestArgs())
+}
+
 // FipsECHTest runs a smoke test using a FIPS enabled binary targetting an ECH deployment.
 func FipsECHTest(ctx context.Context) error {
 	return devtools.GoTest(ctx, devtools.DefaultECHTestArgs())
