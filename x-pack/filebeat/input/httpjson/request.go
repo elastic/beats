@@ -34,20 +34,6 @@ type httpClient struct {
 	limiter *rateLimiter
 }
 
-// wrapTransport applies wrap to the client's transport. It is used to attach
-// the beat-provided transport wrapper (beat.Info.HTTPTransportWrapper), which
-// in OTel receiver mode carries the headers_setter extension's RoundTripper.
-//
-// Note that requestFactory.newHTTPRequest sets User-Agent on the request
-// itself, before any RoundTripper runs, so a User-Agent configured on the
-// extension only replaces it when the extension uses the upsert action.
-func (c *httpClient) wrapTransport(wrap func(http.RoundTripper) http.RoundTripper) {
-	if c == nil || c.client == nil || wrap == nil {
-		return
-	}
-	c.client.Transport = wrap(c.client.Transport)
-}
-
 // httpError represents an HTTP error with status code, message, and body.
 type httpError struct {
 	StatusCode int    // HTTP status code.
@@ -331,7 +317,7 @@ type requestFactory struct {
 	allowedOrigins []*url.URL
 }
 
-func newRequestFactory(ctx context.Context, config config, stat status.StatusReporter, log *logp.Logger, metrics *inputMetrics, reg *monitoring.Registry, userAgent string, wrapTransport func(http.RoundTripper) http.RoundTripper) ([]*requestFactory, error) {
+func newRequestFactory(ctx context.Context, config config, stat status.StatusReporter, log *logp.Logger, metrics *inputMetrics, reg *monitoring.Registry, userAgent string) ([]*requestFactory, error) {
 	// config validation already checked for errors here
 	rfs := make([]*requestFactory, 0, len(config.Chain)+1)
 	ts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Request.Transforms, requestNamespace, stat, log)
@@ -379,7 +365,6 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 			if err != nil {
 				return nil, fmt.Errorf("failed in creating chain http client with error: %w", err)
 			}
-			client.wrapTransport(wrapTransport)
 
 			responseProcessor := newChainResponseProcessor(ch, client, xmlDetails, metrics, stat, log)
 			stepURL := ch.Step.Request.URL.URL
@@ -413,7 +398,6 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 			if err != nil {
 				return nil, fmt.Errorf("failed in creating chain http client with error: %w", err)
 			}
-			client.wrapTransport(wrapTransport)
 
 			responseProcessor := newChainResponseProcessor(ch, client, xmlDetails, metrics, stat, log)
 			whileURL := ch.While.Request.URL.URL

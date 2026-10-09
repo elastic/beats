@@ -476,13 +476,6 @@ func connectWebSocket(ctx context.Context, cfg config, url string, stat status.S
 	var conn *websocket.Conn
 	var response *http.Response
 	var err error
-	// Only auth headers are sent on the handshake; no User-Agent is set, so
-	// the websocket library's default goes out. beat.Info.HTTPTransportWrapper
-	// (the headers_setter extension in OTel receiver mode) cannot be applied
-	// here either: gorilla's Dialer performs the handshake itself and has no
-	// http.RoundTripper to wrap. Supporting it would mean adding the headers
-	// to this map directly, which is a different mechanism from the one the
-	// extension provides.
 	headers := formHeader(cfg)
 	dialer, err := createWebSocketDialer(cfg, log)
 	if err != nil {

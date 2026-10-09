@@ -8,6 +8,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/api"
@@ -27,6 +29,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/extension/extensionauth"
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
 )
@@ -179,14 +182,10 @@ func (br *BeatReceiver) Start(host component.Host) (retErr error) {
 		}
 	}
 
-	// In receiver mode the beat does not know how it is being run (managed,
-	// privileged, agent version...), so the User-Agent it generates says
-	// "Standalone" (#53390). If the collector ships a headers_setter
-	// extension, inputs and modules wrap their outgoing HTTP clients with its
-	// RoundTripper so the headers configured there are sent instead. This has
-	// to be set before beater.Run, which is when they copy beat.Info.
-	// See headers_extension.go for what this does and does not cover.
-	br.beat.Info.HTTPTransportWrapper = httpTransportWrapperFromExtensions(extensions, br.Logger)
+	if ua := userAgentFromHeaders(headersFromExtensions(context.Background(), extensions, br.Logger)); ua != "" {
+		br.Logger.Infof("using User-Agent from headers_setter extension: %q", ua)
+		br.beat.Info.UserAgent = ua
+	}
 
 	if w, ok := br.beater.(backend.WithESStateStoreExtension); ok {
 		if present, err := br.beat.RawConfig.Has("storage", -1); present && err == nil {
@@ -314,4 +313,73 @@ func (br *BeatReceiver) getESStateStoreExtension(host component.Host, storageExt
 		return nil, fmt.Errorf("extension '%s' is not a backend.Registry", componentID.String())
 	}
 	return reg, nil
+}
+
+const (
+	// headersSetterType is the component type of the contrib headers_setter
+	// extension. It is matched by name so Beats does not depend on the
+	// extension module; only extensionauth.GRPCClient is needed.
+	headersSetterType = "headers_setter"
+	// agentComponentPrefix starts the name of every extension Elastic Agent
+	// generates, e.g. "headers_setter/_agent-component/default".
+	agentComponentPrefix = "_agent-component/"
+)
+
+// headersFromExtensions returns the headers configured on the Elastic Agent
+// generated headers_setter extension on the host, or nil if there is none.
+// Elastic Agent adds one per collector, shared by all receivers.
+//
+// The headers are read through PerRPCCredentials.GetRequestMetadata, which
+// resolves every configured header to a plain map without sending a request.
+// Only `value` and `value_file` sources resolve to something useful;
+// `from_context` and `from_attribute` have no incoming request to read and
+// yield their default_value.
+func headersFromExtensions(ctx context.Context, extensions map[component.ID]component.Component, log *logp.Logger) map[string]string {
+	var ids []component.ID
+	for id := range extensions {
+		if id.Type().String() == headersSetterType && strings.HasPrefix(id.Name(), agentComponentPrefix) {
+			ids = append(ids, id)
+		}
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	sort.Slice(ids, func(i, j int) bool { return ids[i].String() < ids[j].String() })
+	if len(ids) > 1 {
+		log.Warnf("found %d headers_setter extensions (%v); using %s", len(ids), ids, ids[0])
+	}
+	id := ids[0]
+
+	grpcClient, ok := extensions[id].(extensionauth.GRPCClient)
+	if !ok {
+		log.Warnf("extension %s does not implement extensionauth.GRPCClient; its headers cannot be read", id)
+		return nil
+	}
+	creds, err := grpcClient.PerRPCCredentials()
+	if err != nil {
+		// Only fails when additional_auth is configured and that extension is
+		// missing or broken.
+		log.Warnf("extension %s: could not get PerRPCCredentials, ignoring its headers: %v", id, err)
+		return nil
+	}
+	if creds == nil {
+		return nil
+	}
+	headers, err := creds.GetRequestMetadata(ctx)
+	if err != nil {
+		log.Warnf("extension %s: could not resolve headers, ignoring them: %v", id, err)
+		return nil
+	}
+	return headers
+}
+
+// userAgentFromHeaders returns the User-Agent value in headers, matched
+// case-insensitively, or "" if there is none.
+func userAgentFromHeaders(headers map[string]string) string {
+	for k, v := range headers {
+		if strings.EqualFold(k, "User-Agent") {
+			return v
+		}
+	}
+	return ""
 }

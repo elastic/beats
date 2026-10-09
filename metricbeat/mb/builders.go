@@ -64,7 +64,6 @@ func NewModule(config *conf.C, r *Register, info beat.Info) (Module, []MetricSet
 		return nil, nil, err
 	}
 	bm.userAgent = info.UserAgent
-	bm.httpTransportWrapper = info.HTTPTransportWrapper
 
 	module, err := createModule(r, bm)
 	if err != nil {

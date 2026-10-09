@@ -13,18 +13,17 @@ kind: enhancement
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Apply headers from a collector headers_setter extension to outgoing HTTP requests of beat receivers
+summary: Use the User-Agent from a collector headers_setter extension in beat receivers
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
 description: |
-  When running as an OTel receiver, Filebeat and Metricbeat look for a
-  `headers_setter` extension on the collector host and wrap the HTTP clients
-  of metricbeat's HTTP helper and the cel, httpjson and streaming (crowdstrike)
-  inputs with its RoundTripper. This lets Elastic Agent provide the User-Agent
-  (and other headers) these requests should carry. Inputs using gRPC
-  (gcppubsub), autorest (o365audit) or websockets are not covered.
+  When running as an OTel receiver, a beat looks for a `headers_setter`
+  extension on the collector host. If one configures a `User-Agent` header,
+  its value replaces the User-Agent the beat generates for itself, which
+  otherwise reports "Standalone" in receiver mode. All inputs and modules
+  that send the beat's User-Agent pick it up.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:

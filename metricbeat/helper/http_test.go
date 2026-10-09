@@ -121,45 +121,6 @@ func TestAuthentication(t *testing.T) {
 	assert.Equal(t, http.StatusOK, response.StatusCode, "response status code")
 }
 
-// TestTransportWrapperPrecedence checks that a transport wrapper (the
-// headers_setter extension in OTel receiver mode) runs before the helper's
-// own User-Agent RoundTripper, so a User-Agent it sets is the one sent, and
-// that headers it adds reach the server.
-func TestTransportWrapperPrecedence(t *testing.T) {
-	var gotUA, gotExtra string
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		gotUA = r.Header.Get("User-Agent")
-		gotExtra = r.Header.Get("X-From-Extension")
-	}))
-	defer ts.Close()
-
-	wrap := func(rt http.RoundTripper) http.RoundTripper {
-		return roundTripperFunc(func(r *http.Request) (*http.Response, error) {
-			// Mirrors the headers_setter "insert" action: only set when absent.
-			if r.Header.Get("User-Agent") == "" {
-				r.Header.Set("User-Agent", "from-extension")
-			}
-			r.Header.Set("X-From-Extension", "yes")
-			return rt.RoundTrip(r)
-		})
-	}
-
-	cfg := defaultConfig()
-	hostData := mb.HostData{URI: ts.URL, SanitizedURI: ts.URL}
-	h, err := newHTTPFromConfig(cfg, hostData, logptest.NewTestingLogger(t, ""), "generated-user-agent", wrap)
-	require.NoError(t, err, "creating the helper should succeed")
-
-	_, err = h.FetchContent()
-	require.NoError(t, err, "request should succeed")
-
-	assert.Equal(t, "from-extension", gotUA, "wrapper must run before the helper's User-Agent RoundTripper")
-	assert.Equal(t, "yes", gotExtra, "headers added by the wrapper must reach the server")
-}
-
-type roundTripperFunc func(*http.Request) (*http.Response, error)
-
-func (f roundTripperFunc) RoundTrip(r *http.Request) (*http.Response, error) { return f(r) }
-
 func TestSetHeader(t *testing.T) {
 	cfg := defaultConfig()
 	cfg.Headers = map[string]string{

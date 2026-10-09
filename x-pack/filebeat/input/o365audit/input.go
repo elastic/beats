@@ -162,13 +162,6 @@ func (inp *o365input) run(v2ctx v2.Context, stream *stream, cursor cursor.Cursor
 	// MaxRequestsPerMinute limitation is per tenant.
 	delay := time.Duration(len(config.ContentType)) * time.Minute / time.Duration(config.API.MaxRequestsPerMinute)
 
-	// The User-Agent is set on the request by an autorest PrepareDecorator and
-	// the request is sent by autorest.Send through autorest's package-global
-	// http.Client. There is no transport we own to wrap, so
-	// v2ctx.Agent.HTTPTransportWrapper (the headers_setter extension in OTel
-	// receiver mode) is not applied to this input. Doing so would require the
-	// poller to send with its own client (autorest.SendWithSender), which is
-	// a behavioural change to the input and out of scope here.
 	poller, err := poll.New(
 		poll.WithTokenProvider(tokenProvider),
 		poll.WithMinRequestInterval(delay),

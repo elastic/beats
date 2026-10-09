@@ -60,21 +60,11 @@ func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 	if ua, ok := base.Module().(interface{ UserAgent() string }); ok {
 		userAgent = ua.UserAgent()
 	}
-	var wrapTransport func(http.RoundTripper) http.RoundTripper
-	if w, ok := base.Module().(interface {
-		HTTPTransportWrapper() func(http.RoundTripper) http.RoundTripper
-	}); ok {
-		wrapTransport = w.HTTPTransportWrapper()
-	}
-	return newHTTPFromConfig(config, base.HostData(), base.Logger(), userAgent, wrapTransport)
+	return NewHTTPFromConfig(config, base.HostData(), base.Logger(), userAgent)
 }
 
 // NewHTTPFromConfig newHTTPWithConfig creates a new http helper from some configuration
 func NewHTTPFromConfig(config Config, hostData mb.HostData, logger *logp.Logger, userAgent string) (*HTTP, error) {
-	return newHTTPFromConfig(config, hostData, logger, userAgent, nil)
-}
-
-func newHTTPFromConfig(config Config, hostData mb.HostData, logger *logp.Logger, userAgent string, wrapTransport func(http.RoundTripper) http.RoundTripper) (*HTTP, error) {
 	headers := http.Header{}
 	if config.Headers == nil {
 		config.Headers = map[string]string{}
@@ -94,20 +84,13 @@ func newHTTPFromConfig(config Config, hostData mb.HostData, logger *logp.Logger,
 		return nil, err
 	}
 
-	opts := []httpcommon.TransportOption{
+	client, err := config.Transport.Client(
 		// also sets a local logger for use by http transport
 		httpcommon.WithLogger(logger),
 		httpcommon.WithBaseDialer(dialer),
 		httpcommon.WithAPMHTTPInstrumentation(),
 		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}),
-	}
-	if wrapTransport != nil {
-		// Last option is the outermost RoundTripper, so this runs before the
-		// User-Agent header above is filled in and its headers take
-		// precedence.
-		opts = append(opts, httpcommon.WithModRoundtripper(wrapTransport))
-	}
-	client, err := config.Transport.Client(opts...)
+	)
 	if err != nil {
 		return nil, err
 	}

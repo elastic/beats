@@ -385,20 +385,6 @@ func (in *pubsubInput) newPubsubClient(ctx context.Context) (*pubsub.Client, err
 		}
 		opts = append(opts, option.WithHTTPClient(c))
 	} else {
-		// The Pub/Sub client is gRPC-only, so the user agent is set through
-		// grpc.WithUserAgent, which owns the single "user-agent" header field
-		// grpc-go writes on every RPC.
-		//
-		// beat.Info.HTTPTransportWrapper (the headers_setter extension in OTel
-		// receiver mode) is HTTP-only and does not apply here. The extension
-		// also implements extensionauth.GRPCClient, and its PerRPCCredentials
-		// could be attached with option.WithGRPCDialOption(
-		// grpc.WithPerRPCCredentials(...)), but grpc-go appends per-RPC
-		// credential metadata after its own user-agent field and without the
-		// reserved-header filter, so the request would carry two user-agent
-		// headers and the server's choice between them is undefined. Until
-		// grpc-go offers a way to override that field per connection, this
-		// input keeps the string path.
 		opts = append(opts, option.WithUserAgent(in.userAgent))
 	}
 

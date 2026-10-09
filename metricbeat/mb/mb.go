@@ -24,7 +24,6 @@ package mb
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"net/url"
 	"time"
 
@@ -82,11 +81,8 @@ type BaseModule struct {
 	rawConfig      *conf.C
 	statusReporter status.StatusReporter
 	userAgent      string
-	// httpTransportWrapper comes from beat.Info.HTTPTransportWrapper; see
-	// that field for what it is.
-	httpTransportWrapper func(http.RoundTripper) http.RoundTripper
-	Logger               *logp.Logger
-	Paths                *paths.Path
+	Logger         *logp.Logger
+	Paths          *paths.Path
 }
 
 func (m *BaseModule) String() string {
@@ -123,13 +119,6 @@ func (m *BaseModule) UserAgent() string {
 	return m.userAgent
 }
 
-// HTTPTransportWrapper returns the wrapper HTTP clients created by this module
-// should apply to their transport, or nil if there is none. See
-// beat.Info.HTTPTransportWrapper.
-func (m *BaseModule) HTTPTransportWrapper() func(http.RoundTripper) http.RoundTripper {
-	return m.httpTransportWrapper
-}
-
 // WithConfig re-configures the module with the given raw configuration and returns a
 // copy of the module.
 // Intended to be called from module factories. Note that if metricsets are specified
@@ -153,11 +142,10 @@ func (m *BaseModule) WithConfig(config conf.C) (*BaseModule, error) {
 	}
 
 	newBM := &BaseModule{
-		name:                 m.name,
-		rawConfig:            &config,
-		userAgent:            m.userAgent,
-		httpTransportWrapper: m.httpTransportWrapper,
-		Logger:               m.Logger,
+		name:      m.name,
+		rawConfig: &config,
+		userAgent: m.userAgent,
+		Logger:    m.Logger,
 	}
 
 	if err := config.Unpack(&newBM.config); err != nil {
