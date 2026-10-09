@@ -15,7 +15,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.opentelemetry.io/collector/component/componenttest"
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
@@ -180,17 +179,23 @@ func TestElasticStorage_Lifecycle(t *testing.T) {
 	user := esURL.User.Username()
 	pass, _ := esURL.User.Password()
 
-	cfg := &Config{
-		ElasticsearchConfig: map[string]any{
-			"hosts":    []string{fmt.Sprintf("%s://%s", esURL.Scheme, esURL.Host)},
-			"username": user,
-			"password": pass,
-		},
-	}
+	authenticatorID, authenticator := newTestBeatsAuthenticator(
+		t,
+		fmt.Sprintf("%s://%s", esURL.Scheme, esURL.Host),
+		user,
+		pass,
+	)
+	cfg := newTestStorageConfig(authenticatorID)
 
 	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, "")}
-
-	require.NoError(t, ext.Start(context.Background(), componenttest.NewNopHost()))
+	require.NoError(
+		t,
+		ext.Start(
+			context.Background(),
+			storageTestHost{authenticatorID: authenticator},
+		),
+		"storage must start with Elasticsearch authentication",
+	)
 	assert.NotNil(t, ext.client)
 
 	// Access returns a usable store.
@@ -211,16 +216,16 @@ func TestElasticStorage_Start_BadCredentials(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 	esURL := integration.GetESURL(t, "http")
 
-	cfg := &Config{
-		ElasticsearchConfig: map[string]any{
-			"hosts":    []string{fmt.Sprintf("%s://%s", esURL.Scheme, esURL.Host)},
-			"username": "invaliduser",
-			"password": "wrongpassword",
-		},
-	}
+	authenticatorID, authenticator := newTestBeatsAuthenticator(
+		t,
+		fmt.Sprintf("%s://%s", esURL.Scheme, esURL.Host),
+		"invaliduser",
+		"wrongpassword",
+	)
+	cfg := newTestStorageConfig(authenticatorID)
 	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, "")}
-	err := ext.Start(context.Background(), componenttest.NewNopHost())
-	// NewConnectedClient performs a ping that will receive a 401; it should err.
-	require.Error(t, err)
+	err := ext.Start(context.Background(), storageTestHost{authenticatorID: authenticator})
+	// The connection ping must receive a 401 through the configured authenticator.
+	require.Error(t, err, "invalid Elasticsearch credentials must fail startup")
 	_ = ext.Shutdown(context.Background())
 }

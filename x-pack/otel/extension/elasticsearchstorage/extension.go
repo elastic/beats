@@ -6,23 +6,27 @@ package elasticsearchstorage
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"net/http"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/es"
-	cfg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension"
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/extension"
+	"go.opentelemetry.io/collector/extension/extensioncapabilities"
 )
 
 var (
-	_ extension.Extension = (*elasticStorage)(nil)
-	_ backend.Registry    = (*elasticStorage)(nil)
-	_ backend.Store       = (*lockedStore)(nil)
+	_ extension.Extension             = (*elasticStorage)(nil)
+	_ extensioncapabilities.Dependent = (*elasticStorage)(nil)
+	_ backend.Registry                = (*elasticStorage)(nil)
+	_ backend.Store                   = (*lockedStore)(nil)
 )
 
 type elasticStorage struct {
@@ -38,18 +42,64 @@ type elasticStorage struct {
 	clientMu sync.Mutex
 }
 
+// Dependencies ensures the configured authenticator starts before storage.
+func (e *elasticStorage) Dependencies() []component.ID {
+	if !e.cfg.Auth.HasValue() {
+		return nil
+	}
+	return []component.ID{e.cfg.Auth.Get().AuthenticatorID}
+}
+
 func (e *elasticStorage) Start(ctx context.Context, host component.Host) error {
-	c, err := cfg.NewConfigFrom(e.cfg.ElasticsearchConfig)
-	if err != nil {
-		return err
+	if !e.cfg.Auth.HasValue() {
+		return errMissingAuthenticator
 	}
-	client, err := eslegclient.NewConnectedClient(ctx, c, beat.Info{Beat: "Filebeat", Logger: e.logger})
+
+	auth, err := e.cfg.Auth.Get().GetHTTPClientAuthenticator(ctx, host.GetExtensions())
 	if err != nil {
-		return err
+		return fmt.Errorf("get Elasticsearch authenticator: %w", err)
 	}
-	e.client = client
-	e.ctx = ctx
-	return nil
+
+	endpointProvider, ok := auth.(beatsauthextension.EndpointsProvider)
+	if !ok {
+		return errors.New("configured authenticator does not provide Elasticsearch endpoints")
+	}
+	endpoints := endpointProvider.Endpoints()
+	if len(endpoints) == 0 {
+		return errors.New("configured authenticator has no Elasticsearch endpoints")
+	}
+
+	roundTripper, err := auth.RoundTripper(nil)
+	if err != nil {
+		return fmt.Errorf("get Elasticsearch authenticator transport: %w", err)
+	}
+	if roundTripper == nil {
+		return errors.New("configured authenticator returned a nil HTTP transport")
+	}
+
+	connectionErrors := make([]string, 0, len(endpoints))
+	for _, endpoint := range endpoints {
+		client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
+			URL:      endpoint,
+			Beatname: "Filebeat",
+		}, e.logger)
+		if err != nil {
+			return fmt.Errorf("create Elasticsearch client for endpoint %q: %w", endpoint, err)
+		}
+
+		client.HTTP = &http.Client{Transport: roundTripper}
+		if err := client.Connect(ctx); err != nil {
+			e.logger.Errorf("error connecting to Elasticsearch at %v: %v", endpoint, err)
+			connectionErrors = append(connectionErrors, err.Error())
+			continue
+		}
+
+		e.client = client
+		e.ctx = ctx
+		return nil
+	}
+
+	return fmt.Errorf("couldn't connect to any Elasticsearch authenticator endpoint: %v", connectionErrors)
 }
 
 func (e *elasticStorage) Shutdown(ctx context.Context) error {
