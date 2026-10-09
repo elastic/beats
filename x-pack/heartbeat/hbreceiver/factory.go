@@ -57,7 +57,9 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 		return nil, fmt.Errorf("error restoring browser params: %w", err)
 	}
 
-	beatCreator := beater.New
+	// Receivers sharing a scheduler group share their scheduler, and so their
+	// concurrency limits.
+	beatCreator := beater.NewWithSchedulerGroup(cfg.SchedulerGroup)
 	br, err := xpInstance.NewBeatReceiver(ctx, b, beatCreator, set)
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)

@@ -37,6 +37,32 @@ func TestUnmarshal(t *testing.T) {
 		assert.Contains(t, cfg.Beatconfig, "heartbeat")
 	})
 
+	t.Run("scheduler_group is a receiver setting, not beat config", func(t *testing.T) {
+		cfg := &Config{}
+
+		userConf := confmap.NewFromStringMap(map[string]any{
+			"scheduler_group": "synthetics/synthetics-browser-default",
+			"heartbeat":       map[string]any{"monitors": []any{}},
+		})
+
+		require.NoError(t, cfg.Unmarshal(userConf))
+
+		assert.Equal(t, "synthetics/synthetics-browser-default", cfg.SchedulerGroup)
+		assert.NotContains(t, cfg.Beatconfig, "scheduler_group",
+			"scheduler_group must not be passed down to heartbeat as beat config")
+	})
+
+	t.Run("scheduler_group defaults to empty", func(t *testing.T) {
+		cfg := &Config{}
+
+		userConf := confmap.NewFromStringMap(map[string]any{
+			"heartbeat": map[string]any{"monitors": []any{}},
+		})
+
+		require.NoError(t, cfg.Unmarshal(userConf))
+		assert.Empty(t, cfg.SchedulerGroup)
+	})
+
 	t.Run("no defaults does not error", func(t *testing.T) {
 		cfg := &Config{}
 
@@ -96,6 +122,21 @@ func TestValidate(t *testing.T) {
 			hasError:    false,
 			errorString: "",
 		},
+		"run_once disabled": {
+			c:           &Config{Beatconfig: map[string]any{"heartbeat": map[string]any{"run_once": false}}},
+			hasError:    false,
+			errorString: "",
+		},
+		"run_once enabled": {
+			c:           &Config{Beatconfig: map[string]any{"heartbeat": map[string]any{"run_once": true}}},
+			hasError:    true,
+			errorString: "'heartbeat.run_once' is not supported by the heartbeat receiver",
+		},
+		"run_once enabled as a string": {
+			c:           &Config{Beatconfig: map[string]any{"heartbeat": map[string]any{"run_once": "true"}}},
+			hasError:    true,
+			errorString: "'heartbeat.run_once' is not supported by the heartbeat receiver",
+		},
 	}
 	for name, tc := range tests {
 		err := tc.c.Validate()
@@ -105,5 +146,21 @@ func TestValidate(t *testing.T) {
 		} else {
 			assert.NoErrorf(t, err, "%s failed, should not have error", name)
 		}
+	}
+}
+
+// TestRunOnceIsRejected checks that run_once is rejected however the key is
+// spelled in the collector configuration.
+func TestRunOnceIsRejected(t *testing.T) {
+	for name, userConf := range map[string]map[string]any{
+		"nested":       {"heartbeat": map[string]any{"run_once": true, "monitors": []any{}}},
+		"dotted":       {"heartbeat.run_once": true, "heartbeat.monitors": []any{}},
+		"dotted group": {"heartbeat": map[string]any{"monitors": []any{}}, "heartbeat.run_once": true},
+	} {
+		t.Run(name, func(t *testing.T) {
+			cfg := &Config{}
+			require.NoError(t, cfg.Unmarshal(confmap.NewFromStringMap(userConf)), "unmarshalling must succeed")
+			assert.ErrorContains(t, cfg.Validate(), "run_once", "a run_once receiver must be rejected")
+		})
 	}
 }
