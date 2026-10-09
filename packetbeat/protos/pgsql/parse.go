@@ -602,16 +602,16 @@ func (pgsql *pgsqlPlugin) parseDataRow(s *pgsqlStream, buf []byte) error {
 		return fmt.Errorf("%w: DataRow field mismatch, got %d, expected %d", errFieldBufferBig, fieldCount, len(msg.fieldsFormat))
 	}
 	for field := range fieldCount {
-		if len(buf) <= off {
+		if len(buf) < off+4 {
 			return errFieldBufferShort
 		}
 
 		// read column length (int32)
-		columnLength := readLength(buf[off:])
+		columnLength := readColumnLength(buf[off:])
 		off += 4
 
-		if columnLength > 0 && columnLength > len(buf[off:]) {
-			pgsql.log.Errorf("Pgsql invalid column_length=%v, buffer_length=%v, field=%v",
+		if columnLength < nullColumnLength || columnLength > len(buf[off:]) {
+			pgsql.detailf("Pgsql invalid column_length=%v, buffer_length=%v, field=%v",
 				columnLength, len(buf[off:]), field)
 			return errInvalidLength
 		}
@@ -764,6 +764,17 @@ func readLength(b []byte) int {
 
 func readCount(b []byte) int {
 	return int(binary.BigEndian.Uint16(b))
+}
+
+// nullColumnLength is the column length a DataRow uses to mark a NULL value.
+// No value bytes follow it, and no smaller length is legal.
+const nullColumnLength = -1
+
+// readColumnLength reads the length of a DataRow column value. Unlike a
+// message length it is signed, so that nullColumnLength can be distinguished
+// from a very long value.
+func readColumnLength(b []byte) int {
+	return int(int32(binary.BigEndian.Uint32(b)))
 }
 
 func pgsqlString(b []byte, sz int) (string, error) {

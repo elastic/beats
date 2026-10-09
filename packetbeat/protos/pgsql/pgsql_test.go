@@ -22,6 +22,7 @@ package pgsql
 import (
 	"encoding/hex"
 	"net"
+	"slices"
 	"testing"
 	"time"
 
@@ -199,6 +200,97 @@ func TestPgslMaliciousDataRowLen(t *testing.T) {
 	ok, complete := pgsql.pgsqlMessageParser(stream)
 	assert.False(t, ok)
 	assert.False(t, complete)
+}
+
+// rowDescription2 describes two text-format columns, "a" and "b". It is the
+// preamble the DataRow tests below need so that parseDataRow knows the column
+// formats.
+const rowDescription2 = "540000002e0002" +
+	"6100" + "00000000" + "0001" + "00000019" + "ffff" + "ffffffff" + "0000" +
+	"6200" + "00000000" + "0002" + "00000019" + "ffff" + "ffffffff" + "0000"
+
+// Test a DataRow whose second column is NULL, which the protocol encodes as a
+// column length of -1.
+func TestPgsqlParser_nullColumn(t *testing.T) {
+	pgsql := pgsqlModForTests(nil)
+
+	data := rowDescription2 +
+		"440000000f0002" + "00000001" + "58" + "ffffffff" + // DataRow: "X", NULL
+		"430000000d53454c454354203100" + // CommandComplete "SELECT 1"
+		"5a0000000549" // ReadyForQuery
+
+	message, err := hex.DecodeString(data)
+	if err != nil {
+		t.Fatalf("hex.DecodeString(data) = %v; want no error", err)
+	}
+
+	stream := &pgsqlStream{data: message, message: new(pgsqlMessage)}
+
+	ok, complete := pgsql.pgsqlMessageParser(stream)
+	if !ok {
+		t.Error("pgsqlMessageParser ok = false; want true")
+	}
+	if !complete {
+		t.Error("pgsqlMessageParser complete = false; want true")
+	}
+	if stream.message.numberOfRows != 1 {
+		t.Errorf("numberOfRows = %d; want 1", stream.message.numberOfRows)
+	}
+	want := []string{"X", ""}
+	if len(stream.message.rows) != 1 || !slices.Equal(stream.message.rows[0], want) {
+		t.Errorf("rows = %v; want [%v]", stream.message.rows, want)
+	}
+}
+
+// Test a DataRow with a column length below -1, which no value can have.
+func TestPgsqlParser_negativeColumnLength(t *testing.T) {
+	pgsql := pgsqlModForTests(nil)
+
+	data := rowDescription2 +
+		"440000000f0002" + "00000001" + "58" + "fffffffe" + // second length is -2
+		"5a0000000549"
+
+	message, err := hex.DecodeString(data)
+	if err != nil {
+		t.Fatalf("hex.DecodeString(data) = %v; want no error", err)
+	}
+
+	stream := &pgsqlStream{data: message, message: new(pgsqlMessage)}
+
+	ok, complete := pgsql.pgsqlMessageParser(stream)
+	if ok {
+		t.Error("pgsqlMessageParser ok = true; want false")
+	}
+	if complete {
+		t.Error("pgsqlMessageParser complete = true; want false")
+	}
+}
+
+// Test a DataRow that ends part-way through a column length field.
+func TestPgsqlParser_truncatedColumnLength(t *testing.T) {
+	pgsql := pgsqlModForTests(nil)
+
+	// The row claims two columns but leaves only two bytes where the second
+	// column's four-byte length should be.
+	data := rowDescription2 +
+		"440000000d0002" + "00000001" + "58" + "0000" +
+		"5a0000000549"
+
+	message, err := hex.DecodeString(data)
+	if err != nil {
+		t.Fatalf("hex.DecodeString(data) = %v; want no error", err)
+	}
+
+	stream := &pgsqlStream{data: message, message: new(pgsqlMessage)}
+
+	// make sure we don't panic
+	ok, complete := pgsql.pgsqlMessageParser(stream)
+	if ok {
+		t.Error("pgsqlMessageParser ok = true; want false")
+	}
+	if complete {
+		t.Error("pgsqlMessageParser complete = true; want false")
+	}
 }
 
 // Test parsing an incomplete pgsql response
