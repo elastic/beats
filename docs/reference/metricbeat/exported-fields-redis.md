@@ -346,7 +346,7 @@ Provides information about RDB persistence
 
 ## aof [_aof]
 
-Provides information about AOF persitence
+Provides information about AOF persistence
 
 **`redis.info.persistence.aof.enabled`**
 :   Flag indicating AOF logging is activated
@@ -391,7 +391,7 @@ Provides information about AOF persitence
 
 
 **`redis.info.persistence.aof.bgrewrite.last_status`**
-:   Status of the last AOF rewrite operatio
+:   Status of the last AOF rewrite operation
 
     type: keyword
 
