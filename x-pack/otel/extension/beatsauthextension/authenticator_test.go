@@ -671,3 +671,199 @@ func (m *mockHost) Report(event *componentstatus.Event) {
 		m.reportStatusFunc(event)
 	}
 }
+
+func TestConfigValidation(t *testing.T) {
+	tests := []struct {
+		name      string
+		config    func() *Config
+		errString string
+	}{
+		{
+			name:   "endpoints omitted",
+			config: func() *Config { return &Config{} },
+		},
+		{
+			name: "valid endpoint",
+			config: func() *Config {
+				return &Config{Endpoints: []string{"https://es.example:9200"}}
+			},
+		},
+		{
+			name:      "invalid endpoint",
+			config:    func() *Config { return &Config{Endpoints: []string{"tcp://es.example:9200"}} },
+			errString: "scheme must be http or https",
+		},
+		{
+			name:      "endpoint userinfo",
+			config:    func() *Config { return &Config{Endpoints: []string{"https://user:password@es.example:9200"}} },
+			errString: "endpoint userinfo is unsupported",
+		},
+		{
+			name: "API key and basic authentication",
+			config: func() *Config {
+				return &Config{BeatAuthConfig: map[string]any{
+					"auth": map[string]any{
+						"api_key":  "api-key",
+						"username": "elastic",
+						"password": "password",
+					},
+				}}
+			},
+			errString: "cannot set both api_key and username/password",
+		},
+		{
+			name: "API key and Authorization header",
+			config: func() *Config {
+				return &Config{BeatAuthConfig: map[string]any{
+					"auth": map[string]any{
+						"api_key": "api-key",
+						"headers": []map[string]any{
+							{"key": "authorization", "value": "Bearer token"},
+						},
+					},
+				}}
+			},
+			errString: "cannot configure multiple HTTP authorization methods",
+		},
+		{
+			name: "basic authentication and Authorization header",
+			config: func() *Config {
+				return &Config{BeatAuthConfig: map[string]any{
+					"auth": map[string]any{
+						"username": "elastic",
+						"password": "password",
+						"headers": []map[string]any{
+							{"key": "Authorization", "value": "Bearer token"},
+						},
+					},
+				}}
+			},
+			errString: "cannot configure multiple HTTP authorization methods",
+		},
+		{
+			name: "multiple Authorization headers",
+			config: func() *Config {
+				return &Config{BeatAuthConfig: map[string]any{
+					"auth": map[string]any{
+						"headers": []map[string]any{
+							{"key": "Authorization", "value": "Bearer token"},
+							{"key": "authorization", "value": "ApiKey api-key"},
+						},
+					},
+				}}
+			},
+			errString: "cannot configure multiple Authorization headers",
+		},
+		{
+			name: "Kerberos and HTTP authorization",
+			config: func() *Config {
+				return &Config{BeatAuthConfig: map[string]any{
+					"kerberos": map[string]any{
+						"auth_type":   "password",
+						"config_path": "../../../../libbeat/outputs/elasticsearch/testdata/krb5.conf",
+						"username":    "user",
+						"password":    "pass",
+						"realm":       "elastic",
+					},
+					"auth": map[string]any{
+						"api_key": "api-key",
+					},
+				}}
+			},
+			errString: "cannot combine Kerberos with HTTP authorization",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			err := test.config().Validate()
+			if test.errString == "" {
+				require.NoError(t, err, "valid configuration must pass validation")
+				return
+			}
+			require.ErrorContains(t, err, test.errString, "invalid configuration must fail validation")
+		})
+	}
+}
+
+func TestHTTPAuthorization(t *testing.T) {
+	tests := []struct {
+		name       string
+		authConfig map[string]any
+		expectAuth string
+		expectHead string
+	}{
+		{
+			name: "API key",
+			authConfig: map[string]any{
+				"api_key": "already-base64-encoded",
+			},
+			expectAuth: "ApiKey already-base64-encoded",
+		},
+		{
+			name: "basic authentication",
+			authConfig: map[string]any{
+				"username": "elastic",
+				"password": "password",
+			},
+			expectAuth: "Basic ZWxhc3RpYzpwYXNzd29yZA==",
+		},
+		{
+			name: "custom headers",
+			authConfig: map[string]any{
+				"headers": []map[string]any{
+					{"key": "X-Extension", "value": "extension"},
+				},
+			},
+			expectHead: "extension",
+		},
+		{
+			name: "authentication omitted",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			var gotAuthorization, gotHeader string
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				gotAuthorization = r.Header.Get("Authorization")
+				gotHeader = r.Header.Get("X-Extension")
+				w.WriteHeader(http.StatusNoContent)
+			}))
+			t.Cleanup(server.Close)
+
+			config := &Config{BeatAuthConfig: map[string]any{}}
+			if test.authConfig != nil {
+				config.BeatAuthConfig["auth"] = test.authConfig
+			}
+
+			settings := componenttest.NewNopTelemetrySettings()
+			auth, err := newAuthenticator(config, settings)
+			require.NoError(t, err, "authenticator creation must succeed")
+			host := &mockHost{
+				extensions:       extensionsMap{component.NewID(Type): auth},
+				reportStatusFunc: func(*componentstatus.Event) {},
+			}
+			require.NoError(t, auth.Start(t.Context(), host), "authenticator start must succeed")
+
+			roundTripper, err := auth.RoundTripper(nil)
+			require.NoError(t, err, "authenticator must provide a transport")
+
+			request, err := http.NewRequestWithContext(t.Context(), http.MethodGet, server.URL, nil)
+			require.NoError(t, err, "request creation must succeed")
+			response, err := roundTripper.RoundTrip(request)
+			require.NoError(t, err, "request must succeed")
+			require.NoError(t, response.Body.Close(), "response body must close")
+
+			require.Equal(t, test.expectAuth, gotAuthorization, "configured authorization must be applied unchanged")
+			require.Equal(t, test.expectHead, gotHeader, "configured headers must be applied")
+		})
+	}
+}
+
+func TestEndpointsReturnsCopy(t *testing.T) {
+	auth := &authenticator{cfg: &Config{Endpoints: []string{"https://es.example:9200"}}}
+	endpoints := auth.Endpoints()
+	endpoints[0] = "https://changed.example:9200"
+	require.Equal(t, []string{"https://es.example:9200"}, auth.Endpoints(), "callers must not mutate configured endpoints")
+}

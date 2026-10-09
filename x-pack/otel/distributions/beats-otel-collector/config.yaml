@@ -4,6 +4,8 @@ extensions:
   pprof:
     endpoint: 0.0.0.0:1777
   beatsauth:
+    endpoints:
+      - http://localhost:9200
   elasticsearch_storage:
     hosts:
       - http://localhost:9200
