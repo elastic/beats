@@ -22,6 +22,7 @@ import (
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
 
+	"github.com/elastic/beats/v7/heartbeat/beater"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -121,6 +122,26 @@ func TestBeatsAuthStartHookErrors(t *testing.T) {
 
 func TestBeatsAuthStartHookEmptyReference(t *testing.T) {
 	require.NoError(t, beatsAuthStartHook(t.Context(), "", nil, "", logp.NewNopLogger(), func(*eslegclient.Connection) {})(nil), "empty Beats auth reference should be a no-op")
+}
+
+func TestBeatsAuthStartHookESClientFailureIsBestEffort(t *testing.T) {
+	authID := component.MustNewIDWithName("beatsauth", "auth")
+	host := elasticsearchAuthTestHost{extensions: map[component.ID]component.Component{
+		authID: &fakeBeatsAuthExtension{},
+	}}
+
+	requesterSet := false
+	err := beatsAuthStartHook(
+		t.Context(),
+		authID.String(),
+		&beater.Heartbeat{},
+		"",
+		logp.NewNopLogger(),
+		func(*eslegclient.Connection) { requesterSet = true },
+	)(host)
+
+	require.NoError(t, err, "monitor state client setup failures must not prevent receiver startup")
+	assert.False(t, requesterSet, "failed client setup must not install an Elasticsearch requester")
 }
 
 func TestNewESClientConnectivityFailureIsBestEffort(t *testing.T) {

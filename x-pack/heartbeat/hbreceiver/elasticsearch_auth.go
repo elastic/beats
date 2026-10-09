@@ -67,7 +67,15 @@ func beatsAuthStartHook(
 
 		requester, err := newESClient(ctx, auth, userAgent, logger)
 		if err != nil {
-			return fmt.Errorf("creating Elasticsearch requester from extension %q: %w", extensionID.String(), err)
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}
+			logger.Warnf(
+				"skipping monitor state management: creating Elasticsearch requester from extension %q failed: %v",
+				extensionID.String(),
+				err,
+			)
+			return nil
 		}
 		heartbeat.WithElasticsearchStateLoader(requester)
 		setRequester(requester)
