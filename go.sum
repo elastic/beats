@@ -813,8 +813,8 @@ github.com/mdlayher/netlink v1.7.2 h1:/UtM3ofJap7Vl4QWCPDGXY8d3GIY2UGSDbK+QWmY8/
 github.com/mdlayher/netlink v1.7.2/go.mod h1:xraEF7uJbxLhc5fpHL4cPe221LI2bdttWlU+ZGLfQSw=
 github.com/mdlayher/socket v0.5.1 h1:VZaqt6RkGkt2OE9l3GcC6nZkqD3xKeQLyfleW/uBcos=
 github.com/mdlayher/socket v0.5.1/go.mod h1:TjPLHI1UgwEv5J1B5q0zTZq12A/6H7nKmtTanQE37IQ=
-github.com/microsoft/go-mssqldb v1.11.0 h1:YbDqolEjGH9hBfvKzONTf5/dbl9RKXmizMJE93lVxNs=
-github.com/microsoft/go-mssqldb v1.11.0/go.mod h1:goQLDOPlMN/l1REhnNPElMoY/yX+fUWn1+7UoFJPH9Y=
+github.com/microsoft/go-mssqldb v1.11.2 h1:FCgeBIK8um2+X4tbun6Q71N1KsfyCDPKY41e1yGVjSE=
+github.com/microsoft/go-mssqldb v1.11.2/go.mod h1:CYgwG5AMXFojbjTg+GNP5G/y6uz1BhTyZaPqQWzkGnQ=
 github.com/microsoft/wmi v0.44.0 h1:kgUtdKkdd+9pMhVfUItNPCRPUjsxf9dzBDojOl3WP6I=
 github.com/microsoft/wmi v0.44.0/go.mod h1:pEPSA8nFWrDOc4SSFRZfZaurx+9HT58ZWDo8vdVWIrI=
 github.com/miekg/dns v1.1.72 h1:vhmr+TF2A3tuoGNkLDFK9zi36F2LS+hKTRW0Uf8kbzI=
