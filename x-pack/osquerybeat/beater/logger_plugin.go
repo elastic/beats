@@ -32,8 +32,10 @@ type QueryResult struct {
 type HandleQueryResultFunc func(res QueryResult)
 
 type LoggerPlugin struct {
-	log           *logp.Logger
-	logSnapshotFn HandleQueryResultFunc
+	log            *logp.Logger
+	logSnapshotFn  HandleQueryResultFunc
+	maxResultBytes int
+	dropOversized  func()
 }
 
 func NewLoggerPlugin(log *logp.Logger, logSnapshotFn HandleQueryResultFunc) *LoggerPlugin {
@@ -45,6 +47,12 @@ func NewLoggerPlugin(log *logp.Logger, logSnapshotFn HandleQueryResultFunc) *Log
 
 func (p *LoggerPlugin) Log(ctx context.Context, typ logger.LogType, logText string) error {
 	if typ == logger.LogTypeSnapshot || typ == logger.LogTypeString {
+		if p.maxResultBytes > 0 && len(logText) > p.maxResultBytes {
+			if p.dropOversized != nil {
+				p.dropOversized()
+			}
+			return nil
+		}
 		var res QueryResult
 		if err := json.Unmarshal([]byte(logText), &res); err != nil {
 			p.log.Errorf("failed to unmarshal shapshot result: %v", err)

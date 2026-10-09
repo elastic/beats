@@ -64,7 +64,10 @@ type ConfigPlugin struct {
 
 	mx sync.RWMutex
 
-	queriesCount int
+	queriesCount            int
+	resultGeneration        uint64
+	pendingResultGeneration uint64
+	resultNamespaces        map[string]string
 
 	// A map that allows to look up the queryInfo by query name
 	queryInfoMap queryInfoMap
@@ -211,6 +214,8 @@ func (p *ConfigPlugin) GenerateConfig(ctx context.Context) (map[string]string, e
 	// replace the query info map
 	if p.newQueryInfoMap != nil {
 		p.queryInfoMap = p.newQueryInfoMap
+		p.resultNamespaces = p.namespaces
+		p.resultGeneration = p.pendingResultGeneration
 		p.newQueryInfoMap = nil
 	}
 
@@ -478,4 +483,27 @@ func traverseTree(depth int, ecsm ecs.Mapping, path []string, v any) error {
 		}
 	}
 	return nil
+}
+
+func (p *ConfigPlugin) setGeneration(inputs []config.InputConfig, generation uint64) error {
+	p.mx.Lock()
+	defer p.mx.Unlock()
+	if err := p.set(inputs); err != nil {
+		return err
+	}
+	p.pendingResultGeneration = generation
+	return nil
+}
+
+// lookupResultMetadata captures the policy last pulled by osqueryd, including
+// its generation and namespace. Set updates public namespaces immediately for
+// API-key permissions, but interim results still belong to the applied policy
+// and must fail the publication generation guard until GenerateConfig applies it.
+// Lookup maps are replaced rather than mutated, so accepted work retains them.
+func (p *ConfigPlugin) lookupResultMetadata(name string) (string, QueryInfo, uint64, bool) {
+	p.mx.RLock()
+	defer p.mx.RUnlock()
+	ns, nsOK := p.resultNamespaces[name]
+	qi, qiOK := p.queryInfoMap[name]
+	return ns, qi, p.resultGeneration, nsOK && qiOK
 }

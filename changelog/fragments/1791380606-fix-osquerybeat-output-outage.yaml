@@ -1,0 +1,11 @@
+kind: bug-fix
+summary: Prevent output outages from blocking osqueryd and leaving osquerybeat failed.
+description: >
+  Process scheduled results outside the osquery logger callback using a bounded
+  worker, and use nonblocking queue admission for results, action responses,
+  and profiles. New work can be dropped when the worker or publisher queue is
+  full; monitoring counters and rate-limited warnings report these losses.
+  Recover osqueryd logger exits with bounded backoff while applying the latest
+  configuration, and cancel outstanding RPCs promptly during shutdown.
+component: osquerybeat
+issue: https://github.com/elastic/beats/issues/53645

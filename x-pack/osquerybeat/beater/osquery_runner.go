@@ -8,7 +8,9 @@ import (
 	"context"
 	"errors"
 	"slices"
-	"sync"
+	"time"
+
+	"github.com/elastic/beats/v7/libbeat/management/status"
 
 	"go.uber.org/zap/zapcore"
 
@@ -18,135 +20,175 @@ import (
 )
 
 type osqueryRunner struct {
-	log     *logp.Logger
-	inputCh chan []config.InputConfig
+	log                                  *logp.Logger
+	inputCh                              chan runnerInput
+	retryInitial, retryMax, stablePeriod time.Duration
+	reportStatus                         func(status.Status, string)
 }
 
 func newOsqueryRunner(log *logp.Logger) *osqueryRunner {
 	r := &osqueryRunner{
-		log:     log,
-		inputCh: make(chan []config.InputConfig, 1),
+		log:          log,
+		inputCh:      make(chan runnerInput, 1),
+		retryInitial: time.Second, retryMax: 30 * time.Second, stablePeriod: time.Minute,
 	}
 	return r
 }
 
-type osqueryRunFunc func(ctx context.Context, flags osqd.Flags, extensions config.ExtensionsConfig, inputCh <-chan []config.InputConfig) error
+type osqueryRunFunc func(ctx context.Context, flags osqd.Flags, extensions config.ExtensionsConfig, inputCh <-chan runnerInput) error
 
 // Run manages osqueryd lifecycle, processes inputs changes, restarts osquery if needed
 func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) error {
 	var (
+		latest     *runnerInput
 		flags      osqd.Flags
 		extensions config.ExtensionsConfig
-
-		ctx context.Context
-		cn  context.CancelFunc
-		wg  sync.WaitGroup
-
-		inputCh chan []config.InputConfig
+		logLevel   zapcore.Level
+		cancel     context.CancelFunc
+		completed  <-chan error
+		inputs     chan runnerInput
+		pending    *runnerInput
+		stopping   bool
+		recovering bool
+		runID      uint64
+		readyAt    time.Time
+		retry      *time.Timer
+		retryCh    <-chan time.Time
 	)
-
-	var mx sync.Mutex
-	cancel := func() {
-		mx.Lock()
-		defer mx.Unlock()
-		if cn != nil {
-			cn()
-			cn = nil
+	ready := make(chan uint64, 1)
+	backoff := r.retryInitial
+	report := func(s status.Status, message string) {
+		if r.reportStatus != nil {
+			r.reportStatus(s, message)
 		}
 	}
-
-	// Cleanup on exit: cancel child context first, then wait for the runfn
-	// goroutine to exit. The order matters — cancel must run before wg.Wait
-	// so the goroutine sees context cancellation and exits promptly.
-	defer wg.Wait()
-	defer cancel()
-
-	errCh := make(chan error, 1)
-
-	// lastKnownInputs is used for recovery after a recoverable osquery error
-	var lastKnownInputs []config.InputConfig
-
-	logLevel := zapcore.LevelOf(r.log.Core())
-
-	process := func(inputs []config.InputConfig) {
-		lastKnownInputs = inputs
-		newFlags := config.GetOsqueryOptions(inputs)
-		newExtensions := config.GetOsqueryExtensions(inputs)
-		newLogLevel := zapcore.LevelOf(r.log.Core())
-
-		// cn is cleared by the spawned goroutine's cancel() on exit, so guard it with mx.
-		mx.Lock()
-		running := cn != nil
-		mx.Unlock()
-
-		// If Osqueryd is running and flags, log level, or the customer-managed extensions
-		// changed: stop osquery so it is restarted with the new autoload file.
-		if running && (!osqd.FlagsAreSame(flags, newFlags) || logLevel != newLogLevel || !extensionsAreSame(extensions, newExtensions)) {
-			r.log.Info("Osquery is running and options changed, stop osqueryd")
-
-			// Cancel context
+	stopRetry := func() {
+		if retry != nil {
+			retry.Stop()
+			retry = nil
+			retryCh = nil
+		}
+	}
+	defer stopRetry()
+	defer func() {
+		if cancel != nil {
 			cancel()
-
-			// Wait until osquery runner exits
-			wg.Wait()
+			<-completed
 		}
-
-		mx.Lock()
-		// Start osqueryd if not running
-		if cn == nil {
-			r.log.Info("Start osqueryd")
-
-			flags = newFlags
-			extensions = newExtensions
-			logLevel = newLogLevel
-			inputCh = make(chan []config.InputConfig, 1)
-			ctx, cn = context.WithCancel(parentCtx) //nolint:gosec // G118: cn is stored and invoked via the cancel() helper
-
-			wg.Go(func() {
-				err := runfn(ctx, flags, extensions, inputCh)
-
-				// Reset cancellable
-				cancel()
-
-				// Forward error to main loop
-				r.log.Debugf("Forward osquery run error to the main runner loop: %v", err)
-				errCh <- err
-			})
-		}
-		mx.Unlock()
-
-		select {
-		case inputCh <- inputs:
-		case <-ctx.Done():
-		}
-	}
-
-	for {
-		select {
-		case inputs := <-r.inputCh:
-			r.log.Debug("Got configuration update")
-			process(inputs)
-		case err := <-errCh:
-			if err == nil || errors.Is(err, context.Canceled) {
-				r.log.Info("Osquery exited: ", err)
-			} else {
-				r.log.Error("Failed to run osquery:", err)
-				if isRecoverableOsqueryError(err) {
-					r.log.Infof("Recover osquery after recoverable error: %v", err)
-					if lastKnownInputs != nil {
-						select {
-						case r.inputCh <- lastKnownInputs:
-						case <-parentCtx.Done():
-							return parentCtx.Err()
-						}
-					}
-				} else {
-					return err
-				}
+	}()
+	start := func() {
+		stopRetry()
+		flags = config.GetOsqueryOptions(latest.inputs)
+		extensions = config.GetOsqueryExtensions(latest.inputs)
+		logLevel = zapcore.LevelOf(r.log.Core())
+		runID++
+		id := runID
+		childCtx, childCancel := context.WithCancel(parentCtx)
+		cancel = childCancel
+		childCtx = context.WithValue(childCtx, osqueryReadyKey{}, func() {
+			if childCtx.Err() != nil {
+				return
 			}
+			select {
+			case ready <- id:
+			case <-childCtx.Done():
+			}
+		})
+		inputs = make(chan runnerInput, 1)
+		pending = latest
+		done := make(chan error, 1)
+		completed = done
+		readyAt = time.Time{}
+		stopping = false
+		if !recovering {
+			report(status.Configuring, "Starting osqueryd")
+		}
+		r.log.Info("Start osqueryd")
+		// Capture per-run values; configuration can change while teardown completes.
+		runFlags, runExtensions, runInputs := flags, extensions, inputs
+		go func() {
+			defer childCancel()
+			done <- runfn(childCtx, runFlags, runExtensions, runInputs)
+		}()
+	}
+	for {
+		var send chan runnerInput
+		var next runnerInput
+		if pending != nil && !stopping {
+			send = inputs
+			next = *pending
+		}
+		select {
 		case <-parentCtx.Done():
 			return parentCtx.Err()
+		case input := <-r.inputCh:
+			latest = &input
+			if completed == nil {
+				if retryCh == nil {
+					start()
+				}
+				continue
+			}
+			newFlags := config.GetOsqueryOptions(input.inputs)
+			newExtensions := config.GetOsqueryExtensions(input.inputs)
+			if !osqd.FlagsAreSame(flags, newFlags) || !extensionsAreSame(extensions, newExtensions) || logLevel != zapcore.LevelOf(r.log.Core()) {
+				stopping = true
+				pending = nil
+				cancel()
+			} else {
+				pending = latest
+			}
+		case send <- next:
+			pending = nil
+		case id := <-ready:
+			if id == runID && completed != nil && !stopping {
+				if readyAt.IsZero() {
+					readyAt = time.Now()
+				}
+				recovering = false
+				report(status.Running, "Osqueryd configuration applied")
+			}
+		case err := <-completed:
+			cancel()
+			cancel = nil
+			completed = nil
+			inputs = nil
+			pending = nil
+			if stopping {
+				start()
+				continue
+			}
+			if parentCtx.Err() != nil {
+				return parentCtx.Err()
+			}
+			if err == nil || errors.Is(err, context.Canceled) {
+				r.log.Info("Osquery exited: ", err)
+				continue
+			}
+			if !isRecoverableOsqueryError(err) {
+				return err
+			}
+			if !readyAt.IsZero() && time.Since(readyAt) >= r.stablePeriod {
+				backoff = r.retryInitial
+			}
+			recovering = true
+			report(status.Degraded, "Osqueryd exited; restarting: "+err.Error())
+			r.log.Warnf("Restart osqueryd after recoverable error in %s: %v", backoff, err)
+			retry = time.NewTimer(backoff)
+			retryCh = retry.C
+			backoff = min(backoff*2, r.retryMax)
+		case <-retryCh:
+			// Updates received during backoff replace latest, without restarting early.
+			start()
 		}
+	}
+}
+
+type osqueryReadyKey struct{}
+
+func notifyOsqueryReady(ctx context.Context) {
+	if ready, ok := ctx.Value(osqueryReadyKey{}).(func()); ok {
+		ready()
 	}
 }
 
@@ -163,11 +205,20 @@ func extensionsAreSame(a, b config.ExtensionsConfig) bool {
 	return slices.Equal(a.Require, b.Require)
 }
 
+type runnerInput struct {
+	inputs     []config.InputConfig
+	generation uint64
+}
+
 func (r *osqueryRunner) Update(ctx context.Context, inputs []config.InputConfig) error {
+	return r.updateGeneration(ctx, inputs, 0)
+}
+
+func (r *osqueryRunner) updateGeneration(ctx context.Context, inputs []config.InputConfig, generation uint64) error {
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
-	case r.inputCh <- inputs:
+	case r.inputCh <- runnerInput{inputs: inputs, generation: generation}:
 	}
 	return nil
 }

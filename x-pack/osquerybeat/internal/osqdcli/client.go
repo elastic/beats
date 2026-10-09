@@ -16,8 +16,9 @@ import (
 
 	"golang.org/x/sync/semaphore"
 
-	"github.com/osquery/osquery-go"
+	"github.com/apache/thrift/lib/go/thrift"
 	genosquery "github.com/osquery/osquery-go/gen/osquery"
+	"github.com/osquery/osquery-go/transport"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -67,7 +68,7 @@ type Client struct {
 
 	log *logp.Logger
 
-	cli *osquery.ExtensionManagerClient
+	cli *rpcClient
 	mx  sync.Mutex
 
 	cache Cache[string, map[string]string]
@@ -156,7 +157,7 @@ func (c *Client) reconnect(ctx context.Context) error {
 	return nil
 }
 
-func (c *Client) connectWithRetry(ctx context.Context, timeout time.Duration) (cli *osquery.ExtensionManagerClient, err error) {
+func (c *Client) connectWithRetry(ctx context.Context, timeout time.Duration) (cli *rpcClient, err error) {
 	var retryLog *logp.Logger
 	if c.log != nil {
 		retryLog = c.log.With("context", "osquery client connect")
@@ -175,7 +176,7 @@ func (c *Client) connectWithRetry(ctx context.Context, timeout time.Duration) (c
 			return err
 		}
 		var connErr error
-		cli, connErr = osquery.NewClient(c.socketPath, timeout)
+		cli, connErr = newRPCClient(c.socketPath, timeout)
 		if connErr != nil {
 			if r.log != nil {
 				r.log.Warnf("failed to connect, reconnect might be attempted, err: %v", connErr)
@@ -224,14 +225,17 @@ func (c *Client) close() {
 // that doesn't cancel the query execution itself.
 // This also makes the client RPC unusable until the long running query finishes, returning errors for each subsequent query.
 func (c *Client) Query(ctx context.Context, sql string, timeout time.Duration) ([]map[string]any, error) {
-	c.mx.Lock()
-	defer c.mx.Unlock()
-
 	err := c.cliLimiter.Acquire(ctx, limit)
 	if err != nil {
 		return nil, err
 	}
 	defer c.cliLimiter.Release(limit)
+
+	c.mx.Lock()
+	defer c.mx.Unlock()
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
+	}
 
 	// If query timeout is <= 0, then use client timeout (default is 1 minute)
 	if timeout <= 0 {
@@ -253,10 +257,14 @@ func (c *Client) Query(ctx context.Context, sql string, timeout time.Duration) (
 		return nil, err
 	}
 	defer cli.Close()
+	defer closeOnCancellation(ctx, cli)()
 
 	var res *genosquery.ExtensionResponse
 	res, err = cli.QueryContext(ctx, sql)
 	if err != nil {
+		if ctx.Err() != nil {
+			return nil, ctx.Err()
+		}
 		return nil, fmt.Errorf("osquery failed: %w", err)
 	}
 
@@ -273,18 +281,21 @@ func (c *Client) Query(ctx context.Context, sql string, timeout time.Duration) (
 // ResolveResult types for a give query
 // The API is public to allow resolution of scheduled queries results captured by custom logger plugin
 func (c *Client) ResolveResult(ctx context.Context, sql string, hits []map[string]string) ([]map[string]any, error) {
-	c.mx.Lock()
-	defer c.mx.Unlock()
-	if c.cli == nil {
-		return nil, ErrClientClosed
-	}
-
 	err := c.cliLimiter.Acquire(ctx, limit)
 	if err != nil {
 		return nil, err
 	}
 	defer c.cliLimiter.Release(limit)
 
+	c.mx.Lock()
+	defer c.mx.Unlock()
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
+	}
+
+	if c.cli == nil {
+		return nil, ErrClientClosed
+	}
 	return c.resolveResult(ctx, sql, hits)
 }
 
@@ -309,7 +320,18 @@ func (c *Client) queryColumnTypes(ctx context.Context, sql string) (map[string]s
 			err   error
 		)
 
-		exres, err = c.cli.GetQueryColumnsContext(ctx, sql)
+		// A column lookup can use an action's shorter context. Cancelling it
+		// must not close the connection retained for daemon lifecycle tracking.
+		cli, err := c.connectWithRetry(ctx, c.timeout)
+		if err != nil {
+			return nil, err
+		}
+		defer cli.Close()
+		defer closeOnCancellation(ctx, cli)()
+		exres, err = cli.GetQueryColumnsContext(ctx, sql)
+		if ctx.Err() != nil {
+			return nil, ctx.Err()
+		}
 
 		if err != nil {
 			return nil, fmt.Errorf("osquery get query columns failed: %w", err)
@@ -369,4 +391,43 @@ func resolveHitTypes(hit, colTypes map[string]string) map[string]any {
 		m[k] = v
 	}
 	return m
+}
+
+// closeOnCancellation interrupts an RPC transport read, which thrift does not
+// otherwise cancel when its context ends. Joining the callback keeps the normal
+// deferred Close from racing with the cancellation Close.
+func closeOnCancellation(ctx context.Context, cli *rpcClient) func() {
+	done := make(chan struct{})
+	stop := context.AfterFunc(ctx, func() { cli.Close(); close(done) })
+	return func() {
+		if !stop() {
+			<-done
+		}
+	}
+}
+
+// rpcClient owns its transport so cancellation can close it directly. The
+// osquery-go Close method probes IsOpen first, which can wait behind the very
+// transport read cancellation needs to interrupt. Client's semaphore and mutex
+// already serialize these RPC calls, so an additional socket locker is unneeded.
+type rpcClient struct {
+	client    *genosquery.ExtensionManagerClient
+	transport thrift.TTransport
+}
+
+func newRPCClient(socketPath string, timeout time.Duration) (*rpcClient, error) {
+	conn, err := transport.Open(socketPath, timeout)
+	if err != nil {
+		return nil, err
+	}
+	// A nil protocol configuration preserves the socket timeouts set by Open.
+	return &rpcClient{client: genosquery.NewExtensionManagerClientFactory(conn, thrift.NewTBinaryProtocolFactoryConf(nil)), transport: conn}, nil
+}
+
+func (c *rpcClient) Close() { _ = c.transport.Close() }
+func (c *rpcClient) QueryContext(ctx context.Context, sql string) (*genosquery.ExtensionResponse, error) {
+	return c.client.Query(ctx, sql)
+}
+func (c *rpcClient) GetQueryColumnsContext(ctx context.Context, sql string) (*genosquery.ExtensionResponse, error) {
+	return c.client.GetQueryColumns(ctx, sql)
 }
