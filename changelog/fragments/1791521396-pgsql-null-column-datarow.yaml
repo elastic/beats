@@ -11,19 +11,18 @@
 kind: bug-fix
 
 # Change summary; a 80ish characters long description of the change.
-summary: Treat a pgsql DataRow column length of -1 as a NULL value instead of an error.
+summary: Fix pgsql queries being paired with the wrong responses after a NULL column.
 
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
 description: >
   The pgsql parser read DataRow column lengths as unsigned, so the -1 that the
-  PostgreSQL wire protocol uses to mark a NULL column was read as 4294967295.
-  That failed the buffer bounds check, logged "Pgsql invalid column_length",
-  and dropped the whole transaction. Any query returning a NULL was affected.
-  The same loop could also read past the end of a DataRow truncated part-way
-  through a column length field, panicking packetbeat. The log message for a
-  genuinely invalid length now goes to the pgsqldetailed debug selector, which
-  is where the other parse failures in this protocol already report.
+  PostgreSQL wire protocol uses to mark a NULL column was rejected as an invalid
+  length. The response was dropped but its query stayed queued, so for the rest
+  of that connection's life every published event carried the previous query's
+  text against a later query's rows, and the last query was never published at
+  all. A DataRow truncated part-way through a column length could also panic
+  packetbeat.
 
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
 component: packetbeat

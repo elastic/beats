@@ -248,7 +248,8 @@ func TestPgsqlParser_negativeColumnLength(t *testing.T) {
 
 	data := rowDescription2 +
 		"440000000f0002" + "00000001" + "58" + "fffffffe" + // second length is -2
-		"5a0000000549"
+		"430000000d53454c454354203100" + // CommandComplete, so only the bad length can fail the parse
+		"5a0000000549" // ReadyForQuery
 
 	message, err := hex.DecodeString(data)
 	if err != nil {
@@ -274,7 +275,8 @@ func TestPgsqlParser_truncatedColumnLength(t *testing.T) {
 	// column's four-byte length should be.
 	data := rowDescription2 +
 		"440000000d0002" + "00000001" + "58" + "0000" +
-		"5a0000000549"
+		"430000000d53454c454354203100" + // CommandComplete, so only the short row can fail the parse
+		"5a0000000549" // ReadyForQuery
 
 	message, err := hex.DecodeString(data)
 	if err != nil {
