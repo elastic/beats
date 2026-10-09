@@ -13,6 +13,30 @@ import (
 )
 
 func TestUnmarshal(t *testing.T) {
+	t.Run("monitor state is receiver-only", func(t *testing.T) {
+		cfg := &Config{}
+		userConf := confmap.NewFromStringMap(map[string]any{
+			"monitor_state": map[string]any{
+				"elasticsearch": "beatsauth/_agent-component/default",
+			},
+			"heartbeat": map[string]any{"monitors": []any{}},
+		})
+
+		require.NoError(t, cfg.Unmarshal(userConf), "receiver config should unmarshal")
+		assert.Equal(
+			t,
+			"beatsauth/_agent-component/default",
+			cfg.MonitorState.Elasticsearch,
+			"receiver should decode the Elasticsearch monitor-state extension reference",
+		)
+		assert.NotContains(
+			t,
+			cfg.Beatconfig,
+			"monitor_state",
+			"receiver-only monitor-state configuration should not reach the Beat config",
+		)
+	})
+
 	t.Run("partial path override preserves defaults", func(t *testing.T) {
 		cfg := &Config{
 			Beatconfig: map[string]any{

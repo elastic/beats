@@ -876,7 +876,18 @@ func EnsureESIsRunning(t *testing.T) {
 
 func GetESClient(t *testing.T, scheme string) *elasticsearch.Client {
 	t.Helper()
-	esURL := GetESURL(t, scheme)
+	return getESClient(t, GetESURL(t, scheme))
+}
+
+// GetESAdminClient returns an Elasticsearch client configured with the
+// administrator credentials used by the integration test environment.
+func GetESAdminClient(t *testing.T, scheme string) *elasticsearch.Client {
+	t.Helper()
+	return getESClient(t, GetESAdminURL(t, scheme))
+}
+
+func getESClient(t *testing.T, esURL url.URL) *elasticsearch.Client {
+	t.Helper()
 
 	u := esURL.User.Username()
 	p, _ := esURL.User.Password()
