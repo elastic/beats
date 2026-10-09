@@ -60,3 +60,11 @@
       type: date
       description: >
         The usage date
+    - name: fetch_id
+      type: keyword
+      description: >
+        Identifier of the metricset run that produced the event. All usage detail and forecast events of one run share it and the same `@timestamp`, so a complete run can be told apart from earlier runs that re-fetched the same days.
+    - name: scope
+      type: keyword
+      description: >
+        The Azure scope the data was queried for: the subscription, department, or billing account.

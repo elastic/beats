@@ -27,6 +27,10 @@ type Client struct {
 
 // Usage contains the usage details and forecast values.
 type Usage struct {
+	// Scope is the Azure scope the data was queried for: "subscriptions/{id}",
+	// "/providers/Microsoft.Billing/departments/{id}", or
+	// "/providers/Microsoft.Billing/billingAccounts/{id}".
+	Scope        string
 	UsageDetails []armconsumption.UsageDetailClassification
 	Forecasts    armcostmanagement.QueryResult
 }
@@ -59,6 +63,7 @@ func (client *Client) GetMetrics(timeOpts TimeIntervalOptions) (Usage, error) {
 	} else if client.Config.BillingScopeAccountId != "" {
 		scope = fmt.Sprintf("/providers/Microsoft.Billing/billingAccounts/%s", client.Config.BillingScopeAccountId)
 	}
+	usage.Scope = scope
 
 	//
 	// Fetch the usage details
