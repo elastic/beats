@@ -59,7 +59,7 @@ func numChunks(capacity int) int {
 	if capacity <= 0 {
 		return 1
 	}
-	return (capacity + slabChunkSize - 1) >> slabChunkShift
+	return ((capacity - 1) >> slabChunkShift) + 1
 }
 
 // newDirectory allocates a directory whose chunks cover at least `capacity`

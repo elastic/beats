@@ -41,15 +41,15 @@ import (
 //
 //   - slabqueue (Beat-receiver mode): one slabqueue.Pool of the same total
 //     capacity, but with M Queue façades — one per receiver — each with its
-//     own producer and its own consumer goroutine. This is what the receiver
-//     path looks like with M receivers.
+//     own producer and its own consumer goroutine. Each receiver is capped at
+//     benchTotalCapacity/M so the aggregate budget matches memqueue.
 //
 // Both configurations process the same total number of events per iteration
 // (benchEventsPerIteration), so ns/op values are directly comparable across
 // rows: a row with N inputs/receivers does the same amount of work as every
 // other row, just distributed differently. Both configurations use the same
-// Settings.Events cap, so the operator-visible "max events in memory" budget
-// is identical.
+// total event budget. BenchmarkCappedPoolCapacity separately measures allocation
+// when every receiver keeps the default 3200-event cap.
 //
 // Reported via -benchmem: ns/op (total iteration wall time), B/op, allocs/op.
 //
@@ -126,7 +126,9 @@ func BenchmarkSlabQueuePool(b *testing.B) {
 			queues := make([]queue.Queue[benchEvent], m)
 			producers := make([]queue.Producer[benchEvent], m)
 			for i := range m {
-				queues[i] = pool.Connect()
+				q := pool.Connect()
+				q.SetTarget(benchTotalCapacity / m)
+				queues[i] = q
 				producers[i] = queues[i].Producer(queue.ProducerConfig{})
 			}
 

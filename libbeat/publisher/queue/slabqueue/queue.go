@@ -79,8 +79,8 @@ type Queue[T any] struct {
 	// yet acked) on this one queue, independently of and in addition to the
 	// shared pool budget: a producer blocks when this queue reaches its limit
 	// even if the pool still has free slots. It is what lets several queues on
-	// one pool each enforce their own configured size while the pool is sized to
-	// the largest of them.
+	// one pool each enforce their own configured size while the pool provides
+	// the sum of their budgets.
 	//
 	//   live:  events published to this queue but not yet released (FIFO +
 	//          in-flight). Maintained as an atomic so the reserve fast path is
@@ -124,12 +124,10 @@ func newQueue[T any](pool *Pool[T]) *Queue[T] {
 // only by the pool). Lowering the cap takes effect lazily as in-flight events
 // drain; raising it immediately unblocks any producers parked on the old cap.
 //
-// Setting a queue's cap also resizes the shared pool to the largest cap among
-// the queues connected to it, so the pool always tracks its queues: a queue's
-// cap can never be larger than the pool that backs it, and the pool shrinks when
-// the queue holding the largest cap is lowered or leaves. The pool is therefore
-// driven entirely through the queues — callers set per-queue caps, not the pool
-// size directly.
+// Setting a queue's cap also resizes the shared pool to the sum of connected
+// queues' caps. Existing events above a lowered cap or on a closing queue keep
+// their capacity until released, so another capped queue can still use its
+// whole budget. Uncapped queues share the pool without reserving capacity.
 func (q *Queue[T]) SetTarget(n int) {
 	if n < 0 {
 		n = 0
@@ -145,18 +143,48 @@ func (q *Queue[T]) SetTarget(n int) {
 // cap, without blocking. It is the lock-free fast path: a CAS on the live
 // counter, with limit==0 meaning unlimited.
 func (q *Queue[T]) tryReserve() bool {
+	live, ok := q.tryReserveLive()
+	return ok && q.validateReservation(live)
+}
+
+// tryReserveLive records a candidate under the sampled cap. Callers must
+// validate the resulting count before acquiring a pool slot.
+func (q *Queue[T]) tryReserveLive() (int64, bool) {
 	for {
 		lim := q.limit.Load()
 		if lim <= 0 {
-			q.live.Add(1)
-			return true
+			return q.live.Add(1), true
 		}
 		cur := q.live.Load()
 		if cur >= lim {
-			return false
+			return 0, false
 		}
 		if q.live.CompareAndSwap(cur, cur+1) {
+			return cur + 1, true
+		}
+	}
+}
+
+// SetTarget can lower the cap after tryReserve reads it but before its live
+// increment. Recheck before acquiring a pool slot, so that stale admission
+// cannot use capacity reserved for another queue. Conversely, a reduction
+// after this check sees the increment when it computes retained backlog.
+func (q *Queue[T]) validateReservation(live int64) bool {
+	for {
+		if limit := q.limit.Load(); limit <= 0 || live <= limit {
 			return true
+		}
+		q.live.Add(-1)
+		q.pool.syncTargetToQueues()
+		// Concurrent ACKs may have freed capacity since the rejected live
+		// snapshot. Retry so that we either use that capacity or observe an
+		// actually full cap; returning now could leave another waiter asleep
+		// while capacity is idle. reserve's slow path may hold limMu, so
+		// waking waiters here would reenter that mutex.
+		var ok bool
+		live, ok = q.tryReserveLive()
+		if !ok {
+			return false
 		}
 	}
 }
@@ -200,7 +228,12 @@ func (q *Queue[T]) releaseLive(n int) {
 	if n <= 0 {
 		return
 	}
-	q.live.Add(int64(-n))
+	live := q.live.Add(int64(-n))
+	if limit := q.limit.Load(); q.isClosing() || (limit > 0 && live+int64(n) > limit) {
+		// A cap reduction or close retained this backlog in the pool budget.
+		// Recompute only on those paths; ordinary ACKs need no pool scan.
+		q.pool.syncTargetToQueues()
+	}
 	q.wakeLimitWaiters()
 }
 

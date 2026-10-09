@@ -25,22 +25,23 @@
 //     semaphore: total live events across all pipelines is capped by the
 //     pool's current capacity. The capacity is resizable at runtime (driven by
 //     the connected queues' caps via Queue.SetTarget) so a shared pool can grow
-//     to the largest budget its connected receivers request and shrink back as
-//     they leave, all while traffic flows; storage is a directory of non-moving
+//     to the sum of its capped receivers' budgets and shrink back as their
+//     events drain, all while traffic flows; storage is a directory of non-moving
 //     chunks and the free list is sharded for concurrency (see storage.go /
 //     freelist.go).
 //   - Each Queue may additionally have its own per-queue cap (Queue.SetTarget),
 //     bounding the live events on that one pipeline independently of the shared
 //     pool. With several queues on one pool, each enforces its own configured
-//     size while the pool is sized to the largest of them: e.g. a 4096-cap
-//     queue and an 8192-cap queue share an 8192-slot pool, and the first can
-//     never exceed 4096 live events even when the pool has room. A queue with
-//     no per-queue cap is bounded only by the pool, so a single busy pipeline
-//     can still use the whole budget while others are quiet.
+//     size while the pool provides their aggregate capacity: a 4096-cap queue
+//     and an 8192-cap queue reserve 12288 slots in total. Excess backlog after
+//     a cap reduction, and live slots held by a closing queue, remain budgeted
+//     until released. An uncapped queue reserves no capacity and can use any
+//     free pool slot; pools containing uncapped queues therefore do not provide
+//     capacity isolation. With only uncapped queues the existing target is kept.
 //   - Each connected pipeline gets its own Queue (implementing
 //     queue.Queue[T]) with its own FIFO over the shared array. A slow or
-//     stalled consumer on one pipeline only holds its own in-flight slots;
-//     other pipelines flow independently.
+//     stalled consumer on one capped pipeline only holds its own budget;
+//     other capped pipelines retain their configured capacity.
 //
 // Slot release and ACK ordering are decoupled. Slots return to the pool as
 // soon as a batch is Done so other producers can make progress. Producer
