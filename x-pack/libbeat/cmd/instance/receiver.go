@@ -185,6 +185,7 @@ func (br *BeatReceiver) Start(host component.Host) (retErr error) {
 	if ua := userAgentFromHeaders(headersFromExtensions(context.Background(), extensions, br.Logger)); ua != "" {
 		br.Logger.Debugf("using User-Agent from headers_setter extension: %q", ua)
 		br.beat.Info.UserAgent = ua
+		fmt.Println("userAgent", ua)
 	}
 
 	if w, ok := br.beater.(backend.WithESStateStoreExtension); ok {
@@ -322,7 +323,6 @@ const (
 
 // headersFromExtensions returns the headers configured on headers_setter extension.
 // Elastic Agent adds one per collector, shared by all receivers.
-
 func headersFromExtensions(ctx context.Context, extensions map[component.ID]component.Component, log *logp.Logger) map[string]string {
 	var ids []component.ID
 	for id := range extensions {
