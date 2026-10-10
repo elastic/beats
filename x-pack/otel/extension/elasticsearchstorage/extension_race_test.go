@@ -18,7 +18,9 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/component/componenttest"
+	"go.opentelemetry.io/collector/extension/xextension/storage"
 
 	"github.com/elastic/entcollect"
 
@@ -62,7 +64,7 @@ func TestElasticStorage_Access_Concurrent_Race(t *testing.T) {
 			"password": "changeme",
 		},
 	}
-	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, "")}
+	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, t.Name())}
 
 	ctx := t.Context()
 
@@ -160,7 +162,7 @@ func TestElasticStorage_MixedRegistry_Concurrent_Race(t *testing.T) {
 			"password": "changeme",
 		},
 	}
-	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, "")}
+	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, t.Name())}
 
 	ctx := t.Context()
 
@@ -181,6 +183,7 @@ func TestElasticStorage_MixedRegistry_Concurrent_Race(t *testing.T) {
 
 	beatStores := make([]backend.Store, numStores)
 	entStores := make([]entcollect.Store, numStores)
+	otelClients := make([]storage.Client, numStores)
 	for i := range numStores {
 		bs, err := ext.Access(fmt.Sprintf("stream-%d", i))
 		require.NoError(t, err)
@@ -189,7 +192,18 @@ func TestElasticStorage_MixedRegistry_Concurrent_Race(t *testing.T) {
 		es, err := ext.Store(fmt.Sprintf("provider-%d", i))
 		require.NoError(t, err)
 		entStores[i] = es
+
+		// OTel storage.Client path: the third path reaching the shared
+		// connection. It must serialize on the same clientMu as the other two.
+		oc, err := ext.GetClient(ctx, component.KindReceiver, component.MustNewIDWithName("otelrcv", fmt.Sprintf("r%d", i)), "")
+		require.NoError(t, err)
+		otelClients[i] = oc
 	}
+	t.Cleanup(func() {
+		for _, oc := range otelClients {
+			_ = oc.Close(context.Background())
+		}
+	})
 
 	var (
 		wg     sync.WaitGroup
@@ -256,6 +270,37 @@ func TestElasticStorage_MixedRegistry_Concurrent_Race(t *testing.T) {
 				}
 			}
 		})
+
+		// OTel path: Set + Get + Walk via the storage.Client, exercising the
+		// same shared connection as the two Beats paths above.
+		oc := otelClients[i]
+		wg.Go(func() {
+			val := []byte(fmt.Sprintf(`{"cursor":null,"n":%d}`, i))
+			for range opsPerStore {
+				if err := oc.Set(ctx, key, val); err != nil {
+					report("OTel.Set", err)
+					return
+				}
+			}
+		})
+		wg.Go(func() {
+			for range opsPerStore {
+				if _, err := oc.Get(ctx, key); err != nil {
+					report("OTel.Get", err)
+					return
+				}
+			}
+		})
+		wg.Go(func() {
+			for range opsPerStore {
+				if err := oc.(*esStorageClient).Walk(ctx, func(string, []byte) ([]*storage.Operation, error) {
+					return nil, nil
+				}); err != nil {
+					report("OTel.Walk", err)
+					return
+				}
+			}
+		})
 	}
 
 	wg.Wait()
@@ -266,6 +311,77 @@ func TestElasticStorage_MixedRegistry_Concurrent_Race(t *testing.T) {
 	if srvErrs := srv.errs(); len(srvErrs) > 0 {
 		t.Fatalf("fake ES detected corrupted request bodies (signature A/B): %v", srvErrs)
 	}
+}
+
+// TestElasticStorage_Shutdown_Concurrent_Race drives live storage.Client
+// traffic (Set/Get/Walk) while Shutdown runs. Shutdown sets the shared
+// client to nil under clientMu, so in-flight operations must fail with
+// errExtensionClosed instead of panicking, and GetClient/Access after
+// Shutdown must return an error. Run under -race.
+func TestElasticStorage_Shutdown_Concurrent_Race(t *testing.T) {
+	srv := newFakeES(t)
+	defer srv.Close()
+
+	cfg := &Config{
+		ElasticsearchConfig: map[string]any{
+			"hosts":    []string{srv.URL},
+			"username": "elastic",
+			"password": "changeme",
+		},
+	}
+	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, t.Name())}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	require.NoError(t, ext.Start(ctx, componenttest.NewNopHost()))
+
+	const numClients = 4
+	clients := make([]storage.Client, numClients)
+	for i := range clients {
+		oc, err := ext.GetClient(ctx, component.KindReceiver, component.MustNewIDWithName("otelrcv", fmt.Sprintf("sd%d", i)), "")
+		require.NoError(t, err)
+		clients[i] = oc
+	}
+
+	var wg sync.WaitGroup
+	stop := make(chan struct{})
+	for i, oc := range clients {
+		key := fmt.Sprintf("cursor-%d", i)
+		val := []byte(fmt.Sprintf(`{"cursor":null,"n":%d}`, i))
+		wg.Go(func() {
+			for {
+				select {
+				case <-stop:
+					return
+				default:
+				}
+				// Errors are expected once Shutdown lands; the test asserts
+				// no panic and no data race, not per-op success.
+				_ = oc.Set(ctx, key, val)
+				_, _ = oc.Get(ctx, key)
+				_ = oc.(*esStorageClient).Walk(ctx, func(string, []byte) ([]*storage.Operation, error) {
+					return nil, nil
+				})
+			}
+		})
+	}
+
+	// Let traffic build up, then shut down underneath it.
+	time.Sleep(20 * time.Millisecond)
+	require.NoError(t, ext.Shutdown(context.Background()))
+
+	// The extension refuses new consumers after Shutdown ...
+	_, err := ext.GetClient(ctx, component.KindReceiver, component.MustNewID("late"), "")
+	require.Error(t, err, "GetClient after Shutdown must fail")
+	_, err = ext.Access("late-stream")
+	require.Error(t, err, "Access after Shutdown must fail")
+
+	// ... and an existing client's operations fail cleanly, not by panic.
+	err = clients[0].Set(ctx, "k", []byte(`{}`))
+	require.ErrorIs(t, err, errExtensionClosed, "operations on a client outliving the extension must fail with errExtensionClosed")
+
+	close(stop)
+	wg.Wait()
 }
 
 // fakeES is a minimal stand-in for Elasticsearch that:
@@ -290,6 +406,11 @@ func newFakeES(t *testing.T) *fakeES {
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = io.WriteString(w, `{"version":{"number":"8.10.0","build_flavor":"default"},"name":"fake"}`)
 
+		case r.Method == http.MethodPost && strings.HasSuffix(r.URL.Path, "/_pit"):
+			// Point-in-time open for the OTel client's Walk enumeration.
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = io.WriteString(w, `{"id":"fakepit"}`)
+
 		case strings.HasSuffix(r.URL.Path, "/_search"):
 			body, _ := io.ReadAll(r.Body)
 			if !bytes.Contains(body, []byte(`match_all`)) {
@@ -298,7 +419,7 @@ func newFakeES(t *testing.T) *fakeES {
 				return
 			}
 			w.Header().Set("Content-Type", "application/json")
-			_, _ = io.WriteString(w, `{"took":1,"hits":{"total":{"value":0,"relation":"eq"},"hits":[]}}`)
+			_, _ = io.WriteString(w, `{"took":1,"pit_id":"fakepit","hits":{"total":{"value":0,"relation":"eq"},"hits":[]}}`)
 
 		case r.Method == http.MethodPut && strings.Contains(r.URL.Path, "/_doc/"):
 			body, _ := io.ReadAll(r.Body)
