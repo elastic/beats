@@ -23,6 +23,9 @@ import (
 	// Import X-Pack modules.
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 
+	// Import secret stores.
+	_ "github.com/elastic/beats/v7/x-pack/heartbeat/secretstores/vault"
+
 	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
 )
 

@@ -27,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	"github.com/elastic/beats/v7/heartbeat/monitors/secretstores"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
@@ -60,6 +61,7 @@ type RunnerFactory struct {
 	logger                *logp.Logger
 	pipelineClientFactory PipelineClientFactory
 	beatLocation          *config.LocationWithID
+	secrets               *secretstores.Resolver
 }
 
 type PipelineClientFactory func(pipeline beat.Pipeline) (beat.Client, error)
@@ -104,6 +106,7 @@ func NewFactory(fp FactoryParams) *RunnerFactory {
 		pipelineClientFactory: fp.PipelineClientFactory,
 		beatLocation:          fp.BeatRunFrom,
 		stateLoader:           fp.StateLoader,
+		secrets:               secretstores.NewResolver(fp.BeatInfo.Logger),
 	}
 }
 
@@ -205,7 +208,7 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 		}
 	}
 
-	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, f.stateLoader, *f.info, safeStop)
+	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, f.stateLoader, *f.info, safeStop, f.secrets.Resolve)
 	if err != nil {
 		return nil, fmt.Errorf("factory could not create monitor: %w", err)
 	}
@@ -225,6 +228,10 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 func (f *RunnerFactory) CheckConfig(config *conf.C) error {
 	if !config.Enabled() {
 		return nil
+	}
+	// Validated offline: checking a config never contacts a secret store.
+	if err := f.secrets.Validate(config); err != nil {
+		return err
 	}
 	return checkMonitorConfig(config, plugin.GlobalPluginsReg, *f.info)
 }
