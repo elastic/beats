@@ -175,7 +175,7 @@ require (
 	github.com/elastic/go-freelru v0.16.0
 	github.com/elastic/go-quark v0.9.0
 	github.com/elastic/go-sfdc v0.0.0-20260504130806-a46e22d049d9
-	github.com/elastic/mito v1.28.0
+	github.com/elastic/mito v1.28.1-0.20261011222112-948fe041ab9e
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
 	github.com/elastic/sarama v1.19.1-0.20260310070522-abae92ca1603
 	github.com/elastic/tk-btf v0.2.0
