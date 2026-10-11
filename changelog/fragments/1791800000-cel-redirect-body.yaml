@@ -1,0 +1,17 @@
+kind: bug-fix
+
+summary: Fix CEL input requests failing when a followed redirect response has a body, and add redirect.follow.
+
+description: >
+  Following a redirect caused the request to fail with "http: read on closed
+  response body" because the CEL library tried to read the body of the
+  intermediate redirect response, which the HTTP client had already closed.
+  The library no longer reads it. A new resource.redirect.follow option, which
+  defaults to true, can be set to false to return redirect responses to the
+  CEL program instead of following them.
+
+component: filebeat
+
+# Related pull request; add once the pull request exists.
+#pr: https://github.com/elastic/beats/pull/0
+issue: https://github.com/elastic/mito/issues/133
