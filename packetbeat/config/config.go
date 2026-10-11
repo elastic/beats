@@ -20,7 +20,9 @@ package config
 import (
 	"errors"
 	"fmt"
+	"reflect"
 	"runtime"
+	"slices"
 	"strings"
 	"time"
 
@@ -73,6 +75,10 @@ func GetShutDownTimeOut(cfg *conf.C) (time.Duration, error) {
 // neither is present, c.Interfaces is unchanged: the placeholder interface
 // from initialConfig in the beater package is kept, and a zero Config has no
 // interfaces. FromStatic does not add a default device.
+//
+// Protocols entries with identical interface keys share one interface, as
+// setupSniffer in the beater package does for NewAgentConfig. Entries that
+// name the same device with different settings are an error.
 func (c Config) FromStatic(cfg *conf.C, _ *logp.Logger) (Config, error) {
 	err := cfg.Unpack(&c)
 	if err != nil {
@@ -99,7 +105,9 @@ func (c Config) FromStatic(cfg *conf.C, _ *logp.Logger) (Config, error) {
 		if err := protocol.Unpack(&stream); err != nil {
 			return c, err
 		}
-		if stream.Interface != nil {
+		if stream.Interface != nil && !slices.ContainsFunc(streamInterfaces, func(i InterfaceConfig) bool {
+			return reflect.DeepEqual(i, *stream.Interface)
+		}) {
 			streamInterfaces = append(streamInterfaces, *stream.Interface)
 		}
 		if stream.Procs != nil {

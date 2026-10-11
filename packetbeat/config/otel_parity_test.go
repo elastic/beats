@@ -178,17 +178,36 @@ protocols:
 			want: nil,
 		},
 		{
-			name: "duplicate_devices",
+			name: "identical_interfaces_are_merged",
 			yaml: `
 protocols:
 - type: http
   ports: [80]
   interface:
     device: eth0
+    bpf_filter: port 80 or port 53
 - type: dns
   ports: [53]
   interface:
     device: eth0
+    bpf_filter: port 80 or port 53
+`,
+			want: []InterfaceConfig{{Device: "eth0", BpfFilter: "port 80 or port 53"}},
+		},
+		{
+			name: "same_device_with_different_settings",
+			yaml: `
+protocols:
+- type: http
+  ports: [80]
+  interface:
+    device: eth0
+    bpf_filter: port 80
+- type: dns
+  ports: [53]
+  interface:
+    device: eth0
+    bpf_filter: port 53
 `,
 			err: "duplicated device configurations: eth0",
 		},
