@@ -437,10 +437,6 @@ func TestQueryProfileToEvent_SpaceID(t *testing.T) {
 	}
 }
 
-<<<<<<< HEAD
-func toMap(t *testing.T, s string) map[string]interface{} {
-	var m map[string]interface{}
-=======
 // TestConfigureByDataset verifies that Configure builds each client from the
 // input for its dataset rather than from the input at its position, so
 // out-of-order delivery does not break client binding.
@@ -581,7 +577,6 @@ func TestConfigureEmptyDataset(t *testing.T) {
 
 func toMap(t *testing.T, s string) map[string]any {
 	var m map[string]any
->>>>>>> 860e48c (x-pack/osquerybeat: fix positional stream binding and add parity tests (#53322))
 	err := json.Unmarshal([]byte(s), &m)
 	if err != nil {
 		t.Fatal(err)

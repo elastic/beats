@@ -296,10 +296,6 @@ func QueryProfileDatastream(namespace string) string {
 	return queryProfileDatastreamPrefix + namespace
 }
 
-<<<<<<< HEAD
-// GetOsqueryOptions Returns options from the first input if available
-func GetOsqueryOptions(inputs []InputConfig) map[string]interface{} {
-=======
 // ResultInput returns the input for the DefaultDataset data stream, which
 // carries the osquery configuration. This is the first input whose dataset is
 // DefaultDataset or unset; an unset dataset is treated as DefaultDataset when
@@ -316,7 +312,6 @@ func ResultInput(inputs []InputConfig) *InputConfig {
 			return &inputs[i]
 		}
 	}
->>>>>>> 860e48c (x-pack/osquerybeat: fix positional stream binding and add parity tests (#53322))
 	if len(inputs) == 0 {
 		return nil
 	}
@@ -352,21 +347,7 @@ func GetOsqueryCheckTimeout(inputs []InputConfig) (time.Duration, error) {
 	return ParseCheckTimeout(in.Osquery.ElasticOptions.CheckTimeout)
 }
 
-<<<<<<< HEAD
-// GetProfilingEnabled returns the global query profiling default from the first input.
-=======
-// GetOsqueryExtensions returns customer-managed osquery extension settings
-// (elastic_options.extensions) from the result input if available.
-func GetOsqueryExtensions(inputs []InputConfig) ExtensionsConfig {
-	in := ResultInput(inputs)
-	if in == nil || in.Osquery == nil || in.Osquery.ElasticOptions == nil || in.Osquery.ElasticOptions.Extensions == nil {
-		return ExtensionsConfig{}
-	}
-	return *in.Osquery.ElasticOptions.Extensions
-}
-
 // GetProfilingEnabled returns the global query profiling default from the result input.
->>>>>>> 860e48c (x-pack/osquerybeat: fix positional stream binding and add parity tests (#53322))
 // This is the fleet-wide on/off switch; individual queries may override it (see ResolveProfiling).
 // Profiling is enabled by default unless elastic_options.profiling.profiling_all is explicitly false.
 func GetProfilingEnabled(inputs []InputConfig) bool {
