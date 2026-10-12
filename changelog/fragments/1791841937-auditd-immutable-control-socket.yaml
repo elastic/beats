@@ -1,0 +1,8 @@
+kind: bug-fix
+summary: Fix auditd module losing the reply when setting audit rules immutable.
+description: |
+  The auditd module waited for the kernel's reply to the immutable request on
+  the socket that was already being read for audit events, so the event reader
+  could consume the reply or the request could consume an event. The request
+  is now sent on the control socket.
+component: auditbeat
