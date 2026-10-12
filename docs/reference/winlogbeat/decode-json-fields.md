@@ -18,6 +18,7 @@ processors:
       fields: ["field1", "field2", ...]
       process_array: false
       max_depth: 1
+      max_object_depth: 0
       target: ""
       overwrite_keys: false
       add_error_key: true
@@ -32,7 +33,12 @@ The `decode_json_fields` processor has the following configuration settings:
 :   (Optional) A Boolean value that specifies whether to process arrays. The default is `false`.
 
 `max_depth`
-:   (Optional) The maximum parsing depth. A value of `1`  will decode the JSON objects in fields indicated in `fields`, a value of `2` will also decode the objects embedded in the fields of these parsed documents. The default is `1`.
+:   (Optional) The maximum number of times JSON is decoded. A value of `1` decodes the JSON string in each field listed in `fields`. A value of `2` also decodes strings inside the decoded documents that contain JSON, for example `{"log": "{\"level\": \"info\"}"}`. Objects that are already nested in the JSON, rather than encoded as strings, are always decoded in full regardless of this setting. To limit how deeply nested objects are kept as fields, use `max_object_depth`. The default is `1`.
+
+`max_object_depth` {applies_to}`stack: ga 9.6`
+:   (Optional) The maximum nesting level of objects and arrays kept as event fields after decoding. Objects and arrays nested deeper than this are not expanded into fields; they are stored as JSON-encoded strings instead. The decoded document is at level `1`, the objects it contains are at level `2`, and so on. Arrays do not add a level. This limits the number of fields created from deeply nested input, which helps prevent mapping explosions in Elasticsearch. The default is `0`, which means no limit. The stored strings are the original JSON text from the input, unchanged. Objects and arrays deeper than the limit are not decoded, so `document_id` must name a key within the limit. Keys containing dots are expanded after decoding when `expand_keys` is `true`, so they are not counted.
+
+    For example, with `max_object_depth: 2` the input `{"a": {"b": {"c": 1}}}` becomes `{"a": {"b": "{\"c\":1}"}}`.
 
 `target`
 :   (Optional) The field under which the decoded JSON will be written. By default, the decoded JSON object replaces the string field from which it was read. To merge the decoded JSON fields into the root of the event, specify `target` with an empty string (`target: ""`). Note that the `null` value (`target:`) is treated as if the field was not set.
