@@ -166,12 +166,19 @@ func (r *BeatRunner) newBeat() *integration.BeatProc {
 	return proc
 }
 
-// run runs the Beat with args until it exits. It returns the process, to
-// inspect its output and logs, and the exit error.
-func (r *BeatRunner) run(args ...string) (*integration.BeatProc, error) {
+// run runs the Beat with args until it exits, killing it if ctx ends first.
+// It returns the process, to inspect its output and logs, and the exit error.
+func (r *BeatRunner) run(ctx context.Context, args ...string) (*integration.BeatProc, error) {
 	proc := r.newBeat()
 	proc.Start(args...)
-	return proc, proc.Cmd.Wait()
+	// The framework's command isn't tied to a context, so kill it ourselves.
+	stop := context.AfterFunc(ctx, func() { _ = proc.Cmd.Process.Kill() })
+	defer stop()
+	err := proc.Cmd.Wait()
+	if ctxErr := ctx.Err(); ctxErr != nil {
+		err = fmt.Errorf("%w: %w", ctxErr, err)
+	}
+	return proc, err
 }
 
 // stdout returns what the exited Beat process wrote to stdout.
@@ -204,7 +211,7 @@ func (r *BeatRunner) TestSetupDashboards() {
 	ctx, cancel := context.WithTimeout(r.T().Context(), time.Minute*3) //dashboards seem to take a while
 	defer cancel()
 
-	proc, err := r.run("setup", "--dashboards")
+	proc, err := r.run(ctx, "setup", "--dashboards")
 	r.NoError(err, "setup --dashboards failed")
 	r.Require().Contains(r.stdout(proc), "Loaded dashboards")
 
@@ -242,7 +249,7 @@ func (r *BeatRunner) SubtestExportDashboards() {
 	r.Require().NoError(err)
 	r.Require().NotEmpty(dashlist)
 
-	_, err = r.run("export", "dashboard", "--folder", outDir, "--id", dashlist[0].ID)
+	_, err = r.run(ctx, "export", "dashboard", "--folder", outDir, "--id", dashlist[0].ID)
 	r.NoError(err, "export dashboard failed")
 
 	// The folder matches the major version of Kibana, so we read it from the API
@@ -271,7 +278,7 @@ func (r *BeatRunner) TestSetupPipelines() {
 	}()
 
 	// need to actually enable something that has pipelines
-	_, err := r.run("setup", "--pipelines", "--modules", "apache", "-M", "apache.error.enabled=true", "-M", "apache.access.enabled=true")
+	_, err := r.run(ctx, "setup", "--pipelines", "--modules", "apache", "-M", "apache.error.enabled=true", "-M", "apache.access.enabled=true")
 	r.NoError(err, "setup --pipelines failed")
 
 	pipelines, err := estools.GetPipelines(ctx, r.esClient, "*filebeat*")
@@ -285,10 +292,11 @@ func (r *BeatRunner) TestIndexManagementNoILM() {
 	defer cancel()
 	defer r.CleanupTemplates(ctx)
 
-	proc, err := r.run("setup", "--index-management", "--E=setup.ilm.enabled=false")
+	proc, err := r.run(ctx, "setup", "--index-management", "--E=setup.ilm.enabled=false")
 	r.NoError(err, "setup --index-management failed")
-	// we should not print a warning if we've explicitly disabled ILM
-	r.False(proc.LogContains("not supported"), "unexpected warning about ILM not being supported")
+	// we should not print a warning if we've explicitly disabled ILM. It goes
+	// to stdout, not the log.
+	r.NotContains(r.stdout(proc), "not supported", "unexpected warning about ILM not being supported")
 
 	tmpls, err := estools.GetIndexTemplatesForPattern(ctx, r.esClient, fmt.Sprintf("*%s*", r.beatName))
 	r.Require().NoError(err)
@@ -310,7 +318,7 @@ func (r *BeatRunner) TestWithAllDefaults() {
 	// pre-delete in case something else missed cleanup
 	r.CleanupTemplates(ctx)
 
-	_, err := r.run("setup", "--index-management")
+	_, err := r.run(ctx, "setup", "--index-management")
 	r.Require().NoError(err)
 
 	streams, err := estools.GetDataStreamsForPattern(ctx, r.esClient, fmt.Sprintf("%s*", r.beatName))
@@ -324,7 +332,7 @@ func (r *BeatRunner) TestCustomBadNames() {
 	defer cancel()
 	defer r.CleanupTemplates(ctx)
 
-	proc, err := r.run("setup", "--index-management",
+	proc, err := r.run(ctx, "setup", "--index-management",
 		"--E=setup.dsl.enabled=true", "--E=setup.dsl.data_stream_pattern='custom-bad-name'", "--E=setup.template.name='custom-name'", "--E=setup.template.pattern='custom-name'")
 	r.Require().NoError(err)
 
@@ -344,13 +352,13 @@ func (r *BeatRunner) TestOverwriteWithCustomName() {
 
 	r.CleanupTemplates(ctx)
 
-	_, err := r.run("setup", "--index-management",
+	_, err := r.run(ctx, "setup", "--index-management",
 		"--E=setup.dsl.enabled=true", "--E=setup.dsl.data_stream_pattern='custom-name'", "--E=setup.template.name='custom-name'", "--E=setup.template.pattern='custom-name'")
 	r.Require().NoError(err)
 
 	r.CheckDSLPolicy(ctx, "*custom-name*", "7d")
 
-	_, err = r.run("setup", "--index-management",
+	_, err = r.run(ctx, "setup", "--index-management",
 		"--E=setup.dsl.enabled=true", "--E=setup.dsl.overwrite=true", "--E=setup.dsl.data_stream_pattern='custom-name'",
 		"--E=setup.template.name='custom-name'", "--E=setup.template.pattern='custom-name'", fmt.Sprintf("--E=setup.dsl.policy_file=%s", lifecyclePath))
 	r.Require().NoError(err)
@@ -368,7 +376,7 @@ func (r *BeatRunner) TestWithCustomLifecyclePolicy() {
 
 	r.CleanupTemplates(ctx)
 
-	_, err := r.run("setup", "--index-management",
+	_, err := r.run(ctx, "setup", "--index-management",
 		"--E=setup.dsl.enabled=true", fmt.Sprintf("--E=setup.dsl.policy_file=%s", lifecyclePath))
 	r.Require().NoError(err)
 
@@ -382,14 +390,17 @@ func (r *BeatRunner) TestIndexManagementILMEnabledFailure() {
 	defer cancel()
 	r.requireServerless(ctx)
 
-	proc, err := r.run("setup", "--index-management", "--E=setup.ilm.enabled=true", "--E=setup.ilm.overwrite=true")
+	proc, err := r.run(ctx, "setup", "--index-management", "--E=setup.ilm.enabled=true", "--E=setup.ilm.overwrite=true")
 	r.Require().Error(err)
 	r.Contains(r.stderr(proc), "error creating")
 }
 
 // tests setup with both ILM and DSL enabled, should fail
 func (r *BeatRunner) TestBothLifecyclesEnabled() {
-	_, err := r.run("setup", "--index-management", "--E=setup.ilm.enabled=true", "--E=setup.dsl.enabled=true")
+	ctx, cancel := context.WithTimeout(r.T().Context(), time.Minute)
+	defer cancel()
+
+	_, err := r.run(ctx, "setup", "--index-management", "--E=setup.ilm.enabled=true", "--E=setup.dsl.enabled=true")
 	r.Require().Error(err)
 }
 
@@ -401,7 +412,7 @@ func (r *BeatRunner) TestAllLifecyclesDisabled() {
 
 	r.CleanupTemplates(ctx)
 
-	_, err := r.run("setup", "--index-management", "--E=setup.ilm.enabled=false", "--E=setup.dsl.enabled=false")
+	_, err := r.run(ctx, "setup", "--index-management", "--E=setup.ilm.enabled=false", "--E=setup.dsl.enabled=false")
 	r.Require().NoError(err)
 
 	// make sure we have data streams, but there's no lifecycles
@@ -426,7 +437,7 @@ func (r *BeatRunner) TestExport() {
 	defer cancel()
 	r.requireServerless(ctx)
 
-	proc, err := r.run("export", "ilm-policy", "--E=setup.ilm.enabled=true")
+	proc, err := r.run(ctx, "export", "ilm-policy", "--E=setup.ilm.enabled=true")
 	r.NoError(err, "export ilm-policy failed")
 	// check to see if we got a valid output
 	policy := map[string]any{}
@@ -437,7 +448,9 @@ func (r *BeatRunner) TestExport() {
 
 // tests beat export with DSL
 func (r *BeatRunner) TestExportDSL() {
-	proc, err := r.run("export", "ilm-policy", "--E=setup.dsl.enabled=true")
+	ctx, cancel := context.WithTimeout(r.T().Context(), time.Minute)
+	defer cancel()
+	proc, err := r.run(ctx, "export", "ilm-policy", "--E=setup.dsl.enabled=true")
 	r.NoError(err, "export ilm-policy failed")
 	// check to see if we got a valid output
 	policy := map[string]any{}
@@ -447,9 +460,11 @@ func (r *BeatRunner) TestExportDSL() {
 }
 
 func (r *BeatRunner) SubtestExportTemplates() {
+	ctx, cancel := context.WithTimeout(r.T().Context(), time.Minute)
+	defer cancel()
 	outDir := r.T().TempDir()
 
-	_, err := r.run("export", "template", "--dir", outDir)
+	_, err := r.run(ctx, "export", "template", "--dir", outDir)
 	r.NoError(err, "export template failed")
 
 	inFolder, err := os.ReadDir(filepath.Join(outDir, "/template"))
@@ -459,7 +474,9 @@ func (r *BeatRunner) SubtestExportTemplates() {
 }
 
 func (r *BeatRunner) SubtestExportIndexPatterns() {
-	proc, err := r.run("export", "index-pattern")
+	ctx, cancel := context.WithTimeout(r.T().Context(), time.Minute)
+	defer cancel()
+	proc, err := r.run(ctx, "export", "index-pattern")
 	r.NoError(err, "export index-pattern failed")
 
 	idxPattern := map[string]any{}
