@@ -254,6 +254,14 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat, pipeline beat.Pipeline) (st
 				continue // don't stop loading monitors just because they're disabled
 			}
 
+			if bt.otelStatusFactoryWrapper != nil {
+				// A receiver typically runs every monitor of a policy, so one invalid
+				// monitor must not keep the others from starting. The failure is
+				// reported against that monitor's input by the status wrapper.
+				bt.logger.Errorf("skipping monitor that could not be created: %s", err)
+				continue
+			}
+
 			return nil, fmt.Errorf("could not create monitor: %w", err)
 		}
 
