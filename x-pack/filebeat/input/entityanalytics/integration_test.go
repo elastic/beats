@@ -7,6 +7,7 @@ package entityanalytics
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -181,10 +182,18 @@ func runInputOnce(t *testing.T, dataDir string, providerName string, prov entcol
 		)
 	}()
 
-	// Wait for at least one event (the sync fires at timer 0).
+	// Wait for at least one event (the sync fires at timer 0). Run only
+	// returns early on setup failures, so report that error rather than
+	// timing out.
 	deadline := time.After(10 * time.Second)
 	for len(client.Events()) == 0 {
 		select {
+		case err := <-done:
+			cancel()
+			if err == nil {
+				err = errors.New("run returned without error")
+			}
+			t.Fatalf("Run exited before first sync produced events: %v", err)
 		case <-deadline:
 			cancel()
 			t.Fatal("timed out waiting for events from first sync")
