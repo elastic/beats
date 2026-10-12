@@ -429,6 +429,9 @@ func (s *sharedRegistrar) gcStates() {
 	beforeCount := s.states.Count()
 	cleanedStates, pendingClean := s.states.CleanupWith(func(id string) {
 		s.store.Remove(fileStatePrefix + id) //nolint:errcheck // TODO: report error
+		for _, ids := range s.owned {
+			delete(ids, id)
+		}
 	})
 	statesCleanup.Add(int64(cleanedStates))
 
