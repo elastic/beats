@@ -54,7 +54,7 @@ func (amqp *amqpPlugin) amqpMessageParser(s *amqpStream) (ok bool, complete bool
 		case methodType:
 			ok, complete = amqp.decodeMethodFrame(s, f.content)
 		case headerType:
-			ok = amqp.decodeHeaderFrame(s, f.content)
+			ok, complete = amqp.decodeHeaderFrame(s, f.content)
 		case bodyType:
 			ok, complete = s.decodeBodyFrame(f.content)
 		case heartbeatType:
@@ -149,10 +149,15 @@ Structure of a content header, according to official doc :
   short      short   long long        short         remainder...
 */
 
-func (amqp *amqpPlugin) decodeHeaderFrame(s *amqpStream, buf []byte) bool {
+func (amqp *amqpPlugin) decodeHeaderFrame(s *amqpStream, buf []byte) (ok, complete bool) {
 	if len(buf) < 14 {
+<<<<<<< HEAD
 		logp.Debug("amqp", "Header frame too small, waiting for mode data")
 		return true
+=======
+		amqp.amqpLogger.Debug("Header frame too small, waiting for more data")
+		return true, false
+>>>>>>> aa643f9 (packetbeat/amqp: fix nil map panic and zero-body completion (#53491))
 	}
 	s.message.bodySize = binary.BigEndian.Uint64(buf[4:12])
 	debugf("Received Header frame. A message of %d bytes is expected", s.message.bodySize)
@@ -160,10 +165,11 @@ func (amqp *amqpPlugin) decodeHeaderFrame(s *amqpStream, buf []byte) bool {
 	if amqp.parseHeaders {
 		err := getMessageProperties(s, buf[12:])
 		if err {
-			return false
+			return false, false
 		}
 	}
-	return true
+	complete = uint64(len(s.message.body)) >= s.message.bodySize
+	return true, complete
 }
 
 /*
@@ -191,6 +197,9 @@ func hasProperty(prop, flag byte) bool {
 // function to get message content-type and content-encoding
 func getMessageProperties(s *amqpStream, data []byte) bool {
 	m := s.message
+	if m.fields == nil {
+		m.fields = mapstr.M{}
+	}
 
 	if len(data) < 2 {
 		logp.Debug("amqp", "Malformed packet: unexpected end of data")
