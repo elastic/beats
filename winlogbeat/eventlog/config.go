@@ -64,6 +64,7 @@ type config struct {
 	NoMoreEvents         NoMoreEventsAction `config:"no_more_events"` // Action to take when no more events are available - wait or stop.
 	EventLanguage        uint32             `config:"language"`
 	IgnoreMissingChannel *bool              `config:"ignore_missing_channel"` // Ignore missing channels and continue reading.
+	StartPosition        StartPosition      `config:"start_position"`         // Where to start reading when no bookmark exists - beginning or end.
 }
 
 // query contains parameters used to customize the event log data that is
@@ -105,6 +106,39 @@ func (a *NoMoreEventsAction) Unpack(v string) error {
 
 // String returns the name of the action.
 func (a NoMoreEventsAction) String() string { return noMoreEventsActionNames[a] }
+
+// StartPosition defines where the reader starts in a channel when no
+// bookmark exists for it. It has no effect once a bookmark has been saved,
+// and no effect when reading from an .evtx file.
+type StartPosition uint8
+
+const (
+	// StartAtBeginning starts from the oldest record in the channel.
+	StartAtBeginning StartPosition = iota
+	// StartAtEnd skips existing records and only reads events written after
+	// the subscription is created.
+	StartAtEnd
+)
+
+var startPositionNames = map[StartPosition]string{
+	StartAtBeginning: "beginning",
+	StartAtEnd:       "end",
+}
+
+// Unpack sets the start position based on the string value.
+func (p *StartPosition) Unpack(v string) error {
+	v = strings.ToLower(v)
+	for pos, name := range startPositionNames {
+		if v == name {
+			*p = pos
+			return nil
+		}
+	}
+	return fmt.Errorf("invalid start_position: %v (valid values are 'beginning' and 'end')", v)
+}
+
+// String returns the name of the start position.
+func (p StartPosition) String() string { return startPositionNames[p] }
 
 // Validate validates the winEventLogConfig data and returns an error describing
 // any problems or nil.

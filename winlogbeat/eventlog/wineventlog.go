@@ -157,6 +157,9 @@ func newWinEventLog(options *conf.C, logger *logp.Logger) (EventLog, error) {
 			}
 			l.file = true
 			l.channelName = path
+			if c.StartPosition == StartAtEnd {
+				l.log.Warn("start_position: end has no effect when reading from a file; the whole file will be read")
+			}
 		}
 
 		l.filter, err = newRecordFilter(c.SimpleQuery)
@@ -316,14 +319,18 @@ func (l *winEventLog) openChannel(bookmark win.Bookmark) (win.EvtHandle, error) 
 	defer windows.CloseHandle(signalEvent) //nolint:errcheck // This is just a resource release.
 
 	var flags win.EvtSubscribeFlag
-	if bookmark > 0 {
+	switch {
+	case bookmark > 0:
 		flags = win.EvtSubscribeStartAfterBookmark
 		if !l.isForwarded() {
 			// Use EvtSubscribeStrict to detect when the bookmark is missing and be able to
 			// subscribe again from the beginning.
 			flags |= win.EvtSubscribeStrict
 		}
-	} else {
+	case l.config.StartPosition == StartAtEnd:
+		flags = win.EvtSubscribeToFutureEvents
+		l.log.Info("No bookmark found, starting at the end of the channel (start_position: end).")
+	default:
 		flags = win.EvtSubscribeStartAtOldestRecord
 	}
 

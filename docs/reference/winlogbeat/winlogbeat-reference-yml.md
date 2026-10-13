@@ -50,8 +50,8 @@ The contents of the file are included here for your convenience.
 # dictionaries.
 #
 # The supported keys are name, id, xml_query, tags, fields, fields_under_root,
-# forwarded, ignore_older, level, event_id, provider, include_xml, and 
-# ignore_missing_channel.
+# forwarded, ignore_older, level, event_id, provider, include_xml,
+# ignore_missing_channel, and start_position.
 # The xml_query key requires an id and must not be used with the name,
 # ignore_older, level, event_id, or provider keys. Please visit the
 # documentation for the complete details of each option.
