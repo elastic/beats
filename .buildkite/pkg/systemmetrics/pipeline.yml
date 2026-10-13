@@ -79,7 +79,7 @@ steps:
           - test-collector#v1.10.2:
               files: "pkg/systemmetrics/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -138,7 +138,7 @@ steps:
           - test-collector#v1.10.2:
               files: "pkg/systemmetrics/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
