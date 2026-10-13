@@ -27,6 +27,7 @@ package process
 #include <mach/mach_host.h>
 #include <mach/host_info.h>
 #include <libproc.h>
+#include <sys/resource.h>
 #include <mach/processor_info.h>
 #include <mach/vm_map.h>
 */
@@ -154,6 +155,10 @@ func GetInfoForPid(_ resolve.Resolver, pid int) (ProcState, error) {
 
 // FillPidMetrics is the darwin implementation
 func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, filter func(string) bool) (ProcState, error) {
+	// error of getting the footprint shouldn't prevent collection of other data
+	if footprint, err := getPhysFootprint(pid); err == nil {
+		state.Memory.PhysFootprint = opt.UintWith(footprint)
+	}
 
 	args, exe, env, err := getProcArgs(pid, filter)
 	if err != nil {
@@ -167,6 +172,19 @@ func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, filter func(st
 	}
 
 	return state, nil
+}
+
+// getPhysFootprint returns the physical memory footprint of the process, the
+// value top(1) reports as MEM and Activity Monitor as Memory.
+func getPhysFootprint(pid int) (uint64, error) {
+	var info C.struct_rusage_info_v0
+	// The buffer argument is declared as rusage_info_t* (void**), but the
+	// kernel writes the struct into the memory it points to.
+	n, err := C.proc_pid_rusage(C.int(pid), C.RUSAGE_INFO_V0, (*C.rusage_info_t)(unsafe.Pointer(&info)))
+	if n != 0 {
+		return 0, fmt.Errorf("proc_pid_rusage failed for pid %d: %w", pid, err)
+	}
+	return uint64(info.ri_phys_footprint), nil
 }
 
 func getProcArgs(pid int, filter func(string) bool) ([]string, string, mapstr.M, error) {
