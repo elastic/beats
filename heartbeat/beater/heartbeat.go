@@ -171,7 +171,8 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	bt.logger.Infof("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
 
 	if bt.otelStatusFactoryWrapper != nil {
-		bt.monitorFactory = bt.otelStatusFactoryWrapper(bt.monitorFactory)
+		// In receiver mode one invalid monitor must not stop the others.
+		bt.monitorFactory = bt.otelStatusFactoryWrapper(invalidMonitorFactory{RunnerFactory: bt.monitorFactory, logger: bt.logger})
 	}
 
 	waitMonitors := monitors.NewSignalWait()
@@ -252,12 +253,6 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat, pipeline beat.Pipeline) (st
 			if errors.Is(err, monitors.ErrMonitorDisabled) {
 				bt.logger.Infof("skipping disabled monitor: %s", err)
 				continue // don't stop loading monitors just because they're disabled
-			}
-
-			if bt.otelStatusFactoryWrapper != nil {
-				// In receiver mode one invalid monitor must not stop the others.
-				bt.logger.Errorf("skipping monitor that could not be created: %s", err)
-				continue
 			}
 
 			return nil, fmt.Errorf("could not create monitor: %w", err)

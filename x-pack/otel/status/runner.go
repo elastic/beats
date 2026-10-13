@@ -23,10 +23,6 @@ type statusFactory struct {
 func (s *statusFactory) Create(p beat.PipelineConnector, config *config.C) (cfgfile.Runner, error) {
 	runner, err := s.factory.Create(p, config)
 	if err != nil {
-		// Report the failure, a caller may skip this input.
-		if inputId, idErr := getInputId(config); idErr == nil {
-			s.reporter.GetReporterForRunner(inputId).UpdateStatus(status.Failed, err.Error())
-		}
 		return nil, err
 	}
 	if runnerWithStatus, ok := runner.(status.WithStatusReporter); ok {

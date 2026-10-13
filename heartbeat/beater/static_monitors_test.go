@@ -67,9 +67,11 @@ func newStaticMonitorsHeartbeat(t *testing.T, otel bool) (*Heartbeat, *fakeFacto
 		cfg.Monitors = append(cfg.Monitors, c)
 	}
 	factory := &fakeFactory{badID: "bad", runners: map[string]*fakeRunner{}}
-	bt := &Heartbeat{config: cfg, monitorFactory: factory, logger: logptest.NewTestingLogger(t, "")}
+	logger := logptest.NewTestingLogger(t, "")
+	bt := &Heartbeat{config: cfg, monitorFactory: factory, logger: logger}
 	if otel {
-		bt.WithOtelFactoryWrapper(func(f cfgfile.RunnerFactory) cfgfile.RunnerFactory { return f })
+		// As set up by Run in receiver mode.
+		bt.monitorFactory = invalidMonitorFactory{RunnerFactory: factory, logger: logger}
 	}
 	return bt, factory
 }
