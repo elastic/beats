@@ -53,7 +53,11 @@ func (t *icmpTuple) Hashable() hashableIcmpTuple {
 	var hash hashableIcmpTuple
 	copy(hash[0:16], t.srcIP)
 	copy(hash[16:32], t.dstIP)
-	copy(hash[32:37], []byte{byte(t.id >> 8), byte(t.id), byte(t.seq >> 8), byte(t.seq), t.icmpVersion})
+	hash[32] = byte(t.id >> 8)
+	hash[33] = byte(t.id)
+	hash[34] = byte(t.seq >> 8)
+	hash[35] = byte(t.seq)
+	hash[36] = t.icmpVersion
 	return hash
 }
 

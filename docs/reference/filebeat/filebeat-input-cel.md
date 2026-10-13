@@ -4,7 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html
 sub:
   mito_docs: https://pkg.go.dev/github.com/elastic/mito
-  mito_version: v1.26.1-0.20260617204810-b54ab9f21153
+  mito_version: v1.28.0
 applies_to:
   stack: ga 8.6.0
   serverless: ga
@@ -337,7 +337,7 @@ In addition to the extensions provided in the packages listed above, a global va
 
 Host environment variables are made available via the global map `env`. Only environment variables that have been allow listed via the `allowed_environment` configuration list are visible to the CEL program.
 
-The CEL environment enables the [optional types](https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes) library using the version defined [here]({{mito_docs}}@{{mito_version}}/lib#OptionalTypesVersion) and the [two-variable comprehensions extensions](https://pkg.go.dev/github.com/google/cel-go/ext#TwoVarComprehensions) library using the version defined [here]({{mito_docs}}@{{mito_version}}/lib#TwoVarComprehensionVersion).
+The CEL environment enables the [optional types](https://pkg.go.dev/cel.dev/cel-go/cel#OptionalTypes) library using the version defined [here]({{mito_docs}}@{{mito_version}}/lib#OptionalTypesVersion) and the [two-variable comprehensions extensions](https://pkg.go.dev/cel.dev/cel-go/ext#TwoVarComprehensions) library using the version defined [here]({{mito_docs}}@{{mito_version}}/lib#TwoVarComprehensionVersion).
 
 * Optional types
 * Two-variable comprehensions {applies_to}`stack: ga 9.1+`
@@ -783,17 +783,17 @@ OAuth2 settings are disabled if either `enabled` is set to `false` or the `auth.
 
 ### `auth.oauth2.provider` [_auth_oauth2_provider]
 
-Used to configure supported oauth2 providers. Each supported provider will require specific settings. It is not set by default. Supported providers are: `azure`, `google`, `okta`.
+Used to configure supported oauth2 providers. Each supported provider will require specific settings. It is not set by default. Supported providers are: `azure`, `box`, `google`, `okta`.
 
 
 ### `auth.oauth2.client.id` [_auth_oauth2_client_id]
 
-The client ID used as part of the authentication flow. It is always required except if using `google` as provider. Required for providers: `default`, `azure`, `okta`.
+The client ID used as part of the authentication flow. It is always required except if using `google` as provider. Required for providers: `default`, `azure`, `okta`. For `box`, required when using discrete credentials; not used when `box.config_file` or `box.config_json` is set.
 
 
 ### `auth.oauth2.client.secret` [_auth_oauth2_client_secret]
 
-The client secret used as part of the authentication flow. It is always required except if using `google` or `okta` as provider. Required for providers: `default`, `azure`.
+The client secret used as part of the authentication flow. It is always required except if using `google` or `okta` as provider. Required for providers: `default`, `azure`. For `box`, required when using discrete credentials; not used when `box.config_file` or `box.config_json` is set.
 
 
 ### `auth.oauth2.user` [_auth_oauth2_user]
@@ -822,6 +822,8 @@ The endpoint that will be used to generate the tokens during the oauth2 flow. It
 
 ::::{note}
 For `azure` provider either `token_url` or `azure.tenant_id` is required.
+
+For `box` provider `token_url` is optional and defaults to `https://api.box.com/oauth2/token`.
 ::::
 
 
@@ -852,6 +854,86 @@ For information about where to find it, you can refer to [https://docs.microsoft
 ### `auth.oauth2.azure.resource` [_auth_oauth2_azure_resource]
 
 The accessed WebAPI resource when using `azure` provider. It is not required.
+
+
+### `auth.oauth2.box.config_file` [_auth_oauth2_box_config_file]
+
+```{applies_to}
+stack: ga 9.6.0
+```
+
+Path to the `config.json` file downloaded from the Box Developer Console. The file contains all credentials needed to authenticate: client ID, client secret, RSA private key, passphrase, public key ID, and enterprise ID.
+
+::::{note}
+Only one of `box.config_file`, `box.config_json`, or discrete credentials (`box.private_key`) may be set. For more information, refer to [https://developer.box.com/guides/authentication/jwt/without-sdk/](https://developer.box.com/guides/authentication/jwt/without-sdk/).
+::::
+
+
+### `auth.oauth2.box.config_json` [_auth_oauth2_box_config_json]
+
+```{applies_to}
+stack: ga 9.6.0
+```
+
+The Box Developer Console `config.json` content as a raw JSON blob. Use this when the credentials are injected as an environment variable or a secret rather than stored on disk.
+
+::::{note}
+Only one of `box.config_file`, `box.config_json`, or discrete credentials (`box.private_key`) may be set. For more information, refer to [https://developer.box.com/guides/authentication/jwt/without-sdk/](https://developer.box.com/guides/authentication/jwt/without-sdk/).
+::::
+
+
+### `auth.oauth2.box.enterprise_id` [_auth_oauth2_box_enterprise_id]
+
+```{applies_to}
+stack: ga 9.6.0
+```
+
+The Box enterprise ID. Used as the JWT subject when `box.subject_type` is `enterprise` (the default). Not required when using `box.config_file` or `box.config_json`, since the enterprise ID is read from those files.
+
+
+### `auth.oauth2.box.public_key_id` [_auth_oauth2_box_public_key_id]
+
+```{applies_to}
+stack: ga 9.6.0
+```
+
+The public key ID from the Box Developer Console, added as the `kid` header of the JWT assertion. Optional for discrete credentials; not used when `box.config_file` or `box.config_json` is set.
+
+
+### `auth.oauth2.box.private_key` [_auth_oauth2_box_private_key]
+
+```{applies_to}
+stack: ga 9.6.0
+```
+
+The RSA private key in PKCS#8 PEM form for the Box app. Supports both plain (`BEGIN PRIVATE KEY`) and encrypted (`BEGIN ENCRYPTED PRIVATE KEY`) blocks. When the key is encrypted, provide the passphrase via `box.passphrase`. Required for discrete credentials; not used when `box.config_file` or `box.config_json` is set.
+
+
+### `auth.oauth2.box.passphrase` [_auth_oauth2_box_passphrase]
+
+```{applies_to}
+stack: ga 9.6.0
+```
+
+Passphrase for decrypting `box.private_key` when it is an encrypted PKCS#8 key. Leave empty for unencrypted keys. When using `box.config_file` or `box.config_json`, the passphrase is read from the file.
+
+
+### `auth.oauth2.box.subject_type` [_auth_oauth2_box_subject_type]
+
+```{applies_to}
+stack: ga 9.6.0
+```
+
+Whether the JWT subject identifies an enterprise service account or a specific user. Accepted values: `enterprise` (default) or `user`. When set to `user`, `box.subject_id` must also be provided.
+
+
+### `auth.oauth2.box.subject_id` [_auth_oauth2_box_subject_id]
+
+```{applies_to}
+stack: ga 9.6.0
+```
+
+The Box user ID to impersonate. Required when `box.subject_type` is `user`. Must not be set when `box.subject_type` is `enterprise`.
 
 
 ### `auth.oauth2.google.credentials_file` [_auth_oauth2_google_credentials_file]

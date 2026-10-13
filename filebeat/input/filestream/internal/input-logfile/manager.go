@@ -25,7 +25,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/go-concert/unison"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -68,13 +67,14 @@ type InputManager struct {
 	// that will be used to collect events from each source.
 	Configure func(cfg *conf.C, log *logp.Logger, src *SourceIdentifier) (Prospector, Harvester, error)
 
-	initOnce  sync.Once
-	closeOnce sync.Once
-	initErr   error
-	store     *store
-	ackCH     *updateChan
-	idsMux    sync.Mutex
-	ids       map[string]struct{}
+	// storeMu guards entry and release. Both are set once on the first
+	// successful Create and cleared on Close.
+	storeMu sync.Mutex
+	entry   *cacheEntry
+	release func()
+	closed  bool
+	idsMux  sync.Mutex
+	ids     map[string]struct{}
 }
 
 // Source describe a source the input can collect data from.
@@ -92,45 +92,77 @@ var errNoInputRunner = errors.New("no input runner available")
 // Deprecated: Inputs without an ID are not supported anymore.
 const globalInputID = ".global"
 
-func (cim *InputManager) Init(group unison.Group) error {
-	cim.initOnce.Do(func() {
-		if group == nil {
-			cim.initErr = errors.New("input manager Init must be called before Create")
-			return
-		}
+// ensureSetup opens the shared store on first call and returns a retained
+// reference to the cacheEntry. The caller must call entry.store.Release()
+// when done. ensureSetup must NOT be called with storeMu held: it releases
+// and re-acquires the lock around the blocking acquireStore call so that a
+// concurrent Close() can always proceed.
+func (cim *InputManager) ensureSetup() (*cacheEntry, error) {
+	cim.storeMu.Lock()
+	if cim.closed {
+		cim.storeMu.Unlock()
+		return nil, errors.New("input manager is closed")
+	}
+	if cim.entry != nil {
+		cim.entry.store.Retain()
+		entry := cim.entry
+		cim.storeMu.Unlock()
+		return entry, nil
+	}
+	log := cim.Logger.With("input_type", cim.Type)
+	cim.storeMu.Unlock()
 
-		log := cim.Logger.With("input_type", cim.Type)
+	// Acquire the store without holding storeMu so that a concurrent Close()
+	// or another Create() can proceed while this potentially-slow call runs.
+	newEntry, newRelease, err := acquireStore(log, cim.StateStore, cim.Type)
+	if err != nil {
+		return nil, err
+	}
 
-		var store *store
-		store, cim.initErr = acquireStore(log, cim.StateStore, cim.Type)
-		if cim.initErr != nil {
-			return
-		}
-
-		cim.store = store
-		cim.ackCH = store.cacheEntry.ackCH
+	cim.storeMu.Lock()
+	if cim.closed {
+		cim.storeMu.Unlock()
+		newRelease()
+		return nil, errors.New("input manager is closed")
+	}
+	if cim.entry == nil {
+		cim.entry = newEntry
+		cim.release = newRelease
 		cim.ids = map[string]struct{}{}
-	})
-
-	return cim.initErr
+	} else {
+		// Another Create() won the race; release the redundant reference.
+		newRelease()
+	}
+	cim.entry.store.Retain()
+	entry := cim.entry
+	cim.storeMu.Unlock()
+	return entry, nil
 }
 
-// Close releases the store acquired by Init. It must be called after all inputs
-// managed by cim have stopped.
+// Close releases the manager's reference to the shared store. When the last
+// manager sharing a backend key releases, the background cleaner is stopped
+// and the store is closed. Call after all inputs managed by cim have stopped.
 func (cim *InputManager) Close() {
-	cim.closeOnce.Do(func() {
-		if cim.store != nil {
-			releaseAcquiredStore(cim.Logger, cim.store)
-		}
-	})
+	cim.storeMu.Lock()
+	cim.closed = true
+	release := cim.release
+	cim.release = nil
+	cim.entry = nil
+	cim.storeMu.Unlock()
+	if release != nil {
+		release()
+	}
 }
 
 // Create builds a new v2.Input using the provided Configure function.
 // The Input will run a go-routine per source that has been configured.
 func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
-	if err := cim.Init(nil); err != nil {
+	entry, err := cim.ensureSetup()
+	if err != nil {
 		return nil, err
 	}
+	pStore := entry.store
+	defer pStore.Release()
 
 	settings := struct {
 		// All those values are duplicated from the Filestream configuration
@@ -228,7 +260,7 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		return nil, errNoInputRunner
 	}
 
-	var previousSrcIdentifiers []*SourceIdentifier
+	var previousMatchers []InputMatcher
 	if settings.TakeOver.Enabled {
 		for _, id := range settings.TakeOver.FromIDs {
 			si, err := NewSourceIdentifier(cim.Type, id)
@@ -238,15 +270,11 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 						"[ID: %q] error while creating source identifier for previous ID %q: %w",
 						settings.ID, id, err)
 			}
-
-			previousSrcIdentifiers = append(previousSrcIdentifiers, si)
+			previousMatchers = append(previousMatchers, si)
 		}
 	}
 
-	pStore := cim.getRetainedStore()
-	defer pStore.Release()
-
-	prospectorStore := newSourceStore(pStore, srcIdentifier, previousSrcIdentifiers)
+	prospectorStore := newSourceStore(pStore, srcIdentifier, previousMatchers, settings.TakeOver.FromAnyID)
 
 	// create a store with the deprecated global ID. This will be used to
 	// migrate the entries in the registry to use the new input ID.
@@ -254,7 +282,7 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 	if err != nil {
 		return nil, fmt.Errorf("cannot create global identifier for input: %w", err)
 	}
-	globalStore := newSourceStore(pStore, globalIdentifier, nil)
+	globalStore := newSourceStore(pStore, globalIdentifier, nil, false)
 
 	err = prospector.Init(prospectorStore, globalStore, srcIdentifier.ID)
 	if err != nil {
@@ -262,18 +290,19 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 	}
 
 	return &managedInput{
-		manager:                cim,
-		ackCH:                  cim.ackCH,
-		id:                     settings.ID,
-		prospector:             prospector,
-		harvester:              harvester,
-		readUntilEOF:           settings.ReadUntilEOF,
-		backoff:                settings.Backoff,
-		stateCheckInterval:     settings.Close.OnStateChange.CheckInterval,
-		sourceIdentifier:       srcIdentifier,
-		previousSrcIdentifiers: previousSrcIdentifiers,
-		cleanTimeout:           settings.CleanInactive,
-		harvesterLimit:         settings.HarvesterLimit,
+		manager:            cim,
+		ackCH:              entry.ackCH,
+		id:                 settings.ID,
+		prospector:         prospector,
+		harvester:          harvester,
+		readUntilEOF:       settings.ReadUntilEOF,
+		backoff:            settings.Backoff,
+		stateCheckInterval: settings.Close.OnStateChange.CheckInterval,
+		sourceIdentifier:   srcIdentifier,
+		previousMatchers:   previousMatchers,
+		takeOverAnyID:      settings.TakeOver.FromAnyID,
+		cleanTimeout:       settings.CleanInactive,
+		harvesterLimit:     settings.HarvesterLimit,
 	}, nil
 }
 
@@ -303,10 +332,29 @@ func (cim *InputManager) StopInput(id string) {
 	cim.idsMux.Unlock()
 }
 
-func (cim *InputManager) getRetainedStore() *store {
-	store := cim.store
-	store.Retain()
-	return store
+// acquireLease increments the globalCache user count for this manager's key,
+// preventing the cache from draining the entry (and closing the ackUpdater)
+// while the caller is active. Returns ok=false if the manager is closed.
+// The returned release function must be called exactly once.
+func (cim *InputManager) acquireLease() (func(), bool) {
+	cim.storeMu.Lock()
+	closed := cim.closed
+	cim.storeMu.Unlock()
+	if closed {
+		return func() {}, false
+	}
+	_, release, ok := globalCache.Lease(cim.StateStore.StoreKey("", ""))
+	return release, ok
+}
+
+func (cim *InputManager) getRetainedStore() (*store, error) {
+	cim.storeMu.Lock()
+	defer cim.storeMu.Unlock()
+	if cim.entry == nil {
+		return nil, errors.New("input manager is closed")
+	}
+	cim.entry.store.Retain()
+	return cim.entry.store, nil
 }
 
 type SourceIdentifier struct {
@@ -335,13 +383,21 @@ func (i *SourceIdentifier) MatchesInput(id string) bool {
 	return strings.HasPrefix(id, i.prefix)
 }
 
+// InputMatcher reports whether a registry key belongs to a given input.
+type InputMatcher interface {
+	MatchesInput(key string) bool
+}
+
 // TakeOverConfig is the configuration for the take over mode.
 // It allows the Filestream input to take over states from the log
 // input or other Filestream inputs
 type TakeOverConfig struct {
 	Enabled bool `config:"enabled"`
-	// Filestream IDs to take over states
+	// Filestream IDs to take over states (exact match).
 	FromIDs []string `config:"from_ids"`
+	// FromAnyID, when true, takes over states from any previous filestream
+	// input ID, regardless of what that ID was. Mutually exclusive with FromIDs.
+	FromAnyID bool `config:"from_any_id"`
 	// Stream from the container input to take over from.
 	// Valid values: stderr, stdout or it can be empty. An empty stream means
 	// all streams.
@@ -371,20 +427,31 @@ func (t *TakeOverConfig) Unpack(value any) error {
 		}
 
 		rawFromIDs, exists := v["from_ids"]
-		if !exists {
-			return nil
+		if exists {
+			fromIDs, ok := rawFromIDs.([]any)
+			if !ok {
+				return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as []any", rawFromIDs)
+			}
+			for _, el := range fromIDs {
+				strEl, ok := el.(string)
+				if !ok {
+					return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as string", el)
+				}
+				t.FromIDs = append(t.FromIDs, strEl)
+			}
 		}
 
-		fromIDs, ok := rawFromIDs.([]any)
-		if !ok {
-			return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as []any", rawFromIDs)
-		}
-		for _, el := range fromIDs {
-			strEl, ok := el.(string)
+		rawFromAnyID, exists := v["from_any_id"]
+		if exists {
+			fromAnyID, ok := rawFromAnyID.(bool)
 			if !ok {
-				return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as string", el)
+				return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as bool", rawFromAnyID)
 			}
-			t.FromIDs = append(t.FromIDs, strEl)
+			t.FromAnyID = fromAnyID
+		}
+
+		if t.FromAnyID && len(t.FromIDs) > 0 {
+			return fmt.Errorf("'from_any_id' and 'from_ids' are mutually exclusive")
 		}
 
 	default:
@@ -401,7 +468,7 @@ func (t *TakeOverConfig) LogWarnings(logger *logp.Logger) {
 }
 
 func (t *TakeOverConfig) FromFilestream() bool {
-	return len(t.FromIDs) != 0
+	return len(t.FromIDs) != 0 || t.FromAnyID
 }
 
 // ReadUntilEOFConfig configures the behaviour to keep reading the current

@@ -78,3 +78,14 @@ func (c *cursor) clone() mapstr.M {
 	}
 	return c.state.Clone()
 }
+
+func (c *cursor) restore(state mapstr.M) {
+	if c == nil {
+		return
+	}
+	if len(state) == 0 {
+		c.state = nil
+		return
+	}
+	c.state = state
+}

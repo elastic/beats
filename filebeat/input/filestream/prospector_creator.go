@@ -92,7 +92,9 @@ func logFileIdentifiers(logger *logp.Logger) map[string]file.StateIdentifier {
 func newProspector(
 	config config,
 	log *logp.Logger,
-	srci *loginp.SourceIdentifier) (loginp.Prospector, error) {
+	srci *loginp.SourceIdentifier,
+	dc *dirCache,
+	harvesterState *fileStateTable) (loginp.Prospector, error) {
 
 	logger := log.Named("filestream").With("id", config.ID)
 
@@ -105,7 +107,7 @@ func newProspector(
 	}
 	logger.Debugf("file identity is set to %s", identifier.Name())
 
-	filewatcher, err := newFileWatcher(
+	filewatcher, err := newFileWatcherWithDirReader(
 		logger,
 		config.Paths,
 		config.FileWatcher,
@@ -113,6 +115,8 @@ func newProspector(
 		config.Delete.Enabled,
 		identifier,
 		srci,
+		dc,
+		min(config.FileWatcher.Interval, maxDirCacheAge),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating filewatcher %w", err)
@@ -120,6 +124,7 @@ func newProspector(
 
 	fileprospector := fileProspector{
 		filewatcher:           filewatcher,
+		checkInterval:         config.FileWatcher.Interval,
 		identifier:            identifier,
 		ignoreOlder:           config.IgnoreOlder,
 		ignoreInactiveSince:   config.IgnoreInactive,
@@ -130,6 +135,7 @@ func newProspector(
 		filestreamIdentifiers: filestreamFileIdentifiers(logger, config.Reader.Parsers.Suffix),
 		logIdentifiers:        logFileIdentifiers(logger),
 		growingFingerprint:    config.FileWatcher.Scanner.Fingerprint.Growing,
+		harvesterState:        harvesterState,
 	}
 	if config.Rotation == nil {
 		return &fileprospector, nil

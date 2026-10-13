@@ -78,6 +78,16 @@ func TestConfigInvalid(t *testing.T) {
 		},
 		// The default config does not set `topic` nor `topics`.
 		"No topics or topic provided": mapstr.M{},
+		"password without username": mapstr.M{
+			"password": "secret",
+			"topic":    "foo",
+		},
+		"OAUTHBEARER with username and password": mapstr.M{
+			"sasl":     mapstr.M{"mechanism": "OAUTHBEARER"},
+			"username": "user",
+			"password": "secret",
+			"topic":    "foo",
+		},
 	}
 
 	for name, test := range tests {

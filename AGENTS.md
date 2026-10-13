@@ -136,18 +136,7 @@ When referencing code, always use exact locations and names:
 
 ## Changelog
 
-PRs require a changelog fragment in `changelog/fragments/` (CI enforced unless `skip-changelog` label is applied). Create using `elastic-agent-changelog-tool`:
-
-```bash
-go run github.com/elastic/elastic-agent-changelog-tool@latest new --component <beat> --kind <kind>
-```
-
-Fragment format (`changelog/fragments/<timestamp>-<slug>.yaml`):
-```yaml
-kind: bug-fix          # bug-fix, enhancement, breaking-change, deprecation, known-issue
-summary: Short description of the change
-component: filebeat    # the affected beat/component
-```
+If the change is user-visible (not tests, CI, refactoring, or docs), add a changelog fragment: run `go run github.com/elastic/elastic-agent-changelog-tool@latest new` and edit the emitted fragment following the instructions in its comments. Otherwise, add the `skip-changelog` label to the PR.
 
 ## Commits and PRs
 

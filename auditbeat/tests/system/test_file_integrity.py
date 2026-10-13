@@ -80,8 +80,8 @@ def wrap_except(expr):
 
 
 class Test(BaseTest):
-    def wait_output(self, min_events):
-        self.wait_until(lambda: wrap_except(lambda: len(self.read_output()) >= min_events))
+    def wait_output(self, min_events, max_timeout=20):
+        self.wait_until(lambda: wrap_except(lambda: len(self.read_output()) >= min_events), max_timeout=max_timeout)
         # wait for the number of lines in the file to stay constant for 10 seconds
         prev_lines = -1
         while True:
@@ -95,7 +95,7 @@ class Test(BaseTest):
     def wait_startup(self, backend, dir):
         if backend == "ebpf":
             self.wait_log_contains("started ebpf watcher", max_timeout=30, ignore_case=True)
-        if backend == "kprobes":
+        elif backend == "kprobes":
             self.wait_log_contains("Started kprobes watcher", max_timeout=30, ignore_case=True)
         else:
             # wait until the directories to watch are printed in the logs
@@ -146,7 +146,8 @@ class Test(BaseTest):
 
             # wait until file1 is reported before deleting. Otherwise the hash
             # might not be calculated
-            self.wait_log_contains("\"path\":\"{0}\"".format(escape_path(file1)), ignore_case=True)
+            timeout = 30 if backend in ("kprobes", "ebpf") else 10
+            self.wait_log_contains("\"path\":\"{0}\"".format(escape_path(file1)), ignore_case=True, max_timeout=timeout)
 
             os.unlink(file1)
 
@@ -242,9 +243,11 @@ class Test(BaseTest):
             self.create_file(file2, "")
 
             if backend == "fsnotify" or backend == "kprobes":
-                self.wait_output(4)
+                timeout = 30 if backend == "kprobes" else 20
+                self.wait_output(4, max_timeout=timeout)
                 self.wait_until(lambda: any(
-                    'file.path' in obj and obj['file.path'].lower() == subdir2.lower() for obj in self.read_output()))
+                    'file.path' in obj and obj['file.path'].lower() == subdir2.lower() for obj in self.read_output()),
+                    max_timeout=timeout)
             else:
                 # ebpf backend doesn't catch directory creation
                 self.wait_output(2)

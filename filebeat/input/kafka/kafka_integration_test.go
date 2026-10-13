@@ -16,6 +16,41 @@
 // under the License.
 
 // This file was contributed to by generative AI
+//
+// # Running integration tests
+//
+// These tests require a running Kafka broker. The easiest way to run it is to use the
+// pre-built Docker image from testing/environments/docker/kafka.
+//
+// ## Start Kafka (standalone, outside docker-compose)
+//
+//	docker build -t beats-kafka-test ../../testing/environments/docker/kafka
+//	docker run -d --name beats-kafka-test \
+//	    -e KAFKA_ADVERTISED_HOST=localhost \
+//	    -p 9092:9092 -p 9093:9093 -p 9094:9094 -p 2181:2181 \
+//	    beats-kafka-test
+//
+// IMPORTANT: -e KAFKA_ADVERTISED_HOST=localhost is required when running
+// outside docker-compose. Without it the broker advertises "kafka:9092" for
+// inter-broker communication, which cannot be resolved on the host, causing all
+// external connections to fail.
+//
+// Wait for the container to become healthy (Kafka is ready when the healthcheck passes), then run:
+//
+//	until docker inspect --format='{{.State.Health.Status}}' beats-kafka-test | grep -q healthy; do sleep 2; done
+//
+// ## Run the tests
+//
+//	KAFKA_HOST=localhost KAFKA_PORT=9094 go test -v -tags integration ./input/kafka/ -timeout 5m
+//
+// To run a specific test:
+//
+//	KAFKA_HOST=localhost KAFKA_PORT=9094 go test -v -tags integration -run TestInputWithStickyRebalanceStrategy ./input/kafka/
+//
+// ## Teardown
+//
+//	docker rm -f beats-kafka-test
+
 //go:build integration
 
 package kafka
@@ -31,13 +66,13 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/kafka/testutil"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
-	"github.com/elastic/beats/v7/testing/testutils"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/sarama"
 
@@ -319,8 +354,6 @@ func TestInputWithJsonPayloadAndMultipleEvents(t *testing.T) {
 }
 
 func TestSASLAuthentication(t *testing.T) {
-	testutils.SkipIfFIPSOnly(t, "SASL disabled when in fips140=only mode.")
-
 	testCases := []struct {
 		name      string
 		mechanism string
@@ -443,13 +476,13 @@ func TestTest(t *testing.T) {
 		"group_id": "filebeat",
 	})
 
-	inp, err := Plugin(logptest.NewTestingLogger(t, "")).Manager.Create(config)
+	inp, err := Plugin(logp.NewNopLogger()).Manager.Create(config)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	err = inp.Test(v2.TestContext{
-		Logger: logptest.NewTestingLogger(t, "kafka_test"),
+		Logger: logp.NewNopLogger(),
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -548,7 +581,7 @@ func assertOffset(t *testing.T, groupID, topic string, expected int64) {
 }
 
 func run(t *testing.T, cfg *conf.C, client *beattest.ChanClient) (*kafkaInput, func()) {
-	inp, err := Plugin(logptest.NewTestingLogger(t, "")).Manager.Create(cfg)
+	inp, err := Plugin(logp.NewNopLogger()).Manager.Create(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -568,8 +601,70 @@ func newV2Context() (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
 	logger, _ := logp.NewDevelopmentLogger("kafka_test")
 	return v2.Context{
-		Logger:      logger,
-		ID:          "test_id",
-		Cancelation: ctx,
+		Logger:          logger,
+		ID:              "test_id",
+		Cancelation:     ctx,
+		MetricsRegistry: monitoring.NewRegistry(),
 	}, cancel
+}
+
+// TestInputWithStickyRebalanceStrategy verifies that the Kafka input
+// successfully consumes all messages when rebalance.strategy is "sticky".
+func TestInputWithStickyRebalanceStrategy(t *testing.T) {
+	testTopic := createReadyTestTopic(t)
+	groupID := fmt.Sprintf("sticky-filebeat-%d", rand.Int())
+
+	messages := []testMessage{
+		{message: "sticky-1"},
+		{message: "sticky-2"},
+		{message: "sticky-3"},
+	}
+	for _, m := range messages {
+		testutil.WriteToKafkaTopic(t, testTopic, m.message, m.headers)
+	}
+
+	config := conf.MustNewConfigFrom(mapstr.M{
+		"hosts":              testutil.GetTestKafkaHost(),
+		"topics":             []string{testTopic},
+		"group_id":           groupID,
+		"wait_close":         0,
+		"rebalance.strategy": "sticky",
+	})
+
+	client := beattest.NewChanClient(100)
+	defer client.Close()
+	events := client.Channel
+	input, cancel := run(t, config, client)
+
+	timeout := time.After(30 * time.Second)
+	for range messages {
+		select {
+		case event := <-events:
+			v, err := event.Fields.GetValue("message")
+			require.NoError(t, err)
+			_, ok := v.(string)
+			require.True(t, ok, "could not get message text from event")
+			meta, ok := event.Private.(eventMeta)
+			require.True(t, ok, "could not get eventMeta")
+			meta.ackHandler()
+		case <-timeout:
+			t.Fatal("timeout waiting for incoming events")
+		}
+	}
+
+	<-time.After(2 * time.Second)
+
+	cancel()
+	didClose := make(chan struct{})
+	go func() {
+		input.Wait()
+		close(didClose)
+	}()
+	select {
+	case <-time.After(30 * time.Second):
+		t.Fatal("timeout waiting for beat to shut down")
+	case <-didClose:
+	}
+
+	assertOffset(t, groupID, testTopic, int64(len(messages)))
 }

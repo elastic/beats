@@ -143,12 +143,37 @@ func configYML() error {
 	return devtools.Config(devtools.AllConfigTypes, filebeat.OSSConfigFileParams(), ".")
 }
 
-// GenerateModuleIncludeListGo generates include/list.go with imports for inputs.
+// GenerateModuleIncludeListGo generates include/list*.go files with imports for inputs.
 func GenerateModuleIncludeListGo() error {
+	// generate include/list.go
 	options := devtools.DefaultIncludeListOptions()
 	options.ImportDirs = []string{"autodiscover", "autodiscover/**/*", "input", "input/*", "processor/*"}
 	options.BuildTags = "\n//go:build !agentbeat\n"
-	return devtools.GenerateIncludeListGo(options)
+	if err := devtools.GenerateIncludeListGo(options); err != nil {
+		return err
+	}
+	// generate include/list_agentbeat.go
+	if err := devtools.GenerateIncludeListGo(devtools.IncludeListOptions{
+		ImportDirs: []string{"input", "input/*", "processor/*"},
+		ModuleDirs: []string{"module"},
+		Outfile:    "include/list_agentbeat.go",
+		BuildTags:  "\n//go:build agentbeat && !securityonly\n",
+		Pkg:        "include",
+	}); err != nil {
+		return err
+	}
+	// generate include/list_inputs_securityonly.go
+	if err := devtools.GenerateIncludeListGo(devtools.IncludeListOptions{
+		ImportDirs:            []string{"input/syslog"},
+		Outfile:               "include/list_inputs_securityonly.go",
+		BuildTags:             "\n//go:build securityonly\n",
+		Pkg:                   "include",
+		SkipInitModule:        true,
+		ForceInitializeModule: true,
+	}); err != nil {
+		return err
+	}
+	return nil
 }
 
 // Fields generates fields.yml and fields.go files for the Beat.

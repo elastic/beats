@@ -268,7 +268,7 @@ func VerifyNoLeaks(t *testing.T) {
 		// On Linux, mainly arm64, some HTTP transport goroutines are leaked while still dialing.
 		goleak.IgnoreAnyFunction("net.(*netFD).connect"),
 		goleak.IgnoreAnyFunction("net.(*netFD).connect.func2"),
-		goleak.IgnoreAnyFunction("net/http.(*Transport).startDialConnForLocked"),
+		goleak.IgnoreAnyFunction("net/http.(*Transport).startDialConnForLocked.func1"),
 		// heartbeat's ICMP monitor lazily starts a process-wide singleton receive
 		// loop on first use and never stops it, since a real heartbeat process
 		// runs the loop forever. See heartbeat/monitors/active/icmp/stdloop.go.

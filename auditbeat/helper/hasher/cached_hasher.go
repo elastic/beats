@@ -53,7 +53,7 @@ type hashEntry struct {
 }
 
 // NewFileHasherWithCache creates a CachedHasher with space up to size elements.
-func NewFileHasherWithCache(c Config, size int) (*CachedHasher, error) {
+func NewFileHasherWithCache(c Config, size int, logger *logp.Logger) (*CachedHasher, error) {
 	// We don't rate limit our hashes, we cache
 	c.ScanRateBytesPerSec = 0
 	hasher, err := NewFileHasher(c, nil)
@@ -71,7 +71,7 @@ func NewFileHasherWithCache(c Config, size int) (*CachedHasher, error) {
 		hasher:   hasher,
 		hashLRU:  hashLRU,
 		hasStatx: hasStatx,
-		log:      logp.NewLogger("cached_hasher"),
+		log:      logger.Named("cached_hasher"),
 	}, nil
 }
 

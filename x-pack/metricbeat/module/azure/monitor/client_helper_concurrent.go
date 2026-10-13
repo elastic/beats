@@ -27,6 +27,11 @@ func concurrentMapMetrics(client *azure.BatchClient, resources []*armresources.G
 				client.ResourceConfigurations.ErrorChan <- err // Send error and stop processing
 				return
 			}
+			// An empty definition list is a skipped resource (unsupported namespace).
+			// fetchBatch treats an empty batch as a fatal mapping error, so do not send one.
+			if len(res) == 0 {
+				continue
+			}
 			client.ResourceConfigurations.MetricDefinitionsChan <- res
 		}
 	}()
@@ -48,6 +53,10 @@ func getMappedResourceDefinitions(client *azure.BatchClient, resourceId string, 
 		if !exists {
 			metricDefinitions, err = client.AzureMonitorService.GetMetricDefinitionsWithRetry(resourceId, metricConfig.Namespace)
 			if err != nil {
+				if metricConfig.IgnoreUnsupported && isUnsupportedPlatformMetricNamespace(err) {
+					client.Log.Infof("skipping resource %s namespace %s: %s", resourceId, metricConfig.Namespace, unsupportedPlatformMetricNamespaceMessage)
+					continue
+				}
 				return nil, err
 			}
 			namespaceMetrics[metricConfig.Namespace] = metricDefinitions

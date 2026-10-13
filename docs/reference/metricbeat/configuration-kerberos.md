@@ -59,7 +59,16 @@ There are two options to authenticate with Kerberos KDC: `password` and `keytab`
 
 ### `config_path` [_config_path]
 
-You need to set the path to the `krb5.conf`, so Metricbeat can find the Kerberos KDC to retrieve a ticket.
+You need to set the path to the `krb5.conf`, so Metricbeat can find the Kerberos KDC to retrieve a ticket. Mutually exclusive with `krb5_conf`.
+
+
+### `krb5_conf` [_krb5_conf]
+
+```{applies_to}
+stack: ga 9.6.0+
+```
+
+Inline `krb5.conf` body. Use this instead of `config_path` when the config should travel with the settings rather than live in a file on the host.
 
 
 ### `username` [_username_4]

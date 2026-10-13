@@ -192,7 +192,10 @@ func TestContract_StateStoreKeyFormat(t *testing.T) {
 
 func TestContract_StateStoreKeyPrefix(t *testing.T) {
 	assert.Equal(t, "filebeat::aws-s3::state::", awsS3ObjectStatePrefix)
-	assert.Equal(t, "filebeat::aws-s3::tail", awsS3TailKey)
+	assert.Equal(t, "filebeat::aws-s3::tail::", awsS3TailKeyPrefix)
+	assert.Equal(t, "filebeat::aws-s3::tail", awsS3LegacyTailKey)
+	assert.Equal(t, "filebeat::aws-s3::tail::my-bucket::logs/", tailStoreKey("my-bucket", "logs/"))
+	assert.Equal(t, "filebeat::aws-s3::tail::my-bucket::", tailStoreKey("my-bucket", ""))
 }
 
 func TestContract_StateJSON_RoundTrip(t *testing.T) {
@@ -257,7 +260,7 @@ func TestContract_StateRegistry_PersistsThroughReload(t *testing.T) {
 			etag := "test-etag"
 			lastModified := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
 
-			reg, err := newStateRegistry(log, store, "", false, 100)
+			reg, err := newStateRegistry(log, store, "", "", false, 100)
 			require.NoError(t, err)
 
 			st := newState(bucket, key, etag, lastModified)
@@ -268,7 +271,7 @@ func TestContract_StateRegistry_PersistsThroughReload(t *testing.T) {
 			assert.True(t, reg.IsProcessed(id), "%s state must be treated as processed", test.name)
 			reg.Close()
 
-			reg2, err := newStateRegistry(log, store, "", false, 100)
+			reg2, err := newStateRegistry(log, store, "", "", false, 100)
 			require.NoError(t, err)
 			defer reg2.Close()
 			assert.True(t, reg2.IsProcessed(id), "%s state must survive registry reload", test.name)
