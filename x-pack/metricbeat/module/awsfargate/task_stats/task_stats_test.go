@@ -10,7 +10,11 @@ import (
 	"net/http"
 	"testing"
 
+	dcontainer "github.com/moby/moby/api/types/container"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -135,6 +139,41 @@ func TestGetCPUStats(t *testing.T) {
 	assert.Equal(t, 0.4, cpuStats.TotalUsage.ValueOr(0), "total CPU usage must match")
 	assert.True(t, cpuStats.TotalUsageNormalized.Exists(), "normalized total CPU usage must be present")
 	assert.Equal(t, 0.2, cpuStats.TotalUsageNormalized.ValueOr(0), "normalized total CPU usage must match")
+}
+
+func TestCreateCPUFieldsOmitsUnavailablePercentages(t *testing.T) {
+	taskStats := dcontainer.StatsResponse{
+		PreCPUStats: dcontainer.CPUStats{
+			SystemUsage: 1000,
+			CPUUsage: dcontainer.CPUUsage{
+				TotalUsage:        100,
+				UsageInKernelmode: 80,
+				UsageInUsermode:   20,
+			},
+		},
+		CPUStats: dcontainer.CPUStats{
+			SystemUsage: 2000,
+			OnlineCPUs:  2,
+			CPUUsage: dcontainer.CPUUsage{
+				TotalUsage:        50,
+				UsageInKernelmode: 40,
+				UsageInUsermode:   30,
+			},
+		},
+	}
+
+	fields := createCPUFields(&Stats{cpuStats: getCPUStats(taskStats)})
+
+	assert.NotContains(t, fields, "total", "total percentages must be omitted after a counter reset")
+
+	kernel, ok := fields["kernel"].(mapstr.M)
+	require.True(t, ok, "kernel fields must be a map")
+	assert.Equal(t, mapstr.M{"ticks": uint64(40)}, kernel, "kernel ticks must remain while unavailable percentages are omitted")
+
+	user, ok := fields["user"].(mapstr.M)
+	require.True(t, ok, "user fields must be a map")
+	assert.Contains(t, user, "pct", "valid user percentage must remain")
+	assert.Contains(t, user, "norm", "valid normalized user percentage must remain")
 }
 
 func TestGetRegionAndClusterName(t *testing.T) {
