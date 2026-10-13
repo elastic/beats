@@ -374,7 +374,7 @@ func (l *winEventLog) Read() ([]Record, error) {
 		l.resetRenderNoEventRetry()
 		// Any successfully processed event breaks a previous gap retry streak.
 		l.resetGapRetry()
-		if l.filter != nil && !l.filter.match(record) {
+		if l.filter != nil && !l.filter.match(&record.Event) {
 			continue
 		}
 		records = append(records, *record)
