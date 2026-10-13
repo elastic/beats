@@ -20,6 +20,7 @@ package cpu
 import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/opt"
 )
 
 func eventsMapping(r mb.ReporterV2, cpuStatsList []CPUStats) {
@@ -29,43 +30,44 @@ func eventsMapping(r mb.ReporterV2, cpuStatsList []CPUStats) {
 }
 
 func eventMapping(r mb.ReporterV2, stats *CPUStats) {
+	kernel := mapstr.M{"ticks": stats.UsageInKernelmode}
+	addPercentageFields(kernel, stats.UsageInKernelmodePercentage, stats.UsageInKernelmodePercentageNormalized)
+
+	user := mapstr.M{"ticks": stats.UsageInUsermode}
+	addPercentageFields(user, stats.UsageInUsermodePercentage, stats.UsageInUsermodePercentageNormalized)
+
+	system := mapstr.M{"ticks": stats.SystemUsage}
+	addPercentageFields(system, stats.SystemUsagePercentage, stats.SystemUsagePercentageNormalized)
+
 	fields := mapstr.M{
-		"core": stats.PerCPUUsage,
-		"total": mapstr.M{
-			"pct": stats.TotalUsage,
-			"norm": mapstr.M{
-				"pct": stats.TotalUsageNormalized,
-			},
-		},
-		"kernel": mapstr.M{
-			"ticks": stats.UsageInKernelmode,
-			"pct":   stats.UsageInKernelmodePercentage,
-			"norm": mapstr.M{
-				"pct": stats.UsageInKernelmodePercentageNormalized,
-			},
-		},
-		"user": mapstr.M{
-			"ticks": stats.UsageInUsermode,
-			"pct":   stats.UsageInUsermodePercentage,
-			"norm": mapstr.M{
-				"pct": stats.UsageInUsermodePercentageNormalized,
-			},
-		},
-		"system": mapstr.M{
-			"ticks": stats.SystemUsage,
-			"pct":   stats.SystemUsagePercentage,
-			"norm": mapstr.M{
-				"pct": stats.SystemUsagePercentageNormalized,
-			},
-		},
+		"core":   stats.PerCPUUsage,
+		"kernel": kernel,
+		"user":   user,
+		"system": system,
+	}
+	total := mapstr.M{}
+	addPercentageFields(total, stats.TotalUsage, stats.TotalUsageNormalized)
+	if len(total) != 0 {
+		fields["total"] = total
 	}
 
 	rootFields := stats.Container.ToMapStr()
 	// Add container ECS fields
-	_, _ = rootFields.Put("container.cpu.usage", stats.TotalUsageNormalized)
+	if stats.TotalUsageNormalized.Exists() {
+		_, _ = rootFields.Put("container.cpu.usage", stats.TotalUsageNormalized.ValueOr(0))
+	}
 
 	r.Event(mb.Event{
 		RootFields:      rootFields,
 		MetricSetFields: fields,
 	})
+}
+
+func addPercentageFields(fields mapstr.M, percentage, normalized opt.Float) {
+	if percentage.Exists() {
+		fields["pct"] = percentage.ValueOr(0)
+	}
+	if normalized.Exists() {
+		fields["norm"] = mapstr.M{"pct": normalized.ValueOr(0)}
+	}
 }
