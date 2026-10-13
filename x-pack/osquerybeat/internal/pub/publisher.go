@@ -6,6 +6,7 @@ package pub
 
 import (
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -16,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -37,22 +39,36 @@ type Publisher struct {
 	// client for osquery_manager.query_profile
 	queryProfileClient    beat.Client
 	profileDropWarnLogged bool
+
+	// Scheduled profiling must not wait behind a result publication holding mx.
+	scheduledProfileMu      sync.Mutex
+	scheduledProfile        *scheduledProfileSink
+	scheduledProfileMissing bool
+	scheduledProfileDropped *monitoring.Uint
+	scheduledProfileWarning atomic.Int64
 }
 
 func New(b *beat.Beat, log *logp.Logger) *Publisher {
+	reg := b.Monitoring.StatsRegistry()
+	if reg == nil {
+		reg = monitoring.NewRegistry()
+	}
 	return &Publisher{
-		b:   b,
-		log: log,
+		b:                       b,
+		log:                     log,
+		scheduledProfileDropped: monitoring.NewUint(reg.GetOrCreateRegistry("osquerybeat.scheduled_query_profiles"), "dropped.output_full"),
 	}
 }
 
 func (p *Publisher) Configure(inputs []config.InputConfig) error {
+	p.mx.Lock()
+	defer p.mx.Unlock()
+	// Retire delayed profiles even when all inputs have been removed, before
+	// replacing any clients or their routing metadata.
+	p.retireScheduledProfileSink()
 	if len(inputs) == 0 {
 		return nil
 	}
-
-	p.mx.Lock()
-	defer p.mx.Unlock()
 
 	// Locate each stream by dataset so that delivery order does not affect
 	// which client handles which data stream. The first input for a dataset wins.
@@ -149,6 +165,11 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 		if oldClient != nil {
 			oldClient.Close()
 		}
+		if resultInput != nil {
+			if err := p.configureScheduledProfileSink(*resultInput, *profileInput); err != nil {
+				return err
+			}
+		}
 	} else {
 		if p.queryProfileClient != nil {
 			p.queryProfileClient.Close()
@@ -170,8 +191,11 @@ func (p *Publisher) Publish(index, idValue, idFieldKey, responseID, spaceID, pac
 }
 
 func (p *Publisher) Close() {
+	p.retireScheduledProfileSink()
 	p.mx.Lock()
 	defer p.mx.Unlock()
+	// Configure may have installed a lease while Close waited for mx.
+	p.retireScheduledProfileSink()
 
 	if p.client != nil {
 		p.client.Close()
