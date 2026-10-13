@@ -44,12 +44,12 @@ type elasticStorage struct {
 
 // Dependencies ensures the configured authenticator starts before storage.
 func (e *elasticStorage) Dependencies() []component.ID {
-	return []component.ID{e.cfg.Auth.Get().AuthenticatorID}
+	return []component.ID{e.cfg.Auth.AuthenticatorID}
 }
 
 func (e *elasticStorage) Start(ctx context.Context, host component.Host) error {
 
-	auth, err := e.cfg.Auth.Get().GetHTTPClientAuthenticator(ctx, host.GetExtensions())
+	auth, err := e.cfg.Auth.GetHTTPClientAuthenticator(ctx, host.GetExtensions())
 	if err != nil {
 		return fmt.Errorf("get Elasticsearch authenticator: %w", err)
 	}

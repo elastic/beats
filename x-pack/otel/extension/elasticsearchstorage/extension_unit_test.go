@@ -33,8 +33,7 @@ func TestConfigDecode(t *testing.T) {
 		},
 	}).Unmarshal(config), "storage authenticator configuration must decode")
 	require.NoError(t, config.Validate(), "decoded storage configuration must validate")
-	require.True(t, config.Auth.HasValue(), "decoded configuration must contain an authenticator")
-	require.Equal(t, component.MustNewIDWithName("beatsauth", "state"), config.Auth.Get().AuthenticatorID, "decoded configuration must preserve the authenticator ID")
+	require.Equal(t, component.MustNewIDWithName("beatsauth", "state"), config.Auth.AuthenticatorID, "decoded configuration must preserve the authenticator ID")
 }
 
 func TestElasticStorageStartUsesBeatsAuth(t *testing.T) {
