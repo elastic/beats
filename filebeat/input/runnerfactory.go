@@ -52,6 +52,10 @@ func (r *RunnerFactory) Create(
 	pipeline beat.PipelineConnector,
 	c *conf.C,
 ) (cfgfile.Runner, error) {
+	if err := r.registrar.Start(); err != nil {
+		return nil, err
+	}
+
 	connector := r.outlet(pipeline)
 	p, err := New(c, connector, r.beatDone, r.info, r.registrar.GetStates())
 	if err != nil {

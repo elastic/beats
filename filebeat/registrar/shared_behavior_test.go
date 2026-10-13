@@ -115,6 +115,7 @@ func TestSharedRegistrarAcksAndStopsWhenWriteFails(t *testing.T) {
 	r, err := New(stateStore, spy, 0, logger)
 	require.NoError(t, err, "registrar must be created")
 	require.NoError(t, r.Start(), "registrar must start")
+	t.Cleanup(r.Stop)
 
 	failsBefore := registryFails.Get()
 	successBefore := registrySuccess.Get()
@@ -148,7 +149,9 @@ func TestSharedRegistrarStopOfOneOwnerFlushesAndAcksTheOtherOnce(t *testing.T) {
 	regB, err := New(stateStore, spyB, time.Hour, logger)
 	require.NoError(t, err, "registrar B must be created")
 	require.NoError(t, regA.Start(), "registrar A must start")
+	t.Cleanup(regA.Stop)
 	require.NoError(t, regB.Start(), "registrar B must start")
+	t.Cleanup(regB.Stop)
 
 	fileB.Offset = 7000
 	regB.Channel <- []file.State{fileB, fileB, fileB}
@@ -180,6 +183,7 @@ func TestSharedRegistrarReacquiredAfterLastOwnerStops(t *testing.T) {
 	regA, err := New(stateStore, &atomicSpy{}, 0, logger)
 	require.NoError(t, err, "registrar A must be created")
 	require.NoError(t, regA.Start(), "registrar A must start")
+	t.Cleanup(regA.Stop)
 	first := regA.shared
 	fileA.Offset = 5000
 	regA.Channel <- []file.State{fileA}
@@ -189,6 +193,7 @@ func TestSharedRegistrarReacquiredAfterLastOwnerStops(t *testing.T) {
 	regB, err := New(stateStore, &atomicSpy{}, 0, logger)
 	require.NoError(t, err, "registrar B must be created")
 	require.NoError(t, regB.Start(), "registrar B must start after a full release")
+	t.Cleanup(regB.Stop)
 	assert.NotSame(t, first, regB.shared, "a fresh shared registrar must be created")
 
 	var loaded *file.State
@@ -210,9 +215,11 @@ func TestSharedRegistrarUsesShortestFlushTimeout(t *testing.T) {
 	regA, err := New(stateStore, spyA, time.Hour, logger)
 	require.NoError(t, err, "registrar A must be created")
 	require.NoError(t, regA.Start(), "registrar A must start")
+	t.Cleanup(regA.Stop)
 	regB, err := New(stateStore, &atomicSpy{}, 0, logger)
 	require.NoError(t, err, "registrar B must be created")
 	require.NoError(t, regB.Start(), "registrar B must start")
+	t.Cleanup(regB.Stop)
 
 	fileA.Offset = 5000
 	regA.Channel <- []file.State{fileA}
@@ -240,6 +247,7 @@ func TestSharedRegistrarConcurrentOwnersStress(t *testing.T) {
 		r, err := New(stateStore, spies[i], timeout, logger)
 		require.NoError(t, err, "registrar %d must be created", i)
 		require.NoError(t, r.Start(), "registrar %d must start", i)
+		t.Cleanup(r.Stop)
 		regs[i] = r
 	}
 
@@ -273,7 +281,11 @@ func (b accessFailBackend) Access(name string) (backend.Store, error) {
 	return b.Registry.Access(name)
 }
 
-func TestRegistrarStartCanBeRetriedAfterFailedAcquire(t *testing.T) {
+// TestRegistrarStartFailureIsSticky pins that a failed Start is never retried,
+// even once the underlying problem is gone: every V1 input created after the
+// first, failed Start (see input.RunnerFactory.Create) must see the same
+// failure instead of racing to retry the shared registrar.
+func TestRegistrarStartFailureIsSticky(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	fail := &atomic.Bool{}
 	fail.Store(true)
@@ -282,15 +294,13 @@ func TestRegistrarStartCanBeRetriedAfterFailedAcquire(t *testing.T) {
 
 	r, err := New(stateStore, &atomicSpy{}, 0, logger)
 	require.NoError(t, err, "registrar must be created")
-	require.Error(t, r.Start(), "Start must fail while the store cannot be opened")
+	first := r.Start()
+	require.Error(t, first, "Start must fail while the store cannot be opened")
 	assert.Equal(t, 0, sharedRegistrars.Len(), "a failed Start must leave no shared registrar behind")
 
 	fail.Store(false)
-	require.NoError(t, r.Start(), "Start must succeed on retry once the store opens")
-	r.Channel <- []file.State{fileState(1, 5000)}
-	stopWithin(t, r, 5*time.Second)
-	assert.EqualValues(t, 5000, readState(t, stateStore, "native::1-1").Offset, "the retried handle must persist state normally")
-	assert.Equal(t, 0, sharedRegistrars.Len(), "Stop must release the reference taken by the successful Start")
+	assert.EqualError(t, r.Start(), first.Error(), "a later Start must report the same failure instead of retrying")
+	assert.Equal(t, 0, sharedRegistrars.Len(), "a sticky failure must never acquire the shared registrar")
 }
 
 type unhashableLogger struct {
@@ -308,7 +318,9 @@ func TestSharedRegistrarMarksLeavingOwnersStatesFinished(t *testing.T) {
 	regB, err := New(stateStore, &atomicSpy{}, 0, logger)
 	require.NoError(t, err, "registrar B must be created")
 	require.NoError(t, regA.Start(), "registrar A must start")
+	t.Cleanup(regA.Stop)
 	require.NoError(t, regB.Start(), "registrar B must start")
+	t.Cleanup(regB.Stop)
 
 	fileA.Offset, fileA.Finished = 5000, false
 	fileB.Offset, fileB.Finished = 7000, false
@@ -343,13 +355,18 @@ func TestRegistrarStartGuards(t *testing.T) {
 	stopped, err := New(stateStore, &atomicSpy{}, 0, logger)
 	require.NoError(t, err, "registrar must be created")
 	stopped.Stop()
-	assert.Error(t, stopped.Start(), "Start after Stop must fail instead of leaking a shared registrar reference")
+	assert.ErrorIs(t, stopped.Start(), ErrStopped, "Start after Stop must fail instead of leaking a shared registrar reference")
 	assert.Equal(t, 0, sharedRegistrars.Len(), "a refused Start must not acquire the shared registrar")
 
+	// Every V1 input created through the same owner calls Start (see
+	// input.RunnerFactory.Create), so a second Start must be a no-op instead
+	// of acquiring a second reference to the shared registrar.
 	twice, err := New(stateStore, &atomicSpy{}, 0, logger)
 	require.NoError(t, err, "registrar must be created")
 	require.NoError(t, twice.Start(), "first Start must succeed")
-	assert.Error(t, twice.Start(), "second Start must fail instead of acquiring a second reference")
+	t.Cleanup(twice.Stop)
+	assert.NoError(t, twice.Start(), "second Start must be a no-op instead of failing")
+	assert.Equal(t, 1, sharedRegistrars.Len(), "a repeated Start must not acquire a second reference")
 	stopWithin(t, twice, 5*time.Second)
 	assert.Equal(t, 0, sharedRegistrars.Len(), "Stop must release the single reference the first Start took")
 }
@@ -361,6 +378,7 @@ func TestSharedRegistrarAcceptsUnhashableSuccessLogger(t *testing.T) {
 	r, err := New(stateStore, unhashableLogger{}, 0, logger)
 	require.NoError(t, err, "registrar must be created")
 	require.NoError(t, r.Start(), "registrar must start")
+	t.Cleanup(r.Stop)
 	fileA.Offset = 5000
 	r.Channel <- []file.State{fileA}
 	stopWithin(t, r, 5*time.Second)
@@ -375,6 +393,7 @@ func TestSharedRegistrarLoweredTimeoutFlushesArmedBatch(t *testing.T) {
 	regA, err := New(stateStore, spyA, time.Hour, logger)
 	require.NoError(t, err, "registrar A must be created")
 	require.NoError(t, regA.Start(), "registrar A must start")
+	t.Cleanup(regA.Stop)
 
 	fileA.Offset = 5000
 	regA.Channel <- []file.State{fileA}
@@ -384,6 +403,7 @@ func TestSharedRegistrarLoweredTimeoutFlushesArmedBatch(t *testing.T) {
 	regB, err := New(stateStore, &atomicSpy{}, time.Millisecond, logger)
 	require.NoError(t, err, "registrar B must be created")
 	require.NoError(t, regB.Start(), "registrar B must start")
+	t.Cleanup(regB.Stop)
 
 	assert.Equal(t, 1, spyA.count(), "joining with a shorter timeout must have committed A's armed batch before Start returned")
 	assert.EqualValues(t, 5000, readState(t, stateStore, fileA.Id).Offset, "A's batch must be persisted by the join flush")

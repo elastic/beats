@@ -29,7 +29,6 @@ import (
 )
 
 func TestPublisherMetadataStore(t *testing.T) {
-	logp.TestingSetup()
 
 	s, err := NewPublisherMetadataStore(
 		NilHandle,

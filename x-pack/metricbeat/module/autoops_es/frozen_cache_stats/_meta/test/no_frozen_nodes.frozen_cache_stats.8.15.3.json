@@ -1,0 +1,28 @@
+{
+  "nodes": {
+    "eerrtBMtQEisohZzxBLUSw": {
+      "shared_cache": {
+        "reads": 0,
+        "bytes_read_in_bytes": 0,
+        "writes": 0,
+        "bytes_written_in_bytes": 0,
+        "evictions": 0,
+        "num_regions": 0,
+        "size_in_bytes": 0,
+        "region_size_in_bytes": 16777216
+      }
+    },
+    "DFUEPmkQS5OIhRDTnGPJnA": {
+      "shared_cache": {
+        "reads": 0,
+        "bytes_read_in_bytes": 0,
+        "writes": 0,
+        "bytes_written_in_bytes": 0,
+        "evictions": 0,
+        "num_regions": 0,
+        "size_in_bytes": 0,
+        "region_size_in_bytes": 16777216
+      }
+    }
+  }
+}

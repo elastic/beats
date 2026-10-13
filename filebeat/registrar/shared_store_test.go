@@ -63,7 +63,9 @@ func TestSharedRegistrarPreservesOtherOwnersOffsets(t *testing.T) {
 	regB, err := New(stateStore, spyB, 0, logger)
 	require.NoError(t, err, "registrar B must be created")
 	require.NoError(t, regA.Start(), "registrar A must start")
+	t.Cleanup(regA.Stop)
 	require.NoError(t, regB.Start(), "registrar B must start")
+	t.Cleanup(regB.Stop)
 	assert.Same(t, regA.shared, regB.shared, "owners with the same store key must share one registrar")
 	assert.Len(t, regA.GetStates(), 2, "regA must see the previously persisted states")
 
@@ -92,7 +94,9 @@ func TestSharedRegistrarAcksEachOwnerSeparately(t *testing.T) {
 	regB, err := New(stateStore, spyB, time.Second, logger)
 	require.NoError(t, err, "registrar B must be created")
 	require.NoError(t, regA.Start(), "registrar A must start")
+	t.Cleanup(regA.Stop)
 	require.NoError(t, regB.Start(), "registrar B must start")
+	t.Cleanup(regB.Stop)
 
 	regA.Channel <- []file.State{fileA, fileA}
 	regB.Channel <- []file.State{fileB}
@@ -113,7 +117,9 @@ func TestRegistrarsOnDifferentStoresStayIsolated(t *testing.T) {
 	regB, err := New(stateStoreB, &spyLogger{}, 0, logger)
 	require.NoError(t, err, "registrar B must be created")
 	require.NoError(t, regA.Start(), "registrar A must start")
+	t.Cleanup(regA.Stop)
 	require.NoError(t, regB.Start(), "registrar B must start")
+	t.Cleanup(regB.Stop)
 	assert.NotSame(t, regA.shared, regB.shared, "different store keys must not share a registrar")
 	assert.Equal(t, 2, sharedRegistrars.Len(), "one shared registrar per store key must exist")
 
@@ -138,9 +144,11 @@ func TestSharedRegistrarSurvivesFirstOwnerStopping(t *testing.T) {
 	regA, err := New(stateStore, &spyLogger{}, 0, logger)
 	require.NoError(t, err, "registrar A must be created")
 	require.NoError(t, regA.Start(), "registrar A must start")
+	t.Cleanup(regA.Stop)
 	regB, err := New(stateStore, &spyLogger{}, 0, logger)
 	require.NoError(t, err, "registrar B must be created")
 	require.NoError(t, regB.Start(), "registrar B must start")
+	t.Cleanup(regB.Stop)
 
 	fileA.Offset = 5000
 	regA.Channel <- []file.State{fileA}

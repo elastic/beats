@@ -352,7 +352,7 @@ The response body returned upon success.
 
 ### `options_headers` [_options_headers]
 
-A set of response headers to add to the response for OPTIONS requests. Headers with the same canonical MIME header name will be replaced with the values in this configuration.
+A set of response headers to add to the response for OPTIONS requests. Headers with the same canonical MIME header name will be replaced with the values in this configuration. The `options_headers` option must be non-empty if set.
 
 
 ### `options_response_code` [_options_response_code]

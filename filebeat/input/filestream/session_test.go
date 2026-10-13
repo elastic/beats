@@ -295,6 +295,60 @@ func TestHarvestSession_Close(t *testing.T) {
 	})
 }
 
+func TestHarvestSession_TrackSource(t *testing.T) {
+	assert.NotPanics(t, func() {
+		(&harvestSession{}).TrackSource(fileSource{})
+	})
+
+	tbl := newFileStateTable()
+	h := tbl.NewHandle()
+	s := &harvestSession{harvesterState: h}
+
+	s.TrackSource(notAFileSource{})
+	assert.Empty(t, tbl.entries, "a non-file source must not list the session")
+
+	s.TrackSource(fileSource{fileID: "fingerprint::new", desc: completeDesc("sum")})
+	assert.Same(t, h, tbl.entries["fingerprint::new"], "the session must be listed under the source's identity")
+	assert.Equal(t, "sum", h.FingerprintSum(), "the entry must take the source's descriptor")
+}
+
+// TestHarvestSession_TrackSourceCarriesDescriptor reproduces a migration that
+// lands while OpenSession is still running. The scanner's UpdateDescriptor
+// under the new key finds no entry, so TrackSource must deliver the completed
+// fingerprint.
+func TestHarvestSession_TrackSourceCarriesDescriptor(t *testing.T) {
+	inp := testFilestream(t, closerConfig{Reader: readerCloserConfig{OnEOF: true}})
+	inp.includeFileFingerprint = true
+	inp.harvesterState = newFileStateTable()
+
+	oldSrc := tempFileSource(t, "first line\nsecond line\n")
+	oldSrc.fileID = "fingerprint::short"
+	oldSrc.desc.Fingerprint = loginp.FingerprintID{Raw: "deadbeef"}
+	newSrc := oldSrc
+	newSrc.fileID = "fingerprint::full"
+	newSrc.desc.Fingerprint = completeFP("full-sum")
+
+	s := mustOpenSession(t, inp, oldSrc, "id", testMetrics(t))
+	assert.Empty(t, inp.harvesterState.entries, "OpenSession must not list the file under its possibly stale identity")
+
+	inp.harvesterState.UpdateDescriptor(newSrc.Name(), newSrc.desc)
+	s.TrackSource(newSrc)
+
+	assert.Equal(t, "full-sum", s.harvesterState.FingerprintSum(),
+		"TrackSource must carry the completed fingerprint")
+
+	pub := &countingPublisher{}
+	verdict, err := s.ReadSlice(backgroundCtx(), pub)
+	require.NoError(t, err)
+	assert.Equal(t, loginp.SliceDone, verdict, "close.on_eof must end the slice")
+	assert.Len(t, pub.events, 2, "both lines must be published")
+	for _, e := range pub.events {
+		fp, err := e.Fields.GetValue("log.file.fingerprint")
+		assert.NoError(t, err, "every event after the migration must carry log.file.fingerprint")
+		assert.Equal(t, "full-sum", fp, "events must carry the completed fingerprint")
+	}
+}
+
 // --- OpenSession & Test -------------------------------------------------
 
 func TestFilestream_OpenSession_NotFileSource(t *testing.T) {
@@ -319,17 +373,11 @@ func TestFilestream_OpenSession_OpenError(t *testing.T) {
 // their progress can't be represented by a plain offset/size comparison.
 func TestFilestream_OpenSession_HarvesterOffsetMetric(t *testing.T) {
 	t.Run("registers, updates, and cleans up the offset", func(t *testing.T) {
-		path := writeTempFile(t, "a\nbc\n")
-		fi, err := os.Stat(path)
-		require.NoError(t, err)
 		inp := testFilestream(t, closerConfig{Reader: readerCloserConfig{OnEOF: true}})
 		metrics := testMetrics(t)
-		src := fileSource{newPath: path, fileID: "id", desc: loginp.FileDescriptor{Info: file.ExtendFileInfo(fi)}}
+		src := tempFileSource(t, "a\nbc\n")
 
-		sess, err := inp.OpenSession(backgroundCtx(), src, "harvester-id", loginp.NewCursorForTest("id", 0, 0), metrics)
-		require.NoError(t, err)
-		s, ok := sess.(*harvestSession)
-		require.True(t, ok)
+		s := mustOpenSession(t, inp, src, "harvester-id", metrics)
 		require.NotNil(t, s.metricsOffset, "a non-GZIP source must register an offset")
 		require.Zero(t, s.metricsOffset.Load())
 
@@ -349,18 +397,12 @@ func TestFilestream_OpenSession_HarvesterOffsetMetric(t *testing.T) {
 	})
 
 	t.Run("GZIP sources are excluded", func(t *testing.T) {
-		path := writeTempFile(t, "a\n")
-		fi, err := os.Stat(path)
-		require.NoError(t, err)
 		inp := testFilestream(t, closerConfig{})
 		metrics := testMetrics(t)
-		src := fileSource{newPath: path, fileID: "id", desc: loginp.FileDescriptor{GZIP: true, Info: file.ExtendFileInfo(fi)}}
+		src := tempFileSource(t, "a\n")
+		src.desc.GZIP = true
 
-		sess, err := inp.OpenSession(backgroundCtx(), src, "gzip-id", loginp.NewCursorForTest("id", 0, 0), metrics)
-		require.NoError(t, err)
-		defer sess.Close()
-		s, ok := sess.(*harvestSession)
-		require.True(t, ok)
+		s := mustOpenSession(t, inp, src, "gzip-id", metrics)
 		assert.Nil(t, s.metricsOffset)
 		assert.Nil(t, s.cleanupMetricsOffset)
 	})
@@ -405,10 +447,7 @@ func TestFilestream_Test(t *testing.T) {
 	})
 
 	t.Run("valid source passes", func(t *testing.T) {
-		path := writeTempFile(t, "line\n")
-		fi, err := os.Stat(path)
-		require.NoError(t, err)
-		src := fileSource{newPath: path, fileID: "id", desc: loginp.FileDescriptor{Info: file.ExtendFileInfo(fi)}}
+		src := tempFileSource(t, "line\n")
 		require.NoError(t, inp.Test(src, input.TestContext{Logger: logp.NewNopLogger(), Cancelation: context.Background()}))
 	})
 }
@@ -436,11 +475,23 @@ func backgroundCtx() input.Context {
 	return input.Context{Logger: logp.NewNopLogger(), Cancelation: context.Background()}
 }
 
-func writeTempFile(t *testing.T, content string) string {
+func mustOpenSession(t *testing.T, inp *filestream, src fileSource, id string, metrics *loginp.Metrics) *harvestSession {
+	t.Helper()
+	sess, err := inp.OpenSession(backgroundCtx(), src, id, loginp.NewCursorForTest(id, 0, 0), metrics)
+	require.NoError(t, err)
+	t.Cleanup(func() { _ = sess.Close() })
+	s, ok := sess.(*harvestSession)
+	require.Truef(t, ok, "Got %T instead of *harvestSession", sess)
+	return s
+}
+
+func tempFileSource(t *testing.T, content string) fileSource {
 	t.Helper()
 	path := filepath.Join(t.TempDir(), "test.log")
 	require.NoError(t, os.WriteFile(path, []byte(content), 0o644))
-	return path
+	fi, err := os.Stat(path)
+	require.NoError(t, err)
+	return fileSource{newPath: path, fileID: "id", desc: loginp.FileDescriptor{Info: file.ExtendFileInfo(fi)}}
 }
 
 // newPollSession builds a harvestSession over a real file with its offset at the
@@ -448,22 +499,16 @@ func writeTempFile(t *testing.T, content string) string {
 func newPollSession(t *testing.T, closer closerConfig, content string) *harvestSession {
 	t.Helper()
 	inp := testFilestream(t, closer)
-	path := writeTempFile(t, content)
-	rawFile, err := file.ReadOpen(path)
+	src := tempFileSource(t, content)
+	rawFile, err := file.ReadOpen(src.newPath)
 	require.NoError(t, err)
 	t.Cleanup(func() { rawFile.Close() })
 	f, err := inp.newFile(rawFile)
 	require.NoError(t, err)
-	fi, err := os.Stat(path)
-	require.NoError(t, err)
 	return &harvestSession{
-		inp: inp,
-		log: logp.NewNopLogger(),
-		src: fileSource{
-			newPath: path,
-			fileID:  "id",
-			desc:    loginp.FileDescriptor{Info: file.ExtendFileInfo(fi)},
-		},
+		inp:        inp,
+		log:        logp.NewNopLogger(),
+		src:        src,
 		file:       f,
 		metrics:    testMetrics(t),
 		state:      state{Offset: int64(len(content))},

@@ -126,7 +126,10 @@ func (c *config) Validate() error {
 	if c.ResponseCode < 100 || c.ResponseCode > 999 {
 		return fmt.Errorf("response_code must be a valid HTTP status code: %d", c.ResponseCode)
 	}
-	if len(c.OptionsHeaders) > 0 && (c.OptionsStatus < 100 || 999 < c.OptionsStatus) {
+	if c.OptionsHeaders != nil && len(c.OptionsHeaders) == 0 {
+		return fmt.Errorf("options_headers must be non-empty if configured")
+	}
+	if c.OptionsHeaders != nil && (c.OptionsStatus < 100 || 999 < c.OptionsStatus) {
 		return fmt.Errorf("options_response_code must be a valid HTTP status code: %d", c.OptionsStatus)
 	}
 

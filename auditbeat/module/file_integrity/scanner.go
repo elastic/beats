@@ -52,9 +52,9 @@ type scanner struct {
 // NewFileSystemScanner creates a new EventProducer instance that scans the
 // configured file paths. Files and directories in new paths are recorded with
 // the action `found`.
-func NewFileSystemScanner(c Config, newPathsInConfig map[string]struct{}) (EventProducer, error) {
+func NewFileSystemScanner(c Config, newPathsInConfig map[string]struct{}, logger *logp.Logger) (EventProducer, error) {
 	return &scanner{
-		log:      logp.NewLogger(moduleName).With("scanner_id", atomic.AddUint32(&scannerID, 1)),
+		log:      logger.Named(moduleName).With("scanner_id", atomic.AddUint32(&scannerID, 1)),
 		config:   c,
 		newPaths: newPathsInConfig,
 		eventC:   make(chan Event, 1),

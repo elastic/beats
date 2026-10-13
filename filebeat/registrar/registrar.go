@@ -19,6 +19,7 @@ package registrar
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -32,6 +33,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
+
+// ErrStopped is returned by Start when the registrar was already stopped, so
+// callers do not build inputs on a registrar that will never run.
+var ErrStopped = errors.New("registrar stopped")
 
 // Registrar is one owner's handle onto the registrar shared by every owner
 // whose state store resolves to the same backend key. States sent on Channel
@@ -51,7 +56,12 @@ type Registrar struct {
 	shared  *sharedRegistrar
 	release func()
 
-	state    atomic.Int32
+	// The registrar is started lazily by the first V1 input to be created, which
+	// cannot know whether another already did. startOnce makes Start safe to
+	// call repeatedly; startErr is kept so every call reports a failed start.
+	startOnce sync.Once
+	startErr  error
+
 	done     chan struct{}
 	stopOnce sync.Once
 	wg       sync.WaitGroup
@@ -61,19 +71,6 @@ type successLogger interface {
 	Published(n int) bool
 }
 
-// Registrar handle lifecycle. A handle is started only once it holds a
-// reference to the shared registrar, so Stop can rely on release being set.
-const (
-	handleIdle int32 = iota
-	handleStarting
-	handleStarted
-)
-
-// update is one message from an owner to the shared registrar. A nil states
-// slice with a non-nil flushed channel requests a commit; flushed is closed
-// once every state received before it has been persisted and acknowledged.
-// leaving marks the owner's final flush: its harvesters are stopped, so every
-// state it ever reported is marked finished before the commit.
 type update struct {
 	states  []file.State
 	owner   *Registrar
@@ -95,9 +92,7 @@ type sharedRegistrar struct {
 	// nanoseconds. Zero or less commits after every update.
 	flushTimeout atomic.Int64
 
-	// pending counts states applied but not yet committed, per owner.
-	pending map[*Registrar]int
-	// owned records the state IDs each active owner has reported.
+	pending      map[*Registrar]int
 	owned        map[*Registrar]map[string]struct{}
 	flushWaiters []chan struct{}
 
@@ -147,66 +142,68 @@ func (r *Registrar) GetStates() []file.State {
 }
 
 // Start joins or creates the shared registrar for this owner's backend key and
-// begins forwarding states from Channel to it. Start may be called once, and
-// not after Stop.
+// begins forwarding states from Channel to it. It is called when a V1 input is
+// created (see input.RunnerFactory.Create), and is safe to call any number of
+// times: only the first call does anything. If that first start fails, every
+// later call returns the same error, and after Stop every call returns
+// ErrStopped.
 func (r *Registrar) Start() error {
-	select {
-	case <-r.done:
-		return fmt.Errorf("registrar already stopped")
-	default:
-	}
-	if !r.state.CompareAndSwap(handleIdle, handleStarting) {
-		return fmt.Errorf("registrar already started")
-	}
+	r.startOnce.Do(func() {
+		key := r.stateStore.StoreKey("", "")
+		shared, release, err := sharedRegistrars.Acquire(
+			key,
+			func() (*sharedRegistrar, error) {
+				return openShared(r.stateStore, r.flushTimeout, r.log)
+			},
+			func(ctx context.Context, s *sharedRegistrar) { s.run(ctx) },
+			func() { r.log.Debugf("Waiting for shared registrar %q to initialize", key) },
+			func() { r.log.Debugf("Joining shared registrar %q", key) },
+		)
+		if err != nil {
+			r.startErr = fmt.Errorf("error loading state: %w", err)
+			return
+		}
+		r.shared = shared
+		r.release = release
 
-	key := r.stateStore.StoreKey("", "")
-	shared, release, err := sharedRegistrars.Acquire(
-		key,
-		func() (*sharedRegistrar, error) {
-			return openShared(r.stateStore, r.flushTimeout, r.log)
-		},
-		func(ctx context.Context, s *sharedRegistrar) { s.run(ctx) },
-		func() { r.log.Debugf("Waiting for shared registrar %q to initialize", key) },
-		func() { r.log.Debugf("Joining shared registrar %q", key) },
-	)
-	if err != nil {
-		r.state.Store(handleIdle)
-		return fmt.Errorf("error loading state: %w", err)
-	}
-	r.shared = shared
-	r.release = release
-	r.state.Store(handleStarted)
+		effective, lowered := shared.lowerFlushTimeout(r.flushTimeout)
+		if effective != r.flushTimeout {
+			r.log.Debugf("Shared registrar %q flushes every %v, shorter than the configured %v", key, effective, r.flushTimeout)
+		}
+		if lowered {
+			flushed := make(chan struct{})
+			shared.updates <- update{owner: r, flushed: flushed}
+			<-flushed
+		}
+		r.log.Infof("States Loaded from registrar: %+v", shared.states.Count())
 
-	effective, lowered := shared.lowerFlushTimeout(r.flushTimeout)
-	if effective != r.flushTimeout {
-		r.log.Debugf("Shared registrar %q flushes every %v, shorter than the configured %v", key, effective, r.flushTimeout)
-	}
-	if lowered {
-		// Commit whatever is waiting on the previous, longer timeout.
-		flushed := make(chan struct{})
-		shared.updates <- update{owner: r, flushed: flushed}
-		<-flushed
-	}
-	r.log.Infof("States Loaded from registrar: %+v", shared.states.Count())
+		r.wg.Go(r.forward)
+	})
 
-	r.wg.Go(r.forward)
-	return nil
+	return r.startErr
 }
 
 // Stop flushes this owner's pending states, waits for their acknowledgement,
 // and leaves the shared registrar. The store is closed once the last owner
-// leaves.
+// leaves. It is safe to call more than once.
 func (r *Registrar) Stop() {
-	r.stopOnce.Do(func() {
-		r.log.Info("Stopping Registrar")
-		defer r.log.Info("Registrar stopped")
+	r.stopOnce.Do(r.stop)
+}
 
-		close(r.done)
-		r.wg.Wait()
-		if r.release != nil {
-			r.release()
-		}
-	})
+func (r *Registrar) stop() {
+	r.log.Info("Stopping Registrar")
+	defer r.log.Info("Registrar stopped")
+
+	// Claim startOnce so an input created concurrently with shutdown cannot
+	// start a registrar after this point. Start then reports ErrStopped
+	// instead of joining a shared registrar that is about to go away.
+	r.startOnce.Do(func() { r.startErr = ErrStopped })
+
+	close(r.done)
+	r.wg.Wait()
+	if r.release != nil {
+		r.release()
+	}
 }
 
 func (r *Registrar) forward() {

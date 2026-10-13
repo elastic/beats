@@ -25,6 +25,7 @@ import (
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
@@ -205,7 +206,7 @@ func TestPackageDatabaseMigration(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	bucket, err := datastore.OpenBucketWithMigration(bucketNameV2, testPaths(dataDir), migrateDatastoreSchema)
+	bucket, err := datastore.OpenBucketWithMigration(bucketNameV2, testPaths(dataDir), logptest.NewTestingLogger(t, ""), migrateDatastoreSchema)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -246,7 +247,7 @@ func TestPackageDatabaseMigrationWithEmptyPackageV1Bucket(t *testing.T) {
 
 	// Create empty package.v1 bucket and close it so the database is
 	// released before we reopen it via the migration path.
-	bucket, err := datastore.OpenBucket("package.v1", p)
+	bucket, err := datastore.OpenBucket("package.v1", p, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -254,7 +255,7 @@ func TestPackageDatabaseMigrationWithEmptyPackageV1Bucket(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	bucket, err = datastore.OpenBucketWithMigration(bucketNameV2, p, migrateDatastoreSchema)
+	bucket, err = datastore.OpenBucketWithMigration(bucketNameV2, p, logptest.NewTestingLogger(t, ""), migrateDatastoreSchema)
 	if err != nil {
 		t.Fatal(err)
 	}
