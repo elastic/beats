@@ -19483,11 +19483,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/microsoft/go-mssqldb
-Version: v1.11.0
+Version: v1.11.2
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/microsoft/go-mssqldb@v1.11.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/microsoft/go-mssqldb@v1.11.2/LICENSE.txt:
 
 Copyright (c) 2012 The Go Authors. All rights reserved.
 Copyright (c) Microsoft Corporation.
