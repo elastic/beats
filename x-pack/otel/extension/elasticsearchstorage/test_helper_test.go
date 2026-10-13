@@ -11,7 +11,6 @@ import (
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/component/componenttest"
 	"go.opentelemetry.io/collector/config/configauth"
-	"go.opentelemetry.io/collector/config/configoptional"
 	"go.opentelemetry.io/collector/extension"
 
 	"github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension"
@@ -59,7 +58,7 @@ func newTestBeatsAuthenticator(
 
 func newTestStorageConfig(authenticatorID component.ID) *Config {
 	return &Config{
-		Auth: configoptional.Some(configauth.Config{AuthenticatorID: authenticatorID}),
+		Auth: configauth.Config{AuthenticatorID: authenticatorID},
 	}
 }
 

@@ -9,7 +9,6 @@ import (
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/config/configauth"
-	"go.opentelemetry.io/collector/config/configoptional"
 )
 
 var errMissingAuthenticator = errors.New("an Elasticsearch authenticator must be configured")
@@ -25,7 +24,7 @@ func createDefaultConfig() component.Config {
 }
 
 func (c *Config) Validate() error {
-	if !c.Auth.HasValue() {
+	if c.Auth.AuthenticatorID == (component.ID{}) {
 		return errMissingAuthenticator
 	}
 	return nil
