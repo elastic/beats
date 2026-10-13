@@ -61,6 +61,10 @@ func New(b *beat.Beat, log *logp.Logger) *Publisher {
 }
 
 func (p *Publisher) Configure(inputs []config.InputConfig) error {
+	// Policy replacement must invalidate delayed profiles even while a result
+	// publication holds mx. Repeat after acquiring it in case another Configure
+	// installed a lease while this call waited.
+	p.retireScheduledProfileSink()
 	p.mx.Lock()
 	defer p.mx.Unlock()
 	// Retire delayed profiles even when all inputs have been removed, before

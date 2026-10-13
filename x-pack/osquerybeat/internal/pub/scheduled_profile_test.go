@@ -102,3 +102,31 @@ func TestScheduledProfileSinkRetiresOnPublisherClose(t *testing.T) {
 	p.Close()
 	assert.False(t, sink.Valid(), "publisher shutdown must retire retained profile leases")
 }
+
+func TestScheduledProfileSinkRetiresBeforeWaitingForResultPublication(t *testing.T) {
+	p := New(&beat.Beat{Publisher: &connectRecorder{}}, logptest.NewTestingLogger(t, "scheduled_profile"))
+	t.Cleanup(p.Close)
+	require.NoError(t, p.Configure(scheduledProfileInputs("default")), "configure the original profile lease")
+	sink := p.CaptureScheduledProfileSink("default")
+	require.NotNil(t, sink, "capture the original policy destination")
+	p.mx.Lock()
+	done := make(chan error, 1)
+	go func() { done <- p.Configure(nil) }()
+	retired := assert.Eventually(t, func() bool { return !sink.Valid() }, time.Second, time.Millisecond,
+		"policy removal must retire delayed profiles before waiting for a blocked result publication")
+	select {
+	case err := <-done:
+		t.Errorf("Configure should still wait for the result publisher mutex: %v", err)
+	default:
+	}
+	p.mx.Unlock()
+	if !retired {
+		t.Fatal("the previous policy lease remained active while configuration was blocked")
+	}
+	select {
+	case err := <-done:
+		assert.NoError(t, err, "policy removal should complete when result publication releases the mutex")
+	case <-time.After(time.Second):
+		t.Fatal("Configure did not finish after releasing the result publisher mutex")
+	}
+}
