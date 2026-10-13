@@ -6,6 +6,7 @@ package pub
 
 import (
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -27,6 +28,7 @@ type scheduledProfileSink struct {
 	mu        sync.Mutex
 	client    beat.Client
 	namespace string
+	retired   atomic.Bool
 }
 
 // CaptureScheduledProfileSink preserves the destination used by this result.
@@ -84,26 +86,40 @@ func (p *Publisher) retireScheduledProfileSink() {
 	p.scheduledProfileMissing = false
 	p.scheduledProfileMu.Unlock()
 	if sink != nil {
-		sink.mu.Lock()
-		client := sink.client
-		sink.client = nil
-		sink.mu.Unlock()
-		if client != nil {
-			_ = client.Close()
-		}
+		sink.retire()
 	}
 }
 
 func (s *scheduledProfileSink) Valid() bool {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return s.client != nil
+	return !s.retired.Load()
+}
+
+func (s *scheduledProfileSink) retire() {
+	s.retired.Store(true)
+	// Do not wait behind publication to invalidate this policy. The publisher
+	// owns closing its client if retirement overlaps an active call.
+	if s.mu.TryLock() {
+		defer s.mu.Unlock()
+		s.closeClient()
+	}
+}
+
+func (s *scheduledProfileSink) closeClient() {
+	if s.client != nil {
+		_ = s.client.Close()
+		s.client = nil
+	}
 }
 
 func (s *scheduledProfileSink) Publish(queryName, responseID, spaceID string, profile map[string]any) bool {
 	s.mu.Lock()
-	defer s.mu.Unlock()
-	if s.client == nil {
+	defer func() {
+		if s.retired.Load() {
+			s.closeClient()
+		}
+		s.mu.Unlock()
+	}()
+	if s.retired.Load() {
 		return false
 	}
 	s.client.Publish(beat.Event{
