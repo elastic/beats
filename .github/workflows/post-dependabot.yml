@@ -41,28 +41,3 @@ jobs:
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git commit -m "Update NOTICE.txt"
           git push
-<<<<<<< HEAD
-=======
-
-  manage-pr-reviewers:
-    permissions:
-      pull-requests: write
-      repository-projects: read
-    runs-on: ubuntu-latest
-    steps:
-      - name: Add reviewers (obs-signals-integrations-team) if PR has Team:Obs-InfraObs label
-        run: |
-          PR_NUMBER=$(gh pr list --repo ${{ github.repository }} --head ${{ github.ref_name }} --json number --jq '.[0].number')
-          
-          if [ -n "$PR_NUMBER" ] && [ "$PR_NUMBER" != "null" ]; then
-            echo "Found PR #$PR_NUMBER"
-            HAS_LABEL=$(gh pr view $PR_NUMBER --repo ${{ github.repository }} --json labels --jq '.labels[] | select(.name == "Team:Obs-InfraObs") | .name')
-            
-            if [ -n "$HAS_LABEL" ]; then
-              echo "PR #$PR_NUMBER has Team:Obs-InfraObs label, adding reviewer elastic/obs-signals-integrations-team"
-              gh pr edit $PR_NUMBER --repo ${{ github.repository }} --add-reviewer elastic/obs-signals-integrations-team
-            fi
-          fi
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
->>>>>>> 6965d3c (Replacing previous obs-infraobs-integrations team with new name (#53676))
