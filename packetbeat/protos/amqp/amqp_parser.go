@@ -151,13 +151,8 @@ Structure of a content header, according to official doc :
 
 func (amqp *amqpPlugin) decodeHeaderFrame(s *amqpStream, buf []byte) (ok, complete bool) {
 	if len(buf) < 14 {
-<<<<<<< HEAD
 		logp.Debug("amqp", "Header frame too small, waiting for mode data")
-		return true
-=======
-		amqp.amqpLogger.Debug("Header frame too small, waiting for more data")
 		return true, false
->>>>>>> aa643f9 (packetbeat/amqp: fix nil map panic and zero-body completion (#53491))
 	}
 	s.message.bodySize = binary.BigEndian.Uint64(buf[4:12])
 	debugf("Received Header frame. A message of %d bytes is expected", s.message.bodySize)
