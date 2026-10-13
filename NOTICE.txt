@@ -19521,11 +19521,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/microsoft/wmi
-Version: v0.44.0
+Version: v0.45.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/microsoft/wmi@v0.44.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/microsoft/wmi@v0.45.0/LICENSE:
 
     MIT License
 
