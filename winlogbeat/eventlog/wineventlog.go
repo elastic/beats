@@ -30,6 +30,7 @@ import (
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
+	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -374,7 +375,8 @@ func (l *winEventLog) Read() ([]Record, error) {
 		l.resetRenderNoEventRetry()
 		// Any successfully processed event breaks a previous gap retry streak.
 		l.resetGapRetry()
-		if l.filter != nil && !l.filter.match(&record.Event) {
+		if record == nil {
+			// Dropped by the filter. Checkpoint state was still advanced.
 			continue
 		}
 		records = append(records, *record)
@@ -479,11 +481,41 @@ func (l *winEventLog) handleProcessError(err error) error {
 	return nil
 }
 
+// systemRenderer is implemented by renderers that can render the cheap system
+// properties of an event separately from the rest of it.
+type systemRenderer interface {
+	RenderSystem(handle win.EvtHandle) (*winevent.Event, error)
+	RenderRemaining(handle win.EvtHandle, event *winevent.Event) (*winevent.Event, string, error)
+}
+
+// render renders the event and applies the filter. When the renderer supports
+// it, filtered events get only their system properties rendered, which is all
+// that checkpointing and gap detection need.
+// NOTE: Like EventRenderer.Render, this can return an error and a partial event.
+func (l *winEventLog) render(h win.EvtHandle) (evt *winevent.Event, xml string, filtered bool, err error) {
+	sr, ok := l.renderer.(systemRenderer)
+	if !ok || l.filter == nil {
+		evt, xml, err = l.renderer.Render(h)
+		return evt, xml, evt != nil && !l.filter.match(evt), err
+	}
+
+	evt, err = sr.RenderSystem(h)
+	if err != nil {
+		return nil, "", false, err
+	}
+	if !l.filter.match(evt) {
+		return evt, "", true, nil
+	}
+	evt, xml, err = sr.RenderRemaining(h, evt)
+	return evt, xml, false, err
+}
+
+// processHandle returns a nil record and nil error for events dropped by the
+// filter.
 func (l *winEventLog) processHandle(h win.EvtHandle) (*Record, error) {
 	defer h.Close()
 
-	// NOTE: Render can return an error and a partial event.
-	evt, xml, err := l.renderer.Render(h)
+	evt, xml, filtered, err := l.render(h)
 	if evt == nil {
 		return nil, l.newRenderNoEventError(h, err)
 	}
@@ -526,6 +558,9 @@ func (l *winEventLog) processHandle(h win.EvtHandle) (*Record, error) {
 		l.log.Warnw("Failed creating bookmark.", "error", err)
 	}
 	l.lastRead = r.Offset
+	if filtered {
+		return nil, nil
+	}
 	return r, nil
 }
 
