@@ -18,6 +18,8 @@ import (
 // A retired lease rejects publication, including after its namespace is reused.
 type ScheduledProfileSink interface {
 	Valid() bool
+	// Publish returns whether the lease accepted this publication attempt.
+	// Queue admission remains best effort; dropped.output_full records losses.
 	Publish(queryName, responseID, spaceID string, profile map[string]any) bool
 }
 
