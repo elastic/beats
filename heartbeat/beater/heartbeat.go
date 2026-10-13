@@ -30,11 +30,11 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
+	"github.com/elastic/beats/v7/heartbeat/hbscheduler"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	hbrunner "github.com/elastic/beats/v7/heartbeat/reload"
-	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	_ "github.com/elastic/beats/v7/heartbeat/security"
 	"github.com/elastic/beats/v7/heartbeat/tracer"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
@@ -51,8 +51,14 @@ type Heartbeat struct {
 	done     chan struct{}
 	stopOnce sync.Once
 	// config is used for iterating over elements of the config.
-	config             *config.Config
-	scheduler          *scheduler.Scheduler
+	config *config.Config
+	// The scheduler is acquired by Run, as it may be shared with the other
+	// Heartbeat instances in this process that use the same scheduler group, see
+	// hbscheduler.Acquire. Acquiring it any earlier would pin it for Heartbeats
+	// that are created but never run.
+	schedulerGroup     string
+	schedulerParams    hbscheduler.Params
+	stateLoader        monitorstate.StateLoader
 	monitorReloader    *cfgfile.Reloader
 	monitorFactory     cfgfile.RunnerFactory
 	autodiscover       *autodiscover.Autodiscover
@@ -63,8 +69,24 @@ type Heartbeat struct {
 	logger                   *logp.Logger
 }
 
-// New creates a new heartbeat.
+// New creates a new heartbeat in the default scheduler group. That is what a
+// Heartbeat process wants, as it is the only Heartbeat instance in the process.
 func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
+	return newHeartbeat(b, rawConfig, "")
+}
+
+// NewWithSchedulerGroup creates Heartbeats that share one scheduler, and
+// therefore one set of concurrency limits, with every other Heartbeat in this
+// process created for the same schedulerGroup. It exists for hosts that run
+// several Heartbeat instances in a single process, such as the Heartbeat OTel
+// receiver. An empty schedulerGroup behaves like New.
+func NewWithSchedulerGroup(schedulerGroup string) beat.Creator {
+	return func(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
+		return newHeartbeat(b, rawConfig, schedulerGroup)
+	}
+}
+
+func newHeartbeat(b *beat.Beat, rawConfig *conf.C, schedulerGroup string) (beat.Beater, error) {
 	logger := b.Info.Logger
 
 	parsedConfig := config.DefaultConfig(logger)
@@ -119,29 +141,21 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	}
 	jobConfig := parsedConfig.Jobs
 
-	sched := scheduler.Create(limit, hbregistry.SchedulerRegistry, location, jobConfig, parsedConfig.RunOnce, logger)
-
-	pipelineClientFactory := func(p beat.Pipeline) (beat.Client, error) {
-		return p.Connect()
-	}
-
 	bt := &Heartbeat{
-		done:               make(chan struct{}),
-		config:             parsedConfig,
-		scheduler:          sched,
+		done:           make(chan struct{}),
+		config:         parsedConfig,
+		schedulerGroup: schedulerGroup,
+		schedulerParams: hbscheduler.Params{
+			Limit:          limit,
+			Registry:       hbregistry.SchedulerRegistry,
+			Location:       location,
+			JobLimitByType: jobConfig,
+			RunOnce:        parsedConfig.RunOnce,
+		},
+		stateLoader:        stateLoader,
 		replaceStateLoader: replaceStateLoader,
-		// monitorFactory is the factory used for creating all monitor instances,
-		// wiring them up to everything needed to actually execute.
-		monitorFactory: monitors.NewFactory(monitors.FactoryParams{
-			BeatInfo:              b.Info,
-			AddTask:               sched.Add,
-			StateLoader:           stateLoader,
-			PluginsReg:            plugin.GlobalPluginsReg,
-			PipelineClientFactory: pipelineClientFactory,
-			BeatRunFrom:           parsedConfig.RunFrom,
-		}),
-		trace:  trace,
-		logger: logger,
+		trace:              trace,
+		logger:             logger,
 	}
 	runFromID := "<unknown location>"
 	if parsedConfig.RunFrom != nil {
@@ -170,6 +184,25 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	groups, _ := syscall.Getgroups()
 	bt.logger.Infof("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
 
+	sched, releaseSched, err := hbscheduler.Acquire(bt.logger, bt.schedulerGroup, bt.schedulerParams)
+	if err != nil {
+		return err
+	}
+	defer releaseSched()
+
+	// monitorFactory is the factory used for creating all monitor instances,
+	// wiring them up to everything needed to actually execute.
+	bt.monitorFactory = monitors.NewFactory(monitors.FactoryParams{
+		BeatInfo:    b.Info,
+		AddTask:     sched.Add,
+		StateLoader: bt.stateLoader,
+		PluginsReg:  plugin.GlobalPluginsReg,
+		PipelineClientFactory: func(p beat.Pipeline) (beat.Client, error) {
+			return p.Connect()
+		},
+		BeatRunFrom: bt.config.RunFrom,
+	})
+
 	if bt.otelStatusFactoryWrapper != nil {
 		bt.monitorFactory = bt.otelStatusFactoryWrapper(bt.monitorFactory)
 	}
@@ -186,7 +219,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	defer stopStaticMonitors()
 
 	if bt.config.RunOnce {
-		waitMonitors.Add(monitors.WithLog(bt.scheduler.WaitForRunOnce, "Ending run_once run.", bt.logger))
+		waitMonitors.Add(monitors.WithLog(sched.WaitForRunOnce, "Ending run_once run.", bt.logger))
 	}
 
 	if b.Manager.Enabled() {
@@ -217,8 +250,6 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		bt.autodiscover.Start()
 		defer bt.autodiscover.Stop()
 	}
-
-	defer bt.scheduler.Stop()
 
 	// Wait until run_once ends or bt is being shut down
 	waitMonitors.AddChan(bt.done)
