@@ -184,6 +184,29 @@ func (p *ConfigPlugin) LookupQueryProfile(name string) bool {
 	return false
 }
 
+// scheduledProfileMatches rejects work captured before a policy or namespace
+// replacement. Pending policy changes take effect for profiling immediately,
+// while result query metadata retains its existing native-refresh behavior.
+func (p *ConfigPlugin) scheduledProfileMatches(request scheduledProfileRequest) bool {
+	p.mx.RLock()
+	defer p.mx.RUnlock()
+	namespace, ok := p.namespaces[request.name]
+	if !ok || namespace != request.namespace {
+		return false
+	}
+	query, ok := p.queryInfoMap[request.name]
+	if !ok || query.Query != request.query || query.SpaceID != request.spaceID {
+		return false
+	}
+	if p.newQueryInfoMap != nil {
+		query, ok = p.newQueryInfoMap[request.name]
+		if !ok || query.Query != request.query || query.SpaceID != request.spaceID {
+			return false
+		}
+	}
+	return query.Profile
+}
+
 // GlobalProfileEnabled returns the fleet-wide profiling default applied to queries
 // that do not set their own profile override (notably live ad-hoc queries).
 func (p *ConfigPlugin) GlobalProfileEnabled() bool {
