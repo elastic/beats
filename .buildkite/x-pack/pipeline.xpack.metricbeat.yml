@@ -107,7 +107,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -134,7 +134,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -161,7 +161,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -190,7 +190,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -223,7 +223,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -252,7 +252,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -287,7 +287,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
           - elastic/vault-secrets#v0.1.0:
 # We are temporarily using the Production CFT environment API key instead of the
@@ -326,7 +326,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -353,7 +353,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -380,7 +380,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -412,7 +412,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -439,7 +439,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -466,7 +466,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -502,7 +502,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
           # See https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/beats/01-aws-buildkite-oidc.tf
           - elastic/oblt-aws-auth#v0.2.0:

@@ -49,7 +49,7 @@ common:
       test-collector#v1.11.0:
         files: "heartbeat/build/TEST-*.xml"
         format: "junit"
-        branches: "main"
+        branches: "^main$"
         debug: true
 
 steps:

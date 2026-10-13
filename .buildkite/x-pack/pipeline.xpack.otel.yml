@@ -86,7 +86,7 @@ steps:
           - test-collector#v1.11.0:
               files: "x-pack/otel/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
