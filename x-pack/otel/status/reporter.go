@@ -77,7 +77,14 @@ func (r *reporter) updateStatusForRunner(id string, state status.Status, msg str
 	if r.runnerStates == nil {
 		r.runnerStates = make(map[string]*runnerState)
 	}
-	if rState, ok := r.runnerStates[id]; ok {
+	if state == status.Stopped {
+		// A stopped runner was removed or is being replaced, a stale entry
+		// would keep reporting its last status.
+		if _, ok := r.runnerStates[id]; !ok {
+			return
+		}
+		delete(r.runnerStates, id)
+	} else if rState, ok := r.runnerStates[id]; ok {
 		rState.msg = msg
 		rState.state = state
 	} else {

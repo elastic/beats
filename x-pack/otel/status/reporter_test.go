@@ -166,3 +166,31 @@ func TestGroupStatusHasNoInputStatuses(t *testing.T) {
 	_, ok = m.GetEvent().Attributes().Get(InputStatusAttributesKey)
 	assert.False(t, ok, "expected the group status event to carry no input statuses")
 }
+
+func TestStoppedRunnerIsRemoved(t *testing.T) {
+	m := &oteltest.MockHost{}
+	reporter := NewGroupStatusReporter(m)
+	healthy := reporter.GetReporterForRunner("healthy")
+	removed := reporter.GetReporterForRunner("removed")
+
+	healthy.UpdateStatus(status.Running, "")
+	removed.UpdateStatus(status.Failed, "invalid config")
+	require.Equal(t, componentstatus.StatusPermanentError, m.GetEvent().Status(), "a failed runner fails the group")
+
+	removed.UpdateStatus(status.Stopped, "")
+
+	evt := m.GetEvent()
+	assert.Equal(t, componentstatus.StatusOK, evt.Status(), "a removed runner must not keep the group failed")
+	inputs, ok := evt.Attributes().Get(InputStatusAttributesKey)
+	require.True(t, ok, "expected 'inputs' attribute to exist")
+	_, ok = inputs.Map().Get("removed")
+	assert.False(t, ok, "a stopped runner must not be reported")
+	_, ok = inputs.Map().Get("healthy")
+	assert.True(t, ok, "other runners must still be reported")
+
+	t.Run("stopping an unknown runner reports nothing", func(t *testing.T) {
+		before := len(m.GetEvents())
+		reporter.GetReporterForRunner("unknown").UpdateStatus(status.Stopped, "")
+		assert.Len(t, m.GetEvents(), before, "no report expected")
+	})
+}
