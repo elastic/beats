@@ -17,11 +17,11 @@ var errMissingAuthenticator = errors.New("an Elasticsearch authenticator must be
 type Config struct {
 	// Auth identifies the Elasticsearch authenticator that provides the
 	// destination endpoints and authenticated HTTP transport.
-	Auth configoptional.Optional[configauth.Config] `mapstructure:"auth"`
+	Auth configauth.Config `mapstructure:"auth"`
 }
 
 func createDefaultConfig() component.Config {
-	return &Config{Auth: configoptional.None[configauth.Config]()}
+	return &Config{}
 }
 
 func (c *Config) Validate() error {

@@ -66,7 +66,7 @@ func TestElasticStorage_Access_Concurrent_Race(t *testing.T) {
 			ctx,
 			storageTestHost{authenticatorID: authenticator},
 		),
-		"storage must start with Elasticsearch authentication",
+		"storage must start with beatsauth authentication",
 	)
 	t.Cleanup(func() { _ = ext.Shutdown(context.Background()) })
 
