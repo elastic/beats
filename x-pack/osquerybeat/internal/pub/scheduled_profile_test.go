@@ -5,6 +5,7 @@
 package pub
 
 import (
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -128,5 +129,51 @@ func TestScheduledProfileSinkRetiresBeforeWaitingForResultPublication(t *testing
 		assert.NoError(t, err, "policy removal should complete when result publication releases the mutex")
 	case <-time.After(time.Second):
 		t.Fatal("Configure did not finish after releasing the result publisher mutex")
+	}
+}
+
+type stalledScheduledProfileClient struct {
+	entered, release chan struct{}
+	closed           atomic.Bool
+}
+
+func (c *stalledScheduledProfileClient) Publish(beat.Event) {
+	close(c.entered)
+	<-c.release
+}
+func (c *stalledScheduledProfileClient) PublishAll(events []beat.Event) {
+	for _, event := range events {
+		c.Publish(event)
+	}
+}
+func (c *stalledScheduledProfileClient) Close() error { c.closed.Store(true); return nil }
+
+func TestScheduledProfileLeaseInvalidationDoesNotWaitForPublication(t *testing.T) {
+	client := &stalledScheduledProfileClient{entered: make(chan struct{}), release: make(chan struct{})}
+	sink := &scheduledProfileSink{client: client, namespace: "default"}
+	done := make(chan bool, 1)
+	go func() { done <- sink.Publish("scheduled", "response", "", nil) }()
+	select {
+	case <-client.entered:
+	case <-time.After(time.Second):
+		t.Fatal("profile publication did not enter the stalled client")
+	}
+	retired := make(chan struct{})
+	go func() { sink.retire(); close(retired) }()
+	select {
+	case <-retired:
+		assert.False(t, sink.Valid(), "lease validity must not wait behind an active publication")
+		assert.False(t, client.closed.Load(), "the active publisher should own final client closure")
+	case <-time.After(time.Second):
+		close(client.release)
+		t.Fatal("lease invalidation waited for stalled publication")
+	}
+	close(client.release)
+	select {
+	case ok := <-done:
+		assert.True(t, ok, "the original publication attempt entered the pipeline before retirement")
+		assert.True(t, client.closed.Load(), "finishing the active publication should close the retired client without a detached goroutine")
+	case <-time.After(time.Second):
+		t.Fatal("the released publisher did not finish and close its retired client")
 	}
 }
