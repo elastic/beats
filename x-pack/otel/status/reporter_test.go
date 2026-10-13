@@ -36,7 +36,7 @@ func TestGroupStatus(t *testing.T) {
 	subReporter3.UpdateStatus(status.Degraded, "Degrade Runner3")
 	subReporter2.UpdateStatus(status.Failed, "Failed Runner2")
 
-	require.Equalf(t, componentstatus.StatusPermanentError, m.GetEvent().Status(), "expected StatusPermanentError, got %v", m.GetEvent().Status())
+	require.Equalf(t, componentstatus.StatusRecoverableError, m.GetEvent().Status(), "a failed runner degrades the group, got %v", m.GetEvent().Status())
 	require.Error(t, m.GetEvent().Err(), "expected non-nil error, got nil")
 	require.Equalf(t, "Failed Runner2", m.GetEvent().Err().Error(), "expected 'Failed Runner1', got %v", m.GetEvent().Err())
 
@@ -155,7 +155,7 @@ func TestStoppedRunnerIsRemoved(t *testing.T) {
 
 	healthy.UpdateStatus(status.Running, "")
 	removed.UpdateStatus(status.Failed, "invalid config")
-	require.Equal(t, componentstatus.StatusPermanentError, m.GetEvent().Status(), "a failed runner fails the group")
+	require.Equal(t, componentstatus.StatusRecoverableError, m.GetEvent().Status(), "a failed runner degrades the group")
 
 	removed.UpdateStatus(status.Stopped, "")
 

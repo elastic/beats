@@ -149,9 +149,10 @@ func (r *reporter) calculateAggregateState() (status.Status, string) {
 				reportedMsg = s.msg
 			}
 		case status.Failed:
-			// we've encountered a failed runner.
-			// short-circuit and return, as Failed state takes precedence over other states
-			return s.state, s.msg
+			// A failed runner takes precedence over the others, but the receiver
+			// keeps running them, so it is degraded. A permanent error would be
+			// final: the collector never lets a component recover from it.
+			return status.Degraded, s.msg
 		default:
 		}
 	}
