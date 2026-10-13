@@ -157,7 +157,11 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement v1.1.1
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor v0.11.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.2.0
+<<<<<<< HEAD
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.8.0
+=======
+	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.8.2
+>>>>>>> ba33d24 (build(deps): bump github.com/Azure/azure-sdk-for-go/sdk/storage/azblob from 1.8.1 to 1.8.2 (#53712))
 	github.com/Azure/azure-storage-blob-go v0.15.0
 	github.com/aerospike/aerospike-client-go/v7 v7.7.1
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.20.1
@@ -254,6 +258,29 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.47.0
 	go.uber.org/goleak v1.3.0
 	sigs.k8s.io/kind v0.29.0
+<<<<<<< HEAD
+=======
+	www.velocidex.com/golang/go-ntfs v0.2.1-0.20250322152626-3c09d909d740
+	www.velocidex.com/golang/regparser v0.0.0-20250203141505-31e704a67ef7
+)
+
+require (
+	github.com/Azure/azure-sdk-for-go/sdk/storage/internal v0.1.0 // indirect
+	github.com/brunoscheufler/aws-ecs-metadata-go v0.0.0-20221221133751-67e37ae746cd // indirect
+	github.com/cenkalti/backoff/v7 v7.0.0 // indirect
+	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
+	github.com/go-openapi/swag/pools v0.28.0 // indirect
+	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
+	github.com/hashicorp/go-hclog v1.6.3 // indirect
+	go.opentelemetry.io/contrib/detectors/aws/ecs v1.45.0 // indirect
+	go.opentelemetry.io/contrib/detectors/aws/eks v1.45.0 // indirect
+	go.opentelemetry.io/contrib/detectors/azure/azurevm v0.17.0 // indirect
+	go.opentelemetry.io/contrib/detectors/gcp v1.45.0 // indirect
+	go.opentelemetry.io/contrib/propagators/autoprop v0.70.0 // indirect
+	go.opentelemetry.io/contrib/propagators/aws v1.45.0 // indirect
+	go.opentelemetry.io/contrib/propagators/jaeger v1.45.0 // indirect
+	go.opentelemetry.io/contrib/propagators/ot v1.45.0 // indirect
+>>>>>>> ba33d24 (build(deps): bump github.com/Azure/azure-sdk-for-go/sdk/storage/azblob from 1.8.1 to 1.8.2 (#53712))
 )
 
 require (
