@@ -23,8 +23,7 @@ type statusFactory struct {
 func (s *statusFactory) Create(p beat.PipelineConnector, config *config.C) (cfgfile.Runner, error) {
 	runner, err := s.factory.Create(p, config)
 	if err != nil {
-		// There is no runner to report on its own, so mark its input as failed.
-		// Otherwise a caller that skips the failed input would hide it.
+		// Report the failure, a caller may skip this input.
 		if inputId, idErr := getInputId(config); idErr == nil {
 			s.reporter.GetReporterForRunner(inputId).UpdateStatus(status.Failed, err.Error())
 		}
