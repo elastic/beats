@@ -44,24 +44,25 @@ type osqueryRunFunc func(ctx context.Context, flags osqd.Flags, extensions confi
 // Run manages osqueryd lifecycle and keeps configuration updates responsive during recovery.
 func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) error {
 	var (
-		latest      []config.InputConfig
-		flags       osqd.Flags
-		extensions  config.ExtensionsConfig
-		logLevel    zapcore.Level
-		cancel      context.CancelFunc
-		completed   <-chan error
-		inputs      chan []config.InputConfig
-		pending     []config.InputConfig
-		havePending bool
-		stopping    bool
-		recovering  bool
-		ready       <-chan time.Time
-		readyAt     time.Time
-		exited      <-chan time.Time
-		exitedAt    time.Time
-		retry       *time.Timer
-		retryCh     <-chan time.Time
-		retries     int
+		latest       []config.InputConfig
+		flags        osqd.Flags
+		extensions   config.ExtensionsConfig
+		logLevel     zapcore.Level
+		cancel       context.CancelFunc
+		completed    <-chan error
+		inputs       chan []config.InputConfig
+		pending      []config.InputConfig
+		havePending  bool
+		stopping     bool
+		recovering   bool
+		ready        <-chan time.Time
+		readyAt      time.Time
+		exited       <-chan time.Time
+		exitedAt     time.Time
+		exitReported bool
+		retry        *time.Timer
+		retryCh      <-chan time.Time
+		retries      int
 	)
 	backoff := r.retryInitial
 	report := func(s status.Status, message string) {
@@ -116,6 +117,7 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 		done := make(chan error, 1)
 		completed = done
 		readyAt, exitedAt = time.Time{}, time.Time{}
+		exitReported = false
 		stopping = false
 		if !recovering {
 			report(status.Configuring, "Starting osqueryd")
@@ -136,6 +138,25 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 		case exitedAt = <-exited:
 			exited = nil
 		default:
+		}
+	}
+	observeReady := func() {
+		if readyAt.IsZero() {
+			select {
+			case readyAt = <-ready:
+				ready = nil
+			default:
+			}
+		}
+		if !exitedAt.IsZero() && readyAt.After(exitedAt) {
+			readyAt = time.Time{}
+		}
+	}
+	reportExit := func() {
+		if !exitReported && !readyAt.IsZero() && !exitedAt.IsZero() && !stopping && parentCtx.Err() == nil {
+			exitReported = true
+			recovering = true
+			report(status.Degraded, "Osqueryd exited; recovering")
 		}
 	}
 	for {
@@ -180,27 +201,21 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 		case readyAt = <-ready:
 			ready = nil
 			observeExit()
-			if !exitedAt.IsZero() && readyAt.After(exitedAt) {
-				readyAt = time.Time{}
-			}
+			observeReady()
+			reportExit()
 			if !stopping && exitedAt.IsZero() && parentCtx.Err() == nil {
 				recovering = false
 				report(status.Running, "Osqueryd configuration applied")
 			}
 		case exitedAt = <-exited:
 			exited = nil
+			observeReady()
+			reportExit()
 		case err := <-completed:
-			// A fast exit may win the select before its buffered readiness notification.
-			if readyAt.IsZero() {
-				select {
-				case readyAt = <-ready:
-				default:
-				}
-			}
+			// Observe both buffered lifecycle notifications before classifying the error.
 			observeExit()
-			if !exitedAt.IsZero() && readyAt.After(exitedAt) {
-				readyAt = time.Time{}
-			}
+			observeReady()
+			reportExit()
 			// Teardown time must not count as healthy operation, including on policy restarts.
 			if !readyAt.IsZero() && exitedAt.Sub(readyAt) >= r.stablePeriod {
 				retries, backoff = 0, r.retryInitial
@@ -231,7 +246,9 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 				return fmt.Errorf("osqueryd restart limit exceeded after %d retries: %w", retries, err)
 			}
 			recovering = true
-			report(status.Degraded, "Osqueryd exited; restarting: "+err.Error())
+			if !exitReported {
+				report(status.Degraded, "Osqueryd exited; restarting: "+err.Error())
+			}
 			r.log.Warnf("Restart osqueryd after recoverable error in %s (attempt %d/%d): %v", backoff, retries+1, r.maxRetries, err)
 			retry = time.NewTimer(backoff)
 			retryCh = retry.C

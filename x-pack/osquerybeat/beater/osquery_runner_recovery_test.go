@@ -121,7 +121,7 @@ func TestOsqueryRunnerExit78RequiresReadyConfiguration(t *testing.T) {
 			} else {
 				require.ErrorIs(t, err, tc.err, "terminal failure must preserve its underlying cause")
 			}
-			assert.Equal(t, int32(tc.wantRuns), runs.Load(), "only ready runtime exit 78 may consume the five restart attempts")
+			assert.Equal(t, tc.wantRuns, int(runs.Load()), "only ready runtime exit 78 may consume the five restart attempts")
 			if tc.wantRuns > 1 {
 				assert.ErrorContains(t, err, "restart limit exceeded after 5 retries", "repeated runtime crashes must become terminal")
 			}
@@ -385,4 +385,28 @@ func TestOsqueryRunnerStablePolicyRestartResetsRecoveryBudget(t *testing.T) {
 	assert.Equal(t, int32(4), waitRecoveryValue(t, started), "stable intentional restart must have replenished the retry budget")
 	cancel()
 	assert.ErrorIs(t, waitRecoveryValue(t, done), context.Canceled, "final replacement must stop")
+}
+
+func TestOsqueryRunnerReportsExitBeforeTeardownCompletes(t *testing.T) {
+	exit78 := osqueryExitError(t, 78)
+	reports := make(chan status.Status, 10)
+	release := make(chan struct{})
+	run := func(_ context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan []config.InputConfig, ready, exited func()) error {
+		ready()
+		exited()
+		<-release
+		return exit78
+	}
+	runner, ctx, cancel, done := recoveryRunner(t, run, func(r *osqueryRunner) { r.reportStatus = func(s status.Status, _ string) { reports <- s } })
+	require.NoError(t, runner.Update(ctx, recoveryInput("policy", 3)), "start daemon whose cleanup is delayed")
+	for waitRecoveryValue(t, reports) != status.Degraded {
+	}
+	select {
+	case err := <-done:
+		t.Errorf("runner returned before run cleanup completed: %v", err)
+	default:
+	}
+	cancel()
+	close(release)
+	assert.ErrorIs(t, waitRecoveryValue(t, done), context.Canceled, "shutdown must join the old run without launching another")
 }

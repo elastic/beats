@@ -231,11 +231,17 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		return err
 	}
 	defer bt.close()
+	// OtelManager has no beat-wide forwarding; the input bridge reports daemon health.
+	otelStatus := &osqueryInputRunnerFactory{state: status.Configuring}
+	reportStatus := func(state status.Status, message string) {
+		b.Manager.UpdateStatus(state, message)
+		otelStatus.UpdateStatus(state, message)
+	}
 
 	// Start checking in with Elastic Agent before validating osqueryd, but do not
 	// apply configuration until startup has completed successfully.
 	if err := b.Manager.PreInit(); err != nil {
-		b.Manager.UpdateStatus(status.Failed, "Failed to pre-initialize manager: "+err.Error())
+		reportStatus(status.Failed, "Failed to pre-initialize manager: "+err.Error())
 		return err
 	}
 	managerEarlyStop := b.Manager.Stop
@@ -259,7 +265,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		otelRunners = make(map[string]cfgfile.Runner)
 	)
 	if bt.otelStatusFactoryWrapper != nil {
-		otelFactory = bt.otelStatusFactoryWrapper(&osqueryInputRunnerFactory{})
+		otelFactory = bt.otelStatusFactoryWrapper(otelStatus)
 	}
 	inputKey := func(idx int, ic config.InputConfig) string {
 		if ic.ID != "" {
@@ -303,14 +309,14 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	// Create socket path
 	socketPath, cleanupFn, err := osqd.CreateSocketPath()
 	if err != nil {
-		b.Manager.UpdateStatus(status.Failed, "Failed to create socket path: "+err.Error())
+		reportStatus(status.Failed, "Failed to create socket path: "+err.Error())
 		return err
 	}
 	defer cleanupFn()
 
 	osqueryRuntime, err := bt.resolveOsqueryRuntime(ctx)
 	if err != nil {
-		b.Manager.UpdateStatus(status.Failed, "Failed to resolve osquery runtime: "+err.Error())
+		reportStatus(status.Failed, "Failed to resolve osquery runtime: "+err.Error())
 		return err
 	}
 	bt.osqueryVersion = osqueryRuntime.Version
@@ -339,7 +345,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	)
 
 	if err != nil {
-		b.Manager.UpdateStatus(status.Failed, "Failed to create osqueryd: "+err.Error())
+		reportStatus(status.Failed, "Failed to create osqueryd: "+err.Error())
 		return err
 	}
 
@@ -350,7 +356,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	// Check that osqueryd exists and runnable
 	err = osq.Check(ctx)
 	if err != nil {
-		b.Manager.UpdateStatus(status.Failed, "Failed to check osqueryd: "+err.Error())
+		reportStatus(status.Failed, "Failed to check osqueryd: "+err.Error())
 		return err
 	}
 
@@ -362,13 +368,13 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	defer rah.Clear()
 
 	g, ctx := errgroup.WithContext(ctx)
-	b.Manager.UpdateStatus(status.Configuring, "Initial configuration")
+	reportStatus(status.Configuring, "Initial configuration")
 
 	// Start osquery runner.
 	// It restarts osquery on configuration changes and recoverable runtime failures.
 	// Invalid startup configuration and exhausted retries still stop the beat.
 	runner := newOsqueryRunner(bt.log)
-	runner.reportStatus = b.Manager.UpdateStatus
+	runner.reportStatus = reportStatus
 	g.Go(func() error {
 		return runner.Run(ctx, func(ctx context.Context, flags osqd.Flags, extensions config.ExtensionsConfig, inputCh <-chan []config.InputConfig, ready, exited func()) error {
 			return bt.runOsquery(ctx, b, osq, flags, extensions, inputCh, ready, exited, rah, osqdMetrics)
@@ -391,7 +397,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	// Run main loop
 	g.Go(func() error {
 		if len(bt.config.Inputs) == 0 {
-			b.Manager.UpdateStatus(status.Running, "Waiting for osquery input configuration")
+			reportStatus(status.Running, "Waiting for osquery input configuration")
 		}
 		// Configure publisher from initial input
 		err := bt.pub.Configure(bt.config.Inputs)
@@ -402,7 +408,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		for {
 			select {
 			case <-ctx.Done():
-				b.Manager.UpdateStatus(status.Stopping, "Context cancelled, stopping")
+				reportStatus(status.Stopping, "Context cancelled, stopping")
 				bt.log.Info("osquerybeat context cancelled, exiting")
 				return ctx.Err()
 			case inputConfigs := <-inputConfigCh:
@@ -427,14 +433,14 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	err = g.Wait()
 	if err != nil {
 		if errors.Is(err, context.Canceled) {
-			b.Manager.UpdateStatus(status.Stopped, "Stopped")
+			reportStatus(status.Stopped, "Stopped")
 			bt.log.Debugf("osquerybeat Run exited, context cancelled")
 		} else {
-			b.Manager.UpdateStatus(status.Failed, "Failed: "+err.Error())
+			reportStatus(status.Failed, "Failed: "+err.Error())
 			bt.log.Errorf("osquerybeat Run exited with error: %v", err)
 		}
 	} else {
-		b.Manager.UpdateStatus(status.Stopped, "Stopped")
+		reportStatus(status.Stopped, "Stopped")
 		bt.log.Debugf("osquerybeat Run exited")
 	}
 	return err
