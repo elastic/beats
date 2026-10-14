@@ -30,6 +30,9 @@ import (
 var (
 	gWatcherOnce sync.Once
 	gWatcher     Watcher
+
+	// newLoader is ebpfevents.NewLoader, replaced in tests.
+	newLoader = ebpfevents.NewLoader
 )
 
 type client struct {
@@ -70,7 +73,7 @@ func GetWatcher() (*Watcher, error) {
 	// Try to load the probe once on startup so consumers can error out.
 	gWatcherOnce.Do(func() {
 		if gWatcher.status == stopped {
-			l, err := ebpfevents.NewLoader()
+			l, err := newLoader()
 			if err != nil {
 				gWatcher.err = fmt.Errorf("init ebpf loader: %w", err)
 				return
@@ -82,13 +85,16 @@ func GetWatcher() (*Watcher, error) {
 	return &gWatcher, gWatcher.err
 }
 
-// Subscribe to receive events from the watcher.
-func (w *Watcher) Subscribe(clientName string, events EventMask) <-chan ebpfevents.Record {
+// Subscribe to receive events from the watcher. It returns an error if the ebpf loader can't
+// be started.
+func (w *Watcher) Subscribe(clientName string, events EventMask) (<-chan ebpfevents.Record, error) {
 	w.Lock()
 	defer w.Unlock()
 
 	if w.status == stopped {
-		w.startLocked()
+		if err := w.startLocked(); err != nil {
+			return nil, err
+		}
 	}
 
 	w.clients[clientName] = client{
@@ -97,7 +103,7 @@ func (w *Watcher) Subscribe(clientName string, events EventMask) <-chan ebpfeven
 		records: make(chan ebpfevents.Record, w.loader.BufferLen()),
 	}
 
-	return w.clients[clientName].records
+	return w.clients[clientName].records, nil
 }
 
 // Unsubscribe the client with the given name.
@@ -112,15 +118,16 @@ func (w *Watcher) Unsubscribe(clientName string) {
 	}
 }
 
-func (w *Watcher) startLocked() {
+// startLocked starts the loader. If that fails, the watcher stays stopped and the next
+// Subscribe tries again.
+func (w *Watcher) startLocked() error {
 	if w.status == started {
-		return
+		return nil
 	}
 
-	loader, err := ebpfevents.NewLoader()
+	loader, err := newLoader()
 	if err != nil {
-		w.err = fmt.Errorf("start ebpf loader: %w", err)
-		return
+		return fmt.Errorf("start ebpf loader: %w", err)
 	}
 
 	w.loader = loader
@@ -154,6 +161,7 @@ func (w *Watcher) startLocked() {
 	}(ctx)
 
 	w.status = started
+	return nil
 }
 
 func (w *Watcher) stopLocked() {

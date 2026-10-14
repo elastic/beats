@@ -20,10 +20,15 @@
 package ebpf
 
 import (
+	"errors"
 	"math"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/ebpfevents"
 )
 
 const allEvents = EventMask(math.MaxUint64)
@@ -36,11 +41,13 @@ func TestWatcherStartStop(t *testing.T) {
 	assert.Equal(t, stopped, gWatcher.status)
 	assert.Equal(t, 0, gWatcher.nclients())
 
-	_ = w.Subscribe("test-1", allEvents)
+	_, err = w.Subscribe("test-1", allEvents)
+	require.NoError(t, err)
 	assert.Equal(t, started, gWatcher.status)
 	assert.Equal(t, 1, gWatcher.nclients())
 
-	_ = w.Subscribe("test-2", allEvents)
+	_, err = w.Subscribe("test-2", allEvents)
+	require.NoError(t, err)
 	assert.Equal(t, 2, gWatcher.nclients())
 
 	w.Unsubscribe("test-2")
@@ -54,8 +61,45 @@ func TestWatcherStartStop(t *testing.T) {
 	assert.Equal(t, 0, gWatcher.nclients())
 	assert.Equal(t, stopped, gWatcher.status)
 
-	_ = w.Subscribe("new", allEvents)
+	_, err = w.Subscribe("new", allEvents)
+	require.NoError(t, err)
 	assert.Equal(t, 1, gWatcher.nclients())
 	assert.Equal(t, started, gWatcher.status)
 	w.Unsubscribe("new")
+}
+
+// resetWatcher gives the test a fresh global watcher and the real loader, and leaves the same
+// for the tests after it.
+func resetWatcher(t *testing.T) {
+	t.Helper()
+
+	reset := func() {
+		gWatcherOnce = sync.Once{}
+		gWatcher = Watcher{}
+		newLoader = ebpfevents.NewLoader
+	}
+	reset()
+	t.Cleanup(reset)
+}
+
+// TestSubscribeLoaderStartFails covers the loader loading in GetWatcher but failing to start in
+// Subscribe: Subscribe must return the error rather than use the nil loader, and the failure
+// must not stick to GetWatcher, which reports only its own load.
+func TestSubscribeLoaderStartFails(t *testing.T) {
+	resetWatcher(t)
+
+	newLoader = func() (*ebpfevents.Loader, error) { return &ebpfevents.Loader{}, nil }
+	w, err := GetWatcher()
+	require.NoError(t, err)
+
+	errStart := errors.New("loader start failed")
+	newLoader = func() (*ebpfevents.Loader, error) { return nil, errStart }
+	records, err := w.Subscribe("test", allEvents)
+	require.ErrorIs(t, err, errStart)
+	assert.Nil(t, records)
+	assert.Equal(t, stopped, gWatcher.status)
+	assert.Equal(t, 0, gWatcher.nclients())
+
+	_, err = GetWatcher()
+	assert.NoError(t, err, "a failed start must not make GetWatcher fail")
 }

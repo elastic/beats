@@ -52,7 +52,10 @@ func (r *ebpfReader) Start(done <-chan struct{}) (<-chan Event, error) {
 	r.done = done
 
 	mask := ebpf.EventMask(ebpfevents.EventTypeFileCreate | ebpfevents.EventTypeFileRename | ebpfevents.EventTypeFileDelete | ebpfevents.EventTypeFileModify)
-	r._records = r.watcher.Subscribe(clientName, mask)
+	r._records, err = r.watcher.Subscribe(clientName, mask)
+	if err != nil {
+		return nil, err
+	}
 
 	go r.consumeEvents()
 
