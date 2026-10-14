@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"net"
+	"os/exec"
 	"strings"
 	"syscall"
 )
@@ -48,4 +49,15 @@ func isRecoverableOsqueryError(err error) bool {
 	}
 	var netErr net.Error
 	return errors.As(err, &netErr) && netErr.Timeout()
+}
+
+// isOsqueryExit78 recognizes the same exit used for both startup configuration
+// errors and catastrophic runtime logger failures. The runner checks readiness
+// before deciding whether this process exit is recoverable.
+func isOsqueryExit78(err error) bool {
+	if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+		return false
+	}
+	var exitError *exec.ExitError
+	return errors.As(err, &exitError) && exitError.ExitCode() == 78
 }

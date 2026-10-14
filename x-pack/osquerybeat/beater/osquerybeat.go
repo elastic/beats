@@ -362,14 +362,16 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	defer rah.Clear()
 
 	g, ctx := errgroup.WithContext(ctx)
+	b.Manager.UpdateStatus(status.Configuring, "Initial configuration")
 
 	// Start osquery runner.
-	// It restarts osquery on configuration options change
-	// It exits if osqueryd fails to run for any reason, like a bad configuration for example
+	// It restarts osquery on configuration changes and recoverable runtime failures.
+	// Invalid startup configuration and exhausted retries still stop the beat.
 	runner := newOsqueryRunner(bt.log)
+	runner.reportStatus = b.Manager.UpdateStatus
 	g.Go(func() error {
-		return runner.Run(ctx, func(ctx context.Context, flags osqd.Flags, extensions config.ExtensionsConfig, inputCh <-chan []config.InputConfig) error {
-			return bt.runOsquery(ctx, b, osq, flags, extensions, inputCh, rah, osqdMetrics)
+		return runner.Run(ctx, func(ctx context.Context, flags osqd.Flags, extensions config.ExtensionsConfig, inputCh <-chan []config.InputConfig, ready, exited func()) error {
+			return bt.runOsquery(ctx, b, osq, flags, extensions, inputCh, ready, exited, rah, osqdMetrics)
 		})
 	})
 
@@ -388,7 +390,9 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 
 	// Run main loop
 	g.Go(func() error {
-		b.Manager.UpdateStatus(status.Configuring, "Initial configuration")
+		if len(bt.config.Inputs) == 0 {
+			b.Manager.UpdateStatus(status.Running, "Waiting for osquery input configuration")
+		}
 		// Configure publisher from initial input
 		err := bt.pub.Configure(bt.config.Inputs)
 		if err != nil {
@@ -396,14 +400,12 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		}
 
 		for {
-			b.Manager.UpdateStatus(status.Running, "Running")
 			select {
 			case <-ctx.Done():
 				b.Manager.UpdateStatus(status.Stopping, "Context cancelled, stopping")
 				bt.log.Info("osquerybeat context cancelled, exiting")
 				return ctx.Err()
 			case inputConfigs := <-inputConfigCh:
-				b.Manager.UpdateStatus(status.Configuring, "Received updated configuration")
 				if len(inputConfigs) == 0 {
 					bt.log.Warn("Osquery input unit was removed; osquery actions (live queries, scheduled packs) will not be available until an osquery input unit is received from Fleet. If the agent was moved to a new policy, ensure the destination policy includes Osquery Manager and that the policy was fully applied.")
 				}
@@ -593,7 +595,7 @@ func (bt *osquerybeat) setExtensionsDiagnostics(extensions config.ExtensionsConf
 	bt.diagOsqueryData = dataPath
 }
 
-func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Runner, flags osqd.Flags, extensions config.ExtensionsConfig, inputCh <-chan []config.InputConfig, rah *resetableActionHandler, osqdMetrics *osquerydMetrics) error {
+func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Runner, flags osqd.Flags, extensions config.ExtensionsConfig, inputCh <-chan []config.InputConfig, ready, exited func(), rah *resetableActionHandler, osqdMetrics *osquerydMetrics) error {
 	socketPath := osq.SocketPath()
 
 	// Apply customer-managed extension entries before starting osqueryd so prepare()
@@ -614,6 +616,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 	g, ctx := errgroup.WithContext(ctx)
 	g.Go(func() error {
 		err := osq.Run(ctx, flags)
+		exited()
 		if err != nil {
 			if errors.Is(err, context.Canceled) {
 				bt.log.Errorf("Osqueryd exited: %v", err)
@@ -669,6 +672,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		// Drive RRULE updates from the same moment native osqueryd applies policy: GenerateConfig
 		// promotes staged query metadata after osqueryd pulls config (see ConfigPlugin.GenerateConfig).
 		configPlugin.SetOnGenerateConfigApplied(func() {
+			ready()
 			if rruleHandler != nil {
 				if err := rruleHandler.UpdateFromConfig(configPlugin.EffectiveOsqueryConfig()); err != nil {
 					bt.log.Errorf("failed to update RRULE scheduled queries: %v", err)
@@ -678,6 +682,18 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 				}
 			}
 		})
+
+		// Validate the first policy before exposing the config extension. Otherwise
+		// its initial empty GenerateConfig could mark an unconfigured daemon ready.
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case initialInputs := <-inputCh:
+			if err := configPlugin.Set(initialInputs); err != nil {
+				return err
+			}
+			cache.Resize(configPlugin.Count())
+		}
 
 		// Start osqueryd health monitoring after connection is established
 		g.Go(func() error {
