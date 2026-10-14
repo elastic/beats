@@ -137,12 +137,17 @@ func TestScheduledProfilerPreservesProfileCorrelation(t *testing.T) {
 
 func TestScheduledProfilerRejectsPolicyChangesDuringCollection(t *testing.T) {
 	disabled := false
+	scheduleIDChanged := profileTestInputs("default", "SELECT 1", nil)
+	query := scheduleIDChanged[0].Osquery.Schedule["scheduled"]
+	query.ScheduleID = "new-schedule"
+	scheduleIDChanged[0].Osquery.Schedule["scheduled"] = query
 	for _, change := range []struct {
 		name   string
 		inputs []config.InputConfig
 	}{
 		{"namespace changed", profileTestInputs("new", "SELECT 1", nil)},
 		{"query replaced", profileTestInputs("default", "SELECT 2", nil)},
+		{"schedule id changed", scheduleIDChanged},
 		{"profiling disabled", profileTestInputs("default", "SELECT 1", &disabled)},
 		{"inputs removed", nil},
 	} {
