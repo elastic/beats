@@ -26,6 +26,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sys/windows"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 // TestSetSessionName tests the setSessionName function with various configurations.
@@ -174,7 +176,7 @@ func TestNewSession_AttachSession(t *testing.T) {
 		Session:     "Session1",
 		SessionName: "TestSession",
 	}
-	session, err := NewSession(conf)
+	session, err := NewSession(conf, logptest.NewTestingLogger(t, ""))
 
 	assert.NoError(t, err)
 	assert.Equal(t, "Session1", session.Name, "SessionName should match expected value")
@@ -188,7 +190,7 @@ func TestNewSession_Logfile(t *testing.T) {
 	conf := Config{
 		Logfile: "LogFile1.etl",
 	}
-	session, err := NewSession(conf)
+	session, err := NewSession(conf, logptest.NewTestingLogger(t, ""))
 
 	assert.NoError(t, err)
 	assert.Equal(t, "LogFile1.etl", session.Name, "SessionName should match expected value")
@@ -202,7 +204,7 @@ func TestSession_Reset(t *testing.T) {
 
 	t.Run("realtime session gets fresh handles and properties", func(t *testing.T) {
 		conf := Config{SessionName: "TestSession", BufferSize: 128}
-		session, err := NewSession(conf)
+		session, err := NewSession(conf, logptest.NewTestingLogger(t, ""))
 		assert.NoError(t, err, "NewSession should not fail")
 		session.Callback = callback
 
@@ -231,7 +233,7 @@ func TestSession_Reset(t *testing.T) {
 	})
 
 	t.Run("logfile session keeps nil properties", func(t *testing.T) {
-		session, err := NewSession(Config{Logfile: "LogFile1.etl"})
+		session, err := NewSession(Config{Logfile: "LogFile1.etl"}, logptest.NewTestingLogger(t, ""))
 		assert.NoError(t, err, "NewSession should not fail")
 		session.traceHandler = 67890
 

@@ -122,7 +122,7 @@ type winEventLog struct {
 
 // newWinEventLog creates and returns a new EventLog for reading event logs
 // using the Windows Event Log.
-func newWinEventLog(options *conf.C) (EventLog, error) {
+func newWinEventLog(options *conf.C, logger *logp.Logger) (EventLog, error) {
 	var err error
 
 	c := defaultConfig()
@@ -140,7 +140,7 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 		id:          id,
 		channelName: c.Name,
 		maxRead:     c.BatchReadSize,
-		log:         logp.NewLogger("wineventlog").With("id", id),
+		log:         logger.Named("wineventlog").With("id", id),
 	}
 
 	if c.XMLQuery != "" {
@@ -240,6 +240,7 @@ func (l *winEventLog) Open(state checkpoint.EventLogState, metricsRegistry *moni
 
 	var err error
 	l.iterator, err = win.NewEventIterator(
+		l.log,
 		win.WithSubscriptionFactory(func() (handle win.EvtHandle, err error) {
 			return l.open(l.lastRead)
 		}),

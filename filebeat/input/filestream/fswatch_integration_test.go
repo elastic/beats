@@ -31,8 +31,8 @@ import (
 )
 
 func TestFileWatcherNotifications(t *testing.T) {
-	testCases := map[string]func(t *testing.T, fw *fileWatcher, evt loginp.FSEvent, dir, logFilePath string){
-		"Partially ingested file": func(t *testing.T, fw *fileWatcher, _ loginp.FSEvent, dir, logFilePath string) {
+	testCases := map[string]func(t *testing.T, fw *testWatcher, evt loginp.FSEvent, dir, logFilePath string){
+		"Partially ingested file": func(t *testing.T, fw *testWatcher, _ loginp.FSEvent, dir, logFilePath string) {
 			// Tests the case:
 			//  - watch runs and sees a new file, it sends a create event
 			//  - data is added to the file
@@ -60,7 +60,7 @@ func TestFileWatcherNotifications(t *testing.T) {
 			}
 
 			// Notify the harvester has closed with a smaller size
-			fw.processNotification(loginp.HarvesterStatus{
+			fw.HarvesterClosed(loginp.HarvesterStatus{
 				ID:   evt.SrcID,
 				Size: 2500, // anything smaller than the real size
 			})
@@ -83,7 +83,7 @@ func TestFileWatcherNotifications(t *testing.T) {
 			}
 		},
 
-		"New file, harvester closed at offset 0": func(t *testing.T, fw *fileWatcher, evt loginp.FSEvent, dir, logFilePath string) {
+		"New file, harvester closed at offset 0": func(t *testing.T, fw *testWatcher, evt loginp.FSEvent, dir, logFilePath string) {
 			// Reproduces the offset-0 harvester-close race:
 			//  - watch sees a new file, sends a create event (done in setup)
 			//  - the harvester is closed during the initial backoff before ingesting anything, so
@@ -92,7 +92,7 @@ func TestFileWatcherNotifications(t *testing.T) {
 			//    new harvester restarts and ingests the data
 
 			// Notify the harvester has closed at offset 0 (nothing ingested)
-			fw.processNotification(loginp.HarvesterStatus{
+			fw.HarvesterClosed(loginp.HarvesterStatus{
 				ID:   evt.SrcID,
 				Size: 0,
 			})
@@ -117,13 +117,13 @@ func TestFileWatcherNotifications(t *testing.T) {
 			}
 		},
 
-		"Fully ingested file": func(t *testing.T, fw *fileWatcher, evt loginp.FSEvent, dir, logFilePath string) {
+		"Fully ingested file": func(t *testing.T, fw *testWatcher, evt loginp.FSEvent, dir, logFilePath string) {
 			// Tests the default case of a harvester closing after fully
 			// ingesting the file. It also ensure entries in closedHarvesters
 			// are correctly removed.
 
 			// Notify the harvester has closed, file fully ingested
-			fw.processNotification(loginp.HarvesterStatus{
+			fw.HarvesterClosed(loginp.HarvesterStatus{
 				ID:   evt.SrcID,
 				Size: 3000,
 			})
@@ -147,9 +147,9 @@ func TestFileWatcherNotifications(t *testing.T) {
 			}
 		},
 
-		"Removed file": func(t *testing.T, fw *fileWatcher, evt loginp.FSEvent, dir, logFilePath string) {
+		"Removed file": func(t *testing.T, fw *testWatcher, evt loginp.FSEvent, dir, logFilePath string) {
 			// Notify the harvester has closed, file fully ingested
-			fw.processNotification(loginp.HarvesterStatus{
+			fw.HarvesterClosed(loginp.HarvesterStatus{
 				ID:   evt.SrcID,
 				Size: 3000,
 			})
@@ -176,9 +176,9 @@ func TestFileWatcherNotifications(t *testing.T) {
 			}
 		},
 
-		"Renamed file": func(t *testing.T, fw *fileWatcher, evt loginp.FSEvent, dir, logFilePath string) {
+		"Renamed file": func(t *testing.T, fw *testWatcher, evt loginp.FSEvent, dir, logFilePath string) {
 			// Notify the harvester has closed, file fully ingested
-			fw.processNotification(loginp.HarvesterStatus{
+			fw.HarvesterClosed(loginp.HarvesterStatus{
 				ID:   evt.SrcID,
 				Size: 3000,
 			})
@@ -218,7 +218,7 @@ func TestFileWatcherNotifications(t *testing.T) {
 			integration.WriteLogFile(t, logFilePath, 50, false)
 
 			cfg := defaultFileWatcherConfig()
-			fw, err := newFileWatcher(
+			fw, err := newTestFileWatcher(
 				logptest.NewFileLogger(t, filepath.Join(dir, "logger")).Logger,
 				[]string{filepath.Join(dir, "*.log")},
 				cfg,
