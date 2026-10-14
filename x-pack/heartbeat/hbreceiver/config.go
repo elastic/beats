@@ -13,9 +13,8 @@ import (
 	"go.opentelemetry.io/collector/confmap"
 )
 
-// Config is config settings for heartbeat receiver.  The structure of
-// which is the same as the heartbeat.yml configuration file, except for the
-// receiver specific settings declared as fields below.
+// Config contains receiver-only settings and the remaining Heartbeat
+// configuration.
 type Config struct {
 	// SchedulerGroup makes this receiver share its scheduler, and therefore its
 	// `heartbeat.scheduler.limit` and `heartbeat.jobs.<type>.limit` concurrency
@@ -31,7 +30,13 @@ type Config struct {
 	// group shares.
 	SchedulerGroup string `mapstructure:"scheduler_group"`
 
-	Beatconfig map[string]any `mapstructure:",remain"`
+	MonitorState MonitorStateConfig `mapstructure:"monitor_state"`
+	Beatconfig   map[string]any     `mapstructure:",remain"`
+}
+
+// MonitorStateConfig configures monitor state restoration.
+type MonitorStateConfig struct {
+	Elasticsearch string `mapstructure:"elasticsearch"`
 }
 
 // Unmarshal implements confmap.Unmarshaler for custom unmarshaling logic.
