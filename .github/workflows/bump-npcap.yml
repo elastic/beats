@@ -18,6 +18,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - uses: elastic/oblt-actions/git/setup@v1
+
       - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
           registry: ${{ secrets.ELASTIC_DOCKER_REGISTRY }}
@@ -36,4 +38,4 @@ jobs:
         with:
           bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
           channel-id: "#ingest-notifications"
-          message: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`,  please look what's going on <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>"
+          message: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, please look what's going on <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>"
