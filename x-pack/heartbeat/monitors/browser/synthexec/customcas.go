@@ -11,12 +11,11 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
-
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"strings"
 )
 
 type customCAsKey string
@@ -74,7 +73,7 @@ func applyCustomCAs(ctx context.Context, cmd *SynthCmd) (cleanup func(), err err
 
 	n := 0
 	for _, src := range sources {
-		data, rerr := tlscommon.ReadPEMFile(logp.L(), src, "")
+		data, rerr := readPEM(src)
 		if rerr != nil {
 			return cleanup, fmt.Errorf("could not read certificate authority %q: %w", src, rerr)
 		}
@@ -126,24 +125,45 @@ func applyCustomCAs(ctx context.Context, cmd *SynthCmd) (cleanup func(), err err
 	return cleanup, nil
 }
 
+// readPEM returns src itself when it is inline PEM, or the content of the file it names.
+func readPEM(src string) ([]byte, error) {
+	if strings.Contains(src, "-----BEGIN") {
+		return []byte(src), nil
+	}
+	return os.ReadFile(src)
+}
+
 // seedFromSharedDB copies the NSS database files of src into dst. It reports false,
 // without error, when src holds no database.
 func seedFromSharedDB(src, dst string) (bool, error) {
-	if _, err := os.Stat(filepath.Join(src, "cert9.db")); err != nil {
+	srcRoot, err := os.OpenRoot(src)
+	if err != nil {
 		if os.IsNotExist(err) || errors.Is(err, os.ErrPermission) {
 			return false, nil
 		}
 		return false, err
 	}
+	defer srcRoot.Close()
+	if _, err := srcRoot.Stat("cert9.db"); err != nil {
+		if os.IsNotExist(err) || errors.Is(err, os.ErrPermission) {
+			return false, nil
+		}
+		return false, err
+	}
+	dstRoot, err := os.OpenRoot(dst)
+	if err != nil {
+		return false, err
+	}
+	defer dstRoot.Close()
 	for _, name := range []string{"cert9.db", "key4.db", "pkcs11.txt"} {
-		data, err := os.ReadFile(filepath.Join(src, name))
+		data, err := srcRoot.ReadFile(name)
 		if err != nil {
 			if os.IsNotExist(err) {
 				continue
 			}
 			return false, err
 		}
-		if err := os.WriteFile(filepath.Join(dst, name), data, 0o600); err != nil {
+		if err := dstRoot.WriteFile(name, data, 0o600); err != nil {
 			return false, err
 		}
 	}
@@ -151,17 +171,23 @@ func seedFromSharedDB(src, dst string) (bool, error) {
 }
 
 func runCertutil(ctx context.Context, certutil string, args ...string) error {
-	if out, err := exec.CommandContext(ctx, certutil, args...).CombinedOutput(); err != nil { //nolint:gosec // certutil path comes from LookPath, args are built here
+	if out, err := exec.CommandContext(ctx, certutil, args...).CombinedOutput(); err != nil {
 		return fmt.Errorf("certutil %v failed: %w: %s", args[:1], err, out)
 	}
 	return nil
 }
 
-func chownTree(root string, uid, gid int) error {
-	return filepath.WalkDir(root, func(path string, _ os.DirEntry, err error) error {
+// chownTree gives everything under dir to uid:gid, without following symlinks out of it.
+func chownTree(dir string, uid, gid int) error {
+	root, err := os.OpenRoot(dir)
+	if err != nil {
+		return err
+	}
+	defer root.Close()
+	return fs.WalkDir(root.FS(), ".", func(path string, _ fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
-		return os.Chown(path, uid, gid)
+		return root.Lchown(path, uid, gid)
 	})
 }

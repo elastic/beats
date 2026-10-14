@@ -52,7 +52,7 @@ func stubCertutil(t *testing.T) (callsFile string) {
 	dir := t.TempDir()
 	callsFile = filepath.Join(dir, "calls")
 	script := "#!/bin/sh\necho \"$@\" >> " + callsFile + "\n"
-	require.NoError(t, os.WriteFile(filepath.Join(dir, "certutil"), []byte(script), 0o755), "writing stub certutil") //nolint:gosec // test stub must be executable
+	require.NoError(t, os.WriteFile(filepath.Join(dir, "certutil"), []byte(script), 0o755), "writing stub certutil")
 	t.Setenv("PATH", dir+string(os.PathListSeparator)+os.Getenv("PATH"))
 	return callsFile
 }
@@ -70,7 +70,7 @@ func envValue(env []string, key string) (string, bool) {
 
 func TestApplyCustomCAs(t *testing.T) {
 	t.Run("does nothing without CAs", func(t *testing.T) {
-		cmd := &SynthCmd{Cmd: exec.Command("true")}
+		cmd := &SynthCmd{Cmd: exec.CommandContext(t.Context(), "true")}
 		cleanup, err := applyCustomCAs(context.Background(), cmd)
 		require.NoError(t, err, "no CAs must not fail")
 		cleanup()
@@ -89,7 +89,7 @@ func TestApplyCustomCAs(t *testing.T) {
 		require.NoError(t, os.WriteFile(bundleFile, []byte(bundle), 0o600), "writing bundle")
 
 		ctx := context.WithValue(context.Background(), CustomCAsKey, []string{inline, bundleFile})
-		cmd := &SynthCmd{Cmd: exec.Command("true")}
+		cmd := &SynthCmd{Cmd: exec.CommandContext(t.Context(), "true")}
 		cleanup, err := applyCustomCAs(ctx, cmd)
 		require.NoError(t, err, "applying CAs")
 
@@ -120,7 +120,7 @@ func TestApplyCustomCAs(t *testing.T) {
 	t.Run("fails clearly when certutil is missing", func(t *testing.T) {
 		t.Setenv("PATH", t.TempDir())
 		ctx := context.WithValue(context.Background(), CustomCAsKey, []string{testCAPEM(t, "ca")})
-		cleanup, err := applyCustomCAs(ctx, &SynthCmd{Cmd: exec.Command("true")})
+		cleanup, err := applyCustomCAs(ctx, &SynthCmd{Cmd: exec.CommandContext(t.Context(), "true")})
 		cleanup()
 		require.Error(t, err, "missing certutil must fail the run")
 		assert.Contains(t, err.Error(), "nss-tools", "the error must say what to install")
@@ -129,7 +129,7 @@ func TestApplyCustomCAs(t *testing.T) {
 	t.Run("fails when no certificate can be read", func(t *testing.T) {
 		stubCertutil(t)
 		ctx := context.WithValue(context.Background(), CustomCAsKey, []string{"/does/not/exist.pem"})
-		cleanup, err := applyCustomCAs(ctx, &SynthCmd{Cmd: exec.Command("true")})
+		cleanup, err := applyCustomCAs(ctx, &SynthCmd{Cmd: exec.CommandContext(t.Context(), "true")})
 		cleanup()
 		require.Error(t, err, "an unreadable CA must fail the run")
 	})
@@ -144,13 +144,13 @@ func TestApplyCustomCAsRealCertutil(t *testing.T) {
 	}
 
 	ctx := context.WithValue(context.Background(), CustomCAsKey, []string{testCAPEM(t, "one") + testCAPEM(t, "two")})
-	cmd := &SynthCmd{Cmd: exec.Command("true")}
+	cmd := &SynthCmd{Cmd: exec.CommandContext(t.Context(), "true")}
 	cleanup, err := applyCustomCAs(ctx, cmd)
 	require.NoError(t, err, "applying CAs")
 	defer cleanup()
 
 	home, _ := envValue(cmd.Env, "HOME")
-	out, err := exec.Command(certutil, "-L", "-d", "sql:"+filepath.Join(home, ".pki", "nssdb")).CombinedOutput() //nolint:gosec // test
+	out, err := exec.CommandContext(t.Context(), certutil, "-L", "-d", "sql:"+filepath.Join(home, ".pki", "nssdb")).CombinedOutput()
 	require.NoError(t, err, "listing the database: %s", out)
 	assert.Contains(t, string(out), "monitor-ca-1", "first certificate must be in the database")
 	assert.Contains(t, string(out), "monitor-ca-2", "second certificate of the bundle must be in the database")
@@ -164,7 +164,7 @@ func TestRunCmdKeepsCustomCAsUntilCommandExits(t *testing.T) {
 	ctx := context.WithValue(context.Background(), SynthexecTimeoutKey, time.Minute)
 	ctx = context.WithValue(ctx, CustomCAsKey, []string{testCAPEM(t, "ca")})
 
-	cmd := exec.Command("sh", "-c", script)
+	cmd := exec.CommandContext(t.Context(), "sh", "-c", script)
 	stdin := ""
 	mpx, err := runCmd(ctx, &SynthCmd{cmd}, &stdin, nil, FilterJourneyConfig{}, stdfields.StdMonitorFields{}, "")
 	require.NoError(t, err, "running command with custom CAs")
@@ -176,7 +176,9 @@ func TestRunCmdKeepsCustomCAsUntilCommandExits(t *testing.T) {
 	lines := strings.Split(strings.TrimSpace(string(out)), "\n")
 	require.Len(t, lines, 2, "the trust store must still exist while the command runs: %q", out)
 	assert.Equal(t, "present", lines[1], "the NSS database must exist for the command's whole run")
-	assert.Eventually(t, func() bool { _, err := os.Stat(lines[0]); return os.IsNotExist(err) }, 5*time.Second, 50*time.Millisecond,
+	home, _ := envValue(cmd.Env, "HOME")
+	assert.Equal(t, home, lines[0], "the command must run with the throwaway HOME")
+	assert.Eventually(t, func() bool { _, err := os.Stat(home); return os.IsNotExist(err) }, 5*time.Second, 50*time.Millisecond,
 		"the trust store must be removed once the command exits")
 }
 
@@ -190,7 +192,7 @@ func TestApplyCustomCAsSeedsFromSharedDB(t *testing.T) {
 	t.Setenv("HOME", userHome)
 
 	ctx := context.WithValue(context.Background(), CustomCAsKey, []string{testCAPEM(t, "ca")})
-	cmd := &SynthCmd{Cmd: exec.Command("true")}
+	cmd := &SynthCmd{Cmd: exec.CommandContext(t.Context(), "true")}
 	cleanup, err := applyCustomCAs(ctx, cmd)
 	require.NoError(t, err, "applying CAs")
 	defer cleanup()
@@ -222,27 +224,27 @@ func TestApplyCustomCAsKeepsSharedCAs(t *testing.T) {
 	shared := filepath.Join(userHome, ".pki", "nssdb")
 	require.NoError(t, os.MkdirAll(shared, 0o700), "creating shared db dir")
 	sharedArg := "sql:" + shared
-	out, err := exec.Command(certutil, "-N", "-d", sharedArg, "--empty-password").CombinedOutput() //nolint:gosec // test
+	out, err := exec.CommandContext(t.Context(), certutil, "-N", "-d", sharedArg, "--empty-password").CombinedOutput()
 	require.NoError(t, err, "creating shared db: %s", out)
 	caFile := filepath.Join(t.TempDir(), "shared.pem")
 	require.NoError(t, os.WriteFile(caFile, []byte(testCAPEM(t, "shared")), 0o600), "writing shared CA")
-	out, err = exec.Command(certutil, "-A", "-d", sharedArg, "-n", "custom-ca-shared", "-t", "C,,", "-i", caFile).CombinedOutput() //nolint:gosec // test
+	out, err = exec.CommandContext(t.Context(), certutil, "-A", "-d", sharedArg, "-n", "custom-ca-shared", "-t", "C,,", "-i", caFile).CombinedOutput()
 	require.NoError(t, err, "importing shared CA: %s", out)
 	t.Setenv("HOME", userHome)
 
 	ctx := context.WithValue(context.Background(), CustomCAsKey, []string{testCAPEM(t, "monitor")})
-	cmd := &SynthCmd{Cmd: exec.Command("true")}
+	cmd := &SynthCmd{Cmd: exec.CommandContext(t.Context(), "true")}
 	cleanup, err := applyCustomCAs(ctx, cmd)
 	require.NoError(t, err, "applying CAs")
 	defer cleanup()
 
 	home, _ := envValue(cmd.Env, "HOME")
-	out, err = exec.Command(certutil, "-L", "-d", "sql:"+filepath.Join(home, ".pki", "nssdb")).CombinedOutput() //nolint:gosec // test
+	out, err = exec.CommandContext(t.Context(), certutil, "-L", "-d", "sql:"+filepath.Join(home, ".pki", "nssdb")).CombinedOutput()
 	require.NoError(t, err, "listing the monitor database: %s", out)
 	assert.Contains(t, string(out), "custom-ca-shared", "the shared CA must stay trusted for the monitor")
 	assert.Contains(t, string(out), "monitor-ca-1", "the monitor's own CA must be trusted")
 
-	out, err = exec.Command(certutil, "-L", "-d", sharedArg).CombinedOutput() //nolint:gosec // test
+	out, err = exec.CommandContext(t.Context(), certutil, "-L", "-d", sharedArg).CombinedOutput()
 	require.NoError(t, err, "listing the shared database: %s", out)
 	assert.NotContains(t, string(out), "monitor-ca-1", "the monitor's CA must not leak into the shared database")
 }
