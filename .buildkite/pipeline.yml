@@ -547,6 +547,7 @@ steps:
         BUILDKITE_PULL_REQUEST: ${BUILDKITE_PULL_REQUEST}
         BUILDKITE_PULL_REQUEST_BASE_BRANCH: ${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
         GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
+<<<<<<< HEAD
 
   - label: "Trigger Agentbeat"
     if: build.pull_request.id != null
@@ -580,3 +581,5 @@ steps:
         BUILDKITE_PULL_REQUEST: ${BUILDKITE_PULL_REQUEST}
         BUILDKITE_PULL_REQUEST_BASE_BRANCH: ${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
         GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
+=======
+>>>>>>> 3451fb9 (Drop serverless beats test trigger in elastic-agent (#53792))
