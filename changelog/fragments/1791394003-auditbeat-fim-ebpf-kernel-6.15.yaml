@@ -24,7 +24,10 @@ description: |
   "bad CO-RE relocation" (tty_driver and kernfs_node changed in 6.15), so the
   module never started. File access, modification and change timestamps are
   also reported correctly again on Linux 6.11 and later. Programs that are not
-  used on the running kernel are no longer loaded, which shortens startup.
+  used on the running kernel are no longer loaded, which shortens startup. When
+  the eBPF loader has to fall back because some probes fail to load on the
+  running kernel, the module logs a warning, and it fails to start if any file
+  event type it needs is disabled.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:
