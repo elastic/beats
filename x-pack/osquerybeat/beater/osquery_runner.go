@@ -22,16 +22,25 @@ import (
 
 type osqueryRunner struct {
 	log                                  *logp.Logger
-	inputCh                              chan []config.InputConfig
+	inputCh                              chan osqueryInputUpdate
+	done                                 chan struct{}
+	runErr                               error // Read only after done closes.
 	retryInitial, retryMax, stablePeriod time.Duration
 	maxRetries                           int
 	reportStatus                         func(status.Status, string)
+	reportWaiting                        func()
+}
+
+type osqueryInputUpdate struct {
+	inputs  []config.InputConfig
+	applied chan struct{}
 }
 
 func newOsqueryRunner(log *logp.Logger) *osqueryRunner {
 	return &osqueryRunner{
 		log:          log,
-		inputCh:      make(chan []config.InputConfig, 1),
+		inputCh:      make(chan osqueryInputUpdate, 1),
+		done:         make(chan struct{}),
 		retryInitial: time.Second,
 		retryMax:     30 * time.Second,
 		stablePeriod: time.Minute,
@@ -42,7 +51,11 @@ func newOsqueryRunner(log *logp.Logger) *osqueryRunner {
 type osqueryRunFunc func(ctx context.Context, flags osqd.Flags, extensions config.ExtensionsConfig, inputCh <-chan []config.InputConfig, ready, exited func()) error
 
 // Run manages osqueryd lifecycle and keeps configuration updates responsive during recovery.
-func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) error {
+func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) (runErr error) {
+	defer func() {
+		r.runErr = runErr
+		close(r.done)
+	}()
 	var (
 		latest       []config.InputConfig
 		flags        osqd.Flags
@@ -70,6 +83,13 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 			r.reportStatus(s, message)
 		}
 	}
+	waiting := func() {
+		if r.reportWaiting != nil {
+			r.reportWaiting()
+		} else {
+			report(status.Configuring, "Waiting for osquery input configuration")
+		}
+	}
 	stopRetry := func() {
 		if retry != nil {
 			retry.Stop()
@@ -88,12 +108,14 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 		stopRetry()
 		// Prefer an update already accepted by Update even when the timer wins select.
 		select {
-		case latest = <-r.inputCh:
+		case update := <-r.inputCh:
+			latest = update.inputs
+			defer close(update.applied)
 		default:
 		}
 		if len(latest) == 0 {
 			recovering = false
-			report(status.Running, "Waiting for osquery input configuration")
+			waiting()
 			return false
 		}
 		flags = config.GetOsqueryOptions(latest)
@@ -167,35 +189,42 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 		select {
 		case <-parentCtx.Done():
 			return parentCtx.Err()
-		case input := <-r.inputCh:
-			latest = input
-			if len(input) == 0 {
+		case update := <-r.inputCh:
+			latest = update.inputs
+			if len(latest) == 0 {
 				stopRetry()
 				havePending = false
 				recovering = false
 				if completed != nil {
 					stopping = true
+					report(status.Configuring, "Stopping osqueryd without inputs")
 					cancel()
 				} else {
-					report(status.Running, "Waiting for osquery input configuration")
+					waiting()
 				}
+				close(update.applied)
 				continue
 			}
 			if completed == nil {
 				if retryCh == nil {
 					start()
 				}
+				close(update.applied)
 				continue
 			}
-			newFlags := config.GetOsqueryOptions(input)
-			newExtensions := config.GetOsqueryExtensions(input)
+			newFlags := config.GetOsqueryOptions(latest)
+			newExtensions := config.GetOsqueryExtensions(latest)
 			if !osqd.FlagsAreSame(flags, newFlags) || !extensionsAreSame(extensions, newExtensions) || logLevel != zapcore.LevelOf(r.log.Core()) {
 				stopping = true
 				havePending = false
+				if !recovering {
+					report(status.Configuring, "Restarting osqueryd for updated configuration")
+				}
 				cancel()
 			} else if !stopping {
 				pending, havePending = latest, true
 			}
+			close(update.applied)
 		case send <- pending:
 			havePending = false
 		case readyAt = <-ready:
@@ -230,7 +259,7 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 				if len(latest) > 0 {
 					start()
 				} else {
-					report(status.Running, "Waiting for osquery input configuration")
+					waiting()
 				}
 				continue
 			}
@@ -279,10 +308,28 @@ func (r *osqueryRunner) Update(ctx context.Context, inputs []config.InputConfig)
 	if err := ctx.Err(); err != nil {
 		return err
 	}
+	update := osqueryInputUpdate{inputs: inputs, applied: make(chan struct{})}
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
-	case r.inputCh <- inputs:
+	case <-r.done:
+		return r.runErr
+	case r.inputCh <- update:
 	}
-	return nil
+	// Reconciliation creates input status reporters immediately after Update.
+	// Wait for the lifecycle decision so they cannot inherit an old run's readiness.
+	// This does not wait for startup, backoff, or the previous run's cleanup.
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-r.done:
+		select {
+		case <-update.applied:
+			return nil
+		default:
+			return r.runErr
+		}
+	case <-update.applied:
+		return nil
+	}
 }

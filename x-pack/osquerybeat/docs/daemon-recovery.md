@@ -18,6 +18,10 @@ reach both Elastic Agent process management and the OTel receiver's active
 input reporters. Inputs added during recovery inherit its status; removed
 inputs stop receiving updates.
 
+With no inputs, the Agent considers the beat running, but this idle status does
+not mark osqueryd ready. The first input or an input re-added after removal waits
+for the current daemon to fetch configuration before reporting healthy.
+
 Configuration updates received during backoff are retained for the next run.
 Removing every input suspends recovery. Shutdown cancels the backoff without
 starting another daemon.

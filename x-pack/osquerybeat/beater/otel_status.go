@@ -13,6 +13,27 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
+// osqueryStatusReporter separates an idle beat from a ready daemon: the Agent
+// can consider the beat running with no inputs, but future input reporters must
+// wait for daemon readiness before inheriting Running.
+type osqueryStatusReporter struct {
+	manager status.StatusReporter
+	inputs  *osqueryInputRunnerFactory
+}
+
+// UpdateStatus forwards daemon health to the Agent and active input reporters.
+func (r osqueryStatusReporter) UpdateStatus(state status.Status, message string) {
+	r.manager.UpdateStatus(state, message)
+	r.inputs.UpdateStatus(state, message)
+}
+
+// WaitingForInputs reports an idle beat without asserting daemon readiness.
+func (r osqueryStatusReporter) WaitingForInputs() {
+	const message = "Waiting for osquery input configuration"
+	r.inputs.UpdateStatus(status.Configuring, message)
+	r.manager.UpdateStatus(status.Running, message)
+}
+
 // osqueryInputRunner is a minimal cfgfile.Runner that reports OTel status for
 // its shared daemon. It is used with otelStatusFactoryWrapper so that per-input
 // componentstatus events reach the OTel host without requiring the cfgfile

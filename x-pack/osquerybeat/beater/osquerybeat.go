@@ -233,10 +233,8 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	defer bt.close()
 	// OtelManager has no beat-wide forwarding; the input bridge reports daemon health.
 	otelStatus := &osqueryInputRunnerFactory{state: status.Configuring}
-	reportStatus := func(state status.Status, message string) {
-		b.Manager.UpdateStatus(state, message)
-		otelStatus.UpdateStatus(state, message)
-	}
+	statusReporter := osqueryStatusReporter{manager: b.Manager, inputs: otelStatus}
+	reportStatus := statusReporter.UpdateStatus
 
 	// Start checking in with Elastic Agent before validating osqueryd, but do not
 	// apply configuration until startup has completed successfully.
@@ -375,6 +373,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	// Invalid startup configuration and exhausted retries still stop the beat.
 	runner := newOsqueryRunner(bt.log)
 	runner.reportStatus = reportStatus
+	runner.reportWaiting = statusReporter.WaitingForInputs
 	g.Go(func() error {
 		return runner.Run(ctx, func(ctx context.Context, flags osqd.Flags, extensions config.ExtensionsConfig, inputCh <-chan []config.InputConfig, ready, exited func()) error {
 			return bt.runOsquery(ctx, b, osq, flags, extensions, inputCh, ready, exited, rah, osqdMetrics)
@@ -397,7 +396,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	// Run main loop
 	g.Go(func() error {
 		if len(bt.config.Inputs) == 0 {
-			reportStatus(status.Running, "Waiting for osquery input configuration")
+			statusReporter.WaitingForInputs()
 		}
 		// Configure publisher from initial input
 		err := bt.pub.Configure(bt.config.Inputs)
@@ -423,6 +422,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 				err = runner.Update(ctx, inputConfigs)
 				if err != nil {
 					bt.log.Errorf("Failed to configure osquery runner, err: %v", err)
+					return err
 				}
 				reconcileOtelRunners(inputConfigs)
 			}

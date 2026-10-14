@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -23,6 +24,59 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
+
+func TestOsqueryRunnerUpdateWaitsForLifecycleDecision(t *testing.T) {
+	entered, release := make(chan struct{}), make(chan struct{})
+	var releaseOnce sync.Once
+	unblock := func() { releaseOnce.Do(func() { close(release) }) }
+	run := func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan []config.InputConfig, _, _ func()) error {
+		<-ctx.Done()
+		return ctx.Err()
+	}
+	runner, ctx, cancel, done := recoveryRunner(t, run, func(r *osqueryRunner) {
+		r.reportStatus = func(s status.Status, _ string) {
+			if s == status.Configuring {
+				close(entered)
+				<-release
+			}
+		}
+	})
+	t.Cleanup(unblock)
+	updated := make(chan error, 1)
+	go func() { updated <- runner.Update(ctx, recoveryInput("new", 3)) }()
+	waitRecoveryValue(t, entered)
+	select {
+	case err := <-updated:
+		t.Fatalf("Update returned before readiness was invalidated: %v", err)
+	default:
+	}
+	unblock()
+	require.NoError(t, waitRecoveryValue(t, updated), "Update must return after the lifecycle decision without waiting for daemon readiness")
+	cancel()
+	require.ErrorIs(t, waitRecoveryValue(t, done), context.Canceled, "runner must remain cancellable")
+}
+
+func TestOsqueryRunnerUpdateWaitIsCancellable(t *testing.T) {
+	runner := newOsqueryRunner(logptest.NewTestingLogger(t, "runner"))
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+	updated := make(chan error, 1)
+	go func() { updated <- runner.Update(ctx, recoveryInput("queued", 3)) }()
+	require.Eventually(t, func() bool { return len(runner.inputCh) == 1 }, time.Second, time.Millisecond, "update must be queued before cancelling its acknowledgement wait")
+	cancel()
+	require.ErrorIs(t, waitRecoveryValue(t, updated), context.Canceled, "waiting for lifecycle acknowledgement must honour cancellation")
+}
+
+func TestOsqueryRunnerUpdateAfterTermination(t *testing.T) {
+	wantErr := errors.New("invalid startup configuration")
+	run := func(context.Context, osqd.Flags, config.ExtensionsConfig, <-chan []config.InputConfig, func(), func()) error {
+		return wantErr
+	}
+	runner, ctx, _, done := recoveryRunner(t, run, nil)
+	require.NoError(t, runner.Update(ctx, recoveryInput("invalid", 3)), "an applied update must be acknowledged even if its run exits immediately")
+	require.ErrorIs(t, waitRecoveryValue(t, done), wantErr, "runner must retain the terminal cause")
+	require.ErrorIs(t, runner.Update(ctx, recoveryInput("late", 3)), wantErr, "a stopped runner must release update waiters without hiding the terminal cause")
+}
 
 func TestOsqueryExitHelper(t *testing.T) {
 	if code := os.Getenv("OSQUERY_TEST_EXIT"); code != "" {
