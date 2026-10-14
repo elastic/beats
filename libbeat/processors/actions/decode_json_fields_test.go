@@ -346,6 +346,66 @@ func TestMaxObjectDepthRoundTrip(t *testing.T) {
 	}
 }
 
+// TestMaxDepthVersusMaxObjectDepth checks the example that compares the two
+// options in the decode_json_fields documentation.
+func TestMaxDepthVersusMaxObjectDepth(t *testing.T) {
+	const msg = `{"log": "{\"level\": \"info\"}", "a": {"b": {"c": 1}}}`
+
+	tests := []struct {
+		name string
+		cfg  map[string]any
+		want map[string]any
+	}{
+		{
+			name: "default",
+			cfg:  map[string]any{},
+			want: map[string]any{
+				"log": `{"level": "info"}`,
+				"a": map[string]any{
+					"b": map[string]any{
+						"c": int64(1),
+					},
+				},
+			},
+		},
+		{
+			name: "max_depth",
+			cfg:  map[string]any{"max_depth": 2},
+			want: map[string]any{
+				"log": map[string]any{
+					"level": "info",
+				},
+				"a": map[string]any{
+					"b": map[string]any{
+						"c": int64(1),
+					},
+				},
+			},
+		},
+		{
+			name: "max_object_depth",
+			cfg:  map[string]any{"max_object_depth": 2},
+			want: map[string]any{
+				"log": `{"level": "info"}`,
+				"a": map[string]any{
+					"b": `{"c": 1}`,
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			test.cfg["fields"] = []string{"msg"}
+			c := conf.MustNewConfigFrom(test.cfg)
+
+			got := getActualValue(t, c, mapstr.M{"msg": msg})
+
+			assert.Equal(t, test.want, got["msg"], "decoded value does not match the documented example")
+		})
+	}
+}
+
 func TestMaxObjectDepthAfterEmbeddedDecoding(t *testing.T) {
 	c := conf.MustNewConfigFrom(map[string]any{
 		"fields":           []string{"msg"},
