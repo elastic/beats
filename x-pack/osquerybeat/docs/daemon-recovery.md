@@ -23,6 +23,8 @@ not mark osqueryd ready. The first input or an input re-added after removal wait
 for the current daemon to fetch configuration before reporting healthy.
 
 Configuration updates received during backoff are retained for the next run.
+Updates received after a daemon exits, while cleanup is still pending, also
+apply to the next run without bypassing the failure's backoff or retry budget.
 Removing every input suspends recovery. Shutdown cancels the backoff without
 starting another daemon.
 

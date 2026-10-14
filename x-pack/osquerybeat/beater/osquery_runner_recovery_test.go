@@ -464,3 +464,112 @@ func TestOsqueryRunnerReportsExitBeforeTeardownCompletes(t *testing.T) {
 	close(release)
 	assert.ErrorIs(t, waitRecoveryValue(t, done), context.Canceled, "shutdown must join the old run without launching another")
 }
+
+func TestOsqueryRunnerPolicyAfterExitPreservesRecovery(t *testing.T) {
+	exit78 := osqueryExitError(t, 78)
+	for _, tc := range []struct{ pendingExit, remove, stayRemoved bool }{{false, false, false}, {true, false, false}, {false, true, false}, {true, true, false}, {true, true, true}} {
+		t.Run(fmt.Sprintf("pending_exit=%t/remove=%t/stay_removed=%t", tc.pendingExit, tc.remove, tc.stayRemoved), func(t *testing.T) {
+			pendingExit := tc.pendingExit
+			running, unblockRunning := make(chan struct{}), make(chan struct{})
+			crash, exitedSignal, cleanup := make(chan struct{}), make(chan struct{}), make(chan struct{})
+			var runningOnce, crashOnce, cleanupOnce sync.Once
+			releaseRunning := func() { runningOnce.Do(func() { close(unblockRunning) }) }
+			releaseCrash := func() { crashOnce.Do(func() { close(crash) }) }
+			releaseCleanup := func() { cleanupOnce.Do(func() { close(cleanup) }) }
+			type start struct {
+				policy []config.InputConfig
+				at     time.Time
+			}
+			started := make(chan start, 3)
+			reports := make(chan status.Status, 20)
+			var runs atomic.Int32
+			run := func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, inputs <-chan []config.InputConfig, ready, exited func()) error {
+				var policy []config.InputConfig
+				select {
+				case policy = <-inputs:
+				case <-ctx.Done():
+					return ctx.Err()
+				}
+				number := runs.Add(1)
+				started <- start{policy: policy, at: time.Now()}
+				ready()
+				if number == 1 {
+					<-crash
+					exited()
+					close(exitedSignal)
+					<-cleanup
+				} else {
+					exited()
+				}
+				return exit78
+			}
+			runner, ctx, cancel, done := recoveryRunner(t, run, func(r *osqueryRunner) {
+				r.maxRetries = 1
+				r.retryInitial = 80 * time.Millisecond
+				r.reportStatus = func(s status.Status, _ string) {
+					reports <- s
+					if s == status.Running && runs.Load() == 1 {
+						close(running)
+						<-unblockRunning
+					}
+				}
+			})
+			t.Cleanup(func() { releaseRunning(); releaseCrash(); releaseCleanup() })
+			require.NoError(t, runner.Update(ctx, recoveryInput("original", 3)), "start the original daemon")
+			waitRecoveryValue(t, started)
+			waitRecoveryValue(t, running)
+			if !pendingExit {
+				releaseRunning()
+			}
+			releaseCrash()
+			waitRecoveryValue(t, exitedSignal)
+			if !pendingExit {
+				for waitRecoveryValue(t, reports) != status.Degraded {
+				}
+			}
+			updated := make(chan error, 1)
+			go func() {
+				if tc.remove {
+					if err := runner.Update(ctx, nil); err != nil {
+						updated <- err
+						return
+					}
+				}
+				if tc.stayRemoved {
+					updated <- nil
+					return
+				}
+				updated <- runner.Update(ctx, recoveryInput("replacement", 4))
+			}()
+			if pendingExit {
+				// Both events are queued before select resumes. Handling the update
+				// first must still observe the exit and report degradation.
+				require.Eventually(t, func() bool { return len(runner.inputCh) == 1 }, time.Second, time.Millisecond, "queue the policy beside the pending exit")
+				releaseRunning()
+			}
+			require.NoError(t, waitRecoveryValue(t, updated), "retain the new policy while cleanup is blocked")
+			if pendingExit {
+				for waitRecoveryValue(t, reports) != status.Degraded {
+				}
+			}
+			assert.Equal(t, int32(1), runs.Load(), "policy update must not start a daemon during cleanup")
+			releasedAt := time.Now()
+			releaseCleanup()
+			if tc.stayRemoved {
+				for waitRecoveryValue(t, reports) != status.Configuring {
+				}
+				assert.Equal(t, int32(1), runs.Load(), "removing all inputs must suspend recovery after cleanup")
+				cancel()
+				assert.ErrorIs(t, waitRecoveryValue(t, done), context.Canceled, "idle runner must stop without retrying")
+				return
+			}
+			replacement := waitRecoveryValue(t, started)
+			assert.GreaterOrEqual(t, replacement.at.Sub(releasedAt), 70*time.Millisecond, "an already-exited daemon must still wait for recovery backoff")
+			assert.Equal(t, "replacement", replacement.policy[0].Name, "recovery must use the latest policy")
+			assert.Equal(t, 4, replacement.policy[0].Osquery.Options["thrift_timeout"], "recovery must use the latest options")
+			err := waitRecoveryValue(t, done)
+			assert.ErrorContains(t, err, "restart limit exceeded after 1 retries", "the replacement must consume the retry budget")
+			assert.Equal(t, int32(2), runs.Load(), "policy changes must not grant an uncounted restart")
+		})
+	}
+}

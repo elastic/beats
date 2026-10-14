@@ -191,6 +191,18 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) (ru
 			return parentCtx.Err()
 		case update := <-r.inputCh:
 			latest = update.inputs
+			if completed != nil {
+				// An exit can be buffered while its logger cleanup is still running.
+				// A later policy must not turn that failure into an intentional restart.
+				observeExit()
+				if !exitedAt.IsZero() {
+					observeReady()
+					reportExit()
+					havePending = false
+					close(update.applied)
+					continue
+				}
+			}
 			if len(latest) == 0 {
 				stopRetry()
 				havePending = false
@@ -270,6 +282,11 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) (ru
 			// Exit 78 also means invalid startup configuration; only recover after readiness.
 			if !isRecoverableOsqueryError(err) && (readyAt.IsZero() || !isOsqueryExit78(err)) {
 				return err
+			}
+			if len(latest) == 0 {
+				recovering = false
+				waiting()
+				continue
 			}
 			if retries >= r.maxRetries {
 				return fmt.Errorf("osqueryd restart limit exceeded after %d retries: %w", retries, err)
