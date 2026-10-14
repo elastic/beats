@@ -135,8 +135,13 @@ func TestOsqueryInputReadinessAfterIdle(t *testing.T) {
 				return len(host.GetEvents()) > before && host.GetEvent().Status() == componentstatus.StatusOK
 			}, time.Second, time.Millisecond, "current daemon readiness must restore healthy input status")
 			require.NoError(t, runner.Update(ctx, recoveryInput("same-run addition", thriftTimeout)), "adding inputs with unchanged options must retain daemon readiness")
+			before = len(host.GetEvents())
 			create("same-run addition")
-			require.Equal(t, componentstatus.StatusOK, host.GetEvent().Status(), "healthy additions must not wait for the once-only readiness callback to fire again")
+			require.Len(t, host.GetEvents(), before, "a new input must not report ready before osqueryd applies its configuration")
+			factory.UpdateStatus(status.Running, "Osqueryd configuration applied")
+			require.Eventually(t, func() bool {
+				return len(host.GetEvents()) > before && host.GetEvent().Status() == componentstatus.StatusOK
+			}, time.Second, time.Millisecond, "configuration application must restore healthy input status")
 			cancel()
 			require.ErrorIs(t, waitRecoveryValue(t, done), context.Canceled, "runner must stop cleanly")
 		})

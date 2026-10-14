@@ -219,7 +219,9 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) (ru
 			if len(latest) == 0 {
 				stopRetry()
 				pending = nil
-				recovering = false
+				// Keep an active recovery budget while inputs are absent. A later
+				// re-add must resume through the existing backoff and retry count.
+				recovering = retryErr != nil
 				if completed != nil {
 					stopping = true
 					report(status.Configuring, "Stopping osqueryd without inputs")

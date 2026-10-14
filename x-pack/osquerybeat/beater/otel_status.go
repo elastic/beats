@@ -61,6 +61,11 @@ func (r *osqueryInputRunner) Start() {
 	if state == status.Unknown {
 		state = status.Configuring
 	}
+	// A newly created input must wait for osqueryd to apply the current
+	// configuration. Do not inherit Running from an older input or run.
+	if state == status.Running {
+		return
+	}
 	r.updateStatus(state, r.factory.message)
 }
 
