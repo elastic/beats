@@ -18,6 +18,8 @@ jobs:
     steps:
       - id: generator
         uses: elastic/oblt-actions/elastic/active-branches@v1
+        with:
+          filter-branches: true
 
   bump-elastic-stack:
     runs-on: ubuntu-latest
@@ -29,7 +31,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.filter.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: elastic/oblt-actions/updatecli/run-and-notify@v1
         with:
