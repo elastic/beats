@@ -33,3 +33,6 @@ blocked on output publication can still delay that cleanup. This change does
 not prevent output outages from blocking logger callbacks or resolve the
 separate scheduled-profiling issue. It does not change result delivery, result
 size limits, or the shared queue memory budget.
+
+Removing all inputs suspends recovery. Re-adding inputs resumes with a fresh
+backoff and the existing retry budget; it does not create a free replacement.

@@ -573,3 +573,34 @@ func TestOsqueryRunnerPolicyAfterExitPreservesRecovery(t *testing.T) {
 		})
 	}
 }
+
+func TestOsqueryRunnerReaddedInputsPreserveRetryBudget(t *testing.T) {
+	started := make(chan time.Time, 8)
+	failed := make(chan struct{}, 8)
+	run := func(context.Context, osqd.Flags, config.ExtensionsConfig, <-chan []config.InputConfig, func(), func()) error {
+		started <- time.Now()
+		return errors.New("write: broken pipe")
+	}
+	runner, ctx, _, done := recoveryRunner(t, run, func(r *osqueryRunner) {
+		r.maxRetries = 2
+		r.retryInitial, r.retryMax = 80*time.Millisecond, 80*time.Millisecond
+		r.reportStatus = func(s status.Status, _ string) {
+			if s == status.Degraded {
+				failed <- struct{}{}
+			}
+		}
+	})
+	require.NoError(t, runner.Update(ctx, recoveryInput("initial", 3)), "start the initial daemon")
+	waitRecoveryValue(t, started)
+	for range 2 {
+		waitRecoveryValue(t, failed)
+		require.NoError(t, runner.Update(ctx, nil), "suspend pending recovery")
+		readded := time.Now()
+		require.NoError(t, runner.Update(ctx, recoveryInput("replacement", 3)), "resume pending recovery")
+		waitRecoveryValue(t, failed)
+		next := waitRecoveryValue(t, started)
+		assert.GreaterOrEqual(t, next.Sub(readded), 70*time.Millisecond, "re-added inputs must wait for a fresh backoff")
+	}
+	assert.ErrorContains(t, waitRecoveryValue(t, done), "restart limit exceeded after 2 retries", "policy toggles must not create uncounted replacement runs")
+	assert.Empty(t, started, "the exhausted budget must prevent further replacements")
+}

@@ -76,6 +76,7 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) (ru
 		retry        *time.Timer
 		retryCh      <-chan time.Time
 		retries      int
+		recoveryErr  error
 	)
 	backoff := r.retryInitial
 	report := func(s status.Status, message string) {
@@ -118,6 +119,7 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) (ru
 			waiting()
 			return false
 		}
+		recoveryErr = nil
 		flags = config.GetOsqueryOptions(latest)
 		extensions = config.GetOsqueryExtensions(latest)
 		logLevel = zapcore.LevelOf(r.log.Core())
@@ -181,6 +183,19 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) (ru
 			report(status.Degraded, "Osqueryd exited; recovering")
 		}
 	}
+	scheduleRetry := func() error {
+		if retries >= r.maxRetries {
+			return fmt.Errorf("osqueryd restart limit exceeded after %d retries: %w", retries, recoveryErr)
+		}
+		if !recovering || !exitReported {
+			report(status.Degraded, "Osqueryd exited; restarting: "+recoveryErr.Error())
+		}
+		recovering = true
+		r.log.Warnf("Restart osqueryd after recoverable error in %s (attempt %d/%d): %v", backoff, retries+1, r.maxRetries, recoveryErr)
+		retry = time.NewTimer(backoff)
+		retryCh = retry.C
+		return nil
+	}
 	for {
 		var send chan []config.InputConfig
 		if havePending && !stopping {
@@ -219,7 +234,14 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) (ru
 			}
 			if completed == nil {
 				if retryCh == nil {
-					start()
+					if recoveryErr != nil {
+						if err := scheduleRetry(); err != nil {
+							close(update.applied)
+							return err
+						}
+					} else {
+						start()
+					}
 				}
 				close(update.applied)
 				continue
@@ -283,21 +305,16 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) (ru
 			if !isRecoverableOsqueryError(err) && (readyAt.IsZero() || !isOsqueryExit78(err)) {
 				return err
 			}
+			// Keep the failure while inputs are absent so re-addition is a counted retry.
+			recoveryErr = err
 			if len(latest) == 0 {
 				recovering = false
 				waiting()
 				continue
 			}
-			if retries >= r.maxRetries {
-				return fmt.Errorf("osqueryd restart limit exceeded after %d retries: %w", retries, err)
+			if err := scheduleRetry(); err != nil {
+				return err
 			}
-			recovering = true
-			if !exitReported {
-				report(status.Degraded, "Osqueryd exited; restarting: "+err.Error())
-			}
-			r.log.Warnf("Restart osqueryd after recoverable error in %s (attempt %d/%d): %v", backoff, retries+1, r.maxRetries, err)
-			retry = time.NewTimer(backoff)
-			retryCh = retry.C
 		case <-retryCh:
 			// Policies received during backoff replace latest without bypassing the delay.
 			if start() {
