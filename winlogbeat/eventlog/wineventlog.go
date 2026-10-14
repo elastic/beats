@@ -496,7 +496,7 @@ func (l *winEventLog) render(h win.EvtHandle) (evt *winevent.Event, xml string, 
 	sr, ok := l.renderer.(systemRenderer)
 	if !ok || l.filter == nil {
 		evt, xml, err = l.renderer.Render(h)
-		return evt, xml, evt != nil && !l.filter.match(evt), err
+		return evt, xml, !l.filter.match(evt), err
 	}
 
 	evt, err = sr.RenderSystem(h)
