@@ -3961,19 +3961,11 @@ Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/featu
 
 --------------------------------------------------------------------------------
 Dependency : github.com/aws/aws-sdk-go-v2/feature/s3/manager
-<<<<<<< HEAD
-Version: v1.23.10
-Licence type (autodetected): Apache-2.0
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/feature/s3/manager@v1.23.10/LICENSE.txt:
-=======
 Version: v1.23.14
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/feature/s3/manager@v1.23.14/LICENSE.txt:
->>>>>>> 881b6b7 (build(deps): bump the aws-sdks group across 1 directory with 30 updates (#53711))
 
 
                                  Apache License
@@ -4817,19 +4809,11 @@ Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/servi
 
 --------------------------------------------------------------------------------
 Dependency : github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs
-<<<<<<< HEAD
-Version: v1.88.1
-Licence type (autodetected): Apache-2.0
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs@v1.88.1/LICENSE.txt:
-=======
 Version: v1.89.3
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs@v1.89.3/LICENSE.txt:
->>>>>>> 881b6b7 (build(deps): bump the aws-sdks group across 1 directory with 30 updates (#53711))
 
 
                                  Apache License
@@ -5249,19 +5233,11 @@ Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/servi
 
 --------------------------------------------------------------------------------
 Dependency : github.com/aws/aws-sdk-go-v2/service/ec2
-<<<<<<< HEAD
-Version: v1.336.1
-Licence type (autodetected): Apache-2.0
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/service/ec2@v1.336.1/LICENSE.txt:
-=======
 Version: v1.338.4
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/service/ec2@v1.338.4/LICENSE.txt:
->>>>>>> 881b6b7 (build(deps): bump the aws-sdks group across 1 directory with 30 updates (#53711))
 
 
                                  Apache License
@@ -5681,19 +5657,11 @@ Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/servi
 
 --------------------------------------------------------------------------------
 Dependency : github.com/aws/aws-sdk-go-v2/service/health
-<<<<<<< HEAD
-Version: v1.47.0
-Licence type (autodetected): Apache-2.0
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/service/health@v1.47.0/LICENSE.txt:
-=======
 Version: v1.50.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/service/health@v1.50.1/LICENSE.txt:
->>>>>>> 881b6b7 (build(deps): bump the aws-sdks group across 1 directory with 30 updates (#53711))
 
 
                                  Apache License
@@ -6113,19 +6081,11 @@ Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/servi
 
 --------------------------------------------------------------------------------
 Dependency : github.com/aws/aws-sdk-go-v2/service/organizations
-<<<<<<< HEAD
-Version: v1.60.1
-Licence type (autodetected): Apache-2.0
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/service/organizations@v1.60.1/LICENSE.txt:
-=======
 Version: v1.61.3
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/service/organizations@v1.61.3/LICENSE.txt:
->>>>>>> 881b6b7 (build(deps): bump the aws-sdks group across 1 directory with 30 updates (#53711))
 
 
                                  Apache License
@@ -6333,19 +6293,11 @@ Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/servi
 
 --------------------------------------------------------------------------------
 Dependency : github.com/aws/aws-sdk-go-v2/service/rds
-<<<<<<< HEAD
-Version: v1.129.1
-Licence type (autodetected): Apache-2.0
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/service/rds@v1.129.1/LICENSE.txt:
-=======
 Version: v1.130.3
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/service/rds@v1.130.3/LICENSE.txt:
->>>>>>> 881b6b7 (build(deps): bump the aws-sdks group across 1 directory with 30 updates (#53711))
 
 
                                  Apache License
@@ -6765,19 +6717,11 @@ Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/servi
 
 --------------------------------------------------------------------------------
 Dependency : github.com/aws/aws-sdk-go-v2/service/s3
-<<<<<<< HEAD
-Version: v1.113.4
-Licence type (autodetected): Apache-2.0
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/service/s3@v1.113.4/LICENSE.txt:
-=======
 Version: v1.114.3
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/service/s3@v1.114.3/LICENSE.txt:
->>>>>>> 881b6b7 (build(deps): bump the aws-sdks group across 1 directory with 30 updates (#53711))
 
 
                                  Apache License
