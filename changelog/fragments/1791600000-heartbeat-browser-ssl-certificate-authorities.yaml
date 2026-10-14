@@ -1,0 +1,15 @@
+kind: feature
+
+summary: Add ssl.certificate_authorities to Heartbeat browser monitors.
+
+description: >
+  Chromium only trusts its own NSS database, so browser monitors against
+  endpoints signed by an internal CA failed with ERR_CERT_AUTHORITY_INVALID
+  unless the CA was installed in the image. Browser monitors now accept
+  ssl.certificate_authorities (inline PEM or file paths). For each run Heartbeat
+  builds a temporary NSS database with certutil, seeded from the shared
+  $HOME/.pki/nssdb when there is one, adds the monitor's CAs and removes it
+  when the run ends, so the CAs apply to that monitor only. Requires certutil
+  (nss-tools) where Heartbeat runs.
+
+component: heartbeat
