@@ -9,6 +9,7 @@ package synthexec
 import (
 	"context"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -58,8 +59,17 @@ func applyCustomCAs(ctx context.Context, cmd *SynthCmd) (cleanup func(), err err
 		return cleanup, fmt.Errorf("could not create NSS database directory: %w", err)
 	}
 	dbArg := "sql:" + db
-	if err = runCertutil(ctx, certutil, "-N", "-d", dbArg, "--empty-password"); err != nil {
-		return cleanup, err
+	userHome := os.Getenv("HOME")
+	// Start from the shared database, if any, so CAs trusted for every browser monitor
+	// (e.g. imported by the Elastic Agent image) stay trusted next to this monitor's.
+	seeded, err := seedFromSharedDB(filepath.Join(userHome, ".pki", "nssdb"), db)
+	if err != nil {
+		return cleanup, fmt.Errorf("could not copy the shared NSS database: %w", err)
+	}
+	if !seeded {
+		if err = runCertutil(ctx, certutil, "-N", "-d", dbArg, "--empty-password"); err != nil {
+			return cleanup, err
+		}
 	}
 
 	n := 0
@@ -83,7 +93,7 @@ func applyCustomCAs(ctx context.Context, cmd *SynthCmd) (cleanup func(), err err
 			if err = os.WriteFile(file, pem.EncodeToMemory(block), 0o600); err != nil {
 				return cleanup, fmt.Errorf("could not write certificate authority: %w", err)
 			}
-			if err = runCertutil(ctx, certutil, "-A", "-d", dbArg, "-n", fmt.Sprintf("custom-ca-%d", n), "-t", "C,,", "-i", file); err != nil {
+			if err = runCertutil(ctx, certutil, "-A", "-d", dbArg, "-n", fmt.Sprintf("monitor-ca-%d", n), "-t", "C,,", "-i", file); err != nil {
 				return cleanup, fmt.Errorf("could not import certificate authority from %q: %w", src, err)
 			}
 		}
@@ -103,7 +113,6 @@ func applyCustomCAs(ctx context.Context, cmd *SynthCmd) (cleanup func(), err err
 
 	// A new HOME must not hide what the browser and its fonts load from the real
 	// one: Playwright's browsers and the font cache, which is slow to rebuild.
-	userHome := os.Getenv("HOME")
 	cmd.Env = append(cmd.Env, "HOME="+home)
 	if userHome != "" {
 		if os.Getenv("PLAYWRIGHT_BROWSERS_PATH") == "" {
@@ -115,6 +124,30 @@ func applyCustomCAs(ctx context.Context, cmd *SynthCmd) (cleanup func(), err err
 	}
 
 	return cleanup, nil
+}
+
+// seedFromSharedDB copies the NSS database files of src into dst. It reports false,
+// without error, when src holds no database.
+func seedFromSharedDB(src, dst string) (bool, error) {
+	if _, err := os.Stat(filepath.Join(src, "cert9.db")); err != nil {
+		if os.IsNotExist(err) || errors.Is(err, os.ErrPermission) {
+			return false, nil
+		}
+		return false, err
+	}
+	for _, name := range []string{"cert9.db", "key4.db", "pkcs11.txt"} {
+		data, err := os.ReadFile(filepath.Join(src, name))
+		if err != nil {
+			if os.IsNotExist(err) {
+				continue
+			}
+			return false, err
+		}
+		if err := os.WriteFile(filepath.Join(dst, name), data, 0o600); err != nil {
+			return false, err
+		}
+	}
+	return true, nil
 }
 
 func runCertutil(ctx context.Context, certutil string, args ...string) error {

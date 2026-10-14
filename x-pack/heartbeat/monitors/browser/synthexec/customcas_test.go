@@ -152,8 +152,8 @@ func TestApplyCustomCAsRealCertutil(t *testing.T) {
 	home, _ := envValue(cmd.Env, "HOME")
 	out, err := exec.Command(certutil, "-L", "-d", "sql:"+filepath.Join(home, ".pki", "nssdb")).CombinedOutput() //nolint:gosec // test
 	require.NoError(t, err, "listing the database: %s", out)
-	assert.Contains(t, string(out), "custom-ca-1", "first certificate must be in the database")
-	assert.Contains(t, string(out), "custom-ca-2", "second certificate of the bundle must be in the database")
+	assert.Contains(t, string(out), "monitor-ca-1", "first certificate must be in the database")
+	assert.Contains(t, string(out), "monitor-ca-2", "second certificate of the bundle must be in the database")
 }
 
 func TestRunCmdKeepsCustomCAsUntilCommandExits(t *testing.T) {
@@ -178,4 +178,71 @@ func TestRunCmdKeepsCustomCAsUntilCommandExits(t *testing.T) {
 	assert.Equal(t, "present", lines[1], "the NSS database must exist for the command's whole run")
 	assert.Eventually(t, func() bool { _, err := os.Stat(lines[0]); return os.IsNotExist(err) }, 5*time.Second, 50*time.Millisecond,
 		"the trust store must be removed once the command exits")
+}
+
+func TestApplyCustomCAsSeedsFromSharedDB(t *testing.T) {
+	calls := stubCertutil(t)
+	userHome := t.TempDir()
+	shared := filepath.Join(userHome, ".pki", "nssdb")
+	require.NoError(t, os.MkdirAll(shared, 0o700), "creating shared db dir")
+	require.NoError(t, os.WriteFile(filepath.Join(shared, "cert9.db"), []byte("shared certs"), 0o600), "writing shared cert db")
+	require.NoError(t, os.WriteFile(filepath.Join(shared, "key4.db"), []byte("shared keys"), 0o600), "writing shared key db")
+	t.Setenv("HOME", userHome)
+
+	ctx := context.WithValue(context.Background(), CustomCAsKey, []string{testCAPEM(t, "ca")})
+	cmd := &SynthCmd{Cmd: exec.Command("true")}
+	cleanup, err := applyCustomCAs(ctx, cmd)
+	require.NoError(t, err, "applying CAs")
+	defer cleanup()
+
+	home, _ := envValue(cmd.Env, "HOME")
+	got, err := os.ReadFile(filepath.Join(home, ".pki", "nssdb", "cert9.db"))
+	require.NoError(t, err, "reading the seeded cert db")
+	assert.Equal(t, "shared certs", string(got), "the shared database must be the starting point")
+
+	out, err := os.ReadFile(calls)
+	require.NoError(t, err, "reading certutil calls")
+	assert.NotContains(t, string(out), "-N", "an existing shared database must not be recreated empty")
+	assert.Contains(t, string(out), "-A", "the monitor's CA must still be added")
+
+	again, err := os.ReadFile(filepath.Join(shared, "cert9.db"))
+	require.NoError(t, err, "reading the shared db again")
+	assert.Equal(t, "shared certs", string(again), "the shared database itself must not be modified")
+}
+
+// TestApplyCustomCAsKeepsSharedCAs checks with the real certutil that a CA trusted
+// through the shared database and one set on the monitor are trusted together.
+func TestApplyCustomCAsKeepsSharedCAs(t *testing.T) {
+	certutil, err := exec.LookPath("certutil")
+	if err != nil {
+		t.Skip("certutil not installed")
+	}
+
+	userHome := t.TempDir()
+	shared := filepath.Join(userHome, ".pki", "nssdb")
+	require.NoError(t, os.MkdirAll(shared, 0o700), "creating shared db dir")
+	sharedArg := "sql:" + shared
+	out, err := exec.Command(certutil, "-N", "-d", sharedArg, "--empty-password").CombinedOutput() //nolint:gosec // test
+	require.NoError(t, err, "creating shared db: %s", out)
+	caFile := filepath.Join(t.TempDir(), "shared.pem")
+	require.NoError(t, os.WriteFile(caFile, []byte(testCAPEM(t, "shared")), 0o600), "writing shared CA")
+	out, err = exec.Command(certutil, "-A", "-d", sharedArg, "-n", "custom-ca-shared", "-t", "C,,", "-i", caFile).CombinedOutput() //nolint:gosec // test
+	require.NoError(t, err, "importing shared CA: %s", out)
+	t.Setenv("HOME", userHome)
+
+	ctx := context.WithValue(context.Background(), CustomCAsKey, []string{testCAPEM(t, "monitor")})
+	cmd := &SynthCmd{Cmd: exec.Command("true")}
+	cleanup, err := applyCustomCAs(ctx, cmd)
+	require.NoError(t, err, "applying CAs")
+	defer cleanup()
+
+	home, _ := envValue(cmd.Env, "HOME")
+	out, err = exec.Command(certutil, "-L", "-d", "sql:"+filepath.Join(home, ".pki", "nssdb")).CombinedOutput() //nolint:gosec // test
+	require.NoError(t, err, "listing the monitor database: %s", out)
+	assert.Contains(t, string(out), "custom-ca-shared", "the shared CA must stay trusted for the monitor")
+	assert.Contains(t, string(out), "monitor-ca-1", "the monitor's own CA must be trusted")
+
+	out, err = exec.Command(certutil, "-L", "-d", sharedArg).CombinedOutput() //nolint:gosec // test
+	require.NoError(t, err, "listing the shared database: %s", out)
+	assert.NotContains(t, string(out), "monitor-ca-1", "the monitor's CA must not leak into the shared database")
 }
