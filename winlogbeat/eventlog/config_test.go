@@ -29,27 +29,31 @@ import (
 )
 
 func TestReadConfig_StartPosition(t *testing.T) {
-	tests := map[string]struct {
+	tests := []struct {
+		name    string
 		cfg     map[string]any
 		want    StartPosition
 		wantErr string
 	}{
-		"default is beginning": {
+		{
+			name: "default is beginning",
 			cfg:  map[string]any{"name": "Application"},
 			want: StartAtBeginning,
 		},
-		"end": {
+		{
+			name: "end",
 			cfg:  map[string]any{"name": "Application", "start_position": "end"},
 			want: StartAtEnd,
 		},
-		"invalid value": {
+		{
+			name:    "invalid value",
 			cfg:     map[string]any{"name": "Application", "start_position": "oldest"},
 			wantErr: "invalid start_position: oldest",
 		},
 	}
 
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
 			c := defaultConfig()
 			err := readConfig(conf.MustNewConfigFrom(tc.cfg), &c)
 			if tc.wantErr != "" {
