@@ -120,7 +120,7 @@ const (
 	StartAtEnd
 )
 
-var startPositionNames = map[StartPosition]string{
+var startPositionNames = [...]string{
 	StartAtBeginning: "beginning",
 	StartAtEnd:       "end",
 }
@@ -128,9 +128,9 @@ var startPositionNames = map[StartPosition]string{
 // Unpack sets the start position based on the string value.
 func (p *StartPosition) Unpack(v string) error {
 	v = strings.ToLower(v)
-	for pos, name := range startPositionNames {
+	for i, name := range startPositionNames {
 		if v == name {
-			*p = pos
+			*p = StartPosition(i)
 			return nil
 		}
 	}
@@ -138,7 +138,12 @@ func (p *StartPosition) Unpack(v string) error {
 }
 
 // String returns the name of the start position.
-func (p StartPosition) String() string { return startPositionNames[p] }
+func (p StartPosition) String() string {
+	if int(p) >= len(startPositionNames) {
+		return fmt.Sprintf("StartPosition(%d)", p)
+	}
+	return startPositionNames[p]
+}
 
 // Validate validates the winEventLogConfig data and returns an error describing
 // any problems or nil.
