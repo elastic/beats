@@ -38,6 +38,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pub"
+	otelstatus "github.com/elastic/beats/v7/x-pack/otel/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -48,6 +49,10 @@ var (
 	ErrActionRequest      = errors.New("invalid action request")
 	ErrOsquerydExited     = errors.New("osqueryd exited")
 )
+
+func osqueryInputKey(rawConfig *conf.C) (string, error) {
+	return otelstatus.InputID(rawConfig)
+}
 
 const (
 	adhocOsqueriesTypesCacheSize = 256 // The final cache size equals the number of periodic queries plus this value, in order to have additional cache for ad-hoc queries
@@ -265,26 +270,24 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	if bt.otelStatusFactoryWrapper != nil {
 		otelFactory = bt.otelStatusFactoryWrapper(otelStatus)
 	}
-	inputKey := func(idx int, ic config.InputConfig) string {
-		if ic.ID != "" {
-			return ic.ID
-		}
-		return fmt.Sprintf("index:%d", idx)
-	}
 	reconcileOtelRunners := func(inputs []config.InputConfig) {
 		if otelFactory == nil {
 			return
 		}
 		newKeys := make(map[string]struct{}, len(inputs))
 		for i := range inputs {
-			key := inputKey(i, inputs[i])
-			newKeys[key] = struct{}{}
-			if _, exists := otelRunners[key]; exists {
-				continue
-			}
 			rawCfg, cfgErr := conf.NewConfigFrom(&inputs[i])
 			if cfgErr != nil {
-				bt.log.Warnf("otel status: failed to build config for input %s: %v", key, cfgErr)
+				bt.log.Warnf("otel status: failed to build config for input %d: %v", i, cfgErr)
+				continue
+			}
+			key, cfgErr := osqueryInputKey(rawCfg)
+			if cfgErr != nil {
+				bt.log.Warnf("otel status: failed to identify input %d: %v", i, cfgErr)
+				continue
+			}
+			newKeys[key] = struct{}{}
+			if _, exists := otelRunners[key]; exists {
 				continue
 			}
 			runner, cfgErr := otelFactory.Create(b.Publisher, rawCfg)

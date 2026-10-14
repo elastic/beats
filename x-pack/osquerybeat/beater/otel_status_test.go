@@ -39,6 +39,33 @@ func TestOsqueryIdleStatusDoesNotMakeInputsReady(t *testing.T) {
 	require.Empty(t, host.GetEvents(), "idle Agent status must not become daemon readiness for a new input")
 }
 
+func TestOsqueryInputKeyTracksIDLessConfiguration(t *testing.T) {
+	first := recoveryInput("same position", 3)[0]
+	first.ID = ""
+	second := recoveryInput("same position", 4)[0]
+	second.ID = ""
+	firstConfig, err := conf.NewConfigFrom(&first)
+	require.NoError(t, err, "build the first ID-less input config")
+	secondConfig, err := conf.NewConfigFrom(&second)
+	require.NoError(t, err, "build the changed ID-less input config")
+	firstKey, err := osqueryInputKey(firstConfig)
+	require.NoError(t, err, "identify the first ID-less input")
+	secondKey, err := osqueryInputKey(secondConfig)
+	require.NoError(t, err, "identify the changed ID-less input")
+	require.NotEqual(t, firstKey, secondKey, "changed ID-less inputs must receive different status runner identities")
+
+	first.ID, second.ID = "fixed", "fixed"
+	firstConfig, err = conf.NewConfigFrom(&first)
+	require.NoError(t, err, "build the first explicit-ID config")
+	secondConfig, err = conf.NewConfigFrom(&second)
+	require.NoError(t, err, "build the changed explicit-ID config")
+	firstKey, err = osqueryInputKey(firstConfig)
+	require.NoError(t, err, "identify the first explicit-ID input")
+	secondKey, err = osqueryInputKey(secondConfig)
+	require.NoError(t, err, "identify the changed explicit-ID input")
+	require.Equal(t, firstKey, secondKey, "explicit IDs must remain stable across configuration changes")
+}
+
 func TestOsqueryInputReadinessAfterIdle(t *testing.T) {
 	for _, scenario := range []string{"empty startup", "remove and re-add", "changed options"} {
 		t.Run(scenario, func(t *testing.T) {

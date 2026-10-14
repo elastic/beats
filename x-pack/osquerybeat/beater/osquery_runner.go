@@ -57,26 +57,23 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) (ru
 		close(r.done)
 	}()
 	var (
-		latest       []config.InputConfig
-		flags        osqd.Flags
-		extensions   config.ExtensionsConfig
-		logLevel     zapcore.Level
-		cancel       context.CancelFunc
-		completed    <-chan error
-		inputs       chan []config.InputConfig
-		pending      []config.InputConfig
-		havePending  bool
-		stopping     bool
-		recovering   bool
-		ready        <-chan time.Time
-		readyAt      time.Time
-		exited       <-chan time.Time
-		exitedAt     time.Time
-		exitReported bool
-		retry        *time.Timer
-		retryCh      <-chan time.Time
-		retries      int
-		recoveryErr  error
+		latest     []config.InputConfig
+		flags      osqd.Flags
+		extensions config.ExtensionsConfig
+		logLevel   zapcore.Level
+		cancel     context.CancelFunc
+		completed  <-chan error
+		inputs     chan []config.InputConfig
+		pending    []config.InputConfig
+		stopping   bool
+		recovering bool
+		ready      <-chan time.Time
+		readyAt    time.Time
+		exited     <-chan time.Time
+		exitedAt   time.Time
+		retry      *time.Timer
+		retries    int
+		retryErr   error // Non-nil while a recovery retry budget is active.
 	)
 	backoff := r.retryInitial
 	report := func(s status.Status, message string) {
@@ -95,8 +92,13 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) (ru
 		if retry != nil {
 			retry.Stop()
 			retry = nil
-			retryCh = nil
 		}
+	}
+	retryChannel := func() <-chan time.Time {
+		if retry == nil {
+			return nil
+		}
+		return retry.C
 	}
 	defer stopRetry()
 	defer func() {
@@ -119,7 +121,6 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) (ru
 			waiting()
 			return false
 		}
-		recoveryErr = nil
 		flags = config.GetOsqueryOptions(latest)
 		extensions = config.GetOsqueryExtensions(latest)
 		logLevel = zapcore.LevelOf(r.log.Core())
@@ -137,11 +138,10 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) (ru
 			}
 		}
 		inputs = make(chan []config.InputConfig, 1)
-		pending, havePending = latest, true
+		pending = latest
 		done := make(chan error, 1)
 		completed = done
 		readyAt, exitedAt = time.Time{}, time.Time{}
-		exitReported = false
 		stopping = false
 		if !recovering {
 			report(status.Configuring, "Starting osqueryd")
@@ -177,28 +177,26 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) (ru
 		}
 	}
 	reportExit := func() {
-		if !exitReported && !readyAt.IsZero() && !exitedAt.IsZero() && !stopping && parentCtx.Err() == nil {
-			exitReported = true
+		if !recovering && !readyAt.IsZero() && !exitedAt.IsZero() && !stopping && parentCtx.Err() == nil {
 			recovering = true
 			report(status.Degraded, "Osqueryd exited; recovering")
 		}
 	}
 	scheduleRetry := func() error {
 		if retries >= r.maxRetries {
-			return fmt.Errorf("osqueryd restart limit exceeded after %d retries: %w", retries, recoveryErr)
+			return fmt.Errorf("osqueryd restart limit exceeded after %d retries: %w", retries, retryErr)
 		}
-		if !recovering || !exitReported {
-			report(status.Degraded, "Osqueryd exited; restarting: "+recoveryErr.Error())
+		if !recovering || readyAt.IsZero() {
+			report(status.Degraded, "Osqueryd exited; restarting: "+retryErr.Error())
 		}
 		recovering = true
-		r.log.Warnf("Restart osqueryd after recoverable error in %s (attempt %d/%d): %v", backoff, retries+1, r.maxRetries, recoveryErr)
+		r.log.Warnf("Restart osqueryd after recoverable error in %s (attempt %d/%d): %v", backoff, retries+1, r.maxRetries, retryErr)
 		retry = time.NewTimer(backoff)
-		retryCh = retry.C
 		return nil
 	}
 	for {
 		var send chan []config.InputConfig
-		if havePending && !stopping {
+		if pending != nil && !stopping {
 			send = inputs
 		}
 		select {
@@ -213,14 +211,14 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) (ru
 				if !exitedAt.IsZero() {
 					observeReady()
 					reportExit()
-					havePending = false
+					pending = nil
 					close(update.applied)
 					continue
 				}
 			}
 			if len(latest) == 0 {
 				stopRetry()
-				havePending = false
+				pending = nil
 				recovering = false
 				if completed != nil {
 					stopping = true
@@ -233,8 +231,8 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) (ru
 				continue
 			}
 			if completed == nil {
-				if retryCh == nil {
-					if recoveryErr != nil {
+				if retry == nil {
+					if retryErr != nil {
 						if err := scheduleRetry(); err != nil {
 							close(update.applied)
 							return err
@@ -250,17 +248,17 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) (ru
 			newExtensions := config.GetOsqueryExtensions(latest)
 			if !osqd.FlagsAreSame(flags, newFlags) || !extensionsAreSame(extensions, newExtensions) || logLevel != zapcore.LevelOf(r.log.Core()) {
 				stopping = true
-				havePending = false
+				pending = nil
 				if !recovering {
 					report(status.Configuring, "Restarting osqueryd for updated configuration")
 				}
 				cancel()
 			} else if !stopping {
-				pending, havePending = latest, true
+				pending = latest
 			}
 			close(update.applied)
 		case send <- pending:
-			havePending = false
+			pending = nil
 		case readyAt = <-ready:
 			ready = nil
 			observeExit()
@@ -282,22 +280,30 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) (ru
 			// Teardown time must not count as healthy operation, including on policy restarts.
 			if !readyAt.IsZero() && exitedAt.Sub(readyAt) >= r.stablePeriod {
 				retries, backoff = 0, r.retryInitial
+				retryErr = nil
 			}
 			cancel()
 			cancel, completed, inputs, ready, exited = nil, nil, nil, nil, nil
-			havePending = false
+			pending = nil
 			if parentCtx.Err() != nil {
 				return parentCtx.Err()
 			}
 			if stopping {
 				if len(latest) > 0 {
-					start()
+					if retryErr != nil {
+						if err := scheduleRetry(); err != nil {
+							return err
+						}
+					} else {
+						start()
+					}
 				} else {
 					waiting()
 				}
 				continue
 			}
 			if err == nil || errors.Is(err, context.Canceled) {
+				retryErr = nil
 				r.log.Info("Osquery exited: ", err)
 				continue
 			}
@@ -306,7 +312,7 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) (ru
 				return err
 			}
 			// Keep the failure while inputs are absent so re-addition is a counted retry.
-			recoveryErr = err
+			retryErr = err
 			if len(latest) == 0 {
 				recovering = false
 				waiting()
@@ -315,7 +321,7 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) (ru
 			if err := scheduleRetry(); err != nil {
 				return err
 			}
-		case <-retryCh:
+		case <-retryChannel():
 			// Policies received during backoff replace latest without bypassing the delay.
 			if start() {
 				retries++

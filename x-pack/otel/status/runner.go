@@ -52,7 +52,7 @@ func getInputId(config *config.C) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("could not unpack config: %w", err)
 	}
-	if inputId, ok := h["id"]; ok {
+	if inputId, ok := h["id"]; ok && fmt.Sprint(inputId) != "" {
 		return fmt.Sprintf("%v", inputId), nil
 	}
 
@@ -62,4 +62,10 @@ func getInputId(config *config.C) (string, error) {
 	}
 
 	return fmt.Sprintf("%x", inputId), nil
+}
+
+// InputID returns the identity used by status reporters for an input config.
+// Explicit IDs are preserved; ID-less configs use a stable hash of their full configuration.
+func InputID(config *config.C) (string, error) {
+	return getInputId(config)
 }

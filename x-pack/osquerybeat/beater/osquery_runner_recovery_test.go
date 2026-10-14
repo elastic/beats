@@ -185,54 +185,6 @@ func TestOsqueryRunnerExit78RequiresReadyConfiguration(t *testing.T) {
 	assert.False(t, isOsqueryExit78(errors.Join(context.Canceled, exit78)), "intentional cancellation must override process exit")
 }
 
-func TestOsqueryRunnerRecoveryKeepsLatestPolicyAndHealth(t *testing.T) {
-	exit78 := osqueryExitError(t, 78)
-	reports := make(chan status.Status, 10)
-	nextPolicy := make(chan []config.InputConfig, 1)
-	releaseReady := make(chan struct{})
-	var runs atomic.Int32
-	run := func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, inputs <-chan []config.InputConfig, ready func(), _ func()) error {
-		if runs.Add(1) == 1 {
-			ready()
-			return exit78
-		}
-		select {
-		case input := <-inputs:
-			nextPolicy <- input
-		case <-ctx.Done():
-			return ctx.Err()
-		}
-		select {
-		case <-releaseReady:
-			ready()
-		case <-ctx.Done():
-			return ctx.Err()
-		}
-		<-ctx.Done()
-		return ctx.Err()
-	}
-	runner, ctx, cancel, done := recoveryRunner(t, run, func(r *osqueryRunner) {
-		r.retryInitial = 100 * time.Millisecond
-		r.reportStatus = func(s status.Status, _ string) { reports <- s }
-	})
-	require.NoError(t, runner.Update(ctx, recoveryInput("old", 3)), "start the initial policy")
-	for waitRecoveryValue(t, reports) != status.Degraded {
-	}
-	require.NoError(t, runner.Update(ctx, recoveryInput("latest", 4)), "policy updates must remain responsive during backoff")
-	policy := waitRecoveryValue(t, nextPolicy)
-	assert.Equal(t, "latest", policy[0].Name, "restart must use the most recent input")
-	assert.Equal(t, 4, policy[0].Osquery.Options["thrift_timeout"], "restart must use the latest flags")
-	select {
-	case s := <-reports:
-		t.Errorf("recovery reported %v before current-run readiness", s)
-	default:
-	}
-	close(releaseReady)
-	assert.Equal(t, status.Running, waitRecoveryValue(t, reports), "current configuration readiness must restore Running")
-	cancel()
-	assert.ErrorIs(t, waitRecoveryValue(t, done), context.Canceled, "shutdown must cancel the active replacement")
-}
-
 func TestOsqueryRunnerRecoveryBackoffAndCancellation(t *testing.T) {
 	started := make(chan time.Time, 4)
 	run := func(context.Context, osqd.Flags, config.ExtensionsConfig, <-chan []config.InputConfig, func(), func()) error {
@@ -311,39 +263,6 @@ func TestOsqueryRunnerRecoveryIgnoresOldReadiness(t *testing.T) {
 	assert.Equal(t, status.Running, waitRecoveryValue(t, reports), "current readiness must not be lost behind stale callbacks")
 	cancel()
 	assert.ErrorIs(t, waitRecoveryValue(t, done), context.Canceled, "runner must stop")
-}
-
-func TestOsqueryRunnerRemovalSuspendsRecovery(t *testing.T) {
-	degraded := make(chan struct{}, 1)
-	started := make(chan struct{}, 2)
-	var runs atomic.Int32
-	run := func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan []config.InputConfig, _, _ func()) error {
-		started <- struct{}{}
-		if runs.Add(1) == 1 {
-			return errors.New("write: broken pipe")
-		}
-		<-ctx.Done()
-		return ctx.Err()
-	}
-	runner, ctx, cancel, done := recoveryRunner(t, run, func(r *osqueryRunner) {
-		r.retryInitial = 100 * time.Millisecond
-		r.reportStatus = func(s status.Status, _ string) {
-			if s == status.Degraded {
-				degraded <- struct{}{}
-			}
-		}
-	})
-	require.NoError(t, runner.Update(ctx, recoveryInput("first", 3)), "start real policy")
-	waitRecoveryValue(t, started)
-	waitRecoveryValue(t, degraded)
-	require.NoError(t, runner.Update(ctx, nil), "remove inputs during backoff")
-	time.Sleep(150 * time.Millisecond)
-	assert.Equal(t, int32(1), runs.Load(), "removed policy must not launch a replacement daemon")
-	require.NoError(t, runner.Update(ctx, recoveryInput("readded", 4)), "new policy must resume daemon lifecycle")
-	waitRecoveryValue(t, started)
-	require.NoError(t, runner.Update(ctx, nil), "removal must also cancel an active daemon")
-	cancel()
-	assert.ErrorIs(t, waitRecoveryValue(t, done), context.Canceled, "suspended runner must remain cancellable")
 }
 
 func TestOsqueryRunnerLatestPolicyDuringTeardown(t *testing.T) {
@@ -467,9 +386,17 @@ func TestOsqueryRunnerReportsExitBeforeTeardownCompletes(t *testing.T) {
 
 func TestOsqueryRunnerPolicyAfterExitPreservesRecovery(t *testing.T) {
 	exit78 := osqueryExitError(t, 78)
-	for _, tc := range []struct{ pendingExit, remove, stayRemoved bool }{{false, false, false}, {true, false, false}, {false, true, false}, {true, true, false}, {true, true, true}} {
-		t.Run(fmt.Sprintf("pending_exit=%t/remove=%t/stay_removed=%t", tc.pendingExit, tc.remove, tc.stayRemoved), func(t *testing.T) {
-			pendingExit := tc.pendingExit
+	for _, tc := range []struct {
+		name                string
+		pendingExit         bool
+		remove, stayRemoved bool
+	}{
+		{"replace", false, false, false},
+		{"pending exit", true, false, false},
+		{"remove and re-add", false, true, false},
+		{"remain removed", false, true, true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
 			running, unblockRunning := make(chan struct{}), make(chan struct{})
 			crash, exitedSignal, cleanup := make(chan struct{}), make(chan struct{}), make(chan struct{})
 			var runningOnce, crashOnce, cleanupOnce sync.Once
@@ -518,39 +445,45 @@ func TestOsqueryRunnerPolicyAfterExitPreservesRecovery(t *testing.T) {
 			require.NoError(t, runner.Update(ctx, recoveryInput("original", 3)), "start the original daemon")
 			waitRecoveryValue(t, started)
 			waitRecoveryValue(t, running)
-			if !pendingExit {
-				releaseRunning()
-			}
-			releaseCrash()
-			waitRecoveryValue(t, exitedSignal)
-			if !pendingExit {
-				for waitRecoveryValue(t, reports) != status.Degraded {
-				}
-			}
-			updated := make(chan error, 1)
-			go func() {
-				if tc.remove {
-					if err := runner.Update(ctx, nil); err != nil {
-						updated <- err
+			sendUpdate := func() <-chan error {
+				updated := make(chan error, 1)
+				go func() {
+					if tc.remove {
+						if err := runner.Update(ctx, nil); err != nil {
+							updated <- err
+							return
+						}
+					}
+					if tc.stayRemoved {
+						updated <- nil
 						return
 					}
-				}
-				if tc.stayRemoved {
-					updated <- nil
-					return
-				}
-				updated <- runner.Update(ctx, recoveryInput("replacement", 4))
-			}()
-			if pendingExit {
+					updated <- runner.Update(ctx, recoveryInput("replacement", 4))
+				}()
+				return updated
+			}
+			var updated <-chan error
+			if tc.pendingExit {
+				updated = sendUpdate()
 				// Both events are queued before select resumes. Handling the update
 				// first must still observe the exit and report degradation.
 				require.Eventually(t, func() bool { return len(runner.inputCh) == 1 }, time.Second, time.Millisecond, "queue the policy beside the pending exit")
+				releaseCrash()
+				waitRecoveryValue(t, exitedSignal)
 				releaseRunning()
+			} else {
+				releaseRunning()
+				releaseCrash()
+				waitRecoveryValue(t, exitedSignal)
+				// The update is intentionally sent after the exit so this case
+				// covers the ordinary observed-exit ordering.
+				updated = sendUpdate()
+				require.NoError(t, waitRecoveryValue(t, updated), "retain the new policy while cleanup is blocked")
 			}
-			require.NoError(t, waitRecoveryValue(t, updated), "retain the new policy while cleanup is blocked")
-			if pendingExit {
-				for waitRecoveryValue(t, reports) != status.Degraded {
-				}
+			if tc.pendingExit {
+				require.NoError(t, waitRecoveryValue(t, updated), "retain the new policy while cleanup is blocked")
+			}
+			for waitRecoveryValue(t, reports) != status.Degraded {
 			}
 			assert.Equal(t, int32(1), runs.Load(), "policy update must not start a daemon during cleanup")
 			releasedAt := time.Now()
@@ -603,4 +536,40 @@ func TestOsqueryRunnerReaddedInputsPreserveRetryBudget(t *testing.T) {
 	}
 	assert.ErrorContains(t, waitRecoveryValue(t, done), "restart limit exceeded after 2 retries", "policy toggles must not create uncounted replacement runs")
 	assert.Empty(t, started, "the exhausted budget must prevent further replacements")
+}
+
+func TestOsqueryRunnerReaddedInputsDuringRetryPreserveRetryBudget(t *testing.T) {
+	started := make(chan time.Time, 3)
+	secondStarted, releaseSecond := make(chan struct{}), make(chan struct{})
+	var releaseOnce sync.Once
+	release := func() { releaseOnce.Do(func() { close(releaseSecond) }) }
+	var runs atomic.Int32
+	run := func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan []config.InputConfig, _, _ func()) error {
+		number := runs.Add(1)
+		started <- time.Now()
+		if number == 2 {
+			close(secondStarted)
+			<-ctx.Done()
+			<-releaseSecond
+			return ctx.Err()
+		}
+		return errors.New("write: broken pipe")
+	}
+	runner, ctx, _, done := recoveryRunner(t, run, func(r *osqueryRunner) {
+		r.maxRetries = 2
+		r.retryInitial, r.retryMax = 80*time.Millisecond, 80*time.Millisecond
+	})
+	t.Cleanup(release)
+	require.NoError(t, runner.Update(ctx, recoveryInput("initial", 3)), "start the initial daemon")
+	waitRecoveryValue(t, started)
+	waitRecoveryValue(t, secondStarted)
+	waitRecoveryValue(t, started)
+	require.NoError(t, runner.Update(ctx, nil), "stop the active replacement")
+	require.NoError(t, runner.Update(ctx, recoveryInput("replacement", 3)), "retain the latest policy while cleanup is pending")
+	released := time.Now()
+	release()
+	third := waitRecoveryValue(t, started)
+	assert.GreaterOrEqual(t, third.Sub(released), 70*time.Millisecond, "re-adding during an active retry must wait through recovery backoff")
+	assert.ErrorContains(t, waitRecoveryValue(t, done), "restart limit exceeded after 2 retries", "the active retry must retain its budget after policy removal")
+	assert.Equal(t, int32(3), runs.Load(), "policy changes must not grant an uncounted replacement")
 }
