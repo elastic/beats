@@ -299,7 +299,7 @@ func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID, 
 		return
 	}
 
-	fields := queryProfileToEvent(queryName, actionID, responseID, spaceID, profile, reqData)
+	fields := queryProfileToEvent(queryName, actionID, responseID, spaceID, profile, reqData, "", 0)
 
 	event := beat.Event{
 		Timestamp: time.Now(),
@@ -315,7 +315,7 @@ func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID, 
 }
 
 // queryProfileToEvent builds the field set for a query profile document.
-func queryProfileToEvent(queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) mapstr.M {
+func queryProfileToEvent(queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any, scheduleID string, scheduleExecutionCount int64) mapstr.M {
 	fields := mapstr.M{
 		"type": "osquery_profile",
 		"event": map[string]any{
@@ -336,6 +336,10 @@ func queryProfileToEvent(queryName, actionID, responseID, spaceID string, profil
 	}
 	if spaceID != "" {
 		fields["space_id"] = spaceID
+	}
+	if scheduleID != "" {
+		fields["schedule_id"] = scheduleID
+		fields["schedule_execution_count"] = scheduleExecutionCount
 	}
 	if reqData != nil {
 		fields["action_data"] = reqData

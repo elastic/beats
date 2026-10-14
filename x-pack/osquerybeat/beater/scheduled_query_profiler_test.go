@@ -30,8 +30,9 @@ func (f profileQueryFunc) Query(ctx context.Context, sql string, timeout time.Du
 }
 
 type collectedProfile struct {
-	name, responseID, spaceID string
-	profile                   map[string]any
+	name, scheduleID, responseID, spaceID string
+	scheduleExecutionCount                int64
+	profile                               map[string]any
 }
 
 type profileTestSink struct {
@@ -40,11 +41,11 @@ type profileTestSink struct {
 }
 
 func (s *profileTestSink) Valid() bool { return !s.retired.Load() }
-func (s *profileTestSink) Publish(name, responseID, spaceID string, profile map[string]any) bool {
+func (s *profileTestSink) Publish(name, scheduleID, responseID, spaceID string, scheduleExecutionCount int64, profile map[string]any) bool {
 	if !s.Valid() {
 		return false
 	}
-	s.published <- collectedProfile{name, responseID, spaceID, profile}
+	s.published <- collectedProfile{name, scheduleID, responseID, spaceID, scheduleExecutionCount, profile}
 	return true
 }
 
@@ -67,7 +68,7 @@ func profileTestPlugin(t *testing.T) *ConfigPlugin {
 }
 
 func profileTestRequest(sink *profileTestSink) scheduledProfileRequest {
-	return scheduledProfileRequest{name: "scheduled", query: "SELECT 1", namespace: "default", responseID: "response", spaceID: "space", sink: sink}
+	return scheduledProfileRequest{name: "scheduled", query: "SELECT 1", namespace: "default", scheduleID: "scheduled", responseID: "response", spaceID: "space", scheduleExecutionCount: 1, sink: sink}
 }
 
 func profileTestRow(sql string) []map[string]any {
@@ -122,7 +123,9 @@ func TestScheduledProfilerPreservesProfileCorrelation(t *testing.T) {
 	select {
 	case published := <-sink.published:
 		assert.Equal(t, "scheduled", published.name, "preserve the native query name")
+		assert.Equal(t, "scheduled", published.scheduleID, "preserve the schedule identity")
 		assert.Equal(t, "response", published.responseID, "preserve correlation with the result and scheduled response")
+		assert.Equal(t, int64(1), published.scheduleExecutionCount, "preserve the originating schedule execution")
 		assert.Equal(t, "space", published.spaceID, "preserve the captured policy space")
 		assert.Equal(t, "scheduled", published.profile["source"], "preserve the scheduled profile schema")
 		assert.Equal(t, int64(2), published.profile["executions"], "preserve the native schedule's execution metrics")

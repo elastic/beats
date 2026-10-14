@@ -420,7 +420,7 @@ func TestQueryProfileToEvent_SpaceID(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			fields := queryProfileToEvent("", "", "", tc.spaceID, map[string]any{"key": "val"}, nil)
+			fields := queryProfileToEvent("", "", "", tc.spaceID, map[string]any{"key": "val"}, nil, "", 0)
 			got, ok := fields["space_id"]
 			if tc.present {
 				if !ok {

@@ -21,8 +21,9 @@ import (
 const scheduledProfilePendingJobs = 64
 
 type scheduledProfileRequest struct {
-	name, query, namespace, responseID, spaceID string
-	sink                                        pub.ScheduledProfileSink
+	name, query, namespace, scheduleID, responseID, spaceID string
+	scheduleExecutionCount                                  int64
+	sink                                                    pub.ScheduledProfileSink
 }
 
 type scheduledProfileMetrics struct {
@@ -145,7 +146,7 @@ func (w *scheduledQueryProfiler) collect(request scheduledProfileRequest) {
 		w.metrics.stale.Inc()
 		return
 	}
-	if !request.sink.Publish(request.name, request.responseID, request.spaceID, profile) {
+	if !request.sink.Publish(request.name, request.scheduleID, request.responseID, request.spaceID, request.scheduleExecutionCount, profile) {
 		w.metrics.stale.Inc()
 		return
 	}

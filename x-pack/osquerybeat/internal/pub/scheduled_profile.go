@@ -21,7 +21,7 @@ type ScheduledProfileSink interface {
 	Valid() bool
 	// Publish returns whether the lease accepted this publication attempt.
 	// Queue admission remains best effort; dropped.output_full records losses.
-	Publish(queryName, responseID, spaceID string, profile map[string]any) bool
+	Publish(queryName, scheduleID, responseID, spaceID string, scheduleExecutionCount int64, profile map[string]any) bool
 }
 
 type scheduledProfileSink struct {
@@ -111,7 +111,7 @@ func (s *scheduledProfileSink) closeClient() {
 	}
 }
 
-func (s *scheduledProfileSink) Publish(queryName, responseID, spaceID string, profile map[string]any) bool {
+func (s *scheduledProfileSink) Publish(queryName, scheduleID, responseID, spaceID string, scheduleExecutionCount int64, profile map[string]any) bool {
 	s.mu.Lock()
 	defer func() {
 		if s.retired.Load() {
@@ -124,7 +124,7 @@ func (s *scheduledProfileSink) Publish(queryName, responseID, spaceID string, pr
 	}
 	s.client.Publish(beat.Event{
 		Timestamp: time.Now(),
-		Fields:    queryProfileToEvent(queryName, "", responseID, spaceID, profile, nil),
+		Fields:    queryProfileToEvent(queryName, "", responseID, spaceID, profile, nil, scheduleID, scheduleExecutionCount),
 		Meta:      mapstr.M{events.FieldMetaRawIndex: config.QueryProfileDatastream(s.namespace)},
 	})
 	return true
