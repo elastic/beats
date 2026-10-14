@@ -67,7 +67,7 @@ func TestRenderFiltersBeforeFullRender(t *testing.T) {
 
 	unwanted := winevent.Event{EventIdentifier: winevent.EventIdentifier{ID: 200}}
 
-	t.Run("system renderer skips remaining render for filtered events", func(t *testing.T) {
+	t.Run("system_renderer_skips_remaining_render_for_filtered_events", func(t *testing.T) {
 		r := &fakeSystemRenderer{fakeRenderer: fakeRenderer{event: unwanted}}
 		l := &winEventLog{renderer: r, filter: filter}
 
@@ -80,7 +80,7 @@ func TestRenderFiltersBeforeFullRender(t *testing.T) {
 		assert.Equal(t, 0, r.renders, "full render should not be used")
 	})
 
-	t.Run("plain renderer filters after full render", func(t *testing.T) {
+	t.Run("plain_renderer_filters_after_full_render", func(t *testing.T) {
 		r := &fakeRenderer{event: unwanted}
 		l := &winEventLog{renderer: r, filter: filter}
 
