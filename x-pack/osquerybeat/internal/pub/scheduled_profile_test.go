@@ -41,10 +41,10 @@ func TestScheduledProfileSinkPreservesSchemaAndDeliveryModes(t *testing.T) {
 	sink := p.CaptureScheduledProfileSink("results")
 	require.NotNil(t, sink, "a compatible result namespace should capture its profile destination")
 	profile := map[string]any{"source": "scheduled", "executions": int64(3), "duration": int64(12)}
-	require.True(t, sink.Publish("uptime", "response", "space", profile), "the active lease should publish the collected profile")
+	require.True(t, sink.Publish("uptime", "schedule", "response", "space", 1, profile), "the active lease should publish the collected profile")
 	require.Len(t, recorder.clients[3].events, 1, "publish one scheduled profile event")
 	event := recorder.clients[3].events[0]
-	assert.Equal(t, queryProfileToEvent("uptime", "", "response", "space", profile, nil), event.Fields, "scheduled profiles must preserve the existing event schema and correlation fields")
+	assert.Equal(t, queryProfileToEvent("uptime", "", "response", "space", profile, nil, "schedule", 1), event.Fields, "scheduled profiles must preserve the existing event schema and correlation fields")
 	assert.Equal(t, config.QueryProfileDatastream("results"), event.Meta[events.FieldMetaRawIndex], "the explicit profile index must preserve the result namespace")
 	require.NotNil(t, recorder.configs[3].ClientListener, "output admission loss should be observable")
 	recorder.configs[3].ClientListener.DroppedOnPublish(event)
@@ -60,7 +60,7 @@ func TestScheduledProfileSinkDoesNotWaitForResultPublisherMutex(t *testing.T) {
 	done := make(chan bool, 1)
 	go func() {
 		sink := p.CaptureScheduledProfileSink("default")
-		done <- sink != nil && sink.Valid() && sink.Publish("query", "response", "", map[string]any{"source": "scheduled"})
+		done <- sink != nil && sink.Valid() && sink.Publish("query", "schedule", "response", "", 1, map[string]any{"source": "scheduled"})
 	}()
 	select {
 	case ok := <-done:
@@ -90,7 +90,7 @@ func TestScheduledProfileSinkRetiresOnPolicyReplacement(t *testing.T) {
 			require.NotNil(t, old, "capture a lease before the policy changes")
 			require.NoError(t, p.Configure(replacement.inputs), "replace the policy")
 			assert.False(t, old.Valid(), "a queued profile must lose its original lease on every policy replacement")
-			assert.False(t, old.Publish("query", "response", "", nil), "a retired lease must not publish even when its namespace is reused")
+			assert.False(t, old.Publish("query", "schedule", "response", "", 1, nil), "a retired lease must not publish even when its namespace is reused")
 		})
 	}
 }
@@ -152,7 +152,7 @@ func TestScheduledProfileLeaseInvalidationDoesNotWaitForPublication(t *testing.T
 	client := &stalledScheduledProfileClient{entered: make(chan struct{}), release: make(chan struct{})}
 	sink := &scheduledProfileSink{client: client, namespace: "default"}
 	done := make(chan bool, 1)
-	go func() { done <- sink.Publish("scheduled", "response", "", nil) }()
+	go func() { done <- sink.Publish("scheduled", "schedule", "response", "", 1, nil) }()
 	select {
 	case <-client.entered:
 	case <-time.After(time.Second):

@@ -874,15 +874,16 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 	var totalHits int
 
 	responseID := uuid.Must(uuid.NewV4()).String()
+	runTime := time.Unix(res.UnixTime, 0).UTC()
+	scheduleExecutionCount, plannedScheduleTime, clockSkewClamped := nativeScheduleTiming(qi.StartDate, qi.Interval, res.UnixTime)
 	var profileRequest scheduledProfileRequest
 	if profiler != nil && configPlugin.LookupQueryProfile(res.Name) {
 		profileRequest = scheduledProfileRequest{
-			name: res.Name, query: qi.Query, namespace: ns, responseID: responseID, spaceID: qi.SpaceID,
-			sink: bt.pub.CaptureScheduledProfileSink(ns),
+			name: res.Name, query: qi.Query, namespace: ns, scheduleID: scheduleID, responseID: responseID, spaceID: qi.SpaceID,
+			scheduleExecutionCount: scheduleExecutionCount,
+			sink:                   bt.pub.CaptureScheduledProfileSink(ns),
 		}
 	}
-	runTime := time.Unix(res.UnixTime, 0).UTC()
-	scheduleExecutionCount, plannedScheduleTime, clockSkewClamped := nativeScheduleTiming(qi.StartDate, qi.Interval, res.UnixTime)
 	if clockSkewClamped && bt.shouldLogClockSkewWarn(res.Name) {
 		bt.log.Warnf(
 			"Native scheduled query %q reported run time %s before start_date %s; possible clock skew, clamping to execution 1",
