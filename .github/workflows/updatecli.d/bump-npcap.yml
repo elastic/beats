@@ -36,15 +36,40 @@ actions:
         https://github.com/nmap/npcap/releases/tag/v{{ source "npcapVersion" }}
 
 sources:
+  goMinorVersion:
+    name: Get Go major.minor version from .go-version
+    kind: shell
+    dependson:
+      - goVersion
+    transformers:
+      - findsubmatch:
+          pattern: '^(\d+\.\d+)\.\d+$'
+          captureindex: 1
+    spec:
+      command: echo {{ source "goVersion" }}
+
   npcapVersion:
     name: Get NPCAP_VERSION from golang-crossbuild/Makefile.common
     kind: shell
+    dependson:
+      - goMinorVersion
     transformers:
       - findsubmatch:
           pattern: 'NPCAP_VERSION := (\d+\.\d+)'
           captureindex: 1
     spec:
-      command: gh api repos/elastic/golang-crossbuild/contents/Makefile.common --jq '.content | @base64d'
+      command: |
+        ref="{{ source "goMinorVersion" }}"
+        if branch_error=$(gh api "repos/elastic/golang-crossbuild/branches/$ref" 2>&1 >/dev/null); then
+          :
+        else
+          status=$?
+          case "$branch_error" in
+            *"HTTP 404"*) ref=main ;;
+            *) printf '%s\n' "$branch_error" >&2; exit "$status" ;;
+          esac
+        fi
+        gh api "repos/elastic/golang-crossbuild/contents/Makefile.common?ref=$ref" --jq '.content | @base64d'
       environments:
         - name: GITHUB_TOKEN
         - name: PATH
