@@ -37,7 +37,6 @@ func TestGetBeatVersion(t *testing.T) {
 				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
-						BeatNameCtxKey:    {"filebeat"},
 						BeatVersionCtxKey: {"8.0.0"},
 					}),
 				}
@@ -50,9 +49,7 @@ func TestGetBeatVersion(t *testing.T) {
 			setupCtx: func() context.Context {
 				ctx := t.Context()
 				info := client.Info{
-					Metadata: client.NewMetadata(map[string][]string{
-						BeatNameCtxKey: {"filebeat"},
-					}),
+					Metadata: client.NewMetadata(map[string][]string{}),
 				}
 				return client.NewContext(ctx, info)
 			},

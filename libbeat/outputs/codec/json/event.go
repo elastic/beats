@@ -49,9 +49,7 @@ func makeEvent(index, version string, in *beat.Event) event {
 		Fields:  in.Meta,
 	}
 
-	// '@metadata.beat' set on the event takes precedence over the output's index, so
-	// events from several beats can share one output. It is removed from a
-	// shallow copy of the inline map so it is not emitted twice.
+	// '@metadata.beat' set on the event takes precedence over the output's index
 	if b, ok := in.Meta["beat"].(string); ok && b != "" {
 		m.Beat = b
 		metaClone := maps.Clone(in.Meta)
