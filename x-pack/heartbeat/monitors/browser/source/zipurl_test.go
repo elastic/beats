@@ -12,7 +12,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
