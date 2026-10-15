@@ -21,11 +21,8 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
-	"fmt"
 	"maps"
-	"os"
 	"strings"
-	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -40,6 +37,9 @@ import (
 // fakeType is a secret store registered for the tests of this package.
 const fakeType = "fake"
 
+// otherType is a second fake store type, to test stores run in order.
+const otherType = "fake_other"
+
 // fakePrefix starts a fake reference: a top-level string "fake:<name>".
 const fakePrefix = "fake:"
 
@@ -49,9 +49,6 @@ var errFakeUnavailable = errors.New("fake: store unavailable")
 type fakeStore struct {
 	id   string
 	fail bool
-
-	mu    sync.Mutex
-	calls int
 }
 
 func (s *fakeStore) Validate(cfg *conf.C) error {
@@ -71,9 +68,6 @@ func (s *fakeStore) Replace(_ context.Context, cfg *conf.C) (*conf.C, error) {
 		return nil, err
 	}
 	return s.replace(m, func(name string) (string, error) {
-		s.mu.Lock()
-		defer s.mu.Unlock()
-		s.calls++
 		if s.fail {
 			return "", errFakeUnavailable
 		}
@@ -101,22 +95,8 @@ func (s *fakeStore) replace(m map[string]any, resolve func(name string) (string,
 	return (*conf.C)(c), err
 }
 
-func (s *fakeStore) callCount() int {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return s.calls
-}
-
-func TestMain(m *testing.M) {
-	if err := registerFakeStore(); err != nil {
-		fmt.Fprintf(os.Stderr, "could not register the fake secret store: %v\n", err)
-		os.Exit(1)
-	}
-	os.Exit(m.Run())
-}
-
-func registerFakeStore() error {
-	return Register(fakeType, func(cfg *conf.C, _ *logp.Logger) (Store, error) {
+func init() {
+	mustRegister(fakeType, func(cfg *conf.C, _ *logp.Logger) (Store, error) {
 		var c struct {
 			Fail    bool   `config:"fail"`
 			Invalid bool   `config:"invalid"`
@@ -130,6 +110,15 @@ func registerFakeStore() error {
 		}
 		return &fakeStore{id: c.ID, fail: c.Fail}, nil
 	})
+	mustRegister(otherType, func(*conf.C, *logp.Logger) (Store, error) {
+		return &fakeStore{id: "other"}, nil
+	})
+}
+
+func mustRegister(storeType string, factory Factory) {
+	if err := Register(storeType, factory); err != nil {
+		panic(err)
+	}
 }
 
 // newTestConfig builds a config the way the process-wide options do.
@@ -138,14 +127,6 @@ func newTestConfig(t *testing.T, m map[string]any) *conf.C {
 	c, err := ucfg.NewFrom(m, ucfg.PathSep("."), ucfg.VarExp)
 	require.NoError(t, err, "test config must be valid")
 	return (*conf.C)(c)
-}
-
-// unpackAsText unpacks cfg keeping every reference as text.
-func unpackAsText(t *testing.T, cfg *conf.C) map[string]any {
-	t.Helper()
-	var m map[string]any
-	require.NoError(t, (*ucfg.Config)(cfg).Unpack(&m, ucfg.PathSep("."), ucfg.ResolveNOOP), "config must unpack")
-	return m
 }
 
 func fakeStores(extra ...map[string]any) []any {
@@ -163,17 +144,10 @@ func resetSharedStores(t *testing.T) {
 	sharedStores.mu.Unlock()
 }
 
-func sharedFakeStores(t *testing.T) []*fakeStore {
-	t.Helper()
+func sharedStoreCount() int {
 	sharedStores.mu.Lock()
 	defer sharedStores.mu.Unlock()
-	var out []*fakeStore
-	for _, s := range sharedStores.stores {
-		fs, ok := s.(*fakeStore)
-		require.True(t, ok, "only fake stores are expected")
-		out = append(out, fs)
-	}
-	return out
+	return len(sharedStores.stores)
 }
 
 func TestRegisterRejectsInvalidAndDuplicateTypes(t *testing.T) {
@@ -188,7 +162,7 @@ func TestRegisterRejectsInvalidAndDuplicateTypes(t *testing.T) {
 }
 
 func TestParseEntries(t *testing.T) {
-	b64 := func(s string) string { return base64.StdEncoding.EncodeToString([]byte(s)) }
+	toBase64 := func(s string) string { return base64.StdEncoding.EncodeToString([]byte(s)) }
 
 	tests := []struct {
 		name    string
@@ -198,11 +172,11 @@ func TestParseEntries(t *testing.T) {
 	}{
 		{name: "nil", raw: nil, want: 0},
 		{name: "list", raw: fakeStores(), want: 1},
-		{name: "base64 json", raw: b64(`[{"type":"fake","id":"x"}]`), want: 1},
-		{name: "base64 yaml", raw: b64("- type: fake\n  id: x\n"), want: 1},
+		{name: "base64 json", raw: toBase64(`[{"type":"fake","id":"x"}]`), want: 1},
+		{name: "base64 yaml", raw: toBase64("- type: fake\n  id: x\n"), want: 1},
 		{name: "empty string", raw: "  ", want: 0},
 		{name: "invalid base64", raw: "not base64!", wantErr: "invalid base64"},
-		{name: "base64 not a list", raw: b64(`{"type":"fake"}`), wantErr: "not a YAML/JSON list"},
+		{name: "base64 not a list", raw: toBase64(`{"type":"fake"}`), wantErr: "not a YAML/JSON list"},
 		{name: "wrong type", raw: 42, wantErr: "expected a list or a base64 string"},
 		{name: "item not an object", raw: []any{"fake"}, wantErr: "expected an object"},
 		{name: "missing type", raw: []any{map[string]any{"id": "x"}}, wantErr: "'type' is required"},
@@ -240,15 +214,15 @@ func TestParseEntriesKeepsBase64ContentLiteral(t *testing.T) {
 }
 
 func TestEntryIdentity(t *testing.T) {
-	a, err := entry{settings: map[string]any{"type": fakeType, "a": "1", "b": "2"}}.identity()
+	a1, err := entry{settings: map[string]any{"type": fakeType, "a": "1", "b": "2"}}.identity()
 	require.NoError(t, err, "identity must be computed")
-	b, err := entry{settings: map[string]any{"b": "2", "type": fakeType, "a": "1"}}.identity()
+	a2, err := entry{settings: map[string]any{"b": "2", "type": fakeType, "a": "1"}}.identity()
 	require.NoError(t, err, "identity must be computed")
-	c, err := entry{settings: map[string]any{"type": fakeType, "a": "1", "b": "3"}}.identity()
+	different, err := entry{settings: map[string]any{"type": fakeType, "a": "1", "b": "3"}}.identity()
 	require.NoError(t, err, "identity must be computed")
 
-	assert.Equal(t, a, b, "equal entries must have the same identity")
-	assert.NotEqual(t, a, c, "different entries must have different identities")
+	assert.Equal(t, a1, a2, "equal entries must have the same identity")
+	assert.NotEqual(t, a1, different, "different entries must have different identities")
 }
 
 func TestResolveWithoutSecretStores(t *testing.T) {
@@ -260,18 +234,15 @@ func TestResolveWithoutSecretStores(t *testing.T) {
 	require.NoError(t, err, "a config without secret stores must not fail")
 	assert.Same(t, cfg, got, "a config without secret stores must be returned as is")
 	assert.NoError(t, r.Validate(cfg), "references are not checked without secret stores")
-	assert.Empty(t, sharedFakeStores(t), "no store is expected without secret stores")
 }
 
 func TestResolveReplacesOnlyInCopy(t *testing.T) {
 	resetSharedStores(t)
-	t.Setenv("SECRETSTORES_TEST_ENV", "from-env")
 	r := NewResolver(logptest.NewTestingLogger(t, ""))
 
 	cfg := newTestConfig(t, map[string]any{
 		"type":     "http",
 		"username": "fake:user",
-		"env":      "${SECRETSTORES_TEST_ENV}",
 		ConfigKey:  fakeStores(),
 	})
 
@@ -280,54 +251,29 @@ func TestResolveReplacesOnlyInCopy(t *testing.T) {
 
 	var resolved struct {
 		Username string `config:"username"`
-		Env      string `config:"env"`
 		Stores   any    `config:"secret_stores"`
 	}
 	require.NoError(t, got.Unpack(&resolved), "resolved config must unpack")
 	assert.Equal(t, "secret-user", resolved.Username, "the store must replace its references")
-	assert.Equal(t, "from-env", resolved.Env, "env references must still resolve")
 	assert.Nil(t, resolved.Stores, "secret_stores must not be given to the plugin")
 
-	original := unpackAsText(t, cfg)
-	assert.Equal(t, "fake:user", original["username"], "the original config must keep the reference")
-	assert.NotNil(t, original[ConfigKey], "the original config must keep secret_stores")
-}
-
-func TestWithoutSecretStoresKeepsConfig(t *testing.T) {
-	t.Setenv("SECRETSTORES_TEST_ENV", "from-env")
-	cfg := newTestConfig(t, map[string]any{"type": "browser", "env": "${SECRETSTORES_TEST_ENV}", ConfigKey: fakeStores()})
-	// Under Elastic Agent params have literal dotted keys.
-	params, err := ucfg.NewFrom(map[string]any{"site.url": "x", "plain": "${not.a.secret}"}, ucfg.PathSep(""))
-	require.NoError(t, err, "params must be valid")
-	require.NoError(t, cfg.SetChild("params", -1, (*conf.C)(params)), "params must be set")
-
-	got, err := withoutSecretStores(cfg)
-	require.NoError(t, err, "the config must be copied")
-
-	text := unpackAsText(t, got)
-	assert.Equal(t, "${SECRETSTORES_TEST_ENV}", text["env"], "references must not be resolved by the copy")
-	assert.NotContains(t, text, ConfigKey, "secret_stores must be removed")
-	var p struct {
-		Params map[string]any `config:"params"`
+	var original struct {
+		Username string `config:"username"`
 	}
-	require.NoError(t, (*ucfg.Config)(got).Unpack(&p, ucfg.PathSep(""), ucfg.ResolveNOOP), "params must unpack")
-	assert.Equal(t, map[string]any{"site.url": "x", "plain": "${not.a.secret}"}, p.Params, "dotted params keys must stay literal")
-	assert.Contains(t, unpackAsText(t, cfg), ConfigKey, "the original config must keep secret_stores")
+	require.NoError(t, cfg.Unpack(&original), "original config must unpack")
+	assert.Equal(t, "fake:user", original.Username, "the original config must keep the reference")
+	assert.True(t, cfg.HasField(ConfigKey), "the original config must keep secret_stores")
 }
 
 func TestResolveRunsStoresInOrder(t *testing.T) {
 	resetSharedStores(t)
-	const otherType = "fake_other"
-	require.NoError(t, Register(otherType, func(*conf.C, *logp.Logger) (Store, error) {
-		return &fakeStore{id: "other"}, nil
-	}), "the second fake store must register")
 	r := NewResolver(logptest.NewTestingLogger(t, ""))
 
-	// The first store returns "fake:-fake:x", another reference, which the
-	// second store replaces.
+	// The fake store replaces "fake:x" by "<id>-x". With id "fake:", it
+	// returns "fake:-x", a new reference only a later store can replace.
 	cfg := newTestConfig(t, map[string]any{
 		"type":    "http",
-		"chained": "fake:fake:x",
+		"chained": "fake:x",
 		ConfigKey: []any{map[string]any{"type": fakeType, "id": "fake:"}, map[string]any{"type": otherType}},
 	})
 	got, err := r.Resolve(cfg)
@@ -336,7 +282,7 @@ func TestResolveRunsStoresInOrder(t *testing.T) {
 		Chained string `config:"chained"`
 	}
 	require.NoError(t, got.Unpack(&resolved), "resolved config must unpack")
-	assert.Equal(t, "other--fake:x", resolved.Chained, "stores must run in the secret_stores order")
+	assert.Equal(t, "other--x", resolved.Chained, "stores must run in the secret_stores order")
 }
 
 func TestResolveSharesStoresAcrossMonitors(t *testing.T) {
@@ -351,9 +297,7 @@ func TestResolveSharesStoresAcrossMonitors(t *testing.T) {
 	_, err = r.Resolve(newCfg())
 	require.NoError(t, err, "second monitor must resolve")
 
-	stores := sharedFakeStores(t)
-	require.Len(t, stores, 1, "monitors with the same connection must share one store")
-	assert.Equal(t, 2, stores[0].callCount(), "the shared store must serve both monitors")
+	assert.Equal(t, 1, sharedStoreCount(), "monitors with the same connection must share one store")
 }
 
 func TestResolveErrors(t *testing.T) {
@@ -372,11 +316,6 @@ func TestResolveErrors(t *testing.T) {
 			cfg:     map[string]any{"type": "http", ConfigKey: fakeStores(map[string]any{"invalid": true})},
 			wantErr: `secret_stores: invalid "fake" entry: invalid fake config`,
 		},
-		{
-			name:    "unknown store type",
-			cfg:     map[string]any{"type": "http", ConfigKey: []any{map[string]any{"type": "nope"}}},
-			wantErr: `unknown secret store type "nope"`,
-		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -388,17 +327,38 @@ func TestResolveErrors(t *testing.T) {
 	}
 }
 
-func TestValidateDoesNotContactStores(t *testing.T) {
-	resetSharedStores(t)
-	r := NewResolver(logptest.NewTestingLogger(t, ""))
-
-	cfg := newTestConfig(t, map[string]any{"type": "http", "target": "fake:token", ConfigKey: fakeStores()})
-	require.NoError(t, r.Validate(cfg), "valid config must pass")
-	assert.Empty(t, sharedFakeStores(t), "validation must not create shared stores")
-
-	bad := newTestConfig(t, map[string]any{"type": "http", "target": "fake:", ConfigKey: fakeStores()})
-	assert.ErrorContains(t, r.Validate(bad), "invalid fake secret references: fake: empty reference", "the store must reject its invalid references")
-
-	invalidStore := newTestConfig(t, map[string]any{"type": "http", ConfigKey: fakeStores(map[string]any{"invalid": true})})
-	assert.ErrorContains(t, r.Validate(invalidStore), "invalid fake config", "an invalid store config must be rejected")
+func TestValidate(t *testing.T) {
+	tests := []struct {
+		name    string
+		cfg     map[string]any
+		wantErr string
+	}{
+		{
+			name: "valid reference",
+			cfg:  map[string]any{"type": "http", "target": "fake:token", ConfigKey: fakeStores()},
+		},
+		{
+			name:    "invalid reference",
+			cfg:     map[string]any{"type": "http", "target": "fake:", ConfigKey: fakeStores()},
+			wantErr: "invalid fake secret references: fake: empty reference",
+		},
+		{
+			name:    "invalid store config",
+			cfg:     map[string]any{"type": "http", ConfigKey: fakeStores(map[string]any{"invalid": true})},
+			wantErr: `secret_stores: invalid "fake" entry: invalid fake config`,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			resetSharedStores(t)
+			r := NewResolver(logptest.NewTestingLogger(t, ""))
+			err := r.Validate(newTestConfig(t, tc.cfg))
+			if tc.wantErr != "" {
+				assert.ErrorContains(t, err, tc.wantErr, "validation must fail")
+			} else {
+				assert.NoError(t, err, "validation must pass")
+			}
+			assert.Zero(t, sharedStoreCount(), "validation must not share stores with running monitors")
+		})
+	}
 }

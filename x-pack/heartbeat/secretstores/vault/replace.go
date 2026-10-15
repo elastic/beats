@@ -29,10 +29,7 @@ func (s *store) Validate(cfg *conf.C) error {
 	if err != nil {
 		return err
 	}
-	decodeSettings(m, func(_ string, raw []byte) (map[string]any, error) {
-		var obj map[string]any
-		return obj, yaml.Unmarshal(raw, &obj)
-	})
+	decodeSettings(m, parseYAMLAsText)
 	return walkSettings(m, func(v string) (string, error) {
 		return replaceReferences(v, func(content string) (string, error) {
 			_, _, err := parseReference(content)
@@ -51,6 +48,8 @@ func (s *store) Replace(ctx context.Context, cfg *conf.C) (*conf.C, error) {
 	if err != nil {
 		return nil, err
 	}
+	// Decode first: base64 settings can hold the only references.
+	decodeSettings(text, parseYAMLAsText)
 	if !containsReferences(text) {
 		return cfg, nil
 	}
@@ -86,6 +85,12 @@ func (s *store) Replace(ctx context.Context, cfg *conf.C) (*conf.C, error) {
 		return nil, fmt.Errorf("could not build resolved config: %w", err)
 	}
 	return (*conf.C)(resolved), nil
+}
+
+// parseYAMLAsText parses a decoded setting keeping ${...} expressions as text.
+func parseYAMLAsText(_ string, raw []byte) (map[string]any, error) {
+	var obj map[string]any
+	return obj, yaml.Unmarshal(raw, &obj)
 }
 
 // unpackAsText unpacks cfg keeping ${...} expressions as text.
