@@ -36,6 +36,10 @@ import (
 	"go.opentelemetry.io/collector/exporter/debugexporter"
 	"go.opentelemetry.io/collector/otelcol"
 	"go.opentelemetry.io/collector/service/telemetry/otelconftelemetry"
+<<<<<<< HEAD
+=======
+	"go.yaml.in/yaml/v3"
+>>>>>>> 3b62662 (feat: replace archived yaml dependency (#49339))
 )
 
 type Collector struct {
