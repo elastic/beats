@@ -26,11 +26,9 @@ import (
 )
 
 const (
-	BeatNameCtxKey        = "beat_name"
 	BeatVersionCtxKey     = "beat_version"
 	BeatIndexPrefixCtxKey = "beat_index_prefix"
 
-	MetadataBeatKey        = "beat"
 	MetadataVersionKey     = "version"
 	MetadataIndexPrefixKey = "index_prefix"
 )
@@ -41,22 +39,11 @@ const (
 func NewConsumerContext(ctx context.Context, beatInfo beat.Info) context.Context {
 	clientInfo := client.Info{
 		Metadata: client.NewMetadata(map[string][]string{
-			BeatNameCtxKey:        {beatInfo.Beat},
 			BeatVersionCtxKey:     {beatInfo.Version},
 			BeatIndexPrefixCtxKey: {beatInfo.IndexPrefix},
 		}),
 	}
 	return client.NewContext(ctx, clientInfo)
-}
-
-// GetBeatName retrieves the beat name from the context metadata
-// If the name is not found, it returns an empty string.
-func GetBeatName(ctx context.Context) string {
-	clientInfo := client.FromContext(ctx)
-	if values := clientInfo.Metadata.Get(BeatNameCtxKey); len(values) > 0 {
-		return values[0]
-	}
-	return ""
 }
 
 // GetBeatVersion retrieves the version of the beat from the context metadata
