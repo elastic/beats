@@ -27,13 +27,7 @@ import (
 	"github.com/elastic/ebpfevents"
 )
 
-var (
-	gWatcherOnce sync.Once
-	gWatcher     Watcher
-
-	// newLoader is ebpfevents.NewLoader, replaced in tests.
-	newLoader = ebpfevents.NewLoader
-)
+var gWatcher Watcher
 
 type client struct {
 	name    string
@@ -55,7 +49,6 @@ type Watcher struct {
 	loader  *ebpfevents.Loader
 	clients map[string]client
 	status  status
-	err     error
 }
 
 type status int
@@ -65,34 +58,25 @@ const (
 	started
 )
 
-// GetWatcher creates the watcher, if required, and returns a reference to the global Watcher.
-func GetWatcher() (*Watcher, error) {
-	gWatcher.Lock()
-	defer gWatcher.Unlock()
-
-	// Try to load the probe once on startup so consumers can error out.
-	gWatcherOnce.Do(func() {
-		if gWatcher.status == stopped {
-			l, err := newLoader()
-			if err != nil {
-				gWatcher.err = fmt.Errorf("init ebpf loader: %w", err)
-				return
-			}
-			_ = l.Close()
-		}
-	})
-
-	return &gWatcher, gWatcher.err
+// GetWatcher returns a reference to the global Watcher. The ebpf loader is started lazily by
+// Subscribe, which reports any failure to load it.
+func GetWatcher() *Watcher {
+	return &gWatcher
 }
 
 // Subscribe to receive events from the watcher. It returns an error if the ebpf loader can't
 // be started.
 func (w *Watcher) Subscribe(clientName string, events EventMask) (<-chan ebpfevents.Record, error) {
+	return w.subscribeWith(clientName, events, ebpfevents.NewLoader)
+}
+
+// subscribeWith is Subscribe with newLoader used to start the ebpf loader.
+func (w *Watcher) subscribeWith(clientName string, events EventMask, newLoader func() (*ebpfevents.Loader, error)) (<-chan ebpfevents.Record, error) {
 	w.Lock()
 	defer w.Unlock()
 
 	if w.status == stopped {
-		if err := w.startLocked(); err != nil {
+		if err := w.startLocked(newLoader); err != nil {
 			return nil, err
 		}
 	}
@@ -120,7 +104,7 @@ func (w *Watcher) Unsubscribe(clientName string) {
 
 // startLocked starts the loader. If that fails, the watcher stays stopped and the next
 // Subscribe tries again.
-func (w *Watcher) startLocked() error {
+func (w *Watcher) startLocked(newLoader func() (*ebpfevents.Loader, error)) error {
 	if w.status == started {
 		return nil
 	}

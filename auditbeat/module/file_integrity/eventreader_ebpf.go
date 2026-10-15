@@ -44,14 +44,11 @@ type ebpfReader struct {
 }
 
 func (r *ebpfReader) Start(done <-chan struct{}) (<-chan Event, error) {
-	watcher, err := ebpf.GetWatcher()
-	if err != nil {
-		return nil, err
-	}
-	r.watcher = watcher
+	r.watcher = ebpf.GetWatcher()
 	r.done = done
 
 	mask := ebpf.EventMask(ebpfevents.EventTypeFileCreate | ebpfevents.EventTypeFileRename | ebpfevents.EventTypeFileDelete | ebpfevents.EventTypeFileModify)
+	var err error
 	r._records, err = r.watcher.Subscribe(clientName, mask)
 	if err != nil {
 		return nil, err

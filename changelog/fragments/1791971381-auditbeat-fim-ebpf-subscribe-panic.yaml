@@ -19,10 +19,11 @@ summary: Fix a panic in the file_integrity eBPF backend when its eBPF loader fai
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
 description: |
-  The eBPF backend loads its probes once to check that they work, and again when
-  the module starts. If the first load succeeded but the second failed, Auditbeat
-  panicked with a nil pointer dereference. The module now fails to start with the
-  loader's error instead, and a later start tries again.
+  The eBPF backend loaded its probes once to check that they work, and again when
+  the module started. If the first load succeeded but the second failed, Auditbeat
+  panicked with a nil pointer dereference. The probes are now loaded only when the
+  module starts; if that fails, the module fails to start with the loader's error
+  and a later start tries again.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:
