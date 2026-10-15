@@ -15,17 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Package secretstores resolves references to secrets kept in external secret
+// Package secretstores replaces references to secrets kept in external secret
 // stores, such as HashiCorp Vault, in monitor configurations.
 //
-// A reference has the form $<type>{<path>#<field>}, for example
-// $vault{app/creds#token}. The type selects the store implementation,
-// registered with Register. Store implementations live in x-pack. The store
-// connection is configured per monitor in the secret_stores list.
+// Store types are registered with Register; implementations live in x-pack.
+// A monitor enables a store type with an entry in its secret_stores list,
+// which also holds the store connection. Each store type defines the syntax
+// of its references and replaces them itself. Without a secret_stores entry,
+// a monitor config is left as is.
 //
 // References are only replaced in the configuration copy given to the monitor
 // plugin. Everywhere else (config hashing, diagnostics, std fields) they stay
-// as text: no other configuration layer interprets $<type>{...}.
+// as text.
 package secretstores
 
 import (
@@ -41,12 +42,16 @@ import (
 // ConfigKey is the monitor setting holding the secret store connections.
 const ConfigKey = "secret_stores"
 
-// Store resolves secret references for one configured connection.
+// Store replaces the secret references of one configured connection.
 // Implementations must be safe for concurrent use, and must never include
 // secret values or credentials in returned errors or logs.
 type Store interface {
-	// Resolve returns the value of field in the secret at path.
-	Resolve(ctx context.Context, path, field string) (string, error)
+	// Validate checks the references in the monitor config cfg without
+	// contacting the secret store.
+	Validate(cfg *conf.C) error
+	// Replace returns a copy of the monitor config cfg with the references
+	// replaced by their secret values. cfg must not be modified.
+	Replace(ctx context.Context, cfg *conf.C) (*conf.C, error)
 }
 
 // Factory creates a Store from one secret_stores entry. It must validate the
@@ -59,27 +64,28 @@ var (
 	factoriesMu sync.RWMutex
 	factories   = map[string]Factory{}
 
-	// stores keeps one Store per connection identity, so monitors with the
-	// same connection share logins and cached values. The number of distinct
-	// connections is small, so entries are never evicted.
-	storesMu sync.Mutex
-	stores   = map[string]Store{}
+	// sharedStores is process-wide, so monitors with the same connection share
+	// logins and cached values across factories and OTel receivers.
+	sharedStores = newStoreCache()
 )
 
-// Register makes a secret store type available. The type is also the prefix
-// of its references. It panics if the type is invalid or already registered,
-// as it is meant to be called from init functions.
-func Register(storeType string, factory Factory) {
+// Register makes a secret store type available. It returns an error if the
+// type is invalid or already registered, or if factory is nil.
+func Register(storeType string, factory Factory) error {
 	if !storeTypePattern.MatchString(storeType) {
-		panic(fmt.Sprintf("invalid secret store type %q", storeType))
+		return fmt.Errorf("invalid secret store type %q", storeType)
+	}
+	if factory == nil {
+		return fmt.Errorf("secret store type %q needs a factory", storeType)
 	}
 
 	factoriesMu.Lock()
 	defer factoriesMu.Unlock()
 	if _, exists := factories[storeType]; exists {
-		panic(fmt.Sprintf("secret store type %q is already registered", storeType))
+		return fmt.Errorf("secret store type %q is already registered", storeType)
 	}
 	factories[storeType] = factory
+	return nil
 }
 
 func lookupFactory(storeType string) (Factory, bool) {
@@ -89,20 +95,34 @@ func lookupFactory(storeType string) (Factory, bool) {
 	return f, ok
 }
 
-// sharedStore returns the Store for the connection identity, creating it on
-// first use.
-func sharedStore(e entry, logger *logp.Logger) (Store, error) {
-	storesMu.Lock()
-	defer storesMu.Unlock()
+// storeCache keeps one Store per connection identity. The number of distinct
+// connections is small, so entries are never evicted.
+type storeCache struct {
+	mu     sync.Mutex
+	stores map[string]Store
+}
 
-	if s, ok := stores[e.identity]; ok {
+func newStoreCache() *storeCache {
+	return &storeCache{stores: map[string]Store{}}
+}
+
+// get returns the Store for the connection of e, creating it on first use.
+func (c *storeCache) get(e entry, logger *logp.Logger) (Store, error) {
+	id, err := e.identity()
+	if err != nil {
+		return nil, fmt.Errorf("%s: %q entry: %w", ConfigKey, e.storeType, err)
+	}
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if s, ok := c.stores[id]; ok {
 		return s, nil
 	}
 	s, err := newStore(e, logger)
 	if err != nil {
 		return nil, err
 	}
-	stores[e.identity] = s
+	c.stores[id] = s
 	return s, nil
 }
 

@@ -167,8 +167,7 @@ func newMonitorUnsafe(
 		m.stdFields.ID = fmt.Sprintf("auto-%s-%#X", m.stdFields.Type, hash)
 	}
 
-	// A secret resolution failure is handled like any plugin creation error:
-	// the monitor keeps running on schedule and reports the error.
+	// A secret resolution failure doesn't stop the monitor: it reports the error.
 	var p plugin.Plugin
 	pluginConfig, err := m.pluginConfig(config)
 	if err == nil {

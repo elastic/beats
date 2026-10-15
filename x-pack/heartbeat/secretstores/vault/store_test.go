@@ -7,7 +7,6 @@ package vault
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -32,12 +31,12 @@ const (
 	testPassword = "pa55w0rd-value"
 )
 
-const testAddress = "http://vault.test:8200"
-
-// fakeVault is a minimal in-memory Vault: AppRole login and KV v2 reads.
-// It is used as the client transport, so tests need no network.
+// fakeVault is a minimal Vault, served by httptest: AppRole login and KV v2
+// reads.
 type fakeVault struct {
 	t *testing.T
+	// address is the URL of the server.
+	address string
 
 	mu          sync.Mutex
 	secrets     map[string]map[string]any
@@ -58,23 +57,19 @@ func newFakeVault(t *testing.T) *fakeVault {
 		},
 		validTokens: map[string]bool{testToken: true},
 	}
+	srv := httptest.NewServer(http.HandlerFunc(fv.handle))
+	t.Cleanup(srv.Close)
+	fv.address = srv.URL
 	return fv
 }
 
-// RoundTrip serves the request in memory.
-func (fv *fakeVault) RoundTrip(r *http.Request) (*http.Response, error) {
-	rec := httptest.NewRecorder()
-	fv.handle(rec, r)
-	resp := rec.Result()
-	resp.Request = r
-	return resp, nil
-}
-
-// failingTransport simulates an unreachable Vault.
-type failingTransport struct{}
-
-func (failingTransport) RoundTrip(*http.Request) (*http.Response, error) {
-	return nil, errors.New("dial tcp: connection refused")
+// unreachableAddress returns the address of a closed server, so connections
+// are refused.
+func unreachableAddress(t *testing.T) string {
+	t.Helper()
+	srv := httptest.NewServer(http.NotFoundHandler())
+	srv.Close()
+	return srv.URL
 }
 
 func (fv *fakeVault) handle(w http.ResponseWriter, r *http.Request) {
@@ -182,15 +177,17 @@ func (c *testClock) Advance(d time.Duration) {
 }
 
 // newTestStore builds a store with a manual clock and recorded sleeps.
-func newTestStore(t *testing.T, entry map[string]any, transport http.RoundTripper, logger *logp.Logger) (*store, *testClock, *[]time.Duration) {
+func newTestStore(t *testing.T, entry map[string]any, logger *logp.Logger) (*store, *testClock, *[]time.Duration) {
 	t.Helper()
 	cfg, err := conf.NewConfigFrom(entry)
 	require.NoError(t, err, "test entry must be valid")
 	if logger == nil {
 		logger = logptest.NewTestingLogger(t, "")
 	}
-	st, err := newStoreWithTransport(cfg, logger, transport)
+	s, err := newStore(cfg, logger)
 	require.NoError(t, err, "store must be created")
+	st, ok := s.(*store)
+	require.True(t, ok, "newStore must return a *store")
 
 	clock := &testClock{now: time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)}
 	var sleeps []time.Duration
@@ -203,11 +200,14 @@ func newTestStore(t *testing.T, entry map[string]any, transport http.RoundTrippe
 }
 
 func TestRegistered(t *testing.T) {
-	// References to unregistered types are plain text and pass validation.
-	cfg, err := conf.NewConfigFrom(map[string]any{"type": "http", "header": "$vault{myapp/creds#token}"})
+	cfg, err := conf.NewConfigFrom(map[string]any{
+		"type":                 "http",
+		"header":               "vault://myapp/creds",
+		secretstores.ConfigKey: []any{map[string]any{"type": storeType, "address": "https://vault:8200", "auth": map[string]any{"token": map[string]any{"value": testToken}}}},
+	})
 	require.NoError(t, err, "test config must be valid")
 	err = secretstores.NewResolver(logptest.NewTestingLogger(t, "")).Validate(cfg)
-	assert.ErrorContains(t, err, `requires a "vault" entry`, "the vault store must be registered")
+	assert.ErrorContains(t, err, "must have the form vault://<path>#<field>", "the vault store must be registered and validate references")
 }
 
 func TestConfigValidation(t *testing.T) {
@@ -248,18 +248,18 @@ func TestConfigValidation(t *testing.T) {
 }
 
 func TestConfigDefaults(t *testing.T) {
-	s, _, _ := newTestStore(t, appRoleEntry("https://vault:8200"), newFakeVault(t), nil)
+	s, _, _ := newTestStore(t, appRoleEntry("https://vault:8200"), nil)
 	assert.Equal(t, "secret", s.cfg.KVMount, "kv_mount must default to secret")
 	assert.Equal(t, "approle", s.cfg.Auth.AppRole.MountPath, "approle mount_path must default to approle")
 }
 
 func TestTokenAuth(t *testing.T) {
 	fv := newFakeVault(t)
-	entry := tokenEntry(testAddress)
+	entry := tokenEntry(fv.address)
 	entry["namespace"] = "admin/team-a"
-	s, _, _ := newTestStore(t, entry, fv, nil)
+	s, _, _ := newTestStore(t, entry, nil)
 
-	v, err := s.Resolve(context.Background(), "myapp/creds", "password")
+	v, err := s.resolve(context.Background(), "myapp/creds#password")
 	require.NoError(t, err, "secret must be read")
 	assert.Equal(t, testPassword, v, "unexpected secret value")
 
@@ -272,9 +272,9 @@ func TestTokenAuth(t *testing.T) {
 func TestTokenAuthRejectedIsNotRetried(t *testing.T) {
 	fv := newFakeVault(t)
 	fv.expireTokens()
-	s, _, sleeps := newTestStore(t, tokenEntry(testAddress), fv, nil)
+	s, _, sleeps := newTestStore(t, tokenEntry(fv.address), nil)
 
-	_, err := s.Resolve(context.Background(), "myapp/creds", "password")
+	_, err := s.resolve(context.Background(), "myapp/creds#password")
 	assert.ErrorContains(t, err, "status 403: permission denied", "a rejected token must be reported")
 	logins, reads := fv.counts()
 	assert.Zero(t, logins, "token auth must never log in")
@@ -284,11 +284,11 @@ func TestTokenAuthRejectedIsNotRetried(t *testing.T) {
 
 func TestAppRoleLoginAndCache(t *testing.T) {
 	fv := newFakeVault(t)
-	s, clock, _ := newTestStore(t, appRoleEntry(testAddress), fv, nil)
+	s, clock, _ := newTestStore(t, appRoleEntry(fv.address), nil)
 	ctx := context.Background()
 
 	for _, field := range []string{"password", "user", "password"} {
-		_, err := s.Resolve(ctx, "myapp/creds", field)
+		_, err := s.resolve(ctx, "myapp/creds#"+field)
 		require.NoError(t, err, "field %q must be read", field)
 	}
 	logins, reads := fv.counts()
@@ -296,7 +296,7 @@ func TestAppRoleLoginAndCache(t *testing.T) {
 	assert.Equal(t, 1, reads, "one read must serve every field while cached")
 
 	clock.Advance(cacheTTL + time.Second)
-	_, err := s.Resolve(ctx, "myapp/creds", "password")
+	_, err := s.resolve(ctx, "myapp/creds#password")
 	require.NoError(t, err, "secret must be read again")
 	logins, reads = fv.counts()
 	assert.Equal(t, 1, logins, "the token must be reused")
@@ -305,10 +305,10 @@ func TestAppRoleLoginAndCache(t *testing.T) {
 
 func TestAppRoleLogsInAgainOnce(t *testing.T) {
 	fv := newFakeVault(t)
-	s, _, _ := newTestStore(t, appRoleEntry(testAddress), fv, nil)
+	s, _, _ := newTestStore(t, appRoleEntry(fv.address), nil)
 	ctx := context.Background()
 
-	_, err := s.Resolve(ctx, "myapp/creds", "password")
+	_, err := s.resolve(ctx, "myapp/creds#password")
 	require.NoError(t, err, "first read must work")
 
 	fv.expireTokens()
@@ -316,7 +316,7 @@ func TestAppRoleLogsInAgainOnce(t *testing.T) {
 	s.cache = map[string]cacheEntry{}
 	s.mu.Unlock()
 
-	_, err = s.Resolve(ctx, "myapp/creds", "password")
+	_, err = s.resolve(ctx, "myapp/creds#password")
 	require.NoError(t, err, "an expired token must be replaced")
 	logins, reads := fv.counts()
 	assert.Equal(t, 2, logins, "one more login is expected")
@@ -328,10 +328,10 @@ func TestAppRoleConcurrentExpiryLogsInOnce(t *testing.T) {
 	for i := range 10 {
 		fv.secrets[fmt.Sprintf("app%d", i)] = map[string]any{"password": "x"}
 	}
-	s, _, _ := newTestStore(t, appRoleEntry(testAddress), fv, nil)
+	s, _, _ := newTestStore(t, appRoleEntry(fv.address), nil)
 	ctx := context.Background()
 
-	_, err := s.Resolve(ctx, "myapp/creds", "password")
+	_, err := s.resolve(ctx, "myapp/creds#password")
 	require.NoError(t, err, "first read must work")
 	fv.expireTokens()
 
@@ -339,7 +339,7 @@ func TestAppRoleConcurrentExpiryLogsInOnce(t *testing.T) {
 	errs := make(chan error, 10)
 	for i := range 10 {
 		wg.Go(func() {
-			_, err := s.Resolve(ctx, fmt.Sprintf("app%d", i), "password")
+			_, err := s.resolve(ctx, fmt.Sprintf("app%d#password", i))
 			errs <- err
 		})
 	}
@@ -355,12 +355,12 @@ func TestAppRoleConcurrentExpiryLogsInOnce(t *testing.T) {
 
 func TestAppRoleInvalidCredentials(t *testing.T) {
 	fv := newFakeVault(t)
-	entry := map[string]any{"address": testAddress, "auth": map[string]any{"approle": map[string]any{
+	entry := map[string]any{"address": fv.address, "auth": map[string]any{"approle": map[string]any{
 		"role_id": testRoleID, "secret_id": "wrong-secret-id-value",
 	}}}
-	s, _, sleeps := newTestStore(t, entry, fv, nil)
+	s, _, sleeps := newTestStore(t, entry, nil)
 
-	_, err := s.Resolve(context.Background(), "myapp/creds", "password")
+	_, err := s.resolve(context.Background(), "myapp/creds#password")
 	require.Error(t, err, "a failed login must be reported")
 	assert.Contains(t, err.Error(), "invalid role or secret ID", "the Vault error must be reported")
 	assert.NotContains(t, err.Error(), "wrong-secret-id-value", "credentials must not be in errors")
@@ -370,10 +370,10 @@ func TestAppRoleInvalidCredentials(t *testing.T) {
 
 func TestTransientErrorsAreRetried(t *testing.T) {
 	fv := newFakeVault(t)
-	s, _, sleeps := newTestStore(t, tokenEntry(testAddress), fv, nil)
+	s, _, sleeps := newTestStore(t, tokenEntry(fv.address), nil)
 	fv.setUnavailable(2)
 
-	v, err := s.Resolve(context.Background(), "myapp/creds", "password")
+	v, err := s.resolve(context.Background(), "myapp/creds#password")
 	require.NoError(t, err, "the read must work after retries")
 	assert.Equal(t, testPassword, v, "unexpected secret value")
 	assert.Equal(t, retryBackoff, *sleeps, "the configured backoff must be used")
@@ -381,30 +381,30 @@ func TestTransientErrorsAreRetried(t *testing.T) {
 
 func TestFailureCache(t *testing.T) {
 	fv := newFakeVault(t)
-	s, clock, sleeps := newTestStore(t, tokenEntry(testAddress), fv, nil)
+	s, clock, sleeps := newTestStore(t, tokenEntry(fv.address), nil)
 	ctx := context.Background()
 	fv.setUnavailable(100)
 
-	_, err := s.Resolve(ctx, "myapp/creds", "password")
+	_, err := s.resolve(ctx, "myapp/creds#password")
 	assert.ErrorContains(t, err, "status 503", "an unavailable Vault must be reported")
 	_, reads := fv.counts()
 	assert.Equal(t, len(retryBackoff)+1, reads, "every attempt must reach Vault")
 	assert.Len(t, *sleeps, len(retryBackoff), "a backoff is expected between attempts")
 
-	_, err = s.Resolve(ctx, "myapp/other", "password")
+	_, err = s.resolve(ctx, "myapp/other#password")
 	assert.ErrorContains(t, err, "status 503", "the failure must be returned for the whole connection")
 	_, readsAfter := fv.counts()
 	assert.Equal(t, reads, readsAfter, "Vault must not be contacted while the failure is cached")
 
 	fv.setUnavailable(0)
 	clock.Advance(failureTTL + time.Second)
-	_, err = s.Resolve(ctx, "myapp/creds", "password")
+	_, err = s.resolve(ctx, "myapp/creds#password")
 	assert.NoError(t, err, "Vault must be contacted again after the failure expires")
 }
 
 func TestConnectionErrorIsTransient(t *testing.T) {
-	s, _, sleeps := newTestStore(t, tokenEntry(testAddress), failingTransport{}, nil)
-	_, err := s.Resolve(context.Background(), "myapp/creds", "password")
+	s, _, sleeps := newTestStore(t, tokenEntry(unreachableAddress(t)), nil)
+	_, err := s.resolve(context.Background(), "myapp/creds#password")
 	require.Error(t, err, "an unreachable Vault must be reported")
 	assert.True(t, isTransient(err), "connection errors must be transient")
 	assert.Len(t, *sleeps, len(retryBackoff), "connection errors must be retried")
@@ -413,23 +413,23 @@ func TestConnectionErrorIsTransient(t *testing.T) {
 
 func TestNotFoundErrors(t *testing.T) {
 	fv := newFakeVault(t)
-	s, _, sleeps := newTestStore(t, tokenEntry(testAddress), fv, nil)
+	s, _, sleeps := newTestStore(t, tokenEntry(fv.address), nil)
 	ctx := context.Background()
 
-	_, err := s.Resolve(ctx, "missing", "password")
+	_, err := s.resolve(ctx, "missing#password")
 	assert.EqualError(t, err, "vault: no secret at secret/data/missing", "a missing secret must be reported")
 
-	_, err = s.Resolve(ctx, "myapp/creds", "nope")
+	_, err = s.resolve(ctx, "myapp/creds#nope")
 	assert.EqualError(t, err, `vault: field "nope" not found at secret/data/myapp/creds`, "a missing field must be reported")
 	assert.Empty(t, *sleeps, "not found errors must not be retried")
 }
 
 func TestFieldValueConversion(t *testing.T) {
 	fv := newFakeVault(t)
-	s, _, _ := newTestStore(t, tokenEntry(testAddress), fv, nil)
+	s, _, _ := newTestStore(t, tokenEntry(fv.address), nil)
 
 	for field, want := range map[string]string{"port": "5432", "enabled": "true", "obj": `{"a":"b"}`} {
-		v, err := s.Resolve(context.Background(), "myapp/creds", field)
+		v, err := s.resolve(context.Background(), "myapp/creds#"+field)
 		require.NoError(t, err, "field %q must be read", field)
 		assert.Equal(t, want, v, "field %q must be converted to text", field)
 	}
@@ -444,14 +444,14 @@ func TestEnvironmentIsIgnored(t *testing.T) {
 	t.Setenv("VAULT_SKIP_VERIFY", "true")
 	t.Setenv("VAULT_MAX_RETRIES", "5")
 
-	s, _, _ := newTestStore(t, appRoleEntry(testAddress), fv, nil)
-	_, err := s.Resolve(context.Background(), "myapp/creds", "password")
+	s, _, _ := newTestStore(t, appRoleEntry(fv.address), nil)
+	_, err := s.resolve(context.Background(), "myapp/creds#password")
 	require.NoError(t, err, "the configured address must be used")
 
 	logins, _ := fv.counts()
 	assert.Equal(t, 1, logins, "VAULT_TOKEN must not replace the AppRole login")
 	req := fv.lastRequest()
-	assert.Equal(t, "vault.test:8200", req.URL.Host, "VAULT_ADDR must be ignored")
+	assert.Equal(t, strings.TrimPrefix(fv.address, "http://"), req.Host, "VAULT_ADDR must be ignored")
 	assert.NotEqual(t, "token-from-env", req.Header.Get("X-Vault-Token"), "VAULT_TOKEN must be ignored")
 	assert.Empty(t, req.Header.Get("X-Vault-Namespace"), "VAULT_NAMESPACE must be ignored")
 	assert.Empty(t, req.Header.Get("X-From-Env"), "VAULT_HEADERS must be ignored")
@@ -460,16 +460,16 @@ func TestEnvironmentIsIgnored(t *testing.T) {
 func TestSecretsAreNotLogged(t *testing.T) {
 	fv := newFakeVault(t)
 	logger := logptest.NewFileLogger(t, "")
-	s, _, _ := newTestStore(t, appRoleEntry(testAddress), fv, logger.Logger)
+	s, _, _ := newTestStore(t, appRoleEntry(fv.address), logger.Logger)
 	ctx := context.Background()
 
-	_, err := s.Resolve(ctx, "myapp/creds", "password")
+	_, err := s.resolve(ctx, "myapp/creds#password")
 	require.NoError(t, err, "secret must be read")
 	fv.expireTokens()
 	s.mu.Lock()
 	s.cache = map[string]cacheEntry{}
 	s.mu.Unlock()
-	_, err = s.Resolve(ctx, "myapp/creds", "password")
+	_, err = s.resolve(ctx, "myapp/creds#password")
 	require.NoError(t, err, "secret must be read again")
 
 	logger.WaitLogsContains(t, "Logged in with AppRole", time.Second, "debug logs are expected")

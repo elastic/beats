@@ -5,8 +5,8 @@
 // Package vault implements the "vault" secret store for Heartbeat monitors:
 // HashiCorp Vault KV v2 secrets, read with token or AppRole authentication.
 //
-// References have the form $vault{<path>#<field>}, where path is relative to
-// the configured KV mount.
+// References have the form vault://<path>#<field>, where path is relative to
+// the configured KV mount. Path and field are percent-decoded.
 package vault
 
 import (
@@ -44,7 +44,10 @@ const (
 var retryBackoff = []time.Duration{time.Second, 2 * time.Second}
 
 func init() {
-	secretstores.Register(storeType, newStore)
+	// Registration only fails on programming errors, such as a duplicate type.
+	if err := secretstores.Register(storeType, newStore); err != nil {
+		panic(err)
+	}
 }
 
 type store struct {
@@ -52,8 +55,7 @@ type store struct {
 	client *vaultapi.Client
 	logger *logp.Logger
 
-	// loginMu serializes AppRole logins, so concurrent auth failures result
-	// in a single login.
+	// loginMu is used to avoid concurrent auth failures
 	loginMu sync.Mutex
 
 	mu          sync.Mutex
@@ -71,12 +73,6 @@ type cacheEntry struct {
 }
 
 func newStore(cfg *conf.C, logger *logp.Logger) (secretstores.Store, error) {
-	return newStoreWithTransport(cfg, logger, nil)
-}
-
-// newStoreWithTransport creates a store; a nil transport means the default
-// HTTP transport.
-func newStoreWithTransport(cfg *conf.C, logger *logp.Logger, transport http.RoundTripper) (*store, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, err
@@ -85,7 +81,7 @@ func newStoreWithTransport(cfg *conf.C, logger *logp.Logger, transport http.Roun
 		return nil, err
 	}
 
-	client, err := newClient(c, transport)
+	client, err := newClient(c)
 	if err != nil {
 		return nil, err
 	}
@@ -103,13 +99,10 @@ func newStoreWithTransport(cfg *conf.C, logger *logp.Logger, transport http.Roun
 // newClient creates a Vault client that only uses the given config. The
 // Vault library reads VAULT_* environment variables by default; none of them
 // must change how Heartbeat connects.
-func newClient(c config, transport http.RoundTripper) (*vaultapi.Client, error) {
-	if transport == nil {
-		// Same defaults as the Vault library, honoring the proxy environment.
-		t := cleanhttp.DefaultPooledTransport()
-		t.TLSClientConfig = &tls.Config{MinVersion: tls.VersionTLS12}
-		transport = t
-	}
+func newClient(c config) (*vaultapi.Client, error) {
+	// Same defaults as the Vault library, honoring the proxy environment.
+	transport := cleanhttp.DefaultPooledTransport()
+	transport.TLSClientConfig = &tls.Config{MinVersion: tls.VersionTLS12}
 
 	// Passing a config, instead of vaultapi.DefaultConfig(), keeps the values
 	// read from the environment out of the client.
@@ -141,8 +134,13 @@ func newClient(c config, transport http.RoundTripper) (*vaultapi.Client, error) 
 	return client, nil
 }
 
-// Resolve returns the value of field in the KV v2 secret at path.
-func (s *store) Resolve(ctx context.Context, path, field string) (string, error) {
+// resolve returns the value of the field in the KV v2 secret that content,
+// <path>#<field>, refers to.
+func (s *store) resolve(ctx context.Context, content string) (string, error) {
+	path, field, err := parseReference(content)
+	if err != nil {
+		return "", fmt.Errorf("vault: invalid reference: %w", err)
+	}
 	data, err := s.secret(ctx, path)
 	if err != nil {
 		return "", err

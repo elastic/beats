@@ -20,7 +20,10 @@ package monitors
 import (
 	"context"
 	"errors"
+	"fmt"
 	"maps"
+	"os"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -46,18 +49,57 @@ const testSecretStore = "monsecret"
 
 var testStoreCalls atomic.Int64
 
+// testSecretStoreImpl replaces "monsecret://<path>#<field>" at the end of
+// top-level strings by "<path>-<field>-value".
 type testSecretStoreImpl struct{ fail bool }
 
-func (s testSecretStoreImpl) Resolve(_ context.Context, path, field string) (string, error) {
-	testStoreCalls.Add(1)
-	if s.fail {
-		return "", errors.New("monsecret: store unavailable")
+const testSecretPrefix = testSecretStore + "://"
+
+func (s testSecretStoreImpl) Validate(cfg *conf.C) error {
+	var m map[string]any
+	if err := cfg.Unpack(&m); err != nil {
+		return err
 	}
-	return path + "-" + field + "-value", nil
+	for _, v := range m {
+		str, _ := v.(string)
+		if _, ref, found := strings.Cut(str, testSecretPrefix); found && !strings.Contains(ref, "#") {
+			return errors.New("monsecret: invalid reference")
+		}
+	}
+	return nil
 }
 
-func init() {
-	secretstores.Register(testSecretStore, func(cfg *conf.C, _ *logp.Logger) (secretstores.Store, error) {
+func (s testSecretStoreImpl) Replace(_ context.Context, cfg *conf.C) (*conf.C, error) {
+	var m map[string]any
+	if err := cfg.Unpack(&m); err != nil {
+		return nil, err
+	}
+	for k, v := range m {
+		str, _ := v.(string)
+		before, ref, found := strings.Cut(str, testSecretPrefix)
+		if !found {
+			continue
+		}
+		testStoreCalls.Add(1)
+		if s.fail {
+			return nil, errors.New("monsecret: store unavailable")
+		}
+		path, field, _ := strings.Cut(ref, "#")
+		m[k] = before + path + "-" + field + "-value"
+	}
+	return conf.NewConfigFrom(m)
+}
+
+func TestMain(m *testing.M) {
+	if err := registerTestSecretStore(); err != nil {
+		fmt.Fprintf(os.Stderr, "could not register the test secret store: %v\n", err)
+		os.Exit(1)
+	}
+	os.Exit(m.Run())
+}
+
+func registerTestSecretStore() error {
+	return secretstores.Register(testSecretStore, func(cfg *conf.C, _ *logp.Logger) (secretstores.Store, error) {
 		var c struct {
 			Fail bool `config:"fail"`
 		}
@@ -130,7 +172,7 @@ func secretMonitorConf(t *testing.T, storeEntry map[string]any) *conf.C {
 		"id":                       "secret-monitor",
 		"name":                     "secret monitor",
 		"schedule":                 "@every 1m",
-		"header":                   "Bearer $monsecret{app/creds#token}",
+		"header":                   "Bearer monsecret://app/creds#token",
 		secretstores.ConfigKey:     []any{entry},
 		"fields.unrelated_setting": "kept",
 	})
@@ -167,7 +209,7 @@ func TestMonitorResolvesSecretsOnlyForPlugin(t *testing.T) {
 		Header string `config:"header"`
 	}
 	require.NoError(t, cfg.Unpack(&stored), "stored config must unpack")
-	assert.Equal(t, "Bearer $monsecret{app/creds#token}", stored.Header, "the stored config must keep the reference")
+	assert.Equal(t, "Bearer monsecret://app/creds#token", stored.Header, "the stored config must keep the reference")
 
 	require.NoError(t, m.Update(cfg), "update must resolve references")
 	assert.Equal(t, []string{"Bearer app/creds-token-value", "Bearer app/creds-token-value"}, captured.get(), "the plugin must get resolved values on update")
@@ -233,14 +275,21 @@ func TestFactoryCheckConfigValidatesSecretStores(t *testing.T) {
 	defer closeFactory()
 	testStoreCalls.Store(0)
 
-	cfg, err := conf.NewConfigFrom(map[string]any{
-		"type":     "http",
-		"id":       "no-store",
-		"schedule": "@every 1m",
-		"header":   "$monsecret{app/creds#token}",
-	})
-	require.NoError(t, err, "test config must be valid")
+	newCfg := func(header string, withStore bool) *conf.C {
+		m := map[string]any{"type": "http", "id": "check", "schedule": "@every 1m", "urls": []string{"http://localhost"}, "header": header}
+		if withStore {
+			m[secretstores.ConfigKey] = []any{map[string]any{"type": testSecretStore}}
+		}
+		cfg, err := conf.NewConfigFrom(m)
+		require.NoError(t, err, "test config must be valid")
+		return cfg
+	}
 
-	assert.ErrorContains(t, factory.CheckConfig(cfg), `requires a "monsecret" entry`, "a reference without a store must be rejected")
+	// No plugin is registered in the global registry here: a config that
+	// passes the secret checks fails on the plugin lookup.
+	const pluginLookupErr = "monitor type http does not exist"
+	assert.ErrorContains(t, factory.CheckConfig(newCfg("monsecret://app/creds", false)), pluginLookupErr, "without secret_stores the value is plain text")
+	assert.ErrorContains(t, factory.CheckConfig(newCfg("monsecret://app/creds#token", true)), pluginLookupErr, "a valid reference must pass")
+	assert.ErrorContains(t, factory.CheckConfig(newCfg("monsecret://app/creds", true)), "monsecret: invalid reference", "the store must reject its invalid references")
 	assert.Zero(t, testStoreCalls.Load(), "checking a config must not call the secret store")
 }

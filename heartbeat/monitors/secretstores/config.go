@@ -35,9 +35,9 @@ import (
 type entry struct {
 	storeType string
 	config    *conf.C
-	// identity is a hash of the whole entry, credentials included. It never
-	// leaves the process and is not logged.
-	identity string
+	// settings is the raw entry, credentials included, used to identify the
+	// connection.
+	settings map[string]any
 }
 
 // parseEntries converts the unpacked secret_stores value into entries.
@@ -80,27 +80,23 @@ func parseEntries(raw any) ([]entry, error) {
 			return nil, fmt.Errorf("%s: only one %q entry is supported", ConfigKey, storeType)
 		}
 		seen[storeType] = true
-
 		// PathSep("") keeps keys literal; values are already resolved and
 		// must not be expanded again.
 		cfg, err := ucfg.NewFrom(m, ucfg.PathSep(""))
 		if err != nil {
 			return nil, fmt.Errorf("%s: entry %d: %w", ConfigKey, i, err)
 		}
-		identity, err := entryIdentity(m)
-		if err != nil {
-			return nil, fmt.Errorf("%s: entry %d: %w", ConfigKey, i, err)
-		}
-		entries = append(entries, entry{storeType: storeType, config: (*conf.C)(cfg), identity: identity})
+		entries = append(entries, entry{storeType: storeType, config: (*conf.C)(cfg), settings: m})
 	}
 	return entries, nil
 }
 
 func decodeEntries(s string) ([]any, error) {
-	if strings.TrimSpace(s) == "" {
+	s = strings.TrimSpace(s)
+	if s == "" {
 		return nil, nil
 	}
-	raw, err := base64.StdEncoding.DecodeString(strings.TrimSpace(s))
+	raw, err := base64.StdEncoding.DecodeString(s)
 	if err != nil {
 		return nil, fmt.Errorf("%s: invalid base64: %w", ConfigKey, err)
 	}
@@ -111,9 +107,11 @@ func decodeEntries(s string) ([]any, error) {
 	return items, nil
 }
 
-func entryIdentity(m map[string]any) (string, error) {
-	// encoding/json sorts map keys, so equal entries have equal identities.
-	b, err := json.Marshal(m)
+// identity returns a hash of the whole entry, credentials included. Equal
+// entries have equal identities. It never leaves the process and is not logged.
+func (e entry) identity() (string, error) {
+	// encoding/json sorts map keys.
+	b, err := json.Marshal(e.settings)
 	if err != nil {
 		return "", fmt.Errorf("cannot compute identity: %w", err)
 	}

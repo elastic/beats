@@ -99,14 +99,16 @@ func TestIntegrationResolve(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			cfg, err := conf.NewConfigFrom(entry)
 			require.NoError(t, err, "entry must be valid")
-			s, err := newStore(cfg, logptest.NewTestingLogger(t, ""))
+			st, err := newStore(cfg, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err, "store must be created")
+			s, ok := st.(*store)
+			require.True(t, ok, "newStore must return a *store")
 
-			v, err := s.Resolve(context.Background(), itPath, "token")
+			v, err := s.resolve(context.Background(), itPath+"#token")
 			require.NoError(t, err, "secret must be read from Vault")
 			assert.Equal(t, fx.token, v, "unexpected secret value")
 
-			_, err = s.Resolve(context.Background(), "heartbeat-it/missing", "token")
+			_, err = s.resolve(context.Background(), "heartbeat-it/missing#token")
 			assert.ErrorContains(t, err, "no secret at secret/data/heartbeat-it/missing", "a missing secret must be reported")
 		})
 	}
@@ -131,7 +133,7 @@ func TestIntegrationHTTPMonitor(t *testing.T) {
 		"name":                  "vault-it",
 		"schedule":              "@every 1m",
 		"urls":                  []string{srv.URL},
-		"check.request.headers": map[string]any{"Authorization": "Bearer $vault{" + itPath + "#token}"},
+		"check.request.headers": map[string]any{"Authorization": "Bearer vault://" + itPath + "#token"},
 		"check.response.status": []int{200},
 		secretstores.ConfigKey: []any{map[string]any{
 			"type":    storeType,
