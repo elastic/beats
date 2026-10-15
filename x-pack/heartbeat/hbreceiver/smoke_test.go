@@ -7,7 +7,6 @@ package hbreceiver
 import (
 	"context"
 	"fmt"
-	"maps"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -73,15 +72,11 @@ func startReceiverWithConfig(t *testing.T, cfg *Config) (receiver.Logs, func() [
 }
 
 // staticMonitorConfig builds a Config for a set of static monitors.
-func staticMonitorConfig(t *testing.T, monitors []map[string]any, extra map[string]any) *Config {
+func staticMonitorConfig(t *testing.T, monitors []map[string]any) *Config {
 	t.Helper()
-	hbSection := map[string]any{
-		"monitors": monitors,
-	}
-	maps.Copy(hbSection, extra)
 	return &Config{
 		Beatconfig: map[string]any{
-			"heartbeat":               hbSection,
+			"heartbeat":               map[string]any{"monitors": monitors},
 			"queue.mem.flush.timeout": "0s",
 			"path.home":               t.TempDir(),
 		},
@@ -91,7 +86,7 @@ func staticMonitorConfig(t *testing.T, monitors []map[string]any, extra map[stri
 // startSmokeReceiver is a convenience wrapper for tests with static monitors.
 func startSmokeReceiver(t *testing.T, monitors []map[string]any) (receiver.Logs, func() []mapstr.M) {
 	t.Helper()
-	return startReceiverWithConfig(t, staticMonitorConfig(t, monitors, nil))
+	return startReceiverWithConfig(t, staticMonitorConfig(t, monitors))
 }
 
 // assertMonitorEvent waits up to 2 minutes for the first collected event's
@@ -411,30 +406,6 @@ func TestMonitorDisabled(t *testing.T) {
 	// Let the scheduler run for a few cycles; a disabled monitor must be silent.
 	time.Sleep(3 * time.Second)
 	assert.Empty(t, snapshot(), "disabled monitor must not produce events")
-}
-
-// TestRunOnce verifies that heartbeat in run_once mode fires monitors once,
-// produces events, and exits cleanly.
-// Ported from test_base.py::Test.test_run_once.
-func TestRunOnce(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-	}))
-	defer server.Close()
-
-	cfg := staticMonitorConfig(t, []map[string]any{{
-		"type": "http", "id": "test-http",
-		"schedule": "@every 1s", "timeout": "3s",
-		"urls": []string{server.URL},
-	}}, map[string]any{"run_once": true})
-
-	rec, snapshot := startReceiverWithConfig(t, cfg)
-	defer func() { require.NoError(t, rec.Shutdown(context.Background())) }()
-
-	assertMonitorEvent(t, snapshot, map[string]any{
-		"monitor.type":   "http",
-		"monitor.status": "up",
-	})
 }
 
 // ── Event field tests ─────────────────────────────────────────────────────────

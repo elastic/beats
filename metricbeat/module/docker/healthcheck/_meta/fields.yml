@@ -10,7 +10,7 @@
     - name: failingstreak
       type: integer
       description: >
-        concurent failed check
+        concurrent failed check
     - name: status
       type: keyword
       description: >
