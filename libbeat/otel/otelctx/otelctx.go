@@ -34,8 +34,9 @@ const (
 )
 
 // NewConsumerContext creates a new context.Context adding the beats metadata
-// to the client.Info. This is used to pass the beat name, version and index prefix to the
+// to the client.Info. This is used to pass the version and index prefix to the
 // Collector, so it can be used by the components to access that data.
+// Currently, only used by the Logstash exporter.
 func NewConsumerContext(ctx context.Context, beatInfo beat.Info) context.Context {
 	clientInfo := client.Info{
 		Metadata: client.NewMetadata(map[string][]string{
