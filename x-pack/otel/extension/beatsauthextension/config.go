@@ -53,6 +53,11 @@ func (c *Config) Validate() error {
 	// we unmarshal and validate it.
 	beatsAuthCfg, _, err := c.beatsAuthConfig()
 	if err != nil {
+		// Start installs an error round-tripper when ContinueOnError is
+		// enabled, so transport configuration errors must be deferred to it.
+		if c.ContinueOnError {
+			return nil
+		}
 		return err
 	}
 

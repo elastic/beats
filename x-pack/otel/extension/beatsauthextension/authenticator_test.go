@@ -699,6 +699,34 @@ func TestConfigValidation(t *testing.T) {
 			errString: "endpoint userinfo is unsupported",
 		},
 		{
+			name: "invalid TLS certificate without continue_on_error",
+			config: func() *Config {
+				return &Config{BeatAuthConfig: map[string]any{
+					"ssl": map[string]any{
+						"enabled":     true,
+						"certificate": "/nonexistent/cert.pem",
+						"key":         "/nonexistent/key.pem",
+					},
+				}}
+			},
+			errString: "failed unpacking config",
+		},
+		{
+			name: "invalid TLS certificate with continue_on_error",
+			config: func() *Config {
+				return &Config{
+					BeatAuthConfig: map[string]any{
+						"ssl": map[string]any{
+							"enabled":     true,
+							"certificate": "/nonexistent/cert.pem",
+							"key":         "/nonexistent/key.pem",
+						},
+					},
+					ContinueOnError: true,
+				}
+			},
+		},
+		{
 			name: "API key and basic authentication",
 			config: func() *Config {
 				return &Config{BeatAuthConfig: map[string]any{
