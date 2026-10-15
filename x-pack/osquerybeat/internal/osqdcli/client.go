@@ -67,9 +67,9 @@ type Client struct {
 
 	log *logp.Logger
 
-	cli *rpcClient
-	mx  sync.Mutex
-
+	// mx protects cli and serializes access to cache.
+	mx    sync.Mutex
+	cli   *rpcClient
 	cache Cache[string, map[string]string]
 
 	cliLimiter *semaphore.Weighted
@@ -127,9 +127,6 @@ func (c *Client) Connect(ctx context.Context) error {
 
 	c.mx.Lock()
 	defer c.mx.Unlock()
-	if err := ctx.Err(); err != nil {
-		return err
-	}
 	if c.log != nil {
 		c.log.Debugf("connect osquery client: socket_path: %s, retries: %v", c.socketPath, c.connectRetries)
 	}
@@ -248,9 +245,6 @@ func (c *Client) Query(ctx context.Context, sql string, timeout time.Duration) (
 
 	c.mx.Lock()
 	defer c.mx.Unlock()
-	if err := ctx.Err(); err != nil {
-		return nil, err
-	}
 
 	// If query timeout is <= 0, then use client timeout (default is 1 minute)
 	if timeout <= 0 {
@@ -276,10 +270,12 @@ func (c *Client) Query(ctx context.Context, sql string, timeout time.Duration) (
 
 	var res *genosquery.ExtensionResponse
 	res, err = cli.QueryContext(ctx, sql)
-	if ctx.Err() != nil {
+	switch {
+	case ctx.Err() != nil:
+		// This should not be necessary, but thrift
+		// do not return the context error here.
 		return nil, ctx.Err()
-	}
-	if err != nil {
+	case err != nil:
 		return nil, fmt.Errorf("osquery failed: %w", err)
 	}
 
@@ -304,9 +300,6 @@ func (c *Client) ResolveResult(ctx context.Context, sql string, hits []map[strin
 
 	c.mx.Lock()
 	defer c.mx.Unlock()
-	if err := ctx.Err(); err != nil {
-		return nil, err
-	}
 	if c.cli == nil {
 		return nil, ErrClientClosed
 	}
@@ -344,11 +337,12 @@ func (c *Client) queryColumnTypes(ctx context.Context, sql string) (map[string]s
 		defer cli.Close()
 		defer closeOnCancellation(ctx, cli)()
 		exres, err = cli.GetQueryColumnsContext(ctx, sql)
-		if ctx.Err() != nil {
+		switch {
+		case ctx.Err() != nil:
+			// This should not be necessary, but thrift
+			// do not return the context error here.
 			return nil, ctx.Err()
-		}
-
-		if err != nil {
+		case err != nil:
 			return nil, fmt.Errorf("osquery get query columns failed: %w", err)
 		}
 
