@@ -289,7 +289,7 @@ func (l *logstashExporter) makeLogstashWorkers(ctx context.Context) ([]internal.
 
 	workers := make([]internal.Worker, 0, len(group.Clients))
 	for _, cli := range group.Clients {
-		workers = append(workers, internal.MakeClientWorker(l.workQueue, cli, *l.logger))
+		workers = append(workers, internal.MakeClientWorker(l.workQueue, cli, l.logger))
 	}
 
 	l.workers = workers

@@ -54,13 +54,13 @@ type clientWorker struct {
 type netClientWorker struct {
 	worker
 	client outputs.NetworkClient
-	logger logp.Logger
+	logger *logp.Logger
 	// holds nil if we are able to connect, else err
 	connected   error
 	connectedMu sync.RWMutex
 }
 
-func MakeClientWorker(workQueue chan *Work, client outputs.Client, logger logp.Logger) Worker {
+func MakeClientWorker(workQueue chan *Work, client outputs.Client, logger *logp.Logger) Worker {
 	ctx, cancel := context.WithCancel(context.Background())
 	w := worker{
 		workQueue: workQueue,
