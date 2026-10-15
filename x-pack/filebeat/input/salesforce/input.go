@@ -539,9 +539,10 @@ func laterObjectResumeWatermark(legacyWatermark, progressTime string) string {
 // nextObjectBatchWindow, which also applies the upgrade-safety fallback
 // from legacy first_event_time / last_event_time watermarks. The object
 // cursor is snapshotted before each query and restored on error, so a
-// failed paginated window retries the exact same bounds on the next tick
-// instead of re-advancing from first/last_event_time values partially
-// updated mid-window by runObjectQuery.
+// failed paginated window retries the exact same bounds on the next tick.
+// On the batched path runObjectQuery does not touch first/last_event_time
+// or last_event_id, so progress_time is the sole watermark that moves, and
+// it moves only here after a window fully succeeds.
 //
 // The loop also stops early once a window reaches runEnd, because any
 // further window would be empty.
@@ -595,7 +596,11 @@ func (s *salesforceInput) runObjectBatches() error {
 // publishes one event per record. It returns the total number of events
 // published.
 //
-// Per-row side effects:
+// Per-row side effects apply only to the unbatched path. When bounded
+// batching is enabled these are skipped entirely, because the batched cursor
+// is progress_time (advanced by runObjectBatches at window completion) and
+// mutating the legacy watermarks mid-window would corrupt restart resume (see
+// the comment at the batched/unbatched split below). On the unbatched path:
 //
 //   - first_event_time is written from the cursor field of the first row of
 //     the first page only (legacy semantics required for ORDER BY EventDate
@@ -636,11 +641,24 @@ func (s *salesforceInput) runObjectQuery(cursor mapstr.M) (int, error) {
 
 	totalEvents := 0
 	firstEvent := true
-	// Reset LastEventID at the start of each run so stale values from a
-	// previous query (e.g. after a user changes their SOQL to omit Id) can
-	// never be carried forward as a tie-breaker into a new last_event_time
-	// bucket. Rows with an Id below will repopulate it.
-	s.cursor.Object.LastEventID = ""
+	// On the batched path the authoritative cursor is progress_time, which
+	// runObjectBatches advances only after a whole (Start, End] window has been
+	// published and ACKed. first_event_time / last_event_time / last_event_id
+	// must not move per row here: those values are published with every event
+	// and persisted on ACK, so advancing them mid-window would let a crash (or
+	// a later page failure) persist a cursor whose next window starts past rows
+	// that were never durably ingested — dropping the un-ACKed pages. Freezing
+	// them means the worst case after a restart is replaying the window from
+	// the last durable progress_time (or the pre-upgrade watermark), which the
+	// fingerprint _id makes idempotent.
+	batched := objectCfg.Batch.isEnabled()
+	if !batched {
+		// Reset LastEventID at the start of each run so stale values from a
+		// previous query (e.g. after a user changes their SOQL to omit Id) can
+		// never be carried forward as a tie-breaker into a new last_event_time
+		// bucket. Rows with an Id below will repopulate it.
+		s.cursor.Object.LastEventID = ""
+	}
 
 	for res.TotalSize() > 0 {
 		for _, rec := range res.Records() {
@@ -651,14 +669,16 @@ func (s *salesforceInput) runObjectQuery(cursor mapstr.M) (int, error) {
 				return 0, err
 			}
 
-			if timestamp, ok := val[objectCfg.Cursor.Field].(string); ok {
-				if firstEvent {
-					s.cursor.Object.FirstEventTime = timestamp
+			if !batched {
+				if timestamp, ok := val[objectCfg.Cursor.Field].(string); ok {
+					if firstEvent {
+						s.cursor.Object.FirstEventTime = timestamp
+					}
+					s.cursor.Object.LastEventTime = timestamp
 				}
-				s.cursor.Object.LastEventTime = timestamp
-			}
-			if id, ok := val["Id"].(string); ok {
-				s.cursor.Object.LastEventID = id
+				if id, ok := val["Id"].(string); ok {
+					s.cursor.Object.LastEventID = id
+				}
 			}
 
 			err = publishEvent(s.publisher, s.cursor, jsonStrEvent, "Object")
