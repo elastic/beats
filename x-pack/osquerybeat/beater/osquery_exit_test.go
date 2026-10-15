@@ -108,3 +108,58 @@ func TestOsqueryRunnerRuntimeExit78ThenStartupFailure(t *testing.T) {
 		t.Fatal("runner did not restart and return its startup failure")
 	}
 }
+
+// delayedCleanupRunner reports child exit before allowing Run to return.
+type delayedCleanupRunner struct {
+	osqd.Runner
+	err     error
+	exited  chan struct{}
+	cleanup chan struct{}
+}
+
+func (r *delayedCleanupRunner) Run(ctx context.Context, _ osqd.Flags, onExit func(error)) error {
+	onExit(r.err)
+	close(r.exited)
+	select {
+	case <-r.cleanup:
+	case <-ctx.Done():
+	}
+	return r.err
+}
+
+func TestOsqueryReadinessDuringExitCleanup(t *testing.T) {
+	exit78 := osqueryExitError(t, 78)
+	for _, initiallyReady := range []bool{false, true} {
+		t.Run(fmt.Sprintf("ready=%v", initiallyReady), func(t *testing.T) {
+			ctx, cancel := context.WithCancel(t.Context())
+			defer cancel()
+			runner := &delayedCleanupRunner{err: exit78, exited: make(chan struct{}), cleanup: make(chan struct{})}
+			var state osqueryRunState
+			if initiallyReady {
+				state.ready()
+			}
+			done := make(chan error, 1)
+			go func() { done <- state.run(ctx, runner, nil) }()
+			select {
+			case <-runner.exited:
+			case <-time.After(5 * time.Second):
+				t.Fatal("child exit was not observed")
+			}
+			// Complete a config callback while Run is blocked in post-exit cleanup.
+			state.ready()
+			select {
+			case <-done:
+				t.Fatal("Run returned before cleanup was released")
+			default:
+			}
+			close(runner.cleanup)
+			select {
+			case err := <-done:
+				assert.ErrorIs(t, err, exit78, "preserve exit cause")
+				assert.Equal(t, initiallyReady, isRecoverableOsqueryError(err), "only readiness before child exit permits recovery")
+			case <-time.After(5 * time.Second):
+				t.Fatal("Run did not finish cleanup")
+			}
+		})
+	}
+}

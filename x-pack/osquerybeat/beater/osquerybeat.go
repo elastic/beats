@@ -614,7 +614,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 	var runState osqueryRunState
 	g, ctx := errgroup.WithContext(ctx)
 	g.Go(func() error {
-		err := runState.exit(osq.Run(ctx, flags))
+		err := runState.run(ctx, osq, flags)
 		if err != nil {
 			if errors.Is(err, context.Canceled) {
 				bt.log.Errorf("Osqueryd exited: %v", err)

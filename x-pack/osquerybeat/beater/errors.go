@@ -12,6 +12,8 @@ import (
 	"strings"
 	"sync/atomic"
 	"syscall"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 )
 
 // isBrokenPipeOrEOFError checks for broken pipe, disconnect, or EOF errors from osquery.
@@ -84,6 +86,16 @@ func (s *osqueryRunState) ready() {
 func (s *osqueryRunState) exit(err error) error {
 	if s.state.Swap(osqueryExited) == osqueryReady && isOsqueryExit78(err) {
 		return errors.Join(errOsqueryRuntimeExit78, err)
+	}
+	return err
+}
+
+// run classifies the process error before Run waits for output logging and cleanup.
+func (s *osqueryRunState) run(ctx context.Context, runner osqd.Runner, flags osqd.Flags) error {
+	var exitErr error
+	err := runner.Run(ctx, flags, func(err error) { exitErr = s.exit(err) })
+	if err != nil && exitErr != nil {
+		return exitErr
 	}
 	return err
 }
