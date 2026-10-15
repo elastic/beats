@@ -6,17 +6,16 @@ package osqreceiver
 
 import (
 	"bytes"
-	"context"
 	"encoding/base64"
 	"math/rand/v2"
 	"os"
 	"path/filepath"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/component/componentstatus"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -28,8 +27,12 @@ import (
 // sub-test of TestReceiverStatus are not included here because they require a
 // live osqueryd binary (see tests/integration/receiver_test.go).
 //
-// TestReceiverStatus verifies that a missing daemon is reported as a terminal
-// input failure without announcing readiness before the runtime check.
+// TestReceiverStatus contains a unit sub-test ("early status ok") that verifies
+// the otelStatusFactoryWrapper wiring: osquerybeat calls runner.Start() before
+// the osqueryd binary check, so StatusOK reaches the OTel host without needing
+// osqueryd. StatusMatchHistorical is set because without osqueryd the receiver
+// later transitions to failed; the unit test only checks that StatusOK was
+// emitted at least once (the early-OK design guarantee), not that it is final.
 
 func BenchmarkFactory(b *testing.B) {
 	tmpDir := b.TempDir()
@@ -102,56 +105,62 @@ func TestReceiverHook(t *testing.T) {
 }
 
 func TestReceiverStatus(t *testing.T) {
+	// inputID is embedded in the input config and picked up by getInputId so
+	// the status attributes can reference a known, stable key.
 	const inputID = "osquery-status-test"
-	// Select an empty binary directory even when the host has osquery installed.
-	t.Setenv("OSQUERYBEAT_BINARY_DIR", t.TempDir())
-	t.Cleanup(func() { oteltest.VerifyNoLeaks(t) })
-	cfg := &Config{Beatconfig: map[string]any{
-		"osquerybeat": map[string]any{"inputs": []any{
-			map[string]any{"type": "osquery", "id": inputID},
-		}},
-		"management.otel.enabled": true,
-		"http.enabled":            false,
-		"path.home":               t.TempDir(),
-	}}
-	factory := NewFactoryWithSettings(Settings{Home: t.TempDir()})
-	settings := receiver.Settings{
-		ID:                component.NewIDWithName(factory.Type(), "status"),
-		TelemetrySettings: component.TelemetrySettings{Logger: zap.NewNop()},
+
+	inputStatusAttributes := func(state, msg string) pcommon.Map {
+		attrs := pcommon.NewMap()
+		inputs := attrs.PutEmptyMap("inputs")
+		inp := inputs.PutEmptyMap(inputID)
+		inp.PutStr("status", state)
+		inp.PutStr("error", msg)
+		return attrs
 	}
-	host := &oteltest.MockHost{}
-	var consumeLogs oteltest.DummyConsumer
-	rec, err := factory.CreateLogs(t.Context(), settings, cfg, &consumeLogs)
-	require.NoError(t, err, "create receiver with missing daemon")
-	require.NoError(t, rec.Start(t.Context(), host), "start receiver lifecycle")
-	t.Cleanup(func() {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		require.NoError(t, rec.Shutdown(ctx), "clean up receiver after runtime failure")
-	})
-	require.Eventually(t, func() bool {
-		for _, event := range host.GetEvents() {
-			if event.Status() != componentstatus.StatusPermanentError {
-				continue
-			}
-			inputs, ok := event.Attributes().Get("inputs")
-			if !ok {
-				continue
-			}
-			input, ok := inputs.Map().Get(inputID)
-			if !ok {
-				continue
-			}
-			state, ok := input.Map().Get("status")
-			if ok && state.Str() == componentstatus.StatusPermanentError.String() {
-				return true
-			}
+
+	t.Run("early status ok", func(t *testing.T) {
+		cfg := Config{
+			Beatconfig: map[string]any{
+				"osquerybeat": map[string]any{
+					"inputs": []any{
+						map[string]any{
+							"type": "osquery",
+							"id":   inputID,
+							"osquery": map[string]any{
+								"schedule": map[string]any{
+									"osquery_info": map[string]any{
+										"query":    "SELECT * FROM osquery_info",
+										"interval": 60,
+									},
+								},
+							},
+						},
+					},
+				},
+				"path.home": t.TempDir(),
+			},
 		}
-		return false
-	}, 10*time.Second, 10*time.Millisecond, "missing daemon must fail its identified input")
-	for _, event := range host.GetEvents() {
-		require.NotEqual(t, componentstatus.StatusOK, event.Status(), "missing daemon must never announce readiness")
-	}
+		oteltest.CheckReceivers(oteltest.CheckReceiversParams{
+			T: t,
+			Receivers: []oteltest.ReceiverConfig{
+				{
+					Name:    "r1",
+					Beat:    "osquerybeat",
+					Config:  &cfg,
+					Factory: NewFactoryWithSettings(Settings{Home: t.TempDir()}),
+				},
+			},
+			Status: componentstatus.NewEvent(
+				componentstatus.StatusOK,
+				componentstatus.WithAttributes(
+					inputStatusAttributes(componentstatus.StatusOK.String(), ""))),
+			// Without osqueryd the receiver transitions to failed after the early
+			// StatusOK; historical matching verifies the early-OK emission only.
+			// See tests/integration/receiver_test.go for the "running input" test
+			// that checks the final StatusOK with a live osqueryd.
+			StatusMatchHistorical: true,
+		})
+	})
 }
 
 func genSocketPath() string {

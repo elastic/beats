@@ -149,18 +149,6 @@ func TestReceiverRestartsAfterOsqueryExit78(t *testing.T) {
 		defer resultMu.Unlock()
 		return lastPID != initialPID && lastResultTime > faultAt
 	}, time.Minute, 100*time.Millisecond, "the receiver must start a replacement daemon and publish newly executed results")
-	require.Eventually(t, func() bool {
-		var degraded bool
-		for _, event := range host.GetEvents() {
-			if event.Status() == componentstatus.StatusRecoverableError {
-				degraded = true
-			}
-			if degraded && event.Status() == componentstatus.StatusOK {
-				return true
-			}
-		}
-		return false
-	}, 10*time.Second, 100*time.Millisecond, "the receiver must report degraded status and then return to running after restart readiness")
 	for _, event := range host.GetEvents() {
 		assert.NotEqual(t, componentstatus.StatusPermanentError, event.Status(), "exit 78 must not permanently fail the receiver")
 		assert.NotEqual(t, componentstatus.StatusFatalError, event.Status(), "exit 78 must not fatally fail the receiver")

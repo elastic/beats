@@ -10,6 +10,7 @@ import (
 	"net"
 	"os/exec"
 	"strings"
+	"sync/atomic"
 	"syscall"
 )
 
@@ -37,7 +38,7 @@ func isRecoverableOsqueryError(err error) bool {
 	if err == nil || errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 		return false
 	}
-	if isBrokenPipeOrEOFError(err) {
+	if errors.Is(err, errOsqueryRuntimeExit78) || isBrokenPipeOrEOFError(err) {
 		return true
 	}
 	// osquery-go's extension manager watchdog shares a single thrift socket, and a single
@@ -52,12 +53,37 @@ func isRecoverableOsqueryError(err error) bool {
 }
 
 // isOsqueryExit78 recognizes the same exit used for both startup configuration
-// errors and catastrophic runtime logger failures. The runner checks readiness
-// before deciding whether this process exit is recoverable.
+// errors and catastrophic runtime logger failures.
 func isOsqueryExit78(err error) bool {
 	if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 		return false
 	}
 	var exitError *exec.ExitError
 	return errors.As(err, &exitError) && exitError.ExitCode() == 78
+}
+
+// osqueryRunState distinguishes runtime failure from invalid startup configuration.
+// Exit seals the state before logger cleanup, so late config callbacks cannot
+// turn a startup failure into a recoverable runtime failure.
+type osqueryRunState struct {
+	state atomic.Uint32
+}
+
+const (
+	osqueryStarting uint32 = iota
+	osqueryReady
+	osqueryExited
+)
+
+var errOsqueryRuntimeExit78 = errors.New("osqueryd runtime exit 78")
+
+func (s *osqueryRunState) ready() {
+	s.state.CompareAndSwap(osqueryStarting, osqueryReady)
+}
+
+func (s *osqueryRunState) exit(err error) error {
+	if s.state.Swap(osqueryExited) == osqueryReady && isOsqueryExit78(err) {
+		return errors.Join(errOsqueryRuntimeExit78, err)
+	}
+	return err
 }

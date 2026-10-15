@@ -13,82 +13,32 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
-// osqueryStatusReporter separates an idle beat from a ready daemon: the Agent
-// can consider the beat running with no inputs, but future input reporters must
-// wait for daemon readiness before inheriting Running.
-type osqueryStatusReporter struct {
-	manager status.StatusReporter
-	inputs  *osqueryInputRunnerFactory
-}
-
-// UpdateStatus forwards daemon health to the Agent and active input reporters.
-func (r osqueryStatusReporter) UpdateStatus(state status.Status, message string) {
-	r.manager.UpdateStatus(state, message)
-	r.inputs.UpdateStatus(state, message)
-}
-
-// WaitingForInputs reports an idle beat without asserting daemon readiness.
-func (r osqueryStatusReporter) WaitingForInputs() {
-	const message = "Waiting for osquery input configuration"
-	r.inputs.UpdateStatus(status.Configuring, message)
-	r.manager.UpdateStatus(status.Running, message)
-}
-
-// osqueryInputRunner is a minimal cfgfile.Runner that reports OTel status for
-// its shared daemon. It is used with otelStatusFactoryWrapper so that per-input
+// osqueryInputRunner is a minimal cfgfile.Runner that reports OTel status when
+// started. It is used together with otelStatusFactoryWrapper so that per-input
 // componentstatus events reach the OTel host without requiring the cfgfile
 // manager infrastructure. osquerybeat manages its own scheduling via osqueryd
 // rather than through cfgfile runners, so this shim bridges the gap.
 type osqueryInputRunner struct {
 	mu       sync.Mutex
 	reporter status.StatusReporter
-	factory  *osqueryInputRunnerFactory
 }
 
 var _ cfgfile.Runner = (*osqueryInputRunner)(nil)
 var _ status.WithStatusReporter = (*osqueryInputRunner)(nil)
 
-// Start inherits the current daemon state, including when an input is added
-// during restart backoff. The wrapper has already injected its sub-reporter.
+// Start reports status.Running to the injected reporter. This is called once
+// per input after the otelStatusFactoryWrapper has injected a sub-reporter,
+// mirroring the pattern used by heartbeat monitors.
 func (r *osqueryInputRunner) Start() {
-	r.factory.mu.Lock()
-	defer r.factory.mu.Unlock()
-	if r.factory.runners == nil {
-		r.factory.runners = make(map[*osqueryInputRunner]struct{})
-	}
-	r.factory.runners[r] = struct{}{}
-	state := r.factory.state
-	if state == status.Unknown {
-		state = status.Configuring
-	}
-	// A newly created input must wait for osqueryd to apply the current
-	// configuration. Do not inherit Running from an older input or run.
-	if state == status.Running {
-		return
-	}
-	r.updateStatus(state, r.factory.message)
-}
-
-func (r *osqueryInputRunner) Stop() {
-	r.factory.mu.Lock()
-	defer r.factory.mu.Unlock()
-	delete(r.factory.runners, r)
-	r.updateStatus(status.Stopped, "")
-}
-
-func (r *osqueryInputRunner) updateStatus(state status.Status, message string) {
-	// The generic input aggregator maps Configuring to OK. Preserve the receiver's
-	// startup status until the daemon is ready rather than announce premature health.
-	if state == status.Configuring || state == status.Starting || state == status.Unknown {
-		return
-	}
 	r.mu.Lock()
 	reporter := r.reporter
 	r.mu.Unlock()
 	if reporter != nil {
-		reporter.UpdateStatus(state, message)
+		reporter.UpdateStatus(status.Running, "")
 	}
 }
+
+func (r *osqueryInputRunner) Stop() {}
 
 func (r *osqueryInputRunner) String() string { return "osqueryInputRunner" }
 
@@ -98,29 +48,16 @@ func (r *osqueryInputRunner) SetStatusReporter(reporter status.StatusReporter) {
 	r.mu.Unlock()
 }
 
-// osqueryInputRunnerFactory forwards shared daemon state to the active input
-// reporters. OtelManager.UpdateStatus does not forward beat status to the host,
-// so osquerybeat must update its existing per-input status bridge as well.
-type osqueryInputRunnerFactory struct {
-	mu      sync.Mutex
-	state   status.Status
-	message string
-	runners map[*osqueryInputRunner]struct{}
-}
+// osqueryInputRunnerFactory is a cfgfile.RunnerFactory whose sole purpose is to
+// be wrapped by otelStatusFactoryWrapper. Each Create call returns a new
+// osqueryInputRunner; the wrapper then calls SetStatusReporter on it so that
+// subsequent Start() calls report componentstatus events to the OTel host.
+type osqueryInputRunnerFactory struct{}
 
 var _ cfgfile.RunnerFactory = (*osqueryInputRunnerFactory)(nil)
 
-func (f *osqueryInputRunnerFactory) Create(_ beat.PipelineConnector, _ *conf.C) (cfgfile.Runner, error) {
-	return &osqueryInputRunner{factory: f}, nil
+func (*osqueryInputRunnerFactory) Create(_ beat.PipelineConnector, _ *conf.C) (cfgfile.Runner, error) {
+	return &osqueryInputRunner{}, nil
 }
 
 func (*osqueryInputRunnerFactory) CheckConfig(_ *conf.C) error { return nil }
-
-func (f *osqueryInputRunnerFactory) UpdateStatus(state status.Status, message string) {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	f.state, f.message = state, message
-	for runner := range f.runners {
-		runner.updateStatus(state, message)
-	}
-}
