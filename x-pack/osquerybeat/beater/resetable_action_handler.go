@@ -63,7 +63,7 @@ func resetableActionHandlerWithTimeout(timeout time.Duration) optionFunc {
 	}
 }
 
-func (a *resetableActionHandler) Execute(ctx context.Context, req map[string]interface{}) (res map[string]interface{}, err error) {
+func (a *resetableActionHandler) Execute(ctx context.Context, req map[string]any) (res map[string]any, err error) {
 	a.log.Debug(formatLogMessage("execute"))
 
 	// Normalize error on exit, always return nil as error and encode it into result as per current contract
@@ -120,14 +120,14 @@ func (a *resetableActionHandler) Execute(ctx context.Context, req map[string]int
 	return res, nil
 }
 
-func formatLogMessage(format string, args ...interface{}) string {
+func formatLogMessage(format string, args ...any) string {
 	return "resetable action handler: " + fmt.Sprintf(format, args...)
 }
 
-func renderResult(res map[string]interface{}, err error) map[string]interface{} {
+func renderResult(res map[string]any, err error) map[string]any {
 	if res == nil {
 		now := time.Now().UTC()
-		res = map[string]interface{}{
+		res = map[string]any{
 			"started_at":   now.Format(time.RFC3339Nano),
 			"completed_at": now.Format(time.RFC3339Nano),
 		}
@@ -138,7 +138,7 @@ func renderResult(res map[string]interface{}, err error) map[string]interface{} 
 	return res
 }
 
-func (a *resetableActionHandler) execute(ctx context.Context, req map[string]interface{}) (map[string]interface{}, error) {
+func (a *resetableActionHandler) execute(ctx context.Context, req map[string]any) (map[string]any, error) {
 	a.mx.Lock()
 	defer a.mx.Unlock()
 

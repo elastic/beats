@@ -23,7 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
+
 	"net"
 	"net/url"
 	"strings"
@@ -260,11 +260,11 @@ func (c *Client) GetInfo() (*Info, error) {
 		return nil, err
 	}
 
-	if b, err := ioutil.ReadAll(res); err == nil {
+	if b, err := io.ReadAll(res); err == nil {
 
-		resultMap := map[string]interface{}{}
+		resultMap := map[string]any{}
 
-		for _, ln := range strings.Split(string(b), "\n") {
+		for ln := range strings.SplitSeq(string(b), "\n") {
 
 			ln := strings.TrimSpace(ln)
 			if ln == "" {

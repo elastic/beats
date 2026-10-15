@@ -29,7 +29,7 @@ func config() error {
 
 func configFileParams() devtools.ConfigFileParams {
 	conf := devtools.DefaultConfigFileParams()
-	conf.ExtraVars = map[string]interface{}{"GOOS": "windows"}
+	conf.ExtraVars = map[string]any{"GOOS": "windows"}
 	conf.Templates = append(conf.Templates, devtools.OSSBeatDir("_meta/config/*.tmpl"))
 	if devtools.XPackProject == SelectLogic {
 		conf.Templates = append(conf.Templates, devtools.XPackBeatDir("_meta/config/*.tmpl"))

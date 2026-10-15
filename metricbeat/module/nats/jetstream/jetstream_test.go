@@ -65,9 +65,9 @@ func TestFetchEventContentForStats(t *testing.T) {
 		WritePath: "_meta/testdata/expected",
 		// Not sure why this field isn't being recognized as documented. It does exist.
 		OmitDocumentedFieldsCheck: []string{"nats.jetstream.category"},
-		Module: map[string]interface{}{
-			"jetstream": map[string]interface{}{
-				"stats": map[string]interface{}{
+		Module: map[string]any{
+			"jetstream": map[string]any{
+				"stats": map[string]any{
 					"enabled": true,
 				},
 			},
@@ -86,9 +86,9 @@ func TestFetchEventContentForAccount(t *testing.T) {
 		WritePath: "_meta/testdata/expected",
 		// Not sure why this field isn't being recognized as documented. It does exist.
 		OmitDocumentedFieldsCheck: []string{"nats.jetstream.account.accounts"},
-		Module: map[string]interface{}{
-			"jetstream": map[string]interface{}{
-				"account": map[string]interface{}{
+		Module: map[string]any{
+			"jetstream": map[string]any{
+				"account": map[string]any{
 					"enabled": true,
 				},
 			},
@@ -107,9 +107,9 @@ func TestFetchEventContentForStreams(t *testing.T) {
 		WritePath: "_meta/testdata/expected",
 		// Not sure why this field isn't being recognized as documented. It does exist.
 		OmitDocumentedFieldsCheck: []string{"nats.jetstream.category"},
-		Module: map[string]interface{}{
-			"jetstream": map[string]interface{}{
-				"stream": map[string]interface{}{
+		Module: map[string]any{
+			"jetstream": map[string]any{
+				"stream": map[string]any{
 					"enabled": true,
 				},
 			},
@@ -128,9 +128,9 @@ func TestFetchEventContentForConsumers(t *testing.T) {
 		WritePath: "_meta/testdata/expected",
 		// Not sure why this field isn't being recognized as documented. It does exist.
 		OmitDocumentedFieldsCheck: []string{"nats.jetstream.category"},
-		Module: map[string]interface{}{
-			"jetstream": map[string]interface{}{
-				"consumer": map[string]interface{}{
+		Module: map[string]any{
+			"jetstream": map[string]any{
+				"consumer": map[string]any{
 					"enabled": true,
 				},
 			},
@@ -149,18 +149,18 @@ func TestFetchEventContentForAll(t *testing.T) {
 		WritePath: "_meta/testdata/expected",
 		// Not sure why this field isn't being recognized as documented. It does exist.
 		OmitDocumentedFieldsCheck: []string{"nats.jetstream.category", "nats.jetstream.account.accounts"},
-		Module: map[string]interface{}{
-			"jetstream": map[string]interface{}{
-				"stats": map[string]interface{}{
+		Module: map[string]any{
+			"jetstream": map[string]any{
+				"stats": map[string]any{
 					"enabled": true,
 				},
-				"account": map[string]interface{}{
+				"account": map[string]any{
 					"enabled": true,
 				},
-				"stream": map[string]interface{}{
+				"stream": map[string]any{
 					"enabled": true,
 				},
-				"consumer": map[string]interface{}{
+				"consumer": map[string]any{
 					"enabled": true,
 				},
 			},
@@ -179,18 +179,18 @@ func TestFetchEventContentForAllWithNothingEnabled(t *testing.T) {
 		WritePath: "_meta/testdata/expected",
 		// Not sure why this field isn't being recognized as documented. It does exist.
 		OmitDocumentedFieldsCheck: []string{},
-		Module: map[string]interface{}{
-			"jetstream": map[string]interface{}{
-				"stats": map[string]interface{}{
+		Module: map[string]any{
+			"jetstream": map[string]any{
+				"stats": map[string]any{
 					"enabled": false,
 				},
-				"account": map[string]interface{}{
+				"account": map[string]any{
 					"enabled": false,
 				},
-				"stream": map[string]interface{}{
+				"stream": map[string]any{
 					"enabled": false,
 				},
-				"consumer": map[string]interface{}{
+				"consumer": map[string]any{
 					"enabled": false,
 				},
 			},
@@ -209,20 +209,20 @@ func TestFetchEventContentForAllWithFilters(t *testing.T) {
 		WritePath: "_meta/testdata/expected",
 		// Not sure why this field isn't being recognized as documented. It does exist.
 		OmitDocumentedFieldsCheck: []string{"nats.jetstream.category", "nats.jetstream.account.accounts"},
-		Module: map[string]interface{}{
-			"jetstream": map[string]interface{}{
-				"stats": map[string]interface{}{
+		Module: map[string]any{
+			"jetstream": map[string]any{
+				"stats": map[string]any{
 					"enabled": true,
 				},
-				"account": map[string]interface{}{
+				"account": map[string]any{
 					"enabled": true,
 					"names":   []string{"account-2"},
 				},
-				"stream": map[string]interface{}{
+				"stream": map[string]any{
 					"enabled": true,
 					"names":   []string{"test-stream-2"},
 				},
-				"consumer": map[string]interface{}{
+				"consumer": map[string]any{
 					"enabled": true,
 					"names":   []string{"test-stream-2-consumer-2"},
 				},

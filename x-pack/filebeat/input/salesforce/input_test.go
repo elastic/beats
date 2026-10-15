@@ -157,8 +157,8 @@ func TestFormQueryWithCursor(t *testing.T) {
 }
 
 var (
-	defaultUserPasswordFlowMap = map[string]interface{}{
-		"user_password_flow": map[string]interface{}{
+	defaultUserPasswordFlowMap = map[string]any{
+		"user_password_flow": map[string]any{
 			"enabled":       true,
 			"client.id":     "clientid",
 			"client.secret": "clientsecret",
@@ -167,8 +167,8 @@ var (
 			"password":      "password",
 		},
 	}
-	wrongUserPasswordFlowMap = map[string]interface{}{
-		"user_password_flow": map[string]interface{}{
+	wrongUserPasswordFlowMap = map[string]any{
+		"user_password_flow": map[string]any{
 			"enabled":       true,
 			"client.id":     "clientid-wrong",
 			"client.secret": "clientsecret-wrong",
@@ -178,48 +178,48 @@ var (
 		},
 	}
 
-	defaultObjectMonitoringMethodConfigMap = map[string]interface{}{
+	defaultObjectMonitoringMethodConfigMap = map[string]any{
 		"interval": "5s",
 		"enabled":  true,
-		"query": map[string]interface{}{
+		"query": map[string]any{
 			"default": defaultLoginObjectQuery,
 			"value":   valueLoginObjectQuery,
 		},
-		"cursor": map[string]interface{}{
+		"cursor": map[string]any{
 			"field": "EventDate",
 		},
 	}
-	defaultEventLogFileMonitoringMethodMap = map[string]interface{}{
+	defaultEventLogFileMonitoringMethodMap = map[string]any{
 		"interval": "5s",
 		"enabled":  true,
-		"query": map[string]interface{}{
+		"query": map[string]any{
 			"default": defaultLoginEventLogFileQuery,
 			"value":   valueLoginEventLogFileQuery,
 		},
-		"cursor": map[string]interface{}{
+		"cursor": map[string]any{
 			"field": "CreatedDate",
 		},
 	}
 
-	invalidObjectMonitoringMethodMap = map[string]interface{}{
+	invalidObjectMonitoringMethodMap = map[string]any{
 		"interval": "5m",
 		"enabled":  true,
-		"query": map[string]interface{}{
+		"query": map[string]any{
 			"default": invalidDefaultLoginEventObjectQuery,
 			"value":   valueLoginEventLogFileQuery,
 		},
-		"cursor": map[string]interface{}{
+		"cursor": map[string]any{
 			"field": "CreatedDate",
 		},
 	}
-	invalidEventLogFileMonitoringMethodMap = map[string]interface{}{
+	invalidEventLogFileMonitoringMethodMap = map[string]any{
 		"interval": "5m",
 		"enabled":  true,
-		"query": map[string]interface{}{
+		"query": map[string]any{
 			"default": invalidDefaultLoginEventLogFileQuery,
 			"value":   invalidValueLoginEventLogFileQuery,
 		},
-		"cursor": map[string]interface{}{
+		"cursor": map[string]any{
 			"field": "CreatedDate",
 		},
 	}
@@ -229,8 +229,8 @@ func TestInput(t *testing.T) {
 	logptest.NewTestingLogger(t, "")
 
 	tests := []struct {
-		setupServer      func(testing.TB, http.HandlerFunc, map[string]interface{})
-		baseConfig       map[string]interface{}
+		setupServer      func(testing.TB, http.HandlerFunc, map[string]any)
+		baseConfig       map[string]any
 		handler          http.HandlerFunc
 		persistentCursor *state
 		name             string
@@ -243,10 +243,10 @@ func TestInput(t *testing.T) {
 		{
 			name:        "Positive/event_monitoring_method_object_with_default_query_only",
 			setupServer: newTestServer(httptest.NewServer),
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"version":     56,
 				"auth.oauth2": defaultUserPasswordFlowMap,
-				"event_monitoring_method": map[string]interface{}{
+				"event_monitoring_method": map[string]any{
 					"object": defaultObjectMonitoringMethodConfigMap,
 				},
 			},
@@ -256,10 +256,10 @@ func TestInput(t *testing.T) {
 		{
 			name:        "Negative/event_monitoring_method_object_with_error_in_data_collection",
 			setupServer: newTestServer(httptest.NewServer),
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"version":     56,
 				"auth.oauth2": defaultUserPasswordFlowMap,
-				"event_monitoring_method": map[string]interface{}{
+				"event_monitoring_method": map[string]any{
 					"object": invalidObjectMonitoringMethodMap,
 				},
 			},
@@ -269,10 +269,10 @@ func TestInput(t *testing.T) {
 		{
 			name:        "Positive/event_monitoring_method_object_with_interval_5s",
 			setupServer: newTestServer(httptest.NewServer),
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"version":     56,
 				"auth.oauth2": defaultUserPasswordFlowMap,
-				"event_monitoring_method": map[string]interface{}{
+				"event_monitoring_method": map[string]any{
 					"object": defaultObjectMonitoringMethodConfigMap,
 				},
 			},
@@ -283,10 +283,10 @@ func TestInput(t *testing.T) {
 		{
 			name:        "Positive/event_monitoring_method_object_with_Pagination",
 			setupServer: newTestServer(httptest.NewServer),
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"version":     56,
 				"auth.oauth2": defaultUserPasswordFlowMap,
-				"event_monitoring_method": map[string]interface{}{
+				"event_monitoring_method": map[string]any{
 					"object": defaultObjectMonitoringMethodConfigMap,
 				},
 			},
@@ -298,10 +298,10 @@ func TestInput(t *testing.T) {
 		{
 			name:        "Positive/event_monitoring_method_elf_with_default_query_only",
 			setupServer: newTestServer(httptest.NewServer),
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"version":     56,
 				"auth.oauth2": defaultUserPasswordFlowMap,
-				"event_monitoring_method": map[string]interface{}{
+				"event_monitoring_method": map[string]any{
 					"event_log_file": defaultEventLogFileMonitoringMethodMap,
 				},
 			},
@@ -311,10 +311,10 @@ func TestInput(t *testing.T) {
 		{
 			name:        "Negative/event_monitoring_method_elf_with_error_in_auth",
 			setupServer: newTestServer(httptest.NewServer),
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"version":     56,
 				"auth.oauth2": wrongUserPasswordFlowMap,
-				"event_monitoring_method": map[string]interface{}{
+				"event_monitoring_method": map[string]any{
 					"event_log_file": defaultEventLogFileMonitoringMethodMap,
 				},
 			},
@@ -325,10 +325,10 @@ func TestInput(t *testing.T) {
 		{
 			name:        "Negative/event_monitoring_method_elf_with_error_in_data_collection",
 			setupServer: newTestServer(httptest.NewServer),
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"version":     56,
 				"auth.oauth2": defaultUserPasswordFlowMap,
-				"event_monitoring_method": map[string]interface{}{
+				"event_monitoring_method": map[string]any{
 					"event_log_file": invalidEventLogFileMonitoringMethodMap,
 				},
 			},
@@ -446,8 +446,8 @@ func TestRunObjectWithBatching(t *testing.T) {
 	}))
 	t.Cleanup(server.Close)
 
-	authConfig := map[string]interface{}{
-		"user_password_flow": map[string]interface{}{
+	authConfig := map[string]any{
+		"user_password_flow": map[string]any{
 			"enabled":       true,
 			"client.id":     "clientid",
 			"client.secret": "clientsecret",
@@ -457,25 +457,25 @@ func TestRunObjectWithBatching(t *testing.T) {
 		},
 	}
 
-	baseConfig := map[string]interface{}{
+	baseConfig := map[string]any{
 		"url":         server.URL,
 		"version":     56,
 		"auth.oauth2": authConfig,
-		"event_monitoring_method": map[string]interface{}{
-			"object": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"object": map[string]any{
 				"interval": "5s",
 				"enabled":  true,
-				"batch": map[string]interface{}{
+				"batch": map[string]any{
 					"enabled":             true,
 					"initial_interval":    "15m",
 					"max_windows_per_run": 2,
 					"window":              "5m",
 				},
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultLoginObjectQuery,
 					"value":   valueBatchedLoginObjectQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "EventDate",
 				},
 			},
@@ -514,10 +514,10 @@ func TestRunObjectWithBatching(t *testing.T) {
 	assert.Equal(t, []string{firstBatchQuery, secondBatchQuery}, queries, "expected batched query windows to be executed in order")
 	assert.Len(t, client.published, 2, "expected one event from each batch window")
 
-	var cursorState map[string]interface{}
+	var cursorState map[string]any
 	require.NoError(t, typeconv.Convert(&cursorState, s.cursor), "expected cursor state to be convertible")
 
-	objectCursor, ok := cursorState["object"].(map[string]interface{})
+	objectCursor, ok := cursorState["object"].(map[string]any)
 	require.True(t, ok, "expected object cursor state to be present")
 	assert.Equal(t, "2024-01-01T11:55:00.000Z", objectCursor["progress_time"], "expected batch progress to advance to the end of the last processed window")
 }
@@ -559,11 +559,11 @@ func TestRunObjectWithBatchingIncludesEventAtBatchEndBoundary(t *testing.T) {
 	t.Cleanup(server.Close)
 
 	cfg := defaultConfig()
-	err := conf.MustNewConfigFrom(map[string]interface{}{
+	err := conf.MustNewConfigFrom(map[string]any{
 		"url":     server.URL,
 		"version": 56,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -572,21 +572,21 @@ func TestRunObjectWithBatchingIncludesEventAtBatchEndBoundary(t *testing.T) {
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"object": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"object": map[string]any{
 				"interval": "5s",
 				"enabled":  true,
-				"batch": map[string]interface{}{
+				"batch": map[string]any{
 					"enabled":             true,
 					"initial_interval":    "15m",
 					"max_windows_per_run": 2,
 					"window":              "5m",
 				},
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultLoginObjectQuery,
 					"value":   valueBatchedLoginObjectQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "EventDate",
 				},
 			},
@@ -626,10 +626,10 @@ func TestRunObjectWithBatchingIncludesEventAtBatchEndBoundary(t *testing.T) {
 	require.True(t, ok, "expected published event message to be a string")
 	assert.Contains(t, firstMessage, `"EventDate":"2024-01-01T11:50:00.000+0000"`, "expected the inclusive batch end-boundary event to be published")
 
-	var cursorState map[string]interface{}
+	var cursorState map[string]any
 	require.NoError(t, typeconv.Convert(&cursorState, s.cursor), "expected cursor state to be convertible")
 
-	objectCursor, ok := cursorState["object"].(map[string]interface{})
+	objectCursor, ok := cursorState["object"].(map[string]any)
 	require.True(t, ok, "expected object cursor state to be present")
 	assert.Equal(t, "2024-01-01T11:55:00.000Z", objectCursor["progress_time"], "expected batch progress to advance after processing a boundary event")
 }
@@ -649,7 +649,7 @@ func TestRunObjectRequiresObjectQueryCursorConfig(t *testing.T) {
 	cfg := defaultConfig()
 	cfg.EventMonitoringMethod = &eventMonitoringMethod{
 		Object: EventMonitoringConfig{
-			Enabled:  pointer(true),
+			Enabled:  new(true),
 			Interval: time.Second,
 		},
 	}
@@ -696,11 +696,11 @@ func TestRunObjectWithBatchingSeedsFirstWindowFromLegacyFirstEventTime(t *testin
 	t.Cleanup(server.Close)
 
 	cfg := defaultConfig()
-	err := conf.MustNewConfigFrom(map[string]interface{}{
+	err := conf.MustNewConfigFrom(map[string]any{
 		"url":     server.URL,
 		"version": 56,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -709,21 +709,21 @@ func TestRunObjectWithBatchingSeedsFirstWindowFromLegacyFirstEventTime(t *testin
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"object": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"object": map[string]any{
 				"interval": "5s",
 				"enabled":  true,
-				"batch": map[string]interface{}{
+				"batch": map[string]any{
 					"enabled":             true,
 					"initial_interval":    "15m",
 					"max_windows_per_run": 1,
 					"window":              "5m",
 				},
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultLoginObjectQuery,
 					"value":   valueBatchedLoginObjectQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "EventDate",
 				},
 			},
@@ -942,11 +942,11 @@ func TestRunObjectResumeWithLastEventIDKeepsSameTimestampRows(t *testing.T) {
 	t.Cleanup(server.Close)
 
 	cfg := defaultConfig()
-	err := conf.MustNewConfigFrom(map[string]interface{}{
+	err := conf.MustNewConfigFrom(map[string]any{
 		"url":     server.URL,
 		"version": 56,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -955,15 +955,15 @@ func TestRunObjectResumeWithLastEventIDKeepsSameTimestampRows(t *testing.T) {
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"object": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"object": map[string]any{
 				"interval": "5s",
 				"enabled":  true,
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultSetupAuditTrailQuery,
 					"value":   "SELECT Id,CreatedDate,Action FROM SetupAuditTrail WHERE CreatedDate > [[ .cursor.object.last_event_time ]][[ if .cursor.object.last_event_id ]] OR (CreatedDate = [[ .cursor.object.last_event_time ]] AND Id > '[[ .cursor.object.last_event_id ]]')[[ end ]] ORDER BY CreatedDate ASC, Id ASC",
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "CreatedDate",
 				},
 			},
@@ -1063,11 +1063,11 @@ func TestRunObjectSetupAuditTrailResumeWithoutLastEventIDUsesLegacyBoundary(t *t
 	t.Cleanup(server.Close)
 
 	cfg := defaultConfig()
-	err := conf.MustNewConfigFrom(map[string]interface{}{
+	err := conf.MustNewConfigFrom(map[string]any{
 		"url":     server.URL,
 		"version": 56,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -1076,15 +1076,15 @@ func TestRunObjectSetupAuditTrailResumeWithoutLastEventIDUsesLegacyBoundary(t *t
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"object": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"object": map[string]any{
 				"interval": "5s",
 				"enabled":  true,
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": "SELECT Id,CreatedDate,Action FROM SetupAuditTrail ORDER BY CreatedDate ASC, Id ASC",
 					"value":   "SELECT Id,CreatedDate,Action FROM SetupAuditTrail WHERE CreatedDate > [[ .cursor.object.last_event_time ]][[ if .cursor.object.last_event_id ]] OR (CreatedDate = [[ .cursor.object.last_event_time ]] AND Id > '[[ .cursor.object.last_event_id ]]')[[ end ]] ORDER BY CreatedDate ASC, Id ASC",
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "CreatedDate",
 				},
 			},
@@ -1169,12 +1169,12 @@ func TestRunObjectUnbatchedRestoresCursorOnMidStreamFailure(t *testing.T) {
 	t.Cleanup(server.Close)
 
 	cfg := defaultConfig()
-	err := conf.MustNewConfigFrom(map[string]interface{}{
+	err := conf.MustNewConfigFrom(map[string]any{
 		"url":                         server.URL,
 		"version":                     56,
 		"resource.retry.max_attempts": 1,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -1183,15 +1183,15 @@ func TestRunObjectUnbatchedRestoresCursorOnMidStreamFailure(t *testing.T) {
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"object": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"object": map[string]any{
 				"interval": "5s",
 				"enabled":  true,
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultLoginObjectQuery,
 					"value":   valueLoginObjectQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "EventDate",
 				},
 			},
@@ -1267,11 +1267,11 @@ func TestRunObjectClearsStaleLastEventIDWhenQueryDropsIDWithoutRows(t *testing.T
 	t.Cleanup(server.Close)
 
 	cfg := defaultConfig()
-	err := conf.MustNewConfigFrom(map[string]interface{}{
+	err := conf.MustNewConfigFrom(map[string]any{
 		"url":     server.URL,
 		"version": 56,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -1280,15 +1280,15 @@ func TestRunObjectClearsStaleLastEventIDWhenQueryDropsIDWithoutRows(t *testing.T
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"object": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"object": map[string]any{
 				"interval": "5s",
 				"enabled":  true,
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": customQuery,
 					"value":   customQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "CreatedDate",
 				},
 			},
@@ -1378,11 +1378,11 @@ func TestRunObjectReopensSessionOnInvalidSessionID(t *testing.T) {
 	t.Cleanup(server.Close)
 
 	cfg := defaultConfig()
-	err := conf.MustNewConfigFrom(map[string]interface{}{
+	err := conf.MustNewConfigFrom(map[string]any{
 		"url":     server.URL,
 		"version": 56,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -1391,15 +1391,15 @@ func TestRunObjectReopensSessionOnInvalidSessionID(t *testing.T) {
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"object": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"object": map[string]any{
 				"interval": "5s",
 				"enabled":  true,
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": objectQuery,
 					"value":   objectQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "EventDate",
 				},
 			},
@@ -1484,11 +1484,11 @@ func TestRunEventLogFileReopensSessionOnUnauthorizedDownload(t *testing.T) {
 	t.Cleanup(server.Close)
 
 	cfg := defaultConfig()
-	err := conf.MustNewConfigFrom(map[string]interface{}{
+	err := conf.MustNewConfigFrom(map[string]any{
 		"url":     server.URL,
 		"version": 56,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -1497,15 +1497,15 @@ func TestRunEventLogFileReopensSessionOnUnauthorizedDownload(t *testing.T) {
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"event_log_file": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"event_log_file": map[string]any{
 				"interval": "5s",
 				"enabled":  true,
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultLoginEventLogFileQuery,
 					"value":   valueLoginEventLogFileQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "CreatedDate",
 				},
 			},
@@ -1600,11 +1600,11 @@ func TestRunEventLogFileResumesWithinSameCreatedDateBucket(t *testing.T) {
 	t.Cleanup(server.Close)
 
 	cfg := defaultConfig()
-	err := conf.MustNewConfigFrom(map[string]interface{}{
+	err := conf.MustNewConfigFrom(map[string]any{
 		"url":     server.URL,
 		"version": 56,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -1613,15 +1613,15 @@ func TestRunEventLogFileResumesWithinSameCreatedDateBucket(t *testing.T) {
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"event_log_file": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"event_log_file": map[string]any{
 				"interval": "5s",
 				"enabled":  true,
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultQuery,
 					"value":   resumeQueryTmpl,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "CreatedDate",
 				},
 			},
@@ -1695,11 +1695,11 @@ func TestRunObjectWithBatchingResumesFromProgressTime(t *testing.T) {
 	t.Cleanup(server.Close)
 
 	cfg := defaultConfig()
-	err := conf.MustNewConfigFrom(map[string]interface{}{
+	err := conf.MustNewConfigFrom(map[string]any{
 		"url":     server.URL,
 		"version": 56,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -1708,21 +1708,21 @@ func TestRunObjectWithBatchingResumesFromProgressTime(t *testing.T) {
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"object": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"object": map[string]any{
 				"interval": "5s",
 				"enabled":  true,
-				"batch": map[string]interface{}{
+				"batch": map[string]any{
 					"enabled":             true,
 					"initial_interval":    "15m",
 					"max_windows_per_run": 1,
 					"window":              "5m",
 				},
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultLoginObjectQuery,
 					"value":   valueBatchedLoginObjectQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "EventDate",
 				},
 			},
@@ -1761,10 +1761,10 @@ func TestRunObjectWithBatchingResumesFromProgressTime(t *testing.T) {
 
 	assert.Len(t, client.published, 1, "expected resumed batching to publish one event")
 
-	var cursorState map[string]interface{}
+	var cursorState map[string]any
 	require.NoError(t, typeconv.Convert(&cursorState, s.cursor), "expected cursor state to be convertible")
 
-	objectCursor, ok := cursorState["object"].(map[string]interface{})
+	objectCursor, ok := cursorState["object"].(map[string]any)
 	require.True(t, ok, "expected object cursor state to be present")
 	assert.Equal(t, "2024-01-01T12:00:00.000Z", objectCursor["progress_time"], "expected batch progress to advance from the persisted watermark")
 }
@@ -1800,11 +1800,11 @@ func TestRunObjectWithBatchingResumeUsesProgressTimeAsExclusiveBoundary(t *testi
 	t.Cleanup(server.Close)
 
 	cfg := defaultConfig()
-	err := conf.MustNewConfigFrom(map[string]interface{}{
+	err := conf.MustNewConfigFrom(map[string]any{
 		"url":     server.URL,
 		"version": 56,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -1813,21 +1813,21 @@ func TestRunObjectWithBatchingResumeUsesProgressTimeAsExclusiveBoundary(t *testi
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"object": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"object": map[string]any{
 				"interval": "5s",
 				"enabled":  true,
-				"batch": map[string]interface{}{
+				"batch": map[string]any{
 					"enabled":             true,
 					"initial_interval":    "15m",
 					"max_windows_per_run": 1,
 					"window":              "5m",
 				},
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultLoginObjectQuery,
 					"value":   valueBatchedLoginObjectQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "EventDate",
 				},
 			},
@@ -1875,21 +1875,21 @@ func TestRunObjectWithBatchingResumeUsesProgressTimeAsExclusiveBoundary(t *testi
 	require.True(t, ok, "expected published event message to be a string")
 	assert.Contains(t, firstMessage, `"EventDate":"2024-01-01T12:00:00.000+0000"`, "expected the resumed batch to publish the in-window boundary event")
 
-	var cursorState map[string]interface{}
+	var cursorState map[string]any
 	require.NoError(t, typeconv.Convert(&cursorState, s.cursor), "expected cursor state to be convertible")
 
-	objectCursor, ok := cursorState["object"].(map[string]interface{})
+	objectCursor, ok := cursorState["object"].(map[string]any)
 	require.True(t, ok, "expected object cursor state to be present")
 	assert.Equal(t, "2024-01-01T12:00:00.000Z", objectCursor["progress_time"], "expected resumed batch progress to advance to the end of the resumed window")
 }
 
 func TestRunObjectWithInvalidBatchProgressTime(t *testing.T) {
 	cfg := defaultConfig()
-	err := conf.MustNewConfigFrom(map[string]interface{}{
+	err := conf.MustNewConfigFrom(map[string]any{
 		"url":     "https://salesforce.example",
 		"version": 56,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -1898,21 +1898,21 @@ func TestRunObjectWithInvalidBatchProgressTime(t *testing.T) {
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"object": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"object": map[string]any{
 				"interval": "5s",
 				"enabled":  true,
-				"batch": map[string]interface{}{
+				"batch": map[string]any{
 					"enabled":             true,
 					"initial_interval":    "15m",
 					"max_windows_per_run": 1,
 					"window":              "5m",
 				},
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultLoginObjectQuery,
 					"value":   valueBatchedLoginObjectQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "EventDate",
 				},
 			},
@@ -1966,11 +1966,11 @@ func TestRunObjectWithBatchingPagination(t *testing.T) {
 	t.Cleanup(server.Close)
 
 	cfg := defaultConfig()
-	err := conf.MustNewConfigFrom(map[string]interface{}{
+	err := conf.MustNewConfigFrom(map[string]any{
 		"url":     server.URL,
 		"version": 56,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -1979,21 +1979,21 @@ func TestRunObjectWithBatchingPagination(t *testing.T) {
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"object": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"object": map[string]any{
 				"interval": "5s",
 				"enabled":  true,
-				"batch": map[string]interface{}{
+				"batch": map[string]any{
 					"enabled":             true,
 					"initial_interval":    "10m",
 					"max_windows_per_run": 1,
 					"window":              "5m",
 				},
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultLoginObjectQuery,
 					"value":   valueBatchedLoginObjectQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "EventDate",
 				},
 			},
@@ -2028,10 +2028,10 @@ func TestRunObjectWithBatchingPagination(t *testing.T) {
 
 	assert.Len(t, client.published, 2, "expected all paginated records within the window to be published")
 
-	var cursorState map[string]interface{}
+	var cursorState map[string]any
 	require.NoError(t, typeconv.Convert(&cursorState, s.cursor), "expected cursor state to be convertible")
 
-	objectCursor, ok := cursorState["object"].(map[string]interface{})
+	objectCursor, ok := cursorState["object"].(map[string]any)
 	require.True(t, ok, "expected object cursor state to be present")
 	assert.Equal(t, "2024-01-01T11:55:00.000Z", objectCursor["progress_time"], "expected paginated batch windows to advance progress once the full window is processed")
 }
@@ -2078,12 +2078,12 @@ func TestRunObjectWithBatchingPaginationFailureRetriesSameWindow(t *testing.T) {
 	t.Cleanup(server.Close)
 
 	cfg := defaultConfig()
-	err := conf.MustNewConfigFrom(map[string]interface{}{
+	err := conf.MustNewConfigFrom(map[string]any{
 		"url":                         server.URL,
 		"version":                     56,
 		"resource.retry.max_attempts": 1,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -2092,21 +2092,21 @@ func TestRunObjectWithBatchingPaginationFailureRetriesSameWindow(t *testing.T) {
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"object": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"object": map[string]any{
 				"interval": "5s",
 				"enabled":  true,
-				"batch": map[string]interface{}{
+				"batch": map[string]any{
 					"enabled":             true,
 					"initial_interval":    "10m",
 					"max_windows_per_run": 1,
 					"window":              "5m",
 				},
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultLoginObjectQuery,
 					"value":   valueBatchedLoginObjectQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "EventDate",
 				},
 			},
@@ -2154,10 +2154,10 @@ func TestRunObjectWithBatchingPaginationFailureRetriesSameWindow(t *testing.T) {
 	assert.Equal(t, 2, nextPageCount, "expected the next page to be retried after the initial failure")
 	assert.Len(t, retryPublisher.published, 2, "expected the retried batch to publish both pages")
 
-	var cursorState map[string]interface{}
+	var cursorState map[string]any
 	require.NoError(t, typeconv.Convert(&cursorState, s.cursor), "expected cursor state to be convertible")
 
-	objectCursor, ok := cursorState["object"].(map[string]interface{})
+	objectCursor, ok := cursorState["object"].(map[string]any)
 	require.True(t, ok, "expected object cursor state to be present")
 	assert.Equal(t, "2024-01-01T11:55:00.000Z", objectCursor["progress_time"], "expected retry to advance progress only after the full paginated window succeeds")
 }
@@ -2212,12 +2212,12 @@ func TestRunObjectWithBatchingResumesFromLastSuccessfulWindowAfterLaterWindowFai
 	t.Cleanup(server.Close)
 
 	cfg := defaultConfig()
-	err := conf.MustNewConfigFrom(map[string]interface{}{
+	err := conf.MustNewConfigFrom(map[string]any{
 		"url":                         server.URL,
 		"version":                     56,
 		"resource.retry.max_attempts": 1,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -2226,21 +2226,21 @@ func TestRunObjectWithBatchingResumesFromLastSuccessfulWindowAfterLaterWindowFai
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"object": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"object": map[string]any{
 				"interval": "5s",
 				"enabled":  true,
-				"batch": map[string]interface{}{
+				"batch": map[string]any{
 					"enabled":             true,
 					"initial_interval":    "15m",
 					"max_windows_per_run": 2,
 					"window":              "5m",
 				},
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultLoginObjectQuery,
 					"value":   valueBatchedLoginObjectQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "EventDate",
 				},
 			},
@@ -2316,11 +2316,11 @@ func TestRunObjectWithBatchingAdvancesProgressOnEmptyWindow(t *testing.T) {
 	t.Cleanup(server.Close)
 
 	cfg := defaultConfig()
-	err := conf.MustNewConfigFrom(map[string]interface{}{
+	err := conf.MustNewConfigFrom(map[string]any{
 		"url":     server.URL,
 		"version": 56,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -2329,21 +2329,21 @@ func TestRunObjectWithBatchingAdvancesProgressOnEmptyWindow(t *testing.T) {
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"object": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"object": map[string]any{
 				"interval": "5s",
 				"enabled":  true,
-				"batch": map[string]interface{}{
+				"batch": map[string]any{
 					"enabled":             true,
 					"initial_interval":    "5m",
 					"max_windows_per_run": 1,
 					"window":              "5m",
 				},
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultLoginObjectQuery,
 					"value":   valueBatchedLoginObjectQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "EventDate",
 				},
 			},
@@ -2377,10 +2377,10 @@ func TestRunObjectWithBatchingAdvancesProgressOnEmptyWindow(t *testing.T) {
 	require.NoError(t, err, "expected empty batched window to succeed")
 	assert.Empty(t, client.published, "expected empty batched windows to publish no events")
 
-	var cursorState map[string]interface{}
+	var cursorState map[string]any
 	require.NoError(t, typeconv.Convert(&cursorState, s.cursor), "expected cursor state to be convertible")
 
-	objectCursor, ok := cursorState["object"].(map[string]interface{})
+	objectCursor, ok := cursorState["object"].(map[string]any)
 	require.True(t, ok, "expected object cursor state to be present")
 	assert.Equal(t, "2024-01-01T12:00:00.000Z", objectCursor["progress_time"], "expected empty batched windows to still advance progress")
 }
@@ -2417,12 +2417,12 @@ func defaultHandler(flow string, withoutQuery bool, msg1, msg2 string) http.Hand
 	}
 }
 
-func newTestServer(newServer func(http.Handler) *httptest.Server) func(testing.TB, http.HandlerFunc, map[string]interface{}) {
-	return func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+func newTestServer(newServer func(http.Handler) *httptest.Server) func(testing.TB, http.HandlerFunc, map[string]any) {
+	return func(t testing.TB, h http.HandlerFunc, config map[string]any) {
 		server := newServer(h)
 		config["url"] = server.URL
-		authOAuth2, _ := config["auth.oauth2"].(map[string]interface{})
-		userPasswordFlow, _ := authOAuth2["user_password_flow"].(map[string]interface{})
+		authOAuth2, _ := config["auth.oauth2"].(map[string]any)
+		userPasswordFlow, _ := authOAuth2["user_password_flow"].(map[string]any)
 		userPasswordFlow["token_url"] = server.URL
 		t.Cleanup(server.Close)
 	}
@@ -2433,17 +2433,17 @@ var _ inputcursor.Publisher = (*publisher)(nil)
 type publisher struct {
 	done      func()
 	published []beat.Event
-	cursors   []map[string]interface{}
+	cursors   []map[string]any
 	mu        sync.Mutex
 }
 
-func (p *publisher) Publish(e beat.Event, cursor interface{}) error {
+func (p *publisher) Publish(e beat.Event, cursor any) error {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
 	p.published = append(p.published, e)
 	if cursor != nil {
-		var cv map[string]interface{}
+		var cv map[string]any
 		err := typeconv.Convert(&cv, cursor)
 		if err != nil {
 			return err
@@ -2458,7 +2458,7 @@ func (p *publisher) Publish(e beat.Event, cursor interface{}) error {
 
 type failingPublisher struct{ err error }
 
-func (p failingPublisher) Publish(beat.Event, interface{}) error {
+func (p failingPublisher) Publish(beat.Event, any) error {
 	return p.err
 }
 
@@ -2561,11 +2561,11 @@ func TestPublishCSVRecordsReportsRowNumberOnParseError(t *testing.T) {
 
 func TestRunEventLogFileReturnsProcessingErrors(t *testing.T) {
 	cfg := defaultConfig()
-	err := conf.MustNewConfigFrom(map[string]interface{}{
+	err := conf.MustNewConfigFrom(map[string]any{
 		"url":     "http://placeholder.invalid",
 		"version": 56,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -2574,15 +2574,15 @@ func TestRunEventLogFileReturnsProcessingErrors(t *testing.T) {
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"event_log_file": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"event_log_file": map[string]any{
 				"interval": "5s",
 				"enabled":  true,
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultLoginEventLogFileQuery,
 					"value":   valueLoginEventLogFileQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "CreatedDate",
 				},
 			},
@@ -2625,7 +2625,7 @@ func TestRunEventLogFileRequiresQueryCursorConfig(t *testing.T) {
 	cfg := defaultConfig()
 	cfg.EventMonitoringMethod = &eventMonitoringMethod{
 		EventLogFile: EventMonitoringConfig{
-			Enabled:  pointer(true),
+			Enabled:  new(true),
 			Interval: time.Hour,
 		},
 	}
@@ -2646,7 +2646,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 		defaultUserPassAuthConfig = authConfig{
 			OAuth2: &OAuth2{
 				UserPasswordFlow: &UserPasswordFlow{
-					Enabled:      pointer(true),
+					Enabled:      new(true),
 					TokenURL:     "https://instance_id.develop.my.salesforce.com/services/oauth2/token",
 					ClientID:     "clientid",
 					ClientSecret: "clientsecret",
@@ -2657,7 +2657,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 		}
 		objectEventMonitotingConfig = eventMonitoringMethod{
 			Object: EventMonitoringConfig{
-				Enabled:  pointer(true),
+				Enabled:  new(true),
 				Interval: time.Second * 5,
 				Query: &QueryConfig{
 					Default: getValueTpl(defaultLoginObjectQuery),
@@ -2668,7 +2668,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 		}
 		objectEventMonitoringWithWrongQuery = eventMonitoringMethod{
 			Object: EventMonitoringConfig{
-				Enabled:  pointer(true),
+				Enabled:  new(true),
 				Interval: time.Second * 5,
 				Query: &QueryConfig{
 					Default: getValueTpl(invalidDefaultLoginEventObjectQuery),
@@ -2680,7 +2680,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 
 		elfEventMonitotingConfig = eventMonitoringMethod{
 			EventLogFile: EventMonitoringConfig{
-				Enabled:  pointer(true),
+				Enabled:  new(true),
 				Interval: time.Second * 5,
 				Query: &QueryConfig{
 					Default: getValueTpl(defaultLoginEventLogFileQuery),
@@ -2691,7 +2691,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 		}
 		elfEventMonitotingWithWrongQuery = eventMonitoringMethod{
 			EventLogFile: EventMonitoringConfig{
-				Enabled:  pointer(true),
+				Enabled:  new(true),
 				Interval: time.Second * 5,
 				Query: &QueryConfig{
 					Default: getValueTpl(invalidDefaultLoginEventLogFileQuery),
@@ -2715,9 +2715,9 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 
 	defaultResource := resourceConfig{
 		Retry: retryConfig{
-			MaxAttempts: pointer(5),
-			WaitMin:     pointer(time.Minute),
-			WaitMax:     pointer(time.Minute),
+			MaxAttempts: new(5),
+			WaitMin:     new(time.Minute),
+			WaitMax:     new(time.Minute),
 		},
 		Transport: httpcommon.DefaultHTTPTransportSettings(),
 	}
@@ -2951,11 +2951,11 @@ func TestUserPasswordFlowTokenURLAcceptsFullTokenEndpoint(t *testing.T) {
 	t.Cleanup(server.Close)
 
 	cfg := defaultConfig()
-	err := conf.MustNewConfigFrom(map[string]interface{}{
+	err := conf.MustNewConfigFrom(map[string]any{
 		"url":     server.URL,
 		"version": 56,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -2964,15 +2964,15 @@ func TestUserPasswordFlowTokenURLAcceptsFullTokenEndpoint(t *testing.T) {
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"object": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"object": map[string]any{
 				"interval": "1s",
 				"enabled":  true,
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": "SELECT Id FROM Account",
 					"value":   "SELECT Id FROM Account WHERE Id > [[ .cursor.object.first_event_time ]]",
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "Id",
 				},
 			},
@@ -3025,7 +3025,7 @@ func TestJWTBearerFlowTokenURL(t *testing.T) {
 			Version: 56,
 			URL:     url,
 			Auth: &authConfig{OAuth2: &OAuth2{JWTBearerFlow: &JWTBearerFlow{
-				Enabled:        pointer(true),
+				Enabled:        new(true),
 				URL:            url,
 				TokenURL:       tokenURL,
 				ClientID:       "test-client",
@@ -3033,13 +3033,13 @@ func TestJWTBearerFlowTokenURL(t *testing.T) {
 				ClientKeyPath:  keyPath,
 			}}},
 			EventMonitoringMethod: &eventMonitoringMethod{Object: EventMonitoringConfig{
-				Enabled:  pointer(true),
+				Enabled:  new(true),
 				Interval: time.Second,
 				Query:    &QueryConfig{Default: getValueTpl("SELECT Id FROM Account")},
 				Cursor:   &cursorConfig{Field: "Id"},
 			}},
 			Resource: &resourceConfig{
-				Retry:     retryConfig{MaxAttempts: pointer(1), WaitMin: pointer(time.Second), WaitMax: pointer(time.Second)},
+				Retry:     retryConfig{MaxAttempts: new(1), WaitMin: new(time.Second), WaitMax: new(time.Second)},
 				Transport: httpcommon.DefaultHTTPTransportSettings(),
 			},
 		}
@@ -3163,17 +3163,17 @@ func TestRunWithMixedMonitoringMethodsStartsEventLogFileBeforeObject(t *testing.
 	}))
 	t.Cleanup(server.Close)
 
-	baseConfig := map[string]interface{}{
+	baseConfig := map[string]any{
 		"url":         server.URL,
 		"version":     56,
 		"auth.oauth2": defaultUserPasswordFlowMap,
-		"event_monitoring_method": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
 			"event_log_file": defaultEventLogFileMonitoringMethodMap,
 			"object":         defaultObjectMonitoringMethodConfigMap,
 		},
 	}
-	authOAuth2, _ := baseConfig["auth.oauth2"].(map[string]interface{})
-	userPasswordFlow, _ := authOAuth2["user_password_flow"].(map[string]interface{})
+	authOAuth2, _ := baseConfig["auth.oauth2"].(map[string]any)
+	userPasswordFlow, _ := authOAuth2["user_password_flow"].(map[string]any)
 	userPasswordFlow["token_url"] = server.URL
 
 	cfg := defaultConfig()
@@ -3278,12 +3278,12 @@ func TestRunWithMixedMonitoringMethodsRunsBothTickersAfterStartup(t *testing.T) 
 	}))
 	t.Cleanup(server.Close)
 
-	baseConfig := map[string]interface{}{
+	baseConfig := map[string]any{
 		"url":                         server.URL,
 		"version":                     56,
 		"resource.retry.max_attempts": 1,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -3292,26 +3292,26 @@ func TestRunWithMixedMonitoringMethodsRunsBothTickersAfterStartup(t *testing.T) 
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"event_log_file": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"event_log_file": map[string]any{
 				"interval": "50ms",
 				"enabled":  true,
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultLoginEventLogFileQuery,
 					"value":   valueLoginEventLogFileQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "CreatedDate",
 				},
 			},
-			"object": map[string]interface{}{
+			"object": map[string]any{
 				"interval": "80ms",
 				"enabled":  true,
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultLoginObjectQuery,
 					"value":   valueLoginObjectQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "EventDate",
 				},
 			},
@@ -3456,12 +3456,12 @@ func TestRunEventLogFileSkipsQueuedTickerAfterFailure(t *testing.T) {
 	}))
 	t.Cleanup(server.Close)
 
-	baseConfig := map[string]interface{}{
+	baseConfig := map[string]any{
 		"url":                         server.URL,
 		"version":                     56,
 		"resource.retry.max_attempts": 1,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -3470,15 +3470,15 @@ func TestRunEventLogFileSkipsQueuedTickerAfterFailure(t *testing.T) {
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"event_log_file": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"event_log_file": map[string]any{
 				"interval": "50ms",
 				"enabled":  true,
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultLoginEventLogFileQuery,
 					"value":   valueLoginEventLogFileQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "CreatedDate",
 				},
 			},
@@ -3597,12 +3597,12 @@ func TestRunWithMixedMonitoringMethodsContinuesObjectAfterEventLogFileTickerFail
 	}))
 	t.Cleanup(server.Close)
 
-	baseConfig := map[string]interface{}{
+	baseConfig := map[string]any{
 		"url":                         server.URL,
 		"version":                     56,
 		"resource.retry.max_attempts": 1,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -3611,26 +3611,26 @@ func TestRunWithMixedMonitoringMethodsContinuesObjectAfterEventLogFileTickerFail
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"event_log_file": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"event_log_file": map[string]any{
 				"interval": "40ms",
 				"enabled":  true,
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultLoginEventLogFileQuery,
 					"value":   valueLoginEventLogFileQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "CreatedDate",
 				},
 			},
-			"object": map[string]interface{}{
+			"object": map[string]any{
 				"interval": "80ms",
 				"enabled":  true,
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultLoginObjectQuery,
 					"value":   valueLoginObjectQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "EventDate",
 				},
 			},
@@ -3785,12 +3785,12 @@ func TestRunWithMixedMonitoringMethodsContinuesEventLogFileAfterObjectTickerFail
 	}))
 	t.Cleanup(server.Close)
 
-	baseConfig := map[string]interface{}{
+	baseConfig := map[string]any{
 		"url":                         server.URL,
 		"version":                     56,
 		"resource.retry.max_attempts": 1,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -3799,26 +3799,26 @@ func TestRunWithMixedMonitoringMethodsContinuesEventLogFileAfterObjectTickerFail
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"event_log_file": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"event_log_file": map[string]any{
 				"interval": "80ms",
 				"enabled":  true,
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultLoginEventLogFileQuery,
 					"value":   valueLoginEventLogFileQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "CreatedDate",
 				},
 			},
-			"object": map[string]interface{}{
+			"object": map[string]any{
 				"interval": "40ms",
 				"enabled":  true,
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultLoginObjectQuery,
 					"value":   valueLoginObjectQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "EventDate",
 				},
 			},
@@ -4090,12 +4090,12 @@ func TestRunObjectCooldownSuppressesNextTickerTick(t *testing.T) {
 	}))
 	t.Cleanup(server.Close)
 
-	baseConfig := map[string]interface{}{
+	baseConfig := map[string]any{
 		"url":                         server.URL,
 		"version":                     56,
 		"resource.retry.max_attempts": 1,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -4104,15 +4104,15 @@ func TestRunObjectCooldownSuppressesNextTickerTick(t *testing.T) {
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"object": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"object": map[string]any{
 				"interval": interval.String(),
 				"enabled":  true,
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultLoginObjectQuery,
 					"value":   valueLoginObjectQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "EventDate",
 				},
 			},
@@ -4199,12 +4199,12 @@ func TestRunObjectInitialFailureSetsCooldown(t *testing.T) {
 	}))
 	t.Cleanup(server.Close)
 
-	baseConfig := map[string]interface{}{
+	baseConfig := map[string]any{
 		"url":                         server.URL,
 		"version":                     56,
 		"resource.retry.max_attempts": 1,
-		"auth.oauth2": map[string]interface{}{
-			"user_password_flow": map[string]interface{}{
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
 				"enabled":       true,
 				"client.id":     "clientid",
 				"client.secret": "clientsecret",
@@ -4213,15 +4213,15 @@ func TestRunObjectInitialFailureSetsCooldown(t *testing.T) {
 				"password":      "password",
 			},
 		},
-		"event_monitoring_method": map[string]interface{}{
-			"object": map[string]interface{}{
+		"event_monitoring_method": map[string]any{
+			"object": map[string]any{
 				"interval": interval.String(),
 				"enabled":  true,
-				"query": map[string]interface{}{
+				"query": map[string]any{
 					"default": defaultLoginObjectQuery,
 					"value":   valueLoginObjectQuery,
 				},
-				"cursor": map[string]interface{}{
+				"cursor": map[string]any{
 					"field": "EventDate",
 				},
 			},

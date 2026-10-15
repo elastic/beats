@@ -3,21 +3,21 @@ name: "beats-metricbeat"
 
 env:
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1782878510"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1791307588"
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
-  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1782878510"
+  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1791307588"
   IMAGE_WIN_10: "platform-ingest-beats-windows-10-pro"
   IMAGE_WIN_11: "platform-ingest-beats-windows-11-pro"
-  IMAGE_WIN_10_VERSION: "1.0.1782878510"
-  IMAGE_WIN_11_VERSION: "1.0.1782878510"
-  IMAGE_WIN_2016: "platform-ingest-beats-windows-2016-1782878510"
-  IMAGE_WIN_2019: "platform-ingest-beats-windows-2019-1782878510"
-  IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1782878510"
-  IMAGE_WIN_2025: "platform-ingest-beats-windows-2025-1782878510"
+  IMAGE_WIN_10_VERSION: "1.0.1791307588"
+  IMAGE_WIN_11_VERSION: "1.0.1791307588"
+  IMAGE_WIN_2016: "platform-ingest-beats-windows-2016-1791307588"
+  IMAGE_WIN_2019: "platform-ingest-beats-windows-2019-1791307588"
+  IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1791307588"
+  IMAGE_WIN_2025: "platform-ingest-beats-windows-2025-1791307588"
 
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
@@ -108,7 +108,7 @@ steps:
           - test-collector#v1.10.2:
               files: "metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -135,7 +135,7 @@ steps:
           - test-collector#v1.10.2:
               files: "metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -162,7 +162,7 @@ steps:
           - test-collector#v1.10.2:
               files: "metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -193,7 +193,7 @@ steps:
           - test-collector#v1.10.2:
               files: "metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -224,7 +224,7 @@ steps:
           - test-collector#v1.10.2:
               files: "metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -253,7 +253,7 @@ steps:
           - test-collector#v1.10.2:
               files: "metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -285,7 +285,7 @@ steps:
           - test-collector#v1.10.2:
               files: "metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -312,7 +312,7 @@ steps:
           - test-collector#v1.10.2:
               files: "metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -339,7 +339,7 @@ steps:
           - test-collector#v1.10.2:
               files: "metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -371,7 +371,7 @@ steps:
           - test-collector#v1.10.2:
               files: "metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -398,7 +398,7 @@ steps:
           - test-collector#v1.10.2:
               files: "metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -425,7 +425,7 @@ steps:
           - test-collector#v1.10.2:
               files: "metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:
@@ -452,7 +452,7 @@ steps:
           - test-collector#v1.10.2:
               files: "metricbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
         notify:
           - github_commit_status:

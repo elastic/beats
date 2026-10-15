@@ -87,14 +87,31 @@ func (r *Renderer) Close() error {
 	)
 }
 
-// Render renders the event handle into an Event.
+// Render renders the event handle into an Event. It is RenderSystem followed
+// by RenderRemaining; call those directly to filter on the system properties
+// in between.
 func (r *Renderer) Render(handle EvtHandle) (*winevent.Event, string, error) {
-	event := &winevent.Event{}
-
-	if err := r.renderSystem(handle, event); err != nil {
-		return nil, "", fmt.Errorf("failed to render system properties: %w", err)
+	event, err := r.RenderSystem(handle)
+	if err != nil {
+		return nil, "", err
 	}
+	return r.RenderRemaining(handle, event)
+}
 
+// RenderSystem renders only the system properties of the event (provider,
+// event ID, level, time created, record ID, ...). It is much cheaper than
+// Render. Pass the result to RenderRemaining to finish rendering it.
+func (r *Renderer) RenderSystem(handle EvtHandle) (*winevent.Event, error) {
+	event := &winevent.Event{}
+	if err := r.renderSystem(handle, event); err != nil {
+		return nil, fmt.Errorf("failed to render system properties: %w", err)
+	}
+	return event, nil
+}
+
+// RenderRemaining renders the event data and message into an event whose
+// system properties were rendered by RenderSystem.
+func (r *Renderer) RenderRemaining(handle EvtHandle, event *winevent.Event) (*winevent.Event, string, error) {
 	// From this point on it will return both the event and any errors. It's
 	// critical to not drop data.
 	var errs []error
@@ -134,7 +151,7 @@ func (r *Renderer) renderSystem(handle EvtHandle, event *winevent.Event) error {
 	}
 	defer bb.Free()
 
-	for i := 0; i < propertyCount; i++ {
+	for i := range propertyCount {
 		property := EvtSystemPropertyID(i)
 		offset := i * int(sizeofEvtVariant)
 		evtVar := (*EvtVariant)(unsafe.Pointer(bb.PtrAt(offset)))
@@ -197,7 +214,7 @@ func (r *Renderer) renderSystem(handle EvtHandle, event *winevent.Event) error {
 // renderUser returns the event/user data values. This does not provide the
 // parameter names. It computes a fingerprint of the values types to help the
 // caller match the correct names to the returned values.
-func (r *Renderer) renderUser(mds *PublisherMetadataStore, handle EvtHandle, event *winevent.Event) (values []interface{}, fingerprint uint64, err error) {
+func (r *Renderer) renderUser(mds *PublisherMetadataStore, handle EvtHandle, event *winevent.Event) (values []any, fingerprint uint64, err error) {
 	bb, propertyCount, err := r.render(r.userContext, handle)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to get user values: %w", err)
@@ -216,8 +233,8 @@ func (r *Renderer) renderUser(mds *PublisherMetadataStore, handle EvtHandle, eve
 		return nil, 0, fmt.Errorf("failed to hash property count: %w", err)
 	}
 
-	values = make([]interface{}, propertyCount)
-	for i := 0; i < propertyCount; i++ {
+	values = make([]any, propertyCount)
+	for i := range propertyCount {
 		offset := i * int(sizeofEvtVariant)
 		evtVar := (*EvtVariant)(unsafe.Pointer(bb.PtrAt(offset)))
 		binary.Write(argumentHash, binary.LittleEndian, uint32(evtVar.Type)) //nolint:errcheck // Hash writes never fail.
@@ -280,7 +297,7 @@ func (r *Renderer) render(context EvtHandle, eventHandle EvtHandle) (*sys.Pooled
 }
 
 // addEventData adds the event/user data values to the event.
-func (r *Renderer) addEventData(evtMeta *EventMetadata, values []interface{}, event *winevent.Event) {
+func (r *Renderer) addEventData(evtMeta *EventMetadata, values []any, event *winevent.Event) {
 	if len(values) == 0 {
 		return
 	}
@@ -341,7 +358,7 @@ func (r *Renderer) addEventData(evtMeta *EventMetadata, values []interface{}, ev
 
 // formatMessage adds the message to the event.
 func (r *Renderer) formatMessage(publisherMeta *PublisherMetadata,
-	eventMeta *EventMetadata, eventHandle EvtHandle, values []interface{},
+	eventMeta *EventMetadata, eventHandle EvtHandle, values []any,
 	eventID uint16) (string, error,
 ) {
 	if eventMeta != nil {
@@ -362,7 +379,7 @@ func (r *Renderer) formatMessage(publisherMeta *PublisherMetadata,
 
 // formatMessageFromTemplate creates the message by executing the stored Go
 // text/template with the event/user data values.
-func (r *Renderer) formatMessageFromTemplate(msgTmpl *template.Template, values []interface{}) (string, error) {
+func (r *Renderer) formatMessageFromTemplate(msgTmpl *template.Template, values []any) (string, error) {
 	bb := sys.NewPooledByteBuffer()
 	defer bb.Free()
 

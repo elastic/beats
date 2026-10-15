@@ -143,14 +143,14 @@ func computeNodesHash(clusterState mapstr.M) (int32, error) {
 		return 0, elastic.MakeErrorForMissingField("nodes", elastic.Elasticsearch)
 	}
 
-	nodes, ok := value.(map[string]interface{})
+	nodes, ok := value.(map[string]any)
 	if !ok {
 		return 0, fmt.Errorf("nodes is not a map")
 	}
 
 	var nodeEphemeralIDs []string
 	for _, value := range nodes {
-		nodeData, ok := value.(map[string]interface{})
+		nodeData, ok := value.(map[string]any)
 		if !ok {
 			return 0, fmt.Errorf("node data is not a map")
 		}
@@ -186,7 +186,7 @@ func apmIndicesExist(clusterState mapstr.M) (bool, error) {
 		return false, elastic.MakeErrorForMissingField("routing_table.indices", elastic.Elasticsearch)
 	}
 
-	indices, ok := value.(map[string]interface{})
+	indices, ok := value.(map[string]any)
 	if !ok {
 		return false, fmt.Errorf("routing table indices is not a map")
 	}
@@ -223,7 +223,7 @@ func eventMapping(
 	content []byte,
 	isXpack bool,
 	_ *logp.Logger) error {
-	var data map[string]interface{}
+	var data map[string]any
 	err := json.Unmarshal(content, &data)
 	if err != nil {
 		return fmt.Errorf("failure parsing Elasticsearch Cluster Stats API response: %w", err)
@@ -287,9 +287,9 @@ func eventMapping(
 	}
 	delete(clusterState, "routing_table") // We don't want to index the routing table in monitoring indices
 
-	stackStats := map[string]interface{}{
+	stackStats := map[string]any{
 		"xpack": usage,
-		"apm": map[string]interface{}{
+		"apm": map[string]any{
 			"found": isAPMFound,
 		},
 	}

@@ -81,7 +81,7 @@ func AutodiscoverBuilder(
 		return nil, err
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, nil, path)
+	builders, err := autodiscover.NewBuilders(logger.Named("nomad"), config.Builders, config.Hints, nil, path)
 	if err != nil {
 		return nil, err
 	}

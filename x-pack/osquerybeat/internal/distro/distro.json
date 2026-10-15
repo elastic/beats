@@ -1,0 +1,10 @@
+{
+  "version": "5.23.1",
+  "checksums": {
+    "darwin": "9f40cea0358759ab2ee871c577055657e3cc2c7cbe5c1247f764245941178aa6",
+    "linux_amd64": "0f37a478a1dbda24b67c81551e32d734b392c5a2f5deb156bf1c41ca204cfa67",
+    "linux_arm64": "9ae763820166f75f19970b5147b1930a308865a923ab127f4b8bbaea7b69962a",
+    "windows_arm64": "0913d05cc3fc92dd9253c945caacde10a776408f267cc1cc853a05de24dba900",
+    "windows_amd64": "7bd411050ef6b5aae1b23956aec0dc5ce6e800c5656f0cd463ac70a6e1bdf30b"
+  }
+}

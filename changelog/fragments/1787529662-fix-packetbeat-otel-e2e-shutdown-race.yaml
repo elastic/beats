@@ -1,0 +1,9 @@
+kind: enhancement
+summary: Wire shutdown_timeout to the publisher pipeline drain deadline on beat shutdown.
+description: |
+  Previously the shutdown_timeout config key was only used to bound the beater
+  watchdog; the publisher pipeline always drained with a fixed 1s deadline
+  regardless. The pipeline now uses shutdown_timeout as the Disconnect deadline,
+  so beats that read a bounded input (e.g. packetbeat replaying a pcap file) can
+  ensure the last batch is delivered before the process exits.
+component: libbeat

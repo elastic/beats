@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build windows
-// +build windows
 
 package test
 
@@ -21,8 +20,8 @@ type Service struct {
 	State   string
 }
 
-func GetConfig(metricset string) map[string]interface{} {
-	return map[string]interface{}{
+func GetConfig(metricset string) map[string]any {
+	return map[string]any{
 		"module":     "iis",
 		"metricsets": []string{metricset},
 	}

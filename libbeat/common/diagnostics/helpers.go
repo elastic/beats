@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 )
 
 // GetRawFileOrErrorString is a convinence method that will return either the contents of the specified file,

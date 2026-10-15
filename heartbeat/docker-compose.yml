@@ -5,6 +5,22 @@ services:
     image: busybox
     depends_on:
       elasticsearch: { condition: service_healthy }
+      heartbeat_kerberos: { condition: service_healthy }
+
+  # MIT KDC + SPNEGO-protected HTTP server for the HTTP monitor Kerberos
+  # integration test. KDC is exposed on 1088 (matching testdata/krb5.conf) and
+  # the SPNEGO endpoint on 8080.
+  heartbeat_kerberos:
+    build: ${ES_BEATS}/testing/environments/docker/heartbeat_kerberos
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/88 && </dev/tcp/127.0.0.1/8080'"]
+      retries: 300
+      interval: 1s
+      start_period: 30s
+    ports:
+      - 1088:88
+      - 1088:88/udp
+      - 8080:8080
 
   elasticsearch:
     extends:

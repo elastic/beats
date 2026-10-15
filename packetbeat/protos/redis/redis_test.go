@@ -140,6 +140,26 @@ func TestRedisParser_SimpleString(t *testing.T) {
 	assert.Equal(t, len(message), msg.size)
 }
 
+func TestRedisParser_InvalidBulkLength(t *testing.T) {
+	for _, tc := range []struct {
+		name    string
+		message string
+	}{
+		{name: "minus two", message: "$-2\r\n"},
+		{name: "minus three", message: "$-3\r\n"},
+		{name: "minimum int64", message: "$-9223372036854775808\r\n"},
+		{name: "array element", message: "*1\r\n$-2\r\n"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.NotPanics(t, func() {
+				_, ok, complete := parse([]byte(tc.message))
+				assert.False(t, ok, "invalid bulk length must be rejected")
+				assert.False(t, complete, "invalid bulk length must not yield a complete message")
+			}, "invalid bulk length must not panic the parser")
+		})
+	}
+}
+
 func TestRedisParser_NilString(t *testing.T) {
 	message := []byte("$-1\r\n")
 	msg, ok, complete := parse(message)

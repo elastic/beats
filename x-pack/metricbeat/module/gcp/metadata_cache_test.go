@@ -197,7 +197,7 @@ func TestCacheRegistry_TypedCaches(t *testing.T) {
 	logger := logp.NewLogger("test")
 	registry := NewCacheRegistry(logger, 5*time.Minute)
 
-	computeInstance := &computepb.Instance{Name: stringPtr("test-instance")}
+	computeInstance := &computepb.Instance{Name: new("test-instance")}
 	registry.Compute.data["instance1"] = computeInstance
 	retrieved, found := registry.Compute.Get("instance1")
 	assert.True(t, found)
@@ -220,9 +220,4 @@ func TestCacheRegistry_TypedCaches(t *testing.T) {
 	retrievedCluster, found := registry.Dataproc.Get("cluster1")
 	assert.True(t, found)
 	assert.Equal(t, dataprocCluster, retrievedCluster)
-}
-
-// Helper function for string pointers
-func stringPtr(s string) *string {
-	return &s
 }

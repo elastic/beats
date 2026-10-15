@@ -69,7 +69,7 @@ type triggeredAlarm struct {
 }
 
 type metricData struct {
-	perfMetrics     map[string]interface{}
+	perfMetrics     map[string]any
 	assetNames      assetNames
 	triggeredAlarms []triggeredAlarm
 }

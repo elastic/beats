@@ -21,7 +21,7 @@ type tryFunc func(ctx context.Context) error
 
 func (r *retry) Run(ctx context.Context, fn tryFunc) (err error) {
 	maxAttempts := r.maxRetry + 1
-	for i := 0; i < maxAttempts; i++ {
+	for i := range maxAttempts {
 		attempt := i + 1
 		if r.log != nil {
 			r.log.Debugf("attempt %v out of %v", attempt, maxAttempts)

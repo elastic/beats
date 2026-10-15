@@ -264,7 +264,7 @@ func TestRaces(t *testing.T) {
 	// Generate a lot of events in parallel to Start() so there is a chance of
 	// events arriving before all watched dirs are Add()-ed
 	go func() {
-		for i := 0; i < 10; i++ {
+		for i := range 10 {
 			for _, dir := range dirs {
 				fname := filepath.Join(dir, fmt.Sprintf("%d.dat", i))
 				require.NoError(t, os.WriteFile(fname, []byte("hello"), fileMode))
@@ -403,7 +403,7 @@ func mustRun(t *testing.T, name string, f func(t *testing.T)) {
 func rename(t *testing.T, oldPath, newPath string) {
 	const maxRetries = 100
 
-	for retries := 0; retries < maxRetries; retries++ {
+	for retries := range maxRetries {
 		err := os.Rename(oldPath, newPath)
 		if err == nil {
 			if retries > 0 {

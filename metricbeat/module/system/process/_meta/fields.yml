@@ -302,7 +302,7 @@
               type: long
               description: >
                 The total time duration (in microseconds) for which tasks in a
-                cgroup have been throttled, as reported by cgroupsv2
+                cgroup have been throttled.
             - name: stats.throttled.ns
               type: long
               description: >

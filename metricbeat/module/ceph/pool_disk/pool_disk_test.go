@@ -18,7 +18,8 @@
 package pool_disk
 
 import (
-	"io/ioutil"
+	"os"
+
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
@@ -34,7 +35,7 @@ func TestFetchEventContents(t *testing.T) {
 	absPath, err := filepath.Abs("../_meta/testdata/")
 	assert.NoError(t, err)
 
-	response, err := ioutil.ReadFile(absPath + "/df_sample_response.json")
+	response, err := os.ReadFile(absPath + "/df_sample_response.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json;")
@@ -42,7 +43,7 @@ func TestFetchEventContents(t *testing.T) {
 	}))
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "ceph",
 		"metricsets": []string{"pool_disk"},
 		"hosts":      []string{server.URL},

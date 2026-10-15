@@ -33,3 +33,14 @@ func SkipIfFIPSOnly(t *testing.T, msg string) {
 		t.Skip("GODEBUG=fips140=only detected, skipping test:", msg)
 	}
 }
+
+// SkipIfNotFIPSOnly will mark the passed test as skipped unless GODEBUG=fips140=only is detected.
+// Use this for guard tests that are only observable under strict FIPS enforcement, where the
+// absence of an error would be a false-positive pass rather than a successful test.
+func SkipIfNotFIPSOnly(t *testing.T, msg string) {
+	t.Helper()
+	s := os.Getenv("GODEBUG")
+	if !strings.Contains(s, "fips140=only") {
+		t.Skip("GODEBUG=fips140=only not detected, skipping test:", msg)
+	}
+}

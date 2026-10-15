@@ -558,11 +558,9 @@ func connectWebSocket(ctx context.Context, cfg config, url string, stat status.S
 // calculateWaitTime calculates the wait time for the next attempt based on the exponential backoff algorithm.
 func calculateWaitTime(waitMin, waitMax time.Duration, attempt, maxAttempts int) time.Duration {
 	// calculate exponential backoff
-	waitTime := wait(waitMin, waitMax, attempt, maxAttempts, spread)
-	// caps the wait time to the maximum wait time
-	if waitTime > waitMax {
-		waitTime = waitMax
-	}
+	waitTime := min(
+		// caps the wait time to the maximum wait time
+		wait(waitMin, waitMax, attempt, maxAttempts, spread), waitMax)
 
 	return waitTime
 }

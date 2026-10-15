@@ -4,7 +4,10 @@
 
 package fields
 
-import "fmt"
+import (
+	"fmt"
+	"maps"
+)
 
 var GlobalFields = FieldDict{}
 
@@ -33,7 +36,5 @@ func RegisterGlobalFields(dict FieldDict) error {
 // Merge merges the passed fields into the dictionary, overwriting existing
 // fields if duplicated.
 func (f FieldDict) Merge(otherFields FieldDict) {
-	for key, value := range otherFields {
-		f[key] = value
-	}
+	maps.Copy(f, otherFields)
 }

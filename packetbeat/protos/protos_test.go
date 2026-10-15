@@ -207,15 +207,15 @@ func TestGetUDP(t *testing.T) {
 func TestValidateProtocolDevice(t *testing.T) {
 	tcs := []struct {
 		testCase, device string
-		config           map[string]interface{}
+		config           map[string]any
 		expectedValid    bool
 		expectedErr      string
 	}{
 		{
 			"DeviceIsIncorrect",
 			"eth0",
-			map[string]interface{}{
-				"interface": map[string]interface{}{
+			map[string]any{
+				"interface": map[string]any{
 					"device": "eth1",
 				},
 			},
@@ -225,8 +225,8 @@ func TestValidateProtocolDevice(t *testing.T) {
 		{
 			"DeviceIsCorrect",
 			"eth1",
-			map[string]interface{}{
-				"interface": map[string]interface{}{
+			map[string]any{
+				"interface": map[string]any{
 					"device": "eth1",
 				},
 			},
@@ -236,7 +236,7 @@ func TestValidateProtocolDevice(t *testing.T) {
 		{
 			"ConfigIsInvalid",
 			"eth0",
-			map[string]interface{}{
+			map[string]any{
 				"interface": "eth1",
 			},
 			false,
@@ -245,7 +245,6 @@ func TestValidateProtocolDevice(t *testing.T) {
 	}
 
 	for _, tc := range tcs {
-		tc := tc
 		t.Run(tc.testCase, func(t *testing.T) {
 			cfg := (*conf.C)(ucfg.MustNewFrom(tc.config))
 			isValid, err := validateProtocolDevice(tc.device, cfg)

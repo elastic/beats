@@ -7,9 +7,12 @@
 package monitor
 
 import (
+	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
@@ -19,6 +22,11 @@ import (
 )
 
 const missingMetricDefinitions = "no metric definitions were found for resource %s and namespace %s. Verify if the namespace is spelled correctly or if it is supported by the resource in case"
+
+// unsupportedPlatformMetricNamespaceMessage is the Azure Monitor metricDefinitions
+// API phrase for a resource type that has no platform metrics. The SDK error
+// text around it is not stable; this sentence is the service contract.
+const unsupportedPlatformMetricNamespaceMessage = "not a supported platform metric namespace"
 
 // mapMetrics should validate and map the metric related configuration to relevant azure monitor api parameters
 func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceExpanded, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
@@ -38,6 +46,10 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 			if !exists {
 				metricDefinitions, err = client.AzureMonitorService.GetMetricDefinitionsWithRetry(*resource.ID, metricConfig.Namespace)
 				if err != nil {
+					if metricConfig.IgnoreUnsupported && isUnsupportedPlatformMetricNamespace(err) {
+						client.Log.Infof("skipping resource %s namespace %s: %s", *resource.ID, metricConfig.Namespace, unsupportedPlatformMetricNamespaceMessage)
+						continue
+					}
 					return nil, err
 				}
 				namespaceMetrics[metricConfig.Namespace] = metricDefinitions
@@ -85,6 +97,20 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 	return metrics, nil
 }
 
+// isUnsupportedPlatformMetricNamespace reports whether err is the metricDefinitions
+// HTTP 400 Azure returns when the namespace is not a supported platform metric namespace.
+// Other failures, including other 400s, stay fatal.
+func isUnsupportedPlatformMetricNamespace(err error) bool {
+	var respErr *azcore.ResponseError
+	if !errors.As(err, &respErr) {
+		return false
+	}
+	if respErr.StatusCode != http.StatusBadRequest {
+		return false
+	}
+	return strings.Contains(respErr.Error(), unsupportedPlatformMetricNamespaceMessage)
+}
+
 // filterMetricNames func will verify if the metric names entered are valid and will also return the corresponding list of metrics
 func filterMetricNames(resourceId string, metricConfig azure.MetricConfig, metricDefinitions []*armmonitor.MetricDefinition) ([]string, error) {
 	var supportedMetricNames []string
@@ -113,12 +139,12 @@ func filterMetricNames(resourceId string, metricConfig azure.MetricConfig, metri
 func filterConfiguredMetrics(selectedRange []string, allRange []*armmonitor.MetricDefinition) ([]string, []string) {
 	var inRange []string
 	var notInRange []string
-	var allMetrics string
+	var allMetrics strings.Builder
 	for _, definition := range allRange {
-		allMetrics += *definition.Name.Value + " "
+		allMetrics.WriteString(*definition.Name.Value + " ")
 	}
 	for _, name := range selectedRange {
-		if strings.Contains(allMetrics, name) {
+		if strings.Contains(allMetrics.String(), name) {
 			inRange = append(inRange, name)
 		} else {
 			notInRange = append(notInRange, name)

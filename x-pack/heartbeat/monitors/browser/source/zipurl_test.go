@@ -12,7 +12,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -105,7 +105,7 @@ func TestSimpleCases(t *testing.T) {
 	}
 }
 
-func dummyZus(conf map[string]interface{}) (*ZipURLSource, error) {
+func dummyZus(conf map[string]any) (*ZipURLSource, error) {
 	zus := &ZipURLSource{}
 	y, _ := yaml.Marshal(conf)
 	c, err := config.NewConfigWithYAML(y, string(y))

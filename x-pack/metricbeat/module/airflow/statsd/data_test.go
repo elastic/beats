@@ -32,8 +32,8 @@ const (
 	STATSD_PORT = 8126
 )
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
+func getConfig() map[string]any {
+	return map[string]any{
 		"module":     "airflow",
 		"metricsets": []string{"statsd"},
 		"host":       STATSD_HOST,
@@ -62,7 +62,7 @@ func TestData(t *testing.T) {
 	ms := mbtest.NewPushMetricSetV2(t, getConfig())
 	var events []mb.Event
 	var reporter mb.PushReporterV2
-	done := make(chan interface{})
+	done := make(chan any)
 	wg := new(sync.WaitGroup)
 	wg.Add(1)
 	go func(wg *sync.WaitGroup) {

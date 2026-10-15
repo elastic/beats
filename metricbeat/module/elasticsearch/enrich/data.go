@@ -64,8 +64,8 @@ var (
 )
 
 type response struct {
-	ExecutingPolicies []map[string]interface{} `json:"executing_policies"`
-	CoordinatorStats  []map[string]interface{} `json:"coordinator_stats"`
+	ExecutingPolicies []map[string]any `json:"executing_policies"`
+	CoordinatorStats  []map[string]any `json:"coordinator_stats"`
 }
 
 func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXpack bool) error {
@@ -130,7 +130,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 			continue
 		}
 
-		taskMapstr, ok := taskData.(map[string]interface{})
+		taskMapstr, ok := taskData.(map[string]any)
 		if !ok {
 			errs = append(errs, errors.New("error trying to convert interface of task data into a map"))
 			continue

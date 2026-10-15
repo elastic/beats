@@ -9,11 +9,8 @@ import (
 	"context"
 	"encoding/json"
 	"log/slog"
-	"maps"
-	"net/http"
 	"net/http/httptest"
 	"slices"
-	"strings"
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
@@ -25,6 +22,7 @@ import (
 	mockauth "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator/mock"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher"
 	mockfetcher "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher/mock"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/testazuread"
 )
 
 // TestEquivalence_FullSync runs both the legacy and minimal-state EntraID
@@ -64,7 +62,7 @@ import (
 func TestEquivalence_FullSync(t *testing.T) {
 	legacyUsers, legacyDevices, legacyUserGroups, legacyDeviceGroups, legacyMFAUserIDs, legacySignIn := runLegacyFetch(t)
 
-	srv := startEquivGraphServer(t)
+	srv := testazuread.StartGraphServer(t)
 	minimalDocs := runMinimalFullSync(t, srv)
 
 	minimalUsers := filterDocsByKind(minimalDocs, entcollect.KindUser)
@@ -219,201 +217,6 @@ func runMinimalFullSync(t *testing.T, srv *httptest.Server) []entcollect.Documen
 		t.Fatalf("minimal FullSync: %v", err)
 	}
 	return docs
-}
-
-// startEquivGraphServer starts an httptest server that serves Graph API
-// responses derived from the fetcher/mock fixture data. Responses use
-// proper delta envelopes with @odata.deltaLink and @odata.type annotations,
-// following the patterns from entcollect's testGraphMux.
-func startEquivGraphServer(t *testing.T) *httptest.Server {
-	t.Helper()
-
-	var srvURL string
-	mux := http.NewServeMux()
-
-	deltaLink := func(path string) string {
-		return srvURL + path
-	}
-
-	// OAuth token endpoint.
-	mux.HandleFunc("POST /test-tenant/oauth2/v2.0/token", func(w http.ResponseWriter, _ *http.Request) {
-		_ = json.NewEncoder(w).Encode(map[string]any{
-			"access_token": "test-token",
-			"token_type":   "Bearer",
-			"expires_in":   3600,
-		})
-	})
-
-	// Users delta — always full (first call in FullSync after clearing cursors).
-	mux.HandleFunc("GET /v1.0/users/delta", func(w http.ResponseWriter, _ *http.Request) {
-		_ = json.NewEncoder(w).Encode(map[string]any{
-			"@odata.deltaLink": deltaLink("/v1.0/users/delta?$deltatoken=full"),
-			"value":            mockUsersAsGraphJSON(),
-		})
-	})
-
-	// Devices delta — always full.
-	mux.HandleFunc("GET /v1.0/devices/delta", func(w http.ResponseWriter, _ *http.Request) {
-		_ = json.NewEncoder(w).Encode(map[string]any{
-			"@odata.deltaLink": deltaLink("/v1.0/devices/delta?$deltatoken=full"),
-			"value":            mockDevicesAsGraphJSON(),
-		})
-	})
-
-	// Groups list.
-	groups := mockfetcher.GroupResponse
-	mux.HandleFunc("GET /v1.0/groups", func(w http.ResponseWriter, _ *http.Request) {
-		var groupList []map[string]any
-		for _, g := range groups {
-			groupList = append(groupList, map[string]any{
-				"id":          g.ID.String(),
-				"displayName": g.Name,
-			})
-		}
-		_ = json.NewEncoder(w).Encode(map[string]any{"value": groupList})
-	})
-
-	// Group members — route /v1.0/groups/{id}/members.
-	groupMembers := buildGroupMembersMap()
-	mux.HandleFunc("GET /v1.0/groups/", func(w http.ResponseWriter, r *http.Request) {
-		parts := strings.Split(r.URL.Path, "/")
-		if len(parts) < 5 || parts[4] != "members" {
-			http.NotFound(w, r)
-			return
-		}
-		groupID := parts[3]
-		members := groupMembers[groupID]
-		_ = json.NewEncoder(w).Encode(map[string]any{"value": members})
-	})
-
-	// Device registered owners/users — serve empty responses.
-	mux.HandleFunc("GET /v1.0/devices/", func(w http.ResponseWriter, r *http.Request) {
-		parts := strings.Split(r.URL.Path, "/")
-		if len(parts) < 5 {
-			http.NotFound(w, r)
-			return
-		}
-		relation := parts[4]
-		if relation != "registeredOwners" && relation != "registeredUsers" {
-			http.NotFound(w, r)
-			return
-		}
-		_ = json.NewEncoder(w).Encode(map[string]any{"value": []any{}})
-	})
-
-	// MFA registration details.
-	mux.HandleFunc("GET /v1.0/reports/authenticationMethods/userRegistrationDetails", func(w http.ResponseWriter, _ *http.Request) {
-		_ = json.NewEncoder(w).Encode(map[string]any{"value": mockMFAAsGraphJSON()})
-	})
-
-	// Sign-in activity.
-	mux.HandleFunc("GET /v1.0/users", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Query().Get("$select") != "id,signInActivity" {
-			http.NotFound(w, r)
-			return
-		}
-		_ = json.NewEncoder(w).Encode(map[string]any{"value": mockSignInActivityAsGraphJSON()})
-	})
-
-	srv := httptest.NewServer(mux)
-	srvURL = srv.URL
-	t.Cleanup(srv.Close)
-	return srv
-}
-
-// mockUsersAsGraphJSON converts mock fetcher users into Graph API delta
-// response entries with "id" field injected back into the object.
-func mockUsersAsGraphJSON() []map[string]any {
-	var result []map[string]any
-	for _, u := range mockfetcher.UserResponse {
-		entry := make(map[string]any, len(u.Fields)+1)
-		entry["id"] = u.ID.String()
-		maps.Copy(entry, u.Fields)
-		result = append(result, entry)
-	}
-	return result
-}
-
-// mockDevicesAsGraphJSON converts mock fetcher devices into Graph API delta
-// response entries with "id" field injected back into the object.
-func mockDevicesAsGraphJSON() []map[string]any {
-	var result []map[string]any
-	for _, d := range mockfetcher.DeviceResponse {
-		entry := make(map[string]any, len(d.Fields)+1)
-		entry["id"] = d.ID.String()
-		maps.Copy(entry, d.Fields)
-		result = append(result, entry)
-	}
-	return result
-}
-
-// buildGroupMembersMap builds a map of group ID → []member for the httptest
-// server, using @odata.type annotations as the real Graph API does.
-func buildGroupMembersMap() map[string][]map[string]any {
-	result := make(map[string][]map[string]any)
-	for _, g := range mockfetcher.GroupResponse {
-		var members []map[string]any
-		for _, m := range g.Members {
-			var odataType string
-			switch m.Type {
-			case fetcher.MemberUser:
-				odataType = "#microsoft.graph.user"
-			case fetcher.MemberDevice:
-				odataType = "#microsoft.graph.device"
-			case fetcher.MemberGroup:
-				odataType = "#microsoft.graph.group"
-			}
-			members = append(members, map[string]any{
-				"id":          m.ID.String(),
-				"@odata.type": odataType,
-			})
-		}
-		result[g.ID.String()] = members
-	}
-	return result
-}
-
-// mockMFAAsGraphJSON converts mock fetcher MFA data into Graph API response
-// entries with the user "id" field included.
-func mockMFAAsGraphJSON() []map[string]any {
-	var result []map[string]any
-	for userID, mfa := range mockfetcher.MFAResponse {
-		entry := map[string]any{
-			"id":                    userID.String(),
-			"isMfaCapable":          mfa.IsMFACapable,
-			"isMfaRegistered":       mfa.IsMFARegistered,
-			"isPasswordlessCapable": mfa.IsPasswordlessCapable,
-			"isSsprCapable":         mfa.IsSsprCapable,
-			"isSsprEnabled":         mfa.IsSsprEnabled,
-			"isSsprRegistered":      mfa.IsSsprRegistered,
-			"methodsRegistered":     mfa.MethodsRegistered,
-			"userPreferredMethodForSecondaryAuthentication": mfa.UserPreferredMethodForSecondaryAuthentication,
-			"userType": mfa.UserType,
-		}
-		result = append(result, entry)
-	}
-	return result
-}
-
-// mockSignInActivityAsGraphJSON converts mock fetcher sign-in activity data
-// into Graph API response entries with nested signInActivity objects.
-func mockSignInActivityAsGraphJSON() []map[string]any {
-	var result []map[string]any
-	for userID, sia := range mockfetcher.SignInActivityResponse {
-		entry := map[string]any{
-			"id": userID.String(),
-			"signInActivity": map[string]any{
-				"lastSignInDateTime":                sia.LastSignInDateTime,
-				"lastSignInRequestId":               sia.LastSignInRequestId,
-				"lastNonInteractiveSignInDateTime":  sia.LastNonInteractiveSignInDateTime,
-				"lastNonInteractiveSignInRequestId": sia.LastNonInteractiveSignInRequestId,
-				"lastSuccessfulSignInDateTime":      sia.LastSuccessfulSignInDateTime,
-				"lastSuccessfulSignInRequestId":     sia.LastSuccessfulSignInRequestId,
-			},
-		}
-		result = append(result, entry)
-	}
-	return result
 }
 
 // idPayload pairs an entity ID with its JSON-serialized azure_ad field blob.

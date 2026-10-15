@@ -30,7 +30,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/go-concert/unison"
 )
 
 const logPluginName = "log"
@@ -157,9 +156,8 @@ type manager struct {
 	logger *logp.Logger
 }
 
-// Init is a no-op. The filestream manager is initialised by the
-// Loader from its own registry; this manager has no resources.
-func (m manager) Init(_ unison.Group) error { return nil }
+// Close is a no-op; this manager holds no resources to release.
+func (m manager) Close() {}
 
 // Create unconditionally returns ErrUnknownInput. When a redirect is
 // needed, the Loader handles it via the Redirector interface before

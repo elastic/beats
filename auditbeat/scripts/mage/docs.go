@@ -46,7 +46,7 @@ func ModuleDocs() error {
 	}
 
 	configs := make([]string, 0, len(configFiles))
-	params := map[string]interface{}{
+	params := map[string]any{
 		"GOOS":      "linux",
 		"GOARCH":    "amd64",
 		"ArchBits":  archBits,

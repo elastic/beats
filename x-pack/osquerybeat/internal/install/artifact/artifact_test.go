@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/Masterminds/semver"
+
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -370,7 +371,7 @@ func TestEnsureConcurrentCallsUseSingleInstallFlow(t *testing.T) {
 	results := make(chan Result, 2)
 
 	wg.Add(2)
-	for i := 0; i < 2; i++ {
+	for range 2 {
 		go func() {
 			defer wg.Done()
 			res, err := Ensure(context.Background(), cfg, installDir, log)

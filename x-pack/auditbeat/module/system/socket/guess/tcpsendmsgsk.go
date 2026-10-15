@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package guess
 
@@ -78,7 +77,7 @@ func (g *guessTcpSendmsgSock) Probes() ([]helper.ProbeDef, error) {
 				Address:   "tcp_sendmsg",
 				Fetchargs: "p1=+{{.INET_SOCK_RADDR}}({{.P1}}):u32 p2=+{{.INET_SOCK_RADDR}}({{.P2}}):u32 indirect=+{{.INET_SOCK_RADDR}}(+{{.SOCKET_SOCK}}({{.P2}})):u32",
 			},
-			Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpSendMsgSockGuess) }),
+			Decoder: helper.NewStructDecoder(func() any { return new(tcpSendMsgSockGuess) }),
 		},
 	}, nil
 }
@@ -103,7 +102,7 @@ func (g *guessTcpSendmsgSock) Trigger() (err error) {
 
 // Extract checks which of the arguments to tcp_sendmsg contains the expected
 // value (address of destination).
-func (g *guessTcpSendmsgSock) Extract(ev interface{}) (mapstr.M, bool) {
+func (g *guessTcpSendmsgSock) Extract(ev any) (mapstr.M, bool) {
 	event := ev.(*tcpSendMsgSockGuess)
 	if g.written <= 0 {
 		g.ctx.Log.Errorf("write failed for guess")

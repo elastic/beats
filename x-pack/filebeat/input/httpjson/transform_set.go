@@ -36,7 +36,7 @@ type set struct {
 	doNotLogFailure     bool
 	valueType           valueType
 
-	runFunc func(ctx *transformContext, transformable transformable, key string, val interface{}) error
+	runFunc func(ctx *transformContext, transformable transformable, key string, val any) error
 
 	status status.StatusReporter
 	log    *logp.Logger
@@ -135,18 +135,18 @@ func (set *set) run(ctx *transformContext, tr transformable) (transformable, err
 	return tr, nil
 }
 
-func setToCommonMap(m mapstr.M, key string, val interface{}) error {
+func setToCommonMap(m mapstr.M, key string, val any) error {
 	if _, err := m.Put(key, val); err != nil {
 		return err
 	}
 	return nil
 }
 
-func setBody(ctx *transformContext, transformable transformable, key string, value interface{}) error {
+func setBody(ctx *transformContext, transformable transformable, key string, value any) error {
 	return setToCommonMap(transformable.body(), key, value)
 }
 
-func setHeader(ctx *transformContext, transformable transformable, key string, value interface{}) error {
+func setHeader(ctx *transformContext, transformable transformable, key string, value any) error {
 	v, ok := value.(string)
 	if !ok {
 		return fmt.Errorf("headers can only contain string values, but got: %T", value)
@@ -155,7 +155,7 @@ func setHeader(ctx *transformContext, transformable transformable, key string, v
 	return nil
 }
 
-func setURLParams(ctx *transformContext, transformable transformable, key string, value interface{}) error {
+func setURLParams(ctx *transformContext, transformable transformable, key string, value any) error {
 	v, ok := value.(string)
 	if !ok {
 		return fmt.Errorf("URL params can only contain string values, but got: %T", value)
@@ -168,7 +168,7 @@ func setURLParams(ctx *transformContext, transformable transformable, key string
 	return nil
 }
 
-func setURLValue(ctx *transformContext, transformable transformable, _ string, value interface{}) error {
+func setURLValue(ctx *transformContext, transformable transformable, _ string, value any) error {
 	v, ok := value.(string)
 	if !ok {
 		return fmt.Errorf("URL value can only contain string values, but got: %T", value)

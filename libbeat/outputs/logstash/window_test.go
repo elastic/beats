@@ -32,7 +32,7 @@ func TestShrinkWindowSizeNeverZero(t *testing.T) {
 	w.init(windowSize, DefaultConfig().BulkMaxSize)
 
 	w.windowSize = int32(windowSize)
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		w.shrinkWindow()
 	}
 
@@ -70,7 +70,7 @@ func testGrowWindowSize(t *testing.T,
 	var w window
 	w.init(initial, windowSize)
 	w.maxOkWindowSize = maxOK
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		w.tryGrowWindow(batchSize)
 	}
 

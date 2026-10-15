@@ -7,6 +7,7 @@ package cursor
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 )
 
@@ -109,12 +110,7 @@ func (c *Config) Validate() error {
 
 // isValidCursorType checks if the given type is a supported cursor type
 func isValidCursorType(t string) bool {
-	for _, valid := range supportedCursorTypes {
-		if t == valid {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(supportedCursorTypes, t)
 }
 
 // isValidDirection checks if the given direction is valid

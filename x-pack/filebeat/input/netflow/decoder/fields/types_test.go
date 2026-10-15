@@ -41,7 +41,7 @@ func TestOctetArray(t *testing.T) {
 type testCase struct {
 	title    string
 	bytes    []byte
-	value    interface{}
+	value    any
 	err      bool
 	strValue string
 }

@@ -73,12 +73,12 @@ func TestParseInfo(t *testing.T) {
 	tests := []struct {
 		Name     string
 		info     string
-		expected map[string]interface{}
+		expected map[string]any
 	}{
 		{
 			Name: "with kv",
 			info: "key1=value1;key2=value2",
-			expected: map[string]interface{}{
+			expected: map[string]any{
 				"key1": "value1",
 				"key2": "value2",
 			},
@@ -86,12 +86,12 @@ func TestParseInfo(t *testing.T) {
 		{
 			Name:     "without kv",
 			info:     "wrong result",
-			expected: map[string]interface{}{},
+			expected: map[string]any{},
 		},
 		{
 			Name:     "mixed",
 			info:     "wrong result;key=value",
-			expected: map[string]interface{}{"key": "value"},
+			expected: map[string]any{"key": "value"},
 		},
 	}
 
@@ -101,17 +101,13 @@ func TestParseInfo(t *testing.T) {
 	}
 }
 
-func pointer[T any](d T) *T {
-	return &d
-}
-
 func TestParseClientPolicy(t *testing.T) {
 	sampleClusterName := "TestCluster"
 	sampleUser := "TestUser"
 	samplePassword := "MySecretPassword"
 
 	TLSPolicy := as.NewClientPolicy()
-	tlsconfig, _ := tlscommon.LoadTLSConfig(&tlscommon.Config{Enabled: pointer(true)}, logptest.NewTestingLogger(t, ""))
+	tlsconfig, _ := tlscommon.LoadTLSConfig(&tlscommon.Config{Enabled: new(true)}, logptest.NewTestingLogger(t, ""))
 	TLSPolicy.TlsConfig = tlsconfig.ToConfig()
 
 	ClusterNamePolicy := as.NewClientPolicy()
@@ -151,7 +147,7 @@ func TestParseClientPolicy(t *testing.T) {
 			Name: "TLS Declaration",
 			Config: Config{
 				TLS: &tlscommon.Config{
-					Enabled: pointer(true),
+					Enabled: new(true),
 				},
 			},
 			expectedClientPolicy: TLSPolicy,
@@ -194,7 +190,7 @@ func TestParseClientPolicy(t *testing.T) {
 			Name: "TLS and Basic Auth",
 			Config: Config{
 				TLS: &tlscommon.Config{
-					Enabled: pointer(true),
+					Enabled: new(true),
 				},
 				User:     sampleUser,
 				Password: samplePassword,

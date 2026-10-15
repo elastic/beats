@@ -10,8 +10,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 )
 
 var (
@@ -83,7 +81,7 @@ func TestNewConnectionStringProperties(t *testing.T) {
 			FullyQualifiedNamespace: namespace + ".servicebus.windows.net",
 			SharedAccessKeyName:     nil,
 			SharedAccessKey:         nil,
-			SharedAccessSignature:   to.Ptr("SharedAccessSignature sr=" + namespace + ".servicebus.windows.net&sig=<base64-sig>&se=<expiry>&skn=<keyname>"),
+			SharedAccessSignature:   new("SharedAccessSignature sr=" + namespace + ".servicebus.windows.net&sig=<base64-sig>&se=<expiry>&skn=<keyname>"),
 		}, props)
 	})
 

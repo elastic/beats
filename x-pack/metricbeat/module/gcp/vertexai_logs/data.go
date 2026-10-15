@@ -84,7 +84,7 @@ func processJSONField(jsonStr, fieldName string, fields mapstr.M, logger *logp.L
 		return nil
 	}
 
-	var parsedJSON interface{}
+	var parsedJSON any
 	if err := json.Unmarshal([]byte(jsonStr), &parsedJSON); err != nil {
 		// If JSON parsing fails, store the raw string in a structured way
 		fields[fieldName] = mapstr.M{"raw": jsonStr}

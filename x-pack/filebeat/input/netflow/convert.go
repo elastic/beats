@@ -385,7 +385,7 @@ func getKeyUint64(dict record.Map, key string) (value uint64, found bool) {
 }
 
 func getKeyUint64Alternatives(dict record.Map, keys ...string) (value uint64, found bool) {
-	var iface interface{}
+	var iface any
 	for _, key := range keys {
 		if iface, found = dict[key]; found {
 			if value, found = iface.(uint64); found {
@@ -416,7 +416,7 @@ func getKeyIP(dict record.Map, key string) (value net.IP, found bool) {
 
 // Replaces each net.HardwareAddr in the dictionary with its string representation
 // because HardwareAddr doesn't implement Marshaler interface.
-func fixMacAddresses(dict map[string]interface{}) {
+func fixMacAddresses(dict map[string]any) {
 	for key, value := range dict {
 		if addr, ok := value.(net.HardwareAddr); ok {
 			if len(addr) == 0 {

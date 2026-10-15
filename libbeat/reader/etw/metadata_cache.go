@@ -262,19 +262,19 @@ type bufferPools struct {
 func newBufferPools() *bufferPools {
 	return &bufferPools{
 		smallBufferPool: sync.Pool{
-			New: func() interface{} {
+			New: func() any {
 				buf := make([]byte, 256)
 				return &buf
 			},
 		},
 		mediumBufferPool: sync.Pool{
-			New: func() interface{} {
+			New: func() any {
 				buf := make([]byte, 1024)
 				return &buf
 			},
 		},
 		largeBufferPool: sync.Pool{
-			New: func() interface{} {
+			New: func() any {
 				buf := make([]byte, 4096)
 				return &buf
 			},

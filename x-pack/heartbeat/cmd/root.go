@@ -70,16 +70,16 @@ type streamRef struct{ input, stream int }
 // extractBrowserParams removes "params" from every browser stream in rawInputs
 // and pre-parses them with PathSep("") so dotted keys are kept literal.
 // Note: it mutates rawInputs.
-func extractBrowserParams(rawInputs []map[string]interface{}) (map[streamRef]*conf.C, error) {
+func extractBrowserParams(rawInputs []map[string]any) (map[streamRef]*conf.C, error) {
 	extracted := map[streamRef]*conf.C{}
 	for i, input := range rawInputs {
-		streams, _ := input["streams"].([]interface{})
+		streams, _ := input["streams"].([]any)
 		for j, s := range streams {
-			stream, ok := s.(map[string]interface{})
+			stream, ok := s.(map[string]any)
 			if kind, _ := stream["type"].(string); !ok || kind != "browser" {
 				continue
 			}
-			if params, ok := stream["params"].(map[string]interface{}); ok {
+			if params, ok := stream["params"].(map[string]any); ok {
 				parsed, err := ucfg.NewFrom(params, ucfg.PathSep(""))
 				if err != nil {
 					return nil, fmt.Errorf("error parsing browser params for stream %d: %w", j, err)
@@ -108,8 +108,8 @@ func restoreBrowserParams(configList []*reload.ConfigWithMeta, params map[stream
 }
 
 // TransformRawIn removes unwanted fields to keep consistent hashing on reload()
-func TransformRawIn(rawIn *proto.UnitExpectedConfig) []map[string]interface{} {
-	rawInput := []map[string]interface{}{rawIn.GetSource().AsMap()}
+func TransformRawIn(rawIn *proto.UnitExpectedConfig) []map[string]any {
+	rawInput := []map[string]any{rawIn.GetSource().AsMap()}
 
 	for _, p := range rawInput {
 		delete(p, "policy")
@@ -131,12 +131,12 @@ func init() {
 	}
 }
 
-func agentInfoRule(agentInfo *client.AgentInfo) []interface{} {
+func agentInfoRule(agentInfo *client.AgentInfo) []any {
 	// upstream API can sometimes return a nil agent info
 	if agentInfo == nil {
-		return []interface{}{}
+		return []any{}
 	}
-	var processors []interface{}
+	var processors []any
 
 	processors = append(processors, generateAddFieldsProcessor(
 		mapstr.M{"id": agentInfo.ID, "snapshot": agentInfo.Snapshot, "version": agentInfo.Version},

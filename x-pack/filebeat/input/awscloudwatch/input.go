@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/libbeat/statusreporterhelper"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/go-concert/unison"
 )
 
 const (
@@ -48,9 +47,7 @@ type cloudwatchInputManager struct {
 	logger *logp.Logger
 }
 
-func (im *cloudwatchInputManager) Init(grp unison.Group) error {
-	return nil
-}
+func (im *cloudwatchInputManager) Close() {}
 
 func (im *cloudwatchInputManager) Create(cfg *conf.C) (v2.Input, error) {
 	config := defaultConfig()

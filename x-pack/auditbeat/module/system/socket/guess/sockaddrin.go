@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package guess
 
@@ -124,7 +123,7 @@ func (g *guessSockaddrIn) Trigger() error {
 }
 
 // Extract takes the dumped sockaddr_in and scans it for the expected values.
-func (g *guessSockaddrIn) Extract(ev interface{}) (mapstr.M, bool) {
+func (g *guessSockaddrIn) Extract(ev any) (mapstr.M, bool) {
 	arr := ev.([]byte)
 	if len(arr) < 8 {
 		return nil, false

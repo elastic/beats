@@ -46,11 +46,51 @@ type ElasticAgentConfig struct {
 }
 
 type addAgentMetadata struct {
-	cfg Config
+	cfg    Config
+	fields mapstr.M
+	meta   mapstr.M
 }
 
 func New(cfg Config) beat.Processor {
-	return &addAgentMetadata{cfg: cfg}
+	p := &addAgentMetadata{cfg: cfg, fields: mapstr.M{}, meta: mapstr.M{}}
+
+	if cfg.DataStream != nil {
+		dsMap := mapstr.M{}
+		if cfg.DataStream.Dataset != "" {
+			dsMap["dataset"] = cfg.DataStream.Dataset
+			p.fields["event"] = mapstr.M{"dataset": cfg.DataStream.Dataset}
+		}
+		if cfg.DataStream.Namespace != "" {
+			dsMap["namespace"] = cfg.DataStream.Namespace
+		}
+		if cfg.DataStream.Type != "" {
+			dsMap["type"] = cfg.DataStream.Type
+		}
+		if len(dsMap) > 0 {
+			p.fields["data_stream"] = dsMap
+		}
+	}
+
+	if cfg.ElasticAgent != nil {
+		elasticAgentMap := mapstr.M{"snapshot": cfg.ElasticAgent.Snapshot}
+		if cfg.ElasticAgent.ID != "" {
+			elasticAgentMap["id"] = cfg.ElasticAgent.ID
+			p.fields["agent"] = mapstr.M{"id": cfg.ElasticAgent.ID}
+		}
+		if cfg.ElasticAgent.Version != "" {
+			elasticAgentMap["version"] = cfg.ElasticAgent.Version
+		}
+		p.fields["elastic_agent"] = elasticAgentMap
+	}
+
+	if cfg.InputID != "" {
+		p.meta["input_id"] = cfg.InputID
+	}
+	if cfg.StreamID != "" {
+		p.meta["stream_id"] = cfg.StreamID
+	}
+
+	return p
 }
 
 func CreateAddAgentMetadata(c *conf.C, _ *logp.Logger) (beat.Processor, error) {
@@ -66,62 +106,20 @@ func (p *addAgentMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		return nil, nil
 	}
 
-	updateMap := make(mapstr.M)
-	if p.cfg.DataStream != nil {
-		dsMap := make(mapstr.M)
-		if p.cfg.DataStream.Dataset != "" {
-			dsMap["dataset"] = p.cfg.DataStream.Dataset
-			updateMap["event"] = mapstr.M{
-				"dataset": p.cfg.DataStream.Dataset,
-			}
+	if len(p.fields) > 0 {
+		if event.Fields == nil {
+			event.Fields = mapstr.M{}
 		}
-		if p.cfg.DataStream.Namespace != "" {
-			dsMap["namespace"] = p.cfg.DataStream.Namespace
-		}
-		if p.cfg.DataStream.Type != "" {
-			dsMap["type"] = p.cfg.DataStream.Type
-		}
-
-		// only upadte the event if any of the datastream fields are set
-		if len(dsMap) > 0 {
-			updateMap["data_stream"] = dsMap
-		}
+		event.Fields.DeepCloneUpdate(p.fields)
 	}
 
-	if p.cfg.ElasticAgent != nil {
-		elasticAgentMap := make(mapstr.M)
-		if p.cfg.ElasticAgent.ID != "" {
-			elasticAgentMap["id"] = p.cfg.ElasticAgent.ID
-			updateMap["agent"] = mapstr.M{
-				"id": p.cfg.ElasticAgent.ID, // mirrors elastic_agent.id for convenience
-			}
+	if len(p.meta) > 0 {
+		if event.Meta == nil {
+			event.Meta = mapstr.M{}
 		}
-		elasticAgentMap["snapshot"] = p.cfg.ElasticAgent.Snapshot
-		if p.cfg.ElasticAgent.Version != "" {
-			elasticAgentMap["version"] = p.cfg.ElasticAgent.Version
-		}
-
-		// only update the event if any of the elastic_agent fields are set
-		if len(elasticAgentMap) > 0 {
-			updateMap["elastic_agent"] = elasticAgentMap
-		}
+		event.Meta.DeepCloneUpdate(p.meta)
 	}
 
-	inputStreamMap := make(mapstr.M)
-	if p.cfg.InputID != "" {
-		inputStreamMap["input_id"] = p.cfg.InputID
-	}
-	if p.cfg.StreamID != "" {
-		inputStreamMap["stream_id"] = p.cfg.StreamID
-	}
-
-	// add input_id and stream_id only if either of them are set
-	if len(inputStreamMap) > 0 {
-		updateMap["@metadata"] = inputStreamMap
-	}
-
-	// insert the metadata and update the event
-	event.DeepUpdate(updateMap)
 	return event, nil
 }
 

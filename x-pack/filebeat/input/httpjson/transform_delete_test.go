@@ -18,14 +18,14 @@ func TestNewDelete(t *testing.T) {
 	cases := []struct {
 		name           string
 		constructor    constructor
-		config         map[string]interface{}
+		config         map[string]any
 		expectedTarget targetInfo
 		expectedErr    string
 	}{
 		{
 			name:        "newDeleteResponse targets body",
 			constructor: newDeleteResponse,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "body.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "body"},
@@ -33,7 +33,7 @@ func TestNewDelete(t *testing.T) {
 		{
 			name:        "newDeleteResponse targets something else",
 			constructor: newDeleteResponse,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "cursor.foo",
 			},
 			expectedErr: "invalid target: cursor.foo",
@@ -41,7 +41,7 @@ func TestNewDelete(t *testing.T) {
 		{
 			name:        "newDeleteRequest targets body",
 			constructor: newDeleteRequest,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "body.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "body"},
@@ -49,7 +49,7 @@ func TestNewDelete(t *testing.T) {
 		{
 			name:        "newDeleteRequest targets header",
 			constructor: newDeleteRequest,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "header.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "header"},
@@ -57,7 +57,7 @@ func TestNewDelete(t *testing.T) {
 		{
 			name:        "newDeleteRequest targets url param",
 			constructor: newDeleteRequest,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "url.params.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "url.params"},
@@ -65,7 +65,7 @@ func TestNewDelete(t *testing.T) {
 		{
 			name:        "newDeleteRequest targets something else",
 			constructor: newDeleteRequest,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "cursor.foo",
 			},
 			expectedErr: "invalid target: cursor.foo",
@@ -73,7 +73,7 @@ func TestNewDelete(t *testing.T) {
 		{
 			name:        "newDeletePagination targets body",
 			constructor: newDeletePagination,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "body.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "body"},
@@ -81,7 +81,7 @@ func TestNewDelete(t *testing.T) {
 		{
 			name:        "newDeletePagination targets header",
 			constructor: newDeletePagination,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "header.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "header"},
@@ -89,7 +89,7 @@ func TestNewDelete(t *testing.T) {
 		{
 			name:        "newDeletePagination targets url param",
 			constructor: newDeletePagination,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "url.params.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "url.params"},
@@ -97,7 +97,7 @@ func TestNewDelete(t *testing.T) {
 		{
 			name:        "newDeletePagination targets url value",
 			constructor: newDeletePagination,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "url.value",
 			},
 			expectedErr: "invalid target type: url.value",
@@ -105,7 +105,7 @@ func TestNewDelete(t *testing.T) {
 		{
 			name:        "newDeletePagination targets something else",
 			constructor: newDeletePagination,
-			config: map[string]interface{}{
+			config: map[string]any{
 				"target": "cursor.foo",
 			},
 			expectedErr: "invalid target: cursor.foo",
@@ -113,13 +113,12 @@ func TestNewDelete(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(tc.config)
 			gotDelete, gotErr := tc.constructor(cfg, noopReporter{}, nil)
 			if tc.expectedErr == "" {
 				assert.NoError(t, gotErr)
-				assert.Equal(t, tc.expectedTarget, (gotDelete.(*delete)).targetInfo)
+				assert.Equal(t, tc.expectedTarget, (gotDelete.(*deleteTransform)).targetInfo)
 			} else {
 				assert.EqualError(t, gotErr, tc.expectedErr)
 			}
@@ -169,7 +168,6 @@ func TestDeleteFunctions(t *testing.T) {
 	}
 
 	for _, tcase := range cases {
-		tcase := tcase
 		t.Run(tcase.name, func(t *testing.T) {
 			gotErr := tcase.tfunc(tcase.paramCtx, tcase.paramTr, tcase.paramKey)
 			if tcase.expectedErr == nil {

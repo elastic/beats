@@ -31,7 +31,7 @@ import (
 )
 
 type nodeStatsWrapper struct {
-	Nodes map[string]interface{} `json:"nodes"`
+	Nodes map[string]any `json:"nodes"`
 }
 
 var nodeItemSchema = s.Schema{
@@ -161,8 +161,8 @@ func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXP
 	return nil
 }
 
-func addNodeMetrics(rawNode interface{}, summary *IndexSummary) error {
-	nodeMap, ok := rawNode.(map[string]interface{})
+func addNodeMetrics(rawNode any, summary *IndexSummary) error {
+	nodeMap, ok := rawNode.(map[string]any)
 	if !ok {
 		return fmt.Errorf("node is not a map")
 	}
@@ -202,7 +202,7 @@ func addNodeMetrics(rawNode interface{}, summary *IndexSummary) error {
 }
 
 func getInt64(m mapstr.M, path ...string) (int64, error) {
-	current := interface{}(m)
+	current := any(m)
 	for _, key := range path {
 		mm, ok := current.(mapstr.M)
 		if !ok {
@@ -223,7 +223,7 @@ func getInt64(m mapstr.M, path ...string) (int64, error) {
 }
 
 func buildEvent(info *elasticsearch.Info, summary *IndexSummary, isXPack bool) mb.Event {
-	eventNew := map[string]interface{}{
+	eventNew := map[string]any{
 		"primaries": summary,
 		"total":     summary,
 	}

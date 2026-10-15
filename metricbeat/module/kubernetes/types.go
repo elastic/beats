@@ -71,9 +71,9 @@ type Summary struct {
 				UsageBytes      uint64 `json:"usageBytes"`
 				WorkingSetBytes uint64 `json:"workingSetBytes"`
 			} `json:"memory"`
-			Name               string      `json:"name"`
-			StartTime          string      `json:"startTime"`
-			UserDefinedMetrics interface{} `json:"userDefinedMetrics"`
+			Name               string `json:"name"`
+			StartTime          string `json:"startTime"`
+			UserDefinedMetrics any    `json:"userDefinedMetrics"`
 		} `json:"systemContainers"`
 	} `json:"node"`
 	Pods []struct {
@@ -107,8 +107,8 @@ type Summary struct {
 				InodesUsed     uint64 `json:"inodesUsed"`
 				UsedBytes      uint64 `json:"usedBytes"`
 			} `json:"rootfs"`
-			StartTime          string      `json:"startTime"`
-			UserDefinedMetrics interface{} `json:"userDefinedMetrics"`
+			StartTime          string `json:"startTime"`
+			UserDefinedMetrics any    `json:"userDefinedMetrics"`
 		} `json:"containers"`
 		Network struct {
 			RxBytes  uint64 `json:"rxBytes"`

@@ -19,6 +19,7 @@ package procs
 
 import (
 	"net"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -188,12 +189,7 @@ func (proc *ProcessesWatcher) isLocalIP(ip net.IP) bool {
 	if ip.IsLoopback() {
 		return true
 	}
-	for _, addr := range proc.localAddrs {
-		if ip.Equal(addr) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(proc.localAddrs, ip.Equal)
 }
 
 func (proc *ProcessesWatcher) findProc(address net.IP, port uint16, transport applayer.Transport) *process {

@@ -87,7 +87,6 @@ func TestMessage_SetTimestampBSD(t *testing.T) {
 	}
 
 	for name, tc := range cases {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -146,7 +145,6 @@ func TestMessage_SetTimestampRFC3339(t *testing.T) {
 	}
 
 	for name, tc := range cases {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -193,7 +191,6 @@ func TestMessage_SetPriority(t *testing.T) {
 	}
 
 	for name, tc := range cases {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			m := message{priority: -1}
@@ -235,7 +232,6 @@ func TestMessage_SetHostname(t *testing.T) {
 	}
 
 	for name, tc := range cases {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			var m message
 
@@ -262,7 +258,6 @@ func TestMessage_SetMsg(t *testing.T) {
 	}
 
 	for name, tc := range cases {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			var m message
@@ -290,7 +285,6 @@ func TestMessage_SetTag(t *testing.T) {
 	}
 
 	for name, tc := range cases {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			var m message
 
@@ -321,7 +315,6 @@ func TestMessage_SetAppName(t *testing.T) {
 	}
 
 	for name, tc := range cases {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			var m message
@@ -350,7 +343,6 @@ func TestMessage_SetContent(t *testing.T) {
 	}
 
 	for name, tc := range cases {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			var m message
@@ -382,7 +374,6 @@ func TestMessage_SetProcID(t *testing.T) {
 	}
 
 	for name, tc := range cases {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			var m message
@@ -410,7 +401,6 @@ func TestMessage_SetMsgID(t *testing.T) {
 	}
 
 	for name, tc := range cases {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -441,7 +431,6 @@ func TestMessage_SetVersion(t *testing.T) {
 	}
 
 	for name, tc := range cases {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -482,7 +471,6 @@ func TestMessage_SetRawSDValue(t *testing.T) {
 	}
 
 	for name, tc := range cases {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -499,47 +487,47 @@ func TestMessage_SetRawSDValue(t *testing.T) {
 func TestParseStructuredData(t *testing.T) {
 	tests := map[string]struct {
 		in   string
-		want map[string]interface{}
+		want map[string]any
 	}{
 		"basic": {
 			in: `[value@1 foo="bar"]`,
-			want: map[string]interface{}{
-				"value@1": map[string]interface{}{
+			want: map[string]any{
+				"value@1": map[string]any{
 					"foo": "bar",
 				},
 			},
 		},
 		"multi-key": {
 			in: `[exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][examplePriority@32473 class="high"]`,
-			want: map[string]interface{}{
-				"exampleSDID@32473": map[string]interface{}{
+			want: map[string]any{
+				"exampleSDID@32473": map[string]any{
 					"iut":         "3",
 					"eventSource": "Application",
 					"eventID":     "1011",
 				},
-				"examplePriority@32473": map[string]interface{}{
+				"examplePriority@32473": map[string]any{
 					"class": "high",
 				},
 			},
 		},
 		"multi-key-with-escape": {
 			in: `[exampleSDID@32473 iut="3" eventSource="Application" eventID="1011" somekey="[value\] more data"][examplePriority@32473 class="high"]`,
-			want: map[string]interface{}{
-				"exampleSDID@32473": map[string]interface{}{
+			want: map[string]any{
+				"exampleSDID@32473": map[string]any{
 					"iut":         "3",
 					"eventSource": "Application",
 					"eventID":     "1011",
 					"somekey":     "[value] more data",
 				},
-				"examplePriority@32473": map[string]interface{}{
+				"examplePriority@32473": map[string]any{
 					"class": "high",
 				},
 			},
 		},
 		"repeated-id": {
 			in: `[exampleSDID@32473 iut="3"][exampleSDID@32473 class="high"]`,
-			want: map[string]interface{}{
-				"exampleSDID@32473": map[string]interface{}{
+			want: map[string]any{
+				"exampleSDID@32473": map[string]any{
 					"iut":   "3",
 					"class": "high",
 				},
@@ -547,8 +535,8 @@ func TestParseStructuredData(t *testing.T) {
 		},
 		"repeated-id-value": {
 			in: `[exampleSDID@32473 class="low"][exampleSDID@32473 class="high"]`,
-			want: map[string]interface{}{
-				"exampleSDID@32473": map[string]interface{}{
+			want: map[string]any{
+				"exampleSDID@32473": map[string]any{
 					"class": "high",
 				},
 			},
@@ -568,7 +556,6 @@ func TestParseStructuredData(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -615,8 +602,8 @@ func TestMessage_Fields(t *testing.T) {
 						"procid":   "1024",
 						"msgid":    "msg123",
 						"version":  "1",
-						"structured_data": map[string]interface{}{
-							"a": map[string]interface{}{
+						"structured_data": map[string]any{
+							"a": map[string]any{
 								"b": "c",
 							},
 						},
@@ -699,7 +686,6 @@ func TestMessage_Fields(t *testing.T) {
 	}
 
 	for name, tc := range cases {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 

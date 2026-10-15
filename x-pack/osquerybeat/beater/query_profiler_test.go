@@ -16,7 +16,7 @@ import (
 func TestToInt64(t *testing.T) {
 	tests := []struct {
 		name string
-		in   interface{}
+		in   any
 		want int64
 	}{
 		{"int", 42, 42},
@@ -40,7 +40,7 @@ func TestToInt64(t *testing.T) {
 func TestToString(t *testing.T) {
 	tests := []struct {
 		name string
-		in   interface{}
+		in   any
 		want string
 	}{
 		{"string", "hello", "hello"},
@@ -111,7 +111,7 @@ func TestBuildLiveQueryProfile(t *testing.T) {
 
 func TestDiagnosticsErrorJSON(t *testing.T) {
 	data := diagnosticsErrorJSON("something failed")
-	var m map[string]interface{}
+	var m map[string]any
 	if err := json.Unmarshal(data, &m); err != nil {
 		t.Fatal(err)
 	}
@@ -128,18 +128,18 @@ func TestNewQueryProfiler(t *testing.T) {
 }
 
 type mockProfileQueryExecutor struct {
-	rows []map[string]interface{}
+	rows []map[string]any
 	err  error
 }
 
-func (m *mockProfileQueryExecutor) Query(ctx context.Context, sql string, timeout time.Duration) ([]map[string]interface{}, error) {
+func (m *mockProfileQueryExecutor) Query(ctx context.Context, sql string, timeout time.Duration) ([]map[string]any, error) {
 	return m.rows, m.err
 }
 
 func TestProfileScheduledQuery_FirstRun(t *testing.T) {
 	ctx := context.Background()
 	qe := &mockProfileQueryExecutor{
-		rows: []map[string]interface{}{
+		rows: []map[string]any{
 			{
 				"name":              "q1",
 				"query":             "SELECT * FROM osquery_info",
@@ -179,7 +179,7 @@ func TestScheduledProfilesDiagnosticsWithResolver_NilExecutor(t *testing.T) {
 	ctx := context.Background()
 	p := newQueryProfiler(logp.NewLogger("test"))
 	data := p.scheduledProfilesDiagnostics(ctx, nil)
-	var m map[string]interface{}
+	var m map[string]any
 	if err := json.Unmarshal(data, &m); err != nil {
 		t.Fatal(err)
 	}

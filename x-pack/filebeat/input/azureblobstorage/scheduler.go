@@ -192,7 +192,7 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 				containerName: s.src.ContainerName,
 			}
 
-			blobClient, err := fetchBlobClient(blobURL, blobCreds, *s.cfg, s.src.Retry, s.log)
+			blobClient, err := fetchBlobClient(blobURL, blobCreds, s.log)
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
 				s.log.Errorf("Job creation failed for container %s with error %v", s.src.ContainerName, err)

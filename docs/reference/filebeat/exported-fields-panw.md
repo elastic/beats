@@ -215,7 +215,7 @@ Fields to extend the top-level url object.
 
 
 **`panw.panos.error`**
-:   A string showing that error that has occurred in any event.
+:   A string showing the error that has occurred in any event.
 
     type: keyword
 
@@ -227,7 +227,7 @@ Fields to extend the top-level url object.
 
 
 **`panw.panos.repeatcnt`**
-:   The number of sessions with the same source IP address, destination IP address, application, and subtype that GlobalProtect has detected within the last five seconds.An integer associated with any errors that occurred.
+:   The number of sessions with the same source IP address, destination IP address, application, and subtype that GlobalProtect has detected within the last five seconds. An integer associated with any errors that occurred.
 
     type: integer
 

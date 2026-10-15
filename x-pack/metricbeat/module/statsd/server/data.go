@@ -119,7 +119,7 @@ func parse(b []byte, log *logp.Logger) ([]statsdMetric, error) {
 	return metrics, nil
 }
 
-func eventMapping(metricName string, metricValue interface{}, mappings map[string]StatsdMapping, log *logp.Logger) mapstr.M {
+func eventMapping(metricName string, metricValue any, mappings map[string]StatsdMapping, log *logp.Logger) mapstr.M {
 	m := mapstr.M{}
 	if len(mappings) == 0 {
 		m[common.DeDot(metricName)] = metricValue

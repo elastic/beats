@@ -46,8 +46,8 @@ func TestData(t *testing.T) {
 	f.WriteEvents(t, "")
 }
 
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string) map[string]any {
+	return map[string]any{
 		"module":     "etcd",
 		"metricsets": []string{"store"},
 		"hosts":      []string{host},

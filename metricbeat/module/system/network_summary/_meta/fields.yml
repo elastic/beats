@@ -1,6 +1,6 @@
 - name: network_summary
   type: group
-  release: beta
+  release: ga
   description: >
     Metrics relating to global network activity
   fields:

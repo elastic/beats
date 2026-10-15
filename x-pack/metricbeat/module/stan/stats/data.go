@@ -34,7 +34,7 @@ var (
 )
 
 func eventMapping(content []byte, r mb.ReporterV2) error {
-	var streaming = make(map[string]interface{})
+	var streaming = make(map[string]any)
 	if err := json.Unmarshal(content, &streaming); err != nil {
 		return fmt.Errorf("error in streaming server mapping: %w", err)
 	}

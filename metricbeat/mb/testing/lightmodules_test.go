@@ -55,7 +55,7 @@ func TestFetchLightModuleWithProcessors(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "test",
 		"metricsets": []string{"json"},
 		"hosts":      []string{ts.URL},
@@ -92,7 +92,7 @@ func TestDataLightModuleWithProcessors(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "test",
 		"metricsets": []string{"json"},
 		"hosts":      []string{ts.URL},

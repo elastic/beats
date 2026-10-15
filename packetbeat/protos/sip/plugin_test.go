@@ -120,6 +120,7 @@ func TestMalformedBodyFiends(t *testing.T) {
 	}{
 		{msg: &message{body: []byte("\r\no="), contentType: []byte("application/sdp"), hasContentLength: true}},
 		{msg: &message{body: []byte("\r\no=\"00000000"), contentType: []byte("application/sdp"), hasContentLength: true}},
+		{msg: &message{body: []byte("o=\"\" 1 1 IN IP4 1.1.1.1\r\n"), contentType: []byte("application/sdp"), hasContentLength: true}},
 	}
 
 	// test is mostly that we don't crash
@@ -190,7 +191,7 @@ func TestParseUDP(t *testing.T) {
 	assert.EqualValues(t, []common.NetString{common.NetString("SIP/2.0/UDP 10.0.2.20:5060;branch=z9hG4bK-2187-1-0")}, getVal(fields, "sip.via.original"))
 }
 
-func getVal(f beat.Event, k string) interface{} {
+func getVal(f beat.Event, k string) any {
 	v, _ := f.GetValue(k)
 	return v
 }

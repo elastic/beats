@@ -34,7 +34,7 @@ func makeListener(cfg Config) (net.Listener, error) {
 	}
 
 	if len(cfg.SecurityDescriptor) > 0 {
-		return nil, errors.New("security_descriptor option for the HTTP endpoint only work on Windows")
+		return nil, errors.New("the security_descriptor option for the HTTP endpoint only works on Windows")
 	}
 
 	if npipe.IsNPipe(cfg.Host) {

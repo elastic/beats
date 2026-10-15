@@ -18,16 +18,17 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report/log"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	metricreport "github.com/elastic/beats/v7/pkg/systemmetrics/report"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
 	otelstatus "github.com/elastic/beats/v7/x-pack/otel/status"
 	oteltelemetry "github.com/elastic/beats/v7/x-pack/otel/telemetry"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/receiver"
+	"go.uber.org/zap"
 )
 
 // contextStopper is an optional extension of beat.Beater for beaters that can
@@ -46,13 +47,18 @@ type BeatReceiver struct {
 	Logger              *logp.Logger
 	bridge              *oteltelemetry.RegistryBridge
 	releaseSystemBridge func()
+	startHook           func(component.Host) error
 	runDone             chan error // receives the error from beater.Run; closed when Run returns
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
 func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator, set receiver.Settings) (BeatReceiver, error) {
 	receiverID := set.ID
-	ts := set.TelemetrySettings
+	bridgeTelemetrySettings := set.TelemetrySettings
+	// The Beat logger is built from the collector logger core and includes the
+	// component.* fields configured for this receiver, they're necessary to
+	// route the logs to the correct datastream.
+	bridgeTelemetrySettings.Logger = zap.New(b.Info.Logger.Core())
 	beatConfig, err := b.BeatConfig()
 	if err != nil {
 		return BeatReceiver{}, fmt.Errorf("error getting beat config: %w", err)
@@ -103,12 +109,15 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 		return BeatReceiver{}, fmt.Errorf("error getting %s creator:%w", b.Info.Beat, err)
 	}
 
-	bridge, err := oteltelemetry.NewRegistryBridge(ts, receiverID.String(), b.Monitoring.StatsRegistry(), b.Monitoring.InputsRegistry())
+	bridge, err := oteltelemetry.NewRegistryBridge(bridgeTelemetrySettings, receiverID.String(), b.Monitoring.StatsRegistry(), b.Monitoring.InputsRegistry())
 	if err != nil {
 		return BeatReceiver{}, fmt.Errorf("error creating registry bridge: %w", err)
 	}
 
-	releaseSystem, err := oteltelemetry.AcquireSystemBridge(ts)
+	// The system bridge is shared by all receivers. Preserve the original
+	// settings so its logs are not permanently tagged with this receiver's
+	// component.* fields.
+	releaseSystem, err := oteltelemetry.AcquireSystemBridge(set.TelemetrySettings)
 	if err != nil {
 		return BeatReceiver{}, fmt.Errorf("error acquiring system bridge: %w", err)
 	}
@@ -121,6 +130,12 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 		releaseSystemBridge: releaseSystem,
 		runDone:             make(chan error, 1),
 	}, nil
+}
+
+// SetStartHook configures a hook that runs synchronously in Start before the
+// beater's Run method is launched.
+func (br *BeatReceiver) SetStartHook(hook func(component.Host) error) {
+	br.startHook = hook
 }
 
 // BeatReceiver.Start() starts the beat receiver.
@@ -197,6 +212,12 @@ func (br *BeatReceiver) Start(host component.Host) (retErr error) {
 			return fmt.Errorf("error creating metric log reporter")
 		}
 		br.reporter = rep
+	}
+
+	if br.startHook != nil {
+		if err := br.startHook(host); err != nil {
+			return fmt.Errorf("error running Beat receiver start hook: %w", err)
+		}
 	}
 
 	go func() {

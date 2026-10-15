@@ -33,7 +33,7 @@ func (s subscribe) RequestDecorators() []autorest.PrepareDecorator {
 		autorest.WithPath(s.tenantID),
 		autorest.WithPath("activity/feed/subscriptions/start"),
 		autorest.WithQueryParameters(
-			map[string]interface{}{
+			map[string]any{
 				"contentType": s.contentType,
 			}),
 	}

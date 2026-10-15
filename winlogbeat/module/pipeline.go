@@ -27,7 +27,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -46,7 +46,7 @@ const logName = "pipeline"
 
 type pipeline struct {
 	id       string
-	contents map[string]interface{}
+	contents map[string]any
 }
 
 // UploadPipelines reads all pipelines embedded in the Winlogbeat executable
@@ -58,14 +58,14 @@ func UploadPipelines(info beat.Info, esClient *eslegclient.Connection, overwrite
 	if err != nil {
 		return nil, err
 	}
-	return load(esClient, pipelines, overwritePipelines)
+	return load(esClient, pipelines, overwritePipelines, info.Logger)
 }
 
 // ExportPipelines reads all pipelines embedded in the Winlogbeat executable
 // and adapts the pipelines for a given ES version and writes the
 // converted pipelines to the given directory in JSON format.
 func ExportPipelines(info beat.Info, version version.V, directory string) error {
-	log := logp.NewLogger(logName)
+	log := info.Logger.Named(logName)
 	pipelines, err := readAll(info)
 	if err != nil {
 		return err
@@ -153,8 +153,8 @@ func readFile(filename string, info beat.Info) (p pipeline, err error) {
 // load will only overwrite existing pipelines if overwritePipelines is
 // true. An error in loading one of the pipelines will cause the
 // successfully loaded ones to be deleted.
-func load(esClient *eslegclient.Connection, pipelines []pipeline, overwritePipelines bool) (loaded []string, err error) {
-	log := logp.NewLogger(logName)
+func load(esClient *eslegclient.Connection, pipelines []pipeline, overwritePipelines bool, logger *logp.Logger) (loaded []string, err error) {
+	log := logger.Named(logName)
 
 	for _, pipeline := range pipelines {
 		err = fileset.LoadPipeline(esClient, pipeline.id, pipeline.contents, overwritePipelines, log)
@@ -178,9 +178,9 @@ func load(esClient *eslegclient.Connection, pipelines []pipeline, overwritePipel
 	return loaded, nil
 }
 
-func applyTemplates(prefix string, version string, filename string, original []byte) (converted map[string]interface{}, err error) {
-	vars := map[string]interface{}{
-		"builtin": map[string]interface{}{
+func applyTemplates(prefix string, version string, filename string, original []byte) (converted map[string]any, err error) {
+	vars := map[string]any{
+		"builtin": map[string]any{
 			"prefix":      prefix,
 			"module":      "",
 			"fileset":     "",
@@ -193,7 +193,7 @@ func applyTemplates(prefix string, version string, filename string, original []b
 		return nil, fmt.Errorf("failed to apply template: %w", err)
 	}
 
-	var content map[string]interface{}
+	var content map[string]any
 	switch extension := strings.ToLower(filepath.Ext(filename)); extension {
 	case ".json":
 		if err = json.Unmarshal([]byte(encodedString), &content); err != nil {
@@ -208,7 +208,7 @@ func applyTemplates(prefix string, version string, filename string, original []b
 			return nil, fmt.Errorf("failed to sanitize the YAML pipeline file: %s: %w", filename, err)
 		}
 		//nolint:errcheck // ignore
-		content = newContent.(map[string]interface{})
+		content = newContent.(map[string]any)
 	default:
 		return nil, fmt.Errorf("unsupported extension '%s' for pipeline file: %s", extension, filename)
 	}

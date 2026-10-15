@@ -22,7 +22,7 @@ package stress_test
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
+
 	"os"
 	"path/filepath"
 	"strings"
@@ -90,15 +90,15 @@ func TestPipeline(t *testing.T) {
 				name = strings.Replace(name, "/", "-", -1)
 				name = strings.Replace(name, "\\", "-", -1)
 
-				dir, err := ioutil.TempDir("", "")
+				dir, err := os.MkdirTemp("", "")
 				if err != nil {
 					t.Fatal(err)
 				}
 				defer os.RemoveAll(dir)
 
 				// Merge test info into config object
-				config.Merge(map[string]interface{}{
-					"test": map[string]interface{}{
+				config.Merge(map[string]any{
+					"test": map[string]any{
 						"tmpdir": dir,
 						"name":   name,
 					},
@@ -119,7 +119,6 @@ func TestPipeline(t *testing.T) {
 
 func configTest(t *testing.T, typ string, configs []string, fn func(t *testing.T, config string)) {
 	for _, config := range configs {
-		config := config
 		t.Run(testName(typ, config), func(t *testing.T) {
 			t.Parallel()
 			fn(t, config)

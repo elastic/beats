@@ -343,7 +343,7 @@ func getRFC5988Link(rel string, links []string) string {
 	return getMatchLink(rel, links)
 }
 
-func toInt(v interface{}) int64 {
+func toInt(v any) int64 {
 	vv := reflect.ValueOf(v)
 	switch vv.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
@@ -376,7 +376,7 @@ func div(a, b int64) int64 {
 	return a / b
 }
 
-func min(arg1, arg2 reflect.Value) (interface{}, error) {
+func min(arg1, arg2 reflect.Value) (any, error) {
 	lessThan, err := lt(arg1, arg2)
 	if err != nil {
 		return nil, err
@@ -389,7 +389,7 @@ func min(arg1, arg2 reflect.Value) (interface{}, error) {
 	return arg2.Interface(), nil
 }
 
-func max(arg1, arg2 reflect.Value) (interface{}, error) {
+func max(arg1, arg2 reflect.Value) (any, error) {
 	lessThan, err := lt(arg1, arg2)
 	if err != nil {
 		return nil, err
@@ -519,7 +519,7 @@ func uuidString() string {
 // join concatenates the elements of its first argument to create a single string. The separator
 // string sep is placed between elements in the resulting string. If the first argument is not of
 // type string or []string, its elements will be stringified.
-func join(v interface{}, sep string) string {
+func join(v any, sep string) string {
 	// check for []string or string to avoid using reflect
 	switch t := v.(type) {
 	case []string:
@@ -577,7 +577,7 @@ func replaceAll(old, new, s string) string {
 }
 
 // toJSON converts the given structure into a JSON string.
-func toJSON(i interface{}) (string, error) {
+func toJSON(i any) (string, error) {
 	result, err := json.Marshal(i)
 	if err != nil {
 		return "", fmt.Errorf("toJSON failed: %w", err)

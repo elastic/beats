@@ -90,7 +90,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			continue
 		}
 
-		for _, namespace := range strings.Split(info["namespaces"], ";") {
+		for namespace := range strings.SplitSeq(info["namespaces"], ";") {
 			info, err := node.RequestInfo(m.infoPolicy, "namespace/"+namespace)
 			if err != nil {
 				m.Logger().Errorf("Failed to retrieve metrics for namespace %s from node %s", namespace, node.GetName())

@@ -35,6 +35,8 @@ class Test(metricbeat.BaseTest):
             "name": "kibana",
             "metricsets": ["status"],
             "hosts": self.get_hosts(),
+            "username": "beats",
+            "password": "testing",
             "period": "1s"
         }])
         proc = self.start_beat()
@@ -45,10 +47,13 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         self.assertTrue(len(output) >= 1)
         evt = output[0]
-        print(evt)
-
-        # TODO Uncomment this once all fields that aren't used are removed for Stack Monitoring
-        # self.assert_fields_are_documented(evt)
+        self.assertNotIn("error", evt)
+        self.assertEqual(
+            "available",
+            evt["kibana"]["status"]["status"]["overall"]["level"],
+        )
+        self.assertTrue(evt["service"]["version"])
+        self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_xpack(self):
@@ -61,6 +66,8 @@ class Test(metricbeat.BaseTest):
                 "stats"
             ],
             "hosts": self.get_hosts(),
+            "username": "beats",
+            "password": "testing",
             "period": "1s"
         }])
 
@@ -74,7 +81,10 @@ class Test(metricbeat.BaseTest):
 
     def get_version(self):
         host = self.get_hosts()[0]
-        res = urllib.request.urlopen("http://" + host + "/api/status").read()
+        req = urllib.request.Request("http://" + host + "/api/status")
+        # auth: beats:testing
+        req.add_header("Authorization", "Basic YmVhdHM6dGVzdGluZw==")
+        res = urllib.request.urlopen(req).read()
 
         body = json.loads(res)
         version = body["version"]["number"]

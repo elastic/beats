@@ -20,7 +20,7 @@
 package pending_tasks
 
 import (
-	"io/ioutil"
+	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -42,7 +42,7 @@ var info = elasticsearch.Info{
 
 func TestEmptyQueueShouldGiveNoError(t *testing.T) {
 	file := "./_meta/test/empty.json"
-	content, err := ioutil.ReadFile(file)
+	content, err := os.ReadFile(file)
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
@@ -52,7 +52,7 @@ func TestEmptyQueueShouldGiveNoError(t *testing.T) {
 
 func TestNotEmptyQueueShouldGiveNoError(t *testing.T) {
 	file := "./_meta/test/tasks.622.json"
-	content, err := ioutil.ReadFile(file)
+	content, err := os.ReadFile(file)
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
@@ -64,7 +64,7 @@ func TestNotEmptyQueueShouldGiveNoError(t *testing.T) {
 
 func TestEmptyQueueShouldGiveZeroEvent(t *testing.T) {
 	file := "./_meta/test/empty.json"
-	content, err := ioutil.ReadFile(file)
+	content, err := os.ReadFile(file)
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
@@ -75,7 +75,7 @@ func TestEmptyQueueShouldGiveZeroEvent(t *testing.T) {
 
 func TestNotEmptyQueueShouldGiveSeveralEvents(t *testing.T) {
 	file := "./_meta/test/tasks.622.json"
-	content, err := ioutil.ReadFile(file)
+	content, err := os.ReadFile(file)
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
@@ -86,7 +86,7 @@ func TestNotEmptyQueueShouldGiveSeveralEvents(t *testing.T) {
 
 func TestInvalidJsonForRequiredFieldShouldThrowError(t *testing.T) {
 	file := "./_meta/test/invalid_required_field.json"
-	content, err := ioutil.ReadFile(file)
+	content, err := os.ReadFile(file)
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
@@ -96,7 +96,7 @@ func TestInvalidJsonForRequiredFieldShouldThrowError(t *testing.T) {
 
 func TestInvalidJsonForBadFormatShouldThrowError(t *testing.T) {
 	file := "./_meta/test/invalid_format.json"
-	content, err := ioutil.ReadFile(file)
+	content, err := os.ReadFile(file)
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
@@ -198,7 +198,7 @@ func TestEventsMappedMatchToContentReceived(t *testing.T) {
 	}
 
 	for iter, testCase := range testCases {
-		content, err := ioutil.ReadFile(testCase.given)
+		content, err := os.ReadFile(testCase.given)
 		require.NoError(t, err)
 
 		reporter := &mbtest.CapturingReporterV2{}

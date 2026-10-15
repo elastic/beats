@@ -57,14 +57,14 @@ func TestNewTransformsFromConfig(t *testing.T) {
 
 	cases := []struct {
 		name               string
-		paramCfg           map[string]interface{}
+		paramCfg           map[string]any
 		paramNamespace     string
 		expectedTransforms transforms
 		expectedErr        string
 	}{
 		{
 			name: "fails if config has more than one action",
-			paramCfg: map[string]interface{}{
+			paramCfg: map[string]any{
 				"set":  nil,
 				"set2": nil,
 			},
@@ -72,7 +72,7 @@ func TestNewTransformsFromConfig(t *testing.T) {
 		},
 		{
 			name: "fails if not found in namespace",
-			paramCfg: map[string]interface{}{
+			paramCfg: map[string]any{
 				"set": nil,
 			},
 			paramNamespace: "empty",
@@ -80,8 +80,8 @@ func TestNewTransformsFromConfig(t *testing.T) {
 		},
 		{
 			name: "fails if constructor fails",
-			paramCfg: map[string]interface{}{
-				"set": map[string]interface{}{
+			paramCfg: map[string]any{
+				"set": map[string]any{
 					"target": "invalid",
 				},
 			},
@@ -90,8 +90,8 @@ func TestNewTransformsFromConfig(t *testing.T) {
 		},
 		{
 			name: "transform is correct",
-			paramCfg: map[string]interface{}{
-				"set": map[string]interface{}{
+			paramCfg: map[string]any{
+				"set": map[string]any{
 					"target": "body.foo",
 				},
 			},
@@ -107,7 +107,6 @@ func TestNewTransformsFromConfig(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(tc.paramCfg)
 			gotTransforms, gotErr := newTransformsFromConfig(registeredTransforms, transformsConfig{cfg}, tc.paramNamespace, noopReporter{}, nil)
@@ -140,14 +139,14 @@ func TestNewBasicTransformsFromConfig(t *testing.T) {
 
 	cases := []struct {
 		name           string
-		paramCfg       map[string]interface{}
+		paramCfg       map[string]any
 		paramNamespace string
 		expectedErr    string
 	}{
 		{
 			name: "succeeds if transform is basicTransform",
-			paramCfg: map[string]interface{}{
-				"set": map[string]interface{}{
+			paramCfg: map[string]any{
+				"set": map[string]any{
 					"target": "body.foo",
 				},
 			},
@@ -155,7 +154,7 @@ func TestNewBasicTransformsFromConfig(t *testing.T) {
 		},
 		{
 			name: "fails if transform is not a basicTransform",
-			paramCfg: map[string]interface{}{
+			paramCfg: map[string]any{
 				"fake": nil,
 			},
 			paramNamespace: "test",
@@ -164,7 +163,6 @@ func TestNewBasicTransformsFromConfig(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(tc.paramCfg)
 			_, gotErr := newBasicTransformsFromConfig(registeredTransforms, transformsConfig{cfg}, tc.paramNamespace, noopReporter{}, nil)

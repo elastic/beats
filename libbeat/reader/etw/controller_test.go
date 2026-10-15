@@ -21,6 +21,7 @@ package etw
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sys/windows"
@@ -172,6 +173,7 @@ func TestStopSession_Error(t *testing.T) {
 	session := &Session{
 		Realtime:     true,
 		NewSession:   true,
+		handler:      1,     // Session handle from StartTrace
 		traceHandler: 12345, // Example handler value
 		properties:   &EventTraceProperties{},
 		closeTrace:   closeTrace,
@@ -200,6 +202,7 @@ func TestStopSession_Success(t *testing.T) {
 	session := &Session{
 		Realtime:     true,
 		NewSession:   true,
+		handler:      1,     // Session handle from StartTrace
 		traceHandler: 12345, // Example handler value
 		properties:   &EventTraceProperties{},
 		closeTrace:   closeTrace,
@@ -208,4 +211,114 @@ func TestStopSession_Success(t *testing.T) {
 
 	err := session.StopSession()
 	assert.NoError(t, err)
+}
+
+func TestStopSession_AlreadyStopped(t *testing.T) {
+	// When another controller has already stopped the session, the STOP
+	// control fails with ERROR_WMI_INSTANCE_NOT_FOUND. The session is in the
+	// state we asked for, so that is not an error; anything else still is.
+	tests := []struct {
+		name    string
+		stopErr error
+		wantErr error
+	}{
+		{name: "session already gone", stopErr: ERROR_WMI_INSTANCE_NOT_FOUND, wantErr: nil},
+		{name: "other stop failures are reported", stopErr: ERROR_ACCESS_DENIED, wantErr: ERROR_ACCESS_DENIED},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			closed := false
+			session := &Session{
+				Realtime:     true,
+				NewSession:   true,
+				handler:      1,
+				traceHandler: 12345,
+				properties:   &EventTraceProperties{},
+				closeTrace: func(uint64) error {
+					closed = true
+					return nil
+				},
+				controlTrace: func(_ uintptr, _ *uint16, _ *EventTraceProperties, controlCode uint32) error {
+					if controlCode == EVENT_TRACE_CONTROL_STOP {
+						return test.stopErr
+					}
+					return nil
+				},
+			}
+
+			err := session.StopSession()
+			assert.ErrorIs(t, err, test.wantErr, "StopSession with STOP failing with %v", test.stopErr)
+			assert.True(t, closed, "trace handle should be closed before the session is stopped")
+		})
+	}
+}
+
+func TestStopSession_NothingToStop(t *testing.T) {
+	// Connecting failed before StartTrace or the attach QUERY succeeded, so
+	// there is no session handle. StopSession is called as cleanup anyway and
+	// must not issue controls against a session that does not exist.
+	session := &Session{
+		Realtime:   true,
+		NewSession: true,
+		properties: &EventTraceProperties{},
+		closeTrace: func(uint64) error {
+			t.Error("no trace was opened, so nothing should be closed")
+			return nil
+		},
+		controlTrace: func(_ uintptr, _ *uint16, _ *EventTraceProperties, controlCode uint32) error {
+			t.Errorf("no session was created, so control %d should not be sent", controlCode)
+			return nil
+		},
+	}
+
+	start := time.Now()
+	assert.NoError(t, session.StopSession(), "stopping a session that was never created should succeed")
+	assert.Less(t, time.Since(start), time.Second/2, "there was nothing to flush, so there should be no wait for flushed events")
+}
+
+func TestStopSession_NoWaitWhenSessionGone(t *testing.T) {
+	// Another controller stopped the session, which is what brings the
+	// reconnecting consumer here. The flush fails because the session is
+	// gone, so there are no flushed events to wait for; waiting anyway would
+	// add a second to every reconnect.
+	closed := false
+	session := &Session{
+		Realtime:     true,
+		NewSession:   true,
+		handler:      1,
+		traceHandler: 12345,
+		properties:   &EventTraceProperties{},
+		closeTrace: func(uint64) error {
+			closed = true
+			return nil
+		},
+		controlTrace: func(uintptr, *uint16, *EventTraceProperties, uint32) error {
+			return ERROR_WMI_INSTANCE_NOT_FOUND
+		},
+	}
+
+	start := time.Now()
+	assert.NoError(t, session.StopSession(), "a session that is already gone is in the state we asked for")
+	assert.Less(t, time.Since(start), time.Second/2, "a failed flush has nothing to wait for")
+	assert.True(t, closed, "the trace handle should still be closed")
+}
+
+func TestStopSession_NoWaitWithoutConsumer(t *testing.T) {
+	// The session exists but no trace was ever opened on it, so a flush has
+	// nobody to deliver to and there is nothing to wait for.
+	session := &Session{
+		Realtime:   true,
+		NewSession: true,
+		handler:    1,
+		properties: &EventTraceProperties{},
+		closeTrace: func(uint64) error {
+			t.Error("no trace was opened, so nothing should be closed")
+			return nil
+		},
+		controlTrace: func(uintptr, *uint16, *EventTraceProperties, uint32) error { return nil },
+	}
+
+	start := time.Now()
+	assert.NoError(t, session.StopSession(), "stopping a session without a consumer should succeed")
+	assert.Less(t, time.Since(start), time.Second/2, "no consumer is processing, so there should be no wait for flushed events")
 }

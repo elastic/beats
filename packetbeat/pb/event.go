@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"net"
 	"reflect"
+	"slices"
 	"strings"
 	"time"
 
@@ -321,20 +322,16 @@ func hostBasedDirection(source, destination net.IP, ips []net.IP) string {
 		if destination.IsLoopback() || destination.IsLinkLocalUnicast() || destination.IsLinkLocalMulticast() {
 			return Ingress
 		}
-		for _, ip := range ips {
-			if destination.Equal(ip) {
-				return Ingress
-			}
+		if slices.ContainsFunc(ips, destination.Equal) {
+			return Ingress
 		}
 	}
 	if source != nil {
 		if source.IsLoopback() || source.IsLinkLocalUnicast() || source.IsLinkLocalMulticast() {
 			return Egress
 		}
-		for _, ip := range ips {
-			if source.Equal(ip) {
-				return Egress
-			}
+		if slices.ContainsFunc(ips, source.Equal) {
+			return Egress
 		}
 	}
 	return Unknown
@@ -365,7 +362,7 @@ func perimeterBasedDirection(source, destination net.IP, internalNetworks []stri
 // is a problem writing the keys to the given map (like if an intermediate key
 // exists and is not a map).
 func (f *Fields) MarshalMapStr(m mapstr.M) error {
-	typ := reflect.TypeOf(*f)
+	typ := reflect.TypeFor[Fields]()
 	val := reflect.ValueOf(*f)
 
 	for i := 0; i < typ.NumField(); i++ {
@@ -396,13 +393,13 @@ func (f *Fields) MarshalMapStr(m mapstr.M) error {
 
 // MarshalStruct marshals any struct containing ecs or packetbeat tags into the
 // given MapStr. Zero-value and nil fields are always omitted.
-func MarshalStruct(m mapstr.M, key string, val interface{}) error {
+func MarshalStruct(m mapstr.M, key string, val any) error {
 	return marshalStruct(m, key, reflect.ValueOf(val))
 }
 
 func marshalStruct(m mapstr.M, key string, val reflect.Value) error {
 	// Dereference pointers.
-	if val.Type().Kind() == reflect.Ptr {
+	if val.Type().Kind() == reflect.Pointer {
 		if val.IsNil() {
 			return nil
 		}
@@ -417,7 +414,7 @@ func marshalStruct(m mapstr.M, key string, val reflect.Value) error {
 
 	typ := val.Type()
 	// pre-emptively handle time
-	if reflect.TypeOf(time.Time{}) == typ {
+	if reflect.TypeFor[time.Time]() == typ {
 		_, err := m.Put(key, val.Interface())
 		if err != nil {
 			return fmt.Errorf("error creating time value: %w", err)
@@ -463,7 +460,7 @@ func marshalStruct(m mapstr.M, key string, val reflect.Value) error {
 			}
 			// look for a struct or pointer to a struct
 			// that reflect.Ptr check is needed so Elem() doesn't panic
-		} else if (structField.Type.Kind() == reflect.Ptr && fieldValue.Elem().Kind() == reflect.Struct) ||
+		} else if (structField.Type.Kind() == reflect.Pointer && fieldValue.Elem().Kind() == reflect.Struct) ||
 			structField.Type.Kind() == reflect.Struct {
 			if err := marshalStruct(m, key+"."+tag, fieldValue); err != nil {
 				return err
@@ -502,7 +499,7 @@ func isEmptyValue(v reflect.Value) bool {
 		return v.Uint() == 0
 	case reflect.Float32, reflect.Float64:
 		return v.Float() == 0
-	case reflect.Interface, reflect.Ptr:
+	case reflect.Interface, reflect.Pointer:
 		return v.IsNil()
 	}
 

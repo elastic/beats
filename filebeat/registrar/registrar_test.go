@@ -18,6 +18,7 @@
 package registrar
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -42,8 +43,12 @@ type testStateStore struct {
 	registry *statestore.Registry
 }
 
-func (s *testStateStore) StoreFor(string) (*statestore.Store, error) {
+func (s *testStateStore) StoreFor(_, _ string) (*statestore.Store, error) {
 	return s.registry.Get(testStoreName)
+}
+
+func (s *testStateStore) StoreKey(_, _ string) string {
+	return fmt.Sprintf("test:%p", s.registry)
 }
 
 func (s *testStateStore) CleanupInterval() time.Duration {

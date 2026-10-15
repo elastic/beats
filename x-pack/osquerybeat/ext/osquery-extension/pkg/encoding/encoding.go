@@ -6,6 +6,7 @@ package encoding
 
 import (
 	"fmt"
+	"maps"
 	"reflect"
 	"strconv"
 	"strings"
@@ -46,7 +47,7 @@ func MarshalToMapWithFlags(in any, flags EncodingFlag) (map[string]string, error
 	v := reflect.ValueOf(in)
 	t := reflect.TypeOf(in)
 
-	if v.Kind() == reflect.Ptr {
+	if v.Kind() == reflect.Pointer {
 		if v.IsNil() {
 			return nil, fmt.Errorf("input pointer is nil")
 		}
@@ -91,7 +92,7 @@ func MarshalToMapWithFlags(in any, flags EncodingFlag) (map[string]string, error
 		// and the tag will be empty.  We need to recurse into the embedded struct and merge the results.
 		if fieldType.Anonymous && tag == "" {
 			// Handle pointer to struct if necessary
-			if fieldValue.Kind() == reflect.Ptr {
+			if fieldValue.Kind() == reflect.Pointer {
 				if fieldValue.IsNil() {
 					continue
 				}
@@ -105,9 +106,7 @@ func MarshalToMapWithFlags(in any, flags EncodingFlag) (map[string]string, error
 					return nil, err
 				}
 				// Merge the embedded results into the current map
-				for k, v := range embeddedMap {
-					result[k] = v
-				}
+				maps.Copy(result, embeddedMap)
 				continue // Skip the rest of the loop for this field
 			}
 		}
@@ -141,7 +140,7 @@ func GenerateColumnDefinitions(in any) ([]table.ColumnDefinition, error) {
 	var columns []table.ColumnDefinition
 
 	// Handle pointer types by unwrapping to get the underlying type
-	if t.Kind() == reflect.Ptr {
+	if t.Kind() == reflect.Pointer {
 		t = t.Elem()
 	}
 
@@ -149,8 +148,7 @@ func GenerateColumnDefinitions(in any) ([]table.ColumnDefinition, error) {
 		return nil, fmt.Errorf("unsupported type: %s, must be a struct or pointer to struct", t.Kind())
 	}
 
-	for i := 0; i < t.NumField(); i++ {
-		fieldType := t.Field(i)
+	for fieldType := range t.Fields() {
 
 		if !fieldType.IsExported() {
 			continue
@@ -165,7 +163,7 @@ func GenerateColumnDefinitions(in any) ([]table.ColumnDefinition, error) {
 		if fieldType.Anonymous && key == "" {
 			// Get the embedded struct type, handling pointer to struct if necessary
 			embeddedType := fieldType.Type
-			if embeddedType.Kind() == reflect.Ptr {
+			if embeddedType.Kind() == reflect.Pointer {
 				embeddedType = embeddedType.Elem()
 			}
 
@@ -196,7 +194,7 @@ func GenerateColumnDefinitions(in any) ([]table.ColumnDefinition, error) {
 		fieldKind := fieldType.Type.Kind()
 
 		// Handle pointer types by unwrapping to get the underlying type
-		if fieldKind == reflect.Ptr {
+		if fieldKind == reflect.Pointer {
 			fieldKind = fieldType.Type.Elem().Kind()
 		}
 
@@ -220,7 +218,7 @@ func GenerateColumnDefinitions(in any) ([]table.ColumnDefinition, error) {
 		case reflect.Struct:
 			// Handle time.Time type
 			switch fieldType.Type {
-			case reflect.TypeOf(time.Time{}):
+			case reflect.TypeFor[time.Time]():
 				if timeFormat, ok := tag.Lookup("format"); ok {
 					switch strings.ToLower(timeFormat) {
 					case "unix", "unixnano", "unixmilli", "unixmicro":
@@ -248,7 +246,7 @@ func GenerateColumnDefinitions(in any) ([]table.ColumnDefinition, error) {
 // It also handles the EncodingFlagUseNumbersZeroValues flag and the tag format and tz attributes.
 func convertValueToStringWithTag(fieldValue reflect.Value, flag EncodingFlag, tag *reflect.StructTag) (string, error) {
 	// Handle pointers first
-	if fieldValue.Kind() == reflect.Ptr {
+	if fieldValue.Kind() == reflect.Pointer {
 		if fieldValue.IsNil() {
 			return "", nil
 		}
@@ -298,7 +296,7 @@ func convertValueToStringWithTag(fieldValue reflect.Value, flag EncodingFlag, ta
 	case reflect.Struct:
 		// Handle time.Time type
 		switch fieldValue.Type() {
-		case reflect.TypeOf(time.Time{}):
+		case reflect.TypeFor[time.Time]():
 			return formatTimeWithTagFormat(fieldValue, flag, tag)
 		default:
 			return "", fmt.Errorf("unsupported struct type: %s", fieldValue.Type())

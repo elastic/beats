@@ -8,6 +8,7 @@ package app_insights
 
 import (
 	"encoding/json"
+	"maps"
 	"time"
 )
 
@@ -88,7 +89,7 @@ type MetricsResultInfo struct {
 	End                  *time.Time
 	Interval             *string
 	Segments             *[]MetricsSegmentInfo
-	AdditionalProperties map[string]interface{}
+	AdditionalProperties map[string]any
 }
 
 // UnmarshalJSON splits the known fields from the catch-all properties.
@@ -124,9 +125,9 @@ func (m *MetricsResultInfo) UnmarshalJSON(data []byte) error {
 	if len(raw) == 0 {
 		return nil
 	}
-	m.AdditionalProperties = make(map[string]interface{}, len(raw))
+	m.AdditionalProperties = make(map[string]any, len(raw))
 	for k, v := range raw {
-		var val interface{}
+		var val any
 		if err := json.Unmarshal(v, &val); err != nil {
 			return err
 		}
@@ -139,10 +140,8 @@ func (m *MetricsResultInfo) UnmarshalJSON(data []byte) error {
 // single JSON object. Provided mainly for symmetry and tests; the API itself
 // only requires unmarshaling.
 func (m MetricsResultInfo) MarshalJSON() ([]byte, error) {
-	out := map[string]interface{}{}
-	for k, v := range m.AdditionalProperties {
-		out[k] = v
-	}
+	out := map[string]any{}
+	maps.Copy(out, m.AdditionalProperties)
 	if m.Start != nil {
 		out["start"] = m.Start
 	}
@@ -166,7 +165,7 @@ type MetricsSegmentInfo struct {
 	Start                *time.Time
 	End                  *time.Time
 	Segments             *[]MetricsSegmentInfo
-	AdditionalProperties map[string]interface{}
+	AdditionalProperties map[string]any
 }
 
 // UnmarshalJSON splits the known fields from the catch-all properties.
@@ -196,9 +195,9 @@ func (m *MetricsSegmentInfo) UnmarshalJSON(data []byte) error {
 	if len(raw) == 0 {
 		return nil
 	}
-	m.AdditionalProperties = make(map[string]interface{}, len(raw))
+	m.AdditionalProperties = make(map[string]any, len(raw))
 	for k, v := range raw {
-		var val interface{}
+		var val any
 		if err := json.Unmarshal(v, &val); err != nil {
 			return err
 		}
@@ -210,10 +209,8 @@ func (m *MetricsSegmentInfo) UnmarshalJSON(data []byte) error {
 // MarshalJSON merges the known fields and AdditionalProperties back into a
 // single JSON object.
 func (m MetricsSegmentInfo) MarshalJSON() ([]byte, error) {
-	out := map[string]interface{}{}
-	for k, v := range m.AdditionalProperties {
-		out[k] = v
-	}
+	out := map[string]any{}
+	maps.Copy(out, m.AdditionalProperties)
 	if m.Start != nil {
 		out["start"] = m.Start
 	}

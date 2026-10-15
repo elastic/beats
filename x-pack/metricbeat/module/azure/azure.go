@@ -75,7 +75,7 @@ var supportedMonitorMetricsets = []string{"monitor", "container_registry", "cont
 // NewMetricSet will instantiate a new azure metricset
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	metricsetName := base.Name()
-	config := createDefaultConfig()
+	var config Config
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
 		return nil, fmt.Errorf("error unpack raw module config using UnpackConfig: %w", err)
@@ -324,12 +324,7 @@ func hasConfigOptions(config []string) bool {
 	if config == nil {
 		return false
 	}
-	for _, group := range config {
-		if group == "" {
-			return false
-		}
-	}
-	return true
+	return !slices.Contains(config, "")
 }
 
 // calculateTimespan returns the start and end times for the metric values given

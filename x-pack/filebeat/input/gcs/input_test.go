@@ -43,7 +43,7 @@ const (
 func Test_StorageClient(t *testing.T) {
 	tests := []struct {
 		name        string
-		baseConfig  map[string]interface{}
+		baseConfig  map[string]any
 		mockHandler func() http.Handler
 		expected    map[string]bool
 		checkJSON   bool
@@ -51,13 +51,13 @@ func Test_StorageClient(t *testing.T) {
 	}{
 		{
 			name: "SingleBucketWithPoll_NoErr",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                2,
 				"poll":                       true,
 				"poll_interval":              "5s",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": "gcs-test-new",
 					},
@@ -72,13 +72,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "SingleBucketWithoutPoll_NoErr",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                2,
 				"poll":                       false,
 				"poll_interval":              "10s",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": bucketGcsTestNew,
 					},
@@ -93,13 +93,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "TwoBucketsWithPoll_NoErr",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                2,
 				"poll":                       true,
 				"poll_interval":              "5s",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": bucketGcsTestNew,
 					},
@@ -119,13 +119,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "TwoBucketsWithoutPoll_NoErr",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                2,
 				"poll":                       false,
 				"poll_interval":              "10s",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": bucketGcsTestNew,
 					},
@@ -145,13 +145,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "SingleBucketWithPoll_InvalidBucketErr",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                2,
 				"poll":                       true,
 				"poll_interval":              "5s",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": "gcs-test",
 					},
@@ -163,13 +163,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "SingleBucketWithoutPoll_InvalidBucketErr",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                2,
 				"poll":                       false,
 				"poll_interval":              "5s",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": "gcs-test",
 					},
@@ -181,13 +181,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "TwoBucketsWithPoll_InvalidBucketErr",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                2,
 				"poll":                       true,
 				"poll_interval":              "5s",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": "gcs-test",
 					},
@@ -202,13 +202,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "SingleBucketWithPoll_InvalidConfigValue",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                5100,
 				"poll":                       true,
 				"poll_interval":              "5s",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": "gcs-test",
 					},
@@ -220,13 +220,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "TwoBucketWithPoll_InvalidConfigValue",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                5100,
 				"poll":                       true,
 				"poll_interval":              "5s",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": "gcs-test",
 					},
@@ -241,14 +241,14 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "SingleBucketWithPoll_parseJSON",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                1,
 				"poll":                       true,
 				"poll_interval":              "5s",
 				"parse_json":                 true,
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": bucketGcsTestLatest,
 					},
@@ -263,13 +263,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "ReadJSON",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                1,
 				"poll":                       true,
 				"poll_interval":              "5s",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": beatsJSONBucket,
 					},
@@ -284,13 +284,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "ReadOctetStreamJSON",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                1,
 				"poll":                       true,
 				"poll_interval":              "5s",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": beatsMultilineJSONBucket,
 					},
@@ -304,13 +304,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "ReadNDJSON",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                1,
 				"poll":                       true,
 				"poll_interval":              "5s",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": beatsNdJSONBucket,
 					},
@@ -324,13 +324,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "ReadMultilineGzJSON",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                1,
 				"poll":                       true,
 				"poll_interval":              "5s",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": beatsGzJSONBucket,
 					},
@@ -344,13 +344,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "ReadJSONWithRootAsArray",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                1,
 				"poll":                       true,
 				"poll_interval":              "5s",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": beatsJSONWithArrayBucket,
 					},
@@ -366,14 +366,14 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "FilterByTimeStampEpoch",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                1,
 				"poll":                       true,
 				"poll_interval":              "5s",
 				"timestamp_epoch":            1661385600,
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": bucketGcsTestNew,
 					},
@@ -387,18 +387,18 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "FilterByFileSelectorRegexSingle",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                1,
 				"poll":                       true,
 				"poll_interval":              "5s",
-				"file_selectors": []map[string]interface{}{
+				"file_selectors": []map[string]any{
 					{
 						"regex": "docs/",
 					},
 				},
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": bucketGcsTestNew,
 					},
@@ -411,13 +411,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "FilterByFileSelectorRegexMulti",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                1,
 				"poll":                       true,
 				"poll_interval":              "5s",
-				"file_selectors": []map[string]interface{}{
+				"file_selectors": []map[string]any{
 					{
 						"regex": "docs/",
 					},
@@ -425,7 +425,7 @@ func Test_StorageClient(t *testing.T) {
 						"regex": "data",
 					},
 				},
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": bucketGcsTestNew,
 					},
@@ -439,19 +439,19 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "ExpandEventListFromField",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                   "elastic-sa",
 				"auth.credentials_file.path":   "testdata/gcs_creds.json",
 				"max_workers":                  1,
 				"poll":                         true,
 				"poll_interval":                "5s",
 				"expand_event_list_from_field": "Events",
-				"file_selectors": []map[string]interface{}{
+				"file_selectors": []map[string]any{
 					{
 						"regex": "events-array",
 					},
 				},
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": beatsJSONBucket,
 					},
@@ -465,16 +465,16 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "MultiContainerWithMultiFileSelectors",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                1,
 				"poll":                       true,
 				"poll_interval":              "5s",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": bucketGcsTestNew,
-						"file_selectors": []map[string]interface{}{
+						"file_selectors": []map[string]any{
 							{
 								"regex": "docs/",
 							},
@@ -482,7 +482,7 @@ func Test_StorageClient(t *testing.T) {
 					},
 					{
 						"name": bucketGcsTestLatest,
-						"file_selectors": []map[string]interface{}{
+						"file_selectors": []map[string]any{
 							{
 								"regex": "data_3",
 							},
@@ -498,18 +498,18 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "FilterByFileSelectorEmptyRegex",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                1,
 				"poll":                       true,
 				"poll_interval":              "5s",
-				"file_selectors": []map[string]interface{}{
+				"file_selectors": []map[string]any{
 					{
 						"regex": "",
 					},
 				},
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": bucketGcsTestNew,
 					},
@@ -524,13 +524,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "RetryWithDefaultValues",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                1,
 				"poll":                       true,
 				"poll_interval":              "1m",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": "gcs-test-new",
 					},
@@ -545,19 +545,19 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "RetryWithCustomValues",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                1,
 				"poll":                       true,
 				"poll_interval":              "10s",
-				"retry": map[string]interface{}{
+				"retry": map[string]any{
 					"max_attempts":             5,
 					"initial_backoff_duration": "1s",
 					"max_backoff_duration":     "3s",
 					"backoff_multiplier":       1.4,
 				},
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": "gcs-test-new",
 					},
@@ -572,19 +572,19 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "RetryMinimumValueCheck",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                1,
 				"poll":                       true,
 				"poll_interval":              "10s",
-				"retry": map[string]interface{}{
+				"retry": map[string]any{
 					"max_attempts":             5,
 					"initial_backoff_duration": "1s",
 					"max_backoff_duration":     "3s",
 					"backoff_multiplier":       1,
 				},
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": "gcs-test-new",
 					},
@@ -596,14 +596,14 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "BatchSizeGlobal",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"batch_size":                 3,
 				"max_workers":                2,
 				"poll":                       true,
 				"poll_interval":              "5s",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": "gcs-test-new",
 					},
@@ -618,13 +618,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "BatchSizeBucketLevel",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                2,
 				"poll":                       true,
 				"poll_interval":              "5s",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name":       "gcs-test-new",
 						"batch_size": 3,
@@ -640,7 +640,7 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "ReadCSVRootLevel",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                1,
@@ -648,7 +648,7 @@ func Test_StorageClient(t *testing.T) {
 				"poll_interval":              "10s",
 				"decoding.codec.csv.enabled": true,
 				"decoding.codec.csv.comma":   " ",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": beatsCSVBucket,
 					},
@@ -662,13 +662,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "ReadCSVBucketLevel",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                1,
 				"poll":                       true,
 				"poll_interval":              "10s",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name":                       beatsCSVBucket,
 						"decoding.codec.csv.enabled": true,
@@ -684,13 +684,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "CustomContentTypeUnsupported",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                2,
 				"poll":                       true,
 				"poll_interval":              "10s",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name":                  beatsGzJSONBucket,
 						"content_type":          "application/xyz-plain",
@@ -705,13 +705,13 @@ func Test_StorageClient(t *testing.T) {
 		},
 		{
 			name: "CustomContentTypeSupported",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                2,
 				"poll":                       true,
 				"poll_interval":              "10s",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name":         beatsGzJSONBucket,
 						"content_type": "application/x-gzip",
@@ -729,13 +729,13 @@ func Test_StorageClient(t *testing.T) {
 			// content-type already exists and we are not overriding it.
 			// So we expect a successful run.
 			name: "CustomContentTypeIgnored",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                2,
 				"poll":                       true,
 				"poll_interval":              "10s",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name":         beatsNdJSONBucket,
 						"content_type": "application/xyz-plain",
@@ -751,14 +751,14 @@ func Test_StorageClient(t *testing.T) {
 		{
 			// This checks if the root level content-type specifications are respected.
 			name: "CustomContentTypeAtRootLevel",
-			baseConfig: map[string]interface{}{
+			baseConfig: map[string]any{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "testdata/gcs_creds.json",
 				"max_workers":                2,
 				"poll":                       true,
 				"poll_interval":              "10s",
 				"content_type":               "application/x-gzip",
-				"buckets": []map[string]interface{}{
+				"buckets": []map[string]any{
 					{
 						"name": beatsGzJSONBucket,
 					},
@@ -835,7 +835,7 @@ func Test_StorageClient(t *testing.T) {
 					cancel()
 					return
 				case got := <-chanClient.Channel:
-					var val interface{}
+					var val any
 					var err error
 					if !tt.checkJSON {
 						val, err = got.Fields.GetValue("message")

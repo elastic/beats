@@ -36,7 +36,7 @@ func buildModulesManager(beat *beat.Beat) (cmd.ModulesManager, error) {
 	}
 
 	if !strings.HasSuffix(glob, "*.yml") {
-		return nil, fmt.Errorf("wrong settings for config.modules.path, it is expected to end with *.yml. Got: %s", glob)
+		return nil, fmt.Errorf("invalid config.modules.path setting: expected a value ending in *.yml; got: %s", glob)
 	}
 
 	modulesManager, err := cfgfile.NewGlobManager(glob, ".yml", ".disabled", beat.Info.Logger)

@@ -65,19 +65,19 @@ func newRetryLogger(log *logp.Logger) *retryLogger {
 	}
 }
 
-func (log *retryLogger) Error(msg string, keysAndValues ...interface{}) {
+func (log *retryLogger) Error(msg string, keysAndValues ...any) {
 	log.log.Errorw(msg, keysAndValues...)
 }
 
-func (log *retryLogger) Info(msg string, keysAndValues ...interface{}) {
+func (log *retryLogger) Info(msg string, keysAndValues ...any) {
 	log.log.Infow(msg, keysAndValues...)
 }
 
-func (log *retryLogger) Debug(msg string, keysAndValues ...interface{}) {
+func (log *retryLogger) Debug(msg string, keysAndValues ...any) {
 	log.log.Debugw(msg, keysAndValues...)
 }
 
-func (log *retryLogger) Warn(msg string, keysAndValues ...interface{}) {
+func (log *retryLogger) Warn(msg string, keysAndValues ...any) {
 	log.log.Warnw(msg, keysAndValues...)
 }
 
@@ -98,7 +98,7 @@ type redact struct {
 func (r redact) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	v, err := private.Redact(r.value, "", r.fields)
 	if err != nil {
-		return fmt.Errorf("could not redact value: %v", err)
+		return fmt.Errorf("could not redact value: %w", err)
 	}
 	return v.MarshalLogObject(enc)
 }
@@ -133,11 +133,11 @@ func (m mapstrM) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	return nil
 }
 
-func tryToMapStr(v interface{}) (mapstrM, bool) {
+func tryToMapStr(v any) (mapstrM, bool) {
 	switch m := v.(type) {
 	case mapstrM:
 		return m, true
-	case map[string]interface{}:
+	case map[string]any:
 		return mapstrM(m), true
 	default:
 		return nil, false
@@ -156,7 +156,8 @@ func test(url *url.URL) error {
 		return "80"
 	}()
 
-	_, err := net.DialTimeout("tcp", net.JoinHostPort(url.Hostname(), port), time.Second)
+	d := &net.Dialer{Timeout: time.Second}
+	_, err := d.DialContext(context.Background(), "tcp", net.JoinHostPort(url.Hostname(), port))
 	if err != nil {
 		return fmt.Errorf("url %q is unreachable", url)
 	}
@@ -234,7 +235,7 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 			return err
 		}
 	}
-	pagination := newPagination(cfg, client, ctx, log)
+	pagination := newPagination(cfg, client, ctx, log, ctx.Agent.UserAgent)
 	responseProcessor := newResponseProcessor(cfg, pagination, xmlDetails, metrics, ctx, log)
 	requester := newRequester(client, requestFactory, responseProcessor, metrics, ctx, log)
 
@@ -446,7 +447,8 @@ type socketDialer struct {
 }
 
 func (d socketDialer) Dial(_, _ string) (net.Conn, error) {
-	return net.Dial("unix", d.path)
+	var nd net.Dialer
+	return nd.DialContext(context.Background(), "unix", d.path)
 }
 
 func (d socketDialer) DialContext(ctx context.Context, _, _ string) (net.Conn, error) {
@@ -470,7 +472,7 @@ func checkRedirect(config *requestConfig, log *logp.Logger) func(*http.Request, 
 		prev := via[len(via)-1] // previous request to get headers from
 
 		log.Debugf("http client: forwarding headers from previous request: %#v", prev.Header)
-		req.Header = prev.Header.Clone()
+		req.Header = prev.Header.Clone() //nolint:gosec // G119: sensitive headers are removed below for cross-origin redirects via config.RedirectSensitiveHeaders
 
 		if req.URL.Host != prev.URL.Host || (prev.URL.Scheme == "https" && req.URL.Scheme == "http") {
 			for _, k := range config.RedirectSensitiveHeaders {

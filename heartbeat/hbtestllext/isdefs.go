@@ -32,7 +32,7 @@ import (
 )
 
 // IsTime checks that the value is a time.Time instance.
-var IsTime = isdef.Is("time", func(path llpath.Path, v interface{}) *llresult.Results {
+var IsTime = isdef.Is("time", func(path llpath.Path, v any) *llresult.Results {
 	_, ok := v.(time.Time)
 	if !ok {
 		return llresult.SimpleResult(path, false, "expected a time.Time")
@@ -40,7 +40,7 @@ var IsTime = isdef.Is("time", func(path llpath.Path, v interface{}) *llresult.Re
 	return llresult.ValidResult(path)
 })
 
-var IsInt64 = isdef.Is("positiveInt64", func(path llpath.Path, v interface{}) *llresult.Results {
+var IsInt64 = isdef.Is("positiveInt64", func(path llpath.Path, v any) *llresult.Results {
 	_, ok := v.(int64)
 	if !ok {
 		return llresult.SimpleResult(path, false, "expected an int64")
@@ -48,7 +48,7 @@ var IsInt64 = isdef.Is("positiveInt64", func(path llpath.Path, v interface{}) *l
 	return llresult.ValidResult(path)
 })
 
-var IsUint16 = isdef.Is("positiveUInt16", func(path llpath.Path, v interface{}) *llresult.Results {
+var IsUint16 = isdef.Is("positiveUInt16", func(path llpath.Path, v any) *llresult.Results {
 	_, ok := v.(uint16)
 	if !ok {
 		return llresult.SimpleResult(path, false, "expected a uint16")
@@ -56,7 +56,7 @@ var IsUint16 = isdef.Is("positiveUInt16", func(path llpath.Path, v interface{}) 
 	return llresult.ValidResult(path)
 })
 
-var IsMonitorState = isdef.Is("isState", func(path llpath.Path, v interface{}) *llresult.Results {
+var IsMonitorState = isdef.Is("isState", func(path llpath.Path, v any) *llresult.Results {
 	_, ok := v.(monitorstate.State)
 	if !ok {
 		return llresult.SimpleResult(path, false, "expected a monitorstate.State")
@@ -67,7 +67,7 @@ var IsMonitorState = isdef.Is("isState", func(path llpath.Path, v interface{}) *
 var IsMonitorStateInLocation = func(locName string) isdef.IsDef {
 	locPattern := fmt.Sprintf("^%s-[a-z0-9]+-0$", locName)
 	stateIdMatch := regexp.MustCompile(locPattern)
-	return isdef.Is("isState", func(path llpath.Path, v interface{}) *llresult.Results {
+	return isdef.Is("isState", func(path llpath.Path, v any) *llresult.Results {
 		s, ok := v.(monitorstate.State)
 		if !ok {
 			return llresult.SimpleResult(path, false, "expected a monitorstate.State")
@@ -81,7 +81,7 @@ var IsMonitorStateInLocation = func(locName string) isdef.IsDef {
 }
 
 var IsECSErr = func(expectedErr *ecserr.ECSErr) isdef.IsDef {
-	return isdef.Is("matches ECS ERR", func(path llpath.Path, v interface{}) *llresult.Results {
+	return isdef.Is("matches ECS ERR", func(path llpath.Path, v any) *llresult.Results {
 		// This conditional is a bit awkward, apparently there's a bug in lookslike where a pointer
 		// value is de-referenced, so a given *ecserr.ECSErr turns into an ecserr.ECSErr
 		var givenErr *ecserr.ECSErr
@@ -108,7 +108,7 @@ var IsECSErr = func(expectedErr *ecserr.ECSErr) isdef.IsDef {
 }
 
 var IsECSErrMatchingCode = func(ecode ecserr.ECode, messageContains string) isdef.IsDef {
-	return isdef.Is("matches ECS ERR", func(path llpath.Path, v interface{}) *llresult.Results {
+	return isdef.Is("matches ECS ERR", func(path llpath.Path, v any) *llresult.Results {
 		// This conditional is a bit awkward, apparently there's a bug in lookslike where a pointer
 		// value is de-referenced, so a given *ecserr.ECSErr turns into an ecserr.ECSErr
 		var givenErr *ecserr.ECSErr

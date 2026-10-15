@@ -19,10 +19,10 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -92,7 +92,7 @@ func main() {
 		}
 		logs, err = getLogsFromFile(*logfile, &c)
 		if err != nil {
-			os.Stderr.WriteString(fmt.Sprintf("Error while reading logs from file: %v\n", err))
+			fmt.Fprintf(os.Stderr, "Error while reading logs from file: %v\n", err)
 			os.Exit(2)
 		}
 	} else {
@@ -101,7 +101,7 @@ func main() {
 
 	paths, err := getPipelinePath(*path, *modulesPath)
 	if err != nil {
-		os.Stderr.WriteString(err.Error())
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(3)
 	}
 	if len(paths) == 0 {
@@ -117,7 +117,7 @@ func main() {
 		}
 		err = testPipeline(*esURL, path, logs, *verbose, *simulateVerbose)
 		if err != nil {
-			os.Stderr.WriteString(err.Error())
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(4)
 		}
 	}
@@ -137,7 +137,7 @@ func getLogsFromFile(logfile string, conf *logReaderConfig) ([]string, error) {
 
 	enc, err := encFactory(f)
 	if err != nil {
-		return nil, fmt.Errorf("failed to initialize encoding: %v", err)
+		return nil, fmt.Errorf("failed to initialize encoding: %w", err)
 	}
 
 	var r reader.Reader
@@ -192,7 +192,7 @@ func getPipelinePath(path, modulesPath string) ([]string, error) {
 	if err != nil {
 		parts := strings.Split(path, "/")
 		if len(parts) != 2 {
-			return nil, fmt.Errorf("Cannot find pipeline in %s\n", path)
+			return nil, fmt.Errorf("cannot find pipeline in %s", path)
 		}
 		module := parts[0]
 		fileset := parts[1]
@@ -206,13 +206,13 @@ func getPipelinePath(path, modulesPath string) ([]string, error) {
 			}
 		}
 		if err != nil {
-			return nil, fmt.Errorf("Cannot find pipeline in %s: %v %v\n", path, err, pathToPipeline)
+			return nil, fmt.Errorf("cannot find pipeline in %s (last candidate %s): %w", path, pathToPipeline, err)
 		}
 		return []string{pathToPipeline}, nil
 	}
 
 	if stat.IsDir() {
-		files, err := ioutil.ReadDir(path)
+		files, err := os.ReadDir(path)
 		if err != nil {
 			return nil, err
 		}
@@ -223,7 +223,7 @@ func getPipelinePath(path, modulesPath string) ([]string, error) {
 			}
 		}
 		if len(paths) == 0 {
-			return paths, fmt.Errorf("Cannot find pipeline in %s", path)
+			return paths, fmt.Errorf("cannot find pipeline in %s", path)
 		}
 		return paths, nil
 	}
@@ -247,17 +247,18 @@ func isPipelineFileExtension(path string) bool {
 func testPipeline(esURL, path string, logs []string, verbose, simulateVerbose bool) error {
 	pipeline, err := readPipeline(path)
 	if err != nil {
-		return fmt.Errorf("Error while reading pipeline: %v\n", err)
+		return fmt.Errorf("error while reading pipeline: %w", err)
 	}
 
 	resp, err := runSimulate(esURL, pipeline, logs, simulateVerbose)
 	if err != nil {
-		return fmt.Errorf("Error while sending request to Elasticsearch: %v\n", err)
+		return fmt.Errorf("error while sending request to Elasticsearch: %w", err)
 	}
+	defer resp.Body.Close()
 
 	err = showResp(resp, verbose, simulateVerbose)
 	if err != nil {
-		return fmt.Errorf("Error while reading response from Elasticsearch: %v\n", err)
+		return fmt.Errorf("error while reading response from Elasticsearch: %w", err)
 	}
 	return nil
 }
@@ -312,7 +313,13 @@ func runSimulate(url string, pipeline map[string]any, logs []string, verbose boo
 		simulateURL += "?verbose"
 	}
 
-	return client.Post(simulateURL, "application/json", strings.NewReader(payload))
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, simulateURL, strings.NewReader(payload))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	return client.Do(req)
 }
 
 func showResp(resp *http.Response, verbose, simulateVerbose bool) error {
@@ -321,7 +328,9 @@ func showResp(resp *http.Response, verbose, simulateVerbose bool) error {
 	}
 
 	b := new(bytes.Buffer)
-	b.ReadFrom(resp.Body)
+	if _, err := b.ReadFrom(resp.Body); err != nil {
+		return err
+	}
 	var r mapstr.M
 	err := json.Unmarshal(b.Bytes(), &r)
 	if err != nil {
@@ -329,7 +338,7 @@ func showResp(resp *http.Response, verbose, simulateVerbose bool) error {
 	}
 
 	if verbose {
-		fmt.Println(r.StringToPrint())
+		fmt.Fprintln(os.Stdout, r.StringToPrint())
 	} else {
 		docErrors, err := getDocErrors(r, simulateVerbose)
 		if err != nil {
@@ -337,7 +346,7 @@ func showResp(resp *http.Response, verbose, simulateVerbose bool) error {
 		}
 
 		for _, d := range docErrors {
-			fmt.Println(d.StringToPrint())
+			fmt.Fprintln(os.Stdout, d.StringToPrint())
 		}
 	}
 	return nil
@@ -349,7 +358,10 @@ func getDocErrors(r mapstr.M, simulateVerbose bool) ([]mapstr.M, error) {
 		return nil, err
 	}
 
-	docs := d.([]any)
+	docs, ok := d.([]any)
+	if !ok {
+		return nil, fmt.Errorf("expected docs to be a list, got %T", d)
+	}
 	if simulateVerbose {
 		return getErrorsSimulateVerbose(docs)
 	}
@@ -360,7 +372,10 @@ func getDocErrors(r mapstr.M, simulateVerbose bool) ([]mapstr.M, error) {
 func getRegularErrors(docs []any) ([]mapstr.M, error) {
 	var errors []mapstr.M
 	for _, d := range docs {
-		dd := d.(map[string]any)
+		dd, ok := d.(map[string]any)
+		if !ok {
+			return nil, fmt.Errorf("expected doc to be an object, got %T", d)
+		}
 		doc := mapstr.M(dd)
 		hasError, err := doc.HasKey("doc._source.error")
 		if err != nil {
@@ -377,19 +392,27 @@ func getRegularErrors(docs []any) ([]mapstr.M, error) {
 func getErrorsSimulateVerbose(docs []any) ([]mapstr.M, error) {
 	var errors []mapstr.M
 	for _, d := range docs {
-		pr := d.(map[string]any)
+		pr, ok := d.(map[string]any)
+		if !ok {
+			return nil, fmt.Errorf("expected doc to be an object, got %T", d)
+		}
 		p := mapstr.M(pr)
 
 		rr, err := p.GetValue("processor_results")
 		if err != nil {
 			return nil, err
 		}
-		res := rr.([]any)
-		hasError := false
+		res, ok := rr.([]any)
+		if !ok {
+			return nil, fmt.Errorf("expected processor_results to be a list, got %T", rr)
+		}
 		for _, r := range res {
-			rres := r.(map[string]any)
+			rres, ok := r.(map[string]any)
+			if !ok {
+				return nil, fmt.Errorf("expected processor result to be an object, got %T", r)
+			}
 			result := mapstr.M(rres)
-			hasError, _ = result.HasKey("error")
+			hasError, _ := result.HasKey("error")
 			if hasError {
 				errors = append(errors, p)
 			}

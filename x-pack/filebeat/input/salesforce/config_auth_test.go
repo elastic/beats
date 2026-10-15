@@ -17,13 +17,13 @@ func TestOAuth2Config(t *testing.T) {
 		config  UserPasswordFlow
 	}{
 		"auth disabled I":      {config: UserPasswordFlow{}, wantErr: nil},
-		"auth disabled II":     {config: UserPasswordFlow{Enabled: pointer(false)}, wantErr: nil},
-		"tokenURL missing":     {config: UserPasswordFlow{Enabled: pointer(true), TokenURL: ""}, wantErr: errors.New("token_url must be provided")},
-		"clientID missing":     {config: UserPasswordFlow{Enabled: pointer(true), TokenURL: "https://salesforce.com", ClientID: ""}, wantErr: errors.New("client.id must be provided")},
-		"clientSecret missing": {config: UserPasswordFlow{Enabled: pointer(true), TokenURL: "https://salesforce.com", ClientID: "xyz", ClientSecret: ""}, wantErr: errors.New("client.secret must be provided")},
-		"username missing":     {config: UserPasswordFlow{Enabled: pointer(true), TokenURL: "https://salesforce.com", ClientID: "xyz", ClientSecret: "abc", Username: ""}, wantErr: errors.New("username must be provided")},
-		"password missing":     {config: UserPasswordFlow{Enabled: pointer(true), TokenURL: "https://salesforce.com", ClientID: "xyz", ClientSecret: "abc", Username: "user", Password: ""}, wantErr: errors.New("password must be provided")},
-		"all present":          {config: UserPasswordFlow{Enabled: pointer(true), TokenURL: "https://salesforce.com", ClientID: "xyz", ClientSecret: "abc", Username: "user", Password: "pass"}, wantErr: nil},
+		"auth disabled II":     {config: UserPasswordFlow{Enabled: new(false)}, wantErr: nil},
+		"tokenURL missing":     {config: UserPasswordFlow{Enabled: new(true), TokenURL: ""}, wantErr: errors.New("token_url must be provided")},
+		"clientID missing":     {config: UserPasswordFlow{Enabled: new(true), TokenURL: "https://salesforce.com", ClientID: ""}, wantErr: errors.New("client.id must be provided")},
+		"clientSecret missing": {config: UserPasswordFlow{Enabled: new(true), TokenURL: "https://salesforce.com", ClientID: "xyz", ClientSecret: ""}, wantErr: errors.New("client.secret must be provided")},
+		"username missing":     {config: UserPasswordFlow{Enabled: new(true), TokenURL: "https://salesforce.com", ClientID: "xyz", ClientSecret: "abc", Username: ""}, wantErr: errors.New("username must be provided")},
+		"password missing":     {config: UserPasswordFlow{Enabled: new(true), TokenURL: "https://salesforce.com", ClientID: "xyz", ClientSecret: "abc", Username: "user", Password: ""}, wantErr: errors.New("password must be provided")},
+		"all present":          {config: UserPasswordFlow{Enabled: new(true), TokenURL: "https://salesforce.com", ClientID: "xyz", ClientSecret: "abc", Username: "user", Password: "pass"}, wantErr: nil},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -39,13 +39,13 @@ func TestJWTConfig(t *testing.T) {
 		config  JWTBearerFlow
 	}{
 		"auth disabled I":            {config: JWTBearerFlow{}, wantErr: nil},
-		"auth disabled II":           {config: JWTBearerFlow{Enabled: pointer(false)}, wantErr: nil},
-		"url missing":                {config: JWTBearerFlow{Enabled: pointer(true), URL: ""}, wantErr: errors.New("url must be provided")},
-		"clientID missing":           {config: JWTBearerFlow{Enabled: pointer(true), URL: "https://salesforce.com", ClientID: ""}, wantErr: errors.New("client.id must be provided")},
-		"clientUsername missing":     {config: JWTBearerFlow{Enabled: pointer(true), URL: "https://salesforce.com", ClientID: "xyz", ClientUsername: ""}, wantErr: errors.New("client.username must be provided")},
-		"clientKeyPath missing":      {config: JWTBearerFlow{Enabled: pointer(true), URL: "https://salesforce.com", ClientID: "xyz", ClientUsername: "abc", ClientKeyPath: ""}, wantErr: errors.New("client.key_path must be provided")},
-		"all present":                {config: JWTBearerFlow{Enabled: pointer(true), URL: "https://salesforce.com", ClientID: "xyz", ClientUsername: "abc", ClientKeyPath: "def"}, wantErr: nil},
-		"all present with token_url": {config: JWTBearerFlow{Enabled: pointer(true), URL: "https://login.salesforce.com", TokenURL: "https://mydomain.my.salesforce.com/services/oauth2/token", ClientID: "xyz", ClientUsername: "abc", ClientKeyPath: "def"}, wantErr: nil},
+		"auth disabled II":           {config: JWTBearerFlow{Enabled: new(false)}, wantErr: nil},
+		"url missing":                {config: JWTBearerFlow{Enabled: new(true), URL: ""}, wantErr: errors.New("url must be provided")},
+		"clientID missing":           {config: JWTBearerFlow{Enabled: new(true), URL: "https://salesforce.com", ClientID: ""}, wantErr: errors.New("client.id must be provided")},
+		"clientUsername missing":     {config: JWTBearerFlow{Enabled: new(true), URL: "https://salesforce.com", ClientID: "xyz", ClientUsername: ""}, wantErr: errors.New("client.username must be provided")},
+		"clientKeyPath missing":      {config: JWTBearerFlow{Enabled: new(true), URL: "https://salesforce.com", ClientID: "xyz", ClientUsername: "abc", ClientKeyPath: ""}, wantErr: errors.New("client.key_path must be provided")},
+		"all present":                {config: JWTBearerFlow{Enabled: new(true), URL: "https://salesforce.com", ClientID: "xyz", ClientUsername: "abc", ClientKeyPath: "def"}, wantErr: nil},
+		"all present with token_url": {config: JWTBearerFlow{Enabled: new(true), URL: "https://login.salesforce.com", TokenURL: "https://mydomain.my.salesforce.com/services/oauth2/token", ClientID: "xyz", ClientUsername: "abc", ClientKeyPath: "def"}, wantErr: nil},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
