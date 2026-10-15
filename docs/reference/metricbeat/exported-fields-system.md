@@ -1144,7 +1144,7 @@ Memory-specific statistics per process.
     format: bytes
 
 
-**`system.process.memory.phys_footprint`** {applies_to}`stack: ga 9.6.0`
+**`system.process.memory.footprint`** {applies_to}`stack: ga 9.6.0`
 :   The physical memory footprint of the process, the value shown in the MEM column of top and the Memory column of Activity Monitor (supported only on macOS).
 
     type: long

@@ -28,14 +28,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetOne_physFootprint(t *testing.T) {
+func TestGetOne_footprint(t *testing.T) {
 	const allocSize = 64 << 20
 
 	stats, err := initTestResolver(t)
 	require.NoError(t, err, "failed to init process stats")
 
-	before := physFootprint(t, &stats)
-	assert.Positive(t, before, "phys_footprint should be non-zero for the test process")
+	before := eventFootprint(t, &stats)
+	assert.Positive(t, before, "footprint should be non-zero for the test process")
 
 	// mmap keeps the Go allocator and GC from reusing or releasing memory
 	// during the measurement.
@@ -48,22 +48,22 @@ func TestGetOne_physFootprint(t *testing.T) {
 		buf[i] = 1
 	}
 
-	after := physFootprint(t, &stats)
+	after := eventFootprint(t, &stats)
 	assert.InDeltaf(t, float64(allocSize), float64(after)-float64(before), allocSize/4,
-		"phys_footprint should grow by about %d bytes after dirtying %d bytes of anonymous memory; before=%d after=%d",
+		"footprint should grow by about %d bytes after dirtying %d bytes of anonymous memory; before=%d after=%d",
 		allocSize, allocSize, before, after)
 }
 
-func physFootprint(t *testing.T, stats *Stats) uint64 {
+func eventFootprint(t *testing.T, stats *Stats) uint64 {
 	t.Helper()
 
 	event, err := stats.GetOne(os.Getpid())
 	require.NoError(t, err, "GetOne failed for the test process")
 
-	val, err := event.GetValue("memory.phys_footprint")
-	require.NoErrorf(t, err, "event has no memory.phys_footprint; memory: %v", event["memory"])
+	val, err := event.GetValue("memory.footprint")
+	require.NoErrorf(t, err, "event has no memory.footprint; memory: %v", event["memory"])
 
 	footprint, ok := val.(uint64)
-	require.Truef(t, ok, "memory.phys_footprint has type %T, want uint64", val)
+	require.Truef(t, ok, "memory.footprint has type %T, want uint64", val)
 	return footprint
 }

@@ -157,7 +157,7 @@ func GetInfoForPid(_ resolve.Resolver, pid int) (ProcState, error) {
 func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, filter func(string) bool) (ProcState, error) {
 	// error of getting the footprint shouldn't prevent collection of other data
 	if footprint, err := getPhysFootprint(pid); err == nil {
-		state.Memory.PhysFootprint = opt.UintWith(footprint)
+		state.Memory.Footprint = opt.UintWith(footprint)
 	}
 
 	args, exe, env, err := getProcArgs(pid, filter)

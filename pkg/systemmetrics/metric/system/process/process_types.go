@@ -109,8 +109,8 @@ type ProcMemInfo struct {
 	Share opt.Uint   `struct:"share,omitempty"`
 	Swap  opt.Uint   `struct:"swap,omitempty"`
 	Rss   MemBytePct `struct:"rss,omitempty"`
-	// PhysFootprint is only collected on macOS.
-	PhysFootprint opt.Uint `struct:"phys_footprint,omitempty"`
+	// Footprint is only collected on macOS.
+	Footprint opt.Uint `struct:"footprint,omitempty"`
 }
 
 // MemBytePct is the formatting struct for wrapping pct/byte metrics
