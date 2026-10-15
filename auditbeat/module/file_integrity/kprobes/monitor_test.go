@@ -489,6 +489,9 @@ func (p *monitorTestSuite) TestNew() {
 		return
 	}
 
+	// DEBUG: fail on purpose so gotestsum prints this test's log output.
+	defer p.T().Error("DEBUG: deliberate failure to expose the verification log")
+
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 
