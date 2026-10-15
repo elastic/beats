@@ -53,6 +53,7 @@ func getVerifiedProbes(ctx context.Context, timeout time.Duration, logger *logp.
 	}
 
 	var allErr error
+	attempt := 0
 	for len(specs) > 0 {
 
 		s := specs[0]
@@ -68,8 +69,12 @@ func getVerifiedProbes(ctx context.Context, timeout time.Duration, logger *logp.
 			continue
 		}
 
+		attempt++
+		logger.Infof("DEBUG verify attempt %d: %d specs remaining", attempt, len(specs))
 		if err := verify(ctx, fExec, probes, timeout, logger); err != nil {
-			if probeMgr.onErr(err) {
+			retry := probeMgr.onErr(err)
+			logger.Infof("DEBUG verify attempt %d failed: retry=%t err=%v", attempt, retry, err)
+			if retry {
 				continue
 			}
 			allErr = errors.Join(allErr, err)

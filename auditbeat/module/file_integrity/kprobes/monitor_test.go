@@ -47,6 +47,12 @@ type monitorTestSuite struct {
 }
 
 func Test_Monitor(t *testing.T) {
+	// DEBUG: make verification logs visible in CI and record the kernel.
+	if err := logp.DevelopmentSetup(logp.WithLevel(logp.InfoLevel)); err != nil {
+		t.Fatal(err)
+	}
+	version, _ := os.ReadFile("/proc/version")
+	t.Logf("kernel: %s", version)
 	suite.Run(t, &monitorTestSuite{Logger: logp.NewLogger("test_monitor")})
 }
 
