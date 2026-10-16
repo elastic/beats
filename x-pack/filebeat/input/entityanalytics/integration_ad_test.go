@@ -5,11 +5,15 @@
 package entityanalytics
 
 import (
+	"errors"
+	"fmt"
 	"net"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
+	"github.com/go-ldap/ldap/v3"
 	"github.com/jimlambrt/gldap"
 
 	ecad "github.com/elastic/entcollect/provider/ad"
@@ -270,23 +274,47 @@ type adLDAPServer struct {
 	fix *adFixture
 }
 
+// startADIntegLDAPServer starts a gldap server backed by fix and returns its
+// URL. gldap does not expose the address of its listener, so the port is
+// chosen by probing for a free one and then handing it to gldap. Another
+// process can claim the port in between, and gldap reports Ready even when
+// its listen fails, so each attempt is confirmed by binding to the server
+// and the whole start is retried on failure.
 func startADIntegLDAPServer(t *testing.T, fix *adFixture) string {
 	t.Helper()
 
-	srv := &adLDAPServer{fix: fix}
+	const attempts = 5
+	var lastErr error
+	for range attempts {
+		url, err := tryStartADIntegLDAPServer(t, fix)
+		if err == nil {
+			return url
+		}
+		lastErr = err
+		t.Logf("starting gldap server: %v; retrying", err)
+	}
+	t.Fatalf("gldap server did not start after %d attempts: %v", attempts, lastErr)
+	return ""
+}
+
+func tryStartADIntegLDAPServer(t *testing.T, fix *adFixture) (string, error) {
+	t.Helper()
 
 	s, err := gldap.NewServer()
 	if err != nil {
 		t.Fatalf("gldap new server: %v", err)
 	}
-	t.Cleanup(func() { _ = s.Stop() })
 
 	mux, err := gldap.NewMux()
 	if err != nil {
 		t.Fatalf("gldap new mux: %v", err)
 	}
 
+	// served is set when our own handler sees a bind, which distinguishes
+	// this server from any other process that holds the port.
+	var served atomic.Bool
 	if err := mux.Bind(func(w *gldap.ResponseWriter, r *gldap.Request) {
+		served.Store(true)
 		resp := r.NewBindResponse()
 		resp.SetResultCode(gldap.ResultSuccess)
 		_ = w.Write(resp)
@@ -294,6 +322,7 @@ func startADIntegLDAPServer(t *testing.T, fix *adFixture) string {
 		t.Fatalf("mux bind: %v", err)
 	}
 
+	srv := &adLDAPServer{fix: fix}
 	if err := mux.Search(srv.searchHandler(t)); err != nil {
 		t.Fatalf("mux search: %v", err)
 	}
@@ -314,18 +343,50 @@ func startADIntegLDAPServer(t *testing.T, fix *adFixture) string {
 	addr := ln.Addr().String()
 	ln.Close()
 
-	go func() { _ = s.Run(addr) }()
-	for range 100 {
-		if s.Ready() {
-			break
+	runErr := make(chan error, 1)
+	go func() { runErr <- s.Run(addr) }()
+
+	url := "ldap://" + addr
+	err = probeADIntegLDAPServer(url, runErr, &served)
+	if err != nil {
+		_ = s.Stop()
+		return "", err
+	}
+	t.Cleanup(func() { _ = s.Stop() })
+	return url, nil
+}
+
+// probeADIntegLDAPServer binds to the server at url and reports an error
+// unless the bind was handled by the server whose Run result is runErr.
+func probeADIntegLDAPServer(url string, runErr <-chan error, served *atomic.Bool) error {
+	deadline := time.Now().Add(5 * time.Second)
+	for {
+		select {
+		case err := <-runErr:
+			if err == nil {
+				return errors.New("server stopped before probe finished")
+			}
+			return fmt.Errorf("run: %w", err)
+		default:
+		}
+
+		conn, err := ldap.DialURL(url, ldap.DialWithDialer(&net.Dialer{Timeout: time.Second}))
+		if err == nil {
+			conn.SetTimeout(time.Second)
+			err = conn.Bind("cn=admin,dc=example,dc=com", "pass")
+			conn.Close()
+			if err == nil && served.Load() {
+				return nil
+			}
+			if err == nil {
+				return fmt.Errorf("port at %s is held by another process", url)
+			}
+		}
+		if time.Now().After(deadline) {
+			return fmt.Errorf("probing %s: %w", url, err)
 		}
 		time.Sleep(20 * time.Millisecond)
 	}
-	if !s.Ready() {
-		t.Fatal("gldap server not ready")
-	}
-
-	return "ldap://" + addr
 }
 
 func (s *adLDAPServer) searchHandler(t *testing.T) gldap.HandlerFunc {
