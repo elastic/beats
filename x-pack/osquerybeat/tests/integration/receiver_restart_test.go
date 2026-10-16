@@ -32,12 +32,16 @@ import (
 func TestReceiverRestartsAfterOsqueryExit78(t *testing.T) {
 	ensureOsquerydAvailable(t)
 	t.Cleanup(func() { oteltest.VerifyNoLeaks(t) })
+
+	// Set up the receiver and capture results identifying the active daemon.
 	home := receiverTestHome(t)
 	core, observed := observer.New(zapcore.DebugLevel)
 	host := &mockActionHost{MockHost: &oteltest.MockHost{}}
+
 	var resultMu sync.Mutex
 	var lastPID, socketPath string
 	var lastResultTime int64
+
 	logConsumer, err := consumer.NewLogs(func(_ context.Context, logs plog.Logs) error {
 		for _, resource := range logs.ResourceLogs().All() {
 			for _, scope := range resource.ScopeLogs().All() {
@@ -47,6 +51,7 @@ func TestReceiverRestartsAfterOsqueryExit78(t *testing.T) {
 					if !ok || result["extension_socket"] == nil || result["pid"] == nil {
 						continue
 					}
+
 					resultMu.Lock()
 					lastPID = fmt.Sprint(result["pid"])
 					socketPath = fmt.Sprint(result["extension_socket"])
@@ -60,6 +65,8 @@ func TestReceiverRestartsAfterOsqueryExit78(t *testing.T) {
 		return nil
 	})
 	require.NoError(t, err, "create restart consumer")
+
+	// Configure a scheduled query that reports the daemon PID and socket.
 	factory := osqreceiver.NewFactoryWithSettings(osqreceiver.Settings{Home: home})
 	cfg := &osqreceiver.Config{Beatconfig: map[string]any{
 		"path.home":                  home,
@@ -88,6 +95,8 @@ func TestReceiverRestartsAfterOsqueryExit78(t *testing.T) {
 			},
 		}},
 	}}
+
+	// Start the receiver and arrange shutdown and failure diagnostics.
 	rec, err := factory.CreateLogs(t.Context(), makeReceiverSettings(factory, "restart", core), cfg, logConsumer)
 	require.NoError(t, err, "create receiver")
 	require.NoError(t, rec.Start(t.Context(), host), "start receiver")
@@ -106,6 +115,7 @@ func TestReceiverRestartsAfterOsqueryExit78(t *testing.T) {
 			}
 		}
 	})
+
 	require.Eventually(t, func() bool {
 		resultMu.Lock()
 		defer resultMu.Unlock()
@@ -115,13 +125,16 @@ func TestReceiverRestartsAfterOsqueryExit78(t *testing.T) {
 	initialPID, initialSocket := lastPID, socketPath
 	resultMu.Unlock()
 
+	// Remove the live logger registration to provoke native exit 78.
 	cli, err := osquery.NewClient(initialSocket, 3*time.Second, osquery.MaxWaitTime(3*time.Second))
 	require.NoError(t, err, "connect to the live daemon for logger fault injection")
 	defer cli.Close()
+
 	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
 	defer cancel()
 	extensions, err := cli.ExtensionsContext(ctx)
 	require.NoError(t, err, "list live daemon extension registrations")
+
 	var removed bool
 	for id, extension := range extensions {
 		if extension.Name != "osqextman" {
@@ -136,6 +149,8 @@ func TestReceiverRestartsAfterOsqueryExit78(t *testing.T) {
 	require.True(t, removed, "the receiver's osqextman registration must exist before fault injection")
 	cli.Close()
 	faultAt := time.Now().Unix()
+
+	// Verify the exit, a replacement daemon, and newly executed results.
 	require.Eventually(t, func() bool {
 		for _, entry := range observed.FilterMessageSnippet("Failed to run osqueryd").All() {
 			if strings.Contains(entry.Message, "exit status 78") {
@@ -144,11 +159,13 @@ func TestReceiverRestartsAfterOsqueryExit78(t *testing.T) {
 		}
 		return false
 	}, 30*time.Second, 100*time.Millisecond, "the real osqueryd process must exit with status 78 after its logger route fails")
+
 	require.Eventually(t, func() bool {
 		resultMu.Lock()
 		defer resultMu.Unlock()
 		return lastPID != initialPID && lastResultTime > faultAt
 	}, time.Minute, 100*time.Millisecond, "the receiver must start a replacement daemon and publish newly executed results")
+
 	for _, event := range host.GetEvents() {
 		assert.NotEqual(t, componentstatus.StatusPermanentError, event.Status(), "exit 78 must not permanently fail the receiver")
 		assert.NotEqual(t, componentstatus.StatusFatalError, event.Status(), "exit 78 must not fatally fail the receiver")

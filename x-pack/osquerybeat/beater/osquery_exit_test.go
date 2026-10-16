@@ -23,45 +23,65 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
-func TestOsqueryExitHelper(t *testing.T) {
-	if code := os.Getenv("OSQUERY_TEST_EXIT"); code != "" {
-		value, err := strconv.Atoi(code)
-		if err != nil {
-			os.Exit(2)
-		}
-		os.Exit(value)
-	}
-}
-
-func osqueryExitError(t *testing.T, code int) error {
-	t.Helper()
-	executable, err := os.Executable()
-	require.NoError(t, err, "locate the test executable")
-	command := exec.CommandContext(t.Context(), executable, "-test.run=^TestOsqueryExitHelper$")
-	command.Env = append(os.Environ(), "OSQUERY_TEST_EXIT="+strconv.Itoa(code))
-	err = command.Run()
-	require.Error(t, err, "helper must exit unsuccessfully")
-	var exitError *exec.ExitError
-	require.ErrorAs(t, err, &exitError, "helper must produce a real process exit error")
-	return err
-}
-
-func TestOsqueryExitClassification(t *testing.T) {
+func TestOsqueryExit(t *testing.T) {
 	exit78 := osqueryExitError(t, 78)
 	otherExit := osqueryExitError(t, 1)
+
+	t.Run("classification", func(t *testing.T) { testOsqueryExitClassification(t, exit78, otherExit) })
+	t.Run("runtime_exit_78_then_startup_failure", func(t *testing.T) { testOsqueryRunnerRuntimeExit78ThenStartupFailure(t, exit78) })
+	t.Run("readiness_during_exit_cleanup", func(t *testing.T) { testOsqueryReadinessDuringExitCleanup(t, exit78) })
+}
+
+func testOsqueryExitClassification(t *testing.T, exit78, otherExit error) {
+	t.Helper()
 	for _, tc := range []struct {
 		name        string
 		ready       bool
 		err         error
 		recoverable bool
 	}{
-		{"startup exit 78", false, exit78, false},
-		{"runtime exit 78", true, exit78, true},
-		{"wrapped runtime exit 78", true, fmt.Errorf("process: %w", exit78), true},
-		{"other runtime exit", true, otherExit, false},
-		{"cancelled runtime exit", true, errors.Join(context.Canceled, exit78), false},
-		{"deadline runtime exit", true, errors.Join(context.DeadlineExceeded, exit78), false},
-		{"clean exit", true, nil, false},
+		{
+			name:        "startup_exit_78",
+			ready:       false,
+			err:         exit78,
+			recoverable: false,
+		},
+		{
+			name:        "runtime_exit_78",
+			ready:       true,
+			err:         exit78,
+			recoverable: true,
+		},
+		{
+			name:        "wrapped_runtime_exit_78",
+			ready:       true,
+			err:         fmt.Errorf("process: %w", exit78),
+			recoverable: true,
+		},
+		{
+			name:        "other_runtime_exit",
+			ready:       true,
+			err:         otherExit,
+			recoverable: false,
+		},
+		{
+			name:        "cancelled_runtime_exit",
+			ready:       true,
+			err:         errors.Join(context.Canceled, exit78),
+			recoverable: false,
+		},
+		{
+			name:        "deadline_runtime_exit",
+			ready:       true,
+			err:         errors.Join(context.DeadlineExceeded, exit78),
+			recoverable: false,
+		},
+		{
+			name:        "clean_exit",
+			ready:       true,
+			err:         nil,
+			recoverable: false,
+		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			var state osqueryRunState
@@ -77,8 +97,8 @@ func TestOsqueryExitClassification(t *testing.T) {
 	}
 }
 
-func TestOsqueryRunnerRuntimeExit78ThenStartupFailure(t *testing.T) {
-	exit78 := osqueryExitError(t, 78)
+func testOsqueryRunnerRuntimeExit78ThenStartupFailure(t *testing.T, exit78 error) {
+	t.Helper()
 	ctx, cancel := context.WithCancel(t.Context())
 	defer cancel()
 	var runs atomic.Int32
@@ -128,8 +148,8 @@ func (r *delayedCleanupRunner) Run(ctx context.Context, _ osqd.Flags, onExit fun
 	return r.err
 }
 
-func TestOsqueryReadinessDuringExitCleanup(t *testing.T) {
-	exit78 := osqueryExitError(t, 78)
+func testOsqueryReadinessDuringExitCleanup(t *testing.T, exit78 error) {
+	t.Helper()
 	for _, initiallyReady := range []bool{false, true} {
 		t.Run(fmt.Sprintf("ready=%v", initiallyReady), func(t *testing.T) {
 			ctx, cancel := context.WithCancel(t.Context())
@@ -163,4 +183,30 @@ func TestOsqueryReadinessDuringExitCleanup(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestOsqueryExitHelper runs only in a subprocess to produce a real exec.ExitError.
+func TestOsqueryExitHelper(t *testing.T) {
+	code := os.Getenv("OSQUERY_TEST_EXIT")
+	if code == "" {
+		t.Skip("exit code helper is not a test")
+	}
+	value, err := strconv.Atoi(code)
+	if err != nil {
+		os.Exit(2)
+	}
+	os.Exit(value)
+}
+
+func osqueryExitError(t *testing.T, code int) error {
+	t.Helper()
+	executable, err := os.Executable()
+	require.NoError(t, err, "locate the test executable")
+	command := exec.CommandContext(t.Context(), executable, "-test.run=^TestOsqueryExitHelper$")
+	command.Env = append(os.Environ(), "OSQUERY_TEST_EXIT="+strconv.Itoa(code))
+	err = command.Run()
+	require.Error(t, err, "helper must exit unsuccessfully")
+	var exitError *exec.ExitError
+	require.ErrorAs(t, err, &exitError, "helper must produce a real process exit error")
+	return err
 }
