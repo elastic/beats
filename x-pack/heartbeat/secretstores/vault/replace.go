@@ -25,11 +25,10 @@ var referencePattern = regexp.MustCompile(`(^|[^A-Za-z0-9+.\-])vault://([A-Za-z0
 // Validate checks the references in the monitor config cfg without
 // contacting Vault.
 func (s *store) Validate(cfg *conf.C) error {
-	m, err := unpackAsText(cfg)
+	m, _, err := referenceSettings(cfg)
 	if err != nil {
 		return err
 	}
-	decodeSettings(m, parseYAMLAsText)
 	return walkSettings(m, func(v string) (string, error) {
 		return replaceReferences(v, func(content string) (string, error) {
 			_, _, err := parseReference(content)
@@ -44,31 +43,17 @@ func (s *store) Validate(cfg *conf.C) error {
 // Replace returns a copy of the monitor config cfg with the vault references
 // replaced by their values. Without references, cfg is returned as is.
 func (s *store) Replace(ctx context.Context, cfg *conf.C) (*conf.C, error) {
-	text, err := unpackAsText(cfg)
+	m, resolveErr, err := referenceSettings(cfg)
 	if err != nil {
 		return nil, err
 	}
-	// Decode first: base64 settings can hold the only references.
-	decodeSettings(text, parseYAMLAsText)
-	if !containsReferences(text) {
+	if !containsReferences(m) {
 		return cfg, nil
 	}
-
-	// The process-wide options resolve keystore and environment references.
-	var m map[string]any
-	if err := cfg.Unpack(&m); err != nil {
-		return nil, fmt.Errorf("could not read monitor config: %w", err)
+	if resolveErr != nil {
+		return nil, fmt.Errorf("could not read monitor config: %w", resolveErr)
 	}
-	decodeSettings(m, func(name string, raw []byte) (map[string]any, error) {
-		// Same parsing as the plugin, so keystore and environment references
-		// in the decoded content still resolve.
-		c, err := conf.NewConfigWithYAML(raw, name)
-		if err != nil {
-			return nil, err
-		}
-		var obj map[string]any
-		return obj, c.Unpack(&obj)
-	})
+
 	err = walkSettings(m, func(v string) (string, error) {
 		return replaceReferences(v, func(content string) (string, error) {
 			return s.resolve(ctx, content)
@@ -87,20 +72,41 @@ func (s *store) Replace(ctx context.Context, cfg *conf.C) (*conf.C, error) {
 	return (*conf.C)(resolved), nil
 }
 
+// referenceSettings returns the settings of cfg to look for references in,
+// with the encodedSettings holding references decoded. The process-wide
+// options resolve keystore and environment references, so their values can
+// be references too. If one of them doesn't resolve, resolveErr is its error
+// and m keeps them as text: the plugin reports the error of a monitor
+// without references.
+func referenceSettings(cfg *conf.C) (m map[string]any, resolveErr error, err error) {
+	if resolveErr = cfg.Unpack(&m); resolveErr == nil {
+		decodeSettings(m, parseYAML)
+		return m, nil, nil
+	}
+	m = nil
+	// ResolveNOOP returns ${...} expressions as text and never fails.
+	if err := (*ucfg.Config)(cfg).Unpack(&m, ucfg.PathSep("."), ucfg.ResolveNOOP); err != nil {
+		return nil, nil, fmt.Errorf("could not read monitor config: %w", err)
+	}
+	decodeSettings(m, parseYAMLAsText)
+	return m, resolveErr, nil
+}
+
+// parseYAML parses a decoded setting as the plugin does, so keystore and
+// environment references in the decoded content resolve.
+func parseYAML(name string, raw []byte) (map[string]any, error) {
+	c, err := conf.NewConfigWithYAML(raw, name)
+	if err != nil {
+		return nil, err
+	}
+	var obj map[string]any
+	return obj, c.Unpack(&obj)
+}
+
 // parseYAMLAsText parses a decoded setting keeping ${...} expressions as text.
 func parseYAMLAsText(_ string, raw []byte) (map[string]any, error) {
 	var obj map[string]any
 	return obj, yaml.Unmarshal(raw, &obj)
-}
-
-// unpackAsText unpacks cfg keeping ${...} expressions as text.
-func unpackAsText(cfg *conf.C) (map[string]any, error) {
-	var m map[string]any
-	// ResolveNOOP returns ${...} expressions as text and never fails.
-	if err := (*ucfg.Config)(cfg).Unpack(&m, ucfg.PathSep("."), ucfg.ResolveNOOP); err != nil {
-		return nil, fmt.Errorf("could not read monitor config: %w", err)
-	}
-	return m, nil
 }
 
 // replaceReferences replaces the references in s with the values returned by

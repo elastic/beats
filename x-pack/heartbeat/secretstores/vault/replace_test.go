@@ -62,8 +62,17 @@ func TestReplaceReferences(t *testing.T) {
 	}
 }
 
+// textSettings unpacks cfg keeping ${...} expressions as text.
+func textSettings(t *testing.T, cfg *conf.C) map[string]any {
+	t.Helper()
+	var m map[string]any
+	require.NoError(t, (*ucfg.Config)(cfg).Unpack(&m, ucfg.PathSep("."), ucfg.ResolveNOOP), "the config must unpack")
+	return m
+}
+
 func TestReplace(t *testing.T) {
 	t.Setenv("VAULT_TEST_ENV", "from-env")
+	t.Setenv("VAULT_TEST_REF", "vault://app/creds#user")
 	s, _ := newReplaceTestStore(t)
 	const user = "vault://app/creds#user"
 	script := "step('login', () => page.fill('#pw', 'vault://app/creds#token'))"
@@ -114,6 +123,21 @@ func TestReplace(t *testing.T) {
 			want: map[string]any{"source": map[string]any{"inline": map[string]any{"script": script}}, "params": map[string]any{"account": "bob"}},
 		},
 		{
+			name: "reference in an environment variable",
+			cfg:  map[string]any{"v": "${VAULT_TEST_REF}"},
+			want: map[string]any{"v": "bob"},
+		},
+		{
+			name:      "unresolved environment variable without references",
+			cfg:       map[string]any{"v": "${VAULT_TEST_MISSING}"},
+			unchanged: true,
+		},
+		{
+			name:    "unresolved environment variable with references",
+			cfg:     map[string]any{"v": "${VAULT_TEST_MISSING}", "w": user},
+			wantErr: "could not read monitor config: missing field accessing 'v'",
+		},
+		{
 			name:      "no references",
 			cfg:       map[string]any{"urls": []any{"https://example.com/#frag"}},
 			unchanged: true,
@@ -132,19 +156,15 @@ func TestReplace(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			cfg := newMonitorConfig(t, tc.cfg)
-			before, err := unpackAsText(cfg)
-			require.NoError(t, err, "the config must unpack")
+			before := textSettings(t, cfg)
 
 			got, err := s.Replace(context.Background(), cfg)
 			if tc.wantErr != "" {
-				assert.EqualError(t, err, tc.wantErr, "replacement must fail")
+				assert.ErrorContains(t, err, tc.wantErr, "replacement must fail")
 				return
 			}
 			require.NoError(t, err, "references must resolve")
-
-			after, err := unpackAsText(cfg)
-			require.NoError(t, err, "the config must unpack")
-			assert.Equal(t, before, after, "the original config must not be modified")
+			assert.Equal(t, before, textSettings(t, cfg), "the original config must not be modified")
 
 			if tc.unchanged {
 				assert.Same(t, cfg, got, "a config without references must be returned as is")
@@ -158,6 +178,7 @@ func TestReplace(t *testing.T) {
 }
 
 func TestValidate(t *testing.T) {
+	t.Setenv("VAULT_TEST_BAD_REF", "vault://bad")
 	s, fv := newReplaceTestStore(t)
 
 	tests := []struct {
@@ -169,6 +190,7 @@ func TestValidate(t *testing.T) {
 		{name: "unresolved env", cfg: map[string]any{"target": "${missing.env}:vault://app/creds#token"}},
 		{name: "inline script", cfg: map[string]any{"source": map[string]any{"inline": map[string]any{"script": "'vault://bad'"}}}},
 		{name: "invalid", cfg: map[string]any{"target": "vault://app/creds"}, wantErr: "vault: invalid reference vault://app/creds: must have the form"},
+		{name: "invalid in an environment variable", cfg: map[string]any{"target": "${VAULT_TEST_BAD_REF}"}, wantErr: "invalid reference vault://bad"},
 		{name: "invalid in base64 ntlm", cfg: map[string]any{"ntlm": toBase64("password: vault://bad\n")}, wantErr: "invalid reference vault://bad"},
 	}
 	for _, tc := range tests {
