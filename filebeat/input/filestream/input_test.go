@@ -428,6 +428,31 @@ paths:
 	}
 }
 
+func TestConfigure_FollowReplacements(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	srcIdentifier, err := loginp.NewSourceIdentifier(pluginName, "test")
+	require.NoError(t, err)
+
+	tests := map[string]struct {
+		extra string
+		want  bool
+	}{
+		"fingerprint identity":      {want: true},
+		"native identity":           {extra: "file_identity.native: ~"},
+		"fingerprint with deletion": {extra: "delete.enabled: true"},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			cfg := conf.MustNewConfigFrom(fmt.Sprintf("type: filestream\nid: test\npaths: [/var/log/foo]\n%s\n", tc.extra))
+			_, harvester, err := configure(cfg, logger, srcIdentifier, nil)
+			require.NoError(t, err)
+			fs, ok := harvester.(*filestream)
+			require.True(t, ok, "configure must return a *filestream")
+			assert.Equal(t, tc.want, fs.followReplacements, "followReplacements")
+		})
+	}
+}
+
 // TestConfigure_SliceBudget asserts configure only bounds ReadSlice's duration
 // (filestream.sliceBudget, at close.on_state_change.check_interval) when
 // something depends on Poll running while a file stays continuously busy:
