@@ -82,13 +82,15 @@ func parseBatchCursorTime(raw string) (time.Time, error) {
 //     (i.e. the user toggled batch.enabled off and back on), the start is
 //     projected forward to the latest of the three so the first re-enabled
 //     window doesn't replay events the unbatched path already drained.
-//  2. first_event_time - legacy real-time module watermark. Used the first
-//     time the batched path runs on an install that was previously using
-//     the unbatched real-time template (login / logout), so upgrades resume
-//     from the last seen event instead of skipping or replaying data.
-//  3. last_event_time - same idea as first_event_time, for templates that
-//     only persisted last_event_time.
-//  4. runEnd - batch.initial_interval - clean-install fallback when no
+//  2. the newer of first_event_time / last_event_time - legacy real-time
+//     module watermarks. Used the first time the batched path runs on an
+//     install that was previously using the unbatched real-time template, so
+//     upgrades resume from the last seen event instead of skipping or
+//     replaying data. The newer of the two is taken so the seed is correct
+//     regardless of sort order: descending templates (login / logout) persist
+//     the newest row as first_event_time, ascending templates (aura_request)
+//     persist it as last_event_time.
+//  3. runEnd - batch.initial_interval - clean-install fallback when no
 //     cursor is persisted.
 //
 // The window end is start + batch.window, clamped to runEnd. The returned
@@ -112,16 +114,17 @@ func (s *salesforceInput) nextObjectBatchWindow(runEnd time.Time) (objectBatchWi
 			return objectBatchWindow{}, false, err
 		}
 		start = laterBatchStart(ts, s.cursor.Object.FirstEventTime, s.cursor.Object.LastEventTime)
-	case !isZero(s.cursor.Object.FirstEventTime):
-		// Legacy object collection resumed from first_event_time. Seed the first
-		// batched window from that watermark so upgrades don't skip or replay data.
-		ts, err := parseBatchCursorTime(s.cursor.Object.FirstEventTime)
-		if err != nil {
-			return objectBatchWindow{}, false, err
-		}
-		start = ts
-	case !isZero(s.cursor.Object.LastEventTime):
-		ts, err := parseBatchCursorTime(s.cursor.Object.LastEventTime)
+	case !isZero(s.cursor.Object.FirstEventTime) || !isZero(s.cursor.Object.LastEventTime):
+		// Legacy (pre-batch) object collection resumed from first_event_time
+		// and/or last_event_time. Seed the first batched window from the newer
+		// of the two so upgrades resume from the latest observed event
+		// regardless of the template's sort order: login / logout order by
+		// EventDate DESC and persist the newest row as first_event_time, while
+		// aura_request orders by Timestamp ASC and persists the newest row as
+		// last_event_time. Seeding from first_event_time alone would restart an
+		// ascending stream from the oldest row of the last pre-upgrade poll and
+		// replay the whole range.
+		ts, err := latestLegacyBatchWatermark(s.cursor.Object.FirstEventTime, s.cursor.Object.LastEventTime)
 		if err != nil {
 			return objectBatchWindow{}, false, err
 		}
@@ -165,6 +168,30 @@ func laterBatchStart(progressTS time.Time, fallbacks ...string) time.Time {
 		}
 	}
 	return start
+}
+
+// latestLegacyBatchWatermark returns the newer of the legacy first_event_time
+// and last_event_time watermarks, parsing whichever are present. Unlike
+// laterBatchStart (which treats legacy fields as best-effort hints layered on
+// an authoritative progress_time), this is the sole seed for the first batched
+// window after an upgrade, so a present-but-unparseable watermark is surfaced
+// as an error. Failing loud lets an operator see and fix corrupt state instead
+// of silently falling back to the initial-interval default and skipping data.
+func latestLegacyBatchWatermark(first, last string) (time.Time, error) {
+	var latest time.Time
+	for _, raw := range []string{first, last} {
+		if isZero(raw) {
+			continue
+		}
+		ts, err := parseBatchCursorTime(raw)
+		if err != nil {
+			return time.Time{}, err
+		}
+		if ts.After(latest) {
+			latest = ts
+		}
+	}
+	return latest, nil
 }
 
 // objectBatchConfig returns the Object method's batchConfig. It returns an
