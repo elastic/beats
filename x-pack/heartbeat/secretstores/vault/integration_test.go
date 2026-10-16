@@ -90,7 +90,7 @@ func TestIntegrationResolve(t *testing.T) {
 	fx := setupVault(t)
 
 	entries := map[string]map[string]any{
-		"token": {"address": itAddress(), "auth": map[string]any{"token": map[string]any{"value": itRootToken}}},
+		"token": {"address": itAddress(), "auth": map[string]any{"token": itRootToken}},
 		"approle": {"address": itAddress(), "auth": map[string]any{"approle": map[string]any{
 			"role_id": fx.roleID, "secret_id": fx.secretID,
 		}}},

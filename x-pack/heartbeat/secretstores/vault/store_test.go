@@ -17,11 +17,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/yaml.v3"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/secretstores"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/redact"
 )
 
 const (
@@ -183,7 +185,7 @@ func (fv *fakeVault) lastRequest() *http.Request {
 }
 
 func tokenEntry(address string) map[string]any {
-	return map[string]any{"address": address, "auth": map[string]any{"token": map[string]any{"value": testToken}}}
+	return map[string]any{"address": address, "auth": map[string]any{"token": testToken}}
 }
 
 func appRoleEntry(address string) map[string]any {
@@ -235,7 +237,7 @@ func TestRegistered(t *testing.T) {
 	cfg, err := conf.NewConfigFrom(map[string]any{
 		"type":                 "http",
 		"header":               "vault://myapp/creds",
-		secretstores.ConfigKey: []any{map[string]any{"type": storeType, "address": "https://vault:8200", "auth": map[string]any{"token": map[string]any{"value": testToken}}}},
+		secretstores.ConfigKey: []any{map[string]any{"type": storeType, "address": "https://vault:8200", "auth": map[string]any{"token": testToken}}},
 	})
 	require.NoError(t, err, "test config must be valid")
 	err = secretstores.NewResolver(logptest.NewTestingLogger(t, "")).Validate(cfg)
@@ -250,20 +252,20 @@ func TestConfigValidation(t *testing.T) {
 	}{
 		{name: "token", entry: tokenEntry("https://vault:8200")},
 		{name: "approle", entry: appRoleEntry("http://vault:8200")},
-		{name: "missing address", entry: map[string]any{"auth": map[string]any{"token": map[string]any{"value": "x"}}}, wantErr: "'address' is required"},
-		{name: "bad address", entry: map[string]any{"address": "vault:8200", "auth": map[string]any{"token": map[string]any{"value": "x"}}}, wantErr: "must be an http or https URL"},
+		{name: "missing address", entry: map[string]any{"auth": map[string]any{"token": "x"}}, wantErr: "'address' is required"},
+		{name: "bad address", entry: map[string]any{"address": "vault:8200", "auth": map[string]any{"token": "x"}}, wantErr: "must be an http or https URL"},
 		{name: "no auth", entry: map[string]any{"address": "https://vault"}, wantErr: "'auth' must have one method"},
 		{
 			name: "two auth methods",
 			entry: map[string]any{"address": "https://vault", "auth": map[string]any{
-				"token":   map[string]any{"value": "x"},
+				"token":   "x",
 				"approle": map[string]any{"role_id": "r", "secret_id": "s"},
 			}},
 			wantErr: "exactly one method",
 		},
-		{name: "empty token", entry: map[string]any{"address": "https://vault", "auth": map[string]any{"token": map[string]any{"value": ""}}}, wantErr: "'auth.token.value' is required"},
+		{name: "empty token", entry: map[string]any{"address": "https://vault", "auth": map[string]any{"token": ""}}, wantErr: "'auth' must have one method"},
 		{name: "approle without secret_id", entry: map[string]any{"address": "https://vault", "auth": map[string]any{"approle": map[string]any{"role_id": "r"}}}, wantErr: "are required"},
-		{name: "empty kv_mount", entry: map[string]any{"address": "https://vault", "kv_mount": "", "auth": map[string]any{"token": map[string]any{"value": "x"}}}, wantErr: "'kv_mount' must not be empty"},
+		{name: "empty kv_mount", entry: map[string]any{"address": "https://vault", "kv_mount": "", "auth": map[string]any{"token": "x"}}, wantErr: "'kv_mount' must not be empty"},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -283,6 +285,38 @@ func TestConfigDefaults(t *testing.T) {
 	s, _, _ := newTestStore(t, appRoleEntry("https://vault:8200"), nil)
 	assert.Equal(t, "secret", s.cfg.KVMount, "kv_mount must default to secret")
 	assert.Equal(t, "approle", s.cfg.Auth.AppRole.MountPath, "approle mount_path must default to approle")
+}
+
+// TestCredentialsAreRedacted checks that the Elastic Agent diagnostics
+// redact the credentials of a secret_stores entry: they only redact strings
+// under keys such as token or secret_id.
+func TestCredentialsAreRedacted(t *testing.T) {
+	entries := map[string]map[string]any{
+		"token":   tokenEntry("https://vault:8200"),
+		"approle": appRoleEntry("https://vault:8200"),
+	}
+	for name, entry := range entries {
+		t.Run(name, func(t *testing.T) {
+			cfg, err := conf.NewConfigFrom(entry)
+			require.NoError(t, err, "test entry must be valid")
+			_, err = newStore(cfg, logptest.NewTestingLogger(t, ""))
+			require.NoError(t, err, "the entry must be a valid config")
+
+			// The diagnostics redact YAML content, as the agent does.
+			raw, err := yaml.Marshal(map[string]any{"secret_stores": []any{entry}})
+			require.NoError(t, err, "entry must marshal")
+			var content map[string]any
+			require.NoError(t, yaml.Unmarshal(raw, &content), "entry must unmarshal")
+			redact.Redact(content)
+			redacted, err := yaml.Marshal(content)
+			require.NoError(t, err, "redacted entry must marshal")
+
+			for _, credential := range []string{testToken, testSecretID} {
+				assert.NotContains(t, string(redacted), credential, "credentials must be redacted")
+			}
+			assert.Contains(t, string(redacted), redact.REDACTED, "the entry must have redacted values")
+		})
+	}
 }
 
 func TestTokenAuth(t *testing.T) {

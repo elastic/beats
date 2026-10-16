@@ -132,8 +132,8 @@ func newClient(c config) (*vaultapi.Client, error) {
 	if c.Namespace != "" {
 		client.SetNamespace(c.Namespace)
 	}
-	if c.Auth.Token != nil {
-		client.SetToken(c.Auth.Token.Value)
+	if c.Auth.Token != "" {
+		client.SetToken(c.Auth.Token)
 	}
 	return client, nil
 }

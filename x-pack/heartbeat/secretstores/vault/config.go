@@ -23,14 +23,12 @@ type config struct {
 	Auth      authConfig `config:"auth"`
 }
 
-// authConfig holds exactly one authentication method.
+// authConfig holds exactly one authentication method. Each credential is a
+// string under a key that the Elastic Agent diagnostics redact, such as
+// token or secret_id.
 type authConfig struct {
-	Token   *tokenConfig   `config:"token"`
+	Token   string         `config:"token"`
 	AppRole *appRoleConfig `config:"approle"`
-}
-
-type tokenConfig struct {
-	Value string `config:"value"`
 }
 
 type appRoleConfig struct {
@@ -58,12 +56,10 @@ func (c *config) validate() error {
 	}
 
 	switch {
-	case c.Auth.Token != nil && c.Auth.AppRole != nil:
+	case c.Auth.Token != "" && c.Auth.AppRole != nil:
 		return errors.New("'auth' must have exactly one method, got both 'token' and 'approle'")
-	case c.Auth.Token != nil:
-		if c.Auth.Token.Value == "" {
-			return errors.New("'auth.token.value' is required")
-		}
+	case c.Auth.Token != "":
+		// The token is the whole method.
 	case c.Auth.AppRole != nil:
 		if c.Auth.AppRole.RoleID == "" || c.Auth.AppRole.SecretID == "" {
 			return errors.New("'auth.approle.role_id' and 'auth.approle.secret_id' are required")
