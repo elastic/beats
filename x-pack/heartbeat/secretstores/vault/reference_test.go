@@ -31,6 +31,15 @@ func TestParseReference(t *testing.T) {
 		{content: "app#to%zzken", wantErr: "invalid field"},
 		{content: "prod@app/creds#token", wantErr: "named connections are not supported yet"},
 		{content: "app/creds#user%40example", wantPath: "app/creds", wantField: "user@example"},
+		{content: "%2Fapp/creds%2F#token", wantPath: "app/creds", wantField: "token"},
+		{content: "a..b/c.d#token", wantPath: "a..b/c.d", wantField: "token"},
+		{content: "app#..", wantPath: "app", wantField: ".."},
+		{content: "../other/data/prod#password", wantErr: `path must not have "." or ".." segments`},
+		{content: "app/../../other#password", wantErr: `path must not have "." or ".." segments`},
+		{content: "app/./creds#password", wantErr: `path must not have "." or ".." segments`},
+		{content: "app/..#password", wantErr: `path must not have "." or ".." segments`},
+		{content: "..%2Fother#password", wantErr: `path must not have "." or ".." segments`},
+		{content: "%2E%2E/other#password", wantErr: `path must not have "." or ".." segments`},
 	}
 	for _, tc := range tests {
 		t.Run(tc.content, func(t *testing.T) {

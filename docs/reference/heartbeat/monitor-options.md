@@ -125,7 +125,7 @@ Example:
 
 Use the `secret_stores` option to read secrets from an external secret store when the monitor runs, instead of writing them in the monitor configuration. Heartbeat supports HashiCorp Vault KV v2 secrets.
 
-Reference a secret as `vault://<path>#<field>` in any string setting of the monitor. A reference can be part of a longer value, such as `"Bearer vault://my-app/api#token"`. The path is relative to `kv_mount`. Percent-encode `#` and `@` in the path or field, as `%23` and `%40`. A reference can also be the value of a [keystore](/reference/heartbeat/keystore.md) or environment variable.
+Reference a secret as `vault://<path>#<field>` in any string setting of the monitor. A reference can be part of a longer value, such as `"Bearer vault://my-app/api#token"`. The path is relative to `kv_mount` and can't contain `.` or `..` segments. Percent-encode `#` and `@` in the path or field, as `%23` and `%40`. A reference can also be the value of a [keystore](/reference/heartbeat/keystore.md) or environment variable.
 
 Example:
 
