@@ -20,12 +20,18 @@ import (
 type Config struct {
 	// BeatAuthConfig contains the unmatched extension settings decoded by the
 	// Collector. They must be decoded again using the Beats config parser.
-	BeatAuthConfig  map[string]any `mapstructure:",remain"`
-	ContinueOnError bool           `mapstructure:"continue_on_error"`
+	BeatAuthConfig map[string]any `mapstructure:",remain"`
+
+	// ContinueOnError when enabled report the errors on authenticator.Start,
+	// so the Otel collector still starts and errors are still clearly reported.
+	ContinueOnError bool `mapstructure:"continue_on_error"`
 
 	// Endpoints contains optional, fully resolved Elasticsearch HTTP(S)
 	// endpoints.
 	Endpoints []string `mapstructure:"endpoints,omitempty"`
+
+	// validateErr holds the error from Validate when continue_on_error is true
+	validateErr error
 }
 
 type BeatsAuthConfig struct {
@@ -38,14 +44,26 @@ func createDefaultConfig() component.Config {
 }
 
 // Validate validates optional Elasticsearch endpoints and authentication.
-func (c *Config) Validate() error {
+// If ContinueOnError is true, validation errors are deferred to Start.
+func (c *Config) Validate() (err error) {
+	defer func() {
+		// Start installs an error round-tripper when ContinueOnError is
+		// enabled, so configuration errors must be deferred to it.
+		c.validateErr = err
+		if c.ContinueOnError {
+			err = nil
+		}
+	}()
+
 	for _, endpoint := range c.Endpoints {
 		u, err := parseHTTPURL(endpoint)
 		if err != nil {
 			return fmt.Errorf("invalid endpoint: %w", err)
 		}
 		if u.User != nil {
-			return errors.New("endpoint userinfo is unsupported; configure auth.username and auth.password instead")
+			return errors.New(
+				"endpoint userinfo is unsupported; configure auth.username " +
+					"and auth.password instead")
 		}
 	}
 
