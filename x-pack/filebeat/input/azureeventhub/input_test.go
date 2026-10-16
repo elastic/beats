@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/Azure/go-autorest/autorest/azure"
-	"go.opentelemetry.io/collector/pdata/pcommon"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 
@@ -25,7 +24,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -134,12 +132,13 @@ func (c *fakeClient) PublishAll(event []beat.Event) {
 }
 
 // conversionClient is a fake beat.Client that mimics the otel output in the
-// beat receiver runtime: it keeps converting the first published event on a
-// separate goroutine while the input goes on publishing the next ones.
+// beat receiver runtime: it keeps reading the first published event on a
+// separate goroutine while the input goes on publishing the next ones. Like
+// the otelconsumer output, it reads the event by cloning its fields.
 //
 // If the input mutates a map shared with an already published event, the
-// conversion triggers "concurrent map iteration and map write" (or a data
-// race report when running with -race).
+// read triggers "concurrent map iteration and map write" (or a data race
+// report when running with -race).
 type conversionClient struct {
 	stop      chan struct{}
 	done      chan error
@@ -164,10 +163,7 @@ func (c *conversionClient) Publish(event beat.Event) {
 	go func() {
 		close(ready)
 		for {
-			if err := otelmap.FromMapstr(pcommon.NewMap(), event.Fields); err != nil {
-				c.done <- err
-				return
-			}
+			_ = event.Fields.Clone()
 			select {
 			case <-c.stop:
 				c.done <- nil
