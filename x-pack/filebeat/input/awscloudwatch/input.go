@@ -117,6 +117,9 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 		if in.config.AWSConfig.FIPSEnabled {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
+		if in.config.AWSConfig.Endpoint != "" {
+			o.BaseEndpoint = awssdk.String(in.config.AWSConfig.Endpoint)
+		}
 	})
 
 	if len(logGroupIDs) == 0 {
