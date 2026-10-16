@@ -504,7 +504,7 @@ func populateToFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 
 func populateContactFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 	if contact, found := m.headers["contact"]; found && len(contact) > 0 {
-		displayInfo, uri, params := parseFromToContact(m.to)
+		displayInfo, uri, params := parseFromToContact(contact[0])
 		fields.ContactDisplayInfo = displayInfo
 		fields.ContactExpires, _ = strconv.Atoi(string(params["expires"]))
 		fields.ContactQ, _ = strconv.ParseFloat(string(params["q"]), 64)

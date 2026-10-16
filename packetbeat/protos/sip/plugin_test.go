@@ -147,12 +147,12 @@ func TestParseUDP(t *testing.T) {
 	fields := *gotEvent
 
 	assert.Equal(t, common.NetString("1-2187@10.0.2.20"), getVal(fields, "sip.call_id"))
-	assert.Equal(t, common.NetString("test"), getVal(fields, "sip.contact.display_info"))
-	assert.Equal(t, common.NetString("10.0.2.15"), getVal(fields, "sip.contact.uri.host"))
-	assert.Equal(t, common.NetString("sip:test@10.0.2.15:5060"), getVal(fields, "sip.contact.uri.original"))
+	assert.Equal(t, nil, getVal(fields, "sip.contact.display_info"))
+	assert.Equal(t, common.NetString("10.0.2.20"), getVal(fields, "sip.contact.uri.host"))
+	assert.Equal(t, common.NetString("sip:sipp@10.0.2.20:5060"), getVal(fields, "sip.contact.uri.original"))
 	assert.Equal(t, 5060, getVal(fields, "sip.contact.uri.port"))
 	assert.Equal(t, common.NetString("sip"), getVal(fields, "sip.contact.uri.scheme"))
-	assert.Equal(t, common.NetString("test"), getVal(fields, "sip.contact.uri.username"))
+	assert.Equal(t, common.NetString("sipp"), getVal(fields, "sip.contact.uri.username"))
 	assert.Equal(t, 123, getVal(fields, "sip.content_length"))
 	assert.Equal(t, common.NetString("application/sdp"), getVal(fields, "sip.content_type"))
 	assert.Equal(t, 1, getVal(fields, "sip.cseq.code"))
