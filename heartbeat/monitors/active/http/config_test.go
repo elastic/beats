@@ -74,6 +74,35 @@ var tests = []struct {
 	},
 }
 
+func TestResponseConfigValidateBodyMaxBytes(t *testing.T) {
+	base := responseConfig{
+		IncludeBody:         "never",
+		IncludeBodyMaxBytes: 2048,
+	}
+
+	for _, tc := range []struct {
+		name      string
+		value     int
+		wantError bool
+	}{
+		{"positive value is valid", 1, false},
+		{"default 4MiB is valid", 4 * 1024 * 1024, false},
+		{"zero is invalid", 0, true},
+		{"negative is invalid", -1, true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := base
+			cfg.CheckBodyMaxBytes = tc.value
+			err := cfg.Validate()
+			if tc.wantError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
 func TestConfigValidate(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
