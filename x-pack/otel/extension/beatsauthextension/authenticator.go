@@ -32,11 +32,12 @@ import (
 )
 
 var (
-	_                  EndpointsProvider        = (*authenticator)(nil)
-	_                  extensionauth.HTTPClient = (*authenticator)(nil)
-	_                  extensionauth.GRPCClient = (*authenticator)(nil)
-	_                  extension.Extension      = (*authenticator)(nil)
-	ErrInvalidAuthType                          = errors.New("invalid authentication type")
+	ErrInvalidAuthType = errors.New("invalid authentication type")
+
+	_ EndpointsProvider        = (*authenticator)(nil)
+	_ extensionauth.HTTPClient = (*authenticator)(nil)
+	_ extensionauth.GRPCClient = (*authenticator)(nil)
+	_ extension.Extension      = (*authenticator)(nil)
 )
 
 // roundTripperProvider is an interface that provides a RoundTripper
@@ -71,7 +72,7 @@ func newAuthenticator(cfg *Config, telemetry component.TelemetrySettings) (*auth
 	return auth, nil
 }
 
-func (a *authenticator) Start(_ context.Context, host component.Host) error {
+func (a *authenticator) Start(_ context.Context, host component.Host) (err error) {
 	switch {
 	case a == nil:
 		return fmt.Errorf("authenticator is nil")
@@ -80,21 +81,34 @@ func (a *authenticator) Start(_ context.Context, host component.Host) error {
 	}
 
 	var provider roundTripperProvider
+	// Handle errors and continue_on_error.
+	defer func() {
+		if a.cfg.validateErr != nil {
+			err = a.cfg.validateErr
+		}
+
+		if err != nil {
+			componentstatus.ReportStatus(host, componentstatus.NewPermanentErrorEvent(err))
+			a.logger.Warnf("%s", err.Error())
+
+			if a.cfg.ContinueOnError {
+				provider = &errorRoundTripperProvider{err: err}
+				err = nil
+			}
+		} else {
+			componentstatus.ReportStatus(host, componentstatus.NewEvent(componentstatus.StatusOK))
+		}
+
+		a.rtProvider = provider
+	}()
+
 	prov, err := getHttpClient(a)
 	if err != nil {
-		componentstatus.ReportStatus(host, componentstatus.NewPermanentErrorEvent(err))
-		err = fmt.Errorf("failed creating http client: %w", err)
-		if !a.cfg.ContinueOnError {
-			return err
-		}
-		a.logger.Warnf("%s", err.Error())
-		provider = &errorRoundTripperProvider{err: err}
-	} else {
-		componentstatus.ReportStatus(host, componentstatus.NewEvent(componentstatus.StatusOK))
-		provider = prov
+		return err
 	}
 
-	a.rtProvider = provider
+	provider = prov
+
 	return nil
 }
 

@@ -286,6 +286,123 @@ func TestAuthenticator(t *testing.T) {
 	}
 }
 
+func TestContinueOnError(t *testing.T) {
+	tests := []struct {
+		name      string
+		config    *Config
+		errString string
+	}{
+		{
+			name: "invalid endpoint",
+			config: &Config{
+				ContinueOnError: true,
+				Endpoints:       []string{"tcp://es.example:9200"},
+			},
+			errString: "URL scheme must be http or https",
+		},
+		{
+			name: "incompatible authentication settings",
+			config: &Config{
+				ContinueOnError: true,
+				BeatAuthConfig: map[string]any{
+					"auth": map[string]any{
+						"api_key":  "api-key",
+						"username": "elastic",
+						"password": "password",
+					},
+				},
+			},
+			errString: "cannot set both api_key and username/password",
+		},
+		{
+			name: "invalid TLS certificate",
+			config: &Config{
+				ContinueOnError: true,
+				BeatAuthConfig: map[string]any{
+					"ssl": map[string]any{
+						"enabled":     true,
+						"certificate": "/nonexistent/cert.pem",
+						"key":         "/nonexistent/key.pem",
+					},
+				},
+			},
+			errString: "failed unpacking config",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			require.NoError(
+				t,
+				tc.config.Validate(),
+				"validation must succeed when continue_on_error is enabled",
+			)
+			require.ErrorContains(
+				t,
+				tc.config.validateErr,
+				tc.errString,
+				"validation error must be deferred to Start",
+			)
+
+			core, observed := observer.New(zapcore.WarnLevel)
+			settings := componenttest.NewNopTelemetrySettings()
+			settings.Logger = zap.New(core)
+
+			auth, err := newAuthenticator(tc.config, settings)
+			require.NoError(t, err, "authenticator creation must succeed")
+
+			var events []*componentstatus.Event
+			host := &mockHost{
+				extensions: extensionsMap{component.NewID(Type): auth},
+				reportStatusFunc: func(event *componentstatus.Event) {
+					events = append(events, event)
+				},
+			}
+
+			require.NoError(
+				t,
+				auth.Start(t.Context(), host),
+				"start must succeed when continue_on_error is enabled",
+			)
+
+			require.Len(t, events, 1, "start must report one status event")
+			require.Equal(
+				t,
+				componentstatus.StatusPermanentError,
+				events[0].Status(),
+				"start must report a permanent error status",
+			)
+			require.ErrorIs(
+				t,
+				events[0].Err(),
+				tc.config.validateErr,
+				"status event must report the deferred validation error",
+			)
+
+			roundTripper, err := auth.RoundTripper(nil)
+			require.NoError(t, err, "started authenticator must provide a transport")
+
+			request, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://example.com", nil)
+			require.NoError(t, err, "request creation must succeed")
+
+			response, err := roundTripper.RoundTrip(request)
+			require.Nil(t, response, "error transport must not return a response")
+			require.ErrorIs(
+				t,
+				err,
+				tc.config.validateErr,
+				"error transport must return the deferred validation error",
+			)
+
+			warnings := observed.
+				FilterLevelExact(zapcore.WarnLevel).
+				FilterMessageSnippet(tc.config.validateErr.Error()).
+				All()
+			require.Len(t, warnings, 1, "deferred validation error must be logged once at warn level")
+		})
+	}
+}
+
 // startTestServer starts a HTTP server for testing using the provided
 // certificates
 //
