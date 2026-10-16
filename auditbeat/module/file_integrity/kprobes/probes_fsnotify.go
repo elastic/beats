@@ -34,8 +34,10 @@ type fsNotifySymbol struct {
 	inodeProbeFilter  string
 	dentryProbeFilter string
 	pathProbeFilter   string
-	lastOnErr         error
-	seenSpecs         map[*tkbtf.Spec]struct{}
+	// retriedErrs holds the verification errors already retried for the
+	// current spec, so each filter adjustment is attempted only once.
+	retriedErrs map[error]struct{}
+	seenSpecs   map[*tkbtf.Spec]struct{}
 }
 
 func loadFsNotifySymbol(probeMgr *probeManager) error {
@@ -126,7 +128,7 @@ func (sym *fsNotifySymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc,
 			sym.seenSpecs = make(map[*tkbtf.Spec]struct{})
 		}
 
-		sym.lastOnErr = nil
+		sym.retriedErrs = nil
 		// reset probe filters for each new spec
 		// this probes shouldn't cause any ErrVerifyOverlappingEvents or ErrVerifyMissingEvents
 		// for linux kernel versions linux 5.17+, thus we start from here. To see how we handle all
@@ -228,14 +230,14 @@ func (sym *fsNotifySymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc,
 }
 
 func (sym *fsNotifySymbol) onErr(err error) bool {
-	if sym.lastOnErr != nil && errors.Is(err, sym.lastOnErr) {
-		return false
-	}
-
-	sym.lastOnErr = err
-
+	// verify wraps the verifier errors, so retries are tracked per sentinel
+	// rather than per error value; otherwise every failure looks new and
+	// getVerifiedProbes retries the same spec forever.
 	switch {
 	case errors.Is(err, ErrVerifyOverlappingEvents):
+		if !sym.markRetried(ErrVerifyOverlappingEvents) {
+			return false
+		}
 
 		// on ErrVerifyOverlappingEvents for linux kernel versions < 5.7 the __fsnotify_parent
 		// probe is capturing and sending the modify events as well, thus disable them for
@@ -246,6 +248,9 @@ func (sym *fsNotifySymbol) onErr(err error) bool {
 
 		return true
 	case errors.Is(err, ErrVerifyMissingEvents):
+		if !sym.markRetried(ErrVerifyMissingEvents) {
+			return false
+		}
 
 		// on ErrVerifyMissingEvents for linux kernel versions 5.10 - 5.16 the __fsnotify_parent
 		// probe is not capturing and sending the modify attributes events for directories, thus
@@ -259,4 +264,17 @@ func (sym *fsNotifySymbol) onErr(err error) bool {
 	default:
 		return false
 	}
+}
+
+// markRetried records sentinel as retried for the current spec and reports
+// whether it had not been retried before.
+func (sym *fsNotifySymbol) markRetried(sentinel error) bool {
+	if _, ok := sym.retriedErrs[sentinel]; ok {
+		return false
+	}
+	if sym.retriedErrs == nil {
+		sym.retriedErrs = make(map[error]struct{})
+	}
+	sym.retriedErrs[sentinel] = struct{}{}
+	return true
 }
