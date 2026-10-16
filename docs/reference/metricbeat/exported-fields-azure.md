@@ -328,6 +328,18 @@ billing and usage details
     type: date
 
 
+**`azure.billing.fetch_id`**
+:   Identifier of the metricset run that produced the event. All usage detail and forecast events of one run share it and the same `@timestamp`, so a complete run can be told apart from earlier runs that re-fetched the same days.
+
+    type: keyword
+
+
+**`azure.billing.scope`**
+:   The Azure scope the data was queried for: the subscription, department, or billing account.
+
+    type: keyword
+
+
 **`azure.compute_vm.*.*`**
 :   compute_vm
 
