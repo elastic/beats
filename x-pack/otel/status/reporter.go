@@ -7,8 +7,7 @@ package status
 import (
 	"errors"
 	"sync"
-
-	"go.opentelemetry.io/collector/pdata/pcommon"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
 
@@ -18,18 +17,23 @@ import (
 
 const inputStatusAttributesKey = "inputs"
 
+// defaultMinReportInterval bounds how often the aggregated status is reported.
+// Each report covers every runner, so reporting per runner update is quadratic
+// with the number of runners.
+const defaultMinReportInterval = time.Second
+
 type runnerState struct {
 	state status.Status
 	msg   string
 }
 
-// toPdata converts a runnerState to a pdata.Map
+// raw converts a runnerState to the map reported for its input.
 // The format is the same as the healthcheckv2 extension
-func toPdata(r *runnerState) pcommon.Map {
-	pcommonMap := pcommon.NewMap()
-	pcommonMap.PutStr("status", beatStatusToOtelStatus(r.state).String())
-	pcommonMap.PutStr("error", r.msg)
-	return pcommonMap
+func (r *runnerState) raw() map[string]any {
+	return map[string]any{
+		"status": beatStatusToOtelStatus(r.state).String(),
+		"error":  r.msg,
+	}
 }
 
 // RunnerReporter defines an interface that returns a StatusReporter for a specific runner.
@@ -45,6 +49,11 @@ type reporter struct {
 	runnerStates map[string]*runnerState
 	host         component.Host
 	mtx          sync.Mutex
+
+	minInterval time.Duration
+	lastReport  time.Time
+	// pending is set while a trailing report is scheduled.
+	pending *time.Timer
 }
 
 // NewGroupStatusReporter creates a reporter that aggregates the statuses of multiple runners
@@ -52,9 +61,14 @@ type reporter struct {
 // This is needed because multiple modules can report different statuses, and we want to avoid
 // repeatedly flipping the parent's status.
 func NewGroupStatusReporter(host component.Host) RunnerReporter {
+	return newGroupStatusReporter(host, defaultMinReportInterval)
+}
+
+func newGroupStatusReporter(host component.Host, minInterval time.Duration) *reporter {
 	return &reporter{
 		host:         host,
 		runnerStates: make(map[string]*runnerState),
+		minInterval:  minInterval,
 	}
 }
 
@@ -74,6 +88,9 @@ func (r *reporter) updateStatusForRunner(id string, state status.Status, msg str
 		r.runnerStates = make(map[string]*runnerState)
 	}
 	if rState, ok := r.runnerStates[id]; ok {
+		if rState.state == state && rState.msg == msg {
+			return
+		}
 		rState.msg = msg
 		rState.state = state
 	} else {
@@ -84,9 +101,32 @@ func (r *reporter) updateStatusForRunner(id string, state status.Status, msg str
 		}
 	}
 
-	// report aggregated status for all sub-components
-	evt := r.calculateOtelStatus()
-	componentstatus.ReportStatus(r.host, evt)
+	r.scheduleReportLocked()
+}
+
+// scheduleReportLocked reports the aggregated status of all sub-components, at
+// most once per minInterval. A report that is due too early is sent once the
+// interval has passed, covering every update made in the meantime.
+func (r *reporter) scheduleReportLocked() {
+	if r.pending != nil {
+		return
+	}
+	wait := r.minInterval - time.Since(r.lastReport)
+	if wait <= 0 {
+		r.reportLocked()
+		return
+	}
+	r.pending = time.AfterFunc(wait, func() {
+		r.mtx.Lock()
+		defer r.mtx.Unlock()
+		r.pending = nil
+		r.reportLocked()
+	})
+}
+
+func (r *reporter) reportLocked() {
+	r.lastReport = time.Now()
+	componentstatus.ReportStatus(r.host, r.calculateOtelStatus())
 }
 
 // UpdateStatus reports the overall status of the group.
@@ -119,12 +159,14 @@ func (r *reporter) calculateOtelStatus() *componentstatus.Event {
 	}
 	evt = componentstatus.NewEvent(otelStatus, eventBuilderOpts...)
 
-	inputStatusesPdata := evt.Attributes().PutEmptyMap(inputStatusAttributesKey)
-
+	// Build the map in one pass: PutEmptyMap looks the key up linearly, which is
+	// quadratic with the number of runners.
+	inputStatuses := make(map[string]any, len(r.runnerStates))
 	for id, rs := range r.runnerStates {
-		inputStatePdata := toPdata(rs)
-		m := inputStatusesPdata.PutEmptyMap(id)
-		inputStatePdata.MoveTo(m)
+		inputStatuses[id] = rs.raw()
+	}
+	if err := evt.Attributes().PutEmptyMap(inputStatusAttributesKey).FromRaw(inputStatuses); err != nil {
+		return nil
 	}
 
 	return evt
