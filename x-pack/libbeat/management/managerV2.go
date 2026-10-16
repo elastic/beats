@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"slices"
 	"sync"
 	"time"
 
@@ -107,6 +108,9 @@ type BeatV2Manager struct {
 
 	// set with the last applied input configs
 	lastInputCfgs map[string]*proto.UnitExpectedConfig
+
+	// set with the agent info of the last applied input configs
+	lastAgentInfo *client.AgentInfo
 
 	// set with the last applied APM config
 	lastAPMCfg *proto.APMConfig
@@ -253,6 +257,7 @@ func (cm *BeatV2Manager) AgentInfo() lbmanagement.AgentInfo {
 		Snapshot:     info.Snapshot,
 		ManagedMode:  lbmanagement.AgentManagedMode(info.ManagedMode),
 		Unprivileged: info.Unprivileged,
+		Tags:         slices.Clone(info.Tags),
 	}
 }
 
@@ -915,7 +920,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 		inputBeatCfgs = append(inputBeatCfgs, inputCfg...)
 	}
 
-	if !didChange(cm.lastInputCfgs, inputCfgs) && !cm.forceReload {
+	if !didChange(cm.lastInputCfgs, inputCfgs) && !agentInfoChanged(cm.lastAgentInfo, agentInfo) && !cm.forceReload {
 		cm.logger.Debug("Skipped reloading input units; configuration didn't change")
 		return nil
 	}
@@ -975,6 +980,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 	}
 
 	cm.lastInputCfgs = inputCfgs
+	cm.lastAgentInfo = agentInfo
 	cm.lastBeatInputCfgs = inputBeatCfgs
 	return nil
 }
@@ -1140,4 +1146,13 @@ func didChange(previous map[string]*proto.UnitExpectedConfig, latest map[string]
 		}
 	}
 	return false
+}
+
+func agentInfoChanged(previous, latest *client.AgentInfo) bool {
+	if previous == nil || latest == nil {
+		return previous != latest
+	}
+	return previous.ID != latest.ID || previous.Version != latest.Version ||
+		previous.Snapshot != latest.Snapshot || previous.ManagedMode != latest.ManagedMode ||
+		previous.Unprivileged != latest.Unprivileged || !slices.Equal(previous.Tags, latest.Tags)
 }
