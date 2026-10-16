@@ -165,6 +165,9 @@ Each `secret_stores` entry takes these options:
     * `token`: A Vault token.
     * `approle`: AppRole credentials: `role_id`, `secret_id`, and optionally `mount_path`, which defaults to `approle`.
 
+`ssl`
+:   (Optional) TLS settings of the connection to Vault, such as `certificate_authorities` to trust a private CA. They only apply to Vault: the `ssl` settings of the monitor apply to the monitored host. See [SSL](/reference/heartbeat/configuration-ssl.md) for the available settings.
+
 Heartbeat resolves the references before each run. A secret is read from Vault at most once every 5 minutes and shared by the monitors that use the same connection, so rotated secrets are used within 5 minutes without changing the monitor. On runs that read from Vault, the monitor duration includes the time of the read.
 
 If a reference can't be resolved, for example because Vault is unavailable or the path doesn't exist, the monitor reports `down` with the error and tries again on its next run. Failed reads are not retried for 30 seconds.

@@ -8,6 +8,8 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 const (
@@ -21,6 +23,8 @@ type config struct {
 	Namespace string     `config:"namespace"`
 	KVMount   string     `config:"kv_mount"`
 	Auth      authConfig `config:"auth"`
+	// SSL configures TLS for the connection to Vault only.
+	SSL *tlscommon.Config `config:"ssl"`
 }
 
 // authConfig holds exactly one authentication method. Each credential is a

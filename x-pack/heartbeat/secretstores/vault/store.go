@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/secretstores"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 // storeType is the secret_stores type and the reference prefix.
@@ -90,7 +91,7 @@ func newStore(cfg *conf.C, logger *logp.Logger) (secretstores.Store, error) {
 		return nil, err
 	}
 
-	client, err := newClient(c)
+	client, err := newClient(c, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -108,10 +109,14 @@ func newStore(cfg *conf.C, logger *logp.Logger) (secretstores.Store, error) {
 // newClient creates a Vault client that only uses the given config. The
 // Vault library reads VAULT_* environment variables by default; none of them
 // must change how Heartbeat connects.
-func newClient(c config) (*vaultapi.Client, error) {
+func newClient(c config, logger *logp.Logger) (*vaultapi.Client, error) {
+	tlsConfig, err := clientTLSConfig(c, logger)
+	if err != nil {
+		return nil, err
+	}
 	// Same defaults as the Vault library, honoring the proxy environment.
 	transport := cleanhttp.DefaultPooledTransport()
-	transport.TLSClientConfig = &tls.Config{MinVersion: tls.VersionTLS12}
+	transport.TLSClientConfig = tlsConfig
 
 	// Passing a config, instead of vaultapi.DefaultConfig(), keeps the values
 	// read from the environment out of the client.
@@ -141,6 +146,24 @@ func newClient(c config) (*vaultapi.Client, error) {
 		client.SetToken(c.Auth.Token)
 	}
 	return client, nil
+}
+
+// clientTLSConfig returns the TLS config of the connection to Vault. The
+// libbeat defaults, used for the unset ssl settings, require TLS 1.2.
+func clientTLSConfig(c config, logger *logp.Logger) (*tls.Config, error) {
+	if !c.SSL.IsEnabled() {
+		return &tls.Config{MinVersion: tls.VersionTLS12}, nil
+	}
+	tlsConfig, err := tlscommon.LoadTLSConfig(c.SSL, logger)
+	if err != nil {
+		return nil, fmt.Errorf("invalid 'ssl': %w", err)
+	}
+	// The address was validated, it parses.
+	u, err := url.Parse(c.Address)
+	if err != nil {
+		return nil, fmt.Errorf("invalid 'address': %w", err)
+	}
+	return tlsConfig.BuildModuleClientConfig(u.Hostname(), tlscommon.WithLogger(logger)), nil
 }
 
 // resolve returns the value of the field in the KV v2 secret that content,
