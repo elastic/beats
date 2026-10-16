@@ -118,7 +118,7 @@ func (m *testManager) Stop() {
 	m.stopped = true
 }
 func (m *testManager) SetPayload(map[string]any)           {}
-func (m *testManager) Enabled() bool                       { return true }
+func (m *testManager) ConfigFromControlProtocol() bool     { return true }
 func (m *testManager) AgentInfo() management.AgentInfo     { return management.AgentInfo{} }
 func (m *testManager) SetStopCallback(func())              {}
 func (m *testManager) CheckRawConfig(*agentconfig.C) error { return nil }

@@ -37,7 +37,7 @@ type testManager struct {
 }
 
 func (tm testManager) UpdateStatus(_ status.Status, _ string) {}
-func (tm testManager) Enabled() bool                          { return tm.isEnabled }
+func (tm testManager) ConfigFromControlProtocol() bool        { return tm.isEnabled }
 func (tm testManager) Start() error                           { return nil }
 func (tm testManager) PreInit() error                         { return nil }
 func (tm testManager) PostInit()                              {}

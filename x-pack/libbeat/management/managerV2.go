@@ -278,6 +278,11 @@ func (cm *BeatV2Manager) Enabled() bool {
 	return cm.config.Enabled
 }
 
+// ConfigFromControlProtocol returns true if beat is running in process mode inside elastic-agent.
+func (cm *BeatV2Manager) ConfigFromControlProtocol() bool {
+	return cm.config.Enabled
+}
+
 // SetStopCallback sets the callback to run when the manager want to shut down the beats gracefully.
 func (cm *BeatV2Manager) SetStopCallback(stopFunc func()) {
 	cm.stopFuncMut.Lock()
