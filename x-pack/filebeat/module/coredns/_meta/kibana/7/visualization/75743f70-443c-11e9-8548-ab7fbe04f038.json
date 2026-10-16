@@ -21,7 +21,7 @@
                     "id": "1",
                     "params": {
                         "customLabel": "Unique Domains",
-                        "field": "coredns.query.name"
+                        "field": "coredns.question.name"
                     },
                     "schema": "metric",
                     "type": "cardinality"
