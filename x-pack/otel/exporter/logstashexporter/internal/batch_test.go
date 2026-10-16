@@ -33,7 +33,6 @@ func TestNewLogBatch(t *testing.T) {
 				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
-						otelctx.BeatNameCtxKey:        {"filebeat"},
 						otelctx.BeatVersionCtxKey:     {"8.0.0"},
 						otelctx.BeatIndexPrefixCtxKey: {"filebeat"},
 					}),
@@ -69,7 +68,6 @@ func TestNewLogBatch(t *testing.T) {
 				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
-						otelctx.BeatNameCtxKey:        {"filebeat"},
 						otelctx.BeatVersionCtxKey:     {"8.0.0"},
 						otelctx.BeatIndexPrefixCtxKey: {"filebeat"},
 					}),
