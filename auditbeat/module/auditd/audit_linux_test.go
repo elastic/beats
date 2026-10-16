@@ -169,13 +169,14 @@ func TestImmutable(t *testing.T) {
 	// Create mocks of netlink client and control that provide the expected responses.
 	controlMock := NewMock().
 		// Get Status response for initClient
-		returnACK().returnStatus()
+		returnACK().returnStatus().
+		// ACK for SetImmutable, which is sent on the control socket.
+		returnACK()
 
 	mock := NewMock().
 		// Send expected ACKs for initialization
-		// With one extra for SetImmutable
 		returnACK().returnStatus().returnACK().returnACK().
-		returnACK().returnACK().returnACK().returnACK().
+		returnACK().returnACK().returnACK().
 		// Send one auditd message.
 		returnMessage(userLoginFailMsg)
 
