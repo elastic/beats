@@ -1003,12 +1003,12 @@ func TestTrailingChunkReclamation(t *testing.T) {
 func TestPerQueueCapBlocksWhilePoolHasRoom(t *testing.T) {
 	pool := NewPool[int](Settings{Events: 1}, nil)
 	defer pool.Shutdown()
-	// The pool is driven by the queues: max(8, 4) = 8.
+	// The pool is driven by the queues: 8 + 4 = 12.
 	qBig := pool.Connect()
 	qBig.SetTarget(8)
 	qSmall := pool.Connect()
 	qSmall.SetTarget(4)
-	require.Equal(t, 8, pool.Target(), "pool tracks the largest queue cap")
+	require.Equal(t, 12, pool.Target(), "pool provides the sum of queue budgets")
 
 	p := qSmall.Producer(queue.ProducerConfig{})
 	for i := range 4 {
@@ -1017,12 +1017,11 @@ func TestPerQueueCapBlocksWhilePoolHasRoom(t *testing.T) {
 	}
 	_, ok := p.TryPublish(99)
 	assert.False(t, ok, "publishing beyond the per-queue cap must fail even with pool slots free")
-	assert.Equal(t, 4, pool.Available(), "only the per-queue cap blocked; the pool still has 4 free slots")
+	assert.Equal(t, 8, pool.Available(), "only the per-queue cap blocked; the sibling retains its 8 slots")
 }
 
 // TestPerQueueCapsAreIndependent verifies two queues on one pool each enforce
-// their own cap while the pool is sized to the larger of them (the example from
-// the design: a 4-cap and an 8-cap queue share an 8-slot pool, not 12).
+// their own cap while the pool provides both configured budgets.
 func TestPerQueueCapsAreIndependent(t *testing.T) {
 	pool := NewPool[int](Settings{Events: 1}, nil)
 	defer pool.Shutdown()
@@ -1030,7 +1029,7 @@ func TestPerQueueCapsAreIndependent(t *testing.T) {
 	q1.SetTarget(4)
 	q2 := pool.Connect()
 	q2.SetTarget(8)
-	require.Equal(t, 8, pool.Target(), "pool is sized to the larger cap, not the sum")
+	require.Equal(t, 12, pool.Target(), "pool is sized to the sum of capped queues")
 	p1 := q1.Producer(queue.ProducerConfig{})
 	p2 := q2.Producer(queue.ProducerConfig{})
 
@@ -1042,15 +1041,14 @@ func TestPerQueueCapsAreIndependent(t *testing.T) {
 	_, ok := p1.TryPublish(99)
 	assert.False(t, ok, "q1 is capped at 4")
 
-	// q2 may use the rest of the shared 8-slot pool (4 slots remain), then the
-	// pool is full even though q2's own cap (8) is not reached.
-	for i := range 4 {
+	// q2 retains its entire 8-slot budget even while q1 is full.
+	for i := range 8 {
 		_, ok := p2.TryPublish(i)
 		require.True(t, ok)
 	}
-	assert.Equal(t, 0, pool.Available(), "pool full: q1's 4 + q2's 4 = 8")
+	assert.Equal(t, 0, pool.Available(), "pool full: q1's 4 + q2's 8 = 12")
 	_, ok = p2.TryPublish(99)
-	assert.False(t, ok, "pool is full even though q2's own cap is not reached")
+	assert.False(t, ok, "q2 is capped at its own 8 live events")
 }
 
 // TestPerQueueCapUnblocksOnDrain verifies a producer blocked on the per-queue

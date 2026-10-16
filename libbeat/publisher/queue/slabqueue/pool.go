@@ -46,7 +46,8 @@ type slot[T any] struct {
 // lazily, retiring the highest slots as they fall out of circulation so live
 // events are never dropped. Its capacity is not set directly — it is derived
 // from the connected queues' per-queue caps (see syncTargetToQueues), so the
-// pool always tracks the largest queue and the two cannot drift.
+// pool provides the sum of their budgets. Retained events above a lowered cap
+// or on a closing queue remain part of the budget until released.
 //
 // Capacity invariant: the in-circulation slot indices are always exactly
 // [0, capacity) with no holes. Growth appends indices at the top; shrink removes
@@ -97,8 +98,9 @@ type Pool[T any] struct {
 	// is used to broadcast a shutdown notification when the pool itself is
 	// closed and is the authoritative source for ConnectedQueues(); individual
 	// Queue.Close calls remove themselves via disconnect.
-	mu     sync.Mutex
-	queues map[*Queue[T]]struct{}
+	mu       sync.Mutex
+	queues   map[*Queue[T]]struct{}
+	draining map[*Queue[T]]struct{} // closed queues retaining live slots
 }
 
 // NewPool returns an initialized pool with all slots free.
@@ -119,6 +121,7 @@ func NewPool[T any](settings Settings, observer queue.Observer) *Pool[T] {
 		free:     newFreeList(),
 		closed:   make(chan struct{}),
 		queues:   make(map[*Queue[T]]struct{}),
+		draining: make(map[*Queue[T]]struct{}),
 	}
 	p.batchPool.New = func() any { return &batch[T]{} }
 	p.dir.Store(newDirectory[T](settings.Events))
@@ -371,6 +374,9 @@ func (p *Pool[T]) Shutdown() {
 		// state and return instead of blocking forever.
 		p.free.wakeAll()
 		p.mu.Lock()
+		// Once shutdown stops admission there is no remaining capacity to
+		// reserve. Output batches own any live queues until they release.
+		clear(p.draining)
 		queues := make([]*Queue[T], 0, len(p.queues))
 		for q := range p.queues {
 			queues = append(queues, q)
@@ -408,32 +414,58 @@ func (p *Pool[T]) ConnectedQueues() int {
 func (p *Pool[T]) disconnect(q *Queue[T]) {
 	p.mu.Lock()
 	delete(p.queues, q)
+	if q.live.Load() > 0 && !p.isClosed() {
+		// A graceful close can still hold output batches or queued events.
+		// Keep their budget until they drain so they cannot consume the
+		// remaining receivers' configured capacity.
+		p.draining[q] = struct{}{}
+	} else {
+		delete(p.draining, q)
+	}
 	p.mu.Unlock()
-	// A departing queue may have held the largest per-queue cap; resize the pool
-	// to the new maximum so it tracks the connected queues.
 	p.syncTargetToQueues()
 }
 
-// syncTargetToQueues sizes the pool to the largest per-queue cap among the
-// connected queues, so the shared pool always tracks the queues rather than
-// being set independently (which could drift). It is the single place pool
-// capacity is derived: Queue.SetTarget and disconnect call it. Queues with no
-// per-queue cap (limit 0) do not contribute, so a pool of only uncapped queues
-// keeps whatever capacity it was created with.
+// syncTargetToQueues reserves every capped queue's budget independently.
+// Existing backlog above a lowered cap, and live events on closing queues,
+// continue contributing until released. This allows other capped queues to
+// use their full budgets while those events drain, without discarding them.
+// Uncapped queues do not reserve capacity and share the available pool budget;
+// a pool with only uncapped queues keeps its existing target.
 func (p *Pool[T]) syncTargetToQueues() {
 	if p.isClosed() {
 		return
 	}
 	// Hold p.mu across both the scan and the apply so concurrent syncs serialize:
-	// otherwise two callers could each compute a max and then apply them out of
-	// order, letting a stale max overwrite a fresh one.
+	// otherwise a stale budget could overwrite a more recent resize.
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	largest := 0
+	total := 0
+	hasCap := false
 	for q := range p.queues {
-		largest = max(largest, int(q.limit.Load()))
+		if limit := int(q.limit.Load()); limit > 0 {
+			hasCap = true
+			total = addQueueCapacity(total, max(limit, int(q.live.Load())))
+		}
 	}
-	if largest > 0 {
-		p.setTarget(largest)
+	for q := range p.draining {
+		live := int(q.live.Load())
+		if live == 0 {
+			delete(p.draining, q)
+			continue
+		}
+		total = addQueueCapacity(total, live)
 	}
+	if hasCap {
+		p.setTarget(total)
+	}
+}
+
+// Reject an unrepresentable budget before it wraps and silently shrinks the
+// pool. Such a configuration cannot be allocated, regardless of queue layout.
+func addQueueCapacity(total, contribution int) int {
+	if contribution > int(^uint(0)>>1)-total {
+		panic("slabqueue: combined queue capacities exceed int range")
+	}
+	return total + contribution
 }
