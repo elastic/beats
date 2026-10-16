@@ -6,9 +6,11 @@ package hbreceiver
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
 
 	"go.opentelemetry.io/collector/component"
@@ -17,6 +19,7 @@ import (
 
 type heartbeatReceiver struct {
 	xpInstance.BeatReceiver
+<<<<<<< HEAD
 	wg sync.WaitGroup
 }
 
@@ -27,14 +30,56 @@ func (hb *heartbeatReceiver) Start(ctx context.Context, host component.Host) err
 			hb.Logger.Error("error starting heartbeat receiver", zap.Error(err))
 		}
 	})
+=======
+	ctx                        context.Context
+	cancel                     context.CancelFunc
+	elasticsearchAuthRequester *eslegclient.Connection
+}
+
+func newHeartbeatReceiver(br xpInstance.BeatReceiver) *heartbeatReceiver {
+	ctx, cancel := context.WithCancel(context.Background())
+	return &heartbeatReceiver{
+		BeatReceiver: br,
+		ctx:          ctx,
+		cancel:       cancel,
+	}
+}
+
+func (hb *heartbeatReceiver) Start(ctx context.Context, host component.Host) error {
+	hb.Logger.Info("starting heartbeat receiver")
+
+	releaseCancellation := context.AfterFunc(ctx, hb.cancel)
+	defer releaseCancellation()
+
+	if err := hb.BeatReceiver.Start(host); err != nil {
+		return fmt.Errorf("starting heartbeat receiver: %w", err)
+	}
+
+>>>>>>> 188f7ba ([Heartbeat] Prevent Synthetics monitor state from resetting after Elastic Agent restarts (#53183))
 	return nil
 }
 
-func (hb *heartbeatReceiver) Shutdown(ctx context.Context) error {
+func (hb *heartbeatReceiver) Shutdown(ctx context.Context) (err error) {
 	hb.Logger.Info("stopping heartbeat receiver")
+	if hb.cancel != nil {
+		hb.cancel()
+	}
+
+	defer func() {
+		if hb.elasticsearchAuthRequester != nil {
+			if closeErr := hb.elasticsearchAuthRequester.Close(); closeErr != nil {
+				err = errors.Join(err, fmt.Errorf("closing Elasticsearch client: %w", closeErr))
+			}
+		}
+	}()
+
 	if err := hb.BeatReceiver.Shutdown(ctx); err != nil {
 		return fmt.Errorf("error stopping heartbeat receiver: %w", err)
 	}
+<<<<<<< HEAD
 	hb.wg.Wait()
+=======
+
+>>>>>>> 188f7ba ([Heartbeat] Prevent Synthetics monitor state from resetting after Elastic Agent restarts (#53183))
 	return nil
 }

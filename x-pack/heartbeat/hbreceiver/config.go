@@ -12,10 +12,37 @@ import (
 	"go.opentelemetry.io/collector/confmap"
 )
 
+<<<<<<< HEAD
 // Config is config settings for heartbeat receiver.  The structure of
 // which is the same as the heartbeat.yml configuration file.
 type Config struct {
 	Beatconfig map[string]any `mapstructure:",remain"`
+=======
+// Config contains receiver-only settings and the remaining Heartbeat
+// configuration.
+type Config struct {
+	// SchedulerGroup makes this receiver share its scheduler, and therefore its
+	// `heartbeat.scheduler.limit` and `heartbeat.jobs.<type>.limit` concurrency
+	// bounds, with every other heartbeat receiver in this collector configured
+	// with the same group. A Heartbeat process only ever has one scheduler, so
+	// grouping the receivers that were split out of one Heartbeat process keeps
+	// those limits meaningful.
+	//
+	// The first receiver of a group to start configures its scheduler, later
+	// receivers with conflicting limits log a warning.
+	//
+	// Defaults to the empty group, which every receiver without an explicit
+	// group shares.
+	SchedulerGroup string `mapstructure:"scheduler_group"`
+
+	MonitorState MonitorStateConfig `mapstructure:"monitor_state"`
+	Beatconfig   map[string]any     `mapstructure:",remain"`
+}
+
+// MonitorStateConfig configures monitor state restoration.
+type MonitorStateConfig struct {
+	Elasticsearch string `mapstructure:"elasticsearch"`
+>>>>>>> 188f7ba ([Heartbeat] Prevent Synthetics monitor state from resetting after Elastic Agent restarts (#53183))
 }
 
 // Unmarshal implements confmap.Unmarshaler for custom unmarshaling logic.
