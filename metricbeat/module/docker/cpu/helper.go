@@ -22,37 +22,39 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/opt"
 )
 
 type CPUStats struct {
 	Time                                  common.Time
 	Container                             *docker.Container
 	PerCPUUsage                           mapstr.M
-	TotalUsage                            float64
-	TotalUsageNormalized                  float64
+	TotalUsage                            opt.Float
+	TotalUsageNormalized                  opt.Float
 	UsageInKernelmode                     uint64
-	UsageInKernelmodePercentage           float64
-	UsageInKernelmodePercentageNormalized float64
+	UsageInKernelmodePercentage           opt.Float
+	UsageInKernelmodePercentageNormalized opt.Float
 	UsageInUsermode                       uint64
-	UsageInUsermodePercentage             float64
-	UsageInUsermodePercentageNormalized   float64
+	UsageInUsermodePercentage             opt.Float
+	UsageInUsermodePercentageNormalized   opt.Float
 	SystemUsage                           uint64
-	SystemUsagePercentage                 float64
-	SystemUsagePercentageNormalized       float64
+	SystemUsagePercentage                 opt.Float
+	SystemUsagePercentageNormalized       opt.Float
 }
 
 // CPUService is a helper to collect docker CPU metrics
 type CPUService struct {
-	Cores  bool
-	logger *logp.Logger
+	Cores bool
 }
 
 func (c *CPUService) getCPUStatsList(rawStats []docker.Stat, dedot bool) []CPUStats {
 	formattedStats := []CPUStats{}
 
 	for _, stats := range rawStats {
+		if stats.Stats.Read.IsZero() {
+			continue
+		}
 		formattedStats = append(formattedStats, c.getCPUStats(&stats, dedot))
 	}
 
@@ -60,22 +62,26 @@ func (c *CPUService) getCPUStatsList(rawStats []docker.Stat, dedot bool) []CPUSt
 }
 
 func (c *CPUService) getCPUStats(myRawStat *docker.Stat, dedot bool) CPUStats {
-	usage := CPUUsage{Stat: myRawStat, logger: c.logger}
+	usage := CPUUsage{Stat: myRawStat}
+	total, totalNormalized := usage.total()
+	kernel, kernelNormalized := usage.inKernelMode()
+	user, userNormalized := usage.inUserMode()
+	system, systemNormalized := usage.system()
 
 	stats := CPUStats{
 		Time:                                  common.Time(myRawStat.Stats.Read),
 		Container:                             docker.NewContainer(myRawStat.Container, dedot),
-		TotalUsage:                            usage.Total(),
-		TotalUsageNormalized:                  usage.TotalNormalized(),
+		TotalUsage:                            total,
+		TotalUsageNormalized:                  totalNormalized,
 		UsageInKernelmode:                     myRawStat.Stats.CPUStats.CPUUsage.UsageInKernelmode,
-		UsageInKernelmodePercentage:           usage.InKernelMode(),
-		UsageInKernelmodePercentageNormalized: usage.InKernelModeNormalized(),
+		UsageInKernelmodePercentage:           kernel,
+		UsageInKernelmodePercentageNormalized: kernelNormalized,
 		UsageInUsermode:                       myRawStat.Stats.CPUStats.CPUUsage.UsageInUsermode,
-		UsageInUsermodePercentage:             usage.InUserMode(),
-		UsageInUsermodePercentageNormalized:   usage.InUserModeNormalized(),
+		UsageInUsermodePercentage:             user,
+		UsageInUsermodePercentageNormalized:   userNormalized,
 		SystemUsage:                           myRawStat.Stats.CPUStats.SystemUsage,
-		SystemUsagePercentage:                 usage.System(),
-		SystemUsagePercentageNormalized:       usage.SystemNormalized(),
+		SystemUsagePercentage:                 system,
+		SystemUsagePercentageNormalized:       systemNormalized,
 	}
 
 	if c.Cores {
@@ -90,9 +96,10 @@ func (c *CPUService) getCPUStats(myRawStat *docker.Stat, dedot bool) CPUStats {
 type CPUUsage struct {
 	*docker.Stat
 
-	cpus        uint32
-	systemDelta uint64
-	logger      *logp.Logger
+	cpus                  uint32
+	systemDelta           uint64
+	systemDeltaCalculated bool
+	systemDeltaValid      bool
 }
 
 // CPUS returns the number of cpus. If number of cpus is equal to zero, the field will
@@ -119,10 +126,19 @@ func (u *CPUUsage) CPUs() uint32 {
 
 // SystemDelta calculates system delta.
 func (u *CPUUsage) SystemDelta() uint64 {
-	if u.systemDelta == 0 {
-		u.systemDelta = u.Stats.CPUStats.SystemUsage - u.Stats.PreCPUStats.SystemUsage
+	systemDelta, _ := u.validSystemDelta()
+	return systemDelta
+}
+
+func (u *CPUUsage) validSystemDelta() (uint64, bool) {
+	if !u.systemDeltaCalculated {
+		u.systemDeltaCalculated = true
+		if u.Stats.CPUStats.SystemUsage >= u.Stats.PreCPUStats.SystemUsage {
+			u.systemDelta = u.Stats.CPUStats.SystemUsage - u.Stats.PreCPUStats.SystemUsage
+			u.systemDeltaValid = true
+		}
 	}
-	return u.systemDelta
+	return u.systemDelta, u.systemDeltaValid
 }
 
 // PerCPU calculates per CPU usage.
@@ -131,77 +147,107 @@ func (u *CPUUsage) PerCPU() mapstr.M {
 	if len(u.Stats.CPUStats.CPUUsage.PercpuUsage) == len(u.Stats.PreCPUStats.CPUUsage.PercpuUsage) {
 		output = mapstr.M{}
 		for index := range u.Stats.CPUStats.CPUUsage.PercpuUsage {
-			cpu := mapstr.M{}
-			cpu["pct"] = u.calculatePercentage(
+			percentage, normalized := u.calculatePercentages(
 				u.Stats.CPUStats.CPUUsage.PercpuUsage[index],
 				u.Stats.PreCPUStats.CPUUsage.PercpuUsage[index],
-				u.CPUs())
-			cpu["norm"] = mapstr.M{
-				"pct": u.calculatePercentage(
-					u.Stats.CPUStats.CPUUsage.PercpuUsage[index],
-					u.Stats.PreCPUStats.CPUUsage.PercpuUsage[index],
-					1),
-			}
-			cpu["ticks"] = u.Stats.CPUStats.CPUUsage.PercpuUsage[index]
+			)
+			cpu := mapstr.M{"ticks": u.Stats.CPUStats.CPUUsage.PercpuUsage[index]}
+			addPercentageFields(cpu, percentage, normalized)
 			output[strconv.Itoa(index)] = cpu
 		}
 	}
 	return output
 }
 
-// TotalNormalized calculates total CPU usage normalized.
-func (u *CPUUsage) Total() float64 {
-	return u.calculatePercentage(u.Stats.CPUStats.CPUUsage.TotalUsage, u.Stats.PreCPUStats.CPUUsage.TotalUsage, u.CPUs())
+func (u *CPUUsage) total() (opt.Float, opt.Float) {
+	return u.calculatePercentages(u.Stats.CPUStats.CPUUsage.TotalUsage, u.Stats.PreCPUStats.CPUUsage.TotalUsage)
+}
+
+// Total calculates total CPU usage.
+func (u *CPUUsage) Total() opt.Float {
+	percentage, _ := u.total()
+	return percentage
 }
 
 // TotalNormalized calculates total CPU usage normalized by the number of CPU cores.
-func (u *CPUUsage) TotalNormalized() float64 {
-	return u.calculatePercentage(u.Stats.CPUStats.CPUUsage.TotalUsage, u.Stats.PreCPUStats.CPUUsage.TotalUsage, 1)
+func (u *CPUUsage) TotalNormalized() opt.Float {
+	_, normalized := u.total()
+	return normalized
+}
+
+func (u *CPUUsage) inKernelMode() (opt.Float, opt.Float) {
+	return u.calculatePercentages(u.Stats.CPUStats.CPUUsage.UsageInKernelmode, u.Stats.PreCPUStats.CPUUsage.UsageInKernelmode)
 }
 
 // InKernelMode calculates percentage of time in kernel space.
-func (u *CPUUsage) InKernelMode() float64 {
-	return u.calculatePercentage(u.Stats.CPUStats.CPUUsage.UsageInKernelmode, u.Stats.PreCPUStats.CPUUsage.UsageInKernelmode, u.CPUs())
+func (u *CPUUsage) InKernelMode() opt.Float {
+	percentage, _ := u.inKernelMode()
+	return percentage
 }
 
 // InKernelModeNormalized calculates percentage of time in kernel space normalized by the number of CPU cores.
-func (u *CPUUsage) InKernelModeNormalized() float64 {
-	return u.calculatePercentage(u.Stats.CPUStats.CPUUsage.UsageInKernelmode, u.Stats.PreCPUStats.CPUUsage.UsageInKernelmode, 1)
+func (u *CPUUsage) InKernelModeNormalized() opt.Float {
+	_, normalized := u.inKernelMode()
+	return normalized
+}
+
+func (u *CPUUsage) inUserMode() (opt.Float, opt.Float) {
+	return u.calculatePercentages(u.Stats.CPUStats.CPUUsage.UsageInUsermode, u.Stats.PreCPUStats.CPUUsage.UsageInUsermode)
 }
 
 // InUserMode calculates percentage of time in user space.
-func (u *CPUUsage) InUserMode() float64 {
-	return u.calculatePercentage(u.Stats.CPUStats.CPUUsage.UsageInUsermode, u.Stats.PreCPUStats.CPUUsage.UsageInUsermode, u.CPUs())
+func (u *CPUUsage) InUserMode() opt.Float {
+	percentage, _ := u.inUserMode()
+	return percentage
 }
 
 // InUserModeNormalized calculates percentage of time in user space normalized by the number of CPU cores.
-func (u *CPUUsage) InUserModeNormalized() float64 {
-	return u.calculatePercentage(u.Stats.CPUStats.CPUUsage.UsageInUsermode, u.Stats.PreCPUStats.CPUUsage.UsageInUsermode, 1)
+func (u *CPUUsage) InUserModeNormalized() opt.Float {
+	_, normalized := u.inUserMode()
+	return normalized
+}
+
+func (u *CPUUsage) system() (opt.Float, opt.Float) {
+	return u.calculatePercentages(u.Stats.CPUStats.SystemUsage, u.Stats.PreCPUStats.SystemUsage)
 }
 
 // System calculates percentage of total CPU time in the system.
-func (u *CPUUsage) System() float64 {
-	return u.calculatePercentage(u.Stats.CPUStats.SystemUsage, u.Stats.PreCPUStats.SystemUsage, u.CPUs())
+func (u *CPUUsage) System() opt.Float {
+	percentage, _ := u.system()
+	return percentage
 }
 
 // SystemNormalized calculates percentage of total CPU time in the system, normalized by the number of CPU cores.
-func (u *CPUUsage) SystemNormalized() float64 {
-	return u.calculatePercentage(u.Stats.CPUStats.SystemUsage, u.Stats.PreCPUStats.SystemUsage, 1)
+func (u *CPUUsage) SystemNormalized() opt.Float {
+	_, normalized := u.system()
+	return normalized
 }
 
-// This function is meant to calculate the % CPU time change between two successive readings.
-// The "oldValue" refers to the CPU statistics of the last read.
-// Time here is expressed by second and not by nanoseconde.
-// The main goal is to expose the %, in the same way, it's displayed by docker Client.
-func (u *CPUUsage) calculatePercentage(newValue uint64, oldValue uint64, numCPUS uint32) float64 {
+// calculatePercentages calculates CPU usage between two successive readings.
+// It returns the percentage scaled by the number of CPUs and the normalized
+// per-CPU percentage, respectively.
+func (u *CPUUsage) calculatePercentages(newValue uint64, oldValue uint64) (opt.Float, opt.Float) {
 	if newValue < oldValue {
-		u.logger.Errorf("Error calculating CPU time change for docker module: new stats value (%v) is lower than the old one(%v)", newValue, oldValue)
-		return -1
-	}
-	value := newValue - oldValue
-	if value == 0 || u.SystemDelta() == 0 {
-		return 0
+		return opt.NewFloatNone(), opt.NewFloatNone()
 	}
 
-	return float64(uint64(numCPUS)*value) / float64(u.SystemDelta())
+	value := newValue - oldValue
+	if value == 0 {
+		zero := opt.FloatWith(0)
+		return zero, zero
+	}
+
+	systemDelta, valid := u.validSystemDelta()
+	if !valid {
+		return opt.NewFloatNone(), opt.NewFloatNone()
+	}
+
+	if systemDelta == 0 {
+		zero := opt.FloatWith(0)
+		return zero, zero
+	}
+
+	normalized := opt.FloatWith(float64(value) / float64(systemDelta))
+	percentage := opt.FloatWith(float64(uint64(u.CPUs())*value) / float64(systemDelta))
+	return percentage, normalized
 }
