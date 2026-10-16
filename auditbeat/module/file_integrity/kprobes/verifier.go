@@ -53,34 +53,47 @@ func getVerifiedProbes(ctx context.Context, timeout time.Duration, logger *logp.
 	}
 
 	var allErr error
+	attempt := 0
+	total := len(specs)
+	logger.Infof("DEBUG loaded %d BTF specs (kernel spec first if present; 6 are embedded)", total)
 	for len(specs) > 0 {
 
 		s := specs[0]
+		idx := total - len(specs)
 		if !probeMgr.shouldBuild(s) {
+			logger.Infof("DEBUG spec %d/%d skipped by shouldBuild", idx, total)
 			specs = specs[1:]
 			continue
 		}
 
 		probes, err := probeMgr.build(s)
 		if err != nil {
+			logger.Infof("DEBUG spec %d/%d build failed: %v", idx, total, err)
 			allErr = errors.Join(allErr, err)
 			specs = specs[1:]
 			continue
 		}
 
+		attempt++
+		logger.Infof("DEBUG verify attempt %d: spec %d/%d, %d specs remaining", attempt, idx, total, len(specs))
 		if err := verify(ctx, fExec, probes, timeout, logger); err != nil {
-			if probeMgr.onErr(err) {
+			retry := probeMgr.onErr(err)
+			logger.Infof("DEBUG verify attempt %d failed: retry=%t err=%v", attempt, retry, err)
+			if retry {
 				continue
 			}
+			logger.Infof("DEBUG spec %d/%d abandoned after verify failure", idx, total)
 			allErr = errors.Join(allErr, err)
 			specs = specs[1:]
 			continue
 		}
 
+		logger.Infof("DEBUG spec %d/%d verified", idx, total)
 		return probes, fExec, nil
 	}
 
 	fExec.Close()
+	logger.Infof("DEBUG no spec validated; accumulated errors: %v", allErr)
 	return nil, nil, errors.Join(allErr, errors.New("could not validate probes"))
 }
 

@@ -47,6 +47,12 @@ type monitorTestSuite struct {
 }
 
 func Test_Monitor(t *testing.T) {
+	// DEBUG: make verification logs visible in CI and record the kernel.
+	if err := logp.DevelopmentSetup(logp.WithLevel(logp.InfoLevel)); err != nil {
+		t.Fatal(err)
+	}
+	version, _ := os.ReadFile("/proc/version")
+	t.Logf("kernel: %s", version)
 	suite.Run(t, &monitorTestSuite{Logger: logp.NewLogger("test_monitor")})
 }
 
@@ -482,6 +488,9 @@ func (p *monitorTestSuite) TestNew() {
 		p.T().Skip("skipping as non-root")
 		return
 	}
+
+	// DEBUG: fail on purpose so gotestsum prints this test's log output.
+	defer p.T().Error("DEBUG: deliberate failure to expose the verification log")
 
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
