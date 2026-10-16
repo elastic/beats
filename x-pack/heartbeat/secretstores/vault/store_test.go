@@ -41,7 +41,12 @@ type fakeVault struct {
 	mu          sync.Mutex
 	secrets     map[string]map[string]any
 	validTokens map[string]bool
+	// denied holds the paths valid tokens can't read.
+	denied map[string]bool
+	// noLookup denies tokens their own lookup.
+	noLookup    bool
 	logins      int
+	lookups     int
 	reads       int
 	unavailable int // number of reads answered with 503
 	requests    []*http.Request
@@ -56,6 +61,7 @@ func newFakeVault(t *testing.T) *fakeVault {
 			"myapp/creds": {"password": testPassword, "user": "bob", "port": json.Number("5432"), "enabled": true, "obj": map[string]any{"a": "b"}},
 		},
 		validTokens: map[string]bool{testToken: true},
+		denied:      map[string]bool{},
 	}
 	srv := httptest.NewServer(http.HandlerFunc(fv.handle))
 	t.Cleanup(srv.Close)
@@ -100,6 +106,13 @@ func (fv *fakeVault) handle(w http.ResponseWriter, r *http.Request) {
 		token := fmt.Sprintf("approle-token-%d", fv.nextToken)
 		fv.validTokens[token] = true
 		writeJSON(http.StatusOK, map[string]any{"auth": map[string]any{"client_token": token, "lease_duration": 60, "renewable": true}})
+	case r.Method == http.MethodGet && r.URL.Path == "/v1/auth/token/lookup-self":
+		fv.lookups++
+		if fv.noLookup || !fv.validTokens[r.Header.Get("X-Vault-Token")] {
+			writeJSON(http.StatusForbidden, map[string]any{"errors": []string{"permission denied"}})
+			return
+		}
+		writeJSON(http.StatusOK, map[string]any{"data": map[string]any{"ttl": 60}})
 	case r.Method == http.MethodGet && strings.HasPrefix(r.URL.Path, "/v1/secret/data/"):
 		fv.reads++
 		if fv.unavailable > 0 {
@@ -107,11 +120,12 @@ func (fv *fakeVault) handle(w http.ResponseWriter, r *http.Request) {
 			writeJSON(http.StatusServiceUnavailable, map[string]any{"errors": []string{"Vault is sealed"}})
 			return
 		}
-		if !fv.validTokens[r.Header.Get("X-Vault-Token")] {
+		path := strings.TrimPrefix(r.URL.Path, "/v1/secret/data/")
+		if !fv.validTokens[r.Header.Get("X-Vault-Token")] || fv.denied[path] {
 			writeJSON(http.StatusForbidden, map[string]any{"errors": []string{"permission denied"}})
 			return
 		}
-		data, ok := fv.secrets[strings.TrimPrefix(r.URL.Path, "/v1/secret/data/")]
+		data, ok := fv.secrets[path]
 		if !ok {
 			writeJSON(http.StatusNotFound, map[string]any{"errors": []string{}})
 			return
@@ -136,6 +150,24 @@ func (fv *fakeVault) counts() (logins, reads int) {
 	fv.mu.Lock()
 	defer fv.mu.Unlock()
 	return fv.logins, fv.reads
+}
+
+func (fv *fakeVault) lookupCount() int {
+	fv.mu.Lock()
+	defer fv.mu.Unlock()
+	return fv.lookups
+}
+
+func (fv *fakeVault) deny(path string) {
+	fv.mu.Lock()
+	defer fv.mu.Unlock()
+	fv.denied[path] = true
+}
+
+func (fv *fakeVault) setNoLookup() {
+	fv.mu.Lock()
+	defer fv.mu.Unlock()
+	fv.noLookup = true
 }
 
 func (fv *fakeVault) setUnavailable(n int) {
@@ -323,6 +355,34 @@ func TestAppRoleLogsInAgainOnce(t *testing.T) {
 	assert.Equal(t, 3, reads, "the read must be retried once after the login")
 }
 
+func TestAppRoleDeniedPath(t *testing.T) {
+	tests := map[string]struct {
+		noLookup   bool
+		wantLogins int
+	}{
+		// A valid token can look itself up: the path is denied, not the token.
+		"token can look itself up": {wantLogins: 1},
+		// Without the lookup, the token is considered rejected.
+		"token can't look itself up": {noLookup: true, wantLogins: 2},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			fv := newFakeVault(t)
+			fv.deny("myapp/creds")
+			if tc.noLookup {
+				fv.setNoLookup()
+			}
+			s, _, _ := newTestStore(t, appRoleEntry(fv.address), nil)
+
+			_, err := s.resolve(context.Background(), "myapp/creds#password")
+			assert.ErrorContains(t, err, "status 403: permission denied", "the denied path must be reported")
+			logins, _ := fv.counts()
+			assert.Equal(t, tc.wantLogins, logins, "unexpected number of logins")
+			assert.Equal(t, 1, fv.lookupCount(), "the token must be looked up once")
+		})
+	}
+}
+
 func TestAppRoleConcurrentExpiryLogsInOnce(t *testing.T) {
 	fv := newFakeVault(t)
 	for i := range 10 {
@@ -400,6 +460,39 @@ func TestFailureCache(t *testing.T) {
 	clock.Advance(failureTTL + time.Second)
 	_, err = s.resolve(ctx, "myapp/creds#password")
 	assert.NoError(t, err, "Vault must be contacted again after the failure expires")
+}
+
+func TestPathFailureCache(t *testing.T) {
+	fv := newFakeVault(t)
+	fv.secrets["other"] = map[string]any{"password": "x"}
+	fv.deny("denied")
+	s, clock, _ := newTestStore(t, appRoleEntry(fv.address), nil)
+	ctx := context.Background()
+
+	for _, path := range []string{"missing", "denied"} {
+		_, err := s.resolve(ctx, path+"#password")
+		require.Error(t, err, "reading %s must fail", path)
+	}
+	logins, reads := fv.counts()
+	lookups := fv.lookupCount()
+
+	for _, path := range []string{"missing", "denied"} {
+		_, err := s.resolve(ctx, path+"#password")
+		assert.Error(t, err, "the cached failure for %s must be returned", path)
+	}
+	loginsAfter, readsAfter := fv.counts()
+	assert.Equal(t, reads, readsAfter, "Vault must not be read while the failures are cached")
+	assert.Equal(t, logins, loginsAfter, "Vault must not be logged in while the failures are cached")
+	assert.Equal(t, lookups, fv.lookupCount(), "the token must not be looked up while the failures are cached")
+
+	_, err := s.resolve(ctx, "other#password")
+	assert.NoError(t, err, "a failure must not affect other paths")
+
+	clock.Advance(failureTTL + time.Second)
+	_, err = s.resolve(ctx, "missing#password")
+	assert.Error(t, err, "the path must fail again")
+	_, readsAfter = fv.counts()
+	assert.Equal(t, reads+2, readsAfter, "Vault must be read again after the failure expires")
 }
 
 func TestConnectionErrorIsTransient(t *testing.T) {

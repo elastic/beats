@@ -35,8 +35,10 @@ const (
 	requestTimeout = 10 * time.Second
 	// cacheTTL is how long a secret read is reused by every monitor.
 	cacheTTL = 5 * time.Minute
-	// failureTTL is how long a connection failure is returned without
-	// contacting Vault again, so an outage does not slow down every monitor.
+	// failureTTL is how long a failure is returned without contacting Vault
+	// again: a connection failure for every path, so an outage does not slow
+	// down every monitor, and other failures for their path, so a
+	// misconfigured monitor does not contact Vault on every run.
 	failureTTL = 30 * time.Second
 )
 
@@ -67,8 +69,10 @@ type store struct {
 	sleep func(ctx context.Context, d time.Duration) error
 }
 
+// cacheEntry is the data read at a path, or the error reading it.
 type cacheEntry struct {
 	data    map[string]any
+	err     error
 	expires time.Time
 }
 
@@ -158,6 +162,9 @@ func (s *store) secret(ctx context.Context, path string) (map[string]any, error)
 	s.mu.Lock()
 	if e, ok := s.cache[path]; ok && s.now().Before(e.expires) {
 		s.mu.Unlock()
+		if e.err != nil {
+			return nil, e.err
+		}
 		s.logger.Debugf("Using cached secret %s", s.location(path))
 		return e.data, nil
 	}
@@ -172,17 +179,20 @@ func (s *store) secret(ctx context.Context, path string) (map[string]any, error)
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if err != nil {
-		if isTransient(err) {
-			s.failure = err
-			s.failedUntil = s.now().Add(failureTTL)
-		}
-		return nil, err
-	}
-	s.failure = nil
 	s.purgeExpired()
-	s.cache[path] = cacheEntry{data: data, expires: s.now().Add(cacheTTL)}
-	return data, nil
+	switch {
+	case err == nil:
+		s.failure = nil
+		s.cache[path] = cacheEntry{data: data, expires: s.now().Add(cacheTTL)}
+		return data, nil
+	case isTransient(err):
+		s.failure = err
+		s.failedUntil = s.now().Add(failureTTL)
+	case !errors.Is(err, context.Canceled) && !errors.Is(err, context.DeadlineExceeded):
+		// Such as a denied or missing path: reading it again fails the same way.
+		s.cache[path] = cacheEntry{err: err, expires: s.now().Add(failureTTL)}
+	}
+	return nil, err
 }
 
 // purgeExpired removes expired cache entries. s.mu must be held.
@@ -209,7 +219,7 @@ func (s *store) fetchWithRetry(ctx context.Context, path string) (map[string]any
 }
 
 // fetch reads the secret at path. With AppRole it logs in when needed, and
-// logs in again once if Vault rejects the token.
+// logs in again once if Vault rejects the token, not the path.
 func (s *store) fetch(ctx context.Context, path string) (map[string]any, error) {
 	appRole := s.cfg.Auth.AppRole != nil
 	if appRole && s.client.Token() == "" {
@@ -220,7 +230,8 @@ func (s *store) fetch(ctx context.Context, path string) (map[string]any, error) 
 
 	token := s.client.Token()
 	secret, err := s.client.KVv2(s.cfg.KVMount).Get(ctx, path)
-	if appRole && isAuthError(err) {
+	// Logging in again doesn't fix a token without access to the path.
+	if appRole && isAuthError(err) && s.tokenRejected(ctx, token) {
 		s.logger.Debug("Vault rejected the token, logging in again")
 		if err := s.login(ctx, token); err != nil {
 			return nil, err
@@ -238,6 +249,23 @@ func (s *store) fetch(ctx context.Context, path string) (map[string]any, error) 
 		return nil, fmt.Errorf("vault: no secret at %s", s.location(path))
 	}
 	return secret.Data, nil
+}
+
+// tokenRejected reports whether token, used for a read Vault denied, must
+// be replaced: it was replaced already, or Vault rejects it. Vault answers
+// 403 both to an invalid token and to a valid token without access to a
+// path; only the first one can look itself up. A token without access to its
+// own lookup is considered rejected.
+func (s *store) tokenRejected(ctx context.Context, token string) bool {
+	if s.client.Token() != token {
+		return true
+	}
+	if _, err := s.client.Auth().Token().LookupSelfWithContext(ctx); err != nil {
+		s.logger.Debugf("Token lookup failed: %v", requestError(err, "looking up the token"))
+		return true
+	}
+	// The lookup used the current token, which must still be token.
+	return s.client.Token() != token
 }
 
 // login performs an AppRole login, unless the token was already replaced
