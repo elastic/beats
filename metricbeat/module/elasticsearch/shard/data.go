@@ -20,12 +20,12 @@ package shard
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"fmt"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -57,11 +57,28 @@ type stateStruct struct {
 	} `json:"routing_table"`
 }
 
-func eventsMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
+func eventsMapping(r mb.ReporterV2, content []byte, isXpack bool, prev *lastClusterState, log *logp.Logger) error {
 	stateData := &stateStruct{}
 	err := json.Unmarshal(content, stateData)
 	if err != nil {
 		return fmt.Errorf("failure parsing Elasticsearch Cluster State API response: %w", err)
+	}
+
+	// Only proceed if the cluster state has changed.
+	// See https://github.com/elastic/beats/issues/39058
+	if prev != nil && prev.ok && prev.id == stateData.StateID {
+		return nil
+	}
+	if log != nil {
+		prevID := ""
+		if prev != nil && prev.ok {
+			prevID = prev.id
+		}
+		log.Debugf("cluster state has changed from %q to %q, sending new shard data", prevID, stateData.StateID)
+	}
+	if prev != nil {
+		prev.id = stateData.StateID
+		prev.ok = true
 	}
 
 	var errs []error
@@ -160,9 +177,9 @@ func getSourceNode(nodeID string, stateData *stateStruct) (mapstr.M, error) {
 	}, nil
 }
 
-// Note: This function may generate duplicate IDs, but those will be dropped since libbeat
-// ignores the 409 status code
-// https://github.com/elastic/beats/blob/main/libbeat/outputs/elasticsearch/client.go#L396
+// Note: This function will not generate duplicate IDs when eventsMapping skips unchanged
+// cluster states (same state_uuid), thus preserving bandwidth and ES resources.
+// See https://github.com/elastic/beats/issues/39058
 func generateHashForEvent(stateID string, shard mapstr.M, index int) (string, error) {
 	var nodeID string
 	if shard["node"] == nil {
