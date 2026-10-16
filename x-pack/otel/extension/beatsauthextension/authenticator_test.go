@@ -385,6 +385,7 @@ func TestContinueOnError(t *testing.T) {
 			request, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://example.com", nil)
 			require.NoError(t, err, "request creation must succeed")
 
+			//nolint:bodyclose // response is always nil
 			response, err := roundTripper.RoundTrip(request)
 			require.Nil(t, response, "error transport must not return a response")
 			require.ErrorIs(
