@@ -8,11 +8,13 @@ package azureeventhub
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/Azure/go-autorest/autorest/azure"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 
@@ -20,8 +22,11 @@ import (
 
 	eventhub "github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var defaultTestConfig = azureInputConfig{
@@ -126,4 +131,86 @@ func (c *fakeClient) PublishAll(event []beat.Event) {
 	for _, e := range event {
 		c.Publish(e)
 	}
+}
+
+// conversionClient is a fake beat.Client that mimics the otel output in the
+// beat receiver runtime: it keeps converting the first published event on a
+// separate goroutine while the input goes on publishing the next ones.
+//
+// If the input mutates a map shared with an already published event, the
+// conversion triggers "concurrent map iteration and map write" (or a data
+// race report when running with -race).
+type conversionClient struct {
+	stop      chan struct{}
+	done      chan error
+	published int
+}
+
+func newConversionClient() *conversionClient {
+	return &conversionClient{
+		stop: make(chan struct{}),
+		done: make(chan error, 1),
+	}
+}
+
+func (c *conversionClient) Close() error { return nil }
+
+func (c *conversionClient) Publish(event beat.Event) {
+	c.published++
+	if c.published != 1 {
+		return
+	}
+	ready := make(chan struct{})
+	go func() {
+		close(ready)
+		for {
+			if err := otelmap.FromMapstr(pcommon.NewMap(), event.Fields); err != nil {
+				c.done <- err
+				return
+			}
+			select {
+			case <-c.stop:
+				c.done <- nil
+				return
+			default:
+			}
+		}
+	}()
+	<-ready
+}
+
+func (c *conversionClient) PublishAll(events []beat.Event) {
+	for _, event := range events {
+		c.Publish(event)
+	}
+}
+
+// wait stops the conversion goroutine and returns its result.
+func (c *conversionClient) wait() error {
+	close(c.stop)
+	return <-c.done
+}
+
+// assertIndependentMetadata checks that the events published from the same
+// message do not share their `azure` map: changing it in one event must not
+// affect the others.
+func assertIndependentMetadata(t *testing.T, events []beat.Event) {
+	t.Helper()
+	require.Len(t, events, 2, "the message should expand into two events")
+
+	first, ok := events[0].Fields["azure"].(mapstr.M)
+	require.True(t, ok, "the first event should have an azure map")
+	second, ok := events[1].Fields["azure"].(mapstr.M)
+	require.True(t, ok, "the second event should have an azure map")
+
+	want := second.Clone()
+	_, _ = first.Put("offset", "changed")
+	_, _ = first.Put("added", true)
+
+	assert.Equal(t, want, second, "changing the azure map of one event should not affect the other events")
+}
+
+// recordsPayload returns an Event Hub message body with n records.
+func recordsPayload(n int) []byte {
+	return []byte(`{"records":[` + strings.Repeat(`{"test":"record"},`, n-1) + `{"test":"record"}]}`)
 }

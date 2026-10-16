@@ -127,6 +127,72 @@ func TestProcessReceivedEventsUpdatesProcessingTimeOnce(t *testing.T) {
 		"processingTime should be updated once per call, not once per event")
 }
 
+// TestProcessReceivedEventsConcurrentConversion verifies that the events
+// published from one Event Hub message can be read by the output while the
+// input is still publishing the remaining records of the same message.
+//
+// See https://github.com/elastic/beats/issues/53816
+func TestProcessReceivedEventsConcurrentConversion(t *testing.T) {
+	input := newTestInputV2(t)
+	client := newConversionClient()
+
+	err := input.processReceivedEvents(receivedEventsWithRecords(10000), "0", client)
+	require.NoError(t, err, "processing the received events should not fail")
+
+	assert.NoError(t, client.wait(), "converting a published event should not fail")
+	assert.Equal(t, 10000, client.published, "the message should expand into one event per record")
+}
+
+// TestProcessReceivedEventsIndependentMetadata verifies that each event gets
+// its own `azure` map, so processors and outputs can change or read it
+// without affecting the other events from the same message.
+func TestProcessReceivedEventsIndependentMetadata(t *testing.T) {
+	input := newTestInputV2(t)
+	client := &fakeClient{}
+
+	err := input.processReceivedEvents(receivedEventsWithRecords(2), "0", client)
+	require.NoError(t, err, "processing the received events should not fail")
+
+	assertIndependentMetadata(t, client.publishedEvents)
+}
+
+// newTestInputV2 returns a v2 input ready to process received events.
+func newTestInputV2(t *testing.T) *eventHubInputV2 {
+	t.Helper()
+	logger := logptest.NewTestingLogger(t, inputName)
+	metrics := newInputMetrics(monitoring.NewRegistry(), logger)
+	sanitizers, err := newSanitizers(defaultTestConfig.Sanitizers, defaultTestConfig.LegacySanitizeOptions)
+	require.NoError(t, err, "creating the default sanitizers should not fail")
+
+	return &eventHubInputV2{
+		config:  defaultTestConfig,
+		log:     logger,
+		metrics: metrics,
+		messageDecoder: messageDecoder{
+			config:     defaultTestConfig,
+			metrics:    metrics,
+			log:        logger,
+			sanitizers: sanitizers,
+		},
+	}
+}
+
+// receivedEventsWithRecords returns a single received event whose body
+// contains n records.
+func receivedEventsWithRecords(n int) []*azeventhubs.ReceivedEventData {
+	now := time.Now()
+	partitionKey := "key"
+	return []*azeventhubs.ReceivedEventData{
+		{
+			EventData:      azeventhubs.EventData{Body: recordsPayload(n)},
+			SequenceNumber: 12,
+			EnqueuedTime:   &now,
+			PartitionKey:   &partitionKey,
+			Offset:         "1234",
+		},
+	}
+}
+
 // mockStatusReporter is a mock implementation of the status.Reporter interface.
 // It is used to verify that the input updates its status correctly.
 type mockStatusReporter struct {
