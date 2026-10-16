@@ -144,16 +144,29 @@ func TestNonZeroRedirect(t *testing.T) {
 	limit := 5
 	checker := makeCheckRedirect(limit, nil)
 
-	var via []*http.Request
-	// Test requests within the limit
+	// net/http CheckRedirect always passes the original request in via on
+	// the first redirect callback.
+	via := []*http.Request{makeTestHTTPRequest(t)}
 	for range limit {
 		req := makeTestHTTPRequest(t)
 		assert.NoError(t, checker(req, via))
 		via = append(via, req)
 	}
 
-	// We are now at the limit, this request should fail
+	// limit redirects already followed; the next one must be rejected
 	assert.Equal(t, http.ErrUseLastResponse, checker(makeTestHTTPRequest(t), via))
+}
+
+func TestMaxRedirectsOneAllowsExactlyOneRedirect(t *testing.T) {
+	checker := makeCheckRedirect(1, nil)
+
+	firstHop := makeTestHTTPRequest(t)
+	via := []*http.Request{makeTestHTTPRequest(t)}
+
+	assert.NoError(t, checker(firstHop, via), "max_redirects: 1 should allow following one redirect")
+
+	via = append(via, firstHop)
+	assert.Equal(t, http.ErrUseLastResponse, checker(makeTestHTTPRequest(t), via), "a second redirect must be rejected")
 }
 
 func TestRedirectLimitIndependentOfVia(t *testing.T) {
@@ -163,13 +176,13 @@ func TestRedirectLimitIndependentOfVia(t *testing.T) {
 
 	// SPNEGO starts a new Client.Do per hop, so via stays length 1. The limit still applies.
 	via := []*http.Request{makeTestHTTPRequest(t)}
-	for range limit - 1 {
+	for range limit {
 		req := makeTestHTTPRequest(t)
 		assert.NoError(t, checker(req, via), "redirects within the limit should be allowed")
 	}
 
 	assert.Equal(t, http.ErrUseLastResponse, checker(makeTestHTTPRequest(t), via), "limit must apply even when via does not grow")
-	assert.Len(t, redirects, limit, "every hop should still be recorded")
+	assert.Len(t, redirects, limit+1, "successful hops plus the rejected attempt are recorded")
 }
 
 func TestRequestBuildingWithCustomHost(t *testing.T) {
