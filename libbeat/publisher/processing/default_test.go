@@ -35,19 +35,15 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/paths"
-
-	_ "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
-	_ "github.com/elastic/beats/v7/libbeat/processors/add_docker_metadata"
-	_ "github.com/elastic/beats/v7/libbeat/processors/add_host_metadata"
-	_ "github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
 )
 
 func TestGenerateProcessorList(t *testing.T) {
+	processors.RegisterPlugin("foobar", func(config *config.C, logger *logp.Logger) (beat.Processor, error) {
+		return &processorWithClose{}, nil
+	})
+
 	inputCfg := []mapstr.M{
-		{"add_host_metadata": nil},
-		{"add_cloud_metadata": nil},
-		{"add_docker_metadata": nil},
-		{"add_kubernetes_metadata": nil},
+		{"foobar": nil},
 	}
 
 	plugins, err := processors.NewPluginConfigFromList(inputCfg)
@@ -56,7 +52,7 @@ func TestGenerateProcessorList(t *testing.T) {
 	processors, err := processors.New(plugins, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 	// make sure the processor init got the config formatted in a way it expected
-	require.Len(t, processors.List, 4)
+	require.Len(t, processors.List, 1)
 
 	require.NoError(t, processors.Close())
 }
