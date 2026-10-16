@@ -56,6 +56,8 @@ The `statsd` module has these additional config options:
 **`ttl`**
 :   It defines how long a metric will be reported after it was last recorded. Irrespective of the given ttl, metrics will be reported at least once. A ttl of zero means metrics will never expire.
 
+    {applies_to}`stack: ga 9.6+` It controls how long a metric is kept, not what it aggregates: every flush reports what was recorded since the previous one, and a timer or histogram that received no measurements is not reported for that flush.
+
 **`statsd.mappings`**
 :   It defines how metrics will mapped from the original metric label to the event json. Here’s an example configuration:
 

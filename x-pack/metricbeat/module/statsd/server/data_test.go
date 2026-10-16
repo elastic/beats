@@ -1387,6 +1387,144 @@ func TestTimerSampled(t *testing.T) {
 	assert.True(t, actualMetric01["15m_rate"].(float64) > 10)
 }
 
+// newStatsdMetricSet builds the statsd server metricset for a test.
+func newStatsdMetricSet(t *testing.T, config map[string]any) *MetricSet {
+	t.Helper()
+	ms, ok := mbtest.NewMetricSet(t, config).(*MetricSet)
+	require.True(t, ok, "the statsd module must build a *MetricSet")
+	return ms
+}
+
+// metricValues returns the values reported for a single metric.
+func metricValues(t *testing.T, fields mapstr.M, name string) map[string]any {
+	t.Helper()
+	values, ok := fields[name].(map[string]any)
+	require.True(t, ok, "metric %q must be reported as a map of values, got %#v", name, fields[name])
+	return values
+}
+
+func TestTimerReset(t *testing.T) {
+	ms := newStatsdMetricSet(t, map[string]any{"module": "statsd"})
+
+	err := process([]string{"metric01:2|ms", "metric01:4|ms"}, ms)
+	require.NoError(t, err, "the timer packets must be accepted")
+
+	events := ms.getEvents()
+	require.Len(t, events, 1, "the timer received measurements, so it must be reported")
+
+	actual := metricValues(t, events[0].MetricSetFields, "metric01")
+	assert.Equal(t, int64(2), actual["count"], "both measurements of the first interval must be counted")
+	assert.Equal(t, int64(2), actual["min"], "min must be the smallest measurement of the first interval")
+	assert.Equal(t, int64(4), actual["max"], "max must be the largest measurement of the first interval")
+	assert.InDelta(t, 3.0, actual["mean"], 0.001, "mean must average the measurements of the first interval")
+
+	err = process([]string{"metric01:10|ms"}, ms)
+	require.NoError(t, err, "the timer packet of the second interval must be accepted")
+
+	events = ms.getEvents()
+	require.Len(t, events, 1, "the timer received a new measurement, so it must be reported again")
+
+	actual = metricValues(t, events[0].MetricSetFields, "metric01")
+	assert.Equal(t, int64(1), actual["count"], "count must restart from the second interval instead of accumulating the first")
+	assert.Equal(t, int64(10), actual["min"], "min must forget the measurements of the first interval")
+	assert.Equal(t, int64(10), actual["max"], "max must forget the measurements of the first interval")
+	assert.InDelta(t, 10.0, actual["mean"], 0.001, "mean must average only the second interval")
+
+	meanRate, ok := actual["mean_rate"].(float64)
+	require.True(t, ok, "mean_rate must be reported as a float64, got %#v", actual["mean_rate"])
+	assert.Positive(t, meanRate, "the moving average rates span fixed time windows and must survive the reset")
+
+	assert.Empty(t, ms.getEvents(), "a timer that received no new measurements must not be reported")
+}
+
+func TestTimerSampledReset(t *testing.T) {
+	ms := newStatsdMetricSet(t, map[string]any{"module": "statsd"})
+
+	err := process([]string{"metric01:2|ms|@0.1"}, ms)
+	require.NoError(t, err, "the sampled timer packet must be accepted")
+
+	events := ms.getEvents()
+	require.Len(t, events, 1, "the sampled timer received a measurement, so it must be reported")
+	assert.Equal(t, int64(10), metricValues(t, events[0].MetricSetFields, "metric01")["count"],
+		"count must be extrapolated from the 0.1 sample rate")
+
+	err = process([]string{"metric01:2|ms|@0.5"}, ms)
+	require.NoError(t, err, "the sampled timer packet of the second interval must be accepted")
+
+	events = ms.getEvents()
+	require.Len(t, events, 1, "the sampled timer received a new measurement, so it must be reported again")
+	assert.Equal(t, int64(2), metricValues(t, events[0].MetricSetFields, "metric01")["count"],
+		"the extrapolated count must restart from the second interval instead of adding to the previous 10")
+}
+
+// TestTimerSampleRateAboveOne covers a sample rate above one, for which the
+// extrapolated count rounds down to zero. The measurement was still recorded,
+// so the timer must still be reported.
+func TestTimerSampleRateAboveOne(t *testing.T) {
+	ms := newStatsdMetricSet(t, map[string]any{"module": "statsd"})
+
+	err := process([]string{"metric01:2|ms|@2"}, ms)
+	require.NoError(t, err, "a sample rate above one is accepted, only a rate of zero or less is rejected")
+
+	events := ms.getEvents()
+	require.Len(t, events, 1, "the timer recorded a measurement, so it must be reported even though 1/2 truncates its count to zero")
+
+	actual := metricValues(t, events[0].MetricSetFields, "metric01")
+	assert.Equal(t, int64(2), actual["min"], "min must come from the recorded measurement")
+	assert.Equal(t, int64(2), actual["max"], "max must come from the recorded measurement")
+
+	// nothing new arrived, so the next flush skips the timer again
+	assert.Empty(t, ms.getEvents(), "an idle timer must not be reported on the following flush")
+}
+
+func TestHistogramReset(t *testing.T) {
+	ms := newStatsdMetricSet(t, map[string]any{"module": "statsd"})
+
+	err := process([]string{"metric01:2|h", "metric01:4|h"}, ms)
+	require.NoError(t, err, "the histogram packets must be accepted")
+
+	events := ms.getEvents()
+	require.Len(t, events, 1, "the histogram received measurements, so it must be reported")
+
+	actual := metricValues(t, events[0].MetricSetFields, "metric01")
+	assert.Equal(t, int64(2), actual["count"], "both measurements of the first interval must be counted")
+	assert.Equal(t, int64(2), actual["min"], "min must be the smallest measurement of the first interval")
+	assert.Equal(t, int64(4), actual["max"], "max must be the largest measurement of the first interval")
+	assert.InDelta(t, 3.0, actual["mean"], 0.001, "mean must average the measurements of the first interval")
+
+	err = process([]string{"metric01:10|h"}, ms)
+	require.NoError(t, err, "the histogram packet of the second interval must be accepted")
+
+	events = ms.getEvents()
+	require.Len(t, events, 1, "the histogram received a new measurement, so it must be reported again")
+
+	actual = metricValues(t, events[0].MetricSetFields, "metric01")
+	assert.Equal(t, int64(1), actual["count"], "count must restart from the second interval instead of accumulating the first")
+	assert.Equal(t, int64(10), actual["min"], "min must forget the measurements of the first interval")
+	assert.Equal(t, int64(10), actual["max"], "max must forget the measurements of the first interval")
+	assert.InDelta(t, 10.0, actual["mean"], 0.001, "mean must average only the second interval")
+
+	assert.Empty(t, ms.getEvents(), "a histogram that received no new measurements must not be reported")
+}
+
+// TestIdleTimerDoesNotMaskOtherMetrics makes sure that an idle timer is skipped
+// without dropping the metrics it shares a tag group with.
+func TestIdleTimerDoesNotMaskOtherMetrics(t *testing.T) {
+	ms := newStatsdMetricSet(t, map[string]any{"module": "statsd"})
+
+	err := process([]string{"metric01:2|ms|#k1:v1", "metric02:1.0|g|#k1:v1"}, ms)
+	require.NoError(t, err, "the timer and gauge packets must be accepted")
+
+	events := ms.getEvents()
+	require.Len(t, events, 2, "the timer and the gauge of the tag group must each be reported")
+
+	events = ms.getEvents()
+	require.Len(t, events, 1, "the gauge must still be reported once the timer goes idle, skipping the timer must not drop its tag group")
+	assert.NotContains(t, events[0].MetricSetFields, "metric01", "the idle timer must not be reported")
+	assert.InDelta(t, 1.0, metricValues(t, events[0].MetricSetFields, "metric02")["value"], 0.001,
+		"the gauge must keep reporting its value, it is not scoped to a flush interval")
+}
+
 func TestChangeType(t *testing.T) {
 	ms := mbtest.NewMetricSet(t, map[string]any{"module": "statsd"}).(*MetricSet)
 	testData := []string{
