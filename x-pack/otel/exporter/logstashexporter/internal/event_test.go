@@ -54,6 +54,22 @@ func TestParseEvent(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "event with top-level beat, version and type fields",
+			setupLog: func() plog.LogRecord {
+				lr := plog.NewLogRecord()
+				lr.SetObservedTimestamp(pcommon.NewTimestampFromTime(time.Now()))
+
+				bodyMap := lr.Body().SetEmptyMap()
+				bodyMap.PutStr("message", "test message")
+				bodyMap.PutStr("type", "log")
+				bodyMap.PutStr("version", "1.2.3")
+				bodyMap.PutEmptyMap("beat").PutStr("name", "proxy")
+
+				return lr
+			},
+			wantErr: false,
+		},
+		{
 			name: "invalid event body - not a map",
 			setupLog: func() plog.LogRecord {
 				lr := plog.NewLogRecord()
@@ -79,9 +95,14 @@ func TestParseEvent(t *testing.T) {
 
 				require.NoError(t, err)
 
-				// Verify fields match original log record body
+				// Verify fields match original log record body. `@timestamp` moves to
+				// event.Timestamp (the json codec writes it from there).
 				originalBody := log.Body().Map().AsRaw()
 				for key, expectedValue := range originalBody {
+					if key == beat.TimestampFieldKey {
+						assert.NotContains(t, event.Fields, key)
+						continue
+					}
 					assert.Equal(t, expectedValue, event.Fields[key],
 						"Field %s should match original log record", key)
 				}
