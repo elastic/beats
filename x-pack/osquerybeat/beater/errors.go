@@ -69,6 +69,8 @@ func isOsqueryExit78(err error) bool {
 // turn a startup failure into a recoverable runtime failure.
 type osqueryRunState struct {
 	state atomic.Uint32
+	// Written by the process-exit callback; read only after all run goroutines finish.
+	startupErr error
 }
 
 const (
@@ -84,8 +86,12 @@ func (s *osqueryRunState) ready() {
 }
 
 func (s *osqueryRunState) exit(err error) error {
-	if s.state.Swap(osqueryExited) == osqueryReady && isOsqueryExit78(err) {
-		return errors.Join(errOsqueryRuntimeExit78, err)
+	ready := s.state.Swap(osqueryExited) == osqueryReady
+	if isOsqueryExit78(err) {
+		if ready {
+			return errors.Join(errOsqueryRuntimeExit78, err)
+		}
+		s.startupErr = err
 	}
 	return err
 }
@@ -96,6 +102,18 @@ func (s *osqueryRunState) run(ctx context.Context, runner osqd.Runner, flags osq
 	err := runner.Run(ctx, flags, func(err error) { exitErr = s.exit(err) })
 	if err != nil && exitErr != nil {
 		return exitErr
+	}
+	return err
+}
+
+// result must be called after the run's errgroup finishes. A startup exit 78
+// takes precedence over an extension error reported during process cleanup.
+func (s *osqueryRunState) result(parent context.Context, err error) error {
+	if s.startupErr != nil {
+		if parent.Err() != nil {
+			return parent.Err()
+		}
+		return s.startupErr
 	}
 	return err
 }

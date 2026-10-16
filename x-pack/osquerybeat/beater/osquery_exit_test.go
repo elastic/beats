@@ -11,12 +11,14 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
@@ -27,6 +29,7 @@ func TestOsqueryExit(t *testing.T) {
 	exit78 := osqueryExitError(t, 78)
 	otherExit := osqueryExitError(t, 1)
 
+	t.Run("competing_extension_error", func(t *testing.T) { testOsqueryCompetingExtensionError(t, exit78) })
 	t.Run("classification", func(t *testing.T) { testOsqueryExitClassification(t, exit78, otherExit) })
 	t.Run("runtime_exit_78_then_startup_failure", func(t *testing.T) { testOsqueryRunnerRuntimeExit78ThenStartupFailure(t, exit78) })
 	t.Run("readiness_during_exit_cleanup", func(t *testing.T) { testOsqueryReadinessDuringExitCleanup(t, exit78) })
@@ -209,4 +212,66 @@ func osqueryExitError(t *testing.T, code int) error {
 	var exitError *exec.ExitError
 	require.ErrorAs(t, err, &exitError, "helper must produce a real process exit error")
 	return err
+}
+
+func testOsqueryCompetingExtensionError(t *testing.T, exit78 error) {
+	t.Helper()
+	for _, tc := range []struct {
+		name   string
+		ready  bool
+		cancel bool
+	}{
+		{name: "startup_exit"},
+		{name: "runtime_exit", ready: true},
+		{name: "parent_cancellation", cancel: true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			parent, cancel := context.WithCancel(t.Context())
+			defer cancel()
+			var state osqueryRunState
+			if tc.ready {
+				state.ready()
+			}
+			runner := &delayedCleanupRunner{err: exit78, exited: make(chan struct{}), cleanup: make(chan struct{})}
+			var cleanupOnce sync.Once
+			cleanup := func() { cleanupOnce.Do(func() { close(runner.cleanup) }) }
+			defer cleanup()
+			extensionErr := errors.New("extension ping failed: timeout after 200ms")
+			g, ctx := errgroup.WithContext(parent)
+			g.Go(func() error {
+				// Simulate cleanup that remains blocked despite sibling cancellation.
+				return state.run(parent, runner, nil)
+			})
+			g.Go(func() error {
+				select {
+				case <-runner.exited:
+					return extensionErr
+				case <-ctx.Done():
+					return ctx.Err()
+				}
+			})
+			select {
+			case <-ctx.Done():
+			case <-time.After(5 * time.Second):
+				t.Fatal("extension failure was not observed")
+			}
+			state.ready() // Late config callback while process cleanup is blocked.
+			if tc.cancel {
+				cancel()
+			}
+			cleanup()
+			firstErr := g.Wait()
+			require.ErrorIs(t, firstErr, extensionErr, "extension failure must win the errgroup race")
+			err := state.result(parent, firstErr)
+			switch {
+			case tc.cancel:
+				assert.ErrorIs(t, err, context.Canceled, "parent cancellation takes precedence")
+			case tc.ready:
+				assert.ErrorIs(t, err, extensionErr, "runtime recovery keeps existing error selection")
+			default:
+				assert.ErrorIs(t, err, exit78, "startup exit must override the competing extension error")
+				assert.False(t, isRecoverableOsqueryError(err), "startup failure must not restart")
+			}
+		})
+	}
 }
