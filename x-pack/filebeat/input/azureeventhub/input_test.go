@@ -191,12 +191,16 @@ func (c *conversionClient) wait() error {
 	return <-c.done
 }
 
-// assertIndependentMetadata checks that the events published from the same
-// message do not share their `azure` map: changing it in one event must not
-// affect the others.
-func assertIndependentMetadata(t *testing.T, events []beat.Event) {
+// assertIndependentMetadata checks that every event published from the same
+// message carries the expected `azure` metadata, and that the events do not
+// share their `azure` map: changing it in one event must not affect the others.
+func assertIndependentMetadata(t *testing.T, events []beat.Event, expected mapstr.M) {
 	t.Helper()
 	require.Len(t, events, 2, "the message should expand into two events")
+
+	for i, event := range events {
+		assert.Equal(t, expected, event.Fields["azure"], "event %d should carry the Event Hub metadata of its message", i)
+	}
 
 	first, ok := events[0].Fields["azure"].(mapstr.M)
 	require.True(t, ok, "the first event should have an azure map")

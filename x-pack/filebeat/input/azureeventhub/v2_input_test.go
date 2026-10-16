@@ -20,6 +20,7 @@ import (
 	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -150,10 +151,20 @@ func TestProcessReceivedEventsIndependentMetadata(t *testing.T) {
 	input := newTestInputV2(t)
 	client := &fakeClient{}
 
-	err := input.processReceivedEvents(receivedEventsWithRecords(2), "0", client)
+	receivedEvents := receivedEventsWithRecords(2)
+	err := input.processReceivedEvents(receivedEvents, "0", client)
 	require.NoError(t, err, "processing the received events should not fail")
 
-	assertIndependentMetadata(t, client.publishedEvents)
+	received := receivedEvents[0]
+	assertIndependentMetadata(t, client.publishedEvents, mapstr.M{
+		"partition_id":    "0",
+		"eventhub":        defaultTestConfig.EventHubName,
+		"consumer_group":  defaultTestConfig.ConsumerGroup,
+		"offset":          received.Offset,
+		"sequence_number": received.SequenceNumber,
+		"enqueued_time":   received.EnqueuedTime,
+		"partition_key":   *received.PartitionKey,
+	})
 }
 
 // newTestInputV2 returns a v2 input ready to process received events.

@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -76,7 +77,13 @@ func TestProcessEventsIndependentMetadata(t *testing.T) {
 		},
 	})
 
-	assertIndependentMetadata(t, client.publishedEvents)
+	assertIndependentMetadata(t, client.publishedEvents, mapstr.M{
+		"eventhub":        defaultTestConfig.EventHubName,
+		"consumer_group":  defaultTestConfig.ConsumerGroup,
+		"offset":          &offset,
+		"sequence_number": &sequence,
+		"enqueued_time":   &now,
+	})
 }
 
 func TestStripConnectionString(t *testing.T) {
