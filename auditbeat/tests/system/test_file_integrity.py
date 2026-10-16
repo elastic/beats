@@ -309,31 +309,37 @@ class Test(BaseTest):
             proc = self.start_beat()
             self.wait_startup(backend, dirs[0])
 
+            # The eBPF backend emits an extra attributes_modified event on file
+            # creation (alongside the created event). Account for it in all
+            # wait_output calls so the stability loop doesn't see events arrive
+            # mid-wait and restart its 10-second timer repeatedly.
+            extra = 1 if backend == "ebpf" else 0
+
             # Event 1: file create
             f = os.path.join(dirs[0], f'file_{backend}.txt')
             self.create_file(f, "hello world!")
 
             # Wait for file creation to be reported
-            self.wait_output(1)
+            self.wait_output(1 + extra)
 
             # Event 2: chmod
             os.chmod(f, 0o777)
 
             # Wait for mode change to be reported
-            self.wait_output(2)
+            self.wait_output(2 + extra)
 
             with open(f, "w") as fd:
                 # Event 3: write
                 fd.write("data")
                 fd.flush()
                 # Wait for write to be reported
-                self.wait_output(3)
+                self.wait_output(3 + extra)
 
                 # Event 4: truncate
                 fd.truncate(0)
                 fd.flush()
                 # Wait for truncate to be reported
-                self.wait_output(4)
+                self.wait_output(4 + extra)
 
             proc.check_kill_and_wait()
             self.assert_no_logged_warnings()
