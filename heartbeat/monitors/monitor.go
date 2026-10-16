@@ -73,15 +73,10 @@ type Monitor struct {
 	statusReporter      status.StatusReporter
 	plugin              plugin.Plugin
 	logger              *logp.Logger
-
-	// resolveConfig returns the config given to the plugin, with secret
-	// references resolved. Nil means the config is used as is.
-	resolveConfig ConfigResolver
 }
 
-// ConfigResolver returns the config to give to a monitor plugin. It is used
-// to resolve secret references only in the plugin's copy of the config.
-type ConfigResolver func(*conf.C) (*conf.C, error)
+// PluginFactoryWrapper returns a PluginFactory decorating the plugins of pf.
+type PluginFactoryWrapper func(pf plugin.PluginFactory) plugin.PluginFactory
 
 func (m *Monitor) SetStatusReporter(statusReporter status.StatusReporter) {
 	m.statusReporter = statusReporter
@@ -109,9 +104,9 @@ func newMonitor(
 	stateLoader monitorstate.StateLoader,
 	info beat.Info,
 	onStop func(*Monitor),
-	resolveConfig ConfigResolver,
+	wrapFactory PluginFactoryWrapper,
 ) (*Monitor, error) {
-	m, err := newMonitorUnsafe(config, registrar, pubClient, taskAdder, stateLoader, info, onStop, resolveConfig)
+	m, err := newMonitorUnsafe(config, registrar, pubClient, taskAdder, stateLoader, info, onStop, wrapFactory)
 	if m != nil && err != nil {
 		m.Stop()
 	}
@@ -128,7 +123,7 @@ func newMonitorUnsafe(
 	stateLoader monitorstate.StateLoader,
 	info beat.Info,
 	onStop func(*Monitor),
-	resolveConfig ConfigResolver,
+	wrapFactory PluginFactoryWrapper,
 ) (*Monitor, error) {
 	// Extract just the Id, Type, and Enabled fields from the config
 	// We'll parse things more precisely later once we know what exact type of
@@ -141,6 +136,9 @@ func newMonitorUnsafe(
 	pluginFactory, found := registrar.Get(standardFields.Type)
 	if !found {
 		return nil, fmt.Errorf("monitor type %v does not exist, valid types are %v", standardFields.Type, registrar.MonitorNames())
+	}
+	if wrapFactory != nil {
+		pluginFactory = wrapFactory(pluginFactory)
 	}
 
 	m := &Monitor{
@@ -155,7 +153,6 @@ func newMonitorUnsafe(
 		state:               MON_INIT,
 		monitorStateTracker: monitorstate.NewTracker(stateLoader, false, info.Logger),
 		logger:              info.Logger,
-		resolveConfig:       resolveConfig,
 	}
 
 	if m.stdFields.ID == "" {
@@ -167,12 +164,7 @@ func newMonitorUnsafe(
 		m.stdFields.ID = fmt.Sprintf("auto-%s-%#X", m.stdFields.Type, hash)
 	}
 
-	// A secret resolution failure doesn't stop the monitor: it reports the error.
-	var p plugin.Plugin
-	pluginConfig, err := m.pluginConfig(config)
-	if err == nil {
-		p, err = pluginFactory.Create(pluginConfig, info)
-	}
+	p, err := pluginFactory.Create(config, info)
 
 	m.close = func() error {
 		if onStop != nil {
@@ -223,14 +215,6 @@ func newMonitorUnsafe(
 	}
 
 	return m, nil
-}
-
-// pluginConfig returns the config to give to the plugin.
-func (m *Monitor) pluginConfig(config *conf.C) (*conf.C, error) {
-	if m.resolveConfig == nil {
-		return config, nil
-	}
-	return m.resolveConfig(config)
 }
 
 func (m *Monitor) configHash() (uint64, error) {
@@ -309,12 +293,7 @@ func (m *Monitor) Update(config *conf.C) error {
 	defer m.internalsMtx.Unlock()
 
 	m.updateStatus(status.Configuring, "updating runner config")
-	pluginConfig, err := m.pluginConfig(config)
-	if err != nil {
-		m.updateStatus(status.Degraded, "failed to resolve runner config")
-		return err
-	}
-	if err := m.plugin.Update(pluginConfig); err != nil {
+	if err := m.plugin.Update(config); err != nil {
 		m.updateStatus(status.Degraded, "failed to update runner config")
 		return err
 	}

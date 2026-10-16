@@ -208,7 +208,12 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 		}
 	}
 
-	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, f.stateLoader, *f.info, safeStop, f.secrets.Resolve)
+	// Only monitors with secret stores resolve secret references.
+	var wrapFactory PluginFactoryWrapper
+	if c.HasField(secretstores.ConfigKey) {
+		wrapFactory = f.secrets.WrapFactory
+	}
+	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, f.stateLoader, *f.info, safeStop, wrapFactory)
 	if err != nil {
 		return nil, fmt.Errorf("factory could not create monitor: %w", err)
 	}
