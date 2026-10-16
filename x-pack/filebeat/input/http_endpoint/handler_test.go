@@ -689,7 +689,7 @@ func Test_apiResponse(t *testing.T) {
 			}(),
 			events:       nil,
 			wantStatus:   http.StatusBadRequest,
-			wantResponse: `{"message":"malformed JSON object at stream position 0: invalid character '\\n' in string literal"}`,
+			wantResponse: `{"message":"malformed JSON object at stream position 0: invalid character '\\n' in string"}`,
 		},
 		{
 			name: "empty_CRC_challenge",

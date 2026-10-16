@@ -19,5 +19,5 @@ func init() {
 // AssetAwss3 returns asset data.
 // This is the base64 encoded zlib format compressed contents of input/awss3.
 func AssetAwss3() string {
-	return "eJy00LFOwzAYBODdT3Hq3izZPCDxAh3owIj+JpfWxLEj+3dR3h45pYBEBxDgwZLts+7Tv8XIxSK3BlCnnhab3G4M0DN3yc3qYrC4MwCwbzE4+j5jSHFCbuHCXLQxQKKnZFocxeAtZddPWwSZaHEo3Uht6mG9rw2DFK9Pa9pCU7m+6DLTVtlLTP17+ounrp1MRBygJ1bfpQV6krq5DB+PSNTkeGa/uptbLEnhL1X3D7vfoOLhmZ02I5d/HNWl5AeqiSq9qHzTNHhRZeAt1cegHvefLNcGnMUX5sa8BgAA//9Tvst1"
+	return "eJys0DFPwzAQBeDdv+Kpe7Nk84DUP9CBDozomrw0Jk4c2eei/HvktEUIOoCo5MXnZ71Pt8XAxSLVBlCnnhabVG8M0DI10c3qwmTxZADgUKNz9G1CF8OIVMNNc9bKAJGekmhxEoNryq6ftphkpMUxNwO1Kpd1Xho6yV5f17SFxnx70WWmLbL3ENvP9A9POXsZidBBexbfpQXai0J7l+DDCZEaHc9sV3d1jyVxeqRq97z/Dyoc39hoNXB5JOrbqi4lf1CNVGlF5ZemzosqJ95TXUfA7uXwxXJrwFl8ZqrMxwBTvst1"
 }
