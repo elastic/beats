@@ -75,7 +75,7 @@ const (
 type osquerybeat struct {
 	b      *beat.Beat
 	config config.Config
-	// osquery install settings are sourced from inputs[0].osquery.elastic_options.install.
+	// osquery install settings are sourced from the result input's osquery.elastic_options.install.
 	osqueryInstallConfig config.InstallConfig
 	// checkTimeout is the osqueryd --version startup check deadline, from
 	// elastic_options.check_timeout (default 15s).

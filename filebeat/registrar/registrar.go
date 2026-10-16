@@ -18,6 +18,7 @@
 package registrar
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -30,6 +31,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
+// ErrStopped is returned by Start when the registrar was already stopped, so
+// callers do not build inputs on a registrar that will never run.
+var ErrStopped = errors.New("registrar stopped")
+
 type Registrar struct {
 	log *logp.Logger
 
@@ -41,6 +46,16 @@ type Registrar struct {
 	// shutdown handling
 	done chan struct{}
 	wg   sync.WaitGroup
+
+	// The registrar is started lazily by the first V1 input to be created, which
+	// cannot know whether another already did. startOnce makes Start safe to
+	// call repeatedly; startErr is kept so every call reports a failed start.
+	startOnce sync.Once
+	startErr  error
+	// started is true once Run was launched. The store is only closed by Run,
+	// so Stop must close it itself when the registrar never ran.
+	started  bool
+	stopOnce sync.Once
 
 	// state storage
 	states       *file.States      // Map with all file paths inside and the corresponding state
@@ -105,27 +120,52 @@ func (r *Registrar) loadStates() error {
 	return nil
 }
 
+// Start loads the previous log file locations and runs the registrar. It is
+// called when a V1 input is created (see input.RunnerFactory.Create), and is
+// safe to call any number of times: only the first call does anything. If that
+// first start fails, every later call returns the same error, and after Stop
+// every call returns ErrStopped.
 func (r *Registrar) Start() error {
-	// Load the previous log file locations now, for use in input
-	err := r.loadStates()
-	if err != nil {
-		return fmt.Errorf("error loading state: %w", err)
-	}
+	r.startOnce.Do(func() {
+		// Load the previous log file locations now, for use in input
+		if err := r.loadStates(); err != nil {
+			r.startErr = fmt.Errorf("error loading state: %w", err)
+			return
+		}
 
-	r.wg.Go(func() {
-		r.Run()
+		r.started = true
+		r.wg.Go(func() {
+			r.Run()
+		})
 	})
 
-	return nil
+	return r.startErr
 }
 
-// Stop stops the registry. It waits until Run function finished.
+// Stop stops the registry. It waits until Run function finished. It is safe to
+// call more than once.
 func (r *Registrar) Stop() {
+	r.stopOnce.Do(r.stop)
+}
+
+func (r *Registrar) stop() {
 	r.log.Info("Stopping Registrar")
 	defer r.log.Info("Registrar stopped")
 
+	// Claim startOnce so an input created concurrently with shutdown cannot
+	// start a registrar after this point. Start then reports ErrStopped
+	// instead of success, unless an earlier start already failed.
+	r.startOnce.Do(func() { r.startErr = ErrStopped })
+
 	close(r.done)
 	r.wg.Wait()
+
+	// Run closes the store when it exits; if it never ran, close it here.
+	if !r.started {
+		if err := r.store.Close(); err != nil {
+			r.log.Errorf("Error closing the registry store: %v", err)
+		}
+	}
 }
 
 func (r *Registrar) Run() {
