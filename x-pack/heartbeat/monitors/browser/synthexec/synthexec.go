@@ -194,6 +194,20 @@ func runCmd(
 	// Expose the monitor context to the synthetics runner so its APM plugin can
 	// cross-link the journey execution with the traced application's APM data.
 	cmd.Env = append(cmd.Env, syntheticsCrosslinkEnv(traceID, sFields)...)
+	// Added to cmd.Env, so it must come after the lines above.
+	cleanupCAs, err := applyCustomCAs(ctx, cmd)
+	if err != nil {
+		_ = jsonReader.Close()
+		_ = jsonWriter.Close()
+		return nil, err
+	}
+	cmdStarted := false
+	defer func() {
+		// Once the command runs, the completion goroutine below owns the cleanup.
+		if !cmdStarted {
+			cleanupCAs()
+		}
+	}()
 	cmd.Args = append(cmd.Args, "--rich-events")
 
 	if len(filterJourneys.Tags) > 0 {
@@ -281,7 +295,7 @@ func runCmd(
 	})
 
 	// This use of channels for results is awkward, but required for the thread locking below
-	cmdStarted := make(chan error)
+	cmdStartedCh := make(chan error)
 	cmdDone := make(chan error)
 	go func() {
 		// We must idle this thread and ensure it is not killed while the external program is running
@@ -291,18 +305,19 @@ func runCmd(
 		defer runtime.UnlockOSThread()
 		err = cmd.Start()
 
-		cmdStarted <- err
+		cmdStartedCh <- err
 
 		err := cmd.Wait()
 		cmdDone <- err
 	}()
 
-	err = <-cmdStarted
+	err = <-cmdStartedCh
 	if err != nil {
 		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
 		logp.L().Warnf("Could not start command %s: %s", cmd, err)
 		return nil, err
 	}
+	cmdStarted = true
 
 	// Get timeout from parent ctx
 	timeout, _ := ctx.Value(SynthexecTimeoutKey).(time.Duration)
@@ -326,6 +341,7 @@ func runCmd(
 	go func() {
 		err := <-cmdDone
 		_ = jsonWriter.Close()
+		cleanupCAs()
 		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
 		logp.L().Infof("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), cmd)
 

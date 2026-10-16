@@ -537,3 +537,23 @@ func TestExtraArgsForBrowserMonitorUnchanged(t *testing.T) {
 	assert.Contains(t, args, "--screenshots")
 	assert.Contains(t, args, "--no-throttling")
 }
+
+func TestSSLCertificateAuthorities(t *testing.T) {
+	cfg := conf.MustNewConfigFrom(mapstr.M{
+		"name": "My Name",
+		"id":   "myId",
+		"ssl": mapstr.M{
+			"certificate_authorities": []string{"/certs/ca.crt", "-----BEGIN CERTIFICATE-----"},
+		},
+		"source": mapstr.M{
+			"inline": mapstr.M{
+				"script": "a script",
+			},
+		},
+	})
+	s, err := NewSourceJob(cfg)
+	require.NoError(t, err, "browser config with ssl.certificate_authorities must be valid")
+	require.Equal(t, []string{"/certs/ca.crt", "-----BEGIN CERTIFICATE-----"}, s.browserCfg.SSL.CertificateAuthorities,
+		"ssl.certificate_authorities must be read into the browser config")
+	require.NoError(t, s.Close())
+}

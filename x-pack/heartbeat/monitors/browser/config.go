@@ -45,7 +45,16 @@ type Config struct {
 	FilterJourneys                synthexec.FilterJourneyConfig `config:"filter_journeys"`
 	IgnoreHTTPSErrors             bool                          `config:"ignore_https_errors"`
 	CertificateErrorSpkiAllowlist []string                      `config:"certificate_error_spki_allowlist"`
+	SSL                           SSLConfig                     `config:"ssl"`
 	Timeout                       time.Duration                 `config:"timeout"`
+}
+
+// SSLConfig holds the TLS settings of a browser monitor.
+type SSLConfig struct {
+	// CertificateAuthorities are PEM CA certificates, inline or as file paths, that the
+	// browser trusts for this monitor only. They are added to a per-run trust store, so
+	// they never apply to other monitors.
+	CertificateAuthorities []string `config:"certificate_authorities"`
 }
 
 // IsAPI reports whether this is the `api` monitor type (or its alias), which
