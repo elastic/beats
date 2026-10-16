@@ -6,15 +6,21 @@ package vault
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"sync"
 	"testing"
 	"time"
 
+	vaultapi "github.com/hashicorp/vault/api"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v3"
@@ -46,7 +52,10 @@ type fakeVault struct {
 	// denied holds the paths valid tokens can't read.
 	denied map[string]bool
 	// noLookup denies tokens their own lookup.
-	noLookup    bool
+	noLookup bool
+	// raw holds the paths answered with a 200 and a raw body, which isn't a
+	// KV v2 secret.
+	raw         map[string]string
 	logins      int
 	lookups     int
 	reads       int
@@ -64,6 +73,7 @@ func newFakeVault(t *testing.T) *fakeVault {
 		},
 		validTokens: map[string]bool{testToken: true},
 		denied:      map[string]bool{},
+		raw:         map[string]string{},
 	}
 	srv := httptest.NewServer(http.HandlerFunc(fv.handle))
 	t.Cleanup(srv.Close)
@@ -125,6 +135,11 @@ func (fv *fakeVault) handle(w http.ResponseWriter, r *http.Request) {
 		path := strings.TrimPrefix(r.URL.Path, "/v1/secret/data/")
 		if !fv.validTokens[r.Header.Get("X-Vault-Token")] || fv.denied[path] {
 			writeJSON(http.StatusForbidden, map[string]any{"errors": []string{"permission denied"}})
+			return
+		}
+		if body, ok := fv.raw[path]; ok {
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(body))
 			return
 		}
 		data, ok := fv.secrets[path]
@@ -486,7 +501,9 @@ func TestFailureCache(t *testing.T) {
 	assert.Len(t, *sleeps, len(retryBackoff), "a backoff is expected between attempts")
 
 	_, err = s.resolve(ctx, "myapp/other#password")
-	assert.ErrorContains(t, err, "status 503", "the failure must be returned for the whole connection")
+	assert.ErrorContains(t, err, "vault: "+fv.address+" is unavailable", "the failure must be returned for the whole connection")
+	assert.ErrorContains(t, err, "status 503: Vault is sealed", "the failure must explain the cause")
+	assert.NotContains(t, err.Error(), "myapp/creds", "the failure must not name the path of another monitor")
 	_, readsAfter := fv.counts()
 	assert.Equal(t, reads, readsAfter, "Vault must not be contacted while the failure is cached")
 
@@ -529,13 +546,88 @@ func TestPathFailureCache(t *testing.T) {
 	assert.Equal(t, reads+2, readsAfter, "Vault must be read again after the failure expires")
 }
 
-func TestConnectionErrorIsTransient(t *testing.T) {
+func TestConnectionErrorIsRetried(t *testing.T) {
 	s, _, sleeps := newTestStore(t, tokenEntry(unreachableAddress(t)), nil)
 	_, err := s.resolve(context.Background(), "myapp/creds#password")
 	require.Error(t, err, "an unreachable Vault must be reported")
-	assert.True(t, isTransient(err), "connection errors must be transient")
+	assert.True(t, isConnectionError(err), "a refused connection must be a connection error")
 	assert.Len(t, *sleeps, len(retryBackoff), "connection errors must be retried")
 	assert.NotContains(t, err.Error(), testToken, "the token must not be in errors")
+	assert.NotContains(t, err.Error(), "/v1/", "the request URL must not be in errors")
+}
+
+func TestCertificateErrorIsNotRetried(t *testing.T) {
+	// The server certificate is not trusted by the store.
+	srv := httptest.NewTLSServer(http.NotFoundHandler())
+	t.Cleanup(srv.Close)
+	s, _, sleeps := newTestStore(t, tokenEntry(srv.URL), nil)
+	ctx := context.Background()
+
+	_, err := s.resolve(ctx, "myapp/creds#password")
+	require.Error(t, err, "an untrusted certificate must be reported")
+	assert.True(t, isConnectionError(err), "an untrusted certificate must be a connection error")
+	assert.Empty(t, *sleeps, "an untrusted certificate must not be retried")
+
+	_, err = s.resolve(ctx, "myapp/other#password")
+	assert.ErrorContains(t, err, "is unavailable", "the failure must be returned for the whole connection")
+}
+
+func TestRequestErrorClassification(t *testing.T) {
+	refused := &net.OpError{Op: "dial", Net: "tcp", Err: errors.New("connect: connection refused")}
+	// Wrapped as the Vault client does.
+	viaClient := func(err error) error {
+		return fmt.Errorf("error encountered while reading secret at secret/data/app: %w", err)
+	}
+	tests := map[string]struct {
+		err            error
+		wantConnection bool
+		wantRetry      bool
+	}{
+		"server error":         {err: &vaultapi.ResponseError{StatusCode: http.StatusServiceUnavailable}, wantConnection: true, wantRetry: true},
+		"rate limited":         {err: &vaultapi.ResponseError{StatusCode: http.StatusTooManyRequests}, wantConnection: true, wantRetry: true},
+		"denied":               {err: &vaultapi.ResponseError{StatusCode: http.StatusForbidden}},
+		"connection refused":   {err: viaClient(&url.Error{Op: "Get", URL: "https://vault/v1/secret/data/app", Err: refused}), wantConnection: true, wantRetry: true},
+		"untrusted authority":  {err: viaClient(&url.Error{Op: "Get", URL: "https://vault/v1/secret/data/app", Err: x509.UnknownAuthorityError{}}), wantConnection: true},
+		"verification failure": {err: viaClient(&url.Error{Op: "Get", URL: "https://vault/v1/secret/data/app", Err: &tls.CertificateVerificationError{Err: x509.HostnameError{Host: "vault"}}}), wantConnection: true},
+		"unexpected response":  {err: viaClient(errors.New("missing expected 'data' element"))},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			err := requestError(tc.err, "reading secret/data/app")
+			assert.Equal(t, tc.wantConnection, isConnectionError(err), "unexpected connection error classification")
+			assert.Equal(t, tc.wantRetry, isRetryable(err), "unexpected retry classification")
+			if tc.wantConnection {
+				assert.NotContains(t, connectionCause(err), "secret/data/app", "the cause must not name the path")
+			}
+		})
+	}
+}
+
+func TestUnexpectedResponseIsPathError(t *testing.T) {
+	tests := map[string]struct {
+		body    string
+		wantErr string
+	}{
+		"KV v1 secret": {body: `{"data": {"password": "x"}}`, wantErr: "missing expected 'data' element"},
+		"not JSON":     {body: "<html>proxy login</html>", wantErr: "invalid character"},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			fv := newFakeVault(t)
+			fv.raw["unexpected"] = tc.body
+			s, _, sleeps := newTestStore(t, tokenEntry(fv.address), nil)
+			ctx := context.Background()
+
+			_, err := s.resolve(ctx, "unexpected#password")
+			assert.ErrorContains(t, err, tc.wantErr, "the unexpected response must be reported")
+			assert.False(t, isConnectionError(err), "an unexpected response must not be a connection error")
+			assert.Empty(t, *sleeps, "an unexpected response must not be retried")
+
+			v, err := s.resolve(ctx, "myapp/creds#password")
+			require.NoError(t, err, "other paths must not be affected")
+			assert.Equal(t, testPassword, v, "unexpected secret value")
+		})
+	}
 }
 
 func TestNotFoundErrors(t *testing.T) {

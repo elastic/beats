@@ -12,10 +12,12 @@ package vault
 import (
 	"context"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 	"sync"
 	"time"
@@ -60,8 +62,11 @@ type store struct {
 	// loginMu is used to avoid concurrent auth failures
 	loginMu sync.Mutex
 
-	mu          sync.Mutex
-	cache       map[string]cacheEntry
+	mu    sync.Mutex
+	cache map[string]cacheEntry
+	// failure is returned for every path until failedUntil after a
+	// connection error. It doesn't name the path that failed, which
+	// belongs to another monitor.
 	failure     error
 	failedUntil time.Time
 
@@ -185,9 +190,10 @@ func (s *store) secret(ctx context.Context, path string) (map[string]any, error)
 		s.failure = nil
 		s.cache[path] = cacheEntry{data: data, expires: s.now().Add(cacheTTL)}
 		return data, nil
-	case isTransient(err):
-		s.failure = err
+	case isConnectionError(err):
 		s.failedUntil = s.now().Add(failureTTL)
+		s.failure = fmt.Errorf("vault: %s is unavailable, retrying after %s: %s",
+			redactedAddress(s.cfg.Address), s.failedUntil.Format(time.RFC3339), connectionCause(err))
 	case !errors.Is(err, context.Canceled) && !errors.Is(err, context.DeadlineExceeded):
 		// Such as a denied or missing path: reading it again fails the same way.
 		s.cache[path] = cacheEntry{err: err, expires: s.now().Add(failureTTL)}
@@ -208,7 +214,7 @@ func (s *store) purgeExpired() {
 func (s *store) fetchWithRetry(ctx context.Context, path string) (map[string]any, error) {
 	for attempt := 0; ; attempt++ {
 		data, err := s.fetch(ctx, path)
-		if err == nil || !isTransient(err) || attempt >= len(retryBackoff) {
+		if err == nil || !isRetryable(err) || attempt >= len(retryBackoff) {
 			return data, err
 		}
 		s.logger.Debugf("Reading secret %s failed, retrying: %v", s.location(path), err)
@@ -294,8 +300,9 @@ func (s *store) login(ctx context.Context, staleToken string) error {
 	return nil
 }
 
-// requestError converts a Vault client error into an error without secrets,
-// marking it transient when retrying may help.
+// requestError converts a Vault client error into an error without secrets.
+// Errors of the connection to Vault, rather than of the request, are
+// connectionErrors.
 func requestError(err error, msg string) error {
 	if errors.Is(err, context.Canceled) {
 		return fmt.Errorf("vault: %s: %w", msg, err)
@@ -303,19 +310,54 @@ func requestError(err error, msg string) error {
 
 	var respErr *vaultapi.ResponseError
 	if errors.As(err, &respErr) {
-		text := fmt.Sprintf("vault: %s failed with status %d", msg, respErr.StatusCode)
+		cause := fmt.Sprintf("status %d", respErr.StatusCode)
 		// Raw bodies are not Vault errors and could contain anything.
 		if !respErr.RawError && len(respErr.Errors) > 0 {
-			text += ": " + strings.Join(respErr.Errors, "; ")
+			cause += ": " + strings.Join(respErr.Errors, "; ")
 		}
+		text := fmt.Sprintf("vault: %s failed with %s", msg, cause)
 		if respErr.StatusCode == http.StatusTooManyRequests || respErr.StatusCode >= 500 {
-			return &transientError{errors.New(text)}
+			return &connectionError{err: errors.New(text), cause: cause, retry: true}
 		}
 		return errors.New(text)
 	}
 
-	// Connection errors and timeouts.
-	return &transientError{fmt.Errorf("vault: %s failed: %w", msg, err)}
+	// The cause of a url.Error, without the request URL: the path is already
+	// in msg, and other monitors must not see it.
+	var urlErr *url.Error
+	if errors.As(err, &urlErr) {
+		return &connectionError{
+			err:   fmt.Errorf("vault: %s failed: %w", msg, urlErr.Err),
+			cause: urlErr.Err.Error(),
+			// Retrying doesn't fix an untrusted certificate.
+			retry: !isCertificateError(urlErr.Err),
+		}
+	}
+
+	// Such as a response that isn't a KV v2 secret.
+	return fmt.Errorf("vault: %s failed: %w", msg, err)
+}
+
+func isCertificateError(err error) bool {
+	var (
+		unknownAuthority x509.UnknownAuthorityError
+		hostname         x509.HostnameError
+		invalid          x509.CertificateInvalidError
+		verification     *tls.CertificateVerificationError
+	)
+	return errors.As(err, &unknownAuthority) ||
+		errors.As(err, &hostname) ||
+		errors.As(err, &invalid) ||
+		errors.As(err, &verification)
+}
+
+// redactedAddress returns the Vault address without a password.
+func redactedAddress(address string) string {
+	u, err := url.Parse(address)
+	if err != nil {
+		return "<invalid address>"
+	}
+	return u.Redacted()
 }
 
 func (s *store) location(path string) string {
@@ -328,17 +370,36 @@ func isAuthError(err error) bool {
 		(respErr.StatusCode == http.StatusUnauthorized || respErr.StatusCode == http.StatusForbidden)
 }
 
-// transientError marks errors that retrying may fix.
-type transientError struct {
+// connectionError is a failure of the connection to Vault, such as a
+// refused connection or an unavailable server, as opposed to a failure of
+// one request.
+type connectionError struct {
 	err error
+	// cause describes the failure without the request.
+	cause string
+	// retry is true if retrying may fix the failure.
+	retry bool
 }
 
-func (e *transientError) Error() string { return e.err.Error() }
-func (e *transientError) Unwrap() error { return e.err }
+func (e *connectionError) Error() string { return e.err.Error() }
+func (e *connectionError) Unwrap() error { return e.err }
 
-func isTransient(err error) bool {
-	var t *transientError
-	return errors.As(err, &t)
+func isConnectionError(err error) bool {
+	var c *connectionError
+	return errors.As(err, &c)
+}
+
+func isRetryable(err error) bool {
+	var c *connectionError
+	return errors.As(err, &c) && c.retry
+}
+
+func connectionCause(err error) string {
+	var c *connectionError
+	if errors.As(err, &c) {
+		return c.cause
+	}
+	return ""
 }
 
 // stringValue converts a KV field value into the string put in the config.
