@@ -46,6 +46,7 @@ var testCfg = Config{
 		Snapshot: true,
 		Version:  "9.3.0",
 	},
+	Tags: []string{"production", "team-payments"},
 }
 
 func TestAddAgentMetadata(t *testing.T) {
@@ -87,6 +88,9 @@ func TestAddAgentMetadata(t *testing.T) {
 	ag, ok := result.Fields["agent"].(mapstr.M)
 	require.True(t, ok)
 	assert.Equal(t, "db87c002-3ed1-4929-9edd-98cb6f76b2b1", ag["id"])
+
+	// Verify tags
+	assert.Equal(t, []string{"production", "team-payments"}, result.Fields["tags"])
 
 	// Verify pre-existing fields are preserved
 	assert.Equal(t, "keep_me", result.Fields["existing_field"])
@@ -243,19 +247,56 @@ func TestAddAgentMetadata_FromConfig(t *testing.T) {
 			"snapshot": false,
 			"version":  "9.3.0",
 		},
+		"tags": []any{"production", "team-payments"},
 	})
 	require.NoError(t, err)
 
 	p, err := CreateAddAgentMetadata(c, nil)
 	require.NoError(t, err)
 
-	event := &beat.Event{Timestamp: time.Now(), Fields: mapstr.M{}}
+	event := &beat.Event{Timestamp: time.Now(), Fields: mapstr.M{"tags": []string{"integration-tag"}}}
 	result, err := p.Run(event)
 	require.NoError(t, err)
 
 	assert.Equal(t, "test-input", result.Meta["input_id"])
 	ds := result.Fields["data_stream"].(mapstr.M) //nolint:errcheck //it's a test
 	assert.Equal(t, "system.cpu", ds["dataset"])
+	assert.Equal(t, []string{"integration-tag", "production", "team-payments"}, result.Fields["tags"])
+}
+
+func TestAddAgentMetadata_ExistingTags(t *testing.T) {
+	tests := []struct {
+		name string
+		give any
+		want any
+	}{
+		{
+			name: "any list",
+			give: []any{"integration-tag"},
+			want: []any{"integration-tag", "production", "team-payments"},
+		},
+		{
+			name: "string",
+			give: "integration-tag",
+			want: []string{"integration-tag", "production", "team-payments"},
+		},
+		{
+			name: "not a list or a string",
+			give: 42,
+			want: 42,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := New(testCfg)
+			event := &beat.Event{Timestamp: time.Now(), Fields: mapstr.M{"tags": tt.give}}
+
+			result, err := p.Run(event)
+			require.NoError(t, err)
+
+			assert.Equal(t, tt.want, result.Fields["tags"])
+		})
+	}
 }
 
 func TestAddAgentMetadata_String(t *testing.T) {
@@ -308,7 +349,21 @@ func equivalentAddFieldsProcessors(cfg Config) *processors.Processors {
 			}, true))
 	}
 
+	if len(cfg.Tags) > 0 {
+		procs.List = append(procs.List, addTags(cfg.Tags))
+	}
+
 	return procs
+}
+
+type addTags []string
+
+func (t addTags) Run(event *beat.Event) (*beat.Event, error) {
+	return event, mapstr.AddTags(event.Fields, t)
+}
+
+func (t addTags) String() string {
+	return "add_tags"
 }
 
 // TestEquivalence verifies that the combined processor produces the exact same
