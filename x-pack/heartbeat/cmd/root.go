@@ -20,6 +20,8 @@ import (
 	ucfg "github.com/elastic/go-ucfg"
 
 	_ "github.com/elastic/beats/v7/heartbeat/include"
+	_ "github.com/elastic/beats/v7/x-pack/heartbeat/secretstores/cyberark"
+	_ "github.com/elastic/beats/v7/x-pack/heartbeat/secretstores/vault"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 )

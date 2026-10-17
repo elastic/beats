@@ -119,6 +119,78 @@ Example:
 ```
 
 
+## `secret_stores` [monitor-secret-stores]
+
+{applies_to}`stack: preview 9.6+`
+
+Use the `secret_stores` option to read secrets from an external secret store when the monitor runs, instead of writing them in the monitor configuration. Heartbeat supports HashiCorp Vault KV v2 secrets (`vault`) and CyberArk Central Credential Provider accounts (`cyberark`).
+
+Reference a Vault secret as `vault://<path>#<field>`, or a CyberArk account as `cyberark://<safe>/<object>#<field>` (or `cyberark://<safe>/<folder>/<object>#<field>`), in any string setting of the monitor. A reference can be part of a longer value, such as `"Bearer vault://my-app/api#token"`. The path can't contain `.` or `..` segments. Percent-encode `#` and `@` in the path or field, as `%23` and `%40`. A reference can also be the value of a [keystore](/reference/heartbeat/keystore.md) or environment variable.
+
+Example:
+
+```yaml
+- type: http
+  id: my-api
+  schedule: '@every 1m'
+  urls: ["https://api.example.com/status"]
+  check.request.headers:
+    Authorization: "Bearer vault://my-app/api#token"
+  secret_stores:
+    - type: vault
+      address: https://vault.example.com:8200
+      auth:
+        approle:
+          role_id: my-role-id
+          secret_id: my-secret-id
+```
+
+Each `secret_stores` entry takes these options:
+
+`type`
+:   The secret store type: `vault` or `cyberark`.
+
+`address`
+:   The URL of the Vault or CyberArk Central Credential Provider (CCP) server.
+
+`namespace`
+:   (Optional, `vault` only) The Vault Enterprise namespace.
+
+`kv_mount`
+:   (Optional, `vault` only) The mount path of the KV v2 secrets engine. Defaults to `secret`.
+
+`app_id`
+:   (`cyberark` only) The CyberArk Application ID (`AppID`) registered for Heartbeat.
+
+`service_path`
+:   (Optional, `cyberark` only) The CCP web service path. Defaults to `/AIMWebService/api/Accounts`.
+
+`auth`
+:   The authentication method:
+
+    * For `vault` (required, exactly one):
+        * `token`: A Vault token.
+        * `approle`: AppRole credentials: `role_id`, `secret_id`, and optionally `mount_path`, which defaults to `approle`.
+    * For `cyberark` (optional when using mTLS via `ssl` or IP allowlisting):
+        * `token`: A bearer token.
+        * `basic`: HTTP Basic credentials (`username` and `password`).
+
+`ssl`
+:   (Optional) TLS settings of the connection to the secret store, such as `certificate_authorities` to trust a private CA, or `certificate` and `key` for CyberArk CCP mutual TLS authentication. They only apply to the secret store: the `ssl` settings of the monitor apply to the monitored host. See [SSL](/reference/heartbeat/configuration-ssl.md) for the available settings.
+
+Heartbeat resolves the references before each run. A secret is read from Vault at most once every 5 minutes and shared by the monitors that use the same connection, so rotated secrets are used within 5 minutes without changing the monitor. On runs that read from Vault, the monitor duration includes the time of the read.
+
+If a reference can't be resolved, for example because Vault is unavailable or the path doesn't exist, the monitor reports `down` with the error and tries again on its next run. Failed reads are not retried for 30 seconds.
+
+References in the `source.inline.script` setting of browser monitors are not resolved. Pass secrets to scripts with `params` instead.
+
+If a monitor with several URLs or hosts starts while Vault is unavailable, or if the resolved values change its number of URLs or hosts, it reports an error until you change its configuration or restart Heartbeat.
+
+::::{warning}
+Heartbeat uses the resolved values as they are. A secret in a setting that is published in events, such as a URL or a host, is visible in those events, for example in `url.full`, `url.query`, or `error.message`, as with any other secret in the configuration. Use settings that are not published for secrets, such as `username`, `password`, request headers, or TLS settings.
+::::
+
+
 ### `fields` [monitor-fields]
 
 Optional fields that you can specify to add additional information to the output. For example, you might add fields that you can use for filtering log data. Fields can be scalar values, arrays, dictionaries, or any nested combination of these. By default, the fields that you specify here will be grouped under a `fields` sub-dictionary in the output document. To store the custom fields as top-level fields, set the `fields_under_root` option to true. If a duplicate field is declared in the general configuration, then its value will be overwritten by the value declared here.
