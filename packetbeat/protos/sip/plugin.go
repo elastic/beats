@@ -504,7 +504,7 @@ func populateToFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 
 func populateContactFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 	if contact, found := m.headers["contact"]; found && len(contact) > 0 {
-		displayInfo, uri, params := parseFromToContact(contact[0])
+		displayInfo, uri, params := parseFromToContact(firstAddr(contact[0]))
 		fields.ContactDisplayInfo = displayInfo
 		fields.ContactExpires, _ = strconv.Atoi(string(params["expires"]))
 		fields.ContactQ, _ = strconv.ParseFloat(string(params["q"]), 64)
@@ -521,6 +521,32 @@ func populateContactFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 		fields.ContactTransport = bytes.ToLower(urlparams["transport"])
 		pbf.AddHost(string(host))
 	}
+}
+
+// firstAddr returns the first address of a comma-separated Contact header
+// value. Commas inside quoted display names or <...> are not separators.
+func firstAddr(contact common.NetString) common.NetString {
+	var inQuote, inAngle bool
+	for i := 0; i < len(contact); i++ {
+		switch c := contact[i]; {
+		case inQuote:
+			switch c {
+			case '\\':
+				i++
+			case '"':
+				inQuote = false
+			}
+		case c == '"' && !inAngle:
+			inQuote = true
+		case c == '<':
+			inAngle = true
+		case c == '>':
+			inAngle = false
+		case c == ',' && !inAngle:
+			return contact[:i]
+		}
+	}
+	return contact
 }
 
 func populateEventFields(cfg *config, pi *parsingInfo, pbf *pb.Fields, fields ProtocolFields) {
