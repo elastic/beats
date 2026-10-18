@@ -2411,6 +2411,29 @@ var inputTests = []struct {
 		},
 	},
 
+	{
+		name: "empty_events_not_retained",
+		config: map[string]any{
+			"interval": 1,
+			// The first evaluation returns an empty events array and asks
+			// for another evaluation. The second reports whether the empty
+			// array was left in state.
+			"program": `int(state.n).as(n, {
+							"events":    n == 0 ? [] : [{"had_events": has(state.events)}],
+							"n":         n+1,
+							"want_more": n == 0,
+						})`,
+			"state": map[string]any{"n": 0},
+			"resource": map[string]any{
+				"url": "",
+			},
+		},
+		time: func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
+		want: []map[string]any{
+			{"had_events": false},
+		},
+	},
+
 	// Coverage
 	{
 		name: "coverage",
