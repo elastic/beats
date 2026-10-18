@@ -2265,6 +2265,59 @@ var inputTests = []struct {
 		},
 	},
 
+<<<<<<< HEAD
+=======
+	{
+		name: "max_executions_with_remaining_executions",
+		config: map[string]any{
+			"interval":       1,
+			"max_executions": 5,
+			"program": `debug("STATE", int(state.n).as(n, {
+							"events": [{"n": n+1, "remaining_executions": remaining_executions}],
+							"n":          n+1,
+							"want_more":  remaining_executions != 0,
+						}))`,
+			"state": map[string]any{"n": 0},
+			"resource": map[string]any{
+				"url": "",
+			},
+		},
+		time: func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
+		want: []map[string]any{
+			{"n": float64(1), "remaining_executions": float64(4)},
+			{"n": float64(2), "remaining_executions": float64(3)},
+			{"n": float64(3), "remaining_executions": float64(2)},
+			{"n": float64(4), "remaining_executions": float64(1)},
+			{"n": float64(5), "remaining_executions": float64(0)},
+			{"n": float64(6), "remaining_executions": float64(4)},
+			{"n": float64(7), "remaining_executions": float64(3)},
+		},
+	},
+
+	{
+		name: "empty_events_not_retained",
+		config: map[string]any{
+			"interval": 1,
+			// The first evaluation returns an empty events array and asks
+			// for another evaluation. The second reports whether the empty
+			// array was left in state.
+			"program": `int(state.n).as(n, {
+							"events":    n == 0 ? [] : [{"had_events": has(state.events)}],
+							"n":         n+1,
+							"want_more": n == 0,
+						})`,
+			"state": map[string]any{"n": 0},
+			"resource": map[string]any{
+				"url": "",
+			},
+		},
+		time: func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
+		want: []map[string]any{
+			{"had_events": false},
+		},
+	},
+
+>>>>>>> 65ae3d3 (x-pack/filebeat/input/cel: ensure events array is dropped before next eval (#53817))
 	// Coverage
 	{
 		name: "coverage",
