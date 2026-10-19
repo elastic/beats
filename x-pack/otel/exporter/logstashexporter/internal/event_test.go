@@ -16,6 +16,7 @@ import (
 	"go.opentelemetry.io/collector/pdata/plog"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestParseEvent(t *testing.T) {
@@ -86,7 +87,7 @@ func TestParseEvent(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			log := tt.setupLog()
 
-			event, err := parseEvent(&log)
+			event, err := parseEvent(&log, "")
 
 			if tt.wantErr {
 				require.Error(t, err)
@@ -112,6 +113,47 @@ func TestParseEvent(t *testing.T) {
 					assert.Equal(t, log.ObservedTimestamp().AsTime(), event.Timestamp)
 				}
 			}
+		})
+	}
+}
+
+func TestExtractMetadataFields(t *testing.T) {
+	tests := map[string]struct {
+		fields       map[string]any
+		index        string
+		expectedMeta mapstr.M
+	}{
+		"no @metadata": {
+			fields:       map[string]any{"message": "test"},
+			expectedMeta: nil,
+		},
+		"version and type are removed, beat is kept": {
+			fields: map[string]any{
+				beat.MetadataFieldKey: map[string]any{"beat": "filebeat", "version": "9.6.0", "type": "_doc", "pipeline": "p"},
+			},
+			expectedMeta: mapstr.M{"beat": "filebeat", "pipeline": "p"},
+		},
+		"explicit index overrides beat": {
+			fields: map[string]any{
+				beat.MetadataFieldKey: map[string]any{"beat": "filebeat"},
+			},
+			index:        "My-Index",
+			expectedMeta: mapstr.M{"beat": "my-index"},
+		},
+		"explicit index is set when beat is missing": {
+			fields: map[string]any{
+				beat.MetadataFieldKey: map[string]any{"pipeline": "p"},
+			},
+			index:        "my-index",
+			expectedMeta: mapstr.M{"beat": "my-index", "pipeline": "p"},
+		},
+	}
+
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			meta := extractMetadataFields(tt.fields, tt.index)
+			assert.Equal(t, tt.expectedMeta, meta, "unexpected event metadata")
+			assert.NotContains(t, tt.fields, beat.MetadataFieldKey, "@metadata should be removed from the event fields")
 		})
 	}
 }

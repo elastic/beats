@@ -29,8 +29,10 @@ type LogBatch struct {
 	mu            sync.RWMutex
 }
 
-func NewLogBatch(logs plog.Logs) (*LogBatch, error) {
-	events, err := createEvents(&logs)
+// NewLogBatch creates a batch from logs. index is the `index` explicitly configured
+// on the exporter, or empty to keep the `@metadata.beat` set by the receiver.
+func NewLogBatch(logs plog.Logs, index string) (*LogBatch, error) {
+	events, err := createEvents(&logs, index)
 	if err != nil {
 		return nil, err
 	}
@@ -40,12 +42,12 @@ func NewLogBatch(logs plog.Logs) (*LogBatch, error) {
 	}, nil
 }
 
-func createEvents(logs *plog.Logs) ([]publisher.Event, error) {
+func createEvents(logs *plog.Logs, index string) ([]publisher.Event, error) {
 	var events []publisher.Event
 	for _, rl := range logs.ResourceLogs().All() {
 		for _, sl := range rl.ScopeLogs().All() {
 			for _, lr := range sl.LogRecords().All() {
-				record, err := parseEvent(&lr)
+				record, err := parseEvent(&lr, index)
 				if err != nil {
 					return nil, err
 				}

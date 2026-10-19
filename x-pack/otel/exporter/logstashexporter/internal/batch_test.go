@@ -85,7 +85,7 @@ func TestNewLogBatch(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			logs := tt.setupLogs()
 
-			batch, err := NewLogBatch(logs)
+			batch, err := NewLogBatch(logs, "")
 
 			if tt.wantErr {
 				require.Error(t, err)
@@ -173,7 +173,7 @@ func TestCreateEvents(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			logs := tt.setup()
 
-			events, err := createEvents(&logs)
+			events, err := createEvents(&logs, "")
 
 			if tt.wantErr {
 				require.Error(t, err)
@@ -210,7 +210,7 @@ func TestCreateEvents(t *testing.T) {
 }
 
 func TestLogBatchEvents(t *testing.T) {
-	batch, err := NewLogBatch(plog.NewLogs())
+	batch, err := NewLogBatch(plog.NewLogs(), "")
 	require.NoError(t, err)
 
 	batch.pendingEvents = []publisher.Event{
@@ -225,7 +225,7 @@ func TestLogBatchEvents(t *testing.T) {
 }
 
 func TestLogBatchACK(t *testing.T) {
-	batch, err := NewLogBatch(plog.NewLogs())
+	batch, err := NewLogBatch(plog.NewLogs(), "")
 	require.NoError(t, err)
 
 	batch.ACK()
@@ -242,7 +242,7 @@ func TestLogBatchACK(t *testing.T) {
 }
 
 func TestLogBatchDrop(t *testing.T) {
-	batch, err := NewLogBatch(plog.NewLogs())
+	batch, err := NewLogBatch(plog.NewLogs(), "")
 	require.NoError(t, err)
 
 	batch.Drop()
@@ -260,7 +260,7 @@ func TestLogBatchDrop(t *testing.T) {
 
 func TestLogBatchRetry(t *testing.T) {
 	var result LogBatchResult
-	batch, err := NewLogBatch(plog.NewLogs())
+	batch, err := NewLogBatch(plog.NewLogs(), "")
 	require.NoError(t, err)
 
 	// First retry
@@ -294,7 +294,7 @@ func TestLogBatchRetryEvents(t *testing.T) {
 		{Content: beat.Event{Fields: map[string]any{"message": "test2"}}},
 	}
 
-	batch, err := NewLogBatch(plog.NewLogs())
+	batch, err := NewLogBatch(plog.NewLogs(), "")
 	require.NoError(t, err)
 
 	batch.pendingEvents = events
@@ -315,7 +315,7 @@ func TestLogBatchRetryEvents(t *testing.T) {
 }
 
 func TestLogBatchCancelled(t *testing.T) {
-	batch, err := NewLogBatch(plog.NewLogs())
+	batch, err := NewLogBatch(plog.NewLogs(), "")
 	require.NoError(t, err)
 
 	batch.Cancelled()
@@ -332,7 +332,7 @@ func TestLogBatchCancelled(t *testing.T) {
 }
 
 func TestSplitRetry(t *testing.T) {
-	batch, err := NewLogBatch(plog.NewLogs())
+	batch, err := NewLogBatch(plog.NewLogs(), "")
 	require.NoError(t, err)
 	assert.False(t, batch.SplitRetry())
 }
@@ -354,7 +354,7 @@ func TestAddRetry(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			batch, err := NewLogBatch(plog.NewLogs())
+			batch, err := NewLogBatch(plog.NewLogs(), "")
 			require.NoError(t, err)
 
 			batch.retries.Store(tt.current)
