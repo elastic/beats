@@ -160,8 +160,8 @@ func (w *scheduledQueryProfiler) stop() {
 	w.mu.Lock()
 	w.cancel()
 	w.mu.Unlock()
-	// Scheduled profile sinks use DropIfFull, so joining cannot wait for
-	// publisher queue space after the active RPC has been cancelled.
+	// Cancelling RPCs cannot interrupt beat.Client.Publish. Bounding this join
+	// also requires cancellable publisher admission.
 	<-w.done
 }
 

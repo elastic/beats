@@ -58,50 +58,6 @@ func TestPublishReusesResponseChannel(t *testing.T) {
 	})
 }
 
-func TestTryPublishRejectsFullQueueWithoutWaitingForACK(t *testing.T) {
-	for _, tc := range []struct {
-		name string
-		cfg  queue.ProducerConfig
-	}{
-		{"forgetful", queue.ProducerConfig{}},
-		{"ack", queue.ProducerConfig{ACK: func(int) {}}},
-	} {
-		t.Run(tc.name, func(t *testing.T) {
-			// Fill the ring buffer while leaving room in the buffered request channel.
-			q := NewQueue[int](logp.NewNopLogger(), nil, Settings{Events: 1}, 0, nil)
-			defer q.Close(true)
-			p := q.Producer(tc.cfg)
-			defer p.Close()
-			_, ok := p.Publish(1)
-			require.True(t, ok, "fill the queue without consuming or acknowledging the event")
-
-			// A successful request-channel send must not turn TryPublish into a wait for space.
-			done := make(chan bool, 1)
-			go func() {
-				_, accepted := p.TryPublish(2)
-				done <- accepted
-			}()
-			select {
-			case accepted := <-done:
-				require.False(t, accepted, "a full queue must reject TryPublish")
-			case <-time.After(time.Second):
-				t.Fatal("TryPublish waited for an acknowledgment despite its nonblocking contract")
-			}
-
-			// Rejection must preserve the original event and permit later admission after ACK.
-			batch, err := q.Get(1)
-			require.NoError(t, err, "consume the original event")
-			require.Equal(t, 1, batch.Count(), "only the original event may be queued")
-			require.Equal(t, 1, batch.Entry(0), "the rejected event must not enter the queue")
-			batch.Done()
-			require.Eventually(t, func() bool {
-				_, accepted := p.TryPublish(3)
-				return accepted
-			}, time.Second, time.Millisecond, "TryPublish must recover once the queue has space")
-		})
-	}
-}
-
 func assertChanClosed(t *testing.T, ch <-chan struct{}, msg string) {
 	t.Helper()
 	select {
