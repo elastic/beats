@@ -19,6 +19,8 @@ osquerybeat:
 #            # Scheduled profiles are collected asynchronously, with at most 64 pending
 #            # requests and one active collection. They sample the latest schedule metrics,
 #            # which may reflect a later execution when collection is delayed.
+#            # response_id, schedule_id and schedule_execution_count identify the
+#            # originating result; osquery_profile.executions belongs to the sampled metrics.
 #            # Scheduled profiles may be discarded on queue overflow, policy replacement,
 #            # or shutdown. Monitoring counters under osquerybeat.scheduled_query_profiles
 #            # report collection and discards; collected does not mean delivered.
