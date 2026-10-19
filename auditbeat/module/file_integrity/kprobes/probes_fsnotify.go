@@ -128,7 +128,7 @@ func (sym *fsNotifySymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc,
 			sym.seenSpecs = make(map[*tkbtf.Spec]struct{})
 		}
 
-		sym.retriedErrs = nil
+		clear(sym.retriedErrs)
 		// reset probe filters for each new spec
 		// this probes shouldn't cause any ErrVerifyOverlappingEvents or ErrVerifyMissingEvents
 		// for linux kernel versions linux 5.17+, thus we start from here. To see how we handle all
