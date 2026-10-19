@@ -524,6 +524,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				errorSpans(err, end{execSpan}, runSpan)
 				return err
 			}
+			// Drop events from state now that we hold them. If we fail
+			// during the publication, we will re-request these events.
+			delete(state, "events")
 			var events []interface{}
 			switch e := e.(type) {
 			case []interface{}:
@@ -577,10 +580,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			metricsRecorder.AddReceivedEvents(execCtx, uint(len(events)))
 			runSpanEventCount += len(events)
 			execSpan.SetAttributes(attribute.Int("cel.program.event_count", len(events)))
-			// Drop events from state. If we fail during the publication,
-			// we will re-request these events.
-			delete(state, "events")
-
 			// Get cursors if they exist.
 			var (
 				cursors      []interface{}
