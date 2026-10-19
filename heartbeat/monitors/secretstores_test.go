@@ -19,7 +19,9 @@ package monitors
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"sync"
 	"testing"
 	"time"
@@ -30,8 +32,11 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
+	"github.com/elastic/beats/v7/heartbeat/eventext"
+	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/secretstores"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
@@ -63,12 +68,13 @@ func (s *switchableStore) set(value string, err error) {
 
 func (s *switchableStore) Validate(*conf.C) error { return nil }
 
-func (s *switchableStore) Replace(_ context.Context, cfg *conf.C) (*conf.C, error) {
+func (s *switchableStore) Replace(ctx context.Context, cfg *conf.C) (*conf.C, error) {
 	s.mtx.Lock()
 	defer s.mtx.Unlock()
 	if s.err != nil {
 		return nil, s.err
 	}
+	secretstores.Track(ctx, s.value)
 	c := conf.NewConfig()
 	if err := c.Merge(cfg); err != nil {
 		return nil, err
@@ -220,4 +226,51 @@ func TestMonitorRecoversFromSecretStoreError(t *testing.T) {
 			assert.Equal(t, "resolved", headers()[0], "the plugin must get the resolved header")
 		})
 	}
+}
+
+// TestMonitorScrubsSecrets checks a monitor whose plugin publishes and fails
+// with its resolved secret doesn't leak it in its events.
+func TestMonitorScrubsSecrets(t *testing.T) {
+	const secret = "s3cr3t-token"
+	testStore.set(secret, nil)
+
+	reg := plugin.NewPluginsReg()
+	require.NoError(t, reg.Add(plugin.PluginFactory{
+		Name: "leaky",
+		Make: func(_ string, cfg *conf.C, info beat.Info) (plugin.Plugin, error) {
+			header, err := cfg.String("header", -1)
+			if err != nil {
+				return plugin.Plugin{}, err
+			}
+			job := func(event *beat.Event) ([]jobs.Job, error) {
+				eventext.MergeEventFields(event, mapstr.M{"url": mapstr.M{"full": "https://host/?t=" + header}})
+				return nil, fmt.Errorf("request to https://host/?t=%s failed", header)
+			}
+			return plugin.Plugin{Jobs: []jobs.Job{job}, Endpoints: 1, Logger: info.Logger}, nil
+		},
+		Stats: plugin.NewPluginCountersRecorder("leaky", monitoring.NewRegistry()),
+	}), "plugin must be registered")
+
+	pipel := &MockPipeline{}
+	c, err := pipel.Connect()
+	require.NoError(t, err, "pipeline must connect")
+	logger := logptest.NewTestingLogger(t, "")
+	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, false, logger)
+	defer sched.Stop()
+
+	resolver := secretstores.NewResolver(logger)
+	m, err := newMonitor(captureMonitorConf(t, "leaky", true), reg, c, sched.Add, nil, beat.Info{Logger: logger}, nil, resolver.WrapFactory)
+	require.NoError(t, err, "monitor must be created")
+	defer m.Stop()
+	m.Start()
+
+	require.Eventually(t, func() bool { return len(pipel.PublishedEvents()) >= 2 }, 5*time.Second, 5*time.Millisecond, "the monitor must publish events")
+	for _, e := range pipel.PublishedEvents() {
+		doc, err := json.Marshal(e.Fields)
+		require.NoError(t, err, "event must be encoded")
+		assert.NotContains(t, string(doc), secret, "the event must not have the secret")
+	}
+	msg, err := pipel.PublishedEvents()[0].Fields.GetValue("error.message")
+	require.NoError(t, err, "the event must have the error")
+	assert.Equal(t, "request to https://host/?t=<hidden> failed", msg, "the error must have the secret replaced")
 }

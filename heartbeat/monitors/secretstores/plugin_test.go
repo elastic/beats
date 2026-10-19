@@ -19,6 +19,7 @@ package secretstores
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -90,21 +91,21 @@ func (r *testResolver) set(header string, endpoints int, err error) {
 	r.header, r.endpoints, r.err = header, endpoints, err
 }
 
-func (r *testResolver) resolve(cfg *conf.C) (*conf.C, error) {
+func (r *testResolver) resolve(cfg *conf.C) (*conf.C, *Scrubber, error) {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
 	r.calls++
 	if r.err != nil {
-		return nil, r.err
+		return nil, nil, r.err
 	}
 	c := conf.NewConfig()
 	if err := c.Merge(cfg); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if err := c.SetString("header", -1, r.header); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return c, c.SetInt("endpoints", -1, int64(r.endpoints))
+	return c, nil, c.SetInt("endpoints", -1, int64(r.endpoints))
 }
 
 func (r *testResolver) callCount() int {
@@ -255,6 +256,63 @@ func TestSecretPluginClose(t *testing.T) {
 	_, err := runJob(t, p.Jobs[0])
 	assert.ErrorIs(t, err, errPluginClosed, "a closed plugin must not run")
 	assert.Equal(t, int64(1), f.created.Load(), "a closed plugin must not create the inner plugin again")
+}
+
+// TestSecretPluginScrubsSecrets checks the secret value never reaches the
+// events and errors of the inner plugin: from its jobs, their continuations,
+// and its creation.
+func TestSecretPluginScrubsSecrets(t *testing.T) {
+	const secret = "s3cr3t-token"
+	errRun := errors.New("run failed with " + secret)
+
+	factory := plugin.PluginFactory{
+		Name: "leaky",
+		Make: func(_ string, cfg *conf.C, _ beat.Info) (plugin.Plugin, error) {
+			header, err := cfg.String("header", -1)
+			if err != nil {
+				return plugin.Plugin{}, err
+			}
+			if header == "invalid" {
+				return plugin.Plugin{}, fmt.Errorf("invalid header %q", secret)
+			}
+			continuation := func(event *beat.Event) ([]jobs.Job, error) {
+				event.Fields = mapstr.M{"continuation": secret}
+				return nil, errRun
+			}
+			job := func(event *beat.Event) ([]jobs.Job, error) {
+				event.Fields = mapstr.M{"url": mapstr.M{"full": "https://host/?t=" + secret}}
+				return []jobs.Job{continuation}, nil
+			}
+			return plugin.Plugin{Jobs: []jobs.Job{job}, Endpoints: 1}, nil
+		},
+	}
+	header := "valid"
+	resolve := func(cfg *conf.C) (*conf.C, *Scrubber, error) {
+		c := conf.NewConfig()
+		if err := c.Merge(cfg); err != nil {
+			return nil, nil, err
+		}
+		return c, scrubberFor(secret), c.SetString("header", -1, header)
+	}
+	logger := logptest.NewTestingLogger(t, "")
+	p := newSecretPlugin(resolve, factory, "leaky", newTestConfig(t, map[string]any{}), beat.Info{Logger: logger}, logger).plugin()
+	t.Cleanup(func() { _ = p.Close() })
+
+	event := &beat.Event{}
+	cont, err := p.Jobs[0](event)
+	require.NoError(t, err, "the job must run")
+	assert.Equal(t, mapstr.M{"url": mapstr.M{"full": "https://host/?t=<hidden>"}}, event.Fields, "the job must publish without the secret")
+
+	require.Len(t, cont, 1, "the continuation must be returned")
+	event = &beat.Event{}
+	_, err = cont[0](event)
+	assert.Equal(t, mapstr.M{"continuation": "<hidden>"}, event.Fields, "the continuation must publish without the secret")
+	assert.EqualError(t, err, "run failed with <hidden>", "the continuation error must not have the secret")
+	assert.ErrorIs(t, err, errRun, "the scrubbed error must wrap the original")
+
+	header = "invalid"
+	_, err = p.Jobs[0](&beat.Event{})
+	assert.EqualError(t, err, `invalid header "<hidden>"`, "the creation error must not have the secret")
 }
 
 func TestWrapFactoryKeepsFactory(t *testing.T) {
