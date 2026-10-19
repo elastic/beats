@@ -161,7 +161,7 @@ func TestDNSProcessorRunInParallel(t *testing.T) {
 
 	conf := defaultConfig()
 	reg := monitoring.NewRegistry()
-	cache, err := newLookupCache(reg, conf.cacheConfig, &stubResolver{})
+	cache, err := newLookupCache(reg, conf.CacheConfig, &stubResolver{})
 	if err != nil {
 		t.Fatal(err)
 	}
