@@ -18,8 +18,8 @@ import (
 	ucfg "github.com/elastic/go-ucfg"
 )
 
-// defaultScope is the scope of the only entry of its type.
-var defaultScope = secretstores.Scope{Default: true, HasDefault: true}
+// defaultScope is the scope of an entry named "main".
+var defaultScope = secretstores.Scope{Name: "main", Names: []string{"main"}}
 
 // newReplaceTestStore returns a store backed by a fake Vault serving
 // app/creds.
@@ -45,13 +45,13 @@ func toBase64(s string) string { return base64.StdEncoding.EncodeToString([]byte
 
 func TestReplaceReferences(t *testing.T) {
 	tests := []struct{ in, want string }{
-		{in: "vault://app#token", want: "<app#token>"},
-		{in: "Bearer vault://app/creds#token", want: "Bearer <app/creds#token>"},
-		{in: "vault://a#b,vault://c#d", want: "<a#b>,<c#d>"},
-		{in: "https://api/?key=vault://kv/app#key&debug=1", want: "https://api/?key=<kv/app#key>&debug=1"},
-		{in: `{"token":"vault://kv/app#token"}`, want: `{"token":"<kv/app#token>"}`},
-		{in: "${HOME}:vault://a#b", want: "${HOME}:<a#b>"},
-		{in: "vault://my%20app#TLS%20Cert", want: "<my%20app#TLS%20Cert>"},
+		{in: "vault://main@app#token", want: "<app#token>"},
+		{in: "Bearer vault://main@app/creds#token", want: "Bearer <app/creds#token>"},
+		{in: "vault://main@a#b,vault://main@c#d", want: "<a#b>,<c#d>"},
+		{in: "https://api/?key=vault://main@kv/app#key&debug=1", want: "https://api/?key=<kv/app#key>&debug=1"},
+		{in: `{"token":"vault://main@kv/app#token"}`, want: `{"token":"<kv/app#token>"}`},
+		{in: "${HOME}:vault://main@a#b", want: "${HOME}:<a#b>"},
+		{in: "vault://main@my%20app#TLS%20Cert", want: "<my%20app#TLS%20Cert>"},
 		{in: "myvault://a#b", want: "myvault://a#b"},
 		{in: "x-vault://a#b", want: "x-vault://a#b"},
 		{in: "other://a#b", want: "other://a#b"},
@@ -77,10 +77,10 @@ func textSettings(t *testing.T, cfg *conf.C) map[string]any {
 
 func TestReplace(t *testing.T) {
 	t.Setenv("VAULT_TEST_ENV", "from-env")
-	t.Setenv("VAULT_TEST_REF", "vault://app/creds#user")
+	t.Setenv("VAULT_TEST_REF", "vault://main@app/creds#user")
 	s, _ := newReplaceTestStore(t)
-	const user = "vault://app/creds#user"
-	script := "step('login', () => page.fill('#pw', 'vault://app/creds#token'))"
+	const user = "vault://main@app/creds#user"
+	script := "step('login', () => page.fill('#pw', 'vault://main@app/creds#token'))"
 	plainKerberos := toBase64("auth_type: password\nusername: alice\n")
 
 	tests := []struct {
@@ -94,12 +94,12 @@ func TestReplace(t *testing.T) {
 	}{
 		{
 			name: "embedded reference",
-			cfg:  map[string]any{"headers": map[string]any{"Authorization": "Bearer vault://app/creds#token"}},
+			cfg:  map[string]any{"headers": map[string]any{"Authorization": "Bearer vault://main@app/creds#token"}},
 			want: map[string]any{"headers": map[string]any{"Authorization": "Bearer s3cr3t"}},
 		},
 		{
 			name: "secret value is not expanded",
-			cfg:  map[string]any{"v": "vault://app/creds#tricky"},
+			cfg:  map[string]any{"v": "vault://main@app/creds#tricky"},
 			want: map[string]any{"v": "a${b}c"},
 		},
 		{
@@ -109,12 +109,12 @@ func TestReplace(t *testing.T) {
 		},
 		{
 			name: "dotted and nested params",
-			cfg:  map[string]any{"params": map[string]any{"site.url": "vault://app/creds#token", "list": []any{"x=" + user}}},
+			cfg:  map[string]any{"params": map[string]any{"site.url": "vault://main@app/creds#token", "list": []any{"x=" + user}}},
 			want: map[string]any{"params": map[string]any{"site.url": "s3cr3t", "list": []any{"x=bob"}}},
 		},
 		{
 			name: "base64 setting with references is decoded",
-			cfg:  map[string]any{"ntlm": toBase64(`{"domain": "${VAULT_TEST_ENV}", "password": "vault://app/creds#token"}`)},
+			cfg:  map[string]any{"ntlm": toBase64(`{"domain": "${VAULT_TEST_ENV}", "password": "vault://main@app/creds#token"}`)},
 			want: map[string]any{"ntlm": map[string]any{"domain": "from-env", "password": "s3cr3t"}},
 		},
 		{
@@ -154,7 +154,7 @@ func TestReplace(t *testing.T) {
 		},
 		{
 			name:    "missing field",
-			cfg:     map[string]any{"v": "vault://app/creds#nope"},
+			cfg:     map[string]any{"v": "vault://main@app/creds#nope"},
 			wantErr: `vault: field "nope" not found at secret/data/app/creds`,
 		},
 	}
@@ -183,7 +183,7 @@ func TestReplace(t *testing.T) {
 }
 
 func TestValidate(t *testing.T) {
-	t.Setenv("VAULT_TEST_BAD_REF", "vault://bad")
+	t.Setenv("VAULT_TEST_BAD_REF", "vault://main@bad")
 	s, fv := newReplaceTestStore(t)
 
 	tests := []struct {
@@ -191,12 +191,12 @@ func TestValidate(t *testing.T) {
 		cfg     map[string]any
 		wantErr string
 	}{
-		{name: "valid", cfg: map[string]any{"target": "vault://app/creds#token"}},
-		{name: "unresolved env", cfg: map[string]any{"target": "${missing.env}:vault://app/creds#token"}},
-		{name: "inline script", cfg: map[string]any{"source": map[string]any{"inline": map[string]any{"script": "'vault://bad'"}}}},
-		{name: "invalid", cfg: map[string]any{"target": "vault://app/creds"}, wantErr: "vault: invalid reference vault://app/creds: must have the form"},
-		{name: "invalid in an environment variable", cfg: map[string]any{"target": "${VAULT_TEST_BAD_REF}"}, wantErr: "invalid reference vault://bad"},
-		{name: "invalid in base64 ntlm", cfg: map[string]any{"ntlm": toBase64("password: vault://bad\n")}, wantErr: "invalid reference vault://bad"},
+		{name: "valid", cfg: map[string]any{"target": "vault://main@app/creds#token"}},
+		{name: "unresolved env", cfg: map[string]any{"target": "${missing.env}:vault://main@app/creds#token"}},
+		{name: "inline script", cfg: map[string]any{"source": map[string]any{"inline": map[string]any{"script": "'vault://main@bad'"}}}},
+		{name: "invalid", cfg: map[string]any{"target": "vault://main@app/creds"}, wantErr: "vault: invalid reference vault://main@app/creds: must have the form"},
+		{name: "invalid in an environment variable", cfg: map[string]any{"target": "${VAULT_TEST_BAD_REF}"}, wantErr: "invalid reference vault://main@bad"},
+		{name: "invalid in base64 ntlm", cfg: map[string]any{"ntlm": toBase64("password: vault://main@bad\n")}, wantErr: "invalid reference vault://main@bad"},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

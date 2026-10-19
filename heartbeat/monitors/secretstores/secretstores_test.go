@@ -137,7 +137,7 @@ func newTestConfig(t *testing.T, m map[string]any) *conf.C {
 }
 
 func fakeStores(extra ...map[string]any) []any {
-	entry := map[string]any{"type": fakeType, "id": "secret"}
+	entry := map[string]any{"type": fakeType, "name": "main", "id": "secret"}
 	for _, e := range extra {
 		maps.Copy(entry, e)
 	}
@@ -179,8 +179,8 @@ func TestParseEntries(t *testing.T) {
 	}{
 		{name: "nil", raw: nil, want: 0},
 		{name: "list", raw: fakeStores(), want: 1},
-		{name: "base64 json", raw: toBase64(`[{"type":"fake","id":"x"}]`), want: 1},
-		{name: "base64 yaml", raw: toBase64("- type: fake\n  id: x\n"), want: 1},
+		{name: "base64 json", raw: toBase64(`[{"type":"fake","name":"a","id":"x"}]`), want: 1},
+		{name: "base64 yaml", raw: toBase64("- type: fake\n  name: a\n  id: x\n"), want: 1},
 		{name: "empty string", raw: "  ", want: 0},
 		{name: "invalid base64", raw: "not base64!", wantErr: "invalid base64"},
 		{name: "base64 not a list", raw: toBase64(`{"type":"fake"}`), wantErr: "not a YAML/JSON list"},
@@ -189,9 +189,14 @@ func TestParseEntries(t *testing.T) {
 		{name: "missing type", raw: []any{map[string]any{"id": "x"}}, wantErr: "'type' is required"},
 		{name: "unknown type", raw: []any{map[string]any{"type": "nope"}}, wantErr: `unknown secret store type "nope"`},
 		{
-			name:    "duplicate unnamed entries",
-			raw:     []any{map[string]any{"type": fakeType}, map[string]any{"type": fakeType, "id": "2"}},
-			wantErr: `more than one "fake" entry without a 'name'`,
+			name:    "missing name",
+			raw:     []any{map[string]any{"type": fakeType}},
+			wantErr: "'name' is required",
+		},
+		{
+			name:    "empty name",
+			raw:     []any{map[string]any{"type": fakeType, "name": ""}},
+			wantErr: "'name' is required",
 		},
 		{
 			name:    "duplicate names",
@@ -201,16 +206,11 @@ func TestParseEntries(t *testing.T) {
 		{
 			name:    "name is not a string",
 			raw:     []any{map[string]any{"type": fakeType, "name": 3}},
-			wantErr: "'name' must be a string",
+			wantErr: "'name' is required and must be a string",
 		},
 		{
 			name: "same name for different types",
 			raw:  []any{map[string]any{"type": fakeType, "name": "a"}, map[string]any{"type": otherType, "name": "a"}},
-			want: 2,
-		},
-		{
-			name: "named and unnamed entries",
-			raw:  []any{map[string]any{"type": fakeType}, map[string]any{"type": fakeType, "name": "a", "id": "2"}},
 			want: 2,
 		},
 	}
@@ -228,7 +228,7 @@ func TestParseEntries(t *testing.T) {
 }
 
 func TestParseEntriesKeepsBase64ContentLiteral(t *testing.T) {
-	raw := base64.StdEncoding.EncodeToString([]byte(`[{"type":"fake","id":"pa${ss}"}]`))
+	raw := base64.StdEncoding.EncodeToString([]byte(`[{"type":"fake","name":"a","id":"pa${ss}"}]`))
 	entries, err := parseEntries(raw)
 	require.NoError(t, err, "entries must be valid")
 	require.Len(t, entries, 1, "one entry expected")
@@ -259,7 +259,7 @@ func TestEntryIdentity(t *testing.T) {
 func TestResolveWithoutSecretStores(t *testing.T) {
 	resetSharedStores(t)
 	r := NewResolver(logptest.NewTestingLogger(t, ""))
-	cfg := newTestConfig(t, map[string]any{"type": "http", "target": "fake:token", "x": "${unknown.ref}"})
+	cfg := newTestConfig(t, map[string]any{"type": "http", "target": "fake:main@token", "x": "${unknown.ref}"})
 
 	got, err := r.Resolve(cfg)
 	require.NoError(t, err, "a config without secret stores must not fail")
@@ -273,7 +273,7 @@ func TestResolveReplacesOnlyInCopy(t *testing.T) {
 
 	cfg := newTestConfig(t, map[string]any{
 		"type":     "http",
-		"username": "fake:user",
+		"username": "fake:main@user",
 		ConfigKey:  fakeStores(),
 	})
 
@@ -292,7 +292,7 @@ func TestResolveReplacesOnlyInCopy(t *testing.T) {
 		Username string `config:"username"`
 	}
 	require.NoError(t, cfg.Unpack(&original), "original config must unpack")
-	assert.Equal(t, "fake:user", original.Username, "the original config must keep the reference")
+	assert.Equal(t, "fake:main@user", original.Username, "the original config must keep the reference")
 	assert.True(t, cfg.HasField(ConfigKey), "the original config must keep secret_stores")
 }
 
@@ -300,12 +300,12 @@ func TestResolveRunsStoresInOrder(t *testing.T) {
 	resetSharedStores(t)
 	r := NewResolver(logptest.NewTestingLogger(t, ""))
 
-	// The fake store replaces "fake:x" by "<id>-x". With id "fake:", it
-	// returns "fake:-x", a new reference only a later store can replace.
+	// The fake store replaces "fake:main@x" by "<id>-x". With id "fake:main@", it
+	// returns "fake:main@-x", a new reference only a later store can replace.
 	cfg := newTestConfig(t, map[string]any{
 		"type":    "http",
-		"chained": "fake:x",
-		ConfigKey: []any{map[string]any{"type": fakeType, "id": "fake:"}, map[string]any{"type": otherType}},
+		"chained": "fake:main@x",
+		ConfigKey: []any{map[string]any{"type": fakeType, "name": "main", "id": "fake:main@"}, map[string]any{"type": otherType, "name": "main"}},
 	})
 	got, err := r.Resolve(cfg)
 	require.NoError(t, err, "references must resolve")
@@ -320,7 +320,7 @@ func TestResolveSharesStoresAcrossMonitors(t *testing.T) {
 	resetSharedStores(t)
 	r := NewResolver(logptest.NewTestingLogger(t, ""))
 	newCfg := func() *conf.C {
-		return newTestConfig(t, map[string]any{"type": "http", "target": "fake:token", ConfigKey: fakeStores()})
+		return newTestConfig(t, map[string]any{"type": "http", "target": "fake:main@token", ConfigKey: fakeStores()})
 	}
 
 	_, err := r.Resolve(newCfg())
@@ -339,8 +339,8 @@ func TestResolveErrors(t *testing.T) {
 	}{
 		{
 			name:    "store error",
-			cfg:     map[string]any{"type": "http", "target": "fake:token", ConfigKey: fakeStores(map[string]any{"fail": true})},
-			wantErr: "could not resolve fake secret references: " + errFakeUnavailable.Error(),
+			cfg:     map[string]any{"type": "http", "target": "fake:main@token", ConfigKey: fakeStores(map[string]any{"fail": true})},
+			wantErr: "could not resolve fake \"main\" secret references: " + errFakeUnavailable.Error(),
 		},
 		{
 			name:    "invalid store config",
@@ -366,12 +366,12 @@ func TestValidate(t *testing.T) {
 	}{
 		{
 			name: "valid reference",
-			cfg:  map[string]any{"type": "http", "target": "fake:token", ConfigKey: fakeStores()},
+			cfg:  map[string]any{"type": "http", "target": "fake:main@token", ConfigKey: fakeStores()},
 		},
 		{
 			name:    "invalid reference",
-			cfg:     map[string]any{"type": "http", "target": "fake:", ConfigKey: fakeStores()},
-			wantErr: "invalid fake secret references: fake: empty reference",
+			cfg:     map[string]any{"type": "http", "target": "fake:main@", ConfigKey: fakeStores()},
+			wantErr: "invalid fake \"main\" secret references: fake: empty reference",
 		},
 		{
 			name:    "invalid store config",
@@ -413,28 +413,16 @@ func TestResolveNamedEntries(t *testing.T) {
 			want:   map[string]any{"a": "prod-x", "b": "stg-y"},
 		},
 		{
-			name:    "unnamed reference is ambiguous",
+			name:    "unnamed reference",
 			stores:  stores,
 			cfg:     map[string]any{"a": "fake:x"},
-			wantErr: `no connection name, but there are several entries: use <scheme>://<name>@... with one of "prod", "stg"`,
+			wantErr: `the reference must name its connection, as <scheme>://<name>@..., one of "prod", "stg"`,
 		},
 		{
 			name:    "unknown name",
 			stores:  stores,
 			cfg:     map[string]any{"a": "fake:dev@x"},
 			wantErr: `no entry has the name "dev", available names: "prod", "stg"`,
-		},
-		{
-			name:   "unnamed reference uses the unnamed entry",
-			stores: append([]any{map[string]any{"type": fakeType, "id": "def"}}, stores...),
-			cfg:    map[string]any{"a": "fake:x", "b": "fake:stg@y"},
-			want:   map[string]any{"a": "def-x", "b": "stg-y"},
-		},
-		{
-			name:   "unnamed reference uses the only entry, named or not",
-			stores: stores[:1],
-			cfg:    map[string]any{"a": "fake:x", "b": "fake:prod@y"},
-			want:   map[string]any{"a": "prod-x", "b": "prod-y"},
 		},
 		{
 			name:   "name is percent-encoded",

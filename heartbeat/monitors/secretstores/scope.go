@@ -26,19 +26,11 @@ import (
 )
 
 // Scope tells a Store which of the references of its type are its own, when
-// several connections of the same type are configured. References carry an
-// optional connection name: <scheme>://<name>@<content>.
-//
-// A reference with a name belongs to the entry with that name. A reference
-// without a name belongs to the default entry: the only entry of its type, or
-// else the only one without a name.
+// several connections of the same type are configured. Every entry has a
+// name, and every reference carries it: <scheme>://<name>@<content>.
 type Scope struct {
-	// Name is the name of the entry, empty if it has none.
+	// Name is the name of the entry.
 	Name string
-	// Default is true if the references without a name belong to the entry.
-	Default bool
-	// HasDefault is true if one of the entries of the type is the default.
-	HasDefault bool
 	// Names are the names of all the entries of the type.
 	Names []string
 }
@@ -67,13 +59,7 @@ func (e *SelectionError) Unwrap() error { return e.error }
 func (s Scope) Claim(content string) (rest string, mine bool, err error) {
 	rawName, rest, hasName := SplitName(content)
 	if !hasName {
-		switch {
-		case s.Default:
-			return rest, true, nil
-		case s.HasDefault:
-			return "", false, nil
-		}
-		return "", false, &SelectionError{fmt.Errorf("the reference has no connection name, but there are several entries: use <scheme>://<name>@... with one of %s", quoteAll(s.Names))}
+		return "", false, &SelectionError{fmt.Errorf("the reference must name its connection, as <scheme>://<name>@..., one of %s", quoteAll(s.Names))}
 	}
 
 	name, err := url.PathUnescape(rawName)
@@ -88,9 +74,6 @@ func (s Scope) Claim(content string) (rest string, mine bool, err error) {
 	case slices.Contains(s.Names, name):
 		return "", false, nil
 	}
-	if len(s.Names) == 0 {
-		return "", false, &SelectionError{fmt.Errorf("no entry has the name %q, set 'name: %s' on the entry to use it", name, name)}
-	}
 	return "", false, &SelectionError{fmt.Errorf("no entry has the name %q, available names: %s", name, quoteAll(s.Names))}
 }
 
@@ -104,28 +87,16 @@ func quoteAll(names []string) string {
 
 // scopes returns the Scope of each entry, in the order of entries.
 func scopes(entries []entry) []Scope {
-	counts := map[string]int{}
 	names := map[string][]string{}
-	hasDefault := map[string]bool{}
 	for _, e := range entries {
-		counts[e.storeType]++
-		if e.name != "" {
-			names[e.storeType] = append(names[e.storeType], e.name)
-		}
+		names[e.storeType] = append(names[e.storeType], e.name)
 	}
-	for _, e := range entries {
-		hasDefault[e.storeType] = hasDefault[e.storeType] || e.name == "" || counts[e.storeType] == 1
+	for _, n := range names {
+		slices.Sort(n)
 	}
-
 	out := make([]Scope, len(entries))
 	for i, e := range entries {
-		slices.Sort(names[e.storeType])
-		out[i] = Scope{
-			Name:       e.name,
-			Default:    e.name == "" || counts[e.storeType] == 1,
-			HasDefault: hasDefault[e.storeType],
-			Names:      names[e.storeType],
-		}
+		out[i] = Scope{Name: e.name, Names: names[e.storeType]}
 	}
 	return out
 }

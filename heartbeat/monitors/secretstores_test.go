@@ -127,7 +127,7 @@ func captureMonitorConf(t *testing.T, monitorType string, withSecretStores bool)
 		"header":   unresolvedHeader,
 	}
 	if withSecretStores {
-		m[secretstores.ConfigKey] = []any{map[string]any{"type": testStoreType}}
+		m[secretstores.ConfigKey] = []any{map[string]any{"type": testStoreType, "name": "main"}}
 	}
 	cfg, err := conf.NewConfigFrom(m)
 	require.NoError(t, err, "test config must be valid")

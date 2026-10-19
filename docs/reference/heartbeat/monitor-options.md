@@ -127,9 +127,9 @@ stack: preview 9.6+
 
 Use the `secret_stores` option to read secrets from an external secret store when the monitor runs, instead of writing them in the monitor configuration. Heartbeat supports HashiCorp Vault KV v2 secrets.
 
-Reference a secret as `vault://<path>#<field>` in any string setting of the monitor. A reference can be part of a longer value, such as `"Bearer vault://my-app/api#token"`. The path is relative to `kv_mount` and can't contain `.` or `..` segments. Percent-encode `#` and `@` in the path or field, as `%23` and `%40`. A reference can also be the value of a [keystore](/reference/heartbeat/keystore.md) or environment variable.
+Reference a secret as `vault://<name>@<path>#<field>`, where `<name>` is the `name` of the `secret_stores` entry holding the connection, in any string setting of the monitor. A reference can be part of a longer value, such as `"Bearer vault://prod@my-app/api#token"`. The path is relative to `kv_mount` and can't contain `.` or `..` segments. Percent-encode `#` and `@` in the path or field, as `%23` and `%40`. A reference can also be the value of a [keystore](/reference/heartbeat/keystore.md) or environment variable.
 
-To use several Vault connections, give each `secret_stores` entry a `name` and prefix the reference with it: `vault://<name>@<path>#<field>`. A reference with a name only uses the entry with that name, and Heartbeat reports an error for a name no entry has. A reference without a name uses the only entry or, if there are several, the one without a `name`; it is an error if neither exists. Percent-encode characters of the name that are not allowed in a reference, such as `@`.
+The name selects the connection, so references can use several Vault connections. Heartbeat reports an error for a reference without a name or with a name no entry has. Percent-encode characters of the name that are not allowed in a reference, such as `@`.
 
 Example:
 
@@ -139,9 +139,10 @@ Example:
   schedule: '@every 1m'
   urls: ["https://api.example.com/status"]
   check.request.headers:
-    Authorization: "Bearer vault://my-app/api#token"
+    Authorization: "Bearer vault://prod@my-app/api#token"
   secret_stores:
     - type: vault
+      name: prod
       address: https://vault.example.com:8200
       auth:
         approle:
@@ -155,7 +156,7 @@ Each `secret_stores` entry takes these options:
 :   The secret store type. Must be `vault`.
 
 `name`
-:   (Optional) The name that references use to select this entry, as in `vault://prod@my-app/api#token`. Names must be unique, and at most one entry can have no name.
+:   The name that references use to select this entry, as in `vault://prod@my-app/api#token`. Names must be unique.
 
 `address`
 :   The URL of the Vault server.

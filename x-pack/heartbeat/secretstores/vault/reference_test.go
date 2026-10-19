@@ -22,7 +22,7 @@ func TestParseReference(t *testing.T) {
 		{content: "/app/creds/#token", wantPath: "app/creds", wantField: "token"},
 		{content: "my%20app/db%3A5432#TLS%20Cert%231", wantPath: "my app/db:5432", wantField: "TLS Cert#1"},
 		{content: "kv/app#contrase%C3%B1a", wantPath: "kv/app", wantField: "contraseña"},
-		{content: "app/creds", wantErr: "must have the form vault://<path>#<field>"},
+		{content: "app/creds", wantErr: "must have the form vault://<name>@<path>#<field>"},
 		{content: "app/creds#a#b", wantErr: `field must not contain "#"`},
 		{content: "#token", wantErr: "empty path or field"},
 		{content: "app/creds#", wantErr: "empty path or field"},

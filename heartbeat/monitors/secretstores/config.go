@@ -22,6 +22,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"maps"
 	"strings"
@@ -36,7 +37,7 @@ import (
 type entry struct {
 	storeType string
 	// name selects the entry in references, <scheme>://<name>@... It is
-	// optional and unique among the entries of a type.
+	// unique among the entries of a type.
 	name   string
 	config *conf.C
 	// settings is the raw entry, credentials included, used to identify the
@@ -86,9 +87,6 @@ func parseEntries(raw any) ([]entry, error) {
 		}
 		key := [2]string{storeType, name}
 		if seen[key] {
-			if name == "" {
-				return nil, fmt.Errorf("%s: more than one %q entry without a 'name'", ConfigKey, storeType)
-			}
 			return nil, fmt.Errorf("%s: duplicate %q entry name %q", ConfigKey, storeType, name)
 		}
 		seen[key] = true
@@ -103,15 +101,11 @@ func parseEntries(raw any) ([]entry, error) {
 	return entries, nil
 }
 
-// entryName returns the optional 'name' of an entry.
+// entryName returns the required 'name' of an entry.
 func entryName(m map[string]any) (string, error) {
-	v, ok := m["name"]
-	if !ok || v == nil {
-		return "", nil
-	}
-	name, ok := v.(string)
-	if !ok {
-		return "", fmt.Errorf("'name' must be a string, got %T", v)
+	name, ok := m["name"].(string)
+	if !ok || name == "" {
+		return "", errors.New("'name' is required and must be a string")
 	}
 	return name, nil
 }
@@ -148,8 +142,5 @@ func (e entry) identity() (string, error) {
 
 // label describes the entry in errors.
 func (e entry) label() string {
-	if e.name == "" {
-		return e.storeType
-	}
 	return fmt.Sprintf("%s %q", e.storeType, e.name)
 }

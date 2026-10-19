@@ -45,17 +45,13 @@ func TestSplitName(t *testing.T) {
 
 func TestScopes(t *testing.T) {
 	entries := []entry{
+		{storeType: "a", name: "y"},
 		{storeType: "a", name: "x"},
-		{storeType: "a"},
 		{storeType: "b", name: "only"},
-		{storeType: "c", name: "p"},
-		{storeType: "c", name: "q"},
 	}
 	assert.Equal(t, []Scope{
-		{Name: "x", Default: false, HasDefault: true, Names: []string{"x"}},
-		{Name: "", Default: true, HasDefault: true, Names: []string{"x"}},
-		{Name: "only", Default: true, HasDefault: true, Names: []string{"only"}},
-		{Name: "p", Default: false, HasDefault: false, Names: []string{"p", "q"}},
-		{Name: "q", Default: false, HasDefault: false, Names: []string{"p", "q"}},
+		{Name: "y", Names: []string{"x", "y"}},
+		{Name: "x", Names: []string{"x", "y"}},
+		{Name: "only", Names: []string{"only"}},
 	}, scopes(entries), "unexpected scopes")
 }

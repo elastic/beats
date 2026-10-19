@@ -23,7 +23,7 @@ func parseReference(content string) (path, field string, err error) {
 	}
 	rawPath, rawField, ok := strings.Cut(content, "#")
 	if !ok {
-		return "", "", errors.New("must have the form vault://<path>#<field>")
+		return "", "", errors.New("must have the form vault://<name>@<path>#<field>")
 	}
 	if strings.Contains(rawField, "#") {
 		return "", "", errors.New(`field must not contain "#", percent-encode it as %23`)
