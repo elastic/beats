@@ -16,7 +16,6 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
-	"crypto/x509"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -24,7 +23,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/hashicorp/go-cleanhttp"
@@ -32,7 +30,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/secretstores"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 // storeType is the secret_stores type and the reference prefix.
@@ -41,15 +38,7 @@ const storeType = "cyberark"
 const (
 	requestTimeout  = 10 * time.Second
 	maxResponseSize = 1 << 20
-	// cacheTTL is how long an account read is reused by every monitor.
-	cacheTTL = 5 * time.Minute
-	// failureTTL is how long a failure is returned without contacting
-	// CyberArk again.
-	failureTTL = 30 * time.Second
 )
-
-// retryBackoff holds the waits between attempts for retryable connection errors.
-var retryBackoff = []time.Duration{time.Second, 2 * time.Second}
 
 // fieldAliases maps common lowercase field names to their CyberArk CCP
 // response property names when the lowercase name is absent from the response.
@@ -70,20 +59,7 @@ type store struct {
 	cfg    config
 	client *http.Client
 	logger *logp.Logger
-
-	mu          sync.Mutex
-	cache       map[string]cacheEntry
-	failure     error
-	failedUntil time.Time
-
-	now   func() time.Time
-	sleep func(ctx context.Context, d time.Duration) error
-}
-
-type cacheEntry struct {
-	data    map[string]any
-	err     error
-	expires time.Time
+	reader *secretstores.Reader[accountRef]
 }
 
 func newStore(cfg *conf.C, logger *logp.Logger) (secretstores.Store, error) {
@@ -100,14 +76,14 @@ func newStore(cfg *conf.C, logger *logp.Logger) (secretstores.Store, error) {
 		return nil, err
 	}
 
-	return &store{
-		cfg:    c,
-		client: client,
-		logger: logger.Named(storeType),
-		cache:  map[string]cacheEntry{},
-		now:    time.Now,
-		sleep:  sleepContext,
-	}, nil
+	st := &store{cfg: c, client: client, logger: logger.Named(storeType)}
+	st.reader = secretstores.NewReader[accountRef](st.logger)
+	st.reader.Name = storeType
+	st.reader.Address = c.Address
+	st.reader.Noun = "account"
+	st.reader.Describe = accountRef.String
+	st.reader.Fetch = st.fetch
+	return st, nil
 }
 
 func newClient(c config, logger *logp.Logger) (*http.Client, error) {
@@ -128,18 +104,7 @@ func newClient(c config, logger *logp.Logger) (*http.Client, error) {
 }
 
 func clientTLSConfig(c config, logger *logp.Logger) (*tls.Config, error) {
-	if !c.SSL.IsEnabled() {
-		return &tls.Config{MinVersion: tls.VersionTLS12}, nil
-	}
-	tlsConfig, err := tlscommon.LoadTLSConfig(c.SSL, logger)
-	if err != nil {
-		return nil, fmt.Errorf("invalid 'ssl': %w", err)
-	}
-	u, err := url.Parse(c.Address)
-	if err != nil {
-		return nil, fmt.Errorf("invalid 'address': %w", err)
-	}
-	return tlsConfig.BuildModuleClientConfig(u.Hostname(), tlscommon.WithLogger(logger)), nil
+	return secretstores.ClientTLSConfig(c.SSL, c.Address, logger)
 }
 
 func (s *store) resolve(ctx context.Context, content string) (string, error) {
@@ -147,7 +112,7 @@ func (s *store) resolve(ctx context.Context, content string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("cyberark: invalid reference: %w", err)
 	}
-	data, err := s.account(ctx, ref)
+	data, err := s.reader.Read(ctx, ref)
 	if err != nil {
 		return "", err
 	}
@@ -155,7 +120,7 @@ func (s *store) resolve(ctx context.Context, content string) (string, error) {
 	if !ok {
 		return "", fmt.Errorf("cyberark: field %q not found in account %s", field, ref)
 	}
-	return stringValue(v)
+	return secretstores.StringValue(storeType, v)
 }
 
 func lookupField(data map[string]any, field string) (any, bool) {
@@ -167,66 +132,6 @@ func lookupField(data map[string]any, field string) (any, bool) {
 		return v, found
 	}
 	return nil, false
-}
-
-func (s *store) account(ctx context.Context, ref accountRef) (map[string]any, error) {
-	key := ref.String()
-	s.mu.Lock()
-	if e, ok := s.cache[key]; ok && s.now().Before(e.expires) {
-		s.mu.Unlock()
-		if e.err != nil {
-			return nil, e.err
-		}
-		s.logger.Debugf("Using cached account %s", key)
-		return e.data, nil
-	}
-	if s.failure != nil && s.now().Before(s.failedUntil) {
-		err := s.failure
-		s.mu.Unlock()
-		return nil, err
-	}
-	s.mu.Unlock()
-
-	data, err := s.fetchWithRetry(ctx, ref)
-
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.purgeExpired()
-	switch {
-	case err == nil:
-		s.failure = nil
-		s.cache[key] = cacheEntry{data: data, expires: s.now().Add(cacheTTL)}
-		return data, nil
-	case isConnectionError(err):
-		s.failedUntil = s.now().Add(failureTTL)
-		s.failure = fmt.Errorf("cyberark: %s is unavailable, retrying after %s: %s",
-			redactedAddress(s.cfg.Address), s.failedUntil.Format(time.RFC3339), connectionCause(err))
-	case !errors.Is(err, context.Canceled) && !errors.Is(err, context.DeadlineExceeded):
-		s.cache[key] = cacheEntry{err: err, expires: s.now().Add(failureTTL)}
-	}
-	return nil, err
-}
-
-func (s *store) purgeExpired() {
-	now := s.now()
-	for k, e := range s.cache {
-		if !now.Before(e.expires) {
-			delete(s.cache, k)
-		}
-	}
-}
-
-func (s *store) fetchWithRetry(ctx context.Context, ref accountRef) (map[string]any, error) {
-	for attempt := 0; ; attempt++ {
-		data, err := s.fetch(ctx, ref)
-		if err == nil || !isRetryable(err) || attempt >= len(retryBackoff) {
-			return data, err
-		}
-		s.logger.Debugf("Reading account %s failed, retrying: %v", ref, err)
-		if sleepErr := s.sleep(ctx, retryBackoff[attempt]); sleepErr != nil {
-			return nil, err
-		}
-	}
 }
 
 func (s *store) fetch(ctx context.Context, ref accountRef) (map[string]any, error) {
@@ -312,7 +217,7 @@ func responseError(statusCode int, body []byte, msg string) error {
 	}
 	text := fmt.Sprintf("cyberark: %s failed with %s", msg, cause)
 	if statusCode == http.StatusTooManyRequests || statusCode >= 500 {
-		return &connectionError{err: errors.New(text), cause: cause, retry: true}
+		return &secretstores.ConnectionError{Err: errors.New(text), Cause: cause, Retry: true}
 	}
 	return errors.New(text)
 }
@@ -321,89 +226,8 @@ func requestError(err error, msg string) error {
 	if errors.Is(err, context.Canceled) {
 		return fmt.Errorf("cyberark: %s: %w", msg, err)
 	}
-	var urlErr *url.Error
-	if errors.As(err, &urlErr) {
-		return &connectionError{
-			err:   fmt.Errorf("cyberark: %s failed: %w", msg, urlErr.Err),
-			cause: urlErr.Err.Error(),
-			retry: !isCertificateError(urlErr.Err),
-		}
+	if connErr, ok := secretstores.URLConnectionError(storeType, msg, err); ok {
+		return connErr
 	}
 	return fmt.Errorf("cyberark: %s failed: %w", msg, err)
-}
-
-func isCertificateError(err error) bool {
-	var (
-		unknownAuthority x509.UnknownAuthorityError
-		hostname         x509.HostnameError
-		invalid          x509.CertificateInvalidError
-		verification     *tls.CertificateVerificationError
-	)
-	return errors.As(err, &unknownAuthority) ||
-		errors.As(err, &hostname) ||
-		errors.As(err, &invalid) ||
-		errors.As(err, &verification)
-}
-
-func redactedAddress(address string) string {
-	u, err := url.Parse(address)
-	if err != nil {
-		return "<invalid address>"
-	}
-	return u.Redacted()
-}
-
-type connectionError struct {
-	err   error
-	cause string
-	retry bool
-}
-
-func (e *connectionError) Error() string { return e.err.Error() }
-func (e *connectionError) Unwrap() error { return e.err }
-
-func isConnectionError(err error) bool {
-	var c *connectionError
-	return errors.As(err, &c)
-}
-
-func isRetryable(err error) bool {
-	var c *connectionError
-	return errors.As(err, &c) && c.retry
-}
-
-func connectionCause(err error) string {
-	var c *connectionError
-	if errors.As(err, &c) {
-		return c.cause
-	}
-	return ""
-}
-
-func stringValue(v any) (string, error) {
-	switch val := v.(type) {
-	case string:
-		return val, nil
-	case json.Number:
-		return val.String(), nil
-	case nil:
-		return "", nil
-	default:
-		b, err := json.Marshal(val)
-		if err != nil {
-			return "", fmt.Errorf("cyberark: cannot convert field value of type %T", val)
-		}
-		return string(b), nil
-	}
-}
-
-func sleepContext(ctx context.Context, d time.Duration) error {
-	t := time.NewTimer(d)
-	defer t.Stop()
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case <-t.C:
-		return nil
-	}
 }

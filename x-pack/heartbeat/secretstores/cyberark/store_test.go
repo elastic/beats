@@ -200,8 +200,8 @@ func newTestStore(t *testing.T, entry map[string]any, logger *logp.Logger) (*sto
 
 	clock := &testClock{now: time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)}
 	var sleeps []time.Duration
-	st.now = clock.Now
-	st.sleep = func(_ context.Context, d time.Duration) error {
+	st.reader.Now = clock.Now
+	st.reader.Sleep = func(_ context.Context, d time.Duration) error {
 		sleeps = append(sleeps, d)
 		return nil
 	}
@@ -319,7 +319,7 @@ func TestReadAndCache(t *testing.T) {
 	assert.Equal(t, "folder-secret", got, "unexpected folder secret value")
 	assert.Equal(t, "SubFolder", fc.lastRequest().URL.Query().Get("Folder"), "Folder query param must be sent")
 
-	clock.Advance(cacheTTL + time.Second)
+	clock.Advance(secretstores.DefaultCacheTTL + time.Second)
 	_, err = s.resolve(ctx, "MySafe/MyAccount#password")
 	require.NoError(t, err, "account must be read again after cache expiry")
 	assert.Equal(t, 3, fc.readCount(), "expired cache entry must be read again")
@@ -358,7 +358,7 @@ func TestCPMRotationInProgressIsRetried(t *testing.T) {
 	v, err := s.resolve(context.Background(), "MySafe/MyAccount#password")
 	require.NoError(t, err, "read must succeed after retries")
 	assert.Equal(t, testPassword, v, "unexpected secret value")
-	assert.Equal(t, retryBackoff, *sleeps, "configured backoff must be used")
+	assert.Equal(t, secretstores.DefaultBackoff, *sleeps, "configured backoff must be used")
 }
 
 func TestFailureCache(t *testing.T) {
@@ -370,8 +370,8 @@ func TestFailureCache(t *testing.T) {
 	_, err := s.resolve(ctx, "MySafe/MyAccount#password")
 	assert.ErrorContains(t, err, "APPAP282E", "the CCP error code must be reported")
 	reads := fc.readCount()
-	assert.Equal(t, len(retryBackoff)+1, reads, "every attempt must reach CyberArk")
-	assert.Len(t, *sleeps, len(retryBackoff), "a backoff is expected between attempts")
+	assert.Equal(t, len(secretstores.DefaultBackoff)+1, reads, "every attempt must reach CyberArk")
+	assert.Len(t, *sleeps, len(secretstores.DefaultBackoff), "a backoff is expected between attempts")
 
 	_, err = s.resolve(ctx, "OtherSafe/OtherAccount#password")
 	assert.ErrorContains(t, err, "cyberark: "+fc.address+" is unavailable", "the failure must be returned for the whole connection")
@@ -379,7 +379,7 @@ func TestFailureCache(t *testing.T) {
 	assert.Equal(t, reads, fc.readCount(), "CyberArk must not be contacted while the failure is cached")
 
 	fc.setUnavailable(0)
-	clock.Advance(failureTTL + time.Second)
+	clock.Advance(secretstores.DefaultFailureTTL + time.Second)
 	_, err = s.resolve(ctx, "MySafe/MyAccount#password")
 	assert.NoError(t, err, "CyberArk must be contacted again after the failure expires")
 }
@@ -408,7 +408,7 @@ func TestPathFailureCache(t *testing.T) {
 	require.NoError(t, err, "path failures must not affect other accounts")
 	assert.Equal(t, testPassword, v, "unexpected secret value")
 
-	clock.Advance(failureTTL + time.Second)
+	clock.Advance(secretstores.DefaultFailureTTL + time.Second)
 	_, err = s.resolve(ctx, "MySafe/Missing#password")
 	assert.ErrorContains(t, err, "cyberark: no account at MySafe/Missing", "missing account must be reported again after expiry")
 	assert.Equal(t, reads+2, fc.readCount(), "CyberArk must be read again after the path failure expires")
@@ -418,7 +418,7 @@ func TestConnectionErrorIsRetried(t *testing.T) {
 	s, _, sleeps := newTestStore(t, ccpEntry(unreachableAddress(t)), nil)
 	_, err := s.resolve(context.Background(), "MySafe/MyAccount#password")
 	require.Error(t, err, "an unreachable CyberArk must be reported")
-	assert.True(t, isConnectionError(err), "a refused connection must be a connection error")
-	assert.Len(t, *sleeps, len(retryBackoff), "connection errors must be retried")
+	assert.True(t, secretstores.IsConnectionError(err), "a refused connection must be a connection error")
+	assert.Len(t, *sleeps, len(secretstores.DefaultBackoff), "connection errors must be retried")
 	assert.NotContains(t, err.Error(), defaultServicePath, "the request URL must not be in errors")
 }
