@@ -71,21 +71,10 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
 	}
 
-<<<<<<< HEAD
-	beatCreator := beater.New
-	br, err := xpInstance.NewBeatReceiver(ctx, b, beatCreator, set)
-=======
-	if err := restoreBrowserMonitorParams(b.RawConfig, browserParams); err != nil {
-		return nil, fmt.Errorf("error restoring browser params: %w", err)
-	}
-
-	// Receivers sharing a scheduler group share their scheduler, and so their
-	// concurrency limits.
 	creator := &heartbeatCreator{
-		creator: beater.NewWithSchedulerGroup(cfg.SchedulerGroup),
+		creator: beater.New,
 	}
 	br, err := xpInstance.NewBeatReceiver(ctx, b, creator.create, set)
->>>>>>> 188f7ba ([Heartbeat] Prevent Synthetics monitor state from resetting after Elastic Agent restarts (#53183))
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
 	}

@@ -8,29 +8,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
 
 	"go.opentelemetry.io/collector/component"
-	"go.uber.org/zap"
 )
 
 type heartbeatReceiver struct {
 	xpInstance.BeatReceiver
-<<<<<<< HEAD
-	wg sync.WaitGroup
-}
-
-func (hb *heartbeatReceiver) Start(ctx context.Context, host component.Host) error {
-	hb.wg.Go(func() {
-		hb.Logger.Info("starting heartbeat receiver")
-		if err := hb.BeatReceiver.Start(host); err != nil {
-			hb.Logger.Error("error starting heartbeat receiver", zap.Error(err))
-		}
-	})
-=======
 	ctx                        context.Context
 	cancel                     context.CancelFunc
 	elasticsearchAuthRequester *eslegclient.Connection
@@ -55,7 +41,6 @@ func (hb *heartbeatReceiver) Start(ctx context.Context, host component.Host) err
 		return fmt.Errorf("starting heartbeat receiver: %w", err)
 	}
 
->>>>>>> 188f7ba ([Heartbeat] Prevent Synthetics monitor state from resetting after Elastic Agent restarts (#53183))
 	return nil
 }
 
@@ -76,10 +61,6 @@ func (hb *heartbeatReceiver) Shutdown(ctx context.Context) (err error) {
 	if err := hb.BeatReceiver.Shutdown(ctx); err != nil {
 		return fmt.Errorf("error stopping heartbeat receiver: %w", err)
 	}
-<<<<<<< HEAD
-	hb.wg.Wait()
-=======
 
->>>>>>> 188f7ba ([Heartbeat] Prevent Synthetics monitor state from resetting after Elastic Agent restarts (#53183))
 	return nil
 }
