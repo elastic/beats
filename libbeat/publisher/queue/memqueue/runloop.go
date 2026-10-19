@@ -146,6 +146,13 @@ func (l *runLoop[T]) runIteration() {
 	case req := <-pushChan: // producer pushing new event
 		l.handleInsert(&req)
 
+	case req := <-l.broker.tryPushChan:
+		if l.closing || l.eventCount == len(l.broker.buf) {
+			req.resp <- pushResponse{}
+		} else {
+			l.handleInsert(&req)
+		}
+
 	case req := <-getChan: // consumer asking for next batch
 		l.handleGetRequest(&req)
 
@@ -234,7 +241,7 @@ func (l *runLoop[T]) handleDelete(count int) {
 func (l *runLoop[T]) handleInsert(req *pushRequest[T]) {
 	l.insert(req, l.nextEntryID)
 	// Send back the new event id.
-	req.resp <- l.nextEntryID
+	req.resp <- pushResponse{id: l.nextEntryID, accepted: true}
 
 	l.nextEntryID++
 	l.eventCount++
