@@ -29,7 +29,7 @@ func TestParseReference(t *testing.T) {
 		{content: "%2F#token", wantErr: "empty path or field"},
 		{content: "app%zz#token", wantErr: "invalid path"},
 		{content: "app#to%zzken", wantErr: "invalid field"},
-		{content: "prod@app/creds#token", wantErr: "named connections are not supported yet"},
+		{content: "app/creds#user@example", wantErr: `must not contain "@"`},
 		{content: "app/creds#user%40example", wantPath: "app/creds", wantField: "user@example"},
 		{content: "%2Fapp/creds%2F#token", wantPath: "app/creds", wantField: "token"},
 		{content: "a..b/c.d#token", wantPath: "a..b/c.d", wantField: "token"},

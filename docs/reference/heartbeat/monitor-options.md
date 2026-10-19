@@ -129,6 +129,8 @@ Use the `secret_stores` option to read secrets from an external secret store whe
 
 Reference a secret as `vault://<path>#<field>` in any string setting of the monitor. A reference can be part of a longer value, such as `"Bearer vault://my-app/api#token"`. The path is relative to `kv_mount` and can't contain `.` or `..` segments. Percent-encode `#` and `@` in the path or field, as `%23` and `%40`. A reference can also be the value of a [keystore](/reference/heartbeat/keystore.md) or environment variable.
 
+To use several Vault connections, give each `secret_stores` entry a `name` and prefix the reference with it: `vault://<name>@<path>#<field>`. A reference with a name only uses the entry with that name, and Heartbeat reports an error for a name no entry has. A reference without a name uses the only entry or, if there are several, the one without a `name`; it is an error if neither exists. Percent-encode characters of the name that are not allowed in a reference, such as `@`.
+
 Example:
 
 ```yaml
@@ -151,6 +153,9 @@ Each `secret_stores` entry takes these options:
 
 `type`
 :   The secret store type. Must be `vault`.
+
+`name`
+:   (Optional) The name that references use to select this entry, as in `vault://prod@my-app/api#token`. Names must be unique, and at most one entry can have no name.
 
 `address`
 :   The URL of the Vault server.

@@ -51,23 +51,23 @@ type fakeStore struct {
 	fail bool
 }
 
-func (s *fakeStore) Validate(cfg *conf.C) error {
+func (s *fakeStore) Validate(cfg *conf.C, scope Scope) error {
 	var m map[string]any
 	if err := (*ucfg.Config)(cfg).Unpack(&m, ucfg.PathSep(""), ucfg.ResolveNOOP); err != nil {
 		return err
 	}
-	_, err := s.replace(m, func(name string) (string, error) { return name, nil })
+	_, err := s.replace(m, scope, func(name string) (string, error) { return name, nil })
 	return err
 }
 
-func (s *fakeStore) Replace(_ context.Context, cfg *conf.C) (*conf.C, error) {
+func (s *fakeStore) Replace(_ context.Context, cfg *conf.C, scope Scope) (*conf.C, error) {
 	// Resolve keystore and environment references now: the result is built
 	// without variable expansion, so secret values stay literal.
 	var m map[string]any
 	if err := cfg.Unpack(&m); err != nil {
 		return nil, err
 	}
-	return s.replace(m, func(name string) (string, error) {
+	return s.replace(m, scope, func(name string) (string, error) {
 		if s.fail {
 			return "", errFakeUnavailable
 		}
@@ -75,11 +75,18 @@ func (s *fakeStore) Replace(_ context.Context, cfg *conf.C) (*conf.C, error) {
 	})
 }
 
-func (s *fakeStore) replace(m map[string]any, resolve func(name string) (string, error)) (*conf.C, error) {
+func (s *fakeStore) replace(m map[string]any, scope Scope, resolve func(name string) (string, error)) (*conf.C, error) {
 	for k, v := range m {
 		str, ok := v.(string)
-		name, found := strings.CutPrefix(str, fakePrefix)
+		content, found := strings.CutPrefix(str, fakePrefix)
 		if !ok || !found {
+			continue
+		}
+		name, mine, err := scope.Claim(content)
+		if err != nil {
+			return nil, err
+		}
+		if !mine {
 			continue
 		}
 		if name == "" {
@@ -182,9 +189,29 @@ func TestParseEntries(t *testing.T) {
 		{name: "missing type", raw: []any{map[string]any{"id": "x"}}, wantErr: "'type' is required"},
 		{name: "unknown type", raw: []any{map[string]any{"type": "nope"}}, wantErr: `unknown secret store type "nope"`},
 		{
-			name:    "duplicate type",
+			name:    "duplicate unnamed entries",
 			raw:     []any{map[string]any{"type": fakeType}, map[string]any{"type": fakeType, "id": "2"}},
-			wantErr: `only one "fake" entry is supported`,
+			wantErr: `more than one "fake" entry without a 'name'`,
+		},
+		{
+			name:    "duplicate names",
+			raw:     []any{map[string]any{"type": fakeType, "name": "a"}, map[string]any{"type": fakeType, "name": "a", "id": "2"}},
+			wantErr: `duplicate "fake" entry name "a"`,
+		},
+		{
+			name:    "name is not a string",
+			raw:     []any{map[string]any{"type": fakeType, "name": 3}},
+			wantErr: "'name' must be a string",
+		},
+		{
+			name: "same name for different types",
+			raw:  []any{map[string]any{"type": fakeType, "name": "a"}, map[string]any{"type": otherType, "name": "a"}},
+			want: 2,
+		},
+		{
+			name: "named and unnamed entries",
+			raw:  []any{map[string]any{"type": fakeType}, map[string]any{"type": fakeType, "name": "a", "id": "2"}},
+			want: 2,
 		},
 	}
 	for _, tc := range tests {
@@ -223,6 +250,10 @@ func TestEntryIdentity(t *testing.T) {
 
 	assert.Equal(t, a1, a2, "equal entries must have the same identity")
 	assert.NotEqual(t, a1, different, "different entries must have different identities")
+
+	named, err := entry{settings: map[string]any{"type": fakeType, "a": "1", "b": "2", "name": "prod"}}.identity()
+	require.NoError(t, err, "identity must be computed")
+	assert.Equal(t, a1, named, "the name must not change the identity, so equal connections share a store")
 }
 
 func TestResolveWithoutSecretStores(t *testing.T) {
@@ -359,6 +390,89 @@ func TestValidate(t *testing.T) {
 				assert.NoError(t, err, "validation must pass")
 			}
 			assert.Zero(t, sharedStoreCount(), "validation must not share stores with running monitors")
+		})
+	}
+}
+
+func TestResolveNamedEntries(t *testing.T) {
+	stores := []any{
+		map[string]any{"type": fakeType, "name": "prod", "id": "prod"},
+		map[string]any{"type": fakeType, "name": "stg", "id": "stg"},
+	}
+	tests := []struct {
+		name    string
+		stores  []any
+		cfg     map[string]any
+		want    map[string]any
+		wantErr string
+	}{
+		{
+			name:   "each reference uses its own entry",
+			stores: stores,
+			cfg:    map[string]any{"a": "fake:prod@x", "b": "fake:stg@y"},
+			want:   map[string]any{"a": "prod-x", "b": "stg-y"},
+		},
+		{
+			name:    "unnamed reference is ambiguous",
+			stores:  stores,
+			cfg:     map[string]any{"a": "fake:x"},
+			wantErr: `no connection name, but there are several connections: use <scheme>://<name>@... with one of "prod", "stg"`,
+		},
+		{
+			name:    "unknown name",
+			stores:  stores,
+			cfg:     map[string]any{"a": "fake:dev@x"},
+			wantErr: `unknown connection "dev", expected one of "prod", "stg"`,
+		},
+		{
+			name:   "unnamed reference uses the unnamed entry",
+			stores: append([]any{map[string]any{"type": fakeType, "id": "def"}}, stores...),
+			cfg:    map[string]any{"a": "fake:x", "b": "fake:stg@y"},
+			want:   map[string]any{"a": "def-x", "b": "stg-y"},
+		},
+		{
+			name:   "unnamed reference uses the only entry, named or not",
+			stores: stores[:1],
+			cfg:    map[string]any{"a": "fake:x", "b": "fake:prod@y"},
+			want:   map[string]any{"a": "prod-x", "b": "prod-y"},
+		},
+		{
+			name:   "name is percent-encoded",
+			stores: []any{map[string]any{"type": fakeType, "name": "my conn@1", "id": "c"}},
+			cfg:    map[string]any{"a": "fake:my%20conn%401@x"},
+			want:   map[string]any{"a": "c-x"},
+		},
+		{
+			name:    "empty name",
+			stores:  stores,
+			cfg:     map[string]any{"a": "fake:@x"},
+			wantErr: "empty connection name",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			resetSharedStores(t)
+			r := NewResolver(logptest.NewTestingLogger(t, ""))
+			cfgMap := map[string]any{"type": "http", ConfigKey: tc.stores}
+			for k, v := range tc.cfg {
+				cfgMap[k] = v
+			}
+			cfg := newTestConfig(t, cfgMap)
+
+			// Validation must find the same problems without contacting the stores.
+			verr := r.Validate(cfg)
+			got, err := r.Resolve(cfg)
+			if tc.wantErr != "" {
+				assert.ErrorContains(t, verr, tc.wantErr, "validation must fail")
+				assert.ErrorContains(t, err, tc.wantErr, "resolution must fail")
+				return
+			}
+			require.NoError(t, verr, "validation must pass")
+			require.NoError(t, err, "references must resolve")
+			var resolved map[string]any
+			require.NoError(t, got.Unpack(&resolved), "resolved config must unpack")
+			delete(resolved, "type")
+			assert.Equal(t, tc.want, resolved, "unexpected resolved config")
 		})
 	}
 }

@@ -13,8 +13,13 @@ import (
 	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/secretstores"
 	ucfg "github.com/elastic/go-ucfg"
 )
+
+// defaultScope is the scope of the only entry of its type.
+var defaultScope = secretstores.Scope{Default: true, HasDefault: true}
 
 // newReplaceTestStore returns a store backed by a fake Vault serving
 // app/creds.
@@ -55,7 +60,7 @@ func TestReplaceReferences(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.in, func(t *testing.T) {
-			got, err := replaceReferences(tc.in, func(content string) (string, error) { return "<" + content + ">", nil })
+			got, err := replaceReferences(tc.in, defaultScope, func(content string) (string, error) { return "<" + content + ">", nil })
 			require.NoError(t, err, "replacement must not fail")
 			assert.Equal(t, tc.want, got, "unexpected replacement of %q", tc.in)
 		})
@@ -158,7 +163,7 @@ func TestReplace(t *testing.T) {
 			cfg := newMonitorConfig(t, tc.cfg)
 			before := textSettings(t, cfg)
 
-			got, err := s.Replace(context.Background(), cfg)
+			got, err := s.Replace(context.Background(), cfg, defaultScope)
 			if tc.wantErr != "" {
 				assert.ErrorContains(t, err, tc.wantErr, "replacement must fail")
 				return
@@ -195,7 +200,7 @@ func TestValidate(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			err := s.Validate(newMonitorConfig(t, tc.cfg))
+			err := s.Validate(newMonitorConfig(t, tc.cfg), defaultScope)
 			if tc.wantErr == "" {
 				assert.NoError(t, err, "config must be valid")
 				return
@@ -205,4 +210,21 @@ func TestValidate(t *testing.T) {
 	}
 	logins, reads := fv.counts()
 	assert.Zero(t, logins+reads, "validation must not contact Vault")
+}
+
+func TestReplaceNamedConnections(t *testing.T) {
+	s, _ := newReplaceTestStore(t)
+	scope := secretstores.Scope{Name: "prod", Names: []string{"prod", "stg"}}
+	cfg := newMonitorConfig(t, map[string]any{"mine": "vault://prod@app/creds#user", "other": "vault://stg@app/creds#user"})
+
+	got, err := s.Replace(context.Background(), cfg, scope)
+	require.NoError(t, err, "references must resolve")
+	var resolved map[string]any
+	require.NoError(t, got.Unpack(&resolved), "resolved config must unpack")
+	assert.Equal(t, map[string]any{"mine": "bob", "other": "vault://stg@app/creds#user"}, resolved,
+		"only the references naming the entry must be replaced")
+
+	_, err = s.Replace(context.Background(), newMonitorConfig(t, map[string]any{"v": "vault://dev@app/creds#user"}), scope)
+	assert.ErrorContains(t, err, `unknown connection "dev"`, "an unknown connection must fail")
+	assert.NoError(t, s.Validate(cfg, scope), "named references must validate")
 }

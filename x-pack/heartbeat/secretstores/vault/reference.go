@@ -17,9 +17,9 @@ import (
 // ".." segments: the Vault client cleans the request path, so they would
 // read outside the KV mount.
 func parseReference(content string) (path, field string, err error) {
-	// "@" is reserved to select a named secret_stores connection.
+	// The connection name is removed before, a second "@" is not valid.
 	if strings.Contains(content, "@") {
-		return "", "", errors.New(`named connections are not supported yet, percent-encode "@" as %40`)
+		return "", "", errors.New(`must not contain "@", percent-encode it as %40`)
 	}
 	rawPath, rawField, ok := strings.Cut(content, "#")
 	if !ok {
