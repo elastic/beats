@@ -7,6 +7,7 @@ package beater
 import (
 	"context"
 	"errors"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -17,6 +18,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pub"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -472,4 +475,99 @@ func TestProfilingConnectionWaitCanBeCancelled(t *testing.T) {
 		t.Fatal("active profile connection did not exit after cancellation")
 	}
 	assert.False(t, connection.connected.Load(), "cancelled initialization must remain retryable")
+}
+
+// restartProfilePipeline uses the real osquerybeat publication handoff with a
+// blocked output client, while ordinary clients use the nil test pipeline.
+type restartProfilePipeline struct {
+	beat.Pipeline
+	profile *restartProfileClient
+}
+
+func (p *restartProfilePipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
+	if cfg.PublishMode == beat.DropIfFull {
+		return p.profile, nil
+	}
+	return p.Pipeline.ConnectWith(cfg)
+}
+
+type restartProfileClient struct {
+	entered chan struct{}
+	release chan struct{}
+	closed  chan struct{}
+	calls   atomic.Uint64
+	once    sync.Once
+}
+
+func (c *restartProfileClient) Publish(beat.Event) {
+	if c.calls.Add(1) == 1 {
+		close(c.entered)
+	}
+	<-c.release
+}
+func (c *restartProfileClient) PublishAll(events []beat.Event) {
+	for _, event := range events {
+		c.Publish(event)
+	}
+}
+func (c *restartProfileClient) Close() error {
+	c.once.Do(func() { close(c.closed) })
+	return nil
+}
+
+func TestScheduledProfilerRestartsWhilePublicationIsBlocked(t *testing.T) {
+	client := &restartProfileClient{
+		entered: make(chan struct{}), release: make(chan struct{}), closed: make(chan struct{}),
+	}
+	publisher := pub.New(&beat.Beat{Publisher: &restartProfilePipeline{
+		Pipeline: pipeline.NewNilPipeline(), profile: client,
+	}}, logptest.NewTestingLogger(t, "restart_profiles"))
+	t.Cleanup(func() {
+		close(client.release)
+		publisher.Close()
+		select {
+		case <-client.closed:
+		case <-time.After(time.Second):
+			t.Error("the released publication must close its retired client")
+		}
+	})
+	require.NoError(t, publisher.Configure([]config.InputConfig{
+		{Datastream: config.DatastreamConfig{Dataset: config.DefaultDataset, Namespace: "default"}},
+		{Datastream: config.DatastreamConfig{Dataset: config.DefaultQueryProfileDataset, Namespace: "default"}},
+	}), "configure the real osquerybeat publisher")
+	sink := publisher.CaptureScheduledProfileSink("default")
+	require.NotNil(t, sink, "capture a scheduled profile destination")
+	plugin := profileTestPlugin(t)
+	profiler := newQueryProfiler(logptest.NewTestingLogger(t, "restart_profiles"))
+	query := profileQueryFunc(func(context.Context, string, time.Duration) ([]map[string]any, error) {
+		return profileTestRow("SELECT 1"), nil
+	})
+
+	// Each iteration recreates the collection worker just as runOsquery does.
+	// The first publication stays blocked throughout all subsequent restarts.
+	for i := range 10 {
+		metrics := newScheduledProfileMetrics(monitoring.NewRegistry())
+		worker := newScheduledQueryProfiler(t.Context(), 1, query, plugin, profiler, metrics)
+		t.Cleanup(worker.stop)
+		request := profileTestRequest(nil)
+		request.sink = sink
+		require.True(t, worker.enqueue(request), "admit collection after each simulated daemon restart")
+		require.Eventually(t, func() bool { return metrics.collected.Get() == 1 }, time.Second, time.Millisecond,
+			"collection must finish without waiting for publication")
+		if i == 0 {
+			select {
+			case <-client.entered:
+			case <-time.After(time.Second):
+				t.Fatal("the first publication did not reach the blocked client")
+			}
+		}
+		stopped := make(chan struct{})
+		go func() { worker.stop(); close(stopped) }()
+		select {
+		case <-stopped:
+		case <-time.After(time.Second):
+			t.Fatal("collector shutdown waited for blocked publication")
+		}
+	}
+	assert.Equal(t, uint64(1), client.calls.Load(), "restarts must not accumulate publication calls or workers")
 }
