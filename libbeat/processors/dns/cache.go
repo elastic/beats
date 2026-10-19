@@ -163,14 +163,14 @@ type cacheStats struct {
 }
 
 // newLookupCache returns a new cache.
-func newLookupCache(reg *monitoring.Registry, conf cacheConfig, resolver resolver) (*lookupCache, error) {
+func newLookupCache(reg *monitoring.Registry, conf CacheConfig, resolver resolver) (*lookupCache, error) {
 	if err := conf.Validate(); err != nil {
 		return nil, err
 	}
 
 	c := &lookupCache{
 		success: &successCache{
-			enabled:       conf.FailureCache.Enabled,
+			enabled:       conf.SuccessCache.Enabled,
 			data:          make(map[string]successRecord, conf.SuccessCache.InitialCapacity),
 			maxSize:       conf.SuccessCache.MaxCapacity,
 			minSuccessTTL: conf.SuccessCache.MinTTL,
