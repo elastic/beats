@@ -145,8 +145,8 @@ require (
 
 require (
 	cloud.google.com/go v0.123.0
-	cloud.google.com/go/compute v1.72.0
-	cloud.google.com/go/redis v1.26.0
+	cloud.google.com/go/compute v1.73.0
+	cloud.google.com/go/redis v1.27.0
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.23.3
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.14.1
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/v2 v2.0.2
