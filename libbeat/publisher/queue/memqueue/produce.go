@@ -59,14 +59,13 @@ type openState[T any] struct {
 	done         chan struct{}
 	queueClosing <-chan struct{}
 	events       chan pushRequest[T]
-	tryEvents    chan pushRequest[T]
 	encoder      queue.Encoder[T]
 
 	// resp is used to receive the assigned EntryID after the runLoop
 	// processes a push request. It is allocated once per producer and
 	// reused across publishes. Publish is synchronous, so only one
 	// request is outstanding at a time.
-	resp chan pushResponse
+	resp chan queue.EntryID
 }
 
 // producerID stores the order of events within a single producer, so multiple
@@ -88,9 +87,8 @@ func newProducer[T any](b *broker[T], cb ackHandler, encoder queue.Encoder[T]) q
 		done:         make(chan struct{}),
 		queueClosing: b.closingChan,
 		events:       b.pushChan,
-		tryEvents:    b.tryPushChan,
 		encoder:      encoder,
-		resp:         make(chan pushResponse, 1),
+		resp:         make(chan queue.EntryID, 1),
 	}
 
 	if cb != nil {
@@ -233,29 +231,16 @@ func (st *openState[T]) publish(req pushRequest[T]) (queue.EntryID, bool) {
 }
 
 func (st *openState[T]) tryPublish(req pushRequest[T]) (queue.EntryID, bool) {
-	// A buffered request channel must not admit new work after closure.
-	select {
-	case <-st.done:
-		return 0, false
-	case <-st.queueClosing:
-		return 0, false
-	default:
-	}
 	// If we were given an encoder callback for incoming events, apply it before
 	// sending the entry to the queue.
 	if st.encoder != nil {
 		req.event, req.eventSize = st.encoder.EncodeEntry(req.event)
 	}
 	select {
-	case st.tryEvents <- req:
+	case st.events <- req:
 		return st.handlePendingResponse(req.resp)
 	case <-st.done:
 		st.events = nil
-		st.tryEvents = nil
-		return 0, false
-	case <-st.queueClosing:
-		st.events = nil
-		st.tryEvents = nil
 		return 0, false
 	default:
 		st.log.Debugf("Dropping event, queue is blocked")
@@ -263,20 +248,19 @@ func (st *openState[T]) tryPublish(req pushRequest[T]) (queue.EntryID, bool) {
 	}
 }
 
-func (st *openState[T]) handlePendingResponse(respChan chan pushResponse) (queue.EntryID, bool) {
+func (st *openState[T]) handlePendingResponse(respChan chan queue.EntryID) (queue.EntryID, bool) {
 	// The events channel is buffered, which means we may successfully
 	// write to it even if the queue is shutting down. To avoid blocking
 	// forever during shutdown, we also have to wait on the queue's
 	// shutdown channel.
 	select {
 	case resp := <-respChan:
-		return resp.id, resp.accepted
+		return resp, true
 	case <-st.queueClosing:
 	}
 
 	// Clear the request channel so we can't write to it again
 	st.events = nil
-	st.tryEvents = nil
 
 	// Once the queue starts closing, it will not handle any more push
 	// requests, however it may have handled ours before the closing
@@ -286,7 +270,7 @@ func (st *openState[T]) handlePendingResponse(respChan chan pushResponse) (queue
 	// our channel.
 	select {
 	case resp := <-respChan:
-		return resp.id, resp.accepted
+		return resp, true
 	default:
 	}
 	return 0, false

@@ -77,10 +77,6 @@ type broker[T any] struct {
 	// Producers send requests to pushChan to add events to the queue.
 	pushChan chan pushRequest[T]
 
-	// TryPublish requests must be processed even when the ring buffer is full,
-	// so they can be rejected without waiting for an acknowledgment.
-	tryPushChan chan pushRequest[T]
-
 	// Consumers send requests to getChan to read events from the queue.
 	getChan chan getRequest[T]
 
@@ -249,10 +245,9 @@ func newQueue[T any](
 		encoderFactory: encoderFactory,
 
 		// broker API channels
-		pushChan:    make(chan pushRequest[T], chanSize),
-		tryPushChan: make(chan pushRequest[T], chanSize),
-		getChan:     make(chan getRequest[T]),
-		closeChan:   make(chan bool),
+		pushChan:  make(chan pushRequest[T], chanSize),
+		getChan:   make(chan getRequest[T]),
+		closeChan: make(chan bool),
 
 		// internal runLoop and ackLoop channels
 		consumedChan: make(chan batchList[T]),
