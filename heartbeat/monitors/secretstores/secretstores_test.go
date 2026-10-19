@@ -442,9 +442,7 @@ func TestResolveNamedEntries(t *testing.T) {
 			resetSharedStores(t)
 			r := NewResolver(logptest.NewTestingLogger(t, ""))
 			cfgMap := map[string]any{"type": "http", ConfigKey: tc.stores}
-			for k, v := range tc.cfg {
-				cfgMap[k] = v
-			}
+			maps.Copy(cfgMap, tc.cfg)
 			cfg := newTestConfig(t, cfgMap)
 
 			// Validation must find the same problems without contacting the stores.
