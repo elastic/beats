@@ -121,7 +121,9 @@ Example:
 
 ## `secret_stores` [monitor-secret-stores]
 
-{applies_to}`stack: preview 9.6+`
+```{applies_to}
+stack: preview 9.6+
+```
 
 Use the `secret_stores` option to read secrets from an external secret store when the monitor runs, instead of writing them in the monitor configuration. Heartbeat supports HashiCorp Vault KV v2 secrets.
 
