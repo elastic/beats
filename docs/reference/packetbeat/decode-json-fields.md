@@ -1,4 +1,6 @@
 ---
+meta_title: "decode_json_fields: decode JSON in Packetbeat"
+description: "Use the decode_json_fields processor in Packetbeat to parse fields that contain JSON strings into structured objects. Set target, max_depth, overwrite_keys, and error handling."
 navigation_title: "decode_json_fields"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/decode-json-fields.html
@@ -7,7 +9,7 @@ applies_to:
   serverless: ga
 ---
 
-# Decode JSON fields [decode-json-fields]
+# Decode JSON fields in Packetbeat [decode-json-fields]
 
 
 The `decode_json_fields` processor decodes fields containing JSON strings and replaces the strings with valid JSON objects.

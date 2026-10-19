@@ -7,7 +7,7 @@ applies_to:
   serverless: ga
 ---
 
-# Drop events [drop-event]
+# Drop events in Filebeat [drop-event]
 
 
 The `drop_event` processor drops the entire event if the associated condition is fulfilled. The condition is mandatory, because without one, all the events are dropped.

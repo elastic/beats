@@ -7,7 +7,7 @@ applies_to:
   serverless: ga
 ---
 
-# Generate a fingerprint of an event [fingerprint]
+# Generate a fingerprint of an event in Filebeat [fingerprint]
 
 
 The `fingerprint` processor generates a fingerprint of an event based on a specified subset of its fields.

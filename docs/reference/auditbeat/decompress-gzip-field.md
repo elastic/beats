@@ -1,4 +1,5 @@
 ---
+description: "Use the decompress_gzip_field processor in Auditbeat to gzip decompress a field in place or into a target field, with optional failure handling."
 navigation_title: "decompress_gzip_field"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/decompress-gzip-field.html
@@ -7,7 +8,7 @@ applies_to:
   serverless: ga
 ---
 
-# Decompress gzip fields [decompress-gzip-field]
+# Decompress gzip fields in Auditbeat [decompress-gzip-field]
 
 
 The `decompress_gzip_field` processor specifies a field to gzip decompress. The `field` key contains a `from: old-key` and a `to: new-key` pair. `from` is the origin and `to` the target name of the field.

@@ -1,4 +1,6 @@
 ---
+meta_title: "Add tags to events with add_tags in Heartbeat"
+description: "Use the add_tags processor in Heartbeat to add tags to the tags field of each event, or to a custom target field."
 navigation_title: "add_tags"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/add-tags.html
@@ -7,7 +9,7 @@ applies_to:
   serverless: ga
 ---
 
-# Add tags [add-tags]
+# Add tags in Heartbeat [add-tags]
 
 
 The `add_tags` processor adds tags to a list of tags. If the target field already exists, the tags are appended to the existing list of tags.

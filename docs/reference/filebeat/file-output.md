@@ -7,7 +7,7 @@ applies_to:
   serverless: ga
 ---
 
-# Configure the File output [file-output]
+# Configure the File output in Filebeat [file-output]
 
 
 The File output dumps the transactions into a file where each transaction is in a JSON format. Currently, this output is used for testing, but it can be used as input for Logstash.

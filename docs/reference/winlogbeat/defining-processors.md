@@ -1,4 +1,7 @@
 ---
+navigation_title: "Define processors"
+meta_title: "Processors and conditions in Winlogbeat"
+description: "Define processors in Winlogbeat to filter and enhance events before they reach the output. Learn where processors are valid and how to write conditions such as equals, contains, regexp, and range."
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/defining-processors.html
 applies_to:
@@ -6,7 +9,7 @@ applies_to:
   serverless: ga
 ---
 
-# Define processors [defining-processors]
+# Define processors in Winlogbeat [defining-processors]
 
 You can use processors to filter and enhance data before sending it to the configured output. To define a processor, you specify the processor name, an optional condition, and a set of parameters:
 

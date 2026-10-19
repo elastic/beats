@@ -7,7 +7,7 @@ applies_to:
   serverless: ga
 ---
 
-# Script Processor [processor-script]
+# Script Processor in Filebeat [processor-script]
 
 
 The `script` processor executes Javascript code to process an event. The processor uses a pure Go implementation of ECMAScript 5.1 and has no external dependencies. This can be useful in situations where one of the other processors doesn’t provide the functionality you need to filter events.

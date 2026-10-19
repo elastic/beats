@@ -7,7 +7,7 @@ applies_to:
   serverless: ga
 ---
 
-# Decompress gzip fields [decompress-gzip-field]
+# Decompress gzip fields in Filebeat [decompress-gzip-field]
 
 
 The `decompress_gzip_field` processor specifies a field to gzip decompress. The `field` key contains a `from: old-key` and a `to: new-key` pair. `from` is the origin and `to` the target name of the field.

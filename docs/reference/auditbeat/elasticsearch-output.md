@@ -1,4 +1,6 @@
 ---
+meta_title: "Elasticsearch output configuration in Auditbeat"
+description: "Configure Auditbeat to send events directly to Elasticsearch over the HTTP API: hosts, API key or user authentication, indices, ingest pipelines, retries, and bulk size."
 navigation_title: "Elasticsearch"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/elasticsearch-output.html
@@ -7,7 +9,7 @@ applies_to:
   serverless: ga
 ---
 
-# Configure the Elasticsearch output [elasticsearch-output]
+# Configure the Elasticsearch output in Auditbeat [elasticsearch-output]
 
 
 The Elasticsearch output sends events directly to Elasticsearch using the Elasticsearch HTTP API.

@@ -1,4 +1,6 @@
 ---
+meta_title: "File output: write Packetbeat events to local files"
+description: "Write Packetbeat events to rotating local files in JSON format. Configure path, filename, rotate_every_kb, number_of_files, permissions, and codec."
 navigation_title: "File"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/file-output.html
@@ -7,7 +9,7 @@ applies_to:
   serverless: ga
 ---
 
-# Configure the File output [file-output]
+# Configure the File output in Packetbeat [file-output]
 
 
 The File output dumps the transactions into a file where each transaction is in a JSON format. Currently, this output is used for testing, but it can be used as input for Logstash.

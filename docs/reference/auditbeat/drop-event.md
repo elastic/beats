@@ -1,4 +1,6 @@
 ---
+meta_title: "Drop events with drop_event in Auditbeat"
+description: "Use the drop_event processor in Auditbeat to drop entire events that match a condition, so they are never sent to the output."
 navigation_title: "drop_event"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/drop-event.html
@@ -7,7 +9,7 @@ applies_to:
   serverless: ga
 ---
 
-# Drop events [drop-event]
+# Drop events in Auditbeat [drop-event]
 
 
 The `drop_event` processor drops the entire event if the associated condition is fulfilled. The condition is mandatory, because without one, all the events are dropped.

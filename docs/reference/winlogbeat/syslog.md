@@ -1,4 +1,6 @@
 ---
+meta_title: "Syslog processor for RFC 3164 and 5424 in Winlogbeat"
+description: "Use the syslog processor in Winlogbeat to parse RFC 3164 and RFC 5424 syslog messages stored in a field into structured fields, including timestamps, time zones, and structured data."
 navigation_title: "syslog"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/syslog.html
@@ -7,7 +9,7 @@ applies_to:
   serverless: ga
 ---
 
-# Syslog [syslog]
+# Syslog processor in Winlogbeat [syslog]
 
 
 The syslog processor parses RFC 3164 and/or RFC 5424 formatted syslog messages that are stored in a field. The processor itself does not handle receiving syslog messages from external sources. This is done through an input, such as the TCP input. Certain integrations, when enabled through configuration, will embed the syslog processor to process syslog messages, such as Custom TCP Logs and Custom UDP Logs.

@@ -1,4 +1,6 @@
 ---
+meta_title: "Fingerprint processor: hash events in Auditbeat"
+description: "Use the fingerprint processor in Auditbeat to generate a hash from selected event fields, for example to deduplicate events. Choose fields, target_field, method, and encoding."
 navigation_title: "fingerprint"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/fingerprint.html
@@ -7,7 +9,7 @@ applies_to:
   serverless: ga
 ---
 
-# Generate a fingerprint of an event [fingerprint]
+# Generate a fingerprint of an event in Auditbeat [fingerprint]
 
 
 The `fingerprint` processor generates a fingerprint of an event based on a specified subset of its fields.
