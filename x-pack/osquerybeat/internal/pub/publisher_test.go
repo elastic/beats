@@ -7,6 +7,7 @@ package pub
 import (
 	"context"
 	"encoding/json"
+	"sync"
 	"testing"
 	"time"
 
@@ -28,15 +29,26 @@ import (
 )
 
 type recordingClient struct {
+	mu     sync.Mutex
 	events []beat.Event
 }
 
 func (c *recordingClient) Publish(event beat.Event) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	c.events = append(c.events, event)
 }
 
 func (c *recordingClient) PublishAll(events []beat.Event) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	c.events = append(c.events, events...)
+}
+
+func (c *recordingClient) snapshot() []beat.Event {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return append([]beat.Event(nil), c.events...)
 }
 
 func (c *recordingClient) Close() error {

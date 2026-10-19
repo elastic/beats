@@ -18,7 +18,7 @@ summary: Collect scheduled query profiles asynchronously while preserving execut
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-# description:
+description: Scheduled profile publication uses one worker across daemon restarts and drops new profiles while busy, so output backpressure does not hold up collection or daemon restart.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:

@@ -160,8 +160,8 @@ func (w *scheduledQueryProfiler) stop() {
 	w.mu.Lock()
 	w.cancel()
 	w.mu.Unlock()
-	// Cancelling RPCs cannot interrupt beat.Client.Publish. Bounding this join
-	// also requires cancellable publisher admission.
+	// The sink only offers profiles to the process-lifetime publisher worker;
+	// this join never waits for admission to the shared output queue.
 	<-w.done
 }
 
