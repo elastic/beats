@@ -53,7 +53,12 @@ func profileTestInputs(namespace, sql string, profiling *bool) []config.InputCon
 	return []config.InputConfig{{
 		Datastream: config.DatastreamConfig{Dataset: config.DefaultDataset, Namespace: namespace},
 		Osquery: &config.OsqueryConfig{Schedule: map[string]config.Query{
-			"scheduled": {Query: sql, CommonScheduleConfig: config.CommonScheduleConfig{SpaceID: "space"}, NativeSchedule: config.NativeSchedule{Interval: 1}, Profiling: profiling},
+			"scheduled": {
+				Query:                sql,
+				CommonScheduleConfig: config.CommonScheduleConfig{SpaceID: "space"},
+				NativeSchedule:       config.NativeSchedule{Interval: 1},
+				Profiling:            profiling,
+			},
 		}},
 	}}
 }
@@ -68,25 +73,57 @@ func profileTestPlugin(t *testing.T) *ConfigPlugin {
 }
 
 func profileTestRequest(sink *profileTestSink) scheduledProfileRequest {
-	return scheduledProfileRequest{name: "scheduled", query: "SELECT 1", namespace: "default", scheduleID: "scheduled", responseID: "response", spaceID: "space", scheduleExecutionCount: 1, sink: sink}
+	return scheduledProfileRequest{
+		name:                   "scheduled",
+		query:                  "SELECT 1",
+		namespace:              "default",
+		scheduleID:             "scheduled",
+		responseID:             "response",
+		spaceID:                "space",
+		scheduleExecutionCount: 1,
+		sink:                   sink,
+	}
 }
 
 func profileTestRow(sql string) []map[string]any {
-	return []map[string]any{{"query": sql, "executions": int64(2), "last_wall_time_ms": int64(10), "last_user_time": int64(2), "last_system_time": int64(3), "last_memory": int64(100)}}
+	return []map[string]any{{
+		"query":             sql,
+		"executions":        int64(2),
+		"last_wall_time_ms": int64(10),
+		"last_user_time":    int64(2),
+		"last_system_time":  int64(3),
+		"last_memory":       int64(100),
+	}}
 }
 
 func TestScheduledProfilerBoundsJobsAndJoinsCancellation(t *testing.T) {
-	entered := make(chan struct{})
+	// Hold collection in its RPC so the pending queue cannot drain during admission.
+	entered := make(chan struct{}, 1)
+	release := make(chan struct{})
 	query := profileQueryFunc(func(ctx context.Context, _ string, _ time.Duration) ([]map[string]any, error) {
-		close(entered)
-		<-ctx.Done()
-		return nil, ctx.Err()
+		select {
+		case entered <- struct{}{}:
+		default:
+		}
+		select {
+		case <-release:
+			return profileTestRow("SELECT 1"), nil
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		}
 	})
 	metrics := newScheduledProfileMetrics(monitoring.NewRegistry())
-	worker := newScheduledQueryProfiler(t.Context(), 2, query, profileTestPlugin(t), newQueryProfiler(logptest.NewTestingLogger(t, "profile")), metrics)
-	t.Cleanup(worker.stop)
-	sink := &profileTestSink{published: make(chan collectedProfile, 3)}
+	profiler := newQueryProfiler(logptest.NewTestingLogger(t, "profile"))
+	worker := newScheduledQueryProfiler(t.Context(), 2, query, profileTestPlugin(t), profiler, metrics)
+	t.Cleanup(func() {
+		// Release the fake RPC even if a regression blocks admission or shutdown.
+		close(release)
+		worker.stop()
+	})
+	sink := &profileTestSink{published: make(chan collectedProfile, 4)}
 	request := profileTestRequest(sink)
+
+	// Start one collection and fill both pending slots behind it.
 	require.True(t, worker.enqueue(request), "the first profile should reach the owned worker")
 	select {
 	case <-entered:
@@ -96,10 +133,24 @@ func TestScheduledProfilerBoundsJobsAndJoinsCancellation(t *testing.T) {
 	for range 2 {
 		assert.True(t, worker.enqueue(request), "the bounded pending queue should accept its configured jobs")
 	}
-	assert.False(t, worker.enqueue(request), "a full profiling queue must reject work without blocking the logger")
+
+	// Bound the admission call itself: a blocking send must fail this test promptly.
+	enqueued := make(chan bool, 1)
+	go func() { enqueued <- worker.enqueue(request) }()
+	select {
+	case accepted := <-enqueued:
+		assert.False(t, accepted, "a full profiling queue must reject work without blocking the logger")
+	case <-time.After(time.Second):
+		t.Fatal("full-queue admission blocked while the profiling RPC was still waiting")
+	}
 	assert.Equal(t, uint64(1), metrics.queueFull.Get(), "queue overflow should be observable")
+
+	// Cancellation must join the active RPC and account for all queued metadata.
 	done := make(chan struct{})
-	go func() { worker.stop(); close(done) }()
+	go func() {
+		worker.stop()
+		close(done)
+	}()
 	select {
 	case <-done:
 	case <-time.After(time.Second):
@@ -112,13 +163,17 @@ func TestScheduledProfilerBoundsJobsAndJoinsCancellation(t *testing.T) {
 }
 
 func TestScheduledProfilerPreservesProfileCorrelation(t *testing.T) {
+	// Return metrics from a later execution than the result that queued this profile.
 	query := profileQueryFunc(func(context.Context, string, time.Duration) ([]map[string]any, error) {
 		return profileTestRow("SELECT 1"), nil
 	})
 	metrics := newScheduledProfileMetrics(monitoring.NewRegistry())
-	worker := newScheduledQueryProfiler(t.Context(), 2, query, profileTestPlugin(t), newQueryProfiler(logptest.NewTestingLogger(t, "profile")), metrics)
+	profiler := newQueryProfiler(logptest.NewTestingLogger(t, "profile"))
+	worker := newScheduledQueryProfiler(t.Context(), 2, query, profileTestPlugin(t), profiler, metrics)
 	t.Cleanup(worker.stop)
 	sink := &profileTestSink{published: make(chan collectedProfile, 1)}
+
+	// The worker must preserve captured result metadata while collecting current metrics.
 	require.True(t, worker.enqueue(profileTestRequest(sink)), "default profiling should enqueue a scheduled profile")
 	select {
 	case published := <-sink.published:
@@ -141,6 +196,7 @@ func TestScheduledProfilerRejectsPolicyChangesDuringCollection(t *testing.T) {
 	query := scheduleIDChanged[0].Osquery.Schedule["scheduled"]
 	query.ScheduleID = "new-schedule"
 	scheduleIDChanged[0].Osquery.Schedule["scheduled"] = query
+
 	for _, change := range []struct {
 		name   string
 		inputs []config.InputConfig
@@ -152,7 +208,9 @@ func TestScheduledProfilerRejectsPolicyChangesDuringCollection(t *testing.T) {
 		{"inputs removed", nil},
 	} {
 		t.Run(change.name, func(t *testing.T) {
-			entered, release := make(chan struct{}), make(chan struct{})
+			// Pause collection so the policy changes after admission but before publication.
+			entered := make(chan struct{})
+			release := make(chan struct{})
 			query := profileQueryFunc(func(ctx context.Context, _ string, _ time.Duration) ([]map[string]any, error) {
 				close(entered)
 				select {
@@ -164,17 +222,22 @@ func TestScheduledProfilerRejectsPolicyChangesDuringCollection(t *testing.T) {
 			})
 			plugin := profileTestPlugin(t)
 			metrics := newScheduledProfileMetrics(monitoring.NewRegistry())
-			worker := newScheduledQueryProfiler(t.Context(), 2, query, plugin, newQueryProfiler(logptest.NewTestingLogger(t, "profile")), metrics)
+			profiler := newQueryProfiler(logptest.NewTestingLogger(t, "profile"))
+			worker := newScheduledQueryProfiler(t.Context(), 2, query, plugin, profiler, metrics)
 			t.Cleanup(worker.stop)
 			sink := &profileTestSink{published: make(chan collectedProfile, 1)}
+
 			require.True(t, worker.enqueue(profileTestRequest(sink)), "enqueue the original policy's profile")
 			select {
 			case <-entered:
 			case <-time.After(time.Second):
 				t.Fatal("profile collection did not begin")
 			}
+
+			// A pending policy must invalidate old work even before native config refresh.
 			require.NoError(t, plugin.Set(change.inputs), "install the pending policy before native config refresh")
 			close(release)
+
 			require.Eventually(t, func() bool { return metrics.stale.Get() == 1 }, time.Second, time.Millisecond, "collection must reject a policy change before publication")
 			assert.Empty(t, sink.published, "old profile metadata must not use the new policy destination")
 		})
@@ -182,19 +245,24 @@ func TestScheduledProfilerRejectsPolicyChangesDuringCollection(t *testing.T) {
 }
 
 func TestScheduledProfilerRejectsReplacementNativeMetrics(t *testing.T) {
+	// The native schedule now associates this name with different SQL.
 	query := profileQueryFunc(func(context.Context, string, time.Duration) ([]map[string]any, error) {
 		return profileTestRow("SELECT 2"), nil
 	})
 	metrics := newScheduledProfileMetrics(monitoring.NewRegistry())
-	worker := newScheduledQueryProfiler(t.Context(), 2, query, profileTestPlugin(t), newQueryProfiler(logptest.NewTestingLogger(t, "profile")), metrics)
+	profiler := newQueryProfiler(logptest.NewTestingLogger(t, "profile"))
+	worker := newScheduledQueryProfiler(t.Context(), 2, query, profileTestPlugin(t), profiler, metrics)
 	t.Cleanup(worker.stop)
 	sink := &profileTestSink{published: make(chan collectedProfile, 1)}
 	require.True(t, worker.enqueue(profileTestRequest(sink)), "enqueue the captured query identity")
+
+	// Keep the replacement's metrics out of the original result's profile.
 	require.Eventually(t, func() bool { return metrics.stale.Get() == 1 }, time.Second, time.Millisecond, "the schedule row must still describe the captured SQL")
 	assert.Empty(t, sink.published, "replacement query metrics must not be attached to the old result response ID")
 }
 
 func TestProfilingDiagnosticsRespectRunCancellation(t *testing.T) {
+	// The request outlives the daemon run; only run cancellation can unblock it.
 	ctx, cancel := context.WithCancel(t.Context())
 	defer cancel()
 	entered := make(chan struct{})
@@ -213,6 +281,8 @@ func TestProfilingDiagnosticsRespectRunCancellation(t *testing.T) {
 	case <-time.After(time.Second):
 		t.Fatal("diagnostic query did not begin")
 	}
+
+	// Daemon teardown must propagate into the already-running diagnostic request.
 	cancel()
 	select {
 	case err := <-done:
@@ -222,43 +292,64 @@ func TestProfilingDiagnosticsRespectRunCancellation(t *testing.T) {
 	}
 }
 
+type scheduledProfileResponse struct {
+	scheduleID, responseID string
+	executionCount         int64
+}
+
 type profileCallbackPublisher struct {
 	mockBeatPublisher
 	sink      pub.ScheduledProfileSink
-	responses chan string
+	responses chan scheduledProfileResponse
 }
 
 func (p *profileCallbackPublisher) CaptureScheduledProfileSink(string) pub.ScheduledProfileSink {
 	return p.sink
 }
 
-func (p *profileCallbackPublisher) PublishScheduledResponse(_, _, _, _, _, responseID string, _, _, _ time.Time, _ int, _ int64) {
-	p.responses <- responseID
+func (p *profileCallbackPublisher) PublishScheduledResponse(scheduleID, _, _, _, _, responseID string, _, _, _ time.Time, _ int, executionCount int64) {
+	p.responses <- scheduledProfileResponse{scheduleID: scheduleID, responseID: responseID, executionCount: executionCount}
 }
 
 func TestLoggerReturnsWhileScheduledProfileRPCWaits(t *testing.T) {
-	entered, release := make(chan struct{}), make(chan struct{})
+	// Keep the profile RPC blocked until the result callback has returned.
+	entered := make(chan struct{})
+	release := make(chan struct{})
 	query := profileQueryFunc(func(ctx context.Context, _ string, _ time.Duration) ([]map[string]any, error) {
 		close(entered)
 		select {
 		case <-release:
-			return profileTestRow("SELECT 1"), nil
+			rows := profileTestRow("SELECT 1")
+			rows[0]["executions"] = int64(5)
+			return rows, nil
 		case <-ctx.Done():
 			return nil, ctx.Err()
 		}
 	})
-	plugin := profileTestPlugin(t)
 	log := logptest.NewTestingLogger(t, "callback")
-	worker := newScheduledQueryProfiler(t.Context(), 2, query, plugin, newQueryProfiler(log), newScheduledProfileMetrics(monitoring.NewRegistry()))
+	plugin := NewConfigPlugin(log)
+	inputs := profileTestInputs("default", "SELECT 1", nil)
+	scheduled := inputs[0].Osquery.Schedule["scheduled"]
+	scheduled.ScheduleID = "policy-schedule"
+	scheduled.StartDate = time.Unix(120, 0).UTC().Format(time.RFC3339)
+	inputs[0].Osquery.Schedule["scheduled"] = scheduled
+	require.NoError(t, plugin.Set(inputs), "configure a schedule with explicit execution timing and identity")
+	_, err := plugin.GenerateConfig(t.Context())
+	require.NoError(t, err, "apply the timed native schedule")
+	profiler := newQueryProfiler(log)
+	metrics := newScheduledProfileMetrics(monitoring.NewRegistry())
+	worker := newScheduledQueryProfiler(t.Context(), 2, query, plugin, profiler, metrics)
 	t.Cleanup(worker.stop)
 	sink := &profileTestSink{published: make(chan collectedProfile, 1)}
-	publisher := &profileCallbackPublisher{sink: sink, responses: make(chan string, 1)}
-	bt := &osquerybeat{pub: publisher, qp: newQueryProfiler(log), log: log}
+	publisher := &profileCallbackPublisher{sink: sink, responses: make(chan scheduledProfileResponse, 1)}
+	bt := &osquerybeat{pub: publisher, qp: profiler, log: log}
 	loggerPlugin := NewLoggerPlugin(log, func(result QueryResult) {
 		// A zero-hit diff needs no column resolution, so nil cli catches any
 		// accidental reintroduction of profiling RPCs through the main client.
 		bt.handleQueryResult(t.Context(), nil, plugin, worker, result)
 	})
+
+	// Exercise the real logger callback, independently of the profiling worker.
 	done := make(chan error, 1)
 	go func() {
 		done <- loggerPlugin.Log(t.Context(), logger.LogTypeString, `{"name":"scheduled","action":"diff","unixTime":123}`)
@@ -274,12 +365,24 @@ func TestLoggerReturnsWhileScheduledProfileRPCWaits(t *testing.T) {
 	case <-time.After(time.Second):
 		t.Fatal("deferred profile collection did not start")
 	}
-	responseID := <-publisher.responses
+
+	// Results must precede profiles, and both must retain the same response ID.
+	var response scheduledProfileResponse
+	select {
+	case response = <-publisher.responses:
+	case <-time.After(time.Second):
+		t.Fatal("the result callback did not publish its scheduled response")
+	}
+	assert.Equal(t, "policy-schedule", response.scheduleID, "the scheduled response must use policy identity")
+	assert.Equal(t, int64(4), response.executionCount, "capture the result's execution slot before delayed collection")
 	assert.Empty(t, sink.published, "the scheduled response should be emitted while profiling is still pending")
 	close(release)
 	select {
 	case profile := <-sink.published:
-		assert.Equal(t, responseID, profile.responseID, "asynchronous profiling must retain the completed result's response ID")
+		assert.Equal(t, response.responseID, profile.responseID, "asynchronous profiling must retain the completed result's response ID")
+		assert.Equal(t, response.scheduleID, profile.scheduleID, "retain the originating policy schedule identity")
+		assert.Equal(t, response.executionCount, profile.scheduleExecutionCount, "retain execution attribution captured by the logger callback")
+		assert.Equal(t, int64(5), profile.profile["executions"], "native metrics remain a latest snapshot, independent of the originating execution slot")
 	case <-time.After(time.Second):
 		t.Fatal("the released profile RPC did not publish its profile")
 	}
@@ -288,22 +391,33 @@ func TestLoggerReturnsWhileScheduledProfileRPCWaits(t *testing.T) {
 func TestProfilingConnectionIsLazyAndRetriesFailure(t *testing.T) {
 	connectFailure := errors.New("profile socket unavailable")
 	var attempts int
-	connection := &profilingConnection{gate: semaphore.NewWeighted(1), connect: func(context.Context) error {
-		attempts++
-		if attempts == 1 {
-			return connectFailure
-		}
-		return nil
-	}}
+	connection := &profilingConnection{
+		gate: semaphore.NewWeighted(1),
+		connect: func(context.Context) error {
+			attempts++
+			if attempts == 1 {
+				return connectFailure
+			}
+			return nil
+		},
+	}
 	var queries int
-	executor := profilingQueryExecutor{runCtx: t.Context(), connection: connection, executor: profileQueryFunc(func(context.Context, string, time.Duration) ([]map[string]any, error) {
-		queries++
-		return profileTestRow("SELECT 1"), nil
-	})}
+	executor := profilingQueryExecutor{
+		runCtx:     t.Context(),
+		connection: connection,
+		executor: profileQueryFunc(func(context.Context, string, time.Duration) ([]map[string]any, error) {
+			queries++
+			return profileTestRow("SELECT 1"), nil
+		}),
+	}
+
+	// Construction stays lazy, and a failed first attempt must not execute a query.
 	assert.Zero(t, attempts, "disabled profiling or a missing stream must not open a socket during setup")
 	_, err := executor.Query(t.Context(), "SELECT 1", time.Second)
 	assert.ErrorIs(t, err, connectFailure, "a connection failure belongs to this optional profile request")
 	assert.Zero(t, queries, "a failed connection must not start its query")
+
+	// Once a retry connects, later requests reuse that connection.
 	_, err = executor.Query(t.Context(), "SELECT 1", time.Second)
 	require.NoError(t, err, "a later profile should retry a failed connection")
 	_, err = executor.Query(t.Context(), "SELECT 1", time.Second)
@@ -315,12 +429,17 @@ func TestProfilingConnectionIsLazyAndRetriesFailure(t *testing.T) {
 func TestProfilingConnectionWaitCanBeCancelled(t *testing.T) {
 	entered := make(chan struct{})
 	var attempts atomic.Int32
-	connection := &profilingConnection{gate: semaphore.NewWeighted(1), connect: func(ctx context.Context) error {
-		attempts.Add(1)
-		close(entered)
-		<-ctx.Done()
-		return ctx.Err()
-	}}
+	connection := &profilingConnection{
+		gate: semaphore.NewWeighted(1),
+		connect: func(ctx context.Context) error {
+			attempts.Add(1)
+			close(entered)
+			<-ctx.Done()
+			return ctx.Err()
+		},
+	}
+
+	// Occupy the connection gate with an attempt that waits for cancellation.
 	activeCtx, cancelActive := context.WithCancel(t.Context())
 	defer cancelActive()
 	activeDone := make(chan error, 1)
@@ -330,6 +449,8 @@ func TestProfilingConnectionWaitCanBeCancelled(t *testing.T) {
 	case <-time.After(time.Second):
 		t.Fatal("the first lazy connection did not start")
 	}
+
+	// A queued diagnostic must honor its own deadline without starting another connect.
 	waitingCtx, cancelWaiting := context.WithTimeout(t.Context(), 20*time.Millisecond)
 	defer cancelWaiting()
 	waitingDone := make(chan error, 1)
@@ -341,6 +462,8 @@ func TestProfilingConnectionWaitCanBeCancelled(t *testing.T) {
 		t.Fatal("the queued connection ignored cancellation")
 	}
 	assert.Equal(t, int32(1), attempts.Load(), "cancelled waiters must not start a competing connection")
+
+	// Cancelling the active attempt must release the gate and leave initialization retryable.
 	cancelActive()
 	select {
 	case err := <-activeDone:

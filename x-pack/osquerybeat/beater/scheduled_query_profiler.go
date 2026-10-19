@@ -52,7 +52,6 @@ type scheduledQueryProfiler struct {
 	jobs     chan scheduledProfileRequest
 	done     chan struct{}
 	mu       sync.Mutex
-	stopped  bool
 	lastWarn atomic.Int64
 	log      *logp.Logger
 	profiler *queryProfiler
@@ -64,8 +63,15 @@ type scheduledQueryProfiler struct {
 func newScheduledQueryProfiler(ctx context.Context, limit int, executor queryExecutor, plugin *ConfigPlugin, profiler *queryProfiler, metrics *scheduledProfileMetrics) *scheduledQueryProfiler {
 	ctx, cancel := context.WithCancel(ctx)
 	w := &scheduledQueryProfiler{
-		ctx: ctx, cancel: cancel, jobs: make(chan scheduledProfileRequest, limit), done: make(chan struct{}),
-		log: profiler.log, profiler: profiler, executor: executor, config: plugin, metrics: metrics,
+		ctx:      ctx,
+		cancel:   cancel,
+		jobs:     make(chan scheduledProfileRequest, limit),
+		done:     make(chan struct{}),
+		log:      profiler.log,
+		profiler: profiler,
+		executor: executor,
+		config:   plugin,
+		metrics:  metrics,
 	}
 	go w.run()
 	return w
@@ -74,7 +80,7 @@ func newScheduledQueryProfiler(ctx context.Context, limit int, executor queryExe
 func (w *scheduledQueryProfiler) enqueue(request scheduledProfileRequest) bool {
 	w.mu.Lock()
 	defer w.mu.Unlock()
-	if w.stopped || w.ctx.Err() != nil {
+	if w.ctx.Err() != nil {
 		w.metrics.shutdown.Inc()
 		return false
 	}
@@ -97,23 +103,18 @@ func (w *scheduledQueryProfiler) enqueue(request scheduledProfileRequest) bool {
 }
 
 func (w *scheduledQueryProfiler) run() {
-	defer close(w.done)
-	defer func() {
-		w.mu.Lock()
-		defer w.mu.Unlock()
-		w.stopped = true
-		for {
-			select {
-			case <-w.jobs:
-				w.metrics.shutdown.Inc()
-			default:
-				return
-			}
-		}
-	}()
 	for {
 		select {
 		case <-w.ctx.Done():
+			// Serialize with enqueue so callbacks admitted before cancellation
+			// are drained before stop returns.
+			w.mu.Lock()
+			for len(w.jobs) != 0 {
+				<-w.jobs
+				w.metrics.shutdown.Inc()
+			}
+			w.mu.Unlock()
+			close(w.done)
 			return
 		case request := <-w.jobs:
 			w.collect(request)
@@ -157,11 +158,10 @@ func (w *scheduledQueryProfiler) collect(request scheduledProfileRequest) {
 
 func (w *scheduledQueryProfiler) stop() {
 	w.mu.Lock()
-	w.stopped = true
 	w.cancel()
 	w.mu.Unlock()
-	// Cancelling RPCs cannot interrupt beat.Client.Publish. Bounding this join
-	// also requires cancellable publisher admission.
+	// Scheduled profile sinks use DropIfFull, so joining cannot wait for
+	// publisher queue space after the active RPC has been cancelled.
 	<-w.done
 }
 
