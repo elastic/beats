@@ -337,12 +337,6 @@ func TestContinueOnError(t *testing.T) {
 				tc.config.Validate(),
 				"validation must succeed when continue_on_error is enabled",
 			)
-			require.ErrorContains(
-				t,
-				tc.config.validateErr,
-				tc.errString,
-				"validation error must be deferred to Start",
-			)
 
 			core, observed := observer.New(zapcore.WarnLevel)
 			settings := componenttest.NewNopTelemetrySettings()
@@ -372,10 +366,10 @@ func TestContinueOnError(t *testing.T) {
 				events[0].Status(),
 				"start must report a permanent error status",
 			)
-			require.ErrorIs(
+			require.ErrorContains(
 				t,
 				events[0].Err(),
-				tc.config.validateErr,
+				tc.errString,
 				"status event must report the deferred validation error",
 			)
 
@@ -391,13 +385,13 @@ func TestContinueOnError(t *testing.T) {
 			require.ErrorIs(
 				t,
 				err,
-				tc.config.validateErr,
+				events[0].Err(),
 				"error transport must return the deferred validation error",
 			)
 
 			warnings := observed.
 				FilterLevelExact(zapcore.WarnLevel).
-				FilterMessageSnippet(tc.config.validateErr.Error()).
+				FilterMessageSnippet(events[0].Err().Error()).
 				All()
 			require.Len(t, warnings, 1, "deferred validation error must be logged once at warn level")
 		})

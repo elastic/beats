@@ -29,9 +29,6 @@ type Config struct {
 	// Endpoints contains optional, fully resolved Elasticsearch HTTP(S)
 	// endpoints.
 	Endpoints []string `mapstructure:"endpoints,omitempty"`
-
-	// validateErr holds the error from Validate when continue_on_error is true
-	validateErr error
 }
 
 type BeatsAuthConfig struct {
@@ -45,25 +42,23 @@ func createDefaultConfig() component.Config {
 
 // Validate validates optional Elasticsearch endpoints and authentication.
 // If ContinueOnError is true, validation errors are deferred to Start.
-func (c *Config) Validate() (err error) {
-	defer func() {
-		// Start installs an error round-tripper when ContinueOnError is
-		// enabled, so configuration errors must be deferred to it.
-		c.validateErr = err
-		if c.ContinueOnError {
-			err = nil
-		}
-	}()
+func (c *Config) Validate() error {
+	if c.ContinueOnError {
+		return nil
+	}
 
+	return c.validate()
+}
+
+// validate validates optional Elasticsearch endpoints and authentication.
+func (c *Config) validate() error {
 	for _, endpoint := range c.Endpoints {
 		u, err := parseHTTPURL(endpoint)
 		if err != nil {
 			return fmt.Errorf("invalid endpoint: %w", err)
 		}
 		if u.User != nil {
-			return errors.New(
-				"endpoint userinfo is unsupported; configure auth.username " +
-					"and auth.password instead")
+			return errors.New("endpoint userinfo is unsupported; configure auth.username and auth.password instead")
 		}
 	}
 

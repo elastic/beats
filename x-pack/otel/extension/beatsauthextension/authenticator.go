@@ -72,7 +72,7 @@ func newAuthenticator(cfg *Config, telemetry component.TelemetrySettings) (*auth
 	return auth, nil
 }
 
-func (a *authenticator) Start(_ context.Context, host component.Host) (err error) {
+func (a *authenticator) Start(_ context.Context, host component.Host) error {
 	switch {
 	case a == nil:
 		return fmt.Errorf("authenticator is nil")
@@ -80,35 +80,33 @@ func (a *authenticator) Start(_ context.Context, host component.Host) (err error
 		return fmt.Errorf("authenticator config is nil")
 	}
 
-	var provider roundTripperProvider
-	// Handle errors and continue_on_error.
-	defer func() {
-		if a.cfg.validateErr != nil {
-			err = a.cfg.validateErr
-		}
-
-		if err != nil {
+	// When ContinueOnError is true, the config has not been validated
+	if a.cfg.ContinueOnError {
+		if err := a.cfg.validate(); err != nil {
+			err = fmt.Errorf("invalid configuration: %w", err)
 			componentstatus.ReportStatus(host, componentstatus.NewPermanentErrorEvent(err))
 			a.logger.Warnf("%s", err.Error())
-
-			if a.cfg.ContinueOnError {
-				provider = &errorRoundTripperProvider{err: err}
-				err = nil
-			}
-		} else {
-			componentstatus.ReportStatus(host, componentstatus.NewEvent(componentstatus.StatusOK))
+			a.rtProvider = &errorRoundTripperProvider{err: err}
+			return nil
 		}
-
-		a.rtProvider = provider
-	}()
-
-	prov, err := getHttpClient(a)
-	if err != nil {
-		return err
 	}
 
-	provider = prov
+	var provider roundTripperProvider
+	prov, err := getHttpClient(a)
+	if err != nil {
+		componentstatus.ReportStatus(host, componentstatus.NewPermanentErrorEvent(err))
+		err = fmt.Errorf("failed creating http client: %w", err)
+		if !a.cfg.ContinueOnError {
+			return err
+		}
+		a.logger.Warnf("%s", err.Error())
+		provider = &errorRoundTripperProvider{err: err}
+	} else {
+		componentstatus.ReportStatus(host, componentstatus.NewEvent(componentstatus.StatusOK))
+		provider = prov
+	}
 
+	a.rtProvider = provider
 	return nil
 }
 
