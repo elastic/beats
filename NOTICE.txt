@@ -5862,11 +5862,11 @@ Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/servi
 
 --------------------------------------------------------------------------------
 Dependency : github.com/aws/aws-sdk-go-v2/service/ec2
-Version: v1.338.4
+Version: v1.339.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/service/ec2@v1.338.4/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/service/ec2@v1.339.0/LICENSE.txt:
 
 
                                  Apache License
@@ -6710,11 +6710,11 @@ Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/servi
 
 --------------------------------------------------------------------------------
 Dependency : github.com/aws/aws-sdk-go-v2/service/organizations
-Version: v1.61.3
+Version: v1.62.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/service/organizations@v1.61.3/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/service/organizations@v1.62.0/LICENSE.txt:
 
 
                                  Apache License
@@ -25033,11 +25033,11 @@ Contents of probable licence file $GOMODCACHE/go.elastic.co/ecszap@v1.0.3/LICENS
 
 --------------------------------------------------------------------------------
 Dependency : go.elastic.co/go-licence-detector
-Version: v0.10.0
+Version: v0.11.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.elastic.co/go-licence-detector@v0.10.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/go.elastic.co/go-licence-detector@v0.11.1/LICENSE:
 
 
                                  Apache License
@@ -35123,11 +35123,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/mod
-Version: v0.41.0
+Version: v0.42.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/mod@v0.41.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/mod@v0.42.0/LICENSE:
 
 Copyright 2009 The Go Authors.
 
@@ -51277,11 +51277,11 @@ third-party archives.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/cyphar/filepath-securejoin
-Version: v0.6.0
+Version: v0.7.0
 Licence type (autodetected): MPL-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/cyphar/filepath-securejoin@v0.6.0/COPYING.md:
+Contents of probable licence file $GOMODCACHE/github.com/cyphar/filepath-securejoin@v0.7.0/COPYING.md:
 
 ## COPYING ##
 
@@ -60814,11 +60814,11 @@ respective owners.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/google/licenseclassifier
-Version: v0.0.0-20250213175939-b5d1a3369749
+Version: v0.0.0-20260218193730-3cfbab2d0e0d
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/google/licenseclassifier@v0.0.0-20250213175939-b5d1a3369749/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/google/licenseclassifier@v0.0.0-20260218193730-3cfbab2d0e0d/LICENSE:
 
 
                                  Apache License
