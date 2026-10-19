@@ -30,7 +30,7 @@ type LogBatch struct {
 }
 
 // NewLogBatch creates a batch from logs. index is the `index` explicitly configured
-// on the exporter, or empty to keep the `@metadata.beat` set by the receiver.
+// on the exporter and takes precedence over @metadata.beat set by the receiver
 func NewLogBatch(logs plog.Logs, index string) (*LogBatch, error) {
 	events, err := createEvents(&logs, index)
 	if err != nil {

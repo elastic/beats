@@ -18,8 +18,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// parseEvent converts a log record into a beat.Event. If index is not empty, it
-// is used as `@metadata.beat` instead of the value set by the receiver.
+// parseEvent converts a log record into a beat.Event.
 func parseEvent(logRecord *plog.LogRecord, index string) (beat.Event, error) {
 	fields, ok := parseEventFields(logRecord)
 	if !ok {
