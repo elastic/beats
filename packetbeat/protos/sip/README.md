@@ -73,7 +73,8 @@ SIP is a text-based protocol like HTTP. But SIP has various unique features like
     "network.transport": "udp",
     "network.type": "ipv4",
     "related.hosts": [
-        "sip.cybercity.dk"
+        "sip.cybercity.dk",
+        "192.168.1.2"
     ],
     "related.ip": [
         "192.168.1.2",
@@ -90,8 +91,12 @@ SIP is a text-based protocol like HTTP. But SIP has various unique features like
     "sip.auth.uri.original": "sip:192.168.1.2",
     "sip.auth.uri.scheme": "sip",
     "sip.call_id": "578222729-4665d775@578222732-4665d772",
-    "sip.contact.uri.host": "sip.cybercity.dk",
-    "sip.contact.uri.original": "sip:voi18062@sip.cybercity.dk",
+    "sip.contact.expires": 1200,
+    "sip.contact.line": "aca6b97ca3f5e51a",
+    "sip.contact.q": 0.5,
+    "sip.contact.uri.host": "192.168.1.2",
+    "sip.contact.uri.original": "sip:voi18062@192.168.1.2:5060;line=aca6b97ca3f5e51a",
+    "sip.contact.uri.port": 5060,
     "sip.contact.uri.scheme": "sip",
     "sip.contact.uri.username": "voi18062",
     "sip.cseq.code": 75,
