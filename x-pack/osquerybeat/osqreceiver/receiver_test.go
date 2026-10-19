@@ -174,6 +174,9 @@ func genSocketPath() string {
 }
 
 func TestComponentLifecycle(t *testing.T) {
+	// TODO: re-enable once https://github.com/elastic/beats/issues/53865 is fixed.
+	t.Skip("osquerybeat Shutdown hangs when called right after Start, see https://github.com/elastic/beats/issues/53865")
+
 	cfg := &Config{
 		Beatconfig: map[string]any{
 			"osquerybeat": map[string]any{
