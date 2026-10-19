@@ -45,22 +45,19 @@ func TestMain(m *testing.M) {
 func TestLogsPathMatcher_InvalidSource1(t *testing.T) {
 	cfgLogsPath := "" // use the default matcher configuration
 	source := "/var/log/messages"
-	expectedResult := ""
-	executeTest(t, cfgLogsPath, source, expectedResult)
+	executeTest(t, cfgLogsPath, source, nil)
 }
 
 func TestLogsPathMatcher_InvalidSource2(t *testing.T) {
 	cfgLogsPath := "" // use the default matcher configuration
 	source := "/var/lib/docker/containers/01234567/89abcdef-json.log"
-	expectedResult := ""
-	executeTest(t, cfgLogsPath, source, expectedResult)
+	executeTest(t, cfgLogsPath, source, nil)
 }
 
 func TestLogsPathMatcher_InvalidSource3(t *testing.T) {
 	cfgLogsPath := "/var/log/containers/"
 	source := "/var/log/containers/pod_ns_container_01234567.log"
-	expectedResult := ""
-	executeTest(t, cfgLogsPath, source, expectedResult)
+	executeTest(t, cfgLogsPath, source, nil)
 }
 
 func TestLogsPathMatcher_VarLibDockerContainers(t *testing.T) {
@@ -72,9 +69,7 @@ func TestLogsPathMatcher_VarLibDockerContainers(t *testing.T) {
 	}
 
 	source := fmt.Sprintf(path, cid, cid)
-
-	expectedResult := cid
-	executeTest(t, cfgLogsPath, source, expectedResult)
+	executeTest(t, cfgLogsPath, source, []string{cid})
 }
 
 func TestLogsPathMatcher_VarLogContainers(t *testing.T) {
@@ -86,8 +81,7 @@ func TestLogsPathMatcher_VarLogContainers(t *testing.T) {
 	}
 
 	source := fmt.Sprintf(sourcePath, cid)
-	expectedResult := cid
-	executeTest(t, cfgLogsPath, source, expectedResult)
+	executeTest(t, cfgLogsPath, source, []string{cid})
 }
 
 func TestLogsPathMatcher_AnotherLogDir(t *testing.T) {
@@ -99,8 +93,7 @@ func TestLogsPathMatcher_AnotherLogDir(t *testing.T) {
 	}
 
 	source := fmt.Sprintf(sourcePath, cid)
-	expectedResult := cid
-	executeTest(t, cfgLogsPath, source, expectedResult)
+	executeTest(t, cfgLogsPath, source, []string{cid})
 }
 
 func TestLogsPathMatcher_VarLibKubeletPods(t *testing.T) {
@@ -114,26 +107,27 @@ func TestLogsPathMatcher_VarLibKubeletPods(t *testing.T) {
 	}
 
 	source := fmt.Sprintf(sourcePath, puid)
-	expectedResult := puid
-	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
+	// kubelet path: no container segment — returns bare UID only
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, []string{puid})
 }
 
 func TestLogsPathMatcher_InvalidSource4(t *testing.T) {
 	cfgLogsPath := "/var/lib/kubelet/pods/"
 	cfgResourceType := "pod"
 	source := fmt.Sprintf("/invalid/dir/%s/volumes/kubernetes.io~empty-dir/applogs/server.log", puid)
-	expectedResult := ""
-	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, nil)
 }
 
 func TestLogsPathMatcher_InvalidVarLogPodSource(t *testing.T) {
 	cfgLogsPath := "/var/log/pods/"
 	cfgResourceType := "pod"
 	source := fmt.Sprintf("/invalid/dir/namespace_pod-name_%s/container/0.log", puid)
-	expectedResult := ""
-	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, nil)
 }
 
+// ValidVarLogPodSource uses a rotated log filename with a timestamp suffix; the
+// basename is not a plain integer so only the <uid>/<container> and <uid> candidates
+// are returned.
 func TestLogsPathMatcher_ValidVarLogPodSource(t *testing.T) {
 	cfgLogsPath := "/var/log/pods/"
 	cfgResourceType := "pod"
@@ -144,26 +138,52 @@ func TestLogsPathMatcher_ValidVarLogPodSource(t *testing.T) {
 		sourcePath = "C:\\var\\log\\pods\\namespace_pod-name_%s\\container\\0.log.20220221-210912"
 	}
 	source := fmt.Sprintf(sourcePath, puid)
-	expectedResult := puid
-	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source,
+		[]string{puid + "/container", puid})
 }
 
-func TestLogsPathMatcher_InvalidVarLogPodSource2(t *testing.T) {
+// ValidVarLogPodSource_GzRotated verifies that a .gz-compressed rotated log (with a timestamp
+// suffix like 0.log.20220221-210526.gz) returns uid/container and uid candidates. After
+// stripping .gz, the basename is "0.log.20220221-210526" which does not end in ".log", so no
+// restart-count candidate is produced.
+func TestLogsPathMatcher_ValidVarLogPodSource_GzRotated(t *testing.T) {
 	cfgLogsPath := "/var/log/pods/"
 	cfgResourceType := "pod"
-	source := fmt.Sprintf("/var/log/pods/namespace_pod-name_%s/container/0.log.20220221-210526.gz", puid)
-	expectedResult := ""
-	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
+	sourcePath := "/var/log/pods/namespace_pod-name_%s/container/0.log.20220221-210526.gz"
+	if runtime.GOOS == "windows" {
+		cfgLogsPath = "C:\\var\\log\\pods\\"
+		sourcePath = "C:\\var\\log\\pods\\namespace_pod-name_%s\\container\\0.log.20220221-210526.gz"
+	}
+	source := fmt.Sprintf(sourcePath, puid)
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source,
+		[]string{puid + "/container", puid})
+}
+
+// ValidVarLogPodSource_GzDirect verifies that a directly-compressed log (0.log.gz) is treated
+// as restart 0 and returns all three candidates, same as its uncompressed counterpart 0.log.
+func TestLogsPathMatcher_ValidVarLogPodSource_GzDirect(t *testing.T) {
+	cfgLogsPath := "/var/log/pods/"
+	cfgResourceType := "pod"
+	sourcePath := "/var/log/pods/namespace_pod-name_%s/container/0.log.gz"
+	if runtime.GOOS == "windows" {
+		cfgLogsPath = "C:\\var\\log\\pods\\"
+		sourcePath = "C:\\var\\log\\pods\\namespace_pod-name_%s\\container\\0.log.gz"
+	}
+	source := fmt.Sprintf(sourcePath, puid)
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source,
+		[]string{puid + "/container/0", puid + "/container", puid})
 }
 
 func TestLogsPathMatcher_InvalidVarLogPodIDFormat(t *testing.T) {
 	cfgLogsPath := "/var/log/pods/"
 	cfgResourceType := "pod"
+	// Pod dir has no underscores — UID extraction fails
 	source := fmt.Sprintf("/var/log/pods/%s/container/0.log", puid)
-	expectedResult := ""
-	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, nil)
 }
 
+// ValidVarLogPod is the primary success case: a plain <n>.log basename yields the
+// three-candidate list: <uid>/<container>/<n>, <uid>/<container>, <uid>.
 func TestLogsPathMatcher_ValidVarLogPod(t *testing.T) {
 	cfgLogsPath := "/var/log/pods/"
 	cfgResourceType := "pod"
@@ -174,15 +194,81 @@ func TestLogsPathMatcher_ValidVarLogPod(t *testing.T) {
 		sourcePath = "C:\\var\\log\\pods\\namespace_pod-name_%s\\container\\0.log"
 	}
 	source := fmt.Sprintf(sourcePath, puid)
-	expectedResult := puid
-	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source,
+		[]string{puid + "/container/0", puid + "/container", puid})
 }
 
-func executeTest(t *testing.T, cfgLogsPath string, source string, expectedResult string) {
+// ValidVarLogPod_Restart verifies that a non-zero restart count log file (e.g. 3.log) also
+// produces the correct three-candidate list.
+func TestLogsPathMatcher_ValidVarLogPod_Restart(t *testing.T) {
+	cfgLogsPath := "/var/log/pods/"
+	cfgResourceType := "pod"
+	sourcePath := "/var/log/pods/namespace_pod-name_%s/mycontainer/3.log"
+
+	if runtime.GOOS == "windows" {
+		cfgLogsPath = "C:\\var\\log\\pods\\"
+		sourcePath = "C:\\var\\log\\pods\\namespace_pod-name_%s\\mycontainer\\3.log"
+	}
+	source := fmt.Sprintf(sourcePath, puid)
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source,
+		[]string{puid + "/mycontainer/3", puid + "/mycontainer", puid})
+}
+
+// ValidVarLogPod_NoLogExtension covers paths that match /var/log/pods/ but do not contain
+// ".log" in their source — they are rejected and return nil.
+func TestLogsPathMatcher_ValidVarLogPod_NoLogExtension(t *testing.T) {
+	cfgLogsPath := "/var/log/pods/"
+	cfgResourceType := "pod"
+	source := fmt.Sprintf("/var/log/pods/namespace_pod-name_%s/container/0", puid)
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, nil)
+}
+
+// LogsPathNotAPrefix verifies that a source where logs_path appears as an interior substring
+// (not a prefix) is rejected. Previously, strings.Contains was used, which would have accepted
+// /mnt/host/var/log/pods/… and parsed it at the wrong segment offsets.
+func TestLogsPathMatcher_LogsPathNotAPrefix(t *testing.T) {
+	cfgLogsPath := "/var/log/pods/"
+	cfgResourceType := "pod"
+	// logs_path is a substring (interior), not a prefix of the source.
+	source := fmt.Sprintf("/mnt/host/var/log/pods/namespace_pod-name_%s/container/0.log", puid)
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, nil)
+}
+
+// DigitDirectoryNotRestartCount verifies that an intermediate directory named with a digit
+// is not treated as a restart-count filename. Only a basename that ends in ".log" and whose
+// stem is a pure integer is accepted as a restart count.
+func TestLogsPathMatcher_DigitDirectoryNotRestartCount(t *testing.T) {
+	cfgLogsPath := "/var/log/pods/"
+	cfgResourceType := "pod"
+	// pathDirs[6] = "3" (a directory name, not a "<n>.log" filename).
+	// Must fall back to uid/container only — no restart-count candidate.
+	sourcePath := "/var/log/pods/namespace_pod-name_%s/container/3/real.log"
+	if runtime.GOOS == "windows" {
+		cfgLogsPath = "C:\\var\\log\\pods\\"
+		sourcePath = "C:\\var\\log\\pods\\namespace_pod-name_%s\\container\\3\\real.log"
+	}
+	source := fmt.Sprintf(sourcePath, puid)
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source,
+		[]string{puid + "/container", puid})
+}
+
+// DotLogInNamespace verifies that ".log" appearing inside a directory segment
+// (e.g. a namespace named "corp.logging") does not cause non-log files to be
+// enriched. The outer guard must scope the ".log" check to the basename only.
+func TestLogsPathMatcher_DotLogInNamespace_NonLogFile(t *testing.T) {
+	cfgLogsPath := "/var/log/pods/"
+	cfgResourceType := "pod"
+	// Namespace "corp.logging" contains ".log" in the directory name.
+	// The basename "datafile" has no ".log" — must return nil.
+	source := fmt.Sprintf("/var/log/pods/corp.logging_pod-name_%s/container/datafile", puid)
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, nil)
+}
+
+func executeTest(t *testing.T, cfgLogsPath string, source string, expectedResult []string) {
 	executeTestWithResourceType(t, cfgLogsPath, "", source, expectedResult)
 }
 
-func executeTestWithResourceType(t *testing.T, cfgLogsPath string, cfgResourceType string, source string, expectedResult string) {
+func executeTestWithResourceType(t *testing.T, cfgLogsPath string, cfgResourceType string, source string, expectedResult []string) {
 	testConfig := conf.NewConfig()
 	if cfgLogsPath != "" {
 		testConfig.SetString("logs_path", -1, cfgLogsPath)
@@ -202,6 +288,6 @@ func executeTestWithResourceType(t *testing.T, cfgLogsPath string, cfgResourceTy
 			},
 		},
 	}
-	output := logMatcher.MetadataIndex(input)
+	output := logMatcher.MetadataIndexCandidates(input)
 	assert.Equal(t, expectedResult, output)
 }

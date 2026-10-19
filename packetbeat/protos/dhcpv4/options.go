@@ -20,7 +20,6 @@ package dhcpv4
 import (
 	"encoding/binary"
 	"encoding/hex"
-	"fmt"
 	"net"
 	"strings"
 
@@ -92,7 +91,7 @@ func optionsToMap(dhcp *dhcpv4.DHCPv4) (mapstr.M, error) {
 		opts.Put("subnet_mask", net.IP(mask).String())
 	}
 
-	if offset := dhcp.GetOneOption(dhcpv4.OptionTimeOffset); offset != nil {
+	if offset := dhcp.GetOneOption(dhcpv4.OptionTimeOffset); len(offset) == 4 {
 		opts.Put("utc_time_offset_sec", int32(binary.BigEndian.Uint32(offset))) //nolint:gosec // RFC says it should be signed
 	}
 
@@ -107,14 +106,13 @@ func optionsToMap(dhcp *dhcpv4.DHCPv4) (mapstr.M, error) {
 
 	if timeServer := dhcp.GetOneOption(dhcpv4.OptionTimeServer); timeServer != nil {
 		var ips dhcpv4.IPs
-		if err := ips.FromBytes(timeServer); err != nil {
-			return nil, fmt.Errorf("error parsing IP options for time servers: %w", err)
+		if ips.FromBytes(timeServer) == nil {
+			var timeServers []string
+			for _, s := range ips {
+				timeServers = append(timeServers, s.String())
+			}
+			opts.Put("time_servers", timeServers)
 		}
-		var timeServers []string
-		for _, s := range ips {
-			timeServers = append(timeServers, s.String())
-		}
-		opts.Put("time_servers", timeServers)
 	}
 
 	if ntpServers := dhcp.NTPServers(); ntpServers != nil {

@@ -87,6 +87,9 @@ func expectValidParsedDetailed(t *testing.T, data metricset.FetcherData[NodesSta
 		require.EqualValues(t, 1777, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.write.completed"))
 		require.EqualValues(t, 1, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.snapshot.threads"))
 		require.EqualValues(t, 397269, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.snapshot.completed"))
+
+		// no node in this fixture advertises the allowlisted attributes
+		require.Nil(t, auto_ops_testing.GetObjectValue(node1MetricSet, "attributes"))
 	} else if data.Version == "8.15.3" {
 		require.Equal(t, 59, len(nodeStatsEvents))
 		require.EqualValues(t, 59, nodeStatsEvents[0].ModuleFields["total_amount_of_fractions"])
@@ -112,6 +115,19 @@ func expectValidParsedDetailed(t *testing.T, data metricset.FetcherData[NodesSta
 		require.EqualValues(t, 24175874622, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.write.completed"))
 		require.EqualValues(t, 1, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.snapshot.threads"))
 		require.EqualValues(t, 383009, auto_ops_testing.GetObjectValue(node1MetricSet, "thread_pool.snapshot.completed"))
+
+		// both allowlisted attributes present
+		require.Equal(t, "zone-0", auto_ops_testing.GetObjectValue(node1MetricSet, "attributes.logical_availability_zone"))
+		require.Equal(t, "aws.es.datahot.i3", auto_ops_testing.GetObjectValue(node1MetricSet, "attributes.instance_configuration"))
+
+		// only one of the two present: the missing one must not fail the node
+		node105MetricSet := nodeStatsEvents[slices.IndexFunc(nodeStatsEvents, func(event mb.Event) bool { return event.MetricSetFields["name"] == "instance-0000000105" })].MetricSetFields
+		require.Equal(t, "zone-2", auto_ops_testing.GetObjectValue(node105MetricSet, "attributes.logical_availability_zone"))
+		require.Nil(t, auto_ops_testing.GetObjectValue(node105MetricSet, "attributes.instance_configuration"))
+
+		// neither present: no empty attributes object is emitted
+		node107MetricSet := nodeStatsEvents[slices.IndexFunc(nodeStatsEvents, func(event mb.Event) bool { return event.MetricSetFields["name"] == "instance-0000000107" })].MetricSetFields
+		require.Nil(t, auto_ops_testing.GetObjectValue(node107MetricSet, "attributes"))
 	} else if data.Version == "9.2.0" {
 		require.Equal(t, 1, len(nodeStatsEvents))
 		require.EqualValues(t, 1, nodeStatsEvents[0].ModuleFields["total_amount_of_fractions"])
@@ -125,6 +141,10 @@ func expectValidParsedDetailed(t *testing.T, data metricset.FetcherData[NodesSta
 		require.EqualValues(t, 646725, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.bulk.total_operations"))
 		require.EqualValues(t, 2818360, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.dense_vector.count"))
 		require.EqualValues(t, 4510292000, auto_ops_testing.GetObjectValue(node1MetricSet, "indices.dense_vector.off_heap.total_size_bytes"))
+
+		// both allowlisted attributes present
+		require.Equal(t, "zone-1", auto_ops_testing.GetObjectValue(node1MetricSet, "attributes.logical_availability_zone"))
+		require.Equal(t, "gcp.es.datahot.n2.68x10x45", auto_ops_testing.GetObjectValue(node1MetricSet, "attributes.instance_configuration"))
 	}
 
 	// some ignored values
@@ -149,6 +169,8 @@ func expectValidParsedDetailedWithNoCache(t *testing.T, data metricset.FetcherDa
 	require.Nil(t, node1MetricSet["index_latency_in_millis"])
 	require.Nil(t, node1MetricSet["merge_latency_in_millis"])
 	require.Nil(t, node1MetricSet["search_latency_in_millis"])
+	// no previous sample → cgroup CPU percent must be absent
+	require.Nil(t, auto_ops_testing.GetObjectValue(node1MetricSet, "os.cgroup.cpu.usage_percent"))
 }
 
 func expectValidParsedDetailedWithCache(t *testing.T, data metricset.FetcherData[NodesStats]) {
@@ -178,6 +200,12 @@ func expectValidParsedDetailedWithCache(t *testing.T, data metricset.FetcherData
 		require.NotNil(t, node1MetricSet["bulk_bytes_per_second"])
 		require.NotNil(t, node1MetricSet["bulk_operations_per_second"])
 	}
+	// all three fixture versions carry cgroup counters with a positive quota; the cache
+	// is seeded with zero prev-counters (getNodeStatsForNode), so the delta equals the
+	// fixture value and the enricher always emits a positive percentage.
+	cgroupCpuPct := auto_ops_testing.GetObjectValue(node1MetricSet, "os.cgroup.cpu.usage_percent")
+	require.NotNil(t, cgroupCpuPct, "expected os.cgroup.cpu.usage_percent to be set")
+	require.Greater(t, cgroupCpuPct.(int64), int64(0))
 }
 
 // Expect a valid response from Elasticsearch to create N events

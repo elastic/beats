@@ -49,7 +49,7 @@ var globalCache = statemanager.NewCache[*cacheEntry](func(e *cacheEntry) {
 // first access. The returned release function must be called exactly once when
 // the caller is done with the entry.
 func acquireStore(logger *logp.Logger, states statestore.States, prefix string) (*cacheEntry, func(), error) {
-	key := states.StoreKey()
+	key := states.StoreKey("", "")
 	log := logger.
 		Named("filestream.store_cache").
 		WithLazy(zap.String("filestream_store_key", key))

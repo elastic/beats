@@ -62,6 +62,7 @@ type Input interface {
 type managedInput struct {
 	manager      *InputManager
 	userID       string
+	cacheKey     string
 	sources      []Source
 	input        Input
 	cleanTimeout time.Duration
@@ -123,7 +124,7 @@ func (inp *managedInput) Run(
 	// Acquire a lease on the shared store. This increments the cache user
 	// count so the store cannot be drained by a concurrent Close() call
 	// until all source goroutines have finished and leaseRelease is called.
-	store, leaseRelease, ok := inp.manager.acquireLease()
+	store, leaseRelease, ok := inp.manager.acquireLease(inp.cacheKey)
 	if !ok {
 		return errors.New("input manager store is not available")
 	}
@@ -190,7 +191,7 @@ func (inp *managedInput) runSource(
 	defer client.Close()
 
 	resourceKey := inp.createSourceID(source)
-	resource, err := inp.manager.lock(ctx, resourceKey)
+	resource, err := lock(ctx, store, resourceKey)
 	if err != nil {
 		return err
 	}

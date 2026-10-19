@@ -150,7 +150,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	m.enricher.Start(m.mod.GetResourceWatchers())
+	if !m.enricher.Start(m.mod.GetResourceWatchers()) {
+		return nil
+	}
 
 	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
 	if err != nil {

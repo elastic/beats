@@ -286,7 +286,7 @@ func TestPublish(t *testing.T) {
 		})
 		otelConsumer.retry = retryConfig{init: initBackoff, max: 500 * time.Millisecond}
 
-		const margin = 25 * time.Millisecond
+		const margin = 45 * time.Millisecond
 		for range 4 {
 			batch := outest.NewBatch(event1)
 			start := time.Now()

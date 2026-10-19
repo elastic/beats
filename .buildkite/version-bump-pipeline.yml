@@ -4,30 +4,25 @@ notify:
         - "#ingest-notifications"
       message: "<!subteam^S01LS4S14FP|agent-team> Version bump to ${NEW_VERSION} — ${BUILDKITE_BUILD_URL}"
     if: (build.branch == 'main' || build.branch =~ /^[0-9]+\.[0-9x]+\$/) && (build.state == 'passed' || build.state == 'failed')
-  - slack:
-      channels:
-        - "#ingest-notifications"
-      message: |
-        <!subteam^S01LS4S14FP|agent-team>
-        🚦 Pipeline waiting for approval 🚦
-        Repo: `${REPO}`
-
-        Ready to fetch DRA artifacts - please unblock when ready.
-        New version: `${NEW_VERSION}`
-        Branch: `${BRANCH}`
-        Workflow: `${WORKFLOW}`
-        ${BUILDKITE_BUILD_URL}
-    if: build.state == "blocked"
 
 env:
   ASDF_MAGE_VERSION: "1.15.0"
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
 steps:
+  - label: ":slack: Notify team version bump started"
+    if: build.branch == 'main' || build.branch =~ /^[0-9]+\.[0-9x]+\$/
+    command: echo "Version bump started"
+    notify:
+      - slack:
+          channels:
+            - "#ingest-notifications"
+          message: "<!subteam^S01LS4S14FP|agent-team> Version bump to ${NEW_VERSION} started — ${BUILDKITE_BUILD_URL}"
+
   # BRANCH is major.minor (e.g. 9.4 for a 9.4.0 minor release, 9.3 for a 9.3.3 patch).
   - label: "Bump version minor"
     key: bump-version-minor
-    if: build.env("WORKFLOW") == "minor"
+    if: build.env("WORKFLOW") == "minor" || build.env("WORKFLOW") == "major"
     agents:
       image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
       cpu: "4000m"
@@ -60,28 +55,16 @@ steps:
       mage release:runPatch
     timeout_in_minutes: 60
 
-  - block: "Ready to fetch for DRA artifacts?"
-    prompt: |
-      Unblock when your team is ready to proceed.
-
-      Trigger parameters:
-      - NEW_VERSION: ${NEW_VERSION}
-      - BRANCH: ${BRANCH}
-      - WORKFLOW: ${WORKFLOW}
-    key: block-get-dra-artifacts
-    blocked_state: running
+  - wait:
 
   - label: "Fetch DRA Artifacts"
     key: fetch-dra-artifacts
-    depends_on: block-get-dra-artifacts
     agents:
       image: docker.elastic.co/release-eng/wolfi-build-essential-release-eng:latest
       cpu: 250m
       memory: 512Mi
       ephemeralStorage: 1Gi
-    command:
-      - echo "Starting DRA artifacts retrieval..."
-    timeout_in_minutes: 240
+    timeout_in_minutes: 480
     retry:
       automatic:
         - exit_status: "*"
@@ -90,13 +73,8 @@ steps:
         permit_on_passed: true
 
     plugins:
-      - elastic/json-watcher#v1.0.0:
-          url: "https://artifacts-staging.elastic.co/beats/latest/${BRANCH}.json"
-          field: ".version"
-          expected_value: "${NEW_VERSION}"
-          polling_interval: "30"
-      - elastic/json-watcher#v1.0.0:
-          url: "https://storage.googleapis.com/elastic-artifacts-snapshot/beats/latest/${BRANCH}.json"
-          field: ".version"
-          expected_value: "${NEW_VERSION}-SNAPSHOT"
-          polling_interval: "30"
+      - elastic/version-bump-dra#v1.0.0:
+          product: "beats"
+          version: "${NEW_VERSION}"
+          workflow: "${WORKFLOW}"
+          polling_interval: 30

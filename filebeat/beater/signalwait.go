@@ -18,14 +18,13 @@
 package beater
 
 import (
-	"time"
-
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type signalWait struct {
 	count   int // number of potential 'alive' signals
 	signals chan struct{}
+	ch      <-chan struct{}
 }
 
 type signaler func()
@@ -41,7 +40,13 @@ func (s *signalWait) Wait() {
 		return
 	}
 
-	<-s.signals
+	select {
+	case <-s.ch:
+		// A closed channel stays readable. Drop it so later Wait
+		// calls still block until another registered signal fires.
+		s.ch = nil
+	case <-s.signals:
+	}
 	s.count--
 }
 
@@ -55,31 +60,16 @@ func (s *signalWait) Add(fn signaler) {
 }
 
 func (s *signalWait) AddChan(c <-chan struct{}) {
-	s.Add(waitChannel(c))
-}
-
-func (s *signalWait) AddTimer(t *time.Timer) {
-	s.Add(waitTimer(t))
-}
-
-func (s *signalWait) AddTimeout(d time.Duration) {
-	s.Add(waitDuration(d))
-}
-
-func (s *signalWait) Signal() {
-	s.Add(func() {})
+	if s.ch == nil {
+		s.ch = c // first channel: Wait() selects on this
+		s.count++
+		return
+	}
+	s.Add(waitChannel(c)) // extra channels: old forwarder goroutine
 }
 
 func waitChannel(c <-chan struct{}) signaler {
 	return func() { <-c }
-}
-
-func waitTimer(t *time.Timer) signaler {
-	return func() { <-t.C }
-}
-
-func waitDuration(d time.Duration) signaler {
-	return waitTimer(time.NewTimer(d))
 }
 
 func withLog(s signaler, msg string, logger *logp.Logger) signaler {

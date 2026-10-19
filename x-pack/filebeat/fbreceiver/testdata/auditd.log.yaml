@@ -1,0 +1,15 @@
+# Source: auditd/data_stream/log/agent/stream/log.yml.hbs
+# rendered with default variable values; type injected by elastic-agent from
+# the stream manifest (input: auditd-logfile).
+type: auditd-logfile
+ignore_older: 72h
+paths:
+  - /var/log/audit/audit.log*
+tags:
+  - auditd-log
+allow_deprecated_use: true
+exclude_files: ['\.gz$']
+data_stream:
+  dataset: auditd.log
+  type: logs
+  namespace: default

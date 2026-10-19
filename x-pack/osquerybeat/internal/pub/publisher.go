@@ -54,11 +54,25 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
-	// Setup configuration pointers to the clients and corresponding default datasets
+	// Locate each stream by dataset so that delivery order does not affect
+	// which client handles which data stream. The first input for a dataset wins.
+	resultInput := config.ResultInput(inputs)
+	var actionResponsesInput, profileInput *config.InputConfig
+	for i := range inputs {
+		switch inputs[i].Datastream.Dataset {
+		case config.DefaultActionResponsesDataset:
+			if actionResponsesInput == nil {
+				actionResponsesInput = &inputs[i]
+			}
+		case config.DefaultQueryProfileDataset:
+			if profileInput == nil {
+				profileInput = &inputs[i]
+			}
+		}
+	}
 
-	// The osquery_manager.result is always first
-	if len(inputs) > 0 {
-		processors, err := p.processorsForInputConfig(inputs[0], config.DefaultDataset)
+	if resultInput != nil {
+		processors, err := p.processorsForInputConfig(*resultInput, config.DefaultDataset)
 		if err != nil {
 			return err
 		}
@@ -80,12 +94,11 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 		if oldclient != nil {
 			oldclient.Close()
 		}
-
 	}
 
-	// Attach remaining DefaultActionResultsDataset if present
-	if len(inputs) > 1 {
-		processors, err := p.processorsForInputConfig(inputs[1], config.DefaultActionResponsesDataset)
+	// Attach DefaultActionResponsesDataset if present
+	if actionResponsesInput != nil {
+		processors, err := p.processorsForInputConfig(*actionResponsesInput, config.DefaultActionResponsesDataset)
 		if err != nil {
 			return err
 		}
@@ -114,16 +127,8 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 		}
 	}
 
-	// Attach optional query profiling stream if present, identified by dataset.
-	// For query profile events to be published, the integration (e.g. Fleet policy) must include
-	// an input stream with dataset osquery_manager.query_profile. Otherwise profile events are dropped.
-	var profileInput *config.InputConfig
-	for i := range inputs {
-		if inputs[i].Datastream.Dataset == config.DefaultQueryProfileDataset {
-			profileInput = &inputs[i]
-			break
-		}
-	}
+	// Attach optional query profiling stream if present. For query profile events to be
+	// published, the integration must include a stream with dataset osquery_manager.query_profile.
 	if profileInput != nil {
 		processors, err := p.processorsForInputConfig(*profileInput, config.DefaultQueryProfileDataset)
 		if err != nil {
@@ -198,9 +203,10 @@ func (p *Publisher) PublishActionResult(req map[string]any, res map[string]any) 
 	p.publishActionResponseEvent(fields, time.Now())
 }
 
-// PublishScheduledResponse publishes a synthetic response document for a scheduled query run (no action).
-// Includes schedule_execution_count;
-// native uses 1 + (run_time - start_date) / interval).
+// PublishScheduledResponse publishes a synthetic response document for a
+// scheduled query run (no action). Native schedule execution counts use
+// 1 + (run_time - start_date) / interval. The event timestamp is floored at the
+// planned slot while the original started_at and completed_at fields are kept.
 func (p *Publisher) PublishScheduledResponse(scheduleID, packID, packName, queryName, spaceID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64) {
 	p.mx.Lock()
 	defer p.mx.Unlock()
@@ -238,7 +244,11 @@ func (p *Publisher) PublishScheduledResponse(scheduleID, packID, packName, query
 	}
 
 	p.log.Debugf("Scheduled response event sent, schedule_id=%s, schedule_execution_count=%d", scheduleID, scheduleExecutionCount)
-	p.publishActionResponseEvent(fields, completedAt)
+	eventTimestamp := completedAt
+	if eventTimestamp.Before(plannedScheduleTime) {
+		eventTimestamp = plannedScheduleTime
+	}
+	p.publishActionResponseEvent(fields, eventTimestamp)
 }
 
 func (p *Publisher) publishActionResponseEvent(fields map[string]any, timestamp time.Time) {

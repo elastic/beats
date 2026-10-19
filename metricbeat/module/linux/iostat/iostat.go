@@ -23,8 +23,8 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/diskio"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/diskio"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -72,7 +72,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	// Sample the current cpu counter
-	m.stats.OpenSampling()
+	if err := m.stats.OpenSampling(); err != nil {
+		return fmt.Errorf("open disk io sampling: %w", err)
+	}
 
 	// Store the last cpu counter when finished
 	defer m.stats.CloseSampling()

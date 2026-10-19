@@ -38,10 +38,10 @@ import (
 	"go.uber.org/zap/zapcore"
 	"golang.org/x/time/rate"
 
-	"github.com/google/cel-go/cel"
-	"github.com/google/cel-go/common/decls"
-	"github.com/google/cel-go/common/types"
-	"github.com/google/cel-go/ext"
+	"cel.dev/cel-go/cel"
+	"cel.dev/cel-go/common/decls"
+	"cel.dev/cel-go/common/types"
+	"cel.dev/cel-go/ext"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -660,6 +660,9 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 		errorSpans(err, execSpan)
 		return result, err
 	}
+	// Drop events from state when we're done. If we fail
+	// during the publication, we will re-request these events.
+	defer delete(s.state, "events")
 
 	if s.emitter.hadCursor {
 		var n int
@@ -730,9 +733,6 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 	s.metrics.AddReceivedEvents(execCtx, uint(len(events)))
 	result.eventCount = len(events)
 	execSpan.SetAttributes(attribute.Int("cel.program.event_count", len(events)))
-	// Drop events from state. If we fail during the publication,
-	// we will re-request these events.
-	delete(s.state, "events")
 
 	// Get cursors if they exist.
 	var (

@@ -15,6 +15,9 @@ const (
 	MaxSplay = 12 * time.Hour
 	// DefaultSplay is the default splay duration (disabled)
 	DefaultSplay = 0
+	// DefaultCheckTimeout is the osqueryd --version startup check deadline
+	// when elastic_options.check_timeout is unset.
+	DefaultCheckTimeout = 15 * time.Second
 )
 
 // RRuleScheduleConfig represents an RRULE-based schedule configuration
@@ -104,6 +107,25 @@ type ElasticOptions struct {
 	Profiling *ProfilingConfig `config:"profiling" json:"-"`
 	// Extensions configures loading of customer-managed osquery extensions.
 	Extensions *ExtensionsConfig `config:"extensions" json:"-"`
+	// CheckTimeout optionally overrides the osqueryd --version startup check
+	// deadline. Go duration format ("15s", "30s", "1m"). Default: 15s.
+	CheckTimeout string `config:"check_timeout" json:"-"`
+}
+
+// ParseCheckTimeout parses elastic_options.check_timeout. An empty value
+// returns DefaultCheckTimeout. The duration must be greater than zero.
+func ParseCheckTimeout(raw string) (time.Duration, error) {
+	if raw == "" {
+		return DefaultCheckTimeout, nil
+	}
+	d, err := time.ParseDuration(raw)
+	if err != nil {
+		return 0, fmt.Errorf("invalid osquery.elastic_options.check_timeout %q: %w", raw, err)
+	}
+	if d <= 0 {
+		return 0, fmt.Errorf("osquery.elastic_options.check_timeout must be greater than 0, got %s", raw)
+	}
+	return d, nil
 }
 
 // ExtensionsConfig configures loading of customer-managed (third-party or

@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"slices"
 	"time"
 
 	"go.elastic.co/apm/module/apmelasticsearch/v2"
@@ -31,15 +32,22 @@ import (
 )
 
 var (
-	_                  extensionauth.HTTPClient = (*authenticator)(nil)
-	_                  extensionauth.GRPCClient = (*authenticator)(nil)
-	_                  extension.Extension      = (*authenticator)(nil)
-	ErrInvalidAuthType                          = errors.New("invalid authentication type")
+	ErrInvalidAuthType = errors.New("invalid authentication type")
+
+	_ EndpointsProvider        = (*authenticator)(nil)
+	_ extensionauth.HTTPClient = (*authenticator)(nil)
+	_ extensionauth.GRPCClient = (*authenticator)(nil)
+	_ extension.Extension      = (*authenticator)(nil)
 )
 
 // roundTripperProvider is an interface that provides a RoundTripper
 type roundTripperProvider interface {
 	RoundTripper() http.RoundTripper
+}
+
+// EndpointsProvider provides optional configured Elasticsearch endpoints.
+type EndpointsProvider interface {
+	Endpoints() []string
 }
 
 type authenticator struct {
@@ -72,6 +80,17 @@ func (a *authenticator) Start(_ context.Context, host component.Host) error {
 		return fmt.Errorf("authenticator config is nil")
 	}
 
+	// When ContinueOnError is true, the config has not been validated
+	if a.cfg.ContinueOnError {
+		if err := a.cfg.validate(); err != nil {
+			err = fmt.Errorf("invalid configuration: %w", err)
+			componentstatus.ReportStatus(host, componentstatus.NewPermanentErrorEvent(err))
+			a.logger.Warnf("%s", err.Error())
+			a.rtProvider = &errorRoundTripperProvider{err: err}
+			return nil
+		}
+	}
+
 	var provider roundTripperProvider
 	prov, err := getHttpClient(a)
 	if err != nil {
@@ -102,6 +121,11 @@ func (a *authenticator) RoundTripper(_ http.RoundTripper) (http.RoundTripper, er
 	return a.rtProvider.RoundTripper(), nil
 }
 
+// Endpoints returns a copy of the configured endpoints.
+func (a *authenticator) Endpoints() []string {
+	return slices.Clone(a.cfg.Endpoints)
+}
+
 // getHTTPOptions returns a list of http transport options
 // these options are derived from beats codebase Ref: https://github.com/elastic/beats/blob/4dfef8b/libbeat/esleg/eslegclient/connection.go#L163-L171
 // httpcommon.WithIOStats(s.Observer) is omitted as we do not have access to observer here
@@ -122,15 +146,10 @@ func (a *authenticator) PerRPCCredentials() (credentials.PerRPCCredentials, erro
 }
 
 func getHttpClient(a *authenticator) (roundTripperProvider, error) {
-	parsedCfg, err := config.NewConfigFrom(a.cfg.BeatAuthConfig)
+	beatAuthConfig, parsedCfg, err := a.cfg.beatsAuthConfig()
 	if err != nil {
+		// This should never fail because the config has been validated already.
 		return nil, fmt.Errorf("failed creating config: %w", err)
-	}
-
-	beatAuthConfig := BeatsAuthConfig{}
-	err = parsedCfg.Unpack(&beatAuthConfig)
-	if err != nil {
-		return nil, fmt.Errorf("failed unpacking config: %w", err)
 	}
 
 	applyRestartOnCertChangeAlias(parsedCfg, &beatAuthConfig, a.logger)

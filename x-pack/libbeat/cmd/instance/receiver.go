@@ -18,13 +18,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report/log"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	metricreport "github.com/elastic/beats/v7/pkg/systemmetrics/report"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
 	otelstatus "github.com/elastic/beats/v7/x-pack/otel/status"
 	oteltelemetry "github.com/elastic/beats/v7/x-pack/otel/telemetry"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/receiver"
@@ -47,6 +47,7 @@ type BeatReceiver struct {
 	Logger              *logp.Logger
 	bridge              *oteltelemetry.RegistryBridge
 	releaseSystemBridge func()
+	startHook           func(component.Host) error
 	runDone             chan error // receives the error from beater.Run; closed when Run returns
 }
 
@@ -131,6 +132,12 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 	}, nil
 }
 
+// SetStartHook configures a hook that runs synchronously in Start before the
+// beater's Run method is launched.
+func (br *BeatReceiver) SetStartHook(hook func(component.Host) error) {
+	br.startHook = hook
+}
+
 // BeatReceiver.Start() starts the beat receiver.
 func (br *BeatReceiver) Start(host component.Host) (retErr error) {
 	// If Start returns an error before the beater.Run goroutine is launched,
@@ -205,6 +212,12 @@ func (br *BeatReceiver) Start(host component.Host) (retErr error) {
 			return fmt.Errorf("error creating metric log reporter")
 		}
 		br.reporter = rep
+	}
+
+	if br.startHook != nil {
+		if err := br.startHook(host); err != nil {
+			return fmt.Errorf("error running Beat receiver start hook: %w", err)
+		}
 	}
 
 	go func() {

@@ -1,3 +1,0 @@
-kind: enhancement
-summary: Add ingest volume enrichment fields to autoops_es module
-component: metricbeat

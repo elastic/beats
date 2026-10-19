@@ -27,6 +27,8 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/features"
+	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
@@ -52,7 +54,7 @@ func TestOpenStateStore_SamePathSharesRegistry(t *testing.T) {
 	s2 := testOpenStore(t, dir)
 
 	assert.Same(t, s1.shared, s2.shared, "stores with the same path should share the same sharedRegistries")
-	assert.Equal(t, s1.StoreKey(), s2.StoreKey(), "stores with the same backend should have the same key")
+	assert.Equal(t, s1.StoreKey("", ""), s2.StoreKey("", ""), "stores with the same backend should have the same key")
 
 	globalMu.Lock()
 	assert.Equal(t, 2, s1.shared.refCount)
@@ -89,8 +91,53 @@ func TestFilebeatStore_StoreKeyMatchesBackendAndPath(t *testing.T) {
 	require.NoError(t, err)
 	defer second.Close()
 
-	assert.Equal(t, expected, first.StoreKey())
-	assert.Equal(t, expected, second.StoreKey())
+	assert.Equal(t, expected, first.StoreKey("", ""))
+	assert.Equal(t, expected, second.StoreKey("", ""))
+}
+
+// Elasticsearch inputs with different IDs must use separate stores.
+// Other input types must share the file store.
+func TestFilebeatStore_ElasticsearchStoreIsPerInputID(t *testing.T) {
+	// Restore the environment before reloading the feature flags during cleanup.
+	t.Cleanup(features.ReinitForTest)
+	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "test")
+	features.ReinitForTest()
+
+	beatPaths := paths.New()
+	beatPaths.Data = t.TempDir()
+	cfg := config.Registry{
+		Path:               "registry",
+		Permissions:        0o600,
+		Backend:            "memlog",
+		ESStorageExtension: storetest.NewMemoryStoreBackend(),
+	}
+
+	s, err := openStateStore(
+		t.Context(),
+		beat.Info{Beat: "test", Paths: beatPaths},
+		logp.NewNopLogger(),
+		cfg,
+	)
+	require.NoError(t, err)
+	defer s.Close()
+
+	assert.NotEqual(t, s.StoreKey("test", "a"), s.StoreKey("test", "b"))
+
+	fileKey := storeKey(beatPaths.Resolve(paths.Data, cfg.Path), cfg.Backend)
+	assert.Equal(t, fileKey, s.StoreKey("other", "a"))
+	assert.Equal(t, fileKey, s.StoreKey("other", "b"))
+
+	storeA, err := s.StoreFor("test", "a")
+	require.NoError(t, err)
+	defer storeA.Close()
+	storeB, err := s.StoreFor("test", "b")
+	require.NoError(t, err)
+	defer storeB.Close()
+
+	require.NoError(t, storeA.Set("key", "value"))
+	has, err := storeB.Has("key")
+	require.NoError(t, err)
+	assert.False(t, has, "inputs with different ids must not share state")
 }
 
 func TestOpenStateStore_DifferentPathsGetDifferentRegistries(t *testing.T) {
@@ -101,7 +148,7 @@ func TestOpenStateStore_DifferentPathsGetDifferentRegistries(t *testing.T) {
 	s2 := testOpenStore(t, dir2)
 
 	assert.NotSame(t, s1.shared, s2.shared, "stores with different paths should not share registries")
-	assert.NotEqual(t, s1.StoreKey(), s2.StoreKey(), "stores with different backends should have different keys")
+	assert.NotEqual(t, s1.StoreKey("", ""), s2.StoreKey("", ""), "stores with different backends should have different keys")
 
 	s1.Close()
 	s2.Close()

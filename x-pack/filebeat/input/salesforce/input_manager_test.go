@@ -36,10 +36,10 @@ var _ statestore.States = stateStore{}
 
 type stateStore struct{}
 
-func (stateStore) StoreFor(string) (*statestore.Store, error) {
+func (stateStore) StoreFor(_, _ string) (*statestore.Store, error) {
 	return makeTestStore(map[string]any{"hello": "world"}), nil
 }
-func (stateStore) StoreKey() string               { return "salesforce-test-store" }
+func (stateStore) StoreKey(_, _ string) string    { return "salesforce-test-store" }
 func (stateStore) CleanupInterval() time.Duration { return time.Duration(0) }
 
 func TestInputManager(t *testing.T) {
