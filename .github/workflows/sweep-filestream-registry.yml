@@ -7,6 +7,7 @@ on:
 permissions:
   actions: read
   contents: read
+  copilot-requests: write
   issues: write
   pull-requests: read
 
@@ -14,6 +15,7 @@ jobs:
   run:
     uses: elastic/ai-github-actions/.github/workflows/gh-aw-code-quality-audit.lock.yml@v0
     with:
+      report-failure-as-issue: false
       title-prefix: "[filestream-registry]"
       severity-threshold: "high"
       additional-instructions: |
@@ -97,5 +99,3 @@ jobs:
           the coverage
         - A priority ranking: which risks are most likely to affect users in production vs
           only in edge-case configurations
-    secrets:
-      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}

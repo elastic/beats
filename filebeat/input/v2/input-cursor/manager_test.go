@@ -194,6 +194,42 @@ func TestManager_Create(t *testing.T) {
 	})
 }
 
+func TestManager_DefaultCleanTimeout(t *testing.T) {
+	cases := []struct {
+		name       string
+		configured time.Duration
+		want       time.Duration
+	}{
+		{name: "unset falls back", configured: 0, want: 30 * time.Minute},
+		{name: "negative falls back", configured: -1, want: 30 * time.Minute},
+		{name: "configured is kept", configured: time.Second, want: time.Second},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			manager := &InputManager{DefaultCleanTimeout: tc.configured}
+			assert.Equal(t, tc.want, manager.defaultCleanTimeout())
+			assert.Equal(t, tc.configured, manager.DefaultCleanTimeout, "defaultCleanTimeout must not mutate the field")
+		})
+	}
+}
+
+func TestManager_CreateCleanTimeout(t *testing.T) {
+	manager := constInput(t, sourceList("test"), &fakeTestInput{})
+	require.Zero(t, manager.DefaultCleanTimeout, "test needs an unset timeout")
+
+	// Create sequentially because init is not safe for concurrent use.
+	var timeouts []time.Duration
+	for range 2 {
+		inp, err := manager.Create(conf.NewConfig())
+		require.NoError(t, err, "Create must succeed")
+		managed, ok := inp.(*managedInput)
+		require.True(t, ok, "Create must return a *managedInput, got %T", inp)
+		timeouts = append(timeouts, managed.cleanTimeout)
+	}
+	assert.Equal(t, []time.Duration{30 * time.Minute, 30 * time.Minute}, timeouts, "every input must get the default clean timeout")
+}
+
 func TestManager_InputsTest(t *testing.T) {
 	var mu sync.Mutex
 	var seen []string
