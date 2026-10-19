@@ -30,7 +30,8 @@ type LogBatch struct {
 }
 
 // NewLogBatch creates a batch from logs. index is the `index` explicitly configured
-// on the exporter and takes precedence over @metadata.beat set by the receiver
+// on the exporter and takes precedence over @metadata.beat set by the receiver.
+// See: https://github.com/elastic/beats/blob/8aecb93ca78989f29ff3c64821c864335ee0b544/libbeat/outputs/logstash/config.go#L83
 func NewLogBatch(logs plog.Logs, index string) (*LogBatch, error) {
 	events, err := createEvents(&logs, index)
 	if err != nil {
