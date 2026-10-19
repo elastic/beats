@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 	"sync"
 	"time"
@@ -170,15 +171,13 @@ func (c *Client) connectWithRetry(ctx context.Context, timeout time.Duration) (c
 		log:       retryLog,
 	}
 
-	err = r.Run(ctx, func(_ context.Context) error {
-		var err error
-		cli, err = osquery.NewClient(c.socketPath, timeout)
-		if err != nil {
-			r.log.Warnf("failed to connect, reconnect might be attempted, err: %v", err)
+	err = r.Run(ctx, func(ctx context.Context) error {
+		// Poll for the socket file with context awareness so that shutdown does
+		// not block for the full transport timeout waiting for a socket that may
+		// never appear.
+		if err := waitSocketCtx(ctx, c.socketPath); err != nil {
 			return err
 		}
-<<<<<<< HEAD
-=======
 		var connErr error
 		cli, connErr = newRPCClient(c.socketPath, timeout)
 		if connErr != nil {
@@ -192,14 +191,11 @@ func (c *Client) connectWithRetry(ctx context.Context, timeout time.Duration) (c
 			cli = nil
 			return err
 		}
->>>>>>> 15ff579 ([osquerybeat] Honor RPC cancellation without poisoning later queries (#53774))
 		return nil
 	})
 	return cli, err
 }
 
-<<<<<<< HEAD
-=======
 // waitSocketCtx polls until the socket file at path exists or ctx is cancelled.
 func waitSocketCtx(ctx context.Context, path string) error {
 	for {
@@ -219,7 +215,6 @@ func waitSocketCtx(ctx context.Context, path string) error {
 	}
 }
 
->>>>>>> 15ff579 ([osquerybeat] Honor RPC cancellation without poisoning later queries (#53774))
 func (c *Client) Close() {
 	c.mx.Lock()
 	defer c.mx.Unlock()
@@ -240,14 +235,7 @@ func (c *Client) close() {
 // Current implementation of osqueryd RPC returns the error when the long running query times out, but this timeout is a transport timeout,
 // that doesn't cancel the query execution itself.
 // This also makes the client RPC unusable until the long running query finishes, returning errors for each subsequent query.
-<<<<<<< HEAD
 func (c *Client) Query(ctx context.Context, sql string, timeout time.Duration) ([]map[string]interface{}, error) {
-	c.mx.Lock()
-	defer c.mx.Unlock()
-
-=======
-func (c *Client) Query(ctx context.Context, sql string, timeout time.Duration) ([]map[string]any, error) {
->>>>>>> 15ff579 ([osquerybeat] Honor RPC cancellation without poisoning later queries (#53774))
 	err := c.cliLimiter.Acquire(ctx, limit)
 	if err != nil {
 		return nil, err
@@ -302,17 +290,7 @@ func (c *Client) Query(ctx context.Context, sql string, timeout time.Duration) (
 
 // ResolveResult types for a give query
 // The API is public to allow resolution of scheduled queries results captured by custom logger plugin
-<<<<<<< HEAD
 func (c *Client) ResolveResult(ctx context.Context, sql string, hits []map[string]string) ([]map[string]interface{}, error) {
-	c.mx.Lock()
-	defer c.mx.Unlock()
-	if c.cli == nil {
-		return nil, ErrClientClosed
-	}
-
-=======
-func (c *Client) ResolveResult(ctx context.Context, sql string, hits []map[string]string) ([]map[string]any, error) {
->>>>>>> 15ff579 ([osquerybeat] Honor RPC cancellation without poisoning later queries (#53774))
 	err := c.cliLimiter.Acquire(ctx, limit)
 	if err != nil {
 		return nil, err
