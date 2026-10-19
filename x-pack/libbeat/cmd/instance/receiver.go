@@ -244,11 +244,8 @@ func (br *BeatReceiver) Shutdown(ctx context.Context) error {
 	if br.releaseSystemBridge != nil {
 		br.releaseSystemBridge()
 	}
-	// The collector may call Shutdown without Start, e.g. when another
-	// component fails to start. The beater never ran then, so there is nothing
-	// to stop or wait for: stopping it could block on a ready signal that never
-	// comes, and runDone is never signaled. Only release the resources created
-	// by NewBeatReceiver. See https://github.com/elastic/beats/issues/53836.
+
+	// If the Shutdown was called before the Start, do not wait for beater.Run to return.
 	select {
 	case <-br.startCalled:
 		// The Beater owns shutdown sequencing: stop it first so it can close its

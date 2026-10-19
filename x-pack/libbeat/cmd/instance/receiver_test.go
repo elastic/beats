@@ -424,12 +424,7 @@ func TestBeatReceiverStartFailureShutdownDoesNotHang(t *testing.T) {
 // TestBeatReceiverShutdownWithoutStart covers the collector calling Shutdown on
 // a receiver that was never started
 func TestBeatReceiverShutdownWithoutStart(t *testing.T) {
-	mb := &mockReceiverBeater{
-		acked:    &atomic.Int64{},
-		initDone: make(chan struct{}),
-		done:     make(chan struct{}),
-	}
-	creator := func(*beat.Beat, *conf.C) (beat.Beater, error) { return mb, nil }
+	creator := func(*beat.Beat, *conf.C) (beat.Beater, error) { return &mockReceiverBeater{}, nil }
 
 	b, err := NewBeatForReceiver(
 		cmd.FilebeatSettings("filebeat"),

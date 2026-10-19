@@ -47,11 +47,9 @@ import (
 type Sniffer struct {
 	sniffers []sniffer
 	closers  []func()
-	// ctx and cancel are created in New so that Stop can cancel the sniffers
-	// even if it is called before or concurrently with Run.
-	ctx    context.Context
-	cancel context.CancelFunc
-	log    *logp.Logger
+	ctx      context.Context
+	cancel   context.CancelFunc
+	log      *logp.Logger
 }
 
 type sniffer struct {
