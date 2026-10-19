@@ -32,6 +32,7 @@ import (
 	"go.uber.org/zap/zaptest"
 	"go.uber.org/zap/zaptest/observer"
 
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommontest"
 )
 
@@ -866,4 +867,8 @@ func TestEndpointsReturnsCopy(t *testing.T) {
 	endpoints := auth.Endpoints()
 	endpoints[0] = "https://changed.example:9200"
 	require.Equal(t, []string{"https://es.example:9200"}, auth.Endpoints(), "callers must not mutate configured endpoints")
+}
+
+func TestComponentLifecycle(t *testing.T) {
+	oteltest.CheckExtensionLifecycle(t, NewFactory(), &Config{})
 }

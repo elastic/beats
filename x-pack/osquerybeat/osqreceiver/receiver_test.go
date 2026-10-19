@@ -172,3 +172,19 @@ func genSocketPath() string {
 	socketDir := os.TempDir()
 	return filepath.Join(socketDir, socketName)
 }
+
+func TestComponentLifecycle(t *testing.T) {
+	cfg := &Config{
+		Beatconfig: map[string]any{
+			"osquerybeat": map[string]any{
+				"inputs": []any{
+					map[string]any{
+						"type": "osquery",
+					},
+				},
+			},
+			"path.home": t.TempDir(),
+		},
+	}
+	oteltest.CheckReceiverLifecycle(t, NewFactoryWithSettings(Settings{Home: t.TempDir()}), cfg)
+}
