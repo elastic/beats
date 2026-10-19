@@ -18,6 +18,7 @@
 package secretstores
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 	"slices"
@@ -53,6 +54,13 @@ func SplitName(content string) (name, rest string, hasName bool) {
 	return content[:end], content[end+1:], true
 }
 
+// SelectionError is returned by Claim when no entry can resolve a reference.
+// The fault is in the reference or in the list of entries, not in the entry
+// that reported it.
+type SelectionError struct{ error }
+
+func (e *SelectionError) Unwrap() error { return e.error }
+
 // Claim reports whether the reference with the given content belongs to the
 // scope, and returns the content without the connection name. It fails for
 // references that no entry can resolve.
@@ -65,7 +73,7 @@ func (s Scope) Claim(content string) (rest string, mine bool, err error) {
 		case s.HasDefault:
 			return "", false, nil
 		}
-		return "", false, fmt.Errorf("the reference has no connection name, but there are several connections: use <scheme>://<name>@... with one of %s", quoteAll(s.Names))
+		return "", false, &SelectionError{fmt.Errorf("the reference has no connection name, but there are several entries: use <scheme>://<name>@... with one of %s", quoteAll(s.Names))}
 	}
 
 	name, err := url.PathUnescape(rawName)
@@ -74,16 +82,16 @@ func (s Scope) Claim(content string) (rest string, mine bool, err error) {
 	}
 	switch {
 	case name == "":
-		return "", false, fmt.Errorf("empty connection name")
+		return "", false, &SelectionError{errors.New("empty connection name")}
 	case name == s.Name:
 		return rest, true, nil
 	case slices.Contains(s.Names, name):
 		return "", false, nil
 	}
 	if len(s.Names) == 0 {
-		return "", false, fmt.Errorf("unknown connection %q: the secret store has no name", name)
+		return "", false, &SelectionError{fmt.Errorf("no entry has the name %q, set 'name: %s' on the entry to use it", name, name)}
 	}
-	return "", false, fmt.Errorf("unknown connection %q, expected one of %s", name, quoteAll(s.Names))
+	return "", false, &SelectionError{fmt.Errorf("no entry has the name %q, available names: %s", name, quoteAll(s.Names))}
 }
 
 func quoteAll(names []string) string {

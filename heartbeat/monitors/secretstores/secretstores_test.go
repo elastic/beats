@@ -416,13 +416,13 @@ func TestResolveNamedEntries(t *testing.T) {
 			name:    "unnamed reference is ambiguous",
 			stores:  stores,
 			cfg:     map[string]any{"a": "fake:x"},
-			wantErr: `no connection name, but there are several connections: use <scheme>://<name>@... with one of "prod", "stg"`,
+			wantErr: `no connection name, but there are several entries: use <scheme>://<name>@... with one of "prod", "stg"`,
 		},
 		{
 			name:    "unknown name",
 			stores:  stores,
 			cfg:     map[string]any{"a": "fake:dev@x"},
-			wantErr: `unknown connection "dev", expected one of "prod", "stg"`,
+			wantErr: `no entry has the name "dev", available names: "prod", "stg"`,
 		},
 		{
 			name:   "unnamed reference uses the unnamed entry",

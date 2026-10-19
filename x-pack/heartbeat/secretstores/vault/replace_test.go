@@ -225,6 +225,6 @@ func TestReplaceNamedConnections(t *testing.T) {
 		"only the references naming the entry must be replaced")
 
 	_, err = s.Replace(context.Background(), newMonitorConfig(t, map[string]any{"v": "vault://dev@app/creds#user"}), scope)
-	assert.ErrorContains(t, err, `unknown connection "dev"`, "an unknown connection must fail")
+	assert.ErrorContains(t, err, `no entry has the name "dev"`, "an unknown connection must fail")
 	assert.NoError(t, s.Validate(cfg, scope), "named references must validate")
 }
