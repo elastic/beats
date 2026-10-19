@@ -35,7 +35,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 var seed int64
@@ -267,7 +266,8 @@ func TestDoubleClose(t *testing.T) {
 
 func makeTestQueue(sz, minEvents int, flushTimeout time.Duration) queuetest.QueueFactory {
 	return func(t *testing.T) queue.Queue[publisher.Event] {
-		return NewQueue[publisher.Event](logptest.NewTestingLogger(t, ""), nil, Settings{
+		// Queue shutdown is asynchronous, so worker logging must not retain the subtest.
+		return NewQueue[publisher.Event](logp.NewNopLogger(), nil, Settings{
 			Events:        sz,
 			MaxGetRequest: minEvents,
 			FlushTimeout:  flushTimeout,
