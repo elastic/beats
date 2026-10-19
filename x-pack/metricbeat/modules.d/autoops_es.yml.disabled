@@ -6,6 +6,7 @@
     - cat_shards
     - cluster_health
     - cluster_settings
+    - frozen_cache_stats
     - hot_threads
     - license
     - node_stats

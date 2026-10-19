@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Add proxy_url and proxy_disable support to the azure-eventhub input, reject websocket transport with processor v1, and propagate checkpoint migration errors.
+component: filebeat
