@@ -189,6 +189,7 @@ func defaultConfig() config {
 				WaitMin:     &waitMin,
 				WaitMax:     &waitMax,
 			},
+			RedirectFollow:           true,
 			RedirectForwardHeaders:   false,
 			RedirectSensitiveHeaders: []string{"Authorization", "Proxy-Authorization", "Cookie"},
 			RedirectMaxRedirects:     10,
@@ -287,6 +288,7 @@ type ResourceConfig struct {
 	URL                      *urlConfig       `config:"url" validate:"required"`
 	Headers                  http.Header      `config:"headers"`
 	Retry                    retryConfig      `config:"retry"`
+	RedirectFollow           bool             `config:"redirect.follow"`
 	RedirectForwardHeaders   bool             `config:"redirect.forward_headers"`
 	RedirectHeadersBanList   []string         `config:"redirect.headers_ban_list"`
 	RedirectSensitiveHeaders []string         `config:"redirect.sensitive_headers"`

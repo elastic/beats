@@ -175,7 +175,11 @@ require (
 	github.com/elastic/go-freelru v0.16.0
 	github.com/elastic/go-quark v0.6.0
 	github.com/elastic/go-sfdc v0.0.0-20260504130806-a46e22d049d9
+<<<<<<< HEAD
 	github.com/elastic/mito v1.25.1
+=======
+	github.com/elastic/mito v1.28.1
+>>>>>>> 2e1d8f5 (x-pack/filebeat/input/cel: fix redirect handling and add redirect.follow (#53689))
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
 	github.com/elastic/sarama v1.19.1-0.20260310070522-abae92ca1603
 	github.com/elastic/tk-btf v0.2.0

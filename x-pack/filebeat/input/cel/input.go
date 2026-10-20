@@ -1092,6 +1092,9 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 			Backoff:      retryablehttp.DefaultBackoff,
 			ErrorHandler: retryErrorHandler(maxAttempts, log),
 		}).StandardClient()
+		// The retrying client returns redirect responses that the inner
+		// client declined to follow, so the outer client needs the policy too.
+		c.CheckRedirect = checkRedirect(cfg.Resource, log)
 	}
 
 	c.Transport = userAgentDecorator{
@@ -1218,6 +1221,10 @@ func (d socketDialer) DialContext(ctx context.Context, _, _ string) (net.Conn, e
 func checkRedirect(cfg *ResourceConfig, log *logp.Logger) func(*http.Request, []*http.Request) error {
 	return func(req *http.Request, via []*http.Request) error {
 		log.Debug("http client: checking redirect")
+		if !cfg.RedirectFollow {
+			log.Debug("http client: not following redirect")
+			return http.ErrUseLastResponse
+		}
 		if len(via) >= cfg.RedirectMaxRedirects {
 			log.Debug("http client: max redirects exceeded")
 			return fmt.Errorf("stopped after %d redirects", cfg.RedirectMaxRedirects)
