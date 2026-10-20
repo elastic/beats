@@ -773,7 +773,9 @@ func TestNewIndexersForwardsImageSource(t *testing.T) {
 			{Name: "main", ContainerID: "containerd://main01", Image: "sha256:abc"},
 		}},
 	}
-	indexers := NewIndexers(PluginConfig{{ContainerIndexerName: *config.NewConfig()}}, metagen, ImageSourceSpec)
+	shared := *config.NewConfig()
+	indexers := NewIndexers(PluginConfig{{ContainerIndexerName: shared}}, metagen, ImageSourceSpec)
+	assert.False(t, shared.HasField(ImageMetadataSourceKey), "NewIndexers must not mutate the caller's indexer config")
 	md := indexers.GetMetadata(&pod)
 	require.Len(t, md, 1)
 	img, err := md[0].Data.GetValue("kubernetes.container.image")
