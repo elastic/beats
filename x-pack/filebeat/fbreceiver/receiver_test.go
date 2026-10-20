@@ -621,3 +621,22 @@ func writeFile(t require.TestingT, path string, data string) {
 	_, err = f.WriteString(data + "\n")
 	require.NoErrorf(t, err, "Could not write %s to file %s", data, path)
 }
+
+func TestComponentLifecycle(t *testing.T) {
+	cfg := &Config{
+		Beatconfig: map[string]any{
+			"filebeat": map[string]any{
+				"inputs": []map[string]any{
+					{
+						"type":    "benchmark",
+						"enabled": true,
+						"message": "test",
+						"count":   1,
+					},
+				},
+			},
+			"path.home": t.TempDir(),
+		},
+	}
+	oteltest.CheckReceiverLifecycle(t, NewFactoryWithSettings(Settings{Home: t.TempDir()}), cfg)
+}

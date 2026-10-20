@@ -37,10 +37,22 @@ type contextStopper interface {
 
 // BaseReceiver holds common configurations for beatreceivers.
 type BeatReceiver struct {
+<<<<<<< HEAD
 	beat    *instance.Beat
 	beater  beat.Beater
 	Logger  *logp.Logger
 	runDone chan error // receives the error from beater.Run; closed when Run returns
+=======
+	beat                *instance.Beat
+	beater              beat.Beater
+	reporter            *log.Reporter
+	Logger              *logp.Logger
+	bridge              *oteltelemetry.RegistryBridge
+	releaseSystemBridge func()
+	startHook           func(component.Host) error
+	startCalled         chan struct{} // closed when Start is called
+	runDone             chan error    // receives the error from beater.Run; closed when Run returns
+>>>>>>> 3f661f0 ([beatreceiver] Introduce lifecycle tests (#53863))
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
@@ -99,15 +111,26 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 		return BeatReceiver{}, fmt.Errorf("error getting %s creator:%w", b.Info.Beat, err)
 	}
 	return BeatReceiver{
+<<<<<<< HEAD
 		beat:    b,
 		beater:  beater,
 		Logger:  b.Info.Logger,
 		runDone: make(chan error, 1),
+=======
+		beat:                b,
+		beater:              beater,
+		Logger:              b.Info.Logger,
+		bridge:              bridge,
+		releaseSystemBridge: releaseSystem,
+		startCalled:         make(chan struct{}),
+		runDone:             make(chan error, 1),
+>>>>>>> 3f661f0 ([beatreceiver] Introduce lifecycle tests (#53863))
 	}, nil
 }
 
 // BeatReceiver.Start() starts the beat receiver.
 func (br *BeatReceiver) Start(host component.Host) (retErr error) {
+	close(br.startCalled)
 	// If Start returns an error before the beater.Run goroutine is launched,
 	// signal runDone so that a concurrent Shutdown does not block forever on it.
 	defer func() {
@@ -168,6 +191,7 @@ func (br *BeatReceiver) Start(host component.Host) (retErr error) {
 // it is force-closed (issue #49794); if it carries no deadline the pipeline's
 // configured close timeout is used.
 func (br *BeatReceiver) Shutdown(ctx context.Context) error {
+<<<<<<< HEAD
 	// The Beater owns shutdown sequencing: stop it first so it can close its
 	// inputs and finalize acknowledgments before the pipeline is disconnected.
 	// See https://github.com/elastic/beats/issues/49794.
@@ -177,21 +201,44 @@ func (br *BeatReceiver) Shutdown(ctx context.Context) error {
 		cs.StopWithContext(ctx)
 	} else {
 		br.beater.Stop()
+=======
+	if br.bridge != nil {
+		br.bridge.Shutdown()
+	}
+	if br.releaseSystemBridge != nil {
+		br.releaseSystemBridge()
+>>>>>>> 3f661f0 ([beatreceiver] Introduce lifecycle tests (#53863))
 	}
 
-	// Trigger the stop callback. Some beaters (e.g. metricbeat) call
-	// Manager.Stop() in their Run() method, but others (e.g. packetbeat in
-	// static mode) do not. The OtelManager.stopOnce ensures the callback runs
-	// exactly once regardless.
-	br.beat.Manager.Stop()
-
-	// Wait for beater.Run to return before disconnecting the pipeline, so the
-	// beater owns its full shutdown drain and the pipeline is not torn down
-	// while inputs are still active. Bounded by ctx so a hung beater does not
-	// block Shutdown indefinitely.
+	// If the Shutdown was called before the Start, do not wait for beater.Run to return.
 	select {
-	case <-br.runDone:
-	case <-ctx.Done():
+	case <-br.startCalled:
+		// The Beater owns shutdown sequencing: stop it first so it can close its
+		// inputs and finalize acknowledgments before the pipeline is disconnected.
+		// See https://github.com/elastic/beats/issues/49794.
+		// Pass ctx so beaters that implement contextStopper don't exhaust the OTel
+		// shutdown deadline during their ready-state wait.
+		if cs, ok := br.beater.(contextStopper); ok {
+			cs.StopWithContext(ctx)
+		} else {
+			br.beater.Stop()
+		}
+
+		// Trigger the stop callback. Some beaters (e.g. metricbeat) call
+		// Manager.Stop() in their Run() method, but others (e.g. packetbeat in
+		// static mode) do not. The OtelManager.stopOnce ensures the callback runs
+		// exactly once regardless.
+		br.beat.Manager.Stop()
+
+		// Wait for beater.Run to return before disconnecting the pipeline, so the
+		// beater owns its full shutdown drain and the pipeline is not torn down
+		// while inputs are still active. Bounded by ctx so a hung beater does not
+		// block Shutdown indefinitely.
+		select {
+		case <-br.runDone:
+		case <-ctx.Done():
+		}
+	default:
 	}
 
 	br.beat.Instrumentation.Tracer().Close()
