@@ -917,19 +917,19 @@ Module for parsing Zoom API Webhooks.
 
 
 **`zoom.participant.sharing_details.source`**
-:   The file source that was share
+:   The file source that was shared
 
     type: keyword
 
 
 **`zoom.old_values`**
-:   Includes the old values when updating a object like user, meeting, account or webinar
+:   Includes the old values when updating an object like user, meeting, account or webinar
 
     type: flattened
 
 
 **`zoom.settings`**
-:   The current active settings related to a object like user, meeting, account or webinar
+:   The current active settings related to an object like user, meeting, account or webinar
 
     type: flattened
 
