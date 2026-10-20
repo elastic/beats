@@ -108,7 +108,7 @@ func testOsqueryRunnerRuntimeExit78ThenStartupFailure(t *testing.T, exit78 error
 	runner := newOsqueryRunner(logptest.NewTestingLogger(t, "runner"))
 	done := make(chan error, 1)
 	go func() {
-		done <- runner.Run(ctx, func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, inputs <-chan []config.InputConfig) error {
+		done <- runner.Run(ctx, func(ctx context.Context, _ osqd.Flags, inputs <-chan []config.InputConfig) error {
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
@@ -267,7 +267,9 @@ func testOsqueryCompetingExtensionError(t *testing.T, exit78 error) {
 			case tc.cancel:
 				assert.ErrorIs(t, err, context.Canceled, "parent cancellation takes precedence")
 			case tc.ready:
-				assert.ErrorIs(t, err, extensionErr, "runtime recovery keeps existing error selection")
+				assert.ErrorIs(t, err, extensionErr, "preserve the competing cleanup error")
+				assert.ErrorIs(t, err, errOsqueryRuntimeExit78, "retain the confirmed runtime exit on this release")
+				assert.True(t, isRecoverableOsqueryError(err), "runtime exit must recover even if the extension error wins")
 			default:
 				assert.ErrorIs(t, err, exit78, "startup exit must override the competing extension error")
 				assert.False(t, isRecoverableOsqueryError(err), "startup failure must not restart")

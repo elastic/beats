@@ -5,6 +5,7 @@
 package beater
 
 import (
+	"context"
 	"errors"
 	"net"
 	"os/exec"
@@ -22,37 +23,14 @@ func isBrokenPipeOrEOFError(err error) bool {
 	return (errors.As(err, &netErr) && (errors.Is(netErr.Err, syscall.EPIPE) || errors.Is(netErr.Err, syscall.ECONNRESET))) ||
 		strings.HasSuffix(err.Error(), " broken pipe") || strings.HasSuffix(err.Error(), " EOF")
 }
-<<<<<<< HEAD
-=======
 
-// extensionPingFailed is the prefix osquery-go adds when the extension manager
-// watchdog loses communication with osqueryd.
-// https://github.com/osquery/osquery-go/blob/0cc22f415e57/server.go#L274
-const extensionPingFailed = "extension ping failed"
-
-// isRecoverableOsqueryError reports whether an osquery run failure should restart osqueryd
-// rather than terminate the beat.
-//
-// This matters more when osquerybeat runs as a beat receiver than it did as a supervised
-// process. A terminal error from Run is reported as status.Failed, which maps to an OTel
-// PermanentError, and nothing restarts a receiver. The osquery_manager unit then stays
-// FAILED until the whole agent is restarted.
+// isRecoverableOsqueryError preserves the release's broken-pipe recovery and
+// adds exit 78 only after this process has fetched its input configuration.
 func isRecoverableOsqueryError(err error) bool {
 	if err == nil || errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 		return false
 	}
-	if errors.Is(err, errOsqueryRuntimeExit78) || isBrokenPipeOrEOFError(err) {
-		return true
-	}
-	// osquery-go's extension manager watchdog shares a single thrift socket, and a single
-	// 200ms lock, with extension registration and deregistration. Losing that lock race
-	// surfaces as "extension ping failed: timeout after 200ms" and is indistinguishable
-	// from osqueryd actually being gone. Either way, restarting osqueryd is the right move.
-	if strings.Contains(err.Error(), extensionPingFailed) {
-		return true
-	}
-	var netErr net.Error
-	return errors.As(err, &netErr) && netErr.Timeout()
+	return errors.Is(err, errOsqueryRuntimeExit78) || isBrokenPipeOrEOFError(err)
 }
 
 // isOsqueryExit78 recognizes the same exit used for both startup configuration
@@ -72,6 +50,7 @@ type osqueryRunState struct {
 	state atomic.Uint32
 	// Written by the process-exit callback; read only after all run goroutines finish.
 	startupErr error
+	runtimeErr error
 }
 
 const (
@@ -90,7 +69,8 @@ func (s *osqueryRunState) exit(err error) error {
 	ready := s.state.Swap(osqueryExited) == osqueryReady
 	if isOsqueryExit78(err) {
 		if ready {
-			return errors.Join(errOsqueryRuntimeExit78, err)
+			s.runtimeErr = errors.Join(errOsqueryRuntimeExit78, err)
+			return s.runtimeErr
 		}
 		s.startupErr = err
 	}
@@ -116,6 +96,10 @@ func (s *osqueryRunState) result(parent context.Context, err error) error {
 		}
 		return s.startupErr
 	}
+	// This release does not independently recover extension-watchdog failures.
+	// Preserve a confirmed runtime exit even if cleanup reports that error first.
+	if s.runtimeErr != nil && parent.Err() == nil {
+		return errors.Join(err, s.runtimeErr)
+	}
 	return err
 }
->>>>>>> c37abd0 ([osquerybeat] Recover from runtime osqueryd exit 78 (#53776))
