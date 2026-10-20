@@ -1,5 +1,4 @@
 ---
-meta_title: "Syslog processor for RFC 3164 and 5424 in Heartbeat"
 description: "Use the syslog processor in Heartbeat to parse RFC 3164 and RFC 5424 syslog messages stored in a field into structured fields, including timestamps, time zones, and structured data."
 navigation_title: "syslog"
 mapped_pages:

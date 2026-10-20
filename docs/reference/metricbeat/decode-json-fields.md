@@ -1,5 +1,4 @@
 ---
-meta_title: "decode_json_fields: decode JSON in Metricbeat"
 description: "Use the decode_json_fields processor in Metricbeat to parse fields that contain JSON strings into structured objects. Set target, max_depth, overwrite_keys, and error handling."
 navigation_title: "decode_json_fields"
 mapped_pages:

@@ -1,5 +1,4 @@
 ---
-meta_title: "Drop events with drop_event in Metricbeat"
 description: "Use the drop_event processor in Metricbeat to drop entire events that match a condition, so they are never sent to the output."
 navigation_title: "drop_event"
 mapped_pages:

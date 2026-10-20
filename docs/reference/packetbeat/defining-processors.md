@@ -1,6 +1,5 @@
 ---
 navigation_title: "Define processors"
-meta_title: "Processors and conditions in Packetbeat"
 description: "Define processors in Packetbeat to filter and enhance events before they reach the output. Learn where processors are valid and how to write conditions such as equals, contains, regexp, and range."
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/defining-processors.html

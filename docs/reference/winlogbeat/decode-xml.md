@@ -1,5 +1,4 @@
 ---
-meta_title: "decode_xml processor in Winlogbeat"
 description: "Use the decode_xml processor in Winlogbeat to parse XML stored in a field into structured fields. Set target_field, overwrite_keys, document_id, to_lower, and ignore_failure."
 navigation_title: "decode_xml"
 mapped_pages:

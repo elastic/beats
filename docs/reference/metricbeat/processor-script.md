@@ -1,5 +1,4 @@
 ---
-meta_title: "JavaScript script processor in Metricbeat"
 description: "Use the script processor in Metricbeat to process events with JavaScript. Load inline source or script files, pass params, set a timeout, and use the Event API to change fields."
 navigation_title: "script"
 mapped_pages:
@@ -9,7 +8,7 @@ applies_to:
   serverless: ga
 ---
 
-# Script Processor in Metricbeat [processor-script]
+# Script processor in Metricbeat [processor-script]
 
 
 The `script` processor executes Javascript code to process an event. The processor uses a pure Go implementation of ECMAScript 5.1 and has no external dependencies. This can be useful in situations where one of the other processors doesn’t provide the functionality you need to filter events.

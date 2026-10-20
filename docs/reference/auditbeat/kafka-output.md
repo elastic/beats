@@ -1,5 +1,4 @@
 ---
-meta_title: "Kafka output: send Auditbeat data to Apache Kafka"
 description: "Send Auditbeat events to Apache Kafka. Configure brokers, topics, partitioning, SASL authentication, compression, and retries in the output.kafka section of auditbeat.yml."
 navigation_title: "Kafka"
 mapped_pages:

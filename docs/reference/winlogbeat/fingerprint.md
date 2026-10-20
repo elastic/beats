@@ -1,5 +1,4 @@
 ---
-meta_title: "Fingerprint processor: hash events in Winlogbeat"
 description: "Use the fingerprint processor in Winlogbeat to generate a hash from selected event fields, for example to deduplicate events. Choose fields, target_field, method, and encoding."
 navigation_title: "fingerprint"
 mapped_pages:

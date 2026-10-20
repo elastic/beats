@@ -1,5 +1,4 @@
 ---
-meta_title: "Dissect processor: parse strings in Metricbeat"
 description: "Use the dissect processor in Metricbeat to extract fields from a string with a tokenizer pattern. Covers field, target_prefix, and trim options, with an example."
 navigation_title: "dissect"
 mapped_pages:

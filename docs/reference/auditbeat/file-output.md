@@ -1,5 +1,4 @@
 ---
-meta_title: "File output: write Auditbeat events to local files"
 description: "Write Auditbeat events to rotating local files in JSON format. Configure path, filename, rotate_every_kb, number_of_files, permissions, and codec."
 navigation_title: "File"
 mapped_pages:

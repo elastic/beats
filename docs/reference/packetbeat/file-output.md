@@ -1,5 +1,4 @@
 ---
-meta_title: "File output: write Packetbeat events to local files"
 description: "Write Packetbeat events to rotating local files in JSON format. Configure path, filename, rotate_every_kb, number_of_files, permissions, and codec."
 navigation_title: "File"
 mapped_pages:

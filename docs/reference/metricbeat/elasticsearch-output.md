@@ -1,5 +1,4 @@
 ---
-meta_title: "Elasticsearch output configuration in Metricbeat"
 description: "Configure Metricbeat to send events directly to Elasticsearch over the HTTP API: hosts, API key or user authentication, indices, ingest pipelines, retries, and bulk size."
 navigation_title: "Elasticsearch"
 mapped_pages:

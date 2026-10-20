@@ -1,5 +1,4 @@
 ---
-meta_title: "Logstash output: send Metricbeat data to Logstash"
 description: "Send Metricbeat events to Logstash over the Beats (lumberjack) protocol. Configure hosts, load balancing, SSL, pipelining, and the Beats input on the Logstash side."
 navigation_title: "Logstash"
 mapped_pages:

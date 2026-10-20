@@ -1,5 +1,4 @@
 ---
-meta_title: "Kafka output: send Packetbeat data to Apache Kafka"
 description: "Send Packetbeat events to Apache Kafka. Configure brokers, topics, partitioning, SASL authentication, compression, and retries in the output.kafka section of packetbeat.yml."
 navigation_title: "Kafka"
 mapped_pages:

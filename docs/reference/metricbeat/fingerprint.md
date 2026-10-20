@@ -1,5 +1,4 @@
 ---
-meta_title: "Fingerprint processor: hash events in Metricbeat"
 description: "Use the fingerprint processor in Metricbeat to generate a hash from selected event fields, for example to deduplicate events. Choose fields, target_field, method, and encoding."
 navigation_title: "fingerprint"
 mapped_pages:
