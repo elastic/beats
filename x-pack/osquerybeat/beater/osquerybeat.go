@@ -429,10 +429,12 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		return err
 	}
 
-	// Start osqueryd
+	// Start osqueryd. Readiness belongs to this process instance only.
+	var runState osqueryRunState
+	parentCtx := ctx
 	g, ctx := errgroup.WithContext(ctx)
 	g.Go(func() error {
-		err := osq.Run(ctx, flags)
+		err := runState.run(ctx, osq, flags)
 		if err != nil {
 			if errors.Is(err, context.Canceled) {
 				bt.log.Errorf("Osqueryd exited: %v", err)
@@ -488,6 +490,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		// Drive RRULE updates from the same moment native osqueryd applies policy: GenerateConfig
 		// promotes staged query metadata after osqueryd pulls config (see ConfigPlugin.GenerateConfig).
 		configPlugin.SetOnGenerateConfigApplied(func() {
+			runState.ready()
 			if rruleHandler != nil {
 				if err := rruleHandler.UpdateFromConfig(configPlugin.EffectiveOsqueryConfig()); err != nil {
 					bt.log.Errorf("failed to update RRULE scheduled queries: %v", err)
@@ -497,6 +500,18 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 				}
 			}
 		})
+
+		// Stage the first policy before exposing the config extension, so an
+		// initial empty GenerateConfig cannot mark the daemon ready.
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case initialInputs := <-inputCh:
+			if err := configPlugin.Set(initialInputs); err != nil {
+				return err
+			}
+			cache.Resize(configPlugin.Count())
+		}
 
 		// Start osqueryd health monitoring after connection is established
 		g.Go(func() error {
@@ -532,7 +547,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		}
 	})
 
-	err = g.Wait()
+	err = runState.result(parentCtx, g.Wait())
 	if err != nil {
 		if errors.Is(err, context.Canceled) {
 			bt.log.Debugf("runOsquery exited, context cancelled")
