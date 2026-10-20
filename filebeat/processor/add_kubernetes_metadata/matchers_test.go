@@ -126,8 +126,7 @@ func TestLogsPathMatcher_InvalidVarLogPodSource(t *testing.T) {
 }
 
 // ValidVarLogPodSource uses a rotated log filename with a timestamp suffix; the
-// basename is not a plain integer so only the <uid>/<container> and <uid> candidates
-// are returned.
+// restart count is still extracted so container metadata is attached to rotated files.
 func TestLogsPathMatcher_ValidVarLogPodSource(t *testing.T) {
 	cfgLogsPath := "/var/log/pods/"
 	cfgResourceType := "pod"
@@ -139,13 +138,11 @@ func TestLogsPathMatcher_ValidVarLogPodSource(t *testing.T) {
 	}
 	source := fmt.Sprintf(sourcePath, puid)
 	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source,
-		[]string{puid + "/container", puid})
+		[]string{puid + "/container/0", puid + "/container", puid})
 }
 
 // ValidVarLogPodSource_GzRotated verifies that a .gz-compressed rotated log (with a timestamp
-// suffix like 0.log.20220221-210526.gz) returns uid/container and uid candidates. After
-// stripping .gz, the basename is "0.log.20220221-210526" which does not end in ".log", so no
-// restart-count candidate is produced.
+// suffix like 0.log.20220221-210526.gz) returns the same candidates as the live 0.log.
 func TestLogsPathMatcher_ValidVarLogPodSource_GzRotated(t *testing.T) {
 	cfgLogsPath := "/var/log/pods/"
 	cfgResourceType := "pod"
@@ -156,7 +153,7 @@ func TestLogsPathMatcher_ValidVarLogPodSource_GzRotated(t *testing.T) {
 	}
 	source := fmt.Sprintf(sourcePath, puid)
 	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source,
-		[]string{puid + "/container", puid})
+		[]string{puid + "/container/0", puid + "/container", puid})
 }
 
 // ValidVarLogPodSource_GzDirect verifies that a directly-compressed log (0.log.gz) is treated
