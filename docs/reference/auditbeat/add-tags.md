@@ -1,5 +1,4 @@
 ---
-meta_title: "Add tags to events with add_tags in Auditbeat"
 description: "Use the add_tags processor in Auditbeat to add tags to the tags field of each event, or to a custom target field."
 navigation_title: "add_tags"
 mapped_pages:

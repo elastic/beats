@@ -1,5 +1,4 @@
 ---
-meta_title: "Add tags to events with add_tags in Packetbeat"
 description: "Use the add_tags processor in Packetbeat to add tags to the tags field of each event, or to a custom target field."
 navigation_title: "add_tags"
 mapped_pages:
