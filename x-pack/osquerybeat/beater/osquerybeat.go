@@ -428,10 +428,12 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		return err
 	}
 
-	// Start osqueryd
+	// Start osqueryd. Readiness belongs to this process instance only.
+	var runState osqueryRunState
+	parentCtx := ctx
 	g, ctx := errgroup.WithContext(ctx)
 	g.Go(func() error {
-		err := osq.Run(ctx, flags)
+		err := runState.run(ctx, osq, flags)
 		if err != nil {
 			if errors.Is(err, context.Canceled) {
 				bt.log.Errorf("Osqueryd exited: %v", err)
@@ -476,6 +478,18 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		defer cli.Close()
 		defer bt.setDiagnosticsQueryExecutor(nil)
 
+		// Stage the first policy before exposing the config extension, so an
+		// initial empty GenerateConfig cannot mark the daemon ready.
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case initialInputs := <-inputCh:
+			if err := configPlugin.Set(initialInputs); err != nil {
+				return err
+			}
+			cache.Resize(configPlugin.Count())
+		}
+
 		// Start osqueryd health monitoring after connection is established
 		g.Go(func() error {
 			monitorOsquerydHealth(ctx, cli, osqdMetrics, bt.log)
@@ -484,7 +498,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 
 		// Run extensions only after successful connect, otherwise the extension server fails with windows pipes if the pipe was not created by osqueryd yet
 		g.Go(func() error {
-			return runExtensionServer(ctx, socketPath, configPlugin, loggerPlugin, osqueryTimeout)
+			return runExtensionServer(ctx, socketPath, configPlugin, loggerPlugin, osqueryTimeout, runState.ready)
 		})
 
 		// Register action handler
@@ -508,7 +522,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		}
 	})
 
-	err = g.Wait()
+	err = runState.result(parentCtx, g.Wait())
 	if err != nil {
 		if errors.Is(err, context.Canceled) {
 			bt.log.Debugf("runOsquery exited, context cancelled")
@@ -521,7 +535,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 	return err
 }
 
-func runExtensionServer(ctx context.Context, socketPath string, configPlugin *ConfigPlugin, loggerPlugin *LoggerPlugin, timeout time.Duration) (err error) {
+func runExtensionServer(ctx context.Context, socketPath string, configPlugin *ConfigPlugin, loggerPlugin *LoggerPlugin, timeout time.Duration, onConfigApplied func()) (err error) {
 	// Register config and logger extensions
 	extserver, err := osquery.NewExtensionManagerServer(extManagerServerName, socketPath, osquery.ServerTimeout(timeout))
 	if err != nil {
@@ -529,7 +543,13 @@ func runExtensionServer(ctx context.Context, socketPath string, configPlugin *Co
 	}
 
 	// Register osquery configuration plugin
-	extserver.RegisterPlugin(kconfig.NewPlugin(configPluginName, configPlugin.GenerateConfig))
+	extserver.RegisterPlugin(kconfig.NewPlugin(configPluginName, func(ctx context.Context) (map[string]string, error) {
+		generated, err := configPlugin.GenerateConfig(ctx)
+		if err == nil {
+			onConfigApplied()
+		}
+		return generated, err
+	}))
 	// Register osquery logger plugin
 	extserver.RegisterPlugin(klogger.NewPlugin(loggerPluginName, loggerPlugin.Log))
 
