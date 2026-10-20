@@ -281,21 +281,15 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags, onExit func(error)) err
 	finished := make(chan error, 1)
 
 	// Wait on osqueryd exit
-<<<<<<< HEAD
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		finished <- cmd.Wait()
-	}()
-=======
-	wg.Go(func() {
 		err := cmd.Wait()
 		if onExit != nil {
 			onExit(err)
 		}
 		finished <- err
-	})
->>>>>>> c37abd0 ([osquerybeat] Recover from runtime osqueryd exit 78 (#53776))
+	}()
 
 	select {
 	case err = <-finished:

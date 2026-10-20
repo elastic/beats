@@ -108,7 +108,7 @@ func testOsqueryRunnerRuntimeExit78ThenStartupFailure(t *testing.T, exit78 error
 	runner := newOsqueryRunner(logptest.NewTestingLogger(t, "runner"))
 	done := make(chan error, 1)
 	go func() {
-		done <- runner.Run(ctx, func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, inputs <-chan []config.InputConfig) error {
+		done <- runner.Run(ctx, func(ctx context.Context, _ osqd.Flags, inputs <-chan []config.InputConfig) error {
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
