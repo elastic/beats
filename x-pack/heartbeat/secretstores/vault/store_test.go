@@ -240,8 +240,8 @@ func newTestStore(t *testing.T, entry map[string]any, logger *logp.Logger) (*sto
 
 	clock := &testClock{now: time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)}
 	var sleeps []time.Duration
-	st.now = clock.Now
-	st.sleep = func(_ context.Context, d time.Duration) error {
+	st.reader.Now = clock.Now
+	st.reader.Sleep = func(_ context.Context, d time.Duration) error {
 		sleeps = append(sleeps, d)
 		return nil
 	}
@@ -376,7 +376,7 @@ func TestAppRoleLoginAndCache(t *testing.T) {
 	assert.Equal(t, 1, logins, "one login is expected")
 	assert.Equal(t, 1, reads, "one read must serve every field while cached")
 
-	clock.Advance(cacheTTL + time.Second)
+	clock.Advance(secretstores.DefaultCacheTTL + time.Second)
 	_, err := s.resolve(ctx, "myapp/creds#password")
 	require.NoError(t, err, "secret must be read again")
 	logins, reads = fv.counts()
@@ -393,9 +393,7 @@ func TestAppRoleLogsInAgainOnce(t *testing.T) {
 	require.NoError(t, err, "first read must work")
 
 	fv.expireTokens()
-	s.mu.Lock()
-	s.cache = map[string]cacheEntry{}
-	s.mu.Unlock()
+	s.reader.Reset()
 
 	_, err = s.resolve(ctx, "myapp/creds#password")
 	require.NoError(t, err, "an expired token must be replaced")
@@ -485,7 +483,7 @@ func TestTransientErrorsAreRetried(t *testing.T) {
 	v, err := s.resolve(context.Background(), "myapp/creds#password")
 	require.NoError(t, err, "the read must work after retries")
 	assert.Equal(t, testPassword, v, "unexpected secret value")
-	assert.Equal(t, retryBackoff, *sleeps, "the configured backoff must be used")
+	assert.Equal(t, secretstores.DefaultBackoff, *sleeps, "the configured backoff must be used")
 }
 
 func TestFailureCache(t *testing.T) {
@@ -497,8 +495,8 @@ func TestFailureCache(t *testing.T) {
 	_, err := s.resolve(ctx, "myapp/creds#password")
 	assert.ErrorContains(t, err, "status 503", "an unavailable Vault must be reported")
 	_, reads := fv.counts()
-	assert.Equal(t, len(retryBackoff)+1, reads, "every attempt must reach Vault")
-	assert.Len(t, *sleeps, len(retryBackoff), "a backoff is expected between attempts")
+	assert.Equal(t, len(secretstores.DefaultBackoff)+1, reads, "every attempt must reach Vault")
+	assert.Len(t, *sleeps, len(secretstores.DefaultBackoff), "a backoff is expected between attempts")
 
 	_, err = s.resolve(ctx, "myapp/other#password")
 	assert.ErrorContains(t, err, "vault: "+fv.address+" is unavailable", "the failure must be returned for the whole connection")
@@ -508,7 +506,7 @@ func TestFailureCache(t *testing.T) {
 	assert.Equal(t, reads, readsAfter, "Vault must not be contacted while the failure is cached")
 
 	fv.setUnavailable(0)
-	clock.Advance(failureTTL + time.Second)
+	clock.Advance(secretstores.DefaultFailureTTL + time.Second)
 	_, err = s.resolve(ctx, "myapp/creds#password")
 	assert.NoError(t, err, "Vault must be contacted again after the failure expires")
 }
@@ -539,7 +537,7 @@ func TestPathFailureCache(t *testing.T) {
 	_, err := s.resolve(ctx, "other#password")
 	assert.NoError(t, err, "a failure must not affect other paths")
 
-	clock.Advance(failureTTL + time.Second)
+	clock.Advance(secretstores.DefaultFailureTTL + time.Second)
 	_, err = s.resolve(ctx, "missing#password")
 	assert.Error(t, err, "the path must fail again")
 	_, readsAfter = fv.counts()
@@ -550,8 +548,8 @@ func TestConnectionErrorIsRetried(t *testing.T) {
 	s, _, sleeps := newTestStore(t, tokenEntry(unreachableAddress(t)), nil)
 	_, err := s.resolve(context.Background(), "myapp/creds#password")
 	require.Error(t, err, "an unreachable Vault must be reported")
-	assert.True(t, isConnectionError(err), "a refused connection must be a connection error")
-	assert.Len(t, *sleeps, len(retryBackoff), "connection errors must be retried")
+	assert.True(t, secretstores.IsConnectionError(err), "a refused connection must be a connection error")
+	assert.Len(t, *sleeps, len(secretstores.DefaultBackoff), "connection errors must be retried")
 	assert.NotContains(t, err.Error(), testToken, "the token must not be in errors")
 	assert.NotContains(t, err.Error(), "/v1/", "the request URL must not be in errors")
 }
@@ -565,7 +563,7 @@ func TestCertificateErrorIsNotRetried(t *testing.T) {
 
 	_, err := s.resolve(ctx, "myapp/creds#password")
 	require.Error(t, err, "an untrusted certificate must be reported")
-	assert.True(t, isConnectionError(err), "an untrusted certificate must be a connection error")
+	assert.True(t, secretstores.IsConnectionError(err), "an untrusted certificate must be a connection error")
 	assert.Empty(t, *sleeps, "an untrusted certificate must not be retried")
 
 	_, err = s.resolve(ctx, "myapp/other#password")
@@ -594,10 +592,10 @@ func TestRequestErrorClassification(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			err := requestError(tc.err, "reading secret/data/app")
-			assert.Equal(t, tc.wantConnection, isConnectionError(err), "unexpected connection error classification")
-			assert.Equal(t, tc.wantRetry, isRetryable(err), "unexpected retry classification")
+			assert.Equal(t, tc.wantConnection, secretstores.IsConnectionError(err), "unexpected connection error classification")
+			assert.Equal(t, tc.wantRetry, secretstores.IsRetryable(err), "unexpected retry classification")
 			if tc.wantConnection {
-				assert.NotContains(t, connectionCause(err), "secret/data/app", "the cause must not name the path")
+				assert.NotContains(t, secretstores.ConnectionCause(err), "secret/data/app", "the cause must not name the path")
 			}
 		})
 	}
@@ -620,7 +618,7 @@ func TestUnexpectedResponseIsPathError(t *testing.T) {
 
 			_, err := s.resolve(ctx, "unexpected#password")
 			assert.ErrorContains(t, err, tc.wantErr, "the unexpected response must be reported")
-			assert.False(t, isConnectionError(err), "an unexpected response must not be a connection error")
+			assert.False(t, secretstores.IsConnectionError(err), "an unexpected response must not be a connection error")
 			assert.Empty(t, *sleeps, "an unexpected response must not be retried")
 
 			v, err := s.resolve(ctx, "myapp/creds#password")
@@ -685,9 +683,7 @@ func TestSecretsAreNotLogged(t *testing.T) {
 	_, err := s.resolve(ctx, "myapp/creds#password")
 	require.NoError(t, err, "secret must be read")
 	fv.expireTokens()
-	s.mu.Lock()
-	s.cache = map[string]cacheEntry{}
-	s.mu.Unlock()
+	s.reader.Reset()
 	_, err = s.resolve(ctx, "myapp/creds#password")
 	require.NoError(t, err, "secret must be read again")
 

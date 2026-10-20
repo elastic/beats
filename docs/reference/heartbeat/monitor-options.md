@@ -125,9 +125,9 @@ Example:
 stack: preview 9.6+
 ```
 
-Use the `secret_stores` option to read secrets from an external secret store when the monitor runs, instead of writing them in the monitor configuration. Heartbeat supports HashiCorp Vault KV v2 secrets.
+Use the `secret_stores` option to read secrets from an external secret store when the monitor runs, instead of writing them in the monitor configuration. Heartbeat supports HashiCorp Vault KV v2 secrets (`vault`) and CyberArk Central Credential Provider accounts (`cyberark`).
 
-Reference a secret as `vault://<path>#<field>` in any string setting of the monitor. A reference can be part of a longer value, such as `"Bearer vault://my-app/api#token"`. The path is relative to `kv_mount` and can't contain `.` or `..` segments. Percent-encode `#` and `@` in the path or field, as `%23` and `%40`. A reference can also be the value of a [keystore](/reference/heartbeat/keystore.md) or environment variable.
+Reference a Vault secret as `vault://<path>#<field>`, or a CyberArk account as `cyberark://<safe>/<object>#<field>` (or `cyberark://<safe>/<folder>/<object>#<field>`), in any string setting of the monitor. A reference can be part of a longer value, such as `"Bearer vault://my-app/api#token"`. The path can't contain `.` or `..` segments. Percent-encode `#` and `@` in the path or field, as `%23` and `%40`. A reference can also be the value of a [keystore](/reference/heartbeat/keystore.md) or environment variable.
 
 Example:
 
@@ -150,25 +150,35 @@ Example:
 Each `secret_stores` entry takes these options:
 
 `type`
-:   The secret store type. Must be `vault`.
+:   The secret store type: `vault` or `cyberark`.
 
 `address`
-:   The URL of the Vault server.
+:   The URL of the Vault or CyberArk Central Credential Provider (CCP) server.
 
 `namespace`
-:   (Optional) The Vault Enterprise namespace.
+:   (Optional, `vault` only) The Vault Enterprise namespace.
 
 `kv_mount`
-:   (Optional) The mount path of the KV v2 secrets engine. Defaults to `secret`.
+:   (Optional, `vault` only) The mount path of the KV v2 secrets engine. Defaults to `secret`.
+
+`app_id`
+:   (`cyberark` only) The CyberArk Application ID (`AppID`) registered for Heartbeat.
+
+`service_path`
+:   (Optional, `cyberark` only) The CCP web service path. Defaults to `/AIMWebService/api/Accounts`.
 
 `auth`
-:   The authentication method, exactly one of:
+:   The authentication method:
 
-    * `token`: A Vault token.
-    * `approle`: AppRole credentials: `role_id`, `secret_id`, and optionally `mount_path`, which defaults to `approle`.
+    * For `vault` (required, exactly one):
+        * `token`: A Vault token.
+        * `approle`: AppRole credentials: `role_id`, `secret_id`, and optionally `mount_path`, which defaults to `approle`.
+    * For `cyberark` (optional when using mTLS via `ssl` or IP allowlisting):
+        * `token`: A bearer token.
+        * `basic`: HTTP Basic credentials (`username` and `password`).
 
 `ssl`
-:   (Optional) TLS settings of the connection to Vault, such as `certificate_authorities` to trust a private CA. They only apply to Vault: the `ssl` settings of the monitor apply to the monitored host. See [SSL](/reference/heartbeat/configuration-ssl.md) for the available settings.
+:   (Optional) TLS settings of the connection to the secret store, such as `certificate_authorities` to trust a private CA, or `certificate` and `key` for CyberArk CCP mutual TLS authentication. They only apply to the secret store: the `ssl` settings of the monitor apply to the monitored host. See [SSL](/reference/heartbeat/configuration-ssl.md) for the available settings.
 
 Heartbeat resolves the references before each run. A secret is read from Vault at most once every 5 minutes and shared by the monitors that use the same connection, so rotated secrets are used within 5 minutes without changing the monitor. On runs that read from Vault, the monitor duration includes the time of the read.
 
