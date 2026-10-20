@@ -165,7 +165,7 @@ All of the Beats documentation is located in the `elastic/beats` repository:
 * `beats/docs/reference` contains the docs for each individual Beat, as well as some content that is common to all Beats in the `beats/docs/reference/libbeat` directory.
 * `beats/docs/release-notes` contains all of the product update notes.
 
-Beginning with version 9.0.0, all Elastic documentation is sourced in Markdown format. For general information about contributing to the Elastic documentation, including versioning guidelines, a syntax reference, and more,  refer to the [Elastic Docs v3 welcome page](https://elastic.github.io/docs-builder/).
+Beginning with version 9.0.0, all Elastic documentation is sourced in Markdown and one page covers every version. To edit a Beats page, read [Contributing to the docs](/extend/contributing-docs.md). For the style guide, versioning, and syntax, read the [Elastic documentation contribution guide](https://www.elastic.co/docs/contribute-docs).
 
 ## Dependencies [dependencies]
 
