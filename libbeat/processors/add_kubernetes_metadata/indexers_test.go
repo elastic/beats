@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -687,4 +688,93 @@ func TestIpPortIndexer(t *testing.T) {
 			"id":      "foobar",
 			"runtime": "docker"})
 	assert.Equal(t, expected.String(), indexers[1].Data.String())
+}
+
+func TestIndexersImageMetadataSource(t *testing.T) {
+	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
+	pod := kubernetes.Pod{
+		ObjectMeta: metav1.ObjectMeta{Name: "testpod", Namespace: "testns", UID: types.UID(uid)},
+		Spec: v1.PodSpec{
+			NodeName:       "testnode",
+			Containers:     []v1.Container{{Name: "main", Image: "nginx:1.25"}},
+			InitContainers: []v1.Container{{Name: "init", Image: "busybox"}},
+		},
+		Status: v1.PodStatus{
+			ContainerStatuses: []kubernetes.PodContainerStatus{
+				{Name: "main", ContainerID: "containerd://main01", Image: "docker.io/library/nginx@sha256:abc"},
+			},
+			InitContainerStatuses: []kubernetes.PodContainerStatus{
+				{Name: "init", ContainerID: "containerd://init01", Image: "docker.io/library/busybox@sha256:def"},
+			},
+		},
+	}
+
+	tests := []struct {
+		name      string
+		source    string
+		wantMain  string
+		wantInit  string
+		wantError bool
+	}{
+		{name: "default is status", source: "", wantMain: "docker.io/library/nginx@sha256:abc", wantInit: "docker.io/library/busybox@sha256:def"},
+		{name: "status", source: "status", wantMain: "docker.io/library/nginx@sha256:abc", wantInit: "docker.io/library/busybox@sha256:def"},
+		{name: "spec", source: "spec", wantMain: "nginx:1.25", wantInit: "busybox"},
+		{name: "invalid", source: "bogus", wantError: true},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := config.NewConfig()
+			if tc.source != "" {
+				require.NoError(t, cfg.SetString(ImageMetadataSourceKey, -1, tc.source))
+			}
+
+			conIndexer, err := NewContainerIndexer(*cfg, metagen)
+			if tc.wantError {
+				assert.Error(t, err, "container indexer should reject an invalid image source")
+				_, err = NewPodUIDIndexer(*cfg, metagen)
+				assert.Error(t, err, "pod_uid indexer should reject an invalid image source")
+				return
+			}
+			require.NoError(t, err)
+			uidIndexer, err := NewPodUIDIndexer(*cfg, metagen)
+			require.NoError(t, err)
+
+			images := map[string]string{}
+			for _, mi := range conIndexer.GetMetadata(&pod) {
+				name, _ := mi.Data.GetValue("kubernetes.container.name")
+				img, _ := mi.Data.GetValue("kubernetes.container.image")
+				images["container/"+name.(string)] = img.(string)
+			}
+			assert.Equal(t, tc.wantMain, images["container/main"], "container indexer main image")
+			assert.Equal(t, tc.wantInit, images["container/init"], "container indexer init image")
+
+			for _, mi := range uidIndexer.GetMetadata(&pod) {
+				switch mi.Index {
+				case uid + "/main":
+					img, _ := mi.Data.GetValue("kubernetes.container.image")
+					assert.Equal(t, tc.wantMain, img, "pod_uid indexer main image")
+				case uid + "/init":
+					img, _ := mi.Data.GetValue("kubernetes.container.image")
+					assert.Equal(t, tc.wantInit, img, "pod_uid indexer init image")
+				}
+			}
+		})
+	}
+}
+
+func TestNewIndexersForwardsImageSource(t *testing.T) {
+	pod := kubernetes.Pod{
+		ObjectMeta: metav1.ObjectMeta{Name: "p", Namespace: "ns", UID: "uid"},
+		Spec:       v1.PodSpec{Containers: []v1.Container{{Name: "main", Image: "nginx:1.25"}}},
+		Status: v1.PodStatus{ContainerStatuses: []kubernetes.PodContainerStatus{
+			{Name: "main", ContainerID: "containerd://main01", Image: "sha256:abc"},
+		}},
+	}
+	indexers := NewIndexers(PluginConfig{{ContainerIndexerName: *config.NewConfig()}}, metagen, ImageSourceSpec)
+	md := indexers.GetMetadata(&pod)
+	require.Len(t, md, 1)
+	img, err := md[0].Data.GetValue("kubernetes.container.image")
+	require.NoError(t, err)
+	assert.Equal(t, "nginx:1.25", img, "processor-level image_metadata_source should reach the indexer")
 }
