@@ -55,7 +55,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/eapache/go-resiliency v1.7.0
 	github.com/eclipse/paho.mqtt.golang v1.5.1
-	github.com/elastic/elastic-agent-client/v7 v7.18.1
+	github.com/elastic/elastic-agent-client/v7 v7.19.0
 	github.com/elastic/go-concert v0.3.1
 	github.com/elastic/go-libaudit/v2 v2.6.2
 	github.com/elastic/go-licenser v0.4.2
@@ -580,7 +580,6 @@ replace (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption => github.com/elastic/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0-elastic
 	github.com/apoydence/eachers => github.com/poy/eachers v0.0.0-20181020210610-23942921fe77 //indirect, see https://github.com/elastic/beats/pull/29780 for details.
 	github.com/dop251/goja => github.com/elastic/goja v0.0.0-20190128172624-dd2ac4456e20
-	github.com/elastic/elastic-agent-client/v7 => github.com/samuelvl/elastic-agent-client/v7 v7.0.0-20261019115441-8235393c4626
 	github.com/fsnotify/fsevents => github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270
 	github.com/fsnotify/fsnotify => github.com/elastic/fsnotify v1.6.1-0.20240920222514-49f82bdbc9e3
 	github.com/google/gopacket => github.com/elastic/gopacket v1.1.20-0.20260708143104-cfe2cc0f0cc7

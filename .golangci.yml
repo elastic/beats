@@ -85,7 +85,6 @@ linters:
         - github.com/apoydence/eachers
         - github.com/dop251/goja
         - github.com/dop251/goja_nodejs
-        - github.com/elastic/elastic-agent-client/v7
         - github.com/fsnotify/fsevents
         - github.com/fsnotify/fsnotify
         - github.com/google/gopacket
