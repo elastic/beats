@@ -328,14 +328,14 @@ billing and usage details
     type: date
 
 
-**`azure.billing.fetch_id`**
-:   Identifier of the metricset run that produced the event. All usage detail and forecast events of one run share it and the same `@timestamp`, so a complete run can be told apart from earlier runs that re-fetched the same days.
+**`azure.billing.fetch_id`** {applies_to}`stack: ga 9.6.0`
+:   Unique ID (UUID) generated each time the metricset collects billing data. All usage detail and forecast events from the same collection share this ID and the same `@timestamp`. The metricset re-fetches whole days on every collection, so use this field to keep only the events from the most recent collection for a given day.
 
     type: keyword
 
 
-**`azure.billing.scope`**
-:   The Azure scope the data was queried for: the subscription, department, or billing account.
+**`azure.billing.scope`** {applies_to}`stack: ga 9.6.0`
+:   The Azure scope the billing data was queried for: the subscription, department, or billing account.
 
     type: keyword
 
