@@ -18,6 +18,7 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"sync/atomic"
 )
 
 var (
@@ -25,6 +26,7 @@ var (
 	errIncorrectHeaderSecret  = errors.New("incorrect header or header secret")
 	errMissingHMACHeader      = errors.New("missing HMAC header")
 	errIncorrectHMACSignature = errors.New("invalid HMAC signature")
+	errHMACBodyTooLarge       = errors.New("request body too large for HMAC validation")
 )
 
 type apiValidator struct {
@@ -39,6 +41,11 @@ type apiValidator struct {
 	hmacType           string
 	hmacPrefix         string
 	maxBodySize        int64
+
+	// inFlight is the handler's in-flight byte counter. If maxInFlight is
+	// non-zero, bytes buffered for HMAC validation count towards it.
+	inFlight    *atomic.Int64
+	maxInFlight int64
 
 	optionsHeaders http.Header
 	optionsStatus  int
@@ -85,13 +92,31 @@ func (v *apiValidator) validateRequest(r *http.Request) (status int, err error) 
 
 		// We need access to the request body to validate the signature, but we
 		// must leave the body intact for future processing.
-		body := io.Reader(r.Body)
-		if v.maxBodySize >= 0 {
-			body = io.LimitReader(body, v.maxBodySize)
+		// The body is buffered before the request is authenticated, so it
+		// is always bounded. When max_body_bytes is not set, an extra byte is
+		// read to distinguish an oversized body from one at the limit.
+		n := v.maxBodySize
+		if n < 0 {
+			n = hmacBodyLimit + 1
+		}
+		body := io.LimitReader(r.Body, n)
+		if v.maxInFlight > 0 {
+			// The deferred Close releases the counted bytes when validation
+			// returns; they are counted again when the handler reads the
+			// buffered body.
+			cr := newCountReader(io.NopCloser(body), v.inFlight, v.maxInFlight)
+			defer cr.Close()
+			body = cr
 		}
 		buf, err := io.ReadAll(body)
+		if errors.Is(err, errMaxInFlightExceeded) {
+			return http.StatusServiceUnavailable, err
+		}
 		if err != nil {
 			return http.StatusInternalServerError, fmt.Errorf("failed to read request body: %w", err)
+		}
+		if v.maxBodySize < 0 && len(buf) > hmacBodyLimit {
+			return http.StatusRequestEntityTooLarge, errHMACBodyTooLarge
 		}
 		// Set r.Body back to untouched original value.
 		r.Body = io.NopCloser(bytes.NewBuffer(buf))
@@ -117,6 +142,11 @@ func (v *apiValidator) validateRequest(r *http.Request) (status int, err error) 
 
 	return http.StatusAccepted, nil
 }
+
+// hmacBodyLimit is the largest body that is buffered for HMAC validation
+// when max_body_bytes is not set. It is at least as large as the largest
+// payload GitHub sends to webhooks, which it caps at 25 MB.
+const hmacBodyLimit = 25 << 20
 
 func (v *apiValidator) isMethodOK(m string) bool {
 	if m == http.MethodOptions {
