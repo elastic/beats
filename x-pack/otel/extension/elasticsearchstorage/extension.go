@@ -81,6 +81,7 @@ func (e *elasticStorage) Start(ctx context.Context, host component.Host) error {
 			return fmt.Errorf("create Elasticsearch client for endpoint %q: %w", endpoint, err)
 		}
 
+		client.Headers["User-Agent"] = client.UserAgent
 		client.HTTP = &http.Client{Transport: roundTripper}
 		if err := client.Connect(ctx); err != nil {
 			e.logger.Errorf("error connecting to Elasticsearch at %v: %v", endpoint, err)
