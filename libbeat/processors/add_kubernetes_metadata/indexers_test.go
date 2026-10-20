@@ -742,12 +742,14 @@ func TestIndexersImageMetadataSource(t *testing.T) {
 
 			images := map[string]string{}
 			for _, mi := range conIndexer.GetMetadata(&pod) {
-				name, _ := mi.Data.GetValue("kubernetes.container.name")
-				img, _ := mi.Data.GetValue("kubernetes.container.image")
-				images["container/"+name.(string)] = img.(string)
+				name, err := mi.Data.GetValue("kubernetes.container.name")
+				require.NoError(t, err)
+				img, err := mi.Data.GetValue("kubernetes.container.image")
+				require.NoError(t, err)
+				images[fmt.Sprint(name)] = fmt.Sprint(img)
 			}
-			assert.Equal(t, tc.wantMain, images["container/main"], "container indexer main image")
-			assert.Equal(t, tc.wantInit, images["container/init"], "container indexer init image")
+			assert.Equal(t, tc.wantMain, images["main"], "container indexer main image")
+			assert.Equal(t, tc.wantInit, images["init"], "container indexer init image")
 
 			for _, mi := range uidIndexer.GetMetadata(&pod) {
 				switch mi.Index {
