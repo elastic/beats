@@ -82,7 +82,7 @@ func TestOsqueryRunnerCancellable(t *testing.T) {
 	})
 
 	// Sent input that will start the runner function
-	err := runner.Update(ctx, nil)
+	err := runner.Update(ctx, []config.InputConfig{{}})
 	if err != nil {
 		t.Fatal("failed runner update:", err)
 	}
@@ -133,7 +133,7 @@ func TestOsqueryRunnerRestart(t *testing.T) {
 	})
 
 	// Sent input that will start the runner function
-	err := runner.Update(ctx, nil)
+	err := runner.Update(ctx, []config.InputConfig{{}})
 	if err != nil {
 		t.Fatal("failed runner update:", err)
 	}

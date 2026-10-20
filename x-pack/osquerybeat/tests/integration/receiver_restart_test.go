@@ -79,8 +79,8 @@ func TestReceiverRestartsAfterOsqueryExit78(t *testing.T) {
 				"id": "restart-result", "type": "osquery",
 				"data_stream": map[string]any{"dataset": "osquery_manager.result"},
 				"osquery": map[string]any{
-					// Allow the existing synchronous profiling query to time out before
-					// native logging does; this test injects its own logger failure.
+					// This test injects a logger failure directly instead of waiting
+					// for the production thrift deadline.
 					"options": map[string]any{"thrift_timeout": 30, "schedule_splay_percent": 0},
 					"schedule": map[string]any{"restart": map[string]any{
 						"query": "SELECT info.pid, flags.value AS extension_socket " +
@@ -170,4 +170,16 @@ func TestReceiverRestartsAfterOsqueryExit78(t *testing.T) {
 		assert.NotEqual(t, componentstatus.StatusPermanentError, event.Status(), "exit 78 must not permanently fail the receiver")
 		assert.NotEqual(t, componentstatus.StatusFatalError, event.Status(), "exit 78 must not fatally fail the receiver")
 	}
+	var degraded, recovered bool
+	for _, event := range host.GetEvents() {
+		if event.Status() == componentstatus.StatusRecoverableError {
+			degraded = true
+		}
+		if degraded && event.Status() == componentstatus.StatusOK {
+			recovered = true
+		}
+	}
+	assert.True(t, degraded, "runtime exit must report recoverable health while waiting to restart")
+	assert.True(t, recovered, "replacement readiness must restore healthy status")
+
 }

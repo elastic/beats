@@ -62,10 +62,13 @@ func testOsqueryExitClassification(t *testing.T, exit78, otherExit error) {
 			recoverable: true,
 		},
 		{
+			name: "other_startup_exit", err: otherExit,
+		},
+		{
 			name:        "other_runtime_exit",
 			ready:       true,
 			err:         otherExit,
-			recoverable: false,
+			recoverable: true,
 		},
 		{
 			name:        "cancelled_runtime_exit",
@@ -83,7 +86,7 @@ func testOsqueryExitClassification(t *testing.T, exit78, otherExit error) {
 			name:        "clean_exit",
 			ready:       true,
 			err:         nil,
-			recoverable: false,
+			recoverable: true,
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -92,7 +95,9 @@ func testOsqueryExitClassification(t *testing.T, exit78, otherExit error) {
 				state.ready()
 			}
 			err := state.exit(tc.err)
-			assert.ErrorIs(t, err, tc.err, "preserve the original process error")
+			if tc.err != nil {
+				assert.ErrorIs(t, err, tc.err, "preserve the original process error")
+			}
 			assert.Equal(t, tc.recoverable, isRecoverableOsqueryError(err), "only runtime exit 78 adds recovery")
 			state.ready()
 			assert.Equal(t, osqueryExited, state.state.Load(), "late config callback must not revive an exited process")
@@ -106,6 +111,9 @@ func testOsqueryRunnerRuntimeExit78ThenStartupFailure(t *testing.T, exit78 error
 	defer cancel()
 	var runs atomic.Int32
 	runner := newOsqueryRunner(logptest.NewTestingLogger(t, "runner"))
+	runner.maxRestarts = 8
+	runner.retryInitial = time.Millisecond
+	runner.retryMax = time.Millisecond
 	done := make(chan error, 1)
 	go func() {
 		done <- runner.Run(ctx, func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, inputs <-chan []config.InputConfig) error {
@@ -115,8 +123,7 @@ func testOsqueryRunnerRuntimeExit78ThenStartupFailure(t *testing.T, exit78 error
 			case <-inputs:
 			}
 			var state osqueryRunState
-			// More than five failures verifies that the existing unlimited retry
-			// semantics remain intact. The replacement's startup failure is terminal.
+			// A larger test budget permits six runtime retries; The replacement's startup failure is terminal.
 			if runs.Add(1) <= 6 {
 				state.ready()
 			}

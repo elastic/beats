@@ -40,7 +40,7 @@ func isRecoverableOsqueryError(err error) bool {
 	if err == nil || errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 		return false
 	}
-	if errors.Is(err, errOsqueryRuntimeExit78) || isBrokenPipeOrEOFError(err) {
+	if errors.Is(err, errOsqueryRuntimeExit78) || errors.Is(err, errOsqueryRuntimeExit) || isBrokenPipeOrEOFError(err) {
 		return true
 	}
 	// osquery-go's extension manager watchdog shares a single thrift socket, and a single
@@ -80,9 +80,10 @@ const (
 )
 
 var errOsqueryRuntimeExit78 = errors.New("osqueryd runtime exit 78")
+var errOsqueryRuntimeExit = errors.New("osqueryd unexpected runtime exit")
 
-func (s *osqueryRunState) ready() {
-	s.state.CompareAndSwap(osqueryStarting, osqueryReady)
+func (s *osqueryRunState) ready() bool {
+	return s.state.CompareAndSwap(osqueryStarting, osqueryReady)
 }
 
 func (s *osqueryRunState) exit(err error) error {
@@ -93,6 +94,22 @@ func (s *osqueryRunState) exit(err error) error {
 		}
 		s.startupErr = err
 	}
+	if !ready {
+		var exitError *exec.ExitError
+		if err == nil {
+			s.startupErr = ErrOsquerydExited
+			return s.startupErr
+		}
+		if errors.As(err, &exitError) {
+			s.startupErr = err
+		}
+	}
+	if ready && !errors.Is(err, context.Canceled) && !errors.Is(err, context.DeadlineExceeded) {
+		var exitError *exec.ExitError
+		if err == nil || errors.As(err, &exitError) {
+			return errors.Join(errOsqueryRuntimeExit, err)
+		}
+	}
 	return err
 }
 
@@ -100,19 +117,19 @@ func (s *osqueryRunState) exit(err error) error {
 func (s *osqueryRunState) run(ctx context.Context, runner osqd.Runner, flags osqd.Flags) error {
 	var exitErr error
 	err := runner.Run(ctx, flags, func(err error) { exitErr = s.exit(err) })
-	if err != nil && exitErr != nil {
+	if exitErr != nil {
 		return exitErr
 	}
 	return err
 }
 
-// result must be called after the run's errgroup finishes. A startup exit 78
+// result must be called after the run's errgroup finishes. A startup process exit
 // takes precedence over an extension error reported during process cleanup.
 func (s *osqueryRunState) result(parent context.Context, err error) error {
+	if parent.Err() != nil {
+		return parent.Err()
+	}
 	if s.startupErr != nil {
-		if parent.Err() != nil {
-			return parent.Err()
-		}
 		return s.startupErr
 	}
 	return err
