@@ -30,7 +30,7 @@ The `redisenterprise` module has these additional config options:
 
 ## Compatibility [_compatibility_46]
 
-The metricsets `node` and `proxy` are compatible with Redis Enterprise Software (RES). There were tested with RES 5.4.10-22 and are expected to work with all versions >= 5.0.2.
+The metricsets `node` and `proxy` are compatible with Redis Enterprise Software (RES). They were tested with RES 5.4.10-22 and are expected to work with all versions >= 5.0.2.
 
 
 ## Dashboard [_dashboard_40]
