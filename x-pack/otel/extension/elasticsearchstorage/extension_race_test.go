@@ -18,11 +18,11 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/extension/extensiontest"
 
 	"github.com/elastic/entcollect"
 
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
-	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
@@ -30,8 +30,39 @@ func TestComponentLifecycle(t *testing.T) {
 	srv := newFakeES(t)
 	defer srv.Close()
 
-	oteltest.CheckExtensionLifecycle(t, NewFactory(), &Config{
-		ElasticsearchConfig: map[string]any{"hosts": []string{srv.URL}},
+	authenticatorID, authenticator := newTestBeatsAuthenticator(t, srv.URL, "elastic", "changeme")
+	cfg := newTestStorageConfig(authenticatorID)
+	factory := NewFactory()
+
+	newStorage := func(t *testing.T) *elasticStorage {
+		t.Helper()
+
+		extension, err := factory.Create(
+			t.Context(),
+			extensiontest.NewNopSettings(factory.Type()),
+			cfg,
+		)
+		require.NoError(t, err, "storage extension must be created")
+
+		storage, ok := extension.(*elasticStorage)
+		require.True(t, ok, "factory must create an elasticStorage")
+		return storage
+	}
+
+	t.Run("shutdown without start", func(t *testing.T) {
+		require.NoError(t, newStorage(t).Shutdown(t.Context()), "storage shutdown before start must succeed")
+	})
+
+	t.Run("start shutdown", func(t *testing.T) {
+		for range 2 {
+			storage := newStorage(t)
+			require.NoError(
+				t,
+				storage.Start(t.Context(), storageTestHost{authenticatorID: authenticator}),
+				"storage must start with beatsauth authentication",
+			)
+			require.NoError(t, storage.Shutdown(t.Context()), "storage shutdown must succeed")
+		}
 	})
 }
 
