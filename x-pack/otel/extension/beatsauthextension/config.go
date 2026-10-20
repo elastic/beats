@@ -20,8 +20,11 @@ import (
 type Config struct {
 	// BeatAuthConfig contains the unmatched extension settings decoded by the
 	// Collector. They must be decoded again using the Beats config parser.
-	BeatAuthConfig  map[string]any `mapstructure:",remain"`
-	ContinueOnError bool           `mapstructure:"continue_on_error"`
+	BeatAuthConfig map[string]any `mapstructure:",remain"`
+
+	// ContinueOnError when enabled report the errors on authenticator.Start,
+	// so the Otel collector still starts and errors are still clearly reported.
+	ContinueOnError bool `mapstructure:"continue_on_error"`
 
 	// Endpoints contains optional, fully resolved Elasticsearch HTTP(S)
 	// endpoints.
@@ -38,7 +41,17 @@ func createDefaultConfig() component.Config {
 }
 
 // Validate validates optional Elasticsearch endpoints and authentication.
+// If ContinueOnError is true, validation errors are deferred to Start.
 func (c *Config) Validate() error {
+	if c.ContinueOnError {
+		return nil
+	}
+
+	return c.validate()
+}
+
+// validate validates optional Elasticsearch endpoints and authentication.
+func (c *Config) validate() error {
 	for _, endpoint := range c.Endpoints {
 		u, err := parseHTTPURL(endpoint)
 		if err != nil {
