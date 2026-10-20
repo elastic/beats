@@ -350,6 +350,26 @@ func TestTokenAuth(t *testing.T) {
 	assert.Equal(t, "true", req.Header.Get("X-Vault-Request"), "the Vault request header must be sent")
 }
 
+func TestResolvedSecretsAreScrubbed(t *testing.T) {
+	fv := newFakeVault(t)
+	entry := tokenEntry(fv.address)
+	entry["type"] = storeType
+	cfg, err := conf.NewConfigFrom(map[string]any{
+		"url":                  "https://host/?token=vault://myapp/creds#password",
+		secretstores.ConfigKey: []any{entry},
+	})
+	require.NoError(t, err, "monitor config must be valid")
+
+	resolved, scrubber, err := secretstores.NewResolver(logptest.NewTestingLogger(t, "")).Resolve(cfg)
+	require.NoError(t, err, "references must resolve")
+	target, err := resolved.String("url", -1)
+	require.NoError(t, err, "resolved config must have the url")
+	require.Contains(t, target, testPassword, "the reference must be replaced")
+
+	require.NotNil(t, scrubber, "resolved secrets must be scrubbed")
+	assert.Equal(t, "https://host/?token=<hidden>", scrubber.String(target), "the secret must be removed")
+}
+
 func TestTokenAuthRejectedIsNotRetried(t *testing.T) {
 	fv := newFakeVault(t)
 	fv.expireTokens()

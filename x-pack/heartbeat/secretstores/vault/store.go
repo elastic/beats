@@ -181,7 +181,12 @@ func (s *store) resolve(ctx context.Context, content string) (string, error) {
 	if !ok {
 		return "", fmt.Errorf("vault: field %q not found at %s", field, s.location(path))
 	}
-	return stringValue(v)
+	value, err := stringValue(v)
+	if err != nil {
+		return "", err
+	}
+	secretstores.Track(ctx, value)
+	return value, nil
 }
 
 // secret returns the data of the secret at path, from the cache when

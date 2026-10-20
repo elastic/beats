@@ -41,27 +41,31 @@ func NewResolver(logger *logp.Logger) *Resolver {
 // Resolve returns a copy of cfg without the secret_stores setting, where each
 // configured store, in list order, replaced its references. cfg itself is not
 // modified. Without secret_stores, cfg is returned as is.
-func (r *Resolver) Resolve(cfg *conf.C) (*conf.C, error) {
+//
+// The Scrubber removes the substituted secret values from what the monitor
+// publishes. It is nil if there is nothing to scrub.
+func (r *Resolver) Resolve(cfg *conf.C) (*conf.C, *Scrubber, error) {
 	entries, err := configEntries(cfg)
 	if err != nil || len(entries) == 0 {
-		return cfg, err
+		return cfg, nil, err
 	}
 
 	resolved, err := withoutSecretStores(cfg)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	ctx := context.Background()
+	var t tracker
+	ctx := withTracker(context.Background(), &t)
 	for _, e := range entries {
 		s, err := sharedStores.get(e, r.logger)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		if resolved, err = s.Replace(ctx, resolved); err != nil {
-			return nil, fmt.Errorf("could not resolve %s secret references: %w", e.storeType, err)
+			return nil, nil, fmt.Errorf("could not resolve %s secret references: %w", e.storeType, err)
 		}
 	}
-	return resolved, nil
+	return resolved, t.scrubber(), nil
 }
 
 // Validate checks the secret_stores setting and lets each configured store
