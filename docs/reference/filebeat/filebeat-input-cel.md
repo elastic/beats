@@ -4,7 +4,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html
 sub:
   mito_docs: https://pkg.go.dev/github.com/elastic/mito
+<<<<<<< HEAD
   mito_version: v1.26.1-0.20260617204810-b54ab9f21153
+=======
+  mito_version: v1.28.1
+>>>>>>> 2e1d8f5 (x-pack/filebeat/input/cel: fix redirect handling and add redirect.follow (#53689))
 applies_to:
   stack: ga 8.6.0
   serverless: ga
@@ -1188,6 +1192,15 @@ The minimum time to wait before a retry is attempted. Default: `1s`.
 ### `resource.retry.wait_max` [_resource_retry_wait_max]
 
 The maximum time to wait before a retry is attempted. Default: `60s`.
+
+
+### `resource.redirect.follow` [_resource_redirect_follow]
+
+```{applies_to}
+stack: ga 9.6.0
+```
+
+When set to `false` redirects are not followed and the redirect response is returned to the CEL program, which can then read its status code and `Location` header. Default: `true`.
 
 
 ### `resource.redirect.forward_headers` [_resource_redirect_forward_headers]

@@ -1081,6 +1081,67 @@ var inputTests = []struct {
 		},
 	},
 	{
+		name:   "GET_redirect_follow",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]any{
+			"interval": 1,
+			"program": `
+	get(state.url).Body.as(body, {
+		"events": [{"message": string(body)}]
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == "/" {
+				w.Header().Set("Location", "/file")
+				w.Header().Set("Content-Length", "2")
+				w.WriteHeader(http.StatusFound)
+				_, _ = w.Write([]byte("{}"))
+				return
+			}
+			_, _ = w.Write([]byte("hello"))
+		},
+		want: []map[string]any{
+			{
+				"message": "hello",
+			},
+		},
+	},
+	{
+		name:   "GET_redirect_no_follow",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]any{
+			"interval":                 1,
+			"resource.redirect.follow": false,
+			"program": `
+	get(state.url).as(resp, {
+		"events": [{
+			"status":   resp.StatusCode == 302 ? "found" : "other",
+			"location": resp.Header["Location"][0],
+			"message":  string(resp.Body),
+		}]
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == "/" {
+				w.Header().Set("Location", "/file")
+				w.Header().Set("Content-Length", "2")
+				w.WriteHeader(http.StatusFound)
+				_, _ = w.Write([]byte("{}"))
+				return
+			}
+			_, _ = w.Write([]byte("hello"))
+		},
+		want: []map[string]any{
+			{
+				"status":   "found",
+				"location": "/file",
+				"message":  "{}",
+			},
+		},
+	},
+	{
 		name:   "GET_max_body_size_ok",
 		server: newTestServer(httptest.NewServer),
 		config: map[string]interface{}{

@@ -14491,11 +14491,19 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/mito
+<<<<<<< HEAD
 Version: v1.27.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/elastic/mito@v1.27.0/LICENSE:
+=======
+Version: v1.28.1
+Licence type (autodetected): Apache-2.0
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/github.com/elastic/mito@v1.28.1/LICENSE:
+>>>>>>> 2e1d8f5 (x-pack/filebeat/input/cel: fix redirect handling and add redirect.follow (#53689))
 
 
                                  Apache License
