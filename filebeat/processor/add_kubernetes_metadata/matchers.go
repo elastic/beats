@@ -81,6 +81,7 @@ func newLogsPathMatcher(cfg conf.C, log *logp.Logger) (add_kubernetes_metadata.M
 
 // podLogFileRegexp matches kubelet pod log file names: the live file (<n>.log) and its
 // rotated forms (<n>.log.<yyyymmdd-hhmmss>, optionally compressed with .gz).
+// see https://github.com/kubernetes/kubernetes/blob/c16ce23e957dd82f106b73e8f4c9847a4eefd863/pkg/kubelet/logs/container_log_manager.go#L45
 var podLogFileRegexp = regexp.MustCompile(`^(\d+)\.log(?:\.\d{8}-\d{6})?(?:\.gz)?$`)
 
 // Docker container ID is a 64-character-long hexadecimal string
