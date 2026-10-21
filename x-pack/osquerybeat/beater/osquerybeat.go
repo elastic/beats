@@ -17,7 +17,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	lru "github.com/hashicorp/golang-lru/v2"
 	"github.com/osquery/osquery-go"
 	kconfig "github.com/osquery/osquery-go/plugin/config"
@@ -97,7 +96,7 @@ type osquerybeat struct {
 	mx     sync.Mutex
 
 	// clockSkewWarnLogged latches the pre-start clamp warning to once per
-	// schedule name. handleQueryResult runs per result document, so without
+	// schedule name. handleScheduledQueryResult runs per result document, so without
 	// this a persistently skewed agent would warn on every snapshot/diff hit.
 	clockSkewWarnLogged map[string]struct{}
 
@@ -858,26 +857,6 @@ func (bt *osquerybeat) shouldLogClockSkewWarn(scheduleName string) bool {
 	}
 	bt.clockSkewWarnLogged[scheduleName] = struct{}{}
 	return true
-}
-
-func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Client, configPlugin *ConfigPlugin, profiler *scheduledQueryProfiler, res QueryResult) {
-	ns, ok := configPlugin.LookupNamespace(res.Name)
-	if !ok {
-		bt.log.Debugf("failed to lookup query namespace: %s, the query was possibly removed recently from the schedule", res.Name)
-		// Drop the scheduled query results since at this point we don't have the namespace for the datastream where to send the results to
-		// and the API key would not have permissions for that namespaces datastream to create the index
-		return
-	}
-
-	qi, ok := configPlugin.LookupQueryInfo(res.Name)
-	if !ok {
-		bt.log.Errorf("failed to lookup query info: %s", res.Name)
-		return
-	}
-
-	responseID := uuid.Must(uuid.NewV4()).String()
-	bt.handleScheduledQueryResult(ctx, cli, bt.pub, ns, qi, res, responseID)
-	bt.enqueueScheduledProfile(profiler, ns, qi, res, responseID)
 }
 
 func (bt *osquerybeat) enqueueScheduledProfile(profiler *scheduledQueryProfiler, ns string, qi QueryInfo, res QueryResult, responseID string) {

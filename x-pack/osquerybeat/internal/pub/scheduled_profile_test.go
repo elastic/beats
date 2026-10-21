@@ -210,7 +210,8 @@ func TestScheduledProfileBusyPublisherDropsAcrossPolicyChanges(t *testing.T) {
 	p := New(&beat.Beat{Publisher: recorder}, logptest.NewTestingLogger(t, "scheduled_profile"))
 	require.NoError(t, p.Configure(scheduledProfileInputs("default")), "configure the original policy")
 	worker := p.scheduledProfileWorker
-	sink := p.CaptureScheduledProfileSink("default").(*scheduledProfileSink)
+	sink, ok := p.CaptureScheduledProfileSink("default").(*scheduledProfileSink)
+	require.True(t, ok, "capture the configured scheduled profile sink")
 	client := &stalledScheduledProfileClient{entered: make(chan struct{}), release: make(chan struct{})}
 	sink.client = client
 	var releaseOnce sync.Once

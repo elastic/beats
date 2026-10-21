@@ -83,7 +83,8 @@ func TestScheduledProfileFullQueueDoesNotBlockAdmissionOrClose(t *testing.T) {
 		closeScheduledProfilePublisher(t, p)
 	})
 	require.NoError(t, p.Configure(scheduledProfileInputs("default")), "configure the scheduled profile destination")
-	sink := p.CaptureScheduledProfileSink("default").(*scheduledProfileSink)
+	sink, ok := p.CaptureScheduledProfileSink("default").(*scheduledProfileSink)
+	require.True(t, ok, "capture the configured scheduled profile sink")
 	observed := &observedProfileClient{Client: sink.client, entered: make(chan struct{})}
 	sink.client = observed
 	hits := make([]map[string]any, 32)
