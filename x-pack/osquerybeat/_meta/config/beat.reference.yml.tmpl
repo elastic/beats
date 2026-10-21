@@ -16,6 +16,18 @@ osquerybeat:
 #            # osquery_manager.query_profile data stream for all queries (enabled by default).
 #            # Individual queries may override this with their own profiling flag. Requires the
 #            # query_profile input stream.
+#            # Scheduled profiles are collected asynchronously, with at most 64 pending
+#            # requests and one active collection. They sample the latest schedule metrics,
+#            # which may reflect a later execution when collection is delayed.
+#            # response_id, schedule_id and schedule_execution_count identify the
+#            # originating result; osquery_profile.executions belongs to the sampled metrics.
+#            # Publication uses one worker for the lifetime of osquerybeat, with no
+#            # backlog. A busy publisher drops new profiles immediately; see
+#            # osquerybeat.scheduled_query_profiles.dropped.publisher_busy.
+#            # Daemon restart does not wait for an in-flight profile publication.
+#            # Scheduled profiles may be discarded on queue overflow, policy replacement,
+#            # or shutdown. Monitoring counters under osquerybeat.scheduled_query_profiles
+#            # report collection and discards; collected does not mean delivered.
 #            #profiling_all: true
 #            storage:
 #              # Enable local storage of live query profiles (for diagnostics).
