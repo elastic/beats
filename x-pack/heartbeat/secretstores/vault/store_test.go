@@ -251,12 +251,12 @@ func newTestStore(t *testing.T, entry map[string]any, logger *logp.Logger) (*sto
 func TestRegistered(t *testing.T) {
 	cfg, err := conf.NewConfigFrom(map[string]any{
 		"type":                 "http",
-		"header":               "vault://myapp/creds",
-		secretstores.ConfigKey: []any{map[string]any{"type": storeType, "address": "https://vault:8200", "auth": map[string]any{"token": testToken}}},
+		"header":               "vault://main@myapp/creds",
+		secretstores.ConfigKey: []any{map[string]any{"type": storeType, "name": "main", "address": "https://vault:8200", "auth": map[string]any{"token": testToken}}},
 	})
 	require.NoError(t, err, "test config must be valid")
 	err = secretstores.NewResolver(logptest.NewTestingLogger(t, "")).Validate(cfg)
-	assert.ErrorContains(t, err, "must have the form vault://<path>#<field>", "the vault store must be registered and validate references")
+	assert.ErrorContains(t, err, "must have the form vault://<name>@<path>#<field>", "the vault store must be registered and validate references")
 }
 
 func TestConfigValidation(t *testing.T) {
