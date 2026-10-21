@@ -18,7 +18,6 @@
 package json
 
 import (
-	"maps"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -42,24 +41,14 @@ type meta struct {
 }
 
 func makeEvent(index, version string, in *beat.Event) event {
-	m := meta{
-		Beat:    index,
-		Version: version,
-		Type:    "_doc",
-		Fields:  in.Meta,
-	}
-
-	// '@metadata.beat' set on the event takes precedence over the output's index
-	if b, ok := in.Meta["beat"].(string); ok && b != "" {
-		m.Beat = b
-		metaClone := maps.Clone(in.Meta)
-		delete(metaClone, "beat")
-		m.Fields = metaClone
-	}
-
 	return event{
 		Timestamp: in.Timestamp,
-		Meta:      m,
-		Fields:    in.Fields,
+		Meta: meta{
+			Beat:    index,
+			Version: version,
+			Type:    "_doc",
+			Fields:  in.Meta,
+		},
+		Fields: in.Fields,
 	}
 }

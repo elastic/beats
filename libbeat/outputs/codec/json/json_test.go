@@ -22,9 +22,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -95,46 +92,6 @@ func TestJsonCodec(t *testing.T) {
 			} else if string(actual) != expected {
 				t.Errorf("Expected value (%s) does not equal with output (%s)", expected, actual)
 			}
-		})
-	}
-}
-
-func TestJsonCodecEventMetaPrecedence(t *testing.T) {
-	cases := map[string]struct {
-		meta     mapstr.M
-		expected string
-	}{
-		"no meta uses output defaults": {
-			meta:     nil,
-			expected: `{"@timestamp":"0001-01-01T00:00:00.000Z","@metadata":{"beat":"test","type":"_doc","version":"1.2.3"},"msg":"message"}`,
-		},
-		"unrelated meta is inlined, defaults kept": {
-			meta:     mapstr.M{"pipeline": "p"},
-			expected: `{"@timestamp":"0001-01-01T00:00:00.000Z","@metadata":{"beat":"test","type":"_doc","version":"1.2.3","pipeline":"p"},"msg":"message"}`,
-		},
-		"meta beat overrides index": {
-			meta:     mapstr.M{"beat": "filebeat"},
-			expected: `{"@timestamp":"0001-01-01T00:00:00.000Z","@metadata":{"beat":"filebeat","type":"_doc","version":"1.2.3"},"msg":"message"}`,
-		},
-		"meta beat overrides index, other meta keys are kept": {
-			meta:     mapstr.M{"beat": "filebeat", "pipeline": "p"},
-			expected: `{"@timestamp":"0001-01-01T00:00:00.000Z","@metadata":{"beat":"filebeat","type":"_doc","version":"1.2.3","pipeline":"p"},"msg":"message"}`,
-		},
-	}
-
-	for name, test := range cases {
-		t.Run(name, func(t *testing.T) {
-			codec := New("1.2.3", defaultConfig)
-			in := &beat.Event{Fields: mapstr.M{"msg": "message"}, Meta: test.meta}
-			var before mapstr.M
-			if test.meta != nil {
-				before = test.meta.Clone()
-			}
-
-			actual, err := codec.Encode("test", in)
-			require.NoError(t, err, "encoding must not fail")
-			assert.Equal(t, test.expected, string(actual), "unexpected encoded event")
-			assert.Equal(t, before, in.Meta, "event Meta must not be mutated by the encoder")
 		})
 	}
 }
