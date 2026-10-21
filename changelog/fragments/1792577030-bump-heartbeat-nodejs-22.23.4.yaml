@@ -13,7 +13,7 @@ kind: security
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Bump Node.js to 22.23.3 in the Heartbeat Docker images and install it from nodejs.org on Wolfi.
+summary: Bump Node.js to 22.23.4 in the Heartbeat Docker images and install it from nodejs.org on Wolfi.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
