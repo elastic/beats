@@ -23,6 +23,7 @@ changelog/fragments/
 # Sub-directories/files ownership. Remember that order matters; the last matching pattern takes the most precedence.
 /.buildkite @elastic/observablt-ci
 /.ci/ @elastic/elastic-agent-data-plane @elastic/observablt-ci
+/.agents/skills/docs-authoring/SKILL.md @elastic/ski-docs
 /.github/actions @elastic/observablt-ci
 /.github/workflows @elastic/observablt-ci
 /.github/workflows/release-notes.yml @elastic/ski-docs @elastic/elastic-agent-data-plane

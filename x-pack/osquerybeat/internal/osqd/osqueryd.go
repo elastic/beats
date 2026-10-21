@@ -52,7 +52,10 @@ var (
 
 type Runner interface {
 	Check(ctx context.Context) error
-	Run(ctx context.Context, flags Flags) error
+	// onExit is called after the child is reaped, before logging and cleanup.
+	// It completes before Run returns and must return promptly. It is not
+	// called if process startup fails.
+	Run(ctx context.Context, flags Flags, onExit func(error)) error
 	SocketPath() string
 	DataPath() string
 	// SetExtensions configures customer-managed extension entries (directories,
@@ -298,7 +301,7 @@ func runCheckWithTimeout(ctx context.Context, timeout time.Duration, check func(
 }
 
 // Run executes osqueryd binary as a child process
-func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
+func (q *OSQueryD) Run(ctx context.Context, flags Flags, onExit func(error)) error {
 	cleanup, err := q.prepare()
 	if err != nil {
 		return err
@@ -349,7 +352,11 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 
 	// Wait on osqueryd exit
 	wg.Go(func() {
-		finished <- cmd.Wait()
+		err := cmd.Wait()
+		if onExit != nil {
+			onExit(err)
+		}
+		finished <- err
 	})
 
 	select {
