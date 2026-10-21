@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gofrs/uuid/v5"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
@@ -66,12 +68,31 @@ type TimeIntervalOptions struct {
 	forecastEnd time.Time
 }
 
+// FetchContext identifies one run of the metricset. Every event produced by the
+// run carries the same ID and timestamp, so a consumer can tell a complete fetch
+// apart from earlier fetches of the same days and keep only the most recent one.
+// This matters because the metricset re-fetches whole days on every run, and the
+// Usage Details API does not give individual rows a unique identifier.
+type FetchContext struct {
+	// ID is unique per run.
+	ID string
+	// Time is the reference time of the run. It becomes the @timestamp of every
+	// event of the run.
+	Time time.Time
+}
+
 // Fetch methods implements the data gathering and data conversion to the right metricset
 // It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// reference time used to calculate usage and forecast time intervals.
 	referenceTime := time.Now()
+
+	fetchID, err := uuid.NewV4()
+	if err != nil {
+		return fmt.Errorf("error generating the fetch ID: %w", err)
+	}
+	fetch := FetchContext{ID: fetchID.String(), Time: referenceTime.UTC()}
 
 	usageStart, usageEnd := usageIntervalFrom(referenceTime, m.client.Config.BillingUsageLookback)
 	forecastStart, forecastEnd := forecastIntervalFrom(referenceTime, m.client.Config.BillingForecastWindow)
@@ -85,6 +106,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	m.log.
 		With("billing.reference_time", referenceTime).
+		With("billing.fetch_id", fetch.ID).
 		Infow("Fetching billing data")
 
 	results, err := m.client.GetMetrics(timeIntervalOptions)
@@ -92,7 +114,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return fmt.Errorf("error retrieving usage information: %w", err)
 	}
 
-	events, err := EventsMapping(m.client.Config.SubscriptionId, results, timeIntervalOptions, m.log)
+	events, err := EventsMapping(m.client.Config.SubscriptionId, results, timeIntervalOptions, fetch, m.log)
 	if err != nil {
 		return fmt.Errorf("error mapping events: %w", err)
 	}

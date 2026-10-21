@@ -19,6 +19,7 @@ package secretstores
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -52,13 +53,17 @@ func (r *Resolver) Resolve(cfg *conf.C) (*conf.C, error) {
 		return nil, err
 	}
 	ctx := context.Background()
-	for _, e := range entries {
+	scopes := scopes(entries)
+	for i, e := range entries {
 		s, err := sharedStores.get(e, r.logger)
 		if err != nil {
 			return nil, err
 		}
-		if resolved, err = s.Replace(ctx, resolved); err != nil {
-			return nil, fmt.Errorf("could not resolve %s secret references: %w", e.storeType, err)
+		if resolved, err = s.Replace(ctx, resolved, scopes[i]); err != nil {
+			if errors.Is(err, ErrSelection) {
+				return nil, fmt.Errorf("%s: %w", ConfigKey, err)
+			}
+			return nil, fmt.Errorf("could not resolve %s secret references: %w", e.label(), err)
 		}
 	}
 	return resolved, nil
@@ -76,14 +81,18 @@ func (r *Resolver) Validate(cfg *conf.C) error {
 	if err != nil {
 		return err
 	}
-	for _, e := range entries {
+	scopes := scopes(entries)
+	for i, e := range entries {
 		// A new store, so validation never shares state with running monitors.
 		s, err := newStore(e, r.logger)
 		if err != nil {
 			return err
 		}
-		if err := s.Validate(monitorCfg); err != nil {
-			return fmt.Errorf("invalid %s secret references: %w", e.storeType, err)
+		if err := s.Validate(monitorCfg, scopes[i]); err != nil {
+			if errors.Is(err, ErrSelection) {
+				return fmt.Errorf("%s: %w", ConfigKey, err)
+			}
+			return fmt.Errorf("invalid %s secret references: %w", e.label(), err)
 		}
 	}
 	return nil

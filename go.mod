@@ -178,7 +178,7 @@ require (
 	github.com/elastic/mito v1.28.0
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
 	github.com/elastic/sarama v1.19.1-0.20260310070522-abae92ca1603
-	github.com/elastic/tk-btf v0.2.0
+	github.com/elastic/tk-btf v0.3.0
 	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
 	github.com/go-ldap/ldap/v3 v3.4.13
 	github.com/go-ole/go-ole v1.3.0
@@ -534,7 +534,7 @@ require (
 	go.opentelemetry.io/collector/pdata/testdata v0.163.0 // indirect
 	go.opentelemetry.io/collector/pdata/xpdata v0.163.0 // indirect
 	go.opentelemetry.io/collector/pipeline/xpipeline v0.163.0 // indirect
-	go.opentelemetry.io/collector/processor/processortest v0.163.0 // indirect
+	go.opentelemetry.io/collector/processor/processortest v0.163.0
 	go.opentelemetry.io/collector/processor/xprocessor v0.163.0 // indirect
 	go.opentelemetry.io/collector/receiver/xreceiver v0.163.0 // indirect
 	go.opentelemetry.io/collector/service/hostcapabilities v0.163.0 // indirect
