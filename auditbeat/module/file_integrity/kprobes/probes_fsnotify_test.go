@@ -24,6 +24,7 @@ import (
 	"testing"
 
 	"github.com/cilium/ebpf/btf"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -71,7 +72,6 @@ func Test_fsNotifySymbol_buildProbes(t *testing.T) {
 
 	s := &fsNotifySymbol{
 		symbolName: "fsnotify",
-		lastOnErr:  nil,
 	}
 
 	for _, spec := range specs {
@@ -124,16 +124,47 @@ func Test_fsNotifySymbol_load(t *testing.T) {
 }
 
 func Test_fsNotifySymbol_onErr(t *testing.T) {
-	s := &fsNotifySymbol{
-		symbolName: "fsnotify",
-		lastOnErr:  nil,
+	// wrap mimics verify(), which never returns the bare sentinel.
+	wrap := func(err error) error {
+		return fmt.Errorf("events could not be verified: %w", err)
 	}
 
-	require.True(t, s.onErr(ErrVerifyOverlappingEvents))
+	tests := []struct {
+		name   string
+		errs   []error
+		repeat []bool
+	}{
+		{
+			name:   "each sentinel retried once",
+			errs:   []error{ErrVerifyOverlappingEvents, ErrVerifyMissingEvents, ErrVerifyMissingEvents, ErrVerifyUnexpectedEvent},
+			repeat: []bool{true, true, false, false},
+		},
+		{
+			name:   "wrapped repeated error is not retried again",
+			errs:   []error{wrap(ErrVerifyMissingEvents), wrap(ErrVerifyMissingEvents)},
+			repeat: []bool{true, false},
+		},
+		{
+			name:   "wrapped alternating errors are bounded",
+			errs:   []error{wrap(ErrVerifyMissingEvents), wrap(ErrVerifyOverlappingEvents), wrap(ErrVerifyMissingEvents), wrap(ErrVerifyOverlappingEvents)},
+			repeat: []bool{true, true, false, false},
+		},
+		{
+			name:   "unrelated error is not retried",
+			errs:   []error{wrap(ErrAckTimeout)},
+			repeat: []bool{false},
+		},
+	}
 
-	require.True(t, s.onErr(ErrVerifyMissingEvents))
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			s := &fsNotifySymbol{
+				symbolName: "fsnotify",
+			}
 
-	require.False(t, s.onErr(ErrVerifyMissingEvents))
-
-	require.False(t, s.onErr(ErrVerifyUnexpectedEvent))
+			for i, err := range tc.errs {
+				assert.Equal(t, tc.repeat[i], s.onErr(err), "unexpected retry decision for call %d with error %q", i, err)
+			}
+		})
+	}
 }
