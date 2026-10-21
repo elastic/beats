@@ -131,8 +131,6 @@ func TestBeatReceiverStartFailureShutdownDoesNotHang(t *testing.T) {
 		t.Fatal("Shutdown hung after BeatReceiver.Start failed — nil runDone not fixed")
 	}
 }
-<<<<<<< HEAD
-=======
 
 // TestBeatReceiverShutdownWithoutStart covers the collector calling Shutdown on
 // a receiver that was never started
@@ -168,51 +166,3 @@ func TestBeatReceiverShutdownWithoutStart(t *testing.T) {
 		t.Fatal("Shutdown hung when Start was never called")
 	}
 }
-
-func TestBeatReceiverStartHookFailureShutdownDoesNotHang(t *testing.T) {
-	mb := &mockReceiverBeater{
-		acked:    &atomic.Int64{},
-		initDone: make(chan struct{}),
-		done:     make(chan struct{}),
-	}
-	creator := func(*beat.Beat, *conf.C) (beat.Beater, error) { return mb, nil }
-
-	b, err := NewBeatForReceiver(
-		cmd.FilebeatSettings("filebeat"),
-		map[string]any{"path.home": t.TempDir()},
-		consumertest.NewNop(),
-		"test-receiver",
-		zapcore.NewNopCore(),
-	)
-	require.NoError(t, err, "building the receiver beat should succeed")
-
-	rs := receiver.Settings{
-		ID: component.NewIDWithName(component.MustNewType("mockbeatreceiver"), "r1"),
-		TelemetrySettings: component.TelemetrySettings{
-			Logger: zap.NewNop(),
-		},
-	}
-	br, err := NewBeatReceiver(t.Context(), b, creator, rs)
-	require.NoError(t, err, "creating the beat receiver should succeed")
-
-	hookErr := errors.New("start hook failed")
-	br.SetStartHook(func(component.Host) error {
-		return hookErr
-	})
-
-	startErr := br.Start(componenttest.NewNopHost())
-	require.ErrorIs(t, startErr, hookErr, "Start should return the start hook failure")
-
-	// Shutdown must complete promptly even though Start failed before launching
-	// beater.Run. Use t.Context() (no deadline during test execution) so that a
-	// missing runDone signal would block indefinitely.
-	done := make(chan error, 1)
-	go func() { done <- br.Shutdown(t.Context()) }()
-	select {
-	case err := <-done:
-		require.NoError(t, err, "Shutdown should consume the start failure signal without error")
-	case <-time.After(5 * time.Second):
-		t.Fatal("Shutdown hung after BeatReceiver.Start failed")
-	}
-}
->>>>>>> 3f661f0 ([beatreceiver] Introduce lifecycle tests (#53863))

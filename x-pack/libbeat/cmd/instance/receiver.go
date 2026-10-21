@@ -48,13 +48,8 @@ type BeatReceiver struct {
 	Logger              *logp.Logger
 	bridge              *oteltelemetry.RegistryBridge
 	releaseSystemBridge func()
-<<<<<<< HEAD
-	runDone             chan error // receives the error from beater.Run; closed when Run returns
-=======
-	startHook           func(component.Host) error
 	startCalled         chan struct{} // closed when Start is called
 	runDone             chan error    // receives the error from beater.Run; closed when Run returns
->>>>>>> 3f661f0 ([beatreceiver] Introduce lifecycle tests (#53863))
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
@@ -234,20 +229,6 @@ func (br *BeatReceiver) Shutdown(ctx context.Context) error {
 	if br.releaseSystemBridge != nil {
 		br.releaseSystemBridge()
 	}
-<<<<<<< HEAD
-
-	// The Beater owns shutdown sequencing: stop it first so it can close its
-	// inputs and finalize acknowledgments before the pipeline is disconnected.
-	// See https://github.com/elastic/beats/issues/49794.
-	// Pass ctx so beaters that implement contextStopper don't exhaust the OTel
-	// shutdown deadline during their ready-state wait.
-	if cs, ok := br.beater.(contextStopper); ok {
-		cs.StopWithContext(ctx)
-	} else {
-		br.beater.Stop()
-	}
-=======
->>>>>>> 3f661f0 ([beatreceiver] Introduce lifecycle tests (#53863))
 
 	// If the Shutdown was called before the Start, do not wait for beater.Run to return.
 	select {

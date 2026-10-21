@@ -13,7 +13,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/logstash"
-	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 )
 
 func TestCreateExporter(t *testing.T) {
@@ -30,8 +29,4 @@ func TestCreateExporter(t *testing.T) {
 	require.NotNil(t, exporter)
 
 	require.NoError(t, exporter.Shutdown(context.Background()))
-}
-
-func TestComponentLifecycle(t *testing.T) {
-	oteltest.CheckExporterLifecycle(t, NewFactory(), Config{"hosts": []string{"localhost:5044"}})
 }

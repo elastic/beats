@@ -96,30 +96,14 @@ const (
 // only, but no device is opened yet. Accessing and configuring the actual device
 // is done by the Run method. The id parameter is used to specify the metric
 // collection ID for AF_PACKET sniffers on Linux.
-<<<<<<< HEAD
 func New(id string, testMode bool, _ string, decoders map[string]Decoders, interfaces []config.InterfaceConfig, reporter status.StatusReporter, closers ...func()) (*Sniffer, error) {
-	s := &Sniffer{
-		sniffers: make([]sniffer, len(interfaces)),
-		closers:  closers,
-		log:      logp.NewLogger("sniffer"),
-=======
-func New(
-	id string,
-	testMode bool,
-	_ string,
-	decoders map[string]Decoders,
-	interfaces []config.InterfaceConfig,
-	reporter status.StatusReporter,
-	logger *logp.Logger,
-	closers ...func()) (*Sniffer, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	s := &Sniffer{
 		sniffers: make([]sniffer, len(interfaces)),
 		closers:  closers,
 		ctx:      ctx,
 		cancel:   cancel,
-		log:      logger.Named("sniffer"),
->>>>>>> 3f661f0 ([beatreceiver] Introduce lifecycle tests (#53863))
+		log:      logp.NewLogger("sniffer"),
 	}
 
 	for i, iface := range interfaces {
