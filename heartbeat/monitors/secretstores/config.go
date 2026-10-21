@@ -22,7 +22,9 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"maps"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -34,7 +36,10 @@ import (
 // entry is one validated secret_stores item.
 type entry struct {
 	storeType string
-	config    *conf.C
+	// name selects the entry in references, <scheme>://<name>@... It is
+	// unique among the entries of a type.
+	name   string
+	config *conf.C
 	// settings is the raw entry, credentials included, used to identify the
 	// connection.
 	settings map[string]any
@@ -63,7 +68,7 @@ func parseEntries(raw any) ([]entry, error) {
 	}
 
 	entries := make([]entry, 0, len(items))
-	seen := map[string]bool{}
+	seen := map[[2]string]bool{}
 	for i, item := range items {
 		m, ok := item.(map[string]any)
 		if !ok {
@@ -76,19 +81,33 @@ func parseEntries(raw any) ([]entry, error) {
 		if _, ok := lookupFactory(storeType); !ok {
 			return nil, fmt.Errorf("%s: entry %d: unknown secret store type %q", ConfigKey, i, storeType)
 		}
-		if seen[storeType] {
-			return nil, fmt.Errorf("%s: only one %q entry is supported", ConfigKey, storeType)
+		name, err := entryName(m)
+		if err != nil {
+			return nil, fmt.Errorf("%s: entry %d: %w", ConfigKey, i, err)
 		}
-		seen[storeType] = true
+		key := [2]string{storeType, name}
+		if seen[key] {
+			return nil, fmt.Errorf("%s: duplicate %q entry name %q", ConfigKey, storeType, name)
+		}
+		seen[key] = true
 		// PathSep("") keeps keys literal; values are already resolved and
 		// must not be expanded again.
 		cfg, err := ucfg.NewFrom(m, ucfg.PathSep(""))
 		if err != nil {
 			return nil, fmt.Errorf("%s: entry %d: %w", ConfigKey, i, err)
 		}
-		entries = append(entries, entry{storeType: storeType, config: (*conf.C)(cfg), settings: m})
+		entries = append(entries, entry{storeType: storeType, name: name, config: (*conf.C)(cfg), settings: m})
 	}
 	return entries, nil
+}
+
+// entryName returns the required 'name' of an entry.
+func entryName(m map[string]any) (string, error) {
+	name, ok := m["name"].(string)
+	if !ok || name == "" {
+		return "", errors.New("'name' is required and must be a string")
+	}
+	return name, nil
 }
 
 func decodeEntries(s string) ([]any, error) {
@@ -107,14 +126,21 @@ func decodeEntries(s string) ([]any, error) {
 	return items, nil
 }
 
-// identity returns a hash of the whole entry, credentials included. Equal
-// entries have equal identities. It never leaves the process and is not logged.
+// identity returns a hash of the connection settings, credentials included.
+// Equal connections have equal identities, whatever their name. It never leaves the process and is not logged.
 func (e entry) identity() (string, error) {
 	// encoding/json sorts map keys.
-	b, err := json.Marshal(e.settings)
+	settings := maps.Clone(e.settings)
+	delete(settings, "name")
+	b, err := json.Marshal(settings)
 	if err != nil {
 		return "", fmt.Errorf("cannot compute identity: %w", err)
 	}
 	sum := sha256.Sum256(b)
 	return hex.EncodeToString(sum[:]), nil
+}
+
+// label describes the entry in errors.
+func (e entry) label() string {
+	return fmt.Sprintf("%s %q", e.storeType, e.name)
 }
