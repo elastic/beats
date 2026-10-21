@@ -15,6 +15,8 @@ import (
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	ucfg "github.com/elastic/go-ucfg"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/secretstores"
 )
 
 // referencePattern matches vault://<content>, also inside a longer value, as
@@ -24,16 +26,16 @@ var referencePattern = regexp.MustCompile(`(^|[^A-Za-z0-9+.\-])vault://([A-Za-z0
 
 // Validate checks the references in the monitor config cfg without
 // contacting Vault.
-func (s *store) Validate(cfg *conf.C) error {
+func (s *store) Validate(cfg *conf.C, scope secretstores.Scope) error {
 	m, _, err := referenceSettings(cfg)
 	if err != nil {
 		return err
 	}
 	return walkSettings(m, func(v string) (string, error) {
-		return replaceReferences(v, func(content string) (string, error) {
+		return replaceReferences(v, scope, func(content string) (string, error) {
 			_, _, err := parseReference(content)
 			if err != nil {
-				return "", fmt.Errorf("vault: invalid reference vault://%s: %w", content, err)
+				return "", fmt.Errorf("vault: invalid reference to connection %q: %w", scope.Name, err)
 			}
 			return "", nil
 		})
@@ -42,7 +44,7 @@ func (s *store) Validate(cfg *conf.C) error {
 
 // Replace returns a copy of the monitor config cfg with the vault references
 // replaced by their values. Without references, cfg is returned as is.
-func (s *store) Replace(ctx context.Context, cfg *conf.C) (*conf.C, error) {
+func (s *store) Replace(ctx context.Context, cfg *conf.C, scope secretstores.Scope) (*conf.C, error) {
 	m, resolveErr, err := referenceSettings(cfg)
 	if err != nil {
 		return nil, err
@@ -55,7 +57,7 @@ func (s *store) Replace(ctx context.Context, cfg *conf.C) (*conf.C, error) {
 	}
 
 	err = walkSettings(m, func(v string) (string, error) {
-		return replaceReferences(v, func(content string) (string, error) {
+		return replaceReferences(v, scope, func(content string) (string, error) {
 			return s.resolve(ctx, content)
 		})
 	})
@@ -109,16 +111,25 @@ func parseYAMLAsText(_ string, raw []byte) (map[string]any, error) {
 	return obj, yaml.Unmarshal(raw, &obj)
 }
 
-// replaceReferences replaces the references in s with the values returned by
-// resolve, called with the text after "vault://".
-func replaceReferences(s string, resolve func(content string) (string, error)) (string, error) {
+// replaceReferences replaces the references of scope in s with the values
+// returned by resolve, called with the text after "vault://" and the
+// connection name, if any. References of other connections are kept.
+func replaceReferences(s string, scope secretstores.Scope, resolve func(content string) (string, error)) (string, error) {
 	var firstErr error
 	out := referencePattern.ReplaceAllStringFunc(s, func(expr string) string {
 		if firstErr != nil {
 			return expr
 		}
 		sm := referencePattern.FindStringSubmatch(expr)
-		v, err := resolve(sm[2])
+		content, mine, err := scope.Claim(sm[2])
+		if err != nil {
+			firstErr = fmt.Errorf("vault: invalid reference: %w", err)
+			return expr
+		}
+		if !mine {
+			return expr
+		}
+		v, err := resolve(content)
 		if err != nil {
 			firstErr = err
 			return expr

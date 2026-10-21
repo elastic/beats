@@ -13,8 +13,13 @@ import (
 	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/secretstores"
 	ucfg "github.com/elastic/go-ucfg"
 )
+
+// defaultScope is the scope of an entry named "main".
+var defaultScope = secretstores.Scope{Name: "main", AllNames: []string{"main"}}
 
 // newReplaceTestStore returns a store backed by a fake Vault serving
 // app/creds.
@@ -40,13 +45,13 @@ func toBase64(s string) string { return base64.StdEncoding.EncodeToString([]byte
 
 func TestReplaceReferences(t *testing.T) {
 	tests := []struct{ in, want string }{
-		{in: "vault://app#token", want: "<app#token>"},
-		{in: "Bearer vault://app/creds#token", want: "Bearer <app/creds#token>"},
-		{in: "vault://a#b,vault://c#d", want: "<a#b>,<c#d>"},
-		{in: "https://api/?key=vault://kv/app#key&debug=1", want: "https://api/?key=<kv/app#key>&debug=1"},
-		{in: `{"token":"vault://kv/app#token"}`, want: `{"token":"<kv/app#token>"}`},
-		{in: "${HOME}:vault://a#b", want: "${HOME}:<a#b>"},
-		{in: "vault://my%20app#TLS%20Cert", want: "<my%20app#TLS%20Cert>"},
+		{in: "vault://main@app#token", want: "<app#token>"},
+		{in: "Bearer vault://main@app/creds#token", want: "Bearer <app/creds#token>"},
+		{in: "vault://main@a#b,vault://main@c#d", want: "<a#b>,<c#d>"},
+		{in: "https://api/?key=vault://main@kv/app#key&debug=1", want: "https://api/?key=<kv/app#key>&debug=1"},
+		{in: `{"token":"vault://main@kv/app#token"}`, want: `{"token":"<kv/app#token>"}`},
+		{in: "${HOME}:vault://main@a#b", want: "${HOME}:<a#b>"},
+		{in: "vault://main@my%20app#TLS%20Cert", want: "<my%20app#TLS%20Cert>"},
 		{in: "myvault://a#b", want: "myvault://a#b"},
 		{in: "x-vault://a#b", want: "x-vault://a#b"},
 		{in: "other://a#b", want: "other://a#b"},
@@ -55,7 +60,7 @@ func TestReplaceReferences(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.in, func(t *testing.T) {
-			got, err := replaceReferences(tc.in, func(content string) (string, error) { return "<" + content + ">", nil })
+			got, err := replaceReferences(tc.in, defaultScope, func(content string) (string, error) { return "<" + content + ">", nil })
 			require.NoError(t, err, "replacement must not fail")
 			assert.Equal(t, tc.want, got, "unexpected replacement of %q", tc.in)
 		})
@@ -72,10 +77,10 @@ func textSettings(t *testing.T, cfg *conf.C) map[string]any {
 
 func TestReplace(t *testing.T) {
 	t.Setenv("VAULT_TEST_ENV", "from-env")
-	t.Setenv("VAULT_TEST_REF", "vault://app/creds#user")
+	t.Setenv("VAULT_TEST_REF", "vault://main@app/creds#user")
 	s, _ := newReplaceTestStore(t)
-	const user = "vault://app/creds#user"
-	script := "step('login', () => page.fill('#pw', 'vault://app/creds#token'))"
+	const user = "vault://main@app/creds#user"
+	script := "step('login', () => page.fill('#pw', 'vault://main@app/creds#token'))"
 	plainKerberos := toBase64("auth_type: password\nusername: alice\n")
 
 	tests := []struct {
@@ -89,12 +94,12 @@ func TestReplace(t *testing.T) {
 	}{
 		{
 			name: "embedded reference",
-			cfg:  map[string]any{"headers": map[string]any{"Authorization": "Bearer vault://app/creds#token"}},
+			cfg:  map[string]any{"headers": map[string]any{"Authorization": "Bearer vault://main@app/creds#token"}},
 			want: map[string]any{"headers": map[string]any{"Authorization": "Bearer s3cr3t"}},
 		},
 		{
 			name: "secret value is not expanded",
-			cfg:  map[string]any{"v": "vault://app/creds#tricky"},
+			cfg:  map[string]any{"v": "vault://main@app/creds#tricky"},
 			want: map[string]any{"v": "a${b}c"},
 		},
 		{
@@ -104,12 +109,12 @@ func TestReplace(t *testing.T) {
 		},
 		{
 			name: "dotted and nested params",
-			cfg:  map[string]any{"params": map[string]any{"site.url": "vault://app/creds#token", "list": []any{"x=" + user}}},
+			cfg:  map[string]any{"params": map[string]any{"site.url": "vault://main@app/creds#token", "list": []any{"x=" + user}}},
 			want: map[string]any{"params": map[string]any{"site.url": "s3cr3t", "list": []any{"x=bob"}}},
 		},
 		{
 			name: "base64 setting with references is decoded",
-			cfg:  map[string]any{"ntlm": toBase64(`{"domain": "${VAULT_TEST_ENV}", "password": "vault://app/creds#token"}`)},
+			cfg:  map[string]any{"ntlm": toBase64(`{"domain": "${VAULT_TEST_ENV}", "password": "vault://main@app/creds#token"}`)},
 			want: map[string]any{"ntlm": map[string]any{"domain": "from-env", "password": "s3cr3t"}},
 		},
 		{
@@ -149,7 +154,7 @@ func TestReplace(t *testing.T) {
 		},
 		{
 			name:    "missing field",
-			cfg:     map[string]any{"v": "vault://app/creds#nope"},
+			cfg:     map[string]any{"v": "vault://main@app/creds#nope"},
 			wantErr: `vault: field "nope" not found at secret/data/app/creds`,
 		},
 	}
@@ -158,7 +163,7 @@ func TestReplace(t *testing.T) {
 			cfg := newMonitorConfig(t, tc.cfg)
 			before := textSettings(t, cfg)
 
-			got, err := s.Replace(context.Background(), cfg)
+			got, err := s.Replace(context.Background(), cfg, defaultScope)
 			if tc.wantErr != "" {
 				assert.ErrorContains(t, err, tc.wantErr, "replacement must fail")
 				return
@@ -178,7 +183,7 @@ func TestReplace(t *testing.T) {
 }
 
 func TestValidate(t *testing.T) {
-	t.Setenv("VAULT_TEST_BAD_REF", "vault://bad")
+	t.Setenv("VAULT_TEST_BAD_REF", "vault://main@bad")
 	s, fv := newReplaceTestStore(t)
 
 	tests := []struct {
@@ -186,23 +191,42 @@ func TestValidate(t *testing.T) {
 		cfg     map[string]any
 		wantErr string
 	}{
-		{name: "valid", cfg: map[string]any{"target": "vault://app/creds#token"}},
-		{name: "unresolved env", cfg: map[string]any{"target": "${missing.env}:vault://app/creds#token"}},
-		{name: "inline script", cfg: map[string]any{"source": map[string]any{"inline": map[string]any{"script": "'vault://bad'"}}}},
-		{name: "invalid", cfg: map[string]any{"target": "vault://app/creds"}, wantErr: "vault: invalid reference vault://app/creds: must have the form"},
-		{name: "invalid in an environment variable", cfg: map[string]any{"target": "${VAULT_TEST_BAD_REF}"}, wantErr: "invalid reference vault://bad"},
-		{name: "invalid in base64 ntlm", cfg: map[string]any{"ntlm": toBase64("password: vault://bad\n")}, wantErr: "invalid reference vault://bad"},
+		{name: "valid", cfg: map[string]any{"target": "vault://main@app/creds#token"}},
+		{name: "unresolved env", cfg: map[string]any{"target": "${missing.env}:vault://main@app/creds#token"}},
+		{name: "inline script", cfg: map[string]any{"source": map[string]any{"inline": map[string]any{"script": "'vault://main@bad'"}}}},
+		{name: "invalid", cfg: map[string]any{"target": "vault://main@app/creds"}, wantErr: `vault: invalid reference to connection "main": must have the form`},
+		{name: "invalid in an environment variable", cfg: map[string]any{"target": "${VAULT_TEST_BAD_REF}"}, wantErr: `invalid reference to connection "main"`},
+		{name: "invalid in base64 ntlm", cfg: map[string]any{"ntlm": toBase64("password: vault://main@bad\n")}, wantErr: `invalid reference to connection "main"`},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			err := s.Validate(newMonitorConfig(t, tc.cfg))
+			err := s.Validate(newMonitorConfig(t, tc.cfg), defaultScope)
 			if tc.wantErr == "" {
 				assert.NoError(t, err, "config must be valid")
 				return
 			}
 			assert.ErrorContains(t, err, tc.wantErr, "config must be rejected")
+			assert.NotContains(t, err.Error(), "main@", "the error must not echo the reference, it may be a secret")
 		})
 	}
 	logins, reads := fv.counts()
 	assert.Zero(t, logins+reads, "validation must not contact Vault")
+}
+
+func TestReplaceNamedConnections(t *testing.T) {
+	s, _ := newReplaceTestStore(t)
+	scope := secretstores.Scope{Name: "prod", AllNames: []string{"prod", "stg"}}
+	cfg := newMonitorConfig(t, map[string]any{"mine": "vault://prod@app/creds#user", "other": "vault://stg@app/creds#user"})
+
+	got, err := s.Replace(context.Background(), cfg, scope)
+	require.NoError(t, err, "references must resolve")
+	var resolved map[string]any
+	require.NoError(t, got.Unpack(&resolved), "resolved config must unpack")
+	assert.Equal(t, map[string]any{"mine": "bob", "other": "vault://stg@app/creds#user"}, resolved,
+		"only the references naming the entry must be replaced")
+
+	_, err = s.Replace(context.Background(), newMonitorConfig(t, map[string]any{"v": "vault://dev@app/creds#user"}), scope)
+	assert.ErrorContains(t, err, `no entry has the connection name of the reference, available names: "prod", "stg"`, "an unknown connection must fail")
+	assert.NotContains(t, err.Error(), "dev", "the error must not echo the reference, it may be a secret")
+	assert.NoError(t, s.Validate(cfg, scope), "named references must validate")
 }

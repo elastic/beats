@@ -133,10 +133,11 @@ func TestIntegrationHTTPMonitor(t *testing.T) {
 		"name":                  "vault-it",
 		"schedule":              "@every 1m",
 		"urls":                  []string{srv.URL},
-		"check.request.headers": map[string]any{"Authorization": "Bearer vault://" + itPath + "#token"},
+		"check.request.headers": map[string]any{"Authorization": "Bearer vault://main@" + itPath + "#token"},
 		"check.response.status": []int{200},
 		secretstores.ConfigKey: []any{map[string]any{
 			"type":    storeType,
+			"name":    "main",
 			"address": itAddress(),
 			"auth":    map[string]any{"approle": map[string]any{"role_id": fx.roleID, "secret_id": fx.secretID}},
 		}},
