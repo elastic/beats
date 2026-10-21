@@ -50,8 +50,8 @@ func TestScopes(t *testing.T) {
 		{storeType: "b", name: "only"},
 	}
 	assert.Equal(t, []Scope{
-		{Name: "y", Names: []string{"x", "y"}},
-		{Name: "x", Names: []string{"x", "y"}},
-		{Name: "only", Names: []string{"only"}},
+		{Name: "y", AllNames: []string{"x", "y"}},
+		{Name: "x", AllNames: []string{"x", "y"}},
+		{Name: "only", AllNames: []string{"only"}},
 	}, scopes(entries), "unexpected scopes")
 }

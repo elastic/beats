@@ -31,8 +31,8 @@ import (
 type Scope struct {
 	// Name is the name of the entry.
 	Name string
-	// Names are the names of all the entries of the type.
-	Names []string
+	// AllNames are the names of all the entries of the type, Name included.
+	AllNames []string
 }
 
 // SplitName splits the content of a reference into its connection name and
@@ -46,12 +46,10 @@ func SplitName(content string) (name, rest string, hasName bool) {
 	return content[:end], content[end+1:], true
 }
 
-// SelectionError is returned by Claim when no entry can resolve a reference.
-// The fault is in the reference or in the list of entries, not in the entry
-// that reported it.
-type SelectionError struct{ error }
-
-func (e *SelectionError) Unwrap() error { return e.error }
+// ErrSelection is wrapped by the errors of Claim for references that no entry
+// can resolve. The fault is in the reference or in the list of entries, not in
+// the entry that reported it.
+var ErrSelection = errors.New("invalid connection selection")
 
 // Claim reports whether the reference with the given content belongs to the
 // scope, and returns the content without the connection name. It fails for
@@ -59,22 +57,22 @@ func (e *SelectionError) Unwrap() error { return e.error }
 func (s Scope) Claim(content string) (rest string, mine bool, err error) {
 	rawName, rest, hasName := SplitName(content)
 	if !hasName {
-		return "", false, &SelectionError{fmt.Errorf("the reference must name its connection, as <scheme>://<name>@..., one of %s", quoteAll(s.Names))}
+		return "", false, fmt.Errorf("%w: the reference must name its connection, as <scheme>://<name>@..., one of %s", ErrSelection, quoteAll(s.AllNames))
 	}
 
 	name, err := url.PathUnescape(rawName)
 	if err != nil {
-		return "", false, fmt.Errorf("invalid connection name: %w", err)
+		return "", false, errors.New("invalid percent-encoding in connection name")
 	}
 	switch {
 	case name == "":
-		return "", false, &SelectionError{errors.New("empty connection name")}
+		return "", false, fmt.Errorf("%w: empty connection name", ErrSelection)
 	case name == s.Name:
 		return rest, true, nil
-	case slices.Contains(s.Names, name):
+	case slices.Contains(s.AllNames, name):
 		return "", false, nil
 	}
-	return "", false, &SelectionError{fmt.Errorf("no entry has the name %q, available names: %s", name, quoteAll(s.Names))}
+	return "", false, fmt.Errorf("%w: no entry has the connection name of the reference, available names: %s", ErrSelection, quoteAll(s.AllNames))
 }
 
 func quoteAll(names []string) string {
@@ -96,7 +94,7 @@ func scopes(entries []entry) []Scope {
 	}
 	out := make([]Scope, len(entries))
 	for i, e := range entries {
-		out[i] = Scope{Name: e.name, Names: names[e.storeType]}
+		out[i] = Scope{Name: e.name, AllNames: names[e.storeType]}
 	}
 	return out
 }

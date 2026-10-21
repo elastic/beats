@@ -60,7 +60,7 @@ func (r *Resolver) Resolve(cfg *conf.C) (*conf.C, error) {
 			return nil, err
 		}
 		if resolved, err = s.Replace(ctx, resolved, scopes[i]); err != nil {
-			if isSelectionError(err) {
+			if errors.Is(err, ErrSelection) {
 				return nil, fmt.Errorf("%s: %w", ConfigKey, err)
 			}
 			return nil, fmt.Errorf("could not resolve %s secret references: %w", e.label(), err)
@@ -89,7 +89,7 @@ func (r *Resolver) Validate(cfg *conf.C) error {
 			return err
 		}
 		if err := s.Validate(monitorCfg, scopes[i]); err != nil {
-			if isSelectionError(err) {
+			if errors.Is(err, ErrSelection) {
 				return fmt.Errorf("%s: %w", ConfigKey, err)
 			}
 			return fmt.Errorf("invalid %s secret references: %w", e.label(), err)
@@ -123,9 +123,4 @@ func withoutSecretStores(cfg *conf.C) (*conf.C, error) {
 		return nil, fmt.Errorf("could not remove %s: %w", ConfigKey, err)
 	}
 	return c, nil
-}
-
-func isSelectionError(err error) bool {
-	var se *SelectionError
-	return errors.As(err, &se)
 }

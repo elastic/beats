@@ -8,7 +8,6 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"net/url"
 	"regexp"
 	"strings"
 
@@ -36,7 +35,7 @@ func (s *store) Validate(cfg *conf.C, scope secretstores.Scope) error {
 		return replaceReferences(v, scope, func(content string) (string, error) {
 			_, _, err := parseReference(content)
 			if err != nil {
-				return "", fmt.Errorf("vault: invalid reference vault://%s@%s: %w", url.PathEscape(scope.Name), content, err)
+				return "", fmt.Errorf("vault: invalid reference to connection %q: %w", scope.Name, err)
 			}
 			return "", nil
 		})
@@ -124,7 +123,7 @@ func replaceReferences(s string, scope secretstores.Scope, resolve func(content 
 		sm := referencePattern.FindStringSubmatch(expr)
 		content, mine, err := scope.Claim(sm[2])
 		if err != nil {
-			firstErr = fmt.Errorf("vault: invalid reference vault://%s: %w", sm[2], err)
+			firstErr = fmt.Errorf("vault: invalid reference: %w", err)
 			return expr
 		}
 		if !mine {

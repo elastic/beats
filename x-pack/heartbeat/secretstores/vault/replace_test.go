@@ -19,7 +19,7 @@ import (
 )
 
 // defaultScope is the scope of an entry named "main".
-var defaultScope = secretstores.Scope{Name: "main", Names: []string{"main"}}
+var defaultScope = secretstores.Scope{Name: "main", AllNames: []string{"main"}}
 
 // newReplaceTestStore returns a store backed by a fake Vault serving
 // app/creds.
@@ -194,9 +194,9 @@ func TestValidate(t *testing.T) {
 		{name: "valid", cfg: map[string]any{"target": "vault://main@app/creds#token"}},
 		{name: "unresolved env", cfg: map[string]any{"target": "${missing.env}:vault://main@app/creds#token"}},
 		{name: "inline script", cfg: map[string]any{"source": map[string]any{"inline": map[string]any{"script": "'vault://main@bad'"}}}},
-		{name: "invalid", cfg: map[string]any{"target": "vault://main@app/creds"}, wantErr: "vault: invalid reference vault://main@app/creds: must have the form"},
-		{name: "invalid in an environment variable", cfg: map[string]any{"target": "${VAULT_TEST_BAD_REF}"}, wantErr: "invalid reference vault://main@bad"},
-		{name: "invalid in base64 ntlm", cfg: map[string]any{"ntlm": toBase64("password: vault://main@bad\n")}, wantErr: "invalid reference vault://main@bad"},
+		{name: "invalid", cfg: map[string]any{"target": "vault://main@app/creds"}, wantErr: `vault: invalid reference to connection "main": must have the form`},
+		{name: "invalid in an environment variable", cfg: map[string]any{"target": "${VAULT_TEST_BAD_REF}"}, wantErr: `invalid reference to connection "main"`},
+		{name: "invalid in base64 ntlm", cfg: map[string]any{"ntlm": toBase64("password: vault://main@bad\n")}, wantErr: `invalid reference to connection "main"`},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -206,6 +206,7 @@ func TestValidate(t *testing.T) {
 				return
 			}
 			assert.ErrorContains(t, err, tc.wantErr, "config must be rejected")
+			assert.NotContains(t, err.Error(), "main@", "the error must not echo the reference, it may be a secret")
 		})
 	}
 	logins, reads := fv.counts()
@@ -214,7 +215,7 @@ func TestValidate(t *testing.T) {
 
 func TestReplaceNamedConnections(t *testing.T) {
 	s, _ := newReplaceTestStore(t)
-	scope := secretstores.Scope{Name: "prod", Names: []string{"prod", "stg"}}
+	scope := secretstores.Scope{Name: "prod", AllNames: []string{"prod", "stg"}}
 	cfg := newMonitorConfig(t, map[string]any{"mine": "vault://prod@app/creds#user", "other": "vault://stg@app/creds#user"})
 
 	got, err := s.Replace(context.Background(), cfg, scope)
@@ -225,6 +226,7 @@ func TestReplaceNamedConnections(t *testing.T) {
 		"only the references naming the entry must be replaced")
 
 	_, err = s.Replace(context.Background(), newMonitorConfig(t, map[string]any{"v": "vault://dev@app/creds#user"}), scope)
-	assert.ErrorContains(t, err, `no entry has the name "dev"`, "an unknown connection must fail")
+	assert.ErrorContains(t, err, `no entry has the connection name of the reference, available names: "prod", "stg"`, "an unknown connection must fail")
+	assert.NotContains(t, err.Error(), "dev", "the error must not echo the reference, it may be a secret")
 	assert.NoError(t, s.Validate(cfg, scope), "named references must validate")
 }

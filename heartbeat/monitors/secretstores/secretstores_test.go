@@ -422,7 +422,7 @@ func TestResolveNamedEntries(t *testing.T) {
 			name:    "unknown name",
 			stores:  stores,
 			cfg:     map[string]any{"a": "fake:dev@x"},
-			wantErr: `no entry has the name "dev", available names: "prod", "stg"`,
+			wantErr: `no entry has the connection name of the reference, available names: "prod", "stg"`,
 		},
 		{
 			name:   "name is percent-encoded",
@@ -451,6 +451,8 @@ func TestResolveNamedEntries(t *testing.T) {
 			if tc.wantErr != "" {
 				assert.ErrorContains(t, verr, tc.wantErr, "validation must fail")
 				assert.ErrorContains(t, err, tc.wantErr, "resolution must fail")
+				assert.ErrorIs(t, verr, ErrSelection, "validation must report a selection error")
+				assert.ErrorIs(t, err, ErrSelection, "resolution must report a selection error")
 				return
 			}
 			require.NoError(t, verr, "validation must pass")

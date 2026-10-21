@@ -6,7 +6,6 @@ package vault
 
 import (
 	"errors"
-	"fmt"
 	"net/url"
 	"strings"
 )
@@ -30,7 +29,7 @@ func parseReference(content string) (path, field string, err error) {
 	}
 	path, err = url.PathUnescape(rawPath)
 	if err != nil {
-		return "", "", fmt.Errorf("invalid path: %w", err)
+		return "", "", errors.New("invalid percent-encoding in path")
 	}
 	path = strings.Trim(path, "/")
 	for segment := range strings.SplitSeq(path, "/") {
@@ -40,7 +39,7 @@ func parseReference(content string) (path, field string, err error) {
 	}
 	field, err = url.PathUnescape(rawField)
 	if err != nil {
-		return "", "", fmt.Errorf("invalid field: %w", err)
+		return "", "", errors.New("invalid percent-encoding in field")
 	}
 	if path == "" || field == "" {
 		return "", "", errors.New("empty path or field")
