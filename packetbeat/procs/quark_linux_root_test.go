@@ -33,22 +33,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
-// quarkTestDialEnv makes the re-executed test binary act as a
-// short-lived client: dial the address, then exit immediately.
-const quarkTestDialEnv = "QUARK_TEST_DIAL"
-
-func TestMain(m *testing.M) {
-	if addr := os.Getenv(quarkTestDialEnv); addr != "" {
-		conn, err := net.Dial("tcp", addr)
-		if err != nil {
-			os.Exit(1)
-		}
-		conn.Close()
-		os.Exit(0)
-	}
-	os.Exit(m.Run())
-}
-
 // TestQuarkShortLivedConnection is the elastic/beats#51125 regression
 // test against a real quark queue: a short-lived child process makes a
 // TCP connection and exits; the connection must still resolve to the
@@ -87,15 +71,7 @@ func TestQuarkShortLivedConnection(t *testing.T) {
 		conn.Close()
 	}()
 
-	// Re-execute the test binary as a short-lived client and wait for
-	// it to exit, so that its socket and /proc entry are gone.
-	exe, err := os.Executable()
-	require.NoError(t, err)
-	cmd := exec.Command(exe)
-	cmd.Env = append(os.Environ(), quarkTestDialEnv+"="+listener.Addr().String())
-	require.NoError(t, cmd.Start())
-	childPid := cmd.Process.Pid
-	require.NoError(t, cmd.Wait())
+	childPid := dialAndExit(t, listener.Addr())
 
 	var childAddr *net.TCPAddr
 	select {
@@ -136,4 +112,34 @@ func TestQuarkShortLivedConnection(t *testing.T) {
 	// process, which is still alive.
 	dst := proc.FindProcessesTupleTCP(tuple).Dst
 	assert.Equal(t, os.Getpid(), dst.PID, "server side must resolve to the test process")
+}
+
+// dialAndExit re-executes the test binary as a short-lived client that
+// connects to addr and exits immediately, waits for it to exit so that
+// its socket and /proc entry are gone, and returns its PID.
+func dialAndExit(t *testing.T, addr net.Addr) int {
+	t.Helper()
+	exe, err := os.Executable()
+	require.NoError(t, err)
+	cmd := exec.Command(exe)
+	cmd.Env = append(os.Environ(), quarkTestDialEnv+"="+addr.String())
+	require.NoError(t, cmd.Start())
+	require.NoError(t, cmd.Wait())
+	return cmd.Process.Pid
+}
+
+// quarkTestDialEnv makes the re-executed test binary act as the
+// short-lived client for dialAndExit: dial the address, then exit.
+const quarkTestDialEnv = "QUARK_TEST_DIAL"
+
+func TestMain(m *testing.M) {
+	if addr := os.Getenv(quarkTestDialEnv); addr != "" {
+		conn, err := net.Dial("tcp", addr)
+		if err != nil {
+			os.Exit(1)
+		}
+		conn.Close()
+		os.Exit(0)
+	}
+	os.Exit(m.Run())
 }

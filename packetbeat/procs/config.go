@@ -22,27 +22,64 @@ import (
 	"time"
 )
 
-// Backend values for ProcsConfig.Backend.
+// Backend selects how connections are resolved to processes. It is
+// represented by a string in the configuration. Values are ordered by
+// how strongly they request kernel tracing, so that when several
+// streams ask for different backends the strongest can be chosen with
+// max.
+type Backend int
+
 const (
 	// BackendProcfs resolves ports to processes by polling the OS
 	// socket table (/proc on Linux, IP Helper on Windows). This is
 	// the default. Lookups for sockets that already closed fail.
-	BackendProcfs = "procfs"
+	BackendProcfs Backend = iota
+
+	// BackendAuto tries kernel_tracing and silently falls back to
+	// procfs when it is unavailable.
+	BackendAuto
 
 	// BackendKernelTracing tracks socket and process lifecycle with
 	// quark (eBPF), so short-lived connections can be resolved even
 	// after their socket closed. Linux amd64/arm64 only; initialization
 	// fails on other systems or when eBPF is unavailable.
-	BackendKernelTracing = "kernel_tracing"
-
-	// BackendAuto tries kernel_tracing and silently falls back to
-	// procfs when it is unavailable.
-	BackendAuto = "auto"
+	BackendKernelTracing
 )
+
+var backendNames = [...]string{
+	BackendProcfs:        "procfs",
+	BackendAuto:          "auto",
+	BackendKernelTracing: "kernel_tracing",
+}
+
+// String returns the configuration name of the backend.
+func (b Backend) String() string {
+	if b < 0 || int(b) >= len(backendNames) {
+		return fmt.Sprintf("Backend(%d)", int(b))
+	}
+	return backendNames[b]
+}
+
+// Unpack implements go-ucfg's StringUnpacker. An empty string selects
+// the default, procfs.
+func (b *Backend) Unpack(s string) error {
+	if s == "" {
+		*b = BackendProcfs
+		return nil
+	}
+	for i, name := range backendNames {
+		if s == name {
+			*b = Backend(i)
+			return nil
+		}
+	}
+	return fmt.Errorf("invalid procs backend %q: must be one of %s, %s or %s",
+		s, BackendProcfs, BackendKernelTracing, BackendAuto)
+}
 
 type ProcsConfig struct {
 	Enabled         bool          `config:"enabled"`
-	Backend         string        `config:"backend"`
+	Backend         Backend       `config:"backend"`
 	MaxProcReadFreq time.Duration `config:"max_proc_read_freq"`
 	Monitored       []ProcConfig  `config:"monitored"`
 	RefreshPidsFreq time.Duration `config:"refresh_pids_freq"`
@@ -78,14 +115,4 @@ func GraceTimeForFlows(timeout, period time.Duration) time.Duration {
 type ProcConfig struct {
 	Process     string `config:"process"`
 	CmdlineGrep string `config:"cmdline_grep"`
-}
-
-// Validate validates the ProcsConfig. It is called by go-ucfg on Unpack.
-func (c *ProcsConfig) Validate() error {
-	switch c.Backend {
-	case "", BackendProcfs, BackendKernelTracing, BackendAuto:
-		return nil
-	}
-	return fmt.Errorf("invalid procs backend %q: must be one of %s, %s or %s",
-		c.Backend, BackendProcfs, BackendKernelTracing, BackendAuto)
 }

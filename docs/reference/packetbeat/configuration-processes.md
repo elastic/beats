@@ -36,8 +36,10 @@ When the process monitor is enabled, it will enrich all the events whose source 
 The mechanism used to resolve connections to processes. The following values are supported:
 
 * `procfs` (default): Look the socket up in the OS socket table (`/proc` on Linux, the IP Helper API on Windows). Short-lived connections whose socket already closed at lookup time cannot be resolved.
-* `kernel_tracing`: Track socket and process lifecycle with [quark](https://github.com/elastic/quark) using eBPF, so TCP connections are resolved reliably even after their socket closed. This backend is only available on Linux amd64/arm64 and falls back to the `procfs` mechanism for UDP and for connections not yet seen by the kernel tracer. Packetbeat fails to start when this backend is requested but unavailable.
-* `auto`: Use `kernel_tracing` when available, and silently fall back to `procfs` otherwise.
+* `kernel_tracing`: Track socket and process lifecycle with [quark](https://github.com/elastic/quark) using eBPF, so TCP connections are resolved reliably even after their socket closed. This backend is only available on Linux amd64/arm64. Packetbeat fails to start when this backend is requested but the kernel tracer cannot be started.
+* `auto`: The same as `kernel_tracing` when the kernel tracer can be started. Otherwise Packetbeat logs a warning and runs with `procfs` instead of failing to start.
+
+With both `kernel_tracing` and `auto`, UDP connections and TCP connections that the kernel tracer has not seen yet are still looked up with the `procfs` mechanism.
 
 Example configuration:
 

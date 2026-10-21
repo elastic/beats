@@ -29,6 +29,6 @@ import (
 // newTupleWatcher returns an error: the kernel_tracing backend is
 // backed by quark, which is only available on Linux amd64/arm64 and
 // needs cgo.
-func newTupleWatcher(_ time.Duration, _ *logp.Logger) (tupleWatcher, error) {
+func newTupleWatcher(time.Duration, *logp.Logger) (tupleWatcher, error) {
 	return nil, errors.New("kernel_tracing is only available on Linux amd64/arm64 with cgo")
 }

@@ -20,6 +20,7 @@
 package procs
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/netip"
@@ -59,10 +60,12 @@ type quarkWatcher struct {
 	// mu serializes access to queue: quark queues are not safe for
 	// concurrent use, and all state, including the caches consulted
 	// by findProcTuple, is mutated inside GetEvent.
-	mu     sync.Mutex
-	queue  quarkQueue
-	closed bool
-	done   chan struct{}
+	mu    sync.Mutex
+	queue quarkQueue
+	// ctx is cancelled when the watcher is closed or the pump stops;
+	// findProcTuple returns nil once it is done.
+	ctx    context.Context
+	cancel context.CancelFunc
 	logger *logp.Logger
 }
 
@@ -86,9 +89,11 @@ func newTupleWatcher(grace time.Duration, logger *logp.Logger) (tupleWatcher, er
 // newQuarkWatcher starts a watcher driving queue. It is split from
 // newTupleWatcher so tests can inject a fake queue.
 func newQuarkWatcher(queue quarkQueue, logger *logp.Logger) *quarkWatcher {
+	ctx, cancel := context.WithCancel(context.Background())
 	w := &quarkWatcher{
 		queue:  queue,
-		done:   make(chan struct{}),
+		ctx:    ctx,
+		cancel: cancel,
 		logger: logger,
 	}
 	go w.pump()
@@ -97,20 +102,17 @@ func newQuarkWatcher(queue quarkQueue, logger *logp.Logger) *quarkWatcher {
 
 // pump drives the quark queue until the watcher is closed. The events
 // themselves are discarded; GetEvent is called for its side effect of
-// updating quark's socket and process caches.
+// updating quark's socket and process caches. The queue is closed
+// when pump returns, and the context cancelled so that lookups stop
+// even if pump stopped on its own.
 func (w *quarkWatcher) pump() {
 	defer func() {
 		w.mu.Lock()
+		w.cancel()
 		w.queue.Close()
-		w.closed = true
 		w.mu.Unlock()
 	}()
-	for {
-		select {
-		case <-w.done:
-			return
-		default:
-		}
+	for w.ctx.Err() == nil {
 		w.mu.Lock()
 		_, ok := w.queue.GetEvent()
 		w.mu.Unlock()
@@ -123,9 +125,10 @@ func (w *quarkWatcher) pump() {
 	}
 }
 
-// close stops the watcher. Lookups made after close return nil.
+// close stops the watcher. Lookups made after close return nil. It is
+// safe to call close more than once.
 func (w *quarkWatcher) close() {
-	close(w.done)
+	w.cancel()
 }
 
 // findProcTuple returns process information for the TCP connection
@@ -144,7 +147,7 @@ func (w *quarkWatcher) findProcTuple(localIP net.IP, localPort uint16, remoteIP 
 
 	w.mu.Lock()
 	defer w.mu.Unlock()
-	if w.closed {
+	if w.ctx.Err() != nil {
 		return nil
 	}
 	socket, ok := w.queue.SocketLookup(local, remote)

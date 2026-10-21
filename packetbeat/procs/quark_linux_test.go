@@ -20,6 +20,7 @@
 package procs
 
 import (
+	"errors"
 	"net"
 	"net/netip"
 	"testing"
@@ -38,9 +39,10 @@ import (
 // tables. All methods except Block are only called while holding the
 // quarkWatcher mutex, so no synchronization is needed.
 type fakeQuarkQueue struct {
-	sockets map[socketKey]quark.Socket
-	procs   map[int]quark.Process
-	closed  chan struct{}
+	sockets  map[socketKey]quark.Socket
+	procs    map[int]quark.Process
+	blockErr error // returned by Block, to make the pump stop.
+	closed   chan struct{}
 }
 
 type socketKey struct {
@@ -64,7 +66,7 @@ func (q *fakeQuarkQueue) GetEvent() (quark.Event, bool) { return quark.Event{}, 
 
 func (q *fakeQuarkQueue) Block() error {
 	time.Sleep(time.Millisecond)
-	return nil
+	return q.blockErr
 }
 
 func (q *fakeQuarkQueue) Lookup(pid int) (quark.Process, bool) {
@@ -360,13 +362,37 @@ func TestQuarkWatcherClose(t *testing.T) {
 	assert.Equal(t, 1234, p.pid)
 
 	w.close()
-	// The pump closes the queue and marks the watcher closed.
+	// Lookups fail as soon as the watcher is closed, before the pump
+	// has necessarily noticed.
+	assert.Nil(t, w.findProcTuple(net.ParseIP("127.0.0.1"), 34000, net.ParseIP("127.0.0.1"), 80), "lookups must fail after close")
+	// The pump closes the queue.
 	select {
 	case <-fake.closed:
 	case <-time.After(10 * time.Second):
 		t.Fatal("quark queue was not closed")
 	}
-	require.Eventually(t, func() bool {
-		return w.findProcTuple(net.ParseIP("127.0.0.1"), 34000, net.ParseIP("127.0.0.1"), 80) == nil
-	}, 10*time.Second, 10*time.Millisecond, "lookups must fail after close")
+	// Closing again is a no-op.
+	w.close()
+}
+
+func TestQuarkWatcherPumpFailure(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "procs")
+
+	fake := newFakeQuarkQueue()
+	fake.procs[1234] = quark.Process{Pid: 1234, Comm: "closer"}
+	local := netip.MustParseAddrPort("127.0.0.1:34000")
+	remote := netip.MustParseAddrPort("127.0.0.1:80")
+	fake.addSocket(local, remote, quark.Socket{PidOrigin: 1234})
+	fake.blockErr = errors.New("boom")
+
+	w := newQuarkWatcher(fake, logger)
+	// When the pump stops on its own it closes the queue, and lookups
+	// must not touch the closed queue.
+	select {
+	case <-fake.closed:
+	case <-time.After(10 * time.Second):
+		t.Fatal("quark queue was not closed")
+	}
+	assert.Nil(t, w.findProcTuple(net.ParseIP("127.0.0.1"), 34000, net.ParseIP("127.0.0.1"), 80), "lookups must fail after the pump stopped")
+	w.close()
 }

@@ -30,18 +30,30 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
-func TestProcsConfigValidate(t *testing.T) {
-	for _, backend := range []string{"", BackendProcfs, BackendKernelTracing, BackendAuto} {
-		cfg := ProcsConfig{Backend: backend}
-		assert.NoError(t, cfg.Validate(), "backend %q must be valid", backend)
+func TestBackendUnpack(t *testing.T) {
+	for name, want := range map[string]Backend{
+		"":               BackendProcfs,
+		"procfs":         BackendProcfs,
+		"auto":           BackendAuto,
+		"kernel_tracing": BackendKernelTracing,
+	} {
+		c := conf.MustNewConfigFrom(map[string]any{"enabled": true, "backend": name})
+		var unpacked ProcsConfig
+		require.NoError(t, c.Unpack(&unpacked), "backend %q must be valid", name)
+		assert.Equal(t, want, unpacked.Backend, "backend %q", name)
+		if name != "" {
+			assert.Equal(t, name, want.String())
+		}
 	}
 
-	cfg := ProcsConfig{Backend: "ptrace"}
-	assert.ErrorContains(t, cfg.Validate(), `invalid procs backend "ptrace"`)
-
-	// Validate is invoked by Unpack.
-	c := conf.MustNewConfigFrom(map[string]any{"enabled": true, "backend": "nonsense"})
+	// The zero value is the default backend.
 	var unpacked ProcsConfig
+	require.NoError(t, conf.MustNewConfigFrom(map[string]any{"enabled": true}).Unpack(&unpacked))
+	assert.Equal(t, BackendProcfs, unpacked.Backend)
+
+	var b Backend
+	assert.ErrorContains(t, b.Unpack("ptrace"), `invalid procs backend "ptrace"`)
+	c := conf.MustNewConfigFrom(map[string]any{"enabled": true, "backend": "nonsense"})
 	assert.ErrorContains(t, c.Unpack(&unpacked), "invalid procs backend")
 }
 

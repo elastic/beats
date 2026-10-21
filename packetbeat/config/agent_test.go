@@ -105,20 +105,17 @@ streams:
 	require.Equal(t, procs.BackendAuto, config.Procs.Backend)
 }
 
-func TestMergeProcsBackend(t *testing.T) {
+func TestMergeProcsConfigBackend(t *testing.T) {
 	for _, tc := range []struct {
-		one, two, want string
+		one, two, want procs.Backend
 	}{
-		{"", "", ""},
-		{procs.BackendProcfs, "", procs.BackendProcfs},
-		{"", procs.BackendProcfs, procs.BackendProcfs},
+		{procs.BackendProcfs, procs.BackendProcfs, procs.BackendProcfs},
 		{procs.BackendProcfs, procs.BackendAuto, procs.BackendAuto},
 		{procs.BackendAuto, procs.BackendProcfs, procs.BackendAuto},
 		{procs.BackendAuto, procs.BackendKernelTracing, procs.BackendKernelTracing},
-		{procs.BackendKernelTracing, "", procs.BackendKernelTracing},
-		{procs.BackendProcfs, procs.BackendProcfs, procs.BackendProcfs},
+		{procs.BackendKernelTracing, procs.BackendProcfs, procs.BackendKernelTracing},
 	} {
-		require.Equal(t, tc.want, mergeProcsBackend(tc.one, tc.two),
-			"mergeProcsBackend(%q, %q)", tc.one, tc.two)
+		got := mergeProcsConfig(procs.ProcsConfig{Backend: tc.one}, procs.ProcsConfig{Backend: tc.two})
+		require.Equal(t, tc.want, got.Backend, "merge(%s, %s)", tc.one, tc.two)
 	}
 }
