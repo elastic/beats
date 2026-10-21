@@ -45,15 +45,15 @@ type ebpfReader struct {
 }
 
 func (r *ebpfReader) Start(done <-chan struct{}) (<-chan Event, error) {
-	watcher, err := ebpf.GetWatcher()
-	if err != nil {
-		return nil, err
-	}
-	r.watcher = watcher
+	r.watcher = ebpf.GetWatcher()
 	r.done = done
 
 	mask := ebpf.EventMask(ebpfevents.EventTypeFileCreate | ebpfevents.EventTypeFileRename | ebpfevents.EventTypeFileDelete | ebpfevents.EventTypeFileModify)
-	r._records = r.watcher.Subscribe(clientName, mask)
+	var err error
+	r._records, err = r.watcher.Subscribe(clientName, mask)
+	if err != nil {
+		return nil, err
+	}
 
 	// The loader falls back when some of its programs fail to load on this kernel. It
 	// keeps running, but events only the dropped programs emit are lost.
