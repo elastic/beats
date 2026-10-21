@@ -21,12 +21,19 @@ type auditbeatReceiver struct {
 }
 
 func (ab *auditbeatReceiver) Start(ctx context.Context, host component.Host) error {
+<<<<<<< HEAD
 	ab.wg.Go(func() {
 		ab.Logger.Info("starting auditbeat receiver")
 		if err := ab.BeatReceiver.Start(host); err != nil {
 			ab.Logger.Error("error starting auditbeat receiver", zap.Error(err))
 		}
 	})
+=======
+	ab.Logger.Info("starting auditbeat receiver")
+	if err := ab.BeatReceiver.Start(ctx, host); err != nil {
+		return fmt.Errorf("error starting auditbeat receiver: %w", err)
+	}
+>>>>>>> 36c8c4f (Correctly set useragent field in otel mode (#53654))
 	return nil
 }
 

@@ -21,12 +21,20 @@ type metricbeatReceiver struct {
 }
 
 func (mb *metricbeatReceiver) Start(ctx context.Context, host component.Host) error {
+<<<<<<< HEAD
 	mb.wg.Go(func() {
 		mb.Logger.Info("starting metricbeat receiver")
 		if err := mb.BeatReceiver.Start(host); err != nil {
 			mb.Logger.Error("error starting metricbeat receiver", zap.Error(err))
 		}
 	})
+=======
+	mb.Logger.Info("starting metricbeat receiver")
+	if err := mb.BeatReceiver.Start(ctx, host); err != nil {
+		return fmt.Errorf("error starting metricbeat receiver: %w", err)
+	}
+
+>>>>>>> 36c8c4f (Correctly set useragent field in otel mode (#53654))
 	return nil
 }
 

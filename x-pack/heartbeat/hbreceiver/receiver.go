@@ -21,12 +21,24 @@ type heartbeatReceiver struct {
 }
 
 func (hb *heartbeatReceiver) Start(ctx context.Context, host component.Host) error {
+<<<<<<< HEAD
 	hb.wg.Go(func() {
 		hb.Logger.Info("starting heartbeat receiver")
 		if err := hb.BeatReceiver.Start(host); err != nil {
 			hb.Logger.Error("error starting heartbeat receiver", zap.Error(err))
 		}
 	})
+=======
+	hb.Logger.Info("starting heartbeat receiver")
+
+	releaseCancellation := context.AfterFunc(ctx, hb.cancel)
+	defer releaseCancellation()
+
+	if err := hb.BeatReceiver.Start(ctx, host); err != nil {
+		return fmt.Errorf("starting heartbeat receiver: %w", err)
+	}
+
+>>>>>>> 36c8c4f (Correctly set useragent field in otel mode (#53654))
 	return nil
 }
 

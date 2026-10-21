@@ -21,12 +21,19 @@ type packetbeatReceiver struct {
 }
 
 func (pb *packetbeatReceiver) Start(ctx context.Context, host component.Host) error {
+<<<<<<< HEAD
 	pb.wg.Go(func() {
 		pb.Logger.Info("starting packetbeat receiver")
 		if err := pb.BeatReceiver.Start(host); err != nil {
 			pb.Logger.Error("error starting packetbeat receiver", zap.Error(err))
 		}
 	})
+=======
+	pb.Logger.Info("starting packetbeat receiver")
+	if err := pb.BeatReceiver.Start(ctx, host); err != nil {
+		return fmt.Errorf("error starting packetbeat receiver: %w", err)
+	}
+>>>>>>> 36c8c4f (Correctly set useragent field in otel mode (#53654))
 	return nil
 }
 
