@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"maps"
 	"slices"
+	"strconv"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
@@ -105,18 +106,24 @@ var (
 		}, c.DictOptional),
 	}, c.DictOptional)
 
+	// `serverless.*` only exists on Serverless projects. `min_search_vcu` is collected as a string
+	// like its siblings and converted to a number afterwards by normalizeMinSearchVCU, because
+	// Elasticsearch returns it as a string and `-1` has to be dropped after scope precedence.
+	serverlessSchema = c.Dict("serverless", s.Schema{
+		"search": c.Dict("search", s.Schema{
+			"boost_window":     c.Str("boost_window", s.IgnoreAllErrors),
+			"search_power_max": c.Str("search_power_max", s.IgnoreAllErrors),
+			"search_power_min": c.Str("search_power_min", s.IgnoreAllErrors),
+			"min_search_vcu":   c.Str("min_search_vcu", s.IgnoreAllErrors),
+		}, c.DictOptional),
+	}, c.DictOptional)
+
 	schema = s.Schema{
 		"defaults": c.Dict("defaults", s.Schema{
 			"path": c.Dict("path", s.Schema{
 				"data": c.Ifc("data", s.Optional),
 			}, c.DictOptional),
-			"serverless": c.Dict("serverless", s.Schema{
-				"search": c.Dict("search", s.Schema{
-					"boost_window":     c.Str("boost_window", s.IgnoreAllErrors),
-					"search_power_max": c.Str("search_power_max", s.IgnoreAllErrors),
-					"search_power_min": c.Str("search_power_min", s.IgnoreAllErrors),
-				}, c.DictOptional),
-			}, c.DictOptional),
+			"serverless": serverlessSchema,
 			"discovery":  discoverySchema,
 			"processors": c.Str("processors", s.IgnoreAllErrors),
 			"cluster":    clusterSchema,
@@ -172,13 +179,7 @@ var (
 			"action": actionSchema,
 		}, c.DictRequired),
 		"persistent": c.Dict("persistent", s.Schema{
-			"serverless": c.Dict("serverless", s.Schema{
-				"search": c.Dict("search", s.Schema{
-					"boost_window":     c.Str("boost_window", s.IgnoreAllErrors),
-					"search_power_max": c.Str("search_power_max", s.IgnoreAllErrors),
-					"search_power_min": c.Str("search_power_min", s.IgnoreAllErrors),
-				}, c.DictOptional),
-			}, c.DictOptional),
+			"serverless": serverlessSchema,
 			"discovery":  discoverySchema,
 			"processors": c.Str("processors", s.IgnoreAllErrors),
 			"cluster":    clusterSchema,
@@ -213,13 +214,7 @@ var (
 			"action": actionSchema,
 		}, c.DictOptional),
 		"transient": c.Dict("transient", s.Schema{
-			"serverless": c.Dict("serverless", s.Schema{
-				"search": c.Dict("search", s.Schema{
-					"boost_window":     c.Str("boost_window", s.IgnoreAllErrors),
-					"search_power_max": c.Str("search_power_max", s.IgnoreAllErrors),
-					"search_power_min": c.Str("search_power_min", s.IgnoreAllErrors),
-				}, c.DictOptional),
-			}, c.DictOptional),
+			"serverless": serverlessSchema,
 			"discovery":  discoverySchema,
 			"processors": c.Str("processors", s.IgnoreAllErrors),
 			"cluster":    clusterSchema,
@@ -273,6 +268,36 @@ func flattenSettings(metricSetFields mapstr.M) mapstr.M {
 	}
 
 	return result
+}
+
+// normalizeMinSearchVCU turns the flattened `serverless.search.min_search_vcu` string into an
+// integer so it can be mapped as a number and aggregated over time.
+//
+// It runs after flattenSettings so that an explicit `-1` in a higher-precedence scope (Elasticsearch's
+// "unset" sentinel) hides a real value from a lower one. The key is removed, rather than set to a
+// placeholder, when the setting is unset, negative or not a whole number, so unset projects index no
+// value and a malformed one never breaks the event.
+func normalizeMinSearchVCU(flattened mapstr.M) {
+	const key = "serverless.search.min_search_vcu"
+
+	raw, err := flattened.GetValue(key)
+	if err != nil {
+		return
+	}
+
+	text, ok := raw.(string)
+	if !ok {
+		_ = flattened.Delete(key)
+		return
+	}
+
+	vcu, err := strconv.ParseInt(text, 10, 64)
+	if err != nil || vcu < 0 {
+		_ = flattened.Delete(key)
+		return
+	}
+
+	_, _ = flattened.Put(key, vcu)
 }
 
 // collectArchivedSettings returns the names of the settings Elasticsearch has archived, gathered
@@ -345,6 +370,7 @@ func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, settings *map[strin
 
 	// Flatten settings with precedence: transient > persistent > defaults
 	flattenedSettings := flattenSettings(metricSetFields)
+	normalizeMinSearchVCU(flattenedSettings)
 
 	// archived settings are collected outside the schema and are not subject to that precedence:
 	// they are reported as a single, scope-independent list of names
