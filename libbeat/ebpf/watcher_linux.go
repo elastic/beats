@@ -90,6 +90,31 @@ func (w *Watcher) subscribeWith(clientName string, events EventMask, newLoader f
 	return w.clients[clientName].records, nil
 }
 
+// Degraded returns the load failures the running loader worked around on this kernel, and
+// what it gave up for each, or nil if it loaded everything it normally does. See
+// ebpfevents.Loader.Degraded.
+func (w *Watcher) Degraded() error {
+	w.Lock()
+	defer w.Unlock()
+
+	if w.loader == nil {
+		return nil
+	}
+	return w.loader.Degraded()
+}
+
+// DisabledEvents returns the event types the running loader can't produce on this kernel,
+// because the programs that emit them failed to load. See ebpfevents.Loader.DisabledEvents.
+func (w *Watcher) DisabledEvents() []ebpfevents.EventType {
+	w.Lock()
+	defer w.Unlock()
+
+	if w.loader == nil {
+		return nil
+	}
+	return w.loader.DisabledEvents()
+}
+
 // Unsubscribe the client with the given name.
 func (w *Watcher) Unsubscribe(clientName string) {
 	w.Lock()
