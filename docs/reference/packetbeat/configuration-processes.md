@@ -30,8 +30,24 @@ When the process monitor is enabled, it will enrich all the events whose source 
 
 ## Configuration options [_configuration_options_14]
 
+You can specify the following process monitoring options in the `monitored` section of the `packetbeat.yml` config file to customize the name of process:
+
+
+### `process` [_process]
+
+The name of the process as it will appear in the published transactions. The name doesn’t have to match the name of the executable, so feel free to choose something more descriptive (for example,  "myapp" instead of "gunicorn").
+
+
+### `cmdline_grep` [_cmdline_grep]
+
+The name used to identify the process at run time. When Packetbeat starts, and then periodically afterwards, it scans the process table for processes that match the values specified for this option. The match is done against the process' command line as read from `/proc/<pid>/cmdline`.
+
 
 ### `backend` [_procs_backend]
+
+```{applies_to}
+stack: ga 9.7.0+
+```
 
 The mechanism used to resolve connections to processes. The following values are supported:
 
@@ -58,18 +74,6 @@ The `kernel_tracing` backend loads eBPF programs into the kernel, which needs mo
 * When running in a container, the container must share the host PID namespace and have the capabilities above. The backend is not available under Elastic Agent's unprivileged mode.
 
 The backend keeps closed connections resolvable for the flow timeout plus the flow reporting period, plus a margin, so that flows reported after a connection ended are still attributed to a process. Long flow timeouts therefore increase the memory kept by the kernel tracer.
-
-You can specify the following process monitoring options in the `monitored` section of the `packetbeat.yml` config file to customize the name of process:
-
-
-### `process` [_process]
-
-The name of the process as it will appear in the published transactions. The name doesn’t have to match the name of the executable, so feel free to choose something more descriptive (for example,  "myapp" instead of "gunicorn").
-
-
-### `cmdline_grep` [_cmdline_grep]
-
-The name used to identify the process at run time. When Packetbeat starts, and then periodically afterwards, it scans the process table for processes that match the values specified for this option. The match is done against the process' command line as read from `/proc/<pid>/cmdline`.
 
 
 ### `shutdown_timeout` [shutdown-timeout]
