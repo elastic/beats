@@ -14765,11 +14765,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/mito
-Version: v1.28.0
+Version: v1.28.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/mito@v1.28.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/mito@v1.28.1/LICENSE:
 
 
                                  Apache License
@@ -15034,11 +15034,11 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/tk-btf
-Version: v0.2.0
+Version: v0.3.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/tk-btf@v0.2.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/tk-btf@v0.3.0/LICENSE.txt:
 
 
                                  Apache License
