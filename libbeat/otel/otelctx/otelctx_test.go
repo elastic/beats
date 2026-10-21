@@ -37,7 +37,6 @@ func TestGetBeatVersion(t *testing.T) {
 				ctx := t.Context()
 				info := client.Info{
 					Metadata: client.NewMetadata(map[string][]string{
-						BeatNameCtxKey:    {"filebeat"},
 						BeatVersionCtxKey: {"8.0.0"},
 					}),
 				}
@@ -47,58 +46,6 @@ func TestGetBeatVersion(t *testing.T) {
 		},
 		{
 			name: "version missing",
-			setupCtx: func() context.Context {
-				ctx := t.Context()
-				info := client.Info{
-					Metadata: client.NewMetadata(map[string][]string{
-						BeatNameCtxKey: {"filebeat"},
-					}),
-				}
-				return client.NewContext(ctx, info)
-			},
-			expected: "",
-		},
-		{
-			name: "no client info",
-			setupCtx: func() context.Context {
-				return t.Context()
-			},
-			expected: "",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ctx := tt.setupCtx()
-
-			version := GetBeatVersion(ctx)
-
-			assert.Equal(t, tt.expected, version)
-		})
-	}
-}
-
-func TestGetBeatName(t *testing.T) {
-	tests := []struct {
-		name     string
-		setupCtx func() context.Context
-		expected string
-	}{
-		{
-			name: "beat name exists",
-			setupCtx: func() context.Context {
-				ctx := t.Context()
-				info := client.Info{
-					Metadata: client.NewMetadata(map[string][]string{
-						BeatNameCtxKey: {"filebeat"},
-					}),
-				}
-				return client.NewContext(ctx, info)
-			},
-			expected: "filebeat",
-		},
-		{
-			name: "beat name missing",
 			setupCtx: func() context.Context {
 				ctx := t.Context()
 				info := client.Info{
@@ -120,8 +67,10 @@ func TestGetBeatName(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := tt.setupCtx()
-			name := GetBeatName(ctx)
-			assert.Equal(t, tt.expected, name)
+
+			version := GetBeatVersion(ctx)
+
+			assert.Equal(t, tt.expected, version)
 		})
 	}
 }
