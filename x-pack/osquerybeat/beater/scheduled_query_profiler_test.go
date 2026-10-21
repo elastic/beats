@@ -458,10 +458,22 @@ func TestLoggerReturnsWhileScheduledProfileRPCWaits(t *testing.T) {
 	sink := &profileTestSink{published: make(chan collectedProfile, 1)}
 	publisher := &profileCallbackPublisher{sink: sink, responses: make(chan scheduledProfileResponse, 1)}
 	bt := &osquerybeat{pub: publisher, qp: profiler, log: log}
+	dispatcher := newScheduledResultDispatcher(monitoring.NewRegistry(), log,
+		func(func() bool, func()) osquerybeatPublisher { return publisher }, bt.handleScheduledQueryResult)
+	dispatcher.profile = bt.enqueueScheduledProfile
+	require.NoError(t, dispatcher.configure(inputs), "configure the scheduled result handoff")
+	t.Cleanup(func() {
+		dispatcher.stop()
+		select {
+		case <-dispatcher.done:
+		case <-time.After(time.Second):
+			t.Error("scheduled result worker did not stop")
+		}
+	})
 	loggerPlugin := NewLoggerPlugin(log, func(result QueryResult) {
 		// A zero-hit diff needs no column resolution, so nil cli catches any
 		// accidental reintroduction of profiling RPCs through the main client.
-		bt.handleQueryResult(t.Context(), nil, plugin, worker, result)
+		dispatcher.enqueue(t.Context(), nil, plugin, result, worker)
 	})
 
 	// Exercise the real logger callback while the profile RPC stays blocked.
@@ -483,7 +495,7 @@ func TestLoggerReturnsWhileScheduledProfileRPCWaits(t *testing.T) {
 		t.Fatal("deferred profile collection did not start")
 	}
 
-	// Results must precede profiles, and both must retain the same response ID.
+	// Result completion must not wait for profiling, and both retain the same response ID.
 	var response scheduledProfileResponse
 	select {
 	case response = <-publisher.responses:
