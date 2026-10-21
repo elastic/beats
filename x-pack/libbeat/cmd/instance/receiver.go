@@ -37,22 +37,11 @@ type contextStopper interface {
 
 // BaseReceiver holds common configurations for beatreceivers.
 type BeatReceiver struct {
-<<<<<<< HEAD
-	beat    *instance.Beat
-	beater  beat.Beater
-	Logger  *logp.Logger
-	runDone chan error // receives the error from beater.Run; closed when Run returns
-=======
-	beat                *instance.Beat
-	beater              beat.Beater
-	reporter            *log.Reporter
-	Logger              *logp.Logger
-	bridge              *oteltelemetry.RegistryBridge
-	releaseSystemBridge func()
-	startHook           func(component.Host) error
-	startCalled         chan struct{} // closed when Start is called
-	runDone             chan error    // receives the error from beater.Run; closed when Run returns
->>>>>>> 3f661f0 ([beatreceiver] Introduce lifecycle tests (#53863))
+	beat        *instance.Beat
+	beater      beat.Beater
+	Logger      *logp.Logger
+	startCalled chan struct{} // closed when Start is called
+	runDone     chan error    // receives the error from beater.Run; closed when Run returns
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
@@ -111,20 +100,11 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 		return BeatReceiver{}, fmt.Errorf("error getting %s creator:%w", b.Info.Beat, err)
 	}
 	return BeatReceiver{
-<<<<<<< HEAD
-		beat:    b,
-		beater:  beater,
-		Logger:  b.Info.Logger,
-		runDone: make(chan error, 1),
-=======
-		beat:                b,
-		beater:              beater,
-		Logger:              b.Info.Logger,
-		bridge:              bridge,
-		releaseSystemBridge: releaseSystem,
-		startCalled:         make(chan struct{}),
-		runDone:             make(chan error, 1),
->>>>>>> 3f661f0 ([beatreceiver] Introduce lifecycle tests (#53863))
+		beat:        b,
+		beater:      beater,
+		Logger:      b.Info.Logger,
+		startCalled: make(chan struct{}),
+		runDone:     make(chan error, 1),
 	}, nil
 }
 
@@ -191,25 +171,6 @@ func (br *BeatReceiver) Start(host component.Host) (retErr error) {
 // it is force-closed (issue #49794); if it carries no deadline the pipeline's
 // configured close timeout is used.
 func (br *BeatReceiver) Shutdown(ctx context.Context) error {
-<<<<<<< HEAD
-	// The Beater owns shutdown sequencing: stop it first so it can close its
-	// inputs and finalize acknowledgments before the pipeline is disconnected.
-	// See https://github.com/elastic/beats/issues/49794.
-	// Pass ctx so beaters that implement contextStopper don't exhaust the OTel
-	// shutdown deadline during their ready-state wait.
-	if cs, ok := br.beater.(contextStopper); ok {
-		cs.StopWithContext(ctx)
-	} else {
-		br.beater.Stop()
-=======
-	if br.bridge != nil {
-		br.bridge.Shutdown()
-	}
-	if br.releaseSystemBridge != nil {
-		br.releaseSystemBridge()
->>>>>>> 3f661f0 ([beatreceiver] Introduce lifecycle tests (#53863))
-	}
-
 	// If the Shutdown was called before the Start, do not wait for beater.Run to return.
 	select {
 	case <-br.startCalled:
