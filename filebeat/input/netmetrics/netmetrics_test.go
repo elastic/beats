@@ -30,7 +30,7 @@ import (
 
 func TestAddrs(t *testing.T) {
 	t.Run("ipv4", func(t *testing.T) {
-		addr4, addr6, err := addrs("0.0.0.0:65535", logptest.NewTestingLogger(t, ""))
+		addr4, addr6, err := addrs("127.0.0.1:65535", logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -40,6 +40,15 @@ func TestAddrs(t *testing.T) {
 		if len(addr6) != 0 {
 			t.Errorf("unexpected addrs in addr6 for IPv4 address: %v", addr6)
 		}
+	})
+
+	// A listener on 0.0.0.0 is a dual-stack socket that is only listed in
+	// /proc/net/{tcp,udp}6 when IPv6 is enabled, so both tables are needed.
+	t.Run("ipv4_unspecified", func(t *testing.T) {
+		addr4, addr6, err := addrs("0.0.0.0:65535", logptest.NewTestingLogger(t, ""))
+		assert.NoError(t, err)
+		assert.Equal(t, []string{"00000000:FFFF"}, addr4)
+		assert.Equal(t, []string{"00000000000000000000000000000000:FFFF"}, addr6)
 	})
 
 	t.Run("ipv6", func(t *testing.T) {

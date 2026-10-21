@@ -40,6 +40,11 @@ import (
 // an IPv4 or IPv6 address, or an FQDN for the host. The returned slices
 // contain the string representations of the address as they would appear in
 // the /proc/net tables.
+//
+// If addr is the IPv4 unspecified address (0.0.0.0), the IPv6 unspecified
+// address is also returned in addr6. A listener on 0.0.0.0 with a "tcp" or
+// "udp" network is a dual-stack AF_INET6 socket on hosts with IPv6 enabled,
+// which only appears in /proc/net/{tcp,udp}6.
 func addrs(addr string, log *logp.Logger) (addr4, addr6 []string, err error) {
 	host, port, err := net.SplitHostPort(addr)
 	if err != nil {
@@ -63,6 +68,9 @@ func addrs(addr string, log *logp.Logger) (addr4, addr6 []string, err error) {
 		switch {
 		case len(p.To4()) == net.IPv4len:
 			addr4 = append(addr4, ipV4(p, int(pn)))
+			if p.IsUnspecified() {
+				addr6 = append(addr6, ipV6(net.IPv6unspecified, int(pn)))
+			}
 		case len(p.To16()) == net.IPv6len:
 			addr6 = append(addr6, ipV6(p, int(pn)))
 		default:
