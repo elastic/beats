@@ -174,14 +174,17 @@ RUN cd $NODE_PATH \
         esac \
     && mkdir -p node \
     && curl -fsSL ${NODE_DOWNLOAD_URL} | tar -xJ --strip 1 -C node \
+# TODO: Remove the npm bootstrap when Node.js is bumped to a version that bundles npm >= 12.0.2
+# Bootstrap npm 12.0.2 from a downloaded copy to avoid npm 10.x self-replacement failures.
+# Install it over the bundled npm, in the same layer, so the image ships a single npm.
+    && curl -fsSL https://registry.npmjs.org/npm/-/npm-12.0.2.tgz | tar xz -C /tmp \
+    && node /tmp/package/bin/npm-cli.js install -g --prefix $NODE_PATH/node npm@12.0.2 \
+    && rm -rf /tmp/package \
+    && rm -rf /tmp/node-compile-cache \
+    && npm cache clean --force \
     && chown -R {{ .user }} $NODE_PATH
 
 USER {{ .user }}
-# TODO: Remove this step when Node.js is bumped to a version that bundles npm >= 12.0.2
-# Bootstrap npm 12.0.2 from a downloaded copy to avoid npm 10.x self-replacement failures
-RUN curl -fsSL https://registry.npmjs.org/npm/-/npm-12.0.2.tgz | tar xz -C /tmp \
-    && node /tmp/package/bin/npm-cli.js install -g npm@12.0.2 \
-    && rm -rf /tmp/package
 RUN (npm i -g --loglevel verbose --production --engine-strict  @elastic/synthetics@stack_release || sh -c 'tail -n +1 ${NPM_CONFIG_PREFIX}/_logs/* && exit 1')
 # npm >= 12 blocks dependency install scripts by default, so playwright-chromium's
 # install hook no longer downloads browsers during `npm i`. Install them explicitly
