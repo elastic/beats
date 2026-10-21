@@ -150,7 +150,7 @@ func TestProcNetTCP(t *testing.T) {
 // match its entries in /proc/net/tcp6, which is where dual-stack sockets are
 // listed.
 func TestProcNetTCPDualStack(t *testing.T) {
-	_, addr6, err := addrs("0.0.0.0:6060", logptest.NewTestingLogger(t, ""))
+	_, addr6, err := addrs("0.0.0.0:6060", "", logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 
 	hasUnspecified6, addrIsUnspecified6, bad := containsUnspecifiedAddr(addr6)

@@ -41,11 +41,13 @@ import (
 // contain the string representations of the address as they would appear in
 // the /proc/net tables.
 //
-// If addr is the IPv4 unspecified address (0.0.0.0), the IPv6 unspecified
-// address is also returned in addr6. A listener on 0.0.0.0 with a "tcp" or
-// "udp" network is a dual-stack AF_INET6 socket on hosts with IPv6 enabled,
-// which only appears in /proc/net/{tcp,udp}6.
-func addrs(addr string, log *logp.Logger) (addr4, addr6 []string, err error) {
+// If addr is the IPv4 unspecified address (0.0.0.0) and network is empty,
+// "tcp" or "udp", the IPv6 unspecified address is also returned in addr6.
+// Such a listener is a dual-stack AF_INET6 socket on hosts with IPv6 enabled,
+// which only appears in /proc/net/{tcp,udp}6. With "tcp4" or "udp4" the
+// socket is AF_INET only, so no IPv6 address is added: unspecified addresses
+// are matched by port alone and would pick up unrelated IPv6 sockets.
+func addrs(addr, network string, log *logp.Logger) (addr4, addr6 []string, err error) {
 	host, port, err := net.SplitHostPort(addr)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to get address for %s: could not split host and port: %w", addr, err)
@@ -68,7 +70,7 @@ func addrs(addr string, log *logp.Logger) (addr4, addr6 []string, err error) {
 		switch {
 		case len(p.To4()) == net.IPv4len:
 			addr4 = append(addr4, ipV4(p, int(pn)))
-			if p.IsUnspecified() {
+			if p.IsUnspecified() && isDualStack(network) {
 				addr6 = append(addr6, ipV6(net.IPv6unspecified, int(pn)))
 			}
 		case len(p.To16()) == net.IPv6len:
@@ -78,6 +80,16 @@ func addrs(addr string, log *logp.Logger) (addr4, addr6 []string, err error) {
 		}
 	}
 	return addr4, addr6, nil
+}
+
+// isDualStack returns whether a listener on the IPv4 unspecified address with
+// the provided network may be bound as a dual-stack socket.
+func isDualStack(network string) bool {
+	switch network {
+	case "", "tcp", "udp":
+		return true
+	}
+	return false
 }
 
 // ipV4 returns the string representation of an IPv4 address in a /proc/net table.

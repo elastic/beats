@@ -122,7 +122,7 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 
 	const pollInterval = time.Minute
 	if env.ID != "" {
-		n.udpMetrics = netmetrics.NewUDP(env.MetricsRegistry, n.cfg.Host, uint64(n.cfg.ReadBuffer), pollInterval, n.logger)
+		n.udpMetrics = netmetrics.NewUDP(env.MetricsRegistry, n.cfg.Host, n.cfg.Network, uint64(n.cfg.ReadBuffer), pollInterval, n.logger)
 		defer n.udpMetrics.Close()
 	}
 

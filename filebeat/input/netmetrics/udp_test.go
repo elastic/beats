@@ -156,7 +156,7 @@ func TestProcNetUDP(t *testing.T) {
 // match its entries in /proc/net/udp6, which is where dual-stack sockets are
 // listed.
 func TestProcNetUDPDualStack(t *testing.T) {
-	_, addr6, err := addrs("0.0.0.0:7101", logptest.NewTestingLogger(t, ""))
+	_, addr6, err := addrs("0.0.0.0:7101", "", logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 
 	hasUnspecified6, addrIsUnspecified6, bad := containsUnspecifiedAddr(addr6)
