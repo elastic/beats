@@ -117,7 +117,7 @@ func TestBeatReceiverStartShutdown(t *testing.T) {
 
 	// Start blocks in beater.Run, so run it in a goroutine.
 	startErr := make(chan error, 1)
-	go func() { startErr <- br.Start(componenttest.NewNopHost()) }()
+	go func() { startErr <- br.Start(t.Context(), componenttest.NewNopHost()) }()
 
 	// Wait until the beater is running and has published its events.
 	select {
@@ -191,7 +191,7 @@ func TestBeatReceiverStartHookRunsBeforeRun(t *testing.T) {
 		return nil
 	})
 
-	require.NoError(t, br.Start(host), "starting the Beat receiver should succeed")
+	require.NoError(t, br.Start(t.Context(), host), "starting the Beat receiver should succeed")
 	select {
 	case observed := <-runObservedHook:
 		assert.True(t, observed, "start hook should complete before beater.Run begins")
@@ -304,7 +304,7 @@ func TestBeatReceiverStart_WiresActionAndDiagnosticExtensions(t *testing.T) {
 	}}
 
 	startErr := make(chan error, 1)
-	go func() { startErr <- br.Start(host) }()
+	go func() { startErr <- br.Start(t.Context(), host) }()
 
 	select {
 	case <-mb.initDone:
@@ -405,7 +405,7 @@ func TestBeatReceiverStartFailureShutdownDoesNotHang(t *testing.T) {
 	var wg sync.WaitGroup
 	wg.Go(func() {
 		// Swallow the error, exactly as the wrapper receivers do.
-		_ = br.Start(componenttest.NewNopHost())
+		_ = br.Start(t.Context(), componenttest.NewNopHost())
 	})
 	// Wait for the goroutine to complete. Start has failed and returned; on the
 	// buggy path runDone is still nil at this point.
@@ -455,7 +455,7 @@ func TestBeatReceiverStartHookFailureShutdownDoesNotHang(t *testing.T) {
 		return hookErr
 	})
 
-	startErr := br.Start(componenttest.NewNopHost())
+	startErr := br.Start(t.Context(), componenttest.NewNopHost())
 	require.ErrorIs(t, startErr, hookErr, "Start should return the start hook failure")
 
 	// Shutdown must complete promptly even though Start failed before launching
@@ -622,7 +622,7 @@ func TestBeatReceiverStart_UsesHeadersSetterUserAgent(t *testing.T) {
 	}}
 
 	startErr := make(chan error, 1)
-	go func() { startErr <- br.Start(host) }()
+	go func() { startErr <- br.Start(t.Context(), host) }()
 
 	select {
 	case <-mb.initDone:

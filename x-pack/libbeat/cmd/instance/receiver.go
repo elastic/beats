@@ -142,7 +142,7 @@ func (br *BeatReceiver) SetStartHook(hook func(component.Host) error) {
 }
 
 // BeatReceiver.Start() starts the beat receiver.
-func (br *BeatReceiver) Start(host component.Host) (retErr error) {
+func (br *BeatReceiver) Start(ctx context.Context, host component.Host) (retErr error) {
 	// If Start returns an error before the beater.Run goroutine is launched,
 	// signal runDone so that a concurrent Shutdown does not block forever on it.
 	defer func() {
@@ -189,7 +189,7 @@ func (br *BeatReceiver) Start(host component.Host) (retErr error) {
 		}
 	}
 
-	if ua := userAgentFromHeaders(headersFromExtensions(context.Background(), extensions, br.Logger)); ua != "" {
+	if ua := userAgentFromHeaders(headersFromExtensions(ctx, extensions, br.Logger)); ua != "" {
 		br.Logger.Debugf("using User-Agent from headers_setter extension: %q", ua)
 		br.beat.Info.UserAgent = ua
 	}
