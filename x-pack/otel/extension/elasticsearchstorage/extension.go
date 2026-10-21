@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
@@ -21,6 +22,8 @@ import (
 	"go.opentelemetry.io/collector/extension"
 	"go.opentelemetry.io/collector/extension/extensioncapabilities"
 )
+
+const elasticsearchRequestTimeout = 90 * time.Second
 
 var (
 	_ extension.Extension             = (*elasticStorage)(nil)
@@ -82,7 +85,10 @@ func (e *elasticStorage) Start(ctx context.Context, host component.Host) error {
 		}
 
 		client.Headers["User-Agent"] = client.UserAgent
-		client.HTTP = &http.Client{Transport: roundTripper}
+		client.HTTP = &http.Client{
+			Transport: roundTripper,
+			Timeout:   elasticsearchRequestTimeout,
+		}
 		if err := client.Connect(ctx); err != nil {
 			e.logger.Errorf("error connecting to Elasticsearch at %v: %v", endpoint, err)
 			connectionErrors = append(connectionErrors, err.Error())
