@@ -480,12 +480,3 @@ func traverseTree(depth int, ecsm ecs.Mapping, path []string, v any) error {
 	}
 	return nil
 }
-
-// lookupResultMetadata captures routing and query identity under one read lock.
-func (p *ConfigPlugin) lookupResultMetadata(name string) (string, QueryInfo, bool) {
-	p.mx.RLock()
-	defer p.mx.RUnlock()
-	query, ok := p.queryInfoMap[name]
-	namespace, routed := p.namespaces[name]
-	return namespace, query, ok && routed
-}

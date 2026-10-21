@@ -37,9 +37,6 @@ type Publisher struct {
 	// client for osquery_manager.query_profile
 	queryProfileClient    beat.Client
 	profileDropWarnLogged bool
-	publishMode           beat.PublishMode
-	listener              beat.ClientListener
-	allowed               func() bool
 }
 
 func New(b *beat.Beat, log *logp.Logger) *Publisher {
@@ -83,8 +80,6 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 		p.log.Debugf("Connect publisher for %s with processors: %d", config.DefaultDataset, len(processors.All()))
 		// Connect publisher
 		client, err := p.b.Publisher.ConnectWith(beat.ClientConfig{
-			PublishMode:    p.publishMode,
-			ClientListener: p.listener,
 			Processing: beat.ProcessingConfig{
 				Processor: processors,
 			},
@@ -111,8 +106,6 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 		p.log.Debugf("Connect publisher for %s with processors: %d", config.DefaultActionResponsesDataset, len(processors.All()))
 		// Connect publisher
 		client, err := p.b.Publisher.ConnectWith(beat.ClientConfig{
-			PublishMode:    p.publishMode,
-			ClientListener: p.listener,
 			Processing: beat.ProcessingConfig{
 				Processor: processors,
 			},
@@ -143,8 +136,6 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 		}
 		p.log.Debugf("Connect publisher for %s with processors: %d", config.DefaultQueryProfileDataset, len(processors.All()))
 		client, err := p.b.Publisher.ConnectWith(beat.ClientConfig{
-			PublishMode:    p.publishMode,
-			ClientListener: p.listener,
 			Processing: beat.ProcessingConfig{
 				Processor: processors,
 			},
@@ -172,9 +163,6 @@ func (p *Publisher) Publish(index, idValue, idFieldKey, responseID, spaceID, pac
 	defer p.mx.Unlock()
 
 	for _, hit := range hits {
-		if p.allowed != nil && !p.allowed() {
-			return
-		}
 		event := hitToEvent(index, p.b.Info.Name, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName, meta, hit, ecsm, reqData)
 		p.client.Publish(event)
 	}
@@ -264,9 +252,6 @@ func (p *Publisher) PublishScheduledResponse(scheduleID, packID, packName, query
 }
 
 func (p *Publisher) publishActionResponseEvent(fields map[string]any, timestamp time.Time) {
-	if p.allowed != nil && !p.allowed() {
-		return
-	}
 	event := beat.Event{
 		Timestamp: timestamp,
 		Fields:    fields,
@@ -298,9 +283,7 @@ func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID, 
 
 	p.log.Debugf("Query profile event is sent, fields: %#v", fields)
 
-	if p.allowed == nil || p.allowed() {
-		p.queryProfileClient.Publish(event)
-	}
+	p.queryProfileClient.Publish(event)
 }
 
 // queryProfileToEvent builds the field set for a query profile document.
@@ -469,22 +452,3 @@ func hitToEvent(index, eventType, idValue, idFieldKey, responseID, spaceID, pack
 
 	return event
 }
-
-// NewScheduled creates policy-bound, best-effort clients for the asynchronous
-// native logger path. allowed prevents remaining rows from crossing retirement.
-func NewScheduled(b *beat.Beat, log *logp.Logger, allowed func() bool, dropped func()) *Publisher {
-	p := New(b, log)
-	p.publishMode = beat.DropIfFull
-	p.allowed = allowed
-	p.listener = &scheduledListener{dropped: dropped}
-	return p
-}
-
-type scheduledListener struct{ dropped func() }
-
-func (*scheduledListener) Closing()                      {}
-func (*scheduledListener) Closed()                       {}
-func (*scheduledListener) NewEvent()                     {}
-func (*scheduledListener) Filtered()                     {}
-func (*scheduledListener) Published()                    {}
-func (l *scheduledListener) DroppedOnPublish(beat.Event) { l.dropped() }
