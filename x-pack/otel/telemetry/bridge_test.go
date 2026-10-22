@@ -11,10 +11,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-logr/logr"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"go.opentelemetry.io/collector/component/componenttest"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
@@ -575,12 +577,10 @@ func TestBridgeConcurrentMapAccess(t *testing.T) {
 	go func() {
 		defer wg.Done()
 		for i := range 100 {
-			bridge.mu.Lock()
 			_ = bridge.ensureStatsInt(fmt.Sprintf("pipeline.dynamic_%d", i))
 			_ = bridge.ensureStatsFloat(fmt.Sprintf("pipeline.pct_%d", i))
 			_ = bridge.ensureInputInt(fmt.Sprintf("input_counter_%d", i))
 			_ = bridge.ensureInputFloat(fmt.Sprintf("input_gauge_%d", i))
-			bridge.mu.Unlock()
 		}
 	}()
 
@@ -592,4 +592,105 @@ func TestBridgeConcurrentMapAccess(t *testing.T) {
 	}()
 
 	wg.Wait()
+}
+
+// TestBridgeNoDeadlockWhenMetricsAppearDuringCollection is a regression test
+// for a lock inversion between the OTel SDK and the bridge. The SDK holds its
+// pipeline lock while it runs the bridge's callback, and the callback takes
+// b.mu. The goroutine that creates instruments for newly discovered metrics
+// must therefore never hold b.mu while it calls into the meter (creating an
+// instrument, registering or unregistering the callback), because each of
+// those needs the pipeline lock.
+//
+// A new metric appears before every collection, so a re-registration started by
+// one collection is usually still in flight when the next one begins.
+func TestBridgeNoDeadlockWhenMetricsAppearDuringCollection(t *testing.T) {
+	reader := metric.NewManualReader()
+	statsReg := monitoring.NewRegistry()
+	pipelineReg := statsReg.GetOrCreateRegistry("pipeline")
+	monitoring.NewUint(pipelineReg, "clients").Set(1)
+
+	bridge := newTestBridge(t, reader, statsReg, nil)
+
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for i := range 300 {
+			monitoring.NewUint(pipelineReg, fmt.Sprintf("dynamic_%d", i)).Set(uint64(i))
+			var rm metricdata.ResourceMetrics
+			if err := reader.Collect(t.Context(), &rm); err != nil {
+				t.Errorf("collect: %v", err)
+				return
+			}
+		}
+		bridge.Shutdown()
+	}()
+
+	select {
+	case <-done:
+	case <-time.After(30 * time.Second):
+		t.Fatal("deadlock: collecting while the bridge creates instruments for new metrics did not finish")
+	}
+}
+
+// errorCapture is a logr sink that records the messages the OTel SDK reports
+// through its global logger when it fails to record an observation.
+type errorCapture struct {
+	mu   sync.Mutex
+	msgs []string
+}
+
+func (c *errorCapture) Init(logr.RuntimeInfo)          {}
+func (c *errorCapture) Enabled(int) bool               { return true }
+func (c *errorCapture) Info(int, string, ...any)       {}
+func (c *errorCapture) WithValues(...any) logr.LogSink { return c }
+func (c *errorCapture) WithName(string) logr.LogSink   { return c }
+func (c *errorCapture) Error(_ error, msg string, _ ...any) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.msgs = append(c.msgs, msg)
+}
+
+// TestBridgeNoUnregisteredObservations checks that a new metric's instrument is
+// not observed by the old callback registration, which the SDK reports as
+// "observable instrument not registered for callback".
+func TestBridgeNoUnregisteredObservations(t *testing.T) {
+	capture := &errorCapture{}
+	otel.SetLogger(logr.New(capture))
+	t.Cleanup(func() { otel.SetLogger(logr.Discard()) })
+
+	reader := metric.NewManualReader()
+	statsReg := monitoring.NewRegistry()
+	pipelineReg := statsReg.GetOrCreateRegistry("pipeline")
+	monitoring.NewUint(pipelineReg, "clients").Set(1)
+
+	bridge := newTestBridge(t, reader, statsReg, nil)
+
+	// Collect continuously so a collection is likely to land between the new
+	// instrument being created and the callback being re-registered.
+	stop := make(chan struct{})
+	collecting := make(chan struct{})
+	go func() {
+		defer close(collecting)
+		var rm metricdata.ResourceMetrics
+		for {
+			select {
+			case <-stop:
+				return
+			default:
+				_ = reader.Collect(context.Background(), &rm)
+			}
+		}
+	}()
+	for i := range 100 {
+		monitoring.NewUint(pipelineReg, fmt.Sprintf("dynamic_%d", i)).Set(uint64(i))
+		time.Sleep(time.Millisecond)
+	}
+	close(stop)
+	<-collecting
+	bridge.Shutdown()
+
+	capture.mu.Lock()
+	defer capture.mu.Unlock()
+	assert.Zero(t, len(capture.msgs), "SDK reported %d failed observations", len(capture.msgs))
 }
