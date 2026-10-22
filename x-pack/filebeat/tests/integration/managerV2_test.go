@@ -53,6 +53,7 @@ type Event struct {
 		Version string `json:"version"`
 		Id      string `json:"id"`
 	} `json:"agent"`
+	Tags []string `json:"tags"`
 }
 
 // TestInputReloadUnderElasticAgent will start a Filebeat and cause the input
@@ -554,6 +555,7 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 							"enabled": true,
 							"type":    "log",
 							"paths":   []any{logFilePath},
+							"tags":    []any{"integration-tag"},
 						}),
 					},
 				},
@@ -564,6 +566,7 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 		Id:       "agent-id",
 		Version:  wantVersion,
 		Snapshot: true,
+		Tags:     []string{"production", "team-payments"},
 	}
 
 	observedCh := make(chan *proto.CheckinObserved, 5)
@@ -651,6 +654,8 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 
 		assert.Equal(t, wantAgentInfo.Id, got.Agent.Id)
 		assert.Equal(t, wantVersion, got.Agent.Version)
+
+		assert.Equal(t, []string{"integration-tag", "production", "team-payments"}, got.Tags)
 	}
 }
 
