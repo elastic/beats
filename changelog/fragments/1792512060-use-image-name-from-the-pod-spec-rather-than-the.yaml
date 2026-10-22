@@ -28,7 +28,7 @@ summary: Add `image_metadata_source` option to `add_kubernetes_metadata` to repo
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: libbeat
+component: all
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs
