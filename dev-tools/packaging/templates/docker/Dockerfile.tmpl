@@ -133,7 +133,7 @@ USER root
 # Install required dependencies from wolfi repository
 RUN for iter in {1..10}; do \
         apk update && \
-        apk add --no-interactive --no-progress --no-cache gnutar xz glib libatk-1.0 \
+        apk add --no-interactive --no-progress --no-cache nodejs-24=24.22.1-r2 glib libatk-1.0 \
         libatk-bridge-2.0 cups-libs libxcomposite libxdamage libxfixes libxrandr libxkbcommon pango alsa-lib \
         font-opensans fontconfig gtk icu-data-full libnss mesa font-noto-cjk font-noto-emoji && \
         exit_code=0 && break || exit_code=$? && echo "apk error: retry $iter in 10s" && sleep 10; \
@@ -143,13 +143,10 @@ RUN for iter in {1..10}; do \
 # Setup synthetics env vars
 ENV ELASTIC_SYNTHETICS_CAPABLE=true
 ENV TZ=UTC
-ENV NODE_VERSION=22.23.4
-ENV NODE_PATH={{ $beatHome }}/.node
 ENV NPM_CONFIG_PREFIX={{ $beatHome }}/.npm
-ENV PATH="$NPM_CONFIG_PREFIX/bin:$NODE_PATH/node/bin:$PATH"
+ENV PATH="$NPM_CONFIG_PREFIX/bin:$PATH"
 
 RUN echo \
-    $NODE_PATH \
     $NPM_CONFIG_PREFIX \
     {{ $beatHome }}/.config \
     {{ $beatHome }}/.synthetics \
@@ -157,34 +154,13 @@ RUN echo \
     {{ $beatHome }}/.cache \
     | xargs -IDIR sh -c 'mkdir -m 0770 -p DIR && chown -R {{ .user }} DIR'
 
-# Wolfi no longer publishes Node.js 22 patch releases, so install the official
-# Node.js build (same as the UBI image) instead of the nodejs-22 apk package.
-RUN cd $NODE_PATH \
-    && NODE_DOWNLOAD_URL="" \
-    && case "$(uname -m)" in \
-        x86_64) \
-            NODE_DOWNLOAD_URL=https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz \
-            ;; \
-        aarch64) \
-            NODE_DOWNLOAD_URL=https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-arm64.tar.xz \
-            ;; \
-        *) \
-            echo >&2 ; echo >&2 "Unsupported architecture $(uname -m)" ; echo >&2 ; exit 1 ; \
-            ;; \
-        esac \
-    && mkdir -p node \
-    && curl -fsSL ${NODE_DOWNLOAD_URL} | tar -xJ --strip 1 -C node \
-# TODO: Remove the npm bootstrap when Node.js is bumped to a version that bundles npm >= 12.0.2
-# Bootstrap npm 12.0.2 from a downloaded copy to avoid npm 10.x self-replacement failures.
-# Install it over the bundled npm, in the same layer, so the image ships a single npm.
-    && curl -fsSL https://registry.npmjs.org/npm/-/npm-12.0.2.tgz | tar xz -C /tmp \
-    && node /tmp/package/bin/npm-cli.js install -g --prefix $NODE_PATH/node npm@12.0.2 \
-    && rm -rf /tmp/package \
-    && rm -rf /tmp/node-compile-cache \
-    && npm cache clean --force \
-    && chown -R {{ .user }} $NODE_PATH
-
 USER {{ .user }}
+# nodejs-24 ships no npm, and Wolfi's npm package (12.0.2) bundles undici 6.27.0 (CVE-2026-19534,
+# CVE-2026-85024). Bootstrap npm >= 12.2.1, which bundles undici 6.29.0, from the registry instead.
+RUN curl -fsSL https://registry.npmjs.org/npm/-/npm-12.2.1.tgz | tar xz -C /tmp \
+    && node /tmp/package/bin/npm-cli.js install -g npm@12.2.1 \
+    && rm -rf /tmp/package /tmp/node-compile-cache \
+    && npm cache clean --force
 RUN (npm i -g --loglevel verbose --production --engine-strict  @elastic/synthetics@stack_release || sh -c 'tail -n +1 ${NPM_CONFIG_PREFIX}/_logs/* && exit 1')
 # npm >= 12 blocks dependency install scripts by default, so playwright-chromium's
 # install hook no longer downloads browsers during `npm i`. Install them explicitly
@@ -258,10 +234,10 @@ RUN cd /usr/share/heartbeat/.node \
     && curl ${NODE_DOWNLOAD_URL} | tar -xJ --strip 1 -C node \
     && chmod ug+rwX -R $NODE_PATH
 
-# TODO: Remove this step when Node.js is bumped to a version that bundles npm >= 12.0.2
-# Bootstrap npm 12.0.2 from a downloaded copy to avoid npm 10.x self-replacement failures
-RUN curl -fsSL https://registry.npmjs.org/npm/-/npm-12.0.2.tgz | tar xz -C /tmp \
-    && node /tmp/package/bin/npm-cli.js install -g npm@12.0.2 \
+# TODO: Remove this step when Node.js is bumped to a version that bundles npm >= 12.2.1
+# Bootstrap npm 12.2.1 from a downloaded copy to avoid npm 10.x self-replacement failures
+RUN curl -fsSL https://registry.npmjs.org/npm/-/npm-12.2.1.tgz | tar xz -C /tmp \
+    && node /tmp/package/bin/npm-cli.js install -g npm@12.2.1 \
     && rm -rf /tmp/package
 
 # Install synthetics as a regular user, installing npm deps as root doesn't work
