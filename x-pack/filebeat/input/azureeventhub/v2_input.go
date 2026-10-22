@@ -537,6 +537,14 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 		// We create a new event for each record.
 		records := in.messageDecoder.Decode(receivedEventData.Body)
 
+		// Retain only checkpoint and logging metadata until acknowledgment,
+		// so the message body and AMQP metadata can be collected sooner.
+		checkpoint := &azeventhubs.ReceivedEventData{
+			Offset:         receivedEventData.Offset,
+			SequenceNumber: receivedEventData.SequenceNumber,
+			EnqueuedTime:   receivedEventData.EnqueuedTime,
+		}
+
 		for _, record := range records {
 
 			event := beat.Event{
@@ -550,7 +558,7 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 					// and outputs may read it on other goroutines.
 					"azure": eventHubMetadata.Clone(),
 				},
-				Private: receivedEventData,
+				Private: checkpoint,
 			}
 
 			// Publish the event to the Beats pipeline.
