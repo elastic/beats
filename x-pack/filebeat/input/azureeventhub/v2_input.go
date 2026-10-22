@@ -73,7 +73,6 @@ type eventHubInputV2 struct {
 type checkpointMetadata struct {
 	offset         string
 	sequenceNumber int64
-	enqueuedTime   *time.Time
 }
 
 // newEventHubInputV2 creates a new instance of the Azure Event Hub input v2,
@@ -544,12 +543,11 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 		// We create a new event for each record.
 		records := in.messageDecoder.Decode(receivedEventData.Body)
 
-		// Retain only checkpoint and logging metadata until acknowledgment,
+		// Retain only checkpoint metadata until acknowledgment,
 		// so the message body and AMQP metadata can be collected sooner.
 		checkpoint := &checkpointMetadata{
 			offset:         receivedEventData.Offset,
 			sequenceNumber: receivedEventData.SequenceNumber,
-			enqueuedTime:   receivedEventData.EnqueuedTime,
 		}
 
 		for _, record := range records {
@@ -629,7 +627,6 @@ func initializePartitionResources(ctx context.Context, partitionClient *azeventh
 				"acked", acked,
 				"sequence_number", checkpoint.sequenceNumber,
 				"offset", checkpoint.offset,
-				"enqueued_time", checkpoint.enqueuedTime,
 			)
 		}),
 		Processing: beat.ProcessingConfig{

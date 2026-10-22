@@ -130,60 +130,49 @@ func TestProcessReceivedEventsUpdatesProcessingTimeOnce(t *testing.T) {
 
 func TestProcessReceivedEventsRetainsOnlyCheckpointMetadata(t *testing.T) {
 	now := time.Now()
-	for _, tc := range []struct {
-		name         string
-		enqueuedTime *time.Time
-	}{
-		{name: "without enqueued time"},
-		{name: "with enqueued time", enqueuedTime: &now},
-	} {
-		t.Run(tc.name, func(t *testing.T) {
-			logger := logptest.NewTestingLogger(t, inputName)
-			metrics := newInputMetrics(monitoring.NewRegistry(), logger)
-			sanitizers, err := newSanitizers(defaultTestConfig.Sanitizers, defaultTestConfig.LegacySanitizeOptions)
-			require.NoError(t, err, "sanitizers should initialize")
-			input := &eventHubInputV2{
-				config:  defaultTestConfig,
-				log:     logger,
-				metrics: metrics,
-				messageDecoder: messageDecoder{
-					config: defaultTestConfig, log: logger, metrics: metrics, sanitizers: sanitizers,
-				},
-			}
-			received := []*azeventhubs.ReceivedEventData{
-				{
-					EventData: azeventhubs.EventData{
-						Body:       []byte(`{"records":[{"msg":"one"},{"msg":"two"}]}`),
-						Properties: map[string]any{"application": "test"},
-					},
-					Offset:           "1234",
-					SequenceNumber:   42,
-					EnqueuedTime:     tc.enqueuedTime,
-					RawAMQPMessage:   &azeventhubs.AMQPAnnotatedMessage{},
-					SystemProperties: map[string]any{"service": "test"},
-				},
-				{
-					EventData:      azeventhubs.EventData{Body: []byte(`{"msg":"three"}`)},
-					Offset:         "5678",
-					SequenceNumber: 43,
-					EnqueuedTime:   tc.enqueuedTime,
-				},
-			}
-			client := &fakeClient{}
-			require.NoError(t, input.processReceivedEvents(received, "0", client), "messages should be published")
-			require.Len(t, client.publishedEvents, 3, "the first message should expand into two records")
-
-			for i, source := range []*azeventhubs.ReceivedEventData{received[0], received[0], received[1]} {
-				checkpoint, ok := client.publishedEvents[i].Private.(*checkpointMetadata)
-				require.True(t, ok, "event %d should carry checkpoint metadata accepted by the ACK callback", i)
-				assert.Equal(t, &checkpointMetadata{
-					offset: source.Offset, sequenceNumber: source.SequenceNumber, enqueuedTime: source.EnqueuedTime,
-				}, checkpoint, "event %d should retain only checkpoint and logging metadata", i)
-			}
-			assert.Same(t, client.publishedEvents[0].Private, client.publishedEvents[1].Private,
-				"records from the same message should share checkpoint metadata")
-		})
+	logger := logptest.NewTestingLogger(t, inputName)
+	metrics := newInputMetrics(monitoring.NewRegistry(), logger)
+	sanitizers, err := newSanitizers(defaultTestConfig.Sanitizers, defaultTestConfig.LegacySanitizeOptions)
+	require.NoError(t, err, "sanitizers should initialize")
+	input := &eventHubInputV2{
+		config:  defaultTestConfig,
+		log:     logger,
+		metrics: metrics,
+		messageDecoder: messageDecoder{
+			config: defaultTestConfig, log: logger, metrics: metrics, sanitizers: sanitizers,
+		},
 	}
+	received := []*azeventhubs.ReceivedEventData{
+		{
+			EventData: azeventhubs.EventData{
+				Body:       []byte(`{"records":[{"msg":"one"},{"msg":"two"}]}`),
+				Properties: map[string]any{"application": "test"},
+			},
+			Offset:           "1234",
+			SequenceNumber:   42,
+			EnqueuedTime:     &now,
+			RawAMQPMessage:   &azeventhubs.AMQPAnnotatedMessage{},
+			SystemProperties: map[string]any{"service": "test"},
+		},
+		{
+			EventData:      azeventhubs.EventData{Body: []byte(`{"msg":"three"}`)},
+			Offset:         "5678",
+			SequenceNumber: 43,
+		},
+	}
+	client := &fakeClient{}
+	require.NoError(t, input.processReceivedEvents(received, "0", client), "messages should be published")
+	require.Len(t, client.publishedEvents, 3, "the first message should expand into two records")
+
+	for i, source := range []*azeventhubs.ReceivedEventData{received[0], received[0], received[1]} {
+		checkpoint, ok := client.publishedEvents[i].Private.(*checkpointMetadata)
+		require.True(t, ok, "event %d should carry checkpoint metadata accepted by the ACK callback", i)
+		assert.Equal(t, &checkpointMetadata{
+			offset: source.Offset, sequenceNumber: source.SequenceNumber,
+		}, checkpoint, "event %d should retain only checkpoint metadata", i)
+	}
+	assert.Same(t, client.publishedEvents[0].Private, client.publishedEvents[1].Private,
+		"records from the same message should share checkpoint metadata")
 }
 
 // TestProcessReceivedEventsConcurrentConversion verifies that the events
