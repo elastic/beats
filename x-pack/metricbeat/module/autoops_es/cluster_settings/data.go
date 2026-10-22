@@ -106,15 +106,12 @@ var (
 		}, c.DictOptional),
 	}, c.DictOptional)
 
-	// `serverless.*` only exists on Serverless projects. `min_search_vcu` is collected as a string
-	// like its siblings and converted to a number afterwards by normalizeMinSearchVCU, because
-	// Elasticsearch returns it as a string and `-1` has to be dropped after scope precedence.
 	serverlessSchema = c.Dict("serverless", s.Schema{
 		"search": c.Dict("search", s.Schema{
 			"boost_window":     c.Str("boost_window", s.IgnoreAllErrors),
 			"search_power_max": c.Str("search_power_max", s.IgnoreAllErrors),
 			"search_power_min": c.Str("search_power_min", s.IgnoreAllErrors),
-			"min_search_vcu":   c.Str("min_search_vcu", s.IgnoreAllErrors),
+			"min_search_vcu":   c.Ifc("min_search_vcu", s.Optional),
 		}, c.DictOptional),
 	}, c.DictOptional)
 
@@ -270,13 +267,9 @@ func flattenSettings(metricSetFields mapstr.M) mapstr.M {
 	return result
 }
 
-// normalizeMinSearchVCU turns the flattened `serverless.search.min_search_vcu` string into an
-// integer so it can be mapped as a number and aggregated over time.
-//
-// It runs after flattenSettings so that an explicit `-1` in a higher-precedence scope (Elasticsearch's
-// "unset" sentinel) hides a real value from a lower one. The key is removed, rather than set to a
-// placeholder, when the setting is unset, negative or not a whole number, so unset projects index no
-// value and a malformed one never breaks the event.
+// normalizeMinSearchVCU converts the merged min_search_vcu to an integer, or removes it when unset (-1),
+// null, negative or not a whole number. The raw value is kept until here so that an unset or invalid
+// override in a higher-precedence scope also hides a valid value from a lower one.
 func normalizeMinSearchVCU(flattened mapstr.M) {
 	const key = "serverless.search.min_search_vcu"
 

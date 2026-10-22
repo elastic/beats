@@ -39,18 +39,20 @@ func expectValidParsedData(t *testing.T, data metricset.FetcherData[map[string]a
 	// schema is expected to drop this field if it appears (it does in one file)
 	require.Nil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "ignored_field"))
 
-	if data.Version == "8.11.0" {
+	// fixtures are told apart by display name: stateful clusters are "my-cluster", the rest are Serverless projects
+	switch displayName {
+	case "my-cluster":
+		expectStatefulSettings(t, data, event)
+
+		// min_search_vcu only exists on Serverless, so stateful clusters never report it
+		require.NotContains(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "serverless.search"), "min_search_vcu")
+	case "my-search-project", "my-unset-project":
 		expectServerlessSettings(t, event, displayName)
-		return
+	default:
+		require.Failf(t, "unexpected fixture", "no expectations for display name %q in %s", displayName, data.File)
 	}
-
-	expectStatefulSettings(t, data, event)
-
-	// min_search_vcu only exists on Serverless, so stateful clusters never report it
-	require.NotContains(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "serverless.search"), "min_search_vcu")
 }
 
-// Serverless projects report 8.11.0 (see cluster_info.8.11.0.json); the fixtures differ by display name.
 func expectServerlessSettings(t *testing.T, event mb.Event, displayName string) {
 	require.Equal(t, "20000", auto_ops_testing.GetObjectValue(event.MetricSetFields, "cluster.max_shards_per_node"))
 	require.ElementsMatch(t, []string{"/usr/share/elasticsearch/data"}, auto_ops_testing.GetObjectValue(event.MetricSetFields, "path.data"))
@@ -338,6 +340,20 @@ func TestMinSearchVCU(t *testing.T) {
 			settings: map[string]any{
 				"defaults":   map[string]any{},
 				"persistent": serverlessScope(map[string]any{"min_search_vcu": nil}),
+			},
+			expected: nil,
+		},
+		"null in a higher scope hides a valid lower scope value": {
+			settings: map[string]any{
+				"defaults":  serverlessScope(map[string]any{"min_search_vcu": "8"}),
+				"transient": serverlessScope(map[string]any{"min_search_vcu": nil}),
+			},
+			expected: nil,
+		},
+		"non-string in a higher scope hides a valid lower scope value": {
+			settings: map[string]any{
+				"defaults":   serverlessScope(map[string]any{"min_search_vcu": "8"}),
+				"persistent": serverlessScope(map[string]any{"min_search_vcu": true}),
 			},
 			expected: nil,
 		},
