@@ -17,6 +17,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	protobuf "google.golang.org/protobuf/proto"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
@@ -269,7 +270,7 @@ func TestManagerV2(t *testing.T) {
 	}, 15*time.Second, 300*time.Millisecond)
 }
 
-func TestManagerV2_ReloadCount(t *testing.T) {
+func TestManagerV2_ReloadCountOnConfigChange(t *testing.T) {
 	r := reload.NewRegistry()
 
 	output := &reloadable{}
@@ -402,6 +403,77 @@ func TestManagerV2_ReloadCount(t *testing.T) {
 	assert.Equal(t, 1, output.reloadCount) // initial load
 	assert.Equal(t, 2, inputs.reloadCount) // initial load + config update
 	assert.Equal(t, 0, apm.reloadCount)    // no apm tracing config applied
+}
+
+func TestManagerV2_ReloadCountOnAgentInfoChange(t *testing.T) {
+	r := reload.NewRegistry()
+
+	r.MustRegisterOutput(&reloadable{})
+	inputs := &reloadableList{}
+	r.MustRegisterInput(inputs)
+
+	// tagAgentInfo returns a copy of info with new tags, a change that must trigger an inputs reload.
+	tagAgentInfo := func(info *proto.AgentInfo, tags ...string) *proto.AgentInfo {
+		tagged := protobuf.CloneOf(info)
+		tagged.Tags = tags
+		return tagged
+	}
+
+	agentInfo := &proto.AgentInfo{
+		Id:       "elastic-agent-id",
+		Version:  version.GetDefaultVersion(),
+		Snapshot: true,
+	}
+	units := []*proto.UnitExpected{
+		{
+			Id:             "input-unit",
+			Type:           proto.UnitType_INPUT,
+			ConfigStateIdx: 1,
+			Config: &proto.UnitExpectedConfig{
+				Id:      "input",
+				Streams: []*proto.Stream{{Id: "stream"}},
+			},
+			State:    proto.State_HEALTHY,
+			LogLevel: proto.UnitLogLevel_INFO,
+		},
+	}
+	srv := integration.NewMockServer([]*proto.CheckinExpected{
+		{
+			AgentInfo:   agentInfo,
+			Units:       units,
+			FeaturesIdx: 1,
+		},
+		{
+			AgentInfo:   tagAgentInfo(agentInfo, "production"),
+			Units:       units,
+			FeaturesIdx: 1,
+		},
+	},
+		nil,
+		500*time.Millisecond,
+	)
+	require.NoError(t, srv.Start())
+	defer srv.Stop()
+
+	client := client.NewV2(fmt.Sprintf(":%d", srv.Port), "", client.VersionInfo{
+		Name: "program",
+	}, client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
+
+	m, err := NewV2AgentManagerWithClient(&Config{
+		Enabled: true,
+	}, r, client, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	require.NoError(t, m.PreInit(), "could not pre-init ManagerV2")
+	defer m.Stop()
+	m.PostInit()
+
+	require.Eventually(t, func() bool {
+		inputs.mx.Lock()
+		defer inputs.mx.Unlock()
+		return inputs.reloadCount == 2 // initial load + agent info update
+	}, 10*time.Second, 10*time.Millisecond, "expected inputs to be reloaded when only the agent info changed")
+	assert.Equal(t, []string{"production"}, m.AgentInfo().Tags)
 }
 
 func TestManagerV2_PreInitAppliesBufferedUnitsAfterPostInit(t *testing.T) {
