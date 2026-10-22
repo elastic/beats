@@ -6,9 +6,12 @@ package logstashexporter
 
 import (
 	"context"
+	stdjson "encoding/json"
 	"errors"
 	"maps"
+	"net"
 	"runtime"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -28,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter/internal"
 	"github.com/elastic/elastic-agent-libs/transport"
+	v2 "github.com/elastic/go-lumber/server/v2"
 )
 
 const (
@@ -384,7 +388,7 @@ func TestProcessBatchResultHandlesCancelledContext(t *testing.T) {
 
 	exp := newExporterWithDefaults(t)
 	logs := newTestLogs()
-	batch, err := internal.NewLogBatch(logs)
+	batch, err := internal.NewLogBatch(logs, "")
 	require.NoError(t, err)
 
 	ok, err := runWithTimeout(t.Context(), func(context.Context) error {
@@ -398,6 +402,97 @@ func TestProcessBatchResultHandlesCancelledContext(t *testing.T) {
 	if assert.ErrorAs(t, err, &retryableErr) {
 		assert.Equal(t, logs, retryableErr.Data())
 		assert.ErrorIs(t, retryableErr, context.Canceled)
+	}
+}
+
+// TestConsumeLogsMultipleBeatReceivers verifies that one exporter shared by
+// several beat receivers emits the '@metadata.beat' and '@metadata.version'
+// of the beat each batch came from
+func TestConsumeLogsMultipleBeatReceivers(t *testing.T) {
+	var rawEvents []string
+	listener, err := net.Listen("tcp", "localhost:0")
+	require.NoError(t, err, "failed to listen")
+
+	// create a server
+	server, err := v2.NewWithListener(listener, v2.JSONDecoder(func(data []byte, v any) error {
+		rawEvents = append(rawEvents, string(data))
+		return stdjson.Unmarshal(data, v)
+	}))
+	require.NoError(t, err, "failed to start lumberjack server")
+	t.Cleanup(func() { _ = server.Close() })
+
+	exp := newExporterWithDefaultsWith(t, map[string]any{"hosts": []string{listener.Addr().String()}})
+	t.Cleanup(func() { _ = exp.Shutdown(context.Background()) })
+
+	// Elastic Agent runs every receiver feeding a Logstash output with
+	// include_metadata, so each log record body carries '@metadata'. All
+	// receivers in one Agent share the same version.
+	receivers := []beat.Info{
+		{Beat: "filebeat", Version: "9.6.0", IndexPrefix: "filebeat"},
+		{Beat: "metricbeat", Version: "9.6.0", IndexPrefix: "metricbeat"},
+		{Beat: "heartbeat", Version: "9.6.0", IndexPrefix: "heartbeat"},
+	}
+
+	// Drain and ACK everything the server receives, collecting the events.
+	received := make(chan map[string]any, len(receivers))
+	go func() {
+		for batch := range server.ReceiveChan() {
+			for _, ev := range batch.Events {
+				if m, ok := ev.(map[string]any); ok {
+					received <- m
+				}
+			}
+			batch.ACK()
+		}
+	}()
+
+	// Publish one batch per receiver, in order: the first one creates the
+	// shared Logstash clients with its own index prefix and version.
+	for _, info := range receivers {
+		logs := plog.NewLogs()
+		body := logs.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty().LogRecords().AppendEmpty().Body().SetEmptyMap()
+		body.PutStr("message", info.Beat+" event")
+		meta := body.PutEmptyMap(beat.MetadataFieldKey)
+		meta.PutStr("beat", info.Beat)
+		meta.PutStr("version", info.Version)
+		meta.PutStr("type", "_doc")
+
+		ctx, cancel := context.WithTimeout(t.Context(), exporterTestDefaultTimeout)
+		err := exp.ConsumeLogs(otelctx.NewConsumerContext(ctx, info), logs)
+		cancel()
+		require.NoError(t, err, "ConsumeLogs for %s must succeed", info.Beat)
+	}
+
+	// collect the events from the server
+	got := make(map[string]map[string]any, len(receivers))
+	for range receivers {
+		select {
+		case ev := <-received:
+			msg, _ := ev["message"].(string)
+			got[msg] = ev
+		case <-time.After(exporterTestDefaultTimeout):
+			t.Fatalf("timed out waiting for events, got %d of %d", len(got), len(receivers))
+		}
+	}
+
+	// verify the events
+	for _, info := range receivers {
+		ev, ok := got[info.Beat+" event"]
+		require.True(t, ok, "event for %s was not received", info.Beat)
+
+		meta, ok := ev[beat.MetadataFieldKey].(map[string]any)
+		require.True(t, ok, "event for %s has no @metadata map: %v", info.Beat, ev)
+		assert.Equal(t, info.Beat, meta["beat"], "@metadata.beat for %s", info.Beat)
+		assert.Equal(t, info.Version, meta["version"], "@metadata.version for %s", info.Beat)
+		assert.Equal(t, "_doc", meta["type"], "@metadata.type for %s", info.Beat)
+	}
+
+	// verify the raw events and that there are no duplicate keys
+	require.Len(t, rawEvents, len(receivers), "unexpected number of raw events")
+	for _, raw := range rawEvents {
+		for _, key := range []string{"@timestamp", "@metadata", "beat", "version", "type"} {
+			assert.Equal(t, 1, strings.Count(raw, `"`+key+`"`), "key %q must appear exactly once in %s", key, raw)
+		}
 	}
 }
 

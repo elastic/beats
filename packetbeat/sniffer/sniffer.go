@@ -47,12 +47,9 @@ import (
 type Sniffer struct {
 	sniffers []sniffer
 	closers  []func()
+	ctx      context.Context
+	cancel   context.CancelFunc
 	log      *logp.Logger
-
-	// ctx is cancelled by Stop. It is created in New, rather than in Run,
-	// so that a Stop that happens before or during Run is never lost.
-	ctx    context.Context
-	cancel context.CancelFunc
 }
 
 type sniffer struct {
@@ -108,12 +105,14 @@ func New(
 	reporter status.StatusReporter,
 	logger *logp.Logger,
 	closers ...func()) (*Sniffer, error) {
+	ctx, cancel := context.WithCancel(context.Background())
 	s := &Sniffer{
 		sniffers: make([]sniffer, len(interfaces)),
 		closers:  closers,
+		ctx:      ctx,
+		cancel:   cancel,
 		log:      logger.Named("sniffer"),
 	}
-	s.ctx, s.cancel = context.WithCancel(context.Background())
 
 	for i, iface := range interfaces {
 		dec, ok := decoders[iface.Device]

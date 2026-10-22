@@ -373,6 +373,33 @@ func TestHarvesterRunner_TeardownNotifiesObserverWithSessionOffset(t *testing.T)
 	require.NoError(t, g.StopHarvesters())
 }
 
+// TestHarvesterRunner_NotifiesObserverAfterRemovingSource asserts the observer
+// hears about a closed source only once the source can be started again.
+func TestHarvesterRunner_NotifiesObserverAfterRemovingSource(t *testing.T) {
+	tests := map[string]*fakeHarvester{
+		"teardown":     {readFn: func(int, v2.Context) (SliceVerdict, error) { return SliceDone, nil }},
+		"open failure": {openErr: errHarvester},
+	}
+	for name, h := range tests {
+		t.Run(name, func(t *testing.T) {
+			g := testHarvesterRunner(t, h, 0)
+			obs := registeredObserver{g: g, registered: make(chan bool, 1)}
+			g.SetObserver(obs)
+
+			g.start()
+			g.Start(startContext(t), &testSource{name: "/path/to/test"})
+
+			select {
+			case registered := <-obs.registered:
+				assert.False(t, registered, "a start triggered by the notification must not find the closed source")
+			case <-time.After(eventuallyTimeout):
+				t.Fatal("the observer was not notified")
+			}
+			assert.NoError(t, g.StopHarvesters(), "stopping the harvesters must not fail")
+		})
+	}
+}
+
 // TestHarvesterRunner_ConnectErrorDoesNotNotifyObserver asserts a setup failure
 // before the cursor exists does not notify the observer. A pipeline connect
 // failure is permanent and degrades the input (see
@@ -1844,3 +1871,11 @@ func (r *recordingStatusReporter) lastMsg() string {
 type chanObserver chan HarvesterStatus
 
 func (c chanObserver) HarvesterClosed(s HarvesterStatus) { c <- s }
+
+// registeredObserver reports whether a notified source was still registered.
+type registeredObserver struct {
+	g          *harvesterRunner
+	registered chan bool
+}
+
+func (o registeredObserver) HarvesterClosed(s HarvesterStatus) { o.registered <- o.g.hasID(s.ID) }
