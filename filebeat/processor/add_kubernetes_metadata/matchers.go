@@ -147,8 +147,10 @@ func (f *LogPathMatcher) MetadataIndexCandidates(event mapstr.M) []string {
 								// Match <n>.log, optionally with a rotation timestamp (<n>.log.20220221-210912)
 								// and/or a .gz suffix. The anchored regex also guards against digit
 								// directory segments (e.g. container/3/real.log).
-								if m := podLogFileRegexp.FindStringSubmatch(pathDirs[podUIDPos+2]); m != nil {
-									logName := m[1]
+								// MatchString plus slicing avoids the allocation FindStringSubmatch makes.
+								// The regexp is anchored on <digits>.log, so the first '.' ends the restart count.
+								if filename := pathDirs[podUIDPos+2]; podLogFileRegexp.MatchString(filename) {
+									logName := filename[:strings.IndexByte(filename, '.')]
 									f.logger.Debugf("Using pod uid/container/restart: %s/%s/%s", podUID, containerName, logName)
 									return []string{
 										containerIndex + "/" + logName,
