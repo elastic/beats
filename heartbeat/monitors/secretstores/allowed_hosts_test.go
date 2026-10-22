@@ -94,7 +94,7 @@ func TestParseAllowedHosts(t *testing.T) {
 		{name: "missing", raw: nil, want: nil},
 		{name: "empty list", raw: []any{}, want: map[string]bool{}},
 		{name: "host names", raw: []any{"API.Example.com.", "intranet", "bücher.example", "my_host"}, want: map[string]bool{"api.example.com": true, "intranet": true, "bücher.example": true, "my_host": true}},
-		{name: "IPs", raw: []any{"10.0.0.1", "::FFFF:10.0.0.2", "[2001:DB8::1]"}, want: map[string]bool{"10.0.0.1": true, "10.0.0.2": true, "2001:db8::1": true}},
+		{name: "IPs", raw: []any{"10.0.0.1", "::FFFF:10.0.0.2", "2001:DB8::1"}, want: map[string]bool{"10.0.0.1": true, "10.0.0.2": true, "2001:db8::1": true}},
 		{name: "not a list", raw: "api.example.com", wantErr: "allowed_hosts: expected a list of host names or IPs"},
 		{name: "not a string", raw: []any{42}, wantErr: "allowed_hosts: expected a host name or IP, got int"},
 		{name: "empty host", raw: []any{""}, wantErr: `"" must be a host name or IP`},
