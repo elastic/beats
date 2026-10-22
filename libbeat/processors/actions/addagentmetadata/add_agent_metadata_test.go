@@ -247,7 +247,7 @@ func TestAddAgentMetadata_FromConfig(t *testing.T) {
 			"snapshot": false,
 			"version":  "9.3.0",
 		},
-		"tags": []any{"production", "team-payments"},
+		"tags": []string{"production", "team-payments"},
 	})
 	require.NoError(t, err)
 
