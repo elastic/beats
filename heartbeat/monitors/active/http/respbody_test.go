@@ -322,7 +322,7 @@ func TestBodyMaxBytesMinimalBufferWithNoValidatorsAndNoIncludeBody(t *testing.T)
 	resp := fakeResponse(body)
 	defer resp.Body.Close()
 
-	fields, _, _ := processBody( //nolint: errcheck //testcode
+	fields, _, _ := processBody(
 		resp,
 		responseConfig{IncludeBody: "never", CheckBodyMaxBytes: bodyMaxBytes, IncludeBodyMaxBytes: 2048},
 		multiValidator{},
@@ -343,7 +343,7 @@ func TestBodyMaxBytesIncludeBodyDefaultSizeLessThanBodyMax(t *testing.T) {
 	resp := fakeResponse(body)
 	defer resp.Body.Close()
 
-	fields, _, _ := processBody( //nolint: errcheck //testcode
+	fields, _, _ := processBody(
 		resp,
 		responseConfig{IncludeBody: "always", CheckBodyMaxBytes: bodyMaxBytes, IncludeBodyMaxBytes: includeBodyMaxBytes},
 		multiValidator{}, // no body validators — triggers the bug
@@ -371,7 +371,7 @@ func TestBodyMaxBytesExpandsWhenIncludeBodyMaxBytesIsLarger(t *testing.T) {
 	resp := fakeResponse(body)
 	defer resp.Body.Close()
 
-	fields, _, _ := processBody( //nolint: errcheck //testcode
+	fields, _, _ := processBody(
 		resp,
 		responseConfig{IncludeBody: "always", CheckBodyMaxBytes: bodyMaxBytes, IncludeBodyMaxBytes: includeBodyMaxBytes},
 		validator,
@@ -398,7 +398,7 @@ func TestBodyMaxBytesEventContentTrimmedToIncludeBodyMaxBytes(t *testing.T) {
 	resp := fakeResponse(body)
 	defer resp.Body.Close()
 
-	fields, _, _ := processBody( //nolint: errcheck //testcode
+	fields, _, _ := processBody(
 		resp,
 		responseConfig{IncludeBody: "always", CheckBodyMaxBytes: bodyMaxBytes, IncludeBodyMaxBytes: includeBodyMaxBytes},
 		validator,
@@ -418,7 +418,9 @@ func TestBodyMaxBytesBelowMIMEBuffer(t *testing.T) {
 			cfg := defaultConfig().Response
 			cfg.IncludeBody = "never"
 			cfg.CheckBodyMaxBytes = limit
-			fields, mimeType, err := processBody(fakeResponse(body), cfg, multiValidator{bodyValidators: []bodyValidator{v}})
+			resp := fakeResponse(body)
+			defer resp.Body.Close()
+			fields, mimeType, err := processBody(resp, cfg, multiValidator{bodyValidators: []bodyValidator{v}})
 			assert.Nil(t, err, "processing a valid response should succeed")
 			assert.Len(t, *captured, limit, "MIME detection must not increase the validation limit")
 			assert.Equal(t, len(body), fields["bytes"], "the full response must still be counted")
