@@ -204,7 +204,8 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	})
 
 	if bt.otelStatusFactoryWrapper != nil {
-		bt.monitorFactory = bt.otelStatusFactoryWrapper(bt.monitorFactory)
+		// In receiver mode one invalid monitor must not stop the others.
+		bt.monitorFactory = bt.otelStatusFactoryWrapper(invalidMonitorFactory{RunnerFactory: bt.monitorFactory, logger: bt.logger})
 	}
 
 	waitMonitors := monitors.NewSignalWait()
