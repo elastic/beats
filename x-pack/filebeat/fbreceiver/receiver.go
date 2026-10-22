@@ -7,34 +7,22 @@ package fbreceiver
 import (
 	"context"
 	"fmt"
-	"sync"
 
 	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
 
 	"go.opentelemetry.io/collector/component"
-	"go.uber.org/zap"
 )
 
 type filebeatReceiver struct {
 	xpInstance.BeatReceiver
-	wg sync.WaitGroup
 }
 
 func (fb *filebeatReceiver) Start(ctx context.Context, host component.Host) error {
-<<<<<<< HEAD
-	fb.wg.Go(func() {
-		fb.Logger.Info("starting filebeat receiver")
-		if err := fb.BeatReceiver.Start(host); err != nil {
-			fb.Logger.Error("error starting filebeat receiver", zap.Error(err))
-		}
-	})
-=======
 	fb.Logger.Info("starting filebeat receiver")
 	if err := fb.BeatReceiver.Start(ctx, host); err != nil {
 		return fmt.Errorf("error starting filebeat receiver: %w", err)
 	}
 
->>>>>>> 36c8c4f (Correctly set useragent field in otel mode (#53654))
 	return nil
 }
 
@@ -43,6 +31,6 @@ func (fb *filebeatReceiver) Shutdown(ctx context.Context) error {
 	if err := fb.BeatReceiver.Shutdown(ctx); err != nil {
 		return fmt.Errorf("error stopping filebeat receiver: %w", err)
 	}
-	fb.wg.Wait()
+
 	return nil
 }

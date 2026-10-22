@@ -135,12 +135,7 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 }
 
 // BeatReceiver.Start() starts the beat receiver.
-<<<<<<< HEAD
-func (br *BeatReceiver) Start(host component.Host) (retErr error) {
-=======
 func (br *BeatReceiver) Start(ctx context.Context, host component.Host) (retErr error) {
-	close(br.startCalled)
->>>>>>> 36c8c4f (Correctly set useragent field in otel mode (#53654))
 	// If Start returns an error before the beater.Run goroutine is launched,
 	// signal runDone so that a concurrent Shutdown does not block forever on it.
 	defer func() {

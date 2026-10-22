@@ -7,33 +7,21 @@ package pbreceiver
 import (
 	"context"
 	"fmt"
-	"sync"
 
 	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
 
 	"go.opentelemetry.io/collector/component"
-	"go.uber.org/zap"
 )
 
 type packetbeatReceiver struct {
 	xpInstance.BeatReceiver
-	wg sync.WaitGroup
 }
 
 func (pb *packetbeatReceiver) Start(ctx context.Context, host component.Host) error {
-<<<<<<< HEAD
-	pb.wg.Go(func() {
-		pb.Logger.Info("starting packetbeat receiver")
-		if err := pb.BeatReceiver.Start(host); err != nil {
-			pb.Logger.Error("error starting packetbeat receiver", zap.Error(err))
-		}
-	})
-=======
 	pb.Logger.Info("starting packetbeat receiver")
 	if err := pb.BeatReceiver.Start(ctx, host); err != nil {
 		return fmt.Errorf("error starting packetbeat receiver: %w", err)
 	}
->>>>>>> 36c8c4f (Correctly set useragent field in otel mode (#53654))
 	return nil
 }
 
@@ -42,6 +30,5 @@ func (pb *packetbeatReceiver) Shutdown(ctx context.Context) error {
 	if err := pb.BeatReceiver.Shutdown(ctx); err != nil {
 		return fmt.Errorf("error stopping packetbeat receiver: %w", err)
 	}
-	pb.wg.Wait()
 	return nil
 }

@@ -6,11 +6,8 @@ package instance
 
 import (
 	"context"
-<<<<<<< HEAD
-=======
 	"errors"
 	"maps"
->>>>>>> 36c8c4f (Correctly set useragent field in otel mode (#53654))
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -151,57 +148,6 @@ func TestBeatReceiverStartShutdown(t *testing.T) {
 		"all published events must be acknowledged by the time Shutdown returns")
 }
 
-<<<<<<< HEAD
-=======
-func TestBeatReceiverStartHookRunsBeforeRun(t *testing.T) {
-	hookRan := &atomic.Bool{}
-	runObservedHook := make(chan bool, 1)
-	mb := &mockReceiverBeater{
-		acked:    &atomic.Int64{},
-		initDone: make(chan struct{}),
-		done:     make(chan struct{}),
-		runCalledHook: func() {
-			runObservedHook <- hookRan.Load()
-		},
-	}
-	creator := func(*beat.Beat, *conf.C) (beat.Beater, error) { return mb, nil }
-
-	b, err := NewBeatForReceiver(
-		cmd.FilebeatSettings("filebeat"),
-		map[string]any{"path.home": t.TempDir()},
-		consumertest.NewNop(),
-		"test-receiver",
-		zapcore.NewNopCore(),
-	)
-	require.NoError(t, err, "building the receiver beat should succeed")
-
-	rs := receiver.Settings{
-		ID: component.NewIDWithName(component.MustNewType("mockbeatreceiver"), "r1"),
-		TelemetrySettings: component.TelemetrySettings{
-			Logger: zap.NewNop(),
-		},
-	}
-	br, err := NewBeatReceiver(t.Context(), b, creator, rs)
-	require.NoError(t, err, "creating the beat receiver should succeed")
-
-	host := componenttest.NewNopHost()
-	br.SetStartHook(func(receivedHost component.Host) error {
-		assert.Same(t, host, receivedHost, "start hook should receive the Start host")
-		hookRan.Store(true)
-		return nil
-	})
-
-	require.NoError(t, br.Start(t.Context(), host), "starting the Beat receiver should succeed")
-	select {
-	case observed := <-runObservedHook:
-		assert.True(t, observed, "start hook should complete before beater.Run begins")
-	case <-time.After(5 * time.Second):
-		t.Fatal("beater.Run did not begin")
-	}
-	require.NoError(t, br.Shutdown(t.Context()), "shutting down the Beat receiver should succeed")
-}
-
->>>>>>> 36c8c4f (Correctly set useragent field in otel mode (#53654))
 // fakeActionDiagExtension implements both otelmanager.DiagnosticExtension and
 // otelmanager.ActionExtension, modeling elastic-agent's elasticdiagnostics
 // extension for the purposes of testing that BeatReceiver.Start wires both
@@ -424,90 +370,6 @@ func TestBeatReceiverStartFailureShutdownDoesNotHang(t *testing.T) {
 		t.Fatal("Shutdown hung after BeatReceiver.Start failed — nil runDone not fixed")
 	}
 }
-<<<<<<< HEAD
-=======
-
-// TestBeatReceiverShutdownWithoutStart covers the collector calling Shutdown on
-// a receiver that was never started
-func TestBeatReceiverShutdownWithoutStart(t *testing.T) {
-	creator := func(*beat.Beat, *conf.C) (beat.Beater, error) { return &mockReceiverBeater{}, nil }
-
-	b, err := NewBeatForReceiver(
-		cmd.FilebeatSettings("filebeat"),
-		map[string]any{"path.home": t.TempDir()},
-		consumertest.NewNop(),
-		"test-receiver",
-		zapcore.NewNopCore(),
-	)
-	require.NoError(t, err, "building the receiver beat should succeed")
-
-	rs := receiver.Settings{
-		ID: component.NewIDWithName(component.MustNewType("mockbeatreceiver"), "r1"),
-		TelemetrySettings: component.TelemetrySettings{
-			Logger: zap.NewNop(),
-		},
-	}
-	br, err := NewBeatReceiver(t.Context(), b, creator, rs)
-	require.NoError(t, err, "creating the beat receiver should succeed")
-
-	// Use t.Context() (no deadline during test execution) so that waiting on
-	// a runDone that is never signaled would block indefinitely.
-	done := make(chan error, 1)
-	go func() { done <- br.Shutdown(t.Context()) }()
-	select {
-	case err := <-done:
-		require.NoError(t, err, "Shutdown without Start should not error")
-	case <-time.After(5 * time.Second):
-		t.Fatal("Shutdown hung when Start was never called")
-	}
-}
-
-func TestBeatReceiverStartHookFailureShutdownDoesNotHang(t *testing.T) {
-	mb := &mockReceiverBeater{
-		acked:    &atomic.Int64{},
-		initDone: make(chan struct{}),
-		done:     make(chan struct{}),
-	}
-	creator := func(*beat.Beat, *conf.C) (beat.Beater, error) { return mb, nil }
-
-	b, err := NewBeatForReceiver(
-		cmd.FilebeatSettings("filebeat"),
-		map[string]any{"path.home": t.TempDir()},
-		consumertest.NewNop(),
-		"test-receiver",
-		zapcore.NewNopCore(),
-	)
-	require.NoError(t, err, "building the receiver beat should succeed")
-
-	rs := receiver.Settings{
-		ID: component.NewIDWithName(component.MustNewType("mockbeatreceiver"), "r1"),
-		TelemetrySettings: component.TelemetrySettings{
-			Logger: zap.NewNop(),
-		},
-	}
-	br, err := NewBeatReceiver(t.Context(), b, creator, rs)
-	require.NoError(t, err, "creating the beat receiver should succeed")
-
-	hookErr := errors.New("start hook failed")
-	br.SetStartHook(func(component.Host) error {
-		return hookErr
-	})
-
-	startErr := br.Start(t.Context(), componenttest.NewNopHost())
-	require.ErrorIs(t, startErr, hookErr, "Start should return the start hook failure")
-
-	// Shutdown must complete promptly even though Start failed before launching
-	// beater.Run. Use t.Context() (no deadline during test execution) so that a
-	// missing runDone signal would block indefinitely.
-	done := make(chan error, 1)
-	go func() { done <- br.Shutdown(t.Context()) }()
-	select {
-	case err := <-done:
-		require.NoError(t, err, "Shutdown should consume the start failure signal without error")
-	case <-time.After(5 * time.Second):
-		t.Fatal("Shutdown hung after BeatReceiver.Start failed")
-	}
-}
 
 // fakeHeadersSetter models the contrib headers_setter extension: a component
 // implementing extensionauth.GRPCClient whose PerRPCCredentials resolve to a
@@ -684,4 +546,3 @@ func TestBeatReceiverStart_UsesHeadersSetterUserAgent(t *testing.T) {
 		t.Fatal("beater.Run did not return after Stop")
 	}
 }
->>>>>>> 36c8c4f (Correctly set useragent field in otel mode (#53654))
