@@ -210,8 +210,11 @@ func (bt *osquerybeat) close() {
 		bt.cancel = nil
 	}
 
-	// Start watching the parent process.
-	// The beat exits if the process gets orphaned.
+	// Start watching the parent process only now, as a fallback for a
+	// shutdown that never completes (for example when the management client
+	// blocks after Elastic Agent has gone). The beat exits if the process
+	// gets orphaned. See https://github.com/elastic/beats/pull/31931 and
+	// https://github.com/elastic/elastic-agent/issues/556.
 	if bt.watcher != nil {
 		go bt.watcher.Run()
 		bt.watcher = nil

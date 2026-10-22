@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.26.8
+go 1.26.10
 
 require (
 	cloud.google.com/go/bigquery v1.85.0
@@ -169,7 +169,7 @@ require (
 	github.com/brianvoe/gofakeit v3.18.0+incompatible
 	github.com/dgraph-io/badger/v4 v4.6.0
 	github.com/elastic/bayeux v1.0.5
-	github.com/elastic/ebpfevents v0.10.0
+	github.com/elastic/ebpfevents v0.12.0
 	github.com/elastic/elastic-agent-libs v0.47.0
 	github.com/elastic/go-elasticsearch/v8 v8.19.7
 	github.com/elastic/go-freelru v0.16.0
@@ -523,7 +523,7 @@ require (
 	go.opentelemetry.io/collector/consumer/xconsumer v0.163.0 // indirect
 	go.opentelemetry.io/collector/exporter/exporterhelper/xexporterhelper v0.163.0 // indirect
 	go.opentelemetry.io/collector/exporter/xexporter v0.163.0 // indirect
-	go.opentelemetry.io/collector/extension/extensioncapabilities v0.163.0 // indirect
+	go.opentelemetry.io/collector/extension/extensioncapabilities v0.163.0
 	go.opentelemetry.io/collector/extension/extensionmiddleware v0.163.0 // indirect
 	go.opentelemetry.io/collector/extension/xextension v0.163.0
 	go.opentelemetry.io/collector/featuregate v1.69.0 // indirect
