@@ -1,0 +1,10 @@
+kind: security
+
+summary: Update Python test CA bundles for the eMudhra certificate compromise.
+
+description: |
+  Update certifi to 2026.10.19 in the shared system-test requirements and pip
+  to 26.2.2 in the Auditbeat, Heartbeat, Metricbeat and Packetbeat test images
+  so these test environments use patched certificate bundles.
+
+component: libbeat
