@@ -47,8 +47,12 @@ import (
 type Sniffer struct {
 	sniffers []sniffer
 	closers  []func()
-	cancel   atomic.Pointer[context.CancelFunc]
 	log      *logp.Logger
+
+	// ctx is cancelled by Stop. It is created in New, rather than in Run,
+	// so that a Stop that happens before or during Run is never lost.
+	ctx    context.Context
+	cancel context.CancelFunc
 }
 
 type sniffer struct {
@@ -109,6 +113,7 @@ func New(
 		closers:  closers,
 		log:      logger.Named("sniffer"),
 	}
+	s.ctx, s.cancel = context.WithCancel(context.Background())
 
 	for i, iface := range interfaces {
 		dec, ok := decoders[iface.Device]
@@ -219,9 +224,7 @@ func validateAfPacketConfig(cfg *config.InterfaceConfig) error {
 // Run opens the sniffing device and processes packets being read from that device.
 // Worker instances are instantiated as needed.
 func (s *Sniffer) Run() error {
-	ctx, cancel := context.WithCancel(context.Background())
-	s.cancel.Store(&cancel)
-	g, ctx := errgroup.WithContext(ctx)
+	g, ctx := errgroup.WithContext(s.ctx)
 	for i := range s.sniffers {
 		c := &s.sniffers[i]
 		g.Go(func() error {
@@ -528,10 +531,8 @@ func (s *Sniffer) Stop() {
 		s.log.Debugf("sending closing to %s", c.config.Device)
 		c.state.Store(snifferClosing)
 	}
-	if cancel := s.cancel.Load(); cancel != nil {
-		s.log.Debug("cancelling sniffers")
-		(*cancel)()
-	}
+	s.log.Debug("cancelling sniffers")
+	s.cancel()
 }
 
 func openPcap(device, filter string, cfg *config.InterfaceConfig) (snifferHandle, error) {

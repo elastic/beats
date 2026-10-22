@@ -185,61 +185,86 @@ func TestEnsureDecoderReplaceErrorKeepsCurrentCleanup(t *testing.T) {
 	assert.Equal(t, 1, cleanupCalls)
 }
 
+// lifecycleCases cover both Run paths. The default route case is built from
+// a pcap file so that no real device or route is needed; the poll interval
+// is long enough that the poller never reports a route change, so only
+// cancellation can make Run return.
+var lifecycleCases = []struct {
+	name   string
+	device string
+	poll   time.Duration
+}{
+	{name: "static", device: ""},
+	{name: "default_route", device: "default_route", poll: time.Hour},
+}
+
 func TestSnifferStopRunLifecycle(t *testing.T) {
-	t.Parallel()
+	for _, test := range lifecycleCases {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
 
-	s := newTestFileSniffer(t)
+			s := newTestFileSniffer(t, test.device, test.poll)
 
-	s.Stop()
+			s.Stop()
 
-	done := make(chan error, 1)
-	go func() {
-		done <- s.Run()
-	}()
+			done := make(chan error, 1)
+			go func() {
+				done <- s.Run()
+			}()
 
-	select {
-	case err := <-done:
-		assert.NoError(t, err, "Run should return cleanly after Stop-before-Run")
-	case <-time.After(5 * time.Second):
-		t.Fatal("Run did not return after Stop-before-Run")
-	}
+			select {
+			case err := <-done:
+				assert.NoError(t, err, "Run should return cleanly after Stop-before-Run")
+			case <-time.After(5 * time.Second):
+				t.Fatal("Run did not return after Stop-before-Run")
+			}
 
-	for range 2 {
-		s.Stop()
+			for range 2 {
+				s.Stop()
+			}
+		})
 	}
 }
 
 func TestSnifferConcurrentStopRun(t *testing.T) {
-	t.Parallel()
+	for _, test := range lifecycleCases {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
 
-	const iterations = 50
-	for i := range iterations {
-		s := newTestFileSniffer(t)
+			const iterations = 50
+			for i := range iterations {
+				s := newTestFileSniffer(t, test.device, test.poll)
 
-		done := make(chan error, 1)
-		go func() {
-			done <- s.Run()
-		}()
+				done := make(chan error, 1)
+				go func() {
+					done <- s.Run()
+				}()
 
-		for range 10 {
-			s.Stop()
-		}
+				for range 10 {
+					s.Stop()
+				}
 
-		select {
-		case err := <-done:
-			assert.NoError(t, err, "Run should return cleanly after concurrent Stop calls")
-		case <-time.After(5 * time.Second):
-			t.Fatalf("Run did not return after concurrent Stop calls on iteration %d", i)
-		}
+				select {
+				case err := <-done:
+					assert.NoError(t, err, "Run should return cleanly after concurrent Stop calls")
+				case <-time.After(5 * time.Second):
+					t.Fatalf("Run did not return after concurrent Stop calls on iteration %d", i)
+				}
+			}
+		})
 	}
 }
 
-func newTestFileSniffer(t *testing.T) *Sniffer {
+func newTestFileSniffer(t *testing.T, device string, poll time.Duration) *Sniffer {
 	t.Helper()
+
+	// The file path in New skips device resolution, which is where the
+	// default route poller's metric is normally registered.
+	registerDefaultRouteMetricOnce()
 
 	logger := logp.NewLogger("sniffer_test")
 	decoders := map[string]Decoders{
-		"": func(dl layers.LinkType, _ string, _ int) (*decoder.Decoder, func(), error) {
+		device: func(dl layers.LinkType, _ string, _ int) (*decoder.Decoder, func(), error) {
 			dec, err := decoder.New(nil, dl, discardICMP{}, discardICMP{}, discardTCP{}, discardUDP{}, false, logger)
 			if err != nil {
 				return nil, nil, err
@@ -248,8 +273,10 @@ func newTestFileSniffer(t *testing.T) *Sniffer {
 		},
 	}
 	interfaces := []config.InterfaceConfig{{
-		File: "../tests/system/pcaps/http_x_forwarded_for.pcap",
-		Loop: 1000,
+		Device:           device,
+		File:             "../tests/system/pcaps/http_x_forwarded_for.pcap",
+		Loop:             1000,
+		PollDefaultRoute: poll,
 	}}
 	s, err := New("test", true, "", decoders, interfaces, nil, logger)
 	require.NoError(t, err, "creating a file-backed sniffer should succeed")
