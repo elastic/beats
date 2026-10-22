@@ -24,6 +24,7 @@ import (
 	"errors"
 	"os"
 	"runtime"
+	"time"
 
 	"github.com/shirou/gopsutil/v4/common"
 	psprocess "github.com/shirou/gopsutil/v4/process"
@@ -232,8 +233,8 @@ func ReportMetricsCGV1(logger *logp.Logger, pid int, cgroups *cgroup.Reader, V m
 			monitoring.ReportNamespace(V, "stats", func() {
 				monitoring.ReportInt(V, "periods", int64(cpu.Stats.Periods)) //nolint:gosec // G115 — cgroup stats fit in int64
 				monitoring.ReportNamespace(V, "throttled", func() {
-					monitoring.ReportInt(V, "periods", int64(cpu.Stats.Throttled.Periods)) //nolint:gosec // G115 — cgroup stats fit in int64
-					monitoring.ReportInt(V, "ns", int64(cpu.Stats.Throttled.Us))           //nolint:gosec // G115 — cgroup stats fit in int64
+					monitoring.ReportInt(V, "periods", int64(cpu.Stats.Throttled.Periods))                //nolint:gosec // G115 — cgroup stats fit in int64
+					monitoring.ReportInt(V, "ns", int64(cpu.Stats.Throttled.Us*uint64(time.Microsecond))) //nolint:gosec // G115 — cgroup stats fit in int64
 				})
 			})
 		})
@@ -282,8 +283,8 @@ func ReportMetricsCGV2(logger *logp.Logger, pid int, cgroups *cgroup.Reader, V m
 			monitoring.ReportNamespace(V, "stats", func() {
 				monitoring.ReportInt(V, "periods", int64(cpu.Stats.Periods.ValueOr(0))) //nolint:gosec // G115 — cgroup stats fit in int64
 				monitoring.ReportNamespace(V, "throttled", func() {
-					monitoring.ReportInt(V, "periods", int64(cpu.Stats.Throttled.Periods.ValueOr(0))) //nolint:gosec // G115 — cgroup stats fit in int64
-					monitoring.ReportInt(V, "ns", int64(cpu.Stats.Throttled.Us.ValueOr(0)))           //nolint:gosec // G115 — cgroup stats fit in int64
+					monitoring.ReportInt(V, "periods", int64(cpu.Stats.Throttled.Periods.ValueOr(0)))                //nolint:gosec // G115 — cgroup stats fit in int64
+					monitoring.ReportInt(V, "ns", int64(cpu.Stats.Throttled.Us.ValueOr(0)*uint64(time.Microsecond))) //nolint:gosec // G115 — cgroup stats fit in int64
 				})
 			})
 		})

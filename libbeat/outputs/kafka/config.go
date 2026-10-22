@@ -172,6 +172,10 @@ func (c *KafkaConfig) Validate() error {
 
 	if c.Username != "" && c.Password == "" {
 		return fmt.Errorf("password must be set when username is configured")
+	} else if c.Username == "" && c.Password != "" {
+		return fmt.Errorf("username must be set when password is configured")
+	} else if err := c.Sasl.ValidateWithUsernameAndPassword(c.Username != ""); err != nil {
+		return err
 	}
 
 	if c.Compression == "gzip" {

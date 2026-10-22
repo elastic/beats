@@ -57,12 +57,21 @@ type eventConsumer struct {
 }
 
 // consumerTarget specifies the queue to read from, the parameters needed
-// to generate a batch, and the output channel to send batches to.
+// to generate a batch, and where to send batches. Batches go to dispatch if
+// it is set, otherwise to ch. A target with neither is paused.
 type consumerTarget struct {
-	queue      queue.Queue[publisher.Event]
-	ch         chan publisher.Batch
+	queue queue.Queue[publisher.Event]
+	ch    chan publisher.Batch
+	// dispatch hands a batch to the output inline. The consumer calls it
+	// outside its select, so it must never block.
+	dispatch   func(publisher.Batch)
 	timeToLive int
 	batchSize  int
+}
+
+// ready reports whether the target can accept batches.
+func (t consumerTarget) ready() bool {
+	return t.ch != nil || t.dispatch != nil
 }
 
 // retryRequest is used by ttlBatch to add itself back to the eventConsumer
@@ -140,7 +149,7 @@ outerLoop:
 		// If possible, start reading the next batch in the background.
 		// We require a non-nil target channel so we don't queue up a large
 		// batch before we know the real requested size for our output.
-		if queueBatch == nil && !pendingRead && target.queue != nil && target.ch != nil {
+		if queueBatch == nil && !pendingRead && target.queue != nil && target.ready() {
 			pendingRead = true
 			c.queueReader.req <- queueReaderRequest{
 				queue:      target.queue,
@@ -159,6 +168,28 @@ outerLoop:
 			active = queueBatch
 		}
 
+		// Direct dispatch never blocks, so skip the blocking select for it.
+		// Still poll for control messages first: otherwise a steady supply
+		// of batches would starve retries and shutdown.
+		if active != nil && target.dispatch != nil {
+			select {
+			case <-c.done:
+				releaseHeldBatches(queueBatch, retryBatches)
+				break outerLoop
+			case target = <-c.targetChan:
+				continue
+			case req := <-c.retryChan:
+				if b := applyRetry(log, c.retryObserver, req); b != nil {
+					retryBatches = append(retryBatches, b)
+				}
+				continue
+			default:
+			}
+			target.dispatch(active)
+			queueBatch, retryBatches = popActive(queueBatch, retryBatches)
+			continue
+		}
+
 		// If we have a batch, we'll point the output channel at the target
 		// and try to send to it. Otherwise, it will remain nil, and sends
 		// to it will always block, so the output case of the select below
@@ -172,14 +203,7 @@ outerLoop:
 		select {
 		case outputChan <- active:
 			// Successfully sent a batch to the output workers
-			if len(retryBatches) > 0 {
-				// This was a retry, advance the retry batch list
-				retryBatches = retryBatches[1:]
-			} else {
-				// This was directly from the queue, clear the value so we can
-				// fetch a new one
-				queueBatch = nil
-			}
+			queueBatch, retryBatches = popActive(queueBatch, retryBatches)
 
 		case target = <-c.targetChan:
 
@@ -228,7 +252,7 @@ outerLoop:
 		// TryGet has no coalescing window of its own. Skip it while a
 		// debounce timer is running so ReadyChan can accumulate events
 		// the way blocking Get does.
-		if queueBatch == nil && uq != nil && target.ch != nil && debounceC == nil {
+		if queueBatch == nil && uq != nil && target.ready() && debounceC == nil {
 			batch, err := uq.TryGet(target.batchSize)
 			if batch != nil {
 				queueBatch = newBatch(c, batch, target.timeToLive)
@@ -244,6 +268,28 @@ outerLoop:
 		} else if queueBatch != nil {
 			active = queueBatch
 		}
+		// See runBlocking: dispatch never blocks, but control messages
+		// must still be polled between batches.
+		if active != nil && target.dispatch != nil {
+			select {
+			case <-c.done:
+				releaseHeldBatches(queueBatch, retryBatches)
+				break outerLoop
+			case target = <-c.targetChan:
+				stopDebounce()
+				uq, _ = target.queue.(queue.UnblockingQueue[publisher.Event])
+				continue
+			case req := <-c.retryChan:
+				if b := applyRetry(log, c.retryObserver, req); b != nil {
+					retryBatches = append(retryBatches, b)
+				}
+				continue
+			default:
+			}
+			target.dispatch(active)
+			queueBatch, retryBatches = popActive(queueBatch, retryBatches)
+			continue
+		}
 		var outputChan chan publisher.Batch
 		if active != nil {
 			outputChan = target.ch
@@ -252,7 +298,7 @@ outerLoop:
 		// Wait on ReadyChan only when we need a new batch and none is
 		// available. uq is non-nil here, so ReadyChan is safe to call
 		// with no extra local channel.
-		if queueBatch == nil && uq != nil && target.ch != nil && active == nil {
+		if queueBatch == nil && uq != nil && target.ready() && active == nil {
 			select {
 			case <-uq.ReadyChan():
 				// First events are available. Wait GetDebounce before
@@ -287,11 +333,7 @@ outerLoop:
 
 		select {
 		case outputChan <- active:
-			if len(retryBatches) > 0 {
-				retryBatches = retryBatches[1:]
-			} else {
-				queueBatch = nil
-			}
+			queueBatch, retryBatches = popActive(queueBatch, retryBatches)
 
 		case target = <-c.targetChan:
 			stopDebounce()
@@ -307,6 +349,15 @@ outerLoop:
 			break outerLoop
 		}
 	}
+}
+
+// popActive removes the batch that was just handed to the output: the first
+// retry batch if there is one, otherwise the queue batch.
+func popActive(queueBatch *ttlBatch, retryBatches []*ttlBatch) (*ttlBatch, []*ttlBatch) {
+	if len(retryBatches) > 0 {
+		return queueBatch, retryBatches[1:]
+	}
+	return nil, retryBatches
 }
 
 func applyRetry(log *logp.Logger, observer retryObserver, req retryRequest) *ttlBatch {

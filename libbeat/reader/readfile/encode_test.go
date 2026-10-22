@@ -123,7 +123,7 @@ func TestReadersForwardReadDeadline(t *testing.T) {
 
 	var r reader.Reader = enc
 	r = NewStripNewline(r, LineFeed)
-	r = NewFilemeta(r, "path", createTestFileInfo(), false, false, "", 0)
+	r = NewFilemeta(r, "path", createTestFileInfo(), false, false, nil, 0)
 
 	deadline := time.Now().Add(time.Hour)
 	require.True(t, reader.SetReadDeadline(r, deadline),

@@ -174,7 +174,7 @@ func newSessionProperties(sessionName string, conf Config) *EventTraceProperties
 }
 
 // NewSession initializes and returns a new ETW Session based on the provided configuration.
-func NewSession(conf Config) (*Session, error) {
+func NewSession(conf Config, logger *logp.Logger) (*Session, error) {
 	session := &Session{
 		config: conf,
 	}
@@ -187,7 +187,7 @@ func NewSession(conf Config) (*Session, error) {
 	session.processTrace = _ProcessTrace
 	session.closeTrace = _CloseTrace
 
-	session.metadataCache = newMetadataCache(logp.NewLogger("etw_session"))
+	session.metadataCache = newMetadataCache(logger.Named("etw_session"))
 	session.Name = setSessionName(conf)
 	session.Realtime = true
 

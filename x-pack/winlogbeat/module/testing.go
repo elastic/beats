@@ -116,6 +116,7 @@ func testIngestPipeline(t *testing.T, pipeline, pattern string, p *params) {
 	info := beat.Info{
 		IndexPrefix: indexPrefix,
 		Version:     version.GetDefaultVersion(),
+		Logger:      logptest.NewTestingLogger(t, ""),
 	}
 	loaded, err := module.UploadPipelines(info, conn, true)
 	if err != nil {

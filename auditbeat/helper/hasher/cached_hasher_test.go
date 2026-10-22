@@ -26,6 +26,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type pattern struct {
@@ -56,13 +58,13 @@ var config = Config{
 }
 
 func TestCachedHasher(t *testing.T) {
-	ch, err := NewFileHasherWithCache(config, 1)
+	ch, err := NewFileHasherWithCache(config, 1, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 	doTestCachedHasher(t, ch)
 }
 
 func TestCachedHasherWithStat(t *testing.T) {
-	ch, err := NewFileHasherWithCache(config, 1)
+	ch, err := NewFileHasherWithCache(config, 1, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 	ch.hasStatx = false
 	doTestCachedHasher(t, ch)

@@ -29,7 +29,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.uber.org/goleak"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	k8sclient "k8s.io/client-go/kubernetes"
 	k8sfake "k8s.io/client-go/kubernetes/fake"
 	k8stesting "k8s.io/client-go/testing"
@@ -37,10 +40,21 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes/metadata"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+// funcMatcher is a test-only Matcher that delegates to a function.
+type funcMatcher struct {
+	fn func(mapstr.M) []string
+}
+
+func (f funcMatcher) MetadataIndexCandidates(event mapstr.M) []string {
+	return f.fn(event)
+}
 
 // assertRunPdataEquivalent verifies that RunPdata, given the same input fields
 // used to produce result via Run, enriches a pcommon.Map with identical output.
@@ -807,4 +821,196 @@ func TestAnnotatorAppendFields(t *testing.T) {
 		// RunPdata path: assert Run == RunPdata.
 		assertRunPdataEquivalent(t, processor, inputFields, result.Fields)
 	})
+}
+
+// TestAnnotatorRunCandidateFallback verifies that when a matcher returns multiple
+// candidate indexes, the processor walks them in order and uses the first hit.
+func TestAnnotatorRunCandidateFallback(t *testing.T) {
+	uid := "uid-001"
+	containerIdx := uid + "/mycontainer"
+	restartIdx := uid + "/mycontainer/0"
+
+	// Build a matcher that returns three candidates in the expected order.
+	matcher := funcMatcher{fn: func(mapstr.M) []string {
+		return []string{restartIdx, containerIdx, uid}
+	}}
+
+	newProcessor := func() *kubernetesAnnotator {
+		p := &kubernetesAnnotator{
+			log:   logptest.NewTestingLogger(t, selector),
+			cache: newCache(10 * time.Second),
+		}
+		setReady(p, &Matchers{matchers: []Matcher{matcher}})
+		return p
+	}
+
+	podOnlyMeta := mapstr.M{
+		"kubernetes": mapstr.M{"pod": mapstr.M{"name": "mypod", "uid": uid}},
+	}
+	containerNameMeta := mapstr.M{
+		"kubernetes": mapstr.M{
+			"pod":       mapstr.M{"name": "mypod", "uid": uid},
+			"container": mapstr.M{"name": "mycontainer", "image": "myimage:latest"},
+		},
+	}
+	fullMeta := mapstr.M{
+		"kubernetes": mapstr.M{
+			"pod":       mapstr.M{"name": "mypod", "uid": uid},
+			"container": mapstr.M{"name": "mycontainer", "image": "myimage:latest", "id": "abc123", "runtime": "containerd"},
+		},
+	}
+
+	// freshEvent returns a new event on each call so subtests don't share mutable state.
+	freshEvent := func() *beat.Event {
+		return &beat.Event{Fields: mapstr.M{"log": mapstr.M{"file": mapstr.M{"path": "/any"}}}}
+	}
+
+	t.Run("most_specific_wins", func(t *testing.T) {
+		// All three indexes present; the most specific (restart-count) is returned.
+		p := newProcessor()
+		p.cache.set(uid, podOnlyMeta)
+		p.cache.set(containerIdx, containerNameMeta)
+		p.cache.set(restartIdx, fullMeta)
+
+		result, err := p.Run(freshEvent())
+		require.NoError(t, err)
+
+		cid, err := result.Fields.GetValue("container.id")
+		require.NoError(t, err)
+		assert.Equal(t, "abc123", cid, "most-specific candidate must win")
+	})
+
+	t.Run("fallback_to_container_index", func(t *testing.T) {
+		// Only <uid>/<container> and <uid> present (rotated log from previous restart).
+		p := newProcessor()
+		p.cache.set(uid, podOnlyMeta)
+		p.cache.set(containerIdx, containerNameMeta)
+		// restartIdx intentionally absent
+
+		result, err := p.Run(freshEvent())
+		require.NoError(t, err)
+
+		_, cidErr := result.Fields.GetValue("container.id")
+		assert.Error(t, cidErr, "container.id must not be set when only name/image are in metadata")
+
+		name, err := result.Fields.GetValue("kubernetes.container.name")
+		require.NoError(t, err)
+		assert.Equal(t, "mycontainer", name, "container name from mid-level candidate must be present")
+	})
+
+	t.Run("fallback_to_uid_only", func(t *testing.T) {
+		// Only bare <uid> in cache (unknown container in path).
+		p := newProcessor()
+		p.cache.set(uid, podOnlyMeta)
+
+		result, err := p.Run(freshEvent())
+		require.NoError(t, err)
+
+		_, cErr := result.Fields.GetValue("kubernetes.container")
+		assert.Error(t, cErr, "kubernetes.container must be absent when only the bare-UID entry is in cache")
+
+		name, err := result.Fields.GetValue("kubernetes.pod.name")
+		require.NoError(t, err)
+		assert.Equal(t, "mypod", name)
+	})
+}
+
+// TestAnnotatorCacheEvictionOnUpdate verifies that when a pod's container restarts
+// (its restart count increments), updatePod schedules the old restart-count indexes for
+// cleanup and records the new indexes, so no entries are stranded in the tracked set.
+//
+// Note: cache.delete schedules TTL-based removal rather than immediate deletion, which is
+// by design (metadata remains available briefly for in-flight events). The test verifies
+// the indexed map tracks the correct current set after each update.
+func TestAnnotatorCacheEvictionOnUpdate(t *testing.T) {
+	mg := metadata.NewPodMetadataGenerator(config.NewConfig(), nil, nil, nil, nil, nil, nil,
+		metadata.GetDefaultResourceMetadataConfig())
+	uidIndexer, err := NewPodUIDIndexer(*config.NewConfig(), mg)
+	require.NoError(t, err)
+	indexers := &Indexers{indexers: []Indexer{uidIndexer}}
+
+	uid := "evict-uid-001"
+	pod := &kubernetes.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "evictpod", Namespace: "default", UID: types.UID(uid),
+		},
+		Spec: v1.PodSpec{
+			Containers: []v1.Container{{Name: "mycontainer", Image: "myimage:v1"}},
+		},
+		Status: v1.PodStatus{
+			PodIP: "10.0.0.1",
+			ContainerStatuses: []kubernetes.PodContainerStatus{
+				{
+					Name:         "mycontainer",
+					Image:        "myimage:v1",
+					ContainerID:  "containerd://old-id",
+					RestartCount: 0,
+				},
+			},
+		},
+	}
+
+	annotator := &kubernetesAnnotator{
+		log:   logptest.NewTestingLogger(t, selector),
+		cache: newCache(10 * time.Second),
+	}
+
+	// indexedFor returns the slice of cache keys recorded for a pod UID, or nil if absent.
+	indexedFor := func(podUID string) []string {
+		v, ok := annotator.indexed.Load(podUID)
+		if !ok {
+			return nil
+		}
+		idxs, _ := v.([]string)
+		return idxs
+	}
+
+	// Seed with restart 0.
+	annotator.addPod(indexers, pod)
+	require.NotNil(t, annotator.cache.get(uid+"/mycontainer/0"), "restart-0 index must be in cache after addPod")
+	require.Contains(t, indexedFor(uid), uid+"/mycontainer/0", "indexed must track restart-0 index")
+
+	// Simulate a container restart: restartCount 0→1, new container ID, no LastTerminationState.
+	// Without deleteRecordedIndexes, uid/mycontainer/0 would be stranded because GetIndexes of the
+	// new pod state no longer includes it (different restart count).
+	pod.Status.ContainerStatuses[0].RestartCount = 1
+	pod.Status.ContainerStatuses[0].ContainerID = "containerd://new-id"
+	// Intentionally no LastTerminationState.
+
+	annotator.updatePod(indexers, pod)
+
+	// The new restart-1 index must be present and tracked.
+	newRestartIdx := uid + "/mycontainer/1"
+	assert.NotNil(t, annotator.cache.get(newRestartIdx), "new restart-1 index must exist after updatePod")
+	assert.Contains(t, indexedFor(uid), newRestartIdx, "indexed must track the new restart-1 index")
+
+	// The old restart-0 index must NOT be tracked any more; it is scheduled for TTL cleanup.
+	assert.NotContains(t, indexedFor(uid), uid+"/mycontainer/0",
+		"old restart-0 index must be removed from indexed set after updatePod (no LastTerminationState)")
+
+	// Now simulate a second restart (1→2) with LastTerminationState populated so the indexer
+	// re-adds the previous-restart entry for the rotated 1.log file.
+	pod.Status.ContainerStatuses[0].RestartCount = 2
+	pod.Status.ContainerStatuses[0].ContainerID = "containerd://third-id"
+	pod.Status.ContainerStatuses[0].LastTerminationState = v1.ContainerState{
+		Terminated: &v1.ContainerStateTerminated{ContainerID: "containerd://new-id"},
+	}
+
+	annotator.updatePod(indexers, pod)
+
+	// The new restart-2 index (live container) must be present.
+	liveIdx := uid + "/mycontainer/2"
+	assert.NotNil(t, annotator.cache.get(liveIdx), "restart-2 index for live container must exist")
+
+	// The restart-1 index is re-added from LastTerminationState (for the rotated 1.log file).
+	prevMeta := annotator.cache.get(newRestartIdx)
+	require.NotNil(t, prevMeta, "previous-restart-1 index for rotated log must be re-added from LastTerminationState")
+	prevID, err := prevMeta.GetValue("kubernetes.container.id")
+	require.NoError(t, err)
+	assert.Equal(t, "new-id", prevID, "previous-restart index must map to the previous container ID")
+
+	// Both the live and previous-restart indexes are tracked in the indexed map.
+	tracked := indexedFor(uid)
+	assert.Contains(t, tracked, liveIdx)
+	assert.Contains(t, tracked, newRestartIdx, "re-added previous-restart index must be tracked")
 }
