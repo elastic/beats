@@ -157,9 +157,13 @@ RUN echo \
 USER {{ .user }}
 # nodejs-24 ships no npm, and Wolfi's npm package (12.0.2) bundles undici 6.27.0 (CVE-2026-19534,
 # CVE-2026-85024). Bootstrap npm >= 12.2.1, which bundles undici 6.29.0, from the registry instead.
-RUN curl -fsSL https://registry.npmjs.org/npm/-/npm-12.2.1.tgz | tar xz -C /tmp \
+# Pinned sha512 (hex) of npm-12.2.1.tgz, i.e. `npm view npm@12.2.1 dist.integrity` decoded from base64.
+# Update it together with the version.
+RUN curl -fsSL -o /tmp/npm.tgz https://registry.npmjs.org/npm/-/npm-12.2.1.tgz \
+    && echo "6ca0a6151553fc107e60f1186d9c10d57508dcde6de31292a54d4cc4e8e8ef3de25b3281274657442d7115d10df930bb3794ddcb0681cdfd9d317189abf7b63d  /tmp/npm.tgz" | sha512sum -c - \
+    && tar xz -C /tmp -f /tmp/npm.tgz \
     && node /tmp/package/bin/npm-cli.js install -g npm@12.2.1 \
-    && rm -rf /tmp/package /tmp/node-compile-cache \
+    && rm -rf /tmp/package /tmp/npm.tgz /tmp/node-compile-cache \
     && npm cache clean --force
 RUN (npm i -g --loglevel verbose --production --engine-strict  @elastic/synthetics@stack_release || sh -c 'tail -n +1 ${NPM_CONFIG_PREFIX}/_logs/* && exit 1')
 # npm >= 12 blocks dependency install scripts by default, so playwright-chromium's
@@ -236,9 +240,13 @@ RUN cd /usr/share/heartbeat/.node \
 
 # TODO: Remove this step when Node.js is bumped to a version that bundles npm >= 12.2.1
 # Bootstrap npm 12.2.1 from a downloaded copy to avoid npm 10.x self-replacement failures
-RUN curl -fsSL https://registry.npmjs.org/npm/-/npm-12.2.1.tgz | tar xz -C /tmp \
+# Pinned sha512 (hex) of npm-12.2.1.tgz, i.e. `npm view npm@12.2.1 dist.integrity` decoded from base64.
+# Update it together with the version.
+RUN curl -fsSL -o /tmp/npm.tgz https://registry.npmjs.org/npm/-/npm-12.2.1.tgz \
+    && echo "6ca0a6151553fc107e60f1186d9c10d57508dcde6de31292a54d4cc4e8e8ef3de25b3281274657442d7115d10df930bb3794ddcb0681cdfd9d317189abf7b63d  /tmp/npm.tgz" | sha512sum -c - \
+    && tar xz -C /tmp -f /tmp/npm.tgz \
     && node /tmp/package/bin/npm-cli.js install -g npm@12.2.1 \
-    && rm -rf /tmp/package
+    && rm -rf /tmp/package /tmp/npm.tgz
 
 # Install synthetics as a regular user, installing npm deps as root doesn't work
 RUN chown -R {{ .user }} $NODE_PATH
