@@ -1415,6 +1415,15 @@ The pagination batch size for requests. If it is zero or negative, the API defau
 The number of requests to allow in each limit window, if set. This parameter should only be set in exceptional cases. When it is set, rate limit information in API responses will be ignored in favor of the fixed limit. The limit is applied separately to each endpoint. Defaults to unset.
 
 
+#### `scratch_dir` [_scratch_dir]
+
+```{applies_to}
+stack: preview 9.5.0
+```
+
+The directory for the temporary file that holds group membership during a full synchronization. This is only used when `use_minimal_state` is `true`. Defaults to the system temporary directory. The directory must already exist and be writable by Filebeat. Use an absolute path: a relative path is resolved against the working directory of the Filebeat process, not against `path.data`.
+
+
 #### `tracer.enabled` [_tracer_enabled_2]
 
 It is possible to log HTTP requests and responses to the Okta API to a local file-system for debugging configurations. This option is enabled by setting `tracer.enabled` to true and setting the `tracer.filename` value. Additional options are available to tune log rotation behavior. To delete existing logs, set `tracer.enabled` to false without unsetting the filename option.
@@ -1474,15 +1483,19 @@ If a sync cannot complete within `update_interval`, the system cannot converge. 
 
 ### Scratch storage
 
+The EntraID and Okta providers write temporary bbolt files during synchronization when `use_minimal_state` is `true`.
+
 The EntraID membership graph is stored in a temporary file (bbolt) rather than in-memory. This bounds Go heap usage for large directories — the heap holds only the BFS working set, not the full adjacency data. The trade-off is ephemeral disk usage:
 
 - At 2.5M edges (5,000 groups × 500 members), the scratch file is approximately 103 MB.
 - Mmap'd pages are OS-reclaimable under memory pressure and do not contribute to OOM kills in cgroup-limited containers.
 - Build time is dominated by API call latency, not local I/O.
 
-The Okta provider also uses a scratch file, to hold group membership during a full synchronization when `groups` is in `enrich_with`.
+The Okta provider uses a scratch file to hold group membership during a full synchronization, when users are collected and `groups` is in `enrich_with`, which is the default. No file is created with `dataset: devices`.
 
-The `scratch_dir` provider configuration option overrides the default temporary directory for both providers. The directory must exist and be writable. Files use the prefix `entcollect-scratch-*`.
+The `scratch_dir` provider configuration option overrides the default temporary directory for both providers. The directory must exist and be writable. Use an absolute path: unlike the state files, which are kept under `path.data`, a relative `scratch_dir` is resolved against the working directory of the Filebeat process. Files use the prefix `entcollect-scratch-*`.
+
+A scratch file is removed when the synchronization ends. If Filebeat is killed (for example by SIGKILL or the out-of-memory killer), the file is left behind and nothing removes it later. If stale `entcollect-scratch-*.db` files build up in `scratch_dir`, delete them.
 
 ### Rate limiting
 
