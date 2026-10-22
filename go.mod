@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.26.8
+go 1.26.10
 
 require (
 	cloud.google.com/go/bigquery v1.85.0
@@ -169,7 +169,7 @@ require (
 	github.com/brianvoe/gofakeit v3.18.0+incompatible
 	github.com/dgraph-io/badger/v4 v4.6.0
 	github.com/elastic/bayeux v1.0.5
-	github.com/elastic/ebpfevents v0.10.0
+	github.com/elastic/ebpfevents v0.12.0
 	github.com/elastic/elastic-agent-libs v0.47.0
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
@@ -178,7 +178,7 @@ require (
 	github.com/elastic/mito v1.27.0
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
 	github.com/elastic/sarama v1.19.1-0.20260310070522-abae92ca1603
-	github.com/elastic/tk-btf v0.2.0
+	github.com/elastic/tk-btf v0.3.0
 	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
 	github.com/go-ldap/ldap/v3 v3.4.13
 	github.com/go-ole/go-ole v1.3.0
@@ -331,7 +331,7 @@ require (
 	github.com/andybalholm/brotli v1.2.0 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
 	github.com/apache/arrow/go/v15 v15.0.2 // indirect
-	github.com/apache/thrift v0.25.0 // indirect
+	github.com/apache/thrift v0.25.0
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/aws/aws-msk-iam-sasl-signer-go v1.0.4 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.22 // indirect
