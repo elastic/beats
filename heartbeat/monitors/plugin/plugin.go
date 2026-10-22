@@ -36,16 +36,21 @@ import (
 // to prevent a start/stop cycle for select fields updates
 type HashConfigFunc func(cfg *conf.C) (uint64, error)
 
+// DestinationsFunc (optional) returns the hosts (targets and proxies) that a monitor with the config cfg sends data to.
+// Required to use secret stores with allowed_hosts.
+type DestinationsFunc func(cfg *conf.C) ([]string, error)
+
 type PluginMake func(string, *conf.C, beat.Info) (p Plugin, err error)
 type PluginUpdate func(*conf.C) (err error)
 
 // PluginFactory represents an uninstantiated plug in instance generated from a monitor config. Invoking the Make function creates a plug-in instance.
 type PluginFactory struct {
-	Name       string
-	Aliases    []string
-	Make       PluginMake
-	Stats      RegistryRecorder
-	HashConfig HashConfigFunc
+	Name         string
+	Aliases      []string
+	Make         PluginMake
+	Stats        RegistryRecorder
+	HashConfig   HashConfigFunc
+	Destinations DestinationsFunc
 }
 
 // Plugin describes a configured instance of a plug-in with its jobs already instantiated.
@@ -147,8 +152,18 @@ func Register(name string, make PluginMake, aliases ...string) {
 }
 
 func RegisterWithHashFunc(name string, hashConfig HashConfigFunc, make PluginMake, aliases ...string) {
-	stats := statsForPlugin(name)
-	if err := GlobalPluginsReg.Add(PluginFactory{name, aliases, make, stats, hashConfig}); err != nil {
+	register(PluginFactory{Name: name, Aliases: aliases, Make: make, HashConfig: hashConfig})
+}
+
+// RegisterWithDestinations registers a new active monitor that reports its
+// destinations, see DestinationsFunc.
+func RegisterWithDestinations(name string, destinations DestinationsFunc, make PluginMake, aliases ...string) {
+	register(PluginFactory{Name: name, Aliases: aliases, Make: make, Destinations: destinations})
+}
+
+func register(pf PluginFactory) {
+	pf.Stats = statsForPlugin(pf.Name)
+	if err := GlobalPluginsReg.Add(pf); err != nil {
 		panic(err)
 	}
 }
