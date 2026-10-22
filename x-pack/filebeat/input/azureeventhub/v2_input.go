@@ -69,6 +69,13 @@ type eventHubInputV2 struct {
 	status             status.StatusReporter
 }
 
+// checkpointMetadata excludes payloads and AMQP metadata from pending acknowledgments.
+type checkpointMetadata struct {
+	offset         string
+	sequenceNumber int64
+	enqueuedTime   *time.Time
+}
+
 // newEventHubInputV2 creates a new instance of the Azure Event Hub input v2,
 // that uses the modern Azure Event Hub SDK for Go.
 func newEventHubInputV2(config azureInputConfig, log *logp.Logger) (v2.Input, error) {
@@ -539,10 +546,10 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 
 		// Retain only checkpoint and logging metadata until acknowledgment,
 		// so the message body and AMQP metadata can be collected sooner.
-		checkpoint := &azeventhubs.ReceivedEventData{
-			Offset:         receivedEventData.Offset,
-			SequenceNumber: receivedEventData.SequenceNumber,
-			EnqueuedTime:   receivedEventData.EnqueuedTime,
+		checkpoint := &checkpointMetadata{
+			offset:         receivedEventData.Offset,
+			sequenceNumber: receivedEventData.SequenceNumber,
+			enqueuedTime:   receivedEventData.EnqueuedTime,
 		}
 
 		for _, record := range records {
@@ -593,7 +600,7 @@ func initializePartitionResources(ctx context.Context, partitionClient *azeventh
 			//
 			// The data parameter contains the private data of the last
 			// acknowledged event.
-			receivedEventData, ok := data.(*azeventhubs.ReceivedEventData)
+			checkpoint, ok := data.(*checkpointMetadata)
 			if !ok {
 				log.Errorw(
 					"error updating checkpoint",
@@ -605,7 +612,10 @@ func initializePartitionResources(ctx context.Context, partitionClient *azeventh
 				return
 			}
 
-			err := partitionClient.UpdateCheckpoint(ctx, receivedEventData, nil)
+			err := partitionClient.UpdateCheckpoint(ctx, &azeventhubs.ReceivedEventData{
+				Offset:         checkpoint.offset,
+				SequenceNumber: checkpoint.sequenceNumber,
+			}, nil)
 			if err != nil {
 				log.Errorw(
 					"error updating checkpoint",
@@ -617,9 +627,9 @@ func initializePartitionResources(ctx context.Context, partitionClient *azeventh
 				"checkpoint updated",
 				"partition_id", partitionClient.PartitionID(),
 				"acked", acked,
-				"sequence_number", receivedEventData.SequenceNumber,
-				"offset", receivedEventData.Offset,
-				"enqueued_time", receivedEventData.EnqueuedTime,
+				"sequence_number", checkpoint.sequenceNumber,
+				"offset", checkpoint.offset,
+				"enqueued_time", checkpoint.enqueuedTime,
 			)
 		}),
 		Processing: beat.ProcessingConfig{

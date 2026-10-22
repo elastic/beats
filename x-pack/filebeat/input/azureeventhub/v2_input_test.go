@@ -174,11 +174,10 @@ func TestProcessReceivedEventsRetainsOnlyCheckpointMetadata(t *testing.T) {
 			require.Len(t, client.publishedEvents, 3, "the first message should expand into two records")
 
 			for i, source := range []*azeventhubs.ReceivedEventData{received[0], received[0], received[1]} {
-				checkpoint, ok := client.publishedEvents[i].Private.(*azeventhubs.ReceivedEventData)
+				checkpoint, ok := client.publishedEvents[i].Private.(*checkpointMetadata)
 				require.True(t, ok, "event %d should carry checkpoint metadata accepted by the ACK callback", i)
-				assert.NotSame(t, source, checkpoint, "event %d must not retain the received message", i)
-				assert.Equal(t, &azeventhubs.ReceivedEventData{
-					Offset: source.Offset, SequenceNumber: source.SequenceNumber, EnqueuedTime: source.EnqueuedTime,
+				assert.Equal(t, &checkpointMetadata{
+					offset: source.Offset, sequenceNumber: source.SequenceNumber, enqueuedTime: source.EnqueuedTime,
 				}, checkpoint, "event %d should retain only checkpoint and logging metadata", i)
 			}
 			assert.Same(t, client.publishedEvents[0].Private, client.publishedEvents[1].Private,
