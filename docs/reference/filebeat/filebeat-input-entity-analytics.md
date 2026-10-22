@@ -1472,7 +1472,7 @@ The ceiling is determined by API call count multiplied by per-call latency. Grap
 
 If a sync cannot complete within `update_interval`, the system cannot converge. Increase `update_interval` for larger environments.
 
-### Scratch storage (EntraID)
+### Scratch storage
 
 The EntraID membership graph is stored in a temporary file (bbolt) rather than in-memory. This bounds Go heap usage for large directories — the heap holds only the BFS working set, not the full adjacency data. The trade-off is ephemeral disk usage:
 
@@ -1480,7 +1480,9 @@ The EntraID membership graph is stored in a temporary file (bbolt) rather than i
 - Mmap'd pages are OS-reclaimable under memory pressure and do not contribute to OOM kills in cgroup-limited containers.
 - Build time is dominated by API call latency, not local I/O.
 
-The `scratch_dir` provider configuration option overrides the default temporary directory. Files use the prefix `entcollect-scratch-*`.
+The Okta provider also uses a scratch file, to hold group membership during a full synchronization when `groups` is in `enrich_with`.
+
+The `scratch_dir` provider configuration option overrides the default temporary directory for both providers. The directory must exist and be writable. Files use the prefix `entcollect-scratch-*`.
 
 ### Rate limiting
 
