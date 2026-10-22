@@ -56,29 +56,34 @@ func (tm testManager) RegisterDiagnosticHook(_ string, _ string, _ string, _ str
 func TestUserAgentString(t *testing.T) {
 	tests := []struct {
 		beat             *Beat
+		underAgent       bool
 		expectedComments []string
 		name             string
 	}{
 		{
-			name: "managed-unprivileged",
+			name:       "managed-unprivileged",
+			underAgent: true,
 			beat: &Beat{Info: Info{Beat: "testbeat"},
 				Manager: testManager{isEnabled: true, isUnpriv: true, mgmtMode: management.AgentManagedMode_MANAGED}},
 			expectedComments: []string{"Managed", "Unprivileged"},
 		},
 		{
-			name: "managed-privileged",
+			name:       "managed-privileged",
+			underAgent: true,
 			beat: &Beat{Info: Info{Beat: "testbeat"},
 				Manager: testManager{isEnabled: true, isUnpriv: false, mgmtMode: management.AgentManagedMode_MANAGED}},
 			expectedComments: []string{"Managed"},
 		},
 		{
-			name: "unmanaged-privileged",
+			name:       "unmanaged-privileged",
+			underAgent: true,
 			beat: &Beat{Info: Info{Beat: "testbeat"},
 				Manager: testManager{isEnabled: true, isUnpriv: false, mgmtMode: management.AgentManagedMode_STANDALONE}},
 			expectedComments: []string{"Unmanaged"},
 		},
 		{
-			name: "unmanaged-unprivileged",
+			name:       "unmanaged-unprivileged",
+			underAgent: true,
 			beat: &Beat{Info: Info{Beat: "testbeat"},
 				Manager: testManager{isEnabled: true, isUnpriv: true, mgmtMode: management.AgentManagedMode_STANDALONE}},
 			expectedComments: []string{"Unmanaged", "Unprivileged"},
@@ -114,6 +119,10 @@ func TestUserAgentString(t *testing.T) {
 	uaReg := regexp.MustCompile(`Elastic-testbeat/([\d.]+) \(([\w-:+; ]+)\)`)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			previous := management.UnderAgent()
+			t.Cleanup(func() { management.SetUnderAgent(previous) })
+			management.SetUnderAgent(test.underAgent)
+
 			test.beat.GenerateUserAgent()
 			res := uaReg.FindAllStringSubmatch(test.beat.Info.UserAgent, -1)
 			// check to make sure the regex passed, then verify the comments section
