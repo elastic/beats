@@ -49,6 +49,7 @@ func processBody(resp *http.Response, config responseConfig, validator multiVali
 		bufferBodyBytes = config.IncludeBodyMaxBytes
 	}
 
+	validationBodyBytes := bufferBodyBytes
 	if bufferBodyBytes < minBufferBodyBytes {
 		bufferBodyBytes = minBufferBodyBytes
 	}
@@ -60,7 +61,12 @@ func processBody(resp *http.Response, config responseConfig, validator multiVali
 	}
 
 	// Run any validations
-	errReason := validator.validate(resp, respBody)
+	validationBody := respBody
+	if validator.wantsBody() && config.CheckBodyMaxBytes > 0 {
+		// MIME detection may need more bytes than the configured validation limit.
+		validationBody = respBody[:min(len(respBody), validationBodyBytes)]
+	}
+	errReason := validator.validate(resp, validationBody)
 
 	bodyFields := mapstr.M{
 		"hash":  bodyHash,

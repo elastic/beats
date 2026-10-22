@@ -88,14 +88,17 @@ On by default. Set `response.include_headers` to `false` to disable.
 
 Controls the processing and ingestion of the HTTP response body contents to the `http.response.body.contents` field.
 
-### `check_body_max_bytes`
+### `check_body_max_bytes` [monitor-http-check-body-max-bytes]
 
 ```{applies_to}
 stack: ga 9.4+
 ```
 
-Sets the upper boundary for the HTTP responso body length (in bytes). Defaults to 4096 bytes.
-This limit is overriden when `response.include_body_max_bytes` is set to a higher value.
+Sets the maximum number of response body bytes available to body and JSON checks. Set `response.check_body_max_bytes` to a positive integer. Defaults to 4194304 bytes (4 MiB).
+
+When `response.include_body` is `always` or `on_error`, a larger `response.include_body_max_bytes` also increases the number of bytes available to checks. Heartbeat still downloads and hashes the full response; this setting limits the buffered body used by checks. Checks that need content beyond this limit can fail, and truncated JSON can fail to parse.
+
+Before version 9.4, body checks use a fixed 100 MiB limit.
 
 ### `include_body`
 
@@ -113,7 +116,7 @@ Set `response.include_body` to one of the options listed below.
 
 ### `include_body_max_bytes`
 
-Set `response.include_body_max_bytes` to control the maximum size of the stored body contents. Defaults to 1024 bytes.
+Set `response.include_body_max_bytes` to control the maximum size of the stored body contents. Defaults to 2048 bytes.
 
 ### `check` [monitor-http-check]
 
@@ -172,7 +175,7 @@ Under `check.response`, specify these options:
 :   The required response headers.
 
 **`body`**
-:   A list of regular expressions to match the body output. Only a single expression needs to match. HTTP response bodies of up to 100MiB are supported.
+:   A list of regular expressions to match the body output. Only a single expression needs to match. The body available to checks is limited by [`response.check_body_max_bytes`](#monitor-http-check-body-max-bytes).
 
 Example configuration: This monitor examines the response body for the strings `saved` or `Saved` and expects 200 or 201 status codes
 
@@ -195,7 +198,7 @@ Example configuration: This monitor examines the response body for the strings `
       - saved
 ```
 
-Under `check.response.body`, specify these options: **`positive`**:: This option has the same behavior as given a list of regular expressions under `check.response.body`. **`negative`**:: A list of regular expressions to match the the body output negatively. Return match failed if single expression matches. HTTP response bodies of up to 100MiB are supported.
+Under `check.response.body`, specify these options: **`positive`**:: This option has the same behavior as given a list of regular expressions under `check.response.body`. **`negative`**:: A list of regular expressions to match the the body output negatively. Return match failed if single expression matches. The body available to checks is limited by [`response.check_body_max_bytes`](#monitor-http-check-body-max-bytes).
 
 Example configuration: This monitor examines the response body for the strings *foo* or *Foo*
 
@@ -260,7 +263,7 @@ Example configuration: This monitor examines match successfully only when *foo* 
 ```
 
 **`json`**
-:   A list of expressions or [condition](/reference/heartbeat/defining-processors.md#conditions) statements (now deprecated) executed against the body when parsed as JSON. Body sizes must be less than or equal to 100 MiB.
+:   A list of expressions or [condition](/reference/heartbeat/defining-processors.md#conditions) statements (now deprecated) executed against the body when parsed as JSON. The JSON body must fit within the [response body check limit](#monitor-http-check-body-max-bytes).
 
 The following configuration shows how to check the response using [gval](https://github.com/PaesslerAG/gval/blob/master/README.md) expressions when the body contains JSON:
 

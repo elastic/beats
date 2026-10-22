@@ -409,3 +409,20 @@ func TestBodyMaxBytesEventContentTrimmedToIncludeBodyMaxBytes(t *testing.T) {
 	require.True(t, ok)
 	assert.Len(t, content, includeBodyMaxBytes, "event content must be trimmed to IncludeBodyMaxBytes")
 }
+
+func TestBodyMaxBytesBelowMIMEBuffer(t *testing.T) {
+	for _, limit := range []int{1, minBufferBodyBytes - 1, minBufferBodyBytes, minBufferBodyBytes + 1} {
+		t.Run(fmt.Sprintf("limit_%d", limit), func(t *testing.T) {
+			body := strings.Repeat("x", 2*minBufferBodyBytes)
+			v, captured := capturingValidator()
+			cfg := defaultConfig().Response
+			cfg.IncludeBody = "never"
+			cfg.CheckBodyMaxBytes = limit
+			fields, mimeType, err := processBody(fakeResponse(body), cfg, multiValidator{bodyValidators: []bodyValidator{v}})
+			assert.Nil(t, err, "processing a valid response should succeed")
+			assert.Len(t, *captured, limit, "MIME detection must not increase the validation limit")
+			assert.Equal(t, len(body), fields["bytes"], "the full response must still be counted")
+			assert.Equal(t, "text/plain; charset=utf-8", mimeType, "MIME detection must retain its sample")
+		})
+	}
+}
