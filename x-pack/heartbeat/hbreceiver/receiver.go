@@ -19,7 +19,7 @@ type heartbeatReceiver struct {
 
 func (hb *heartbeatReceiver) Start(ctx context.Context, host component.Host) error {
 	hb.Logger.Info("starting heartbeat receiver")
-	if err := hb.BeatReceiver.Start(host); err != nil {
+	if err := hb.BeatReceiver.Start(ctx, host); err != nil {
 		return fmt.Errorf("error starting heartbeat receiverL %w", err)
 	}
 	return nil
