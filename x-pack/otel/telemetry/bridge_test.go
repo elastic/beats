@@ -633,11 +633,11 @@ func TestBridgeNoDeadlockWhenMetricsAppearDuringCollection(t *testing.T) {
 	}
 }
 
-// errorCapture is a logr sink that records the messages the OTel SDK reports
+// errorCapture is a logr sink that counts the errors the OTel SDK reports
 // through its global logger when it fails to record an observation.
 type errorCapture struct {
-	mu   sync.Mutex
-	msgs []string
+	mu sync.Mutex
+	n  int
 }
 
 func (c *errorCapture) Init(logr.RuntimeInfo)          {}
@@ -645,10 +645,10 @@ func (c *errorCapture) Enabled(int) bool               { return true }
 func (c *errorCapture) Info(int, string, ...any)       {}
 func (c *errorCapture) WithValues(...any) logr.LogSink { return c }
 func (c *errorCapture) WithName(string) logr.LogSink   { return c }
-func (c *errorCapture) Error(_ error, msg string, _ ...any) {
+func (c *errorCapture) Error(error, string, ...any) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	c.msgs = append(c.msgs, msg)
+	c.n++
 }
 
 // TestBridgeNoUnregisteredObservations checks that a new metric's instrument is
@@ -692,5 +692,5 @@ func TestBridgeNoUnregisteredObservations(t *testing.T) {
 
 	capture.mu.Lock()
 	defer capture.mu.Unlock()
-	assert.Zero(t, len(capture.msgs), "SDK reported %d failed observations", len(capture.msgs))
+	assert.Zero(t, capture.n, "SDK reported failed observations")
 }
