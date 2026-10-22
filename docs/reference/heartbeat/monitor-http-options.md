@@ -90,6 +90,10 @@ Controls the processing and ingestion of the HTTP response body contents to the 
 
 ### `check_body_max_bytes`
 
+```{applies_to}
+stack: ga 9.4+
+```
+
 Sets the upper boundary for the HTTP responso body length (in bytes). Defaults to 4096 bytes.
 This limit is overriden when `response.include_body_max_bytes` is set to a higher value.
 
