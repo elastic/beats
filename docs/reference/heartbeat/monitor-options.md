@@ -119,6 +119,7 @@ Example:
 ```
 
 
+<<<<<<< HEAD
 ## `secret_stores` [monitor-secret-stores]
 
 ```{applies_to}
@@ -189,6 +190,8 @@ Heartbeat uses the resolved values as they are. A secret in a setting that is pu
 ::::
 
 
+=======
+>>>>>>> 5608c0d ([9.5](backport #53864) docs: flatten Heartbeat monitor option headings to level 2 (#53984))
 ## `fields` [monitor-fields]
 
 Optional fields that you can specify to add additional information to the output. For example, you might add fields that you can use for filtering log data. Fields can be scalar values, arrays, dictionaries, or any nested combination of these. By default, the fields that you specify here will be grouped under a `fields` sub-dictionary in the output document. To store the custom fields as top-level fields, set the `fields_under_root` option to true. If a duplicate field is declared in the general configuration, then its value will be overwritten by the value declared here.
