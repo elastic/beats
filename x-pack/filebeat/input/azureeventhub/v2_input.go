@@ -547,7 +547,10 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 				Timestamp: processingStartTime,
 				Fields: mapstr.M{
 					"message": record,
-					"azure":   eventHubMetadata,
+					// Each event needs its own copy: event normalization is
+					// disabled, so published events reference this map directly
+					// and outputs may read it on other goroutines.
+					"azure": eventHubMetadata.Clone(),
 				},
 				Private: receivedEventData,
 			}
