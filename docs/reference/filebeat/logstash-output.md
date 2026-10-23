@@ -7,7 +7,7 @@ applies_to:
   serverless: ga
 ---
 
-# Configure the Logstash output [logstash-output]
+# Configure the Logstash output in Filebeat [logstash-output]
 
 
 The {{ls}} output sends events directly to {{ls}} by using the lumberjack protocol, which runs over TCP. {{ls}} allows for additional processing and routing of generated events.

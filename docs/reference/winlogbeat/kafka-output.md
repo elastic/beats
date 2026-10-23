@@ -1,4 +1,5 @@
 ---
+description: "Send Winlogbeat events to Apache Kafka. Configure brokers, topics, partitioning, SASL authentication, compression, and retries in the output.kafka section of winlogbeat.yml."
 navigation_title: "Kafka"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/kafka-output.html
@@ -7,7 +8,7 @@ applies_to:
   serverless: ga
 ---
 
-# Configure the Kafka output [kafka-output]
+# Configure the Kafka output in Winlogbeat [kafka-output]
 
 
 The Kafka output sends events to Apache Kafka.

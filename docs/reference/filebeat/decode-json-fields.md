@@ -7,7 +7,7 @@ applies_to:
   serverless: ga
 ---
 
-# Decode JSON fields [decode-json-fields]
+# Decode JSON fields in Filebeat [decode-json-fields]
 
 
 The `decode_json_fields` processor decodes fields containing JSON strings and replaces the strings with valid JSON objects.

@@ -7,7 +7,7 @@ applies_to:
   serverless: ga
 ---
 
-# Configure the Elasticsearch output [elasticsearch-output]
+# Configure the Elasticsearch output in Filebeat [elasticsearch-output]
 
 
 The Elasticsearch output sends events directly to Elasticsearch using the Elasticsearch HTTP API.
