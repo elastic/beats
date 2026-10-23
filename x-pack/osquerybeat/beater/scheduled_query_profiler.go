@@ -171,7 +171,7 @@ func (w *scheduledQueryProfiler) collect(request scheduledProfileRequest) {
 		}
 		return
 	}
-	// This counts collection, not output delivery.
+	// The sink accepted the profile; this does not mean the output delivered it.
 	w.metrics.collected.Inc()
 }
 
