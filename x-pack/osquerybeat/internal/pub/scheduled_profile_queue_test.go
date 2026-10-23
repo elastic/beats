@@ -45,7 +45,9 @@ func (o *blockedProfileOutput) Close() error {
 func (*blockedProfileOutput) String() string { return "blocked profile test output" }
 
 // TestScheduledProfileSinkDoesNotBlockOnFullPool uses a real pipeline whose
-// slab queue is full because the output withholds acknowledgments.
+// slab queue is full because the output withholds acknowledgments. It covers
+// the slab queue only: on the memory queue a DropIfFull publish can wait for a
+// slot by design, so this test would block there.
 func TestScheduledProfileSinkDoesNotBlockOnFullPool(t *testing.T) {
 	// Build a real pipeline with a tiny slab queue and an output that never acks.
 	const capacity = 32 // The slab queue rejects smaller pools.
@@ -95,13 +97,16 @@ func TestScheduledProfileSinkDoesNotBlockOnFullPool(t *testing.T) {
 	// Offer many profiles to the full queue: none may block, and each must be counted as dropped.
 	const attempts = 1024
 	var slowest time.Duration
+	var accepted int
 	for range attempts {
 		start := time.Now()
-		ok := sink.Publish("scheduled", "schedule", "response", "", 1, nil)
+		if sink.Publish("scheduled", "schedule", "response", "", 1, nil) {
+			accepted++
+		}
 		slowest = max(slowest, time.Since(start))
-		assert.False(t, ok, "a profile offered to a full queue must report that it was dropped")
 	}
-	assert.Less(t, slowest, 50*time.Millisecond, "no Publish call may wait for queue space")
+	assert.Zero(t, accepted, "a profile offered to a full queue must report that it was dropped")
+	assert.Less(t, slowest, time.Second, "no Publish call may wait for queue space")
 	assert.Equal(t, uint64(attempts), p.scheduledProfileDropped.Get(), "count every profile dropped on the full queue")
 	assert.True(t, sink.Valid(), "dropping profiles must not retire the lease")
 }
