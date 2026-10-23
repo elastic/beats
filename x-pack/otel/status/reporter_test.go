@@ -5,7 +5,9 @@
 package status
 
 import (
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -17,7 +19,7 @@ import (
 
 func TestGroupStatus(t *testing.T) {
 	m := &oteltest.MockHost{}
-	reporter := NewGroupStatusReporter(m)
+	reporter := newGroupStatusReporter(m, 0)
 
 	subReporter1, subReporter2, subReporter3 := reporter.GetReporterForRunner("1"), reporter.GetReporterForRunner("2"), reporter.GetReporterForRunner("3")
 
@@ -48,7 +50,7 @@ func TestGroupStatus(t *testing.T) {
 	require.Equalf(t, "beatreceiver failed to start", m.GetEvent().Err().Error(), "expected 'beatreceiver failed to start', got %v", m.GetEvent().Err())
 }
 
-func TestToPdata(t *testing.T) {
+func TestRunnerStateRaw(t *testing.T) {
 	tests := []struct {
 		name     string
 		state    status.Status
@@ -90,12 +92,12 @@ func TestToPdata(t *testing.T) {
 				state: tt.state,
 				msg:   tt.msg,
 			}
-			result := toPdata(rs)
+			result := rs.raw()
 
 			for key, expectedVal := range tt.wantKeys {
-				val, ok := result.Get(key)
+				val, ok := result[key]
 				require.True(t, ok, "expected key %q to exist", key)
-				require.Equal(t, expectedVal, val.Str(), "expected %q=%q, got %q", key, expectedVal, val.Str())
+				require.Equal(t, expectedVal, val, "expected %q=%q, got %q", key, expectedVal, val)
 			}
 		})
 	}
@@ -103,7 +105,7 @@ func TestToPdata(t *testing.T) {
 
 func TestInputStatusesInEventAttributes(t *testing.T) {
 	m := &oteltest.MockHost{}
-	reporter := NewGroupStatusReporter(m)
+	reporter := newGroupStatusReporter(m, 0)
 
 	subReporter1 := reporter.GetReporterForRunner("runner-1")
 	subReporter2 := reporter.GetReporterForRunner("runner-2")
@@ -145,4 +147,39 @@ func TestInputStatusesInEventAttributes(t *testing.T) {
 	runner2Error, ok := runner2Map.Get("error")
 	require.True(t, ok)
 	assert.Equal(t, "some warning", runner2Error.Str())
+}
+
+func TestUnchangedUpdateIsNotReported(t *testing.T) {
+	m := &oteltest.MockHost{}
+	reporter := newGroupStatusReporter(m, 0)
+	sub := reporter.GetReporterForRunner("runner-1")
+
+	sub.UpdateStatus(status.Running, "")
+	sub.UpdateStatus(status.Running, "")
+	sub.UpdateStatus(status.Degraded, "slow")
+	sub.UpdateStatus(status.Degraded, "slow")
+
+	assert.Len(t, m.GetEvents(), 2, "only the two changes must be reported")
+}
+
+func TestReportsAreThrottled(t *testing.T) {
+	const runners = 1000
+	m := &oteltest.MockHost{}
+	reporter := newGroupStatusReporter(m, 50*time.Millisecond)
+
+	for i := range runners {
+		reporter.GetReporterForRunner(fmt.Sprint(i)).UpdateStatus(status.Running, "")
+	}
+
+	require.Eventually(t, func() bool {
+		evt := m.GetEvent()
+		if evt == nil {
+			return false
+		}
+		inputs, ok := evt.Attributes().Get(inputStatusAttributesKey)
+		return ok && inputs.Map().Len() == runners
+	}, 5*time.Second, 10*time.Millisecond, "the last report must cover every runner")
+
+	reported := len(m.GetEvents())
+	assert.Less(t, reported, runners/10, "updates must be coalesced into few reports, got %d", reported)
 }
