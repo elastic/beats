@@ -102,12 +102,13 @@ func TestOsqueryRecoveryCancellationAndPolicyRemoval(t *testing.T) {
 	}
 }
 
-// Shutdown can race the end of a policy restart or of a backoff delay. The
-// policy restart case stops the beat from the runner's clock, which it reads
-// after the old run ends. The backoff case relies on select picking the timer
-// over the cancelled context, so it repeats.
+// Shutdown can race a queued policy, the end of a policy restart, or the end of
+// a backoff delay. The policy restart case stops the beat from the runner's
+// clock, which it reads after the old run ends. The idle and backoff cases rely
+// on select picking the policy or the timer over the cancelled context, so they
+// repeat.
 func TestOsqueryRecoveryShutdownDoesNotStartReplacement(t *testing.T) {
-	for _, name := range []string{"policy restart", "backoff"} {
+	for _, name := range []string{"idle", "policy restart", "backoff"} {
 		t.Run(name, func(t *testing.T) {
 			for range 50 {
 				ctx, cancel := context.WithCancel(t.Context())
@@ -140,9 +141,14 @@ func TestOsqueryRecoveryShutdownDoesNotStartReplacement(t *testing.T) {
 					}
 				}
 				var attempts atomic.Int32
+				want := int32(1)
 				require.NoError(t, runner.Update(ctx, []config.InputConfig{{}}), "start the original policy")
+				if name == "idle" {
+					want = 0
+					stop()
+				}
 				err := runner.Run(ctx, func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan []config.InputConfig) error {
-					if attempts.Add(1) > 1 {
+					if attempts.Add(1) > 1 || name == "idle" {
 						return ctx.Err()
 					}
 					if name == "backoff" {
@@ -159,7 +165,7 @@ func TestOsqueryRecoveryShutdownDoesNotStartReplacement(t *testing.T) {
 				})
 				cancel()
 				require.ErrorIs(t, err, context.Canceled, "shutdown must stop the runner")
-				require.Equal(t, int32(1), attempts.Load(), "shutdown must not start a replacement osqueryd")
+				require.Equal(t, want, attempts.Load(), "shutdown must not start osqueryd")
 				require.Zero(t, lateStarts.Load(), "shutdown must not report a replacement starting")
 			}
 		})
