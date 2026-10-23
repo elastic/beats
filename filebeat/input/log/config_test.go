@@ -20,12 +20,15 @@
 package log
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/filebeat/harvester"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestCleanOlderError(t *testing.T) {
@@ -69,4 +72,24 @@ func TestCleanOlderIgnoreOlder(t *testing.T) {
 
 	err := config.Validate()
 	assert.NoError(t, err)
+}
+
+func TestHarvesterBufferSizeMustBePositive(t *testing.T) {
+	tcs := map[string]string{
+		"zero":     `0`,
+		"negative": `-1`,
+	}
+	for name, size := range tcs {
+		t.Run(name, func(t *testing.T) {
+			c, err := conf.NewConfigFrom(fmt.Sprintf(`
+paths: [/foo/bar*]
+harvester_buffer_size: %s
+`, size))
+			require.NoError(t, err, "could not create config from string")
+
+			got := defaultConfig()
+			err = c.Unpack(&got)
+			assert.ErrorContains(t, err, "accessing 'harvester_buffer_size'")
+		})
+	}
 }
