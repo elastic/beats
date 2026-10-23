@@ -203,6 +203,10 @@ func (sj *SourceJob) jobs() []jobs.Job {
 
 	isScript := sj.browserCfg.Source.Inline != nil
 	ctx := context.WithValue(sj.ctx, synthexec.SynthexecTimeoutKey, sj.browserCfg.Timeout+30*time.Second)
+	// Custom CAs need Chromium's trust store, so they don't apply to API journeys.
+	if cas := sj.browserCfg.SSL.CertificateAuthorities; len(cas) > 0 && !sj.browserCfg.IsAPI() {
+		ctx = context.WithValue(ctx, synthexec.CustomCAsKey, cas)
+	}
 	sFields := sj.StdFields()
 
 	if isScript {
