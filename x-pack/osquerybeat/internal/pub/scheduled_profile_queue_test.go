@@ -18,7 +18,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type blockedProfileOutput struct {
@@ -44,27 +44,17 @@ func (o *blockedProfileOutput) Close() error {
 }
 func (*blockedProfileOutput) String() string { return "blocked profile test output" }
 
-type observedProfileClient struct {
-	beat.Client
-	entered chan struct{}
-}
-
-func (c *observedProfileClient) Publish(event beat.Event) {
-	close(c.entered)
-	c.Client.Publish(event)
-}
-
-func TestScheduledProfileFullQueueDoesNotBlockAdmissionOrClose(t *testing.T) {
-	// Fill a real memory queue with results and withhold output acknowledgments.
+// TestScheduledProfileSinkDoesNotBlockOnFullPool uses a real pipeline whose
+// slab queue is full because the output withholds acknowledgments.
+func TestScheduledProfileSinkDoesNotBlockOnFullPool(t *testing.T) {
+	const capacity = 32 // The slab queue rejects smaller pools.
 	var cfg pipeline.Config
 	require.NoError(t, conf.MustNewConfigFrom(map[string]any{
-		"queue.mem.events":           32,
-		"queue.mem.flush.min_events": 1,
-		"queue.mem.flush.timeout":    time.Millisecond,
-	}).Unpack(&cfg), "configure a small publisher queue")
+		"queue.slab.events": capacity,
+	}).Unpack(&cfg), "configure a small slab queue")
 	output := &blockedProfileOutput{entered: make(chan struct{}), release: make(chan struct{})}
 	pipe, err := pipeline.LoadWithSettings(
-		beat.Info{Name: "osquerybeat", Logger: logp.NewNopLogger()},
+		beat.Info{Name: "osquerybeat", Logger: logptest.NewTestingLogger(t, "pipeline")},
 		pipeline.Monitors{}, cfg,
 		func(outputs.Observer) (string, outputs.Group, error) {
 			return "blocked", outputs.Group{BatchSize: 1, Clients: []outputs.Client{output}}, nil
@@ -72,66 +62,40 @@ func TestScheduledProfileFullQueueDoesNotBlockAdmissionOrClose(t *testing.T) {
 		pipeline.Settings{WaitCloseMode: pipeline.WaitOnPipelineCloseThenForce},
 	)
 	require.NoError(t, err, "create the real publisher pipeline")
-	p := New(&beat.Beat{Publisher: pipe}, logp.NewNopLogger())
+	p := New(&beat.Beat{Publisher: pipe}, logptest.NewTestingLogger(t, "pub"))
 	t.Cleanup(func() {
-		// Always release the output, including if a shutdown regression fails.
+		// Always release the output, including if a regression fails the test.
 		_ = output.Close()
 		p.Close()
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 		defer cancel()
 		assert.NoError(t, pipe.Disconnect(ctx), "disconnect the test publisher pipeline")
-		closeScheduledProfilePublisher(t, p)
 	})
 	require.NoError(t, p.Configure(scheduledProfileInputs("default")), "configure the scheduled profile destination")
-	sink := p.CaptureScheduledProfileSink("default").(*scheduledProfileSink)
-	observed := &observedProfileClient{Client: sink.client, entered: make(chan struct{})}
-	sink.client = observed
-	hits := make([]map[string]any, 32)
+	sink := p.CaptureScheduledProfileSink("default")
+	require.NotNil(t, sink, "capture the scheduled profile destination")
+
+	// Fill every slot through the guaranteed-delivery client, with no acks.
+	hits := make([]map[string]any, capacity)
 	for i := range hits {
 		hits[i] = map[string]any{"value": i}
 	}
-	p.Publish("index", "schedule", "schedule_id", "response", "", "", "", "query", nil, hits, nil, nil)
+	p.Publish("index", "id", "schedule_id", "response", "", "", "", "query", nil, hits, nil, nil)
 	select {
 	case <-output.entered:
 	case <-time.After(time.Second):
 		t.Fatal("output did not receive the first result")
 	}
-	require.True(t, sink.Publish("scheduled", "schedule", "response", "", 1, nil), "offer one profile to the saturated pipeline")
-	select {
-	case <-observed.entered:
-	case <-time.After(time.Second):
-		t.Fatal("the independent publisher did not attempt admission")
-	}
 
-	// This must finish while the one real Publish call is still blocked.
-	finished := make(chan struct{})
-	go func() {
-		for range 1024 {
-			sink.Publish("scheduled", "schedule", "response", "", 1, nil)
-		}
-		p.Close()
-		close(finished)
-	}()
-	select {
-	case <-finished:
-	case <-time.After(time.Second):
-		t.Fatal("scheduled profile offers or publisher shutdown waited for the full queue")
+	const attempts = 1024
+	var slowest time.Duration
+	for range attempts {
+		start := time.Now()
+		ok := sink.Publish("scheduled", "schedule", "response", "", 1, nil)
+		slowest = max(slowest, time.Since(start))
+		assert.False(t, ok, "a profile offered to a full queue must report that it was dropped")
 	}
-	assert.Equal(t, uint64(1024), p.scheduledProfileWorker.dropped.Get(), "drop profiles locally while the single publication worker is busy")
-	assert.False(t, sink.Valid(), "shutdown must retire the profile destination")
-	select {
-	case <-p.scheduledProfileWorker.done:
-		t.Fatal("the saturated queue should still hold the one in-flight publication")
-	default:
-	}
-
-	// Pipeline shutdown must release the remaining worker without an output ACK.
-	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
-	defer cancel()
-	require.NoError(t, pipe.Disconnect(ctx), "force-close the full queue through the existing pipeline lifecycle")
-	select {
-	case <-p.scheduledProfileWorker.done:
-	case <-time.After(time.Second):
-		t.Fatal("pipeline closure did not release the remaining publication worker")
-	}
+	assert.Less(t, slowest, 50*time.Millisecond, "no Publish call may wait for queue space")
+	assert.Equal(t, uint64(attempts), p.scheduledProfileDropped.Get(), "count every profile dropped on the full queue")
+	assert.True(t, sink.Valid(), "dropping profiles must not retire the lease")
 }

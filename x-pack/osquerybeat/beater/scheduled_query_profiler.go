@@ -148,11 +148,14 @@ func (w *scheduledQueryProfiler) collect(request scheduledProfileRequest) {
 		return
 	}
 	if !request.sink.Publish(request.name, request.scheduleID, request.responseID, request.spaceID, request.scheduleExecutionCount, profile) {
-		w.metrics.stale.Inc()
+		// A false result from a live lease means the output queue was full,
+		// which the sink's output_full counter already records.
+		if !request.sink.Valid() {
+			w.metrics.stale.Inc()
+		}
 		return
 	}
-	// This counts collection, not output delivery. The sink's output_full
-	// counter records failed best-effort queue admission separately.
+	// This counts collection, not output delivery.
 	w.metrics.collected.Inc()
 }
 
@@ -160,8 +163,8 @@ func (w *scheduledQueryProfiler) stop() {
 	w.mu.Lock()
 	w.cancel()
 	w.mu.Unlock()
-	// The sink only offers profiles to the process-lifetime publisher worker;
-	// this join never waits for admission to the shared output queue.
+	// The sink's DropIfFull client never waits for queue space, so this join
+	// cannot be held up by output backpressure.
 	<-w.done
 }
 

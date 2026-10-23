@@ -43,7 +43,6 @@ type Publisher struct {
 	// Scheduled profiling must not wait behind a result publication holding mx.
 	scheduledProfileMu      sync.Mutex
 	scheduledProfile        *scheduledProfileSink
-	scheduledProfileWorker  *scheduledProfilePublisher
 	scheduledProfileClosed  bool
 	scheduledProfileMissing bool
 	scheduledProfileDropped *monitoring.Uint
@@ -199,9 +198,6 @@ func (p *Publisher) Publish(index, idValue, idFieldKey, responseID, spaceID, pac
 func (p *Publisher) Close() {
 	p.scheduledProfileMu.Lock()
 	p.scheduledProfileClosed = true
-	if p.scheduledProfileWorker != nil {
-		p.scheduledProfileWorker.stop()
-	}
 	p.scheduledProfileMu.Unlock()
 	p.retireScheduledProfileSink()
 	p.mx.Lock()
