@@ -100,7 +100,7 @@ func testOsqueryExitClassification(t *testing.T, exit78, otherExit error) {
 			if tc.err != nil {
 				assert.ErrorIs(t, err, tc.err, "preserve the original process error")
 			}
-			assert.Equal(t, tc.recoverable, isRecoverableOsqueryError(err), "only runtime exit 78 adds recovery")
+			assert.Equal(t, tc.recoverable, isRecoverableOsqueryError(err), "only uncancelled runtime exits add recovery")
 			state.ready()
 			assert.Equal(t, osqueryExited, state.state.Load(), "late config callback must not revive an exited process")
 		})
@@ -125,7 +125,7 @@ func testOsqueryRunnerRuntimeExit78ThenStartupFailure(t *testing.T, exit78 error
 			case <-inputs:
 			}
 			var state osqueryRunState
-			// A larger test budget permits six runtime retries; The replacement's startup failure is terminal.
+			// A larger test budget permits six runtime retries; the replacement's startup failure is terminal.
 			if runs.Add(1) <= 6 {
 				state.ready()
 			}

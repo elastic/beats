@@ -102,11 +102,98 @@ func TestOsqueryRecoveryCancellationAndPolicyRemoval(t *testing.T) {
 	}
 }
 
+func TestOsqueryRecoveryRemovalCancelsBackoff(t *testing.T) {
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+	runner := newOsqueryRunner(logptest.NewTestingLogger(t, "recovery"))
+	runner.retryInitial = time.Hour
+	degraded := make(chan struct{}, 1)
+	runner.reportStatus = func(state status.Status, _ string) {
+		if state == status.Degraded {
+			degraded <- struct{}{}
+		}
+	}
+	var attempts atomic.Int32
+	started := make(chan struct{}, 2)
+	done := make(chan error, 1)
+	go func() {
+		done <- runner.Run(ctx, func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan []config.InputConfig) error {
+			started <- struct{}{}
+			if attempts.Add(1) == 1 {
+				return errOsqueryRuntimeExit78
+			}
+			<-ctx.Done()
+			return ctx.Err()
+		})
+	}()
+	require.NoError(t, runner.Update(ctx, []config.InputConfig{{}}), "start collection")
+	<-started
+	select {
+	case <-degraded:
+	case <-time.After(time.Second):
+		t.Fatal("runner did not enter backoff")
+	}
+	require.NoError(t, runner.Update(ctx, nil), "remove policy while waiting")
+	require.NoError(t, runner.Update(ctx, []config.InputConfig{{}}), "add a policy again")
+	select {
+	case <-started:
+	case <-time.After(time.Second):
+		t.Fatal("a policy added after removal waited for the abandoned backoff")
+	}
+	cancel()
+	require.ErrorIs(t, <-done, context.Canceled, "stop the new run")
+}
+
+func TestOsqueryRecoveryIgnoresReadinessWhileStopping(t *testing.T) {
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+	runner := newOsqueryRunner(logptest.NewTestingLogger(t, "readiness"))
+	healthy := make(chan struct{}, 1)
+	runner.reportStatus = func(state status.Status, _ string) {
+		if state == status.Running {
+			select {
+			case healthy <- struct{}{}:
+			default:
+			}
+		}
+	}
+	var attempts atomic.Int32
+	restarted := make(chan struct{})
+	done := make(chan error, 1)
+	go func() {
+		done <- runner.Run(ctx, func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan []config.InputConfig) error {
+			if attempts.Add(1) == 2 {
+				close(restarted)
+				<-ctx.Done()
+				return ctx.Err()
+			}
+			<-ctx.Done()
+			// Readiness of a run being stopped races its done context, so repeat it
+			// to make a send reach the runner.
+			for range 20 {
+				notifyOsqueryReady(ctx)
+			}
+			assert.Never(t, func() bool { return len(healthy) > 0 }, 100*time.Millisecond, 10*time.Millisecond, "a stopping run marked osqueryd healthy")
+			return ctx.Err()
+		})
+	}()
+	require.NoError(t, runner.Update(ctx, []config.InputConfig{{}}), "start the original policy")
+	require.NoError(t, runner.Update(ctx, []config.InputConfig{{Osquery: &config.OsqueryConfig{Options: map[string]any{"disable_watchdog": true}}}}), "change flags to restart osqueryd")
+	select {
+	case <-restarted:
+	case <-time.After(5 * time.Second):
+		t.Fatal("osqueryd did not restart for the new flags")
+	}
+	cancel()
+	require.ErrorIs(t, <-done, context.Canceled, "stop the replacement")
+}
+
 func TestOsqueryRecoveryUsesLatestPolicyAfterBackoff(t *testing.T) {
 	ctx, cancel := context.WithCancel(t.Context())
 	defer cancel()
 	runner := newOsqueryRunner(logptest.NewTestingLogger(t, "recovery"))
-	runner.retryInitial = 30 * time.Millisecond
+	// Long enough that both updates are queued before the replacement starts.
+	runner.retryInitial = 500 * time.Millisecond
 	degraded := make(chan struct{}, 1)
 	runner.reportStatus = func(state status.Status, _ string) {
 		if state == status.Degraded {
@@ -140,6 +227,9 @@ func TestOsqueryRecoveryUsesLatestPolicyAfterBackoff(t *testing.T) {
 	}
 	require.NoError(t, runner.Update(ctx, []config.InputConfig{{ID: "intermediate"}}), "update during backoff")
 	require.NoError(t, runner.Update(ctx, []config.InputConfig{{ID: "latest"}}), "replace pending policy")
+	// The input channel holds one update, so this returns once the runner has taken "latest".
+	require.NoError(t, runner.Update(ctx, []config.InputConfig{{ID: "latest"}}), "wait for the runner to take the latest policy")
+	require.Equal(t, int32(1), attempts.Load(), "backoff ended before the updates were taken; the delay is too short")
 	select {
 	case id := <-seen:
 		assert.Equal(t, "latest", id, "replacement must not resurrect cached inputs")
@@ -220,12 +310,12 @@ func TestOsqueryRecoveryIgnoresRetiredReadiness(t *testing.T) {
 	case <-time.After(time.Second):
 		t.Fatal("replacement did not start")
 	}
-	retired()
-	select {
-	case <-healthy:
-		t.Fatal("retired run marked the replacement healthy")
-	default:
+	// A retired callback races its done context, so repeat it to make a stale
+	// send reach the runner.
+	for range 20 {
+		retired()
 	}
+	assert.Never(t, func() bool { return len(healthy) > 0 }, 100*time.Millisecond, 10*time.Millisecond, "retired run marked the replacement healthy")
 	replacement()
 	select {
 	case <-healthy:

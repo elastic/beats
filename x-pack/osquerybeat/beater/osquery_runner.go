@@ -86,17 +86,6 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 	}()
 	start := func() {
 		stopRetry()
-		// Prefer configuration already queued when a retry timer expires.
-		// Otherwise a busy select can restart a superseded policy first.
-		draining := true
-		for draining {
-			select {
-			case input := <-r.inputCh:
-				latest = &input
-			default:
-				draining = false
-			}
-		}
 		if latest == nil || len(*latest) == 0 {
 			recovering = false
 			report(status.Running, "No osquery inputs configured")
@@ -110,9 +99,6 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 		childCtx, childCancel := context.WithCancel(parentCtx)
 		cancel = childCancel
 		childCtx = context.WithValue(childCtx, osqueryReadyKey{}, func() {
-			if childCtx.Err() != nil {
-				return
-			}
 			select {
 			case ready <- id:
 			case <-childCtx.Done():
