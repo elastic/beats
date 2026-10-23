@@ -11,12 +11,12 @@ The initial run may be followed by five replacement attempts. The delays are
 1, 2, 4, 8, and 16 seconds; exponential backoff has a 30-second upper bound.
 The restart budget and delay reset only after a process has remained ready for
 five minutes. Merely fetching configuration, or repeatedly changing policy,
-does not reset the budget. Persistent failures exhaust it and report FAILED.
-As an OTel receiver, osquerybeat then stays FAILED until the receiver or Agent
-is restarted. As a process, the beat exits with code 1 and Agent restarts it
-with a fresh budget, so a persistent failure repeats about 31 seconds of
-retries followed by a process restart. These limits are fixed defaults, not new
-configuration options.
+does not reset the budget. Persistent failures exhaust it. As an OTel receiver,
+osquerybeat then reports FAILED until the receiver or Agent is restarted. On the
+process runtime the beat exits with code 1; Agent restarts it about 1 s later
+with a fresh budget and reports the exit as STOPPED rather than FAILED, so a
+persistent failure cycles through about 31 s of retries and a restart. These
+limits are fixed defaults, not new configuration options.
 
 Backoff is cancellable. Policy updates replace the pending configuration without
 shortening the delay, and removing all inputs cancels pending restarts. Adding
@@ -26,11 +26,13 @@ finishes cleanup.
 
 Compared with earlier releases, exits after readiness with code 0, or with a
 nonzero code other than 78, are now retried; they used to report FAILED at
-once. Removing all inputs now stops osqueryd and unregisters the action handler. While
-recovering, process-runtime and per-input OTel status reporters receive DEGRADED.
-Only readiness from the current process restores RUNNING; stale callbacks from
-an earlier process cannot mark its replacement healthy. Startup failures and
-exhausted retries report FAILED to both status paths.
+once. Removing all inputs now stops osqueryd and unregisters the action
+handler.
+
+While recovering, process-runtime and per-input OTel status reporters receive
+DEGRADED. Only readiness from the current process restores RUNNING; stale
+callbacks from an earlier process cannot mark its replacement healthy. Startup
+failures and exhausted retries report FAILED to both status paths.
 
 ## Scope
 
