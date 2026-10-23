@@ -93,16 +93,8 @@ func (s *server) Test(_ input.TestContext) error {
 	return l.Close()
 }
 
-<<<<<<< HEAD:filebeat/input/tcp/input.go
 func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	log := ctx.Logger.With("host", s.Host)
-=======
-// InitMetrics initialises and returns a netmetrics.TCP
-func (s *server) InitMetrics(id string, reg *monitoring.Registry, logger *logp.Logger) netinput.Metrics {
-	s.metrics = netmetrics.NewTCP(reg, s.Host, s.Network, time.Minute, logger)
-	return s.metrics
-}
->>>>>>> 2d57e14 (filebeat: read tcp/udp receive queue metrics for dual-stack listeners (#53972)):filebeat/input/net/tcp/input.go
 
 	log.Info("starting tcp socket input")
 	defer log.Info("tcp input stopped")
@@ -111,7 +103,7 @@ func (s *server) InitMetrics(id string, reg *monitoring.Registry, logger *logp.L
 	ctx.UpdateStatus(status.Configuring, "")
 
 	const pollInterval = time.Minute
-	metrics := netmetrics.NewTCP(ctx.ID, ctx.MetricsRegistry, s.config.Host, pollInterval, log)
+	metrics := netmetrics.NewTCP(ctx.ID, ctx.MetricsRegistry, s.config.Host, s.config.Network, pollInterval, log)
 	defer metrics.Close()
 
 	split, err := streaming.SplitFunc(s.Framing, []byte(s.LineDelimiter))
