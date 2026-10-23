@@ -417,7 +417,11 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		for {
 			select {
 			case <-ctx.Done():
-				reportDaemonStatus(status.Stopping, "Context cancelled, stopping")
+				// A runner failure also ends ctx; it has reported FAILED already,
+				// and Stopping before the final FAILED would flicker to healthy.
+				if bt.ctx.Err() != nil {
+					reportDaemonStatus(status.Stopping, "Context cancelled, stopping")
+				}
 				bt.log.Info("osquerybeat context cancelled, exiting")
 				return ctx.Err()
 			case inputConfigs := <-inputConfigCh:
