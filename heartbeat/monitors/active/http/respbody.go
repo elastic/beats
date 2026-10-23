@@ -26,18 +26,12 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/docker/go-units"
-
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/mime"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
-	// maxBufferBodyBytes sets a hard limit on how much we're willing to buffer for any reason internally.
-	// since we must buffer the whole body for body validators this is effectively a cap on that.
-	// 100MiB out to be enough for everybody.
-	maxBufferBodyBytes = 100 * units.MiB
 	// minBufferBytes is the lower bound on how much of the body content we actually read. In order to do
 	// do mime type detection of the response body, we always need a small read buffer.
 	minBufferBodyBytes = 128
@@ -47,12 +41,15 @@ func processBody(resp *http.Response, config responseConfig, validator multiVali
 	// Determine how much of the body to actually buffer in memory
 	var bufferBodyBytes int
 	if validator.wantsBody() {
-		bufferBodyBytes = maxBufferBodyBytes
-	} else if config.IncludeBody == "always" || config.IncludeBody == "on_error" {
+		bufferBodyBytes = config.CheckBodyMaxBytes
+	}
+
+	if (config.IncludeBody == "always" || config.IncludeBody == "on_error") && config.IncludeBodyMaxBytes > bufferBodyBytes {
 		// If the user has asked for bodies to be recorded we only need to buffer that much
 		bufferBodyBytes = config.IncludeBodyMaxBytes
 	}
 
+	validationBodyBytes := bufferBodyBytes
 	if bufferBodyBytes < minBufferBodyBytes {
 		bufferBodyBytes = minBufferBodyBytes
 	}
@@ -64,7 +61,12 @@ func processBody(resp *http.Response, config responseConfig, validator multiVali
 	}
 
 	// Run any validations
-	errReason := validator.validate(resp, respBody)
+	validationBody := respBody
+	if validator.wantsBody() && config.CheckBodyMaxBytes > 0 {
+		// MIME detection may need more bytes than the configured validation limit.
+		validationBody = respBody[:min(len(respBody), validationBodyBytes)]
+	}
+	errReason := validator.validate(resp, validationBody)
 
 	bodyFields := mapstr.M{
 		"hash":  bodyHash,
