@@ -19,7 +19,6 @@ package secretstores
 
 import (
 	"context"
-	"errors"
 	"maps"
 	"testing"
 
@@ -61,7 +60,7 @@ func init() {
 	})
 }
 
-var errFakeDestinations = errors.New("redirects are not supported")
+var errFakeDestinations = plugin.UnknownDestinations("redirects are not supported")
 
 // fakeDestinations returns the "host" and "proxy" settings. A true "redirects"
 // setting fails.
@@ -209,6 +208,8 @@ func TestAllowedHosts(t *testing.T) {
 		// noDestinations stands for a monitor type without Destinations.
 		noDestinations bool
 		wantErr        string
+		// wantConfigErr is set for errors that are not policy errors.
+		wantConfigErr bool
 	}{
 		{
 			name:   "allowed host",
@@ -263,6 +264,14 @@ func TestAllowedHosts(t *testing.T) {
 			wantErr: `connection "prod": not allowed by allowed_hosts: ` + errFakeDestinations.Error(),
 		},
 		{
+			// Reported as without allowed_hosts, not as a policy error.
+			name:          "config error",
+			stores:        []any{prod("api.example.com")},
+			cfg:           map[string]any{"type": "dest", "host": "api.example.com", "redirects": "sometimes", "header": "fake:prod@token"},
+			wantErr:       "accessing 'redirects'",
+			wantConfigErr: true,
+		},
+		{
 			name:           "type without destinations",
 			stores:         []any{prod("api.example.com")},
 			cfg:            map[string]any{"type": "nodest", "header": "fake:prod@token"},
@@ -312,6 +321,11 @@ func TestAllowedHosts(t *testing.T) {
 				return
 			}
 			assert.ErrorContains(t, err, tc.wantErr, "the monitor must be rejected")
+			if tc.wantConfigErr {
+				assert.NotErrorIs(t, err, ErrNotAllowed, "a config error must not be a policy error")
+				assert.NotContains(t, err.Error(), allowedHostsKey, "a config error must not mention allowed_hosts")
+				return
+			}
 			assert.ErrorIs(t, err, ErrNotAllowed, "the error must be a policy error")
 			assert.NotContains(t, err.Error(), "attacker.example", "a resolved host may be a secret and must not be named")
 		})

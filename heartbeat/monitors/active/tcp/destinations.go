@@ -18,11 +18,12 @@
 package tcp
 
 import (
-	"errors"
 	"fmt"
 	"net/url"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 )
 
 // destinations returns the hosts of the endpoints and of the SOCKS5 proxy of
@@ -39,7 +40,7 @@ func destinations(cfg *conf.C) ([]string, error) {
 		// out of errors: they can come from the keystore.
 		eps, err := makeEndpoints([]string{h}, config.Ports, "tcp")
 		if err != nil || len(eps) != 1 {
-			return nil, fmt.Errorf("cannot parse host %d", i)
+			return nil, plugin.UnknownDestinations(fmt.Sprintf("cannot parse host %d", i))
 		}
 		hosts = append(hosts, eps[0].Hostname)
 	}
@@ -47,7 +48,7 @@ func destinations(cfg *conf.C) ([]string, error) {
 	if config.Socks5.URL != "" {
 		u, err := url.Parse(config.Socks5.URL)
 		if err != nil || u.Hostname() == "" {
-			return nil, errors.New("cannot parse proxy_url")
+			return nil, plugin.UnknownDestinations("cannot parse proxy_url")
 		}
 		hosts = append(hosts, u.Hostname())
 	}

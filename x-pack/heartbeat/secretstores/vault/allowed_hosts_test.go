@@ -36,6 +36,8 @@ func TestAllowedHosts(t *testing.T) {
 		name    string
 		monitor map[string]any
 		wantErr string
+		// wantConfigErr is set for config errors, which are not policy errors.
+		wantConfigErr bool
 	}{
 		{
 			name:    "allowed host",
@@ -61,15 +63,10 @@ func TestAllowedHosts(t *testing.T) {
 			wantErr: "not allowed by allowed_hosts: max_redirects must be 0",
 		},
 		{
-			name: "kerberos",
-			monitor: map[string]any{"type": "http", "urls": []any{"https://api.stripe.com/"}, "kerberos": map[string]any{
-				"auth_type": "password",
-				"username":  "u",
-				"password":  ref,
-				"realm":     "EVIL.EXAMPLE",
-				"krb5_conf": "[realms]\n  EVIL.EXAMPLE = { kdc = attacker.example:88 }\n",
-			}},
-			wantErr: "kerberos is not supported",
+			name:          "config error",
+			monitor:       map[string]any{"type": "http", "urls": []any{"https://api.stripe.com/"}, "max_redirects": "many", "check.request.body": ref},
+			wantErr:       "accessing 'max_redirects'",
+			wantConfigErr: true,
 		},
 		{
 			name:    "proxy not allowed",
@@ -114,6 +111,10 @@ func TestAllowedHosts(t *testing.T) {
 				return
 			}
 			assert.ErrorContains(t, err, tc.wantErr, "the monitor must be rejected")
+			if tc.wantConfigErr {
+				assert.NotErrorIs(t, err, secretstores.ErrNotAllowed, "a config error must not be a policy error")
+				return
+			}
 			assert.ErrorIs(t, err, secretstores.ErrNotAllowed, "the error must be a policy error")
 			assert.NotContains(t, err.Error(), "attacker.example", "a resolved host may be a secret and must not be named")
 		})

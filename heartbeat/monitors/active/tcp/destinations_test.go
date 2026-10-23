@@ -18,12 +18,15 @@
 package tcp
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 )
 
 func TestDestinations(t *testing.T) {
@@ -32,11 +35,15 @@ func TestDestinations(t *testing.T) {
 		cfg     map[string]any
 		want    []string
 		wantErr string
+		// wantConfigErr is set for config errors, which are not refusals.
+		wantConfigErr bool
 	}{
 		{name: "host and port", cfg: map[string]any{"hosts": []any{"api.example.com:443", "[::1]:22"}}, want: []string{"api.example.com", "::1"}},
 		{name: "hosts and ports", cfg: map[string]any{"hosts": []any{"api.example.com"}, "ports": []any{80, 443}}, want: []string{"api.example.com"}},
 		{name: "URL", cfg: map[string]any{"hosts": []any{"tls://api.example.com:443"}}, want: []string{"api.example.com"}},
 		{name: "SOCKS5 proxy", cfg: map[string]any{"hosts": []any{"api.example.com:443"}, "proxy_url": "socks5://proxy.example.com:1080", "proxy_use_local_resolver": true}, want: []string{"api.example.com", "proxy.example.com"}},
+		{name: "SOCKS5 proxy without host", cfg: map[string]any{"hosts": []any{"api.example.com:443"}, "proxy_url": "socks5:///path"}, wantErr: "cannot parse proxy_url"},
+		{name: "config error", cfg: map[string]any{"hosts": []any{"api.example.com:443"}, "ports": "many"}, wantErr: "accessing 'ports'", wantConfigErr: true},
 		{name: "missing port", cfg: map[string]any{"hosts": []any{"api.example.com"}}, wantErr: "cannot parse host 0"},
 		{name: "unsupported scheme", cfg: map[string]any{"hosts": []any{"http://api.example.com:80"}}, wantErr: "cannot parse host 0"},
 		// References are text here. Whatever they resolve to, they can't
@@ -50,6 +57,7 @@ func TestDestinations(t *testing.T) {
 			got, err := destinations(conf.MustNewConfigFrom(tc.cfg))
 			if tc.wantErr != "" {
 				assert.ErrorContains(t, err, tc.wantErr, "destinations must fail")
+				assert.Equal(t, !tc.wantConfigErr, errors.Is(err, plugin.ErrUnknownDestinations), "only refusals must be unknown destinations errors")
 				return
 			}
 			require.NoError(t, err, "destinations must not fail")

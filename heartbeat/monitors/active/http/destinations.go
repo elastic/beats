@@ -18,11 +18,12 @@
 package http
 
 import (
-	"errors"
 	"fmt"
 	"net/url"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 )
 
 // destinations returns the hosts of the URLs and of the proxy of the monitor,
@@ -34,10 +35,10 @@ func destinations(cfg *conf.C) ([]string, error) {
 		return nil, err
 	}
 	if config.MaxRedirects > 0 {
-		return nil, errors.New("max_redirects must be 0")
+		return nil, plugin.UnknownDestinations("max_redirects must be 0")
 	}
 	if config.Kerberos.IsEnabled() {
-		return nil, errors.New("kerberos is not supported")
+		return nil, plugin.UnknownDestinations("kerberos is not supported")
 	}
 
 	// Validate, run by Unpack, merged urls into hosts.
@@ -46,7 +47,7 @@ func destinations(cfg *conf.C) ([]string, error) {
 		// Values are left out of errors: they can come from the keystore.
 		u, err := url.Parse(raw)
 		if err != nil || (u.Scheme != urlSchemaHTTP && u.Scheme != urlSchemaHTTPS) || u.Hostname() == "" {
-			return nil, fmt.Errorf("cannot parse URL %d", i)
+			return nil, plugin.UnknownDestinations(fmt.Sprintf("cannot parse URL %d", i))
 		}
 		hosts = append(hosts, u.Hostname())
 	}
@@ -54,7 +55,7 @@ func destinations(cfg *conf.C) ([]string, error) {
 	if proxy := config.Transport.Proxy; proxy.URL != nil && !proxy.Disable {
 		host := proxy.URL.URI().Hostname()
 		if host == "" {
-			return nil, errors.New("cannot parse proxy_url")
+			return nil, plugin.UnknownDestinations("cannot parse proxy_url")
 		}
 		hosts = append(hosts, host)
 	}

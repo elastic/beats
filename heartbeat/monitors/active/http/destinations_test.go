@@ -18,12 +18,15 @@
 package http
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 )
 
 func TestDestinations(t *testing.T) {
@@ -32,6 +35,8 @@ func TestDestinations(t *testing.T) {
 		cfg     map[string]any
 		want    []string
 		wantErr string
+		// wantConfigErr is set for config errors, which are not refusals.
+		wantConfigErr bool
 	}{
 		{name: "urls", cfg: map[string]any{"urls": []any{"https://api.example.com/v1", "http://[::1]:8080/"}}, want: []string{"api.example.com", "::1"}},
 		{name: "hosts without scheme", cfg: map[string]any{"hosts": []any{"api.example.com:8080"}}, want: []string{"api.example.com"}},
@@ -39,7 +44,9 @@ func TestDestinations(t *testing.T) {
 		{name: "proxy", cfg: map[string]any{"urls": []any{"https://api.example.com"}, "proxy_url": "http://proxy.example.com:3128"}, want: []string{"api.example.com", "proxy.example.com"}},
 		{name: "disabled proxy", cfg: map[string]any{"urls": []any{"https://api.example.com"}, "proxy_url": "http://proxy.example.com:3128", "proxy_disable": true}, want: []string{"api.example.com"}},
 		{name: "redirects", cfg: map[string]any{"urls": []any{"https://api.example.com"}, "max_redirects": 1}, wantErr: "max_redirects must be 0"},
-		{name: "kerberos", cfg: map[string]any{"urls": []any{"https://api.example.com"}, "kerberos": kerberosDestinationsConfig()}, wantErr: "kerberos is not supported"},
+		{name: "kerberos", cfg: map[string]any{"urls": []any{"https://api.example.com"}, "kerberos": kerberosDestinationsConfig()}, wantErr: "kerberos is not supported", wantConfigErr: fipsBuild},
+		{name: "proxy without host", cfg: map[string]any{"urls": []any{"https://api.example.com"}, "proxy_url": "http:///path"}, wantErr: "cannot parse proxy_url"},
+		{name: "config error", cfg: map[string]any{"urls": []any{"https://api.example.com"}, "max_redirects": "many"}, wantErr: "accessing 'max_redirects'", wantConfigErr: true},
 		{name: "unsupported scheme", cfg: map[string]any{"urls": []any{"ftp://api.example.com"}}, wantErr: "cannot parse URL 0"},
 		// References are text here. Whatever they resolve to, they can't
 		// change a host parsed before them.
@@ -55,6 +62,7 @@ func TestDestinations(t *testing.T) {
 			got, err := destinations(conf.MustNewConfigFrom(tc.cfg))
 			if tc.wantErr != "" {
 				assert.ErrorContains(t, err, tc.wantErr, "destinations must fail")
+				assert.Equal(t, !tc.wantConfigErr, errors.Is(err, plugin.ErrUnknownDestinations), "only refusals must be unknown destinations errors")
 				return
 			}
 			require.NoError(t, err, "destinations must not fail")

@@ -18,6 +18,7 @@
 package plugin
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -37,8 +38,18 @@ import (
 type HashConfigFunc func(cfg *conf.C) (uint64, error)
 
 // DestinationsFunc (optional) returns the hosts (targets and proxies) that a monitor with the config cfg sends data to.
-// Required to use secret stores with allowed_hosts.
+// Required to use secret stores with allowed_hosts. For a valid config whose destinations can't all be known, it
+// returns an error from UnknownDestinations. Other errors are config errors.
 type DestinationsFunc func(cfg *conf.C) ([]string, error)
+
+// ErrUnknownDestinations matches, with errors.Is, the errors returned by UnknownDestinations.
+var ErrUnknownDestinations = errors.New("unknown destinations")
+
+// UnknownDestinations returns the error of a DestinationsFunc for a config whose destinations can't all be known,
+// such as with redirects. reason must not contain config values: they can be secrets.
+func UnknownDestinations(reason string) error {
+	return fmt.Errorf("%w: %s", ErrUnknownDestinations, reason)
+}
 
 type PluginMake func(string, *conf.C, beat.Info) (p Plugin, err error)
 type PluginUpdate func(*conf.C) (err error)

@@ -49,8 +49,13 @@ func checkAllowedHosts(entries []entry, monitorType string, destinations plugin.
 		return fmt.Errorf("%s: connection %q: %w: monitor type %q is not supported", ConfigKey, entries[0].name, ErrNotAllowed, monitorType)
 	}
 	hosts, err := destinations(cfg)
-	if err != nil {
-		return fmt.Errorf("%s: connection %q: %w: %s", ConfigKey, entries[0].name, ErrNotAllowed, err.Error())
+	switch {
+	case errors.Is(err, plugin.ErrUnknownDestinations):
+		return fmt.Errorf("%s: connection %q: %w: %w", ConfigKey, entries[0].name, ErrNotAllowed, err)
+	case err != nil:
+		// A config error, reported as the plugin reports it without
+		// allowed_hosts, so users don't look for it in allowed_hosts.
+		return err
 	}
 	for _, e := range entries {
 		for _, h := range hosts {
