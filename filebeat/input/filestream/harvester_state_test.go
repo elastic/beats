@@ -59,12 +59,8 @@ func publishHandle(tbl *fileStateTable, name string, desc loginp.FileDescriptor)
 	return h
 }
 
-func TestFileStateTable_PublishPinLookup(t *testing.T) {
+func TestFileStateTable_PublishListsHandle(t *testing.T) {
 	tbl := newFileStateTable()
-
-	// No entry yet.
-	_, ok := tbl.LookupOSState("id-1")
-	assert.False(t, ok, "LookupOSState must fail before any Publish")
 
 	h := tbl.NewHandle()
 	assert.NotNil(t, h, "NewHandle must return a handle")
@@ -78,22 +74,8 @@ func TestFileStateTable_PublishPinLookup(t *testing.T) {
 	assert.Equal(t, "sum-1", h.FingerprintSum(),
 		"FingerprintSum must return the completed Sum passed to Publish")
 
-	got, ok := tbl.LookupOSState("id-1")
-	assert.True(t, ok, "LookupOSState must succeed on a pinned, non-zero entry")
-	assert.Equal(t, want, got, "LookupOSState must return the pinned StateOS")
-}
-
-func TestFileStateTable_LookupUnpinnedReadsAsNoPin(t *testing.T) {
-	tbl := newFileStateTable()
-	h := publishHandle(tbl, "id-1", completeDesc("sum-1"))
-
-	_, ok := tbl.LookupOSState("id-1")
-	assert.False(t, ok, "LookupOSState must fail on an unpinned entry")
-
-	// A zero StateOS (e.g. Windows loadFileId failing) must read as "no pin".
-	h.PinOSState(file.StateOS{})
-	_, ok = tbl.LookupOSState("id-1")
-	assert.False(t, ok, "a zero pinned StateOS must read as no pin")
+	assert.Same(t, h, tbl.entries["id-1"], "Publish must list the handle under its key")
+	assert.Equal(t, want, h.os, "Publish must keep the pinned StateOS")
 }
 
 func TestFileStateTable_FingerprintSum(t *testing.T) {
@@ -108,12 +90,41 @@ func TestFileStateTable_FingerprintSum(t *testing.T) {
 		"an incomplete fingerprint must expose no Sum")
 }
 
+func TestOpenFileState_LongerReplacement(t *testing.T) {
+	open := tempFileSource(t, "0123456789")
+	other := tempFileSource(t, "0123456789")
+	gzipped := other.desc
+	gzipped.GZIP = true
+
+	tests := map[string]struct {
+		unpinned bool
+		desc     loginp.FileDescriptor
+		offset   int64
+		want     string
+	}{
+		"a different file larger than the offset":     {desc: other.desc, offset: 9, want: other.newPath},
+		"a different file not larger than the offset": {desc: other.desc, offset: 10},
+		"the open file itself":                        {desc: open.desc},
+		"a GZIP file":                                 {desc: gzipped},
+		"an unknown open file identity":               {unpinned: true, desc: other.desc},
+		"no scanner descriptor":                       {},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			h := publishHandle(newFileStateTable(), "id", tc.desc)
+			if !tc.unpinned {
+				h.PinOSState(open.desc.Info.GetOSState())
+			}
+			assert.Equal(t, tc.want, h.LongerReplacement(tc.offset), "LongerReplacement must return the scanned path or none")
+		})
+	}
+}
+
 func TestFileStateTable_UpdateDescriptorUpdatesIfPresent(t *testing.T) {
 	tbl := newFileStateTable()
 
 	tbl.UpdateDescriptor("absent", completeDesc("sum"))
-	_, ok := tbl.LookupOSState("absent")
-	assert.False(t, ok, "UpdateDescriptor must not insert an entry for an absent key")
+	assert.NotContains(t, tbl.entries, "absent", "UpdateDescriptor must not insert an entry for an absent key")
 
 	h := publishHandle(tbl, "id-1", growingDesc("deadbeef"))
 	assert.Empty(t, h.FingerprintSum(), "handle must start below threshold with no Sum")
@@ -131,12 +142,9 @@ func TestFileStateTable_PublishMovesHandle(t *testing.T) {
 
 	h.Publish("new-id", completeDesc("sum-1"))
 
-	_, ok := tbl.LookupOSState("old-id")
-	assert.False(t, ok, "old key must no longer resolve after Publish")
-
-	got, ok := tbl.LookupOSState("new-id")
-	assert.True(t, ok, "new key must resolve to the moved handle after Publish")
-	assert.Equal(t, pinned, got, "Publish must preserve the pinned StateOS")
+	assert.NotContains(t, tbl.entries, "old-id", "old key must no longer resolve after Publish")
+	assert.Same(t, h, tbl.entries["new-id"], "new key must resolve to the moved handle after Publish")
+	assert.Equal(t, pinned, h.os, "Publish must preserve the pinned StateOS")
 	assert.Equal(t, "sum-1", h.FingerprintSum(), "Publish must store the new identity's descriptor")
 
 	tbl.UpdateDescriptor("new-id", completeDesc("sum-2"))
@@ -154,24 +162,14 @@ func TestFileStateTable_PublishDisplacedHandle(t *testing.T) {
 	tbl := newFileStateTable()
 
 	first := publishHandle(tbl, "fingerprint::short", growingDesc("deadbeef"))
-	firstPin := nonZeroOSState(t)
-	first.PinOSState(firstPin)
-
 	second := publishHandle(tbl, "fingerprint::short", growingDesc("deadbeef"))
-	secondPin := nonZeroOSState(t)
-	second.PinOSState(secondPin)
 
 	first.Publish("fingerprint::full", completeDesc("full-sum"))
 
-	got, ok := tbl.LookupOSState("fingerprint::full")
-	require.True(t, ok, "a displaced handle must still move to its new key")
-	assert.Equal(t, firstPin, got, "the new key must resolve to the first handle's identity")
+	assert.Same(t, first, tbl.entries["fingerprint::full"], "a displaced handle must still move to its new key")
 	assert.Equal(t, "full-sum", first.FingerprintSum(),
 		"the moved handle must expose the new identity's fingerprint")
-
-	got, ok = tbl.LookupOSState("fingerprint::short")
-	assert.True(t, ok, "the second handle must keep the old key")
-	assert.Equal(t, secondPin, got, "the old key must resolve to the second handle's identity")
+	assert.Same(t, second, tbl.entries["fingerprint::short"], "the second handle must keep the old key")
 
 	tbl.Deregister(second)
 	tbl.Deregister(first)
@@ -182,11 +180,9 @@ func TestFileStateTable_DeregisterCompareAndDelete(t *testing.T) {
 	t.Run("removes its own entry", func(t *testing.T) {
 		tbl := newFileStateTable()
 		h := publishHandle(tbl, "id-1", completeDesc("sum"))
-		h.PinOSState(nonZeroOSState(t))
 
 		tbl.Deregister(h)
-		_, ok := tbl.LookupOSState("id-1")
-		assert.False(t, ok, "Deregister must remove the handle's own entry")
+		assert.NotContains(t, tbl.entries, "id-1", "Deregister must remove the handle's own entry")
 	})
 
 	t.Run("displaced handle Deregister no-ops under Restart overlap", func(t *testing.T) {
@@ -195,19 +191,14 @@ func TestFileStateTable_DeregisterCompareAndDelete(t *testing.T) {
 		// During a restart, the new harvester can publish before the old one closes.
 		old := publishHandle(tbl, "id-1", completeDesc("old"))
 		newer := publishHandle(tbl, "id-1", completeDesc("new"))
-		newerPin := nonZeroOSState(t)
-		newer.PinOSState(newerPin)
 
 		// Removing the old handle must preserve the newer entry.
 		tbl.Deregister(old)
-		got, ok := tbl.LookupOSState("id-1")
-		assert.True(t, ok, "the newer handle must survive the displaced handle's Deregister")
-		assert.Equal(t, newerPin, got, "the surviving entry must be the newer handle's")
+		assert.Same(t, newer, tbl.entries["id-1"], "the newer handle must survive the displaced handle's Deregister")
 
 		// The newer handle can still deregister itself.
 		tbl.Deregister(newer)
-		_, ok = tbl.LookupOSState("id-1")
-		assert.False(t, ok, "the newer handle must be able to deregister itself")
+		assert.NotContains(t, tbl.entries, "id-1", "the newer handle must be able to deregister itself")
 	})
 }
 
@@ -220,11 +211,10 @@ func TestFileStateTable_NilSafety(t *testing.T) {
 	tbl.UpdateDescriptor("id", completeDesc("sum"))
 	h.Publish("b", completeDesc("sum"))
 	tbl.Deregister(h)
-	_, ok := tbl.LookupOSState("id")
-	assert.False(t, ok, "LookupOSState on a nil table must report no pin")
 
 	h.PinOSState(nonZeroOSState(t))
 	assert.Empty(t, h.FingerprintSum(), "FingerprintSum on a nil handle must be empty")
+	assert.Empty(t, h.LongerReplacement(0), "LongerReplacement on a nil handle must report no replacement")
 
 	// A handle obtained from a real table must tolerate a nil-table Deregister path too.
 	realTable := newFileStateTable()
@@ -258,7 +248,7 @@ func TestFileStateTable_ConcurrentAccess(t *testing.T) {
 		wg.Go(func() {
 			for range ops {
 				tbl.UpdateDescriptor(key, completeDesc("sum"))
-				_, _ = tbl.LookupOSState(key)
+				_ = current.Load().LongerReplacement(0)
 			}
 		})
 
