@@ -47,6 +47,7 @@ func (*blockedProfileOutput) String() string { return "blocked profile test outp
 // TestScheduledProfileSinkDoesNotBlockOnFullPool uses a real pipeline whose
 // slab queue is full because the output withholds acknowledgments.
 func TestScheduledProfileSinkDoesNotBlockOnFullPool(t *testing.T) {
+	// Build a real pipeline with a tiny slab queue and an output that never acks.
 	const capacity = 32 // The slab queue rejects smaller pools.
 	var cfg pipeline.Config
 	require.NoError(t, conf.MustNewConfigFrom(map[string]any{
@@ -62,6 +63,8 @@ func TestScheduledProfileSinkDoesNotBlockOnFullPool(t *testing.T) {
 		pipeline.Settings{WaitCloseMode: pipeline.WaitOnPipelineCloseThenForce},
 	)
 	require.NoError(t, err, "create the real publisher pipeline")
+
+	// Wrap the pipeline in a publisher and make sure the output is always released.
 	p := New(&beat.Beat{Publisher: pipe}, logptest.NewTestingLogger(t, "pub"))
 	t.Cleanup(func() {
 		// Always release the output, including if a regression fails the test.
@@ -71,6 +74,8 @@ func TestScheduledProfileSinkDoesNotBlockOnFullPool(t *testing.T) {
 		defer cancel()
 		assert.NoError(t, pipe.Disconnect(ctx), "disconnect the test publisher pipeline")
 	})
+
+	// Capture the scheduled profile sink that will be offered to the full queue.
 	require.NoError(t, p.Configure(scheduledProfileInputs("default")), "configure the scheduled profile destination")
 	sink := p.CaptureScheduledProfileSink("default")
 	require.NotNil(t, sink, "capture the scheduled profile destination")
@@ -87,6 +92,7 @@ func TestScheduledProfileSinkDoesNotBlockOnFullPool(t *testing.T) {
 		t.Fatal("output did not receive the first result")
 	}
 
+	// Offer many profiles to the full queue: none may block, and each must be counted as dropped.
 	const attempts = 1024
 	var slowest time.Duration
 	for range attempts {
