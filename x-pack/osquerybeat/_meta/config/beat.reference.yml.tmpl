@@ -21,9 +21,11 @@ osquerybeat:
 #            # which may reflect a later execution when collection is delayed.
 #            # response_id, schedule_id and schedule_execution_count identify the
 #            # originating result; osquery_profile.executions belongs to the sampled metrics.
-#            # Profiles are published best effort: when the output queue is full a
-#            # new profile is dropped immediately and counted in
-#            # osquerybeat.scheduled_query_profiles.dropped.output_full.
+#            # Profiles are published best effort: when the OTel runtime's slab queue is
+#            # full a new profile is dropped immediately and counted in
+#            # osquerybeat.scheduled_query_profiles.dropped.output_full. On the memory
+#            # queue a profile publish can wait for a slot, as scheduled result
+#            # publishes already do.
 #            # Scheduled profiles may be discarded on queue overflow, policy replacement,
 #            # or shutdown. Monitoring counters under osquerybeat.scheduled_query_profiles
 #            # report collection and discards; collected does not mean delivered.

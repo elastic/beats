@@ -13,12 +13,12 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Collect scheduled query profiles asynchronously while preserving execution attribution.
+summary: Fix scheduled query results being delayed by about 10 seconds when scheduled query profiling is enabled.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-description: Scheduled profiles are published best effort from the collector and dropped when the output queue is full, so output backpressure does not hold up collection or daemon restart.
+description: Scheduled query profiles are now collected outside osqueryd's logger callback, so the osquery_schedule query no longer deadlocks on osqueryd's schedule mutex. Profiles are published best effort; on the OTel runtime's slab queue a full queue drops the profile, while on the memory queue a profile publish can wait for a slot, as scheduled result publishes already do.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:

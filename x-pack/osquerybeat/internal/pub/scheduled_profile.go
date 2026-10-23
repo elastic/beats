@@ -21,12 +21,15 @@ import (
 type ScheduledProfileSink interface {
 	Valid() bool
 	// Publish returns false when the lease is retired or the output queue is full.
-	// Publication is best effort and never waits for queue space.
+	// Publication is best effort. On the OTel runtime's slab queue it never waits
+	// for queue space; on the memory queue it can wait for a slot, as scheduled
+	// result publishes already do.
 	Publish(queryName, scheduleID, responseID, spaceID string, scheduleExecutionCount int64, profile map[string]any) bool
 }
 
-// scheduledProfileSink publishes through a DropIfFull client, whose Publish
-// never waits for queue space, so callers need no separate publication worker.
+// scheduledProfileSink publishes through a DropIfFull client. The slab queue
+// never makes that Publish wait; the memory queue can, so Publish may wait for
+// a slot there.
 type scheduledProfileSink struct {
 	mu        sync.Mutex
 	client    beat.Client
