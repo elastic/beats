@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func TestOsqueryExit(t *testing.T) {
@@ -33,6 +34,7 @@ func TestOsqueryExit(t *testing.T) {
 	t.Run("classification", func(t *testing.T) { testOsqueryExitClassification(t, exit78, otherExit) })
 	t.Run("runtime_exit_78_then_startup_failure", func(t *testing.T) { testOsqueryRunnerRuntimeExit78ThenStartupFailure(t, exit78) })
 	t.Run("readiness_during_exit_cleanup", func(t *testing.T) { testOsqueryReadinessDuringExitCleanup(t, exit78) })
+	t.Run("kill_after_cancellation", func(t *testing.T) { testOsqueryKillAfterCancellation(t, osqueryKilledError(t), exit78) })
 }
 
 func testOsqueryExitClassification(t *testing.T, exit78, otherExit error) {
@@ -201,6 +203,10 @@ func TestOsqueryExitHelper(t *testing.T) {
 	if code == "" {
 		t.Skip("exit code helper is not a test")
 	}
+	if code == "hang" {
+		time.Sleep(time.Minute)
+		os.Exit(0)
+	}
 	value, err := strconv.Atoi(code)
 	if err != nil {
 		os.Exit(2)
@@ -219,6 +225,82 @@ func osqueryExitError(t *testing.T, code int) error {
 	var exitError *exec.ExitError
 	require.ErrorAs(t, err, &exitError, "helper must produce a real process exit error")
 	return err
+}
+
+// osqueryKilledError returns the exit error of a killed process, as osqd.Run
+// reports it after its context is cancelled.
+func osqueryKilledError(t *testing.T) error {
+	t.Helper()
+	executable, err := os.Executable()
+	require.NoError(t, err, "locate the test executable")
+	command := exec.CommandContext(t.Context(), executable, "-test.run=^TestOsqueryExitHelper$")
+	command.Env = append(os.Environ(), "OSQUERY_TEST_EXIT=hang")
+	require.NoError(t, command.Start(), "start the helper")
+	require.NoError(t, command.Process.Kill(), "kill the helper")
+	err = command.Wait()
+	var exitError *exec.ExitError
+	require.ErrorAs(t, err, &exitError, "a killed helper must produce a real process exit error")
+	return err
+}
+
+// killedOnCancelRunner behaves like osqd.Run when its context is cancelled:
+// the process is killed, onExit receives the kill, and Run returns nil.
+type killedOnCancelRunner struct {
+	mockOsqueryd
+	err error
+}
+
+func (r *killedOnCancelRunner) Run(ctx context.Context, _ osqd.Flags, onExit func(error)) error {
+	<-ctx.Done()
+	onExit(r.err)
+	return nil
+}
+
+func testOsqueryKillAfterCancellation(t *testing.T, killed, exit78 error) {
+	t.Helper()
+	extensionErr := errors.New("extension ping failed: timeout after 200ms")
+	for _, tc := range []struct {
+		name        string
+		exit        error
+		want        error
+		recoverable bool
+	}{
+		{name: "sibling_failure_before_ready", exit: killed, want: extensionErr, recoverable: true},
+		// osqueryd may exit 78 on its own just after a sibling notices it is gone.
+		{name: "startup_exit_78_after_sibling_failure", exit: exit78, want: exit78, recoverable: false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			var state osqueryRunState
+			g, ctx := errgroup.WithContext(t.Context())
+			g.Go(func() error { return state.run(ctx, &killedOnCancelRunner{err: tc.exit}, nil) })
+			g.Go(func() error { return extensionErr })
+			err := state.result(t.Context(), g.Wait())
+			assert.ErrorIs(t, err, tc.want, "keep the cause of the shutdown")
+			assert.Equal(t, tc.recoverable, isRecoverableOsqueryError(err), "keep the cause's recoverability")
+		})
+	}
+	t.Run("intentional_restart_after_ready", func(t *testing.T) {
+		ctx, cancel := context.WithCancel(t.Context())
+		cancel()
+		var state osqueryRunState
+		state.ready()
+		err := state.run(ctx, &killedOnCancelRunner{err: killed}, nil)
+		assert.NoError(t, err, "a kill caused by our cancellation is not an osqueryd failure")
+	})
+}
+
+func TestRunOsqueryLogsCancelledExitAtInfo(t *testing.T) {
+	log, logs := logptest.NewTestingLoggerWithObserver(t, "")
+	ob, b, _ := newStatusTestBeater(t, func(ob *osquerybeat) { ob.log = log })
+	ctx, cancel := context.WithCancel(t.Context())
+	cancel()
+	runner := &killedOnCancelRunner{err: osqueryKilledError(t)}
+	rah := newResetableActionHandler(ob.pub, log)
+	metrics := newOsquerydMetrics(monitoring.NewRegistry(), log)
+	err := ob.runOsquery(ctx, b, runner, nil, config.ExtensionsConfig{}, make(chan []config.InputConfig), rah, metrics)
+	assert.ErrorIs(t, err, context.Canceled, "shutdown must report cancellation")
+	assert.Zero(t, logs.FilterMessageSnippet("Failed to run osqueryd").Len(), "an intentional stop must not log a failure")
+	assert.Equal(t, 1, logs.FilterMessage("osqueryd process exited").Len(), "an intentional stop logs the exit at info")
 }
 
 func testOsqueryCompetingExtensionError(t *testing.T, exit78 error) {

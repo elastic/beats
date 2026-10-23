@@ -114,9 +114,18 @@ func (s *osqueryRunState) exit(err error) error {
 }
 
 // run classifies the process error before Run waits for output logging and cleanup.
+// After ctx is cancelled, Run kills osqueryd, so the exit only reflects that kill;
+// the error that cancelled ctx is the one to report. An exit 78 still counts,
+// because osqueryd may fail on its own just before a sibling notices it is gone.
 func (s *osqueryRunState) run(ctx context.Context, runner osqd.Runner, flags osqd.Flags) error {
 	var exitErr error
-	err := runner.Run(ctx, flags, func(err error) { exitErr = s.exit(err) })
+	err := runner.Run(ctx, flags, func(err error) {
+		if ctx.Err() != nil && !isOsqueryExit78(err) {
+			s.state.Store(osqueryExited)
+			return
+		}
+		exitErr = s.exit(err)
+	})
 	if exitErr != nil {
 		return exitErr
 	}
