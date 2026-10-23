@@ -6,12 +6,9 @@ package beater
 
 import (
 	"context"
-	"errors"
 	"sync/atomic"
 	"testing"
 	"time"
-
-	"golang.org/x/sync/semaphore"
 
 	"github.com/osquery/osquery-go/plugin/logger"
 	"github.com/stretchr/testify/assert"
@@ -411,94 +408,4 @@ func TestLoggerReturnsWhileScheduledProfileRPCWaits(t *testing.T) {
 	case <-time.After(time.Second):
 		t.Fatal("the released profile RPC did not publish its profile")
 	}
-}
-
-func TestProfilingConnectionIsLazyAndRetriesFailure(t *testing.T) {
-	// Fail the first connection attempt and succeed afterwards.
-	connectFailure := errors.New("profile socket unavailable")
-	var attempts int
-	connection := &profilingConnection{
-		gate: semaphore.NewWeighted(1),
-		connect: func(context.Context) error {
-			attempts++
-			if attempts == 1 {
-				return connectFailure
-			}
-			return nil
-		},
-	}
-
-	// Count queries that reach the isolated executor.
-	var queries int
-	executor := profilingQueryExecutor{
-		runCtx:     t.Context(),
-		connection: connection,
-		executor: profileQueryFunc(func(context.Context, string, time.Duration) ([]map[string]any, error) {
-			queries++
-			return profileTestRow("SELECT 1"), nil
-		}),
-	}
-
-	// Construction stays lazy, and a failed first attempt must not execute a query.
-	assert.Zero(t, attempts, "disabled profiling or a missing stream must not open a socket during setup")
-	_, err := executor.Query(t.Context(), "SELECT 1", time.Second)
-	assert.ErrorIs(t, err, connectFailure, "a connection failure belongs to this optional profile request")
-	assert.Zero(t, queries, "a failed connection must not start its query")
-
-	// Once a retry connects, later requests reuse that connection.
-	_, err = executor.Query(t.Context(), "SELECT 1", time.Second)
-	require.NoError(t, err, "a later profile should retry a failed connection")
-	_, err = executor.Query(t.Context(), "SELECT 1", time.Second)
-	require.NoError(t, err, "the connected executor should serve later diagnostics and profile requests")
-	assert.Equal(t, 2, attempts, "successful connection should be shared for the remainder of this daemon run")
-	assert.Equal(t, 2, queries, "both requests after connection should reach the isolated executor")
-}
-
-func TestProfilingConnectionWaitCanBeCancelled(t *testing.T) {
-	// Use a connect function that blocks until its context is cancelled.
-	entered := make(chan struct{})
-	var attempts atomic.Int32
-	connection := &profilingConnection{
-		gate: semaphore.NewWeighted(1),
-		connect: func(ctx context.Context) error {
-			attempts.Add(1)
-			close(entered)
-			<-ctx.Done()
-			return ctx.Err()
-		},
-	}
-
-	// Occupy the connection gate with an attempt that waits for cancellation.
-	activeCtx, cancelActive := context.WithCancel(t.Context())
-	defer cancelActive()
-	activeDone := make(chan error, 1)
-	go func() { activeDone <- connection.ensure(activeCtx) }()
-	select {
-	case <-entered:
-	case <-time.After(time.Second):
-		t.Fatal("the first lazy connection did not start")
-	}
-
-	// A queued diagnostic must honor its own deadline without starting another connect.
-	waitingCtx, cancelWaiting := context.WithTimeout(t.Context(), 20*time.Millisecond)
-	defer cancelWaiting()
-	waitingDone := make(chan error, 1)
-	go func() { waitingDone <- connection.ensure(waitingCtx) }()
-	select {
-	case err := <-waitingDone:
-		assert.ErrorIs(t, err, context.DeadlineExceeded, "queued diagnostics must not wait past their own deadline")
-	case <-time.After(time.Second):
-		t.Fatal("the queued connection ignored cancellation")
-	}
-	assert.Equal(t, int32(1), attempts.Load(), "cancelled waiters must not start a competing connection")
-
-	// Cancelling the active attempt must release the gate and leave initialization retryable.
-	cancelActive()
-	select {
-	case err := <-activeDone:
-		assert.ErrorIs(t, err, context.Canceled, "daemon cancellation must reach the active connection")
-	case <-time.After(time.Second):
-		t.Fatal("active profile connection did not exit after cancellation")
-	}
-	assert.False(t, connection.connected.Load(), "cancelled initialization must remain retryable")
 }

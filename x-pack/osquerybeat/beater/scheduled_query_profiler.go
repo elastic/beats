@@ -10,8 +10,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"golang.org/x/sync/semaphore"
-
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pub"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -163,52 +161,21 @@ func (w *scheduledQueryProfiler) stop() {
 	w.mu.Lock()
 	w.cancel()
 	w.mu.Unlock()
-	// The sink's DropIfFull client never waits for queue space, so this join
-	// cannot be held up by output backpressure.
+	// On the OTel runtime's slab queue the sink's DropIfFull client never waits
+	// for queue space. On the memory queue a profile publish can wait for a
+	// slot, as scheduled result publishes already do, so this join can wait too.
 	<-w.done
 }
 
 // profilingQueryExecutor links diagnostic request deadlines to daemon teardown.
 // Its client is isolated from result resolution, actions, and health monitoring.
 type profilingQueryExecutor struct {
-	runCtx     context.Context
-	executor   queryExecutor
-	connection *profilingConnection
-}
-
-// Connecting lazily keeps optional profiling failures out of daemon startup.
-// A failed or cancelled attempt must allow a later request to try again.
-type profilingConnection struct {
-	connect   func(context.Context) error
-	gate      *semaphore.Weighted
-	connected atomic.Bool
+	runCtx   context.Context
+	executor queryExecutor
 }
 
 func newProfilingQueryExecutor(ctx context.Context, client *osqdcli.Client) profilingQueryExecutor {
-	return profilingQueryExecutor{
-		runCtx: ctx, executor: client,
-		connection: &profilingConnection{connect: client.Connect, gate: semaphore.NewWeighted(1)},
-	}
-}
-
-func (c *profilingConnection) ensure(ctx context.Context) error {
-	if c.connected.Load() {
-		return ctx.Err()
-	}
-	if err := c.gate.Acquire(ctx, 1); err != nil {
-		return err
-	}
-	defer c.gate.Release(1)
-	if err := ctx.Err(); err != nil {
-		return err
-	}
-	if !c.connected.Load() {
-		if err := c.connect(ctx); err != nil {
-			return err
-		}
-		c.connected.Store(true)
-	}
-	return nil
+	return profilingQueryExecutor{runCtx: ctx, executor: client}
 }
 
 func (q profilingQueryExecutor) Query(ctx context.Context, sql string, timeout time.Duration) ([]map[string]any, error) {
@@ -218,10 +185,5 @@ func (q profilingQueryExecutor) Query(ctx context.Context, sql string, timeout t
 	ctx, cancel := context.WithCancel(ctx)
 	stop := context.AfterFunc(q.runCtx, cancel)
 	defer func() { stop(); cancel() }()
-	if q.connection != nil {
-		if err := q.connection.ensure(ctx); err != nil {
-			return nil, err
-		}
-	}
 	return q.executor.Query(ctx, sql, timeout)
 }
