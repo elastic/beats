@@ -72,7 +72,7 @@ The `kernel_tracing` backend loads eBPF programs into the kernel, which needs mo
 * Run as root, or with the `CAP_BPF`, `CAP_PERFMON` and `CAP_SYS_RESOURCE` capabilities in addition to the capabilities needed for packet capture. On kernels older than 5.8, `CAP_SYS_ADMIN` is required instead of `CAP_BPF` and `CAP_PERFMON`.
 * Read access to `tracefs` (normally mounted at `/sys/kernel/tracing` or `/sys/kernel/debug/tracing`) and, for process metadata, read access to `/proc`.
 * When running in a container, the container must share the host PID namespace and have the capabilities above. The backend is not available under Elastic Agent's unprivileged mode.
-* Packetbeat's default [seccomp policy](/reference/packetbeat/linux-seccomp.md) is extended to allow the system calls the kernel tracer needs (`bpf`, `perf_event_open`, `memfd_create`, `mremap`, `prlimit64`, `getpriority`). If you configure a custom `seccomp` policy, it must allow them too.
+* Packetbeat's default [seccomp policy](/reference/packetbeat/linux-seccomp.md) is extended to allow the system calls the kernel tracer needs (`bpf`, `perf_event_open`, `memfd_create`). If you configure a custom `seccomp` policy, it must allow them too.
 
 The backend keeps closed connections resolvable for the flow timeout plus the flow reporting period, plus a margin, so that flows reported after a connection ended are still attributed to a process. Long flow timeouts therefore increase the memory kept by the kernel tracer.
 

@@ -27,8 +27,7 @@ func init() {
 	// The default seccomp policy on amd64 is an allowlist that predates
 	// eBPF. Allow the system calls quark makes when opening a queue and
 	// loading its programs, otherwise the kernel_tracing backend fails
-	// with EPERM. The set was obtained by tracing packetbeat with the
-	// backend enabled.
+	// with EPERM.
 	//
 	// This must stay amd64-only: ModifyDefaultPolicy appends to the
 	// first syscall group of the default policy, which on arm64 is an
@@ -38,9 +37,6 @@ func init() {
 		"bpf",             // load programs and maps
 		"perf_event_open", // attach probes
 		"memfd_create",    // libbpf object loading
-		"mremap",          // realloc of large buffers
-		"prlimit64",       // RLIMIT_MEMLOCK adjustment
-		"getpriority",
 	); err != nil {
 		panic(err)
 	}
