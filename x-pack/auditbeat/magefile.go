@@ -71,7 +71,17 @@ func AssembleDarwinUniversal() error {
 func GenerateModuleIncludeListGo() error {
 	opts := devtools.DefaultIncludeListOptions()
 	opts.ImportDirs = []string{"processors/*"}
-	return devtools.GenerateIncludeListGo(opts)
+	opts.BuildTags = "\n//go:build !securityonly\n"
+	if err := devtools.GenerateIncludeListGo(opts); err != nil {
+		return err
+	}
+	// generate include/list_securityonly.go
+	return devtools.GenerateIncludeListGo(devtools.IncludeListOptions{
+		Outfile:               "include/list_securityonly.go",
+		BuildTags:             "\n//go:build securityonly\n",
+		Pkg:                   "include",
+		ForceInitializeModule: true,
+	})
 }
 
 // Package packages the Beat for distribution.

@@ -28,8 +28,8 @@ import (
 )
 
 func Init(info beat.Info, components statestore.States) []v2.Plugin {
-	return []v2.Plugin{
+	return append([]v2.Plugin{
 		filestream.Plugin(info.Logger, components),
 		logv2.LogPluginV2(info.Logger),
-	}
+	}, securityOnlyOSInputs(info, components)...)
 }
