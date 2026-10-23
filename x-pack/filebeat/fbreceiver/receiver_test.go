@@ -511,8 +511,9 @@ func TestReceiverStatus(t *testing.T) {
 	}{
 		{
 			name: "failed input",
+			// The receiver keeps running its other inputs, so it is degraded.
 			status: componentstatus.NewEvent(
-				componentstatus.StatusPermanentError,
+				componentstatus.StatusRecoverableError,
 				componentstatus.WithError(errors.New(expectedFailedErrorMessage)),
 				componentstatus.WithAttributes(inputStatusAttributes(
 					componentstatus.StatusPermanentError.String(), expectedFailedErrorMessage)),

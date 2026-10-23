@@ -36,7 +36,7 @@ func TestGroupStatus(t *testing.T) {
 	subReporter3.UpdateStatus(status.Degraded, "Degrade Runner3")
 	subReporter2.UpdateStatus(status.Failed, "Failed Runner2")
 
-	require.Equalf(t, componentstatus.StatusPermanentError, m.GetEvent().Status(), "expected StatusPermanentError, got %v", m.GetEvent().Status())
+	require.Equalf(t, componentstatus.StatusRecoverableError, m.GetEvent().Status(), "a failed runner degrades the group, got %v", m.GetEvent().Status())
 	require.Error(t, m.GetEvent().Err(), "expected non-nil error, got nil")
 	require.Equalf(t, "Failed Runner2", m.GetEvent().Err().Error(), "expected 'Failed Runner1', got %v", m.GetEvent().Err())
 
@@ -145,4 +145,32 @@ func TestInputStatusesInEventAttributes(t *testing.T) {
 	runner2Error, ok := runner2Map.Get("error")
 	require.True(t, ok)
 	assert.Equal(t, "some warning", runner2Error.Str())
+}
+
+func TestStoppedRunnerIsRemoved(t *testing.T) {
+	m := &oteltest.MockHost{}
+	reporter := NewGroupStatusReporter(m)
+	healthy := reporter.GetReporterForRunner("healthy")
+	removed := reporter.GetReporterForRunner("removed")
+
+	healthy.UpdateStatus(status.Running, "")
+	removed.UpdateStatus(status.Failed, "invalid config")
+	require.Equal(t, componentstatus.StatusRecoverableError, m.GetEvent().Status(), "a failed runner degrades the group")
+
+	removed.UpdateStatus(status.Stopped, "")
+
+	evt := m.GetEvent()
+	assert.Equal(t, componentstatus.StatusOK, evt.Status(), "a removed runner must not keep the group failed")
+	inputs, ok := evt.Attributes().Get(inputStatusAttributesKey)
+	require.True(t, ok, "expected 'inputs' attribute to exist")
+	_, ok = inputs.Map().Get("removed")
+	assert.False(t, ok, "a stopped runner must not be reported")
+	_, ok = inputs.Map().Get("healthy")
+	assert.True(t, ok, "other runners must still be reported")
+
+	t.Run("stopping an unknown runner reports nothing", func(t *testing.T) {
+		before := len(m.GetEvents())
+		reporter.GetReporterForRunner("unknown").UpdateStatus(status.Stopped, "")
+		assert.Len(t, m.GetEvents(), before, "no report expected")
+	})
 }

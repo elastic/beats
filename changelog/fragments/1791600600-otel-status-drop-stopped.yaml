@@ -1,0 +1,9 @@
+kind: bug-fix
+
+# REQUIRED for all kinds
+# Change summary; a 80ish characters long description of the change.
+summary: Report a failed input as a degraded beat receiver so it can recover, and stop reporting inputs that were removed.
+
+# REQUIRED for all kinds
+# Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
+component: all

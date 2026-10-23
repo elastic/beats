@@ -73,7 +73,14 @@ func (r *reporter) updateStatusForRunner(id string, state status.Status, msg str
 	if r.runnerStates == nil {
 		r.runnerStates = make(map[string]*runnerState)
 	}
-	if rState, ok := r.runnerStates[id]; ok {
+	if state == status.Stopped {
+		// A stopped runner was removed or is being replaced, a stale entry
+		// would keep reporting its last status.
+		if _, ok := r.runnerStates[id]; !ok {
+			return
+		}
+		delete(r.runnerStates, id)
+	} else if rState, ok := r.runnerStates[id]; ok {
 		rState.msg = msg
 		rState.state = state
 	} else {
@@ -142,9 +149,10 @@ func (r *reporter) calculateAggregateState() (status.Status, string) {
 				reportedMsg = s.msg
 			}
 		case status.Failed:
-			// we've encountered a failed runner.
-			// short-circuit and return, as Failed state takes precedence over other states
-			return s.state, s.msg
+			// A failed runner takes precedence over the others, but the receiver
+			// keeps running them, so it is degraded. A permanent error would be
+			// final: the collector never lets a component recover from it.
+			return status.Degraded, s.msg
 		default:
 		}
 	}
