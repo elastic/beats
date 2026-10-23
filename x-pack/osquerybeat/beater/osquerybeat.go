@@ -90,9 +90,12 @@ type osquerybeat struct {
 
 	log *logp.Logger
 
-	// Beat lifecycle context, cancelled on Stop
-	cancel context.CancelFunc
-	mx     sync.Mutex
+	// Beat lifecycle context, created in New so that a Stop delivered before
+	// Run is not lost. Cancelled on Stop.
+	ctx     context.Context
+	cancel  context.CancelFunc
+	started bool // Run has started, guarded by mx
+	mx      sync.Mutex
 
 	// clockSkewWarnLogged latches the pre-start clamp warning to once per
 	// schedule name. handleQueryResult runs per result document, so without
@@ -150,7 +153,10 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 		return nil, err
 	}
 
+	ctx, cancel := context.WithCancel(context.Background())
 	bt := &osquerybeat{
+		ctx:                  ctx,
+		cancel:               cancel,
 		b:                    b,
 		config:               c,
 		osqueryInstallConfig: installCfg,
@@ -184,11 +190,10 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 func (bt *osquerybeat) init() (context.Context, error) {
 	bt.mx.Lock()
 	defer bt.mx.Unlock()
-	if bt.cancel != nil {
+	if bt.started {
 		return nil, ErrAlreadyRunning
 	}
-	var ctx context.Context
-	ctx, bt.cancel = context.WithCancel(context.Background())
+	bt.started = true
 
 	if !bt.disableWatcher {
 		if bt.watcher != nil {
@@ -196,7 +201,7 @@ func (bt *osquerybeat) init() (context.Context, error) {
 		}
 		bt.watcher = NewWatcher(bt.log)
 	}
-	return ctx, nil
+	return bt.ctx, nil
 }
 
 func (bt *osquerybeat) close() {
@@ -207,7 +212,6 @@ func (bt *osquerybeat) close() {
 	}
 	if bt.cancel != nil {
 		bt.cancel()
-		bt.cancel = nil
 	}
 
 	// Start watching the parent process only now, as a fallback for a
@@ -223,6 +227,11 @@ func (bt *osquerybeat) close() {
 
 // Run starts osquerybeat.
 func (bt *osquerybeat) Run(b *beat.Beat) error {
+	// Stop was called before Run started, there is nothing to run.
+	if bt.ctx.Err() != nil {
+		return nil
+	}
+
 	pj, err := proc.CreateJobObject()
 	if err != nil {
 		return fmt.Errorf("failed to create process JobObject: %w", err)
