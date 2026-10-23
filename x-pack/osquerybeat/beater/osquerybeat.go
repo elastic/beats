@@ -90,9 +90,12 @@ type osquerybeat struct {
 
 	log *logp.Logger
 
-	// Beat lifecycle context, cancelled on Stop
-	cancel context.CancelFunc
-	mx     sync.Mutex
+	// Beat lifecycle context, created in New so that a Stop delivered before
+	// Run is not lost. Cancelled on Stop.
+	ctx     context.Context
+	cancel  context.CancelFunc
+	started bool // Run has started, guarded by mx
+	mx      sync.Mutex
 
 	// clockSkewWarnLogged latches the pre-start clamp warning to once per
 	// schedule name. handleQueryResult runs per result document, so without
@@ -150,7 +153,10 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 		return nil, err
 	}
 
+	ctx, cancel := context.WithCancel(context.Background())
 	bt := &osquerybeat{
+		ctx:                  ctx,
+		cancel:               cancel,
 		b:                    b,
 		config:               c,
 		osqueryInstallConfig: installCfg,
@@ -184,11 +190,10 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 func (bt *osquerybeat) init() (context.Context, error) {
 	bt.mx.Lock()
 	defer bt.mx.Unlock()
-	if bt.cancel != nil {
+	if bt.started {
 		return nil, ErrAlreadyRunning
 	}
-	var ctx context.Context
-	ctx, bt.cancel = context.WithCancel(context.Background())
+	bt.started = true
 
 	if !bt.disableWatcher {
 		if bt.watcher != nil {
@@ -196,7 +201,7 @@ func (bt *osquerybeat) init() (context.Context, error) {
 		}
 		bt.watcher = NewWatcher(bt.log)
 	}
-	return ctx, nil
+	return bt.ctx, nil
 }
 
 func (bt *osquerybeat) close() {
@@ -207,7 +212,6 @@ func (bt *osquerybeat) close() {
 	}
 	if bt.cancel != nil {
 		bt.cancel()
-		bt.cancel = nil
 	}
 
 	// Start watching the parent process only now, as a fallback for a
@@ -223,6 +227,11 @@ func (bt *osquerybeat) close() {
 
 // Run starts osquerybeat.
 func (bt *osquerybeat) Run(b *beat.Beat) error {
+	// Stop was called before Run started, there is nothing to run.
+	if bt.ctx.Err() != nil {
+		return nil
+	}
+
 	pj, err := proc.CreateJobObject()
 	if err != nil {
 		return fmt.Errorf("failed to create process JobObject: %w", err)
@@ -261,8 +270,13 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		otelFactory cfgfile.RunnerFactory
 		otelRunners = make(map[string]cfgfile.Runner)
 	)
+	daemonStatus := &osqueryInputRunnerFactory{}
+	reportDaemonStatus := func(state status.Status, message string) {
+		b.Manager.UpdateStatus(state, message)
+		daemonStatus.UpdateStatus(state, message)
+	}
 	if bt.otelStatusFactoryWrapper != nil {
-		otelFactory = bt.otelStatusFactoryWrapper(&osqueryInputRunnerFactory{})
+		otelFactory = bt.otelStatusFactoryWrapper(daemonStatus)
 	}
 	inputKey := func(idx int, ic config.InputConfig) string {
 		if ic.ID != "" {
@@ -306,14 +320,14 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	// Create socket path
 	socketPath, cleanupFn, err := osqd.CreateSocketPath()
 	if err != nil {
-		b.Manager.UpdateStatus(status.Failed, "Failed to create socket path: "+err.Error())
+		reportDaemonStatus(status.Failed, "Failed to create socket path: "+err.Error())
 		return err
 	}
 	defer cleanupFn()
 
 	osqueryRuntime, err := bt.resolveOsqueryRuntime(ctx)
 	if err != nil {
-		b.Manager.UpdateStatus(status.Failed, "Failed to resolve osquery runtime: "+err.Error())
+		reportDaemonStatus(status.Failed, "Failed to resolve osquery runtime: "+err.Error())
 		return err
 	}
 	bt.osqueryVersion = osqueryRuntime.Version
@@ -342,7 +356,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	)
 
 	if err != nil {
-		b.Manager.UpdateStatus(status.Failed, "Failed to create osqueryd: "+err.Error())
+		reportDaemonStatus(status.Failed, "Failed to create osqueryd: "+err.Error())
 		return err
 	}
 
@@ -353,7 +367,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	// Check that osqueryd exists and runnable
 	err = osq.Check(ctx)
 	if err != nil {
-		b.Manager.UpdateStatus(status.Failed, "Failed to check osqueryd: "+err.Error())
+		reportDaemonStatus(status.Failed, "Failed to check osqueryd: "+err.Error())
 		return err
 	}
 
@@ -364,12 +378,21 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	rah := newResetableActionHandler(bt.pub, bt.log)
 	defer rah.Clear()
 
+	reportDaemonStatus(status.Configuring, "Initial configuration")
+	if err := bt.pub.Configure(bt.config.Inputs); err != nil {
+		reportDaemonStatus(status.Failed, err.Error())
+		return err
+	}
+	if len(bt.config.Inputs) == 0 {
+		reportDaemonStatus(status.Running, "No osquery inputs configured")
+	}
 	g, ctx := errgroup.WithContext(ctx)
 
 	// Start osquery runner.
 	// It restarts osquery on configuration options change
 	// It exits if osqueryd fails to run for any reason, like a bad configuration for example
 	runner := newOsqueryRunner(bt.log)
+	runner.reportStatus = reportDaemonStatus
 	g.Go(func() error {
 		return runner.Run(ctx, func(ctx context.Context, flags osqd.Flags, extensions config.ExtensionsConfig, inputCh <-chan []config.InputConfig) error {
 			return bt.runOsquery(ctx, b, osq, flags, extensions, inputCh, rah, osqdMetrics)
@@ -391,22 +414,17 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 
 	// Run main loop
 	g.Go(func() error {
-		b.Manager.UpdateStatus(status.Configuring, "Initial configuration")
-		// Configure publisher from initial input
-		err := bt.pub.Configure(bt.config.Inputs)
-		if err != nil {
-			return err
-		}
-
 		for {
-			b.Manager.UpdateStatus(status.Running, "Running")
 			select {
 			case <-ctx.Done():
-				b.Manager.UpdateStatus(status.Stopping, "Context cancelled, stopping")
+				// A runner failure also ends ctx; it has reported FAILED already,
+				// and Stopping before the final FAILED would flicker to healthy.
+				if bt.ctx.Err() != nil {
+					reportDaemonStatus(status.Stopping, "Context cancelled, stopping")
+				}
 				bt.log.Info("osquerybeat context cancelled, exiting")
 				return ctx.Err()
 			case inputConfigs := <-inputConfigCh:
-				b.Manager.UpdateStatus(status.Configuring, "Received updated configuration")
 				if len(inputConfigs) == 0 {
 					bt.log.Warn("Osquery input unit was removed; osquery actions (live queries, scheduled packs) will not be available until an osquery input unit is received from Fleet. If the agent was moved to a new policy, ensure the destination policy includes Osquery Manager and that the policy was fully applied.")
 				}
@@ -428,14 +446,14 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	err = g.Wait()
 	if err != nil {
 		if errors.Is(err, context.Canceled) {
-			b.Manager.UpdateStatus(status.Stopped, "Stopped")
+			reportDaemonStatus(status.Stopped, "Stopped")
 			bt.log.Debugf("osquerybeat Run exited, context cancelled")
 		} else {
-			b.Manager.UpdateStatus(status.Failed, "Failed: "+err.Error())
+			reportDaemonStatus(status.Failed, "Failed: "+err.Error())
 			bt.log.Errorf("osquerybeat Run exited with error: %v", err)
 		}
 	} else {
-		b.Manager.UpdateStatus(status.Stopped, "Stopped")
+		reportDaemonStatus(status.Stopped, "Stopped")
 		bt.log.Debugf("osquerybeat Run exited")
 	}
 	return err
@@ -674,7 +692,9 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		// Drive RRULE updates from the same moment native osqueryd applies policy: GenerateConfig
 		// promotes staged query metadata after osqueryd pulls config (see ConfigPlugin.GenerateConfig).
 		configPlugin.SetOnGenerateConfigApplied(func() {
-			runState.ready()
+			if runState.ready() {
+				notifyOsqueryReady(parentCtx)
+			}
 			if rruleHandler != nil {
 				if err := rruleHandler.UpdateFromConfig(configPlugin.EffectiveOsqueryConfig()); err != nil {
 					bt.log.Errorf("failed to update RRULE scheduled queries: %v", err)

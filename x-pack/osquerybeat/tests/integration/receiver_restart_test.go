@@ -170,4 +170,16 @@ func TestReceiverRestartsAfterOsqueryExit78(t *testing.T) {
 		assert.NotEqual(t, componentstatus.StatusPermanentError, event.Status(), "exit 78 must not permanently fail the receiver")
 		assert.NotEqual(t, componentstatus.StatusFatalError, event.Status(), "exit 78 must not fatally fail the receiver")
 	}
+	var degraded, recovered bool
+	for _, event := range host.GetEvents() {
+		if event.Status() == componentstatus.StatusRecoverableError {
+			degraded = true
+		}
+		if degraded && event.Status() == componentstatus.StatusOK {
+			recovered = true
+		}
+	}
+	assert.True(t, degraded, "runtime exit must report recoverable health while waiting to restart")
+	assert.True(t, recovered, "replacement readiness must restore healthy status")
+
 }
