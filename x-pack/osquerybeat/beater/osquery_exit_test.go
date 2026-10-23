@@ -20,6 +20,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/sync/errgroup"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -140,6 +141,32 @@ func testOsqueryRunnerRuntimeExit78ThenStartupFailure(t *testing.T, exit78 error
 	case <-time.After(10 * time.Second):
 		t.Fatal("runner did not restart and return its startup failure")
 	}
+}
+
+// A clean osqueryd exit after readiness is an unexpected runtime exit, so it
+// restarts with backoff; the same exit before readiness is a startup failure.
+func TestOsqueryCleanExitAfterReadinessRestarts(t *testing.T) {
+	ctx, cancel := context.WithTimeout(t.Context(), 3*time.Second)
+	defer cancel()
+	runner := newOsqueryRunner(logptest.NewTestingLogger(t, "clean_exit"))
+	runner.retryInitial = time.Millisecond
+	var states []status.Status
+	runner.reportStatus = func(state status.Status, _ string) {
+		states = append(states, state)
+	}
+	var attempts atomic.Int32
+	require.NoError(t, runner.Update(ctx, []config.InputConfig{{}}), "start a policy")
+	err := runner.Run(ctx, func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan []config.InputConfig) error {
+		var state osqueryRunState
+		if attempts.Add(1) == 1 {
+			state.ready()
+		}
+		// osqd.Run reports a clean exit as a nil error.
+		return state.run(ctx, &mockOsqueryd{}, nil)
+	})
+	assert.ErrorIs(t, err, ErrOsquerydExited, "a clean exit before readiness must fail startup")
+	assert.Equal(t, int32(2), attempts.Load(), "a clean exit after readiness must restart once")
+	assert.Contains(t, states, status.Degraded, "a clean runtime exit must report degraded while waiting to restart")
 }
 
 // delayedCleanupRunner reports child exit before allowing Run to return.

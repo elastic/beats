@@ -256,8 +256,8 @@ func TestOsqueryRecoveryUsesLatestPolicyAfterBackoff(t *testing.T) {
 	ctx, cancel := context.WithCancel(t.Context())
 	defer cancel()
 	runner := newOsqueryRunner(logptest.NewTestingLogger(t, "recovery"))
-	// Long enough that both updates are queued before the replacement starts.
-	runner.retryInitial = 500 * time.Millisecond
+	// Long enough that the updates and the check below finish before the replacement starts.
+	runner.retryInitial = time.Second
 	degraded := make(chan struct{}, 1)
 	runner.reportStatus = func(state status.Status, _ string) {
 		if state == status.Degraded {
@@ -269,13 +269,14 @@ func TestOsqueryRecoveryUsesLatestPolicyAfterBackoff(t *testing.T) {
 	done := make(chan error, 1)
 	go func() {
 		done <- runner.Run(ctx, func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, inputs <-chan []config.InputConfig) error {
+			n := attempts.Add(1)
 			var policy []config.InputConfig
 			select {
 			case policy = <-inputs:
 			case <-ctx.Done():
 				return ctx.Err()
 			}
-			if attempts.Add(1) == 1 {
+			if n == 1 {
 				return errOsqueryRuntimeExit78
 			}
 			seen <- policy[0].ID
@@ -293,7 +294,7 @@ func TestOsqueryRecoveryUsesLatestPolicyAfterBackoff(t *testing.T) {
 	require.NoError(t, runner.Update(ctx, []config.InputConfig{{ID: "latest"}}), "replace pending policy")
 	// The input channel holds one update, so this returns once the runner has taken "latest".
 	require.NoError(t, runner.Update(ctx, []config.InputConfig{{ID: "latest"}}), "wait for the runner to take the latest policy")
-	require.Equal(t, int32(1), attempts.Load(), "backoff ended before the updates were taken; the delay is too short")
+	assert.Never(t, func() bool { return attempts.Load() > 1 }, 200*time.Millisecond, 10*time.Millisecond, "a policy update during backoff started osqueryd early")
 	select {
 	case id := <-seen:
 		assert.Equal(t, "latest", id, "replacement must not resurrect cached inputs")
@@ -336,6 +337,59 @@ func TestOsqueryRecoveryResetsOnlyAfterStableReadiness(t *testing.T) {
 	})
 	assert.ErrorContains(t, err, "exhausted 1 restart attempts", "a later unstable run must exhaust its fresh budget")
 	assert.Equal(t, int32(3), attempts.Load(), "stable ready run must reset the budget exactly once")
+}
+
+func TestOsqueryRecoveryMeasuresStabilityFromFirstReadiness(t *testing.T) {
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+	runner := newOsqueryRunner(logptest.NewTestingLogger(t, "recovery"))
+	runner.maxRestarts = 1
+	runner.retryInitial = time.Millisecond
+	var clock atomic.Int64
+	clock.Store(time.Now().UnixNano())
+	runner.now = func() time.Time { return time.Unix(0, clock.Load()) }
+	short := runner.stablePeriod - time.Nanosecond
+	ready := make(chan struct{}, 1)
+	runner.reportStatus = func(state status.Status, _ string) {
+		if state == status.Running {
+			ready <- struct{}{}
+		}
+	}
+	readyFor := func(ctx context.Context, d time.Duration) error {
+		notifyOsqueryReady(ctx)
+		select {
+		case <-ready:
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+		clock.Add(int64(d))
+		return nil
+	}
+	var attempts atomic.Int32
+	terminal := errors.New("unexpected extra attempt")
+	require.NoError(t, runner.Update(ctx, []config.InputConfig{{}}), "start a policy")
+	err := runner.Run(ctx, func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan []config.InputConfig) error {
+		var err error
+		switch attempts.Add(1) {
+		case 1, 3:
+			// Ready, but not for the stable period: the restart counts.
+			err = readyFor(ctx, short)
+		case 2:
+			// Ready again before the stable period ends: stable since the first readiness.
+			err = readyFor(ctx, short)
+			if err == nil {
+				err = readyFor(ctx, runner.stablePeriod-short)
+			}
+		default:
+			return terminal
+		}
+		if err != nil {
+			return err
+		}
+		return errOsqueryRuntimeExit78
+	})
+	assert.ErrorContains(t, err, "exhausted 1 restart attempts", "a short ready run must not reset the budget")
+	assert.Equal(t, int32(3), attempts.Load(), "only the run that stayed ready for the stable period resets the budget")
 }
 
 func TestOsqueryRecoveryIgnoresRetiredReadiness(t *testing.T) {
