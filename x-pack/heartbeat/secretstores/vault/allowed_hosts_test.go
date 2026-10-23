@@ -61,6 +61,17 @@ func TestAllowedHosts(t *testing.T) {
 			wantErr: "not allowed by allowed_hosts: max_redirects must be 0",
 		},
 		{
+			name: "kerberos",
+			monitor: map[string]any{"type": "http", "urls": []any{"https://api.stripe.com/"}, "kerberos": map[string]any{
+				"auth_type": "password",
+				"username":  "u",
+				"password":  ref,
+				"realm":     "EVIL.EXAMPLE",
+				"krb5_conf": "[realms]\n  EVIL.EXAMPLE = { kdc = attacker.example:88 }\n",
+			}},
+			wantErr: "kerberos is not supported",
+		},
+		{
 			name:    "proxy not allowed",
 			monitor: map[string]any{"type": "http", "urls": []any{"https://api.stripe.com/"}, "proxy_url": "http://attacker.example:3128", "password": ref},
 			wantErr: "a host that is not allowed",

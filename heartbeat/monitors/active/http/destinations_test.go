@@ -39,6 +39,7 @@ func TestDestinations(t *testing.T) {
 		{name: "proxy", cfg: map[string]any{"urls": []any{"https://api.example.com"}, "proxy_url": "http://proxy.example.com:3128"}, want: []string{"api.example.com", "proxy.example.com"}},
 		{name: "disabled proxy", cfg: map[string]any{"urls": []any{"https://api.example.com"}, "proxy_url": "http://proxy.example.com:3128", "proxy_disable": true}, want: []string{"api.example.com"}},
 		{name: "redirects", cfg: map[string]any{"urls": []any{"https://api.example.com"}, "max_redirects": 1}, wantErr: "max_redirects must be 0"},
+		{name: "kerberos", cfg: map[string]any{"urls": []any{"https://api.example.com"}, "kerberos": kerberosDestinationsConfig()}, wantErr: "kerberos is not supported"},
 		{name: "unsupported scheme", cfg: map[string]any{"urls": []any{"ftp://api.example.com"}}, wantErr: "cannot parse URL 0"},
 		// References are text here. Whatever they resolve to, they can't
 		// change a host parsed before them.
@@ -59,6 +60,18 @@ func TestDestinations(t *testing.T) {
 			require.NoError(t, err, "destinations must not fail")
 			assert.Equal(t, tc.want, got, "unexpected destinations")
 		})
+	}
+}
+
+// kerberosDestinationsConfig is an enabled Kerberos block whose KDC is not one
+// of the monitor hosts.
+func kerberosDestinationsConfig() map[string]any {
+	return map[string]any{
+		"auth_type": "password",
+		"username":  "u",
+		"password":  "p",
+		"realm":     "EVIL.EXAMPLE",
+		"krb5_conf": "[realms]\n  EVIL.EXAMPLE = { kdc = attacker.example:88 }\n",
 	}
 }
 

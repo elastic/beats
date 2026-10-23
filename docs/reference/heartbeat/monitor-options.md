@@ -212,6 +212,7 @@ A monitor that references the connection passes the check when:
 * Its type is `http`, `tcp`, or `icmp`. Browser monitors can't use the connection, because their scripts can send the secrets to any host.
 * Every host it connects to is in `allowed_hosts`: the hosts of `urls` or `hosts`, and the host of `proxy_url` if it's set.
 * It's an `http` monitor with `max_redirects` set to `0`, the default, or a monitor of another type. A redirect can send the request to any host.
+* It's an `http` monitor without `kerberos`, or a monitor of another type. Kerberos sends data derived from the password to the Kerberos servers (KDCs), which are not checked.
 
 Host names are compared without case and without a trailing dot. Ports are ignored, so `api.example.com` allows `https://api.example.com:8443`. IP addresses are compared as addresses, so `::1` allows `[0:0:0:0:0:0:0:1]`. Wildcards are not supported. Write internationalized host names the same way in `allowed_hosts` and in the monitor.
 

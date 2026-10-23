@@ -27,7 +27,7 @@ import (
 
 // destinations returns the hosts of the URLs and of the proxy of the monitor,
 // parsed as create does. Redirects are refused: they can send the request to
-// any host.
+// any host. Kerberos is refused.
 func destinations(cfg *conf.C) ([]string, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
@@ -35,6 +35,9 @@ func destinations(cfg *conf.C) ([]string, error) {
 	}
 	if config.MaxRedirects > 0 {
 		return nil, errors.New("max_redirects must be 0")
+	}
+	if config.Kerberos.IsEnabled() {
+		return nil, errors.New("kerberos is not supported")
 	}
 
 	// Validate, run by Unpack, merged urls into hosts.
