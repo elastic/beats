@@ -27,6 +27,7 @@ These are the possible response codes from the server.
 | 401 | Unauthorized | Returned when basic auth, secret header, or HMAC validation fails. |
 | 405 | Method Not Allowed | Returned if methods other than POST are used. |
 | 406 | Not Acceptable | Returned if the POST request does not contain a body. |
+| 413 | Content Too Large | {applies_to}`stack: ga 9.5+` Returned if HMAC validation is configured, `max_body_bytes` is not set, and the request body, as received and before any gzip decoding, is larger than 25 MiB. |
 | 415 | Unsupported Media Type | Returned if the Content-Type is not application/json. Or if Content-Encoding is present and is not gzip. |
 | 500 | Internal Server Error | Returned if an I/O error occurs reading the request. |
 | 503 | Service Unavailable | Returned if the hard limit `max_in_flight_bytes` is exceeded during body reading, or if the total in-flight bytes are above the `high_water_in_flight_bytes` threshold. The response includes a `Retry-After` header. |
@@ -271,6 +272,8 @@ The secret stored in the header name specified by `secret.header`. Certain webho
 
 The name of the header that contains the HMAC signature: `X-Dropbox-Signature`, `X-Hub-Signature-256`, etc. HMAC signatures may be encoded as hex or base64.
 
+{applies_to}`stack: ga 9.5+` When `max_body_bytes` is not set, request bodies larger than 25 MiB are rejected with a 413 status when HMAC validation is configured. Set `max_body_bytes` to accept larger bodies.
+
 
 ### `hmac.key` [_hmac_key]
 
@@ -298,6 +301,8 @@ The hard limit on the total sum of request body bytes that are allowed to be in-
 
 In-flight bytes are tracked from the moment they are read from the request body until the event is acknowledged by the output (for requests with `wait_for_completion_timeout`) or until the request completes (for requests without the timeout parameter).
 
+{applies_to}`stack: ga 9.5+` When HMAC validation is configured, the bytes read to check the signature also count towards this limit. A request that goes over the limit while it is being validated gets a 503 response before its signature is checked. This limit is also what bounds the total memory used by concurrent requests being validated, since the 25 MiB limit that applies when `max_body_bytes` is not set is per request.
+
 Note that in-flight byte tracking uses the raw request body size as a heuristic proxy for memory consumption. For requests without `wait_for_completion_timeout`, the byte count is released when the HTTP request completes, even though published events may still be queued in the output pipeline. This means the in-flight count can underestimate actual memory use under sustained load from non-ACK requests. Using `wait_for_completion_timeout` provides tighter accounting because the byte count is held until the output acknowledges the events.
 
 This option works together with `high_water_in_flight_bytes` and `low_water_in_flight_bytes` to implement hysteresis-based admission control. See those options for details.
@@ -323,6 +328,8 @@ The relationship between the three limits must be: `low_water_in_flight_bytes` <
 ### `max_body_bytes` [_max_body_bytes]
 
 The maximum body length allowed for a single request. If present, the input will truncate request bodies at the configured limit. The default value for this option is unset, no limit.
+
+{applies_to}`stack: ga 9.5+` When HMAC validation is configured and this option is not set, request bodies larger than 25 MiB (before any gzip decoding) are rejected with a 413 status. This is because the whole body is held in memory to validate the signature before the request is authenticated.
 
 :::{note}
 In Filebeat versions prior to 9.4.0, `max_body_bytes` was only enforced for HMAC-authenticated requests. In Filebeat 9.4.0 and later, the limit applies to all HTTP endpoint requests regardless of the authentication method.
