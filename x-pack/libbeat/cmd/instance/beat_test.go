@@ -5,6 +5,7 @@
 package instance
 
 import (
+	"context"
 	"maps"
 	"testing"
 	"time"
@@ -179,5 +180,33 @@ func TestNewBeatForReceiverMetricLoggingDefault(t *testing.T) {
 		require.NoError(t, beat.Config.MetricLogging.Unpack(&metricCfg))
 		assert.True(t, metricCfg.Enabled)
 		assert.Equal(t, time.Duration(0), metricCfg.Period)
+	})
+}
+
+type blockingFQDNLooker struct{}
+
+func (blockingFQDNLooker) FQDNWithContext(ctx context.Context) (string, error) {
+	<-ctx.Done()
+	return "", ctx.Err()
+}
+
+type staticFQDNLooker string
+
+func (l staticFQDNLooker) FQDNWithContext(context.Context) (string, error) { return string(l), nil }
+
+func TestLookupFQDN(t *testing.T) {
+	t.Run("a lookup that does not answer is bounded by the timeout", func(t *testing.T) {
+		start := time.Now()
+		_, err := lookupFQDN(blockingFQDNLooker{}, 50*time.Millisecond)
+
+		require.ErrorIs(t, err, context.DeadlineExceeded, "the lookup must fail with the deadline")
+		assert.Less(t, time.Since(start), 5*time.Second, "the lookup must not outlive its timeout")
+	})
+
+	t.Run("a lookup that answers returns the name", func(t *testing.T) {
+		fqdn, err := lookupFQDN(staticFQDNLooker("host.example.com"), time.Second)
+
+		require.NoError(t, err)
+		assert.Equal(t, "host.example.com", fqdn, "the answer must be returned unchanged")
 	})
 }
