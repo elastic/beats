@@ -52,7 +52,7 @@ func GeoConfigToMap(config GeoConfig) (mapstr.M, error) {
 			`\s*$` //optional whitespace then end anchor
 
 		if m, _ := regexp.MatchString(locRegexp, config.Location); !m {
-			return nil, fmt.Errorf("Invalid lat,lon  string for add_observer_metadata: %s", config.Location)
+			return nil, fmt.Errorf("Invalid lat,lon string for add_observer_metadata: %s", config.Location)
 		}
 	}
 

@@ -193,7 +193,7 @@ func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric,
 			filter,
 		)
 		if err != nil {
-			err = fmt.Errorf("error while listing metric values by resource ID %s and namespace  %s: %w", metric.ResourceSubId, metric.Namespace, err)
+			err = fmt.Errorf("error while listing metric values by resource ID %s and namespace %s: %w", metric.ResourceSubId, metric.Namespace, err)
 			client.Log.Error(err)
 			reporter.Error(err)
 
