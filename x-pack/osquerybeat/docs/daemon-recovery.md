@@ -26,10 +26,15 @@ exhausted retries report FAILED to both status paths.
 ## Scope
 
 This recovery policy does not change publishing, logger callbacks, profiling,
-or shared queue admission. If an existing logger publication is blocked by an
-output outage, teardown can still wait for it before a replacement daemon starts.
-Separating scheduled publication and profiling from the logger callback remains
-independent work.
+or shared queue admission. Stopping the extension server waits, with no
+timeout, for logger callbacks that are still publishing. If an output outage
+blocks a publication, the run does not finish until the output accepts the
+event. Until then no replacement daemon starts, even if osqueryd has already
+exited, and both status paths keep reporting RUNNING. Shutdown waits for the
+same publication. This is the scenario reported in #53645, where the output is
+down and osqueryd exits 78, so this change alone does not make that case report
+DEGRADED and restart; #53939 is needed for that. Separating scheduled
+publication and profiling from the logger callback remains independent work.
 
 ## Validation
 
