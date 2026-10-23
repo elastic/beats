@@ -89,8 +89,16 @@ func (s *server) Test(_ input.TestContext) error {
 	return l.Close()
 }
 
+<<<<<<< HEAD:filebeat/input/udp/input.go
 func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	log := ctx.Logger.With("host", s.Host)
+=======
+func (s *server) InitMetrics(id string, reg *monitoring.Registry, logger *logp.Logger) netinput.Metrics {
+	//nolint:gosec // read_buffer is a byte size, never negative
+	s.metrics = netmetrics.NewUDP(reg, s.Host, s.Network, uint64(s.ReadBuffer), time.Second, logger)
+	return s.metrics
+}
+>>>>>>> 2d57e14 (filebeat: read tcp/udp receive queue metrics for dual-stack listeners (#53972)):filebeat/input/net/udp/input.go
 
 	log.Info("starting udp socket input")
 	defer log.Info("udp input stopped")

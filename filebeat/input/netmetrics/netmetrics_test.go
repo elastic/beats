@@ -25,7 +25,7 @@ import (
 
 func TestAddrs(t *testing.T) {
 	t.Run("ipv4", func(t *testing.T) {
-		addr4, addr6, err := addrs("0.0.0.0:65535", logptest.NewTestingLogger(t, ""))
+		addr4, addr6, err := addrs("127.0.0.1:65535", "", logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -37,8 +37,30 @@ func TestAddrs(t *testing.T) {
 		}
 	})
 
+	// A listener on 0.0.0.0 is a dual-stack socket that is only listed in
+	// /proc/net/{tcp,udp}6 when IPv6 is enabled, so both tables are needed.
+	t.Run("ipv4_unspecified", func(t *testing.T) {
+		for _, network := range []string{"", "tcp", "udp"} {
+			addr4, addr6, err := addrs("0.0.0.0:65535", network, logptest.NewTestingLogger(t, ""))
+			assert.NoError(t, err)
+			assert.Equal(t, []string{"00000000:FFFF"}, addr4, "network %q", network)
+			assert.Equal(t, []string{"00000000000000000000000000000000:FFFF"}, addr6, "network %q", network)
+		}
+	})
+
+	// With an IPv4-only network the socket is AF_INET, so matching IPv6
+	// sockets by port would count unrelated listeners.
+	t.Run("ipv4_unspecified_ipv4_only_network", func(t *testing.T) {
+		for _, network := range []string{"tcp4", "udp4"} {
+			addr4, addr6, err := addrs("0.0.0.0:65535", network, logptest.NewTestingLogger(t, ""))
+			assert.NoError(t, err)
+			assert.Equal(t, []string{"00000000:FFFF"}, addr4, "network %q", network)
+			assert.Empty(t, addr6, "network %q", network)
+		}
+	})
+
 	t.Run("ipv6", func(t *testing.T) {
-		addr4, addr6, err := addrs("[::]:9001", logptest.NewTestingLogger(t, ""))
+		addr4, addr6, err := addrs("[::]:9001", "", logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -50,3 +72,48 @@ func TestAddrs(t *testing.T) {
 		}
 	})
 }
+<<<<<<< HEAD
+=======
+
+func TestUDPMetrics(t *testing.T) {
+	reg := monitoring.NewRegistry()
+	m := NewUDP(reg, "localhost:4242", "", 1000, time.Second, logp.NewNopLogger())
+
+	data := make([]byte, 42, 42)
+	start := time.Now()
+	now := start
+
+	numEvents := 100
+	for range 100 {
+		now = start.Add(100 * time.Millisecond)
+		m.EventReceived(len(data), now)
+		m.EventPublished(now)
+	}
+
+	assert.EqualValues(t, len(data)*numEvents, m.bytes.Get(), "wrong value for bytes received")
+	assert.EqualValues(t, numEvents, m.packets.Get(), "wrong value for packets received")
+	assert.EqualValues(t, numEvents, m.processingTime.Count(), "wrong number of events for processing time calculation")
+	assert.EqualValues(t, numEvents-1, m.arrivalPeriod.Count(), "wrong number of events for processing time calculation")
+}
+
+func TestTCPMetrics(t *testing.T) {
+	reg := monitoring.NewRegistry()
+	m := NewTCP(reg, "localhost:4242", "", time.Second, logp.NewNopLogger())
+
+	data := make([]byte, 42, 42)
+	start := time.Now()
+	now := start
+
+	numEvents := 100
+	for range 100 {
+		now = start.Add(100 * time.Millisecond)
+		m.EventReceived(len(data), now)
+		m.EventPublished(now)
+	}
+
+	assert.EqualValues(t, len(data)*numEvents, m.bytes.Get(), "wrong value for bytes received")
+	assert.EqualValues(t, numEvents, m.packets.Get(), "wrong value for packets received")
+	assert.EqualValues(t, numEvents, m.processingTime.Count(), "wrong number of events for processing time calculation")
+	assert.EqualValues(t, numEvents-1, m.arrivalPeriod.Count(), "wrong number of events for processing time calculation")
+}
+>>>>>>> 2d57e14 (filebeat: read tcp/udp receive queue metrics for dual-stack listeners (#53972))
