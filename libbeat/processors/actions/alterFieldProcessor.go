@@ -154,7 +154,7 @@ func (a *alterFieldProcessor) alterValue(event *beat.Event, valueKey string) err
 	if v, ok := value.(string); ok {
 		err = event.Delete(valueKey)
 		if err != nil {
-			return fmt.Errorf("could not delete key: %s,  %w", v, err)
+			return fmt.Errorf("could not delete key: %s, %w", v, err)
 		}
 
 		v, err = a.alterFunc(v)

@@ -147,7 +147,7 @@ func (f *renameFields) renameField(from string, to string, event *beat.Event) er
 	// Deletion must happen first to support cases where a becomes a.b
 	err = event.Delete(from)
 	if err != nil {
-		return fmt.Errorf("could not delete key: %s,  %w", from, err)
+		return fmt.Errorf("could not delete key: %s, %w", from, err)
 	}
 
 	_, err = event.PutValue(to, value)
@@ -185,7 +185,7 @@ func (f *renameFields) renameFieldSafe(from string, to string, event *beat.Event
 
 	err = event.Delete(from)
 	if err != nil {
-		return fmt.Errorf("could not delete key: %s,  %w", from, err)
+		return fmt.Errorf("could not delete key: %s, %w", from, err)
 	}
 
 	_, err = event.PutValue(to, value)
