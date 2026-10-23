@@ -348,7 +348,7 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, id s
 	var eventsPerObject int
 	if err := json.Unmarshal(raw, &jsonObject); err != nil {
 		j.status.UpdateStatus(status.Degraded, "failed to unmarshal JSON: "+err.Error())
-		return eventsPerObject, fmt.Errorf("job with job id %s encountered an unmarshaling error: %w", id, err)
+		return eventsPerObject, fmt.Errorf("job with ID %s encountered an unmarshaling error: %w", id, err)
 	}
 
 	raw, found := jsonObject[key]
@@ -386,7 +386,7 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, id s
 		data, err := item.MarshalJSON()
 		if err != nil {
 			j.status.UpdateStatus(status.Degraded, "failed to re-marshal JSON: "+err.Error())
-			return eventsPerObject, fmt.Errorf("job with job id %s encountered a marshaling error: %w", id, err)
+			return eventsPerObject, fmt.Errorf("job with ID %s encountered a marshaling error: %w", id, err)
 		}
 		evt := j.createEvent(data, nil, offset+arrayOffset)
 
