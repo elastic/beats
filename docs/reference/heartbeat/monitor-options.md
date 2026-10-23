@@ -218,6 +218,8 @@ Host names are compared without case and without a trailing dot. Ports are ignor
 
 Heartbeat checks the hosts after it resolves the references, so the hosts that are checked are the ones the monitor connects to. For example, `https://attacker.example/?k=vault://prod@payments/stripe#api_key` is rejected because `attacker.example` is not allowed, and so is a URL or a host that comes from a secret and isn't in `allowed_hosts`.
 
+Because the check runs after the references are resolved, a monitor that fails it still reads its secrets from Vault on its runs, at most once every 5 minutes for each secret. These reads appear in the Vault audit log. The secrets stay in Heartbeat and are not sent to any host.
+
 Example:
 
 ```yaml
