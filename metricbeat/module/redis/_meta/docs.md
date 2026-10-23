@@ -12,7 +12,7 @@ Refer to the [Elastic Integrations documentation](integration-docs://reference/r
 
 This module periodically fetches metrics from [Redis](http://redis.io/) servers.
 
-The defaut metricsets are `info` and `keyspace`.
+The default metricsets are `info` and `keyspace`.
 
 
 ## Module-specific configuration notes [_module_specific_configuration_notes_18]
