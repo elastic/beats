@@ -102,6 +102,70 @@ func TestOsqueryRecoveryCancellationAndPolicyRemoval(t *testing.T) {
 	}
 }
 
+// Shutdown can race the end of a policy restart or of a backoff delay. The
+// policy restart case stops the beat from the runner's clock, which it reads
+// after the old run ends. The backoff case relies on select picking the timer
+// over the cancelled context, so it repeats.
+func TestOsqueryRecoveryShutdownDoesNotStartReplacement(t *testing.T) {
+	for _, name := range []string{"policy restart", "backoff"} {
+		t.Run(name, func(t *testing.T) {
+			for range 50 {
+				ctx, cancel := context.WithCancel(t.Context())
+				runner := newOsqueryRunner(logptest.NewTestingLogger(t, "shutdown"))
+				runner.retryInitial = time.Nanosecond
+				var stopped, restarting atomic.Bool
+				var lateStarts atomic.Int32
+				stop := func() {
+					stopped.Store(true)
+					cancel()
+				}
+				runner.now = func() time.Time {
+					if restarting.Load() {
+						stop()
+					}
+					return time.Now()
+				}
+				ready := make(chan struct{}, 1)
+				runner.reportStatus = func(state status.Status, _ string) {
+					if stopped.Load() && state == status.Configuring {
+						lateStarts.Add(1)
+					}
+					switch state {
+					case status.Running:
+						ready <- struct{}{}
+					case status.Degraded:
+						if name == "backoff" {
+							stop()
+						}
+					}
+				}
+				var attempts atomic.Int32
+				require.NoError(t, runner.Update(ctx, []config.InputConfig{{}}), "start the original policy")
+				err := runner.Run(ctx, func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan []config.InputConfig) error {
+					if attempts.Add(1) > 1 {
+						return ctx.Err()
+					}
+					if name == "backoff" {
+						return errOsqueryRuntimeExit78
+					}
+					notifyOsqueryReady(ctx)
+					<-ready
+					restarting.Store(true)
+					if err := runner.Update(ctx, []config.InputConfig{{Osquery: &config.OsqueryConfig{Options: map[string]any{"disable_watchdog": true}}}}); err != nil {
+						return err
+					}
+					<-ctx.Done()
+					return ctx.Err()
+				})
+				cancel()
+				require.ErrorIs(t, err, context.Canceled, "shutdown must stop the runner")
+				require.Equal(t, int32(1), attempts.Load(), "shutdown must not start a replacement osqueryd")
+				require.Zero(t, lateStarts.Load(), "shutdown must not report a replacement starting")
+			}
+		})
+	}
+}
+
 func TestOsqueryRecoveryRemovalCancelsBackoff(t *testing.T) {
 	ctx, cancel := context.WithCancel(t.Context())
 	defer cancel()

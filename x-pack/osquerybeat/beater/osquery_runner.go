@@ -179,14 +179,15 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 				backoff = r.retryInitial
 				restarts = 0
 			}
+			// Shutdown can be noticed here first, so check it before a restart.
+			if parentCtx.Err() != nil {
+				return parentCtx.Err()
+			}
 			if stopping {
 				if latest != nil && len(*latest) > 0 {
 					start()
 				}
 				continue
-			}
-			if parentCtx.Err() != nil {
-				return parentCtx.Err()
 			}
 			if err == nil || errors.Is(err, context.Canceled) {
 				r.log.Info("Osquery exited: ", err)
@@ -209,6 +210,9 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 			retryCh = retry.C
 			backoff = min(backoff*2, r.retryMax)
 		case <-retryCh:
+			if parentCtx.Err() != nil {
+				return parentCtx.Err()
+			}
 			// Updates received during backoff replace latest, without restarting early.
 			start()
 		}
