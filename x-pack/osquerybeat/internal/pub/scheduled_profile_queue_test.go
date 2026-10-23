@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
@@ -53,7 +54,9 @@ func blockedPipeline(t *testing.T, queue map[string]any) (*pipeline.Pipeline, *b
 	require.NoError(t, conf.MustNewConfigFrom(queue).Unpack(&cfg), "configure a small queue")
 	output := &blockedProfileOutput{entered: make(chan struct{}), release: make(chan struct{})}
 	pipe, err := pipeline.LoadWithSettings(
-		beat.Info{Name: "osquerybeat", Logger: logptest.NewTestingLogger(t, "pipeline")},
+		// Queue goroutines can log after Disconnect returns, so they must not
+		// write to the test's log once the test has finished.
+		beat.Info{Name: "osquerybeat", Logger: logp.NewNopLogger()},
 		pipeline.Monitors{}, cfg,
 		func(outputs.Observer) (string, outputs.Group, error) {
 			return "blocked", outputs.Group{BatchSize: 1, Clients: []outputs.Client{output}}, nil
