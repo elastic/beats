@@ -51,8 +51,12 @@ type Heartbeat struct {
 	done     chan struct{}
 	stopOnce sync.Once
 	// config is used for iterating over elements of the config.
-	config             *config.Config
+	config *config.Config
+	// The scheduler is created by Run. Creating it any earlier would leak its
+	// goroutines for Heartbeats that are created but never run.
 	scheduler          *scheduler.Scheduler
+	schedulerLocation  *time.Location
+	stateLoader        monitorstate.StateLoader
 	monitorReloader    *cfgfile.Reloader
 	monitorFactory     cfgfile.RunnerFactory
 	autodiscover       *autodiscover.Autodiscover
@@ -108,7 +112,6 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		stateLoader, replaceStateLoader = monitorstate.DeferredStateLoader(monitorstate.NilStateLoader, 15*time.Second, logger)
 	}
 
-	limit := parsedConfig.Scheduler.Limit
 	schedLocationName := parsedConfig.Scheduler.Location
 	if schedLocationName == "" {
 		schedLocationName = "Local"
@@ -117,31 +120,15 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	if err != nil {
 		return nil, err
 	}
-	jobConfig := parsedConfig.Jobs
-
-	sched := scheduler.Create(limit, hbregistry.SchedulerRegistry, location, jobConfig, parsedConfig.RunOnce, logger)
-
-	pipelineClientFactory := func(p beat.Pipeline) (beat.Client, error) {
-		return p.Connect()
-	}
 
 	bt := &Heartbeat{
 		done:               make(chan struct{}),
 		config:             parsedConfig,
-		scheduler:          sched,
+		schedulerLocation:  location,
+		stateLoader:        stateLoader,
 		replaceStateLoader: replaceStateLoader,
-		// monitorFactory is the factory used for creating all monitor instances,
-		// wiring them up to everything needed to actually execute.
-		monitorFactory: monitors.NewFactory(monitors.FactoryParams{
-			BeatInfo:              b.Info,
-			AddTask:               sched.Add,
-			StateLoader:           stateLoader,
-			PluginsReg:            plugin.GlobalPluginsReg,
-			PipelineClientFactory: pipelineClientFactory,
-			BeatRunFrom:           parsedConfig.RunFrom,
-		}),
-		trace:  trace,
-		logger: logger,
+		trace:              trace,
+		logger:             logger,
 	}
 	runFromID := "<unknown location>"
 	if parsedConfig.RunFrom != nil {
@@ -169,6 +156,22 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	bt.logger.Info("heartbeat is running! Hit CTRL-C to stop it.")
 	groups, _ := syscall.Getgroups()
 	bt.logger.Infof("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
+
+	bt.scheduler = scheduler.Create(bt.config.Scheduler.Limit, hbregistry.SchedulerRegistry, bt.schedulerLocation, bt.config.Jobs, bt.config.RunOnce, bt.logger)
+	defer bt.scheduler.Stop()
+
+	// monitorFactory is the factory used for creating all monitor instances,
+	// wiring them up to everything needed to actually execute.
+	bt.monitorFactory = monitors.NewFactory(monitors.FactoryParams{
+		BeatInfo:    b.Info,
+		AddTask:     bt.scheduler.Add,
+		StateLoader: bt.stateLoader,
+		PluginsReg:  plugin.GlobalPluginsReg,
+		PipelineClientFactory: func(p beat.Pipeline) (beat.Client, error) {
+			return p.Connect()
+		},
+		BeatRunFrom: bt.config.RunFrom,
+	})
 
 	if bt.otelStatusFactoryWrapper != nil {
 		bt.monitorFactory = bt.otelStatusFactoryWrapper(bt.monitorFactory)
@@ -217,8 +220,6 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		bt.autodiscover.Start()
 		defer bt.autodiscover.Stop()
 	}
-
-	defer bt.scheduler.Stop()
 
 	// Wait until run_once ends or bt is being shut down
 	waitMonitors.AddChan(bt.done)
