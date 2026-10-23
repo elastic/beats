@@ -1,0 +1,9 @@
+kind: enhancement
+summary: Coalesce bursts of input status changes in beat receivers into one status report.
+description: >
+  Every status change of an input made a beat receiver report the status of
+  all its inputs to the collector, so starting many inputs in one receiver,
+  like thousands of Heartbeat monitors, took time quadratic in the number of
+  inputs. A change after a quiet period of 500ms is still reported right away,
+  and changes within that period are reported together at its end.
+component: all

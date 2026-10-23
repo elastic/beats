@@ -5,7 +5,9 @@
 package status
 
 import (
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -17,7 +19,7 @@ import (
 
 func TestGroupStatus(t *testing.T) {
 	m := &oteltest.MockHost{}
-	reporter := NewGroupStatusReporter(m)
+	reporter := newGroupStatusReporter(m, 0) // report every change
 
 	subReporter1, subReporter2, subReporter3 := reporter.GetReporterForRunner("1"), reporter.GetReporterForRunner("2"), reporter.GetReporterForRunner("3")
 
@@ -103,7 +105,7 @@ func TestToPdata(t *testing.T) {
 
 func TestInputStatusesInEventAttributes(t *testing.T) {
 	m := &oteltest.MockHost{}
-	reporter := NewGroupStatusReporter(m)
+	reporter := newGroupStatusReporter(m, 0) // report every change
 
 	subReporter1 := reporter.GetReporterForRunner("runner-1")
 	subReporter2 := reporter.GetReporterForRunner("runner-2")
@@ -165,4 +167,41 @@ func TestGroupStatusHasNoInputStatuses(t *testing.T) {
 	assert.Equal(t, componentstatus.StatusPermanentError, m.GetEvent().Status(), "expected the group failure to be permanent")
 	_, ok = m.GetEvent().Attributes().Get(InputStatusAttributesKey)
 	assert.False(t, ok, "expected the group status event to carry no input statuses")
+}
+
+func TestGroupStatusCoalescesBursts(t *testing.T) {
+	m := &oteltest.MockHost{}
+	reporter := newGroupStatusReporter(m, 100*time.Millisecond)
+
+	// a change after a quiet interval is reported right away
+	reporter.GetReporterForRunner("runner-0").UpdateStatus(status.Running, "")
+	require.Len(t, m.GetEvents(), 1)
+
+	// a burst of changes is reported once, at the end of the interval
+	for i := 1; i < 1000; i++ {
+		reporter.GetReporterForRunner(fmt.Sprintf("runner-%d", i)).UpdateStatus(status.Running, "")
+	}
+	reporter.GetReporterForRunner("runner-1").UpdateStatus(status.Degraded, "degraded")
+	require.Len(t, m.GetEvents(), 1)
+	require.Eventually(t, func() bool { return len(m.GetEvents()) == 2 }, time.Second, 10*time.Millisecond)
+
+	evt := m.GetEvent()
+	assert.Equal(t, componentstatus.StatusRecoverableError, evt.Status())
+	inputs, ok := evt.Attributes().Get(InputStatusAttributesKey)
+	require.True(t, ok)
+	assert.Equal(t, 1000, inputs.Map().Len())
+	time.Sleep(200 * time.Millisecond)
+	assert.Len(t, m.GetEvents(), 2, "no reports without changes")
+}
+
+func TestGroupStatusOverridesScheduledReport(t *testing.T) {
+	m := &oteltest.MockHost{}
+	reporter := newGroupStatusReporter(m, 100*time.Millisecond)
+
+	reporter.GetReporterForRunner("runner-0").UpdateStatus(status.Running, "")
+	reporter.GetReporterForRunner("runner-1").UpdateStatus(status.Running, "")
+	reporter.UpdateStatus(status.Failed, "beatreceiver failed")
+
+	time.Sleep(200 * time.Millisecond)
+	assert.Equal(t, componentstatus.StatusPermanentError, m.GetEvent().Status(), "the scheduled report must not override the receiver status")
 }
