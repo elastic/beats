@@ -110,17 +110,20 @@ func TestScheduledProfileSinkDoesNotBlockOnFullPool(t *testing.T) {
 
 	// Offer many profiles to the full queue: none may block, and each must be counted as dropped.
 	const attempts = 1024
-	var slowest time.Duration
 	var accepted int
 	for range attempts {
-		start := time.Now()
-		if sink.Publish("scheduled", "schedule", "response", "", 1, nil) {
-			accepted++
+		published := make(chan bool, 1)
+		go func() { published <- sink.Publish("scheduled", "schedule", "response", "", 1, nil) }()
+		select {
+		case ok := <-published:
+			if ok {
+				accepted++
+			}
+		case <-time.After(time.Second):
+			t.Fatal("a profile Publish waited for queue space")
 		}
-		slowest = max(slowest, time.Since(start))
 	}
 	assert.Zero(t, accepted, "a profile offered to a full queue must report that it was dropped")
-	assert.Less(t, slowest, time.Second, "no Publish call may wait for queue space")
 	assert.Equal(t, uint64(attempts), p.scheduledProfileDropped.Get(), "count every profile dropped on the full queue")
 	assert.True(t, sink.Valid(), "dropping profiles must not retire the lease")
 }

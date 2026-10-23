@@ -35,11 +35,20 @@ type collectedProfile struct {
 type profileTestSink struct {
 	retired   atomic.Bool
 	published chan collectedProfile
+	// drop makes Publish report a full output queue. retireOnDrop also
+	// retires the lease, as a policy change during publication does.
+	drop, retireOnDrop bool
 }
 
 func (s *profileTestSink) Valid() bool { return !s.retired.Load() }
 func (s *profileTestSink) Publish(name, scheduleID, responseID, spaceID string, scheduleExecutionCount int64, profile map[string]any) bool {
 	if !s.Valid() {
+		return false
+	}
+	if s.drop {
+		if s.retireOnDrop {
+			s.retired.Store(true)
+		}
 		return false
 	}
 	s.published <- collectedProfile{name, scheduleID, responseID, spaceID, scheduleExecutionCount, profile}
@@ -250,6 +259,10 @@ func TestScheduledProfilerRejectsPolicyChangesDuringCollection(t *testing.T) {
 	query := scheduleIDChanged[0].Osquery.Schedule["scheduled"]
 	query.ScheduleID = "new-schedule"
 	scheduleIDChanged[0].Osquery.Schedule["scheduled"] = query
+	spaceIDChanged := profileTestInputs("default", "SELECT 1", nil)
+	query = spaceIDChanged[0].Osquery.Schedule["scheduled"]
+	query.SpaceID = "new-space"
+	spaceIDChanged[0].Osquery.Schedule["scheduled"] = query
 
 	for _, change := range []struct {
 		name   string
@@ -258,6 +271,7 @@ func TestScheduledProfilerRejectsPolicyChangesDuringCollection(t *testing.T) {
 		{"namespace changed", profileTestInputs("new", "SELECT 1", nil)},
 		{"query replaced", profileTestInputs("default", "SELECT 2", nil)},
 		{"schedule id changed", scheduleIDChanged},
+		{"space id changed", spaceIDChanged},
 		{"profiling disabled", profileTestInputs("default", "SELECT 1", &disabled)},
 		{"inputs removed", nil},
 	} {
@@ -297,6 +311,42 @@ func TestScheduledProfilerRejectsPolicyChangesDuringCollection(t *testing.T) {
 
 			require.Eventually(t, func() bool { return metrics.stale.Get() == 1 }, time.Second, time.Millisecond, "collection must reject a policy change before publication")
 			assert.Empty(t, sink.published, "old profile metadata must not use the new policy destination")
+		})
+	}
+}
+
+func TestScheduledProfilerCountsRejectedPublish(t *testing.T) {
+	for _, tc := range []struct {
+		name      string
+		retire    bool
+		wantStale uint64
+	}{
+		// The sink's output_full counter records this drop, not the worker.
+		{"output full", false, 0},
+		{"lease retired during publish", true, 1},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			// Run a worker whose first profile is rejected by its sink.
+			query := profileQueryFunc(func(context.Context, string, time.Duration) ([]map[string]any, error) {
+				return profileTestRow("SELECT 1"), nil
+			})
+			metrics := newScheduledProfileMetrics(monitoring.NewRegistry())
+			profiler := newQueryProfiler(logptest.NewTestingLogger(t, "profile"))
+			worker := newScheduledQueryProfiler(t.Context(), 2, query, profileTestPlugin(t), profiler, metrics)
+			t.Cleanup(worker.stop)
+			rejecting := &profileTestSink{published: make(chan collectedProfile, 1), drop: true, retireOnDrop: tc.retire}
+			require.True(t, worker.enqueue(profileTestRequest(rejecting)), "enqueue a profile its sink will reject")
+
+			// The worker is serial, so a later publication shows the first collection finished.
+			next := &profileTestSink{published: make(chan collectedProfile, 1)}
+			require.True(t, worker.enqueue(profileTestRequest(next)), "enqueue a profile that publishes")
+			select {
+			case <-next.published:
+			case <-time.After(time.Second):
+				t.Fatal("the worker did not publish the later profile")
+			}
+			require.Eventually(t, func() bool { return metrics.collected.Get() == 1 }, time.Second, time.Millisecond, "only the published profile counts as collected")
+			assert.Equal(t, tc.wantStale, metrics.stale.Get(), "a rejected publish is stale only when the lease retired")
 		})
 	}
 }

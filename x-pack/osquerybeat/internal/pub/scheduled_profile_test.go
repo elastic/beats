@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func scheduledProfileInputs(namespace string) []config.InputConfig {
@@ -47,10 +48,20 @@ func TestScheduledProfileSinkPreservesSchemaAndDeliveryModes(t *testing.T) {
 
 	// Publish one profile and check the event keeps the existing schema and index.
 	profile := map[string]any{"source": "scheduled", "executions": int64(3), "duration": int64(12)}
-	require.True(t, sink.Publish("uptime", "schedule", "response", "space", 1, profile), "the active lease should publish the collected profile")
+	require.True(t, sink.Publish("uptime", "schedule", "response", "space", 7, profile), "the active lease should publish the collected profile")
 	require.Len(t, recorder.clients[3].snapshot(), 1, "the sink should publish one scheduled profile event synchronously")
 	event := recorder.clients[3].snapshot()[0]
-	assert.Equal(t, queryProfileToEvent("uptime", "", "response", "space", profile, nil, "schedule", 1), event.Fields, "scheduled profiles must preserve the existing event schema and correlation fields")
+	want := mapstr.M{
+		"type":                     "osquery_profile",
+		"event":                    map[string]any{"module": "osquery_manager"},
+		"osquery_profile":          map[string]any{"source": "scheduled", "executions": int64(3), "duration": int64(12)},
+		"query":                    map[string]any{"name": "uptime"},
+		"response_id":              "response",
+		"space_id":                 "space",
+		"schedule_id":              "schedule",
+		"schedule_execution_count": int64(7),
+	}
+	assert.Equal(t, want, event.Fields, "scheduled profiles must preserve the existing event schema and correlation fields")
 	assert.Equal(t, config.QueryProfileDatastream("results"), event.Meta[events.FieldMetaRawIndex], "the explicit profile index must preserve the result namespace")
 
 	// Simulate the queue dropping the event and check the drop is counted.
