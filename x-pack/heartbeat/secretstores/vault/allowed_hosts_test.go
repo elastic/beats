@@ -60,7 +60,7 @@ func TestAllowedHosts(t *testing.T) {
 		{
 			name:    "redirects",
 			monitor: map[string]any{"type": "http", "urls": []any{"https://api.stripe.com/"}, "max_redirects": 3, "check.request.body": ref},
-			wantErr: "not allowed by allowed_hosts: max_redirects must be 0",
+			wantErr: "not allowed by allowed_hosts: unknown destinations: max_redirects must be 0",
 		},
 		{
 			name:          "config error",
