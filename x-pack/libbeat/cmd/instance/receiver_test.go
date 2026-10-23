@@ -371,6 +371,41 @@ func TestBeatReceiverStartFailureShutdownDoesNotHang(t *testing.T) {
 	}
 }
 
+// TestBeatReceiverShutdownWithoutStart covers the collector calling Shutdown on
+// a receiver that was never started
+func TestBeatReceiverShutdownWithoutStart(t *testing.T) {
+	creator := func(*beat.Beat, *conf.C) (beat.Beater, error) { return &mockReceiverBeater{}, nil }
+
+	b, err := NewBeatForReceiver(
+		cmd.FilebeatSettings("filebeat"),
+		map[string]any{"path.home": t.TempDir()},
+		consumertest.NewNop(),
+		"test-receiver",
+		zapcore.NewNopCore(),
+	)
+	require.NoError(t, err, "building the receiver beat should succeed")
+
+	rs := receiver.Settings{
+		ID: component.NewIDWithName(component.MustNewType("mockbeatreceiver"), "r1"),
+		TelemetrySettings: component.TelemetrySettings{
+			Logger: zap.NewNop(),
+		},
+	}
+	br, err := NewBeatReceiver(t.Context(), b, creator, rs)
+	require.NoError(t, err, "creating the beat receiver should succeed")
+
+	// Use t.Context() (no deadline during test execution) so that waiting on
+	// a runDone that is never signaled would block indefinitely.
+	done := make(chan error, 1)
+	go func() { done <- br.Shutdown(t.Context()) }()
+	select {
+	case err := <-done:
+		require.NoError(t, err, "Shutdown without Start should not error")
+	case <-time.After(5 * time.Second):
+		t.Fatal("Shutdown hung when Start was never called")
+	}
+}
+
 // fakeHeadersSetter models the contrib headers_setter extension: a component
 // implementing extensionauth.GRPCClient whose PerRPCCredentials resolve to a
 // fixed set of headers.
