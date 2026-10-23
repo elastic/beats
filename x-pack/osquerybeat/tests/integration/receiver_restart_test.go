@@ -79,8 +79,8 @@ func TestReceiverRestartsAfterOsqueryExit78(t *testing.T) {
 				"id": "restart-result", "type": "osquery",
 				"data_stream": map[string]any{"dataset": "osquery_manager.result"},
 				"osquery": map[string]any{
-					// This test injects a logger failure directly instead of waiting
-					// for the production thrift deadline.
+					// Allow the existing synchronous profiling query to time out before
+					// native logging does; this test injects its own logger failure.
 					"options": map[string]any{"thrift_timeout": 30, "schedule_splay_percent": 0},
 					"schedule": map[string]any{"restart": map[string]any{
 						"query": "SELECT info.pid, flags.value AS extension_socket " +

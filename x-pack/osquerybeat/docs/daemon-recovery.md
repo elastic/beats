@@ -12,12 +12,21 @@ The initial run may be followed by five replacement attempts. The delays are
 The restart budget and delay reset only after a process has remained ready for
 five minutes. Merely fetching configuration, or repeatedly changing policy,
 does not reset the budget. Persistent failures exhaust it and report FAILED.
-An operator must then correct the cause and restart the failed receiver or
-Agent. These limits are fixed defaults, not new configuration options.
+As an OTel receiver, osquerybeat then stays FAILED until the receiver or Agent
+is restarted. As a process, the beat exits with code 1 and Agent restarts it
+with a fresh budget, so a persistent failure repeats about 31 seconds of
+retries followed by a process restart. These limits are fixed defaults, not new
+configuration options.
 
 Backoff is cancellable. Policy updates replace the pending configuration without
-shortening the delay, and removing all inputs cancels pending restarts. No
-replacement process starts before the previous run finishes cleanup. While
+shortening the delay, and removing all inputs cancels pending restarts. Adding
+inputs again starts osqueryd without waiting for the rest of the delay, but
+keeps the restart count. No replacement process starts before the previous run
+finishes cleanup.
+
+Compared with earlier releases, exits after readiness with code 0, or with a
+nonzero code other than 78, are now retried; they used to report FAILED at
+once. Removing all inputs now stops osqueryd and unregisters the action handler. While
 recovering, process-runtime and per-input OTel status reporters receive DEGRADED.
 Only readiness from the current process restores RUNNING; stale callbacks from
 an earlier process cannot mark its replacement healthy. Startup failures and
