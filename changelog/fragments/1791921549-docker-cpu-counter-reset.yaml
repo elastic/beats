@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Prevent negative Docker CPU percentages and error log noise when containers stop or restart.
+component: metricbeat
