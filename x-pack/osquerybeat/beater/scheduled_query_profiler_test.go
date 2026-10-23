@@ -164,6 +164,53 @@ func TestScheduledProfilerBoundsJobsAndJoinsCancellation(t *testing.T) {
 	assert.Empty(t, sink.published, "cancelled collection must not publish a profile")
 }
 
+// stuckProfileSink is a live lease whose Publish waits until release is closed,
+// as a memory queue publish waits for a slot.
+type stuckProfileSink struct{ entered, release chan struct{} }
+
+func (*stuckProfileSink) Valid() bool { return true }
+func (s *stuckProfileSink) Publish(string, string, string, string, int64, map[string]any) bool {
+	close(s.entered)
+	<-s.release
+	return false
+}
+
+func TestScheduledProfilerStopDoesNotJoinStuckPublish(t *testing.T) {
+	// Run a worker whose only profile publish gets stuck.
+	query := profileQueryFunc(func(context.Context, string, time.Duration) ([]map[string]any, error) {
+		return profileTestRow("SELECT 1"), nil
+	})
+	metrics := newScheduledProfileMetrics(monitoring.NewRegistry())
+	profiler := newQueryProfiler(logptest.NewTestingLogger(t, "profile"))
+	worker := newScheduledQueryProfiler(t.Context(), 2, query, profileTestPlugin(t), profiler, metrics)
+	sink := &stuckProfileSink{entered: make(chan struct{}), release: make(chan struct{})}
+	t.Cleanup(func() {
+		// Release the publish even if a regression makes stop wait for it.
+		close(sink.release)
+		worker.stop()
+	})
+	request := profileTestRequest(nil)
+	request.sink = sink
+	require.True(t, worker.enqueue(request), "enqueue a profile whose publish will get stuck")
+	select {
+	case <-sink.entered:
+	case <-time.After(time.Second):
+		t.Fatal("the worker did not reach Publish")
+	}
+
+	// Stopping must not wait for the stuck publish.
+	done := make(chan struct{})
+	go func() {
+		worker.stop()
+		close(done)
+	}()
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+		t.Fatal("stop waited for a collector stuck in Publish")
+	}
+}
+
 func TestScheduledProfilerPreservesProfileCorrelation(t *testing.T) {
 	// Return metrics from a later execution than the result that queued this profile.
 	query := profileQueryFunc(func(context.Context, string, time.Duration) ([]map[string]any, error) {

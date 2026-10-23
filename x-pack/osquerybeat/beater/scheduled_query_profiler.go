@@ -56,6 +56,10 @@ type scheduledQueryProfiler struct {
 	executor queryExecutor
 	config   *ConfigPlugin
 	metrics  *scheduledProfileMetrics
+
+	// publishing is guarded by mu. It is set while collect is inside
+	// sink.Publish, which can wait for a memory queue slot.
+	publishing bool
 }
 
 func newScheduledQueryProfiler(ctx context.Context, limit int, executor queryExecutor, plugin *ConfigPlugin, profiler *queryProfiler, metrics *scheduledProfileMetrics) *scheduledQueryProfiler {
@@ -145,7 +149,21 @@ func (w *scheduledQueryProfiler) collect(request scheduledProfileRequest) {
 		w.metrics.stale.Inc()
 		return
 	}
-	if !request.sink.Publish(request.name, request.scheduleID, request.responseID, request.spaceID, request.scheduleExecutionCount, profile) {
+	// Check cancellation under mu so that either stop sees publishing or this
+	// worker sees the cancellation.
+	w.mu.Lock()
+	if w.ctx.Err() != nil {
+		w.mu.Unlock()
+		w.metrics.shutdown.Inc()
+		return
+	}
+	w.publishing = true
+	w.mu.Unlock()
+	ok := request.sink.Publish(request.name, request.scheduleID, request.responseID, request.spaceID, request.scheduleExecutionCount, profile)
+	w.mu.Lock()
+	w.publishing = false
+	w.mu.Unlock()
+	if !ok {
 		// A false result from a live lease means the output queue was full,
 		// which the sink's output_full counter already records.
 		if !request.sink.Valid() {
@@ -157,14 +175,19 @@ func (w *scheduledQueryProfiler) collect(request scheduledProfileRequest) {
 	w.metrics.collected.Inc()
 }
 
+// stop cancels the worker and joins it unless it is inside sink.Publish. On
+// the memory queue that publish can wait for a slot, so stop returns without
+// joining; the worker exits once the publish returns, when the output recovers
+// or the queue closes. A sink admits one publish at a time, so daemon restarts
+// leave at most one stuck worker per sink.
 func (w *scheduledQueryProfiler) stop() {
 	w.mu.Lock()
 	w.cancel()
+	publishing := w.publishing
 	w.mu.Unlock()
-	// On the OTel runtime's slab queue the sink's DropIfFull client never waits
-	// for queue space. On the memory queue a profile publish can wait for a
-	// slot, as scheduled result publishes already do, so this join can wait too.
-	<-w.done
+	if !publishing {
+		<-w.done
+	}
 }
 
 // profilingQueryExecutor links diagnostic request deadlines to daemon teardown.

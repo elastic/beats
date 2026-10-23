@@ -29,11 +29,17 @@ type ScheduledProfileSink interface {
 
 // scheduledProfileSink publishes through a DropIfFull client. The slab queue
 // never makes that Publish wait; the memory queue can, so Publish may wait for
-// a slot there.
+// a slot there. A waiting Publish holds the client's own mutex, so retire must
+// not close the client then; that Publish closes it when it returns.
 type scheduledProfileSink struct {
-	mu        sync.Mutex
-	client    beat.Client
+	mu     sync.Mutex
+	client beat.Client
+	// publishing is set while a Publish uses client; only one may at a time.
+	publishing bool
+
 	namespace string
+	// countDrop records a profile dropped because the output queue is full.
+	countDrop func()
 
 	retired atomic.Bool
 	// drops counts events the client rejected; Publish compares it across a call.
@@ -67,18 +73,20 @@ func (p *Publisher) configureScheduledProfileSink(result, profile config.InputCo
 	if namespace == "" {
 		namespace = config.DefaultNamespace
 	}
-	sink := &scheduledProfileSink{namespace: namespace}
+	sink := &scheduledProfileSink{namespace: namespace, countDrop: func() {
+		p.scheduledProfileDropped.Inc()
+		now := time.Now().UnixNano()
+		previous := p.scheduledProfileWarning.Load()
+		if now-previous >= int64(time.Minute) && p.scheduledProfileWarning.CompareAndSwap(previous, now) {
+			p.log.Warn("Scheduled query profile dropped because the publisher queue is full; see osquerybeat.scheduled_query_profiles.dropped.output_full")
+		}
+	}}
 	client, err := p.b.Publisher.ConnectWith(beat.ClientConfig{
 		PublishMode: beat.DropIfFull,
 		Processing:  beat.ProcessingConfig{Processor: procs},
 		ClientListener: &scheduledProfileListener{dropped: func() {
 			sink.drops.Add(1)
-			p.scheduledProfileDropped.Inc()
-			now := time.Now().UnixNano()
-			previous := p.scheduledProfileWarning.Load()
-			if now-previous >= int64(time.Minute) && p.scheduledProfileWarning.CompareAndSwap(previous, now) {
-				p.log.Warn("Scheduled query profile dropped because the publisher queue is full; see osquerybeat.scheduled_query_profiles.dropped.output_full")
-			}
+			sink.countDrop()
 		}},
 	})
 	if err != nil {
@@ -110,13 +118,20 @@ func (s *scheduledProfileSink) Valid() bool {
 	return !s.retired.Load()
 }
 
+// retire never waits for a Publish. If one is in flight, that Publish closes
+// the client when it returns.
 func (s *scheduledProfileSink) retire() {
 	s.retired.Store(true)
 	s.mu.Lock()
-	defer s.mu.Unlock()
-	if s.client != nil {
-		_ = s.client.Close()
+	client := s.client
+	if s.publishing {
+		client = nil
+	} else {
 		s.client = nil
+	}
+	s.mu.Unlock()
+	if client != nil {
+		_ = client.Close()
 	}
 }
 
@@ -129,13 +144,38 @@ func (s *scheduledProfileSink) Publish(queryName, scheduleID, responseID, spaceI
 		Meta:      mapstr.M{events.FieldMetaRawIndex: config.QueryProfileDatastream(s.namespace)},
 	}
 	s.mu.Lock()
-	defer s.mu.Unlock()
 	if s.retired.Load() || s.client == nil {
+		s.mu.Unlock()
 		return false
 	}
+	if s.publishing {
+		// An earlier Publish is waiting for a queue slot. Waiting behind it
+		// would strand one more collector per daemon restart.
+		s.mu.Unlock()
+		s.countDrop()
+		return false
+	}
+	s.publishing = true
+	client := s.client
+	s.mu.Unlock()
+
 	before := s.drops.Load()
-	s.client.Publish(event)
-	return s.drops.Load() == before
+	client.Publish(event)
+	ok := s.drops.Load() == before
+
+	s.mu.Lock()
+	s.publishing = false
+	if s.retired.Load() {
+		// retire left the client to this call.
+		s.client = nil
+	} else {
+		client = nil
+	}
+	s.mu.Unlock()
+	if client != nil {
+		_ = client.Close()
+	}
+	return ok
 }
 
 type scheduledProfileListener struct{ dropped func() }
