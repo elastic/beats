@@ -3,6 +3,50 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+// begin 8.19.23 relnotes
+
+[[release-notes-8.19.23]]
+== Beats version 8.19.23
+
+https://github.com/elastic/beats/compare/v8.19.22\...v8.19.23[View commits]
+
+[discrete]
+[[enhancements-8.19.23]]
+=== Enhancements
+
+**All**
+
+* Update Go to 1.26.8. https://github.com/elastic/beats/pull/53026[#53026] 
+
+**Filebeat**
+
+* Reuse the UDP and Unix datagram read buffer so each packet allocates only its own length. https://github.com/elastic/beats/pull/53490[#53490]
+
+[discrete]
+[[bug-fixes-8.19.23]]
+=== Bug fixes
+
+**Auditbeat**
+
+* Fix Auditbeat `file_integrity` kprobe leak that could prevent FIM from starting when the running kernel does not match the first candidate BTF spec. https://github.com/elastic/beats/pull/53253[#53253] https://github.com/elastic/beats/issues/45827[#45827]
+* Fix process misattribution in `system/socket` where TCP/UDP flows were attributed to wrong processes. https://github.com/elastic/beats/pull/53421[#53421] https://github.com/elastic/beats/issues/44741[#44741]
+
+**Filebeat**
+
+* Wire Sarama client logs in the Filebeat Kafka input so consumer-group lifecycle is visible. https://github.com/elastic/beats/pull/52871[#52871] https://github.com/elastic/beats/issues/51305[#51305]
+* Respond to `http_endpoint` requests that contain no events instead of closing the connection. https://github.com/elastic/beats/pull/53261[#53261]
+* Fix `httpjson` rate limiter marking the input "Degraded" when rate-limit headers are absent. https://github.com/elastic/beats/pull/53326[#53326] https://github.com/elastic/beats/issues/53185[#53185]
+
+**Packetbeat**
+
+* Fix panic in DHCPv4 parser when the `OptionTimeOffset` value is shorter than 4 bytes. https://github.com/elastic/beats/pull/53419[#53419] https://github.com/elastic/beats/issues/53330[#53330]
+
+**Winlogbeat**
+
+* Fix binary event data fields being overread into subsequent buffer contents. https://github.com/elastic/beats/pull/53327[#53327] https://github.com/elastic/beats/issues/53260[#53260]
+
+// end 8.19.23 relnotes
+
 // begin 8.19.22 relnotes
 
 [[release-notes-8.19.22]]

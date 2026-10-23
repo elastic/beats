@@ -34,8 +34,12 @@ type fsNotifySymbol struct {
 	inodeProbeFilter  string
 	dentryProbeFilter string
 	pathProbeFilter   string
-	lastOnErr         error
-	seenSpecs         map[*tkbtf.Spec]struct{}
+	// retriedOverlapping and retriedMissing record that the filters were
+	// already adjusted for the matching verification error on the current
+	// spec, so each adjustment is attempted only once.
+	retriedOverlapping bool
+	retriedMissing     bool
+	seenSpecs          map[*tkbtf.Spec]struct{}
 }
 
 func loadFsNotifySymbol(s *probeManager) error {
@@ -125,7 +129,8 @@ func (f *fsNotifySymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc, e
 			f.seenSpecs = make(map[*tkbtf.Spec]struct{})
 		}
 
-		f.lastOnErr = nil
+		f.retriedOverlapping = false
+		f.retriedMissing = false
 		// reset probe filters for each new spec
 		// this probes shouldn't cause any ErrVerifyOverlappingEvents or ErrVerifyMissingEvents
 		// for linux kernel versions linux 5.17+, thus we start from here. To see how we handle all
@@ -226,33 +231,38 @@ func (f *fsNotifySymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc, e
 	}, nil
 }
 
-func (f *fsNotifySymbol) onErr(err error) bool {
-	if f.lastOnErr != nil && errors.Is(err, f.lastOnErr) {
-		return false
-	}
-
-	f.lastOnErr = err
-
+func (sym *fsNotifySymbol) onErr(err error) bool {
+	// verify wraps the verifier errors, so retries are tracked per sentinel
+	// rather than per error value; otherwise every failure looks new and
+	// getVerifiedProbes retries the same spec forever.
 	switch {
 	case errors.Is(err, ErrVerifyOverlappingEvents):
+		if sym.retriedOverlapping {
+			return false
+		}
+		sym.retriedOverlapping = true
 
 		// on ErrVerifyOverlappingEvents for linux kernel versions < 5.7 the __fsnotify_parent
 		// probe is capturing and sending the modify events as well, thus disable them for
 		// fsnotify and return true to signal a retry.
-		f.inodeProbeFilter = "(mc==1 || md==1 || ma==1 || mmt==1 || mmf==1) && dt==2 && nptr!=0"
-		f.dentryProbeFilter = "(mc==1 || md==1 || ma==1 || mmt==1 || mmf==1) && dt==3"
-		f.pathProbeFilter = "(mc==1 || md==1 || ma==1 || mmt==1 || mmf==1) && dt==1"
+		sym.inodeProbeFilter = "(mc==1 || md==1 || ma==1 || mmt==1 || mmf==1) && dt==2 && nptr!=0"
+		sym.dentryProbeFilter = "(mc==1 || md==1 || ma==1 || mmt==1 || mmf==1) && dt==3"
+		sym.pathProbeFilter = "(mc==1 || md==1 || ma==1 || mmt==1 || mmf==1) && dt==1"
 
 		return true
 	case errors.Is(err, ErrVerifyMissingEvents):
+		if sym.retriedMissing {
+			return false
+		}
+		sym.retriedMissing = true
 
 		// on ErrVerifyMissingEvents for linux kernel versions 5.10 - 5.16 the __fsnotify_parent
 		// probe is not capturing and sending the modify attributes events for directories, thus
 		// we adjust the filters to allow them flowing through fsnotify and return true to signal
 		// a retry.
-		f.pathProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==1"
-		f.inodeProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==2 && (nptr!=0 || (mid==1 && ma==1))"
-		f.dentryProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==3"
+		sym.pathProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==1"
+		sym.inodeProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==2 && (nptr!=0 || (mid==1 && ma==1))"
+		sym.dentryProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==3"
 
 		return true
 	default:

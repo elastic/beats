@@ -50,7 +50,7 @@ type TCP struct {
 }
 
 // NewTCP returns a new TCP input metricset. Note that if the id is empty then a nil TCP metricset is returned.
-func NewTCP(id string, reg *monitoring.Registry, device string, poll time.Duration, log *logp.Logger) *TCP {
+func NewTCP(id string, reg *monitoring.Registry, device, network string, poll time.Duration, log *logp.Logger) *TCP {
 	if id == "" {
 		return nil
 	}
@@ -72,7 +72,7 @@ func NewTCP(id string, reg *monitoring.Registry, device string, poll time.Durati
 	out.device.Set(device)
 
 	if poll > 0 && runtime.GOOS == "linux" {
-		addr4, addr6, err := addrs(device, log)
+		addr4, addr6, err := addrs(device, network, log)
 		if err != nil {
 			log.Warn(err)
 			return out

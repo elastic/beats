@@ -1,0 +1,137 @@
+version: 8.19.23
+entries:
+    - kind: bug-fix
+      summary: Wire Sarama client logs in the Filebeat Kafka input so consumer-group lifecycle is visible.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52871
+      issue:
+        - https://github.com/elastic/beats/issues/51305
+      impact: ""
+      action: ""
+      timestamp: 1787821145
+      file:
+        name: 1787821145-filebeat-kafka-input-sarama-logger.yaml
+        checksum: 55eb8e024c2b7b5ea739170dc408e97ff5f511aa
+    - kind: enhancement
+      summary: Update Go to 1.26.8
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/53026
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1788470079
+      file:
+        name: 1788470079-update-go-to-1.26.8.yaml
+        checksum: 858399fb732eb068110b8847ae6a70d03bc7e004
+    - kind: bug-fix
+      summary: Fix auditbeat file_integrity kprobe leak that could prevent FIM from starting when the running kernel does not match the first candidate BTF spec
+      description: ""
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/53253
+      issue:
+        - https://github.com/elastic/beats/issues/45827
+      impact: ""
+      action: ""
+      timestamp: 1789534721
+      file:
+        name: 1789534721-auditbeat-fim-kprobe-leak.yaml
+        checksum: d0be6c0f8e02eb42163f2e4b1388bc74c8e145d5
+    - kind: bug-fix
+      summary: Respond to http_endpoint requests that contain no events instead of closing the connection
+      description: |
+        Since 8.9 the http_endpoint input wrote a zero HTTP status code when a
+        request decoded to no events. net/http rejects status codes below 100, so
+        the response panicked and the connection was closed with nothing written:
+        clients saw an empty reply and reverse proxies in front of the endpoint
+        turned it into a 502. Requests that hold no events are now answered with
+        the configured response_code and response_body, as they were before 8.9.
+        This covers an empty or nested-empty JSON array, an array holding only
+        non-object elements, a whitespace-only body, and a program that returns an
+        empty array. A request with no body at all is still rejected with 406, and
+        that rejection no longer depends on whether max_body_bytes,
+        max_in_flight_bytes or tracer is configured. Invalid response_code and
+        options_response_code values are now rejected at startup.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/53261
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1789551574
+      file:
+        name: 1789551574-http-endpoint-empty-batch-response.yaml
+        checksum: 8eb73ba94663516a52b48edc5af37617ba341c9a
+    - kind: bug-fix
+      summary: Fix httpjson rate limiter marking input Degraded when rate-limit headers are absent.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/53326
+      issue:
+        - https://github.com/elastic/beats/issues/53185
+      impact: ""
+      action: ""
+      timestamp: 1789960820
+      file:
+        name: 1789960820-httpjson-rate-limit-absent-header-degrades.yaml
+        checksum: 8d2960e1ab85937e65a17bfb5cac18b7744db5e8
+    - kind: bug-fix
+      summary: Fix binary event data fields being overread into subsequent buffer contents.
+      description: ""
+      component: winlogbeat
+      pr:
+        - https://github.com/elastic/beats/pull/53327
+      issue:
+        - https://github.com/elastic/beats/issues/53260
+      impact: ""
+      action: ""
+      timestamp: 1789965119
+      file:
+        name: 1789965119-fix-winlogbeat-binary-field-overread.yaml
+        checksum: 269d05fb830d6f06a75a53f2fec7ceb5ee841168
+    - kind: bug-fix
+      summary: Fix panic in DHCPv4 parser when OptionTimeOffset value is shorter than 4 bytes.
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/53419
+      issue:
+        - https://github.com/elastic/beats/issues/53330
+      impact: ""
+      action: ""
+      timestamp: 1790550849
+      file:
+        name: 1790550849-fix-dhcpv4-short-time-offset-panic.yaml
+        checksum: 8e37c60ecfeb1bd283341f9249464ed6a2b8e848
+    - kind: bug-fix
+      summary: Fix process misattribution in system/socket where TCP/UDP flows were attributed to wrong processes
+      description: ""
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/53421
+      issue:
+        - https://github.com/elastic/beats/issues/44741
+      impact: ""
+      action: ""
+      timestamp: 1790572224
+      file:
+        name: 1790572224-44741-auditbeat.yaml
+        checksum: 939e0623600591f4340f93b6e9218486954b5d30
+    - kind: enhancement
+      summary: Reuse the UDP and unix datagram read buffer so each packet allocates only its own length
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/53490
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1790714188
+      file:
+        name: 1790714188-udp-datagram-buffer-reuse.yaml
+        checksum: 77150648bb9d8ba7f55df47463a78e5b5038b189
