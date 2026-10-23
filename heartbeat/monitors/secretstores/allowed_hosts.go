@@ -23,6 +23,8 @@ import (
 	"net/netip"
 	"strings"
 
+	"golang.org/x/net/idna"
+
 	conf "github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
@@ -52,7 +54,7 @@ func checkAllowedHosts(entries []entry, monitorType string, destinations plugin.
 	}
 	for _, e := range entries {
 		for _, h := range hosts {
-			if !e.allowedHosts[normalizeHost(h)] {
+			if n, ok := normalizeHost(h); !ok || !e.allowedHosts[n] {
 				return fmt.Errorf("%s: connection %q: %w: the monitor connects to a host that is not allowed", ConfigKey, e.name, ErrNotAllowed)
 			}
 		}
@@ -78,7 +80,11 @@ func parseAllowedHosts(raw any) (map[string]bool, error) {
 		if !validHost(h) {
 			return nil, fmt.Errorf("%s: %q must be a host name or IP, without scheme, port or path", allowedHostsKey, h)
 		}
-		hosts[normalizeHost(h)] = true
+		n, ok := normalizeHost(h)
+		if !ok {
+			return nil, fmt.Errorf("%s: %q is not a valid internationalized host name", allowedHostsKey, h)
+		}
+		hosts[n] = true
 	}
 	return hosts, nil
 }
@@ -96,13 +102,31 @@ func validHost(h string) bool {
 }
 
 // normalizeHost returns the form of a host used to compare it with the
-// allowed hosts: lowercase, without the trailing dot of a fully qualified
-// name, IPs in their canonical form. A form not normalized here can only
-// prevent a match, never make two different hosts match.
-func normalizeHost(h string) string {
+// allowed hosts: without the trailing dot of a fully qualified name, IPs in
+// their canonical form, names in lowercase ASCII. Like net/http, which dials
+// the result, non-ASCII names are converted with IDNA: Unicode case folding
+// doesn't always agree with it ("ẞ" lowercases to "ß", IDNA maps it to
+// "ss"). ok is false if the name can't be converted; such a host must not
+// match.
+func normalizeHost(h string) (normalized string, ok bool) {
 	h = strings.TrimSuffix(h, ".")
 	if ip, err := netip.ParseAddr(h); err == nil {
-		return ip.Unmap().String()
+		return ip.Unmap().String(), true
 	}
-	return strings.ToLower(h)
+	if !isASCII(h) {
+		var err error
+		if h, err = idna.Lookup.ToASCII(h); err != nil || h == "" {
+			return "", false
+		}
+	}
+	return strings.ToLower(h), true
+}
+
+func isASCII(s string) bool {
+	for i := 0; i < len(s); i++ {
+		if s[i] >= 0x80 {
+			return false
+		}
+	}
+	return true
 }

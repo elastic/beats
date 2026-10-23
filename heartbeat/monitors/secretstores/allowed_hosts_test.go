@@ -93,7 +93,7 @@ func TestParseAllowedHosts(t *testing.T) {
 	}{
 		{name: "missing", raw: nil, want: nil},
 		{name: "empty list", raw: []any{}, want: map[string]bool{}},
-		{name: "host names", raw: []any{"API.Example.com.", "intranet", "bücher.example", "my_host"}, want: map[string]bool{"api.example.com": true, "intranet": true, "bücher.example": true, "my_host": true}},
+		{name: "host names", raw: []any{"API.Example.com.", "intranet", "bücher.example", "my_host"}, want: map[string]bool{"api.example.com": true, "intranet": true, "xn--bcher-kva.example": true, "my_host": true}},
 		{name: "IPs", raw: []any{"10.0.0.1", "::FFFF:10.0.0.2", "2001:DB8::1"}, want: map[string]bool{"10.0.0.1": true, "10.0.0.2": true, "2001:db8::1": true}},
 		{name: "not a list", raw: "api.example.com", wantErr: "allowed_hosts: expected a list of host names or IPs"},
 		{name: "not a string", raw: []any{42}, wantErr: "allowed_hosts: expected a host name or IP, got int"},
@@ -104,6 +104,8 @@ func TestParseAllowedHosts(t *testing.T) {
 		{name: "path", raw: []any{"api.example.com/v1"}, wantErr: "without scheme, port or path"},
 		{name: "wildcard", raw: []any{"*.example.com"}, wantErr: "without scheme, port or path"},
 		{name: "user info", raw: []any{"user@api.example.com"}, wantErr: "without scheme, port or path"},
+		{name: "internationalized names in ASCII form", raw: []any{"BÜCHER.example", "ß.example"}, want: map[string]bool{"xn--bcher-kva.example": true, "xn--zca.example": true}},
+		{name: "invalid internationalized name", raw: []any{"-ü.example"}, wantErr: `"-ü.example" is not a valid internationalized host name`},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -124,9 +126,27 @@ func TestNormalizeHost(t *testing.T) {
 		"api.example.com.": "api.example.com",
 		"::ffff:192.0.2.1": "192.0.2.1",
 		"192.0.2.1.":       "192.0.2.1",
+		// ASCII names are not converted with IDNA, as in net/http.
+		"my_host": "my_host",
+		// Non-ASCII names get the ASCII form that net/http dials.
+		"bücher.example":        "xn--bcher-kva.example",
+		"BÜCHER.example.":       "xn--bcher-kva.example",
+		"xn--bcher-kva.example": "xn--bcher-kva.example",
+		"ß.example":             "xn--zca.example",
+		// Capital sharp s lowercases to "ß", but IDNA maps it to "ss".
+		"ẞ.example": "ss.example",
+		// Kelvin sign.
+		"Kelvin.example": "kelvin.example",
 	}
 	for in, want := range tests {
-		assert.Equal(t, want, normalizeHost(in), "unexpected normalized form of %q", in)
+		got, ok := normalizeHost(in)
+		assert.True(t, ok, "%q must be normalized", in)
+		assert.Equal(t, want, got, "unexpected normalized form of %q", in)
+	}
+
+	for _, in := range []string{"-ü.example", "\u00ad"} {
+		_, ok := normalizeHost(in)
+		assert.False(t, ok, "%q is not a valid internationalized host name and must not match", in)
 	}
 }
 
@@ -205,6 +225,24 @@ func TestAllowedHosts(t *testing.T) {
 			stores:  []any{prod("api.example.com")},
 			cfg:     map[string]any{"type": "dest", "host": "attacker.example", "header": "fake:prod@token"},
 			wantErr: `secret_stores: connection "prod": not allowed by allowed_hosts: the monitor connects to a host that is not allowed`,
+		},
+		{
+			name:   "internationalized name in another form",
+			stores: []any{prod("bücher.example")},
+			cfg:    map[string]any{"type": "dest", "host": "xn--bcher-kva.example", "header": "fake:prod@token"},
+		},
+		{
+			// "ẞ" lowercases to "ß", but net/http dials "ss.example".
+			name:    "name that lowercases to an allowed host but dials another",
+			stores:  []any{prod("ß.example")},
+			cfg:     map[string]any{"type": "dest", "host": "ẞ.example", "header": "fake:prod@token"},
+			wantErr: "a host that is not allowed",
+		},
+		{
+			name:    "invalid internationalized name",
+			stores:  []any{prod("api.example.com")},
+			cfg:     map[string]any{"type": "dest", "host": "-ü.example", "header": "fake:prod@token"},
+			wantErr: "a host that is not allowed",
 		},
 		{
 			name:    "proxy not allowed",
