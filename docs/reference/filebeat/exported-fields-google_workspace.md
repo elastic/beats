@@ -638,7 +638,7 @@ More information about specific fields can be found at https://developers.google
 
 
 **`google_workspace.drive.target_domain`**
-:   The domain for which the acccess scope was changed. This can also be the alias all to indicate the access scope was changed for all domains that have visibility for this document.
+:   The domain for which the access scope was changed. This can also be the alias all to indicate the access scope was changed for all domains that have visibility for this document.
 
     type: keyword
 
