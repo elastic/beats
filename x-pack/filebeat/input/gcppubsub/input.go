@@ -16,11 +16,14 @@ import (
 	"sync"
 	"time"
 
-	"cloud.google.com/go/pubsub"
+	"cloud.google.com/go/pubsub/v2"
+	"cloud.google.com/go/pubsub/v2/apiv1/pubsubpb"
 	"golang.org/x/time/rate"
 	"google.golang.org/api/option"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
+	grpcstatus "google.golang.org/grpc/status"
 
 	"github.com/gohugoio/hashstructure"
 
@@ -323,27 +326,32 @@ func makeEvent(topicID string, msg *pubsub.Message) beat.Event {
 	return event
 }
 
-func (in *pubsubInput) getOrCreateSubscription(ctx context.Context, client *pubsub.Client) (*pubsub.Subscription, error) {
-	sub := client.Subscription(in.Subscription.Name)
-
-	exists, err := sub.Exists(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to check if subscription exists: %w", err)
+func (in *pubsubInput) getOrCreateSubscription(ctx context.Context, client *pubsub.Client) (*pubsub.Subscriber, error) {
+	getReq := &pubsubpb.GetSubscriptionRequest{
+		Subscription: fmt.Sprintf("projects/%s/subscriptions/%s", client.Project(), in.Subscription.Name),
 	}
-	if exists {
+	_, err := client.SubscriptionAdminClient.GetSubscription(ctx, getReq)
+	if err == nil {
+		sub := client.Subscriber(in.Subscription.Name)
 		return sub, nil
+	}
+
+	if grpcstatus.Code(err) != codes.NotFound {
+		return nil, fmt.Errorf("failed to check if subscription exists: %w", err)
 	}
 
 	// Create subscription.
 	if in.Subscription.Create {
-		sub, err = client.CreateSubscription(ctx, in.Subscription.Name, pubsub.SubscriptionConfig{
-			Topic: client.Topic(in.Topic),
-		})
+		createReq := &pubsubpb.Subscription{
+			Name:  fmt.Sprintf("projects/%s/subscriptions/%s", client.Project(), in.Subscription.Name),
+			Topic: fmt.Sprintf("projects/%s/topics/%s", client.Project(), in.Topic),
+		}
+		sub, err := client.SubscriptionAdminClient.CreateSubscription(ctx, createReq)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create subscription: %w", err)
 		}
 		in.log.Debug("Created new subscription.")
-		return sub, nil
+		return client.Subscriber(sub.Name), nil
 	}
 
 	return nil, errors.New("no subscription exists and 'subscription.create' is not enabled")
