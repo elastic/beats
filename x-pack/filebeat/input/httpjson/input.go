@@ -40,7 +40,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 )
 
@@ -175,7 +174,7 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	ctx.UpdateStatus(status.Configuring, "")
 
 	log := ctx.Logger.With("input_url", cfg.Request.URL)
-	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
+	stdCtx := ctx.Cancelation
 
 	if cfg.Request.Tracer != nil {
 		resolved, err := httplog.ResolveTraceFilename(ctx.Agent.Paths, inputName, ctx.IDWithoutName, cfg.Request.Tracer.Filename)

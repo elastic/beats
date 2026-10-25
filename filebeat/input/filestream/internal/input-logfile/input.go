@@ -27,7 +27,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/go-concert/ctxtool"
 )
 
 type managedInput struct {
@@ -91,7 +90,7 @@ func (inp *managedInput) Run(
 
 	// Setup cancellation using a custom cancel context. All harvesters will be
 	// stopped if one failed badly by returning an error.
-	cancelCtx, cancel := context.WithCancel(ctxtool.FromCanceller(ctx.Cancelation))
+	cancelCtx, cancel := context.WithCancel(ctx.Cancelation)
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 

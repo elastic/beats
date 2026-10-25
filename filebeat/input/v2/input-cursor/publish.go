@@ -18,9 +18,9 @@
 package cursor
 
 import (
+	"context"
 	"time"
 
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -39,7 +39,7 @@ type Publisher interface {
 // an update for the persistent store. The updateOp is run by the inputs ACK
 // handler, persisting the pending update.
 type cursorPublisher struct {
-	canceler input.Canceler
+	canceler context.Context
 	client   beat.Client
 	cursor   *Cursor
 }

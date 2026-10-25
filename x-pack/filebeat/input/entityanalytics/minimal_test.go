@@ -131,7 +131,7 @@ func TestMinimalInput_RunSync_FullCycle(t *testing.T) {
 		v2.Context{
 			Logger:      log,
 			ID:          "test-input-1",
-			Cancelation: v2.GoContextFromCanceler(ctx),
+			Cancelation: ctx,
 		},
 		prov,
 		ackClient,
@@ -205,7 +205,7 @@ func TestMinimalInput_RunSync_ErrorDiscardsBuffer(t *testing.T) {
 		v2.Context{
 			Logger:      log,
 			ID:          "test-input-err",
-			Cancelation: v2.GoContextFromCanceler(ctx),
+			Cancelation: ctx,
 		},
 		prov,
 		ackClient,
@@ -252,7 +252,7 @@ func TestMinimalInput_RunCancelation(t *testing.T) {
 			v2.Context{
 				Logger:      logptest.NewTestingLogger(t, "test"),
 				ID:          "test-cancel",
-				Cancelation: v2.GoContextFromCanceler(ctx),
+				Cancelation: ctx,
 			},
 			connector,
 		)

@@ -64,7 +64,7 @@ func (in *inputV2) Run(inputCtx v2.Context, pipeline beat.Pipeline) error {
 		return fmt.Errorf("initializing AWS config: %w", err)
 	}
 
-	ctx := v2.GoContextFromCanceler(inputCtx.Cancelation)
+	ctx := inputCtx.Cancelation
 
 	if in.config.QueueURL != "" {
 		err = in.runSQS(ctx, log, awsCfg, pipeline, inputCtx)

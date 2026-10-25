@@ -101,7 +101,7 @@ func (in *eventHubInputV2) Run(
 	// When the input is initializing before attempting to connect to Azure Event Hub.
 	in.status.UpdateStatus(status.Starting, "Input starting")
 
-	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
+	ctx := inputContext.Cancelation
 
 	// Setup input metrics
 	inputMetrics := newInputMetrics(inputContext.MetricsRegistry, in.log)

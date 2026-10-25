@@ -25,7 +25,6 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 )
 
@@ -99,7 +98,7 @@ func (inp *o365input) Test(src cursor.Source, ctx v2.TestContext) error {
 		return err
 	}
 
-	if _, err := auth.Token(ctxtool.FromCanceller(ctx.Cancelation)); err != nil {
+	if _, err := auth.Token(ctx.Cancelation); err != nil {
 		return fmt.Errorf("unable to acquire authentication token for tenant:%s: %w", tenantID, err)
 	}
 
@@ -146,7 +145,7 @@ func (inp *o365input) Run(ctx v2.Context, src cursor.Source, cursor cursor.Curso
 func (inp *o365input) run(v2ctx v2.Context, stream *stream, cursor cursor.Cursor, pub cursor.Publisher, stat status.StatusReporter) error {
 	tenantID, contentType := stream.tenantID, stream.contentType
 	log := v2ctx.Logger.With("tenantID", tenantID, "contentType", contentType)
-	ctx := ctxtool.FromCanceller(v2ctx.Cancelation)
+	ctx := v2ctx.Cancelation
 
 	tokenProvider, err := inp.config.NewTokenProvider(stream.tenantID, log)
 	if err != nil {

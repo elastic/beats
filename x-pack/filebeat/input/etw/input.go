@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
-	"github.com/elastic/go-concert/ctxtool"
 
 	"github.com/rcrowley/go-metrics"
 	"golang.org/x/sys/windows"
@@ -167,7 +166,7 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	if b == nil {
 		b = backoff.NewEqualJitterBackoff(reconnectInitialBackoff, reconnectMaxBackoff)
 	}
-	cancelCtx := ctxtool.FromCanceller(ctx.Cancelation)
+	cancelCtx := ctx.Cancelation
 
 	// The first pass fails fast so that a bad configuration or missing
 	// privileges surface as Failed with the runner's error log. Once the

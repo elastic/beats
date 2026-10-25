@@ -87,7 +87,7 @@ func (in *sqsReaderInput) Run(
 	}
 
 	// Start the main run loop
-	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
+	ctx := inputContext.Cancelation
 	in.run(ctx)
 	in.cleanup()
 	in.health.UpdateStatus(status.Stopped, "Input execution ended")

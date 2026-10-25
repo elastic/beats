@@ -229,7 +229,7 @@ func lock(ctx v2.Context, store *store, key string) (*resource, error) {
 	return resource, nil
 }
 
-func lockResource(log *logp.Logger, resource *resource, canceler v2.Canceler) error {
+func lockResource(log *logp.Logger, resource *resource, canceler context.Context) error {
 	if !resource.lock.TryLock() {
 		log.Infof("Resource '%v' currently in use, waiting...", resource.key)
 		err := resource.lock.LockContext(canceler)

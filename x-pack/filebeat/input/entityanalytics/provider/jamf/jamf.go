@@ -33,7 +33,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/go-concert/ctxtool"
 )
 
 func init() {
@@ -118,7 +117,7 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	}
 
 	var err error
-	p.client, err = newClient(ctxtool.FromCanceller(inputCtx.Cancelation), p.cfg, p.logger)
+	p.client, err = newClient(inputCtx.Cancelation, p.cfg, p.logger)
 	if err != nil {
 		return err
 	}
@@ -306,7 +305,7 @@ func (p *jamfInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, clien
 		}
 	}()
 
-	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
+	ctx := inputCtx.Cancelation
 	p.logger.Debugf("Starting fetch...")
 	_, err = p.doFetchComputers(ctx, state, true)
 	if err != nil {
@@ -358,7 +357,7 @@ func (p *jamfInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Sto
 		}
 	}()
 
-	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
+	ctx := inputCtx.Cancelation
 	updatedDevices, err := p.doFetchComputers(ctx, state, false)
 	if err != nil {
 		return err

@@ -68,7 +68,7 @@ type JournalEntry struct {
 
 // JctlFactory is a function that returns an instance of journalctl ready to use.
 // It exists to allow testing
-type JctlFactory func(canceller input.Canceler, logger *logp.Logger, args ...string) (Jctl, error)
+type JctlFactory func(canceller context.Context, logger *logp.Logger, args ...string) (Jctl, error)
 
 // Jctl abstracts the call to journalctl, it exists only for testing purposes
 //
@@ -82,7 +82,7 @@ type Jctl interface {
 	//
 	// If cancel is cancelled, Next returns a zero value JournalEntry
 	// and ErrCancelled.
-	Next(input.Canceler) (data []byte, err error)
+	Next(context.Context) (data []byte, err error)
 
 	// Kill terminates the journalctl process and blocks until all
 	// background goroutines (stdout/stderr readers and the process-wait
@@ -121,7 +121,7 @@ type Reader struct {
 	// cursor is the jornalctl cursor, it is also stored in Filebeat's registry
 	cursor string
 
-	canceler input.Canceler
+	canceler context.Context
 
 	jctl        Jctl
 	jctlFactory JctlFactory
@@ -261,7 +261,7 @@ func handleSeekAndCursor(mode SeekMode, since time.Duration, cursor string, supp
 // calls to `Next` will return an error.
 func New(
 	logger *logp.Logger,
-	canceler input.Canceler,
+	canceler context.Context,
 	units []string,
 	syslogIdentifiers []string,
 	transports []string,
@@ -375,14 +375,14 @@ func (r *Reader) SetReadDeadline(t time.Time) bool {
 // next reads the next entry from journalctl. It handles any errors from
 // journalctl restarting it as necessary with a backoff strategy. It either
 // returns a valid journald entry or ErrCancelled when the input is cancelled.
-func (r *Reader) next(cancel input.Canceler) ([]byte, error) {
+func (r *Reader) next(ctx context.Context) ([]byte, error) {
 	// Apply the current read deadline to the (possibly restarted) journalctl.
 	r.jctl.SetReadDeadline(r.deadline.ReadDeadline())
 
-	msg, err := r.jctl.Next(cancel)
+	msg, err := r.jctl.Next(ctx)
 
 	// Check if the input has been cancelled
-	if cancel.Err() != nil {
+	if ctx.Err() != nil {
 		// The caller is responsible for calling Reader.Close to terminate
 		// journalctl. Cancelling this canceller only means this Next call was
 		// cancelled. Because the input has been cancelled, we ignore the message
@@ -426,7 +426,7 @@ func (r *Reader) next(cancel input.Canceler) ([]byte, error) {
 	if !r.backoff.Last().IsZero() && time.Since(r.backoff.Last()) > 5*time.Second {
 		r.backoff = backoff.NewExpBackoff(100*time.Millisecond, 2*time.Second)
 	} else {
-		r.backoff.Wait(input.GoContextFromCanceler(cancel))
+		r.backoff.Wait(ctx)
 	}
 
 	var extraArgs []string
@@ -456,7 +456,7 @@ func (r *Reader) next(cancel input.Canceler) ([]byte, error) {
 //
 // If cancel is cancelled, Next returns a zero value JournalEntry
 // and ErrCancelled.
-func (r *Reader) Next(cancel input.Canceler) (JournalEntry, error) {
+func (r *Reader) Next(cancel context.Context) (JournalEntry, error) {
 	// r.next returns ErrRestarting when journalctl is restarting,
 	// this happens in two situations:
 	//  - When the reader first starts, it runs journalctl without the follow

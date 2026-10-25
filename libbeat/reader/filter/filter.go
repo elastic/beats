@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/match"
-	"github.com/elastic/go-concert/ctxtool"
 )
 
 type Config struct {
@@ -41,15 +40,19 @@ func DefaultConfig() Config {
 // contents of the message, it is returned to the next reader.
 // If not, the message is dropped.
 type FilterParser struct {
-	ctx      ctxtool.CancelContext
+	ctx    context.Context
+	cancel context.CancelFunc
+
 	logger   *logp.Logger
 	r        reader.Reader
 	matchers []match.Matcher
 }
 
 func NewParser(r reader.Reader, c *Config, logger *logp.Logger) *FilterParser {
+	ctx, cancel := context.WithCancel(context.Background())
 	return &FilterParser{
-		ctx:      ctxtool.WithCancelContext(context.Background()),
+		ctx:      ctx,
+		cancel:   cancel,
 		logger:   logger.Named("filter_parser"),
 		r:        r,
 		matchers: c.Patterns,
@@ -89,7 +92,7 @@ func (p *FilterParser) matchAny(text string) bool {
 }
 
 func (p *FilterParser) Close() error {
-	p.ctx.Cancel()
+	p.cancel()
 	return p.r.Close()
 }
 

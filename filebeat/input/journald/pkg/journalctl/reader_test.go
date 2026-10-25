@@ -58,7 +58,7 @@ func TestEventWithNonStringData(t *testing.T) {
 	for idx, rawEvent := range testCases {
 		t.Run(fmt.Sprintf("test %d", idx), func(t *testing.T) {
 			mock := JctlMock{
-				NextFunc: func(canceler input.Canceler) ([]byte, error) {
+				NextFunc: func(canceler context.Context) ([]byte, error) {
 					return rawEvent, nil
 				},
 				KillFunc:            func() error { return nil },
@@ -85,7 +85,7 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 	ctx := context.Background()
 
 	mock := JctlMock{
-		NextFunc: func(canceler input.Canceler) ([]byte, error) {
+		NextFunc: func(canceler context.Context) ([]byte, error) {
 			return jdEvent, errors.New("journalctl exited with code 42")
 		},
 		KillFunc:            func() error { return nil },
@@ -93,7 +93,7 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 	}
 
 	versionMock := JctlMock{
-		NextFunc: func(canceler input.Canceler) ([]byte, error) {
+		NextFunc: func(canceler context.Context) ([]byte, error) {
 			ret := "systemd 259 (259.3-1-arch)\n+PAM +AUDIT -SELINUX +APPARMOR"
 			return []byte(ret), nil
 		},
@@ -101,7 +101,7 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 	}
 
 	factoryCalls := atomic.Uint32{}
-	factory := func(canceller input.Canceler, logger *logp.Logger, args ...string) (Jctl, error) {
+	factory := func(canceller context.Context, logger *logp.Logger, args ...string) (Jctl, error) {
 		if slices.Contains(args, "--version") {
 			return &versionMock, nil
 		}
@@ -117,7 +117,7 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 
 		// If calls have been made, change the Next function to always succeed
 		// and return it
-		mock.NextFunc = func(canceler input.Canceler) ([]byte, error) {
+		mock.NextFunc = func(canceler context.Context) ([]byte, error) {
 			return jdEvent, nil
 		}
 
@@ -205,9 +205,9 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 }
 
 func TestNewUsesMergeFlag(t *testing.T) {
-	f := func(_ input.Canceler, _ *logp.Logger, s ...string) (Jctl, error) {
+	f := func(_ context.Context, _ *logp.Logger, s ...string) (Jctl, error) {
 		return &JctlMock{
-			NextFunc: func(canceler input.Canceler) ([]byte, error) {
+			NextFunc: func(canceler context.Context) ([]byte, error) {
 				ret := "systemd 259 (259.3-1-arch)\n+PAM +AUDIT -SELINUX +APPARMOR"
 				return []byte(ret), nil
 			},
@@ -266,21 +266,21 @@ func (m *mockStatusReporter) getUpdates() []statusUpdate {
 
 func TestReaderReportsDegradedOnRestartLoop(t *testing.T) {
 	versionMock := JctlMock{
-		NextFunc: func(canceler input.Canceler) ([]byte, error) {
+		NextFunc: func(canceler context.Context) ([]byte, error) {
 			return []byte("systemd 259 (259.3-1-arch)\n+PAM +AUDIT"), nil
 		},
 		KillFunc: func() error { return nil },
 	}
 
 	dataCalls := atomic.Uint32{}
-	factory := func(canceller input.Canceler, logger *logp.Logger, args ...string) (Jctl, error) {
+	factory := func(canceller context.Context, logger *logp.Logger, args ...string) (Jctl, error) {
 		if slices.Contains(args, "--version") {
 			return &versionMock, nil
 		}
 
 		id := dataCalls.Add(1)
 		return &JctlMock{
-			NextFunc: func(canceler input.Canceler) ([]byte, error) {
+			NextFunc: func(canceler context.Context) ([]byte, error) {
 				// The first two journalctl instances exit without delivering
 				// any data, the third one succeeds.
 				if id < 3 {
@@ -386,9 +386,9 @@ func TestFacilityArgs(t *testing.T) {
 	// and is implemented as exactly these matches.
 	for _, version := range []int{239, 250} {
 		t.Run(fmt.Sprintf("version %d", version), func(t *testing.T) {
-			f := func(_ input.Canceler, _ *logp.Logger, s ...string) (Jctl, error) {
+			f := func(_ context.Context, _ *logp.Logger, s ...string) (Jctl, error) {
 				return &JctlMock{
-					NextFunc: func(canceler input.Canceler) ([]byte, error) {
+					NextFunc: func(canceler context.Context) ([]byte, error) {
 						ret := fmt.Sprintf("systemd %d (%d-test)\n+PAM +AUDIT", version, version)
 						return []byte(ret), nil
 					},

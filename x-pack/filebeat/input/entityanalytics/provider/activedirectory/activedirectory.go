@@ -28,7 +28,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
-	"github.com/elastic/go-concert/ctxtool"
 )
 
 func init() {
@@ -242,7 +241,7 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 	wantEmptyGroups := p.cfg.wantEmptyGroups()
 	if wantUsers || wantDevices || wantEmptyGroups {
 		var users, devices, groups []*User
-		ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
+		ctx := inputCtx.Cancelation
 		p.logger.Debugf("Starting fetch...")
 		if wantUsers {
 			users, err = p.doFetchUsers(ctx, state, true)
@@ -364,7 +363,7 @@ func (p *adInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store
 	}()
 
 	var updatedUsers, updatedDevices, updatedGroups []*User
-	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
+	ctx := inputCtx.Cancelation
 	if p.cfg.wantUsers() {
 		updatedUsers, err = p.doFetchUsers(ctx, state, false)
 		if err != nil {

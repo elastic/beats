@@ -120,7 +120,7 @@ func TestMultilineParserPreservesJournaldCheckpoint(t *testing.T) {
 
 	mock := &journalReaderMock{
 		CloseFunc: func() error { return nil },
-		NextFunc: func(cancel v2.Canceler) (journalctl.JournalEntry, error) {
+		NextFunc: func(cancel context.Context) (journalctl.JournalEntry, error) {
 			if call >= len(lines) {
 				return journalctl.JournalEntry{}, io.EOF
 			}

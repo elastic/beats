@@ -33,7 +33,6 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/go-concert/ctxtool"
 )
 
 func Plugin() input.Plugin {
@@ -130,5 +129,5 @@ func (s *server) Run(ctx input.Context, evtChan chan<- netinput.DataMetadata, me
 	logger.Debug("udp input initialized")
 	ctx.UpdateStatus(status.Running, "")
 
-	return server.Run(ctxtool.FromCanceller(ctx.Cancelation))
+	return server.Run(ctx.Cancelation)
 }

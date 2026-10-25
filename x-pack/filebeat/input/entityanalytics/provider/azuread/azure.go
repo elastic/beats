@@ -29,7 +29,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/paths"
-	"github.com/elastic/go-concert/ctxtool"
 )
 
 func init() {
@@ -88,7 +87,7 @@ func (p *azure) Test(testCtx v2.TestContext) error {
 	p.logger = testCtx.Logger.With("tenant_id", p.conf.TenantID, "provider", Name)
 	p.auth.SetLogger(p.logger)
 
-	ctx := ctxtool.FromCanceller(testCtx.Cancelation)
+	ctx := testCtx.Cancelation
 	if _, err := p.auth.Token(ctx); err != nil {
 		return fmt.Errorf("%s test failed: %w", Name, err)
 	}
@@ -109,7 +108,7 @@ func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Clien
 	}
 	p.auth.SetLogger(p.logger)
 
-	p.fetcher, err = graph.New(ctxtool.FromCanceller(p.ctx.Cancelation), p.ctx.ID, p.cfg, p.Manager.Logger, p.auth, p.ctx.Agent.Paths)
+	p.fetcher, err = graph.New(p.ctx.Cancelation, p.ctx.ID, p.cfg, p.Manager.Logger, p.auth, p.ctx.Agent.Paths)
 	if err != nil {
 		return fmt.Errorf("unable to create fetcher: %w", err)
 	}
@@ -209,7 +208,7 @@ func (p *azure) runFullSync(inputCtx v2.Context, store *kvstore.Store, client be
 		}
 	}()
 
-	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
+	ctx := inputCtx.Cancelation
 	p.logger.Debugf("Starting fetch...")
 	if _, _, err = p.doFetch(ctx, state, true); err != nil {
 		return err
@@ -271,7 +270,7 @@ func (p *azure) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, 
 		}
 	}()
 
-	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
+	ctx := inputCtx.Cancelation
 	updatedUsers, updatedDevices, err := p.doFetch(ctx, state, false)
 	if err != nil {
 		return err

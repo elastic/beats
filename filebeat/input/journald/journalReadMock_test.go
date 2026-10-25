@@ -23,10 +23,10 @@
 package journald
 
 import (
+	"context"
 	"sync"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalctl"
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
 )
 
 // Ensure, that journalReaderMock does implement journalReader.
@@ -56,7 +56,7 @@ type journalReaderMock struct {
 	CloseFunc func() error
 
 	// NextFunc mocks the Next method.
-	NextFunc func(cancel input.Canceler) (journalctl.JournalEntry, error)
+	NextFunc func(cancel context.Context) (journalctl.JournalEntry, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -66,7 +66,7 @@ type journalReaderMock struct {
 		// Next holds details about calls to the Next method.
 		Next []struct {
 			// Cancel is the cancel argument value.
-			Cancel input.Canceler
+			Cancel context.Context
 		}
 	}
 	lockClose sync.RWMutex
@@ -101,12 +101,12 @@ func (mock *journalReaderMock) CloseCalls() []struct {
 }
 
 // Next calls NextFunc.
-func (mock *journalReaderMock) Next(cancel input.Canceler) (journalctl.JournalEntry, error) {
+func (mock *journalReaderMock) Next(cancel context.Context) (journalctl.JournalEntry, error) {
 	if mock.NextFunc == nil {
 		panic("journalReaderMock.NextFunc: method is nil but journalReader.Next was just called")
 	}
 	callInfo := struct {
-		Cancel input.Canceler
+		Cancel context.Context
 	}{
 		Cancel: cancel,
 	}
@@ -121,10 +121,10 @@ func (mock *journalReaderMock) Next(cancel input.Canceler) (journalctl.JournalEn
 //
 //	len(mockedjournalReader.NextCalls())
 func (mock *journalReaderMock) NextCalls() []struct {
-	Cancel input.Canceler
+	Cancel context.Context
 } {
 	var calls []struct {
-		Cancel input.Canceler
+		Cancel context.Context
 	}
 	mock.lockNext.RLock()
 	calls = mock.calls.Next

@@ -36,7 +36,6 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/go-concert/ctxtool"
 )
 
 // factory implements the cfgfile.RunnerFactory interface and wraps the
@@ -59,7 +58,8 @@ type runner struct {
 	log                *logp.Logger
 	agent              *beat.Info
 	wg                 sync.WaitGroup
-	sig                ctxtool.CancelContext
+	ctx                context.Context
+	cancel             context.CancelFunc
 	input              v2.Input
 	connector          beat.PipelineConnector
 	statusReporter     status.StatusReporter
@@ -113,11 +113,14 @@ func (f *factory) Create(
 		return nil, err
 	}
 
+	ctx, cancel := context.WithCancel(context.Background())
+
 	return &runner{
 		id:                 id,
 		log:                f.log.Named(input.Name()).With("id", id),
 		agent:              &f.info,
-		sig:                ctxtool.WithCancelContext(context.Background()),
+		ctx:                ctx,
+		cancel:             cancel,
 		input:              input,
 		connector:          p,
 		rootInputsRegistry: f.rootInputsRegistry,
@@ -152,7 +155,7 @@ func (r *runner) Start() {
 			IDWithoutName:   r.id,
 			Name:            r.input.Name(),
 			Agent:           *r.agent,
-			Cancelation:     r.sig,
+			Cancelation:     r.ctx,
 			MetricsRegistry: reg,
 			Logger:          log,
 		}
@@ -171,7 +174,7 @@ func (r *runner) Start() {
 }
 
 func (r *runner) Stop() {
-	r.sig.Cancel()
+	r.cancel()
 	r.wg.Wait()
 	r.log.Infof("Input '%s' stopped (runner)", r.input.Name())
 	r.statusReporter = nil
