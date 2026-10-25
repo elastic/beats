@@ -108,7 +108,7 @@ func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Clien
 	}
 	p.auth.SetLogger(p.logger)
 
-	p.fetcher, err = graph.New(p.ctx.Cancelation, p.ctx.ID, p.cfg, p.Manager.Logger, p.auth, p.ctx.Agent.Paths)
+	p.fetcher, err = graph.New(p.ctx.Cancelation, p.ctx.ID, p.cfg, p.Logger, p.auth, p.ctx.Agent.Paths)
 	if err != nil {
 		return fmt.Errorf("unable to create fetcher: %w", err)
 	}
