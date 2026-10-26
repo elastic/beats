@@ -57,6 +57,11 @@ func TestReceiverOutputOutage(t *testing.T) {
 			restore := func() { restoreOnce.Do(func() { close(restored) }) }
 			var pidMu sync.Mutex
 			var lastPID string
+			const liveActionID = "outage-live"
+			// liveTimeoutErr is the text of beater.errLivePublishTimeout.
+			const liveTimeoutErr = "timed out publishing live query results"
+			var responseMu sync.Mutex
+			var liveResponse map[string]any
 			logConsumer, err := consumer.NewLogs(func(ctx context.Context, logs plog.Logs) error {
 				if unavailable.Load() {
 					blockedOnce.Do(func() { close(blocked) })
@@ -70,6 +75,11 @@ func TestReceiverOutputOutage(t *testing.T) {
 					for _, scope := range resource.ScopeLogs().All() {
 						for _, record := range scope.LogRecords().All() {
 							fields := record.Body().Map().AsRaw()
+							if fields["action_id"] == liveActionID && fields["completed_at"] != nil {
+								responseMu.Lock()
+								liveResponse = fields
+								responseMu.Unlock()
+							}
 							if profile, ok := fields["osquery_profile"].(map[string]any); ok {
 								if executions, ok := profile["executions"].(int64); ok && executions > 0 && profile["source"] == "scheduled" && profile["query_name"] == "outage" {
 									profiles.Add(1)
@@ -119,12 +129,15 @@ func TestReceiverOutputOutage(t *testing.T) {
 							"options": map[string]any{"thrift_timeout": 30, "schedule_splay_percent": 0},
 							// A 60 s outage queues about 4000 rows; room for all of them
 							// makes any loss a failure rather than an expected overflow.
+							// The live timeout ends well inside the outage, so the live
+							// query always times out.
 							"elastic_options": map[string]any{"publishing": map[string]any{
 								"scheduled": map[string]any{"max_events": 100000},
+								"live":      map[string]any{"timeout": "10s"},
 							}},
-							// Each run selects its own osquery_schedule execution count,
-							// read before osqueryd increments it, so every run carries a
-							// unique consecutive number and a lost run leaves a gap.
+							// Each run selects its own osquery_schedule execution count, so
+							// every run carries a unique, consecutive number and a lost run
+							// leaves a gap.
 							"schedule": map[string]any{"outage": map[string]any{
 								"query": fmt.Sprintf("SELECT i.pid, s.executions AS execution, a.value * 8 + b.value AS value "+
 									"FROM osquery_info i CROSS JOIN osquery_schedule s CROSS JOIN %s a CROSS JOIN %s b "+
@@ -206,7 +219,7 @@ func TestReceiverOutputOutage(t *testing.T) {
 				go func() {
 					defer close(liveDone)
 					liveRes, liveErr = execute(t.Context(), map[string]any{
-						"id":   "outage-live",
+						"id":   liveActionID,
 						"data": map[string]any{"query": "SELECT value FROM " + values},
 					})
 				}()
@@ -228,6 +241,18 @@ func TestReceiverOutputOutage(t *testing.T) {
 			require.Contains(t, dropped, "overflow", "the scheduled queue must report overflow drops")
 			assert.Zero(t, dropped["overflow"], "the outage backlog must fit in max_events without overflow drops")
 			if restoreOutput {
+				select {
+				case <-liveDone:
+				case <-time.After(30 * time.Second):
+					t.Fatal("live query action did not return while the output was unavailable")
+				}
+				require.NoError(t, liveErr, "live query action reports failures in its result")
+				assert.Equal(t, liveTimeoutErr, liveRes["error"],
+					"a live query that outlasts live.timeout must report the publish timeout")
+				count, ok := liveRes["count"].(int)
+				require.True(t, ok, "a timed-out live query must report its published row count, got %v", liveRes)
+				assert.Less(t, count, liveRows, "a timed-out live query must report only the rows it published")
+
 				recoveredAt := time.Now().Unix()
 				restore()
 				require.Eventually(t, func() bool { return lastResultTime.Load() > recoveredAt }, 20*time.Second, 100*time.Millisecond,
@@ -244,22 +269,13 @@ func TestReceiverOutputOutage(t *testing.T) {
 				pidMu.Lock()
 				assert.Equal(t, initialPID, lastPID, "osqueryd must remain alive through the outage")
 				pidMu.Unlock()
-
-				select {
-				case <-liveDone:
-				case <-time.After(90 * time.Second):
-					t.Fatal("live query action did not return")
-				}
-				require.NoError(t, liveErr, "live query action reports failures in its result")
-				count, ok := liveRes["count"].(int)
-				require.True(t, ok, "live query action must report its published row count, got %v", liveRes)
-				if msg, failed := liveRes["error"]; failed {
-					assert.Equal(t, "timed out publishing live query results", msg,
-						"a live query that outlasts the output must report the publish timeout")
-					assert.Less(t, count, liveRows, "a timed-out live query must report the rows it published")
-				} else {
-					assert.Equal(t, liveRows, count, "a live query published in time must report all rows")
-				}
+				require.EventuallyWithT(t, func(c *assert.CollectT) {
+					responseMu.Lock()
+					defer responseMu.Unlock()
+					require.NotNil(c, liveResponse, "no action response for %s yet", liveActionID)
+					assert.Equal(c, liveTimeoutErr, liveResponse["error"], "the action response must carry the publish timeout")
+				}, 20*time.Second, 100*time.Millisecond,
+					"the timed-out live query's action response must be published after recovery")
 			}
 			shutdown()
 			select {
