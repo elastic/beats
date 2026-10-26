@@ -13,12 +13,30 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Keep native scheduled osquery logging responsive during output outages.
+summary: Keep osquery scheduled and live query publishing responsive during output back-pressure.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-# description:
+description: >-
+  Osquerybeat now publishes scheduled and live query results from two internal
+  queues with their own workers and clients, so osqueryd's logger callback
+  never waits for the output and osqueryd no longer exits with code 78 when the
+  output is slow. The workers block for output queue space instead of dropping
+  events. The scheduled queue holds up to
+  osquery.elastic_options.publishing.scheduled.max_events rows (default 3200);
+  when full it drops the oldest items, scheduled profiles first, and an item
+  larger than the limit is still accepted whole. publishing.scheduled.max_age
+  drops items that waited too long (disabled by default). A live query waits up
+  to publishing.live.timeout (default 60s) for its rows to be handed to the
+  output, then reports the rows handed over so far with an error; its response
+  is still published. Drops are counted under osquerybeat.publishing.scheduled
+  and osquerybeat.publishing.live (dropped.<reason> in items, dropped_rows.<reason>
+  in rows, queue.items and queue.events gauges) and logged at most once a
+  minute per queue. osquerybeat.scheduled_query_profiles.dropped.output_full now
+  counts profiles dropped for space in the scheduled queue. Any invalid osquery
+  input configuration now marks the osquery unit as failed instead of being
+  ignored.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:
