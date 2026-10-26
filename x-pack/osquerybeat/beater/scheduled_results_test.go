@@ -404,7 +404,7 @@ func TestScheduledResultsRetiredLeaseCountsCutRows(t *testing.T) {
 	_, err := plugin.GenerateConfig(t.Context())
 	require.NoError(t, err, "apply the native policy")
 	require.NoError(t, d.configure(inputs, outageLimits), "configure the first scheduled clients")
-	t.Cleanup(func() { d.stop() })
+	stopOnCleanup(t, d)
 
 	rows := []map[string]string{{"value": "a"}, {"value": "b"}, {"value": "c"}}
 	d.enqueue(t.Context(), outageQueryClient{}, plugin, QueryResult{Name: "scheduled", Action: "snapshot", Hits: rows}, nil)
