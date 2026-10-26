@@ -28,16 +28,12 @@ import (
 )
 
 func init() {
-	// quark's eBPF backend loads programs and reads perf ring buffers, which
-	// the default seccomp policy does not allow. This package is linked into
-	// both the OSS and x-pack auditbeat binaries, so the x-pack quark
-	// consumers rely on this policy extension as well.
+	// quark's eBPF backend goes through libbpf, which needs the following
 	if runtime.GOARCH == "amd64" {
 		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall,
-			"bpf",
-			"eventfd2",        // needed by ring buffers
-			"memfd_create",    // needed when quark loads its embedded BTF
-			"perf_event_open", // needed by tracepoints and kprobes
+			"bpf",             // program and map loading
+			"memfd_create",    // libbpf placeholder fds while opening the object
+			"perf_event_open", // libbpf attaches kprobes and tracepoints through perf events
 		); err != nil {
 			panic(err)
 		}
