@@ -172,11 +172,13 @@ type scheduledResultDispatcher struct {
 	profileMetrics  *scheduledProfileMetrics
 	newPublisher    func(allowed func() bool, dropped func(), cut func(rows int)) osquerybeatPublisher
 	profile         func(*scheduledQueryProfiler, string, QueryInfo, QueryResult, string)
-	handle          func(context.Context, scheduledQueryClient, scheduledQueryPublisher, string, QueryInfo, QueryResult, string)
+	// handle resolves and publishes a native result and returns the rows it
+	// could not publish because their types could not be resolved.
+	handle func(context.Context, scheduledQueryClient, scheduledQueryPublisher, string, QueryInfo, QueryResult, string) int
 }
 
 func newScheduledResultDispatcher(reg *monitoring.Registry, log *logp.Logger, maxEvents int, factory func(allowed func() bool, dropped func(), cut func(rows int)) osquerybeatPublisher,
-	handle func(context.Context, scheduledQueryClient, scheduledQueryPublisher, string, QueryInfo, QueryResult, string)) *scheduledResultDispatcher {
+	handle func(context.Context, scheduledQueryClient, scheduledQueryPublisher, string, QueryInfo, QueryResult, string) int) *scheduledResultDispatcher {
 	if reg == nil {
 		reg = monitoring.NewRegistry()
 	}
@@ -344,22 +346,24 @@ func (d *scheduledResultDispatcher) publish(lease *scheduledResultLease, item sc
 		d.dropStale(item)
 		return
 	}
+	unresolved := 0
 	switch item := item.(type) {
 	case scheduledResult:
-		d.handle(ctx, item.client, lease.publisher, item.namespace, item.query, item.result, item.responseID)
+		unresolved = d.handle(ctx, item.client, lease.publisher, item.namespace, item.query, item.result, item.responseID)
 	case resolvedScheduledResult:
 		publishResolvedResult(lease.publisher, item)
 	case scheduledProfileItem:
 		lease.publisher.PublishScheduledProfile(config.QueryProfileDatastream(item.namespace), item.name, item.scheduleID, item.responseID, item.spaceID, item.executionCount, item.profile)
 	}
-	if lease.cut > 0 {
-		d.dropCut(item, lease.cut)
-		lease.cut = 0
+	if rows := lease.cut + unresolved; rows > 0 {
+		d.dropCut(item, rows)
 	}
+	lease.cut = 0
 }
 
-// dropCut counts the rows of item that the publisher skipped because its
-// lease was retired, or its run cancelled, while the item was in flight.
+// dropCut counts the rows of item that were not published because its lease
+// was retired, its run cancelled, or its rows could not be resolved while the
+// item was in flight.
 func (d *scheduledResultDispatcher) dropCut(item scheduledItem, rows int) {
 	if d.ctx.Err() != nil {
 		d.metrics.drop(dropShutdown, rows)

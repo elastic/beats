@@ -6,6 +6,7 @@ package beater
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -162,6 +163,8 @@ func TestScheduledResultsBoundLoggerAdmissionAndShutdown(t *testing.T) {
 	assert.Equal(t, uint64(1), d.metrics.droppedRows[dropOverflow].Get(), "count the dropped result's rows")
 	assert.Equal(t, uint64(outageMaxEvents), d.metrics.dropped[dropShutdown].Get(), "shutdown should discard all pending results")
 	assert.Equal(t, uint64(outageMaxEvents), d.metrics.droppedRows[dropShutdown].Get(), "count the rows of the discarded results")
+	assert.Zero(t, d.metrics.items.Get(), "the queue.items gauge must be zero after stop discards the backlog")
+	assert.Zero(t, d.metrics.events.Get(), "the queue.events gauge must be zero after stop discards the backlog")
 	assert.Zero(t, publisher.closed.Load(), "the active worker owns deferred client cleanup")
 	release()
 	select {
@@ -353,6 +356,62 @@ func TestScheduledPublishDroppedOnCloseCountsRows(t *testing.T) {
 	dropped()
 	assert.Zero(t, d.metrics.dropped[dropShutdown].Get(), "a dropped event is not a dropped queue item")
 	assert.Equal(t, uint64(1), d.metrics.droppedRows[dropShutdown].Get(), "count the dropped event as a shutdown row")
+}
+
+// unresolvedQueryClient fails ResolveResult from its failFrom-th call on,
+// counting from 0.
+type unresolvedQueryClient struct {
+	failFrom int
+	calls    *int // only the worker calls it
+}
+
+func (c unresolvedQueryClient) ResolveResult(_ context.Context, _ string, rows []map[string]string) ([]map[string]any, error) {
+	call := *c.calls
+	*c.calls++
+	if call >= c.failFrom {
+		return nil, errors.New("resolve failed")
+	}
+	return make([]map[string]any, len(rows)), nil
+}
+
+func TestScheduledResultsUnresolvedRowsCountStale(t *testing.T) {
+	rows := func(n int) []map[string]string { return make([]map[string]string, n) }
+	diff := QueryResult{Name: "scheduled", Action: "diff"}
+	diff.DiffResults.Added, diff.DiffResults.Removed = rows(2), rows(3)
+	tests := []struct {
+		name     string
+		result   QueryResult
+		failFrom int
+		want     uint64 // stale rows
+	}{
+		{name: "snapshot", result: QueryResult{Name: "scheduled", Action: "snapshot", Hits: rows(2)}, failFrom: 0, want: 2 + 1},
+		{
+			name:     "diff removed",
+			result:   diff,
+			failFrom: 1,
+			want:     3 + 1,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			log := logptest.NewTestingLogger(t, "unresolved")
+			d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents,
+				func(func() bool, func(), func(int)) osquerybeatPublisher { return &mockBeatPublisher{} }, (&osquerybeat{log: log}).handleScheduledQueryResult)
+			inputs := outageInputs("old")
+			plugin := NewConfigPlugin(log)
+			require.NoError(t, plugin.Set(inputs), "validate the policy")
+			_, err := plugin.GenerateConfig(t.Context())
+			require.NoError(t, err, "apply the native policy")
+			require.NoError(t, d.configure(inputs, outageLimits), "configure the scheduled clients")
+			stopOnCleanup(t, d)
+
+			d.enqueue(t.Context(), unresolvedQueryClient{failFrom: test.failFrom, calls: new(int)}, plugin, test.result, nil)
+
+			assert.Eventually(t, func() bool { return d.metrics.dropped[dropStale].Get() == 1 }, time.Second, time.Millisecond,
+				"a result whose rows could not be resolved must count as one stale item")
+			assert.Equal(t, test.want, d.metrics.droppedRows[dropStale].Get(), "count the unresolved rows and the unpublished response")
+		})
+	}
 }
 
 // cuttingResultPublisher stops publishing rows once its lease is retired and
@@ -566,9 +625,9 @@ type handledResult struct {
 func recordHandledResults(d *scheduledResultDispatcher) <-chan handledResult {
 	calls := make(chan handledResult, 8)
 	handle := d.handle
-	d.handle = func(ctx context.Context, cli scheduledQueryClient, publisher scheduledQueryPublisher, ns string, qi QueryInfo, res QueryResult, responseID string) {
+	d.handle = func(ctx context.Context, cli scheduledQueryClient, publisher scheduledQueryPublisher, ns string, qi QueryInfo, res QueryResult, responseID string) int {
 		calls <- handledResult{publisher: publisher, query: qi}
-		handle(ctx, cli, publisher, ns, qi, res, responseID)
+		return handle(ctx, cli, publisher, ns, qi, res, responseID)
 	}
 	return calls
 }

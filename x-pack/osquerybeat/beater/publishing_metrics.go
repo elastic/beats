@@ -61,25 +61,28 @@ func newPublishingMetrics(reg *monitoring.Registry, queue string, log *logp.Logg
 func (m *publishingMetrics) drop(reason string, rows int) {
 	m.droppedRows[reason].Add(uint64(rows))
 	m.dropped[reason].Inc()
-	m.warn(reason)
+	m.warn("dropped." + reason)
 }
 
 // dropRows counts rows dropped without dropping an item, such as an event
 // the pipeline discards while closing.
 func (m *publishingMetrics) dropRows(reason string, rows int) {
 	m.droppedRows[reason].Add(uint64(rows))
-	m.warn(reason)
+	m.warn("dropped_rows." + reason)
 }
 
-// warn logs at most one warning per minute, naming the counter that moved.
-func (m *publishingMetrics) warn(reason string) {
+// warn logs at most one warning per minute, naming counter, the counter
+// that moved.
+func (m *publishingMetrics) warn(counter string) {
 	now := time.Now().UnixNano()
 	last := m.lastWarning.Load()
 	if now-last >= int64(time.Minute) && m.lastWarning.CompareAndSwap(last, now) {
-		m.log.Warnf("Dropped osquery %s results; see the osquerybeat.publishing.%s.dropped.%s monitoring counter", m.queue, m.queue, reason)
+		m.log.Warnf("Dropped osquery %s results; see the osquerybeat.publishing.%s.%s monitoring counter", m.queue, m.queue, counter)
 	}
 }
 
+// setQueue sets the queue.items and queue.events gauges to the items waiting
+// in the queue and their rows.
 func (m *publishingMetrics) setQueue(items, events int) {
 	m.items.Set(int64(items))
 	m.events.Set(int64(events))

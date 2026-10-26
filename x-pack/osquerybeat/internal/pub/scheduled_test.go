@@ -7,6 +7,7 @@ package pub
 import (
 	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -78,4 +79,21 @@ func TestScheduledProfilePreservesSchema(t *testing.T) {
 	}
 	assert.Equal(t, want, published[0].Fields, "scheduled profiles must preserve the existing event schema and correlation fields")
 	assert.Equal(t, config.QueryProfileDatastream("results"), published[0].Meta[events.FieldMetaRawIndex], "the explicit profile index must preserve the result namespace")
+}
+
+func TestScheduledPublisherReportsCutResponse(t *testing.T) {
+	recorder := &connectRecorder{}
+	var cut atomic.Int32
+	p := NewScheduled(&beat.Beat{Publisher: recorder}, logptest.NewTestingLogger(t, "scheduled_response"),
+		func() bool { return false }, func() {}, func(rows int) { cut.Add(int32(rows)) })
+	t.Cleanup(p.Close)
+	require.NoError(t, p.Configure([]config.InputConfig{
+		inputWithNamespace(config.DefaultActionResponsesDataset, "default"),
+	}), "configure the scheduled response client")
+
+	p.PublishScheduledResponse("schedule", "", "", "query", "", "response", time.Now(), time.Now(), time.Now(), 0, 1)
+
+	require.NotNil(t, p.actionResponsesClient, "connect the response client")
+	assert.Empty(t, p.actionResponsesClient.(*recordingClient).snapshot(), "a retired publisher must not publish the response")
+	assert.Equal(t, int32(1), cut.Load(), "report the skipped response as one cut row")
 }

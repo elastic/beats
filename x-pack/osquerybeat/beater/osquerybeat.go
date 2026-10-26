@@ -887,7 +887,9 @@ func (bt *osquerybeat) enqueueScheduledProfile(profiler *scheduledQueryProfiler,
 	})
 }
 
-func (bt *osquerybeat) handleScheduledQueryResult(ctx context.Context, cli scheduledQueryClient, publisher scheduledQueryPublisher, ns string, qi QueryInfo, res QueryResult, responseID string) {
+// handleScheduledQueryResult resolves and publishes res. It returns the rows,
+// including the response, it did not publish because ResolveResult failed.
+func (bt *osquerybeat) handleScheduledQueryResult(ctx context.Context, cli scheduledQueryClient, publisher scheduledQueryPublisher, ns string, qi QueryInfo, res QueryResult, responseID string) int {
 	// Use policy schedule_id when set, otherwise query name.
 	scheduleID := qi.ScheduleID
 	if scheduleID == "" {
@@ -915,7 +917,7 @@ func (bt *osquerybeat) handleScheduledQueryResult(ctx context.Context, cli sched
 		snapshot, err := cli.ResolveResult(ctx, qi.Query, res.Hits)
 		if err != nil {
 			bt.log.Errorf("failed to resolve snapshot query result types: %s", res.Name)
-			return
+			return len(res.Hits) + 1
 		}
 		publishResolved("snapshot", "", snapshot)
 	} else {
@@ -923,7 +925,7 @@ func (bt *osquerybeat) handleScheduledQueryResult(ctx context.Context, cli sched
 			added, err := cli.ResolveResult(ctx, qi.Query, res.DiffResults.Added)
 			if err != nil {
 				bt.log.Errorf(`failed to resolve diff query "added" result types: %s`, res.Name)
-				return
+				return len(res.DiffResults.Added) + len(res.DiffResults.Removed) + 1
 			}
 			publishResolved("diff", "added", added)
 		}
@@ -931,13 +933,14 @@ func (bt *osquerybeat) handleScheduledQueryResult(ctx context.Context, cli sched
 			removed, err := cli.ResolveResult(ctx, qi.Query, res.DiffResults.Removed)
 			if err != nil {
 				bt.log.Errorf(`failed to resolve diff query "removed" result types: %s`, res.Name)
-				return
+				return len(res.DiffResults.Removed) + 1
 			}
 			publishResolved("diff", "removed", removed)
 		}
 	}
 
 	publisher.PublishScheduledResponse(scheduleID, qi.PackID, qi.PackName, qi.QueryName, qi.SpaceID, responseID, runTime, runTime, plannedScheduleTime, totalHits, scheduleExecutionCount)
+	return 0
 }
 
 func queryResultMeta(typ, action string, res QueryResult, scheduleExecutionCount int64, plannedScheduleTime time.Time) map[string]any {

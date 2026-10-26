@@ -83,5 +83,11 @@ func TestPublishingMetricsWarnsOncePerMinute(t *testing.T) {
 		m.drop(dropStale, 1)
 		assert.Equal(t, 1, logs.FilterMessageSnippet("osquerybeat.publishing.scheduled.dropped.stale").Len(),
 			"a drop a minute later must warn again, naming the counter that moved")
+
+		time.Sleep(time.Minute)
+		m.dropRows(dropShutdown, 1)
+		assert.Equal(t, 1, logs.FilterMessageSnippet("osquerybeat.publishing.scheduled.dropped_rows.shutdown").Len(),
+			"rows dropped without an item must name the rows counter")
+		assert.Zero(t, logs.FilterMessageSnippet("dropped.shutdown").Len(), "the items counter did not move")
 	})
 }

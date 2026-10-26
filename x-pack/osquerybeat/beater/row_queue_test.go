@@ -215,3 +215,24 @@ func TestResolvedScheduledResultRowsCountsProfile(t *testing.T) {
 	r.profile = map[string]any{}
 	assert.Equal(t, 7, r.rows(), "a profile document counts as one more row")
 }
+
+func TestRowQueueObservesEveryChange(t *testing.T) {
+	q, _ := newTestRowQueue(10)
+	var got [2]int
+	q.observe = func(items, events int) { got = [2]int{items, events} }
+
+	q.push(testQueueItem{name: "a", n: 4})
+	q.push(testQueueItem{name: "b", n: 4})
+	assert.Equal(t, [2]int{2, 8}, got, "observe the queue after a push")
+
+	q.setLimit(5)
+	assert.Equal(t, [2]int{1, 4}, got, "observe the queue after a shrinking limit evicts")
+
+	_, ok := q.pop(t.Context())
+	require.True(t, ok, "pop the queued item")
+	assert.Equal(t, [2]int{0, 0}, got, "observe the queue after a pop")
+
+	q.push(testQueueItem{name: "c", n: 2})
+	q.drain()
+	assert.Equal(t, [2]int{0, 0}, got, "observe the queue after a drain")
+}

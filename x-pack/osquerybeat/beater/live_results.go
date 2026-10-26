@@ -47,6 +47,7 @@ type liveItem struct {
 	job       liveJob
 	pub       actionQueryPublisher
 	handed    atomic.Int64  // rows of job handed to Publish so far
+	profiled  atomic.Bool   // set once job's profile is handed to Publish
 	cancelled atomic.Bool   // set when the waiting action gives up
 	done      chan struct{} // closed when the worker is finished with job
 
@@ -121,7 +122,11 @@ func (d *liveResultDispatcher) publishResults(ctx context.Context, pub actionQue
 	d.abandon(it)
 
 	n := int(it.handed.Load())
-	if n == len(job.hits) {
+	lost := job.rows() - n
+	if it.profiled.Load() {
+		lost--
+	}
+	if lost == 0 {
 		return n, nil
 	}
 	if reason == "" {
@@ -131,7 +136,12 @@ func (d *liveResultDispatcher) publishResults(ctx context.Context, pub actionQue
 			reason = dropShutdown
 		}
 	}
-	d.metrics.drop(reason, len(job.hits)-n)
+	d.metrics.drop(reason, lost)
+	if n == len(job.hits) {
+		// Only the profile was lost. The action reports its query's outcome,
+		// not the profile's.
+		return n, nil
+	}
 	return n, liveDropErrors[reason]
 }
 
@@ -215,6 +225,7 @@ func (d *liveResultDispatcher) publish(it *liveItem) {
 	j := it.job
 	if j.profile != nil && !d.abandoned(it) {
 		it.pub.PublishQueryProfile(j.profileIndex, "", j.actionID, j.responseID, j.spaceID, j.profile, j.reqData)
+		it.profiled.Store(true)
 	}
 	// stop runs before each hit, so its call count is the number of hits
 	// already handed to Publish; the waiting action reads it on timeout.

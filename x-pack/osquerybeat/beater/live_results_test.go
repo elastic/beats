@@ -25,10 +25,11 @@ import (
 // gatedLivePublisher records live documents in publication order. Rows from
 // index blockFrom on wait until release is closed, like a full output.
 type gatedLivePublisher struct {
-	blockFrom int
-	release   chan struct{}
-	blocked   chan struct{} // receives when a row starts waiting for release
-	closed    atomic.Bool
+	blockFrom    int
+	blockProfile bool // the profile waits for release too
+	release      chan struct{}
+	blocked      chan struct{} // receives when a row starts waiting for release
+	closed       atomic.Bool
 
 	mu   sync.Mutex
 	docs []string
@@ -58,6 +59,9 @@ func (p *gatedLivePublisher) PublishEach(_, idValue, _, _, _, _, _, _ string, _ 
 }
 
 func (p *gatedLivePublisher) PublishQueryProfile(_, _, actionID, _, _ string, _ map[string]any, _ any) {
+	if p.blockProfile {
+		<-p.release
+	}
 	p.record(actionID + " profile")
 }
 
@@ -232,6 +236,49 @@ func TestLiveResponseAfterStopIsDropped(t *testing.T) {
 
 	assert.Equal(t, uint64(1), d.metrics.dropped[dropShutdown].Get(), "count a response admitted after stop as a shutdown drop")
 	assert.Empty(t, pub.snapshot(), "publish nothing after stop")
+}
+
+func TestLiveTimeoutCountsProfile(t *testing.T) {
+	tests := []struct {
+		name         string
+		hits         int
+		blockFrom    int
+		blockProfile bool
+		wantCount    int
+		wantErr      error
+		wantRows     uint64 // dropped_rows.timeout
+	}{
+		// The profile is handed over before the rows, so only rows are lost.
+		{name: "rows", hits: 5, blockFrom: 2, wantCount: 2, wantErr: errLivePublishTimeout, wantRows: 3},
+		// A failed query publishes only its profile; the action reports the
+		// query error, not the profile's.
+		{name: "profile only", blockFrom: 1 << 30, blockProfile: true, wantRows: 1},
+		{name: "profile and rows", hits: 5, blockFrom: 1 << 30, blockProfile: true, wantErr: errLivePublishTimeout, wantRows: 6},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			synctest.Test(t, func(t *testing.T) {
+				pub := newGatedLivePublisher(test.blockFrom)
+				pub.blockProfile = test.blockProfile
+				d := newLiveResultDispatcher(monitoring.NewRegistry(), logptest.NewTestingLogger(t, ""), 100*time.Millisecond)
+				job := liveJob{actionID: "a1", hits: make([]map[string]any, test.hits), profile: map[string]any{}}
+
+				n, err := d.publishResults(t.Context(), pub, job)
+
+				assert.Equal(t, test.wantCount, n, "report the rows handed to the output")
+				if test.wantErr == nil {
+					assert.NoError(t, err, "a lost profile alone is not an action error")
+				} else {
+					assert.ErrorIs(t, err, test.wantErr, "report the timeout when rows were lost")
+				}
+				assert.Equal(t, uint64(1), d.metrics.dropped[dropTimeout].Get(), "count the timed-out action")
+				assert.Equal(t, test.wantRows, d.metrics.droppedRows[dropTimeout].Get(), "count every row and profile not handed to the output")
+
+				close(pub.release)
+				d.stop()
+			})
+		})
+	}
 }
 
 func TestExecuteWithoutClientsReportsNotConfigured(t *testing.T) {
