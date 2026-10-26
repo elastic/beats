@@ -51,7 +51,8 @@ with the same namespace and SQL, and drops it otherwise. A policy change retires
 the previous clients; rows of an item in flight that were not yet handed to the
 output when this happens are dropped. One `Publish` call can still be blocked
 on the retired clients until the output recovers or the pipeline closes.
-Results of an osqueryd run that has ended are dropped too.
+Results of an osqueryd run that has ended are dropped too, as are the rows and
+response of a native result whose column types osqueryd could not resolve.
 
 Shutdown drops the queued items and does not wait for a blocked `Publish`.
 
@@ -94,15 +95,16 @@ Reasons:
 |---|---|---|
 | `overflow` | scheduled | Dropped for space, oldest first and profiles first |
 | `expired` | scheduled | Older than `max_age` when the worker reached it |
-| `stale` | both | No current policy publishes it: the query was removed, moved to another namespace or changed SQL, the policy was replaced while it was in flight, its osqueryd run ended, or no results stream is configured |
+| `stale` | both | No current policy publishes it: the query was removed, moved to another namespace or changed SQL, the policy was replaced while it was in flight, its osqueryd run ended, osqueryd could not resolve its column types, or no results stream is configured |
 | `shutdown` | both | Osquerybeat was stopping |
 | `timeout` | live | The action stopped waiting after `live.timeout` |
 
-For a live action, an item is the action's results, and its rows are the rows
-not handed to the output; the live queue gauges show the waiting action. An
-event the pipeline discards while closing counts in `dropped_rows.shutdown`
-only. Each queue logs at most one warning per minute about drops, naming the
-counter that moved.
+For a live action, an item is the action's results and profile, and its rows
+are the rows and profile not handed to the output; the live queue gauges show
+the waiting action. A live action response dropped because osquerybeat is
+stopping counts as its own item of one row. An event the pipeline discards
+while closing counts in `dropped_rows.shutdown` only. Each queue logs at most
+one warning per minute about drops, naming the counter that moved.
 
 Scheduled profile drops are also counted under the earlier
 `osquerybeat.scheduled_query_profiles.dropped` counters, which existing
@@ -118,6 +120,3 @@ counts profiles the collection worker had no room for.
   configuration was ignored and the unit stayed healthy.
 - Live query actions that fail now report their real `started_at` and
   `completed_at`.
-- The 128-document and 8 MiB bounds on scheduled results are gone; the queue is
-  bounded by `max_events` rows only. Memory per row is the same as with the
-  memory queue's `queue.mem.events`.
