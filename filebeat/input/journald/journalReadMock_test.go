@@ -42,7 +42,7 @@ var _ journalReader = &journalReaderMock{}
 //			CloseFunc: func() error {
 //				panic("mock out the Close method")
 //			},
-//			NextFunc: func(cancel input.Canceler) (journalctl.JournalEntry, error) {
+//			NextFunc: func(cancel context.Context) (journalctl.JournalEntry, error) {
 //				panic("mock out the Next method")
 //			},
 //		}
