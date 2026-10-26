@@ -3,8 +3,8 @@ module github.com/elastic/beats/v7
 go 1.26.10
 
 require (
-	cloud.google.com/go/bigquery v1.85.0
-	cloud.google.com/go/monitoring v1.31.0
+	cloud.google.com/go/bigquery v1.86.0
+	cloud.google.com/go/monitoring v1.32.0
 	cloud.google.com/go/pubsub v1.51.1
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
 	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
@@ -128,9 +128,9 @@ require (
 	golang.org/x/sync v0.24.0
 	golang.org/x/sys v0.49.0
 	golang.org/x/text v0.43.0
-	golang.org/x/time v0.15.0
+	golang.org/x/time v0.16.0
 	golang.org/x/tools v0.51.0
-	google.golang.org/api v0.288.0
+	google.golang.org/api v0.307.0
 	google.golang.org/genproto v0.0.0-20260715232425-e75dac1f907d // indirect
 	google.golang.org/grpc v1.84.0
 	google.golang.org/protobuf v1.36.12
@@ -146,8 +146,8 @@ require (
 
 require (
 	cloud.google.com/go v0.123.0
-	cloud.google.com/go/compute v1.72.0
-	cloud.google.com/go/redis v1.26.0
+	cloud.google.com/go/compute v1.74.0
+	cloud.google.com/go/redis v1.28.0
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.23.3
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.14.1
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/v2 v2.0.2
@@ -301,9 +301,9 @@ require (
 	cloud.google.com/go/auth v0.24.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.3.0 // indirect
 	cloud.google.com/go/compute/metadata v0.10.0 // indirect
-	cloud.google.com/go/iam v1.14.0 // indirect
-	cloud.google.com/go/longrunning v1.3.0 // indirect
-	cloud.google.com/go/pubsub/v2 v2.7.0 // indirect
+	cloud.google.com/go/iam v1.15.0 // indirect
+	cloud.google.com/go/longrunning v1.4.0 // indirect
+	cloud.google.com/go/pubsub/v2 v2.8.0 // indirect
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f // indirect
 	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/Azure/azure-amqp-common-go/v4 v4.2.0 // indirect
@@ -400,9 +400,9 @@ require (
 	github.com/google/go-querystring v1.2.0 // indirect
 	github.com/google/go-tpm v0.9.8 // indirect
 	github.com/google/licenseclassifier v0.0.0-20260218193730-3cfbab2d0e0d // indirect
-	github.com/google/s2a-go v0.1.9 // indirect
+	github.com/google/s2a-go v0.1.11 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
-	github.com/googleapis/enterprise-certificate-proxy v0.3.17 // indirect
+	github.com/googleapis/enterprise-certificate-proxy v0.3.23 // indirect
 	github.com/grafana/regexp v0.0.0-20250905093917-f7b3be9d1853 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0 // indirect
 	github.com/hashicorp/cronexpr v1.1.3 // indirect
@@ -541,7 +541,7 @@ require (
 	golang.org/x/telemetry v0.0.0-20260924152758-ed294f943157 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	gonum.org/v1/gonum v0.17.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260803160001-6ac0973c030d // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20261019180522-ce908d29299b // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	k8s.io/klog/v2 v2.140.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20260721132016-d427ff9ee9ad // indirect
@@ -555,7 +555,7 @@ require (
 )
 
 require (
-	cloud.google.com/go/storage v1.69.0
+	cloud.google.com/go/storage v1.70.0
 	github.com/PaloAltoNetworks/pango v0.10.2
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/yuin/gopher-lua v1.1.1 // indirect
