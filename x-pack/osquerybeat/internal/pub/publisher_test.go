@@ -595,3 +595,22 @@ func toMap(t *testing.T, s string) map[string]any {
 	}
 	return m
 }
+
+func TestPublishEachStops(t *testing.T) {
+	client := &recordingClient{}
+	p := &Publisher{b: &beat.Beat{}, log: logptest.NewTestingLogger(t, "publish_each"), client: client}
+	hits := []map[string]any{{"n": 1}, {"n": 2}, {"n": 3}}
+
+	calls := 0
+	n := p.PublishEach("index", "action", "action_id", "", "", "", "", "", nil, hits, nil, nil, func() bool {
+		calls++
+		return calls > 2
+	})
+
+	assert.Equal(t, 2, n, "return the rows handed to the client before stop returned true")
+	published := client.snapshot()
+	require.Len(t, published, 2, "publish only the rows before stop returned true")
+	assert.Equal(t, map[string]any{"n": 2}, published[1].Fields["osquery"], "publish rows in order")
+	n = p.PublishEach("index", "action", "action_id", "", "", "", "", "", nil, hits, nil, nil, func() bool { return false })
+	assert.Equal(t, 3, n, "publish every row when stop never returns true")
+}

@@ -31,7 +31,8 @@ var (
 //
 // The lifetime of this should the a scope of the beat Run
 type resetableActionHandler struct {
-	pub actionResultPublisher
+	live *liveResultDispatcher
+	pub  actionResultPublisher
 
 	log *logp.Logger
 
@@ -45,8 +46,11 @@ type resetableActionHandler struct {
 
 type optionFunc func(a *resetableActionHandler)
 
-func newResetableActionHandler(pub actionResultPublisher, log *logp.Logger, opts ...optionFunc) *resetableActionHandler {
+// newResetableActionHandler returns a handler that publishes each action
+// response through live, after the action's results.
+func newResetableActionHandler(live *liveResultDispatcher, pub actionResultPublisher, log *logp.Logger, opts ...optionFunc) *resetableActionHandler {
 	a := &resetableActionHandler{
+		live:    live,
 		pub:     pub,
 		log:     log,
 		timeout: defaultTimeout,
@@ -73,7 +77,7 @@ func (a *resetableActionHandler) Execute(ctx context.Context, req map[string]any
 			err = nil
 		}
 		if a.pub != nil {
-			a.pub.PublishActionResult(req, res)
+			a.live.enqueueResponse(a.pub, req, res)
 		}
 	}()
 
@@ -81,7 +85,8 @@ func (a *resetableActionHandler) Execute(ctx context.Context, req map[string]any
 	if err != nil {
 		a.log.Error(formatLogMessage("execute error: %v", err))
 		if !isBrokenPipeOrEOFError(err) {
-			return nil, err
+			// Keep res: it may hold a partial count next to the error.
+			return res, err
 		}
 
 		a.log.Info(formatLogMessage("broken pipe error, retry the action with timeout: %v", a.timeout))

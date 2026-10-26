@@ -430,11 +430,14 @@ func (d *scheduledResultDispatcher) stop() {
 	// join a worker that it must release from beat.Client.Publish first.
 }
 
+// scheduledResultMetrics counts dropped documents. The live dispatcher uses it
+// too, with only shutdown and the timeout counters set.
 type scheduledResultMetrics struct {
-	overflow, stale, expired, shutdown   *monitoring.Uint
-	overflowRows, staleRows, expiredRows *monitoring.Uint
-	lastWarning                          atomic.Int64
-	log                                  *logp.Logger
+	overflow, stale, expired, shutdown, timeout       *monitoring.Uint
+	overflowRows, staleRows, expiredRows, timeoutRows *monitoring.Uint
+	lastWarning                                       atomic.Int64
+	log                                               *logp.Logger
+	warning                                           string
 }
 
 func newScheduledResultMetrics(reg *monitoring.Registry, log *logp.Logger) *scheduledResultMetrics {
@@ -448,6 +451,7 @@ func newScheduledResultMetrics(reg *monitoring.Registry, log *logp.Logger) *sche
 		expiredRows:  monitoring.NewUint(reg, "dropped_rows.expired"),
 		shutdown:     monitoring.NewUint(reg, "dropped.shutdown"),
 		log:          log,
+		warning:      "Scheduled osquery result dropped; see osquerybeat.scheduled_results.dropped monitoring counters",
 	}
 }
 
@@ -462,6 +466,6 @@ func (m *scheduledResultMetrics) drop(counter *monitoring.Uint) {
 	now := time.Now().UnixNano()
 	last := m.lastWarning.Load()
 	if now-last >= int64(time.Minute) && m.lastWarning.CompareAndSwap(last, now) {
-		m.log.Warn("Scheduled osquery result dropped; see osquerybeat.scheduled_results.dropped monitoring counters")
+		m.log.Warn(m.warning)
 	}
 }

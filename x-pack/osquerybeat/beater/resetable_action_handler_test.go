@@ -87,7 +87,9 @@ func TestResetableActionHandler(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			pub := &mockActionResultPublisher{}
-			rah := newResetableActionHandler(pub, log, resetableActionHandlerWithTimeout(testActionHandlerTimeout))
+			live := newLiveResultDispatcher(nil, log, time.Second)
+			defer live.stop()
+			rah := newResetableActionHandler(live, pub, log, resetableActionHandlerWithTimeout(testActionHandlerTimeout))
 			defer rah.Clear()
 
 			if tc.ah != nil {

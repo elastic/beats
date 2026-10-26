@@ -84,7 +84,8 @@ type osquerybeat struct {
 	osquerySource  string
 
 	scheduledResults *scheduledResultDispatcher
-	pub              osquerybeatPublisher
+	liveResults      *liveResultDispatcher
+	pub              liveQueryPublisher
 	qp               *queryProfiler
 	liveProfiles     *liveProfileStore
 	profileMetrics   *scheduledProfileMetrics
@@ -131,7 +132,10 @@ type osquerybeatPublisher interface {
 	Close()
 }
 
-var _ osquerybeatPublisher = (*pub.Publisher)(nil)
+var (
+	_ osquerybeatPublisher = (*pub.Publisher)(nil)
+	_ liveQueryPublisher   = (*pub.Publisher)(nil)
+)
 
 // New creates an instance of osquerybeat.
 func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
@@ -158,7 +162,8 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 		osqueryInstallConfig: installCfg,
 		checkTimeout:         checkTimeout,
 		log:                  log,
-		pub:                  pub.New(b, log),
+		pub:                  &liveClients{newPublisher: func() liveQueryPublisher { return pub.New(b, log) }},
+		liveResults:          newLiveResultDispatcher(b.Monitoring.StatsRegistry(), log, config.DefaultLivePublishTimeout),
 		qp:                   newQueryProfiler(log),
 		osquerydFactory:      osqd.New,
 		executablePath:       os.Executable,
@@ -219,6 +224,11 @@ func (bt *osquerybeat) close() {
 	if bt.scheduledResults != nil {
 		bt.scheduledResults.stop()
 	}
+	if bt.liveResults != nil {
+		bt.liveResults.stop()
+	}
+	// Close does not wait for a live publish stuck on a full output; that
+	// client is closed when the pipeline releases its Publish.
 	if bt.pub != nil {
 		bt.pub.Close()
 	}
@@ -374,7 +384,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	osqdMetrics := newOsquerydMetrics(bt.b.Monitoring.StatsRegistry(), bt.log)
 
 	// Set reseable action handler
-	rah := newResetableActionHandler(bt.pub, bt.log)
+	rah := newResetableActionHandler(bt.liveResults, bt.pub, bt.log)
 	defer rah.Clear()
 
 	if err := bt.configurePublishers(bt.config.Inputs); err != nil {
@@ -1028,6 +1038,7 @@ func (bt *osquerybeat) registerActionHandler(b *beat.Beat, cli *osqdcli.Client, 
 		log:             bt.log,
 		inputType:       osqueryInputType,
 		publisher:       bt.pub,
+		live:            bt.liveResults,
 		queryExec:       cli,
 		np:              configPlugin,
 		profiles:        bt.liveProfiles,
@@ -1044,14 +1055,17 @@ func (bt *osquerybeat) unregisterActionHandler(b *beat.Beat, rah *resetableActio
 }
 
 func (bt *osquerybeat) configurePublishers(inputs []config.InputConfig) error {
+	publishing, err := config.GetPublishingConfig(inputs)
+	if err != nil {
+		return err
+	}
 	if bt.scheduledResults != nil {
-		publishing, err := config.GetPublishingConfig(inputs)
-		if err != nil {
-			return err
-		}
 		if err := bt.scheduledResults.configure(inputs, publishing.Scheduled); err != nil {
 			return err
 		}
+	}
+	if bt.liveResults != nil {
+		bt.liveResults.setTimeout(publishing.Live.Timeout)
 	}
 	return bt.pub.Configure(inputs)
 }

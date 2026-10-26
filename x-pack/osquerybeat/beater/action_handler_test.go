@@ -48,7 +48,7 @@ type mockPublisher struct {
 	profileSpaceID string
 }
 
-func (p *mockPublisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any) {
+func (p *mockPublisher) PublishEach(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any, _ func() bool) int {
 	p.index = index
 	p.idValue = idValue
 	p.idFieldKey = idFieldKey
@@ -61,6 +61,7 @@ func (p *mockPublisher) Publish(index, idValue, idFieldKey, responseID, spaceID,
 	p.hits = hits
 	p.ecsm = ecsm
 	p.reqData = reqData
+	return len(hits)
 }
 
 func (p *mockPublisher) PublishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) {
@@ -137,11 +138,14 @@ func TestActionHandlerExecute(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.Name, func(t *testing.T) {
+			live := newLiveResultDispatcher(nil, validLogger, time.Second)
+			defer live.stop()
 			ac := &actionHandler{
 				log:       validLogger,
 				inputType: inputType,
 				queryExec: tc.QueryExecutor,
 				publisher: tc.Publisher,
+				live:      live,
 			}
 
 			diff := cmp.Diff(inputType, ac.Name())
@@ -242,11 +246,14 @@ func TestActionHandlerExecuteSpaceID(t *testing.T) {
 		},
 	}
 
+	live := newLiveResultDispatcher(nil, logptest.NewTestingLogger(t, t.Name()), time.Second)
+	defer live.stop()
 	ac := &actionHandler{
 		log:       logptest.NewTestingLogger(t, t.Name()),
 		inputType: osqueryInputType,
 		queryExec: exec,
 		publisher: pub,
+		live:      live,
 	}
 
 	if _, err := ac.Execute(t.Context(), req); err != nil {

@@ -24,6 +24,10 @@ var _ scheduledQueryPublisher = (*mockBeatPublisher)(nil)
 func (m *mockBeatPublisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any) {
 }
 
+func (m *mockBeatPublisher) PublishEach(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any, stop func() bool) int {
+	return 0
+}
+
 func (m *mockBeatPublisher) PublishActionResult(req map[string]any, res map[string]any) {
 }
 
