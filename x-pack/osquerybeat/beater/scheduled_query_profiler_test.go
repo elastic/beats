@@ -461,7 +461,7 @@ func TestLoggerReturnsWhileScheduledProfileRPCWaits(t *testing.T) {
 	dispatcher := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents,
 		func(func() bool, func()) osquerybeatPublisher { return publisher }, bt.handleScheduledQueryResult)
 	dispatcher.profile = bt.enqueueScheduledProfile
-	require.NoError(t, dispatcher.configure(inputs), "configure the scheduled result handoff")
+	require.NoError(t, dispatcher.configure(inputs, config.ScheduledPublishingConfig{MaxEvents: config.DefaultScheduledMaxEvents}), "configure the scheduled result handoff")
 	t.Cleanup(func() {
 		dispatcher.stop()
 		select {

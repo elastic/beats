@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pub"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -111,7 +112,7 @@ func TestScheduledResultsSaturatedPipelineDoesNotBlockShutdown(t *testing.T) {
 		}
 	})
 	inputs := outageInputs("old")
-	require.NoError(t, d.configure(inputs), "configure scheduled-only publisher clients")
+	require.NoError(t, d.configure(inputs, config.ScheduledPublishingConfig{MaxEvents: config.DefaultScheduledMaxEvents}), "configure scheduled-only publisher clients")
 	plugin := NewConfigPlugin(log)
 	require.NoError(t, plugin.Set(inputs), "stage the native policy")
 	_, err = plugin.GenerateConfig(t.Context())
@@ -154,4 +155,95 @@ func TestScheduledResultsSaturatedPipelineDoesNotBlockShutdown(t *testing.T) {
 		t.Fatal("pipeline closure did not release the scheduled worker")
 	}
 	assert.Equal(t, int32(33), observed.calls.Load(), "cancelled work must not publish the remaining rows or completion")
+}
+
+// pacedOutput acknowledges one batch every 20ms and counts the events that
+// are not marked as noise.
+type pacedOutput struct {
+	scheduled atomic.Int32
+}
+
+func (o *pacedOutput) Publish(ctx context.Context, batch publisher.Batch) error {
+	select {
+	case <-time.After(20 * time.Millisecond):
+	case <-ctx.Done():
+	}
+	for _, e := range batch.Events() {
+		if _, noise := e.Content.Fields["noise"]; !noise {
+			o.scheduled.Add(1)
+		}
+	}
+	batch.ACK()
+	return nil
+}
+func (*pacedOutput) Close() error   { return nil }
+func (*pacedOutput) String() string { return "paced output" }
+
+// TestScheduledWorkerGetsSlotsUnderPoolPressure shares a slab queue pool with
+// a client that publishes continuously, as all receivers share one pool on the
+// OTel runtime. The scheduled worker must wait for slots rather than drop.
+func TestScheduledWorkerGetsSlotsUnderPoolPressure(t *testing.T) {
+	log := logp.NewNopLogger()
+	var cfg pipeline.Config
+	require.NoError(t, conf.MustNewConfigFrom(map[string]any{"queue.slab.events": 64}).Unpack(&cfg), "configure the slab queue pool")
+	output := &pacedOutput{}
+	pipe, err := pipeline.LoadWithSettings(beat.Info{Name: "osquerybeat", Logger: log}, pipeline.Monitors{}, cfg,
+		func(outputs.Observer) (string, outputs.Group, error) {
+			return "paced", outputs.Group{BatchSize: 8, Clients: []outputs.Client{output}}, nil
+		},
+		pipeline.Settings{WaitCloseMode: pipeline.WaitOnPipelineCloseThenForce})
+	require.NoError(t, err, "create the real publisher pipeline")
+
+	noise, err := pipe.ConnectWith(beat.ClientConfig{})
+	require.NoError(t, err, "connect the competing client")
+	ctx, cancel := context.WithCancel(t.Context())
+	var wg sync.WaitGroup
+	wg.Go(func() {
+		for ctx.Err() == nil {
+			noise.Publish(beat.Event{Timestamp: time.Now(), Fields: mapstr.M{"noise": true}})
+		}
+	})
+
+	bt := &osquerybeat{log: log}
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents, func(allowed func() bool, dropped func()) osquerybeatPublisher {
+		return pub.NewScheduled(&beat.Beat{Publisher: pipe}, log, allowed, dropped)
+	}, bt.handleScheduledQueryResult)
+	t.Cleanup(func() {
+		d.stop()
+		cancel()
+		ctx, cancelDisconnect := context.WithTimeout(context.Background(), time.Second)
+		defer cancelDisconnect()
+		assert.NoError(t, pipe.Disconnect(ctx), "close the test pipeline")
+		wg.Wait()
+		select {
+		case <-d.done:
+		case <-time.After(time.Second):
+			t.Error("publication did not exit after closing the queue")
+		}
+	})
+	inputs := append(outageInputs("default"), config.InputConfig{
+		Datastream: config.DatastreamConfig{Dataset: config.DefaultActionResponsesDataset, Namespace: "default"},
+	})
+	require.NoError(t, d.configure(inputs, config.ScheduledPublishingConfig{MaxEvents: config.DefaultScheduledMaxEvents}), "configure scheduled clients")
+	plugin := NewConfigPlugin(log)
+	require.NoError(t, plugin.Set(inputs), "stage the native policy")
+	_, err = plugin.GenerateConfig(t.Context())
+	require.NoError(t, err, "apply the policy")
+
+	rows := make([]map[string]string, 5)
+	for i := range rows {
+		rows[i] = map[string]string{"value": "row"}
+	}
+	result := QueryResult{Name: "scheduled", Action: "snapshot", Hits: rows}
+	for i := range 20 {
+		start := time.Now()
+		d.enqueue(t.Context(), outageQueryClient{}, plugin, result, nil)
+		assert.Less(t, time.Since(start), 50*time.Millisecond, "enqueue %d must not wait for the pool", i)
+	}
+	const want = 20*5 + 20 // Result rows plus one response per result.
+	assert.Eventually(t, func() bool { return output.scheduled.Load() == want }, 10*time.Second, 10*time.Millisecond,
+		"every scheduled row and response must be published, got %d of %d", output.scheduled.Load(), want)
+	assert.Zero(t, d.metrics.overflowRows.Get(), "no rows may overflow")
+	assert.Zero(t, d.metrics.staleRows.Get(), "no rows may be stale")
+	assert.Zero(t, d.metrics.expiredRows.Get(), "no rows may expire")
 }

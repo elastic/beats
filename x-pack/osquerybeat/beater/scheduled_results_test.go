@@ -49,7 +49,11 @@ func outageInputs(namespace string) []config.InputConfig {
 // outageMaxEvents is the outage dispatcher's queue limit in rows.
 const outageMaxEvents = 8
 
-func outageDispatcher(t *testing.T) (*scheduledResultDispatcher, *ConfigPlugin, *stalledResultPublisher, func()) {
+var outageLimits = config.ScheduledPublishingConfig{MaxEvents: outageMaxEvents}
+
+// outageDispatcher returns a dispatcher whose first policy's publisher blocks
+// until release is called. Publishers for later policies do not block.
+func outageDispatcher(t *testing.T, limits config.ScheduledPublishingConfig) (*scheduledResultDispatcher, *ConfigPlugin, *stalledResultPublisher, func()) {
 	t.Helper()
 	log := logptest.NewTestingLogger(t, "outage")
 	bt := &osquerybeat{log: log}
@@ -60,13 +64,15 @@ func outageDispatcher(t *testing.T) (*scheduledResultDispatcher, *ConfigPlugin, 
 			created = true
 			return first
 		}
-		return &stalledResultPublisher{entered: make(chan struct{}), release: make(chan struct{})}
+		next := &stalledResultPublisher{entered: make(chan struct{}), release: make(chan struct{})}
+		close(next.release)
+		return next
 	}, bt.handleScheduledQueryResult)
 	plugin := NewConfigPlugin(log)
 	require.NoError(t, plugin.Set(outageInputs("old")), "validate the initial policy")
 	_, err := plugin.GenerateConfig(t.Context())
 	require.NoError(t, err, "apply the initial native policy")
-	require.NoError(t, d.configure(outageInputs("old")), "configure independent scheduled clients")
+	require.NoError(t, d.configure(outageInputs("old"), limits), "configure independent scheduled clients")
 	var releaseOnce sync.Once
 	release := func() { releaseOnce.Do(func() { close(first.release) }) }
 	t.Cleanup(func() {
@@ -91,7 +97,7 @@ func waitForResultPublication(t *testing.T, p *stalledResultPublisher) {
 }
 
 func TestScheduledResultsBoundLoggerAdmissionAndShutdown(t *testing.T) {
-	d, plugin, publisher, release := outageDispatcher(t)
+	d, plugin, publisher, release := outageDispatcher(t, outageLimits)
 	loggerPlugin := NewLoggerPlugin(logptest.NewTestingLogger(t, "logger"), func(res QueryResult) {
 		d.enqueue(t.Context(), nil, plugin, res, nil)
 	})
@@ -133,29 +139,85 @@ func TestScheduledResultsBoundLoggerAdmissionAndShutdown(t *testing.T) {
 }
 
 func TestScheduledResultsPolicyRetirementDoesNotWaitForOutput(t *testing.T) {
-	d, plugin, publisher, _ := outageDispatcher(t)
+	d, plugin, publisher, _ := outageDispatcher(t, outageLimits)
 	result := QueryResult{Name: "scheduled", Action: "diff"}
 	d.enqueue(t.Context(), nil, plugin, result, nil)
 	waitForResultPublication(t, publisher)
 	d.enqueue(t.Context(), nil, plugin, result, nil)
 	configured := make(chan error, 1)
-	go func() { configured <- d.configure(outageInputs("new")) }()
+	go func() { configured <- d.configure(outageInputs("new"), outageLimits) }()
 	select {
 	case err := <-configured:
 		require.NoError(t, err, "replace policy while old publication waits")
 	case <-time.After(time.Second):
 		t.Fatal("policy replacement waited on old output")
 	}
-	d.prune()
-	assert.Equal(t, uint64(1), d.metrics.stale.Get(), "queued old-policy work should retire immediately")
 	d.enqueue(t.Context(), nil, plugin, result, nil)
-	assert.Equal(t, uint64(2), d.metrics.stale.Get(), "old namespace must not enter replacement clients")
+	assert.Equal(t, uint64(1), d.metrics.stale.Get(), "old namespace must not enter replacement clients")
+	assert.Equal(t, uint64(1), d.metrics.staleRows.Get(), "count the stale result's rows")
 	items, _ := d.queue.stats()
-	assert.Zero(t, items, "only the one original, active publication may remain")
+	assert.Equal(t, 1, items, "policy replacement must keep the queued result for the worker to rebind or drop")
+}
+
+func TestScheduledResultsPolicyChangeKeepsBacklog(t *testing.T) {
+	d, plugin, blocked, release := outageDispatcher(t, outageLimits)
+	result := QueryResult{Name: "scheduled", Action: "diff"}
+	d.enqueue(t.Context(), nil, plugin, result, nil)
+	waitForResultPublication(t, blocked)
+	for range 3 {
+		d.enqueue(t.Context(), nil, plugin, result, nil)
+	}
+	require.NoError(t, d.configure(outageInputs("old"), outageLimits), "replace the policy with one keeping the query")
+	next := activePublisher(d)
+	release()
+	assert.Eventually(t, func() bool { return next.calls.Load() == 3 }, time.Second, time.Millisecond,
+		"queued results must publish through the new policy's clients, got %d", next.calls.Load())
+	assert.Equal(t, int32(1), blocked.calls.Load(), "only the in-flight result may use the old clients")
+	assert.Zero(t, d.metrics.stale.Get(), "an unchanged query must not be dropped as stale")
+}
+
+func TestScheduledResultsPolicyChangeDropsMovedQuery(t *testing.T) {
+	d, plugin, blocked, release := outageDispatcher(t, outageLimits)
+	result := QueryResult{Name: "scheduled", Action: "diff"}
+	d.enqueue(t.Context(), nil, plugin, result, nil)
+	waitForResultPublication(t, blocked)
+	for range 3 {
+		d.enqueue(t.Context(), nil, plugin, result, nil)
+	}
+	require.NoError(t, d.configure(outageInputs("other"), outageLimits), "move the query to another namespace")
+	next := activePublisher(d)
+	release()
+	assert.Eventually(t, func() bool { return d.metrics.stale.Get() == 3 }, time.Second, time.Millisecond,
+		"results for a moved query must be dropped as stale, got %d", d.metrics.stale.Get())
+	assert.Equal(t, uint64(3), d.metrics.staleRows.Get(), "count the stale results' rows")
+	assert.Zero(t, next.calls.Load(), "results captured for the old namespace must not use the new clients")
+	assert.Equal(t, int32(1), blocked.calls.Load(), "only the in-flight result may use the old clients")
+}
+
+func TestScheduledResultsMaxAgeExpires(t *testing.T) {
+	d, plugin, blocked, release := outageDispatcher(t, config.ScheduledPublishingConfig{MaxEvents: outageMaxEvents, MaxAge: 50 * time.Millisecond})
+	result := QueryResult{Name: "scheduled", Action: "diff"}
+	d.enqueue(t.Context(), nil, plugin, result, nil)
+	waitForResultPublication(t, blocked)
+	d.enqueue(t.Context(), nil, plugin, result, nil)
+	d.enqueue(t.Context(), nil, plugin, result, nil)
+	time.Sleep(100 * time.Millisecond)
+	release()
+	assert.Eventually(t, func() bool { return d.metrics.expired.Get() == 2 }, time.Second, time.Millisecond,
+		"results queued longer than max_age must be dropped as expired, got %d", d.metrics.expired.Get())
+	assert.Equal(t, uint64(2), d.metrics.expiredRows.Get(), "count the expired results' rows")
+	assert.Equal(t, int32(1), blocked.calls.Load(), "expired results must not be published")
+}
+
+// activePublisher returns the publisher of d's current policy.
+func activePublisher(d *scheduledResultDispatcher) *stalledResultPublisher {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	return d.lease.publisher.(*stalledResultPublisher)
 }
 
 func TestScheduledResultsReuseWorkerAcrossDaemonRestarts(t *testing.T) {
-	d, plugin, publisher, _ := outageDispatcher(t)
+	d, plugin, publisher, _ := outageDispatcher(t, outageLimits)
 	result := QueryResult{Name: "scheduled", Action: "diff"}
 	ctx, cancel := context.WithCancel(t.Context())
 	d.enqueue(ctx, nil, plugin, result, nil)
@@ -178,7 +240,7 @@ func TestScheduledResultsStopReleasesIdleWorker(t *testing.T) {
 	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(func() bool, func()) osquerybeatPublisher {
 		return &stalledResultPublisher{entered: make(chan struct{}), release: make(chan struct{})}
 	}, (&osquerybeat{log: log}).handleScheduledQueryResult)
-	require.NoError(t, d.configure(outageInputs("idle")), "start the result worker")
+	require.NoError(t, d.configure(outageInputs("idle"), outageLimits), "start the result worker")
 	time.Sleep(10 * time.Millisecond) // Let the worker block on the empty queue.
 	d.stop()
 	select {
@@ -227,7 +289,7 @@ func TestScheduledResultsStalledOutputDoesNotBlockProfileCollection(t *testing.T
 	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents,
 		func(func() bool, func()) osquerybeatPublisher { return publisher }, bt.handleScheduledQueryResult)
 	d.profile = bt.enqueueScheduledProfile
-	require.NoError(t, d.configure(inputs), "configure the independent result publisher")
+	require.NoError(t, d.configure(inputs, config.ScheduledPublishingConfig{MaxEvents: config.DefaultScheduledMaxEvents}), "configure the independent result publisher")
 	t.Cleanup(func() {
 		close(publisher.release)
 		d.stop()

@@ -27,12 +27,12 @@ func TestScheduledPublisherGuardAndDeliveryMode(t *testing.T) {
 		inputWithNamespace(config.DefaultQueryProfileDataset, "default"),
 	}), "configure a scheduled result client")
 	require.Len(t, recorder.configs, 1, "scheduled result clients must not duplicate the independent profile stream")
-	assert.Equal(t, beat.DropIfFull, recorder.configs[0].PublishMode, "native scheduled clients must request best-effort admission")
+	assert.Equal(t, beat.DefaultGuarantees, recorder.configs[0].PublishMode, "native scheduled clients must block for queue space")
 	p.Publish("index", "schedule", "schedule_id", "response", "", "", "", "query", nil,
 		[]map[string]any{{"value": 1}, {"value": 2}}, nil, nil)
 	assert.Len(t, recorder.clients[0].events, 1, "retirement between rows must prevent further publication")
 	recorder.configs[0].ClientListener.DroppedOnPublish(beat.Event{})
-	assert.Equal(t, int32(1), dropped.Load(), "make admission losses observable")
+	assert.Equal(t, int32(1), dropped.Load(), "make publication after close observable")
 
 	regular := &connectRecorder{}
 	live := New(&beat.Beat{Publisher: regular}, logptest.NewTestingLogger(t, "live"))

@@ -40,7 +40,6 @@ type Publisher struct {
 	queryProfileClient    beat.Client
 	profileDropWarnLogged bool
 	scheduledOnly         bool
-	publishMode           beat.PublishMode
 	listener              beat.ClientListener
 	allowed               func() bool
 
@@ -105,7 +104,6 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 		p.log.Debugf("Connect publisher for %s with processors: %d", config.DefaultDataset, len(processors.All()))
 		// Connect publisher
 		client, err := p.b.Publisher.ConnectWith(beat.ClientConfig{
-			PublishMode:    p.publishMode,
 			ClientListener: p.listener,
 			Processing: beat.ProcessingConfig{
 				Processor: processors,
@@ -133,7 +131,6 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 		p.log.Debugf("Connect publisher for %s with processors: %d", config.DefaultActionResponsesDataset, len(processors.All()))
 		// Connect publisher
 		client, err := p.b.Publisher.ConnectWith(beat.ClientConfig{
-			PublishMode:    p.publishMode,
 			ClientListener: p.listener,
 			Processing: beat.ProcessingConfig{
 				Processor: processors,
@@ -503,10 +500,13 @@ func hitToEvent(index, eventType, idValue, idFieldKey, responseID, spaceID, pack
 	return event
 }
 
-// NewScheduled creates policy-bound, best-effort clients for the asynchronous
-// native logger path. allowed prevents remaining rows from crossing retirement.
+// NewScheduled creates policy-bound clients for the asynchronous native logger
+// path. They block for queue space, because on a shared slab queue pool a
+// DropIfFull client loses nearly every race against blocked producers. allowed
+// prevents remaining rows from crossing retirement. dropped is called for each
+// event published after its client closed.
 func NewScheduled(b *beat.Beat, log *logp.Logger, allowed func() bool, dropped func()) *Publisher {
-	return &Publisher{b: b, log: log, scheduledOnly: true, publishMode: beat.DropIfFull,
+	return &Publisher{b: b, log: log, scheduledOnly: true,
 		allowed: allowed, listener: &scheduledListener{dropped: dropped}}
 }
 

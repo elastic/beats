@@ -1046,10 +1046,13 @@ func (bt *osquerybeat) unregisterActionHandler(b *beat.Beat, rah *resetableActio
 
 func (bt *osquerybeat) configurePublishers(inputs []config.InputConfig) error {
 	if bt.scheduledResults != nil {
-		if err := bt.scheduledResults.configure(inputs); err != nil {
+		publishing, err := config.GetPublishingConfig(inputs)
+		if err != nil {
 			return err
 		}
-		bt.scheduledResults.prune()
+		if err := bt.scheduledResults.configure(inputs, publishing.Scheduled); err != nil {
+			return err
+		}
 	}
 	return bt.pub.Configure(inputs)
 }

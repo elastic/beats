@@ -28,7 +28,6 @@ type scheduledResult struct {
 	result     QueryResult
 	namespace  string
 	query      QueryInfo
-	lease      *scheduledResultLease
 	queuedAt   time.Time
 	responseID string
 }
@@ -57,6 +56,22 @@ func (l *scheduledResultLease) allowed() bool {
 	return !l.retired.Load() && l.ctx != nil && l.ctx.Err() == nil
 }
 
+// routes reports whether l still sends job's query to the namespace and SQL
+// that job was captured with.
+func (l *scheduledResultLease) routes(job scheduledResult) bool {
+	namespace, query, ok := l.view.lookupResultMetadata(job.result.Name)
+	return ok && namespace == job.namespace && query.Query == job.query.Query
+}
+
+// unlock ends the worker's use of l, closing l if it was retired meanwhile.
+func (l *scheduledResultLease) unlock() {
+	l.ctx = nil
+	if l.retired.Load() {
+		l.closeOnce.Do(l.publisher.Close)
+	}
+	l.mu.Unlock()
+}
+
 func (l *scheduledResultLease) retire() {
 	l.retired.Store(true)
 	if l.mu.TryLock() {
@@ -73,6 +88,7 @@ type scheduledResultDispatcher struct {
 	done            chan struct{}
 	started, closed bool
 	lease           *scheduledResultLease
+	maxAge          time.Duration
 	log             *logp.Logger
 	metrics         *scheduledResultMetrics
 	newPublisher    func(func() bool, func()) osquerybeatPublisher
@@ -96,7 +112,9 @@ func newScheduledResultDispatcher(reg *monitoring.Registry, log *logp.Logger, ma
 	}
 }
 
-func (d *scheduledResultDispatcher) configure(inputs []config.InputConfig) error {
+// configure replaces the active policy and queue limits. Queued results are
+// kept; the worker binds each to the policy that is active when it is popped.
+func (d *scheduledResultDispatcher) configure(inputs []config.InputConfig, cfg config.ScheduledPublishingConfig) error {
 	var next *scheduledResultLease
 	if config.ResultInput(inputs) != nil {
 		view := NewConfigPlugin(d.log)
@@ -107,7 +125,8 @@ func (d *scheduledResultDispatcher) configure(inputs []config.InputConfig) error
 			return err
 		}
 		next = &scheduledResultLease{view: view}
-		next.publisher = d.newPublisher(next.allowed, func() { d.metrics.drop(d.metrics.outputFull) })
+		// A blocking client drops only events published after it is closed.
+		next.publisher = d.newPublisher(next.allowed, func() { d.metrics.drop(d.metrics.shutdown) })
 		if err := next.publisher.Configure(inputs); err != nil {
 			next.retire()
 			return err
@@ -126,6 +145,7 @@ func (d *scheduledResultDispatcher) configure(inputs []config.InputConfig) error
 		previous.retired.Store(true)
 	}
 	d.lease = next
+	d.maxAge = cfg.MaxAge
 	if next != nil && !d.started {
 		d.started = true
 		go d.run()
@@ -134,13 +154,15 @@ func (d *scheduledResultDispatcher) configure(inputs []config.InputConfig) error
 	if previous != nil {
 		previous.retire()
 	}
+	d.queue.setLimit(cfg.MaxEvents)
 	return nil
 }
 
 func (d *scheduledResultDispatcher) enqueue(ctx context.Context, client scheduledQueryClient, plugin *ConfigPlugin, result QueryResult, profiler *scheduledQueryProfiler) {
+	job := scheduledResult{ctx: ctx, client: client, result: result}
 	namespace, query, ok := plugin.lookupResultMetadata(result.Name)
 	if !ok {
-		d.metrics.drop(d.metrics.stale)
+		d.dropStale(job)
 		return
 	}
 	d.mu.Lock()
@@ -150,16 +172,17 @@ func (d *scheduledResultDispatcher) enqueue(ctx context.Context, client schedule
 		return
 	}
 	if d.lease == nil {
-		d.metrics.drop(d.metrics.stale)
+		d.dropStale(job)
 		return
 	}
 	expectedNamespace, expectedQuery, ok := d.lease.view.lookupResultMetadata(result.Name)
 	if !ok || namespace != expectedNamespace || !reflect.DeepEqual(query, expectedQuery) {
-		d.metrics.drop(d.metrics.stale)
+		d.dropStale(job)
 		return
 	}
 	responseID := uuid.Must(uuid.NewV4()).String()
-	d.queue.push(scheduledResult{ctx: ctx, client: client, result: result, namespace: namespace, query: query, lease: d.lease, queuedAt: time.Now(), responseID: responseID})
+	job.namespace, job.query, job.queuedAt, job.responseID = namespace, query, time.Now(), responseID
+	d.queue.push(job)
 	// Profiling keeps its own collection worker. Its admission never waits for
 	// this result's publication or shares the result worker.
 	if d.profile != nil {
@@ -179,15 +202,27 @@ func (d *scheduledResultDispatcher) run() {
 }
 
 func (d *scheduledResultDispatcher) process(job scheduledResult) {
-	lease := job.lease
-	lease.mu.Lock()
-	defer func() {
-		lease.ctx = nil
-		if lease.retired.Load() {
-			lease.closeOnce.Do(lease.publisher.Close)
-		}
-		lease.mu.Unlock()
-	}()
+	d.mu.Lock()
+	lease, maxAge := d.lease, d.maxAge
+	if lease != nil {
+		// Lock while the lease is still active, so it cannot have been closed;
+		// a later retire leaves closing it to unlock.
+		lease.mu.Lock()
+		defer lease.unlock()
+	}
+	d.mu.Unlock()
+	switch {
+	case maxAge > 0 && time.Since(job.queuedAt) > maxAge:
+		d.metrics.dropRows(d.metrics.expired, d.metrics.expiredRows, job.rows())
+	case lease == nil || !lease.routes(job):
+		d.dropStale(job)
+	default:
+		d.publish(lease, job)
+	}
+}
+
+// publish sends job through lease, whose mu the caller holds.
+func (d *scheduledResultDispatcher) publish(lease *scheduledResultLease, job scheduledResult) {
 	ctx, cancel := context.WithCancel(job.ctx)
 	stop := context.AfterFunc(d.ctx, cancel)
 	if d.ctx.Err() != nil {
@@ -196,20 +231,24 @@ func (d *scheduledResultDispatcher) process(job scheduledResult) {
 	defer func() { stop(); cancel() }()
 	lease.ctx = ctx
 	if !lease.allowed() {
-		d.metrics.drop(d.metrics.stale)
+		d.dropStale(job)
 		return
 	}
 	d.handle(ctx, job.client, lease.publisher, job.namespace, job.query, job.result, job.responseID)
 }
 
-// prune releases cancelled runs and retired policies even while the active
+func (d *scheduledResultDispatcher) dropStale(job scheduledResult) {
+	d.metrics.dropRows(d.metrics.stale, d.metrics.staleRows, job.rows())
+}
+
+// prune releases results of cancelled daemon runs even while the active
 // publication is blocked.
 func (d *scheduledResultDispatcher) prune() {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	for _, job := range d.queue.drain() {
-		if job.ctx.Err() != nil || job.lease.retired.Load() {
-			d.metrics.drop(d.metrics.stale)
+		if job.ctx.Err() != nil {
+			d.dropStale(job)
 			continue
 		}
 		d.queue.push(job)
@@ -244,10 +283,10 @@ func (d *scheduledResultDispatcher) stop() {
 }
 
 type scheduledResultMetrics struct {
-	overflow, stale, shutdown, outputFull *monitoring.Uint
-	overflowRows                          *monitoring.Uint
-	lastWarning                           atomic.Int64
-	log                                   *logp.Logger
+	overflow, stale, expired, shutdown   *monitoring.Uint
+	overflowRows, staleRows, expiredRows *monitoring.Uint
+	lastWarning                          atomic.Int64
+	log                                  *logp.Logger
 }
 
 func newScheduledResultMetrics(reg *monitoring.Registry, log *logp.Logger) *scheduledResultMetrics {
@@ -255,8 +294,10 @@ func newScheduledResultMetrics(reg *monitoring.Registry, log *logp.Logger) *sche
 	return &scheduledResultMetrics{
 		overflow:     monitoring.NewUint(reg, "dropped.overflow"),
 		overflowRows: monitoring.NewUint(reg, "dropped_rows.overflow"),
-		outputFull:   monitoring.NewUint(reg, "dropped.output_full"),
 		stale:        monitoring.NewUint(reg, "dropped.stale"),
+		staleRows:    monitoring.NewUint(reg, "dropped_rows.stale"),
+		expired:      monitoring.NewUint(reg, "dropped.expired"),
+		expiredRows:  monitoring.NewUint(reg, "dropped_rows.expired"),
 		shutdown:     monitoring.NewUint(reg, "dropped.shutdown"),
 		log:          log,
 	}
