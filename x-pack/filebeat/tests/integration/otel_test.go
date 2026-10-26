@@ -738,6 +738,12 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 				// Request-level failures: entire HTTP request fails with the specified status code
 				var attemptCount atomic.Int64
 				mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+					// Only fail bulk requests, so that other requests made by the exporter
+					// (e.g. version detection at startup) do not consume the failure budget.
+					if !strings.HasSuffix(r.URL.Path, "/_bulk") {
+						baseHandler.ServeHTTP(w, r)
+						return
+					}
 					currentAttempt := attemptCount.Add(1)
 
 					// For retryable status codes (429, 503), fail for failuresPerEvent times, then forward to deterministic handler
