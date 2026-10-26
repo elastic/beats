@@ -176,6 +176,19 @@ func TestRecurrenceRowsPublished(t *testing.T) {
 	}
 }
 
+func TestRecurrenceRunOfOtherSQLIsStale(t *testing.T) {
+	// The policy routes "scheduled" with SELECT 1; the run executes SELECT 2.
+	d, plugin, publisher, release := outageDispatcher(t, outageLimits)
+	release()
+	h := newRecurrenceQueryHandler(logptest.NewTestingLogger(t, "rrule"), rruleQueryClient([]map[string]any{{"value": "a"}}, nil), plugin, d, nil, "5.12.0")
+	sq := scheduler.ScheduledQuery{Name: "scheduled", Config: config.Query{Query: "SELECT 2"}, Timeout: time.Second}
+	require.NoError(t, h.executeQuery(t.Context(), sq, 1, time.Now()), "run the RRULE query")
+	assert.Equal(t, uint64(1), d.metrics.dropped[dropStale].Get(), "a run of SQL the policy does not route must be dropped as stale")
+	items, _ := d.queue.stats()
+	assert.Zero(t, items, "the stale run must not be queued")
+	assert.Zero(t, publisher.calls.Load(), "the stale run must not be published")
+}
+
 func TestRecurrenceSkipsQueryWithoutNamespace(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "rrule")
 	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents,
