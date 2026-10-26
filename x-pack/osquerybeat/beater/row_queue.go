@@ -47,16 +47,25 @@ func newRowQueue[T queuedItem](maxEvents int, onEvict func(T)) *rowQueue[T] {
 	return &rowQueue[T]{onEvict: onEvict, notify: make(chan struct{}, 1), items: list.New(), limit: maxEvents}
 }
 
-// push adds item, evicting older items until it fits. It never blocks.
+// push adds item, evicting older items until it fits. An evictFirst item
+// that would need an item for which evictFirst is false evicted is dropped
+// itself instead. push never blocks.
 func (q *rowQueue[T]) push(item T) {
 	q.mu.Lock()
+	first := item.evictFirst()
 	var evicted []T
 	for q.items.Len() > 0 && q.events+item.rows() > q.limit {
+		if first && q.first == 0 {
+			q.changed()
+			q.mu.Unlock()
+			q.evicted(append(evicted, item))
+			return
+		}
 		evicted = append(evicted, q.evict())
 	}
 	q.items.PushBack(item)
 	q.events += item.rows()
-	if item.evictFirst() {
+	if first {
 		q.first++
 	}
 	q.changed()

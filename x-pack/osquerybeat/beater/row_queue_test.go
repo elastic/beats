@@ -61,6 +61,15 @@ func TestRowQueueEvictsProfilesFirst(t *testing.T) {
 	assertStats(t, q, 2, 8)
 }
 
+func TestRowQueueDropsProfileRatherThanResult(t *testing.T) {
+	q, evicted := newTestRowQueue(10)
+	q.push(testQueueItem{name: "r1", n: 6})
+	q.push(testQueueItem{name: "r2", n: 4})
+	q.push(testQueueItem{name: "p", n: 1, profile: true})
+	assert.Equal(t, []string{"p"}, *evicted, "an incoming profile should be dropped instead of evicting a result")
+	assertStats(t, q, 2, 10)
+}
+
 func TestRowQueueTracksEvictFirstItems(t *testing.T) {
 	// Popping a result must not hide a queued profile from eviction.
 	q, evicted := newTestRowQueue(10)
