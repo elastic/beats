@@ -34,7 +34,7 @@ Privilege requirements vary by backend.
 **ebpf**
 :   Requires `CAP_SYS_ADMIN` and `CAP_BPF` (or root), and a kernel version of 5.10.16 or later. The kernel BPF policy must permit eBPF programs.
 
-    In Docker containers, add `--cap-add=SYS_ADMIN --cap-add=BPF` and mount `/sys` from the host.
+    In Docker containers, add `--cap-add=SYS_ADMIN --cap-add=BPF --pid=host` and mount `/sys` from the host. The backend attributes each file event to the process that made the change by looking the process up in a table built from the host's `/proc` and kept current from kernel events. The kernel reports host process IDs, but without `--pid=host` the table is built from the container's own process IDs. Events from processes that were already running when Auditbeat started are then dropped, or attributed to the wrong process when a host process ID happens to match a container one.
 
 **ETW (Windows only)**
 :   Requires Administrator privileges.
