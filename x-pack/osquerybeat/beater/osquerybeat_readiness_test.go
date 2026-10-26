@@ -77,7 +77,11 @@ func (f reportingRunnerFactory) Create(p beat.PipelineConnector, c *conf.C) (cfg
 	if err != nil {
 		return nil, err
 	}
-	runner.(status.WithStatusReporter).SetStatusReporter(f.reporter)
+	r, ok := runner.(status.WithStatusReporter)
+	if !ok {
+		return nil, fmt.Errorf("runner %T does not accept a status reporter", runner)
+	}
+	r.SetStatusReporter(f.reporter)
 	return runner, nil
 }
 
