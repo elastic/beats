@@ -173,7 +173,7 @@ AWS SQS queue url (Required when `var.bucket_arn` is not set).
 *`var.visibility_timeout`*::
 
 The duration that the received messages are hidden from ReceiveMessage request.
-Defaults to 300 seconds.
+Default to be 300 seconds.
 
 *`var.api_timeout`*::
 
@@ -193,7 +193,7 @@ Use to vertically scale the input.
 
 *`var.bucket_list_interval`*::
 
-Wait interval between completion of a list request to the S3 bucket and beginning of the next one. Defaults to 120 seconds.
+Wait interval between completion of a list request to the S3 bucket and beginning of the next one. Default to be 120 seconds.
 
 *`var.bucket_list_prefix`*::
 
