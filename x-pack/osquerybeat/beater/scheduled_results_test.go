@@ -15,7 +15,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -171,7 +173,7 @@ func TestScheduledResultsPolicyChangeKeepsBacklog(t *testing.T) {
 	next := activePublisher(d)
 	release()
 	assert.Eventually(t, func() bool { return next.calls.Load() == 3 }, time.Second, time.Millisecond,
-		"queued results must publish through the new policy's clients, got %d", next.calls.Load())
+		"queued results must publish through the new policy's clients")
 	assert.Equal(t, int32(1), blocked.calls.Load(), "only the in-flight result may use the old clients")
 	assert.Zero(t, d.metrics.stale.Get(), "an unchanged query must not be dropped as stale")
 }
@@ -188,7 +190,7 @@ func TestScheduledResultsPolicyChangeDropsMovedQuery(t *testing.T) {
 	next := activePublisher(d)
 	release()
 	assert.Eventually(t, func() bool { return d.metrics.stale.Get() == 3 }, time.Second, time.Millisecond,
-		"results for a moved query must be dropped as stale, got %d", d.metrics.stale.Get())
+		"results for a moved query must be dropped as stale")
 	assert.Equal(t, uint64(3), d.metrics.staleRows.Get(), "count the stale results' rows")
 	assert.Zero(t, next.calls.Load(), "results captured for the old namespace must not use the new clients")
 	assert.Equal(t, int32(1), blocked.calls.Load(), "only the in-flight result may use the old clients")
@@ -204,9 +206,153 @@ func TestScheduledResultsMaxAgeExpires(t *testing.T) {
 	time.Sleep(100 * time.Millisecond)
 	release()
 	assert.Eventually(t, func() bool { return d.metrics.expired.Get() == 2 }, time.Second, time.Millisecond,
-		"results queued longer than max_age must be dropped as expired, got %d", d.metrics.expired.Get())
+		"results queued longer than max_age must be dropped as expired")
 	assert.Equal(t, uint64(2), d.metrics.expiredRows.Get(), "count the expired results' rows")
 	assert.Equal(t, int32(1), blocked.calls.Load(), "expired results must not be published")
+}
+
+func TestScheduledResultsPolicyChangeDropsChangedSQL(t *testing.T) {
+	d, plugin, blocked, release := outageDispatcher(t, outageLimits)
+	result := QueryResult{Name: "scheduled", Action: "diff"}
+	d.enqueue(t.Context(), nil, plugin, result, nil)
+	waitForResultPublication(t, blocked)
+	for range 2 {
+		d.enqueue(t.Context(), nil, plugin, result, nil)
+	}
+	changed := outageInputs("old")
+	query := changed[0].Osquery.Schedule["scheduled"]
+	query.Query = "SELECT 2"
+	changed[0].Osquery.Schedule["scheduled"] = query
+	require.NoError(t, d.configure(changed, outageLimits), "change the query's SQL in the same namespace")
+	next := activePublisher(d)
+	d.enqueue(t.Context(), nil, plugin, result, nil)
+	release()
+	assert.Eventually(t, func() bool { return d.metrics.stale.Get() == 3 }, time.Second, time.Millisecond,
+		"results captured for the old SQL must be dropped as stale at admission and when dequeued")
+	assert.Equal(t, uint64(3), d.metrics.staleRows.Get(), "count the stale results' rows")
+	assert.Zero(t, next.calls.Load(), "results for the old SQL must not use the new clients")
+}
+
+func TestScheduledResultsPolicyChangeKeepsCapturedQueryInfo(t *testing.T) {
+	d, plugin, blocked, release := outageDispatcher(t, outageLimits)
+	calls := recordHandledResults(d)
+	result := QueryResult{Name: "scheduled", Action: "diff"}
+	d.enqueue(t.Context(), nil, plugin, result, nil)
+	waitForResultPublication(t, blocked)
+	d.enqueue(t.Context(), nil, plugin, result, nil)
+	mapped := outageInputs("old")
+	query := mapped[0].Osquery.Schedule["scheduled"]
+	query.ECSMapping = map[string]any{"user": map[string]any{"id": map[string]any{"field": "uid"}}}
+	mapped[0].Osquery.Schedule["scheduled"] = query
+	require.NoError(t, d.configure(mapped, outageLimits), "change only the query's ECS mapping")
+	next := activePublisher(d)
+	// The live plugin still has the old mapping; admission must accept it.
+	d.enqueue(t.Context(), nil, plugin, result, nil)
+	release()
+	<-calls // The in-flight result on the old clients.
+	for i := range 2 {
+		select {
+		case call := <-calls:
+			assert.Same(t, next, call.publisher, "result %d must publish through the new policy's clients", i)
+			assert.Empty(t, call.query.ECSMapping, "result %d must publish with the QueryInfo captured at admission", i)
+		case <-time.After(time.Second):
+			t.Fatalf("result %d was not published", i)
+		}
+	}
+	assert.Zero(t, d.metrics.stale.Get(), "an ECS mapping change must not make results stale")
+}
+
+func TestScheduledResultsCancelledRunDroppedBeforeHandling(t *testing.T) {
+	d, plugin, blocked, release := outageDispatcher(t, outageLimits)
+	calls := recordHandledResults(d)
+	rows := []map[string]string{{"value": "a"}, {"value": "b"}}
+	d.enqueue(t.Context(), nil, plugin, QueryResult{Name: "scheduled", Action: "diff"}, nil)
+	waitForResultPublication(t, blocked)
+	ctx, cancel := context.WithCancel(t.Context())
+	d.enqueue(ctx, nil, plugin, QueryResult{Name: "scheduled", Action: "snapshot", Hits: rows}, nil)
+	cancel()
+	release()
+	assert.Eventually(t, func() bool { return d.metrics.stale.Get() == 1 }, time.Second, time.Millisecond,
+		"a result of a cancelled daemon run must be dropped as stale")
+	assert.Equal(t, uint64(len(rows)+1), d.metrics.staleRows.Get(), "count the cancelled result's rows and response")
+	<-calls // The in-flight result.
+	select {
+	case <-calls:
+		t.Error("a result of a cancelled daemon run must not reach the handler")
+	default:
+	}
+}
+
+func TestScheduledResultsInvalidPolicyKeepsLimits(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "invalid-policy")
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(func() bool, func()) osquerybeatPublisher {
+		return &stalledResultPublisher{entered: make(chan struct{}), release: make(chan struct{})}
+	}, (&osquerybeat{log: log}).handleScheduledQueryResult)
+	t.Cleanup(d.stop)
+	require.NoError(t, d.configure(outageInputs("old"), outageLimits), "apply the initial policy")
+
+	// Feed policy updates to the dispatcher as the beater's main loop does.
+	registry := reload.NewRegistry()
+	updates := config.WatchInputs(t.Context(), log, registry)
+	configured := make(chan error, 1)
+	go func() {
+		for {
+			select {
+			case <-t.Context().Done():
+				return
+			case inputs := <-updates:
+				publishing, err := config.GetPublishingConfig(inputs)
+				if err == nil {
+					err = d.configure(inputs, publishing.Scheduled)
+				}
+				configured <- err
+			}
+		}
+	}()
+	policy := func(maxEvents int) []*reload.ConfigWithMeta {
+		return []*reload.ConfigWithMeta{{InputUnitID: "osquery-unit", Config: conf.MustNewConfigFrom(map[string]any{
+			"data_stream": map[string]any{"dataset": config.DefaultDataset, "namespace": "old"},
+			"osquery": map[string]any{
+				"schedule":        map[string]any{"scheduled": map[string]any{"query": "SELECT 1", "interval": 1}},
+				"elastic_options": map[string]any{"publishing": map[string]any{"scheduled": map[string]any{"max_events": maxEvents}}},
+			},
+		})}}
+	}
+
+	assert.Error(t, registry.GetInputList().Reload(policy(-1)), "the policy with a negative max_events must be rejected")
+	select {
+	case err := <-configured:
+		t.Errorf("a rejected policy reached the dispatcher (configure error: %v)", err)
+	case <-time.After(50 * time.Millisecond):
+	}
+	assert.Equal(t, outageMaxEvents, queueLimit(d), "a rejected policy must leave the queue limit unchanged")
+
+	require.NoError(t, registry.GetInputList().Reload(policy(5)), "a valid policy must be accepted")
+	require.NoError(t, <-configured, "apply the valid policy")
+	assert.Equal(t, 5, queueLimit(d), "a valid policy must apply its queue limit")
+}
+
+func queueLimit(d *scheduledResultDispatcher) int {
+	d.queue.mu.Lock()
+	defer d.queue.mu.Unlock()
+	return d.queue.limit
+}
+
+type handledResult struct {
+	publisher scheduledQueryPublisher
+	query     QueryInfo
+}
+
+// recordHandledResults wraps d's handler to report each call. Call it before
+// enqueueing; the queue orders the change before the worker reads it.
+func recordHandledResults(d *scheduledResultDispatcher) <-chan handledResult {
+	calls := make(chan handledResult, 8)
+	handle := d.handle
+	d.handle = func(ctx context.Context, cli scheduledQueryClient, publisher scheduledQueryPublisher, ns string, qi QueryInfo, res QueryResult, responseID string) {
+		calls <- handledResult{publisher: publisher, query: qi}
+		handle(ctx, cli, publisher, ns, qi, res, responseID)
+	}
+	return calls
 }
 
 // activePublisher returns the publisher of d's current policy.

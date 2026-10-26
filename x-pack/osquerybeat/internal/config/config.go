@@ -363,13 +363,9 @@ func GetPublishingConfig(inputs []InputConfig) (PublishingConfig, error) {
 		return cfg, nil
 	}
 	set := *in.Osquery.ElasticOptions.Publishing
-	switch {
-	case set.Scheduled.MaxEvents < 0:
-		return PublishingConfig{}, fmt.Errorf("osquery.elastic_options.publishing.scheduled.max_events must not be negative, got %d", set.Scheduled.MaxEvents)
-	case set.Scheduled.MaxAge < 0:
-		return PublishingConfig{}, fmt.Errorf("osquery.elastic_options.publishing.scheduled.max_age must not be negative, got %s", set.Scheduled.MaxAge)
-	case set.Live.Timeout < 0:
-		return PublishingConfig{}, fmt.Errorf("osquery.elastic_options.publishing.live.timeout must not be negative, got %s", set.Live.Timeout)
+	// Unpacking already validated set; this guards configurations built in code.
+	if err := set.Validate(); err != nil {
+		return PublishingConfig{}, err
 	}
 	if set.Scheduled.MaxEvents > 0 {
 		cfg.Scheduled.MaxEvents = set.Scheduled.MaxEvents

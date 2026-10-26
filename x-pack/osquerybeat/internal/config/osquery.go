@@ -408,6 +408,21 @@ type PublishingConfig struct {
 	Live      LivePublishingConfig      `config:"live"`
 }
 
+// Validate rejects negative settings. go-ucfg calls it while unpacking, so an
+// invalid policy is rejected before it is applied and an invalid standalone
+// configuration fails at startup.
+func (c PublishingConfig) Validate() error {
+	switch {
+	case c.Scheduled.MaxEvents < 0:
+		return fmt.Errorf("osquery.elastic_options.publishing.scheduled.max_events must not be negative, got %d", c.Scheduled.MaxEvents)
+	case c.Scheduled.MaxAge < 0:
+		return fmt.Errorf("osquery.elastic_options.publishing.scheduled.max_age must not be negative, got %s", c.Scheduled.MaxAge)
+	case c.Live.Timeout < 0:
+		return fmt.Errorf("osquery.elastic_options.publishing.live.timeout must not be negative, got %s", c.Live.Timeout)
+	}
+	return nil
+}
+
 // ScheduledPublishingConfig configures the scheduled results queue.
 type ScheduledPublishingConfig struct {
 	// MaxEvents is the queue capacity. Default: 3200.

@@ -6,7 +6,6 @@ package beater
 
 import (
 	"context"
-	"reflect"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -56,11 +55,12 @@ func (l *scheduledResultLease) allowed() bool {
 	return !l.retired.Load() && l.ctx != nil && l.ctx.Err() == nil
 }
 
-// routes reports whether l still sends job's query to the namespace and SQL
-// that job was captured with.
-func (l *scheduledResultLease) routes(job scheduledResult) bool {
-	namespace, query, ok := l.view.lookupResultMetadata(job.result.Name)
-	return ok && namespace == job.namespace && query.Query == job.query.Query
+// routes reports whether l sends the named query to namespace with the same
+// SQL as query. Results are published with the QueryInfo captured at
+// admission, so other metadata may differ.
+func (l *scheduledResultLease) routes(name, namespace string, query QueryInfo) bool {
+	ns, q, ok := l.view.lookupResultMetadata(name)
+	return ok && ns == namespace && q.Query == query.Query
 }
 
 // unlock ends the worker's use of l, closing l if it was retired meanwhile.
@@ -175,8 +175,7 @@ func (d *scheduledResultDispatcher) enqueue(ctx context.Context, client schedule
 		d.dropStale(job)
 		return
 	}
-	expectedNamespace, expectedQuery, ok := d.lease.view.lookupResultMetadata(result.Name)
-	if !ok || namespace != expectedNamespace || !reflect.DeepEqual(query, expectedQuery) {
+	if !d.lease.routes(result.Name, namespace, query) {
 		d.dropStale(job)
 		return
 	}
@@ -214,7 +213,7 @@ func (d *scheduledResultDispatcher) process(job scheduledResult) {
 	switch {
 	case maxAge > 0 && time.Since(job.queuedAt) > maxAge:
 		d.metrics.dropRows(d.metrics.expired, d.metrics.expiredRows, job.rows())
-	case lease == nil || !lease.routes(job):
+	case lease == nil || !lease.routes(job.result.Name, job.namespace, job.query):
 		d.dropStale(job)
 	default:
 		d.publish(lease, job)

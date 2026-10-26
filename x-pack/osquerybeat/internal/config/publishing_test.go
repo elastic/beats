@@ -60,21 +60,29 @@ inputs:
 	assert.Equal(t, 10*time.Second, got.Live.Timeout, "live.timeout override")
 }
 
-func TestGetPublishingConfigRejectsNegative(t *testing.T) {
+func TestPublishingConfigRejectsNegative(t *testing.T) {
 	tests := []struct {
 		name  string
 		yaml  string
 		field string
+		set   PublishingConfig
 	}{
-		{"max_events", "scheduled: {max_events: -1}", "publishing.scheduled.max_events"},
-		{"max_age", "scheduled: {max_age: -1s}", "publishing.scheduled.max_age"},
-		{"timeout", "live: {timeout: -1s}", "publishing.live.timeout"},
+		{"max_events", "scheduled: {max_events: -1}", "publishing.scheduled.max_events", PublishingConfig{Scheduled: ScheduledPublishingConfig{MaxEvents: -1}}},
+		{"max_age", "scheduled: {max_age: -1s}", "publishing.scheduled.max_age", PublishingConfig{Scheduled: ScheduledPublishingConfig{MaxAge: -time.Second}}},
+		{"timeout", "live: {timeout: -1s}", "publishing.live.timeout", PublishingConfig{Live: LivePublishingConfig{Timeout: -time.Second}}},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			inputs := publishingInputs(t, "inputs:\n  - osquery:\n      elastic_options:\n        publishing: {"+tc.yaml+"}\n")
-			_, err := GetPublishingConfig(inputs)
-			require.Error(t, err, "negative value must be rejected")
+			c, err := conf.NewConfigWithYAML([]byte("inputs:\n  - osquery:\n      elastic_options:\n        publishing: {"+tc.yaml+"}\n"), "")
+			require.NoError(t, err, "parsing test YAML")
+			var parsed Config
+			err = c.Unpack(&parsed)
+			require.Error(t, err, "unpacking a negative value must fail, so startup and policy reloads reject it")
+			assert.Contains(t, err.Error(), tc.field, "unpack error must name the offending setting")
+
+			inputs := []InputConfig{{Osquery: &OsqueryConfig{ElasticOptions: &ElasticOptions{Publishing: &tc.set}}}}
+			_, err = GetPublishingConfig(inputs)
+			require.Error(t, err, "GetPublishingConfig must still reject a negative value that bypassed unpacking")
 			assert.Contains(t, err.Error(), tc.field, "error must name the offending setting")
 		})
 	}

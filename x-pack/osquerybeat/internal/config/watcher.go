@@ -7,7 +7,9 @@ package config
 import (
 	"context"
 	"encoding/json"
+	"errors"
 
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -40,7 +42,13 @@ func (r *reloader) Reload(configs []*reload.ConfigWithMeta) error {
 		var icfg InputConfig
 		err := cfg.Config.Unpack(&icfg)
 		if err != nil {
-			return err
+			r.log.Errorf("Rejected osquery input configuration, keeping the previous one: %v", err)
+			// The V2 manager reports only unit errors found in an error list
+			// and discards any other reload error without a log or status.
+			if cfg.InputUnitID != "" {
+				err = cfgfile.UnitError{UnitID: cfg.InputUnitID, Err: err}
+			}
+			return errors.Join(err)
 		}
 
 		// Log the new configuration at the debug level only

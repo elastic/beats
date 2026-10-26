@@ -242,7 +242,7 @@ func TestScheduledWorkerGetsSlotsUnderPoolPressure(t *testing.T) {
 	}
 	const want = 20*5 + 20 // Result rows plus one response per result.
 	assert.Eventually(t, func() bool { return output.scheduled.Load() == want }, 10*time.Second, 10*time.Millisecond,
-		"every scheduled row and response must be published, got %d of %d", output.scheduled.Load(), want)
+		"every scheduled row and response must be published")
 	assert.Zero(t, d.metrics.overflowRows.Get(), "no rows may overflow")
 	assert.Zero(t, d.metrics.staleRows.Get(), "no rows may be stale")
 	assert.Zero(t, d.metrics.expiredRows.Get(), "no rows may expire")
