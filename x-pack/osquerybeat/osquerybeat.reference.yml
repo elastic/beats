@@ -13,7 +13,7 @@ osquerybeat:
 #          #check_timeout: 15s
 #          publishing:
 #            scheduled:
-#              # Capacity of the scheduled results queue. Default: 3200.
+#              # Capacity of the scheduled results queue, counted in rows. Default: 3200.
 #              #max_events: 3200
 #              # Drop queued scheduled results older than this. Default: 0 (disabled).
 #              #max_age: 0s

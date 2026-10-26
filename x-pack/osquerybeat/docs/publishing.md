@@ -48,11 +48,21 @@ A policy change keeps the queued items. Each item carries the namespace and
 query captured when it was queued. When the worker reaches it, it publishes it
 through the clients of the current policy if that policy still has the query
 with the same namespace and SQL, and drops it otherwise. A policy change retires
-the previous clients; rows of an item in flight that were not yet handed to the
-output when this happens are dropped. One `Publish` call can still be blocked
-on the retired clients until the output recovers or the pipeline closes.
-Results of an osqueryd run that has ended are dropped too, as are the rows and
-response of a native result whose column types osqueryd could not resolve.
+the previous clients. The item in flight keeps publishing on them while the new
+policy still has its query with the same namespace and SQL; otherwise its rows
+not yet handed to the output are dropped. One `Publish` call can still be
+blocked on the retired clients until the output recovers or the pipeline
+closes.
+
+The queue also survives osqueryd restarts, such as an options or extensions
+change or a crash. The worker resolves a native result's column types when it
+publishes the result, with the client of the osqueryd run that logged it or,
+once that run has ended, of the current run. While no osqueryd runs, the worker
+keeps that result at the head of the queue and waits; new items queue behind
+it, and it can still be dropped for space, `max_age` or shutdown. When an
+osqueryd run ends, queued items the current policy no longer publishes are
+dropped. The rows and response of a native result whose column types osqueryd
+could not resolve are dropped.
 
 Shutdown drops the queued items and does not wait for a blocked `Publish`.
 
@@ -95,14 +105,15 @@ Reasons:
 |---|---|---|
 | `overflow` | scheduled | Dropped for space, oldest first and profiles first |
 | `expired` | scheduled | Older than `max_age` when the worker reached it |
-| `stale` | both | No current policy publishes it: the query was removed, moved to another namespace or changed SQL, the policy was replaced while it was in flight, its osqueryd run ended, osqueryd could not resolve its column types, or no results stream is configured |
+| `stale` | both | No current policy publishes it: the query was removed, moved to another namespace or changed SQL (also while it was in flight), osqueryd could not resolve its column types, no results stream is configured, or, for a profile, no profile stream is configured |
 | `shutdown` | both | Osquerybeat was stopping |
 | `timeout` | live | The action stopped waiting after `live.timeout` |
 
 For a live action, an item is the action's results and profile, and its rows
-are the rows and profile not handed to the output; the live queue gauges show
-the waiting action. A live action response dropped because osquerybeat is
-stopping counts as its own item of one row. An event the pipeline discards
+are the rows and profile not handed to the output. The live `queue.*` gauges
+cover only the waiting action, not the action responses queued behind it. A
+live action response dropped because osquerybeat is stopping, or because no
+live clients are configured, counts as its own item of one row. An event the pipeline discards
 while closing counts in `dropped_rows.shutdown` only. Each queue logs at most
 one warning per minute about drops, naming the counter that moved.
 
