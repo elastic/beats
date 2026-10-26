@@ -232,7 +232,7 @@ Heartbeat checks the hosts after it resolves the references, so the hosts that a
 
 Because of this order, a monitor that fails the check still reads its secrets from Vault, at most once every 5 minutes for each secret. These reads appear in the Vault audit log. The secrets stay in Heartbeat and aren't sent to any host.
 
-Example:
+In this example, the secrets of the `prod` connection can only be sent to `api.stripe.com`:
 
 ```yaml
 - type: http
