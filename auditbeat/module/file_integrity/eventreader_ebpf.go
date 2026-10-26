@@ -59,13 +59,32 @@ func (r *ebpfReader) Start(done <-chan struct{}) (<-chan Event, error) {
 	return r.eventC, nil
 }
 
+// statsCheckInterval defines the frequency of fetching quark stats.
+const statsCheckInterval = time.Second
+
 // consumeEvents owns the quark queue. The queue is not safe for concurrent
 // use, so every call on it, including Close, happens on this goroutine.
 func (r *ebpfReader) consumeEvents(done <-chan struct{}) {
 	defer close(r.eventC)
 	defer r.queue.Close()
 
-	var lost uint64
+	var (
+		lost      uint64
+		nextCheck time.Time
+	)
+
+	// Retrieves quark stats and checks for lost events.
+	checkLost := func(now time.Time) {
+		if now.Before(nextCheck) {
+			return
+		}
+		nextCheck = now.Add(statsCheckInterval)
+		if stats := r.queue.Stats(); stats.Lost != lost {
+			r.log.Warnf("ebpf watcher lost %d events", stats.Lost-lost)
+			lost = stats.Lost
+		}
+	}
+
 	for {
 		select {
 		case <-done:
@@ -81,10 +100,7 @@ func (r *ebpfReader) consumeEvents(done <-chan struct{}) {
 				r.log.Errorf("ebpf watcher error: %v", err)
 				return
 			}
-			if stats := r.queue.Stats(); stats.Lost != lost {
-				r.log.Warnf("ebpf watcher lost %d events", stats.Lost-lost)
-				lost = stats.Lost
-			}
+			checkLost(time.Now())
 			continue
 		}
 
@@ -94,6 +110,9 @@ func (r *ebpfReader) consumeEvents(done <-chan struct{}) {
 		}
 
 		start := time.Now()
+		// Also check for lost events, periodically, here so that a busy loop
+		// doesn't cause us to miss event drops.
+		checkLost(start)
 		e, ok := NewEventFromQuarkEvent(
 			qe,
 			r.config.MaxFileSizeBytes,
