@@ -40,8 +40,9 @@ var errPluginClosed = errors.New("monitor is stopped")
 // the monitor reports them and retries on its next run.
 func (r *Resolver) WrapFactory(pf plugin.PluginFactory) plugin.PluginFactory {
 	inner := pf
+	resolve := func(cfg *conf.C) (*conf.C, error) { return r.Resolve(cfg, inner.Destinations) }
 	pf.Make = func(name string, cfg *conf.C, info beat.Info) (plugin.Plugin, error) {
-		return newSecretPlugin(r.Resolve, inner, name, cfg, info, r.logger).plugin(), nil
+		return newSecretPlugin(resolve, inner, name, cfg, info, r.logger).plugin(), nil
 	}
 	return pf
 }

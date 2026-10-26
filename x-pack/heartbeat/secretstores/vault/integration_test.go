@@ -145,11 +145,11 @@ func TestIntegrationHTTPMonitor(t *testing.T) {
 	require.NoError(t, err, "monitor config must be valid")
 
 	logger := logptest.NewTestingLogger(t, "")
-	resolved, err := secretstores.NewResolver(logger).Resolve(cfg)
-	require.NoError(t, err, "references must resolve")
-
 	factory, ok := plugin.GlobalPluginsReg.Get("http")
 	require.True(t, ok, "the http plugin must be registered")
+	resolved, err := secretstores.NewResolver(logger).Resolve(cfg, factory.Destinations)
+	require.NoError(t, err, "references must resolve")
+
 	p, err := factory.Make("http", resolved, beat.Info{Logger: logger})
 	require.NoError(t, err, "the http plugin must be created")
 	defer p.Close()

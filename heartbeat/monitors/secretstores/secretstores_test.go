@@ -67,15 +67,23 @@ func (s *fakeStore) Replace(_ context.Context, cfg *conf.C, scope Scope) (*conf.
 	if err := cfg.Unpack(&m); err != nil {
 		return nil, err
 	}
-	return s.replace(m, scope, func(name string) (string, error) {
+	replaced, err := s.replace(m, scope, func(name string) (string, error) {
 		if s.fail {
 			return "", errFakeUnavailable
 		}
 		return s.id + "-" + name, nil
 	})
+	if err != nil || !replaced {
+		return cfg, err
+	}
+	c, err := ucfg.NewFrom(m, ucfg.PathSep(""))
+	return (*conf.C)(c), err
 }
 
-func (s *fakeStore) replace(m map[string]any, scope Scope, resolve func(name string) (string, error)) (*conf.C, error) {
+// replace replaces the references of scope in m, and reports whether it
+// replaced any.
+func (s *fakeStore) replace(m map[string]any, scope Scope, resolve func(name string) (string, error)) (bool, error) {
+	var replaced bool
 	for k, v := range m {
 		str, ok := v.(string)
 		content, found := strings.CutPrefix(str, fakePrefix)
@@ -84,22 +92,22 @@ func (s *fakeStore) replace(m map[string]any, scope Scope, resolve func(name str
 		}
 		name, mine, err := scope.Claim(content)
 		if err != nil {
-			return nil, err
+			return false, err
 		}
 		if !mine {
 			continue
 		}
 		if name == "" {
-			return nil, errors.New("fake: empty reference")
+			return false, errors.New("fake: empty reference")
 		}
 		value, err := resolve(name)
 		if err != nil {
-			return nil, err
+			return false, err
 		}
 		m[k] = value
+		replaced = true
 	}
-	c, err := ucfg.NewFrom(m, ucfg.PathSep(""))
-	return (*conf.C)(c), err
+	return replaced, nil
 }
 
 func init() {
@@ -261,7 +269,7 @@ func TestResolveWithoutSecretStores(t *testing.T) {
 	r := NewResolver(logptest.NewTestingLogger(t, ""))
 	cfg := newTestConfig(t, map[string]any{"type": "http", "target": "fake:main@token", "x": "${unknown.ref}"})
 
-	got, err := r.Resolve(cfg)
+	got, err := r.Resolve(cfg, nil)
 	require.NoError(t, err, "a config without secret stores must not fail")
 	assert.Same(t, cfg, got, "a config without secret stores must be returned as is")
 	assert.NoError(t, r.Validate(cfg), "references are not checked without secret stores")
@@ -277,7 +285,7 @@ func TestResolveReplacesOnlyInCopy(t *testing.T) {
 		ConfigKey:  fakeStores(),
 	})
 
-	got, err := r.Resolve(cfg)
+	got, err := r.Resolve(cfg, nil)
 	require.NoError(t, err, "references must resolve")
 
 	var resolved struct {
@@ -307,7 +315,7 @@ func TestResolveRunsStoresInOrder(t *testing.T) {
 		"chained": "fake:main@x",
 		ConfigKey: []any{map[string]any{"type": fakeType, "name": "main", "id": "fake:main@"}, map[string]any{"type": otherType, "name": "main"}},
 	})
-	got, err := r.Resolve(cfg)
+	got, err := r.Resolve(cfg, nil)
 	require.NoError(t, err, "references must resolve")
 	var resolved struct {
 		Chained string `config:"chained"`
@@ -323,9 +331,9 @@ func TestResolveSharesStoresAcrossMonitors(t *testing.T) {
 		return newTestConfig(t, map[string]any{"type": "http", "target": "fake:main@token", ConfigKey: fakeStores()})
 	}
 
-	_, err := r.Resolve(newCfg())
+	_, err := r.Resolve(newCfg(), nil)
 	require.NoError(t, err, "first monitor must resolve")
-	_, err = r.Resolve(newCfg())
+	_, err = r.Resolve(newCfg(), nil)
 	require.NoError(t, err, "second monitor must resolve")
 
 	assert.Equal(t, 1, sharedStoreCount(), "monitors with the same connection must share one store")
@@ -352,7 +360,7 @@ func TestResolveErrors(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			resetSharedStores(t)
 			r := NewResolver(logptest.NewTestingLogger(t, ""))
-			_, err := r.Resolve(newTestConfig(t, tc.cfg))
+			_, err := r.Resolve(newTestConfig(t, tc.cfg), nil)
 			assert.ErrorContains(t, err, tc.wantErr, "resolution must fail")
 		})
 	}
@@ -447,7 +455,7 @@ func TestResolveNamedEntries(t *testing.T) {
 
 			// Validation must find the same problems without contacting the stores.
 			verr := r.Validate(cfg)
-			got, err := r.Resolve(cfg)
+			got, err := r.Resolve(cfg, nil)
 			if tc.wantErr != "" {
 				assert.ErrorContains(t, verr, tc.wantErr, "validation must fail")
 				assert.ErrorContains(t, err, tc.wantErr, "resolution must fail")
