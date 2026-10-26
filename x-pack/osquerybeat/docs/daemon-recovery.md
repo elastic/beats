@@ -9,6 +9,6 @@ connection-reset, EOF, extension watchdog and network timeout errors. This chang
 adds no backoff or retry limit and leaves existing health reporting unchanged.
 Repeated runtime failures can therefore cause repeated immediate restarts.
 
-Restart waits for the previous run to finish cleanup. A logger callback blocked
-on output publication can still delay recovery. Scheduled query profiling runs
-outside the logger callback, and a stuck profile publish does not delay restart.
+Restart waits for the previous run to finish cleanup. Output publishing no
+longer runs in the logger callback; see [publishing.md](publishing.md) for what
+can still wait for the output.

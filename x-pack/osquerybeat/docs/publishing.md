@@ -3,10 +3,11 @@
 Osquerybeat publishes osquery results from two internal queues, each with its
 own worker and its own output clients: one for scheduled queries and one for
 live queries. The workers use blocking `beat.Client.Publish`, so under output
-back-pressure they wait for queue slots alongside other receivers instead of
-dropping events. osqueryd's logger callback only adds results to the scheduled
-queue and never waits for the output, so a slow output cannot hold the logger
-RPC until osqueryd times out.
+back-pressure they wait for queue slots alongside other receivers, as
+publishing did before; what changes is where they wait. osqueryd's logger
+callback only adds results to the scheduled queue and never waits for the
+output, so a slow output can no longer hold the logger RPC until osqueryd
+times out.
 
 ## Settings
 
@@ -23,7 +24,10 @@ publishing:
 ```
 
 Negative values are rejected, and the policy that contains them is not
-applied.
+applied. Durations are Go durations such as `60s`, or bare integers in
+seconds; a quoted number without a unit, such as `"60"`, is rejected.
+`max_events` has no upper bound, like `queue.mem.events`, and the memory the
+queue can use grows with it.
 
 ## Scheduled queue
 
@@ -74,7 +78,8 @@ use up the window. If the timeout elapses, the action reports the rows handed
 over so far as its count, with an error. The remaining rows are skipped; a row
 already inside a blocked `Publish` can still be delivered late. The action's
 response document is published after its rows and is not dropped by the
-timeout, so Kibana always learns the outcome. If osquerybeat is stopping, the
+timeout, so Kibana learns the outcome unless osquerybeat stops before the
+response is published. If osquerybeat is stopping, the
 action reports an error instead of a count. If no results stream is configured,
 the action reports that error instead.
 
@@ -105,7 +110,7 @@ Reasons:
 |---|---|---|
 | `overflow` | scheduled | Dropped for space, oldest first and profiles first |
 | `expired` | scheduled | Older than `max_age` when the worker reached it |
-| `stale` | both | No current policy publishes it: the query was removed, moved to another namespace or changed SQL (also while it was in flight), osqueryd could not resolve its column types, no results stream is configured, or, for a profile, no profile stream is configured |
+| `stale` | both | No current policy publishes it: the query was removed, moved to another namespace or changed SQL (also while it was in flight), osqueryd could not resolve its column types, no results stream is configured, or, for a profile or an action response, no profile or action response stream is configured |
 | `shutdown` | both | Osquerybeat was stopping |
 | `timeout` | live | The action stopped waiting after `live.timeout` |
 
@@ -113,9 +118,10 @@ For a live action, an item is the action's results and profile, and its rows
 are the rows and profile not handed to the output. The live `queue.*` gauges
 cover only the waiting action, not the action responses queued behind it. A
 live action response dropped because osquerybeat is stopping, or because no
-live clients are configured, counts as its own item of one row. An event the pipeline discards
-while closing counts in `dropped_rows.shutdown` only. Each queue logs at most
-one warning per minute about drops, naming the counter that moved.
+live clients or no action response stream are configured, counts as its own
+item of one row. An event the pipeline discards while closing counts in
+`dropped_rows.shutdown` only. Each queue logs at most one warning per minute
+about drops, naming the counter that moved.
 
 A scheduled profile dropped once it is queued is counted only under
 `osquerybeat.publishing.scheduled`. The profile collection worker reports
@@ -127,7 +133,19 @@ collected and queued, not delivered.
 ## Behaviour changes
 
 - Any invalid osquery input configuration, including invalid publishing
-  settings, now marks the osquery unit as failed. Before, an invalid
-  configuration was ignored and the unit stayed healthy.
+  settings, is now rejected. On the process runtime the osquery unit is
+  marked failed and the previous settings stay active; before, an invalid
+  configuration was ignored and the unit stayed healthy. On the OTel runtime
+  the receiver fails to start.
 - Live query actions that fail now report their real `started_at` and
   `completed_at`.
+- Live query action responses are published asynchronously by the live
+  worker, after the action's rows, instead of synchronously when the action
+  returns.
+- Live query rows not handed to the output within `live.timeout` are skipped
+  and the action reports a partial count with an error. Before, they were
+  delivered eventually, once the blocked publish went through.
+- Queued scheduled results survive osqueryd restarts (an options or
+  extensions change, or a crash) and are published once osqueryd runs again.
+- Results still queued when osquerybeat stops are dropped and counted as
+  `shutdown`.

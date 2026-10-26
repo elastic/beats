@@ -42,7 +42,7 @@ func (r *reloader) Reload(configs []*reload.ConfigWithMeta) error {
 		var icfg InputConfig
 		err := cfg.Config.Unpack(&icfg)
 		if err != nil {
-			r.log.Errorf("Rejected osquery input configuration; any configuration already applied stays active: %v", err)
+			r.log.Errorf("Rejected osquery input configuration; any configuration already applied stays active and, on the Elastic Agent process runtime, the osquery unit is marked failed: %v", err)
 			// The V2 manager reports only unit errors found in an error list
 			// and discards any other reload error without a log or status.
 			if cfg.InputUnitID != "" {
