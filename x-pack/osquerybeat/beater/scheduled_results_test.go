@@ -709,6 +709,21 @@ func TestScheduledResultsUnroutedAtDaemonRestartAreStale(t *testing.T) {
 	assert.Zero(t, items, "the pruned result must leave the queue")
 }
 
+func TestScheduledResultsConfigureNamesInvalidPolicy(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "invalid-mapping")
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents,
+		func(func() bool, func(), func(int)) osquerybeatPublisher { return &mockBeatPublisher{} }, (&osquerybeat{log: log}).handleScheduledQueryResult)
+	t.Cleanup(d.stop)
+	inputs := outageInputs("old")
+	query := inputs[0].Osquery.Schedule["scheduled"]
+	query.ECSMapping = map[string]any{"user": map[string]any{"id": map[string]any{"field": ""}}}
+	inputs[0].Osquery.Schedule["scheduled"] = query
+
+	err := d.configure(inputs, outageLimits)
+	assert.ErrorIs(t, err, ErrECSMappingIsInvalid, "the policy's invalid ECS mapping must be rejected")
+	assert.ErrorContains(t, err, "invalid osquery configuration", "the error must name the configuration as the cause")
+}
+
 func TestScheduledResultsInvalidPolicyKeepsLimits(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "invalid-policy")
 	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(func() bool, func(), func(int)) osquerybeatPublisher {

@@ -6,6 +6,7 @@ package beater
 
 import (
 	"context"
+	"fmt"
 	"slices"
 	"sync"
 	"sync/atomic"
@@ -220,10 +221,10 @@ func (d *scheduledResultDispatcher) configure(inputs []config.InputConfig, cfg c
 	if config.ResultInput(inputs) != nil {
 		view := NewConfigPlugin(d.log)
 		if err := view.Set(inputs); err != nil {
-			return err
+			return fmt.Errorf("invalid osquery configuration: %w", err)
 		}
 		if _, err := view.GenerateConfig(d.ctx); err != nil {
-			return err
+			return fmt.Errorf("invalid osquery configuration: %w", err)
 		}
 		next = &scheduledResultLease{view: view, profiles: slices.ContainsFunc(inputs, func(in config.InputConfig) bool {
 			return in.Datastream.Dataset == config.DefaultQueryProfileDataset
