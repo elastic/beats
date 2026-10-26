@@ -214,7 +214,13 @@ A monitor that references the connection passes the check when:
 * It's an `http` monitor with `max_redirects` set to `0`, the default, or a monitor of another type. A redirect can send the request to any host.
 * It's an `http` monitor without `kerberos`, or a monitor of another type. Kerberos sends data derived from the password to the Kerberos servers (KDCs), which are not checked.
 
-Host names are compared without case and without a trailing dot. Ports are ignored, so `api.example.com` allows `https://api.example.com:8443`. IP addresses are compared as addresses, so `::1` allows `[0:0:0:0:0:0:0:1]`. Internationalized host names are compared in the ASCII form that Heartbeat connects to, so `bücher.example` allows `xn--bcher-kva.example`. Wildcards are not supported.
+Hosts are compared as follows:
+
+* Host names are compared case-insensitively and without a trailing dot. They aren't resolved, so allowing a name doesn't allow its IP addresses.
+* Ports are ignored, so `api.example.com` allows `https://api.example.com:8443`.
+* IP addresses are compared as addresses, so `::1` allows `[0:0:0:0:0:0:0:1]`.
+* Internationalized host names are compared in their ASCII (Punycode) form, so `bücher.example` allows `xn--bcher-kva.example`.
+* Wildcards aren't supported.
 
 Heartbeat checks the hosts after it resolves the references, so the hosts that are checked are the ones the monitor connects to. For example, `https://attacker.example/?k=vault://prod@payments/stripe#api_key` is rejected because `attacker.example` is not allowed, and so is a URL or a host that comes from a secret and isn't in `allowed_hosts`.
 
