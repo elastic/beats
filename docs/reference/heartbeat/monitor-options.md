@@ -213,12 +213,12 @@ The error doesn't name the host, because a host can come from a secret.
 
 A monitor that lists the connection in `secret_stores` but doesn't reference it is not checked.
 
-A monitor that references the connection passes the check when:
+A monitor that references a connection with `allowed_hosts` runs only if all of these conditions are met:
 
-* Its type is `http`, `tcp`, or `icmp`. Browser monitors can't use the connection, because their scripts can send the secrets to any host.
-* Every host it connects to is in `allowed_hosts`: the hosts of `urls` or `hosts`, and the host of `proxy_url` if it's set.
-* It's an `http` monitor with `max_redirects` set to `0`, the default, or a monitor of another type. A redirect can send the request to any host.
-* It's an `http` monitor without `kerberos`, or a monitor of another type. Kerberos sends data derived from the password to the Kerberos servers (KDCs), which are not checked.
+* It's an `http`, `tcp`, or `icmp` monitor. Browser monitors can't use the connection, because their scripts can send the secrets to any host.
+* Every host it connects to is in `allowed_hosts`. This includes the hosts in `urls` or `hosts` and, if set, the host in `proxy_url`.
+* For `http` monitors, `max_redirects` is `0`, which is the default. A redirect can send the request to any host.
+* For `http` monitors, `kerberos` isn't set. Kerberos sends data derived from the password to the Kerberos servers (KDCs), which aren't checked.
 
 Hosts are compared as follows:
 
