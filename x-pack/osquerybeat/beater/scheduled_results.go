@@ -407,6 +407,12 @@ func (d *scheduledResultDispatcher) publish(lease *scheduledResultLease, item sc
 	case scheduledResult:
 		unresolved = d.handle(ctx, client, lease.publisher, item.namespace, item.query, item.result, item.responseID)
 	case resolvedScheduledResult:
+		if item.profile != nil && !lease.profiles {
+			// Without a profile stream the publisher has no client for it.
+			item.profile = nil
+			d.metrics.dropRows(dropStale, 1)
+			d.profileMetrics.stale.Inc()
+		}
 		publishResolvedResult(lease.publisher, item)
 	case scheduledProfileItem:
 		lease.publisher.PublishScheduledProfile(config.QueryProfileDatastream(item.namespace), item.name, item.scheduleID, item.responseID, item.spaceID, item.executionCount, item.profile)

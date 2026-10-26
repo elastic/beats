@@ -528,6 +528,18 @@ func TestScheduledProfilesNeedProfileStream(t *testing.T) {
 	assert.Zero(t, blocked.profiles.Load()+next.profiles.Load(), "no profile may be published without a profile stream")
 }
 
+func TestScheduledRunProfileNeedsProfileStream(t *testing.T) {
+	d, _, publisher, release := outageDispatcher(t, outageLimits)
+	release()
+	d.enqueueResolved(resolvedScheduledResult{name: "scheduled", namespace: "old", query: QueryInfo{Query: "SELECT 1"}, profile: map[string]any{}})
+	assert.Eventually(t, func() bool { return publisher.calls.Load() == 1 }, time.Second, time.Millisecond,
+		"the run's response must be published without a profile stream")
+	assert.Zero(t, publisher.profiles.Load(), "the run's profile must not be published without a profile stream")
+	assert.Equal(t, uint64(1), d.metrics.droppedRows[dropStale].Get(), "count the run's profile as a stale row")
+	assert.Zero(t, d.metrics.dropped[dropStale].Get(), "the run itself was published")
+	assert.Equal(t, uint64(1), d.profileMetrics.stale.Get(), "count the profile where existing dashboards read them")
+}
+
 func TestScheduledItemsDroppedAfterStop(t *testing.T) {
 	tests := []struct {
 		name         string
