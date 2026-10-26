@@ -237,7 +237,7 @@ type TestContext struct {
 	// Cancelation is used by Beats to signal the input to shut down.
 	//
 	// An input started with a Context parameter, ctx, must shut down when
-	// <-ctx.Cancelation.Done() does not block or when ctx.Cancelation.Error()
+	// <-ctx.Cancelation.Done() does not block or when ctx.Cancelation.Err()
 	// returns a non-nil error. If an input is started with a specific Context
 	// it should only shut down in response to that Context's Cancelation.
 	Cancelation context.Context
