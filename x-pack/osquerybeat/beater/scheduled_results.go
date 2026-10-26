@@ -272,23 +272,26 @@ func (d *scheduledResultDispatcher) enqueue(ctx context.Context, client schedule
 	}
 	job.namespace, job.query = namespace, query
 	d.mu.Lock()
-	defer d.mu.Unlock()
 	// A result of an ended run is kept: any run's client resolves its rows.
 	if d.closed {
 		d.dropShutdown(job)
+		d.mu.Unlock()
 		return
 	}
 	if d.lease == nil || !d.lease.routes(job) {
 		d.dropStale(job)
+		d.mu.Unlock()
 		return
 	}
 	responseID := uuid.Must(uuid.NewV4()).String()
 	job.queuedAt, job.responseID = time.Now(), responseID
 	d.queue.push(job)
+	profiles := d.lease.profiles
+	d.mu.Unlock()
 	// Profiling keeps its own collection worker. Its admission never waits for
 	// this result's publication or shares the result worker. Without a profile
 	// stream, skip the profile RPC.
-	if d.profile != nil && d.lease.profiles {
+	if d.profile != nil && profiles {
 		d.profile(profiler, namespace, query, result, responseID)
 	}
 }
