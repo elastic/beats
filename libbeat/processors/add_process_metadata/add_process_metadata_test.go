@@ -33,12 +33,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/capabilities"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cgroup"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 type testCGRsolver struct {
@@ -74,7 +73,11 @@ func TestNilProcessor(t *testing.T) {
 func TestDefaultProcessorStartup(t *testing.T) {
 	// set initCgroupPaths to system non-test defaults
 	initCgroupPaths = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (processors.CGReader, error) {
-		return cgroup.NewReader(rootfsMountpoint, ignoreRootCgroups)
+		return cgroup.NewReaderOptions(cgroup.ReaderOptions{
+			RootfsMountpoint:  rootfsMountpoint,
+			IgnoreRootCgroups: ignoreRootCgroups,
+			Logger:            logptest.NewTestingLogger(t, ""),
+		})
 	}
 
 	proc, err := newProcessMetadataProcessorWithProvider(defaultConfig(), &procCache, false, logptest.NewTestingLogger(t, ""))
@@ -928,8 +931,6 @@ func TestAddProcessMetadata(t *testing.T) {
 }
 
 func TestUsingCache(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors(processorName))
-
 	selfPID := os.Getpid()
 
 	// mock of the cgroup processCgroupPaths
@@ -1037,8 +1038,6 @@ func TestUsingCache(t *testing.T) {
 }
 
 func TestSelf(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors(processorName))
-
 	config, err := conf.NewConfigFrom(mapstr.M{
 		"match_pids": []string{"self_pid"},
 		"target":     "self",
@@ -1071,8 +1070,6 @@ func TestSelf(t *testing.T) {
 }
 
 func TestBadProcess(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors(processorName))
-
 	config, err := conf.NewConfigFrom(mapstr.M{
 		"match_pids": []string{"self_pid"},
 		"target":     "self",

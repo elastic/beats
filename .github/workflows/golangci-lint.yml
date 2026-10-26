@@ -16,7 +16,6 @@ on:
 
 permissions:
   contents: read
-  # Optional: allow read access to pull request. Use with `only-new-issues` option.
   pull-requests: read
 jobs:
   golangci:
@@ -28,6 +27,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          # --new-from-merge-base below needs the history of the base branch.
+          fetch-depth: 0
 
       - uses: actions/setup-go@v7
         with:
@@ -48,8 +50,14 @@ jobs:
           version-file: .golangci-lint-version
 
           # Give the job more time to execute.
+          #
           # Issues are reported only on the lines the pull request changed.
-          args: --timeout=90m
-
-          # Optional: show only new issues if it's a pull request. The default value is `false`.
-          only-new-issues: true
+          # This is not done with the action's `only-new-issues` option: that
+          # one fetches the diff from the GitHub API, which refuses diffs over
+          # 20000 lines or 300 files and then silently lints the whole
+          # repository instead. --new-from-merge-base computes the same filter
+          # locally from git and has no size limit. `base_ref` is empty on
+          # workflow_dispatch, where there is nothing to compare against.
+          args: >-
+            --timeout=90m
+            ${{ github.base_ref && format('--new-from-merge-base=origin/{0}', github.base_ref) || '' }}

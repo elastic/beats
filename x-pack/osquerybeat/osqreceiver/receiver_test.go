@@ -172,3 +172,22 @@ func genSocketPath() string {
 	socketDir := os.TempDir()
 	return filepath.Join(socketDir, socketName)
 }
+
+func TestComponentLifecycle(t *testing.T) {
+	// TODO: re-enable once https://github.com/elastic/beats/issues/53865 is fixed.
+	t.Skip("osquerybeat Shutdown hangs when called right after Start, see https://github.com/elastic/beats/issues/53865")
+
+	cfg := &Config{
+		Beatconfig: map[string]any{
+			"osquerybeat": map[string]any{
+				"inputs": []any{
+					map[string]any{
+						"type": "osquery",
+					},
+				},
+			},
+			"path.home": t.TempDir(),
+		},
+	}
+	oteltest.CheckReceiverLifecycle(t, NewFactoryWithSettings(Settings{Home: t.TempDir()}), cfg)
+}

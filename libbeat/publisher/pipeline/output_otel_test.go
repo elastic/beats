@@ -22,6 +22,7 @@ package pipeline
 import (
 	"context"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -559,4 +560,42 @@ func cancelledContext() context.Context {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	return ctx
+}
+
+type countingClient struct {
+	published atomic.Int32
+	closed    atomic.Bool
+}
+
+func (c *countingClient) String() string { return "countingClient" }
+func (c *countingClient) Close() error   { c.closed.Store(true); return nil }
+func (c *countingClient) Publish(ctx context.Context, b publisher.Batch) error {
+	<-ctx.Done()
+	c.published.Add(1)
+	return nil
+}
+
+// TestSpawningDispatcherCloseWaitsForPublish verifies dispatch never blocks and
+// Close cancels the publish context, waits for in-flight publishes, then closes
+// the client.
+func TestSpawningDispatcherCloseWaitsForPublish(t *testing.T) {
+	client := &countingClient{}
+	d := newSpawningDispatcher(client)
+
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		d.dispatch(nil)
+		d.dispatch(&ttlBatch{})
+		d.dispatch(&ttlBatch{})
+	}()
+	select {
+	case <-done:
+	case <-time.After(2 * time.Second):
+		t.Fatal("dispatch blocked while publishes were in flight")
+	}
+
+	require.NoError(t, d.Close(), "Close should succeed")
+	assert.Equal(t, int32(2), client.published.Load(), "Close should wait for in-flight publishes")
+	assert.True(t, client.closed.Load(), "Close should close the client")
 }

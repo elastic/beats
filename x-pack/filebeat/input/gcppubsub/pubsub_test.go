@@ -314,3 +314,42 @@ func TestEndToEndACK(t *testing.T) {
 		}
 	})
 }
+
+func TestAPIEndpointOverride(t *testing.T) {
+	cfg := defaultTestConfig()
+	err := cfg.SetString("api_endpoint", -1, "invalid-custom-endpoint.example.com:443")
+	assert.NoError(t, err, "failed to set api_endpoint configuration")
+
+	runTest(t, cfg, func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T) {
+		err := input.run()
+		assert.Error(t, err, "expected input.run() to fail when using an unreachable custom API endpoint")
+	})
+}
+
+func TestAPIEndpointOverrideSuccess(t *testing.T) {
+	host := testutil.EnsureEmulator(t)
+
+	cfg := defaultTestConfig()
+	err := cfg.SetString("api_endpoint", -1, host)
+	assert.NoError(t, err, "failed to set api_endpoint configuration")
+
+	runTest(t, cfg, func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T) {
+		testutil.CreateTopic(t, client)
+		testutil.CreateSubscription(t, emulatorSubscription, client)
+		testutil.PublishMessages(t, client, 5)
+
+		var group errgroup.Group
+		group.Go(input.run)
+
+		time.AfterFunc(10*time.Second, func() { out.Close() })
+		events, ok := out.waitForEvents(5)
+		if !ok {
+			t.Errorf("Expected 5 events, but got %d.", len(events))
+		}
+		input.Stop()
+
+		if err := group.Wait(); err != nil {
+			t.Errorf("unexpected error from errgroup: %v", err)
+		}
+	})
+}

@@ -1,0 +1,17 @@
+# Source: system_audit/data_stream/package/agent/stream/package.yml.hbs
+# rendered with default variable values, plus the module field that
+# elastic-agent must inject when translating audit/system streams.
+module: system
+type: audit/system
+datasets:
+  - package
+period: 2m
+state.period: 12h
+tags:
+  - audit-system-package
+data_stream:
+  dataset: system_audit.package
+  type: logs
+  namespace: default
+processors:
+  - add_host_metadata: ~

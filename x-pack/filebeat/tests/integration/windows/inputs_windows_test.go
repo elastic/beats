@@ -91,6 +91,48 @@ output.console:
 	})
 }
 
+// TestWinlogStartPositionEnd checks that start_position is plumbed through the
+// Filebeat winlog input: with no saved bookmark and start_position: end, the
+// reader subscribes to future events only and logs that it did so.
+func TestWinlogStartPositionEnd(t *testing.T) {
+	buildCtx, cancelBuild := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancelBuild()
+	lbint.EnsureCompiled(buildCtx, t, "filebeat")
+
+	// The expected log line is emitted on the first subscription attempt, so
+	// the run itself should only take a few seconds.
+	ctx, cancel := context.WithTimeout(t.Context(), 30*time.Second)
+	defer cancel()
+
+	reportOptions := lbint.ReportOptions{
+		PrintLinesOnFail:  10,
+		PrintConfigOnFail: true,
+	}
+
+	configTemplate := `
+filebeat.inputs:
+  - type: winlog
+    id: "test-winlog-start-position-end"
+    enabled: true
+    name: Application
+    start_position: end
+output.console:
+  enabled: true
+logging.level: info
+`
+
+	test := fbint.NewTest(t, fbint.TestOptions{
+		Config: configTemplate,
+	})
+
+	test.
+		ExpectOutput("No bookmark found, starting at the end of the channel").
+		WithReportOptions(reportOptions).
+		ExpectStart().
+		Start(ctx).
+		Wait()
+}
+
 func TestWinlogIgnoreMissingChannel(t *testing.T) {
 	t.Skip("Flaky Test: https://github.com/elastic/beats/issues/49015")
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)

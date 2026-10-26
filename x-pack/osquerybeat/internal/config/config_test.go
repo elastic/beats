@@ -6,6 +6,7 @@ package config
 
 import (
 	"testing"
+	"time"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
@@ -453,4 +454,159 @@ func TestGetOsqueryExtensions(t *testing.T) {
 			t.Fatalf("unexpected require: %v", cfg.Require)
 		}
 	})
+}
+
+func TestGetOsqueryCheckTimeout(t *testing.T) {
+	t.Run("missing input returns default", func(t *testing.T) {
+		got, err := GetOsqueryCheckTimeout(nil)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if got != DefaultCheckTimeout {
+			t.Fatalf("expected default %s, got %s", DefaultCheckTimeout, got)
+		}
+	})
+
+	t.Run("returns first input check timeout", func(t *testing.T) {
+		inputs := []InputConfig{
+			{
+				Osquery: &OsqueryConfig{
+					ElasticOptions: &ElasticOptions{
+						CheckTimeout: "30s",
+					},
+				},
+			},
+		}
+		got, err := GetOsqueryCheckTimeout(inputs)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if got != 30*time.Second {
+			t.Fatalf("unexpected timeout: %s", got)
+		}
+	})
+
+	t.Run("unpacks config tags from yaml", func(t *testing.T) {
+		c, err := conf.NewConfigFrom(map[string]any{
+			"inputs": []map[string]any{
+				{
+					"osquery": map[string]any{
+						"elastic_options": map[string]any{
+							"check_timeout": "45s",
+						},
+					},
+				},
+			},
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		var parsed Config
+		if err := c.Unpack(&parsed); err != nil {
+			t.Fatal(err)
+		}
+		got, err := GetOsqueryCheckTimeout(parsed.Inputs)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if got != 45*time.Second {
+			t.Fatalf("unexpected timeout: %s", got)
+		}
+	})
+
+	t.Run("invalid duration returns error", func(t *testing.T) {
+		inputs := []InputConfig{
+			{
+				Osquery: &OsqueryConfig{
+					ElasticOptions: &ElasticOptions{
+						CheckTimeout: "not-a-duration",
+					},
+				},
+			},
+		}
+		_, err := GetOsqueryCheckTimeout(inputs)
+		if err == nil {
+			t.Fatal("expected error for invalid check_timeout")
+		}
+	})
+
+	t.Run("non-positive duration returns error", func(t *testing.T) {
+		inputs := []InputConfig{
+			{
+				Osquery: &OsqueryConfig{
+					ElasticOptions: &ElasticOptions{
+						CheckTimeout: "0s",
+					},
+				},
+			},
+		}
+		_, err := GetOsqueryCheckTimeout(inputs)
+		if err == nil {
+			t.Fatal("expected error for non-positive check_timeout")
+		}
+	})
+}
+
+func TestResultInput(t *testing.T) {
+	result := InputConfig{Datastream: DatastreamConfig{Dataset: DefaultDataset}}
+	actions := InputConfig{Datastream: DatastreamConfig{Dataset: DefaultActionResponsesDataset}}
+	profile := InputConfig{Datastream: DatastreamConfig{Dataset: DefaultQueryProfileDataset}}
+	noDataset := InputConfig{}
+	custom := InputConfig{Datastream: DatastreamConfig{Dataset: "custom.dataset"}}
+
+	tests := []struct {
+		name   string
+		inputs []InputConfig
+		want   int // Index into inputs, or -1 for nil.
+	}{
+		{name: "empty", inputs: nil, want: -1},
+		{name: "result_first", inputs: []InputConfig{result, actions, profile}, want: 0},
+		{name: "result_last", inputs: []InputConfig{profile, actions, result}, want: 2},
+		{name: "empty_dataset_is_result", inputs: []InputConfig{actions, noDataset}, want: 1},
+		{name: "first_match_wins", inputs: []InputConfig{actions, noDataset, result}, want: 1},
+		{name: "custom_dataset_falls_back_to_first_input", inputs: []InputConfig{custom}, want: 0},
+		{name: "no_result_falls_back_to_first_input", inputs: []InputConfig{actions, profile}, want: 0},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := ResultInput(test.inputs)
+			if test.want < 0 {
+				if got != nil {
+					t.Errorf("ResultInput(%d inputs) = %v; want nil", len(test.inputs), got)
+				}
+				return
+			}
+			if got != &test.inputs[test.want] {
+				t.Errorf("ResultInput(%d inputs) did not return inputs[%d]", len(test.inputs), test.want)
+			}
+		})
+	}
+}
+
+// TestGettersUseResultInput checks that the getters read the result input
+// when it is not the first input.
+func TestGettersUseResultInput(t *testing.T) {
+	inputs := []InputConfig{
+		{Datastream: DatastreamConfig{Dataset: DefaultQueryProfileDataset}},
+		{Datastream: DatastreamConfig{Dataset: DefaultActionResponsesDataset}},
+		{
+			Datastream: DatastreamConfig{Dataset: DefaultDataset},
+			Osquery: &OsqueryConfig{
+				Options:        map[string]any{"verbose": true},
+				ElasticOptions: &ElasticOptions{CheckTimeout: "42s"},
+			},
+		},
+	}
+
+	opts := GetOsqueryOptions(inputs)
+	if opts["verbose"] != true {
+		t.Errorf("GetOsqueryOptions = %v; want verbose=true", opts)
+	}
+	timeout, err := GetOsqueryCheckTimeout(inputs)
+	if err != nil {
+		t.Fatalf("GetOsqueryCheckTimeout: %v", err)
+	}
+	if timeout != 42*time.Second {
+		t.Errorf("GetOsqueryCheckTimeout = %v; want 42s", timeout)
+	}
 }

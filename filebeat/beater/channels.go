@@ -24,12 +24,16 @@ import (
 	"github.com/elastic/beats/v7/filebeat/registrar"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type registrarLogger struct {
-	done chan struct{}
-	ch   chan<- []file.State
+	log       *logp.Logger
+	done      chan struct{}
+	closeOnce sync.Once
+	start     func() error
+	ch        chan<- []file.State
 }
 
 type finishedLogger struct {
@@ -56,15 +60,29 @@ type countingClientListener struct {
 	wgEvents *eventCounter
 }
 
-func newRegistrarLogger(reg *registrar.Registrar) *registrarLogger {
+func newRegistrarLogger(reg *registrar.Registrar, log *logp.Logger) *registrarLogger {
 	return &registrarLogger{
-		done: make(chan struct{}),
-		ch:   reg.Channel,
+		log:   log,
+		done:  make(chan struct{}),
+		start: reg.Start,
+		ch:    reg.Channel,
 	}
 }
 
-func (l *registrarLogger) Close() { close(l.done) }
+func (l *registrarLogger) Close() { l.closeOnce.Do(func() { close(l.done) }) }
 func (l *registrarLogger) Published(states []file.State) {
+	select {
+	case <-l.done:
+		l.ch = nil
+		return
+	default:
+	}
+
+	if err := l.start(); err != nil {
+		l.log.Errorf("Could not start registrar: %v; dropping file state updates", err)
+		l.Close()
+	}
+
 	select {
 	case <-l.done:
 		// set ch to nil, so no more events will be send after channel close signal

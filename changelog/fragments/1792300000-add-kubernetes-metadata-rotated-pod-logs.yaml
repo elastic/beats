@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: add_kubernetes_metadata now attaches container metadata to rotated Kubernetes pod log files.
+component: filebeat

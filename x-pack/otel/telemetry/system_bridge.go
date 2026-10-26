@@ -6,6 +6,7 @@ package telemetry
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"go.opentelemetry.io/collector/component"
@@ -13,9 +14,9 @@ import (
 	"go.opentelemetry.io/otel/metric/noop"
 	"go.uber.org/zap"
 
+	metricreport "github.com/elastic/beats/v7/pkg/systemmetrics/report"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 )
 
 var (
@@ -63,8 +64,13 @@ func AcquireSystemBridge(settings component.TelemetrySettings) (func(), error) {
 		processReg := reg.GetOrCreateRegistry("beat")
 		systemReg := reg.GetOrCreateRegistry("system")
 
-		err := metricreport.SetupMetricsOptions(metricreport.MetricOptions{
-			Logger:         logp.NewLogger("system-bridge"),
+		logger, err := logp.NewZapLogger(settings.Logger.Named("system-bridge"))
+		if err != nil {
+			return nil, fmt.Errorf("failed to adapt the collector logger: %w", err)
+		}
+
+		err = metricreport.SetupMetricsOptions(metricreport.MetricOptions{
+			Logger:         logger,
 			Name:           "beat",
 			SystemMetrics:  systemReg,
 			ProcessMetrics: processReg,
@@ -222,11 +228,14 @@ func (b *SystemRegistryBridge) callback(_ context.Context, obs metric.Observer) 
 // shutdown unregisters the callback and marks the bridge as closed.
 func (b *SystemRegistryBridge) shutdown() {
 	b.mu.Lock()
-	defer b.mu.Unlock()
-
 	b.closed = true
-	if b.registration != nil {
-		_ = b.registration.Unregister()
-		b.registration = nil
+	reg := b.registration
+	b.registration = nil
+	b.mu.Unlock()
+
+	// Unregister waits for an in-flight callback, and the callback takes b.mu,
+	// so it must not be called with b.mu held.
+	if reg != nil {
+		_ = reg.Unregister()
 	}
 }

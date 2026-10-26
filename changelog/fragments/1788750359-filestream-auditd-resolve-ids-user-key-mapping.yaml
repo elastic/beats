@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix UID/GID name resolution and user field key mapping in filestream auditd coalescing parser.
+component: libbeat

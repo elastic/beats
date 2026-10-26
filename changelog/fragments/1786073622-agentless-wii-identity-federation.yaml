@@ -1,0 +1,12 @@
+kind: feature
+summary: Add workload-identity-issuer mTLS token exchange for agentless identity federation
+description: >
+  Beats running in agentless deployments with `use_cloud_connectors` enabled now
+  exchange a controller-provisioned mTLS client certificate for a short-lived JWT
+  at the workload-identity-issuer `POST /token` endpoint and present it directly
+  to the customer's AWS role via `sts:AssumeRoleWithWebIdentity`, replacing the
+  legacy cloud-connector token-file flow. The new path activates when the
+  `WORKLOAD_IDENTITY_ISSUER_URL` environment variable is set; the legacy IRSA and
+  OIDC paths are retained as fallbacks during rollout. AWS only — Azure and GCP
+  identity federation keep their existing flows.
+component: all

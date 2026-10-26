@@ -24,7 +24,6 @@ import (
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/go-concert/unison"
 )
 
 const (
@@ -47,9 +46,7 @@ type netflowInputManager struct {
 	log *logp.Logger
 }
 
-func (im *netflowInputManager) Init(_ unison.Group) error {
-	return nil
-}
+func (im *netflowInputManager) Close() {}
 
 func (im *netflowInputManager) Create(cfg *conf.C) (v2.Input, error) {
 	inputCfg := defaultConfig
@@ -125,7 +122,8 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 
 	const pollInterval = time.Minute
 	if env.ID != "" {
-		n.udpMetrics = netmetrics.NewUDP(env.MetricsRegistry, n.cfg.Host, uint64(n.cfg.ReadBuffer), pollInterval, n.logger)
+		//nolint:gosec // read_buffer is a byte size, never negative
+		n.udpMetrics = netmetrics.NewUDP(env.MetricsRegistry, n.cfg.Host, n.cfg.Network, uint64(n.cfg.ReadBuffer), pollInterval, n.logger)
 		defer n.udpMetrics.Close()
 	}
 

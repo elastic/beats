@@ -78,7 +78,7 @@ func NewAutodiscover(name string, pipeline beat.PipelineConnector, factory cfgfi
 	// Init providers
 	var providers []Provider
 	for _, providerCfg := range c.Providers {
-		provider, err := Registry.BuildProvider(name, bus, providerCfg, keystore, path)
+		provider, err := Registry.BuildProvider(logger, name, bus, providerCfg, keystore, path)
 		if err != nil {
 			return nil, fmt.Errorf("error in autodiscover provider settings: %w", err)
 		}

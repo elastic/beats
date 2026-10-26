@@ -1,0 +1,57 @@
+# Kind can be one of:
+# - breaking-change: a change to previously-documented behavior
+# - deprecation: functionality that is being removed in a later release
+# - bug-fix: fixes a problem in a previous version
+# - enhancement: extends functionality but does not break or fix existing behavior
+# - feature: new functionality
+# - known-issue: problems that we are aware of in a given version
+# - security: impacts on the security of a product or a user's deployment.
+# - upgrade: important information for someone upgrading from a prior version
+# - other: does not fit into any of the other categories
+kind: breaking-change
+
+# Change summary; a 80ish characters long description of the change.
+summary: Report cgroup v1 CPU throttling time in microseconds instead of nanoseconds
+
+# Long description; in case the summary is not enough to describe the change
+# this field accommodate a description without length limits.
+description: |
+  On cgroups v1 the kernel reports cpu.stat's throttled_time in nanoseconds,
+  but the value was stored unconverted in the microsecond field, so
+  `system.process.cgroup.cpu.stats.throttled.us` was 1000x too large on v1
+  hosts while being correct on v2 hosts. The value is now converted to
+  microseconds at the parse site, so the field means the same thing on every
+  host.
+
+  The beat self-monitoring metric `beat.cgroup.cpu.stats.throttled.ns` keeps
+  reporting nanoseconds; on cgroups v2 it was 1000x too small because the
+  microsecond value was reported as-is, and it is now converted as well.
+
+impact: |
+  On cgroups v1 hosts, `system.process.cgroup.cpu.stats.throttled.us` drops by
+  a factor of 1000, and values collected before and after the upgrade are not
+  comparable. On cgroups v2 hosts the beat self-monitoring metric
+  `beat.cgroup.cpu.stats.throttled.ns` grows by a factor of 1000. Nothing
+  changes for `system.process.cgroup.cpu.stats.throttled.us` on cgroups v2,
+  which was already correct. On cgroups v1 the value of
+  `beat.cgroup.cpu.stats.throttled.ns` is unchanged except that it is now
+  truncated to whole microseconds, losing up to 999ns of a counter that is
+  typically in the seconds range.
+
+action: |
+  Review dashboards, alerting rules and queries that read
+  `system.process.cgroup.cpu.stats.throttled.us` from cgroups v1 hosts, or
+  `beat.cgroup.cpu.stats.throttled.ns` from cgroups v2 hosts, and remove any
+  scaling that compensated for the wrong unit.
+
+# Affected component; usually one of "elastic-agent", "fleet-server",
+# "filebeat", "metricbeat", "auditbeat", "all", etc.
+# metricbeat owns system.process.cgroup.cpu.stats.throttled.us; libbeat owns the
+# beat.cgroup.cpu.stats.throttled.ns self-monitoring metric that every beat emits.
+component: metricbeat, libbeat
+
+# PR URL; optional; the PR number that added the changeset.
+# pr: https://github.com/owner/repo/1234
+
+# Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
+# issue: https://github.com/elastic/beats/issues/<new-issue>

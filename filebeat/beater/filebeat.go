@@ -49,7 +49,6 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/go-concert/unison"
 
 	// Add filebeat level processors
 	_ "github.com/elastic/beats/v7/libbeat/processors/decode_csv_fields"
@@ -80,6 +79,8 @@ type Filebeat struct {
 	logger                   *logp.Logger
 	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
 	runReady                 *closeOnce
+	ctx                      context.Context
+	cancelCtx                context.CancelFunc
 }
 
 type PluginFactory func(beat.Info, statestore.States) []v2.Plugin
@@ -152,7 +153,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		haveEnabledInputs = true
 	}
 
-	if !config.ConfigInput.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledInputs && config.Autodiscover == nil && !b.Manager.Enabled() {
+	if !config.ConfigInput.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledInputs && config.Autodiscover == nil && !management.UnderAgent() {
 		if !b.InSetupCmd {
 			return nil, fmt.Errorf("no modules or inputs enabled and configuration reloading disabled. What files do you want me to watch?")
 		}
@@ -169,6 +170,8 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		return nil, fmt.Errorf("stdin requires to be run in exclusive mode, configured inputs: %s", strings.Join(enabledInputs, ", "))
 	}
 
+	ctx, cn := context.WithCancel(context.Background())
+
 	fb := &Filebeat{
 		done:           make(chan struct{}),
 		runReady:       &closeOnce{ch: make(chan struct{})},
@@ -176,6 +179,8 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		moduleRegistry: moduleRegistry,
 		pluginFactory:  plugins,
 		logger:         b.Info.Logger,
+		ctx:            ctx,
+		cancelCtx:      cn,
 	}
 
 	err = fb.setupPipelineLoaderCallback(b)
@@ -188,7 +193,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 
 // setupPipelineLoaderCallback sets the callback function for loading pipelines during setup.
 func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
-	if b.Config.Output.Name() != "elasticsearch" && !b.Manager.Enabled() {
+	if b.Config.Output.Name() != "elasticsearch" && !management.UnderAgent() {
 		fb.logger.Warn(pipelinesWarning)
 		return nil
 	}
@@ -243,7 +248,7 @@ func (fb *Filebeat) WithESStateStoreExtension(esStateStoreExtension backend.Regi
 // setup.
 func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 	if b.Config.Output.Name() != "elasticsearch" {
-		if !b.Manager.Enabled() {
+		if !management.UnderAgent() {
 			fb.logger.Warn(pipelinesWarning)
 		}
 		return nil
@@ -335,14 +340,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	// Use context, like normal people do, hooking up to the beat.done channel
-	ctx, cn := context.WithCancel(context.Background())
-	go func() {
-		<-fb.done
-		cn()
-	}()
-
-	stateStore, err := openStateStore(ctx, b.Info, fb.logger.Named("filebeat"), config.Registry)
+	stateStore, err := openStateStore(fb.ctx, b.Info, fb.logger.Named("filebeat"), config.Registry)
 	if err != nil {
 		fb.logger.Errorf("Failed to open state store: %+v", err)
 		return err
@@ -391,7 +389,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	// Make sure all events that were published in
-	registrarChannel := newRegistrarLogger(registrar)
+	registrarChannel := newRegistrarLogger(registrar, fb.logger)
 
 	// setup event counting for startup and a global common ACKer, such that all events will be
 	// routed to the reigstrar after they've been ACKed.
@@ -419,17 +417,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		panic(err) // loader detected invalid state.
 	}
 
-	var inputTaskGroup unison.TaskGroup
-	defer func() {
-		_ = inputTaskGroup.Stop()
-		v2InputLoader.Close()
-	}()
-
-	// Store needs to be fully configured at this point
-	if err := v2InputLoader.Init(&inputTaskGroup); err != nil {
-		fb.logger.Errorf("Failed to initialize the input managers: %v", err)
-		return err
-	}
+	defer v2InputLoader.Close()
 
 	inputLoader := channel.RunnerFactoryWithCommonInputSettings(b.Info, compat.Combine(
 		compat.RunnerFactory(inputInfo, b.Monitoring.InputsRegistry(), v2InputLoader),
@@ -453,7 +441,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		if b.Config.Output.Name() == "elasticsearch" {
 			pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config(), b.Info)
 		} else {
-			if !b.Manager.Enabled() {
+			if !management.UnderAgent() {
 				fb.logger.Warn(pipelinesWarning)
 			}
 		}
@@ -469,13 +457,14 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// The current order is: registrar, publisher, spooler, crawler
 	// That means, crawler is stopped first.
 
-	// Start the registrar
-	err = registrar.Start()
-	if err != nil {
-		return fmt.Errorf("Could not start registrar: %w", err) //nolint:staticcheck //Keep old behavior
-	}
-
-	// Stopping registrar will write last state
+	// The registrar is started by the first V1 input to be created (see
+	// input.RunnerFactory.Create), which includes any input that fell back to
+	// the V1 loader after a V2 creation error. When only V2 inputs (eg.
+	// filestream) are running it is never started, so the registry is not
+	// scanned for state that cannot arrive.
+	//
+	// Stopping registrar will write last state in cases where a registrar was actually
+	// started. When nothing is started this is a no-op.
 	defer registrar.Stop()
 
 	// Stopping publisher (might potentially drop items)
@@ -617,7 +606,10 @@ func (fb *Filebeat) StopWithContext(ctx context.Context) {
 		fb.logger.Warn("Timed out waiting for Run to reach ready state; stopping anyway")
 	}
 
-	fb.stopOnce.Do(func() { close(fb.done) })
+	fb.stopOnce.Do(func() {
+		close(fb.done)
+		fb.cancelCtx()
+	})
 }
 
 // Create a new pipeline loader (es client) factory

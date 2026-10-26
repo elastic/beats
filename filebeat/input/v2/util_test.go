@@ -24,11 +24,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/go-concert/unison"
 )
 
 type fakeInputManager struct {
-	OnInit      func() error
 	OnConfigure func(*conf.C) (Input, error)
 	OnClose     func()
 }
@@ -44,13 +42,6 @@ func makeConfigFakeInput(prototype fakeInput) func(*conf.C, *logp.Logger) (Input
 		tmp := prototype
 		return &tmp, nil
 	}
-}
-
-func (m *fakeInputManager) Init(_ unison.Group) error {
-	if m.OnInit != nil {
-		return m.OnInit()
-	}
-	return nil
 }
 
 func (m *fakeInputManager) Create(cfg *conf.C) (Input, error) {

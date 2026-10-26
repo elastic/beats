@@ -165,6 +165,12 @@ The `add_kubernetes_metadata` processor has the following configuration settings
 `wait_for_metadata_retry_period` {applies_to}`stack: ga 9.5`
 :   Time to wait before retrying the metadata request. The retry period must not be greater than `wait_for_metadata_timeout` unless retrying indefinitely. Defaults to `3s`.
 
+`append_fields` {applies_to}`stack: ga 9.6`
+:   (Optional) When `true`, the processor enriches events that already have a `kubernetes` field by merging the cached metadata into the existing object. Existing keys are preserved. Only absent fields are added. Defaults to `false`.
+
+`image_metadata_source` {applies_to}`stack: ga 9.6.0+`
+:   (Optional) Where `kubernetes.container.image` comes from. `status` uses the image reported in the container status, as resolved by the container runtime, which can differ from the manifest (for example a different tag or a digest). `spec` uses the image from the pod spec, exactly as written in the manifest. Applies to the `container` and `pod_uid` indexers. The `ip_port` indexer always uses the pod spec. Defaults to `status`.
+
 ## Indexers and matchers [kubernetes-indexers-and-matchers]
 
 ## Indexers [_indexers]

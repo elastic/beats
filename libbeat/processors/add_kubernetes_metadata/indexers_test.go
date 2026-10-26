@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -143,6 +144,208 @@ func TestPodUIDIndexer(t *testing.T) {
 	indices := podUIDIndexer.GetIndexes(&pod)
 	assert.Len(t, indices, 1)
 	assert.Equal(t, indices[0], uid)
+}
+
+func TestPodUIDIndexer_WithContainers(t *testing.T) {
+	podUIDIndexer, err := NewPodUIDIndexer(*config.NewConfig(), metagen)
+	assert.NoError(t, err)
+
+	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
+	podName := "testpod"
+	ns := "testns"
+	nodeName := "testnode"
+
+	t.Run("restart0_no_last_termination", func(t *testing.T) {
+		// Container on its first run: restartCount=0, no LastTerminationState.
+		// Expect: <uid>, <uid>/<name>, <uid>/<name>/0
+		pod := kubernetes.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: podName, Namespace: ns, UID: types.UID(uid),
+			},
+			Spec: v1.PodSpec{
+				NodeName: nodeName,
+				Containers: []v1.Container{
+					{Name: "mycontainer", Image: "myimage:latest"},
+				},
+			},
+			Status: v1.PodStatus{
+				PodIP: "127.0.0.1",
+				ContainerStatuses: []kubernetes.PodContainerStatus{
+					{
+						Name:         "mycontainer",
+						Image:        "myimage@sha256:abc",
+						ContainerID:  "containerd://deadbeef",
+						RestartCount: 0,
+					},
+				},
+			},
+		}
+
+		indexers := podUIDIndexer.GetMetadata(&pod)
+		indexes := podUIDIndexer.GetIndexes(&pod)
+
+		// Index set must match between GetMetadata and GetIndexes.
+		metaIndexes := make([]string, len(indexers))
+		for i, m := range indexers {
+			metaIndexes[i] = m.Index
+		}
+		assert.ElementsMatch(t, metaIndexes, indexes)
+
+		wantIndexes := []string{uid, uid + "/mycontainer", uid + "/mycontainer/0"}
+		assert.ElementsMatch(t, wantIndexes, indexes)
+
+		// Verify metadata for each index.
+		byIndex := map[string]mapstr.M{}
+		for _, m := range indexers {
+			byIndex[m.Index] = m.Data
+		}
+
+		// Bare UID: no container fields.
+		_, err := byIndex[uid].GetValue("kubernetes.container")
+		assert.Error(t, err, "bare uid entry must not contain container fields")
+
+		// <uid>/<name>: name + image only (no id/runtime).
+		cMeta, err := byIndex[uid+"/mycontainer"].GetValue("kubernetes.container")
+		assert.NoError(t, err)
+		cm, ok := cMeta.(mapstr.M)
+		assert.True(t, ok)
+		assert.Equal(t, "mycontainer", cm["name"])
+		assert.Equal(t, "myimage@sha256:abc", cm["image"])
+		assert.Empty(t, cm["id"])
+		assert.Empty(t, cm["runtime"])
+
+		// <uid>/<name>/0: name + image + id + runtime.
+		cMeta, err = byIndex[uid+"/mycontainer/0"].GetValue("kubernetes.container")
+		assert.NoError(t, err)
+		cm, ok = cMeta.(mapstr.M)
+		assert.True(t, ok)
+		assert.Equal(t, "mycontainer", cm["name"])
+		assert.Equal(t, "myimage@sha256:abc", cm["image"])
+		assert.Equal(t, "deadbeef", cm["id"])
+		assert.Equal(t, "containerd", cm["runtime"])
+	})
+
+	t.Run("restart2_with_last_termination", func(t *testing.T) {
+		// Container on restart 2: index for /2 (live) and /1 (previous, from LastTerminationState).
+		pod := kubernetes.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: podName, Namespace: ns, UID: types.UID(uid),
+			},
+			Spec: v1.PodSpec{
+				NodeName:   nodeName,
+				Containers: []v1.Container{{Name: "mycontainer", Image: "myimage:latest"}},
+			},
+			Status: v1.PodStatus{
+				PodIP: "127.0.0.1",
+				ContainerStatuses: []kubernetes.PodContainerStatus{
+					{
+						Name:         "mycontainer",
+						Image:        "myimage@sha256:abc",
+						ContainerID:  "containerd://live1234",
+						RestartCount: 2,
+						LastTerminationState: v1.ContainerState{
+							Terminated: &v1.ContainerStateTerminated{
+								ContainerID: "containerd://prev5678",
+							},
+						},
+					},
+				},
+			},
+		}
+
+		indexes := podUIDIndexer.GetIndexes(&pod)
+		wantIndexes := []string{
+			uid,
+			uid + "/mycontainer",
+			uid + "/mycontainer/2",
+			uid + "/mycontainer/1",
+		}
+		assert.ElementsMatch(t, wantIndexes, indexes)
+
+		indexers := podUIDIndexer.GetMetadata(&pod)
+		byIndex := map[string]mapstr.M{}
+		for _, m := range indexers {
+			byIndex[m.Index] = m.Data
+		}
+
+		// <uid>/<name>/2: live container id
+		cMeta, err := byIndex[uid+"/mycontainer/2"].GetValue("kubernetes.container")
+		assert.NoError(t, err)
+		cm2, ok := cMeta.(mapstr.M)
+		assert.True(t, ok)
+		assert.Equal(t, "live1234", cm2["id"])
+
+		// <uid>/<name>/1: previous container id
+		cMeta, err = byIndex[uid+"/mycontainer/1"].GetValue("kubernetes.container")
+		assert.NoError(t, err)
+		cm1, ok := cMeta.(mapstr.M)
+		assert.True(t, ok)
+		assert.Equal(t, "prev5678", cm1["id"])
+	})
+
+	t.Run("spec_only_no_status", func(t *testing.T) {
+		// Container defined in spec but not yet started (no ContainerStatus).
+		// GetContainersInPod is spec-driven, so we still get the name/image indexes.
+		pod := kubernetes.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: podName, Namespace: ns, UID: types.UID(uid),
+			},
+			Spec: v1.PodSpec{
+				NodeName:   nodeName,
+				Containers: []v1.Container{{Name: "pending", Image: "pending:latest"}},
+			},
+			Status: v1.PodStatus{PodIP: "127.0.0.1"},
+		}
+
+		indexes := podUIDIndexer.GetIndexes(&pod)
+		// No ID → no /0 entry; but name/image entry is present.
+		wantIndexes := []string{uid, uid + "/pending"}
+		assert.ElementsMatch(t, wantIndexes, indexes)
+
+		indexers := podUIDIndexer.GetMetadata(&pod)
+		byIndex := map[string]mapstr.M{}
+		for _, m := range indexers {
+			byIndex[m.Index] = m.Data
+		}
+		cMeta, err := byIndex[uid+"/pending"].GetValue("kubernetes.container")
+		assert.NoError(t, err)
+		cm, ok := cMeta.(mapstr.M)
+		assert.True(t, ok)
+		assert.Equal(t, "pending", cm["name"])
+		assert.Equal(t, "pending:latest", cm["image"])
+	})
+
+	t.Run("init_and_ephemeral_containers", func(t *testing.T) {
+		// Init and ephemeral containers appear in GetContainersInPod and must be indexed.
+		pod := kubernetes.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: podName, Namespace: ns, UID: types.UID(uid),
+			},
+			Spec: v1.PodSpec{
+				NodeName:            nodeName,
+				Containers:          []v1.Container{{Name: "main", Image: "main:latest"}},
+				InitContainers:      []v1.Container{{Name: "init", Image: "init:latest"}},
+				EphemeralContainers: []v1.EphemeralContainer{{EphemeralContainerCommon: v1.EphemeralContainerCommon{Name: "ephemeral", Image: "ephemeral:latest"}}},
+			},
+			Status: v1.PodStatus{
+				PodIP: "127.0.0.1",
+				ContainerStatuses: []kubernetes.PodContainerStatus{
+					{Name: "main", ContainerID: "containerd://main01", RestartCount: 0},
+				},
+				InitContainerStatuses: []kubernetes.PodContainerStatus{
+					{Name: "init", ContainerID: "containerd://init01", RestartCount: 0},
+				},
+			},
+		}
+
+		indexes := podUIDIndexer.GetIndexes(&pod)
+		assert.Contains(t, indexes, uid)
+		assert.Contains(t, indexes, uid+"/main")
+		assert.Contains(t, indexes, uid+"/main/0")
+		assert.Contains(t, indexes, uid+"/init")
+		assert.Contains(t, indexes, uid+"/init/0")
+		assert.Contains(t, indexes, uid+"/ephemeral") // no status → no /0
+	})
 }
 
 func TestContainerIndexer(t *testing.T) {
@@ -485,4 +688,97 @@ func TestIpPortIndexer(t *testing.T) {
 			"id":      "foobar",
 			"runtime": "docker"})
 	assert.Equal(t, expected.String(), indexers[1].Data.String())
+}
+
+func TestIndexersImageMetadataSource(t *testing.T) {
+	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
+	pod := kubernetes.Pod{
+		ObjectMeta: metav1.ObjectMeta{Name: "testpod", Namespace: "testns", UID: types.UID(uid)},
+		Spec: v1.PodSpec{
+			NodeName:       "testnode",
+			Containers:     []v1.Container{{Name: "main", Image: "nginx:1.25"}},
+			InitContainers: []v1.Container{{Name: "init", Image: "busybox"}},
+		},
+		Status: v1.PodStatus{
+			ContainerStatuses: []kubernetes.PodContainerStatus{
+				{Name: "main", ContainerID: "containerd://main01", Image: "docker.io/library/nginx@sha256:abc"},
+			},
+			InitContainerStatuses: []kubernetes.PodContainerStatus{
+				{Name: "init", ContainerID: "containerd://init01", Image: "docker.io/library/busybox@sha256:def"},
+			},
+		},
+	}
+
+	tests := []struct {
+		name      string
+		source    string
+		wantMain  string
+		wantInit  string
+		wantError bool
+	}{
+		{name: "default is status", source: "", wantMain: "docker.io/library/nginx@sha256:abc", wantInit: "docker.io/library/busybox@sha256:def"},
+		{name: "status", source: "status", wantMain: "docker.io/library/nginx@sha256:abc", wantInit: "docker.io/library/busybox@sha256:def"},
+		{name: "spec", source: "spec", wantMain: "nginx:1.25", wantInit: "busybox"},
+		{name: "invalid", source: "bogus", wantError: true},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := config.NewConfig()
+			if tc.source != "" {
+				require.NoError(t, cfg.SetString(ImageMetadataSourceKey, -1, tc.source))
+			}
+
+			conIndexer, err := NewContainerIndexer(*cfg, metagen)
+			if tc.wantError {
+				assert.Error(t, err, "container indexer should reject an invalid image source")
+				_, err = NewPodUIDIndexer(*cfg, metagen)
+				assert.Error(t, err, "pod_uid indexer should reject an invalid image source")
+				return
+			}
+			require.NoError(t, err)
+			uidIndexer, err := NewPodUIDIndexer(*cfg, metagen)
+			require.NoError(t, err)
+
+			images := map[string]string{}
+			for _, mi := range conIndexer.GetMetadata(&pod) {
+				name, err := mi.Data.GetValue("kubernetes.container.name")
+				require.NoError(t, err)
+				img, err := mi.Data.GetValue("kubernetes.container.image")
+				require.NoError(t, err)
+				images[fmt.Sprint(name)] = fmt.Sprint(img)
+			}
+			assert.Equal(t, tc.wantMain, images["main"], "container indexer main image")
+			assert.Equal(t, tc.wantInit, images["init"], "container indexer init image")
+
+			for _, mi := range uidIndexer.GetMetadata(&pod) {
+				switch mi.Index {
+				case uid + "/main":
+					img, _ := mi.Data.GetValue("kubernetes.container.image")
+					assert.Equal(t, tc.wantMain, img, "pod_uid indexer main image")
+				case uid + "/init":
+					img, _ := mi.Data.GetValue("kubernetes.container.image")
+					assert.Equal(t, tc.wantInit, img, "pod_uid indexer init image")
+				}
+			}
+		})
+	}
+}
+
+func TestNewIndexersForwardsImageSource(t *testing.T) {
+	pod := kubernetes.Pod{
+		ObjectMeta: metav1.ObjectMeta{Name: "p", Namespace: "ns", UID: "uid"},
+		Spec:       v1.PodSpec{Containers: []v1.Container{{Name: "main", Image: "nginx:1.25"}}},
+		Status: v1.PodStatus{ContainerStatuses: []kubernetes.PodContainerStatus{
+			{Name: "main", ContainerID: "containerd://main01", Image: "sha256:abc"},
+		}},
+	}
+	shared := *config.NewConfig()
+	indexers := NewIndexers(PluginConfig{{ContainerIndexerName: shared}}, metagen, ImageSourceSpec)
+	assert.False(t, shared.HasField(ImageMetadataSourceKey), "NewIndexers must not mutate the caller's indexer config")
+	md := indexers.GetMetadata(&pod)
+	require.Len(t, md, 1)
+	img, err := md[0].Data.GetValue("kubernetes.container.image")
+	require.NoError(t, err)
+	assert.Equal(t, "nginx:1.25", img, "processor-level image_metadata_source should reach the indexer")
 }

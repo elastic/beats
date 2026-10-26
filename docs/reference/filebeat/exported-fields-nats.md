@@ -77,7 +77,7 @@ Fields from NATS logs message.
 
 
 **`nats.log.msg.error.message`**
-:   Details about the error occurred
+:   Details about the error that occurred
 
     type: text
 

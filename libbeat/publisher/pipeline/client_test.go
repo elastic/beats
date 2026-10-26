@@ -46,8 +46,9 @@ import (
 
 func makePipeline(t *testing.T, settings Settings, qu queue.Queue[publisher.Event]) *Pipeline {
 	t.Helper()
-	logger := logptest.NewTestingLogger(t, "")
-	p, err := New(beat.Info{Logger: logger},
+	// Use a nop logger so the async queueReader goroutine (which is intentionally
+	// not tracked in the shutdown WaitGroup) cannot race with *testing.T cleanup.
+	p, err := New(beat.Info{Logger: logp.NewNopLogger()},
 		Monitors{},
 		conf.Namespace{},
 		outputs.Group{},
@@ -493,7 +494,9 @@ func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientCon
 
 	metrics := monitoring.NewRegistry()
 	telemetry := monitoring.NewRegistry()
-	logger := logptest.NewTestingLogger(t, "")
+	// Use a nop logger to avoid a race between the async queueReader goroutine
+	// (which logs on shutdown) and the sub-test's *testing.T being cleaned up.
+	logger := logp.NewNopLogger()
 	pipeline, err := Load(
 		beat.Info{
 			Logger: logger,
@@ -532,6 +535,7 @@ func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientCon
 		},
 	)
 	require.NoError(t, err)
+	defer func() { _ = pipeline.Disconnect(t.Context()) }()
 
 	c, err := pipeline.ConnectWith(clientCfg)
 	require.NoError(t, err, "pipeline.ConnectWith failed")

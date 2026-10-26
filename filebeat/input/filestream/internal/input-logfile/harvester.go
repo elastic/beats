@@ -74,6 +74,7 @@ const (
 //
 // Implementations are NOT safe for concurrent use: the runner guarantees a
 // single goroutine operates a session at a time (one reader per source).
+// TrackSource is the exception.
 type HarvesterSession interface {
 	// ReadSlice reads from the source and publishes events until there is no
 	// data currently available (SliceYield), the slice's time budget elapsed
@@ -92,6 +93,8 @@ type HarvesterSession interface {
 	IsGZIP() bool
 	// Close releases the file handle and resources held by the session.
 	Close() error
+	// TrackSource tells the session its source's current identity.
+	TrackSource(current Source)
 }
 
 // HarvesterGroup is responsible for running the Harvesters started by the
@@ -108,14 +111,21 @@ type HarvesterGroup interface {
 	// StopHarvesters cancels all running Harvesters.
 	StopHarvesters() error
 	// SetObserver sets the observer to get notified when a harvester closes.
-	SetObserver(c chan HarvesterStatus)
+	SetObserver(o HarvesterObserver)
 	// Migrate re-keys a running or pending harvester from oldID to next's
 	// identity and persists the new key via updateStore, so the harvester keeps
 	// running under its new identity without being restarted. It is safe to call
 	// when nothing is registered under oldID, in which case only updateStore
 	// runs. It returns an error if a harvester is already registered under next's
-	// identity.
+	// identity. An open session is told the new source.
 	Migrate(oldID string, next Source, updateStore func(newID string) error) error
+}
+
+// HarvesterObserver is notified when a harvester closes. HarvesterClosed is
+// called on the closing harvester's goroutine, so implementations must not
+// block.
+type HarvesterObserver interface {
+	HarvesterClosed(HarvesterStatus)
 }
 
 // HarvesterStatus is used to notify an observer that the harvester for the ID

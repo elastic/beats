@@ -13,10 +13,10 @@ import (
 	"time"
 
 	"go.uber.org/zap/zapcore"
+	"go.yaml.in/yaml/v2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	gproto "google.golang.org/protobuf/proto"
-	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -107,6 +107,9 @@ type BeatV2Manager struct {
 
 	// set with the last applied input configs
 	lastInputCfgs map[string]*proto.UnitExpectedConfig
+
+	// set with the agent info of the last applied input configs
+	lastAgentInfo *client.AgentInfo
 
 	// set with the last applied APM config
 	lastAPMCfg *proto.APMConfig
@@ -241,11 +244,10 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 // ================================
 
 func (cm *BeatV2Manager) AgentInfo() lbmanagement.AgentInfo {
-	if cm.client.AgentInfo() == nil {
+	info := cm.client.AgentInfo()
+	if info == nil {
 		return lbmanagement.AgentInfo{}
 	}
-
-	info := *cm.client.AgentInfo()
 
 	return lbmanagement.AgentInfo{
 		ID:           info.ID,
@@ -253,6 +255,7 @@ func (cm *BeatV2Manager) AgentInfo() lbmanagement.AgentInfo {
 		Snapshot:     info.Snapshot,
 		ManagedMode:  lbmanagement.AgentManagedMode(info.ManagedMode),
 		Unprivileged: info.Unprivileged,
+		Tags:         info.Tags,
 	}
 }
 
@@ -275,6 +278,11 @@ func (cm *BeatV2Manager) UpdateStatus(status status.Status, msg string) {
 
 // Enabled returns true if config management is enabled.
 func (cm *BeatV2Manager) Enabled() bool {
+	return cm.config.Enabled
+}
+
+// ConfigFromControlProtocol returns true if beat is running in process mode inside elastic-agent.
+func (cm *BeatV2Manager) ConfigFromControlProtocol() bool {
 	return cm.config.Enabled
 }
 
@@ -773,7 +781,6 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 						delete(healthyInputs, unitErr.UnitID)
 					}
 				}
-				return
 
 			default:
 				// That is not one of the cases we know how to handle, hard stop
@@ -916,7 +923,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 		inputBeatCfgs = append(inputBeatCfgs, inputCfg...)
 	}
 
-	if !didChange(cm.lastInputCfgs, inputCfgs) && !cm.forceReload {
+	if !didChange(cm.lastInputCfgs, inputCfgs) && cm.lastAgentInfo.Equal(agentInfo) && !cm.forceReload {
 		cm.logger.Debug("Skipped reloading input units; configuration didn't change")
 		return nil
 	}
@@ -976,6 +983,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 	}
 
 	cm.lastInputCfgs = inputCfgs
+	cm.lastAgentInfo = agentInfo
 	cm.lastBeatInputCfgs = inputBeatCfgs
 	return nil
 }

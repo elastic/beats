@@ -25,8 +25,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cgroup"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
 )
 
 const (

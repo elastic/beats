@@ -75,8 +75,11 @@ const (
 type osquerybeat struct {
 	b      *beat.Beat
 	config config.Config
-	// osquery install settings are sourced from inputs[0].osquery.elastic_options.install.
+	// osquery install settings are sourced from the result input's osquery.elastic_options.install.
 	osqueryInstallConfig config.InstallConfig
+	// checkTimeout is the osqueryd --version startup check deadline, from
+	// elastic_options.check_timeout (default 15s).
+	checkTimeout time.Duration
 	// runtime-selected osquery metadata.
 	osqueryVersion string
 	osquerySource  string
@@ -90,6 +93,11 @@ type osquerybeat struct {
 	// Beat lifecycle context, cancelled on Stop
 	cancel context.CancelFunc
 	mx     sync.Mutex
+
+	// clockSkewWarnLogged latches the pre-start clamp warning to once per
+	// schedule name. handleQueryResult runs per result document, so without
+	// this a persistently skewed agent would warn on every snapshot/diff hit.
+	clockSkewWarnLogged map[string]struct{}
 
 	diagMx          sync.RWMutex
 	diagQueryExec   queryExecutor
@@ -137,11 +145,16 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 	if err != nil {
 		return nil, fmt.Errorf("invalid osquery.elastic_options.install configuration: %w", err)
 	}
+	checkTimeout, err := config.GetOsqueryCheckTimeout(c.Inputs)
+	if err != nil {
+		return nil, err
+	}
 
 	bt := &osquerybeat{
 		b:                    b,
 		config:               c,
 		osqueryInstallConfig: installCfg,
+		checkTimeout:         checkTimeout,
 		log:                  log,
 		pub:                  pub.New(b, log),
 		qp:                   newQueryProfiler(log),
@@ -197,8 +210,11 @@ func (bt *osquerybeat) close() {
 		bt.cancel = nil
 	}
 
-	// Start watching the parent process.
-	// The beat exits if the process gets orphaned.
+	// Start watching the parent process only now, as a fallback for a
+	// shutdown that never completes (for example when the management client
+	// blocks after Elastic Agent has gone). The beat exits if the process
+	// gets orphaned. See https://github.com/elastic/beats/pull/31931 and
+	// https://github.com/elastic/elastic-agent/issues/556.
 	if bt.watcher != nil {
 		go bt.watcher.Run()
 		bt.watcher = nil
@@ -218,6 +234,19 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		return err
 	}
 	defer bt.close()
+
+	// Start checking in with Elastic Agent before validating osqueryd, but do not
+	// apply configuration until startup has completed successfully.
+	if err := b.Manager.PreInit(); err != nil {
+		b.Manager.UpdateStatus(status.Failed, "Failed to pre-initialize manager: "+err.Error())
+		return err
+	}
+	managerEarlyStop := b.Manager.Stop
+	defer func() {
+		if managerEarlyStop != nil {
+			managerEarlyStop()
+		}
+	}()
 
 	// Watch input configuration updates
 	inputConfigCh := config.WatchInputs(ctx, bt.log, b.Registry)
@@ -297,6 +326,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		osqd.WithConfigPlugin(configPluginName),
 		osqd.WithLoggerPlugin(loggerPluginName),
 		osqd.WithDataPath(bt.osqueryDataPath),
+		osqd.WithCheckTimeout(bt.checkTimeout),
 	}
 	if osqueryRuntime.BinDir != "" {
 		opts = append(opts, osqd.WithBinaryPath(osqueryRuntime.BinDir))
@@ -353,10 +383,8 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		_ = runner.Update(ctx, bt.config.Inputs)
 	}
 
-	if err := b.Manager.Start(); err != nil { //nolint:staticcheck // SA1019 will be addressed in a follow-up
-		b.Manager.UpdateStatus(status.Failed, "Failed to start manager: "+err.Error())
-		return err
-	}
+	b.Manager.PostInit()
+	managerEarlyStop = nil
 
 	// Set the osquery beat version to the manager payload. This allows the bundled osquery version to be reported to the stack.
 	bt.setManagerPayload(b)
@@ -585,10 +613,12 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		return err
 	}
 
-	// Start osqueryd
+	// Start osqueryd. Readiness belongs to this process instance only.
+	var runState osqueryRunState
+	parentCtx := ctx
 	g, ctx := errgroup.WithContext(ctx)
 	g.Go(func() error {
-		err := osq.Run(ctx, flags)
+		err := runState.run(ctx, osq, flags)
 		if err != nil {
 			if errors.Is(err, context.Canceled) {
 				bt.log.Errorf("Osqueryd exited: %v", err)
@@ -644,6 +674,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		// Drive RRULE updates from the same moment native osqueryd applies policy: GenerateConfig
 		// promotes staged query metadata after osqueryd pulls config (see ConfigPlugin.GenerateConfig).
 		configPlugin.SetOnGenerateConfigApplied(func() {
+			runState.ready()
 			if rruleHandler != nil {
 				if err := rruleHandler.UpdateFromConfig(configPlugin.EffectiveOsqueryConfig()); err != nil {
 					bt.log.Errorf("failed to update RRULE scheduled queries: %v", err)
@@ -653,6 +684,18 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 				}
 			}
 		})
+
+		// Stage the first policy before exposing the config extension, so an
+		// initial empty GenerateConfig cannot mark the daemon ready.
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case initialInputs := <-inputCh:
+			if err := configPlugin.Set(initialInputs); err != nil {
+				return err
+			}
+			cache.Resize(configPlugin.Count())
+		}
 
 		// Start osqueryd health monitoring after connection is established
 		g.Go(func() error {
@@ -688,7 +731,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		}
 	})
 
-	err = g.Wait()
+	err = runState.result(parentCtx, g.Wait())
 	if err != nil {
 		if errors.Is(err, context.Canceled) {
 			bt.log.Debugf("runOsquery exited, context cancelled")
@@ -728,42 +771,60 @@ func runExtensionServer(ctx context.Context, socketPath string, configPlugin *Co
 	return g.Wait()
 }
 
-// nativeScheduleExecutionCount returns the 1-based execution count for a native (interval) schedule,
-// computed from start_date and interval so it is deterministic across agents.
-// Returns 0 if startDate is empty, interval <= 0, or runTime is before startDate.
-func nativeScheduleExecutionCount(startDateRFC3339 string, intervalSecs int, runTimeUnix int64) int64 {
+// nativeScheduleTiming returns deterministic timing metadata for a native
+// interval schedule. A run reported before a valid start date is clamped to the
+// first execution and its planned start date so clock skew cannot produce an
+// execution count of zero or a pre-schedule planned time.
+func nativeScheduleTiming(startDateRFC3339 string, intervalSecs int, runTimeUnix int64) (executionCount int64, plannedScheduleTime time.Time, clockSkewClamped bool) {
+	runTime := time.Unix(runTimeUnix, 0).UTC()
 	if startDateRFC3339 == "" || intervalSecs <= 0 {
-		return 0
+		return 0, runTime, false
 	}
+
 	startTime, err := time.Parse(time.RFC3339, startDateRFC3339)
 	if err != nil {
-		return 0
+		return 0, runTime, false
+	}
+	startTime = startTime.UTC()
+
+	if runTime.Before(startTime) {
+		return 1, startTime, true
 	}
 
-	startUnix := startTime.Unix()
-	if runTimeUnix < startUnix {
-		return 0
-	}
+	elapsedSeconds := runTimeUnix - startTime.Unix()
+	executionCount = 1 + (elapsedSeconds / int64(intervalSecs))
+	plannedScheduleTime = startTime.Add(time.Duration(executionCount-1) * time.Duration(intervalSecs) * time.Second)
+	return executionCount, plannedScheduleTime, false
+}
 
-	elapsedSeconds := runTimeUnix - startUnix
-	return 1 + (elapsedSeconds / int64(intervalSecs))
+// nativeScheduleExecutionCount returns the 1-based execution count for a native
+// interval schedule. It returns 0 for missing or invalid schedule metadata.
+func nativeScheduleExecutionCount(startDateRFC3339 string, intervalSecs int, runTimeUnix int64) int64 {
+	executionCount, _, _ := nativeScheduleTiming(startDateRFC3339, intervalSecs, runTimeUnix)
+	return executionCount
 }
 
 // nativePlannedScheduleTime returns the intended schedule slot for a native interval schedule.
 // Falls back to runTimeUnix when schedule metadata is missing or invalid.
 func nativePlannedScheduleTime(startDateRFC3339 string, intervalSecs int, runTimeUnix int64) time.Time {
-	runTime := time.Unix(runTimeUnix, 0).UTC()
-	executionCount := nativeScheduleExecutionCount(startDateRFC3339, intervalSecs, runTimeUnix)
-	if executionCount <= 0 {
-		return runTime
-	}
+	_, plannedScheduleTime, _ := nativeScheduleTiming(startDateRFC3339, intervalSecs, runTimeUnix)
+	return plannedScheduleTime
+}
 
-	startTime, err := time.Parse(time.RFC3339, startDateRFC3339)
-	if err != nil {
-		return runTime
+// shouldLogClockSkewWarn reports whether a clock-skew clamp warning should be
+// emitted for scheduleName. The first call for a name returns true; later
+// calls for the same name return false.
+func (bt *osquerybeat) shouldLogClockSkewWarn(scheduleName string) bool {
+	bt.mx.Lock()
+	defer bt.mx.Unlock()
+	if bt.clockSkewWarnLogged == nil {
+		bt.clockSkewWarnLogged = make(map[string]struct{})
 	}
-
-	return startTime.UTC().Add(time.Duration(executionCount-1) * time.Duration(intervalSecs) * time.Second)
+	if _, logged := bt.clockSkewWarnLogged[scheduleName]; logged {
+		return false
+	}
+	bt.clockSkewWarnLogged[scheduleName] = struct{}{}
+	return true
 }
 
 func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Client, configPlugin *ConfigPlugin, res QueryResult) {
@@ -786,14 +847,19 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 	if scheduleID == "" {
 		scheduleID = res.Name
 	}
-	// Schedule execution count from start_date + interval (same across agents)
-	scheduleExecutionCount := nativeScheduleExecutionCount(qi.StartDate, qi.Interval, res.UnixTime)
-
 	var totalHits int
 
 	responseID := uuid.Must(uuid.NewV4()).String()
-	runTime := time.Unix(res.UnixTime, 0)
-	plannedScheduleTime := nativePlannedScheduleTime(qi.StartDate, qi.Interval, res.UnixTime)
+	runTime := time.Unix(res.UnixTime, 0).UTC()
+	scheduleExecutionCount, plannedScheduleTime, clockSkewClamped := nativeScheduleTiming(qi.StartDate, qi.Interval, res.UnixTime)
+	if clockSkewClamped && bt.shouldLogClockSkewWarn(res.Name) {
+		bt.log.Warnf(
+			"Native scheduled query %q reported run time %s before start_date %s; possible clock skew, clamping to execution 1",
+			res.Name,
+			runTime.Format(time.RFC3339Nano),
+			plannedScheduleTime.Format(time.RFC3339Nano),
+		)
+	}
 	publishResolved := func(resultType, action string, hits []map[string]any) {
 		totalHits += len(hits)
 		meta := queryResultMeta(resultType, action, res, scheduleExecutionCount, plannedScheduleTime)
@@ -831,7 +897,7 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 		if err != nil {
 			bt.log.Debugf("failed to collect scheduled query profile for %s: %v", res.Name, err)
 		} else {
-			bt.pub.PublishQueryProfile(config.QueryProfileDatastream(ns), res.Name, "", responseID, profile, nil)
+			bt.pub.PublishQueryProfile(config.QueryProfileDatastream(ns), res.Name, "", responseID, qi.SpaceID, profile, nil)
 		}
 	}
 

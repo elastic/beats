@@ -42,8 +42,15 @@ import (
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
 
+	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/go-ucfg"
 )
 
 func TestNewReceiver(t *testing.T) {
@@ -114,6 +121,83 @@ func TestNewReceiver(t *testing.T) {
 			}, "failed to check metrics logging")
 		},
 	})
+}
+
+type mockBuilder struct{}
+
+func (mockBuilder) CreateConfig(_ bus.Event, _ ...ucfg.Option) []*conf.C {
+	return nil
+}
+
+type mockProvider struct{}
+
+func (mockProvider) Start() {}
+
+func (mockProvider) Stop() {}
+
+func (mockProvider) String() string {
+	return "mock provider"
+}
+
+func TestReceiverRecreatesAutodiscoverBuilders(t *testing.T) {
+	id, err := uuid.NewV4()
+	require.NoError(t, err, "failed to generate mock autodiscover UUID")
+	builderType := "mock-builder-" + id.String()
+	providerType := "mock-provider-" + id.String()
+
+	var builderCalls atomic.Int32
+	builder := func(_ *conf.C, _ *logp.Logger, _ *paths.Path) (autodiscover.Builder, error) {
+		builderCalls.Add(1)
+		return mockBuilder{}, nil
+	}
+	provider := func(_ string, _ bus.Bus, _ uuid.UUID, c *conf.C, _ keystore.Keystore, logger *logp.Logger, path *paths.Path) (autodiscover.Provider, error) {
+		var config struct {
+			Builders []*conf.C `config:"builders"`
+		}
+		if err := c.Unpack(&config); err != nil {
+			return nil, fmt.Errorf("unpack mock provider config: %w", err)
+		}
+		if _, err := autodiscover.NewBuilders(logger, config.Builders, nil, nil, path); err != nil {
+			return nil, fmt.Errorf("create mock builders: %w", err)
+		}
+		return mockProvider{}, nil
+	}
+	require.NoError(t, autodiscover.Registry.AddBuilder(builderType, builder), "failed to register mock builder")
+	require.NoError(t, autodiscover.Registry.AddProvider(providerType, provider), "failed to register mock provider")
+
+	tmpDir := t.TempDir()
+	factory := NewFactory()
+	config := &Config{
+		Beatconfig: map[string]any{
+			"filebeat": map[string]any{
+				"autodiscover": map[string]any{
+					"providers": []any{
+						map[string]any{
+							"type": providerType,
+							"builders": []any{
+								map[string]any{
+									"type": builderType,
+								},
+							},
+						},
+					},
+				},
+			},
+			"path.home": tmpDir,
+		},
+	}
+	settings := receiver.Settings{ID: component.NewID(factory.Type())}
+	settings.Logger = zap.NewNop()
+
+	for attempt := range 2 {
+		receiver, err := factory.CreateLogs(t.Context(), settings, config, nil)
+		require.NoErrorf(t, err, "failed to create receiver on attempt %d", attempt+1)
+		require.NoErrorf(t, receiver.Start(t.Context(), componenttest.NewNopHost()), "failed to start receiver on attempt %d", attempt+1)
+		require.Eventuallyf(t, func() bool {
+			return builderCalls.Load() == int32(attempt+1)
+		}, 5*time.Second, 10*time.Millisecond, "expected Registry.BuildBuilder to invoke the registered builder on attempt %d", attempt+1)
+		require.NoErrorf(t, receiver.Shutdown(t.Context()), "failed to shut down receiver on attempt %d", attempt+1)
+	}
 }
 
 func BenchmarkFactory(b *testing.B) {
@@ -329,6 +413,80 @@ func TestMultipleReceivers(t *testing.T) {
 					assert.NotEqualf(c, allMetaData[i], allMetaData[j], "meta data files between %v and %v should be different", h1, h2)
 					assert.NotContainsf(c, allRegData[i], allRegData[j], "receiver %v registry should not contain data from %v registry", h1, h2)
 				}
+			}
+		},
+	})
+}
+
+// TestRegistrarLazyStart verifies that a receiver only starts the registrar
+// (and loads its states) when it runs a V1 input, and that each receiver
+// decides on its own.
+func TestRegistrarLazyStart(t *testing.T) {
+	const loadedMsg = "States Loaded from registrar"
+
+	factory := NewFactoryWithSettings(Settings{Home: t.TempDir()})
+
+	newConfig := func(inputType string, ingest string, home string) *Config {
+		input := map[string]any{
+			"type":    inputType,
+			"enabled": true,
+			"id":      "lazy-" + inputType,
+			"paths":   []string{ingest},
+		}
+		if inputType == "filestream" {
+			input["file_identity.native"] = nil
+		} else {
+			input["allow_deprecated_use"] = true
+		}
+		return &Config{
+			Beatconfig: map[string]any{
+				"queue.mem.flush.timeout": "0s",
+				"filebeat": map[string]any{
+					"inputs": []map[string]any{input},
+				},
+				"logging": map[string]any{
+					"level":     "info",
+					"selectors": []string{"*"},
+				},
+				"path.home": home,
+			},
+		}
+	}
+
+	type receiverCase struct {
+		name, inputType, ingest, home string
+		wantLoaded                    int
+	}
+	cases := []receiverCase{
+		{name: "fs", inputType: "filestream", wantLoaded: 0},
+		{name: "log", inputType: "log", wantLoaded: 1},
+	}
+	configs := make([]oteltest.ReceiverConfig, len(cases))
+	for i := range cases {
+		cases[i].ingest = filepath.Join(t.TempDir(), cases[i].name+".log")
+		cases[i].home = t.TempDir()
+		configs[i] = oteltest.ReceiverConfig{
+			Name:    cases[i].name,
+			Beat:    "filebeat",
+			Config:  newConfig(cases[i].inputType, cases[i].ingest, cases[i].home),
+			Factory: factory,
+		}
+	}
+
+	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
+		T:           t,
+		NumRestarts: 1,
+		Receivers:   configs,
+		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
+			for _, tc := range cases {
+				writeFile(c, tc.ingest, "A log line")
+				require.NotEmptyf(c, logs[tc.name], "receiver %s does not have any logs", tc.name)
+
+				loaded := zapLogs.
+					FilterMessageSnippet(loadedMsg).
+					FilterField(zap.String("otelcol.component.id", "filebeatreceiver/"+tc.name))
+				assert.Equalf(c, tc.wantLoaded, loaded.Len(),
+					"receiver %s (%s input) should log %q %d time(s)", tc.name, tc.inputType, loadedMsg, tc.wantLoaded)
 			}
 		},
 	})
@@ -833,4 +991,23 @@ func writeFile(t require.TestingT, path string, data string) {
 	defer f.Close()
 	_, err = f.WriteString(data + "\n")
 	require.NoErrorf(t, err, "Could not write %s to file %s", data, path)
+}
+
+func TestComponentLifecycle(t *testing.T) {
+	cfg := &Config{
+		Beatconfig: map[string]any{
+			"filebeat": map[string]any{
+				"inputs": []map[string]any{
+					{
+						"type":    "benchmark",
+						"enabled": true,
+						"message": "test",
+						"count":   1,
+					},
+				},
+			},
+			"path.home": t.TempDir(),
+		},
+	}
+	oteltest.CheckReceiverLifecycle(t, NewFactoryWithSettings(Settings{Home: t.TempDir()}), cfg)
 }

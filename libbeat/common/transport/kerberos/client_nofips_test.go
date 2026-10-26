@@ -36,4 +36,21 @@ func TestNewClient(t *testing.T) {
 	}, http.DefaultClient)
 	require.NoError(t, err)
 	require.NotNil(t, c)
+
+	c, err = NewClient(&Config{
+		AuthType:   authPassword,
+		ConfigPath: cfg.Name(),
+		EnableFAST: true,
+	}, http.DefaultClient)
+	require.NoError(t, err)
+	require.NotNil(t, c)
+}
+
+func TestNewClientInlineKrb5Conf(t *testing.T) {
+	c, err := NewClient(&Config{
+		AuthType: authPassword,
+		Krb5Conf: "[libdefaults]\n  default_realm = EXAMPLE.COM\n",
+	}, http.DefaultClient)
+	require.NoError(t, err, "inline krb5_conf should load without a config_path file")
+	require.NotNil(t, c)
 }
