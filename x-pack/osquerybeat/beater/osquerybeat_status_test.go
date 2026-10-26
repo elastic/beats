@@ -43,13 +43,16 @@ func (m *mockOsqueryd) Check(ctx context.Context) error {
 	return m.checkErr
 }
 
-func (m *mockOsqueryd) Run(ctx context.Context, flags osqd.Flags) error {
+func (m *mockOsqueryd) Run(ctx context.Context, flags osqd.Flags, onExit func(error)) error {
 	if m.runDelay > 0 {
 		select {
 		case <-time.After(m.runDelay):
 		case <-ctx.Done():
 			return ctx.Err()
 		}
+	}
+	if onExit != nil {
+		onExit(m.runErr)
 	}
 	return m.runErr
 }
@@ -118,7 +121,7 @@ func (m *testManager) Stop() {
 	m.stopped = true
 }
 func (m *testManager) SetPayload(map[string]any)           {}
-func (m *testManager) Enabled() bool                       { return true }
+func (m *testManager) ConfigFromControlProtocol() bool     { return true }
 func (m *testManager) AgentInfo() management.AgentInfo     { return management.AgentInfo{} }
 func (m *testManager) SetStopCallback(func())              {}
 func (m *testManager) CheckRawConfig(*agentconfig.C) error { return nil }

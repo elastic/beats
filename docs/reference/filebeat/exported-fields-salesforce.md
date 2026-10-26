@@ -647,7 +647,7 @@ Fileset for ingesting Salesforce SetupAuditTrail logs.
 
 
 **`salesforce.setup_audit_trail.display`**
-:   The full description of changes made in Setup. For example, if the Action field has a value of PermSetCreate, the Display field has a value like “Created permission set MAD: with user license Salesforce.
+:   The full description of changes made in Setup. For example, if the Action field has a value of PermSetCreate, the Display field has a value like "Created permission set MAD: with user license Salesforce."
 
     type: keyword
 

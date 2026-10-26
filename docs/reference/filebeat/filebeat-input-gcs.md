@@ -52,7 +52,7 @@ filebeat.inputs:
 ```
 1. {applies_to}`stack: ga 9.1.0`
 
-**Explanation :** This `configuration` given above describes a basic gcs config having two buckets named `gcs-test-new` and `gcs-test-old`. Each of these buckets have their own attributes such as `name`, `batch_size` {applies_to}`stack: ga 9.1.0`, `max_workers`, `poll` and `poll_interval`. These attributes have detailed explanations given [below](#supported-attributes-gcs). For now lets try to understand how this config works.
+**Explanation :** This `configuration` given above describes a basic gcs config having two buckets named `gcs-test-new` and `gcs-test-old`. Each of these buckets has its own attributes such as `name`, `batch_size` {applies_to}`stack: ga 9.1.0`, `max_workers`, `poll` and `poll_interval`. These attributes have detailed explanations given [below](#supported-attributes-gcs). For now let's try to understand how this config works.
 
 For google cloud storage input to identify the files it needs to read and process, it will require the bucket names to be specified. We can have as many buckets as we deem fit. We are also able to configure the attributes `max_workers`, `poll` and `poll_interval` at the root level, which will then be applied to all buckets which do not specify any of these attributes explicitly.
 
@@ -258,7 +258,7 @@ An example config is shown below:
 
 ### `file_selectors` [attrib-file_selectors-gcs]
 
-If the GCS buckets have objects that correspond to files that Filebeat shouldn’t process, `file_selectors` can be used to limit the files that are downloaded. This is a list of selectors which are based on a regular expression pattern. The regular expression should match the object name or should be a part of the object name (ideally a prefix). The regular expression syntax used is [RE2](https://github.com/google/re2/wiki/Syntax). Files that don’t match any configured expression won’t be processed.This attribute can be specified both at the root level of the configuration as well at the bucket level. The bucket level values will always take priority and override the root level values if both are specified.
+If the GCS buckets have objects that correspond to files that Filebeat shouldn’t process, `file_selectors` can be used to limit the files that are downloaded. This is a list of selectors which are based on a regular expression pattern. The regular expression should match the object name or should be a part of the object name (ideally a prefix). The regular expression syntax used is [RE2](https://github.com/google/re2/wiki/Syntax). Files that don’t match any configured expression won’t be processed. This attribute can be specified both at the root level of the configuration as well at the bucket level. The bucket level values will always take priority and override the root level values if both are specified.
 
 ```yaml
 filebeat.inputs:
