@@ -695,7 +695,13 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		defer cli.Close()
 		// Results queued by an earlier run are resolved with this run's client.
 		bt.scheduledResults.setClient(ctx, cli)
-		defer bt.scheduledResults.clearClient(cli)
+		// Stop handing cli to the result worker as soon as the run ends, not
+		// after the rest of this run's teardown.
+		stopClear := context.AfterFunc(ctx, func() { bt.scheduledResults.clearClient(cli) })
+		defer func() {
+			stopClear()
+			bt.scheduledResults.clearClient(cli)
+		}()
 		profileCtx, cancelProfiles := context.WithCancel(ctx)
 		profileExecutor := newProfilingQueryExecutor(profileCtx, profileCli)
 		metrics := bt.profileMetrics

@@ -339,6 +339,11 @@ func (d *scheduledResultDispatcher) process(item scheduledItem) {
 	routed := lease != nil && lease.routes(item)
 	runCtx, client, ok := d.runFor(item)
 	if !expired && routed && !ok {
+		if d.client != nil {
+			// The run has ended but clearClient has not run yet. Clear the
+			// client now, so the wait below lasts until the next run.
+			d.clearRun()
+		}
 		// Keep item, as the oldest, until a run can resolve its rows. A
 		// routing lease means stop has not drained the queue yet.
 		set := d.clientSet
@@ -371,7 +376,8 @@ func (d *scheduledResultDispatcher) process(item scheduledItem) {
 // runFor returns the osqueryd run whose client resolves item's rows: the run
 // that produced item while it lasts, else the current run. Column types depend
 // only on the SQL, so any run's client resolves them. ok is false when item
-// needs a client and no run is current. The caller holds d.mu.
+// needs a client and no run is current, including a run whose context has
+// ended before clearClient ran. The caller holds d.mu.
 func (d *scheduledResultDispatcher) runFor(item scheduledItem) (ctx context.Context, client scheduledQueryClient, ok bool) {
 	r, native := item.(scheduledResult)
 	switch {
@@ -379,7 +385,7 @@ func (d *scheduledResultDispatcher) runFor(item scheduledItem) (ctx context.Cont
 		return context.Background(), nil, true
 	case r.ctx.Err() == nil:
 		return r.ctx, r.client, true
-	case d.client != nil:
+	case d.client != nil && d.runCtx.Err() == nil:
 		return d.runCtx, d.client, true
 	default:
 		return nil, nil, false
@@ -505,6 +511,11 @@ func (d *scheduledResultDispatcher) clearClient(client scheduledQueryClient) {
 	if d.client != client {
 		return
 	}
+	d.clearRun()
+}
+
+// clearRun forgets the current run's client. The caller holds d.mu.
+func (d *scheduledResultDispatcher) clearRun() {
 	d.runCtx, d.client = nil, nil
 	d.clientSet = make(chan struct{})
 }

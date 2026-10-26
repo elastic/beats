@@ -640,6 +640,43 @@ func TestScheduledResultsWaitForDaemonRun(t *testing.T) {
 	assert.Zero(t, client.calls.Load(), "the ended run's client must not resolve rows")
 }
 
+// ctxQueryClient resolves rows only while ctx is not done, as osqdcli.Client
+// does, and counts its calls.
+type ctxQueryClient struct{ calls atomic.Int32 }
+
+func (c *ctxQueryClient) ResolveResult(ctx context.Context, _ string, rows []map[string]string) ([]map[string]any, error) {
+	c.calls.Add(1)
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	return make([]map[string]any, len(rows)), nil
+}
+
+func TestScheduledResultsWaitWhileDaemonStops(t *testing.T) {
+	d, plugin, blocked, release := outageDispatcher(t, outageLimits)
+	client := &ctxQueryClient{}
+	run, cancel := context.WithCancel(t.Context())
+	d.setClient(run, client)
+	d.enqueue(run, client, plugin, QueryResult{Name: "scheduled", Action: "diff"}, nil)
+	waitForResultPublication(t, blocked)
+	rows := []map[string]string{{"value": "a"}, {"value": "b"}}
+	d.enqueue(run, client, plugin, QueryResult{Name: "scheduled", Action: "snapshot", Hits: rows}, nil)
+
+	// The run has ended, but runOsquery has not cleared its client yet.
+	cancel()
+	release()
+	assert.Never(t, func() bool { return d.metrics.dropped[dropStale].Get() > 0 || blocked.calls.Load() > 1 }, 100*time.Millisecond, time.Millisecond,
+		"a result must be neither dropped nor published with the client of an ended run")
+
+	next := &ctxQueryClient{}
+	d.setClient(t.Context(), next)
+	assert.Eventually(t, func() bool { return blocked.calls.Load() == 2 }, time.Second, time.Millisecond,
+		"the waiting result must be published once a run starts")
+	assert.Equal(t, int32(1), next.calls.Load(), "the new run's client must resolve the rows")
+	assert.Zero(t, client.calls.Load(), "the ended run's client must not resolve rows")
+	assert.Zero(t, d.metrics.dropped[dropStale].Get(), "a result that still routes must not be dropped as stale")
+}
+
 func TestScheduledResultsUnroutedAtDaemonRestartAreStale(t *testing.T) {
 	d, plugin, blocked, _ := outageDispatcher(t, outageLimits)
 	client := &countingQueryClient{}
