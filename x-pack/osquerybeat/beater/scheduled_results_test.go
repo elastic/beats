@@ -176,6 +176,21 @@ func TestScheduledResultsBoundLoggerAdmissionAndShutdown(t *testing.T) {
 	assert.Equal(t, int32(1), publisher.calls.Load(), "shutdown must not publish pending documents")
 }
 
+func TestScheduledResultsOverflowCountsRows(t *testing.T) {
+	d, plugin, blocked, _ := outageDispatcher(t, outageLimits)
+	d.enqueue(t.Context(), nil, plugin, QueryResult{Name: "scheduled", Action: "diff"}, nil)
+	waitForResultPublication(t, blocked)
+
+	// Each result is two rows plus its response, so the third overflows the
+	// eight-row limit.
+	result := QueryResult{Name: "scheduled", Action: "snapshot", Hits: make([]map[string]string, 2)}
+	for range 3 {
+		d.enqueue(t.Context(), outageQueryClient{}, plugin, result, nil)
+	}
+	assert.Equal(t, uint64(1), d.metrics.dropped[dropOverflow].Get(), "the oldest queued result must be dropped")
+	assert.Equal(t, uint64(3), d.metrics.droppedRows[dropOverflow].Get(), "count every row of the dropped result")
+}
+
 func TestScheduledResultsPolicyRetirementDoesNotWaitForOutput(t *testing.T) {
 	d, plugin, publisher, _ := outageDispatcher(t, outageLimits)
 	result := QueryResult{Name: "scheduled", Action: "diff"}
@@ -305,16 +320,17 @@ func TestScheduledProfilesQueuedAndEvictedFirst(t *testing.T) {
 	d.enqueue(t.Context(), outageQueryClient{}, plugin, result, nil)
 	waitForResultPublication(t, blocked)
 
-	// Queue a profile behind the in-flight result, then overflow the limit.
-	d.enqueueProfile(scheduledProfileItem{name: "scheduled", namespace: "old", query: "SELECT 1", profile: map[string]any{}})
+	// Queue a result and then a profile behind the in-flight result, then
+	// overflow the limit. The profile goes although the result is older.
 	d.enqueue(t.Context(), outageQueryClient{}, plugin, result, nil)
+	d.enqueueProfile(scheduledProfileItem{name: "scheduled", namespace: "old", query: "SELECT 1", profile: map[string]any{}})
 	d.enqueue(t.Context(), outageQueryClient{}, plugin, result, nil)
 	assert.Equal(t, uint64(1), d.metrics.dropped[dropOverflow].Get(), "only the profile should be evicted")
 	assert.Equal(t, uint64(1), d.metrics.droppedRows[dropOverflow].Get(), "a profile is one row")
 	assert.Equal(t, uint64(1), d.profileMetrics.outputFull.Get(), "keep counting evicted profiles where existing dashboards read them")
 	items, events := d.queue.stats()
-	assert.Equal(t, 2, items, "both later results should stay queued")
-	assert.Equal(t, 10, events, "the later results should fill the queue")
+	assert.Equal(t, 2, items, "both queued results should stay queued")
+	assert.Equal(t, 10, events, "the queued results should fill the queue")
 	assert.Equal(t, int64(2), d.metrics.items.Get(), "the queue.items gauge must report the queued results")
 	assert.Equal(t, int64(10), d.metrics.events.Get(), "the queue.events gauge must report the queued rows")
 
@@ -456,11 +472,14 @@ func TestScheduledResultsRetiredLeaseCutsUnroutedRows(t *testing.T) {
 	tests := []struct {
 		name          string
 		namespace     string // of the replacement policy
+		stop          bool   // stop the dispatcher instead of replacing the policy
 		wantPublished int32  // rows and response published by the retired clients
-		wantStale     uint64 // rows cut
+		reason        string // drop reason of the cut rows
+		wantCut       uint64 // rows cut
 	}{
-		{name: "still routed", namespace: "old", wantPublished: int32(len(rows) + 1)},
-		{name: "moved namespace", namespace: "other", wantStale: uint64(len(rows) + 1)},
+		{name: "still routed", namespace: "old", wantPublished: int32(len(rows) + 1), reason: dropStale},
+		{name: "moved namespace", namespace: "other", reason: dropStale, wantCut: uint64(len(rows) + 1)},
+		{name: "stopped", stop: true, reason: dropShutdown, wantCut: uint64(len(rows) + 1)},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -489,21 +508,25 @@ func TestScheduledResultsRetiredLeaseCutsUnroutedRows(t *testing.T) {
 			case <-time.After(time.Second):
 				t.Fatal("the result did not reach the blocked output")
 			}
-			require.NoError(t, d.configure(outageInputs(test.namespace), outageLimits), "retire the clients publishing the result")
+			if test.stop {
+				d.stop()
+			} else {
+				require.NoError(t, d.configure(outageInputs(test.namespace), outageLimits), "retire the clients publishing the result")
+			}
 			close(first.release)
 
-			if test.wantStale == 0 {
+			if test.wantCut == 0 {
 				select {
 				case <-first.done:
 				case <-time.After(time.Second):
 					t.Fatal("the in-flight result's response was not published")
 				}
 			} else {
-				assert.Eventually(t, func() bool { return d.metrics.dropped[dropStale].Get() == 1 }, time.Second, time.Millisecond,
-					"a result cut short by retirement must count as one stale item")
+				assert.Eventually(t, func() bool { return d.metrics.dropped[test.reason].Get() == 1 }, time.Second, time.Millisecond,
+					"a result cut short by retirement must count as one %s item", test.reason)
 			}
 			assert.Equal(t, test.wantPublished, first.published.Load(), "rows and response published through the retired clients")
-			assert.Equal(t, test.wantStale, d.metrics.droppedRows[dropStale].Get(), "rows cut by retirement")
+			assert.Equal(t, test.wantCut, d.metrics.droppedRows[test.reason].Get(), "rows cut by retirement")
 		})
 	}
 }

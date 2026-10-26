@@ -121,6 +121,16 @@ func TestRowQueueAcceptsOversizedItemWhole(t *testing.T) {
 	}
 }
 
+func TestRowQueueRequeueKeepsOversizedItem(t *testing.T) {
+	q, evicted := newTestRowQueue(10)
+	q.push(testQueueItem{name: "huge", n: 50})
+	item, ok := q.pop(t.Context())
+	require.True(t, ok, "pop the oversized item")
+	q.requeue(item)
+	assert.Empty(t, *evicted, "a requeued item larger than the limit must stay queued on its own")
+	assertStats(t, q, 1, 50)
+}
+
 func TestRowQueueShrinkEvicts(t *testing.T) {
 	tests := []struct {
 		name        string
