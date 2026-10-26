@@ -250,7 +250,7 @@ In this example, the secrets of the `prod` connection can only be sent to `api.s
       allowed_hosts: ["api.stripe.com"]
 ```
 
-`allowed_hosts` restricts where the secrets are sent, not who can see them. A secret in a setting that Heartbeat publishes is visible in the events, as the warning above describes.
+`allowed_hosts` restricts where secrets are sent, not who can see them. A secret in a setting that Heartbeat publishes is visible in events, as described in the [`secret_stores`](#monitor-secret-stores) warning.
 
 
 ### `fields` [monitor-fields]
