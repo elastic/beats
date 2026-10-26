@@ -177,7 +177,7 @@ Each `secret_stores` entry takes these options:
 :   (Optional) TLS settings of the connection to Vault, such as `certificate_authorities` to trust a private CA. They only apply to Vault: the `ssl` settings of the monitor apply to the monitored host. See [SSL](/reference/heartbeat/configuration-ssl.md) for the available settings.
 
 `allowed_hosts`
-:   (Optional) The hosts that the secrets of this connection can be sent to, as host names or IP addresses, without scheme, port, or path. See [Restrict the hosts that receive secrets](#monitor-secret-stores-allowed-hosts). If you don't set it, or set it to an empty list, any host can receive the secrets.
+:   (Optional) The hosts that the secrets of this connection can be sent to, as host names or IP addresses, without scheme, port, or path. Refer to [Restrict the hosts that receive secrets](#monitor-secret-stores-allowed-hosts). If you don't set this option, or set it to an empty list, any host can receive the secrets.
 
 Heartbeat resolves the references before each run. A secret is read from Vault at most once every 5 minutes and shared by the monitors that use the same connection, so rotated secrets are used within 5 minutes without changing the monitor. On runs that read from Vault, the monitor duration includes the time of the read.
 
