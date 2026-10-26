@@ -122,6 +122,10 @@ func (f StreamDecoder) ReadBytesInternal() []byte {
 		return nil
 	}
 
+	if !f.r.Avail(size) {
+		panic(fmt.Errorf("not enough buf to readBytes, need:%d, actual:%d", size, f.r.Len()))
+	}
+
 	bytes := make([]byte, size)
 	_, err := f.r.Read(bytes)
 	if err != nil {

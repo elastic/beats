@@ -45,3 +45,53 @@ func TestReadInt(t *testing.T) {
 		assert.Equal(t, tc.want, array.ReadInt(), "ByteArrayDecoder.ReadInt(%#x)", tc.wire)
 	}
 }
+
+func TestStreamDecoderReadBytesLength(t *testing.T) {
+	authSuccess := func(length int32, payload string) []byte {
+		return append(appendInt(nil, length), payload...)
+	}
+
+	tests := []struct {
+		name    string
+		body    []byte
+		want    map[string]any
+		wantErr string
+	}{
+		{
+			name: "valid token",
+			body: authSuccess(3, "abc"),
+			want: map[string]any{"authentication": map[string]any{"data": `"abc"`}},
+		},
+		{
+			name: "null token",
+			body: authSuccess(-1, ""),
+			want: map[string]any{"authentication": map[string]any{"data": `""`}},
+		},
+		{
+			name: "other negative length",
+			body: authSuccess(-2, ""),
+			want: map[string]any{"authentication": map[string]any{"data": `""`}},
+		},
+		{
+			name:    "length beyond buffered body",
+			body:    authSuccess(4096, "abc"),
+			wantErr: "not enough buf to readBytes, need:4096, actual:3",
+		},
+		{
+			name:    "maximum length",
+			body:    authSuccess(0x7fffffff, ""),
+			wantErr: "not enough buf to readBytes, need:2147483647, actual:0",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			data, err := decodeFrame(t, newFrame(v4Response, 0, opAuthSuccess, tc.body), nil)
+			if tc.wantErr != "" {
+				assert.ErrorContains(t, err, tc.wantErr, "length beyond the body should be rejected before allocating")
+				return
+			}
+			assert.NoError(t, err, "valid frame should parse")
+			assert.Equal(t, tc.want, data, "unexpected decoded frame")
+		})
+	}
+}
