@@ -77,7 +77,7 @@ func TestReadFrameLongStringLength(t *testing.T) {
 		encode     func([]byte) []byte
 	}{
 		{name: "stream", encode: func(b []byte) []byte { return b }},
-		{name: "compressed", compressor: SnappyCompressor{}, flags: flagCompress, encode: func(b []byte) []byte { return snappy.Encode(nil, b) }},
+		{name: "compressed", compressor: SnappyCompressor{MaxDecodedLen: 1 << 10}, flags: flagCompress, encode: func(b []byte) []byte { return snappy.Encode(nil, b) }},
 	}
 	for _, dec := range decoders {
 		for _, tc := range tests {
@@ -154,6 +154,41 @@ func TestReadFramePkeyCount(t *testing.T) {
 			prepared, _ := result["prepared"].(map[string]any)
 			reqMeta, _ := prepared["req_meta"].(map[string]any)
 			assert.Equal(t, tc.want, reqMeta["pkey_columns"], "unexpected pkey columns")
+		})
+	}
+}
+
+func TestReadFrameSnappyDecodedLength(t *testing.T) {
+	voidResult := appendInt(nil, resultKindVoid)
+	compressor := SnappyCompressor{MaxDecodedLen: len(voidResult)}
+
+	tests := []struct {
+		name    string
+		body    []byte
+		want    map[string]any
+		wantErr error
+	}{
+		{
+			name: "decoded length at limit",
+			body: snappy.Encode(nil, voidResult),
+			want: map[string]any{"result": map[string]any{"type": "void"}},
+		},
+		{
+			name:    "decoded length above limit",
+			body:    binary.AppendUvarint(nil, uint64(len(voidResult)+1)),
+			wantErr: ErrFrameTooBig,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			frame := newFrame(v4Response, flagCompress, opResult, tc.body)
+			data, err := decodeFrame(t, frame, compressor)
+			if tc.wantErr != nil {
+				assert.ErrorIs(t, err, tc.wantErr, "oversized decoded length should be rejected before allocating")
+				return
+			}
+			assert.NoError(t, err, "valid frame should parse")
+			assert.Equal(t, tc.want, data, "unexpected decoded frame")
 		})
 	}
 }
