@@ -128,15 +128,17 @@ A scheduled profile dropped once it is queued is counted only under
 under `osquerybeat.scheduled_query_profiles`: `dropped.queue_full`,
 `dropped.stale` and `dropped.shutdown` count profiles dropped before they were
 queued, `failed` counts failed collections, and `collected` counts profiles
-collected and queued, not delivered.
+collected and handed to the scheduled queue, not delivered.
 
 ## Behaviour changes
 
-- Any invalid osquery input configuration, including invalid publishing
-  settings, is now rejected. On the process runtime the osquery unit is
-  marked failed and the previous settings stay active; before, an invalid
-  configuration was ignored and the unit stayed healthy. On the OTel runtime
-  the receiver fails to start.
+- An osquery input configuration that fails validation when the policy is
+  read, including invalid publishing settings, is now rejected. On the
+  process runtime the osquery unit is marked failed and the previous settings
+  stay active; before, such a configuration was ignored and the unit stayed
+  healthy. On the OTel runtime the receiver fails to start. A policy
+  osquerybeat cannot apply, for example one with an invalid ECS mapping,
+  still stops osquerybeat, as before.
 - Live query actions that fail now report their real `started_at` and
   `completed_at`.
 - Live query action responses are published asynchronously by the live
