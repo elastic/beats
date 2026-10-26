@@ -106,8 +106,8 @@ class Test(BaseTest):
                 return False
             if size is not None and event.get("file.size") != size:
                 return False
-            # The ebpf backend reports the full st_mode (0100777), the
-            # others only the permission bits (0777).
+            # Mask to the permission bits so the check does not depend on
+            # whether a backend reports the full st_mode.
             if mode is not None and int(event.get("file.mode", "0"), 8) & 0o7777 != mode:
                 return False
             return True
