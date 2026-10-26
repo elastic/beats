@@ -93,7 +93,9 @@ type sharedRegistrar struct {
 	flushTimeout atomic.Int64
 
 	pending      map[*Registrar]int
+	mu           sync.Mutex
 	owned        map[*Registrar]map[string]struct{}
+	warned       map[string]struct{}
 	flushWaiters []chan struct{}
 
 	gcEnabled, gcRequired bool
@@ -138,7 +140,20 @@ func (r *Registrar) GetStates() []file.State {
 	if r.shared == nil {
 		return nil
 	}
-	return r.shared.states.GetStates()
+	return r.shared.statesFor(r)
+}
+
+func (s *sharedRegistrar) statesFor(owner *Registrar) []file.State {
+	states := s.states.GetStates()
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	mine := s.owned[owner]
+	for i := range states {
+		if _, ok := mine[states[i].Id]; !ok {
+			states[i].Finished = true
+		}
+	}
+	return states
 }
 
 // Start joins or creates the shared registrar for this owner's backend key and
@@ -242,6 +257,7 @@ func openShared(stateStore statestore.States, flushTimeout time.Duration, logger
 		store:   store,
 		pending: make(map[*Registrar]int),
 		owned:   make(map[*Registrar]map[string]struct{}),
+		warned:  make(map[string]struct{}),
 	}
 	s.flushTimeout.Store(int64(max(flushTimeout, 0)))
 
@@ -341,17 +357,20 @@ func (s *sharedRegistrar) apply(u update) {
 	}
 }
 
-// finishStatesOf marks every state the owner reported as finished and forgets
-// the owner. The owner's harvesters have stopped, so a later input matching
+// finishStatesOf marks every state the owner is harvesting as finished and
+// forgets the owner. The owner's harvesters have stopped, so a later input matching
 // these files must be allowed to start, exactly as after a process restart.
 func (s *sharedRegistrar) finishStatesOf(owner *Registrar) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	for id := range s.owned[owner] {
+		delete(s.warned, id)
 		st := s.states.FindPrevious(file.State{Id: id})
 		if st.Id == "" || st.Finished {
 			continue
 		}
 		st.Finished = true
-		s.states.UpdateWithTs(st, st.Timestamp)
+		s.states.UpdateWithTs(st, time.Now())
 	}
 	delete(s.owned, owner)
 }
@@ -388,14 +407,7 @@ func (s *sharedRegistrar) commitStateUpdates() {
 func (s *sharedRegistrar) onEvents(states []file.State, owner *Registrar) {
 	s.processEventStates(states)
 	s.pending[owner] += len(states)
-	ids := s.owned[owner]
-	if ids == nil {
-		ids = make(map[string]struct{})
-		s.owned[owner] = ids
-	}
-	for i := range states {
-		ids[states[i].Id] = struct{}{}
-	}
+	s.trackOwnership(states, owner)
 
 	// check if we need to enable state cleanup
 	if !s.gcEnabled {
@@ -414,6 +426,44 @@ func (s *sharedRegistrar) onEvents(states []file.State, owner *Registrar) {
 	s.gcRequired = s.gcEnabled
 }
 
+func (s *sharedRegistrar) trackOwnership(states []file.State, owner *Registrar) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	ids := s.owned[owner]
+	if ids == nil {
+		ids = make(map[string]struct{})
+		s.owned[owner] = ids
+	}
+	for i := range states {
+		st := &states[i]
+		if st.Finished {
+			delete(ids, st.Id)
+			delete(s.warned, st.Id)
+			continue
+		}
+		if _, ok := ids[st.Id]; ok {
+			continue
+		}
+		ids[st.Id] = struct{}{}
+		if _, ok := s.warned[st.Id]; ok {
+			continue
+		}
+		for other, otherIDs := range s.owned {
+			if other == owner {
+				continue
+			}
+			if _, ok := otherIDs[st.Id]; ok {
+				s.warned[st.Id] = struct{}{}
+				for _, r := range []*Registrar{owner, other} {
+					r.log.Warnf("File %s is harvested by more than one receiver sharing this registry: "+
+						"overlapping log input paths are unsupported and duplicate events", st.Source)
+				}
+				break
+			}
+		}
+	}
+}
+
 // gcStates runs a registry Cleanup. The method check if more event in the
 // registry can be gc'ed in the future. If no potential removable state is found,
 // the gcEnabled flag is set to false, indicating the current registrar state being
@@ -426,6 +476,9 @@ func (s *sharedRegistrar) gcStates() {
 	beforeCount := s.states.Count()
 	cleanedStates, pendingClean := s.states.CleanupWith(func(id string) {
 		s.store.Remove(fileStatePrefix + id) //nolint:errcheck // TODO: report error
+		s.mu.Lock()
+		defer s.mu.Unlock()
+		delete(s.warned, id)
 		for _, ids := range s.owned {
 			delete(ids, id)
 		}

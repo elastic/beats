@@ -18,7 +18,7 @@ summary: Fix Log input file re-ingestion after restart when multiple inputs run 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-description: When multiple Log inputs used the same registry, each registrar loaded every log input state and rewrote all of them on every flush. A registrar could therefore persist a stale offset for a file harvested by another Log input, causing events to be ingested again after restart. Log inputs that use the same registry now share a single registrar.
+description: When multiple Log inputs used the same registry, each registrar loaded every log input state and rewrote all of them on every flush. A registrar could therefore persist a stale offset for a file harvested by another Log input, causing events to be ingested again after restart. Log inputs that use the same registry now share a single registrar. Overlapping Log input paths remain unsupported and still duplicate events, and a warning is now logged when receivers sharing a registry read the same file.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:
