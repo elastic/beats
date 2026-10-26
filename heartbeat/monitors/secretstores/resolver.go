@@ -24,6 +24,8 @@ import (
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 )
 
 // Resolver replaces secret references in monitor configurations.
@@ -42,7 +44,11 @@ func NewResolver(logger *logp.Logger) *Resolver {
 // Resolve returns a copy of cfg without the secret_stores setting, where each
 // configured store, in list order, replaced its references. cfg itself is not
 // modified. Without secret_stores, cfg is returned as is.
-func (r *Resolver) Resolve(cfg *conf.C) (*conf.C, error) {
+//
+// If a connection with allowed_hosts replaced references, every host that
+// destinations returns for the resolved config must be allowed. A nil
+// destinations means the monitor type can't use such connections.
+func (r *Resolver) Resolve(cfg *conf.C, destinations plugin.DestinationsFunc) (*conf.C, error) {
 	entries, err := configEntries(cfg)
 	if err != nil || len(entries) == 0 {
 		return cfg, err
@@ -54,17 +60,30 @@ func (r *Resolver) Resolve(cfg *conf.C) (*conf.C, error) {
 	}
 	ctx := context.Background()
 	scopes := scopes(entries)
+	var usedRestricted []entry
 	for i, e := range entries {
 		s, err := sharedStores.get(e, r.logger)
 		if err != nil {
 			return nil, err
 		}
-		if resolved, err = s.Replace(ctx, resolved, scopes[i]); err != nil {
+		next, err := s.Replace(ctx, resolved, scopes[i])
+		if err != nil {
 			if errors.Is(err, ErrSelection) {
 				return nil, fmt.Errorf("%s: %w", ConfigKey, err)
 			}
 			return nil, fmt.Errorf("could not resolve %s secret references: %w", e.label(), err)
 		}
+		// Replace returns its input when it has no references of the entry.
+		if next != resolved && e.isRestricted() {
+			usedRestricted = append(usedRestricted, e)
+		}
+		resolved = next
+	}
+	// Checking the resolved config covers destinations and references that
+	// come from secret values.
+	monitorType, _ := cfg.String("type", -1)
+	if err := checkAllowedHosts(usedRestricted, monitorType, destinations, resolved); err != nil {
+		return nil, err
 	}
 	return resolved, nil
 }
