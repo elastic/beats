@@ -37,8 +37,8 @@ type rowQueue[T queuedItem] struct {
 	limit  int
 	events int
 	// first counts the queued evictFirst items, so evict scans only when
-	// there is one.
-	first int
+	// there is one, and firstRows counts their rows.
+	first, firstRows int
 }
 
 // newRowQueue returns a queue holding up to maxEvents rows. onEvict is
@@ -49,24 +49,24 @@ func newRowQueue[T queuedItem](maxEvents int, onEvict func(T)) *rowQueue[T] {
 
 // push adds item, evicting older items until it fits. An evictFirst item
 // that would need an item for which evictFirst is false evicted is dropped
-// itself instead. push never blocks.
+// itself instead, without evicting anything. push never blocks.
 func (q *rowQueue[T]) push(item T) {
 	q.mu.Lock()
 	first := item.evictFirst()
+	if first && q.items.Len() > q.first && q.events-q.firstRows+item.rows() > q.limit {
+		q.mu.Unlock()
+		q.onEvict(item)
+		return
+	}
 	var evicted []T
 	for q.items.Len() > 0 && q.events+item.rows() > q.limit {
-		if first && q.first == 0 {
-			q.changed()
-			q.mu.Unlock()
-			q.evicted(append(evicted, item))
-			return
-		}
 		evicted = append(evicted, q.evict())
 	}
 	q.items.PushBack(item)
 	q.events += item.rows()
 	if first {
 		q.first++
+		q.firstRows += item.rows()
 	}
 	q.changed()
 	q.mu.Unlock()
@@ -92,6 +92,7 @@ func (q *rowQueue[T]) remove(e *list.Element) T {
 	q.events -= item.rows()
 	if item.evictFirst() {
 		q.first--
+		q.firstRows -= item.rows()
 	}
 	return item
 }
@@ -154,6 +155,7 @@ func (q *rowQueue[T]) requeue(item T) {
 	q.events += item.rows()
 	if item.evictFirst() {
 		q.first++
+		q.firstRows += item.rows()
 	}
 	var evicted []T
 	for q.items.Len() > 1 && q.events > q.limit {

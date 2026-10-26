@@ -70,6 +70,15 @@ func TestRowQueueDropsProfileRatherThanResult(t *testing.T) {
 	assertStats(t, q, 2, 10)
 }
 
+func TestRowQueueDropsOnlyIncomingProfileWhenProfilesCannotMakeRoom(t *testing.T) {
+	q, evicted := newTestRowQueue(10)
+	q.push(testQueueItem{name: "r", n: 9})
+	q.push(testQueueItem{name: "p1", n: 1, profile: true})
+	q.push(testQueueItem{name: "p2", n: 2, profile: true})
+	assert.Equal(t, []string{"p2"}, *evicted, "evicting the queued profile cannot make room, so only the incoming one should be dropped")
+	assertStats(t, q, 2, 10)
+}
+
 func TestRowQueueTracksEvictFirstItems(t *testing.T) {
 	// Popping a result must not hide a queued profile from eviction.
 	q, evicted := newTestRowQueue(10)
