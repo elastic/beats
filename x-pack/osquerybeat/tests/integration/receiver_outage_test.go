@@ -215,6 +215,10 @@ func TestReceiverOutputOutage(t *testing.T) {
 			var liveErr error
 			liveDone := make(chan struct{})
 			if restoreOutput {
+				// A queued scheduled result proves the pipeline is full, so the
+				// live rows cannot all be handed to it before the timeout.
+				require.Eventually(t, func() bool { return scheduledStats(t, monitorPort).Queue.Items > 0 }, 30*time.Second, 100*time.Millisecond,
+					"scheduled results must queue behind the full pipeline before the live query")
 				execute := actions.handler()
 				go func() {
 					defer close(liveDone)
@@ -237,7 +241,7 @@ func TestReceiverOutputOutage(t *testing.T) {
 				assert.NotEqual(t, componentstatus.StatusPermanentError, event.Status(), "receiver must not permanently fail")
 				assert.NotEqual(t, componentstatus.StatusFatalError, event.Status(), "receiver must not fatally fail")
 			}
-			dropped := scheduledDroppedRows(t, monitorPort)
+			dropped := scheduledStats(t, monitorPort).DroppedRows
 			require.Contains(t, dropped, "overflow", "the scheduled queue must report overflow drops")
 			assert.Zero(t, dropped["overflow"], "the outage backlog must fit in max_events without overflow drops")
 			if restoreOutput {
@@ -395,9 +399,16 @@ func (l *executionLog) completeAfter(first, unixTime int64, rows int) (int64, bo
 	}
 }
 
-// scheduledDroppedRows returns osquerybeat.publishing.scheduled.dropped_rows
-// from the receiver's stats endpoint.
-func scheduledDroppedRows(t *testing.T, port int) map[string]uint64 {
+// scheduledPublishingStats is osquerybeat.publishing.scheduled from the
+// receiver's stats endpoint.
+type scheduledPublishingStats struct {
+	DroppedRows map[string]uint64 `json:"dropped_rows"`
+	Queue       struct {
+		Items int64 `json:"items"`
+	} `json:"queue"`
+}
+
+func scheduledStats(t *testing.T, port int) scheduledPublishingStats {
 	t.Helper()
 	// Without keep-alives no connection goroutines outlive the request.
 	client := &http.Client{Transport: &http.Transport{DisableKeepAlives: true}}
@@ -408,12 +419,10 @@ func scheduledDroppedRows(t *testing.T, port int) map[string]uint64 {
 	var stats struct {
 		Osquerybeat struct {
 			Publishing struct {
-				Scheduled struct {
-					DroppedRows map[string]uint64 `json:"dropped_rows"`
-				} `json:"scheduled"`
+				Scheduled scheduledPublishingStats `json:"scheduled"`
 			} `json:"publishing"`
 		} `json:"osquerybeat"`
 	}
 	require.NoError(t, json.NewDecoder(resp.Body).Decode(&stats), "decode receiver stats")
-	return stats.Osquerybeat.Publishing.Scheduled.DroppedRows
+	return stats.Osquerybeat.Publishing.Scheduled
 }
