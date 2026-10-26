@@ -22,6 +22,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestProcNetUDP(t *testing.T) {
@@ -148,4 +150,20 @@ func TestProcNetUDP(t *testing.T) {
 			}
 		})
 	})
+}
+
+// TestProcNetUDPDualStack checks that the addresses for a listener on 0.0.0.0
+// match its entries in /proc/net/udp6, which is where dual-stack sockets are
+// listed.
+func TestProcNetUDPDualStack(t *testing.T) {
+	_, addr6, err := addrs("0.0.0.0:7101", "", logptest.NewTestingLogger(t, ""))
+	assert.NoError(t, err)
+
+	hasUnspecified6, addrIsUnspecified6, bad := containsUnspecifiedAddr(addr6)
+	assert.Nil(t, bad)
+	rx6, drops6, err := procNetUDP("testdata/proc_net_udp6.txt", addr6, hasUnspecified6, addrIsUnspecified6)
+	assert.NoError(t, err)
+	assert.EqualValues(t, 2, rx6)
+	assert.EqualValues(t, 2*475174, drops6)
+
 }
