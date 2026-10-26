@@ -416,14 +416,16 @@ func TestScheduledResultsUnresolvedRowsCountStale(t *testing.T) {
 
 // cuttingResultPublisher stops publishing rows once its lease is retired and
 // reports the rows it skipped, like pub.Publisher. Its first row waits for
-// release.
+// release; done is closed when it publishes a response.
 type cuttingResultPublisher struct {
 	mockBeatPublisher
-	allowed func() bool
-	cut     func(int)
-	entered chan struct{}
-	release chan struct{}
-	once    sync.Once
+	allowed   func() bool
+	cut       func(int)
+	entered   chan struct{}
+	release   chan struct{}
+	done      chan struct{}
+	once      sync.Once
+	published atomic.Int32
 }
 
 func (p *cuttingResultPublisher) Publish(_, _, _, _, _, _, _, _ string, _ map[string]any, hits []map[string]any, _ ecs.Mapping, _ any) {
@@ -436,48 +438,74 @@ func (p *cuttingResultPublisher) Publish(_, _, _, _, _, _, _, _ string, _ map[st
 			p.cut(len(hits) - i)
 			return
 		}
+		p.published.Add(1)
 	}
 }
 
 func (p *cuttingResultPublisher) PublishScheduledResponse(string, string, string, string, string, string, time.Time, time.Time, time.Time, int, int64) {
 	if !p.allowed() {
 		p.cut(1)
+		return
 	}
+	p.published.Add(1)
+	close(p.done)
 }
 
-func TestScheduledResultsRetiredLeaseCountsCutRows(t *testing.T) {
-	log := logptest.NewTestingLogger(t, "cut")
-	var first *cuttingResultPublisher
-	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(allowed func() bool, _ func(), cut func(int)) osquerybeatPublisher {
-		p := &cuttingResultPublisher{allowed: allowed, cut: cut, entered: make(chan struct{}), release: make(chan struct{})}
-		if first == nil {
-			first = p
-		} else {
-			close(p.release)
-		}
-		return p
-	}, (&osquerybeat{log: log}).handleScheduledQueryResult)
-	inputs := outageInputs("old")
-	plugin := NewConfigPlugin(log)
-	require.NoError(t, plugin.Set(inputs), "validate the policy")
-	_, err := plugin.GenerateConfig(t.Context())
-	require.NoError(t, err, "apply the native policy")
-	require.NoError(t, d.configure(inputs, outageLimits), "configure the first scheduled clients")
-	stopOnCleanup(t, d)
-
+func TestScheduledResultsRetiredLeaseCutsUnroutedRows(t *testing.T) {
 	rows := []map[string]string{{"value": "a"}, {"value": "b"}, {"value": "c"}}
-	d.enqueue(t.Context(), outageQueryClient{}, plugin, QueryResult{Name: "scheduled", Action: "snapshot", Hits: rows}, nil)
-	select {
-	case <-first.entered:
-	case <-time.After(time.Second):
-		t.Fatal("the result did not reach the blocked output")
+	tests := []struct {
+		name          string
+		namespace     string // of the replacement policy
+		wantPublished int32  // rows and response published by the retired clients
+		wantStale     uint64 // rows cut
+	}{
+		{name: "still routed", namespace: "old", wantPublished: int32(len(rows) + 1)},
+		{name: "moved namespace", namespace: "other", wantStale: uint64(len(rows) + 1)},
 	}
-	require.NoError(t, d.configure(inputs, outageLimits), "retire the clients publishing the result")
-	close(first.release)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			log := logptest.NewTestingLogger(t, "cut")
+			var first *cuttingResultPublisher
+			d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(allowed func() bool, _ func(), cut func(int)) osquerybeatPublisher {
+				p := &cuttingResultPublisher{allowed: allowed, cut: cut, entered: make(chan struct{}), release: make(chan struct{}), done: make(chan struct{})}
+				if first == nil {
+					first = p
+				} else {
+					close(p.release)
+				}
+				return p
+			}, (&osquerybeat{log: log}).handleScheduledQueryResult)
+			inputs := outageInputs("old")
+			plugin := NewConfigPlugin(log)
+			require.NoError(t, plugin.Set(inputs), "validate the policy")
+			_, err := plugin.GenerateConfig(t.Context())
+			require.NoError(t, err, "apply the native policy")
+			require.NoError(t, d.configure(inputs, outageLimits), "configure the first scheduled clients")
+			stopOnCleanup(t, d)
 
-	assert.Eventually(t, func() bool { return d.metrics.dropped[dropStale].Get() == 1 }, time.Second, time.Millisecond,
-		"a result cut short by retirement must count as one stale item")
-	assert.Equal(t, uint64(len(rows)+1), d.metrics.droppedRows[dropStale].Get(), "count the cut rows and the skipped response")
+			d.enqueue(t.Context(), outageQueryClient{}, plugin, QueryResult{Name: "scheduled", Action: "snapshot", Hits: rows}, nil)
+			select {
+			case <-first.entered:
+			case <-time.After(time.Second):
+				t.Fatal("the result did not reach the blocked output")
+			}
+			require.NoError(t, d.configure(outageInputs(test.namespace), outageLimits), "retire the clients publishing the result")
+			close(first.release)
+
+			if test.wantStale == 0 {
+				select {
+				case <-first.done:
+				case <-time.After(time.Second):
+					t.Fatal("the in-flight result's response was not published")
+				}
+			} else {
+				assert.Eventually(t, func() bool { return d.metrics.dropped[dropStale].Get() == 1 }, time.Second, time.Millisecond,
+					"a result cut short by retirement must count as one stale item")
+			}
+			assert.Equal(t, test.wantPublished, first.published.Load(), "rows and response published through the retired clients")
+			assert.Equal(t, test.wantStale, d.metrics.droppedRows[dropStale].Get(), "rows cut by retirement")
+		})
+	}
 }
 
 func TestScheduledProfilesNeedProfileStream(t *testing.T) {

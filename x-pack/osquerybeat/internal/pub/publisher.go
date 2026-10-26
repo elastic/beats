@@ -498,8 +498,9 @@ func hitToEvent(index, eventType, idValue, idFieldKey, responseID, spaceID, pack
 // NewScheduled creates policy-bound clients for the asynchronous native logger
 // path. They block for queue space, because on a shared slab queue pool a
 // DropIfFull client loses nearly every race against blocked producers. allowed
-// prevents remaining rows from crossing retirement; cut is called with the
-// number of rows skipped because allowed returned false. dropped is called for
+// reports whether the remaining rows may still be published, for example
+// after the policy was replaced; cut is called with the number of rows skipped
+// because allowed returned false. dropped is called for
 // each event published after its client closed.
 func NewScheduled(b *beat.Beat, log *logp.Logger, allowed func() bool, dropped func(), cut func(rows int)) *Publisher {
 	return &Publisher{b: b, log: log, allowed: allowed, cut: cut, listener: &scheduledListener{dropped: dropped}}

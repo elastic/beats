@@ -122,11 +122,18 @@ type scheduledResultLease struct {
 	view      *ConfigPlugin
 	profiles  bool            // whether the policy has a query profile stream
 	ctx       context.Context // accessed only while the worker holds mu
+	item      scheduledItem   // the item being published; accessed only while the worker holds mu
 	cut       int             // rows the publisher skipped after retirement; accessed only while the worker holds mu
 }
 
-func (l *scheduledResultLease) allowed() bool {
-	return !l.retired.Load() && l.ctx != nil && l.ctx.Err() == nil
+// allowed reports whether the worker may publish the rest of l.item through
+// l: the dispatcher has not stopped, and l is active or current, the lease
+// that replaced it, still routes the item.
+func (l *scheduledResultLease) allowed(current *scheduledResultLease) bool {
+	if l.ctx == nil || l.ctx.Err() != nil {
+		return false
+	}
+	return !l.retired.Load() || current != nil && current.routes(l.item)
 }
 
 // routes reports whether l sends item's query to the item's namespace with
@@ -143,7 +150,7 @@ func (l *scheduledResultLease) routes(item scheduledItem) bool {
 
 // unlock ends the worker's use of l, closing l if it was retired meanwhile.
 func (l *scheduledResultLease) unlock() {
-	l.ctx = nil
+	l.ctx, l.item = nil, nil
 	if l.retired.Load() {
 		l.closeOnce.Do(l.publisher.Close)
 	}
@@ -166,6 +173,9 @@ type scheduledResultDispatcher struct {
 	done            chan struct{}
 	started, closed bool
 	lease           *scheduledResultLease
+	// current mirrors lease for publishers' allowed checks, which run
+	// without mu.
+	current atomic.Pointer[scheduledResultLease]
 	// runCtx and client belong to the running osqueryd, if any; client is
 	// nil between runs. clientSet is closed while client is set.
 	runCtx         context.Context
@@ -218,7 +228,7 @@ func (d *scheduledResultDispatcher) configure(inputs []config.InputConfig, cfg c
 		})}
 		// A blocking client drops only events published after it is closed,
 		// which happens when the pipeline closes on shutdown.
-		next.publisher = d.newPublisher(next.allowed,
+		next.publisher = d.newPublisher(func() bool { return next.allowed(d.current.Load()) },
 			func() { d.metrics.dropRows(dropShutdown, 1) },
 			func(rows int) { next.cut += rows })
 		if err := next.publisher.Configure(inputs); err != nil {
@@ -239,6 +249,7 @@ func (d *scheduledResultDispatcher) configure(inputs []config.InputConfig, cfg c
 		previous.retired.Store(true)
 	}
 	d.lease = next
+	d.current.Store(next)
 	d.maxAge = cfg.MaxAge
 	if next != nil && !d.started {
 		d.started = true
@@ -383,8 +394,8 @@ func (d *scheduledResultDispatcher) publish(lease *scheduledResultLease, item sc
 		cancel()
 	}
 	defer func() { stop(); cancel() }()
-	lease.ctx = d.ctx
-	if !lease.allowed() {
+	lease.ctx, lease.item = d.ctx, item
+	if !lease.allowed(d.current.Load()) {
 		d.dropCut(item, item.rows())
 		return
 	}
@@ -502,6 +513,7 @@ func (d *scheduledResultDispatcher) stop() {
 		lease.retired.Store(true)
 	}
 	d.lease = nil
+	d.current.Store(nil)
 	for _, item := range d.queue.drain() {
 		d.dropShutdown(item)
 	}
