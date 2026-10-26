@@ -17,11 +17,17 @@ type testQueueItem struct {
 	name    string
 	n       int
 	profile bool
+	checks  *int // Counts evictFirst calls when set.
 }
 
 func (i testQueueItem) rows() int           { return i.n }
 func (i testQueueItem) enqueued() time.Time { return time.Time{} }
-func (i testQueueItem) evictFirst() bool    { return i.profile }
+func (i testQueueItem) evictFirst() bool {
+	if i.checks != nil {
+		*i.checks++
+	}
+	return i.profile
+}
 
 func newTestRowQueue(limit int) (*rowQueue[testQueueItem], *[]string) {
 	var evicted []string
@@ -53,6 +59,27 @@ func TestRowQueueEvictsProfilesFirst(t *testing.T) {
 	q.push(testQueueItem{name: "r3", n: 4})
 	assert.Equal(t, []string{"p", "r1"}, *evicted, "the profile item should go before the oldest result")
 	assertStats(t, q, 2, 8)
+}
+
+func TestRowQueueTracksEvictFirstItems(t *testing.T) {
+	// Popping a result must not hide a queued profile from eviction.
+	q, evicted := newTestRowQueue(10)
+	q.push(testQueueItem{name: "r0", n: 4})
+	q.push(testQueueItem{name: "r1", n: 4})
+	q.push(testQueueItem{name: "p", n: 1, profile: true})
+	_, ok := q.pop(t.Context())
+	require.True(t, ok, "pop the oldest result")
+	q.push(testQueueItem{name: "r2", n: 4})
+	q.push(testQueueItem{name: "r3", n: 4})
+	assert.Equal(t, []string{"p", "r1"}, *evicted, "the profile should still go before the oldest result")
+
+	// Without queued profiles, eviction must not scan the queue for one.
+	var checks int
+	q, _ = newTestRowQueue(10)
+	for range 20 {
+		q.push(testQueueItem{n: 1, checks: &checks})
+	}
+	assert.LessOrEqual(t, checks, 2*20, "each item should be checked at most when pushed and when removed")
 }
 
 func TestRowQueueAcceptsOversizedItemWhole(t *testing.T) {

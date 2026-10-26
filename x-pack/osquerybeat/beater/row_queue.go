@@ -33,6 +33,9 @@ type rowQueue[T queuedItem] struct {
 	items  *list.List
 	limit  int
 	events int
+	// first counts the queued evictFirst items, so evict scans only when
+	// there is one.
+	first int
 }
 
 // newRowQueue returns a queue holding up to maxEvents rows. onEvict is
@@ -50,6 +53,9 @@ func (q *rowQueue[T]) push(item T) {
 	}
 	q.items.PushBack(item)
 	q.events += item.rows()
+	if item.evictFirst() {
+		q.first++
+	}
 	q.mu.Unlock()
 	q.signal()
 	q.evicted(evicted)
@@ -59,7 +65,7 @@ func (q *rowQueue[T]) push(item T) {
 // is none. The caller holds q.mu and ensures the queue is not empty.
 func (q *rowQueue[T]) evict() T {
 	victim := q.items.Front()
-	for e := victim; e != nil; e = e.Next() {
+	for e := victim; q.first > 0 && e != nil; e = e.Next() {
 		if e.Value.(T).evictFirst() {
 			victim = e
 			break
@@ -71,6 +77,9 @@ func (q *rowQueue[T]) evict() T {
 func (q *rowQueue[T]) remove(e *list.Element) T {
 	item := q.items.Remove(e).(T)
 	q.events -= item.rows()
+	if item.evictFirst() {
+		q.first--
+	}
 	return item
 }
 
