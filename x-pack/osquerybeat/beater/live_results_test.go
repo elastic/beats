@@ -319,6 +319,30 @@ func TestLiveWithoutClientsCountsProfileAndResponse(t *testing.T) {
 	})
 }
 
+func TestLiveWithoutStreamsCountsProfileAndResponse(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		d := newLiveResultDispatcher(monitoring.NewRegistry(), logptest.NewTestingLogger(t, ""), time.Minute)
+		pub := newGatedLivePublisher(0)
+		c := &liveClients{newPublisher: func() liveQueryPublisher { return pub }}
+		results := []config.InputConfig{{Datastream: config.DatastreamConfig{Dataset: config.DefaultDataset}}}
+		require.NoError(t, c.Configure(results), "configure a policy without profile or action response streams")
+
+		n, err := d.publishResults(t.Context(), c, liveJob{actionID: "a1", profile: map[string]any{}})
+		assert.Zero(t, n, "the job had no rows")
+		assert.NoError(t, err, "a lost profile alone is not an action error")
+		assert.Equal(t, uint64(1), d.metrics.dropped[dropStale].Get(), "count the profile's action as stale without a profile stream")
+		assert.Equal(t, uint64(1), d.metrics.droppedRows[dropStale].Get(), "count the profile as a stale row")
+
+		d.enqueueResponse(c, liveRequest("a1"), map[string]any{})
+		synctest.Wait()
+		assert.Equal(t, uint64(2), d.metrics.dropped[dropStale].Get(), "count the response as a stale item without an action response stream")
+		assert.Equal(t, uint64(2), d.metrics.droppedRows[dropStale].Get(), "count the response as a stale row")
+		assert.Empty(t, pub.snapshot(), "nothing may be handed to a stream the policy does not have")
+
+		d.stop()
+	})
+}
+
 func TestExecuteCancelledCountsShutdown(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		pub := newGatedLivePublisher(0)

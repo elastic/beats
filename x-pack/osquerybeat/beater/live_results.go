@@ -326,8 +326,12 @@ func (c *liveClients) Configure(inputs []config.InputConfig) error {
 		p.Close()
 		return err
 	}
-	c.swap(&liveLease{pub: p})
+	c.swap(&liveLease{pub: p, responses: hasDataset(inputs, config.DefaultActionResponsesDataset), profiles: hasDataset(inputs, config.DefaultQueryProfileDataset)})
 	return nil
+}
+
+func hasDataset(inputs []config.InputConfig, dataset string) bool {
+	return slices.ContainsFunc(inputs, func(in config.InputConfig) bool { return in.Datastream.Dataset == dataset })
 }
 
 // Close retires the current clients without waiting for a stuck publish.
@@ -359,13 +363,16 @@ func (c *liveClients) PublishQueryProfile(index, queryName, actionID, responseID
 }
 
 // publishQueryProfile is PublishQueryProfile, reporting false when no clients
-// are configured.
+// or no profile stream are configured.
 func (c *liveClients) publishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) bool {
 	l := c.acquire()
 	if l == nil {
 		return false
 	}
 	defer l.release()
+	if !l.profiles {
+		return false
+	}
 	l.pub.PublishQueryProfile(index, queryName, actionID, responseID, spaceID, profile, reqData)
 	return true
 }
@@ -375,13 +382,16 @@ func (c *liveClients) PublishActionResult(req, res map[string]any) {
 }
 
 // publishActionResult is PublishActionResult, reporting false when no
-// clients are configured.
+// clients or no action response stream are configured.
 func (c *liveClients) publishActionResult(req, res map[string]any) bool {
 	l := c.acquire()
 	if l == nil {
 		return false
 	}
 	defer l.release()
+	if !l.responses {
+		return false
+	}
 	l.pub.PublishActionResult(req, res)
 	return true
 }
@@ -406,6 +416,10 @@ type liveLease struct {
 	retired   atomic.Bool
 	closeOnce sync.Once
 	pub       liveQueryPublisher
+	// responses and profiles report whether the policy has an action
+	// response stream and a query profile stream. Without one, pub drops
+	// the documents silently.
+	responses, profiles bool
 }
 
 func (l *liveLease) release() {
