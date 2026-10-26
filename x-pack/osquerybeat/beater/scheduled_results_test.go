@@ -173,6 +173,21 @@ func TestScheduledResultsReuseWorkerAcrossDaemonRestarts(t *testing.T) {
 	assert.Equal(t, uint64(20), d.metrics.stale.Get(), "prune each cancelled run from the backlog")
 }
 
+func TestScheduledResultsStopReleasesIdleWorker(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "idle")
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(func() bool, func()) osquerybeatPublisher {
+		return &stalledResultPublisher{entered: make(chan struct{}), release: make(chan struct{})}
+	}, (&osquerybeat{log: log}).handleScheduledQueryResult)
+	require.NoError(t, d.configure(outageInputs("idle")), "start the result worker")
+	time.Sleep(10 * time.Millisecond) // Let the worker block on the empty queue.
+	d.stop()
+	select {
+	case <-d.done:
+	case <-time.After(time.Second):
+		t.Fatal("stop did not release the worker waiting on an empty queue")
+	}
+}
+
 // Result and profile publication remain separate. Capturing correlation when
 // admitting the logger document must not make collection wait for its output.
 type correlatedStalledResultPublisher struct {
