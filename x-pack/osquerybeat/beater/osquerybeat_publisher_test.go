@@ -64,6 +64,9 @@ osquery.elastic_options.publishing.live.timeout: 7s
 	bt := &osquerybeat{log: log, pub: &mockBeatPublisher{}, liveResults: newLiveResultDispatcher(nil, log, config.DefaultLivePublishTimeout)}
 	require.NoError(t, bt.configurePublishers([]config.InputConfig{input}), "configure the publishers")
 	assert.Equal(t, 7*time.Second, time.Duration(bt.liveResults.timeout.Load()), "the live dispatcher must use publishing.live.timeout")
+
+	require.NoError(t, bt.configurePublishers(nil), "remove the inputs")
+	assert.Equal(t, 7*time.Second, time.Duration(bt.liveResults.timeout.Load()), "removing the inputs must keep the live timeout")
 }
 
 func TestOsquerybeatClose_ClosesPublisher(t *testing.T) {

@@ -1076,7 +1076,8 @@ func (bt *osquerybeat) configurePublishers(inputs []config.InputConfig) error {
 			return err
 		}
 	}
-	if bt.liveResults != nil {
+	// With no inputs the publishers keep their settings.
+	if bt.liveResults != nil && len(inputs) > 0 {
 		bt.liveResults.setTimeout(publishing.Live.Timeout)
 	}
 	return bt.pub.Configure(inputs)
