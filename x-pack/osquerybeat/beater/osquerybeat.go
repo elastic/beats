@@ -693,6 +693,9 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 			return err
 		}
 		defer cli.Close()
+		// Results queued by an earlier run are resolved with this run's client.
+		bt.scheduledResults.setClient(ctx, cli)
+		defer bt.scheduledResults.clearClient(cli)
 		profileCtx, cancelProfiles := context.WithCancel(ctx)
 		profileExecutor := newProfilingQueryExecutor(profileCtx, profileCli)
 		metrics := bt.profileMetrics

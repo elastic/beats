@@ -539,25 +539,81 @@ func TestScheduledItemsDroppedAfterStop(t *testing.T) {
 	}
 }
 
-func TestScheduledResultsCancelledRunDroppedBeforeHandling(t *testing.T) {
-	d, plugin, blocked, release := outageDispatcher(t, outageLimits)
-	calls := recordHandledResults(d)
-	rows := []map[string]string{{"value": "a"}, {"value": "b"}}
-	d.enqueue(t.Context(), nil, plugin, QueryResult{Name: "scheduled", Action: "diff"}, nil)
-	waitForResultPublication(t, blocked)
-	ctx, cancel := context.WithCancel(t.Context())
-	d.enqueue(ctx, nil, plugin, QueryResult{Name: "scheduled", Action: "snapshot", Hits: rows}, nil)
+// countingQueryClient resolves every row and counts its calls.
+type countingQueryClient struct{ calls atomic.Int32 }
+
+func (c *countingQueryClient) ResolveResult(_ context.Context, _ string, rows []map[string]string) ([]map[string]any, error) {
+	c.calls.Add(1)
+	return make([]map[string]any, len(rows)), nil
+}
+
+// endRun ends an osqueryd run as runOsquery does when it returns.
+func endRun(d *scheduledResultDispatcher, cancel context.CancelFunc, client scheduledQueryClient) {
 	cancel()
+	d.clearClient(client)
+	d.prune()
+}
+
+func TestScheduledResultsSurviveDaemonRestart(t *testing.T) {
+	d, plugin, blocked, release := outageDispatcher(t, outageLimits)
+	first, second := &countingQueryClient{}, &countingQueryClient{}
+	run, cancel := context.WithCancel(t.Context())
+	d.setClient(run, first)
+	d.enqueue(run, first, plugin, QueryResult{Name: "scheduled", Action: "diff"}, nil)
+	waitForResultPublication(t, blocked)
+	rows := []map[string]string{{"value": "a"}, {"value": "b"}}
+	d.enqueue(run, first, plugin, QueryResult{Name: "scheduled", Action: "snapshot", Hits: rows}, nil)
+
+	endRun(d, cancel, first)
+	d.setClient(t.Context(), second)
 	release()
-	assert.Eventually(t, func() bool { return d.metrics.dropped[dropStale].Get() == 1 }, time.Second, time.Millisecond,
-		"a result of a cancelled daemon run must be dropped as stale")
-	assert.Equal(t, uint64(len(rows)+1), d.metrics.droppedRows[dropStale].Get(), "count the cancelled result's rows and response")
-	<-calls // The in-flight result.
-	select {
-	case <-calls:
-		t.Error("a result of a cancelled daemon run must not reach the handler")
-	default:
-	}
+	assert.Eventually(t, func() bool { return blocked.calls.Load() == 2 }, time.Second, time.Millisecond,
+		"a result queued by an ended run must be published")
+	assert.Zero(t, first.calls.Load(), "the ended run's client must not resolve rows")
+	assert.Equal(t, int32(1), second.calls.Load(), "the current run's client must resolve the rows")
+	assert.Zero(t, d.metrics.dropped[dropStale].Get(), "a result that still routes must not be dropped as stale")
+}
+
+func TestScheduledResultsWaitForDaemonRun(t *testing.T) {
+	d, plugin, blocked, release := outageDispatcher(t, outageLimits)
+	client := &countingQueryClient{}
+	run, cancel := context.WithCancel(t.Context())
+	d.setClient(run, client)
+	d.enqueue(run, client, plugin, QueryResult{Name: "scheduled", Action: "diff"}, nil)
+	waitForResultPublication(t, blocked)
+	rows := []map[string]string{{"value": "a"}, {"value": "b"}}
+	d.enqueue(run, client, plugin, QueryResult{Name: "scheduled", Action: "snapshot", Hits: rows}, nil)
+
+	endRun(d, cancel, client)
+	release()
+	assert.Never(t, func() bool { return d.metrics.dropped[dropStale].Get() > 0 || blocked.calls.Load() > 1 }, 100*time.Millisecond, time.Millisecond,
+		"a result must be neither dropped nor published while no osqueryd runs")
+	items, events := d.queue.stats()
+	assert.Equal(t, 1, items, "the result must wait in the queue for the next run")
+	assert.Equal(t, len(rows)+1, events, "the waiting result's rows must count against the limit")
+
+	next := &countingQueryClient{}
+	d.setClient(t.Context(), next)
+	assert.Eventually(t, func() bool { return blocked.calls.Load() == 2 }, time.Second, time.Millisecond,
+		"the waiting result must be published once a run starts")
+	assert.Equal(t, int32(1), next.calls.Load(), "the new run's client must resolve the rows")
+	assert.Zero(t, client.calls.Load(), "the ended run's client must not resolve rows")
+}
+
+func TestScheduledResultsUnroutedAtDaemonRestartAreStale(t *testing.T) {
+	d, plugin, blocked, _ := outageDispatcher(t, outageLimits)
+	client := &countingQueryClient{}
+	run, cancel := context.WithCancel(t.Context())
+	d.setClient(run, client)
+	d.enqueue(run, client, plugin, QueryResult{Name: "scheduled", Action: "diff"}, nil)
+	waitForResultPublication(t, blocked)
+	d.enqueue(run, client, plugin, QueryResult{Name: "scheduled", Action: "diff"}, nil)
+	require.NoError(t, d.configure(outageInputs("other"), outageLimits), "move the query to another namespace")
+
+	endRun(d, cancel, client)
+	assert.Equal(t, uint64(1), d.metrics.dropped[dropStale].Get(), "a result the policy no longer routes must be pruned as stale")
+	items, _ := d.queue.stats()
+	assert.Zero(t, items, "the pruned result must leave the queue")
 }
 
 func TestScheduledResultsInvalidPolicyKeepsLimits(t *testing.T) {
@@ -648,14 +704,16 @@ func TestScheduledResultsReuseWorkerAcrossDaemonRestarts(t *testing.T) {
 	cancel()
 	for range 20 {
 		ctx, cancel := context.WithCancel(t.Context())
-		d.enqueue(ctx, nil, plugin, result, nil)
-		cancel()
-		d.prune()
+		client := &countingQueryClient{}
+		d.setClient(ctx, client)
+		d.enqueue(ctx, client, plugin, result, nil)
+		endRun(d, cancel, client)
 	}
 	items, _ := d.queue.stats()
-	assert.Zero(t, items, "cancelled runs must not accumulate behind the stuck publication")
+	assert.Equal(t, outageMaxEvents, items, "the backlog of ended runs must stay bounded by the queue limit")
+	assert.Equal(t, uint64(20-outageMaxEvents), d.metrics.dropped[dropOverflow].Get(), "results beyond the limit must be dropped as overflow")
+	assert.Zero(t, d.metrics.dropped[dropStale].Get(), "results that still route must survive restarts")
 	assert.Equal(t, int32(1), publisher.calls.Load(), "restarts must reuse the single publishing worker")
-	assert.Equal(t, uint64(20), d.metrics.dropped[dropStale].Get(), "prune each cancelled run from the backlog")
 }
 
 func TestScheduledResultsStopReleasesIdleWorker(t *testing.T) {

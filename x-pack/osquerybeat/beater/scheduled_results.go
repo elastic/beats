@@ -166,12 +166,17 @@ type scheduledResultDispatcher struct {
 	done            chan struct{}
 	started, closed bool
 	lease           *scheduledResultLease
-	maxAge          time.Duration
-	log             *logp.Logger
-	metrics         *publishingMetrics
-	profileMetrics  *scheduledProfileMetrics
-	newPublisher    func(allowed func() bool, dropped func(), cut func(rows int)) osquerybeatPublisher
-	profile         func(*scheduledQueryProfiler, string, QueryInfo, QueryResult, string)
+	// runCtx and client belong to the running osqueryd, if any; client is
+	// nil between runs. clientSet is closed while client is set.
+	runCtx         context.Context
+	client         scheduledQueryClient
+	clientSet      chan struct{}
+	maxAge         time.Duration
+	log            *logp.Logger
+	metrics        *publishingMetrics
+	profileMetrics *scheduledProfileMetrics
+	newPublisher   func(allowed func() bool, dropped func(), cut func(rows int)) osquerybeatPublisher
+	profile        func(*scheduledQueryProfiler, string, QueryInfo, QueryResult, string)
 	// handle resolves and publishes a native result and returns the rows it
 	// could not publish because their types could not be resolved.
 	handle func(context.Context, scheduledQueryClient, scheduledQueryPublisher, string, QueryInfo, QueryResult, string) int
@@ -191,7 +196,7 @@ func newScheduledResultDispatcher(reg *monitoring.Registry, log *logp.Logger, ma
 	})
 	queue.observe = metrics.setQueue
 	return &scheduledResultDispatcher{
-		ctx: ctx, cancel: cancel, done: make(chan struct{}), log: log,
+		ctx: ctx, cancel: cancel, done: make(chan struct{}), clientSet: make(chan struct{}), log: log,
 		queue: queue, metrics: metrics, profileMetrics: profileMetrics, newPublisher: factory, handle: handle,
 	}
 }
@@ -257,7 +262,8 @@ func (d *scheduledResultDispatcher) enqueue(ctx context.Context, client schedule
 	job.namespace, job.query = namespace, query
 	d.mu.Lock()
 	defer d.mu.Unlock()
-	if d.closed || ctx.Err() != nil {
+	// A result of an ended run is kept: any run's client resolves its rows.
+	if d.closed {
 		d.dropShutdown(job)
 		return
 	}
@@ -315,6 +321,21 @@ func (d *scheduledResultDispatcher) run() {
 func (d *scheduledResultDispatcher) process(item scheduledItem) {
 	d.mu.Lock()
 	lease, maxAge := d.lease, d.maxAge
+	expired := maxAge > 0 && time.Since(item.enqueued()) > maxAge
+	routed := lease != nil && lease.routes(item)
+	runCtx, client, ok := d.runFor(item)
+	if !expired && routed && !ok {
+		// Keep item, as the oldest, until a run can resolve its rows. A
+		// routing lease means stop has not drained the queue yet.
+		set := d.clientSet
+		d.queue.requeue(item)
+		d.mu.Unlock()
+		select {
+		case <-set:
+		case <-d.ctx.Done():
+		}
+		return
+	}
 	if lease != nil {
 		// Lock while the lease is still active, so it cannot have been closed;
 		// a later retire leaves closing it to unlock.
@@ -323,33 +344,54 @@ func (d *scheduledResultDispatcher) process(item scheduledItem) {
 	}
 	d.mu.Unlock()
 	switch {
-	case maxAge > 0 && time.Since(item.enqueued()) > maxAge:
+	case expired:
 		d.metrics.drop(dropExpired, item.rows())
 		countProfileDrop(item, d.profileMetrics.expired)
-	case lease == nil || !lease.routes(item):
+	case !routed:
 		d.dropStale(item)
 	default:
-		d.publish(lease, item)
+		d.publish(lease, item, runCtx, client)
 	}
 }
 
-// publish sends item through lease, whose mu the caller holds.
-func (d *scheduledResultDispatcher) publish(lease *scheduledResultLease, item scheduledItem) {
-	ctx, cancel := context.WithCancel(runContext(item))
+// runFor returns the osqueryd run whose client resolves item's rows: the run
+// that produced item while it lasts, else the current run. Column types depend
+// only on the SQL, so any run's client resolves them. ok is false when item
+// needs a client and no run is current. The caller holds d.mu.
+func (d *scheduledResultDispatcher) runFor(item scheduledItem) (ctx context.Context, client scheduledQueryClient, ok bool) {
+	r, native := item.(scheduledResult)
+	switch {
+	case !native:
+		return context.Background(), nil, true
+	case r.ctx.Err() == nil:
+		return r.ctx, r.client, true
+	case d.client != nil:
+		return d.runCtx, d.client, true
+	default:
+		return nil, nil, false
+	}
+}
+
+// publish sends item through lease, whose mu the caller holds. runCtx and
+// client resolve a native result's rows.
+func (d *scheduledResultDispatcher) publish(lease *scheduledResultLease, item scheduledItem, runCtx context.Context, client scheduledQueryClient) {
+	// Only resolution depends on the run; rows already resolved keep
+	// publishing after it ends.
+	ctx, cancel := context.WithCancel(runCtx)
 	stop := context.AfterFunc(d.ctx, cancel)
 	if d.ctx.Err() != nil {
 		cancel()
 	}
 	defer func() { stop(); cancel() }()
-	lease.ctx = ctx
+	lease.ctx = d.ctx
 	if !lease.allowed() {
-		d.dropStale(item)
+		d.dropCut(item, item.rows())
 		return
 	}
 	unresolved := 0
 	switch item := item.(type) {
 	case scheduledResult:
-		unresolved = d.handle(ctx, item.client, lease.publisher, item.namespace, item.query, item.result, item.responseID)
+		unresolved = d.handle(ctx, client, lease.publisher, item.namespace, item.query, item.result, item.responseID)
 	case resolvedScheduledResult:
 		publishResolvedResult(lease.publisher, item)
 	case scheduledProfileItem:
@@ -362,8 +404,8 @@ func (d *scheduledResultDispatcher) publish(lease *scheduledResultLease, item sc
 }
 
 // dropCut counts the rows of item that were not published because its lease
-// was retired, its run cancelled, or its rows could not be resolved while the
-// item was in flight.
+// was retired, the dispatcher stopped, or its rows could not be resolved while
+// the item was in flight.
 func (d *scheduledResultDispatcher) dropCut(item scheduledItem, rows int) {
 	if d.ctx.Err() != nil {
 		d.metrics.drop(dropShutdown, rows)
@@ -372,15 +414,6 @@ func (d *scheduledResultDispatcher) dropCut(item scheduledItem, rows int) {
 	}
 	d.metrics.drop(dropStale, rows)
 	countProfileDrop(item, d.profileMetrics.stale)
-}
-
-// runContext returns the context of the osqueryd run whose client resolves
-// item's rows. Other items do not depend on a run.
-func runContext(item scheduledItem) context.Context {
-	if r, ok := item.(scheduledResult); ok {
-		return r.ctx
-	}
-	return context.Background()
 }
 
 // publishResolvedResult publishes an RRULE run's profile, rows and response.
@@ -415,18 +448,45 @@ func countProfileDrop(item scheduledItem, counter *monitoring.Uint) {
 	}
 }
 
-// prune releases results of cancelled daemon runs even while the active
-// publication is blocked.
+// prune releases queued items the active policy no longer routes, even while
+// the active publication is blocked. Items that still route are kept for the
+// next osqueryd run.
 func (d *scheduledResultDispatcher) prune() {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	for _, item := range d.queue.drain() {
-		if runContext(item).Err() != nil {
+		if d.lease == nil || !d.lease.routes(item) {
 			d.dropStale(item)
 			continue
 		}
 		d.queue.push(item)
 	}
+}
+
+// setClient makes client, of the osqueryd run with context ctx, resolve the
+// rows of results whose own run has ended, and releases the worker if it
+// waits for a run.
+func (d *scheduledResultDispatcher) setClient(ctx context.Context, client scheduledQueryClient) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	d.runCtx, d.client = ctx, client
+	select {
+	case <-d.clientSet:
+	default:
+		close(d.clientSet)
+	}
+}
+
+// clearClient ends the use of client set by setClient once its run ends.
+// Results then wait in the queue for the next run.
+func (d *scheduledResultDispatcher) clearClient(client scheduledQueryClient) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	if d.client != client {
+		return
+	}
+	d.runCtx, d.client = nil, nil
+	d.clientSet = make(chan struct{})
 }
 
 func (d *scheduledResultDispatcher) stop() {

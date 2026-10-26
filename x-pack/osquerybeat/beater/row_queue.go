@@ -145,6 +145,25 @@ func (q *rowQueue[T]) pop(ctx context.Context) (T, bool) {
 	}
 }
 
+// requeue returns a popped item to the front of the queue, as its oldest
+// item, evicting the oldest items until the queue fits or only one item
+// remains.
+func (q *rowQueue[T]) requeue(item T) {
+	q.mu.Lock()
+	q.items.PushFront(item)
+	q.events += item.rows()
+	if item.evictFirst() {
+		q.first++
+	}
+	var evicted []T
+	for q.items.Len() > 1 && q.events > q.limit {
+		evicted = append(evicted, q.evict())
+	}
+	q.changed()
+	q.mu.Unlock()
+	q.evicted(evicted)
+}
+
 // setLimit changes the row limit, evicting the oldest items until the
 // queue fits or only one item remains.
 func (q *rowQueue[T]) setLimit(maxEvents int) {
