@@ -683,6 +683,10 @@ func TestScheduledResultsWaitWhileDaemonStops(t *testing.T) {
 	release()
 	assert.Never(t, func() bool { return d.metrics.dropped[dropStale].Get() > 0 || blocked.calls.Load() > 1 }, 100*time.Millisecond, time.Millisecond,
 		"a result must be neither dropped nor published with the client of an ended run")
+	d.mu.Lock()
+	current := d.client
+	d.mu.Unlock()
+	assert.Nil(t, current, "the waiting worker must clear the ended run's client")
 
 	next := &ctxQueryClient{}
 	d.setClient(t.Context(), next)
