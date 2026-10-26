@@ -125,9 +125,9 @@ type osquerybeat struct {
 
 type osquerybeatPublisher interface {
 	scheduledQueryPublisher
+	queryProfilePublisher
 	actionResultPublisher
 	Configure(inputs []config.InputConfig) error
-	CaptureScheduledProfileSink(namespace string) pub.ScheduledProfileSink
 	Close()
 }
 
@@ -160,7 +160,6 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 		log:                  log,
 		pub:                  pub.New(b, log),
 		qp:                   newQueryProfiler(log),
-		profileMetrics:       newScheduledProfileMetrics(b.Monitoring.StatsRegistry()),
 		osquerydFactory:      osqd.New,
 		executablePath:       os.Executable,
 		// Resolve the osqueryd data path now, while b.Info.Paths still reflects
@@ -175,6 +174,7 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 			return pub.NewScheduled(b, log, allowed, dropped)
 		}, bt.handleScheduledQueryResult)
 	bt.scheduledResults.profile = bt.enqueueScheduledProfile
+	bt.profileMetrics = bt.scheduledResults.profileMetrics
 
 	profileCfg := config.GetQueryProfileStorageConfig(c.Inputs)
 	if profileCfg.EnabledOrDefault() {
@@ -689,7 +689,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		if metrics == nil {
 			metrics = newScheduledProfileMetrics(nil)
 		}
-		scheduledProfiler = newScheduledQueryProfiler(profileCtx, scheduledProfilePendingJobs, profileExecutor, configPlugin, bt.qp, metrics)
+		scheduledProfiler = newScheduledQueryProfiler(profileCtx, scheduledProfilePendingJobs, profileExecutor, configPlugin, bt.qp, metrics, bt.scheduledResults.enqueueProfile)
 		// osquery_schedule diagnostics need the same isolation as normal profiles.
 		bt.setDiagnosticsQueryExecutor(profileExecutor)
 		defer func() {
@@ -700,7 +700,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		}()
 
 		// Initialize and start RRULE query handler after osqueryd connection is established
-		rruleHandler = newRecurrenceQueryHandler(bt.log, cli, configPlugin, bt.pub, bt.liveProfiles, bt.osqueryVersion)
+		rruleHandler = newRecurrenceQueryHandler(bt.log, cli, configPlugin, bt.scheduledResults, bt.liveProfiles, bt.osqueryVersion)
 		rruleHandler.Start(ctx)
 		defer rruleHandler.Stop()
 
@@ -861,7 +861,9 @@ func (bt *osquerybeat) shouldLogClockSkewWarn(scheduleName string) bool {
 }
 
 func (bt *osquerybeat) enqueueScheduledProfile(profiler *scheduledQueryProfiler, ns string, qi QueryInfo, res QueryResult, responseID string) {
-	if profiler == nil || !qi.Profile {
+	// The pending policy decides, so profiling starts as soon as a policy
+	// enables it rather than after osqueryd next fetches its configuration.
+	if profiler == nil || !profiler.config.LookupQueryProfile(res.Name) {
 		return
 	}
 	scheduleID := qi.ScheduleID
@@ -869,13 +871,10 @@ func (bt *osquerybeat) enqueueScheduledProfile(profiler *scheduledQueryProfiler,
 		scheduleID = res.Name
 	}
 	executionCount, _, _ := nativeScheduleTiming(qi.StartDate, qi.Interval, res.UnixTime)
-	sink := bt.pub.CaptureScheduledProfileSink(ns)
-	if sink != nil {
-		profiler.enqueue(scheduledProfileRequest{
-			name: res.Name, query: qi.Query, namespace: ns, scheduleID: scheduleID,
-			responseID: responseID, spaceID: qi.SpaceID, scheduleExecutionCount: executionCount, sink: sink,
-		})
-	}
+	profiler.enqueue(scheduledProfileRequest{
+		name: res.Name, query: qi.Query, namespace: ns, scheduleID: scheduleID,
+		responseID: responseID, spaceID: qi.SpaceID, scheduleExecutionCount: executionCount,
+	})
 }
 
 func (bt *osquerybeat) handleScheduledQueryResult(ctx context.Context, cli scheduledQueryClient, publisher scheduledQueryPublisher, ns string, qi QueryInfo, res QueryResult, responseID string) {

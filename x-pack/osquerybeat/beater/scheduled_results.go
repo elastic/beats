@@ -6,6 +6,7 @@ package beater
 
 import (
 	"context"
+	"slices"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -19,6 +20,14 @@ import (
 
 type scheduledQueryClient interface {
 	ResolveResult(context.Context, string, []map[string]string) ([]map[string]any, error)
+}
+
+// scheduledItem is a native result, a resolved RRULE result or a profile
+// waiting in the scheduled queue.
+type scheduledItem interface {
+	queuedItem
+	// target returns the query name, namespace and SQL captured at admission.
+	target() (name, namespace, sql string)
 }
 
 type scheduledResult struct {
@@ -40,6 +49,69 @@ func (r scheduledResult) enqueued() time.Time { return r.queuedAt }
 
 func (r scheduledResult) evictFirst() bool { return false }
 
+func (r scheduledResult) target() (string, string, string) {
+	return r.result.Name, r.namespace, r.query.Query
+}
+
+// resolvedScheduledResult is an RRULE run. Its rows were resolved when
+// osquerybeat ran the query.
+type resolvedScheduledResult struct {
+	name, namespace, scheduleID, responseID string
+	query                                   QueryInfo
+	batches                                 []resolvedRows
+	startedAt, completedAt, plannedTime     time.Time
+	executionCount                          int64
+	profile                                 map[string]any // nil when profiling is off
+	enqueuedAt                              time.Time
+}
+
+// resolvedRows are rows published with one osquery_meta.
+type resolvedRows struct {
+	meta map[string]any
+	hits []map[string]any
+}
+
+// rows counts the result rows, the response document and the profile, if any.
+func (r resolvedScheduledResult) rows() int {
+	n := 1
+	for _, b := range r.batches {
+		n += len(b.hits)
+	}
+	if r.profile != nil {
+		n++
+	}
+	return n
+}
+
+func (r resolvedScheduledResult) enqueued() time.Time { return r.enqueuedAt }
+
+func (r resolvedScheduledResult) evictFirst() bool { return false }
+
+func (r resolvedScheduledResult) target() (string, string, string) {
+	return r.name, r.namespace, r.query.Query
+}
+
+// scheduledProfileItem is the profile of one scheduled query run, queued
+// apart from the run's results.
+type scheduledProfileItem struct {
+	name, namespace, query, scheduleID, responseID, spaceID string
+	executionCount                                          int64
+	profile                                                 map[string]any
+	enqueuedAt                                              time.Time
+}
+
+func (p scheduledProfileItem) rows() int { return 1 }
+
+func (p scheduledProfileItem) enqueued() time.Time { return p.enqueuedAt }
+
+// evictFirst reports true because profiles are best effort and worth less
+// than results.
+func (p scheduledProfileItem) evictFirst() bool { return true }
+
+func (p scheduledProfileItem) target() (string, string, string) {
+	return p.name, p.namespace, p.query
+}
+
 // Each policy owns separate clients. Retirement never waits behind an output
 // call; the one process-lifetime worker closes an active lease when it returns.
 type scheduledResultLease struct {
@@ -48,6 +120,7 @@ type scheduledResultLease struct {
 	retired   atomic.Bool
 	publisher osquerybeatPublisher
 	view      *ConfigPlugin
+	profiles  bool            // whether the policy has a query profile stream
 	ctx       context.Context // accessed only while the worker holds mu
 }
 
@@ -55,12 +128,16 @@ func (l *scheduledResultLease) allowed() bool {
 	return !l.retired.Load() && l.ctx != nil && l.ctx.Err() == nil
 }
 
-// routes reports whether l sends the named query to namespace with the same
-// SQL as query. Results are published with the QueryInfo captured at
-// admission, so other metadata may differ.
-func (l *scheduledResultLease) routes(name, namespace string, query QueryInfo) bool {
+// routes reports whether l sends item's query to the item's namespace with
+// the same SQL and, for a profile, has a profile stream. Items are published
+// with the metadata captured at admission, so other metadata may differ.
+func (l *scheduledResultLease) routes(item scheduledItem) bool {
+	if _, ok := item.(scheduledProfileItem); ok && !l.profiles {
+		return false
+	}
+	name, namespace, sql := item.target()
 	ns, q, ok := l.view.lookupResultMetadata(name)
-	return ok && ns == namespace && q.Query == query.Query
+	return ok && ns == namespace && q.Query == sql
 }
 
 // unlock ends the worker's use of l, closing l if it was retired meanwhile.
@@ -84,13 +161,14 @@ type scheduledResultDispatcher struct {
 	mu              sync.Mutex
 	ctx             context.Context
 	cancel          context.CancelFunc
-	queue           *rowQueue[scheduledResult]
+	queue           *rowQueue[scheduledItem]
 	done            chan struct{}
 	started, closed bool
 	lease           *scheduledResultLease
 	maxAge          time.Duration
 	log             *logp.Logger
 	metrics         *scheduledResultMetrics
+	profileMetrics  *scheduledProfileMetrics
 	newPublisher    func(func() bool, func()) osquerybeatPublisher
 	profile         func(*scheduledQueryProfiler, string, QueryInfo, QueryResult, string)
 	handle          func(context.Context, scheduledQueryClient, scheduledQueryPublisher, string, QueryInfo, QueryResult, string)
@@ -103,12 +181,14 @@ func newScheduledResultDispatcher(reg *monitoring.Registry, log *logp.Logger, ma
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	metrics := newScheduledResultMetrics(reg, log)
+	profileMetrics := newScheduledProfileMetrics(reg)
 	return &scheduledResultDispatcher{
 		ctx: ctx, cancel: cancel, done: make(chan struct{}), log: log,
-		queue: newRowQueue(maxEvents, func(r scheduledResult) {
-			metrics.dropRows(metrics.overflow, metrics.overflowRows, r.rows())
+		queue: newRowQueue(maxEvents, func(item scheduledItem) {
+			metrics.dropRows(metrics.overflow, metrics.overflowRows, item.rows())
+			countProfileDrop(item, profileMetrics.outputFull)
 		}),
-		metrics: metrics, newPublisher: factory, handle: handle,
+		metrics: metrics, profileMetrics: profileMetrics, newPublisher: factory, handle: handle,
 	}
 }
 
@@ -124,7 +204,9 @@ func (d *scheduledResultDispatcher) configure(inputs []config.InputConfig, cfg c
 		if _, err := view.GenerateConfig(d.ctx); err != nil {
 			return err
 		}
-		next = &scheduledResultLease{view: view}
+		next = &scheduledResultLease{view: view, profiles: slices.ContainsFunc(inputs, func(in config.InputConfig) bool {
+			return in.Datastream.Dataset == config.DefaultQueryProfileDataset
+		})}
 		// A blocking client drops only events published after it is closed.
 		next.publisher = d.newPublisher(next.allowed, func() { d.metrics.drop(d.metrics.shutdown) })
 		if err := next.publisher.Configure(inputs); err != nil {
@@ -165,42 +247,65 @@ func (d *scheduledResultDispatcher) enqueue(ctx context.Context, client schedule
 		d.dropStale(job)
 		return
 	}
+	job.namespace, job.query = namespace, query
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	if d.closed || ctx.Err() != nil {
-		d.metrics.drop(d.metrics.shutdown)
+		d.dropShutdown(job)
 		return
 	}
-	if d.lease == nil {
-		d.dropStale(job)
-		return
-	}
-	if !d.lease.routes(result.Name, namespace, query) {
+	if d.lease == nil || !d.lease.routes(job) {
 		d.dropStale(job)
 		return
 	}
 	responseID := uuid.Must(uuid.NewV4()).String()
-	job.namespace, job.query, job.queuedAt, job.responseID = namespace, query, time.Now(), responseID
+	job.queuedAt, job.responseID = time.Now(), responseID
 	d.queue.push(job)
 	// Profiling keeps its own collection worker. Its admission never waits for
-	// this result's publication or shares the result worker.
-	if d.profile != nil {
+	// this result's publication or shares the result worker. Without a profile
+	// stream, skip the profile RPC.
+	if d.profile != nil && d.lease.profiles {
 		d.profile(profiler, namespace, query, result, responseID)
+	}
+}
+
+// enqueueResolved queues an RRULE run. It never waits.
+func (d *scheduledResultDispatcher) enqueueResolved(item resolvedScheduledResult) {
+	item.enqueuedAt = time.Now()
+	d.admit(item)
+}
+
+// enqueueProfile queues a collected profile. It never waits.
+func (d *scheduledResultDispatcher) enqueueProfile(item scheduledProfileItem) {
+	item.enqueuedAt = time.Now()
+	d.admit(item)
+}
+
+func (d *scheduledResultDispatcher) admit(item scheduledItem) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	switch {
+	case d.closed:
+		d.dropShutdown(item)
+	case d.lease == nil || !d.lease.routes(item):
+		d.dropStale(item)
+	default:
+		d.queue.push(item)
 	}
 }
 
 func (d *scheduledResultDispatcher) run() {
 	defer close(d.done)
 	for {
-		job, ok := d.queue.pop(d.ctx)
+		item, ok := d.queue.pop(d.ctx)
 		if !ok {
 			return
 		}
-		d.process(job)
+		d.process(item)
 	}
 }
 
-func (d *scheduledResultDispatcher) process(job scheduledResult) {
+func (d *scheduledResultDispatcher) process(item scheduledItem) {
 	d.mu.Lock()
 	lease, maxAge := d.lease, d.maxAge
 	if lease != nil {
@@ -211,18 +316,18 @@ func (d *scheduledResultDispatcher) process(job scheduledResult) {
 	}
 	d.mu.Unlock()
 	switch {
-	case maxAge > 0 && time.Since(job.queuedAt) > maxAge:
-		d.metrics.dropRows(d.metrics.expired, d.metrics.expiredRows, job.rows())
-	case lease == nil || !lease.routes(job.result.Name, job.namespace, job.query):
-		d.dropStale(job)
+	case maxAge > 0 && time.Since(item.enqueued()) > maxAge:
+		d.metrics.dropRows(d.metrics.expired, d.metrics.expiredRows, item.rows())
+	case lease == nil || !lease.routes(item):
+		d.dropStale(item)
 	default:
-		d.publish(lease, job)
+		d.publish(lease, item)
 	}
 }
 
-// publish sends job through lease, whose mu the caller holds.
-func (d *scheduledResultDispatcher) publish(lease *scheduledResultLease, job scheduledResult) {
-	ctx, cancel := context.WithCancel(job.ctx)
+// publish sends item through lease, whose mu the caller holds.
+func (d *scheduledResultDispatcher) publish(lease *scheduledResultLease, item scheduledItem) {
+	ctx, cancel := context.WithCancel(runContext(item))
 	stop := context.AfterFunc(d.ctx, cancel)
 	if d.ctx.Err() != nil {
 		cancel()
@@ -230,14 +335,58 @@ func (d *scheduledResultDispatcher) publish(lease *scheduledResultLease, job sch
 	defer func() { stop(); cancel() }()
 	lease.ctx = ctx
 	if !lease.allowed() {
-		d.dropStale(job)
+		d.dropStale(item)
 		return
 	}
-	d.handle(ctx, job.client, lease.publisher, job.namespace, job.query, job.result, job.responseID)
+	switch item := item.(type) {
+	case scheduledResult:
+		d.handle(ctx, item.client, lease.publisher, item.namespace, item.query, item.result, item.responseID)
+	case resolvedScheduledResult:
+		publishResolvedResult(lease.publisher, item)
+	case scheduledProfileItem:
+		lease.publisher.PublishScheduledProfile(config.QueryProfileDatastream(item.namespace), item.name, item.scheduleID, item.responseID, item.spaceID, item.executionCount, item.profile)
+	}
 }
 
-func (d *scheduledResultDispatcher) dropStale(job scheduledResult) {
-	d.metrics.dropRows(d.metrics.stale, d.metrics.staleRows, job.rows())
+// runContext returns the context of the osqueryd run whose client resolves
+// item's rows. Other items do not depend on a run.
+func runContext(item scheduledItem) context.Context {
+	if r, ok := item.(scheduledResult); ok {
+		return r.ctx
+	}
+	return context.Background()
+}
+
+// publishResolvedResult publishes an RRULE run's profile, rows and response.
+func publishResolvedResult(p scheduledQueryPublisher, r resolvedScheduledResult) {
+	qi := r.query
+	if r.profile != nil {
+		p.PublishScheduledProfile(config.QueryProfileDatastream(r.namespace), r.name, r.scheduleID, r.responseID, qi.SpaceID, r.executionCount, r.profile)
+	}
+	count := 0
+	for _, b := range r.batches {
+		count += len(b.hits)
+		p.Publish(config.Datastream(r.namespace), r.scheduleID, "schedule_id", r.responseID, qi.SpaceID, qi.PackID, qi.PackName, qi.QueryName, b.meta, b.hits, qi.ECSMapping, nil)
+	}
+	p.PublishScheduledResponse(r.scheduleID, qi.PackID, qi.PackName, qi.QueryName, qi.SpaceID, r.responseID, r.startedAt, r.completedAt, r.plannedTime, count, r.executionCount)
+}
+
+func (d *scheduledResultDispatcher) dropStale(item scheduledItem) {
+	d.metrics.dropRows(d.metrics.stale, d.metrics.staleRows, item.rows())
+	countProfileDrop(item, d.profileMetrics.stale)
+}
+
+func (d *scheduledResultDispatcher) dropShutdown(item scheduledItem) {
+	d.metrics.drop(d.metrics.shutdown)
+	countProfileDrop(item, d.profileMetrics.shutdown)
+}
+
+// countProfileDrop counts a dropped profile item in counter too. Its
+// osquerybeat.scheduled_query_profiles registry is read by existing dashboards.
+func countProfileDrop(item scheduledItem, counter *monitoring.Uint) {
+	if _, ok := item.(scheduledProfileItem); ok {
+		counter.Inc()
+	}
 }
 
 // prune releases results of cancelled daemon runs even while the active
@@ -245,12 +394,12 @@ func (d *scheduledResultDispatcher) dropStale(job scheduledResult) {
 func (d *scheduledResultDispatcher) prune() {
 	d.mu.Lock()
 	defer d.mu.Unlock()
-	for _, job := range d.queue.drain() {
-		if job.ctx.Err() != nil {
-			d.dropStale(job)
+	for _, item := range d.queue.drain() {
+		if runContext(item).Err() != nil {
+			d.dropStale(item)
 			continue
 		}
-		d.queue.push(job)
+		d.queue.push(item)
 	}
 }
 
@@ -267,8 +416,8 @@ func (d *scheduledResultDispatcher) stop() {
 		lease.retired.Store(true)
 	}
 	d.lease = nil
-	for range d.queue.drain() {
-		d.metrics.drop(d.metrics.shutdown)
+	for _, item := range d.queue.drain() {
+		d.dropShutdown(item)
 	}
 	if !d.started {
 		close(d.done)

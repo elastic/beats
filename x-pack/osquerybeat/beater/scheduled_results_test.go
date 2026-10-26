@@ -24,17 +24,21 @@ import (
 
 type stalledResultPublisher struct {
 	mockBeatPublisher
-	entered chan struct{}
-	release chan struct{}
-	calls   atomic.Int32
-	closed  atomic.Int32
-	once    sync.Once
+	entered  chan struct{}
+	release  chan struct{}
+	calls    atomic.Int32
+	profiles atomic.Int32
+	closed   atomic.Int32
+	once     sync.Once
 }
 
 func (p *stalledResultPublisher) PublishScheduledResponse(string, string, string, string, string, string, time.Time, time.Time, time.Time, int, int64) {
 	p.calls.Add(1)
 	p.once.Do(func() { close(p.entered) })
 	<-p.release
+}
+func (p *stalledResultPublisher) PublishScheduledProfile(string, string, string, string, string, int64, map[string]any) {
+	p.profiles.Add(1)
 }
 func (p *stalledResultPublisher) Close() { p.closed.Add(1) }
 
@@ -48,6 +52,13 @@ func outageInputs(namespace string) []config.InputConfig {
 	}}
 }
 
+// outageProfileInputs adds a query profile stream to outageInputs.
+func outageProfileInputs(namespace string) []config.InputConfig {
+	return append(outageInputs(namespace), config.InputConfig{
+		Datastream: config.DatastreamConfig{Dataset: config.DefaultQueryProfileDataset, Namespace: namespace},
+	})
+}
+
 // outageMaxEvents is the outage dispatcher's queue limit in rows.
 const outageMaxEvents = 8
 
@@ -56,6 +67,12 @@ var outageLimits = config.ScheduledPublishingConfig{MaxEvents: outageMaxEvents}
 // outageDispatcher returns a dispatcher whose first policy's publisher blocks
 // until release is called. Publishers for later policies do not block.
 func outageDispatcher(t *testing.T, limits config.ScheduledPublishingConfig) (*scheduledResultDispatcher, *ConfigPlugin, *stalledResultPublisher, func()) {
+	t.Helper()
+	return outageDispatcherFor(t, outageInputs("old"), limits)
+}
+
+// outageDispatcherFor is outageDispatcher with inputs as the first policy.
+func outageDispatcherFor(t *testing.T, inputs []config.InputConfig, limits config.ScheduledPublishingConfig) (*scheduledResultDispatcher, *ConfigPlugin, *stalledResultPublisher, func()) {
 	t.Helper()
 	log := logptest.NewTestingLogger(t, "outage")
 	bt := &osquerybeat{log: log}
@@ -71,10 +88,10 @@ func outageDispatcher(t *testing.T, limits config.ScheduledPublishingConfig) (*s
 		return next
 	}, bt.handleScheduledQueryResult)
 	plugin := NewConfigPlugin(log)
-	require.NoError(t, plugin.Set(outageInputs("old")), "validate the initial policy")
+	require.NoError(t, plugin.Set(inputs), "validate the initial policy")
 	_, err := plugin.GenerateConfig(t.Context())
 	require.NoError(t, err, "apply the initial native policy")
-	require.NoError(t, d.configure(outageInputs("old"), limits), "configure independent scheduled clients")
+	require.NoError(t, d.configure(inputs, limits), "configure independent scheduled clients")
 	var releaseOnce sync.Once
 	release := func() { releaseOnce.Do(func() { close(first.release) }) }
 	t.Cleanup(func() {
@@ -87,6 +104,19 @@ func outageDispatcher(t *testing.T, limits config.ScheduledPublishingConfig) (*s
 		}
 	})
 	return d, plugin, first, release
+}
+
+// stopOnCleanup stops d when the test ends and waits for its worker, which
+// must not log once the test has finished. d's publisher must not block.
+func stopOnCleanup(t *testing.T, d *scheduledResultDispatcher) {
+	t.Cleanup(func() {
+		d.stop()
+		select {
+		case <-d.done:
+		case <-time.After(time.Second):
+			t.Error("scheduled result worker did not stop")
+		}
+	})
 }
 
 func waitForResultPublication(t *testing.T, p *stalledResultPublisher) {
@@ -262,6 +292,51 @@ func TestScheduledResultsPolicyChangeKeepsCapturedQueryInfo(t *testing.T) {
 	assert.Zero(t, d.metrics.stale.Get(), "an ECS mapping change must not make results stale")
 }
 
+func TestScheduledProfilesQueuedAndEvictedFirst(t *testing.T) {
+	// Each result is four rows plus its response. The first one holds the output.
+	d, plugin, blocked, release := outageDispatcherFor(t, outageProfileInputs("old"), config.ScheduledPublishingConfig{MaxEvents: 10})
+	result := QueryResult{Name: "scheduled", Action: "snapshot", Hits: make([]map[string]string, 4)}
+	d.enqueue(t.Context(), outageQueryClient{}, plugin, result, nil)
+	waitForResultPublication(t, blocked)
+
+	// Queue a profile behind the in-flight result, then overflow the limit.
+	d.enqueueProfile(scheduledProfileItem{name: "scheduled", namespace: "old", query: "SELECT 1", profile: map[string]any{}})
+	d.enqueue(t.Context(), outageQueryClient{}, plugin, result, nil)
+	d.enqueue(t.Context(), outageQueryClient{}, plugin, result, nil)
+	assert.Equal(t, uint64(1), d.metrics.overflow.Get(), "only the profile should be evicted")
+	assert.Equal(t, uint64(1), d.metrics.overflowRows.Get(), "a profile is one row")
+	assert.Equal(t, uint64(1), d.profileMetrics.outputFull.Get(), "keep counting evicted profiles where existing dashboards read them")
+	items, events := d.queue.stats()
+	assert.Equal(t, 2, items, "both later results should stay queued")
+	assert.Equal(t, 10, events, "the later results should fill the queue")
+
+	// Both results are published once the output recovers; the profile is not.
+	release()
+	assert.Eventually(t, func() bool { return blocked.calls.Load() == 3 }, time.Second, time.Millisecond,
+		"the queued results must be published")
+	assert.Zero(t, blocked.profiles.Load(), "the evicted profile must not be published")
+}
+
+func TestScheduledProfilesNeedProfileStream(t *testing.T) {
+	// Queue a profile while the output is blocked.
+	d, plugin, blocked, release := outageDispatcherFor(t, outageProfileInputs("old"), outageLimits)
+	d.enqueue(t.Context(), nil, plugin, QueryResult{Name: "scheduled", Action: "diff"}, nil)
+	waitForResultPublication(t, blocked)
+	profile := scheduledProfileItem{name: "scheduled", namespace: "old", query: "SELECT 1", profile: map[string]any{}}
+	d.enqueueProfile(profile)
+
+	// Remove the profile stream; the queued and a new profile must both be stale.
+	require.NoError(t, d.configure(outageInputs("old"), outageLimits), "remove the profile stream")
+	next := activePublisher(d)
+	d.enqueueProfile(profile)
+	release()
+	// The worker counts a drop under osquerybeat.scheduled_query_profiles last.
+	assert.Eventually(t, func() bool { return d.profileMetrics.stale.Get() == 2 }, time.Second, time.Millisecond,
+		"keep counting stale profiles where existing dashboards read them")
+	assert.Equal(t, uint64(2), d.metrics.stale.Get(), "profiles must be dropped as stale without a profile stream, when admitted and when dequeued")
+	assert.Zero(t, blocked.profiles.Load()+next.profiles.Load(), "no profile may be published without a profile stream")
+}
+
 func TestScheduledResultsCancelledRunDroppedBeforeHandling(t *testing.T) {
 	d, plugin, blocked, release := outageDispatcher(t, outageLimits)
 	calls := recordHandledResults(d)
@@ -396,16 +471,22 @@ func TestScheduledResultsStopReleasesIdleWorker(t *testing.T) {
 	}
 }
 
-// Result and profile publication remain separate. Capturing correlation when
-// admitting the logger document must not make collection wait for its output.
+// Profiles are published by the scheduled worker, but collected by their own
+// worker. Capturing correlation when admitting the logger document must not
+// make collection wait for the output.
 type correlatedStalledResultPublisher struct {
 	stalledResultPublisher
 	response chan scheduledProfileResponse
+	profile  chan collectedProfile
 }
 
 func (p *correlatedStalledResultPublisher) PublishScheduledResponse(scheduleID, packID, packName, queryName, spaceID, responseID string, startedAt, completedAt, plannedAt time.Time, count int, executionCount int64) {
 	p.response <- scheduledProfileResponse{scheduleID: scheduleID, responseID: responseID, executionCount: executionCount}
 	p.stalledResultPublisher.PublishScheduledResponse(scheduleID, packID, packName, queryName, spaceID, responseID, startedAt, completedAt, plannedAt, count, executionCount)
+}
+
+func (p *correlatedStalledResultPublisher) PublishScheduledProfile(_, name, scheduleID, responseID, spaceID string, executionCount int64, profile map[string]any) {
+	p.profile <- collectedProfile{name, scheduleID, responseID, spaceID, executionCount, profile}
 }
 
 func TestScheduledResultsStalledOutputDoesNotBlockProfileCollection(t *testing.T) {
@@ -420,24 +501,19 @@ func TestScheduledResultsStalledOutputDoesNotBlockProfileCollection(t *testing.T
 	_, err := plugin.GenerateConfig(t.Context())
 	require.NoError(t, err, "apply the profiled policy")
 
-	profiler := newQueryProfiler(log)
-	executor := profileQueryFunc(func(context.Context, string, time.Duration) ([]map[string]any, error) {
-		return profileTestRow("SELECT 1"), nil
-	})
-	worker := newScheduledQueryProfiler(t.Context(), 2, executor, plugin, profiler, newScheduledProfileMetrics(monitoring.NewRegistry()))
-	t.Cleanup(worker.stop)
-	sink := &profileTestSink{published: make(chan collectedProfile, 1)}
-	bt := &osquerybeat{pub: &profileCallbackPublisher{sink: sink}, qp: profiler, log: log}
+	bt := &osquerybeat{log: log}
 	publisher := &correlatedStalledResultPublisher{
 		stalledResultPublisher: stalledResultPublisher{entered: make(chan struct{}), release: make(chan struct{})},
 		response:               make(chan scheduledProfileResponse, 1),
+		profile:                make(chan collectedProfile, 1),
 	}
+	release := sync.OnceFunc(func() { close(publisher.release) })
 	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents,
 		func(func() bool, func()) osquerybeatPublisher { return publisher }, bt.handleScheduledQueryResult)
 	d.profile = bt.enqueueScheduledProfile
-	require.NoError(t, d.configure(inputs, config.ScheduledPublishingConfig{MaxEvents: config.DefaultScheduledMaxEvents}), "configure the independent result publisher")
+	require.NoError(t, d.configure(inputs, config.ScheduledPublishingConfig{MaxEvents: config.DefaultScheduledMaxEvents}), "configure the scheduled clients")
 	t.Cleanup(func() {
-		close(publisher.release)
+		release()
 		d.stop()
 		select {
 		case <-d.done:
@@ -445,16 +521,29 @@ func TestScheduledResultsStalledOutputDoesNotBlockProfileCollection(t *testing.T
 			t.Error("released result publisher did not stop")
 		}
 	})
+	executor := profileQueryFunc(func(context.Context, string, time.Duration) ([]map[string]any, error) {
+		return profileTestRow("SELECT 1"), nil
+	})
+	metrics := newScheduledProfileMetrics(monitoring.NewRegistry())
+	worker := newScheduledQueryProfiler(t.Context(), 2, executor, plugin, newQueryProfiler(log), metrics, d.enqueueProfile)
+	t.Cleanup(worker.stop)
+
+	// Collection must finish and queue the profile while the result output is stalled.
 	d.enqueue(t.Context(), nil, plugin, QueryResult{Name: "scheduled", Action: "diff", UnixTime: 123}, worker)
 	waitForResultPublication(t, &publisher.stalledResultPublisher)
-	var profile collectedProfile
-	select {
-	case profile = <-sink.published:
-	case <-time.After(time.Second):
-		t.Fatal("profile collection waited for the blocked result publisher")
-	}
+	assert.Eventually(t, func() bool { items, _ := d.queue.stats(); return items == 1 }, time.Second, time.Millisecond,
+		"profile collection waited for the blocked result publisher")
+	assert.Equal(t, uint64(1), metrics.collected.Get(), "count the collected profile")
+
+	// After the output recovers, the profile keeps the result's correlation.
+	release()
 	response := <-publisher.response
-	assert.Equal(t, response.responseID, profile.responseID, "independent workers must retain the same response identity")
-	assert.Equal(t, "policy-schedule", profile.scheduleID, "capture policy identity before deferred work")
-	assert.Equal(t, response.executionCount, profile.scheduleExecutionCount, "retain the originating execution slot")
+	select {
+	case profile := <-publisher.profile:
+		assert.Equal(t, response.responseID, profile.responseID, "independent workers must retain the same response identity")
+		assert.Equal(t, "policy-schedule", profile.scheduleID, "capture policy identity before deferred work")
+		assert.Equal(t, response.executionCount, profile.scheduleExecutionCount, "retain the originating execution slot")
+	case <-time.After(time.Second):
+		t.Fatal("the queued profile was not published after the output recovered")
+	}
 }

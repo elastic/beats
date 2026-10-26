@@ -6,7 +6,6 @@ package beater
 
 import (
 	"context"
-	"sync/atomic"
 	"testing"
 	"time"
 
@@ -15,7 +14,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pub"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -32,28 +30,10 @@ type collectedProfile struct {
 	profile                               map[string]any
 }
 
-type profileTestSink struct {
-	retired   atomic.Bool
-	published chan collectedProfile
-	// drop makes Publish report a full output queue. retireOnDrop also
-	// retires the lease, as a policy change during publication does.
-	drop, retireOnDrop bool
-}
+// profileTestQueue receives the profiles a worker hands to the scheduled queue.
+type profileTestQueue chan scheduledProfileItem
 
-func (s *profileTestSink) Valid() bool { return !s.retired.Load() }
-func (s *profileTestSink) Publish(name, scheduleID, responseID, spaceID string, scheduleExecutionCount int64, profile map[string]any) bool {
-	if !s.Valid() {
-		return false
-	}
-	if s.drop {
-		if s.retireOnDrop {
-			s.retired.Store(true)
-		}
-		return false
-	}
-	s.published <- collectedProfile{name, scheduleID, responseID, spaceID, scheduleExecutionCount, profile}
-	return true
-}
+func (q profileTestQueue) enqueue(item scheduledProfileItem) { q <- item }
 
 func profileTestInputs(namespace, sql string, profiling *bool) []config.InputConfig {
 	return []config.InputConfig{{
@@ -66,6 +46,8 @@ func profileTestInputs(namespace, sql string, profiling *bool) []config.InputCon
 				Profiling:            profiling,
 			},
 		}},
+	}, {
+		Datastream: config.DatastreamConfig{Dataset: config.DefaultQueryProfileDataset, Namespace: namespace},
 	}}
 }
 
@@ -78,7 +60,7 @@ func profileTestPlugin(t *testing.T) *ConfigPlugin {
 	return p
 }
 
-func profileTestRequest(sink *profileTestSink) scheduledProfileRequest {
+func profileTestRequest() scheduledProfileRequest {
 	return scheduledProfileRequest{
 		name:                   "scheduled",
 		query:                  "SELECT 1",
@@ -87,7 +69,6 @@ func profileTestRequest(sink *profileTestSink) scheduledProfileRequest {
 		responseID:             "response",
 		spaceID:                "space",
 		scheduleExecutionCount: 1,
-		sink:                   sink,
 	}
 }
 
@@ -122,14 +103,14 @@ func TestScheduledProfilerBoundsJobsAndJoinsCancellation(t *testing.T) {
 	// Build a worker with two pending slots whose cleanup always releases the RPC.
 	metrics := newScheduledProfileMetrics(monitoring.NewRegistry())
 	profiler := newQueryProfiler(logptest.NewTestingLogger(t, "profile"))
-	worker := newScheduledQueryProfiler(t.Context(), 2, query, profileTestPlugin(t), profiler, metrics)
+	queue := make(profileTestQueue, 4)
+	worker := newScheduledQueryProfiler(t.Context(), 2, query, profileTestPlugin(t), profiler, metrics, queue.enqueue)
 	t.Cleanup(func() {
 		// Release the fake RPC even if a regression blocks admission or shutdown.
 		close(release)
 		worker.stop()
 	})
-	sink := &profileTestSink{published: make(chan collectedProfile, 4)}
-	request := profileTestRequest(sink)
+	request := profileTestRequest()
 
 	// Start one collection and fill both pending slots behind it.
 	require.True(t, worker.enqueue(request), "the first profile should reach the owned worker")
@@ -166,58 +147,11 @@ func TestScheduledProfilerBoundsJobsAndJoinsCancellation(t *testing.T) {
 		t.Fatal("shutdown did not cancel and join the profiling RPC")
 	}
 
-	// After shutdown nothing may remain queued, be admitted, or be published.
+	// After shutdown nothing may remain queued, be admitted, or be handed on.
 	assert.Empty(t, worker.jobs, "shutdown should release queued metadata references")
 	assert.Equal(t, uint64(3), metrics.shutdown.Get(), "shutdown should count the active and queued profiles it discarded")
 	assert.False(t, worker.enqueue(request), "the stopped worker must reject later callbacks")
-	assert.Empty(t, sink.published, "cancelled collection must not publish a profile")
-}
-
-// stuckProfileSink is a live lease whose Publish waits until release is closed,
-// as a memory queue publish waits for a slot.
-type stuckProfileSink struct{ entered, release chan struct{} }
-
-func (*stuckProfileSink) Valid() bool { return true }
-func (s *stuckProfileSink) Publish(string, string, string, string, int64, map[string]any) bool {
-	close(s.entered)
-	<-s.release
-	return false
-}
-
-func TestScheduledProfilerStopDoesNotJoinStuckPublish(t *testing.T) {
-	// Run a worker whose only profile publish gets stuck.
-	query := profileQueryFunc(func(context.Context, string, time.Duration) ([]map[string]any, error) {
-		return profileTestRow("SELECT 1"), nil
-	})
-	metrics := newScheduledProfileMetrics(monitoring.NewRegistry())
-	profiler := newQueryProfiler(logptest.NewTestingLogger(t, "profile"))
-	worker := newScheduledQueryProfiler(t.Context(), 2, query, profileTestPlugin(t), profiler, metrics)
-	sink := &stuckProfileSink{entered: make(chan struct{}), release: make(chan struct{})}
-	t.Cleanup(func() {
-		// Release the publish even if a regression makes stop wait for it.
-		close(sink.release)
-		worker.stop()
-	})
-	request := profileTestRequest(nil)
-	request.sink = sink
-	require.True(t, worker.enqueue(request), "enqueue a profile whose publish will get stuck")
-	select {
-	case <-sink.entered:
-	case <-time.After(time.Second):
-		t.Fatal("the worker did not reach Publish")
-	}
-
-	// Stopping must not wait for the stuck publish.
-	done := make(chan struct{})
-	go func() {
-		worker.stop()
-		close(done)
-	}()
-	select {
-	case <-done:
-	case <-time.After(time.Second):
-		t.Fatal("stop waited for a collector stuck in Publish")
-	}
+	assert.Empty(t, queue, "cancelled collection must not queue a profile")
 }
 
 func TestScheduledProfilerPreservesProfileCorrelation(t *testing.T) {
@@ -226,30 +160,32 @@ func TestScheduledProfilerPreservesProfileCorrelation(t *testing.T) {
 		return profileTestRow("SELECT 1"), nil
 	})
 
-	// Run a worker against that query and capture what it publishes.
+	// Run a worker against that query and capture what it queues.
 	metrics := newScheduledProfileMetrics(monitoring.NewRegistry())
 	profiler := newQueryProfiler(logptest.NewTestingLogger(t, "profile"))
-	worker := newScheduledQueryProfiler(t.Context(), 2, query, profileTestPlugin(t), profiler, metrics)
+	queue := make(profileTestQueue, 1)
+	worker := newScheduledQueryProfiler(t.Context(), 2, query, profileTestPlugin(t), profiler, metrics, queue.enqueue)
 	t.Cleanup(worker.stop)
-	sink := &profileTestSink{published: make(chan collectedProfile, 1)}
 
 	// The worker must preserve captured result metadata while collecting current metrics.
-	require.True(t, worker.enqueue(profileTestRequest(sink)), "default profiling should enqueue a scheduled profile")
+	require.True(t, worker.enqueue(profileTestRequest()), "default profiling should enqueue a scheduled profile")
 	select {
-	case published := <-sink.published:
-		assert.Equal(t, "scheduled", published.name, "preserve the native query name")
-		assert.Equal(t, "scheduled", published.scheduleID, "preserve the schedule identity")
-		assert.Equal(t, "response", published.responseID, "preserve correlation with the result and scheduled response")
-		assert.Equal(t, int64(1), published.scheduleExecutionCount, "preserve the originating schedule execution")
-		assert.Equal(t, "space", published.spaceID, "preserve the captured policy space")
-		assert.Equal(t, "scheduled", published.profile["source"], "preserve the scheduled profile schema")
-		assert.Equal(t, int64(2), published.profile["executions"], "preserve the native schedule's execution metrics")
+	case item := <-queue:
+		assert.Equal(t, "scheduled", item.name, "preserve the native query name")
+		assert.Equal(t, "default", item.namespace, "preserve the result namespace")
+		assert.Equal(t, "SELECT 1", item.query, "preserve the SQL the profile describes")
+		assert.Equal(t, "scheduled", item.scheduleID, "preserve the schedule identity")
+		assert.Equal(t, "response", item.responseID, "preserve correlation with the result and scheduled response")
+		assert.Equal(t, int64(1), item.executionCount, "preserve the originating schedule execution")
+		assert.Equal(t, "space", item.spaceID, "preserve the captured policy space")
+		assert.Equal(t, "scheduled", item.profile["source"], "preserve the scheduled profile schema")
+		assert.Equal(t, int64(2), item.profile["executions"], "preserve the native schedule's execution metrics")
 	case <-time.After(time.Second):
-		t.Fatal("the worker did not publish its collected profile")
+		t.Fatal("the worker did not queue its collected profile")
 	}
 
-	// Collection is counted by the worker, separately from output admission.
-	require.Eventually(t, func() bool { return metrics.collected.Get() == 1 }, time.Second, time.Millisecond, "completed collection should be counted separately from output admission")
+	// Collection is counted by the worker, separately from publication.
+	require.Eventually(t, func() bool { return metrics.collected.Get() == 1 }, time.Second, time.Millisecond, "completed collection should be counted")
 }
 
 func TestScheduledProfilerRejectsPolicyChangesDuringCollection(t *testing.T) {
@@ -293,12 +229,12 @@ func TestScheduledProfilerRejectsPolicyChangesDuringCollection(t *testing.T) {
 			plugin := profileTestPlugin(t)
 			metrics := newScheduledProfileMetrics(monitoring.NewRegistry())
 			profiler := newQueryProfiler(logptest.NewTestingLogger(t, "profile"))
-			worker := newScheduledQueryProfiler(t.Context(), 2, query, plugin, profiler, metrics)
+			queue := make(profileTestQueue, 1)
+			worker := newScheduledQueryProfiler(t.Context(), 2, query, plugin, profiler, metrics, queue.enqueue)
 			t.Cleanup(worker.stop)
-			sink := &profileTestSink{published: make(chan collectedProfile, 1)}
 
 			// Enqueue a profile and wait until collection is in flight.
-			require.True(t, worker.enqueue(profileTestRequest(sink)), "enqueue the original policy's profile")
+			require.True(t, worker.enqueue(profileTestRequest()), "enqueue the original policy's profile")
 			select {
 			case <-entered:
 			case <-time.After(time.Second):
@@ -310,43 +246,7 @@ func TestScheduledProfilerRejectsPolicyChangesDuringCollection(t *testing.T) {
 			close(release)
 
 			require.Eventually(t, func() bool { return metrics.stale.Get() == 1 }, time.Second, time.Millisecond, "collection must reject a policy change before publication")
-			assert.Empty(t, sink.published, "old profile metadata must not use the new policy destination")
-		})
-	}
-}
-
-func TestScheduledProfilerCountsRejectedPublish(t *testing.T) {
-	for _, tc := range []struct {
-		name      string
-		retire    bool
-		wantStale uint64
-	}{
-		// The sink's output_full counter records this drop, not the worker.
-		{"output full", false, 0},
-		{"lease retired during publish", true, 1},
-	} {
-		t.Run(tc.name, func(t *testing.T) {
-			// Run a worker whose first profile is rejected by its sink.
-			query := profileQueryFunc(func(context.Context, string, time.Duration) ([]map[string]any, error) {
-				return profileTestRow("SELECT 1"), nil
-			})
-			metrics := newScheduledProfileMetrics(monitoring.NewRegistry())
-			profiler := newQueryProfiler(logptest.NewTestingLogger(t, "profile"))
-			worker := newScheduledQueryProfiler(t.Context(), 2, query, profileTestPlugin(t), profiler, metrics)
-			t.Cleanup(worker.stop)
-			rejecting := &profileTestSink{published: make(chan collectedProfile, 1), drop: true, retireOnDrop: tc.retire}
-			require.True(t, worker.enqueue(profileTestRequest(rejecting)), "enqueue a profile its sink will reject")
-
-			// The worker is serial, so a later publication shows the first collection finished.
-			next := &profileTestSink{published: make(chan collectedProfile, 1)}
-			require.True(t, worker.enqueue(profileTestRequest(next)), "enqueue a profile that publishes")
-			select {
-			case <-next.published:
-			case <-time.After(time.Second):
-				t.Fatal("the worker did not publish the later profile")
-			}
-			require.Eventually(t, func() bool { return metrics.collected.Get() == 1 }, time.Second, time.Millisecond, "only the published profile counts as collected")
-			assert.Equal(t, tc.wantStale, metrics.stale.Get(), "a rejected publish is stale only when the lease retired")
+			assert.Empty(t, queue, "old profile metadata must not use the new policy destination")
 		})
 	}
 }
@@ -360,14 +260,14 @@ func TestScheduledProfilerRejectsReplacementNativeMetrics(t *testing.T) {
 	// Enqueue a profile that captured the original SQL.
 	metrics := newScheduledProfileMetrics(monitoring.NewRegistry())
 	profiler := newQueryProfiler(logptest.NewTestingLogger(t, "profile"))
-	worker := newScheduledQueryProfiler(t.Context(), 2, query, profileTestPlugin(t), profiler, metrics)
+	queue := make(profileTestQueue, 1)
+	worker := newScheduledQueryProfiler(t.Context(), 2, query, profileTestPlugin(t), profiler, metrics, queue.enqueue)
 	t.Cleanup(worker.stop)
-	sink := &profileTestSink{published: make(chan collectedProfile, 1)}
-	require.True(t, worker.enqueue(profileTestRequest(sink)), "enqueue the captured query identity")
+	require.True(t, worker.enqueue(profileTestRequest()), "enqueue the captured query identity")
 
 	// Keep the replacement's metrics out of the original result's profile.
 	require.Eventually(t, func() bool { return metrics.stale.Get() == 1 }, time.Second, time.Millisecond, "the schedule row must still describe the captured SQL")
-	assert.Empty(t, sink.published, "replacement query metrics must not be attached to the old result response ID")
+	assert.Empty(t, queue, "replacement query metrics must not be attached to the old result response ID")
 }
 
 func TestProfilingDiagnosticsRespectRunCancellation(t *testing.T) {
@@ -408,18 +308,78 @@ type scheduledProfileResponse struct {
 	executionCount         int64
 }
 
+// profileCallbackPublisher records the responses and profiles the scheduled
+// worker publishes.
 type profileCallbackPublisher struct {
 	mockBeatPublisher
-	sink      pub.ScheduledProfileSink
 	responses chan scheduledProfileResponse
-}
-
-func (p *profileCallbackPublisher) CaptureScheduledProfileSink(string) pub.ScheduledProfileSink {
-	return p.sink
+	profiles  chan collectedProfile
 }
 
 func (p *profileCallbackPublisher) PublishScheduledResponse(scheduleID, _, _, _, _, responseID string, _, _, _ time.Time, _ int, executionCount int64) {
 	p.responses <- scheduledProfileResponse{scheduleID: scheduleID, responseID: responseID, executionCount: executionCount}
+}
+
+func (p *profileCallbackPublisher) PublishScheduledProfile(_, name, scheduleID, responseID, spaceID string, executionCount int64, profile map[string]any) {
+	p.profiles <- collectedProfile{name, scheduleID, responseID, spaceID, executionCount, profile}
+}
+
+func TestScheduledProfileAdmission(t *testing.T) {
+	disabled, enabled := false, true
+	tests := []struct {
+		name             string
+		applied, pending []config.InputConfig // pending is nil when the applied policy is current
+		wantProfile      bool
+	}{
+		{
+			name:        "pending policy enables profiling",
+			applied:     profileTestInputs("default", "SELECT 1", &disabled),
+			pending:     profileTestInputs("default", "SELECT 1", &enabled),
+			wantProfile: true,
+		},
+		{
+			// Without a profile stream the profile RPC would be wasted.
+			name:    "no profile stream",
+			applied: profileTestInputs("default", "SELECT 1", &enabled)[:1],
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// Apply the policy, then stage the pending one before osqueryd refreshes.
+			log := logptest.NewTestingLogger(t, "profile-admission")
+			plugin := NewConfigPlugin(log)
+			require.NoError(t, plugin.Set(test.applied), "stage the applied policy")
+			_, err := plugin.GenerateConfig(t.Context())
+			require.NoError(t, err, "apply the native schedule")
+			policy := test.applied
+			if test.pending != nil {
+				require.NoError(t, plugin.Set(test.pending), "stage the pending policy")
+				policy = test.pending
+			}
+
+			// Wire the logger path to a collector that reports its profile RPC.
+			publisher := &profileCallbackPublisher{responses: make(chan scheduledProfileResponse, 1), profiles: make(chan collectedProfile, 1)}
+			bt := &osquerybeat{log: log}
+			d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents,
+				func(func() bool, func()) osquerybeatPublisher { return publisher }, bt.handleScheduledQueryResult)
+			d.profile = bt.enqueueScheduledProfile
+			require.NoError(t, d.configure(policy, config.ScheduledPublishingConfig{MaxEvents: config.DefaultScheduledMaxEvents}), "configure the scheduled clients")
+			stopOnCleanup(t, d)
+			collecting := make(chan struct{}, 1)
+			query := profileQueryFunc(func(context.Context, string, time.Duration) ([]map[string]any, error) {
+				collecting <- struct{}{}
+				return profileTestRow("SELECT 1"), nil
+			})
+			metrics := newScheduledProfileMetrics(monitoring.NewRegistry())
+			worker := newScheduledQueryProfiler(t.Context(), 2, query, plugin, newQueryProfiler(log), metrics, d.enqueueProfile)
+
+			// Stopping the worker either collects or discards an admitted profile.
+			d.enqueue(t.Context(), nil, plugin, QueryResult{Name: "scheduled", Action: "diff", UnixTime: 123}, worker)
+			worker.stop()
+			admitted := len(collecting) == 1 || metrics.shutdown.Get() == 1
+			assert.Equal(t, test.wantProfile, admitted, "whether the result's profile is collected")
+		})
+	}
 }
 
 func TestLoggerReturnsWhileScheduledProfileRPCWaits(t *testing.T) {
@@ -450,14 +410,9 @@ func TestLoggerReturnsWhileScheduledProfileRPCWaits(t *testing.T) {
 	_, err := plugin.GenerateConfig(t.Context())
 	require.NoError(t, err, "apply the timed native schedule")
 
-	// Wire the real logger callback to a worker and fake publishers.
-	profiler := newQueryProfiler(log)
-	metrics := newScheduledProfileMetrics(monitoring.NewRegistry())
-	worker := newScheduledQueryProfiler(t.Context(), 2, query, plugin, profiler, metrics)
-	t.Cleanup(worker.stop)
-	sink := &profileTestSink{published: make(chan collectedProfile, 1)}
-	publisher := &profileCallbackPublisher{sink: sink, responses: make(chan scheduledProfileResponse, 1)}
-	bt := &osquerybeat{pub: publisher, qp: profiler, log: log}
+	// Wire the real logger callback to a worker and a fake publisher.
+	publisher := &profileCallbackPublisher{responses: make(chan scheduledProfileResponse, 1), profiles: make(chan collectedProfile, 1)}
+	bt := &osquerybeat{log: log}
 	dispatcher := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents,
 		func(func() bool, func()) osquerybeatPublisher { return publisher }, bt.handleScheduledQueryResult)
 	dispatcher.profile = bt.enqueueScheduledProfile
@@ -470,6 +425,8 @@ func TestLoggerReturnsWhileScheduledProfileRPCWaits(t *testing.T) {
 			t.Error("scheduled result worker did not stop")
 		}
 	})
+	worker := newScheduledQueryProfiler(t.Context(), 2, query, plugin, newQueryProfiler(log), newScheduledProfileMetrics(monitoring.NewRegistry()), dispatcher.enqueueProfile)
+	t.Cleanup(worker.stop)
 	loggerPlugin := NewLoggerPlugin(log, func(result QueryResult) {
 		// A zero-hit diff needs no column resolution, so nil cli catches any
 		// accidental reintroduction of profiling RPCs through the main client.
@@ -504,12 +461,12 @@ func TestLoggerReturnsWhileScheduledProfileRPCWaits(t *testing.T) {
 	}
 	assert.Equal(t, "policy-schedule", response.scheduleID, "the scheduled response must use policy identity")
 	assert.Equal(t, int64(4), response.executionCount, "capture the result's execution slot before delayed collection")
-	assert.Empty(t, sink.published, "the scheduled response should be emitted while profiling is still pending")
+	assert.Empty(t, publisher.profiles, "the scheduled response should be emitted while profiling is still pending")
 
 	// Release the RPC and check the profile carries the result's correlation.
 	close(release)
 	select {
-	case profile := <-sink.published:
+	case profile := <-publisher.profiles:
 		assert.Equal(t, response.responseID, profile.responseID, "asynchronous profiling must retain the completed result's response ID")
 		assert.Equal(t, response.scheduleID, profile.scheduleID, "retain the originating policy schedule identity")
 		assert.Equal(t, response.executionCount, profile.scheduleExecutionCount, "retain execution attribution captured by the logger callback")

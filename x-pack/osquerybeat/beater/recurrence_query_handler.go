@@ -18,8 +18,6 @@ import (
 	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/scheduler"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -32,9 +30,6 @@ const (
 // rruleRuntimeProfileState holds optional live-style profiling for one RRULE execution.
 type rruleRuntimeProfileState struct {
 	queryName            string
-	ns                   string
-	responseID           string
-	spaceID              string
 	sql                  string
 	shouldPublishProfile bool
 	shouldCollectProfile bool
@@ -46,9 +41,9 @@ type rruleRuntimeProfileState struct {
 type recurrenceQueryHandler struct {
 	log          *logp.Logger
 	scheduler    *scheduler.Scheduler
-	cli          *osqdcli.Client
+	cli          queryExecutor
 	configPlugin *ConfigPlugin
-	publisher    scheduledQueryPublisher
+	results      *scheduledResultDispatcher
 	profiles     liveProfileRecorder
 	osqueryVer   string
 
@@ -56,15 +51,16 @@ type recurrenceQueryHandler struct {
 	previousResults map[string]map[string]map[string]any
 }
 
-// newRecurrenceQueryHandler creates a new RRULE query handler.
+// newRecurrenceQueryHandler creates a new RRULE query handler. It queues each
+// execution's results to results, which publishes them like native ones.
 // profiles may be nil; when set, runtime-style profiles are recorded for every RRULE execution
 // (same backing store as live queries), and policy-driven publish still follows LookupQueryProfile.
-func newRecurrenceQueryHandler(log *logp.Logger, cli *osqdcli.Client, configPlugin *ConfigPlugin, pub scheduledQueryPublisher, profiles liveProfileRecorder, osqueryVersion string) *recurrenceQueryHandler {
+func newRecurrenceQueryHandler(log *logp.Logger, cli queryExecutor, configPlugin *ConfigPlugin, results *scheduledResultDispatcher, profiles liveProfileRecorder, osqueryVersion string) *recurrenceQueryHandler {
 	h := &recurrenceQueryHandler{
 		log:             log.With("log.logger", "rrule-query-handler"),
 		cli:             cli,
 		configPlugin:    configPlugin,
-		publisher:       pub,
+		results:         results,
 		profiles:        profiles,
 		osqueryVer:      osqueryVersion,
 		previousResults: make(map[string]map[string]map[string]any),
@@ -247,16 +243,9 @@ func (h *recurrenceQueryHandler) retainDiffState(queries []*scheduler.ScheduledQ
 
 // initRRuleRuntimeProfiling collects a pre-query process snapshot when profiling is enabled
 // for this query (publish flag and/or local profile store).
-func (h *recurrenceQueryHandler) initRRuleRuntimeProfiling(ctx context.Context, name, ns, responseID, sql string) rruleRuntimeProfileState {
-	var spaceID string
-	if qi, ok := h.configPlugin.LookupQueryInfo(name); ok {
-		spaceID = qi.SpaceID
-	}
+func (h *recurrenceQueryHandler) initRRuleRuntimeProfiling(ctx context.Context, name, sql string) rruleRuntimeProfileState {
 	st := rruleRuntimeProfileState{
 		queryName:            name,
-		ns:                   ns,
-		responseID:           responseID,
-		spaceID:              spaceID,
 		sql:                  sql,
 		shouldPublishProfile: h.configPlugin.LookupQueryProfile(name),
 	}
@@ -274,11 +263,11 @@ func (h *recurrenceQueryHandler) initRRuleRuntimeProfiling(ctx context.Context, 
 	return st
 }
 
-// completeRRuleRuntimeProfiling collects the post-query snapshot and records or publishes
-// the profile. queryErr is the error from the user query, if any.
-func (h *recurrenceQueryHandler) completeRRuleRuntimeProfiling(ctx context.Context, st rruleRuntimeProfileState, queryDuration time.Duration, queryErr error) {
+// completeRRuleRuntimeProfiling collects the post-query snapshot, records the profile,
+// and returns it if it should be published, or nil. queryErr is the error from the user query, if any.
+func (h *recurrenceQueryHandler) completeRRuleRuntimeProfiling(ctx context.Context, st rruleRuntimeProfileState, queryDuration time.Duration, queryErr error) map[string]any {
 	if !st.shouldCollectProfile {
-		return
+		return nil
 	}
 	if !st.beforeReady {
 		if st.shouldPublishProfile {
@@ -286,20 +275,21 @@ func (h *recurrenceQueryHandler) completeRRuleRuntimeProfiling(ctx context.Conte
 		} else {
 			h.log.Debug("profile storage skipped: pre-query snapshot was not collected")
 		}
-		return
+		return nil
 	}
 	after, snapErr := collectRuntimeSnapshot(ctx, h.cli)
 	if snapErr != nil {
 		h.log.Debugf("failed to collect post-query profile snapshot for %s: %v", st.queryName, snapErr)
-		return
+		return nil
 	}
 	prof := buildRuntimeQueryProfile(rruleRuntimeProfileSource, st.sql, st.before, after, queryDuration, queryErr)
 	if h.profiles != nil {
 		h.profiles.RecordLiveProfile(st.sql, prof)
 	}
-	if st.shouldPublishProfile {
-		h.publisher.PublishQueryProfile(config.QueryProfileDatastream(st.ns), st.queryName, "", st.responseID, st.spaceID, prof, nil)
+	if !st.shouldPublishProfile {
+		return nil
 	}
+	return prof
 }
 
 // executeQuery is called by the scheduler to execute a query
@@ -314,30 +304,29 @@ func (h *recurrenceQueryHandler) executeQuery(ctx context.Context, scheduledQuer
 	}
 
 	responseID := uuid.Must(uuid.NewV4()).String()
-	profSt := h.initRRuleRuntimeProfiling(ctx, name, ns, responseID, query)
+	profSt := h.initRRuleRuntimeProfiling(ctx, name, query)
 
 	startedAt := time.Now()
 	hits, err := h.cli.Query(ctx, query, scheduledQuery.Timeout)
 	queryDuration := time.Since(startedAt)
 	completedAt := time.Now()
-	h.completeRRuleRuntimeProfiling(ctx, profSt, queryDuration, err)
+	profile := h.completeRRuleRuntimeProfiling(ctx, profSt, queryDuration, err)
+
+	// Query info supplies the ECS mapping and pack and space metadata. The
+	// scheduled worker publishes a run only while the policy still routes it.
+	qi, _ := h.configPlugin.LookupQueryInfo(name)
+	scheduleID := scheduledQuery.ScheduleID()
 
 	if err != nil {
+		// The profile of a failed run records the failure.
+		if profile != nil {
+			h.results.enqueueProfile(scheduledProfileItem{
+				name: name, namespace: ns, query: qi.Query, scheduleID: scheduleID,
+				responseID: responseID, spaceID: qi.SpaceID, executionCount: int64(executionIndex), profile: profile,
+			})
+		}
 		return err
 	}
-
-	// Get query info for ECS mapping, pack/space, and schedule id fallback
-	var ecsMapping ecs.Mapping
-	var spaceID, packID, packName, queryName string
-	if qi, ok := h.configPlugin.LookupQueryInfo(name); ok {
-		ecsMapping = qi.ECSMapping
-		spaceID = qi.SpaceID
-		packID = qi.PackID
-		packName = qi.PackName
-		queryName = qi.QueryName
-	}
-
-	scheduleID := scheduledQuery.ScheduleID()
 
 	baseMeta := map[string]any{
 		"unix_time":                completedAt.Unix(),
@@ -347,30 +336,34 @@ func (h *recurrenceQueryHandler) executeQuery(ctx context.Context, scheduledQuer
 		"schedule_execution_count": executionIndex,
 	}
 
-	totalHits := 0
-	publish := func(typ, action string, rows []map[string]any) {
+	var batches []resolvedRows
+	add := func(typ, action string, rows []map[string]any) {
 		if len(rows) == 0 {
 			return
 		}
-		totalHits += len(rows)
 		meta := cloneRRuleMeta(baseMeta)
 		meta["type"] = typ
 		if action != "" {
 			meta["action"] = action
 		}
-		h.publisher.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, spaceID, packID, packName, queryName, meta, rows, ecsMapping, nil)
+		batches = append(batches, resolvedRows{meta: meta, hits: rows})
 	}
 
 	if scheduledQuery.Snapshot() {
-		publish("snapshot", "", hits)
+		add("snapshot", "", hits)
 	} else {
 		added, removed := h.diffResults(name, hits, scheduledQuery.Removed())
-		publish("diff", "added", added)
-		publish("diff", "removed", removed)
+		add("diff", "added", added)
+		add("diff", "removed", removed)
 	}
 
-	// Synthetic response document (no action) with execution count for correlation
-	h.publisher.PublishScheduledResponse(scheduleID, packID, packName, queryName, spaceID, responseID, startedAt, completedAt, plannedScheduleTime, totalHits, int64(executionIndex))
+	// The worker publishes the profile, the rows, and a synthetic response
+	// document (no action) with the execution count for correlation.
+	h.results.enqueueResolved(resolvedScheduledResult{
+		name: name, namespace: ns, scheduleID: scheduleID, responseID: responseID, query: qi,
+		batches: batches, startedAt: startedAt, completedAt: completedAt, plannedTime: plannedScheduleTime,
+		executionCount: int64(executionIndex), profile: profile,
+	})
 
 	h.log.Debugf("RRULE-scheduled query '%s' completed with %d results", name, len(hits))
 	return nil
