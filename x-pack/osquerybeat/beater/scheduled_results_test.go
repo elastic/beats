@@ -109,6 +109,7 @@ func outageDispatcherFor(t *testing.T, inputs []config.InputConfig, limits confi
 // stopOnCleanup stops d when the test ends and waits for its worker, which
 // must not log once the test has finished. d's publisher must not block.
 func stopOnCleanup(t *testing.T, d *scheduledResultDispatcher) {
+	t.Helper()
 	t.Cleanup(func() {
 		d.stop()
 		select {
@@ -337,6 +338,45 @@ func TestScheduledProfilesNeedProfileStream(t *testing.T) {
 	assert.Zero(t, blocked.profiles.Load()+next.profiles.Load(), "no profile may be published without a profile stream")
 }
 
+func TestScheduledItemsDroppedAfterStop(t *testing.T) {
+	tests := []struct {
+		name         string
+		enqueue      func(*scheduledResultDispatcher)
+		wantProfiles uint64 // Legacy osquerybeat.scheduled_query_profiles shutdown drops.
+	}{
+		{
+			name: "resolved run",
+			enqueue: func(d *scheduledResultDispatcher) {
+				d.enqueueResolved(resolvedScheduledResult{name: "scheduled", namespace: "old", query: QueryInfo{Query: "SELECT 1"}})
+			},
+		},
+		{
+			name: "profile",
+			enqueue: func(d *scheduledResultDispatcher) {
+				d.enqueueProfile(scheduledProfileItem{name: "scheduled", namespace: "old", query: "SELECT 1"})
+			},
+			wantProfiles: 1,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			log := logptest.NewTestingLogger(t, "stopped")
+			d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents,
+				func(func() bool, func()) osquerybeatPublisher { return &mockBeatPublisher{} }, (&osquerybeat{log: log}).handleScheduledQueryResult)
+			require.NoError(t, d.configure(outageProfileInputs("old"), outageLimits), "configure a policy that routes the item")
+			stopOnCleanup(t, d)
+			d.stop()
+
+			test.enqueue(d)
+			assert.Equal(t, uint64(1), d.metrics.shutdown.Get(), "an item admitted after stop must be dropped as shutdown")
+			assert.Zero(t, d.metrics.stale.Get(), "an item admitted after stop is not stale")
+			assert.Equal(t, test.wantProfiles, d.profileMetrics.shutdown.Get(), "count profile shutdown drops where existing dashboards read them")
+			items, _ := d.queue.stats()
+			assert.Zero(t, items, "a stopped dispatcher must not queue the item")
+		})
+	}
+}
+
 func TestScheduledResultsCancelledRunDroppedBeforeHandling(t *testing.T) {
 	d, plugin, blocked, release := outageDispatcher(t, outageLimits)
 	calls := recordHandledResults(d)
@@ -537,7 +577,12 @@ func TestScheduledResultsStalledOutputDoesNotBlockProfileCollection(t *testing.T
 
 	// After the output recovers, the profile keeps the result's correlation.
 	release()
-	response := <-publisher.response
+	var response scheduledProfileResponse
+	select {
+	case response = <-publisher.response:
+	case <-time.After(time.Second):
+		t.Fatal("the stalled result's response was not published")
+	}
 	select {
 	case profile := <-publisher.profile:
 		assert.Equal(t, response.responseID, profile.responseID, "independent workers must retain the same response identity")

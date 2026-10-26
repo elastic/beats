@@ -300,7 +300,10 @@ func (h *recurrenceQueryHandler) executeQuery(ctx context.Context, scheduledQuer
 
 	ns, ok := h.configPlugin.LookupNamespace(name)
 	if !ok {
-		ns = config.DefaultNamespace
+		// No policy routes the query, so its run would be dropped as stale.
+		h.log.Debugf("Skipping RRULE-scheduled query '%s': no namespace in the active policy", name)
+		h.results.dropStale(resolvedScheduledResult{name: name})
+		return nil
 	}
 
 	responseID := uuid.Must(uuid.NewV4()).String()
@@ -313,15 +316,17 @@ func (h *recurrenceQueryHandler) executeQuery(ctx context.Context, scheduledQuer
 	profile := h.completeRRuleRuntimeProfiling(ctx, profSt, queryDuration, err)
 
 	// Query info supplies the ECS mapping and pack and space metadata. The
-	// scheduled worker publishes a run only while the policy still routes it.
+	// scheduled worker publishes a run only while the policy still routes its
+	// name and namespace to the SQL that produced the rows.
 	qi, _ := h.configPlugin.LookupQueryInfo(name)
+	qi.Query = query
 	scheduleID := scheduledQuery.ScheduleID()
 
 	if err != nil {
 		// The profile of a failed run records the failure.
 		if profile != nil {
 			h.results.enqueueProfile(scheduledProfileItem{
-				name: name, namespace: ns, query: qi.Query, scheduleID: scheduleID,
+				name: name, namespace: ns, query: query, scheduleID: scheduleID,
 				responseID: responseID, spaceID: qi.SpaceID, executionCount: int64(executionIndex), profile: profile,
 			})
 		}

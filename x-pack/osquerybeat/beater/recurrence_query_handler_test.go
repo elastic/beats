@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/scheduler"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -48,7 +49,7 @@ func TestRecurrenceResultsUseScheduledQueue(t *testing.T) {
 	select {
 	case err := <-done:
 		require.NoError(t, err, "run the RRULE query")
-	case <-time.After(50 * time.Millisecond):
+	case <-time.After(time.Second):
 		t.Fatal("the RRULE execution waited for the blocked output")
 	}
 	items, events := d.queue.stats()
@@ -59,6 +60,142 @@ func TestRecurrenceResultsUseScheduledQueue(t *testing.T) {
 	release()
 	assert.Eventually(t, func() bool { return blocked.calls.Load() == 2 }, time.Second, time.Millisecond,
 		"publish the queued run's response")
+}
+
+// rrulePublishedRows is one Publish call for an RRULE run.
+type rrulePublishedRows struct {
+	index, idValue, idKey, responseID string
+	meta                              map[string]any
+	hits                              []map[string]any
+}
+
+// rruleRowsPublisher records the rows and responses the scheduled worker publishes.
+type rruleRowsPublisher struct {
+	profileCallbackPublisher
+	rows chan rrulePublishedRows
+}
+
+func (p *rruleRowsPublisher) Publish(index, idValue, idFieldKey, responseID, _, _, _, _ string, meta map[string]any, hits []map[string]any, _ ecs.Mapping, _ any) {
+	p.rows <- rrulePublishedRows{index: index, idValue: idValue, idKey: idFieldKey, responseID: responseID, meta: meta, hits: hits}
+}
+
+func TestRecurrenceRowsPublished(t *testing.T) {
+	a, b, c := map[string]any{"value": "a"}, map[string]any{"value": "b"}, map[string]any{"value": "c"}
+	type batch struct {
+		typ, action string
+		hits        []map[string]any
+	}
+	tests := []struct {
+		name     string
+		snapshot bool
+		runs     [][]map[string]any // Rows each execution returns; the last one is checked.
+		want     []batch
+	}{
+		{
+			name:     "snapshot",
+			snapshot: true,
+			runs:     [][]map[string]any{{a, b}},
+			want:     []batch{{typ: "snapshot", hits: []map[string]any{a, b}}},
+		},
+		{
+			name: "diff",
+			runs: [][]map[string]any{{a, b}, {b, c}},
+			want: []batch{{typ: "diff", action: "added", hits: []map[string]any{c}}, {typ: "diff", action: "removed", hits: []map[string]any{a}}},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// Apply an unprofiled policy with an explicit schedule ID.
+			log := logptest.NewTestingLogger(t, "rrule")
+			disabled, removed := false, true
+			inputs := profileTestInputs("default", "SELECT 1", &disabled)
+			query := inputs[0].Osquery.Schedule["scheduled"]
+			query.ScheduleID = "policy-schedule"
+			query.Snapshot = &test.snapshot
+			query.Removed = &removed
+			inputs[0].Osquery.Schedule["scheduled"] = query
+			plugin := NewConfigPlugin(log)
+			require.NoError(t, plugin.Set(inputs), "stage the policy")
+			_, err := plugin.GenerateConfig(t.Context())
+			require.NoError(t, err, "apply the policy")
+			publisher := &rruleRowsPublisher{
+				profileCallbackPublisher: profileCallbackPublisher{responses: make(chan scheduledProfileResponse, 1)},
+				rows:                     make(chan rrulePublishedRows, 4),
+			}
+			d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents,
+				func(func() bool, func()) osquerybeatPublisher { return publisher }, (&osquerybeat{log: log}).handleScheduledQueryResult)
+			require.NoError(t, d.configure(inputs, config.ScheduledPublishingConfig{MaxEvents: config.DefaultScheduledMaxEvents}), "configure the scheduled clients")
+			stopOnCleanup(t, d)
+
+			// Run each execution and collect what the worker publishes for it.
+			run := 0
+			cli := profileQueryFunc(func(context.Context, string, time.Duration) ([]map[string]any, error) {
+				hits := test.runs[run]
+				run++
+				return hits, nil
+			})
+			h := newRecurrenceQueryHandler(log, cli, plugin, d, nil, "5.12.0")
+			sq := scheduler.ScheduledQuery{Name: "scheduled", Config: query, Timeout: time.Second}
+			var response scheduledProfileResponse
+			var got []rrulePublishedRows
+			for i := range test.runs {
+				require.NoError(t, h.executeQuery(t.Context(), sq, i+1, time.Now()), "run execution %d", i+1)
+				select {
+				case response = <-publisher.responses:
+				case <-time.After(time.Second):
+					t.Fatalf("the response of execution %d was not published", i+1)
+				}
+				// The worker publishes a run's rows before its response.
+				got = got[:0]
+				for len(publisher.rows) > 0 {
+					got = append(got, <-publisher.rows)
+				}
+			}
+
+			// The last execution's rows keep their routing, correlation and metadata.
+			require.Len(t, got, len(test.want), "publish each non-empty row group once")
+			total := 0
+			for i, want := range test.want {
+				assert.Equal(t, config.Datastream("default"), got[i].index, "row group %d index", i)
+				assert.Equal(t, "schedule_id", got[i].idKey, "row group %d ID field", i)
+				assert.Equal(t, "policy-schedule", got[i].idValue, "row group %d schedule ID", i)
+				assert.Equal(t, response.responseID, got[i].responseID, "row group %d must share the run's response ID", i)
+				assert.Equal(t, want.typ, got[i].meta["type"], "row group %d osquery_meta.type", i)
+				if want.action == "" {
+					assert.NotContains(t, got[i].meta, "action", "row group %d must have no osquery_meta.action", i)
+				} else {
+					assert.Equal(t, want.action, got[i].meta["action"], "row group %d osquery_meta.action", i)
+				}
+				assert.Equal(t, len(test.runs), got[i].meta["schedule_execution_count"], "row group %d execution count", i)
+				assert.Equal(t, want.hits, got[i].hits, "row group %d rows", i)
+				total += len(want.hits)
+			}
+			assert.Equal(t, total, response.count, "the response must count the run's published rows")
+			assert.Equal(t, int64(len(test.runs)), response.executionCount, "the response must carry the execution count")
+		})
+	}
+}
+
+func TestRecurrenceSkipsQueryWithoutNamespace(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "rrule")
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents,
+		func(func() bool, func()) osquerybeatPublisher { return &mockBeatPublisher{} }, (&osquerybeat{log: log}).handleScheduledQueryResult)
+	require.NoError(t, d.configure(outageInputs("old"), outageLimits), "configure the scheduled clients")
+	stopOnCleanup(t, d)
+	plugin := NewConfigPlugin(log)
+	require.NoError(t, plugin.Set(outageInputs("old")), "stage the policy")
+	_, err := plugin.GenerateConfig(t.Context())
+	require.NoError(t, err, "apply the policy")
+
+	// A query the policy does not route must not run, and counts as stale.
+	cli := profileQueryFunc(func(context.Context, string, time.Duration) ([]map[string]any, error) {
+		t.Error("a query without a namespace must not run")
+		return nil, nil
+	})
+	h := newRecurrenceQueryHandler(log, cli, plugin, d, nil, "5.12.0")
+	sq := scheduler.ScheduledQuery{Name: "unknown", Config: config.Query{Query: "SELECT 1"}, Timeout: time.Second}
+	assert.NoError(t, h.executeQuery(t.Context(), sq, 1, time.Now()), "skipping is not a query failure")
+	assert.Equal(t, uint64(1), d.metrics.stale.Get(), "count the skipped run as stale")
 }
 
 func TestRecurrenceProfilesUseScheduledQueue(t *testing.T) {

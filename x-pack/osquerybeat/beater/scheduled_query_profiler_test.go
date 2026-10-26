@@ -305,6 +305,7 @@ func TestProfilingDiagnosticsRespectRunCancellation(t *testing.T) {
 
 type scheduledProfileResponse struct {
 	scheduleID, responseID string
+	count                  int
 	executionCount         int64
 }
 
@@ -316,8 +317,8 @@ type profileCallbackPublisher struct {
 	profiles  chan collectedProfile
 }
 
-func (p *profileCallbackPublisher) PublishScheduledResponse(scheduleID, _, _, _, _, responseID string, _, _, _ time.Time, _ int, executionCount int64) {
-	p.responses <- scheduledProfileResponse{scheduleID: scheduleID, responseID: responseID, executionCount: executionCount}
+func (p *profileCallbackPublisher) PublishScheduledResponse(scheduleID, _, _, _, _, responseID string, _, _, _ time.Time, count int, executionCount int64) {
+	p.responses <- scheduledProfileResponse{scheduleID: scheduleID, responseID: responseID, count: count, executionCount: executionCount}
 }
 
 func (p *profileCallbackPublisher) PublishScheduledProfile(_, name, scheduleID, responseID, spaceID string, executionCount int64, profile map[string]any) {
