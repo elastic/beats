@@ -153,7 +153,7 @@ var liveDropErrors = map[string]error{
 }
 
 // enqueueResponse queues an action response after the action's rows. It never
-// waits. Only stop drops a response.
+// waits. A response is dropped only on stop or when no clients are configured.
 func (d *liveResultDispatcher) enqueueResponse(pub actionResultPublisher, req, res map[string]any) {
 	if !d.push(&liveItem{resPub: pub, req: req, res: res}) {
 		d.metrics.drop(dropShutdown, 1)
@@ -218,13 +218,15 @@ func (d *liveResultDispatcher) next() (*liveItem, bool) {
 
 func (d *liveResultDispatcher) publish(it *liveItem) {
 	if it.pub == nil {
-		it.resPub.PublishActionResult(it.req, it.res)
+		if !publishActionResult(it.resPub, it.req, it.res) {
+			d.metrics.drop(dropStale, 1)
+		}
 		return
 	}
 	defer close(it.done)
 	j := it.job
-	if j.profile != nil && !d.abandoned(it) {
-		it.pub.PublishQueryProfile(j.profileIndex, "", j.actionID, j.responseID, j.spaceID, j.profile, j.reqData)
+	if j.profile != nil && !d.abandoned(it) &&
+		publishQueryProfile(it.pub, j.profileIndex, j.actionID, j.responseID, j.spaceID, j.profile, j.reqData) {
 		it.profiled.Store(true)
 	}
 	// stop runs before each hit, so its call count is the number of hits
@@ -237,6 +239,26 @@ func (d *liveResultDispatcher) publish(it *liveItem) {
 	}
 	n := it.pub.PublishEach(j.index, j.actionID, "action_id", j.responseID, j.spaceID, "", "", "", nil, j.hits, j.ecsm, j.reqData, stop)
 	it.handed.Store(int64(n))
+}
+
+// publishActionResult publishes an action response and reports whether a
+// client took it. Only liveClients can report a miss.
+func publishActionResult(p actionResultPublisher, req, res map[string]any) bool {
+	if c, ok := p.(*liveClients); ok {
+		return c.publishActionResult(req, res)
+	}
+	p.PublishActionResult(req, res)
+	return true
+}
+
+// publishQueryProfile publishes a live query's profile and reports whether a
+// client took it. Only liveClients can report a miss.
+func publishQueryProfile(p actionQueryPublisher, index, actionID, responseID, spaceID string, profile map[string]any, reqData any) bool {
+	if c, ok := p.(*liveClients); ok {
+		return c.publishQueryProfile(index, "", actionID, responseID, spaceID, profile, reqData)
+	}
+	p.PublishQueryProfile(index, "", actionID, responseID, spaceID, profile, reqData)
+	return true
 }
 
 func (d *liveResultDispatcher) abandoned(it *liveItem) bool {
@@ -333,21 +355,35 @@ func (c *liveClients) PublishEach(index, idValue, idFieldKey, responseID, spaceI
 }
 
 func (c *liveClients) PublishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) {
+	c.publishQueryProfile(index, queryName, actionID, responseID, spaceID, profile, reqData)
+}
+
+// publishQueryProfile is PublishQueryProfile, reporting false when no clients
+// are configured.
+func (c *liveClients) publishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) bool {
 	l := c.acquire()
 	if l == nil {
-		return
+		return false
 	}
 	defer l.release()
 	l.pub.PublishQueryProfile(index, queryName, actionID, responseID, spaceID, profile, reqData)
+	return true
 }
 
 func (c *liveClients) PublishActionResult(req, res map[string]any) {
+	c.publishActionResult(req, res)
+}
+
+// publishActionResult is PublishActionResult, reporting false when no
+// clients are configured.
+func (c *liveClients) publishActionResult(req, res map[string]any) bool {
 	l := c.acquire()
 	if l == nil {
-		return
+		return false
 	}
 	defer l.release()
 	l.pub.PublishActionResult(req, res)
+	return true
 }
 
 // acquire returns the current lease, locked for publishing, or nil when no
