@@ -1,0 +1,17 @@
+{
+    "name": "serverless-search-node",
+    "cluster_name": "my_cluster",
+    "cluster_uuid": "GZbSUUMQQI-A7UcGS6vCMa",
+    "version": {
+        "number": "8.11.0",
+        "build_flavor": "serverless",
+        "build_type": "docker",
+        "build_hash": "00000000",
+        "build_date": "2023-10-31T00:00:00.000000000Z",
+        "build_snapshot": false,
+        "lucene_version": "9.7.0",
+        "minimum_wire_compatibility_version": "8.9.0",
+        "minimum_index_compatibility_version": "8.0.0"
+    },
+    "tagline": "You Know, for Search"
+}
