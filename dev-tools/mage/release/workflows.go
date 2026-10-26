@@ -111,7 +111,9 @@ func checkRequirements(cfg *ReleaseConfig) error {
 // 2. Opens PR-A on main (backport rule + next minor version)
 // 3. Opens PR-B on release branch (ff-release)
 // 4. Opens PR-C on main (docs + test env for next minor)
-// 5. Opens PR-D on release branch (next patch prep)
+//
+// Next-patch bumps on the release branch are intentionally omitted here; they
+// are created only by RunPatchRelease so patch and minor/FF stay independent.
 func RunMajorMinorRelease(cfg *ReleaseConfig) error {
 	fmt.Println("=== Starting Major/Minor Release Workflow ===")
 
@@ -155,12 +157,8 @@ func RunMajorMinorRelease(cfg *ReleaseConfig) error {
 	if err != nil {
 		return err
 	}
-	prD, err := prepNextPatchOnReleaseBranch(repo, cfg)
-	if err != nil {
-		return err
-	}
 
-	branchesToFinalize := []workflowPR{prA, prB, prC, prD}
+	branchesToFinalize := []workflowPR{prA, prB, prC}
 
 	if cfg.DryRun {
 		fmt.Println("\nDRY RUN: Skipping push and PR creation")
@@ -175,12 +173,12 @@ func RunMajorMinorRelease(cfg *ReleaseConfig) error {
 	if err := repo.CheckoutBranch(releaseBranch); err != nil {
 		return err
 	}
-	if err := repo.Push("origin"); err != nil {
+	if err := repo.Push("origin", cfg.GitHubToken); err != nil {
 		return err
 	}
 
 	gh := NewGitHubClient(cfg.GitHubToken)
-	results, err := finalizeWorkflowPRs(repo, gh, branchesToFinalize)
+	results, err := finalizeWorkflowPRs(repo, gh, cfg.GitHubToken, branchesToFinalize)
 	if err != nil {
 		return err
 	}
@@ -313,6 +311,8 @@ func prepMainDocsAndTestEnv(repo *GitRepo, cfg *ReleaseConfig) (workflowPR, erro
 	}, nil
 }
 
+// prepNextPatchOnReleaseBranch prepares the next-patch version + test-env bump.
+// Used only by RunPatchRelease (not by RunMajorMinorRelease).
 func prepNextPatchOnReleaseBranch(repo *GitRepo, cfg *ReleaseConfig) (workflowPR, error) {
 	branch := fmt.Sprintf("ff-prep-next-patch-%s", cfg.NextRelease)
 	fmt.Printf("\n--- Preparing next-patch prep: %s on %s ---\n", cfg.NextRelease, cfg.ReleaseBranch)
@@ -444,7 +444,11 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 	}
 
 	if cfg.ReleaseBranch == "" {
-		cfg.ReleaseBranch = inferReleaseBranch(cfg.CurrentRelease)
+		parsed, err := parseReleaseVersion(cfg.CurrentRelease)
+		if err != nil {
+			return err
+		}
+		cfg.ReleaseBranch = inferReleaseBranch(parsed)
 	}
 
 	if err := ensurePatchCurrentReleaseMatchesBranch(repo, cfg); err != nil {
@@ -472,7 +476,7 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 	}
 
 	gh := NewGitHubClient(cfg.GitHubToken)
-	results, err := finalizeWorkflowPRs(repo, gh, branchesToFinalize)
+	results, err := finalizeWorkflowPRs(repo, gh, cfg.GitHubToken, branchesToFinalize)
 	if err != nil {
 		return err
 	}
@@ -569,10 +573,10 @@ Updates docs versions to %s (former prepare-patch-release docs PR).
 `, currentRelease, currentRelease, currentRelease)
 }
 
-func finalizeWorkflowPRs(repo *GitRepo, gh *GitHubClient, items []workflowPR) ([]workflowPRResult, error) {
+func finalizeWorkflowPRs(repo *GitRepo, gh *GitHubClient, token string, items []workflowPR) ([]workflowPRResult, error) {
 	results := make([]workflowPRResult, 0, len(items))
 	for i, item := range items {
-		pr, err := finalizePR(repo, gh, item.branch, item.base, item.opts)
+		pr, err := finalizePR(repo, gh, token, item.branch, item.base, item.opts)
 		if err != nil {
 			return results, fmt.Errorf("failed to finalize PR %d/%d: %w", i+1, len(items), err)
 		}
@@ -610,7 +614,7 @@ func formatWorkflowPRLine(index int, result workflowPRResult) string {
 // finalizePR pushes a branch when it has new commits and creates or reuses an open PR.
 // When the branch has nothing new to push, it still resolves a related open or merged PR
 // so workflow summaries always list every expected slot.
-func finalizePR(repo *GitRepo, gh *GitHubClient, branchName, baseBranch string, opts PROptions) (*github.PullRequest, error) {
+func finalizePR(repo *GitRepo, gh *GitHubClient, token, branchName, baseBranch string, opts PROptions) (*github.PullRequest, error) {
 	if err := repo.CheckoutBranch(branchName); err != nil {
 		return nil, err
 	}
@@ -620,7 +624,9 @@ func finalizePR(repo *GitRepo, gh *GitHubClient, branchName, baseBranch string, 
 		return nil, err
 	}
 	if found {
-		gh.ensurePRLabels(opts.Owner, opts.Repo, existingPR.GetNumber(), opts.Labels)
+		if err := gh.ensurePRLabels(opts.Owner, opts.Repo, existingPR.GetNumber(), opts.Labels); err != nil {
+			return nil, err
+		}
 		return existingPR, nil
 	}
 
@@ -641,7 +647,7 @@ func finalizePR(repo *GitRepo, gh *GitHubClient, branchName, baseBranch string, 
 		return nil, nil
 	}
 
-	if err := repo.Push("origin"); err != nil {
+	if err := repo.Push("origin", token); err != nil {
 		return nil, err
 	}
 

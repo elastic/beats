@@ -25,22 +25,21 @@ targets.
 
 This package provides release automation for the Beats project via mage.
 
-It lives in a **nested Go module** (`dev-tools/mage/release/go.mod`) so tooling
-dependencies (`go-git`, `go-github`, and their transitive tree) stay out of the
-root Beats `go.mod` and `NOTICE.txt`. Root mage targets invoke
-`go run -C ./dev-tools/mage/release ./cmd/beats-release …`.
+It is a regular package of the root Beats module
+(`github.com/elastic/beats/v7/dev-tools/mage/release`). Root `magefile.go`
+targets in the `Release` namespace import it and call its functions directly.
 
 **Key features:**
 - Pure Go implementation
-- Nested module isolation for release-only dependencies
+- Mage targets call the package directly (no separate CLI or module)
 - Comprehensive testing (>60% coverage)
 - DRY_RUN mode for safe testing
 - Multi-PR workflow support
 - Deprecated version checks
 
 **Workflows supported:**
-1. **Major/Minor Release (feature-freeze)** - Creates release branch + 4 grouped PRs (backport+version on main, ff-release, docs+test-env on main, next patch on release branch)
-2. **Patch Release** - Creates 2 grouped PRs on the release branch (docs before build; next-patch version + test-env after release)
+1. **Major/Minor Release (feature-freeze)** - Creates release branch + 3 grouped PRs (backport+version on main, ff-release, docs+test-env on main). Does **not** open next-patch bumps.
+2. **Patch Release** - Creates 2 grouped PRs on the release branch (docs before build; next-patch version + test-env after release). This is the only workflow that opens next-patch bumps.
 
 Release notes are handled separately via `.github/workflows/release-notes.yml`.
 
@@ -69,8 +68,7 @@ export GITHUB_TOKEN="ghp_your_token_here"
 ## Installation
 
 The release automation is built into the Beats mage targets. No separate
-installation is needed. Mage shells out to the nested-module CLI; Go downloads
-that module's dependencies on first run.
+installation is needed.
 
 Verify it's available:
 ```bash
@@ -80,7 +78,7 @@ mage -l | grep release
 You should see:
 ```
 release:ensureIssueTracker  Creates/updates the Beats release checklist issue for CURRENT_RELEASE
-release:runMajorMinor       Feature-freeze workflow (release branch + 4 grouped PRs)
+release:runMajorMinor       Feature-freeze workflow (release branch + 3 grouped PRs)
 release:runPatch            Executes the complete patch release workflow
 release:updateDocs          Updates version references in documentation and K8s manifests
 release:updateMergify       Updates .mergify.yml backport configuration
@@ -141,21 +139,20 @@ with grouped PRs.
 2. Requires `CURRENT_RELEASE` to match `libbeat/version/version.go` on
    `BASE_BRANCH` before cutting the release branch
 3. Creates release branch from `BASE_BRANCH` (e.g., `9.5`)
-4. Prepares **4 grouped PRs** (merge order matters):
+4. Prepares **3 grouped PRs** (merge order matters):
 
 | Step | PR | Target | Branch | Merge label | Changes |
 |------|-----|--------|--------|-------------|---------|
 | 1 | PR-A | `main` | `ff-prep-main-X.Y.0` | `merge:1-ff-day` | Mergify backport rule + `version.go` → next minor |
 | 2 | PR-B | release branch | `ff-release-X.Y.0` | `merge:2-after-branch` | ff-release version, docs, test env, `make update` |
 | 3 | PR-C | `main` | `ff-prep-main-docs-env-X.(Y+1).0` | `merge:3-after-images` | Docs + test env for next minor |
-| 4 | PR-D | release branch | `ff-prep-next-patch-X.Y.1` | `merge:4-after-release` | Next patch version + test env |
 
-Titles use `[Release <CURRENT_RELEASE>] …` (e.g. `[Release 9.4.0] Update version to 9.4.1 and test environments`).
+Titles use `[Release <CURRENT_RELEASE>] …`. Next-patch bumps are **not** opened here; use `mage release:runPatch` after the patch release trigger.
 
 5. Pushes release branch and opens PRs (unless `DRY_RUN`). Merge-timing labels are created automatically if missing.
 6. Best-effort: ensures the Beats release checklist issue `[RELEASE <CURRENT_RELEASE>] Instructions & Checklist` exists and lists related Beats `release`-labeled PRs (linked to https://github.com/elastic/ingest-dev/issues/8866). Failures are warnings only.
 
-**RM merge order:** push branch → merge PR-A on `main` → merge PR-B on release branch → merge PR-C on `main` → merge PR-D on release branch (after release day).
+**RM merge order:** push branch → merge PR-A on `main` → merge PR-B on release branch → merge PR-C on `main`.
 
 **Usage:**
 
@@ -367,14 +364,12 @@ Creating release branch: 9.5
 --- Preparing PR-A: backport rule + version 9.6.0 on main ---
 --- Preparing PR-B: ff-release 9.5.0 on 9.5 ---
 --- Preparing PR-C: docs + test env 9.6.0 on main ---
---- Preparing PR-D: next patch 9.5.1 on 9.5 ---
 
 DRY RUN: Skipping push and PR creation
 Release branch prepared: 9.5
 Branch prepared: ff-prep-main-9.5.0
 Branch prepared: ff-release-9.5.0
 Branch prepared: ff-prep-main-docs-env-9.6.0
-Branch prepared: ff-prep-next-patch-9.5.1
 ```
 
 ## Multi-PR Workflows
@@ -392,7 +387,7 @@ Some workflows create multiple PRs to separate concerns.
 **PR-B: Next patch prep (after release)**
 - Branch: `ff-prep-next-patch-X.Y.(Z+1)`
 - Title: `[Release X.Y.Z] Prepare next X.Y.(Z+1) (version + test env)`
-- Updates: next patch `version.go` + test env tags → CURRENT (same as FF PR-D)
+- Updates: next patch `version.go` + test env tags → CURRENT (opened only by the patch workflow)
 - Labels: `release`, `Team:Automation`, `skip-changelog`, `merge:4-after-release`
 
 **Why two PRs?**
@@ -607,26 +602,11 @@ Target coverage:
 - Overall: >60%
 - Core functions: >80%
 
-### CLI (optional)
-
-Mage is the supported entry point. For local debugging you can call the CLI
-directly from the repo root:
-
-```bash
-go run -C ./dev-tools/mage/release ./cmd/beats-release help
-BEATS_REPO_ROOT=$PWD go run -C ./dev-tools/mage/release ./cmd/beats-release run-major-minor
-```
-
-`BEATS_REPO_ROOT` is set automatically by mage. When calling `go run -C` by
-hand, set it (or rely on walking up to the root `go.mod`) so file and git
-operations run against the Beats checkout, not the nested module directory.
-
 ### Adding New Workflows
 
 1. Add workflow function in `workflows.go`
 2. Add tests in `workflows_test.go`
-3. Expose a subcommand in `cmd/beats-release/main.go` and a mage target in
-   root `magefile.go` (thin `go run` wrapper)
+3. Expose a mage target in root `magefile.go` that calls the new function
 4. Update documentation
 
 ## Support
