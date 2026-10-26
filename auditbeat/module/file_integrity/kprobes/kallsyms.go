@@ -21,10 +21,9 @@ package kprobes
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os"
-	"regexp"
+	"slices"
 	"strings"
 )
 
@@ -50,48 +49,63 @@ func getSymbolInfoRuntime(symbolName string) (runtimeSymbolInfo, error) {
 }
 
 // getSymbolInfoFromReader retrieves symbol information from a reader that is expected to
-// provide content in the same format as /proc/kallsyms
+// provide content in the same format as /proc/kallsyms.
+//
+// An exact match for symbolName always returns immediately. The kernel may list
+// compiler-generated variants of a symbol before the symbol itself but only the
+// the plain symbol is a reliable probe target. A symbol is reported as optimised
+// when no exact match exists and a clone such as "name.constprop.0" or "name.isra.0"
+// does. Cold-path fragments ("name.cold") are not clones: the compiler splits rarely
+// executed blocks out of the function, which keeps its symbolName entry point, so these
+// symbol names never count as optimised variants.
 func getSymbolInfoFromReader(reader io.Reader, symbolName string) (runtimeSymbolInfo, error) {
 	fileScanner := bufio.NewScanner(reader)
 	fileScanner.Split(bufio.ScanLines)
 
-	symReg, err := regexp.Compile(fmt.Sprintf("(?m)^([a-fA-F0-9]+).*?(%s(|.*?)?)(\\s+.*$|$)", symbolName))
-	if err != nil {
-		return runtimeSymbolInfo{}, err
-	}
-
 	// optimised symbols start with the unoptimised symbol name
 	// followed by ".{optimisation_type}..."
-	optimisedSymbolName := symbolName + "."
+	optimisedPrefix := symbolName + "."
 
+	var optimisedName string
 	for fileScanner.Scan() {
-		matches := symReg.FindAllSubmatch(fileScanner.Bytes(), -1)
-		if len(matches) == 0 {
+		// Lines are "address type name [module]".
+		fields := strings.Fields(fileScanner.Text())
+		if len(fields) < 3 {
 			continue
 		}
+		name := fields[2]
 
-		for _, match := range matches {
-			matchSymbolName := string(match[2])
-			switch {
-			case strings.HasPrefix(matchSymbolName, optimisedSymbolName):
-				return runtimeSymbolInfo{
-					symbolName:          symbolName,
-					isOptimised:         true,
-					optimisedSymbolName: matchSymbolName,
-				}, nil
-			case strings.EqualFold(matchSymbolName, symbolName):
-				return runtimeSymbolInfo{
-					symbolName:          symbolName,
-					isOptimised:         false,
-					optimisedSymbolName: "",
-				}, nil
-			}
+		switch {
+		case name == symbolName:
+			// Exact match
+			return runtimeSymbolInfo{
+				symbolName:  symbolName,
+				isOptimised: false,
+			}, nil
+		case optimisedName == "" && strings.HasPrefix(name, optimisedPrefix) &&
+			!isColdFragment(strings.TrimPrefix(name, optimisedPrefix)):
+			optimisedName = name
 		}
 	}
 
-	if fileScanner.Err() != nil {
+	if err := fileScanner.Err(); err != nil {
 		return runtimeSymbolInfo{}, err
+	}
+
+	if optimisedName != "" {
+		return runtimeSymbolInfo{
+			symbolName:          symbolName,
+			isOptimised:         true,
+			optimisedSymbolName: optimisedName,
+		}, nil
 	}
 
 	return runtimeSymbolInfo{}, ErrSymbolNotFound
+}
+
+// isColdFragment reports whether a symbol suffix (the part after "name.") denotes a
+// cold-path fragment as emitted by -freorder-blocks-and-partition: "cold", "cold.1",
+// or the fragment of a clone such as "constprop.0.cold".
+func isColdFragment(suffix string) bool {
+	return slices.Contains(strings.Split(suffix, "."), "cold")
 }
