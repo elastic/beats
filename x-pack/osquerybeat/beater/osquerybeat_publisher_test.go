@@ -9,9 +9,12 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type mockBeatPublisher struct {
@@ -46,6 +49,21 @@ func (m *mockBeatPublisher) Configure(inputs []config.InputConfig) error {
 
 func (m *mockBeatPublisher) Close() {
 	m.closeCalled = true
+}
+
+func TestConfigurePublishersSetsLiveTimeout(t *testing.T) {
+	c, err := conf.NewConfigWithYAML([]byte(`
+data_stream.dataset: osquery_manager.result
+osquery.elastic_options.publishing.live.timeout: 7s
+`), "policy")
+	require.NoError(t, err, "parse the policy")
+	var input config.InputConfig
+	require.NoError(t, c.Unpack(&input), "unpack the policy")
+
+	log := logptest.NewTestingLogger(t, "live-timeout")
+	bt := &osquerybeat{log: log, pub: &mockBeatPublisher{}, liveResults: newLiveResultDispatcher(nil, log, config.DefaultLivePublishTimeout)}
+	require.NoError(t, bt.configurePublishers([]config.InputConfig{input}), "configure the publishers")
+	assert.Equal(t, 7*time.Second, time.Duration(bt.liveResults.timeout.Load()), "the live dispatcher must use publishing.live.timeout")
 }
 
 func TestOsquerybeatClose_ClosesPublisher(t *testing.T) {
