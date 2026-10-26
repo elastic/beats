@@ -39,6 +39,7 @@ type Publisher struct {
 	profileDropWarnLogged bool
 	listener              beat.ClientListener
 	allowed               func() bool
+	cut                   func(rows int)
 }
 
 func New(b *beat.Beat, log *logp.Logger) *Publisher {
@@ -179,7 +180,10 @@ func (p *Publisher) PublishEach(index, idValue, idFieldKey, responseID, spaceID,
 		return 0
 	}
 	for i, hit := range hits {
-		if stop() || (p.allowed != nil && !p.allowed()) {
+		if stop() {
+			return i
+		}
+		if p.retired(len(hits) - i) {
 			return i
 		}
 		event := hitToEvent(index, p.b.Info.Name, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName, meta, hit, ecsm, reqData)
@@ -271,7 +275,7 @@ func (p *Publisher) PublishScheduledResponse(scheduleID, packID, packName, query
 }
 
 func (p *Publisher) publishActionResponseEvent(fields map[string]any, timestamp time.Time) {
-	if p.allowed != nil && !p.allowed() {
+	if p.retired(1) {
 		return
 	}
 	event := beat.Event{
@@ -303,7 +307,7 @@ func (p *Publisher) publishProfile(index string, fields mapstr.M) {
 		}
 		return
 	}
-	if p.allowed != nil && !p.allowed() {
+	if p.retired(1) {
 		return
 	}
 
@@ -494,10 +498,23 @@ func hitToEvent(index, eventType, idValue, idFieldKey, responseID, spaceID, pack
 // NewScheduled creates policy-bound clients for the asynchronous native logger
 // path. They block for queue space, because on a shared slab queue pool a
 // DropIfFull client loses nearly every race against blocked producers. allowed
-// prevents remaining rows from crossing retirement. dropped is called for each
-// event published after its client closed.
-func NewScheduled(b *beat.Beat, log *logp.Logger, allowed func() bool, dropped func()) *Publisher {
-	return &Publisher{b: b, log: log, allowed: allowed, listener: &scheduledListener{dropped: dropped}}
+// prevents remaining rows from crossing retirement; cut is called with the
+// number of rows skipped because allowed returned false. dropped is called for
+// each event published after its client closed.
+func NewScheduled(b *beat.Beat, log *logp.Logger, allowed func() bool, dropped func(), cut func(rows int)) *Publisher {
+	return &Publisher{b: b, log: log, allowed: allowed, cut: cut, listener: &scheduledListener{dropped: dropped}}
+}
+
+// retired reports whether the clients may no longer publish, reporting the
+// rows that are skipped because of it.
+func (p *Publisher) retired(rows int) bool {
+	if p.allowed == nil || p.allowed() {
+		return false
+	}
+	if p.cut != nil {
+		p.cut(rows)
+	}
+	return true
 }
 
 type scheduledListener struct{ dropped func() }

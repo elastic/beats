@@ -113,8 +113,8 @@ func TestExecuteReportsPartialCountOnPublishTimeout(t *testing.T) {
 		assert.Equal(t, 2, res["count"], "report the rows handed to the output before the timeout")
 		assert.Contains(t, res["error"], "timed out publishing", "report the timeout as the action error")
 		assert.LessOrEqual(t, elapsed, 300*time.Millisecond, "Execute must return soon after the publish timeout")
-		assert.Equal(t, uint64(1), d.metrics.timeout.Get(), "count the timed-out action")
-		assert.Equal(t, uint64(3), d.metrics.timeoutRows.Get(), "count the rows not handed to the output")
+		assert.Equal(t, uint64(1), d.metrics.dropped[dropTimeout].Get(), "count the timed-out action")
+		assert.Equal(t, uint64(3), d.metrics.droppedRows[dropTimeout].Get(), "count the rows not handed to the output")
 
 		close(pub.release)
 		d.stop()
@@ -134,7 +134,7 @@ func TestExecuteHealthyPublishesAll(t *testing.T) {
 		assert.NotContains(t, res, "error", "a healthy output must not report an error")
 		assert.Equal(t, []string{"a1 row 1", "a1 row 2", "a1 row 3", "a1 row 4", "a1 row 5"}, pub.snapshot(),
 			"publish every row in order")
-		assert.Zero(t, d.metrics.timeoutRows.Get(), "a healthy output drops no rows")
+		assert.Zero(t, d.metrics.droppedRows[dropTimeout].Get(), "a healthy output drops no rows")
 
 		d.stop()
 	})
@@ -160,7 +160,7 @@ func TestActionResponsePublishedAfterTimedOutRows(t *testing.T) {
 		synctest.Wait()
 		assert.Equal(t, []string{"a1 row 1", "a1 row 2", "a1 row 3", "a1 response"}, pub.snapshot(),
 			"publish the response after the rows; the stuck row arrives late and later rows are skipped")
-		assert.Zero(t, d.metrics.shutdown.Get(), "the timeout must not drop the response")
+		assert.Zero(t, d.metrics.dropped[dropShutdown].Get(), "the timeout must not drop the response")
 
 		d.stop()
 	})
@@ -186,8 +186,8 @@ func TestSecondLiveActionTimesOutBehindStuckRow(t *testing.T) {
 		assert.Equal(t, 0, res["count"], "no row of the second action can pass the stuck row")
 		assert.Contains(t, res["error"], "timed out publishing", "report the timeout as the action error")
 		assert.LessOrEqual(t, elapsed, timeout+100*time.Millisecond, "the second action must wait at most its timeout")
-		assert.Equal(t, uint64(2), d.metrics.timeout.Get(), "count both timed-out actions")
-		assert.Equal(t, uint64(3+5), d.metrics.timeoutRows.Get(), "count the rows of both actions not handed to the output")
+		assert.Equal(t, uint64(2), d.metrics.dropped[dropTimeout].Get(), "count both timed-out actions")
+		assert.Equal(t, uint64(3+5), d.metrics.droppedRows[dropTimeout].Get(), "count the rows of both actions not handed to the output")
 
 		close(pub.release)
 		synctest.Wait()
@@ -217,7 +217,7 @@ func TestExecuteReturnsOnShutdown(t *testing.T) {
 
 		assert.LessOrEqual(t, time.Since(start), 100*time.Millisecond, "Execute must return promptly on shutdown")
 		assert.Equal(t, errLiveShutdown.Error(), res["error"], "report the shutdown as the action error")
-		assert.Equal(t, uint64(1), d.metrics.shutdown.Get(), "count the abandoned action")
+		assert.Equal(t, uint64(1), d.metrics.dropped[dropShutdown].Get(), "count the abandoned action")
 
 		close(pub.release)
 	})
@@ -230,13 +230,61 @@ func TestLiveResponseAfterStopIsDropped(t *testing.T) {
 
 	d.enqueueResponse(pub, liveRequest("a1"), map[string]any{})
 
-	assert.Equal(t, uint64(1), d.metrics.shutdown.Get(), "count a response admitted after stop as a shutdown drop")
+	assert.Equal(t, uint64(1), d.metrics.dropped[dropShutdown].Get(), "count a response admitted after stop as a shutdown drop")
 	assert.Empty(t, pub.snapshot(), "publish nothing after stop")
 }
 
-// TestClearWaitsAtMostLiveTimeout uses real time: synctest does not advance
-// its clock while a goroutine waits for a sync.Mutex.
-func TestClearWaitsAtMostLiveTimeout(t *testing.T) {
+func TestExecuteWithoutClientsReportsNotConfigured(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		d := newLiveResultDispatcher(monitoring.NewRegistry(), logptest.NewTestingLogger(t, ""), time.Minute)
+		h := newLiveTestHandler(t, d, &liveClients{}, 3)
+
+		res, err := h.Execute(t.Context(), liveRequest("a1"))
+
+		require.NoError(t, err, "Execute reports errors in the result")
+		assert.Equal(t, errLiveNotConfigured.Error(), res["error"], "without clients the action must not claim osquerybeat is stopping")
+		assert.Zero(t, d.metrics.dropped[dropShutdown].Get(), "missing clients are not a shutdown")
+		assert.Equal(t, uint64(1), d.metrics.dropped[dropStale].Get(), "count the unpublished action as stale")
+		assert.Equal(t, uint64(3), d.metrics.droppedRows[dropStale].Get(), "count its rows as stale")
+
+		d.stop()
+	})
+}
+
+func TestExecuteCancelledCountsShutdown(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		pub := newGatedLivePublisher(0)
+		d := newLiveResultDispatcher(monitoring.NewRegistry(), logptest.NewTestingLogger(t, ""), time.Minute)
+		h := newLiveTestHandler(t, d, pub, 5)
+		ctx, cancel := context.WithCancel(t.Context())
+
+		done := make(chan map[string]any)
+		go func() {
+			res, _ := h.Execute(ctx, liveRequest("a1"))
+			done <- res
+		}()
+		synctest.Wait()
+		assert.Equal(t, int64(1), d.metrics.items.Get(), "the queue.items gauge must report the waiting action")
+		assert.Equal(t, int64(5), d.metrics.events.Get(), "the queue.events gauge must report the waiting action's rows")
+
+		cancel()
+		res := <-done
+		assert.Equal(t, errLiveShutdown.Error(), res["error"], "the agent cancelling the action means osquerybeat is stopping")
+		assert.Zero(t, d.metrics.dropped[dropTimeout].Get(), "a cancelled action did not time out")
+		assert.Equal(t, uint64(1), d.metrics.dropped[dropShutdown].Get(), "count the cancelled action as a shutdown drop")
+		assert.Equal(t, uint64(5), d.metrics.droppedRows[dropShutdown].Get(), "count its rows as shutdown drops")
+		assert.Zero(t, d.metrics.items.Get(), "the queue gauges must reset once the action returns")
+
+		close(pub.release)
+		d.stop()
+	})
+}
+
+// TestClearWaitBoundedByLiveTimeout checks that Clear behind one queued
+// action waits about the live timeout. With several actions queued on the
+// handler, the wait adds up per action. It uses real time: synctest does not
+// advance its clock while a goroutine waits for a sync.Mutex.
+func TestClearWaitBoundedByLiveTimeout(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "")
 	pub := newGatedLivePublisher(0)
 	d := newLiveResultDispatcher(monitoring.NewRegistry(), log, 200*time.Millisecond)
@@ -252,7 +300,7 @@ func TestClearWaitsAtMostLiveTimeout(t *testing.T) {
 
 	start := time.Now()
 	rah.Clear()
-	assert.Less(t, time.Since(start), 400*time.Millisecond, "Clear must wait at most about the live timeout")
+	assert.Less(t, time.Since(start), time.Second, "Clear behind one action must wait about the live timeout, not until the output recovers")
 
 	<-executed
 	close(pub.release)

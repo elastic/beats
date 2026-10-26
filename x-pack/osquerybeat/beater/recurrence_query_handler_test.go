@@ -123,7 +123,7 @@ func TestRecurrenceRowsPublished(t *testing.T) {
 				rows:                     make(chan rrulePublishedRows, 4),
 			}
 			d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents,
-				func(func() bool, func()) osquerybeatPublisher { return publisher }, (&osquerybeat{log: log}).handleScheduledQueryResult)
+				func(func() bool, func(), func(int)) osquerybeatPublisher { return publisher }, (&osquerybeat{log: log}).handleScheduledQueryResult)
 			require.NoError(t, d.configure(inputs, config.ScheduledPublishingConfig{MaxEvents: config.DefaultScheduledMaxEvents}), "configure the scheduled clients")
 			stopOnCleanup(t, d)
 
@@ -179,7 +179,7 @@ func TestRecurrenceRowsPublished(t *testing.T) {
 func TestRecurrenceSkipsQueryWithoutNamespace(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "rrule")
 	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents,
-		func(func() bool, func()) osquerybeatPublisher { return &mockBeatPublisher{} }, (&osquerybeat{log: log}).handleScheduledQueryResult)
+		func(func() bool, func(), func(int)) osquerybeatPublisher { return &mockBeatPublisher{} }, (&osquerybeat{log: log}).handleScheduledQueryResult)
 	require.NoError(t, d.configure(outageInputs("old"), outageLimits), "configure the scheduled clients")
 	stopOnCleanup(t, d)
 	plugin := NewConfigPlugin(log)
@@ -195,7 +195,7 @@ func TestRecurrenceSkipsQueryWithoutNamespace(t *testing.T) {
 	h := newRecurrenceQueryHandler(log, cli, plugin, d, nil, "5.12.0")
 	sq := scheduler.ScheduledQuery{Name: "unknown", Config: config.Query{Query: "SELECT 1"}, Timeout: time.Second}
 	assert.NoError(t, h.executeQuery(t.Context(), sq, 1, time.Now()), "skipping is not a query failure")
-	assert.Equal(t, uint64(1), d.metrics.stale.Get(), "count the skipped run as stale")
+	assert.Equal(t, uint64(1), d.metrics.dropped[dropStale].Get(), "count the skipped run as stale")
 }
 
 func TestRecurrenceProfilesUseScheduledQueue(t *testing.T) {
@@ -220,7 +220,7 @@ func TestRecurrenceProfilesUseScheduledQueue(t *testing.T) {
 			require.NoError(t, err, "apply the profiled policy")
 			publisher := &profileCallbackPublisher{responses: make(chan scheduledProfileResponse, 1), profiles: make(chan collectedProfile, 1)}
 			d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents,
-				func(func() bool, func()) osquerybeatPublisher { return publisher }, (&osquerybeat{log: log}).handleScheduledQueryResult)
+				func(func() bool, func(), func(int)) osquerybeatPublisher { return publisher }, (&osquerybeat{log: log}).handleScheduledQueryResult)
 			require.NoError(t, d.configure(inputs, config.ScheduledPublishingConfig{MaxEvents: config.DefaultScheduledMaxEvents}), "configure the scheduled clients")
 			stopOnCleanup(t, d)
 

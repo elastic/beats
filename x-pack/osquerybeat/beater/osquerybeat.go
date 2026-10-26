@@ -175,8 +175,8 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 	}
 
 	bt.scheduledResults = newScheduledResultDispatcher(b.Monitoring.StatsRegistry(), log, config.DefaultScheduledMaxEvents,
-		func(allowed func() bool, dropped func()) osquerybeatPublisher {
-			return pub.NewScheduled(b, log, allowed, dropped)
+		func(allowed func() bool, dropped func(), cut func(int)) osquerybeatPublisher {
+			return pub.NewScheduled(b, log, allowed, dropped, cut)
 		}, bt.handleScheduledQueryResult)
 	bt.scheduledResults.profile = bt.enqueueScheduledProfile
 	bt.profileMetrics = bt.scheduledResults.profileMetrics

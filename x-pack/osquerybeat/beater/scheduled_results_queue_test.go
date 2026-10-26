@@ -96,8 +96,8 @@ func TestScheduledResultsSaturatedPipelineDoesNotBlockShutdown(t *testing.T) {
 	require.NoError(t, err, "create the real publisher pipeline")
 	observed := &observedResultPipeline{PipelineConnector: pipe, entered: make(chan struct{})}
 	bt := &osquerybeat{log: log}
-	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents, func(allowed func() bool, dropped func()) osquerybeatPublisher {
-		return pub.NewScheduled(&beat.Beat{Publisher: observed}, log, allowed, dropped)
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents, func(allowed func() bool, dropped func(), cut func(int)) osquerybeatPublisher {
+		return pub.NewScheduled(&beat.Beat{Publisher: observed}, log, allowed, dropped, cut)
 	}, bt.handleScheduledQueryResult)
 	t.Cleanup(func() {
 		_ = output.Close()
@@ -142,7 +142,7 @@ func TestScheduledResultsSaturatedPipelineDoesNotBlockShutdown(t *testing.T) {
 	case <-time.After(time.Second):
 		t.Fatal("admission or shutdown waited for the full queue")
 	}
-	assert.Positive(t, d.metrics.overflow.Get(), "saturation must cause observable local drops")
+	assert.Positive(t, d.metrics.dropped[dropOverflow].Get(), "saturation must cause observable local drops")
 
 	// The existing pipeline lifecycle, after the beater returns, releases its
 	// one blocked publication. Retiring the lease stops all remaining rows.
@@ -205,8 +205,8 @@ func TestScheduledWorkerGetsSlotsUnderPoolPressure(t *testing.T) {
 	})
 
 	bt := &osquerybeat{log: log}
-	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents, func(allowed func() bool, dropped func()) osquerybeatPublisher {
-		return pub.NewScheduled(&beat.Beat{Publisher: pipe}, log, allowed, dropped)
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents, func(allowed func() bool, dropped func(), cut func(int)) osquerybeatPublisher {
+		return pub.NewScheduled(&beat.Beat{Publisher: pipe}, log, allowed, dropped, cut)
 	}, bt.handleScheduledQueryResult)
 	t.Cleanup(func() {
 		d.stop()
@@ -243,7 +243,7 @@ func TestScheduledWorkerGetsSlotsUnderPoolPressure(t *testing.T) {
 	const want = 20*5 + 20 // Result rows plus one response per result.
 	assert.Eventually(t, func() bool { return output.scheduled.Load() == want }, 10*time.Second, 10*time.Millisecond,
 		"every scheduled row and response must be published")
-	assert.Zero(t, d.metrics.overflowRows.Get(), "no rows may overflow")
-	assert.Zero(t, d.metrics.staleRows.Get(), "no rows may be stale")
-	assert.Zero(t, d.metrics.expiredRows.Get(), "no rows may expire")
+	assert.Zero(t, d.metrics.droppedRows[dropOverflow].Get(), "no rows may overflow")
+	assert.Zero(t, d.metrics.droppedRows[dropStale].Get(), "no rows may be stale")
+	assert.Zero(t, d.metrics.droppedRows[dropExpired].Get(), "no rows may expire")
 }

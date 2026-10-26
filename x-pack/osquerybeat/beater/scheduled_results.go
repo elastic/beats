@@ -122,6 +122,7 @@ type scheduledResultLease struct {
 	view      *ConfigPlugin
 	profiles  bool            // whether the policy has a query profile stream
 	ctx       context.Context // accessed only while the worker holds mu
+	cut       int             // rows the publisher skipped after retirement; accessed only while the worker holds mu
 }
 
 func (l *scheduledResultLease) allowed() bool {
@@ -167,28 +168,29 @@ type scheduledResultDispatcher struct {
 	lease           *scheduledResultLease
 	maxAge          time.Duration
 	log             *logp.Logger
-	metrics         *scheduledResultMetrics
+	metrics         *publishingMetrics
 	profileMetrics  *scheduledProfileMetrics
-	newPublisher    func(func() bool, func()) osquerybeatPublisher
+	newPublisher    func(allowed func() bool, dropped func(), cut func(rows int)) osquerybeatPublisher
 	profile         func(*scheduledQueryProfiler, string, QueryInfo, QueryResult, string)
 	handle          func(context.Context, scheduledQueryClient, scheduledQueryPublisher, string, QueryInfo, QueryResult, string)
 }
 
-func newScheduledResultDispatcher(reg *monitoring.Registry, log *logp.Logger, maxEvents int, factory func(func() bool, func()) osquerybeatPublisher,
+func newScheduledResultDispatcher(reg *monitoring.Registry, log *logp.Logger, maxEvents int, factory func(allowed func() bool, dropped func(), cut func(rows int)) osquerybeatPublisher,
 	handle func(context.Context, scheduledQueryClient, scheduledQueryPublisher, string, QueryInfo, QueryResult, string)) *scheduledResultDispatcher {
 	if reg == nil {
 		reg = monitoring.NewRegistry()
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	metrics := newScheduledResultMetrics(reg, log)
+	metrics := newPublishingMetrics(reg, "scheduled", log)
 	profileMetrics := newScheduledProfileMetrics(reg)
+	queue := newRowQueue(maxEvents, func(item scheduledItem) {
+		metrics.drop(dropOverflow, item.rows())
+		countProfileDrop(item, profileMetrics.outputFull)
+	})
+	queue.observe = metrics.setQueue
 	return &scheduledResultDispatcher{
 		ctx: ctx, cancel: cancel, done: make(chan struct{}), log: log,
-		queue: newRowQueue(maxEvents, func(item scheduledItem) {
-			metrics.dropRows(metrics.overflow, metrics.overflowRows, item.rows())
-			countProfileDrop(item, profileMetrics.outputFull)
-		}),
-		metrics: metrics, profileMetrics: profileMetrics, newPublisher: factory, handle: handle,
+		queue: queue, metrics: metrics, profileMetrics: profileMetrics, newPublisher: factory, handle: handle,
 	}
 }
 
@@ -207,8 +209,11 @@ func (d *scheduledResultDispatcher) configure(inputs []config.InputConfig, cfg c
 		next = &scheduledResultLease{view: view, profiles: slices.ContainsFunc(inputs, func(in config.InputConfig) bool {
 			return in.Datastream.Dataset == config.DefaultQueryProfileDataset
 		})}
-		// A blocking client drops only events published after it is closed.
-		next.publisher = d.newPublisher(next.allowed, func() { d.metrics.drop(d.metrics.shutdown) })
+		// A blocking client drops only events published after it is closed,
+		// which happens when the pipeline closes on shutdown.
+		next.publisher = d.newPublisher(next.allowed,
+			func() { d.metrics.dropRows(dropShutdown, 1) },
+			func(rows int) { next.cut += rows })
 		if err := next.publisher.Configure(inputs); err != nil {
 			next.retire()
 			return err
@@ -317,7 +322,8 @@ func (d *scheduledResultDispatcher) process(item scheduledItem) {
 	d.mu.Unlock()
 	switch {
 	case maxAge > 0 && time.Since(item.enqueued()) > maxAge:
-		d.metrics.dropRows(d.metrics.expired, d.metrics.expiredRows, item.rows())
+		d.metrics.drop(dropExpired, item.rows())
+		countProfileDrop(item, d.profileMetrics.expired)
 	case lease == nil || !lease.routes(item):
 		d.dropStale(item)
 	default:
@@ -346,6 +352,22 @@ func (d *scheduledResultDispatcher) publish(lease *scheduledResultLease, item sc
 	case scheduledProfileItem:
 		lease.publisher.PublishScheduledProfile(config.QueryProfileDatastream(item.namespace), item.name, item.scheduleID, item.responseID, item.spaceID, item.executionCount, item.profile)
 	}
+	if lease.cut > 0 {
+		d.dropCut(item, lease.cut)
+		lease.cut = 0
+	}
+}
+
+// dropCut counts the rows of item that the publisher skipped because its
+// lease was retired, or its run cancelled, while the item was in flight.
+func (d *scheduledResultDispatcher) dropCut(item scheduledItem, rows int) {
+	if d.ctx.Err() != nil {
+		d.metrics.drop(dropShutdown, rows)
+		countProfileDrop(item, d.profileMetrics.shutdown)
+		return
+	}
+	d.metrics.drop(dropStale, rows)
+	countProfileDrop(item, d.profileMetrics.stale)
 }
 
 // runContext returns the context of the osqueryd run whose client resolves
@@ -372,12 +394,12 @@ func publishResolvedResult(p scheduledQueryPublisher, r resolvedScheduledResult)
 }
 
 func (d *scheduledResultDispatcher) dropStale(item scheduledItem) {
-	d.metrics.dropRows(d.metrics.stale, d.metrics.staleRows, item.rows())
+	d.metrics.drop(dropStale, item.rows())
 	countProfileDrop(item, d.profileMetrics.stale)
 }
 
 func (d *scheduledResultDispatcher) dropShutdown(item scheduledItem) {
-	d.metrics.drop(d.metrics.shutdown)
+	d.metrics.drop(dropShutdown, item.rows())
 	countProfileDrop(item, d.profileMetrics.shutdown)
 }
 
@@ -428,44 +450,4 @@ func (d *scheduledResultDispatcher) stop() {
 	}
 	// The existing shared pipeline closes after the beater returns. Do not
 	// join a worker that it must release from beat.Client.Publish first.
-}
-
-// scheduledResultMetrics counts dropped documents. The live dispatcher uses it
-// too, with only shutdown and the timeout counters set.
-type scheduledResultMetrics struct {
-	overflow, stale, expired, shutdown, timeout       *monitoring.Uint
-	overflowRows, staleRows, expiredRows, timeoutRows *monitoring.Uint
-	lastWarning                                       atomic.Int64
-	log                                               *logp.Logger
-	warning                                           string
-}
-
-func newScheduledResultMetrics(reg *monitoring.Registry, log *logp.Logger) *scheduledResultMetrics {
-	reg = reg.GetOrCreateRegistry("osquerybeat.scheduled_results")
-	return &scheduledResultMetrics{
-		overflow:     monitoring.NewUint(reg, "dropped.overflow"),
-		overflowRows: monitoring.NewUint(reg, "dropped_rows.overflow"),
-		stale:        monitoring.NewUint(reg, "dropped.stale"),
-		staleRows:    monitoring.NewUint(reg, "dropped_rows.stale"),
-		expired:      monitoring.NewUint(reg, "dropped.expired"),
-		expiredRows:  monitoring.NewUint(reg, "dropped_rows.expired"),
-		shutdown:     monitoring.NewUint(reg, "dropped.shutdown"),
-		log:          log,
-		warning:      "Scheduled osquery result dropped; see osquerybeat.scheduled_results.dropped monitoring counters",
-	}
-}
-
-// dropRows counts one dropped document in counter and its rows in rowCounter.
-func (m *scheduledResultMetrics) dropRows(counter, rowCounter *monitoring.Uint, rows int) {
-	rowCounter.Add(uint64(rows))
-	m.drop(counter)
-}
-
-func (m *scheduledResultMetrics) drop(counter *monitoring.Uint) {
-	counter.Inc()
-	now := time.Now().UnixNano()
-	last := m.lastWarning.Load()
-	if now-last >= int64(time.Minute) && m.lastWarning.CompareAndSwap(last, now) {
-		m.log.Warn(m.warning)
-	}
 }

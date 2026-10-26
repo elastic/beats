@@ -20,9 +20,9 @@ import (
 
 func TestScheduledPublisherGuardAndDeliveryMode(t *testing.T) {
 	recorder := &connectRecorder{}
-	var guarded, dropped atomic.Int32
+	var guarded, dropped, cut atomic.Int32
 	p := NewScheduled(&beat.Beat{Publisher: recorder}, logptest.NewTestingLogger(t, "scheduled"),
-		func() bool { return guarded.Add(1) == 1 }, func() { dropped.Add(1) })
+		func() bool { return guarded.Add(1) == 1 }, func() { dropped.Add(1) }, func(rows int) { cut.Add(int32(rows)) })
 	t.Cleanup(p.Close)
 	require.NoError(t, p.Configure([]config.InputConfig{
 		inputWithNamespace(config.DefaultDataset, "default"),
@@ -38,6 +38,7 @@ func TestScheduledPublisherGuardAndDeliveryMode(t *testing.T) {
 	assert.Len(t, recorder.clients[0].events, 1, "retirement between rows must prevent further publication")
 	p.PublishScheduledProfile("index", "query", "schedule", "response", "", 1, nil)
 	assert.Empty(t, recorder.clients[1].events, "retirement must prevent profile publication")
+	assert.Equal(t, int32(2), cut.Load(), "report the row and the profile skipped after retirement")
 	recorder.configs[0].ClientListener.DroppedOnPublish(beat.Event{})
 	assert.Equal(t, int32(1), dropped.Load(), "make publication after close observable")
 
@@ -51,7 +52,7 @@ func TestScheduledPublisherGuardAndDeliveryMode(t *testing.T) {
 func TestScheduledProfilePreservesSchema(t *testing.T) {
 	// Configure streams by dataset so the test does not depend on input order.
 	p := NewScheduled(&beat.Beat{Publisher: &connectRecorder{}}, logptest.NewTestingLogger(t, "scheduled_profile"),
-		func() bool { return true }, func() {})
+		func() bool { return true }, func() {}, func(int) {})
 	t.Cleanup(p.Close)
 	require.NoError(t, p.Configure([]config.InputConfig{
 		inputWithNamespace(config.DefaultQueryProfileDataset, "profiles"),

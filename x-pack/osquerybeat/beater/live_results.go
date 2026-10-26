@@ -21,6 +21,7 @@ import (
 var (
 	errLivePublishTimeout = errors.New("timed out publishing live query results")
 	errLiveShutdown       = errors.New("live query results not published: osquerybeat is stopping")
+	errLiveNotConfigured  = errors.New("live query results not published: results stream not configured")
 )
 
 // liveJob is one live query's results and, if requested, its profile.
@@ -31,6 +32,14 @@ type liveJob struct {
 	reqData                              any
 	profileIndex                         string
 	profile                              map[string]any // nil when not requested
+}
+
+// rows counts the job's hits and its profile, if any.
+func (j liveJob) rows() int {
+	if j.profile != nil {
+		return len(j.hits) + 1
+	}
+	return len(j.hits)
 }
 
 // liveItem is a queued live job, or an action response when pub is nil.
@@ -51,7 +60,7 @@ type liveItem struct {
 // resetableActionHandler lock, indefinitely.
 type liveResultDispatcher struct {
 	log      *logp.Logger
-	metrics  *scheduledResultMetrics
+	metrics  *publishingMetrics
 	timeout  atomic.Int64 // time.Duration
 	start    sync.Once
 	wake     chan struct{}
@@ -68,7 +77,7 @@ func newLiveResultDispatcher(reg *monitoring.Registry, log *logp.Logger, timeout
 	}
 	d := &liveResultDispatcher{
 		log:      log,
-		metrics:  newLiveResultMetrics(reg, log),
+		metrics:  newPublishingMetrics(reg, "live", log),
 		wake:     make(chan struct{}, 1),
 		stopping: make(chan struct{}),
 	}
@@ -86,46 +95,58 @@ func (d *liveResultDispatcher) setTimeout(timeout time.Duration) {
 // all hits are handed to Publish, ctx is done, the timeout elapses or the
 // dispatcher stops. It returns the number of hits handed over. Hits not
 // handed over by then are skipped; one already inside a blocked Publish cannot
-// be pulled back and may be delivered late.
+// be pulled back and may be delivered late. ctx is the agent client's
+// lifetime context, so its end counts as a shutdown.
 func (d *liveResultDispatcher) publishResults(ctx context.Context, pub actionQueryPublisher, job liveJob) (int, error) {
 	it := &liveItem{job: job, pub: pub, done: make(chan struct{})}
 	if !d.push(it) {
-		d.metrics.drop(d.metrics.shutdown)
+		d.metrics.drop(dropShutdown, job.rows())
 		return 0, errLiveShutdown
 	}
+	// Live actions are serialised, so the waiting action is the whole backlog.
+	d.metrics.setQueue(1, job.rows())
+	defer d.metrics.setQueue(0, 0)
 
 	t := time.NewTimer(time.Duration(d.timeout.Load()))
 	defer t.Stop()
-	var err error
+	reason := ""
 	select {
 	case <-it.done:
 	case <-t.C:
-		err = errLivePublishTimeout
+		reason = dropTimeout
 	case <-ctx.Done():
-		err = ctx.Err()
+		reason = dropShutdown
 	case <-d.stopping:
 	}
 	d.abandon(it)
 
 	n := int(it.handed.Load())
-	switch {
-	case n == len(job.hits):
+	if n == len(job.hits) {
 		return n, nil
-	case err == nil:
-		// The worker gave up, or has not started, because the dispatcher stopped.
-		d.metrics.drop(d.metrics.shutdown)
-		return n, errLiveShutdown
-	default:
-		d.metrics.dropRows(d.metrics.timeout, d.metrics.timeoutRows, len(job.hits)-n)
-		return n, err
 	}
+	if reason == "" {
+		// The worker returned early: it was stopping, or there were no clients.
+		reason = dropStale
+		if d.isStopping() {
+			reason = dropShutdown
+		}
+	}
+	d.metrics.drop(reason, len(job.hits)-n)
+	return n, liveDropErrors[reason]
+}
+
+// liveDropErrors are the action errors for each drop reason.
+var liveDropErrors = map[string]error{
+	dropTimeout:  errLivePublishTimeout,
+	dropShutdown: errLiveShutdown,
+	dropStale:    errLiveNotConfigured,
 }
 
 // enqueueResponse queues an action response after the action's rows. It never
 // waits. Only stop drops a response.
 func (d *liveResultDispatcher) enqueueResponse(pub actionResultPublisher, req, res map[string]any) {
 	if !d.push(&liveItem{resPub: pub, req: req, res: res}) {
-		d.metrics.drop(d.metrics.shutdown)
+		d.metrics.drop(dropShutdown, 1)
 	}
 }
 
@@ -208,9 +229,10 @@ func (d *liveResultDispatcher) publish(it *liveItem) {
 }
 
 func (d *liveResultDispatcher) abandoned(it *liveItem) bool {
-	if it.cancelled.Load() {
-		return true
-	}
+	return it.cancelled.Load() || d.isStopping()
+}
+
+func (d *liveResultDispatcher) isStopping() bool {
 	select {
 	case <-d.stopping:
 		return true
@@ -235,19 +257,8 @@ func (d *liveResultDispatcher) stop() {
 	d.mu.Unlock()
 	for _, it := range queued {
 		if it.pub == nil {
-			d.metrics.drop(d.metrics.shutdown)
+			d.metrics.drop(dropShutdown, 1)
 		}
-	}
-}
-
-func newLiveResultMetrics(reg *monitoring.Registry, log *logp.Logger) *scheduledResultMetrics {
-	reg = reg.GetOrCreateRegistry("osquerybeat.live_results")
-	return &scheduledResultMetrics{
-		timeout:     monitoring.NewUint(reg, "dropped.timeout"),
-		timeoutRows: monitoring.NewUint(reg, "dropped_rows.timeout"),
-		shutdown:    monitoring.NewUint(reg, "dropped.shutdown"),
-		log:         log,
-		warning:     "Live osquery result dropped; see osquerybeat.live_results.dropped monitoring counters",
 	}
 }
 

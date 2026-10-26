@@ -27,6 +27,9 @@ type queuedItem interface {
 // longer count against the limit.
 type rowQueue[T queuedItem] struct {
 	onEvict func(T)
+	// observe, if set, is called with the queue lock held after every
+	// change, with the queued items and rows.
+	observe func(items, events int)
 	notify  chan struct{}
 
 	mu     sync.Mutex
@@ -56,6 +59,7 @@ func (q *rowQueue[T]) push(item T) {
 	if item.evictFirst() {
 		q.first++
 	}
+	q.changed()
 	q.mu.Unlock()
 	q.signal()
 	q.evicted(evicted)
@@ -83,6 +87,14 @@ func (q *rowQueue[T]) remove(e *list.Element) T {
 	return item
 }
 
+// changed reports the queue size to observe. The caller holds q.mu, so
+// reports arrive in the order of the changes.
+func (q *rowQueue[T]) changed() {
+	if q.observe != nil {
+		q.observe(q.items.Len(), q.events)
+	}
+}
+
 func (q *rowQueue[T]) signal() {
 	select {
 	case q.notify <- struct{}{}:
@@ -108,6 +120,7 @@ func (q *rowQueue[T]) pop(ctx context.Context) (T, bool) {
 		if q.items.Len() > 0 {
 			item := q.remove(q.items.Front())
 			more := q.items.Len() > 0
+			q.changed()
 			q.mu.Unlock()
 			if more {
 				// Pass the wake-up on in case another consumer consumed it.
@@ -132,6 +145,7 @@ func (q *rowQueue[T]) setLimit(maxEvents int) {
 	for q.items.Len() > 1 && q.events > q.limit {
 		evicted = append(evicted, q.evict())
 	}
+	q.changed()
 	q.mu.Unlock()
 	q.evicted(evicted)
 }
@@ -145,6 +159,7 @@ func (q *rowQueue[T]) drain() []T {
 	for q.items.Len() > 0 {
 		items = append(items, q.remove(q.items.Front()))
 	}
+	q.changed()
 	return items
 }
 

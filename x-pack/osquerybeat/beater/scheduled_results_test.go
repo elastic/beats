@@ -17,6 +17,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -78,7 +79,7 @@ func outageDispatcherFor(t *testing.T, inputs []config.InputConfig, limits confi
 	bt := &osquerybeat{log: log}
 	first := &stalledResultPublisher{entered: make(chan struct{}), release: make(chan struct{})}
 	created := false
-	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(func() bool, func()) osquerybeatPublisher {
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(func() bool, func(), func(int)) osquerybeatPublisher {
 		if !created {
 			created = true
 			return first
@@ -157,9 +158,10 @@ func TestScheduledResultsBoundLoggerAdmissionAndShutdown(t *testing.T) {
 	case <-time.After(time.Second):
 		t.Fatal("logger or shutdown waited for blocked publication")
 	}
-	assert.Equal(t, uint64(1), d.metrics.overflow.Get(), "the oldest queued result must be dropped once the row limit is reached")
-	assert.Equal(t, uint64(1), d.metrics.overflowRows.Get(), "count the dropped result's rows")
-	assert.Equal(t, uint64(outageMaxEvents), d.metrics.shutdown.Get(), "shutdown should discard all pending results")
+	assert.Equal(t, uint64(1), d.metrics.dropped[dropOverflow].Get(), "the oldest queued result must be dropped once the row limit is reached")
+	assert.Equal(t, uint64(1), d.metrics.droppedRows[dropOverflow].Get(), "count the dropped result's rows")
+	assert.Equal(t, uint64(outageMaxEvents), d.metrics.dropped[dropShutdown].Get(), "shutdown should discard all pending results")
+	assert.Equal(t, uint64(outageMaxEvents), d.metrics.droppedRows[dropShutdown].Get(), "count the rows of the discarded results")
 	assert.Zero(t, publisher.closed.Load(), "the active worker owns deferred client cleanup")
 	release()
 	select {
@@ -186,8 +188,8 @@ func TestScheduledResultsPolicyRetirementDoesNotWaitForOutput(t *testing.T) {
 		t.Fatal("policy replacement waited on old output")
 	}
 	d.enqueue(t.Context(), nil, plugin, result, nil)
-	assert.Equal(t, uint64(1), d.metrics.stale.Get(), "old namespace must not enter replacement clients")
-	assert.Equal(t, uint64(1), d.metrics.staleRows.Get(), "count the stale result's rows")
+	assert.Equal(t, uint64(1), d.metrics.dropped[dropStale].Get(), "old namespace must not enter replacement clients")
+	assert.Equal(t, uint64(1), d.metrics.droppedRows[dropStale].Get(), "count the stale result's rows")
 	items, _ := d.queue.stats()
 	assert.Equal(t, 1, items, "policy replacement must keep the queued result for the worker to rebind or drop")
 }
@@ -206,7 +208,7 @@ func TestScheduledResultsPolicyChangeKeepsBacklog(t *testing.T) {
 	assert.Eventually(t, func() bool { return next.calls.Load() == 3 }, time.Second, time.Millisecond,
 		"queued results must publish through the new policy's clients")
 	assert.Equal(t, int32(1), blocked.calls.Load(), "only the in-flight result may use the old clients")
-	assert.Zero(t, d.metrics.stale.Get(), "an unchanged query must not be dropped as stale")
+	assert.Zero(t, d.metrics.dropped[dropStale].Get(), "an unchanged query must not be dropped as stale")
 }
 
 func TestScheduledResultsPolicyChangeDropsMovedQuery(t *testing.T) {
@@ -220,9 +222,9 @@ func TestScheduledResultsPolicyChangeDropsMovedQuery(t *testing.T) {
 	require.NoError(t, d.configure(outageInputs("other"), outageLimits), "move the query to another namespace")
 	next := activePublisher(d)
 	release()
-	assert.Eventually(t, func() bool { return d.metrics.stale.Get() == 3 }, time.Second, time.Millisecond,
+	assert.Eventually(t, func() bool { return d.metrics.dropped[dropStale].Get() == 3 }, time.Second, time.Millisecond,
 		"results for a moved query must be dropped as stale")
-	assert.Equal(t, uint64(3), d.metrics.staleRows.Get(), "count the stale results' rows")
+	assert.Equal(t, uint64(3), d.metrics.droppedRows[dropStale].Get(), "count the stale results' rows")
 	assert.Zero(t, next.calls.Load(), "results captured for the old namespace must not use the new clients")
 	assert.Equal(t, int32(1), blocked.calls.Load(), "only the in-flight result may use the old clients")
 }
@@ -236,9 +238,9 @@ func TestScheduledResultsMaxAgeExpires(t *testing.T) {
 	d.enqueue(t.Context(), nil, plugin, result, nil)
 	time.Sleep(100 * time.Millisecond)
 	release()
-	assert.Eventually(t, func() bool { return d.metrics.expired.Get() == 2 }, time.Second, time.Millisecond,
+	assert.Eventually(t, func() bool { return d.metrics.dropped[dropExpired].Get() == 2 }, time.Second, time.Millisecond,
 		"results queued longer than max_age must be dropped as expired")
-	assert.Equal(t, uint64(2), d.metrics.expiredRows.Get(), "count the expired results' rows")
+	assert.Equal(t, uint64(2), d.metrics.droppedRows[dropExpired].Get(), "count the expired results' rows")
 	assert.Equal(t, int32(1), blocked.calls.Load(), "expired results must not be published")
 }
 
@@ -258,9 +260,9 @@ func TestScheduledResultsPolicyChangeDropsChangedSQL(t *testing.T) {
 	next := activePublisher(d)
 	d.enqueue(t.Context(), nil, plugin, result, nil)
 	release()
-	assert.Eventually(t, func() bool { return d.metrics.stale.Get() == 3 }, time.Second, time.Millisecond,
+	assert.Eventually(t, func() bool { return d.metrics.dropped[dropStale].Get() == 3 }, time.Second, time.Millisecond,
 		"results captured for the old SQL must be dropped as stale at admission and when dequeued")
-	assert.Equal(t, uint64(3), d.metrics.staleRows.Get(), "count the stale results' rows")
+	assert.Equal(t, uint64(3), d.metrics.droppedRows[dropStale].Get(), "count the stale results' rows")
 	assert.Zero(t, next.calls.Load(), "results for the old SQL must not use the new clients")
 }
 
@@ -290,7 +292,7 @@ func TestScheduledResultsPolicyChangeKeepsCapturedQueryInfo(t *testing.T) {
 			t.Fatalf("result %d was not published", i)
 		}
 	}
-	assert.Zero(t, d.metrics.stale.Get(), "an ECS mapping change must not make results stale")
+	assert.Zero(t, d.metrics.dropped[dropStale].Get(), "an ECS mapping change must not make results stale")
 }
 
 func TestScheduledProfilesQueuedAndEvictedFirst(t *testing.T) {
@@ -304,18 +306,119 @@ func TestScheduledProfilesQueuedAndEvictedFirst(t *testing.T) {
 	d.enqueueProfile(scheduledProfileItem{name: "scheduled", namespace: "old", query: "SELECT 1", profile: map[string]any{}})
 	d.enqueue(t.Context(), outageQueryClient{}, plugin, result, nil)
 	d.enqueue(t.Context(), outageQueryClient{}, plugin, result, nil)
-	assert.Equal(t, uint64(1), d.metrics.overflow.Get(), "only the profile should be evicted")
-	assert.Equal(t, uint64(1), d.metrics.overflowRows.Get(), "a profile is one row")
+	assert.Equal(t, uint64(1), d.metrics.dropped[dropOverflow].Get(), "only the profile should be evicted")
+	assert.Equal(t, uint64(1), d.metrics.droppedRows[dropOverflow].Get(), "a profile is one row")
 	assert.Equal(t, uint64(1), d.profileMetrics.outputFull.Get(), "keep counting evicted profiles where existing dashboards read them")
 	items, events := d.queue.stats()
 	assert.Equal(t, 2, items, "both later results should stay queued")
 	assert.Equal(t, 10, events, "the later results should fill the queue")
+	assert.Equal(t, int64(2), d.metrics.items.Get(), "the queue.items gauge must report the queued results")
+	assert.Equal(t, int64(10), d.metrics.events.Get(), "the queue.events gauge must report the queued rows")
 
 	// Both results are published once the output recovers; the profile is not.
 	release()
 	assert.Eventually(t, func() bool { return blocked.calls.Load() == 3 }, time.Second, time.Millisecond,
 		"the queued results must be published")
 	assert.Zero(t, blocked.profiles.Load(), "the evicted profile must not be published")
+	assert.Eventually(t, func() bool { return d.metrics.items.Get() == 0 && d.metrics.events.Get() == 0 }, time.Second, time.Millisecond,
+		"the queue gauges must drop to zero once the worker takes the results")
+}
+
+func TestScheduledProfilesExpiredCountedInLegacyCounters(t *testing.T) {
+	d, plugin, blocked, release := outageDispatcherFor(t, outageProfileInputs("old"),
+		config.ScheduledPublishingConfig{MaxEvents: outageMaxEvents, MaxAge: 50 * time.Millisecond})
+	d.enqueue(t.Context(), nil, plugin, QueryResult{Name: "scheduled", Action: "diff"}, nil)
+	waitForResultPublication(t, blocked)
+	d.enqueueProfile(scheduledProfileItem{name: "scheduled", namespace: "old", query: "SELECT 1", profile: map[string]any{}})
+	time.Sleep(100 * time.Millisecond)
+	release()
+	assert.Eventually(t, func() bool { return d.profileMetrics.expired.Get() == 1 }, time.Second, time.Millisecond,
+		"keep counting expired profiles where existing dashboards read them")
+	assert.Equal(t, uint64(1), d.metrics.dropped[dropExpired].Get(), "count the expired profile in the queue's counters")
+	assert.Zero(t, blocked.profiles.Load(), "an expired profile must not be published")
+}
+
+// TestScheduledPublishDroppedOnCloseCountsRows checks that an event the
+// pipeline drops while closing counts as a row, not as a queue item.
+func TestScheduledPublishDroppedOnCloseCountsRows(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "dropped-on-close")
+	var dropped func()
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(_ func() bool, onDrop func(), _ func(int)) osquerybeatPublisher {
+		dropped = onDrop
+		return &mockBeatPublisher{}
+	}, (&osquerybeat{log: log}).handleScheduledQueryResult)
+	require.NoError(t, d.configure(outageInputs("old"), outageLimits), "configure the scheduled clients")
+	stopOnCleanup(t, d)
+
+	dropped()
+	assert.Zero(t, d.metrics.dropped[dropShutdown].Get(), "a dropped event is not a dropped queue item")
+	assert.Equal(t, uint64(1), d.metrics.droppedRows[dropShutdown].Get(), "count the dropped event as a shutdown row")
+}
+
+// cuttingResultPublisher stops publishing rows once its lease is retired and
+// reports the rows it skipped, like pub.Publisher. Its first row waits for
+// release.
+type cuttingResultPublisher struct {
+	mockBeatPublisher
+	allowed func() bool
+	cut     func(int)
+	entered chan struct{}
+	release chan struct{}
+	once    sync.Once
+}
+
+func (p *cuttingResultPublisher) Publish(_, _, _, _, _, _, _, _ string, _ map[string]any, hits []map[string]any, _ ecs.Mapping, _ any) {
+	p.once.Do(func() {
+		close(p.entered)
+		<-p.release
+	})
+	for i := range hits {
+		if !p.allowed() {
+			p.cut(len(hits) - i)
+			return
+		}
+	}
+}
+
+func (p *cuttingResultPublisher) PublishScheduledResponse(string, string, string, string, string, string, time.Time, time.Time, time.Time, int, int64) {
+	if !p.allowed() {
+		p.cut(1)
+	}
+}
+
+func TestScheduledResultsRetiredLeaseCountsCutRows(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "cut")
+	var first *cuttingResultPublisher
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(allowed func() bool, _ func(), cut func(int)) osquerybeatPublisher {
+		p := &cuttingResultPublisher{allowed: allowed, cut: cut, entered: make(chan struct{}), release: make(chan struct{})}
+		if first == nil {
+			first = p
+		} else {
+			close(p.release)
+		}
+		return p
+	}, (&osquerybeat{log: log}).handleScheduledQueryResult)
+	inputs := outageInputs("old")
+	plugin := NewConfigPlugin(log)
+	require.NoError(t, plugin.Set(inputs), "validate the policy")
+	_, err := plugin.GenerateConfig(t.Context())
+	require.NoError(t, err, "apply the native policy")
+	require.NoError(t, d.configure(inputs, outageLimits), "configure the first scheduled clients")
+	t.Cleanup(func() { d.stop() })
+
+	rows := []map[string]string{{"value": "a"}, {"value": "b"}, {"value": "c"}}
+	d.enqueue(t.Context(), outageQueryClient{}, plugin, QueryResult{Name: "scheduled", Action: "snapshot", Hits: rows}, nil)
+	select {
+	case <-first.entered:
+	case <-time.After(time.Second):
+		t.Fatal("the result did not reach the blocked output")
+	}
+	require.NoError(t, d.configure(inputs, outageLimits), "retire the clients publishing the result")
+	close(first.release)
+
+	assert.Eventually(t, func() bool { return d.metrics.dropped[dropStale].Get() == 1 }, time.Second, time.Millisecond,
+		"a result cut short by retirement must count as one stale item")
+	assert.Equal(t, uint64(len(rows)+1), d.metrics.droppedRows[dropStale].Get(), "count the cut rows and the skipped response")
 }
 
 func TestScheduledProfilesNeedProfileStream(t *testing.T) {
@@ -334,7 +437,7 @@ func TestScheduledProfilesNeedProfileStream(t *testing.T) {
 	// The worker counts a drop under osquerybeat.scheduled_query_profiles last.
 	assert.Eventually(t, func() bool { return d.profileMetrics.stale.Get() == 2 }, time.Second, time.Millisecond,
 		"keep counting stale profiles where existing dashboards read them")
-	assert.Equal(t, uint64(2), d.metrics.stale.Get(), "profiles must be dropped as stale without a profile stream, when admitted and when dequeued")
+	assert.Equal(t, uint64(2), d.metrics.dropped[dropStale].Get(), "profiles must be dropped as stale without a profile stream, when admitted and when dequeued")
 	assert.Zero(t, blocked.profiles.Load()+next.profiles.Load(), "no profile may be published without a profile stream")
 }
 
@@ -362,14 +465,14 @@ func TestScheduledItemsDroppedAfterStop(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			log := logptest.NewTestingLogger(t, "stopped")
 			d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents,
-				func(func() bool, func()) osquerybeatPublisher { return &mockBeatPublisher{} }, (&osquerybeat{log: log}).handleScheduledQueryResult)
+				func(func() bool, func(), func(int)) osquerybeatPublisher { return &mockBeatPublisher{} }, (&osquerybeat{log: log}).handleScheduledQueryResult)
 			require.NoError(t, d.configure(outageProfileInputs("old"), outageLimits), "configure a policy that routes the item")
 			stopOnCleanup(t, d)
 			d.stop()
 
 			test.enqueue(d)
-			assert.Equal(t, uint64(1), d.metrics.shutdown.Get(), "an item admitted after stop must be dropped as shutdown")
-			assert.Zero(t, d.metrics.stale.Get(), "an item admitted after stop is not stale")
+			assert.Equal(t, uint64(1), d.metrics.dropped[dropShutdown].Get(), "an item admitted after stop must be dropped as shutdown")
+			assert.Zero(t, d.metrics.dropped[dropStale].Get(), "an item admitted after stop is not stale")
 			assert.Equal(t, test.wantProfiles, d.profileMetrics.shutdown.Get(), "count profile shutdown drops where existing dashboards read them")
 			items, _ := d.queue.stats()
 			assert.Zero(t, items, "a stopped dispatcher must not queue the item")
@@ -387,9 +490,9 @@ func TestScheduledResultsCancelledRunDroppedBeforeHandling(t *testing.T) {
 	d.enqueue(ctx, nil, plugin, QueryResult{Name: "scheduled", Action: "snapshot", Hits: rows}, nil)
 	cancel()
 	release()
-	assert.Eventually(t, func() bool { return d.metrics.stale.Get() == 1 }, time.Second, time.Millisecond,
+	assert.Eventually(t, func() bool { return d.metrics.dropped[dropStale].Get() == 1 }, time.Second, time.Millisecond,
 		"a result of a cancelled daemon run must be dropped as stale")
-	assert.Equal(t, uint64(len(rows)+1), d.metrics.staleRows.Get(), "count the cancelled result's rows and response")
+	assert.Equal(t, uint64(len(rows)+1), d.metrics.droppedRows[dropStale].Get(), "count the cancelled result's rows and response")
 	<-calls // The in-flight result.
 	select {
 	case <-calls:
@@ -400,7 +503,7 @@ func TestScheduledResultsCancelledRunDroppedBeforeHandling(t *testing.T) {
 
 func TestScheduledResultsInvalidPolicyKeepsLimits(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "invalid-policy")
-	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(func() bool, func()) osquerybeatPublisher {
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(func() bool, func(), func(int)) osquerybeatPublisher {
 		return &stalledResultPublisher{entered: make(chan struct{}), release: make(chan struct{})}
 	}, (&osquerybeat{log: log}).handleScheduledQueryResult)
 	t.Cleanup(d.stop)
@@ -493,12 +596,12 @@ func TestScheduledResultsReuseWorkerAcrossDaemonRestarts(t *testing.T) {
 	items, _ := d.queue.stats()
 	assert.Zero(t, items, "cancelled runs must not accumulate behind the stuck publication")
 	assert.Equal(t, int32(1), publisher.calls.Load(), "restarts must reuse the single publishing worker")
-	assert.Equal(t, uint64(20), d.metrics.stale.Get(), "prune each cancelled run from the backlog")
+	assert.Equal(t, uint64(20), d.metrics.dropped[dropStale].Get(), "prune each cancelled run from the backlog")
 }
 
 func TestScheduledResultsStopReleasesIdleWorker(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "idle")
-	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(func() bool, func()) osquerybeatPublisher {
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(func() bool, func(), func(int)) osquerybeatPublisher {
 		return &stalledResultPublisher{entered: make(chan struct{}), release: make(chan struct{})}
 	}, (&osquerybeat{log: log}).handleScheduledQueryResult)
 	require.NoError(t, d.configure(outageInputs("idle"), outageLimits), "start the result worker")
@@ -549,7 +652,7 @@ func TestScheduledResultsStalledOutputDoesNotBlockProfileCollection(t *testing.T
 	}
 	release := sync.OnceFunc(func() { close(publisher.release) })
 	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents,
-		func(func() bool, func()) osquerybeatPublisher { return publisher }, bt.handleScheduledQueryResult)
+		func(func() bool, func(), func(int)) osquerybeatPublisher { return publisher }, bt.handleScheduledQueryResult)
 	d.profile = bt.enqueueScheduledProfile
 	require.NoError(t, d.configure(inputs, config.ScheduledPublishingConfig{MaxEvents: config.DefaultScheduledMaxEvents}), "configure the scheduled clients")
 	t.Cleanup(func() {

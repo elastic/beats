@@ -22,11 +22,17 @@ type scheduledProfileRequest struct {
 	scheduleExecutionCount                                  int64
 }
 
+// scheduledProfileMetrics are the osquerybeat.scheduled_query_profiles
+// counters. They shipped before the scheduled queue counted profile drops
+// under osquerybeat.publishing.scheduled, and stay for existing dashboards.
 type scheduledProfileMetrics struct {
 	queueFull, stale, shutdown, failed, collected *monitoring.Uint
 	// outputFull counts profiles evicted from the full scheduled queue
-	// because the output did not keep up.
+	// because the output did not keep up. Before the scheduled queue, it
+	// counted profiles a full output refused.
 	outputFull *monitoring.Uint
+	// expired counts profiles older than max_age when the worker reached them.
+	expired *monitoring.Uint
 }
 
 func newScheduledProfileMetrics(reg *monitoring.Registry) *scheduledProfileMetrics {
@@ -39,6 +45,7 @@ func newScheduledProfileMetrics(reg *monitoring.Registry) *scheduledProfileMetri
 		stale:      monitoring.NewUint(reg, "dropped.stale"),
 		shutdown:   monitoring.NewUint(reg, "dropped.shutdown"),
 		outputFull: monitoring.NewUint(reg, "dropped.output_full"),
+		expired:    monitoring.NewUint(reg, "dropped.expired"),
 		failed:     monitoring.NewUint(reg, "failed"),
 		collected:  monitoring.NewUint(reg, "collected"),
 	}
