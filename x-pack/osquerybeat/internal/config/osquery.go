@@ -18,6 +18,12 @@ const (
 	// DefaultCheckTimeout is the osqueryd --version startup check deadline
 	// when elastic_options.check_timeout is unset.
 	DefaultCheckTimeout = 15 * time.Second
+	// DefaultScheduledMaxEvents is the scheduled publishing queue capacity
+	// when elastic_options.publishing.scheduled.max_events is unset.
+	DefaultScheduledMaxEvents = 3200
+	// DefaultLivePublishTimeout is how long a live result may wait to be
+	// published when elastic_options.publishing.live.timeout is unset.
+	DefaultLivePublishTimeout = 60 * time.Second
 )
 
 // RRuleScheduleConfig represents an RRULE-based schedule configuration
@@ -110,6 +116,8 @@ type ElasticOptions struct {
 	// CheckTimeout optionally overrides the osqueryd --version startup check
 	// deadline. Go duration format ("15s", "30s", "1m"). Default: 15s.
 	CheckTimeout string `config:"check_timeout" json:"-"`
+	// Publishing configures the scheduled and live result publishing queues.
+	Publishing *PublishingConfig `config:"publishing" json:"-"`
 }
 
 // ParseCheckTimeout parses elastic_options.check_timeout. An empty value
@@ -392,4 +400,24 @@ func (c OsqueryConfig) forOsqueryd() OsqueryConfig {
 // Render serializes the OsqueryConfig to JSON for osqueryd configuration.
 func (c OsqueryConfig) Render() ([]byte, error) {
 	return json.MarshalIndent(c.forOsqueryd(), "", "    ")
+}
+
+// PublishingConfig configures the osquerybeat-owned publishing queues.
+type PublishingConfig struct {
+	Scheduled ScheduledPublishingConfig `config:"scheduled"`
+	Live      LivePublishingConfig      `config:"live"`
+}
+
+// ScheduledPublishingConfig configures the scheduled results queue.
+type ScheduledPublishingConfig struct {
+	// MaxEvents is the queue capacity. Default: 3200.
+	MaxEvents int `config:"max_events"`
+	// MaxAge drops queued events older than this. Zero disables it.
+	MaxAge time.Duration `config:"max_age"`
+}
+
+// LivePublishingConfig configures live result publishing.
+type LivePublishingConfig struct {
+	// Timeout bounds how long a live result may wait to be published. Default: 60s.
+	Timeout time.Duration `config:"timeout"`
 }

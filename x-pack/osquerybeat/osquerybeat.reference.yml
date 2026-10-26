@@ -11,6 +11,15 @@ osquerybeat:
 #          # duration format. Default: 15s. Increase on hosts where antivirus
 #          # scanning delays the first osqueryd exec.
 #          #check_timeout: 15s
+#          publishing:
+#            scheduled:
+#              # Capacity of the scheduled results queue. Default: 3200.
+#              #max_events: 3200
+#              # Drop queued scheduled results older than this. Default: 0 (disabled).
+#              #max_age: 0s
+#            live:
+#              # How long a live result may wait to be published. Default: 60s.
+#              #timeout: 60s
 #          profiling:
 #            # Global default for collecting and publishing query profiles to the
 #            # osquery_manager.query_profile data stream for all queries (enabled by default).

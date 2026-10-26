@@ -350,6 +350,37 @@ func GetOsqueryCheckTimeout(inputs []InputConfig) (time.Duration, error) {
 	return ParseCheckTimeout(in.Osquery.ElasticOptions.CheckTimeout)
 }
 
+// GetPublishingConfig returns the publishing queue settings
+// (elastic_options.publishing) from the result input. Unset or zero values use
+// the defaults; negative values are an error.
+func GetPublishingConfig(inputs []InputConfig) (PublishingConfig, error) {
+	cfg := PublishingConfig{
+		Scheduled: ScheduledPublishingConfig{MaxEvents: DefaultScheduledMaxEvents},
+		Live:      LivePublishingConfig{Timeout: DefaultLivePublishTimeout},
+	}
+	in := ResultInput(inputs)
+	if in == nil || in.Osquery == nil || in.Osquery.ElasticOptions == nil || in.Osquery.ElasticOptions.Publishing == nil {
+		return cfg, nil
+	}
+	set := *in.Osquery.ElasticOptions.Publishing
+	switch {
+	case set.Scheduled.MaxEvents < 0:
+		return PublishingConfig{}, fmt.Errorf("osquery.elastic_options.publishing.scheduled.max_events must not be negative, got %d", set.Scheduled.MaxEvents)
+	case set.Scheduled.MaxAge < 0:
+		return PublishingConfig{}, fmt.Errorf("osquery.elastic_options.publishing.scheduled.max_age must not be negative, got %s", set.Scheduled.MaxAge)
+	case set.Live.Timeout < 0:
+		return PublishingConfig{}, fmt.Errorf("osquery.elastic_options.publishing.live.timeout must not be negative, got %s", set.Live.Timeout)
+	}
+	if set.Scheduled.MaxEvents > 0 {
+		cfg.Scheduled.MaxEvents = set.Scheduled.MaxEvents
+	}
+	cfg.Scheduled.MaxAge = set.Scheduled.MaxAge
+	if set.Live.Timeout > 0 {
+		cfg.Live.Timeout = set.Live.Timeout
+	}
+	return cfg, nil
+}
+
 // GetOsqueryExtensions returns customer-managed osquery extension settings
 // (elastic_options.extensions) from the result input if available.
 func GetOsqueryExtensions(inputs []InputConfig) ExtensionsConfig {
