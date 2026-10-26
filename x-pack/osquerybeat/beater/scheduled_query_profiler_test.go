@@ -458,7 +458,7 @@ func TestLoggerReturnsWhileScheduledProfileRPCWaits(t *testing.T) {
 	sink := &profileTestSink{published: make(chan collectedProfile, 1)}
 	publisher := &profileCallbackPublisher{sink: sink, responses: make(chan scheduledProfileResponse, 1)}
 	bt := &osquerybeat{pub: publisher, qp: profiler, log: log}
-	dispatcher := newScheduledResultDispatcher(monitoring.NewRegistry(), log,
+	dispatcher := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents,
 		func(func() bool, func()) osquerybeatPublisher { return publisher }, bt.handleScheduledQueryResult)
 	dispatcher.profile = bt.enqueueScheduledProfile
 	require.NoError(t, dispatcher.configure(inputs), "configure the scheduled result handoff")

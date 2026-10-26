@@ -6,7 +6,6 @@ package beater
 
 import (
 	"context"
-	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -47,13 +46,16 @@ func outageInputs(namespace string) []config.InputConfig {
 	}}
 }
 
+// outageMaxEvents is the outage dispatcher's queue limit in rows.
+const outageMaxEvents = 8
+
 func outageDispatcher(t *testing.T) (*scheduledResultDispatcher, *ConfigPlugin, *stalledResultPublisher, func()) {
 	t.Helper()
 	log := logptest.NewTestingLogger(t, "outage")
 	bt := &osquerybeat{log: log}
 	first := &stalledResultPublisher{entered: make(chan struct{}), release: make(chan struct{})}
 	created := false
-	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, func(func() bool, func()) osquerybeatPublisher {
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(func() bool, func()) osquerybeatPublisher {
 		if !created {
 			created = true
 			return first
@@ -97,12 +99,13 @@ func TestScheduledResultsBoundLoggerAdmissionAndShutdown(t *testing.T) {
 	require.NoError(t, loggerPlugin.Log(t.Context(), logger.LogTypeString, payload), "zero-hit logger call should return before its response is published")
 	waitForResultPublication(t, publisher)
 
-	// Keep the first response blocked, fill the bounded backlog, and prove
+	// Keep the first response blocked, overfill the bounded backlog, and prove
 	// logger admission and shutdown both finish before the output recovers.
+	// Each zero-hit result is one row.
 	finished := make(chan struct{})
 	go func() {
 		defer close(finished)
-		for range scheduledResultLimit {
+		for range outageMaxEvents + 1 {
 			if err := loggerPlugin.Log(t.Context(), logger.LogTypeString, payload); err != nil {
 				t.Errorf("logger admission: %v", err)
 				return
@@ -115,8 +118,9 @@ func TestScheduledResultsBoundLoggerAdmissionAndShutdown(t *testing.T) {
 	case <-time.After(time.Second):
 		t.Fatal("logger or shutdown waited for blocked publication")
 	}
-	assert.Equal(t, uint64(1), d.metrics.overflow.Get(), "the active result must count against the document limit")
-	assert.Equal(t, uint64(scheduledResultLimit-1), d.metrics.shutdown.Get(), "shutdown should discard all pending results")
+	assert.Equal(t, uint64(1), d.metrics.overflow.Get(), "the oldest queued result must be dropped once the row limit is reached")
+	assert.Equal(t, uint64(1), d.metrics.overflowRows.Get(), "count the dropped result's rows")
+	assert.Equal(t, uint64(outageMaxEvents), d.metrics.shutdown.Get(), "shutdown should discard all pending results")
 	assert.Zero(t, publisher.closed.Load(), "the active worker owns deferred client cleanup")
 	release()
 	select {
@@ -126,20 +130,6 @@ func TestScheduledResultsBoundLoggerAdmissionAndShutdown(t *testing.T) {
 	}
 	assert.Equal(t, int32(1), publisher.closed.Load(), "retired publishing clients must close exactly once")
 	assert.Equal(t, int32(1), publisher.calls.Load(), "shutdown must not publish pending documents")
-}
-
-func TestScheduledResultsBoundsBytesIncludingActiveDocument(t *testing.T) {
-	d, plugin, publisher, _ := outageDispatcher(t)
-	result := QueryResult{Name: "scheduled", Action: "diff", Hits: []map[string]string{{"value": strings.Repeat("x", 3<<20)}}}
-	d.enqueue(t.Context(), nil, plugin, result, nil)
-	waitForResultPublication(t, publisher)
-	d.enqueue(t.Context(), nil, plugin, result, nil)
-	d.enqueue(t.Context(), nil, plugin, result, nil)
-	assert.Equal(t, uint64(1), d.metrics.overflow.Get(), "third document must exceed the retained-byte budget")
-	d.mu.Lock()
-	assert.Equal(t, 2, d.count, "count the active and pending documents")
-	assert.LessOrEqual(t, d.bytes, scheduledResultBytesLimit, "retained estimates must stay bounded")
-	d.mu.Unlock()
 }
 
 func TestScheduledResultsPolicyRetirementDoesNotWaitForOutput(t *testing.T) {
@@ -160,9 +150,8 @@ func TestScheduledResultsPolicyRetirementDoesNotWaitForOutput(t *testing.T) {
 	assert.Equal(t, uint64(1), d.metrics.stale.Get(), "queued old-policy work should retire immediately")
 	d.enqueue(t.Context(), nil, plugin, result, nil)
 	assert.Equal(t, uint64(2), d.metrics.stale.Get(), "old namespace must not enter replacement clients")
-	d.mu.Lock()
-	assert.Equal(t, 1, d.count, "only the one original publication may remain")
-	d.mu.Unlock()
+	items, _ := d.queue.stats()
+	assert.Zero(t, items, "only the one original, active publication may remain")
 }
 
 func TestScheduledResultsReuseWorkerAcrossDaemonRestarts(t *testing.T) {
@@ -178,20 +167,10 @@ func TestScheduledResultsReuseWorkerAcrossDaemonRestarts(t *testing.T) {
 		cancel()
 		d.prune()
 	}
-	d.mu.Lock()
-	assert.Equal(t, 1, d.count, "cancelled runs must not accumulate behind the stuck publication")
-	d.mu.Unlock()
+	items, _ := d.queue.stats()
+	assert.Zero(t, items, "cancelled runs must not accumulate behind the stuck publication")
 	assert.Equal(t, int32(1), publisher.calls.Load(), "restarts must reuse the single publishing worker")
 	assert.Equal(t, uint64(20), d.metrics.stale.Get(), "prune each cancelled run from the backlog")
-}
-
-func TestScheduledLoggerDropsOversizeBeforeParsing(t *testing.T) {
-	var dropped atomic.Int32
-	p := NewLoggerPlugin(logptest.NewTestingLogger(t, "oversized"), func(QueryResult) { t.Error("oversized input reached result handling") })
-	p.maxResultBytes = 8
-	p.dropOversized = func() { dropped.Add(1) }
-	assert.NoError(t, p.Log(t.Context(), logger.LogTypeString, strings.Repeat("invalid JSON", 2)), "oversized payload must drop before JSON parsing")
-	assert.Equal(t, int32(1), dropped.Load(), "count the dropped document")
 }
 
 // Result and profile publication remain separate. Capturing correlation when
@@ -230,7 +209,7 @@ func TestScheduledResultsStalledOutputDoesNotBlockProfileCollection(t *testing.T
 		stalledResultPublisher: stalledResultPublisher{entered: make(chan struct{}), release: make(chan struct{})},
 		response:               make(chan scheduledProfileResponse, 1),
 	}
-	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log,
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents,
 		func(func() bool, func()) osquerybeatPublisher { return publisher }, bt.handleScheduledQueryResult)
 	d.profile = bt.enqueueScheduledProfile
 	require.NoError(t, d.configure(inputs), "configure the independent result publisher")

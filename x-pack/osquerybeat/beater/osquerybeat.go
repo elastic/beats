@@ -170,7 +170,7 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 		osqueryDataPath: b.Info.Paths.Resolve(paths.Data, "osquery"),
 	}
 
-	bt.scheduledResults = newScheduledResultDispatcher(b.Monitoring.StatsRegistry(), log,
+	bt.scheduledResults = newScheduledResultDispatcher(b.Monitoring.StatsRegistry(), log, config.DefaultScheduledMaxEvents,
 		func(allowed func() bool, dropped func()) osquerybeatPublisher {
 			return pub.NewScheduled(b, log, allowed, dropped)
 		}, bt.handleScheduledQueryResult)
@@ -670,8 +670,6 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 	loggerPlugin := NewLoggerPlugin(bt.log, func(res QueryResult) {
 		bt.scheduledResults.enqueue(ctx, cli, configPlugin, res, scheduledProfiler)
 	})
-	loggerPlugin.maxResultBytes = scheduledResultBytesLimit
-	loggerPlugin.dropOversized = func() { bt.scheduledResults.metrics.drop(bt.scheduledResults.metrics.overflow) }
 	defer bt.scheduledResults.prune()
 
 	// Create recurrence query handler for scheduling queries with RRULE expressions

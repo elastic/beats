@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pub"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -94,7 +95,7 @@ func TestScheduledResultsSaturatedPipelineDoesNotBlockShutdown(t *testing.T) {
 	require.NoError(t, err, "create the real publisher pipeline")
 	observed := &observedResultPipeline{PipelineConnector: pipe, entered: make(chan struct{})}
 	bt := &osquerybeat{log: log}
-	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, func(allowed func() bool, dropped func()) osquerybeatPublisher {
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents, func(allowed func() bool, dropped func()) osquerybeatPublisher {
 		return pub.NewScheduled(&beat.Beat{Publisher: observed}, log, allowed, dropped)
 	}, bt.handleScheduledQueryResult)
 	t.Cleanup(func() {

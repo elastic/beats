@@ -18,11 +18,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-const (
-	scheduledResultLimit      = 128
-	scheduledResultBytesLimit = 8 << 20
-)
-
 type scheduledQueryClient interface {
 	ResolveResult(context.Context, string, []map[string]string) ([]map[string]any, error)
 }
@@ -34,9 +29,18 @@ type scheduledResult struct {
 	namespace  string
 	query      QueryInfo
 	lease      *scheduledResultLease
-	bytes      int
+	queuedAt   time.Time
 	responseID string
 }
+
+// rows counts the result rows plus the response document.
+func (r scheduledResult) rows() int {
+	return len(r.result.Hits) + len(r.result.DiffResults.Added) + len(r.result.DiffResults.Removed) + 1
+}
+
+func (r scheduledResult) enqueued() time.Time { return r.queuedAt }
+
+func (r scheduledResult) evictFirst() bool { return false }
 
 // Each policy owns separate clients. Retirement never waits behind an output
 // call; the one process-lifetime worker closes an active lease when it returns.
@@ -65,11 +69,9 @@ type scheduledResultDispatcher struct {
 	mu              sync.Mutex
 	ctx             context.Context
 	cancel          context.CancelFunc
-	pending         chan scheduledResult
-	wake            chan struct{}
+	queue           *rowQueue[scheduledResult]
 	done            chan struct{}
 	started, closed bool
-	count, bytes    int
 	lease           *scheduledResultLease
 	log             *logp.Logger
 	metrics         *scheduledResultMetrics
@@ -78,16 +80,19 @@ type scheduledResultDispatcher struct {
 	handle          func(context.Context, scheduledQueryClient, scheduledQueryPublisher, string, QueryInfo, QueryResult, string)
 }
 
-func newScheduledResultDispatcher(reg *monitoring.Registry, log *logp.Logger, factory func(func() bool, func()) osquerybeatPublisher,
+func newScheduledResultDispatcher(reg *monitoring.Registry, log *logp.Logger, maxEvents int, factory func(func() bool, func()) osquerybeatPublisher,
 	handle func(context.Context, scheduledQueryClient, scheduledQueryPublisher, string, QueryInfo, QueryResult, string)) *scheduledResultDispatcher {
 	if reg == nil {
 		reg = monitoring.NewRegistry()
 	}
 	ctx, cancel := context.WithCancel(context.Background())
+	metrics := newScheduledResultMetrics(reg, log)
 	return &scheduledResultDispatcher{
-		ctx: ctx, cancel: cancel, pending: make(chan scheduledResult, scheduledResultLimit),
-		wake: make(chan struct{}, 1), done: make(chan struct{}), log: log,
-		metrics: newScheduledResultMetrics(reg, log), newPublisher: factory, handle: handle,
+		ctx: ctx, cancel: cancel, done: make(chan struct{}), log: log,
+		queue: newRowQueue(maxEvents, func(r scheduledResult) {
+			metrics.dropRows(metrics.overflow, metrics.overflowRows, r.rows())
+		}),
+		metrics: metrics, newPublisher: factory, handle: handle,
 	}
 }
 
@@ -138,7 +143,6 @@ func (d *scheduledResultDispatcher) enqueue(ctx context.Context, client schedule
 		d.metrics.drop(d.metrics.stale)
 		return
 	}
-	bytes := resultSize(result)
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	if d.closed || ctx.Err() != nil {
@@ -154,50 +158,23 @@ func (d *scheduledResultDispatcher) enqueue(ctx context.Context, client schedule
 		d.metrics.drop(d.metrics.stale)
 		return
 	}
-	if d.count >= scheduledResultLimit || bytes > scheduledResultBytesLimit-d.bytes {
-		d.metrics.drop(d.metrics.overflow)
-		return
-	}
 	responseID := uuid.Must(uuid.NewV4()).String()
-	d.count++
-	d.bytes += bytes
-	d.pending <- scheduledResult{ctx: ctx, client: client, result: result, namespace: namespace, query: query, lease: d.lease, bytes: bytes, responseID: responseID}
+	d.queue.push(scheduledResult{ctx: ctx, client: client, result: result, namespace: namespace, query: query, lease: d.lease, queuedAt: time.Now(), responseID: responseID})
 	// Profiling keeps its own collection worker. Its admission never waits for
 	// this result's publication or shares the result worker.
 	if d.profile != nil {
 		d.profile(profiler, namespace, query, result, responseID)
-	}
-	select {
-	case d.wake <- struct{}{}:
-	default:
 	}
 }
 
 func (d *scheduledResultDispatcher) run() {
 	defer close(d.done)
 	for {
-		select {
-		case <-d.ctx.Done():
+		job, ok := d.queue.pop(d.ctx)
+		if !ok {
 			return
-		case <-d.wake:
 		}
-		for {
-			d.mu.Lock()
-			var job scheduledResult
-			select {
-			case job = <-d.pending:
-			default:
-				d.mu.Unlock()
-				goto drained
-			}
-			d.mu.Unlock()
-			d.process(job)
-			d.mu.Lock()
-			d.count--
-			d.bytes -= job.bytes
-			d.mu.Unlock()
-		}
-	drained:
+		d.process(job)
 	}
 }
 
@@ -226,19 +203,16 @@ func (d *scheduledResultDispatcher) process(job scheduledResult) {
 }
 
 // prune releases cancelled runs and retired policies even while the active
-// publication is blocked. Both the outstanding count and byte bound include it.
+// publication is blocked.
 func (d *scheduledResultDispatcher) prune() {
 	d.mu.Lock()
 	defer d.mu.Unlock()
-	for range len(d.pending) {
-		job := <-d.pending
+	for _, job := range d.queue.drain() {
 		if job.ctx.Err() != nil || job.lease.retired.Load() {
-			d.count--
-			d.bytes -= job.bytes
 			d.metrics.drop(d.metrics.stale)
-		} else {
-			d.pending <- job
+			continue
 		}
+		d.queue.push(job)
 	}
 }
 
@@ -255,10 +229,7 @@ func (d *scheduledResultDispatcher) stop() {
 		lease.retired.Store(true)
 	}
 	d.lease = nil
-	for len(d.pending) > 0 {
-		job := <-d.pending
-		d.count--
-		d.bytes -= job.bytes
+	for range d.queue.drain() {
 		d.metrics.drop(d.metrics.shutdown)
 	}
 	if !d.started {
@@ -274,6 +245,7 @@ func (d *scheduledResultDispatcher) stop() {
 
 type scheduledResultMetrics struct {
 	overflow, stale, shutdown, outputFull *monitoring.Uint
+	overflowRows                          *monitoring.Uint
 	lastWarning                           atomic.Int64
 	log                                   *logp.Logger
 }
@@ -281,12 +253,19 @@ type scheduledResultMetrics struct {
 func newScheduledResultMetrics(reg *monitoring.Registry, log *logp.Logger) *scheduledResultMetrics {
 	reg = reg.GetOrCreateRegistry("osquerybeat.scheduled_results")
 	return &scheduledResultMetrics{
-		overflow:   monitoring.NewUint(reg, "dropped.overflow"),
-		outputFull: monitoring.NewUint(reg, "dropped.output_full"),
-		stale:      monitoring.NewUint(reg, "dropped.stale"),
-		shutdown:   monitoring.NewUint(reg, "dropped.shutdown"),
-		log:        log,
+		overflow:     monitoring.NewUint(reg, "dropped.overflow"),
+		overflowRows: monitoring.NewUint(reg, "dropped_rows.overflow"),
+		outputFull:   monitoring.NewUint(reg, "dropped.output_full"),
+		stale:        monitoring.NewUint(reg, "dropped.stale"),
+		shutdown:     monitoring.NewUint(reg, "dropped.shutdown"),
+		log:          log,
 	}
+}
+
+// dropRows counts one dropped document in counter and its rows in rowCounter.
+func (m *scheduledResultMetrics) dropRows(counter, rowCounter *monitoring.Uint, rows int) {
+	rowCounter.Add(uint64(rows))
+	m.drop(counter)
 }
 
 func (m *scheduledResultMetrics) drop(counter *monitoring.Uint) {
@@ -296,20 +275,4 @@ func (m *scheduledResultMetrics) drop(counter *monitoring.Uint) {
 	if now-last >= int64(time.Minute) && m.lastWarning.CompareAndSwap(last, now) {
 		m.log.Warn("Scheduled osquery result dropped; see osquerybeat.scheduled_results.dropped monitoring counters")
 	}
-}
-
-// resultSize estimates retained decoded storage, including map and row overhead,
-// rather than treating a result document with millions of tiny fields as cheap.
-func resultSize(res QueryResult) int {
-	size := 256 + len(res.Name) + len(res.Action) + len(res.CalendarTime)
-	for _, rows := range [][]map[string]string{res.Hits, res.DiffResults.Added, res.DiffResults.Removed} {
-		size += 24 * len(rows)
-		for _, row := range rows {
-			size += 128
-			for key, value := range row {
-				size += 128 + len(key) + len(value)
-			}
-		}
-	}
-	return size
 }
