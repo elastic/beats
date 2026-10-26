@@ -19,6 +19,7 @@ package logstash
 
 import (
 	"errors"
+	"maps"
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -38,7 +39,19 @@ func makeLogstashEventEncoder(log *logp.Logger, beatVersion string, escapeHTML b
 			return nil, errors.New("event is not of type *beat.Event")
 		}
 
-		d, err := enc.Encode(index, beatEvent)
+		eventIndex := index
+		// '@metadata.beat' set on the event takes precedence over the output's index so
+		// events from several beats can share one output. It is removed from a copy of
+		// Meta so the encoder does not emit the key twice.
+		if b, ok := beatEvent.Meta["beat"].(string); ok && b != "" {
+			eventIndex = b
+			e := *beatEvent
+			e.Meta = maps.Clone(beatEvent.Meta)
+			delete(e.Meta, "beat")
+			beatEvent = &e
+		}
+
+		d, err := enc.Encode(eventIndex, beatEvent)
 		if err != nil {
 			log.Debugf("Failed to encode event: %v", event)
 			return nil, err
