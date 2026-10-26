@@ -616,7 +616,7 @@ filebeat.inputs:
 stack: ga 8.9.0
 ```
 
-XML documents may require additional type information to enable correct parsing and ingestion. This information can be provided as an XML Schema Definitions (XSD) for XML documents using the `xsd` option. The key under which the XSD information is provided is accessed via the `decode_xml` CEL extension.
+XML documents may require additional type information to enable correct parsing and ingestion. This information can be provided as an XML Schema Definition (XSD) for XML documents using the `xsd` option. The key under which the XSD information is provided is accessed via the `decode_xml` CEL extension.
 
 ```yaml
 filebeat.inputs:
