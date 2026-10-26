@@ -197,7 +197,13 @@ Heartbeat uses the resolved values as they are. A secret in a setting that is pu
 stack: preview 9.6+
 ```
 
-Use `allowed_hosts` to make sure that the secrets of a connection are only sent to the hosts you approve, whoever writes the monitors that use it. This holds only if the monitor authors can't change the `secret_stores` setting, for example when Kibana adds it to the monitors. If the same person writes the monitor and its `secret_stores`, as in a standalone `heartbeat.yml`, they can remove `allowed_hosts` or add their own connection. Before each run, Heartbeat resolves the references and then checks the resolved monitor configuration. A monitor that fails the check doesn't run and reports `down` with an error such as:
+Use `allowed_hosts` to make sure the secrets of a connection are only sent to hosts you approve, regardless of who writes the monitors that use the connection.
+
+::::{note}
+This protection only holds if monitor authors can't change the `secret_stores` setting, for example when Kibana adds it to the monitors. If the same person writes both the monitor and its `secret_stores`, as in a standalone `heartbeat.yml`, they can remove `allowed_hosts` or add their own connection.
+::::
+
+Before each run, Heartbeat resolves the references and then checks the resolved monitor configuration. A monitor that fails the check doesn't run and reports `down` with an error such as:
 
 ```
 secret_stores: connection "prod": not allowed by allowed_hosts: the monitor connects to a host that is not allowed
