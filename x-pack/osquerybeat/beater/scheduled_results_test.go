@@ -742,6 +742,35 @@ func TestScheduledResultsInvalidPolicyKeepsLimits(t *testing.T) {
 	assert.Equal(t, 5, queueLimit(d), "a valid policy must apply its queue limit")
 }
 
+func TestScheduledResultsRemovedInputsKeepPolicy(t *testing.T) {
+	limits := config.ScheduledPublishingConfig{MaxEvents: outageMaxEvents, MaxAge: time.Hour}
+	d, plugin, blocked, release := outageDispatcher(t, limits)
+	result := QueryResult{Name: "scheduled", Action: "diff"}
+	d.enqueue(t.Context(), nil, plugin, result, nil)
+	waitForResultPublication(t, blocked)
+	for range 3 {
+		d.enqueue(t.Context(), nil, plugin, result, nil)
+	}
+
+	// configurePublishers passes the default settings when the inputs are removed.
+	publishing, err := config.GetPublishingConfig(nil)
+	require.NoError(t, err, "read the settings of no inputs")
+	require.NoError(t, d.configure(nil, publishing.Scheduled), "remove the inputs")
+	assert.Equal(t, outageMaxEvents, queueLimit(d), "removing the inputs must keep the queue limit")
+	d.mu.Lock()
+	maxAge := d.maxAge
+	d.mu.Unlock()
+	assert.Equal(t, time.Hour, maxAge, "removing the inputs must keep max_age")
+	release()
+	assert.Eventually(t, func() bool { return blocked.calls.Load() == 4 }, time.Second, time.Millisecond,
+		"queued results must keep publishing through the current policy's clients")
+	assert.Zero(t, d.metrics.dropped[dropStale].Get(), "removing the inputs must not make queued results stale")
+
+	require.NoError(t, d.configure(outageInputs("old"), config.ScheduledPublishingConfig{MaxEvents: 5}), "apply a later policy")
+	assert.Equal(t, 5, queueLimit(d), "a later policy must apply its queue limit")
+	assert.NotSame(t, blocked, activePublisher(d), "a later policy must replace the clients")
+}
+
 func queueLimit(d *scheduledResultDispatcher) int {
 	d.queue.mu.Lock()
 	defer d.queue.mu.Unlock()

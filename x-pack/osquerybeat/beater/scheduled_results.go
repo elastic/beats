@@ -213,7 +213,12 @@ func newScheduledResultDispatcher(reg *monitoring.Registry, log *logp.Logger, ma
 
 // configure replaces the active policy and queue limits. Queued results are
 // kept; the worker binds each to the policy that is active when it is popped.
+// With no inputs it keeps the current policy and limits, as liveClients and
+// pub.Publisher do.
 func (d *scheduledResultDispatcher) configure(inputs []config.InputConfig, cfg config.ScheduledPublishingConfig) error {
+	if len(inputs) == 0 {
+		return nil
+	}
 	var next *scheduledResultLease
 	if config.ResultInput(inputs) != nil {
 		view := NewConfigPlugin(d.log)
