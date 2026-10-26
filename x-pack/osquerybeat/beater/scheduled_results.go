@@ -178,15 +178,14 @@ type scheduledResultDispatcher struct {
 	current atomic.Pointer[scheduledResultLease]
 	// runCtx and client belong to the running osqueryd, if any; client is
 	// nil between runs. clientSet is closed while client is set.
-	runCtx         context.Context
-	client         scheduledQueryClient
-	clientSet      chan struct{}
-	maxAge         time.Duration
-	log            *logp.Logger
-	metrics        *publishingMetrics
-	profileMetrics *scheduledProfileMetrics
-	newPublisher   func(allowed func() bool, dropped func(), cut func(rows int)) osquerybeatPublisher
-	profile        func(*scheduledQueryProfiler, string, QueryInfo, QueryResult, string)
+	runCtx       context.Context
+	client       scheduledQueryClient
+	clientSet    chan struct{}
+	maxAge       time.Duration
+	log          *logp.Logger
+	metrics      *publishingMetrics
+	newPublisher func(allowed func() bool, dropped func(), cut func(rows int)) osquerybeatPublisher
+	profile      func(*scheduledQueryProfiler, string, QueryInfo, QueryResult, string)
 	// handle resolves and publishes a native result and returns the rows it
 	// could not publish because their types could not be resolved.
 	handle func(context.Context, scheduledQueryClient, scheduledQueryPublisher, string, QueryInfo, QueryResult, string) int
@@ -199,15 +198,13 @@ func newScheduledResultDispatcher(reg *monitoring.Registry, log *logp.Logger, ma
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	metrics := newPublishingMetrics(reg, "scheduled", log)
-	profileMetrics := newScheduledProfileMetrics(reg)
 	queue := newRowQueue(maxEvents, func(item scheduledItem) {
 		metrics.drop(dropOverflow, item.rows())
-		countProfileDrop(item, profileMetrics.outputFull)
 	})
 	queue.observe = metrics.setQueue
 	return &scheduledResultDispatcher{
 		ctx: ctx, cancel: cancel, done: make(chan struct{}), clientSet: make(chan struct{}), log: log,
-		queue: queue, metrics: metrics, profileMetrics: profileMetrics, newPublisher: factory, handle: handle,
+		queue: queue, metrics: metrics, newPublisher: factory, handle: handle,
 	}
 }
 
@@ -370,7 +367,6 @@ func (d *scheduledResultDispatcher) process(item scheduledItem) {
 	switch {
 	case expired:
 		d.metrics.drop(dropExpired, item.rows())
-		countProfileDrop(item, d.profileMetrics.expired)
 	case !routed:
 		d.dropStale(item)
 	default:
@@ -410,7 +406,7 @@ func (d *scheduledResultDispatcher) publish(lease *scheduledResultLease, item sc
 	defer func() { stop(); cancel() }()
 	lease.ctx, lease.item = d.ctx, item
 	if !lease.allowed(d.current.Load()) {
-		d.dropCut(item, item.rows())
+		d.dropCut(item.rows())
 		return
 	}
 	unresolved := 0
@@ -422,29 +418,26 @@ func (d *scheduledResultDispatcher) publish(lease *scheduledResultLease, item sc
 			// Without a profile stream the publisher has no client for it.
 			item.profile = nil
 			d.metrics.dropRows(dropStale, 1)
-			d.profileMetrics.stale.Inc()
 		}
 		publishResolvedResult(lease.publisher, item)
 	case scheduledProfileItem:
 		lease.publisher.PublishScheduledProfile(config.QueryProfileDatastream(item.namespace), item.name, item.scheduleID, item.responseID, item.spaceID, item.executionCount, item.profile)
 	}
 	if rows := lease.cut + unresolved; rows > 0 {
-		d.dropCut(item, rows)
+		d.dropCut(rows)
 	}
 	lease.cut = 0
 }
 
-// dropCut counts the rows of item that were not published because its lease
+// dropCut counts the rows of an item that were not published because its lease
 // was retired, the dispatcher stopped, or its rows could not be resolved while
 // the item was in flight.
-func (d *scheduledResultDispatcher) dropCut(item scheduledItem, rows int) {
+func (d *scheduledResultDispatcher) dropCut(rows int) {
 	if d.ctx.Err() != nil {
 		d.metrics.drop(dropShutdown, rows)
-		countProfileDrop(item, d.profileMetrics.shutdown)
 		return
 	}
 	d.metrics.drop(dropStale, rows)
-	countProfileDrop(item, d.profileMetrics.stale)
 }
 
 // publishResolvedResult publishes an RRULE run's profile, rows and response.
@@ -463,20 +456,10 @@ func publishResolvedResult(p scheduledQueryPublisher, r resolvedScheduledResult)
 
 func (d *scheduledResultDispatcher) dropStale(item scheduledItem) {
 	d.metrics.drop(dropStale, item.rows())
-	countProfileDrop(item, d.profileMetrics.stale)
 }
 
 func (d *scheduledResultDispatcher) dropShutdown(item scheduledItem) {
 	d.metrics.drop(dropShutdown, item.rows())
-	countProfileDrop(item, d.profileMetrics.shutdown)
-}
-
-// countProfileDrop counts a dropped profile item in counter too. Its
-// osquerybeat.scheduled_query_profiles registry is read by existing dashboards.
-func countProfileDrop(item scheduledItem, counter *monitoring.Uint) {
-	if _, ok := item.(scheduledProfileItem); ok {
-		counter.Inc()
-	}
 }
 
 // prune releases queued items the active policy no longer routes, even while

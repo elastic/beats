@@ -327,7 +327,6 @@ func TestScheduledProfilesQueuedAndEvictedFirst(t *testing.T) {
 	d.enqueue(t.Context(), outageQueryClient{}, plugin, result, nil)
 	assert.Equal(t, uint64(1), d.metrics.dropped[dropOverflow].Get(), "only the profile should be evicted")
 	assert.Equal(t, uint64(1), d.metrics.droppedRows[dropOverflow].Get(), "a profile is one row")
-	assert.Equal(t, uint64(1), d.profileMetrics.outputFull.Get(), "keep counting evicted profiles where existing dashboards read them")
 	items, events := d.queue.stats()
 	assert.Equal(t, 2, items, "both queued results should stay queued")
 	assert.Equal(t, 10, events, "the queued results should fill the queue")
@@ -343,7 +342,7 @@ func TestScheduledProfilesQueuedAndEvictedFirst(t *testing.T) {
 		"the queue gauges must drop to zero once the worker takes the results")
 }
 
-func TestScheduledProfilesExpiredCountedInLegacyCounters(t *testing.T) {
+func TestScheduledProfilesExpire(t *testing.T) {
 	d, plugin, blocked, release := outageDispatcherFor(t, outageProfileInputs("old"),
 		config.ScheduledPublishingConfig{MaxEvents: outageMaxEvents, MaxAge: 50 * time.Millisecond})
 	d.enqueue(t.Context(), nil, plugin, QueryResult{Name: "scheduled", Action: "diff"}, nil)
@@ -351,9 +350,9 @@ func TestScheduledProfilesExpiredCountedInLegacyCounters(t *testing.T) {
 	d.enqueueProfile(scheduledProfileItem{name: "scheduled", namespace: "old", query: "SELECT 1", profile: map[string]any{}})
 	time.Sleep(100 * time.Millisecond)
 	release()
-	assert.Eventually(t, func() bool { return d.profileMetrics.expired.Get() == 1 }, time.Second, time.Millisecond,
-		"keep counting expired profiles where existing dashboards read them")
-	assert.Equal(t, uint64(1), d.metrics.dropped[dropExpired].Get(), "count the expired profile in the queue's counters")
+	assert.Eventually(t, func() bool { return d.metrics.dropped[dropExpired].Get() == 1 }, time.Second, time.Millisecond,
+		"count the expired profile in the queue's counters")
+	assert.Equal(t, uint64(1), d.metrics.droppedRows[dropExpired].Get(), "an expired profile is one row")
 	assert.Zero(t, blocked.profiles.Load(), "an expired profile must not be published")
 }
 
@@ -544,10 +543,8 @@ func TestScheduledProfilesNeedProfileStream(t *testing.T) {
 	next := activePublisher(d)
 	d.enqueueProfile(profile)
 	release()
-	// The worker counts a drop under osquerybeat.scheduled_query_profiles last.
-	assert.Eventually(t, func() bool { return d.profileMetrics.stale.Get() == 2 }, time.Second, time.Millisecond,
-		"keep counting stale profiles where existing dashboards read them")
-	assert.Equal(t, uint64(2), d.metrics.dropped[dropStale].Get(), "profiles must be dropped as stale without a profile stream, when admitted and when dequeued")
+	assert.Eventually(t, func() bool { return d.metrics.dropped[dropStale].Get() == 2 }, time.Second, time.Millisecond,
+		"profiles must be dropped as stale without a profile stream, when admitted and when dequeued")
 	assert.Zero(t, blocked.profiles.Load()+next.profiles.Load(), "no profile may be published without a profile stream")
 }
 
@@ -560,14 +557,12 @@ func TestScheduledRunProfileNeedsProfileStream(t *testing.T) {
 	assert.Zero(t, publisher.profiles.Load(), "the run's profile must not be published without a profile stream")
 	assert.Equal(t, uint64(1), d.metrics.droppedRows[dropStale].Get(), "count the run's profile as a stale row")
 	assert.Zero(t, d.metrics.dropped[dropStale].Get(), "the run itself was published")
-	assert.Equal(t, uint64(1), d.profileMetrics.stale.Get(), "count the profile where existing dashboards read them")
 }
 
 func TestScheduledItemsDroppedAfterStop(t *testing.T) {
 	tests := []struct {
-		name         string
-		enqueue      func(*scheduledResultDispatcher)
-		wantProfiles uint64 // Legacy osquerybeat.scheduled_query_profiles shutdown drops.
+		name    string
+		enqueue func(*scheduledResultDispatcher)
 	}{
 		{
 			name: "resolved run",
@@ -580,7 +575,6 @@ func TestScheduledItemsDroppedAfterStop(t *testing.T) {
 			enqueue: func(d *scheduledResultDispatcher) {
 				d.enqueueProfile(scheduledProfileItem{name: "scheduled", namespace: "old", query: "SELECT 1"})
 			},
-			wantProfiles: 1,
 		},
 	}
 	for _, test := range tests {
@@ -595,7 +589,6 @@ func TestScheduledItemsDroppedAfterStop(t *testing.T) {
 			test.enqueue(d)
 			assert.Equal(t, uint64(1), d.metrics.dropped[dropShutdown].Get(), "an item admitted after stop must be dropped as shutdown")
 			assert.Zero(t, d.metrics.dropped[dropStale].Get(), "an item admitted after stop is not stale")
-			assert.Equal(t, test.wantProfiles, d.profileMetrics.shutdown.Get(), "count profile shutdown drops where existing dashboards read them")
 			items, _ := d.queue.stats()
 			assert.Zero(t, items, "a stopped dispatcher must not queue the item")
 		})

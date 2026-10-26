@@ -117,12 +117,12 @@ live clients are configured, counts as its own item of one row. An event the pip
 while closing counts in `dropped_rows.shutdown` only. Each queue logs at most
 one warning per minute about drops, naming the counter that moved.
 
-Scheduled profile drops are also counted under the earlier
-`osquerybeat.scheduled_query_profiles.dropped` counters, which existing
-dashboards read: `output_full` now counts profiles dropped for space in the
-scheduled queue (it used to count profiles a full output refused), and
-`stale`, `expired` and `shutdown` count the other drops. `queue_full` still
-counts profiles the collection worker had no room for.
+A scheduled profile dropped once it is queued is counted only under
+`osquerybeat.publishing.scheduled`. The profile collection worker reports
+under `osquerybeat.scheduled_query_profiles`: `dropped.queue_full`,
+`dropped.stale` and `dropped.shutdown` count profiles dropped before they were
+queued, `failed` counts failed collections, and `collected` counts profiles
+collected and queued, not delivered.
 
 ## Behaviour changes
 

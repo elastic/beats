@@ -23,16 +23,13 @@ type scheduledProfileRequest struct {
 }
 
 // scheduledProfileMetrics are the osquerybeat.scheduled_query_profiles
-// counters. They shipped before the scheduled queue counted profile drops
-// under osquerybeat.publishing.scheduled, and stay for existing dashboards.
+// counters of the collection worker. Profiles dropped after collection are
+// counted under osquerybeat.publishing.scheduled.
 type scheduledProfileMetrics struct {
-	queueFull, stale, shutdown, failed, collected *monitoring.Uint
-	// outputFull counts profiles evicted from the full scheduled queue
-	// because the output did not keep up. Before the scheduled queue, it
-	// counted profiles a full output refused.
-	outputFull *monitoring.Uint
-	// expired counts profiles older than max_age when the worker reached them.
-	expired *monitoring.Uint
+	queueFull, stale, shutdown, failed *monitoring.Uint
+	// collected counts profiles collected and handed to the scheduled
+	// queue, not profiles delivered.
+	collected *monitoring.Uint
 }
 
 func newScheduledProfileMetrics(reg *monitoring.Registry) *scheduledProfileMetrics {
@@ -41,13 +38,11 @@ func newScheduledProfileMetrics(reg *monitoring.Registry) *scheduledProfileMetri
 	}
 	reg = reg.GetOrCreateRegistry("osquerybeat.scheduled_query_profiles")
 	return &scheduledProfileMetrics{
-		queueFull:  monitoring.NewUint(reg, "dropped.queue_full"),
-		stale:      monitoring.NewUint(reg, "dropped.stale"),
-		shutdown:   monitoring.NewUint(reg, "dropped.shutdown"),
-		outputFull: monitoring.NewUint(reg, "dropped.output_full"),
-		expired:    monitoring.NewUint(reg, "dropped.expired"),
-		failed:     monitoring.NewUint(reg, "failed"),
-		collected:  monitoring.NewUint(reg, "collected"),
+		queueFull: monitoring.NewUint(reg, "dropped.queue_full"),
+		stale:     monitoring.NewUint(reg, "dropped.stale"),
+		shutdown:  monitoring.NewUint(reg, "dropped.shutdown"),
+		failed:    monitoring.NewUint(reg, "failed"),
+		collected: monitoring.NewUint(reg, "collected"),
 	}
 }
 

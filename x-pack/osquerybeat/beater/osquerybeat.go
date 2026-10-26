@@ -179,7 +179,7 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 			return pub.NewScheduled(b, log, allowed, dropped, cut)
 		}, bt.handleScheduledQueryResult)
 	bt.scheduledResults.profile = bt.enqueueScheduledProfile
-	bt.profileMetrics = bt.scheduledResults.profileMetrics
+	bt.profileMetrics = newScheduledProfileMetrics(b.Monitoring.StatsRegistry())
 
 	profileCfg := config.GetQueryProfileStorageConfig(c.Inputs)
 	if profileCfg.EnabledOrDefault() {
