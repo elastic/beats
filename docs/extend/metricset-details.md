@@ -54,7 +54,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 ### Timeout Connections to Services [_timeout_connections_to_services]
 
-Each time the `Fetch` method is called, it makes a request to the service, so it’s important to handle the connections correctly. We recommended that you set up the connections in the `New` method and persist them in the `MetricSet` object. This allows connections to be reused.
+Each time the `Fetch` method is called, it makes a request to the service, so it’s important to handle the connections correctly. We recommend that you set up the connections in the `New` method and persist them in the `MetricSet` object. This allows connections to be reused.
 
 One very important point is that connections must respect the timeout variable: `base.Module().Config().Timeout`. If the timeout elapses before the request completes, the request must be ended and an error must be returned to make sure the next request can be started on time. By default the Timeout is set to Period, so one request gets ended before a new request is made.
 
