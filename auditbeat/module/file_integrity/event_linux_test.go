@@ -149,7 +149,7 @@ func TestNewEventFromQuarkEventKeepsHashAndParserErrors(t *testing.T) {
 	qe.Process.Proc.Valid = false
 	parseErr := errors.New("parse failed")
 
-	event, ok := NewEventFromQuarkEvent(qe, 1024, []HashType{SHA1}, []FileParser{failingParser{parseErr}}, notExcluded)
+	event, ok := NewEventFromQuarkEvent(qe, 1024, []HashType{SHA256}, []FileParser{failingParser{parseErr}}, notExcluded)
 	require.True(t, ok, "event should be produced")
 	assert.Len(t, event.errors, 2, "process and parser errors are both kept: %v", event.errors)
 	assert.ErrorIs(t, errors.Join(event.errors...), parseErr, "parser error is kept")
