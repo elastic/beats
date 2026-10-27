@@ -550,6 +550,61 @@ func TestNewForReceiverConnects(t *testing.T) {
 	require.NoError(t, p.Disconnect(context.Background()))
 }
 
+// TestReceiverClientPublishContextCancel checks that a Beat receiver client can
+// cancel a publish blocked on a full queue. The receiver pipeline wraps its
+// producers in trackedProducer, which must forward PublishContext.
+func TestReceiverClientPublishContextCancel(t *testing.T) {
+	const events = 32 // the smallest queue.mem.events allowed
+	var queueCfg conf.Namespace
+	err := conf.MustNewConfigFrom(map[string]any{
+		"mem": map[string]any{"events": events, "flush.min_events": 1},
+	}).Unpack(&queueCfg)
+	require.NoError(t, err, "the queue config must unpack")
+	p, err := NewForReceiver(beatInfoNoDrain(t), monitorsForTest(), queueCfg, Settings{})
+	require.NoError(t, err, "NewForReceiver must succeed")
+	bc, err := p.ConnectWith(beat.ClientConfig{})
+	require.NoError(t, err, "ConnectWith must succeed")
+	defer bc.Close()
+	// Runs first: force-closes the queue, so a publish that ignored its ctx
+	// cannot block bc.Close.
+	defer func() { _ = p.Disconnect(cancelledContext()) }()
+
+	cp, ok := bc.(beat.ContextPublisher)
+	require.True(t, ok, "the receiver client must implement beat.ContextPublisher")
+	for i := range events {
+		require.NoError(t, cp.PublishContext(t.Context(), beat.Event{}), "publish %d must fit in the queue", i)
+	}
+
+	ctx, cancel := context.WithTimeout(t.Context(), 50*time.Millisecond)
+	defer cancel()
+	errc := make(chan error, 1)
+	go func() { errc <- cp.PublishContext(ctx, beat.Event{}) }()
+	select {
+	case err := <-errc:
+		assert.ErrorIs(t, err, context.DeadlineExceeded, "a publish on a full receiver queue must stop at its ctx deadline")
+	case <-time.After(10 * time.Second):
+		t.Fatal("PublishContext on a full receiver queue ignored its ctx deadline")
+	}
+}
+
+// TestTrackedProducerPublishContextFallback checks that trackedProducer
+// publishes with Publish when its producer cannot cancel (the disk queue), and
+// reports a refused event as queue.ErrClosed.
+func TestTrackedProducerPublishContextFallback(t *testing.T) {
+	for _, accept := range []bool{true, false} {
+		p := &trackedProducer{Producer: &testProducer{
+			publish: func(bool, publisher.Event) (queue.EntryID, bool) { return 7, accept },
+		}}
+		id, err := p.PublishContext(t.Context(), publisher.Event{})
+		if accept {
+			assert.NoError(t, err, "an accepted event must not be an error")
+			assert.Equal(t, queue.EntryID(7), id, "the producer's entry ID must be returned")
+		} else {
+			assert.ErrorIs(t, err, queue.ErrClosed, "a refused event must be reported as ErrClosed")
+		}
+	}
+}
+
 func testEvent(i int) publisher.Event {
 	return publisher.Event{
 		Content: beat.Event{Private: i},
