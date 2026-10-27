@@ -53,7 +53,7 @@ func getSymbolInfoRuntime(symbolName string) (runtimeSymbolInfo, error) {
 //
 // An exact match for symbolName always returns immediately. The kernel may list
 // compiler-generated variants of a symbol before the symbol itself but only the
-// the plain symbol is a reliable probe target. A symbol is reported as optimised
+// plain symbol is a reliable probe target. A symbol is reported as optimised
 // when no exact match exists and a clone such as "name.constprop.0" or "name.isra.0"
 // does. Cold-path fragments ("name.cold") are not clones: the compiler splits rarely
 // executed blocks out of the function, which keeps its symbolName entry point, so these
