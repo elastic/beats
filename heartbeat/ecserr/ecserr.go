@@ -91,7 +91,7 @@ func NewSyntheticsCmdCouldNotStartErr(reason error) *ECSErr {
 	return NewECSErr(
 		TYPE_IO,
 		"SYNTHETICS_CMD_COULD_NOT_START",
-		fmt.Sprintf("could not start command not found: %s", reason),
+		fmt.Sprintf("could not start command: %s", reason),
 	)
 }
 
