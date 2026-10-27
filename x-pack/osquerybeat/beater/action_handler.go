@@ -34,7 +34,10 @@ type scheduledResponsePublisher interface {
 }
 
 type queryProfilePublisher interface {
-	PublishQueryProfile(ctx context.Context, index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any)
+	// PublishQueryProfile publishes a live query's profile and reports
+	// whether it was handed to the output: false when no profile stream is
+	// configured or ctx cancelled the publish.
+	PublishQueryProfile(ctx context.Context, index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) bool
 }
 
 type scheduledProfilePublisher interface {

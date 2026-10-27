@@ -38,7 +38,8 @@ func (m *mockBeatPublisher) PublishActionResult(req map[string]any, res map[stri
 func (m *mockBeatPublisher) PublishScheduledResponse(scheduleID, packID, packName, queryName, spaceID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64) {
 }
 
-func (m *mockBeatPublisher) PublishQueryProfile(_ context.Context, index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) {
+func (m *mockBeatPublisher) PublishQueryProfile(_ context.Context, index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) bool {
+	return true
 }
 
 func (m *mockBeatPublisher) PublishScheduledProfile(index, queryName, scheduleID, responseID, spaceID string, scheduleExecutionCount int64, profile map[string]any) {

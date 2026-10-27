@@ -126,7 +126,18 @@ func (d *liveResultDispatcher) publishResults(ctx context.Context, pub actionQue
 		reason = dropShutdown
 	case <-d.stopping:
 	}
-	d.abandon(it)
+	if !d.abandon(it) {
+		// The worker has it. Cancelling made a cancellable publish return,
+		// so wait for the worker's own count: a row can still have been
+		// queued as the publish was cancelled. A blocking Publish cannot be
+		// cancelled, so wait only briefly for it.
+		bound := time.NewTimer(liveCancelWait)
+		select {
+		case <-it.done:
+		case <-bound.C:
+		}
+		bound.Stop()
+	}
 
 	n := int(it.handed.Load())
 	lost := job.rows() - n
@@ -151,6 +162,10 @@ func (d *liveResultDispatcher) publishResults(ctx context.Context, pub actionQue
 	}
 	return n, liveDropErrors[reason]
 }
+
+// liveCancelWait bounds how long an action that stopped waiting waits for the
+// worker to return from a cancelled publish.
+const liveCancelWait = 100 * time.Millisecond
 
 // liveDropErrors are the action errors for each drop reason.
 var liveDropErrors = map[string]error{
@@ -183,13 +198,15 @@ func (d *liveResultDispatcher) push(it *liveItem) bool {
 }
 
 // abandon tells the worker to skip its remaining rows, and drops it if the
-// worker has not reached it.
-func (d *liveResultDispatcher) abandon(it *liveItem) {
+// worker has not reached it. It reports whether it dropped it.
+func (d *liveResultDispatcher) abandon(it *liveItem) bool {
 	it.cancelled.Store(true)
 	it.cancel()
 	d.mu.Lock()
 	defer d.mu.Unlock()
+	n := len(d.queue)
 	d.queue = slices.DeleteFunc(d.queue, func(q *liveItem) bool { return q == it })
+	return len(d.queue) < n
 }
 
 func (d *liveResultDispatcher) run() {
@@ -234,7 +251,7 @@ func (d *liveResultDispatcher) publish(it *liveItem) {
 	defer close(it.done)
 	j := it.job
 	if j.profile != nil && !d.abandoned(it) &&
-		publishQueryProfile(it.ctx, it.pub, j.profileIndex, j.actionID, j.responseID, j.spaceID, j.profile, j.reqData) {
+		it.pub.PublishQueryProfile(it.ctx, j.profileIndex, "", j.actionID, j.responseID, j.spaceID, j.profile, j.reqData) {
 		it.profiled.Store(true)
 	}
 	// stop runs before each hit, so its call count is the number of hits
@@ -256,16 +273,6 @@ func publishActionResult(p actionResultPublisher, req, res map[string]any) bool 
 		return c.publishActionResult(req, res)
 	}
 	p.PublishActionResult(req, res)
-	return true
-}
-
-// publishQueryProfile publishes a live query's profile and reports whether a
-// client took it. Only liveClients can report a miss.
-func publishQueryProfile(ctx context.Context, p actionQueryPublisher, index, actionID, responseID, spaceID string, profile map[string]any, reqData any) bool {
-	if c, ok := p.(*liveClients); ok {
-		return c.publishQueryProfile(ctx, index, "", actionID, responseID, spaceID, profile, reqData)
-	}
-	p.PublishQueryProfile(ctx, index, "", actionID, responseID, spaceID, profile, reqData)
 	return true
 }
 
@@ -366,8 +373,8 @@ func (c *liveClients) PublishEach(ctx context.Context, index, idValue, idFieldKe
 	return l.pub.PublishEach(ctx, index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName, meta, hits, ecsm, reqData, stop)
 }
 
-func (c *liveClients) PublishQueryProfile(ctx context.Context, index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) {
-	c.publishQueryProfile(ctx, index, queryName, actionID, responseID, spaceID, profile, reqData)
+func (c *liveClients) PublishQueryProfile(ctx context.Context, index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) bool {
+	return c.publishQueryProfile(ctx, index, queryName, actionID, responseID, spaceID, profile, reqData)
 }
 
 // publishQueryProfile is PublishQueryProfile, reporting false when no clients
@@ -381,8 +388,7 @@ func (c *liveClients) publishQueryProfile(ctx context.Context, index, queryName,
 	if !l.profiles {
 		return false
 	}
-	l.pub.PublishQueryProfile(ctx, index, queryName, actionID, responseID, spaceID, profile, reqData)
-	return true
+	return l.pub.PublishQueryProfile(ctx, index, queryName, actionID, responseID, spaceID, profile, reqData)
 }
 
 func (c *liveClients) PublishActionResult(req, res map[string]any) {

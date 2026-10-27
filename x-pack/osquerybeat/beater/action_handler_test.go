@@ -64,9 +64,10 @@ func (p *mockPublisher) PublishEach(_ context.Context, index, idValue, idFieldKe
 	return len(hits)
 }
 
-func (p *mockPublisher) PublishQueryProfile(_ context.Context, index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) {
+func (p *mockPublisher) PublishQueryProfile(_ context.Context, index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) bool {
 	p.profile = profile
 	p.profileSpaceID = spaceID
+	return true
 }
 
 func TestActionHandlerExecute(t *testing.T) {

@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pub"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -41,11 +42,16 @@ var stuckQueues = []struct {
 // stuckRows is more rows than a stuck queue holds, so publishing them blocks.
 const stuckRows = 64
 
-// cancelBound is how soon a cancelled publish must release its worker.
-const cancelBound = 100 * time.Millisecond
+// releaseBound is how soon a cancelled publish must release its worker. It
+// is generous because it is wall-clock time under -race and load; without
+// cancellation the worker is never released.
+const releaseBound = time.Second
+
+// stillBlocked is how long a publish that must not be cancelled is watched.
+const stillBlocked = 100 * time.Millisecond
 
 // stuckOutput holds every batch until it is unblocked, then counts its
-// events as delivered.
+// events, except filler events, as delivered.
 type stuckOutput struct {
 	release   chan struct{}
 	once      sync.Once
@@ -55,7 +61,11 @@ type stuckOutput struct {
 func (o *stuckOutput) Publish(ctx context.Context, batch publisher.Batch) error {
 	select {
 	case <-o.release:
-		o.delivered.Add(int64(len(batch.Events())))
+		for _, e := range batch.Events() {
+			if _, filler := e.Content.Fields["filler"]; !filler {
+				o.delivered.Add(1)
+			}
+		}
 	case <-ctx.Done():
 	}
 	batch.ACK()
@@ -191,8 +201,8 @@ func TestScheduledWorkerCancelsBlockedPublishOnShutdown(t *testing.T) {
 			d.stop()
 			select {
 			case <-d.done:
-			case <-time.After(cancelBound):
-				t.Errorf("the worker blocked on the full queue did not return within %v of shutdown", cancelBound)
+			case <-time.After(releaseBound):
+				t.Errorf("the worker blocked on the full queue did not return within %v of shutdown", releaseBound)
 			}
 
 			pipe.close(t)
@@ -219,7 +229,7 @@ func TestScheduledPolicyChangeCancelsBlockedPublish(t *testing.T) {
 			// longer routes the item in flight.
 			require.NoError(t, d.configure(stuckScheduledInputs("other"), config.ScheduledPublishingConfig{MaxEvents: config.DefaultScheduledMaxEvents}), "change the policy")
 			// The worker counts the cut item when it finishes the item.
-			assert.Eventually(t, func() bool { return d.metrics.dropped[dropStale].Get() == 1 }, cancelBound, time.Millisecond,
+			assert.Eventually(t, func() bool { return d.metrics.dropped[dropStale].Get() == 1 }, releaseBound, time.Millisecond,
 				"a policy that no longer routes the item must release the worker blocked on the full queue")
 
 			d.stop()
@@ -241,7 +251,7 @@ func TestScheduledPolicyChangeKeepsRoutedPublish(t *testing.T) {
 	pipe.waitBlocked(t)
 
 	require.NoError(t, d.configure(stuckScheduledInputs("default"), config.ScheduledPublishingConfig{MaxEvents: config.DefaultScheduledMaxEvents}), "change the policy")
-	time.Sleep(cancelBound)
+	time.Sleep(stillBlocked)
 	assert.False(t, pipe.idle(), "a policy that still routes the item must not cancel its publish")
 
 	pipe.output.unblock()
@@ -268,7 +278,7 @@ func TestScheduledWorkerWithoutContextPublisherBlocks(t *testing.T) {
 	select {
 	case <-d.done:
 		t.Error("a blocking Publish cannot be cancelled, so the worker must still wait")
-	case <-time.After(cancelBound):
+	case <-time.After(stillBlocked):
 	}
 
 	pipe.close(t)
@@ -296,13 +306,48 @@ func TestLiveTimeoutCancelsBlockedPublish(t *testing.T) {
 			assert.ErrorIs(t, err, errLivePublishTimeout, "the stuck output must time out the action")
 			assert.Positive(t, n, "rows queued before the queue filled are handed over")
 			assert.Equal(t, uint64(stuckRows-n), d.metrics.droppedRows[dropTimeout].Get(), "count the rows not handed to the output")
-			assert.Eventually(t, pipe.idle, cancelBound, time.Millisecond,
+			assert.Eventually(t, pipe.idle, releaseBound, time.Millisecond,
 				"the timeout must release the worker blocked on the full queue")
 
 			c.Close()
 			d.stop()
 			pipe.close(t)
 			assert.Equal(t, int64(n), pipe.output.delivered.Load(), "only the rows handed over before the timeout are delivered, none late")
+		})
+	}
+}
+
+func TestLiveTimeoutCountsCancelledProfile(t *testing.T) {
+	for _, q := range stuckQueues {
+		t.Run(q.name, func(t *testing.T) {
+			log := logp.NewNopLogger()
+			pipe := newStuckPipeline(t, q.cfg)
+			// Fill the queue, so the profile, published before the rows,
+			// is the publish that blocks.
+			filler, err := pipe.Pipeline.ConnectWith(beat.ClientConfig{})
+			require.NoError(t, err, "connect the filler client")
+			for range 32 {
+				filler.Publish(beat.Event{Timestamp: time.Now(), Fields: mapstr.M{"filler": true}})
+			}
+			c := &liveClients{newPublisher: func() liveQueryPublisher { return pub.New(&beat.Beat{Publisher: pipe}, log) }}
+			require.NoError(t, c.Configure([]config.InputConfig{
+				{Datastream: config.DatastreamConfig{Dataset: config.DefaultDataset}},
+				{Datastream: config.DatastreamConfig{Dataset: config.DefaultQueryProfileDataset}},
+			}), "configure live result and profile clients")
+			d := newLiveResultDispatcher(monitoring.NewRegistry(), log, 200*time.Millisecond)
+			job := liveJob{actionID: "a1", hits: []map[string]any{{"row": 1}, {"row": 2}}, profile: map[string]any{}}
+
+			n, err := d.publishResults(t.Context(), c, job)
+			assert.ErrorIs(t, err, errLivePublishTimeout, "the stuck output must time out the action")
+			assert.Zero(t, n, "no row was handed over")
+			assert.Equal(t, uint64(1), d.metrics.dropped[dropTimeout].Get(), "count the timed-out action")
+			assert.Equal(t, uint64(3), d.metrics.droppedRows[dropTimeout].Get(), "count the cancelled profile and both rows")
+
+			c.Close()
+			d.stop()
+			assert.NoError(t, filler.Close(), "close the filler client")
+			pipe.close(t)
+			assert.Zero(t, pipe.output.delivered.Load(), "the cancelled profile and rows are never delivered")
 		})
 	}
 }

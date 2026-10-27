@@ -357,10 +357,11 @@ func (p *Publisher) publishActionResponseEvent(fields map[string]any, timestamp 
 	}
 }
 
-// PublishQueryProfile publishes a live query's profile. ctx stops it waiting for
-// room in the queue, as in PublishEach.
-func (p *Publisher) PublishQueryProfile(ctx context.Context, index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) {
-	p.publishProfile(ctx, index, queryProfileToEvent(queryName, actionID, responseID, spaceID, profile, reqData, "", 0))
+// PublishQueryProfile publishes a live query's profile and reports whether it
+// was handed to the client. ctx stops it waiting for room in the queue, as in
+// PublishEach.
+func (p *Publisher) PublishQueryProfile(ctx context.Context, index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) bool {
+	return p.publishProfile(ctx, index, queryProfileToEvent(queryName, actionID, responseID, spaceID, profile, reqData, "", 0))
 }
 
 // PublishScheduledProfile publishes the profile of one scheduled query run,
@@ -370,7 +371,9 @@ func (p *Publisher) PublishScheduledProfile(index, queryName, scheduleID, respon
 	p.publishProfile(p.ctx, index, queryProfileToEvent(queryName, "", responseID, spaceID, profile, nil, scheduleID, scheduleExecutionCount))
 }
 
-func (p *Publisher) publishProfile(ctx context.Context, index string, fields mapstr.M) {
+// publishProfile publishes a profile document and reports whether it was handed
+// to the client.
+func (p *Publisher) publishProfile(ctx context.Context, index string, fields mapstr.M) bool {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
@@ -379,10 +382,10 @@ func (p *Publisher) publishProfile(ctx context.Context, index string, fields map
 			p.log.Info("Query profile stream is not configured. Query profile events will be dropped.")
 			p.profileDropWarnLogged = true
 		}
-		return
+		return false
 	}
 	if p.retired(1) {
-		return
+		return false
 	}
 
 	event := beat.Event{
@@ -397,7 +400,9 @@ func (p *Publisher) publishProfile(ctx context.Context, index string, fields map
 
 	if !p.publish(ctx, p.queryProfileClient, event) {
 		p.skip(1)
+		return false
 	}
+	return true
 }
 
 // queryProfileToEvent builds the field set for a query profile document.
