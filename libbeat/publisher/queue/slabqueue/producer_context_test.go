@@ -37,10 +37,13 @@ type publishResult struct {
 
 // publishAsync runs PublishContext on its own goroutine and delivers the
 // result on the returned channel.
-func publishAsync(ctx context.Context, p queue.Producer[int], v int) <-chan publishResult {
+func publishAsync(t *testing.T, ctx context.Context, p queue.Producer[int], v int) <-chan publishResult {
+	t.Helper()
+	cp, ok := p.(queue.ContextProducer[int])
+	require.True(t, ok, "slabqueue producers must implement queue.ContextProducer")
 	ch := make(chan publishResult, 1)
 	go func() {
-		id, err := p.(queue.ContextProducer[int]).PublishContext(ctx, v)
+		id, err := cp.PublishContext(ctx, v)
 		ch <- publishResult{id: id, err: err}
 	}()
 	return ch
@@ -54,7 +57,7 @@ func waitDeadline(t *testing.T, p queue.Producer[int]) {
 	ctx, cancel := context.WithTimeout(t.Context(), 50*time.Millisecond)
 	defer cancel()
 	start := time.Now()
-	res := publishAsync(ctx, p, 2)
+	res := publishAsync(t, ctx, p, 2)
 	synctest.Wait()
 	select {
 	case r := <-res:
@@ -131,9 +134,9 @@ func TestPublishContextCancelPassesPoolWakeup(t *testing.T) {
 		p := q.Producer(queue.ProducerConfig{})
 
 		ctx, cancel := context.WithCancel(t.Context())
-		cancelled := publishAsync(ctx, p, 1)
+		cancelled := publishAsync(t, ctx, p, 1)
 		synctest.Wait() // park the cancelled waiter first, so Signal picks it
-		waiting := publishAsync(t.Context(), p, 2)
+		waiting := publishAsync(t, t.Context(), p, 2)
 		synctest.Wait()
 
 		pool.releaseSlot(idx)
@@ -164,9 +167,9 @@ func TestPublishContextCancelPassesCapWakeup(t *testing.T) {
 		p := q.Producer(queue.ProducerConfig{})
 
 		ctx, cancel := context.WithCancel(t.Context())
-		cancelled := publishAsync(ctx, p, 1)
+		cancelled := publishAsync(t, ctx, p, 1)
 		synctest.Wait()
-		waiting := publishAsync(t.Context(), p, 2)
+		waiting := publishAsync(t, t.Context(), p, 2)
 		synctest.Wait()
 
 		q.releaseLive(1)
@@ -192,6 +195,8 @@ func TestPublishContextClosed(t *testing.T) {
 	q := pool.Connect()
 	p := q.Producer(queue.ProducerConfig{})
 	require.NoError(t, q.Close(true), "Close must succeed")
-	_, err := p.(queue.ContextProducer[int]).PublishContext(t.Context(), 1)
+	cp, ok := p.(queue.ContextProducer[int])
+	require.True(t, ok, "slabqueue producers must implement queue.ContextProducer")
+	_, err := cp.PublishContext(t.Context(), 1)
 	assert.ErrorIs(t, err, queue.ErrClosed, "PublishContext on a closed queue must return ErrClosed")
 }

@@ -186,7 +186,7 @@ func (p *ackProducer[T]) Publish(event T) (queue.EntryID, bool) {
 // ctx.Err(); the event is then never added. See queue.ContextProducer.
 func (p *ackProducer[T]) PublishContext(ctx context.Context, event T) (queue.EntryID, error) {
 	// Counted before enqueuing for the same reason as in Publish.
-	id := producerID(p.producedCount.Add(1)) //nolint:gosec // G115: monotonic per-producer publish count
+	id := producerID(p.producedCount.Add(1))
 	entryID, err := p.openState.publishContext(ctx, p.makePushRequest(event, id))
 	if err != nil {
 		// Never enqueued (publishContext guarantees it): undo the count.

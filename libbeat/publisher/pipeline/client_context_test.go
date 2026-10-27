@@ -231,7 +231,9 @@ func TestClientCloseReleasesPublishContext(t *testing.T) {
 			q := pool.Connect()
 			defer q.Close(true) // releases the publish if Close does not
 			entered := make(chan struct{}, 2)
-			p := &signallingProducer{Producer: q.Producer(queue.ProducerConfig{}), entered: entered}
+			qp, ok := q.Producer(queue.ProducerConfig{}).(queue.ContextProducer[publisher.Event])
+			require.True(t, ok, "slabqueue producers must implement queue.ContextProducer")
+			p := &signallingProducer{ContextProducer: qp, entered: entered}
 			listener := &mockClientListener{}
 			c := newContextTestClient(p, listener, nil)
 			require.NoError(t, c.PublishContext(tc.ctx, beat.Event{}), "the first publish must fill the queue")
@@ -258,13 +260,13 @@ func TestClientCloseReleasesPublishContext(t *testing.T) {
 // signallingProducer sends on entered each time PublishContext starts, so a
 // test knows the client holds its mutex.
 type signallingProducer struct {
-	queue.Producer[publisher.Event]
+	queue.ContextProducer[publisher.Event]
 	entered chan<- struct{}
 }
 
 func (p *signallingProducer) PublishContext(ctx context.Context, e publisher.Event) (queue.EntryID, error) {
 	p.entered <- struct{}{}
-	return p.Producer.(queue.ContextProducer[publisher.Event]).PublishContext(ctx, e)
+	return p.ContextProducer.PublishContext(ctx, e)
 }
 
 // TestClientPublishContextFiltered checks that an event dropped by processors
@@ -348,7 +350,9 @@ func TestConnectWithCancellablePublish(t *testing.T) {
 			bc, err := p.ConnectWith(beat.ClientConfig{EventListener: tc.el})
 			require.NoError(t, err, "ConnectWith must succeed")
 			defer bc.Close()
-			got := bc.(*client).ctxProducer != nil
+			cl, ok := bc.(*client)
+			require.True(t, ok, "ConnectWith must return a *client")
+			got := cl.ctxProducer != nil
 			assert.Equal(t, tc.want, got, "whether the client's publishes can be cancelled")
 		})
 	}
@@ -377,8 +381,7 @@ func BenchmarkClientPublish(b *testing.B) {
 	})
 	b.Run("PublishContext/cancellable", func(b *testing.B) {
 		c := newClient()
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		ctx := b.Context()
 		b.ReportAllocs()
 		for b.Loop() {
 			_ = c.PublishContext(ctx, beat.Event{})
