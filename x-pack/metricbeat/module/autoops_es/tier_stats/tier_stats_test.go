@@ -166,9 +166,9 @@ type seriesID struct {
 }
 
 const (
-	fixtureIndexNode   = "es-es-index-6865646ffb-br5jn"
-	fixtureSearchNodeA = "es-es-search-5d4d754484-d6hcl"
-	fixtureSearchNodeB = "es-es-search-5d4d754484-zq8mw"
+	fixtureIndexNode   = "es-es-index-5f6d8c9b7d-x2k4p"
+	fixtureSearchNodeA = "es-es-search-7c9d5b8f4-m8q2z"
+	fixtureSearchNodeB = "es-es-search-7c9d5b8f4-t6w9r"
 )
 
 // What each node served since the previous scrape of the main fixture.

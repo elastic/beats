@@ -8,8 +8,8 @@
   "resource_metrics": [
     {
       "resource_attributes": {
-        "project.id": "f5588895e7ae41018b1e601846c7f675",
-        "service.instance.id": "es-es-index-6865646ffb-br5jn",
+        "project.id": "0123456789abcdef0123456789abcdef",
+        "service.instance.id": "es-es-index-5f6d8c9b7d-x2k4p",
         "service.name": "elasticsearch",
         "node.tier": "index"
       },
@@ -294,8 +294,8 @@
     },
     {
       "resource_attributes": {
-        "project.id": "f5588895e7ae41018b1e601846c7f675",
-        "service.instance.id": "es-es-search-5d4d754484-d6hcl",
+        "project.id": "0123456789abcdef0123456789abcdef",
+        "service.instance.id": "es-es-search-7c9d5b8f4-m8q2z",
         "service.name": "elasticsearch",
         "node.tier": "search"
       },
