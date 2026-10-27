@@ -1350,3 +1350,59 @@ tasks information from cluster
     type: keyword
 
 
+## tier_stats [_tier_stats]
+
+```{applies_to}
+stack: beta 9.7.0
+```
+
+Request rate and latency of a tier of an Elasticsearch Serverless project, for one HTTP status code. There is one document per tier and HTTP status code with requests during the scrape (and always one for the successful, 2xx, requests), which adds the requests of every node of the tier.
+
+**`autoops_es.tier_stats.tier`**
+:   The tier that served the requests, such as `search` or `index`.
+
+    type: keyword
+
+
+**`autoops_es.tier_stats.status_code`**
+:   HTTP status code of the responses.
+
+    type: integer
+
+
+**`autoops_es.tier_stats.status_group`**
+:   Class of the HTTP status code, such as `2xx` or `5xx`.
+
+    type: keyword
+
+
+**`autoops_es.tier_stats.count_delta`**
+:   Number of requests since the previous scrape.
+
+    type: long
+
+
+**`autoops_es.tier_stats.duration_delta_in_millis`**
+:   Total duration of those requests in milliseconds.
+
+    type: double
+
+
+**`autoops_es.tier_stats.rate_per_second`**
+:   Requests per second since the previous scrape.
+
+    type: double
+
+
+**`autoops_es.tier_stats.latency_in_millis`**
+:   Average duration of a request in milliseconds. Only reported for successful (2xx) requests.
+
+    type: double
+
+
+**`autoops_es.tier_stats.timestamp_diff`**
+:   Milliseconds since the previous scrape.
+
+    type: long
+
+

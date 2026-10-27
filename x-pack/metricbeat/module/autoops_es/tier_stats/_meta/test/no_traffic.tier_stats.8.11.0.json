@@ -1,0 +1,45 @@
+{
+  "_nodes": {
+    "total": 2,
+    "successful": 2,
+    "failed": 0
+  },
+  "cluster_name": "es",
+  "resource_metrics": [
+    {
+      "resource_attributes": {
+        "service.instance.id": "es-es-index-6865646ffb-br5jn",
+        "service.name": "elasticsearch",
+        "node.tier": "index"
+      },
+      "metrics": {}
+    },
+    {
+      "resource_attributes": {
+        "service.instance.id": "es-es-search-5d4d754484-d6hcl",
+        "service.name": "elasticsearch",
+        "node.tier": "search"
+      },
+      "metrics": {}
+    }
+  ],
+  "missing_metrics": [
+    "es.rest.search.duration",
+    "es.rest.msearch.duration",
+    "es.rest.esql.duration",
+    "es.rest.count.duration",
+    "es.rest.search_scroll.duration",
+    "es.rest.prometheus_query.duration",
+    "es.rest.index.duration",
+    "es.rest.update.duration",
+    "es.rest.bulk.duration",
+    "es.rest.prometheus_write.duration",
+    "es.async.esql.duration",
+    "es.async.eql.duration",
+    "es.async.sql.duration",
+    "es.async.async_search.duration",
+    "es.async.reindex.duration",
+    "es.async.update_by_query.duration",
+    "es.async.delete_by_query.duration"
+  ]
+}

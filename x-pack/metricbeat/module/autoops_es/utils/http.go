@@ -111,6 +111,20 @@ func HandleHTTPResponse[T any](resp *http.Response, err error) (*T, error) {
 // FetchAPIData fetches data from the specified path using the provided MetricSet and deserializes it into the specified type T.
 func FetchAPIData[T any](m *elasticsearch.MetricSet, path string) (*T, error) {
 	m.SetServiceURI(path)
+	m.SetMethod(http.MethodGet)
+	m.SetBody(nil)
+
+	return HandleHTTPResponse[T](m.FetchResponse()) //nolint:bodyclose // the handler closes the body
+}
+
+// FetchAPIDataWithRequest is like FetchAPIData, but it sends the given HTTP method and JSON body instead of a plain GET.
+//
+// The Content-Type header stays set for later requests because the helper cannot remove a header, which is harmless on a GET without a body.
+func FetchAPIDataWithRequest[T any](m *elasticsearch.MetricSet, method string, path string, body []byte) (*T, error) {
+	m.SetServiceURI(path)
+	m.SetMethod(method)
+	m.SetBody(body)
+	m.SetHeader("Content-Type", "application/json")
 
 	return HandleHTTPResponse[T](m.FetchResponse()) //nolint:bodyclose // the handler closes the body
 }

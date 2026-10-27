@@ -1,0 +1,676 @@
+{
+  "_nodes": {
+    "total": 3,
+    "successful": 3,
+    "failed": 0
+  },
+  "cluster_name": "es",
+  "resource_metrics": [
+    {
+      "resource_attributes": {
+        "project.id": "f5588895e7ae41018b1e601846c7f675",
+        "service.instance.id": "es-es-index-6865646ffb-br5jn",
+        "service.name": "elasticsearch",
+        "node.tier": "index"
+      },
+      "metrics": {
+        "es.rest.bulk.duration": {
+          "type": "histogram",
+          "measurements": [
+            {
+              "sum": 5833615.346245014,
+              "count": 25277,
+              "min": 0.5,
+              "max": 999.0,
+              "boundaries": [
+                1,
+                5,
+                10,
+                25,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                2500,
+                5000,
+                10000,
+                30000
+              ],
+              "counts": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "attributes": {
+                "http.response.status_code": 200
+              }
+            }
+          ]
+        },
+        "es.rest.index.duration": {
+          "type": "histogram",
+          "measurements": [
+            {
+              "sum": 2233257.676029998,
+              "count": 6148,
+              "min": 0.5,
+              "max": 999.0,
+              "boundaries": [
+                1,
+                5,
+                10,
+                25,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                2500,
+                5000,
+                10000,
+                30000
+              ],
+              "counts": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "attributes": {
+                "http.response.status_code": 200
+              }
+            }
+          ]
+        },
+        "es.rest.update.duration": {
+          "type": "histogram",
+          "measurements": [
+            {
+              "sum": 233.379006,
+              "count": 2,
+              "min": 0.5,
+              "max": 999.0,
+              "boundaries": [
+                1,
+                5,
+                10,
+                25,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                2500,
+                5000,
+                10000,
+                30000
+              ],
+              "counts": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "attributes": {
+                "http.response.status_code": 201
+              }
+            },
+            {
+              "sum": 2528093.396533002,
+              "count": 10589,
+              "min": 0.5,
+              "max": 999.0,
+              "boundaries": [
+                1,
+                5,
+                10,
+                25,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                2500,
+                5000,
+                10000,
+                30000
+              ],
+              "counts": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "attributes": {
+                "http.response.status_code": 200
+              }
+            }
+          ]
+        },
+        "es.async.reindex.duration": {
+          "type": "histogram",
+          "measurements": [
+            {
+              "sum": 9000.0,
+              "count": 3,
+              "min": 0.5,
+              "max": 999.0,
+              "boundaries": [
+                1,
+                5,
+                10,
+                25,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                2500,
+                5000,
+                10000,
+                30000
+              ],
+              "counts": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "attributes": {
+                "http.response.status_code": 200
+              }
+            }
+          ]
+        },
+        "es.rest.unrequested.duration": {
+          "type": "histogram",
+          "measurements": [
+            {
+              "sum": 99.0,
+              "count": 99,
+              "min": 0.5,
+              "max": 999.0,
+              "boundaries": [
+                1,
+                5,
+                10,
+                25,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                2500,
+                5000,
+                10000,
+                30000
+              ],
+              "counts": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "attributes": {
+                "http.response.status_code": 200
+              }
+            }
+          ]
+        },
+        "es.example_counter": {
+          "type": "counter",
+          "measurements": [
+            {
+              "value": 42,
+              "attributes": {
+                "http.response.status_code": 200
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "resource_attributes": {
+        "project.id": "f5588895e7ae41018b1e601846c7f675",
+        "service.instance.id": "es-es-search-5d4d754484-d6hcl",
+        "service.name": "elasticsearch",
+        "node.tier": "search"
+      },
+      "metrics": {
+        "es.rest.esql.duration": {
+          "type": "histogram",
+          "measurements": [
+            {
+              "sum": 86167.42996900005,
+              "count": 6365,
+              "min": 0.5,
+              "max": 999.0,
+              "boundaries": [
+                1,
+                5,
+                10,
+                25,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                2500,
+                5000,
+                10000,
+                30000
+              ],
+              "counts": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "attributes": {
+                "http.response.status_code": 200
+              }
+            }
+          ]
+        },
+        "es.rest.search.duration": {
+          "type": "histogram",
+          "measurements": [
+            {
+              "sum": 60180.11679199977,
+              "count": 34506,
+              "min": 0.5,
+              "max": 999.0,
+              "boundaries": [
+                1,
+                5,
+                10,
+                25,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                2500,
+                5000,
+                10000,
+                30000
+              ],
+              "counts": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "attributes": {
+                "http.response.status_code": 200
+              }
+            },
+            {
+              "sum": 33.821721,
+              "count": 57,
+              "min": 0.5,
+              "max": 999.0,
+              "boundaries": [
+                1,
+                5,
+                10,
+                25,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                2500,
+                5000,
+                10000,
+                30000
+              ],
+              "counts": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "attributes": {
+                "http.response.status_code": 404
+              }
+            },
+            {
+              "sum": 20.0,
+              "count": 10,
+              "min": 0.5,
+              "max": 999.0,
+              "boundaries": [
+                1,
+                5,
+                10,
+                25,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                2500,
+                5000,
+                10000,
+                30000
+              ],
+              "counts": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "attributes": {
+                "http.response.status_code": 429
+              }
+            },
+            {
+              "sum": 3000.0,
+              "count": 3,
+              "min": 0.5,
+              "max": 999.0,
+              "boundaries": [
+                1,
+                5,
+                10,
+                25,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                2500,
+                5000,
+                10000,
+                30000
+              ],
+              "counts": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "attributes": {
+                "http.response.status_code": 500
+              }
+            }
+          ]
+        },
+        "es.rest.msearch.duration": {
+          "type": "histogram",
+          "measurements": [
+            {
+              "sum": 36737.239725999796,
+              "count": 19676,
+              "min": 0.5,
+              "max": 999.0,
+              "boundaries": [
+                1,
+                5,
+                10,
+                25,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                2500,
+                5000,
+                10000,
+                30000
+              ],
+              "counts": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "attributes": {
+                "http.response.status_code": 200
+              }
+            }
+          ]
+        },
+        "es.rest.count.duration": {
+          "type": "histogram",
+          "measurements": [
+            {
+              "sum": 5.0,
+              "count": 5,
+              "attributes": {}
+            }
+          ]
+        }
+      }
+    },
+    {
+      "resource_attributes": {
+        "project.id": "f5588895e7ae41018b1e601846c7f675",
+        "service.instance.id": "es-es-search-5d4d754484-zq8mw",
+        "service.name": "elasticsearch",
+        "node.tier": "search"
+      },
+      "metrics": {
+        "es.rest.search.duration": {
+          "type": "histogram",
+          "measurements": [
+            {
+              "sum": 2000.0,
+              "count": 1000,
+              "min": 0.5,
+              "max": 999.0,
+              "boundaries": [
+                1,
+                5,
+                10,
+                25,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                2500,
+                5000,
+                10000,
+                30000
+              ],
+              "counts": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "attributes": {
+                "http.response.status_code": 200
+              }
+            }
+          ]
+        },
+        "es.async.esql.duration": {
+          "type": "histogram",
+          "measurements": [
+            {
+              "sum": 4000.0,
+              "count": 2,
+              "min": 0.5,
+              "max": 999.0,
+              "boundaries": [
+                1,
+                5,
+                10,
+                25,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                2500,
+                5000,
+                10000,
+                30000
+              ],
+              "counts": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "attributes": {
+                "http.response.status_code": 200
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "missing_metrics": [
+    "es.rest.prometheus_write.duration",
+    "es.rest.prometheus_query.duration",
+    "es.rest.search_scroll.duration"
+  ]
+}

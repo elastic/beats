@@ -1,0 +1,42 @@
+- name: tier_stats
+  type: group
+  release: beta
+  version:
+    beta: 9.7.0
+  description: >
+    Request rate and latency of a tier of an Elasticsearch Serverless project, for one HTTP status code. There is one document per tier and
+    HTTP status code with requests during the scrape (and always one for the successful, 2xx, requests), which adds the requests of every node
+    of the tier.
+  fields:
+    - name: tier
+      type: keyword
+      description: >
+        The tier that served the requests, such as `search` or `index`.
+    - name: status_code
+      type: integer
+      description: >
+        HTTP status code of the responses.
+    - name: status_group
+      type: keyword
+      description: >
+        Class of the HTTP status code, such as `2xx` or `5xx`.
+    - name: count_delta
+      type: long
+      description: >
+        Number of requests since the previous scrape.
+    - name: duration_delta_in_millis
+      type: double
+      description: >
+        Total duration of those requests in milliseconds.
+    - name: rate_per_second
+      type: double
+      description: >
+        Requests per second since the previous scrape.
+    - name: latency_in_millis
+      type: double
+      description: >
+        Average duration of a request in milliseconds. Only reported for successful (2xx) requests.
+    - name: timestamp_diff
+      type: long
+      description: >
+        Milliseconds since the previous scrape.

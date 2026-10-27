@@ -8,9 +8,13 @@ import (
 	"github.com/elastic/elastic-agent-libs/version"
 )
 
+// BuildFlavorServerless is the `version.build_flavor` reported by Elasticsearch Serverless.
+const BuildFlavorServerless = "serverless"
+
 type ClusterInfoVersion struct {
 	Number       *version.V `json:"number"`
 	Distribution string     `json:"distribution,omitempty"`
+	BuildFlavor  string     `json:"build_flavor,omitempty"`
 }
 
 // Info construct contains the data from the cluster / endpoint
@@ -18,6 +22,11 @@ type ClusterInfo struct {
 	ClusterName string             `json:"cluster_name"`
 	ClusterID   string             `json:"cluster_uuid"`
 	Version     ClusterInfoVersion `json:"version"`
+}
+
+// IsServerless reports whether the cluster is Elasticsearch Serverless.
+func (i *ClusterInfo) IsServerless() bool {
+	return i != nil && i.Version.BuildFlavor == BuildFlavorServerless
 }
 
 // ClusterInfoError represents an error related to cluster information retrieval.
