@@ -58,11 +58,12 @@ func (p *gatedLivePublisher) PublishEach(_ context.Context, _, idValue, _, _, _,
 	return len(hits)
 }
 
-func (p *gatedLivePublisher) PublishQueryProfile(_ context.Context, _, _, actionID, _, _ string, _ map[string]any, _ any) {
+func (p *gatedLivePublisher) PublishQueryProfile(_ context.Context, _, _, actionID, _, _ string, _ map[string]any, _ any) bool {
 	if p.blockProfile {
 		<-p.release
 	}
 	p.record(actionID + " profile")
+	return true
 }
 
 func (p *gatedLivePublisher) PublishActionResult(req, _ map[string]any) {
@@ -139,6 +140,42 @@ func TestExecuteHealthyPublishesAll(t *testing.T) {
 		assert.Equal(t, []string{"a1 row 1", "a1 row 2", "a1 row 3", "a1 row 4", "a1 row 5"}, pub.snapshot(),
 			"publish every row in order")
 		assert.Zero(t, d.metrics.droppedRows[dropTimeout].Get(), "a healthy output drops no rows")
+
+		d.stop()
+	})
+}
+
+// queuedOnCancelPublisher blocks on hit blockAt until its context ends, and
+// then reports that hit as queued anyway, as a memqueue PublishContext does
+// when the queue takes the row as the context ends.
+type queuedOnCancelPublisher struct{ blockAt int }
+
+func (p queuedOnCancelPublisher) PublishEach(ctx context.Context, _, _, _, _, _, _, _, _ string, _ map[string]any, hits []map[string]any, _ ecs.Mapping, _ any, stop func() bool) int {
+	for i := range hits {
+		if stop() {
+			return i
+		}
+		if i == p.blockAt {
+			<-ctx.Done()
+		}
+	}
+	return len(hits)
+}
+
+func (queuedOnCancelPublisher) PublishQueryProfile(context.Context, string, string, string, string, string, map[string]any, any) bool {
+	return true
+}
+
+func TestLiveTimeoutCountsRowQueuedAsCancelled(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		d := newLiveResultDispatcher(monitoring.NewRegistry(), logptest.NewTestingLogger(t, ""), 100*time.Millisecond)
+		hits := make([]map[string]any, 5)
+
+		n, err := d.publishResults(t.Context(), queuedOnCancelPublisher{blockAt: 2}, liveJob{actionID: "a1", hits: hits})
+
+		assert.ErrorIs(t, err, errLivePublishTimeout, "the action timed out")
+		assert.Equal(t, 3, n, "the row queued as its publish was cancelled is handed over")
+		assert.Equal(t, uint64(2), d.metrics.droppedRows[dropTimeout].Get(), "count only the rows that were not queued")
 
 		d.stop()
 	})
