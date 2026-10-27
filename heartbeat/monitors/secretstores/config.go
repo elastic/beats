@@ -43,6 +43,14 @@ type entry struct {
 	// settings is the raw entry, credentials included, used to identify the
 	// connection.
 	settings map[string]any
+	// allowedHosts are the normalized hosts the secrets of the connection can
+	// be sent to. Empty means any host.
+	allowedHosts map[string]bool
+}
+
+// isRestricted reports whether the connection has allowed_hosts.
+func (e entry) isRestricted() bool {
+	return len(e.allowedHosts) > 0
 }
 
 // parseEntries converts the unpacked secret_stores value into entries.
@@ -90,13 +98,27 @@ func parseEntries(raw any) ([]entry, error) {
 			return nil, fmt.Errorf("%s: duplicate %q entry name %q", ConfigKey, storeType, name)
 		}
 		seen[key] = true
-		// PathSep("") keeps keys literal; values are already resolved and
-		// must not be expanded again.
-		cfg, err := ucfg.NewFrom(m, ucfg.PathSep(""))
+		allowedHosts, err := parseAllowedHosts(m[allowedHostsKey])
 		if err != nil {
 			return nil, fmt.Errorf("%s: entry %d: %w", ConfigKey, i, err)
 		}
-		entries = append(entries, entry{storeType: storeType, name: name, config: (*conf.C)(cfg), settings: m})
+		// The resolver enforces allowed_hosts, not the store: connections that
+		// only differ by it share a store.
+		settings := maps.Clone(m)
+		delete(settings, allowedHostsKey)
+		// PathSep("") keeps keys literal; values are already resolved and
+		// must not be expanded again.
+		cfg, err := ucfg.NewFrom(settings, ucfg.PathSep(""))
+		if err != nil {
+			return nil, fmt.Errorf("%s: entry %d: %w", ConfigKey, i, err)
+		}
+		entries = append(entries, entry{
+			storeType:    storeType,
+			name:         name,
+			config:       (*conf.C)(cfg),
+			settings:     settings,
+			allowedHosts: allowedHosts,
+		})
 	}
 	return entries, nil
 }
