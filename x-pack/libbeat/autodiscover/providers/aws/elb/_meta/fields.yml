@@ -42,7 +42,7 @@
         - name: security_groups
           type: keyword
           example: sg-a1b555d4
-          description: List of security groups for this
+          description: List of security groups for this ELB
         - name: created
           type: date
           example: 2019-06-12T21:55:14.490Z
