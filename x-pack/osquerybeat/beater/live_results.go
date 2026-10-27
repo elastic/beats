@@ -50,6 +50,10 @@ type liveItem struct {
 	profiled  atomic.Bool   // set once job's profile is handed to Publish
 	cancelled atomic.Bool   // set when the waiting action gives up
 	done      chan struct{} // closed when the worker is finished with job
+	// ctx is cancelled when the waiting action gives up. Clients that
+	// implement beat.ContextPublisher then stop waiting for the output.
+	ctx    context.Context
+	cancel context.CancelFunc
 
 	resPub   actionResultPublisher
 	req, res map[string]any
@@ -95,11 +99,14 @@ func (d *liveResultDispatcher) setTimeout(timeout time.Duration) {
 // publishResults hands job's profile and hits to the worker and waits until
 // all hits are handed to Publish, ctx is done, the timeout elapses or the
 // dispatcher stops. It returns the number of hits handed over. Hits not
-// handed over by then are skipped; one already inside a blocked Publish cannot
-// be pulled back and may be delivered late. ctx is the agent client's
-// lifetime context, so its end counts as a shutdown.
+// handed over by then are skipped. A client that implements
+// beat.ContextPublisher stops waiting for the output then; with any other
+// client, a hit already inside a blocked Publish cannot be pulled back and
+// may be delivered late. ctx is the agent client's lifetime context, so its
+// end counts as a shutdown.
 func (d *liveResultDispatcher) publishResults(ctx context.Context, pub actionQueryPublisher, job liveJob) (int, error) {
 	it := &liveItem{job: job, pub: pub, done: make(chan struct{})}
+	it.ctx, it.cancel = context.WithCancel(context.Background())
 	if !d.push(it) {
 		d.metrics.drop(dropShutdown, job.rows())
 		return 0, errLiveShutdown
@@ -179,6 +186,7 @@ func (d *liveResultDispatcher) push(it *liveItem) bool {
 // worker has not reached it.
 func (d *liveResultDispatcher) abandon(it *liveItem) {
 	it.cancelled.Store(true)
+	it.cancel()
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	d.queue = slices.DeleteFunc(d.queue, func(q *liveItem) bool { return q == it })
@@ -226,7 +234,7 @@ func (d *liveResultDispatcher) publish(it *liveItem) {
 	defer close(it.done)
 	j := it.job
 	if j.profile != nil && !d.abandoned(it) &&
-		publishQueryProfile(it.pub, j.profileIndex, j.actionID, j.responseID, j.spaceID, j.profile, j.reqData) {
+		publishQueryProfile(it.ctx, it.pub, j.profileIndex, j.actionID, j.responseID, j.spaceID, j.profile, j.reqData) {
 		it.profiled.Store(true)
 	}
 	// stop runs before each hit, so its call count is the number of hits
@@ -237,7 +245,7 @@ func (d *liveResultDispatcher) publish(it *liveItem) {
 		handed++
 		return d.abandoned(it)
 	}
-	n := it.pub.PublishEach(j.index, j.actionID, "action_id", j.responseID, j.spaceID, "", "", "", nil, j.hits, j.ecsm, j.reqData, stop)
+	n := it.pub.PublishEach(it.ctx, j.index, j.actionID, "action_id", j.responseID, j.spaceID, "", "", "", nil, j.hits, j.ecsm, j.reqData, stop)
 	it.handed.Store(int64(n))
 }
 
@@ -253,11 +261,11 @@ func publishActionResult(p actionResultPublisher, req, res map[string]any) bool 
 
 // publishQueryProfile publishes a live query's profile and reports whether a
 // client took it. Only liveClients can report a miss.
-func publishQueryProfile(p actionQueryPublisher, index, actionID, responseID, spaceID string, profile map[string]any, reqData any) bool {
+func publishQueryProfile(ctx context.Context, p actionQueryPublisher, index, actionID, responseID, spaceID string, profile map[string]any, reqData any) bool {
 	if c, ok := p.(*liveClients); ok {
-		return c.publishQueryProfile(index, "", actionID, responseID, spaceID, profile, reqData)
+		return c.publishQueryProfile(ctx, index, "", actionID, responseID, spaceID, profile, reqData)
 	}
-	p.PublishQueryProfile(index, "", actionID, responseID, spaceID, profile, reqData)
+	p.PublishQueryProfile(ctx, index, "", actionID, responseID, spaceID, profile, reqData)
 	return true
 }
 
@@ -349,22 +357,22 @@ func (c *liveClients) swap(next *liveLease) {
 	}
 }
 
-func (c *liveClients) PublishEach(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any, stop func() bool) int {
+func (c *liveClients) PublishEach(ctx context.Context, index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any, stop func() bool) int {
 	l := c.acquire()
 	if l == nil {
 		return 0
 	}
 	defer l.release()
-	return l.pub.PublishEach(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName, meta, hits, ecsm, reqData, stop)
+	return l.pub.PublishEach(ctx, index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName, meta, hits, ecsm, reqData, stop)
 }
 
-func (c *liveClients) PublishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) {
-	c.publishQueryProfile(index, queryName, actionID, responseID, spaceID, profile, reqData)
+func (c *liveClients) PublishQueryProfile(ctx context.Context, index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) {
+	c.publishQueryProfile(ctx, index, queryName, actionID, responseID, spaceID, profile, reqData)
 }
 
 // publishQueryProfile is PublishQueryProfile, reporting false when no clients
 // or no profile stream are configured.
-func (c *liveClients) publishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) bool {
+func (c *liveClients) publishQueryProfile(ctx context.Context, index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) bool {
 	l := c.acquire()
 	if l == nil {
 		return false
@@ -373,7 +381,7 @@ func (c *liveClients) publishQueryProfile(index, queryName, actionID, responseID
 	if !l.profiles {
 		return false
 	}
-	l.pub.PublishQueryProfile(index, queryName, actionID, responseID, spaceID, profile, reqData)
+	l.pub.PublishQueryProfile(ctx, index, queryName, actionID, responseID, spaceID, profile, reqData)
 	return true
 }
 

@@ -636,7 +636,7 @@ func TestPublishEachStops(t *testing.T) {
 	hits := []map[string]any{{"n": 1}, {"n": 2}, {"n": 3}}
 
 	calls := 0
-	n := p.PublishEach("index", "action", "action_id", "", "", "", "", "", nil, hits, nil, nil, func() bool {
+	n := p.PublishEach(t.Context(), "index", "action", "action_id", "", "", "", "", "", nil, hits, nil, nil, func() bool {
 		calls++
 		return calls > 2
 	})
@@ -645,6 +645,6 @@ func TestPublishEachStops(t *testing.T) {
 	published := client.snapshot()
 	require.Len(t, published, 2, "publish only the rows before stop returned true")
 	assert.Equal(t, map[string]any{"n": 2}, published[1].Fields["osquery"], "publish rows in order")
-	n = p.PublishEach("index", "action", "action_id", "", "", "", "", "", nil, hits, nil, nil, func() bool { return false })
+	n = p.PublishEach(t.Context(), "index", "action", "action_id", "", "", "", "", "", nil, hits, nil, nil, func() bool { return false })
 	assert.Equal(t, 3, n, "publish every row when stop never returns true")
 }

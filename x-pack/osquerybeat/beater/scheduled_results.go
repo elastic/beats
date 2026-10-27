@@ -121,17 +121,22 @@ type scheduledResultLease struct {
 	retired   atomic.Bool
 	publisher osquerybeatPublisher
 	view      *ConfigPlugin
-	profiles  bool            // whether the policy has a query profile stream
-	ctx       context.Context // accessed only while the worker holds mu
-	item      scheduledItem   // the item being published; accessed only while the worker holds mu
-	cut       int             // rows the publisher skipped after retirement; accessed only while the worker holds mu
+	profiles  bool // whether the policy has a query profile stream
+	// ctx ends the lease's publishes. It is cancelled when the dispatcher
+	// stops, when a policy change stops routing the item in flight, and when
+	// the lease closes. Clients that implement beat.ContextPublisher stop
+	// waiting for the output then.
+	ctx    context.Context
+	cancel context.CancelFunc
+	item   scheduledItem // the item being published; accessed only while the worker holds mu
+	cut    int           // rows the publisher skipped after retirement; accessed only while the worker holds mu
 }
 
 // allowed reports whether the worker may publish the rest of l.item through
 // l: the dispatcher has not stopped, and l is active or current, the lease
 // that replaced it, still routes the item.
 func (l *scheduledResultLease) allowed(current *scheduledResultLease) bool {
-	if l.ctx == nil || l.ctx.Err() != nil {
+	if l.item == nil || l.ctx.Err() != nil {
 		return false
 	}
 	return !l.retired.Load() || current != nil && current.routes(l.item)
@@ -151,9 +156,9 @@ func (l *scheduledResultLease) routes(item scheduledItem) bool {
 
 // unlock ends the worker's use of l, closing l if it was retired meanwhile.
 func (l *scheduledResultLease) unlock() {
-	l.ctx, l.item = nil, nil
+	l.item = nil
 	if l.retired.Load() {
-		l.closeOnce.Do(l.publisher.Close)
+		l.closeOnce.Do(l.close)
 	}
 	l.mu.Unlock()
 }
@@ -161,9 +166,14 @@ func (l *scheduledResultLease) unlock() {
 func (l *scheduledResultLease) retire() {
 	l.retired.Store(true)
 	if l.mu.TryLock() {
-		l.closeOnce.Do(l.publisher.Close)
+		l.closeOnce.Do(l.close)
 		l.mu.Unlock()
 	}
+}
+
+func (l *scheduledResultLease) close() {
+	l.cancel()
+	l.publisher.Close()
 }
 
 type scheduledResultDispatcher struct {
@@ -179,20 +189,23 @@ type scheduledResultDispatcher struct {
 	current atomic.Pointer[scheduledResultLease]
 	// runCtx and client belong to the running osqueryd, if any; client is
 	// nil between runs. clientSet is closed while client is set.
-	runCtx       context.Context
-	client       scheduledQueryClient
-	clientSet    chan struct{}
-	maxAge       time.Duration
-	log          *logp.Logger
-	metrics      *publishingMetrics
-	newPublisher func(allowed func() bool, dropped func(), cut func(rows int)) osquerybeatPublisher
+	runCtx    context.Context
+	client    scheduledQueryClient
+	clientSet chan struct{}
+	maxAge    time.Duration
+	log       *logp.Logger
+	metrics   *publishingMetrics
+	// inflight is the lease the worker publishes inflightItem through, if any.
+	inflight     *scheduledResultLease
+	inflightItem scheduledItem
+	newPublisher func(ctx context.Context, allowed func() bool, dropped func(), cut func(rows int)) osquerybeatPublisher
 	profile      func(*scheduledQueryProfiler, string, QueryInfo, QueryResult, string)
 	// handle resolves and publishes a native result and returns the rows it
 	// could not publish because their types could not be resolved.
 	handle func(context.Context, scheduledQueryClient, scheduledQueryPublisher, string, QueryInfo, QueryResult, string) int
 }
 
-func newScheduledResultDispatcher(reg *monitoring.Registry, log *logp.Logger, maxEvents int, factory func(allowed func() bool, dropped func(), cut func(rows int)) osquerybeatPublisher,
+func newScheduledResultDispatcher(reg *monitoring.Registry, log *logp.Logger, maxEvents int, factory func(ctx context.Context, allowed func() bool, dropped func(), cut func(rows int)) osquerybeatPublisher,
 	handle func(context.Context, scheduledQueryClient, scheduledQueryPublisher, string, QueryInfo, QueryResult, string) int) *scheduledResultDispatcher {
 	if reg == nil {
 		reg = monitoring.NewRegistry()
@@ -226,9 +239,10 @@ func (d *scheduledResultDispatcher) configure(inputs []config.InputConfig, cfg c
 		next = &scheduledResultLease{view: view, profiles: slices.ContainsFunc(inputs, func(in config.InputConfig) bool {
 			return in.Datastream.Dataset == config.DefaultQueryProfileDataset
 		})}
+		next.ctx, next.cancel = context.WithCancel(d.ctx)
 		// A blocking client drops only events published after it is closed,
 		// which happens when the pipeline closes on shutdown.
-		next.publisher = d.newPublisher(func() bool { return next.allowed(d.current.Load()) },
+		next.publisher = d.newPublisher(next.ctx, func() bool { return next.allowed(d.current.Load()) },
 			func() { d.metrics.dropRows(dropShutdown, 1) },
 			func(rows int) { next.cut += rows })
 		if err := next.publisher.Configure(inputs); err != nil {
@@ -250,6 +264,10 @@ func (d *scheduledResultDispatcher) configure(inputs []config.InputConfig, cfg c
 	}
 	d.lease = next
 	d.current.Store(next)
+	if l := d.inflight; l != nil && (next == nil || !next.routes(d.inflightItem)) {
+		// Stop waiting for the output: the rest of the item is cut.
+		l.cancel()
+	}
 	d.maxAge = cfg.MaxAge
 	if next != nil && !d.started {
 		d.started = true
@@ -375,6 +393,9 @@ func (d *scheduledResultDispatcher) process(item scheduledItem) {
 		lease.mu.Lock()
 		defer lease.unlock()
 	}
+	if !expired && routed {
+		d.inflight, d.inflightItem = lease, item
+	}
 	d.mu.Unlock()
 	switch {
 	case expired:
@@ -383,6 +404,9 @@ func (d *scheduledResultDispatcher) process(item scheduledItem) {
 		d.dropStale(item)
 	default:
 		d.publish(lease, item, runCtx, client)
+		d.mu.Lock()
+		d.inflight, d.inflightItem = nil, nil
+		d.mu.Unlock()
 	}
 }
 
@@ -416,7 +440,7 @@ func (d *scheduledResultDispatcher) publish(lease *scheduledResultLease, item sc
 		cancel()
 	}
 	defer func() { stop(); cancel() }()
-	lease.ctx, lease.item = d.ctx, item
+	lease.item = item
 	if !lease.allowed(d.current.Load()) {
 		d.dropCut(item.rows())
 		return
@@ -544,6 +568,7 @@ func (d *scheduledResultDispatcher) stop() {
 	if lease != nil {
 		lease.retire()
 	}
-	// The existing shared pipeline closes after the beater returns. Do not
-	// join a worker that it must release from beat.Client.Publish first.
+	// Cancelling d.ctx releases a worker waiting in PublishContext. Otherwise
+	// the shared pipeline, which closes after the beater returns, releases it
+	// from beat.Client.Publish, so do not join the worker.
 }

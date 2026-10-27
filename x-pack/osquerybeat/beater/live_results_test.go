@@ -41,7 +41,7 @@ func newGatedLivePublisher(blockFrom int) *gatedLivePublisher {
 	return &gatedLivePublisher{blockFrom: blockFrom, release: make(chan struct{}), blocked: make(chan struct{}, 16)}
 }
 
-func (p *gatedLivePublisher) PublishEach(_, idValue, _, _, _, _, _, _ string, _ map[string]any, hits []map[string]any, _ ecs.Mapping, _ any, stop func() bool) int {
+func (p *gatedLivePublisher) PublishEach(_ context.Context, _, idValue, _, _, _, _, _, _ string, _ map[string]any, hits []map[string]any, _ ecs.Mapping, _ any, stop func() bool) int {
 	for i := range hits {
 		if stop() {
 			return i
@@ -58,7 +58,7 @@ func (p *gatedLivePublisher) PublishEach(_, idValue, _, _, _, _, _, _ string, _ 
 	return len(hits)
 }
 
-func (p *gatedLivePublisher) PublishQueryProfile(_, _, actionID, _, _ string, _ map[string]any, _ any) {
+func (p *gatedLivePublisher) PublishQueryProfile(_ context.Context, _, _, actionID, _, _ string, _ map[string]any, _ any) {
 	if p.blockProfile {
 		<-p.release
 	}
@@ -412,7 +412,7 @@ func TestLiveClientsCloseDoesNotWaitForStuckPublish(t *testing.T) {
 	published := make(chan struct{})
 	go func() {
 		defer close(published)
-		c.PublishEach("", "a1", "action_id", "", "", "", "", "", nil, []map[string]any{{}}, nil, nil, func() bool { return false })
+		c.PublishEach(context.Background(), "", "a1", "action_id", "", "", "", "", "", nil, []map[string]any{{}}, nil, nil, func() bool { return false })
 	}()
 	<-made[0].blocked
 
