@@ -474,7 +474,7 @@ steps:
           - test-collector#v1.12.0:
               files: "x-pack/packetbeat/build/TEST-*.xml"
               format: "junit"
-              branches: "main"
+              branches: "^main$"
               debug: true
           # See https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/beats/01-gcp-buildkite-oidc.tf
           # This plugin authenticates to Google Cloud using the OIDC token.
