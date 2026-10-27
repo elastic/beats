@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build securityonly && !windows
+//go:build securityonly && !windows && !linux
 
 package inputs
 
@@ -26,7 +26,7 @@ import (
 )
 
 // securityOnlyOSInputs returns the OS specific inputs included in the
-// security-only build; there are none outside of Windows.
+// security-only build; there are none outside of Linux and Windows.
 func securityOnlyOSInputs(_ beat.Info, _ statestore.States) []v2.Plugin {
 	return nil
 }
