@@ -60,12 +60,7 @@ func NewEventFromQuarkEvent(
 		return Event{Path: file.Path}, false
 	}
 
-	var errs []error
 	process, err := processFromQuark(qe.Process)
-	if err != nil {
-		errs = append(errs, err)
-	}
-
 	event := Event{
 		Timestamp:   time.Now().UTC(),
 		Path:        file.Path,
@@ -75,27 +70,30 @@ func NewEventFromQuarkEvent(
 		Process:     &process,
 		ContainerID: containerIDFromCgroupPath(qe.Process.Cgroup),
 	}
+	if err != nil {
+		event.errors = append(event.errors, err)
+	}
 
 	// A removed file has no metadata to report, mirroring the other backends.
 	if action&Deleted == 0 {
 		md, err := metadataFromQuarkFile(file)
 		if err != nil {
-			errs = append(errs, err)
+			event.errors = append(event.errors, err)
 		}
 		event.Info = &md
 
 		switch md.Type {
 		case FileType:
+			// fillHashes records hashing and parser errors in event.errors.
 			fillHashes(&event, file.Path, maxFileSize, hashTypes, fileParsers)
 		case SymlinkType:
 			event.TargetPath, err = filepath.EvalSymlinks(event.Path)
 			if err != nil {
-				errs = append(errs, err)
+				event.errors = append(event.errors, err)
 			}
 		}
 	}
 
-	event.errors = errs
 	return event, true
 }
 

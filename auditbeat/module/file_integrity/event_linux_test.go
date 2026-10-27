@@ -20,6 +20,7 @@
 package file_integrity
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"syscall"
@@ -29,6 +30,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	quark "github.com/elastic/go-quark"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const testContainerID = "d12fe576354a1805165303a4e34a69e5fe8db791ceb7e545f17811d1fbfba68f"
@@ -126,6 +129,31 @@ func TestNewEventFromQuarkEventExcluded(t *testing.T) {
 
 	_, ok = NewEventFromQuarkEvent(quark.Event{Events: quark.QUARK_EV_FILE}, 0, nil, nil, notExcluded)
 	assert.False(t, ok, "events without a file payload are dropped")
+}
+
+type failingParser struct{ err error }
+
+func (p failingParser) Parse(mapstr.M, string) error { return p.err }
+
+func TestNewEventFromQuarkEventKeepsHashAndParserErrors(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "foo")
+	require.NoError(t, os.WriteFile(path, []byte("hello"), 0o644), "write test file")
+
+	qe := quarkFileEvent(&quark.File{
+		Path:   path,
+		Mode:   syscall.S_IFREG | 0o644,
+		Size:   5,
+		OpMask: quark.QUARK_FILE_OP_CREATE,
+	})
+	qe.Process.Proc.Valid = false
+	parseErr := errors.New("parse failed")
+
+	event, ok := NewEventFromQuarkEvent(qe, 1024, []HashType{SHA1}, []FileParser{failingParser{parseErr}}, notExcluded)
+	require.True(t, ok, "event should be produced")
+	assert.Len(t, event.errors, 2, "process and parser errors are both kept: %v", event.errors)
+	assert.ErrorIs(t, errors.Join(event.errors...), parseErr, "parser error is kept")
+	assert.NotEmpty(t, event.Hashes, "hashing still succeeds")
 }
 
 func TestNewEventFromQuarkEventUnknownProcess(t *testing.T) {
