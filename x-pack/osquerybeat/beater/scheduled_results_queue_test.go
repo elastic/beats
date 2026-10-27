@@ -96,8 +96,8 @@ func TestScheduledResultsSaturatedPipelineDoesNotBlockShutdown(t *testing.T) {
 	require.NoError(t, err, "create the real publisher pipeline")
 	observed := &observedResultPipeline{PipelineConnector: pipe, entered: make(chan struct{})}
 	bt := &osquerybeat{log: log}
-	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents, func(allowed func() bool, dropped func(), cut func(int)) osquerybeatPublisher {
-		return pub.NewScheduled(&beat.Beat{Publisher: observed}, log, allowed, dropped, cut)
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents, func(ctx context.Context, allowed func() bool, dropped func(), cut func(int)) osquerybeatPublisher {
+		return pub.NewScheduled(ctx, &beat.Beat{Publisher: observed}, log, allowed, dropped, cut)
 	}, bt.handleScheduledQueryResult)
 	t.Cleanup(func() {
 		_ = output.Close()
@@ -214,8 +214,8 @@ func TestScheduledWorkerGetsSlotsUnderPoolPressure(t *testing.T) {
 	})
 
 	bt := &osquerybeat{log: log}
-	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents, func(allowed func() bool, dropped func(), cut func(int)) osquerybeatPublisher {
-		return pub.NewScheduled(&beat.Beat{Publisher: pipe}, log, allowed, dropped, cut)
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents, func(ctx context.Context, allowed func() bool, dropped func(), cut func(int)) osquerybeatPublisher {
+		return pub.NewScheduled(ctx, &beat.Beat{Publisher: pipe}, log, allowed, dropped, cut)
 	}, bt.handleScheduledQueryResult)
 	t.Cleanup(func() {
 		d.stop()

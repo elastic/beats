@@ -155,7 +155,7 @@ func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquer
 	ob, ok := beater.(*osquerybeat)
 	require.True(t, ok)
 	// b has no pipeline, so scheduled results get a mock publisher too.
-	ob.scheduledResults.newPublisher = func(func() bool, func(), func(int)) osquerybeatPublisher {
+	ob.scheduledResults.newPublisher = func(context.Context, func() bool, func(), func(int)) osquerybeatPublisher {
 		return &mockBeatPublisher{}
 	}
 	for _, override := range overrides {

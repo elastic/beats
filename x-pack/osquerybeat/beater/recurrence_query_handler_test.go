@@ -123,7 +123,7 @@ func TestRecurrenceRowsPublished(t *testing.T) {
 				rows:                     make(chan rrulePublishedRows, 4),
 			}
 			d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents,
-				func(func() bool, func(), func(int)) osquerybeatPublisher { return publisher }, (&osquerybeat{log: log}).handleScheduledQueryResult)
+				func(context.Context, func() bool, func(), func(int)) osquerybeatPublisher { return publisher }, (&osquerybeat{log: log}).handleScheduledQueryResult)
 			require.NoError(t, d.configure(inputs, config.ScheduledPublishingConfig{MaxEvents: config.DefaultScheduledMaxEvents}), "configure the scheduled clients")
 			stopOnCleanup(t, d)
 
@@ -192,7 +192,9 @@ func TestRecurrenceRunOfOtherSQLIsStale(t *testing.T) {
 func TestRecurrenceSkipsQueryWithoutNamespace(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "rrule")
 	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents,
-		func(func() bool, func(), func(int)) osquerybeatPublisher { return &mockBeatPublisher{} }, (&osquerybeat{log: log}).handleScheduledQueryResult)
+		func(context.Context, func() bool, func(), func(int)) osquerybeatPublisher {
+			return &mockBeatPublisher{}
+		}, (&osquerybeat{log: log}).handleScheduledQueryResult)
 	require.NoError(t, d.configure(outageInputs("old"), outageLimits), "configure the scheduled clients")
 	stopOnCleanup(t, d)
 	plugin := NewConfigPlugin(log)
@@ -233,7 +235,7 @@ func TestRecurrenceProfilesUseScheduledQueue(t *testing.T) {
 			require.NoError(t, err, "apply the profiled policy")
 			publisher := &profileCallbackPublisher{responses: make(chan scheduledProfileResponse, 1), profiles: make(chan collectedProfile, 1)}
 			d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents,
-				func(func() bool, func(), func(int)) osquerybeatPublisher { return publisher }, (&osquerybeat{log: log}).handleScheduledQueryResult)
+				func(context.Context, func() bool, func(), func(int)) osquerybeatPublisher { return publisher }, (&osquerybeat{log: log}).handleScheduledQueryResult)
 			require.NoError(t, d.configure(inputs, config.ScheduledPublishingConfig{MaxEvents: config.DefaultScheduledMaxEvents}), "configure the scheduled clients")
 			stopOnCleanup(t, d)
 

@@ -81,7 +81,7 @@ func outageDispatcherFor(t *testing.T, inputs []config.InputConfig, limits confi
 	bt := &osquerybeat{log: log}
 	first := &stalledResultPublisher{entered: make(chan struct{}), release: make(chan struct{})}
 	created := false
-	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(func() bool, func(), func(int)) osquerybeatPublisher {
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(context.Context, func() bool, func(), func(int)) osquerybeatPublisher {
 		if !created {
 			created = true
 			return first
@@ -362,7 +362,7 @@ func TestScheduledProfilesExpire(t *testing.T) {
 func TestScheduledPublishDroppedOnCloseCountsRows(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "dropped-on-close")
 	var dropped func()
-	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(_ func() bool, onDrop func(), _ func(int)) osquerybeatPublisher {
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(_ context.Context, _ func() bool, onDrop func(), _ func(int)) osquerybeatPublisher {
 		dropped = onDrop
 		return &mockBeatPublisher{}
 	}, (&osquerybeat{log: log}).handleScheduledQueryResult)
@@ -412,7 +412,9 @@ func TestScheduledResultsUnresolvedRowsCountStale(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			log := logptest.NewTestingLogger(t, "unresolved")
 			d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents,
-				func(func() bool, func(), func(int)) osquerybeatPublisher { return &mockBeatPublisher{} }, (&osquerybeat{log: log}).handleScheduledQueryResult)
+				func(context.Context, func() bool, func(), func(int)) osquerybeatPublisher {
+					return &mockBeatPublisher{}
+				}, (&osquerybeat{log: log}).handleScheduledQueryResult)
 			inputs := outageInputs("old")
 			plugin := NewConfigPlugin(log)
 			require.NoError(t, plugin.Set(inputs), "validate the policy")
@@ -485,7 +487,7 @@ func TestScheduledResultsRetiredLeaseCutsUnroutedRows(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			log := logptest.NewTestingLogger(t, "cut")
 			var first *cuttingResultPublisher
-			d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(allowed func() bool, _ func(), cut func(int)) osquerybeatPublisher {
+			d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(_ context.Context, allowed func() bool, _ func(), cut func(int)) osquerybeatPublisher {
 				p := &cuttingResultPublisher{allowed: allowed, cut: cut, entered: make(chan struct{}), release: make(chan struct{}), done: make(chan struct{})}
 				if first == nil {
 					first = p
@@ -582,7 +584,9 @@ func TestScheduledItemsDroppedAfterStop(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			log := logptest.NewTestingLogger(t, "stopped")
 			d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents,
-				func(func() bool, func(), func(int)) osquerybeatPublisher { return &mockBeatPublisher{} }, (&osquerybeat{log: log}).handleScheduledQueryResult)
+				func(context.Context, func() bool, func(), func(int)) osquerybeatPublisher {
+					return &mockBeatPublisher{}
+				}, (&osquerybeat{log: log}).handleScheduledQueryResult)
 			require.NoError(t, d.configure(outageProfileInputs("old"), outageLimits), "configure a policy that routes the item")
 			stopOnCleanup(t, d)
 			d.stop()
@@ -717,7 +721,9 @@ func TestScheduledResultsUnroutedAtDaemonRestartAreStale(t *testing.T) {
 func TestScheduledResultsConfigureNamesInvalidPolicy(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "invalid-mapping")
 	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents,
-		func(func() bool, func(), func(int)) osquerybeatPublisher { return &mockBeatPublisher{} }, (&osquerybeat{log: log}).handleScheduledQueryResult)
+		func(context.Context, func() bool, func(), func(int)) osquerybeatPublisher {
+			return &mockBeatPublisher{}
+		}, (&osquerybeat{log: log}).handleScheduledQueryResult)
 	t.Cleanup(d.stop)
 	inputs := outageInputs("old")
 	query := inputs[0].Osquery.Schedule["scheduled"]
@@ -731,7 +737,7 @@ func TestScheduledResultsConfigureNamesInvalidPolicy(t *testing.T) {
 
 func TestScheduledResultsInvalidPolicyKeepsLimits(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "invalid-policy")
-	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(func() bool, func(), func(int)) osquerybeatPublisher {
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(context.Context, func() bool, func(), func(int)) osquerybeatPublisher {
 		return &stalledResultPublisher{entered: make(chan struct{}), release: make(chan struct{})}
 	}, (&osquerybeat{log: log}).handleScheduledQueryResult)
 	t.Cleanup(d.stop)
@@ -977,7 +983,7 @@ func TestScheduledResultsReuseWorkerAcrossDaemonRestarts(t *testing.T) {
 
 func TestScheduledResultsStopReleasesIdleWorker(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "idle")
-	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(func() bool, func(), func(int)) osquerybeatPublisher {
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, outageMaxEvents, func(context.Context, func() bool, func(), func(int)) osquerybeatPublisher {
 		return &stalledResultPublisher{entered: make(chan struct{}), release: make(chan struct{})}
 	}, (&osquerybeat{log: log}).handleScheduledQueryResult)
 	require.NoError(t, d.configure(outageInputs("idle"), outageLimits), "start the result worker")
@@ -1028,7 +1034,7 @@ func TestScheduledResultsStalledOutputDoesNotBlockProfileCollection(t *testing.T
 	}
 	release := sync.OnceFunc(func() { close(publisher.release) })
 	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents,
-		func(func() bool, func(), func(int)) osquerybeatPublisher { return publisher }, bt.handleScheduledQueryResult)
+		func(context.Context, func() bool, func(), func(int)) osquerybeatPublisher { return publisher }, bt.handleScheduledQueryResult)
 	d.profile = bt.enqueueScheduledProfile
 	require.NoError(t, d.configure(inputs, config.ScheduledPublishingConfig{MaxEvents: config.DefaultScheduledMaxEvents}), "configure the scheduled clients")
 	t.Cleanup(func() {

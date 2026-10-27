@@ -23,7 +23,7 @@ func TestScheduledPublisherGuardAndDeliveryMode(t *testing.T) {
 	recorder := &connectRecorder{}
 	var guarded, dropped atomic.Int32
 	var cut atomic.Int64
-	p := NewScheduled(&beat.Beat{Publisher: recorder}, logptest.NewTestingLogger(t, "scheduled"),
+	p := NewScheduled(t.Context(), &beat.Beat{Publisher: recorder}, logptest.NewTestingLogger(t, "scheduled"),
 		func() bool { return guarded.Add(1) == 1 }, func() { dropped.Add(1) }, func(rows int) { cut.Add(int64(rows)) })
 	t.Cleanup(p.Close)
 	require.NoError(t, p.Configure([]config.InputConfig{
@@ -53,7 +53,7 @@ func TestScheduledPublisherGuardAndDeliveryMode(t *testing.T) {
 
 func TestScheduledProfilePreservesSchema(t *testing.T) {
 	// Configure streams by dataset so the test does not depend on input order.
-	p := NewScheduled(&beat.Beat{Publisher: &connectRecorder{}}, logptest.NewTestingLogger(t, "scheduled_profile"),
+	p := NewScheduled(t.Context(), &beat.Beat{Publisher: &connectRecorder{}}, logptest.NewTestingLogger(t, "scheduled_profile"),
 		func() bool { return true }, func() {}, func(int) {})
 	t.Cleanup(p.Close)
 	require.NoError(t, p.Configure([]config.InputConfig{
@@ -88,7 +88,7 @@ func TestScheduledProfilePreservesSchema(t *testing.T) {
 func TestScheduledPublisherReportsCutResponse(t *testing.T) {
 	recorder := &connectRecorder{}
 	var cut atomic.Int64
-	p := NewScheduled(&beat.Beat{Publisher: recorder}, logptest.NewTestingLogger(t, "scheduled_response"),
+	p := NewScheduled(t.Context(), &beat.Beat{Publisher: recorder}, logptest.NewTestingLogger(t, "scheduled_response"),
 		func() bool { return false }, func() {}, func(rows int) { cut.Add(int64(rows)) })
 	t.Cleanup(p.Close)
 	require.NoError(t, p.Configure([]config.InputConfig{

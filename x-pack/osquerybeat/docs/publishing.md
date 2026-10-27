@@ -64,9 +64,10 @@ through the clients of the current policy if that policy still has the query
 with the same namespace and SQL, and drops it otherwise. A policy change retires
 the previous clients. The item in flight keeps publishing on them while the new
 policy still has its query with the same namespace and SQL; otherwise its rows
-not yet handed to the output are dropped. One `Publish` call can still be
-blocked on the retired clients until the output recovers or the pipeline
-closes.
+not yet handed to the output are dropped, and a publish waiting for the output
+is cancelled. A publish can only be cancelled when the publishing pipeline
+supports it (see below); otherwise one `Publish` call can still be blocked on
+the retired clients until the output recovers or the pipeline closes.
 
 The queue also survives osqueryd restarts, such as an options or extensions
 change or a crash. The worker resolves a native result's column types when it
@@ -78,7 +79,11 @@ osqueryd run ends, queued items the current policy no longer publishes are
 dropped. The rows and response of a native result whose column types osqueryd
 could not resolve are dropped.
 
-Shutdown drops the queued items and does not wait for a blocked `Publish`.
+Shutdown drops the queued items and cancels a publish waiting for the output.
+Without cancellation support it does not wait for a blocked `Publish`.
+
+Cancellation works with the memory, slab and disk queues. A cancelled row is
+counted as dropped and is not queued.
 
 ## Live queue
 
@@ -87,8 +92,9 @@ A live query action waits for its rows to be handed to the output for at most
 use up the window. On the OTel runtime the action's own context can end first,
 at the Fleet action timeout (1 minute by default); that is handled the same
 way. If the timeout elapses, the action reports the rows handed over so far as
-its count, with an error. The remaining rows are skipped; a row
-already inside a blocked `Publish` can still be delivered late. The action's
+its count, with an error. The remaining rows are skipped and a publish waiting
+for the output is cancelled; without cancellation support, a row already
+inside a blocked `Publish` can still be delivered late. The action's
 response document is published after its rows and is not dropped by the
 timeout, so Kibana learns the outcome unless osquerybeat stops before the
 response is published. If osquerybeat is stopping, the
