@@ -218,7 +218,8 @@ func TestScheduledPolicyChangeCancelsBlockedPublish(t *testing.T) {
 			// The query moves to another namespace, so the new policy no
 			// longer routes the item in flight.
 			require.NoError(t, d.configure(stuckScheduledInputs("other"), config.ScheduledPublishingConfig{MaxEvents: config.DefaultScheduledMaxEvents}), "change the policy")
-			assert.Eventually(t, pipe.idle, cancelBound, time.Millisecond,
+			// The worker counts the cut item when it finishes the item.
+			assert.Eventually(t, func() bool { return d.metrics.dropped[dropStale].Get() == 1 }, cancelBound, time.Millisecond,
 				"a policy that no longer routes the item must release the worker blocked on the full queue")
 
 			d.stop()
