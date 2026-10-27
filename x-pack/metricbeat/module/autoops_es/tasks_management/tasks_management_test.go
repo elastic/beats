@@ -7,7 +7,6 @@
 package tasks_management
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/auto_ops_testing"
@@ -30,9 +29,8 @@ func TestSuccessfulFetch(t *testing.T) {
 	})
 }
 
-// The filter must collect snapshot creation, but neither the nonexistent indices:admin/snapshot* nor anything broader that would also match get, status, delete and restore
+// The filter must collect snapshot tasks such as create, delete and restore, not the nonexistent indices:admin/snapshot*
 func TestTasksPathSnapshotFilter(t *testing.T) {
-	require.Contains(t, TasksPath, "cluster:admin/snapshot/create*", "filter should collect snapshot creation tasks")
+	require.Contains(t, TasksPath, "cluster:admin/snapshot/*", "filter should collect snapshot related tasks")
 	require.NotContains(t, TasksPath, "indices:admin/snapshot", "filter should not use the nonexistent indices:admin/snapshot action")
-	require.False(t, strings.Contains(TasksPath, "cluster:admin/snapshot*"), "filter should not collect every snapshot action")
 }

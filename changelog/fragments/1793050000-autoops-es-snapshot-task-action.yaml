@@ -1,3 +1,3 @@
 kind: bug-fix
-summary: Collect running snapshot tasks in the autoops_es tasks_management metricset by filtering on cluster:admin/snapshot/create instead of the nonexistent indices:admin/snapshot action.
+summary: Collect running snapshot tasks in the autoops_es tasks_management metricset by filtering on cluster:admin/snapshot instead of the nonexistent indices:admin/snapshot actions.
 component: metricbeat
