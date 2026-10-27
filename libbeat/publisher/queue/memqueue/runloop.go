@@ -232,6 +232,10 @@ func (l *runLoop[T]) handleDelete(count int) {
 }
 
 func (l *runLoop[T]) handleInsert(req *pushRequest[T]) {
+	if req.claim != nil && !req.claim.CompareAndSwap(false, true) {
+		// The producer's PublishContext gave up on this request.
+		return
+	}
 	l.insert(req, l.nextEntryID)
 	// Send back the new event id.
 	req.resp <- l.nextEntryID
