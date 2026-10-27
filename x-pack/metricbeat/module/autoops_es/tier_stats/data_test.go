@@ -121,7 +121,9 @@ func TestEventsMappingReportsOneEventPerDocument(t *testing.T) {
 	for _, event := range events {
 		auto_ops_testing.CheckEvent(t, event, info)
 		require.NotNil(t, auto_ops_testing.GetObjectValue(event.ModuleFields, "transaction_id"))
-		require.NotNil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "timestamp_diff"))
+		// the milliseconds since the previous scrape is the root-level field that other documents have
+		require.NotNil(t, auto_ops_testing.GetObjectValue(event.RootFields, "timestamp_diff"))
+		require.NotContains(t, event.MetricSetFields, "timestamp_diff")
 	}
 
 	search := auto_ops_testing.GetEventsWithField(t, events, "latency_in_millis")

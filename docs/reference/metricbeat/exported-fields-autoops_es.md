@@ -1385,24 +1385,18 @@ Request rate and latency of a tier of an Elasticsearch Serverless project, for o
 **`autoops_es.tier_stats.duration_delta_in_millis`**
 :   Total duration of those requests in milliseconds.
 
-    type: double
+    type: float
 
 
 **`autoops_es.tier_stats.rate_per_second`**
 :   Requests per second since the previous scrape.
 
-    type: double
+    type: float
 
 
 **`autoops_es.tier_stats.latency_in_millis`**
 :   Average duration of a request in milliseconds. Only reported for successful (2xx) requests.
 
-    type: double
-
-
-**`autoops_es.tier_stats.timestamp_diff`**
-:   Milliseconds since the previous scrape.
-
-    type: long
+    type: float
 
 

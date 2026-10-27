@@ -145,7 +145,7 @@ func document(tier string, status int, change *delta, timestampDiff int64) mapst
 		"count_delta":              change.count,
 		"duration_delta_in_millis": change.duration,
 		"rate_per_second":          float64(change.count) / (float64(timestampDiff) / 1000),
-		"timestamp_diff":           timestampDiff,
+		timestampDiffField:         timestampDiff,
 	}
 
 	if isSuccess(status) {

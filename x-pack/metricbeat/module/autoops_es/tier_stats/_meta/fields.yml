@@ -25,18 +25,14 @@
       description: >
         Number of requests since the previous scrape.
     - name: duration_delta_in_millis
-      type: double
+      type: float
       description: >
         Total duration of those requests in milliseconds.
     - name: rate_per_second
-      type: double
+      type: float
       description: >
         Requests per second since the previous scrape.
     - name: latency_in_millis
-      type: double
+      type: float
       description: >
         Average duration of a request in milliseconds. Only reported for successful (2xx) requests.
-    - name: timestamp_diff
-      type: long
-      description: >
-        Milliseconds since the previous scrape.

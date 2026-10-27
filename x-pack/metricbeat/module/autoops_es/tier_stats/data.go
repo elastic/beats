@@ -18,6 +18,9 @@ const (
 	serviceInstanceIDAttribute = "service.instance.id"
 	statusCodeAttribute        = "http.response.status_code"
 	histogramType              = "histogram"
+
+	// the root-level field with the milliseconds since the previous scrape
+	timestampDiffField = "timestamp_diff"
 )
 
 // NodesMetricsResponse is the response of `_nodes/metrics`, which has one entry per node. Everything that is not needed is ignored.
@@ -147,7 +150,19 @@ func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, response *NodesMetr
 		return nil
 	}
 
-	e.CreateAndReportEvents(r, info, docs, utils.NewUUID())
+	transactionID := utils.NewUUID()
+
+	for index, doc := range docs {
+		// the milliseconds between the scrapes is not specific to this metricset: it is the root-level timestamp_diff that other
+		// documents (such as the ones of the shards) already have, so it is not one of the fields of the metricset
+		timestampDiff := doc[timestampDiffField]
+		delete(doc, timestampDiffField)
+
+		event := e.CreateEvent(info, doc, transactionID)
+		event.RootFields[timestampDiffField] = timestampDiff
+
+		e.ReportEvent(r, event, index, len(docs))
+	}
 
 	return nil
 }

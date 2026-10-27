@@ -231,13 +231,16 @@ func documents(events []mb.Event) []mapstr.M {
 	return docs
 }
 
-func requireTimestampDiff(t *testing.T, docs []mapstr.M) {
+func requireTimestampDiff(t *testing.T, events []mb.Event) {
 	t.Helper()
 
-	for _, doc := range docs {
+	for _, event := range events {
 		// the baseline was taken 10 seconds ago
-		require.Greater(t, doc["timestamp_diff"], int64(9_999))
-		require.Less(t, doc["timestamp_diff"], int64(20_000))
+		require.Greater(t, event.RootFields["timestamp_diff"], int64(9_999))
+		require.Less(t, event.RootFields["timestamp_diff"], int64(20_000))
+
+		// it is a root-level field, not one of the metricset
+		require.NotContains(t, event.MetricSetFields, "timestamp_diff")
 	}
 }
 
@@ -258,7 +261,7 @@ func TestSuccessfulFetchWithFixtures(t *testing.T) {
 			auto_ops_testing.CheckEvent(t, event, data.ClusterInfo)
 		}
 
-		requireTimestampDiff(t, docs)
+		requireTimestampDiff(t, events)
 
 		switch filepath.Base(data.File) {
 		case "tier_stats.8.11.0.json":
@@ -280,8 +283,10 @@ func TestSuccessfulFetchWithFixtures(t *testing.T) {
 				require.NotContains(t, find(t, docs, "search", status), "latency_in_millis")
 			}
 
-			for _, doc := range docs {
-				require.InDelta(t, float64(doc["count_delta"].(int64))/(float64(doc["timestamp_diff"].(int64))/1000), doc["rate_per_second"], 1e-9)
+			for _, event := range events {
+				doc := event.MetricSetFields
+
+				require.InDelta(t, float64(doc["count_delta"].(int64))/(float64(event.RootFields["timestamp_diff"].(int64))/1000), doc["rate_per_second"], 1e-9)
 			}
 		case "no_traffic.tier_stats.8.11.0.json":
 			// the nodes have never served a request, which is a rate and a latency of 0 rather than no data
@@ -430,8 +435,8 @@ func TestFetchStateIsNotLostByAFailedScrape(t *testing.T) {
 	require.NoError(t, ms.Fetch(recovered))
 	require.Len(t, recovered.GetEvents(), 2)
 
-	for _, doc := range documents(recovered.GetEvents()) {
-		require.GreaterOrEqual(t, doc["timestamp_diff"], int64(20_000))
+	for _, event := range recovered.GetEvents() {
+		require.GreaterOrEqual(t, event.RootFields["timestamp_diff"], int64(20_000))
 	}
 }
 
