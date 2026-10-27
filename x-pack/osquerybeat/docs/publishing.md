@@ -132,13 +132,17 @@ collected and handed to the scheduled queue, not delivered.
 
 ## Behaviour changes
 
-- An osquery input configuration that fails validation when the policy is
-  read, including invalid publishing settings, is now rejected. On the
-  process runtime the osquery unit is marked failed and the previous settings
-  stay active; before, such a configuration was ignored and the unit stayed
-  healthy. On the OTel runtime the receiver fails to start. A policy
-  osquerybeat cannot apply, for example one with an invalid ECS mapping,
-  still stops osquerybeat, as before.
+- An osquery policy that fails validation, for example one with invalid
+  publishing settings, an invalid ECS mapping or an invalid query schedule,
+  is now rejected before any of it is applied. On the process runtime the
+  osquery unit is marked failed, the previous policy keeps running, and the
+  next valid policy clears the failure. Before, a configuration that failed
+  to parse was ignored and the unit stayed healthy, and a policy osquerybeat
+  could not apply, such as one with an invalid ECS mapping, stopped
+  osquerybeat. On the OTel runtime the policy is the receiver's static
+  configuration and is not checked this way: a configuration that fails to
+  parse stops the receiver from starting, and one osquerybeat cannot apply
+  makes the receiver report a failed status and stop, as before.
 - Live query actions that fail now report their real `started_at` and
   `completed_at`.
 - Live query action responses are published asynchronously by the live

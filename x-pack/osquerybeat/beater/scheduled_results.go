@@ -219,12 +219,9 @@ func (d *scheduledResultDispatcher) configure(inputs []config.InputConfig, cfg c
 	}
 	var next *scheduledResultLease
 	if config.ResultInput(inputs) != nil {
-		view := NewConfigPlugin(d.log)
-		if err := view.Set(inputs); err != nil {
-			return fmt.Errorf("invalid osquery configuration: %w", err)
-		}
-		if _, err := view.GenerateConfig(d.ctx); err != nil {
-			return fmt.Errorf("invalid osquery configuration: %w", err)
+		view, err := newPolicyView(d.ctx, d.log, inputs)
+		if err != nil {
+			return err
 		}
 		next = &scheduledResultLease{view: view, profiles: slices.ContainsFunc(inputs, func(in config.InputConfig) bool {
 			return in.Datastream.Dataset == config.DefaultQueryProfileDataset
@@ -264,6 +261,20 @@ func (d *scheduledResultDispatcher) configure(inputs []config.InputConfig, cfg c
 	}
 	d.queue.setLimit(cfg.MaxEvents)
 	return nil
+}
+
+// newPolicyView returns a config plugin with inputs applied as osqueryd would
+// pull them. validatePolicy uses it to reject a policy before any of it is
+// applied, so it must run every step that can fail when the policy is applied.
+func newPolicyView(ctx context.Context, log *logp.Logger, inputs []config.InputConfig) (*ConfigPlugin, error) {
+	view := NewConfigPlugin(log)
+	if err := view.Set(inputs); err != nil {
+		return nil, fmt.Errorf("invalid osquery configuration: %w", err)
+	}
+	if _, err := view.GenerateConfig(ctx); err != nil {
+		return nil, fmt.Errorf("invalid osquery configuration: %w", err)
+	}
+	return view, nil
 }
 
 func (d *scheduledResultDispatcher) enqueue(ctx context.Context, client scheduledQueryClient, plugin *ConfigPlugin, result QueryResult, profiler *scheduledQueryProfiler) {

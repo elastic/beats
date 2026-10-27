@@ -272,7 +272,9 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	}()
 
 	// Watch input configuration updates
-	inputConfigCh := config.WatchInputs(ctx, bt.log, b.Registry)
+	inputConfigCh := config.WatchInputs(ctx, bt.log, b.Registry, func(inputs []config.InputConfig) error {
+		return validatePolicy(ctx, bt.log, inputs)
+	})
 
 	// Set up OTel status shim runner tracking. reconcileOtelRunners starts a
 	// shim runner for each added input and stops runners for removed inputs so
@@ -764,9 +766,10 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		bt.registerActionHandler(b, cli, configPlugin, rah)
 		defer bt.unregisterActionHandler(b, rah)
 
-		// Process Elastic Agent/Fleet input. A failed Set means the policy cannot be applied
-		// safely (invalid ECS mapping, schedule rules, and so on); we exit this runner so the beat
-		// surfaces the error instead of continuing with stale or partial osquery extension state.
+		// Process Elastic Agent/Fleet input. The input reloader rejects a policy that Set would
+		// fail (invalid ECS mapping, schedule rules, and so on) before it reaches this loop, so a
+		// failed Set here is unexpected; we exit this runner rather than continue with stale or
+		// partial osquery extension state.
 		for {
 			select {
 			case <-ctx.Done():
@@ -1081,4 +1084,15 @@ func (bt *osquerybeat) configurePublishers(inputs []config.InputConfig) error {
 		bt.liveResults.setTimeout(publishing.Live.Timeout)
 	}
 	return bt.pub.Configure(inputs)
+}
+
+// validatePolicy dry-runs the policy steps of configurePublishers and
+// runOsquery, so that a policy that would fail them is rejected before any of
+// it is applied.
+func validatePolicy(ctx context.Context, log *logp.Logger, inputs []config.InputConfig) error {
+	if _, err := config.GetPublishingConfig(inputs); err != nil {
+		return err
+	}
+	_, err := newPolicyView(ctx, log, inputs)
+	return err
 }

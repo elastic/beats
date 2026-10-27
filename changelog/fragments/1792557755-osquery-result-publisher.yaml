@@ -28,10 +28,11 @@ description: >-
   live query waits up to publishing.live.timeout (default 60s) for its rows to
   be handed to the output. Drops are counted under
   osquerybeat.publishing.scheduled and osquerybeat.publishing.live. An osquery
-  input configuration that fails validation when the policy is read now marks
-  the osquery unit failed on the process runtime, and stops the receiver from
-  starting on the OTel runtime. A policy osquerybeat cannot apply, for example
-  one with an invalid ECS mapping, still stops osquerybeat, as before. See
+  policy that fails validation, for example one with invalid publishing
+  settings or an invalid ECS mapping, is now rejected before any of it is
+  applied: on the process runtime the osquery unit is marked failed and the
+  previous policy keeps running, instead of osquerybeat stopping. On the OTel
+  runtime such a configuration still stops the receiver. See
   x-pack/osquerybeat/docs/publishing.md.
 
 # REQUIRED for breaking-change, deprecation, known-issue

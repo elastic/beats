@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
@@ -738,7 +739,9 @@ func TestScheduledResultsInvalidPolicyKeepsLimits(t *testing.T) {
 
 	// Feed policy updates to the dispatcher as the beater's main loop does.
 	registry := reload.NewRegistry()
-	updates := config.WatchInputs(t.Context(), log, registry)
+	updates := config.WatchInputs(t.Context(), log, registry, func(inputs []config.InputConfig) error {
+		return validatePolicy(t.Context(), log, inputs)
+	})
 	configured := make(chan error, 1)
 	go func() {
 		for {
@@ -775,6 +778,73 @@ func TestScheduledResultsInvalidPolicyKeepsLimits(t *testing.T) {
 	require.NoError(t, registry.GetInputList().Reload(policy(5)), "a valid policy must be accepted")
 	require.NoError(t, <-configured, "apply the valid policy")
 	assert.Equal(t, 5, queueLimit(d), "a valid policy must apply its queue limit")
+}
+
+func TestReloadRejectsUnappliablePolicy(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "unappliable-policy")
+	d, plugin, _, _ := outageDispatcher(t, outageLimits)
+	lease := d.current.Load()
+	before := plugin.EffectiveOsqueryConfig()
+
+	// Feed policy updates to the dispatcher and the config plugin as the
+	// beater's main loop and runOsquery do.
+	registry := reload.NewRegistry()
+	updates := config.WatchInputs(t.Context(), log, registry, func(inputs []config.InputConfig) error {
+		return validatePolicy(t.Context(), log, inputs)
+	})
+	applied := make(chan error, 1)
+	go func() {
+		for {
+			select {
+			case <-t.Context().Done():
+				return
+			case inputs := <-updates:
+				publishing, err := config.GetPublishingConfig(inputs)
+				if err == nil {
+					err = d.configure(inputs, publishing.Scheduled)
+				}
+				if err == nil {
+					err = plugin.Set(inputs)
+				}
+				applied <- err
+			}
+		}
+	}()
+	policy := func(field string) []*reload.ConfigWithMeta {
+		return []*reload.ConfigWithMeta{{InputUnitID: "osquery-unit", Config: conf.MustNewConfigFrom(map[string]any{
+			"data_stream": map[string]any{"dataset": config.DefaultDataset, "namespace": "new"},
+			"osquery": map[string]any{
+				"schedule": map[string]any{"scheduled": map[string]any{
+					"query": "SELECT 1", "interval": 1,
+					"ecs_mapping": map[string]any{"user": map[string]any{"id": map[string]any{"field": field}}},
+				}},
+				"elastic_options": map[string]any{"publishing": map[string]any{"scheduled": map[string]any{"max_events": 5}}},
+			},
+		})}}
+	}
+
+	err := registry.GetInputList().Reload(policy(""))
+	require.Error(t, err, "a policy with an invalid ECS mapping must be rejected")
+	assert.ErrorIs(t, err, ErrECSMappingIsInvalid, "the error must name the invalid ECS mapping")
+	var unitErr cfgfile.UnitError
+	require.ErrorAs(t, err, &unitErr, "the error must identify the rejected unit")
+	assert.Equal(t, "osquery-unit", unitErr.UnitID, "the error must name the unit's ID")
+	select {
+	case err := <-applied:
+		t.Errorf("a rejected policy reached the beater (apply error: %v)", err)
+	case <-time.After(50 * time.Millisecond):
+	}
+	assert.Same(t, lease, d.current.Load(), "a rejected policy must leave the dispatcher's lease unchanged")
+	assert.Equal(t, outageMaxEvents, queueLimit(d), "a rejected policy must leave the queue limit unchanged")
+	assert.Same(t, before, plugin.EffectiveOsqueryConfig(), "a rejected policy must leave the osquery config unchanged")
+	ns, _ := plugin.LookupNamespace("scheduled")
+	assert.Equal(t, "old", ns, "a rejected policy must leave the query namespace unchanged")
+
+	require.NoError(t, registry.GetInputList().Reload(policy("uid")), "a valid policy after a rejected one must be accepted")
+	require.NoError(t, <-applied, "apply the valid policy")
+	assert.Equal(t, 5, queueLimit(d), "a valid policy must apply its queue limit")
+	ns, _ = plugin.LookupNamespace("scheduled")
+	assert.Equal(t, "new", ns, "a valid policy must apply its namespace")
 }
 
 func TestScheduledResultsRemovedInputsKeepPolicy(t *testing.T) {

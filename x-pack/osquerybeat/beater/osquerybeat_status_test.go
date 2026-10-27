@@ -17,6 +17,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
@@ -207,6 +208,48 @@ func TestOsquerybeatManagerInitializationWaitsForCheck(t *testing.T) {
 	select {
 	case err := <-errCh:
 		require.ErrorIs(t, err, context.Canceled, "Run should stop after cancellation")
+	case <-time.After(5 * time.Second):
+		t.Fatal("Run did not stop")
+	}
+}
+
+func TestOsquerybeatRejectedPolicyKeepsRunning(t *testing.T) {
+	ob, b, mgr := newStatusTestBeater(t, func(ob *osquerybeat) {
+		ob.osquerydFactory = func(string, ...osqd.Option) (osqd.Runner, error) {
+			return &mockOsqueryd{runErr: context.Canceled}, nil
+		}
+	})
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- ob.Run(b)
+	}()
+	require.Eventually(t, func() bool {
+		mgr.mx.Lock()
+		defer mgr.mx.Unlock()
+		return mgr.postInitialized
+	}, 5*time.Second, 10*time.Millisecond, "osquerybeat should finish initialization")
+
+	bad := agentconfig.MustNewConfigFrom(map[string]any{
+		"data_stream": map[string]any{"dataset": config.DefaultDataset},
+		"osquery": map[string]any{"schedule": map[string]any{"users": map[string]any{
+			"query": "SELECT 1", "interval": 60,
+			"ecs_mapping": map[string]any{"user": map[string]any{"id": map[string]any{"field": ""}}},
+		}}},
+	})
+	err := b.Registry.GetInputList().Reload([]*reload.ConfigWithMeta{{Config: bad, InputUnitID: "osquery-unit"}})
+	var unitErr cfgfile.UnitError
+	assert.ErrorAs(t, err, &unitErr, "a policy with an invalid ECS mapping must fail its unit")
+	select {
+	case err := <-errCh:
+		t.Fatalf("Run returned after a rejected policy: %v", err)
+	case <-time.After(200 * time.Millisecond):
+	}
+	assert.Nil(t, ob.scheduledResults.current.Load(), "a rejected policy must not reach the scheduled results dispatcher")
+
+	ob.Stop()
+	select {
+	case err := <-errCh:
+		assert.ErrorIs(t, err, context.Canceled, "Run should stop after cancellation")
 	case <-time.After(5 * time.Second):
 		t.Fatal("Run did not stop")
 	}
