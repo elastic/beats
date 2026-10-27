@@ -96,7 +96,7 @@ func (p *trackedProducer) PublishContext(ctx context.Context, e publisher.Event)
 	if cp, ok := p.Producer.(queue.ContextProducer[publisher.Event]); ok {
 		return cp.PublishContext(ctx, e)
 	}
-	id, ok := p.Producer.Publish(e)
+	id, ok := p.Publish(e)
 	if !ok {
 		return 0, queue.ErrClosed
 	}
