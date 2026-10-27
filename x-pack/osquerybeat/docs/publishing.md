@@ -133,8 +133,8 @@ collected and handed to the scheduled queue, not delivered.
 ## Behaviour changes
 
 - An osquery policy that fails validation, for example one with invalid
-  publishing settings, an invalid ECS mapping or an invalid query schedule,
-  is now rejected before any of it is applied. On the process runtime the
+  publishing settings, an invalid processor, an invalid ECS mapping or an
+  invalid query schedule, is now rejected before any of it is applied. On the process runtime the
   osquery unit is marked failed, the previous policy keeps running, and the
   next valid policy clears the failure. Before, a configuration that failed
   to parse was ignored and the unit stayed healthy, and a policy osquerybeat

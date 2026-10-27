@@ -41,9 +41,15 @@ func (r *reloader) debugLogConfig(cfg *reload.ConfigWithMeta) {
 func (r *reloader) Reload(configs []*reload.ConfigWithMeta) error {
 	r.log.Debug("Inputs reloader got configuration update")
 	inputConfigs := make([]InputConfig, 0)
+	// Validation may change the inputs it checks, so it gets a separately
+	// unpacked copy and the beater gets the inputs as unpacked.
+	checked := make([]InputConfig, 0, len(configs))
 	for _, cfg := range configs {
-		var icfg InputConfig
+		var icfg, check InputConfig
 		err := cfg.Config.Unpack(&icfg)
+		if err == nil {
+			err = cfg.Config.Unpack(&check)
+		}
 		if err != nil {
 			return r.reject([]*reload.ConfigWithMeta{cfg}, err)
 		}
@@ -52,9 +58,10 @@ func (r *reloader) Reload(configs []*reload.ConfigWithMeta) error {
 		r.debugLogConfig(cfg)
 
 		inputConfigs = append(inputConfigs, icfg)
+		checked = append(checked, check)
 	}
 
-	err := r.validate(inputConfigs)
+	err := r.validate(checked)
 	if err != nil {
 		return r.reject(configs, err)
 	}

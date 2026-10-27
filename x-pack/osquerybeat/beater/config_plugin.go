@@ -117,9 +117,9 @@ func NewConfigPlugin(log *logp.Logger) *ConfigPlugin {
 
 // Set replaces the in-memory osquery policy, rebuilds query lookup state, and resets the cached
 // osqueryd config string. Validation errors (invalid ECS mapping, incompatible native vs RRULE
-// scheduling, pack schedule defaults, and so on) are returned immediately: callers that treat
-// a failed Set as fatal—such as runOsquery's input loop—will stop the osquery runner until policy
-// is corrected and a new input arrives.
+// scheduling, pack schedule defaults, and so on) are returned immediately and leave the current
+// policy in place. Policy updates are validated by the input reloader before they reach Set, so
+// for them a failure here is unexpected.
 func (p *ConfigPlugin) Set(inputs []config.InputConfig) error {
 	p.mx.Lock()
 	defer p.mx.Unlock()

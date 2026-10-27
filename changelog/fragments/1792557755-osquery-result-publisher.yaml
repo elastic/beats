@@ -29,7 +29,7 @@ description: >-
   be handed to the output. Drops are counted under
   osquerybeat.publishing.scheduled and osquerybeat.publishing.live. An osquery
   policy that fails validation, for example one with invalid publishing
-  settings or an invalid ECS mapping, is now rejected before any of it is
+  settings, an invalid processor or an invalid ECS mapping, is now rejected before any of it is
   applied: on the process runtime the osquery unit is marked failed and the
   previous policy keeps running, instead of osquerybeat stopping. On the OTel
   runtime such a configuration still stops the receiver. See

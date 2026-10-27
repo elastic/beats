@@ -1093,6 +1093,9 @@ func validatePolicy(ctx context.Context, log *logp.Logger, inputs []config.Input
 	if _, err := config.GetPublishingConfig(inputs); err != nil {
 		return err
 	}
+	if err := pub.CheckProcessors(inputs, log); err != nil {
+		return err
+	}
 	_, err := newPolicyView(ctx, log, inputs)
 	return err
 }

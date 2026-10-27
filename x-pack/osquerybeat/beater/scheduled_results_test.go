@@ -810,9 +810,10 @@ func TestReloadRejectsUnappliablePolicy(t *testing.T) {
 			}
 		}
 	}()
-	policy := func(field string) []*reload.ConfigWithMeta {
+	policy := func(field string, procs []any) []*reload.ConfigWithMeta {
 		return []*reload.ConfigWithMeta{{InputUnitID: "osquery-unit", Config: conf.MustNewConfigFrom(map[string]any{
 			"data_stream": map[string]any{"dataset": config.DefaultDataset, "namespace": "new"},
+			"processors":  procs,
 			"osquery": map[string]any{
 				"schedule": map[string]any{"scheduled": map[string]any{
 					"query": "SELECT 1", "interval": 1,
@@ -823,28 +824,73 @@ func TestReloadRejectsUnappliablePolicy(t *testing.T) {
 		})}}
 	}
 
-	err := registry.GetInputList().Reload(policy(""))
-	require.Error(t, err, "a policy with an invalid ECS mapping must be rejected")
-	assert.ErrorIs(t, err, ErrECSMappingIsInvalid, "the error must name the invalid ECS mapping")
-	var unitErr cfgfile.UnitError
-	require.ErrorAs(t, err, &unitErr, "the error must identify the rejected unit")
-	assert.Equal(t, "osquery-unit", unitErr.UnitID, "the error must name the unit's ID")
-	select {
-	case err := <-applied:
-		t.Errorf("a rejected policy reached the beater (apply error: %v)", err)
-	case <-time.After(50 * time.Millisecond):
+	for _, bad := range []struct {
+		name   string
+		policy []*reload.ConfigWithMeta
+		err    string
+	}{
+		{name: "invalid ECS mapping", policy: policy("", nil), err: ErrECSMappingIsInvalid.Error()},
+		{name: "invalid processor", policy: policy("uid", []any{map[string]any{"not_a_processor": map[string]any{}}}), err: "not_a_processor"},
+	} {
+		err := registry.GetInputList().Reload(bad.policy)
+		assert.ErrorContains(t, err, bad.err, "a policy with an %s must be rejected with the cause", bad.name)
+		var unitErr cfgfile.UnitError
+		if assert.ErrorAs(t, err, &unitErr, "a policy with an %s must fail its unit", bad.name) {
+			assert.Equal(t, "osquery-unit", unitErr.UnitID, "the error must name the unit's ID")
+		}
+		select {
+		case err := <-applied:
+			t.Errorf("a policy with an %s reached the beater (apply error: %v)", bad.name, err)
+		case <-time.After(50 * time.Millisecond):
+		}
+		assert.Same(t, lease, d.current.Load(), "a policy with an %s must leave the dispatcher's lease unchanged", bad.name)
+		assert.Equal(t, outageMaxEvents, queueLimit(d), "a policy with an %s must leave the queue limit unchanged", bad.name)
+		assert.Same(t, before, plugin.EffectiveOsqueryConfig(), "a policy with an %s must leave the osquery config unchanged", bad.name)
+		ns, _ := plugin.LookupNamespace("scheduled")
+		assert.Equal(t, "old", ns, "a policy with an %s must leave the query namespace unchanged", bad.name)
 	}
-	assert.Same(t, lease, d.current.Load(), "a rejected policy must leave the dispatcher's lease unchanged")
-	assert.Equal(t, outageMaxEvents, queueLimit(d), "a rejected policy must leave the queue limit unchanged")
-	assert.Same(t, before, plugin.EffectiveOsqueryConfig(), "a rejected policy must leave the osquery config unchanged")
-	ns, _ := plugin.LookupNamespace("scheduled")
-	assert.Equal(t, "old", ns, "a rejected policy must leave the query namespace unchanged")
 
-	require.NoError(t, registry.GetInputList().Reload(policy("uid")), "a valid policy after a rejected one must be accepted")
+	require.NoError(t, registry.GetInputList().Reload(policy("uid", nil)), "a valid policy after a rejected one must be accepted")
 	require.NoError(t, <-applied, "apply the valid policy")
 	assert.Equal(t, 5, queueLimit(d), "a valid policy must apply its queue limit")
-	ns, _ = plugin.LookupNamespace("scheduled")
+	ns, _ := plugin.LookupNamespace("scheduled")
 	assert.Equal(t, "new", ns, "a valid policy must apply its namespace")
+}
+
+func TestReloadSendsUnvalidatedInputs(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "unvalidated-inputs")
+	registry := reload.NewRegistry()
+	updates := config.WatchInputs(t.Context(), log, registry, func(inputs []config.InputConfig) error {
+		return validatePolicy(t.Context(), log, inputs)
+	})
+	// Set fills query defaults, merges pack defaults and adds stream packs to
+	// the inputs it is given.
+	cfg := conf.MustNewConfigFrom(map[string]any{
+		"name":        "osquery-manager-1",
+		"data_stream": map[string]any{"dataset": config.DefaultDataset},
+		"streams":     []any{map[string]any{"id": "users", "query": "SELECT 1", "interval": 60}},
+		"osquery": map[string]any{
+			"schedule": map[string]any{"scheduled": map[string]any{"query": "SELECT 1", "interval": 1}},
+			"packs": map[string]any{"pack": map[string]any{
+				"interval": 30,
+				"queries":  map[string]any{"q": map[string]any{"query": "SELECT 1"}},
+			}},
+		},
+	})
+	var want config.InputConfig
+	require.NoError(t, cfg.Unpack(&want), "unpack the policy")
+
+	reloaded := make(chan error, 1)
+	go func() {
+		reloaded <- registry.GetInputList().Reload([]*reload.ConfigWithMeta{{Config: cfg, InputUnitID: "osquery-unit"}})
+	}()
+	select {
+	case got := <-updates:
+		assert.Equal(t, []config.InputConfig{want}, got, "the beater must get the policy as unpacked, not as changed by validation")
+	case <-time.After(5 * time.Second):
+		t.Fatal("the valid policy did not reach the beater")
+	}
+	assert.NoError(t, <-reloaded, "a valid policy must be accepted")
 }
 
 func TestScheduledResultsRemovedInputsKeepPolicy(t *testing.T) {
