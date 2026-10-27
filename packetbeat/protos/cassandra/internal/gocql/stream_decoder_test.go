@@ -48,7 +48,7 @@ func TestReadInt(t *testing.T) {
 
 func TestStreamDecoderReadBytesLength(t *testing.T) {
 	authSuccess := func(length int32, payload string) []byte {
-		return append(appendInt(nil, length), payload...)
+		return append(appendInt32(nil, length), payload...)
 	}
 
 	tests := []struct {

@@ -48,7 +48,7 @@ func decodeFrame(t *testing.T, frame []byte, compressor Compressor) (map[string]
 	return framer.ReadFrame()
 }
 
-func appendInt(b []byte, n int32) []byte {
+func appendInt32(b []byte, n int32) []byte {
 	return binary.BigEndian.AppendUint32(b, uint32(n)) //nolint:gosec // test values keep their bit pattern
 }
 
@@ -61,12 +61,12 @@ func TestReadFrameLongStringLength(t *testing.T) {
 	}{
 		{
 			name: "valid query",
-			body: append(appendInt(nil, 8), "SELECT 1"...),
+			body: append(appendInt32(nil, 8), "SELECT 1"...),
 			want: map[string]any{"query": "SELECT 1"},
 		},
 		{
 			name:    "negative length",
-			body:    appendInt(nil, -1),
+			body:    appendInt32(nil, -1),
 			wantErr: "invalid long string length: -1",
 		},
 	}
@@ -99,17 +99,17 @@ func TestReadFrameLongStringLength(t *testing.T) {
 
 func TestReadFramePkeyCount(t *testing.T) {
 	preparedResult := func(pkeyCount int32, pkeyIndexes ...uint16) []byte {
-		body := appendInt(nil, resultKindPrepared)
+		body := appendInt32(nil, resultKindPrepared)
 		body = binary.BigEndian.AppendUint16(body, 16)
 		body = append(body, make([]byte, 16)...) // prepared id
-		body = appendInt(body, 0)                // flags
-		body = appendInt(body, 0)                // column count
-		body = appendInt(body, pkeyCount)
+		body = appendInt32(body, 0)              // flags
+		body = appendInt32(body, 0)              // column count
+		body = appendInt32(body, pkeyCount)
 		for _, i := range pkeyIndexes {
 			body = binary.BigEndian.AppendUint16(body, i)
 		}
-		body = appendInt(body, 0) // result metadata flags
-		return appendInt(body, 0) // result metadata column count
+		body = appendInt32(body, 0) // result metadata flags
+		return appendInt32(body, 0) // result metadata column count
 	}
 
 	tests := []struct {
@@ -161,7 +161,7 @@ func TestReadFramePkeyCount(t *testing.T) {
 }
 
 func TestReadFrameSnappyDecodedLength(t *testing.T) {
-	voidResult := appendInt(nil, resultKindVoid)
+	voidResult := appendInt32(nil, resultKindVoid)
 	compressor := SnappyCompressor{MaxDecodedLen: len(voidResult)}
 
 	tests := []struct {
