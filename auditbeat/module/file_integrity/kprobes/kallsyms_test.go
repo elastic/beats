@@ -28,7 +28,9 @@ import (
 
 func Test_getSymbolInfoFromReader(t *testing.T) {
 	// fsnotify.cold precedes fsnotify on purpose: distribution kernels list the
-	// cold fragment first, and the exact symbol must still win.
+	// cold fragment first, and the exact symbol must still win. Likewise
+	// fsnotify_nameremove.isra.0 precedes fsnotify_nameremove: an exact match
+	// must win over an earlier non-cold clone too.
 	content := `0000000000000000 t fsnotify_move
 0000000000000000 t fsnotify.cold
 0000000000000000 t __fsnotify_parent
@@ -39,6 +41,8 @@ func Test_getSymbolInfoFromReader(t *testing.T) {
 0000000000000000 t chmod_common.isra.0.cold
 0000000000000000 t vfs_getattr.constprop.0.cold
 0000000000000000 t vfs_getattr.constprop.0
+0000000000000000 t fsnotify_nameremove.isra.0
+0000000000000000 T fsnotify_nameremove
 0000000000000000 t fsnotify_parent.cold`
 
 	cases := []struct {
@@ -74,6 +78,13 @@ func Test_getSymbolInfoFromReader(t *testing.T) {
 			symbolName:          "vfs_getattr",
 			isOptimised:         true,
 			optimisedSymbolName: "vfs_getattr.constprop.0",
+			err:                 nil,
+		},
+		{
+			tName:               "exact_symbol_listed_after_clone",
+			symbolName:          "fsnotify_nameremove",
+			isOptimised:         false,
+			optimisedSymbolName: "",
 			err:                 nil,
 		},
 		{
