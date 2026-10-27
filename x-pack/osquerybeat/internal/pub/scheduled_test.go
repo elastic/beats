@@ -21,9 +21,10 @@ import (
 
 func TestScheduledPublisherGuardAndDeliveryMode(t *testing.T) {
 	recorder := &connectRecorder{}
-	var guarded, dropped, cut atomic.Int32
+	var guarded, dropped atomic.Int32
+	var cut atomic.Int64
 	p := NewScheduled(&beat.Beat{Publisher: recorder}, logptest.NewTestingLogger(t, "scheduled"),
-		func() bool { return guarded.Add(1) == 1 }, func() { dropped.Add(1) }, func(rows int) { cut.Add(int32(rows)) })
+		func() bool { return guarded.Add(1) == 1 }, func() { dropped.Add(1) }, func(rows int) { cut.Add(int64(rows)) })
 	t.Cleanup(p.Close)
 	require.NoError(t, p.Configure([]config.InputConfig{
 		inputWithNamespace(config.DefaultDataset, "default"),
@@ -39,7 +40,7 @@ func TestScheduledPublisherGuardAndDeliveryMode(t *testing.T) {
 	assert.Len(t, recorder.clients[0].events, 1, "retirement between rows must prevent further publication")
 	p.PublishScheduledProfile("index", "query", "schedule", "response", "", 1, nil)
 	assert.Empty(t, recorder.clients[1].events, "retirement must prevent profile publication")
-	assert.Equal(t, int32(2), cut.Load(), "report the row and the profile skipped after retirement")
+	assert.Equal(t, int64(2), cut.Load(), "report the row and the profile skipped after retirement")
 	recorder.configs[0].ClientListener.DroppedOnPublish(beat.Event{})
 	assert.Equal(t, int32(1), dropped.Load(), "make publication after close observable")
 
@@ -59,13 +60,16 @@ func TestScheduledProfilePreservesSchema(t *testing.T) {
 		inputWithNamespace(config.DefaultQueryProfileDataset, "profiles"),
 		inputWithNamespace(config.DefaultDataset, "results"),
 	}), "configure the scheduled result and profile clients")
-	recorder := p.b.Publisher.(*connectRecorder)
+	recorder, ok := p.b.Publisher.(*connectRecorder)
+	require.True(t, ok, "the publisher should be the connect recorder")
 	assert.Equal(t, "profiles", recorder.namespaceOf(t, p.queryProfileClient), "profiles should use the profile input's processors")
 
 	// Publish one profile and check the event keeps the existing schema and index.
 	profile := map[string]any{"source": "scheduled", "executions": int64(3), "duration": int64(12)}
 	p.PublishScheduledProfile(config.QueryProfileDatastream("results"), "uptime", "schedule", "response", "space", 7, profile)
-	published := p.queryProfileClient.(*recordingClient).snapshot()
+	profileClient, ok := p.queryProfileClient.(*recordingClient)
+	require.True(t, ok, "the profile client should be a recording client")
+	published := profileClient.snapshot()
 	require.Len(t, published, 1, "publish one scheduled profile event")
 	want := mapstr.M{
 		"type":                     "osquery_profile",
@@ -83,9 +87,9 @@ func TestScheduledProfilePreservesSchema(t *testing.T) {
 
 func TestScheduledPublisherReportsCutResponse(t *testing.T) {
 	recorder := &connectRecorder{}
-	var cut atomic.Int32
+	var cut atomic.Int64
 	p := NewScheduled(&beat.Beat{Publisher: recorder}, logptest.NewTestingLogger(t, "scheduled_response"),
-		func() bool { return false }, func() {}, func(rows int) { cut.Add(int32(rows)) })
+		func() bool { return false }, func() {}, func(rows int) { cut.Add(int64(rows)) })
 	t.Cleanup(p.Close)
 	require.NoError(t, p.Configure([]config.InputConfig{
 		inputWithNamespace(config.DefaultActionResponsesDataset, "default"),
@@ -94,6 +98,8 @@ func TestScheduledPublisherReportsCutResponse(t *testing.T) {
 	p.PublishScheduledResponse("schedule", "", "", "query", "", "response", time.Now(), time.Now(), time.Now(), 0, 1)
 
 	require.NotNil(t, p.actionResponsesClient, "connect the response client")
-	assert.Empty(t, p.actionResponsesClient.(*recordingClient).snapshot(), "a retired publisher must not publish the response")
-	assert.Equal(t, int32(1), cut.Load(), "report the skipped response as one cut row")
+	responseClient, ok := p.actionResponsesClient.(*recordingClient)
+	require.True(t, ok, "the response client should be a recording client")
+	assert.Empty(t, responseClient.snapshot(), "a retired publisher must not publish the response")
+	assert.Equal(t, int64(1), cut.Load(), "report the skipped response as one cut row")
 }

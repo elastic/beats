@@ -59,7 +59,7 @@ func newPublishingMetrics(reg *monitoring.Registry, queue string, log *logp.Logg
 // drop counts one dropped item of rows rows. Rows are counted first, so a
 // reader that sees the item also sees its rows.
 func (m *publishingMetrics) drop(reason string, rows int) {
-	m.droppedRows[reason].Add(uint64(rows))
+	m.droppedRows[reason].Add(nonNegative(rows))
 	m.dropped[reason].Inc()
 	m.warn("dropped." + reason)
 }
@@ -67,8 +67,16 @@ func (m *publishingMetrics) drop(reason string, rows int) {
 // dropRows counts rows dropped without dropping an item, such as an event
 // the pipeline discards while closing.
 func (m *publishingMetrics) dropRows(reason string, rows int) {
-	m.droppedRows[reason].Add(uint64(rows))
+	m.droppedRows[reason].Add(nonNegative(rows))
 	m.warn("dropped_rows." + reason)
+}
+
+// nonNegative converts a row count to uint64, treating a negative count as zero.
+func nonNegative(n int) uint64 {
+	if n < 0 {
+		return 0
+	}
+	return uint64(n)
 }
 
 // warn logs at most one warning per minute, naming counter, the counter

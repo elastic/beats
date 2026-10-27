@@ -472,11 +472,11 @@ func TestScheduledResultsRetiredLeaseCutsUnroutedRows(t *testing.T) {
 		name          string
 		namespace     string // of the replacement policy
 		stop          bool   // stop the dispatcher instead of replacing the policy
-		wantPublished int32  // rows and response published by the retired clients
+		wantPublished int    // rows and response published by the retired clients
 		reason        string // drop reason of the cut rows
 		wantCut       uint64 // rows cut
 	}{
-		{name: "still routed", namespace: "old", wantPublished: int32(len(rows) + 1), reason: dropStale},
+		{name: "still routed", namespace: "old", wantPublished: len(rows) + 1, reason: dropStale},
 		{name: "moved namespace", namespace: "other", reason: dropStale, wantCut: uint64(len(rows) + 1)},
 		{name: "stopped", stop: true, reason: dropShutdown, wantCut: uint64(len(rows) + 1)},
 	}
@@ -524,7 +524,7 @@ func TestScheduledResultsRetiredLeaseCutsUnroutedRows(t *testing.T) {
 				assert.Eventually(t, func() bool { return d.metrics.dropped[test.reason].Get() == 1 }, time.Second, time.Millisecond,
 					"a result cut short by retirement must count as one %s item", test.reason)
 			}
-			assert.Equal(t, test.wantPublished, first.published.Load(), "rows and response published through the retired clients")
+			assert.Equal(t, test.wantPublished, int(first.published.Load()), "rows and response published through the retired clients")
 			assert.Equal(t, test.wantCut, d.metrics.droppedRows[test.reason].Get(), "rows cut by retirement")
 		})
 	}
