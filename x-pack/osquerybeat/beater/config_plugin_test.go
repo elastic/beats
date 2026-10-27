@@ -12,11 +12,14 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/testutil"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func renderFullConfigJSON(inputs []config.InputConfig) (string, error) {
@@ -460,6 +463,29 @@ func TestSetScheduledQueryProfileFlag(t *testing.T) {
 	if !cfgp.LookupQueryProfile("scheduled_users") {
 		t.Fatal("expected scheduled query profile flag to be enabled")
 	}
+}
+
+func TestSetFailureKeepsConfig(t *testing.T) {
+	inputs := func(namespace, field string) []config.InputConfig {
+		return []config.InputConfig{{
+			Datastream: config.DatastreamConfig{Namespace: namespace},
+			Osquery: &config.OsqueryConfig{Schedule: map[string]config.Query{"users": {
+				Query:          "select * from users",
+				NativeSchedule: config.NativeSchedule{Interval: 60},
+				ECSMapping:     map[string]any{"user": map[string]any{"id": map[string]any{"field": field}}},
+			}}},
+		}}
+	}
+	cfgp := NewConfigPlugin(logptest.NewTestingLogger(t, "config_test"))
+	require.NoError(t, cfgp.Set(inputs("old", "uid")), "apply the first policy")
+	_, err := cfgp.GenerateConfig(t.Context())
+	require.NoError(t, err, "render the first policy")
+	rendered := cfgp.configString
+
+	err = cfgp.Set(inputs("new", ""))
+	require.ErrorIs(t, err, ErrECSMappingIsInvalid, "an empty ECS mapping field must be rejected")
+	assert.Equal(t, "old", cfgp.GetNamespace(), "a failed Set must keep the namespace")
+	assert.Equal(t, rendered, cfgp.configString, "a failed Set must keep the rendered config")
 }
 
 func TestNewConfigPluginProfilingEnabledByDefault(t *testing.T) {

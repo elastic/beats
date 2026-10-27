@@ -288,10 +288,7 @@ func (p *ConfigPlugin) render() (string, error) {
 }
 
 func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
-
-	p.configString = ""
-	p.namespace = ""
-
+	namespace := ""
 	queriesCount := 0
 	osqueryConfig := &config.OsqueryConfig{}
 	newQueryInfoMap := make(map[string]QueryInfo)
@@ -303,6 +300,8 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		if err != nil {
 			return
 		}
+		p.configString = ""
+		p.namespace = namespace
 		p.osqueryConfig = osqueryConfig
 		p.newQueryInfoMap = newQueryInfoMap
 		p.namespaces = namespaces
@@ -317,9 +316,9 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 
 	// Read namespace from the result input as of 7.16
 	result := config.ResultInput(inputs)
-	p.namespace = result.Datastream.Namespace
-	if p.namespace == "" {
-		p.namespace = config.DefaultNamespace
+	namespace = result.Datastream.Namespace
+	if namespace == "" {
+		namespace = config.DefaultNamespace
 	}
 
 	// Since 7.16 version only one integration/input is expected
@@ -366,7 +365,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		if err := config.ValidateQueryScheduleMode(qi); err != nil {
 			return fmt.Errorf("osquery.schedule[%q]: %w", name, err)
 		}
-		qi, err = registerQuery(name, p.namespace, qi, "", "", name)
+		qi, err = registerQuery(name, namespace, qi, "", "", name)
 		if err != nil {
 			return err
 		}
@@ -387,7 +386,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 			if err != nil {
 				return fmt.Errorf("osquery.packs[%q].queries[%q]: %w", packName, name, err)
 			}
-			qi, err = registerQuery(getPackQueryName(packName, name), p.namespace, qi, packID, pack.PackName, name)
+			qi, err = registerQuery(getPackQueryName(packName, name), namespace, qi, packID, pack.PackName, name)
 			if err != nil {
 				return err
 			}
@@ -422,7 +421,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 				Profiling:  stream.Profiling,
 			}
 
-			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), p.namespace, qi, input.Name, "", stream.ID)
+			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), namespace, qi, input.Name, "", stream.ID)
 			if err != nil {
 				return err
 			}
