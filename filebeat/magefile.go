@@ -157,16 +157,16 @@ func GenerateModuleIncludeListGo() error {
 		ImportDirs: []string{"input", "input/*", "processor/*"},
 		ModuleDirs: []string{"module"},
 		Outfile:    "include/list_agentbeat.go",
-		BuildTags:  "\n//go:build agentbeat && !securityonly\n",
+		BuildTags:  "\n//go:build agentbeat && !edr\n",
 		Pkg:        "include",
 	}); err != nil {
 		return err
 	}
-	// generate include/list_inputs_securityonly.go
+	// generate include/list_inputs_edr.go
 	if err := devtools.GenerateIncludeListGo(devtools.IncludeListOptions{
 		ImportDirs:            []string{"input/syslog"},
-		Outfile:               "include/list_inputs_securityonly.go",
-		BuildTags:             "\n//go:build securityonly\n",
+		Outfile:               "include/list_inputs_edr.go",
+		BuildTags:             "\n//go:build edr\n",
 		Pkg:                   "include",
 		SkipInitModule:        true,
 		ForceInitializeModule: true,

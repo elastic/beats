@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build securityonly && windows
+//go:build edr && windows
 
 package inputs
 
@@ -26,9 +26,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 )
 
-// securityOnlyOSInputs returns the OS specific inputs included in the
-// security-only build.
-func securityOnlyOSInputs(info beat.Info, components statestore.States) []v2.Plugin {
+// edrOSInputs returns the OS specific inputs included in the
+// edr build.
+func edrOSInputs(info beat.Info, components statestore.States) []v2.Plugin {
 	return []v2.Plugin{
 		winlog.Plugin(info.Logger, components),
 	}

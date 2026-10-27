@@ -15,21 +15,26 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build securityonly
+//go:build edr && linux
 
 package inputs
 
 import (
-	"github.com/elastic/beats/v7/filebeat/input/filestream"
-	"github.com/elastic/beats/v7/filebeat/input/logv2"
+	"github.com/elastic/beats/v7/filebeat/input/journald"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 )
 
-func Init(info beat.Info, components statestore.States) []v2.Plugin {
-	return append([]v2.Plugin{
-		filestream.Plugin(info.Logger, components),
-		logv2.LogPluginV2(info.Logger),
-	}, securityOnlyOSInputs(info, components)...)
+// edrOSInputs returns the OS specific inputs included in the
+// edr build.
+func edrOSInputs(info beat.Info, components statestore.States) []v2.Plugin {
+	var plugins []v2.Plugin
+
+	zeroPlugin := v2.Plugin{}
+	if journald := journald.Plugin(info.Logger, components); journald != zeroPlugin {
+		plugins = append(plugins, journald)
+	}
+
+	return plugins
 }

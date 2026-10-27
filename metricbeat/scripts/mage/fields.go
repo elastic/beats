@@ -31,7 +31,7 @@ func GenerateOSSMetricbeatModuleIncludeListGo() error {
 			ModuleDirs:       []string{"module"},
 			ModulesToExclude: []string{"module/docker", "module/kubernetes"},
 			Outfile:          "include/list_common.go",
-			BuildTags:        "\n//go:build !securityonly\n",
+			BuildTags:        "\n//go:build !edr\n",
 			Pkg:              "include",
 			SkipInitModule:   true,
 		})
@@ -45,7 +45,7 @@ func GenerateOSSMetricbeatModuleIncludeListGo() error {
 			ModuleDirs:       []string{"module/docker", "module/kubernetes"},
 			ModulesToExclude: nil,
 			Outfile:          "include/list_docker.go",
-			BuildTags:        "\n//go:build (linux || darwin || windows) && !securityonly\n",
+			BuildTags:        "\n//go:build (linux || darwin || windows) && !edr\n",
 			Pkg:              "include",
 			SkipInitModule:   true,
 		})
@@ -73,14 +73,14 @@ func GenerateOSSMetricbeatModuleIncludeListGo() error {
 			ModuleDirs:       nil,
 			ModulesToExclude: nil,
 			Outfile:          "include/list_init_agentbeat.go",
-			BuildTags:        "\n//go:build agentbeat && !securityonly\n",
+			BuildTags:        "\n//go:build agentbeat && !edr\n",
 			Pkg:              "include",
 			SkipInitModule:   false,
 		})
 	if err != nil {
 		return err
 	}
-	// generate include/list_common_securityonly.go
+	// generate include/list_common_edr.go
 	// ImportDirs picks up the top-level module package (registers the module factory via init()),
 	// while ModuleDirs finds the metricsets one level down via their _meta directories.
 	err = devtools.GenerateIncludeListGo(
@@ -88,8 +88,8 @@ func GenerateOSSMetricbeatModuleIncludeListGo() error {
 			ImportDirs:            []string{"module/linux", "module/system", "module/windows"},
 			ModuleDirs:            []string{"module/linux", "module/system", "module/windows"},
 			ModulesToExclude:      nil,
-			Outfile:               "include/list_common_securityonly.go",
-			BuildTags:             "\n//go:build securityonly\n",
+			Outfile:               "include/list_common_edr.go",
+			BuildTags:             "\n//go:build edr\n",
 			Pkg:                   "include",
 			SkipInitModule:        true,
 			ForceInitializeModule: true,

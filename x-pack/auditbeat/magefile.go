@@ -71,14 +71,14 @@ func AssembleDarwinUniversal() error {
 func GenerateModuleIncludeListGo() error {
 	opts := devtools.DefaultIncludeListOptions()
 	opts.ImportDirs = []string{"processors/*"}
-	opts.BuildTags = "\n//go:build !securityonly\n"
+	opts.BuildTags = "\n//go:build !edr\n"
 	if err := devtools.GenerateIncludeListGo(opts); err != nil {
 		return err
 	}
-	// generate include/list_securityonly.go
+	// generate include/list_edr.go
 	return devtools.GenerateIncludeListGo(devtools.IncludeListOptions{
-		Outfile:               "include/list_securityonly.go",
-		BuildTags:             "\n//go:build securityonly\n",
+		Outfile:               "include/list_edr.go",
+		BuildTags:             "\n//go:build edr\n",
 		Pkg:                   "include",
 		ForceInitializeModule: true,
 	})
