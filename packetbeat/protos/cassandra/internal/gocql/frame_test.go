@@ -80,18 +80,20 @@ func TestReadFrameLongStringLength(t *testing.T) {
 		{name: "compressed", compressor: SnappyCompressor{MaxDecodedLen: 1 << 10}, flags: flagCompress, encode: func(b []byte) []byte { return snappy.Encode(nil, b) }},
 	}
 	for _, dec := range decoders {
-		for _, tc := range tests {
-			t.Run(dec.name+"/"+tc.name, func(t *testing.T) {
-				frame := newFrame(v4Request, dec.flags, opQuery, dec.encode(tc.body))
-				data, err := decodeFrame(t, frame, dec.compressor)
-				if tc.wantErr != "" {
-					assert.ErrorContains(t, err, tc.wantErr, "negative length should be rejected")
-					return
-				}
-				assert.NoError(t, err, "valid frame should parse")
-				assert.Equal(t, tc.want, data, "unexpected decoded frame")
-			})
-		}
+		t.Run(dec.name, func(t *testing.T) {
+			for _, tc := range tests {
+				t.Run(tc.name, func(t *testing.T) {
+					frame := newFrame(v4Request, dec.flags, opQuery, dec.encode(tc.body))
+					data, err := decodeFrame(t, frame, dec.compressor)
+					if tc.wantErr != "" {
+						assert.ErrorContains(t, err, tc.wantErr, "negative length should be rejected")
+						return
+					}
+					assert.NoError(t, err, "valid frame should parse")
+					assert.Equal(t, tc.want, data, "unexpected decoded frame")
+				})
+			}
+		})
 	}
 }
 
