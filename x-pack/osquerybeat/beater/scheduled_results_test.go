@@ -221,7 +221,7 @@ func TestScheduledResultsPolicyChangeKeepsBacklog(t *testing.T) {
 		d.enqueue(t.Context(), nil, plugin, result, nil)
 	}
 	require.NoError(t, d.configure(outageInputs("old"), outageLimits), "replace the policy with one keeping the query")
-	next := activePublisher(d)
+	next := activePublisher(t, d)
 	release()
 	assert.Eventually(t, func() bool { return next.calls.Load() == 3 }, time.Second, time.Millisecond,
 		"queued results must publish through the new policy's clients")
@@ -238,7 +238,7 @@ func TestScheduledResultsPolicyChangeDropsMovedQuery(t *testing.T) {
 		d.enqueue(t.Context(), nil, plugin, result, nil)
 	}
 	require.NoError(t, d.configure(outageInputs("other"), outageLimits), "move the query to another namespace")
-	next := activePublisher(d)
+	next := activePublisher(t, d)
 	release()
 	assert.Eventually(t, func() bool { return d.metrics.dropped[dropStale].Get() == 3 }, time.Second, time.Millisecond,
 		"results for a moved query must be dropped as stale")
@@ -275,7 +275,7 @@ func TestScheduledResultsPolicyChangeDropsChangedSQL(t *testing.T) {
 	query.Query = "SELECT 2"
 	changed[0].Osquery.Schedule["scheduled"] = query
 	require.NoError(t, d.configure(changed, outageLimits), "change the query's SQL in the same namespace")
-	next := activePublisher(d)
+	next := activePublisher(t, d)
 	d.enqueue(t.Context(), nil, plugin, result, nil)
 	release()
 	assert.Eventually(t, func() bool { return d.metrics.dropped[dropStale].Get() == 3 }, time.Second, time.Millisecond,
@@ -296,7 +296,7 @@ func TestScheduledResultsPolicyChangeKeepsCapturedQueryInfo(t *testing.T) {
 	query.ECSMapping = map[string]any{"user": map[string]any{"id": map[string]any{"field": "uid"}}}
 	mapped[0].Osquery.Schedule["scheduled"] = query
 	require.NoError(t, d.configure(mapped, outageLimits), "change only the query's ECS mapping")
-	next := activePublisher(d)
+	next := activePublisher(t, d)
 	// The live plugin still has the old mapping; admission must accept it.
 	d.enqueue(t.Context(), nil, plugin, result, nil)
 	release()
@@ -540,7 +540,7 @@ func TestScheduledProfilesNeedProfileStream(t *testing.T) {
 
 	// Remove the profile stream; the queued and a new profile must both be stale.
 	require.NoError(t, d.configure(outageInputs("old"), outageLimits), "remove the profile stream")
-	next := activePublisher(d)
+	next := activePublisher(t, d)
 	d.enqueueProfile(profile)
 	release()
 	assert.Eventually(t, func() bool { return d.metrics.dropped[dropStale].Get() == 2 }, time.Second, time.Millisecond,
@@ -803,7 +803,7 @@ func TestScheduledResultsRemovedInputsKeepPolicy(t *testing.T) {
 
 	require.NoError(t, d.configure(outageInputs("old"), config.ScheduledPublishingConfig{MaxEvents: 5}), "apply a later policy")
 	assert.Equal(t, 5, queueLimit(d), "a later policy must apply its queue limit")
-	assert.NotSame(t, blocked, activePublisher(d), "a later policy must replace the clients")
+	assert.NotSame(t, blocked, activePublisher(t, d), "a later policy must replace the clients")
 }
 
 func queueLimit(d *scheduledResultDispatcher) int {
@@ -830,10 +830,12 @@ func recordHandledResults(d *scheduledResultDispatcher) <-chan handledResult {
 }
 
 // activePublisher returns the publisher of d's current policy.
-func activePublisher(d *scheduledResultDispatcher) *stalledResultPublisher {
+func activePublisher(t *testing.T, d *scheduledResultDispatcher) *stalledResultPublisher {
 	d.mu.Lock()
 	defer d.mu.Unlock()
-	return d.lease.publisher.(*stalledResultPublisher)
+	publisher, ok := d.lease.publisher.(*stalledResultPublisher)
+	require.True(t, ok, "the active publisher should be a stalled result publisher")
+	return publisher
 }
 
 func TestScheduledResultsReuseWorkerAcrossDaemonRestarts(t *testing.T) {

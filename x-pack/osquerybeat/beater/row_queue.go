@@ -7,6 +7,7 @@ package beater
 import (
 	"container/list"
 	"context"
+	"fmt"
 	"sync"
 	"time"
 )
@@ -79,7 +80,11 @@ func (q *rowQueue[T]) push(item T) {
 func (q *rowQueue[T]) evict() T {
 	victim := q.items.Front()
 	for e := victim; q.first > 0 && e != nil; e = e.Next() {
-		if e.Value.(T).evictFirst() {
+		v, ok := e.Value.(T)
+		if !ok {
+			panic(fmt.Sprintf("rowQueue holds %T, want only items pushed as its element type", e.Value))
+		}
+		if v.evictFirst() {
 			victim = e
 			break
 		}
@@ -88,7 +93,11 @@ func (q *rowQueue[T]) evict() T {
 }
 
 func (q *rowQueue[T]) remove(e *list.Element) T {
-	item := q.items.Remove(e).(T)
+	removed := q.items.Remove(e)
+	item, ok := removed.(T)
+	if !ok {
+		panic(fmt.Sprintf("rowQueue holds %T, want only items pushed as its element type", removed))
+	}
 	q.events -= item.rows()
 	if item.evictFirst() {
 		q.first--
