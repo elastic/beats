@@ -151,8 +151,28 @@ func (r *overlapReceiver) ingested() []string {
 
 func (r *overlapReceiver) waitIngested(n int) {
 	r.env.t.Helper()
-	require.Eventually(r.env.t, func() bool { return len(r.ingested()) >= n }, 30*time.Second, 20*time.Millisecond,
-		"receiver %s must ingest %d records, has %d", r.name, n, len(r.ingested()))
+	ok := assert.Eventually(r.env.t, func() bool { return len(r.ingested()) >= n }, 30*time.Second, 20*time.Millisecond)
+	if !ok {
+		r.dumpLogs()
+	}
+	require.True(r.env.t, ok, "receiver %s must ingest %d records, has %d", r.name, n, len(r.ingested()))
+}
+
+func (r *overlapReceiver) dumpLogs() {
+	t := r.env.t
+	t.Helper()
+	for _, rc := range r.env.receivers {
+		for _, e := range rc.logs.All() {
+			t.Logf("[%s] %s %s %v", rc.name, e.Time.Format("15:04:05.000"), e.Message, e.ContextMap())
+		}
+	}
+	entries, _ := os.ReadDir(r.env.logDir)
+	for _, de := range entries {
+		if info, err := de.Info(); err == nil {
+			t.Logf("log file %s size=%d", de.Name(), info.Size())
+		}
+	}
+	t.Logf("registry offsets: %v", registryOffsets(t, r.env.dataDir))
 }
 
 func (e *overlapEnv) flushes() int {

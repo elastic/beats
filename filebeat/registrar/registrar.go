@@ -140,11 +140,24 @@ func (r *Registrar) GetStates() []file.State {
 	if r.shared == nil {
 		return nil
 	}
-	return r.shared.statesFor(r)
+	return r.shared.statesFor(r, r.shared.states.GetStates())
 }
 
-func (s *sharedRegistrar) statesFor(owner *Registrar) []file.State {
-	states := s.states.GetStates()
+// StartStates returns the flushed states for a new input, as a separate
+// process would load them from disk, ignoring other owners' unflushed progress.
+func (r *Registrar) StartStates() []file.State {
+	if r.shared == nil {
+		return nil
+	}
+	states, err := readStatesFrom(r.shared.store, r.log)
+	if err != nil {
+		r.log.Errorf("Error reading persisted states: %v", err)
+		return nil
+	}
+	return r.shared.statesFor(r, states)
+}
+
+func (s *sharedRegistrar) statesFor(owner *Registrar, states []file.State) []file.State {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	mine := s.owned[owner]

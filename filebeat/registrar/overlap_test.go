@@ -182,7 +182,8 @@ func TestOverlapWarnsAgainAfterHandoff(t *testing.T) {
 
 func TestOverlapLeavingOwnerKeepsStateWithExpiredTTL(t *testing.T) {
 	regA, regB, _, _, a, b := startOverlapOwners(t)
-	stateStore := regA.stateStore.(*testStateStore)
+	stateStore, ok := regA.stateStore.(*testStateStore)
+	require.True(t, ok, "state store must be a testStateStore")
 
 	a.Offset, a.TTL = 500, 500*time.Millisecond
 	regA.Channel <- []file.State{a}
