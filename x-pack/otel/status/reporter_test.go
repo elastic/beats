@@ -7,6 +7,7 @@ package status
 import (
 	"fmt"
 	"testing"
+	"testing/synctest"
 	"time"
 
 	"github.com/stretchr/testify/assert"
@@ -170,38 +171,52 @@ func TestGroupStatusHasNoInputStatuses(t *testing.T) {
 }
 
 func TestGroupStatusCoalescesBursts(t *testing.T) {
-	m := &oteltest.MockHost{}
-	reporter := newGroupStatusReporter(m, 100*time.Millisecond)
+	synctest.Test(t, func(t *testing.T) {
+		m := &oteltest.MockHost{}
+		reporter := newGroupStatusReporter(m, 100*time.Millisecond)
 
-	// a change after a quiet interval is reported right away
-	reporter.GetReporterForRunner("runner-0").UpdateStatus(status.Running, "")
-	require.Len(t, m.GetEvents(), 1)
+		// a change after a quiet interval is reported right away
+		reporter.GetReporterForRunner("runner-0").UpdateStatus(status.Running, "")
+		require.Len(t, m.GetEvents(), 1, "the first change should be reported right away")
 
-	// a burst of changes is reported once, at the end of the interval
-	for i := 1; i < 1000; i++ {
-		reporter.GetReporterForRunner(fmt.Sprintf("runner-%d", i)).UpdateStatus(status.Running, "")
-	}
-	reporter.GetReporterForRunner("runner-1").UpdateStatus(status.Degraded, "degraded")
-	require.Len(t, m.GetEvents(), 1)
-	require.Eventually(t, func() bool { return len(m.GetEvents()) == 2 }, time.Second, 10*time.Millisecond)
+		// a burst of changes is reported once, at the end of the interval
+		for i := 1; i < 1000; i++ {
+			reporter.GetReporterForRunner(fmt.Sprintf("runner-%d", i)).UpdateStatus(status.Running, "")
+		}
+		reporter.GetReporterForRunner("runner-1").UpdateStatus(status.Degraded, "degraded")
 
-	evt := m.GetEvent()
-	assert.Equal(t, componentstatus.StatusRecoverableError, evt.Status())
-	inputs, ok := evt.Attributes().Get(InputStatusAttributesKey)
-	require.True(t, ok)
-	assert.Equal(t, 1000, inputs.Map().Len())
-	time.Sleep(200 * time.Millisecond)
-	assert.Len(t, m.GetEvents(), 2, "no reports without changes")
+		time.Sleep(100*time.Millisecond - time.Nanosecond)
+		synctest.Wait()
+		require.Len(t, m.GetEvents(), 1, "changes within the interval should not be reported before it ends")
+
+		time.Sleep(time.Nanosecond)
+		synctest.Wait()
+		require.Len(t, m.GetEvents(), 2, "changes within the interval should be reported once at its end")
+
+		evt := m.GetEvent()
+		assert.Equal(t, componentstatus.StatusRecoverableError, evt.Status(), "the report should include the last change")
+		inputs, ok := evt.Attributes().Get(InputStatusAttributesKey)
+		require.True(t, ok, "expected 'inputs' attribute to exist")
+		assert.Equal(t, 1000, inputs.Map().Len(), "the report should include every runner")
+
+		time.Sleep(time.Second)
+		synctest.Wait()
+		assert.Len(t, m.GetEvents(), 2, "no reports without changes")
+	})
 }
 
 func TestGroupStatusOverridesScheduledReport(t *testing.T) {
-	m := &oteltest.MockHost{}
-	reporter := newGroupStatusReporter(m, 100*time.Millisecond)
+	synctest.Test(t, func(t *testing.T) {
+		m := &oteltest.MockHost{}
+		reporter := newGroupStatusReporter(m, 100*time.Millisecond)
 
-	reporter.GetReporterForRunner("runner-0").UpdateStatus(status.Running, "")
-	reporter.GetReporterForRunner("runner-1").UpdateStatus(status.Running, "")
-	reporter.UpdateStatus(status.Failed, "beatreceiver failed")
+		reporter.GetReporterForRunner("runner-0").UpdateStatus(status.Running, "")
+		reporter.GetReporterForRunner("runner-1").UpdateStatus(status.Running, "")
+		reporter.UpdateStatus(status.Failed, "beatreceiver failed")
 
-	time.Sleep(200 * time.Millisecond)
-	assert.Equal(t, componentstatus.StatusPermanentError, m.GetEvent().Status(), "the scheduled report must not override the receiver status")
+		time.Sleep(time.Second)
+		synctest.Wait()
+		assert.Len(t, m.GetEvents(), 2, "the scheduled report should be canceled")
+		assert.Equal(t, componentstatus.StatusPermanentError, m.GetEvent().Status(), "the scheduled report must not override the receiver status")
+	})
 }
