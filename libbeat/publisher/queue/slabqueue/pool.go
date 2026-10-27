@@ -18,6 +18,7 @@
 package slabqueue
 
 import (
+	"context"
 	"sync"
 	"sync/atomic"
 
@@ -227,19 +228,30 @@ func (p *Pool[T]) shrinkLocked() {
 }
 
 // acquire takes a free slot index for a producer, blocking until one is
-// available, the queue closes (closeCh), or the pool shuts down. It returns
-// (0, false) when interrupted by close/shutdown. home is the producer's shard
-// hint.
-func (p *Pool[T]) acquire(home int, closeCh <-chan struct{}) (int, bool) {
+// available, the queue closes (closeCh), the pool shuts down, or ctx is done.
+// It returns queue.ErrClosed when interrupted by close/shutdown and ctx.Err()
+// when ctx ends first. home is the producer's shard hint.
+func (p *Pool[T]) acquire(ctx context.Context, home int, closeCh <-chan struct{}) (int, error) {
 	// Mirror the original channel select: a publish racing with shutdown/close
 	// fails rather than grabbing a slot that would be immediately abandoned.
 	if p.isClosed() || chClosed(closeCh) {
-		return 0, false
+		return 0, queue.ErrClosed
 	}
 	if i, ok := p.free.tryGrab(home); ok {
-		return i, true
+		return i, nil
 	}
+	return p.acquireSlow(ctx, home, closeCh)
+}
+
+// acquireSlow is acquire's blocking path, kept separate so the fast path
+// carries no defer.
+func (p *Pool[T]) acquireSlow(ctx context.Context, home int, closeCh <-chan struct{}) (int, error) {
 	f := p.free
+	if ctx.Done() != nil {
+		// Wake parked acquirers when ctx ends so this one sees ctx.Err().
+		stop := context.AfterFunc(ctx, f.wakeAll)
+		defer stop()
+	}
 	for {
 		f.gmu.Lock()
 		f.waiters.Add(1)
@@ -248,21 +260,27 @@ func (p *Pool[T]) acquire(home int, closeCh <-chan struct{}) (int, bool) {
 		if i, ok := f.tryGrab(home); ok {
 			f.waiters.Add(-1)
 			f.gmu.Unlock()
-			return i, true
+			return i, nil
 		}
 		if p.isClosed() || chClosed(closeCh) {
 			f.waiters.Add(-1)
 			f.gmu.Unlock()
-			return 0, false
+			return 0, queue.ErrClosed
+		}
+		err := ctx.Err()
+		if err != nil {
+			f.waiters.Add(-1)
+			f.gmu.Unlock()
+			return 0, err
 		}
 		f.gcond.Wait()
 		f.waiters.Add(-1)
 		f.gmu.Unlock()
 		if p.isClosed() || chClosed(closeCh) {
-			return 0, false
+			return 0, queue.ErrClosed
 		}
 		if i, ok := f.tryGrab(home); ok {
-			return i, true
+			return i, nil
 		}
 	}
 }

@@ -18,10 +18,16 @@
 package queue
 
 import (
+	"context"
+	"errors"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+// ErrClosed is returned by ContextProducer.PublishContext when the producer
+// or queue is closed.
+var ErrClosed = errors.New("queue: closed")
 
 // Queue is responsible for accepting, forwarding and ACKing events.
 // A queue will receive and buffer single events from its producers.
@@ -128,6 +134,22 @@ type Producer[T any] interface {
 	// The same channel instance is returned across calls. ACKWaitChan is safe to
 	// call concurrently with Publish, TryPublish and Close.
 	ACKWaitChan() <-chan struct{}
+}
+
+// ContextProducer is implemented by producers whose blocking publish can be
+// cancelled. Callers find it with a type assertion on a Producer and fall back
+// to Publish when it is absent; the disk queue does not implement it.
+type ContextProducer[T any] interface {
+	Producer[T]
+	// PublishContext adds an entry to the queue like Publish, but stops waiting
+	// for room when ctx is done. It returns the new entry's id and nil on
+	// success, ctx.Err() if ctx ended first (the entry was not added), or
+	// ErrClosed if the producer or queue is closed (where Publish would return
+	// false; the entry was not added). A nil error means the entry was added,
+	// even if ctx is done by the time PublishContext returns. If ctx is already
+	// done when PublishContext is called, an entry that fits without waiting
+	// may still be added; check ctx first to avoid that.
+	PublishContext(ctx context.Context, entry T) (EntryID, error)
 }
 
 // Batch of entries (usually publisher.Event) to be returned to Consumers.

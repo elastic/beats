@@ -18,6 +18,7 @@
 package memqueue
 
 import (
+	"context"
 	"sync"
 	"sync/atomic"
 
@@ -54,6 +55,11 @@ type ackProducer[T any] struct {
 	ackOnce       sync.Once
 }
 
+var (
+	_ queue.ContextProducer[int] = (*forgetfulProducer[int])(nil)
+	_ queue.ContextProducer[int] = (*ackProducer[int])(nil)
+)
+
 type openState[T any] struct {
 	log          *logp.Logger
 	done         chan struct{}
@@ -63,9 +69,16 @@ type openState[T any] struct {
 
 	// resp is used to receive the assigned EntryID after the runLoop
 	// processes a push request. It is allocated once per producer and
-	// reused across publishes. Publish is synchronous, so only one
-	// request is outstanding at a time.
+	// reused across publishes. Publish is synchronous, so a producer waits
+	// on one request at a time. A request abandoned by PublishContext gets
+	// no reply (see pushRequest.claim), so it never leaves a stale EntryID
+	// in resp.
 	resp chan queue.EntryID
+
+	// claim is handed to the run loop with each PublishContext request (see
+	// pushRequest.claim). It is reused until a request is abandoned, then
+	// replaced, because the abandoned request still refers to it.
+	claim *atomic.Bool
 }
 
 // producerID stores the order of events within a single producer, so multiple
@@ -127,6 +140,12 @@ func (p *forgetfulProducer[T]) Publish(event T) (queue.EntryID, bool) {
 	return p.openState.publish(p.makePushRequest(event))
 }
 
+// PublishContext is Publish, but stops waiting when ctx is done and returns
+// ctx.Err(); the event is then never added. See queue.ContextProducer.
+func (p *forgetfulProducer[T]) PublishContext(ctx context.Context, event T) (queue.EntryID, error) {
+	return p.openState.publishContext(ctx, p.makePushRequest(event))
+}
+
 func (p *forgetfulProducer[T]) TryPublish(event T) (queue.EntryID, bool) {
 	return p.openState.tryPublish(p.makePushRequest(event))
 }
@@ -161,6 +180,20 @@ func (p *ackProducer[T]) Publish(event T) (queue.EntryID, bool) {
 		p.maybeCloseAckWait()
 	}
 	return entryID, published
+}
+
+// PublishContext is Publish, but stops waiting when ctx is done and returns
+// ctx.Err(); the event is then never added. See queue.ContextProducer.
+func (p *ackProducer[T]) PublishContext(ctx context.Context, event T) (queue.EntryID, error) {
+	// Counted before enqueuing for the same reason as in Publish.
+	id := producerID(p.producedCount.Add(1)) //nolint:gosec // G115: monotonic per-producer publish count
+	entryID, err := p.openState.publishContext(ctx, p.makePushRequest(event, id))
+	if err != nil {
+		// Never enqueued (publishContext guarantees it): undo the count.
+		p.producedCount.Add(^uint64(0)) // -1
+		p.maybeCloseAckWait()
+	}
+	return entryID, err
 }
 
 // TryPublish adds an event to the queue only if there is room right now, never
@@ -228,6 +261,53 @@ func (st *openState[T]) publish(req pushRequest[T]) (queue.EntryID, bool) {
 		st.events = nil
 		return 0, false
 	}
+}
+
+// publishContext is publish, but gives up when ctx is done. A request already
+// sent to pushChan cannot be taken back, so on cancel it races the run loop
+// for req.claim: if the producer wins, the run loop discards the request and
+// the event is never added; if the run loop wins, it has added the event and
+// sent the reply, so the publish succeeds despite ctx.
+func (st *openState[T]) publishContext(ctx context.Context, req pushRequest[T]) (queue.EntryID, error) {
+	if st.encoder != nil {
+		req.event, req.eventSize = st.encoder.EncodeEntry(req.event)
+	}
+	if st.claim == nil {
+		st.claim = new(atomic.Bool)
+	}
+	// The previous request using this claim, if any, was handled by the run
+	// loop, so no one else refers to it.
+	st.claim.Store(false)
+	req.claim = st.claim
+	select {
+	case st.events <- req:
+	case <-st.done:
+		st.events = nil
+		return 0, queue.ErrClosed
+	case <-st.queueClosing:
+		st.events = nil
+		return 0, queue.ErrClosed
+	case <-ctx.Done():
+		return 0, ctx.Err()
+	}
+
+	select {
+	case id := <-req.resp:
+		return id, nil
+	case <-st.queueClosing:
+		id, ok := st.handlePendingResponse(req.resp)
+		if !ok {
+			return 0, queue.ErrClosed
+		}
+		return id, nil
+	case <-ctx.Done():
+	}
+	if st.claim.CompareAndSwap(false, true) {
+		st.claim = nil
+		return 0, ctx.Err()
+	}
+	// The run loop claimed the request; its reply is sent right after.
+	return <-req.resp, nil
 }
 
 func (st *openState[T]) tryPublish(req pushRequest[T]) (queue.EntryID, bool) {

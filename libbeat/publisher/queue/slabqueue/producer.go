@@ -18,6 +18,7 @@
 package slabqueue
 
 import (
+	"context"
 	"sync"
 	"sync/atomic"
 
@@ -52,6 +53,8 @@ type producer[T any] struct {
 	ackOnce   sync.Once
 }
 
+var _ queue.ContextProducer[int] = (*producer[int])(nil)
+
 // Publish adds an entry, blocking until both this queue is under its per-queue
 // cap and the shared pool has a free slot, or the queue/pool is closed.
 //
@@ -59,24 +62,36 @@ type producer[T any] struct {
 // its cap must not consume pool slots it cannot keep, which would starve other
 // queues sharing the pool.
 func (p *producer[T]) Publish(entry T) (queue.EntryID, bool) {
+	id, err := p.PublishContext(context.Background(), entry)
+	return id, err == nil
+}
+
+// PublishContext is Publish, but stops waiting when ctx is done and returns
+// ctx.Err(); the event is then not enqueued. See queue.ContextProducer.
+func (p *producer[T]) PublishContext(ctx context.Context, entry T) (queue.EntryID, error) {
 	if p.closed.Load() {
-		return 0, false
+		return 0, queue.ErrClosed
 	}
 	// Count the event before enqueuing it, else a concurrent Close could see
 	// finished >= published and close ackWait while it's still in flight. Each
 	// failure path below calls unpublish to undo this.
 	p.published.Add(1)
-	if !p.queue.reserve() {
+	err := p.queue.reserve(ctx)
+	if err != nil {
 		p.unpublish()
-		return 0, false
+		return 0, err
 	}
-	slotIdx, ok := p.queue.pool.acquire(p.home, p.queue.closeCh)
-	if !ok {
+	slotIdx, err := p.queue.pool.acquire(ctx, p.home, p.queue.closeCh)
+	if err != nil {
 		p.queue.releaseLive(1)
 		p.unpublish()
-		return 0, false
+		return 0, err
 	}
-	return p.fill(entry, slotIdx)
+	id, ok := p.fill(entry, slotIdx)
+	if !ok {
+		return 0, queue.ErrClosed
+	}
+	return id, nil
 }
 
 // TryPublish adds an entry only if this queue is under its per-queue cap and a
