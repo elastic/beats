@@ -87,6 +87,22 @@ type trackedProducer struct {
 	closed     atomic.Bool
 }
 
+var _ queue.ContextProducer[publisher.Event] = (*trackedProducer)(nil)
+
+// PublishContext forwards to the embedded producer, which the embedding would
+// otherwise hide. A producer that cannot cancel (the disk queue) publishes with
+// Publish, ignoring ctx.
+func (p *trackedProducer) PublishContext(ctx context.Context, e publisher.Event) (queue.EntryID, error) {
+	if cp, ok := p.Producer.(queue.ContextProducer[publisher.Event]); ok {
+		return cp.PublishContext(ctx, e)
+	}
+	id, ok := p.Producer.Publish(e)
+	if !ok {
+		return 0, queue.ErrClosed
+	}
+	return id, nil
+}
+
 func (p *trackedProducer) Close() {
 	if p.closed.Swap(true) {
 		return

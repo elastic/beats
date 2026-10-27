@@ -19,6 +19,7 @@ package beat
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -63,6 +64,36 @@ type Client interface {
 	// PublishAll events specified in the Event array
 	PublishAll([]Event)
 	Close() error
+}
+
+// ErrClientClosed is returned by ContextPublisher.PublishContext when the
+// event was not queued because the client or its queue is closed, or because
+// the queue rejected it (for example when the disk queue fails to serialize
+// it).
+var ErrClientClosed = errors.New("beat: client closed")
+
+// ContextPublisher is an optional interface of a Client whose blocking publish
+// can be cancelled. Find it with a type assertion on a Client and fall back to
+// Publish when it is absent. A wrapper around a Client must forward
+// PublishContext to keep it.
+type ContextPublisher interface {
+	// PublishContext publishes e like Publish, but stops waiting for room in
+	// the queue when ctx is done or the client is closed. It returns nil if
+	// the event was queued or filtered out by processors, ctx.Err() if ctx
+	// ended first, or ErrClientClosed if the event was not queued because the
+	// client or queue is closed (Close releases a PublishContext in flight).
+	// An event that is not queued is reported to the ClientListener as
+	// DroppedOnPublish; a filtered event is reported as Filtered, not
+	// dropped. If ctx is already done, an event that fits without waiting may
+	// still be queued, and PublishContext returns nil.
+	//
+	// Cancellation applies only to clients connected with no EventListener
+	// (ACK handling); setting one, even acker.Nil(), turns it off. It also
+	// needs a queue that supports it (the disk queue does not). Otherwise
+	// PublishContext ignores ctx and Close, and blocks like Publish. With
+	// DropIfFull it never blocks and returns nil for an event dropped because
+	// the queue is full.
+	PublishContext(ctx context.Context, e Event) error
 }
 
 // ClientConfig defines common configuration options one can pass to

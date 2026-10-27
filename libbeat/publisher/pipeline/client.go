@@ -18,6 +18,8 @@
 package pipeline
 
 import (
+	"context"
+	"errors"
 	"sync"
 	"sync/atomic"
 
@@ -28,7 +30,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-var _ beat.Client = (*client)(nil)
+var (
+	_ beat.Client           = (*client)(nil)
+	_ beat.ContextPublisher = (*client)(nil)
+)
 
 // client implements beat.Client interface
 // client connects a beat with the processors and pipeline queue.
@@ -44,7 +49,20 @@ type client struct {
 	logger     *logp.Logger
 	processors beat.Processor
 	producer   queue.Producer[publisher.Event]
-	mutex      sync.Mutex
+	// ctxProducer is producer when PublishContext may cancel a publish to it,
+	// else nil (see cancellableProducer).
+	ctxProducer queue.ContextProducer[publisher.Event]
+	// closeCtx is cancelled by Close to release a PublishContext waiting for
+	// room in the queue. Set only when ctxProducer is.
+	closeCtx    context.Context
+	closeCancel context.CancelFunc
+	mutex       sync.Mutex
+
+	// merged is the last context built by publishCtx, for a caller ctx whose
+	// Done channel is mergedDone.
+	merged       context.Context
+	mergedDone   <-chan struct{}
+	mergedCancel func()
 
 	eventFlags publisher.EventFlags
 	canDrop    bool
@@ -83,43 +101,13 @@ func (c *client) Publish(e beat.Event) {
 	c.publish(e)
 }
 
-func (c *client) publish(e beat.Event) {
-	var (
-		event   = &e
-		publish = true
-	)
-
-	c.onNewEvent()
-
-	if !c.isOpen.Load() {
-		// client is closing down -> report event as dropped and return
-		c.onDroppedOnPublish(e)
-		return
+// publish publishes e and reports whether it was queued or filtered out; false
+// means the event was dropped.
+func (c *client) publish(e beat.Event) bool {
+	if !c.prepare(&e) {
+		return c.isOpen.Load()
 	}
 
-	if c.processors != nil {
-		var err error
-
-		event, err = c.processors.Run(event)
-		publish = event != nil
-		if err != nil {
-			// If we introduce a dead-letter queue, this is where we should
-			// route the event to it.
-			c.logger.Errorf("Failed to publish event: %v", err)
-		}
-	}
-
-	if event != nil {
-		e = *event
-	}
-
-	c.eventListener.AddEvent(e, publish)
-	if !publish {
-		c.onFilteredOut()
-		return
-	}
-
-	e = *event
 	pubEvent := publisher.Event{
 		Content: e,
 		Flags:   c.eventFlags,
@@ -137,6 +125,125 @@ func (c *client) publish(e beat.Event) {
 	} else {
 		c.onDroppedOnPublish(e)
 	}
+	return published
+}
+
+// PublishContext implements beat.ContextPublisher. When the publish cannot be
+// cancelled (see cancellableProducer), or the client drops events on a full
+// queue, it publishes like Publish.
+func (c *client) PublishContext(ctx context.Context, e beat.Event) error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	if c.canDrop || c.ctxProducer == nil {
+		// With DropIfFull a refused event may only mean a full queue, which
+		// is not an error.
+		if !c.publish(e) && (!c.canDrop || !c.isOpen.Load()) {
+			return beat.ErrClientClosed
+		}
+		return nil
+	}
+
+	if !c.prepare(&e) {
+		if !c.isOpen.Load() {
+			return beat.ErrClientClosed
+		}
+		return nil // filtered out
+	}
+
+	_, err := c.ctxProducer.PublishContext(c.publishCtx(ctx), publisher.Event{
+		Content: e,
+		Flags:   c.eventFlags,
+	})
+	if err != nil {
+		c.onDroppedOnPublish(e)
+		if errors.Is(err, queue.ErrClosed) || c.closeCtx.Err() != nil {
+			return beat.ErrClientClosed
+		}
+		return err
+	}
+	c.onPublished()
+	return nil
+}
+
+// publishCtx returns a context that is done when ctx is done or the client
+// closes. Callers usually pass the same ctx many times, so the merged context
+// is kept and keyed on ctx's Done channel. A ctx with the same Done channel,
+// such as a context.WithValue child, reuses it: its values are not visible
+// through the merged context, but a producer only uses Done and Err. c.mutex
+// must be held.
+func (c *client) publishCtx(ctx context.Context) context.Context {
+	done := ctx.Done()
+	if done == nil {
+		return c.closeCtx // ctx is never done
+	}
+	if done != c.mergedDone {
+		if c.mergedCancel != nil {
+			c.mergedCancel()
+		}
+		merged, cancel := context.WithCancel(ctx)
+		stop := context.AfterFunc(c.closeCtx, cancel)
+		c.merged, c.mergedDone = merged, done
+		c.mergedCancel = func() {
+			stop()
+			cancel()
+		}
+	}
+	return c.merged
+}
+
+// cancellableProducer returns p as a queue.ContextProducer if a publish to it
+// may be cancelled, else nil. A client with an event listener cannot cancel:
+// the listener has already seen the event in AddEvent, and listeners that
+// count events in order (acker.TrackingCounter, EventPrivateReporter) would
+// then wait for an ACK that never comes.
+func cancellableProducer(p queue.Producer[publisher.Event], l beat.EventListener) queue.ContextProducer[publisher.Event] {
+	if l != nil {
+		return nil
+	}
+	cp, _ := p.(queue.ContextProducer[publisher.Event])
+	return cp
+}
+
+// prepare does the bookkeeping and processing shared by every publish path,
+// leaving the processed event in e. It returns false, having reported the
+// event, if the client is closed or the processors filtered the event out.
+func (c *client) prepare(e *beat.Event) bool {
+	var (
+		event   = e
+		publish = true
+	)
+
+	c.onNewEvent()
+
+	if !c.isOpen.Load() {
+		// client is closing down -> report event as dropped and return
+		c.onDroppedOnPublish(*e)
+		return false
+	}
+
+	if c.processors != nil {
+		var err error
+
+		event, err = c.processors.Run(event)
+		publish = event != nil
+		if err != nil {
+			// If we introduce a dead-letter queue, this is where we should
+			// route the event to it.
+			c.logger.Errorf("Failed to publish event: %v", err)
+		}
+	}
+
+	if event != nil {
+		*e = *event
+	}
+
+	c.eventListener.AddEvent(*e, publish)
+	if !publish {
+		c.onFilteredOut()
+		return false
+	}
+	return true
 }
 
 // Close performs stage one of shutdown: it stops the client from accepting new
@@ -148,6 +255,11 @@ func (c *client) publish(e beat.Event) {
 // pipeline-level shutdown (Pipeline.Disconnect, bounded by its context) is now
 // responsible for waiting on outstanding acknowledgments.
 func (c *client) Close() error {
+	if c.closeCancel != nil {
+		// Release a PublishContext waiting for room in the queue: it holds
+		// the mutex.
+		c.closeCancel()
+	}
 	// Hold the mutex so any in-progress Publish finishes before we flip isOpen.
 	c.mutex.Lock()
 	if !c.isOpen.Swap(false) {
