@@ -243,30 +243,9 @@ func runCmd(
 		return nil, fmt.Errorf("could not open stderr pipe: %w", err)
 	}
 
-	// This use of channels for results is awkward, but required for the thread locking below
-	cmdStarted := make(chan error)
-	cmdDone := make(chan error, 1)
-	go func() {
-		// We must idle this thread and ensure it is not killed while the external program is running
-		// see https://github.com/golang/go/issues/27505#issuecomment-713706104 . Otherwise, the Pdeathsig
-		// could cause the subprocess to die prematurely
-		runtime.LockOSThread()
-		defer runtime.UnlockOSThread()
-		cmdStarted <- cmd.Start()
-		// Buffered so this goroutine exits even if Start failed and nobody receives.
-		cmdDone <- cmd.Wait()
-	}()
-
-	err = <-cmdStarted
-	if err != nil {
-		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-		logp.L().Warnf("Could not start command %s: %s", cmd, err)
-		return nil, err
-	}
-
-	// The readers start only after cmd.Start: it reads the ExtraFiles
-	// descriptors that the results reader closes, and a failed start leaves no
-	// reader behind to wait for.
+	// Scan output from before cmd.Start: cmd.Wait closes these pipes as soon as
+	// the command exits, losing anything not read yet. A failed cmd.Start
+	// closes them too, so these scanners return without being waited on.
 	var wg sync.WaitGroup
 	wg.Go(func() {
 		err := scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
@@ -282,6 +261,33 @@ func runCmd(
 			logp.L().Warnf("could not scan stderr events from synthetics: %s", err)
 		}
 	})
+
+	// This use of channels for results is awkward, but required for the thread locking below
+	cmdStarted := make(chan error)
+	cmdDone := make(chan error)
+	go func() {
+		// We must idle this thread and ensure it is not killed while the external program is running
+		// see https://github.com/golang/go/issues/27505#issuecomment-713706104 . Otherwise, the Pdeathsig
+		// could cause the subprocess to die prematurely
+		runtime.LockOSThread()
+		defer runtime.UnlockOSThread()
+		err := cmd.Start()
+		cmdStarted <- err
+		// Nobody receives from cmdDone after a failed start.
+		if err == nil {
+			cmdDone <- cmd.Wait()
+		}
+	}()
+
+	err = <-cmdStarted
+	if err != nil {
+		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
+		logp.L().Warnf("Could not start command %s: %s", cmd, err)
+		return nil, err
+	}
+
+	// The results reader closes jsonReader, which cmd.Start reads as one of
+	// the ExtraFiles, so it starts only once cmd.Start has returned.
 	wg.Go(func() {
 		defer jsonReader.Close()
 
