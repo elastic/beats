@@ -346,7 +346,7 @@ URL of the AWS SQS queue that messages will be received from. (Required when `bu
 
 ### `region` [_region]
 
-The name of the AWS region of the end point. If this option is given it takes precedence over the region name obtained from the `queue_url` value. This parameter is required when `non_aws_bucket_name` is defined.
+The name of the AWS region of the end point. If this option is given it takes precedence over the region name obtained from the `queue_url` value. When `non_aws_bucket_name` is defined, either this parameter or `default_region` must be set.
 
 
 ### `visibility_timeout` [_visibility_timeout]
@@ -453,7 +453,7 @@ ARN of the AWS S3 Access Point that will be polled for list operation. (Required
 ### `non_aws_bucket_name` [_non_aws_bucket_name]
 
 Name of the S3 bucket that will be polled for list operation. Required for third-party S3 compatible services. (Required when `queue_url` and `bucket_arn` are not set).
-Note: `region` is required when `non_aws_bucket_name` is defined
+Note: `region` or `default_region` is required when `non_aws_bucket_name` is defined. If both are set, `region` is used.
 
 ### `bucket_list_interval` [_bucket_list_interval]
 
