@@ -37,7 +37,11 @@ func (hb *heartbeatReceiver) Start(ctx context.Context, host component.Host) err
 	releaseCancellation := context.AfterFunc(ctx, hb.cancel)
 	defer releaseCancellation()
 
+<<<<<<< HEAD
 	if err := hb.BeatReceiver.Start(host); err != nil {
+=======
+	if err := hb.BeatReceiver.Start(ctx, statusHost{Host: host}); err != nil {
+>>>>>>> 3ee7fd4 (Let heartbeat receiver recover from failed monitors (#54107))
 		return fmt.Errorf("starting heartbeat receiver: %w", err)
 	}
 
