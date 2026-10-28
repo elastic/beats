@@ -340,7 +340,8 @@ processors:
       source: |-
         def parseRawDetail(String raw) {
             Pattern detailRegex = /^([^(]+)\(([^)]+)\)\:\s*(.+)?$/;
-            Pattern parameterBindingRegex = /name\=(.+);\s*value\=(.+)$/;
+            // Labels are localized (e.g. German Name=/Wert=), so match the structure only.
+            Pattern parameterBindingRegex = /^[^=]+=(.+?);\s*[^=;]+=(.+)$/;
 
             def matcher = detailRegex.matcher(raw);
             if (!matcher.matches()) {
@@ -363,9 +364,9 @@ processors:
                 ];
             }
 
-            matcher = parameterBindingRegex.matcher(matches[3]);
+            matcher = parameterBindingRegex.matcher(matches[3] ?: "");
             if (!matcher.matches()) {
-                return ["value": matches[4]];
+                return ["value": raw];
             }
             def nameValMatches = new ArrayList();
             for (def i = 0; i <= matcher.groupCount(); i++) {
