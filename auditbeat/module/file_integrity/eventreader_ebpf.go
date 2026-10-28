@@ -21,6 +21,7 @@ package file_integrity
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -55,10 +56,41 @@ func (r *ebpfReader) Start(done <-chan struct{}) (<-chan Event, error) {
 	// The queue is owned by ebpfReader.consumeEvents, see its doc string.
 	r.queue = queue
 
+	// quark attributes file events through a process table keyed by the
+	// PIDs the kernel reports, which are those of the initial PID namespace.
+	// In other namespaces, the table is built from local PIDs and quark
+	// drops events it cannot attribute. Make this obvious by logging a warning.
+	if initial, err := inInitialPIDNamespace(); err != nil {
+		r.log.Debugw("could not determine PID namespace", "error", err)
+	} else if !initial {
+		r.log.Warn("auditbeat is not running in the initial PID namespace: " +
+			"the ebpf backend drops file events from processes started before " +
+			"auditbeat and may attribute others to the wrong process. " +
+			"In Docker, run with --pid=host.")
+	}
+
 	go r.consumeEvents(done)
 
 	r.log.Infow("started ebpf watcher", "file_path", r.config.Paths, "recursive", r.config.Recursive)
 	return r.eventC, nil
+}
+
+// initPIDNsInode is the inode of the initial PID namespace.
+// Fixed by the kernel as PROC_PID_INIT_INO in include/linux/proc_ns.h.
+const initPIDNsInode = 4026531836
+
+// inInitialPIDNamespace reports whether this process runs in the initial PID
+// namespace.
+func inInitialPIDNamespace() (bool, error) {
+	link, err := os.Readlink("/proc/self/ns/pid")
+	if err != nil {
+		return false, fmt.Errorf("read /proc/self/ns/pid: %w", err)
+	}
+	var inode uint64
+	if _, err := fmt.Sscanf(link, "pid:[%d]", &inode); err != nil {
+		return false, fmt.Errorf("parse /proc/self/ns/pid link %q: %w", link, err)
+	}
+	return inode == initPIDNsInode, nil
 }
 
 // statsCheckInterval defines the frequency of fetching quark stats.
