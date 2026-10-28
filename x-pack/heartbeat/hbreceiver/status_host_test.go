@@ -14,11 +14,12 @@ import (
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
+	otelstatus "github.com/elastic/beats/v7/x-pack/otel/status"
 )
 
 func TestStatusHost(t *testing.T) {
 	inputs := pcommon.NewMap()
-	monitor := inputs.PutEmptyMap(inputStatusesKey).PutEmptyMap("monitor")
+	monitor := inputs.PutEmptyMap(otelstatus.InputStatusAttributesKey).PutEmptyMap("monitor")
 	monitor.PutStr("status", componentstatus.StatusPermanentError.String())
 	monitor.PutStr("error", "invalid schedule")
 

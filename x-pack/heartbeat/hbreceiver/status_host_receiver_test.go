@@ -19,6 +19,7 @@ import (
 	"go.uber.org/zap/zaptest"
 
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
+	otelstatus "github.com/elastic/beats/v7/x-pack/otel/status"
 )
 
 // collectorHost records the status the receiver reports, and like the
@@ -79,7 +80,7 @@ func TestReceiverRecoversFromFailedMonitor(t *testing.T) {
 		if !assert.NotNil(c, evt) {
 			return componentstatus.StatusNone, ""
 		}
-		inputs, ok := evt.Attributes().Get(inputStatusesKey)
+		inputs, ok := evt.Attributes().Get(otelstatus.InputStatusAttributesKey)
 		if !assert.True(c, ok, "no input statuses") {
 			return evt.Status(), ""
 		}

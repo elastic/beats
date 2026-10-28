@@ -16,7 +16,11 @@ import (
 	"go.opentelemetry.io/collector/component/componentstatus"
 )
 
-const inputStatusAttributesKey = "inputs"
+// InputStatusAttributesKey is the event attribute holding the status of each
+// runner. Only events aggregated from runner statuses carry it; events from
+// RunnerReporter.UpdateStatus, which report the status of the whole group,
+// never do.
+const InputStatusAttributesKey = "inputs"
 
 type runnerState struct {
 	state status.Status
@@ -119,7 +123,7 @@ func (r *reporter) calculateOtelStatus() *componentstatus.Event {
 	}
 	evt = componentstatus.NewEvent(otelStatus, eventBuilderOpts...)
 
-	inputStatusesPdata := evt.Attributes().PutEmptyMap(inputStatusAttributesKey)
+	inputStatusesPdata := evt.Attributes().PutEmptyMap(InputStatusAttributesKey)
 
 	for id, rs := range r.runnerStates {
 		inputStatePdata := toPdata(rs)

@@ -7,11 +7,9 @@ package hbreceiver
 import (
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/component/componentstatus"
-)
 
-// inputStatusesKey is the event attribute where the beat receiver status
-// reporter puts the status of each input.
-const inputStatusesKey = "inputs"
+	otelstatus "github.com/elastic/beats/v7/x-pack/otel/status"
+)
 
 // statusHost adapts the status the receiver reports to the collector.
 //
@@ -29,7 +27,7 @@ type statusHost struct {
 
 func (h statusHost) Report(evt *componentstatus.Event) {
 	if evt.Status() == componentstatus.StatusPermanentError {
-		if _, fromInputs := evt.Attributes().Get(inputStatusesKey); fromInputs {
+		if _, fromInputs := evt.Attributes().Get(otelstatus.InputStatusAttributesKey); fromInputs {
 			evt = componentstatus.NewEvent(componentstatus.StatusRecoverableError,
 				componentstatus.WithError(evt.Err()),
 				componentstatus.WithAttributes(evt.Attributes()))
