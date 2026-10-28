@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component/componentstatus"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
@@ -167,30 +168,74 @@ func TestGroupStatusHasNoInputStatuses(t *testing.T) {
 	assert.False(t, ok, "expected the group status event to carry no input statuses")
 }
 
-func TestStoppedRunnerIsRemoved(t *testing.T) {
-	m := &oteltest.MockHost{}
-	reporter := NewGroupStatusReporter(m)
-	healthy := reporter.GetReporterForRunner("healthy")
-	removed := reporter.GetReporterForRunner("removed")
+func TestRemoveRunner(t *testing.T) {
+	remove := func(t *testing.T, r status.StatusReporter) {
+		remover, ok := r.(runnerRemover)
+		require.True(t, ok, "expected the runner reporter to remove its runner")
+		remover.remove()
+	}
+	inputStatuses := func(t *testing.T, evt *componentstatus.Event) pcommon.Map {
+		inputs, ok := evt.Attributes().Get(InputStatusAttributesKey)
+		require.True(t, ok, "expected the event to carry input statuses")
+		return inputs.Map()
+	}
 
-	healthy.UpdateStatus(status.Running, "")
-	removed.UpdateStatus(status.Failed, "invalid config")
-	require.Equal(t, componentstatus.StatusPermanentError, m.GetEvent().Status(), "a failed runner fails the group")
+	t.Run("removes the state and reports the group again", func(t *testing.T) {
+		m := &oteltest.MockHost{}
+		reporter := NewGroupStatusReporter(m)
+		healthy := reporter.GetReporterForRunner("healthy")
+		failed := reporter.GetReporterForRunner("failed")
+		healthy.UpdateStatus(status.Running, "")
+		failed.UpdateStatus(status.Failed, "invalid config")
+		require.Equal(t, componentstatus.StatusPermanentError, m.GetEvent().Status(), "a failed runner fails the group")
 
-	removed.UpdateStatus(status.Stopped, "")
+		remove(t, failed)
 
-	evt := m.GetEvent()
-	assert.Equal(t, componentstatus.StatusOK, evt.Status(), "a removed runner must not keep the group failed")
-	inputs, ok := evt.Attributes().Get(InputStatusAttributesKey)
-	require.True(t, ok, "expected 'inputs' attribute to exist")
-	_, ok = inputs.Map().Get("removed")
-	assert.False(t, ok, "a stopped runner must not be reported")
-	_, ok = inputs.Map().Get("healthy")
-	assert.True(t, ok, "other runners must still be reported")
+		evt := m.GetEvent()
+		assert.Equal(t, componentstatus.StatusOK, evt.Status(), "a removed runner must not keep the group failed")
+		inputs := inputStatuses(t, evt)
+		_, ok := inputs.Get("failed")
+		assert.False(t, ok, "a removed runner must not be reported")
+		_, ok = inputs.Get("healthy")
+		assert.True(t, ok, "other runners must still be reported")
+	})
 
-	t.Run("stopping an unknown runner reports nothing", func(t *testing.T) {
+	t.Run("ignores updates of a removed runner", func(t *testing.T) {
+		m := &oteltest.MockHost{}
+		reporter := NewGroupStatusReporter(m)
+		runner := reporter.GetReporterForRunner("runner")
+		runner.UpdateStatus(status.Running, "")
+		remove(t, runner)
 		before := len(m.GetEvents())
-		reporter.GetReporterForRunner("unknown").UpdateStatus(status.Stopped, "")
-		assert.Len(t, m.GetEvents(), before, "no report expected")
+
+		runner.UpdateStatus(status.Failed, "late failure")
+
+		assert.Len(t, m.GetEvents(), before, "a removed runner must not report")
+	})
+
+	t.Run("keeps the state of a replacement with the same ID", func(t *testing.T) {
+		m := &oteltest.MockHost{}
+		reporter := NewGroupStatusReporter(m)
+		old := reporter.GetReporterForRunner("runner")
+		old.UpdateStatus(status.Running, "")
+		replacement := reporter.GetReporterForRunner("runner")
+		replacement.UpdateStatus(status.Degraded, "slow")
+		before := len(m.GetEvents())
+
+		remove(t, old)
+
+		assert.Len(t, m.GetEvents(), before, "removing a replaced runner must not report")
+		replacement.UpdateStatus(status.Degraded, "still slow")
+		_, ok := inputStatuses(t, m.GetEvent()).Get("runner")
+		assert.True(t, ok, "the replacement must still be reported")
+	})
+
+	t.Run("reports nothing for a runner that never reported", func(t *testing.T) {
+		m := &oteltest.MockHost{}
+		reporter := NewGroupStatusReporter(m)
+
+		remove(t, reporter.GetReporterForRunner("runner"))
+
+		assert.Empty(t, m.GetEvents(), "no report expected")
 	})
 }

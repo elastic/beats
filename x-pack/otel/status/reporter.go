@@ -25,6 +25,9 @@ const InputStatusAttributesKey = "inputs"
 type runnerState struct {
 	state status.Status
 	msg   string
+	// owner is the reporter of the runner that reported this state last, so a
+	// stopped runner does not remove the state of a replacement with its ID.
+	owner *subReporter
 }
 
 // toPdata converts a runnerState to a pdata.Map
@@ -71,31 +74,47 @@ func (r *reporter) GetReporterForRunner(id string) status.StatusReporter {
 	}
 }
 
-func (r *reporter) updateStatusForRunner(id string, state status.Status, msg string) {
+func (r *reporter) updateStatusForRunner(sub *subReporter, state status.Status, msg string) {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
+	if sub.removed {
+		// The runner already stopped, a late update would add its state back.
+		return
+	}
 	if r.runnerStates == nil {
 		r.runnerStates = make(map[string]*runnerState)
 	}
-	if state == status.Stopped {
-		// A stopped runner was removed or is being replaced, a stale entry
-		// would keep reporting its last status.
-		if _, ok := r.runnerStates[id]; !ok {
-			return
-		}
-		delete(r.runnerStates, id)
-	} else if rState, ok := r.runnerStates[id]; ok {
+	if rState, ok := r.runnerStates[sub.id]; ok {
 		rState.msg = msg
 		rState.state = state
+		rState.owner = sub
 	} else {
 		// add status for the runner to the map, if not preset
-		r.runnerStates[id] = &runnerState{
+		r.runnerStates[sub.id] = &runnerState{
 			state: state,
 			msg:   msg,
+			owner: sub,
 		}
 	}
 
 	// report aggregated status for all sub-components
+	evt := r.calculateOtelStatus()
+	componentstatus.ReportStatus(r.host, evt)
+}
+
+// removeRunner deletes the state of a stopped runner. Runners are added and
+// removed for as long as the receiver runs, for example by autodiscover, so a
+// state that is never deleted leaks and keeps counting towards the group status.
+func (r *reporter) removeRunner(sub *subReporter) {
+	r.mtx.Lock()
+	defer r.mtx.Unlock()
+	sub.removed = true
+	rState, ok := r.runnerStates[sub.id]
+	if !ok || rState.owner != sub {
+		return
+	}
+	delete(r.runnerStates, sub.id)
+
 	evt := r.calculateOtelStatus()
 	componentstatus.ReportStatus(r.host, evt)
 }
@@ -166,11 +185,18 @@ func (r *reporter) calculateAggregateState() (status.Status, string) {
 type subReporter struct {
 	id string
 	r  *reporter
+	// removed is set once the runner stopped, guarded by r.mtx.
+	removed bool
 }
 
 func (m *subReporter) UpdateStatus(status status.Status, msg string) {
 	// report status to its parent
-	m.r.updateStatusForRunner(m.id, status, msg)
+	m.r.updateStatusForRunner(m, status, msg)
+}
+
+// remove deletes the runner's state from its group once the runner stopped.
+func (m *subReporter) remove() {
+	m.r.removeRunner(m)
 }
 
 // beatStatusToOtelStatus converts a beat status to an otel status.

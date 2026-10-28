@@ -139,7 +139,7 @@ func (c *crawler) startInput(
 	if err != nil {
 		return fmt.Errorf("error while initializing input: %w", err)
 	}
-	if inputRunner, ok := runner.(*input.Runner); ok {
+	if inputRunner, ok := unwrapRunner(runner).(*input.Runner); ok {
 		inputRunner.Once = c.once
 	}
 
@@ -184,4 +184,16 @@ func (c *crawler) Stop() {
 
 func (c *crawler) WaitForCompletion() {
 	c.wg.Wait()
+}
+
+// unwrapRunner returns the runner that runner wraps, if any. Factory wrappers
+// can wrap the runners they create, such as the OTel status wrapper.
+func unwrapRunner(runner cfgfile.Runner) cfgfile.Runner {
+	for {
+		w, ok := runner.(interface{ Unwrap() cfgfile.Runner })
+		if !ok {
+			return runner
+		}
+		runner = w.Unwrap()
+	}
 }
