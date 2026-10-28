@@ -51,6 +51,8 @@ func (r *ebpfReader) Start(done <-chan struct{}) (<-chan Event, error) {
 	if err != nil {
 		return nil, fmt.Errorf("open quark queue: %w", err)
 	}
+
+	// The queue is owned by ebpfReader.consumeEvents, see its doc string.
 	r.queue = queue
 
 	go r.consumeEvents(done)
@@ -62,8 +64,9 @@ func (r *ebpfReader) Start(done <-chan struct{}) (<-chan Event, error) {
 // statsCheckInterval defines the frequency of fetching quark stats.
 const statsCheckInterval = time.Second
 
-// consumeEvents owns the quark queue. The queue is not safe for concurrent
-// use, so every call on it, including Close, happens on this goroutine.
+// consumeEvents owns the quark queue and runs in its own goroutine.
+// The queue is not safe for concurrent use, so every call on it,
+// including Close, happens on this goroutine.
 func (r *ebpfReader) consumeEvents(done <-chan struct{}) {
 	defer close(r.eventC)
 	defer r.queue.Close()
