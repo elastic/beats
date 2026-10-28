@@ -37,7 +37,7 @@ func (f StreamDecoder) ReadInt() (n int) {
 	if err != nil {
 		panic(err)
 	}
-	n = int(data)
+	n = int(int32(data)) //nolint:gosec // [int] is signed on the wire
 
 	return
 }
@@ -77,6 +77,9 @@ func (f StreamDecoder) ReadString() (s string) {
 
 func (f StreamDecoder) ReadLongString() (s string) {
 	size := f.ReadInt()
+	if size < 0 {
+		panic(fmt.Errorf("invalid long string length: %d", size))
+	}
 
 	if !f.r.Avail(size) {
 		panic(fmt.Errorf("not enough buf to readLongString,need:%d,actual:%d", size, f.r.Len()))
@@ -117,6 +120,10 @@ func (f StreamDecoder) ReadBytesInternal() []byte {
 	size := f.ReadInt()
 	if size < 0 {
 		return nil
+	}
+
+	if !f.r.Avail(size) {
+		panic(fmt.Errorf("not enough buf to readBytes, need:%d, actual:%d", size, f.r.Len()))
 	}
 
 	bytes := make([]byte, size)
