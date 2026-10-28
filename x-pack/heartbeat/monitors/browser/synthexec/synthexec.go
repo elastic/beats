@@ -129,16 +129,28 @@ func runCmd(
 	stdinStr *string,
 	params func() map[string]interface{},
 	filterJourneys FilterJourneyConfig,
+<<<<<<< HEAD
 ) (mpx *ExecMultiplexer, err error) {
+=======
+	sFields stdfields.StdMonitorFields,
+	traceID string,
+) (_ *ExecMultiplexer, err error) {
+>>>>>>> 821662f (x-pack/heartbeat/synthexec: fix pipe race and start-failure leaks (#52405))
 	// Attach sysproc attrs to ensure subprocesses are properly killed
 	platformCmdMutate(cmd)
 
-	mpx = NewExecMultiplexer()
+	mpx := NewExecMultiplexer()
 	// Setup a pipe for JSON structured output
 	jsonReader, jsonWriter, err := os.Pipe()
 	if err != nil {
 		return nil, err
 	}
+	defer func() {
+		if err != nil {
+			_ = jsonWriter.Close()
+			_ = jsonReader.Close()
+		}
+	}()
 
 	// Common args
 	cmd.Env = append(os.Environ(), "NODE_ENV=production")
@@ -176,20 +188,31 @@ func runCmd(
 		cmd.Stdin = strings.NewReader(*stdinStr)
 	}
 
-	wg := sync.WaitGroup{}
-
-	// Send stdout into the output
 	stdoutPipe, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, fmt.Errorf("could not open stdout pipe: %w", err)
 	}
+<<<<<<< HEAD
 	wg.Add(1)
 	go func() {
+=======
+	stderrPipe, err := cmd.StderrPipe()
+	if err != nil {
+		return nil, fmt.Errorf("could not open stderr pipe: %w", err)
+	}
+
+	// Scan output from before cmd.Start: cmd.Wait closes these pipes as soon as
+	// the command exits, losing anything not read yet. A failed cmd.Start
+	// closes them too, so these scanners return without being waited on.
+	var wg sync.WaitGroup
+	wg.Go(func() {
+>>>>>>> 821662f (x-pack/heartbeat/synthexec: fix pipe race and start-failure leaks (#52405))
 		err := scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
 		if err != nil {
 			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
 			logp.L().Warnf("could not scan stdout events from synthetics: %s", err)
 		}
+<<<<<<< HEAD
 
 		wg.Done()
 	}()
@@ -200,6 +223,10 @@ func runCmd(
 	}
 	wg.Add(1)
 	go func() {
+=======
+	})
+	wg.Go(func() {
+>>>>>>> 821662f (x-pack/heartbeat/synthexec: fix pipe race and start-failure leaks (#52405))
 		err := scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)
 		if err != nil {
 			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
@@ -208,9 +235,39 @@ func runCmd(
 		wg.Done()
 	}()
 
+<<<<<<< HEAD
 	// Send the test results into the output
 	wg.Add(1)
 	go func() {
+=======
+	// This use of channels for results is awkward, but required for the thread locking below
+	cmdStarted := make(chan error)
+	cmdDone := make(chan error)
+	go func() {
+		// We must idle this thread and ensure it is not killed while the external program is running
+		// see https://github.com/golang/go/issues/27505#issuecomment-713706104 . Otherwise, the Pdeathsig
+		// could cause the subprocess to die prematurely
+		runtime.LockOSThread()
+		defer runtime.UnlockOSThread()
+		err := cmd.Start()
+		cmdStarted <- err
+		// Nobody receives from cmdDone after a failed start.
+		if err == nil {
+			cmdDone <- cmd.Wait()
+		}
+	}()
+
+	err = <-cmdStarted
+	if err != nil {
+		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
+		logp.L().Warnf("Could not start command %s: %s", cmd, err)
+		return nil, err
+	}
+
+	// The results reader closes jsonReader, which cmd.Start reads as one of
+	// the ExtraFiles, so it starts only once cmd.Start has returned.
+	wg.Go(func() {
+>>>>>>> 821662f (x-pack/heartbeat/synthexec: fix pipe race and start-failure leaks (#52405))
 		defer jsonReader.Close()
 
 		// We don't use scanToSynthEvents here because all lines here will be JSON
@@ -229,33 +286,13 @@ func runCmd(
 
 			mpx.writeSynthEvent(&se)
 		}
+<<<<<<< HEAD
 
 		wg.Done()
 	}()
-
-	// This use of channels for results is awkward, but required for the thread locking below
-	cmdStarted := make(chan error)
-	cmdDone := make(chan error)
-	go func() {
-		// We must idle this thread and ensure it is not killed while the external program is running
-		// see https://github.com/golang/go/issues/27505#issuecomment-713706104 . Otherwise, the Pdeathsig
-		// could cause the subprocess to die prematurely
-		runtime.LockOSThread()
-		defer runtime.UnlockOSThread()
-		err = cmd.Start()
-
-		cmdStarted <- err
-
-		err := cmd.Wait()
-		cmdDone <- err
-	}()
-
-	err = <-cmdStarted
-	if err != nil {
-		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-		logp.L().Warnf("Could not start command %s: %s", cmd, err)
-		return nil, err
-	}
+=======
+	})
+>>>>>>> 821662f (x-pack/heartbeat/synthexec: fix pipe race and start-failure leaks (#52405))
 
 	// Get timeout from parent ctx
 	timeout, _ := ctx.Value(SynthexecTimeoutKey).(time.Duration)
