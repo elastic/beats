@@ -95,11 +95,11 @@ func (s *osqueryRunState) exit(err error) error {
 		s.startupErr = err
 	}
 	if !ready {
-		var exitError *exec.ExitError
 		if err == nil {
 			s.startupErr = ErrOsquerydExited
 			return s.startupErr
 		}
+		var exitError *exec.ExitError
 		if errors.As(err, &exitError) {
 			s.startupErr = err
 		}

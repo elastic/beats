@@ -31,7 +31,8 @@ func TestOsqueryExit(t *testing.T) {
 	exit78 := osqueryExitError(t, 78)
 	otherExit := osqueryExitError(t, 1)
 
-	t.Run("competing_extension_error", func(t *testing.T) { testOsqueryCompetingExtensionError(t, exit78) })
+	t.Run("competing_extension_error_exit_78", func(t *testing.T) { testOsqueryCompetingExtensionError(t, exit78) })
+	t.Run("competing_extension_error_other_exit", func(t *testing.T) { testOsqueryCompetingExtensionError(t, otherExit) })
 	t.Run("classification", func(t *testing.T) { testOsqueryExitClassification(t, exit78, otherExit) })
 	t.Run("runtime_exit_78_then_startup_failure", func(t *testing.T) { testOsqueryRunnerRuntimeExit78ThenStartupFailure(t, exit78) })
 	t.Run("readiness_during_exit_cleanup", func(t *testing.T) { testOsqueryReadinessDuringExitCleanup(t, exit78) })
@@ -116,7 +117,6 @@ func testOsqueryRunnerRuntimeExit78ThenStartupFailure(t *testing.T, exit78 error
 	runner := newOsqueryRunner(logptest.NewTestingLogger(t, "runner"))
 	runner.maxRestarts = 8
 	runner.retryInitial = time.Millisecond
-	runner.retryMax = time.Millisecond
 	done := make(chan error, 1)
 	go func() {
 		done <- runner.Run(ctx, func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, inputs <-chan []config.InputConfig) error {
@@ -126,7 +126,8 @@ func testOsqueryRunnerRuntimeExit78ThenStartupFailure(t *testing.T, exit78 error
 			case <-inputs:
 			}
 			var state osqueryRunState
-			// A larger test budget permits six runtime retries; the replacement's startup failure is terminal.
+			// With maxRestarts at 8, the first six runs fail after readiness and
+			// all restart. The seventh fails before readiness, which is terminal.
 			if runs.Add(1) <= 6 {
 				state.ready()
 			}
@@ -137,7 +138,7 @@ func testOsqueryRunnerRuntimeExit78ThenStartupFailure(t *testing.T, exit78 error
 	select {
 	case err := <-done:
 		assert.ErrorIs(t, err, exit78, "replacement startup failure must remain terminal")
-		assert.Equal(t, int32(7), runs.Load(), "runtime errors must restart without a retry cap")
+		assert.Equal(t, int32(7), runs.Load(), "runtime exit 78 must restart while the budget lasts")
 	case <-time.After(10 * time.Second):
 		t.Fatal("runner did not restart and return its startup failure")
 	}
@@ -316,6 +317,22 @@ func testOsqueryKillAfterCancellation(t *testing.T, killed, exit78 error) {
 	})
 }
 
+// After an intentional stop, runOsquery turns the killed process's nil exit
+// into ErrOsquerydExited, which can win the errgroup race. The cancellation
+// must still be the result, with or without a startup error.
+func TestOsqueryRunResultPrefersCancellation(t *testing.T) {
+	ctx, cancel := context.WithCancel(t.Context())
+	cancel()
+	for _, startupErr := range []bool{false, true} {
+		var state osqueryRunState
+		if startupErr {
+			assert.ErrorIs(t, state.exit(nil), ErrOsquerydExited, "a clean exit before readiness is a startup failure")
+		}
+		err := state.result(ctx, ErrOsquerydExited)
+		assert.ErrorIs(t, err, context.Canceled, "an intentional stop must not report an osqueryd exit (startup error: %v)", startupErr)
+	}
+}
+
 func TestRunOsqueryLogsCancelledExitAtInfo(t *testing.T) {
 	log, logs := logptest.NewTestingLoggerWithObserver(t, "")
 	ob, b, _ := newStatusTestBeater(t, func(ob *osquerybeat) { ob.log = log })
@@ -330,7 +347,7 @@ func TestRunOsqueryLogsCancelledExitAtInfo(t *testing.T) {
 	assert.Equal(t, 1, logs.FilterMessage("osqueryd process exited").Len(), "an intentional stop logs the exit at info")
 }
 
-func testOsqueryCompetingExtensionError(t *testing.T, exit78 error) {
+func testOsqueryCompetingExtensionError(t *testing.T, exit error) {
 	t.Helper()
 	for _, tc := range []struct {
 		name   string
@@ -348,7 +365,7 @@ func testOsqueryCompetingExtensionError(t *testing.T, exit78 error) {
 			if tc.ready {
 				state.ready()
 			}
-			runner := &delayedCleanupRunner{err: exit78, exited: make(chan struct{}), cleanup: make(chan struct{})}
+			runner := &delayedCleanupRunner{err: exit, exited: make(chan struct{}), cleanup: make(chan struct{})}
 			var cleanupOnce sync.Once
 			cleanup := func() { cleanupOnce.Do(func() { close(runner.cleanup) }) }
 			defer cleanup()
@@ -385,7 +402,7 @@ func testOsqueryCompetingExtensionError(t *testing.T, exit78 error) {
 			case tc.ready:
 				assert.ErrorIs(t, err, extensionErr, "runtime recovery keeps existing error selection")
 			default:
-				assert.ErrorIs(t, err, exit78, "startup exit must override the competing extension error")
+				assert.ErrorIs(t, err, exit, "startup exit must override the competing extension error")
 				assert.False(t, isRecoverableOsqueryError(err), "startup failure must not restart")
 			}
 		})
