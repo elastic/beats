@@ -20,16 +20,9 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-<<<<<<< HEAD
-=======
 	"go.uber.org/goleak"
-
-	hbconfig "github.com/elastic/beats/v7/heartbeat/config"
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/mapstr"
->>>>>>> 821662f (x-pack/heartbeat/synthexec: fix pipe race and start-failure leaks (#52405))
 )
 
 func TestLineToSynthEventFactory(t *testing.T) {
@@ -219,7 +212,7 @@ func TestRunCmdStartFailure(t *testing.T) {
 
 	cmd := exec.CommandContext(t.Context(), "/dev/null/no-such-binary")
 
-	mpx, err := runCmd(t.Context(), &SynthCmd{cmd}, nil, nil, FilterJourneyConfig{}, stdfields.StdMonitorFields{}, "")
+	mpx, err := runCmd(t.Context(), &SynthCmd{cmd}, nil, nil, FilterJourneyConfig{})
 	assert.Error(t, err, "runCmd should report that the command could not be started")
 	assert.Nil(t, mpx, "runCmd should not return a multiplexer when the command could not be started")
 
