@@ -126,13 +126,20 @@ func TestEventsMappingReportsOneEventPerDocument(t *testing.T) {
 		require.NotContains(t, event.MetricSetFields, "timestamp_diff")
 	}
 
-	search := auto_ops_testing.GetEventsWithField(t, events, "latency_in_millis")
-	require.Len(t, search, 2)
+	successful := 0
 
-	for _, event := range search {
-		require.Equal(t, "2xx", auto_ops_testing.GetObjectValue(event.MetricSetFields, "status_group"))
-		require.EqualValues(t, 200, auto_ops_testing.GetObjectValue(event.MetricSetFields, "status_code"))
+	for _, event := range events {
+		// only what is read is reported, so the rate and the latency, which are calculated when reading, are not
+		require.NotContains(t, event.MetricSetFields, "rate_per_second")
+		require.NotContains(t, event.MetricSetFields, "latency_in_millis")
+
+		if auto_ops_testing.GetObjectValue(event.MetricSetFields, "status_group") == "2xx" {
+			require.EqualValues(t, 200, auto_ops_testing.GetObjectValue(event.MetricSetFields, "status_code"))
+			successful++
+		}
 	}
+
+	require.Equal(t, 2, successful)
 }
 
 func TestEventsMappingOnlyCountsTheNodesThatAnswered(t *testing.T) {

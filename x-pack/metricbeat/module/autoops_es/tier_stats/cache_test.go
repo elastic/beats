@@ -139,21 +139,32 @@ func TestDeltaRateAndLatency(t *testing.T) {
 	require.Equal(t, 200, doc["status_code"])
 	require.Equal(t, "2xx", doc["status_group"])
 	requireDocument(t, doc, 150, 7500)
-	require.InDelta(t, 15.0, doc["rate_per_second"], 1e-9)
-	require.InDelta(t, 50.0, doc["latency_in_millis"], 1e-9)
 	require.EqualValues(t, tick, doc["timestamp_diff"])
 }
 
-func TestRateUsesTheRealInterval(t *testing.T) {
+func TestOnlyTheFieldsThatAreReadAreReported(t *testing.T) {
 	s := &state{}
 
-	scrape(s, start, node(searchNodeA, "search", hist(searchMetric, 200, 0, 0)))
-	docs := scrape(s, start+30_001, node(searchNodeA, "search", hist(searchMetric, 200, 3000, 6000)))
+	scrape(s, start, node(searchNodeA, "search", hist(searchMetric, 200, 0, 0), hist(searchMetric, 500, 0, 0)))
+	docs := scrape(s, start+30_001, node(searchNodeA, "search", hist(searchMetric, 200, 3000, 6000), hist(searchMetric, 500, 2, 6)))
 
-	doc := find(t, docs, "search", 200)
+	require.Len(t, docs, 2)
 
-	require.EqualValues(t, 30_001, doc["timestamp_diff"])
-	require.InDelta(t, 3000/30.001, doc["rate_per_second"], 1e-9)
+	for _, doc := range docs {
+		// the rate and the latency are calculated when reading from the count and the duration of all the scrapes of a period
+		require.ElementsMatch(t, []string{"tier", "status_code", "status_group", "count_delta", "duration_delta_in_millis", "timestamp_diff"}, keys(doc))
+		require.EqualValues(t, 30_001, doc["timestamp_diff"])
+	}
+}
+
+func keys(doc mapstr.M) []string {
+	names := make([]string, 0, len(doc))
+
+	for name := range doc {
+		names = append(names, name)
+	}
+
+	return names
 }
 
 func TestNodesAndActionsAreAddedTogether(t *testing.T) {
@@ -172,7 +183,6 @@ func TestNodesAndActionsAreAddedTogether(t *testing.T) {
 	require.Len(t, docs, 1)
 	// 100 + 50 + 100 + 1 requests taking 500 + 250 + 1000 + 2000 ms
 	requireDocument(t, docs[0], 251, 3750)
-	require.InDelta(t, 3750.0/251, docs[0]["latency_in_millis"], 1e-9)
 }
 
 func TestTiersAreSeparate(t *testing.T) {
@@ -186,7 +196,7 @@ func TestTiersAreSeparate(t *testing.T) {
 	requireDocument(t, find(t, docs, "index", 200), 5, 300)
 }
 
-func TestSuccessStatusCodesAreSeparateDocumentsWithLatency(t *testing.T) {
+func TestSuccessStatusCodesAreSeparateDocuments(t *testing.T) {
 	s := &state{}
 
 	scrape(s, start, node(indexNodeA, "index", hist(bulkMetric, 200, 0, 0), hist(bulkMetric, 201, 0, 0)))
@@ -194,15 +204,15 @@ func TestSuccessStatusCodesAreSeparateDocumentsWithLatency(t *testing.T) {
 
 	require.Len(t, docs, 2)
 
-	for status, latency := range map[int]float64{200: 10, 201: 20} {
+	for status, duration := range map[int]float64{200: 100, 201: 80} {
 		doc := find(t, docs, "index", status)
 
 		require.Equal(t, "2xx", doc["status_group"])
-		require.InDelta(t, latency, doc["latency_in_millis"], 1e-9)
+		require.InDelta(t, duration, doc["duration_delta_in_millis"], 1e-9)
 	}
 }
 
-func TestErrorStatusCodesHaveNoLatency(t *testing.T) {
+func TestErrorStatusCodesAreSeparateDocuments(t *testing.T) {
 	s := &state{}
 
 	scrape(s, start, node(searchNodeA, "search",
@@ -216,12 +226,10 @@ func TestErrorStatusCodesHaveNoLatency(t *testing.T) {
 		doc := find(t, docs, "search", status)
 
 		require.Equal(t, group, doc["status_group"])
-		require.NotContains(t, doc, "latency_in_millis")
-		require.Contains(t, doc, "rate_per_second")
 	}
 
-	// the slow errors do not affect the latency of the successful requests
-	require.InDelta(t, 10.0, find(t, docs, "search", 200)["latency_in_millis"], 1e-9)
+	// the slow errors do not affect the duration of the successful requests
+	requireDocument(t, find(t, docs, "search", 200), 10, 100)
 }
 
 func TestQuietTierReportsZeros(t *testing.T) {
@@ -236,8 +244,6 @@ func TestQuietTierReportsZeros(t *testing.T) {
 	doc := find(t, docs, "search", 200)
 
 	requireDocument(t, doc, 0, 0)
-	require.InDelta(t, 0.0, doc["rate_per_second"], 1e-9)
-	require.InDelta(t, 0.0, doc["latency_in_millis"], 1e-9)
 }
 
 func TestTierWithoutAnyMetricsReportsZeros(t *testing.T) {
@@ -253,7 +259,6 @@ func TestTierWithoutAnyMetricsReportsZeros(t *testing.T) {
 		doc := find(t, docs, tier, 200)
 
 		requireDocument(t, doc, 0, 0)
-		require.InDelta(t, 0.0, doc["latency_in_millis"], 1e-9)
 	}
 }
 
@@ -304,7 +309,6 @@ func TestResetOfTheOnlyNodeReportsZeros(t *testing.T) {
 
 	require.Len(t, docs, 1)
 	requireDocument(t, docs[0], 0, 0)
-	require.GreaterOrEqual(t, docs[0]["rate_per_second"], 0.0)
 }
 
 func TestSumGoingDownNeverMakesTheDurationNegative(t *testing.T) {
@@ -314,7 +318,6 @@ func TestSumGoingDownNeverMakesTheDurationNegative(t *testing.T) {
 	docs := scrape(s, start+tick, node(searchNodeA, "search", hist(searchMetric, 200, 20, 900)))
 
 	requireDocument(t, docs[0], 10, 0)
-	require.InDelta(t, 0.0, docs[0]["latency_in_millis"], 1e-9)
 }
 
 func TestNewNodeIsIgnoredUntilItHasABaseline(t *testing.T) {

@@ -135,28 +135,15 @@ func isSuccess(status int) bool {
 	return status >= 200 && status <= 299
 }
 
-// document is the data for one tier and HTTP status code. Latency is only reported for successful requests because failing fast (or
-// slowly) says nothing about how quickly the tier serves requests.
+// document is the data for one tier and HTTP status code. The rate and the latency are not reported: they are calculated from the
+// count and the duration of all the scrapes in the period that is being read, which cannot be done from per scrape values.
 func document(tier string, status int, change *delta, timestampDiff int64) mapstr.M {
-	doc := mapstr.M{
+	return mapstr.M{
 		"tier":                     tier,
 		"status_code":              status,
 		"status_group":             fmt.Sprintf("%dxx", status/100),
 		"count_delta":              change.count,
 		"duration_delta_in_millis": change.duration,
-		"rate_per_second":          float64(change.count) / (float64(timestampDiff) / 1000),
 		timestampDiffField:         timestampDiff,
 	}
-
-	if isSuccess(status) {
-		latency := float64(0)
-
-		if change.count > 0 {
-			latency = change.duration / float64(change.count)
-		}
-
-		doc["latency_in_millis"] = latency
-	}
-
-	return doc
 }

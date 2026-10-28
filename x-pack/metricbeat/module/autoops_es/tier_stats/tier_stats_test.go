@@ -268,36 +268,23 @@ func TestSuccessfulFetchWithFixtures(t *testing.T) {
 			// the index tier: the bulk, index, update (200) and reindex (async) requests; and the created documents
 			require.Len(t, docs, 6)
 			requireDocument(t, find(t, docs, "index", 200), 231, 36_000)
-			require.InDelta(t, 36_000.0/231, find(t, docs, "index", 200)["latency_in_millis"], 1e-9)
 			requireDocument(t, find(t, docs, "index", 201), 2, 233.379006)
 
 			// the search tier: both nodes, and the REST and async requests; the unrequested histogram, the counter, and the measurement
 			// without a status code are not used
 			requireDocument(t, find(t, docs, "search", 200), 281, 3290)
-			require.InDelta(t, 3290.0/281, find(t, docs, "search", 200)["latency_in_millis"], 1e-9)
 			requireDocument(t, find(t, docs, "search", 404), 5, 5)
 			requireDocument(t, find(t, docs, "search", 429), 10, 20)
 			requireDocument(t, find(t, docs, "search", 500), 3, 3000)
 
-			for _, status := range []int{404, 429, 500} {
-				require.NotContains(t, find(t, docs, "search", status), "latency_in_millis")
-			}
-
-			for _, event := range events {
-				doc := event.MetricSetFields
-
-				require.InDelta(t, float64(doc["count_delta"].(int64))/(float64(event.RootFields["timestamp_diff"].(int64))/1000), doc["rate_per_second"], 1e-9)
-			}
 		case "no_traffic.tier_stats.8.11.0.json":
-			// the nodes have never served a request, which is a rate and a latency of 0 rather than no data
+			// the nodes have never served a request, which is no requests rather than no data
 			require.Len(t, docs, 2)
 
 			for _, tier := range []string{"index", "search"} {
 				doc := find(t, docs, tier, 200)
 
 				requireDocument(t, doc, 0, 0)
-				require.InDelta(t, 0.0, doc["rate_per_second"], 1e-9)
-				require.InDelta(t, 0.0, doc["latency_in_millis"], 1e-9)
 			}
 		case "partial.tier_stats.8.11.0.json":
 			// the second search node did not answer, so only the nodes that did are counted

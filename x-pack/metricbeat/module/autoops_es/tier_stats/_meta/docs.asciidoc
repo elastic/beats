@@ -1,4 +1,4 @@
-The `tier_stats` metricset collects the request rate and latency of the search tier and the indexing tier of an Elasticsearch Serverless project, which the nodes report in cumulative histograms.
+The `tier_stats` metricset collects the number and the duration of the requests of the search tier and the indexing tier of an Elasticsearch Serverless project, which the nodes report in cumulative histograms.
 
 It only collects from Elasticsearch Serverless, because the API only exists there, and does nothing on any other cluster. It is not enabled by default.
 

@@ -1356,7 +1356,7 @@ tasks information from cluster
 stack: beta 9.7.0
 ```
 
-Request rate and latency of a tier of an Elasticsearch Serverless project, for one HTTP status code. There is one document per tier and HTTP status code with requests during the scrape (and always one for the successful, 2xx, requests), which adds the requests of every node of the tier.
+Number and duration of the requests of a tier of an Elasticsearch Serverless project, for one HTTP status code. There is one document per tier and HTTP status code with requests during the scrape (and always one for the successful, 2xx, requests), which adds the requests of every node of the tier.
 
 **`autoops_es.tier_stats.tier`**
 :   The tier that served the requests, such as `search` or `index`.
@@ -1386,17 +1386,3 @@ Request rate and latency of a tier of an Elasticsearch Serverless project, for o
 :   Total duration of those requests in milliseconds.
 
     type: float
-
-
-**`autoops_es.tier_stats.rate_per_second`**
-:   Requests per second since the previous scrape.
-
-    type: float
-
-
-**`autoops_es.tier_stats.latency_in_millis`**
-:   Average duration of a request in milliseconds. Only reported for successful (2xx) requests.
-
-    type: float
-
-
