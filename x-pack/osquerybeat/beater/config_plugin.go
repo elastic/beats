@@ -195,23 +195,23 @@ func (p *ConfigPlugin) scheduledProfileMatches(request scheduledProfileRequest) 
 		return false
 	}
 	query, ok := p.queryInfoMap[request.name]
-	if !ok || query.Query != request.query || query.SpaceID != request.spaceID || scheduledProfileScheduleID(request.name, query) != request.scheduleID {
+	if !ok || query.Query != request.query || query.SpaceID != request.spaceID || idOrDefault(query.ScheduleID, request.name) != request.scheduleID {
 		return false
 	}
 	if p.newQueryInfoMap != nil {
 		query, ok = p.newQueryInfoMap[request.name]
-		if !ok || query.Query != request.query || query.SpaceID != request.spaceID || scheduledProfileScheduleID(request.name, query) != request.scheduleID {
+		if !ok || query.Query != request.query || query.SpaceID != request.spaceID || idOrDefault(query.ScheduleID, request.name) != request.scheduleID {
 			return false
 		}
 	}
 	return query.Profile
 }
 
-func scheduledProfileScheduleID(name string, query QueryInfo) string {
-	if query.ScheduleID != "" {
-		return query.ScheduleID
+func idOrDefault(id, dflt string) string {
+	if id != "" {
+		return id
 	}
-	return name
+	return dflt
 }
 
 // GlobalProfileEnabled returns the fleet-wide profiling default applied to queries

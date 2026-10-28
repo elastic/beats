@@ -149,8 +149,6 @@ func (w *scheduledQueryProfiler) collect(request scheduledProfileRequest) {
 		w.metrics.stale.Inc()
 		return
 	}
-	// Check cancellation under mu so that either stop sees publishing or this
-	// worker sees the cancellation.
 	w.mu.Lock()
 	if w.ctx.Err() != nil {
 		w.mu.Unlock()
@@ -159,6 +157,17 @@ func (w *scheduledQueryProfiler) collect(request scheduledProfileRequest) {
 	}
 	w.publishing = true
 	w.mu.Unlock()
+	// Publish runs without mu. On the memory queue it can wait for a slot, and
+	// holding mu would block enqueue (in the logger callback) and stop.
+	//
+	// This is safe because publishing was set above under the same mu that stop
+	// takes to cancel. Either stop sees publishing and returns without joining,
+	// or this worker saw the cancellation and never got here. A stuck Publish
+	// therefore never blocks stop.
+	//
+	// stop can return while Publish is running, or just before it starts. This is
+	// harmless since the sink's retire leaves closing its client to an in-flight
+	// Publish.
 	ok := request.sink.Publish(request.name, request.scheduleID, request.responseID, request.spaceID, request.scheduleExecutionCount, profile)
 	w.mu.Lock()
 	w.publishing = false
@@ -197,7 +206,17 @@ type profilingQueryExecutor struct {
 	executor queryExecutor
 }
 
-func newProfilingQueryExecutor(ctx context.Context, client *osqdcli.Client) profilingQueryExecutor {
+// newProfilingQueryExecutor builds its own client rather than taking one. A
+// profile RPC can wait for osqueryd's scheduler lock while a later logger call
+// resolves columns on the shared client, and sharing that client would turn the
+// overlap into a lock cycle. The client is never connected: each Query opens
+// and closes its own connection, so it needs no Close.
+func newProfilingQueryExecutor(ctx context.Context, socketPath string, log *logp.Logger) profilingQueryExecutor {
+	client := osqdcli.New(socketPath,
+		osqdcli.WithLogger(log),
+		osqdcli.WithTimeout(10*time.Second),
+		osqdcli.WithMaxTimeout(10*time.Second),
+	)
 	return profilingQueryExecutor{runCtx: ctx, executor: client}
 }
 

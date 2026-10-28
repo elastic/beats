@@ -586,10 +586,18 @@ func (bt *osquerybeat) extensionsDiagnosticsPayload(ctx context.Context) map[str
 	return payload
 }
 
-func (bt *osquerybeat) setDiagnosticsQueryExecutor(qe queryExecutor) {
+// setDiagnosticsQueryExecutor takes a profilingQueryExecutor rather than any
+// queryExecutor, so diagnostics cannot be given the shared result client.
+func (bt *osquerybeat) setDiagnosticsQueryExecutor(qe profilingQueryExecutor) {
 	bt.diagMx.Lock()
 	defer bt.diagMx.Unlock()
 	bt.diagQueryExec = qe
+}
+
+func (bt *osquerybeat) clearDiagnosticsQueryExecutor() {
+	bt.diagMx.Lock()
+	defer bt.diagMx.Unlock()
+	bt.diagQueryExec = nil
 }
 
 func (bt *osquerybeat) setExtensionsDiagnostics(extensions config.ExtensionsConfig, dataPath string) {
@@ -644,13 +652,6 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		osqdcli.WithMaxTimeout(osqueryMaxTimeout),
 		osqdcli.WithCache(cache, adhocOsqueriesTypesCacheSize),
 	)
-	// A profile RPC can wait for the scheduler lock while a later logger call
-	// resolves columns. Sharing cli would turn that overlap into a lock cycle.
-	profileCli := osqdcli.New(socketPath,
-		osqdcli.WithLogger(bt.log),
-		osqdcli.WithTimeout(10*time.Second),
-		osqdcli.WithMaxTimeout(10*time.Second),
-	)
 
 	// Create osquery configuration plugin that loads a persisted configuration from the disk
 	configPlugin := NewConfigPlugin(bt.log)
@@ -675,7 +676,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		}
 		defer cli.Close()
 		profileCtx, cancelProfiles := context.WithCancel(ctx)
-		profileExecutor := newProfilingQueryExecutor(profileCtx, profileCli)
+		profileExecutor := newProfilingQueryExecutor(profileCtx, socketPath, bt.log)
 		metrics := bt.profileMetrics
 		if metrics == nil {
 			metrics = newScheduledProfileMetrics(nil)
@@ -685,9 +686,8 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		bt.setDiagnosticsQueryExecutor(profileExecutor)
 		defer func() {
 			cancelProfiles()
-			bt.setDiagnosticsQueryExecutor(nil)
+			bt.clearDiagnosticsQueryExecutor()
 			scheduledProfiler.stop()
-			profileCli.Close()
 		}()
 
 		// Initialize and start RRULE query handler after osqueryd connection is established
@@ -867,10 +867,7 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 	}
 
 	// Use policy schedule_id when set, otherwise query name.
-	scheduleID := qi.ScheduleID
-	if scheduleID == "" {
-		scheduleID = res.Name
-	}
+	scheduleID := idOrDefault(qi.ScheduleID, res.Name)
 	var totalHits int
 
 	responseID := uuid.Must(uuid.NewV4()).String()
