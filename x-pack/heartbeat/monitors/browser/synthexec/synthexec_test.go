@@ -271,7 +271,7 @@ func TestRunTimeoutExitCodeCmd(t *testing.T) {
 }
 
 func TestRunCmdStartFailure(t *testing.T) {
-	const deadline = 30*time.Second
+	const deadline = 30 * time.Second
 	ctx := context.WithValue(t.Context(), SynthexecTimeoutKey, 2*deadline)
 	cmd := exec.CommandContext(ctx, "/dev/null/no-such-binary")
 
