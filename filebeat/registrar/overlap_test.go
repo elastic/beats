@@ -199,3 +199,90 @@ func TestOverlapLeavingOwnerKeepsStateWithExpiredTTL(t *testing.T) {
 
 	assert.EqualValues(t, 500, readState(t, stateStore, a.Id).Offset, "an expired but active state must survive its owner stopping")
 }
+
+func startUnflushedOwners(t *testing.T) (regA, regB *Registrar, a file.State) {
+	t.Helper()
+	stateStore, a, _ := seededStore(t)
+	regA, err := New(stateStore, &atomicSpy{}, time.Hour, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err, "registrar A must be created")
+	regB, err = New(stateStore, &atomicSpy{}, time.Hour, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err, "registrar B must be created")
+	require.NoError(t, regA.Start(), "registrar A must start")
+	t.Cleanup(regA.Stop)
+	require.NoError(t, regB.Start(), "registrar B must start")
+	t.Cleanup(regB.Stop)
+	return regA, regB, a
+}
+
+func startOffset(r *Registrar, id string) int64 {
+	for _, st := range r.StartStates() {
+		if st.Id == id {
+			return st.Offset
+		}
+	}
+	return -1
+}
+
+func TestStartStatesOwnUnflushedOffset(t *testing.T) {
+	regA, _, a := startUnflushedOwners(t)
+	a.Offset = 500
+	regA.Channel <- []file.State{a}
+	require.Eventually(t, func() bool { return inMemoryOffset(regA, a.Id) == 500 }, 5*time.Second, 10*time.Millisecond)
+
+	assert.EqualValues(t, 500, startOffset(regA, a.Id), "an owner must resume from its own unflushed offset")
+}
+
+func TestStartStatesOwnUnflushedNewFile(t *testing.T) {
+	regA, _, _ := startUnflushedOwners(t)
+	n := fileState(9, 42)
+	regA.Channel <- []file.State{n}
+	require.Eventually(t, func() bool { return inMemoryOffset(regA, n.Id) == 42 }, 5*time.Second, 10*time.Millisecond)
+
+	assert.EqualValues(t, 42, startOffset(regA, n.Id), "a file never flushed must still resume from the owner's offset")
+}
+
+func TestStartStatesOwnFinishedUnflushed(t *testing.T) {
+	regA, _, a := startUnflushedOwners(t)
+	a.Offset, a.Finished = 500, true
+	regA.Channel <- []file.State{a}
+	require.Eventually(t, func() bool { return inMemoryOffset(regA, a.Id) == 500 }, 5*time.Second, 10*time.Millisecond)
+
+	assert.EqualValues(t, 500, startOffset(regA, a.Id), "a finished state must keep the owner's offset")
+}
+
+func TestStartStatesIgnoresOtherOwnersOffset(t *testing.T) {
+	regA, regB, a := startUnflushedOwners(t)
+	a.Offset = 200
+	regA.Channel <- []file.State{a}
+	require.Eventually(t, func() bool { return inMemoryOffset(regA, a.Id) == 200 }, 5*time.Second, 10*time.Millisecond)
+	a.Offset = 300
+	regB.Channel <- []file.State{a}
+	require.Eventually(t, func() bool { return inMemoryOffset(regA, a.Id) == 300 }, 5*time.Second, 10*time.Millisecond)
+
+	assert.EqualValues(t, 200, startOffset(regA, a.Id), "an owner must not skip to another owner's offset")
+	assert.EqualValues(t, 300, startOffset(regB, a.Id), "the other owner must resume from its own offset")
+}
+
+func TestStartStatesIgnoresOtherOwnersLaterFlush(t *testing.T) {
+	regA, regB, _, _, a, _ := startOverlapOwners(t)
+	a.Offset = 900
+	regB.Channel <- []file.State{a}
+	require.Eventually(t, func() bool { return inMemoryOffset(regB, a.Id) == 900 }, 5*time.Second, 10*time.Millisecond)
+
+	assert.EqualValues(t, 100, startOffset(regA, a.Id), "an owner must start from the state flushed when it started")
+
+	regC, err := New(regA.stateStore, &atomicSpy{}, 0, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err, "registrar C must be created")
+	require.NoError(t, regC.Start(), "registrar C must start")
+	t.Cleanup(regC.Stop)
+	assert.EqualValues(t, 900, startOffset(regC, a.Id), "an owner joining later must start from the state flushed by then")
+}
+
+func TestStartStatesBaselineDroppedOnCleanup(t *testing.T) {
+	regA, regB, _, _, a, _ := startOverlapOwners(t)
+	a.Finished, a.TTL = true, 0
+	regB.Channel <- []file.State{a}
+
+	require.Eventually(t, func() bool { return startOffset(regA, a.Id) == -1 }, 5*time.Second, 10*time.Millisecond,
+		"a cleaned up state must leave every owner's baseline")
+}

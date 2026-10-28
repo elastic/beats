@@ -95,6 +95,7 @@ type sharedRegistrar struct {
 	pending      map[*Registrar]int
 	mu           sync.Mutex
 	owned        map[*Registrar]map[string]struct{}
+	acked        map[*Registrar]map[string]file.State
 	warned       map[string]struct{}
 	flushWaiters []chan struct{}
 
@@ -143,30 +144,17 @@ func (r *Registrar) GetStates() []file.State {
 	return r.shared.statesFor(r, r.shared.states.GetStates())
 }
 
-// StartStates returns the flushed states for a new input, as a separate
-// process would load them from disk, ignoring other owners' unflushed progress.
+// StartStates returns the states for a new input: what was flushed when this
+// owner started, plus everything this owner acknowledged since, as in a
+// registrar of its own. Other owners' progress is never visible.
 func (r *Registrar) StartStates() []file.State {
 	if r.shared == nil {
 		return nil
 	}
-	states, err := readStatesFrom(r.shared.store, r.log)
-	if err != nil {
-		r.log.Errorf("Error reading persisted states: %v", err)
-		return nil
-	}
-	live := r.shared.states.GetStates()
 	r.shared.mu.Lock()
-	mine := r.shared.owned[r]
-	for i := range states {
-		if _, ok := mine[states[i].Id]; !ok {
-			continue
-		}
-		for _, l := range live {
-			if l.Id == states[i].Id {
-				states[i].Finished = l.Finished
-				break
-			}
-		}
+	states := make([]file.State, 0, len(r.shared.acked[r]))
+	for _, st := range r.shared.acked[r] {
+		states = append(states, st)
 	}
 	r.shared.mu.Unlock()
 	return r.shared.statesFor(r, states)
@@ -208,6 +196,12 @@ func (r *Registrar) Start() error {
 		}
 		r.shared = shared
 		r.release = release
+		if err := shared.seedBaseline(r); err != nil {
+			release()
+			r.shared, r.release = nil, nil
+			r.startErr = fmt.Errorf("error loading state: %w", err)
+			return
+		}
 
 		effective, lowered := shared.lowerFlushTimeout(r.flushTimeout)
 		if effective != r.flushTimeout {
@@ -285,6 +279,7 @@ func openShared(stateStore statestore.States, flushTimeout time.Duration, logger
 		store:   store,
 		pending: make(map[*Registrar]int),
 		owned:   make(map[*Registrar]map[string]struct{}),
+		acked:   make(map[*Registrar]map[string]file.State),
 		warned:  make(map[string]struct{}),
 	}
 	s.flushTimeout.Store(int64(max(flushTimeout, 0)))
@@ -296,6 +291,24 @@ func openShared(stateStore statestore.States, flushTimeout time.Duration, logger
 	}
 	s.states.SetStates(states)
 	return s, nil
+}
+
+// seedBaseline records the states flushed at the time the owner starts, the
+// part of its view that it did not acknowledge itself. The lock is held across
+// the read so a concurrent cleanup cannot be undone by a stale seed.
+func (s *sharedRegistrar) seedBaseline(owner *Registrar) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	states, err := readStatesFrom(s.store, owner.log)
+	if err != nil {
+		return err
+	}
+	baseline := make(map[string]file.State, len(states))
+	for _, st := range states {
+		baseline[st.Id] = st
+	}
+	s.acked[owner] = baseline
+	return nil
 }
 
 // lowerFlushTimeout shortens the shared flush timeout to d if d is shorter.
@@ -401,6 +414,7 @@ func (s *sharedRegistrar) finishStatesOf(owner *Registrar) {
 		s.states.UpdateWithTs(st, time.Now())
 	}
 	delete(s.owned, owner)
+	delete(s.acked, owner)
 }
 
 func (s *sharedRegistrar) commitStateUpdates() {
@@ -462,8 +476,14 @@ func (s *sharedRegistrar) trackOwnership(states []file.State, owner *Registrar) 
 		ids = make(map[string]struct{})
 		s.owned[owner] = ids
 	}
+	acked := s.acked[owner]
+	if acked == nil {
+		acked = make(map[string]file.State)
+		s.acked[owner] = acked
+	}
 	for i := range states {
 		st := &states[i]
+		acked[st.Id] = *st
 		if st.Finished {
 			delete(ids, st.Id)
 			delete(s.warned, st.Id)
@@ -509,6 +529,9 @@ func (s *sharedRegistrar) gcStates() {
 		delete(s.warned, id)
 		for _, ids := range s.owned {
 			delete(ids, id)
+		}
+		for _, acked := range s.acked {
+			delete(acked, id)
 		}
 	})
 	statesCleanup.Add(int64(cleanedStates))
