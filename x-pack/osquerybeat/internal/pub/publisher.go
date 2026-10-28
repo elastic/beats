@@ -61,16 +61,14 @@ func New(b *beat.Beat, log *logp.Logger) *Publisher {
 	}
 }
 
+// Configure replaces the clients for the given inputs. It must be called from a
+// single goroutine; only Close may run concurrently with it.
 func (p *Publisher) Configure(inputs []config.InputConfig) error {
 	// Policy replacement must invalidate delayed profiles even while a result
-	// publication holds mx. Repeat after acquiring it in case another Configure
-	// installed a lease while this call waited.
+	// publication holds mx, and even when all inputs have been removed.
 	p.retireScheduledProfileSink()
 	p.mx.Lock()
 	defer p.mx.Unlock()
-	// Retire delayed profiles even when all inputs have been removed, before
-	// replacing any clients or their routing metadata.
-	p.retireScheduledProfileSink()
 	if len(inputs) == 0 {
 		return nil
 	}
@@ -196,14 +194,14 @@ func (p *Publisher) Publish(index, idValue, idFieldKey, responseID, spaceID, pac
 }
 
 func (p *Publisher) Close() {
+	// Once closed is set, configureScheduledProfileSink installs no new lease,
+	// so a single retire covers one installed earlier.
 	p.scheduledProfileMu.Lock()
 	p.scheduledProfileClosed = true
 	p.scheduledProfileMu.Unlock()
 	p.retireScheduledProfileSink()
 	p.mx.Lock()
 	defer p.mx.Unlock()
-	// Configure may have installed a lease while Close waited for mx.
-	p.retireScheduledProfileSink()
 
 	if p.client != nil {
 		p.client.Close()

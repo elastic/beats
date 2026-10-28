@@ -134,6 +134,18 @@ func TestScheduledProfileSinkRetiresOnPublisherClose(t *testing.T) {
 	assert.False(t, sink.Valid(), "publisher shutdown must retire retained profile leases")
 }
 
+// Stop closes the publisher from another goroutine, so the main loop can still
+// apply a queued policy afterwards. That policy must not install a lease.
+func TestScheduledProfileSinkNotInstalledAfterClose(t *testing.T) {
+	recorder := &connectRecorder{}
+	p := New(&beat.Beat{Publisher: recorder}, logptest.NewTestingLogger(t, "scheduled_profile"))
+	p.Close()
+	assert.Error(t, p.Configure(scheduledProfileInputs("default")), "configuring the scheduled profile stream after Close must fail")
+	assert.Nil(t, p.CaptureScheduledProfileSink("default"), "a closed publisher must not hand out a lease")
+	require.Len(t, recorder.clients, 4, "Configure should have connected the scheduled profile client before failing")
+	assert.True(t, recorder.clients[3].closed.Load(), "the rejected scheduled profile client must be closed")
+}
+
 func TestScheduledProfileSinkRetiresBeforeWaitingForResultPublication(t *testing.T) {
 	// Capture a lease under the original policy.
 	p := New(&beat.Beat{Publisher: &connectRecorder{}}, logptest.NewTestingLogger(t, "scheduled_profile"))

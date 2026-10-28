@@ -84,10 +84,10 @@ func (p *Publisher) configureScheduledProfileSink(result, profile config.InputCo
 	client, err := p.b.Publisher.ConnectWith(beat.ClientConfig{
 		PublishMode: beat.DropIfFull,
 		Processing:  beat.ProcessingConfig{Processor: procs},
-		ClientListener: &scheduledProfileListener{dropped: func() {
+		ClientListener: scheduledProfileListener(func() {
 			sink.drops.Add(1)
 			sink.countDrop()
-		}},
+		}),
 	})
 	if err != nil {
 		return err
@@ -178,13 +178,13 @@ func (s *scheduledProfileSink) Publish(queryName, scheduleID, responseID, spaceI
 	return ok
 }
 
-type scheduledProfileListener struct{ dropped func() }
+type scheduledProfileListener func()
 
-func (*scheduledProfileListener) Closing()   {}
-func (*scheduledProfileListener) Closed()    {}
-func (*scheduledProfileListener) NewEvent()  {}
-func (*scheduledProfileListener) Filtered()  {}
-func (*scheduledProfileListener) Published() {}
-func (l *scheduledProfileListener) DroppedOnPublish(beat.Event) {
-	l.dropped()
+func (scheduledProfileListener) Closing()   {}
+func (scheduledProfileListener) Closed()    {}
+func (scheduledProfileListener) NewEvent()  {}
+func (scheduledProfileListener) Filtered()  {}
+func (scheduledProfileListener) Published() {}
+func (l scheduledProfileListener) DroppedOnPublish(beat.Event) {
+	l()
 }
