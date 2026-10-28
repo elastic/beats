@@ -27,6 +27,7 @@ import (
 	// Import X-Pack modules.
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 
+	_ "github.com/elastic/beats/v7/x-pack/heartbeat/secretstores/vault"
 	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
 )
 
@@ -96,7 +97,7 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 			hbReceiver.ctx,
 			cfg.MonitorState.Elasticsearch,
 			creator.heartbeat,
-			b.Info.UserAgent,
+			func() string { return b.Info.UserAgent },
 			b.Info.Logger,
 			func(requester *eslegclient.Connection) {
 				hbReceiver.elasticsearchAuthRequester = requester

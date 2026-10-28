@@ -37,15 +37,15 @@ func (w *Watcher) Start() {
 
 func (w *Watcher) Run() {
 	w.mx.Lock()
-	defer w.mx.Unlock()
-
 	if w.cancel != nil {
+		w.mx.Unlock()
 		w.log.Debug("watcher is already running")
 		return
 	}
-
+	// The lock is released before the loop so that Close can acquire it.
 	var ctx context.Context
 	ctx, w.cancel = context.WithCancel(context.Background())
+	w.mx.Unlock()
 
 	ticker := time.NewTicker(watchFrequency)
 	defer ticker.Stop()
@@ -64,6 +64,7 @@ func (w *Watcher) Run() {
 			f()
 		case <-ctx.Done():
 			w.log.Info("exit watcher on context done")
+			return
 		}
 	}
 }

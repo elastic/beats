@@ -327,3 +327,26 @@ The action that the event log reader should take when it receives a signal from 
 
 Setting `no_more_events` to `stop` is useful when reading from archived event log files where you want to read the whole file then exit.
 
+
+### `start_position` [_start_position]
+
+```{applies_to}
+stack: ga 9.6.0
+```
+
+Where to start reading a channel the first time it is read, that is, when no bookmark has been saved for it yet. Valid values are:
+
+* `beginning`: Start from the oldest record in the channel (the default). Combine with [`ignore_older`](#_ignore_older_2) to limit how far back the initial read goes.
+* `end`: Skip the records already in the channel and only collect events written after the input subscribes.
+
+Once a bookmark exists this option has no effect: the input resumes from the bookmark and the `ignore_older` filter applies as usual. It also has no effect when reading from an `.evtx` file.
+
+`end` is useful when rolling out the input to many hosts at once and you don't want each of them to send the events that were already in its logs. Note that if no event is written to the channel before the input is stopped, no bookmark is saved and the next start is treated as a first start again.
+
+```yaml
+- type: winlog
+  name: Security
+  start_position: end
+  ignore_older: 72h
+```
+
