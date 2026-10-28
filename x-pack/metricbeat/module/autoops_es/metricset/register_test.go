@@ -13,15 +13,20 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/version"
 )
 
@@ -647,6 +652,169 @@ func TestMaybeRegisterCloudConnectedCluster(t *testing.T) {
 				assert.NoError(t, err)
 				assert.Equal(t, "registered-cluster-id", utils.GetResourceID(), "Resource ID mismatch")
 			}
+		})
+	}
+}
+
+// ccmFixture serves a self-managed cluster that can be registered, and counts the registrations that the CCM API gets.
+type ccmFixture struct {
+	esURL         string
+	registrations *atomic.Int32
+}
+
+func newCCMFixture(t *testing.T, ccmStatus int) ccmFixture {
+	t.Helper()
+
+	t.Cleanup(utils.ClearResourceID)
+	utils.ClearResourceID()
+
+	for _, name := range []string{"AUTOOPS_DEPLOYMENT_ID", "AUTOOPS_PROJECT_ID", "AUTOOPS_RESOURCE_ID"} {
+		t.Setenv(name, "")
+	}
+
+	previous := checkedCloudConnectedMode
+	checkedCloudConnectedMode = false
+
+	t.Cleanup(func() { checkedCloudConnectedMode = previous })
+
+	registrations := &atomic.Int32{}
+
+	ccm := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		registrations.Add(1)
+
+		if ccmStatus != http.StatusOK {
+			w.WriteHeader(ccmStatus)
+
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		_ = writeCloudConnectedResource(w, "registered-cluster-id", true, "8.0.0", []string{"enterprise"})
+	}))
+	t.Cleanup(ccm.Close)
+
+	es := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		switch r.URL.Path {
+		case "/":
+			_, _ = w.Write([]byte(`{"cluster_name":"c","cluster_uuid":"abc","version":{"number":"8.15.3","build_flavor":"default"}}`))
+		case "/_cluster/settings":
+			_, _ = w.Write([]byte(`{}`))
+		case "/_license":
+			_, _ = w.Write([]byte(`{"license":{"uid":"u","type":"enterprise","status":"active"}}`))
+		default:
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	t.Cleanup(es.Close)
+
+	t.Setenv(CLOUD_CONNECTED_MODE_API_KEY_NAME, "test-api-key")
+	t.Setenv(CLOUD_CONNECTED_MODE_API_URL_NAME, ccm.URL)
+
+	return ccmFixture{esURL: es.URL, registrations: registrations}
+}
+
+// newMetricSets creates the metricsets in the order that they are given, which are either "standard" or "serverless".
+func (f ccmFixture) newMetricSets(t *testing.T, kinds ...string) []error {
+	t.Helper()
+
+	var errs []error
+
+	for _, kind := range kinds {
+		registry := mb.NewRegister()
+		registry.MustAddMetricSet(MODULE_NAME, "ccm_test", func(base mb.BaseMetricSet) (mb.MetricSet, error) {
+			if kind == "serverless" {
+				return newServerlessAutoOpsMetricSet(base, "/", RequestOptions{}, func(_ mb.ReporterV2, _ *utils.ClusterInfo, _ *any) error { return nil })
+			}
+
+			return newAutoOpsMetricSet(base, "/", func(_ mb.ReporterV2, _ *utils.ClusterInfo, _ *any) error { return nil }, nil)
+		},
+			mb.WithHostParser(elasticsearch.HostParser),
+			mb.DefaultMetricSet(),
+		)
+
+		// not mbtest.NewMetricSetsWithRegistry, which fails the test when the metricset cannot be created
+		c, err := conf.NewConfigFrom(map[string]any{
+			"module":     "autoops_es",
+			"metricsets": []string{"ccm_test"},
+			"hosts":      []string{f.esURL},
+		})
+		require.NoError(t, err)
+
+		_, _, err = mb.NewModule(c, registry, beat.Info{Paths: paths.New(), UserAgent: "test", Logger: logptest.NewTestingLogger(t, "")})
+
+		errs = append(errs, err)
+	}
+
+	return errs
+}
+
+func TestRegisterCloudConnectedClusterOnce(t *testing.T) {
+	tests := []struct {
+		name              string
+		kinds             []string
+		ccmStatus         int
+		expectRegistered  int32
+		expectResourceID  string
+		expectErrorOnEach []bool
+	}{
+		{"standard registers once", []string{"standard", "standard", "standard"}, http.StatusOK, 1, "registered-cluster-id", []bool{false, false, false}},
+		{"only serverless never registers", []string{"serverless", "serverless"}, http.StatusOK, 0, "", []bool{false, false}},
+		// a failure is returned once, then the flag is set, so later metricsets are not blocked (as before the change)
+		{"failure is returned once", []string{"standard", "standard"}, http.StatusInternalServerError, 1, "", []bool{true, false}},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			fixture := newCCMFixture(t, test.ccmStatus)
+
+			errs := fixture.newMetricSets(t, test.kinds...)
+
+			for i, err := range errs {
+				if test.expectErrorOnEach[i] {
+					assert.ErrorContains(t, err, "failed to register Cloud Connected cluster", "metricset %d should fail with the wrapped error", i)
+				} else {
+					assert.NoError(t, err, "metricset %d should be created", i)
+				}
+			}
+
+			assert.Equal(t, test.expectRegistered, fixture.registrations.Load(), "registrations that the CCM API got")
+			assert.Equal(t, test.expectResourceID, utils.GetResourceID(), "resource ID")
+		})
+	}
+}
+
+func TestGetAndSetResourceIDFromTheEnvironment(t *testing.T) {
+	tests := []struct {
+		name     string
+		env      map[string]string
+		existing string
+		expected string
+	}{
+		{"nothing set", nil, "", ""},
+		{"project", map[string]string{"AUTOOPS_PROJECT_ID": "project"}, "", "project"},
+		{"resource", map[string]string{"AUTOOPS_RESOURCE_ID": "resource"}, "", "resource"},
+		{"deployment wins over project", map[string]string{"AUTOOPS_DEPLOYMENT_ID": "deployment", "AUTOOPS_PROJECT_ID": "project"}, "", "deployment"},
+		{"project wins over resource", map[string]string{"AUTOOPS_PROJECT_ID": "project", "AUTOOPS_RESOURCE_ID": "resource"}, "", "project"},
+		{"existing is not overwritten", map[string]string{"AUTOOPS_PROJECT_ID": "project"}, "existing", "existing"},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			t.Cleanup(utils.ClearResourceID)
+			utils.ClearResourceID()
+
+			for _, name := range []string{"AUTOOPS_DEPLOYMENT_ID", "AUTOOPS_PROJECT_ID", "AUTOOPS_RESOURCE_ID"} {
+				t.Setenv(name, test.env[name])
+			}
+
+			if test.existing != "" {
+				utils.SetResourceID(test.existing)
+			}
+
+			assert.Equal(t, test.expected, utils.GetAndSetResourceID(), "returned resource ID")
+			assert.Equal(t, test.expected, utils.GetResourceID(), "stored resource ID")
 		})
 	}
 }

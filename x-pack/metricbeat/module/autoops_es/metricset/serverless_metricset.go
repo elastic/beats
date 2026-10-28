@@ -39,7 +39,8 @@ func AddServerlessAutoOpsMetricSet[T any](name string, routePath string, options
 //
 // It is separate from AutoOpsMetricSet so that what only this kind of metricset needs does not affect the others. It follows the same
 // flow (get the cluster info, fetch the data, map it to events), and shares everything that does not depend on the request: the cluster
-// info, the error events, the Cloud Connected registration, and the HTTP helpers.
+// info, the error events, and the HTTP helpers. It does not register with Cloud Connected mode, which is only for self-managed clusters,
+// and a serverless cluster never is one.
 type ServerlessAutoOpsMetricSet[T any] struct {
 	*elasticsearch.MetricSet
 	Mapper    EventsMapper[T]
@@ -55,14 +56,8 @@ func newServerlessAutoOpsMetricSet[T any](base mb.BaseMetricSet, routePath strin
 		return nil, err
 	}
 
-	// metricsets are not started asynchronously, so there is no need for synchronization here
-	if !checkedCloudConnectedMode {
-		checkedCloudConnectedMode = true
-
-		if err := maybeRegisterCloudConnectedCluster(ms, GetInfo); err != nil {
-			return nil, fmt.Errorf("failed to register Cloud Connected cluster: %w", err)
-		}
-	}
+	// the resource ID that is put on every event comes from the environment on serverless (Cloud Connected mode is only for self-managed clusters)
+	utils.GetAndSetResourceID()
 
 	return &ServerlessAutoOpsMetricSet[T]{
 		MetricSet: ms,

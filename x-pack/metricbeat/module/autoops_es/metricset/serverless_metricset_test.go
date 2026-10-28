@@ -113,9 +113,6 @@ func (c *mapperCalls) count() int {
 func newServerlessTestMetricSet(t *testing.T, server *serverlessServer, options RequestOptions, mapper EventsMapper[payload]) mb.ReportingMetricSetV2Error {
 	t.Helper()
 
-	// do not look up Cloud Connected mode, which is checked by the first metricset that is created
-	checkedCloudConnectedMode = true
-
 	registry := mb.NewRegister()
 	registry.MustAddMetricSet(MODULE_NAME, "serverless_test", func(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return newServerlessAutoOpsMetricSet(base, dataPath, options, mapper)
@@ -337,4 +334,30 @@ func TestServerlessAutoOpsMetricSetDoesNothingOnOtherClusters(t *testing.T) {
 	for _, request := range requests {
 		require.Equal(t, "/", request.uri)
 	}
+}
+
+func TestServerlessAutoOpsMetricSetDoesNotUseCloudConnectedMode(t *testing.T) {
+	previous := checkedCloudConnectedMode
+	checkedCloudConnectedMode = false
+
+	t.Cleanup(func() { checkedCloudConnectedMode = previous })
+	t.Setenv(CLOUD_CONNECTED_MODE_API_KEY_NAME, "an-api-key")
+
+	// any request other than the cluster info and the data fails the test, such as the ones that registering would make
+	server := newServerlessServer(t, clusterInfo, respondWith(`{"value": 1}`))
+	newServerlessTestMetricSet(t, server, options(), recordingMapper(&mapperCalls{}))
+
+	require.False(t, checkedCloudConnectedMode, "creating the metricset must not check Cloud Connected mode")
+	require.Empty(t, server.recorded(), "creating the metricset must not make any request")
+}
+
+func TestServerlessAutoOpsMetricSetSetsTheResourceID(t *testing.T) {
+	utils.ClearResourceID()
+	t.Cleanup(utils.ClearResourceID)
+	t.Setenv("AUTOOPS_PROJECT_ID", "my-project")
+
+	server := newServerlessServer(t, clusterInfo, respondWith(`{"value": 1}`))
+	newServerlessTestMetricSet(t, server, options(), recordingMapper(&mapperCalls{}))
+
+	require.Equal(t, "my-project", utils.GetResourceID(), "the resource ID must come from the environment")
 }
