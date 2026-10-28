@@ -188,6 +188,12 @@ func runCmd(
 	if err != nil {
 		return nil, err
 	}
+	defer func() {
+		if err != nil {
+			_ = jsonWriter.Close()
+			_ = jsonReader.Close()
+		}
+	}()
 
 	// Common args
 	cmd.Env = append(os.Environ(), "NODE_ENV=production")
@@ -228,32 +234,14 @@ func runCmd(
 		cmd.Stdin = strings.NewReader(*stdinStr)
 	}
 
-	wg := sync.WaitGroup{}
-
-	// Send stdout into the output
 	stdoutPipe, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, fmt.Errorf("could not open stdout pipe: %w", err)
 	}
-	wg.Go(func() {
-		err := scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
-		if err != nil {
-			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-			logp.L().Warnf("could not scan stdout events from synthetics: %s", err)
-		}
-	})
-
 	stderrPipe, err := cmd.StderrPipe()
 	if err != nil {
 		return nil, fmt.Errorf("could not open stderr pipe: %w", err)
 	}
-	wg.Go(func() {
-		err := scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)
-		if err != nil {
-			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-			logp.L().Warnf("could not scan stderr events from synthetics: %s", err)
-		}
-	})
 
 	// This use of channels for results is awkward, but required for the thread locking below
 	cmdStarted := make(chan error)
@@ -264,24 +252,36 @@ func runCmd(
 		// could cause the subprocess to die prematurely
 		runtime.LockOSThread()
 		defer runtime.UnlockOSThread()
-		err = cmd.Start()
-
-		cmdStarted <- err
-
-		err := cmd.Wait()
-		cmdDone <- err
+		cmdStarted <- cmd.Start()
+		// Buffered so this goroutine exits even if Start failed and nobody receives.
+		cmdDone <- cmd.Wait()
 	}()
 
 	err = <-cmdStarted
 	if err != nil {
 		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
 		logp.L().Warnf("Could not start command %s: %s", cmd, err)
-		_ = jsonWriter.Close()
-		_ = jsonReader.Close()
 		return nil, err
 	}
 
-	// After cmd.Start: ExtraFiles must stay open until the child inherits them.
+	// The readers start only after cmd.Start: it reads the ExtraFiles
+	// descriptors that the results reader closes, and a failed start leaves no
+	// reader behind to wait for.
+	var wg sync.WaitGroup
+	wg.Go(func() {
+		err := scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
+		if err != nil {
+			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
+			logp.L().Warnf("could not scan stdout events from synthetics: %s", err)
+		}
+	})
+	wg.Go(func() {
+		err := scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)
+		if err != nil {
+			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
+			logp.L().Warnf("could not scan stderr events from synthetics: %s", err)
+		}
+	})
 	wg.Go(func() {
 		defer jsonReader.Close()
 

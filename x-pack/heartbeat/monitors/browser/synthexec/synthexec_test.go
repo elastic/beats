@@ -270,24 +270,21 @@ func TestRunTimeoutExitCodeCmd(t *testing.T) {
 	})
 }
 
+// TestRunCmdStartFailure checks that runCmd releases the results pipe and every
+// goroutine it started when the synthetics command cannot be started.
 func TestRunCmdStartFailure(t *testing.T) {
-	const deadline = 30 * time.Second
-	ctx := context.WithValue(t.Context(), SynthexecTimeoutKey, 2*deadline)
+	ctx := context.WithValue(t.Context(), SynthexecTimeoutKey, time.Minute)
 	cmd := exec.CommandContext(ctx, "/dev/null/no-such-binary")
 
 	goroutines := resources.NewGoroutinesChecker()
 
-	returned := make(chan error, 1)
-	go func() {
-		_, err := runCmd(ctx, &SynthCmd{cmd}, nil, nil, FilterJourneyConfig{}, stdfields.StdMonitorFields{}, "")
-		returned <- err
-	}()
+	mpx, err := runCmd(ctx, &SynthCmd{cmd}, nil, nil, FilterJourneyConfig{}, stdfields.StdMonitorFields{}, "")
+	assert.Error(t, err, "runCmd should report that the command could not be started")
+	assert.Nil(t, mpx, "runCmd should not return a multiplexer when the command could not be started")
 
-	select {
-	case err := <-returned:
-		require.Error(t, err, "runCmd should report that the command could not be started")
-	case <-time.After(deadline):
-		require.Fail(t, "runCmd blocked instead of returning the start error")
+	assert.Len(t, cmd.ExtraFiles, 2, "runCmd should pass both results pipe ends to the command")
+	for _, f := range cmd.ExtraFiles {
+		assert.ErrorIsf(t, f.Close(), os.ErrClosed, "runCmd should close results pipe end %s", f.Name())
 	}
 
 	goroutines.Check(t)
