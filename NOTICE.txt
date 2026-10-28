@@ -23162,11 +23162,19 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/vmware/govmomi
+<<<<<<< HEAD
 Version: v0.56.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/vmware/govmomi@v0.56.0/LICENSE.txt:
+=======
+Version: v0.56.2
+Licence type (autodetected): Apache-2.0
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/github.com/vmware/govmomi@v0.56.2/LICENSE.txt:
+>>>>>>> a6e1521 (build(deps): bump github.com/vmware/govmomi from 0.56.1 to 0.56.2 (#54154))
 
 
                                  Apache License
