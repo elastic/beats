@@ -178,11 +178,11 @@ func runCmd(
 	filterJourneys FilterJourneyConfig,
 	sFields stdfields.StdMonitorFields,
 	traceID string,
-) (mpx *ExecMultiplexer, err error) {
+) (_ *ExecMultiplexer, err error) {
 	// Attach sysproc attrs to ensure subprocesses are properly killed
 	platformCmdMutate(cmd)
 
-	mpx = NewExecMultiplexer()
+	mpx := NewExecMultiplexer()
 	// Setup a pipe for JSON structured output
 	jsonReader, jsonWriter, err := os.Pipe()
 	if err != nil {
