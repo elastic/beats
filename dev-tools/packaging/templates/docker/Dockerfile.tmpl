@@ -1,6 +1,14 @@
 {{- $beatHome := printf "%s/%s" "/usr/share" .BeatName }}
 {{- $beatBinary := printf "%s/%s" $beatHome .BeatName }}
 {{- $repoInfo := repo }}
+{{- /*
+  npm 12.2.1's bundled node-gyp carries undici 6.29.0, which is vulnerable to CVE-2026-109383 (fixed in
+  6.29.1). The Heartbeat images replace that copy with the version below right after the npm bootstrap.
+  The sha512 (hex) is `npm view undici@<version> dist.integrity` decoded from base64. Update both together
+  and remove the replacement once the npm we install bundles undici >= 6.29.1.
+*/ -}}
+{{- $undiciVersion := "6.29.1" }}
+{{- $undiciSHA512 := "12f46552dfd0a8012f5dd41e44c6147f0390b1fce90f3b7292b1b6a3018413fac1381a18bfdb85dfd673b0d0e1e254c51e14ebd973998ca91882e783d7666618" }}
 
 # Prepare home in a different stage to avoid creating additional layers on
 # the final image because of permission changes.
@@ -157,18 +165,16 @@ RUN echo \
 USER {{ .user }}
 # nodejs-24 ships no npm, and Wolfi's npm package (12.0.2) bundles undici 6.27.0 (CVE-2026-19534,
 # CVE-2026-85024). Bootstrap npm >= 12.2.1, which bundles undici 6.29.0, from the registry instead.
-# npm 12.2.1's bundled node-gyp still carries undici 6.29.0, which is vulnerable to CVE-2026-109383
-# (fixed in 6.29.1), so that copy is replaced with undici 6.29.1 right after the npm bootstrap. The undici
-# sha512 (hex) is `npm view undici@6.29.1 dist.integrity` decoded from base64. Remove the replacement once
-# the npm we install bundles undici >= 6.29.1.
+# The undici bundled in npm's node-gyp is replaced right after the npm bootstrap (CVE-2026-109383, see
+# the undici variables at the top of Dockerfile.tmpl).
 # Pinned sha512 (hex) of npm-12.2.1.tgz, i.e. `npm view npm@12.2.1 dist.integrity` decoded from base64.
 # Update it together with the version.
 RUN curl -fsSL -o /tmp/npm.tgz https://registry.npmjs.org/npm/-/npm-12.2.1.tgz \
     && echo "6ca0a6151553fc107e60f1186d9c10d57508dcde6de31292a54d4cc4e8e8ef3de25b3281274657442d7115d10df930bb3794ddcb0681cdfd9d317189abf7b63d  /tmp/npm.tgz" | sha512sum -c - \
     && tar xz -C /tmp -f /tmp/npm.tgz \
     && node /tmp/package/bin/npm-cli.js install -g npm@12.2.1 \
-    && curl -fsSL -o /tmp/undici.tgz https://registry.npmjs.org/undici/-/undici-6.29.1.tgz \
-    && echo "12f46552dfd0a8012f5dd41e44c6147f0390b1fce90f3b7292b1b6a3018413fac1381a18bfdb85dfd673b0d0e1e254c51e14ebd973998ca91882e783d7666618  /tmp/undici.tgz" | sha512sum -c - \
+    && curl -fsSL -o /tmp/undici.tgz https://registry.npmjs.org/undici/-/undici-{{ $undiciVersion }}.tgz \
+    && echo "{{ $undiciSHA512 }}  /tmp/undici.tgz" | sha512sum -c - \
     && UNDICI_DIR="$(npm root -g)/npm/node_modules/undici" \
     && rm -rf "$UNDICI_DIR" && mkdir -p "$UNDICI_DIR" \
     && tar xz -C "$UNDICI_DIR" --strip-components=1 -f /tmp/undici.tgz \
@@ -248,10 +254,8 @@ RUN cd /usr/share/heartbeat/.node \
     && chmod ug+rwX -R $NODE_PATH
 
 # TODO: Remove this step when Node.js is bumped to a version that bundles npm >= 12.2.1
-# npm 12.2.1's bundled node-gyp still carries undici 6.29.0, which is vulnerable to CVE-2026-109383
-# (fixed in 6.29.1), so that copy is replaced with undici 6.29.1 right after the npm bootstrap. The undici
-# sha512 (hex) is `npm view undici@6.29.1 dist.integrity` decoded from base64. Remove the replacement once
-# the npm we install bundles undici >= 6.29.1.
+# The undici bundled in npm's node-gyp is replaced right after the npm bootstrap (CVE-2026-109383, see
+# the undici variables at the top of Dockerfile.tmpl).
 # Bootstrap npm 12.2.1 from a downloaded copy to avoid npm 10.x self-replacement failures
 # Pinned sha512 (hex) of npm-12.2.1.tgz, i.e. `npm view npm@12.2.1 dist.integrity` decoded from base64.
 # Update it together with the version.
@@ -259,8 +263,8 @@ RUN curl -fsSL -o /tmp/npm.tgz https://registry.npmjs.org/npm/-/npm-12.2.1.tgz \
     && echo "6ca0a6151553fc107e60f1186d9c10d57508dcde6de31292a54d4cc4e8e8ef3de25b3281274657442d7115d10df930bb3794ddcb0681cdfd9d317189abf7b63d  /tmp/npm.tgz" | sha512sum -c - \
     && tar xz -C /tmp -f /tmp/npm.tgz \
     && node /tmp/package/bin/npm-cli.js install -g npm@12.2.1 \
-    && curl -fsSL -o /tmp/undici.tgz https://registry.npmjs.org/undici/-/undici-6.29.1.tgz \
-    && echo "12f46552dfd0a8012f5dd41e44c6147f0390b1fce90f3b7292b1b6a3018413fac1381a18bfdb85dfd673b0d0e1e254c51e14ebd973998ca91882e783d7666618  /tmp/undici.tgz" | sha512sum -c - \
+    && curl -fsSL -o /tmp/undici.tgz https://registry.npmjs.org/undici/-/undici-{{ $undiciVersion }}.tgz \
+    && echo "{{ $undiciSHA512 }}  /tmp/undici.tgz" | sha512sum -c - \
     && UNDICI_DIR="$(npm root -g)/npm/node_modules/undici" \
     && rm -rf "$UNDICI_DIR" && mkdir -p "$UNDICI_DIR" \
     && tar xz -C "$UNDICI_DIR" --strip-components=1 -f /tmp/undici.tgz \
