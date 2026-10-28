@@ -6,6 +6,7 @@ package beater
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -157,7 +158,11 @@ type countedContextClient struct{ *countedClient }
 func (c *countedContextClient) PublishContext(ctx context.Context, e beat.Event) error {
 	c.owner.entered.Add(1)
 	defer c.owner.returned.Add(1)
-	return c.Client.(beat.ContextPublisher).PublishContext(ctx, e)
+	cp, ok := c.Client.(beat.ContextPublisher)
+	if !ok {
+		return errors.New("the pipeline client does not implement beat.ContextPublisher")
+	}
+	return cp.PublishContext(ctx, e)
 }
 
 // stuckScheduledDispatcher returns a dispatcher publishing to pipe under a
@@ -207,11 +212,10 @@ func TestScheduledWorkerCancelsBlockedPublishOnShutdown(t *testing.T) {
 
 			pipe.close(t)
 			<-d.done
-			dropped := int64(d.metrics.droppedRows[dropShutdown].Get())
 			assert.Equal(t, uint64(1), d.metrics.dropped[dropShutdown].Get(), "count the cut item once")
 			assert.Zero(t, d.metrics.droppedRows[dropStale].Get(), "a shutdown is not a stale drop")
 			assert.Positive(t, pipe.output.delivered.Load(), "rows queued before the shutdown are delivered")
-			assert.Equal(t, int64(stuckRows+1), pipe.output.delivered.Load()+dropped,
+			assert.EqualValues(t, stuckRows+1-pipe.output.delivered.Load(), d.metrics.droppedRows[dropShutdown].Get(),
 				"each row and the response is either delivered or counted once as a shutdown drop, never both")
 		})
 	}
@@ -235,10 +239,9 @@ func TestScheduledPolicyChangeCancelsBlockedPublish(t *testing.T) {
 			d.stop()
 			pipe.close(t)
 			<-d.done
-			dropped := int64(d.metrics.droppedRows[dropStale].Get())
 			assert.Equal(t, uint64(1), d.metrics.dropped[dropStale].Get(), "count the cut item once")
 			assert.Zero(t, d.metrics.droppedRows[dropShutdown].Get(), "a policy change is not a shutdown")
-			assert.Equal(t, int64(stuckRows+1), pipe.output.delivered.Load()+dropped,
+			assert.EqualValues(t, stuckRows+1-pipe.output.delivered.Load(), d.metrics.droppedRows[dropStale].Get(),
 				"each row and the response is either delivered or counted once as a stale drop, never both")
 		})
 	}
@@ -305,7 +308,7 @@ func TestLiveTimeoutCancelsBlockedPublish(t *testing.T) {
 			n, err := d.publishResults(t.Context(), c, liveJob{actionID: "a1", hits: hits})
 			assert.ErrorIs(t, err, errLivePublishTimeout, "the stuck output must time out the action")
 			assert.Positive(t, n, "rows queued before the queue filled are handed over")
-			assert.Equal(t, uint64(stuckRows-n), d.metrics.droppedRows[dropTimeout].Get(), "count the rows not handed to the output")
+			assert.EqualValues(t, stuckRows-n, d.metrics.droppedRows[dropTimeout].Get(), "count the rows not handed to the output")
 			assert.Eventually(t, pipe.idle, releaseBound, time.Millisecond,
 				"the timeout must release the worker blocked on the full queue")
 
