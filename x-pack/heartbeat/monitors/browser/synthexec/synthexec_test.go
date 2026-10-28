@@ -275,10 +275,9 @@ func TestRunTimeoutExitCodeCmd(t *testing.T) {
 func TestRunCmdStartFailure(t *testing.T) {
 	defer goleak.VerifyNone(t, goleak.IgnoreCurrent())
 
-	ctx := context.WithValue(t.Context(), SynthexecTimeoutKey, time.Minute)
-	cmd := exec.CommandContext(ctx, "/dev/null/no-such-binary")
+	cmd := exec.CommandContext(t.Context(), "/dev/null/no-such-binary")
 
-	mpx, err := runCmd(ctx, &SynthCmd{cmd}, nil, nil, FilterJourneyConfig{}, stdfields.StdMonitorFields{}, "")
+	mpx, err := runCmd(t.Context(), &SynthCmd{cmd}, nil, nil, FilterJourneyConfig{}, stdfields.StdMonitorFields{}, "")
 	assert.Error(t, err, "runCmd should report that the command could not be started")
 	assert.Nil(t, mpx, "runCmd should not return a multiplexer when the command could not be started")
 
