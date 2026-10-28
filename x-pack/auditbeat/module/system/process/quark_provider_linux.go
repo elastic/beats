@@ -29,6 +29,7 @@ var quarkMetrics = struct {
 	nonAggregations    *monitoring.Uint
 	garbageCollections *monitoring.Uint
 	lost               *monitoring.Uint
+	stalls             *monitoring.Uint
 	backend            *monitoring.String
 }{}
 
@@ -40,6 +41,7 @@ func init() {
 	quarkMetrics.nonAggregations = monitoring.NewUint(reg, "non_aggregations")
 	quarkMetrics.garbageCollections = monitoring.NewUint(reg, "garbage_collections")
 	quarkMetrics.lost = monitoring.NewUint(reg, "lost")
+	quarkMetrics.stalls = monitoring.NewUint(reg, "stalls")
 	quarkMetrics.backend = monitoring.NewString(reg, "backend", monitoring.Report)
 }
 
@@ -52,6 +54,11 @@ type QuarkMetricSet struct {
 	queue        *quark.Queue // Quark runtime state
 	selfMntNsIno uint32       // Mnt inode from current process
 	cachedHasher *hasher.CachedHasher
+	// Wallclock time of boot in nanoseconds since the Unix epoch,
+	// added to quark boottime timestamps to get wallclock.
+	// Refreshed in maybeUpdateMetrics, only moves on a system
+	// clock step.
+	boottime uint64
 }
 
 // Used for testing only and not exposed via config
@@ -68,17 +75,23 @@ func NewFromQuark(ms MetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("failed to fetch self mount inode: %w", err)
 	}
 	qm.selfMntNsIno = uint32(ino64) //nolint:gosec // mount namespace inodes fit in uint32
-	qm.cachedHasher, err = hasher.NewFileHasherWithCache(qm.config.HasherConfig, 4096)
+	qm.cachedHasher, err = hasher.NewFileHasherWithCache(qm.config.HasherConfig, 4096, ms.log)
 	if err != nil {
 		return nil, fmt.Errorf("can't create hash cache: %w", err)
 	}
 
 	attr := quark.DefaultQueueAttr()
 	if quarkForceKprobe {
-		attr.Flags &= ^quark.QQ_ALL_BACKENDS
+		attr.Flags &= ^quark.QQ_EBPF
 		attr.Flags |= quark.QQ_KPROBE
 	}
 	qm.queue, err = quark.OpenQueue(attr)
+	if err != nil && !quarkForceKprobe {
+		qm.log.Infof("quark ebpf backend failed (%v), trying kprobes", err)
+		attr.Flags &= ^quark.QQ_EBPF
+		attr.Flags |= quark.QQ_KPROBE
+		qm.queue, err = quark.OpenQueue(attr)
+	}
 	if err != nil {
 		qm.cachedHasher.Close()
 		return nil, fmt.Errorf("can't open quark queue: %w", err)
@@ -106,6 +119,7 @@ func (ms *QuarkMetricSet) Run(r mb.PushReporterV2) {
 
 	metricsStamp := time.Now()
 
+	ms.boottime = quark.Boottime()
 	for _, proc := range ms.queue.Snapshot() {
 		var snapshotEvent quark.Event
 		snapshotEvent.Process = proc
@@ -200,7 +214,7 @@ func (ms *QuarkMetricSet) toEvent(quarkEvent quark.Event, snap bool) (mb.Event, 
 
 	// Ids
 	event.RootFields.Put("process.parent.pid", process.Proc.Ppid)
-	startTime := time.Unix(0, int64(process.Proc.TimeBoot)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
+	startTime := time.Unix(0, int64(process.Proc.TimeBoot+ms.boottime)) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
 	if ms.HostID() != "" {
 		// TODO unify with sessionview and guarantee loss of precision
 		event.RootFields.Put("process.entity_id",
@@ -332,6 +346,7 @@ func (ms *QuarkMetricSet) maybeUpdateMetrics(stamp *time.Time) {
 	quarkMetrics.nonAggregations.Set(stats.NonAggregations)
 	quarkMetrics.garbageCollections.Set(stats.GarbageCollections)
 	quarkMetrics.lost.Set(stats.Lost)
+	quarkMetrics.stalls.Set(stats.Stalls)
 	switch stats.Backend {
 	case quark.QQ_EBPF:
 		quarkMetrics.backend.Set("ebpf")
@@ -340,6 +355,14 @@ func (ms *QuarkMetricSet) maybeUpdateMetrics(stamp *time.Time) {
 	default:
 		quarkMetrics.backend.Set("invalid")
 	}
+
+	// Quark hands out timestamps in nanoseconds since boot, converted
+	// at the last moment by adding the boottime epoch. Quark keeps the
+	// epoch fresh by itself and only moves it on a system clock step
+	// (say NTP correcting a clock that was wrong at boot), but each
+	// Boottime() call is a cgo call, so we refetch it here instead of
+	// once per event.
+	ms.boottime = quark.Boottime()
 
 	*stamp = time.Now()
 }

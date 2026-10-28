@@ -20,6 +20,7 @@ package partition
 import (
 	"errors"
 	"fmt"
+	"slices"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -204,10 +205,5 @@ func queryOffsetRange(
 }
 
 func hasID(id int32, lst []int32) bool {
-	for _, other := range lst {
-		if id == other {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(lst, id)
 }

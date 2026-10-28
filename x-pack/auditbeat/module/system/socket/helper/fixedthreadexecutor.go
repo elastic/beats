@@ -13,11 +13,11 @@ import (
 )
 
 // Task is a function that returns an arbitrary result and/or an error.
-type Task func() (interface{}, error)
+type Task func() (any, error)
 
 // TaskResult encapsulates the results of a Task.
 type TaskResult struct {
-	Data interface{}
+	Data any
 	Err  error
 }
 
@@ -66,7 +66,7 @@ func NewFixedThreadExecutor(queueSize int) FixedThreadExecutor {
 		}
 	}()
 
-	ex.Run(func() (interface{}, error) { return unix.Gettid(), nil })
+	ex.Run(func() (any, error) { return unix.Gettid(), nil })
 	res := <-ex.resultC
 	ex.TID = res.Data.(int)
 	return ex

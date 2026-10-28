@@ -89,7 +89,7 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 	}
 
 	if s.timeSeries.Metric != nil {
-		metrics := make(map[string]interface{})
+		metrics := make(map[string]any)
 		// common.Mapstr seems to not work as expected when deleting keys so I have to iterate over all results to add
 		// the ones I want
 		for k, v := range s.timeSeries.Metric.Labels {
@@ -107,7 +107,7 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 	}
 
 	if s.timeSeries.Resource != nil {
-		resources := make(map[string]interface{})
+		resources := make(map[string]any)
 		// common.Mapstr seems to not work as expected when deleting keys so I have to iterate over all results to add
 		// the ones I want
 		for k, v := range s.timeSeries.Resource.Labels {

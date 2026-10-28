@@ -5,8 +5,12 @@
 package cel
 
 import (
+	"bytes"
 	"context"
+	"crypto"
+	"crypto/x509"
 	"encoding/json"
+	"encoding/pem"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -16,6 +20,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/youmark/pkcs8"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 	"golang.org/x/oauth2/endpoints"
@@ -190,6 +195,7 @@ type oAuth2Provider string
 const (
 	oAuth2ProviderDefault oAuth2Provider = ""       // oAuth2ProviderDefault means no specific provider is set.
 	oAuth2ProviderAzure   oAuth2Provider = "azure"  // oAuth2ProviderAzure AzureAD.
+	oAuth2ProviderBox     oAuth2Provider = "box"    // oAuth2ProviderBox Box.
 	oAuth2ProviderGoogle  oAuth2Provider = "google" // oAuth2ProviderGoogle Google.
 	oAuth2ProviderOkta    oAuth2Provider = "okta"   // oAuth2ProviderOkta Okta.
 )
@@ -232,6 +238,16 @@ type oAuth2Config struct {
 	OktaJWKJSON common.JSONBlob `config:"okta.jwk_json"`
 	OktaJWKPEM  string          `config:"okta.jwk_pem"`
 	DPoPKeyPEM  string          `config:"okta.dpop_key_pem"`
+
+	// box specific
+	BoxConfigFile   string          `config:"box.config_file"`
+	BoxConfigJSON   common.JSONBlob `config:"box.config_json"`
+	BoxEnterpriseID string          `config:"box.enterprise_id"`
+	BoxPublicKeyID  string          `config:"box.public_key_id"`
+	BoxPrivateKey   string          `config:"box.private_key"`
+	BoxPassphrase   string          `config:"box.passphrase"`
+	BoxSubjectType  string          `config:"box.subject_type"`
+	BoxSubjectID    string          `config:"box.subject_id"`
 }
 
 // isEnabled returns true if the `enable` field is set to true in the yaml.
@@ -277,6 +293,8 @@ func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.C
 		}
 	case oAuth2ProviderAzure:
 		return o.clientCredentialsGrant(ctx, client), nil
+	case oAuth2ProviderBox:
+		return o.fetchBoxOauthClient(ctx)
 	case oAuth2ProviderGoogle:
 		if len(o.GoogleJWTJSON) != 0 {
 			cfg, err := google.JWTConfigFromJSON(o.GoogleJWTJSON, o.Scopes...)
@@ -323,6 +341,10 @@ func (o *oAuth2Config) getTokenURL() string {
 		if o.TokenURL == "" {
 			return endpoints.AzureAD(o.AzureTenantID).TokenURL
 		}
+	case oAuth2ProviderBox:
+		if o.TokenURL == "" {
+			return boxTokenURL
+		}
 	}
 
 	return o.TokenURL
@@ -357,6 +379,8 @@ func (o *oAuth2Config) Validate() error {
 	switch o.getProvider() {
 	case oAuth2ProviderAzure:
 		return o.validateAzureProvider()
+	case oAuth2ProviderBox:
+		return o.validateBoxProvider()
 	case oAuth2ProviderGoogle:
 		return o.validateGoogleProvider()
 	case oAuth2ProviderOkta:
@@ -438,7 +462,7 @@ func (o *oAuth2Config) validateOktaProvider() error {
 	}
 	// jwk_pem
 	if o.OktaJWKPEM != "" {
-		_, err := pemPKCS8PrivateKey([]byte(o.OktaJWKPEM))
+		_, err := pemPKCS8PrivateKey([]byte(o.OktaJWKPEM), "")
 		if err != nil {
 			return fmt.Errorf("okta validation error: %w", err)
 		}
@@ -454,6 +478,41 @@ func (o *oAuth2Config) validateOktaProvider() error {
 	}
 
 	return fmt.Errorf("okta validation error: no authentication credentials were configured or detected")
+}
+
+// pemPKCS8PrivateKey decodes a PEM block and parses it as a PKCS#8 private key.
+// If the block type is "ENCRYPTED PRIVATE KEY" it is decrypted using pass before
+// parsing. pass may be empty for unencrypted keys.
+func pemPKCS8PrivateKey(pemdata []byte, pass string) (crypto.Signer, error) {
+	blk, rest := pem.Decode(pemdata)
+	if blk == nil {
+		return nil, errors.New("no PEM data")
+	}
+	if rest := bytes.TrimSpace(rest); len(rest) != 0 {
+		return nil, fmt.Errorf("PEM text has trailing data: %d bytes", len(rest))
+	}
+
+	var (
+		key any
+		err error
+	)
+	if blk.Type == "ENCRYPTED PRIVATE KEY" {
+		key, err = pkcs8.ParsePKCS8PrivateKey(blk.Bytes, []byte(pass))
+		if err != nil {
+			return nil, fmt.Errorf("decrypting private key: %w", err)
+		}
+	} else {
+		key, err = x509.ParsePKCS8PrivateKey(blk.Bytes)
+		if err != nil {
+			return nil, fmt.Errorf("parsing private key: %w", err)
+		}
+	}
+
+	signer, ok := key.(crypto.Signer)
+	if !ok {
+		return nil, fmt.Errorf("key is not a signer: %T", key)
+	}
+	return signer, nil
 }
 
 func populateJSONFromFile(file string, dst *common.JSONBlob) error {

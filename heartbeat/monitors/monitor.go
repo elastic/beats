@@ -75,6 +75,9 @@ type Monitor struct {
 	logger              *logp.Logger
 }
 
+// PluginFactoryWrapper returns a PluginFactory decorating the plugins of pf.
+type PluginFactoryWrapper func(pf plugin.PluginFactory) plugin.PluginFactory
+
 func (m *Monitor) SetStatusReporter(statusReporter status.StatusReporter) {
 	m.statusReporter = statusReporter
 }
@@ -86,7 +89,7 @@ func (m *Monitor) String() string {
 }
 
 func checkMonitorConfig(config *conf.C, registrar *plugin.PluginsReg, info beat.Info) error {
-	_, err := newMonitor(config, registrar, nil, nil, monitorstate.NilStateLoader, info, nil)
+	_, err := newMonitor(config, registrar, nil, nil, monitorstate.NilStateLoader, info, nil, nil)
 
 	return err
 }
@@ -101,8 +104,9 @@ func newMonitor(
 	stateLoader monitorstate.StateLoader,
 	info beat.Info,
 	onStop func(*Monitor),
+	wrapFactory PluginFactoryWrapper,
 ) (*Monitor, error) {
-	m, err := newMonitorUnsafe(config, registrar, pubClient, taskAdder, stateLoader, info, onStop)
+	m, err := newMonitorUnsafe(config, registrar, pubClient, taskAdder, stateLoader, info, onStop, wrapFactory)
 	if m != nil && err != nil {
 		m.Stop()
 	}
@@ -119,6 +123,7 @@ func newMonitorUnsafe(
 	stateLoader monitorstate.StateLoader,
 	info beat.Info,
 	onStop func(*Monitor),
+	wrapFactory PluginFactoryWrapper,
 ) (*Monitor, error) {
 	// Extract just the Id, Type, and Enabled fields from the config
 	// We'll parse things more precisely later once we know what exact type of
@@ -131,6 +136,9 @@ func newMonitorUnsafe(
 	pluginFactory, found := registrar.Get(standardFields.Type)
 	if !found {
 		return nil, fmt.Errorf("monitor type %v does not exist, valid types are %v", standardFields.Type, registrar.MonitorNames())
+	}
+	if wrapFactory != nil {
+		pluginFactory = wrapFactory(pluginFactory)
 	}
 
 	m := &Monitor{
@@ -210,7 +218,7 @@ func newMonitorUnsafe(
 }
 
 func (m *Monitor) configHash() (uint64, error) {
-	unpacked := map[string]interface{}{}
+	unpacked := map[string]any{}
 	err := m.config.Unpack(unpacked)
 	if err != nil {
 		return 0, err

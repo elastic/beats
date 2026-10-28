@@ -22,6 +22,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/packetbeat/procs"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
@@ -64,6 +65,7 @@ streams:
       buffer_size_mb: 100
     procs:
       enabled: true
+      backend: auto
       monitored:
         - process: postgresql
           cmdline_grep: postgresql
@@ -93,11 +95,27 @@ streams:
 	require.Equal(t, config.Flows.Index, "logs-packet.flow-default")
 	require.Len(t, config.ProtocolsList, 2)
 
-	var protocol map[string]interface{}
+	var protocol map[string]any
 	require.NoError(t, config.ProtocolsList[0].Unpack(&protocol))
-	require.Len(t, protocol["processors"].([]interface{}), 3)
+	require.Len(t, protocol["processors"].([]any), 3)
 	require.Equal(t, "default_route", config.Interfaces[0].Device)
 	require.Equal(t, "en1", config.Interfaces[1].Device)
 	require.Equal(t, "en2", config.Interfaces[2].Device)
 	require.Len(t, config.Procs.Monitored, 3)
+	require.Equal(t, procs.BackendAuto, config.Procs.Backend)
+}
+
+func TestMergeProcsConfigBackend(t *testing.T) {
+	for _, tc := range []struct {
+		one, two, want procs.Backend
+	}{
+		{procs.BackendProcfs, procs.BackendProcfs, procs.BackendProcfs},
+		{procs.BackendProcfs, procs.BackendAuto, procs.BackendAuto},
+		{procs.BackendAuto, procs.BackendProcfs, procs.BackendAuto},
+		{procs.BackendAuto, procs.BackendKernelTracing, procs.BackendKernelTracing},
+		{procs.BackendKernelTracing, procs.BackendProcfs, procs.BackendKernelTracing},
+	} {
+		got := mergeProcsConfig(procs.ProcsConfig{Backend: tc.one}, procs.ProcsConfig{Backend: tc.two})
+		require.Equal(t, tc.want, got.Backend, "merge(%s, %s)", tc.one, tc.two)
+	}
 }

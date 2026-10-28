@@ -88,7 +88,7 @@ type rawData struct {
 // It allows unit tests to exercise fetch paths without real DB connections.
 type dbClient interface {
 	FetchTableMode(ctx context.Context, query string) ([]mapstr.M, error)
-	FetchTableModeWithParams(ctx context.Context, query string, args ...interface{}) ([]mapstr.M, error)
+	FetchTableModeWithParams(ctx context.Context, query string, args ...any) ([]mapstr.M, error)
 	FetchVariableMode(ctx context.Context, query string) (mapstr.M, error)
 	Close() error
 }

@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package guess
 
@@ -70,7 +69,7 @@ func (g *guessTCPSendMsg) Probes() ([]helper.ProbeDef, error) {
 				Address:   "tcp_sendmsg",
 				Fetchargs: "c={{.P3}} d={{.P4}}",
 			},
-			Decoder: helper.NewStructDecoder(func() interface{} { return new(tcpSendMsgArgCountGuess) }),
+			Decoder: helper.NewStructDecoder(func() any { return new(tcpSendMsgArgCountGuess) }),
 		},
 	}, nil
 }
@@ -94,7 +93,7 @@ func (g *guessTCPSendMsg) Trigger() (err error) {
 
 // Extract receives the arguments from the tcp_sendmsg call and checks
 // which one contains the number of bytes written by trigger.
-func (g *guessTCPSendMsg) Extract(ev interface{}) (mapstr.M, bool) {
+func (g *guessTCPSendMsg) Extract(ev any) (mapstr.M, bool) {
 	event := ev.(*tcpSendMsgArgCountGuess)
 	if g.written <= 0 {
 		g.ctx.Log.Errorf("write failed for guess")

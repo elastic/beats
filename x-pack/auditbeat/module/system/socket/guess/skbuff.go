@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package guess
 
@@ -126,7 +125,7 @@ func (g *guessSkBuffLen) Trigger() error {
 
 // Extract scans the sk_buff memory for any values between the expected
 // payload + [0 ... 128).
-func (g *guessSkBuffLen) Extract(ev interface{}) (mapstr.M, bool) {
+func (g *guessSkBuffLen) Extract(ev any) (mapstr.M, bool) {
 	skbuff := ev.([]byte)
 	if len(skbuff) != skbuffDumpSize || g.written <= 0 {
 		return nil, false
@@ -141,7 +140,7 @@ func (g *guessSkBuffLen) Extract(ev interface{}) (mapstr.M, bool) {
 	target := uint32(g.written)
 	arr := (*[n]uint32)(unsafe.Pointer(&skbuff[0]))[:]
 	var results [maxOverhead][]int
-	for i := 0; i < n; i++ {
+	for i := range n {
 		if val := arr[i]; val >= target && val < target+maxOverhead {
 			excess := val - target
 			results[excess] = append(results[excess], i*uIntSize)
@@ -352,7 +351,7 @@ func (g *guessSkBuffProto) Trigger() error {
 
 // Extract will scan the sk_buff memory to look for all the uint16-sized memory
 // locations that contain the expected protocol value.
-func (g *guessSkBuffProto) Extract(event interface{}) (mapstr.M, bool) {
+func (g *guessSkBuffProto) Extract(event any) (mapstr.M, bool) {
 	raw := event.([]byte)
 	needle := []byte{0x08, 0x00} // ETH_P_IP
 	if g.doIPv6 {
@@ -532,7 +531,7 @@ func (g *guessSkBuffDataPtr) Probes() ([]helper.ProbeDef, error) {
 				Address:   "{{.RECV_UDP_DATAGRAM}}",
 				Fetchargs: fmt.Sprintf("ptr=%s data=%s", address, helper.MakeMemoryDump(address, 0, dataDumpBytes)),
 			},
-			Decoder: helper.NewStructDecoder(func() interface{} { return new(dataDump) }),
+			Decoder: helper.NewStructDecoder(func() any { return new(dataDump) }),
 		},
 		{
 			Probe: tracing.Probe{
@@ -571,7 +570,7 @@ func (g *guessSkBuffDataPtr) Prepare(ctx Context) (err error) {
 		g.dumpOffset = alignTo(g.protoOffset+2, int(sizeOfPtr))
 		g.payload = make([]byte, payloadLen)
 		banner := "HELLO!"
-		for i := 0; i < payloadLen; i++ {
+		for i := range payloadLen {
 			g.payload[i] = banner[i%len(banner)]
 		}
 	} else {
@@ -621,7 +620,7 @@ func u32At(buf []byte) uintptr {
 // (any), false : Signals that it needs another event in the current iteration.
 // nil, true : Finish the current iteration and perform a new one.
 // (non-nil), true : The guess completed.
-func (g *guessSkBuffDataPtr) Extract(event interface{}) (mapstr.M, bool) {
+func (g *guessSkBuffDataPtr) Extract(event any) (mapstr.M, bool) {
 	switch v := event.(type) {
 	case *dataDump:
 		g.data = v
@@ -693,7 +692,7 @@ func (g *guessSkBuffDataPtr) Extract(event interface{}) (mapstr.M, bool) {
 	scanFields := func(width int, ptrBase uintptr, reader func([]byte) uintptr) mapstr.M {
 		var off [3]uintptr
 		for base := g.dumpOffset - width*3; base >= limit; base -= width {
-			for i := 0; i < 3; i++ {
+			for i := range 3 {
 				off[i] = reader(g.skbuff[base+i*width:]) - ptrBase
 			}
 			if off[0] == uintptr(udpHdrOff) &&

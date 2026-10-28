@@ -11,7 +11,7 @@ import (
 )
 
 // GetConfigForTest function gets aws credentials for integration tests.
-func GetConfigForTest(t *testing.T, metricSetName string, period string) map[string]interface{} {
+func GetConfigForTest(t *testing.T, metricSetName string, period string) map[string]any {
 	t.Helper()
 
 	accessKeyID, okAccessKeyID := os.LookupEnv("AWS_ACCESS_KEY_ID")
@@ -22,13 +22,13 @@ func GetConfigForTest(t *testing.T, metricSetName string, period string) map[str
 		defaultRegion = "us-west-1"
 	}
 
-	config := map[string]interface{}{}
+	config := map[string]any{}
 	if !okAccessKeyID || accessKeyID == "" {
 		t.Fatal("$AWS_ACCESS_KEY_ID not set or set to empty")
 	} else if !okSecretAccessKey || secretAccessKey == "" {
 		t.Fatal("$AWS_SECRET_ACCESS_KEY not set or set to empty")
 	} else {
-		config = map[string]interface{}{
+		config = map[string]any{
 			"module":            "aws",
 			"period":            period,
 			"metricsets":        []string{metricSetName},
@@ -46,7 +46,7 @@ func GetConfigForTest(t *testing.T, metricSetName string, period string) map[str
 	return config
 }
 
-func compareType(metricValue interface{}, expectedType string, metricName string) (err error) {
+func compareType(metricValue any, expectedType string, metricName string) (err error) {
 	switch metricValue.(type) {
 	case float64:
 		if expectedType != "float" {

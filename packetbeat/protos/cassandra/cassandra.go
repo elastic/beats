@@ -83,7 +83,7 @@ func New(
 }
 
 //go:inline
-func (cassandra *cassandra) debugf(format string, args ...interface{}) {
+func (cassandra *cassandra) debugf(format string, args ...any) {
 	if cassandra.isDebug {
 		cassandra.logger.Debugf(format, args...)
 	}
@@ -110,7 +110,7 @@ func (cassandra *cassandra) setFromConfig(config *cassandraConfig) error {
 
 	// set parser's compressor, only `snappy` supported right now
 	if config.Compressor == gocql.Snappy {
-		parser.compressor = gocql.SnappyCompressor{}
+		parser.compressor = gocql.SnappyCompressor{MaxDecodedLen: parser.maxBytes}
 	} else {
 		parser.compressor = nil
 	}

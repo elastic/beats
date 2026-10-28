@@ -126,10 +126,10 @@ var (
 )
 
 type response struct {
-	AutoFollowStats map[string]interface{} `json:"auto_follow_stats"`
+	AutoFollowStats map[string]any `json:"auto_follow_stats"`
 	FollowStats     struct {
 		Indices []struct {
-			Shards []map[string]interface{} `json:"shards"`
+			Shards []map[string]any `json:"shards"`
 		} `json:"indices"`
 	} `json:"follow_stats"`
 }

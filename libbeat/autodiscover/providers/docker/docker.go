@@ -100,7 +100,7 @@ func AutodiscoverBuilder(
 		return nil, errWrap(fmt.Errorf("no configs or hints defined for autodiscover provider"))
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, nil, path)
+	builders, err := autodiscover.NewBuilders(logger, config.Builders, config.Hints, nil, path)
 	if err != nil {
 		return nil, errWrap(err)
 	}

@@ -31,16 +31,16 @@ func TestInvalidXMLIsSanitized(t *testing.T) {
 	tests := []struct {
 		name  string
 		input []byte
-		want  map[string]interface{}
+		want  map[string]any
 		err   error
 	}{
 		{
 			name: "control space",
 			input: []byte(`<person><Name ID="123">John` + "\t" + `
 </Name></person>`),
-			want: map[string]interface{}{
-				"person": map[string]interface{}{
-					"Name": map[string]interface{}{
+			want: map[string]any{
+				"person": map[string]any{
+					"Name": map[string]any{
 						"#text": "John",
 						"ID":    "123",
 					},
@@ -50,9 +50,9 @@ func TestInvalidXMLIsSanitized(t *testing.T) {
 		{
 			name:  "crlf",
 			input: []byte(`<person><Name ID="123">John` + "\r\n" + `</Name></person>`),
-			want: map[string]interface{}{
-				"person": map[string]interface{}{
-					"Name": map[string]interface{}{
+			want: map[string]any{
+				"person": map[string]any{
+					"Name": map[string]any{
 						"#text": "John",
 						"ID":    "123",
 					},
@@ -62,9 +62,9 @@ func TestInvalidXMLIsSanitized(t *testing.T) {
 		{
 			name:  "single invalid",
 			input: []byte(`<person><Name ID="123">John` + "\x80" + `</Name></person>`),
-			want: map[string]interface{}{
-				"person": map[string]interface{}{
-					"Name": map[string]interface{}{
+			want: map[string]any{
+				"person": map[string]any{
+					"Name": map[string]any{
 						"#text": "John\\ufffd",
 						"ID":    "123",
 					},
@@ -74,9 +74,9 @@ func TestInvalidXMLIsSanitized(t *testing.T) {
 		{
 			name:  "double invalid",
 			input: []byte(`<person><Name ID="123">` + "\x80" + `John` + "\x80" + `</Name></person>`),
-			want: map[string]interface{}{
-				"person": map[string]interface{}{
-					"Name": map[string]interface{}{
+			want: map[string]any{
+				"person": map[string]any{
+					"Name": map[string]any{
 						"#text": "\\ufffdJohn\\ufffd",
 						"ID":    "123",
 					},
@@ -86,9 +86,9 @@ func TestInvalidXMLIsSanitized(t *testing.T) {
 		{
 			name:  "happy single invalid",
 			input: []byte(`<person><Name ID="123">😊John` + "\x80" + `</Name></person>`),
-			want: map[string]interface{}{
-				"person": map[string]interface{}{
-					"Name": map[string]interface{}{
+			want: map[string]any{
+				"person": map[string]any{
+					"Name": map[string]any{
 						"#text": "😊John\\ufffd",
 						"ID":    "123",
 					},
@@ -104,9 +104,9 @@ func TestInvalidXMLIsSanitized(t *testing.T) {
 		{
 			name:  "invalid tag value",
 			input: []byte(`<person><Name ID="` + "\x80" + `123">John</Name></person>`),
-			want: map[string]interface{}{
-				"person": map[string]interface{}{
-					"Name": map[string]interface{}{
+			want: map[string]any{
+				"person": map[string]any{
+					"Name": map[string]any{
 						"#text": "John",
 						"ID":    "\\ufffd123",
 					},
@@ -116,9 +116,9 @@ func TestInvalidXMLIsSanitized(t *testing.T) {
 		{
 			name:  "unhappy",
 			input: []byte(`<person><Name ID="123">John is` + strings.Repeat(" ", 223) + ` 😞</Name></person>`),
-			want: map[string]interface{}{
-				"person": map[string]interface{}{
-					"Name": map[string]interface{}{
+			want: map[string]any{
+				"person": map[string]any{
+					"Name": map[string]any{
 						"#text": "John is" + strings.Repeat(" ", 223) + " 😞",
 						"ID":    "123",
 					},

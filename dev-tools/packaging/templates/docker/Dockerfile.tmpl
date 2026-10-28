@@ -48,7 +48,7 @@ RUN for iter in {1..10}; do \
 
 {{- if and (contains .from "ubi") (contains .from "minimal") }}
 RUN for iter in {1..10}; do \
-        microdnf -y update && \
+        microdnf -y update --nobest && \
         microdnf -y install findutils shadow-utils ca-certificates \
         gawk libcap xz tar && \
         microdnf clean all && \
@@ -133,7 +133,7 @@ USER root
 # Install required dependencies from wolfi repository
 RUN for iter in {1..10}; do \
         apk update && \
-        apk add --no-interactive --no-progress --no-cache nodejs-22=22.23.1-r0 npm=12.0.1-r1 glib libatk-1.0 \
+        apk add --no-interactive --no-progress --no-cache nodejs-24=24.22.1-r2 glib libatk-1.0 \
         libatk-bridge-2.0 cups-libs libxcomposite libxdamage libxfixes libxrandr libxkbcommon pango alsa-lib \
         font-opensans fontconfig gtk icu-data-full libnss mesa font-noto-cjk font-noto-emoji && \
         exit_code=0 && break || exit_code=$? && echo "apk error: retry $iter in 10s" && sleep 10; \
@@ -155,17 +155,32 @@ RUN echo \
     | xargs -IDIR sh -c 'mkdir -m 0770 -p DIR && chown -R {{ .user }} DIR'
 
 USER {{ .user }}
+# nodejs-24 ships no npm, and Wolfi's npm package (12.0.2) bundles undici 6.27.0 (CVE-2026-19534,
+# CVE-2026-85024). Bootstrap npm >= 12.2.1, which bundles undici 6.29.0, from the registry instead.
+# Pinned sha512 (hex) of npm-12.2.1.tgz, i.e. `npm view npm@12.2.1 dist.integrity` decoded from base64.
+# Update it together with the version.
+RUN curl -fsSL -o /tmp/npm.tgz https://registry.npmjs.org/npm/-/npm-12.2.1.tgz \
+    && echo "6ca0a6151553fc107e60f1186d9c10d57508dcde6de31292a54d4cc4e8e8ef3de25b3281274657442d7115d10df930bb3794ddcb0681cdfd9d317189abf7b63d  /tmp/npm.tgz" | sha512sum -c - \
+    && tar xz -C /tmp -f /tmp/npm.tgz \
+    && node /tmp/package/bin/npm-cli.js install -g npm@12.2.1 \
+    && rm -rf /tmp/package /tmp/npm.tgz /tmp/node-compile-cache \
+    && npm cache clean --force
 RUN (npm i -g --loglevel verbose --production --engine-strict  @elastic/synthetics@stack_release || sh -c 'tail -n +1 ${NPM_CONFIG_PREFIX}/_logs/* && exit 1')
+# npm >= 12 blocks dependency install scripts by default, so playwright-chromium's
+# install hook no longer downloads browsers during `npm i`. Install them explicitly
+# with the bundled Playwright CLI (same revision synthetics expects).
+RUN HOME={{ $beatHome }} node "$(npm root -g)/@elastic/synthetics/node_modules/playwright-core/cli.js" install chromium && \
+    test -d {{ $beatHome }}/.cache/ms-playwright
 {{- end }}
 
-{{- if (and (eq .BeatName "heartbeat") (contains .from "ubi10-minimal")) }}
+{{- if (and (eq .BeatName "heartbeat") (contains .from "ubi") (contains .from "minimal")) }}
 USER root
 
 # Install the deps as needed by the exact version of playwright elastic synthetics uses
 # We don't use npx playwright install-deps because that could pull a newer version
 # Install additional fonts as well
 RUN for iter in {1..10}; do \
-    microdnf -y update && \
+    microdnf -y update --nobest && \
     microdnf -y install fontconfig freetype cairo glib2 gtk3 pango xorg-x11-fonts-misc xorg-x11-fonts-Type1 \
     at-spi2-atk atk at-spi2-core alsa-lib cups-libs dbus-libs libdrm mesa-libEGL mesa-libgbm nspr nss libX11 \
     libX11-xcb libxcb libXcomposite libXdamage libXext libXfixes libXrandr libxkbcommon libxshmfence glib2 \
@@ -198,7 +213,7 @@ RUN echo \
 # Setup synthetics env vars
 ENV ELASTIC_SYNTHETICS_CAPABLE=true
 ENV TZ=UTC
-ENV NODE_VERSION=22.23.1
+ENV NODE_VERSION=22.23.4
 ENV PATH="$NODE_PATH/node/bin:$PATH"
 # Install the latest version of @elastic/synthetics forcefully ignoring the previously
 # cached node_modules, heartbeat then calls the global executable to run test suites
@@ -223,11 +238,15 @@ RUN cd /usr/share/heartbeat/.node \
     && curl ${NODE_DOWNLOAD_URL} | tar -xJ --strip 1 -C node \
     && chmod ug+rwX -R $NODE_PATH
 
-# TODO: Remove this step when Node.js is bumped to a version that bundles npm >= 12.0.1
-# Bootstrap npm 12.0.1 from a downloaded copy to avoid npm 10.x self-replacement failures
-RUN curl -fsSL https://registry.npmjs.org/npm/-/npm-12.0.1.tgz | tar xz -C /tmp \
-    && node /tmp/package/bin/npm-cli.js install -g npm@12.0.1 \
-    && rm -rf /tmp/package
+# TODO: Remove this step when Node.js is bumped to a version that bundles npm >= 12.2.1
+# Bootstrap npm 12.2.1 from a downloaded copy to avoid npm 10.x self-replacement failures
+# Pinned sha512 (hex) of npm-12.2.1.tgz, i.e. `npm view npm@12.2.1 dist.integrity` decoded from base64.
+# Update it together with the version.
+RUN curl -fsSL -o /tmp/npm.tgz https://registry.npmjs.org/npm/-/npm-12.2.1.tgz \
+    && echo "6ca0a6151553fc107e60f1186d9c10d57508dcde6de31292a54d4cc4e8e8ef3de25b3281274657442d7115d10df930bb3794ddcb0681cdfd9d317189abf7b63d  /tmp/npm.tgz" | sha512sum -c - \
+    && tar xz -C /tmp -f /tmp/npm.tgz \
+    && node /tmp/package/bin/npm-cli.js install -g npm@12.2.1 \
+    && rm -rf /tmp/package /tmp/npm.tgz
 
 # Install synthetics as a regular user, installing npm deps as root doesn't work
 RUN chown -R {{ .user }} $NODE_PATH
@@ -235,6 +254,11 @@ USER {{ .user }}
 # If this fails dump the NPM logs
 RUN npm i -g --loglevel verbose --production --engine-strict @elastic/synthetics@stack_release || sh -c 'tail -n +1 /root/.npm/_logs/* && exit 1'
 RUN chmod ug+rwX -R $NODE_PATH
+# npm >= 12 blocks dependency install scripts by default, so playwright-chromium's
+# install hook no longer downloads browsers during `npm i`. Install them explicitly
+# with the bundled Playwright CLI (same revision synthetics expects).
+RUN HOME={{ $beatHome }} node "$(npm root -g)/@elastic/synthetics/node_modules/playwright-core/cli.js" install chromium && \
+    test -d {{ $beatHome }}/.cache/ms-playwright
 
 USER root
 
@@ -245,7 +269,7 @@ USER root
 
     {{- if (contains .from "ubi") }}
     RUN for iter in {1..10}; do \
-            microdnf -y update && \
+            microdnf -y update --nobest && \
             microdnf -y install systemd && \
             microdnf clean all && \
             exit_code=0 && break || exit_code=$? && echo "microdnf error: retry $iter in 10s" && sleep 10; \

@@ -97,14 +97,14 @@ func TestStateStore(t *testing.T) {
 					ID:              "userid",
 					Status:          "STATUS",
 					Created:         time.Now(),
-					StatusChanged:   ptr(time.Now()),
-					LastLogin:       ptr(time.Now()),
+					StatusChanged:   new(time.Now()),
+					LastLogin:       new(time.Now()),
 					LastUpdated:     time.Now(),
-					PasswordChanged: ptr(time.Now()),
-					Type: map[string]interface{}{
+					PasswordChanged: new(time.Now()),
+					Type: map[string]any{
 						"id": "typeid",
 					},
-					Profile: map[string]interface{}{
+					Profile: map[string]any{
 						"login":     "name.surname@example.com",
 						"email":     "name.surname@example.com",
 						"firstName": "name",
@@ -115,11 +115,11 @@ func TestStateStore(t *testing.T) {
 						RecoveryQuestion: &struct{}{}, // Had a question: not retained.
 						Provider: okta.Provider{
 							Type: "OKTA",
-							Name: ptr("OKTA"),
+							Name: new("OKTA"),
 						},
 					},
 					Links: okta.HAL{
-						"self": map[string]interface{}{
+						"self": map[string]any{
 							"href": "https://localhost/api/v1/users/userid",
 						},
 					},
@@ -135,7 +135,7 @@ func TestStateStore(t *testing.T) {
 					Created:     time.Now(),
 					LastUpdated: time.Now(),
 					Links: okta.HAL{
-						"self": map[string]interface{}{
+						"self": map[string]any{
 							"href": "https://localhost/api/v1/devices/deviceid",
 						},
 					},
@@ -286,8 +286,6 @@ func TestErrIsItemFound(t *testing.T) {
 		})
 	}
 }
-
-func ptr[T any](v T) *T { return &v }
 
 func testSetupStore(t *testing.T, path string) *kvstore.Store {
 	t.Helper()

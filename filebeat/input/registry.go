@@ -61,7 +61,7 @@ func Register(name string, factory Factory) error {
 
 func GetFactory(name string) (Factory, error) {
 	if _, exists := registry[name]; !exists {
-		return nil, fmt.Errorf("Error creating input. No such input type exist: '%v'", name) //nolint:staticcheck //Keep old behavior
+		return nil, fmt.Errorf("Error creating input. No such input type exists: '%v'", name) //nolint:staticcheck //Keep old behavior
 	}
 	return registry[name], nil
 }

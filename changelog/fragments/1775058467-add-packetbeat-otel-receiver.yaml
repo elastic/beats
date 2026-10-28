@@ -1,3 +1,0 @@
-kind: feature
-summary: Add OpenTelemetry Collector receiver for Packetbeat
-component: packetbeat

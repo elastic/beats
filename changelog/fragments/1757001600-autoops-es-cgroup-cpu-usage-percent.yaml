@@ -1,0 +1,4 @@
+kind: enhancement
+summary: Add os.cgroup.cpu.usage_percent to autoops_es node_stats metricset
+component: metricbeat
+issue: https://github.com/elastic/beats/issues/52616

@@ -84,6 +84,9 @@ func (f ByteArrayDecoder) ReadString() (s string) {
 
 func (f ByteArrayDecoder) ReadLongString() (s string) {
 	size := f.ReadInt()
+	if size < 0 {
+		panic(fmt.Errorf("invalid long string length: %d", size))
+	}
 	data := *f.Data
 	if len(data) < size {
 		panic(fmt.Errorf("not enough bytes in buffer to Read long string require %d got: %d", size, len(data)))
@@ -168,7 +171,7 @@ func (f ByteArrayDecoder) ReadInet() (net.IP, int) {
 	}
 
 	data = *f.Data
-	if len(data) < 1 {
+	if len(data) < int(size) {
 		panic(fmt.Errorf("not enough bytes in buffer to Read inet require %d got: %d", size, len(data)))
 	}
 

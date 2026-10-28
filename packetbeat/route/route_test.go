@@ -52,7 +52,7 @@ func TestDefault(t *testing.T) {
 				// based on the LUID.
 				b, err := run("getmac")
 				if err != nil {
-					b = []byte(fmt.Sprintf("\nunable to recover getmac information: %v", err))
+					b = fmt.Appendf(nil, "\nunable to recover getmac information: %v", err)
 				}
 				t.Logf("unexpected interface for family %d: got:%s want:%s\n%s", family, iface, wantIface, b)
 			} else {

@@ -428,7 +428,7 @@ var (
 )
 
 type nodesStruct struct {
-	Nodes map[string]map[string]interface{} `json:"nodes"`
+	Nodes map[string]map[string]any `json:"nodes"`
 }
 
 func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticsearch.Info, content []byte, isXpack bool) error {

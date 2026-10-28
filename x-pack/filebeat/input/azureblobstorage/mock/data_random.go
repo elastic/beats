@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"time"
 )
 
@@ -44,7 +44,7 @@ func generateMetadata() []byte {
 	const numDataSets = TotalRandomDataSets
 	dataSets := make([]Blob, numDataSets)
 
-	for i := 0; i < numDataSets; i++ {
+	for i := range numDataSets {
 		dataSets[i] = createRandomBlob(i)
 	}
 
@@ -66,13 +66,11 @@ func generateMetadata() []byte {
 
 // Helper function to create a random Blob
 func createRandomBlob(i int) Blob {
-	rand.New(rand.NewSource(12345))
-
 	return Blob{
 		Name: fmt.Sprintf("data_%d.json", i),
 		Properties: Properties{
 			LastModified: time.Now().Format(time.RFC1123),
-			Etag:         fmt.Sprintf("0x%X", rand.Int63()),
+			Etag:         fmt.Sprintf("0x%X", rand.Int64()),
 			ContentType:  "application/json",
 		},
 		Metadata: "",
@@ -92,7 +90,7 @@ func generateRandomBlob() []byte {
 	const numObjects = 10
 	dataObjects := make([]MyData, numObjects)
 
-	for i := 0; i < numObjects; i++ {
+	for i := range numObjects {
 		dataObjects[i] = createRandomData()
 	}
 
@@ -104,12 +102,10 @@ func generateRandomBlob() []byte {
 }
 
 func createRandomData() MyData {
-	rand.New(rand.NewSource(12345))
-
 	return MyData{
-		ID:          rand.Intn(1000) + 1,
+		ID:          rand.IntN(1000) + 1,
 		Name:        getRandomString([]string{"John", "Alice", "Bob", "Eve"}),
-		Age:         rand.Intn(80) + 18,
+		Age:         rand.IntN(80) + 18,
 		Email:       getRandomString([]string{"john@example.com", "alice@example.com", "bob@example.com"}),
 		Description: getRandomString([]string{"Student", "Engineer", "Artist", "Doctor"}),
 	}
@@ -120,6 +116,5 @@ func getRandomString(options []string) string {
 		return ""
 	}
 
-	rand.New(rand.NewSource(time.Now().UnixNano()))
-	return options[rand.Intn(len(options))]
+	return options[rand.IntN(len(options))]
 }

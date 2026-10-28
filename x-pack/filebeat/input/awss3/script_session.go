@@ -49,9 +49,9 @@ func newSession(p *goja.Program, conf scriptConfig, test bool, logger *logp.Logg
 
 	// Register mapstr.M as being a simple map[string]interface{} for
 	// treatment within the JS VM.
-	s.vm.RegisterSimpleMapType(reflect.TypeOf(mapstr.M(nil)),
-		func(i interface{}) map[string]interface{} {
-			return map[string]interface{}(i.(mapstr.M))
+	s.vm.RegisterSimpleMapType(reflect.TypeFor[mapstr.M](),
+		func(i any) map[string]any {
+			return map[string]any(i.(mapstr.M))
 		},
 	)
 
@@ -99,7 +99,7 @@ func (s *session) setParseFunction() error {
 }
 
 // registerScriptParams calls the register() function and passes the params.
-func (s *session) registerScriptParams(params map[string]interface{}) error {
+func (s *session) registerScriptParams(params map[string]any) error {
 	registerFunc := s.vm.Get(registerFunction)
 	if registerFunc == nil {
 		return errors.New("params were provided but no register function was found")

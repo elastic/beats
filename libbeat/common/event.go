@@ -39,13 +39,17 @@ type EventConverter interface {
 type GenericEventConverter struct {
 	log      *logp.Logger
 	keepNull bool
+	inPlace  bool
 }
 
-// NewGenericEventConverter creates an EventConverter with the given configuration options
-func NewGenericEventConverter(keepNull bool, logger *logp.Logger) *GenericEventConverter {
+// NewGenericEventConverter creates an EventConverter with the given configuration
+// options. With inPlace it reuses the maps of the event that it converts instead
+// of copying them, so the caller must exclusively own every reachable map.
+func NewGenericEventConverter(keepNull, inPlace bool, logger *logp.Logger) *GenericEventConverter {
 	return &GenericEventConverter{
 		log:      logger.Named("event"),
 		keepNull: keepNull,
+		inPlace:  inPlace,
 	}
 }
 
@@ -69,7 +73,12 @@ func (e *GenericEventConverter) Convert(m mapstr.M) mapstr.M {
 func (e *GenericEventConverter) normalizeMap(m mapstr.M, keys ...string) (mapstr.M, []error) {
 	var errs []error
 
-	out := make(mapstr.M, len(m))
+	reuse := e.inPlace && m != nil
+	out := m
+	if !reuse {
+		out = make(mapstr.M, len(m))
+	}
+
 	for key, value := range m {
 		v, err := e.normalizeValue(value, append(keys, key)...)
 		if len(err) > 0 {
@@ -80,6 +89,9 @@ func (e *GenericEventConverter) normalizeMap(m mapstr.M, keys ...string) (mapstr
 		if !e.keepNull && v == nil {
 			if e.log.IsDebug() {
 				e.log.Debugf("Dropped nil value from event where key=%v", joinKeys(append(keys, key)...))
+			}
+			if reuse {
+				delete(out, key)
 			}
 			continue
 		}

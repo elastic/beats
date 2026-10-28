@@ -18,6 +18,7 @@
 package addagentmetadata
 
 import (
+	"sync"
 	"testing"
 	"time"
 
@@ -45,6 +46,7 @@ var testCfg = Config{
 		Snapshot: true,
 		Version:  "9.3.0",
 	},
+	Tags: []string{"production", "team-payments"},
 }
 
 func TestAddAgentMetadata(t *testing.T) {
@@ -86,6 +88,9 @@ func TestAddAgentMetadata(t *testing.T) {
 	ag, ok := result.Fields["agent"].(mapstr.M)
 	require.True(t, ok)
 	assert.Equal(t, "db87c002-3ed1-4929-9edd-98cb6f76b2b1", ag["id"])
+
+	// Verify tags
+	assert.Equal(t, []string{"production", "team-payments"}, result.Fields["tags"])
 
 	// Verify pre-existing fields are preserved
 	assert.Equal(t, "keep_me", result.Fields["existing_field"])
@@ -192,6 +197,42 @@ func TestAddAgentMetadata_PreservesExistingSubMaps(t *testing.T) {
 	assert.Equal(t, testCfg.DataStream.Dataset, ev["dataset"])
 }
 
+func TestAddAgentMetadata_EventsDoNotAliasCachedMaps(t *testing.T) {
+	p := New(testCfg)
+
+	first, err := p.Run(&beat.Event{Timestamp: time.Now(), Fields: mapstr.M{}})
+	require.NoError(t, err)
+	first.Fields["elastic_agent"].(mapstr.M)["id"] = "tampered" //nolint:errcheck //it's a test
+	first.Fields["data_stream"].(mapstr.M)["extra"] = "x"       //nolint:errcheck //it's a test
+	first.Meta["input_id"] = "tampered"
+
+	second, err := p.Run(&beat.Event{Timestamp: time.Now(), Fields: mapstr.M{}})
+	require.NoError(t, err)
+	assert.Equal(t, testCfg.ElasticAgent.ID, second.Fields["elastic_agent"].(mapstr.M)["id"]) //nolint:errcheck //it's a test
+	_, hasExtra := second.Fields["data_stream"].(mapstr.M)["extra"]                           //nolint:errcheck //it's a test
+	assert.False(t, hasExtra)
+	assert.Equal(t, testCfg.InputID, second.Meta["input_id"])
+}
+
+func TestAddAgentMetadata_ConcurrentRun(t *testing.T) {
+	p := New(testCfg)
+
+	var wg sync.WaitGroup
+	for range 8 {
+		wg.Go(func() {
+			for range 100 {
+				result, err := p.Run(&beat.Event{Timestamp: time.Now(), Fields: mapstr.M{}})
+				if !assert.NoError(t, err) {
+					return
+				}
+				result.Fields["elastic_agent"].(mapstr.M)["id"] = "tampered" //nolint:errcheck //it's a test
+				assert.Equal(t, testCfg.StreamID, result.Meta["stream_id"])
+			}
+		})
+	}
+	wg.Wait()
+}
+
 func TestAddAgentMetadata_FromConfig(t *testing.T) {
 	c, err := conf.NewConfigFrom(map[string]any{
 		"input_id":  "test-input",
@@ -206,19 +247,56 @@ func TestAddAgentMetadata_FromConfig(t *testing.T) {
 			"snapshot": false,
 			"version":  "9.3.0",
 		},
+		"tags": []string{"production", "team-payments"},
 	})
 	require.NoError(t, err)
 
 	p, err := CreateAddAgentMetadata(c, nil)
 	require.NoError(t, err)
 
-	event := &beat.Event{Timestamp: time.Now(), Fields: mapstr.M{}}
+	event := &beat.Event{Timestamp: time.Now(), Fields: mapstr.M{"tags": []string{"integration-tag"}}}
 	result, err := p.Run(event)
 	require.NoError(t, err)
 
 	assert.Equal(t, "test-input", result.Meta["input_id"])
 	ds := result.Fields["data_stream"].(mapstr.M) //nolint:errcheck //it's a test
 	assert.Equal(t, "system.cpu", ds["dataset"])
+	assert.Equal(t, []string{"integration-tag", "production", "team-payments"}, result.Fields["tags"])
+}
+
+func TestAddAgentMetadata_ExistingTags(t *testing.T) {
+	tests := []struct {
+		name string
+		give any
+		want any
+	}{
+		{
+			name: "any list",
+			give: []any{"integration-tag"},
+			want: []any{"integration-tag", "production", "team-payments"},
+		},
+		{
+			name: "string",
+			give: "integration-tag",
+			want: []string{"integration-tag", "production", "team-payments"},
+		},
+		{
+			name: "not a list or a string",
+			give: 42,
+			want: 42,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := New(testCfg)
+			event := &beat.Event{Timestamp: time.Now(), Fields: mapstr.M{"tags": tt.give}}
+
+			result, err := p.Run(event)
+			require.NoError(t, err)
+
+			assert.Equal(t, tt.want, result.Fields["tags"])
+		})
+	}
 }
 
 func TestAddAgentMetadata_String(t *testing.T) {
@@ -241,33 +319,51 @@ func equivalentAddFieldsProcessors(cfg Config) *processors.Processors {
 			addfields.MakeFieldsProcessor("@metadata", mapstr.M{"input_id": cfg.InputID}, true))
 	}
 
-	procs.List = append(procs.List,
-		addfields.MakeFieldsProcessor("data_stream", mapstr.M{
-			"dataset":   cfg.DataStream.Dataset,
-			"namespace": cfg.DataStream.Namespace,
-			"type":      cfg.DataStream.Type,
-		}, true),
-		addfields.MakeFieldsProcessor("event", mapstr.M{
-			"dataset": cfg.DataStream.Dataset,
-		}, true),
-	)
+	if cfg.DataStream != nil {
+		procs.List = append(procs.List,
+			addfields.MakeFieldsProcessor("data_stream", mapstr.M{
+				"dataset":   cfg.DataStream.Dataset,
+				"namespace": cfg.DataStream.Namespace,
+				"type":      cfg.DataStream.Type,
+			}, true),
+			addfields.MakeFieldsProcessor("event", mapstr.M{
+				"dataset": cfg.DataStream.Dataset,
+			}, true),
+		)
+	}
 
 	if cfg.StreamID != "" {
 		procs.List = append(procs.List,
 			addfields.MakeFieldsProcessor("@metadata", mapstr.M{"stream_id": cfg.StreamID}, true))
 	}
 
-	procs.List = append(procs.List,
-		addfields.MakeFieldsProcessor("elastic_agent", mapstr.M{
-			"id":       cfg.ElasticAgent.ID,
-			"snapshot": cfg.ElasticAgent.Snapshot,
-			"version":  cfg.ElasticAgent.Version,
-		}, true),
-		addfields.MakeFieldsProcessor("agent", mapstr.M{
-			"id": cfg.ElasticAgent.ID,
-		}, true))
+	if cfg.ElasticAgent != nil {
+		procs.List = append(procs.List,
+			addfields.MakeFieldsProcessor("elastic_agent", mapstr.M{
+				"id":       cfg.ElasticAgent.ID,
+				"snapshot": cfg.ElasticAgent.Snapshot,
+				"version":  cfg.ElasticAgent.Version,
+			}, true),
+			addfields.MakeFieldsProcessor("agent", mapstr.M{
+				"id": cfg.ElasticAgent.ID,
+			}, true))
+	}
+
+	if len(cfg.Tags) > 0 {
+		procs.List = append(procs.List, addTags(cfg.Tags))
+	}
 
 	return procs
+}
+
+type addTags []string
+
+func (t addTags) Run(event *beat.Event) (*beat.Event, error) {
+	return event, mapstr.AddTags(event.Fields, t)
+}
+
+func (t addTags) String() string {
+	return "add_tags"
 }
 
 // TestEquivalence verifies that the combined processor produces the exact same

@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package guess
 
@@ -86,7 +85,7 @@ func (g *guessInet6CskXmit) Probes() ([]helper.ProbeDef, error) {
 				Address:   "inet_csk_accept",
 				Fetchargs: "sock={{.RET}}",
 			},
-			Decoder: helper.NewStructDecoder(func() interface{} { return new(sockArgumentGuess) }),
+			Decoder: helper.NewStructDecoder(func() any { return new(sockArgumentGuess) }),
 		},
 		{
 			Probe: tracing.Probe{
@@ -94,7 +93,7 @@ func (g *guessInet6CskXmit) Probes() ([]helper.ProbeDef, error) {
 				Address:   "inet6_csk_xmit",
 				Fetchargs: "arg={{.P1}} dump=" + helper.MakeMemoryDump("{{.P1}}", 0, skbuffDumpSize),
 			},
-			Decoder: helper.NewStructDecoder(func() interface{} { return new(skbuffSockGuess) }),
+			Decoder: helper.NewStructDecoder(func() any { return new(skbuffSockGuess) }),
 		},
 	}, nil
 }
@@ -163,7 +162,7 @@ func (g *guessInet6CskXmit) Trigger() error {
 
 // Extract receives first the sock* from inet_csk_accept, then the arguments
 // from inet6_csk_xmit.
-func (g *guessInet6CskXmit) Extract(event interface{}) (mapstr.M, bool) {
+func (g *guessInet6CskXmit) Extract(event any) (mapstr.M, bool) {
 	switch msg := event.(type) {
 	case *sockArgumentGuess:
 		g.sock = msg.Sock

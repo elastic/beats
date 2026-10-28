@@ -34,7 +34,7 @@ type incomingFieldMapper struct {
 // @timestamp, and metadata.
 type KeyValuePoint struct {
 	Key       string
-	Value     interface{}
+	Value     any
 	Labels    mapstr.M
 	ECS       mapstr.M
 	Timestamp time.Time
@@ -272,7 +272,7 @@ func remap(l *logp.Logger, s string) string {
 	return s
 }
 
-func getValueFromPoint(p *monitoringpb.Point) (out interface{}) {
+func getValueFromPoint(p *monitoringpb.Point) (out any) {
 	switch v := p.Value.Value.(type) {
 	case *monitoringpb.TypedValue_DoubleValue:
 		out = v.DoubleValue

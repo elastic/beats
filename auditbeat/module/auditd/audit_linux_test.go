@@ -354,8 +354,8 @@ func assertFieldsAreDocumented(t *testing.T, events []mb.Event) {
 	}
 }
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
+func getConfig() map[string]any {
+	return map[string]any{
 		"module":              "auditd",
 		"failure_mode":        "log",
 		"socket_type":         "unicast",
@@ -371,7 +371,7 @@ func TestUnicastClient(t *testing.T) {
 
 	FailIfAuditdIsRunning(t)
 
-	c := map[string]interface{}{
+	c := map[string]any{
 		"module":      "auditd",
 		"socket_type": "unicast",
 		"audit_rules": fmt.Sprintf(`
@@ -400,7 +400,7 @@ func TestMulticastClient(t *testing.T) {
 
 	FailIfAuditdIsRunning(t)
 
-	c := map[string]interface{}{
+	c := map[string]any{
 		"module":      "auditd",
 		"socket_type": "multicast",
 		"audit_rules": fmt.Sprintf(`

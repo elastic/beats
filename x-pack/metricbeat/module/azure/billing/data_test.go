@@ -67,7 +67,7 @@ func TestEventMapping(t *testing.T) {
 	// this unusual format.
 	actualUsageDate := float64(20200807)
 	forecastUsageDate := float64(20200808)
-	rows := [][]interface{}{
+	rows := [][]any{
 		{actualCost, actualUsageDate, "Actual", "USD"},
 		{forecastCost, forecastUsageDate, "Forecast", "USD"},
 	}
@@ -92,8 +92,8 @@ func TestEventMapping(t *testing.T) {
 	//
 	// Run the tests
 	//
-	usageStart, usageEnd := usageIntervalFrom(time.Now())
-	forecastStart, forecastEnd := forecastIntervalFrom(time.Now())
+	usageStart, usageEnd := usageIntervalFrom(time.Now(), 24*time.Hour)
+	forecastStart, forecastEnd := forecastIntervalFrom(time.Now(), 30*24*time.Hour)
 	opts := TimeIntervalOptions{
 		usageStart:    usageStart,
 		usageEnd:      usageEnd,
@@ -101,14 +101,26 @@ func TestEventMapping(t *testing.T) {
 		forecastEnd:   forecastEnd,
 	}
 
-	events, err := EventsMapping("sub", usage, opts, logger)
+	usage.Scope = "/providers/Microsoft.Billing/departments/123"
+	fetch := FetchContext{ID: "fetch-1", Time: time.Date(2026, 10, 5, 0, 6, 10, 0, time.UTC)}
+
+	events, err := EventsMapping("sub", usage, opts, fetch, logger)
 	assert.NoError(t, err)
-	assert.Equal(t, 3, len(events))
+	assert.Len(t, events, 3)
 
 	//
 	// Check the results
 	//
 	for _, event := range events {
+		// Every event of a run shares the fetch identity, its timestamp, and the
+		// scope the data was queried for, whether it is a usage detail or a
+		// forecast row.
+		fetchID, _ := event.MetricSetFields.GetValue("fetch_id")
+		assert.Equal(t, "fetch-1", fetchID)
+		scope, _ := event.MetricSetFields.GetValue("scope")
+		assert.Equal(t, "/providers/Microsoft.Billing/departments/123", scope)
+		assert.Equal(t, fetch.Time, event.Timestamp)
+
 		if ok, _ := event.MetricSetFields.HasKey("department_name"); ok {
 			//
 			// The event is a usage detail
@@ -120,7 +132,7 @@ func TestEventMapping(t *testing.T) {
 			val3, _ := event.MetricSetFields.GetValue("department_name")
 			assert.Equal(t, val3, &name)
 			tags, _ := event.ModuleFields.GetValue("resource.tags")
-			assert.Equal(t, tags, map[string]*string{tagName: &tagValue})
+			assert.Equal(t, map[string]*string{tagName: &tagValue}, tags)
 
 		} else {
 			//
@@ -131,7 +143,7 @@ func TestEventMapping(t *testing.T) {
 			isActual, _ := event.MetricSetFields.HasKey("actual_cost")
 			if isActual {
 				cost, _ := event.MetricSetFields.GetValue("actual_cost")
-				assert.Equal(t, actualCost, cost)
+				assert.InDelta(t, actualCost, cost, 0.0001)
 				dt, _ := time.Parse("2006-01-02", "2020-08-07")
 				usageDate, _ := event.MetricSetFields.GetValue("usage_date")
 				assert.Equal(t, usageDate, dt)
@@ -141,7 +153,7 @@ func TestEventMapping(t *testing.T) {
 			isForecast, _ := event.MetricSetFields.HasKey("forecast_cost")
 			if isForecast {
 				cost, _ := event.MetricSetFields.GetValue("forecast_cost")
-				assert.Equal(t, forecastCost, cost)
+				assert.InDelta(t, forecastCost, cost, 0.0001)
 				dt, _ := time.Parse("2006-01-02", "2020-08-08")
 				usageDate, _ := event.MetricSetFields.GetValue("usage_date")
 				assert.Equal(t, usageDate, dt)
@@ -157,6 +169,8 @@ func TestEventMapping(t *testing.T) {
 func TestGetEventsFromQueryResult(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "TestGetEventsFromQueryResult")
 	subscriptionID := "sub"
+	scope := "subscriptions/sub"
+	fetch := FetchContext{ID: "fetch-1", Time: time.Date(2026, 10, 5, 0, 6, 10, 0, time.UTC)}
 
 	columns := []*armcostmanagement.QueryColumn{
 		column("Cost", "Number"),
@@ -168,7 +182,7 @@ func TestGetEventsFromQueryResult(t *testing.T) {
 	t.Run("no columns", func(t *testing.T) {
 		queryResult := armcostmanagement.QueryResult{}
 
-		events, err := getEventsFromQueryResult(queryResult, subscriptionID, logger)
+		events, err := getEventsFromQueryResult(queryResult, subscriptionID, scope, fetch, logger)
 		assert.Equal(t, []mb.Event{}, events)
 		assert.Error(t, err)
 	})
@@ -188,7 +202,7 @@ func TestGetEventsFromQueryResult(t *testing.T) {
 			},
 		}
 
-		events, err := getEventsFromQueryResult(queryResult, subscriptionID, logger)
+		events, err := getEventsFromQueryResult(queryResult, subscriptionID, scope, fetch, logger)
 		assert.Equal(t, []mb.Event{}, events)
 		assert.EqualError(t, err, "unsupported forecasts QueryResult format: got 5 columns instead of 4")
 	})
@@ -201,13 +215,13 @@ func TestGetEventsFromQueryResult(t *testing.T) {
 			},
 		}
 
-		events, err := getEventsFromQueryResult(queryResult, subscriptionID, logger)
+		events, err := getEventsFromQueryResult(queryResult, subscriptionID, scope, fetch, logger)
 		assert.Equal(t, []mb.Event{}, events)
 		assert.NoError(t, err)
 	})
 
 	t.Run("wrong number of elements in a row", func(t *testing.T) {
-		rows := [][]interface{}{
+		rows := [][]any{
 			{float64(1), float64(2), "Actual", "USD", "UnexpectedValue"},
 		}
 		queryResult := armcostmanagement.QueryResult{
@@ -217,13 +231,13 @@ func TestGetEventsFromQueryResult(t *testing.T) {
 			},
 		}
 
-		events, err := getEventsFromQueryResult(queryResult, subscriptionID, logger)
+		events, err := getEventsFromQueryResult(queryResult, subscriptionID, scope, fetch, logger)
 		assert.Equal(t, []mb.Event{}, events)
 		assert.NoError(t, err)
 	})
 
 	t.Run("drop rows with a wrong type", func(t *testing.T) {
-		rows := [][]interface{}{
+		rows := [][]any{
 			{float64(1), float64(20220818), "Actual", "USD"}, // good row, this will be mapped as event
 			{42, float64(20220818), "Actual", "USD"},         // wrong cost type
 			{float64(1), 20220818, "Actual", "USD"},          // wrong usage date type
@@ -237,9 +251,15 @@ func TestGetEventsFromQueryResult(t *testing.T) {
 			},
 		}
 
-		events, err := getEventsFromQueryResult(queryResult, subscriptionID, logger)
-		assert.Equal(t, 1, len(events))
+		events, err := getEventsFromQueryResult(queryResult, subscriptionID, scope, fetch, logger)
+		assert.Len(t, events, 1)
 		assert.NoError(t, err)
+
+		fetchID, _ := events[0].MetricSetFields.GetValue("fetch_id")
+		assert.Equal(t, fetch.ID, fetchID)
+		gotScope, _ := events[0].MetricSetFields.GetValue("scope")
+		assert.Equal(t, scope, gotScope)
+		assert.Equal(t, fetch.Time, events[0].Timestamp)
 	})
 }
 

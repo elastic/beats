@@ -75,22 +75,17 @@ func getIPSecTunnelEvents(m *MetricSet) ([]mb.Event, error) {
 	jobs := make(chan int)
 	results := make(chan stateResult, len(response.Result.Entries))
 
-	workers := maxConcurrentTunnelStateQueries
-	if workers > len(response.Result.Entries) {
-		workers = len(response.Result.Entries)
-	}
+	workers := min(maxConcurrentTunnelStateQueries, len(response.Result.Entries))
 
 	var wg sync.WaitGroup
-	for w := 0; w < workers; w++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+	for range workers {
+		wg.Go(func() {
 			for i := range jobs {
 				entry := response.Result.Entries[i]
 				state, err := getTunnelState(m, entry.ID)
 				results <- stateResult{index: i, id: entry.ID, state: state, err: err}
 			}
-		}()
+		})
 	}
 
 	for i, entry := range response.Result.Entries {

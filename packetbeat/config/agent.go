@@ -35,10 +35,10 @@ type datastream struct {
 }
 
 type agentInput struct {
-	Type       string                   `config:"type"`
-	Datastream datastream               `config:"data_stream"`
-	Processors []mapstr.M               `config:"processors"`
-	Streams    []map[string]interface{} `config:"streams"`
+	Type       string           `config:"type"`
+	Datastream datastream       `config:"data_stream"`
+	Processors []mapstr.M       `config:"processors"`
+	Streams    []map[string]any `config:"streams"`
 }
 
 func defaultDevice() string {
@@ -92,18 +92,15 @@ func (i agentInput) addProcessorsAndIndex(cfg *conf.C) (*conf.C, error) {
 }
 
 func mergeProcsConfig(one, two procs.ProcsConfig) procs.ProcsConfig {
-	maxProcReadFreq := one.MaxProcReadFreq
-	if two.MaxProcReadFreq > maxProcReadFreq {
-		maxProcReadFreq = two.MaxProcReadFreq
-	}
+	maxProcReadFreq := max(two.MaxProcReadFreq, one.MaxProcReadFreq)
 
-	refreshPidsFreq := one.RefreshPidsFreq
-	if two.RefreshPidsFreq < refreshPidsFreq {
-		refreshPidsFreq = two.RefreshPidsFreq
-	}
+	refreshPidsFreq := min(two.RefreshPidsFreq, one.RefreshPidsFreq)
 
+	// The strongest backend requested by any stream wins:
+	// kernel_tracing over auto over procfs.
 	return procs.ProcsConfig{
 		Enabled:         true,
+		Backend:         max(one.Backend, two.Backend),
 		MaxProcReadFreq: maxProcReadFreq,
 		RefreshPidsFreq: refreshPidsFreq,
 		Monitored:       append(one.Monitored, two.Monitored...),

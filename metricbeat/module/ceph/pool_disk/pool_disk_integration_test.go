@@ -36,8 +36,8 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string) map[string]any {
+	return map[string]any{
 		"module":     "ceph",
 		"metricsets": []string{"pool_disk"},
 		"hosts":      []string{host},

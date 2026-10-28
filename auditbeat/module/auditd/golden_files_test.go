@@ -110,8 +110,8 @@ func normalize(t testing.TB, events []mb.Event) (norm []mapstr.M) {
 	return norm
 }
 
-func configForGolden() map[string]interface{} {
-	return map[string]interface{}{
+func configForGolden() map[string]any {
+	return map[string]any{
 		"module":                  "auditd",
 		"failure_mode":            "log",
 		"socket_type":             "unicast",

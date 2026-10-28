@@ -26,7 +26,7 @@ import (
 func ConfigFileParams() devtools.ConfigFileParams {
 	p := devtools.DefaultConfigFileParams()
 	p.Templates = append(p.Templates, devtools.OSSBeatDir("_meta/config/*.tmpl"))
-	p.ExtraVars = map[string]interface{}{
+	p.ExtraVars = map[string]any{
 		"UseObserverProcessor": true,
 		"ExcludeDashboards":    true,
 	}

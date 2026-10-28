@@ -23,8 +23,8 @@ import (
 
 // GetIntegrationConfig generates a base configuration with common values for
 // integration tests
-func GetIntegrationConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func GetIntegrationConfig(host string) map[string]any {
+	return map[string]any{
 		"module":   "rabbitmq",
 		"hosts":    []string{host},
 		"username": getTestRabbitMQUsername(),

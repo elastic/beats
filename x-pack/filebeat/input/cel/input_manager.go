@@ -5,8 +5,6 @@
 package cel
 
 import (
-	"github.com/elastic/go-concert/unison"
-
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -65,11 +63,6 @@ type source struct{ cfg config }
 
 func (s *source) Name() string { return s.cfg.Resource.URL.String() }
 
-// Init initializes both wrapped input managers.
-func (m InputManager) Init(grp unison.Group) error {
-	return m.cursor.Init(grp)
-}
-
 // Create creates a cursor input manager.
 func (m InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	config := defaultConfig()
@@ -79,6 +72,9 @@ func (m InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	config.DataStream = dataStreamName(cfg)
 	return m.cursor.Create(cfg)
 }
+
+// Close releases resources held by the underlying cursor input manager.
+func (m InputManager) Close() { m.cursor.Close() }
 
 func dataStreamName(cfg *conf.C) string {
 	var probe struct {

@@ -41,9 +41,9 @@ func TestOneHostSuccessResp_Bulk(t *testing.T) {
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 	expectedResp := []byte(`{"took":7,"errors":false,"items":[]}`)
 
-	ops := []map[string]interface{}{
+	ops := []map[string]any{
 		{
-			"index": map[string]interface{}{
+			"index": map[string]any{
 				"_index": index,
 				"_type":  "type1",
 				"_id":    "1",
@@ -54,7 +54,7 @@ func TestOneHostSuccessResp_Bulk(t *testing.T) {
 		},
 	}
 
-	body := make([]interface{}, 0, 10)
+	body := make([]any, 0, 10)
 	for _, op := range ops {
 		body = append(body, op)
 	}
@@ -76,9 +76,9 @@ func TestOneHost500Resp_Bulk(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
-	ops := []map[string]interface{}{
+	ops := []map[string]any{
 		{
-			"index": map[string]interface{}{
+			"index": map[string]any{
 				"_index": index,
 				"_type":  "type1",
 				"_id":    "1",
@@ -89,7 +89,7 @@ func TestOneHost500Resp_Bulk(t *testing.T) {
 		},
 	}
 
-	body := make([]interface{}, 0, 10)
+	body := make([]any, 0, 10)
 	for _, op := range ops {
 		body = append(body, op)
 	}
@@ -115,9 +115,9 @@ func TestOneHost503Resp_Bulk(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
-	ops := []map[string]interface{}{
+	ops := []map[string]any{
 		{
-			"index": map[string]interface{}{
+			"index": map[string]any{
 				"_index": index,
 				"_type":  "type1",
 				"_id":    "1",
@@ -128,7 +128,7 @@ func TestOneHost503Resp_Bulk(t *testing.T) {
 		},
 	}
 
-	body := make([]interface{}, 0, 10)
+	body := make([]any, 0, 10)
 	for _, op := range ops {
 		body = append(body, op)
 	}
@@ -154,9 +154,9 @@ func TestEnforceParameters(t *testing.T) {
 	// Prepare the test bulk request.
 	index := "what"
 
-	ops := []map[string]interface{}{
+	ops := []map[string]any{
 		{
-			"index": map[string]interface{}{
+			"index": map[string]any{
 				"_index": index,
 				"_type":  "type1",
 				"_id":    "1",
@@ -167,7 +167,7 @@ func TestEnforceParameters(t *testing.T) {
 		},
 	}
 
-	body := make([]interface{}, 0, 10)
+	body := make([]any, 0, 10)
 	for _, op := range ops {
 		body = append(body, op)
 	}
@@ -255,9 +255,9 @@ func TestEnforceHeaders(t *testing.T) {
 	// Prepare the test bulk request.
 	index := "what"
 
-	ops := []map[string]interface{}{
+	ops := []map[string]any{
 		{
-			"index": map[string]interface{}{
+			"index": map[string]any{
 				"_index": index,
 				"_type":  "type1",
 				"_id":    "1",
@@ -268,7 +268,7 @@ func TestEnforceHeaders(t *testing.T) {
 		},
 	}
 
-	body := make([]interface{}, 0, 10)
+	body := make([]any, 0, 10)
 	for _, op := range ops {
 		body = append(body, op)
 	}

@@ -43,9 +43,9 @@ var (
 )
 
 type response struct {
-	Rules       map[string]interface{} `json:"cluster_rules"`
-	Kibana      map[string]interface{} `json:"kibana"`
-	ClusterUuid string                 `json:"cluster_uuid"`
+	Rules       map[string]any `json:"cluster_rules"`
+	Kibana      map[string]any `json:"kibana"`
+	ClusterUuid string         `json:"cluster_uuid"`
 }
 
 func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {

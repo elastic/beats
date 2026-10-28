@@ -36,8 +36,8 @@ func TestSimpleScenariosBasicFields(t *testing.T) {
 		require.GreaterOrEqual(t, len(mtr.Events()), 1)
 		var checkHist []*CheckHistItem
 		for _, e := range mtr.Events() {
-			testslike.Test(t, lookslike.MustCompile(map[string]interface{}{
-				"monitor": map[string]interface{}{
+			testslike.Test(t, lookslike.MustCompile(map[string]any{
+				"monitor": map[string]any{
 					"id":          mtr.StdFields.ID,
 					"name":        mtr.StdFields.Name,
 					"type":        mtr.StdFields.Type,
@@ -86,8 +86,8 @@ func TestLightweightUrls(t *testing.T) {
 	t.Parallel()
 	scenarioDB.RunTag(t, "lightweight", func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
 		for _, e := range mtr.Events() {
-			testslike.Test(t, lookslike.MustCompile(map[string]interface{}{
-				"url": map[string]interface{}{
+			testslike.Test(t, lookslike.MustCompile(map[string]any{
+				"url": map[string]any{
 					"full":   isdef.IsNonEmptyString,
 					"domain": isdef.IsNonEmptyString,
 					"scheme": mtr.StdFields.Type,
@@ -133,11 +133,11 @@ func TestRunFromOverride(t *testing.T) {
 			if isLast {
 				stateIsDef = hbtestllext.IsMonitorStateInLocation(TestLocationDefault.ID)
 			}
-			validator := lookslike.MustCompile(map[string]interface{}{
+			validator := lookslike.MustCompile(map[string]any{
 				"state": stateIsDef,
-				"observer": map[string]interface{}{
+				"observer": map[string]any{
 					"name": TestLocationDefault.ID,
-					"geo": map[string]interface{}{
+					"geo": map[string]any{
 						"name": TestLocationDefault.Geo.Name,
 					},
 				},

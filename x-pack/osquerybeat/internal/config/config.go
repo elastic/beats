@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
@@ -34,16 +35,18 @@ const (
 	DefaultQueryProfileMaxProfiles = 64
 )
 
-var datastreamPrefix = fmt.Sprintf("%s-%s-", DefaultType, DefaultDataset)
-var queryProfileDatastreamPrefix = fmt.Sprintf("%s-%s-", DefaultType, DefaultQueryProfileDataset)
+var (
+	datastreamPrefix             = fmt.Sprintf("%s-%s-", DefaultType, DefaultDataset)
+	queryProfileDatastreamPrefix = fmt.Sprintf("%s-%s-", DefaultType, DefaultQueryProfileDataset)
+)
 
 type StreamConfig struct {
-	ID         string                 `config:"id"`
-	Query      string                 `config:"query"`       // the SQL query to run
-	Interval   int                    `config:"interval"`    // an interval in seconds to run the query (subject to splay/smoothing). It has a maximum value of 604,800 (1 week).
-	Platform   string                 `config:"platform"`    // restrict this query to a given platform, default is 'all' platforms; you may use commas to set multiple platforms
-	Version    string                 `config:"version"`     // only run on osquery versions greater than or equal-to this version string
-	ECSMapping map[string]interface{} `config:"ecs_mapping"` // ECS mapping definition where the key is the source field in osquery result and the value is the destination fields in ECS
+	ID         string         `config:"id"`
+	Query      string         `config:"query"`       // the SQL query to run
+	Interval   int            `config:"interval"`    // an interval in seconds to run the query (subject to splay/smoothing). It has a maximum value of 604,800 (1 week).
+	Platform   string         `config:"platform"`    // restrict this query to a given platform, default is 'all' platforms; you may use commas to set multiple platforms
+	Version    string         `config:"version"`     // only run on osquery versions greater than or equal-to this version string
+	ECSMapping map[string]any `config:"ecs_mapping"` // ECS mapping definition where the key is the source field in osquery result and the value is the destination fields in ECS
 	// Profiling is a per-query override for profiling on this stream. When nil the global
 	// elastic_options.profiling.profiling_all default applies (see ResolveProfiling). Published profiles
 	// for live-style paths reflect the osqueryd process while extension queries run (serialized
@@ -59,6 +62,7 @@ type DatastreamConfig struct {
 }
 
 type InputConfig struct {
+	ID         string                  `config:"id,omitempty"`
 	Name       string                  `config:"name"`
 	Type       string                  `config:"type"`
 	Datastream DatastreamConfig        `config:"data_stream"` // Datastream configuration
@@ -295,60 +299,84 @@ func QueryProfileDatastream(namespace string) string {
 	return queryProfileDatastreamPrefix + namespace
 }
 
-// GetOsqueryOptions Returns options from the first input if available
-func GetOsqueryOptions(inputs []InputConfig) map[string]interface{} {
+// ResultInput returns the input for the DefaultDataset data stream, which
+// carries the osquery configuration. This is the first input whose dataset is
+// DefaultDataset or unset; an unset dataset is treated as DefaultDataset when
+// processors are built. If there is none, it returns the first input, which is
+// where the result stream was previously assumed to be. It returns nil if
+// inputs is empty.
+//
+// elastic-agent does not document the order of inputs, so the result stream is
+// looked up by dataset instead of being assumed to be first.
+func ResultInput(inputs []InputConfig) *InputConfig {
+	for i := range inputs {
+		switch inputs[i].Datastream.Dataset {
+		case DefaultDataset, "":
+			return &inputs[i]
+		}
+	}
 	if len(inputs) == 0 {
 		return nil
 	}
-	if inputs[0].Osquery == nil {
-		return nil
-	}
-	return inputs[0].Osquery.Options
+	return &inputs[0]
 }
 
-// GetOsqueryInstallConfig returns custom osquery install settings from the first input if available.
+// GetOsqueryOptions returns options from the result input if available.
+func GetOsqueryOptions(inputs []InputConfig) map[string]any {
+	in := ResultInput(inputs)
+	if in == nil || in.Osquery == nil {
+		return nil
+	}
+	return in.Osquery.Options
+}
+
+// GetOsqueryInstallConfig returns custom osquery install settings from the result input if available.
 func GetOsqueryInstallConfig(inputs []InputConfig) InstallConfig {
-	if len(inputs) == 0 {
+	in := ResultInput(inputs)
+	if in == nil || in.Osquery == nil || in.Osquery.ElasticOptions == nil || in.Osquery.ElasticOptions.Install == nil {
 		return InstallConfig{}
 	}
-	if inputs[0].Osquery == nil || inputs[0].Osquery.ElasticOptions == nil || inputs[0].Osquery.ElasticOptions.Install == nil {
-		return InstallConfig{}
+	return *in.Osquery.ElasticOptions.Install
+}
+
+// GetOsqueryCheckTimeout returns the osqueryd --version startup check deadline
+// from elastic_options.check_timeout on the result input. Unset values use
+// DefaultCheckTimeout.
+func GetOsqueryCheckTimeout(inputs []InputConfig) (time.Duration, error) {
+	in := ResultInput(inputs)
+	if in == nil || in.Osquery == nil || in.Osquery.ElasticOptions == nil {
+		return DefaultCheckTimeout, nil
 	}
-	return *inputs[0].Osquery.ElasticOptions.Install
+	return ParseCheckTimeout(in.Osquery.ElasticOptions.CheckTimeout)
 }
 
 // GetOsqueryExtensions returns customer-managed osquery extension settings
-// (elastic_options.extensions) from the first input if available.
+// (elastic_options.extensions) from the result input if available.
 func GetOsqueryExtensions(inputs []InputConfig) ExtensionsConfig {
-	if len(inputs) == 0 {
+	in := ResultInput(inputs)
+	if in == nil || in.Osquery == nil || in.Osquery.ElasticOptions == nil || in.Osquery.ElasticOptions.Extensions == nil {
 		return ExtensionsConfig{}
 	}
-	o := inputs[0].Osquery
-	if o == nil || o.ElasticOptions == nil || o.ElasticOptions.Extensions == nil {
-		return ExtensionsConfig{}
-	}
-	return *o.ElasticOptions.Extensions
+	return *in.Osquery.ElasticOptions.Extensions
 }
 
-// GetProfilingEnabled returns the global query profiling default from the first input.
+// GetProfilingEnabled returns the global query profiling default from the result input.
 // This is the fleet-wide on/off switch; individual queries may override it (see ResolveProfiling).
 // Profiling is enabled by default unless elastic_options.profiling.profiling_all is explicitly false.
 func GetProfilingEnabled(inputs []InputConfig) bool {
-	if len(inputs) == 0 || inputs[0].Osquery == nil || inputs[0].Osquery.ElasticOptions == nil || inputs[0].Osquery.ElasticOptions.Profiling == nil {
+	in := ResultInput(inputs)
+	if in == nil || in.Osquery == nil || in.Osquery.ElasticOptions == nil || in.Osquery.ElasticOptions.Profiling == nil {
 		return ProfilingConfig{}.ProfilingAllOrDefault()
 	}
-	return inputs[0].Osquery.ElasticOptions.Profiling.ProfilingAllOrDefault()
+	return in.Osquery.ElasticOptions.Profiling.ProfilingAllOrDefault()
 }
 
 // GetQueryProfileStorageConfig returns live query profile storage settings
-// (elastic_options.profiling.storage) from the first input if available.
+// (elastic_options.profiling.storage) from the result input if available.
 func GetQueryProfileStorageConfig(inputs []InputConfig) QueryProfileStorageConfig {
-	if len(inputs) == 0 {
+	in := ResultInput(inputs)
+	if in == nil || in.Osquery == nil || in.Osquery.ElasticOptions == nil || in.Osquery.ElasticOptions.Profiling == nil || in.Osquery.ElasticOptions.Profiling.Storage == nil {
 		return QueryProfileStorageConfig{}
 	}
-	o := inputs[0].Osquery
-	if o == nil || o.ElasticOptions == nil || o.ElasticOptions.Profiling == nil || o.ElasticOptions.Profiling.Storage == nil {
-		return QueryProfileStorageConfig{}
-	}
-	return *o.ElasticOptions.Profiling.Storage
+	return *in.Osquery.ElasticOptions.Profiling.Storage
 }

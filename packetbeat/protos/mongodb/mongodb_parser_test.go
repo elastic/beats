@@ -148,7 +148,7 @@ func addInt32(in []byte, v int32) []byte {
 func Test_isDatabaseCommand(t *testing.T) {
 	type io struct {
 		Key   string
-		Value interface{}
+		Value any
 
 		Output bool
 	}

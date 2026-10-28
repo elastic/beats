@@ -217,11 +217,9 @@ func BenchmarkReadParquet(b *testing.B) {
 					for _, f := range filePtrArr {
 						f.Seek(0, 0)
 						cf := f
-						wg.Add(1)
-						go func() {
-							defer wg.Done()
+						wg.Go(func() {
 							tc.invocation(b, cfg, cf)
-						}()
+						})
 					}
 					wg.Wait()
 				}

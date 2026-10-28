@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"sort"
 	"strconv"
@@ -34,11 +35,13 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/klauspost/compress/gzip"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -1506,4 +1509,79 @@ func TestHarvesterGZIP(t *testing.T) {
 
 	cancelInput()
 	env.waitUntilInputStops()
+}
+
+// TestFilestreamGrowingFingerprintEmitsLiveFingerprint tests that a file
+// opened below the threshold must publish a fingerprint after it grows past
+// the threshold.
+func TestFilestreamGrowingFingerprintEmitsLiveFingerprint(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	logName := "growing.log"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	inp := env.mustCreateInput(map[string]any{
+		"id":                                    id,
+		"paths":                                 []string{env.abspath(logName)},
+		"prospector.scanner.fingerprint.offset": 0,
+		// Use the minimum fingerprint length to keep the test files small.
+		"prospector.scanner.fingerprint.length": 64,
+		"prospector.scanner.check_interval":     "100ms",
+		"file_identity.fingerprint.growing":     true,
+		"include_file_fingerprint":              true,
+		// Read appended data promptly so events are produced quickly.
+		"backoff.init": "10ms",
+		"backoff.max":  "50ms",
+	})
+
+	// A completed SHA-256 fingerprint has 64 lowercase hex characters.
+	// The growing header in this test has a different length.
+	sha256Re := regexp.MustCompile(`^[a-f0-9]{64}$`)
+
+	// Start below the 64-byte fingerprint threshold.
+	env.mustWriteToFile(logName, []byte("below-threshold-line\n")) // 21 bytes < 64
+
+	ctx, cancelInput := context.WithCancel(t.Context())
+	defer func() {
+		cancelInput()
+		env.waitUntilInputStops()
+	}()
+	env.startInput(ctx, id, inp)
+
+	// The first event must omit the fingerprint while the file is too small.
+	env.waitUntilEventCount(1)
+	require.Empty(t, eventStringField(env.pipeline.GetAllEvents()[0], "log.file.fingerprint"),
+		"a file below the fingerprint threshold must not emit log.file.fingerprint")
+
+	// Grow the file across the threshold.
+	env.mustAppendToFile(logName, []byte(strings.Repeat("A", 80)+"\n"))
+
+	// The scanner completes the fingerprint on a later scan, and only events
+	// read after that carry it, so keep appending until one does.
+	marker := 0
+	require.EventuallyWithT(t, func(c *assert.CollectT) {
+		env.mustAppendToFile(logName, fmt.Appendf(nil, "marker-%d\n", marker))
+		marker++
+		events := env.pipeline.GetAllEvents()
+		assert.Regexp(c, sha256Re, eventStringField(events[len(events)-1], "log.file.fingerprint"),
+			"log.file.fingerprint of the latest event")
+	}, 30*time.Second, 200*time.Millisecond,
+		"an event must carry the completed SHA-256 after the file grew past the threshold")
+
+	// Publish only SHA-256 fingerprints. Raw headers can expose file content.
+	for _, evt := range env.pipeline.GetAllEvents() {
+		if fp := eventStringField(evt, "log.file.fingerprint"); fp != "" {
+			assert.Regexp(t, sha256Re, fp, "published fingerprint must be a SHA-256, never raw header hex")
+		}
+	}
+}
+
+// eventStringField returns the string value of key in evt, or "" when the key
+// is absent or not a string.
+func eventStringField(evt beat.Event, key string) string {
+	v, err := evt.Fields.GetValue(key)
+	if err != nil {
+		return ""
+	}
+	s, _ := v.(string)
+	return s
 }

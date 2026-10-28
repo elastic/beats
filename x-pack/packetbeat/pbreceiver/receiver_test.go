@@ -409,6 +409,9 @@ func TestReceiverStatus(t *testing.T) {
 		Status: componentstatus.NewEvent(componentstatus.StatusOK,
 			componentstatus.WithAttributes(inputStatusAttributes(
 				componentstatus.StatusOK.String(), "running packetbeat processor"))),
+		// packetbeat replays a pcap and finishes quickly, transitioning through
+		// StatusOK before the first poll tick; historical matching is required.
+		StatusMatchHistorical: true,
 	})
 }
 
@@ -434,4 +437,18 @@ func TestReceiverHook(t *testing.T) {
 	// For packetbeatreceiver, we expect 2 hooks to be registered:
 	// 	one for beat metrics and one for input metrics.
 	oteltest.TestReceiverHook(t, &cfg, NewFactoryWithSettings(Settings{Home: t.TempDir()}), receiverSettings, 2)
+}
+
+func TestComponentLifecycle(t *testing.T) {
+	cfg := &Config{
+		Beatconfig: map[string]any{
+			"packetbeat": map[string]any{
+				"interfaces": map[string]any{
+					"device": "lo0",
+				},
+			},
+			"path.home": t.TempDir(),
+		},
+	}
+	oteltest.CheckReceiverLifecycle(t, NewFactoryWithSettings(Settings{Home: t.TempDir()}), cfg)
 }

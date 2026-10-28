@@ -40,25 +40,25 @@ func TestSplit(t *testing.T) {
 			resp: transformable{
 				"body": mapstr.M{
 					"this": "is kept",
-					"alerts": []interface{}{
-						map[string]interface{}{
+					"alerts": []any{
+						map[string]any{
 							"this_is": "also kept",
-							"entities": []interface{}{
-								map[string]interface{}{
+							"entities": []any{
+								map[string]any{
 									"something": "something",
 								},
-								map[string]interface{}{
+								map[string]any{
 									"else": "else",
 								},
 							},
 						},
-						map[string]interface{}{
+						map[string]any{
 							"this_is": "also kept 2",
-							"entities": []interface{}{
-								map[string]interface{}{
+							"entities": []any{
+								map[string]any{
 									"something": "something 2",
 								},
-								map[string]interface{}{
+								map[string]any{
 									"else": "else 2",
 								},
 							},
@@ -107,19 +107,19 @@ func TestSplit(t *testing.T) {
 			resp: transformable{
 				"body": mapstr.M{
 					"this": "is not kept",
-					"alerts": []interface{}{
-						map[string]interface{}{
+					"alerts": []any{
+						map[string]any{
 							"this_is": "kept",
-							"entities": map[string]interface{}{
-								"id1": map[string]interface{}{
+							"entities": map[string]any{
+								"id1": map[string]any{
 									"something": "else",
 								},
 							},
 						},
-						map[string]interface{}{
+						map[string]any{
 							"this_is": "also kept",
-							"entities": map[string]interface{}{
-								"id2": map[string]interface{}{
+							"entities": map[string]any{
+								"id2": map[string]any{
 									"something": "else 2",
 								},
 							},
@@ -150,8 +150,8 @@ func TestSplit(t *testing.T) {
 					Target: "body.entities",
 					Type:   "map",
 					Transforms: transformsConfig{
-						conf.MustNewConfigFrom(map[string]interface{}{
-							"set": map[string]interface{}{
+						conf.MustNewConfigFrom(map[string]any{
+							"set": map[string]any{
 								"target": "body.foo",
 								"value":  "set for each",
 							},
@@ -163,19 +163,19 @@ func TestSplit(t *testing.T) {
 			resp: transformable{
 				"body": mapstr.M{
 					"this": "is not kept",
-					"alerts": []interface{}{
-						map[string]interface{}{
+					"alerts": []any{
+						map[string]any{
 							"this_is": "kept",
-							"entities": map[string]interface{}{
-								"id1": map[string]interface{}{
+							"entities": map[string]any{
+								"id1": map[string]any{
 									"something": "else",
 								},
 							},
 						},
-						map[string]interface{}{
+						map[string]any{
 							"this_is": "also not kept",
-							"entities": map[string]interface{}{
-								"id2": map[string]interface{}{
+							"entities": map[string]any{
+								"id2": map[string]any{
 									"something": "else 2",
 								},
 							},
@@ -208,15 +208,15 @@ func TestSplit(t *testing.T) {
 			ctx: emptyTransformContext(),
 			resp: transformable{
 				"body": mapstr.M{
-					"response": []interface{}{
-						map[string]interface{}{
-							"Event": map[string]interface{}{
+					"response": []any{
+						map[string]any{
+							"Event": map[string]any{
 								"timestamp": "1606324417",
-								"Attributes": []interface{}{
-									map[string]interface{}{
+								"Attributes": []any{
+									map[string]any{
 										"key": "value",
 									},
-									map[string]interface{}{
+									map[string]any{
 										"key2": "value2",
 									},
 								},
@@ -258,9 +258,9 @@ func TestSplit(t *testing.T) {
 			ctx: emptyTransformContext(),
 			resp: transformable{
 				"body": mapstr.M{
-					"response": []interface{}{
-						map[string]interface{}{
-							"Event": map[string]interface{}{
+					"response": []any{
+						map[string]any{
+							"Event": map[string]any{
 								"timestamp": "1606324417",
 							},
 						},
@@ -289,12 +289,12 @@ func TestSplit(t *testing.T) {
 			ctx: emptyTransformContext(),
 			resp: transformable{
 				"body": mapstr.M{
-					"response": []interface{}{},
+					"response": []any{},
 				},
 			},
 			expectedMessages: []mapstr.M{
 				{
-					"response": []interface{}{},
+					"response": []any{},
 				},
 			},
 			expectedErr: errEmptyRootField,
@@ -315,12 +315,12 @@ func TestSplit(t *testing.T) {
 				"body": mapstr.M{
 					"@timestamp":    "1234567890",
 					"nextPageToken": "tok",
-					"items": []interface{}{
+					"items": []any{
 						mapstr.M{"foo": "bar"},
 						mapstr.M{
 							"baz": "buzz",
 							"splitHere": mapstr.M{
-								"splitMore": []interface{}{
+								"splitMore": []any{
 									mapstr.M{
 										"deepest1": "data",
 									},
@@ -377,16 +377,16 @@ func TestSplit(t *testing.T) {
 			ctx: emptyTransformContext(),
 			resp: transformable{
 				"body": mapstr.M{
-					"response": []interface{}{
-						map[string]interface{}{
-							"Event": map[string]interface{}{
+					"response": []any{
+						map[string]any{
+							"Event": map[string]any{
 								"timestamp":  "1606324417",
-								"Attributes": []interface{}{},
-								"OtherAttributes": []interface{}{
-									map[string]interface{}{
+								"Attributes": []any{},
+								"OtherAttributes": []any{
+									map[string]any{
 										"key": "value",
 									},
-									map[string]interface{}{
+									map[string]any{
 										"key2": "value2",
 									},
 								},
@@ -399,7 +399,7 @@ func TestSplit(t *testing.T) {
 				{
 					"Event": mapstr.M{
 						"timestamp":  "1606324417",
-						"Attributes": []interface{}{},
+						"Attributes": []any{},
 						"OtherAttributes": mapstr.M{
 							"key": "value",
 						},
@@ -408,7 +408,7 @@ func TestSplit(t *testing.T) {
 				{
 					"Event": mapstr.M{
 						"timestamp":  "1606324417",
-						"Attributes": []interface{}{},
+						"Attributes": []any{},
 						"OtherAttributes": mapstr.M{
 							"key2": "value2",
 						},
@@ -435,15 +435,15 @@ func TestSplit(t *testing.T) {
 			ctx: emptyTransformContext(),
 			resp: transformable{
 				"body": mapstr.M{
-					"response": []interface{}{
-						map[string]interface{}{
-							"Event": map[string]interface{}{
+					"response": []any{
+						map[string]any{
+							"Event": map[string]any{
 								"timestamp": "1606324417",
-								"OtherAttributes": []interface{}{
-									map[string]interface{}{
+								"OtherAttributes": []any{
+									map[string]any{
 										"key": "value",
 									},
-									map[string]interface{}{
+									map[string]any{
 										"key2": "value2",
 									},
 								},
@@ -492,15 +492,15 @@ func TestSplit(t *testing.T) {
 			ctx: emptyTransformContext(),
 			resp: transformable{
 				"body": mapstr.M{
-					"response": []interface{}{
-						map[string]interface{}{
-							"Event": map[string]interface{}{
+					"response": []any{
+						map[string]any{
+							"Event": map[string]any{
 								"timestamp":  "1606324417",
-								"Attributes": map[string]interface{}{},
-								"OtherAttributes": map[string]interface{}{
+								"Attributes": map[string]any{},
+								"OtherAttributes": map[string]any{
 									// Only include a single item here to avoid
 									// map iteration order flakes.
-									"1": map[string]interface{}{
+									"1": map[string]any{
 										"key": "value",
 									},
 								},
@@ -542,14 +542,14 @@ func TestSplit(t *testing.T) {
 			ctx: emptyTransformContext(),
 			resp: transformable{
 				"body": mapstr.M{
-					"response": []interface{}{
-						map[string]interface{}{
-							"Event": map[string]interface{}{
+					"response": []any{
+						map[string]any{
+							"Event": map[string]any{
 								"timestamp": "1606324417",
-								"OtherAttributes": map[string]interface{}{
+								"OtherAttributes": map[string]any{
 									// Only include a single item here to avoid
 									// map iteration order flakes.
-									"1": map[string]interface{}{
+									"1": map[string]any{
 										"key": "value",
 									},
 								},
@@ -634,7 +634,7 @@ func TestSplit(t *testing.T) {
 			resp: transformable{
 				"body": mapstr.M{
 					"this": "is kept",
-					"alerts": []interface{}{
+					"alerts": []any{
 						"test1",
 						"test2",
 						"test3",
@@ -668,8 +668,8 @@ func TestSplit(t *testing.T) {
 			resp: transformable{
 				"body": mapstr.M{
 					"this": "is kept",
-					"alerts": []interface{}{
-						[]interface{}{"test1-1", "test1-2"},
+					"alerts": []any{
+						[]any{"test1-1", "test1-2"},
 						[]string{"test2-1", "test2-2"},
 						[]int{1, 2},
 					},
@@ -678,7 +678,7 @@ func TestSplit(t *testing.T) {
 			expectedMessages: []mapstr.M{
 				{
 					"this": "is kept",
-					"alerts": []interface{}{
+					"alerts": []any{
 						"test1-1",
 						"test1-2",
 					},

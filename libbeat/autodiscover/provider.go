@@ -72,7 +72,14 @@ func (r *registry) GetProvider(name string) ProviderBuilder {
 }
 
 // BuildProvider reads provider configuration and instantiate one
-func (r *registry) BuildProvider(beatName string, bus bus.Bus, c *config.C, keystore keystore.Keystore, path *paths.Path) (Provider, error) {
+func (r *registry) BuildProvider(
+	logger *logp.Logger,
+	beatName string,
+	bus bus.Bus,
+	c *config.C,
+	keystore keystore.Keystore,
+	path *paths.Path,
+) (Provider, error) {
 	var config ProviderConfig
 	err := c.Unpack(&config)
 	if err != nil {
@@ -89,5 +96,5 @@ func (r *registry) BuildProvider(beatName string, bus bus.Bus, c *config.C, keys
 		return nil, err
 	}
 
-	return builder(beatName, bus, uuid, c, keystore, r.logger, path)
+	return builder(beatName, bus, uuid, c, keystore, logger, path)
 }

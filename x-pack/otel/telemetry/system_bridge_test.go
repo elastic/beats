@@ -5,8 +5,10 @@
 package telemetry
 
 import (
+	"context"
 	"runtime"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -16,9 +18,9 @@ import (
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	metricreport "github.com/elastic/beats/v7/pkg/systemmetrics/report"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 )
 
 func resetSystemBridgeForTest() {
@@ -45,7 +47,7 @@ func setupTestRegistry(t *testing.T) *monitoring.Registry {
 	t.Helper()
 	reg := monitoring.NewRegistry()
 	err := metricreport.SetupMetricsOptions(metricreport.MetricOptions{
-		Logger:         logp.NewLogger("system-bridge-test"),
+		Logger:         logptest.NewTestingLogger(t, "system-bridge-test"),
 		Name:           "beat",
 		SystemMetrics:  reg.GetOrCreateRegistry("system"),
 		ProcessMetrics: reg.GetOrCreateRegistry("beat"),
@@ -220,4 +222,53 @@ func TestSystemBridgeLiveValues(t *testing.T) {
 
 	rm = collectMetrics(t, reader)
 	assert.NotNil(t, findMetricByName(rm, "beat.memstats.rss"))
+}
+
+// TestSystemBridgeShutdownDoesNotDeadlockWithCollection checks that shutdown
+// does not hold b.mu while it unregisters the callback. Unregister waits for an
+// in-flight callback and the callback takes b.mu, so doing both at once
+// deadlocks. Collections run continuously while bridges are shut down.
+func TestSystemBridgeShutdownDoesNotDeadlockWithCollection(t *testing.T) {
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for range 200 {
+			reader := metric.NewManualReader()
+			settings := componenttest.NewNopTelemetrySettings()
+			settings.MeterProvider = metric.NewMeterProvider(metric.WithReader(reader))
+
+			reg := monitoring.NewRegistry()
+			monitoring.NewUint(reg, "beat.memstats.memory_alloc").Set(1)
+			bridge, err := newSystemRegistryBridge(settings, reg)
+			if err != nil {
+				t.Errorf("newSystemRegistryBridge: %v", err)
+				return
+			}
+
+			stop := make(chan struct{})
+			collecting := make(chan struct{})
+			go func() {
+				defer close(collecting)
+				var rm metricdata.ResourceMetrics
+				for {
+					select {
+					case <-stop:
+						return
+					default:
+						_ = reader.Collect(context.Background(), &rm)
+					}
+				}
+			}()
+
+			bridge.shutdown()
+			close(stop)
+			<-collecting
+		}
+	}()
+
+	select {
+	case <-done:
+	case <-time.After(60 * time.Second):
+		t.Fatal("deadlock: shutting down the system bridge while it is being collected did not finish")
+	}
 }

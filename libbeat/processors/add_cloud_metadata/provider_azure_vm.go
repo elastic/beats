@@ -69,7 +69,7 @@ var azureVMMetadataFetcher = provider{
 	Create: func(_ string, config *conf.C) (metadataFetcher, error) {
 		azMetadataURI := "/metadata/instance/compute?api-version=2021-02-01"
 		azHeaders := map[string]string{"Metadata": "true"}
-		azHttpSchema := func(m map[string]interface{}) mapstr.M {
+		azHttpSchema := func(m map[string]any) mapstr.M {
 			m["serviceName"] = "Virtual Machines"
 			cloud, _ := s.Schema{
 				"account": s.Object{
@@ -93,7 +93,7 @@ var azureVMMetadataFetcher = provider{
 			return mapstr.M{"cloud": cloud}
 		}
 
-		azGenSchema := func(m map[string]interface{}) mapstr.M {
+		azGenSchema := func(m map[string]any) mapstr.M {
 			orchestrator := mapstr.M{
 				"orchestrator": mapstr.M{},
 			}

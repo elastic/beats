@@ -218,7 +218,7 @@ func TestTemplateFunc(t *testing.T) {
 		Parse(`Hello {{ eventParam $ 1 }}! Foo {{ eventParam $ 2 }}.`))
 
 	buf := new(bytes.Buffer)
-	err := tmpl.Execute(buf, []interface{}{"world"})
+	err := tmpl.Execute(buf, []any{"world"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -269,14 +269,14 @@ func BenchmarkRenderer(b *testing.B) {
 
 	const totalEvents = 1000000
 	msg := strings.Repeat("Hello world! ", 21)
-	for i := 0; i < totalEvents; i++ {
+	for range totalEvents {
 		safeWriteEvent(b, writer, 10, msg)
 	}
 
 	setup := func() (*EventIterator, *Renderer) {
 		log := openLog(b, winlogbeatTestLogName)
 
-		itr, err := NewEventIterator(WithSubscription(log), WithBatchSize(1024))
+		itr, err := NewEventIterator(logp.NewNopLogger(), WithSubscription(log), WithBatchSize(1024))
 		if err != nil {
 			log.Close()
 			b.Fatal(err)

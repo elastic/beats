@@ -26,7 +26,7 @@ const (
 
 // nativeOsqueryOptionDefaults are applied to the options map when building the
 // config for osqueryd, only when each key is not already set in the native config.
-var nativeOsqueryOptionDefaults = map[string]interface{}{
+var nativeOsqueryOptionDefaults = map[string]any{
 	"schedule_splay_percent": 10,
 	"schedule_max_drift":     60,
 }
@@ -130,8 +130,8 @@ func (p *ConfigPlugin) Set(inputs []config.InputConfig) error {
 // EffectiveOsqueryConfig returns the osquery policy snapshot last applied successfully by Set,
 // including merged pack-level schedule defaults. RRULE execution should read this snapshot only
 // after osqueryd has applied generated config (for example from a post-GenerateConfig hook), so
-// native and RRULE schedules stay aligned. Do not assume inputs[0].Osquery remains the canonical
-// merged struct across refactors.
+// native and RRULE schedules stay aligned. Do not assume the result input's
+// Osquery remains the canonical merged struct across refactors.
 func (p *ConfigPlugin) EffectiveOsqueryConfig() *config.OsqueryConfig {
 	p.mx.RLock()
 	defer p.mx.RUnlock()
@@ -234,7 +234,7 @@ func newOsqueryConfig(osqueryConfig *config.OsqueryConfig) *config.OsqueryConfig
 		osqueryConfig = &config.OsqueryConfig{}
 	}
 	if osqueryConfig.Options == nil {
-		osqueryConfig.Options = make(map[string]interface{})
+		osqueryConfig.Options = make(map[string]any)
 	}
 	// Apply native osquery option defaults only when not already set in config
 	for k, v := range nativeOsqueryOptionDefaults {
@@ -285,16 +285,17 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		return nil
 	}
 
-	// Read namespace from the first input as of 7.16
-	p.namespace = inputs[0].Datastream.Namespace
+	// Read namespace from the result input as of 7.16
+	result := config.ResultInput(inputs)
+	p.namespace = result.Datastream.Namespace
 	if p.namespace == "" {
 		p.namespace = config.DefaultNamespace
 	}
 
 	// Since 7.16 version only one integration/input is expected
-	// The inputs[0].Osquery can be nil if this is pre 7.16 integration configuration
-	if inputs[0].Osquery != nil {
-		osqueryConfig = inputs[0].Osquery
+	// The result input's Osquery can be nil if this is pre 7.16 integration configuration
+	if result.Osquery != nil {
+		osqueryConfig = result.Osquery
 	}
 
 	// Common code to register query with lookup maps, enforce snapshot and increment queries count.
@@ -416,7 +417,7 @@ func getPackQueryName(packName, queryName string) string {
 // Due to current configuration passing between the agent and beats the keys that contain dots (".")
 // are split into the nested tree-like structure.
 // This converts this dynamic map[string]interface{} tree into strongly typed flat map.
-func flattenECSMapping(m map[string]interface{}) (ecs.Mapping, error) {
+func flattenECSMapping(m map[string]any) (ecs.Mapping, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -433,7 +434,7 @@ func flattenECSMapping(m map[string]interface{}) (ecs.Mapping, error) {
 	return ecsm, nil
 }
 
-func traverseTree(depth int, ecsm ecs.Mapping, path []string, v interface{}) error {
+func traverseTree(depth int, ecsm ecs.Mapping, path []string, v any) error {
 
 	if path[len(path)-1] == keyField {
 		if s, ok := v.(string); ok {
@@ -462,7 +463,7 @@ func traverseTree(depth int, ecsm ecs.Mapping, path []string, v interface{}) err
 			Value: v,
 		}
 		return nil
-	} else if m, ok := v.(map[string]interface{}); ok {
+	} else if m, ok := v.(map[string]any); ok {
 		if depth < maxECSMappingDepth {
 			for k, v := range m {
 				if strings.TrimSpace(k) == "" {

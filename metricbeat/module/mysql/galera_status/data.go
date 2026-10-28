@@ -95,7 +95,7 @@ var (
 // Map data to MapStr of server stats variables: http://galeracluster.com/documentation-webpages/galerastatusvariables.html
 // queryMode specifies, which subset of the available Variables is used.
 func eventMapping(status map[string]string) mapstr.M {
-	source := map[string]interface{}{}
+	source := map[string]any{}
 	for key, val := range status {
 		source[key] = val
 	}

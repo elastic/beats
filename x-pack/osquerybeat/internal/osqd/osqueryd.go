@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -17,6 +18,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	"go.uber.org/zap/zapcore"
 
@@ -36,6 +38,7 @@ const (
 	defaultCertsDir              = "certs"
 	defaultLensesDir             = "lenses"
 	defaultConfigRefreshInterval = 30 // interval osqueryd will poll for configuration changed; scheduled queries configuration for now
+	defaultCheckTimeout          = 15 * time.Second
 )
 
 const (
@@ -49,7 +52,10 @@ var (
 
 type Runner interface {
 	Check(ctx context.Context) error
-	Run(ctx context.Context, flags Flags) error
+	// onExit is called after the child is reaped, before logging and cleanup.
+	// It completes before Run returns and must return promptly. It is not
+	// called if process startup fails.
+	Run(ctx context.Context, flags Flags, onExit func(error)) error
 	SocketPath() string
 	DataPath() string
 	// SetExtensions configures customer-managed extension entries (directories,
@@ -76,6 +82,7 @@ type OSQueryD struct {
 
 	extensionsTimeout     int
 	configRefreshInterval int
+	checkTimeout          time.Duration
 
 	// baseExtensionsTimeout is the effective extensions_timeout after construction
 	// options are applied; SetExtensions reverts to it when the configuration no
@@ -98,6 +105,16 @@ type Option func(*OSQueryD)
 func WithExtensionsTimeout(to int) Option {
 	return func(q *OSQueryD) {
 		q.extensionsTimeout = to
+	}
+}
+
+// WithCheckTimeout sets the osqueryd --version startup check deadline.
+// Values <= 0 leave the default (15s) in place.
+func WithCheckTimeout(to time.Duration) Option {
+	return func(q *OSQueryD) {
+		if to > 0 {
+			q.checkTimeout = to
+		}
 	}
 }
 
@@ -160,6 +177,7 @@ func newOsqueryD(socketPath string, opts ...Option) (*OSQueryD, error) {
 		socketPath:            socketPath,
 		extensionsTimeout:     defaultExtensionsTimeout,
 		configRefreshInterval: defaultConfigRefreshInterval,
+		checkTimeout:          defaultCheckTimeout,
 	}
 
 	for _, opt := range opts {
@@ -249,31 +267,41 @@ func AutoloadPath(dataPath string) string {
 	return filepath.Join(dataPath, osqueryAutoload)
 }
 
-// Check checks if the binary exists and executable
+// Check checks if the binary exists and is executable.
 func (q *OSQueryD) Check(ctx context.Context) error {
 	err := q.prepareBinPath()
 	if err != nil {
 		return fmt.Errorf("failed to prepare bin path, %w", err)
 	}
 
-	//nolint:gosec // works as expected
-	cmd := exec.CommandContext(
-		ctx,
-		osquerydPath(q.binPath),
-		"--S",
-		"--version",
-	)
+	return runCheckWithTimeout(ctx, q.checkTimeout, func(checkCtx context.Context) error {
+		//nolint:gosec // The executable path is selected from the validated runtime.
+		cmd := exec.CommandContext(
+			checkCtx,
+			osquerydPath(q.binPath),
+			"--S",
+			"--version",
+		)
+		return cmd.Run()
+	})
+}
 
-	err = cmd.Start()
-	if err != nil {
-		return err
+func runCheckWithTimeout(ctx context.Context, timeout time.Duration, check func(context.Context) error) error {
+	checkCtx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	err := check(checkCtx)
+	if parentErr := ctx.Err(); parentErr != nil {
+		return parentErr
 	}
-
-	return cmd.Wait()
+	if errors.Is(checkCtx.Err(), context.DeadlineExceeded) {
+		return fmt.Errorf("osqueryd check timed out after %s: %w", timeout, checkCtx.Err())
+	}
+	return err
 }
 
 // Run executes osqueryd binary as a child process
-func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
+func (q *OSQueryD) Run(ctx context.Context, flags Flags, onExit func(error)) error {
 	cleanup, err := q.prepare()
 	if err != nil {
 		return err
@@ -293,11 +321,9 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 	if err != nil {
 		return err
 	}
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		_ = q.logOSQueryOutput(ctx, stdout)
-	}()
+	})
 
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
@@ -318,20 +344,20 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 
 	// Capture stderr for error messages
 	// Log stderr line-by-line at error level for better visibility
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		_ = q.logOSQueryOutput(ctx, stderr)
-	}()
+	})
 
 	finished := make(chan error, 1)
 
 	// Wait on osqueryd exit
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		finished <- cmd.Wait()
-	}()
+	wg.Go(func() {
+		err := cmd.Wait()
+		if onExit != nil {
+			onExit(err)
+		}
+		finished <- err
+	})
 
 	select {
 	case err = <-finished:
@@ -698,8 +724,13 @@ func verifyAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath string) er
 }
 
 func (q *OSQueryD) prepareBinPath() error {
-	// If path to osquery was not set use the current executable path
 	if q.binPath == "" {
+		// Allow tests to override binary discovery via env var (e.g. when the
+		// receiver runs in-process and os.Executable returns a temp test binary).
+		if dir := os.Getenv("OSQUERYBEAT_BINARY_DIR"); dir != "" {
+			q.binPath = dir
+			return nil
+		}
 		exePath, err := os.Executable()
 		if err != nil {
 			return err
@@ -723,9 +754,7 @@ func (q *OSQueryD) args(userFlags Flags) Args {
 	}
 
 	// Copy protected flags, protected keys overwrite the user keys
-	for k, v := range protectedFlags {
-		flags[k] = v
-	}
+	maps.Copy(flags, protectedFlags)
 
 	flags["pidfile"] = q.resolveDataPath(flags.GetString("pidfile"))
 	flags["database_path"] = q.resolveDataPath(flags.GetString("database_path"))
@@ -824,8 +853,7 @@ func getEnabledDisabledTables(userFlags Flags) (enabled, disabled []string) {
 	iterate := func(key string, fn func(name string)) {
 		if tablesValue, ok := userFlags[key]; ok {
 			if tablesString, ok := tablesValue.(string); ok {
-				tables := strings.Split(tablesString, ",")
-				for _, table := range tables {
+				for table := range strings.SplitSeq(tablesString, ",") {
 					name := strings.TrimSpace(table)
 					if name == "" {
 						continue

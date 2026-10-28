@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !integration
-// +build !integration
 
 package license
 
@@ -28,7 +27,7 @@ func TestProperlyHandlesResponseWhenNoOptionalFields(t *testing.T) {
 }
 
 // Tests that License reported with no errors
-func expectValidParsedData(t *testing.T, data metricset.FetcherData[map[string]interface{}]) {
+func expectValidParsedData(t *testing.T, data metricset.FetcherData[map[string]any]) {
 	require.NoError(t, data.Error)
 	require.Equal(t, 0, len(data.Reporter.GetErrors()))
 	require.Equal(t, 1, len(data.Reporter.GetEvents()))
@@ -59,7 +58,7 @@ func expectValidParsedData(t *testing.T, data metricset.FetcherData[map[string]i
 }
 
 // Tests that LicenseMetricsSet reported with no errors (without optional fields)
-func expectValidParsedDataWithoutOptionalFields(t *testing.T, data metricset.FetcherData[map[string]interface{}]) {
+func expectValidParsedDataWithoutOptionalFields(t *testing.T, data metricset.FetcherData[map[string]any]) {
 	require.NoError(t, data.Error)
 	require.Equal(t, 0, len(data.Reporter.GetErrors()))
 	require.Equal(t, 1, len(data.Reporter.GetEvents()))

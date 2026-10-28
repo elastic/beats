@@ -39,7 +39,7 @@ func testFetch(t *testing.T, collect string) {
 	server := mtest.Server(t, mtest.DefaultServerConfig)
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":       "rabbitmq",
 		"metricsets":   []string{"node"},
 		"hosts":        []string{server.URL},

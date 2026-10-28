@@ -36,15 +36,16 @@ type Config struct {
 	// Name is optional for lightweight checks but required for browsers
 	Name string `config:"name"`
 	// Id is optional for lightweight checks but required for browsers
-	Id                string                        `config:"id"`
-	Sandbox           bool                          `config:"sandbox"`
-	Throttling        any                           `config:"throttling"`
-	Screenshots       string                        `config:"screenshots"`
-	SyntheticsArgs    []string                      `config:"synthetics_args"`
-	PlaywrightOpts    map[string]any                `config:"playwright_options"`
-	FilterJourneys    synthexec.FilterJourneyConfig `config:"filter_journeys"`
-	IgnoreHTTPSErrors bool                          `config:"ignore_https_errors"`
-	Timeout           time.Duration                 `config:"timeout"`
+	Id                            string                        `config:"id"`
+	Sandbox                       bool                          `config:"sandbox"`
+	Throttling                    any                           `config:"throttling"`
+	Screenshots                   string                        `config:"screenshots"`
+	SyntheticsArgs                []string                      `config:"synthetics_args"`
+	PlaywrightOpts                map[string]any                `config:"playwright_options"`
+	FilterJourneys                synthexec.FilterJourneyConfig `config:"filter_journeys"`
+	IgnoreHTTPSErrors             bool                          `config:"ignore_https_errors"`
+	CertificateErrorSpkiAllowlist []string                      `config:"certificate_error_spki_allowlist"`
+	Timeout                       time.Duration                 `config:"timeout"`
 }
 
 // IsAPI reports whether this is the `api` monitor type (or its alias), which

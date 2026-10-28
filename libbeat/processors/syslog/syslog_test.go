@@ -114,11 +114,11 @@ var syslogCases = map[string]struct {
 					"procid":   "1024",
 					"msgid":    "ID47",
 					"version":  "1",
-					"structured_data": map[string]interface{}{
-						"examplePriority@32473": map[string]interface{}{
+					"structured_data": map[string]any{
+						"examplePriority@32473": map[string]any{
 							"class": "high",
 						},
-						"exampleSDID@32473": map[string]interface{}{
+						"exampleSDID@32473": map[string]any{
 							"eventID":     "1011",
 							"eventSource": "Application",
 							"iut":         "3",
@@ -134,7 +134,6 @@ var syslogCases = map[string]struct {
 
 func TestSyslog(t *testing.T) {
 	for name, tc := range syslogCases {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -160,7 +159,6 @@ func TestSyslog(t *testing.T) {
 
 func BenchmarkSyslog(b *testing.B) {
 	for name, bc := range syslogCases {
-		bc := bc
 		b.Run(name, func(b *testing.B) {
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
@@ -213,18 +211,17 @@ func TestAppendStringField(t *testing.T) {
 		},
 		"interface-slice": {
 			inMap: mapstr.M{
-				"error": []interface{}{"foo", "bar"},
+				"error": []any{"foo", "bar"},
 			},
 			inField: "error",
 			inValue: "some value",
 			want: mapstr.M{
-				"error": []interface{}{"foo", "bar", "some value"},
+				"error": []any{"foo", "bar", "some value"},
 			},
 		},
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			appendStringField(tc.inMap, tc.inField, tc.inValue)

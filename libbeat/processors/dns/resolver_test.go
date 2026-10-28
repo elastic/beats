@@ -75,7 +75,7 @@ func TestMiekgResolverLookupPTR(t *testing.T) {
 
 	// Validate that our metrics exist.
 	var metricCount int
-	reg.Do(monitoring.Full, func(name string, v interface{}) {
+	reg.Do(monitoring.Full, func(name string, v any) {
 		if strings.Contains(name, "processor.dns") {
 			metricCount++
 		}
@@ -130,7 +130,7 @@ func TestMiekgResolverLookupPTRTLS(t *testing.T) {
 
 	// Validate that our metrics exist.
 	var metricCount int
-	reg.Do(monitoring.Full, func(name string, v interface{}) {
+	reg.Do(monitoring.Full, func(name string, v any) {
 		if strings.Contains(name, "processor.dns") {
 			metricCount++
 		}

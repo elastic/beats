@@ -44,7 +44,7 @@ var actionMap = map[Action]schema.Action{
 var bufferPool sync.Pool
 
 func init() {
-	bufferPool.New = func() interface{} {
+	bufferPool.New = func() any {
 		return flatbuffers.NewBuilder(1024)
 	}
 }
@@ -378,7 +378,7 @@ func fbDecodeHash(e *schema.Event) map[HashType]Digest {
 
 		if length > 0 {
 			hashValue := make([]byte, length)
-			for i := 0; i < len(hashValue); i++ {
+			for i := range hashValue {
 				hashValue[i] = byte(producer(i))
 			}
 

@@ -120,6 +120,7 @@ func TestDocker(t *testing.T) {
 		t.Log(docker)
 		checkDocker(t, docker)
 	}
+	checkHeartbeatBrowserE2E(t, dockers)
 }
 
 // Sub-tests

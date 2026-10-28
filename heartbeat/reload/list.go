@@ -20,6 +20,7 @@ package reload
 import (
 	"errors"
 	"fmt"
+	"maps"
 	"sync"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors"
@@ -260,7 +261,16 @@ func (r *HBRunnerList) Has(hash uint64) bool {
 
 // HashConfig hashes a given config.C
 func (r *HBRunnerList) HashConfig(c *config.C) (uint64, error) {
-	hbfactory, ok := r.factory.(monitors.HBRunnerFactory)
+	factory := r.factory
+	// Wrappers, such as the OTel status wrapper, hide the factory's hash function.
+	for {
+		w, ok := factory.(interface{ Unwrap() cfgfile.RunnerFactory })
+		if !ok {
+			break
+		}
+		factory = w.Unwrap()
+	}
+	hbfactory, ok := factory.(monitors.HBRunnerFactory)
 	if !ok {
 		r.logger.Debugf("plugin factory does not implement HBRunnerFactory, defaulting to config hash")
 		return DefaultHashConfig(c)
@@ -281,7 +291,7 @@ func (r *HBRunnerList) HashConfig(c *config.C) (uint64, error) {
 }
 
 func DefaultHashConfig(c *config.C) (uint64, error) {
-	var config map[string]interface{}
+	var config map[string]any
 	if err := c.Unpack(&config); err != nil {
 		return 0, err
 	}
@@ -291,9 +301,7 @@ func DefaultHashConfig(c *config.C) (uint64, error) {
 
 func (r *HBRunnerList) copyRunnerList() map[uint64]cfgfile.Runner {
 	list := make(map[uint64]cfgfile.Runner, len(r.runners))
-	for k, v := range r.runners {
-		list[k] = v
-	}
+	maps.Copy(list, r.runners)
 	return list
 }
 

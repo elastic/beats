@@ -239,13 +239,11 @@ func NewDB(ctx context.Context, metrics *monitoring.Registry, reader procfs.Read
 
 func (db *DB) calculateEntityIDv1(pid uint32, startTime time.Time) string {
 	return base64.StdEncoding.EncodeToString(
-		[]byte(
-			fmt.Sprintf("%d__%s__%d__%d",
-				pidNsInode,
-				bootID,
-				uint64(pid),
-				uint64(startTime.Unix()),
-			),
+		fmt.Appendf(nil, "%d__%s__%d__%d",
+			pidNsInode,
+			bootID,
+			uint64(pid),
+			uint64(startTime.Unix()),
 		),
 	)
 }
@@ -681,7 +679,7 @@ func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 	ret := fullProcessFromDBProcess(process)
 
 	if process.PIDs.Ppid != 0 {
-		for i := 0; i < retryCount; i++ {
+		for range retryCount {
 			if parent, ok := db.processes[process.PIDs.Ppid]; ok {
 				fillParent(&ret, parent)
 				break
@@ -690,7 +688,7 @@ func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 	}
 
 	if process.PIDs.Pgid != 0 {
-		for i := 0; i < retryCount; i++ {
+		for range retryCount {
 			if groupLeader, ok := db.processes[process.PIDs.Pgid]; ok {
 				fillGroupLeader(&ret, groupLeader)
 				break
@@ -699,7 +697,7 @@ func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 	}
 
 	if process.PIDs.Sid != 0 {
-		for i := 0; i < retryCount; i++ {
+		for range retryCount {
 			if sessionLeader, ok := db.processes[process.PIDs.Sid]; ok {
 				fillSessionLeader(&ret, sessionLeader)
 				break

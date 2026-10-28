@@ -102,8 +102,8 @@ The `add_kubernetes_metadata` processor has the following configuration settings
 :   (Optional) Specify filters and configuration for the extra metadata, that will be added to the event. Configuration parameters:
 
     * `node` or `namespace`: Specify labels and annotations filters for the extra metadata coming from node and namespace. By default all labels are included while annotations are not. To change default behaviour `include_labels`, `exclude_labels` and `include_annotations` can be defined. Those settings are useful when storing labels and annotations that require special handling to avoid overloading the storage output. Note: wildcards are not supported for those settings. The enrichment of `node` or `namespace` metadata can be individually disabled by setting `enabled: false`.
-    * `deployment`: If resource is `pod` and it is created from a `deployment`, by default the deployment name is added, this can be disabled by setting `deployment: false`.
-    * `cronjob`: If resource is `pod` and it is created from a `cronjob`, by default the cronjob name is added, this can be disabled by setting `cronjob: false`.
+    * `deployment`: If resource is `pod` and it is created from a `deployment`, the deployment name is added. This is disabled by default and can be enabled by setting `deployment: true`.
+    * `cronjob`: If resource is `pod` and it is created from a `cronjob`, the cronjob name is added. This is disabled by default and can be enabled by setting `cronjob: true`.
 
         Example:
 
@@ -119,8 +119,8 @@ The `add_kubernetes_metadata` processor has the following configuration settings
           include_annotations: ["nodeannotation1"]
           #labels.dedot: true
           #annotations.dedot: true
-        deployment: false
-        cronjob: false
+        deployment: true
+        cronjob: true
 ```
 
 `kube_config`
@@ -164,6 +164,12 @@ The `add_kubernetes_metadata` processor has the following configuration settings
 
 `wait_for_metadata_retry_period` {applies_to}`stack: ga 9.5`
 :   Time to wait before retrying the metadata request. The retry period must not be greater than `wait_for_metadata_timeout` unless retrying indefinitely. Defaults to `3s`.
+
+`append_fields` {applies_to}`stack: ga 9.6`
+:   (Optional) When `true`, the processor enriches events that already have a `kubernetes` field by merging the cached metadata into the existing object. Existing keys are preserved. Only absent fields are added. Defaults to `false`.
+
+`image_metadata_source` {applies_to}`stack: ga 9.6.0+`
+:   (Optional) Where `kubernetes.container.image` comes from. `status` uses the image reported in the container status, as resolved by the container runtime, which can differ from the manifest (for example a different tag or a digest). `spec` uses the image from the pod spec, exactly as written in the manifest. Applies to the `container` and `pod_uid` indexers. The `ip_port` indexer always uses the pod spec. Defaults to `status`.
 
 ## Indexers and matchers [kubernetes-indexers-and-matchers]
 

@@ -25,9 +25,9 @@ type perfChannelMock struct {
 	mock.Mock
 }
 
-func (p *perfChannelMock) C() <-chan interface{} {
+func (p *perfChannelMock) C() <-chan any {
 	args := p.Called()
-	return args.Get(0).(chan interface{})
+	return args.Get(0).(chan any)
 }
 
 func (p *perfChannelMock) ErrC() <-chan error {

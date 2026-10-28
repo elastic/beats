@@ -15,6 +15,9 @@ const (
 	MaxSplay = 12 * time.Hour
 	// DefaultSplay is the default splay duration (disabled)
 	DefaultSplay = 0
+	// DefaultCheckTimeout is the osqueryd --version startup check deadline
+	// when elastic_options.check_timeout is unset.
+	DefaultCheckTimeout = 15 * time.Second
 )
 
 // RRuleScheduleConfig represents an RRULE-based schedule configuration
@@ -104,6 +107,25 @@ type ElasticOptions struct {
 	Profiling *ProfilingConfig `config:"profiling" json:"-"`
 	// Extensions configures loading of customer-managed osquery extensions.
 	Extensions *ExtensionsConfig `config:"extensions" json:"-"`
+	// CheckTimeout optionally overrides the osqueryd --version startup check
+	// deadline. Go duration format ("15s", "30s", "1m"). Default: 15s.
+	CheckTimeout string `config:"check_timeout" json:"-"`
+}
+
+// ParseCheckTimeout parses elastic_options.check_timeout. An empty value
+// returns DefaultCheckTimeout. The duration must be greater than zero.
+func ParseCheckTimeout(raw string) (time.Duration, error) {
+	if raw == "" {
+		return DefaultCheckTimeout, nil
+	}
+	d, err := time.ParseDuration(raw)
+	if err != nil {
+		return 0, fmt.Errorf("invalid osquery.elastic_options.check_timeout %q: %w", raw, err)
+	}
+	if d <= 0 {
+		return 0, fmt.Errorf("osquery.elastic_options.check_timeout must be greater than 0, got %s", raw)
+	}
+	return d, nil
 }
 
 // ExtensionsConfig configures loading of customer-managed (third-party or
@@ -232,7 +254,7 @@ type Query struct {
 	Description int    `config:"description" json:"description,omitempty"`
 
 	// Optional ECS mapping for the query, not rendered into osqueryd configuration
-	ECSMapping map[string]interface{} `config:"ecs_mapping" json:"-"`
+	ECSMapping map[string]any `config:"ecs_mapping" json:"-"`
 
 	// A boolean to set 'snapshot' mode, default true
 	// This is different from the default osquery behavior where the missing value defaults to false
@@ -313,16 +335,16 @@ type Events struct {
 }
 
 type OsqueryConfig struct {
-	Options               map[string]interface{} `config:"options" json:"options,omitempty"`
-	ElasticOptions        *ElasticOptions        `config:"elastic_options" json:"-"`
-	Schedule              map[string]Query       `config:"schedule" json:"schedule,omitempty"`
-	Packs                 map[string]Pack        `config:"packs" json:"packs,omitempty"`
-	Filepaths             map[string][]string    `config:"file_paths" json:"file_paths,omitempty"`
-	Views                 map[string]string      `config:"views" json:"views,omitempty"`
-	Events                *Events                `config:"events" json:"events,omitempty"`
-	Yara                  map[string]interface{} `config:"yara" json:"yara,omitempty"`
-	PrometheusTargets     map[string]interface{} `config:"prometheus_targets" json:"prometheus_targets,omitempty"`
-	AutoTableConstruction map[string]interface{} `config:"auto_table_construction" json:"auto_table_construction,omitempty"`
+	Options               map[string]any      `config:"options" json:"options,omitempty"`
+	ElasticOptions        *ElasticOptions     `config:"elastic_options" json:"-"`
+	Schedule              map[string]Query    `config:"schedule" json:"schedule,omitempty"`
+	Packs                 map[string]Pack     `config:"packs" json:"packs,omitempty"`
+	Filepaths             map[string][]string `config:"file_paths" json:"file_paths,omitempty"`
+	Views                 map[string]string   `config:"views" json:"views,omitempty"`
+	Events                *Events             `config:"events" json:"events,omitempty"`
+	Yara                  map[string]any      `config:"yara" json:"yara,omitempty"`
+	PrometheusTargets     map[string]any      `config:"prometheus_targets" json:"prometheus_targets,omitempty"`
+	AutoTableConstruction map[string]any      `config:"auto_table_construction" json:"auto_table_construction,omitempty"`
 }
 
 // forOsqueryd returns a copy of c without queries that osquerybeat runs via RRULE (they would

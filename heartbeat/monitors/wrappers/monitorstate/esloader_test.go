@@ -49,7 +49,7 @@ func TestStatesESLoader(t *testing.T) {
 	// Create three monitors in ES, load their states, and make sure we track them correctly
 	// We create a few to make sure the query isolates the monitors correctly
 	// and alternate between testing monitors that start up or down
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		testStatus := StatusUp
 		if i%2 == 1 {
 			testStatus = StatusDown
@@ -64,7 +64,7 @@ func TestStatesESLoader(t *testing.T) {
 		// Write the state a few times, enough to guarantee a stable state
 		count := FlappingThreshold * 2
 		var lastId string
-		for i := 0; i < count; i++ {
+		for i := range count {
 			ms = etc.tracker.RecordStatus(monID, testStatus, true)
 			if i == 0 {
 				lastId = ms.ID
@@ -82,7 +82,7 @@ func TestStatesESLoader(t *testing.T) {
 		}
 
 		origMsId := ms.ID
-		for i := 0; i < count; i++ {
+		for i := range count {
 			ms = etc.tracker.RecordStatus(monID, testStatus, true)
 			require.NotEqual(t, origMsId, ms.ID)
 			if i == 0 {

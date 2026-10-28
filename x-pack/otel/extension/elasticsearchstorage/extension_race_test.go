@@ -18,13 +18,53 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"go.opentelemetry.io/collector/component/componenttest"
+	"go.opentelemetry.io/collector/extension/extensiontest"
 
 	"github.com/elastic/entcollect"
 
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
+
+func TestComponentLifecycle(t *testing.T) {
+	srv := newFakeES(t)
+	defer srv.Close()
+
+	authenticatorID, authenticator := newTestBeatsAuthenticator(t, srv.URL, "elastic", "changeme")
+	cfg := newTestStorageConfig(authenticatorID)
+	factory := NewFactory()
+
+	newStorage := func(t *testing.T) *elasticStorage {
+		t.Helper()
+
+		extension, err := factory.Create(
+			t.Context(),
+			extensiontest.NewNopSettings(factory.Type()),
+			cfg,
+		)
+		require.NoError(t, err, "storage extension must be created")
+
+		storage, ok := extension.(*elasticStorage)
+		require.True(t, ok, "factory must create an elasticStorage")
+		return storage
+	}
+
+	t.Run("shutdown without start", func(t *testing.T) {
+		require.NoError(t, newStorage(t).Shutdown(t.Context()), "storage shutdown before start must succeed")
+	})
+
+	t.Run("start shutdown", func(t *testing.T) {
+		for range 2 {
+			storage := newStorage(t)
+			require.NoError(
+				t,
+				storage.Start(t.Context(), storageTestHost{authenticatorID: authenticator}),
+				"storage must start with beatsauth authentication",
+			)
+			require.NoError(t, storage.Shutdown(t.Context()), "storage shutdown must succeed")
+		}
+	})
+}
 
 // TestElasticStorage_Access_Concurrent_Race documents and guards against the
 // data race in the elasticsearch_storage OTel extension: a single
@@ -55,18 +95,20 @@ func TestElasticStorage_Access_Concurrent_Race(t *testing.T) {
 	srv := newFakeES(t)
 	defer srv.Close()
 
-	cfg := &Config{
-		ElasticsearchConfig: map[string]any{
-			"hosts":    []string{srv.URL},
-			"username": "elastic",
-			"password": "changeme",
-		},
-	}
+	authenticatorID, authenticator := newTestBeatsAuthenticator(t, srv.URL, "elastic", "changeme")
+	cfg := newTestStorageConfig(authenticatorID)
 	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, "")}
 
 	ctx := t.Context()
 
-	require.NoError(t, ext.Start(ctx, componenttest.NewNopHost()))
+	require.NoError(
+		t,
+		ext.Start(
+			ctx,
+			storageTestHost{authenticatorID: authenticator},
+		),
+		"storage must start with beatsauth authentication",
+	)
 	t.Cleanup(func() { _ = ext.Shutdown(context.Background()) })
 
 	const (
@@ -153,18 +195,20 @@ func TestElasticStorage_MixedRegistry_Concurrent_Race(t *testing.T) {
 	srv := newFakeES(t)
 	defer srv.Close()
 
-	cfg := &Config{
-		ElasticsearchConfig: map[string]any{
-			"hosts":    []string{srv.URL},
-			"username": "elastic",
-			"password": "changeme",
-		},
-	}
+	authenticatorID, authenticator := newTestBeatsAuthenticator(t, srv.URL, "elastic", "changeme")
+	cfg := newTestStorageConfig(authenticatorID)
 	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, "")}
 
 	ctx := t.Context()
 
-	require.NoError(t, ext.Start(ctx, componenttest.NewNopHost()))
+	require.NoError(
+		t,
+		ext.Start(
+			ctx,
+			storageTestHost{authenticatorID: authenticator},
+		),
+		"storage must start with Elasticsearch authentication",
+	)
 	t.Cleanup(func() { _ = ext.Shutdown(context.Background()) })
 
 	// Compile-time check that the extension still satisfies the two

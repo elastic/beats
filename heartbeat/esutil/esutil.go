@@ -26,7 +26,7 @@ import (
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 )
 
-func ToJsonRdr(i interface{}) (io.Reader, error) {
+func ToJsonRdr(i any) (io.Reader, error) {
 	b, err := json.Marshal(i)
 	if err != nil {
 		return nil, err

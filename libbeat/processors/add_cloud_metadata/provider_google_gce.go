@@ -21,7 +21,7 @@ import (
 	"path"
 	"strings"
 
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -50,7 +50,7 @@ var gceMetadataFetcher = provider{
 	Create: func(provider string, config *conf.C) (metadataFetcher, error) {
 		gceMetadataURI := "/computeMetadata/v1/?recursive=true&alt=json"
 		gceHeaders := map[string]string{"Metadata-Flavor": "Google"}
-		gceSchema := func(m map[string]interface{}) mapstr.M {
+		gceSchema := func(m map[string]any) mapstr.M {
 			cloud := mapstr.M{
 				"service": mapstr.M{
 					"name": "GCE",
@@ -70,7 +70,7 @@ var gceMetadataFetcher = provider{
 				_, _ = cloud.Put(key, path.Base(p))
 			}
 
-			if instance, ok := m["instance"].(map[string]interface{}); ok {
+			if instance, ok := m["instance"].(map[string]any); ok {
 				s.Schema{
 					"instance": s.Object{
 						"id":   c.StrFromNum("id"),
@@ -132,7 +132,7 @@ var gceMetadataFetcher = provider{
 				_ = meta.Delete("orchestrator")
 			}
 
-			if project, ok := m["project"].(map[string]interface{}); ok {
+			if project, ok := m["project"].(map[string]any); ok {
 				s.Schema{
 					"project": s.Object{
 						"id": c.Str("projectId"),

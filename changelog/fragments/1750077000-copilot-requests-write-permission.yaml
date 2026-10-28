@@ -1,3 +1,0 @@
-kind: enhancement
-summary: Replace COPILOT_GITHUB_TOKEN secret with copilot-requests:write permission in agentic workflow files
-component: beats

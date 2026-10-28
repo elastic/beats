@@ -2,18 +2,13 @@
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-system-users.html
 applies_to:
-  stack: beta
-  serverless: beta
+  stack: ga
+  serverless: ga
 ---
 
 % This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # System users metricset [metricbeat-metricset-system-users]
-
-::::{warning}
-This functionality is in beta and is subject to change. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.
-::::
-
 
 The system/users metricset reports logged in users and associated sessions via dbus and logind, which is a systemd component. By default, the metricset will look in `/var/run/dbus/` for a system socket, although a new path can be selected with `DBUS_SYSTEM_BUS_ADDRESS`.
 

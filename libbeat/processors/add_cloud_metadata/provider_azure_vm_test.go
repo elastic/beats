@@ -35,7 +35,6 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	azfake "github.com/Azure/azure-sdk-for-go/sdk/azcore/fake"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -48,9 +47,9 @@ var cluster1Name = "testcluster1Name"
 var cluster1ID = "testcluster1ID"
 
 var cluster1 = armcontainerservice.ManagedCluster{
-	ID:         to.Ptr(cluster1ID),
-	Name:       to.Ptr(cluster1Name),
-	Properties: &armcontainerservice.ManagedClusterProperties{NodeResourceGroup: to.Ptr("MC_myname_group_myname_eastus")},
+	ID:         new(cluster1ID),
+	Name:       new(cluster1Name),
+	Properties: &armcontainerservice.ManagedClusterProperties{NodeResourceGroup: new("MC_myname_group_myname_eastus")},
 }
 
 const azInstanceIdentityDocument = `{
@@ -171,7 +170,7 @@ func TestRetrieveAzureMetadata(t *testing.T) {
 	server := initAzureTestServer()
 	defer server.Close()
 
-	config, err := conf.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]any{
 		"host": server.Listener.Addr().String(),
 	})
 	if err != nil {

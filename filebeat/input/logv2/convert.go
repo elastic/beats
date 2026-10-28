@@ -456,36 +456,16 @@ func handleParsers(logger *logp.Logger, cfg, newCfg *config.C) error {
 	return nil
 }
 
-// handleFileIdentity sets the file identity using the following rules:
-//   - If no file identity is set, default to 'native' (same as Log input)
-//   - If file identity is set, keep it as is
-//   - If file identity is NOT fingerprint, disable fingerprint in the scanner
+// handleFileIdentity keeps a configured file identity as is and otherwise
+// defaults to 'native', matching the Log input. The identity alone determines
+// whether the filestream scanner computes fingerprints.
 func handleFileIdentity(cfg, newCfg *config.C) error {
 	if cfg.HasField("file_identity") {
-		isFingerprint, err := cfg.Has("file_identity.fingerprint", -1)
-		if err != nil {
-			return fmt.Errorf("cannot read 'file_identity.fingerprint': %w", err)
-		}
-
-		if isFingerprint {
-			return nil
-		}
-
-		// If the file identity is not fingerprint,
-		// disable fingerprint in the scanner
-		if err := newCfg.SetBool("prospector.scanner.fingerprint.enabled", -1, false); err != nil {
-			return fmt.Errorf("cannot set 'prospector.scanner.fingerprint.enalbed': %w", err)
-		}
-
 		return nil
 	}
 
 	if err := newCfg.SetChild("file_identity.native", -1, config.NewConfig()); err != nil {
 		return fmt.Errorf("cannot set 'file_identity.native': %w", err)
-	}
-
-	if err := newCfg.SetBool("prospector.scanner.fingerprint.enabled", -1, false); err != nil {
-		return fmt.Errorf("cannot set 'prospector.scanner.fingerprint.enalbed': %w", err)
 	}
 
 	return nil

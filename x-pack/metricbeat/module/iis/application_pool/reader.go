@@ -9,6 +9,7 @@ package application_pool
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 	"syscall"
 
@@ -303,10 +304,8 @@ func getProcessIds(counterValues map[string][]pdh.CounterValue) []WorkerProcess 
 func hasWorkerProcess(instance string, workers []WorkerProcess, pids []int) bool {
 	for _, worker := range workers {
 		if worker.instanceName == instance {
-			for _, pid := range pids {
-				if pid == worker.processId {
-					return true
-				}
+			if slices.Contains(pids, worker.processId) {
+				return true
 			}
 		}
 	}

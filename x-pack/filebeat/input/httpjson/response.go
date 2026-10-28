@@ -24,7 +24,7 @@ type response struct {
 	url        url.URL
 	header     http.Header
 	xmlDetails map[string]xml.Detail
-	body       interface{}
+	body       any
 }
 
 func (resp *response) clone() *response {
@@ -35,13 +35,13 @@ func (resp *response) clone() *response {
 	}
 
 	switch t := resp.body.(type) {
-	case []interface{}:
-		c := make([]interface{}, len(t))
+	case []any:
+		c := make([]any, len(t))
 		copy(c, t)
 		clone.body = c
 	case mapstr.M:
 		clone.body = t.Clone()
-	case map[string]interface{}:
+	case map[string]any:
 		clone.body = mapstr.M(t).Clone()
 	}
 
@@ -51,7 +51,7 @@ func (resp *response) clone() *response {
 func (resp *response) asTransformables(stat status.StatusReporter, log *logp.Logger, allowStringArray bool) []transformable {
 	var ts []transformable
 
-	convertAndAppend := func(m map[string]interface{}) {
+	convertAndAppend := func(m map[string]any) {
 		tr := transformable{}
 		tr.setHeader(resp.header.Clone())
 		tr.setURL(resp.url)
@@ -60,13 +60,13 @@ func (resp *response) asTransformables(stat status.StatusReporter, log *logp.Log
 	}
 
 	switch tresp := resp.body.(type) {
-	case []interface{}:
+	case []any:
 		var scalars int
 		for _, v := range tresp {
 			switch v := v.(type) {
 			case string, float64:
 				scalars++
-			case map[string]interface{}:
+			case map[string]any:
 				convertAndAppend(v)
 			default:
 				msg := fmt.Sprintf("events must be JSON objects, but got %T: skipping", v)
@@ -79,7 +79,7 @@ func (resp *response) asTransformables(stat status.StatusReporter, log *logp.Log
 			log.Debug(msg)
 			stat.UpdateStatus(status.Degraded, msg)
 		}
-	case map[string]interface{}:
+	case map[string]any:
 		convertAndAppend(tresp)
 	default:
 		stat.UpdateStatus(status.Degraded, "response is not a valid JSON")
@@ -94,7 +94,7 @@ func (resp *response) templateValues() mapstr.M {
 		return mapstr.M{}
 	}
 	body := resp.body
-	if m, ok := body.(map[string]interface{}); ok {
+	if m, ok := body.(map[string]any); ok {
 		body = mapstr.M(m)
 	}
 	return mapstr.M{

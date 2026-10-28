@@ -114,12 +114,60 @@ func TestParseFromTo(t *testing.T) {
 	parseFromToContact(common.NetString(" \"Mr. Watson\" >mailto:watson@bell-telephone.com< ;q=0.1"))
 }
 
+func TestFirstAddr(t *testing.T) {
+	tests := []struct {
+		name string
+		in   string
+		want string
+	}{
+		{name: "single_wrapped", in: "<sip:a@h1>;expires=60", want: "<sip:a@h1>;expires=60"},
+		{name: "single_bare", in: "sip:a@h1", want: "sip:a@h1"},
+		{name: "wrapped_list", in: "<sip:a@h1>;expires=60, <sip:b@h2>;expires=120", want: "<sip:a@h1>;expires=60"},
+		{name: "bare_list", in: "sip:a@h1, sip:b@h2", want: "sip:a@h1"},
+		{name: "comma_in_quoted_name", in: `"Smith, John" <sip:a@h1>;q=0.5, <sip:b@h2>`, want: `"Smith, John" <sip:a@h1>;q=0.5`},
+		{name: "escaped_quote_in_name", in: `"a\", b" <sip:a@h1>, <sip:b@h2>`, want: `"a\", b" <sip:a@h1>`},
+		{name: "comma_in_angle", in: "<sip:a@h1;x=1,2>, <sip:b@h2>", want: "<sip:a@h1;x=1,2>"},
+		{name: "quoted_param_with_comma", in: `<sip:a@h1>;foo="x,y", <sip:b@h2>`, want: `<sip:a@h1>;foo="x,y"`},
+		{name: "quote_in_angle", in: `<sip:a@h1?x="foo>, <sip:b@h2>`, want: `<sip:a@h1?x="foo>`},
+		{name: "space_before_comma", in: "sip:a@h1 , sip:b@h2", want: "sip:a@h1 "},
+		{name: "leading_comma", in: ",<sip:b@h2>", want: ""},
+		{name: "unterminated_quote", in: `"abc, <sip:a@h1>`, want: `"abc, <sip:a@h1>`},
+		{name: "unterminated_angle", in: "<sip:a@h1, <sip:b@h2", want: "<sip:a@h1, <sip:b@h2"},
+		{name: "trailing_backslash_in_quote", in: `"abc\`, want: `"abc\`},
+		{name: "empty", in: "", want: ""},
+	}
+	for _, test := range tests {
+		got := firstAddr(common.NetString(test.in))
+		assert.Equal(t, test.want, string(got), "firstAddr(%q)", test.in)
+	}
+}
+
+func TestContactFieldsMultipleAddrs(t *testing.T) {
+	msg := &message{headers: map[string][]common.NetString{
+		"contact": {common.NetString("<sip:a@h1:5060;transport=udp>;expires=60;q=0.5, <sip:b@h2:5070>;expires=120")},
+	}}
+	pbf := &pb.Fields{}
+	fields := &ProtocolFields{}
+	populateContactFields(msg, pbf, fields)
+
+	assert.Equal(t, common.NetString("sip:a@h1:5060;transport=udp"), fields.ContactURIOriginal, "contact URI should be the first address")
+	assert.Equal(t, common.NetString("a"), fields.ContactURIUsername, "contact username should be the first address's user")
+	assert.Equal(t, common.NetString("h1"), fields.ContactURIHost, "contact host should be the first address's host")
+	assert.Equal(t, 5060, fields.ContactURIPort, "contact port should be the first address's port")
+	assert.Equal(t, 60, fields.ContactExpires, "expires should come from the first address")
+	assert.Equal(t, 0.5, fields.ContactQ, "q should come from the first address")
+	assert.Equal(t, common.NetString("udp"), fields.ContactTransport, "transport should come from the first address")
+	assert.Equal(t, []string{"a"}, pbf.Related.User, "only the first address's user should be related")
+	assert.Equal(t, []string{"h1"}, pbf.Related.Hosts, "only the first address's host should be related")
+}
+
 func TestMalformedBodyFiends(t *testing.T) {
 	cases := []struct {
 		msg *message
 	}{
 		{msg: &message{body: []byte("\r\no="), contentType: []byte("application/sdp"), hasContentLength: true}},
 		{msg: &message{body: []byte("\r\no=\"00000000"), contentType: []byte("application/sdp"), hasContentLength: true}},
+		{msg: &message{body: []byte("o=\"\" 1 1 IN IP4 1.1.1.1\r\n"), contentType: []byte("application/sdp"), hasContentLength: true}},
 	}
 
 	// test is mostly that we don't crash
@@ -146,12 +194,12 @@ func TestParseUDP(t *testing.T) {
 	fields := *gotEvent
 
 	assert.Equal(t, common.NetString("1-2187@10.0.2.20"), getVal(fields, "sip.call_id"))
-	assert.Equal(t, common.NetString("test"), getVal(fields, "sip.contact.display_info"))
-	assert.Equal(t, common.NetString("10.0.2.15"), getVal(fields, "sip.contact.uri.host"))
-	assert.Equal(t, common.NetString("sip:test@10.0.2.15:5060"), getVal(fields, "sip.contact.uri.original"))
+	assert.Equal(t, nil, getVal(fields, "sip.contact.display_info"))
+	assert.Equal(t, common.NetString("10.0.2.20"), getVal(fields, "sip.contact.uri.host"))
+	assert.Equal(t, common.NetString("sip:sipp@10.0.2.20:5060"), getVal(fields, "sip.contact.uri.original"))
 	assert.Equal(t, 5060, getVal(fields, "sip.contact.uri.port"))
 	assert.Equal(t, common.NetString("sip"), getVal(fields, "sip.contact.uri.scheme"))
-	assert.Equal(t, common.NetString("test"), getVal(fields, "sip.contact.uri.username"))
+	assert.Equal(t, common.NetString("sipp"), getVal(fields, "sip.contact.uri.username"))
 	assert.Equal(t, 123, getVal(fields, "sip.content_length"))
 	assert.Equal(t, common.NetString("application/sdp"), getVal(fields, "sip.content_type"))
 	assert.Equal(t, 1, getVal(fields, "sip.cseq.code"))
@@ -190,7 +238,7 @@ func TestParseUDP(t *testing.T) {
 	assert.EqualValues(t, []common.NetString{common.NetString("SIP/2.0/UDP 10.0.2.20:5060;branch=z9hG4bK-2187-1-0")}, getVal(fields, "sip.via.original"))
 }
 
-func getVal(f beat.Event, k string) interface{} {
+func getVal(f beat.Event, k string) any {
 	v, _ := f.GetValue(k)
 	return v
 }

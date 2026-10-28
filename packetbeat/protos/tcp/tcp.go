@@ -87,7 +87,7 @@ func NewTCP(p protos.Protocols, id, device string, idx int, logger *logp.Logger)
 }
 
 //go:inline
-func (tcp *TCP) debugf(format string, args ...interface{}) {
+func (tcp *TCP) debugf(format string, args ...any) {
 	if tcp.isDebug {
 		tcp.logger.Debugf(format, args...)
 	}

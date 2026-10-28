@@ -45,7 +45,7 @@ import (
 func TestRunner(t *testing.T) {
 	pubClient, factory := newPubClientFactory()
 
-	config, err := conf.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]any{
 		"module":     moduleName,
 		"metricsets": []string{reportingFetcherName},
 	})
@@ -75,7 +75,7 @@ func TestRunner(t *testing.T) {
 func TestCPUDiagnostics(t *testing.T) {
 	pubClient, factory := newPubClientFactory()
 
-	config, err := conf.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]any{
 		"module":     "system",
 		"metricsets": []string{"cpu"},
 	})
@@ -163,7 +163,7 @@ func TestRunnerStop_ClientClosedAfterPublishGoroutine(t *testing.T) {
 		},
 	}
 
-	config, err := conf.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]any{
 		"module":     moduleName,
 		"metricsets": []string{pushMetricSetName},
 		"period":     "1s",

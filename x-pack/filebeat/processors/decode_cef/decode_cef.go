@@ -7,6 +7,7 @@ package decode_cef
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -227,14 +228,12 @@ func appendErrorMessage(m mapstr.M, msg string) error {
 			m.Put(field, []string{v, msg})
 		}
 	case []string:
-		for _, existingTag := range v {
-			if msg == existingTag {
-				// Duplicate
-				return nil
-			}
+		if slices.Contains(v, msg) {
+			// Duplicate
+			return nil
 		}
 		m.Put(field, append(v, msg))
-	case []interface{}:
+	case []any:
 		for _, existingTag := range v {
 			if msg == existingTag {
 				// Duplicate

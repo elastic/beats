@@ -934,10 +934,6 @@ Detailed zswap statistics from /sys/kernel/debug/zswap. Requires debugfs to be m
 
 ## network_summary [_network_summary]
 
-```{applies_to}
-stack: beta
-```
-
 Metrics relating to global network activity
 
 **`system.network_summary.ip.*`**
@@ -1142,6 +1138,14 @@ Memory-specific statistics per process.
 
 **`system.process.memory.swap`** {applies_to}`stack: ga 8.19.11`
 :   The swap memory used by the process (supported only on Linux kernel version 2.6.34+).
+
+    type: long
+
+    format: bytes
+
+
+**`system.process.memory.footprint`** {applies_to}`stack: ga 9.6.0`
+:   The physical memory footprint of the process, the value shown in the MEM column of top and the Memory column of Activity Monitor (supported only on macOS).
 
     type: long
 
@@ -1361,7 +1365,7 @@ cgroupv2 stats
 
 
 **`system.process.cgroup.cpu.stats.throttled.us`**
-:   The total time duration (in microseconds) for which tasks in a cgroup have been throttled, as reported by cgroupsv2
+:   The total time duration (in microseconds) for which tasks in a cgroup have been throttled.
 
     type: long
 
@@ -2298,10 +2302,6 @@ raid
 
 ## service [_service]
 
-```{applies_to}
-stack: beta
-```
-
 metrics for system services
 
 **`system.service.name`**
@@ -2655,10 +2655,6 @@ All UDP connections
 
 
 ## users [_users]
-
-```{applies_to}
-stack: beta
-```
 
 Logged-in user session data
 

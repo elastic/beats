@@ -41,8 +41,8 @@ func TestData(t *testing.T) {
 	mbtest.WriteEventToDataJSON(t, fullEvent, "")
 }
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
+func getConfig() map[string]any {
+	return map[string]any{
 		"module":   system.ModuleName,
 		"datasets": []string{"process"},
 
@@ -65,7 +65,7 @@ func TestProcessEvent(t *testing.T) {
 		assert.False(t, containsError)
 	}
 
-	expectedRootFields := map[string]interface{}{
+	expectedRootFields := map[string]any{
 		"event.kind":     "event",
 		"event.category": []string{"process"},
 		"event.type":     []string{"start"},

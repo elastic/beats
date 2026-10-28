@@ -28,12 +28,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// cleaner removes finished entries from the registry file.
-type cleaner struct {
-	log *logp.Logger
-}
-
-// run starts a loop that tries to clean entries from the registry.
+// runCleaner starts a loop that tries to clean entries from the registry.
 // The cleaner locks the store, such that no new states can be created
 // during the cleanup phase. Only resources that are finished and whose TTL
 // (clean_inactive setting) has expired will be removed.
@@ -45,14 +40,14 @@ type cleaner struct {
 // The event acquisition timestamp is used as reference to clean resources. If a resources was blocked
 // for a long time, and the lifetime has been exhausted, then the resource will be removed immediately
 // once the last event has been ACKed.
-func (c *cleaner) run(canceler unison.Canceler, store *store, interval time.Duration) {
+func runCleaner(logger *logp.Logger, canceler unison.Canceler, store *store, interval time.Duration) {
 	started := time.Now()
 	err := timed.Periodic(canceler, interval, func() error {
-		gcStore(c.log, started, store)
+		gcStore(logger, started, store)
 		return nil
 	})
 	if err != nil && !errors.Is(err, context.Canceled) {
-		c.log.Errorw("failed running periodic registry cleaning routine", "error", err)
+		logger.Errorw("failed running periodic registry cleaning routine", "error", err)
 	}
 }
 

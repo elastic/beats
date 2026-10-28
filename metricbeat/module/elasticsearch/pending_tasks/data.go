@@ -41,7 +41,7 @@ var (
 
 func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXpack bool) error {
 	tasksStruct := struct {
-		Tasks []map[string]interface{} `json:"tasks"`
+		Tasks []map[string]any `json:"tasks"`
 	}{}
 
 	err := json.Unmarshal(content, &tasksStruct)

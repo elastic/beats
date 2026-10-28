@@ -1,6 +1,6 @@
 - key: linux
   title: "Linux"
-  release: beta
+  release: ga
   description: >
     linux module
   fields:

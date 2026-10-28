@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package guess
 
@@ -137,7 +136,7 @@ func (g *guessInetSockFamily) Trigger() error {
 }
 
 // Extract scans the struct inet_sock* memory for the current address family value.
-func (g *guessInetSockFamily) Extract(event interface{}) (mapstr.M, bool) {
+func (g *guessInetSockFamily) Extract(event any) (mapstr.M, bool) {
 	raw := event.([]byte)
 	var expected [2]byte
 	var hits []int

@@ -63,7 +63,7 @@ var (
 )
 
 func eventMapping(content []byte) mapstr.M {
-	var data map[string]interface{}
+	var data map[string]any
 	json.Unmarshal(content, &data)
 	event, _ := schema.Apply(data)
 	return event

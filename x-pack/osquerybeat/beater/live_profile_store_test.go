@@ -22,13 +22,13 @@ func TestLiveProfileStoreEvictsAndDeletesFiles(t *testing.T) {
 	query1 := "select * from uptime"
 	query2 := "select * from osquery_info"
 
-	store.Record(query1, map[string]interface{}{"source": "live", "query": query1})
+	store.Record(query1, map[string]any{"source": "live", "query": query1})
 	file1 := filepath.Join(dir, liveProfileFilename(liveProfileKey(query1)))
 	if _, err := os.Stat(file1); err != nil {
 		t.Fatalf("expected profile file for query1, got error: %v", err)
 	}
 
-	store.Record(query2, map[string]interface{}{"source": "live", "query": query2})
+	store.Record(query2, map[string]any{"source": "live", "query": query2})
 	file2 := filepath.Join(dir, liveProfileFilename(liveProfileKey(query2)))
 	if _, err := os.Stat(file2); err != nil {
 		t.Fatalf("expected profile file for query2, got error: %v", err)

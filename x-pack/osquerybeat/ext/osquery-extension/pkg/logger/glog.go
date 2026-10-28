@@ -158,7 +158,7 @@ func (l *Logger) Info(msg string) {
 }
 
 // Infof logs a formatted informational message (only if verbose is enabled)
-func (l *Logger) Infof(format string, args ...interface{}) {
+func (l *Logger) Infof(format string, args ...any) {
 	l.log(LevelInfo, fmt.Sprintf(format, args...))
 }
 
@@ -168,7 +168,7 @@ func (l *Logger) Warning(msg string) {
 }
 
 // Warningf logs a formatted warning message
-func (l *Logger) Warningf(format string, args ...interface{}) {
+func (l *Logger) Warningf(format string, args ...any) {
 	l.log(LevelWarning, fmt.Sprintf(format, args...))
 }
 
@@ -178,7 +178,7 @@ func (l *Logger) Error(msg string) {
 }
 
 // Errorf logs a formatted error message
-func (l *Logger) Errorf(format string, args ...interface{}) {
+func (l *Logger) Errorf(format string, args ...any) {
 	l.log(LevelError, fmt.Sprintf(format, args...))
 }
 
@@ -189,7 +189,7 @@ func (l *Logger) Fatal(msg string) {
 }
 
 // Fatalf logs a formatted error message and exits
-func (l *Logger) Fatalf(format string, args ...interface{}) {
+func (l *Logger) Fatalf(format string, args ...any) {
 	l.log(LevelError, fmt.Sprintf(format, args...))
 	osExit(1)
 }

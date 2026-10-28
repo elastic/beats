@@ -1,0 +1,5 @@
+kind: bug-fix
+
+summary: Fix cursor inputs losing their saved position when two inputs start at the same time
+
+component: filebeat

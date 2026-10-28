@@ -15,18 +15,19 @@ import (
 
 // TestMinimalConfigRoundTrip verifies that every exported field of
 // ecokta.Config is represented in the localConf mirror inside
-// minimalProvider. It does this in two ways:
+// minimalConfig. It does this in two ways:
 //
 //  1. Field-count assertion — if ecokta.Config gains a field, the count
 //     check fails, forcing the developer to update localConf and this test.
-//  2. Functional round-trip — all fields are set to non-default sentinel
-//     values; the returned sync intervals must match, confirming that at
-//     least the duration fields are wired through end-to-end.
+//  2. Functional round-trip — the top-level fields are set to non-default
+//     sentinel values; the returned ecokta.Config must match them, which
+//     catches a field whose config tag is wrong. The oauth2 and request
+//     settings are not covered here.
 func TestMinimalConfigRoundTrip(t *testing.T) {
 	const wantFields = 12
-	if got := reflect.TypeOf(ecokta.Config{}).NumField(); got != wantFields {
+	if got := reflect.TypeFor[ecokta.Config]().NumField(); got != wantFields {
 		t.Fatalf("ecokta.Config has %d exported fields, want %d; "+
-			"update localConf inside minimalProvider and this test", got, wantFields)
+			"update localConf inside minimalConfig and this test", got, wantFields)
 	}
 
 	wantSync := 48 * time.Hour
@@ -57,6 +58,38 @@ func TestMinimalConfigRoundTrip(t *testing.T) {
 	}
 	if gotUpdate != wantUpdate {
 		t.Errorf("update_interval: got %v, want %v", gotUpdate, wantUpdate)
+	}
+
+	// The provider hides its config, so check the mapping directly. A
+	// field with a wrong struct tag is silently dropped by ucfg and would
+	// otherwise only show up as a default value at run time.
+	got, _, err := minimalConfig(cfg)
+	if err != nil {
+		t.Fatalf("minimalConfig returned unexpected error: %v", err)
+	}
+	want := ecokta.Config{
+		Domain:         "test.okta.com",
+		Token:          "test-token",
+		Dataset:        "users",
+		EnrichWith:     []string{"groups", "factors"},
+		BatchSize:      100,
+		SyncInterval:   wantSync,
+		UpdateInterval: wantUpdate,
+		IDSetShards:    32,
+		LimitWindow:    2 * time.Minute,
+		ScratchDir:     scratchDir,
+	}
+	// Compare the pointer field by value so a mismatch is readable, then
+	// clear it for the whole-struct comparison.
+	switch {
+	case got.LimitFixed == nil:
+		t.Errorf("limit_fixed: got nil, want %d", limitFixed)
+	case *got.LimitFixed != limitFixed:
+		t.Errorf("limit_fixed: got %d, want %d", *got.LimitFixed, limitFixed)
+	}
+	got.LimitFixed = nil
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("minimalConfig() = %+v; want %+v", got, want)
 	}
 }
 

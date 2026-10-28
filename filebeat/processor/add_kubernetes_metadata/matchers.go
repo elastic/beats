@@ -20,6 +20,7 @@ package add_kubernetes_metadata
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"runtime"
 	"strings"
 
@@ -78,63 +79,99 @@ func newLogsPathMatcher(cfg conf.C, log *logp.Logger) (add_kubernetes_metadata.M
 	return &LogPathMatcher{LogsPath: logPath, ResourceType: resourceType, logger: log}, nil
 }
 
+// podLogFileRegexp matches kubelet pod log file names: the live file (<n>.log) and its
+// rotated forms (<n>.log.<yyyymmdd-hhmmss>, optionally compressed with .gz).
+// see https://github.com/kubernetes/kubernetes/blob/c16ce23e957dd82f106b73e8f4c9847a4eefd863/pkg/kubelet/logs/container_log_manager.go#L45
+var podLogFileRegexp = regexp.MustCompile(`^(\d+)\.log(?:\.\d{8}-\d{6})?(?:\.gz)?$`)
+
 // Docker container ID is a 64-character-long hexadecimal string
 const containerIdLen = 64
 
-func (f *LogPathMatcher) MetadataIndex(event mapstr.M) string {
+func (f *LogPathMatcher) MetadataIndexCandidates(event mapstr.M) []string {
 	value, err := event.GetValue("log.file.path")
 	if err != nil {
 		f.logger.Debugf("Error extracting log.file.path from the event: %s.", event)
-		return ""
+		return nil
 	}
 
 	source, ok := value.(string)
 	if !ok {
 		f.logger.Debugf("Error extracting log.file.path from the event: value is not a string.")
-		return ""
+		return nil
 	}
 	f.logger.Debugf("Incoming log.file.path value: %s", source)
 
-	if !strings.Contains(source, f.LogsPath) {
-		f.logger.Debugf("log.file.path value does not contain matcher's logs_path '%s', skipping...", f.LogsPath)
-		return ""
+	if !strings.HasPrefix(source, f.LogsPath) {
+		f.logger.Debugf("log.file.path value does not have matcher's logs_path '%s' as a prefix, skipping...", f.LogsPath)
+		return nil
 	}
 
 	sourceLen := len(source)
 	logsPathLen := len(f.LogsPath)
 
 	if f.ResourceType == "pod" {
-		// Pod resource type will extract only the pod UID, which offers less granularity of metadata when compared to the container ID
-		if strings.Contains(source, ".log") && !strings.HasSuffix(source, ".gz") {
+		// Check the basename only — a namespace like "corp.logging" would otherwise trigger
+		// this guard. strings.Contains (not HasSuffix) handles rotated names like 0.log.20220221.
+		basename := source[strings.LastIndex(source, pathSeparator)+1:]
+		if strings.Contains(basename, ".log") {
 			// Specify a pod resource type when writing logs into manually mounted log volume,
-			// those logs apper under under "/var/lib/kubelet/pods/<pod_id>/volumes/..."
+			// those logs appear under "/var/lib/kubelet/pods/<pod_id>/volumes/..."
 			if strings.HasPrefix(f.LogsPath, podKubeletLogsPath()) {
 				pathDirs := strings.Split(source, pathSeparator)
 				podUIDPos := 5
 				if len(pathDirs) > podUIDPos {
-					podUID := strings.Split(source, pathSeparator)[podUIDPos]
+					podUID := pathDirs[podUIDPos]
 					f.logger.Debugf("Using pod uid: %s", podUID)
-					return podUID
+					return []string{podUID}
 				}
 			}
 			// In case of the Kubernetes log path "/var/log/pods/",
-			// the pod ID will be extracted from the directory name,
-			// file name example: "/var/log/pods/'<namespace>_<pod_name>_<pod_uid>'/container_name/0.log".
+			// the pod UID is extracted from the directory name and the container name and
+			// restart count from the subsequent path segments.
+			// file name example: "/var/log/pods/<namespace>_<pod_name>_<pod_uid>/<container_name>/<restart_count>.log"
 			if strings.HasPrefix(f.LogsPath, podLogsPath()) {
 				pathDirs := strings.Split(source, pathSeparator)
+				// pathDirs: ["", "var", "log", "pods", "<ns>_<pod>_<uid>", "<container>", "<n>.log"]
+				//                  0     1     2      3          4               5              6
 				podUIDPos := 4
 				if len(pathDirs) > podUIDPos {
-					podUID := strings.Split(pathDirs[podUIDPos], "_")
-					if len(podUID) > 2 {
-						f.logger.Debugf("Using pod uid: %s", podUID[2])
-						return podUID[2]
+					uidParts := strings.Split(pathDirs[podUIDPos], "_")
+					if len(uidParts) > 2 {
+						podUID := uidParts[len(uidParts)-1]
+						f.logger.Debugf("Using pod uid: %s", podUID)
+
+						if len(pathDirs) > podUIDPos+1 {
+							containerName := pathDirs[podUIDPos+1]
+							containerIndex := podUID + "/" + containerName
+							if len(pathDirs) > podUIDPos+2 {
+								// Match <n>.log, optionally with a rotation timestamp (<n>.log.20220221-210912)
+								// and/or a .gz suffix. The anchored regex also guards against digit
+								// directory segments (e.g. container/3/real.log).
+								// MatchString plus slicing avoids the allocation FindStringSubmatch makes.
+								// The regexp is anchored on <digits>.log, so the first '.' ends the restart count.
+								if filename := pathDirs[podUIDPos+2]; podLogFileRegexp.MatchString(filename) {
+									logName := filename[:strings.IndexByte(filename, '.')]
+									f.logger.Debugf("Using pod uid/container/restart: %s/%s/%s", podUID, containerName, logName)
+									return []string{
+										containerIndex + "/" + logName,
+										containerIndex,
+										podUID,
+									}
+								}
+							}
+							f.logger.Debugf("Using pod uid/container: %s/%s", podUID, containerName)
+							return []string{containerIndex, podUID}
+						}
+						return []string{podUID}
 					}
 				}
 			}
 
-			f.logger.Error("Error extracting pod UID - source value does not contain matcher's logs_path")
-			return ""
+			f.logger.Errorf("Error extracting pod UID from '%s': configured logs_path '%s' does not match a known Kubernetes pod log directory (/var/log/pods/ or /var/lib/kubelet/pods/)", source, f.LogsPath)
+			return nil
 		}
+		// Source filename has no .log extension — silently drop.
+		return nil
 	} else {
 		// In case of the Kubernetes log path "/var/log/containers/",
 		// the container ID will be located right before the ".log" extension.
@@ -143,7 +180,7 @@ func (f *LogPathMatcher) MetadataIndex(event mapstr.M) string {
 			containerIDEnd := sourceLen - 4
 			cid := source[containerIDEnd-containerIdLen : containerIDEnd]
 			f.logger.Debugf("Using container id: %s", cid)
-			return cid
+			return []string{cid}
 		}
 
 		// In any other case, we assume the container ID will follow right after the log path.
@@ -153,11 +190,11 @@ func (f *LogPathMatcher) MetadataIndex(event mapstr.M) string {
 		if sourceLen >= logsPathLen+containerIdLen {
 			cid := source[logsPathLen : logsPathLen+containerIdLen]
 			f.logger.Debugf("Using container id: %s", cid)
-			return cid
+			return []string{cid}
 		}
 	}
 	f.logger.Error("Error extracting container id - source value contains matcher's logs_path, however it is too short to contain a Docker container ID.")
-	return ""
+	return nil
 }
 
 func defaultLogPath() string {

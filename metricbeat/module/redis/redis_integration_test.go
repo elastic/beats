@@ -111,20 +111,20 @@ func TestFetchKeyInfo(t *testing.T) {
 		Title    string
 		Key      string
 		Command  string
-		Value    []interface{}
+		Value    []any
 		Expire   uint
-		Expected map[string]interface{}
+		Expected map[string]any
 	}{
 		{
 			Title:   "plain string",
 			Key:     "string-key",
 			Command: "SET",
-			Value:   []interface{}{"foo"},
-			Expected: map[string]interface{}{
+			Value:   []any{"foo"},
+			Expected: map[string]any{
 				"name":   "string-key",
 				"type":   "string",
 				"length": int64(3),
-				"expire": map[string]interface{}{
+				"expire": map[string]any{
 					"ttl": int64(-1),
 				},
 			},
@@ -133,13 +133,13 @@ func TestFetchKeyInfo(t *testing.T) {
 			Title:   "plain string with TTL",
 			Key:     "string-key",
 			Command: "SET",
-			Value:   []interface{}{"foo"},
+			Value:   []any{"foo"},
 			Expire:  60,
-			Expected: map[string]interface{}{
+			Expected: map[string]any{
 				"name":   "string-key",
 				"type":   "string",
 				"length": int64(3),
-				"expire": map[string]interface{}{
+				"expire": map[string]any{
 					"ttl": int64(60),
 				},
 			},
@@ -148,12 +148,12 @@ func TestFetchKeyInfo(t *testing.T) {
 			Title:   "list",
 			Key:     "list-key",
 			Command: "LPUSH",
-			Value:   []interface{}{"foo", "bar"},
-			Expected: map[string]interface{}{
+			Value:   []any{"foo", "bar"},
+			Expected: map[string]any{
 				"name":   "list-key",
 				"type":   "list",
 				"length": int64(2),
-				"expire": map[string]interface{}{
+				"expire": map[string]any{
 					"ttl": int64(-1),
 				},
 			},
@@ -162,12 +162,12 @@ func TestFetchKeyInfo(t *testing.T) {
 			Title:   "set",
 			Key:     "set-key",
 			Command: "SADD",
-			Value:   []interface{}{"foo", "bar"},
-			Expected: map[string]interface{}{
+			Value:   []any{"foo", "bar"},
+			Expected: map[string]any{
 				"name":   "set-key",
 				"type":   "set",
 				"length": int64(2),
-				"expire": map[string]interface{}{
+				"expire": map[string]any{
 					"ttl": int64(-1),
 				},
 			},
@@ -176,12 +176,12 @@ func TestFetchKeyInfo(t *testing.T) {
 			Title:   "sorted set",
 			Key:     "sorted-set-key",
 			Command: "ZADD",
-			Value:   []interface{}{1, "foo", 2, "bar"},
-			Expected: map[string]interface{}{
+			Value:   []any{1, "foo", 2, "bar"},
+			Expected: map[string]any{
 				"name":   "sorted-set-key",
 				"type":   "zset",
 				"length": int64(2),
-				"expire": map[string]interface{}{
+				"expire": map[string]any{
 					"ttl": int64(-1),
 				},
 			},
@@ -190,12 +190,12 @@ func TestFetchKeyInfo(t *testing.T) {
 			Title:   "hash",
 			Key:     "hash-key",
 			Command: "HSET",
-			Value:   []interface{}{"foo", "bar"},
-			Expected: map[string]interface{}{
+			Value:   []any{"foo", "bar"},
+			Expected: map[string]any{
 				"name":   "hash-key",
 				"type":   "hash",
 				"length": int64(1),
-				"expire": map[string]interface{}{
+				"expire": map[string]any{
 					"ttl": int64(-1),
 				},
 			},
@@ -204,7 +204,7 @@ func TestFetchKeyInfo(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.Title, func(t *testing.T) {
-			args := append([]interface{}{c.Key}, c.Value...)
+			args := append([]any{c.Key}, c.Value...)
 			conn.Do(c.Command, args...)
 			defer conn.Do("DEL", c.Key)
 			if c.Expire > 0 {

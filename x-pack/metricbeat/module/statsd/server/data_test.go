@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -281,8 +281,8 @@ func TestEventMapping(t *testing.T) {
 	var mappings []StatsdMapping
 	_ = yaml.Unmarshal([]byte(mappingsYml), &mappings)
 
-	countValue := map[string]interface{}{"count": 4}
-	timerValue := map[string]interface{}{
+	countValue := map[string]any{"count": 4}
+	timerValue := map[string]any{
 		"stddev":    0,
 		"p99_9":     100,
 		"mean_rate": 0.2689038235718098,
@@ -299,11 +299,11 @@ func TestEventMapping(t *testing.T) {
 		"15m_rate":  0.2,
 	}
 
-	gaugeValue := map[string]interface{}{"value": 2}
+	gaugeValue := map[string]any{"value": 2}
 
 	for _, test := range []struct {
 		metricName  string
-		metricValue interface{}
+		metricValue any
 		expected    mapstr.M
 	}{
 		{
@@ -1145,7 +1145,7 @@ func process(packets []string, ms *MetricSet) error {
 }
 
 func TestTagsGrouping(t *testing.T) {
-	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	ms := mbtest.NewMetricSet(t, map[string]any{"module": "statsd"}).(*MetricSet)
 	testData := []string{
 		"metric1:1.0|g|#k1:v1,k2:v2",
 		"metric2:2|c|#k1:v1,k2:v2",
@@ -1203,7 +1203,7 @@ func TestTagsGrouping(t *testing.T) {
 }
 
 func TestTagsCleanup(t *testing.T) {
-	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd", "ttl": "1s"}).(*MetricSet)
+	ms := mbtest.NewMetricSet(t, map[string]any{"module": "statsd", "ttl": "1s"}).(*MetricSet)
 	testData := []string{
 		"metric1:1|g|#k1:v1,k2:v2",
 
@@ -1231,11 +1231,11 @@ func TestTagsCleanup(t *testing.T) {
 	events := ms.getEvents()
 	assert.Len(t, events, 1)
 
-	assert.Equal(t, events[0].MetricSetFields, mapstr.M{"metric1": map[string]interface{}{"value": float64(3)}})
+	assert.Equal(t, events[0].MetricSetFields, mapstr.M{"metric1": map[string]any{"value": float64(3)}})
 }
 
 func TestSetReset(t *testing.T) {
-	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd", "ttl": "1s"}).(*MetricSet)
+	ms := mbtest.NewMetricSet(t, map[string]any{"module": "statsd", "ttl": "1s"}).(*MetricSet)
 	testData := []string{
 		"metric1:hello|s|#k1:v1,k2:v2",
 		"metric1:again|s|#k1:v1,k2:v2",
@@ -1246,14 +1246,14 @@ func TestSetReset(t *testing.T) {
 	events := ms.getEvents()
 	require.Len(t, events, 1)
 
-	assert.Equal(t, 2, events[0].MetricSetFields["metric1"].(map[string]interface{})["count"])
+	assert.Equal(t, 2, events[0].MetricSetFields["metric1"].(map[string]any)["count"])
 
 	events = ms.getEvents()
-	assert.Equal(t, 0, events[0].MetricSetFields["metric1"].(map[string]interface{})["count"])
+	assert.Equal(t, 0, events[0].MetricSetFields["metric1"].(map[string]any)["count"])
 }
 
 func TestData(t *testing.T) {
-	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	ms := mbtest.NewMetricSet(t, map[string]any{"module": "statsd"}).(*MetricSet)
 	testData := []string{
 		"metric01:1.0|g|#k1:v1,k2:v2",
 		"metric02:2|c|#k1:v1,k2:v2",
@@ -1278,7 +1278,7 @@ func TestData(t *testing.T) {
 }
 
 func TestGaugeDeltas(t *testing.T) {
-	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	ms := mbtest.NewMetricSet(t, map[string]any{"module": "statsd"}).(*MetricSet)
 	testData := []string{
 		"metric01:1.0|g|#k1:v1,k2:v2",
 		"metric01:-2.0|g|#k1:v1,k2:v2",
@@ -1290,7 +1290,7 @@ func TestGaugeDeltas(t *testing.T) {
 	assert.Len(t, events, 1)
 
 	assert.Equal(t, events[0].MetricSetFields, mapstr.M{
-		"metric01": map[string]interface{}{"value": -1.0},
+		"metric01": map[string]any{"value": -1.0},
 	})
 
 	// same value reported again
@@ -1298,12 +1298,12 @@ func TestGaugeDeltas(t *testing.T) {
 	assert.Len(t, events, 1)
 
 	assert.Equal(t, events[0].MetricSetFields, mapstr.M{
-		"metric01": map[string]interface{}{"value": -1.0},
+		"metric01": map[string]any{"value": -1.0},
 	})
 }
 
 func TestCounter(t *testing.T) {
-	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	ms := mbtest.NewMetricSet(t, map[string]any{"module": "statsd"}).(*MetricSet)
 	testData := []string{
 		"metric01:1|c|#k1:v1,k2:v2",
 		"metric01:2|c|#k1:v1,k2:v2",
@@ -1315,7 +1315,7 @@ func TestCounter(t *testing.T) {
 	assert.Len(t, events, 1)
 
 	assert.Equal(t, events[0].MetricSetFields, mapstr.M{
-		"metric01": map[string]interface{}{"count": int64(3)},
+		"metric01": map[string]any{"count": int64(3)},
 	})
 
 	// reset
@@ -1323,12 +1323,12 @@ func TestCounter(t *testing.T) {
 	assert.Len(t, events, 1)
 
 	assert.Equal(t, events[0].MetricSetFields, mapstr.M{
-		"metric01": map[string]interface{}{"count": int64(0)},
+		"metric01": map[string]any{"count": int64(0)},
 	})
 }
 
 func TestCounterSampled(t *testing.T) {
-	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	ms := mbtest.NewMetricSet(t, map[string]any{"module": "statsd"}).(*MetricSet)
 	testData := []string{
 		"metric01:1|c|@0.1",
 		"metric01:2|c|@0.2",
@@ -1340,12 +1340,12 @@ func TestCounterSampled(t *testing.T) {
 	assert.Len(t, events, 1)
 
 	assert.Equal(t, events[0].MetricSetFields, mapstr.M{
-		"metric01": map[string]interface{}{"count": int64(20)},
+		"metric01": map[string]any{"count": int64(20)},
 	})
 }
 
 func TestCounterSampledZero(t *testing.T) {
-	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	ms := mbtest.NewMetricSet(t, map[string]any{"module": "statsd"}).(*MetricSet)
 	testData := []string{
 		"metric01:1|c|@0.0",
 	}
@@ -1357,7 +1357,7 @@ func TestCounterSampledZero(t *testing.T) {
 }
 
 func TestTimerSampled(t *testing.T) {
-	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	ms := mbtest.NewMetricSet(t, map[string]any{"module": "statsd"}).(*MetricSet)
 	testData := []string{
 		"metric01:2|ms|@0.01",
 		"metric01:1|ms|@0.1",
@@ -1375,7 +1375,7 @@ func TestTimerSampled(t *testing.T) {
 	events := ms.getEvents()
 	assert.Len(t, events, 1)
 
-	actualMetric01 := events[0].MetricSetFields["metric01"].(map[string]interface{})
+	actualMetric01 := events[0].MetricSetFields["metric01"].(map[string]any)
 
 	// returns the extrapolated count
 	assert.Equal(t, int64(116), actualMetric01["count"])
@@ -1387,8 +1387,152 @@ func TestTimerSampled(t *testing.T) {
 	assert.True(t, actualMetric01["15m_rate"].(float64) > 10)
 }
 
+// newStatsdMetricSet builds the statsd server metricset for a test.
+func newStatsdMetricSet(t *testing.T, config map[string]any) *MetricSet {
+	t.Helper()
+	ms, ok := mbtest.NewMetricSet(t, config).(*MetricSet)
+	require.True(t, ok, "the statsd module must build a *MetricSet")
+	return ms
+}
+
+// metricValues returns the values reported for a single metric.
+func metricValues(t *testing.T, fields mapstr.M, name string) map[string]any {
+	t.Helper()
+	values, ok := fields[name].(map[string]any)
+	require.True(t, ok, "metric %q must be reported as a map of values, got %#v", name, fields[name])
+	return values
+}
+
+func TestTimerReset(t *testing.T) {
+	ms := newStatsdMetricSet(t, map[string]any{"module": "statsd"})
+
+	err := process([]string{"metric01:2|ms", "metric01:4|ms"}, ms)
+	require.NoError(t, err, "the timer packets must be accepted")
+
+	events := ms.getEvents()
+	require.Len(t, events, 1, "the timer received measurements, so it must be reported")
+
+	actual := metricValues(t, events[0].MetricSetFields, "metric01")
+	assert.Equal(t, int64(2), actual["count"], "both measurements of the first interval must be counted")
+	assert.Equal(t, int64(2), actual["min"], "min must be the smallest measurement of the first interval")
+	assert.Equal(t, int64(4), actual["max"], "max must be the largest measurement of the first interval")
+	assert.InDelta(t, 3.0, actual["mean"], 0.001, "mean must average the measurements of the first interval")
+
+	err = process([]string{"metric01:10|ms"}, ms)
+	require.NoError(t, err, "the timer packet of the second interval must be accepted")
+
+	events = ms.getEvents()
+	require.Len(t, events, 1, "the timer received a new measurement, so it must be reported again")
+
+	actual = metricValues(t, events[0].MetricSetFields, "metric01")
+	assert.Equal(t, int64(1), actual["count"], "count must restart from the second interval instead of accumulating the first")
+	assert.Equal(t, int64(10), actual["min"], "min must forget the measurements of the first interval")
+	assert.Equal(t, int64(10), actual["max"], "max must forget the measurements of the first interval")
+	assert.InDelta(t, 10.0, actual["mean"], 0.001, "mean must average only the second interval")
+
+	meanRate, ok := actual["mean_rate"].(float64)
+	require.True(t, ok, "mean_rate must be reported as a float64, got %#v", actual["mean_rate"])
+	assert.Positive(t, meanRate, "the moving average rates span fixed time windows and must survive the reset")
+
+	assert.Empty(t, ms.getEvents(), "a timer that received no new measurements must not be reported")
+	assert.Equal(t, int64(3), ms.processor.registry.GetOrNewTimer("metric01", nil).meter.Count(),
+		"the timer must stay in the registry across the idle flush and its meter must keep its cumulative count")
+}
+
+func TestTimerSampledReset(t *testing.T) {
+	ms := newStatsdMetricSet(t, map[string]any{"module": "statsd"})
+
+	err := process([]string{"metric01:2|ms|@0.1"}, ms)
+	require.NoError(t, err, "the sampled timer packet must be accepted")
+
+	events := ms.getEvents()
+	require.Len(t, events, 1, "the sampled timer received a measurement, so it must be reported")
+	assert.Equal(t, int64(10), metricValues(t, events[0].MetricSetFields, "metric01")["count"],
+		"count must be extrapolated from the 0.1 sample rate")
+
+	err = process([]string{"metric01:2|ms|@0.5"}, ms)
+	require.NoError(t, err, "the sampled timer packet of the second interval must be accepted")
+
+	events = ms.getEvents()
+	require.Len(t, events, 1, "the sampled timer received a new measurement, so it must be reported again")
+	assert.Equal(t, int64(2), metricValues(t, events[0].MetricSetFields, "metric01")["count"],
+		"the extrapolated count must restart from the second interval instead of adding to the previous 10")
+}
+
+// TestTimerSampleRateAboveOne covers a sample rate above one, for which the
+// extrapolated count rounds down to zero. The measurement was still recorded,
+// so the timer must still be reported.
+func TestTimerSampleRateAboveOne(t *testing.T) {
+	ms := newStatsdMetricSet(t, map[string]any{"module": "statsd"})
+
+	err := process([]string{"metric01:2|ms|@2"}, ms)
+	require.NoError(t, err, "a sample rate above one is accepted, only a rate of zero or less is rejected")
+
+	events := ms.getEvents()
+	require.Len(t, events, 1, "the timer recorded a measurement, so it must be reported even though 1/2 truncates its count to zero")
+
+	actual := metricValues(t, events[0].MetricSetFields, "metric01")
+	assert.Equal(t, int64(0), actual["count"], "the extrapolated count must be 1/2 truncated to zero")
+	assert.Equal(t, int64(2), actual["min"], "min must come from the recorded measurement")
+	assert.Equal(t, int64(2), actual["max"], "max must come from the recorded measurement")
+
+	// nothing new arrived, so the next flush skips the timer again
+	assert.Empty(t, ms.getEvents(), "an idle timer must not be reported on the following flush")
+}
+
+func TestHistogramReset(t *testing.T) {
+	ms := newStatsdMetricSet(t, map[string]any{"module": "statsd"})
+
+	err := process([]string{"metric01:2|h", "metric01:4|h"}, ms)
+	require.NoError(t, err, "the histogram packets must be accepted")
+
+	events := ms.getEvents()
+	require.Len(t, events, 1, "the histogram received measurements, so it must be reported")
+
+	actual := metricValues(t, events[0].MetricSetFields, "metric01")
+	assert.Equal(t, int64(2), actual["count"], "both measurements of the first interval must be counted")
+	assert.Equal(t, int64(2), actual["min"], "min must be the smallest measurement of the first interval")
+	assert.Equal(t, int64(4), actual["max"], "max must be the largest measurement of the first interval")
+	assert.InDelta(t, 3.0, actual["mean"], 0.001, "mean must average the measurements of the first interval")
+
+	err = process([]string{"metric01:10|h"}, ms)
+	require.NoError(t, err, "the histogram packet of the second interval must be accepted")
+
+	events = ms.getEvents()
+	require.Len(t, events, 1, "the histogram received a new measurement, so it must be reported again")
+
+	actual = metricValues(t, events[0].MetricSetFields, "metric01")
+	assert.Equal(t, int64(1), actual["count"], "count must restart from the second interval instead of accumulating the first")
+	assert.Equal(t, int64(10), actual["min"], "min must forget the measurements of the first interval")
+	assert.Equal(t, int64(10), actual["max"], "max must forget the measurements of the first interval")
+	assert.InDelta(t, 10.0, actual["mean"], 0.001, "mean must average only the second interval")
+
+	histogram := ms.processor.registry.GetOrNewHistogram("metric01", nil)
+	assert.Empty(t, ms.getEvents(), "a histogram that received no new measurements must not be reported")
+	assert.Same(t, histogram, ms.processor.registry.GetOrNewHistogram("metric01", nil),
+		"the histogram must stay in the registry across the idle flush")
+}
+
+// TestIdleTimerDoesNotMaskOtherMetrics makes sure that an idle timer is skipped
+// without dropping the metrics it shares a tag group with.
+func TestIdleTimerDoesNotMaskOtherMetrics(t *testing.T) {
+	ms := newStatsdMetricSet(t, map[string]any{"module": "statsd"})
+
+	err := process([]string{"metric01:2|ms|#k1:v1", "metric02:1.0|g|#k1:v1"}, ms)
+	require.NoError(t, err, "the timer and gauge packets must be accepted")
+
+	events := ms.getEvents()
+	require.Len(t, events, 2, "the timer and the gauge of the tag group must each be reported")
+
+	events = ms.getEvents()
+	require.Len(t, events, 1, "the gauge must still be reported once the timer goes idle, skipping the timer must not drop its tag group")
+	assert.NotContains(t, events[0].MetricSetFields, "metric01", "the idle timer must not be reported")
+	assert.InDelta(t, 1.0, metricValues(t, events[0].MetricSetFields, "metric02")["value"], 0.001,
+		"the gauge must keep reporting its value, it is not scoped to a flush interval")
+}
+
 func TestChangeType(t *testing.T) {
-	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	ms := mbtest.NewMetricSet(t, map[string]any{"module": "statsd"}).(*MetricSet)
 	testData := []string{
 		"metric01:1|ms",
 		"metric01:2|c",
@@ -1400,7 +1544,7 @@ func TestChangeType(t *testing.T) {
 	assert.Len(t, events, 1)
 
 	assert.Equal(t, mapstr.M{
-		"metric01": map[string]interface{}{"count": int64(2)},
+		"metric01": map[string]any{"count": int64(2)},
 	}, events[0].MetricSetFields)
 }
 
@@ -1430,7 +1574,7 @@ func BenchmarkIngest(b *testing.B) {
 			},
 		}
 	}
-	ms := mbtest.NewMetricSet(b, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	ms := mbtest.NewMetricSet(b, map[string]any{"module": "statsd"}).(*MetricSet)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
