@@ -129,13 +129,7 @@ func runCmd(
 	stdinStr *string,
 	params func() map[string]interface{},
 	filterJourneys FilterJourneyConfig,
-<<<<<<< HEAD
-) (mpx *ExecMultiplexer, err error) {
-=======
-	sFields stdfields.StdMonitorFields,
-	traceID string,
 ) (_ *ExecMultiplexer, err error) {
->>>>>>> 821662f (x-pack/heartbeat/synthexec: fix pipe race and start-failure leaks (#52405))
 	// Attach sysproc attrs to ensure subprocesses are properly killed
 	platformCmdMutate(cmd)
 
@@ -192,10 +186,6 @@ func runCmd(
 	if err != nil {
 		return nil, fmt.Errorf("could not open stdout pipe: %w", err)
 	}
-<<<<<<< HEAD
-	wg.Add(1)
-	go func() {
-=======
 	stderrPipe, err := cmd.StderrPipe()
 	if err != nil {
 		return nil, fmt.Errorf("could not open stderr pipe: %w", err)
@@ -205,28 +195,17 @@ func runCmd(
 	// the command exits, losing anything not read yet. A failed cmd.Start
 	// closes them too, so these scanners return without being waited on.
 	var wg sync.WaitGroup
-	wg.Go(func() {
->>>>>>> 821662f (x-pack/heartbeat/synthexec: fix pipe race and start-failure leaks (#52405))
+	wg.Add(1)
+	go func() {
 		err := scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
 		if err != nil {
 			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
 			logp.L().Warnf("could not scan stdout events from synthetics: %s", err)
 		}
-<<<<<<< HEAD
-
 		wg.Done()
 	}()
-
-	stderrPipe, err := cmd.StderrPipe()
-	if err != nil {
-		return nil, fmt.Errorf("could not open stderr pipe: %w", err)
-	}
 	wg.Add(1)
 	go func() {
-=======
-	})
-	wg.Go(func() {
->>>>>>> 821662f (x-pack/heartbeat/synthexec: fix pipe race and start-failure leaks (#52405))
 		err := scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)
 		if err != nil {
 			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
@@ -235,11 +214,6 @@ func runCmd(
 		wg.Done()
 	}()
 
-<<<<<<< HEAD
-	// Send the test results into the output
-	wg.Add(1)
-	go func() {
-=======
 	// This use of channels for results is awkward, but required for the thread locking below
 	cmdStarted := make(chan error)
 	cmdDone := make(chan error)
@@ -266,8 +240,8 @@ func runCmd(
 
 	// The results reader closes jsonReader, which cmd.Start reads as one of
 	// the ExtraFiles, so it starts only once cmd.Start has returned.
-	wg.Go(func() {
->>>>>>> 821662f (x-pack/heartbeat/synthexec: fix pipe race and start-failure leaks (#52405))
+	wg.Add(1)
+	go func() {
 		defer jsonReader.Close()
 
 		// We don't use scanToSynthEvents here because all lines here will be JSON
@@ -286,13 +260,8 @@ func runCmd(
 
 			mpx.writeSynthEvent(&se)
 		}
-<<<<<<< HEAD
-
 		wg.Done()
 	}()
-=======
-	})
->>>>>>> 821662f (x-pack/heartbeat/synthexec: fix pipe race and start-failure leaks (#52405))
 
 	// Get timeout from parent ctx
 	timeout, _ := ctx.Value(SynthexecTimeoutKey).(time.Duration)
