@@ -60,7 +60,6 @@ func getSymbolInfoRuntime(symbolName string) (runtimeSymbolInfo, error) {
 // symbol names never count as optimised variants.
 func getSymbolInfoFromReader(reader io.Reader, symbolName string) (runtimeSymbolInfo, error) {
 	fileScanner := bufio.NewScanner(reader)
-	fileScanner.Split(bufio.ScanLines)
 
 	// optimised symbols start with the unoptimised symbol name
 	// followed by ".{optimisation_type}..."
