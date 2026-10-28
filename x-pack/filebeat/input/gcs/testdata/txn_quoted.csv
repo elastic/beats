@@ -1,0 +1,3 @@
+date,time,content-type,response-type,host,category
+2020-01-01,00:00:00,"text/plain; charset=""us-ascii""","multipart/mixed; boundary=""gc0p4Jq0M2Yt08jU534c0p""",test.invalid,demo
+2020-01-02,12:30:00,application/json,application/json,example.invalid,demo
