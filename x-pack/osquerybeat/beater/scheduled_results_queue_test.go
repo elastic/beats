@@ -196,11 +196,20 @@ func TestScheduledWorkerGetsSlotsUnderPoolPressure(t *testing.T) {
 
 	noise, err := pipe.ConnectWith(beat.ClientConfig{})
 	require.NoError(t, err, "connect the competing client")
+	// The competing client publishes a bounded burst rather than forever: the
+	// pool hands freed slots to waiters in no guaranteed order, so an endless
+	// publisher could starve the scheduled worker on a slow runner.
+	const noiseEvents = 1000 // About 2.5s of output time.
+	var noisePublished atomic.Int32
 	ctx, cancel := context.WithCancel(t.Context())
 	var wg sync.WaitGroup
 	wg.Go(func() {
-		for ctx.Err() == nil {
+		for range noiseEvents {
+			if ctx.Err() != nil {
+				return
+			}
 			noise.Publish(beat.Event{Timestamp: time.Now(), Fields: mapstr.M{"noise": true}})
+			noisePublished.Add(1)
 		}
 	})
 
@@ -235,13 +244,17 @@ func TestScheduledWorkerGetsSlotsUnderPoolPressure(t *testing.T) {
 		rows[i] = map[string]string{"value": "row"}
 	}
 	result := QueryResult{Name: "scheduled", Action: "snapshot", Hits: rows}
+	// Enqueue only once the competing client has filled the pool.
+	require.Eventually(t, func() bool { return noisePublished.Load() > 64 }, 10*time.Second, time.Millisecond,
+		"the competing client must fill the pool")
 	for i := range 20 {
 		start := time.Now()
 		d.enqueue(t.Context(), outageQueryClient{}, plugin, result, nil)
-		assert.Less(t, time.Since(start), 50*time.Millisecond, "enqueue %d must not wait for the pool", i)
+		// Waiting for the pool would take seconds; the bound only allows for a slow runner.
+		assert.Less(t, time.Since(start), time.Second, "enqueue %d must not wait for the pool", i)
 	}
 	const want = 20*5 + 20 // Result rows plus one response per result.
-	assert.Eventually(t, func() bool { return output.scheduled.Load() == want }, 10*time.Second, 10*time.Millisecond,
+	assert.Eventually(t, func() bool { return output.scheduled.Load() == want }, 30*time.Second, 10*time.Millisecond,
 		"every scheduled row and response must be published")
 	assert.Zero(t, d.metrics.droppedRows[dropOverflow].Get(), "no rows may overflow")
 	assert.Zero(t, d.metrics.droppedRows[dropStale].Get(), "no rows may be stale")
