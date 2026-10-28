@@ -7,12 +7,15 @@ startup configurations are not retried indefinitely. Existing broken-pipe,
 connection-reset, EOF, extension watchdog and network timeout failures use the
 same bounded recovery policy.
 
-The initial run may be followed by five replacement attempts. The delays are
-1, 2, 4, 8, and 16 seconds; exponential backoff has a 30-second upper bound.
-The restart budget and delay reset only after a process has remained ready for
-five minutes. Merely fetching configuration, or repeatedly changing policy,
-does not reset the budget. Persistent failures exhaust it. As an OTel receiver,
-osquerybeat then reports FAILED until the receiver or Agent is restarted. On the
+At most five restarts may happen within any five minutes. Each restart waits
+1 second, doubled for every earlier restart still within the last five minutes,
+so a crash loop waits 1, 2, 4, 8, and 16 seconds. Restarts older than five
+minutes no longer count, so failures spread further apart than that never
+exhaust the budget, and the delay falls back as they age out. Policy changes do
+not count as restarts. A crash loop exhausts the budget only if six failures
+fall within five minutes, so a loop whose runs each last more than about a
+minute keeps restarting and stays DEGRADED. Once the budget is exhausted, an
+OTel receiver reports FAILED until the receiver or Agent is restarted. On the
 process runtime the beat exits with code 1; Agent restarts it about 1 s later
 with a fresh budget and reports the exit as STOPPED rather than FAILED, so a
 persistent failure cycles through about 31 s of retries and a restart. These
@@ -49,7 +52,7 @@ publication and profiling from the logger callback remains independent work.
 
 ## Validation
 
-Unit regressions cover backoff, exhaustion, cancellation, stable-period reset,
+Unit regressions cover backoff, exhaustion, cancellation, the restart window,
 latest-policy selection, startup and runtime exit classification, and per-input
 OTel status forwarding. Native receiver coverage exercises an actual exit-78
 restart and requires matching osqueryd and Elastic extension binaries. A full

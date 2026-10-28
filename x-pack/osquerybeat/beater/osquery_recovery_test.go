@@ -24,7 +24,6 @@ import (
 func TestOsqueryRecoveryBackoffExhaustsBudget(t *testing.T) {
 	runner := newOsqueryRunner(logptest.NewTestingLogger(t, "recovery"))
 	runner.retryInitial = time.Millisecond
-	runner.retryMax = 3 * time.Millisecond
 	runner.maxRestarts = 4
 	var messages []string
 	var states []status.Status
@@ -45,8 +44,8 @@ func TestOsqueryRecoveryBackoffExhaustsBudget(t *testing.T) {
 	assert.ErrorContains(t, err, "exhausted 4 restart attempts", "bound repeated failures")
 	assert.Equal(t, int32(5), attempts.Load(), "initial attempt plus four replacements")
 	require.Len(t, messages, 4, "report each retry as degraded")
-	for i, delay := range []string{"1ms", "2ms", "3ms", "3ms"} {
-		assert.Contains(t, messages[i], "in "+delay+":", "grow backoff and cap it")
+	for i, delay := range []string{"1ms", "2ms", "4ms", "8ms"} {
+		assert.Contains(t, messages[i], "in "+delay+":", "double the delay for each recent restart")
 	}
 	assert.Equal(t, status.Failed, states[len(states)-1], "exhaustion must reach status reporters")
 }
@@ -311,91 +310,68 @@ func TestOsqueryRecoveryUsesLatestPolicyAfterBackoff(t *testing.T) {
 	require.ErrorIs(t, <-done, context.Canceled, "stop the replacement")
 }
 
-func TestOsqueryRecoveryResetsOnlyAfterStableReadiness(t *testing.T) {
-	ctx, cancel := context.WithCancel(t.Context())
-	defer cancel()
+// Failures a full window apart never exhaust the budget and always wait the
+// initial delay. Failures inside the window, even by a nanosecond, double the
+// delay and exhaust it.
+func TestOsqueryRecoveryCountsRestartsInWindow(t *testing.T) {
 	runner := newOsqueryRunner(logptest.NewTestingLogger(t, "recovery"))
-	runner.maxRestarts = 1
+	runner.maxRestarts = 2
 	runner.retryInitial = time.Millisecond
 	var clock atomic.Int64
 	clock.Store(time.Now().UnixNano())
 	runner.now = func() time.Time { return time.Unix(0, clock.Load()) }
-	ready := make(chan struct{}, 1)
-	runner.reportStatus = func(state status.Status, _ string) {
-		if state == status.Running {
-			ready <- struct{}{}
+	var messages []string
+	runner.reportStatus = func(state status.Status, message string) {
+		if state == status.Degraded {
+			messages = append(messages, message)
 		}
 	}
+	const slow = 5 // Failures a full window after the previous one.
 	var attempts atomic.Int32
-	require.NoError(t, runner.Update(ctx, []config.InputConfig{{}}), "start a policy")
-	err := runner.Run(ctx, func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan []config.InputConfig) error {
-		n := attempts.Add(1)
-		if n == 2 {
-			notifyOsqueryReady(ctx)
-			select {
-			case <-ready:
-			case <-ctx.Done():
-				return ctx.Err()
-			}
-			clock.Add(int64(runner.stablePeriod))
+	require.NoError(t, runner.Update(t.Context(), []config.InputConfig{{}}), "start a policy")
+	err := runner.Run(t.Context(), func(context.Context, osqd.Flags, config.ExtensionsConfig, <-chan []config.InputConfig) error {
+		switch n := attempts.Add(1); {
+		case n <= slow:
+			clock.Add(int64(runner.restartWindow))
+		case n == slow+1:
+			clock.Add(int64(runner.restartWindow - time.Nanosecond))
 		}
 		return errOsqueryRuntimeExit78
 	})
-	assert.ErrorContains(t, err, "exhausted 1 restart attempts", "a later unstable run must exhaust its fresh budget")
-	assert.Equal(t, int32(3), attempts.Load(), "stable ready run must reset the budget exactly once")
+	assert.ErrorContains(t, err, "exhausted 2 restart attempts", "failures inside the window must exhaust the budget")
+	assert.Equal(t, int32(slow+2), attempts.Load(), "slow failures must not use up the budget")
+	want := []string{"1ms", "1ms", "1ms", "1ms", "1ms", "2ms"}
+	require.Len(t, messages, len(want), "report each retry as degraded")
+	for i, delay := range want {
+		assert.Contains(t, messages[i], "in "+delay+":", "delay must double only for restarts still in the window")
+	}
 }
 
-func TestOsqueryRecoveryMeasuresStabilityFromFirstReadiness(t *testing.T) {
-	ctx, cancel := context.WithCancel(t.Context())
+func TestOsqueryRecoveryPolicyRestartIsNotCounted(t *testing.T) {
+	ctx, cancel := context.WithTimeout(t.Context(), 3*time.Second)
 	defer cancel()
-	runner := newOsqueryRunner(logptest.NewTestingLogger(t, "recovery"))
-	runner.maxRestarts = 1
+	runner := newOsqueryRunner(logptest.NewTestingLogger(t, "policy_restart"))
+	runner.maxRestarts = 2
 	runner.retryInitial = time.Millisecond
-	var clock atomic.Int64
-	clock.Store(time.Now().UnixNano())
-	runner.now = func() time.Time { return time.Unix(0, clock.Load()) }
-	short := runner.stablePeriod - time.Nanosecond
-	ready := make(chan struct{}, 1)
-	runner.reportStatus = func(state status.Status, _ string) {
-		if state == status.Running {
-			ready <- struct{}{}
-		}
-	}
-	readyFor := func(ctx context.Context, d time.Duration) error {
-		notifyOsqueryReady(ctx)
-		select {
-		case <-ready:
-		case <-ctx.Done():
-			return ctx.Err()
-		}
-		clock.Add(int64(d))
-		return nil
-	}
 	var attempts atomic.Int32
-	terminal := errors.New("unexpected extra attempt")
-	require.NoError(t, runner.Update(ctx, []config.InputConfig{{}}), "start a policy")
+	terminal := errors.New("invalid replacement configuration")
+	require.NoError(t, runner.Update(ctx, []config.InputConfig{{}}), "start the original policy")
 	err := runner.Run(ctx, func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan []config.InputConfig) error {
-		var err error
 		switch attempts.Add(1) {
 		case 1, 3:
-			// Ready, but not for the stable period: the restart counts.
-			err = readyFor(ctx, short)
+			return errOsqueryRuntimeExit78
 		case 2:
-			// Ready again before the stable period ends: stable since the first readiness.
-			err = readyFor(ctx, short)
-			if err == nil {
-				err = readyFor(ctx, runner.stablePeriod-short)
+			if err := runner.Update(ctx, []config.InputConfig{{Osquery: &config.OsqueryConfig{Options: map[string]any{"disable_watchdog": true}}}}); err != nil {
+				return err
 			}
+			<-ctx.Done()
+			return ctx.Err()
 		default:
 			return terminal
 		}
-		if err != nil {
-			return err
-		}
-		return errOsqueryRuntimeExit78
 	})
-	assert.ErrorContains(t, err, "exhausted 1 restart attempts", "a short ready run must not reset the budget")
-	assert.Equal(t, int32(3), attempts.Load(), "only the run that stayed ready for the stable period resets the budget")
+	assert.ErrorIs(t, err, terminal, "a policy restart between failures must not use up the budget")
+	assert.Equal(t, int32(4), attempts.Load(), "both runtime failures must restart")
 }
 
 func TestOsqueryRecoveryIgnoresRetiredReadiness(t *testing.T) {
@@ -448,47 +424,4 @@ func TestOsqueryRecoveryIgnoresRetiredReadiness(t *testing.T) {
 	}
 	cancel()
 	require.ErrorIs(t, <-done, context.Canceled, "cancel the replacement")
-}
-
-func TestOsqueryRecoveryStableBudgetSurvivesPolicyRestart(t *testing.T) {
-	ctx, cancel := context.WithTimeout(t.Context(), 3*time.Second)
-	defer cancel()
-	runner := newOsqueryRunner(logptest.NewTestingLogger(t, "policy_restart"))
-	runner.maxRestarts = 1
-	runner.retryInitial = time.Millisecond
-	var clock atomic.Int64
-	clock.Store(time.Now().UnixNano())
-	runner.now = func() time.Time { return time.Unix(0, clock.Load()) }
-	ready := make(chan struct{}, 1)
-	runner.reportStatus = func(state status.Status, _ string) {
-		if state == status.Running {
-			ready <- struct{}{}
-		}
-	}
-	var attempts atomic.Int32
-	terminal := errors.New("invalid replacement configuration")
-	require.NoError(t, runner.Update(ctx, []config.InputConfig{{}}), "start the original policy")
-	err := runner.Run(ctx, func(ctx context.Context, _ osqd.Flags, _ config.ExtensionsConfig, _ <-chan []config.InputConfig) error {
-		switch attempts.Add(1) {
-		case 1, 3:
-			return errOsqueryRuntimeExit78
-		case 2:
-			notifyOsqueryReady(ctx)
-			select {
-			case <-ready:
-			case <-ctx.Done():
-				return ctx.Err()
-			}
-			clock.Add(int64(runner.stablePeriod))
-			if err := runner.Update(ctx, []config.InputConfig{{Osquery: &config.OsqueryConfig{Options: map[string]any{"disable_watchdog": true}}}}); err != nil {
-				return err
-			}
-			<-ctx.Done()
-			return ctx.Err()
-		default:
-			return terminal
-		}
-	})
-	assert.ErrorIs(t, err, terminal, "the post-policy-restart runtime failure must receive a fresh retry")
-	assert.Equal(t, int32(4), attempts.Load(), "intentional restart must not lose the previous run's stable period")
 }

@@ -11,33 +11,34 @@ import (
 	"slices"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/management/status"
-
 	"go.uber.org/zap/zapcore"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type osqueryRunner struct {
-	log                                  *logp.Logger
-	inputCh                              chan []config.InputConfig
-	retryInitial, retryMax, stablePeriod time.Duration
-	reportStatus                         func(status.Status, string)
-	maxRestarts                          int
-	now                                  func() time.Time
+	log          *logp.Logger
+	inputCh      chan []config.InputConfig
+	reportStatus func(status.Status, string)
+	now          func() time.Time
+
+	// At most maxRestarts restarts may happen within restartWindow. Each
+	// restart waits retryInitial, doubled for every restart still in the window.
+	retryInitial, restartWindow time.Duration
+	maxRestarts                 int
 }
 
 func newOsqueryRunner(log *logp.Logger) *osqueryRunner {
 	r := &osqueryRunner{
-		log:          log,
-		now:          time.Now,
-		inputCh:      make(chan []config.InputConfig, 1),
-		retryInitial: time.Second,
-		retryMax:     30 * time.Second,
-		stablePeriod: 5 * time.Minute,
-		maxRestarts:  5,
+		log:           log,
+		now:           time.Now,
+		inputCh:       make(chan []config.InputConfig, 1),
+		retryInitial:  time.Second,
+		restartWindow: 5 * time.Minute,
+		maxRestarts:   5,
 	}
 	return r
 }
@@ -58,13 +59,11 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 		stopping   bool
 		recovering bool
 		runID      uint64
-		readyAt    time.Time
 		retry      *time.Timer
 		retryCh    <-chan time.Time
+		restarts   []time.Time // Restarts within the last restartWindow.
 	)
 	ready := make(chan uint64, 1)
-	backoff := r.retryInitial
-	restarts := 0
 	report := func(s status.Status, message string) {
 		if r.reportStatus != nil {
 			r.reportStatus(s, message)
@@ -113,7 +112,6 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 		pending = latest
 		done := make(chan error, 1)
 		completed = done
-		readyAt = time.Time{}
 		stopping = false
 		if !recovering {
 			report(status.Configuring, "Starting osqueryd")
@@ -168,22 +166,16 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 			pending = nil
 		case id := <-ready:
 			if id == runID && completed != nil && !stopping {
-				if readyAt.IsZero() {
-					readyAt = r.now()
-				}
 				recovering = false
 				report(status.Running, "Osqueryd configuration applied")
 			}
 		case err := <-completed:
+			now := r.now()
 			cancel()
 			cancel = nil
 			completed = nil
 			inputs = nil
 			pending = nil
-			if !readyAt.IsZero() && r.now().Sub(readyAt) >= r.stablePeriod {
-				backoff = r.retryInitial
-				restarts = 0
-			}
 			if stopping {
 				if latest != nil && len(*latest) > 0 {
 					start()
@@ -201,18 +193,19 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 				report(status.Failed, err.Error())
 				return err
 			}
-			if restarts >= r.maxRestarts {
-				failure := fmt.Errorf("osqueryd exhausted %d restart attempts: %w", r.maxRestarts, err)
+			restarts = slices.DeleteFunc(restarts, func(t time.Time) bool { return now.Sub(t) >= r.restartWindow })
+			if len(restarts) >= r.maxRestarts {
+				failure := fmt.Errorf("osqueryd exhausted %d restart attempts in %s: %w", r.maxRestarts, r.restartWindow, err)
 				report(status.Failed, failure.Error())
 				return failure
 			}
-			restarts++
+			backoff := r.retryInitial << len(restarts)
+			restarts = append(restarts, now)
 			recovering = true
-			report(status.Degraded, fmt.Sprintf("Osqueryd restart %d/%d in %s: %v", restarts, r.maxRestarts, backoff, err))
+			report(status.Degraded, fmt.Sprintf("Osqueryd restart %d/%d in %s: %v", len(restarts), r.maxRestarts, backoff, err))
 			r.log.Warnf("Restart osqueryd after recoverable error in %s: %v", backoff, err)
 			retry = time.NewTimer(backoff)
 			retryCh = retry.C
-			backoff = min(backoff*2, r.retryMax)
 		case <-retryCh:
 			// Updates received during backoff replace latest, without restarting early.
 			start()
@@ -242,9 +235,6 @@ func extensionsAreSame(a, b config.ExtensionsConfig) bool {
 }
 
 func (r *osqueryRunner) Update(ctx context.Context, inputs []config.InputConfig) error {
-	if err := ctx.Err(); err != nil {
-		return err
-	}
 	select {
 	case <-ctx.Done():
 		return ctx.Err()

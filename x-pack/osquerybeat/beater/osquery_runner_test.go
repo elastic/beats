@@ -59,9 +59,8 @@ func waitForStart(ctx context.Context, runCh <-chan struct{}, to time.Duration) 
 func TestOsqueryRunnerDefaults(t *testing.T) {
 	runner := newOsqueryRunner(logptest.NewTestingLogger(t, "defaults"))
 	assert.Equal(t, time.Second, runner.retryInitial, "initial restart delay")
-	assert.Equal(t, 30*time.Second, runner.retryMax, "maximum restart delay")
 	assert.Equal(t, 5, runner.maxRestarts, "restart attempts")
-	assert.Equal(t, 5*time.Minute, runner.stablePeriod, "stable period that resets the budget")
+	assert.Equal(t, 5*time.Minute, runner.restartWindow, "window that counts restarts")
 }
 
 func TestOsqueryRunnerCancellable(t *testing.T) {
