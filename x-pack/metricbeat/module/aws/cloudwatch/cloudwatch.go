@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"maps"
 	"reflect"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -65,6 +66,7 @@ type MetricSet struct {
 	logger            *logp.Logger
 	CloudwatchConfigs []Config `config:"metrics" validate:"nonzero,required"`
 	PreviousEndTime   time.Time
+	metrics           *cloudwatchMetrics
 }
 
 // Dimension holds name and value for cloudwatch metricset dimension config.
@@ -128,16 +130,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		MetricSet:         metricSet,
 		logger:            logger,
 		CloudwatchConfigs: config.CloudwatchMetrics,
+		metrics:           newCloudwatchMetrics(base.Metrics(), metricSet, config.CloudwatchMetrics),
 	}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(report mb.ReporterV2) error {
+func (m *MetricSet) Fetch(report mb.ReporterV2) (fetchErr error) {
 	// Get startTime and endTime
 	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.Period, m.Latency, m.PreviousEndTime)
 	m.PreviousEndTime = endTime
+	previousErrors := m.metrics.beginWindow(startTime, endTime)
+	defer func() { m.metrics.endWindow(previousErrors, fetchErr) }()
 	m.Logger().Debugf("startTime = %s, endTime = %s", startTime, endTime)
 	// Initialise the map that will be used in case APIGateway api is configured. Infoapi includes Name_of_API:ID_of_API entries
 	infoapi := make(map[string]string)
@@ -172,13 +177,16 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
 			beatsConfig := m.AwsConfig.Copy()
 			beatsConfig.Region = regionName
+			beatsConfig.APIOptions = append(slices.Clone(beatsConfig.APIOptions), m.metrics.instrument)
 			APIClients, err := m.createAwsRequiredClients(beatsConfig, regionName, config)
 			if err != nil {
 				m.Logger().Warnf("skipping metrics list from region '%s': %v", regionName, err)
 				continue
 			}
 
+			started := time.Now()
 			eventsWithIdentifier, err := m.createEvents(APIClients.CloudWatchClient, APIClients.Resourcegroupstaggingapi, listMetricDetailTotal.metricsWithStats, listMetricDetailTotal.resourceTypeFilters, infoapi, regionName, startTime, endTime)
+			m.metrics.observeScope(regionName, "*", false, started, len(eventsWithIdentifier), err)
 			if err != nil {
 				m.Logger().Errorf("createEvents failed for region %s, skipping region: %v", regionName, err)
 				continue
@@ -198,6 +206,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
 		beatsConfig := m.AwsConfig.Copy()
 		beatsConfig.Region = regionName
+		beatsConfig.APIOptions = append(slices.Clone(beatsConfig.APIOptions), m.metrics.instrument)
 
 		APIClients, err := m.createAwsRequiredClients(beatsConfig, regionName, config)
 		if err != nil {
@@ -209,13 +218,17 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		// otherwise only retrieve metrics from the specific namespaces from the config
 		var listMetricsOutput []aws.MetricWithID
 		if len(namespaceDetailTotal) == 0 {
+			started := time.Now()
 			listMetricsOutput, err = aws.GetListMetricsOutput("*", regionName, m.Period, m.IncludeLinkedAccounts, m.OwningAccount, m.MonitoringAccountID, APIClients.CloudWatchClient)
+			m.metrics.observeScope(regionName, "*", true, started, len(listMetricsOutput), err)
 			if err != nil {
 				m.Logger().Errorf("Error while retrieving the list of metrics for region %s and namespace %s: %v", regionName, "*", err)
 			}
 		} else {
 			for namespace := range namespaceDetailTotal {
+				started := time.Now()
 				listMetricsOutputPerNamespace, err := aws.GetListMetricsOutput(namespace, regionName, m.Period, m.IncludeLinkedAccounts, m.OwningAccount, m.MonitoringAccountID, APIClients.CloudWatchClient)
+				m.metrics.observeScope(regionName, namespace, true, started, len(listMetricsOutputPerNamespace), err)
 				if err != nil {
 					m.Logger().Errorf("Error while retrieving the list of metrics for region %s and namespace %s: %v", regionName, namespace, err)
 				}
@@ -272,8 +285,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				m.Logger().Debugf("infoapi response: %v", infoapi)
 
 			}
+			started := time.Now()
 			eventsWithIdentifier, err := m.createEvents(APIClients.CloudWatchClient, APIClients.Resourcegroupstaggingapi, filteredMetricWithStatsTotal, resourceTypeTagFilters, infoapi, regionName, startTime, endTime)
 			if err != nil {
+				m.metrics.observeScope(regionName, namespace, false, started, 0, err)
 				m.Logger().Errorf("createEvents failed for region %s and namespace %s, skipping: %v", regionName, namespace, err)
 				continue
 			}
@@ -286,6 +301,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				m.Logger().Warnf("could not add metadata to events: %v", err)
 			}
 
+			m.metrics.observeScope(regionName, namespace, false, started, len(events), err)
 			for _, event := range events {
 				_ = event.RootFields.Delete(aws.CloudWatchPeriodName)
 				report.Event(event)
@@ -549,6 +565,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 	// Construct metricDataQueries
 	metricDataQueries := createMetricDataQueries(listMetricWithStatsTotal, m.DataGranularity)
 	m.logger.Debugf("Number of MetricDataQueries = %d", len(metricDataQueries))
+	m.metrics.addQueries(len(metricDataQueries))
 	if len(metricDataQueries) == 0 {
 		return events, nil
 	}
@@ -556,6 +573,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 	// Use metricDataQueries to make GetMetricData API calls
 	metricDataResults, err := aws.GetMetricDataResults(metricDataQueries, svcCloudwatch, startTime, endTime)
 	m.logger.Debugf("Number of metricDataResults = %d", len(metricDataResults))
+	m.metrics.observeResults(metricDataResults)
 	if err != nil {
 		return events, fmt.Errorf("getMetricDataResults failed: %w", err)
 	}

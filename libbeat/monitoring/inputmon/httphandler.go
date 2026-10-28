@@ -86,7 +86,7 @@ func filteredSnapshot(
 	requestedType string) []map[string]any {
 	// 1st collect all input metrics.
 	inputs := inputMetricsFromRegistry(global)
-	// If there is an id collision, metrics in the local registry take precedence
+	// If the same instance exists in both registries, local metrics take precedence
 	maps.Copy(inputs, inputMetricsFromRegistry(local))
 
 	// Now collect all that match the requested type
@@ -103,6 +103,12 @@ func filteredSnapshot(
 	return selected
 }
 
+// Metricbeat module IDs may be shared by several metricset/host instances.
+type inputMetricIdentity struct {
+	id          string
+	ephemeralID string
+}
+
 type inputMetricsTable struct {
 	id    string
 	input string
@@ -111,11 +117,11 @@ type inputMetricsTable struct {
 }
 
 // Finds all valid input sub-registries within the given registry (including
-// nested ones) and returns them as a map keyed by input id, with all inputs
+// nested ones) and returns them as a map keyed by input instance, with all inputs
 // at the top level.
-func inputMetricsFromRegistry(registry *monitoring.Registry) map[string]inputMetricsTable {
+func inputMetricsFromRegistry(registry *monitoring.Registry) map[inputMetricIdentity]inputMetricsTable {
 	metrics := monitoring.CollectStructSnapshot(registry, monitoring.Full, false)
-	result := map[string]inputMetricsTable{}
+	result := map[inputMetricIdentity]inputMetricsTable{}
 	addInputMetrics(result, metrics, nil)
 	return result
 }
@@ -123,7 +129,7 @@ func inputMetricsFromRegistry(registry *monitoring.Registry) map[string]inputMet
 // A helper that iterates over the entries in "from" looking for
 // valid input metrics tables, adding them to "to", and recurses on
 // any that are tagged with InputNested.
-func addInputMetrics(to map[string]inputMetricsTable, from map[string]any, pathPrefix []string) {
+func addInputMetrics(to map[inputMetricIdentity]inputMetricsTable, from map[string]any, pathPrefix []string) {
 	for key, value := range from {
 		// A valid input metrics table must be a string-keyed map with string
 		// values for the "id" and "input" keys. An "input" value of InputNested
@@ -145,7 +151,8 @@ func addInputMetrics(to map[string]inputMetricsTable, from map[string]any, pathP
 		}
 
 		inputPath := append(pathPrefix, key)
-		to[id] = inputMetricsTable{
+		ephemeralID, _ := data["ephemeral_id"].(string)
+		to[inputMetricIdentity{id: id, ephemeralID: ephemeralID}] = inputMetricsTable{
 			id:    id,
 			input: input,
 			path:  strings.Join(inputPath, "."),
