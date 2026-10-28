@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
@@ -51,7 +52,12 @@ var fqdnOnce = sync.OnceValues(func() (string, error) {
 })
 
 // NewBeatForReceiver creates a Beat that will be used in the context of an otel receiver
-func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]any, consumer consumer.Logs, componentID string, core zapcore.Core) (*instance.Beat, error) {
+func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]any, consumer consumer.Logs, componentID string, core zapcore.Core, opts ...ReceiverOption) (*instance.Beat, error) {
+	var options receiverOptions
+	for _, opt := range opts {
+		opt(&options)
+	}
+
 	b, err := instance.NewBeat(settings.Name,
 		settings.IndexPrefix,
 		settings.Version,
@@ -216,12 +222,8 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		}
 	}
 
-	// register NewOtelManager
-	management.SetManagerFactory(otelmanager.NewOtelManager)
-
 	// initialize config manager
-	oCfg, _ := cfg.Child("management.otel", -1)
-	m, err := management.NewManager(oCfg, b.Registry, logger)
+	m, err := newReceiverManager(cfg, b, options, logger)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new manager: %w", err)
 	}
@@ -319,4 +321,74 @@ func setLogger(b *instance.Beat, receiverConfig map[string]any, core zapcore.Cor
 	}
 
 	return nil
+}
+
+// ReceiverOption configures optional behaviour of NewBeatForReceiver.
+type ReceiverOption func(*receiverOptions)
+
+type receiverOptions struct {
+	agentConfigTransform otelmanager.UnitTransform
+}
+
+// WithAgentConfigTransform lets the receiver take its inputs from Elastic Agent
+// over the control protocol when the receiver config sets
+// management.agent.connection_secret. The transform turns input units into
+// beat input configs.
+func WithAgentConfigTransform(transform otelmanager.UnitTransform) ReceiverOption {
+	return func(o *receiverOptions) {
+		o.agentConfigTransform = transform
+	}
+}
+
+// agentControlConfig is the receiver config for taking inputs from Elastic
+// Agent over the control protocol.
+type agentControlConfig struct {
+	// ConnectionSecret is the base64-encoded connection info Elastic Agent gives
+	// the receiver, in the format beat processes read from stdin. It holds the
+	// receiver's TLS key and token.
+	ConnectionSecret string `config:"connection_secret"`
+}
+
+// newReceiverManager returns the manager for a beat receiver. By default this
+// is the OtelManager, where the receiver config holds the inputs. When the
+// config sets management.agent.connection_secret, it is the UnitsManager, which
+// gets the inputs as units from Elastic Agent over the control protocol.
+func newReceiverManager(cfg *config.C, b *instance.Beat, opts receiverOptions, logger *logp.Logger) (management.Manager, error) {
+	agentCfg := agentControlConfig{}
+	if sub, err := cfg.Child("management.agent", -1); err == nil {
+		if err := sub.Unpack(&agentCfg); err != nil {
+			return nil, fmt.Errorf("error unpacking management.agent: %w", err)
+		}
+	}
+
+	if agentCfg.ConnectionSecret == "" {
+		management.SetManagerFactory(otelmanager.NewOtelManager)
+		oCfg, _ := cfg.Child("management.otel", -1)
+		return management.NewManager(oCfg, b.Registry, logger)
+	}
+
+	if opts.agentConfigTransform == nil {
+		return nil, fmt.Errorf("the %s receiver does not support management.agent", b.Info.Beat)
+	}
+
+	agentClient, err := otelmanager.NewAgentClient(agentCfg.ConnectionSecret)
+	if err != nil {
+		return nil, err
+	}
+
+	m := otelmanager.NewUnitsManager(agentClient, b.Registry, opts.agentConfigTransform, logger)
+
+	// The collector exporter owns the output, so the receiver has no output to
+	// reload. The output config is still passed to the beater, as for a beat
+	// process, in case the beat wants to load any config from there. Heartbeat
+	// does, for its monitor state, but as a receiver it also gets an
+	// Elasticsearch client for that from its monitor_state config.
+	b.Registry.MustRegisterOutput(reload.ReloadableFunc(func(update *reload.ConfigWithMeta) error {
+		if update == nil || b.OutputConfigReloader == nil {
+			return nil
+		}
+		return b.OutputConfigReloader.Reload(update)
+	}))
+
+	return m, nil
 }

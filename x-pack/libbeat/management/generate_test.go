@@ -247,7 +247,7 @@ func TestOutputGen(t *testing.T) {
 		}),
 	}
 
-	cfg, err := groupByOutputs(&testExpected)
+	cfg, err := GroupByOutputs(&testExpected)
 	require.NoError(t, err)
 	testStruct := mapstr.M{}
 	err = cfg.Config.Unpack(&testStruct)

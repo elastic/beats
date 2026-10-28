@@ -27,6 +27,7 @@ import (
 	// Import X-Pack modules.
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 
+	"github.com/elastic/beats/v7/x-pack/heartbeat/cmd/agentconfig"
 	_ "github.com/elastic/beats/v7/x-pack/heartbeat/secretstores/vault"
 	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
 )
@@ -72,7 +73,8 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 		return nil, fmt.Errorf("error extracting browser params: %w", err)
 	}
 
-	b, err := xpInstance.NewBeatForReceiver(settings, cfg.Beatconfig, consumer, set.ID.String(), set.Logger.Core())
+	b, err := xpInstance.NewBeatForReceiver(settings, cfg.Beatconfig, consumer, set.ID.String(), set.Logger.Core(),
+		xpInstance.WithAgentConfigTransform(agentconfig.Transform))
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
 	}
