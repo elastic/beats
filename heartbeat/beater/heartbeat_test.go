@@ -25,11 +25,48 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/heartbeat/config"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/libbeat/beat"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
+
+type fakeElasticsearchRequester struct {
+	requestFn func(method, path, pipeline string, params map[string]string, body any) (int, []byte, error)
+}
+
+func (f fakeElasticsearchRequester) Request(method, path, pipeline string, params map[string]string, body any) (int, []byte, error) {
+	return f.requestFn(method, path, pipeline, params, body)
+}
+
+func TestHeartbeatWithElasticsearchStateLoader(t *testing.T) {
+	logger := logp.NewNopLogger()
+	stateLoader, replaceStateLoader := monitorstate.AtomicStateLoader(monitorstate.NilStateLoader, logger)
+
+	bt := &Heartbeat{
+		config:             &config.Config{},
+		replaceStateLoader: replaceStateLoader,
+		logger:             logger,
+	}
+
+	var requestCount int
+	fake := fakeElasticsearchRequester{
+		requestFn: func(string, string, string, map[string]string, any) (int, []byte, error) {
+			requestCount++
+			return 200, []byte(`{"hits":{"hits":[]}}`), nil
+		},
+	}
+
+	bt.WithElasticsearchStateLoader(fake)
+
+	_, err := stateLoader(stdfields.StdMonitorFields{ID: "mon-1", Type: "http"})
+	require.NoError(t, err, "installed ES loader should succeed with empty hits")
+	assert.Equal(t, 1, requestCount, "installed loader should call the injected requester")
+}
 
 func TestMakeESClient(t *testing.T) {
 	t.Run("should not modify the timeout setting from original config", func(t *testing.T) {

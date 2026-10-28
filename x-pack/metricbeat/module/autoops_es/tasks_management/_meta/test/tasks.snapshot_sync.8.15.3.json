@@ -1,0 +1,15 @@
+{
+    "tasks": {
+        "GKfQWFJxTaikL5NG2a5XTQ:37250": {
+            "node": "GKfQWFJxTaikL5NG2a5XTQ",
+            "id": 37250,
+            "type": "transport",
+            "action": "cluster:admin/snapshot/create",
+            "description": "snapshot [fixture-repo:manual-sync]",
+            "start_time_in_millis": 1793047928930,
+            "running_time_in_nanos": 85234567890,
+            "cancellable": false,
+            "headers": {}
+        }
+    }
+}

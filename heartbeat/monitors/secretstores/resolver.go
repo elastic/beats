@@ -1,0 +1,145 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+package secretstores
+
+import (
+	"context"
+	"errors"
+	"fmt"
+
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+)
+
+// Resolver replaces secret references in monitor configurations.
+type Resolver struct {
+	logger *logp.Logger
+}
+
+// NewResolver returns a Resolver.
+func NewResolver(logger *logp.Logger) *Resolver {
+	if logger == nil {
+		logger = logp.NewNopLogger()
+	}
+	return &Resolver{logger: logger.Named("secretstores")}
+}
+
+// Resolve returns a copy of cfg without the secret_stores setting, where each
+// configured store, in list order, replaced its references. cfg itself is not
+// modified. Without secret_stores, cfg is returned as is.
+//
+// If a connection with allowed_hosts replaced references, every host that
+// destinations returns for the resolved config must be allowed. A nil
+// destinations means the monitor type can't use such connections.
+func (r *Resolver) Resolve(cfg *conf.C, destinations plugin.DestinationsFunc) (*conf.C, error) {
+	entries, err := configEntries(cfg)
+	if err != nil || len(entries) == 0 {
+		return cfg, err
+	}
+
+	resolved, err := withoutSecretStores(cfg)
+	if err != nil {
+		return nil, err
+	}
+	ctx := context.Background()
+	scopes := scopes(entries)
+	var usedRestricted []entry
+	for i, e := range entries {
+		s, err := sharedStores.get(e, r.logger)
+		if err != nil {
+			return nil, err
+		}
+		next, err := s.Replace(ctx, resolved, scopes[i])
+		if err != nil {
+			if errors.Is(err, ErrSelection) {
+				return nil, fmt.Errorf("%s: %w", ConfigKey, err)
+			}
+			return nil, fmt.Errorf("could not resolve %s secret references: %w", e.label(), err)
+		}
+		// Replace returns its input when it has no references of the entry.
+		if next != resolved && e.isRestricted() {
+			usedRestricted = append(usedRestricted, e)
+		}
+		resolved = next
+	}
+	// Checking the resolved config covers destinations and references that
+	// come from secret values.
+	monitorType, _ := cfg.String("type", -1)
+	if err := checkAllowedHosts(usedRestricted, monitorType, destinations, resolved); err != nil {
+		return nil, err
+	}
+	return resolved, nil
+}
+
+// Validate checks the secret_stores setting and lets each configured store
+// check its references, without contacting any secret store.
+func (r *Resolver) Validate(cfg *conf.C) error {
+	entries, err := configEntries(cfg)
+	if err != nil || len(entries) == 0 {
+		return err
+	}
+
+	monitorCfg, err := withoutSecretStores(cfg)
+	if err != nil {
+		return err
+	}
+	scopes := scopes(entries)
+	for i, e := range entries {
+		// A new store, so validation never shares state with running monitors.
+		s, err := newStore(e, r.logger)
+		if err != nil {
+			return err
+		}
+		if err := s.Validate(monitorCfg, scopes[i]); err != nil {
+			if errors.Is(err, ErrSelection) {
+				return fmt.Errorf("%s: %w", ConfigKey, err)
+			}
+			return fmt.Errorf("invalid %s secret references: %w", e.label(), err)
+		}
+	}
+	return nil
+}
+
+// configEntries returns the secret_stores entries of cfg.
+func configEntries(cfg *conf.C) ([]entry, error) {
+	if !cfg.HasField(ConfigKey) {
+		return nil, nil
+	}
+	var raw struct {
+		Stores any `config:"secret_stores"`
+	}
+	if err := cfg.Unpack(&raw); err != nil {
+		return nil, fmt.Errorf("%s: %w", ConfigKey, err)
+	}
+	return parseEntries(raw.Stores)
+}
+
+// withoutSecretStores returns a copy of cfg without secret_stores, to avoid
+// leaking store credentials to the stores and the plugin.
+func withoutSecretStores(cfg *conf.C) (*conf.C, error) {
+	c := conf.NewConfig()
+	if err := c.Merge(cfg); err != nil {
+		return nil, fmt.Errorf("could not copy monitor config: %w", err)
+	}
+	if _, err := c.Remove(ConfigKey, -1); err != nil {
+		return nil, fmt.Errorf("could not remove %s: %w", ConfigKey, err)
+	}
+	return c, nil
+}

@@ -1,0 +1,3 @@
+kind: feature
+summary: Ensure that the CEL input's events from previous evaluations are removed from the CEL state before starting a new evaluation.
+component: filebeat

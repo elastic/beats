@@ -19,7 +19,7 @@ type osquerybeatReceiver struct {
 
 func (ob *osquerybeatReceiver) Start(ctx context.Context, host component.Host) error {
 	ob.Logger.Info("starting osquerybeat receiver")
-	if err := ob.BeatReceiver.Start(host); err != nil {
+	if err := ob.BeatReceiver.Start(ctx, host); err != nil {
 		return fmt.Errorf("error starting osquerybeat receiver: %w", err)
 	}
 	return nil
