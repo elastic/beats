@@ -34,15 +34,20 @@ func ImageSelector(platform string) (string, error) {
 	if os.Getenv("CI") != "true" && os.Getenv("NPCAP_LOCAL") != "true" {
 		return image, nil
 	}
-	if platform == "windows/amd64" {
+	if strings.HasPrefix(platform, "windows/") {
 		image = strings.ReplaceAll(image, "beats-dev", "observability-ci") // Temporarily work around naming of npcap image.
-		image = strings.ReplaceAll(image, "main", "npcap-"+NpcapVersion+"-debian9")
+		switch platform {
+		case "windows/amd64":
+			image = strings.ReplaceAll(image, "main", "npcap-"+NpcapVersion+"-debian9")
+		case "windows/arm64":
+			image = strings.ReplaceAll(image, "windows-arm64", "npcap-arm64-"+NpcapVersion)
+		}
 	}
 	return image, nil
 }
 
 func CopyNPCAPInstaller(dir string) error {
-	if devtools.Platform.GOOS == "windows" && (devtools.Platform.GOARCH == "amd64" || devtools.Platform.GOARCH == "386") {
+	if devtools.Platform.GOOS == "windows" && (devtools.Platform.GOARCH == "amd64" || devtools.Platform.GOARCH == "386" || devtools.Platform.GOARCH == "arm64") {
 		err := sh.Copy(dir+installer, "/installer/"+installer)
 		if err != nil {
 			return fmt.Errorf("failed to copy Npcap installer into source tree: %w", err)
