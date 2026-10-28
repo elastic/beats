@@ -26,7 +26,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 const (
@@ -42,7 +41,7 @@ func newFrame(version, flags byte, op FrameOp, body []byte) []byte {
 
 func decodeFrame(t *testing.T, frame []byte, compressor Compressor) (map[string]any, error) {
 	t.Helper()
-	framer := NewFramer(streambuf.New(frame), compressor, logptest.NewTestingLogger(t, ""))
+	framer := NewFramer(streambuf.New(frame), compressor)
 	_, err := framer.ReadHeader()
 	require.NoError(t, err, "header should parse")
 	return framer.ReadFrame()
