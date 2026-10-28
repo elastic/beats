@@ -154,6 +154,21 @@ func (r *Registrar) StartStates() []file.State {
 		r.log.Errorf("Error reading persisted states: %v", err)
 		return nil
 	}
+	live := r.shared.states.GetStates()
+	r.shared.mu.Lock()
+	mine := r.shared.owned[r]
+	for i := range states {
+		if _, ok := mine[states[i].Id]; !ok {
+			continue
+		}
+		for _, l := range live {
+			if l.Id == states[i].Id {
+				states[i].Finished = l.Finished
+				break
+			}
+		}
+	}
+	r.shared.mu.Unlock()
 	return r.shared.statesFor(r, states)
 }
 
