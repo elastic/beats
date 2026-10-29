@@ -75,9 +75,9 @@ var ErrClientClosed = errors.New("beat: client closed")
 // the disk queue could not serialize it or it is too large. Check for it with
 // errors.Is; the error includes the reason when the queue reports one. The
 // client stays usable. When PublishContext cannot be cancelled (see
-// ContextPublisher), or the queue's producer reports no reason, the error has
-// none (the queue logs it), and a queue that shuts down before the client is
-// closed can also cause it. A client with DropIfFull never returns it.
+// ContextPublisher), the error has no reason (the queue logs it), and a queue
+// that shuts down before the client is closed is also reported this way. A
+// client with DropIfFull never returns it.
 var ErrRejected = errors.New("beat: event rejected by queue")
 
 // ContextPublisher is an optional interface of a Client whose blocking publish

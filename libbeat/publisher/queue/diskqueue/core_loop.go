@@ -49,9 +49,8 @@ func (dq *diskQueue) run() {
 		case responseChan := <-dq.producerCancelChan:
 			dq.handleProducerCancel(responseChan)
 
-			// The withdrawn request may have been the one holding back smaller
-			// requests behind it that fit now.
-			dq.maybeUnblockProducers()
+			// Requests unblocked by the cancellation may be ready to send to
+			// the writer loop.
 			dq.maybeWritePending()
 
 		case ackedSegmentID := <-dq.acks.segmentACKChan:
@@ -147,6 +146,9 @@ func (dq *diskQueue) handleProducerCancel(responseChan chan error) {
 		if request.responseChan == responseChan {
 			dq.blockedProducers = slices.Delete(dq.blockedProducers, i, i+1)
 			responseChan <- errCancelled
+			// The withdrawn request may have been holding back requests
+			// behind it that fit now.
+			dq.maybeUnblockProducers()
 			return
 		}
 	}

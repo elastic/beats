@@ -181,42 +181,58 @@ func TestPublishContextRejected(t *testing.T) {
 // loop can give after the producer asks it to withdraw the request. A stub
 // stands in for the core loop so the order is fixed.
 func TestPublishContextCancelAnswer(t *testing.T) {
+	// The stub core loop either takes the cancel and withdraws the request, or
+	// never reads the cancel because it already answered: the request was
+	// added before the cancel, or the loop stopped and shutdown answered it.
 	tests := []struct {
-		name   string
-		answer error
-		want   error
+		name       string
+		takeCancel bool
+		answer     error
+		want       error
 	}{
+		{name: "withdrawn", takeCancel: true, answer: errCancelled, want: context.Canceled},
 		{name: "added before the cancel", answer: nil, want: nil},
-		{name: "withdrawn", answer: errCancelled, want: context.Canceled},
-		{name: "queue closed", answer: queue.ErrClosed, want: queue.ErrClosed},
+		{name: "queue shut down", answer: queue.ErrClosed, want: queue.ErrClosed},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			dq := &diskQueue{
-				producerWriteRequestChan: make(chan producerWriteRequest),
-				producerCancelChan:       make(chan chan error),
-				close:                    make(chan struct{}),
-			}
-			p := &diskQueueProducer{
-				queue:   dq,
-				encoder: newEventEncoder(SerializationCBOR),
-				done:    make(chan struct{}),
-			}
-			ctx, cancel := context.WithCancel(t.Context())
-			defer cancel()
-			go func() {
-				<-dq.producerWriteRequestChan
-				cancel()
-				responseChan := <-dq.producerCancelChan
-				responseChan <- tc.answer
-			}()
+			synctest.Test(t, func(t *testing.T) {
+				dq := &diskQueue{
+					producerWriteRequestChan: make(chan producerWriteRequest),
+					producerCancelChan:       make(chan chan error),
+					close:                    make(chan struct{}),
+				}
+				p := &diskQueueProducer{
+					queue:   dq,
+					encoder: newEventEncoder(SerializationCBOR),
+					done:    make(chan struct{}),
+				}
+				ctx, cancel := context.WithCancel(t.Context())
+				defer cancel()
+				errc := make(chan error, 1)
+				go func() {
+					_, err := p.PublishContext(ctx, makeLargeTestEvent("event"))
+					errc <- err
+				}()
 
-			_, err := p.PublishContext(ctx, makeLargeTestEvent("event"))
-			if tc.want == nil {
-				assert.NoError(t, err, "an event the core loop added should be reported as published despite the cancelled ctx")
-			} else {
-				assert.ErrorIs(t, err, tc.want, "PublishContext should report the core loop's answer")
-			}
+				request := <-dq.producerWriteRequestChan
+				cancel()
+				// The producer is now waiting to hand over its cancel.
+				synctest.Wait()
+				if tc.takeCancel {
+					responseChan := <-dq.producerCancelChan
+					responseChan <- tc.answer
+				} else {
+					request.responseChan <- tc.answer
+				}
+
+				err := <-errc
+				if tc.want == nil {
+					assert.NoError(t, err, "an event the core loop added should be reported as published despite the cancelled ctx")
+				} else {
+					assert.ErrorIs(t, err, tc.want, "PublishContext should report the core loop's answer")
+				}
+			})
 		})
 	}
 }

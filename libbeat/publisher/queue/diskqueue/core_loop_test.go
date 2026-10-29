@@ -850,12 +850,22 @@ func TestHandleProducerCancel(t *testing.T) {
 	// given response channel, answer it with errCancelled, and keep the other
 	// requests in order without answering them. An unknown channel belongs to
 	// a request that was already answered, so nothing changes.
+	// Every frame is too large for the remaining space, so none of the
+	// requests left behind is unblocked.
+	settings := DefaultSettings()
+	settings.MaxBufferSize = 1000
 	responseChans := []chan error{
 		make(chan error, 1), make(chan error, 1), make(chan error, 1)}
-	dq := &diskQueue{}
+	dq := &diskQueue{
+		observer: queue.NewQueueObserver(nil),
+		settings: settings,
+		segments: diskQueueSegments{
+			writing: []*queueSegment{segmentWithSize(100)},
+		},
+	}
 	for _, c := range responseChans {
-		dq.blockedProducers = append(dq.blockedProducers,
-			producerWriteRequest{responseChan: c, shouldBlock: true})
+		dq.blockedProducers = append(dq.blockedProducers, producerWriteRequest{
+			frame: makeWriteFrameWithSize(950), responseChan: c, shouldBlock: true})
 	}
 
 	dq.handleProducerCancel(responseChans[1])
@@ -877,6 +887,37 @@ func TestHandleProducerCancel(t *testing.T) {
 
 	dq.handleProducerCancel(make(chan error, 1))
 	assert.Len(t, dq.blockedProducers, 2, "cancelling an unknown request should change nothing")
+}
+
+func TestHandleProducerCancelUnblocksNext(t *testing.T) {
+	// Withdrawing a blocked request that does not fit should let a request
+	// behind it that fits into the queue at once, rather than wait for the
+	// next writer or deleter response.
+	settings := DefaultSettings()
+	settings.MaxBufferSize = 1000
+	head, next := make(chan error, 1), make(chan error, 1)
+	dq := &diskQueue{
+		observer: queue.NewQueueObserver(nil),
+		settings: settings,
+		segments: diskQueueSegments{
+			writing: []*queueSegment{segmentWithSize(100)},
+		},
+		blockedProducers: []producerWriteRequest{
+			{frame: makeWriteFrameWithSize(950), responseChan: head},
+			{frame: makeWriteFrameWithSize(200), responseChan: next},
+		},
+	}
+
+	dq.handleProducerCancel(head)
+	assert.ErrorIs(t, <-head, errCancelled, "the withdrawn request should be answered with errCancelled")
+	select {
+	case err := <-next:
+		assert.NoError(t, err, "the request behind the withdrawn one should be added")
+	default:
+		t.Error("the request behind the withdrawn one should be answered at once")
+	}
+	assert.Empty(t, dq.blockedProducers, "no request should stay blocked")
+	assert.Len(t, dq.pendingFrames, 1, "the unblocked request's frame should be pending")
 }
 
 func TestCanAcceptFrameOfSize(t *testing.T) {
