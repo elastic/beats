@@ -110,12 +110,12 @@ func TestNewEventFromQuarkEventDelete(t *testing.T) {
 	qe := quarkFileEvent(&quark.File{
 		Path:   "/gone",
 		Mode:   syscall.S_IFREG | 0o644,
-		OpMask: quark.QUARK_FILE_OP_CREATE | quark.QUARK_FILE_OP_MODIFY | quark.QUARK_FILE_OP_REMOVE,
+		OpMask: quark.QUARK_FILE_OP_REMOVE,
 	})
 
 	event, ok := NewEventFromQuarkEvent(qe, 0, []HashType{}, []FileParser{}, notExcluded)
 	require.True(t, ok, "event should be produced")
-	assert.Equal(t, Action(Deleted), event.Action, "removal outranks aggregated create/modify")
+	assert.Equal(t, Action(Deleted), event.Action, "action")
 	assert.Nil(t, event.Info, "deleted files carry no metadata")
 	assert.Nil(t, event.Hashes, "deleted files are not hashed")
 }
@@ -182,11 +182,7 @@ func TestActionFromQuarkFile(t *testing.T) {
 		{name: "modify perms", opMask: quark.QUARK_FILE_OP_MODIFY, changeMask: quark.QUARK_FILE_CH_PERMS, want: AttributesModified},
 		{name: "modify owner", opMask: quark.QUARK_FILE_OP_MODIFY, changeMask: quark.QUARK_FILE_CH_OWNER, want: AttributesModified},
 		{name: "modify xattrs", opMask: quark.QUARK_FILE_OP_MODIFY, changeMask: quark.QUARK_FILE_CH_XATTRS, want: AttributesModified},
-		{name: "modify content and perms", opMask: quark.QUARK_FILE_OP_MODIFY, changeMask: quark.QUARK_FILE_CH_CONTENT | quark.QUARK_FILE_CH_PERMS, want: Updated | AttributesModified},
 		{name: "modify without change mask", opMask: quark.QUARK_FILE_OP_MODIFY, want: Updated},
-		{name: "aggregated create and modify", opMask: quark.QUARK_FILE_OP_CREATE | quark.QUARK_FILE_OP_MODIFY, changeMask: quark.QUARK_FILE_CH_CONTENT, want: Created},
-		{name: "aggregated move and modify", opMask: quark.QUARK_FILE_OP_MOVE | quark.QUARK_FILE_OP_MODIFY, changeMask: quark.QUARK_FILE_CH_CONTENT, want: Moved},
-		{name: "aggregated create and remove", opMask: quark.QUARK_FILE_OP_CREATE | quark.QUARK_FILE_OP_REMOVE, want: Deleted},
 		{name: "no op", want: None},
 	}
 	for _, tc := range tests {

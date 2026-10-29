@@ -46,7 +46,11 @@ func (r *ebpfReader) Start(done <-chan struct{}) (<-chan Event, error) {
 	// Only the eBPF backend in quark produces file events, so there is no
 	// fallback to quark's kprobe backend. Kernels without eBPF are served
 	// by this module's own kprobes backend instead.
-	attr.Flags = quark.QQ_EBPF | quark.QQ_FILE
+	//
+	// QQ_MIN_AGG stops quark from merging file events. Minimal aggregation
+	// also keeps every operation as its own event, as the previous backend
+	// did, while leaving the process bookkeeping quark relies on in place.
+	attr.Flags = quark.QQ_EBPF | quark.QQ_FILE | quark.QQ_MIN_AGG
 
 	queue, err := quark.OpenQueue(attr)
 	if err != nil {

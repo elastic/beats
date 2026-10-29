@@ -98,9 +98,9 @@ func NewEventFromQuarkEvent(
 }
 
 // actionFromQuarkFile maps quark's operation and change masks to an Action.
-// quark aggregates operations on the same inode that happen close together, so
-// several bits can be set at once. The final state of the file wins: a removal
-// or move outranks the create or modifications that preceded it.
+// The queue is opened with minimal aggregation, which never merges file
+// events, so each event carries a single operation and, for a modification,
+// a single kind of change.
 func actionFromQuarkFile(file *quark.File) Action {
 	switch {
 	case file.OpMask&quark.QUARK_FILE_OP_REMOVE != 0:

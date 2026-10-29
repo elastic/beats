@@ -20,8 +20,13 @@ summary: The file_integrity ebpf backend requires the host PID namespace when ru
 # this field accommodate a description without length limits.
 description: |
   The file_integrity module's ebpf backend now sources file events through
-  quark, which attributes each event to a process by looking up the process ID
-  the kernel reports in a table built from `/proc` and kept current from kernel
+  quark instead of the ebpfevents library, removing the dependency on
+  elastic/ebpfevents and elastic/ebpf. Configuration is unchanged. Each
+  operation is still reported as its own event, and `file.mode` now reports
+  only the permission bits, consistent with the `fsnotify` backend.
+
+  quark attributes each event to a process by looking up the process ID the
+  kernel reports in a table built from `/proc` and kept current from kernel
   events. The kernel reports host process IDs. When Auditbeat runs in a Docker
   container or K8s pod with its own PID namespace, that table is built from the
   container's process IDs instead.
