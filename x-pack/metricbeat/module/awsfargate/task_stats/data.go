@@ -13,6 +13,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/opt"
 )
 
 var (
@@ -111,35 +112,35 @@ func createRootFields(stats *Stats, regionName string) mapstr.M {
 }
 
 func createCPUFields(stats *Stats) mapstr.M {
-	return mapstr.M{
-		"core": stats.cpuStats.PerCPUUsage,
-		"total": mapstr.M{
-			"pct": stats.cpuStats.TotalUsage,
-			"norm": mapstr.M{
-				"pct": stats.cpuStats.TotalUsageNormalized,
-			},
-		},
-		"kernel": mapstr.M{
-			"ticks": stats.cpuStats.UsageInKernelmode,
-			"pct":   stats.cpuStats.UsageInKernelmodePercentage,
-			"norm": mapstr.M{
-				"pct": stats.cpuStats.UsageInKernelmodePercentageNormalized,
-			},
-		},
-		"user": mapstr.M{
-			"ticks": stats.cpuStats.UsageInUsermode,
-			"pct":   stats.cpuStats.UsageInUsermodePercentage,
-			"norm": mapstr.M{
-				"pct": stats.cpuStats.UsageInUsermodePercentageNormalized,
-			},
-		},
-		"system": mapstr.M{
-			"ticks": stats.cpuStats.SystemUsage,
-			"pct":   stats.cpuStats.SystemUsagePercentage,
-			"norm": mapstr.M{
-				"pct": stats.cpuStats.SystemUsagePercentageNormalized,
-			},
-		},
+	kernel := mapstr.M{"ticks": stats.cpuStats.UsageInKernelmode}
+	addCPUPercentageFields(kernel, stats.cpuStats.UsageInKernelmodePercentage, stats.cpuStats.UsageInKernelmodePercentageNormalized)
+
+	user := mapstr.M{"ticks": stats.cpuStats.UsageInUsermode}
+	addCPUPercentageFields(user, stats.cpuStats.UsageInUsermodePercentage, stats.cpuStats.UsageInUsermodePercentageNormalized)
+
+	system := mapstr.M{"ticks": stats.cpuStats.SystemUsage}
+	addCPUPercentageFields(system, stats.cpuStats.SystemUsagePercentage, stats.cpuStats.SystemUsagePercentageNormalized)
+
+	fields := mapstr.M{
+		"core":   stats.cpuStats.PerCPUUsage,
+		"kernel": kernel,
+		"user":   user,
+		"system": system,
+	}
+	total := mapstr.M{}
+	addCPUPercentageFields(total, stats.cpuStats.TotalUsage, stats.cpuStats.TotalUsageNormalized)
+	if len(total) != 0 {
+		fields["total"] = total
+	}
+	return fields
+}
+
+func addCPUPercentageFields(fields mapstr.M, percentage, normalized opt.Float) {
+	if percentage.Exists() {
+		fields["pct"] = percentage.ValueOr(0)
+	}
+	if normalized.Exists() {
+		fields["norm"] = mapstr.M{"pct": normalized.ValueOr(0)}
 	}
 }
 
