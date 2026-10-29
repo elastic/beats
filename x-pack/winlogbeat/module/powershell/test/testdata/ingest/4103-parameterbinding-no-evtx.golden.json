@@ -1,0 +1,201 @@
+[
+  {
+    "@timestamp": "2020-05-15T08:12:01.0000000Z",
+    "ecs": {
+      "version": "8.17.0"
+    },
+    "event": {
+      "action": "Executing Pipeline",
+      "category": [
+        "process"
+      ],
+      "code": "4103",
+      "ingested": "2026-10-27T11:09:08.092036527Z",
+      "kind": "event",
+      "module": "powershell",
+      "provider": "Microsoft-Windows-PowerShell",
+      "type": [
+        "info"
+      ]
+    },
+    "host": {
+      "name": "vagrant",
+      "os": {
+        "family": "windows",
+        "type": "windows"
+      }
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "CommandInvocation(Get-Date): \"Get-Date\"\nParameterBinding(Get-Date): Name=\"Format\"; Wert=\"yyyy-MM-dd\"\n\n\nContext:\n        Schweregrad: Informational\n        Hostname: ConsoleHost\n        Hostversion: 5.1.17763.1007\n        Host-ID: 69eeb206-43ce-4730-9d9a-3659b2d6dc4d\n        Hostanwendung = C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\n        Modulversion: 5.1.17763.1007\n        Runspace-ID: f78ba949-8d9f-4deb-a379-bf576ba72fb8\n        Pipeline-ID: 1\n        Befehlsname: Get-Date\n        Befehlstyp: Cmdlet\n        Skriptname: \n        Befehlspfad: \n        Sequenznummer: 16\n        Benutzer: VAGRANT\\vagrant\n        Verbundener Benutzer = \n        Shell-ID: Microsoft.PowerShell\n\n\nUser Data:",
+    "powershell": {
+      "command": {
+        "invocation_details": [
+          {
+            "related_command": "Get-Date",
+            "type": "CommandInvocation",
+            "value": "\"Get-Date\""
+          },
+          {
+            "name": "\"Format\"",
+            "related_command": "Get-Date",
+            "type": "ParameterBinding",
+            "value": "\"yyyy-MM-dd\""
+          }
+        ]
+      }
+    },
+    "user": {
+      "id": "S-1-5-21-1350058589-2282154016-2764056528-1000"
+    },
+    "winlog": {
+      "activity_id": "{1ACA0717-2ACB-0002-C208-CA1ACB2AD601}",
+      "channel": "Microsoft-Windows-PowerShell/Operational",
+      "computer_name": "vagrant",
+      "event_data": {
+        "Befehlsname": "Get-Date",
+        "Befehlstyp": "Cmdlet",
+        "Benutzer": "VAGRANT\\vagrant",
+        "Host-ID": "69eeb206-43ce-4730-9d9a-3659b2d6dc4d",
+        "Hostanwendung": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "Hostname": "ConsoleHost",
+        "Hostversion": "5.1.17763.1007",
+        "Modulversion": "5.1.17763.1007",
+        "Pipeline-ID": "1",
+        "Runspace-ID": "f78ba949-8d9f-4deb-a379-bf576ba72fb8",
+        "Schweregrad": "Informational",
+        "Sequenznummer": "16",
+        "Shell-ID": "Microsoft.PowerShell"
+      },
+      "event_id": "4103",
+      "opcode": "To be used when operation is just executing a method",
+      "process": {
+        "pid": 3984,
+        "thread": {
+          "id": 3616
+        }
+      },
+      "provider_guid": "{A0C1853B-5C40-4B15-8766-3CF1C58F985A}",
+      "provider_name": "Microsoft-Windows-PowerShell",
+      "record_id": "3886",
+      "task": "Executing Pipeline",
+      "user": {
+        "identifier": "S-1-5-21-1350058589-2282154016-2764056528-1000"
+      },
+      "version": 1
+    }
+  },
+  {
+    "@timestamp": "2020-05-15T08:12:02.0000000Z",
+    "destination": {
+      "user": {
+        "domain": "VAGRANT",
+        "name": "vagrant"
+      }
+    },
+    "ecs": {
+      "version": "8.17.0"
+    },
+    "event": {
+      "action": "Executing Pipeline",
+      "category": [
+        "process"
+      ],
+      "code": "4103",
+      "ingested": "2026-10-27T11:09:08.092053545Z",
+      "kind": "event",
+      "module": "powershell",
+      "provider": "Microsoft-Windows-PowerShell",
+      "sequence": 35,
+      "type": [
+        "info"
+      ]
+    },
+    "host": {
+      "name": "vagrant",
+      "os": {
+        "family": "windows",
+        "type": "windows"
+      }
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "CommandInvocation(Write-Output): \"Write-Output\"\nParameterBinding(Write-Output): unexpected format\nParameterBinding(Write-Output):\n\n\nContext:\n        Severity = Informational\n        Host Name = ConsoleHost\n        Host Version = 5.1.17763.1007\n        Host ID = ed57761b-ba0f-4d11-87d9-fac33820d20e\n        Host Application = C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\n        Engine Version = 5.1.17763.1007\n        Runspace ID = 0729459a-8646-4176-8b02-024421a9632e\n        Pipeline ID = 1\n        Command Name = Write-Output\n        Command Type = Cmdlet\n        Script Name = \n        Command Path = \n        Sequence Number = 35\n        User = VAGRANT\\vagrant\n        Connected User = VAGRANT\\vagrant\n        Shell ID = Microsoft.PowerShell\n\n\nUser Data:",
+    "powershell": {
+      "command": {
+        "invocation_details": [
+          {
+            "related_command": "Write-Output",
+            "type": "CommandInvocation",
+            "value": "\"Write-Output\""
+          },
+          {
+            "value": "ParameterBinding(Write-Output): unexpected format"
+          },
+          {
+            "value": "ParameterBinding(Write-Output):"
+          }
+        ],
+        "name": "Write-Output",
+        "type": "Cmdlet"
+      },
+      "engine": {
+        "version": "5.1.17763.1007"
+      },
+      "id": "Microsoft.PowerShell",
+      "pipeline_id": "1",
+      "process": {
+        "executable_version": "5.1.17763.1007"
+      },
+      "runspace_id": "0729459a-8646-4176-8b02-024421a9632e"
+    },
+    "process": {
+      "args": [
+        "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"
+      ],
+      "args_count": 1,
+      "command_line": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "entity_id": "ed57761b-ba0f-4d11-87d9-fac33820d20e",
+      "title": "ConsoleHost"
+    },
+    "related": {
+      "user": [
+        "vagrant"
+      ]
+    },
+    "source": {
+      "user": {
+        "domain": "VAGRANT",
+        "name": "vagrant"
+      }
+    },
+    "user": {
+      "domain": "VAGRANT",
+      "id": "S-1-5-21-1350058589-2282154016-2764056528-1000",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "activity_id": "{1ACA0717-2ACB-0002-C208-CA1ACB2AD601}",
+      "channel": "Microsoft-Windows-PowerShell/Operational",
+      "computer_name": "vagrant",
+      "event_id": "4103",
+      "opcode": "To be used when operation is just executing a method",
+      "process": {
+        "pid": 3984,
+        "thread": {
+          "id": 3616
+        }
+      },
+      "provider_guid": "{A0C1853B-5C40-4B15-8766-3CF1C58F985A}",
+      "provider_name": "Microsoft-Windows-PowerShell",
+      "record_id": "3887",
+      "task": "Executing Pipeline",
+      "user": {
+        "identifier": "S-1-5-21-1350058589-2282154016-2764056528-1000"
+      },
+      "version": 1
+    }
+  }
+]
