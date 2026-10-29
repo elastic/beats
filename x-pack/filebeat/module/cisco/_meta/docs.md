@@ -317,10 +317,10 @@ Example config:
 :   The secret token used for authenticating to the SQS queue.
 
 **`var.visibility_timeout`**
-:   The duration that the received messages are hidden from ReceiveMessage request. Default to be 300 seconds.
+:   The duration that the received messages are hidden from ReceiveMessage request. Defaults to 300 seconds.
 
 **`var.api_timeout`**
-:   Maximum duration before AWS API request will be interrupted. Default to be 120 seconds.
+:   Maximum duration before AWS API request will be interrupted. Defaults to 120 seconds.
 
 
 ### `amp` fileset settings [_amp_fileset_settings]
