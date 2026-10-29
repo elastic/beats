@@ -193,7 +193,7 @@ func TestCPUServiceCounterResetOutput(t *testing.T) {
 	require.True(t, ok, "container root fields must be a map")
 	cpuFields, ok := containerFields["cpu"].(mapstr.M)
 	require.True(t, ok, "container CPU fields must be a map")
-	assert.Equal(t, 0.1, cpuFields["usage"], "container CPU usage must retain a valid normalized total")
+	assert.InDelta(t, 0.1, cpuFields["usage"], 1e-12, "container CPU usage must retain a valid normalized total")
 }
 
 func TestEventMappingOmitsUnavailableTotalPercentage(t *testing.T) {

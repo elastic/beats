@@ -136,9 +136,9 @@ func TestGetCPUStats(t *testing.T) {
 
 	cpuStats := getCPUStats(taskStatsOutput["query-metadata-1"])
 	assert.True(t, cpuStats.TotalUsage.Exists(), "total CPU usage must be present")
-	assert.Equal(t, 0.4, cpuStats.TotalUsage.ValueOr(0), "total CPU usage must match")
+	assert.InDelta(t, 0.4, cpuStats.TotalUsage.ValueOr(0), 1e-12, "total CPU usage must match")
 	assert.True(t, cpuStats.TotalUsageNormalized.Exists(), "normalized total CPU usage must be present")
-	assert.Equal(t, 0.2, cpuStats.TotalUsageNormalized.ValueOr(0), "normalized total CPU usage must match")
+	assert.InDelta(t, 0.2, cpuStats.TotalUsageNormalized.ValueOr(0), 1e-12, "normalized total CPU usage must match")
 }
 
 func TestCreateCPUFieldsOmitsUnavailablePercentages(t *testing.T) {
