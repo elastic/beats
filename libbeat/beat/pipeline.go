@@ -74,7 +74,8 @@ var ErrClientClosed = errors.New("beat: client closed")
 // is open but the queue refused the event, for example because the disk queue
 // could not serialize it or it is too large; the queue logs the reason. The
 // client stays usable. A queue that shuts down before the client is closed
-// can also cause it, since such a queue does not say why it refused.
+// can also cause it, since such a queue does not say why it refused. A client
+// with DropIfFull never returns it.
 var ErrRejected = errors.New("beat: event rejected by queue")
 
 // ContextPublisher is an optional interface of a Client whose blocking publish
@@ -97,8 +98,9 @@ type ContextPublisher interface {
 	// (ACK handling); setting one, even acker.Nil(), turns it off. It also
 	// needs a queue that supports it (the disk queue does not). Otherwise
 	// PublishContext ignores ctx and Close, and blocks like Publish. With
-	// DropIfFull it never blocks and returns nil for an event dropped because
-	// the queue is full.
+	// DropIfFull it never blocks and returns nil for any event the queue
+	// refuses while the client is open, including one dropped because the
+	// queue is full.
 	PublishContext(ctx context.Context, e Event) error
 }
 

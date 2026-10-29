@@ -610,25 +610,40 @@ func TestTrackedProducerPublishContextFallback(t *testing.T) {
 // reports a refused event as beat.ErrRejected while open and as
 // beat.ErrClientClosed once closed.
 func TestClientPublishContextReceiverRefused(t *testing.T) {
-	for _, closeClient := range []bool{false, true} {
-		listener := &mockClientListener{}
-		p := &trackedProducer{
-			Producer: &testProducer{
-				publish: func(bool, publisher.Event) (queue.EntryID, bool) { return 0, false },
-			},
-			controller: &otelOutputController{},
-		}
-		c := newContextTestClient(p, listener, nil)
-		require.NotNil(t, c.ctxProducer, "a receiver's client must publish through trackedProducer.PublishContext")
-		want := beat.ErrRejected
-		if closeClient {
-			require.NoError(t, c.Close(), "Close must succeed")
-			want = beat.ErrClientClosed
-		}
+	tests := []struct {
+		name          string
+		closeClient   bool
+		closeProducer bool
+		want          error
+	}{
+		{name: "open", want: beat.ErrRejected},
+		{name: "client closed", closeClient: true, want: beat.ErrClientClosed},
+		// The controller closes producers left open when the pipeline
+		// disconnects, while their clients are still open.
+		{name: "producer closed by controller", closeProducer: true, want: beat.ErrClientClosed},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			listener := &mockClientListener{}
+			p := &trackedProducer{
+				Producer: &testProducer{
+					publish: func(bool, publisher.Event) (queue.EntryID, bool) { return 0, false },
+				},
+				controller: &otelOutputController{},
+			}
+			c := newContextTestClient(p, listener, nil)
+			require.NotNil(t, c.ctxProducer, "a receiver's client must publish through trackedProducer.PublishContext")
+			if tc.closeClient {
+				require.NoError(t, c.Close(), "Close must succeed")
+			}
+			if tc.closeProducer {
+				p.Close()
+			}
 
-		err := c.PublishContext(t.Context(), beat.Event{})
-		assert.Equalf(t, want, err, "PublishContext with client closed=%v", closeClient)
-		assert.Equalf(t, 1, listener.eventsDroppedOnPublish, "the refused event must be reported as dropped (client closed=%v)", closeClient)
+			err := c.PublishContext(t.Context(), beat.Event{})
+			assert.Equal(t, tc.want, err, "PublishContext must report why the event was refused")
+			assert.Equal(t, 1, listener.eventsDroppedOnPublish, "the refused event must be reported as dropped")
+		})
 	}
 }
 

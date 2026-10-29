@@ -177,9 +177,8 @@ func (c *client) PublishContext(ctx context.Context, e beat.Event) error {
 
 // errRejected is returned by a ContextProducer wrapping a producer that cannot
 // cancel (trackedProducer around the disk queue's) when Publish refuses an
-// event. Publish's bool cannot tell a closed queue from a rejected event, so
-// PublishContext decides between beat.ErrClientClosed and beat.ErrRejected
-// from the client's own state.
+// event although the wrapper is open. PublishContext reports it as
+// beat.ErrRejected unless the client is closing.
 var errRejected = errors.New("pipeline: event rejected by queue")
 
 // publishCtx returns a context that is done when ctx is done or the client
