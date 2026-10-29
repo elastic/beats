@@ -216,7 +216,26 @@ func TestGroupStatusOverridesScheduledReport(t *testing.T) {
 
 		time.Sleep(time.Second)
 		synctest.Wait()
-		assert.Len(t, m.GetEvents(), 2, "the scheduled report should be canceled")
+		assert.Len(t, m.GetEvents(), 2, "the scheduled report should be skipped")
 		assert.Equal(t, componentstatus.StatusPermanentError, m.GetEvent().Status(), "the scheduled report must not override the receiver status")
+	})
+}
+
+func TestRunnerChangeAfterGroupStatusIsReported(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		m := &oteltest.MockHost{}
+		reporter := newGroupStatusReporter(m, 100*time.Millisecond)
+
+		reporter.GetReporterForRunner("runner-0").UpdateStatus(status.Running, "")
+		reporter.GetReporterForRunner("runner-1").UpdateStatus(status.Running, "")
+		reporter.UpdateStatus(status.Failed, "beatreceiver failed")
+		reporter.GetReporterForRunner("runner-1").UpdateStatus(status.Degraded, "degraded")
+
+		time.Sleep(time.Second)
+		synctest.Wait()
+		assert.Len(t, m.GetEvents(), 3, "the runner change after the group status should be reported once")
+		assert.Equal(t, componentstatus.StatusRecoverableError, m.GetEvent().Status(), "the runner change should override the group status")
+		_, ok := m.GetEvent().Attributes().Get(InputStatusAttributesKey)
+		assert.True(t, ok, "expected the last event to be a runner report")
 	})
 }

@@ -62,6 +62,9 @@ type reporter struct {
 	lastReport time.Time
 	// pending is the report scheduled at the end of the current interval, if any.
 	pending *time.Timer
+	// dirty is set when a runner status changed since the last report. A
+	// scheduled report is skipped if a newer report made it redundant.
+	dirty bool
 }
 
 // NewGroupStatusReporter creates a reporter that aggregates the statuses of multiple runners
@@ -107,6 +110,7 @@ func (r *reporter) updateStatusForRunner(id string, state status.Status, msg str
 	}
 
 	// report aggregated status for all sub-components
+	r.dirty = true
 	r.reportLocked()
 }
 
@@ -122,7 +126,9 @@ func (r *reporter) reportLocked() {
 			r.mtx.Lock()
 			defer r.mtx.Unlock()
 			r.pending = nil
-			r.sendLocked()
+			if r.dirty {
+				r.sendLocked()
+			}
 		})
 		return
 	}
@@ -130,6 +136,7 @@ func (r *reporter) reportLocked() {
 }
 
 func (r *reporter) sendLocked() {
+	r.dirty = false
 	r.lastReport = time.Now()
 	componentstatus.ReportStatus(r.host, r.calculateOtelStatus())
 }
@@ -150,11 +157,9 @@ func (r *reporter) UpdateStatus(status status.Status, msg string) {
 
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
-	// a scheduled report of the runners would override this status
-	if r.pending != nil {
-		r.pending.Stop()
-		r.pending = nil
-	}
+	// a scheduled report would override this status with runner statuses older
+	// than it; only runner changes made after it should be reported
+	r.dirty = false
 	componentstatus.ReportStatus(r.host, evt)
 }
 
