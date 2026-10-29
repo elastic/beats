@@ -66,7 +66,7 @@ func (r *ebpfReader) Start(done <-chan struct{}) (<-chan Event, error) {
 		r.log.Warn("auditbeat is not running in the initial PID namespace: " +
 			"the ebpf backend drops file events from processes started before " +
 			"auditbeat and may attribute others to the wrong process. " +
-			"In Docker, run with --pid=host.")
+			"In Docker, run with --pid=host. In K8s set `hostPID: true` on the pod.")
 	}
 
 	go r.consumeEvents(done)
