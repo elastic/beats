@@ -14,7 +14,6 @@ import (
 	"io"
 	"net"
 	"path/filepath"
-	"slices"
 	"sync"
 	"testing"
 	"time"
@@ -43,6 +42,9 @@ import (
 // control protocol, that changing one monitor leaves the others running, and
 // that monitor status is still reported to the collector.
 func TestReceiverWithControlProtocol(t *testing.T) {
+	// Registered first so it runs after the receiver and the fake agent stop.
+	t.Cleanup(func() { oteltest.VerifyNoLeaks(t) })
+
 	target := startTCPTarget(t)
 
 	// Version 1 runs monitors a and b, plus an invalid monitor. Version 2 keeps a,
@@ -157,7 +159,7 @@ func TestReceiverWithControlProtocol(t *testing.T) {
 		status, _ := inputStatus(evt, "synthetics/tcp-monitor-invalid")
 		assert.Equal(c, componentstatus.StatusStopped.String(), status)
 	}, 30*time.Second, 100*time.Millisecond)
-	assert.Empty(t, host.rejected(), "the collector would reject these status changes")
+	assert.Empty(t, host.rejectedChanges(), "the collector would reject these status changes")
 
 	// Monitor status goes to the collector, keyed by monitor ID. Heartbeat names
 	// a monitor after its input unless it comes from the Synthetics app.
@@ -293,34 +295,10 @@ func inputStatus(evt *componentstatus.Event, id string) (string, string) {
 	return status.Str(), msg.Str()
 }
 
-// hostWithExtension is a host with a diagnostics extension. Like the
-// collector, it rejects status changes out of StatusPermanentError other than
-// stopping.
+// hostWithExtension is a collectorHost with a diagnostics extension.
 type hostWithExtension struct {
-	oteltest.MockHost
+	collectorHost
 	ext component.Component
-
-	mx      sync.Mutex
-	current componentstatus.Status
-	invalid []string
-}
-
-func (h *hostWithExtension) Report(evt *componentstatus.Event) {
-	h.mx.Lock()
-	if h.current == componentstatus.StatusPermanentError && evt.Status() != componentstatus.StatusStopping {
-		h.invalid = append(h.invalid, h.current.String()+" -> "+evt.Status().String())
-		h.mx.Unlock()
-		return
-	}
-	h.current = evt.Status()
-	h.mx.Unlock()
-	h.MockHost.Report(evt)
-}
-
-func (h *hostWithExtension) rejected() []string {
-	h.mx.Lock()
-	defer h.mx.Unlock()
-	return slices.Clone(h.invalid)
 }
 
 func (h *hostWithExtension) GetExtensions() map[component.ID]component.Component {
