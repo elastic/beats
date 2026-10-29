@@ -67,7 +67,9 @@ After Azure VM metadata is detected, `add_cloud_metadata` automatically attempts
 
 If all three of `TENANT_ID`, `CLIENT_ID`, and `CLIENT_SECRET` are set, Metricbeat uses an explicit client secret credential for the ARM lookup. Otherwise, it uses the Azure SDK for Go `DefaultAzureCredential`.
 
-On Windows, development-focused credentials in the bundled default chain can start Azure CLI, Azure Developer CLI, or Azure PowerShell. `AzurePowerShellCredential` is in the chain in Beats 9.1.8 and later 9.1 releases, 9.2.2 and later 9.2 releases, and all 9.3 and later releases. When included, it starts PowerShell with an encoded command.
+On Windows, development-focused credentials in the bundled default chain can start Azure CLI, Azure Developer CLI, or Azure PowerShell.
+
+{applies_to}`stack: ga 9.1+` `AzurePowerShellCredential` is also in the chain. When included, it starts PowerShell with an encoded command.
 
 {applies_to}`stack: ga 9.1.3+` To exclude development credentials, set `AZURE_TOKEN_CREDENTIALS=prod` in the Beat or {{agent}} process environment and restart the process. This setting retains `EnvironmentCredential`, `WorkloadIdentityCredential`, and `ManagedIdentityCredential`. For details, refer to Microsoft's guidance on [excluding a credential type category](https://learn.microsoft.com/en-us/azure/developer/go/sdk/authentication/credential-chains#exclude-a-credential-type-category). For {{agent}} environment variable locations, refer to [Where to set proxy environment variables](docs-content://reference/fleet/host-proxy-env-vars.md#where-to-set-proxy-env-vars).
 
