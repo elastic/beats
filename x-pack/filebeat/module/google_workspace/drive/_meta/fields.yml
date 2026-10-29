@@ -35,7 +35,7 @@
     - name: shared_drive_id
       type: keyword
       description: >
-        The unique identifier of the Team Drive. Only populated for for events relating to a Team Drive or item contained inside a Team Drive.
+        The unique identifier of the Team Drive. Only populated for events relating to a Team Drive or item contained inside a Team Drive.
     - name: visibility
       type: keyword
       description: >

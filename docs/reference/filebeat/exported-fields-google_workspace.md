@@ -596,7 +596,7 @@ More information about specific fields can be found at https://developers.google
 
 
 **`google_workspace.drive.shared_drive_id`**
-:   The unique identifier of the Team Drive. Only populated for for events relating to a Team Drive or item contained inside a Team Drive.
+:   The unique identifier of the Team Drive. Only populated for events relating to a Team Drive or item contained inside a Team Drive.
 
     type: keyword
 
