@@ -12,6 +12,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pub"
 )
 
 type mockBeatPublisher struct {
@@ -36,6 +37,8 @@ func (m *mockBeatPublisher) PublishQueryProfile(index, queryName, actionID, resp
 func (m *mockBeatPublisher) Configure(inputs []config.InputConfig) error {
 	return nil
 }
+
+func (m *mockBeatPublisher) CaptureScheduledProfileSink(string) pub.ScheduledProfileSink { return nil }
 
 func (m *mockBeatPublisher) Close() {
 	m.closeCalled = true

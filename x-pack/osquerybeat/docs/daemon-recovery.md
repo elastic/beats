@@ -10,5 +10,5 @@ adds no backoff or retry limit and leaves existing health reporting unchanged.
 Repeated runtime failures can therefore cause repeated immediate restarts.
 
 Restart waits for the previous run to finish cleanup. A logger callback blocked
-on output publication can still delay recovery; callback and profiling fixes
-are separate changes.
+on output publication can still delay recovery. Scheduled query profiling runs
+outside the logger callback, and a stuck profile publish does not delay restart.
