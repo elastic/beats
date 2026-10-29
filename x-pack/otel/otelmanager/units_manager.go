@@ -159,11 +159,14 @@ func (m *UnitsManager) run() {
 				m.logger.Errorf("elastic-agent-client error: %v", err)
 			}
 		case change := <-m.client.UnitChanges():
-			key := unitKey(change.Unit)
-			if change.Type == client.UnitChangedRemoved {
-				delete(m.units, key)
-			} else {
-				m.units[key] = change.Unit
+			switch change.Type {
+			case client.UnitChangedAdded, client.UnitChangedModified:
+				m.units[unitKey(change.Unit)] = change.Unit
+			case client.UnitChangedRemoved:
+				delete(m.units, unitKey(change.Unit))
+			default:
+				m.logger.Warnf("ignoring unit change of unknown type %v", change.Type)
+				continue
 			}
 			timer.Reset(unitsDebounce)
 		case <-ready:
