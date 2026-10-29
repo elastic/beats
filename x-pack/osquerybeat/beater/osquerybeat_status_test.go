@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"slices"
 	"sync"
 	"testing"
 	"time"
@@ -355,6 +356,38 @@ func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
 	// Last status should be Stopped
 	lastEvent := events[eventCount-1]
 	assert.Equal(t, status.Stopped, lastEvent.Status, "last status should be Stopped")
+}
+
+// A runner failure must stay FAILED until Run returns. Reporting Stopping in
+// between shows the OTel host FAILED, then OK, then FAILED again. A terminal
+// startup failure takes the same path as an exhausted restart budget without
+// waiting for the production backoff.
+func TestOsquerybeatRunnerFailureDoesNotReportStopping(t *testing.T) {
+	failure := errors.New("osqueryd failed to start")
+	ob, b, mgr := newStatusTestBeater(t, func(ob *osquerybeat) {
+		ob.pub = &mockBeatPublisher{}
+		ob.config.Inputs = []config.InputConfig{{Name: "osquery-manager-1", Type: osqueryInputType}}
+		ob.osquerydFactory = func(string, ...osqd.Option) (osqd.Runner, error) {
+			return &mockOsqueryd{runErr: failure}, nil
+		}
+	})
+	errCh := make(chan error, 1)
+	go func() { errCh <- ob.Run(b) }()
+	select {
+	case err := <-errCh:
+		require.ErrorIs(t, err, failure, "Run must return the runner failure")
+	case <-time.After(5 * time.Second):
+		ob.Stop()
+		t.Fatal("Run did not return the runner failure")
+	}
+	mgr.mx.Lock()
+	events := append([]statusEvent(nil), mgr.events...)
+	mgr.mx.Unlock()
+	first := slices.IndexFunc(events, func(e statusEvent) bool { return e.Status == status.Failed })
+	require.NotEqual(t, -1, first, "the runner must report its failure: %v", events)
+	for _, event := range events[first:] {
+		assert.Equal(t, status.Failed, event.Status, "nothing may follow the runner failure but FAILED: %v", events)
+	}
 }
 
 func newTestBeatPaths(t *testing.T) *paths.Path {

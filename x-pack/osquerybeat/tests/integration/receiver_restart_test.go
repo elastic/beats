@@ -192,4 +192,7 @@ func TestReceiverRestartsAfterOsqueryExit78(t *testing.T) {
 		assert.NotEqual(t, componentstatus.StatusPermanentError, event.Status(), "exit 78 must not permanently fail the receiver")
 		assert.NotEqual(t, componentstatus.StatusFatalError, event.Status(), "exit 78 must not fatally fail the receiver")
 	}
+	// The receiver's beat status does not reach the host on this branch, so
+	// check that the restart went through the bounded backoff instead.
+	assert.NotEmpty(t, observed.FilterMessageSnippet("Restart osqueryd after recoverable error in 1s").All(), "the first runtime exit must restart after the initial backoff")
 }
