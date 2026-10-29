@@ -53,7 +53,7 @@ type client struct {
 	// else nil (see cancellableProducer).
 	ctxProducer queue.ContextProducer[publisher.Event]
 	// closeCtx is cancelled by Close to release a PublishContext waiting for
-	// room in the queue. Set only when ctxProducer is.
+	// room in the queue. Set only when ctxProducer is non-nil.
 	closeCtx    context.Context
 	closeCancel context.CancelFunc
 	mutex       sync.Mutex
