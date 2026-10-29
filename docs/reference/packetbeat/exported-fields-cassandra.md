@@ -61,7 +61,7 @@ Cassandra request headers.
 
 
 **`cassandra.request.headers.length`**
-:   A integer representing the length of the body of the frame (a frame is limited to 256MB in length).
+:   An integer representing the length of the body of the frame (a frame is limited to 256MB in length).
 
     type: long
 
@@ -105,7 +105,7 @@ Cassandra response headers, the structure is as same as request's header.
 
 
 **`cassandra.response.headers.length`**
-:   A integer representing the length of the body of the frame (a frame is limited to 256MB in length).
+:   An integer representing the length of the body of the frame (a frame is limited to 256MB in length).
 
     type: long
 
