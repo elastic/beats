@@ -1,0 +1,7 @@
+kind: bug-fix
+summary: Do not apply start_position after stale bookmark recovery in the Windows event log reader.
+description: |
+  The start_position setting only applies when a channel has never been read.
+  When a stale bookmark is cleared the setting is ignored and the reader
+  continues from the oldest record.
+component: winlogbeat, filebeat
