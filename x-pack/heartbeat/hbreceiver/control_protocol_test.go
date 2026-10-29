@@ -129,10 +129,12 @@ func TestReceiverWithControlProtocol(t *testing.T) {
 		assert.Contains(c, msg, "schedule")
 	}, 30*time.Second, 100*time.Millisecond)
 
-	// The rendered config lists the monitors, as for a beat process.
+	// The rendered config lists the monitors and the output, as for a beat
+	// process, though the output never reaches the beater.
 	rendered := diagExt.run(t, "beat-rendered-config.yml")
 	assert.Contains(t, rendered, "monitor-a")
 	assert.Contains(t, rendered, "monitor-b")
+	assert.Contains(t, rendered, "pretty: true")
 
 	agent.setUnits(unitsV2)
 	require.EventuallyWithT(t, func(c *assert.CollectT) {
@@ -375,6 +377,10 @@ func outputUnit(idx uint64) *proto.UnitExpected {
 			Id:   "default",
 			Type: "console",
 			Name: "console",
+			Source: &structpb.Struct{Fields: map[string]*structpb.Value{
+				"type":   structpb.NewStringValue("console"),
+				"pretty": structpb.NewBoolValue(true),
+			}},
 		},
 	}
 }
