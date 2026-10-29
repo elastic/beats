@@ -154,10 +154,10 @@ The `add_kubernetes_metadata` processor has the following configuration settings
 :   (Optional) Enable or disable default pod matchers when you want to specify your own.
 
 `labels.dedot`
-:   (Optional) Default to be true. If set to true, then `.` in labels will be replaced with `_`.
+:   (Optional) Defaults to true. If set to true, then `.` in labels will be replaced with `_`.
 
 `annotations.dedot`
-:   (Optional) Default to be true. If set to true, then `.` in labels will be replaced with `_`.
+:   (Optional) Defaults to true. If set to true, then `.` in annotations will be replaced with `_`.
 
 
 `append_fields` {applies_to}`stack: ga 9.4`
