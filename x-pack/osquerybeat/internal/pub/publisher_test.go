@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -31,6 +32,7 @@ import (
 type recordingClient struct {
 	mu     sync.Mutex
 	events []beat.Event
+	closed atomic.Bool
 }
 
 func (c *recordingClient) Publish(event beat.Event) {
@@ -52,6 +54,7 @@ func (c *recordingClient) snapshot() []beat.Event {
 }
 
 func (c *recordingClient) Close() error {
+	c.closed.Store(true)
 	return nil
 }
 

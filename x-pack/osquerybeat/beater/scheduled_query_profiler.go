@@ -173,7 +173,17 @@ type profilingQueryExecutor struct {
 	executor queryExecutor
 }
 
-func newProfilingQueryExecutor(ctx context.Context, client *osqdcli.Client) profilingQueryExecutor {
+// newProfilingQueryExecutor builds its own client rather than taking one. A
+// profile RPC can wait for osqueryd's scheduler lock while a later logger call
+// resolves columns on the shared client, and sharing that client would turn the
+// overlap into a lock cycle. The client is never connected: each Query opens
+// and closes its own connection, so it needs no Close.
+func newProfilingQueryExecutor(ctx context.Context, socketPath string, log *logp.Logger) profilingQueryExecutor {
+	client := osqdcli.New(socketPath,
+		osqdcli.WithLogger(log),
+		osqdcli.WithTimeout(10*time.Second),
+		osqdcli.WithMaxTimeout(10*time.Second),
+	)
 	return profilingQueryExecutor{runCtx: ctx, executor: client}
 }
 

@@ -50,6 +50,8 @@ func New(b *beat.Beat, log *logp.Logger) *Publisher {
 	}
 }
 
+// Configure replaces the clients for the given inputs. It must be called from a
+// single goroutine; only Close may run concurrently with it.
 func (p *Publisher) Configure(inputs []config.InputConfig) error {
 	if len(inputs) == 0 {
 		return nil
