@@ -242,6 +242,39 @@ func TestPgsqlParser_nullColumn(t *testing.T) {
 	}
 }
 
+// Test a DataRow whose second column is binary. The value bytes must be
+// skipped so the row still parses. The captured value stays empty.
+func TestPgsqlParser_binaryColumn(t *testing.T) {
+	pgsql := pgsqlModForTests(nil)
+
+	rowDescription := "540000002e0002" +
+		"6100" + "00000000" + "0001" + "00000019" + "ffff" + "ffffffff" + "0000" +
+		"6200" + "00000000" + "0002" + "00000019" + "ffff" + "ffffffff" + "0001"
+	data := rowDescription +
+		"44000000100002" + "00000001" + "59" + "00000001" + "5a" + // "Y", binary "Z"
+		"430000000d53454c454354203100" +
+		"5a0000000549"
+
+	message, err := hex.DecodeString(data)
+	if err != nil {
+		t.Fatalf("hex.DecodeString(data) = %v; want no error", err)
+	}
+
+	stream := &pgsqlStream{data: message, message: new(pgsqlMessage)}
+
+	ok, complete := pgsql.pgsqlMessageParser(stream)
+	if !ok {
+		t.Error("pgsqlMessageParser ok = false; want true")
+	}
+	if !complete {
+		t.Error("pgsqlMessageParser complete = false; want true")
+	}
+	want := []string{"Y", ""}
+	if len(stream.message.rows) != 1 || !slices.Equal(stream.message.rows[0], want) {
+		t.Errorf("rows = %v; want [%v]", stream.message.rows, want)
+	}
+}
+
 // Test a DataRow with a column length below -1, which no value can have.
 func TestPgsqlParser_negativeColumnLength(t *testing.T) {
 	pgsql := pgsqlModForTests(nil)
