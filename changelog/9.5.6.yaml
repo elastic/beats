@@ -5,10 +5,7 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53140
       issue:
         - https://github.com/elastic/beats/issues/52616
       impact: ""
@@ -22,10 +19,7 @@ entries:
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/51690
       issue: []
       impact: ""
       action: ""
@@ -41,10 +35,7 @@ entries:
         glibc 2.27 systems, such as Ubuntu 18.04.
       component: osquerybeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/52651
       issue: []
       impact: ""
       action: ""
@@ -57,10 +48,7 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53067
       issue: []
       impact: ""
       action: ""
@@ -73,10 +61,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53204
       issue: []
       impact: ""
       action: ""
@@ -89,10 +74,7 @@ entries:
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53301
       issue: []
       impact: ""
       action: ""
@@ -105,10 +87,7 @@ entries:
       description: ""
       component: osquerybeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53322
       issue:
         - https://github.com/elastic/elastic-agent/issues/15964
       impact: ""
@@ -131,10 +110,7 @@ entries:
         not counted as an error.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53416
       issue: []
       impact: ""
       action: ""
@@ -148,10 +124,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53417
       issue: []
       impact: ""
       action: ""
@@ -164,10 +137,7 @@ entries:
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53418
       issue: []
       impact: ""
       action: ""
@@ -180,10 +150,7 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53643
       issue:
         - https://github.com/elastic/beats/issues/52999
       impact: ""
@@ -197,10 +164,7 @@ entries:
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53491
       issue: []
       impact: ""
       action: ""
@@ -213,10 +177,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53534
       issue: []
       impact: ""
       action: ""
@@ -229,10 +190,7 @@ entries:
       description: ""
       component: heartbeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53593
       issue: []
       impact: ""
       action: ""
@@ -245,10 +203,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53636
       issue: []
       impact: ""
       action: ""
@@ -270,10 +225,7 @@ entries:
         event type it needs is disabled.
       component: auditbeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53511
       issue:
         - https://github.com/elastic/beats/issues/46719
       impact: ""
@@ -287,10 +239,7 @@ entries:
       description: ""
       component: heartbeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53664
       issue:
         - https://github.com/elastic/beats/issues/53662
       impact: ""
@@ -304,10 +253,7 @@ entries:
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53658
       issue: []
       impact: ""
       action: ""
@@ -321,10 +267,7 @@ entries:
         The pgsql parser read DataRow column lengths as unsigned, so the -1 that the PostgreSQL wire protocol uses to mark a NULL column was rejected as an invalid length. The response was dropped but its query stayed queued, so for the rest of that connection's life every published event carried the previous query's text against a later query's rows, and the last query was never published at all. A DataRow truncated part-way through a column length could also panic packetbeat.
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53666
       issue: []
       impact: ""
       action: ""
@@ -350,10 +293,7 @@ entries:
       description: ""
       component: osquerybeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53774
       issue:
         - https://github.com/elastic/beats/issues/53645
       impact: ""
@@ -367,10 +307,7 @@ entries:
       description: Bump the npcap OEM installer version used by Packetbeat to 1.88.
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53773
       issue: []
       impact: ""
       action: ""
@@ -383,10 +320,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53777
       issue: []
       impact: ""
       action: ""
@@ -418,10 +352,7 @@ entries:
         and a later start tries again.
       component: auditbeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53785
       issue: []
       impact: ""
       action: ""
@@ -434,10 +365,7 @@ entries:
       description: ""
       component: auditbeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53782
       issue: []
       impact: ""
       action: ""
@@ -450,10 +378,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53817
       issue: []
       impact: ""
       action: ""
@@ -466,10 +391,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53822
       issue:
         - https://github.com/elastic/beats/issues/53816
       impact: ""
@@ -483,10 +405,7 @@ entries:
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53843
       issue: []
       impact: ""
       action: ""
@@ -500,9 +419,6 @@ entries:
       component: all
       pr:
         - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
       issue: []
       impact: ""
       action: ""
@@ -515,10 +431,7 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53943
       issue: []
       impact: ""
       action: ""
@@ -531,10 +444,7 @@ entries:
       description: ""
       component: heartbeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53947
       issue: []
       impact: ""
       action: ""
@@ -547,10 +457,7 @@ entries:
       description: Bump the npcap OEM installer version used by Packetbeat to 1.89.
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53706
       issue: []
       impact: ""
       action: ""
@@ -563,10 +470,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53972
       issue: []
       impact: ""
       action: ""
@@ -584,10 +488,7 @@ entries:
         with an "okta: open scratch for groups" error.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53979
       issue: []
       impact: ""
       action: ""
@@ -601,10 +502,7 @@ entries:
         Upgrade the bundled osquery runtime to version 5.24.0. It fixes a deadlock in osqueryd that could occur when the osquery extension restarted: osqueryd stopped answering queries, every extension restart was rejected with "Refusing to register duplicate extension osquery-extension", and on Windows queries failed with "boost::lock_error: No error" until the agent was restarted (osquery/osquery#9163). It also includes a fix for a heap buffer overflow in the Windows processes table (GHSA-4r78-6hg6-33gg).
       component: osquerybeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53993
       issue: []
       impact: ""
       action: ""
@@ -618,10 +516,7 @@ entries:
         The bridge held its own lock while calling into the OTel meter, while the OTel SDK holds its pipeline lock when it runs the bridge callback, which takes the bridge lock. A collection overlapping an instrument creation, callback re-registration or shutdown could hang metrics collection.
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/53995
       issue:
         - https://github.com/elastic/beats/issues/53991
       impact: ""
@@ -649,10 +544,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/54014
       issue: []
       impact: ""
       action: ""
@@ -665,10 +557,7 @@ entries:
       description: ""
       component: elastic-agent
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/54036
       issue: []
       impact: ""
       action: ""
@@ -681,10 +570,7 @@ entries:
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/54067
       issue: []
       impact: ""
       action: ""
@@ -697,10 +583,7 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/53919
-        - https://github.com/elastic/beats/pull/54150
-        - https://github.com/elastic/beats/pull/54154
-        - https://github.com/elastic/beats/pull/54120
+        - https://github.com/elastic/beats/pull/54100
       issue: []
       impact: ""
       action: ""
