@@ -163,14 +163,24 @@ func (c *client) PublishContext(ctx context.Context, e beat.Event) error {
 	})
 	if err != nil {
 		c.onDroppedOnPublish(e)
-		if errors.Is(err, queue.ErrClosed) || c.closeCtx.Err() != nil {
+		switch {
+		case errors.Is(err, queue.ErrClosed) || c.closeCtx.Err() != nil:
 			return beat.ErrClientClosed
+		case errors.Is(err, errRejected):
+			return beat.ErrRejected
 		}
 		return err
 	}
 	c.onPublished()
 	return nil
 }
+
+// errRejected is returned by a ContextProducer wrapping a producer that cannot
+// cancel (trackedProducer around the disk queue's) when Publish refuses an
+// event. Publish's bool cannot tell a closed queue from a rejected event, so
+// PublishContext decides between beat.ErrClientClosed and beat.ErrRejected
+// from the client's own state.
+var errRejected = errors.New("pipeline: event rejected by queue")
 
 // publishCtx returns a context that is done when ctx is done or the client
 // closes. Callers usually pass the same ctx many times, so the merged context

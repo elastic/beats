@@ -589,7 +589,7 @@ func TestReceiverClientPublishContextCancel(t *testing.T) {
 
 // TestTrackedProducerPublishContextFallback checks that trackedProducer
 // publishes with Publish when its producer cannot cancel (the disk queue), and
-// reports a refused event as queue.ErrClosed.
+// reports a refused event as errRejected.
 func TestTrackedProducerPublishContextFallback(t *testing.T) {
 	for _, accept := range []bool{true, false} {
 		p := &trackedProducer{Producer: &testProducer{
@@ -600,8 +600,35 @@ func TestTrackedProducerPublishContextFallback(t *testing.T) {
 			assert.NoError(t, err, "an accepted event must not be an error")
 			assert.Equal(t, queue.EntryID(7), id, "the producer's entry ID must be returned")
 		} else {
-			assert.ErrorIs(t, err, queue.ErrClosed, "a refused event must be reported as ErrClosed")
+			assert.ErrorIs(t, err, errRejected, "a refused event must be reported as errRejected")
 		}
+	}
+}
+
+// TestClientPublishContextReceiverRefused checks that a Beat receiver's client,
+// whose trackedProducer wraps a producer that cannot cancel (the disk queue),
+// reports a refused event as beat.ErrRejected while open and as
+// beat.ErrClientClosed once closed.
+func TestClientPublishContextReceiverRefused(t *testing.T) {
+	for _, closeClient := range []bool{false, true} {
+		listener := &mockClientListener{}
+		p := &trackedProducer{
+			Producer: &testProducer{
+				publish: func(bool, publisher.Event) (queue.EntryID, bool) { return 0, false },
+			},
+			controller: &otelOutputController{},
+		}
+		c := newContextTestClient(p, listener, nil)
+		require.NotNil(t, c.ctxProducer, "a receiver's client must publish through trackedProducer.PublishContext")
+		want := beat.ErrRejected
+		if closeClient {
+			require.NoError(t, c.Close(), "Close must succeed")
+			want = beat.ErrClientClosed
+		}
+
+		err := c.PublishContext(t.Context(), beat.Event{})
+		assert.Equalf(t, want, err, "PublishContext with client closed=%v", closeClient)
+		assert.Equalf(t, 1, listener.eventsDroppedOnPublish, "the refused event must be reported as dropped (client closed=%v)", closeClient)
 	}
 }
 
