@@ -34,6 +34,9 @@ func GenTestOutputCmd(settings instance.Settings) *cobra.Command {
 		Use:   "output",
 		Short: "Test " + settings.Name + " can connect to the output by using the current settings",
 		Run: func(cmd *cobra.Command, args []string) {
+			// Output connectivity does not require an event pipeline. Skipping global
+			// processors also avoids starting unrelated background work during a CLI probe.
+			settings.SkipProcessorInitialization = true
 			b, err := instance.NewInitializedBeat(settings)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)

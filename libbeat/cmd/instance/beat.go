@@ -1007,14 +1007,19 @@ func (b *Beat) configure(settings Settings) error {
 		return err
 	}
 
-	processingFactory := settings.Processing
-	if processingFactory == nil {
-		processingFactory = processing.MakeDefaultBeatSupport(true)
-	}
-	b.processors, err = processingFactory(b.Info, logger.Named("processors"), b.RawConfig)
+	if !settings.SkipProcessorInitialization {
+		processingFactory := settings.Processing
+		if processingFactory == nil {
+			processingFactory = processing.MakeDefaultBeatSupport(true)
+		}
+		b.processors, err = processingFactory(b.Info, logger.Named("processors"), b.RawConfig)
+		if err != nil {
+			return err
+		}
 
-	b.Manager.RegisterDiagnosticHook("global processors", "a list of currently configured global beat processors",
-		"global_processors.txt", "text/plain", b.agentDiagnosticHook)
+		b.Manager.RegisterDiagnosticHook("global processors", "a list of currently configured global beat processors",
+			"global_processors.txt", "text/plain", b.agentDiagnosticHook)
+	}
 	b.Manager.RegisterDiagnosticHook("beat_metrics", "Metrics from the default monitoring namespace and expvar.",
 		"beat_metrics.json", "application/json", func() []byte {
 			m := monitoring.CollectStructSnapshot((b.Monitoring.StatsRegistry()), monitoring.Full, true)
