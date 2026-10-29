@@ -2,7 +2,7 @@
 # repositories do not provide the Kerberos KDC packages. Copy the current
 # Elasticsearch distribution into Debian, where the fixture can install and
 # run krb5kdc and kadmind alongside Elasticsearch.
-FROM docker.elastic.co/elasticsearch/elasticsearch:9.7.0-b8ab0cff-SNAPSHOT AS elasticsearch
+FROM docker.elastic.co/elasticsearch/elasticsearch:9.7.0-574dd107-SNAPSHOT AS elasticsearch
 
 FROM debian:bookworm
 
