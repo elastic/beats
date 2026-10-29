@@ -67,10 +67,15 @@ type Client interface {
 }
 
 // ErrClientClosed is returned by ContextPublisher.PublishContext when the
-// event was not queued because the client or its queue is closed, or because
-// the queue rejected it (for example when the disk queue fails to serialize
-// it).
+// event was not queued because the client or its queue is closed.
 var ErrClientClosed = errors.New("beat: client closed")
+
+// ErrRejected is returned by ContextPublisher.PublishContext when the client
+// is open but the queue refused the event, for example because the disk queue
+// could not serialize it or it is too large; the queue logs the reason. The
+// client stays usable. A queue that shuts down before the client is closed
+// can also cause it, since such a queue does not say why it refused.
+var ErrRejected = errors.New("beat: event rejected by queue")
 
 // ContextPublisher is an optional interface of a Client whose blocking publish
 // can be cancelled. Find it with a type assertion on a Client and fall back to
@@ -80,9 +85,10 @@ type ContextPublisher interface {
 	// PublishContext publishes e like Publish, but stops waiting for room in
 	// the queue when ctx is done or the client is closed. It returns nil if
 	// the event was queued or filtered out by processors, ctx.Err() if ctx
-	// ended first, or ErrClientClosed if the event was not queued because the
-	// client or queue is closed (Close releases a PublishContext in flight).
-	// An event that is not queued is reported to the ClientListener as
+	// ended first, ErrClientClosed if the event was not queued because the
+	// client or queue is closed (Close releases a PublishContext in flight),
+	// or ErrRejected if the open client's queue refused the event. An event
+	// that is not queued is reported to the ClientListener as
 	// DroppedOnPublish; a filtered event is reported as Filtered, not
 	// dropped. If ctx is already done, an event that fits without waiting may
 	// still be queued, and PublishContext returns nil.

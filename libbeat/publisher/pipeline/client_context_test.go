@@ -132,18 +132,20 @@ func TestClientPublishContextNewContext(t *testing.T) {
 	})
 }
 
-// TestClientPublishContextClosed checks that PublishContext reports
-// ErrClientClosed, and counts the event as dropped, when the client is closed
-// and when a producer without PublishContext refuses the event.
-func TestClientPublishContextClosed(t *testing.T) {
+// TestClientPublishContextRefused checks the error PublishContext reports, and
+// that it counts the event as dropped, when the client is closed and when a
+// producer without PublishContext (like the disk queue's) refuses the event.
+func TestClientPublishContextRefused(t *testing.T) {
 	tests := []struct {
 		name    string
 		close   bool
 		canDrop bool
+		want    error
 	}{
-		{name: "client closed", close: true},
-		{name: "client closed with DropIfFull", close: true, canDrop: true},
-		{name: "fallback producer closed", close: false},
+		{name: "client closed", close: true, want: beat.ErrClientClosed},
+		{name: "client closed with DropIfFull", close: true, canDrop: true, want: beat.ErrClientClosed},
+		{name: "fallback producer rejects", want: beat.ErrRejected},
+		{name: "fallback producer full with DropIfFull", canDrop: true, want: nil},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -159,7 +161,7 @@ func TestClientPublishContextClosed(t *testing.T) {
 			cp, ok := beat.Client(c).(beat.ContextPublisher)
 			require.True(t, ok, "the pipeline client must implement beat.ContextPublisher")
 			err := cp.PublishContext(t.Context(), beat.Event{})
-			assert.ErrorIs(t, err, beat.ErrClientClosed, "PublishContext must report the closed client")
+			assert.Equal(t, tc.want, err, "PublishContext must report why the event was refused")
 			assert.Equal(t, 1, listener.eventsDroppedOnPublish, "the refused event must be reported as dropped")
 		})
 	}

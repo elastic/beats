@@ -136,12 +136,18 @@ func (c *client) PublishContext(ctx context.Context, e beat.Event) error {
 	defer c.mutex.Unlock()
 
 	if c.canDrop || c.ctxProducer == nil {
-		// With DropIfFull a refused event may only mean a full queue, which
-		// is not an error.
-		if !c.publish(e) && (!c.canDrop || !c.isOpen.Load()) {
+		switch {
+		case c.publish(e):
+			return nil
+		case !c.isOpen.Load():
 			return beat.ErrClientClosed
+		case c.canDrop:
+			// With DropIfFull a refused event may only mean a full queue,
+			// which is not an error.
+			return nil
+		default:
+			return beat.ErrRejected
 		}
-		return nil
 	}
 
 	if !c.prepare(&e) {
