@@ -1,0 +1,11 @@
+kind: bug-fix
+summary: Stop auditbeat add_session_metadata stalling audit event reading after falling behind.
+description: |
+  The kernel_tracing backend of add_session_metadata waited up to 1.2 seconds
+  for each process missing from its cache, regardless of how old the event
+  was. Once auditbeat fell behind, every event in the backlog was for a process
+  that had already exited and waited the full time, so auditbeat never caught
+  up, stopped reading the audit socket, and the kernel dropped audit messages.
+  The wait is now measured from the event's timestamp, so events that have
+  already waited longer than the limit are not delayed further.
+component: auditbeat
