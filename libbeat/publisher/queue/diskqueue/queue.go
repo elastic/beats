@@ -72,6 +72,11 @@ type diskQueue struct {
 	// The API channel used by diskQueueProducer to write events.
 	producerWriteRequestChan chan producerWriteRequest
 
+	// producerCancelChan receives the response channel of a request that a
+	// producer gave up waiting on. The core loop removes the request from
+	// blockedProducers, if it is still there, and answers it with errCancelled.
+	producerCancelChan chan chan error
+
 	// pendingFrames is a list of all incoming data frames that have been
 	// accepted by the queue and are waiting to be sent to the writer loop.
 	// Segment ids in this list always appear in sorted order, even between
@@ -243,6 +248,7 @@ func NewQueue(
 		deleterLoop: newDeleterLoop(settings, paths),
 
 		producerWriteRequestChan: make(chan producerWriteRequest),
+		producerCancelChan:       make(chan chan error),
 
 		close: make(chan struct{}),
 		done:  make(chan struct{}),

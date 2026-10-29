@@ -68,9 +68,12 @@ func TestHandleProducerWriteRequest(t *testing.T) {
 		// The value to set shouldBlock to in the producer write request
 		shouldBlock bool
 
-		// The result we expect on the requests's response channel, or
-		// nil if there should be none.
+		// Whether we expect the request's response channel to report success
+		// (a nil error), or nil if there should be no response.
 		expectedResult *bool
+
+		// The error we expect a failure response to wrap.
+		expectedErr error
 
 		// The segment the frame should be assigned to in pendingFrames.
 		// This is ignored unless expectedResult is &true.
@@ -88,6 +91,7 @@ func TestHandleProducerWriteRequest(t *testing.T) {
 			frameSize:      1001,
 			shouldBlock:    true,
 			expectedResult: new(false),
+			expectedErr:    queue.ErrRejected,
 		},
 		"accept with frame in new segment if current segment is full": {
 			segments: diskQueueSegments{
@@ -109,6 +113,7 @@ func TestHandleProducerWriteRequest(t *testing.T) {
 			frameSize:      500,
 			shouldBlock:    false,
 			expectedResult: new(false),
+			expectedErr:    errQueueFull,
 		},
 		"block when full and shouldBlock=true": {
 			segments: diskQueueSegments{
@@ -125,6 +130,7 @@ func TestHandleProducerWriteRequest(t *testing.T) {
 			frameSize:        500,
 			shouldBlock:      false,
 			expectedResult:   new(false),
+			expectedErr:      errQueueFull,
 		},
 		"block when blockedProducers is nonempty and shouldBlock=true": {
 			blockedProducers: true,
@@ -157,15 +163,19 @@ func TestHandleProducerWriteRequest(t *testing.T) {
 		request := producerWriteRequest{
 			frame:        makeWriteFrameWithSize(test.frameSize),
 			shouldBlock:  test.shouldBlock,
-			responseChan: make(chan bool, 1),
+			responseChan: make(chan error, 1),
 		}
 
 		dq.handleProducerWriteRequest(request)
 
 		var result *bool
 		select {
-		case r := <-request.responseChan:
-			result = &r
+		case err := <-request.responseChan:
+			result = new(err == nil)
+			if test.expectedErr != nil && !errors.Is(err, test.expectedErr) {
+				t.Errorf("%s: expected an error wrapping %v, got %v",
+					description, test.expectedErr, err)
+			}
 		default:
 			// No response, result can stay nil.
 		}
@@ -763,8 +773,8 @@ func TestMaybeUnblockProducers(t *testing.T) {
 
 	settings := DefaultSettings()
 	settings.MaxBufferSize = 1000
-	responseChans := []chan bool{
-		make(chan bool, 1), make(chan bool, 1), make(chan bool, 1)}
+	responseChans := []chan error{
+		make(chan error, 1), make(chan error, 1), make(chan error, 1)}
 	dq := &diskQueue{
 		observer: queue.NewQueueObserver(nil),
 		settings: settings,
@@ -797,8 +807,8 @@ func TestMaybeUnblockProducers(t *testing.T) {
 	for i := range 3 {
 		select {
 		case response := <-responseChans[i]:
-			if i < 2 && !response {
-				t.Errorf("Expected success response for producer %v, got failure", i)
+			if i < 2 && response != nil {
+				t.Errorf("Expected success response for producer %v, got %v", i, response)
 			} else if i == 2 {
 				t.Fatalf("Expected no response for producer 2, got %v", response)
 			}
@@ -824,8 +834,8 @@ func TestMaybeUnblockProducers(t *testing.T) {
 		case response := <-responseChans[i]:
 			if i < 2 {
 				t.Errorf("Expected no response for producer %v, got %v", i, response)
-			} else if !response {
-				t.Errorf("Expected success response for producer 2, got failure")
+			} else if response != nil {
+				t.Errorf("Expected success response for producer 2, got %v", response)
 			}
 		default:
 			if i == 2 {
@@ -833,6 +843,40 @@ func TestMaybeUnblockProducers(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestHandleProducerCancel(t *testing.T) {
+	// handleProducerCancel should remove only the blocked request with the
+	// given response channel, answer it with errCancelled, and keep the other
+	// requests in order without answering them. An unknown channel belongs to
+	// a request that was already answered, so nothing changes.
+	responseChans := []chan error{
+		make(chan error, 1), make(chan error, 1), make(chan error, 1)}
+	dq := &diskQueue{}
+	for _, c := range responseChans {
+		dq.blockedProducers = append(dq.blockedProducers,
+			producerWriteRequest{responseChan: c, shouldBlock: true})
+	}
+
+	dq.handleProducerCancel(responseChans[1])
+	require.Len(t, dq.blockedProducers, 2, "only the cancelled request should be removed")
+	assert.Equal(t, responseChans[0], dq.blockedProducers[0].responseChan, "the first request should stay first")
+	assert.Equal(t, responseChans[2], dq.blockedProducers[1].responseChan, "the last request should follow the first")
+	for i, c := range responseChans {
+		select {
+		case err := <-c:
+			if i == 1 {
+				assert.ErrorIs(t, err, errCancelled, "the cancelled request should be answered with errCancelled")
+			} else {
+				assert.Failf(t, "unexpected response", "request %d should get no response, got %v", i, err)
+			}
+		default:
+			assert.NotEqual(t, 1, i, "the cancelled request should be answered")
+		}
+	}
+
+	dq.handleProducerCancel(make(chan error, 1))
+	assert.Len(t, dq.blockedProducers, 2, "cancelling an unknown request should change nothing")
 }
 
 func TestCanAcceptFrameOfSize(t *testing.T) {
@@ -983,7 +1027,7 @@ func TestObserverAddEvent(t *testing.T) {
 	eventFrame := &writeFrame{serialized: make([]byte, 123)}
 	request := producerWriteRequest{
 		frame:        eventFrame,
-		responseChan: make(chan bool, 1),
+		responseChan: make(chan error, 1),
 	}
 	dq.handleProducerWriteRequest(request)
 	assertRegistryUint(t, reg, "queue.added.events", 1, "handleProducerWriteRequest should report the added event")

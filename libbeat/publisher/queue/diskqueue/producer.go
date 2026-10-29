@@ -18,6 +18,9 @@
 package diskqueue
 
 import (
+	"context"
+	"errors"
+	"fmt"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -47,36 +50,56 @@ type diskQueueProducer struct {
 	ackOnce sync.Once
 }
 
+var _ queue.ContextProducer[publisher.Event] = (*diskQueueProducer)(nil)
+
 // A request sent from a producer to the core loop to add a frame to the queue.
 type producerWriteRequest struct {
-	frame        *writeFrame
-	shouldBlock  bool
-	responseChan chan bool
+	frame       *writeFrame
+	shouldBlock bool
+	// responseChan gets exactly one value once the core loop has received the
+	// request: nil if the frame was added, else why it was not. That is an
+	// error wrapping queue.ErrRejected for a frame the queue can never take,
+	// errQueueFull, queue.ErrClosed or errCancelled.
+	responseChan chan error
 }
+
+var (
+	// errQueueFull answers a non-blocking request that does not fit.
+	errQueueFull = errors.New("diskqueue: queue is full")
+	// errCancelled answers a blocked request withdrawn through
+	// diskQueue.producerCancelChan.
+	errCancelled = errors.New("diskqueue: request cancelled")
+)
 
 //
 // diskQueueProducer implementation of the queue.Producer interface
 //
 
 func (producer *diskQueueProducer) Publish(event publisher.Event) (queue.EntryID, bool) {
-	return 0, producer.publish(event, true)
+	return 0, producer.publish(context.Background(), event, true) == nil
+}
+
+// PublishContext is Publish, but stops waiting for room when ctx is done. See
+// queue.ContextProducer.
+func (producer *diskQueueProducer) PublishContext(ctx context.Context, event publisher.Event) (queue.EntryID, error) {
+	return 0, producer.publish(ctx, event, true)
 }
 
 func (producer *diskQueueProducer) TryPublish(event publisher.Event) (queue.EntryID, bool) {
-	return 0, producer.publish(event, false)
+	return 0, producer.publish(context.Background(), event, false) == nil
 }
 
 func (producer *diskQueueProducer) publish(
-	event publisher.Event, shouldBlock bool,
-) bool {
+	ctx context.Context, event publisher.Event, shouldBlock bool,
+) error {
 	if producer.cancelled {
-		return false
+		return queue.ErrClosed
 	}
 	serialized, err := producer.encoder.encode(event)
 	if err != nil {
 		producer.queue.logger.Errorf(
 			"Couldn't serialize incoming event: %v", err)
-		return false
+		return fmt.Errorf("%w: serializing event: %w", queue.ErrRejected, err)
 	}
 	request := producerWriteRequest{
 		frame: &writeFrame{
@@ -86,21 +109,38 @@ func (producer *diskQueueProducer) publish(
 		shouldBlock: shouldBlock,
 		// This response channel will be used by the core loop, so it must have
 		// buffer size 1 to guarantee that the core loop will not need to block.
-		responseChan: make(chan bool, 1),
+		responseChan: make(chan error, 1),
 	}
 
 	select {
 	case producer.queue.producerWriteRequestChan <- request:
-		// The request has been sent, and we are now guaranteed to get a result on
-		// the response channel, so we must read from it immediately to avoid
-		// blocking the core loop.
-		response := <-request.responseChan
-		return response
+	case <-ctx.Done():
+		return ctx.Err()
 	case <-producer.queue.close:
-		return false
+		return queue.ErrClosed
 	case <-producer.done:
-		return false
+		return queue.ErrClosed
 	}
+
+	// The request has been sent, so the core loop will answer it exactly once.
+	select {
+	case err := <-request.responseChan:
+		return err
+	case <-ctx.Done():
+	}
+	// Ask the core loop to withdraw the request. Either way it answers: with
+	// errCancelled if it withdrew the request, or with the result it had
+	// already sent. Shutdown answers every blocked request, so this cannot hang
+	// once the core loop has stopped.
+	select {
+	case producer.queue.producerCancelChan <- request.responseChan:
+		err = <-request.responseChan
+	case err = <-request.responseChan:
+	}
+	if errors.Is(err, errCancelled) {
+		return ctx.Err()
+	}
+	return err
 }
 
 func (producer *diskQueueProducer) Close() {

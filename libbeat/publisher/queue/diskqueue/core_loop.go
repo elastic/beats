@@ -17,7 +17,12 @@
 
 package diskqueue
 
-import "fmt"
+import (
+	"fmt"
+	"slices"
+
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+)
 
 // This file contains the queue's "core loop" -- the central goroutine
 // that owns all queue state that is not encapsulated in one of the
@@ -39,6 +44,14 @@ func (dq *diskQueue) run() {
 
 			// After a write request, there may be data ready to send to the
 			// writer loop.
+			dq.maybeWritePending()
+
+		case responseChan := <-dq.producerCancelChan:
+			dq.handleProducerCancel(responseChan)
+
+			// The withdrawn request may have been the one holding back smaller
+			// requests behind it that fit now.
+			dq.maybeUnblockProducers()
 			dq.maybeWritePending()
 
 		case ackedSegmentID := <-dq.acks.segmentACKChan:
@@ -97,7 +110,9 @@ func (dq *diskQueue) handleProducerWriteRequest(request producerWriteRequest) {
 		dq.logger.Warnf(
 			"Rejecting event with size %v because the segment buffer limit is %v",
 			frameSize, dq.settings.maxValidFrameSize())
-		request.responseChan <- false
+		request.responseChan <- fmt.Errorf(
+			"%w: event size %d exceeds the segment buffer limit %d",
+			queue.ErrRejected, frameSize, dq.settings.maxValidFrameSize())
 		return
 	}
 
@@ -112,14 +127,27 @@ func (dq *diskQueue) handleProducerWriteRequest(request producerWriteRequest) {
 		// writer loop if no other requests are outstanding.
 		dq.enqueueWriteFrame(request.frame)
 		dq.observer.AddEvent(int(request.frame.sizeOnDisk())) //nolint:gosec // G115 Conversion from uint64 to int is safe here.
-		request.responseChan <- true
+		request.responseChan <- nil
 	} else {
 		// The queue is too full. Either add the request to blockedProducers,
 		// or send an immediate reject.
 		if request.shouldBlock {
 			dq.blockedProducers = append(dq.blockedProducers, request)
 		} else {
-			request.responseChan <- false
+			request.responseChan <- errQueueFull
+		}
+	}
+}
+
+// handleProducerCancel withdraws the blocked request answering on
+// responseChan, keeping the others in order. A request that is no longer
+// blocked has already been answered, so it is left alone.
+func (dq *diskQueue) handleProducerCancel(responseChan chan error) {
+	for i, request := range dq.blockedProducers {
+		if request.responseChan == responseChan {
+			dq.blockedProducers = slices.Delete(dq.blockedProducers, i, i+1)
+			responseChan <- errCancelled
+			return
 		}
 	}
 }
@@ -268,7 +296,7 @@ func (dq *diskQueue) handleShutdown() {
 	// If there are any blocked producers still hoping for space to open up
 	// in the queue, send them the bad news.
 	for _, request := range dq.blockedProducers {
-		request.responseChan <- false
+		request.responseChan <- queue.ErrClosed
 	}
 	dq.blockedProducers = nil
 
@@ -422,7 +450,7 @@ func (dq *diskQueue) maybeUnblockProducers() {
 		// Add the frame to pendingFrames and report success.
 		dq.enqueueWriteFrame(request.frame)
 		dq.observer.AddEvent(int(request.frame.sizeOnDisk())) //nolint:gosec // G115 Conversion from uint64 to int is safe here.
-		request.responseChan <- true
+		request.responseChan <- nil
 		unblockedCount++
 	}
 	if unblockedCount > 0 {
