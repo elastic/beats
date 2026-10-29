@@ -17,7 +17,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
@@ -376,19 +375,12 @@ func newReceiverManager(cfg *config.C, b *instance.Beat, opts receiverOptions, l
 		return nil, err
 	}
 
-	m := otelmanager.NewUnitsManager(agentClient, b.Registry, opts.agentConfigTransform, logger)
-
-	// The collector exporter owns the output, so the receiver has no output to
-	// reload. The output config is still passed to the beater, as for a beat
-	// process, in case the beat wants to load any config from there. Heartbeat
-	// does, for its monitor state, but as a receiver it also gets an
-	// Elasticsearch client for that from its monitor_state config.
-	b.Registry.MustRegisterOutput(reload.ReloadableFunc(func(update *reload.ConfigWithMeta) error {
-		if update == nil || b.OutputConfigReloader == nil {
-			return nil
-		}
-		return b.OutputConfigReloader.Reload(update)
-	}))
-
-	return m, nil
+	// Unlike in a beat process, no output reloader is registered, so the output
+	// unit never reaches the beater, including b.OutputConfigReloader. The
+	// collector exporter owns the output, and anything else the receiver needs
+	// from it comes from the receiver config. Heartbeat, for one, builds an
+	// Elasticsearch client from the output config for its monitor state. As a
+	// receiver it builds that client from its monitor_state config instead, and
+	// passing it the output would replace that client with one nothing closes.
+	return otelmanager.NewUnitsManager(agentClient, b.Registry, opts.agentConfigTransform, logger), nil
 }

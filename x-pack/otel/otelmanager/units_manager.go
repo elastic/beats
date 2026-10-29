@@ -202,12 +202,12 @@ func (m *UnitsManager) apply() {
 	m.applyInputs(inputs)
 }
 
-// applyOutput passes the output unit's config to the beat's output reloader.
-// The receiver doesn't publish through it, but the beat may want to load
-// config from the output, as it can in a beat process.
+// applyOutput keeps the output unit's config for beat-rendered-config, and
+// passes it to the beat's output reloader if one is registered. The receiver
+// doesn't publish through the output, but a beat may want to load config from
+// it, as it can in a beat process.
 func (m *UnitsManager) applyOutput(output *proto.UnitExpectedConfig) {
-	reloader := m.registry.GetReloadableOutput()
-	if reloader == nil || (m.outputReady && gproto.Equal(output, m.lastOutput)) {
+	if m.outputReady && gproto.Equal(output, m.lastOutput) {
 		return
 	}
 	var cfg *reload.ConfigWithMeta
@@ -218,9 +218,11 @@ func (m *UnitsManager) applyOutput(output *proto.UnitExpectedConfig) {
 			return
 		}
 	}
-	if err := reloader.Reload(cfg); err != nil {
-		m.logger.Errorf("failed to reload output: %v", err)
-		return
+	if reloader := m.registry.GetReloadableOutput(); reloader != nil {
+		if err := reloader.Reload(cfg); err != nil {
+			m.logger.Errorf("failed to reload output: %v", err)
+			return
+		}
 	}
 	m.lastOutput, m.outputReady = output, true
 	m.renderedMx.Lock()
