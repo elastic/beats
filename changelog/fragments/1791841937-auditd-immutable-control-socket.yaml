@@ -1,0 +1,8 @@
+kind: bug-fix
+summary: 'Fix auditd module failing or dropping events when `immutable: true` is set.'
+description: |
+  With `immutable: true`, the auditd module could fail at startup with
+  `Failure setting audit config as immutable` and stop collecting events, or
+  drop audit events that arrived while it waited for the kernel's reply. The
+  request is now sent on the control socket.
+component: auditbeat
