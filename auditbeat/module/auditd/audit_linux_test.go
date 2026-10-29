@@ -168,14 +168,15 @@ func TestSetPID(t *testing.T) {
 func TestImmutable(t *testing.T) {
 	// Create mocks of netlink client and control that provide the expected responses.
 	controlMock := NewMock().
-		// Get Status response for initClient
-		returnACK().returnStatus()
+		// Get Status response for Run
+		returnACK().returnStatus().
+		// ACK for SetImmutable, which is sent on the control socket.
+		returnACK()
 
 	mock := NewMock().
 		// Send expected ACKs for initialization
-		// With one extra for SetImmutable
 		returnACK().returnStatus().returnACK().returnACK().
-		returnACK().returnACK().returnACK().returnACK().
+		returnACK().returnACK().returnACK().
 		// Send one auditd message.
 		returnMessage(userLoginFailMsg)
 
@@ -199,6 +200,13 @@ func TestImmutable(t *testing.T) {
 		t.Fatalf("expected 1 events, but received %d", len(events))
 	}
 	assertNoErrors(t, events)
+
+	// The immutable request must go on the control socket. The data socket
+	// is read by the receive goroutine, which can consume the reply.
+	assert.Eventually(t, func() bool {
+		return controlMock.sentImmutable() && controlMock.unread() == 0
+	}, time.Second, 10*time.Millisecond, "immutable request was not sent and acknowledged on the control socket")
+	assert.False(t, mock.sentImmutable(), "immutable request was sent on the data socket")
 
 	assertFieldsAreDocumented(t, events)
 

@@ -38,7 +38,7 @@ import (
 var debugf = logp.MakeDebug("icmp")
 
 func init() {
-	plugin.Register("icmp", create, "synthetics/icmp")
+	plugin.RegisterWithDestinations("icmp", destinations, create, "synthetics/icmp")
 }
 
 func create(

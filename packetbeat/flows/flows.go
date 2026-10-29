@@ -18,6 +18,7 @@
 package flows
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -33,6 +34,27 @@ const (
 	defaultTimeout = 30 * time.Second
 	defaultPeriod  = 10 * time.Second
 )
+
+// Durations returns the flow timeout and reporting period from config,
+// applying the defaults to unset values.
+func Durations(config *config.Flows) (timeout, period time.Duration, err error) {
+	duration := func(s string, d time.Duration) (time.Duration, error) {
+		if s == "" {
+			return d, nil
+		}
+		return time.ParseDuration(s)
+	}
+
+	timeout, err = duration(config.Timeout, defaultTimeout)
+	if err != nil {
+		return 0, 0, fmt.Errorf("failed to parse flow timeout: %w", err)
+	}
+	period, err = duration(config.Period, defaultPeriod)
+	if err != nil {
+		return 0, 0, fmt.Errorf("failed to parse flow period: %w", err)
+	}
+	return timeout, period, nil
+}
 
 // Flows holds and publishes network flow information for running processes.
 type Flows struct {
@@ -51,22 +73,9 @@ func NewFlows(
 	logger *logp.Logger,
 ) (*Flows, error) {
 	logger = logger.Named("flows")
-	duration := func(s string, d time.Duration) (time.Duration, error) {
-		if s == "" {
-			return d, nil
-		}
-		return time.ParseDuration(s)
-	}
-
-	timeout, err := duration(config.Timeout, defaultTimeout)
+	timeout, period, err := Durations(config)
 	if err != nil {
-		logger.Errorf("failed to parse flow timeout: %v", err)
-		return nil, err
-	}
-
-	period, err := duration(config.Period, defaultPeriod)
-	if err != nil {
-		logger.Errorf("failed to parse period: %v", err)
+		logger.Errorf("%v", err)
 		return nil, err
 	}
 

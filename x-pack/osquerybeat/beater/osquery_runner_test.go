@@ -55,6 +55,14 @@ func waitForStart(ctx context.Context, runCh <-chan struct{}, to time.Duration) 
 	}
 }
 
+// The defaults are documented in docs/daemon-recovery.md.
+func TestOsqueryRunnerDefaults(t *testing.T) {
+	runner := newOsqueryRunner(logptest.NewTestingLogger(t, "defaults"))
+	assert.Equal(t, time.Second, runner.retryInitial, "initial restart delay")
+	assert.Equal(t, 5, runner.maxRestarts, "restart attempts")
+	assert.Equal(t, 5*time.Minute, runner.restartWindow, "window that counts restarts")
+}
+
 func TestOsqueryRunnerCancellable(t *testing.T) {
 	to := 10 * time.Second
 
@@ -82,7 +90,7 @@ func TestOsqueryRunnerCancellable(t *testing.T) {
 	})
 
 	// Sent input that will start the runner function
-	err := runner.Update(ctx, nil)
+	err := runner.Update(ctx, []config.InputConfig{{}})
 	if err != nil {
 		t.Fatal("failed runner update:", err)
 	}
@@ -133,7 +141,7 @@ func TestOsqueryRunnerRestart(t *testing.T) {
 	})
 
 	// Sent input that will start the runner function
-	err := runner.Update(ctx, nil)
+	err := runner.Update(ctx, []config.InputConfig{{}})
 	if err != nil {
 		t.Fatal("failed runner update:", err)
 	}
