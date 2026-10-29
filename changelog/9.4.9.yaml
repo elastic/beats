@@ -1,0 +1,622 @@
+version: 9.4.9
+entries:
+    - kind: enhancement
+      summary: Add os.cgroup.cpu.usage_percent to autoops_es node_stats metricset
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue:
+        - https://github.com/elastic/beats/issues/52616
+      impact: ""
+      action: ""
+      timestamp: 1757001600
+      file:
+        name: 1757001600-autoops-es-cgroup-cpu-usage-percent.yaml
+        checksum: eb990551840e9e978860c971ea4237c4b3912d45
+    - kind: bug-fix
+      summary: fix data race in translate_ldap_attribute
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783070300
+      file:
+        name: 1783070300-fix-translate-ldap-attribute-string-race.yaml
+        checksum: 925a829424bc31fd7ccb857560e4b5a32164ef04
+    - kind: bug-fix
+      summary: Restore osquery-extension compatibility with Linux systems on glibc before 2.28.
+      description: |
+        Building SQLite with SQLITE_DISABLE_LFS on 64-bit Linux avoids a dependency
+        on glibc 2.28. Functionality is unchanged but compatibility is restored for
+        glibc 2.27 systems, such as Ubuntu 18.04.
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1786952482
+      file:
+        name: 1786952482-osquery-extension-glibc-228.yaml
+        checksum: f7e016bdc04eabd1ba3b2c52946b84e50434f48b
+    - kind: bug-fix
+      summary: Fix cursor inputs losing their saved position when two inputs start at the same time
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1789389324
+      file:
+        name: 1789389324-cursor-clean-timeout-race.yaml
+        checksum: bc35316279c10059e411ea252ce9d32d600fe4a4
+    - kind: bug-fix
+      summary: Resume CrowdStrike Event Streams after dropped firehose connections without exhausting retries.
+      description: |
+        The CrowdStrike streaming input counted a firehose connection dropped mid-stream
+        (reported as "error decoding event: unexpected EOF") as a failed attempt, and only
+        reset the count when a stream ended cleanly. Drops spread over hours of healthy
+        streaming accumulated until max_attempts was exceeded and the input stopped until
+        it was restarted. A drop after events were delivered now reconnects from the cursor
+        and resets the attempt count, the unit reports healthy again once events flow, and
+        feed connects, ends, interruptions and non-2xx session refresh responses are logged.
+        Each session error is now counted once in errors_total, and a clean end of stream is
+        not counted as an error.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1790237584
+      file:
+        name: 1790237584-crowdstrike-stream-interruptions.yaml
+        checksum: ca6dbc8ccb3c0b97184d977867e9ccfd7f1e8e78
+    - kind: bug-fix
+      summary: |
+        HTTP Endpoint options_headers must be non-empty and options_response_code must be valid when options_headers is configured. A previously accepted empty options_headers: {} now fails at startup.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1790544732
+      file:
+        name: 1790544732-53313-http_endpoint.yaml
+        checksum: 8f49a4cf3cafe99719728d408d246175163e41df
+    - kind: bug-fix
+      summary: Fix contact fields handling to use Contact instead of To header.
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1790549653
+      file:
+        name: 1790549653-53382-packetbeat.yaml
+        checksum: 0e6488861847b0e5886f215146dd7aca8d78f1de
+    - kind: bug-fix
+      summary: Skip unsupported Azure Monitor metric namespaces when ignore_unsupported is true instead of failing collection on HTTP 400
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue:
+        - https://github.com/elastic/beats/issues/52999
+      impact: ""
+      action: ""
+      timestamp: 1790591049
+      file:
+        name: 1790591049-azure-monitor-ignore-unsupported-namespace.yaml
+        checksum: fed3501821c46ea3fe6851e6bda4f945115a2dd1
+    - kind: bug-fix
+      summary: Fix nil map panic and missed completion for zero-body messages in AMQP parser.
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1790723047
+      file:
+        name: 1790723047-amqp-nil-map-zero-body-completion.yaml
+        checksum: 14da9c5dfd5c237063172e9dd1fb65d5e4271d84
+    - kind: enhancement
+      summary: Add proxy_url and proxy_disable support to the azure-eventhub input, reject websocket transport with processor v1, and propagate checkpoint migration errors.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1790825310
+      file:
+        name: 1790825310-azure-eventhub-proxy-websocket-validation.yaml
+        checksum: 299c951c6570ee4946a5d79f069979d3091bf1fe
+    - kind: bug-fix
+      summary: Fix malformed Synthetics runner log messages
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1791207256
+      file:
+        name: 1791207256-fix-malformed-synthetics-runner-log-messages.yaml
+        checksum: 85d9b6e11ff476095057fcef54c934fb653d5b1e
+    - kind: security
+      summary: Update github.com/apache/thrift to v0.25.0 to fix CVE-2026-82458 in Parquet decoding.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1791305201
+      file:
+        name: 1791305201-update-github.com-apache-thrift-to-v0.25.0.yaml
+        checksum: e6ea03039d66fe047fd758ad4dd13688f0c03004
+    - kind: bug-fix
+      summary: Fix the file_integrity eBPF backend failing to start on Linux 6.15 and later.
+      description: |
+        Update github.com/elastic/ebpfevents to v0.11.0. On Linux 6.15 and later the
+        file_integrity module's eBPF backend failed to load its probes with
+        "bad CO-RE relocation" (tty_driver and kernfs_node changed in 6.15), so the
+        module never started. File access, modification and change timestamps are
+        also reported correctly again on Linux 6.11 and later. Programs that are not
+        used on the running kernel are no longer loaded, which shortens startup. When
+        the eBPF loader has to fall back because some probes fail to load on the
+        running kernel, the module logs a warning, and it fails to start if any file
+        event type it needs is disabled.
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue:
+        - https://github.com/elastic/beats/issues/46719
+      impact: ""
+      action: ""
+      timestamp: 1791394003
+      file:
+        name: 1791394003-auditbeat-fim-ebpf-kernel-6.15.yaml
+        checksum: 51897cc6cdd62006cd99abee8fac67e3a75e3f8c
+    - kind: bug-fix
+      summary: Fix Heartbeat memory growth by releasing popped tasks from the scheduler timer queue.
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue:
+        - https://github.com/elastic/beats/issues/53662
+      impact: ""
+      action: ""
+      timestamp: 1791400000
+      file:
+        name: 1791400000-heartbeat-timerqueue-release-popped-tasks.yaml
+        checksum: b88ba209768546b41b51f4465c4397e8ee56ca82
+    - kind: bug-fix
+      summary: Fix pgsql queries being paired with the wrong responses after a NULL column.
+      description: |
+        The pgsql parser read DataRow column lengths as unsigned, so the -1 that the PostgreSQL wire protocol uses to mark a NULL column was rejected as an invalid length. The response was dropped but its query stayed queued, so for the rest of that connection's life every published event carried the previous query's text against a later query's rows, and the last query was never published at all. A DataRow truncated part-way through a column length could also panic packetbeat.
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1791521396
+      file:
+        name: 1791521396-pgsql-null-column-datarow.yaml
+        checksum: 91866ed3f5d60fdf4802fe6e33ee74da4dee2f76
+    - kind: enhancement
+      summary: Update Go to 1.26.10
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/53706
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1791837294
+      file:
+        name: 1791837294-update-go-to-1.26.9.yaml
+        checksum: 892484fedba2d6cd0f8c6774e26ef88af4dbaec0
+    - kind: bug-fix
+      summary: Honor osquery RPC cancellation without breaking later result resolution.
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue:
+        - https://github.com/elastic/beats/issues/53645
+      impact: ""
+      action: ""
+      timestamp: 1791911855
+      file:
+        name: 1791911855-fix-osquery-rpc-cancellation.yaml
+        checksum: 0eb7faf1707f049f46881b75c3fae09c877d8dcc
+    - kind: enhancement
+      summary: bump npcap OEM installer to 1.88
+      description: Bump the npcap OEM installer version used by Packetbeat to 1.88.
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1791962517
+      file:
+        name: 1791962517-bump-npcap-1.88.yaml
+        checksum: c1240ca5c4be78793dd56e872fb304df76298b04
+    - kind: bug-fix
+      summary: Restart osqueryd after runtime exit 78 while preserving startup failures.
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/53776
+      issue:
+        - https://github.com/elastic/beats/issues/53645
+      impact: ""
+      action: ""
+      timestamp: 1791969199
+      file:
+        name: 1791969199-recover-osquery-runtime-exit-78.yaml
+        checksum: 2287f9e8ce4268a0f58939acf4c7ec8a44b2e1a3
+    - kind: bug-fix
+      summary: Fix a panic in the file_integrity eBPF backend when its eBPF loader fails to start.
+      description: |
+        The eBPF backend loaded its probes once to check that they work, and again when
+        the module started. If the first load succeeded but the second failed, Auditbeat
+        panicked with a nil pointer dereference. The probes are now loaded only when the
+        module starts; if that fails, the module fails to start with the loader's error
+        and a later start tries again.
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1791971381
+      file:
+        name: 1791971381-auditbeat-fim-ebpf-subscribe-panic.yaml
+        checksum: c9b6253f6d3a35325f4e82fe546a5983d55e7ee9
+    - kind: bug-fix
+      summary: Fix file_integrity kprobes backend hanging at startup when probe verification keeps failing
+      description: ""
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1791978871
+      file:
+        name: 1791978871-auditbeat-fim-kprobes-verify-retry-loop.yaml
+        checksum: 07d6e002bd4f469a44a339a5d72c80cb1f045a43
+    - kind: feature
+      summary: Ensure that the CEL input's events from previous evaluations are removed from the CEL state before starting a new evaluation.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1792093676
+      file:
+        name: 1792093676-s7697-cel.yaml
+        checksum: 7e27b2dec968509fb57011a438fec6075d25351b
+    - kind: bug-fix
+      summary: Fix azure-eventhub v1 input crashing the otel collector with concurrent map iteration and map write.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue:
+        - https://github.com/elastic/beats/issues/53816
+      impact: ""
+      action: ""
+      timestamp: 1792132498
+      file:
+        name: 1792132498-fix-azure-eventhub-v1-input-crashing-the-beat-receiver-runtime.yaml
+        checksum: dd4929e4ead4ad3cabf564373632b24c3abf80dd
+    - kind: bug-fix
+      summary: Reject invalid negative RESP array lengths in the Redis parser.
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1792230000
+      file:
+        name: 1792230000-fix-redis-parser-negative-array-length.yaml
+        checksum: bb648f87491e9337142ad136d0089efcc4470fb6
+    - kind: bug-fix
+      summary: Only log metrics namespaces listed in logging.metrics.namespaces (default [stats]), stops logging per-input metrics (monitoring.dataset.*) by default.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1792500483
+      file:
+        name: 1792500483-fix-log-reporter-namespaces.yaml
+        checksum: 2514e5dbcbb3902b8fda55de86bcaf1ff02ac355
+    - kind: feature
+      summary: Collect the serverless.search.min_search_vcu cluster setting as a number in the AutoOps ES cluster_settings metricset.
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1792574798
+      file:
+        name: 1792574798-autoops-es-min-search-vcu.yaml
+        checksum: e0484dc638c9f2fb12138ea785cf4f3b51891394
+    - kind: security
+      summary: Bump npm to 12.2.1 and Node.js to 22.23.4 (24.22.1 on Wolfi) in the Heartbeat Docker images to remove vulnerable undici copies.
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1792577030
+      file:
+        name: 1792577030-bump-heartbeat-nodejs-22.23.4.yaml
+        checksum: 239a0809813bc2fcea4d5b47e66d39c3ec94b4dd
+    - kind: enhancement
+      summary: bump npcap OEM installer to 1.89
+      description: Bump the npcap OEM installer version used by Packetbeat to 1.89.
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1792580531
+      file:
+        name: 1792580531-bump-npcap-1.89.yaml
+        checksum: 659b10f76def00e6306516123633d25c70f1da40
+    - kind: bug-fix
+      summary: Fix TCP and UDP input receive queue and packet drop metrics always reporting 0 when listening on 0.0.0.0 on hosts with IPv6 enabled.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1792600000
+      file:
+        name: 1792600000-fix-tcp-udp-receive-queue-dual-stack.yaml
+        checksum: 567b1c34077c58519d445a0a5e47dbcaeae40662
+    - kind: upgrade
+      summary: upgrade osquery version to 5.24.0
+      description: |
+        Upgrade the bundled osquery runtime to version 5.24.0. It fixes a deadlock in osqueryd that could occur when the osquery extension restarted: osqueryd stopped answering queries, every extension restart was rejected with "Refusing to register duplicate extension osquery-extension", and on Windows queries failed with "boost::lock_error: No error" until the agent was restarted (osquery/osquery#9163). It also includes a fix for a heap buffer overflow in the Windows processes table (GHSA-4r78-6hg6-33gg).
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1792670665
+      file:
+        name: 1792670665-upgrade-osquery-5.24.0.yaml
+        checksum: de04f014932b058e2dcc07d60a5171c2f297f08a
+    - kind: bug-fix
+      summary: Fix system/auth module journald ingest pipeline failing on events without journald.process.name.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54033
+      issue:
+        - https://github.com/elastic/beats/issues/54013
+      impact: ""
+      action: ""
+      timestamp: 1792700000
+      file:
+        name: 1792700000-fix-system-auth-journald-missing-process-name.yaml
+        checksum: 877e4a1fa027e1ba16921e92dc0923632adddce6
+    - kind: bug-fix
+      summary: Reduce Azure Event Hub v2 memory retention while waiting for acknowledgments.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1792701625
+      file:
+        name: 1792701625-fix-azure-eventhub-checkpoint-memory.yaml
+        checksum: e8a1a8a64e1a7fec97432aaea07f4da5814ff695
+    - kind: bug-fix
+      summary: Fix unbounded memory growth when the Logstash exporter admits batches out of order under the OTel runtime.
+      description: ""
+      component: elastic-agent
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1792776648
+      file:
+        name: 1792776648-logstash-exporter-fifo-enqueue.yaml
+        checksum: b16b01d4cff6a08727fddb526f3c2a35cf13971f
+    - kind: bug-fix
+      summary: Fix length and count decoding in the Packetbeat Cassandra parser.
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1793010748
+      file:
+        name: 1793010748-packetbeat-cassandra-check-bytes-length.yaml
+        checksum: ed5331b5365e7e67159c7d191d05e9ab88ac1336
+    - kind: bug-fix
+      summary: Collect running snapshot tasks in the autoops_es tasks_management metricset by filtering on cluster:admin/snapshot instead of the nonexistent indices:admin/snapshot actions.
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54165
+        - https://github.com/elastic/beats/pull/54150
+        - https://github.com/elastic/beats/pull/54154
+        - https://github.com/elastic/beats/pull/54221
+        - https://github.com/elastic/beats/pull/54120
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1793050000
+      file:
+        name: 1793050000-autoops-es-snapshot-task-action.yaml
+        checksum: c26b171ca9e8311659c88f00443a55dc5bb3ed23
