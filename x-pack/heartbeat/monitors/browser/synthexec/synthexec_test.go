@@ -20,7 +20,9 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/goleak"
 )
 
 func TestLineToSynthEventFactory(t *testing.T) {
@@ -201,6 +203,23 @@ func TestRunTimeoutExitCodeCmd(t *testing.T) {
 		require.Len(t, stdoutEvents, 1)
 		require.Equal(t, synthEvents[0].Error.Code, "CMD_TIMEOUT")
 	})
+}
+
+// TestRunCmdStartFailure checks that runCmd releases the results pipe and every
+// goroutine it started when the synthetics command cannot be started.
+func TestRunCmdStartFailure(t *testing.T) {
+	defer goleak.VerifyNone(t, goleak.IgnoreCurrent())
+
+	cmd := exec.CommandContext(t.Context(), "/dev/null/no-such-binary")
+
+	mpx, err := runCmd(t.Context(), &SynthCmd{cmd}, nil, nil, FilterJourneyConfig{})
+	assert.Error(t, err, "runCmd should report that the command could not be started")
+	assert.Nil(t, mpx, "runCmd should not return a multiplexer when the command could not be started")
+
+	assert.Len(t, cmd.ExtraFiles, 2, "runCmd should pass both results pipe ends to the command")
+	for _, f := range cmd.ExtraFiles {
+		assert.ErrorIsf(t, f.Close(), os.ErrClosed, "runCmd should close results pipe end %s", f.Name())
+	}
 }
 
 func runAndCollect(t *testing.T, cmd *exec.Cmd, stdinStr string, cmdTimeout time.Duration) []*SynthEvent {
