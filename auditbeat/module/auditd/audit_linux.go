@@ -181,8 +181,10 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 		return
 	}
 
+	// Use the control socket: ms.client is being read by the receive
+	// goroutine, which can consume the ACK that SetImmutable waits for.
 	if ms.config.Immutable && status.Enabled != auditLocked {
-		if err := ms.client.SetImmutable(libaudit.WaitForReply); err != nil {
+		if err := ms.control.SetImmutable(libaudit.WaitForReply); err != nil {
 			reporter.Error(err)
 			ms.log.Errorw("Failure setting audit config as immutable", "error", err)
 			return

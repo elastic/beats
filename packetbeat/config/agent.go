@@ -96,8 +96,11 @@ func mergeProcsConfig(one, two procs.ProcsConfig) procs.ProcsConfig {
 
 	refreshPidsFreq := min(two.RefreshPidsFreq, one.RefreshPidsFreq)
 
+	// The strongest backend requested by any stream wins:
+	// kernel_tracing over auto over procfs.
 	return procs.ProcsConfig{
 		Enabled:         true,
+		Backend:         max(one.Backend, two.Backend),
 		MaxProcReadFreq: maxProcReadFreq,
 		RefreshPidsFreq: refreshPidsFreq,
 		Monitored:       append(one.Monitored, two.Monitored...),

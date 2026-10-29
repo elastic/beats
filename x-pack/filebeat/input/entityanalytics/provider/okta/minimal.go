@@ -46,6 +46,20 @@ func (o *minimalOAuth2Conf) isEnabled() bool {
 }
 
 func minimalProvider(cfg *config.C, log *logp.Logger) (entcollect.Provider, time.Duration, time.Duration, error) {
+	ec, transport, err := minimalConfig(cfg)
+	if err != nil {
+		return nil, 0, 0, err
+	}
+	client, err := transport.Client(httpcommon.WithLogger(log), httpcommon.WithAPMHTTPInstrumentation())
+	if err != nil {
+		return nil, 0, 0, fmt.Errorf("creating HTTP client: %w", err)
+	}
+	return ecokta.NewWithClient(ec, client), ec.SyncInterval, ec.UpdateInterval, nil
+}
+
+// minimalConfig unpacks cfg into a validated ecokta.Config and the HTTP
+// transport settings used to build the provider's client.
+func minimalConfig(cfg *config.C) (ecokta.Config, httpcommon.HTTPTransportSettings, error) {
 	// localConf mirrors ecokta.Config with config:"" tags for ucfg Unpack.
 	// If ecokta.Config gains a new field, add it here and in the mapping
 	// below; TestMinimalConfigRoundTrip (minimal_test.go) will catch any drift.
@@ -65,7 +79,7 @@ func minimalProvider(cfg *config.C, log *logp.Logger) (entcollect.Provider, time
 		LimitWindow time.Duration `config:"limit_window"`
 		LimitFixed  *int          `config:"limit_fixed"`
 
-		ScratchDir string `json:"scratch_dir"`
+		ScratchDir string `config:"scratch_dir"`
 
 		Transport httpcommon.HTTPTransportSettings `config:"request"`
 	}
@@ -82,7 +96,7 @@ func minimalProvider(cfg *config.C, log *logp.Logger) (entcollect.Provider, time
 		Transport:      transport,
 	}
 	if err := cfg.Unpack(&lc); err != nil {
-		return nil, 0, 0, err
+		return ecokta.Config{}, httpcommon.HTTPTransportSettings{}, err
 	}
 
 	ec := ecokta.Config{
@@ -103,7 +117,7 @@ func minimalProvider(cfg *config.C, log *logp.Logger) (entcollect.Provider, time
 		ec.Token = "" // OAuth2 takes precedence over okta_token.
 		jwk, err := resolveJWK(lc.OAuth2)
 		if err != nil {
-			return nil, 0, 0, fmt.Errorf("oauth2 jwk: %w", err)
+			return ecokta.Config{}, httpcommon.HTTPTransportSettings{}, fmt.Errorf("oauth2 jwk: %w", err)
 		}
 		ec.OAuth2 = &ecokta.OAuth2Config{
 			ClientID:     lc.OAuth2.ClientID,
@@ -115,13 +129,9 @@ func minimalProvider(cfg *config.C, log *logp.Logger) (entcollect.Provider, time
 	}
 
 	if err := ec.Validate(); err != nil {
-		return nil, 0, 0, err
+		return ecokta.Config{}, httpcommon.HTTPTransportSettings{}, err
 	}
-	client, err := lc.Transport.Client(httpcommon.WithLogger(log), httpcommon.WithAPMHTTPInstrumentation())
-	if err != nil {
-		return nil, 0, 0, fmt.Errorf("creating HTTP client: %w", err)
-	}
-	return ecokta.NewWithClient(ec, client), ec.SyncInterval, ec.UpdateInterval, nil
+	return ec, lc.Transport, nil
 }
 
 // resolveJWK converts one of the three JWK input forms (JSON, file, PEM)

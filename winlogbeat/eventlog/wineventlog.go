@@ -108,6 +108,7 @@ type winEventLog struct {
 	file        bool                     // Reading from file rather than channel.
 	maxRead     int                      // Maximum number returned in one Read.
 	lastRead    checkpoint.EventLogState // Record number of the last read event.
+	hadBookmark bool                     // A bookmark existed at some point.
 	log         *logp.Logger
 
 	iterator *win.EventIterator
@@ -322,13 +323,14 @@ func (l *winEventLog) openChannel(bookmark win.Bookmark) (win.EvtHandle, error) 
 	var flags win.EvtSubscribeFlag
 	switch {
 	case bookmark > 0:
+		l.hadBookmark = true
 		flags = win.EvtSubscribeStartAfterBookmark
 		if !l.isForwarded() {
 			// Use EvtSubscribeStrict to detect when the bookmark is missing and be able to
 			// subscribe again from the beginning.
 			flags |= win.EvtSubscribeStrict
 		}
-	case l.config.StartPosition == StartAtEnd:
+	case l.config.StartPosition == StartAtEnd && !l.hadBookmark:
 		flags = win.EvtSubscribeToFutureEvents
 		l.log.Info("No bookmark found, starting at the end of the channel (start_position: end).")
 	default:
