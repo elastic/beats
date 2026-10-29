@@ -49,7 +49,7 @@ Example config:
 :   A string to filter the results to include only log events from log streams that have names starting with this prefix.
 
 **`var.start_position`**
-:   `start_position` allows user to specify if this input should read log files from the `beginning` or from the `end`.
+:   `start_position` allows users to specify whether this input should read log files from the `beginning` or from the `end`.
 
     * `beginning`: reads from the beginning of the log group (default).
     * `end`: read only new messages from current time minus `scan_frequency` going forward

@@ -147,11 +147,11 @@ filebeat.modules:
     #var.session_token: session_token
 
     # The duration that the received messages are hidden from ReceiveMessage request
-    # Default to be 300s
+    # Defaults to 300s
     #var.visibility_timeout: 300s
 
     # Maximum duration before AWS API request will be interrupted
-    # Default to be 120s
+    # Defaults to 120s
     #var.api_timeout: 120s
 
     # Custom endpoint used to access AWS APIs
@@ -205,11 +205,11 @@ filebeat.modules:
     #var.session_token: session_token
 
     # The duration that the received messages are hidden from ReceiveMessage request
-    # Default to be 300s
+    # Defaults to 300s
     #var.visibility_timeout: 300s
 
     # Maximum duration before AWS API request will be interrupted
-    # Default to be 120s
+    # Defaults to 120s
     #var.api_timeout: 120s
 
     # Custom endpoint used to access AWS APIs
@@ -263,11 +263,11 @@ filebeat.modules:
     #var.session_token: session_token
 
     # The duration that the received messages are hidden from ReceiveMessage request
-    # Default to be 300s
+    # Defaults to 300s
     #var.visibility_timeout: 300s
 
     # Maximum duration before AWS API request will be interrupted
-    # Default to be 120s
+    # Defaults to 120s
     #var.api_timeout: 120s
 
     # Custom endpoint used to access AWS APIs
@@ -321,11 +321,11 @@ filebeat.modules:
     #var.session_token: session_token
 
     # The duration that the received messages are hidden from ReceiveMessage request
-    # Default to be 300s
+    # Defaults to 300s
     #var.visibility_timeout: 300s
 
     # Maximum duration before AWS API request will be interrupted
-    # Default to be 120s
+    # Defaults to 120s
     #var.api_timeout: 120s
 
     # Custom endpoint used to access AWS APIs
@@ -379,11 +379,11 @@ filebeat.modules:
     #var.session_token: session_token
 
     # The duration that the received messages are hidden from ReceiveMessage request
-    # Default to be 300s
+    # Defaults to 300s
     #var.visibility_timeout: 300s
 
     # Maximum duration before AWS API request will be interrupted
-    # Default to be 120s
+    # Defaults to 120s
     #var.api_timeout: 120s
 
     # Custom endpoint used to access AWS APIs
@@ -437,11 +437,11 @@ filebeat.modules:
     #var.session_token: session_token
 
     # The duration that the received messages are hidden from ReceiveMessage request
-    # Default to be 300s
+    # Defaults to 300s
     #var.visibility_timeout: 300s
 
     # Maximum duration before AWS API request will be interrupted
-    # Default to be 120s
+    # Defaults to 120s
     #var.api_timeout: 120s
 
     # Custom endpoint used to access AWS APIs
@@ -485,7 +485,7 @@ filebeat.modules:
     #var.session_token: session_token
 
     # Maximum duration before AWS API request will be interrupted
-    # Default to be 120s
+    # Defaults to 120s
     #var.api_timeout: 120s
 
     # Custom endpoint used to access AWS APIs
@@ -3229,7 +3229,7 @@ filebeat.inputs:
   # that have names starting with this prefix.
   #log_stream_prefix: test
 
-  # `start_position` allows user to specify if this input should read log files
+  # `start_position` allows users to specify whether this input should read log files
   # from the `beginning` or from the `end`.
   # `beginning`: reads from the beginning of the log group (default).
   # `end`: read only new messages from current time minus `scan_frequency` going forward.
