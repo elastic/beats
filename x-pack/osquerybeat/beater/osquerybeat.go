@@ -427,24 +427,13 @@ func (bt *osquerybeat) setDiagnosticsQueryExecutor(qe profilingQueryExecutor) {
 	bt.diagQueryExec = qe
 }
 
-<<<<<<< HEAD
-func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Runner, flags osqd.Flags, inputCh <-chan []config.InputConfig, rah *resetableActionHandler, osqdMetrics *osquerydMetrics) error {
-=======
 func (bt *osquerybeat) clearDiagnosticsQueryExecutor() {
 	bt.diagMx.Lock()
 	defer bt.diagMx.Unlock()
 	bt.diagQueryExec = nil
 }
 
-func (bt *osquerybeat) setExtensionsDiagnostics(extensions config.ExtensionsConfig, dataPath string) {
-	bt.diagMx.Lock()
-	defer bt.diagMx.Unlock()
-	bt.diagExtensions = extensions
-	bt.diagOsqueryData = dataPath
-}
-
-func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Runner, flags osqd.Flags, extensions config.ExtensionsConfig, inputCh <-chan []config.InputConfig, rah *resetableActionHandler, osqdMetrics *osquerydMetrics) error {
->>>>>>> b7fb9dc ([osquerybeat] Defer scheduled profiling outside the logger callback (#53775))
+func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Runner, flags osqd.Flags, inputCh <-chan []config.InputConfig, rah *resetableActionHandler, osqdMetrics *osquerydMetrics) error {
 	socketPath := osq.SocketPath()
 
 	// Create a cache for queries types resolution

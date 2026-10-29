@@ -550,13 +550,8 @@ func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 	ob := &osquerybeat{
 		qp: newQueryProfiler(logptest.NewTestingLogger(t, "")),
 	}
-<<<<<<< HEAD
-	ob.setDiagnosticsQueryExecutor(&diagnosticsQueryExecutor{
-		rows: []map[string]interface{}{
-=======
 	ob.setDiagnosticsQueryExecutor(profilingQueryExecutor{runCtx: t.Context(), executor: &diagnosticsQueryExecutor{
 		rows: []map[string]any{
->>>>>>> b7fb9dc ([osquerybeat] Defer scheduled profiling outside the logger callback (#53775))
 			{
 				"name":              "pack_test_query",
 				"query":             "select * from users limit 1",
