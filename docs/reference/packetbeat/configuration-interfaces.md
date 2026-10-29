@@ -39,7 +39,7 @@ packetbeat.interfaces.buffer_size_mb: 100
 
 ## Windows Npcap installation options [_windows_npcap_installation_options]
 
-On Windows Packetbeat requires an Npcap DLL installation. This is provided by Packetbeat for users of the Elastic Licenced version. In some cases users may wish to use their own installed version. In order to do this the `packetbeat.npcap.never_install` option can be used. Setting this option to `true` will not attempt to install the bundled Npcap library on start-up unless no Npcap is already installed.
+On Windows Packetbeat requires an Npcap DLL installation. This is provided by Packetbeat for users of the Elastic Licensed version. In some cases users may wish to use their own installed version. In order to do this the `packetbeat.npcap.never_install` option can be used. Setting this option to `true` will not attempt to install the bundled Npcap library on start-up unless no Npcap is already installed.
 
 ```yaml
 packetbeat.npcap.never_install: true
