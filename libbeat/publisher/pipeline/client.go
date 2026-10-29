@@ -20,6 +20,7 @@ package pipeline
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 	"sync/atomic"
 
@@ -166,20 +167,15 @@ func (c *client) PublishContext(ctx context.Context, e beat.Event) error {
 		switch {
 		case errors.Is(err, queue.ErrClosed) || c.closeCtx.Err() != nil:
 			return beat.ErrClientClosed
-		case errors.Is(err, errRejected):
-			return beat.ErrRejected
+		case errors.Is(err, queue.ErrRejected):
+			// Keep the queue's reason alongside beat.ErrRejected.
+			return fmt.Errorf("%w: %w", beat.ErrRejected, err)
 		}
 		return err
 	}
 	c.onPublished()
 	return nil
 }
-
-// errRejected is returned by a ContextProducer wrapping a producer that cannot
-// cancel (trackedProducer around the disk queue's) when Publish refuses an
-// event although the wrapper is open. PublishContext reports it as
-// beat.ErrRejected unless the client is closing.
-var errRejected = errors.New("pipeline: event rejected by queue")
 
 // publishCtx returns a context that is done when ctx is done or the client
 // closes. Callers usually pass the same ctx many times, so the merged context

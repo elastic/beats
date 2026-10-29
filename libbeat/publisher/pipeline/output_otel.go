@@ -90,10 +90,10 @@ type trackedProducer struct {
 var _ queue.ContextProducer[publisher.Event] = (*trackedProducer)(nil)
 
 // PublishContext forwards to the embedded producer, which the embedding would
-// otherwise hide. A producer that cannot cancel (the disk queue) publishes with
-// Publish, ignoring ctx; an event it refuses is reported as queue.ErrClosed if
-// this producer was closed (by its client or the controller), else as
-// errRejected.
+// otherwise hide. A producer that cannot cancel publishes with Publish,
+// ignoring ctx; an event it refuses is reported as queue.ErrClosed if this
+// producer was closed (by its client or the controller), else as
+// queue.ErrRejected, with no reason.
 func (p *trackedProducer) PublishContext(ctx context.Context, e publisher.Event) (queue.EntryID, error) {
 	if cp, ok := p.Producer.(queue.ContextProducer[publisher.Event]); ok {
 		return cp.PublishContext(ctx, e)
@@ -103,7 +103,7 @@ func (p *trackedProducer) PublishContext(ctx context.Context, e publisher.Event)
 		if p.closed.Load() {
 			return 0, queue.ErrClosed
 		}
-		return 0, errRejected
+		return 0, queue.ErrRejected
 	}
 	return id, nil
 }
