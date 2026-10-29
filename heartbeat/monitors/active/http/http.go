@@ -35,7 +35,7 @@ import (
 )
 
 func init() {
-	plugin.Register("http", create, "synthetics/http")
+	plugin.RegisterWithDestinations("http", destinations, create, "synthetics/http")
 }
 
 var userAgent = useragent.UserAgent("Heartbeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())

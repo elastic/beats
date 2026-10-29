@@ -47,8 +47,10 @@ event. Until then no replacement daemon starts, even if osqueryd has already
 exited, and both status paths keep reporting RUNNING. Shutdown waits for the
 same publication. This is the scenario reported in #53645, where the output is
 down and osqueryd exits 78, so this change alone does not make that case report
-DEGRADED and restart; #53939 is needed for that. Separating scheduled
-publication and profiling from the logger callback remains independent work.
+DEGRADED and restart; #53939 is needed for that. Scheduled query profiling
+already runs outside the logger callback, so a stuck profile publish does not
+delay restart. Separating scheduled result publication from the logger
+callback remains independent work.
 
 ## Validation
 

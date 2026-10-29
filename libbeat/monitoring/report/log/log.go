@@ -128,17 +128,39 @@ func MakeReporter(beat beat.Info, cfg *conf.C, mon beatmonitoring.Monitoring) (r
 		registries: map[string]*monitoring.Registry{},
 	}
 
-	// That 'stats' namespace is reported as 'metrics' in the Elasticsearch
-	// reporter so use the same name for consistency.
-	r.registries["metrics"] = mon.StatsRegistry()
-	r.registries["info"] = mon.InfoRegistry()
-	r.registries["state"] = mon.StateRegistry()
-	r.registries["dataset"] = mon.InputsRegistry()
+	for _, ns := range config.Namespaces {
+		name, reg := registryForNamespace(mon, ns)
+		if name == "" {
+			r.logger.Warnf("Ignoring unknown namespace %q in logging.metrics.namespaces", ns)
+			continue
+		}
+		if reg == nil {
+			continue
+		}
+		r.registries[name] = reg
+	}
 
 	r.wg.Go(func() {
 		r.snapshotLoop()
 	})
 	return r, nil
+}
+
+func registryForNamespace(mon beatmonitoring.Monitoring, ns string) (string, *monitoring.Registry) {
+	switch ns {
+	case "stats", "metrics":
+		// That 'stats' namespace is reported as 'metrics' in the Elasticsearch
+		// reporter so use the same name for consistency.
+		return "metrics", mon.StatsRegistry()
+	case "info":
+		return "info", mon.InfoRegistry()
+	case "state":
+		return "state", mon.StateRegistry()
+	case "dataset":
+		return "dataset", mon.InputsRegistry()
+	default:
+		return "", nil
+	}
 }
 
 func (r *Reporter) Stop() {

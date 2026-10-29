@@ -41,12 +41,19 @@ func TestReceiverRestartsAfterOsqueryExit78(t *testing.T) {
 	var resultMu sync.Mutex
 	var lastPID, socketPath string
 	var lastResultTime int64
+	var profileScheduleIDs []any
 
 	logConsumer, err := consumer.NewLogs(func(_ context.Context, logs plog.Logs) error {
 		for _, resource := range logs.ResourceLogs().All() {
 			for _, scope := range resource.ScopeLogs().All() {
 				for _, record := range scope.LogRecords().All() {
 					fields := record.Body().Map().AsRaw()
+					if fields["type"] == "osquery_profile" {
+						resultMu.Lock()
+						profileScheduleIDs = append(profileScheduleIDs, fields["schedule_id"])
+						resultMu.Unlock()
+						continue
+					}
 					result, ok := fields["osquery"].(map[string]any)
 					if !ok || result["extension_socket"] == nil || result["pid"] == nil {
 						continue
@@ -66,7 +73,10 @@ func TestReceiverRestartsAfterOsqueryExit78(t *testing.T) {
 	})
 	require.NoError(t, err, "create restart consumer")
 
-	// Configure a scheduled query that reports the daemon PID and socket.
+	// Configure a scheduled query that reports the daemon PID and socket. With a
+	// query_profile stream, each execution is also profiled outside the logger
+	// callback.
+	const scheduleID = "restart-schedule"
 	factory := osqreceiver.NewFactoryWithSettings(osqreceiver.Settings{Home: home})
 	cfg := &osqreceiver.Config{Beatconfig: map[string]any{
 		"path.home":                  home,
@@ -79,19 +89,21 @@ func TestReceiverRestartsAfterOsqueryExit78(t *testing.T) {
 				"id": "restart-result", "type": "osquery",
 				"data_stream": map[string]any{"dataset": "osquery_manager.result"},
 				"osquery": map[string]any{
-					// Allow the existing synchronous profiling query to time out before
-					// native logging does; this test injects its own logger failure.
-					"options": map[string]any{"thrift_timeout": 30, "schedule_splay_percent": 0},
+					"options": map[string]any{"schedule_splay_percent": 0},
 					"schedule": map[string]any{"restart": map[string]any{
 						"query": "SELECT info.pid, flags.value AS extension_socket " +
 							"FROM osquery_info info CROSS JOIN osquery_flags flags WHERE flags.name = 'extensions_socket'",
-						"interval": 1, "snapshot": true,
+						"interval": 1, "snapshot": true, "schedule_id": scheduleID,
 					}},
 				},
 			},
 			map[string]any{
 				"id": "restart-response", "type": "osquery",
 				"data_stream": map[string]any{"dataset": "osquery_manager.action.responses"},
+			},
+			map[string]any{
+				"id": "restart-profile", "type": "osquery",
+				"data_stream": map[string]any{"dataset": "osquery_manager.query_profile"},
 			},
 		}},
 	}}
@@ -123,6 +135,16 @@ func TestReceiverRestartsAfterOsqueryExit78(t *testing.T) {
 	}, time.Minute, 100*time.Millisecond, "scheduled results must expose the live daemon PID and extension socket")
 	resultMu.Lock()
 	initialPID, initialSocket := lastPID, socketPath
+	resultMu.Unlock()
+
+	// The deferred profile query runs against the real daemon's osquery_schedule.
+	require.Eventually(t, func() bool {
+		resultMu.Lock()
+		defer resultMu.Unlock()
+		return len(profileScheduleIDs) > 0
+	}, 30*time.Second, 100*time.Millisecond, "scheduled executions must publish a query_profile event")
+	resultMu.Lock()
+	assert.Equal(t, scheduleID, profileScheduleIDs[0], "the profile must carry the policy's schedule_id")
 	resultMu.Unlock()
 
 	// Remove the live logger registration to provoke native exit 78.
