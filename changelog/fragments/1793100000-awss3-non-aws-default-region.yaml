@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix awss3 input rejecting non_aws_bucket_name configs that set only default_region.
+component: filebeat
