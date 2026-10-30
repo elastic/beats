@@ -18,10 +18,13 @@
 package log
 
 import (
+	"maps"
+	"slices"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
@@ -180,6 +183,72 @@ func TestZeroPeriodConfig(t *testing.T) {
 		t.Fatal("MakeReporter did not return a *Reporter")
 	}
 	assert.Equal(t, time.Duration(0), reporter.Period)
+}
+
+func TestMakeReporterNamespaces(t *testing.T) {
+	for _, tc := range []struct {
+		name               string
+		cfg                map[string]any
+		bm                 beatmonitoring.Monitoring
+		want               []string
+		expectWarnLog      bool
+		expectedWarnLogMsg string
+	}{
+		{
+			name: "default logs only metrics",
+			cfg:  map[string]any{},
+			bm:   beatmonitoring.NewMonitoring(),
+			want: []string{"metrics"},
+		},
+		{
+			name: "dataset is opt-in",
+			cfg: map[string]any{
+				"namespaces": []string{"stats", "dataset"},
+			},
+			bm:   beatmonitoring.NewMonitoring(),
+			want: []string{"metrics", "dataset"},
+		},
+		{
+			name: "unknown namespace ignored",
+			cfg: map[string]any{
+				"namespaces": []string{"stats", "bogus"},
+			},
+			bm:                 beatmonitoring.NewMonitoring(),
+			want:               []string{"metrics"},
+			expectWarnLog:      true,
+			expectedWarnLogMsg: "Ignoring unknown namespace \"bogus\" in logging.metrics.namespaces",
+		},
+		{
+			name: "nil beatmonitoring returns default 'metrics' registry",
+			cfg: map[string]any{
+				"namespaces": []string{"stats"},
+			},
+			bm:            beatmonitoring.Monitoring{},
+			want:          nil,
+			expectWarnLog: false,
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			logger, zapLogs := logptest.NewTestingLoggerWithObserver(t, "")
+			rep, err := MakeReporter(beat.Info{Logger: logger}, conf.MustNewConfigFrom(tc.cfg), tc.bm)
+			require.NoError(t, err)
+			r, ok := rep.(*Reporter)
+			require.True(t, ok)
+			defer r.Stop()
+
+			assert.ElementsMatch(t, tc.want, slices.Collect(maps.Keys(r.registries)))
+
+			const warningSnippet = "Ignoring unknown namespace"
+			warnings := zapLogs.FilterMessageSnippet(warningSnippet)
+			if tc.expectWarnLog {
+				if assert.Equal(t, 1, warnings.Len(), "expected exactly one warning msg") {
+					assert.Equal(t, tc.expectedWarnLogMsg, warnings.All()[0].Message)
+				}
+			} else {
+				assert.Zero(t, warnings.Len(), "didn't expect a warning log")
+			}
+		})
+	}
 }
 
 func assertMapHas(t *testing.T, m map[string]any, key string, expectedValue any) {

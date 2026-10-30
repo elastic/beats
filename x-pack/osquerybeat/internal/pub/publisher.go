@@ -6,6 +6,7 @@ package pub
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -44,9 +45,9 @@ type Publisher struct {
 	cut                   func(rows int)
 	// ctx ends the publishes of a scheduled publisher (see NewScheduled).
 	ctx context.Context
-	// inPublishContext is set while a client's PublishContext runs. The
-	// caller counts an event it does not queue as cut, so the listener must
-	// not count it again.
+	// inPublishContext is set while a client's PublishContext runs. An event
+	// it does not queue is counted by publish (rejected) or its caller (cut),
+	// so the listener must not count it again.
 	inPublishContext bool
 }
 
@@ -57,6 +58,8 @@ func New(b *beat.Beat, log *logp.Logger) *Publisher {
 	}
 }
 
+// Configure replaces the clients for the given inputs. It must be called from a
+// single goroutine; only Close may run concurrently with it.
 func (p *Publisher) Configure(inputs []config.InputConfig) error {
 	if len(inputs) == 0 {
 		return nil
@@ -239,10 +242,12 @@ func (p *Publisher) PublishEach(ctx context.Context, index, idValue, idFieldKey,
 	return len(hits)
 }
 
-// publish hands e to c and reports whether c queued it. With a non-nil ctx
-// and a client that implements beat.ContextPublisher, it stops waiting for
-// room when ctx ends or c closes, and the event is not queued. Otherwise it
-// blocks like Publish and reports true. p.mx must be held.
+// publish hands e to c and reports false if the publish was cancelled. With a
+// non-nil ctx and a client that implements beat.ContextPublisher, it stops
+// waiting for room when ctx ends or c closes, and the event is not queued.
+// Otherwise it blocks like Publish and reports true. An event the queue
+// rejects is dropped as Publish would drop it, and publish reports true.
+// p.mx must be held.
 func (p *Publisher) publish(ctx context.Context, c beat.Client, e beat.Event) bool {
 	cp, ok := c.(beat.ContextPublisher)
 	if ctx == nil || !ok {
@@ -250,8 +255,17 @@ func (p *Publisher) publish(ctx context.Context, c beat.Client, e beat.Event) bo
 		return true
 	}
 	p.inPublishContext = true
-	defer func() { p.inPublishContext = false }()
-	return cp.PublishContext(ctx, e) == nil
+	err := cp.PublishContext(ctx, e)
+	p.inPublishContext = false
+	if errors.Is(err, beat.ErrRejected) {
+		// The listener ignored the drop report made during PublishContext,
+		// so count it here.
+		if l, ok := p.listener.(*scheduledListener); ok {
+			l.dropped()
+		}
+		return true
+	}
+	return err == nil
 }
 
 // skip reports rows that were not published because their publish was
@@ -582,7 +596,7 @@ func hitToEvent(index, eventType, idValue, idFieldKey, responseID, spaceID, pack
 // reports whether the remaining rows may still be published, for example
 // after the policy was replaced; cut is called with the number of rows skipped
 // because allowed returned false. dropped is called for
-// each event published after its client closed.
+// each event published after its client closed or rejected by the queue.
 //
 // If the clients implement beat.ContextPublisher, ctx ending or a client
 // closing stops a publish waiting for room in the queue. Such an event is

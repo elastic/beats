@@ -61,10 +61,8 @@ func TestPublishContextCancel(t *testing.T) {
 
 				ctx, cancel := context.WithTimeout(t.Context(), 50*time.Millisecond)
 				defer cancel()
-				cp, ok := p.(queue.ContextProducer[int])
-				require.True(t, ok, "memqueue producers must implement queue.ContextProducer")
 				start := time.Now()
-				_, err := cp.PublishContext(ctx, 100)
+				_, err := p.PublishContext(ctx, 100)
 				assert.ErrorIs(t, err, context.DeadlineExceeded, "PublishContext on a full queue must return the ctx error")
 				assert.Equal(t, 50*time.Millisecond, time.Since(start), "PublishContext must return as soon as the deadline passes")
 
@@ -106,12 +104,11 @@ func TestPublishContextBackToBack(t *testing.T) {
 			Events: 4, MaxGetRequest: 4, FlushTimeout: time.Millisecond,
 		}, 0, nil)
 		defer q.Close(true)
-		cp, ok := q.Producer(queue.ProducerConfig{}).(queue.ContextProducer[int])
-		require.True(t, ok, "memqueue producers must implement queue.ContextProducer")
+		p := q.Producer(queue.ProducerConfig{})
 
 		for i := range 3 {
 			ctx, cancel := context.WithTimeout(t.Context(), time.Second)
-			id, err := cp.PublishContext(ctx, i)
+			id, err := p.PublishContext(ctx, i)
 			cancel()
 			require.NoError(t, err, "publish %d on a queue with room must succeed", i)
 			assert.Equal(t, queue.EntryID(i), id, "publish %d must get the next entry ID", i)
@@ -141,13 +138,12 @@ func TestPublishContextCancelWhilePushChanFull(t *testing.T) {
 		synctest.Wait()
 		require.Len(t, q.pushChan, cap(q.pushChan), "pushChan must be full")
 
-		cp, ok := q.Producer(queue.ProducerConfig{}).(queue.ContextProducer[int])
-		require.True(t, ok, "memqueue producers must implement queue.ContextProducer")
+		p := q.Producer(queue.ProducerConfig{})
 		ctx, cancel := context.WithTimeout(t.Context(), 50*time.Millisecond)
 		defer cancel()
 		res := make(chan error, 1)
 		go func() {
-			_, err := cp.PublishContext(ctx, 100)
+			_, err := p.PublishContext(ctx, 100)
 			res <- err
 		}()
 		select {
@@ -166,13 +162,11 @@ func TestPublishContextCancelBeforeBrokerAccepts(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		b := newQueue[int](logp.NewNopLogger(), nil, Settings{Events: 2, MaxGetRequest: 2}, 0, nil)
 		p := b.Producer(queue.ProducerConfig{ACK: func(int) {}})
-		cp, ok := p.(queue.ContextProducer[int])
-		require.True(t, ok, "memqueue producers must implement queue.ContextProducer")
 
 		ctx, cancel := context.WithCancel(t.Context())
 		res := make(chan error, 1)
 		go func() {
-			_, err := cp.PublishContext(ctx, 1)
+			_, err := p.PublishContext(ctx, 1)
 			res <- err
 		}()
 		synctest.Wait()
@@ -184,7 +178,7 @@ func TestPublishContextCancelBeforeBrokerAccepts(t *testing.T) {
 
 		ids := make(chan queue.EntryID, 1)
 		go func() {
-			id, err := cp.PublishContext(t.Context(), 2)
+			id, err := p.PublishContext(t.Context(), 2)
 			assert.NoError(t, err, "publish after an abandoned request must succeed")
 			ids <- id
 		}()
@@ -204,13 +198,12 @@ func TestPublishContextCancelBeforeBrokerAccepts(t *testing.T) {
 func TestPublishContextRepublishBeforeBrokerReadsAbandoned(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		b := newQueue[int](logp.NewNopLogger(), nil, Settings{Events: 2, MaxGetRequest: 2}, 0, nil)
-		cp, ok := b.Producer(queue.ProducerConfig{ACK: func(int) {}}).(queue.ContextProducer[int])
-		require.True(t, ok, "memqueue producers must implement queue.ContextProducer")
+		p := b.Producer(queue.ProducerConfig{ACK: func(int) {}})
 
 		ctx, cancel := context.WithCancel(t.Context())
 		res := make(chan error, 1)
 		go func() {
-			_, err := cp.PublishContext(ctx, 1)
+			_, err := p.PublishContext(ctx, 1)
 			res <- err
 		}()
 		synctest.Wait()
@@ -220,7 +213,7 @@ func TestPublishContextRepublishBeforeBrokerReadsAbandoned(t *testing.T) {
 		// Publish again while the abandoned request is still in pushChan.
 		ids := make(chan queue.EntryID, 1)
 		go func() {
-			id, err := cp.PublishContext(t.Context(), 2)
+			id, err := p.PublishContext(t.Context(), 2)
 			assert.NoError(t, err, "publish after an abandoned request must succeed")
 			ids <- id
 		}()
@@ -239,13 +232,12 @@ func TestPublishContextRepublishBeforeBrokerReadsAbandoned(t *testing.T) {
 func TestPublishContextCancelAfterBrokerAccepts(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		b := newQueue[int](logp.NewNopLogger(), nil, Settings{Events: 2, MaxGetRequest: 2}, 0, nil)
-		cp, ok := b.Producer(queue.ProducerConfig{ACK: func(int) {}}).(queue.ContextProducer[int])
-		require.True(t, ok, "memqueue producers must implement queue.ContextProducer")
+		p := b.Producer(queue.ProducerConfig{ACK: func(int) {}})
 
 		ctx, cancel := context.WithCancel(t.Context())
 		res := make(chan error, 1)
 		go func() {
-			_, err := cp.PublishContext(ctx, 1)
+			_, err := p.PublishContext(ctx, 1)
 			res <- err
 		}()
 		synctest.Wait()

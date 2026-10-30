@@ -927,7 +927,7 @@ Module for parsing sophosxg syslog.
 
 
 **`sophos.xg.signature_msg`**
-:   Signature messsage
+:   Signature message
 
     type: keyword
 

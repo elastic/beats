@@ -42,7 +42,16 @@ type logstashExporter struct {
 	settings      exporter.Settings
 	mu            sync.RWMutex
 	componentHost component.Host
+
+	// shutdown is closed by Shutdown so that ConsumeLogs calls blocked in
+	// enqueueWork return instead of waiting for workers that no longer exist.
+	shutdown     chan struct{}
+	shutdownOnce sync.Once
 }
+
+// errExporterShutdown is returned by enqueueWork when the exporter is shut
+// down while a batch is waiting for a free worker.
+var errExporterShutdown = errors.New("logstash exporter is shut down")
 
 func newLogstashExporter(settings exporter.Settings, cfg component.Config) (*logstashExporter, error) {
 	rawConfig, logstashConfig, err := parseLogstashConfig(&cfg)
@@ -56,8 +65,8 @@ func newLogstashExporter(settings exporter.Settings, cfg component.Config) (*log
 	}
 
 	// The work queue size should be the same as the number of outputs.Client created by the
-	// otelconsumer.makeOtelConsumer. A lower size will cause backpressure, and it might lead
-	// to starvation of some batches if the queue is always full.
+	// otelconsumer.makeOtelConsumer. A lower size will cause backpressure on the callers of
+	// ConsumeLogs, which wait in enqueueWork in arrival order.
 	workQueueSize := runtime.NumCPU()
 
 	return &logstashExporter{
@@ -66,6 +75,7 @@ func newLogstashExporter(settings exporter.Settings, cfg component.Config) (*log
 		logger:    logger,
 		workQueue: make(chan *internal.Work, workQueueSize),
 		settings:  settings,
+		shutdown:  make(chan struct{}),
 	}, nil
 }
 
@@ -78,6 +88,7 @@ func (l *logstashExporter) Start(_ context.Context, host component.Host) error {
 }
 
 func (l *logstashExporter) Shutdown(context.Context) error {
+	l.shutdownOnce.Do(func() { close(l.shutdown) })
 	return l.shutdownLogstashWorkers()
 }
 
@@ -104,30 +115,21 @@ func (l *logstashExporter) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 	return l.processWorkResult(ctx, ld, work, batch)
 }
 
+// enqueueWork hands w to the worker queue, blocking until there is room.
+//
+// Blocked senders on a Go channel are woken in arrival order, so batches are
+// admitted to the workers first-in-first-out. This matters because the
+// pipeline releases a batch's events only in order: if a batch waiting here is
+// repeatedly overtaken by newer ones, every batch behind it is already done
+// but its events stay in memory until this one completes.
 func (l *logstashExporter) enqueueWork(ctx context.Context, w *internal.Work) error {
-	backoff := 5 * time.Millisecond
-	maxBackoff := 250 * time.Millisecond
-	attempts := 0
-
-	for {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-
-		case l.workQueue <- w:
-			return nil
-
-		default:
-			attempts++
-			l.logger.Debugf("Work queue is full, retrying enqueue (attempt %d, backoff %v)", attempts, backoff)
-			time.Sleep(backoff)
-			if backoff < maxBackoff {
-				backoff *= 2
-				if backoff > maxBackoff {
-					backoff = maxBackoff
-				}
-			}
-		}
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-l.shutdown:
+		return errExporterShutdown
+	case l.workQueue <- w:
+		return nil
 	}
 }
 

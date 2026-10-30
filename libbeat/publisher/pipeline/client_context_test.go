@@ -19,6 +19,7 @@ package pipeline
 
 import (
 	"context"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"testing/synctest"
@@ -31,9 +32,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/slabqueue"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // newContextTestClient returns an open client publishing to p, wired like
@@ -132,25 +136,32 @@ func TestClientPublishContextNewContext(t *testing.T) {
 	})
 }
 
-// TestClientPublishContextClosed checks that PublishContext reports
-// ErrClientClosed, and counts the event as dropped, when the client is closed
-// and when a producer without PublishContext refuses the event.
-func TestClientPublishContextClosed(t *testing.T) {
+// TestClientPublishContextRefused checks the error PublishContext reports, and
+// that it counts the event as dropped, when the client is closed and when the
+// producer refuses the event, with and without an event listener (which makes
+// the publish not cancellable).
+func TestClientPublishContextRefused(t *testing.T) {
 	tests := []struct {
 		name    string
 		close   bool
 		canDrop bool
+		el      beat.EventListener
+		want    error
 	}{
-		{name: "client closed", close: true},
-		{name: "client closed with DropIfFull", close: true, canDrop: true},
-		{name: "fallback producer closed", close: false},
+		{name: "client closed", close: true, want: beat.ErrClientClosed},
+		{name: "client closed with DropIfFull", close: true, canDrop: true, want: beat.ErrClientClosed},
+		{name: "client closed with event listener", close: true, el: acker.Nil(), want: beat.ErrClientClosed},
+		{name: "producer rejects", want: beat.ErrRejected},
+		{name: "producer rejects with event listener", el: acker.Nil(), want: beat.ErrRejected},
+		{name: "producer full with DropIfFull", canDrop: true, want: nil},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			listener := &mockClientListener{}
 			c := newContextTestClient(&testProducer{
 				publish: func(bool, publisher.Event) (queue.EntryID, bool) { return 0, false },
-			}, listener, nil)
+			}, listener, tc.el)
+			require.Equal(t, tc.el == nil, c.ctxProducer != nil, "the publish must be cancellable only without an event listener")
 			c.canDrop = tc.canDrop
 			if tc.close {
 				require.NoError(t, c.Close(), "Close must succeed")
@@ -159,7 +170,7 @@ func TestClientPublishContextClosed(t *testing.T) {
 			cp, ok := beat.Client(c).(beat.ContextPublisher)
 			require.True(t, ok, "the pipeline client must implement beat.ContextPublisher")
 			err := cp.PublishContext(t.Context(), beat.Event{})
-			assert.ErrorIs(t, err, beat.ErrClientClosed, "PublishContext must report the closed client")
+			assert.ErrorIs(t, err, tc.want, "PublishContext must report why the event was refused")
 			assert.Equal(t, 1, listener.eventsDroppedOnPublish, "the refused event must be reported as dropped")
 		})
 	}
@@ -231,9 +242,7 @@ func TestClientCloseReleasesPublishContext(t *testing.T) {
 			q := pool.Connect()
 			defer q.Close(true) // releases the publish if Close does not
 			entered := make(chan struct{}, 2)
-			qp, ok := q.Producer(queue.ProducerConfig{}).(queue.ContextProducer[publisher.Event])
-			require.True(t, ok, "slabqueue producers must implement queue.ContextProducer")
-			p := &signallingProducer{ContextProducer: qp, entered: entered}
+			p := &signallingProducer{Producer: q.Producer(queue.ProducerConfig{}), entered: entered}
 			listener := &mockClientListener{}
 			c := newContextTestClient(p, listener, nil)
 			require.NoError(t, c.PublishContext(tc.ctx, beat.Event{}), "the first publish must fill the queue")
@@ -257,16 +266,113 @@ func TestClientCloseReleasesPublishContext(t *testing.T) {
 	}
 }
 
+// TestClientPublishContextDiskQueue checks that a client over a disk queue
+// producer publishes through its PublishContext: a publish blocked on the full
+// queue is released by ctx cancellation and by Close, and an event the queue
+// can never take is reported as beat.ErrRejected with the queue's reason.
+func TestClientPublishContextDiskQueue(t *testing.T) {
+	const payloadSize = 4 * 1024
+	tests := []struct {
+		name string
+		// fill makes the queue full before the publish.
+		fill bool
+		// release, if set, is run once the publish is blocked.
+		release func(t *testing.T, c *client, cancel context.CancelFunc)
+		event   beat.Event
+		want    error
+		reason  string
+	}{
+		{
+			name:    "ctx cancelled",
+			fill:    true,
+			release: func(_ *testing.T, _ *client, cancel context.CancelFunc) { cancel() },
+			event:   diskQueueTestEvent(payloadSize),
+			want:    context.Canceled,
+		},
+		{
+			name: "client closed",
+			fill: true,
+			release: func(t *testing.T, c *client, _ context.CancelFunc) {
+				go func() { assert.NoError(t, c.Close(), "Close must succeed") }()
+			},
+			event: diskQueueTestEvent(payloadSize),
+			want:  beat.ErrClientClosed,
+		},
+		{
+			name:   "event too large",
+			event:  diskQueueTestEvent(32 * 1024),
+			want:   beat.ErrRejected,
+			reason: "exceeds the segment buffer limit",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			synctest.Test(t, func(t *testing.T) {
+				settings := diskqueue.DefaultSettings()
+				settings.Path = t.TempDir()
+				settings.MaxBufferSize = 64 * 1024
+				settings.MaxSegmentSize = 16 * 1024
+				q, err := diskqueue.NewQueue(logp.NewNopLogger(), nil, settings, nil, &paths.Path{})
+				require.NoError(t, err, "the disk queue must be created")
+				defer func() {
+					assert.NoError(t, q.Close(false), "closing the disk queue must succeed")
+					<-q.Done()
+				}()
+				p := q.Producer(queue.ProducerConfig{})
+				if tc.fill {
+					for i := 0; ; i++ {
+						require.Less(t, i, 100, "the disk queue must fill up")
+						_, ok := p.TryPublish(publisher.Event{Content: diskQueueTestEvent(payloadSize)})
+						if !ok {
+							break
+						}
+					}
+				}
+				listener := &mockClientListener{}
+				c := newContextTestClient(p, listener, nil)
+				defer c.Close()
+				require.NotNil(t, c.ctxProducer, "the client must publish through the disk queue's PublishContext")
+
+				ctx, cancel := context.WithCancel(t.Context())
+				defer cancel()
+				errc := make(chan error, 1)
+				go func() { errc <- c.PublishContext(ctx, tc.event) }()
+				if tc.release != nil {
+					synctest.Wait()
+					select {
+					case err := <-errc:
+						t.Fatalf("PublishContext returned %v on a full queue; want it to block", err)
+					default:
+					}
+					tc.release(t, c, cancel)
+				}
+
+				err = <-errc
+				assert.ErrorIs(t, err, tc.want, "PublishContext must report why the event was not queued")
+				if tc.reason != "" {
+					assert.ErrorContains(t, err, tc.reason, "the error must include the queue's reason")
+				}
+				assert.Equal(t, 1, listener.eventsDroppedOnPublish, "the event must be reported as dropped")
+				assert.Equal(t, 0, listener.eventsPublished, "no event must be published")
+			})
+		})
+	}
+}
+
+func diskQueueTestEvent(payloadSize int) beat.Event {
+	return beat.Event{Fields: mapstr.M{"payload": strings.Repeat("x", payloadSize)}}
+}
+
 // signallingProducer sends on entered each time PublishContext starts, so a
 // test knows the client holds its mutex.
 type signallingProducer struct {
-	queue.ContextProducer[publisher.Event]
+	queue.Producer[publisher.Event]
 	entered chan<- struct{}
 }
 
 func (p *signallingProducer) PublishContext(ctx context.Context, e publisher.Event) (queue.EntryID, error) {
 	p.entered <- struct{}{}
-	return p.ContextProducer.PublishContext(ctx, e)
+	return p.Producer.PublishContext(ctx, e)
 }
 
 // TestClientPublishContextFiltered checks that an event dropped by processors

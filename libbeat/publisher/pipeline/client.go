@@ -20,6 +20,7 @@ package pipeline
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 	"sync/atomic"
 
@@ -51,9 +52,9 @@ type client struct {
 	producer   queue.Producer[publisher.Event]
 	// ctxProducer is producer when PublishContext may cancel a publish to it,
 	// else nil (see cancellableProducer).
-	ctxProducer queue.ContextProducer[publisher.Event]
+	ctxProducer queue.Producer[publisher.Event]
 	// closeCtx is cancelled by Close to release a PublishContext waiting for
-	// room in the queue. Set only when ctxProducer is.
+	// room in the queue. Set only when ctxProducer is non-nil.
 	closeCtx    context.Context
 	closeCancel context.CancelFunc
 	mutex       sync.Mutex
@@ -136,12 +137,18 @@ func (c *client) PublishContext(ctx context.Context, e beat.Event) error {
 	defer c.mutex.Unlock()
 
 	if c.canDrop || c.ctxProducer == nil {
-		// With DropIfFull a refused event may only mean a full queue, which
-		// is not an error.
-		if !c.publish(e) && (!c.canDrop || !c.isOpen.Load()) {
+		switch {
+		case c.publish(e):
+			return nil
+		case !c.isOpen.Load():
 			return beat.ErrClientClosed
+		case c.canDrop:
+			// With DropIfFull a refused event may only mean a full queue,
+			// which is not an error.
+			return nil
+		default:
+			return beat.ErrRejected
 		}
-		return nil
 	}
 
 	if !c.prepare(&e) {
@@ -157,8 +164,12 @@ func (c *client) PublishContext(ctx context.Context, e beat.Event) error {
 	})
 	if err != nil {
 		c.onDroppedOnPublish(e)
-		if errors.Is(err, queue.ErrClosed) || c.closeCtx.Err() != nil {
+		switch {
+		case errors.Is(err, queue.ErrClosed) || c.closeCtx.Err() != nil:
 			return beat.ErrClientClosed
+		case errors.Is(err, queue.ErrRejected):
+			// Keep the queue's reason alongside beat.ErrRejected.
+			return fmt.Errorf("%w: %w", beat.ErrRejected, err)
 		}
 		return err
 	}
@@ -192,17 +203,16 @@ func (c *client) publishCtx(ctx context.Context) context.Context {
 	return c.merged
 }
 
-// cancellableProducer returns p as a queue.ContextProducer if a publish to it
-// may be cancelled, else nil. A client with an event listener cannot cancel:
-// the listener has already seen the event in AddEvent, and listeners that
-// count events in order (acker.TrackingCounter, EventPrivateReporter) would
-// then wait for an ACK that never comes.
-func cancellableProducer(p queue.Producer[publisher.Event], l beat.EventListener) queue.ContextProducer[publisher.Event] {
+// cancellableProducer returns p if a publish to it may be cancelled, else nil.
+// A client with an event listener cannot cancel: the listener has already seen
+// the event in AddEvent, and listeners that count events in order
+// (acker.TrackingCounter, EventPrivateReporter) would then wait for an ACK
+// that never comes.
+func cancellableProducer(p queue.Producer[publisher.Event], l beat.EventListener) queue.Producer[publisher.Event] {
 	if l != nil {
 		return nil
 	}
-	cp, _ := p.(queue.ContextProducer[publisher.Event])
-	return cp
+	return p
 }
 
 // prepare does the bookkeeping and processing shared by every publish path,

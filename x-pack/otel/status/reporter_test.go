@@ -115,7 +115,7 @@ func TestInputStatusesInEventAttributes(t *testing.T) {
 
 	// Verify inputs attribute exists
 	attrs := m.GetEvent().Attributes()
-	inputsVal, ok := attrs.Get(inputStatusAttributesKey)
+	inputsVal, ok := attrs.Get(InputStatusAttributesKey)
 	require.True(t, ok, "expected 'inputs' attribute to exist")
 
 	inputsMap := inputsVal.Map()
@@ -145,4 +145,24 @@ func TestInputStatusesInEventAttributes(t *testing.T) {
 	runner2Error, ok := runner2Map.Get("error")
 	require.True(t, ok)
 	assert.Equal(t, "some warning", runner2Error.Str())
+}
+
+// TestGroupStatusHasNoInputStatuses checks that a status reported for the
+// whole group carries no input statuses, even once runners reported theirs.
+// The Heartbeat receiver relies on this to tell a failed monitor from a failed
+// receiver.
+func TestGroupStatusHasNoInputStatuses(t *testing.T) {
+	m := &oteltest.MockHost{}
+	reporter := NewGroupStatusReporter(m)
+
+	reporter.GetReporterForRunner("runner-1").UpdateStatus(status.Failed, "runner failed")
+	require.NotNil(t, m.GetEvent(), "expected the runner status to be reported")
+	_, ok := m.GetEvent().Attributes().Get(InputStatusAttributesKey)
+	require.True(t, ok, "expected the runner status event to carry input statuses")
+
+	reporter.UpdateStatus(status.Failed, "beatreceiver failed to start")
+	require.NotNil(t, m.GetEvent(), "expected the group status to be reported")
+	assert.Equal(t, componentstatus.StatusPermanentError, m.GetEvent().Status(), "expected the group failure to be permanent")
+	_, ok = m.GetEvent().Attributes().Get(InputStatusAttributesKey)
+	assert.False(t, ok, "expected the group status event to carry no input statuses")
 }

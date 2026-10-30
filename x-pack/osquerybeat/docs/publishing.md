@@ -45,6 +45,16 @@ cut while the output is healthy. The item the worker is publishing does not
 count against the limit and is never dropped for space. A policy change applies
 the new limit; shrinking it drops the oldest items.
 
+In a burst, rows are dropped only once libbeat's queue is full and more than
+`max_events` rows (3200 by default) wait here; the queue does not wait before
+it drops them, because a wait would hold osqueryd's logger RPC again.
+
+A dropped differential result is lost for good. osqueryd updates its diff
+baseline before it logs the result, so it does not report those added or
+removed rows again. The same holds for an RRULE-scheduled differential query:
+osquerybeat updates its baseline when the query runs, before the run is
+queued. A snapshot query, the default, reports all its rows on its next run.
+
 `max_age` drops items that waited longer than this when the worker reaches
 them.
 
@@ -72,19 +82,19 @@ could not resolve are dropped.
 Shutdown drops the queued items and cancels a publish waiting for the output.
 Without cancellation support it does not wait for a blocked `Publish`.
 
-Cancellation works with the memory queue and the slab queue. With the disk
-queue, a publish waits until the output frees room or the pipeline closes. A
-cancelled row is counted as dropped and is not queued.
+Cancellation works with the memory, slab and disk queues. A cancelled row is
+counted as dropped and is not queued.
 
 ## Live queue
 
 A live query action waits for its rows to be handed to the output for at most
 `live.timeout`, counted from when the query returns, so a slow query does not
-use up the window. If the timeout elapses, the action reports the rows handed
-over so far as its count, with an error. The remaining rows are skipped and a
-publish waiting for the output is cancelled; without cancellation support (the
-disk queue), a row already inside a blocked `Publish` can still be delivered
-late. The action's
+use up the window. On the OTel runtime the action's own context can end first,
+at the Fleet action timeout (1 minute by default); that is handled the same
+way. If the timeout elapses, the action reports the rows handed over so far as
+its count, with an error. The remaining rows are skipped and a publish waiting
+for the output is cancelled; without cancellation support, a row already
+inside a blocked `Publish` can still be delivered late. The action's
 response document is published after its rows and is not dropped by the
 timeout, so Kibana learns the outcome unless osquerybeat stops before the
 response is published. If osquerybeat is stopping, the
@@ -120,7 +130,7 @@ Reasons:
 | `expired` | scheduled | Older than `max_age` when the worker reached it |
 | `stale` | both | No current policy publishes it: the query was removed, moved to another namespace or changed SQL (also while it was in flight), osqueryd could not resolve its column types, no results stream is configured, or, for a profile or an action response, no profile or action response stream is configured |
 | `shutdown` | both | Osquerybeat was stopping |
-| `timeout` | live | The action stopped waiting after `live.timeout` |
+| `timeout` | live | The action stopped waiting after `live.timeout`, or its context ended first |
 
 For a live action, an item is the action's results and profile, and its rows
 are the rows and profile not handed to the output. The live `queue.*` gauges

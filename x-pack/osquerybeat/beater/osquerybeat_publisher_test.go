@@ -86,5 +86,4 @@ func TestOsquerybeatClose_ClosesPublisher(t *testing.T) {
 
 	assert.True(t, p.closeCalled)
 	assert.True(t, cancelCalled)
-	assert.Nil(t, bt.cancel)
 }

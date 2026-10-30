@@ -13,26 +13,21 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Keep osqueryd running when the output is slow by queueing osquery results.
+summary: Keep osqueryd running when the output is slow by queueing scheduled osquery results.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
 description: >-
-  Osquerybeat now publishes scheduled and live query results from its own
-  queues, so a slow output no longer makes osqueryd exit with code 78. The
+  Osquerybeat now publishes native scheduled query results from its own
+  queue, so a slow output no longer makes osqueryd exit with code 78. The
   scheduled queue holds up to
   osquery.elastic_options.publishing.scheduled.max_events rows (default 3200)
-  and, when full, drops the oldest items, profiles first;
-  publishing.scheduled.max_age optionally drops items that waited too long. A
-  live query waits up to publishing.live.timeout (default 60s) for its rows to
-  be handed to the output. Drops are counted under
-  osquerybeat.publishing.scheduled and osquerybeat.publishing.live. An osquery
-  policy that fails validation, for example one with invalid publishing
-  settings, an invalid processor or an invalid ECS mapping, is now rejected before any of it is
-  applied: on the process runtime the osquery unit is marked failed and the
-  previous policy keeps running, instead of osquerybeat stopping. On the OTel
-  runtime such a configuration still stops the receiver. See
+  and, when full, drops the oldest items; publishing.scheduled.max_age
+  optionally drops items that waited too long. Queued results survive
+  osqueryd restarts and are dropped when osquerybeat stops. Drops are counted
+  under osquerybeat.publishing.scheduled. A policy with invalid publishing
+  settings is rejected before any of it is applied. See
   x-pack/osquerybeat/docs/publishing.md.
 
 # REQUIRED for breaking-change, deprecation, known-issue

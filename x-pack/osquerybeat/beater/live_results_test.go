@@ -380,7 +380,66 @@ func TestLiveWithoutStreamsCountsProfileAndResponse(t *testing.T) {
 	})
 }
 
-func TestExecuteCancelledCountsShutdown(t *testing.T) {
+// TestExecuteContextDeadlineCountsTimeout checks an action whose context ends
+// while osquerybeat keeps running, as the Fleet action timeout does on the
+// OTel runtime.
+func TestExecuteContextDeadlineCountsTimeout(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		pub := newGatedLivePublisher(2)
+		d := newLiveResultDispatcher(monitoring.NewRegistry(), logptest.NewTestingLogger(t, ""), time.Minute)
+		h := newLiveTestHandler(t, d, pub, 5)
+		ctx, cancel := context.WithTimeout(t.Context(), time.Second)
+		defer cancel()
+
+		done := make(chan map[string]any)
+		go func() {
+			res, _ := h.Execute(ctx, liveRequest("a1"))
+			done <- res
+		}()
+		synctest.Wait()
+		assert.Equal(t, int64(1), d.metrics.items.Get(), "the queue.items gauge must report the waiting action")
+		assert.Equal(t, int64(5), d.metrics.events.Get(), "the queue.events gauge must report the waiting action's rows")
+
+		res := <-done
+		assert.Equal(t, "timed out publishing live query results: context deadline exceeded", res["error"], "report the ended context as a timeout, not as osquerybeat stopping")
+		assert.Equal(t, 2, res["count"], "report the rows handed to the output before the context ended")
+		assert.Zero(t, d.metrics.dropped[dropShutdown].Get(), "osquerybeat was not stopping")
+		assert.Equal(t, uint64(1), d.metrics.dropped[dropTimeout].Get(), "count the action as timed out")
+		assert.Equal(t, uint64(3), d.metrics.droppedRows[dropTimeout].Get(), "count the rows not handed to the output as timed out")
+		assert.Zero(t, d.metrics.items.Get(), "the queue gauges must reset once the action returns")
+
+		close(pub.release)
+		d.stop()
+	})
+}
+
+// TestLiveContextDeadlineErrorWrapsBoth checks that the error for an ended
+// context matches both errLivePublishTimeout, which Execute relies on to
+// report the count, and the context's error.
+func TestLiveContextDeadlineErrorWrapsBoth(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		pub := newGatedLivePublisher(0)
+		d := newLiveResultDispatcher(monitoring.NewRegistry(), logptest.NewTestingLogger(t, ""), time.Minute)
+		ctx, cancel := context.WithTimeout(t.Context(), time.Second)
+		defer cancel()
+
+		n, err := d.publishResults(ctx, pub, liveJob{actionID: "a1", hits: make([]map[string]any, 3)})
+
+		assert.Zero(t, n, "no row was handed to the output")
+		assert.ErrorIs(t, err, errLivePublishTimeout, "report the ended context as a publish timeout")
+		assert.ErrorIs(t, err, context.DeadlineExceeded, "keep the context's error")
+
+		close(pub.release)
+		d.stop()
+	})
+}
+
+// TestExecuteCancelledWhileStoppingCountsShutdown checks that an action
+// whose context ends during shutdown, as the agent client's lifetime context
+// does on the process runtime, still counts as a shutdown. The stop usually
+// wakes the action first, so this checks the outcome, not which case of the
+// select ran.
+func TestExecuteCancelledWhileStoppingCountsShutdown(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		pub := newGatedLivePublisher(0)
 		d := newLiveResultDispatcher(monitoring.NewRegistry(), logptest.NewTestingLogger(t, ""), time.Minute)
@@ -393,19 +452,17 @@ func TestExecuteCancelledCountsShutdown(t *testing.T) {
 			done <- res
 		}()
 		synctest.Wait()
-		assert.Equal(t, int64(1), d.metrics.items.Get(), "the queue.items gauge must report the waiting action")
-		assert.Equal(t, int64(5), d.metrics.events.Get(), "the queue.events gauge must report the waiting action's rows")
 
+		// The agent stops osquerybeat before its client cancels the context.
+		d.stop()
 		cancel()
 		res := <-done
-		assert.Equal(t, errLiveShutdown.Error(), res["error"], "the agent cancelling the action means osquerybeat is stopping")
+		assert.Equal(t, errLiveShutdown.Error(), res["error"], "an action cancelled while stopping reports that osquerybeat is stopping")
 		assert.Zero(t, d.metrics.dropped[dropTimeout].Get(), "a cancelled action did not time out")
 		assert.Equal(t, uint64(1), d.metrics.dropped[dropShutdown].Get(), "count the cancelled action as a shutdown drop")
 		assert.Equal(t, uint64(5), d.metrics.droppedRows[dropShutdown].Get(), "count its rows as shutdown drops")
-		assert.Zero(t, d.metrics.items.Get(), "the queue gauges must reset once the action returns")
 
 		close(pub.release)
-		d.stop()
 	})
 }
 

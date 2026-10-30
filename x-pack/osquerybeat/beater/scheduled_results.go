@@ -176,6 +176,11 @@ func (l *scheduledResultLease) close() {
 	l.publisher.Close()
 }
 
+// scheduledResultDispatcher publishes scheduled items from one worker.
+//
+// Lock order: take d.mu before a lease's mu, never the reverse. Code that
+// holds a lease's mu reads the active lease through current, not d.mu.
+// retire uses TryLock, so a policy change never waits on a stuck Publish.
 type scheduledResultDispatcher struct {
 	mu              sync.Mutex
 	ctx             context.Context
@@ -240,8 +245,10 @@ func (d *scheduledResultDispatcher) configure(inputs []config.InputConfig, cfg c
 			return in.Datastream.Dataset == config.DefaultQueryProfileDataset
 		})}
 		next.ctx, next.cancel = context.WithCancel(d.ctx)
-		// A blocking client drops only events published after it is closed,
-		// which happens when the pipeline closes on shutdown.
+		// A blocking client drops events published after it is closed, which
+		// happens when the pipeline closes on shutdown. The rare event the
+		// queue rejects, such as one the disk queue cannot serialize, is
+		// counted here too.
 		next.publisher = d.newPublisher(next.ctx, func() bool { return next.allowed(d.current.Load()) },
 			func() { d.metrics.dropRows(dropShutdown, 1) },
 			func(rows int) { next.cut += rows })
@@ -389,7 +396,9 @@ func (d *scheduledResultDispatcher) process(item scheduledItem) {
 	}
 	if lease != nil {
 		// Lock while the lease is still active, so it cannot have been closed;
-		// a later retire leaves closing it to unlock.
+		// a later retire leaves closing it to unlock. This Lock never waits,
+		// although d.mu is held: retire only runs on a lease that is no
+		// longer d.lease, and only this worker otherwise takes lease.mu.
 		lease.mu.Lock()
 		defer lease.unlock()
 	}

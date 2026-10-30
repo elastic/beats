@@ -26,6 +26,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors"
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	hbrunner "github.com/elastic/beats/v7/heartbeat/reload"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/management/status"
@@ -85,4 +87,23 @@ func TestInvalidMonitorFactory(t *testing.T) {
 		_, err := factory.Create(nil, conf.NewConfig())
 		assert.ErrorIs(t, err, monitors.ErrMonitorDisabled, "disabled monitors must keep their error")
 	})
+}
+
+// hashingFactory is a monitor factory with its own config hash function, like
+// the one browser monitors use.
+type hashingFactory struct {
+	cfgfile.RunnerFactory
+}
+
+func (hashingFactory) GetHashFunc(*conf.C) (plugin.HashConfigFunc, error) {
+	return func(*conf.C) (uint64, error) { return 42, nil }, nil
+}
+
+func TestInvalidMonitorFactoryKeepsHashFunc(t *testing.T) {
+	factory := invalidMonitorFactory{RunnerFactory: hashingFactory{}, logger: logptest.NewTestingLogger(t, "")}
+	list := hbrunner.NewHBRunnerList("", factory, nil, logptest.NewTestingLogger(t, ""))
+
+	hash, err := list.HashConfig(conf.MustNewConfigFrom(map[string]any{"id": "monitor"}))
+	require.NoError(t, err)
+	assert.Equal(t, uint64(42), hash)
 }

@@ -41,7 +41,7 @@ The following example changes the path from `/usr/bin` to `/usr/local/bin`:
 | --- | --- | --- | --- |
 | `fields` | Yes |  | List of one or more items. Each item contains a `field: field-name`, `pattern: regex-pattern`, and `replacement: replacement-string`, where:<br><br>* `field` is the original field name. You can use the `@metadata.` prefix in this field to replace values in the event metadata instead of event fields.<br>* `pattern` is the regex pattern to match the field’s value<br>* `replacement` is the replacement string to use to update the field’s value<br> |
 | `ignore_missing` | No | `false` | Whether to ignore missing fields. If `true`, no error is logged if the specified field is missing. |
-| `fail_on_error` | No | `true` | Whether to fail replacement of field values if an error occurs.If `true` and there’s an error, the replacement of field values is stopped, and the original event is returned.If `false`, replacement continues even if an error occurs during replacement. |
+| `fail_on_error` | No | `true` | Whether to fail replacement of field values if an error occurs. If `true` and there’s an error, the replacement of field values is stopped, and the original event is returned. If `false`, replacement continues even if an error occurs during replacement. |
 
 See [Conditions](/reference/filebeat/defining-processors.md#conditions) for a list of supported conditions.
 

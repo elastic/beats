@@ -22,15 +22,15 @@ Runs the configured `mergify-backport-labels-copier` job(s) for **mergify backpo
 
 | Job | Runs when / runner | Depends on | Configured work |
 | --- | --- | --- | --- |
-| mergify-backport-labels-copier | condition `startsWith(github.head_ref, 'mergify/bp/')`; runner `ubuntu-latest` | None declared | Step uses `elastic/oblt-actions/mergify/labels-copier@v1`; Step input names `["excluded-labels-regex"]` |
+| mergify-backport-labels-copier | condition `startsWith(github.head_ref, 'mergify/bp/')`; runner `ubuntu-latest` | None declared | Step uses `elastic/oblt-actions/mergify/labels-copier@v1`; Step input names `["excluded-labels-regex", "use-ephemeral-token"]` |
 
 ## Inputs, outputs, and access
 
 | Item | Details |
 | --- | --- |
-| Inputs | elastic/oblt-actions/mergify/labels-copier@v1 input names: excluded-labels-regex |
+| Inputs | elastic/oblt-actions/mergify/labels-copier@v1 input names: excluded-labels-regex, use-ephemeral-token |
 | Outputs | No job outputs, artifact upload, or cache action declared in this workflow. |
-| Permissions | workflow: `{"contents": "read"}`; mergify-backport-labels-copier: `{"pull-requests": "write", "repository-projects": "read"}` |
+| Permissions | workflow: `{"contents": "read"}`; mergify-backport-labels-copier: `{"id-token": "write", "pull-requests": "write", "repository-projects": "read"}` |
 | Secrets | No secret references found in this workflow file. |
 
 ## Operational notes
