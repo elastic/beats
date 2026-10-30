@@ -23,6 +23,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/license"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/node_stats"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/tasks_management"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/tier_stats"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/awshealth"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/billing"
