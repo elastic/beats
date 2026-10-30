@@ -4,31 +4,49 @@ processors:
   - script:
       description: |-
         Split Event 4103 event data fields.
-        ContextInfo is a block of "<Key> = <Value>" lines indented by at least eight spaces.
-        A value can span several lines, and those lines can themselves be indented, for example
-        when 'Host Application' holds a multi-line script passed to powershell.exe -Command.
-        A KV processor splits on those lines and then fails on the ones that hold no
-        key/value separator, so a line is treated as a new key only when it has eight or more
-        leading spaces and matches the key pattern. Anything else is appended to the previous value.
-        Keys are localized and can contain non-ASCII letters (e.g. Spanish 'Aplicación host').
+        ContextInfo is a block of "<Key> = <Value>" lines indented by eight spaces, with localized keys.
+        Windows PowerShell writes 16 keys in a fixed order, and only the fifth, 'Host Application', can
+        span several lines, for example when it holds a multi-line script passed to powershell.exe -Command.
+        Lines of such a script can look like keys (e.g. an indented hashtable entry), so when the block has
+        at least 16 lines and its first five and last eleven lines are key lines, only those lines are
+        taken as keys and everything between them is appended to 'Host Application'.
+        Otherwise a line is taken as a new key when it has eight or more leading spaces and a key that
+        starts with a letter, and anything else is appended to the previous value.
         Parse failures are recorded on error.message without stopping the rest of the pipeline.
       lang: painless
       tag: parse_context_info
       if: ctx.winlog?.event_id == "4103" && ctx.winlog?.event_data?.ContextInfo != null
       source: |-
-        def keyPattern = /^\s{8,}(\p{L}[\p{L}0-9 _.\-]*?)\s*[:=](.*)$/;
+        def keyLine = /^\s{8,}(\S[^:=]*?)\s*[:=](.*)$/;
+        def labelLine = /^\s{8,}(\p{L}[\p{L}0-9 _.'’\-]*?)\s*[:=](.*)$/;
+        def lines = /\r?\n/.split(ctx.winlog.event_data.ContextInfo);
+        int head = 5;
+        int tail = 11;
+        boolean fixed = lines.length >= head + tail;
+        for (int i = 0; fixed && i < head; i++) {
+          fixed = keyLine.matcher(lines[i]).matches();
+        }
+        for (int i = lines.length - tail; fixed && i < lines.length; i++) {
+          fixed = keyLine.matcher(lines[i]).matches();
+        }
         def key = null;
         def value = new StringBuilder();
-        for (def line : /\r?\n/.split(ctx.winlog.event_data.ContextInfo)) {
-          def matcher = keyPattern.matcher(line);
-          if (matcher.matches()) {
+        for (int i = 0; i < lines.length; i++) {
+          def matcher = null;
+          if (!fixed || i < head || i >= lines.length - tail) {
+            matcher = (fixed ? keyLine : labelLine).matcher(lines[i]);
+            if (!matcher.matches()) {
+              matcher = null;
+            }
+          }
+          if (matcher != null) {
             if (key != null) {
               ctx.winlog.event_data[key] = value.toString().trim();
             }
             key = matcher.group(1);
             value = new StringBuilder(matcher.group(2));
           } else if (key != null) {
-            value.append((char)10).append(line);
+            value.append((char)10).append(lines[i]);
           }
         }
         if (key != null) {

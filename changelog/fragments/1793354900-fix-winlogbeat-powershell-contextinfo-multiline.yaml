@@ -23,8 +23,9 @@ description: |
   [winlog.event_data.ContextInfo] does not contain value_split [[:=]]" when
   Host Application held a multi-line script, for example one passed to
   powershell.exe -Command. The ContextInfo block is now parsed by a script
-  that appends continuation lines to the previous value, so the full script is
-  kept in process.command_line. Localized keys that contain non-ASCII letters
+  that uses its fixed 16-key layout, so the full script is kept in
+  process.command_line and script lines that look like keys are not taken as
+  keys. Localized keys, including ones with non-ASCII letters or apostrophes,
   are still parsed as separate fields, and dots are removed from event_data
   keys (for example the Spanish "Id. de host" becomes "Iddehost") so they
   are not read as object paths.
