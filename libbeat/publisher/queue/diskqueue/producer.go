@@ -127,20 +127,23 @@ func (producer *diskQueueProducer) publish(
 	case err := <-request.responseChan:
 		return err
 	case <-ctx.Done():
+		// Withdraw the request by sending its responseChan on
+		// producerCancelChan. The core loop's handleProducerCancel removes the
+		// matching request from blockedProducers and answers it with
+		// errCancelled. If the core loop answered first, the answer is its
+		// result instead. Either way exactly one answer arrives, and shutdown
+		// answers every blocked request, so this cannot hang.
+		var err error
+		select {
+		case producer.queue.producerCancelChan <- request.responseChan:
+			err = <-request.responseChan
+		case err = <-request.responseChan:
+		}
+		if errors.Is(err, errCancelled) {
+			return ctx.Err()
+		}
+		return err
 	}
-	// Ask the core loop to withdraw the request. Either way it answers: with
-	// errCancelled if it withdrew the request, or with the result it had
-	// already sent. Shutdown answers every blocked request, so this cannot hang
-	// once the core loop has stopped.
-	select {
-	case producer.queue.producerCancelChan <- request.responseChan:
-		err = <-request.responseChan
-	case err = <-request.responseChan:
-	}
-	if errors.Is(err, errCancelled) {
-		return ctx.Err()
-	}
-	return err
 }
 
 func (producer *diskQueueProducer) Close() {

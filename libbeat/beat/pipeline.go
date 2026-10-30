@@ -71,13 +71,9 @@ type Client interface {
 var ErrClientClosed = errors.New("beat: client closed")
 
 // ErrRejected is wrapped by the error ContextPublisher.PublishContext returns
-// when the client is open but the queue refused the event, for example because
-// the disk queue could not serialize it or it is too large. Check for it with
-// errors.Is; the error includes the reason when the queue reports one. The
-// client stays usable. When PublishContext cannot be cancelled (see
-// ContextPublisher), the error has no reason (the queue logs it), and a queue
-// that shuts down before the client is closed is also reported this way. A
-// client with DropIfFull never returns it.
+// when the open client's queue refused the event, so check for it with
+// errors.Is. The error includes the queue's reason when it has one. A client
+// with DropIfFull never returns it.
 var ErrRejected = errors.New("beat: event rejected by queue")
 
 // ContextPublisher is an optional interface of a Client whose blocking publish

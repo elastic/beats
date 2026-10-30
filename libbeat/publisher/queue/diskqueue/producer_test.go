@@ -143,19 +143,19 @@ func TestPublishContextRejected(t *testing.T) {
 	tests := []struct {
 		name  string
 		event publisher.Event
-		// reason matches the error message.
+		// reason is part of the error message.
 		reason string
 	}{
 		{
 			name:   "too large",
 			event:  makeLargeTestEvent(strings.Repeat("x", 32*1024)),
-			reason: `event size \d+ exceeds the segment buffer limit ` + strconv.Itoa(16*1024-segmentHeaderSize),
+			reason: "exceeds the segment buffer limit 16372",
 		},
 		{
 			// The CBOR encoder cannot serialize a channel.
 			name:   "not serializable",
 			event:  queuetest.MakeEvent(mapstr.M{"ch": make(chan int)}),
-			reason: `serializing event`,
+			reason: "serializing event",
 		},
 	}
 	for _, tc := range tests {
@@ -165,7 +165,7 @@ func TestPublishContextRejected(t *testing.T) {
 
 				_, err := p.PublishContext(t.Context(), tc.event)
 				require.ErrorIs(t, err, queue.ErrRejected, "an event the queue cannot take should be rejected")
-				assert.Regexp(t, tc.reason, err.Error(), "the error should give the reason")
+				assert.ErrorContains(t, err, tc.reason, "the error should give the reason")
 				_, ok := p.Publish(tc.event)
 				assert.False(t, ok, "Publish should refuse the event too")
 
