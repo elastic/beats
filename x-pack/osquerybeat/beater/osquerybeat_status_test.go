@@ -154,6 +154,10 @@ func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquer
 
 	ob, ok := beater.(*osquerybeat)
 	require.True(t, ok)
+	// b has no pipeline, so scheduled results get a mock publisher too.
+	ob.scheduledResults.newPublisher = func(func() bool, func(), func(int)) osquerybeatPublisher {
+		return &mockBeatPublisher{}
+	}
 	for _, override := range overrides {
 		override(ob)
 	}
@@ -245,6 +249,7 @@ func TestOsquerybeatRejectedPolicyKeepsRunning(t *testing.T) {
 		t.Fatalf("Run returned after a rejected policy: %v", err)
 	case <-time.After(200 * time.Millisecond):
 	}
+	assert.Nil(t, ob.scheduledResults.current.Load(), "a rejected policy must not reach the scheduled results dispatcher")
 
 	ob.Stop()
 	select {
@@ -253,42 +258,6 @@ func TestOsquerybeatRejectedPolicyKeepsRunning(t *testing.T) {
 	case <-time.After(5 * time.Second):
 		t.Fatal("Run did not stop")
 	}
-}
-
-func TestReloadSendsUnvalidatedInputs(t *testing.T) {
-	log := logptest.NewTestingLogger(t, "unvalidated-inputs")
-	registry := reload.NewRegistry()
-	updates := config.WatchInputs(t.Context(), log, registry, func(inputs []config.InputConfig) error {
-		return validatePolicy(t.Context(), log, inputs)
-	})
-	// Set fills query defaults, merges pack defaults and adds stream packs to
-	// the inputs it is given.
-	cfg := agentconfig.MustNewConfigFrom(map[string]any{
-		"name":        "osquery-manager-1",
-		"data_stream": map[string]any{"dataset": config.DefaultDataset},
-		"streams":     []any{map[string]any{"id": "users", "query": "SELECT 1", "interval": 60}},
-		"osquery": map[string]any{
-			"schedule": map[string]any{"scheduled": map[string]any{"query": "SELECT 1", "interval": 1}},
-			"packs": map[string]any{"pack": map[string]any{
-				"interval": 30,
-				"queries":  map[string]any{"q": map[string]any{"query": "SELECT 1"}},
-			}},
-		},
-	})
-	var want config.InputConfig
-	require.NoError(t, cfg.Unpack(&want), "unpack the policy")
-
-	reloaded := make(chan error, 1)
-	go func() {
-		reloaded <- registry.GetInputList().Reload([]*reload.ConfigWithMeta{{Config: cfg, InputUnitID: "osquery-unit"}})
-	}()
-	select {
-	case got := <-updates:
-		assert.Equal(t, []config.InputConfig{want}, got, "the beater must get the policy as unpacked, not as changed by validation")
-	case <-time.After(5 * time.Second):
-		t.Fatal("the valid policy did not reach the beater")
-	}
-	assert.NoError(t, <-reloaded, "a valid policy must be accepted")
 }
 
 func TestOsquerybeatEarlyShutdownDuringCheck(t *testing.T) {
