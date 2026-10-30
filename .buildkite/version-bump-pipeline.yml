@@ -42,6 +42,7 @@ steps:
         REPOSITORY: "beats"
         CURRENT_RELEASE: "${NEW_VERSION}"
         DISABLE_DEV_ISSUE: "true"
+        DISABLE_RELEASE_PREPARE: "true"
         REVIEWERS: "elastic/elastic-agent-release"
 
   - wait:
