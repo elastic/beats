@@ -245,8 +245,10 @@ func (d *scheduledResultDispatcher) configure(inputs []config.InputConfig, cfg c
 			return in.Datastream.Dataset == config.DefaultQueryProfileDataset
 		})}
 		next.ctx, next.cancel = context.WithCancel(d.ctx)
-		// A blocking client drops only events published after it is closed,
-		// which happens when the pipeline closes on shutdown.
+		// A blocking client drops events published after it is closed, which
+		// happens when the pipeline closes on shutdown. The rare event the
+		// queue rejects, such as one the disk queue cannot serialize, is
+		// counted here too.
 		next.publisher = d.newPublisher(next.ctx, func() bool { return next.allowed(d.current.Load()) },
 			func() { d.metrics.dropRows(dropShutdown, 1) },
 			func(rows int) { next.cut += rows })

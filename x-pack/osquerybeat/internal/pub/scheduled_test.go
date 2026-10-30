@@ -5,6 +5,8 @@
 package pub
 
 import (
+	"context"
+	"fmt"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -102,4 +104,45 @@ func TestScheduledPublisherReportsCutResponse(t *testing.T) {
 	require.True(t, ok, "the response client should be a recording client")
 	assert.Empty(t, responseClient.snapshot(), "a retired publisher must not publish the response")
 	assert.Equal(t, int64(1), cut.Load(), "report the skipped response as one cut row")
+}
+
+func TestScheduledPublisherCountsRejectedRow(t *testing.T) {
+	var dropped atomic.Int32
+	var cut atomic.Int64
+	p := NewScheduled(t.Context(), &beat.Beat{}, logptest.NewTestingLogger(t, "scheduled_rejected"),
+		func() bool { return true }, func() { dropped.Add(1) }, func(rows int) { cut.Add(int64(rows)) })
+	t.Cleanup(p.Close)
+	client := &rejectingClient{listener: p.listener}
+	p.client = client
+	hits := []map[string]any{{"n": 1}, {"n": 2}, {"n": 3}}
+
+	n := p.PublishEach(t.Context(), "index", "schedule", "schedule_id", "", "", "", "", "", nil, hits, nil, nil, func() bool { return false })
+
+	assert.Equal(t, 3, n, "a rejected row must not stop the rows after it")
+	published := client.snapshot()
+	if assert.Len(t, published, 2, "queue the rows the queue did not reject") {
+		assert.Equal(t, map[string]any{"n": 2}, published[0].Fields["osquery"], "queue the row after the rejected one")
+		assert.Equal(t, map[string]any{"n": 3}, published[1].Fields["osquery"], "queue the last row")
+	}
+	assert.Equal(t, int32(1), dropped.Load(), "count the rejected row as dropped once")
+	assert.Zero(t, cut.Load(), "a rejected row is not cut")
+}
+
+// rejectingClient is a recordingClient whose queue rejects the first event
+// published with PublishContext. Like the pipeline client, it reports the
+// rejected event to its listener before returning.
+type rejectingClient struct {
+	recordingClient
+	listener beat.ClientListener
+	calls    int
+}
+
+func (c *rejectingClient) PublishContext(_ context.Context, e beat.Event) error {
+	c.calls++
+	if c.calls == 1 {
+		c.listener.DroppedOnPublish(e)
+		return fmt.Errorf("%w: event too large", beat.ErrRejected)
+	}
+	c.Publish(e)
+	return nil
 }
