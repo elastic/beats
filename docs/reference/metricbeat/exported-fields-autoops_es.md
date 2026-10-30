@@ -1386,3 +1386,5 @@ Number and duration of the requests of a tier of an Elasticsearch Serverless pro
 :   Total duration of those requests in milliseconds.
 
     type: float
+
+
