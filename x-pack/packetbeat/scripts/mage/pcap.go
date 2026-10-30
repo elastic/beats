@@ -36,16 +36,7 @@ func ImageSelector(platform string) (string, error) {
 	}
 	if platform == "windows/amd64" {
 		image = strings.ReplaceAll(image, "beats-dev", "observability-ci") // Temporarily work around naming of npcap image.
-<<<<<<< HEAD
-		image = strings.ReplaceAll(image, "main", "npcap-"+NpcapVersion+"-debian9")
-=======
-		switch platform {
-		case "windows/amd64":
-			image = strings.ReplaceAll(image, "main", "npcap-"+NpcapVersion)
-		case "windows/arm64":
-			image = strings.ReplaceAll(image, "windows-arm64", "npcap-arm64-"+NpcapVersion)
-		}
->>>>>>> f7711e9 (Use Debian 11 for Windows amd64 and 386 cross-builds (#54259))
+		image = strings.ReplaceAll(image, "main", "npcap-"+NpcapVersion)
 	}
 	return image, nil
 }
