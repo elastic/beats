@@ -261,7 +261,16 @@ func (r *HBRunnerList) Has(hash uint64) bool {
 
 // HashConfig hashes a given config.C
 func (r *HBRunnerList) HashConfig(c *config.C) (uint64, error) {
-	hbfactory, ok := r.factory.(monitors.HBRunnerFactory)
+	factory := r.factory
+	// Wrappers, such as the OTel status wrapper, hide the factory's hash function.
+	for {
+		w, ok := factory.(interface{ Unwrap() cfgfile.RunnerFactory })
+		if !ok {
+			break
+		}
+		factory = w.Unwrap()
+	}
+	hbfactory, ok := factory.(monitors.HBRunnerFactory)
 	if !ok {
 		r.logger.Debugf("plugin factory does not implement HBRunnerFactory, defaulting to config hash")
 		return DefaultHashConfig(c)

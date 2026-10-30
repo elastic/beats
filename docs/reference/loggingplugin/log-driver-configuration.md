@@ -61,7 +61,7 @@ For more examples, see [Usage examples](/reference/loggingplugin/log-driver-usag
 | `password` |  | The basic authentication password for connecting to {{es}}. |
 | `index` |  | A [format string](/reference/libbeat/config-file-format-type.md#_format_string_sprintf)value that specifies the index to write events to when you’re using dailyindices. For example: `"dockerlogs-%{+yyyy.MM.dd}"`. |
 | **Advanced:** |
-| `name` | `testbeat` | A custom value that will be inserted into the document as `agent.name`.If not set, it will be the hostname of Docker host. |
+| `name` | `testbeat` | A custom value that will be inserted into the document as `agent.name`. If not set, it will be the hostname of Docker host. |
 | `backoff_init` | `1s` | The number of seconds to wait before trying to reconnect to {{es}} aftera network error. After waiting `backoff.init` seconds, the Elastic Logging Plugintries to reconnect. If the attempt fails, the backoff timer is increasedexponentially up to `backoff.max`. After a successful connection, the backofftimer is reset. |
 | `backoff_max` | `60s` | The maximum number of seconds to wait before attempting to connect to{{es}} after a network error. |
 | `api_key` |  | Instead of using usernames and passwords,you can use API keys to secure communication with {{es}}. |

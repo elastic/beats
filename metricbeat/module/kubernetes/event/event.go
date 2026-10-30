@@ -51,8 +51,8 @@ type MetricSet struct {
 }
 
 // dedotConfig defines LabelsDedot and AnnotationsDedot.
-// If set to true, replace dots in labels with `_`.
-// Default to be true.
+// If set to true, replace dots in labels and annotations with `_`.
+// Defaults to true.
 type dedotConfig struct {
 	LabelsDedot      bool `config:"labels.dedot"`
 	AnnotationsDedot bool `config:"annotations.dedot"`

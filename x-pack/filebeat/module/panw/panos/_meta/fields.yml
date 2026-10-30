@@ -187,7 +187,7 @@
     - name: repeatcnt
       type: integer
       description: >
-        The number of sessions with the same source IP address, destination IP address, application, and subtype that GlobalProtect has detected within the last five seconds. An integer associated with any errors that occurred.
+        The number of sessions with the same source IP address, destination IP address, application, and subtype that GlobalProtect has detected within the last five seconds.
 
     - name: serial_number
       type: keyword
@@ -295,7 +295,7 @@
     - name: connect_method
       type: keyword
       description: >
-        A string showing the how the GlobalProtect app connects to Gateway
+        A string showing how the GlobalProtect app connects to the gateway
 
     - name: matchname
       type: keyword

@@ -36,6 +36,12 @@ func (s *statusFactory) Create(p beat.PipelineConnector, config *config.C) (cfgf
 	return runner, nil
 }
 
+// Unwrap returns the wrapped factory, so callers can use its optional
+// interfaces, such as Heartbeat's config hash function.
+func (s *statusFactory) Unwrap() cfgfile.RunnerFactory {
+	return s.factory
+}
+
 func (s *statusFactory) CheckConfig(config *config.C) error {
 	return s.factory.CheckConfig(config)
 }

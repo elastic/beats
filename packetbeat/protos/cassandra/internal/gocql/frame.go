@@ -386,6 +386,9 @@ func (f *Framer) parseResultMetadata(getPKinfo bool) map[string]any {
 		// only for prepared result
 		if f.proto >= protoVersion4 {
 			pkeyCount := decoder.ReadInt()
+			if pkeyCount < 0 || pkeyCount > maxPkeyCount {
+				panic(fmt.Errorf("invalid pkey count: %d", pkeyCount))
+			}
 			pkeys := make([]int, pkeyCount)
 			for i := range pkeyCount {
 				pkeys[i] = int(decoder.ReadShort())
