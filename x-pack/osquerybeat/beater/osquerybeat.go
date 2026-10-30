@@ -128,9 +128,9 @@ type osquerybeat struct {
 
 type osquerybeatPublisher interface {
 	scheduledQueryPublisher
+	queryProfilePublisher
 	actionResultPublisher
 	Configure(inputs []config.InputConfig) error
-	CaptureScheduledProfileSink(namespace string) pub.ScheduledProfileSink
 	Close()
 }
 
@@ -722,7 +722,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		if metrics == nil {
 			metrics = newScheduledProfileMetrics(nil)
 		}
-		scheduledProfiler = newScheduledQueryProfiler(profileCtx, scheduledProfilePendingJobs, profileExecutor, configPlugin, bt.qp, metrics)
+		scheduledProfiler = newScheduledQueryProfiler(profileCtx, scheduledProfilePendingJobs, profileExecutor, configPlugin, bt.qp, metrics, bt.scheduledResults.enqueueProfile)
 		// osquery_schedule diagnostics need the same isolation as normal profiles.
 		bt.setDiagnosticsQueryExecutor(profileExecutor)
 		defer func() {
@@ -732,7 +732,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		}()
 
 		// Initialize and start RRULE query handler after osqueryd connection is established
-		rruleHandler = newRecurrenceQueryHandler(bt.log, cli, configPlugin, bt.pub, bt.liveProfiles, bt.osqueryVersion)
+		rruleHandler = newRecurrenceQueryHandler(bt.log, cli, configPlugin, bt.scheduledResults, bt.liveProfiles, bt.osqueryVersion)
 		rruleHandler.Start(ctx)
 		defer rruleHandler.Stop()
 
@@ -901,11 +901,6 @@ func (bt *osquerybeat) enqueueScheduledProfile(profiler *scheduledQueryProfiler,
 	if profiler == nil || !profiler.config.LookupQueryProfile(res.Name) {
 		return
 	}
-	// Without a profile stream there is no sink; skip the profile RPC.
-	sink := bt.pub.CaptureScheduledProfileSink(ns)
-	if sink == nil {
-		return
-	}
 	scheduleID := qi.ScheduleID
 	if scheduleID == "" {
 		scheduleID = res.Name
@@ -913,7 +908,7 @@ func (bt *osquerybeat) enqueueScheduledProfile(profiler *scheduledQueryProfiler,
 	executionCount, _, _ := nativeScheduleTiming(qi.StartDate, qi.Interval, res.UnixTime)
 	profiler.enqueue(scheduledProfileRequest{
 		name: res.Name, query: qi.Query, namespace: ns, scheduleID: scheduleID,
-		responseID: responseID, spaceID: qi.SpaceID, scheduleExecutionCount: executionCount, sink: sink,
+		responseID: responseID, spaceID: qi.SpaceID, scheduleExecutionCount: executionCount,
 	})
 }
 
