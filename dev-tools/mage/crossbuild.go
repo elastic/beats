@@ -279,6 +279,8 @@ func CrossBuildImage(platform string) (string, error) {
 		tagSuffix = "s390x-debian12"
 	case strings.HasPrefix(platform, "linux"):
 		tagSuffix = "main-debian11"
+	case platform == "windows/amd64" || platform == "windows/386":
+		tagSuffix = "main-debian11"
 	case platform == "windows/arm64":
 		tagSuffix = "windows-arm64-debian12"
 	}
