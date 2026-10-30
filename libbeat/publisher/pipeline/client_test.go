@@ -89,7 +89,10 @@ func TestClient(t *testing.T) {
 	})
 
 	t.Run("no infinite loop when processing fails", func(t *testing.T) {
-		l := logptest.NewTestingLogger(t, "")
+		// The queue's ack loop can still be logging after the test ends, and
+		// nothing outside memqueue can wait for it: Done signals cancellation,
+		// not worker exit. Use a nop logger so it never writes through t.
+		l := logp.NewNopLogger()
 
 		// a small in-memory queue with a very short flush interval
 		q := memqueue.NewQueue[publisher.Event](l, nil, memqueue.Settings{
