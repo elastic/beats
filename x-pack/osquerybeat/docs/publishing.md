@@ -49,8 +49,9 @@ it drops them, because a wait would hold osqueryd's logger RPC again.
 
 A dropped differential result is lost for good. osqueryd updates its diff
 baseline before it logs the result, so it does not report those added or
-removed rows again. A snapshot query, the default, reports all its rows on
-its next run.
+removed rows again. The same holds for an RRULE-scheduled differential query:
+osquerybeat updates its baseline when the query runs, before the run is
+queued. A snapshot query, the default, reports all its rows on its next run.
 
 `max_age` drops items that waited longer than this when the worker reaches
 them.
