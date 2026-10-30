@@ -162,7 +162,7 @@ Auditbeat modules and datasets have different privilege requirements. The follow
 | **auditd** (unicast) | `AUDIT_CONTROL`, `AUDIT_READ` | **Yes** | — |
 | **file_integrity** (fsnotify, default) | None | No | Paths to monitor (read-only) |
 | **file_integrity** (kprobes) | `SYS_ADMIN` | No | `-v /sys:/sys` |
-| **file_integrity** (ebpf) | `SYS_ADMIN`, `BPF` | No | `-v /sys:/sys` |
+| **file_integrity** (ebpf) | `SYS_ADMIN`, `BPF` | **Yes** | `-v /sys:/sys` |
 | **system/host** | None | No | — |
 | **system/login** | None (utmp group membership) | No | `-v /var/log:/var/log:ro` |
 | **system/package** (dpkg) | None | No | `-v /var/lib/dpkg:/var/lib/dpkg:ro` |
