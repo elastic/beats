@@ -65,7 +65,7 @@ func (p *Publisher) CaptureScheduledProfileSink(namespace string) ScheduledProfi
 }
 
 func (p *Publisher) configureScheduledProfileSink(result, profile config.InputConfig) error {
-	procs, err := p.processorsForInputConfig(profile, config.DefaultQueryProfileDataset)
+	procs, err := processorsForInputConfig(profile, config.DefaultQueryProfileDataset, p.log)
 	if err != nil {
 		return err
 	}
