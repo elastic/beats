@@ -230,6 +230,13 @@ func TestRowQueuePopWaitsForPush(t *testing.T) {
 	}
 }
 
+func TestScheduledResultRowsCountsDiff(t *testing.T) {
+	var r scheduledResult
+	r.result.DiffResults.Added = make([]map[string]string, 2)
+	r.result.DiffResults.Removed = make([]map[string]string, 3)
+	assert.Equal(t, 6, r.rows(), "added and removed rows plus the response document")
+}
+
 func TestRowQueueObservesEveryChange(t *testing.T) {
 	q, _ := newTestRowQueue(10)
 	var got [2]int
