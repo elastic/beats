@@ -20,6 +20,7 @@
 package file_integrity
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
 	"time"
@@ -44,20 +45,43 @@ type ebpfReader struct {
 }
 
 func (r *ebpfReader) Start(done <-chan struct{}) (<-chan Event, error) {
-	watcher, err := ebpf.GetWatcher()
-	if err != nil {
-		return nil, err
-	}
-	r.watcher = watcher
+	r.watcher = ebpf.GetWatcher()
 	r.done = done
 
 	mask := ebpf.EventMask(ebpfevents.EventTypeFileCreate | ebpfevents.EventTypeFileRename | ebpfevents.EventTypeFileDelete | ebpfevents.EventTypeFileModify)
-	r._records = r.watcher.Subscribe(clientName, mask)
+	var err error
+	r._records, err = r.watcher.Subscribe(clientName, mask)
+	if err != nil {
+		return nil, err
+	}
+
+	// The loader falls back when some of its programs fail to load on this kernel. It
+	// keeps running, but events only the dropped programs emit are lost.
+	degraded := r.watcher.Degraded()
+	if degraded != nil {
+		r.log.Warnw("ebpf loader fell back on this kernel", "error", degraded)
+	}
+	if missing := missingEvents(mask, r.watcher.DisabledEvents()); len(missing) > 0 {
+		r.watcher.Unsubscribe(clientName)
+		return nil, fmt.Errorf("ebpf events required by file_integrity are disabled on this kernel: %s: %w",
+			strings.Join(missing, ", "), degraded)
+	}
 
 	go r.consumeEvents()
 
 	r.log.Infow("started ebpf watcher", "file_path", r.config.Paths, "recursive", r.config.Recursive)
 	return r.eventC, nil
+}
+
+// missingEvents returns the names of the event types in mask that are disabled.
+func missingEvents(mask ebpf.EventMask, disabled []ebpfevents.EventType) []string {
+	var missing []string
+	for _, et := range disabled {
+		if mask&ebpf.EventMask(et) != 0 {
+			missing = append(missing, et.String())
+		}
+	}
+	return missing
 }
 
 func (r *ebpfReader) consumeEvents() {

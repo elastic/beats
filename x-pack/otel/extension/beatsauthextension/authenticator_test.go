@@ -32,6 +32,7 @@ import (
 	"go.uber.org/zap/zaptest"
 	"go.uber.org/zap/zaptest/observer"
 
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommontest"
 )
 
@@ -282,6 +283,118 @@ func TestAuthenticator(t *testing.T) {
 				require.NoError(t, err)
 				_ = resp.Body.Close()
 			}
+		})
+	}
+}
+
+func TestContinueOnError(t *testing.T) {
+	tests := []struct {
+		name      string
+		config    *Config
+		errString string
+	}{
+		{
+			name: "invalid endpoint",
+			config: &Config{
+				ContinueOnError: true,
+				Endpoints:       []string{"tcp://es.example:9200"},
+			},
+			errString: "URL scheme must be http or https",
+		},
+		{
+			name: "incompatible authentication settings",
+			config: &Config{
+				ContinueOnError: true,
+				BeatAuthConfig: map[string]any{
+					"auth": map[string]any{
+						"api_key":  "api-key",
+						"username": "elastic",
+						"password": "password",
+					},
+				},
+			},
+			errString: "cannot set both api_key and username/password",
+		},
+		{
+			name: "invalid TLS certificate",
+			config: &Config{
+				ContinueOnError: true,
+				BeatAuthConfig: map[string]any{
+					"ssl": map[string]any{
+						"enabled":     true,
+						"certificate": "/nonexistent/cert.pem",
+						"key":         "/nonexistent/key.pem",
+					},
+				},
+			},
+			errString: "failed unpacking config",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			require.NoError(
+				t,
+				tc.config.Validate(),
+				"validation must succeed when continue_on_error is enabled",
+			)
+
+			core, observed := observer.New(zapcore.WarnLevel)
+			settings := componenttest.NewNopTelemetrySettings()
+			settings.Logger = zap.New(core)
+
+			auth, err := newAuthenticator(tc.config, settings)
+			require.NoError(t, err, "authenticator creation must succeed")
+
+			var events []*componentstatus.Event
+			host := &mockHost{
+				extensions: extensionsMap{component.NewID(Type): auth},
+				reportStatusFunc: func(event *componentstatus.Event) {
+					events = append(events, event)
+				},
+			}
+
+			require.NoError(
+				t,
+				auth.Start(t.Context(), host),
+				"start must succeed when continue_on_error is enabled",
+			)
+
+			require.Len(t, events, 1, "start must report one status event")
+			require.Equal(
+				t,
+				componentstatus.StatusPermanentError,
+				events[0].Status(),
+				"start must report a permanent error status",
+			)
+			require.ErrorContains(
+				t,
+				events[0].Err(),
+				tc.errString,
+				"status event must report the deferred validation error",
+			)
+
+			roundTripper, err := auth.RoundTripper(nil)
+			require.NoError(t, err, "started authenticator must provide a transport")
+
+			request, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://example.com", nil)
+			require.NoError(t, err, "request creation must succeed")
+
+			//nolint:bodyclose // response is always nil
+			response, err := roundTripper.RoundTrip(request)
+			require.Nil(t, response, "error transport must not return a response")
+			require.ErrorIs(
+				t,
+				err,
+				events[0].Err(),
+				"error transport must return the deferred validation error",
+			)
+
+			warnings := observed.
+				FilterLevelExact(zapcore.WarnLevel).
+				FilterMessageSnippet(events[0].Err().Error()).
+				All()
+			require.Len(t, warnings, 1, "deferred validation error must be logged once at warn level")
 		})
 	}
 }
@@ -699,6 +812,34 @@ func TestConfigValidation(t *testing.T) {
 			errString: "endpoint userinfo is unsupported",
 		},
 		{
+			name: "invalid TLS certificate without continue_on_error",
+			config: func() *Config {
+				return &Config{BeatAuthConfig: map[string]any{
+					"ssl": map[string]any{
+						"enabled":     true,
+						"certificate": "/nonexistent/cert.pem",
+						"key":         "/nonexistent/key.pem",
+					},
+				}}
+			},
+			errString: "failed unpacking config",
+		},
+		{
+			name: "invalid TLS certificate with continue_on_error",
+			config: func() *Config {
+				return &Config{
+					BeatAuthConfig: map[string]any{
+						"ssl": map[string]any{
+							"enabled":     true,
+							"certificate": "/nonexistent/cert.pem",
+							"key":         "/nonexistent/key.pem",
+						},
+					},
+					ContinueOnError: true,
+				}
+			},
+		},
+		{
 			name: "API key and basic authentication",
 			config: func() *Config {
 				return &Config{BeatAuthConfig: map[string]any{
@@ -866,4 +1007,8 @@ func TestEndpointsReturnsCopy(t *testing.T) {
 	endpoints := auth.Endpoints()
 	endpoints[0] = "https://changed.example:9200"
 	require.Equal(t, []string{"https://es.example:9200"}, auth.Endpoints(), "callers must not mutate configured endpoints")
+}
+
+func TestComponentLifecycle(t *testing.T) {
+	oteltest.CheckExtensionLifecycle(t, NewFactory(), &Config{})
 }

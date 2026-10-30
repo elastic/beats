@@ -11,7 +11,7 @@
     type: keyword
   - name: qmgr
     description: >
-      Name of the queue manager. Queue managers provide queuing services to applications, and manages the queues that belong to them.
+      Name of the queue manager. Queue managers provide queuing services to applications, and manage the queues that belong to them.
     type: keyword
   - name: arithinsert
     description: Changing content based on error.id
@@ -24,7 +24,7 @@
     example: Please add example
     type: text
   - name: explanation
-    description: Explaines the error in more detail
+    description: Explains the error in more detail
     type: keyword
   - name: action
     description: Defines what to do when the error occurs

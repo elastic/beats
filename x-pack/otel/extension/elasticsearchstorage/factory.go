@@ -11,7 +11,6 @@ import (
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/extension"
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -23,10 +22,13 @@ func NewFactory() extension.Factory {
 func newExtension(ctx context.Context, set extension.Settings, cfg component.Config) (extension.Extension, error) {
 	config, ok := cfg.(*Config)
 	if !ok {
-		return nil, fmt.Errorf("could not convert otel config to elasticstorage config")
+		return nil, fmt.Errorf("could not convert OTel config to elasticsearch_storage config")
 	}
-	logger := logp.NewLogger("", zap.WrapCore(func(zapcore.Core) zapcore.Core {
-		return set.Logger.Named("elasticstorage").Core()
-	}))
+
+	logger, err := logp.NewZapLogger(set.Logger.WithOptions(zap.AddCallerSkip(1)))
+	if err != nil {
+		return nil, fmt.Errorf("cannot create logger: %w", err)
+	}
+
 	return &elasticStorage{cfg: config, logger: logger}, nil
 }

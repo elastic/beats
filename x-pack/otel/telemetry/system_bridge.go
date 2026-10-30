@@ -228,11 +228,14 @@ func (b *SystemRegistryBridge) callback(_ context.Context, obs metric.Observer) 
 // shutdown unregisters the callback and marks the bridge as closed.
 func (b *SystemRegistryBridge) shutdown() {
 	b.mu.Lock()
-	defer b.mu.Unlock()
-
 	b.closed = true
-	if b.registration != nil {
-		_ = b.registration.Unregister()
-		b.registration = nil
+	reg := b.registration
+	b.registration = nil
+	b.mu.Unlock()
+
+	// Unregister waits for an in-flight callback, and the callback takes b.mu,
+	// so it must not be called with b.mu held.
+	if reg != nil {
+		_ = reg.Unregister()
 	}
 }

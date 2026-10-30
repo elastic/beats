@@ -248,8 +248,11 @@ func (in *eventHubInputV1) processEvents(event *eventhub.Event) {
 	eventHubMetadata := mapstr.M{
 		// The `partition_id` is not available in the
 		// legacy version of the SDK.
-		"eventhub":       in.config.EventHubName,
-		"consumer_group": in.config.ConsumerGroup,
+		"eventhub":        in.config.EventHubName,
+		"consumer_group":  in.config.ConsumerGroup,
+		"offset":          event.SystemProperties.Offset,
+		"sequence_number": event.SystemProperties.SequenceNumber,
+		"enqueued_time":   event.SystemProperties.EnqueuedTime,
 	}
 
 	// update the input metrics
@@ -259,10 +262,6 @@ func (in *eventHubInputV1) processEvents(event *eventhub.Event) {
 	records := in.messageDecoder.Decode(event.Data)
 
 	for _, record := range records {
-		_, _ = eventHubMetadata.Put("offset", event.SystemProperties.Offset)
-		_, _ = eventHubMetadata.Put("sequence_number", event.SystemProperties.SequenceNumber)
-		_, _ = eventHubMetadata.Put("enqueued_time", event.SystemProperties.EnqueuedTime)
-
 		event := beat.Event{
 			// We set the timestamp to the processing
 			// start time as default value.
@@ -272,7 +271,10 @@ func (in *eventHubInputV1) processEvents(event *eventhub.Event) {
 			Timestamp: processingStartTime,
 			Fields: mapstr.M{
 				"message": record,
-				"azure":   eventHubMetadata,
+				// Each event needs its own copy: event normalization is
+				// disabled, so published events reference this map directly
+				// and outputs may read it on other goroutines.
+				"azure": eventHubMetadata.Clone(),
 			},
 			Private: event.Data,
 		}

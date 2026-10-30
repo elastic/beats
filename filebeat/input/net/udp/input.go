@@ -93,7 +93,7 @@ func (s *server) Test(_ input.TestContext) error {
 
 func (s *server) InitMetrics(id string, reg *monitoring.Registry, logger *logp.Logger) netinput.Metrics {
 	//nolint:gosec // read_buffer is a byte size, never negative
-	s.metrics = netmetrics.NewUDP(reg, s.Host, uint64(s.ReadBuffer), time.Second, logger)
+	s.metrics = netmetrics.NewUDP(reg, s.Host, s.Network, uint64(s.ReadBuffer), time.Second, logger)
 	return s.metrics
 }
 

@@ -1,0 +1,5 @@
+kind: bug-fix
+summary: Restart osqueryd after runtime exit 78 while preserving startup failures.
+component: osquerybeat
+pr: https://github.com/elastic/beats/pull/53776
+issue: https://github.com/elastic/beats/issues/53645

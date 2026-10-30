@@ -33,7 +33,7 @@ func TestBareConfig(t *testing.T) {
 		},
 	}
 
-	cfgMap := buildConfigMap(t, &rawExpected, &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true})
+	cfgMap := buildConfigMap(t, &rawExpected, &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true, Tags: []string{"production", "team-payments"}})
 
 	// Actual checks
 	processorFields := map[string]any{
@@ -43,6 +43,45 @@ func TestBareConfig(t *testing.T) {
 		"add_fields.fields.type":      "log",
 		"add_fields.fields.input_id":  "system/metrics-system-default-system",
 		"add_fields.fields.id":        "beat-ID",
+		"add_tags.tags":               []any{"production", "team-payments"},
+	}
+	findFieldsInProcessors(t, processorFields, cfgMap)
+}
+
+func TestBareConfigForReceiver(t *testing.T) {
+	// config with datastreams, metadata, etc, removed
+	rawExpected := proto.UnitExpectedConfig{
+		Id:   "system/metrics-system-default-system",
+		Type: "system/metrics",
+		Name: "system-1",
+		Streams: []*proto.Stream{
+			{
+				Id: "system/metrics-system.filesystem-default-system",
+				Source: requireNewStruct(t, map[string]any{
+					"metricsets": []any{"filesystem"},
+					"period":     "1m",
+				}),
+			},
+		},
+	}
+
+	streams, err := CreateInputsFromStreamsForReceiver(&rawExpected, "log", &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true, Tags: []string{"production", "team-payments"}})
+	require.NoError(t, err, "error in CreateInputsFromStreamsForReceiver")
+	reloadCfg, err := CreateReloadConfigFromInputs(streams)
+	require.NoError(t, err, "error in CreateReloadConfigFromInputs")
+	cfgMap := mapstr.M{}
+	err = reloadCfg[0].Config.Unpack(&cfgMap)
+	require.NoError(t, err, "error in unpack for config %#v", reloadCfg[0].Config)
+
+	// Actual checks
+	processorFields := map[string]any{
+		"add_agent_metadata.stream_id":             "system/metrics-system.filesystem-default-system",
+		"add_agent_metadata.data_stream.dataset":   "generic",
+		"add_agent_metadata.data_stream.namespace": "default",
+		"add_agent_metadata.data_stream.type":      "log",
+		"add_agent_metadata.input_id":              "system/metrics-system-default-system",
+		"add_agent_metadata.elastic_agent.id":      "beat-ID",
+		"add_agent_metadata.tags":                  []any{"production", "team-payments"},
 	}
 	findFieldsInProcessors(t, processorFields, cfgMap)
 }
@@ -260,7 +299,7 @@ func findFieldsInProcessors(t *testing.T, configFields map[string]any, cfgMap ma
 	for key, val := range configFields {
 		gotKey := false
 		gotVal := false
-		errStr := ""
+		var got any
 		procList, ok := cfgMap["processors"].([]any)
 		require.True(t, ok, "must be a list of objects")
 		for _, proc := range procList {
@@ -273,18 +312,16 @@ func findFieldsInProcessors(t *testing.T, configFields map[string]any, cfgMap ma
 				if val == nil {
 					gotVal = true
 				} else {
-					if val == found {
+					if assert.ObjectsAreEqual(val, found) {
 						gotVal = true
 					} else {
-						s, ok := found.(string)
-						require.True(t, ok, "must be a string")
-						errStr = s
+						got = found
 					}
 				}
 			}
 		}
 		assert.True(t, gotKey, "did not find key for %s", key)
-		assert.True(t, gotVal, "got incorrect key for %s, expected %s, got %s", key, val, errStr)
+		assert.True(t, gotVal, "got incorrect value for %s, expected %v, got %v", key, val, got)
 	}
 }
 

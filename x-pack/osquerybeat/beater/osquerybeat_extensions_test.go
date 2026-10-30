@@ -57,7 +57,7 @@ func TestExtensionsDiagnosticsPayload(t *testing.T) {
 		Timeout: 20,
 		Require: []string{"valid_ext"},
 	}, dataDir)
-	bt.setDiagnosticsQueryExecutor(&mockExecutor{result: loaded})
+	bt.setDiagnosticsQueryExecutor(profilingQueryExecutor{runCtx: t.Context(), executor: &mockExecutor{result: loaded}})
 
 	payload := bt.extensionsDiagnosticsPayload(context.Background())
 

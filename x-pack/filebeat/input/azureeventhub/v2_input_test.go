@@ -20,6 +20,7 @@ import (
 	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -125,6 +126,129 @@ func TestProcessReceivedEventsUpdatesProcessingTimeOnce(t *testing.T) {
 	// not once per event (which was the bug).
 	assert.Equal(t, 1, metrics.processingTime.Size(),
 		"processingTime should be updated once per call, not once per event")
+}
+
+func TestProcessReceivedEventsRetainsOnlyCheckpointMetadata(t *testing.T) {
+	now := time.Now()
+	logger := logptest.NewTestingLogger(t, inputName)
+	metrics := newInputMetrics(monitoring.NewRegistry(), logger)
+	sanitizers, err := newSanitizers(defaultTestConfig.Sanitizers, defaultTestConfig.LegacySanitizeOptions)
+	require.NoError(t, err, "sanitizers should initialize")
+	input := &eventHubInputV2{
+		config:  defaultTestConfig,
+		log:     logger,
+		metrics: metrics,
+		messageDecoder: messageDecoder{
+			config: defaultTestConfig, log: logger, metrics: metrics, sanitizers: sanitizers,
+		},
+	}
+	received := []*azeventhubs.ReceivedEventData{
+		{
+			EventData: azeventhubs.EventData{
+				Body:       []byte(`{"records":[{"msg":"one"},{"msg":"two"}]}`),
+				Properties: map[string]any{"application": "test"},
+			},
+			Offset:           "1234",
+			SequenceNumber:   42,
+			EnqueuedTime:     &now,
+			RawAMQPMessage:   &azeventhubs.AMQPAnnotatedMessage{},
+			SystemProperties: map[string]any{"service": "test"},
+		},
+		{
+			EventData:      azeventhubs.EventData{Body: []byte(`{"msg":"three"}`)},
+			Offset:         "5678",
+			SequenceNumber: 43,
+		},
+	}
+	client := &fakeClient{}
+	require.NoError(t, input.processReceivedEvents(received, "0", client), "messages should be published")
+	require.Len(t, client.publishedEvents, 3, "the first message should expand into two records")
+
+	for i, source := range []*azeventhubs.ReceivedEventData{received[0], received[0], received[1]} {
+		checkpoint, ok := client.publishedEvents[i].Private.(*checkpointMetadata)
+		require.True(t, ok, "event %d should carry checkpoint metadata accepted by the ACK callback", i)
+		assert.Equal(t, &checkpointMetadata{
+			offset: source.Offset, sequenceNumber: source.SequenceNumber,
+		}, checkpoint, "event %d should retain only checkpoint metadata", i)
+	}
+	assert.Same(t, client.publishedEvents[0].Private, client.publishedEvents[1].Private,
+		"records from the same message should share checkpoint metadata")
+}
+
+// TestProcessReceivedEventsConcurrentConversion verifies that the events
+// published from one Event Hub message can be read by the output while the
+// input is still publishing the remaining records of the same message.
+//
+// See https://github.com/elastic/beats/issues/53816
+func TestProcessReceivedEventsConcurrentConversion(t *testing.T) {
+	input := newTestInputV2(t)
+	client := newConversionClient()
+
+	err := input.processReceivedEvents(receivedEventsWithRecords(10000), "0", client)
+	require.NoError(t, err, "processing the received events should not fail")
+
+	assert.NoError(t, client.wait(), "converting a published event should not fail")
+	assert.Equal(t, 10000, client.published, "the message should expand into one event per record")
+}
+
+// TestProcessReceivedEventsIndependentMetadata verifies that each event gets
+// its own `azure` map, so processors and outputs can change or read it
+// without affecting the other events from the same message.
+func TestProcessReceivedEventsIndependentMetadata(t *testing.T) {
+	input := newTestInputV2(t)
+	client := &fakeClient{}
+
+	receivedEvents := receivedEventsWithRecords(2)
+	err := input.processReceivedEvents(receivedEvents, "0", client)
+	require.NoError(t, err, "processing the received events should not fail")
+
+	received := receivedEvents[0]
+	assertIndependentMetadata(t, client.publishedEvents, mapstr.M{
+		"partition_id":    "0",
+		"eventhub":        defaultTestConfig.EventHubName,
+		"consumer_group":  defaultTestConfig.ConsumerGroup,
+		"offset":          received.Offset,
+		"sequence_number": received.SequenceNumber,
+		"enqueued_time":   received.EnqueuedTime,
+		"partition_key":   *received.PartitionKey,
+	})
+}
+
+// newTestInputV2 returns a v2 input ready to process received events.
+func newTestInputV2(t *testing.T) *eventHubInputV2 {
+	t.Helper()
+	logger := logptest.NewTestingLogger(t, inputName)
+	metrics := newInputMetrics(monitoring.NewRegistry(), logger)
+	sanitizers, err := newSanitizers(defaultTestConfig.Sanitizers, defaultTestConfig.LegacySanitizeOptions)
+	require.NoError(t, err, "creating the default sanitizers should not fail")
+
+	return &eventHubInputV2{
+		config:  defaultTestConfig,
+		log:     logger,
+		metrics: metrics,
+		messageDecoder: messageDecoder{
+			config:     defaultTestConfig,
+			metrics:    metrics,
+			log:        logger,
+			sanitizers: sanitizers,
+		},
+	}
+}
+
+// receivedEventsWithRecords returns a single received event whose body
+// contains n records.
+func receivedEventsWithRecords(n int) []*azeventhubs.ReceivedEventData {
+	now := time.Now()
+	partitionKey := "key"
+	return []*azeventhubs.ReceivedEventData{
+		{
+			EventData:      azeventhubs.EventData{Body: recordsPayload(n)},
+			SequenceNumber: 12,
+			EnqueuedTime:   &now,
+			PartitionKey:   &partitionKey,
+			Offset:         "1234",
+		},
+	}
 }
 
 // mockStatusReporter is a mock implementation of the status.Reporter interface.

@@ -76,7 +76,7 @@ func testMonitorConfig(t *testing.T, conf *conf.C, eventValidator validator.Vali
 
 	c, err := pipel.Connect()
 	require.NoError(t, err)
-	mon, err := newMonitor(conf, reg, c, sched.Add, nil, beat.Info{Logger: logptest.NewTestingLogger(t, "")}, nil)
+	mon, err := newMonitor(conf, reg, c, sched.Add, nil, beat.Info{Logger: logptest.NewTestingLogger(t, "")}, nil, nil)
 	require.NoError(t, err)
 
 	mon.Start()
@@ -125,7 +125,7 @@ func TestCheckInvalidConfig(t *testing.T) {
 
 	c, err := pipel.Connect()
 	require.NoError(t, err)
-	m, err := newMonitor(serverMonConf, reg, c, sched.Add, nil, beat.Info{Logger: logptest.NewTestingLogger(t, "")}, nil)
+	m, err := newMonitor(serverMonConf, reg, c, sched.Add, nil, beat.Info{Logger: logptest.NewTestingLogger(t, "")}, nil, nil)
 	require.Error(t, err)
 	// This could change if we decide the contract for newMonitor should always return a monitor
 	require.Nil(t, m, "For this test to work we need a nil value for the monitor.")
@@ -175,7 +175,7 @@ func TestStatusReporter(t *testing.T) {
 
 	c, err := pipel.Connect()
 	require.NoError(t, err)
-	m, err := newMonitor(cfg, reg, c, sched.Add, nil, beat.Info{Logger: logptest.NewTestingLogger(t, "")}, nil)
+	m, err := newMonitor(cfg, reg, c, sched.Add, nil, beat.Info{Logger: logptest.NewTestingLogger(t, "")}, nil, nil)
 	require.NoError(t, err)
 
 	// Track status marked as failed during run_once execution

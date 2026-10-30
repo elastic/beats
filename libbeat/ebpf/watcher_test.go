@@ -20,27 +20,32 @@
 package ebpf
 
 import (
+	"errors"
 	"math"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/ebpfevents"
 )
 
 const allEvents = EventMask(math.MaxUint64)
 
 func TestWatcherStartStop(t *testing.T) {
-	w, err := GetWatcher()
-	if err != nil {
-		t.Skipf("skipping ebpf watcher test: %v", err)
-	}
+	w := GetWatcher()
 	assert.Equal(t, stopped, gWatcher.status)
 	assert.Equal(t, 0, gWatcher.nclients())
 
-	_ = w.Subscribe("test-1", allEvents)
+	_, err := w.Subscribe("test-1", allEvents)
+	if err != nil {
+		t.Skipf("skipping ebpf watcher test: %v", err)
+	}
 	assert.Equal(t, started, gWatcher.status)
 	assert.Equal(t, 1, gWatcher.nclients())
 
-	_ = w.Subscribe("test-2", allEvents)
+	_, err = w.Subscribe("test-2", allEvents)
+	require.NoError(t, err)
 	assert.Equal(t, 2, gWatcher.nclients())
 
 	w.Unsubscribe("test-2")
@@ -54,8 +59,30 @@ func TestWatcherStartStop(t *testing.T) {
 	assert.Equal(t, 0, gWatcher.nclients())
 	assert.Equal(t, stopped, gWatcher.status)
 
-	_ = w.Subscribe("new", allEvents)
+	_, err = w.Subscribe("new", allEvents)
+	require.NoError(t, err)
 	assert.Equal(t, 1, gWatcher.nclients())
 	assert.Equal(t, started, gWatcher.status)
 	w.Unsubscribe("new")
+}
+
+// TestSubscribeLoaderStartFails covers the loader failing to start in Subscribe: Subscribe must
+// return the error rather than use the nil loader, and the next Subscribe must try again.
+func TestSubscribeLoaderStartFails(t *testing.T) {
+	errStart := errors.New("loader start failed")
+	loads := 0
+	newLoader := func() (*ebpfevents.Loader, error) {
+		loads++
+		return nil, errStart
+	}
+
+	var w Watcher
+	for i := 1; i <= 2; i++ {
+		records, err := w.subscribeWith("test", allEvents, newLoader)
+		require.ErrorIs(t, err, errStart)
+		assert.Nil(t, records, "a failed Subscribe must not return a channel")
+		assert.Equal(t, i, loads, "each Subscribe on a stopped watcher must load the ebpf programs once")
+		assert.Equal(t, stopped, w.status, "a failed start must leave the watcher stopped")
+		assert.Equal(t, 0, w.nclients(), "a failed Subscribe must not register the client")
+	}
 }

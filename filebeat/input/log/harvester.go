@@ -334,7 +334,7 @@ func (h *Harvester) Run() error {
 				logger.Info("File was removed. Closing because close_removed is enabled.")
 			case errors.Is(err, ErrRenamed):
 				logger.Info("File was renamed. Closing because close_renamed is enabled.")
-			case errors.Is(err, ErrClosed):
+			case errors.Is(err, ErrClosed), errors.Is(err, os.ErrClosed):
 				logger.Info("Reader was closed. Closing.")
 			case errors.Is(err, io.EOF):
 				logger.Info("End of file reached. Closing because close_eof is enabled.")

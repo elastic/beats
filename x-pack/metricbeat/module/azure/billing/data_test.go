@@ -101,7 +101,10 @@ func TestEventMapping(t *testing.T) {
 		forecastEnd:   forecastEnd,
 	}
 
-	events, err := EventsMapping("sub", usage, opts, logger)
+	usage.Scope = "/providers/Microsoft.Billing/departments/123"
+	fetch := FetchContext{ID: "fetch-1", Time: time.Date(2026, 10, 5, 0, 6, 10, 0, time.UTC)}
+
+	events, err := EventsMapping("sub", usage, opts, fetch, logger)
 	assert.NoError(t, err)
 	assert.Len(t, events, 3)
 
@@ -109,6 +112,15 @@ func TestEventMapping(t *testing.T) {
 	// Check the results
 	//
 	for _, event := range events {
+		// Every event of a run shares the fetch identity, its timestamp, and the
+		// scope the data was queried for, whether it is a usage detail or a
+		// forecast row.
+		fetchID, _ := event.MetricSetFields.GetValue("fetch_id")
+		assert.Equal(t, "fetch-1", fetchID)
+		scope, _ := event.MetricSetFields.GetValue("scope")
+		assert.Equal(t, "/providers/Microsoft.Billing/departments/123", scope)
+		assert.Equal(t, fetch.Time, event.Timestamp)
+
 		if ok, _ := event.MetricSetFields.HasKey("department_name"); ok {
 			//
 			// The event is a usage detail
@@ -157,6 +169,8 @@ func TestEventMapping(t *testing.T) {
 func TestGetEventsFromQueryResult(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "TestGetEventsFromQueryResult")
 	subscriptionID := "sub"
+	scope := "subscriptions/sub"
+	fetch := FetchContext{ID: "fetch-1", Time: time.Date(2026, 10, 5, 0, 6, 10, 0, time.UTC)}
 
 	columns := []*armcostmanagement.QueryColumn{
 		column("Cost", "Number"),
@@ -168,7 +182,7 @@ func TestGetEventsFromQueryResult(t *testing.T) {
 	t.Run("no columns", func(t *testing.T) {
 		queryResult := armcostmanagement.QueryResult{}
 
-		events, err := getEventsFromQueryResult(queryResult, subscriptionID, logger)
+		events, err := getEventsFromQueryResult(queryResult, subscriptionID, scope, fetch, logger)
 		assert.Equal(t, []mb.Event{}, events)
 		assert.Error(t, err)
 	})
@@ -188,7 +202,7 @@ func TestGetEventsFromQueryResult(t *testing.T) {
 			},
 		}
 
-		events, err := getEventsFromQueryResult(queryResult, subscriptionID, logger)
+		events, err := getEventsFromQueryResult(queryResult, subscriptionID, scope, fetch, logger)
 		assert.Equal(t, []mb.Event{}, events)
 		assert.EqualError(t, err, "unsupported forecasts QueryResult format: got 5 columns instead of 4")
 	})
@@ -201,7 +215,7 @@ func TestGetEventsFromQueryResult(t *testing.T) {
 			},
 		}
 
-		events, err := getEventsFromQueryResult(queryResult, subscriptionID, logger)
+		events, err := getEventsFromQueryResult(queryResult, subscriptionID, scope, fetch, logger)
 		assert.Equal(t, []mb.Event{}, events)
 		assert.NoError(t, err)
 	})
@@ -217,7 +231,7 @@ func TestGetEventsFromQueryResult(t *testing.T) {
 			},
 		}
 
-		events, err := getEventsFromQueryResult(queryResult, subscriptionID, logger)
+		events, err := getEventsFromQueryResult(queryResult, subscriptionID, scope, fetch, logger)
 		assert.Equal(t, []mb.Event{}, events)
 		assert.NoError(t, err)
 	})
@@ -237,9 +251,15 @@ func TestGetEventsFromQueryResult(t *testing.T) {
 			},
 		}
 
-		events, err := getEventsFromQueryResult(queryResult, subscriptionID, logger)
+		events, err := getEventsFromQueryResult(queryResult, subscriptionID, scope, fetch, logger)
 		assert.Len(t, events, 1)
 		assert.NoError(t, err)
+
+		fetchID, _ := events[0].MetricSetFields.GetValue("fetch_id")
+		assert.Equal(t, fetch.ID, fetchID)
+		gotScope, _ := events[0].MetricSetFields.GetValue("scope")
+		assert.Equal(t, scope, gotScope)
+		assert.Equal(t, fetch.Time, events[0].Timestamp)
 	})
 }
 

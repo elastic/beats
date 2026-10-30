@@ -19,7 +19,7 @@ type packetbeatReceiver struct {
 
 func (pb *packetbeatReceiver) Start(ctx context.Context, host component.Host) error {
 	pb.Logger.Info("starting packetbeat receiver")
-	if err := pb.BeatReceiver.Start(host); err != nil {
+	if err := pb.BeatReceiver.Start(ctx, host); err != nil {
 		return fmt.Errorf("error starting packetbeat receiver: %w", err)
 	}
 	return nil

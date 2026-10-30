@@ -20,6 +20,7 @@ package addagentmetadata
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -32,6 +33,7 @@ type Config struct {
 	StreamID     string              `config:"stream_id"`
 	DataStream   *DataStreamConfig   `config:"data_stream"`
 	ElasticAgent *ElasticAgentConfig `config:"elastic_agent"`
+	Tags         []string            `config:"tags"`
 }
 
 type DataStreamConfig struct {
@@ -49,6 +51,7 @@ type addAgentMetadata struct {
 	cfg    Config
 	fields mapstr.M
 	meta   mapstr.M
+	tags   []string
 }
 
 func New(cfg Config) beat.Processor {
@@ -90,6 +93,10 @@ func New(cfg Config) beat.Processor {
 		p.meta["stream_id"] = cfg.StreamID
 	}
 
+	if len(cfg.Tags) > 0 {
+		p.tags = slices.Clip(slices.Clone(cfg.Tags))
+	}
+
 	return p
 }
 
@@ -113,6 +120,14 @@ func (p *addAgentMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		event.Fields.DeepCloneUpdate(p.fields)
 	}
 
+	// Append the AgentInfo tags to the event tags.
+	if len(p.tags) > 0 {
+		if event.Fields == nil {
+			event.Fields = mapstr.M{}
+		}
+		appendTags(event.Fields, p.tags)
+	}
+
 	if len(p.meta) > 0 {
 		if event.Meta == nil {
 			event.Meta = mapstr.M{}
@@ -126,4 +141,21 @@ func (p *addAgentMetadata) Run(event *beat.Event) (*beat.Event, error) {
 func (p *addAgentMetadata) String() string {
 	s, _ := json.Marshal(p.cfg)
 	return fmt.Sprintf("add_agent_metadata=%s", s)
+}
+
+// appendTags appends tags to the event tags, also when the event tags field is a single string.
+func appendTags(fields mapstr.M, tags []string) {
+	switch existing := fields[mapstr.TagsKey].(type) {
+	case nil:
+		fields[mapstr.TagsKey] = tags
+	case string:
+		fields[mapstr.TagsKey] = append([]string{existing}, tags...)
+	case []string:
+		fields[mapstr.TagsKey] = append(existing, tags...)
+	case []any:
+		for _, tag := range tags {
+			existing = append(existing, tag)
+		}
+		fields[mapstr.TagsKey] = existing
+	}
 }

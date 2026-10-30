@@ -149,10 +149,10 @@ The `add_kubernetes_metadata` processor has the following configuration settings
 :   (Optional) Enable or disable default pod matchers when you want to specify your own.
 
 `labels.dedot`
-:   (Optional) Default to be true. If set to true, then `.` in labels will be replaced with `_`.
+:   (Optional) Defaults to true. If set to true, then `.` in labels will be replaced with `_`.
 
 `annotations.dedot`
-:   (Optional) Default to be true. If set to true, then `.` in labels will be replaced with `_`.
+:   (Optional) Defaults to true. If set to true, then `.` in annotations will be replaced with `_`.
 
 `wait_for_metadata` {applies_to}`stack: ga 9.5`
 :   When `true`, startup is blocked until the processor is initialized. If the processor can't connect to the Kubernetes API within the duration set in `wait_for_metadata_timeout`, startup fails and the process exits. When `false`, the processor is initialized asynchronously. Defaults to `false`.
@@ -165,6 +165,9 @@ The `add_kubernetes_metadata` processor has the following configuration settings
 
 `append_fields` {applies_to}`stack: ga 9.6`
 :   (Optional) When `true`, the processor enriches events that already have a `kubernetes` field by merging the cached metadata into the existing object. Existing keys are preserved. Only absent fields are added. Defaults to `false`.
+
+`image_metadata_source` {applies_to}`stack: ga 9.6.0+`
+:   (Optional) Where `kubernetes.container.image` comes from. `status` uses the image reported in the container status, as resolved by the container runtime, which can differ from the manifest (for example a different tag or a digest). `spec` uses the image from the pod spec, exactly as written in the manifest. Applies to the `container` and `pod_uid` indexers. The `ip_port` indexer always uses the pod spec. Defaults to `status`.
 
 ## Indexers and matchers [kubernetes-indexers-and-matchers]
 

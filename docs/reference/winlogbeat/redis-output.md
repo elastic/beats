@@ -122,7 +122,7 @@ The Redis database number where the events are published. The default is 0.
 
 ### `datatype` [_datatype]
 
-The Redis data type to use for publishing events.If the data type is `list`, the Redis RPUSH command is used and all events are added to the list with the key defined under `key`. If the data type `channel` is used, the Redis `PUBLISH` command is used and means that all events are pushed to the pub/sub mechanism of Redis. The name of the channel is the one defined under `key`. The default value is `list`.
+The Redis data type to use for publishing events. If the data type is `list`, the Redis RPUSH command is used and all events are added to the list with the key defined under `key`. If the data type `channel` is used, the Redis `PUBLISH` command is used and means that all events are pushed to the pub/sub mechanism of Redis. The name of the channel is the one defined under `key`. The default value is `list`.
 
 
 ### `codec` [_codec_2]

@@ -1,0 +1,12 @@
+kind: enhancement
+summary: Add a start_position option to the Windows event log reader to skip existing events when no bookmark exists.
+description: |
+  Winlogbeat event logs and the Filebeat winlog input accept a new
+  start_position option. The default, beginning, keeps the current behaviour
+  of reading from the oldest record when no bookmark has been saved. Setting
+  it to end subscribes to future events only, so a fresh deployment does not
+  backfill the events already present in the channel. The option has no
+  effect once a bookmark exists, and ignore_older continues to apply as
+  before.
+component: winlogbeat, filebeat
+issue: https://github.com/elastic/beats/issues/52731

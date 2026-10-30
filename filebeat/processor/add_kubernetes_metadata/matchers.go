@@ -20,8 +20,8 @@ package add_kubernetes_metadata
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"runtime"
-	"strconv"
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
@@ -78,6 +78,11 @@ func newLogsPathMatcher(cfg conf.C, log *logp.Logger) (add_kubernetes_metadata.M
 
 	return &LogPathMatcher{LogsPath: logPath, ResourceType: resourceType, logger: log}, nil
 }
+
+// podLogFileRegexp matches kubelet pod log file names: the live file (<n>.log) and its
+// rotated forms (<n>.log.<yyyymmdd-hhmmss>, optionally compressed with .gz).
+// see https://github.com/kubernetes/kubernetes/blob/c16ce23e957dd82f106b73e8f4c9847a4eefd863/pkg/kubelet/logs/container_log_manager.go#L45
+var podLogFileRegexp = regexp.MustCompile(`^(\d+)\.log(?:\.\d{8}-\d{6})?(?:\.gz)?$`)
 
 // Docker container ID is a 64-character-long hexadecimal string
 const containerIdLen = 64
@@ -139,18 +144,18 @@ func (f *LogPathMatcher) MetadataIndexCandidates(event mapstr.M) []string {
 							containerName := pathDirs[podUIDPos+1]
 							containerIndex := podUID + "/" + containerName
 							if len(pathDirs) > podUIDPos+2 {
-								basename := pathDirs[podUIDPos+2]
-								// strip .gz so compressed rotated logs (e.g. 0.log.gz) are parsed like 0.log
-								basename = strings.TrimSuffix(basename, ".gz")
-								// guard against digit directory segments (e.g. container/3/real.log)
-								if logName, ok := strings.CutSuffix(basename, ".log"); ok {
-									if _, err := strconv.Atoi(logName); err == nil {
-										f.logger.Debugf("Using pod uid/container/restart: %s/%s/%s", podUID, containerName, logName)
-										return []string{
-											containerIndex + "/" + logName,
-											containerIndex,
-											podUID,
-										}
+								// Match <n>.log, optionally with a rotation timestamp (<n>.log.20220221-210912)
+								// and/or a .gz suffix. The anchored regex also guards against digit
+								// directory segments (e.g. container/3/real.log).
+								// MatchString plus slicing avoids the allocation FindStringSubmatch makes.
+								// The regexp is anchored on <digits>.log, so the first '.' ends the restart count.
+								if filename := pathDirs[podUIDPos+2]; podLogFileRegexp.MatchString(filename) {
+									logName := filename[:strings.IndexByte(filename, '.')]
+									f.logger.Debugf("Using pod uid/container/restart: %s/%s/%s", podUID, containerName, logName)
+									return []string{
+										containerIndex + "/" + logName,
+										containerIndex,
+										podUID,
 									}
 								}
 							}

@@ -6,6 +6,7 @@ processors:
   - rename:
       field: "journald.process.name"
       target_field: process.name
+      ignore_missing: true
   - set:
       field: "process.pid"
       copy_from: "journald.pid"

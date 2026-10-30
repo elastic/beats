@@ -98,7 +98,7 @@ func (s *server) Test(_ input.TestContext) error {
 
 // InitMetrics initialises and returns a netmetrics.TCP
 func (s *server) InitMetrics(id string, reg *monitoring.Registry, logger *logp.Logger) netinput.Metrics {
-	s.metrics = netmetrics.NewTCP(reg, s.Host, time.Minute, logger)
+	s.metrics = netmetrics.NewTCP(reg, s.Host, s.Network, time.Minute, logger)
 	return s.metrics
 }
 

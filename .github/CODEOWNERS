@@ -23,6 +23,7 @@ changelog/fragments/
 # Sub-directories/files ownership. Remember that order matters; the last matching pattern takes the most precedence.
 /.buildkite @elastic/observablt-ci
 /.ci/ @elastic/elastic-agent-data-plane @elastic/observablt-ci
+/.agents/skills/docs-authoring/SKILL.md @elastic/ski-docs
 /.github/actions @elastic/observablt-ci
 /.github/workflows @elastic/observablt-ci
 /.github/workflows/release-notes.yml @elastic/ski-docs @elastic/elastic-agent-data-plane
@@ -36,7 +37,7 @@ changelog/fragments/
 /docs/ @elastic/ski-docs
 /filebeat @elastic/elastic-agent-data-plane
 /filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
-/filebeat/input/syslog/ @elastic/integration-experience
+/filebeat/input/syslog/ @elastic/security-service-integrations
 /filebeat/input/winlog/ @elastic/security-service-integrations
 /filebeat/module/apache @elastic/obs-signals-integrations-team
 /filebeat/module/auditd @elastic/security-service-integrations
@@ -52,7 +53,7 @@ changelog/fragments/
 /filebeat/module/nats @elastic/obs-signals-integrations-team
 /filebeat/module/nginx @elastic/obs-signals-integrations-team
 /filebeat/module/osquery @elastic/security-service-integrations
-/filebeat/module/pensando @elastic/integration-experience
+/filebeat/module/pensando @elastic/security-service-integrations
 /filebeat/module/postgresql @elastic/obs-signals-integrations-team
 /filebeat/module/redis @elastic/obs-signals-integrations-team
 /filebeat/module/santa @elastic/security-service-integrations
@@ -63,21 +64,22 @@ changelog/fragments/
 /libbeat/ @elastic/elastic-agent-data-plane
 /libbeat/autodiscover/providers/kubernetes @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
 /libbeat/docs/processors-list.asciidoc @elastic/ski-docs
+/libbeat/ebpf @elastic/sec-linux-platform
 /libbeat/management @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
 /libbeat/processors/add_cloud_metadata @elastic/obs-ds-hosted-services
 /libbeat/processors/add_kubernetes_metadata @elastic/elastic-agent-data-plane
 /libbeat/processors/cache/ @elastic/security-service-integrations
-/libbeat/processors/community_id/ @elastic/integration-experience
+/libbeat/processors/community_id/ @elastic/security-service-integrations
 /libbeat/processors/decode_xml/ @elastic/security-service-integrations
 /libbeat/processors/decode_xml_wineventlog/ @elastic/security-service-integrations
-/libbeat/processors/dns/ @elastic/integration-experience
-/libbeat/processors/registered_domain/ @elastic/integration-experience
-/libbeat/processors/syslog/ @elastic/integration-experience
+/libbeat/processors/dns/ @elastic/security-service-integrations
+/libbeat/processors/registered_domain/ @elastic/security-service-integrations
+/libbeat/processors/syslog/ @elastic/security-service-integrations
 /libbeat/processors/translate_ldap_attribute/ @elastic/security-service-integrations
 /libbeat/processors/translate_sid/ @elastic/security-service-integrations
 /libbeat/reader/auditd/ @elastic/security-service-integrations
 /libbeat/reader/etw/ @elastic/security-service-integrations
-/libbeat/reader/syslog/ @elastic/integration-experience
+/libbeat/reader/syslog/ @elastic/security-service-integrations
 /licenses/ @elastic/elastic-agent-data-plane
 /metricbeat/ @elastic/elastic-agent-data-plane
 /metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
@@ -146,7 +148,7 @@ changelog/fragments/
 /x-pack/filebeat/input/internal/httpmon @elastic/security-service-integrations
 /x-pack/filebeat/input/internal/private @elastic/security-service-integrations
 /x-pack/filebeat/input/lumberjack/ @elastic/security-service-integrations
-/x-pack/filebeat/input/netflow/ @elastic/integration-experience
+/x-pack/filebeat/input/netflow/ @elastic/security-service-integrations
 /x-pack/filebeat/input/o365audit/ @elastic/security-service-integrations
 /x-pack/filebeat/input/salesforce @elastic/obs-signals-integrations-team
 /x-pack/filebeat/input/streaming/ @elastic/security-service-integrations
@@ -161,52 +163,52 @@ changelog/fragments/
 /x-pack/filebeat/module/awsfargate @elastic/obs-ds-hosted-services
 /x-pack/filebeat/module/azure @elastic/obs-ds-hosted-services
 /x-pack/filebeat/module/barracuda @elastic/security-service-integrations
-/x-pack/filebeat/module/bluecoat @elastic/integration-experience
-/x-pack/filebeat/module/cef @elastic/integration-experience
-/x-pack/filebeat/module/checkpoint @elastic/integration-experience
-/x-pack/filebeat/module/cisco @elastic/integration-experience
-/x-pack/filebeat/module/coredns @elastic/integration-experience
+/x-pack/filebeat/module/bluecoat @elastic/security-service-integrations
+/x-pack/filebeat/module/cef @elastic/security-service-integrations
+/x-pack/filebeat/module/checkpoint @elastic/security-service-integrations
+/x-pack/filebeat/module/cisco @elastic/security-service-integrations
+/x-pack/filebeat/module/coredns @elastic/security-service-integrations
 /x-pack/filebeat/module/crowdstrike @elastic/security-service-integrations
 /x-pack/filebeat/module/cyberarkpas @elastic/security-service-integrations
 /x-pack/filebeat/module/cylance @elastic/security-service-integrations
-/x-pack/filebeat/module/envoyproxy @elastic/integration-experience
+/x-pack/filebeat/module/envoyproxy @elastic/security-service-integrations
 /x-pack/filebeat/module/f5 @elastic/security-service-integrations
-/x-pack/filebeat/module/fortinet @elastic/integration-experience
+/x-pack/filebeat/module/fortinet @elastic/security-service-integrations
 /x-pack/filebeat/module/gcp @elastic/security-service-integrations
 /x-pack/filebeat/module/google_workspace @elastic/security-service-integrations
 /x-pack/filebeat/module/ibmmq @elastic/obs-signals-integrations-team
-/x-pack/filebeat/module/imperva @elastic/integration-experience
+/x-pack/filebeat/module/imperva @elastic/security-service-integrations
 /x-pack/filebeat/module/infoblox @elastic/security-service-integrations
-/x-pack/filebeat/module/iptables @elastic/integration-experience
-/x-pack/filebeat/module/juniper @elastic/integration-experience
+/x-pack/filebeat/module/iptables @elastic/security-service-integrations
+/x-pack/filebeat/module/juniper @elastic/security-service-integrations
 /x-pack/filebeat/module/microsoft @elastic/security-service-integrations
 /x-pack/filebeat/module/misp @elastic/security-service-integrations
 /x-pack/filebeat/module/mssql @elastic/obs-signals-integrations-team
 /x-pack/filebeat/module/mysqlenterprise @elastic/security-service-integrations
-/x-pack/filebeat/module/netflow @elastic/integration-experience
-/x-pack/filebeat/module/netscout @elastic/integration-experience
+/x-pack/filebeat/module/netflow @elastic/security-service-integrations
+/x-pack/filebeat/module/netscout @elastic/security-service-integrations
 /x-pack/filebeat/module/o365 @elastic/security-service-integrations
 /x-pack/filebeat/module/okta @elastic/security-service-integrations
 /x-pack/filebeat/module/oracle @elastic/obs-signals-integrations-team
-/x-pack/filebeat/module/panw @elastic/integration-experience
+/x-pack/filebeat/module/panw @elastic/security-service-integrations
 /x-pack/filebeat/module/proofpoint @elastic/security-service-integrations
 /x-pack/filebeat/module/rabbitmq @elastic/obs-signals-integrations-team
-/x-pack/filebeat/module/radware @elastic/integration-experience
+/x-pack/filebeat/module/radware @elastic/security-service-integrations
 /x-pack/filebeat/module/salesforce @elastic/obs-signals-integrations-team
-/x-pack/filebeat/module/snort @elastic/integration-experience
+/x-pack/filebeat/module/snort @elastic/security-service-integrations
 /x-pack/filebeat/module/snyk @elastic/security-service-integrations
-/x-pack/filebeat/module/sonicwall @elastic/integration-experience
-/x-pack/filebeat/module/sophos @elastic/integration-experience
-/x-pack/filebeat/module/squid @elastic/integration-experience
-/x-pack/filebeat/module/suricata @elastic/integration-experience
+/x-pack/filebeat/module/sonicwall @elastic/security-service-integrations
+/x-pack/filebeat/module/sophos @elastic/security-service-integrations
+/x-pack/filebeat/module/squid @elastic/security-service-integrations
+/x-pack/filebeat/module/suricata @elastic/security-service-integrations
 /x-pack/filebeat/module/threatintel @elastic/security-service-integrations
 /x-pack/filebeat/module/tomcat @elastic/obs-signals-integrations-team
-/x-pack/filebeat/module/zeek @elastic/integration-experience
+/x-pack/filebeat/module/zeek @elastic/security-service-integrations
 /x-pack/filebeat/module/zookeeper @elastic/obs-signals-integrations-team
 /x-pack/filebeat/module/zoom @elastic/security-service-integrations
 /x-pack/filebeat/module/zscaler @elastic/security-service-integrations
 /x-pack/filebeat/modules.d/zoom.yml.disabled @elastic/security-service-integrations
-/x-pack/filebeat/processors/decode_cef/ @elastic/integration-experience
+/x-pack/filebeat/processors/decode_cef/ @elastic/security-service-integrations
 /x-pack/heartbeat/ @elastic/obs-ds-hosted-services
 /x-pack/heartbeat/hbreceiver/ @elastic/elastic-agent-data-plane
 /x-pack/libbeat/common/identityfederation/ @elastic/cloud-services

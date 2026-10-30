@@ -646,6 +646,15 @@ packetbeat.protocols:
 # This feature works on Linux and Windows.
 packetbeat.procs.enabled: false
 
+# The backend used to resolve connections to processes. The default, procfs,
+# looks sockets up in the OS socket table (/proc on Linux, the IP Helper API
+# on Windows) and can miss short-lived connections whose socket already
+# closed. kernel_tracing tracks socket and process lifecycle with eBPF, so
+# short-lived connections are resolved reliably; it is only available on
+# Linux amd64/arm64 and requires privileges to load eBPF programs. auto uses
+# kernel_tracing when available and falls back to procfs otherwise.
+#packetbeat.procs.backend: procfs
+
 # If you want to ignore transactions created by the server on which the shipper
 # is installed you can enable this option. This option is useful to remove
 # duplicates if shippers are installed on multiple servers. Default value is

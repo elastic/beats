@@ -24,6 +24,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 )
 
 type eventIDRange struct {
@@ -75,30 +77,32 @@ func newRecordFilter(q query) (*recordFilter, error) {
 	return f, nil
 }
 
-func (f *recordFilter) match(r *Record) bool {
-	if f == nil || r == nil {
+// match reports whether the event passes the filter. It only inspects system
+// properties, so it can be applied to an event rendered with RenderSystem.
+func (f *recordFilter) match(e *winevent.Event) bool {
+	if f == nil || e == nil {
 		return true
 	}
 
-	if f.ignoreOlder > 0 && !r.TimeCreated.SystemTime.IsZero() {
-		if time.Since(r.TimeCreated.SystemTime) > f.ignoreOlder {
+	if f.ignoreOlder > 0 && !e.TimeCreated.SystemTime.IsZero() {
+		if time.Since(e.TimeCreated.SystemTime) > f.ignoreOlder {
 			return false
 		}
 	}
 
 	if len(f.providers) > 0 {
-		if _, ok := f.providers[r.Provider.Name]; !ok {
+		if _, ok := f.providers[e.Provider.Name]; !ok {
 			return false
 		}
 	}
 
 	if len(f.levels) > 0 {
-		if _, ok := f.levels[r.LevelRaw]; !ok {
+		if _, ok := f.levels[e.LevelRaw]; !ok {
 			return false
 		}
 	}
 
-	eventID := r.EventIdentifier.ID
+	eventID := e.EventIdentifier.ID
 	for _, ex := range f.excludeIDs {
 		if ex.contains(eventID) {
 			return false

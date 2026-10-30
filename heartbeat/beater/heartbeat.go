@@ -112,7 +112,7 @@ func newHeartbeat(b *beat.Beat, rawConfig *conf.C, schedulerGroup string) (beat.
 
 	// Check if any of these can prevent using states client
 	stateLoader, replaceStateLoader := monitorstate.AtomicStateLoader(monitorstate.NilStateLoader, logger)
-	if b.Config.Output.Name() == "elasticsearch" && !b.Manager.Enabled() {
+	if b.Config.Output.Name() == "elasticsearch" && !management.UnderAgent() {
 		// Connect to ES and setup the State loader if the output is not managed by agent
 		// Note this, intentionally, blocks until connected or max attempts reached
 		esClient, err := makeESClient(context.TODO(), b.Config.Output.Config(), 3, 2*time.Second, logger, b.Info)
@@ -126,7 +126,7 @@ func newHeartbeat(b *beat.Beat, rawConfig *conf.C, schedulerGroup string) (beat.
 		} else {
 			replaceStateLoader(monitorstate.MakeESLoader(esClient, monitorstate.DefaultDataStreams, parsedConfig.RunFrom, logger))
 		}
-	} else if b.Manager.Enabled() {
+	} else if b.Manager.ConfigFromControlProtocol() {
 		stateLoader, replaceStateLoader = monitorstate.DeferredStateLoader(monitorstate.NilStateLoader, 15*time.Second, logger)
 	}
 
@@ -204,7 +204,8 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	})
 
 	if bt.otelStatusFactoryWrapper != nil {
-		bt.monitorFactory = bt.otelStatusFactoryWrapper(bt.monitorFactory)
+		// In receiver mode one invalid monitor must not stop the others.
+		bt.monitorFactory = bt.otelStatusFactoryWrapper(invalidMonitorFactory{RunnerFactory: bt.monitorFactory, logger: bt.logger})
 	}
 
 	waitMonitors := monitors.NewSignalWait()
@@ -222,7 +223,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		waitMonitors.Add(monitors.WithLog(sched.WaitForRunOnce, "Ending run_once run.", bt.logger))
 	}
 
-	if b.Manager.Enabled() {
+	if b.Manager.ConfigFromControlProtocol() {
 		bt.RunCentralMgmtMonitors(b)
 	}
 
@@ -358,6 +359,13 @@ func (bt *Heartbeat) Stop() {
 
 func (bt *Heartbeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
 	bt.otelStatusFactoryWrapper = wrapper
+}
+
+// WithElasticsearchStateLoader atomically installs a monitor state loader that reads
+// prior monitor state from Elasticsearch using requester. Callers such as the OTel
+// Heartbeat receiver invoke this before Run so monitors use the injected client.
+func (bt *Heartbeat) WithElasticsearchStateLoader(requester monitorstate.ElasticsearchRequester) {
+	bt.replaceStateLoader(monitorstate.MakeESLoader(requester, monitorstate.DefaultDataStreams, bt.config.RunFrom, bt.logger))
 }
 
 // makeESClient establishes an ES connection meant to load monitors' state

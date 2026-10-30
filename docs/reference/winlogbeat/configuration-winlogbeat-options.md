@@ -371,6 +371,29 @@ The action that the event log reader should take when it receives a signal from 
 Setting `no_more_events` to `stop` is useful when reading from archived event log files where you want to read the whole file then exit. There’s a complete example of how to read from an `.evtx` file in the [FAQ](/reference/winlogbeat/reading-from-evtx.md).
 
 
+### `event_logs.start_position` [_event_logs_start_position]
+
+```{applies_to}
+stack: ga 9.6.0
+```
+
+Where to start reading a channel the first time it is read, that is, when no bookmark has been saved for it yet. Valid values are:
+
+* `beginning`: Start from the oldest record in the channel (the default). Combine with [`ignore_older`](#_event_logs_ignore_older) to limit how far back the initial read goes.
+* `end`: Skip the records already in the channel and only collect events written after Winlogbeat subscribes.
+
+Once a bookmark exists this option has no effect: Winlogbeat resumes from the bookmark and the `ignore_older` filter applies as usual. It also has no effect when reading from an `.evtx` file.
+
+`end` is useful when rolling out Winlogbeat to many hosts at once and you don't want each of them to send the events that were already in its logs. Note that if no event is written to the channel before Winlogbeat is stopped, no bookmark is saved and the next start is treated as a first start again.
+
+```yaml
+winlogbeat.event_logs:
+  - name: Security
+    start_position: end
+    ignore_older: 72h
+```
+
+
 ### `overwrite_pipelines` [_overwrite_pipelines]
 
 By default Ingest pipelines are not updated if a pipeline with the same ID already exists. If this option is enabled Winlogbeat overwrites pipelines every time a new Elasticsearch connection is established.

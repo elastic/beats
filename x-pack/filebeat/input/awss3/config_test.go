@@ -405,7 +405,7 @@ func TestConfig(t *testing.T) {
 				"non_aws_bucket_name": nonAWSS3Bucket,
 				"number_of_workers":   5,
 			},
-			expectedErr: "region must be configured when using non_aws_bucket_name",
+			expectedErr: "region or default_region must be configured when using non_aws_bucket_name",
 			expectedCfg: nil,
 		},
 		{
@@ -424,6 +424,25 @@ func TestConfig(t *testing.T) {
 				c := makeConfig("", "", "", nonAWSS3Bucket)
 				c.NumberOfWorkers = 5
 				c.RegionName = "region"
+				return c
+			},
+		},
+		{
+			name:           "input for non-AWS S3 Bucket with default_region specified",
+			queueURL:       "",
+			s3Bucket:       "",
+			s3AccessPoint:  "",
+			nonAWSS3Bucket: nonAWSS3Bucket,
+			config: mapstr.M{
+				"non_aws_bucket_name": nonAWSS3Bucket,
+				"default_region":      "auto",
+				"number_of_workers":   5,
+			},
+			expectedErr: "",
+			expectedCfg: func(queueURL, s3Bucket, s3AccessPoint, nonAWSS3Bucket string) config {
+				c := makeConfig("", "", "", nonAWSS3Bucket)
+				c.NumberOfWorkers = 5
+				c.AWSConfig.DefaultRegion = "auto"
 				return c
 			},
 		},

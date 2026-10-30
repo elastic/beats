@@ -1081,6 +1081,67 @@ var inputTests = []struct {
 		},
 	},
 	{
+		name:   "GET_redirect_follow",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]any{
+			"interval": 1,
+			"program": `
+	get(state.url).Body.as(body, {
+		"events": [{"message": string(body)}]
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == "/" {
+				w.Header().Set("Location", "/file")
+				w.Header().Set("Content-Length", "2")
+				w.WriteHeader(http.StatusFound)
+				_, _ = w.Write([]byte("{}"))
+				return
+			}
+			_, _ = w.Write([]byte("hello"))
+		},
+		want: []map[string]any{
+			{
+				"message": "hello",
+			},
+		},
+	},
+	{
+		name:   "GET_redirect_no_follow",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]any{
+			"interval":                 1,
+			"resource.redirect.follow": false,
+			"program": `
+	get(state.url).as(resp, {
+		"events": [{
+			"status":   resp.StatusCode == 302 ? "found" : "other",
+			"location": resp.Header["Location"][0],
+			"message":  string(resp.Body),
+		}]
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == "/" {
+				w.Header().Set("Location", "/file")
+				w.Header().Set("Content-Length", "2")
+				w.WriteHeader(http.StatusFound)
+				_, _ = w.Write([]byte("{}"))
+				return
+			}
+			_, _ = w.Write([]byte("hello"))
+		},
+		want: []map[string]any{
+			{
+				"status":   "found",
+				"location": "/file",
+				"message":  "{}",
+			},
+		},
+	},
+	{
 		name:   "GET_max_body_size_ok",
 		server: newTestServer(httptest.NewServer),
 		config: map[string]any{
@@ -2616,6 +2677,29 @@ var inputTests = []struct {
 			{"n": float64(5), "remaining_executions": float64(0)},
 			{"n": float64(6), "remaining_executions": float64(4)},
 			{"n": float64(7), "remaining_executions": float64(3)},
+		},
+	},
+
+	{
+		name: "empty_events_not_retained",
+		config: map[string]any{
+			"interval": 1,
+			// The first evaluation returns an empty events array and asks
+			// for another evaluation. The second reports whether the empty
+			// array was left in state.
+			"program": `int(state.n).as(n, {
+							"events":    n == 0 ? [] : [{"had_events": has(state.events)}],
+							"n":         n+1,
+							"want_more": n == 0,
+						})`,
+			"state": map[string]any{"n": 0},
+			"resource": map[string]any{
+				"url": "",
+			},
+		},
+		time: func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
+		want: []map[string]any{
+			{"had_events": false},
 		},
 	},
 
