@@ -111,3 +111,22 @@ func TestDefaults(t *testing.T) {
 		})
 	}
 }
+
+func TestSupportedJobTypes(t *testing.T) {
+	assert.Equal(t, []string{"http", "tcp", "icmp", "browser", "api"}, SupportedJobTypes(),
+		"the supported monitor types are the single source of truth for limits and telemetry")
+
+	SupportedJobTypes()[0] = "mutated"
+	assert.Equal(t, []string{"http", "tcp", "icmp", "browser", "api"}, SupportedJobTypes(),
+		"callers must not be able to mutate the supported monitor types")
+}
+
+func TestIsSupportedJobType(t *testing.T) {
+	for _, jobType := range SupportedJobTypes() {
+		assert.True(t, IsSupportedJobType(jobType), "%q is a supported monitor type", jobType)
+	}
+
+	for _, jobType := range []string{"", "HTTP", "operator-key", "synthetics/browser"} {
+		assert.False(t, IsSupportedJobType(jobType), "%q is not a supported monitor type", jobType)
+	}
+}
