@@ -141,7 +141,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 		return nil, fmt.Errorf("error reading configuration file: %w", err)
 	}
 
-	dynamicCfgEnabled := config.ConfigModules.Enabled() || config.Autodiscover != nil || b.Manager.Enabled()
+	dynamicCfgEnabled := config.ConfigModules.Enabled() || config.Autodiscover != nil || management.UnderAgent()
 	if !dynamicCfgEnabled && len(config.Modules) == 0 {
 		return nil, mb.ErrEmptyConfig
 	}
