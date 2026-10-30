@@ -330,6 +330,7 @@ func (op *objectProcessorV2) readFile(bld *eventBuilderV2, pub func(beat.Event),
 	rd = readfile.NewStripNewline(rd, rc.LineTerminator)
 	rd = rc.Parsers.Create(rd, log)
 	rd = readfile.NewLimitReader(rd, int(rc.MaxBytes))
+	defer rd.Close() // release to pool
 
 	var offset int64
 	for {
