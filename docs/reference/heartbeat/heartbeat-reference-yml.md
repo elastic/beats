@@ -281,6 +281,7 @@ heartbeat.jobs:
   # single file descriptor.
   # This feature is most useful for the browser type
   #browser.limit: 1
+  #api.limit: 4
   #http.limit: 10
   #tcp.limit: 10
   #icmp.limit: 10
