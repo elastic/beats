@@ -65,14 +65,14 @@ func makePipeline(t *testing.T, settings Settings, qu queue.Queue[publisher.Even
 
 func TestClient(t *testing.T) {
 	t.Run("client close", func(t *testing.T) {
-		// Note: no asserts. If closing fails we have a deadlock, because Publish
-		// would block forever
+		// Note: no asserts. The test deadlocks unless Close and a concurrent
+		// Publish, which may be blocked in the queue, both return once the
+		// pipeline disconnects.
 
 		routinesChecker := resources.NewGoroutinesChecker()
 		defer routinesChecker.Check(t)
 
 		pipeline := makePipeline(t, Settings{}, makeTestQueue())
-		defer func() { _ = pipeline.Disconnect(t.Context()) }()
 
 		client, err := pipeline.ConnectWith(beat.ClientConfig{})
 		if err != nil {
@@ -83,8 +83,14 @@ func TestClient(t *testing.T) {
 		wg.Go(func() {
 			client.Publish(beat.Event{})
 		})
+		wg.Go(func() {
+			client.Close()
+		})
 
-		client.Close()
+		// If Publish reaches the queue first, it blocks there holding the
+		// client mutex, and Close waits for it. Only closing the queue
+		// releases it, as with a full memqueue.
+		_ = pipeline.Disconnect(t.Context())
 		wg.Wait()
 	})
 
