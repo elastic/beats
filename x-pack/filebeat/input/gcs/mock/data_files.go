@@ -419,6 +419,6 @@ var BeatsFilesBucket_events_array_json = []string{
 }
 
 var BeatsFilesBucket_csv = []string{
-	"{\"id\":\"1\",\"name\":\"Alice\",\"email\":\"alice@example.com\",\"status\":\"active\"}",
-	"{\"id\":\"2\",\"name\":\"Bob\",\"email\":\"bob@example.com\",\"status\":\"inactive\"}",
+	"{\"email\":\"alice@example.com\",\"id\":\"1\",\"name\":\"Alice\",\"status\":\"active\"}",
+	"{\"email\":\"bob@example.com\",\"id\":\"2\",\"name\":\"Bob\",\"status\":\"inactive\"}",
 }

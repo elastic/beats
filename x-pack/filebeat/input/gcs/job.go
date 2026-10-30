@@ -198,29 +198,22 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 
 		for dec.Next() {
 			var (
-				msg []byte
-				val []mapstr.M
+				offset int64
+				msg    []byte
+				v      mapstr.M
+				val    []mapstr.M
 			)
-			if j.src.ParseJSON {
-				var v mapstr.M
-				_, msg, v, err = dec.DecodeValue()
-				if err != nil {
-					if err == io.EOF {
-						return nil
-					}
-					break
+			offset, msg, v, err = dec.DecodeValue()
+			if err != nil {
+				if errors.Is(err, io.EOF) {
+					return nil
 				}
-				val = []mapstr.M{v}
-			} else {
-				msg, err = dec.Decode()
-				if err != nil {
-					if err == io.EOF {
-						return nil
-					}
-					break
-				}
+				break
 			}
-			evt := j.createEvent(msg, val, evtOffset)
+			if j.src.ParseJSON {
+				val = []mapstr.M{v}
+			}
+			evt := j.createEvent(msg, val, offset)
 			j.publish(evt, !dec.More(), id)
 		}
 
@@ -244,6 +237,7 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 			}
 			evt := j.createEvent(msg, val, evtOffset)
 			j.publish(evt, !dec.More(), id)
+			evtOffset++
 		}
 
 	default:
