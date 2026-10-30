@@ -92,7 +92,7 @@ func (in *cometdInput) run() error {
 			// log warning every 5 seconds only to avoid to many unnecessary logs
 			select {
 			case <-ticker.C:
-				in.log.Errorw("Retrying...! facing issue while collecting data from CometD", "error", e.Error())
+				in.log.Errorw("retrying: error while collecting data from CometD", "error", e.Error())
 			default:
 			}
 		} else if !e.Msg.Successful {
