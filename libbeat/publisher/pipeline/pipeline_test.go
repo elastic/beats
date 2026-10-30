@@ -18,6 +18,7 @@
 package pipeline
 
 import (
+	"context"
 	"runtime"
 	"sync"
 	"sync/atomic"
@@ -200,6 +201,15 @@ func (p *testProducer) Publish(event publisher.Event) (queue.EntryID, bool) {
 		return p.publish(false, event)
 	}
 	return 0, false
+}
+
+// PublishContext ignores ctx and reports a refused event as queue.ErrRejected.
+func (p *testProducer) PublishContext(_ context.Context, event publisher.Event) (queue.EntryID, error) {
+	id, ok := p.Publish(event)
+	if !ok {
+		return 0, queue.ErrRejected
+	}
+	return id, nil
 }
 
 func (p *testProducer) TryPublish(event publisher.Event) (queue.EntryID, bool) {

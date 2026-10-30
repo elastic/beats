@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/slabqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -587,47 +588,27 @@ func TestReceiverClientPublishContextCancel(t *testing.T) {
 	}
 }
 
-// TestTrackedProducerPublishContextFallback checks that trackedProducer
-// publishes with Publish when its producer cannot cancel, and reports a refused
-// event as queue.ErrRejected.
-func TestTrackedProducerPublishContextFallback(t *testing.T) {
-	for _, accept := range []bool{true, false} {
-		p := &trackedProducer{Producer: &testProducer{
-			publish: func(bool, publisher.Event) (queue.EntryID, bool) { return 7, accept },
-		}}
-		id, err := p.PublishContext(t.Context(), publisher.Event{})
-		if accept {
-			assert.NoError(t, err, "an accepted event must not be an error")
-			assert.Equal(t, queue.EntryID(7), id, "the producer's entry ID must be returned")
-		} else {
-			assert.ErrorIs(t, err, queue.ErrRejected, "a refused event must be reported as queue.ErrRejected")
-		}
-	}
-}
-
-// TestClientPublishContextReceiverRefused checks that a Beat receiver's client,
-// whose trackedProducer wraps a producer that cannot cancel, reports a refused
-// event as beat.ErrRejected while open and as beat.ErrClientClosed once closed.
-func TestClientPublishContextReceiverRefused(t *testing.T) {
+// TestClientPublishContextReceiverClosed checks that a Beat receiver's client,
+// whose trackedProducer wraps a slabqueue producer, reports beat.ErrClientClosed
+// once the client is closed or the controller has closed its producer.
+func TestClientPublishContextReceiverClosed(t *testing.T) {
 	tests := []struct {
 		name          string
 		closeClient   bool
 		closeProducer bool
-		want          error
 	}{
-		{name: "open", want: beat.ErrRejected},
-		{name: "client closed", closeClient: true, want: beat.ErrClientClosed},
+		{name: "client closed", closeClient: true},
 		// The controller closes producers left open when the pipeline
 		// disconnects, while their clients are still open.
-		{name: "producer closed by controller", closeProducer: true, want: beat.ErrClientClosed},
+		{name: "producer closed by controller", closeProducer: true},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+			q := slabqueue.NewPool[publisher.Event](slabqueue.Settings{Events: 4}, nil).Connect()
+			defer q.Close(true)
 			listener := &mockClientListener{}
 			p := &trackedProducer{
-				Producer: &testProducer{
-					publish: func(bool, publisher.Event) (queue.EntryID, bool) { return 0, false },
-				},
+				Producer:   q.Producer(queue.ProducerConfig{}),
 				controller: &otelOutputController{},
 			}
 			c := newContextTestClient(p, listener, nil)
@@ -640,8 +621,9 @@ func TestClientPublishContextReceiverRefused(t *testing.T) {
 			}
 
 			err := c.PublishContext(t.Context(), beat.Event{})
-			assert.ErrorIs(t, err, tc.want, "PublishContext must report why the event was refused")
+			assert.ErrorIs(t, err, beat.ErrClientClosed, "PublishContext must report the closed client or producer")
 			assert.Equal(t, 1, listener.eventsDroppedOnPublish, "the refused event must be reported as dropped")
+			assert.Equal(t, 0, listener.eventsPublished, "no event must be published")
 		})
 	}
 }

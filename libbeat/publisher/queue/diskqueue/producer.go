@@ -50,7 +50,7 @@ type diskQueueProducer struct {
 	ackOnce sync.Once
 }
 
-var _ queue.ContextProducer[publisher.Event] = (*diskQueueProducer)(nil)
+var _ queue.Producer[publisher.Event] = (*diskQueueProducer)(nil)
 
 // A request sent from a producer to the core loop to add a frame to the queue.
 type producerWriteRequest struct {
@@ -80,7 +80,7 @@ func (producer *diskQueueProducer) Publish(event publisher.Event) (queue.EntryID
 }
 
 // PublishContext is Publish, but stops waiting for room when ctx is done. See
-// queue.ContextProducer.
+// queue.Producer.
 func (producer *diskQueueProducer) PublishContext(ctx context.Context, event publisher.Event) (queue.EntryID, error) {
 	return 0, producer.publish(ctx, event, true)
 }

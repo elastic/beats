@@ -53,7 +53,7 @@ type producer[T any] struct {
 	ackOnce   sync.Once
 }
 
-var _ queue.ContextProducer[int] = (*producer[int])(nil)
+var _ queue.Producer[int] = (*producer[int])(nil)
 
 // Publish adds an entry, blocking until both this queue is under its per-queue
 // cap and the shared pool has a free slot, or the queue/pool is closed.
@@ -67,7 +67,7 @@ func (p *producer[T]) Publish(entry T) (queue.EntryID, bool) {
 }
 
 // PublishContext is Publish, but stops waiting when ctx is done and returns
-// ctx.Err(); the event is then not enqueued. See queue.ContextProducer.
+// ctx.Err(); the event is then not enqueued. See queue.Producer.
 func (p *producer[T]) PublishContext(ctx context.Context, entry T) (queue.EntryID, error) {
 	if p.closed.Load() {
 		return 0, queue.ErrClosed

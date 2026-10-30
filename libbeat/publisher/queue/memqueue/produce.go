@@ -56,8 +56,8 @@ type ackProducer[T any] struct {
 }
 
 var (
-	_ queue.ContextProducer[int] = (*forgetfulProducer[int])(nil)
-	_ queue.ContextProducer[int] = (*ackProducer[int])(nil)
+	_ queue.Producer[int] = (*forgetfulProducer[int])(nil)
+	_ queue.Producer[int] = (*ackProducer[int])(nil)
 )
 
 type openState[T any] struct {
@@ -141,7 +141,7 @@ func (p *forgetfulProducer[T]) Publish(event T) (queue.EntryID, bool) {
 }
 
 // PublishContext is Publish, but stops waiting when ctx is done and returns
-// ctx.Err(); the event is then never added. See queue.ContextProducer.
+// ctx.Err(); the event is then never added. See queue.Producer.
 func (p *forgetfulProducer[T]) PublishContext(ctx context.Context, event T) (queue.EntryID, error) {
 	return p.openState.publishContext(ctx, p.makePushRequest(event))
 }
@@ -183,7 +183,7 @@ func (p *ackProducer[T]) Publish(event T) (queue.EntryID, bool) {
 }
 
 // PublishContext is Publish, but stops waiting when ctx is done and returns
-// ctx.Err(); the event is then never added. See queue.ContextProducer.
+// ctx.Err(); the event is then never added. See queue.Producer.
 func (p *ackProducer[T]) PublishContext(ctx context.Context, event T) (queue.EntryID, error) {
 	// Counted before enqueuing for the same reason as in Publish.
 	id := producerID(p.producedCount.Add(1))

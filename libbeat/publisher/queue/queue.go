@@ -25,13 +25,13 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// ErrClosed is returned by ContextProducer.PublishContext when the producer
-// or queue is closed.
+// ErrClosed is returned by Producer.PublishContext when the producer or queue
+// is closed.
 var ErrClosed = errors.New("queue: closed")
 
 // ErrRejected is wrapped, with the reason, by the error that
-// ContextProducer.PublishContext returns when the queue refused an entry while
-// the producer and queue were open, for example because it is too large.
+// Producer.PublishContext returns when the queue refused an entry while the
+// producer and queue were open, for example because it is too large.
 var ErrRejected = errors.New("queue: cannot accept entry")
 
 // Queue is responsible for accepting, forwarding and ACKing events.
@@ -113,6 +113,17 @@ type Producer[T any] interface {
 	// the new entry's id and true on success.
 	Publish(entry T) (EntryID, bool)
 
+	// PublishContext adds an entry to the queue like Publish, but stops waiting
+	// for room when ctx is done. It returns the new entry's id and nil on
+	// success, ctx.Err() if ctx ended first (the entry was not added),
+	// ErrClosed if the producer or queue is closed (where Publish would return
+	// false; the entry was not added), or an error wrapping ErrRejected, with
+	// the reason, if the queue refused the entry. A nil error means the entry
+	// was added, even if ctx is done by the time PublishContext returns. If ctx
+	// is already done when PublishContext is called, an entry that fits
+	// without waiting may still be added; check ctx first to avoid that.
+	PublishContext(ctx context.Context, entry T) (EntryID, error)
+
 	// TryPublish adds an entry to the queue if doing so will not block the
 	// caller, otherwise it immediately returns. The reasons a publish attempt
 	// might block are defined by the specific queue implementation and its
@@ -139,23 +150,6 @@ type Producer[T any] interface {
 	// The same channel instance is returned across calls. ACKWaitChan is safe to
 	// call concurrently with Publish, TryPublish and Close.
 	ACKWaitChan() <-chan struct{}
-}
-
-// ContextProducer is implemented by producers whose blocking publish can be
-// cancelled. Callers find it with a type assertion on a Producer and fall back
-// to Publish when it is absent.
-type ContextProducer[T any] interface {
-	Producer[T]
-	// PublishContext adds an entry to the queue like Publish, but stops waiting
-	// for room when ctx is done. It returns the new entry's id and nil on
-	// success, ctx.Err() if ctx ended first (the entry was not added),
-	// ErrClosed if the producer or queue is closed (where Publish would return
-	// false; the entry was not added), or an error wrapping ErrRejected, with
-	// the reason, if the queue refused the entry. A nil error means the entry
-	// was added, even if ctx is done by the time PublishContext returns. If ctx
-	// is already done when PublishContext is called, an entry that fits
-	// without waiting may still be added; check ctx first to avoid that.
-	PublishContext(ctx context.Context, entry T) (EntryID, error)
 }
 
 // Batch of entries (usually publisher.Event) to be returned to Consumers.

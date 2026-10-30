@@ -39,11 +39,9 @@ type publishResult struct {
 // result on the returned channel.
 func publishAsync(t *testing.T, ctx context.Context, p queue.Producer[int], v int) <-chan publishResult {
 	t.Helper()
-	cp, ok := p.(queue.ContextProducer[int])
-	require.True(t, ok, "slabqueue producers must implement queue.ContextProducer")
 	ch := make(chan publishResult, 1)
 	go func() {
-		id, err := cp.PublishContext(ctx, v)
+		id, err := p.PublishContext(ctx, v)
 		ch <- publishResult{id: id, err: err}
 	}()
 	return ch
@@ -195,8 +193,6 @@ func TestPublishContextClosed(t *testing.T) {
 	q := pool.Connect()
 	p := q.Producer(queue.ProducerConfig{})
 	require.NoError(t, q.Close(true), "Close must succeed")
-	cp, ok := p.(queue.ContextProducer[int])
-	require.True(t, ok, "slabqueue producers must implement queue.ContextProducer")
-	_, err := cp.PublishContext(t.Context(), 1)
+	_, err := p.PublishContext(t.Context(), 1)
 	assert.ErrorIs(t, err, queue.ErrClosed, "PublishContext on a closed queue must return ErrClosed")
 }

@@ -80,32 +80,12 @@ type otelOutputController struct {
 // during shutdown — so Close is safe to call from both paths and only ever
 // closes the underlying producer once.
 //
-// Publish and TryPublish are promoted from the embedded producer unchanged.
+// Publish, PublishContext and TryPublish are promoted from the embedded
+// producer unchanged.
 type trackedProducer struct {
 	queue.Producer[publisher.Event]
 	controller *otelOutputController
 	closed     atomic.Bool
-}
-
-var _ queue.ContextProducer[publisher.Event] = (*trackedProducer)(nil)
-
-// PublishContext forwards to the embedded producer, which the embedding would
-// otherwise hide. A producer that cannot cancel publishes with Publish,
-// ignoring ctx; an event it refuses is reported as queue.ErrClosed if this
-// producer was closed (by its client or the controller), else as
-// queue.ErrRejected, with no reason.
-func (p *trackedProducer) PublishContext(ctx context.Context, e publisher.Event) (queue.EntryID, error) {
-	if cp, ok := p.Producer.(queue.ContextProducer[publisher.Event]); ok {
-		return cp.PublishContext(ctx, e)
-	}
-	id, ok := p.Publish(e)
-	if !ok {
-		if p.closed.Load() {
-			return 0, queue.ErrClosed
-		}
-		return 0, queue.ErrRejected
-	}
-	return id, nil
 }
 
 func (p *trackedProducer) Close() {

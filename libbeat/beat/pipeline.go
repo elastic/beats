@@ -93,9 +93,8 @@ type ContextPublisher interface {
 	// queued, and PublishContext returns nil.
 	//
 	// Cancellation applies only to clients connected with no EventListener
-	// (ACK handling); setting one, even acker.Nil(), turns it off. It also
-	// needs a queue that supports it, as the libbeat queues do. Otherwise
-	// PublishContext ignores ctx and Close, and blocks like Publish. With
+	// (ACK handling); setting one, even acker.Nil(), turns it off, and
+	// PublishContext then ignores ctx and Close, and blocks like Publish. With
 	// DropIfFull it never blocks and returns nil for any event the queue
 	// refuses while the client is open, including one dropped because the
 	// queue is full.
