@@ -330,7 +330,9 @@ func requestDiagnosticsAndVerifyRegistry(
 				for {
 					header, err := tarReader.Next()
 					if errors.Is(err, io.EOF) {
-						t.Error("registry log file not found in tar archive")
+						if !emtpyRegistyLogFile {
+							t.Error("registry log file not found in tar archive")
+						}
 						return
 					}
 
