@@ -7,7 +7,7 @@ applies_to:
   serverless: ga
 ---
 
-# Filter and enhance data with processors [filtering-and-enhancing-data]
+# Filter and enhance data with processors in Filebeat [filtering-and-enhancing-data]
 
 
 Your use case might require only a subset of the data exported by Filebeat, or you might need to enhance the exported data (for example, by adding metadata). Filebeat provides a couple of options for filtering and enhancing exported data.
