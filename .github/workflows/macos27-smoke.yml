@@ -1,0 +1,123 @@
+name: macos27-smoke
+
+# Temporary: checks auditbeat and packetbeat build, pass unit tests and run on
+# macOS 27 (GitHub's preview xcode-27 image) for the support matrix.
+# Not meant to be merged.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/macos27-smoke.yml
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: ${{ matrix.beat }} on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [xcode-27]
+        beat: [auditbeat, x-pack/auditbeat, packetbeat, x-pack/packetbeat]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: OS info
+        run: sw_vers && uname -a
+
+      # Runs mage build and mage unitTest. Keep going on test failures so the
+      # run step still tells us whether the beat starts.
+      - uses: ./.github/actions/unit-test
+        continue-on-error: true
+        with:
+          beat: ${{ matrix.beat }}
+
+      - name: Run beat and check it publishes events
+        shell: bash
+        working-directory: ${{ matrix.beat }}
+        env:
+          BEAT_DIR: ${{ matrix.beat }}
+        run: |
+          set -euo pipefail
+          name=$(basename "$BEAT_DIR")
+          [ -x "./$name" ] || mage build
+          # Resolve /var -> /private/var so FSEvents paths match the watch.
+          work=$(cd "$(mktemp -d)" && pwd -P)
+          mkdir -p "$work/fim" "$work/out"
+
+          case "$BEAT_DIR" in
+            auditbeat)
+              cat > "$work/beat.yml" <<EOF
+          auditbeat.modules:
+          - module: file_integrity
+            paths: [$work/fim]
+          EOF
+              ;;
+            x-pack/auditbeat)
+              cat > "$work/beat.yml" <<EOF
+          auditbeat.modules:
+          - module: file_integrity
+            paths: [$work/fim]
+          - module: system
+            datasets: [host, package, process]
+            period: 10s
+            state.period: 1m
+          EOF
+              ;;
+            *packetbeat)
+              cat > "$work/beat.yml" <<EOF
+          packetbeat.interfaces.device: default_route
+          packetbeat.flows:
+            timeout: 10s
+            period: 5s
+          packetbeat.protocols:
+          - type: dns
+            ports: [53]
+          - type: http
+            ports: [80]
+          EOF
+              ;;
+          esac
+          cat >> "$work/beat.yml" <<EOF
+          output.file:
+            path: $work/out
+            filename: events
+          logging.level: info
+          EOF
+
+          sudo "./$name" -e --strict.perms=false -c "$work/beat.yml" \
+            --path.home "$work/home" > "$work/beat.log" 2>&1 &
+          pid=$!
+
+          sleep 15
+          for i in 1 2 3; do
+            echo "change $i" >> "$work/fim/test.txt"
+            curl -s -o /dev/null http://example.com || true
+            nslookup example.com > /dev/null || true
+            sleep 5
+          done
+          sleep 15
+
+          if ! sudo kill -0 "$pid" 2>/dev/null; then
+            echo "::error::$name exited early"
+            cat "$work/beat.log"
+            exit 1
+          fi
+          sudo kill -INT "$pid" || true
+          wait "$pid" || true
+
+          echo "---- log (errors and warnings) ----"
+          grep -E '"log.level":"(error|warn)"' "$work/beat.log" || echo "none"
+          echo "---- events by dataset ----"
+          sudo cat "$work"/out/events* | grep -o '"dataset":"[^"]*"' | sort | uniq -c || true
+          count=$(sudo cat "$work"/out/events* 2>/dev/null | wc -l | tr -d ' ')
+          echo "total events: $count"
+          if [ "$count" -eq 0 ]; then
+            echo "::error::$name published no events"
+            tail -100 "$work/beat.log"
+            exit 1
+          fi
