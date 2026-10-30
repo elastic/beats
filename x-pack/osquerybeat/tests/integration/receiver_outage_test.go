@@ -19,6 +19,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/component/componentstatus"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/plog"
@@ -44,7 +45,8 @@ func TestReceiverOutputOutage(t *testing.T) {
 			t.Cleanup(func() { oteltest.VerifyNoLeaks(t) })
 			home := receiverTestHome(t)
 			core, observed := observer.New(zapcore.DebugLevel)
-			host := &oteltest.MockHost{}
+			actions := &actionCapture{}
+			host := &liveActionHost{MockHost: &oteltest.MockHost{}, ext: actions}
 			var runs executionLog
 			var unavailable atomic.Bool
 			var delivered atomic.Int64
@@ -55,6 +57,11 @@ func TestReceiverOutputOutage(t *testing.T) {
 			restore := func() { restoreOnce.Do(func() { close(restored) }) }
 			var pidMu sync.Mutex
 			var lastPID string
+			const liveActionID = "outage-live"
+			// liveTimeoutErr is the text of beater.errLivePublishTimeout.
+			const liveTimeoutErr = "timed out publishing live query results"
+			var responseMu sync.Mutex
+			var liveResponse map[string]any
 			logConsumer, err := consumer.NewLogs(func(ctx context.Context, logs plog.Logs) error {
 				if unavailable.Load() {
 					blockedOnce.Do(func() { close(blocked) })
@@ -68,6 +75,11 @@ func TestReceiverOutputOutage(t *testing.T) {
 					for _, scope := range resource.ScopeLogs().All() {
 						for _, record := range scope.LogRecords().All() {
 							fields := record.Body().Map().AsRaw()
+							if fields["action_id"] == liveActionID && fields["completed_at"] != nil {
+								responseMu.Lock()
+								liveResponse = fields
+								responseMu.Unlock()
+							}
 							if profile, ok := fields["osquery_profile"].(map[string]any); ok {
 								if executions, ok := profile["executions"].(int64); ok && executions > 0 && profile["source"] == "scheduled" && profile["query_name"] == "outage" {
 									profiles.Add(1)
@@ -97,7 +109,7 @@ func TestReceiverOutputOutage(t *testing.T) {
 			})
 			require.NoError(t, err, "create outage consumer")
 			factory := osqreceiver.NewFactoryWithSettings(osqreceiver.Settings{Home: home})
-			const outageRows = 64
+			const liveRows, outageRows = 8, 64
 			const values = "(SELECT 1 AS value UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 " +
 				"UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8)"
 			cfg := &osqreceiver.Config{Beatconfig: map[string]any{
@@ -117,8 +129,11 @@ func TestReceiverOutputOutage(t *testing.T) {
 							"options": map[string]any{"thrift_timeout": 30, "schedule_splay_percent": 0},
 							// A 60 s outage queues about 4000 rows; room for all of them
 							// makes any loss a failure rather than an expected overflow.
+							// The live timeout ends well inside the outage, so the live
+							// query always times out.
 							"elastic_options": map[string]any{"publishing": map[string]any{
 								"scheduled": map[string]any{"max_events": 100000},
+								"live":      map[string]any{"timeout": "10s"},
 							}},
 							// Each run selects its own osquery_schedule execution count, so
 							// every run carries a unique, consecutive number and a lost run
@@ -186,11 +201,32 @@ func TestReceiverOutputOutage(t *testing.T) {
 			firstExecution, ok := runs.latest()
 			require.True(t, ok, "results must carry the osquery_schedule execution count")
 			monitorPort := monitoringPortsFromLogs(t, observed, 1, 30*time.Second)[0]
+			if restoreOutput {
+				require.Eventually(t, func() bool { return actions.handler() != nil }, 30*time.Second, 100*time.Millisecond,
+					"receiver must register its live query action")
+			}
 			unavailable.Store(true)
 			select {
 			case <-blocked:
 			case <-time.After(15 * time.Second):
 				t.Fatal("output consumer did not receive an outage batch")
+			}
+			var liveRes map[string]any
+			var liveErr error
+			liveDone := make(chan struct{})
+			if restoreOutput {
+				// A queued scheduled result proves the pipeline is full, so the
+				// live rows cannot all be handed to it before the timeout.
+				require.Eventually(t, func() bool { return scheduledStats(t, monitorPort).Queue.Items > 0 }, 30*time.Second, 100*time.Millisecond,
+					"scheduled results must queue behind the full pipeline before the live query")
+				execute := actions.handler()
+				go func() {
+					defer close(liveDone)
+					liveRes, liveErr = execute(t.Context(), map[string]any{
+						"id":   liveActionID,
+						"data": map[string]any{"query": "SELECT value FROM " + values},
+					})
+				}()
 			}
 			// Hold the output for two thrift deadlines. Restoring it earlier could
 			// hide a logger callback that waits for the output.
@@ -209,6 +245,18 @@ func TestReceiverOutputOutage(t *testing.T) {
 			require.Contains(t, dropped, "overflow", "the scheduled queue must report overflow drops")
 			assert.Zero(t, dropped["overflow"], "the outage backlog must fit in max_events without overflow drops")
 			if restoreOutput {
+				select {
+				case <-liveDone:
+				case <-time.After(30 * time.Second):
+					t.Fatal("live query action did not return while the output was unavailable")
+				}
+				require.NoError(t, liveErr, "live query action reports failures in its result")
+				assert.Equal(t, liveTimeoutErr, liveRes["error"],
+					"a live query that outlasts live.timeout must report the publish timeout")
+				count, ok := liveRes["count"].(int)
+				require.True(t, ok, "a timed-out live query must report its published row count, got %v", liveRes)
+				assert.Less(t, count, liveRows, "a timed-out live query must report only the rows it published")
+
 				recoveredAt := time.Now().Unix()
 				restore()
 				require.Eventually(t, func() bool { return lastResultTime.Load() > recoveredAt }, 20*time.Second, 100*time.Millisecond,
@@ -225,6 +273,13 @@ func TestReceiverOutputOutage(t *testing.T) {
 				pidMu.Lock()
 				assert.Equal(t, initialPID, lastPID, "osqueryd must remain alive through the outage")
 				pidMu.Unlock()
+				require.EventuallyWithT(t, func(c *assert.CollectT) {
+					responseMu.Lock()
+					defer responseMu.Unlock()
+					require.NotNil(c, liveResponse, "no action response for %s yet", liveActionID)
+					assert.Equal(c, liveTimeoutErr, liveResponse["error"], "the action response must carry the publish timeout")
+				}, 20*time.Second, 100*time.Millisecond,
+					"the timed-out live query's action response must be published after recovery")
 			}
 			shutdown()
 			select {
@@ -239,6 +294,48 @@ func TestReceiverOutputOutage(t *testing.T) {
 				t.Fatal("receiver shutdown waited for output recovery")
 			}
 		})
+	}
+}
+
+// actionCapture is an action extension that keeps the receiver's live query
+// handler so the test can run a live query.
+type actionCapture struct {
+	mu      sync.Mutex
+	execute func(context.Context, map[string]any) (map[string]any, error)
+}
+
+func (*actionCapture) Start(context.Context, component.Host) error { return nil }
+func (*actionCapture) Shutdown(context.Context) error              { return nil }
+
+func (a *actionCapture) RegisterActionHandler(_ string, h func(context.Context, map[string]any) (map[string]any, error)) error {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	a.execute = h
+	return nil
+}
+
+func (a *actionCapture) UnregisterActionHandler(string) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	a.execute = nil
+}
+
+func (a *actionCapture) handler() func(context.Context, map[string]any) (map[string]any, error) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	return a.execute
+}
+
+// liveActionHost is a status-tracking host that exposes ext as the action
+// extension.
+type liveActionHost struct {
+	*oteltest.MockHost
+	ext *actionCapture
+}
+
+func (h *liveActionHost) GetExtensions() map[component.ID]component.Component {
+	return map[component.ID]component.Component{
+		component.MustNewID("elastic_diagnostics"): h.ext,
 	}
 }
 
@@ -306,6 +403,9 @@ func (l *executionLog) completeAfter(first, unixTime int64, rows int) (int64, bo
 // receiver's stats endpoint.
 type scheduledPublishingStats struct {
 	DroppedRows map[string]uint64 `json:"dropped_rows"`
+	Queue       struct {
+		Items int64 `json:"items"`
+	} `json:"queue"`
 }
 
 func scheduledStats(t *testing.T, port int) scheduledPublishingStats {

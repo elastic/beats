@@ -202,19 +202,31 @@ func CheckProcessors(inputs []config.InputConfig, log *logp.Logger) error {
 }
 
 func (p *Publisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any) {
+	n := p.PublishEach(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName, meta, hits, ecsm, reqData, func() bool { return false })
+	p.log.Infof("%d events sent to index %s", n, index)
+}
+
+// PublishEach publishes hits one by one and returns how many were handed to
+// the client before stop returned true. stop is called before each hit.
+func (p *Publisher) PublishEach(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any, stop func() bool) int {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
-	n := len(hits)
+	if p.client == nil {
+		p.log.Info("Results stream is not configured. Results are dropped.")
+		return 0
+	}
 	for i, hit := range hits {
+		if stop() {
+			return i
+		}
 		if p.retired(len(hits) - i) {
-			n = i
-			break
+			return i
 		}
 		event := hitToEvent(index, p.b.Info.Name, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName, meta, hit, ecsm, reqData)
 		p.client.Publish(event)
 	}
-	p.log.Infof("%d events sent to index %s", n, index)
+	return len(hits)
 }
 
 func (p *Publisher) Close() {
