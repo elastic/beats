@@ -262,6 +262,37 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: FIPS ECH Integration Tests / Ubuntu x86_64"
 
+      # Replaces the Serverless Beats Tests that elastic-agent used to run against this repository.
+      - label: ":ubuntu: x-pack/filebeat: Serverless Integration Tests"
+        key: "x-pack-filebeat-mandatory-serverless-int-test"
+        env:
+          ASDF_TERRAFORM_VERSION: "1.9.3"
+        command: |
+          .buildkite/scripts/serverless_tests.sh x-pack/filebeat
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "x-pack/filebeat/build/TEST-go-serverless.*"
+          - "x-pack/filebeat/build/integration-tests/**"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/filebeat/build/TEST-go-serverless.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+          - elastic/vault-secrets#v0.1.0:
+              path: "kv/ci-shared/platform-ingest/platform-ingest-ec-prod"
+              field: "apiKey"
+              env_var: "EC_API_KEY"
+        notify:
+          - github_commit_status:
+              context: "x-pack/filebeat: Serverless Integration Tests / Ubuntu x86_64"
+
       - label: ":ubuntu: x-pack/filebeat: Python Integration Tests"
         key: "x-pack-filebeat-mandatory-python-int-test"
         # Run the module fileset tests in parallel across workers. Each xdist
