@@ -339,7 +339,7 @@ func TestRunOsqueryLogsCancelledExitAtInfo(t *testing.T) {
 	ctx, cancel := context.WithCancel(t.Context())
 	cancel()
 	runner := &killedOnCancelRunner{err: osqueryKilledError(t)}
-	rah := newResetableActionHandler(ob.pub, log)
+	rah := newResetableActionHandler(ob.liveResults, ob.pub, log)
 	metrics := newOsquerydMetrics(monitoring.NewRegistry(), log)
 	err := ob.runOsquery(ctx, b, runner, nil, config.ExtensionsConfig{}, make(chan []config.InputConfig), rah, metrics)
 	assert.ErrorIs(t, err, context.Canceled, "shutdown must report cancellation")

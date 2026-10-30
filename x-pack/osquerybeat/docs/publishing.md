@@ -1,13 +1,13 @@
 # Result publishing
 
-Osquerybeat publishes scheduled query results, from native and RRULE
-schedules, and scheduled query profiles from an internal queue with its own
-worker and its own output clients. The worker uses blocking
-`beat.Client.Publish`, so under output back-pressure it waits for queue slots
-alongside other receivers, as publishing did before; what changes is where it
-waits. osqueryd's logger callback only adds results to the scheduled queue and
-never waits for the output, so a slow output can no longer hold the logger RPC
-until osqueryd times out.
+Osquerybeat publishes osquery results from two internal queues, each with its
+own worker and its own output clients: one for scheduled queries and one for
+live queries. The workers use blocking `beat.Client.Publish`, so under output
+back-pressure they wait for queue slots alongside other receivers, as
+publishing did before; what changes is where they wait. osqueryd's logger
+callback only adds results to the scheduled queue and never waits for the
+output, so a slow output can no longer hold the logger RPC until osqueryd
+times out.
 
 ## Settings
 
@@ -19,6 +19,8 @@ publishing:
   scheduled:
     max_events: 3200   # rows; unset or 0 uses the default
     max_age: 0         # unset or 0 disables it
+  live:
+    timeout: 60s       # unset or 0 uses the default
 ```
 
 Negative values are rejected, and the policy that contains them is not
@@ -78,9 +80,34 @@ could not resolve are dropped.
 
 Shutdown drops the queued items and does not wait for a blocked `Publish`.
 
+## Live queue
+
+A live query action waits for its rows to be handed to the output for at most
+`live.timeout`, counted from when the query returns, so a slow query does not
+use up the window. On the OTel runtime the action's own context can end first,
+at the Fleet action timeout (1 minute by default); that is handled the same
+way. If the timeout elapses, the action reports the rows handed over so far as
+its count, with an error. The remaining rows are skipped; a row
+already inside a blocked `Publish` can still be delivered late. The action's
+response document is published after its rows and is not dropped by the
+timeout, so Kibana learns the outcome unless osquerybeat stops before the
+response is published. If osquerybeat is stopping, the
+action reports an error instead of a count. If no results stream is configured,
+the action reports that error instead.
+
+Live actions run one at a time. While one waits, `Attach` and `Clear` (called
+when osqueryd is re-registered) wait too, each queued action for up to its
+query time plus `live.timeout`. With several actions queued, that adds up to
+roughly N times (query time + `live.timeout`), rather than a single timeout.
+
+A live query that fails but asked for a profile publishes the profile through
+the live queue and can wait up to `live.timeout` for it before reporting the
+query error.
+
 ## Metrics and logs
 
-The queue reports under `osquerybeat.publishing.scheduled`:
+Each queue reports under `osquerybeat.publishing.scheduled` and
+`osquerybeat.publishing.live`:
 
 | Metric | Meaning |
 |---|---|
@@ -91,15 +118,21 @@ The queue reports under `osquerybeat.publishing.scheduled`:
 
 Reasons:
 
-| Reason | Meaning |
-|---|---|
-| `overflow` | Dropped for space, oldest first and profiles first |
-| `expired` | Older than `max_age` when the worker reached it |
-| `stale` | No current policy publishes it: the query was removed, moved to another namespace or changed SQL (also while it was in flight), osqueryd could not resolve its column types, no results stream is configured, or, for a profile, no profile stream is configured |
-| `shutdown` | Osquerybeat was stopping |
+| Reason | Queues | Meaning |
+|---|---|---|
+| `overflow` | scheduled | Dropped for space, oldest first and profiles first |
+| `expired` | scheduled | Older than `max_age` when the worker reached it |
+| `stale` | both | No current policy publishes it: the query was removed, moved to another namespace or changed SQL (also while it was in flight), osqueryd could not resolve its column types, no results stream is configured, or, for a profile or an action response, no profile or action response stream is configured |
+| `shutdown` | both | Osquerybeat was stopping |
+| `timeout` | live | The action stopped waiting after `live.timeout`, or its context ended first |
 
-An event the pipeline discards while closing counts in
-`dropped_rows.shutdown` only. The queue logs at most one warning per minute
+For a live action, an item is the action's results and profile, and its rows
+are the rows and profile not handed to the output. The live `queue.*` gauges
+cover only the waiting action, not the action responses queued behind it. A
+live action response dropped because osquerybeat is stopping, or because no
+live clients or no action response stream are configured, counts as its own
+item of one row. An event the pipeline discards while closing counts in
+`dropped_rows.shutdown` only. Each queue logs at most one warning per minute
 about drops, naming the counter that moved.
 
 A scheduled profile dropped once it is queued is counted only under
@@ -122,6 +155,14 @@ collected and handed to the scheduled queue, not delivered.
   configuration and is not checked this way: a configuration that fails to
   parse stops the receiver from starting, and one osquerybeat cannot apply
   makes the receiver report a failed status and stop, as before.
+- Live query actions that fail now report their real `started_at` and
+  `completed_at`.
+- Live query action responses are published asynchronously by the live
+  worker, after the action's rows, instead of synchronously when the action
+  returns.
+- Live query rows not handed to the output within `live.timeout` are skipped
+  and the action reports a partial count with an error. Before, they were
+  delivered eventually, once the blocked publish went through.
 - Queued scheduled results survive osqueryd restarts (an options or
   extensions change, or a crash) and are published once osqueryd runs again.
 - Results still queued when osquerybeat stops are dropped and counted as
