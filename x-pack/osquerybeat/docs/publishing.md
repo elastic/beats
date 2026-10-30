@@ -84,8 +84,10 @@ Shutdown drops the queued items and does not wait for a blocked `Publish`.
 
 A live query action waits for its rows to be handed to the output for at most
 `live.timeout`, counted from when the query returns, so a slow query does not
-use up the window. If the timeout elapses, the action reports the rows handed
-over so far as its count, with an error. The remaining rows are skipped; a row
+use up the window. On the OTel runtime the action's own context can end first,
+at the Fleet action timeout (1 minute by default); that is handled the same
+way. If the timeout elapses, the action reports the rows handed over so far as
+its count, with an error. The remaining rows are skipped; a row
 already inside a blocked `Publish` can still be delivered late. The action's
 response document is published after its rows and is not dropped by the
 timeout, so Kibana learns the outcome unless osquerybeat stops before the
@@ -122,7 +124,7 @@ Reasons:
 | `expired` | scheduled | Older than `max_age` when the worker reached it |
 | `stale` | both | No current policy publishes it: the query was removed, moved to another namespace or changed SQL (also while it was in flight), osqueryd could not resolve its column types, no results stream is configured, or, for a profile or an action response, no profile or action response stream is configured |
 | `shutdown` | both | Osquerybeat was stopping |
-| `timeout` | live | The action stopped waiting after `live.timeout` |
+| `timeout` | live | The action stopped waiting after `live.timeout`, or its context ended first |
 
 For a live action, an item is the action's results and profile, and its rows
 are the rows and profile not handed to the output. The live `queue.*` gauges
