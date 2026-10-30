@@ -101,6 +101,11 @@ func (l *scheduledResultLease) retire() {
 	}
 }
 
+// scheduledResultDispatcher publishes scheduled items from one worker.
+//
+// Lock order: take d.mu before a lease's mu, never the reverse. Code that
+// holds a lease's mu reads the active lease through current, not d.mu.
+// retire uses TryLock, so a policy change never waits on a stuck Publish.
 type scheduledResultDispatcher struct {
 	mu              sync.Mutex
 	ctx             context.Context
@@ -277,7 +282,9 @@ func (d *scheduledResultDispatcher) process(item scheduledItem) {
 	}
 	if lease != nil {
 		// Lock while the lease is still active, so it cannot have been closed;
-		// a later retire leaves closing it to unlock.
+		// a later retire leaves closing it to unlock. This Lock never waits,
+		// although d.mu is held: retire only runs on a lease that is no
+		// longer d.lease, and only this worker otherwise takes lease.mu.
 		lease.mu.Lock()
 		defer lease.unlock()
 	}
