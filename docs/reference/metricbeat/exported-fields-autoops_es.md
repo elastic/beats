@@ -1356,7 +1356,7 @@ tasks information from cluster
 stack: beta 9.7.0
 ```
 
-Number and duration of the requests of a tier of an Elasticsearch Serverless project, for one HTTP status code. There is one document per tier and HTTP status code with requests during the scrape (and always one for the successful, 2xx, requests), which adds the requests of every node of the tier.
+Number and duration of the requests of a tier of an Elasticsearch Serverless project, for one HTTP status code. There is one document per tier and HTTP status code with requests during the scrape (and always one for the successful, 2xx, requests), which adds the requests of every node of the tier. The first document of a status code only reports that it was returned.
 
 **`autoops_es.tier_stats.tier`**
 :   The tier that served the requests, such as `search` or `index`.
@@ -1377,13 +1377,13 @@ Number and duration of the requests of a tier of an Elasticsearch Serverless pro
 
 
 **`autoops_es.tier_stats.count_delta`**
-:   Number of requests since the previous scrape.
+:   Number of requests since the previous scrape. It is not reported the first time that a status code is returned, because there is no previous scrape to subtract from.
 
     type: long
 
 
 **`autoops_es.tier_stats.duration_delta_in_millis`**
-:   Total duration of those requests in milliseconds.
+:   Total duration of those requests in milliseconds. It is not reported when `count_delta` is not.
 
     type: float
 

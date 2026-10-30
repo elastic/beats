@@ -94,7 +94,8 @@ func seedPreviousScrape(t *testing.T, previous *NodesMetricsResponse) {
 
 	tierStatsState.reset()
 
-	require.Empty(t, tierStatsState.compute(readSnapshot(previous), time.Now().Add(-10*time.Second).UnixMilli()))
+	// the documents of this first scrape are not reported, they are only there to be compared with
+	tierStatsState.compute(readSnapshot(previous), time.Now().Add(-10*time.Second).UnixMilli())
 }
 
 func TestEventsMappingReportsOneEventPerDocument(t *testing.T) {
@@ -158,15 +159,24 @@ func TestEventsMappingOnlyCountsTheNodesThatAnswered(t *testing.T) {
 	require.EqualValues(t, 50, auto_ops_testing.GetObjectValue(reporter.GetEvents()[0].MetricSetFields, "count_delta"))
 }
 
-func TestEventsMappingReportsNothingForTheFirstScrape(t *testing.T) {
+func TestEventsMappingReportsTheFirstScrapeWithoutTheChanges(t *testing.T) {
 	info := metricset.CreateClusterInfo("8.11.0")
 	reporter := &mbtest.CapturingReporterV2{}
 
 	tierStatsState.reset()
 
 	require.NoError(t, eventsMapping(reporter, &info, response(node(searchNodeA, "search", hist(searchMetric, 200, 100, 1000)))))
-	require.Empty(t, reporter.GetEvents())
 	require.Empty(t, reporter.GetErrors())
+	require.Len(t, reporter.GetEvents(), 1)
+
+	event := reporter.GetEvents()[0]
+
+	// there is no previous scrape to subtract from, and no time since it either
+	require.Equal(t, "search", auto_ops_testing.GetObjectValue(event.MetricSetFields, "tier"))
+	require.EqualValues(t, 200, auto_ops_testing.GetObjectValue(event.MetricSetFields, "status_code"))
+	require.NotContains(t, event.MetricSetFields, "count_delta")
+	require.NotContains(t, event.MetricSetFields, "duration_delta_in_millis")
+	require.NotContains(t, event.RootFields, "timestamp_diff")
 }
 
 func TestStatusCode(t *testing.T) {

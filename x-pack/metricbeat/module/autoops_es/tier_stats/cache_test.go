@@ -119,10 +119,27 @@ func requireDocument(t *testing.T, doc mapstr.M, count int64, duration float64) 
 	require.InDelta(t, duration, doc["duration_delta_in_millis"], 1e-9)
 }
 
-func TestFirstScrapeProducesNothing(t *testing.T) {
+func TestFirstScrapeReportsTheStatusCodesWithoutTheChanges(t *testing.T) {
 	s := &state{}
 
-	require.Empty(t, scrape(s, start, node(searchNodeA, "search", hist(searchMetric, 200, 100, 5000))))
+	docs := scrape(s, start, node(searchNodeA, "search", hist(searchMetric, 200, 100, 5000), hist(searchMetric, 429, 7, 14)), node(indexNodeA, "index", hist(bulkMetric, 201, 3, 30)))
+
+	// there is nothing to subtract the cumulative values from, and no time since a previous scrape
+	require.Len(t, docs, 3)
+
+	for _, doc := range docs {
+		require.ElementsMatch(t, []string{"tier", "status_code", "status_group"}, keys(doc))
+	}
+
+	require.Equal(t, "4xx", find(t, docs, "search", 429)["status_group"])
+	require.Equal(t, "2xx", find(t, docs, "index", 201)["status_group"])
+}
+
+func TestFirstScrapeOfATierWithoutRequestsReportsNothing(t *testing.T) {
+	s := &state{}
+
+	// the zeros of a quiet tier are the changes since the previous scrape, so there are none yet
+	require.Empty(t, scrape(s, start, node(searchNodeA, "search")))
 }
 
 func TestDeltaRateAndLatency(t *testing.T) {
@@ -334,20 +351,41 @@ func TestNewNodeIsIgnoredUntilItHasABaseline(t *testing.T) {
 	requireDocument(t, find(t, docs, "search", 200), 30, 500)
 }
 
-func TestNewStatusCodeOnKnownNodeIsIgnoredOnce(t *testing.T) {
+func TestNewStatusCodeOnKnownNodeIsReportedWithoutTheChanges(t *testing.T) {
 	s := &state{}
 
 	scrape(s, start, node(searchNodeA, "search", hist(searchMetric, 200, 100, 1000)))
-	// the first 429 ever returned by the node: there is no previous value to compare it with
+	// the first 429 ever returned by the node: it is reported, but there is no previous value to subtract from
 	docs := scrape(s, start+tick, node(searchNodeA, "search", hist(searchMetric, 200, 110, 1100), hist(searchMetric, 429, 5, 10)))
 
-	require.Len(t, docs, 1)
+	require.Len(t, docs, 2)
 	requireDocument(t, find(t, docs, "search", 200), 10, 100)
 
+	first := find(t, docs, "search", 429)
+
+	require.Equal(t, "4xx", first["status_group"])
+	require.NotContains(t, first, "count_delta")
+	require.NotContains(t, first, "duration_delta_in_millis")
+	// the time since the previous scrape is known
+	require.EqualValues(t, tick, first["timestamp_diff"])
+
+	// from the next scrape it is compared like any other
 	docs = scrape(s, start+2*tick, node(searchNodeA, "search", hist(searchMetric, 200, 120, 1200), hist(searchMetric, 429, 9, 18)))
 
 	require.Len(t, docs, 2)
 	requireDocument(t, find(t, docs, "search", 429), 4, 8)
+}
+
+func TestStatusCodeThatComesBackIsReportedWithoutTheChanges(t *testing.T) {
+	s := &state{}
+
+	scrape(s, start, node(searchNodeA, "search", hist(searchMetric, 200, 100, 1000), hist(searchMetric, 429, 5, 10)))
+	// the 429 is not in a response (its metric is missing)
+	scrape(s, start+tick, node(searchNodeA, "search", hist(searchMetric, 200, 110, 1100)))
+	// and it is back with everything that it served, which cannot be attributed to this scrape
+	docs := scrape(s, start+2*tick, node(searchNodeA, "search", hist(searchMetric, 200, 120, 1200), hist(searchMetric, 429, 50, 100)))
+
+	require.NotContains(t, find(t, docs, "search", 429), "count_delta")
 }
 
 func TestNodeThatDisappearsIsForgotten(t *testing.T) {
@@ -365,15 +403,16 @@ func TestNodeThatDisappearsIsForgotten(t *testing.T) {
 	requireDocument(t, find(t, docs, "search", 200), 10, 100)
 }
 
-func TestNewTierIsNotReportedUntilItHasABaseline(t *testing.T) {
+func TestNewTierIsReportedWithoutTheChangesUntilItHasABaseline(t *testing.T) {
 	s := &state{}
 
 	scrape(s, start, node(searchNodeA, "search", hist(searchMetric, 200, 100, 1000)))
 	// the indexing tier shows up later, and must not report an (incorrect) zero for a scrape it was not compared in
 	docs := scrape(s, start+tick, node(searchNodeA, "search", hist(searchMetric, 200, 110, 1100)), node(indexNodeA, "index", hist(bulkMetric, 200, 50, 500)))
 
-	require.Len(t, docs, 1)
-	require.Equal(t, "search", docs[0]["tier"])
+	require.Len(t, docs, 2)
+	require.NotContains(t, find(t, docs, "index", 200), "count_delta")
+	requireDocument(t, find(t, docs, "search", 200), 10, 100)
 
 	docs = scrape(s, start+2*tick, node(searchNodeA, "search", hist(searchMetric, 200, 120, 1200)), node(indexNodeA, "index", hist(bulkMetric, 200, 60, 700)))
 
@@ -401,9 +440,12 @@ func TestEmptyResponseStartsOver(t *testing.T) {
 	scrape(s, start, node(searchNodeA, "search", hist(searchMetric, 200, 100, 1000)))
 	require.Empty(t, scrape(s, start+tick))
 	// the nodes are back, but they were not compared with anything
-	require.Empty(t, scrape(s, start+2*tick, node(searchNodeA, "search", hist(searchMetric, 200, 200, 2000))))
+	docs := scrape(s, start+2*tick, node(searchNodeA, "search", hist(searchMetric, 200, 200, 2000)))
 
-	docs := scrape(s, start+3*tick, node(searchNodeA, "search", hist(searchMetric, 200, 210, 2100)))
+	require.Len(t, docs, 1)
+	require.NotContains(t, docs[0], "count_delta")
+
+	docs = scrape(s, start+3*tick, node(searchNodeA, "search", hist(searchMetric, 200, 210, 2100)))
 
 	requireDocument(t, docs[0], 10, 100)
 }
@@ -414,7 +456,11 @@ func TestResetForgetsEverything(t *testing.T) {
 	scrape(s, start, node(searchNodeA, "search", hist(searchMetric, 200, 100, 1000)))
 	s.reset()
 
-	require.Empty(t, scrape(s, start+tick, node(searchNodeA, "search", hist(searchMetric, 200, 200, 2000))))
+	docs := scrape(s, start+tick, node(searchNodeA, "search", hist(searchMetric, 200, 200, 2000)))
+
+	require.Len(t, docs, 1)
+	require.NotContains(t, docs[0], "count_delta")
+	require.NotContains(t, docs[0], "timestamp_diff")
 }
 
 func TestDocumentsAreInAStableOrder(t *testing.T) {

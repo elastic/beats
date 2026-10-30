@@ -31,26 +31,44 @@ var tierStatsState = &state{}
 // compute converts the cumulative histograms into one document per tier and HTTP status code, which are the changes since the previous
 // scrape that are added together across all of the tier's nodes and actions.
 //
-// A series is only counted when it has a previous value, so the first sample is ignored for a node (and for a status code that a node has
-// not returned before), and a series whose count went backwards (the node restarted) is ignored. Every tier that has a node that was
-// in the previous scrape gets a document for successful (2xx) requests even if there were none, so that quiet tiers report zeros
-// rather than nothing, and the other status codes are only reported when there were requests.
+// Every status code that a tier returns gets a document in every scrape. The first one for a status code (the first scrape, or the first
+// time that the tier returns the status code) has no count_delta or duration_delta, because there is no previous scrape to subtract
+// them from, but it still reports that the status code was returned.
+//
+// Within a status code that was already returned, a node's series is only counted when it has a previous value, so a node that was not in
+// the previous scrape is ignored once, and a series whose count went backwards (the node restarted) is ignored. Every tier that has a
+// node that was in the previous scrape gets a document for successful (2xx) requests even if there were none, so that quiet tiers
+// report zeros rather than nothing, and the other status codes are only reported when there were requests.
 func (s *state) compute(current snapshot, nowMillis int64) []mapstr.M {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	previous := s.previous
+	hasPreviousScrape := s.previousTimestamp != 0
 	timestampDiff := nowMillis - s.previousTimestamp
-	hasPrevious := s.previousTimestamp != 0 && previous.series != nil
 
 	s.previous = current
 	s.previousTimestamp = nowMillis
 
-	if !hasPrevious || timestampDiff <= 0 {
+	if hasPreviousScrape && timestampDiff <= 0 {
 		return nil
 	}
 
+	// what each tier returned before, to know which status codes are new
+	returnedBefore := map[string]map[int]bool{}
+
+	for key := range previous.series {
+		tier := previous.instances[key.instance]
+
+		if returnedBefore[tier] == nil {
+			returnedBefore[tier] = map[int]bool{}
+		}
+
+		returnedBefore[tier][key.status] = true
+	}
+
 	tiers := map[string]bool{}
+	// a nil delta is a status code that is new, which has nothing to subtract from
 	deltas := map[string]map[int]*delta{}
 
 	for instance, tier := range current.instances {
@@ -60,20 +78,30 @@ func (s *state) compute(current snapshot, nowMillis int64) []mapstr.M {
 	}
 
 	for key, value := range current.series {
-		before, known := previous.series[key]
-
-		// the first sample cannot be compared, a count that went backwards means that the node restarted, and the same count means that
-		// there were no requests
-		if !known || value.count <= before.count {
-			continue
-		}
-
 		tier := current.instances[key.instance]
 		statuses := deltas[tier]
 
 		if statuses == nil {
 			statuses = map[int]*delta{}
 			deltas[tier] = statuses
+		}
+
+		if !returnedBefore[tier][key.status] {
+			tiers[tier] = true
+
+			if _, seen := statuses[key.status]; !seen {
+				statuses[key.status] = nil
+			}
+
+			continue
+		}
+
+		before, known := previous.series[key]
+
+		// a node that is new for a status code that was already returned cannot be compared, a count that went backwards means that the
+		// node restarted, and the same count means that there were no requests
+		if !known || value.count <= before.count {
+			continue
 		}
 
 		change := statuses[key.status]
@@ -87,11 +115,11 @@ func (s *state) compute(current snapshot, nowMillis int64) []mapstr.M {
 		change.duration += max(value.sum-before.sum, 0)
 	}
 
-	return buildDocuments(tiers, deltas, timestampDiff)
+	return buildDocuments(tiers, deltas, timestampDiff, hasPreviousScrape)
 }
 
 // buildDocuments creates the documents in a stable order (by tier, then by status code).
-func buildDocuments(tiers map[string]bool, deltas map[string]map[int]*delta, timestampDiff int64) []mapstr.M {
+func buildDocuments(tiers map[string]bool, deltas map[string]map[int]*delta, timestampDiff int64, hasPreviousScrape bool) []mapstr.M {
 	sortedTiers := make([]string, 0, len(tiers))
 
 	for tier := range tiers {
@@ -111,21 +139,21 @@ func buildDocuments(tiers map[string]bool, deltas map[string]map[int]*delta, tim
 			hasSuccess = hasSuccess || isSuccess(status)
 		}
 
-		// a quiet tier still reports that it had no requests
-		if !hasSuccess {
+		// a quiet tier still reports that it had no requests, but only when there is a previous scrape to compare it with
+		if !hasSuccess && hasPreviousScrape {
 			statuses = append(statuses, 200)
 		}
 
 		slices.Sort(statuses)
 
 		for _, status := range statuses {
-			change := deltas[tier][status]
+			change, hasChange := deltas[tier][status]
 
-			if change == nil {
+			if !hasChange {
 				change = &delta{}
 			}
 
-			docs = append(docs, document(tier, status, change, timestampDiff))
+			docs = append(docs, document(tier, status, change, timestampDiff, hasPreviousScrape))
 		}
 	}
 
@@ -137,14 +165,23 @@ func isSuccess(status int) bool {
 }
 
 // document is the data for one tier and HTTP status code. The rate and the latency are not reported: they are calculated from the
-// count and the duration of all the scrapes in the period that is being read, which cannot be done from per scrape values.
-func document(tier string, status int, change *delta, timestampDiff int64) mapstr.M {
-	return mapstr.M{
-		"tier":                     tier,
-		"status_code":              status,
-		"status_group":             fmt.Sprintf("%dxx", status/100),
-		"count_delta":              change.count,
-		"duration_delta_in_millis": change.duration,
-		timestampDiffField:         timestampDiff,
+// count and the duration of all the scrapes in the period that is being read, which cannot be done from per scrape values. A nil change
+// is a status code that was not returned before, which has no count or duration.
+func document(tier string, status int, change *delta, timestampDiff int64, hasPreviousScrape bool) mapstr.M {
+	doc := mapstr.M{
+		"tier":         tier,
+		"status_code":  status,
+		"status_group": fmt.Sprintf("%dxx", status/100),
 	}
+
+	if change != nil {
+		doc["count_delta"] = change.count
+		doc["duration_delta_in_millis"] = change.duration
+	}
+
+	if hasPreviousScrape {
+		doc[timestampDiffField] = timestampDiff
+	}
+
+	return doc
 }

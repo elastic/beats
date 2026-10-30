@@ -155,11 +155,15 @@ func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, response *NodesMetr
 	for index, doc := range docs {
 		// the milliseconds between the scrapes is not specific to this metricset: it is the root-level timestamp_diff that other
 		// documents (such as the ones of the shards) already have, so it is not one of the fields of the metricset
-		timestampDiff := doc[timestampDiffField]
+		timestampDiff, hasTimestampDiff := doc[timestampDiffField]
 		delete(doc, timestampDiffField)
 
 		event := e.CreateEvent(info, doc, transactionID)
-		event.RootFields[timestampDiffField] = timestampDiff
+
+		// the first scrape has no previous one to measure the time from
+		if hasTimestampDiff {
+			event.RootFields[timestampDiffField] = timestampDiff
+		}
 
 		e.ReportEvent(r, event, index, len(docs))
 	}
