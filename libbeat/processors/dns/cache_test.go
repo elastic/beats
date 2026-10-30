@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -44,7 +45,7 @@ func (r *stubResolver) Lookup(ip string, _ queryType) (*result, error) {
 func TestCache(t *testing.T) {
 	c, err := newLookupCache(
 		monitoring.NewRegistry(),
-		defaultConfig().cacheConfig,
+		defaultConfig().CacheConfig,
 		&stubResolver{})
 	if err != nil {
 		t.Fatal(err)
@@ -128,7 +129,7 @@ func TestCache(t *testing.T) {
 }
 
 func TestDisabledCache(t *testing.T) {
-	config := defaultConfig().cacheConfig
+	config := defaultConfig().CacheConfig
 	config.SuccessCache.Enabled = false
 	config.FailureCache.Enabled = false
 
@@ -151,5 +152,28 @@ func TestDisabledCache(t *testing.T) {
 		assert.EqualValues(t, []string{gatewayName}, r.Data)
 		assert.EqualValues(t, 0, c.stats.Hit.Get())
 		assert.EqualValues(t, 2, c.stats.Miss.Get())
+	}
+}
+
+func TestCacheEnabledSettingsAreIndependent(t *testing.T) {
+	for _, tc := range []struct {
+		name           string
+		successEnabled bool
+		failureEnabled bool
+	}{
+		{name: "only success cache disabled", successEnabled: false, failureEnabled: true},
+		{name: "only failure cache disabled", successEnabled: true, failureEnabled: false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			config := defaultConfig().CacheConfig
+			config.SuccessCache.Enabled = tc.successEnabled
+			config.FailureCache.Enabled = tc.failureEnabled
+
+			c, err := newLookupCache(monitoring.NewRegistry(), config, &stubResolver{})
+			require.NoError(t, err, "creating the lookup cache")
+
+			assert.Equal(t, tc.successEnabled, c.success.enabled, "success cache must follow success_cache.enabled")
+			assert.Equal(t, tc.failureEnabled, c.failure.enabled, "failure cache must follow failure_cache.enabled")
+		})
 	}
 }
