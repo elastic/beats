@@ -162,14 +162,14 @@ func Update() {
 func includeList() error {
 	options := devtools.DefaultIncludeListOptions()
 	options.ImportDirs = []string{"input/*", "processors/*"}
-	options.BuildTags = "\n//go:build !securityonly\n"
+	options.BuildTags = "\n//go:build !edr\n"
 	if err := devtools.GenerateIncludeListGo(options); err != nil {
 		return err
 	}
-	// generate include/list_securityonly.go
+	// generate include/list_edr.go
 	return devtools.GenerateIncludeListGo(devtools.IncludeListOptions{
-		Outfile:               "include/list_securityonly.go",
-		BuildTags:             "\n//go:build securityonly\n",
+		Outfile:               "include/list_edr.go",
+		BuildTags:             "\n//go:build edr\n",
 		Pkg:                   "include",
 		ForceInitializeModule: true,
 	})
