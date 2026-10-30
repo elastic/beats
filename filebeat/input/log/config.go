@@ -58,7 +58,7 @@ type config struct {
 	FileIdentity   *conf.Namespace `config:"file_identity"`
 
 	// Harvester
-	BufferSize int    `config:"harvester_buffer_size"`
+	BufferSize int    `config:"harvester_buffer_size" validate:"min=0,nonzero"`
 	Encoding   string `config:"encoding"`
 	ScanOrder  string `config:"scan.order"`
 	ScanSort   string `config:"scan.sort"`
