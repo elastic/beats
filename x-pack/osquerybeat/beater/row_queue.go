@@ -79,6 +79,7 @@ func (q *rowQueue[T]) push(item T) {
 // is none. The caller holds q.mu and ensures the queue is not empty.
 func (q *rowQueue[T]) evict() T {
 	victim := q.items.Front()
+	// Repeated evictions rescan from the front; that is fine because n is small.
 	for e := victim; q.first > 0 && e != nil; e = e.Next() {
 		v, ok := e.Value.(T)
 		if !ok {
@@ -156,8 +157,8 @@ func (q *rowQueue[T]) pop(ctx context.Context) (T, bool) {
 }
 
 // requeue returns a popped item to the front of the queue, as its oldest
-// item, evicting the oldest items until the queue fits or only one item
-// remains.
+// item. It then evicts items as evict picks them until the queue fits or
+// only one item remains, so it can evict item itself.
 func (q *rowQueue[T]) requeue(item T) {
 	q.mu.Lock()
 	q.items.PushFront(item)
