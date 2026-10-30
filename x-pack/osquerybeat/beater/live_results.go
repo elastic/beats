@@ -7,6 +7,7 @@ package beater
 import (
 	"context"
 	"errors"
+	"fmt"
 	"slices"
 	"sync"
 	"sync/atomic"
@@ -96,8 +97,11 @@ func (d *liveResultDispatcher) setTimeout(timeout time.Duration) {
 // all hits are handed to Publish, ctx is done, the timeout elapses or the
 // dispatcher stops. It returns the number of hits handed over. Hits not
 // handed over by then are skipped; one already inside a blocked Publish cannot
-// be pulled back and may be delivered late. ctx is the agent client's
-// lifetime context, so its end counts as a shutdown.
+// be pulled back and may be delivered late. On the process runtime ctx is
+// the agent client's lifetime context. On the OTel runtime it is the action
+// request's context, which ends at the Fleet action timeout (1 minute by
+// default, or the action's own timeout). So the end of ctx counts as a
+// shutdown only while the dispatcher is stopping, and as a timeout otherwise.
 func (d *liveResultDispatcher) publishResults(ctx context.Context, pub actionQueryPublisher, job liveJob) (int, error) {
 	it := &liveItem{job: job, pub: pub, done: make(chan struct{})}
 	if !d.push(it) {
@@ -111,12 +115,16 @@ func (d *liveResultDispatcher) publishResults(ctx context.Context, pub actionQue
 	t := time.NewTimer(time.Duration(d.timeout.Load()))
 	defer t.Stop()
 	reason := ""
+	var ctxErr error // ctx's error when it ended while not stopping
 	select {
 	case <-it.done:
 	case <-t.C:
 		reason = dropTimeout
 	case <-ctx.Done():
 		reason = dropShutdown
+		if !d.isStopping() {
+			reason, ctxErr = dropTimeout, ctx.Err()
+		}
 	case <-d.stopping:
 	}
 	d.abandon(it)
@@ -141,6 +149,9 @@ func (d *liveResultDispatcher) publishResults(ctx context.Context, pub actionQue
 		// Only the profile was lost. The action reports its query's outcome,
 		// not the profile's.
 		return n, nil
+	}
+	if ctxErr != nil {
+		return n, fmt.Errorf("%w: %w", errLivePublishTimeout, ctxErr)
 	}
 	return n, liveDropErrors[reason]
 }
