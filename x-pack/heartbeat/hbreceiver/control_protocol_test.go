@@ -13,7 +13,6 @@ import (
 	"errors"
 	"io"
 	"net"
-	"path/filepath"
 	"sync"
 	"testing"
 	"time"
@@ -214,7 +213,8 @@ func newFakeAgent(t *testing.T) *fakeAgent {
 	agent := &fakeAgent{changed: make(chan struct{})}
 	proto.RegisterElasticAgentServer(server, agent)
 
-	socket := filepath.Join(t.TempDir(), "units.sock")
+	// t.TempDir() can be too long for a unix socket path on macOS.
+	socket := genSocketPath()
 	listener, err := (&net.ListenConfig{}).Listen(t.Context(), "unix", socket)
 	require.NoError(t, err)
 	go func() { _ = server.Serve(listener) }()
