@@ -1,0 +1,9 @@
+kind: bug-fix
+
+# REQUIRED for all kinds
+# Change summary; a 80ish characters long description of the change.
+summary: Fix a memory leak in beat receivers that kept the status of every input that was ever stopped.
+
+# REQUIRED for all kinds
+# Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
+component: all
