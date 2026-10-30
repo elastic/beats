@@ -40,6 +40,15 @@ worker is publishing does not count against the limit and is never dropped for
 space. A policy change applies the new limit; shrinking it drops the oldest
 items.
 
+In a burst, rows are dropped only once libbeat's queue is full and more than
+`max_events` rows (3200 by default) wait here; the queue does not wait before
+it drops them, because a wait would hold osqueryd's logger RPC again.
+
+A dropped differential result is lost for good. osqueryd updates its diff
+baseline before it logs the result, so it does not report those added or
+removed rows again. A snapshot query, the default, reports all its rows on
+its next run.
+
 `max_age` drops items that waited longer than this when the worker reaches
 them.
 
