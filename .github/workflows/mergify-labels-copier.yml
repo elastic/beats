@@ -13,10 +13,15 @@ jobs:
     runs-on: ubuntu-latest
     if: startsWith(github.head_ref, 'mergify/bp/')
     permissions:
+<<<<<<< HEAD
       # Add GH labels
       pull-requests: write
       # See https://github.com/cli/cli/issues/6274
       repository-projects: read
+=======
+      # OIDC for create-token (required when use-ephemeral-token is true)
+      id-token: write
+>>>>>>> a77c52a (Drop unused GITHUB_TOKEN job permissions from labels copier. (#54112))
     steps:
       - uses: elastic/oblt-actions/mergify/labels-copier@v1
         with:
