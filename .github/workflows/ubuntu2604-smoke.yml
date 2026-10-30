@@ -1,0 +1,184 @@
+name: ubuntu2604-smoke
+
+# Temporary: checks auditbeat and packetbeat build, pass unit tests and run on
+# Ubuntu 26.04 (x86_64 and arm64) for the support matrix.
+# Not meant to be merged.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/ubuntu2604-smoke.yml
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: ${{ matrix.beat }} on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-26.04, ubuntu-26.04-arm]
+        beat: [auditbeat, x-pack/auditbeat, packetbeat, x-pack/packetbeat]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+
+      # auditbeat's auditd module needs the kernel audit socket to itself.
+      - name: OS info
+        run: |
+          cat /etc/os-release && uname -a
+          echo "auditd: $(systemctl is-active auditd || true)"
+          sudo systemctl stop auditd 2>/dev/null || true
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: .go-version
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version-file: .python-version
+
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install -y libpcap-dev
+
+      - name: Install mage
+        run: make mage
+
+      - name: Run build
+        working-directory: ${{ matrix.beat }}
+        run: mage build
+
+      # Keep going on test failures so the run step still tells us whether
+      # the beat starts.
+      - name: Run unitTest
+        continue-on-error: true
+        working-directory: ${{ matrix.beat }}
+        run: mage unitTest
+
+      - name: Run beat and check it publishes events
+        timeout-minutes: 10
+        shell: bash
+        working-directory: ${{ matrix.beat }}
+        env:
+          BEAT_DIR: ${{ matrix.beat }}
+        run: |
+          set -euo pipefail
+          name=$(basename "$BEAT_DIR")
+          work=$(mktemp -d)
+          mkdir -p "$work/fim-fsnotify" "$work/fim-kprobes" "$work/fim-ebpf" "$work/out"
+
+          fim_modules="
+          - module: file_integrity
+            backend: fsnotify
+            paths: [$work/fim-fsnotify]
+          - module: file_integrity
+            backend: kprobes
+            paths: [$work/fim-kprobes]
+          - module: file_integrity
+            backend: ebpf
+            paths: [$work/fim-ebpf]"
+
+          case "$BEAT_DIR" in
+            auditbeat)
+              cat > "$work/beat.yml" <<EOF
+          auditbeat.modules:
+          - module: auditd
+            audit_rules: |
+              -a always,exit -F arch=b64 -S execve -k exec
+              -w /etc/hosts -p wa -k hosts
+          $fim_modules
+          EOF
+              ;;
+            x-pack/auditbeat)
+              cat > "$work/beat.yml" <<EOF
+          auditbeat.modules:
+          - module: auditd
+            audit_rules: |
+              -a always,exit -F arch=b64 -S execve -k exec
+              -w /etc/hosts -p wa -k hosts
+          $fim_modules
+          - module: system
+            datasets: [host, login, package, process, socket, user]
+            period: 10s
+            state.period: 1m
+          EOF
+              ;;
+            *packetbeat)
+              cat > "$work/beat.yml" <<EOF
+          packetbeat.interfaces.device: any
+          packetbeat.flows:
+            timeout: 10s
+            period: 5s
+          packetbeat.protocols:
+          - type: dns
+            ports: [53]
+          - type: http
+            ports: [80]
+          EOF
+              ;;
+          esac
+          cat >> "$work/beat.yml" <<EOF
+          output.file:
+            path: $work/out
+            filename: events
+          logging.level: info
+          EOF
+
+          sudo "./$name" -e --strict.perms=false -c "$work/beat.yml" \
+            --path.home "$work/home" > "$work/beat.log" 2>&1 &
+          pid=$!
+          echo "started $name (pid $pid)"
+
+          sleep 20
+          for i in 1 2 3; do
+            echo "generating activity $i"
+            for b in fsnotify kprobes ebpf; do
+              echo "change $i" >> "$work/fim-$b/test.txt"
+            done
+            echo "# smoke $i" | sudo tee -a /etc/hosts > /dev/null
+            curl -s -o /dev/null --max-time 10 http://example.com || true
+            getent hosts example.com > /dev/null || true
+            sleep 5
+          done
+          sleep 15
+
+          if ! sudo kill -0 "$pid" 2>/dev/null; then
+            echo "::error::$name exited early"
+            cat "$work/beat.log"
+            exit 1
+          fi
+          # SIGTERM, not SIGINT: background jobs in a non-interactive shell
+          # start with SIGINT ignored, so the beat would never stop.
+          echo "stopping $name"
+          sudo pkill -TERM -x "$name" || true
+          for i in $(seq 1 30); do
+            sudo pgrep -x "$name" > /dev/null || break
+            sleep 1
+          done
+          if sudo pgrep -x "$name" > /dev/null; then
+            echo "::warning::$name did not stop within 30s of SIGTERM, killing"
+            sudo pkill -KILL -x "$name" || true
+          fi
+          wait "$pid" || true
+
+          events=$(sudo cat "$work"/out/events* 2>/dev/null || true)
+          echo "---- log (errors and warnings) ----"
+          grep -E '"log.level":"(error|warn)"' "$work/beat.log" || echo "none"
+          echo "---- events by dataset ----"
+          echo "$events" | grep -o '"dataset":"[^"]*"' | sort | uniq -c || true
+          if [[ "$BEAT_DIR" == *auditbeat ]]; then
+            echo "---- file_integrity events by backend ----"
+            for b in fsnotify kprobes ebpf; do
+              echo "$b: $(echo "$events" | grep -c "fim-$b/test.txt" || true)"
+            done
+          fi
+          count=$(echo "$events" | grep -c . || true)
+          echo "total events: $count"
+          if [ "$count" -eq 0 ]; then
+            echo "::error::$name published no events"
+            tail -100 "$work/beat.log"
+            exit 1
+          fi
