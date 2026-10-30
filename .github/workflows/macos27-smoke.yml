@@ -37,6 +37,7 @@ jobs:
           beat: ${{ matrix.beat }}
 
       - name: Run beat and check it publishes events
+        timeout-minutes: 10
         shell: bash
         working-directory: ${{ matrix.beat }}
         env:
@@ -93,11 +94,14 @@ jobs:
             --path.home "$work/home" > "$work/beat.log" 2>&1 &
           pid=$!
 
+          echo "started $name (pid $pid)"
+
           sleep 15
           for i in 1 2 3; do
+            echo "generating activity $i"
             echo "change $i" >> "$work/fim/test.txt"
-            curl -s -o /dev/null http://example.com || true
-            nslookup example.com > /dev/null || true
+            curl -s -o /dev/null --max-time 10 http://example.com || true
+            nslookup -timeout=3 example.com > /dev/null || true
             sleep 5
           done
           sleep 15
@@ -107,7 +111,18 @@ jobs:
             cat "$work/beat.log"
             exit 1
           fi
-          sudo kill -INT "$pid" || true
+          # SIGTERM, not SIGINT: background jobs in a non-interactive shell
+          # start with SIGINT ignored, so the beat would never stop.
+          echo "stopping $name"
+          sudo pkill -TERM -x "$name" || true
+          for i in $(seq 1 30); do
+            sudo pgrep -x "$name" > /dev/null || break
+            sleep 1
+          done
+          if sudo pgrep -x "$name" > /dev/null; then
+            echo "::warning::$name did not stop within 30s of SIGTERM, killing"
+            sudo pkill -KILL -x "$name" || true
+          fi
           wait "$pid" || true
 
           echo "---- log (errors and warnings) ----"
