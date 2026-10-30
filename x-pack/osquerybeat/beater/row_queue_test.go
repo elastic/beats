@@ -237,6 +237,13 @@ func TestScheduledResultRowsCountsDiff(t *testing.T) {
 	assert.Equal(t, 6, r.rows(), "added and removed rows plus the response document")
 }
 
+func TestResolvedScheduledResultRowsCountsProfile(t *testing.T) {
+	r := resolvedScheduledResult{batches: []resolvedRows{{hits: make([]map[string]any, 2)}, {hits: make([]map[string]any, 3)}}}
+	assert.Equal(t, 6, r.rows(), "rows of every batch plus the response document")
+	r.profile = map[string]any{}
+	assert.Equal(t, 7, r.rows(), "a profile document counts as one more row")
+}
+
 func TestRowQueueObservesEveryChange(t *testing.T) {
 	q, _ := newTestRowQueue(10)
 	var got [2]int
