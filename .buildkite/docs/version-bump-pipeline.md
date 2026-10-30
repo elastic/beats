@@ -22,6 +22,7 @@ Buildkite pipeline triggers and branch filters are not specified in this checked
 
 | Step | Runs when / agent | Depends on | Configured work |
 | --- | --- | --- | --- |
+| :slack: Notify team version bump started | condition `build.branch == 'main' \|\| build.branch =~ /^[0-9]+\.[0-9x]+\$/` | None declared | runs configured command; notifies Slack channel `#ingest-notifications` |
 | :rocket: Trigger ingest-dev minor/major release | condition `build.env("WORKFLOW") == "minor" \|\| build.env("WORKFLOW") == "major"` | None declared | triggers pipeline `ingest-dev-pipeline-release-minor-major`; trigger build fields `["branch", "message", "env", "env.REPOSITORY", "env.RELEASE_TYPE", "env.CURRENT_RELEASE", "env.DISABLE_DEV_ISSUE", "env.REVIEWERS"]`; key `bump-version-minor-major` |
 | :rocket: Trigger ingest-dev patch release | condition `build.env("WORKFLOW") == "patch"` | None declared | triggers pipeline `ingest-dev-pipeline-release-patch`; trigger build fields `["branch", "message", "env", "env.REPOSITORY", "env.CURRENT_RELEASE", "env.DISABLE_DEV_ISSUE", "env.REVIEWERS"]`; key `bump-version-patch` |
 | Ready to fetch for DRA artifacts? | No step-level condition or agent declared | None declared | key `block-get-dra-artifacts` |
