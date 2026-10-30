@@ -30,7 +30,6 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalctl"
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -120,7 +119,7 @@ func TestMultilineParserPreservesJournaldCheckpoint(t *testing.T) {
 
 	mock := &journalReaderMock{
 		CloseFunc: func() error { return nil },
-		NextFunc: func(cancel v2.Canceler) (journalctl.JournalEntry, error) {
+		NextFunc: func(cancel context.Context) (journalctl.JournalEntry, error) {
 			if call >= len(lines) {
 				return journalctl.JournalEntry{}, io.EOF
 			}

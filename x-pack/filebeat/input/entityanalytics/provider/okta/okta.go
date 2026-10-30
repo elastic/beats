@@ -36,7 +36,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/go-concert/ctxtool"
 )
 
 func init() {
@@ -124,7 +123,7 @@ func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	}
 
 	var err error
-	p.client, err = newClient(ctxtool.FromCanceller(inputCtx.Cancelation), p.cfg, p.logger)
+	p.client, err = newClient(inputCtx.Cancelation, p.cfg, p.logger)
 	if err != nil {
 		return err
 	}
@@ -325,7 +324,7 @@ func (p *oktaInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, clien
 	wantUsers := p.cfg.wantUsers()
 	wantDevices := p.cfg.wantDevices()
 	if wantUsers || wantDevices {
-		ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
+		ctx := inputCtx.Cancelation
 		p.logger.Debugf("Starting fetch...")
 
 		tracker := kvstore.NewTxTracker(ctx)
@@ -386,7 +385,7 @@ func (p *oktaInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Sto
 		}
 	}()
 
-	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
+	ctx := inputCtx.Cancelation
 	tracker := kvstore.NewTxTracker(ctx)
 
 	if p.cfg.wantUsers() {

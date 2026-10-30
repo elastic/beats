@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/mito/lib"
 )
 
@@ -94,7 +93,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.URL)
 
-	ctx := ctxtool.FromCanceller(env.Cancelation)
+	ctx := env.Cancelation
 	var (
 		s   StreamFollower
 		err error

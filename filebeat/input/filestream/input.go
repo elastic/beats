@@ -18,6 +18,7 @@
 package filestream
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -450,7 +451,7 @@ func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
 // responsible for closing it.
 func (inp *filestream) buildPipeline(
 	log *logp.Logger,
-	canceler input.Canceler,
+	canceler context.Context,
 	f File,
 	encoding encoding.Encoding,
 	fs fileSource,
