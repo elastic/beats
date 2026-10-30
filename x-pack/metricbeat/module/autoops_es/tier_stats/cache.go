@@ -62,8 +62,9 @@ func (s *state) compute(current snapshot, nowMillis int64) []mapstr.M {
 	for key, value := range current.series {
 		before, known := previous.series[key]
 
-		// the first sample cannot be compared and a count that went backwards means that the node restarted
-		if !known || value.count < before.count || value.count == before.count {
+		// the first sample cannot be compared, a count that went backwards means that the node restarted, and the same count means that
+		// there were no requests
+		if !known || value.count <= before.count {
 			continue
 		}
 
