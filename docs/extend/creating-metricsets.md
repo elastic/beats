@@ -322,7 +322,7 @@ metricbeat:
 ```
 
 ::::{note}
-Make sure that you run `make collect` after updating the config file so that your changes are also applied to the global configuration file and the docs.
+Make sure that you run `mage update` after updating the config file so that your changes are also applied to the global configuration file and the docs.
 ::::
 
 
