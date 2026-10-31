@@ -22,11 +22,11 @@
 
         - name: num_fields
           description: >
-            If the SELECT query if successful, this field is set to the number
+            If the SELECT query is successful, this field is set to the number
             of fields returned.
 
         - name: num_rows
           description: >
-            If the SELECT query if successful, this field is set to the number
+            If the SELECT query is successful, this field is set to the number
             of rows returned.
 

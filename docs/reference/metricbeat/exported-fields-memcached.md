@@ -45,7 +45,7 @@ stats
 
 
 **`memcached.stats.connections.total`**
-:   Numer of successful connect attempts to this server since it has been started.
+:   Number of successful connect attempts to this server since it has been started.
 
     type: long
 
