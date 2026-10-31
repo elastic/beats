@@ -350,6 +350,12 @@ watermark settings
     type: keyword
 
 
+**`autoops_es.cluster_settings.defaults.cluster.routing.allocation.disk.watermark.flood_stage_frozen`**
+:   flood_stage.frozen watermark settings
+
+    type: keyword
+
+
 **`autoops_es.cluster_settings.defaults.cluster.routing.allocation.node_concurrent_outgoing_recoveries`**
 :   node_concurrent_outgoing_recoveries
 
@@ -546,6 +552,12 @@ watermark settings
     type: keyword
 
 
+**`autoops_es.cluster_settings.persistent.cluster.routing.allocation.disk.watermark.flood_stage_frozen`**
+:   flood_stage.frozen watermark settings
+
+    type: keyword
+
+
 **`autoops_es.cluster_settings.persistent.cluster.routing.allocation.node_concurrent_outgoing_recoveries`**
 :   node_concurrent_outgoing_recoveries
 
@@ -738,6 +750,12 @@ watermark settings
 
 **`autoops_es.cluster_settings.transient.cluster.routing.allocation.disk.watermark.flood_stage`**
 :   flood_stage watermark settings
+
+    type: keyword
+
+
+**`autoops_es.cluster_settings.transient.cluster.routing.allocation.disk.watermark.flood_stage_frozen`**
+:   flood_stage.frozen watermark settings
 
     type: keyword
 

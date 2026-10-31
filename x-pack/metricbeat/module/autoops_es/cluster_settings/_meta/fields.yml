@@ -64,6 +64,10 @@
                               type: keyword
                               description: >
                                 flood_stage watermark settings
+                            - name: flood_stage_frozen
+                              type: keyword
+                              description: >
+                                flood_stage.frozen watermark settings
                     - name: node_concurrent_outgoing_recoveries
                       type: keyword
                       description: >
@@ -239,6 +243,10 @@
                               type: keyword
                               description: >
                                 flood_stage watermark settings
+                            - name: flood_stage_frozen
+                              type: keyword
+                              description: >
+                                flood_stage.frozen watermark settings
                     - name: node_concurrent_outgoing_recoveries
                       type: keyword
                       description: >
@@ -414,6 +422,10 @@
                               type: keyword
                               description: >
                                 flood_stage watermark settings
+                            - name: flood_stage_frozen
+                              type: keyword
+                              description: >
+                                flood_stage.frozen watermark settings
                     - name: node_concurrent_outgoing_recoveries
                       type: keyword
                       description: >
