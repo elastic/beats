@@ -93,7 +93,7 @@ annotations:
 
 ### Multiple containers [_multiple_containers]
 
-When a pod has multiple containers, the settings are shared unless you add the container name in the hint. For example, these hints configure the container exposing port 8080 to do a HTTP check and have the `sidecar` container to have an TCP check.
+When a pod has multiple containers, the settings are shared unless you add the container name in the hint. For example, these hints configure the container exposing port 8080 to do an HTTP check and the `sidecar` container to do a TCP check.
 
 ```yaml
 annotations:
