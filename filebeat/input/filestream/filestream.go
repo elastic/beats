@@ -19,14 +19,12 @@ package filestream
 
 import (
 	"compress/gzip"
+	"context"
 	"errors"
 	"io"
 	"os"
 	"sync"
 
-	"github.com/elastic/go-concert/ctxtool"
-
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -49,9 +47,10 @@ var (
 // end, ErrFileTruncate when the file shrank, or ErrWouldBlock when an active file
 // has nothing to read yet.
 type logFile struct {
-	file      File
-	log       *logp.Logger
-	readerCtx ctxtool.CancelContext
+	file       File
+	log        *logp.Logger
+	readerCtx  context.Context
+	cancelFunc context.CancelFunc
 
 	closeOnEOF bool
 
@@ -62,7 +61,7 @@ type logFile struct {
 // newFileReader creates a new log instance to read log sources
 func newFileReader(
 	log *logp.Logger,
-	canceler input.Canceler,
+	canceler context.Context,
 	f File,
 	closerConfig closerConfig,
 ) (*logFile, error) {
@@ -71,12 +70,15 @@ func newFileReader(
 		return nil, err
 	}
 
+	ctx, cancel := context.WithCancel(canceler)
+
 	return &logFile{
 		file:       f,
 		log:        log,
 		closeOnEOF: closerConfig.Reader.OnEOF,
 		offset:     offset,
-		readerCtx:  ctxtool.WithCancelContext(ctxtool.FromCanceller(canceler)),
+		readerCtx:  ctx,
+		cancelFunc: cancel,
 	}, nil
 }
 
@@ -184,7 +186,7 @@ func (f *logFile) handleEOF() error {
 // Close cancels the reader. It does NOT close the underlying file handle, which
 // is owned by the harvester session.
 func (f *logFile) Close() error {
-	f.readerCtx.Cancel()
+	f.cancelFunc()
 	f.log.Debugf("Closed reader. Path='%s'", f.file.Name())
 	return nil
 }

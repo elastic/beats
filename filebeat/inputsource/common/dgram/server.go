@@ -117,7 +117,7 @@ func (l *Listener) Start() error {
 		})
 		defer connCancel()
 
-		return l.connectAndRun(ctxtool.FromCanceller(connCtx), conn)
+		return l.connectAndRun(connCtx, conn)
 	})
 	return nil
 }

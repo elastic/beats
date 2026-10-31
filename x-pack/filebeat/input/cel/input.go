@@ -59,7 +59,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 	"github.com/elastic/mito/lib"
 )
@@ -162,7 +161,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 
 	metrics, reg := newInputMetrics(env.MetricsRegistry, env.Logger)
 
-	ctx := ctxtool.FromCanceller(env.Cancelation)
+	ctx := env.Cancelation
 	otelTracerProvider := i.tracerProvider
 	if otelTracerProvider == nil {
 		var err error
