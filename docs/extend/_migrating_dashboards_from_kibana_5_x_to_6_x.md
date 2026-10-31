@@ -54,7 +54,7 @@ You can export the dashboards via the Kibana API by using the [export_dashboards
 For example, to export the Metricbeat rabbitmq dashboard:
 
 ```shell
-cd beats/metricbeat
+cd metricbeat
 go run ../dev-tools/cmd/dashboards/export_dashboards.go -dashboards Metricbeat-Rabbitmq -output
 module/rabbitmq/_meta/kibana/default/Metricbeat-Rabbitmq.json <1>
 ```
