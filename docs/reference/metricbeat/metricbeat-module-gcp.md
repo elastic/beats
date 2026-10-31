@@ -181,7 +181,7 @@ To restore the previous version, you can add a custom ingest pipeline to the Ela
 
 For more information on creating custom ingest pipelines and processors, please see the [Custom Ingest Pipelines](docs-content://reference/fleet/data-streams-pipeline-tutorial.md#data-streams-pipeline-two) guide.
 
-If `period` value is set to 5-minute and sample period of the metric type is 60-second, then this module will collect data from this metric type once every 5 minutes with aggregation. GCP monitoring data has a up to 240 seconds latency, which means latest monitoring data will be up to 4 minutes old. Please see [Latency of GCP Monitoring Metric Data](https://cloud.google.com/monitoring/api/v3/latency-n-retention) for more details. In `gcp` module, metrics are collected based on this ingest delay, which is also obtained from ListMetricDescriptors API.
+If `period` value is set to 5-minute and sample period of the metric type is 60-second, then this module will collect data from this metric type once every 5 minutes with aggregation. GCP monitoring data has up to 240 seconds of latency, which means the latest monitoring data will be up to 4 minutes old. Please see [Latency of GCP Monitoring Metric Data](https://cloud.google.com/monitoring/api/v3/latency-n-retention) for more details. In `gcp` module, metrics are collected based on this ingest delay, which is also obtained from ListMetricDescriptors API.
 
 
 ### Rough estimation of the number of API calls [gcp-api-requests]
