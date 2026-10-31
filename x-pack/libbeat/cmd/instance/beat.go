@@ -38,16 +38,29 @@ import (
 // input type.
 const receiverPublisherCloseTimeout = 5 * time.Second
 
+// fqdnLookupTimeout bounds the FQDN lookup. A lookup that cannot succeed, for
+// example because the DNS server does not answer, otherwise delays the start of
+// every receiver by the whole timeout. The lookup is best effort.
+const fqdnLookupTimeout = 5 * time.Second
+
+type fqdnLooker interface {
+	FQDNWithContext(ctx context.Context) (string, error)
+}
+
+func lookupFQDN(h fqdnLooker, timeout time.Duration) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	return h.FQDNWithContext(ctx)
+}
+
 var fqdnOnce = sync.OnceValues(func() (string, error) {
 	h, err := sysinfo.Host()
 	if err != nil {
 		return "", fmt.Errorf("failed to get host information: %w", err)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
-	defer cancel()
-
-	return h.FQDNWithContext(ctx)
+	return lookupFQDN(h, fqdnLookupTimeout)
 })
 
 // NewBeatForReceiver creates a Beat that will be used in the context of an otel receiver
