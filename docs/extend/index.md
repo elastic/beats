@@ -100,7 +100,7 @@ These commands have the following dependencies:
 * Python [venv module](https://docs.python.org/3/library/venv.html)
 * [Mage](https://github.com/magefile/mage)
 
-Python venv module is included in the standard library in Python 3. On Debian/Ubuntu systems it also requires to install the `python3-venv` package, that includes additional support scripts:
+Python venv module is included in the standard library in Python 3. On Debian/Ubuntu systems, you also need to install the `python3-venv` package, which includes additional support scripts:
 
 ```shell
 sudo apt-get install python3-venv
