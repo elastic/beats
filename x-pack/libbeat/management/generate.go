@@ -479,9 +479,9 @@ func metadataFromDatastreamValues(defaultDataStreamType string, expected *proto.
 	return setType, setDataset, setNamespace
 }
 
-// generate the output config, including shuffling around the `type` key
+// GroupByOutputs generates the output config, including shuffling around the `type` key
 // In V1, this was done by the groupByOutputs function buried in the AST init
-func groupByOutputs(outCfg *proto.UnitExpectedConfig) (*reload.ConfigWithMeta, error) {
+func GroupByOutputs(outCfg *proto.UnitExpectedConfig) (*reload.ConfigWithMeta, error) {
 	// We still need to emulate the InjectHeadersRule AST code,
 	// I don't think we can get the `Headers()` data reported by the AgentInfo()
 	sourceMap := outCfg.GetSource().AsMap()
