@@ -115,7 +115,7 @@ Module for parsing Snyk project vulnerabilities.
 
 
 **`snyk.vulnerabilities.is_upgradable`**
-:   If the vulnerability fixable by upgrading a dependency.
+:   If the vulnerability is fixable by upgrading a dependency.
 
     type: boolean
 
