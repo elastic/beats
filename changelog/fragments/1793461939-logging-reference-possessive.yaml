@@ -1,0 +1,7 @@
+kind: other
+
+summary: Fix the it's/its possessive in the logging reference config comment
+
+component: all
+
+issue: https://github.com/elastic/beats/issues/51216
