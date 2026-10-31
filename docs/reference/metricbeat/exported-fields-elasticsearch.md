@@ -2963,7 +2963,7 @@ shard fields
 
 
 **`elasticsearch.shard.relocating_node.id`**
-:   The node the shard was relocated from. It has the exact same value than relocating_node.name for compatibility purposes.
+:   The node the shard was relocated from. It has the exact same value as relocating_node.name for compatibility purposes.
 
     type: keyword
 
