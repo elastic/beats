@@ -133,7 +133,7 @@ func Configure(cfg *conf.C, logger *logp.Logger) ([]cursor.Source, cursor.Input,
 		}
 		chrootStat, err := os.Stat(config.Chroot)
 		if err != nil {
-			return nil, nil, fmt.Errorf("cannot stat chroot:  %w", err)
+			return nil, nil, fmt.Errorf("cannot stat chroot: %w", err)
 		}
 		if !chrootStat.IsDir() {
 			return nil, nil, fmt.Errorf("provided chroot (%s) is not a directory", config.Chroot)
