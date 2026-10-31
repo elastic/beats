@@ -34,7 +34,7 @@ Privilege requirements vary by backend.
 **ebpf**
 :   Requires `CAP_SYS_ADMIN` and `CAP_BPF` (or root), and a kernel version of 5.10.16 or later. The kernel BPF policy must permit eBPF programs.
 
-    In Docker containers, add `--cap-add=SYS_ADMIN --cap-add=BPF` and mount `/sys` from the host.
+    In Docker containers, add `--cap-add=SYS_ADMIN --cap-add=BPF --pid=host` and mount `/sys` from the host. In Kubernetes, set `hostPID: true` on the pod, as the reference DaemonSet manifest already does. The backend attributes each file event to the process that made the change by looking the process up in a table built from the host's `/proc` and kept current from kernel events. The kernel reports host process IDs, but without `--pid=host` the table is built from the container's own process IDs. Events from processes that were already running when Auditbeat started are then dropped, or attributed to the wrong process when a host process ID happens to match a container one. Auditbeat logs a warning at startup when it is not running in the host PID namespace.
 
 **ETW (Windows only)**
 :   Requires Administrator privileges.
@@ -52,7 +52,7 @@ At startup this module will perform an initial scan of the configured files and 
 
 The operating system features that power this feature are as follows.
 
-* Linux - Multiple backends are supported: `auto`, `fsnotify`, `kprobes`, `ebpf`. By default, `fsnotify` is used, and therefore the kernel must have inotify support. Inotify was initially merged into the 2.6.13 Linux kernel. The eBPF backend uses modern eBPF features and supports 5.10.16+ kernels. The `Kprobes` backend uses tracefs and supports 3.10+ kernels. FSNotify doesn’t have the ability to associate user data to file events. The preferred backend can be selected by specifying the `backend` config option. Since eBPF and Kprobes are in technical preview, `auto` will default to `fsnotify`.
+* Linux - Multiple backends are supported: `auto`, `fsnotify`, `kprobes`, `ebpf`. By default, `fsnotify` is used, and therefore the kernel must have inotify support. Inotify was initially merged into the 2.6.13 Linux kernel. The eBPF backend uses modern eBPF features and supports 5.10.16+ kernels. The eBPF backend is provided by [quark](https://github.com/elastic/quark). The `Kprobes` backend uses tracefs and supports 3.10+ kernels. FSNotify doesn’t have the ability to associate user data to file events. The preferred backend can be selected by specifying the `backend` config option. Since eBPF and Kprobes are in technical preview, `auto` defaults to `fsnotify`.
 * macOS (Darwin) - Uses the `FSEvents` API, present since macOS 10.5. This API coalesces multiple changes to a file into a single event. Auditbeat translates this coalesced changes into a meaningful sequence of actions. However, in rare situations the reported events may have a different ordering than what actually happened.
 * Windows:
   * `ReadDirectoryChangesW` is used.
