@@ -43,7 +43,7 @@ Please notice that ELB logs can take some minutes before being available in S3.
 Using terraform to deploy a testing scenario
 ====
 
-Terraform configuration is included in the metricset to deploy an scenario that deploys
+Terraform configuration is included in the metricset to deploy a scenario that deploys
 some instances with running services and a set of load balancers for these
 services.
 
