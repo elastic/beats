@@ -21,7 +21,7 @@ include::../include/gs-link.asciidoc[]
 [float]
 === Compatibility
 
-The Kibana modules is compatible with Kibana 6.3 and newer.
+The Kibana module is compatible with Kibana 6.3 and newer.
 
 include::../include/configuring-intro.asciidoc[]
 
