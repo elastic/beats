@@ -205,7 +205,10 @@ func getFileInfo(path string) (os.FileInfo, error) {
 		path = resolved
 	}
 	info, err := os.Lstat(path)
-	return info, fmt.Errorf("failed to stat: %w", err)
+	if err != nil {
+		return nil, fmt.Errorf("failed to stat: %w", err)
+	}
+	return info, nil
 }
 
 func (r *fsEventsReader) isWatched(path string) bool {

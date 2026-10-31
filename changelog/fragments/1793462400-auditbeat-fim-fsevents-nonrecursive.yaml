@@ -1,0 +1,5 @@
+kind: bug-fix
+summary: 'Fix Auditbeat file_integrity realtime events on macOS when recursive is false.'
+description: |
+  Corrected FSEvents file info handling so successful stat calls are not returned as errors. This restores realtime change event processing for non-recursive macOS file integrity watches.
+component: auditbeat
