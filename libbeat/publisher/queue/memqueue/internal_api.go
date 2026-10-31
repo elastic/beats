@@ -17,7 +17,11 @@
 
 package memqueue
 
-import "github.com/elastic/beats/v7/libbeat/publisher/queue"
+import (
+	"sync/atomic"
+
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+)
 
 // producer -> broker API
 
@@ -36,6 +40,11 @@ type pushRequest[T any] struct {
 	// multiple acknowledgments for a producer to a single callback call.
 	producerID producerID
 	resp       chan queue.EntryID
+
+	// claim is set only by PublishContext. The run loop and a cancelling
+	// producer race to set it; the run loop inserts the event only if it wins,
+	// so a request abandoned while still buffered in pushChan is discarded.
+	claim *atomic.Bool
 }
 
 // consumer -> broker API

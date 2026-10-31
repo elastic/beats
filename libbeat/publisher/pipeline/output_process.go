@@ -331,6 +331,10 @@ func (emptyProducer) Publish(_ publisher.Event) (queue.EntryID, bool) {
 	return 0, false
 }
 
+func (emptyProducer) PublishContext(context.Context, publisher.Event) (queue.EntryID, error) {
+	return 0, queue.ErrRejected
+}
+
 func (emptyProducer) TryPublish(_ publisher.Event) (queue.EntryID, bool) {
 	return 0, false
 }

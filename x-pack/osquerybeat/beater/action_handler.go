@@ -34,7 +34,14 @@ type scheduledResponsePublisher interface {
 }
 
 type queryProfilePublisher interface {
-	PublishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any)
+	// PublishQueryProfile publishes a live query's profile and reports
+	// whether it was handed to the output: false when no profile stream is
+	// configured or ctx cancelled the publish.
+	PublishQueryProfile(ctx context.Context, index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) bool
+}
+
+type scheduledProfilePublisher interface {
+	PublishScheduledProfile(index, queryName, scheduleID, responseID, spaceID string, scheduleExecutionCount int64, profile map[string]any)
 }
 
 type liveProfileRecorder interface {
@@ -44,11 +51,14 @@ type liveProfileRecorder interface {
 type scheduledQueryPublisher interface {
 	queryResultPublisher
 	scheduledResponsePublisher
-	queryProfilePublisher
+	scheduledProfilePublisher
 }
 
 type actionQueryPublisher interface {
-	queryResultPublisher
+	// PublishEach publishes hits one by one and returns how many were handed
+	// to the output before stop returned true or ctx ended. stop is called
+	// before each hit.
+	PublishEach(ctx context.Context, index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any, stop func() bool) int
 	queryProfilePublisher
 }
 
@@ -70,6 +80,7 @@ type actionHandler struct {
 	log             *logp.Logger
 	inputType       string
 	publisher       actionQueryPublisher
+	live            *liveResultDispatcher
 	queryExec       queryExecutor
 	np              namespaceProvider
 	profiles        liveProfileRecorder
@@ -104,7 +115,9 @@ func (a *actionHandler) Execute(ctx context.Context, req map[string]any) (map[st
 
 	if err != nil {
 		res["error"] = err.Error()
-	} else {
+	}
+	// A publish timeout reports the rows handed to the output too.
+	if err == nil || errors.Is(err, errLivePublishTimeout) {
 		res["count"] = count
 	}
 	return res, nil
@@ -143,6 +156,7 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 
 	a.log.Debugf("Execute query: %s", ac.Query)
 
+	job := liveJob{index: index, actionID: ac.ID, responseID: responseID, spaceID: ac.SpaceID, ecsm: ac.ECSMapping, reqData: req["data"]}
 	var before runtimeSnapshot
 	beforeReady := false
 	publishProfile := a.profileEnabled(ac.Profile)
@@ -172,7 +186,7 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 				a.profiles.RecordLiveProfile(ac.Query, profile)
 			}
 			if publishProfile {
-				a.publisher.PublishQueryProfile(config.QueryProfileDatastream(a.namespace()), "", ac.ID, responseID, ac.SpaceID, profile, req["data"])
+				job.profileIndex, job.profile = config.QueryProfileDatastream(a.namespace()), profile
 			}
 		}
 	} else if shouldCollect && !beforeReady {
@@ -185,12 +199,16 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 
 	if err != nil {
 		a.log.Errorf("Failed to execute query, err: %v", err)
+		if job.profile != nil {
+			// The action reports the query error, not the profile's outcome.
+			_, _ = a.live.publishResults(ctx, a.publisher, job)
+		}
 		return 0, err
 	}
 
 	a.log.Debugf("Completed query in: %v", duration)
 
-	a.publisher.Publish(index, ac.ID, "action_id", responseID, ac.SpaceID, "", "", "", nil, hits, ac.ECSMapping, req["data"])
-
-	return len(hits), nil
+	// The publish timeout starts now, so a slow query never reports partial.
+	job.hits = hits
+	return a.live.publishResults(ctx, a.publisher, job)
 }

@@ -39,18 +39,13 @@ failures and exhausted retries report FAILED to both status paths.
 
 ## Scope
 
-This recovery policy does not change publishing, logger callbacks, profiling,
-or shared queue admission. Stopping the extension server waits, with no
-timeout, for logger callbacks that are still publishing. If an output outage
-blocks a publication, the run does not finish until the output accepts the
-event. Until then no replacement daemon starts, even if osqueryd has already
-exited, and both status paths keep reporting RUNNING. Shutdown waits for the
-same publication. This is the scenario reported in #53645, where the output is
-down and osqueryd exits 78, so this change alone does not make that case report
-DEGRADED and restart; #53939 is needed for that. Scheduled query profiling
-already runs outside the logger callback, so a stuck profile publish does not
-delay restart. Separating scheduled result publication from the logger
-callback remains independent work.
+This recovery policy does not change publishing or shared queue admission.
+Stopping the extension server waits for logger callbacks that are still
+running, but those callbacks no longer publish: they only add results to the
+scheduled queue, and scheduled query profiling also runs outside them. An
+output outage therefore no longer holds a run open, so osqueryd can still be
+restarted while the output is down. See [publishing.md](publishing.md) for
+what can still wait for the output.
 
 ## Validation
 

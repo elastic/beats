@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pub"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -21,11 +20,16 @@ const scheduledProfilePendingJobs = 64
 type scheduledProfileRequest struct {
 	name, query, namespace, scheduleID, responseID, spaceID string
 	scheduleExecutionCount                                  int64
-	sink                                                    pub.ScheduledProfileSink
 }
 
+// scheduledProfileMetrics are the osquerybeat.scheduled_query_profiles
+// counters of the collection worker. Profiles dropped after collection are
+// counted under osquerybeat.publishing.scheduled.
 type scheduledProfileMetrics struct {
-	queueFull, stale, shutdown, failed, collected *monitoring.Uint
+	queueFull, stale, shutdown, failed *monitoring.Uint
+	// collected counts profiles collected and handed to the scheduled
+	// queue, not profiles delivered.
+	collected *monitoring.Uint
 }
 
 func newScheduledProfileMetrics(reg *monitoring.Registry) *scheduledProfileMetrics {
@@ -56,13 +60,11 @@ type scheduledQueryProfiler struct {
 	executor queryExecutor
 	config   *ConfigPlugin
 	metrics  *scheduledProfileMetrics
-
-	// publishing is guarded by mu. It is set while collect is inside
-	// sink.Publish, which can wait for a memory queue slot.
-	publishing bool
+	// publish hands a collected profile on for publication without waiting.
+	publish func(scheduledProfileItem)
 }
 
-func newScheduledQueryProfiler(ctx context.Context, limit int, executor queryExecutor, plugin *ConfigPlugin, profiler *queryProfiler, metrics *scheduledProfileMetrics) *scheduledQueryProfiler {
+func newScheduledQueryProfiler(ctx context.Context, limit int, executor queryExecutor, plugin *ConfigPlugin, profiler *queryProfiler, metrics *scheduledProfileMetrics, publish func(scheduledProfileItem)) *scheduledQueryProfiler {
 	ctx, cancel := context.WithCancel(ctx)
 	w := &scheduledQueryProfiler{
 		ctx:      ctx,
@@ -74,6 +76,7 @@ func newScheduledQueryProfiler(ctx context.Context, limit int, executor queryExe
 		executor: executor,
 		config:   plugin,
 		metrics:  metrics,
+		publish:  publish,
 	}
 	go w.run()
 	return w
@@ -86,7 +89,7 @@ func (w *scheduledQueryProfiler) enqueue(request scheduledProfileRequest) bool {
 		w.metrics.shutdown.Inc()
 		return false
 	}
-	if request.sink == nil || !request.sink.Valid() || !w.config.scheduledProfileMatches(request) {
+	if !w.config.scheduledProfileMatches(request) {
 		w.metrics.stale.Inc()
 		return false
 	}
@@ -129,7 +132,7 @@ func (w *scheduledQueryProfiler) collect(request scheduledProfileRequest) {
 		w.metrics.shutdown.Inc()
 		return
 	}
-	if !request.sink.Valid() || !w.config.scheduledProfileMatches(request) {
+	if !w.config.scheduledProfileMatches(request) {
 		w.metrics.stale.Inc()
 		return
 	}
@@ -149,54 +152,18 @@ func (w *scheduledQueryProfiler) collect(request scheduledProfileRequest) {
 		w.metrics.stale.Inc()
 		return
 	}
-	w.mu.Lock()
-	if w.ctx.Err() != nil {
-		w.mu.Unlock()
-		w.metrics.shutdown.Inc()
-		return
-	}
-	w.publishing = true
-	w.mu.Unlock()
-	// Publish runs without mu. On the memory queue it can wait for a slot, and
-	// holding mu would block enqueue (in the logger callback) and stop.
-	//
-	// This is safe because publishing was set above under the same mu that stop
-	// takes to cancel. Either stop sees publishing and returns without joining,
-	// or this worker saw the cancellation and never got here. A stuck Publish
-	// therefore never blocks stop.
-	//
-	// stop can return while Publish is running, or just before it starts. This is
-	// harmless since the sink's retire leaves closing its client to an in-flight
-	// Publish.
-	ok := request.sink.Publish(request.name, request.scheduleID, request.responseID, request.spaceID, request.scheduleExecutionCount, profile)
-	w.mu.Lock()
-	w.publishing = false
-	w.mu.Unlock()
-	if !ok {
-		// A false result from a live lease means the output queue was full,
-		// which the sink's output_full counter already records.
-		if !request.sink.Valid() {
-			w.metrics.stale.Inc()
-		}
-		return
-	}
-	// The sink accepted the profile; this does not mean the output delivered it.
 	w.metrics.collected.Inc()
+	w.publish(scheduledProfileItem{
+		name: request.name, namespace: request.namespace, query: request.query, scheduleID: request.scheduleID,
+		responseID: request.responseID, spaceID: request.spaceID, executionCount: request.scheduleExecutionCount, profile: profile,
+	})
 }
 
-// stop cancels the worker and joins it unless it is inside sink.Publish. On
-// the memory queue that publish can wait for a slot, so stop returns without
-// joining; the worker exits once the publish returns, when the output recovers
-// or the queue closes. A sink admits one publish at a time, so daemon restarts
-// leave at most one stuck worker per sink.
+// stop cancels the worker and waits for it to exit. Collection never waits
+// for the output, so only the cancelled RPC can delay the exit.
 func (w *scheduledQueryProfiler) stop() {
-	w.mu.Lock()
 	w.cancel()
-	publishing := w.publishing
-	w.mu.Unlock()
-	if !publishing {
-		<-w.done
-	}
+	<-w.done
 }
 
 // profilingQueryExecutor links diagnostic request deadlines to daemon teardown.
