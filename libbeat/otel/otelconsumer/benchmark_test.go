@@ -221,6 +221,7 @@ func makeTestOtelConsumer(t testing.TB, consumeFn func(ctx context.Context, ld p
 		logsConsumer: logConsumer,
 		beatInfo:     beat.Info{},
 		log:          logp.NewNopLogger(),
+		retry:        newRetryBackoff(retryBackoffInit, retryBackoffMax),
 	}
 	return consumer
 }

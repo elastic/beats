@@ -28,7 +28,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -59,11 +58,6 @@ const (
 	retryBackoffMax  = 60 * time.Second
 )
 
-type retryConfig struct {
-	init time.Duration
-	max  time.Duration
-}
-
 type otelConsumer struct {
 	observer       outputs.Observer
 	logsConsumer   consumer.Logs
@@ -71,15 +65,15 @@ type otelConsumer struct {
 	log            *logp.Logger
 	isReceiverTest bool // whether we are running in receivertest context
 
-	retry retryConfig
+	retry *retryBackoff
 }
 
 func MakeOtelConsumer(beat beat.Info, observer outputs.Observer) (outputs.Group, error) {
 	isReceiverTest := os.Getenv("OTELCONSUMER_RECEIVERTEST") == "1"
 
-	retry := retryConfig{init: retryBackoffInit, max: retryBackoffMax}
+	retry := newRetryBackoff(retryBackoffInit, retryBackoffMax)
 	if isReceiverTest {
-		retry = retryConfig{init: 1 * time.Millisecond, max: 2 * time.Millisecond}
+		retry = newRetryBackoff(1*time.Millisecond, 2*time.Millisecond)
 	}
 
 	client := &otelConsumer{
@@ -118,12 +112,6 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 
 	err := out.logsConsumer.ConsumeLogs(otelctx.NewConsumerContext(ctx, out.beatInfo), pLogs)
 	if err != nil {
-		// Queue full errors are expected backpressure signals, not true errors.
-		// Skip logging to avoid log spam since we already track this via metrics.
-		if !errors.Is(err, exporterhelper.ErrQueueIsFull) {
-			out.log.Errorf("failed to publish batch events to otel collector pipeline: %v", err)
-		}
-
 		// Permanent errors shouldn't be retried. This typically means
 		// the data cannot be serialized by the exporter that is attached
 		// to the pipeline or when the destination refuses the data because
@@ -131,15 +119,23 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		//
 		// See https://github.com/open-telemetry/opentelemetry-collector/blob/1c47d89/receiver/doc.go#L23-L40
 		if consumererror.IsPermanent(err) {
+			out.log.Errorf("failed to publish batch events to otel collector pipeline: %v", err)
 			st.PermanentErrors(len(events))
 			batch.Drop()
-		} else {
-			st.RetryableErrors(len(events))
-			bo := backoff.NewEqualJitterBackoff(out.retry.init, out.retry.max)
-			if !bo.Wait(ctx) {
-				batch.Cancelled()
-				return nil
-			}
+			return nil
+		}
+
+		st.RetryableErrors(len(events))
+		wait, newWindow := out.retry.next()
+		// Queue full errors are expected backpressure signals, not true errors.
+		// Skip logging to avoid log spam since we already track this via metrics.
+		if newWindow && !errors.Is(err, exporterhelper.ErrQueueIsFull) {
+			out.log.Errorf("failed to publish batch events to otel collector pipeline: %v", err)
+		}
+		select {
+		case <-ctx.Done():
+			batch.Cancelled()
+		case <-time.After(wait):
 			batch.Retry()
 		}
 		return nil
@@ -147,6 +143,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 
 	batch.ACK()
 	st.AckedEvents(len(events))
+	out.retry.reset()
 	return nil
 }
 
