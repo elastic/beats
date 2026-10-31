@@ -1,0 +1,7 @@
+kind: other
+
+summary: Fix the Transfered typo in two Metricbeat IIS visualization titles
+
+component: metricbeat
+
+issue: https://github.com/elastic/beats/issues/51325
