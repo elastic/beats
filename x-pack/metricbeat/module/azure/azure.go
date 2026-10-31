@@ -243,7 +243,7 @@ func fetchBatch(m *MetricSet, report mb.ReporterV2) error {
 	}
 	// Check if the channel is nil before entering the loop
 	if m.BatchClient.ResourceConfigurations.MetricDefinitionsChan == nil {
-		return fmt.Errorf("no resources were found based on all the configurations options entered")
+		return fmt.Errorf("no resources were found based on all the configuration options entered")
 	}
 
 	metricStores := make(map[ResDefGroupingCriteria]*MetricStore)
@@ -255,7 +255,7 @@ func fetchBatch(m *MetricSet, report mb.ReporterV2) error {
 				// Data channel closed, stop processing further data
 				m.BatchClient.Log.Debug("MetricDefinitionsChan channel closed")
 				if len(m.BatchClient.ResourceConfigurations.MetricDefinitionsChan) == 0 {
-					m.BatchClient.Log.Debug("no resources were found based on all the configurations options entered")
+					m.BatchClient.Log.Debug("no resources were found based on all the configuration options entered")
 				}
 				// process all stores in case there are remaining metricstores for which values are not collected.
 				m.BatchClient.Log.Debug("processAllStores")

@@ -126,7 +126,7 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 	// users could add or remove resources while metricbeat is running so we could encounter the situation where resources are unavailable we log an error message (see above)
 	// we also log a debug message when absolutely no resources are found
 	if len(metrics) == 0 {
-		client.Log.Debug("no resources were found based on all the configurations options entered")
+		client.Log.Debug("no resources were found based on all the configuration options entered")
 	}
 	if client.Log.IsDebug() {
 		metricCount := 0
