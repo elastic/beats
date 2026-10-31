@@ -1,0 +1,7 @@
+kind: other
+
+summary: Fix article and spacing in the Cassandra error-response field description
+
+component: packetbeat
+
+issue: https://github.com/elastic/beats/issues/51451
