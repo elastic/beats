@@ -84,7 +84,15 @@ func (p *AddDataStream) Run(event *beat.Event) (*beat.Event, error) {
 		event.Fields = mapstr.M{}
 	}
 	event.PutValue("event.dataset", eventDataStream.Dataset)
-	event.PutValue("data_stream", eventDataStream)
+	// A map rather than the struct, so the field is encoded the same by every
+	// output: the Elasticsearch output names untagged struct fields in lower
+	// case, but beat receivers convert structs through encoding/json, which keeps
+	// their Go names.
+	event.Fields["data_stream"] = mapstr.M{
+		"namespace": eventDataStream.Namespace,
+		"dataset":   eventDataStream.Dataset,
+		"type":      eventDataStream.Type,
+	}
 
 	return event, nil
 }
