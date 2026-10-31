@@ -1,0 +1,7 @@
+kind: other
+
+summary: Fix grammar in the Elasticsearch shard relocating_node.id field description
+
+component: metricbeat
+
+issue: https://github.com/elastic/beats/issues/53196
