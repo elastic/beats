@@ -120,7 +120,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	client, err := bigquery.NewClient(ctx, m.config.ProjectID, opt...)
 	if err != nil {
-		return fmt.Errorf("error creating bigquery client: %w", err)
+		return fmt.Errorf("error creating BigQuery client: %w", err)
 	}
 	defer client.Close()
 

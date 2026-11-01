@@ -1,0 +1,7 @@
+kind: other
+
+summary: Fix the "gerror" typo in the GCP BigQuery client creation errors
+
+component: metricbeat
+
+issue: https://github.com/elastic/beats/issues/51894
