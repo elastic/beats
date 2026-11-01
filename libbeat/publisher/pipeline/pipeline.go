@@ -405,6 +405,10 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		// were still waiting to connect.
 		return nil, fmt.Errorf("client failed to connect because the pipeline is shutting down")
 	}
+	client.ctxProducer = cancellableProducer(client.producer, cfg.EventListener)
+	if client.ctxProducer != nil {
+		client.closeCtx, client.closeCancel = context.WithCancel(context.Background())
+	}
 
 	// Register the client so the Pipeline can finalize it (stage two of
 	// shutdown) when the pipeline disconnects. The client removes itself from

@@ -80,7 +80,8 @@ type otelOutputController struct {
 // during shutdown — so Close is safe to call from both paths and only ever
 // closes the underlying producer once.
 //
-// Publish and TryPublish are promoted from the embedded producer unchanged.
+// Publish, PublishContext and TryPublish are promoted from the embedded
+// producer unchanged.
 type trackedProducer struct {
 	queue.Producer[publisher.Event]
 	controller *otelOutputController
