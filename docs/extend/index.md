@@ -59,7 +59,7 @@ make mage
 Then you can compile a particular Beat by using Mage. For example, for Filebeat:
 
 ```shell
-cd beats/filebeat
+cd filebeat
 mage build
 ```
 
