@@ -616,14 +616,13 @@ func (pgsql *pgsqlPlugin) parseDataRow(s *pgsqlStream, buf []byte) error {
 			return errInvalidLength
 		}
 
-		// read column value (byten)
+		// read column value (byten). A binary column is skipped. The row is stored as text.
 		var columnValue []byte
-		if msg.fieldsFormat[field] == 0 {
-			// field value in text format
-			if columnLength > 0 {
+		if columnLength > 0 {
+			if msg.fieldsFormat[field] == 0 {
 				columnValue = buf[off : off+columnLength]
-				off += columnLength
 			}
+			off += columnLength
 		}
 
 		if rowLength < pgsql.maxRowLength {
