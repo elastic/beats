@@ -1,0 +1,7 @@
+kind: other
+
+summary: Add the missing possessive apostrophe to two Cisco ASA field descriptions
+
+component: filebeat
+
+issue: https://github.com/elastic/beats/issues/51068
