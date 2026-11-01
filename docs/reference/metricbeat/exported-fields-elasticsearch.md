@@ -2152,7 +2152,7 @@ JVM Info.
 
 ## node.stats [_node.stats]
 
-Statistics about each node in a Elasticsearch cluster
+Statistics about each node in an Elasticsearch cluster
 
 **`elasticsearch.node.stats.ingest.total.count`**
 :   type: long
