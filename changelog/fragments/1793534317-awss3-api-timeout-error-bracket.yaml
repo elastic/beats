@@ -1,0 +1,7 @@
+kind: other
+
+summary: Close the unterminated angle bracket in the S3 api_timeout validation error
+
+component: filebeat
+
+issue: https://github.com/elastic/beats/issues/49572

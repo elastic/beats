@@ -286,7 +286,7 @@ func TestConfig(t *testing.T) {
 				"queue_url":   queueURL,
 				"api_timeout": "0",
 			},
-			expectedErr: "api_timeout <0s> must be greater than the sqs.wait_time <20s",
+			expectedErr: "api_timeout <0s> must be greater than the sqs.wait_time <20s>",
 			expectedCfg: nil,
 		},
 		{
