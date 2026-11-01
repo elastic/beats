@@ -1067,6 +1067,11 @@ The supported configuration options are:
 **`resolve_ids`** {applies_to}`stack: ga 9.6.0+`
 :   (Optional) If `true`, UIDs and GIDs in coalesced events are resolved to names using the reading host's `/etc/passwd` and `/etc/group`. Only meaningful in `coalesce` mode. Defaults to `true`. Set to `false` when reading forwarded logs from a different host, where the local name database does not apply.
 
+**`include_raw_message`** {applies_to}`stack: ga 9.6.0+`
+:   (Optional) If `true`, the raw audit records that were reassembled into a coalesced event are kept as a list of `type=<record type> msg=<raw data>` strings in `auditd.messages`, and the `message` field is set to their newline-joined form. Only meaningful in `coalesce` mode. Defaults to `false`.
+
+    This is the filestream equivalent of the Auditbeat `auditd` module's [`include_raw_message`](/reference/auditbeat/auditbeat-module-auditd.md) option, but the records land in `auditd.messages` rather than `event.original`.
+
 Example configuration (per-line parsing, the default):
 
 ```yaml
