@@ -621,7 +621,7 @@ Contains statistics related to the Istio mixer service
 
 
 **`istio.mixer.handler.name`**
-:   The name of the daemon  handler
+:   The name of the daemon handler
 
     type: keyword
 
