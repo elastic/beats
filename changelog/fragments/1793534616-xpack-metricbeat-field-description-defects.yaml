@@ -1,0 +1,7 @@
+kind: other
+
+summary: Fix an article and two double spaces in GCP, Istio and IIS field descriptions
+
+component: metricbeat
+
+issue: https://github.com/elastic/beats/issues/50396

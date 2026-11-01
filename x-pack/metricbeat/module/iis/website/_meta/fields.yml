@@ -60,7 +60,7 @@
         - name: total_bytes_sent
           type: float
           description: >
-            The  total number of bytes sent.
+            The total number of bytes sent.
         - name: total_connection_attempts
           type: float
           description: >

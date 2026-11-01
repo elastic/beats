@@ -621,7 +621,7 @@ The network overview.
 
 
 **`iis.website.network.total_bytes_sent`**
-:   The  total number of bytes sent.
+:   The total number of bytes sent.
 
     type: float
 
