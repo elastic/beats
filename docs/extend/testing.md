@@ -43,7 +43,7 @@ mage docker:composeBuild
 mage docker:composeUp
 
 # Run all integration tests.
-go test ./filebeat/...  -tags integration
+go test ./... -tags integration
 
 # Stop all started containers.
 mage docker:composeDown
