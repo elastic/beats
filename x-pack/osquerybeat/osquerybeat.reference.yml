@@ -11,14 +11,23 @@ osquerybeat:
 #          # duration format. Default: 15s. Increase on hosts where antivirus
 #          # scanning delays the first osqueryd exec.
 #          #check_timeout: 15s
+#          publishing:
+#            scheduled:
+#              # Capacity of the scheduled results queue, counted in rows. Default: 3200.
+#              #max_events: 3200
+#              # Drop queued scheduled results older than this. Default: 0 (disabled).
+#              #max_age: 0s
+#            live:
+#              # How long a live result may wait to be published. Default: 60s.
+#              #timeout: 60s
 #          profiling:
 #            # Global default for collecting and publishing query profiles to the
 #            # osquery_manager.query_profile data stream for all queries (enabled by default).
 #            # Individual queries may override this with their own profiling flag. Requires the
 #            # query_profile input stream.
-#            # Scheduled profiles are collected asynchronously and published best effort: a full
-#            # slab queue (OTel runtime) drops them, the memory queue can make them wait for a
-#            # slot. Counters are under osquerybeat.scheduled_query_profiles.
+#            # Scheduled profiles are collected asynchronously and queued in the scheduled
+#            # publishing queue, which drops them first when full. Counters are under
+#            # osquerybeat.scheduled_query_profiles and osquerybeat.publishing.scheduled.
 #            #profiling_all: true
 #            storage:
 #              # Enable local storage of live query profiles (for diagnostics).
