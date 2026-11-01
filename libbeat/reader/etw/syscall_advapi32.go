@@ -239,9 +239,11 @@ const (
 // https://learn.microsoft.com/en-us/windows/win32/etw/logging-mode-constants (to extend modes)
 // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wmistr/ns-wmistr-_wnode_header (to extend flags)
 const (
-	WNODE_FLAG_ALL_DATA        = 0x00000001
-	WNODE_FLAG_TRACED_GUID     = 0x00020000
-	EVENT_TRACE_REAL_TIME_MODE = 0x00000100
+	WNODE_FLAG_ALL_DATA                    = 0x00000001
+	WNODE_FLAG_TRACED_GUID                 = 0x00020000
+	EVENT_TRACE_REAL_TIME_MODE             = 0x00000100
+	EVENT_TRACE_PERSIST_ON_HYBRID_SHUTDOWN = 0x00800000
+	EVENT_TRACE_INDEPENDENT_SESSION_MODE   = 0x08000000
 )
 
 // https://learn.microsoft.com/en-us/windows/win32/api/evntcons/ns-evntcons-event_header_extended_data_item
