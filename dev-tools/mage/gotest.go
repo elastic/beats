@@ -537,10 +537,25 @@ func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
 	return err
 }
 
+// DefaultECHTestArgs returns the arguments for the tests that run a Beat
+// against an Elastic Cloud Hosted deployment.
 func DefaultECHTestArgs() GoTestArgs {
-	args := makeGoTestArgs("ECH")
-	args.Tags = append(args.Tags, "ech", "integration")
-	args.Dir = "tests/ech"
+	return cloudTestArgs("ECH", "ech")
+}
+
+// DefaultServerlessTestArgs returns the arguments for the tests that run a
+// packaged Beat against an Elastic Cloud serverless project.
+func DefaultServerlessTestArgs() GoTestArgs {
+	return cloudTestArgs("Serverless", "serverless")
+}
+
+// cloudTestArgs returns the arguments for tests against an Elastic Cloud
+// stack provisioned beforehand. They live in tests/<tag> and need the <tag>
+// build tag, so the regular integration tests don't pick them up.
+func cloudTestArgs(name, tag string) GoTestArgs {
+	args := makeGoTestArgs(name)
+	args.Tags = append(args.Tags, tag, "integration")
+	args.Dir = "tests/" + tag
 
 	// attempt to use absolute paths for filenames
 	path, err := os.Getwd()
@@ -548,7 +563,7 @@ func DefaultECHTestArgs() GoTestArgs {
 		log.Printf("Unable to get working dir, using value: .")
 		path = "."
 	}
-	fileName := path + "/build/TEST-go-ech"
+	fileName := path + "/build/TEST-go-" + tag
 	args.OutputFile = fileName + ".out"
 	args.JUnitReportFile = fileName + ".xml"
 	if TestCoverage {
