@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Report the requested user name and the GID in Heartbeat user lookup error messages.
+component: heartbeat
