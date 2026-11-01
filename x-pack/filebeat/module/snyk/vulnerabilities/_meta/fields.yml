@@ -39,7 +39,7 @@
     - name: is_upgradable
       type: boolean
       description: >
-        If the vulnerability fixable by upgrading a dependency.
+        If the vulnerability is fixable by upgrading a dependency.
     - name: language
       type: keyword
       description: >
