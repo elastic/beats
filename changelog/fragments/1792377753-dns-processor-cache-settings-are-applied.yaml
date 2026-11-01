@@ -1,0 +1,10 @@
+kind: bug-fix
+summary: Apply the dns processor success_cache and failure_cache settings, which were silently ignored.
+description: |
+  Since 8.11.0 the success_cache and failure_cache settings, including their
+  enabled options, had no effect and the defaults were always used. They are
+  now applied and validated, so a configuration that sets capacity.max below
+  capacity.initial (default 1000), or a ttl or min_ttl of 0, now fails to load
+  instead of silently falling back to the defaults.
+component: libbeat
+issue: https://github.com/elastic/beats/issues/42570
