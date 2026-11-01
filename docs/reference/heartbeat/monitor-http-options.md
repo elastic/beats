@@ -56,6 +56,79 @@ You need to specify credentials when your `check.response` settings require it. 
 
 The password for authenticating with the server. This setting is optional.
 
+::::{note}
+Basic authentication (`username` and `password`), `kerberos`, and `ntlm` are mutually exclusive. If you configure more than one, the monitor fails validation with `only one authentication method may be configured: choose one of basic (username/password), kerberos, or ntlm`.
+::::
+
+
+### `kerberos` [monitor-http-kerberos]
+
+{applies_to}`stack: ga 9.6+` The Kerberos/SPNEGO settings used to authenticate with the server. This setting is optional. The monitor must be able to reach the KDC.
+
+Example configuration:
+
+```yaml
+- type: http
+  id: my-http-service
+  name: My HTTP Service
+  hosts: ["https://myhost:443"]
+  schedule: '@every 5s'
+  kerberos:
+    auth_type: password
+    realm: EXAMPLE.COM
+    config_path: /etc/krb5.conf
+    username: elastic
+    password: changeme
+```
+
+Also see [Kerberos](/reference/heartbeat/configuration-kerberos.md) for a full description of the `kerberos` options.
+
+::::{note}
+Kerberos is not available in FIPS builds.
+::::
+
+
+
+### `ntlm` [monitor-http-ntlm]
+
+{applies_to}`stack: ga 9.6+` The NTLM settings used to authenticate with the server. This setting is optional.
+
+Example configuration:
+
+```yaml
+- type: http
+  id: my-http-service
+  name: My HTTP Service
+  hosts: ["https://myhost:443"]
+  schedule: '@every 5s'
+  ntlm:
+    username: elastic
+    password: changeme
+    domain: EXAMPLE
+```
+
+You can specify the following options in the `ntlm` section:
+
+`enabled`
+:   Enables NTLM authentication. Defaults to `true`, so the section is active as soon as you add it. Set it to `false` to keep the block but turn it off.
+
+`username`
+:   The username to authenticate with. Required. It can already carry the domain, as `DOMAIN\user` or `user@domain`.
+
+`password`
+:   The password to authenticate with. Required.
+
+`domain`
+:   The NTLM domain. Optional, and only used when `username` contains neither `\` nor `@`, in which case the monitor sends `DOMAIN\user`.
+
+`workstation`
+:   The client name sent in the NTLM negotiate message. Optional.
+
+::::{note}
+NTLM is not available in FIPS builds, because it relies on MD4 and RC4.
+::::
+
+
 
 ### `ssl` [monitor-http-tls-ssl]
 
