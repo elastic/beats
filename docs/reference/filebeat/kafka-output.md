@@ -7,7 +7,7 @@ applies_to:
   serverless: ga
 ---
 
-# Configure the Kafka output [kafka-output]
+# Configure the Kafka output in Filebeat [kafka-output]
 
 
 The Kafka output sends events to Apache Kafka.

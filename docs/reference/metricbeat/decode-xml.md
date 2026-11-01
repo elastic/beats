@@ -1,4 +1,5 @@
 ---
+description: "Use the decode_xml processor in Metricbeat to parse XML stored in a field into structured fields. Set target_field, overwrite_keys, document_id, to_lower, and ignore_failure."
 navigation_title: "decode_xml"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/decode-xml.html
@@ -7,7 +8,7 @@ applies_to:
   serverless: ga
 ---
 
-# Decode XML [decode-xml]
+# Decode XML in Metricbeat [decode-xml]
 
 
 The `decode_xml` processor decodes XML data that is stored under the `field` key. It outputs the result into the `target_field`.
