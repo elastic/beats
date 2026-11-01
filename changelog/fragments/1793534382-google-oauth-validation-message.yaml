@@ -1,0 +1,7 @@
+kind: other
+
+summary: Clarify the google oauth2 provider validation error in the httpjson and cel inputs
+
+component: filebeat
+
+issue: https://github.com/elastic/beats/issues/49572
