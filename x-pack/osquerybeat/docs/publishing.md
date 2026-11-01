@@ -1,7 +1,8 @@
 # Result publishing
 
-Osquerybeat publishes native scheduled query results from an internal queue
-with its own worker and its own output clients. The worker uses blocking
+Osquerybeat publishes scheduled query results, from native and RRULE
+schedules, and scheduled query profiles from an internal queue with its own
+worker and its own output clients. The worker uses blocking
 `beat.Client.Publish`, so under output back-pressure it waits for queue slots
 alongside other receivers, as publishing did before; what changes is where it
 waits. osqueryd's logger callback only adds results to the scheduled queue and
@@ -28,17 +29,19 @@ queue can use grows with it.
 
 ## Scheduled queue
 
-The scheduled queue holds native scheduled results. An item is one query run:
-its rows plus its response document.
+The scheduled queue holds native scheduled results, RRULE-scheduled runs and
+scheduled query profiles. An item is one query run: its rows plus its response
+document. An RRULE run's profile is part of its item; a native run's profile is
+collected by a separate bounded worker and queued as its own one-row item.
 
 `max_events` limits the rows in the queue, like the memory queue's
-`queue.mem.events`. Response documents count as one row each. When an item
-does not fit, the oldest queued items are dropped until it does. An item larger
-than `max_events` is still accepted whole once everything older has been
-dropped, so a large result is not cut while the output is healthy. The item the
-worker is publishing does not count against the limit and is never dropped for
-space. A policy change applies the new limit; shrinking it drops the oldest
-items.
+`queue.mem.events`. Response and profile documents count as one row each. When
+an item does not fit, the oldest queued items are dropped until it does:
+queued profiles first, then results. An item larger than `max_events` is still
+accepted whole once everything older has been dropped, so a large result is not
+cut while the output is healthy. The item the worker is publishing does not
+count against the limit and is never dropped for space. A policy change applies
+the new limit; shrinking it drops the oldest items.
 
 In a burst, rows are dropped only once libbeat's queue is full and more than
 `max_events` rows (3200 by default) wait here; the queue does not wait before
@@ -46,8 +49,9 @@ it drops them, because a wait would hold osqueryd's logger RPC again.
 
 A dropped differential result is lost for good. osqueryd updates its diff
 baseline before it logs the result, so it does not report those added or
-removed rows again. A snapshot query, the default, reports all its rows on
-its next run.
+removed rows again. The same holds for an RRULE-scheduled differential query:
+osquerybeat updates its baseline when the query runs, before the run is
+queued. A snapshot query, the default, reports all its rows on its next run.
 
 `max_age` drops items that waited longer than this when the worker reaches
 them.
@@ -89,14 +93,21 @@ Reasons:
 
 | Reason | Meaning |
 |---|---|
-| `overflow` | Dropped for space, oldest first |
+| `overflow` | Dropped for space, oldest first and profiles first |
 | `expired` | Older than `max_age` when the worker reached it |
-| `stale` | No current policy publishes it: the query was removed, moved to another namespace or changed SQL (also while it was in flight), osqueryd could not resolve its column types, or no results stream is configured |
+| `stale` | No current policy publishes it: the query was removed, moved to another namespace or changed SQL (also while it was in flight), osqueryd could not resolve its column types, no results stream is configured, or, for a profile, no profile stream is configured |
 | `shutdown` | Osquerybeat was stopping |
 
 An event the pipeline discards while closing counts in
 `dropped_rows.shutdown` only. The queue logs at most one warning per minute
 about drops, naming the counter that moved.
+
+A scheduled profile dropped once it is queued is counted only under
+`osquerybeat.publishing.scheduled`. The profile collection worker reports
+under `osquerybeat.scheduled_query_profiles`: `dropped.queue_full`,
+`dropped.stale` and `dropped.shutdown` count profiles dropped before they were
+queued, `failed` counts failed collections, and `collected` counts profiles
+collected and handed to the scheduled queue, not delivered.
 
 ## Behaviour changes
 

@@ -37,6 +37,10 @@ type queryProfilePublisher interface {
 	PublishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any)
 }
 
+type scheduledProfilePublisher interface {
+	PublishScheduledProfile(index, queryName, scheduleID, responseID, spaceID string, scheduleExecutionCount int64, profile map[string]any)
+}
+
 type liveProfileRecorder interface {
 	RecordLiveProfile(query string, profile map[string]any)
 }
@@ -44,7 +48,7 @@ type liveProfileRecorder interface {
 type scheduledQueryPublisher interface {
 	queryResultPublisher
 	scheduledResponsePublisher
-	queryProfilePublisher
+	scheduledProfilePublisher
 }
 
 type actionQueryPublisher interface {
