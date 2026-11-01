@@ -140,3 +140,5 @@
               type: float
               description: >
                 Current Queue Length.
+        - name: "state"
+          type: long
