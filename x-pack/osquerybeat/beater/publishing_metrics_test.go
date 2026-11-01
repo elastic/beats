@@ -35,12 +35,28 @@ func TestPublishingMetricsNames(t *testing.T) {
 				"osquerybeat.publishing.scheduled.queue.events":          9,
 			},
 		},
+		{
+			queue: "live",
+			want: map[string]int64{
+				"osquerybeat.publishing.live.dropped.stale":         0,
+				"osquerybeat.publishing.live.dropped_rows.stale":    0,
+				"osquerybeat.publishing.live.dropped.shutdown":      0,
+				"osquerybeat.publishing.live.dropped_rows.shutdown": 0,
+				"osquerybeat.publishing.live.dropped.timeout":       1,
+				"osquerybeat.publishing.live.dropped_rows.timeout":  7,
+				"osquerybeat.publishing.live.queue.items":           2,
+				"osquerybeat.publishing.live.queue.events":          9,
+			},
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.queue, func(t *testing.T) {
 			reg := monitoring.NewRegistry()
 			m := newPublishingMetrics(reg, test.queue, logptest.NewTestingLogger(t, ""))
 			reason := dropOverflow
+			if test.queue == "live" {
+				reason = dropTimeout
+			}
 			m.drop(reason, 7)
 			m.setQueue(2, 9)
 

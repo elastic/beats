@@ -1,0 +1,449 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
+package beater
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"slices"
+	"sync"
+	"sync/atomic"
+	"time"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+)
+
+var (
+	errLivePublishTimeout = errors.New("timed out publishing live query results")
+	errLiveShutdown       = errors.New("live query results not published: osquerybeat is stopping")
+	errLiveNotConfigured  = errors.New("live query results not published: results stream not configured")
+)
+
+// liveJob is one live query's results and, if requested, its profile.
+type liveJob struct {
+	index, actionID, responseID, spaceID string
+	hits                                 []map[string]any
+	ecsm                                 ecs.Mapping
+	reqData                              any
+	profileIndex                         string
+	profile                              map[string]any // nil when not requested
+}
+
+// rows counts the job's hits and its profile, if any.
+func (j liveJob) rows() int {
+	if j.profile != nil {
+		return len(j.hits) + 1
+	}
+	return len(j.hits)
+}
+
+// liveItem is a queued live job, or an action response when pub is nil.
+type liveItem struct {
+	job       liveJob
+	pub       actionQueryPublisher
+	handed    atomic.Int64  // rows of job handed to Publish so far
+	profiled  atomic.Bool   // set once job's profile is handed to Publish
+	cancelled atomic.Bool   // set when the waiting action gives up
+	done      chan struct{} // closed when the worker is finished with job
+
+	resPub   actionResultPublisher
+	req, res map[string]any
+}
+
+// liveResultDispatcher publishes live results, profiles and action responses
+// in order on one worker for the lifetime of the beat. An action waits for its
+// rows at most for the timeout, so a full output cannot hold it, or the
+// resetableActionHandler lock, indefinitely.
+type liveResultDispatcher struct {
+	log      *logp.Logger
+	metrics  *publishingMetrics
+	timeout  atomic.Int64 // time.Duration
+	start    sync.Once
+	wake     chan struct{}
+	stopping chan struct{}
+
+	mu     sync.Mutex
+	queue  []*liveItem
+	closed bool
+}
+
+func newLiveResultDispatcher(reg *monitoring.Registry, log *logp.Logger, timeout time.Duration) *liveResultDispatcher {
+	if reg == nil {
+		reg = monitoring.NewRegistry()
+	}
+	d := &liveResultDispatcher{
+		log:      log,
+		metrics:  newPublishingMetrics(reg, "live", log),
+		wake:     make(chan struct{}, 1),
+		stopping: make(chan struct{}),
+	}
+	d.setTimeout(timeout)
+	return d
+}
+
+// setTimeout sets how long an action waits for its rows to be handed to the
+// output, counted from when the query returns.
+func (d *liveResultDispatcher) setTimeout(timeout time.Duration) {
+	d.timeout.Store(int64(timeout))
+}
+
+// publishResults hands job's profile and hits to the worker and waits until
+// all hits are handed to Publish, ctx is done, the timeout elapses or the
+// dispatcher stops. It returns the number of hits handed over. Hits not
+// handed over by then are skipped; one already inside a blocked Publish cannot
+// be pulled back and may be delivered late. On the process runtime ctx is
+// the agent client's lifetime context. On the OTel runtime it is the action
+// request's context, which ends at the Fleet action timeout (1 minute by
+// default, or the action's own timeout). So the end of ctx counts as a
+// shutdown only while the dispatcher is stopping, and as a timeout otherwise.
+func (d *liveResultDispatcher) publishResults(ctx context.Context, pub actionQueryPublisher, job liveJob) (int, error) {
+	it := &liveItem{job: job, pub: pub, done: make(chan struct{})}
+	if !d.push(it) {
+		d.metrics.drop(dropShutdown, job.rows())
+		return 0, errLiveShutdown
+	}
+	// Live actions are serialised, so the waiting action is the whole backlog.
+	d.metrics.setQueue(1, job.rows())
+	defer d.metrics.setQueue(0, 0)
+
+	t := time.NewTimer(time.Duration(d.timeout.Load()))
+	defer t.Stop()
+	reason := ""
+	var ctxErr error // ctx's error when it ended while not stopping
+	select {
+	case <-it.done:
+	case <-t.C:
+		reason = dropTimeout
+	case <-ctx.Done():
+		reason = dropShutdown
+		if !d.isStopping() {
+			reason, ctxErr = dropTimeout, ctx.Err()
+		}
+	case <-d.stopping:
+	}
+	d.abandon(it)
+
+	n := int(it.handed.Load())
+	lost := job.rows() - n
+	if it.profiled.Load() {
+		lost--
+	}
+	if lost == 0 {
+		return n, nil
+	}
+	if reason == "" {
+		// The worker returned early: it was stopping, or there were no clients.
+		reason = dropStale
+		if d.isStopping() {
+			reason = dropShutdown
+		}
+	}
+	d.metrics.drop(reason, lost)
+	if n == len(job.hits) {
+		// Only the profile was lost. The action reports its query's outcome,
+		// not the profile's.
+		return n, nil
+	}
+	if ctxErr != nil {
+		return n, fmt.Errorf("%w: %w", errLivePublishTimeout, ctxErr)
+	}
+	return n, liveDropErrors[reason]
+}
+
+// liveDropErrors are the action errors for each drop reason.
+var liveDropErrors = map[string]error{
+	dropTimeout:  errLivePublishTimeout,
+	dropShutdown: errLiveShutdown,
+	dropStale:    errLiveNotConfigured,
+}
+
+// enqueueResponse queues an action response after the action's rows. It never
+// waits. A response is dropped only on stop or when no clients are configured.
+func (d *liveResultDispatcher) enqueueResponse(pub actionResultPublisher, req, res map[string]any) {
+	if !d.push(&liveItem{resPub: pub, req: req, res: res}) {
+		d.metrics.drop(dropShutdown, 1)
+	}
+}
+
+func (d *liveResultDispatcher) push(it *liveItem) bool {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	if d.closed {
+		return false
+	}
+	d.start.Do(func() { go d.run() })
+	d.queue = append(d.queue, it)
+	select {
+	case d.wake <- struct{}{}:
+	default:
+	}
+	return true
+}
+
+// abandon tells the worker to skip its remaining rows, and drops it if the
+// worker has not reached it.
+func (d *liveResultDispatcher) abandon(it *liveItem) {
+	it.cancelled.Store(true)
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	d.queue = slices.DeleteFunc(d.queue, func(q *liveItem) bool { return q == it })
+}
+
+func (d *liveResultDispatcher) run() {
+	for {
+		it, ok := d.next()
+		if !ok {
+			return
+		}
+		d.publish(it)
+	}
+}
+
+func (d *liveResultDispatcher) next() (*liveItem, bool) {
+	for {
+		d.mu.Lock()
+		if d.closed {
+			d.mu.Unlock()
+			return nil, false
+		}
+		if len(d.queue) > 0 {
+			it := d.queue[0]
+			d.queue[0] = nil
+			d.queue = d.queue[1:]
+			d.mu.Unlock()
+			return it, true
+		}
+		d.mu.Unlock()
+		select {
+		case <-d.wake:
+		case <-d.stopping:
+		}
+	}
+}
+
+func (d *liveResultDispatcher) publish(it *liveItem) {
+	if it.pub == nil {
+		if !publishActionResult(it.resPub, it.req, it.res) {
+			d.metrics.drop(dropStale, 1)
+		}
+		return
+	}
+	defer close(it.done)
+	j := it.job
+	if j.profile != nil && !d.abandoned(it) &&
+		publishQueryProfile(it.pub, j.profileIndex, j.actionID, j.responseID, j.spaceID, j.profile, j.reqData) {
+		it.profiled.Store(true)
+	}
+	// stop runs before each hit, so its call count is the number of hits
+	// already handed to Publish; the waiting action reads it on timeout.
+	handed := 0
+	stop := func() bool {
+		it.handed.Store(int64(handed))
+		handed++
+		return d.abandoned(it)
+	}
+	n := it.pub.PublishEach(j.index, j.actionID, "action_id", j.responseID, j.spaceID, "", "", "", nil, j.hits, j.ecsm, j.reqData, stop)
+	it.handed.Store(int64(n))
+}
+
+// publishActionResult publishes an action response and reports whether a
+// client took it. Only liveClients can report a miss.
+func publishActionResult(p actionResultPublisher, req, res map[string]any) bool {
+	if c, ok := p.(*liveClients); ok {
+		return c.publishActionResult(req, res)
+	}
+	p.PublishActionResult(req, res)
+	return true
+}
+
+// publishQueryProfile publishes a live query's profile and reports whether a
+// client took it. Only liveClients can report a miss.
+func publishQueryProfile(p actionQueryPublisher, index, actionID, responseID, spaceID string, profile map[string]any, reqData any) bool {
+	if c, ok := p.(*liveClients); ok {
+		return c.publishQueryProfile(index, "", actionID, responseID, spaceID, profile, reqData)
+	}
+	p.PublishQueryProfile(index, "", actionID, responseID, spaceID, profile, reqData)
+	return true
+}
+
+func (d *liveResultDispatcher) abandoned(it *liveItem) bool {
+	return it.cancelled.Load() || d.isStopping()
+}
+
+func (d *liveResultDispatcher) isStopping() bool {
+	select {
+	case <-d.stopping:
+		return true
+	default:
+		return false
+	}
+}
+
+// stop drops queued action responses and releases waiting actions, which
+// count their own results. It does not join a worker blocked in Publish; the
+// pipeline closing its queue releases it.
+func (d *liveResultDispatcher) stop() {
+	d.mu.Lock()
+	if d.closed {
+		d.mu.Unlock()
+		return
+	}
+	d.closed = true
+	close(d.stopping)
+	queued := d.queue
+	d.queue = nil
+	d.mu.Unlock()
+	for _, it := range queued {
+		if it.pub == nil {
+			d.metrics.drop(dropShutdown, 1)
+		}
+	}
+}
+
+// liveQueryPublisher publishes live results, profiles and action responses.
+type liveQueryPublisher interface {
+	actionQueryPublisher
+	actionResultPublisher
+	Configure(inputs []config.InputConfig) error
+	Close()
+}
+
+// liveClients gives the live worker clients of its own. A policy change swaps
+// in new clients; the old ones are closed once no publish is in flight,
+// because beat.Client.Close waits for an in-flight Publish.
+type liveClients struct {
+	newPublisher func() liveQueryPublisher
+
+	mu      sync.Mutex
+	current *liveLease
+}
+
+var _ liveQueryPublisher = (*liveClients)(nil)
+
+// Configure connects clients for inputs and retires the previous ones. With
+// no inputs it keeps the current clients, as pub.Publisher.Configure does.
+func (c *liveClients) Configure(inputs []config.InputConfig) error {
+	if len(inputs) == 0 {
+		return nil
+	}
+	p := c.newPublisher()
+	if err := p.Configure(inputs); err != nil {
+		p.Close()
+		return err
+	}
+	c.swap(&liveLease{pub: p, responses: hasDataset(inputs, config.DefaultActionResponsesDataset), profiles: hasDataset(inputs, config.DefaultQueryProfileDataset)})
+	return nil
+}
+
+func hasDataset(inputs []config.InputConfig, dataset string) bool {
+	return slices.ContainsFunc(inputs, func(in config.InputConfig) bool { return in.Datastream.Dataset == dataset })
+}
+
+// Close retires the current clients without waiting for a stuck publish.
+func (c *liveClients) Close() {
+	c.swap(nil)
+}
+
+func (c *liveClients) swap(next *liveLease) {
+	c.mu.Lock()
+	previous := c.current
+	c.current = next
+	c.mu.Unlock()
+	if previous != nil {
+		previous.retire()
+	}
+}
+
+func (c *liveClients) PublishEach(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any, stop func() bool) int {
+	l := c.acquire()
+	if l == nil {
+		return 0
+	}
+	defer l.release()
+	return l.pub.PublishEach(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName, meta, hits, ecsm, reqData, stop)
+}
+
+func (c *liveClients) PublishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) {
+	c.publishQueryProfile(index, queryName, actionID, responseID, spaceID, profile, reqData)
+}
+
+// publishQueryProfile is PublishQueryProfile, reporting false when no clients
+// or no profile stream are configured.
+func (c *liveClients) publishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) bool {
+	l := c.acquire()
+	if l == nil {
+		return false
+	}
+	defer l.release()
+	if !l.profiles {
+		return false
+	}
+	l.pub.PublishQueryProfile(index, queryName, actionID, responseID, spaceID, profile, reqData)
+	return true
+}
+
+func (c *liveClients) PublishActionResult(req, res map[string]any) {
+	c.publishActionResult(req, res)
+}
+
+// publishActionResult is PublishActionResult, reporting false when no
+// clients or no action response stream are configured.
+func (c *liveClients) publishActionResult(req, res map[string]any) bool {
+	l := c.acquire()
+	if l == nil {
+		return false
+	}
+	defer l.release()
+	if !l.responses {
+		return false
+	}
+	l.pub.PublishActionResult(req, res)
+	return true
+}
+
+// acquire returns the current lease, locked for publishing, or nil when no
+// clients are configured.
+func (c *liveClients) acquire() *liveLease {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	l := c.current
+	if l != nil {
+		// Lock while the lease is still current, so it cannot have been
+		// closed; a later retire leaves closing it to release.
+		l.mu.Lock()
+	}
+	return l
+}
+
+// liveLease is one generation of live clients.
+type liveLease struct {
+	mu        sync.Mutex // held while publishing
+	retired   atomic.Bool
+	closeOnce sync.Once
+	pub       liveQueryPublisher
+	// responses and profiles report whether the policy has an action
+	// response stream and a query profile stream. Without one, pub drops
+	// the documents silently.
+	responses, profiles bool
+}
+
+func (l *liveLease) release() {
+	if l.retired.Load() {
+		l.closeOnce.Do(l.pub.Close)
+	}
+	l.mu.Unlock()
+}
+
+func (l *liveLease) retire() {
+	l.retired.Store(true)
+	if l.mu.TryLock() {
+		l.closeOnce.Do(l.pub.Close)
+		l.mu.Unlock()
+	}
+}
