@@ -40,7 +40,7 @@ This module can collect any logs from PostgreSQL servers, but to be able to bett
 
 There are some settings to take into account for the log format.
 
-Log lines should be preffixed with the timestamp in milliseconds, the process id, the user id and the database name. This uses to be the default in most distributions, and is translated to this setting in the configuration file:
+Log lines should be prefixed with the timestamp in milliseconds, the process id, the user id and the database name. This used to be the default in most distributions, and is translated to this setting in the configuration file:
 
 ```sh
 log_line_prefix = '%m [%p] %q%u@%d '
