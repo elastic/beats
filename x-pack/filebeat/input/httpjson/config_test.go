@@ -402,7 +402,7 @@ func TestConfigOauth2Validation(t *testing.T) {
 		},
 		{
 			name:        "google can't have token_url or client credentials set",
-			expectedErr: "none of token_url and client credentials can be used, use google.credentials_file, google.jwt_file, google.credentials_json or ADC instead accessing 'auth.oauth2'",
+			expectedErr: "none of token_url, client credentials, azure_tenant_id, azure_resource or endpoint_params can be used with the google provider; use google.credentials_file, google.jwt_file, google.credentials_json or ADC instead accessing 'auth.oauth2'",
 			input: map[string]any{
 				"auth.oauth2": map[string]any{
 					"provider": "google",
