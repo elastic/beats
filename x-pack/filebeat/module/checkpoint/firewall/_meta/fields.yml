@@ -864,7 +864,7 @@
       type: integer
       overwrite: true
       description: >
-        Number of files that were not  scanned due to an error.
+        Number of files that were not scanned due to an error.
 
     - name: next_scheduled_scan_date
       type: keyword

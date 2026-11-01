@@ -1,0 +1,7 @@
+kind: other
+
+summary: Remove a double space from the Check Point scanned_files_error field description
+
+component: filebeat
+
+issue: https://github.com/elastic/beats/issues/50396

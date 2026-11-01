@@ -875,7 +875,7 @@ Module for parsing Checkpoint syslog.
 
 
 **`checkpoint.number_of_errors`**
-:   Number of files that were not  scanned due to an error.
+:   Number of files that were not scanned due to an error.
 
     type: integer
 
