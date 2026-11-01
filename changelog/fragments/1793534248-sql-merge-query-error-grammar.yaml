@@ -1,0 +1,7 @@
+kind: other
+
+summary: Fix grammar in the SQL module's merge-query error message
+
+component: metricbeat
+
+issue: https://github.com/elastic/beats/issues/49916
