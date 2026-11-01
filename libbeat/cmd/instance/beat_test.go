@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -68,6 +69,24 @@ func TestNewInstance(t *testing.T) {
 	}
 	assert.Equal(t, "testbeat", b.Info.Beat)
 	assert.Equal(t, "testbeat", b.Info.IndexPrefix)
+}
+
+func TestNewInitializedBeatSkipsProcessorInitialization(t *testing.T) {
+	initBeatTestEnv(t)
+	require.NoError(t, flag.Set("c", "testdata/mockbeat.yml"))
+
+	processorFactoryCalls := 0
+	b, err := NewInitializedBeat(Settings{
+		SkipProcessorInitialization: true,
+		Processing: func(_ beat.Info, _ *logp.Logger, _ *config.C) (processing.Supporter, error) {
+			processorFactoryCalls++
+			return nil, nil
+		},
+	})
+
+	require.NoError(t, err)
+	assert.Zero(t, processorFactoryCalls, "processor factory must not run when initialization is skipped")
+	assert.Nil(t, b.GetProcessors(), "beat must not retain a processor supporter when initialization is skipped")
 }
 
 // initBeatTestEnv resets the global flag and monitoring state that NewInitializedBeat touches,
