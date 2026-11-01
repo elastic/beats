@@ -98,6 +98,11 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	txID := h.nextTxID()
 	h.log.Debugw("request", "url", r.URL, "method", r.Method, "tx_id", txID)
 	code, err := h.validator.validateRequest(r)
+	if errors.Is(err, errMaxInFlightExceeded) {
+		h.sendMaxInFlightResponse(w)
+		h.metrics.apiErrors.Add(1)
+		return
+	}
 	if err != nil {
 		h.status.UpdateStatus(status.Degraded, "request did not validate: "+err.Error())
 		h.sendAPIErrorResponse(txID, w, r, h.log, code, err)
@@ -215,17 +220,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	objs, code, err := httpReadJSON(body, h.program)
 	if err != nil {
 		if errors.Is(err, errMaxInFlightExceeded) {
-			w.Header().Set("Content-Type", "application/json")
-			w.Header().Set("Retry-After", strconv.Itoa(h.retryAfter*2))
-			w.WriteHeader(http.StatusServiceUnavailable)
-			_, werr := fmt.Fprintf(w,
-				`{"error":"max in flight bytes exceeded during read","max_in_flight":%d,"in_flight":%d}`,
-				h.maxInFlight, h.inFlight.Load(),
-			)
-			if werr != nil {
-				h.log.Errorw("failed to write 503", "error", werr)
-			}
-			h.status.UpdateStatus(status.Degraded, "max in flight bytes exceeded during read")
+			h.sendMaxInFlightResponse(w)
 			h.metrics.apiErrors.Add(1)
 			return
 		}
@@ -306,6 +301,22 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.metrics.batchesPublished.Add(1)
 }
 
+// sendMaxInFlightResponse sends the 503 response for a request that exceeded
+// the max_in_flight_bytes limit while its body was being read.
+func (h *handler) sendMaxInFlightResponse(w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Retry-After", strconv.Itoa(h.retryAfter*2))
+	w.WriteHeader(http.StatusServiceUnavailable)
+	_, err := fmt.Fprintf(w,
+		`{"error":"max in flight bytes exceeded during read","max_in_flight":%d,"in_flight":%d}`,
+		h.maxInFlight, h.inFlight.Load(),
+	)
+	if err != nil {
+		h.log.Errorw("failed to write 503", "error", err)
+	}
+	h.status.UpdateStatus(status.Degraded, "max in flight bytes exceeded during read")
+}
+
 var errTookTooLong = errors.New("could not publish event within timeout")
 
 func getTimeoutWait(u *url.URL, log *logp.Logger) (time.Duration, error) {
@@ -368,8 +379,26 @@ func (h *handler) sendAPIErrorResponse(txID string, w http.ResponseWriter, r *ht
 		log.Debugw("Failed to write HTTP response.", "error", err, "client.address", r.RemoteAddr)
 	}
 	if h.reqLogger != nil {
+		// The request may have been rejected before its body was read, so
+		// do not let the logger read all of what the client sends. One byte
+		// more than is logged is read so that truncation is still reported.
+		r.Body = limitBody(r.Body, maxLogBodyLen+1)
 		h.logRequest(txID, r, status, buf.Bytes())
 	}
+}
+
+// maxLogBodyLen is the largest request body logged by the request tracer.
+const maxLogBodyLen = 10 * (1 << 10)
+
+// limitBody returns b limited to reading n bytes, with Close closing b.
+func limitBody(b io.ReadCloser, n int64) io.ReadCloser {
+	if b == nil || b == http.NoBody {
+		return b
+	}
+	return struct {
+		io.Reader
+		io.Closer
+	}{io.LimitReader(b, n), b}
 }
 
 func (h *handler) logRequest(txID string, r *http.Request, status int, respBody []byte) {
@@ -399,9 +428,7 @@ func (h *handler) logRequest(txID string, r *http.Request, status int, respBody 
 		)
 	}
 	h.log.Debugw("new request trace transaction", "id", txID)
-	// Limit request logging body size to 10kiB.
-	const maxBodyLen = 10 * (1 << 10)
-	httplog.LogRequest(h.reqLogger.With(zap.String("transaction.id", txID)), r, []string{"Authorization"}, maxBodyLen, extra...)
+	httplog.LogRequest(h.reqLogger.With(zap.String("transaction.id", txID)), r, []string{"Authorization"}, maxLogBodyLen, extra...)
 	if scheme != "" {
 		r.URL.Scheme = scheme
 	}
