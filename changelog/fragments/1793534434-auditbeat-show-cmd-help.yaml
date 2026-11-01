@@ -1,0 +1,7 @@
+kind: other
+
+summary: Fix grammar in the Auditbeat "show" command help text
+
+component: auditbeat
+
+issue: https://github.com/elastic/beats/issues/50439
