@@ -1,3 +1,0 @@
-kind: bug-fix
-summary: fix data race in translate_ldap_attribute
-component: all
