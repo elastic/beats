@@ -281,3 +281,59 @@ func runOnEveryBeat(beatDirs []string, mageTarget string) error {
 
 	return nil
 }
+
+// Release is the namespace for release automation tasks.
+// Implementation lives in a nested module (dev-tools/mage/release) so tooling
+// dependencies are not pulled into the root go.mod / NOTICE.txt.
+type Release mg.Namespace
+
+const releaseToolDir = "dev-tools/mage/release"
+
+// runReleaseTool invokes the nested-module CLI with the Beats repo as cwd.
+func runReleaseTool(args ...string) error {
+	root, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	env := map[string]string{"BEATS_REPO_ROOT": root}
+	cmdArgs := append([]string{"run", "-C", releaseToolDir, "./cmd/beats-release"}, args...)
+	return sh.RunWithV(env, "go", cmdArgs...)
+}
+
+// UpdateVersion updates the version in libbeat/version/version.go
+func (Release) UpdateVersion(version string) error {
+	return runReleaseTool("update-version", version)
+}
+
+// UpdateDocs updates version references in documentation and K8s manifests
+func (Release) UpdateDocs(version string) error {
+	return runReleaseTool("update-docs", version)
+}
+
+// UpdateTestEnv updates docker-compose.yml files with new versions
+func (Release) UpdateTestEnv(latest, current string) error {
+	return runReleaseTool("update-test-env", latest, current)
+}
+
+// UpdateMergify updates .mergify.yml backport configuration
+func (Release) UpdateMergify(version string) error {
+	return runReleaseTool("update-mergify", version)
+}
+
+// RunMajorMinor executes the feature-freeze workflow: creates the release branch
+// and 4 grouped PRs (main backport+version, ff-release, main docs+env, next patch).
+func (Release) RunMajorMinor() error {
+	return runReleaseTool("run-major-minor")
+}
+
+// RunPatch executes the patch release workflow: 2 PRs on the release branch
+// (docs before build; next-patch version + test-env after release).
+func (Release) RunPatch() error {
+	return runReleaseTool("run-patch")
+}
+
+// EnsureIssueTracker creates or updates the Beats release checklist issue for
+// CURRENT_RELEASE, linking related Beats PRs labeled "release".
+func (Release) EnsureIssueTracker() error {
+	return runReleaseTool("ensure-issue-tracker")
+}
