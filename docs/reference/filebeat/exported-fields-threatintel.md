@@ -43,7 +43,7 @@ Fields for AbuseCH Malware Threat Intel
 
 
 **`abusech.malware.signature`**
-:   Malware familiy.
+:   Malware family.
 
     type: keyword
 
@@ -331,7 +331,7 @@ Fields for Malware Bazaar Threat Intel
 
 
 **`abusech.malwarebazaar.signature`**
-:   Malware familiy.
+:   Malware family.
 
     type: keyword
 
