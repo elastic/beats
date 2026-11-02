@@ -165,7 +165,7 @@ Example config:
 :   AWS SQS queue url (Required when `var.bucket_arn` is not set).
 
 **`var.visibility_timeout`**
-:   The duration that the received messages are hidden from ReceiveMessage request. Default to be 300 seconds.
+:   The duration that the received messages are hidden from ReceiveMessage request. Defaults to 300 seconds.
 
 **`var.api_timeout`**
 :   The maximum duration of the AWS API call. If it exceeds the timeout, the AWS API call will be interrupted. The default AWS API timeout is `120s`.
@@ -179,7 +179,7 @@ The API timeout must be longer than the `sqs.wait_time` value.
 :   Number of workers that will process the S3 objects listed (Required when `var.bucket_arn` is set). Use to vertically scale the input.
 
 **`var.bucket_list_interval`**
-:   Wait interval between completion of a list request to the S3 bucket and beginning of the next one. Default to be 120 seconds.
+:   Wait interval between completion of a list request to the S3 bucket and beginning of the next one. Defaults to 120 seconds.
 
 **`var.bucket_list_prefix`**
 :   Prefix to apply for the list request to the S3 bucket. Default empty.

@@ -52,7 +52,7 @@ filebeat.inputs:
 ```
 1. {applies_to}`stack: ga 9.1.0`
 
-**Explanation :** This `configuration` given above describes a basic gcs config having two buckets named `gcs-test-new` and `gcs-test-old`. Each of these buckets have their own attributes such as `name`, `batch_size` {applies_to}`stack: ga 9.1.0`, `max_workers`, `poll` and `poll_interval`. These attributes have detailed explanations given [below](#supported-attributes-gcs). For now lets try to understand how this config works.
+**Explanation :** This `configuration` given above describes a basic gcs config having two buckets named `gcs-test-new` and `gcs-test-old`. Each of these buckets has its own attributes such as `name`, `batch_size` {applies_to}`stack: ga 9.1.0`, `max_workers`, `poll` and `poll_interval`. These attributes have detailed explanations given [below](#supported-attributes-gcs). For now let's try to understand how this config works.
 
 For google cloud storage input to identify the files it needs to read and process, it will require the bucket names to be specified. We can have as many buckets as we deem fit. We are also able to configure the attributes `max_workers`, `poll` and `poll_interval` at the root level, which will then be applied to all buckets which do not specify any of these attributes explicitly.
 

@@ -1,0 +1,69 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+package logstash
+
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+)
+
+func TestLogstashEventEncoderMetaBeatPrecedence(t *testing.T) {
+	cases := map[string]struct {
+		meta     mapstr.M
+		expected string
+	}{
+		"no meta uses output index": {
+			meta:     nil,
+			expected: `{"@timestamp":"0001-01-01T00:00:00.000Z","@metadata":{"beat":"test","type":"_doc","version":"1.2.3"},"msg":"message"}`,
+		},
+		"unrelated meta is inlined, output index kept": {
+			meta:     mapstr.M{"pipeline": "p"},
+			expected: `{"@timestamp":"0001-01-01T00:00:00.000Z","@metadata":{"beat":"test","type":"_doc","version":"1.2.3","pipeline":"p"},"msg":"message"}`,
+		},
+		"meta beat overrides output index": {
+			meta:     mapstr.M{"beat": "filebeat"},
+			expected: `{"@timestamp":"0001-01-01T00:00:00.000Z","@metadata":{"beat":"filebeat","type":"_doc","version":"1.2.3"},"msg":"message"}`,
+		},
+		"meta beat overrides output index, other meta keys are kept": {
+			meta:     mapstr.M{"beat": "filebeat", "pipeline": "p"},
+			expected: `{"@timestamp":"0001-01-01T00:00:00.000Z","@metadata":{"beat":"filebeat","type":"_doc","version":"1.2.3","pipeline":"p"},"msg":"message"}`,
+		},
+	}
+
+	for name, test := range cases {
+		t.Run(name, func(t *testing.T) {
+			encode := makeLogstashEventEncoder(logptest.NewTestingLogger(t, ""), "1.2.3", false, "TEST")
+			in := &beat.Event{Fields: mapstr.M{"msg": "message"}, Meta: test.meta}
+			var before mapstr.M
+			if test.meta != nil {
+				before = test.meta.Clone()
+			}
+
+			actual, err := encode(in)
+			require.NoError(t, err, "encoding must not fail")
+			assert.Equal(t, test.expected, string(actual), "unexpected encoded event")
+			assert.Equal(t, before, in.Meta, "event Meta must not be mutated by the encoder")
+		})
+	}
+}

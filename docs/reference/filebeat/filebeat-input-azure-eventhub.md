@@ -271,6 +271,62 @@ Optional, the name of the storage account container you would like to store the 
 
 Optional, by default we are using the azure public environment, to override, users can provide a specific resource manager endpoint in order to use a different azure environment. Ex: [https://management.chinacloudapi.cn/](https://management.chinacloudapi.cn/) for azure ChinaCloud [https://management.microsoftazure.de/](https://management.microsoftazure.de/) for azure GermanCloud [https://management.azure.com/](https://management.azure.com/) for azure PublicCloud [https://management.usgovcloudapi.net/](https://management.usgovcloudapi.net/) for azure USGovernmentCloud Users can also use this in case of a Hybrid Cloud model, where one may define their own endpoints.
 
+This option applies to processor v1 only. Processor v2 derives the storage endpoint suffix from [`authority_host`](#_authority_host) instead.
+
+### `transport` [_transport]
+
+```{applies_to}
+stack: ga 9.4+
+```
+
+The transport protocol for the Event Hub connection. Default is `amqp`.
+
+Valid values:
+- `amqp` (default): standard AMQP 1.0 over TCP port 5671.
+- `websocket`: AMQP-over-WebSocket on port 443. Use this when connecting through HTTP proxies or firewalls that block port 5671.
+
+WebSocket transport requires processor v2. If `processor_version` is set to `v1`, validation rejects the configuration.
+
+### `proxy_url` [_proxy_url]
+
+```{applies_to}
+stack: ga 9.4+
+```
+
+URL of the HTTP proxy to use for outbound connections. Requires processor v2. Applies to the WebSocket Event Hub connection (when `transport` is `websocket`), blob storage requests, and Entra ID credential requests. When unset, proxy configuration falls back to the `HTTPS_PROXY` and `NO_PROXY` environment variables.
+
+:::{note}
+When `transport` is `amqp`, the AMQP connection to Event Hub on port 5671 does not use the proxy. Blob storage and Entra ID requests still use it. Set `transport` to `websocket` for full proxy support.
+:::
+
+### `proxy_disable` [_proxy_disable]
+
+```{applies_to}
+stack: ga 9.4+
+```
+
+If `true`, all proxy settings are ignored, including `proxy_url` and the `HTTPS_PROXY` environment variable. Requires processor v2. Default is `false`.
+
+### `processor_version` [_processor_version]
+
+Controls which event processor implementation to use. Default is `v2`.
+
+Valid values:
+- `v1`: legacy processor based on the older Azure Event Hub SDK.
+- `v2` (default): modern processor based on the current Azure Event Hub SDK.
+
+Switching from v1 to v2 changes the checkpoint storage layout. Existing v1 checkpoints are migrated automatically on first v2 start. Going back to v1 afterwards resumes from stale v1 checkpoints and may cause duplicate events.
+
+### `storage_account_connection_string` [_storage_account_connection_string]
+
+```{applies_to}
+stack: ga 9.4+
+```
+
+The connection string for the storage account used for checkpoint storage (processor v2 only). When not set, the input attempts to construct it from `storage_account` and `storage_account_key` if both are present.
+
+When using `client_secret` or `managed_identity` authentication with processor v2, this option is not needed — the storage account uses the same credentials as Event Hub.
+
 ## Metrics [_metrics_3]
 
 This input exposes metrics under the [HTTP monitoring endpoint](/reference/filebeat/http-endpoint.md). These metrics are exposed under the `/inputs` path. They can be used to observe the activity of the input.

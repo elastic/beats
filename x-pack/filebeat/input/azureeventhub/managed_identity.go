@@ -28,6 +28,9 @@ func newManagedIdentityCredential(config *azureInputConfig, log *logp.Logger) (a
 			Cloud: getAzureCloud(config.AuthorityHost),
 		},
 	}
+	if httpClient := proxyHTTPClient(config.Proxy); httpClient != nil {
+		credentialOptions.Transport = httpClient
+	}
 
 	// If a client ID is provided, use user-assigned managed identity
 	if config.ManagedIdentityClientID != "" {

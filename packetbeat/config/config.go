@@ -20,7 +20,9 @@ package config
 import (
 	"errors"
 	"fmt"
+	"reflect"
 	"runtime"
+	"slices"
 	"strings"
 	"time"
 
@@ -66,7 +68,17 @@ func GetShutDownTimeOut(cfg *conf.C) (time.Duration, error) {
 
 }
 
-// FromStatic initializes a configuration given a config.C
+// FromStatic initializes a configuration given a config.C.
+//
+// The interface keys of the protocols entries in cfg replace c.Interfaces,
+// unless cfg has a top-level interfaces key, which takes precedence. If
+// neither is present, c.Interfaces is unchanged: the placeholder interface
+// from initialConfig in the beater package is kept, and a zero Config has no
+// interfaces. FromStatic does not add a default device.
+//
+// Protocols entries with identical interface keys share one interface, as
+// setupSniffer in the beater package does for NewAgentConfig. Entries that
+// name the same device with different settings are an error.
 func (c Config) FromStatic(cfg *conf.C, _ *logp.Logger) (Config, error) {
 	err := cfg.Unpack(&c)
 	if err != nil {
@@ -76,15 +88,32 @@ func (c Config) FromStatic(cfg *conf.C, _ *logp.Logger) (Config, error) {
 	// protocols streams, so it may arrive as a protocols list entry with
 	// type "flow". Route it to the flows configuration, consistent with
 	// NewAgentConfig.
+	//
+	// When running as an OTel receiver, elastic-agent also puts interface
+	// and procs keys in each protocols entry instead of at the top level.
+	// Collect them here, as NewAgentConfig does for its streams entries.
+	// As in NewAgentConfig, an entry with a procs key is merged with
+	// mergeProcsConfig, which always sets Enabled to true.
+	var streamInterfaces []InterfaceConfig
 	protocols := c.ProtocolsList[:0]
 	for _, protocol := range c.ProtocolsList {
-		module := struct {
-			Type string `config:"type"`
+		stream := struct {
+			Type      string             `config:"type"`
+			Interface *InterfaceConfig   `config:"interface"`
+			Procs     *procs.ProcsConfig `config:"procs"`
 		}{}
-		if err := protocol.Unpack(&module); err != nil {
+		if err := protocol.Unpack(&stream); err != nil {
 			return c, err
 		}
-		if module.Type == "flow" {
+		if stream.Interface != nil && !slices.ContainsFunc(streamInterfaces, func(i InterfaceConfig) bool {
+			return reflect.DeepEqual(i, *stream.Interface)
+		}) {
+			streamInterfaces = append(streamInterfaces, *stream.Interface)
+		}
+		if stream.Procs != nil {
+			c.Procs = mergeProcsConfig(c.Procs, *stream.Procs)
+		}
+		if stream.Type == "flow" {
 			if err := protocol.Unpack(&c.Flows); err != nil {
 				return c, err
 			}
@@ -94,10 +123,17 @@ func (c Config) FromStatic(cfg *conf.C, _ *logp.Logger) (Config, error) {
 	}
 	c.ProtocolsList = protocols
 	iface, err := cfg.Child("interfaces", -1)
-	if err == nil {
+	switch {
+	case err == nil:
+		// The top-level interfaces key takes precedence, so the interface
+		// keys of the protocols entries are ignored.
 		if !iface.IsArray() {
 			c.Interfaces = []InterfaceConfig{*c.Interface}
 		}
+	case len(streamInterfaces) != 0:
+		// c.Interfaces holds the placeholder interface from initialConfig.
+		// Replace it, since appending would also capture on its default device.
+		c.Interfaces = streamInterfaces
 	}
 	c.Interface = nil
 	counts := make(map[string]int)

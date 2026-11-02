@@ -35775,7 +35775,7 @@ type: keyword
 *`ibmmq.errorlog.qmgr`*::
 +
 --
-Name of the queue manager. Queue managers provide queuing services to applications, and manages the queues that belong to them.
+Name of the queue manager. Queue managers provide queuing services to applications, and manage the queues that belong to them.
 
 
 type: keyword
@@ -35814,7 +35814,7 @@ example: Please add example
 *`ibmmq.errorlog.explanation`*::
 +
 --
-Explaines the error in more detail
+Explains the error in more detail
 
 type: keyword
 
@@ -55457,7 +55457,7 @@ type: keyword
 *`salesforce.setup_audit_trail.display`*::
 +
 --
-The full description of changes made in Setup. For example, if the Action field has a value of PermSetCreate, the Display field has a value like “Created permission set MAD: with user license Salesforce.
+The full description of changes made in Setup. For example, if the Action field has a value of PermSetCreate, the Display field has a value like "Created permission set MAD: with user license Salesforce."
 
 
 type: keyword
