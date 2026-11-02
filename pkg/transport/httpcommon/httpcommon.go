@@ -329,6 +329,7 @@ func (settings *HTTPTransportSettings) httpRoundTripper(
 	return t
 }
 
+//nolint:staticcheck // SA1019: x/net/http2 transport is deprecated; migrating to http.Transport.Protocols changes HTTP/2-only behavior.
 func (settings *HTTPTransportSettings) http2RoundTripper(
 	tls *tlscommon.TLSConfig,
 	dialer, tlsDialer transport.Dialer,
