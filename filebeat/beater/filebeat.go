@@ -153,7 +153,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		haveEnabledInputs = true
 	}
 
-	if !config.ConfigInput.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledInputs && config.Autodiscover == nil && !b.Manager.Enabled() {
+	if !config.ConfigInput.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledInputs && config.Autodiscover == nil && !management.UnderAgent() {
 		if !b.InSetupCmd {
 			return nil, fmt.Errorf("no modules or inputs enabled and configuration reloading disabled. What files do you want me to watch?")
 		}
@@ -193,7 +193,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 
 // setupPipelineLoaderCallback sets the callback function for loading pipelines during setup.
 func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
-	if b.Config.Output.Name() != "elasticsearch" && !b.Manager.Enabled() {
+	if b.Config.Output.Name() != "elasticsearch" && !management.UnderAgent() {
 		fb.logger.Warn(pipelinesWarning)
 		return nil
 	}
@@ -248,7 +248,7 @@ func (fb *Filebeat) WithESStateStoreExtension(esStateStoreExtension backend.Regi
 // setup.
 func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 	if b.Config.Output.Name() != "elasticsearch" {
-		if !b.Manager.Enabled() {
+		if !management.UnderAgent() {
 			fb.logger.Warn(pipelinesWarning)
 		}
 		return nil
@@ -389,7 +389,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	// Make sure all events that were published in
-	registrarChannel := newRegistrarLogger(registrar)
+	registrarChannel := newRegistrarLogger(registrar, fb.logger)
 
 	// setup event counting for startup and a global common ACKer, such that all events will be
 	// routed to the reigstrar after they've been ACKed.
@@ -441,7 +441,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		if b.Config.Output.Name() == "elasticsearch" {
 			pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config(), b.Info)
 		} else {
-			if !b.Manager.Enabled() {
+			if !management.UnderAgent() {
 				fb.logger.Warn(pipelinesWarning)
 			}
 		}
@@ -457,13 +457,14 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// The current order is: registrar, publisher, spooler, crawler
 	// That means, crawler is stopped first.
 
-	// Start the registrar
-	err = registrar.Start()
-	if err != nil {
-		return fmt.Errorf("Could not start registrar: %w", err) //nolint:staticcheck //Keep old behavior
-	}
-
-	// Stopping registrar will write last state
+	// The registrar is started by the first V1 input to be created (see
+	// input.RunnerFactory.Create), which includes any input that fell back to
+	// the V1 loader after a V2 creation error. When only V2 inputs (eg.
+	// filestream) are running it is never started, so the registry is not
+	// scanned for state that cannot arrive.
+	//
+	// Stopping registrar will write last state in cases where a registrar was actually
+	// started. When nothing is started this is a no-op.
 	defer registrar.Stop()
 
 	// Stopping publisher (might potentially drop items)

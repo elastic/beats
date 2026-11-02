@@ -47,6 +47,7 @@ type kubeAnnotatorConfig struct {
 	WaitMetadataTimeout     time.Duration                       `config:"wait_for_metadata_timeout"`
 	WaitMetadataRetryPeriod time.Duration                       `config:"wait_for_metadata_retry_period"`
 	AppendFields            bool                                `config:"append_fields"`
+	ImageMetadataSource     string                              `config:"image_metadata_source"`
 }
 
 type Enabled struct {
@@ -65,6 +66,7 @@ func (k *kubeAnnotatorConfig) InitDefaults() {
 	k.WaitMetadata = false
 	k.WaitMetadataTimeout = 30 * time.Second
 	k.WaitMetadataRetryPeriod = 3 * time.Second
+	k.ImageMetadataSource = ImageSourceStatus
 }
 
 func (k *kubeAnnotatorConfig) Validate() error {
@@ -74,6 +76,10 @@ func (k *kubeAnnotatorConfig) Validate() error {
 
 	if k.Scope == "cluster" {
 		k.Node = ""
+	}
+
+	if k.ImageMetadataSource != ImageSourceStatus && k.ImageMetadataSource != ImageSourceSpec {
+		return fmt.Errorf("invalid image_metadata_source %q, valid values include `%s`, `%s`", k.ImageMetadataSource, ImageSourceStatus, ImageSourceSpec)
 	}
 
 	if k.WaitMetadataTimeout < 0 {

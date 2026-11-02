@@ -111,7 +111,7 @@ type HarvesterGroup interface {
 	// StopHarvesters cancels all running Harvesters.
 	StopHarvesters() error
 	// SetObserver sets the observer to get notified when a harvester closes.
-	SetObserver(c chan HarvesterStatus)
+	SetObserver(o HarvesterObserver)
 	// Migrate re-keys a running or pending harvester from oldID to next's
 	// identity and persists the new key via updateStore, so the harvester keeps
 	// running under its new identity without being restarted. It is safe to call
@@ -119,6 +119,13 @@ type HarvesterGroup interface {
 	// runs. It returns an error if a harvester is already registered under next's
 	// identity. An open session is told the new source.
 	Migrate(oldID string, next Source, updateStore func(newID string) error) error
+}
+
+// HarvesterObserver is notified when a harvester closes. HarvesterClosed is
+// called on the closing harvester's goroutine, so implementations must not
+// block.
+type HarvesterObserver interface {
+	HarvesterClosed(HarvesterStatus)
 }
 
 // HarvesterStatus is used to notify an observer that the harvester for the ID

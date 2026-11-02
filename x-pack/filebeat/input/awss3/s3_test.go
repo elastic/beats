@@ -1250,6 +1250,48 @@ func TestCreateS3API(t *testing.T) {
 		require.Equal(t, cfg.RegionName, input.awsConfig.Region)
 	})
 
+	// InitializeAWSConfig has already set the region from default_region
+	// when the environment and profile provide none.
+	t.Run("non-AWS bucket with default_region only", func(t *testing.T) {
+		cfg := config{NonAWSBucketName: "my-bucket"}
+		cfg.AWSConfig.DefaultRegion = "auto"
+		input := &s3PollerInput{
+			config:    cfg,
+			awsConfig: aws.Config{Region: "auto"},
+		}
+
+		api, err := input.createS3API(context.Background())
+		require.NoError(t, err)
+		require.NotNil(t, api)
+		require.Equal(t, "auto", input.awsConfig.Region)
+	})
+
+	t.Run("non-AWS bucket env or profile region takes precedence over default_region", func(t *testing.T) {
+		cfg := config{NonAWSBucketName: "my-bucket"}
+		cfg.AWSConfig.DefaultRegion = "auto"
+		input := &s3PollerInput{
+			config:    cfg,
+			awsConfig: aws.Config{Region: "us-west-2"},
+		}
+
+		_, err := input.createS3API(context.Background())
+		require.NoError(t, err)
+		require.Equal(t, "us-west-2", input.awsConfig.Region)
+	})
+
+	t.Run("non-AWS bucket region takes precedence over the AWS config region", func(t *testing.T) {
+		cfg := config{NonAWSBucketName: "my-bucket", RegionName: "us-west-2"}
+		cfg.AWSConfig.DefaultRegion = "auto"
+		input := &s3PollerInput{
+			config:    cfg,
+			awsConfig: aws.Config{Region: "auto"},
+		}
+
+		_, err := input.createS3API(context.Background())
+		require.NoError(t, err)
+		require.Equal(t, "us-west-2", input.awsConfig.Region)
+	})
+
 	// "non-AWS bucket without region" is invalid and rejected by config.Validate();
 	t.Run("non-AWS bucket with configured region, aws region and configured region mismatch", func(t *testing.T) {
 		ctx := context.Background()

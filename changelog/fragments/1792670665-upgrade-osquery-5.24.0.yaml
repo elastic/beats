@@ -1,0 +1,14 @@
+kind: upgrade
+
+summary: upgrade osquery version to 5.24.0
+
+description: >
+  Upgrade the bundled osquery runtime to version 5.24.0. It fixes a deadlock
+  in osqueryd that could occur when the osquery extension restarted: osqueryd
+  stopped answering queries, every extension restart was rejected with
+  "Refusing to register duplicate extension osquery-extension", and on Windows
+  queries failed with "boost::lock_error: No error" until the agent was
+  restarted (osquery/osquery#9163). It also includes a fix for a heap buffer
+  overflow in the Windows processes table (GHSA-4r78-6hg6-33gg).
+
+component: osquerybeat

@@ -19,6 +19,7 @@ package pipeline
 
 import (
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -262,4 +263,92 @@ type readyChanHookQueue struct {
 func (q *readyChanHookQueue) ReadyChan() <-chan struct{} {
 	q.once.Do(func() { close(q.parked) })
 	return q.UnblockingQueue.ReadyChan()
+}
+
+// TestEventConsumerDispatchesInline verifies a target with a dispatch func
+// (and no channel) receives batches, including retried ones, inline.
+func TestEventConsumerDispatchesInline(t *testing.T) {
+	q := memqueue.NewQueue[publisher.Event](
+		logp.NewNopLogger(), queue.NewQueueObserver(nil),
+		memqueue.Settings{Events: 10, MaxGetRequest: 1, FlushTimeout: 10 * time.Millisecond},
+		0, nil)
+	producer := q.Producer(queue.ProducerConfig{})
+	_, ok := producer.Publish(publisher.Event{Content: beat.Event{Private: 0}})
+	require.True(t, ok, "publish should succeed")
+
+	c := newEventConsumer(logp.NewNopLogger(), nilObserver)
+	ch := make(chan publisher.Batch, 4)
+	defer func() {
+		q.Close(false)
+		c.close()
+	}()
+	c.setTarget(consumerTarget{
+		queue:      q,
+		dispatch:   func(b publisher.Batch) { ch <- b },
+		batchSize:  1,
+		timeToLive: 2,
+	})
+
+	first := receiveBatch(t, ch)
+	require.Len(t, first.Events(), 1, "first batch should hold the event")
+	first.Retry()
+
+	second := receiveBatch(t, ch)
+	assert.Len(t, second.Events(), 1, "retried batch should be dispatched again")
+}
+
+// TestEventConsumerUnblockingDispatchServicesRetries verifies that on the
+// unblocking (slabqueue) path, inline dispatch does not starve retries while
+// the queue never runs dry.
+func TestEventConsumerUnblockingDispatchServicesRetries(t *testing.T) {
+	pool := slabqueue.NewPool[publisher.Event](slabqueue.Settings{Events: 64}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+	defer q.Close(true)
+	p := q.Producer(queue.ProducerConfig{})
+
+	c := newEventConsumer(logptest.NewTestingLogger(t, ""), nilObserver)
+	defer c.close()
+
+	var (
+		first      publisher.Batch
+		dispatched atomic.Int32
+	)
+	firstSeen := make(chan struct{})
+	// Every dispatch publishes a replacement event, so the queue is never
+	// empty and the consumer never reaches its blocking select on its own.
+	// The calls are serialized: they all run on the consumer goroutine.
+	dispatch := func(b publisher.Batch) {
+		p.Publish(publisher.Event{Content: beat.Event{Private: 1}})
+		if dispatched.Add(1) == 1 {
+			first = b
+			close(firstSeen)
+			return
+		}
+		b.ACK() // free the pool slot
+	}
+
+	for range 8 {
+		_, ok := p.Publish(publisher.Event{Content: beat.Event{Private: 1}})
+		require.True(t, ok, "prefill publish should succeed")
+	}
+	c.setTarget(consumerTarget{queue: q, dispatch: dispatch, batchSize: 1, timeToLive: 3})
+
+	select {
+	case <-firstSeen:
+	case <-time.After(2 * time.Second):
+		t.Fatal("timed out waiting for the first dispatched batch")
+	}
+
+	retried := make(chan struct{})
+	go func() {
+		first.Retry() // blocks until the consumer reads retryChan
+		close(retried)
+	}()
+	select {
+	case <-retried:
+	case <-time.After(2 * time.Second):
+		t.Fatal("retry was not serviced while the queue kept supplying batches")
+	}
+	assert.Greater(t, dispatched.Load(), int32(1), "batches should keep being dispatched inline")
 }

@@ -22,6 +22,7 @@ package pipeline
 import (
 	"context"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -34,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/slabqueue"
 	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/monitoring"
@@ -549,6 +551,83 @@ func TestNewForReceiverConnects(t *testing.T) {
 	require.NoError(t, p.Disconnect(context.Background()))
 }
 
+// TestReceiverClientPublishContextCancel checks that a Beat receiver client can
+// cancel a publish blocked on a full queue. The receiver pipeline wraps its
+// producers in trackedProducer, which must forward PublishContext.
+func TestReceiverClientPublishContextCancel(t *testing.T) {
+	const events = 32 // the smallest queue.mem.events allowed
+	var queueCfg conf.Namespace
+	err := conf.MustNewConfigFrom(map[string]any{
+		"mem": map[string]any{"events": events, "flush.min_events": 1},
+	}).Unpack(&queueCfg)
+	require.NoError(t, err, "the queue config must unpack")
+	p, err := NewForReceiver(beatInfoNoDrain(t), monitorsForTest(), queueCfg, Settings{})
+	require.NoError(t, err, "NewForReceiver must succeed")
+	bc, err := p.ConnectWith(beat.ClientConfig{})
+	require.NoError(t, err, "ConnectWith must succeed")
+	defer bc.Close()
+	// Runs first: force-closes the queue, so a publish that ignored its ctx
+	// cannot block bc.Close.
+	defer func() { _ = p.Disconnect(cancelledContext()) }()
+
+	cp, ok := bc.(beat.ContextPublisher)
+	require.True(t, ok, "the receiver client must implement beat.ContextPublisher")
+	for i := range events {
+		require.NoError(t, cp.PublishContext(t.Context(), beat.Event{}), "publish %d must fit in the queue", i)
+	}
+
+	ctx, cancel := context.WithTimeout(t.Context(), 50*time.Millisecond)
+	defer cancel()
+	errc := make(chan error, 1)
+	go func() { errc <- cp.PublishContext(ctx, beat.Event{}) }()
+	select {
+	case err := <-errc:
+		assert.ErrorIs(t, err, context.DeadlineExceeded, "a publish on a full receiver queue must stop at its ctx deadline")
+	case <-time.After(10 * time.Second):
+		t.Fatal("PublishContext on a full receiver queue ignored its ctx deadline")
+	}
+}
+
+// TestClientPublishContextReceiverClosed checks that a Beat receiver's client,
+// whose trackedProducer wraps a slabqueue producer, reports beat.ErrClientClosed
+// once the client is closed or the controller has closed its producer.
+func TestClientPublishContextReceiverClosed(t *testing.T) {
+	tests := []struct {
+		name          string
+		closeClient   bool
+		closeProducer bool
+	}{
+		{name: "client closed", closeClient: true},
+		// The controller closes producers left open when the pipeline
+		// disconnects, while their clients are still open.
+		{name: "producer closed by controller", closeProducer: true},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			q := slabqueue.NewPool[publisher.Event](slabqueue.Settings{Events: 4}, nil).Connect()
+			defer q.Close(true)
+			listener := &mockClientListener{}
+			p := &trackedProducer{
+				Producer:   q.Producer(queue.ProducerConfig{}),
+				controller: &otelOutputController{},
+			}
+			c := newContextTestClient(p, listener, nil)
+			require.NotNil(t, c.ctxProducer, "a receiver's client must publish through trackedProducer.PublishContext")
+			if tc.closeClient {
+				require.NoError(t, c.Close(), "Close must succeed")
+			}
+			if tc.closeProducer {
+				p.Close()
+			}
+
+			err := c.PublishContext(t.Context(), beat.Event{})
+			assert.ErrorIs(t, err, beat.ErrClientClosed, "PublishContext must report the closed client or producer")
+			assert.Equal(t, 1, listener.eventsDroppedOnPublish, "the refused event must be reported as dropped")
+			assert.Equal(t, 0, listener.eventsPublished, "no event must be published")
+		})
+	}
+}
+
 func testEvent(i int) publisher.Event {
 	return publisher.Event{
 		Content: beat.Event{Private: i},
@@ -559,4 +638,42 @@ func cancelledContext() context.Context {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	return ctx
+}
+
+type countingClient struct {
+	published atomic.Int32
+	closed    atomic.Bool
+}
+
+func (c *countingClient) String() string { return "countingClient" }
+func (c *countingClient) Close() error   { c.closed.Store(true); return nil }
+func (c *countingClient) Publish(ctx context.Context, b publisher.Batch) error {
+	<-ctx.Done()
+	c.published.Add(1)
+	return nil
+}
+
+// TestSpawningDispatcherCloseWaitsForPublish verifies dispatch never blocks and
+// Close cancels the publish context, waits for in-flight publishes, then closes
+// the client.
+func TestSpawningDispatcherCloseWaitsForPublish(t *testing.T) {
+	client := &countingClient{}
+	d := newSpawningDispatcher(client)
+
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		d.dispatch(nil)
+		d.dispatch(&ttlBatch{})
+		d.dispatch(&ttlBatch{})
+	}()
+	select {
+	case <-done:
+	case <-time.After(2 * time.Second):
+		t.Fatal("dispatch blocked while publishes were in flight")
+	}
+
+	require.NoError(t, d.Close(), "Close should succeed")
+	assert.Equal(t, int32(2), client.published.Load(), "Close should wait for in-flight publishes")
+	assert.True(t, client.closed.Load(), "Close should close the client")
 }

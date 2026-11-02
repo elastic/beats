@@ -130,23 +130,13 @@ func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Regis
 				stats.Lost.Set(metrics.Lost)
 				stats.NonAggregations.Set(metrics.NonAggregations)
 				stats.Removals.Set(metrics.Removals)
-				// Quark hands out timestamps in nanoseconds since
-				// boot, converted at the last moment with
-				// quark.TimeToWallclock(). Refresh the boottime
-				// epoch so a system clock step (say NTP correcting
-				// a clock that was wrong at boot) doesn't leave
-				// every converted timestamp skewed by the step
-				// size. Quark only stores the epoch if btime
-				// actually changed, which happens only on a step.
-				if err := quark.UpdateBoottime(); err != nil {
-					logger.Warnf("can't update quark boottime: %v", err)
-				}
+				stats.Stalls.Set(metrics.Stalls)
 				lastUpdate = time.Now()
 			}
 
 			// Quark is idle, Block for a bit
 			if !ok {
-				err = qq.Block()
+				err := qq.Block()
 				if err != nil {
 					logger.Errorw("quark block, no more process enrichment from this processor will be done", "error", err)
 					break
@@ -178,11 +168,18 @@ const (
 // The function waits up to a maximum limit (maxWaitLimit) for the pid to appear in the cache using an exponential delay strategy.
 // If the pid is not found within the time limit, then an error is returned.
 //
+// The wait is only useful while quark may still be catching up with the event,
+// so the time limit is measured from the event's timestamp, not from when the
+// event reaches Sync. An event that has already waited in the pipeline for
+// longer than maxWaitLimit does not wait at all. Without this, a backlog of
+// events for processes that have exited makes every lookup wait the full limit,
+// and the processor can never catch up.
+//
 // The function also maintains a moving window of time for tracking delays, and applies a backoff strategy if the combined wait time
 // exceeds a certain limit (combinedWaitLimit). This is done so that in the case where there are multiple delays, the cumulative delay
 // does not exceed a reasonable threshold that would delay all other events processed by auditbeat. When in the backoff state, enrichment
 // will proceed without waiting for the process data to exist in the cache, likely resulting in missing enrichment data.
-func (p *prvdr) Sync(_ *beat.Event, pid uint32) error {
+func (p *prvdr) Sync(ev *beat.Event, pid uint32) error {
 	// If pid is already in qq, return immediately
 	if _, found := p.lookupLocked(pid); found {
 		return nil
@@ -190,26 +187,55 @@ func (p *prvdr) Sync(_ *beat.Event, pid uint32) error {
 
 	start := time.Now()
 
+	limit := waitLimit(ev, start)
+	if limit <= 0 {
+		// No wait is spent, so this event does not count towards backoff.
+		return fmt.Errorf("process %v was not seen and the event is too old to wait for it", pid)
+	}
+
 	if p.handleBackoff(start) {
 		return nil
 	}
 
-	// Wait until either the process exists within the cache or the maxWaitLimit is exceeded, with an exponential delay
-	nextWait := 5 * time.Millisecond
+	waited, found := waitFor(func() bool {
+		_, ok := p.lookupLocked(pid)
+		return ok
+	}, limit)
+	p.addCombinedWait(waited)
+	if found {
+		p.logger.Debugw("got process that was missing ", "waited", waited)
+		return nil
+	}
+	return fmt.Errorf("process %v was not seen after %v", pid, waited)
+}
+
+// waitLimit returns how long Sync may wait for the process of ev, at most
+// maxWaitLimit. Time the event has already spent in the pipeline counts
+// against the limit. An event with no timestamp is treated as new.
+func waitLimit(ev *beat.Event, now time.Time) time.Duration {
+	if ev == nil || ev.Timestamp.IsZero() {
+		return maxWaitLimit
+	}
+	age := max(0, now.Sub(ev.Timestamp))
+	return max(0, maxWaitLimit-age)
+}
+
+// waitFor polls found with an exponential delay until it returns true or limit
+// has elapsed. It returns the time waited and whether found succeeded.
+func waitFor(found func() bool, limit time.Duration) (time.Duration, bool) {
+	start := time.Now()
+	nextWait := min(5*time.Millisecond, limit)
 	for {
 		waited := time.Since(start)
-		if _, found := p.lookupLocked(pid); found {
-			p.logger.Debugw("got process that was missing ", "waited", waited)
-			p.addCombinedWait(waited)
-			return nil
+		if found() {
+			return waited, true
 		}
-		if waited >= maxWaitLimit {
-			p.addCombinedWait(waited)
-			return fmt.Errorf("process %v was not seen after %v", pid, waited)
+		if waited >= limit {
+			return waited, false
 		}
 		time.Sleep(nextWait)
-		if nextWait*2+waited > maxWaitLimit {
-			nextWait = maxWaitLimit - waited
+		if nextWait*2+waited > limit {
+			nextWait = limit - waited
 		} else {
 			nextWait = nextWait * 2
 		}
@@ -272,7 +298,11 @@ func (p *prvdr) GetProcess(pid uint32) (*types.Process, error) {
 		Minor: proc.Proc.TtyMinor,
 	})
 
-	start := time.Unix(0, int64(quark.TimeToWallclock(proc.Proc.TimeBoot))) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
+	// Quark hands out timestamps in nanoseconds since boot, fetch
+	// the boottime epoch once for the process and all its leaders,
+	// see wallclock().
+	epoch := quark.Boottime()
+	start := wallclock(epoch, proc.Proc.TimeBoot)
 
 	ret := types.Process{
 		PID:              proc.Pid,
@@ -299,16 +329,16 @@ func (p *prvdr) GetProcess(pid uint32) (*types.Process, error) {
 	ret.TTY.CharDevice.Major = uint16(proc.Proc.TtyMajor) //nolint:gosec // tty major/minor numbers fit in uint16
 	ret.TTY.CharDevice.Minor = uint16(proc.Proc.TtyMinor) //nolint:gosec // tty major/minor numbers fit in uint16
 	if proc.Exit.Valid {
-		end := time.Unix(0, int64(quark.TimeToWallclock(proc.Exit.ExitTimeProcess))) //nolint:gosec // ExitTimeProcess is a nanosecond timestamp that fits in int64
+		end := wallclock(epoch, proc.Exit.ExitTimeProcess)
 		ret.ExitCode = proc.Exit.ExitCode
 		ret.End = &end
 	}
 	ret.EntityID = calculateEntityIDv1(pid, *ret.Start)
 
-	p.fillParent(&ret, proc.Proc.Ppid)
-	p.fillGroupLeader(&ret, proc.Proc.Pgid)
-	p.fillSessionLeader(&ret, proc.Proc.Sid)
-	p.fillEntryLeader(&ret, proc.Proc.EntryLeader)
+	p.fillParent(&ret, proc.Proc.Ppid, epoch)
+	p.fillGroupLeader(&ret, proc.Proc.Pgid, epoch)
+	p.fillSessionLeader(&ret, proc.Proc.Sid, epoch)
+	p.fillEntryLeader(&ret, proc.Proc.EntryLeader, epoch)
 	setEntityID(&ret)
 	setSameAsProcess(&ret)
 	return &ret, nil
@@ -321,14 +351,23 @@ func (p *prvdr) lookupLocked(pid uint32) (quark.Process, bool) {
 	return p.qq.Lookup(int(pid))
 }
 
+// wallclock translates sinceBoot, nanoseconds since boot as handed out
+// by quark, to wallclock by adding epoch, the boottime epoch from
+// quark.Boottime(). Since-boot times are immune to system clock
+// changes: the translation happens at the last moment and the epoch
+// is fetched once per GetProcess to reduce the frequency of cgo calls.
+func wallclock(epoch, sinceBoot uint64) time.Time {
+	return time.Unix(0, int64(sinceBoot+epoch)) //nolint:gosec // nanosecond timestamps fit in int64
+}
+
 // fillParent populates the parent process fields with the attributes of the process with PID `ppid`
-func (p *prvdr) fillParent(process *types.Process, ppid uint32) {
+func (p *prvdr) fillParent(process *types.Process, ppid uint32, epoch uint64) {
 	proc, found := p.lookupLocked(ppid)
 	if !found {
 		return
 	}
 
-	start := time.Unix(0, int64(quark.TimeToWallclock(proc.Proc.TimeBoot))) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
+	start := wallclock(epoch, proc.Proc.TimeBoot)
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
 		Minor: proc.Proc.TtyMinor,
@@ -352,17 +391,17 @@ func (p *prvdr) fillParent(process *types.Process, ppid uint32) {
 	if ok {
 		process.Parent.Group.Name = groupname
 	}
-	process.Parent.EntityID = calculateEntityIDv1(ppid, *process.Start)
+	process.Parent.EntityID = calculateEntityIDv1(ppid, *process.Parent.Start)
 }
 
 // fillGroupLeader populates the process group leader fields with the attributes of the process with PID `pgid`
-func (p *prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
+func (p *prvdr) fillGroupLeader(process *types.Process, pgid uint32, epoch uint64) {
 	proc, found := p.lookupLocked(pgid)
 	if !found {
 		return
 	}
 
-	start := time.Unix(0, int64(quark.TimeToWallclock(proc.Proc.TimeBoot))) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
+	start := wallclock(epoch, proc.Proc.TimeBoot)
 
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
@@ -391,13 +430,13 @@ func (p *prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 }
 
 // fillSessionLeader populates the session leader fields with the attributes of the process with PID `sid`
-func (p *prvdr) fillSessionLeader(process *types.Process, sid uint32) {
+func (p *prvdr) fillSessionLeader(process *types.Process, sid uint32, epoch uint64) {
 	proc, found := p.lookupLocked(sid)
 	if !found {
 		return
 	}
 
-	start := time.Unix(0, int64(quark.TimeToWallclock(proc.Proc.TimeBoot))) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
+	start := wallclock(epoch, proc.Proc.TimeBoot)
 
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
@@ -426,13 +465,13 @@ func (p *prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 }
 
 // fillEntryLeader populates the entry leader fields with the attributes of the process with PID `elid`
-func (p *prvdr) fillEntryLeader(process *types.Process, elid uint32) {
+func (p *prvdr) fillEntryLeader(process *types.Process, elid uint32, epoch uint64) {
 	proc, found := p.lookupLocked(elid)
 	if !found {
 		return
 	}
 
-	start := time.Unix(0, int64(quark.TimeToWallclock(proc.Proc.TimeBoot))) //nolint:gosec // TimeBoot is a nanosecond timestamp that fits in int64
+	start := wallclock(epoch, proc.Proc.TimeBoot)
 
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,

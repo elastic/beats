@@ -89,20 +89,18 @@ func NewRegistryBridge(settings component.TelemetrySettings, receiverID string, 
 		inputFloatGauges: make(map[string]metric.Float64ObservableGauge),
 	}
 
-	// Discover initial stats and per-input metrics under a single write lock.
-	// Only ints and floats are bridged — OTel instruments are numeric only.
-	b.mu.Lock()
+	// Discover initial stats and per-input metrics. Only ints and floats are
+	// bridged — OTel instruments are numeric only. The ensure* helpers take
+	// b.mu themselves and must not be called with it held.
 	if statsRegistry != nil {
 		snap := monitoring.CollectFlatSnapshot(statsRegistry, monitoring.Full, false)
 		for key := range snap.Ints {
 			if err := b.ensureStatsInt(key); err != nil {
-				b.mu.Unlock()
 				return nil, err
 			}
 		}
 		for key := range snap.Floats {
 			if err := b.ensureStatsFloat(key); err != nil {
-				b.mu.Unlock()
 				return nil, err
 			}
 		}
@@ -125,19 +123,16 @@ func NewRegistryBridge(settings component.TelemetrySettings, receiverID string, 
 				switch v.(type) {
 				case float64:
 					if err := b.ensureInputFloat(field); err != nil {
-						b.mu.Unlock()
 						return nil, err
 					}
 				case int64, uint64, int:
 					if err := b.ensureInputInt(field); err != nil {
-						b.mu.Unlock()
 						return nil, err
 					}
 				}
 			}
 		}
 	}
-	b.mu.Unlock()
 
 	instruments := b.allInstruments()
 	logger.Info("registry bridge registering callback",
@@ -181,19 +176,30 @@ func (b *RegistryBridge) Shutdown() {
 	b.reRegWg.Wait()
 }
 
+// Locking. The OTel SDK holds its pipeline lock while it runs the callback, and
+// the callback takes b.mu. Creating an instrument and registering or
+// unregistering the callback all need the pipeline lock (Unregister waits for
+// an in-flight callback), so none of them may be done with b.mu held: the
+// callback would wait for b.mu while the holder of b.mu waits for the pipeline
+// lock the callback's caller holds. The ensure* helpers below therefore take
+// b.mu only around the map accesses, and create the instrument between them.
+// Only one goroutine creates instruments at a time (the constructor, then
+// createAndReRegister under reRegMu), so the check and the insert cannot race
+// with another creator.
+
 // ensureStatsInt creates an int instrument for the given stats key if one does
 // not already exist. System-level metrics are skipped. Gauge vs counter is
 // determined by isGauge.
-// Caller must hold b.mu (write lock). Must NOT be called from within an OTel
-// callback (pipeline lock deadlock).
+// Must be called without b.mu held, see the locking note above.
 func (b *RegistryBridge) ensureStatsInt(key string) error {
 	if isSystemMetric(key) {
 		return nil
 	}
-	if _, ok := b.intGauges[key]; ok {
-		return nil
-	}
-	if _, ok := b.intCounters[key]; ok {
+	b.mu.RLock()
+	_, isGaugeInst := b.intGauges[key]
+	_, isCounterInst := b.intCounters[key]
+	b.mu.RUnlock()
+	if isGaugeInst || isCounterInst {
 		return nil
 	}
 	if isGauge(key) {
@@ -201,44 +207,52 @@ func (b *RegistryBridge) ensureStatsInt(key string) error {
 		if err != nil {
 			return err
 		}
+		b.mu.Lock()
 		b.intGauges[key] = inst
+		b.mu.Unlock()
 	} else {
 		inst, err := b.meter.Int64ObservableCounter(key)
 		if err != nil {
 			return err
 		}
+		b.mu.Lock()
 		b.intCounters[key] = inst
+		b.mu.Unlock()
 	}
 	return nil
 }
 
 // ensureStatsFloat creates a float gauge instrument for the given stats key.
 // System-level metrics are skipped. All float metrics in beats are gauges.
-// Caller must hold b.mu (write lock). Must NOT be called from within an OTel
-// callback.
+// Must be called without b.mu held, see the locking note above.
 func (b *RegistryBridge) ensureStatsFloat(key string) error {
 	if isSystemMetric(key) {
 		return nil
 	}
-	if _, ok := b.floatGauges[key]; ok {
+	b.mu.RLock()
+	_, ok := b.floatGauges[key]
+	b.mu.RUnlock()
+	if ok {
 		return nil
 	}
 	inst, err := b.meter.Float64ObservableGauge(key)
 	if err != nil {
 		return err
 	}
+	b.mu.Lock()
 	b.floatGauges[key] = inst
+	b.mu.Unlock()
 	return nil
 }
 
 // ensureInputInt creates a per-input int instrument for the given field name.
-// Caller must hold b.mu (write lock). Must NOT be called from within an OTel
-// callback.
+// Must be called without b.mu held, see the locking note above.
 func (b *RegistryBridge) ensureInputInt(field string) error {
-	if _, ok := b.inputIntGauges[field]; ok {
-		return nil
-	}
-	if _, ok := b.inputIntCounters[field]; ok {
+	b.mu.RLock()
+	_, isGaugeInst := b.inputIntGauges[field]
+	_, isCounterInst := b.inputIntCounters[field]
+	b.mu.RUnlock()
+	if isGaugeInst || isCounterInst {
 		return nil
 	}
 	if isGauge(field) {
@@ -246,30 +260,38 @@ func (b *RegistryBridge) ensureInputInt(field string) error {
 		if err != nil {
 			return err
 		}
+		b.mu.Lock()
 		b.inputIntGauges[field] = inst
+		b.mu.Unlock()
 	} else {
 		inst, err := b.meter.Int64ObservableCounter(field)
 		if err != nil {
 			return err
 		}
+		b.mu.Lock()
 		b.inputIntCounters[field] = inst
+		b.mu.Unlock()
 	}
 	return nil
 }
 
 // ensureInputFloat creates a per-input float gauge instrument for the given
 // field name. All float metrics in beats are gauges.
-// Caller must hold b.mu (write lock). Must NOT be called from within an OTel
-// callback.
+// Must be called without b.mu held, see the locking note above.
 func (b *RegistryBridge) ensureInputFloat(field string) error {
-	if _, ok := b.inputFloatGauges[field]; ok {
+	b.mu.RLock()
+	_, ok := b.inputFloatGauges[field]
+	b.mu.RUnlock()
+	if ok {
 		return nil
 	}
 	inst, err := b.meter.Float64ObservableGauge(field)
 	if err != nil {
 		return err
 	}
+	b.mu.Lock()
 	b.inputFloatGauges[field] = inst
+	b.mu.Unlock()
 	return nil
 }
 
@@ -373,14 +395,29 @@ func (b *RegistryBridge) createAndReRegister(statsInts, statsFloats, inputInts, 
 	b.reRegMu.Lock()
 	defer b.reRegMu.Unlock()
 
-	// Batch-create all pending instruments and unregister the old callback
-	// under a single write lock, reducing lock/unlock cycles.
-	b.mu.Lock()
-	if b.closed {
-		b.mu.Unlock()
+	b.mu.RLock()
+	closed := b.closed
+	b.mu.RUnlock()
+	if closed {
 		return
 	}
 
+	// Unregister the old callback before publishing any new instrument. If the
+	// old callback were still live, it would observe the new instruments (they
+	// are in the maps) without being registered for them, and the SDK would
+	// log an error and drop the sample. Take the registration out under the
+	// lock, then unregister with the lock released: Unregister waits for an
+	// in-flight callback, which needs b.mu.
+	b.mu.Lock()
+	old := b.registration
+	b.registration = nil
+	b.mu.Unlock()
+	if old != nil {
+		_ = old.Unregister()
+	}
+
+	// Nothing below may hold b.mu while it calls into the meter, see the
+	// locking note on the ensure* helpers.
 	for _, key := range statsInts {
 		if err := b.ensureStatsInt(key); err != nil {
 			b.logger.Warn("failed to create stats int instrument", zap.String("key", key), zap.Error(err))
@@ -402,14 +439,6 @@ func (b *RegistryBridge) createAndReRegister(statsInts, statsFloats, inputInts, 
 		}
 	}
 
-	if b.registration != nil {
-		_ = b.registration.Unregister()
-		b.registration = nil
-	}
-	b.mu.Unlock()
-
-	// allInstruments() takes its own RLock, so we must not hold the write
-	// lock here. RegisterCallback is also called without the lock held.
 	instruments := b.allInstruments()
 	reg, err := b.meter.RegisterCallback(b.callback, instruments...)
 	if err != nil {
@@ -420,10 +449,11 @@ func (b *RegistryBridge) createAndReRegister(statsInts, statsFloats, inputInts, 
 
 	b.mu.Lock()
 	if b.closed {
+		b.mu.Unlock()
 		_ = reg.Unregister()
-	} else {
-		b.registration = reg
+		return
 	}
+	b.registration = reg
 	b.mu.Unlock()
 }
 

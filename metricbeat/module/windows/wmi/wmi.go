@@ -222,7 +222,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				for _, propertyName := range properties {
 					propertyValue, err := instance.GetProperty(propertyName)
 					if err != nil {
-						m.Logger().Error("Unable to get propery by name: %v", err)
+						m.Logger().Error("Unable to get property by name: %v", err)
 						continue
 					}
 

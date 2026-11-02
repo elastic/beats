@@ -42,6 +42,8 @@ func (th *timerHeap) Pop() any {
 	old := *th
 	n := len(old)
 	tt := old[n-1]
+	// The backing array outlives the shrink; a stale pointer keeps the task's whole monitor alive.
+	old[n-1] = nil
 	*th = old[0 : n-1]
 	return tt
 }

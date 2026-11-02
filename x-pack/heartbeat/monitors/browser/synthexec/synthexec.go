@@ -178,16 +178,22 @@ func runCmd(
 	filterJourneys FilterJourneyConfig,
 	sFields stdfields.StdMonitorFields,
 	traceID string,
-) (mpx *ExecMultiplexer, err error) {
+) (_ *ExecMultiplexer, err error) {
 	// Attach sysproc attrs to ensure subprocesses are properly killed
 	platformCmdMutate(cmd)
 
-	mpx = NewExecMultiplexer()
+	mpx := NewExecMultiplexer()
 	// Setup a pipe for JSON structured output
 	jsonReader, jsonWriter, err := os.Pipe()
 	if err != nil {
 		return nil, err
 	}
+	defer func() {
+		if err != nil {
+			_ = jsonWriter.Close()
+			_ = jsonReader.Close()
+		}
+	}()
 
 	// Common args
 	cmd.Env = append(os.Environ(), "NODE_ENV=production")
@@ -220,43 +226,68 @@ func runCmd(
 	cmd.Args = append(cmd.Args, "--outfd", "3")
 
 	//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-	logp.L().Info("Running command: %s in directory: '%s'", cmd, cmd.Dir)
+	logp.L().Infof("Running command: %s in directory: '%s'", cmd, cmd.Dir)
 
 	if stdinStr != nil {
 		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-		logp.L().Debug(debugSelector, "Using stdin str %s", *stdinStr)
+		logp.L().Named(debugSelector).Debugf("Using stdin str %s", *stdinStr)
 		cmd.Stdin = strings.NewReader(*stdinStr)
 	}
 
-	wg := sync.WaitGroup{}
-
-	// Send stdout into the output
 	stdoutPipe, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, fmt.Errorf("could not open stdout pipe: %w", err)
 	}
-	wg.Go(func() {
-		err := scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
-		if err != nil {
-			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-			logp.L().Warn("could not scan stdout events from synthetics: %s", err)
-		}
-
-	})
-
 	stderrPipe, err := cmd.StderrPipe()
 	if err != nil {
 		return nil, fmt.Errorf("could not open stderr pipe: %w", err)
 	}
+
+	// Scan output from before cmd.Start: cmd.Wait closes these pipes as soon as
+	// the command exits, losing anything not read yet. A failed cmd.Start
+	// closes them too, so these scanners return without being waited on.
+	var wg sync.WaitGroup
+	wg.Go(func() {
+		err := scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
+		if err != nil {
+			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
+			logp.L().Warnf("could not scan stdout events from synthetics: %s", err)
+		}
+	})
 	wg.Go(func() {
 		err := scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)
 		if err != nil {
 			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-			logp.L().Warn("could not scan stderr events from synthetics: %s", err)
+			logp.L().Warnf("could not scan stderr events from synthetics: %s", err)
 		}
 	})
 
-	// Send the test results into the output
+	// This use of channels for results is awkward, but required for the thread locking below
+	cmdStarted := make(chan error)
+	cmdDone := make(chan error)
+	go func() {
+		// We must idle this thread and ensure it is not killed while the external program is running
+		// see https://github.com/golang/go/issues/27505#issuecomment-713706104 . Otherwise, the Pdeathsig
+		// could cause the subprocess to die prematurely
+		runtime.LockOSThread()
+		defer runtime.UnlockOSThread()
+		err := cmd.Start()
+		cmdStarted <- err
+		// Nobody receives from cmdDone after a failed start.
+		if err == nil {
+			cmdDone <- cmd.Wait()
+		}
+	}()
+
+	err = <-cmdStarted
+	if err != nil {
+		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
+		logp.L().Warnf("Could not start command %s: %s", cmd, err)
+		return nil, err
+	}
+
+	// The results reader closes jsonReader, which cmd.Start reads as one of
+	// the ExtraFiles, so it starts only once cmd.Start has returned.
 	wg.Go(func() {
 		defer jsonReader.Close()
 
@@ -277,32 +308,7 @@ func runCmd(
 
 			mpx.writeSynthEvent(&se)
 		}
-
 	})
-
-	// This use of channels for results is awkward, but required for the thread locking below
-	cmdStarted := make(chan error)
-	cmdDone := make(chan error)
-	go func() {
-		// We must idle this thread and ensure it is not killed while the external program is running
-		// see https://github.com/golang/go/issues/27505#issuecomment-713706104 . Otherwise, the Pdeathsig
-		// could cause the subprocess to die prematurely
-		runtime.LockOSThread()
-		defer runtime.UnlockOSThread()
-		err = cmd.Start()
-
-		cmdStarted <- err
-
-		err := cmd.Wait()
-		cmdDone <- err
-	}()
-
-	err = <-cmdStarted
-	if err != nil {
-		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-		logp.L().Warn("Could not start command %s: %s", cmd, err)
-		return nil, err
-	}
 
 	// Get timeout from parent ctx
 	timeout, _ := ctx.Value(SynthexecTimeoutKey).(time.Duration)
@@ -318,7 +324,7 @@ func runCmd(
 		err := cmd.Process.Kill()
 		if err != nil {
 			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-			logp.L().Warn("could not kill synthetics process: %s", err)
+			logp.L().Warnf("could not kill synthetics process: %s", err)
 		}
 	}()
 
@@ -327,14 +333,14 @@ func runCmd(
 		err := <-cmdDone
 		_ = jsonWriter.Close()
 		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-		logp.L().Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), cmd)
+		logp.L().Infof("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), cmd)
 
 		var cmdError *SynthError = nil
 		if err != nil {
 			// err could be generic or it could have been killed by context timeout, log and check context
 			// to decide which error to stream
 			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-			logp.L().Warn("Error executing command '%s' (%d): %s", cmd, cmd.ProcessState.ExitCode(), err)
+			logp.L().Warnf("Error executing command '%s' (%d): %s", cmd, cmd.ProcessState.ExitCode(), err)
 
 			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 				timeout, _ := ctx.Value(SynthexecTimeoutKey).(time.Duration)
@@ -372,7 +378,7 @@ func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text stri
 		se, err := transform(scanner.Bytes(), scanner.Text())
 		if err != nil {
 			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-			logp.L().Warn("error parsing line: %s for line: %s", err, scanner.Text())
+			logp.L().Warnf("error parsing line: %s for line: %s", err, scanner.Text())
 			continue
 		}
 		if se != nil {
@@ -382,7 +388,7 @@ func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text stri
 
 	if scanner.Err() != nil {
 		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-		logp.L().Warn("error scanning synthetics runner results %s", scanner.Err())
+		logp.L().Warnf("error scanning synthetics runner results %s", scanner.Err())
 		return scanner.Err()
 	}
 
@@ -396,7 +402,7 @@ var stderrToSynthEvent = lineToSynthEventFactory(Stderr)
 func lineToSynthEventFactory(typ string) func(bytes []byte, text string) (res *SynthEvent, err error) {
 	return func(bytes []byte, text string) (res *SynthEvent, err error) {
 		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-		logp.L().Info("%s: %s", typ, text)
+		logp.L().Infof("%s: %s", typ, text)
 		return &SynthEvent{
 			Type:                 typ,
 			TimestampEpochMicros: float64(time.Now().UnixMicro()),

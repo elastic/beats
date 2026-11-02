@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"sync"
 	"time"
 
@@ -53,11 +54,9 @@ type LineReader struct {
 	tempBuffer   []byte
 	logger       *logp.Logger
 
-	// mu serializes Next against Close. The multiline TimeoutReader runs Next in
-	// a background goroutine and can call Close while that goroutine is still
-	// inside Next; without this lock Close would recycle tempBuffer (returning it
-	// to the shared pool and niling the field) while Next is still reading it.
-	mu sync.Mutex
+	// mu serializes Next against Close, which can run on different goroutines.
+	mu     sync.Mutex
+	closed bool
 }
 
 // NewLineReader creates a new reader object
@@ -94,13 +93,17 @@ func NewLineReader(input io.ReadCloser, config Config, logger *logp.Logger) (*Li
 // value n is the number of bytes that were consumed from the
 // underlying reader to read the next line.  If the LineReader is
 // configured with maxBytes n may be larger than the length of b due
-// to skipped lines.
+// to skipped lines. Once the LineReader is closed, Next returns
+// os.ErrClosed, even if complete lines are still buffered.
 func (r *LineReader) Next() (b []byte, n int, err error) {
 	// Hold mu for the duration of the read so a concurrent Close cannot recycle
-	// tempBuffer out from under us. mu is uncontended unless this reader is being
-	// driven by the multiline TimeoutReader's background goroutine.
+	// tempBuffer out from under us. mu is only contended while Close runs.
 	r.mu.Lock()
 	defer r.mu.Unlock()
+
+	if r.closed {
+		return nil, 0, os.ErrClosed
+	}
 
 	// This loop is need in case advance detects an line ending which turns out
 	// not to be one when decoded. If that is the case, reading continues.
@@ -339,9 +342,9 @@ func (r *LineReader) decode(end int) (int, error) {
 }
 
 func (r *LineReader) Close() error {
-	// Close the underlying reader first. If a Next is in flight (e.g. the
-	// multiline TimeoutReader's background goroutine), closing the source
-	// unblocks its pending Read so that Next returns and releases r.mu.
+	// Close the underlying reader first. If a Next is in flight on another
+	// goroutine, closing the source unblocks its pending Read so that Next
+	// returns and releases r.mu.
 	err := r.reader.Close()
 
 	// Now reclaim the scratch buffer. Taking r.mu guarantees no Next is still
@@ -349,6 +352,7 @@ func (r *LineReader) Close() error {
 	// always been copied into the streambufs, so nothing downstream references
 	// it.
 	r.mu.Lock()
+	r.closed = true
 	putTempBuffer(r.tempBuffer)
 	r.tempBuffer = nil
 	r.mu.Unlock()

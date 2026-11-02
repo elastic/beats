@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix per-stream interface and procs config being dropped under the OTel runtime.
+component: packetbeat

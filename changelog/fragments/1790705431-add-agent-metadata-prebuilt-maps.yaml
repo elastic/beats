@@ -1,3 +1,0 @@
-kind: enhancement
-summary: Reduce per-event allocations in the add_agent_metadata processor by prebuilding the static metadata maps once at construction.
-component: libbeat

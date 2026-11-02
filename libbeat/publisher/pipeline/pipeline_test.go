@@ -18,7 +18,10 @@
 package pipeline
 
 import (
+	"context"
+	"maps"
 	"runtime"
+	"slices"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -202,6 +205,15 @@ func (p *testProducer) Publish(event publisher.Event) (queue.EntryID, bool) {
 	return 0, false
 }
 
+// PublishContext ignores ctx and reports a refused event as queue.ErrRejected.
+func (p *testProducer) PublishContext(_ context.Context, event publisher.Event) (queue.EntryID, error) {
+	id, ok := p.Publish(event)
+	if !ok {
+		return 0, queue.ErrRejected
+	}
+	return id, nil
+}
+
 func (p *testProducer) TryPublish(event publisher.Event) (queue.EntryID, bool) {
 	if p.publish != nil {
 		return p.publish(true, event)
@@ -229,11 +241,13 @@ func makeTestQueue() queue.Queue[publisher.Event] {
 
 	return &testQueue{
 		close: func(_ bool) error {
+			// Close the producers without holding mux: their Close takes it.
 			mux.Lock()
-			for producer := range producers {
+			open := slices.Collect(maps.Keys(producers))
+			mux.Unlock()
+			for _, producer := range open {
 				producer.Close()
 			}
-			mux.Unlock()
 
 			wg.Wait()
 			return nil
@@ -253,10 +267,17 @@ func makeTestQueue() queue.Queue[publisher.Event] {
 					}
 					return p.Publish(event)
 				},
+				// Like a memqueue producer, closing releases a blocked
+				// Publish. Both the client and the queue close it, so
+				// only the first Close counts.
 				cancel: func() {
 					mux.Lock()
 					defer mux.Unlock()
+					if _, ok := producers[producer]; !ok {
+						return
+					}
 					delete(producers, producer)
+					p.Close()
 					wg.Done()
 				},
 			}

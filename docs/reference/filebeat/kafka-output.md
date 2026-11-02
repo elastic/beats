@@ -91,7 +91,7 @@ The username for connecting to Kafka. If username is configured, the password mu
 
 ### `password` [_password_4]
 
-The password for connecting to Kafka.
+The password for connecting to Kafka. If password is configured, the username must be configured as well.
 
 
 ### `sasl.mechanism` [_sasl_mechanism_2]

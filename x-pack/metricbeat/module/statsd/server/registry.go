@@ -5,6 +5,7 @@
 package server
 
 import (
+	"sync/atomic"
 	"time"
 
 	"github.com/rcrowley/go-metrics"
@@ -71,6 +72,9 @@ type samplingTimer struct {
 	metrics.Timer
 	meter     metrics.Meter
 	histogram metrics.Histogram
+	// count is the number of measurements since the last flush, tracked here
+	// because the meter count is monotonic and cannot be reset.
+	count atomic.Int64
 }
 
 // NewSamplingTimer returns a new SamplingTimer
@@ -88,25 +92,37 @@ func newSamplingTimer() *samplingTimer {
 // SampledUpdate will update the timer a sampled measurement
 func (s *samplingTimer) SampledUpdate(d time.Duration, sampleRate float64) {
 	s.histogram.Update(int64(d))
-	s.meter.Mark(int64(1 / sampleRate))
+	count := int64(1 / sampleRate)
+	s.meter.Mark(count)
+	s.count.Add(count)
 }
 
 // Snapshot gets a snapshot of the SamplingTimer
 func (s *samplingTimer) Snapshot() samplingTimerSnapshot {
 	return samplingTimerSnapshot{
+		count:     s.count.Load(),
 		histogram: s.histogram.Snapshot(),
 		meter:     s.meter.Snapshot(),
 	}
 }
 
+// Reset clears the values that are aggregated over a single flush interval. The
+// meter's moving average rates are deliberately left alone, they span fixed
+// time windows and are not tied to the interval.
+func (s *samplingTimer) Reset() {
+	s.count.Store(0)
+	s.histogram.Clear()
+}
+
 type samplingTimerSnapshot struct {
+	count     int64
 	histogram metrics.Histogram
 	meter     metrics.Meter
 }
 
-// Count returns the number of events recorded at the time the snapshot was
-// taken.
-func (t *samplingTimerSnapshot) Count() int64 { return t.meter.Count() }
+// Count returns the number of events recorded since the last flush at the time
+// the snapshot was taken.
+func (t *samplingTimerSnapshot) Count() int64 { return t.count }
 
 // Max returns the maximum value at the time the snapshot was taken.
 func (t *samplingTimerSnapshot) Max() int64 { return t.histogram.Max() }
@@ -183,6 +199,10 @@ type metricsGroup struct {
 	metrics mapstr.M
 }
 
+// getMetric returns the values to report for a single metric and resets the
+// accumulators that are scoped to one flush interval, so that every flush
+// reports what happened since the previous one. It returns nil when the metric
+// has nothing to report for this interval.
 func (r *registry) getMetric(metric any) map[string]any {
 	values := map[string]any{}
 	switch m := metric.(type) {
@@ -193,6 +213,11 @@ func (r *registry) getMetric(metric any) map[string]any {
 		values["value"] = m.Value()
 	case metrics.Histogram:
 		h := m.Snapshot()
+		if h.Count() == 0 {
+			// Reporting the aggregates of an empty sample would only add
+			// zeroed out min/max/mean values.
+			return nil
+		}
 		ps := h.Percentiles([]float64{0.5, 0.75, 0.95, 0.99, 0.999})
 		values["count"] = h.Count()
 		values["min"] = h.Min()
@@ -204,8 +229,15 @@ func (r *registry) getMetric(metric any) map[string]any {
 		values["p95"] = ps[2]
 		values["p99"] = ps[3]
 		values["p99_9"] = ps[4]
+		m.Clear()
 	case *samplingTimer:
 		t := m.Snapshot()
+		// Count() is extrapolated from the sample rate and rounds down to zero
+		// for a sample rate above one, so the raw number of measurements is
+		// what decides whether anything was recorded. See the histogram case.
+		if t.histogram.Count() == 0 {
+			return nil
+		}
 		ps := t.Percentiles([]float64{0.5, 0.75, 0.95, 0.99, 0.999})
 		values["count"] = t.Count()
 		values["min"] = t.Min()
@@ -221,6 +253,7 @@ func (r *registry) getMetric(metric any) map[string]any {
 		values["5m_rate"] = t.Rate5()
 		values["15m_rate"] = t.Rate15()
 		values["mean_rate"] = t.RateMean()
+		m.Reset()
 	case *setMetric:
 		values["count"] = m.Count()
 		m.Reset()
@@ -255,12 +288,22 @@ func (r *registry) GetAll() []metricsGroup {
 			// all the .tags are the same for this metricsMap
 			// we just need one
 			tags = m.tags
-			fields[m.name] = r.getMetric(m.metric)
+
+			values := r.getMetric(m.metric)
+			if len(values) == 0 {
+				continue
+			}
+			fields[m.name] = values
 		}
 
 		// cleanup the tag group if it's empty
 		if len(metricsMap) == 0 {
 			delete(r.metrics, tagGroupKey)
+			continue
+		}
+
+		// every metric in this group is idle, there is nothing to report
+		if len(fields) == 0 {
 			continue
 		}
 

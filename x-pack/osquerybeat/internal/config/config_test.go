@@ -546,3 +546,67 @@ func TestGetOsqueryCheckTimeout(t *testing.T) {
 		}
 	})
 }
+
+func TestResultInput(t *testing.T) {
+	result := InputConfig{Datastream: DatastreamConfig{Dataset: DefaultDataset}}
+	actions := InputConfig{Datastream: DatastreamConfig{Dataset: DefaultActionResponsesDataset}}
+	profile := InputConfig{Datastream: DatastreamConfig{Dataset: DefaultQueryProfileDataset}}
+	noDataset := InputConfig{}
+	custom := InputConfig{Datastream: DatastreamConfig{Dataset: "custom.dataset"}}
+
+	tests := []struct {
+		name   string
+		inputs []InputConfig
+		want   int // Index into inputs, or -1 for nil.
+	}{
+		{name: "empty", inputs: nil, want: -1},
+		{name: "result_first", inputs: []InputConfig{result, actions, profile}, want: 0},
+		{name: "result_last", inputs: []InputConfig{profile, actions, result}, want: 2},
+		{name: "empty_dataset_is_result", inputs: []InputConfig{actions, noDataset}, want: 1},
+		{name: "first_match_wins", inputs: []InputConfig{actions, noDataset, result}, want: 1},
+		{name: "custom_dataset_falls_back_to_first_input", inputs: []InputConfig{custom}, want: 0},
+		{name: "no_result_falls_back_to_first_input", inputs: []InputConfig{actions, profile}, want: 0},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := ResultInput(test.inputs)
+			if test.want < 0 {
+				if got != nil {
+					t.Errorf("ResultInput(%d inputs) = %v; want nil", len(test.inputs), got)
+				}
+				return
+			}
+			if got != &test.inputs[test.want] {
+				t.Errorf("ResultInput(%d inputs) did not return inputs[%d]", len(test.inputs), test.want)
+			}
+		})
+	}
+}
+
+// TestGettersUseResultInput checks that the getters read the result input
+// when it is not the first input.
+func TestGettersUseResultInput(t *testing.T) {
+	inputs := []InputConfig{
+		{Datastream: DatastreamConfig{Dataset: DefaultQueryProfileDataset}},
+		{Datastream: DatastreamConfig{Dataset: DefaultActionResponsesDataset}},
+		{
+			Datastream: DatastreamConfig{Dataset: DefaultDataset},
+			Osquery: &OsqueryConfig{
+				Options:        map[string]any{"verbose": true},
+				ElasticOptions: &ElasticOptions{CheckTimeout: "42s"},
+			},
+		},
+	}
+
+	opts := GetOsqueryOptions(inputs)
+	if opts["verbose"] != true {
+		t.Errorf("GetOsqueryOptions = %v; want verbose=true", opts)
+	}
+	timeout, err := GetOsqueryCheckTimeout(inputs)
+	if err != nil {
+		t.Fatalf("GetOsqueryCheckTimeout: %v", err)
+	}
+	if timeout != 42*time.Second {
+		t.Errorf("GetOsqueryCheckTimeout = %v; want 42s", timeout)
+	}
+}

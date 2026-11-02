@@ -826,14 +826,18 @@ func (s *fileScanner) matchedEarlier(a string, aIndex int, b string, bIndex int)
 	// path components, not full-path bytes. The two diverge when a sibling name is
 	// a byte-prefix of another and the next byte sorts before '/' (e.g. Glob visits
 	// "d" before "d-x", yet "d-x/a" < "d/z").
-	as := strings.Split(a, string(filepath.Separator))
-	bs := strings.Split(b, string(filepath.Separator))
-	for i := range min(len(as), len(bs)) {
-		if as[i] != bs[i] {
-			return as[i] < bs[i]
+	sep := string(filepath.Separator)
+	for {
+		ac, aRest, aMore := strings.Cut(a, sep)
+		bc, bRest, bMore := strings.Cut(b, sep)
+		if ac != bc {
+			return ac < bc
 		}
+		if !aMore || !bMore {
+			return !aMore && bMore
+		}
+		a, b = aRest, bRest
 	}
-	return len(as) < len(bs)
 }
 
 // pathsCanOverlap reports whether any two patterns can match the same file. It is

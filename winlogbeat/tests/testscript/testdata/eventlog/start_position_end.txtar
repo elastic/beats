@@ -1,0 +1,58 @@
+[!windows] skip 'requires Windows'
+
+# With start_position: end and no bookmark, existing records are not published.
+# A subscription to future events has nothing to return until a new event is
+# written, so with no_more_events: stop the process exits without output.
+write-event 'Before start'
+wait-for-event-log 1
+exec winlogbeat -c winlogbeat-end.yml --path.data $WORK/data
+check-event-count output 0
+
+# With the default start position, existing records are published and a
+# bookmark is saved. This sets up the bookmark for the next scenario.
+exec winlogbeat -c winlogbeat-beginning.yml --path.data $WORK/data
+check-event-count output 1
+check-event-field output 0 message 'Before start'
+rm $WORK/output
+
+# With start_position: end and a bookmark, reading resumes from the bookmark.
+# The event written while winlogbeat was stopped is published, showing that
+# start_position only applies when there is no bookmark.
+write-event 'After bookmark'
+wait-for-event-log 2
+exec winlogbeat -c winlogbeat-end.yml --path.data $WORK/data
+check-event-count output 1
+check-event-field output 0 message 'After bookmark'
+
+-- winlogbeat-end.yml --
+winlogbeat.shutdown_timeout: 30s
+winlogbeat.event_logs:
+  - name: ${PROVIDER:?missing PROVIDER}
+    start_position: end
+    no_more_events: stop
+output.file:
+  path: ${WORK:?missing WORK}/output
+  filename: winlogbeat
+  rotate_every_kb: 10000
+queue.mem:
+  events: 4096
+  flush.min_events: 1
+  flush.timeout: 0.1s
+logging.level: warning
+logging.to_files: false
+
+-- winlogbeat-beginning.yml --
+winlogbeat.shutdown_timeout: 30s
+winlogbeat.event_logs:
+  - name: ${PROVIDER:?missing PROVIDER}
+    no_more_events: stop
+output.file:
+  path: ${WORK:?missing WORK}/output
+  filename: winlogbeat
+  rotate_every_kb: 10000
+queue.mem:
+  events: 4096
+  flush.min_events: 1
+  flush.timeout: 0.1s
+logging.level: warning
+logging.to_files: false

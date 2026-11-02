@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Reject invalid negative RESP array lengths in the Redis parser.
+component: packetbeat

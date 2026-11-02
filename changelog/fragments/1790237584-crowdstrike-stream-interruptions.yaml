@@ -1,0 +1,13 @@
+kind: bug-fix
+summary: Resume CrowdStrike Event Streams after dropped firehose connections without exhausting retries.
+description: |
+  The CrowdStrike streaming input counted a firehose connection dropped mid-stream
+  (reported as "error decoding event: unexpected EOF") as a failed attempt, and only
+  reset the count when a stream ended cleanly. Drops spread over hours of healthy
+  streaming accumulated until max_attempts was exceeded and the input stopped until
+  it was restarted. A drop after events were delivered now reconnects from the cursor
+  and resets the attempt count, the unit reports healthy again once events flow, and
+  feed connects, ends, interruptions and non-2xx session refresh responses are logged.
+  Each session error is now counted once in errors_total, and a clean end of stream is
+  not counted as an error.
+component: filebeat

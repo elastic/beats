@@ -421,6 +421,8 @@ filebeat.inputs:
 
 The maximum number of times the input should attempt to reconnect to the streaming data source in the event of a connection failure. The default value is `5` which means a maximum of 5 retries will be attempted.
 
+{applies_to}`stack: ga 9.4+` For the `crowdstrike` stream type, a firehose connection that is dropped after delivering events is resumed from the cursor without counting as an attempt, and the attempt count resets. Only consecutive failures that deliver no events count toward `max_attempts`.
+
 
 ### `retry.wait_min` [_retry_wait_min]
 

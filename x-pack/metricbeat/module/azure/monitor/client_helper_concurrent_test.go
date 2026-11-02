@@ -379,3 +379,66 @@ func TestConcurrentMapMetricsNoConfiguredTimegrain(t *testing.T) {
 		m.AssertExpectations(t)
 	})
 }
+
+func TestConcurrentMapMetricsSkipsUnsupportedPlatformMetricNamespace(t *testing.T) {
+	unsupported := resourceExpanded("activity-log-alert")
+	supported := resourceExpanded("key-vault")
+	metricDefinitions := armmonitor.MetricDefinitionCollection{Value: MockMetricDefinitions()}
+	metricConfig := azure.MetricConfig{
+		Name:              []string{"*"},
+		Namespace:         "Microsoft.Insights/activityLogAlerts",
+		Timegrain:         oneHrDuration,
+		IgnoreUnsupported: true,
+	}
+	resourceConfig := azure.ResourceConfig{Metrics: []azure.MetricConfig{metricConfig}}
+	client := azure.NewMockBatchClient(logptest.NewTestingLogger(t, ""))
+	service := &azure.MockService{}
+	service.On("GetMetricDefinitionsWithRetry", "activity-log-alert", metricConfig.Namespace).
+		Return(armmonitor.MetricDefinitionCollection{}, unsupportedPlatformMetricNamespaceError(metricConfig.Namespace)).Once()
+	service.On("GetMetricDefinitionsWithRetry", "key-vault", metricConfig.Namespace).
+		Return(metricDefinitions, nil).Once()
+	client.AzureMonitorService = service
+	definitions := make(chan []azure.Metric)
+	errs := make(chan error, 1)
+	client.ResourceConfigurations.MetricDefinitionsChan = definitions
+	client.ResourceConfigurations.ErrorChan = errs
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	concurrentMapMetrics(client, []*armresources.GenericResourceExpanded{unsupported, supported}, resourceConfig, &wg)
+	go func() {
+		wg.Wait()
+		close(definitions)
+		close(errs)
+	}()
+
+	var collected []azure.Metric
+	var gotErr error
+	definitionsClosed := false
+	errsClosed := false
+	for !definitionsClosed || !errsClosed {
+		select {
+		case defs, ok := <-definitions:
+			if !ok {
+				definitionsClosed = true
+				continue
+			}
+			collected = append(collected, defs...)
+		case err, ok := <-errs:
+			if !ok {
+				errsClosed = true
+				continue
+			}
+			if err != nil {
+				gotErr = err
+			}
+		}
+	}
+
+	assert.NoError(t, gotErr, "HTTP 400 for an unsupported platform metric namespace should be skipped when ignore_unsupported is true")
+	assert.NotEmpty(t, collected, "metrics for the supported resource should still be collected")
+	for _, metric := range collected {
+		assert.Equal(t, "key-vault", metric.ResourceId, "only the supported resource should be mapped")
+	}
+	service.AssertExpectations(t)
+}

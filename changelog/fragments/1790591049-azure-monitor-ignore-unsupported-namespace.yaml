@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: Skip unsupported Azure Monitor metric namespaces when ignore_unsupported is true instead of failing collection on HTTP 400
+component: metricbeat
+issue: https://github.com/elastic/beats/issues/52999

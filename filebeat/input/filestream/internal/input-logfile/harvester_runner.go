@@ -91,6 +91,11 @@ type sourceState struct {
 	ctx       inputv2.Context
 	cancel    context.CancelFunc
 
+	// closedOffset is what finish reports to the observer for a source whose
+	// session failed to open, if hasClosedOffset is set.
+	closedOffset    int64
+	hasClosedOffset bool
+
 	// Runner bookkeeping, guarded by harvesterRunner.mu.
 	status         sourceStatus
 	holdsSlot      bool // occupies one of the harvesterLimit open slots
@@ -134,8 +139,8 @@ type harvesterRunner struct {
 	// open files. Sources that cannot get an open slot are queued (see waiting).
 	harvesterLimit uint64
 
-	ctx        inputv2.Context // input lifetime context, for the waker
-	notifyChan chan HarvesterStatus
+	ctx      inputv2.Context // input lifetime context, for the waker
+	observer HarvesterObserver
 
 	// readUntilEOF, when enabled, makes StopHarvesters drain every source to EOF
 	// (bounded by its Timeout) before tearing it down, instead of cancelling
@@ -250,7 +255,7 @@ func (g *harvesterRunner) start() {
 	}
 }
 
-func (g *harvesterRunner) SetObserver(c chan HarvesterStatus) { g.notifyChan = c }
+func (g *harvesterRunner) SetObserver(o HarvesterObserver) { g.observer = o }
 
 // run spawns a reader goroutine for state unless one is already reading it (or it is
 // being torn down, or the group is shutting down). While draining (read_until_eof
@@ -420,11 +425,9 @@ func (g *harvesterRunner) setup(state *sourceState) error {
 	session, err := g.harvester.OpenSession(state.ctx, src, id, state.cursor, g.metrics)
 	if err != nil {
 		// Unnotified, the watcher never emits another event for an unchanged
-		// file, so a transient open failure (fd exhaustion) strands it. Notify
-		// before releasing the resource, while the cursor is still readable.
-		if offset, ok := cursorOffset(state.ctx.Logger, state.cursor); ok {
-			g.notifyObserver(state, offset)
-		}
+		// file, so a transient open failure (fd exhaustion) strands it. Read the
+		// offset before releasing the resource, while the cursor is still readable.
+		state.closedOffset, state.hasClosedOffset = cursorOffset(state.ctx.Logger, state.cursor)
 		_ = client.Close()
 		releaseResource(resource)
 		state.resource = nil
@@ -785,12 +788,10 @@ func (g *harvesterRunner) finish(state *sourceState) {
 	wasSetUp := state.setUp
 	g.mu.Unlock()
 
-	if state.session != nil {
-		g.notifyObserver(state, state.session.Offset())
-	}
-
 	log := state.ctx.Logger
+	offset, notify := state.closedOffset, state.hasClosedOffset
 	if state.session != nil {
+		offset, notify = state.session.Offset(), true
 		log.Debug("Closing reader of filestream")
 		_ = state.session.Close()
 	}
@@ -824,7 +825,9 @@ func (g *harvesterRunner) finish(state *sourceState) {
 
 	// Remove the source from the runner only after its resources are released,
 	// so anything that observes the removal (Restart's <-done wait, hasID) sees a
-	// fully torn-down source rather than one still closing its session. Releasing
+	// fully torn-down source rather than one still closing its session. The
+	// observer is told only after the removal too, because a Start prompted by
+	// the notification ignores a source that is still registered. Releasing
 	// the slot here (after the fd is closed) and promoting the next queued source
 	// keeps the open-files count at or below harvesterLimit at all times.
 	g.mu.Lock()
@@ -839,6 +842,10 @@ func (g *harvesterRunner) finish(state *sourceState) {
 	}
 	g.mu.Unlock()
 
+	if notify {
+		g.notifyObserver(state, offset)
+	}
+
 	close(state.done)
 
 	if promoted != nil {
@@ -847,13 +854,10 @@ func (g *harvesterRunner) finish(state *sourceState) {
 }
 
 func (g *harvesterRunner) notifyObserver(state *sourceState, offset int64) {
-	if g.notifyChan == nil {
+	if g.observer == nil {
 		return
 	}
-	select {
-	case g.notifyChan <- HarvesterStatus{ID: state.srcID, Size: offset}:
-	case <-g.ctx.Cancelation.Done():
-	}
+	g.observer.HarvesterClosed(HarvesterStatus{ID: state.srcID, Size: offset})
 }
 
 // cursorOffset returns the offset cursor holds in the registry, which is how much

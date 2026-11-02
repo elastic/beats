@@ -6,6 +6,7 @@ package pub
 
 import (
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -14,6 +15,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 )
@@ -37,28 +39,59 @@ type Publisher struct {
 	// client for osquery_manager.query_profile
 	queryProfileClient    beat.Client
 	profileDropWarnLogged bool
+
+	// Scheduled profiling must not wait behind a result publication holding mx.
+	scheduledProfileMu      sync.Mutex
+	scheduledProfile        *scheduledProfileSink
+	scheduledProfileClosed  bool
+	scheduledProfileMissing bool
+	scheduledProfileDropped *monitoring.Uint
+	scheduledProfileWarning atomic.Int64
 }
 
 func New(b *beat.Beat, log *logp.Logger) *Publisher {
+	reg := b.Monitoring.StatsRegistry()
+	if reg == nil {
+		reg = monitoring.NewRegistry()
+	}
 	return &Publisher{
-		b:   b,
-		log: log,
+		b:                       b,
+		log:                     log,
+		scheduledProfileDropped: monitoring.NewUint(reg.GetOrCreateRegistry("osquerybeat.scheduled_query_profiles"), "dropped.output_full"),
 	}
 }
 
+// Configure replaces the clients for the given inputs. It must be called from a
+// single goroutine; only Close may run concurrently with it.
 func (p *Publisher) Configure(inputs []config.InputConfig) error {
+	// Policy replacement must invalidate delayed profiles even while a result
+	// publication holds mx, and even when all inputs have been removed.
+	p.retireScheduledProfileSink()
+	p.mx.Lock()
+	defer p.mx.Unlock()
 	if len(inputs) == 0 {
 		return nil
 	}
 
-	p.mx.Lock()
-	defer p.mx.Unlock()
+	// Locate each stream by dataset so that delivery order does not affect
+	// which client handles which data stream. The first input for a dataset wins.
+	resultInput := config.ResultInput(inputs)
+	var actionResponsesInput, profileInput *config.InputConfig
+	for i := range inputs {
+		switch inputs[i].Datastream.Dataset {
+		case config.DefaultActionResponsesDataset:
+			if actionResponsesInput == nil {
+				actionResponsesInput = &inputs[i]
+			}
+		case config.DefaultQueryProfileDataset:
+			if profileInput == nil {
+				profileInput = &inputs[i]
+			}
+		}
+	}
 
-	// Setup configuration pointers to the clients and corresponding default datasets
-
-	// The osquery_manager.result is always first
-	if len(inputs) > 0 {
-		processors, err := p.processorsForInputConfig(inputs[0], config.DefaultDataset)
+	if resultInput != nil {
+		processors, err := p.processorsForInputConfig(*resultInput, config.DefaultDataset)
 		if err != nil {
 			return err
 		}
@@ -80,12 +113,11 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 		if oldclient != nil {
 			oldclient.Close()
 		}
-
 	}
 
-	// Attach remaining DefaultActionResultsDataset if present
-	if len(inputs) > 1 {
-		processors, err := p.processorsForInputConfig(inputs[1], config.DefaultActionResponsesDataset)
+	// Attach DefaultActionResponsesDataset if present
+	if actionResponsesInput != nil {
+		processors, err := p.processorsForInputConfig(*actionResponsesInput, config.DefaultActionResponsesDataset)
 		if err != nil {
 			return err
 		}
@@ -114,16 +146,8 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 		}
 	}
 
-	// Attach optional query profiling stream if present, identified by dataset.
-	// For query profile events to be published, the integration (e.g. Fleet policy) must include
-	// an input stream with dataset osquery_manager.query_profile. Otherwise profile events are dropped.
-	var profileInput *config.InputConfig
-	for i := range inputs {
-		if inputs[i].Datastream.Dataset == config.DefaultQueryProfileDataset {
-			profileInput = &inputs[i]
-			break
-		}
-	}
+	// Attach optional query profiling stream if present. For query profile events to be
+	// published, the integration must include a stream with dataset osquery_manager.query_profile.
 	if profileInput != nil {
 		processors, err := p.processorsForInputConfig(*profileInput, config.DefaultQueryProfileDataset)
 		if err != nil {
@@ -143,6 +167,11 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 		p.profileDropWarnLogged = false
 		if oldClient != nil {
 			oldClient.Close()
+		}
+		if resultInput != nil {
+			if err := p.configureScheduledProfileSink(*resultInput, *profileInput); err != nil {
+				return err
+			}
 		}
 	} else {
 		if p.queryProfileClient != nil {
@@ -165,6 +194,12 @@ func (p *Publisher) Publish(index, idValue, idFieldKey, responseID, spaceID, pac
 }
 
 func (p *Publisher) Close() {
+	// Once closed is set, configureScheduledProfileSink installs no new lease,
+	// so a single retire covers one installed earlier.
+	p.scheduledProfileMu.Lock()
+	p.scheduledProfileClosed = true
+	p.scheduledProfileMu.Unlock()
+	p.retireScheduledProfileSink()
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
@@ -266,7 +301,7 @@ func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID, 
 		return
 	}
 
-	fields := queryProfileToEvent(queryName, actionID, responseID, spaceID, profile, reqData)
+	fields := queryProfileToEvent(queryName, actionID, responseID, spaceID, profile, reqData, "", 0)
 
 	event := beat.Event{
 		Timestamp: time.Now(),
@@ -282,7 +317,7 @@ func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID, 
 }
 
 // queryProfileToEvent builds the field set for a query profile document.
-func queryProfileToEvent(queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) mapstr.M {
+func queryProfileToEvent(queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any, scheduleID string, scheduleExecutionCount int64) mapstr.M {
 	fields := mapstr.M{
 		"type": "osquery_profile",
 		"event": map[string]any{
@@ -303,6 +338,10 @@ func queryProfileToEvent(queryName, actionID, responseID, spaceID string, profil
 	}
 	if spaceID != "" {
 		fields["space_id"] = spaceID
+	}
+	if scheduleID != "" {
+		fields["schedule_id"] = scheduleID
+		fields["schedule_execution_count"] = scheduleExecutionCount
 	}
 	if reqData != nil {
 		fields["action_data"] = reqData

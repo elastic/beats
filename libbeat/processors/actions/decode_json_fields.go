@@ -38,6 +38,7 @@ import (
 type decodeJSONFields struct {
 	fields        []string
 	maxDepth      int
+	maxObjDepth   int
 	expandKeys    bool
 	overwriteKeys bool
 	addErrorKey   bool
@@ -50,6 +51,7 @@ type decodeJSONFields struct {
 type config struct {
 	Fields        []string `config:"fields"`
 	MaxDepth      int      `config:"max_depth" validate:"min=1"`
+	MaxObjDepth   int      `config:"max_object_depth" validate:"min=0"` // Zero means no limit.
 	ExpandKeys    bool     `config:"expand_keys"`
 	OverwriteKeys bool     `config:"overwrite_keys"`
 	AddErrorKey   bool     `config:"add_error_key"`
@@ -70,7 +72,7 @@ func init() {
 	processors.RegisterPlugin("decode_json_fields",
 		checks.ConfigChecked(NewDecodeJSONFields,
 			checks.RequireFields("fields"),
-			checks.AllowedFields("fields", "max_depth", "overwrite_keys", "add_error_key", "process_array", "target", "when", "document_id", "expand_keys")))
+			checks.AllowedFields("fields", "max_depth", "max_object_depth", "overwrite_keys", "add_error_key", "process_array", "target", "when", "document_id", "expand_keys")))
 
 	jsprocessor.RegisterPlugin("DecodeJSONFields", NewDecodeJSONFields)
 }
@@ -89,6 +91,7 @@ func NewDecodeJSONFields(c *cfg.C, log *logp.Logger) (beat.Processor, error) {
 	f := &decodeJSONFields{
 		fields:        config.Fields,
 		maxDepth:      config.MaxDepth,
+		maxObjDepth:   config.MaxObjDepth,
 		expandKeys:    config.ExpandKeys,
 		overwriteKeys: config.OverwriteKeys,
 		addErrorKey:   config.AddErrorKey,
@@ -118,7 +121,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 		}
 
 		var output any
-		err = unmarshal(f.maxDepth, text, &output, f.processArray)
+		err = unmarshal(f.maxDepth, text, &output, f.processArray, 1, f.maxObjDepth)
 		if err != nil {
 			f.logger.Debugf("Error trying to unmarshal %s", text)
 			errs = append(errs, err.Error())
@@ -182,8 +185,11 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func unmarshal(maxDepth int, text string, fields *any, processArray bool) error {
-	if err := decodeJSON(text, fields); err != nil {
+// unmarshal decodes text into fields. The decoded value is at nesting level
+// level, and if limit is greater than zero, objects and arrays that would be
+// nested deeper than limit are kept as their original JSON text.
+func unmarshal(maxDepth int, text string, fields *any, processArray bool, level, limit int) error {
+	if err := decodeJSON(text, fields, level, limit); err != nil {
 		return err
 	}
 
@@ -192,16 +198,19 @@ func unmarshal(maxDepth int, text string, fields *any, processArray bool) error 
 		return nil
 	}
 
-	tryUnmarshal := func(v any) (any, bool) {
+	tryUnmarshal := func(v any, level int) (any, bool) {
 		str, isString := v.(string)
 		if !isString {
 			return v, false
 		} else if !isStructured(str) {
 			return str, false
 		}
+		if limit > 0 && level > limit {
+			return v, false
+		}
 
 		var tmp any
-		err := unmarshal(maxDepth, str, &tmp, processArray)
+		err := unmarshal(maxDepth, str, &tmp, processArray, level, limit)
 		if err != nil {
 			return v, errors.Is(err, errProcessingSkipped)
 		}
@@ -213,7 +222,7 @@ func unmarshal(maxDepth int, text string, fields *any, processArray bool) error 
 	switch O := (*fields).(type) {
 	case map[string]any:
 		for k, v := range O {
-			if decoded, ok := tryUnmarshal(v); ok {
+			if decoded, ok := tryUnmarshal(v, level+1); ok {
 				O[k] = decoded
 			}
 		}
@@ -224,7 +233,7 @@ func unmarshal(maxDepth int, text string, fields *any, processArray bool) error 
 		}
 
 		for i, v := range O {
-			if decoded, ok := tryUnmarshal(v); ok {
+			if decoded, ok := tryUnmarshal(v, level); ok {
 				O[i] = decoded
 			}
 		}
@@ -232,10 +241,20 @@ func unmarshal(maxDepth int, text string, fields *any, processArray bool) error 
 	return nil
 }
 
-func decodeJSON(text string, to *any) error {
+func decodeJSON(text string, to *any, level, limit int) error {
 	dec := json.NewDecoder(strings.NewReader(text))
 	dec.UseNumber()
-	err := dec.Decode(to)
+	var err error
+	if limit > 0 {
+		*to, err = decodeLimited(dec, text, level, limit)
+		if errors.Is(err, io.EOF) && strings.TrimSpace(text) != "" {
+			// Token reports truncated input as io.EOF where Decode
+			// reports io.ErrUnexpectedEOF.
+			err = io.ErrUnexpectedEOF
+		}
+	} else {
+		err = dec.Decode(to)
+	}
 
 	if err != nil {
 		return err
@@ -252,6 +271,87 @@ func decodeJSON(text string, to *any) error {
 	switch O := (*to).(type) {
 	case map[string]any:
 		jsontransform.TransformNumbers(O)
+	}
+	return nil
+}
+
+// decodeLimited reads the next value from dec, which is decoding text. The
+// value is at nesting level level. Objects and arrays that exceed limit are
+// returned as the string of their original text, without being decoded.
+// Elements of an array are at the same level as the array, since arrays do
+// not add a level to field paths.
+//
+// TODO: Rewrite using encoding/json/jsontext when encoding/json/v2 is
+// available without GOEXPERIMENT. Decoder.ReadValue returns the raw text of a
+// value, which removes the need for skipContainer and the offset arithmetic.
+func decodeLimited(dec *json.Decoder, text string, level, limit int) (any, error) {
+	tok, err := dec.Token()
+	if err != nil {
+		return nil, err
+	}
+	delim, ok := tok.(json.Delim)
+	if !ok {
+		return tok, nil
+	}
+
+	if level > limit {
+		// The offset is just after the opening delimiter.
+		start := dec.InputOffset() - 1
+		err := skipContainer(dec)
+		if err != nil {
+			return nil, err
+		}
+		return text[start:dec.InputOffset()], nil
+	}
+
+	switch delim {
+	case '{':
+		obj := make(map[string]any)
+		for dec.More() {
+			tok, err := dec.Token()
+			if err != nil {
+				return nil, err
+			}
+			key, ok := tok.(string)
+			if !ok {
+				return nil, fmt.Errorf("unexpected object key %v", tok)
+			}
+			obj[key], err = decodeLimited(dec, text, level+1, limit)
+			if err != nil {
+				return nil, err
+			}
+		}
+		_, err = dec.Token()
+		return obj, err
+	case '[':
+		arr := make([]any, 0)
+		for dec.More() {
+			v, err := decodeLimited(dec, text, level, limit)
+			if err != nil {
+				return nil, err
+			}
+			arr = append(arr, v)
+		}
+		_, err = dec.Token()
+		return arr, err
+	}
+	return nil, fmt.Errorf("unexpected delimiter %v", delim)
+}
+
+// skipContainer reads tokens from dec up to and including the end of the
+// object or array whose opening delimiter was the last token read.
+func skipContainer(dec *json.Decoder) error {
+	for depth := 1; depth > 0; {
+		tok, err := dec.Token()
+		if err != nil {
+			return err
+		}
+		switch tok {
+		case json.Delim('{'), json.Delim('['):
+			depth++
+		case json.Delim('}'), json.Delim(']'):
+			depth--
+		}
 	}
 	return nil
 }
