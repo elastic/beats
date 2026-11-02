@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build securityonly
+//go:build edr
 
 package instance
 
