@@ -1164,6 +1164,14 @@ stack: beta 9.4.0
 
 OpenTelemetry tracing is activated using OTel-standard environment variables. You can use input settings to override the default span attribute redaction behavior.
 
+Trace export can also be turned off for the whole input with the `BEATS_OTEL_TRACES_DISABLE` environment variable, which is specific to {{beats}} and is not part of the OTel specification. It takes a comma-separated list of input names, and `cel` is the value that applies to this input:
+
+```sh
+export BEATS_OTEL_TRACES_DISABLE="cel"
+```
+
+When the input's name appears in that list, no span exporter is created and no spans are exported, regardless of how `OTEL_TRACES_EXPORTER` and the other `OTEL_EXPORTER_OTLP_*` variables are set. Spans are still created in process, so this disables export rather than tracing itself. Leaving the variable unset, empty, or without `cel` in it keeps the behavior described above.
+
 By default, the value of an HTTP header or query string parameter will be redacted in span attributes if its name contains a word that suggests sensitive data and its full name isn't in a list of known-safe names.
 
 The following settings can override the default behavior for specific full names.
