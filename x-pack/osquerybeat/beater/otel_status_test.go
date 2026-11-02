@@ -6,6 +6,8 @@ package beater
 
 import (
 	"testing"
+	"testing/synctest"
+	"time"
 
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component/componentstatus"
@@ -18,43 +20,54 @@ import (
 )
 
 func TestOsqueryInputStatusFollowsDaemonRecovery(t *testing.T) {
-	host := &oteltest.MockHost{}
-	factory := &osqueryInputRunnerFactory{}
-	wrapped := otelstatus.StatusReporterFactory(otelstatus.NewGroupStatusReporter(host))(factory)
-	create := func(id string) cfgfile.Runner {
-		cfg, err := conf.NewConfigFrom(map[string]any{"id": id})
-		require.NoError(t, err, "configure input status identity")
-		runner, err := wrapped.Create(nil, cfg)
-		require.NoError(t, err, "create wrapped status runner")
-		runner.Start()
-		return runner
-	}
-	first := create("result")
-	create("response")
-	factory.UpdateStatus(status.Degraded, "osqueryd exited; restarting")
-	require.Equal(t, componentstatus.StatusRecoverableError, host.GetEvent().Status(), "daemon failure must reach receiver health")
-	create("added-during-backoff")
-	inputState := func(id string) string {
-		inputs, ok := host.GetEvent().Attributes().Get("inputs")
-		require.True(t, ok, "receiver health must retain input attributes")
-		input, ok := inputs.Map().Get(id)
-		require.True(t, ok, "receiver health must identify input %s", id)
-		state, ok := input.Map().Get("status")
-		require.True(t, ok, "input health must contain status")
-		return state.Str()
-	}
-	for _, id := range []string{"result", "response", "added-during-backoff"} {
-		require.Equal(t, componentstatus.StatusRecoverableError.String(), inputState(id), "input %s must inherit daemon degradation", id)
-	}
-	first.Stop()
-	factory.UpdateStatus(status.Running, "Osqueryd configuration applied")
-	require.Equal(t, componentstatus.StatusOK, host.GetEvent().Status(), "replacement readiness must restore receiver health")
-	require.Equal(t, componentstatus.StatusStopped.String(), inputState("result"), "removed inputs must not be revived by recovery")
-	for _, id := range []string{"response", "added-during-backoff"} {
-		require.Equal(t, componentstatus.StatusOK.String(), inputState(id), "active input %s must recover", id)
-	}
-	factory.UpdateStatus(status.Failed, "osqueryd restart budget exhausted")
-	require.Equal(t, componentstatus.StatusPermanentError, host.GetEvent().Status(), "exhaustion must report failure to the OTel host")
-	require.Equal(t, componentstatus.StatusStopped.String(), inputState("result"), "removed inputs must remain stopped after exhaustion")
-
+	synctest.Test(t, func(t *testing.T) {
+		host := &oteltest.MockHost{}
+		// The status reporter coalesces reports made in quick succession, so let
+		// it send the latest status before checking it.
+		settle := func() {
+			time.Sleep(time.Second)
+			synctest.Wait()
+		}
+		factory := &osqueryInputRunnerFactory{}
+		wrapped := otelstatus.StatusReporterFactory(otelstatus.NewGroupStatusReporter(host))(factory)
+		create := func(id string) cfgfile.Runner {
+			cfg, err := conf.NewConfigFrom(map[string]any{"id": id})
+			require.NoError(t, err, "configure input status identity")
+			runner, err := wrapped.Create(nil, cfg)
+			require.NoError(t, err, "create wrapped status runner")
+			runner.Start()
+			return runner
+		}
+		first := create("result")
+		create("response")
+		factory.UpdateStatus(status.Degraded, "osqueryd exited; restarting")
+		settle()
+		require.Equal(t, componentstatus.StatusRecoverableError, host.GetEvent().Status(), "daemon failure must reach receiver health")
+		create("added-during-backoff")
+		settle()
+		inputState := func(id string) string {
+			inputs, ok := host.GetEvent().Attributes().Get("inputs")
+			require.True(t, ok, "receiver health must retain input attributes")
+			input, ok := inputs.Map().Get(id)
+			require.True(t, ok, "receiver health must identify input %s", id)
+			state, ok := input.Map().Get("status")
+			require.True(t, ok, "input health must contain status")
+			return state.Str()
+		}
+		for _, id := range []string{"result", "response", "added-during-backoff"} {
+			require.Equal(t, componentstatus.StatusRecoverableError.String(), inputState(id), "input %s must inherit daemon degradation", id)
+		}
+		first.Stop()
+		factory.UpdateStatus(status.Running, "Osqueryd configuration applied")
+		settle()
+		require.Equal(t, componentstatus.StatusOK, host.GetEvent().Status(), "replacement readiness must restore receiver health")
+		require.Equal(t, componentstatus.StatusStopped.String(), inputState("result"), "removed inputs must not be revived by recovery")
+		for _, id := range []string{"response", "added-during-backoff"} {
+			require.Equal(t, componentstatus.StatusOK.String(), inputState(id), "active input %s must recover", id)
+		}
+		factory.UpdateStatus(status.Failed, "osqueryd restart budget exhausted")
+		settle()
+		require.Equal(t, componentstatus.StatusPermanentError, host.GetEvent().Status(), "exhaustion must report failure to the OTel host")
+		require.Equal(t, componentstatus.StatusStopped.String(), inputState("result"), "removed inputs must remain stopped after exhaustion")
+	})
 }

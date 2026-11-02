@@ -27,11 +27,23 @@ import (
 )
 
 func Test_getSymbolInfoFromReader(t *testing.T) {
+	// fsnotify.cold precedes fsnotify on purpose: distribution kernels list the
+	// cold fragment first, and the exact symbol must still win. Likewise
+	// fsnotify_nameremove.isra.0 precedes fsnotify_nameremove: an exact match
+	// must win over an earlier non-cold clone too.
 	content := `0000000000000000 t fsnotify_move
+0000000000000000 t fsnotify.cold
+0000000000000000 t __fsnotify_parent
 0000000000000000 T fsnotify
 0000000000000000 T fsnotifyy
 0000000000000000 t fsnotify_file.isra.0	[btrfs]
-0000000000000000 t chmod_common.isra.0`
+0000000000000000 t chmod_common.isra.0
+0000000000000000 t chmod_common.isra.0.cold
+0000000000000000 t vfs_getattr.constprop.0.cold
+0000000000000000 t vfs_getattr.constprop.0
+0000000000000000 t fsnotify_nameremove.isra.0
+0000000000000000 T fsnotify_nameremove
+0000000000000000 t fsnotify_parent.cold`
 
 	cases := []struct {
 		tName               string
@@ -61,12 +73,44 @@ func Test_getSymbolInfoFromReader(t *testing.T) {
 			optimisedSymbolName: "fsnotify_file.isra.0",
 			err:                 nil,
 		},
+		{
+			tName:               "cold_fragment_listed_before_clone",
+			symbolName:          "vfs_getattr",
+			isOptimised:         true,
+			optimisedSymbolName: "vfs_getattr.constprop.0",
+			err:                 nil,
+		},
+		{
+			tName:               "exact_symbol_listed_after_clone",
+			symbolName:          "fsnotify_nameremove",
+			isOptimised:         false,
+			optimisedSymbolName: "",
+			err:                 nil,
+		},
+		{
+			tName:               "only_cold_fragment_is_not_found",
+			symbolName:          "fsnotify_parent",
+			isOptimised:         false,
+			optimisedSymbolName: "",
+			err:                 ErrSymbolNotFound,
+		},
+		{
+			tName:               "symbol_missing",
+			symbolName:          "vfs_getattr_nosec",
+			isOptimised:         false,
+			optimisedSymbolName: "",
+			err:                 ErrSymbolNotFound,
+		},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.tName, func(t *testing.T) {
 			symInfo, err := getSymbolInfoFromReader(strings.NewReader(content), tc.symbolName)
-			require.IsType(t, err, tc.err)
+			if tc.err != nil {
+				require.ErrorIs(t, err, tc.err, "expected lookup of %q to fail", tc.symbolName)
+				return
+			}
+			require.NoError(t, err, "lookup of %q", tc.symbolName)
 			require.Equal(t, tc.symbolName, symInfo.symbolName)
 			require.Equal(t, tc.isOptimised, symInfo.isOptimised)
 			require.Equal(t, tc.optimisedSymbolName, symInfo.optimisedSymbolName)
