@@ -1,0 +1,7 @@
+kind: other
+
+summary: Fix grammar in the Osquerybeat extension autoload write error
+
+component: osquerybeat
+
+issue: https://github.com/elastic/beats/issues/51185
