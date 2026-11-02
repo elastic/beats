@@ -32,7 +32,9 @@ const Snappy string = "snappy"
 // SnappyCompressor implements the Compressor interface and can be used to
 // compress incoming and outgoing frames. The snappy compression algorithm
 // aims for very high speeds and reasonable compression.
-type SnappyCompressor struct{}
+type SnappyCompressor struct {
+	MaxDecodedLen int
+}
 
 func (s SnappyCompressor) Name() string {
 	return Snappy
@@ -43,6 +45,13 @@ func (s SnappyCompressor) Encode(data []byte) ([]byte, error) {
 }
 
 func (s SnappyCompressor) Decode(data []byte) ([]byte, error) {
+	n, err := snappy.DecodedLen(data)
+	if err != nil {
+		return nil, err
+	}
+	if n > s.MaxDecodedLen {
+		return nil, ErrFrameTooBig
+	}
 	return snappy.Decode(nil, data)
 }
 

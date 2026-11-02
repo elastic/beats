@@ -1,0 +1,10 @@
+kind: bug-fix
+summary: Let the Heartbeat OTel receiver recover once a failed monitor is fixed or removed.
+description: >
+  A monitor that couldn't be created made the Heartbeat receiver report a
+  permanent error, which the collector never lets a component leave. When the
+  monitor was then fixed or removed through heartbeat.config.monitors, the
+  receiver kept reporting the old error and stale monitor statuses. A failed
+  monitor is now reported as a recoverable error of the receiver; the monitor
+  itself is still reported as failed.
+component: heartbeat
