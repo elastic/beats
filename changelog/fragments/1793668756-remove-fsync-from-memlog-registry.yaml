@@ -1,0 +1,3 @@
+kind: feature
+summary: Increase registry checkpoint performance by only syncing to disk once the file is fully written.
+component: all
