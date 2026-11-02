@@ -65,7 +65,15 @@ func (c *Config) Validate() error {
 		return errors.New("compression is unsupported")
 	}
 
-	if (c.User != "" || c.Password != "" || c.APIKey != "") && c.hasAuthorizationHeader() {
+	if c.ClientConfig.TLS.Insecure {
+		return errors.New("tls.insecure is unsupported; use http:// endpoints or tls.insecure_skip_verify")
+	}
+
+	authHeaders := c.authorizationHeaderCount()
+	if authHeaders > 1 {
+		return errors.New("multiple Authorization headers are unsupported")
+	}
+	if (c.User != "" || c.Password != "" || c.APIKey != "") && authHeaders > 0 {
 		return errors.New("an Authorization header cannot be combined with user, password, or api_key")
 	}
 
@@ -88,15 +96,16 @@ func (c *Config) Validate() error {
 	return c.validateAuthentication()
 }
 
-// hasAuthorizationHeader reports whether the configured headers contain an
-// Authorization header, compared case-insensitively.
-func (c *Config) hasAuthorizationHeader() bool {
+// authorizationHeaderCount returns the number of configured Authorization
+// headers, compared case-insensitively.
+func (c *Config) authorizationHeaderCount() int {
+	count := 0
 	for name := range c.ClientConfig.Headers.Iter {
 		if strings.EqualFold(name, "Authorization") {
-			return true
+			count++
 		}
 	}
-	return false
+	return count
 }
 
 func (c *Config) validateAuthentication() error {

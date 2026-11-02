@@ -89,25 +89,18 @@ func (a *authenticator) newTransport() (*http.Transport, error) {
 		transport.WriteBufferSize = cc.WriteBufferSize
 	}
 
-	// Keepalive takes precedence over the flat fields, matching
-	// confighttp.ClientConfig.ToClient. It is populated by programmatic
-	// configurations and, because ClientConfig is squashed into Config, by a
-	// decoded 'keepalive' section as well (ClientConfig.Unmarshal is not
-	// invoked for squashed fields, so it is never folded into the flat fields).
+	// Only Keepalive is supported; the deprecated flat keepalive fields
+	// (disable_keep_alives, max_idle_conns, max_idle_conns_per_host,
+	// idle_conn_timeout) are not used. Keepalive is populated by default
+	// (confighttp.NewDefaultClientConfig) and is None when keepalive.enabled
+	// is false, which disables keep-alives.
 	if keepalive := cc.Keepalive.Get(); keepalive != nil {
 		transport.DisableKeepAlives = false
 		transport.MaxIdleConns = keepalive.MaxIdleConns
 		transport.MaxIdleConnsPerHost = keepalive.MaxIdleConnsPerHost
 		transport.IdleConnTimeout = keepalive.IdleConnTimeout
 	} else {
-		//nolint:staticcheck // confighttp folds decoded keepalive values into the flat fields.
-		transport.DisableKeepAlives = cc.DisableKeepAlives
-		//nolint:staticcheck // confighttp folds decoded keepalive values into the flat fields.
-		transport.MaxIdleConns = cc.MaxIdleConns
-		//nolint:staticcheck // confighttp folds decoded keepalive values into the flat fields.
-		transport.MaxIdleConnsPerHost = cc.MaxIdleConnsPerHost
-		//nolint:staticcheck // confighttp folds decoded keepalive values into the flat fields.
-		transport.IdleConnTimeout = cc.IdleConnTimeout
+		transport.DisableKeepAlives = true
 	}
 	transport.MaxConnsPerHost = cc.MaxConnsPerHost
 	transport.ForceAttemptHTTP2 = cc.ForceAttemptHTTP2

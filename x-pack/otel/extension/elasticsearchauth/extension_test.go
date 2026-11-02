@@ -260,6 +260,27 @@ func TestConfigValidate(t *testing.T) {
 			errText: "compression is unsupported",
 		},
 		{
+			name: "tls.insecure is rejected",
+			config: func() *Config {
+				config := validConfig()
+				config.ClientConfig.TLS.Insecure = true
+				return config
+			},
+			errText: "tls.insecure is unsupported",
+		},
+		{
+			name: "multiple Authorization headers are rejected",
+			config: func() *Config {
+				config := validConfig()
+				config.ClientConfig.Headers = configopaque.MapList{
+					{Name: "Authorization", Value: "Bearer token"},
+					{Name: "authorization", Value: "Bearer other"},
+				}
+				return config
+			},
+			errText: "multiple Authorization headers are unsupported",
+		},
+		{
 			name: "invalid proxy URL",
 			config: func() *Config {
 				config := validConfig()
@@ -336,6 +357,32 @@ tls:
 				assert.True(t, config.ClientConfig.TLS.InsecureSkipVerify, "tls.insecure_skip_verify must decode")
 			},
 		},
+		{
+			name: "default keepalive settings reach the transport",
+			yaml: `
+endpoints: [https://es.example:9200]
+`,
+			verify: func(t *testing.T, config *Config) {
+				transport, err := newAuthenticator(config, nil).newTransport()
+				require.NoError(t, err, "transport construction must succeed")
+				assert.False(t, transport.DisableKeepAlives, "keep-alives must be enabled by default")
+				assert.Equal(t, 100, transport.MaxIdleConns, "default MaxIdleConns must reach the transport")
+				assert.Equal(t, 90*time.Second, transport.IdleConnTimeout, "default IdleConnTimeout must reach the transport")
+			},
+		},
+		{
+			name: "keepalive enabled false disables keep-alives",
+			yaml: `
+endpoints: [https://es.example:9200]
+keepalive:
+  enabled: false
+`,
+			verify: func(t *testing.T, config *Config) {
+				transport, err := newAuthenticator(config, nil).newTransport()
+				require.NoError(t, err, "transport construction must succeed")
+				assert.True(t, transport.DisableKeepAlives, "keepalive.enabled=false must disable keep-alives")
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -347,28 +394,13 @@ tls:
 	}
 }
 
-func TestProgrammaticKeepaliveOverridesFlattenedFields(t *testing.T) {
+func TestProgrammaticKeepaliveNoneDisablesKeepAlives(t *testing.T) {
 	config := validConfig()
-	//nolint:staticcheck // confighttp.ClientConfig documents these as its effective decoded values.
-	config.ClientConfig.DisableKeepAlives = true
-	//nolint:staticcheck // confighttp.ClientConfig documents these as its effective decoded values.
-	config.ClientConfig.MaxIdleConns = 1
-	//nolint:staticcheck // confighttp.ClientConfig documents these as its effective decoded values.
-	config.ClientConfig.MaxIdleConnsPerHost = 2
-	//nolint:staticcheck // confighttp.ClientConfig documents these as its effective decoded values.
-	config.ClientConfig.IdleConnTimeout = time.Second
-	config.ClientConfig.Keepalive = configoptional.Some(confighttp.KeepaliveClientConfig{
-		MaxIdleConns:        10,
-		MaxIdleConnsPerHost: 20,
-		IdleConnTimeout:     30 * time.Second,
-	})
+	config.ClientConfig.Keepalive = configoptional.None[confighttp.KeepaliveClientConfig]()
 
 	transport, err := newAuthenticator(config, nil).newTransport()
 	require.NoError(t, err, "transport construction must succeed")
-	assert.False(t, transport.DisableKeepAlives, "Keepalive must override DisableKeepAlives")
-	assert.Equal(t, 10, transport.MaxIdleConns, "Keepalive must override MaxIdleConns")
-	assert.Equal(t, 20, transport.MaxIdleConnsPerHost, "Keepalive must override MaxIdleConnsPerHost")
-	assert.Equal(t, 30*time.Second, transport.IdleConnTimeout, "Keepalive must override IdleConnTimeout")
+	assert.True(t, transport.DisableKeepAlives, "unset Keepalive must disable keep-alives")
 }
 
 func TestAuthenticationRoundTrip(t *testing.T) {

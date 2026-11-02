@@ -29,14 +29,19 @@ extensions:
 | `endpoints` | Required. Fully resolved HTTP(S) URLs. Each needs an `http` or `https` scheme and a non-empty host, and cannot contain a fragment or userinfo. |
 | `api_key` | Sent as `Authorization: ApiKey <api_key>`. The value is passed through as is; its format is not validated. |
 | `user`, `password` | HTTP Basic authentication. Must be configured together. Mutually exclusive with `api_key`. |
-| `headers` | Headers added to every request, for example `X-Custom-Header`. A `Host` entry (case-insensitive) overrides the request host. An `Authorization` header cannot be combined with `api_key`, `user` or `password`. |
-| `tls` | Standard OTel `configtls` client settings (`ca_file`, `cert_file`, `key_file`, `insecure_skip_verify`, ...). |
+| `headers` | Headers added to every request, for example `X-Custom-Header`. A `Host` entry (case-insensitive) overrides the request host. At most one `Authorization` header (case-insensitive) is allowed, and it cannot be combined with `api_key`, `user` or `password`. |
+| `tls` | Standard OTel `configtls` client settings (`ca_file`, `cert_file`, `key_file`, `insecure_skip_verify`, ...). `tls.insecure` is rejected: use `http://` endpoints for plaintext or `tls.insecure_skip_verify` to skip verification. |
 | `proxy_url` | HTTP(S) proxy URL. |
 | `max_conns_per_host`, `keepalive`, `read_buffer_size`, `write_buffer_size`, `force_attempt_http2`, `http2_read_idle_timeout`, `http2_ping_timeout` | Standard `confighttp` transport settings. |
 
+Keepalive settings must be configured through `keepalive` (`enabled`,
+`max_idle_conns`, `max_idle_conns_per_host`, `idle_conn_timeout`). The
+deprecated top-level `idle_conn_timeout`, `max_idle_conns`,
+`max_idle_conns_per_host` and `disable_keep_alives` fields are not supported.
+
 `confighttp` settings that do not apply are rejected: `endpoint` (use
 `endpoints`), `timeout` (consumers own request deadlines), `auth`,
-`middlewares`, `cookies`, and `compression`.
+`middlewares`, `cookies`, `compression`, and `tls.insecure`.
 
 ## Behavior
 
