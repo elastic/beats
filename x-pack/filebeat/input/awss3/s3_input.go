@@ -27,9 +27,13 @@ import (
 	"github.com/elastic/go-concert/timed"
 )
 
-// var instead of const so it can be reduced during unit tests (instead of waiting
-// through 10 minutes of retry backoff)
-var readerLoopMaxCircuitBreaker = 10
+// vars instead of consts so unit tests can reduce them instead of waiting
+// through minutes of retry backoff.
+var (
+	readerLoopMaxCircuitBreaker = 10
+	errorBackoffInit            = time.Second
+	errorBackoffMax             = 120 * time.Second
+)
 
 type s3PollerInput struct {
 	log             *logp.Logger
@@ -178,7 +182,7 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 	defer client.Close()
 	defer acks.Close()
 
-	rateLimitWaiter := backoff.NewEqualJitterBackoff(1, 120)
+	rateLimitWaiter := backoff.NewEqualJitterBackoff(errorBackoffInit, errorBackoffMax)
 	for _state := range workChan {
 		state := _state
 
@@ -216,7 +220,9 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 			if err := in.registry.UnmarkObjectInFlight(state.Key); err != nil {
 				in.log.Errorf("failed to unmark object in-flight: %v", err)
 			}
-			rateLimitWaiter.Wait(ctx)
+			if downloadErrorNeedsBackoff(err) {
+				rateLimitWaiter.Wait(ctx)
+			}
 			continue
 		}
 		// Reset the rate limit delay on results that aren't download errors.
@@ -272,7 +278,7 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 	isStateValid := in.filterProvider.getApplierFunc()
 	excludePrefix := in.config.backupPrefixToExclude()
 
-	errorBackoff := backoff.NewEqualJitterBackoff(1, 120)
+	errorBackoff := backoff.NewEqualJitterBackoff(errorBackoffInit, errorBackoffMax)
 	circuitBreaker := 0
 
 	startAfterKey := in.registry.GetStartAfterKey()
