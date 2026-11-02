@@ -18,44 +18,46 @@
 package otelconsumer
 
 import (
-	"math/rand/v2"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 )
 
-// retryBackoff is an equal-jitter back-off shared by concurrent Publish calls.
+// retryBackoff is a back-off shared by concurrent Publish calls. Many batches
+// are in flight at once and fail together when the output is down, so only the
+// first failure starts a back-off and the others retry when it ends. The delay
+// escalates only when a failure comes after that, meaning the retries failed.
 type retryBackoff struct {
-	init time.Duration
-	max  time.Duration
-
-	mu       sync.Mutex
-	duration time.Duration // waits are drawn from [duration/2, duration)
-	renew    time.Time     // failures from then on open a new window
+	mu      sync.Mutex
+	bo      *backoff.EqualJitterBackoff
+	retryAt time.Time // end of the current back-off
 }
 
 func newRetryBackoff(init, max time.Duration) *retryBackoff {
-	return &retryBackoff{init: init, max: max, duration: init}
+	// The constructor returns the Backoff interface, which lacks Next.
+	bo, _ := backoff.NewEqualJitterBackoff(init, max).(*backoff.EqualJitterBackoff)
+	return &retryBackoff{bo: bo}
 }
 
-// next records a failure and returns how long to wait before retrying.
-func (b *retryBackoff) next() (wait time.Duration, newWindow bool) {
+// next records a failure and returns how long to wait before retrying. started
+// reports whether the failure started a new back-off instead of joining one.
+func (b *retryBackoff) next() (wait time.Duration, started bool) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
 	now := time.Now()
-	if !now.Before(b.renew) {
-		b.duration = min(2*b.duration, b.max)
-		// Retries from this window wait at least duration/2.
-		b.renew = now.Add(b.duration / 2)
-		newWindow = true
+	if now.Before(b.retryAt) {
+		return b.retryAt.Sub(now), false
 	}
-	half := b.duration / 2
-	return half + rand.N(half), newWindow
+	wait = b.bo.Next()
+	b.retryAt = now.Add(wait)
+	return wait, true
 }
 
 func (b *retryBackoff) reset() {
 	b.mu.Lock()
 	defer b.mu.Unlock()
-	b.duration = b.init
-	b.renew = time.Time{}
+	b.bo.Reset()
+	b.retryAt = time.Time{}
 }

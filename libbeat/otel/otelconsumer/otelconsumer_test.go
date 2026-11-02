@@ -278,12 +278,12 @@ func TestPublish(t *testing.T) {
 		assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag)
 	})
 
-	t.Run("logs retryable errors once per backoff window", func(t *testing.T) {
+	t.Run("logs retryable errors once per back-off", func(t *testing.T) {
 		var result error
 		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
 			return result
 		})
-		// A window far longer than the test keeps all failures in it.
+		// A back-off far longer than the test lasts until the success below.
 		otelConsumer.retry = newRetryBackoff(time.Hour, time.Hour)
 		logger, observed := logptest.NewTestingLoggerWithObserver(t, "")
 		otelConsumer.log = logger
@@ -300,11 +300,11 @@ func TestPublish(t *testing.T) {
 		retryable := errors.New("retryable error")
 		publish(retryable)
 		publish(retryable)
-		assert.Equal(t, 1, logged(), "failures in the same window should be logged once")
+		assert.Equal(t, 1, logged(), "failures during a back-off should be logged once")
 
 		publish(nil)
 		publish(retryable)
-		assert.Equal(t, 2, logged(), "a success should open a new window")
+		assert.Equal(t, 2, logged(), "a failure after a success should start a new back-off")
 	})
 
 	t.Run("cancels batch when context is cancelled during backoff", func(t *testing.T) {

@@ -126,10 +126,11 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		}
 
 		st.RetryableErrors(len(events))
-		wait, newWindow := out.retry.next()
-		// Queue full errors are expected backpressure signals, not true errors.
-		// Skip logging to avoid log spam since we already track this via metrics.
-		if newWindow && !errors.Is(err, exporterhelper.ErrQueueIsFull) {
+		wait, started := out.retry.next()
+		// Failures joining a back-off repeat the error that started it for
+		// other in-flight batches. Queue full errors are expected backpressure.
+		// The metrics above count both, so skip logging them.
+		if started && !errors.Is(err, exporterhelper.ErrQueueIsFull) {
 			out.log.Errorf("failed to publish batch events to otel collector pipeline: %v", err)
 		}
 		select {

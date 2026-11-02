@@ -25,31 +25,40 @@ import (
 )
 
 func TestRetryBackoff(t *testing.T) {
-	// Each step is a failure, after the current window has elapsed when elapsed
-	// is set. It must open a new window when wantNewWindow and wait within
-	// [window/2, window).
+	// Each step is a failure, after the current back-off has ended when ended is
+	// set, or a success when reset is set. A failure must start a back-off when
+	// wantStarted and wait within [window/2, window).
 	steps := []struct {
-		elapsed       bool
-		window        time.Duration
-		wantNewWindow bool
+		ended       bool
+		reset       bool
+		window      time.Duration
+		wantStarted bool
 	}{
-		{window: 2 * time.Second, wantNewWindow: true},
+		{window: 2 * time.Second, wantStarted: true},
 		{window: 2 * time.Second},
-		{elapsed: true, window: 4 * time.Second, wantNewWindow: true},
+		{ended: true, window: 4 * time.Second, wantStarted: true},
 		{window: 4 * time.Second},
-		{elapsed: true, window: 8 * time.Second, wantNewWindow: true},
-		{elapsed: true, window: 8 * time.Second, wantNewWindow: true},
+		{ended: true, window: 8 * time.Second, wantStarted: true},
+		{ended: true, window: 8 * time.Second, wantStarted: true},
+		{reset: true},
+		{window: 2 * time.Second, wantStarted: true},
 	}
 
 	b := newRetryBackoff(time.Second, 8*time.Second)
 	for i, s := range steps {
-		if s.elapsed {
-			// Move the window boundary instead of sleeping until it.
-			b.renew = time.Now()
+		if s.reset {
+			b.reset()
+			continue
 		}
-		wait, newWindow := b.next()
-		assert.Equalf(t, s.wantNewWindow, newWindow, "step %d: new window", i)
-		assert.GreaterOrEqualf(t, wait, s.window/2, "step %d: wait", i)
+		if s.ended {
+			// End the back-off instead of sleeping until it ends.
+			b.retryAt = time.Now()
+		}
+		wait, started := b.next()
+		assert.Equalf(t, s.wantStarted, started, "step %d: started", i)
 		assert.Lessf(t, wait, s.window, "step %d: wait", i)
+		if started {
+			assert.GreaterOrEqualf(t, wait, s.window/2, "step %d: wait", i)
+		}
 	}
 }
