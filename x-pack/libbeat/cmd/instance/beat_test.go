@@ -5,7 +5,6 @@
 package instance
 
 import (
-	"context"
 	"maps"
 	"testing"
 	"time"
@@ -18,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/cmd"
 	"github.com/elastic/beats/v7/filebeat/input/log"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -183,30 +183,40 @@ func TestNewBeatForReceiverMetricLoggingDefault(t *testing.T) {
 	})
 }
 
-type blockingFQDNLooker struct{}
+func TestReceiverFQDNLookupFollowsFeatureFlag(t *testing.T) {
+	origLookup := fqdnOnce
+	t.Cleanup(func() {
+		fqdnOnce = origLookup
+		require.NoError(t, features.UpdateFromConfig(conf.NewConfig()))
+	})
+	lookups := 0
+	fqdnOnce = func() (string, error) {
+		lookups++
+		return "host.example.com", nil
+	}
 
-func (blockingFQDNLooker) FQDNWithContext(ctx context.Context) (string, error) {
-	<-ctx.Done()
-	return "", ctx.Err()
-}
+	t.Run("skipped when features.fqdn is disabled", func(t *testing.T) {
+		lookups = 0
+		cfg := map[string]any{"path.home": t.TempDir()}
 
-type staticFQDNLooker string
+		b, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), cfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
+		require.NoError(t, err)
 
-func (l staticFQDNLooker) FQDNWithContext(context.Context) (string, error) { return string(l), nil }
-
-func TestLookupFQDN(t *testing.T) {
-	t.Run("a lookup that does not answer is bounded by the timeout", func(t *testing.T) {
-		start := time.Now()
-		_, err := lookupFQDN(blockingFQDNLooker{}, 50*time.Millisecond)
-
-		require.ErrorIs(t, err, context.DeadlineExceeded, "the lookup must fail with the deadline")
-		assert.Less(t, time.Since(start), 5*time.Second, "the lookup must not outlive its timeout")
+		assert.Zero(t, lookups, "the FQDN must not be looked up when the feature is disabled")
+		assert.Equal(t, b.Info.Hostname, b.Info.FQDN, "the FQDN must fall back to the hostname")
 	})
 
-	t.Run("a lookup that answers returns the name", func(t *testing.T) {
-		fqdn, err := lookupFQDN(staticFQDNLooker("host.example.com"), time.Second)
+	t.Run("runs when features.fqdn is enabled", func(t *testing.T) {
+		lookups = 0
+		cfg := map[string]any{
+			"path.home": t.TempDir(),
+			"features":  map[string]any{"fqdn": map[string]any{"enabled": true}},
+		}
 
+		b, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), cfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
 		require.NoError(t, err)
-		assert.Equal(t, "host.example.com", fqdn, "the answer must be returned unchanged")
+
+		assert.Equal(t, 1, lookups, "the FQDN must be looked up when the feature is enabled")
+		assert.Equal(t, "host.example.com", b.Info.FQDN)
 	})
 }

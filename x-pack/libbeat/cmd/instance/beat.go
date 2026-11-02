@@ -38,29 +38,16 @@ import (
 // input type.
 const receiverPublisherCloseTimeout = 5 * time.Second
 
-// fqdnLookupTimeout bounds the FQDN lookup. A lookup that cannot succeed, for
-// example because the DNS server does not answer, otherwise delays the start of
-// every receiver by the whole timeout. The lookup is best effort.
-const fqdnLookupTimeout = 5 * time.Second
-
-type fqdnLooker interface {
-	FQDNWithContext(ctx context.Context) (string, error)
-}
-
-func lookupFQDN(h fqdnLooker, timeout time.Duration) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
-	return h.FQDNWithContext(ctx)
-}
-
 var fqdnOnce = sync.OnceValues(func() (string, error) {
 	h, err := sysinfo.Host()
 	if err != nil {
 		return "", fmt.Errorf("failed to get host information: %w", err)
 	}
 
-	return lookupFQDN(h, fqdnLookupTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
+	return h.FQDNWithContext(ctx)
 })
 
 // NewBeatForReceiver creates a Beat that will be used in the context of an otel receiver
@@ -217,15 +204,19 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	logger.Infof("Beat ID: %v", b.Info.ID)
 
 	if b.HostnameOverride() == "" {
-		// Try to get the host's FQDN and set it.
-		fqdn, err := fqdnOnce()
-		if err != nil {
-			// FQDN lookup is "best effort".  We log the error, fallback to
-			// the OS-reported hostname, and move on.
-			logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
-			b.Info.FQDN = b.Info.Hostname
-		} else {
-			b.Info.FQDN = fqdn
+		// Info.FQDN is only read when features.fqdn is enabled, so only look the
+		// FQDN up then. The lookup can wait up to a minute when the DNS server
+		// does not answer for the host name, and every receiver waits for it.
+		b.Info.FQDN = b.Info.Hostname
+		if features.FQDN() {
+			fqdn, err := fqdnOnce()
+			if err != nil {
+				// FQDN lookup is "best effort".  We log the error, fallback to
+				// the OS-reported hostname, and move on.
+				logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
+			} else {
+				b.Info.FQDN = fqdn
+			}
 		}
 	}
 
