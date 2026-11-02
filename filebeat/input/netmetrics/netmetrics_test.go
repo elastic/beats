@@ -20,12 +20,14 @@ package netmetrics
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestAddrs(t *testing.T) {
 	t.Run("ipv4", func(t *testing.T) {
-		addr4, addr6, err := addrs("0.0.0.0:65535", logptest.NewTestingLogger(t, ""))
+		addr4, addr6, err := addrs("127.0.0.1:65535", "", logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -37,8 +39,30 @@ func TestAddrs(t *testing.T) {
 		}
 	})
 
+	// A listener on 0.0.0.0 is a dual-stack socket that is only listed in
+	// /proc/net/{tcp,udp}6 when IPv6 is enabled, so both tables are needed.
+	t.Run("ipv4_unspecified", func(t *testing.T) {
+		for _, network := range []string{"", "tcp", "udp"} {
+			addr4, addr6, err := addrs("0.0.0.0:65535", network, logptest.NewTestingLogger(t, ""))
+			assert.NoError(t, err)
+			assert.Equal(t, []string{"00000000:FFFF"}, addr4, "network %q", network)
+			assert.Equal(t, []string{"00000000000000000000000000000000:FFFF"}, addr6, "network %q", network)
+		}
+	})
+
+	// With an IPv4-only network the socket is AF_INET, so matching IPv6
+	// sockets by port would count unrelated listeners.
+	t.Run("ipv4_unspecified_ipv4_only_network", func(t *testing.T) {
+		for _, network := range []string{"tcp4", "udp4"} {
+			addr4, addr6, err := addrs("0.0.0.0:65535", network, logptest.NewTestingLogger(t, ""))
+			assert.NoError(t, err)
+			assert.Equal(t, []string{"00000000:FFFF"}, addr4, "network %q", network)
+			assert.Empty(t, addr6, "network %q", network)
+		}
+	})
+
 	t.Run("ipv6", func(t *testing.T) {
-		addr4, addr6, err := addrs("[::]:9001", logptest.NewTestingLogger(t, ""))
+		addr4, addr6, err := addrs("[::]:9001", "", logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}

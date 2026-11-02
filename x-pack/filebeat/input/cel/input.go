@@ -457,6 +457,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			if !ok {
 				return errors.New("unexpected missing events array from evaluation")
 			}
+			// Drop events from state now that we hold them. If we fail
+			// during the publication, we will re-request these events.
+			delete(state, "events")
 			var events []interface{}
 			switch e := e.(type) {
 			case []interface{}:
@@ -499,10 +502,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			// We have a non-empty batch of events to process.
 			metrics.batchesReceived.Add(1)
 			metrics.eventsReceived.Add(uint64(len(events)))
-
-			// Drop events from state. If we fail during the publication,
-			// we will re-request these events.
-			delete(state, "events")
 
 			// Get cursors if they exist.
 			var (

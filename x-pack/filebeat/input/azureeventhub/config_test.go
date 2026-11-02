@@ -7,10 +7,13 @@
 package azureeventhub
 
 import (
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 func TestStorageContainerValidate(t *testing.T) {
@@ -453,6 +456,101 @@ func TestConnectionStringConfigValidation(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestValidateWebSocketTransport(t *testing.T) {
+	t.Run("websocket_with_v1_is_rejected", func(t *testing.T) {
+		c := defaultConfig()
+		c.EventHubName = "test-hub"
+		c.ConnectionString = "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=test"
+		c.SAName = "test-storage"
+		c.SAKey = "test-key"
+		c.ProcessorVersion = "v1"
+		c.Transport = "websocket"
+
+		err := c.Validate()
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), `transport "websocket" requires processor_version "v2"`)
+	})
+
+	t.Run("websocket_with_v2_is_accepted", func(t *testing.T) {
+		c := defaultConfig()
+		c.EventHubName = "test-hub"
+		c.ConnectionString = "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=test"
+		c.SAName = "test-storage"
+		c.SAConnectionString = "DefaultEndpointsProtocol=https;AccountName=test;AccountKey=test;EndpointSuffix=core.windows.net"
+		c.ProcessorVersion = "v2"
+		c.Transport = "websocket"
+
+		require.NoError(t, c.Validate())
+	})
+
+	t.Run("amqp_with_v1_is_accepted", func(t *testing.T) {
+		c := defaultConfig()
+		c.EventHubName = "test-hub"
+		c.ConnectionString = "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=test"
+		c.SAName = "test-storage"
+		c.SAKey = "test-key"
+		c.ProcessorVersion = "v1"
+		c.Transport = "amqp"
+
+		require.NoError(t, c.Validate())
+	})
+}
+
+func TestValidateProxySettings(t *testing.T) {
+	t.Run("proxy_url_with_v1_is_rejected", func(t *testing.T) {
+		c := defaultConfig()
+		c.EventHubName = "test-hub"
+		c.ConnectionString = "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=test"
+		c.SAName = "test-storage"
+		c.SAKey = "test-key"
+		c.ProcessorVersion = "v1"
+		u, _ := url.Parse("http://proxy:8080")
+		c.Proxy.URL = (*httpcommon.ProxyURI)(u)
+
+		err := c.Validate()
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), `proxy_url and proxy_disable require processor_version "v2"`)
+	})
+
+	t.Run("proxy_disable_with_v1_is_rejected", func(t *testing.T) {
+		c := defaultConfig()
+		c.EventHubName = "test-hub"
+		c.ConnectionString = "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=test"
+		c.SAName = "test-storage"
+		c.SAKey = "test-key"
+		c.ProcessorVersion = "v1"
+		c.Proxy.Disable = true
+
+		err := c.Validate()
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), `proxy_url and proxy_disable require processor_version "v2"`)
+	})
+
+	t.Run("proxy_url_with_v2_is_accepted", func(t *testing.T) {
+		c := defaultConfig()
+		c.EventHubName = "test-hub"
+		c.ConnectionString = "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=test"
+		c.SAName = "test-storage"
+		c.SAConnectionString = "DefaultEndpointsProtocol=https;AccountName=test;AccountKey=test;EndpointSuffix=core.windows.net"
+		c.ProcessorVersion = "v2"
+		u, _ := url.Parse("http://proxy:8080")
+		c.Proxy.URL = (*httpcommon.ProxyURI)(u)
+
+		require.NoError(t, c.Validate())
+	})
+
+	t.Run("proxy_defaults_with_v1_is_accepted", func(t *testing.T) {
+		c := defaultConfig()
+		c.EventHubName = "test-hub"
+		c.ConnectionString = "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=test"
+		c.SAName = "test-storage"
+		c.SAKey = "test-key"
+		c.ProcessorVersion = "v1"
+
+		require.NoError(t, c.Validate())
+	})
 }
 
 func TestGetFullyQualifiedEventHubNamespace(t *testing.T) {

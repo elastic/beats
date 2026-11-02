@@ -22,6 +22,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestProcNetTCP(t *testing.T) {
@@ -142,4 +144,19 @@ func TestProcNetTCP(t *testing.T) {
 			}
 		})
 	})
+}
+
+// TestProcNetTCPDualStack checks that the addresses for a listener on 0.0.0.0
+// match its entries in /proc/net/tcp6, which is where dual-stack sockets are
+// listed.
+func TestProcNetTCPDualStack(t *testing.T) {
+	_, addr6, err := addrs("0.0.0.0:6060", "", logptest.NewTestingLogger(t, ""))
+	assert.NoError(t, err)
+
+	hasUnspecified6, addrIsUnspecified6, bad := containsUnspecifiedAddr(addr6)
+	assert.Nil(t, bad)
+	rx6, err := procNetTCP("testdata/proc_net_tcp6.txt", addr6, hasUnspecified6, addrIsUnspecified6)
+	assert.NoError(t, err)
+	assert.EqualValues(t, 2, rx6)
+
 }
