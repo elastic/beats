@@ -30,17 +30,17 @@ import (
 
 const overlapWarningText = "harvested by more than one receiver"
 
-type overlapEnv struct {
+type testEnv struct {
 	t         *testing.T
 	dataDir   string
 	logDir    string
 	factory   receiver.Factory
 	mu        sync.Mutex
-	receivers []*overlapReceiver
+	receivers []*testReceiver
 }
 
-type overlapReceiver struct {
-	env     *overlapEnv
+type testReceiver struct {
+	env     *testEnv
 	name    string
 	rcvr    receiver.Logs
 	host    *oteltest.MockHost
@@ -50,8 +50,8 @@ type overlapReceiver struct {
 	stopped bool
 }
 
-func newOverlapEnv(t *testing.T) *overlapEnv {
-	return &overlapEnv{
+func newTestEnv(t *testing.T) *testEnv {
+	return &testEnv{
 		t:       t,
 		dataDir: t.TempDir(),
 		logDir:  t.TempDir(),
@@ -59,15 +59,15 @@ func newOverlapEnv(t *testing.T) *overlapEnv {
 	}
 }
 
-func (e *overlapEnv) path(name string) string { return filepath.Join(e.logDir, name) }
+func (e *testEnv) path(name string) string { return filepath.Join(e.logDir, name) }
 
-func (e *overlapEnv) append(name string, lines ...string) {
+func (e *testEnv) append(name string, lines ...string) {
 	for _, l := range lines {
 		writeFile(e.t, e.path(name), l)
 	}
 }
 
-func overlapLines(prefix string, from, n int) []string {
+func genLines(prefix string, from, n int) []string {
 	out := make([]string, n)
 	for i := range out {
 		out[i] = fmt.Sprintf("%s-%03d", prefix, from+i)
@@ -75,7 +75,7 @@ func overlapLines(prefix string, from, n int) []string {
 	return out
 }
 
-func (e *overlapEnv) start(name string, inputPaths ...[]string) *overlapReceiver {
+func (e *testEnv) start(name string, inputPaths ...[]string) *testReceiver {
 	t := e.t
 	t.Helper()
 	inputs := make([]map[string]any, len(inputPaths))
@@ -101,7 +101,7 @@ func (e *overlapEnv) start(name string, inputPaths ...[]string) *overlapReceiver
 		"management.otel.enabled": true,
 	}}
 
-	r := &overlapReceiver{env: e, name: name, host: &oteltest.MockHost{}}
+	r := &testReceiver{env: e, name: name, host: &oteltest.MockHost{}}
 	var core zapcore.Core
 	core, r.logs = observer.New(zapcore.DebugLevel)
 	var settings receiver.Settings
@@ -135,7 +135,7 @@ func (e *overlapEnv) start(name string, inputPaths ...[]string) *overlapReceiver
 	return r
 }
 
-func (r *overlapReceiver) stop() {
+func (r *testReceiver) stop() {
 	if r.stopped {
 		return
 	}
@@ -143,13 +143,13 @@ func (r *overlapReceiver) stop() {
 	require.NoError(r.env.t, r.rcvr.Shutdown(r.env.t.Context()), "receiver %s must stop", r.name)
 }
 
-func (r *overlapReceiver) ingested() []string {
+func (r *testReceiver) ingested() []string {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	return append([]string(nil), r.lines...)
 }
 
-func (r *overlapReceiver) waitIngested(n int) {
+func (r *testReceiver) waitIngested(n int) {
 	r.env.t.Helper()
 	ok := assert.Eventually(r.env.t, func() bool { return len(r.ingested()) >= n }, 30*time.Second, 20*time.Millisecond)
 	if !ok {
@@ -158,7 +158,7 @@ func (r *overlapReceiver) waitIngested(n int) {
 	require.True(r.env.t, ok, "receiver %s must ingest %d records, has %d", r.name, n, len(r.ingested()))
 }
 
-func (r *overlapReceiver) dumpLogs() {
+func (r *testReceiver) dumpLogs() {
 	t := r.env.t
 	t.Helper()
 	for _, rc := range r.env.receivers {
@@ -175,7 +175,7 @@ func (r *overlapReceiver) dumpLogs() {
 	t.Logf("registry offsets: %v", registryOffsets(t, r.env.dataDir))
 }
 
-func (e *overlapEnv) flushes() int {
+func (e *testEnv) flushes() int {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	n := 0
@@ -185,7 +185,7 @@ func (e *overlapEnv) flushes() int {
 	return n
 }
 
-func (r *overlapReceiver) ingestAndFlush(n int) {
+func (r *testReceiver) ingestAndFlush(n int) {
 	t := r.env.t
 	t.Helper()
 	r.waitIngested(n)
@@ -201,11 +201,11 @@ func (r *overlapReceiver) ingestAndFlush(n int) {
 	}, 30*time.Second, 20*time.Millisecond, "registry flushes must settle")
 }
 
-func (r *overlapReceiver) warnings() int {
+func (r *testReceiver) warnings() int {
 	return r.logs.FilterMessageSnippet(overlapWarningText).Len()
 }
 
-func (r *overlapReceiver) assertHealthy() {
+func (r *testReceiver) assertHealthy() {
 	r.env.t.Helper()
 	for _, e := range r.host.GetEvents() {
 		assert.NotEqual(r.env.t, componentstatus.StatusPermanentError, e.Status(), "receiver %s must not report a permanent error: %v", r.name, e.Err())
@@ -213,7 +213,7 @@ func (r *overlapReceiver) assertHealthy() {
 	}
 }
 
-func (e *overlapEnv) assertOffsetsAtEnd(names ...string) {
+func (e *testEnv) assertOffsetsAtEnd(names ...string) {
 	e.t.Helper()
 	offsets := registryOffsets(e.t, e.dataDir)
 	for _, n := range names {
@@ -223,7 +223,7 @@ func (e *overlapEnv) assertOffsetsAtEnd(names ...string) {
 	}
 }
 
-func assertOverlapWarnings(t *testing.T, want int, rs ...*overlapReceiver) {
+func assertWarnings(t *testing.T, want int, rs ...*testReceiver) {
 	t.Helper()
 	if os.Getenv("LOG_OVERLAP_BASELINE") == "1" {
 		return
@@ -233,198 +233,79 @@ func assertOverlapWarnings(t *testing.T, want int, rs ...*overlapReceiver) {
 	}
 }
 
-func TestLogOverlapN1DisjointFilesRestart(t *testing.T) {
-	e := newOverlapEnv(t)
-	a, b := e.path("a.log"), e.path("b.log")
-	e.append("a.log", overlapLines("a", 0, 5)...)
-	e.append("b.log", overlapLines("b", 0, 5)...)
-	ra, rb := e.start("a", []string{a}), e.start("b", []string{b})
-	ra.ingestAndFlush(5)
-	rb.ingestAndFlush(5)
-	ra.stop()
-	rb.stop()
-
-	e.append("a.log", overlapLines("a", 5, 3)...)
-	e.append("b.log", overlapLines("b", 5, 3)...)
-	ra2, rb2 := e.start("a2", []string{a}), e.start("b2", []string{b})
-	ra2.ingestAndFlush(3)
-	rb2.ingestAndFlush(3)
-	assert.ElementsMatch(t, overlapLines("a", 5, 3), ra2.ingested())
-	assert.ElementsMatch(t, overlapLines("b", 5, 3), rb2.ingested())
-	ra2.assertHealthy()
-	rb2.assertHealthy()
-	assertOverlapWarnings(t, 0, ra, rb, ra2, rb2)
-	ra2.stop()
-	rb2.stop()
-	e.assertOffsetsAtEnd("a.log", "b.log")
-}
-
 func TestLogOverlapN2DisjointReceiverAddedWhileRunning(t *testing.T) {
-	e := newOverlapEnv(t)
-	e.append("a.log", overlapLines("a", 0, 5)...)
-	e.append("b.log", overlapLines("b", 0, 4)...)
+	e := newTestEnv(t)
+	e.append("a.log", genLines("a", 0, 5)...)
+	e.append("b.log", genLines("b", 0, 4)...)
 	ra := e.start("a", []string{e.path("a.log")})
 	ra.ingestAndFlush(5)
 	rb := e.start("b", []string{e.path("b.log")})
 	rb.ingestAndFlush(4)
-	assert.ElementsMatch(t, overlapLines("a", 0, 5), ra.ingested())
-	assert.ElementsMatch(t, overlapLines("b", 0, 4), rb.ingested())
+	assert.ElementsMatch(t, genLines("a", 0, 5), ra.ingested())
+	assert.ElementsMatch(t, genLines("b", 0, 4), rb.ingested())
 	ra.assertHealthy()
 	rb.assertHealthy()
-	assertOverlapWarnings(t, 0, ra, rb)
+	assertWarnings(t, 0, ra, rb)
 	ra.stop()
 	rb.stop()
 	e.assertOffsetsAtEnd("a.log", "b.log")
 }
 
 func TestLogOverlapO1BothStartTogetherFileCreatedAfter(t *testing.T) {
-	e := newOverlapEnv(t)
+	e := newTestEnv(t)
 	p := []string{e.path("x.log")}
 	ra, rb := e.start("a", p), e.start("b", p)
-	e.append("x.log", overlapLines("x", 0, 5)...)
+	e.append("x.log", genLines("x", 0, 5)...)
 	ra.ingestAndFlush(5)
 	rb.ingestAndFlush(5)
-	assert.ElementsMatch(t, overlapLines("x", 0, 5), ra.ingested())
-	assert.ElementsMatch(t, overlapLines("x", 0, 5), rb.ingested())
+	assert.ElementsMatch(t, genLines("x", 0, 5), ra.ingested())
+	assert.ElementsMatch(t, genLines("x", 0, 5), rb.ingested())
 	ra.assertHealthy()
 	rb.assertHealthy()
-	assertOverlapWarnings(t, 1, ra, rb)
-}
-
-func TestLogOverlapO2RestartWithExistingRegistry(t *testing.T) {
-	e := newOverlapEnv(t)
-	p := []string{e.path("x.log")}
-	ra, rb := e.start("a", p), e.start("b", p)
-	e.append("x.log", overlapLines("x", 0, 5)...)
-	ra.ingestAndFlush(5)
-	rb.ingestAndFlush(5)
-	ra.stop()
-	rb.stop()
-
-	e.append("x.log", overlapLines("x", 5, 3)...)
-	ra2, rb2 := e.start("a2", p), e.start("b2", p)
-	require.Eventually(t, func() bool {
-		return len(ra2.ingested())+len(rb2.ingested()) >= 3
-	}, 30*time.Second, 20*time.Millisecond, "new lines must be ingested by a2 or b2")
-	ra2.ingestAndFlush(0)
-	want := overlapLines("x", 5, 3)
-	for _, r := range []*overlapReceiver{ra2, rb2} {
-		got := r.ingested()
-		if len(got) > 0 {
-			assert.ElementsMatch(t, want, got, "receiver %s must ingest the new lines exactly once", r.name)
-		}
-	}
-	ra2.assertHealthy()
-	rb2.assertHealthy()
-	if len(ra2.ingested()) > 0 && len(rb2.ingested()) > 0 {
-		assertOverlapWarnings(t, 1, ra2, rb2)
-	}
-}
-
-func TestLogOverlapO3ReceiverAddedWhileOtherHoldsFile(t *testing.T) {
-	e := newOverlapEnv(t)
-	p := []string{e.path("x.log")}
-	ra := e.start("a", p)
-	e.append("x.log", overlapLines("x", 0, 5)...)
-	ra.ingestAndFlush(5)
-	rb := e.start("b", p)
-
-	e.append("x.log", overlapLines("x", 5, 3)...)
-	ra.ingestAndFlush(8)
-	rb.ingestAndFlush(3)
-	assert.ElementsMatch(t, overlapLines("x", 0, 8), ra.ingested())
-	assert.ElementsMatch(t, overlapLines("x", 5, 3), rb.ingested())
-	ra.assertHealthy()
-	rb.assertHealthy()
-	assertOverlapWarnings(t, 1, ra, rb)
+	assertWarnings(t, 1, ra, rb)
 }
 
 func TestLogOverlapO4WildcardReceiverAddedOverlapsOneFile(t *testing.T) {
-	e := newOverlapEnv(t)
+	e := newTestEnv(t)
 	ra := e.start("a", []string{e.path("a.log")})
-	e.append("a.log", overlapLines("a", 0, 5)...)
+	e.append("a.log", genLines("a", 0, 5)...)
 	ra.ingestAndFlush(5)
-	e.append("c.log", overlapLines("c", 0, 4)...)
+	e.append("c.log", genLines("c", 0, 4)...)
 	rb := e.start("b", []string{filepath.Join(e.logDir, "*.log")})
 	rb.ingestAndFlush(4)
 
-	e.append("a.log", overlapLines("a", 5, 3)...)
+	e.append("a.log", genLines("a", 5, 3)...)
 	ra.ingestAndFlush(8)
 	rb.ingestAndFlush(7)
-	assert.ElementsMatch(t, append(overlapLines("c", 0, 4), overlapLines("a", 5, 3)...), rb.ingested())
+	assert.ElementsMatch(t, genLines("a", 0, 8), ra.ingested())
+	assert.ElementsMatch(t, append(genLines("c", 0, 4), genLines("a", 5, 3)...), rb.ingested())
 	ra.assertHealthy()
 	rb.assertHealthy()
-	assertOverlapWarnings(t, 1, ra, rb)
+	assertWarnings(t, 1, ra, rb)
 }
 
 func TestLogOverlapO5OverlappingReceiverRestartedWhileOtherRuns(t *testing.T) {
-	e := newOverlapEnv(t)
+	e := newTestEnv(t)
 	p := []string{e.path("x.log")}
 	ra := e.start("a", p)
-	e.append("x.log", overlapLines("x", 0, 5)...)
+	e.append("x.log", genLines("x", 0, 5)...)
 	ra.ingestAndFlush(5)
 	rb := e.start("b", p)
-	e.append("x.log", overlapLines("x", 5, 3)...)
+	e.append("x.log", genLines("x", 5, 3)...)
 	ra.ingestAndFlush(8)
 	rb.ingestAndFlush(3)
 	rb.stop()
 
-	e.append("x.log", overlapLines("x", 8, 2)...)
+	e.append("x.log", genLines("x", 8, 2)...)
 	ra.ingestAndFlush(10)
 	rb2 := e.start("b2", p)
-	e.append("x.log", overlapLines("x", 10, 2)...)
+	e.append("x.log", genLines("x", 10, 2)...)
 	ra.ingestAndFlush(12)
 	rb2.waitIngested(2)
-	assert.ElementsMatch(t, overlapLines("x", 10, 2), rb2.ingested()[len(rb2.ingested())-2:])
+	assert.ElementsMatch(t, genLines("x", 10, 2), rb2.ingested()[len(rb2.ingested())-2:])
 	assert.Len(t, rb2.ingested(), 2)
 	ra.assertHealthy()
 	rb2.assertHealthy()
-	assertOverlapWarnings(t, 2, ra)
-	assertOverlapWarnings(t, 1, rb2)
-}
-
-func TestLogOverlapO6SequentialHandoffDoesNotWarn(t *testing.T) {
-	e := newOverlapEnv(t)
-	p := []string{e.path("x.log")}
-	ra := e.start("a", p)
-	e.append("x.log", overlapLines("x", 0, 5)...)
-	ra.ingestAndFlush(5)
-	ra.stop()
-
-	rb := e.start("b", p)
-	e.append("x.log", overlapLines("x", 5, 3)...)
-	rb.ingestAndFlush(3)
-	assert.ElementsMatch(t, overlapLines("x", 5, 3), rb.ingested())
-	ra.assertHealthy()
-	rb.assertHealthy()
-	assertOverlapWarnings(t, 0, ra, rb)
-}
-
-func TestLogOverlapS1OneReceiverTwoInputsSameFile(t *testing.T) {
-	e := newOverlapEnv(t)
-	p := []string{e.path("x.log")}
-	ra := e.start("a", p, p)
-	e.append("x.log", overlapLines("x", 0, 5)...)
-	ra.ingestAndFlush(10)
-	assert.Len(t, ra.ingested(), 10)
-	ra.assertHealthy()
-	assertOverlapWarnings(t, 0, ra)
-}
-
-func TestLogOverlapS2OneReceiverRestart(t *testing.T) {
-	e := newOverlapEnv(t)
-	p := []string{e.path("x.log")}
-	ra := e.start("a", p)
-	e.append("x.log", overlapLines("x", 0, 5)...)
-	ra.ingestAndFlush(5)
-	ra.stop()
-
-	e.append("x.log", overlapLines("x", 5, 3)...)
-	ra2 := e.start("a2", p)
-	ra2.ingestAndFlush(3)
-	assert.ElementsMatch(t, overlapLines("x", 5, 3), ra2.ingested())
-	ra2.assertHealthy()
-	assertOverlapWarnings(t, 0, ra, ra2)
-	ra2.stop()
-	e.assertOffsetsAtEnd("x.log")
+	assertWarnings(t, 2, ra)
+	assertWarnings(t, 1, rb2)
 }

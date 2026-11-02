@@ -177,7 +177,7 @@ func (s *sharedRegistrar) statesFor(owner *Registrar, states []file.State) []fil
 // created (see input.RunnerFactory.Create), and is safe to call any number of
 // times: only the first call does anything. If that first start fails, every
 // later call returns the same error, and after Stop every call returns
-// ErrStopped.
+// ErrStopped or the Start error if Start had failed.
 func (r *Registrar) Start() error {
 	r.startOnce.Do(func() {
 		key := r.stateStore.StoreKey("", "")
