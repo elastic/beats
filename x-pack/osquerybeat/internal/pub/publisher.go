@@ -168,27 +168,6 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 	return nil
 }
 
-// streamInputs returns the inputs for the result, action responses and query
-// profile streams, or nil for a stream with no input. Each stream is located
-// by dataset so that delivery order does not affect which client handles which
-// data stream. The first input for a dataset wins.
-func streamInputs(inputs []config.InputConfig) (result, actionResponses, profile *config.InputConfig) {
-	result = config.ResultInput(inputs)
-	for i := range inputs {
-		switch inputs[i].Datastream.Dataset {
-		case config.DefaultActionResponsesDataset:
-			if actionResponses == nil {
-				actionResponses = &inputs[i]
-			}
-		case config.DefaultQueryProfileDataset:
-			if profile == nil {
-				profile = &inputs[i]
-			}
-		}
-	}
-	return result, actionResponses, profile
-}
-
 // CheckProcessors returns an error if the processors that Configure would
 // build for inputs cannot be built. It builds them and closes them again, so
 // each policy builds its processors one extra time; some processors, such as
@@ -215,6 +194,27 @@ func CheckProcessors(inputs []config.InputConfig, log *logp.Logger) error {
 		}
 	}
 	return nil
+}
+
+// streamInputs returns the inputs for the result, action responses and query
+// profile streams, or nil for a stream with no input. Each stream is located
+// by dataset so that delivery order does not affect which client handles which
+// data stream. The first input for a dataset wins.
+func streamInputs(inputs []config.InputConfig) (result, actionResponses, profile *config.InputConfig) {
+	result = config.ResultInput(inputs)
+	for i := range inputs {
+		switch inputs[i].Datastream.Dataset {
+		case config.DefaultActionResponsesDataset:
+			if actionResponses == nil {
+				actionResponses = &inputs[i]
+			}
+		case config.DefaultQueryProfileDataset:
+			if profile == nil {
+				profile = &inputs[i]
+			}
+		}
+	}
+	return result, actionResponses, profile
 }
 
 func (p *Publisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any) {
