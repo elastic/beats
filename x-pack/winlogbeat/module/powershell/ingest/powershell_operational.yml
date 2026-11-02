@@ -1,23 +1,73 @@
 ---
 description: Pipeline for Windows Powershell/Operational events
 processors:
-  - kv:
-      description: Split Event 4103 event data fields.
-      field: winlog.event_data.ContextInfo
-      target_field: winlog.event_data
-      field_split: "\n"
-      trim_key: " \n\t"
-      trim_value: " \n\t"
-      value_split: "[:=]"
-      if: ctx.winlog?.event_id == "4103"
   - script:
-      description: Remove spaces from all event_data keys.
+      description: |-
+        Split Event 4103 event data fields.
+        ContextInfo is a block of "<Key> = <Value>" lines indented by eight spaces, with localized keys.
+        Windows PowerShell writes 16 keys in a fixed order, and only the fifth, 'Host Application', can
+        span several lines, for example when it holds a multi-line script passed to powershell.exe -Command.
+        Lines of such a script can look like keys (e.g. an indented hashtable entry), so when the block has
+        at least 16 lines and its first five and last eleven lines are key lines, only those lines are
+        taken as keys and everything between them is appended to 'Host Application'.
+        Otherwise a line is taken as a new key when it has eight or more leading spaces and a key that
+        starts with a letter, and anything else is appended to the previous value.
+        Parse failures are recorded on error.message without stopping the rest of the pipeline.
+      lang: painless
+      tag: parse_context_info
+      if: ctx.winlog?.event_id == "4103" && ctx.winlog?.event_data?.ContextInfo != null
+      source: |-
+        def keyLine = /^\s{8,}(\S[^:=]*?)\s*[:=](.*)$/;
+        def labelLine = /^\s{8,}(\p{L}[\p{L}0-9 _.'’\-]*?)\s*[:=](.*)$/;
+        def lines = /\r?\n/.split(ctx.winlog.event_data.ContextInfo);
+        int head = 5;
+        int tail = 11;
+        boolean fixed = lines.length >= head + tail;
+        for (int i = 0; fixed && i < head; i++) {
+          fixed = keyLine.matcher(lines[i]).matches();
+        }
+        for (int i = lines.length - tail; fixed && i < lines.length; i++) {
+          fixed = keyLine.matcher(lines[i]).matches();
+        }
+        def key = null;
+        def value = new StringBuilder();
+        for (int i = 0; i < lines.length; i++) {
+          def matcher = null;
+          if (!fixed || i < head || i >= lines.length - tail) {
+            matcher = (fixed ? keyLine : labelLine).matcher(lines[i]);
+            if (!matcher.matches()) {
+              matcher = null;
+            }
+          }
+          if (matcher != null) {
+            if (key != null) {
+              ctx.winlog.event_data[key] = value.toString().trim();
+            }
+            key = matcher.group(1);
+            value = new StringBuilder(matcher.group(2));
+          } else if (key != null) {
+            value.append((char)10).append(lines[i]);
+          }
+        }
+        if (key != null) {
+          ctx.winlog.event_data[key] = value.toString().trim();
+        }
+      on_failure:
+        - append:
+            field: error.message
+            value: "{{{ _ingest.on_failure_message }}}"
+            allow_duplicates: false
+            ignore_failure: true
+  - script:
+      description: |-
+        Remove spaces and dots from all event_data keys.
+        Dots would be read as object paths, e.g. the Spanish 'Id. de host'.
       lang: painless
       if: ctx.winlog?.event_data != null
       source: |-
         def newEventData = new HashMap();
         for (entry in ctx.winlog.event_data.entrySet()) {
-          def newKey = /\s/.matcher(entry.getKey().toString()).replaceAll("");
+          def newKey = /[\s.]/.matcher(entry.getKey().toString()).replaceAll("");
           newEventData.put(newKey, entry.getValue());
         }
         ctx.winlog.event_data = newEventData;
