@@ -14,7 +14,7 @@ Review important information about the  8.19.24 release.
 
 **Filebeat**
 
-* Update github.com/apache/thrift to v0.25.0 to fix CVE-2026-82458 in Parquet decoding. https://github.com/elastic/beats/pull/53636[#53636] 
+* Update `github.com/apache/thrift` to v0.25.0 to fix CVE-2026-82458 in Parquet decoding. https://github.com/elastic/beats/pull/53636[#53636]
 
 
 **Heartbeat**
@@ -38,7 +38,7 @@ The 8.19.24 release adds the following new and notable features.
 
 **Filebeat**
 
-* Ensure that the CEL input&#39;s events from previous evaluations are removed from the CEL state before starting a new evaluation. https://github.com/elastic/beats/pull/53817[#53817] 
+* Ensure that the CEL input's events from previous evaluations are removed from the CEL state before starting a new evaluation. https://github.com/elastic/beats/pull/53817[#53817]
 
 
 [discrete]
@@ -55,13 +55,13 @@ The 8.19.24 release adds the following new and notable features.
 
 **Filebeat**
 
-* Add proxy_url and proxy_disable support to the azure-eventhub input, reject websocket transport with processor v1, and propagate checkpoint migration errors. https://github.com/elastic/beats/pull/53534[#53534] 
+* Add `proxy_url` and `proxy_disable` support to the `azure-eventhub` input, reject WebSocket transport with processor v1, and propagate checkpoint migration errors. https://github.com/elastic/beats/pull/53534[#53534]
 
 
 **Packetbeat**
 
-* Bump npcap OEM installer to 1.88. https://github.com/elastic/beats/pull/53773[#53773] 
-* Bump npcap OEM installer to 1.89. https://github.com/elastic/beats/pull/53706[#53706] 
+* Update the Npcap OEM installer to 1.88. https://github.com/elastic/beats/pull/53773[#53773]
+* Update the Npcap OEM installer to 1.89. https://github.com/elastic/beats/pull/53706[#53706]
 
 
 
@@ -75,20 +75,19 @@ The 8.19.24 release adds the following new and notable features.
 
 **Auditbeat**
 
-* Fix the file_integrity eBPF backend failing to start on Linux 6.15 and later. https://github.com/elastic/beats/pull/53511[#53511] https://github.com/elastic/beats/issues/46719[#46719]
-* Fix a panic in the file_integrity eBPF backend when its eBPF loader fails to start. https://github.com/elastic/beats/pull/53785[#53785] 
-* Fix file_integrity kprobes backend hanging at startup when probe verification keeps failing. https://github.com/elastic/beats/pull/53782[#53782] 
+* Fix the `file_integrity` eBPF backend failing to start on Linux 6.15 and later. https://github.com/elastic/beats/pull/53511[#53511] https://github.com/elastic/beats/issues/46719[#46719]
+* Fix a panic in the `file_integrity` eBPF backend when its eBPF loader fails to start. https://github.com/elastic/beats/pull/53785[#53785]
+* Fix the `file_integrity` kprobes backend hanging at startup when probe verification keeps failing. https://github.com/elastic/beats/pull/53782[#53782]
 
 
 **Filebeat**
 
 * Resume CrowdStrike Event Streams after dropped firehose connections without exhausting retries. https://github.com/elastic/beats/pull/53416[#53416] 
-* HTTP Endpoint options_headers must be non-empty and options_response_code must be valid when options_headers is configured. A previously accepted empty options_headers: {} now fails at startup.
-. https://github.com/elastic/beats/pull/53417[#53417] 
-* Fix azure-eventhub v1 input crashing the otel collector with concurrent map iteration and map write. https://github.com/elastic/beats/pull/53822[#53822] https://github.com/elastic/beats/issues/53816[#53816]
-* Fix TCP and UDP input receive queue and packet drop metrics always reporting 0 when listening on 0.0.0.0 on hosts with IPv6 enabled. https://github.com/elastic/beats/pull/53972[#53972] 
-* Fix system/auth module journald ingest pipeline failing on events without journald.process.name. https://github.com/elastic/beats/pull/54033[#54033] https://github.com/elastic/beats/issues/54013[#54013]
-* Reduce Azure Event Hub v2 memory retention while waiting for acknowledgments. https://github.com/elastic/beats/pull/54014[#54014] 
+* Validate the `http_endpoint` input's configuration for HTTP OPTIONS requests at startup. When `options_headers` is set, it must not be empty, and `options_response_code` must be valid. A previously accepted empty `options_headers: {}` now fails at startup. https://github.com/elastic/beats/pull/53417[#53417]
+* Fix the `azure-eventhub` v1 input crashing the OTel Collector with a concurrent map iteration and map write. https://github.com/elastic/beats/pull/53822[#53822] https://github.com/elastic/beats/issues/53816[#53816]
+* Fix TCP and UDP input receive queue and packet drop metrics always reporting 0 when listening on `0.0.0.0` on hosts with IPv6 enabled. https://github.com/elastic/beats/pull/53972[#53972]
+* Fix the `system` module's `auth` fileset ingest pipeline failing on journald events without `journald.process.name`. https://github.com/elastic/beats/pull/54033[#54033] https://github.com/elastic/beats/issues/54013[#54013]
+* Reduce the memory retained by the `azure-eventhub` v2 input while waiting for acknowledgments. https://github.com/elastic/beats/pull/54014[#54014]
 
 
 **Heartbeat**
@@ -99,15 +98,15 @@ The 8.19.24 release adds the following new and notable features.
 
 **Metricbeat**
 
-* Skip unsupported Azure Monitor metric namespaces when ignore_unsupported is true instead of failing collection on HTTP 400. https://github.com/elastic/beats/pull/53643[#53643] https://github.com/elastic/beats/issues/52999[#52999]
+* Skip unsupported Azure Monitor metric namespaces when `ignore_unsupported` is `true` instead of failing collection on HTTP 400. https://github.com/elastic/beats/pull/53643[#53643] https://github.com/elastic/beats/issues/52999[#52999]
 
 
 **Packetbeat**
 
-* Reject RESP bulk-string lengths other than -1 (nil) and &gt;=0 in the packetbeat Redis parser. https://github.com/elastic/beats/pull/50288[#50288] https://github.com/elastic/beats/issues/50205[#50205]
-* Fix contact fields handling to use Contact instead of To header. https://github.com/elastic/beats/pull/53418[#53418] 
-* Fix nil map panic and missed completion for zero-body messages in AMQP parser. https://github.com/elastic/beats/pull/53491[#53491] 
-* Fix pgsql queries being paired with the wrong responses after a NULL column. https://github.com/elastic/beats/pull/53666[#53666] 
+* Reject RESP bulk-string lengths other than -1 (nil) and >=0 in the Packetbeat Redis parser. https://github.com/elastic/beats/pull/50288[#50288] https://github.com/elastic/beats/issues/50205[#50205]
+* Fix the SIP parser populating the contact fields from the To header instead of the Contact header. https://github.com/elastic/beats/pull/53418[#53418]
+* Fix a nil map panic and missed completion for zero-body messages in the AMQP parser. https://github.com/elastic/beats/pull/53491[#53491]
+* Fix `pgsql` queries being paired with the wrong responses after a NULL column. https://github.com/elastic/beats/pull/53666[#53666]
 * Reject invalid negative RESP array lengths in the Redis parser. https://github.com/elastic/beats/pull/53843[#53843] 
 
 // end 8.19.24 relnotes
