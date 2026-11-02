@@ -13,12 +13,18 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Fix file_integrity kprobes backend hanging at startup when probe verification keeps failing
+summary: Fix file_integrity kprobes backend failing on kernels that list .cold symbols first
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-# description:
+description: >
+  The kprobes backend of the file_integrity module stopped at the first
+  /proc/kallsyms entry whose name started with the probed symbol, so on kernels
+  that list a cold-path fragment such as fsnotify.cold ahead of fsnotify it
+  reported "symbol fsnotify is optimised" and failed to start. Symbol lookup now
+  scans the whole table, prefers an exact match, and ignores .cold fragments,
+  which are not compiler clones of the function.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:
