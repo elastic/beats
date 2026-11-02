@@ -368,7 +368,7 @@ func (s *diskstore) WriteCheckpoint(state map[string]entry) error {
 // checkpointTmpFile writes all states to tempfile. It returns the file path
 // and the number of bytes written.
 func (s *diskstore) checkpointTmpFile(tempfile string, states map[string]entry) (string, uint64, error) {
-	f, err := os.OpenFile(tempfile, os.O_RDWR|os.O_CREATE|os.O_TRUNC|os.O_SYNC, s.fileMode)
+	f, err := os.OpenFile(tempfile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, s.fileMode)
 	if err != nil {
 		return "", 0, err
 	}
