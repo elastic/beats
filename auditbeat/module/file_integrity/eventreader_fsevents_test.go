@@ -19,7 +19,12 @@
 
 package file_integrity
 
-import "testing"
+import (
+	"path/filepath"
+	"testing"
+
+	"github.com/elastic/elastic-agent-libs/logp"
+)
 
 func TestGetFileInfoReturnsInfoForExistingPath(t *testing.T) {
 	info, err := getFileInfo(t.TempDir())
@@ -28,5 +33,30 @@ func TestGetFileInfoReturnsInfoForExistingPath(t *testing.T) {
 	}
 	if info == nil {
 		t.Fatal("getFileInfo returned nil file info")
+	}
+}
+
+func TestNonRecursiveReaderIsWatched(t *testing.T) {
+	watchedDir := t.TempDir()
+	outsideDir := t.TempDir()
+
+	reader, err := NewEventReader(Config{
+		Paths:     []string{watchedDir},
+		Recursive: false,
+	}, logp.NewLogger("test"))
+	if err != nil {
+		t.Fatalf("NewEventReader returned an unexpected error: %v", err)
+	}
+
+	fsReader, ok := reader.(*fsEventsReader)
+	if !ok {
+		t.Fatalf("NewEventReader returned %T, want *fsEventsReader", reader)
+	}
+
+	if !fsReader.isWatched(filepath.Join(watchedDir, "direct-child")) {
+		t.Fatal("non-recursive reader did not watch a direct child")
+	}
+	if fsReader.isWatched(filepath.Join(outsideDir, "outside")) {
+		t.Fatal("non-recursive reader watched a path outside the configured directory")
 	}
 }
