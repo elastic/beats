@@ -29,3 +29,9 @@ func TestSuccessfulFetch(t *testing.T) {
 		require.LessOrEqual(t, 1, len(data.Reporter.GetEvents()))
 	})
 }
+
+// The filter must collect snapshot tasks such as create, delete and restore, not the nonexistent indices:admin/snapshot*
+func TestTasksPathSnapshotFilter(t *testing.T) {
+	require.Contains(t, TasksPath, "cluster:admin/snapshot/*", "filter should collect snapshot related tasks")
+	require.NotContains(t, TasksPath, "indices:admin/snapshot", "filter should not use the nonexistent indices:admin/snapshot action")
+}
