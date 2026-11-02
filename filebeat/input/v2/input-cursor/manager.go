@@ -93,6 +93,13 @@ var (
 	errNoInputRunner      = errors.New("no input runner available")
 )
 
+func (cim *InputManager) defaultCleanTimeout() time.Duration {
+	if cim.DefaultCleanTimeout <= 0 {
+		return 30 * time.Minute
+	}
+	return cim.DefaultCleanTimeout
+}
+
 // storeKey identifies the cursor store for this input type and ID.
 // The key includes the type because each cursor store loads state for one type.
 func (cim *InputManager) storeKey(inputID string) string {
@@ -111,9 +118,6 @@ func (cim *InputManager) init(inputID string) (*store, error) {
 		cim.mu.Unlock()
 		<-e.ready
 		return e.store, e.err
-	}
-	if cim.DefaultCleanTimeout <= 0 {
-		cim.DefaultCleanTimeout = 30 * time.Minute
 	}
 	e := &storeEntry{ready: make(chan struct{})}
 	if cim.stores == nil {
@@ -210,7 +214,7 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	settings := struct {
 		ID            string        `config:"id"`
 		CleanInactive time.Duration `config:"clean_inactive"`
-	}{ID: "", CleanInactive: cim.DefaultCleanTimeout}
+	}{ID: "", CleanInactive: cim.defaultCleanTimeout()}
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
 	}

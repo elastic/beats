@@ -49,7 +49,7 @@ filebeat.inputs:
 ```
 1. {applies_to}`stack: ga 9.1.0`
 
-**Explanation :** This `configuration` given above describes a basic blob storage config having two containers named `container_1` and `container_2`. Each of these containers have their own attributes such as `name`, `batch_size` {applies_to}`stack: ga 9.1.0`, `max_workers`, `poll` and `poll_interval`. These attributes have detailed explanations given [below](#supported-attributes). For now lets try to understand how this config works.
+**Explanation :** This `configuration` given above describes a basic blob storage config having two containers named `container_1` and `container_2`. Each of these containers has its own attributes such as `name`, `batch_size` {applies_to}`stack: ga 9.1.0`, `max_workers`, `poll` and `poll_interval`. These attributes have detailed explanations given [below](#supported-attributes). For now let's try to understand how this config works.
 
 For azure blob storage input to identify the files it needs to read and process, it will require the container names to be specified. We can have as many containers as we deem fit. We are also able to configure the attributes `batch_size` {applies_to}`stack: ga 9.1.0`, `max_workers`, `poll` and `poll_interval` at the root level, which will then be applied to all containers which do not specify any of these attributes explicitly.
 

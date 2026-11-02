@@ -34,8 +34,12 @@ type fsNotifySymbol struct {
 	inodeProbeFilter  string
 	dentryProbeFilter string
 	pathProbeFilter   string
-	lastOnErr         error
-	seenSpecs         map[*tkbtf.Spec]struct{}
+	// retriedOverlapping and retriedMissing record that the filters were
+	// already adjusted for the matching verification error on the current
+	// spec, so each adjustment is attempted only once.
+	retriedOverlapping bool
+	retriedMissing     bool
+	seenSpecs          map[*tkbtf.Spec]struct{}
 }
 
 func loadFsNotifySymbol(probeMgr *probeManager) error {
@@ -126,7 +130,8 @@ func (sym *fsNotifySymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc,
 			sym.seenSpecs = make(map[*tkbtf.Spec]struct{})
 		}
 
-		sym.lastOnErr = nil
+		sym.retriedOverlapping = false
+		sym.retriedMissing = false
 		// reset probe filters for each new spec
 		// this probes shouldn't cause any ErrVerifyOverlappingEvents or ErrVerifyMissingEvents
 		// for linux kernel versions linux 5.17+, thus we start from here. To see how we handle all
@@ -228,14 +233,15 @@ func (sym *fsNotifySymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc,
 }
 
 func (sym *fsNotifySymbol) onErr(err error) bool {
-	if sym.lastOnErr != nil && errors.Is(err, sym.lastOnErr) {
-		return false
-	}
-
-	sym.lastOnErr = err
-
+	// verify wraps the verifier errors, so retries are tracked per sentinel
+	// rather than per error value; otherwise every failure looks new and
+	// getVerifiedProbes retries the same spec forever.
 	switch {
 	case errors.Is(err, ErrVerifyOverlappingEvents):
+		if sym.retriedOverlapping {
+			return false
+		}
+		sym.retriedOverlapping = true
 
 		// on ErrVerifyOverlappingEvents for linux kernel versions < 5.7 the __fsnotify_parent
 		// probe is capturing and sending the modify events as well, thus disable them for
@@ -246,6 +252,10 @@ func (sym *fsNotifySymbol) onErr(err error) bool {
 
 		return true
 	case errors.Is(err, ErrVerifyMissingEvents):
+		if sym.retriedMissing {
+			return false
+		}
+		sym.retriedMissing = true
 
 		// on ErrVerifyMissingEvents for linux kernel versions 5.10 - 5.16 the __fsnotify_parent
 		// probe is not capturing and sending the modify attributes events for directories, thus

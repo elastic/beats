@@ -27,7 +27,7 @@ import (
 )
 
 // Run 'go generate' to create mocks that are used in tests.
-//go:generate go run go.uber.org/mock/mockgen -source=logout.go -destination=mock_logout.go -package client -mock_names=Logouter=MockLogouter
+//go:generate go run go.uber.org/mock/mockgen -source=logout.go -destination=mock_logout_test.go -package client -mock_names=Logouter=MockLogouter
 
 func TestLogout(t *testing.T) {
 	tests := []struct {

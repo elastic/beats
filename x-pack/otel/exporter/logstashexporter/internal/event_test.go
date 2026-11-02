@@ -16,6 +16,7 @@ import (
 	"go.opentelemetry.io/collector/pdata/plog"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestParseEvent(t *testing.T) {
@@ -54,6 +55,22 @@ func TestParseEvent(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "event with top-level beat, version and type fields",
+			setupLog: func() plog.LogRecord {
+				lr := plog.NewLogRecord()
+				lr.SetObservedTimestamp(pcommon.NewTimestampFromTime(time.Now()))
+
+				bodyMap := lr.Body().SetEmptyMap()
+				bodyMap.PutStr("message", "test message")
+				bodyMap.PutStr("type", "log")
+				bodyMap.PutStr("version", "1.2.3")
+				bodyMap.PutEmptyMap("beat").PutStr("name", "proxy")
+
+				return lr
+			},
+			wantErr: false,
+		},
+		{
 			name: "invalid event body - not a map",
 			setupLog: func() plog.LogRecord {
 				lr := plog.NewLogRecord()
@@ -70,7 +87,7 @@ func TestParseEvent(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			log := tt.setupLog()
 
-			event, err := parseEvent(&log)
+			event, err := parseEvent(&log, "")
 
 			if tt.wantErr {
 				require.Error(t, err)
@@ -79,9 +96,14 @@ func TestParseEvent(t *testing.T) {
 
 				require.NoError(t, err)
 
-				// Verify fields match original log record body
+				// Verify fields match original log record body. `@timestamp` moves to
+				// event.Timestamp (the json codec writes it from there).
 				originalBody := log.Body().Map().AsRaw()
 				for key, expectedValue := range originalBody {
+					if key == beat.TimestampFieldKey {
+						assert.NotContains(t, event.Fields, key)
+						continue
+					}
 					assert.Equal(t, expectedValue, event.Fields[key],
 						"Field %s should match original log record", key)
 				}
@@ -91,6 +113,47 @@ func TestParseEvent(t *testing.T) {
 					assert.Equal(t, log.ObservedTimestamp().AsTime(), event.Timestamp)
 				}
 			}
+		})
+	}
+}
+
+func TestExtractMetadataFields(t *testing.T) {
+	tests := map[string]struct {
+		fields       map[string]any
+		index        string
+		expectedMeta mapstr.M
+	}{
+		"no @metadata": {
+			fields:       map[string]any{"message": "test"},
+			expectedMeta: nil,
+		},
+		"version and type are removed, beat is kept": {
+			fields: map[string]any{
+				beat.MetadataFieldKey: map[string]any{"beat": "filebeat", "version": "9.6.0", "type": "_doc", "pipeline": "p"},
+			},
+			expectedMeta: mapstr.M{"beat": "filebeat", "pipeline": "p"},
+		},
+		"explicit index overrides beat": {
+			fields: map[string]any{
+				beat.MetadataFieldKey: map[string]any{"beat": "filebeat"},
+			},
+			index:        "My-Index",
+			expectedMeta: mapstr.M{"beat": "my-index"},
+		},
+		"explicit index is set when beat is missing": {
+			fields: map[string]any{
+				beat.MetadataFieldKey: map[string]any{"pipeline": "p"},
+			},
+			index:        "my-index",
+			expectedMeta: mapstr.M{"beat": "my-index", "pipeline": "p"},
+		},
+	}
+
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			meta := extractMetadataFields(tt.fields, tt.index)
+			assert.Equal(t, tt.expectedMeta, meta, "unexpected event metadata")
+			assert.NotContains(t, tt.fields, beat.MetadataFieldKey, "@metadata should be removed from the event fields")
 		})
 	}
 }

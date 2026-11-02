@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/libbeat/statusreporterhelper"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 const (
@@ -66,6 +67,12 @@ type eventHubInputV2 struct {
 	migrationAssistant *migrationAssistant
 	setupFn            func(ctx context.Context) error
 	status             status.StatusReporter
+}
+
+// checkpointMetadata excludes payloads and AMQP metadata from pending acknowledgments.
+type checkpointMetadata struct {
+	offset         string
+	sequenceNumber int64
 }
 
 // newEventHubInputV2 creates a new instance of the Azure Event Hub input v2,
@@ -233,8 +240,7 @@ func (in *eventHubInputV2) run(ctx context.Context) error {
 			in.config.ConsumerGroup,
 		)
 		if err != nil {
-			in.log.Errorw("error migrating checkpoint store", "error", err)
-			// FIXME: should we return here?
+			return fmt.Errorf("checkpoint migration failed: %w", err)
 		}
 	}
 
@@ -278,7 +284,7 @@ func (in *eventHubInputV2) run(ctx context.Context) error {
 		// On cancellation, it will return a nil error.
 		if err := processor.Run(ctx); err != nil {
 			// The processor encountered an unrecoverable error.
-			in.log.Errorw("processor encountered an unrecoverable error and needs to be restarted", "error", err)
+			in.log.Errorw("processor stopped with error; restarting after backoff", "error", err)
 
 			// The underlying error type for authentication is internal so we can't cast to it.
 			// Instead, we'll check the error message for the status code.
@@ -537,6 +543,13 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 		// We create a new event for each record.
 		records := in.messageDecoder.Decode(receivedEventData.Body)
 
+		// Retain only checkpoint metadata until acknowledgment,
+		// so the message body and AMQP metadata can be collected sooner.
+		checkpoint := &checkpointMetadata{
+			offset:         receivedEventData.Offset,
+			sequenceNumber: receivedEventData.SequenceNumber,
+		}
+
 		for _, record := range records {
 
 			event := beat.Event{
@@ -545,9 +558,12 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 				Timestamp: processingStartTime,
 				Fields: mapstr.M{
 					"message": record,
-					"azure":   eventHubMetadata,
+					// Each event needs its own copy: event normalization is
+					// disabled, so published events reference this map directly
+					// and outputs may read it on other goroutines.
+					"azure": eventHubMetadata.Clone(),
 				},
-				Private: receivedEventData,
+				Private: checkpoint,
 			}
 
 			// Publish the event to the Beats pipeline.
@@ -582,7 +598,7 @@ func initializePartitionResources(ctx context.Context, partitionClient *azeventh
 			//
 			// The data parameter contains the private data of the last
 			// acknowledged event.
-			receivedEventData, ok := data.(*azeventhubs.ReceivedEventData)
+			checkpoint, ok := data.(*checkpointMetadata)
 			if !ok {
 				log.Errorw(
 					"error updating checkpoint",
@@ -594,7 +610,10 @@ func initializePartitionResources(ctx context.Context, partitionClient *azeventh
 				return
 			}
 
-			err := partitionClient.UpdateCheckpoint(ctx, receivedEventData, nil)
+			err := partitionClient.UpdateCheckpoint(ctx, &azeventhubs.ReceivedEventData{
+				Offset:         checkpoint.offset,
+				SequenceNumber: checkpoint.sequenceNumber,
+			}, nil)
 			if err != nil {
 				log.Errorw(
 					"error updating checkpoint",
@@ -606,9 +625,8 @@ func initializePartitionResources(ctx context.Context, partitionClient *azeventh
 				"checkpoint updated",
 				"partition_id", partitionClient.PartitionID(),
 				"acked", acked,
-				"sequence_number", receivedEventData.SequenceNumber,
-				"offset", receivedEventData.Offset,
-				"enqueued_time", receivedEventData.EnqueuedTime,
+				"sequence_number", checkpoint.sequenceNumber,
+				"offset", checkpoint.offset,
 			)
 		}),
 		Processing: beat.ProcessingConfig{
@@ -629,25 +647,24 @@ func shutdownPartitionResources(ctx context.Context, partitionClient *azeventhub
 	defer pipelineClient.Close()
 }
 
-// newWebSocketConn creates a WebSocket connection for AMQP-over-WebSocket transport.
-//
-// This function is used when the transport configuration is set to "websocket".
-// It enables connectivity through HTTP proxies and firewalls that block the
-// standard AMQP port (5671) but allow HTTPS traffic on port 443.
-//
-// HTTP proxy configuration is automatically detected from environment variables:
-// - HTTP_PROXY / http_proxy
-// - HTTPS_PROXY / https_proxy
-// - NO_PROXY / no_proxy
-func newWebSocketConn(ctx context.Context, args azeventhubs.WebSocketConnParams) (net.Conn, error) {
-	opts := &websocket.DialOptions{
-		Subprotocols: []string{"amqp"},
-	}
+// newWebSocketDialer returns a WebSocket dialer for AMQP-over-WebSocket transport.
+// The returned function captures the given proxy settings so that per-policy
+// proxy_url configuration is forwarded to the WebSocket HTTP upgrade request.
+// When proxy settings are at their defaults, the dialer inherits proxy
+// configuration from environment variables (HTTPS_PROXY, NO_PROXY).
+func newWebSocketDialer(proxy httpcommon.HTTPClientProxySettings) func(ctx context.Context, args azeventhubs.WebSocketConnParams) (net.Conn, error) {
+	client := proxyHTTPClient(proxy)
+	return func(ctx context.Context, args azeventhubs.WebSocketConnParams) (net.Conn, error) {
+		opts := &websocket.DialOptions{
+			Subprotocols: []string{"amqp"},
+			HTTPClient:   client,
+		}
 
-	wssConn, _, err := websocket.Dial(ctx, args.Host, opts)
-	if err != nil {
-		return nil, err
-	}
+		wssConn, _, err := websocket.Dial(ctx, args.Host, opts) //nolint:bodyclose // resp.Body is nil on success; coder/websocket hijacks the conn and nils the body (dial.go:148).
+		if err != nil {
+			return nil, err
+		}
 
-	return websocket.NetConn(ctx, wssConn, websocket.MessageBinary), nil
+		return websocket.NetConn(ctx, wssConn, websocket.MessageBinary), nil
+	}
 }

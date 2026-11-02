@@ -8,7 +8,7 @@ import "github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/metricse
 
 const (
 	TasksMetricSet = "tasks_management"
-	TasksPath      = "/_tasks?detailed&group_by=parents&actions=indices:data/write*,indices:data/read*,indices:admin/snapshot*,internal:index/shard*&filter_path=**.node,*.*.id,*.*.type,*.*.action,*.*.description,*.*.*time*,*.*.cancellable,*.*.headers"
+	TasksPath      = "/_tasks?detailed&group_by=parents&actions=indices:data/write*,indices:data/read*,cluster:admin/snapshot/*,internal:index/shard*&filter_path=**.node,*.*.id,*.*.type,*.*.action,*.*.description,*.*.*time*,*.*.cancellable,*.*.headers"
 )
 
 // init registers the MetricSet with the central registry as soon as the program

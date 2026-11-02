@@ -8,9 +8,16 @@ import (
 	"context"
 	"errors"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
+	"strings"
+	"sync"
 	"testing"
 	"time"
+
+	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 
@@ -152,5 +159,59 @@ func TestPrepareAutoloadFile(t *testing.T) {
 	}
 	if err := verifyAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath); err != nil {
 		t.Fatalf("verifyAutoloadFile second run failed: %v", err)
+	}
+}
+
+func TestRunNotifiesExitBeforeLogging(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("uses a POSIX shell helper")
+	}
+	dir := t.TempDir()
+	binary := osquerydPath(dir)
+	require.NoError(t, os.MkdirAll(filepath.Dir(binary), 0750), "create helper directory")
+	require.NoError(t, os.WriteFile(binary, []byte("#!/bin/sh\nexit 78\n"), 0700), "write process helper")
+	logging := make(chan struct{})
+	release := make(chan struct{})
+	var once sync.Once
+	unblock := func() { once.Do(func() { close(release) }) }
+	defer unblock()
+	core, _ := observer.New(zapcore.DebugLevel)
+	logger, err := logp.ConfigureWithCoreLocal(logp.Config{}, zapcore.RegisterHooks(core, func(entry zapcore.Entry) error {
+		if strings.Contains(entry.Message, "osqueryd process exited with error") {
+			close(logging)
+			<-release
+		}
+		return nil
+	}))
+	require.NoError(t, err, "create blocking exit logger")
+	q, err := newOsqueryD(filepath.Join(dir, "rpc.sock"), WithBinaryPath(dir), WithExtensionPath(binary), WithDataPath(dir), WithLogger(logger))
+	require.NoError(t, err, "create daemon runner")
+	exited := make(chan error, 1)
+	done := make(chan error, 1)
+	go func() { done <- q.Run(t.Context(), nil, func(err error) { exited <- err }) }()
+	select {
+	case <-logging:
+	case <-time.After(5 * time.Second):
+		t.Fatal("process did not reach exit logging")
+	}
+	select {
+	case err := <-exited:
+		var exitError *exec.ExitError
+		require.ErrorAs(t, err, &exitError, "notify with the process error")
+		assert.Equal(t, 78, exitError.ExitCode(), "preserve process exit code")
+	default:
+		t.Fatal("exit callback did not run before blocked logging")
+	}
+	select {
+	case <-done:
+		t.Fatal("Run returned while exit logging was blocked")
+	default:
+	}
+	unblock()
+	select {
+	case err := <-done:
+		require.Error(t, err, "return the process failure after logging")
+	case <-time.After(5 * time.Second):
+		t.Fatal("Run did not finish after logging was released")
 	}
 }
