@@ -26,6 +26,11 @@ type runnerState struct {
 	msg   string
 }
 
+// Equals reports whether both states have the same status and message.
+func (r *runnerState) Equals(other *runnerState) bool {
+	return r.state == other.state && r.msg == other.msg
+}
+
 // raw converts a runnerState to the map reported for its input.
 // The format is the same as the healthcheckv2 extension
 func (r *runnerState) raw() map[string]any {
@@ -96,18 +101,15 @@ func (r *reporter) updateStatusForRunner(id string, state status.Status, msg str
 	if r.runnerStates == nil {
 		r.runnerStates = make(map[string]*runnerState)
 	}
+	newState := runnerState{state: state, msg: msg}
 	if rState, ok := r.runnerStates[id]; ok {
-		if rState.state == state && rState.msg == msg {
+		if rState.Equals(&newState) {
 			return
 		}
-		rState.msg = msg
-		rState.state = state
+		*rState = newState
 	} else {
 		// add status for the runner to the map, if not preset
-		r.runnerStates[id] = &runnerState{
-			state: state,
-			msg:   msg,
-		}
+		r.runnerStates[id] = &newState
 	}
 
 	// report aggregated status for all sub-components
