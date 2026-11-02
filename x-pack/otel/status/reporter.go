@@ -9,8 +9,6 @@ import (
 	"sync"
 	"time"
 
-	"go.opentelemetry.io/collector/pdata/pcommon"
-
 	"github.com/elastic/beats/v7/libbeat/management/status"
 
 	"go.opentelemetry.io/collector/component"
@@ -28,13 +26,13 @@ type runnerState struct {
 	msg   string
 }
 
-// toPdata converts a runnerState to a pdata.Map
+// raw converts a runnerState to the map reported for its input.
 // The format is the same as the healthcheckv2 extension
-func toPdata(r *runnerState) pcommon.Map {
-	pcommonMap := pcommon.NewMap()
-	pcommonMap.PutStr("status", beatStatusToOtelStatus(r.state).String())
-	pcommonMap.PutStr("error", r.msg)
-	return pcommonMap
+func (r *runnerState) raw() map[string]any {
+	return map[string]any{
+		"status": beatStatusToOtelStatus(r.state).String(),
+		"error":  r.msg,
+	}
 }
 
 // RunnerReporter defines an interface that returns a StatusReporter for a specific runner.
@@ -99,6 +97,9 @@ func (r *reporter) updateStatusForRunner(id string, state status.Status, msg str
 		r.runnerStates = make(map[string]*runnerState)
 	}
 	if rState, ok := r.runnerStates[id]; ok {
+		if rState.state == state && rState.msg == msg {
+			return
+		}
 		rState.msg = msg
 		rState.state = state
 	} else {
@@ -177,12 +178,14 @@ func (r *reporter) calculateOtelStatus() *componentstatus.Event {
 	}
 	evt = componentstatus.NewEvent(otelStatus, eventBuilderOpts...)
 
-	inputStatusesPdata := evt.Attributes().PutEmptyMap(InputStatusAttributesKey)
-
+	// Build the map in one pass: PutEmptyMap looks the key up linearly, which is
+	// quadratic in the number of runners.
+	inputStatuses := make(map[string]any, len(r.runnerStates))
 	for id, rs := range r.runnerStates {
-		inputStatePdata := toPdata(rs)
-		m := inputStatusesPdata.PutEmptyMap(id)
-		inputStatePdata.MoveTo(m)
+		inputStatuses[id] = rs.raw()
+	}
+	if err := evt.Attributes().PutEmptyMap(InputStatusAttributesKey).FromRaw(inputStatuses); err != nil {
+		return nil
 	}
 
 	return evt
