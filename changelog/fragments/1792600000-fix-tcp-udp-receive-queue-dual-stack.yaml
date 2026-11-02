@@ -1,3 +1,0 @@
-kind: bug-fix
-summary: Fix TCP and UDP input receive queue and packet drop metrics always reporting 0 when listening on 0.0.0.0 on hosts with IPv6 enabled.
-component: filebeat
