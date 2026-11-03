@@ -11,6 +11,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/auto_ops_testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/metricset"
 
@@ -33,9 +35,49 @@ func expectValidParsedData(t *testing.T, data metricset.FetcherData[map[string]i
 	// filename includes the "display_name" as the second part
 	displayName := strings.Split(data.File, ".")[1]
 
+	require.Equal(t, displayName, auto_ops_testing.GetObjectValue(event.MetricSetFields, "cluster.metadata.display_name"))
+
+	// schema is expected to drop this field if it appears (it does in one file)
+	require.Nil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "ignored_field"))
+
+	// fixtures are told apart by display name: stateful clusters are "my-cluster", the rest are Serverless projects
+	switch displayName {
+	case "my-cluster":
+		expectStatefulSettings(t, data, event)
+
+		// min_search_vcu only exists on Serverless, so stateful clusters never report it
+		require.NotContains(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "serverless.search"), "min_search_vcu")
+	case "my-search-project", "my-unset-project":
+		expectServerlessSettings(t, event, displayName)
+	default:
+		require.Failf(t, "unexpected fixture", "no expectations for display name %q in %s", displayName, data.File)
+	}
+}
+
+func expectServerlessSettings(t *testing.T, event mb.Event, displayName string) {
+	require.Equal(t, "20000", auto_ops_testing.GetObjectValue(event.MetricSetFields, "cluster.max_shards_per_node"))
+	require.ElementsMatch(t, []string{"/usr/share/elasticsearch/data"}, auto_ops_testing.GetObjectValue(event.MetricSetFields, "path.data"))
+
+	// the other serverless.search settings are unaffected and keep being reported as strings
+	require.Equal(t, "1d", auto_ops_testing.GetObjectValue(event.MetricSetFields, "serverless.search.boost_window"))
+	require.Equal(t, "200", auto_ops_testing.GetObjectValue(event.MetricSetFields, "serverless.search.search_power_max"))
+	require.Equal(t, "200", auto_ops_testing.GetObjectValue(event.MetricSetFields, "serverless.search.search_power_min"))
+
+	switch displayName {
+	case "my-search-project":
+		// persistent "4" overrides the "-1" default and is reported as a whole number, not a string
+		require.Equal(t, int64(4), auto_ops_testing.GetObjectValue(event.MetricSetFields, "serverless.search.min_search_vcu"))
+	case "my-unset-project":
+		// only the "-1" default exists, which means unset: the field is omitted instead of reported as -1
+		require.NotContains(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "serverless.search"), "min_search_vcu")
+	default:
+		require.Failf(t, "unexpected serverless fixture", "no expectations for display name %q", displayName)
+	}
+}
+
+func expectStatefulSettings(t *testing.T, data metricset.FetcherData[map[string]any], event mb.Event) {
 	// Settings are flattened with precedence: transient > persistent > defaults
 	require.Equal(t, "4000", auto_ops_testing.GetObjectValue(event.MetricSetFields, "cluster.max_shards_per_node"))
-	require.Equal(t, displayName, auto_ops_testing.GetObjectValue(event.MetricSetFields, "cluster.metadata.display_name"))
 	require.ElementsMatch(t, []string{"/app/data"}, auto_ops_testing.GetObjectValue(event.MetricSetFields, "path.data"))
 	require.Equal(t, "3", auto_ops_testing.GetObjectValue(event.MetricSetFields, "serverless.search.search_power_min"))
 
@@ -107,9 +149,6 @@ func expectValidParsedData(t *testing.T, data metricset.FetcherData[map[string]i
 			"xpack.monitoring.exporters.cloud_monitoring.type",
 		}, auto_ops_testing.GetObjectValue(event.MetricSetFields, "archived"))
 	}
-
-	// schema is expected to drop this field if it appears (it does in one file)
-	require.Nil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "ignored_field"))
 }
 
 // Expect a valid response from Elasticsearch to create a single event
@@ -218,4 +257,166 @@ func TestCollectArchivedSettingsIsDeterministic(t *testing.T) {
 	for range 50 {
 		require.Equal(t, first, collectArchivedSettings(settings))
 	}
+}
+
+// serverlessScope builds one scope (defaults/persistent/transient) of a _cluster/settings response.
+func serverlessScope(settings map[string]any) map[string]any {
+	return map[string]any{"serverless": map[string]any{"search": settings}}
+}
+
+// min_search_vcu is the only numeric setting here: Elasticsearch returns it as a string, `-1` means
+// unset, and it must reach the event as an int64 (or not at all) so it can be mapped as a number.
+func TestMinSearchVCU(t *testing.T) {
+	const key = "serverless.search.min_search_vcu"
+
+	tests := map[string]struct {
+		settings map[string]any
+		// nil means the field must be absent from the event
+		expected any
+	}{
+		"read from defaults": {
+			settings: map[string]any{"defaults": serverlessScope(map[string]any{"min_search_vcu": "8"})},
+			expected: int64(8),
+		},
+		"read from persistent": {
+			settings: map[string]any{
+				"defaults":   map[string]any{},
+				"persistent": serverlessScope(map[string]any{"min_search_vcu": "8"}),
+			},
+			expected: int64(8),
+		},
+		"read from transient": {
+			settings: map[string]any{
+				"defaults":  map[string]any{},
+				"transient": serverlessScope(map[string]any{"min_search_vcu": "8"}),
+			},
+			expected: int64(8),
+		},
+		"persistent overrides the unset default": {
+			settings: map[string]any{
+				"defaults":   serverlessScope(map[string]any{"min_search_vcu": "-1"}),
+				"persistent": serverlessScope(map[string]any{"min_search_vcu": "4"}),
+			},
+			expected: int64(4),
+		},
+		"transient overrides persistent and defaults": {
+			settings: map[string]any{
+				"defaults":   serverlessScope(map[string]any{"min_search_vcu": "-1"}),
+				"persistent": serverlessScope(map[string]any{"min_search_vcu": "8"}),
+				"transient":  serverlessScope(map[string]any{"min_search_vcu": "12"}),
+			},
+			expected: int64(12),
+		},
+		"unset (-1) default is ignored": {
+			settings: map[string]any{"defaults": serverlessScope(map[string]any{"min_search_vcu": "-1"})},
+			expected: nil,
+		},
+		"unset (-1) persistent is ignored": {
+			settings: map[string]any{
+				"defaults":   map[string]any{},
+				"persistent": serverlessScope(map[string]any{"min_search_vcu": "-1"}),
+			},
+			expected: nil,
+		},
+		"unset (-1) in a higher scope hides a lower scope value": {
+			settings: map[string]any{
+				"defaults":   map[string]any{},
+				"persistent": serverlessScope(map[string]any{"min_search_vcu": "8"}),
+				"transient":  serverlessScope(map[string]any{"min_search_vcu": "-1"}),
+			},
+			expected: nil,
+		},
+		"absent everywhere": {
+			settings: map[string]any{
+				"defaults":   serverlessScope(map[string]any{}),
+				"persistent": serverlessScope(map[string]any{}),
+			},
+			expected: nil,
+		},
+		"no serverless settings at all (stateful cluster)": {
+			settings: map[string]any{"defaults": map[string]any{}, "persistent": map[string]any{}},
+			expected: nil,
+		},
+		"null value": {
+			settings: map[string]any{
+				"defaults":   map[string]any{},
+				"persistent": serverlessScope(map[string]any{"min_search_vcu": nil}),
+			},
+			expected: nil,
+		},
+		"null in a higher scope hides a valid lower scope value": {
+			settings: map[string]any{
+				"defaults":  serverlessScope(map[string]any{"min_search_vcu": "8"}),
+				"transient": serverlessScope(map[string]any{"min_search_vcu": nil}),
+			},
+			expected: nil,
+		},
+		"non-string in a higher scope hides a valid lower scope value": {
+			settings: map[string]any{
+				"defaults":   serverlessScope(map[string]any{"min_search_vcu": "8"}),
+				"persistent": serverlessScope(map[string]any{"min_search_vcu": true}),
+			},
+			expected: nil,
+		},
+		"non-numeric value": {
+			settings: map[string]any{"defaults": serverlessScope(map[string]any{"min_search_vcu": "abc"})},
+			expected: nil,
+		},
+		"fractional value": {
+			settings: map[string]any{"defaults": serverlessScope(map[string]any{"min_search_vcu": "2.5"})},
+			expected: nil,
+		},
+		"negative value other than -1": {
+			settings: map[string]any{"defaults": serverlessScope(map[string]any{"min_search_vcu": "-5"})},
+			expected: nil,
+		},
+		"empty string": {
+			settings: map[string]any{"defaults": serverlessScope(map[string]any{"min_search_vcu": ""})},
+			expected: nil,
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			// a sibling setting proves an unset or malformed min_search_vcu never breaks the event
+			settings := test.settings
+			settings["persistent"] = withSiblings(settings["persistent"])
+
+			reporter := &mbtest.CapturingReporterV2{}
+			info := auto_ops_testing.CreateClusterInfo("8.11.0")
+
+			require.NoError(t, eventsMapping(reporter, &info, &settings))
+			require.Empty(t, reporter.GetErrors(), "no error events are expected")
+			require.Len(t, reporter.GetEvents(), 1, "exactly one event is expected")
+
+			fields := reporter.GetEvents()[0].MetricSetFields
+
+			require.Equal(t, "3", auto_ops_testing.GetObjectValue(fields, "serverless.search.search_power_min"), "sibling settings must be kept")
+
+			if test.expected == nil {
+				require.NotContains(t, auto_ops_testing.GetObjectValue(fields, "serverless.search"), "min_search_vcu", "unset settings must be omitted")
+				return
+			}
+
+			require.Equal(t, test.expected, auto_ops_testing.GetObjectValue(fields, key), "must be reported as a whole number")
+		})
+	}
+}
+
+// withSiblings adds search_power_min next to whatever the persistent scope already holds.
+func withSiblings(persistent any) map[string]any {
+	scope, ok := persistent.(map[string]any)
+	if !ok {
+		scope = map[string]any{}
+	}
+
+	search, ok := scope["serverless"].(map[string]any)
+	if !ok {
+		search = map[string]any{"search": map[string]any{}}
+		scope["serverless"] = search
+	}
+
+	search["search"].(map[string]any)["search_power_min"] = "3"
+
+	return scope
 }

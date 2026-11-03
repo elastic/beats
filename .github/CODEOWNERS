@@ -63,6 +63,7 @@ changelog/fragments/
 /libbeat/ @elastic/elastic-agent-data-plane
 /libbeat/autodiscover/providers/kubernetes @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
 /libbeat/docs/processors-list.asciidoc @elastic/ski-docs
+/libbeat/ebpf @elastic/sec-linux-platform
 /libbeat/management @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
 /libbeat/processors/add_cloud_metadata @elastic/obs-ds-hosted-services
 /libbeat/processors/add_kubernetes_metadata @elastic/elastic-agent-data-plane
