@@ -7,6 +7,7 @@ package status
 import (
 	"errors"
 	"sync"
+	"time"
 
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
@@ -45,10 +46,25 @@ type RunnerReporter interface {
 	UpdateStatus(status status.Status, msg string)
 }
 
+// reportInterval is the minimum time between two status reports aggregated from
+// the runners. Each report carries the status of every runner, so reporting
+// every change made a burst of changes, like starting many runners, quadratic.
+// A change after a quiet interval is reported right away; changes within the
+// interval are coalesced into one report at its end.
+const reportInterval = 500 * time.Millisecond
+
 type reporter struct {
 	runnerStates map[string]*runnerState
 	host         component.Host
 	mtx          sync.Mutex
+
+	interval   time.Duration
+	lastReport time.Time
+	// pending is the report scheduled at the end of the current interval, if any.
+	pending *time.Timer
+	// dirty is set when a runner status changed since the last report. A
+	// scheduled report is skipped if a newer report made it redundant.
+	dirty bool
 }
 
 // NewGroupStatusReporter creates a reporter that aggregates the statuses of multiple runners
@@ -56,9 +72,14 @@ type reporter struct {
 // This is needed because multiple modules can report different statuses, and we want to avoid
 // repeatedly flipping the parent's status.
 func NewGroupStatusReporter(host component.Host) RunnerReporter {
+	return newGroupStatusReporter(host, reportInterval)
+}
+
+func newGroupStatusReporter(host component.Host, interval time.Duration) *reporter {
 	return &reporter{
 		host:         host,
 		runnerStates: make(map[string]*runnerState),
+		interval:     interval,
 	}
 }
 
@@ -89,8 +110,35 @@ func (r *reporter) updateStatusForRunner(id string, state status.Status, msg str
 	}
 
 	// report aggregated status for all sub-components
-	evt := r.calculateOtelStatus()
-	componentstatus.ReportStatus(r.host, evt)
+	r.dirty = true
+	r.reportLocked()
+}
+
+// reportLocked reports the aggregated status of the runners now, or at the end
+// of the current interval if a report was sent recently. r.mtx must be held.
+func (r *reporter) reportLocked() {
+	if r.pending != nil {
+		// the scheduled report will include this change
+		return
+	}
+	if wait := r.interval - time.Since(r.lastReport); wait > 0 {
+		r.pending = time.AfterFunc(wait, func() {
+			r.mtx.Lock()
+			defer r.mtx.Unlock()
+			r.pending = nil
+			if r.dirty {
+				r.sendLocked()
+			}
+		})
+		return
+	}
+	r.sendLocked()
+}
+
+func (r *reporter) sendLocked() {
+	r.dirty = false
+	r.lastReport = time.Now()
+	componentstatus.ReportStatus(r.host, r.calculateOtelStatus())
 }
 
 // UpdateStatus reports the overall status of the group.
@@ -106,6 +154,12 @@ func (r *reporter) UpdateStatus(status status.Status, msg string) {
 		eventBuilderOpts = append(eventBuilderOpts, componentstatus.WithError(errors.New(msg)))
 	}
 	evt := componentstatus.NewEvent(otelStatus, eventBuilderOpts...)
+
+	r.mtx.Lock()
+	defer r.mtx.Unlock()
+	// a scheduled report would override this status with runner statuses older
+	// than it; only runner changes made after it should be reported
+	r.dirty = false
 	componentstatus.ReportStatus(r.host, evt)
 }
 

@@ -71,7 +71,17 @@ func AssembleDarwinUniversal() error {
 func GenerateModuleIncludeListGo() error {
 	opts := devtools.DefaultIncludeListOptions()
 	opts.ImportDirs = []string{"processors/*"}
-	return devtools.GenerateIncludeListGo(opts)
+	opts.BuildTags = "\n//go:build !edr\n"
+	if err := devtools.GenerateIncludeListGo(opts); err != nil {
+		return err
+	}
+	// generate include/list_edr.go
+	return devtools.GenerateIncludeListGo(devtools.IncludeListOptions{
+		Outfile:               "include/list_edr.go",
+		BuildTags:             "\n//go:build edr\n",
+		Pkg:                   "include",
+		ForceInitializeModule: true,
+	})
 }
 
 // Package packages the Beat for distribution.
