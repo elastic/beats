@@ -1,3 +1,10 @@
 kind: bug-fix
 summary: Honour the configured WebSocket write deadline when deriving the read timeout
 component: filebeat
+description: |
+  The WebSocket read timeout is three times keep_alive.write_control_deadline and
+  is reset only by PONG frames. With keep-alive enabled, nonpositive deadlines or
+  intervals and intervals at least three times the write deadline are now rejected,
+  including the default 30s interval with the default 10s write deadline. Previously
+  accepted configurations may need a shorter interval or a longer write deadline.
+  Very small deadlines can cause repeated reconnects.

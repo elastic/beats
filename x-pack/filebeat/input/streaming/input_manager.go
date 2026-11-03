@@ -38,6 +38,13 @@ func cursorConfigure(cfg *conf.C, logger *logp.Logger) ([]inputcursor.Source, in
 		return nil, nil, err
 	}
 
+	// Validate after applying defaults: Create first unpacks into an empty config,
+	// where an omitted deadline is indistinguishable from an explicit zero.
+	if src.cfg.Type != "crowdstrike" {
+		if err := src.cfg.KeepAlive.validate(); err != nil {
+			return nil, nil, err
+		}
+	}
 	src.cfg.KeepAlive.readControlDeadline = 3 * src.cfg.KeepAlive.WriteControlDeadline
 	src.cfg.checkUnsupportedParams(logger)
 	if src.cfg.Program == "" {
