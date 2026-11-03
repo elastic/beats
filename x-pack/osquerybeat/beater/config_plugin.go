@@ -117,9 +117,9 @@ func NewConfigPlugin(log *logp.Logger) *ConfigPlugin {
 
 // Set replaces the in-memory osquery policy, rebuilds query lookup state, and resets the cached
 // osqueryd config string. Validation errors (invalid ECS mapping, incompatible native vs RRULE
-// scheduling, pack schedule defaults, and so on) are returned immediately: callers that treat
-// a failed Set as fatal—such as runOsquery's input loop—will stop the osquery runner until policy
-// is corrected and a new input arrives.
+// scheduling, pack schedule defaults, and so on) are returned immediately and leave the current
+// policy in place. Policy updates are validated by the input reloader before they reach Set, so
+// for them a failure here is unexpected.
 func (p *ConfigPlugin) Set(inputs []config.InputConfig) error {
 	p.mx.Lock()
 	defer p.mx.Unlock()
@@ -182,6 +182,36 @@ func (p *ConfigPlugin) LookupQueryProfile(name string) bool {
 		return qi.Profile
 	}
 	return false
+}
+
+// scheduledProfileMatches rejects work captured before a policy or namespace
+// replacement. Pending policy changes take effect for profiling immediately,
+// while result query metadata retains its existing native-refresh behavior.
+func (p *ConfigPlugin) scheduledProfileMatches(request scheduledProfileRequest) bool {
+	p.mx.RLock()
+	defer p.mx.RUnlock()
+	namespace, ok := p.namespaces[request.name]
+	if !ok || namespace != request.namespace {
+		return false
+	}
+	query, ok := p.queryInfoMap[request.name]
+	if !ok || query.Query != request.query || query.SpaceID != request.spaceID || idOrDefault(query.ScheduleID, request.name) != request.scheduleID {
+		return false
+	}
+	if p.newQueryInfoMap != nil {
+		query, ok = p.newQueryInfoMap[request.name]
+		if !ok || query.Query != request.query || query.SpaceID != request.spaceID || idOrDefault(query.ScheduleID, request.name) != request.scheduleID {
+			return false
+		}
+	}
+	return query.Profile
+}
+
+func idOrDefault(id, dflt string) string {
+	if id != "" {
+		return id
+	}
+	return dflt
 }
 
 // GlobalProfileEnabled returns the fleet-wide profiling default applied to queries
@@ -258,10 +288,7 @@ func (p *ConfigPlugin) render() (string, error) {
 }
 
 func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
-
-	p.configString = ""
-	p.namespace = ""
-
+	namespace := ""
 	queriesCount := 0
 	osqueryConfig := &config.OsqueryConfig{}
 	newQueryInfoMap := make(map[string]QueryInfo)
@@ -273,6 +300,8 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		if err != nil {
 			return
 		}
+		p.configString = ""
+		p.namespace = namespace
 		p.osqueryConfig = osqueryConfig
 		p.newQueryInfoMap = newQueryInfoMap
 		p.namespaces = namespaces
@@ -287,9 +316,9 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 
 	// Read namespace from the result input as of 7.16
 	result := config.ResultInput(inputs)
-	p.namespace = result.Datastream.Namespace
-	if p.namespace == "" {
-		p.namespace = config.DefaultNamespace
+	namespace = result.Datastream.Namespace
+	if namespace == "" {
+		namespace = config.DefaultNamespace
 	}
 
 	// Since 7.16 version only one integration/input is expected
@@ -336,7 +365,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		if err := config.ValidateQueryScheduleMode(qi); err != nil {
 			return fmt.Errorf("osquery.schedule[%q]: %w", name, err)
 		}
-		qi, err = registerQuery(name, p.namespace, qi, "", "", name)
+		qi, err = registerQuery(name, namespace, qi, "", "", name)
 		if err != nil {
 			return err
 		}
@@ -357,7 +386,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 			if err != nil {
 				return fmt.Errorf("osquery.packs[%q].queries[%q]: %w", packName, name, err)
 			}
-			qi, err = registerQuery(getPackQueryName(packName, name), p.namespace, qi, packID, pack.PackName, name)
+			qi, err = registerQuery(getPackQueryName(packName, name), namespace, qi, packID, pack.PackName, name)
 			if err != nil {
 				return err
 			}
@@ -392,7 +421,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 				Profiling:  stream.Profiling,
 			}
 
-			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), p.namespace, qi, input.Name, "", stream.ID)
+			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), namespace, qi, input.Name, "", stream.ID)
 			if err != nil {
 				return err
 			}
@@ -479,4 +508,12 @@ func traverseTree(depth int, ecsm ecs.Mapping, path []string, v any) error {
 		}
 	}
 	return nil
+}
+
+func (p *ConfigPlugin) lookupResultMetadata(name string) (string, QueryInfo, bool) {
+	p.mx.RLock()
+	defer p.mx.RUnlock()
+	query, ok := p.queryInfoMap[name]
+	namespace, routed := p.namespaces[name]
+	return namespace, query, ok && routed
 }

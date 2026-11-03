@@ -201,6 +201,269 @@ func TestValidJSONDepthTwo(t *testing.T) {
 	assert.Equal(t, expected.String(), actual.String())
 }
 
+func TestMaxObjectDepth(t *testing.T) {
+	const msg = `{"top":"top_value","top_obj":{"level_1":"level_1_value","level_1_obj":{"level_2":"level_2_value","level_2_obj":{"level_3":"level_3_value"}}},"list":[1,{"a":{"b":"<c>"}}]}`
+
+	tests := []struct {
+		name  string
+		cfg   map[string]any
+		field string
+		want  any
+	}{
+		{
+			name:  "unlimited",
+			cfg:   map[string]any{},
+			field: "parsed",
+			want: map[string]any{
+				"top": "top_value",
+				"top_obj": map[string]any{
+					"level_1": "level_1_value",
+					"level_1_obj": map[string]any{
+						"level_2":     "level_2_value",
+						"level_2_obj": map[string]any{"level_3": "level_3_value"},
+					},
+				},
+				"list": []any{int64(1), map[string]any{"a": map[string]any{"b": "<c>"}}},
+			},
+		},
+		{
+			name:  "one",
+			cfg:   map[string]any{"max_object_depth": 1},
+			field: "parsed",
+			want: map[string]any{
+				"top":     "top_value",
+				"top_obj": `{"level_1":"level_1_value","level_1_obj":{"level_2":"level_2_value","level_2_obj":{"level_3":"level_3_value"}}}`,
+				"list":    `[1,{"a":{"b":"<c>"}}]`,
+			},
+		},
+		{
+			name:  "two",
+			cfg:   map[string]any{"max_object_depth": 2},
+			field: "parsed",
+			want: map[string]any{
+				"top": "top_value",
+				"top_obj": map[string]any{
+					"level_1":     "level_1_value",
+					"level_1_obj": `{"level_2":"level_2_value","level_2_obj":{"level_3":"level_3_value"}}`,
+				},
+				"list": []any{int64(1), map[string]any{"a": `{"b":"<c>"}`}},
+			},
+		},
+		{
+			name:  "deeper than the document",
+			cfg:   map[string]any{"max_object_depth": 10},
+			field: "parsed",
+			want: map[string]any{
+				"top": "top_value",
+				"top_obj": map[string]any{
+					"level_1": "level_1_value",
+					"level_1_obj": map[string]any{
+						"level_2":     "level_2_value",
+						"level_2_obj": map[string]any{"level_3": "level_3_value"},
+					},
+				},
+				"list": []any{int64(1), map[string]any{"a": map[string]any{"b": "<c>"}}},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			test.cfg["fields"] = []string{"msg"}
+			test.cfg["target"] = "parsed"
+			c, err := conf.NewConfigFrom(test.cfg)
+			require.NoError(t, err, "creating config")
+
+			got := getActualValue(t, c, mapstr.M{"msg": msg})
+
+			v, err := got.GetValue(test.field)
+			require.NoError(t, err, "getting decoded field")
+			assert.Equal(t, test.want, v, "decoded value does not match")
+		})
+	}
+}
+
+func TestMaxObjectDepthRoundTrip(t *testing.T) {
+	tests := []struct {
+		name string
+		cfg  map[string]any
+		in   string
+		want any
+		id   string
+	}{
+		{
+			name: "original text is kept",
+			cfg:  map[string]any{"target": "parsed"},
+			in:   `{"a":{"z":1.0,  "b":1e2,"c":12345678901234567890, "d":"\u003c"}}`,
+			want: map[string]any{"a": `{"z":1.0,  "b":1e2,"c":12345678901234567890, "d":"\u003c"}`},
+		},
+		{
+			name: "root target",
+			cfg:  map[string]any{"target": ""},
+			in:   `{"a":{"b":1},"c":2}`,
+			want: map[string]any{"a": `{"b":1}`, "c": int64(2)},
+		},
+		{
+			name: "document id within limit",
+			cfg:  map[string]any{"target": "parsed", "document_id": "id"},
+			in:   `{"id":"x","a":{"b":{"c":1}}}`,
+			want: map[string]any{"a": `{"b":{"c":1}}`},
+			id:   "x",
+		},
+		{
+			name: "document id inside truncated subtree is not found",
+			cfg:  map[string]any{"target": "parsed", "document_id": "a.id"},
+			in:   `{"a":{"id":"x"}}`,
+			want: map[string]any{"a": `{"id":"x"}`},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			test.cfg["fields"] = []string{"msg"}
+			test.cfg["max_object_depth"] = 1
+			c := conf.MustNewConfigFrom(test.cfg)
+			p, err := NewDecodeJSONFields(c, logptest.NewTestingLogger(t, ""))
+			require.NoError(t, err, "creating processor")
+
+			ev, err := p.Run(&beat.Event{Fields: mapstr.M{"msg": test.in}})
+			require.NoError(t, err, "running processor")
+
+			var got any
+			if test.cfg["target"] == "parsed" {
+				got, err = ev.Fields.GetValue("parsed")
+				require.NoError(t, err, "getting parsed field")
+			} else {
+				m := map[string]any(ev.Fields.Clone())
+				delete(m, "msg")
+				got = m
+			}
+			if test.id != "" {
+				assert.Equal(t, test.id, ev.Meta["_id"], "document id should be taken before truncation")
+			}
+			assert.EqualValues(t, test.want, got, "decoded value does not match")
+		})
+	}
+}
+
+// TestMaxDepthVersusMaxObjectDepth checks the example that compares the two
+// options in the decode_json_fields documentation.
+func TestMaxDepthVersusMaxObjectDepth(t *testing.T) {
+	const msg = `{"log": "{\"level\": \"info\"}", "a": {"b": {"c": 1}}}`
+
+	tests := []struct {
+		name string
+		cfg  map[string]any
+		want map[string]any
+	}{
+		{
+			name: "default",
+			cfg:  map[string]any{},
+			want: map[string]any{
+				"log": `{"level": "info"}`,
+				"a": map[string]any{
+					"b": map[string]any{
+						"c": int64(1),
+					},
+				},
+			},
+		},
+		{
+			name: "max_depth",
+			cfg:  map[string]any{"max_depth": 2},
+			want: map[string]any{
+				"log": map[string]any{
+					"level": "info",
+				},
+				"a": map[string]any{
+					"b": map[string]any{
+						"c": int64(1),
+					},
+				},
+			},
+		},
+		{
+			name: "max_object_depth",
+			cfg:  map[string]any{"max_object_depth": 2},
+			want: map[string]any{
+				"log": `{"level": "info"}`,
+				"a": map[string]any{
+					"b": `{"c": 1}`,
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			test.cfg["fields"] = []string{"msg"}
+			c := conf.MustNewConfigFrom(test.cfg)
+
+			got := getActualValue(t, c, mapstr.M{"msg": msg})
+
+			assert.Equal(t, test.want, got["msg"], "decoded value does not match the documented example")
+		})
+	}
+}
+
+func TestMaxObjectDepthAfterEmbeddedDecoding(t *testing.T) {
+	c := conf.MustNewConfigFrom(map[string]any{
+		"fields":           []string{"msg"},
+		"max_depth":        2,
+		"max_object_depth": 1,
+	})
+	input := mapstr.M{"msg": `{"log":"{\"a\":{\"b\":1}}","n":1}`}
+
+	got := getActualValue(t, c, input)
+
+	want := map[string]any{
+		"log": `{"a":{"b":1}}`,
+		"n":   int64(1),
+	}
+	assert.Equal(t, want, got["msg"], "embedded JSON should be decoded first and then limited")
+}
+
+func TestMaxObjectDepthInvalidJSON(t *testing.T) {
+	for _, in := range []string{
+		`{"a":{"b":1,}}`,
+		`{"a":{"b":[1,2}}`,
+		`{"a":{"b":1}`,
+		`{"a":{"b":1}} {"c":2}`,
+	} {
+		c := conf.MustNewConfigFrom(map[string]any{
+			"fields":           []string{"msg"},
+			"max_object_depth": 1,
+		})
+		p, err := NewDecodeJSONFields(c, logptest.NewTestingLogger(t, ""))
+		require.NoError(t, err, "creating processor")
+
+		_, err = p.Run(&beat.Event{Fields: mapstr.M{"msg": in}})
+		assert.Error(t, err, "invalid JSON %s should be an error even inside a truncated subtree", in)
+	}
+}
+
+func TestMaxObjectDepthTruncatedJSON(t *testing.T) {
+	for _, in := range []string{`{"a":`, `{"a":1`, `[1,2`, `{"a":{"b":1}`} {
+		t.Run(in, func(t *testing.T) {
+			var got, want any
+			errGot := decodeJSON(in, &got, 1, 1)
+			errWant := decodeJSON(in, &want, 1, 0)
+
+			assert.EqualError(t, errGot, "unexpected EOF", "error with max_object_depth set")
+			assert.Equal(t, errWant, errGot, "error should match the unlimited decoder")
+		})
+	}
+}
+
+func TestMaxObjectDepthNegative(t *testing.T) {
+	c := conf.MustNewConfigFrom(map[string]any{
+		"fields":           []string{"msg"},
+		"max_object_depth": -1,
+	})
+	_, err := NewDecodeJSONFields(c, logptest.NewTestingLogger(t, ""))
+	assert.Error(t, err, "negative max_object_depth should be rejected")
+}
+
 func TestTargetOption(t *testing.T) {
 	input := mapstr.M{
 		"msg":      "{\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3}",

@@ -78,6 +78,9 @@ Configure Kerberos under `kerberos`; it adds SPNEGO authentication over the
 configured HTTP transport. Do not combine it with Basic authentication, API key
 authentication, or an `Authorization` header.
 
-By default, an invalid transport configuration prevents the extension from
-starting. Set `continue_on_error: true` to allow startup, but all requests using
-the extension then fail with the transport-creation error.
+By default, an invalid extension or transport configuration prevents the
+extension from starting. Set `continue_on_error: true` to allow the Collector
+to start despite those errors. The extension reports a permanent error status
+and logs the configuration error at warn level during startup. Its transport
+then returns that error for every request, so this setting does not make the
+extension usable until its configuration is corrected.

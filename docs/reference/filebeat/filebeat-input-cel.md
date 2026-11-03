@@ -4,7 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html
 sub:
   mito_docs: https://pkg.go.dev/github.com/elastic/mito
-  mito_version: v1.28.0
+  mito_version: v1.28.1
 applies_to:
   stack: ga 8.6.0
   serverless: ga
@@ -616,7 +616,7 @@ filebeat.inputs:
 stack: ga 8.9.0
 ```
 
-XML documents may require additional type information to enable correct parsing and ingestion. This information can be provided as an XML Schema Definitions (XSD) for XML documents using the `xsd` option. The key under which the XSD information is provided is accessed via the `decode_xml` CEL extension.
+XML documents may require additional type information to enable correct parsing and ingestion. This information can be provided as an XML Schema Definition (XSD) for XML documents using the `xsd` option. The key under which the XSD information is provided is accessed via the `decode_xml` CEL extension.
 
 ```yaml
 filebeat.inputs:
@@ -1270,6 +1270,15 @@ The minimum time to wait before a retry is attempted. Default: `1s`.
 ### `resource.retry.wait_max` [_resource_retry_wait_max]
 
 The maximum time to wait before a retry is attempted. Default: `60s`.
+
+
+### `resource.redirect.follow` [_resource_redirect_follow]
+
+```{applies_to}
+stack: ga 9.6.0
+```
+
+When set to `false` redirects are not followed and the redirect response is returned to the CEL program, which can then read its status code and `Location` header. Default: `true`.
 
 
 ### `resource.redirect.forward_headers` [_resource_redirect_forward_headers]

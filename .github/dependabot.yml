@@ -36,7 +36,7 @@ updates:
       - dependency-name: github.com/elastic/go-seccomp-bpf
       - dependency-name: github.com/elastic/toutoumomoma
       - dependency-name: github.com/elastic/ebpfevents
-      # Team:Team:obs-ds-hosted-services, Team:obs-infraobs-integrations
+      # Team:Team:obs-ds-hosted-services, Team:obs-signals-integrations-team
       # AWS SDK dependencies
       - dependency-name: github.com/aws/aws-sdk-go-v2/*
       - dependency-name: github.com/aws/aws-lambda-go/*

@@ -118,6 +118,13 @@
               ga: 8.19.11
           description: >
             The swap memory used by the process (supported only on Linux kernel version 2.6.34+).
+        - name: footprint
+          type: long
+          format: bytes
+          version:
+              ga: 9.6.0
+          description: >
+            The physical memory footprint of the process, the value shown in the MEM column of top and the Memory column of Activity Monitor (supported only on macOS).
     - name: io
       type: group
       description: Disk I/O Metrics, as forwarded from /proc/[PID]/io. Available on Linux only.

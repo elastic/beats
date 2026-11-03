@@ -26,7 +26,7 @@ jobs:
 
       - uses: elastic/oblt-actions/updatecli/run@v1
         with:
-          command: pipeline apply -config .github/workflows/updatecli.d/bump-npcap.yml --values .github/workflows/updatecli.d/values.d/scm.yml
+          command: pipeline apply --config .github/workflows/updatecli.d/bump-npcap.yml --values .github/workflows/updatecli.d/values.d/scm.yml
           version-file: .updatecli-version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

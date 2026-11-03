@@ -2,6 +2,7 @@ import json
 import operator
 import platform
 import random
+import re
 import socket
 import struct
 import time
@@ -17,8 +18,12 @@ def is_root():
 
 
 def is_version_below(version, target):
-    t = list(map(int, target.split('.')))
-    v = list(map(int, version.split('.')))
+    # Keep the leading dotted digits of a release such as 6.17.9+deb14-amd64,
+    # e.g. [6, 17, 9]
+    def parse(s):
+        return [int(x) for x in re.match(r'[\d.]*\d', s).group().split('.')]
+    t = parse(target)
+    v = parse(version)
     v += [0] * (len(t) - len(v))
     for i in range(len(t)):
         if v[i] != t[i]:

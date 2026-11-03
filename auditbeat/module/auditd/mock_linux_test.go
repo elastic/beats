@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
+	"sync"
 	"syscall"
 
 	"github.com/elastic/go-libaudit/v2"
@@ -28,10 +29,13 @@ import (
 )
 
 type MockNetlinkSendReceiver struct {
+	mu       sync.Mutex
 	messages []syscall.NetlinkMessage
 	sendRet  []uint32
 	errors   []error
-	done     chan struct{}
+	sent     []syscall.NetlinkMessage
+
+	done chan struct{}
 }
 
 func NewMock() *MockNetlinkSendReceiver {
@@ -110,6 +114,9 @@ func (n *MockNetlinkSendReceiver) Close() error {
 }
 
 func (n *MockNetlinkSendReceiver) Send(msg syscall.NetlinkMessage) (uint32, error) {
+	n.mu.Lock()
+	defer n.mu.Unlock()
+	n.sent = append(n.sent, msg)
 	if len(n.sendRet) > 0 {
 		ret := n.sendRet[0]
 		n.sendRet = n.sendRet[1:]
@@ -119,22 +126,58 @@ func (n *MockNetlinkSendReceiver) Send(msg syscall.NetlinkMessage) (uint32, erro
 }
 
 func (n *MockNetlinkSendReceiver) SendNoWait(msg syscall.NetlinkMessage) (uint32, error) {
+	n.mu.Lock()
+	defer n.mu.Unlock()
+	n.sent = append(n.sent, msg)
 	return 0, nil
 }
 
 func (n *MockNetlinkSendReceiver) Receive(nonBlocking bool, p libaudit.NetlinkParser) ([]syscall.NetlinkMessage, error) {
-	if len(n.errors) > 0 {
+	n.mu.Lock()
+	switch {
+	case len(n.errors) > 0:
 		err := n.errors[0]
 		n.errors = n.errors[1:]
+		n.mu.Unlock()
 		return nil, err
-	}
-	if len(n.messages) > 0 {
+	case len(n.messages) > 0:
 		msg := n.messages[0]
 		n.messages = n.messages[1:]
+		n.mu.Unlock()
 		return []syscall.NetlinkMessage{msg}, nil
 	}
+	n.mu.Unlock()
 
 	// Block until closed.
 	<-n.done
 	return nil, errors.New("socket closed")
+}
+
+// sentImmutable reports whether a request to make the audit configuration
+// immutable has been sent on n.
+func (n *MockNetlinkSendReceiver) sentImmutable() bool {
+	n.mu.Lock()
+	defer n.mu.Unlock()
+	for _, msg := range n.sent {
+		if msg.Header.Type != libaudit.AuditSet {
+			continue
+		}
+		var status libaudit.AuditStatus
+		err := status.FromWireFormat(msg.Data)
+		if err != nil {
+			continue
+		}
+		if status.Mask&libaudit.AuditStatusEnabled != 0 && status.Enabled == 2 {
+			return true
+		}
+	}
+	return false
+}
+
+// unread returns the number of messages queued on n that have not been
+// received.
+func (n *MockNetlinkSendReceiver) unread() int {
+	n.mu.Lock()
+	defer n.mu.Unlock()
+	return len(n.messages)
 }

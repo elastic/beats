@@ -66,7 +66,7 @@ filebeat.inputs:
         when.not.regexp.message: '^iptables'
 ```
 
-Each example adds the `id` for the input to ensure the cursor is persisted to the registry with a unique ID. The ID should be unique among journald inputs. If you don’t specify and `id` then one is created for you by hashing the configuration. So when you modify the config this will result in a new ID and a fresh cursor.
+Each example adds the `id` for the input to ensure the cursor is persisted to the registry with a unique ID. The ID should be unique among journald inputs. If you don’t specify an `id`, then one is created for you by hashing the configuration. So when you modify the config this will result in a new ID and a fresh cursor.
 
 ## Configuration options [filebeat-input-journald-options]
 

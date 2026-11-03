@@ -8,6 +8,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/api"
@@ -27,6 +29,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/extension/extensionauth"
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
 )
@@ -47,7 +50,9 @@ type BeatReceiver struct {
 	Logger              *logp.Logger
 	bridge              *oteltelemetry.RegistryBridge
 	releaseSystemBridge func()
-	runDone             chan error // receives the error from beater.Run; closed when Run returns
+	startHook           func(component.Host) error
+	startCalled         chan struct{} // closed when Start is called
+	runDone             chan error    // receives the error from beater.Run; closed when Run returns
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
@@ -127,12 +132,20 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 		Logger:              b.Info.Logger,
 		bridge:              bridge,
 		releaseSystemBridge: releaseSystem,
+		startCalled:         make(chan struct{}),
 		runDone:             make(chan error, 1),
 	}, nil
 }
 
+// SetStartHook configures a hook that runs synchronously in Start before the
+// beater's Run method is launched.
+func (br *BeatReceiver) SetStartHook(hook func(component.Host) error) {
+	br.startHook = hook
+}
+
 // BeatReceiver.Start() starts the beat receiver.
-func (br *BeatReceiver) Start(host component.Host) (retErr error) {
+func (br *BeatReceiver) Start(ctx context.Context, host component.Host) (retErr error) {
+	close(br.startCalled)
 	// If Start returns an error before the beater.Run goroutine is launched,
 	// signal runDone so that a concurrent Shutdown does not block forever on it.
 	defer func() {
@@ -179,6 +192,11 @@ func (br *BeatReceiver) Start(host component.Host) (retErr error) {
 		}
 	}
 
+	if ua := userAgentFromHeaders(headersFromExtensions(ctx, extensions, br.Logger)); ua != "" {
+		br.Logger.Debugf("using User-Agent from headers_setter extension: %q", ua)
+		br.beat.Info.UserAgent = ua
+	}
+
 	if w, ok := br.beater.(backend.WithESStateStoreExtension); ok {
 		if present, err := br.beat.RawConfig.Has("storage", -1); present && err == nil {
 			storageID, err := br.beat.RawConfig.String("storage", -1)
@@ -207,6 +225,12 @@ func (br *BeatReceiver) Start(host component.Host) (retErr error) {
 		br.reporter = rep
 	}
 
+	if br.startHook != nil {
+		if err := br.startHook(host); err != nil {
+			return fmt.Errorf("error running Beat receiver start hook: %w", err)
+		}
+	}
+
 	go func() {
 		err := br.beater.Run(&br.beat.Beat)
 		if err != nil {
@@ -228,30 +252,36 @@ func (br *BeatReceiver) Shutdown(ctx context.Context) error {
 	if br.releaseSystemBridge != nil {
 		br.releaseSystemBridge()
 	}
-	// The Beater owns shutdown sequencing: stop it first so it can close its
-	// inputs and finalize acknowledgments before the pipeline is disconnected.
-	// See https://github.com/elastic/beats/issues/49794.
-	// Pass ctx so beaters that implement contextStopper don't exhaust the OTel
-	// shutdown deadline during their ready-state wait.
-	if cs, ok := br.beater.(contextStopper); ok {
-		cs.StopWithContext(ctx)
-	} else {
-		br.beater.Stop()
-	}
 
-	// Trigger the stop callback. Some beaters (e.g. metricbeat) call
-	// Manager.Stop() in their Run() method, but others (e.g. packetbeat in
-	// static mode) do not. The OtelManager.stopOnce ensures the callback runs
-	// exactly once regardless.
-	br.beat.Manager.Stop()
-
-	// Wait for beater.Run to return before disconnecting the pipeline, so the
-	// beater owns its full shutdown drain and the pipeline is not torn down
-	// while inputs are still active. Bounded by ctx so a hung beater does not
-	// block Shutdown indefinitely.
+	// If the Shutdown was called before the Start, do not wait for beater.Run to return.
 	select {
-	case <-br.runDone:
-	case <-ctx.Done():
+	case <-br.startCalled:
+		// The Beater owns shutdown sequencing: stop it first so it can close its
+		// inputs and finalize acknowledgments before the pipeline is disconnected.
+		// See https://github.com/elastic/beats/issues/49794.
+		// Pass ctx so beaters that implement contextStopper don't exhaust the OTel
+		// shutdown deadline during their ready-state wait.
+		if cs, ok := br.beater.(contextStopper); ok {
+			cs.StopWithContext(ctx)
+		} else {
+			br.beater.Stop()
+		}
+
+		// Trigger the stop callback. Some beaters (e.g. metricbeat) call
+		// Manager.Stop() in their Run() method, but others (e.g. packetbeat in
+		// static mode) do not. The OtelManager.stopOnce ensures the callback runs
+		// exactly once regardless.
+		br.beat.Manager.Stop()
+
+		// Wait for beater.Run to return before disconnecting the pipeline, so the
+		// beater owns its full shutdown drain and the pipeline is not torn down
+		// while inputs are still active. Bounded by ctx so a hung beater does not
+		// block Shutdown indefinitely.
+		select {
+		case <-br.runDone:
+		case <-ctx.Done():
+		}
+	default:
 	}
 
 	// Now disconnect the publisher pipeline (this waits for outstanding events
@@ -305,4 +335,61 @@ func (br *BeatReceiver) getESStateStoreExtension(host component.Host, storageExt
 		return nil, fmt.Errorf("extension '%s' is not a backend.Registry", componentID.String())
 	}
 	return reg, nil
+}
+
+const (
+	headersSetterType    = "headers_setter"
+	agentComponentPrefix = "_agent-component/"
+)
+
+// headersFromExtensions returns the headers configured on headers_setter extension.
+// Elastic Agent adds one per collector, shared by all receivers.
+func headersFromExtensions(ctx context.Context, extensions map[component.ID]component.Component, log *logp.Logger) map[string]string {
+	var ids []component.ID
+	for id := range extensions {
+		if id.Type().String() == headersSetterType && strings.HasPrefix(id.Name(), agentComponentPrefix) {
+			ids = append(ids, id)
+		}
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	sort.Slice(ids, func(i, j int) bool { return ids[i].String() < ids[j].String() })
+	if len(ids) > 1 {
+		log.Debugf("found %d headers_setter extensions (%v); using %s", len(ids), ids, ids[0])
+	}
+	id := ids[0]
+
+	grpcClient, ok := extensions[id].(extensionauth.GRPCClient)
+	if !ok {
+		log.Warnf("extension %s does not implement extensionauth.GRPCClient; its headers cannot be read", id)
+		return nil
+	}
+	creds, err := grpcClient.PerRPCCredentials()
+	if err != nil {
+		// Only fails when additional_auth is configured and that extension is
+		// missing or broken.
+		log.Warnf("extension %s: could not get PerRPCCredentials, ignoring its headers: %v", id, err)
+		return nil
+	}
+	if creds == nil {
+		return nil
+	}
+	headers, err := creds.GetRequestMetadata(ctx)
+	if err != nil {
+		log.Warnf("extension %s: could not resolve headers, ignoring them: %v", id, err)
+		return nil
+	}
+	return headers
+}
+
+// userAgentFromHeaders returns the User-Agent value in headers, matched
+// case-insensitively, or "" if there is none.
+func userAgentFromHeaders(headers map[string]string) string {
+	for k, v := range headers {
+		if strings.EqualFold(k, "User-Agent") {
+			return v
+		}
+	}
+	return ""
 }

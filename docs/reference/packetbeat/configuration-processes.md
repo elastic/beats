@@ -12,9 +12,7 @@ applies_to:
 
 This section of the `packetbeat.yml` config file is optional, but configuring the processes enables Packetbeat to show you not only the servers that the traffic is flowing between, but also the processes. Packetbeat can even show you the traffic between two processes running on the same host, which is particularly useful when you have many services running on the same server. By default, process enrichment is disabled.
 
-When Packetbeat starts, and then periodically afterwards, it scans the process table for processes that match the configuration file. For each of these processes, it monitors which file descriptors it has opened. When a new packet is captured, it reads the list of active TCP and UDP connections and matches the corresponding one with the list of file descriptors.
-
-All this information is available via system interfaces: The `/proc` file system in Linux and the IP Helper API (`iphlpapi.dll`) on Windows, so Packetbeat doesn’t need a kernel module.
+By default, Packetbeat resolves a connection to a process by reading the list of active TCP and UDP connections and matching the connection's socket against the file descriptors held by the running processes. This information is available via system interfaces: the `/proc` file system in Linux and the IP Helper API (`iphlpapi.dll`) on Windows, so Packetbeat doesn't need a kernel module. Because the socket must still exist when the lookup runs, short-lived connections can be missed; on Linux the `kernel_tracing` backend avoids this limitation.
 
 ::::{note}
 Process monitoring is currently only supported on Linux and Windows systems. Packetbeat automatically disables process monitoring when it detects other operating systems.
@@ -43,6 +41,42 @@ The name of the process as it will appear in the published transactions. The nam
 ### `cmdline_grep` [_cmdline_grep]
 
 The name used to identify the process at run time. When Packetbeat starts, and then periodically afterwards, it scans the process table for processes that match the values specified for this option. The match is done against the process' command line as read from `/proc/<pid>/cmdline`.
+
+
+### `backend` [_procs_backend]
+
+```{applies_to}
+stack: ga 9.7.0+
+```
+
+The mechanism used to resolve connections to processes. The following values are supported:
+
+* `procfs` (default): Look the socket up in the OS socket table (`/proc` on Linux, the IP Helper API on Windows). Short-lived connections whose socket already closed at lookup time cannot be resolved.
+* `kernel_tracing`: Track socket and process lifecycle with [quark](https://github.com/elastic/quark) using eBPF, so TCP connections are resolved reliably even after their socket closed. This backend is only available on Linux amd64/arm64. Packetbeat fails to start when this backend is requested but the kernel tracer cannot be started.
+* `auto`: The same as `kernel_tracing` when the kernel tracer can be started. Otherwise Packetbeat logs a warning and runs with `procfs` instead of failing to start.
+
+With both `kernel_tracing` and `auto`, UDP connections and TCP connections that the kernel tracer has not seen yet are still looked up with the `procfs` mechanism.
+
+Example configuration:
+
+```yaml
+packetbeat.procs.enabled: true
+packetbeat.procs.backend: auto
+```
+
+#### Requirements for `kernel_tracing` [_procs_kernel_tracing_requirements]
+
+The `kernel_tracing` backend loads eBPF programs into the kernel, which needs more than the packet capture privileges Packetbeat otherwise requires:
+
+* Linux amd64 or arm64 with a kernel that supports BPF CO-RE (BTF) and BPF ring buffers, generally 5.10 or later. Some distribution kernels ship without BTF, in which case the backend is unavailable.
+* Run as root, or with the `CAP_BPF`, `CAP_PERFMON` and `CAP_SYS_RESOURCE` capabilities in addition to the capabilities needed for packet capture. On kernels older than 5.8, `CAP_SYS_ADMIN` is required instead of `CAP_BPF` and `CAP_PERFMON`.
+* Read access to `tracefs` (normally mounted at `/sys/kernel/tracing` or `/sys/kernel/debug/tracing`) and, for process metadata, read access to `/proc`.
+* When running in a container, the container must share the host PID namespace and have the capabilities above. The backend is not available under Elastic Agent's unprivileged mode.
+* Packetbeat's default [seccomp policy](/reference/packetbeat/linux-seccomp.md) is extended to allow the system calls the kernel tracer needs (`bpf`, `perf_event_open`, `memfd_create`). If you configure a custom `seccomp` policy, it must allow them too.
+
+The backend keeps closed connections resolvable for the flow timeout plus the flow reporting period, plus a margin, so that flows reported after a connection ended are still attributed to a process. Long flow timeouts therefore increase the memory kept by the kernel tracer.
+
+The kernel tracer delivers a new connection to Packetbeat a fraction of a second after it is established. A protocol transaction that completes before that, on a connection that lasts only a few tens of milliseconds, may still be published without process information. The flow events for that connection are reported later and are enriched.
 
 
 ### `shutdown_timeout` [shutdown-timeout]
