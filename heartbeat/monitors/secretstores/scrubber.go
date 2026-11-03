@@ -52,6 +52,10 @@ type tracker struct {
 	values map[string]struct{}
 }
 
+func newTracker() *tracker {
+	return &tracker{values: map[string]struct{}{}}
+}
+
 func withTracker(ctx context.Context, t *tracker) context.Context {
 	return context.WithValue(ctx, trackerKey{}, t)
 }
@@ -67,9 +71,6 @@ func Track(ctx context.Context, value string) {
 	}
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	if t.values == nil {
-		t.values = map[string]struct{}{}
-	}
 	t.values[value] = struct{}{}
 }
 

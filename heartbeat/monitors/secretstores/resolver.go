@@ -61,8 +61,8 @@ func (r *Resolver) Resolve(cfg *conf.C, destinations plugin.DestinationsFunc) (*
 	if err != nil {
 		return nil, nil, err
 	}
-	var t tracker
-	ctx := withTracker(context.Background(), &t)
+	t := newTracker()
+	ctx := withTracker(context.Background(), t)
 	scopes := scopes(entries)
 	var usedRestricted []entry
 	for i, e := range entries {

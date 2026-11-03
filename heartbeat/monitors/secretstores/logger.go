@@ -24,15 +24,15 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// Logger returns l writing its messages, and its string and error fields,
-// without the secret values. Plugins log what they run and what their
+// Logger returns logger writing its messages, and its string and error
+// fields, without the secret values. Plugins log what they run and what their
 // commands print, which can contain the values, before any event is made.
-// It returns l itself for a nil Scrubber or l.
-func (s *Scrubber) Logger(l *logp.Logger) *logp.Logger {
-	if s == nil || l == nil {
-		return l
+// It returns logger itself for a nil Scrubber or logger.
+func (s *Scrubber) Logger(logger *logp.Logger) *logp.Logger {
+	if s == nil || logger == nil {
+		return logger
 	}
-	return l.WithOptions(zap.WrapCore(func(c zapcore.Core) zapcore.Core {
+	return logger.WithOptions(zap.WrapCore(func(c zapcore.Core) zapcore.Core {
 		return &scrubbingCore{Core: c, s: s}
 	}))
 }

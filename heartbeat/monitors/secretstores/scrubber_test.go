@@ -33,8 +33,8 @@ import (
 
 // scrubberFor returns the Scrubber of the given secret values.
 func scrubberFor(values ...string) *Scrubber {
-	var t tracker
-	ctx := withTracker(context.Background(), &t)
+	t := newTracker()
+	ctx := withTracker(context.Background(), t)
 	for _, v := range values {
 		Track(ctx, v)
 	}
