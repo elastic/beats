@@ -18,6 +18,7 @@
 package procs
 
 import (
+	"fmt"
 	"net"
 	"slices"
 	"strings"
@@ -52,6 +53,11 @@ type ProcessesWatcher struct {
 
 	// watcher is the OS-dependent engine for the ProcessWatcher.
 	watcher processWatcher
+
+	// kernelTracing is the quark-backed tuple resolver used by the
+	// kernel_tracing backend. It is nil when the backend is procfs or
+	// when kernel tracing is unavailable.
+	kernelTracing tupleWatcher
 
 	logger, procLogger, procDetailedLogger *logp.Logger
 
@@ -89,6 +95,20 @@ func (proc *ProcessesWatcher) Init(config ProcsConfig, logger *logp.Logger) erro
 	return proc.init(config, proc, logger)
 }
 
+// tupleWatcher resolves a full TCP tuple to the owning process from
+// kernel-sourced state, independently of the OS socket table. Unlike
+// processWatcher it can resolve connections whose socket already
+// closed. It is implemented by the quark-backed watcher on Linux.
+type tupleWatcher interface {
+	// findProcTuple returns the process owning the TCP connection
+	// with the given endpoints, or nil if it is not known.
+	findProcTuple(localIP net.IP, localPort uint16, remoteIP net.IP, remotePort uint16) *process
+
+	// close releases the watcher's resources. Lookups after close
+	// return nil.
+	close()
+}
+
 // processWatcher allows the OS-dependent implementation to be replaced by a mock for testing
 type processWatcher interface {
 	// GetLocalPortToPIDMapping returns the list of local port numbers and the PID
@@ -124,6 +144,23 @@ func (proc *ProcessesWatcher) init(config ProcsConfig, watcher processWatcher, l
 	proc.enabled = config.Enabled
 	if proc.enabled {
 		logger.Info("Process watcher enabled")
+		switch config.Backend {
+		case BackendKernelTracing, BackendAuto:
+			grace := config.KernelTracingGraceTime
+			if grace <= 0 {
+				grace = DefaultKernelTracingGraceTime
+			}
+			tw, err := newTupleWatcher(grace, logger)
+			if err != nil {
+				if config.Backend == BackendKernelTracing {
+					return fmt.Errorf("procs: cannot start kernel_tracing backend (requires Linux amd64/arm64 running as root or with CAP_BPF, CAP_PERFMON and CAP_SYS_RESOURCE, and access to tracefs): %w", err)
+				}
+				logger.Warnf("Process watcher kernel_tracing backend unavailable, using procfs: %v", err)
+			} else {
+				proc.kernelTracing = tw
+				logger.Info("Process watcher using kernel_tracing backend")
+			}
+		}
 	} else {
 		logger.Info("Process watcher disabled")
 	}
@@ -159,18 +196,42 @@ func (proc *ProcessesWatcher) FindProcessesTuple(tuple *common.IPPortTuple, tran
 	if !proc.enabled {
 		return &procTuple
 	}
-	proc.enrich(&procTuple.Src, tuple.SrcIP, tuple.SrcPort, transport)
-	proc.enrich(&procTuple.Dst, tuple.DstIP, tuple.DstPort, transport)
+	proc.enrich(&procTuple.Src, tuple.SrcIP, tuple.SrcPort, tuple.DstIP, tuple.DstPort, transport)
+	proc.enrich(&procTuple.Dst, tuple.DstIP, tuple.DstPort, tuple.SrcIP, tuple.SrcPort, transport)
 	return &procTuple
 }
 
-// enrich adds process information to dst for the process associated with the given IP, port and
-// transport if the IP is not local and the information is available to the ProcessWatcher.
-func (proc *ProcessesWatcher) enrich(dst *common.Process, ip net.IP, port uint16, transport applayer.Transport) {
+// Close releases resources held by the watcher. The watcher must not
+// be used after Close returns.
+func (proc *ProcessesWatcher) Close() {
+	if proc.kernelTracing != nil {
+		proc.kernelTracing.close()
+	}
+}
+
+// enrich adds process information to dst for the process associated with the
+// given local IP, port and transport if the IP is local and the information is
+// available to the ProcessWatcher. The remote endpoint identifies the
+// connection for the kernel_tracing backend, which tracks full TCP tuples.
+func (proc *ProcessesWatcher) enrich(dst *common.Process, ip net.IP, port uint16, remoteIP net.IP, remotePort uint16, transport applayer.Transport) {
 	if !proc.isLocalIP(ip) {
 		return
 	}
-	p := proc.findProc(ip, port, transport)
+	var p *process
+	// The kernel_tracing backend only tracks TCP connections, but can
+	// resolve them even after the socket closed.
+	if proc.kernelTracing != nil && transport == applayer.TransportTCP {
+		p = proc.kernelTracing.findProcTuple(ip, port, remoteIP, remotePort)
+		if p != nil {
+			proc.applyMonitored(p)
+		}
+	}
+	if p == nil {
+		// The procfs path resolves the socket from the OS socket
+		// table while it is still open. It also covers very recent
+		// connections that kernel_tracing has not yet delivered.
+		p = proc.findProc(ip, port, transport)
+	}
 	if p == nil {
 		return
 	}
@@ -179,6 +240,7 @@ func (proc *ProcessesWatcher) enrich(dst *common.Process, ip net.IP, port uint16
 	dst.Name = p.name
 	dst.Args = p.args
 	dst.Exe = p.exe
+	dst.CWD = p.cwd
 	dst.StartTime = p.startTime
 	if proc.isProcEnabled {
 		proc.procLogger.Debugf("Found process '%s' (pid=%d) for %s:%d/%s", p.name, p.pid, ip, port, transport)
@@ -338,16 +400,23 @@ func (proc *ProcessesWatcher) getProcessInfo(pid int) *process {
 		return nil
 	}
 
-	// The packetbeat.procs.monitored*.cmdline_grep allows you to overwrite
-	// the process name with an alias.
+	proc.applyMonitored(p)
+	proc.processCache[pid] = p
+	return p
+}
+
+// applyMonitored overwrites the process name with the configured alias
+// when any part of argv contains cmdline_grep.
+//
+// The packetbeat.procs.monitored*.cmdline_grep allows you to overwrite
+// the process name with an alias.
+func (proc *ProcessesWatcher) applyMonitored(p *process) {
 	for _, match := range proc.monitored {
 		if strings.Contains(strings.Join(p.args, " "), match.CmdlineGrep) {
 			p.name = match.Process
 			break
 		}
 	}
-	proc.processCache[pid] = p
-	return p
 }
 
 // GetProcess returns the process metadata.

@@ -258,7 +258,7 @@ An example config is shown below:
 
 ### `file_selectors` [attrib-file_selectors-gcs]
 
-If the GCS buckets have objects that correspond to files that Filebeat shouldn’t process, `file_selectors` can be used to limit the files that are downloaded. This is a list of selectors which are based on a regular expression pattern. The regular expression should match the object name or should be a part of the object name (ideally a prefix). The regular expression syntax used is [RE2](https://github.com/google/re2/wiki/Syntax). Files that don’t match any configured expression won’t be processed.This attribute can be specified both at the root level of the configuration as well at the bucket level. The bucket level values will always take priority and override the root level values if both are specified.
+If the GCS buckets have objects that correspond to files that Filebeat shouldn’t process, `file_selectors` can be used to limit the files that are downloaded. This is a list of selectors which are based on a regular expression pattern. The regular expression should match the object name or should be a part of the object name (ideally a prefix). The regular expression syntax used is [RE2](https://github.com/google/re2/wiki/Syntax). Files that don’t match any configured expression won’t be processed. This attribute can be specified both at the root level of the configuration as well at the bucket level. The bucket level values will always take priority and override the root level values if both are specified.
 
 ```yaml
 filebeat.inputs:

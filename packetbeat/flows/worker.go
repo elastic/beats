@@ -493,13 +493,12 @@ func createEvent(watcher *procs.ProcessesWatcher, ts time.Time, f *biFlow, isOve
 		if proc := watcher.FindProcessesTuple(&tuple, proto); proc != nil {
 			if proc.Src.PID > 0 {
 				p := mapstr.M{
-					"pid":               proc.Src.PID,
-					"name":              proc.Src.Name,
-					"args":              proc.Src.Args,
-					"ppid":              proc.Src.PPID,
-					"executable":        proc.Src.Exe,
-					"start":             proc.Src.StartTime,
-					"working_directory": proc.Src.CWD,
+					"pid":        proc.Src.PID,
+					"name":       proc.Src.Name,
+					"args":       proc.Src.Args,
+					"ppid":       proc.Src.PPID,
+					"executable": proc.Src.Exe,
+					"start":      proc.Src.StartTime,
 				}
 				if proc.Src.CWD != "" {
 					p["working_directory"] = proc.Src.CWD
@@ -509,13 +508,12 @@ func createEvent(watcher *procs.ProcessesWatcher, ts time.Time, f *biFlow, isOve
 			}
 			if proc.Dst.PID > 0 {
 				p := mapstr.M{
-					"pid":               proc.Dst.PID,
-					"name":              proc.Dst.Name,
-					"args":              proc.Dst.Args,
-					"ppid":              proc.Dst.PPID,
-					"executable":        proc.Dst.Exe,
-					"start":             proc.Dst.StartTime,
-					"working_directory": proc.Src.CWD,
+					"pid":        proc.Dst.PID,
+					"name":       proc.Dst.Name,
+					"args":       proc.Dst.Args,
+					"ppid":       proc.Dst.PPID,
+					"executable": proc.Dst.Exe,
+					"start":      proc.Dst.StartTime,
 				}
 				if proc.Dst.CWD != "" {
 					p["working_directory"] = proc.Dst.CWD

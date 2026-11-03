@@ -43,7 +43,8 @@ func (s *store) Validate(cfg *conf.C, scope secretstores.Scope) error {
 }
 
 // Replace returns a copy of the monitor config cfg with the vault references
-// replaced by their values. Without references, cfg is returned as is.
+// replaced by their values. Without references of scope, cfg is returned as
+// is.
 func (s *store) Replace(ctx context.Context, cfg *conf.C, scope secretstores.Scope) (*conf.C, error) {
 	m, resolveErr, err := referenceSettings(cfg)
 	if err != nil {
@@ -56,13 +57,18 @@ func (s *store) Replace(ctx context.Context, cfg *conf.C, scope secretstores.Sco
 		return nil, fmt.Errorf("could not read monitor config: %w", resolveErr)
 	}
 
+	var replaced bool
 	err = walkSettings(m, func(v string) (string, error) {
 		return replaceReferences(v, scope, func(content string) (string, error) {
+			replaced = true
 			return s.resolve(ctx, content)
 		})
 	})
 	if err != nil {
 		return nil, err
+	}
+	if !replaced {
+		return cfg, nil
 	}
 
 	// No VarExp: resolved values must stay literal. PathSep("") keeps keys

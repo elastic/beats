@@ -5,6 +5,7 @@
 package awss3
 
 import (
+	"path/filepath"
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -12,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/features"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -45,6 +47,77 @@ func TestNewInputV2_validates_config(t *testing.T) {
 		assert.Equal(t, inputName, in.Name())
 		assert.Equal(t, "arn:aws:s3:::my-test-bucket", in.config.BucketARN)
 	})
+}
+
+func TestNewInputV2_non_aws_bucket_region(t *testing.T) {
+	tests := []struct {
+		name    string
+		cfg     map[string]any
+		wantErr string
+	}{
+		{
+			name: "default_region_only",
+			cfg: map[string]any{
+				"non_aws_bucket_name": "r2-bucket",
+				"default_region":      "auto",
+			},
+		},
+		{
+			name: "region_only",
+			cfg: map[string]any{
+				"non_aws_bucket_name": "r2-bucket",
+				"region":              "auto",
+			},
+		},
+		{
+			name: "no_region",
+			cfg: map[string]any{
+				"non_aws_bucket_name": "r2-bucket",
+			},
+			wantErr: "region or default_region must be configured when using non_aws_bucket_name",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := defaultConfig()
+			err := conf.MustNewConfigFrom(tt.cfg).Unpack(&cfg)
+			if err == nil {
+				_, err = newInputV2(cfg, nil, nil, logp.NewNopLogger())
+			}
+			if tt.wantErr != "" {
+				require.Error(t, err, "config should be rejected")
+				assert.Contains(t, err.Error(), tt.wantErr, "error should name the missing region")
+				return
+			}
+			assert.NoError(t, err, "config should be accepted")
+		})
+	}
+}
+
+// TestInputV2_non_aws_bucket_default_region checks the region that
+// runPolling starts from for a non-AWS bucket that only sets default_region:
+// the AWS config comes from InitializeAWSConfig and is overridden only when
+// region is set, so default_region must survive.
+func TestInputV2_non_aws_bucket_default_region(t *testing.T) {
+	// Keep the host's AWS profile and environment from supplying a region.
+	dir := t.TempDir()
+	t.Setenv("AWS_PROFILE", "")
+	t.Setenv("AWS_REGION", "")
+	t.Setenv("AWS_DEFAULT_REGION", "")
+	t.Setenv("AWS_CONFIG_FILE", filepath.Join(dir, "config"))
+	t.Setenv("AWS_SHARED_CREDENTIALS_FILE", filepath.Join(dir, "credentials"))
+
+	cfg := defaultConfig()
+	require.NoError(t, conf.MustNewConfigFrom(map[string]any{
+		"non_aws_bucket_name": "r2-bucket",
+		"default_region":      "auto",
+	}).Unpack(&cfg), "unpacking config")
+
+	awsCfg, err := awscommon.InitializeAWSConfig(cfg.AWSConfig, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err, "initializing AWS config")
+	assert.Equal(t, "auto", awsCfg.Region, "region should come from default_region")
+	assert.Empty(t, cfg.RegionName, "region should be unset")
 }
 
 func TestInputV2_resolveSQSRegion(t *testing.T) {

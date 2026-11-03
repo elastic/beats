@@ -16,6 +16,8 @@ import (
 )
 
 func Test_readFileViaNTFS(t *testing.T) {
+	t.Skip("Fails on the Windows 11 CI image: https://github.com/elastic/beats/issues/54070")
+
 	// Read the actual amcache hive using the readFileViaNTFS function to ensure it can read the file and return valid registry data.
 	amcachePath := "C:\\Windows\\AppCompat\\Programs\\Amcache.hve"
 	if _, err := os.Stat(amcachePath); err != nil {

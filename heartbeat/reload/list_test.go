@@ -507,3 +507,21 @@ func TestUpdateConfigsError(t *testing.T) {
 		assert.False(t, hbrunner.updated)
 	}
 }
+
+// wrappedFactory hides the HBRunnerFactory methods, like the OTel status wrapper does.
+type wrappedFactory struct {
+	cfgfile.RunnerFactory
+}
+
+func (w wrappedFactory) Unwrap() cfgfile.RunnerFactory {
+	return w.RunnerFactory
+}
+
+func TestHashConfigUnwrapsFactory(t *testing.T) {
+	factory := &hbrunnerFactory{hashFunc: func(*config.C) (uint64, error) { return 42, nil }}
+	list := NewHBRunnerList("", wrappedFactory{RunnerFactory: factory}, nil, logptest.NewTestingLogger(t, ""))
+
+	hash, err := list.HashConfig(config.MustNewConfigFrom(map[string]any{"id": 1}))
+	require.NoError(t, err)
+	assert.Equal(t, uint64(42), hash)
+}

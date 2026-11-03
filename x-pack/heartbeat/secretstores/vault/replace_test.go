@@ -225,6 +225,12 @@ func TestReplaceNamedConnections(t *testing.T) {
 	assert.Equal(t, map[string]any{"mine": "bob", "other": "vault://stg@app/creds#user"}, resolved,
 		"only the references naming the entry must be replaced")
 
+	// allowed_hosts only applies to the connections whose Replace changed the config.
+	onlyOther := newMonitorConfig(t, map[string]any{"other": "vault://stg@app/creds#user"})
+	got, err = s.Replace(context.Background(), onlyOther, scope)
+	require.NoError(t, err, "references of other connections must be kept")
+	assert.Same(t, onlyOther, got, "a config without references of the entry must be returned as is")
+
 	_, err = s.Replace(context.Background(), newMonitorConfig(t, map[string]any{"v": "vault://dev@app/creds#user"}), scope)
 	assert.ErrorContains(t, err, `no entry has the connection name of the reference, available names: "prod", "stg"`, "an unknown connection must fail")
 	assert.NotContains(t, err.Error(), "dev", "the error must not echo the reference, it may be a secret")
