@@ -1,0 +1,207 @@
+[
+  {
+    "@timestamp": "2026-08-12T19:59:05.2669405Z",
+    "event": {
+      "action": "Executing Pipeline",
+      "code": "4103",
+      "kind": "event",
+      "provider": "Microsoft-Windows-PowerShell"
+    },
+    "host": {
+      "name": "DEVUSER-WIN-SDH"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "CommandInvocation(Out-Default): \"Out-Default\"\nParameterBinding(Out-Default): name=\"InputObject\"; value=\"alpha\"\nParameterBinding(Out-Default): name=\"InputObject\"; value=\"bravo\"\nParameterBinding(Out-Default): name=\"InputObject\"; value=\"charlie\"\nParameterBinding(Out-Default): name=\"InputObject\"; value=\"many items\"\nParameterBinding(Out-Default): name=\"InputObject\"; value=\"SDH7437C-REPRO-MARKER\"\n\n\n\nContext:\n        Severity = Informational\n        Host Name = ConsoleHost\n        Host Version = 5.1.20348.5386\n        Host ID = 7099cc11-f00b-4234-b432-73d3baa3d8de\n        Host Application = C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -NonInteractive -Command $marker = 'SDH7437C-REPRO-MARKER'\n$items = @(\n    'alpha',\n    'bravo',\n    'charlie'\n)\n$count = 0\nforeach ($i in $items) {\n    # walk the list, no colon and no equals on this line\n    Write-Output $i\n    $count++\n}\nif ($count -gt 2) {\n    Write-Output 'many items'\n} else {\n    Write-Output 'few items'\n}\ntry {\n    Get-Random -Maximum 10 | Out-Null\n} catch {\n    Write-Output 'no random available'\n}\nWrite-Output $marker\n        Engine Version = 5.1.20348.5386\n        Runspace ID = 5f75a73b-dbb3-4342-b743-93c99a117c09\n        Pipeline ID = 1\n        Command Name = \n        Command Type = Script\n        Script Name = \n        Command Path = \n        Sequence Number = 28\n        User = DEVUSER-WIN-SDH\\user\n        Connected User = \n        Shell ID = Microsoft.PowerShell\n\n\n\nUser Data:",
+    "winlog": {
+      "activity_id": "{75D3D869-61A5-0003-AF60-295D942ADD01}",
+      "channel": "Microsoft-Windows-PowerShell/Operational",
+      "computer_name": "DEVUSER-WIN-SDH",
+      "event_data": {
+        "ContextInfo": "        Severity = Informational\n        Host Name = ConsoleHost\n        Host Version = 5.1.20348.5386\n        Host ID = 7099cc11-f00b-4234-b432-73d3baa3d8de\n        Host Application = C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -NonInteractive -Command $marker = 'SDH7437C-REPRO-MARKER'\n$items = @(\n    'alpha',\n    'bravo',\n    'charlie'\n)\n$count = 0\nforeach ($i in $items) {\n    # walk the list, no colon and no equals on this line\n    Write-Output $i\n    $count++\n}\nif ($count -gt 2) {\n    Write-Output 'many items'\n} else {\n    Write-Output 'few items'\n}\ntry {\n    Get-Random -Maximum 10 | Out-Null\n} catch {\n    Write-Output 'no random available'\n}\nWrite-Output $marker\n        Engine Version = 5.1.20348.5386\n        Runspace ID = 5f75a73b-dbb3-4342-b743-93c99a117c09\n        Pipeline ID = 1\n        Command Name = \n        Command Type = Script\n        Script Name = \n        Command Path = \n        Sequence Number = 28\n        User = DEVUSER-WIN-SDH\\user\n        Connected User = \n        Shell ID = Microsoft.PowerShell\n",
+        "Payload": "CommandInvocation(Out-Default): \"Out-Default\"\nParameterBinding(Out-Default): name=\"InputObject\"; value=\"alpha\"\nParameterBinding(Out-Default): name=\"InputObject\"; value=\"bravo\"\nParameterBinding(Out-Default): name=\"InputObject\"; value=\"charlie\"\nParameterBinding(Out-Default): name=\"InputObject\"; value=\"many items\"\nParameterBinding(Out-Default): name=\"InputObject\"; value=\"SDH7437C-REPRO-MARKER\"\n"
+      },
+      "event_id": "4103",
+      "opcode": "To be used when operation is just executing a method",
+      "process": {
+        "pid": 5712,
+        "thread": {
+          "id": 5948
+        }
+      },
+      "provider_guid": "{A0C1853B-5C40-4B15-8766-3CF1C58F985A}",
+      "provider_name": "Microsoft-Windows-PowerShell",
+      "record_id": 2158,
+      "task": "Executing Pipeline",
+      "user": {
+        "identifier": "S-1-5-21-1111111111-2222222222-3333333333-1000"
+      },
+      "version": 1
+    }
+  },
+  {
+    "@timestamp": "2023-06-01T05:27:01.2479769Z",
+    "event": {
+      "action": "Executing Pipeline",
+      "code": "4103",
+      "kind": "event",
+      "provider": "Microsoft-Windows-PowerShell"
+    },
+    "host": {
+      "name": "host.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "CommandInvocation(Get-ItemProperty): \"Get-ItemProperty\"\nParameterBinding(Get-ItemProperty): name=\"Path\"; value=\"hklm:\\SYSTEM\\CurrentControlSet\\Control\\Lsa\"\nParameterBinding(Get-ItemProperty): name=\"Name\"; value=\"Authentication Packages\"\nCommandInvocation(Select-Object): \"Select-Object\"\nParameterBinding(Select-Object): name=\"ExpandProperty\"; value=\"Authentication Packages\"\nParameterBinding(Select-Object): name=\"InputObject\"; value=\"@{Authentication Packages=System.String[]; PSPath=Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Lsa; PSParentPath=Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control; PSChildName=Lsa; PSDrive=HKLM; PSProvider=Microsoft.PowerShell.Core\\Registry}\"\n\n\nContext:\n        Severity = Informational\n        Host Name = OpsMgr PowerShell Host\n        Host Version = 7.0.5000.0\n        Host ID = 1c251f62-545d-4d71-901e-b3445e459c2c\n        Host Application = C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -Command Import-Module 'c:\\Users\\JohnDoe\\.vscode\\extensions\\ms-vscode.powershell-2025.4.0\\modules\\PowerShellEditorServices\\PowerShellEditorServices.psd1'; Start-EditorServices -HostName 'Visual Studio Code Host' -HostProfileId 'Microsoft.VSCode' -HostVersion '2025.4.0' -BundledModulesPath 'c:\\Users\\JohnDoe\\.vscode\\extensions\\ms-vscode.powershell-2025.4.0\\modules' -EnableConsoleRepl -StartupBanner \"PowerShell Extension v2025.4.0\nCopyright (c) Microsoft Corporation.\n\nhttps://aka.ms/vscode-powershell\nType 'help' to get help.\n\" -LogLevel 'Warning' -LogPath 'c:\\Users\\JohnDoe\\AppData\\Roaming\\Code\\logs\\20251029T133303\\window1\\exthost\\ms-vscode.powershell' -SessionDetailsPath 'c:\\Users\\JohnDoe\\AppData\\Roaming\\Code\\User\\globalStorage\\ms-vscode.powershell\\sessions\\PSES-VSCode-30052-837581.json' -FeatureFlags @()\n        Engine Version = 5.1.17763.3770\n        Runspace ID = 9f8ee3e6-561c-4875-a882-a352509348b8\n        Pipeline ID = 2\n        Command Name = Get-ItemProperty\n        Command Type = Cmdlet\n        Script Name = \n        Command Path = \n        Sequence Number = 7216833\n        User = CONTOSO\\SYSTEM\n        Connected User = \n        Shell ID = Microsoft.PowerShell\n\n\nUser Data:",
+    "winlog": {
+      "activity_id": "{A5CE6D2B-8964-4EC4-B0A3-1E749F8AA4AD}",
+      "channel": "Microsoft-Windows-PowerShell/Operational",
+      "computer_name": "host.contoso.com",
+      "event_data": {
+        "ContextInfo": "        Severity = Informational\n        Host Name = OpsMgr PowerShell Host\n        Host Version = 7.0.5000.0\n        Host ID = 1c251f62-545d-4d71-901e-b3445e459c2c\n        Host Application = C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -ExecutionPolicy Bypass -Command Import-Module 'c:\\Users\\JohnDoe\\.vscode\\extensions\\ms-vscode.powershell-2025.4.0\\modules\\PowerShellEditorServices\\PowerShellEditorServices.psd1'; Start-EditorServices -HostName 'Visual Studio Code Host' -HostProfileId 'Microsoft.VSCode' -HostVersion '2025.4.0' -BundledModulesPath 'c:\\Users\\JohnDoe\\.vscode\\extensions\\ms-vscode.powershell-2025.4.0\\modules' -EnableConsoleRepl -StartupBanner \"PowerShell Extension v2025.4.0\nCopyright (c) Microsoft Corporation.\n\nhttps://aka.ms/vscode-powershell\nType 'help' to get help.\n\" -LogLevel 'Warning' -LogPath 'c:\\Users\\JohnDoe\\AppData\\Roaming\\Code\\logs\\20251029T133303\\window1\\exthost\\ms-vscode.powershell' -SessionDetailsPath 'c:\\Users\\JohnDoe\\AppData\\Roaming\\Code\\User\\globalStorage\\ms-vscode.powershell\\sessions\\PSES-VSCode-30052-837581.json' -FeatureFlags @()\n        Engine Version = 5.1.17763.3770\n        Runspace ID = 9f8ee3e6-561c-4875-a882-a352509348b8\n        Pipeline ID = 2\n        Command Name = Get-ItemProperty\n        Command Type = Cmdlet\n        Script Name = \n        Command Path = \n        Sequence Number = 7216833\n        User = CONTOSO\\SYSTEM\n        Connected User = \n        Shell ID = Microsoft.PowerShell",
+        "Payload": "CommandInvocation(Get-ItemProperty): \"Get-ItemProperty\"\nParameterBinding(Get-ItemProperty): name=\"Path\"; value=\"hklm:\\SYSTEM\\CurrentControlSet\\Control\\Lsa\"\nParameterBinding(Get-ItemProperty): name=\"Name\"; value=\"Authentication Packages\"\nCommandInvocation(Select-Object): \"Select-Object\"\nParameterBinding(Select-Object): name=\"ExpandProperty\"; value=\"Authentication Packages\"\nParameterBinding(Select-Object): name=\"InputObject\"; value=\"@{Authentication Packages=System.String[]; PSPath=Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Lsa; PSParentPath=Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control; PSChildName=Lsa; PSDrive=HKLM; PSProvider=Microsoft.PowerShell.Core\\Registry}\""
+      },
+      "event_id": "4103",
+      "opcode": "To be used when operation is just executing a method",
+      "process": {
+        "pid": 2349,
+        "thread": {
+          "id": 32444
+        }
+      },
+      "provider_guid": "{A0C1853B-5C40-4B15-8766-3CF1C58F985A}",
+      "provider_name": "Microsoft-Windows-PowerShell",
+      "record_id": 5663677,
+      "task": "Executing Pipeline",
+      "user": {
+        "identifier": "S-1-5-21-2882078887-1352635951-3305458046-1000"
+      },
+      "version": 1
+    }
+  },
+  {
+    "@timestamp": "2023-01-18T10:15:42.1234567Z",
+    "event": {
+      "action": "Executing Pipeline",
+      "code": "4103",
+      "kind": "event",
+      "provider": "Microsoft-Windows-PowerShell"
+    },
+    "host": {
+      "name": "ES-HOST"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "CommandInvocation(Get-Date): \"Get-Date\"\n\n\nContexto:\n        Gravedad = Informational\n        Nombre de host = ConsoleHost\n        Versión de host = 5.1.19041.1320\n        Id. de host = 56995afd-2444-424e-871c-4c5513731a3b\n        Aplicación host = C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\n        Id. de espacio de ejecución = fc8f1c5e-3b52-4d0e-9f3a-6c1d2e7b8a90\n        Id. de canalización = 1\n        Usuario conectado = \n        Id. de shell = Microsoft.PowerShell\n\n\nDatos de usuario:",
+    "winlog": {
+      "activity_id": "{3B9F3D24-5A0C-0001-8E2B-9F3B0C5AD901}",
+      "channel": "Microsoft-Windows-PowerShell/Operational",
+      "computer_name": "ES-HOST",
+      "event_data": {
+        "ContextInfo": "        Gravedad = Informational\n        Nombre de host = ConsoleHost\n        Versión de host = 5.1.19041.1320\n        Id. de host = 56995afd-2444-424e-871c-4c5513731a3b\n        Aplicación host = C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\n        Id. de espacio de ejecución = fc8f1c5e-3b52-4d0e-9f3a-6c1d2e7b8a90\n        Id. de canalización = 1\n        Usuario conectado = \n        Id. de shell = Microsoft.PowerShell",
+        "Payload": "CommandInvocation(Get-Date): \"Get-Date\""
+      },
+      "event_id": "4103",
+      "opcode": "To be used when operation is just executing a method",
+      "process": {
+        "pid": 6120,
+        "thread": {
+          "id": 6244
+        }
+      },
+      "provider_guid": "{A0C1853B-5C40-4B15-8766-3CF1C58F985A}",
+      "provider_name": "Microsoft-Windows-PowerShell",
+      "record_id": 4211,
+      "task": "Executing Pipeline",
+      "user": {
+        "identifier": "S-1-5-21-4444444444-5555555555-6666666666-1001"
+      },
+      "version": 1
+    }
+  },
+  {
+    "@timestamp": "2024-11-05T14:02:11.5550000Z",
+    "event": {
+      "action": "Executing Pipeline",
+      "code": "4103",
+      "kind": "event",
+      "provider": "Microsoft-Windows-PowerShell"
+    },
+    "host": {
+      "name": "WIN-TEST"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "CommandInvocation(Write-Output): \"Write-Output\"\nParameterBinding(Write-Output): name=\"InputObject\"; value=\"example\"\n\n\nContext:\n        Severity = Informational\n        Host Name = ConsoleHost\n        Host Version = 5.1.19041.4648\n        Host ID = 3f1c2a9e-7b4d-4e8a-9c61-2d5e8f0a1b37\n        Host Application = C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -Command $config = @{\n    Outer = @{\n        Name = 'example'\n        Enabled = $true\n    }\n}\n        Host Application = C:\\Windows\\System32\\notepad.exe\nWrite-Output $config.Outer.Name\n        Engine Version = 5.1.19041.4648\n        Runspace ID = 8d2e4b61-0c3f-4a7e-b9d2-5f1a6c3e7b90\n        Pipeline ID = 1\n        Command Name = Write-Output\n        Command Type = Cmdlet\n        Script Name = \n        Command Path = \n        Sequence Number = 22\n        User = WIN-TEST\\tester\n        Connected User = \n        Shell ID = Microsoft.PowerShell\n\n\nUser Data:",
+    "winlog": {
+      "activity_id": "{6E2B9A10-3C4D-0002-91F2-7A6B5C4D3E21}",
+      "channel": "Microsoft-Windows-PowerShell/Operational",
+      "computer_name": "WIN-TEST",
+      "event_data": {
+        "ContextInfo": "        Severity = Informational\n        Host Name = ConsoleHost\n        Host Version = 5.1.19041.4648\n        Host ID = 3f1c2a9e-7b4d-4e8a-9c61-2d5e8f0a1b37\n        Host Application = C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoProfile -Command $config = @{\n    Outer = @{\n        Name = 'example'\n        Enabled = $true\n    }\n}\n        Host Application = C:\\Windows\\System32\\notepad.exe\nWrite-Output $config.Outer.Name\n        Engine Version = 5.1.19041.4648\n        Runspace ID = 8d2e4b61-0c3f-4a7e-b9d2-5f1a6c3e7b90\n        Pipeline ID = 1\n        Command Name = Write-Output\n        Command Type = Cmdlet\n        Script Name = \n        Command Path = \n        Sequence Number = 22\n        User = WIN-TEST\\tester\n        Connected User = \n        Shell ID = Microsoft.PowerShell",
+        "Payload": "CommandInvocation(Write-Output): \"Write-Output\"\nParameterBinding(Write-Output): name=\"InputObject\"; value=\"example\""
+      },
+      "event_id": "4103",
+      "opcode": "To be used when operation is just executing a method",
+      "process": {
+        "pid": 4410,
+        "thread": {
+          "id": 4522
+        }
+      },
+      "provider_guid": "{A0C1853B-5C40-4B15-8766-3CF1C58F985A}",
+      "provider_name": "Microsoft-Windows-PowerShell",
+      "record_id": 7731,
+      "task": "Executing Pipeline",
+      "user": {
+        "identifier": "S-1-5-21-7777777777-8888888888-9999999999-1002"
+      },
+      "version": 1
+    }
+  },
+  {
+    "@timestamp": "2024-11-06T09:30:27.9870000Z",
+    "event": {
+      "action": "Executing Pipeline",
+      "code": "4103",
+      "kind": "event",
+      "provider": "Microsoft-Windows-PowerShell"
+    },
+    "host": {
+      "name": "POSTE-FR"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "CommandInvocation(Get-Date): \"Get-Date\"\n\n\nContexte :\n        Gravité = Informational\n        Nom d’hôte = ConsoleHost\n        Version de l’hôte = 5.1.19041.4648\n        ID d’hôte = a0925d75-baf4-4609-b69b-8d14a9f85b42\n        Application hôte = C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\n        Version du moteur = 5.1.19041.4648\n        ID d’instance d’exécution = 4b7d9e2a-1c3f-4e5a-8b6d-0f2e4a6c8d10\n        ID de pipeline = 1\n        Nom de commande = Get-Date\n        Type de commande = Cmdlet\n        Nom du script = \n        Chemin de la commande = \n        Numéro de séquence = 18\n        Utilisateur = POSTE-FR\\utilisateur\n        Utilisateur connecté = \n        ID d’interpréteur de commandes = Microsoft.PowerShell\n\n\nDonnées utilisateur :",
+    "winlog": {
+      "activity_id": "{1F4E7C2A-9B3D-0001-6A5E-4C3B2A190F87}",
+      "channel": "Microsoft-Windows-PowerShell/Operational",
+      "computer_name": "POSTE-FR",
+      "event_data": {
+        "ContextInfo": "        Gravité = Informational\n        Nom d’hôte = ConsoleHost\n        Version de l’hôte = 5.1.19041.4648\n        ID d’hôte = a0925d75-baf4-4609-b69b-8d14a9f85b42\n        Application hôte = C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\n        Version du moteur = 5.1.19041.4648\n        ID d’instance d’exécution = 4b7d9e2a-1c3f-4e5a-8b6d-0f2e4a6c8d10\n        ID de pipeline = 1\n        Nom de commande = Get-Date\n        Type de commande = Cmdlet\n        Nom du script = \n        Chemin de la commande = \n        Numéro de séquence = 18\n        Utilisateur = POSTE-FR\\utilisateur\n        Utilisateur connecté = \n        ID d’interpréteur de commandes = Microsoft.PowerShell",
+        "Payload": "CommandInvocation(Get-Date): \"Get-Date\""
+      },
+      "event_id": "4103",
+      "opcode": "To be used when operation is just executing a method",
+      "process": {
+        "pid": 3388,
+        "thread": {
+          "id": 3412
+        }
+      },
+      "provider_guid": "{A0C1853B-5C40-4B15-8766-3CF1C58F985A}",
+      "provider_name": "Microsoft-Windows-PowerShell",
+      "record_id": 1290,
+      "task": "Executing Pipeline",
+      "user": {
+        "identifier": "S-1-5-21-1212121212-3434343434-5656565656-1001"
+      },
+      "version": 1
+    }
+  }
+]
