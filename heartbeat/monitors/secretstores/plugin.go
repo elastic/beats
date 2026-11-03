@@ -170,7 +170,11 @@ func (p *secretPlugin) current() (plugin.Plugin, *Scrubber, error) {
 	// a Close, and they have a single job, whose previous run is over since
 	// runs of a job never overlap.
 	_ = p.closeInner()
-	inner, err := p.factory.Make(p.name, resolved, p.info)
+	// The plugin logs with a logger that scrubs too: its log lines can
+	// quote resolved values, such as the params of a browser monitor.
+	info := p.info
+	info.Logger = scrubber.Logger(info.Logger)
+	inner, err := p.factory.Make(p.name, resolved, info)
 	p.hash = hash
 	if err != nil {
 		// A plugin can return resources to close along with the error.

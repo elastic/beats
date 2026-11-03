@@ -267,7 +267,8 @@ func TestSecretPluginScrubsSecrets(t *testing.T) {
 
 	factory := plugin.PluginFactory{
 		Name: "leaky",
-		Make: func(_ string, cfg *conf.C, _ beat.Info) (plugin.Plugin, error) {
+		Make: func(_ string, cfg *conf.C, info beat.Info) (plugin.Plugin, error) {
+			info.Logger.Infof("making with %s", secret)
 			header, err := cfg.String("header", -1)
 			if err != nil {
 				return plugin.Plugin{}, err
@@ -294,7 +295,7 @@ func TestSecretPluginScrubsSecrets(t *testing.T) {
 		}
 		return c, scrubberFor(secret), c.SetString("header", -1, header)
 	}
-	logger := logptest.NewTestingLogger(t, "")
+	logger, logs := logptest.NewTestingLoggerWithObserver(t, "")
 	p := newSecretPlugin(resolve, factory, "leaky", newTestConfig(t, map[string]any{}), beat.Info{Logger: logger}, logger).plugin()
 	t.Cleanup(func() { _ = p.Close() })
 
@@ -313,6 +314,12 @@ func TestSecretPluginScrubsSecrets(t *testing.T) {
 	header = "invalid"
 	_, err = p.Jobs[0](&beat.Event{})
 	assert.EqualError(t, err, `invalid header "<hidden>"`, "the creation error must not have the secret")
+
+	made := logs.FilterMessageSnippet("making with").TakeAll()
+	require.NotEmpty(t, made, "the plugin must log with the logger it is given")
+	for _, e := range made {
+		assert.Equal(t, "making with <hidden>", e.Message, "the plugin logger must not write the secret")
+	}
 }
 
 func TestWrapFactoryKeepsFactory(t *testing.T) {

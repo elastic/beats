@@ -188,7 +188,7 @@ References in the `source.inline.script` setting of browser monitors are not res
 If a monitor with several URLs or hosts starts while Vault is unavailable, or if the resolved values change its number of URLs or hosts, it reports an error until you change its configuration or restart Heartbeat.
 
 ::::{note}
-Heartbeat replaces the resolved values with `<hidden>` in the events of the monitor, for example in `url.full`, `url.query`, or `error.message`, including their percent-encoded form. Values shorter than 4 characters, other transformations of a value such as base64, screenshots, and Heartbeat logs are not covered. Prefer settings that are not published for secrets, such as `username`, `password`, request headers, or TLS settings.
+Heartbeat replaces the resolved values with `<hidden>` in the events of the monitor, for example in `url.full`, `url.query`, or `error.message`, including their percent-encoded form. It does the same in the log lines the monitor writes, including what the browser runner prints. Values shorter than 4 characters, other transformations of a value such as base64, and screenshots are not covered, nor is what the browser runner records itself, such as network events. Prefer settings that are not published for secrets, such as `username`, `password`, request headers, or TLS settings.
 ::::
 
 ### Restrict the hosts that receive secrets [monitor-secret-stores-allowed-hosts]
