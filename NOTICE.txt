@@ -14491,11 +14491,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/mito
-Version: v1.27.0
+Version: v1.27.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/mito@v1.27.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/mito@v1.27.1/LICENSE:
 
 
                                  Apache License
