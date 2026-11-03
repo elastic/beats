@@ -234,6 +234,8 @@ func TestOsquerybeatRejectedPolicyKeepsRunning(t *testing.T) {
 		return mgr.postInitialized
 	}, 5*time.Second, 10*time.Millisecond, "osquerybeat should finish initialization")
 
+	// The ECS mapping for user.id has an empty field and no value, so
+	// osquerybeat cannot apply this policy.
 	bad := agentconfig.MustNewConfigFrom(map[string]any{
 		"data_stream": map[string]any{"dataset": config.DefaultDataset},
 		"osquery": map[string]any{"schedule": map[string]any{"users": map[string]any{

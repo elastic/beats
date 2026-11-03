@@ -90,6 +90,9 @@ func (r *reloader) reject(configs []*reload.ConfigWithMeta, err error) error {
 		errs = append(errs, cfgfile.UnitError{UnitID: cfg.InputUnitID, Err: err})
 	}
 	if len(errs) == 0 {
+		// Still return a list, never err itself: given a plain error, the V2
+		// manager's reloadInputs returns nil and records the rejected policy
+		// as applied, so it would not offer that policy again.
 		return errors.Join(err)
 	}
 	return errors.Join(errs...)
