@@ -51,7 +51,6 @@ const (
 type Monitor struct {
 	stdFields      stdfields.StdMonitorFields
 	pluginName     string
-	config         *conf.C
 	addTask        scheduler.AddTask
 	configuredJobs []*configuredJob
 	enabled        bool
@@ -148,7 +147,6 @@ func newMonitorUnsafe(
 		configuredJobs:      []*configuredJob{},
 		pubClient:           pubClient,
 		internalsMtx:        sync.Mutex{},
-		config:              config,
 		stats:               pluginFactory.Stats,
 		state:               MON_INIT,
 		monitorStateTracker: monitorstate.NewTracker(stateLoader, false, info.Logger),
@@ -157,7 +155,7 @@ func newMonitorUnsafe(
 
 	if m.stdFields.ID == "" {
 		// If there's no explicit ID generate one
-		hash, err := m.configHash()
+		hash, err := configHash(config)
 		if err != nil {
 			return m, err
 		}
@@ -217,9 +215,12 @@ func newMonitorUnsafe(
 	return m, nil
 }
 
-func (m *Monitor) configHash() (uint64, error) {
+// configHash hashes the monitor config. It is only needed to derive an ID for monitors
+// without one, so the config is not kept on the Monitor: at thousands of monitors a
+// retained config tree per monitor is a significant share of Heartbeat's heap.
+func configHash(config *conf.C) (uint64, error) {
 	unpacked := map[string]any{}
-	err := m.config.Unpack(unpacked)
+	err := config.Unpack(unpacked)
 	if err != nil {
 		return 0, err
 	}
