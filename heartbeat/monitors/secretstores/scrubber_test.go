@@ -55,7 +55,9 @@ func TestScrubberString(t *testing.T) {
 		{name: "query encoded", values: []string{"a b&c=d-secret"}, in: "https://host/?t=a+b%26c%3Dd-secret", want: "https://host/?t=<hidden>"},
 		{name: "path encoded", values: []string{"a b/c-secret"}, in: "https://host/a%20b%2Fc-secret", want: "https://host/<hidden>"},
 		{name: "no match", values: []string{"s3cr3t-token"}, in: "nothing to hide", want: "nothing to hide"},
-		{name: "short value", values: []string{"abc"}, in: "abc", want: "abc"},
+		{name: "json escaped", values: []string{"line1\n\"quoted\"-secret"}, in: `{"key":"line1\n\"quoted\"-secret"}`, want: `{"key":"<hidden>"}`},
+		{name: "json html escaped", values: []string{"a<b>&c-secret"}, in: `{"key":"a<b>&c-secret"}`, want: `{"key":"<hidden>"}`},
+		{name: "short value", values: []string{"abcde"}, in: "abcde", want: "abcde"},
 		{name: "empty value", values: []string{""}, in: "text", want: "text"},
 	}
 	for _, tc := range tests {

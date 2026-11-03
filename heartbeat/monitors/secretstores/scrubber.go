@@ -18,8 +18,10 @@
 package secretstores
 
 import (
+	"bytes"
 	"cmp"
 	"context"
+	"encoding/json"
 	"maps"
 	"net/url"
 	"slices"
@@ -39,7 +41,7 @@ const (
 
 	// minScrubLen is the length under which values are not scrubbed. They
 	// are easy to guess, and would garble unrelated text.
-	minScrubLen = 4
+	minScrubLen = 6
 )
 
 type trackerKey struct{}
@@ -81,8 +83,10 @@ func (t *tracker) scrubber() *Scrubber {
 		if len(v) < minScrubLen {
 			continue
 		}
-		// Settings such as URLs get percent-encoded when published.
+		// Settings such as URLs get percent-encoded when published, and
+		// values with quotes or newlines get escaped inside JSON.
 		forms = append(forms, v, url.QueryEscape(v), url.PathEscape(v))
+		forms = append(forms, jsonEscaped(v)...)
 	}
 	if len(forms) == 0 {
 		return nil
@@ -99,6 +103,23 @@ func (t *tracker) scrubber() *Scrubber {
 		oldnew = append(oldnew, f, scrubbed)
 	}
 	return &Scrubber{replacer: strings.NewReplacer(oldnew...)}
+}
+
+// jsonEscaped returns v as it appears inside a JSON string, with and without
+// the HTML escaping of Go's encoder.
+func jsonEscaped(v string) []string {
+	forms := make([]string, 0, 2)
+	for _, escapeHTML := range []bool{true, false} {
+		var b bytes.Buffer
+		enc := json.NewEncoder(&b)
+		enc.SetEscapeHTML(escapeHTML)
+		// Encoding a string can't fail.
+		_ = enc.Encode(v)
+		// Drop the quotes and the newline Encode adds.
+		encoded := strings.TrimSuffix(b.String(), "\n")
+		forms = append(forms, encoded[1:len(encoded)-1])
+	}
+	return forms
 }
 
 // Scrubber removes the secret values a Resolver substituted from the events
