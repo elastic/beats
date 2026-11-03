@@ -68,7 +68,7 @@ steps:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
 
-  - label: "Triggering Build for pkg/systemmetrics"
+  - label: "Triggering Build for pkg"
     trigger: "beats-pkg-systemmetrics"
     build:
       commit: "${BUILDKITE_COMMIT}"

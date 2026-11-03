@@ -1,29 +1,29 @@
-name: pkg-systemmetrics-macos-unit-tests
+name: pkg-macos-unit-tests
 
 env:
-  BEAT: "pkg/systemmetrics"
+  BEAT: "pkg"
 
 on:
   workflow_dispatch:
   pull_request:
     paths:
-      - pkg/systemmetrics/**
+      - pkg/**
       # OSS
       - go.mod
       - dev-tools/**
       # Workflow
-      - .github/workflows/pkg-systemmetrics-macos-unit-tests.yml
+      - .github/workflows/pkg-macos-unit-tests.yml
       - .github/actions/unit-test/action.yml
   push:
     branches:
       - main
     paths:
-      - pkg/systemmetrics/**
+      - pkg/**
       # OSS
       - go.mod
       - dev-tools/**
       # Workflow
-      - .github/workflows/pkg-systemmetrics-macos-unit-tests.yml
+      - .github/workflows/pkg-macos-unit-tests.yml
       - .github/actions/unit-test/action.yml
 
 permissions:

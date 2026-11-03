@@ -1,24 +1,24 @@
-# pkg-systemmetrics-macos-unit-tests
+# pkg-macos-unit-tests
 
-Documents the pkg-systemmetrics-macos-unit-tests GitHub Actions workflow and its configured execution.
+Documents the pkg-macos-unit-tests GitHub Actions workflow and its configured execution.
 
 ## At a glance
 
 | | |
 | --- | --- |
 | Platform | GitHub Actions |
-| Source | [`.github/workflows/pkg-systemmetrics-macos-unit-tests.yml`](../pkg-systemmetrics-macos-unit-tests.yml) |
+| Source | [`.github/workflows/pkg-macos-unit-tests.yml`](../pkg-macos-unit-tests.yml) |
 | Trigger | `workflow_dispatch`, `pull_request`, `push` |
 
 ## Purpose
 
-Builds and runs unit tests for **pkg-systemmetrics** on the configured macOS runner using the shared unit-test action. The checked-in source does not state a separate historical rationale.
+Builds and runs unit tests for all packages under **pkg** on the configured macOS runner using the shared unit-test action. The checked-in source does not state a separate historical rationale.
 
 ## When it runs
 
 - `workflow_dispatch`.
-- `pull_request`: paths: `["pkg/systemmetrics/**", "go.mod", "dev-tools/**", ".github/workflows/pkg-systemmetrics-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
-- `push`: branches: `["main"]`; paths: `["pkg/systemmetrics/**", "go.mod", "dev-tools/**", ".github/workflows/pkg-systemmetrics-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `pull_request`: paths: `["pkg/**", "go.mod", "dev-tools/**", ".github/workflows/pkg-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `push`: branches: `["main"]`; paths: `["pkg/**", "go.mod", "dev-tools/**", ".github/workflows/pkg-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
 
 ## Execution flow
 
@@ -41,5 +41,5 @@ Local composite actions and shell scripts used by this workflow are linked under
 
 ## Sources
 
-- Workflow: [`.github/workflows/pkg-systemmetrics-macos-unit-tests.yml`](../pkg-systemmetrics-macos-unit-tests.yml)
+- Workflow: [`.github/workflows/pkg-macos-unit-tests.yml`](../pkg-macos-unit-tests.yml)
 - Local dependency: [`.github/actions/unit-test/action.yml`](../../actions/unit-test/action.yml)

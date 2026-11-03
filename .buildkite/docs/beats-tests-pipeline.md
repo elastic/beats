@@ -33,7 +33,7 @@ Buildkite pipeline triggers and branch filters are not specified in this checked
 | Triggering Build for x-pack/winlogbeat | No step-level condition or agent declared | None declared | triggers pipeline `beats-xpack-winlogbeat`; trigger build fields `["commit", "branch"]` |
 | Triggering Build for Deploy/K8S | No step-level condition or agent declared | None declared | triggers pipeline `deploy-k8s`; trigger build fields `["commit", "branch"]` |
 | Triggering Build for Libbeat | No step-level condition or agent declared | None declared | triggers pipeline `beats-libbeat`; trigger build fields `["commit", "branch"]` |
-| Triggering Build for pkg/systemmetrics | No step-level condition or agent declared | None declared | triggers pipeline `beats-pkg-systemmetrics`; trigger build fields `["commit", "branch"]` |
+| Triggering Build for pkg | No step-level condition or agent declared | None declared | triggers pipeline `beats-pkg-systemmetrics`; trigger build fields `["commit", "branch"]` |
 | Triggering Build for x-pack/libbeat | No step-level condition or agent declared | None declared | triggers pipeline `beats-xpack-libbeat`; trigger build fields `["commit", "branch"]` |
 | Triggering Build for x-pack/otel | No step-level condition or agent declared | None declared | triggers pipeline `beats-xpack-otel`; trigger build fields `["commit", "branch"]` |
 | Triggering Build for x-pack/auditbeat | No step-level condition or agent declared | None declared | triggers pipeline `beats-xpack-auditbeat`; trigger build fields `["commit", "branch"]` |

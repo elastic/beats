@@ -322,13 +322,13 @@ steps:
         BUILDKITE_PULL_REQUEST_BASE_BRANCH: ${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
         GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
-  - label: "Trigger pkg/systemmetrics"
+  - label: "Trigger pkg"
     if: build.pull_request.id != null
     if_changed:
       include:
         # Package-specific paths
-        - pkg/systemmetrics/**
-        - .buildkite/pkg/systemmetrics/**
+        - pkg/**
+        - .buildkite/pkg/**
         # Shared OSS dependencies
         - .go-version
         - go.mod
