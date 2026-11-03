@@ -45,7 +45,9 @@ type zswapExpectation struct {
 // .buildkite/pkg/systemmetrics/pipeline.yml.
 var ciExpectations = map[string]zswapExpectation{
 	// Ubuntu 22.04 host: kernel >= 5.19 reports Zswap in /proc/meminfo, debugfs not readable
-	"mandatory-systemmetrics-unit-test":                   {zswapExists: true, debugExists: false},
+	"mandatory-pkg-unit-test":                             {zswapExists: true, debugExists: false},
+	"mandatory-pkg-unit-test-fips-tag":                    {zswapExists: true, debugExists: false},
+	"mandatory-pkg-unit-test-fips-only":                   {zswapExists: true, debugExists: false},
 	"mandatory-systemmetrics-container-tests/ubuntu-2204": {zswapExists: true, debugExists: false},
 	// RHEL 9 host: zswap backported into /proc/meminfo, debugfs not readable
 	"mandatory-systemmetrics-container-tests/rhel-9": {zswapExists: true, debugExists: false},
