@@ -21,6 +21,7 @@ package logp
 
 import (
 	"io"
+	"os"
 	"testing"
 
 	"go.uber.org/zap/zapcore"
@@ -32,35 +33,14 @@ import (
 //
 // We call close to ensure it does not return an error.
 //
-// Our syslog is hardcoded to connect via Unix sockets. The container
-// we use to run the tests does not have a syslog listening on Unix socket,
-// so we instantiate our own.
+// Our syslog output connects via the local Unix sockets that log/syslog
+// probes. Hosts with systemd-journald already provide /dev/log; bare
+// containers have no syslog socket, so we start our own there. Creating the
+// socket requires write access to /var/run, which usually means root.
 func TestSyslogOutputCanBeClosed(t *testing.T) {
-	channel := make(syslog.LogPartsChannel)
-	handler := syslog.NewChannelHandler(channel)
-
-	server := syslog.NewServer()
-	server.SetFormat(syslog.RFC5424)
-	server.SetHandler(handler)
-
-	if err := server.ListenUnixgram("/var/run/syslog"); err != nil {
-		t.Errorf("cannot configure syslog to listen on '/var/run/syslog/': %s", err)
-		t.Log("You might already have a syslog running, this test assumes " +
-			"there is no syslog running on the host. You can run this test " +
-			"in a Docker container (adjust the image tag to the current " +
-			"Go version):\n" +
-			"'docker run --rm -it -v $PWD:$PWD -w $PWD golang:1.21.10 go test ./logp'")
+	if !hasSyslogSocket() {
+		startSyslogServer(t)
 	}
-
-	if err := server.Boot(); err != nil {
-		t.Fatalf("cannot start syslog server: %s", err)
-	}
-
-	t.Cleanup(func() {
-		// ignore the error, we just need it to accept
-		// connections from our syslog output
-		_ = server.Kill()
-	})
 
 	cfg := DefaultConfig(DefaultEnvironment)
 	cfg.ToFiles = true
@@ -77,4 +57,41 @@ func TestSyslogOutputCanBeClosed(t *testing.T) {
 	if err := closer.Close(); err != nil {
 		t.Fatalf("Close must not return any error, got: %s", err)
 	}
+}
+
+// hasSyslogSocket reports whether any of the Unix sockets probed by
+// log/syslog exists.
+func hasSyslogSocket() bool {
+	for _, path := range []string{"/dev/log", "/var/run/syslog", "/var/run/log"} {
+		if _, err := os.Stat(path); err == nil {
+			return true
+		}
+	}
+	return false
+}
+
+// startSyslogServer starts a syslog server listening on /var/run/syslog for
+// the duration of the test.
+func startSyslogServer(t *testing.T) {
+	t.Helper()
+
+	server := syslog.NewServer()
+	server.SetFormat(syslog.RFC5424)
+	server.SetHandler(syslog.NewChannelHandler(make(syslog.LogPartsChannel)))
+
+	if err := server.ListenUnixgram("/var/run/syslog"); err != nil {
+		t.Fatalf("cannot configure syslog to listen on '/var/run/syslog': %s. "+
+			"No syslog socket exists on this host and creating one needs write "+
+			"access to /var/run; run the test as root, e.g. in a Docker container", err)
+	}
+
+	if err := server.Boot(); err != nil {
+		t.Fatalf("cannot start syslog server: %s", err)
+	}
+
+	t.Cleanup(func() {
+		// ignore the error, we just need it to accept
+		// connections from our syslog output
+		_ = server.Kill()
+	})
 }
