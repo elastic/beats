@@ -347,8 +347,6 @@ func GetOsqueryCheckTimeout(inputs []InputConfig) (time.Duration, error) {
 	return ParseCheckTimeout(in.Osquery.ElasticOptions.CheckTimeout)
 }
 
-<<<<<<< HEAD
-=======
 // GetPublishingConfig returns the publishing queue settings
 // (elastic_options.publishing) from the result input. Unset or zero values use
 // the defaults; negative values are an error.
@@ -376,17 +374,6 @@ func GetPublishingConfig(inputs []InputConfig) (PublishingConfig, error) {
 	return cfg, nil
 }
 
-// GetOsqueryExtensions returns customer-managed osquery extension settings
-// (elastic_options.extensions) from the result input if available.
-func GetOsqueryExtensions(inputs []InputConfig) ExtensionsConfig {
-	in := ResultInput(inputs)
-	if in == nil || in.Osquery == nil || in.Osquery.ElasticOptions == nil || in.Osquery.ElasticOptions.Extensions == nil {
-		return ExtensionsConfig{}
-	}
-	return *in.Osquery.ElasticOptions.Extensions
-}
-
->>>>>>> ec1f571 (osquerybeat: add a bounded row queue and publishing settings (#54250))
 // GetProfilingEnabled returns the global query profiling default from the result input.
 // This is the fleet-wide on/off switch; individual queries may override it (see ResolveProfiling).
 // Profiling is enabled by default unless elastic_options.profiling.profiling_all is explicitly false.
