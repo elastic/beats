@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -20,7 +21,9 @@ import (
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest/observer"
 
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 )
@@ -102,4 +105,29 @@ func makeReceiverSettings(factory receiver.Factory, name string, sharedCore zapc
 			Logger: zap.New(core),
 		},
 	}
+}
+
+// monitoringPortsFromLogs scans the observer logs and returns n unique ports
+// extracted from "Metrics endpoint listening on:" log lines. It waits up to
+// timeout for the ports to appear, failing the test if they do not.
+func monitoringPortsFromLogs(t *testing.T, zapLogs *observer.ObservedLogs, n int, timeout time.Duration) []int {
+	t.Helper()
+	var ports []int
+	require.EventuallyWithT(t, func(ct *assert.CollectT) {
+		seen := make(map[int]struct{})
+		ports = ports[:0]
+		for _, entry := range zapLogs.FilterMessageSnippet(integration.MonitoringEndpointSnippet).All() {
+			port, err := integration.ParseMonitoringPort(entry.Message)
+			if err != nil {
+				continue
+			}
+			if _, ok := seen[port]; ok {
+				continue
+			}
+			seen[port] = struct{}{}
+			ports = append(ports, port)
+		}
+		assert.GreaterOrEqualf(ct, len(ports), n, "waiting for %d monitoring endpoints to start", n)
+	}, timeout, 100*time.Millisecond, "monitoring ports not found in logs after %s", timeout)
+	return ports[:n]
 }

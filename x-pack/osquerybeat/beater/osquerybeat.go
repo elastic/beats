@@ -313,15 +313,9 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	rah := newResetableActionHandler(bt.pub, bt.log)
 	defer rah.Clear()
 
-<<<<<<< HEAD
 	b.Manager.UpdateStatus(status.Configuring, "Initial configuration")
-	if err := bt.pub.Configure(bt.config.Inputs); err != nil {
-		b.Manager.UpdateStatus(status.Failed, err.Error())
-=======
-	reportDaemonStatus(status.Configuring, "Initial configuration")
 	if err := bt.configurePublishers(bt.config.Inputs); err != nil {
-		reportDaemonStatus(status.Failed, err.Error())
->>>>>>> 1f4edc9 ([osquerybeat] Publish native scheduled results from a bounded queue (#54251))
+		b.Manager.UpdateStatus(status.Failed, err.Error())
 		return err
 	}
 	if len(bt.config.Inputs) == 0 {
@@ -920,6 +914,9 @@ func (bt *osquerybeat) configurePublishers(inputs []config.InputConfig) error {
 // runOsquery, so that a policy that would fail them is rejected before any of
 // it is applied.
 func validatePolicy(ctx context.Context, log *logp.Logger, inputs []config.InputConfig) error {
+	if _, err := config.GetPublishingConfig(inputs); err != nil {
+		return err
+	}
 	if err := pub.CheckProcessors(inputs, log); err != nil {
 		return err
 	}

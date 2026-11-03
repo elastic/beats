@@ -329,14 +329,10 @@ func (p *Publisher) PublishScheduledResponse(scheduleID, packID, packName, query
 	p.publishActionResponseEvent(fields, eventTimestamp)
 }
 
-<<<<<<< HEAD
 func (p *Publisher) publishActionResponseEvent(fields map[string]interface{}, timestamp time.Time) {
-=======
-func (p *Publisher) publishActionResponseEvent(fields map[string]any, timestamp time.Time) {
 	if p.retired(1) {
 		return
 	}
->>>>>>> 1f4edc9 ([osquerybeat] Publish native scheduled results from a bounded queue (#54251))
 	event := beat.Event{
 		Timestamp: timestamp,
 		Fields:    fields,
