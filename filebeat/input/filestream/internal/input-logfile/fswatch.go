@@ -249,6 +249,10 @@ type FileScanOptions struct {
 	IgnoreOlder time.Duration
 	// IgnoreInactiveSince is the ignore_inactive reference time.
 	IgnoreInactiveSince time.Time
+	// SuppressBridgingRaw instructs the scanner to skip attaching the
+	// growing-mode bridging raw header (Fingerprint.Raw) on already-complete
+	// descriptors when no sub-threshold fingerprint entries exist.
+	SuppressBridgingRaw bool
 }
 
 // ScanResults is the outcome of a single FSScanner.GetFiles scan.

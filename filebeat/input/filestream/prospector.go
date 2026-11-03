@@ -352,6 +352,15 @@ func (p *fileProspector) Run(
 	// when it closes
 	hg.SetObserver(p.filewatcher)
 
+	if p.growingFingerprint {
+		if p.shortFingerprints == nil {
+			p.buildShortFingerprintSet(s)
+		}
+		if fw, ok := p.filewatcher.(*fileWatcher); ok {
+			fw.hasGrowingEntries = func() bool { return p.shortFingerprints.Len() > 0 }
+		}
+	}
+
 	ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
 	p.scanLoop(ctx.Cancelation, metrics, ignoreInactiveSince, func(fe loginp.FSEvent) {
 		src := p.identifier.GetSource(fe)
@@ -500,6 +509,9 @@ func (p *fileProspector) onFSEvent(
 
 	// Update the descriptor after any migration moves the table entry.
 	if event.Op != loginp.OpDelete {
+		if event.Descriptor.Fingerprint.Complete() {
+			event.Descriptor.Fingerprint.Raw = ""
+		}
 		p.harvesterState.UpdateDescriptor(src.Name(), event.Descriptor)
 	}
 }
