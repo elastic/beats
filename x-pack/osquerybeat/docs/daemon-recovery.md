@@ -41,6 +41,7 @@ stops with an error, such as after a startup failure or exhausted retries.
 
 ## Scope
 
+<<<<<<< HEAD
 This recovery policy does not change publishing, logger callbacks, profiling,
 or shared queue admission. Stopping the extension server waits, with no
 timeout, for logger callbacks that are still publishing. If an output outage
@@ -53,6 +54,15 @@ DEGRADED and restart; #53939 is needed for that. Scheduled query profiling
 already runs outside the logger callback, so a stuck profile publish does not
 delay restart. Separating scheduled result publication from the logger
 callback remains independent work.
+=======
+This recovery policy does not change publishing or shared queue admission.
+Stopping the extension server waits for logger callbacks that are still
+running, but those callbacks no longer publish: they only add results to the
+scheduled queue, and scheduled query profiling also runs outside them. An
+output outage therefore no longer holds a run open, so osqueryd can still be
+restarted while the output is down. See [publishing.md](publishing.md) for
+what can still wait for the output.
+>>>>>>> 1f4edc9 ([osquerybeat] Publish native scheduled results from a bounded queue (#54251))
 
 ## Validation
 
