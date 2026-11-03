@@ -12,8 +12,9 @@ import (
 
 	dcontainer "github.com/moby/moby/api/types/container"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/metricbeat/module/docker"
+	"github.com/elastic/beats/v7/metricbeat/module/docker/cpu"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -142,6 +143,8 @@ func TestGetCPUStats(t *testing.T) {
 }
 
 func TestCreateCPUFieldsOmitsUnavailablePercentages(t *testing.T) {
+	// The total and kernel counters reset; user, system and per-CPU[1]
+	// increased. The whole sample must be invalidated.
 	taskStats := dcontainer.StatsResponse{
 		PreCPUStats: dcontainer.CPUStats{
 			SystemUsage: 1000,
@@ -149,6 +152,7 @@ func TestCreateCPUFieldsOmitsUnavailablePercentages(t *testing.T) {
 				TotalUsage:        100,
 				UsageInKernelmode: 80,
 				UsageInUsermode:   20,
+				PercpuUsage:       []uint64{60, 40},
 			},
 		},
 		CPUStats: dcontainer.CPUStats{
@@ -158,22 +162,23 @@ func TestCreateCPUFieldsOmitsUnavailablePercentages(t *testing.T) {
 				TotalUsage:        50,
 				UsageInKernelmode: 40,
 				UsageInUsermode:   30,
+				PercpuUsage:       []uint64{10, 50},
 			},
 		},
 	}
 
-	fields := createCPUFields(&Stats{cpuStats: getCPUStats(taskStats)})
+	cpuStats := getCPUStats(taskStats)
+	cpuStats.PerCPUUsage = (&cpu.CPUUsage{Stat: &docker.Stat{Stats: taskStats}}).PerCPU()
+	fields := createCPUFields(&Stats{cpuStats: cpuStats})
 
 	assert.NotContains(t, fields, "total", "total percentages must be omitted after a counter reset")
-
-	kernel, ok := fields["kernel"].(mapstr.M)
-	require.True(t, ok, "kernel fields must be a map")
-	assert.Equal(t, mapstr.M{"ticks": uint64(40)}, kernel, "kernel ticks must remain while unavailable percentages are omitted")
-
-	user, ok := fields["user"].(mapstr.M)
-	require.True(t, ok, "user fields must be a map")
-	assert.Contains(t, user, "pct", "valid user percentage must remain")
-	assert.Contains(t, user, "norm", "valid normalized user percentage must remain")
+	assert.Equal(t, mapstr.M{"ticks": uint64(40)}, fields["kernel"], "kernel must retain ticks only")
+	assert.Equal(t, mapstr.M{"ticks": uint64(30)}, fields["user"], "user must retain ticks only after a sample-wide reset")
+	assert.Equal(t, mapstr.M{"ticks": uint64(2000)}, fields["system"], "system must retain ticks only after a sample-wide reset")
+	assert.Equal(t, mapstr.M{
+		"0": mapstr.M{"ticks": uint64(10)},
+		"1": mapstr.M{"ticks": uint64(50)},
+	}, fields["core"], "core must retain ticks only after a sample-wide reset")
 }
 
 func TestGetRegionAndClusterName(t *testing.T) {

@@ -52,7 +52,9 @@ func (c *CPUService) getCPUStatsList(rawStats []docker.Stat, dedot bool) []CPUSt
 	formattedStats := []CPUStats{}
 
 	for _, stats := range rawStats {
-		if stats.Stats.Read.IsZero() {
+		// An empty current or previous sample (e.g. the container started
+		// between the daemon's two reads) would yield invalid deltas.
+		if stats.Stats.Read.IsZero() || stats.Stats.PreRead.IsZero() {
 			continue
 		}
 		formattedStats = append(formattedStats, c.getCPUStats(&stats, dedot))
@@ -130,15 +132,40 @@ func (u *CPUUsage) SystemDelta() uint64 {
 	return systemDelta
 }
 
+// validSystemDelta returns the system delta and whether the whole sample is
+// valid. A sample is invalid when any CPU counter decreased across the
+// interval, which indicates a container restart or counter reset. The system
+// delta is 0 when the system counter itself decreased.
 func (u *CPUUsage) validSystemDelta() (uint64, bool) {
 	if !u.systemDeltaCalculated {
 		u.systemDeltaCalculated = true
 		if u.Stats.CPUStats.SystemUsage >= u.Stats.PreCPUStats.SystemUsage {
 			u.systemDelta = u.Stats.CPUStats.SystemUsage - u.Stats.PreCPUStats.SystemUsage
-			u.systemDeltaValid = true
 		}
+		u.systemDeltaValid = !u.counterReset()
 	}
 	return u.systemDelta, u.systemDeltaValid
+}
+
+// counterReset reports whether any CPU counter decreased between the previous
+// and the current reading.
+func (u *CPUUsage) counterReset() bool {
+	current, previous := u.Stats.CPUStats, u.Stats.PreCPUStats
+	if current.SystemUsage < previous.SystemUsage ||
+		current.CPUUsage.TotalUsage < previous.CPUUsage.TotalUsage ||
+		current.CPUUsage.UsageInKernelmode < previous.CPUUsage.UsageInKernelmode ||
+		current.CPUUsage.UsageInUsermode < previous.CPUUsage.UsageInUsermode {
+		return true
+	}
+
+	if len(current.CPUUsage.PercpuUsage) == len(previous.CPUUsage.PercpuUsage) {
+		for i, v := range current.CPUUsage.PercpuUsage {
+			if v < previous.CPUUsage.PercpuUsage[i] {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // PerCPU calculates per CPU usage.
@@ -227,22 +254,15 @@ func (u *CPUUsage) SystemNormalized() opt.Float {
 // It returns the percentage scaled by the number of CPUs and the normalized
 // per-CPU percentage, respectively.
 func (u *CPUUsage) calculatePercentages(newValue uint64, oldValue uint64) (opt.Float, opt.Float) {
-	if newValue < oldValue {
+	// A counter reset invalidates the whole sample: deltas of counters that
+	// did not decrease would span two container lifetimes.
+	systemDelta, valid := u.validSystemDelta()
+	if !valid || newValue < oldValue {
 		return opt.NewFloatNone(), opt.NewFloatNone()
 	}
 
 	value := newValue - oldValue
-	if value == 0 {
-		zero := opt.FloatWith(0)
-		return zero, zero
-	}
-
-	systemDelta, valid := u.validSystemDelta()
-	if !valid {
-		return opt.NewFloatNone(), opt.NewFloatNone()
-	}
-
-	if systemDelta == 0 {
+	if value == 0 || systemDelta == 0 {
 		zero := opt.FloatWith(0)
 		return zero, zero
 	}
