@@ -5,8 +5,10 @@
 package telemetry
 
 import (
+	"context"
 	"runtime"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -243,4 +245,53 @@ func TestSystemMetricsSnapshot(t *testing.T) {
 
 	release()
 	assert.Nil(t, SystemMetricsSnapshot(), "no snapshot after the last release")
+}
+
+// TestSystemBridgeShutdownDoesNotDeadlockWithCollection checks that shutdown
+// does not hold b.mu while it unregisters the callback. Unregister waits for an
+// in-flight callback and the callback takes b.mu, so doing both at once
+// deadlocks. Collections run continuously while bridges are shut down.
+func TestSystemBridgeShutdownDoesNotDeadlockWithCollection(t *testing.T) {
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for range 200 {
+			reader := metric.NewManualReader()
+			settings := componenttest.NewNopTelemetrySettings()
+			settings.MeterProvider = metric.NewMeterProvider(metric.WithReader(reader))
+
+			reg := monitoring.NewRegistry()
+			monitoring.NewUint(reg, "beat.memstats.memory_alloc").Set(1)
+			bridge, err := newSystemRegistryBridge(settings, reg)
+			if err != nil {
+				t.Errorf("newSystemRegistryBridge: %v", err)
+				return
+			}
+
+			stop := make(chan struct{})
+			collecting := make(chan struct{})
+			go func() {
+				defer close(collecting)
+				var rm metricdata.ResourceMetrics
+				for {
+					select {
+					case <-stop:
+						return
+					default:
+						_ = reader.Collect(context.Background(), &rm)
+					}
+				}
+			}()
+
+			bridge.shutdown()
+			close(stop)
+			<-collecting
+		}
+	}()
+
+	select {
+	case <-done:
+	case <-time.After(60 * time.Second):
+		t.Fatal("deadlock: shutting down the system bridge while it is being collected did not finish")
+	}
 }

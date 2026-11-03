@@ -42,7 +42,7 @@ import (
 )
 
 func init() {
-	plugin.Register("tcp", create, "synthetics/tcp")
+	plugin.RegisterWithDestinations("tcp", destinations, create, "synthetics/tcp")
 }
 
 var debugf = logp.MakeDebug("tcp")

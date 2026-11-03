@@ -113,20 +113,18 @@ func TestRecordFilterIgnoreOlderZeroTimestamp(t *testing.T) {
 	assert.True(t, f.match(testRecord(time.Time{}, "provider", "", 4, 1)))
 }
 
-func testRecord(ts time.Time, providerName, sourceName string, level uint8, id uint32) *Record {
-	return &Record{
-		Event: winevent.Event{
-			Provider: winevent.Provider{
-				Name:            providerName,
-				EventSourceName: sourceName,
-			},
-			LevelRaw: level,
-			EventIdentifier: winevent.EventIdentifier{
-				ID: id,
-			},
-			TimeCreated: winevent.TimeCreated{
-				SystemTime: ts,
-			},
+func testRecord(ts time.Time, providerName, sourceName string, level uint8, id uint32) *winevent.Event {
+	return &winevent.Event{
+		Provider: winevent.Provider{
+			Name:            providerName,
+			EventSourceName: sourceName,
+		},
+		LevelRaw: level,
+		EventIdentifier: winevent.EventIdentifier{
+			ID: id,
+		},
+		TimeCreated: winevent.TimeCreated{
+			SystemTime: ts,
 		},
 	}
 }

@@ -6,6 +6,7 @@ package internal
 
 import (
 	"errors"
+	"strings"
 	"time"
 
 	"go.opentelemetry.io/collector/consumer/consumererror"
@@ -14,23 +15,27 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func parseEvent(logRecord *plog.LogRecord) (beat.Event, error) {
+// parseEvent converts a log record into a beat.Event.
+func parseEvent(logRecord *plog.LogRecord, index string) (beat.Event, error) {
 	fields, ok := parseEventFields(logRecord)
 	if !ok {
 		return beat.Event{}, consumererror.NewPermanent(errors.New("invalid beats event body, expected a map, got: " + logRecord.Body().Type().String()))
 	}
 
-	removeRedundantMetadataFields(fields)
-
 	timestamp, ok := parseEventTimestamp(fields)
-	if !ok {
+	if ok {
+		// written again by the json codec when the event is serialized
+		delete(fields, beat.TimestampFieldKey)
+	} else {
 		timestamp = logRecord.ObservedTimestamp().AsTime()
 	}
 
 	return beat.Event{
 		Timestamp: timestamp,
+		Meta:      extractMetadataFields(fields, index),
 		Fields:    fields,
 	}, nil
 }
@@ -57,11 +62,24 @@ func parseEventTimestamp(logRecordBody map[string]any) (time.Time, bool) {
 	return time.Time{}, false
 }
 
-// removeRedundantMetadataFields removes certain metadata fields that will be generated again when the event is serialized.
-// See https://github.com/elastic/beats/blob/v9.3.3/libbeat/outputs/codec/json/event.go#L43-L54
-// Not removing these fields would create duplicates and bloat the final event size
-func removeRedundantMetadataFields(fields map[string]any) {
-	delete(fields, otelctx.MetadataBeatKey)
-	delete(fields, otelctx.MetadataVersionKey)
-	delete(fields, "type")
+// extractMetadataFields removes `@metadata` (present when the receiver runs with include_metadata)
+// from the event fields and returns it as the event metadata.
+// A non-empty index is the `index` explicitly configured on the exporter and takes
+// precedence over the beat name set by the receiver, matching the Logstash output.
+func extractMetadataFields(fields map[string]any, index string) mapstr.M {
+	meta, ok := fields[beat.MetadataFieldKey].(map[string]any)
+	if !ok {
+		return nil
+	}
+	delete(fields, beat.MetadataFieldKey)
+
+	// we are deleting the @metadata.version and @metadata.type keys because they are already present in the event metadata
+	// See https://github.com/elastic/beats/blob/v9.3.3/libbeat/outputs/codec/json/event.go#L43-L54
+	delete(meta, otelctx.MetadataVersionKey)
+	delete(meta, "type")
+
+	if index != "" {
+		meta["beat"] = strings.ToLower(index)
+	}
+	return meta
 }

@@ -24,18 +24,18 @@ In the pull request, describe what your changes do and mention any bugs/issues r
 
 ## Setting Up Your Dev Environment [setting-up-dev-environment]
 
-The Beats are Go programs, so install the 1.22.10 version of [Go](http://golang.org/) which is being used for Beats development.
+The Beats are Go programs, so install the version of [Go](http://golang.org/) which is being used for Beats development. That version is pinned in [`.go-version`](https://github.com/elastic/beats/blob/main/.go-version) at the root of the repository, which is also what CI installs.
 
 After [installing Go](https://golang.org/doc/install), set the [GOPATH](https://golang.org/doc/code.md#GOPATH) environment variable to point to your workspace location, and make sure `$GOPATH/bin` is in your PATH.
 
 ::::{note}
-One deterministic manner to install the proper Go version to work with Beats is to use the [GVM](https://github.com/andrewkroh/gvm) Go version manager. An example for Mac users would be:
+One deterministic manner to install the proper Go version to work with Beats is to use the [GVM](https://github.com/andrewkroh/gvm) Go version manager. Run it from the root of your Beats clone so that it picks up the pinned version. An example for Mac users would be:
 ::::
 
 
 ```shell
-gvm use 1.22.10
-eval $(gvm 1.22.10)
+gvm use $(cat .go-version)
+eval $(gvm $(cat .go-version))
 ```
 
 Then you can clone Beats git repository:
@@ -165,7 +165,7 @@ All of the Beats documentation is located in the `elastic/beats` repository:
 * `beats/docs/reference` contains the docs for each individual Beat, as well as some content that is common to all Beats in the `beats/docs/reference/libbeat` directory.
 * `beats/docs/release-notes` contains all of the product update notes.
 
-Beginning with version 9.0.0, all Elastic documentation is sourced in Markdown format. For general information about contributing to the Elastic documentation, including versioning guidelines, a syntax reference, and more,  refer to the [Elastic Docs v3 welcome page](https://elastic.github.io/docs-builder/).
+Beginning with version 9.0.0, all Elastic documentation is sourced in Markdown and one page covers every version. To edit a Beats page, read [Contributing to the docs](/extend/contributing-docs.md). For the style guide, versioning, and syntax, read the [Elastic documentation contribution guide](https://www.elastic.co/docs/contribute-docs).
 
 ## Dependencies [dependencies]
 

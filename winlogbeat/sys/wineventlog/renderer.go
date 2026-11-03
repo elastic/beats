@@ -87,14 +87,31 @@ func (r *Renderer) Close() error {
 	)
 }
 
-// Render renders the event handle into an Event.
+// Render renders the event handle into an Event. It is RenderSystem followed
+// by RenderRemaining; call those directly to filter on the system properties
+// in between.
 func (r *Renderer) Render(handle EvtHandle) (*winevent.Event, string, error) {
-	event := &winevent.Event{}
-
-	if err := r.renderSystem(handle, event); err != nil {
-		return nil, "", fmt.Errorf("failed to render system properties: %w", err)
+	event, err := r.RenderSystem(handle)
+	if err != nil {
+		return nil, "", err
 	}
+	return r.RenderRemaining(handle, event)
+}
 
+// RenderSystem renders only the system properties of the event (provider,
+// event ID, level, time created, record ID, ...). It is much cheaper than
+// Render. Pass the result to RenderRemaining to finish rendering it.
+func (r *Renderer) RenderSystem(handle EvtHandle) (*winevent.Event, error) {
+	event := &winevent.Event{}
+	if err := r.renderSystem(handle, event); err != nil {
+		return nil, fmt.Errorf("failed to render system properties: %w", err)
+	}
+	return event, nil
+}
+
+// RenderRemaining renders the event data and message into an event whose
+// system properties were rendered by RenderSystem.
+func (r *Renderer) RenderRemaining(handle EvtHandle, event *winevent.Event) (*winevent.Event, string, error) {
 	// From this point on it will return both the event and any errors. It's
 	// critical to not drop data.
 	var errs []error

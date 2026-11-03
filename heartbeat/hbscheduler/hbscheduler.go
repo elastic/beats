@@ -1,0 +1,194 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+// Package hbscheduler shares Heartbeat schedulers between the Heartbeat
+// instances running in a process.
+//
+// A Heartbeat process has exactly one Heartbeat instance, and therefore one
+// scheduler, so `heartbeat.scheduler.limit` and the per job type
+// `heartbeat.jobs.<type>.limit` settings bound the concurrency of every monitor
+// it runs. That is no longer true when Heartbeat runs as an OTel receiver,
+// because a process then hosts one Heartbeat instance per receiver and each of
+// them would otherwise build its own scheduler, turning those settings from
+// process-wide bounds into per receiver bounds.
+//
+// Acquire hands out reference counted schedulers grouped by an opaque key, so
+// that instances which should share concurrency bounds also share a scheduler.
+// A standalone Heartbeat uses the empty, default, group, of which it is the
+// only member.
+package hbscheduler
+
+import (
+	"fmt"
+	"reflect"
+	"sync"
+	"time"
+
+	"github.com/elastic/beats/v7/heartbeat/config"
+	"github.com/elastic/beats/v7/heartbeat/scheduler"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+)
+
+// Params describes the scheduler a consumer asks for. Only the consumer that
+// creates a group's scheduler gets to configure it; see Acquire.
+type Params struct {
+	// Limit is the maximum number of concurrently running tasks. Values below
+	// one mean unlimited.
+	Limit int64
+	// Registry is where the scheduler publishes its metrics.
+	Registry *monitoring.Registry
+	// Location is the time zone schedules are evaluated in.
+	Location *time.Location
+	// JobLimitByType bounds concurrency per monitor type, e.g. `browser`.
+	JobLimitByType map[string]*config.JobLimit
+	// RunOnce puts the scheduler in run_once mode.
+	RunOnce bool
+}
+
+// settings are the Params a later consumer of a group may disagree with, in a
+// comparable form. The registry only matters to whoever creates the scheduler,
+// and run_once schedulers are never shared, see Acquire.
+type settings struct {
+	Limit     int64
+	Location  string
+	JobLimits map[string]int64
+}
+
+func (p Params) settings() settings {
+	jobLimits := make(map[string]int64, len(p.JobLimitByType))
+	for jobType, jobLimit := range p.JobLimitByType {
+		if jobLimit != nil {
+			jobLimits[jobType] = jobLimit.Limit
+		}
+	}
+	location := "Local"
+	if p.Location != nil {
+		location = p.Location.String()
+	}
+	return settings{Limit: p.Limit, Location: location, JobLimits: jobLimits}
+}
+
+// ReleaseFunc gives up a scheduler acquired with Acquire. It is safe to call
+// more than once, and from multiple goroutines. A group's scheduler is stopped
+// once every acquisition of it has been released.
+type ReleaseFunc func()
+
+type sharedScheduler struct {
+	group    string
+	sched    *scheduler.Scheduler
+	settings settings
+	runOnce  bool
+	users    int
+}
+
+// groups holds the scheduler handed out for each group.
+type groups struct {
+	mtx sync.Mutex
+	// schedulers is keyed by group. Entries are removed when their last
+	// consumer releases them.
+	schedulers map[string]*sharedScheduler
+}
+
+func newGroups() *groups {
+	return &groups{schedulers: map[string]*sharedScheduler{}}
+}
+
+// processGroups are the groups shared by every Heartbeat in this process.
+var processGroups = newGroups()
+
+// Acquire returns the scheduler shared by the given group, creating it from
+// params if the group does not have one yet. Later callers for the same group
+// reuse its running scheduler; their params are only used to warn about
+// settings that cannot be honored.
+//
+// A run_once scheduler is never shared: joining a group whose scheduler is, or
+// would have to be, in run_once mode is an error. WaitForRunOnce waits on a
+// sync.WaitGroup, and jobs that a consumer adds while another one waits on it
+// make it panic.
+//
+// The group is an opaque key. An empty group is the default group, which is
+// what a standalone Heartbeat process, the only Heartbeat instance in its
+// process, uses.
+//
+// The caller must invoke the returned ReleaseFunc once it is done with the
+// scheduler. A group's scheduler is stopped when its last consumer releases it,
+// and the next Acquire for the group creates a new one.
+func Acquire(logger *logp.Logger, group string, params Params) (*scheduler.Scheduler, ReleaseFunc, error) {
+	return processGroups.acquire(logger, group, params)
+}
+
+func (g *groups) acquire(logger *logp.Logger, group string, params Params) (*scheduler.Scheduler, ReleaseFunc, error) {
+	logger = logger.Named("hbscheduler").With("scheduler_group", group)
+
+	g.mtx.Lock()
+	defer g.mtx.Unlock()
+
+	shared, ok := g.schedulers[group]
+	if !ok {
+		shared = &sharedScheduler{
+			group: group,
+			sched: scheduler.Create(
+				params.Limit,
+				params.Registry,
+				params.Location,
+				params.JobLimitByType,
+				params.RunOnce,
+				logger,
+			),
+			settings: params.settings(),
+			runOnce:  params.RunOnce,
+		}
+		g.schedulers[group] = shared
+	} else if shared.runOnce || params.RunOnce {
+		// This also keeps a run_once scheduler, which WaitForRunOnce stops before
+		// it is released, from being handed out once stopped.
+		return nil, nil, fmt.Errorf(
+			"scheduler group %q is already in use, and run_once schedulers cannot be shared "+
+				"(running with run_once=%t, requested run_once=%t)",
+			group, shared.runOnce, params.RunOnce,
+		)
+	} else if requested := params.settings(); !reflect.DeepEqual(shared.settings, requested) {
+		logger.Warnf(
+			"reusing the scheduler already running for this group, ignoring its conflicting settings: running with %+v, requested %+v",
+			shared.settings, requested,
+		)
+	}
+
+	shared.users++
+	logger.Debugf("acquired shared scheduler, consumers: %d", shared.users)
+
+	var once sync.Once
+	return shared.sched, func() {
+		once.Do(func() { g.release(logger, shared) })
+	}, nil
+}
+
+func (g *groups) release(logger *logp.Logger, shared *sharedScheduler) {
+	g.mtx.Lock()
+	defer g.mtx.Unlock()
+
+	shared.users--
+	if shared.users > 0 {
+		logger.Debugf("released shared scheduler, consumers: %d", shared.users)
+		return
+	}
+
+	delete(g.schedulers, shared.group)
+	logger.Debug("released shared scheduler, stopping it as it has no consumers left")
+	shared.sched.Stop()
+}

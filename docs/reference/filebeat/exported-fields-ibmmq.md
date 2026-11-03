@@ -27,7 +27,7 @@ IBM MQ error logs
 
 
 **`ibmmq.errorlog.qmgr`**
-:   Name of the queue manager. Queue managers provide queuing services to applications, and manages the queues that belong to them.
+:   Name of the queue manager. Queue managers provide queuing services to applications, and manage the queues that belong to them.
 
     type: keyword
 
@@ -53,7 +53,7 @@ IBM MQ error logs
 
 
 **`ibmmq.errorlog.explanation`**
-:   Explaines the error in more detail
+:   Explains the error in more detail
 
     type: keyword
 

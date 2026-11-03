@@ -372,3 +372,23 @@ func TestReceiverHook(t *testing.T) {
 	// 	one for beat metrics.
 	oteltest.TestReceiverHook(t, &cfg, NewFactoryWithSettings(Settings{Home: t.TempDir()}), receiverSettings, 1)
 }
+
+func TestComponentLifecycle(t *testing.T) {
+	cfg := &Config{
+		Beatconfig: map[string]any{
+			"heartbeat": map[string]any{
+				"monitors": []map[string]any{
+					{
+						"type":     "tcp",
+						"id":       "lifecycle-tcp",
+						"schedule": "@every 60s",
+						"hosts":    []string{"localhost:0"},
+						"enabled":  true,
+					},
+				},
+			},
+			"path.home": t.TempDir(),
+		},
+	}
+	oteltest.CheckReceiverLifecycle(t, NewFactoryWithSettings(Settings{Home: t.TempDir()}), cfg)
+}

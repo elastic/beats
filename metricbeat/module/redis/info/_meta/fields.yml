@@ -246,12 +246,12 @@
               type: long
               format: bytes
               description: >
-                The size in bytes of copy-on-write allocations during the last RBD save operation
+                The size in bytes of copy-on-write allocations during the last RDB save operation
 
         - name: aof
           type: group
           description: >
-            Provides information about AOF persitence
+            Provides information about AOF persistence
           fields:
             - name: enabled
               type: boolean
@@ -261,7 +261,7 @@
             - name: rewrite.in_progress
               type: boolean
               description: >
-                Flag indicating a AOF rewrite operation is on-going
+                Flag indicating an AOF rewrite operation is on-going
             - name: rewrite.scheduled
               type: boolean
               description: >
@@ -285,7 +285,7 @@
             - name: bgrewrite.last_status
               type: keyword
               description: >
-                Status of the last AOF rewrite operatio
+                Status of the last AOF rewrite operation
 
             - name: write.last_status
               type: keyword
@@ -296,7 +296,7 @@
               type: long
               format: bytes
               description: >
-                The size in bytes of copy-on-write allocations during the last RBD save operation
+                The size in bytes of copy-on-write allocations during the last RDB save operation
 
             - name: buffer.size
               type: long

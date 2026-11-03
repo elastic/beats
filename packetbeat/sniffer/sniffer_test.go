@@ -22,12 +22,16 @@ package sniffer
 import (
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/google/gopacket/layers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/decoder"
+	"github.com/elastic/beats/v7/packetbeat/flows"
+	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -180,3 +184,117 @@ func TestEnsureDecoderReplaceErrorKeepsCurrentCleanup(t *testing.T) {
 	cleanup()
 	assert.Equal(t, 1, cleanupCalls)
 }
+
+// lifecycleCases cover both Run paths. The default route case is built from
+// a pcap file so that no real device or route is needed; the poll interval
+// is long enough that the poller never reports a route change, so only
+// cancellation can make Run return.
+var lifecycleCases = []struct {
+	name   string
+	device string
+	poll   time.Duration
+}{
+	{name: "static", device: ""},
+	{name: "default_route", device: "default_route", poll: time.Hour},
+}
+
+func TestSnifferStopRunLifecycle(t *testing.T) {
+	for _, test := range lifecycleCases {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
+			s := newTestFileSniffer(t, test.device, test.poll)
+
+			s.Stop()
+
+			done := make(chan error, 1)
+			go func() {
+				done <- s.Run()
+			}()
+
+			select {
+			case err := <-done:
+				assert.NoError(t, err, "Run should return cleanly after Stop-before-Run")
+			case <-time.After(5 * time.Second):
+				t.Fatal("Run did not return after Stop-before-Run")
+			}
+
+			for range 2 {
+				s.Stop()
+			}
+		})
+	}
+}
+
+func TestSnifferConcurrentStopRun(t *testing.T) {
+	for _, test := range lifecycleCases {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
+			const iterations = 50
+			for i := range iterations {
+				s := newTestFileSniffer(t, test.device, test.poll)
+
+				done := make(chan error, 1)
+				go func() {
+					done <- s.Run()
+				}()
+
+				for range 10 {
+					s.Stop()
+				}
+
+				select {
+				case err := <-done:
+					assert.NoError(t, err, "Run should return cleanly after concurrent Stop calls")
+				case <-time.After(5 * time.Second):
+					t.Fatalf("Run did not return after concurrent Stop calls on iteration %d", i)
+				}
+			}
+		})
+	}
+}
+
+func newTestFileSniffer(t *testing.T, device string, poll time.Duration) *Sniffer {
+	t.Helper()
+
+	// The file path in New skips device resolution, which is where the
+	// default route poller's metric is normally registered.
+	registerDefaultRouteMetricOnce()
+
+	logger := logp.NewLogger("sniffer_test")
+	decoders := map[string]Decoders{
+		device: func(dl layers.LinkType, _ string, _ int) (*decoder.Decoder, func(), error) {
+			dec, err := decoder.New(nil, dl, discardICMP{}, discardICMP{}, discardTCP{}, discardUDP{}, false, logger)
+			if err != nil {
+				return nil, nil, err
+			}
+			return dec, func() {}, nil
+		},
+	}
+	interfaces := []config.InterfaceConfig{{
+		Device:           device,
+		File:             "../tests/system/pcaps/http_x_forwarded_for.pcap",
+		Loop:             1000,
+		PollDefaultRoute: poll,
+	}}
+	s, err := New("test", true, "", decoders, interfaces, nil, logger)
+	require.NoError(t, err, "creating a file-backed sniffer should succeed")
+	return s
+}
+
+// The lifecycle tests only need a decoder that drains the pcap without
+// panicking, so every protocol processor discards what it is handed.
+type (
+	discardTCP  struct{}
+	discardUDP  struct{}
+	discardICMP struct{}
+)
+
+func (discardTCP) Process(_ *flows.FlowID, _ *layers.TCP, _ *protos.Packet) {}
+
+func (discardUDP) Process(_ *flows.FlowID, _ *protos.Packet) {}
+
+func (discardICMP) ProcessICMPv4(_ *flows.FlowID, _ *layers.ICMPv4, _ *protos.Packet) {}
+
+func (discardICMP) ProcessICMPv6(_ *flows.FlowID, _ *layers.ICMPv6, _ *protos.Packet) {}
