@@ -38,7 +38,7 @@ Read the [quick start](/reference/filebeat/filebeat-installation-configuration.m
 
 ## Compatibility [_compatibility_20]
 
-The Kibana modules is compatible with Kibana 6.3 and newer.
+The Kibana module is compatible with Kibana 6.3 and newer.
 
 
 ## Configure the module [configuring-kibana-module]

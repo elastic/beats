@@ -532,7 +532,7 @@ The `close.on_state_change.*` settings are applied asynchronously to read from a
 
 When this option is enabled, Filebeat closes the file handle if a file has not been harvested for the specified duration. The counter for the defined period starts when the last log line was read by the harvester. It is not based on the modification time of the file. If the closed file changes again, a new harvester is started and the latest changes will be picked up after `prospector.scanner.check_interval` has elapsed.
 
-We recommended that you set `close.on_state_change.inactive` to a value that is larger than the least frequent updates to your log files. For example, if your log files get updated every few seconds, you can safely set `close.on_state_change.inactive` to `1m`. If there are log files with very different update rates, you can use multiple configurations with different values.
+We recommend that you set `close.on_state_change.inactive` to a value that is larger than the least frequent updates to your log files. For example, if your log files get updated every few seconds, you can safely set `close.on_state_change.inactive` to `1m`. If there are log files with very different update rates, you can use multiple configurations with different values.
 
 Setting `close.on_state_change.inactive` to a lower value means that file handles are closed sooner. However this has the side effect that new log lines are not sent in near real time if the harvester is closed.
 
@@ -1066,6 +1066,11 @@ The supported configuration options are:
 
 **`resolve_ids`** {applies_to}`stack: ga 9.6.0+`
 :   (Optional) If `true`, UIDs and GIDs in coalesced events are resolved to names using the reading host's `/etc/passwd` and `/etc/group`. Only meaningful in `coalesce` mode. Defaults to `true`. Set to `false` when reading forwarded logs from a different host, where the local name database does not apply.
+
+**`include_raw_message`** {applies_to}`stack: ga 9.6.0+`
+:   (Optional) If `true`, the raw audit records that were reassembled into a coalesced event are kept as a list of `type=<record type> msg=<raw data>` strings in `auditd.messages`, and the `message` field is set to their newline-joined form. Only meaningful in `coalesce` mode. Defaults to `false`.
+
+    This is the filestream equivalent of the Auditbeat `auditd` module's [`include_raw_message`](/reference/auditbeat/auditbeat-module-auditd.md) option, but the records land in `auditd.messages` rather than `event.original`.
 
 Example configuration (per-line parsing, the default):
 
