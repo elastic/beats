@@ -21,11 +21,12 @@ package docker
 
 import (
 	"context"
-	"os"
 	"testing"
 
 	"github.com/moby/moby/client"
+	"github.com/moby/moby/client/pkg/versions"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
@@ -40,23 +41,29 @@ func TestNewClient(t *testing.T) {
 	_, err = c.ContainerList(context.Background(), client.ContainerListOptions{})
 	assert.NoError(t, err)
 
-	// This test only works on newer Docker versions (any supported one really)
-	switch c.ClientVersion() {
-	case "1.22":
-		t.Skip("Docker version is too old for this test")
-	case client.MaxAPIVersion:
-		t.Logf("Using default API version: %s", client.MaxAPIVersion)
-	default:
-		t.Logf("Negotiated version: %s", c.ClientVersion())
+	t.Logf("Negotiated version: %s", c.ClientVersion())
+
+	server, err := c.ServerVersion(context.Background(), client.ServerVersionOptions{})
+	require.NoError(t, err)
+
+	// Pin the oldest API version both the client and the daemon accept. Daemons
+	// reject versions below their minimum, so a fixed old version would break
+	// whenever the CI Docker is upgraded.
+	pinned := client.MinAPIVersion
+	if versions.GreaterThan(server.MinAPIVersion, pinned) {
+		pinned = server.MinAPIVersion
+	}
+	if pinned == c.ClientVersion() {
+		t.Skipf("daemon only supports API version %s, cannot test pinning a different version", pinned)
 	}
 
 	// Test we can hardcode version
-	os.Setenv("DOCKER_API_VERSION", "1.22")
+	t.Setenv("DOCKER_API_VERSION", pinned)
 
 	c, err = NewClient(client.DefaultDockerHost, nil, nil, logger)
 	assert.NoError(t, err)
 	assert.NotNil(t, c)
-	assert.Equal(t, "1.22", c.ClientVersion())
+	assert.Equal(t, pinned, c.ClientVersion(), "DOCKER_API_VERSION should override version negotiation")
 
 	_, err = c.ContainerList(context.Background(), client.ContainerListOptions{})
 	assert.NoError(t, err)
