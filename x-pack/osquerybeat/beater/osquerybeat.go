@@ -1100,6 +1100,9 @@ func (bt *osquerybeat) configurePublishers(inputs []config.InputConfig) error {
 // runOsquery, so that a policy that would fail them is rejected before any of
 // it is applied.
 func validatePolicy(ctx context.Context, log *logp.Logger, inputs []config.InputConfig) error {
+	if _, err := config.GetPublishingConfig(inputs); err != nil {
+		return err
+	}
 	if err := pub.CheckProcessors(inputs, log); err != nil {
 		return err
 	}
