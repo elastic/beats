@@ -416,3 +416,22 @@ func TestReceiverHook(t *testing.T) {
 	// 	one for beat metrics and one for input metrics.
 	oteltest.TestReceiverHook(t, &cfg, NewFactoryWithSettings(Settings{Home: t.TempDir()}), receiverSettings, 2)
 }
+
+func TestComponentLifecycle(t *testing.T) {
+	cfg := &Config{
+		Beatconfig: map[string]any{
+			"auditbeat": map[string]any{
+				"modules": []map[string]any{
+					{
+						"module":        "file_integrity",
+						"enabled":       true,
+						"paths":         []string{t.TempDir()},
+						"scan_at_start": false,
+					},
+				},
+			},
+			"path.home": t.TempDir(),
+		},
+	}
+	oteltest.CheckReceiverLifecycle(t, NewFactoryWithSettings(Settings{Home: t.TempDir()}), cfg)
+}

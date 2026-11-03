@@ -236,7 +236,12 @@ func scrubSlice[S ~[]E, E any](s *Scrubber, in S, key string) (S, bool) {
 		if out == nil {
 			out = slices.Clone(in)
 		}
-		out[i] = nv.(E)
+		typed, ok := nv.(E)
+		if !ok {
+			// Only reachable if value changed the type of an element.
+			continue
+		}
+		out[i] = typed
 	}
 	if out == nil {
 		return in, false

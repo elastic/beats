@@ -246,7 +246,7 @@
               type: long
               format: bytes
               description: >
-                The size in bytes of copy-on-write allocations during the last RBD save operation
+                The size in bytes of copy-on-write allocations during the last RDB save operation
 
         - name: aof
           type: group
@@ -261,7 +261,7 @@
             - name: rewrite.in_progress
               type: boolean
               description: >
-                Flag indicating a AOF rewrite operation is on-going
+                Flag indicating an AOF rewrite operation is on-going
             - name: rewrite.scheduled
               type: boolean
               description: >
@@ -296,7 +296,7 @@
               type: long
               format: bytes
               description: >
-                The size in bytes of copy-on-write allocations during the last RBD save operation
+                The size in bytes of copy-on-write allocations during the last RDB save operation
 
             - name: buffer.size
               type: long

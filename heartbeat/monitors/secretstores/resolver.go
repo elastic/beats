@@ -19,10 +19,13 @@ package secretstores
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 )
 
 // Resolver replaces secret references in monitor configurations.
@@ -42,9 +45,13 @@ func NewResolver(logger *logp.Logger) *Resolver {
 // configured store, in list order, replaced its references. cfg itself is not
 // modified. Without secret_stores, cfg is returned as is.
 //
+// If a connection with allowed_hosts replaced references, every host that
+// destinations returns for the resolved config must be allowed. A nil
+// destinations means the monitor type can't use such connections.
+//
 // The Scrubber removes the substituted secret values from what the monitor
 // publishes. It is nil if there is nothing to scrub.
-func (r *Resolver) Resolve(cfg *conf.C) (*conf.C, *Scrubber, error) {
+func (r *Resolver) Resolve(cfg *conf.C, destinations plugin.DestinationsFunc) (*conf.C, *Scrubber, error) {
 	entries, err := configEntries(cfg)
 	if err != nil || len(entries) == 0 {
 		return cfg, nil, err
@@ -56,14 +63,31 @@ func (r *Resolver) Resolve(cfg *conf.C) (*conf.C, *Scrubber, error) {
 	}
 	var t tracker
 	ctx := withTracker(context.Background(), &t)
-	for _, e := range entries {
+	scopes := scopes(entries)
+	var usedRestricted []entry
+	for i, e := range entries {
 		s, err := sharedStores.get(e, r.logger)
 		if err != nil {
 			return nil, nil, err
 		}
-		if resolved, err = s.Replace(ctx, resolved); err != nil {
-			return nil, nil, fmt.Errorf("could not resolve %s secret references: %w", e.storeType, err)
+		next, err := s.Replace(ctx, resolved, scopes[i])
+		if err != nil {
+			if errors.Is(err, ErrSelection) {
+				return nil, nil, fmt.Errorf("%s: %w", ConfigKey, err)
+			}
+			return nil, nil, fmt.Errorf("could not resolve %s secret references: %w", e.label(), err)
 		}
+		// Replace returns its input when it has no references of the entry.
+		if next != resolved && e.isRestricted() {
+			usedRestricted = append(usedRestricted, e)
+		}
+		resolved = next
+	}
+	// Checking the resolved config covers destinations and references that
+	// come from secret values.
+	monitorType, _ := cfg.String("type", -1)
+	if err := checkAllowedHosts(usedRestricted, monitorType, destinations, resolved); err != nil {
+		return nil, nil, err
 	}
 	return resolved, t.scrubber(), nil
 }
@@ -80,14 +104,18 @@ func (r *Resolver) Validate(cfg *conf.C) error {
 	if err != nil {
 		return err
 	}
-	for _, e := range entries {
+	scopes := scopes(entries)
+	for i, e := range entries {
 		// A new store, so validation never shares state with running monitors.
 		s, err := newStore(e, r.logger)
 		if err != nil {
 			return err
 		}
-		if err := s.Validate(monitorCfg); err != nil {
-			return fmt.Errorf("invalid %s secret references: %w", e.storeType, err)
+		if err := s.Validate(monitorCfg, scopes[i]); err != nil {
+			if errors.Is(err, ErrSelection) {
+				return fmt.Errorf("%s: %w", ConfigKey, err)
+			}
+			return fmt.Errorf("invalid %s secret references: %w", e.label(), err)
 		}
 	}
 	return nil

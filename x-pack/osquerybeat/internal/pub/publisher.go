@@ -5,7 +5,9 @@
 package pub
 
 import (
+	"fmt"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -16,6 +18,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -37,42 +40,44 @@ type Publisher struct {
 	// client for osquery_manager.query_profile
 	queryProfileClient    beat.Client
 	profileDropWarnLogged bool
+
+	// Scheduled profiling must not wait behind a result publication holding mx.
+	scheduledProfileMu      sync.Mutex
+	scheduledProfile        *scheduledProfileSink
+	scheduledProfileClosed  bool
+	scheduledProfileMissing bool
+	scheduledProfileDropped *monitoring.Uint
+	scheduledProfileWarning atomic.Int64
 }
 
 func New(b *beat.Beat, log *logp.Logger) *Publisher {
+	reg := b.Monitoring.StatsRegistry()
+	if reg == nil {
+		reg = monitoring.NewRegistry()
+	}
 	return &Publisher{
-		b:   b,
-		log: log,
+		b:                       b,
+		log:                     log,
+		scheduledProfileDropped: monitoring.NewUint(reg.GetOrCreateRegistry("osquerybeat.scheduled_query_profiles"), "dropped.output_full"),
 	}
 }
 
+// Configure replaces the clients for the given inputs. It must be called from a
+// single goroutine; only Close may run concurrently with it.
 func (p *Publisher) Configure(inputs []config.InputConfig) error {
+	// Policy replacement must invalidate delayed profiles even while a result
+	// publication holds mx, and even when all inputs have been removed.
+	p.retireScheduledProfileSink()
+	p.mx.Lock()
+	defer p.mx.Unlock()
 	if len(inputs) == 0 {
 		return nil
 	}
 
-	p.mx.Lock()
-	defer p.mx.Unlock()
-
-	// Locate each stream by dataset so that delivery order does not affect
-	// which client handles which data stream. The first input for a dataset wins.
-	resultInput := config.ResultInput(inputs)
-	var actionResponsesInput, profileInput *config.InputConfig
-	for i := range inputs {
-		switch inputs[i].Datastream.Dataset {
-		case config.DefaultActionResponsesDataset:
-			if actionResponsesInput == nil {
-				actionResponsesInput = &inputs[i]
-			}
-		case config.DefaultQueryProfileDataset:
-			if profileInput == nil {
-				profileInput = &inputs[i]
-			}
-		}
-	}
+	resultInput, actionResponsesInput, profileInput := streamInputs(inputs)
 
 	if resultInput != nil {
-		processors, err := p.processorsForInputConfig(*resultInput, config.DefaultDataset)
+		processors, err := processorsForInputConfig(*resultInput, config.DefaultDataset, p.log)
 		if err != nil {
 			return err
 		}
@@ -98,7 +103,7 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 
 	// Attach DefaultActionResponsesDataset if present
 	if actionResponsesInput != nil {
-		processors, err := p.processorsForInputConfig(*actionResponsesInput, config.DefaultActionResponsesDataset)
+		processors, err := processorsForInputConfig(*actionResponsesInput, config.DefaultActionResponsesDataset, p.log)
 		if err != nil {
 			return err
 		}
@@ -130,7 +135,7 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 	// Attach optional query profiling stream if present. For query profile events to be
 	// published, the integration must include a stream with dataset osquery_manager.query_profile.
 	if profileInput != nil {
-		processors, err := p.processorsForInputConfig(*profileInput, config.DefaultQueryProfileDataset)
+		processors, err := processorsForInputConfig(*profileInput, config.DefaultQueryProfileDataset, p.log)
 		if err != nil {
 			return err
 		}
@@ -149,6 +154,11 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 		if oldClient != nil {
 			oldClient.Close()
 		}
+		if resultInput != nil {
+			if err := p.configureScheduledProfileSink(*resultInput, *profileInput); err != nil {
+				return err
+			}
+		}
 	} else {
 		if p.queryProfileClient != nil {
 			p.queryProfileClient.Close()
@@ -156,6 +166,55 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 		}
 	}
 	return nil
+}
+
+// CheckProcessors returns an error if the processors that Configure would
+// build for inputs cannot be built. It builds them and closes them again, so
+// each policy builds its processors one extra time; some processors, such as
+// add_cloud_metadata, do work when they are built.
+func CheckProcessors(inputs []config.InputConfig, log *logp.Logger) error {
+	result, actionResponses, profile := streamInputs(inputs)
+	for _, s := range []struct {
+		in      *config.InputConfig
+		dataset string
+	}{
+		{result, config.DefaultDataset},
+		{actionResponses, config.DefaultActionResponsesDataset},
+		{profile, config.DefaultQueryProfileDataset},
+	} {
+		if s.in == nil {
+			continue
+		}
+		procs, err := processorsForInputConfig(*s.in, s.dataset, log)
+		if err != nil {
+			return fmt.Errorf("invalid processors for %s: %w", s.dataset, err)
+		}
+		if err := processors.Close(procs); err != nil {
+			log.Warnf("Failed to close the processors built to check the %s policy: %v", s.dataset, err)
+		}
+	}
+	return nil
+}
+
+// streamInputs returns the inputs for the result, action responses and query
+// profile streams, or nil for a stream with no input. Each stream is located
+// by dataset so that delivery order does not affect which client handles which
+// data stream. The first input for a dataset wins.
+func streamInputs(inputs []config.InputConfig) (result, actionResponses, profile *config.InputConfig) {
+	result = config.ResultInput(inputs)
+	for i := range inputs {
+		switch inputs[i].Datastream.Dataset {
+		case config.DefaultActionResponsesDataset:
+			if actionResponses == nil {
+				actionResponses = &inputs[i]
+			}
+		case config.DefaultQueryProfileDataset:
+			if profile == nil {
+				profile = &inputs[i]
+			}
+		}
+	}
+	return result, actionResponses, profile
 }
 
 func (p *Publisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any) {
@@ -170,6 +229,12 @@ func (p *Publisher) Publish(index, idValue, idFieldKey, responseID, spaceID, pac
 }
 
 func (p *Publisher) Close() {
+	// Once closed is set, configureScheduledProfileSink installs no new lease,
+	// so a single retire covers one installed earlier.
+	p.scheduledProfileMu.Lock()
+	p.scheduledProfileClosed = true
+	p.scheduledProfileMu.Unlock()
+	p.retireScheduledProfileSink()
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
@@ -271,7 +336,7 @@ func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID, 
 		return
 	}
 
-	fields := queryProfileToEvent(queryName, actionID, responseID, spaceID, profile, reqData)
+	fields := queryProfileToEvent(queryName, actionID, responseID, spaceID, profile, reqData, "", 0)
 
 	event := beat.Event{
 		Timestamp: time.Now(),
@@ -287,7 +352,7 @@ func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID, 
 }
 
 // queryProfileToEvent builds the field set for a query profile document.
-func queryProfileToEvent(queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) mapstr.M {
+func queryProfileToEvent(queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any, scheduleID string, scheduleExecutionCount int64) mapstr.M {
 	fields := mapstr.M{
 		"type": "osquery_profile",
 		"event": map[string]any{
@@ -308,6 +373,10 @@ func queryProfileToEvent(queryName, actionID, responseID, spaceID string, profil
 	}
 	if spaceID != "" {
 		fields["space_id"] = spaceID
+	}
+	if scheduleID != "" {
+		fields["schedule_id"] = scheduleID
+		fields["schedule_execution_count"] = scheduleExecutionCount
 	}
 	if reqData != nil {
 		fields["action_data"] = reqData
@@ -353,8 +422,8 @@ func actionResultToEvent(req, res map[string]any) map[string]any {
 	return m
 }
 
-func (p *Publisher) processorsForInputConfig(inCfg config.InputConfig, defaultDataset string) (procs *processors.Processors, err error) {
-	procs = processors.NewList(p.log)
+func processorsForInputConfig(inCfg config.InputConfig, defaultDataset string, log *logp.Logger) (procs *processors.Processors, err error) {
+	procs = processors.NewList(log)
 
 	// Use only first input processor.
 	// When Processors is empty, the data_stream processor is not added; Fleet-managed inputs
@@ -381,7 +450,7 @@ func (p *Publisher) processorsForInputConfig(inCfg config.InputConfig, defaultDa
 
 		procs.AddProcessor(add_data_stream.New(ds))
 
-		userProcs, err := processors.New(inCfg.Processors, p.log)
+		userProcs, err := processors.New(inCfg.Processors, log)
 		if err != nil {
 			return nil, err
 		}

@@ -5,7 +5,8 @@
 // Package vault implements the "vault" secret store for Heartbeat monitors:
 // HashiCorp Vault KV v2 secrets, read with token or AppRole authentication.
 //
-// References have the form vault://<path>#<field>, where path is relative to
+// References have the form vault://<name>@<path>#<field>, where name is the
+// name of the secret_stores entry and path is relative to
 // the configured KV mount. Path and field are percent-decoded.
 package vault
 

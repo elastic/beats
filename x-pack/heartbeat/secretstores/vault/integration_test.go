@@ -133,10 +133,11 @@ func TestIntegrationHTTPMonitor(t *testing.T) {
 		"name":                  "vault-it",
 		"schedule":              "@every 1m",
 		"urls":                  []string{srv.URL},
-		"check.request.headers": map[string]any{"Authorization": "Bearer vault://" + itPath + "#token"},
+		"check.request.headers": map[string]any{"Authorization": "Bearer vault://main@" + itPath + "#token"},
 		"check.response.status": []int{200},
 		secretstores.ConfigKey: []any{map[string]any{
 			"type":    storeType,
+			"name":    "main",
 			"address": itAddress(),
 			"auth":    map[string]any{"approle": map[string]any{"role_id": fx.roleID, "secret_id": fx.secretID}},
 		}},
@@ -144,11 +145,11 @@ func TestIntegrationHTTPMonitor(t *testing.T) {
 	require.NoError(t, err, "monitor config must be valid")
 
 	logger := logptest.NewTestingLogger(t, "")
-	resolved, _, err := secretstores.NewResolver(logger).Resolve(cfg)
-	require.NoError(t, err, "references must resolve")
-
 	factory, ok := plugin.GlobalPluginsReg.Get("http")
 	require.True(t, ok, "the http plugin must be registered")
+	resolved, _, err := secretstores.NewResolver(logger).Resolve(cfg, factory.Destinations)
+	require.NoError(t, err, "references must resolve")
+
 	p, err := factory.Make("http", resolved, beat.Info{Logger: logger})
 	require.NoError(t, err, "the http plugin must be created")
 	defer p.Close()

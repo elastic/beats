@@ -611,7 +611,7 @@
     - name: signature_msg
       type: keyword
       description: |
-        Signature messsage
+        Signature message
     - name: site_category
       type: keyword
       description: |

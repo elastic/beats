@@ -7,92 +7,80 @@ applies_to:
 
 # Contributing to the docs
 
-The Beats documentation is written in Markdown and is built using [elastic/docs-builder](https://github.com/elastic/docs-builder).
+The Beats documentation is Markdown in `docs/`, built by [docs-builder](https://github.com/elastic/docs-builder). `docs/docset.yml` defines the docset.
+
+Beats does not publish production docs from `main`. The branch each published environment builds is the `beats` entry in [docs-builder `assembler.yml`](https://github.com/elastic/docs-builder/blob/main/config/assembler.yml): production builds `current`, staging builds `next`, and edge builds `edge`. Read those three refs there. A docs change is on the live site only once it is on the `current` branch. Open the pull request against `main`, as [Contribute to Beats](/extend/index.md#contribution-steps) describes, and backport it to the `current` branch when it should be live now.
+
+* `docs/reference/<beat>/` is the reference for that Beat. `docs/reference/libbeat/` is shared by all Beats.
+* `docs/extend/` is this developer guide.
+* `docs/release-notes/` holds the breaking changes, deprecations, and known issues. Its top-level pages are maintained by hand. The release entries under `_snippets/` are generated from changelog fragments by `.github/workflows/release-notes.yml`.
+* `docs/reference/_snippets/` holds text included by more than one page. Edit a snippet only when every page that includes it should change.
+
+For wording, follow the [Elastic style guide](https://www.elastic.co/docs/contribute-docs/style-guide). Write what you can now do, see, or configure. Use "you", present tense, and sentence case headings. Put settings, field names, and file names in backticks.
+
+Product names that have a substitution in `docs/docset.yml` are written as `{{filebeat}}`, `{{agent}}`, `{{kib}}`, and the rest of that list. Match the page you are editing.
+
+## Where to add something [where-to-add]
+
+Add to the page that already covers the topic. Add a new page only when no existing page can carry it, and then add it to that section's `toc.yml`.
+
+Look through `docs/` and the published docs before you add a page. Each fact belongs in one place. Link to it from the other pages instead of repeating it.
+
+A page you move, rename, or delete needs an entry in `docs/redirects.yml`.
+
+Link to a page in another Elastic docset with its docset link (`docs-content://...`, `integration-docs://...`), not with a URL on `elastic.co`.
 
 ## Cumulative docs [cumulative-docs]
 
-Starting with Elastic Stack version 9.0.0 we no longer publish a new documentation set for every minor release.
-This means that a single page should stay valid over time and use version-related tags to illustrate how the product has evolved.
+Since Elastic Stack 9.0.0, one page stays valid across versions. Mark a version or deployment difference with `applies_to` on the page or on the section that differs, instead of copying the page. Read [Write cumulative documentation](https://www.elastic.co/docs/contribute-docs/how-to/cumulative-docs) and the [`applies_to` reference](https://www.elastic.co/docs/contribute-docs/how-to/cumulative-docs/reference).
 
-For information on labeling manually maintained content with product lifecycle and versioning information, refer to [Write cumulative documentation](https://elastic.github.io/docs-builder/contribute/cumulative-docs/).
+When a GA or deprecated feature, field, or setting is removed from a versioned product, keep the content and mark it `removed <version>` with `applies_to`. Readers on versions that still have it need the page. Delete it only when it was only ever a preview or beta, or only ever existed in a product that has no versions.
 
-For generated content, read more in [Update `fields.yml`](#update-fields).
+For generated content, the version label comes from `fields.yml`. See [Update `fields.yml`](#update-fields). Do not edit `applies_to` in the generated Markdown. The next `make update` overwrites it.
 
 ## Generated docs [generated-docs]
 
-Many Markdown files in the Beats repo should be edited directly, but some are generated including:
+Edit most Markdown files directly. These are generated, and each one says so with `% This file is generated!` at the top of the body:
 
-* Exported fields (for example, [AWS fields](/reference/metricbeat/exported-fields-aws.md))
-* Module docs (for example, [AWS module](/reference/metricbeat/metricbeat-module-aws.md))
-* Metricset and dataset docs (for example, [AWS billing metricset](/reference/metricbeat/metricbeat-metricset-aws-billing.md))
+* Exported fields, for example [AWS fields](/reference/metricbeat/exported-fields-aws.md)
+* Module docs, for example the [AWS module](/reference/metricbeat/metricbeat-module-aws.md)
+* Metricset and dataset docs, for example the [AWS billing metricset](/reference/metricbeat/metricbeat-metricset-aws-billing.md)
 
-:::{tip}
-Every Markdown file that is generated includes a code comment at the top of the content that states `% This file is generated!`.
-:::
+The comment names the script that writes the file. Edit the source, then regenerate. An edit to the generated file is overwritten on the next run.
 
 ### Update `fields.yml` [update-fields]
 
-The `fields.yml` files in `_meta` directories across individual beats contain descriptions of fields available in the module, dataset, fileset, or metricset. Here are some tips for optimizing `fields.yml` for generating docs:
+The `fields.yml` files in `_meta` directories describe the fields a module, dataset, fileset, or metricset emits.
 
-* The `title` is used as a page title in the docs, so it’s best to capitalize it.
-* The `description` at all levels should be written in full sentences and include punctuation.
-* The `version` at all levels is used to label docs with product lifecycle and version-related
-  information that illustrates how the product has evolved over time, which is important to
-  [writing docs cumulatively](#cumulative-docs). Some tips for using `version`:
+* `title` becomes the page title, so capitalize it.
+* `description` is full sentences with punctuation.
+* `version` becomes the `applies_to` label on the generated page. Use `preview`, `beta`, `ga`, `deprecated`, and `removed`. A field can carry more than one, to show how it changed:
 
-  * Supported product lifecycles include `preview`, `beta`, `ga`, and `deprecated`.
-  * Multiple product lifecycles can exist for the same module or field to illustrate how it changed over time.
-  * The version number can be in major, minor, or patch format, but the resulting rendered label will always resolve to the patch level.
-  * Here's an example of `version` for a field that went through all product lifecycles:
-    ```yaml
-    version:
-      preview: 9.0.0
-      beta: 9.1.0
-      ga: 9.2.0
-      deprecated: 9.3.0
-    ```
+```yaml
+version:
+  preview: 9.0.0
+  beta: 9.1.0
+  ga: 9.2.0
+  deprecated: 9.3.0
+```
 
-### Update `docs.md`
+The source can include a patch version, but the rendered badge displays the major and minor version and applies to the latest patch of that minor.
 
-The `docs.md` files in `_meta` directories are used for generated module documentation.
+### Update `docs.md` [update-docs]
 
-### Generate the docs
+The `docs.md` files in `_meta` directories are the source for generated module documentation.
 
-After updating `fields.yml` and `docs.md` files in `_meta` directories,
-you must run the doc collector scripts to regenerate the docs:
+### Generate the docs [generate-the-docs]
 
-1. Make sure you [set up your Beats development environment](./index.md#setting-up-dev-environment)
-  and use the correct Go version.
-    * The Go version is listed in the `version.asciidoc` file for the branch you want to update.
-1. Change to the beats repo directory.
-1. Run `make update` to run the docs collector scripts.
+After you edit `fields.yml` or `docs.md`, regenerate from the repository root:
 
-    ::::{warning}
-    The `make update` command overwrites files in the `docs` directories **without warning**. If you accidentally update a generated file and run `make update`, your changes will be overwritten.
-    ::::
+1. Use the Go version in `.go-version` at the root of the branch you are updating. See [Setting up your dev environment](./index.md#setting-up-dev-environment).
+2. Run `make update`.
 
-    The `make` command calls the following scripts to generate the docs:
+::::{warning}
+`make update` overwrites generated files in `docs/` with no prompt. A hand edit to a generated file is lost the next time it runs.
+::::
 
-    * [**`auditbeat/scripts/mage/docs.go`**](https://github.com/elastic/beats/blob/main/auditbeat/scripts/mage/docs.go) generates:
-        * `docs/reference/auditbeat/auditbeat-modules.md`
-        * `docs/reference/auditbeat/auditbeat-module-*.md`
-    * [**`filebeat/scripts/mage/docs.go`**](https://github.com/elastic/beats/blob/main/filebeat/scripts/mage/docs.go) generates:
-      * `docs/reference/filebeat/filebeat-modules.md`
-      * `docs/reference/filebeat/filebeat-module-*.md`
-    * [**`metricbeat/scripts/mage/docs_collector.go`**](https://github.com/elastic/beats/blob/main/metricbeat/scripts/mage/docs_collector.go) generates:
-      * `docs/reference/metricbeat/metricbeat-modules.md`
-      * `docs/reference/metricbeat/metricbeat-module-*.md`
-    * [**`dev-tools/mage/generate_fields_docs.go`**](https://github.com/elastic/beats/blob/main/dev-tools/mage/generate_fields_docs.go) generates:
-      * `docs/reference/auditbeat/exported-fields.md`
-      * `docs/reference/filebeat/exported-fields.md`
-      * `docs/reference/heartbeat/exported-fields.md`
-      * `docs/reference/metricbeat/exported-fields.md`
-      * `docs/reference/packetbeat/exported-fields.md`
-      * `docs/reference/winlogbeat/exported-fields.md`
+Each generated file names the script that writes it in the `% This file is generated!` comment. That comment is the list. It stays right when a script moves, and a list kept here would not.
 
-1. (Optional) To format your files, you might also need to run this command:
-    ```sh
-    make fmt
-    ```
-
-
+A docs-only change does not get a changelog fragment. Add the `skip-changelog` label. A user-visible behavior change still gets a fragment, as `AGENTS.md` describes, and the fragment stays out of the doc page.

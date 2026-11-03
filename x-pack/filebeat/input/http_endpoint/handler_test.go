@@ -8,6 +8,8 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"flag"
 	"io"
@@ -26,7 +28,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/testing/testutils"
+	confpkg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/lumberjack"
@@ -1015,4 +1019,107 @@ func TestConcurrentRequestsExceedHighWater(t *testing.T) {
 	assert.Equal(t, http.StatusOK, slowReqStatus)
 	// The fast request should be rejected with 503 (in-flight was above high water).
 	assert.Equal(t, http.StatusServiceUnavailable, fastReqStatus)
+}
+
+func TestHMACMaxInFlightResponse(t *testing.T) {
+	// Unpack the configuration as the input does, so that derived
+	// defaults such as the in-flight water marks are set.
+	c := defaultConfig()
+	cfg, err := confpkg.NewConfigWithYAML([]byte(`
+hmac.header: Test-HMAC
+hmac.key: Test-HMAC-Key-Longer-Than-112-Bits
+hmac.type: sha256
+max_in_flight_bytes: 50
+retry_after: 7
+`), "hmac_max_in_flight")
+	if err != nil {
+		t.Fatalf("failed to parse YAML config: %v", err)
+	}
+	err = cfg.Unpack(&c)
+	if err != nil {
+		t.Fatalf("failed to unpack config: %v", err)
+	}
+
+	var pub publisher
+	metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+	h, ok := newHandler(t.Context(), c, nil, pub.Publish, nil, logptest.NewTestingLogger(t, ""), metrics).(*handler)
+	if !ok {
+		t.Fatal("newHandler did not return a *handler")
+	}
+
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", bytes.NewReader(make([]byte, 100)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Test-HMAC", hex.EncodeToString(make([]byte, sha256.Size)))
+	rec := httptest.NewRecorder()
+
+	h.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusServiceUnavailable {
+		t.Errorf("ServeHTTP() status = %d; want %d", rec.Code, http.StatusServiceUnavailable)
+	}
+	if got, want := rec.Header().Get("Retry-After"), "14"; got != want {
+		t.Errorf("ServeHTTP() Retry-After = %q; want %q", got, want)
+	}
+	if got, want := rec.Header().Get("Content-Type"), "application/json"; got != want {
+		t.Errorf("ServeHTTP() Content-Type = %q; want %q", got, want)
+	}
+	if got := h.inFlight.Load(); got != 0 {
+		t.Errorf("in-flight bytes after ServeHTTP() = %d; want 0", got)
+	}
+}
+
+// tallyReader counts the bytes read through it.
+type tallyReader struct {
+	r io.Reader
+	n int64
+}
+
+func (t *tallyReader) Read(p []byte) (int, error) {
+	n, err := t.r.Read(p)
+	t.n += int64(n)
+	return n, err
+}
+
+func TestHMACBodyLimitWithTracer(t *testing.T) {
+	c := defaultConfig()
+	cfg, err := confpkg.NewConfigWithYAML([]byte(`
+hmac.header: Test-HMAC
+hmac.key: Test-HMAC-Key-Longer-Than-112-Bits
+hmac.type: sha256
+tracer:
+  enabled: true
+  filename: `+filepath.Join(t.TempDir(), "trace.ndjson")+`
+`), "hmac_tracer")
+	if err != nil {
+		t.Fatalf("failed to parse YAML config: %v", err)
+	}
+	err = cfg.Unpack(&c)
+	if err != nil {
+		t.Fatalf("failed to unpack config: %v", err)
+	}
+
+	var pub publisher
+	metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+	h := newHandler(t.Context(), c, nil, pub.Publish, nil, logptest.NewTestingLogger(t, ""), metrics)
+
+	// The request is rejected as too large, and the request tracer must
+	// not then read the rest of what the client is sending.
+	body := &tallyReader{r: bytes.NewReader(make([]byte, hmacBodyLimit+10*maxLogBodyLen))}
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", body)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Test-HMAC", hex.EncodeToString(make([]byte, sha256.Size)))
+	rec := httptest.NewRecorder()
+
+	h.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusRequestEntityTooLarge {
+		t.Errorf("ServeHTTP() status = %d; want %d", rec.Code, http.StatusRequestEntityTooLarge)
+	}
+	// The validator reads one byte past its limit, and the tracer at most
+	// one byte past what it logs. The lower bound guards against the tally
+	// not counting, which would make the upper bound pass vacuously.
+	lo, hi := int64(hmacBodyLimit+1), int64(hmacBodyLimit+1+maxLogBodyLen+1)
+	if body.n < lo || body.n > hi {
+		t.Errorf("ServeHTTP() read %d bytes of the body; want between %d and %d", body.n, lo, hi)
+	}
 }

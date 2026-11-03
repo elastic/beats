@@ -66,9 +66,9 @@ func (s *switchableStore) set(value string, err error) {
 	s.value, s.err = value, err
 }
 
-func (s *switchableStore) Validate(*conf.C) error { return nil }
+func (s *switchableStore) Validate(*conf.C, secretstores.Scope) error { return nil }
 
-func (s *switchableStore) Replace(ctx context.Context, cfg *conf.C) (*conf.C, error) {
+func (s *switchableStore) Replace(ctx context.Context, cfg *conf.C, _ secretstores.Scope) (*conf.C, error) {
 	s.mtx.Lock()
 	defer s.mtx.Unlock()
 	if s.err != nil {
@@ -133,7 +133,7 @@ func captureMonitorConf(t *testing.T, monitorType string, withSecretStores bool)
 		"header":   unresolvedHeader,
 	}
 	if withSecretStores {
-		m[secretstores.ConfigKey] = []any{map[string]any{"type": testStoreType}}
+		m[secretstores.ConfigKey] = []any{map[string]any{"type": testStoreType, "name": "main"}}
 	}
 	cfg, err := conf.NewConfigFrom(m)
 	require.NoError(t, err, "test config must be valid")

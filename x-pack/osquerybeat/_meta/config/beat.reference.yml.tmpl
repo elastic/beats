@@ -16,6 +16,9 @@ osquerybeat:
 #            # osquery_manager.query_profile data stream for all queries (enabled by default).
 #            # Individual queries may override this with their own profiling flag. Requires the
 #            # query_profile input stream.
+#            # Scheduled profiles are collected asynchronously and published best effort: a full
+#            # slab queue (OTel runtime) drops them, the memory queue can make them wait for a
+#            # slot. Counters are under osquerybeat.scheduled_query_profiles.
 #            #profiling_all: true
 #            storage:
 #              # Enable local storage of live query profiles (for diagnostics).

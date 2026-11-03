@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"slices"
 	"sync"
 	"testing"
 	"time"
@@ -17,6 +18,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
@@ -43,13 +45,16 @@ func (m *mockOsqueryd) Check(ctx context.Context) error {
 	return m.checkErr
 }
 
-func (m *mockOsqueryd) Run(ctx context.Context, flags osqd.Flags) error {
+func (m *mockOsqueryd) Run(ctx context.Context, flags osqd.Flags, onExit func(error)) error {
 	if m.runDelay > 0 {
 		select {
 		case <-time.After(m.runDelay):
 		case <-ctx.Done():
 			return ctx.Err()
 		}
+	}
+	if onExit != nil {
+		onExit(m.runErr)
 	}
 	return m.runErr
 }
@@ -118,7 +123,7 @@ func (m *testManager) Stop() {
 	m.stopped = true
 }
 func (m *testManager) SetPayload(map[string]any)           {}
-func (m *testManager) Enabled() bool                       { return true }
+func (m *testManager) ConfigFromControlProtocol() bool     { return true }
 func (m *testManager) AgentInfo() management.AgentInfo     { return management.AgentInfo{} }
 func (m *testManager) SetStopCallback(func())              {}
 func (m *testManager) CheckRawConfig(*agentconfig.C) error { return nil }
@@ -207,6 +212,85 @@ func TestOsquerybeatManagerInitializationWaitsForCheck(t *testing.T) {
 	case <-time.After(5 * time.Second):
 		t.Fatal("Run did not stop")
 	}
+}
+
+func TestOsquerybeatRejectedPolicyKeepsRunning(t *testing.T) {
+	ob, b, mgr := newStatusTestBeater(t, func(ob *osquerybeat) {
+		ob.osquerydFactory = func(string, ...osqd.Option) (osqd.Runner, error) {
+			return &mockOsqueryd{runErr: context.Canceled}, nil
+		}
+	})
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- ob.Run(b)
+	}()
+	require.Eventually(t, func() bool {
+		mgr.mx.Lock()
+		defer mgr.mx.Unlock()
+		return mgr.postInitialized
+	}, 5*time.Second, 10*time.Millisecond, "osquerybeat should finish initialization")
+
+	// The ECS mapping for user.id has an empty field and no value, so
+	// osquerybeat cannot apply this policy.
+	bad := agentconfig.MustNewConfigFrom(map[string]any{
+		"data_stream": map[string]any{"dataset": config.DefaultDataset},
+		"osquery": map[string]any{"schedule": map[string]any{"users": map[string]any{
+			"query": "SELECT 1", "interval": 60,
+			"ecs_mapping": map[string]any{"user": map[string]any{"id": map[string]any{"field": ""}}},
+		}}},
+	})
+	err := b.Registry.GetInputList().Reload([]*reload.ConfigWithMeta{{Config: bad, InputUnitID: "osquery-unit"}})
+	var unitErr cfgfile.UnitError
+	assert.ErrorAs(t, err, &unitErr, "a policy with an invalid ECS mapping must fail its unit")
+	select {
+	case err := <-errCh:
+		t.Fatalf("Run returned after a rejected policy: %v", err)
+	case <-time.After(200 * time.Millisecond):
+	}
+
+	ob.Stop()
+	select {
+	case err := <-errCh:
+		assert.ErrorIs(t, err, context.Canceled, "Run should stop after cancellation")
+	case <-time.After(5 * time.Second):
+		t.Fatal("Run did not stop")
+	}
+}
+
+func TestReloadSendsUnvalidatedInputs(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "unvalidated-inputs")
+	registry := reload.NewRegistry()
+	updates := config.WatchInputs(t.Context(), log, registry, func(inputs []config.InputConfig) error {
+		return validatePolicy(t.Context(), log, inputs)
+	})
+	// Set fills query defaults, merges pack defaults and adds stream packs to
+	// the inputs it is given.
+	cfg := agentconfig.MustNewConfigFrom(map[string]any{
+		"name":        "osquery-manager-1",
+		"data_stream": map[string]any{"dataset": config.DefaultDataset},
+		"streams":     []any{map[string]any{"id": "users", "query": "SELECT 1", "interval": 60}},
+		"osquery": map[string]any{
+			"schedule": map[string]any{"scheduled": map[string]any{"query": "SELECT 1", "interval": 1}},
+			"packs": map[string]any{"pack": map[string]any{
+				"interval": 30,
+				"queries":  map[string]any{"q": map[string]any{"query": "SELECT 1"}},
+			}},
+		},
+	})
+	var want config.InputConfig
+	require.NoError(t, cfg.Unpack(&want), "unpack the policy")
+
+	reloaded := make(chan error, 1)
+	go func() {
+		reloaded <- registry.GetInputList().Reload([]*reload.ConfigWithMeta{{Config: cfg, InputUnitID: "osquery-unit"}})
+	}()
+	select {
+	case got := <-updates:
+		assert.Equal(t, []config.InputConfig{want}, got, "the beater must get the policy as unpacked, not as changed by validation")
+	case <-time.After(5 * time.Second):
+		t.Fatal("the valid policy did not reach the beater")
+	}
+	assert.NoError(t, <-reloaded, "a valid policy must be accepted")
 }
 
 func TestOsquerybeatEarlyShutdownDuringCheck(t *testing.T) {
@@ -354,6 +438,38 @@ func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
 	// Last status should be Stopped
 	lastEvent := events[eventCount-1]
 	assert.Equal(t, status.Stopped, lastEvent.Status, "last status should be Stopped")
+}
+
+// A runner failure must stay FAILED until Run returns. Reporting Stopping in
+// between shows the OTel host FAILED, then OK, then FAILED again. A terminal
+// startup failure takes the same path as an exhausted restart budget without
+// waiting for the production backoff.
+func TestOsquerybeatRunnerFailureDoesNotReportStopping(t *testing.T) {
+	failure := errors.New("osqueryd failed to start")
+	ob, b, mgr := newStatusTestBeater(t, func(ob *osquerybeat) {
+		ob.pub = &mockBeatPublisher{}
+		ob.config.Inputs = []config.InputConfig{{Name: "osquery-manager-1", Type: osqueryInputType}}
+		ob.osquerydFactory = func(string, ...osqd.Option) (osqd.Runner, error) {
+			return &mockOsqueryd{runErr: failure}, nil
+		}
+	})
+	errCh := make(chan error, 1)
+	go func() { errCh <- ob.Run(b) }()
+	select {
+	case err := <-errCh:
+		require.ErrorIs(t, err, failure, "Run must return the runner failure")
+	case <-time.After(5 * time.Second):
+		ob.Stop()
+		t.Fatal("Run did not return the runner failure")
+	}
+	mgr.mx.Lock()
+	events := append([]statusEvent(nil), mgr.events...)
+	mgr.mx.Unlock()
+	first := slices.IndexFunc(events, func(e statusEvent) bool { return e.Status == status.Failed })
+	require.NotEqual(t, -1, first, "the runner must report its failure: %v", events)
+	for _, event := range events[first:] {
+		assert.Equal(t, status.Failed, event.Status, "nothing may follow the runner failure but FAILED: %v", events)
+	}
 }
 
 func newTestBeatPaths(t *testing.T) *paths.Path {
@@ -549,7 +665,7 @@ func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 	ob := &osquerybeat{
 		qp: newQueryProfiler(logptest.NewTestingLogger(t, "")),
 	}
-	ob.setDiagnosticsQueryExecutor(&diagnosticsQueryExecutor{
+	ob.setDiagnosticsQueryExecutor(profilingQueryExecutor{runCtx: t.Context(), executor: &diagnosticsQueryExecutor{
 		rows: []map[string]any{
 			{
 				"name":              "pack_test_query",
@@ -567,7 +683,7 @@ func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 				"last_memory":       int64(6000),
 			},
 		},
-	})
+	}})
 
 	ob.registerDiagnosticHooks(b)
 

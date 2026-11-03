@@ -7,6 +7,7 @@ package instance
 import (
 	"context"
 	"errors"
+	"maps"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -20,6 +21,7 @@ import (
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"google.golang.org/grpc/credentials"
 
 	"github.com/elastic/beats/v7/filebeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -28,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -114,7 +117,7 @@ func TestBeatReceiverStartShutdown(t *testing.T) {
 
 	// Start blocks in beater.Run, so run it in a goroutine.
 	startErr := make(chan error, 1)
-	go func() { startErr <- br.Start(componenttest.NewNopHost()) }()
+	go func() { startErr <- br.Start(t.Context(), componenttest.NewNopHost()) }()
 
 	// Wait until the beater is running and has published its events.
 	select {
@@ -188,7 +191,7 @@ func TestBeatReceiverStartHookRunsBeforeRun(t *testing.T) {
 		return nil
 	})
 
-	require.NoError(t, br.Start(host), "starting the Beat receiver should succeed")
+	require.NoError(t, br.Start(t.Context(), host), "starting the Beat receiver should succeed")
 	select {
 	case observed := <-runObservedHook:
 		assert.True(t, observed, "start hook should complete before beater.Run begins")
@@ -301,7 +304,7 @@ func TestBeatReceiverStart_WiresActionAndDiagnosticExtensions(t *testing.T) {
 	}}
 
 	startErr := make(chan error, 1)
-	go func() { startErr <- br.Start(host) }()
+	go func() { startErr <- br.Start(t.Context(), host) }()
 
 	select {
 	case <-mb.initDone:
@@ -402,7 +405,7 @@ func TestBeatReceiverStartFailureShutdownDoesNotHang(t *testing.T) {
 	var wg sync.WaitGroup
 	wg.Go(func() {
 		// Swallow the error, exactly as the wrapper receivers do.
-		_ = br.Start(componenttest.NewNopHost())
+		_ = br.Start(t.Context(), componenttest.NewNopHost())
 	})
 	// Wait for the goroutine to complete. Start has failed and returned; on the
 	// buggy path runDone is still nil at this point.
@@ -418,6 +421,41 @@ func TestBeatReceiverStartFailureShutdownDoesNotHang(t *testing.T) {
 	case <-done:
 	case <-time.After(5 * time.Second):
 		t.Fatal("Shutdown hung after BeatReceiver.Start failed — nil runDone not fixed")
+	}
+}
+
+// TestBeatReceiverShutdownWithoutStart covers the collector calling Shutdown on
+// a receiver that was never started
+func TestBeatReceiverShutdownWithoutStart(t *testing.T) {
+	creator := func(*beat.Beat, *conf.C) (beat.Beater, error) { return &mockReceiverBeater{}, nil }
+
+	b, err := NewBeatForReceiver(
+		cmd.FilebeatSettings("filebeat"),
+		map[string]any{"path.home": t.TempDir()},
+		consumertest.NewNop(),
+		"test-receiver",
+		zapcore.NewNopCore(),
+	)
+	require.NoError(t, err, "building the receiver beat should succeed")
+
+	rs := receiver.Settings{
+		ID: component.NewIDWithName(component.MustNewType("mockbeatreceiver"), "r1"),
+		TelemetrySettings: component.TelemetrySettings{
+			Logger: zap.NewNop(),
+		},
+	}
+	br, err := NewBeatReceiver(t.Context(), b, creator, rs)
+	require.NoError(t, err, "creating the beat receiver should succeed")
+
+	// Use t.Context() (no deadline during test execution) so that waiting on
+	// a runDone that is never signaled would block indefinitely.
+	done := make(chan error, 1)
+	go func() { done <- br.Shutdown(t.Context()) }()
+	select {
+	case err := <-done:
+		require.NoError(t, err, "Shutdown without Start should not error")
+	case <-time.After(5 * time.Second):
+		t.Fatal("Shutdown hung when Start was never called")
 	}
 }
 
@@ -452,7 +490,7 @@ func TestBeatReceiverStartHookFailureShutdownDoesNotHang(t *testing.T) {
 		return hookErr
 	})
 
-	startErr := br.Start(componenttest.NewNopHost())
+	startErr := br.Start(t.Context(), componenttest.NewNopHost())
 	require.ErrorIs(t, startErr, hookErr, "Start should return the start hook failure")
 
 	// Shutdown must complete promptly even though Start failed before launching
@@ -465,5 +503,181 @@ func TestBeatReceiverStartHookFailureShutdownDoesNotHang(t *testing.T) {
 		require.NoError(t, err, "Shutdown should consume the start failure signal without error")
 	case <-time.After(5 * time.Second):
 		t.Fatal("Shutdown hung after BeatReceiver.Start failed")
+	}
+}
+
+// fakeHeadersSetter models the contrib headers_setter extension: a component
+// implementing extensionauth.GRPCClient whose PerRPCCredentials resolve to a
+// fixed set of headers.
+type fakeHeadersSetter struct {
+	headers  map[string]string
+	credsErr error // returned by PerRPCCredentials
+	metaErr  error // returned by GetRequestMetadata
+}
+
+func (f *fakeHeadersSetter) Start(context.Context, component.Host) error { return nil }
+func (f *fakeHeadersSetter) Shutdown(context.Context) error              { return nil }
+
+func (f *fakeHeadersSetter) PerRPCCredentials() (credentials.PerRPCCredentials, error) {
+	if f.credsErr != nil {
+		return nil, f.credsErr
+	}
+	return fakePerRPC{headers: f.headers, err: f.metaErr}, nil
+}
+
+type fakePerRPC struct {
+	headers map[string]string
+	err     error
+}
+
+func (f fakePerRPC) GetRequestMetadata(context.Context, ...string) (map[string]string, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	return maps.Clone(f.headers), nil
+}
+
+func (fakePerRPC) RequireTransportSecurity() bool { return false }
+
+// plainExtension does not implement extensionauth.GRPCClient.
+type plainExtension struct{}
+
+func (plainExtension) Start(context.Context, component.Host) error { return nil }
+func (plainExtension) Shutdown(context.Context) error              { return nil }
+
+// agentHeadersSetterID returns an ID shaped like the ones Elastic Agent
+// generates, e.g. "headers_setter/_agent-component/default".
+func agentHeadersSetterID(name string) component.ID {
+	return component.NewIDWithName(component.MustNewType(headersSetterType), agentComponentPrefix+name)
+}
+
+func TestHeadersFromExtensions(t *testing.T) {
+	const ua = "Elastic-Filebeat/9.4.0 (linux; amd64; Managed; Privileged)"
+
+	tests := []struct {
+		name       string
+		extensions map[component.ID]component.Component
+		want       map[string]string
+	}{
+		{
+			name:       "no extensions",
+			extensions: map[component.ID]component.Component{},
+			want:       nil,
+		},
+		{
+			name: "other extension types are ignored even if they implement GRPCClient",
+			extensions: map[component.ID]component.Component{
+				component.MustNewIDWithName("beatsauth", agentComponentPrefix+"default"): &fakeHeadersSetter{headers: map[string]string{"User-Agent": ua}},
+			},
+			want: nil,
+		},
+		{
+			name: "headers_setter not generated by Elastic Agent is ignored",
+			extensions: map[component.ID]component.Component{
+				component.MustNewID(headersSetterType):                   &fakeHeadersSetter{headers: map[string]string{"User-Agent": "user"}},
+				component.MustNewIDWithName(headersSetterType, "custom"): &fakeHeadersSetter{headers: map[string]string{"User-Agent": "user"}},
+			},
+			want: nil,
+		},
+		{
+			name:       "headers_setter without GRPCClient is skipped",
+			extensions: map[component.ID]component.Component{agentHeadersSetterID("default"): plainExtension{}},
+			want:       nil,
+		},
+		{
+			name: "all configured headers are returned",
+			extensions: map[component.ID]component.Component{
+				agentHeadersSetterID("default"): &fakeHeadersSetter{headers: map[string]string{"User-Agent": ua, "X-Elastic-Team": "obs"}},
+			},
+			want: map[string]string{"User-Agent": ua, "X-Elastic-Team": "obs"},
+		},
+		{
+			name: "PerRPCCredentials error yields no headers",
+			extensions: map[component.ID]component.Component{
+				agentHeadersSetterID("default"): &fakeHeadersSetter{credsErr: errors.New("additional_auth missing")},
+			},
+			want: nil,
+		},
+		{
+			name: "GetRequestMetadata error yields no headers",
+			extensions: map[component.ID]component.Component{
+				agentHeadersSetterID("default"): &fakeHeadersSetter{metaErr: errors.New("value_file unreadable")},
+			},
+			want: nil,
+		},
+		{
+			name: "multiple headers_setter: first by ID is used",
+			extensions: map[component.ID]component.Component{
+				agentHeadersSetterID("b"): &fakeHeadersSetter{headers: map[string]string{"User-Agent": "from-b"}},
+				agentHeadersSetterID("a"): &fakeHeadersSetter{headers: map[string]string{"User-Agent": "from-a"}},
+			},
+			want: map[string]string{"User-Agent": "from-a"},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := headersFromExtensions(t.Context(), tc.extensions, logptest.NewTestingLogger(t, ""))
+			assert.Equal(t, tc.want, got, "unexpected headers read from extensions")
+		})
+	}
+}
+
+// TestBeatReceiverStart_UsesHeadersSetterUserAgent checks that Start replaces
+// beat.Info.UserAgent with the one from the headers_setter extension before
+// the beater runs, which is where inputs and modules copy it from.
+func TestBeatReceiverStart_UsesHeadersSetterUserAgent(t *testing.T) {
+	const ua = "Elastic-Filebeat/9.4.0 (linux; amd64; Managed; Privileged)"
+
+	mb := &mockReceiverBeater{
+		acked:    &atomic.Int64{},
+		initDone: make(chan struct{}),
+		done:     make(chan struct{}),
+	}
+	creator := func(*beat.Beat, *conf.C) (beat.Beater, error) { return mb, nil }
+
+	b, err := NewBeatForReceiver(
+		cmd.FilebeatSettings("filebeat"),
+		map[string]any{"path.home": t.TempDir()},
+		consumertest.NewNop(),
+		"test-receiver",
+		zapcore.NewNopCore(),
+	)
+	require.NoError(t, err, "building the receiver beat should succeed")
+	require.NotEqual(t, ua, b.Info.UserAgent, "test precondition: the extension UA must differ from the generated one")
+
+	var rs receiver.Settings
+	rs.Logger = zap.NewNop()
+	rs.ID = component.NewIDWithName(component.MustNewType("mockbeatreceiver"), "r1")
+
+	br, err := NewBeatReceiver(t.Context(), b, creator, rs)
+	require.NoError(t, err, "creating the beat receiver should succeed")
+
+	host := &fakeExtensionHost{extensions: map[component.ID]component.Component{
+		agentHeadersSetterID("default"): &fakeHeadersSetter{headers: map[string]string{"User-Agent": ua}},
+	}}
+
+	startErr := make(chan error, 1)
+	go func() { startErr <- br.Start(t.Context(), host) }()
+
+	select {
+	case <-mb.initDone:
+	case <-time.After(30 * time.Second):
+		t.Fatal("beater did not start")
+	}
+	assert.Equal(t, ua, b.Info.UserAgent, "beat.Info.UserAgent should be the extension's User-Agent, not the generated one")
+
+	shutdownDone := make(chan error, 1)
+	go func() { shutdownDone <- br.Shutdown(t.Context()) }()
+	select {
+	case err := <-shutdownDone:
+		require.NoError(t, err, "Shutdown should not error")
+	case <-time.After(30 * time.Second):
+		t.Fatal("Shutdown hung")
+	}
+	select {
+	case err := <-startErr:
+		require.NoError(t, err, "beater.Run should return cleanly")
+	case <-time.After(10 * time.Second):
+		t.Fatal("beater.Run did not return after Stop")
 	}
 }

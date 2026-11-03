@@ -6,6 +6,7 @@ package management
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
@@ -279,6 +280,9 @@ func injectAgentInfoRule(inputs map[string]any, agentInfo *client.AgentInfo) (ma
 	processors = append(processors, generateAddFieldsProcessor(
 		mapstr.M{"id": agentInfo.ID},
 		"agent"))
+	if len(agentInfo.Tags) > 0 {
+		processors = append(processors, generateAddTagsProcessor(slices.Clone(agentInfo.Tags)))
+	}
 
 	inputs["processors"] = prependProcessors(inputs, processors)
 
@@ -390,6 +394,14 @@ func generateAddFieldsProcessor(fields mapstr.M, target string) mapstr.M {
 	}
 }
 
+func generateAddTagsProcessor(tags []string) mapstr.M {
+	return mapstr.M{
+		"add_tags": mapstr.M{
+			"tags": tags,
+		},
+	}
+}
+
 func generateAgentMetadataProcessor(agentInfo *client.AgentInfo, inputID, streamID, dataStreamType, dataset, namespace string) mapstr.M {
 	cfg := mapstr.M{
 		"data_stream": mapstr.M{
@@ -408,6 +420,9 @@ func generateAgentMetadataProcessor(agentInfo *client.AgentInfo, inputID, stream
 	}
 	if streamID != "" {
 		cfg["stream_id"] = streamID
+	}
+	if len(agentInfo.Tags) > 0 {
+		cfg["tags"] = slices.Clone(agentInfo.Tags)
 	}
 	return mapstr.M{"add_agent_metadata": cfg}
 }
