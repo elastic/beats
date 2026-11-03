@@ -1,0 +1,8 @@
+kind: bug-fix
+summary: Limit HTTP Endpoint request bodies buffered for HMAC validation to 25 MiB when max_body_bytes is not set
+description: |
+  The http_endpoint input buffers the whole request body in memory to check
+  an HMAC signature. That read now stops at 25 MiB when max_body_bytes is not
+  set, and larger bodies are rejected with a 413 status. The bytes read also
+  count towards max_in_flight_bytes when it is set.
+component: filebeat
