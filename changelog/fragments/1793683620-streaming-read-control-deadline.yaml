@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Honour the configured WebSocket write deadline when deriving the read timeout
+component: filebeat

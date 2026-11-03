@@ -8,10 +8,12 @@ import (
 	"fmt"
 	"net/url"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 var configTests = []struct {
@@ -248,5 +250,29 @@ func TestRegexpConfig(t *testing.T) {
 	err := cfg.Validate()
 	if err != nil {
 		t.Errorf("failed to validate config with regexps: %v", err)
+	}
+}
+
+func TestConfiguredReadControlDeadline(t *testing.T) {
+	for _, tc := range []struct {
+		name          string
+		writeDeadline string
+		want          time.Duration
+	}{
+		{"default", "", 30 * time.Second},
+		{"custom", "25s", 75 * time.Second},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			keepAlive := map[string]any{"enable": true}
+			if tc.writeDeadline != "" {
+				keepAlive["write_control_deadline"] = tc.writeDeadline
+			}
+			cfg := conf.MustNewConfigFrom(map[string]any{"url": "wss://example.org/stream", "keep_alive": keepAlive})
+			sources, _, err := cursorConfigure(cfg, logptest.NewTestingLogger(t, "streaming"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			assert.Equal(t, tc.want, sources[0].(*source).cfg.KeepAlive.readControlDeadline, "read deadline must reflect the effective write deadline")
+		})
 	}
 }
