@@ -18,6 +18,7 @@
 package tlscommon
 
 import (
+	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -144,7 +145,16 @@ func makeKeyCertPair(t testing.TB, blockType int, password string) (string, stri
 		require.NoError(t, err)
 	case blockTypePKCS8Encrypted:
 		//TODO: this uses an elastic implementation of pkcs8 as the stdlib does not support password protected pkcs8
-		b, err := pkcs8.MarshalPrivateKey(key, []byte(password), nil)
+		// GODEBUG=fips140=only rejects PBKDF2 salts shorter than 128 bits,
+		// and the pkcs8 default salt is only 8 bytes.
+		b, err := pkcs8.MarshalPrivateKey(key, []byte(password), &pkcs8.Opts{
+			Cipher: pkcs8.AES256CBC,
+			KDFOpts: pkcs8.PBKDF2Opts{
+				SaltSize:       16,
+				IterationCount: 10000,
+				HMACHash:       crypto.SHA256,
+			},
+		})
 		require.NoError(t, err)
 		block = &pem.Block{
 			Type:  "ENCRYPTED PRIVATE KEY",
