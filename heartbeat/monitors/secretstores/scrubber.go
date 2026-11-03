@@ -102,7 +102,7 @@ func (t *tracker) scrubber() *Scrubber {
 	for _, f := range forms {
 		oldnew = append(oldnew, f, scrubbed)
 	}
-	return &Scrubber{replacer: strings.NewReplacer(oldnew...)}
+	return &Scrubber{forms: forms, replacer: strings.NewReplacer(oldnew...)}
 }
 
 // jsonEscaped returns v as it appears inside a JSON string, with and without
@@ -125,7 +125,19 @@ func jsonEscaped(v string) []string {
 // Scrubber removes the secret values a Resolver substituted from the events
 // and errors of a monitor. A nil Scrubber does nothing.
 type Scrubber struct {
+	forms    []string
 	replacer *strings.Replacer
+}
+
+// replace returns v without the secret values. The Replacer copies every
+// string it's given, so it only runs on the few that hold a value.
+func (s *Scrubber) replace(v string) string {
+	for _, f := range s.forms {
+		if strings.Contains(v, f) {
+			return s.replacer.Replace(v)
+		}
+	}
+	return v
 }
 
 // String returns v without the secret values.
@@ -133,7 +145,7 @@ func (s *Scrubber) String(v string) string {
 	if s == nil {
 		return v
 	}
-	return s.replacer.Replace(v)
+	return s.replace(v)
 }
 
 // Error returns err with a message without the secret values. The result
@@ -143,7 +155,7 @@ func (s *Scrubber) Error(err error) error {
 		return err
 	}
 	msg := err.Error()
-	clean := s.replacer.Replace(msg)
+	clean := s.replace(msg)
 	if clean == msg {
 		return err
 	}
@@ -195,22 +207,26 @@ func (s *Scrubber) Job(job jobs.Job) jobs.Job {
 // value returns v without the secret values, and whether it changed. key is
 // the name of the field holding v.
 func (s *Scrubber) value(v any, key string) (any, bool) {
-	switch v := v.(type) {
+	switch tv := v.(type) {
 	case string:
-		out := s.replacer.Replace(v)
-		return out, out != v
+		out := s.replace(tv)
+		if out == tv {
+			// Returning v and not tv avoids boxing the string again.
+			return v, false
+		}
+		return out, true
 	case mapstr.M:
-		return scrubMap(s, v, key)
+		return scrubMap(s, tv, key)
 	case map[string]any:
-		return scrubMap(s, v, key)
+		return scrubMap(s, tv, key)
 	case []any:
-		return scrubSlice(s, v, key)
+		return scrubSlice(s, tv, key)
 	case []string:
-		return scrubSlice(s, v, key)
+		return scrubSlice(s, tv, key)
 	case []mapstr.M:
-		return scrubSlice(s, v, key)
+		return scrubSlice(s, tv, key)
 	case []map[string]any:
-		return scrubSlice(s, v, key)
+		return scrubSlice(s, tv, key)
 	}
 	return v, false
 }
