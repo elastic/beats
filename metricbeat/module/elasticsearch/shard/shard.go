@@ -37,6 +37,14 @@ const (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*elasticsearch.MetricSet
+	lastClusterState lastClusterState
+}
+
+// lastClusterState tracks the most recently observed cluster state UUID for this
+// metricset instance so unchanged states can be skipped.
+type lastClusterState struct {
+	id string
+	ok bool
 }
 
 // New create a new instance of the MetricSet
@@ -64,5 +72,5 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	return eventsMapping(r, content, m.XPackEnabled)
+	return eventsMapping(r, content, m.XPackEnabled, &m.lastClusterState, m.Logger())
 }
