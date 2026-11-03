@@ -98,23 +98,13 @@ func (t *tracker) scrubber() *Scrubber {
 	for _, f := range forms {
 		oldnew = append(oldnew, f, scrubbed)
 	}
-	return &Scrubber{key: strings.Join(forms, "\x00"), replacer: strings.NewReplacer(oldnew...)}
+	return &Scrubber{replacer: strings.NewReplacer(oldnew...)}
 }
 
 // Scrubber removes the secret values a Resolver substituted from the events
 // and errors of a monitor. A nil Scrubber does nothing.
 type Scrubber struct {
-	key      string
 	replacer *strings.Replacer
-}
-
-// sameAs reports whether s and o scrub the same values, so one can be used
-// instead of the other.
-func (s *Scrubber) sameAs(o *Scrubber) bool {
-	if s == nil || o == nil {
-		return s == o
-	}
-	return s.key == o.key
 }
 
 // String returns v without the secret values.

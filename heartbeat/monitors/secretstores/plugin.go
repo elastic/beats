@@ -71,8 +71,8 @@ type secretPlugin struct {
 	// hash is the hash of the resolved config of inner, or of createErr.
 	hash      uint64
 	createErr error
-	// scrubber is the one of the last resolution, kept while its values
-	// don't change to not build it on every run.
+	// scrubber is the one of the resolved config of inner, or of createErr:
+	// the same config has the same secret values.
 	scrubber *Scrubber
 	closed   bool
 }
@@ -151,19 +151,14 @@ func (p *secretPlugin) current() (plugin.Plugin, *Scrubber, error) {
 
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	if p.scrubber.sameAs(scrubber) {
-		scrubber = p.scrubber
-	} else {
-		p.scrubber = scrubber
-	}
 	switch {
 	case p.closed:
 		return plugin.Plugin{}, nil, errPluginClosed
 	case p.built && p.hash == hash:
-		return p.inner, scrubber, nil
+		return p.inner, p.scrubber, nil
 	case p.createErr != nil && p.hash == hash:
 		// The same config fails the same way, only a change is worth a retry.
-		return plugin.Plugin{}, scrubber, p.createErr
+		return plugin.Plugin{}, p.scrubber, p.createErr
 	}
 
 	// Closing the previous plugin here is safe: only browser plugins have
@@ -175,7 +170,7 @@ func (p *secretPlugin) current() (plugin.Plugin, *Scrubber, error) {
 	info := p.info
 	info.Logger = scrubber.Logger(info.Logger)
 	inner, err := p.factory.Make(p.name, resolved, info)
-	p.hash = hash
+	p.hash, p.scrubber = hash, scrubber
 	if err != nil {
 		// A plugin can return resources to close along with the error.
 		if closeErr := inner.Close(); closeErr != nil {
