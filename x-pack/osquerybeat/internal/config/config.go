@@ -347,6 +347,46 @@ func GetOsqueryCheckTimeout(inputs []InputConfig) (time.Duration, error) {
 	return ParseCheckTimeout(in.Osquery.ElasticOptions.CheckTimeout)
 }
 
+<<<<<<< HEAD
+=======
+// GetPublishingConfig returns the publishing queue settings
+// (elastic_options.publishing) from the result input. Unset or zero values use
+// the defaults; negative values are an error.
+func GetPublishingConfig(inputs []InputConfig) (PublishingConfig, error) {
+	cfg := PublishingConfig{
+		Scheduled: ScheduledPublishingConfig{MaxEvents: DefaultScheduledMaxEvents},
+		Live:      LivePublishingConfig{Timeout: DefaultLivePublishTimeout},
+	}
+	in := ResultInput(inputs)
+	if in == nil || in.Osquery == nil || in.Osquery.ElasticOptions == nil || in.Osquery.ElasticOptions.Publishing == nil {
+		return cfg, nil
+	}
+	set := *in.Osquery.ElasticOptions.Publishing
+	// Unpacking already validated set; this guards configurations built in code.
+	if err := set.Validate(); err != nil {
+		return PublishingConfig{}, err
+	}
+	if set.Scheduled.MaxEvents > 0 {
+		cfg.Scheduled.MaxEvents = set.Scheduled.MaxEvents
+	}
+	cfg.Scheduled.MaxAge = set.Scheduled.MaxAge
+	if set.Live.Timeout > 0 {
+		cfg.Live.Timeout = set.Live.Timeout
+	}
+	return cfg, nil
+}
+
+// GetOsqueryExtensions returns customer-managed osquery extension settings
+// (elastic_options.extensions) from the result input if available.
+func GetOsqueryExtensions(inputs []InputConfig) ExtensionsConfig {
+	in := ResultInput(inputs)
+	if in == nil || in.Osquery == nil || in.Osquery.ElasticOptions == nil || in.Osquery.ElasticOptions.Extensions == nil {
+		return ExtensionsConfig{}
+	}
+	return *in.Osquery.ElasticOptions.Extensions
+}
+
+>>>>>>> ec1f571 (osquerybeat: add a bounded row queue and publishing settings (#54250))
 // GetProfilingEnabled returns the global query profiling default from the result input.
 // This is the fleet-wide on/off switch; individual queries may override it (see ResolveProfiling).
 // Profiling is enabled by default unless elastic_options.profiling.profiling_all is explicitly false.
