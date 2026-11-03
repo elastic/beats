@@ -104,6 +104,41 @@ func AcquireSystemBridge(settings component.TelemetrySettings) (func(), error) {
 	}, nil
 }
 
+// systemRegistry returns the stats registry of the system bridge, or nil if no
+// receiver currently holds it.
+func systemRegistry() *monitoring.Registry {
+	systemMu.Lock()
+	defer systemMu.Unlock()
+	if systemInst == nil {
+		return nil
+	}
+	return systemInst.statsRegistry
+}
+
+// SystemMetricsSnapshot returns a structured snapshot of the process-wide
+// system metrics (beat.memstats, beat.cpu, system.load, ...) collected for the
+// system bridge, or nil if no receiver currently holds it. Receivers do not
+// register these metrics in their own registries because they are identical
+// for every receiver in the process, so anything that wants them next to a
+// receiver's own metrics, such as a diagnostics bundle, reads them here.
+func SystemMetricsSnapshot() map[string]any {
+	reg := systemRegistry()
+	if reg == nil {
+		return nil
+	}
+	return monitoring.CollectStructSnapshot(reg, monitoring.Full, false)
+}
+
+// SystemMetricsFlatSnapshot is SystemMetricsSnapshot in the flat form used by
+// the metrics log reporter. It is empty if no receiver holds the system bridge.
+func SystemMetricsFlatSnapshot() monitoring.FlatSnapshot {
+	reg := systemRegistry()
+	if reg == nil {
+		return monitoring.MakeFlatSnapshot()
+	}
+	return monitoring.CollectFlatSnapshot(reg, monitoring.Full, false)
+}
+
 // newSystemRegistryBridge creates a SystemRegistryBridge from the given
 // registry. The registry should already be populated with system metrics
 // (via SetupMetricsOptions or manually for tests).

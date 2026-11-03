@@ -6,6 +6,12 @@ package instance
 
 import (
 	"context"
+	"encoding/json"
+	"net"
+	"net/http"
+	"os"
+	"path/filepath"
+	"runtime"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -26,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
+	oteltelemetry "github.com/elastic/beats/v7/x-pack/otel/telemetry"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -151,6 +158,7 @@ func TestBeatReceiverStartShutdown(t *testing.T) {
 type fakeActionDiagExtension struct {
 	mu                  sync.Mutex
 	registeredDiagName  string
+	diagHook            func() []byte
 	registeredActionFor string
 	unregisteredFor     string
 	actionHandler       func(ctx context.Context, params map[string]any) (map[string]any, error)
@@ -159,10 +167,11 @@ type fakeActionDiagExtension struct {
 func (f *fakeActionDiagExtension) Start(context.Context, component.Host) error { return nil }
 func (f *fakeActionDiagExtension) Shutdown(context.Context) error              { return nil }
 
-func (f *fakeActionDiagExtension) RegisterDiagnosticHook(name, _, _, _ string, _ func() []byte) {
+func (f *fakeActionDiagExtension) RegisterDiagnosticHook(name, _, _, _ string, hook func() []byte) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.registeredDiagName = name
+	f.diagHook = hook
 }
 
 func (f *fakeActionDiagExtension) RegisterActionHandler(name string, handler func(ctx context.Context, params map[string]any) (map[string]any, error)) error {
@@ -259,6 +268,25 @@ func TestBeatReceiverStart_WiresActionAndDiagnosticExtensions(t *testing.T) {
 	ext.mu.Lock()
 	assert.Equal(t, "test-receiver", ext.registeredDiagName, "diagnostic hook should be registered under the receiver's component ID")
 	ext.mu.Unlock()
+
+	// The per-receiver beat_metrics.json must still carry the process-wide
+	// system metrics even though receivers do not register them themselves.
+	ext.mu.Lock()
+	hook := ext.diagHook
+	ext.mu.Unlock()
+	require.NotNil(t, hook, "diagnostic hook should have been registered")
+	var snapshot map[string]any
+	require.NoError(t, json.Unmarshal(hook(), &snapshot), "hook output should be valid JSON")
+	beatNS, ok := snapshot["beat"].(map[string]any)
+	require.True(t, ok, "beat_metrics.json should have a beat namespace, got %v", snapshot)
+	for _, k := range []string{"memstats", "cpu", "runtime", "info"} {
+		assert.Contains(t, beatNS, k, "beat_metrics.json should contain beat.%s", k)
+	}
+	assert.Contains(t, snapshot, "system", "beat_metrics.json should contain the system namespace")
+	// The shared system bridge reports itself as "beat" with no version.
+	info, _ := beatNS["info"].(map[string]any)
+	assert.Equal(t, b.Info.Version, info["version"], "beat.info must be the receiver's own, not the shared bridge's")
+	assert.NotEqual(t, "beat", info["name"], "beat.info must be the receiver's own, not the shared bridge's")
 
 	// The action extension is only set on the manager by Start; the actual
 	// handler is registered once something (e.g. osquerybeat) calls
@@ -365,4 +393,69 @@ func TestBeatReceiverStartFailureShutdownDoesNotHang(t *testing.T) {
 	case <-time.After(5 * time.Second):
 		t.Fatal("Shutdown hung after BeatReceiver.Start failed — nil runDone not fixed")
 	}
+}
+
+func TestReceiverSystemMetrics(t *testing.T) {
+	release, err := oteltelemetry.AcquireSystemBridge(componenttest.NewNopTelemetrySettings())
+	require.NoError(t, err)
+	defer release()
+
+	system := receiverSystemMetrics()
+	beatNS, ok := system["beat"].(map[string]any)
+	require.True(t, ok, "system metrics should have a beat namespace, got %v", system)
+	assert.Contains(t, beatNS, "memstats", "beat.memstats")
+	assert.Contains(t, system, "system", "system namespace")
+}
+
+// TestReceiverHTTPStatsIncludesSystemMetrics checks that a receiver with
+// http.enabled still serves the system metrics on /stats even though it does not
+// register them in its own registry.
+func TestReceiverHTTPStatsIncludesSystemMetrics(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("uses a unix socket")
+	}
+	// Unix socket paths are short; t.TempDir is too long on macOS.
+	dir, err := os.MkdirTemp("/tmp", "hb")
+	require.NoError(t, err)
+	t.Cleanup(func() { _ = os.RemoveAll(dir) })
+	socket := filepath.Join(dir, "s.sock")
+
+	mb := &mockReceiverBeater{acked: &atomic.Int64{}, initDone: make(chan struct{}), done: make(chan struct{})}
+	creator := func(*beat.Beat, *conf.C) (beat.Beater, error) { return mb, nil }
+	defer management.SetUnderAgent(false)
+	b, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), map[string]any{
+		"path.home":               t.TempDir(),
+		"management.otel.enabled": true,
+		"http.enabled":            true,
+		"http.host":               "unix://" + socket,
+	}, consumertest.NewNop(), "test-receiver", zapcore.NewNopCore())
+	require.NoError(t, err)
+
+	var rs receiver.Settings
+	rs.Logger = zap.NewNop()
+	rs.ID = component.NewIDWithName(component.MustNewType("mockbeatreceiver"), "r1")
+	br, err := NewBeatReceiver(t.Context(), b, creator, rs)
+	require.NoError(t, err)
+	go func() { _ = br.Start(&fakeExtensionHost{}) }()
+	defer func() { _ = br.Shutdown(t.Context()) }()
+
+	client := &http.Client{Transport: &http.Transport{
+		DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
+			return (&net.Dialer{}).DialContext(ctx, "unix", socket)
+		},
+	}}
+	resp, err := client.Get("http://unix/stats")
+	require.NoError(t, err, "GET /stats")
+	defer resp.Body.Close()
+	var stats map[string]any
+	require.NoError(t, json.NewDecoder(resp.Body).Decode(&stats), "decode /stats")
+
+	beatNS, ok := stats["beat"].(map[string]any)
+	require.True(t, ok, "/stats should have a beat namespace, got %v", stats)
+	for _, k := range []string{"memstats", "cpu", "runtime", "info"} {
+		assert.Contains(t, beatNS, k, "/stats should contain beat.%s", k)
+	}
+	assert.Contains(t, stats, "system", "/stats should contain the system namespace")
+	info, _ := beatNS["info"].(map[string]any)
+	assert.NotEqual(t, "beat", info["name"], "beat.info must be the receiver's own")
 }

@@ -91,11 +91,20 @@ func SetupMetricsOptions(opts MetricOptions) error {
 	monitoring.NewFunc(opts.ProcessMetrics, "memstats", MemStatsReporter(opts.Logger, processStats), monitoring.Report)
 	monitoring.NewFunc(opts.ProcessMetrics, "cpu", InstanceCPUReporter(opts.Logger, processStats), monitoring.Report)
 	monitoring.NewFunc(opts.ProcessMetrics, "runtime", ReportRuntime, monitoring.Report)
-	monitoring.NewFunc(opts.ProcessMetrics, "info", infoReporter(opts.Name, opts.Version, opts.EphemeralID), monitoring.Report)
+	SetupInfoMetrics(opts)
 
 	setupPlatformSpecificMetrics(opts.Logger, processStats, opts.SystemMetrics, opts.ProcessMetrics)
 
 	return nil
+}
+
+// SetupInfoMetrics registers only the beat.info metrics (name, version,
+// ephemeral ID and uptime) in opts.ProcessMetrics. Unlike SetupMetricsOptions it
+// is cheap: it does not initialize process statistics or register any system
+// metric. Use it when the process-wide system metrics are provided elsewhere
+// and only the identity of this instance needs reporting.
+func SetupInfoMetrics(opts MetricOptions) {
+	monitoring.NewFunc(opts.ProcessMetrics, "info", infoReporter(processName(opts.Name), opts.Version, opts.EphemeralID), monitoring.Report)
 }
 
 // processName truncates the name if it is longer than 15 characters, so we don't fail process checks later on

@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
@@ -189,4 +190,39 @@ func assertMapHas(t *testing.T, m map[string]any, key string, expectedValue any)
 		t.Fatal(err)
 	}
 	assert.EqualValues(t, expectedValue, v)
+}
+
+func TestReporterExtraMetrics(t *testing.T) {
+	reg := monitoring.NewRegistry()
+	monitoring.NewInt(reg, "own").Set(1)
+	monitoring.NewString(reg, "shared").Set("receiver")
+
+	extraCalls := 0
+	r := &Reporter{extraMetrics: func() monitoring.FlatSnapshot {
+		extraCalls++
+		s := monitoring.MakeFlatSnapshot()
+		s.Ints["beat.memstats.rss"] = 42
+		s.Strings["shared"] = "extra"
+		return s
+	}}
+
+	snap := r.snapshot("metrics", reg)
+	assert.EqualValues(t, 1, snap.Ints["own"], "registry metric kept")
+	assert.EqualValues(t, 42, snap.Ints["beat.memstats.rss"], "extra metric merged")
+	assert.Equal(t, "receiver", snap.Strings["shared"], "extra must not overwrite registry metrics")
+
+	snap = r.snapshot("info", reg)
+	assert.NotContains(t, snap.Ints, "beat.memstats.rss", "extra only applies to the metrics namespace")
+	assert.Equal(t, 1, extraCalls, "extra is only called for the metrics namespace")
+}
+
+func TestExtraMetricsNotCalledWhenDisabled(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	cfg := conf.MustNewConfigFrom(map[string]any{"period": 0})
+	called := false
+	r, err := MakeReporter(beat.Info{Logger: logger}, cfg, beatmonitoring.NewGlobalMonitoring(),
+		WithExtraMetrics(func() monitoring.FlatSnapshot { called = true; return monitoring.MakeFlatSnapshot() }))
+	require.NoError(t, err)
+	r.Stop()
+	assert.False(t, called, "extra metrics must not be collected when metrics logging is disabled")
 }
