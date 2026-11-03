@@ -135,14 +135,14 @@ steps:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
 
-<<<<<<< HEAD
   - label: "Triggering Build for Agentbeat"
+    key: "test-x-pack-agentbeat"
     if: build.pull_request.id == null
     trigger: "beats-xpack-agentbeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
-=======
+
   - wait: ~
     continue_on_failure: true
 
@@ -163,4 +163,3 @@ steps:
         # Retried beat builds can change this build's result; retry this step
         # afterwards to publish the new one.
         permit_on_passed: true
->>>>>>> d2fe22f (ci: mark merged commits with the result of the daily test run (#54219))
