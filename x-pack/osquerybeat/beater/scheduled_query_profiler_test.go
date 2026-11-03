@@ -411,16 +411,6 @@ func TestLoggerReturnsWhileScheduledProfileRPCWaits(t *testing.T) {
 	_, err := plugin.GenerateConfig(t.Context())
 	require.NoError(t, err, "apply the timed native schedule")
 
-<<<<<<< HEAD
-	// Wire the real logger callback to a worker and fake publishers.
-	profiler := newQueryProfiler(log)
-	metrics := newScheduledProfileMetrics(monitoring.NewRegistry())
-	worker := newScheduledQueryProfiler(t.Context(), 2, query, plugin, profiler, metrics)
-	t.Cleanup(worker.stop)
-	sink := &profileTestSink{published: make(chan collectedProfile, 1)}
-	publisher := &profileCallbackPublisher{sink: sink, responses: make(chan scheduledProfileResponse, 1)}
-	bt := &osquerybeat{pub: publisher, qp: profiler, log: log}
-=======
 	// Wire the real logger callback to a worker and a fake publisher.
 	publisher := &profileCallbackPublisher{responses: make(chan scheduledProfileResponse, 1), profiles: make(chan collectedProfile, 1)}
 	bt := &osquerybeat{log: log}
@@ -438,11 +428,10 @@ func TestLoggerReturnsWhileScheduledProfileRPCWaits(t *testing.T) {
 	})
 	worker := newScheduledQueryProfiler(t.Context(), 2, query, plugin, newQueryProfiler(log), newScheduledProfileMetrics(monitoring.NewRegistry()), dispatcher.enqueueProfile)
 	t.Cleanup(worker.stop)
->>>>>>> a98b6d2 (osquerybeat: queue RRULE results and scheduled profiles (#54252))
 	loggerPlugin := NewLoggerPlugin(log, func(result QueryResult) {
 		// A zero-hit diff needs no column resolution, so nil cli catches any
 		// accidental reintroduction of profiling RPCs through the main client.
-		bt.handleQueryResult(t.Context(), nil, plugin, worker, result)
+		dispatcher.enqueue(t.Context(), nil, plugin, result, worker)
 	})
 
 	// Exercise the real logger callback while the profile RPC stays blocked.
@@ -464,7 +453,7 @@ func TestLoggerReturnsWhileScheduledProfileRPCWaits(t *testing.T) {
 		t.Fatal("deferred profile collection did not start")
 	}
 
-	// Results must precede profiles, and both must retain the same response ID.
+	// Result completion must not wait for profiling, and both retain the same response ID.
 	var response scheduledProfileResponse
 	select {
 	case response = <-publisher.responses:
