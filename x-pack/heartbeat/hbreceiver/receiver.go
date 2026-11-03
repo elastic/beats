@@ -37,11 +37,7 @@ func (hb *heartbeatReceiver) Start(ctx context.Context, host component.Host) err
 	releaseCancellation := context.AfterFunc(ctx, hb.cancel)
 	defer releaseCancellation()
 
-<<<<<<< HEAD
-	if err := hb.BeatReceiver.Start(statusHost{Host: host}); err != nil {
-=======
-	if err := hb.BeatReceiver.Start(ctx, host); err != nil {
->>>>>>> 36c8c4f (Correctly set useragent field in otel mode (#53654))
+	if err := hb.BeatReceiver.Start(ctx, statusHost{Host: host}); err != nil {
 		return fmt.Errorf("starting heartbeat receiver: %w", err)
 	}
 
