@@ -128,9 +128,9 @@ type osquerybeat struct {
 
 type osquerybeatPublisher interface {
 	scheduledQueryPublisher
+	queryProfilePublisher
 	actionResultPublisher
 	Configure(inputs []config.InputConfig) error
-	CaptureScheduledProfileSink(namespace string) pub.ScheduledProfileSink
 	Close()
 }
 
@@ -701,7 +701,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		if metrics == nil {
 			metrics = newScheduledProfileMetrics(nil)
 		}
-		scheduledProfiler = newScheduledQueryProfiler(profileCtx, scheduledProfilePendingJobs, profileExecutor, configPlugin, bt.qp, metrics)
+		scheduledProfiler = newScheduledQueryProfiler(profileCtx, scheduledProfilePendingJobs, profileExecutor, configPlugin, bt.qp, metrics, bt.scheduledResults.enqueueProfile)
 		// osquery_schedule diagnostics need the same isolation as normal profiles.
 		bt.setDiagnosticsQueryExecutor(profileExecutor)
 		defer func() {
@@ -711,7 +711,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		}()
 
 		// Initialize and start RRULE query handler after osqueryd connection is established
-		rruleHandler = newRecurrenceQueryHandler(bt.log, cli, configPlugin, bt.pub, bt.liveProfiles, bt.osqueryVersion)
+		rruleHandler = newRecurrenceQueryHandler(bt.log, cli, configPlugin, bt.scheduledResults, bt.liveProfiles, bt.osqueryVersion)
 		rruleHandler.Start(ctx)
 		defer rruleHandler.Stop()
 
@@ -888,6 +888,19 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 		bt.log.Errorf("failed to lookup query info: %s", res.Name)
 		return
 	}
+<<<<<<< HEAD
+=======
+	scheduleID := qi.ScheduleID
+	if scheduleID == "" {
+		scheduleID = res.Name
+	}
+	executionCount, _, _ := nativeScheduleTiming(qi.StartDate, qi.Interval, res.UnixTime)
+	profiler.enqueue(scheduledProfileRequest{
+		name: res.Name, query: qi.Query, namespace: ns, scheduleID: scheduleID,
+		responseID: responseID, spaceID: qi.SpaceID, scheduleExecutionCount: executionCount,
+	})
+}
+>>>>>>> a98b6d2 (osquerybeat: queue RRULE results and scheduled profiles (#54252))
 
 	// Use policy schedule_id when set, otherwise query name.
 	scheduleID := idOrDefault(qi.ScheduleID, res.Name)

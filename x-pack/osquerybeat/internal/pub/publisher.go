@@ -7,7 +7,6 @@ package pub
 import (
 	"fmt"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -18,7 +17,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -40,6 +38,7 @@ type Publisher struct {
 	// client for osquery_manager.query_profile
 	queryProfileClient    beat.Client
 	profileDropWarnLogged bool
+<<<<<<< HEAD
 
 	// Scheduled profiling must not wait behind a result publication holding mx.
 	scheduledProfileMu      sync.Mutex
@@ -48,31 +47,29 @@ type Publisher struct {
 	scheduledProfileMissing bool
 	scheduledProfileDropped *monitoring.Uint
 	scheduledProfileWarning atomic.Int64
+=======
+	listener              beat.ClientListener
+	allowed               func() bool
+	cut                   func(rows int)
+>>>>>>> a98b6d2 (osquerybeat: queue RRULE results and scheduled profiles (#54252))
 }
 
 func New(b *beat.Beat, log *logp.Logger) *Publisher {
-	reg := b.Monitoring.StatsRegistry()
-	if reg == nil {
-		reg = monitoring.NewRegistry()
-	}
 	return &Publisher{
-		b:                       b,
-		log:                     log,
-		scheduledProfileDropped: monitoring.NewUint(reg.GetOrCreateRegistry("osquerybeat.scheduled_query_profiles"), "dropped.output_full"),
+		b:   b,
+		log: log,
 	}
 }
 
 // Configure replaces the clients for the given inputs. It must be called from a
 // single goroutine; only Close may run concurrently with it.
 func (p *Publisher) Configure(inputs []config.InputConfig) error {
-	// Policy replacement must invalidate delayed profiles even while a result
-	// publication holds mx, and even when all inputs have been removed.
-	p.retireScheduledProfileSink()
-	p.mx.Lock()
-	defer p.mx.Unlock()
 	if len(inputs) == 0 {
 		return nil
 	}
+
+	p.mx.Lock()
+	defer p.mx.Unlock()
 
 	resultInput, actionResponsesInput, profileInput := streamInputs(inputs)
 
@@ -154,11 +151,14 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 		if oldClient != nil {
 			oldClient.Close()
 		}
+<<<<<<< HEAD
 		if resultInput != nil {
 			if err := p.configureScheduledProfileSink(*resultInput, *profileInput); err != nil {
 				return err
 			}
 		}
+=======
+>>>>>>> a98b6d2 (osquerybeat: queue RRULE results and scheduled profiles (#54252))
 	} else {
 		if p.queryProfileClient != nil {
 			p.queryProfileClient.Close()
@@ -229,12 +229,6 @@ func (p *Publisher) Publish(index, idValue, idFieldKey, responseID, spaceID, pac
 }
 
 func (p *Publisher) Close() {
-	// Once closed is set, configureScheduledProfileSink installs no new lease,
-	// so a single retire covers one installed earlier.
-	p.scheduledProfileMu.Lock()
-	p.scheduledProfileClosed = true
-	p.scheduledProfileMu.Unlock()
-	p.retireScheduledProfileSink()
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
@@ -325,6 +319,17 @@ func (p *Publisher) publishActionResponseEvent(fields map[string]any, timestamp 
 }
 
 func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) {
+	p.publishProfile(index, queryProfileToEvent(queryName, actionID, responseID, spaceID, profile, reqData, "", 0))
+}
+
+// PublishScheduledProfile publishes the profile of one scheduled query run,
+// correlated with the run's results by its schedule, response ID and
+// execution count.
+func (p *Publisher) PublishScheduledProfile(index, queryName, scheduleID, responseID, spaceID string, scheduleExecutionCount int64, profile map[string]any) {
+	p.publishProfile(index, queryProfileToEvent(queryName, "", responseID, spaceID, profile, nil, scheduleID, scheduleExecutionCount))
+}
+
+func (p *Publisher) publishProfile(index string, fields mapstr.M) {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
@@ -335,8 +340,9 @@ func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID, 
 		}
 		return
 	}
-
-	fields := queryProfileToEvent(queryName, actionID, responseID, spaceID, profile, reqData, "", 0)
+	if p.retired(1) {
+		return
+	}
 
 	event := beat.Event{
 		Timestamp: time.Now(),
