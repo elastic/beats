@@ -15,6 +15,40 @@ The `file_integrity` module sends events when a file is changed (created, update
 The module is implemented for Linux, macOS (Darwin), and Windows.
 
 
+<<<<<<< HEAD
+=======
+## Required privileges [_required_privileges_file_integrity]
+
+Privilege requirements vary by backend.
+
+**fsnotify (default)**
+:   No special Linux capabilities are needed. Auditbeat only needs read access to the paths it monitors. It can run as a non-root user as long as file permissions allow it to read the monitored files or directories.
+
+**kprobes**
+:   Requires `CAP_SYS_ADMIN` to install kernel probes through tracefs. The tracefs or debugfs filesystem must be accessible at `/sys/kernel/tracing` or `/sys/kernel/debug/tracing`.
+
+    In Docker containers, bind-mount `/sys` from the host so that tracefs is available inside the container. The mount must be writable because Auditbeat must write probe definitions to tracefs:
+
+    ```sh
+    docker run --cap-add=SYS_ADMIN -v /sys:/sys ...
+    ```
+
+**ebpf**
+:   Requires `CAP_SYS_ADMIN` and `CAP_BPF` (or root), and a kernel version of 5.10.16 or later. The kernel BPF policy must permit eBPF programs.
+
+    In Docker containers, add `--cap-add=SYS_ADMIN --cap-add=BPF` and mount `/sys` from the host.
+
+    {applies_to}`stack: preview 9.7+` The backend must also run in the host PID namespace. In Docker, add `--pid=host`. In Kubernetes, set `hostPID: true` on the pod, as the reference DaemonSet manifest already does. The backend attributes each file event to the process that made the change by looking the process up in a table built from the host's `/proc` and kept current from kernel events. The kernel reports host process IDs, but without the host PID namespace the table is built from the container's own process IDs. Events from processes that were already running when Auditbeat started are then dropped, or attributed to the wrong process when a host process ID happens to match a container one. Auditbeat logs a warning at startup when it isn't running in the host PID namespace.
+
+**ETW (Windows only)**
+:   Requires Administrator privileges.
+
+::::{note}
+When using the `kprobes` or `ebpf` backend in a Docker container, bind-mount the host `/sys` directory and add the required capabilities. Refer to [Run Auditbeat on Docker](/reference/auditbeat/running-on-docker.md).
+::::
+
+
+>>>>>>> de78e8d (Drop ebpfevents as a dependency, move auditbeat FIM to quark (#53507))
 ## How it works [_how_it_works_2]
 
 This module uses features of the operating system to monitor file changes in realtime. When the module starts it creates a subscription with the OS to receive notifications of changes to the specified files or directories. Upon receiving notification of a change the module will read the file’s metadata and then compute a hash of the file’s contents.
@@ -23,7 +57,7 @@ At startup this module will perform an initial scan of the configured files and 
 
 The operating system features that power this feature are as follows.
 
-* Linux - Multiple backends are supported: `auto`, `fsnotify`, `kprobes`, `ebpf`. By default, `fsnotify` is used, and therefore the kernel must have inotify support. Inotify was initially merged into the 2.6.13 Linux kernel. The eBPF backend uses modern eBPF features and supports 5.10.16+ kernels. The `Kprobes` backend uses tracefs and supports 3.10+ kernels. FSNotify doesn’t have the ability to associate user data to file events. The preferred backend can be selected by specifying the `backend` config option. Since eBPF and Kprobes are in technical preview, `auto` will default to `fsnotify`.
+* Linux - Multiple backends are supported: `auto`, `fsnotify`, `kprobes`, `ebpf`. By default, `fsnotify` is used, and therefore the kernel must have inotify support. Inotify was initially merged into the 2.6.13 Linux kernel. The eBPF backend uses modern eBPF features and supports 5.10.16+ kernels. The `Kprobes` backend uses tracefs and supports 3.10+ kernels. FSNotify doesn’t have the ability to associate user data to file events. The preferred backend can be selected by specifying the `backend` config option. Since eBPF and Kprobes are in technical preview, `auto` defaults to `fsnotify`.
 * macOS (Darwin) - Uses the `FSEvents` API, present since macOS 10.5. This API coalesces multiple changes to a file into a single event. Auditbeat translates this coalesced changes into a meaningful sequence of actions. However, in rare situations the reported events may have a different ordering than what actually happened.
 * Windows:
   * `ReadDirectoryChangesW` is used.

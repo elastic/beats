@@ -15,110 +15,159 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux && (amd64 || arm64)
+//go:build linux && (amd64 || arm64) && cgo
 
 package file_integrity
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/ebpf"
-	"github.com/elastic/ebpfevents"
+	quark "github.com/elastic/go-quark"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-const clientName = "fim"
-
+// ebpfReader receives file events from the eBPF backend in quark.
 type ebpfReader struct {
-	watcher *ebpf.Watcher
-	done    <-chan struct{}
 	config  Config
 	log     *logp.Logger
 	eventC  chan Event
 	parsers []FileParser
 	paths   map[string]struct{}
-
-	_records <-chan ebpfevents.Record
+	queue   *quark.Queue
 }
 
 func (r *ebpfReader) Start(done <-chan struct{}) (<-chan Event, error) {
-	r.watcher = ebpf.GetWatcher()
-	r.done = done
+	attr := quark.DefaultQueueAttr()
+	// Only the eBPF backend in quark produces file events, so there is no
+	// fallback to quark's kprobe backend. Kernels without eBPF are served
+	// by this module's own kprobes backend instead.
+	//
+	// QQ_MIN_AGG stops quark from merging file events. Minimal aggregation
+	// also keeps every operation as its own event, as the previous backend
+	// did, while leaving the process bookkeeping quark relies on in place.
+	attr.Flags = quark.QQ_EBPF | quark.QQ_FILE | quark.QQ_MIN_AGG
 
-	mask := ebpf.EventMask(ebpfevents.EventTypeFileCreate | ebpfevents.EventTypeFileRename | ebpfevents.EventTypeFileDelete | ebpfevents.EventTypeFileModify)
-	var err error
-	r._records, err = r.watcher.Subscribe(clientName, mask)
+	queue, err := quark.OpenQueue(attr)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("open quark queue: %w", err)
 	}
 
-	// The loader falls back when some of its programs fail to load on this kernel. It
-	// keeps running, but events only the dropped programs emit are lost.
-	degraded := r.watcher.Degraded()
-	if degraded != nil {
-		r.log.Warnw("ebpf loader fell back on this kernel", "error", degraded)
-	}
-	if missing := missingEvents(mask, r.watcher.DisabledEvents()); len(missing) > 0 {
-		r.watcher.Unsubscribe(clientName)
-		return nil, fmt.Errorf("ebpf events required by file_integrity are disabled on this kernel: %s: %w",
-			strings.Join(missing, ", "), degraded)
+	// The queue is owned by ebpfReader.consumeEvents, see its doc string.
+	r.queue = queue
+
+	// quark attributes file events through a process table keyed by the
+	// PIDs the kernel reports, which are those of the initial PID namespace.
+	// In other namespaces, the table is built from local PIDs and quark
+	// drops events it cannot attribute. Make this obvious by logging a warning.
+	if initial, err := inInitialPIDNamespace(); err != nil {
+		r.log.Debugw("could not determine PID namespace", "error", err)
+	} else if !initial {
+		r.log.Warn("auditbeat is not running in the initial PID namespace: " +
+			"the ebpf backend drops file events from processes started before " +
+			"auditbeat and may attribute others to the wrong process. " +
+			"In Docker, run with --pid=host. In K8s set `hostPID: true` on the pod.")
 	}
 
-	go r.consumeEvents()
+	go r.consumeEvents(done)
 
 	r.log.Infow("started ebpf watcher", "file_path", r.config.Paths, "recursive", r.config.Recursive)
 	return r.eventC, nil
 }
 
-// missingEvents returns the names of the event types in mask that are disabled.
-func missingEvents(mask ebpf.EventMask, disabled []ebpfevents.EventType) []string {
-	var missing []string
-	for _, et := range disabled {
-		if mask&ebpf.EventMask(et) != 0 {
-			missing = append(missing, et.String())
-		}
+// initPIDNsInode is the inode of the initial PID namespace.
+// Fixed by the kernel as PROC_PID_INIT_INO in include/linux/proc_ns.h.
+const initPIDNsInode = 4026531836
+
+// inInitialPIDNamespace reports whether this process runs in the initial PID
+// namespace.
+func inInitialPIDNamespace() (bool, error) {
+	link, err := os.Readlink("/proc/self/ns/pid")
+	if err != nil {
+		return false, fmt.Errorf("read /proc/self/ns/pid: %w", err)
 	}
-	return missing
+	var inode uint64
+	if _, err := fmt.Sscanf(link, "pid:[%d]", &inode); err != nil {
+		return false, fmt.Errorf("parse /proc/self/ns/pid link %q: %w", link, err)
+	}
+	return inode == initPIDNsInode, nil
 }
 
-func (r *ebpfReader) consumeEvents() {
+// statsCheckInterval defines the frequency of fetching quark stats.
+const statsCheckInterval = time.Second
+
+// consumeEvents owns the quark queue and runs in its own goroutine.
+// The queue is not safe for concurrent use, so every call on it,
+// including Close, happens on this goroutine.
+func (r *ebpfReader) consumeEvents(done <-chan struct{}) {
 	defer close(r.eventC)
-	defer r.watcher.Unsubscribe(clientName)
+	defer r.queue.Close()
+
+	var (
+		lost      uint64
+		nextCheck time.Time
+	)
+
+	// Retrieves quark stats and checks for lost events.
+	checkLost := func(now time.Time) {
+		if now.Before(nextCheck) {
+			return
+		}
+		nextCheck = now.Add(statsCheckInterval)
+		if stats := r.queue.Stats(); stats.Lost != lost {
+			r.log.Warnf("ebpf watcher lost %d events", stats.Lost-lost)
+			lost = stats.Lost
+		}
+	}
 
 	for {
 		select {
-		case rec := <-r._records:
-			if rec.Error != nil {
-				r.log.Errorf("ebpf watcher error: %v", rec.Error)
-				continue
-			}
+		case <-done:
+			r.log.Debug("ebpf watcher terminated")
+			return
+		default:
+		}
 
-			switch rec.Event.Type {
-			case ebpfevents.EventTypeFileCreate, ebpfevents.EventTypeFileRename, ebpfevents.EventTypeFileDelete, ebpfevents.EventTypeFileModify:
-			default:
-				r.log.Warnf("received unwanted ebpf event: %s", rec.Event.Type.String())
-				continue
+		qe, ok := r.queue.GetEvent()
+		if !ok {
+			// Block returns after at most 100ms so done is re-checked promptly.
+			if err := r.queue.Block(); err != nil {
+				r.log.Errorf("ebpf watcher error: %v", err)
+				return
 			}
+			checkLost(time.Now())
+			continue
+		}
 
-			start := time.Now()
-			e, ok := NewEventFromEbpfEvent(
-				*rec.Event,
-				r.config.MaxFileSizeBytes,
-				r.config.HashTypes,
-				r.parsers,
-				r.excludedPath,
-			)
-			if !ok {
-				continue
-			}
-			e.rtt = time.Since(start)
+		if qe.Events&quark.QUARK_EV_FILE == 0 || qe.File == nil {
+			r.log.Debugf("received unwanted quark event: %#x", qe.Events)
+			continue
+		}
 
-			r.log.Debugw("received ebpf event", "file_path", e.Path)
-			r.eventC <- e
-		case <-r.done:
+		start := time.Now()
+		// Also check for lost events, periodically, here so that a busy loop
+		// doesn't cause us to miss event drops.
+		checkLost(start)
+		e, ok := NewEventFromQuarkEvent(
+			qe,
+			r.config.MaxFileSizeBytes,
+			r.config.HashTypes,
+			r.parsers,
+			r.excludedPath,
+		)
+		if !ok {
+			continue
+		}
+		e.rtt = time.Since(start)
+
+		r.log.Debugw("received ebpf event", "file_path", e.Path)
+		select {
+		case r.eventC <- e:
+		case <-done:
 			r.log.Debug("ebpf watcher terminated")
 			return
 		}
