@@ -17,7 +17,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	lru "github.com/hashicorp/golang-lru/v2"
 	"github.com/osquery/osquery-go"
 	kconfig "github.com/osquery/osquery-go/plugin/config"
@@ -84,19 +83,12 @@ type osquerybeat struct {
 	osqueryVersion string
 	osquerySource  string
 
-<<<<<<< HEAD
-	pub            osquerybeatPublisher
-	qp             *queryProfiler
-	liveProfiles   *liveProfileStore
-	profileMetrics *scheduledProfileMetrics
-=======
 	scheduledResults *scheduledResultDispatcher
 	liveResults      *liveResultDispatcher
 	pub              liveQueryPublisher
 	qp               *queryProfiler
 	liveProfiles     *liveProfileStore
 	profileMetrics   *scheduledProfileMetrics
->>>>>>> f8f1483 (osquerybeat: bound live query publishing and report partial counts (#54253))
 
 	log *logp.Logger
 
@@ -108,7 +100,7 @@ type osquerybeat struct {
 	mx      sync.Mutex
 
 	// clockSkewWarnLogged latches the pre-start clamp warning to once per
-	// schedule name. handleQueryResult runs per result document, so without
+	// schedule name. handleScheduledQueryResult runs per result document, so without
 	// this a persistently skewed agent would warn on every snapshot/diff hit.
 	clockSkewWarnLogged map[string]struct{}
 
@@ -137,9 +129,9 @@ type osquerybeat struct {
 
 type osquerybeatPublisher interface {
 	scheduledQueryPublisher
+	queryProfilePublisher
 	actionResultPublisher
 	Configure(inputs []config.InputConfig) error
-	CaptureScheduledProfileSink(namespace string) pub.ScheduledProfileSink
 	Close()
 }
 
@@ -179,7 +171,6 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 		pub:                  &liveClients{newPublisher: func() liveQueryPublisher { return pub.New(b, log) }},
 		liveResults:          newLiveResultDispatcher(b.Monitoring.StatsRegistry(), log, config.DefaultLivePublishTimeout),
 		qp:                   newQueryProfiler(log),
-		profileMetrics:       newScheduledProfileMetrics(b.Monitoring.StatsRegistry()),
 		osquerydFactory:      osqd.New,
 		executablePath:       os.Executable,
 		// Resolve the osqueryd data path now, while b.Info.Paths still reflects
@@ -188,6 +179,13 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 		// the global paths state.
 		osqueryDataPath: b.Info.Paths.Resolve(paths.Data, "osquery"),
 	}
+
+	bt.scheduledResults = newScheduledResultDispatcher(b.Monitoring.StatsRegistry(), log, config.DefaultScheduledMaxEvents,
+		func(allowed func() bool, dropped func(), cut func(int)) osquerybeatPublisher {
+			return pub.NewScheduled(b, log, allowed, dropped, cut)
+		}, bt.handleScheduledQueryResult)
+	bt.scheduledResults.profile = bt.enqueueScheduledProfile
+	bt.profileMetrics = newScheduledProfileMetrics(b.Monitoring.StatsRegistry())
 
 	profileCfg := config.GetQueryProfileStorageConfig(c.Inputs)
 	if profileCfg.EnabledOrDefault() {
@@ -223,8 +221,6 @@ func (bt *osquerybeat) init() (context.Context, error) {
 func (bt *osquerybeat) close() {
 	bt.mx.Lock()
 	defer bt.mx.Unlock()
-<<<<<<< HEAD
-=======
 	if bt.cancel != nil {
 		bt.cancel()
 	}
@@ -237,12 +233,8 @@ func (bt *osquerybeat) close() {
 	}
 	// Close does not wait for a live publish stuck on a full output; that
 	// client is closed when the pipeline releases its Publish.
->>>>>>> f8f1483 (osquerybeat: bound live query publishing and report partial counts (#54253))
 	if bt.pub != nil {
 		bt.pub.Close()
-	}
-	if bt.cancel != nil {
-		bt.cancel()
 	}
 
 	// Start watching the parent process only now, as a fallback for a
@@ -412,13 +404,14 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	defer rah.Clear()
 
 	reportDaemonStatus(status.Configuring, "Initial configuration")
-	if err := bt.pub.Configure(bt.config.Inputs); err != nil {
+	if err := bt.configurePublishers(bt.config.Inputs); err != nil {
 		reportDaemonStatus(status.Failed, err.Error())
 		return err
 	}
 	if len(bt.config.Inputs) == 0 {
 		reportDaemonStatus(status.Running, "No osquery inputs configured")
 	}
+
 	g, ctx := errgroup.WithContext(ctx)
 
 	// Start osquery runner.
@@ -461,7 +454,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 				if len(inputConfigs) == 0 {
 					bt.log.Warn("Osquery input unit was removed; osquery actions (live queries, scheduled packs) will not be available until an osquery input unit is received from Fleet. If the agent was moved to a new policy, ensure the destination policy includes Osquery Manager and that the policy was fully applied.")
 				}
-				err = bt.pub.Configure(inputConfigs)
+				err = bt.configurePublishers(inputConfigs)
 				if err != nil {
 					bt.log.Errorf("Failed to connect beat publisher client, err: %v", err)
 					return err
@@ -709,8 +702,9 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 	// Create osquery logger plugin
 	var scheduledProfiler *scheduledQueryProfiler
 	loggerPlugin := NewLoggerPlugin(bt.log, func(res QueryResult) {
-		bt.handleQueryResult(ctx, cli, configPlugin, scheduledProfiler, res)
+		bt.scheduledResults.enqueue(ctx, cli, configPlugin, res, scheduledProfiler)
 	})
+	defer bt.scheduledResults.prune()
 
 	// Create recurrence query handler for scheduling queries with RRULE expressions
 	var rruleHandler *recurrenceQueryHandler
@@ -723,13 +717,22 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 			return err
 		}
 		defer cli.Close()
+		// Results queued by an earlier run are resolved with this run's client.
+		bt.scheduledResults.setClient(ctx, cli)
+		// Stop handing cli to the result worker as soon as the run ends, not
+		// after the rest of this run's teardown.
+		stopClear := context.AfterFunc(ctx, func() { bt.scheduledResults.clearClient(cli) })
+		defer func() {
+			stopClear()
+			bt.scheduledResults.clearClient(cli)
+		}()
 		profileCtx, cancelProfiles := context.WithCancel(ctx)
 		profileExecutor := newProfilingQueryExecutor(profileCtx, socketPath, bt.log)
 		metrics := bt.profileMetrics
 		if metrics == nil {
 			metrics = newScheduledProfileMetrics(nil)
 		}
-		scheduledProfiler = newScheduledQueryProfiler(profileCtx, scheduledProfilePendingJobs, profileExecutor, configPlugin, bt.qp, metrics)
+		scheduledProfiler = newScheduledQueryProfiler(profileCtx, scheduledProfilePendingJobs, profileExecutor, configPlugin, bt.qp, metrics, bt.scheduledResults.enqueueProfile)
 		// osquery_schedule diagnostics need the same isolation as normal profiles.
 		bt.setDiagnosticsQueryExecutor(profileExecutor)
 		defer func() {
@@ -739,7 +742,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		}()
 
 		// Initialize and start RRULE query handler after osqueryd connection is established
-		rruleHandler = newRecurrenceQueryHandler(bt.log, cli, configPlugin, bt.pub, bt.liveProfiles, bt.osqueryVersion)
+		rruleHandler = newRecurrenceQueryHandler(bt.log, cli, configPlugin, bt.scheduledResults, bt.liveProfiles, bt.osqueryVersion)
 		rruleHandler.Start(ctx)
 		defer rruleHandler.Stop()
 
@@ -902,36 +905,32 @@ func (bt *osquerybeat) shouldLogClockSkewWarn(scheduleName string) bool {
 	return true
 }
 
-func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Client, configPlugin *ConfigPlugin, profiler *scheduledQueryProfiler, res QueryResult) {
-	ns, ok := configPlugin.LookupNamespace(res.Name)
-	if !ok {
-		bt.log.Debugf("failed to lookup query namespace: %s, the query was possibly removed recently from the schedule", res.Name)
-		// Drop the scheduled query results since at this point we don't have the namespace for the datastream where to send the results to
-		// and the API key would not have permissions for that namespaces datastream to create the index
+func (bt *osquerybeat) enqueueScheduledProfile(profiler *scheduledQueryProfiler, ns string, qi QueryInfo, res QueryResult, responseID string) {
+	// The pending policy decides, so profiling starts as soon as a policy
+	// enables it rather than after osqueryd next fetches its configuration.
+	if profiler == nil || !profiler.config.LookupQueryProfile(res.Name) {
 		return
 	}
-
-	qi, ok := configPlugin.LookupQueryInfo(res.Name)
-	if !ok {
-		bt.log.Errorf("failed to lookup query info: %s", res.Name)
-		return
+	scheduleID := qi.ScheduleID
+	if scheduleID == "" {
+		scheduleID = res.Name
 	}
+	executionCount, _, _ := nativeScheduleTiming(qi.StartDate, qi.Interval, res.UnixTime)
+	profiler.enqueue(scheduledProfileRequest{
+		name: res.Name, query: qi.Query, namespace: ns, scheduleID: scheduleID,
+		responseID: responseID, spaceID: qi.SpaceID, scheduleExecutionCount: executionCount,
+	})
+}
 
+// handleScheduledQueryResult resolves and publishes res. It returns the rows,
+// including the response, it did not publish because ResolveResult failed.
+func (bt *osquerybeat) handleScheduledQueryResult(ctx context.Context, cli scheduledQueryClient, publisher scheduledQueryPublisher, ns string, qi QueryInfo, res QueryResult, responseID string) int {
 	// Use policy schedule_id when set, otherwise query name.
 	scheduleID := idOrDefault(qi.ScheduleID, res.Name)
 	var totalHits int
 
-	responseID := uuid.Must(uuid.NewV4()).String()
 	runTime := time.Unix(res.UnixTime, 0).UTC()
 	scheduleExecutionCount, plannedScheduleTime, clockSkewClamped := nativeScheduleTiming(qi.StartDate, qi.Interval, res.UnixTime)
-	var profileRequest scheduledProfileRequest
-	if profiler != nil && configPlugin.LookupQueryProfile(res.Name) {
-		profileRequest = scheduledProfileRequest{
-			name: res.Name, query: qi.Query, namespace: ns, scheduleID: scheduleID, responseID: responseID, spaceID: qi.SpaceID,
-			scheduleExecutionCount: scheduleExecutionCount,
-			sink:                   bt.pub.CaptureScheduledProfileSink(ns),
-		}
-	}
 	if clockSkewClamped && bt.shouldLogClockSkewWarn(res.Name) {
 		bt.log.Warnf(
 			"Native scheduled query %q reported run time %s before start_date %s; possible clock skew, clamping to execution 1",
@@ -943,14 +942,14 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 	publishResolved := func(resultType, action string, hits []map[string]any) {
 		totalHits += len(hits)
 		meta := queryResultMeta(resultType, action, res, scheduleExecutionCount, plannedScheduleTime)
-		bt.pub.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, qi.SpaceID, qi.PackID, qi.PackName, qi.QueryName, meta, hits, qi.ECSMapping, nil)
+		publisher.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, qi.SpaceID, qi.PackID, qi.PackName, qi.QueryName, meta, hits, qi.ECSMapping, nil)
 	}
 
 	if res.Action == "snapshot" {
 		snapshot, err := cli.ResolveResult(ctx, qi.Query, res.Hits)
 		if err != nil {
 			bt.log.Errorf("failed to resolve snapshot query result types: %s", res.Name)
-			return
+			return len(res.Hits) + 1
 		}
 		publishResolved("snapshot", "", snapshot)
 	} else {
@@ -958,7 +957,7 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 			added, err := cli.ResolveResult(ctx, qi.Query, res.DiffResults.Added)
 			if err != nil {
 				bt.log.Errorf(`failed to resolve diff query "added" result types: %s`, res.Name)
-				return
+				return len(res.DiffResults.Added) + len(res.DiffResults.Removed) + 1
 			}
 			publishResolved("diff", "added", added)
 		}
@@ -966,17 +965,14 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 			removed, err := cli.ResolveResult(ctx, qi.Query, res.DiffResults.Removed)
 			if err != nil {
 				bt.log.Errorf(`failed to resolve diff query "removed" result types: %s`, res.Name)
-				return
+				return len(res.DiffResults.Removed) + 1
 			}
 			publishResolved("diff", "removed", removed)
 		}
 	}
 
-	bt.pub.PublishScheduledResponse(scheduleID, qi.PackID, qi.PackName, qi.QueryName, qi.SpaceID, responseID, runTime, runTime, plannedScheduleTime, totalHits, scheduleExecutionCount)
-	if profileRequest.sink != nil {
-		// No profile RPC or queue wait may run inside the native logger callback.
-		profiler.enqueue(profileRequest)
-	}
+	publisher.PublishScheduledResponse(scheduleID, qi.PackID, qi.PackName, qi.QueryName, qi.SpaceID, responseID, runTime, runTime, plannedScheduleTime, totalHits, scheduleExecutionCount)
+	return 0
 }
 
 func queryResultMeta(typ, action string, res QueryResult, scheduleExecutionCount int64, plannedScheduleTime time.Time) map[string]any {
@@ -1093,9 +1089,6 @@ func (bt *osquerybeat) unregisterActionHandler(b *beat.Beat, rah *resetableActio
 	}
 }
 
-<<<<<<< HEAD
-// validatePolicy dry-runs the policy steps of the publisher's Configure and
-=======
 func (bt *osquerybeat) configurePublishers(inputs []config.InputConfig) error {
 	publishing, err := config.GetPublishingConfig(inputs)
 	if err != nil {
@@ -1114,27 +1107,15 @@ func (bt *osquerybeat) configurePublishers(inputs []config.InputConfig) error {
 }
 
 // validatePolicy dry-runs the policy steps of configurePublishers and
->>>>>>> f8f1483 (osquerybeat: bound live query publishing and report partial counts (#54253))
 // runOsquery, so that a policy that would fail them is rejected before any of
 // it is applied.
 func validatePolicy(ctx context.Context, log *logp.Logger, inputs []config.InputConfig) error {
+	if _, err := config.GetPublishingConfig(inputs); err != nil {
+		return err
+	}
 	if err := pub.CheckProcessors(inputs, log); err != nil {
 		return err
 	}
 	_, err := newPolicyView(ctx, log, inputs)
 	return err
-}
-
-// newPolicyView returns a config plugin with inputs applied as osqueryd would
-// pull them. validatePolicy uses it to reject a policy before any of it is
-// applied, so it must run every step that can fail when the policy is applied.
-func newPolicyView(ctx context.Context, log *logp.Logger, inputs []config.InputConfig) (*ConfigPlugin, error) {
-	view := NewConfigPlugin(log)
-	if err := view.Set(inputs); err != nil {
-		return nil, fmt.Errorf("invalid osquery configuration: %w", err)
-	}
-	if _, err := view.GenerateConfig(ctx); err != nil {
-		return nil, fmt.Errorf("invalid osquery configuration: %w", err)
-	}
-	return view, nil
 }

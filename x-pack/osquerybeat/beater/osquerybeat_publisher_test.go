@@ -13,12 +13,8 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
-<<<<<<< HEAD
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pub"
-=======
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
->>>>>>> f8f1483 (osquerybeat: bound live query publishing and report partial counts (#54253))
 )
 
 type mockBeatPublisher struct {
@@ -44,11 +40,12 @@ func (m *mockBeatPublisher) PublishScheduledResponse(scheduleID, packID, packNam
 func (m *mockBeatPublisher) PublishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) {
 }
 
+func (m *mockBeatPublisher) PublishScheduledProfile(index, queryName, scheduleID, responseID, spaceID string, scheduleExecutionCount int64, profile map[string]any) {
+}
+
 func (m *mockBeatPublisher) Configure(inputs []config.InputConfig) error {
 	return nil
 }
-
-func (m *mockBeatPublisher) CaptureScheduledProfileSink(string) pub.ScheduledProfileSink { return nil }
 
 func (m *mockBeatPublisher) Close() {
 	m.closeCalled = true
