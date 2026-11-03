@@ -168,9 +168,6 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 	return nil
 }
 
-<<<<<<< HEAD
-func (p *Publisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
-=======
 // CheckProcessors returns an error if the processors that Configure would
 // build for inputs cannot be built. It builds them and closes them again, so
 // each policy builds its processors one extra time; some processors, such as
@@ -220,8 +217,7 @@ func streamInputs(inputs []config.InputConfig) (result, actionResponses, profile
 	return result, actionResponses, profile
 }
 
-func (p *Publisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any) {
->>>>>>> ac50c08 (osquerybeat: reject policies that cannot be applied (#54249))
+func (p *Publisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
