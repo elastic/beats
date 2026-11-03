@@ -1,0 +1,13 @@
+kind: security
+
+summary: Require verified HTTPS for remote Heartbeat Vault secret stores.
+
+description: >
+  Heartbeat now rejects plaintext HTTP and `ssl.verification_mode: none` for
+  non-loopback Vault secret store addresses. Existing remote Vault connections
+  must use HTTPS with certificate verification. To trust a private CA, configure
+  `ssl.certificate_authorities` instead of disabling verification.
+
+component: heartbeat
+
+issue: https://github.com/elastic/beats/issues/54397

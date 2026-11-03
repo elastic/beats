@@ -265,8 +265,42 @@ func TestConfigValidation(t *testing.T) {
 		entry   map[string]any
 		wantErr string
 	}{
-		{name: "token", entry: tokenEntry("https://vault:8200")},
-		{name: "approle", entry: appRoleEntry("http://vault:8200")},
+		{name: "token over verified https", entry: tokenEntry("https://vault:8200")},
+		{name: "approle over loopback http", entry: appRoleEntry("http://localhost:8200")},
+		{name: "remote http hostname", entry: tokenEntry("http://vault:8200"), wantErr: "must use https unless its host is loopback"},
+		{name: "remote http private IPv4", entry: tokenEntry("http://10.0.0.5:8200"), wantErr: "must use https unless its host is loopback"},
+		{name: "remote http IPv6", entry: tokenEntry("http://[2001:db8::1]:8200"), wantErr: "must use https unless its host is loopback"},
+		{name: "localhost http", entry: tokenEntry("http://localhost:8200")},
+		{name: "mixed-case localhost http", entry: tokenEntry("http://LOCALHOST:8200")},
+		{name: "IPv4 loopback http", entry: tokenEntry("http://127.42.0.1:8200")},
+		{name: "IPv6 loopback http", entry: tokenEntry("http://[::1]:8200")},
+		{name: "expanded IPv6 loopback http", entry: tokenEntry("http://[0:0:0:0:0:0:0:1]:8200")},
+		{
+			name: "remote https without verification",
+			entry: map[string]any{
+				"address": "https://vault:8200",
+				"auth":    map[string]any{"token": "x"},
+				"ssl":     map[string]any{"verification_mode": "none"},
+			},
+			wantErr: "'ssl.verification_mode' must not be 'none' unless the address host is loopback",
+		},
+		{
+			name: "remote https with disabled ssl settings and no verification",
+			entry: map[string]any{
+				"address": "https://vault:8200",
+				"auth":    map[string]any{"token": "x"},
+				"ssl":     map[string]any{"enabled": false, "verification_mode": "none"},
+			},
+			wantErr: "'ssl.verification_mode' must not be 'none' unless the address host is loopback",
+		},
+		{
+			name: "loopback https without verification",
+			entry: map[string]any{
+				"address": "https://[::1]:8200",
+				"auth":    map[string]any{"token": "x"},
+				"ssl":     map[string]any{"verification_mode": "none"},
+			},
+		},
 		{name: "missing address", entry: map[string]any{"auth": map[string]any{"token": "x"}}, wantErr: "'address' is required"},
 		{name: "bad address", entry: map[string]any{"address": "vault:8200", "auth": map[string]any{"token": "x"}}, wantErr: "must be an http or https URL"},
 		{name: "no auth", entry: map[string]any{"address": "https://vault"}, wantErr: "'auth' must have one method"},
