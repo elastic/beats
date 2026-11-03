@@ -1,4 +1,4 @@
-kind: security
+kind: other
 
 summary: Update Python test CA bundles for the eMudhra certificate compromise.
 
