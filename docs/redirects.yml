@@ -1,4 +1,8 @@
 redirects:
+  'extend/archive-dashboards.md': 'extend/new-dashboards.md'
+  'extend/generate-index-pattern.md': 'extend/event-fields-yml.md'
+  'extend/share-beat-dashboards.md': 'extend/new-dashboards.md'
+  'extend/_migrating_dashboards_from_kibana_5_x_to_6_x.md': 'extend/new-dashboards.md'
   'reference/metricbeat/exported-fields-openai.md': 'release-notes/index.md'
   'reference/metricbeat/metricbeat-metricset-openai-usage.md': 'release-notes/index.md'
   'reference/metricbeat/metricbeat-module-openai.md': 'release-notes/index.md'

@@ -35,7 +35,6 @@ This command does initial setup of the environment:
 
  * Index mapping template in Elasticsearch to ensure fields are mapped.
  * Kibana dashboards (where available).
- * ML jobs (where available).
  * Ingest pipelines (where available).
  * ILM policy (for Elasticsearch 6.5 and newer).
 
@@ -43,10 +42,12 @@ Usage:
   metricbeat setup [flags]
 
 Flags:
-      --dashboards         Setup dashboards
-  -h, --help               help for setup
-      --index-management   Setup all components related to Elasticsearch index management, including template, ilm policy and rollover alias
-      --pipelines          Setup Ingest pipelines
+      --dashboards                     Setup dashboards
+      --enable-all-filesets            Behave as if all modules and filesets had been enabled
+      --force-enable-module-filesets   Behave as if all filesets, within enabled modules, are enabled
+  -h, --help                           help for setup
+      --index-management               Setup all components related to Elasticsearch index management, including template, ilm policy and rollover alias
+      --pipelines                      Setup Ingest pipelines
 ```
 
 The flags are useful when you don’t want to load everything. For example, to import only the dashboards, use the `--dashboards` flag:
@@ -64,7 +65,7 @@ Starting with Beats 6.0.0, the dashboards are no longer loaded directly into Ela
 By default, the `setup` command imports the dashboards from the `kibana` directory, which is available in the Beat package.
 
 ::::{note}
-The format of the saved dashboards is not compatible between Kibana 5.x and 6.x. Thus, the Kibana 5.x dashboards are available in the `5.x` directory, and the Kibana 6.0 dashboards, and older are in the `default` directory.
+The `setup` command imports the dashboards from the `7` subdirectory of the dashboards directory, whatever your Kibana version is.
 ::::
 
 
@@ -93,10 +94,12 @@ In case you are using customized dashboards, you can import them:
 
 ## Import Dashboards for Development [import-dashboards-for-development]
 
-You can make use of the Magefile from the Beat GitHub repository to import the dashboards. If Kibana is running on localhost, then you can run the following command from the root of the Beat:
+You can make use of the Magefile from the Beat GitHub repository to collect the dashboards of the Beat and its modules into the `build/kibana` directory, and then import them with the `setup` command. If Kibana is running on localhost, then you can run the following commands from the root of the Beat:
 
 ```shell
+mage build
 mage dashboards
+./metricbeat setup --dashboards -E setup.dashboards.directory=build/kibana
 ```
 
 
