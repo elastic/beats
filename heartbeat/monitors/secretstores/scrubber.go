@@ -185,29 +185,45 @@ func (s *Scrubber) equal(o *Scrubber) bool {
 }
 
 // Event removes the secret values from the fields of event, except the kept
-// ones. Maps and slices that hold one are copied, never modified: jobs can
-// share them between events. Other values, such as structs, are left as is:
-// the pipeline converts them to maps before the Redactor runs.
+// ones. A field whose whole value is a secret is left out instead of set to
+// <hidden>, which typed fields would reject with the whole event: a secret
+// can be the IP address in monitor.ip. Maps and slices that hold one are
+// copied, never modified: jobs can share them between events. Other values,
+// such as structs, are left as is: the pipeline converts them to maps before
+// the Redactor runs.
 func (s *Scrubber) Event(event *beat.Event) {
 	if s == nil || event == nil {
 		return
 	}
-	if fields, changed := scrubMap(s, event.Fields, ""); changed {
+	if fields, c := scrubMap(s, event.Fields, ""); c != unchanged {
 		event.Fields = fields
 	}
 }
 
-// value returns v without the secret values, and whether it changed. key is
-// the name of the field holding v.
-func (s *Scrubber) value(v any, key string) (any, bool) {
+// change is what scrubbing did to a value.
+type change int
+
+const (
+	unchanged change = iota
+	replaced
+	// removed is for a string that is a secret value as a whole.
+	removed
+)
+
+// value returns v without the secret values, and what changed. key is the
+// name of the field holding v.
+func (s *Scrubber) value(v any, key string) (any, change) {
 	switch tv := v.(type) {
 	case string:
-		out := s.replace(tv)
-		if out == tv {
+		switch out := s.replace(tv); out {
+		case tv:
 			// Returning v and not tv avoids boxing the string again.
-			return v, false
+			return v, unchanged
+		case scrubbed:
+			return nil, removed
+		default:
+			return out, replaced
 		}
-		return out, true
 	case mapstr.M:
 		return scrubMap(s, tv, key)
 	case map[string]any:
@@ -221,28 +237,32 @@ func (s *Scrubber) value(v any, key string) (any, bool) {
 	case []map[string]any:
 		return scrubSlice(s, tv, key)
 	}
-	return v, false
+	return v, unchanged
 }
 
-func scrubMap[M ~map[string]any](s *Scrubber, m M, key string) (M, bool) {
+func scrubMap[M ~map[string]any](s *Scrubber, m M, key string) (M, change) {
 	var out M
 	for k, v := range m {
 		if kept(key, k) {
 			continue
 		}
-		nv, changed := s.value(v, k)
-		if !changed {
+		nv, c := s.value(v, k)
+		if c == unchanged {
 			continue
 		}
 		if out == nil {
 			out = maps.Clone(m)
 		}
-		out[k] = nv
+		if c == removed {
+			delete(out, k)
+		} else {
+			out[k] = nv
+		}
 	}
 	if out == nil {
-		return m, false
+		return m, unchanged
 	}
-	return out, true
+	return out, replaced
 }
 
 // kept reports whether the field k of the field parent is never scrubbed.
@@ -267,25 +287,28 @@ func kept(parent, k string) bool {
 	return false
 }
 
-func scrubSlice[S ~[]E, E any](s *Scrubber, in S, key string) (S, bool) {
+func scrubSlice[S ~[]E, E any](s *Scrubber, in S, key string) (S, change) {
 	var out S
 	for i, item := range in {
-		nv, changed := s.value(item, key)
-		if !changed {
-			continue
-		}
+		nv, c := s.value(item, key)
 		if out == nil {
-			out = slices.Clone(in)
+			if c == unchanged {
+				continue
+			}
+			out = append(make(S, 0, len(in)), in[:i]...)
 		}
 		typed, ok := nv.(E)
-		if !ok {
-			// Only reachable if value changed the type of an element.
-			continue
+		switch {
+		case c == removed:
+		case c == unchanged || !ok:
+			// !ok is only reachable if value changed the type of an element.
+			out = append(out, item)
+		default:
+			out = append(out, typed)
 		}
-		out[i] = typed
 	}
 	if out == nil {
-		return in, false
+		return in, unchanged
 	}
-	return out, true
+	return out, replaced
 }

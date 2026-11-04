@@ -76,9 +76,9 @@ func TestScrubberEvent(t *testing.T) {
 
 	event := &beat.Event{Fields: mapstr.M{
 		"url":     mapstr.M{"full": "https://host/?t=" + secret, "port": 443},
-		"nested":  map[string]any{"list": []any{"x", secret}},
-		"tags":    []string{"a", secret},
-		"objects": []mapstr.M{{"key": secret}},
+		"nested":  map[string]any{"list": []any{"x", "is " + secret}},
+		"tags":    []string{"a", "is " + secret},
+		"objects": []mapstr.M{{"key": "is " + secret}},
 		"plain":   "unchanged",
 		"count":   3,
 		"synthetics": mapstr.M{
@@ -90,9 +90,9 @@ func TestScrubberEvent(t *testing.T) {
 
 	assert.Equal(t, mapstr.M{
 		"url":     mapstr.M{"full": "https://host/?t=<hidden>", "port": 443},
-		"nested":  map[string]any{"list": []any{"x", "<hidden>"}},
-		"tags":    []string{"a", "<hidden>"},
-		"objects": []mapstr.M{{"key": "<hidden>"}},
+		"nested":  map[string]any{"list": []any{"x", "is <hidden>"}},
+		"tags":    []string{"a", "is <hidden>"},
+		"objects": []mapstr.M{{"key": "is <hidden>"}},
 		"plain":   "unchanged",
 		"count":   3,
 		"synthetics": mapstr.M{
@@ -123,9 +123,32 @@ func TestScrubberEventKeepsHeartbeatFields(t *testing.T) {
 	scrubberFor(secret).Event(event)
 
 	want := kept.Clone()
-	_, _ = want.Put("monitor.ip", "<hidden>")
 	_, _ = want.Put("synthetics.payload.message", "at <hidden>")
 	assert.Equal(t, want, event.Fields, "the fields Heartbeat sets must be kept, other fields scrubbed")
+}
+
+// TestScrubberEventDropsWholeValues checks a field or item whose whole value
+// is a secret is left out: typed fields, such as monitor.ip mapped as ip,
+// would make the event fail with <hidden>.
+func TestScrubberEventDropsWholeValues(t *testing.T) {
+	const secret = "10.0.0.5"
+	event := &beat.Event{Fields: mapstr.M{
+		"monitor": mapstr.M{"ip": secret, "status": "up"},
+		"resolve": mapstr.M{"ip": secret, "rtt": mapstr.M{"us": 10}},
+		"url":     mapstr.M{"full": "tcp://" + secret + ":5432", "domain": secret},
+		"tags":    []string{"a", secret, "b"},
+		"list":    []any{secret},
+	}}
+
+	scrubberFor(secret).Event(event)
+
+	assert.Equal(t, mapstr.M{
+		"monitor": mapstr.M{"status": "up"},
+		"resolve": mapstr.M{"rtt": mapstr.M{"us": 10}},
+		"url":     mapstr.M{"full": "tcp://<hidden>:5432"},
+		"tags":    []string{"a", "b"},
+		"list":    []any{},
+	}, event.Fields, "whole values must be left out, partial ones replaced")
 }
 
 // TestScrubberEventDoesNotModifySharedValues checks jobs can keep sharing
