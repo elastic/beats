@@ -2,7 +2,7 @@
   type: group
   release: beta
   version:
-    beta: 9.7.0
+    beta: 9.4.0
   description: >
     Number and duration of the requests of a tier of an Elasticsearch Serverless project, for one HTTP status code. There is one document per tier and
     HTTP status code with requests during the scrape (and always one for the successful, 2xx, requests), which adds the requests of every node
