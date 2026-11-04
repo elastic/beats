@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Correct error text and field descriptions in the Azure, GCP and AWS modules
+component: filebeat, heartbeat, metricbeat

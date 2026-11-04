@@ -125,7 +125,7 @@ func filterMetricNames(resourceId string, metricConfig azure.MetricConfig, metri
 		// verify if configured metric names are valid, return log error event for the invalid ones, map only  the valid metric names
 		supportedMetricNames, unsupportedMetricNames = filterConfiguredMetrics(metricConfig.Name, metricDefinitions)
 		if len(unsupportedMetricNames) > 0 && !metricConfig.IgnoreUnsupported {
-			return nil, fmt.Errorf("the metric names configured  %s are not supported for the resource %s and namespace %s",
+			return nil, fmt.Errorf("the metric names configured %s are not supported for the resource %s and namespace %s",
 				strings.Join(unsupportedMetricNames, ","), resourceId, metricConfig.Namespace)
 		}
 	}
