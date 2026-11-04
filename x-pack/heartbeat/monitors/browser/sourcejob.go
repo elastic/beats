@@ -36,6 +36,9 @@ type SourceJob struct {
 // what the synthetics runner prints, so it must be the logger of the monitor:
 // it removes the values of secret references.
 func NewSourceJob(rawCfg *config.C, logger *logp.Logger) (*SourceJob, error) {
+	if logger == nil {
+		logger = logp.NewNopLogger()
+	}
 	// Global browser context to cancel all jobs
 	// on close
 	ctx, cancel := context.WithCancel(context.Background())

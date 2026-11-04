@@ -133,7 +133,8 @@ func (p *secretPlugin) job(i int) jobs.Job {
 
 // current returns the inner plugin for the current resolved config,
 // creating it if the resolved config changed, and the Scrubber of its
-// secret values. The Scrubber is also returned with a creation error.
+// secret values. The Scrubber is also returned with a resolve or creation
+// error.
 func (p *secretPlugin) current() (plugin.Plugin, *Scrubber, error) {
 	p.mu.Lock()
 	config := p.config
@@ -142,11 +143,11 @@ func (p *secretPlugin) current() (plugin.Plugin, *Scrubber, error) {
 	// Resolve without the lock, so a slow secret store doesn't block close.
 	resolved, scrubber, err := p.resolve(config)
 	if err != nil {
-		return plugin.Plugin{}, nil, err
+		return plugin.Plugin{}, scrubber, err
 	}
 	hash, err := hashConfig(resolved)
 	if err != nil {
-		return plugin.Plugin{}, nil, fmt.Errorf("could not hash the resolved config: %w", err)
+		return plugin.Plugin{}, scrubber, fmt.Errorf("could not hash the resolved config: %w", err)
 	}
 
 	p.mu.Lock()
@@ -174,7 +175,7 @@ func (p *secretPlugin) current() (plugin.Plugin, *Scrubber, error) {
 	if err != nil {
 		// A plugin can return resources to close along with the error.
 		if closeErr := inner.Close(); closeErr != nil {
-			p.logger.Errorf("Could not close the monitor plugin: %v", closeErr)
+			p.logger.Errorf("Could not close the monitor plugin: %v", scrubber.Error(closeErr))
 		}
 		p.createErr = err
 		return plugin.Plugin{}, scrubber, err
@@ -206,7 +207,7 @@ func (p *secretPlugin) closeInner() error {
 	}
 	inner := p.inner
 	p.inner, p.built = plugin.Plugin{}, false
-	err := inner.Close()
+	err := p.scrubber.Error(inner.Close())
 	if err != nil {
 		p.logger.Errorf("Could not close the monitor plugin: %v", err)
 	}

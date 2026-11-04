@@ -24,7 +24,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest/observer"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
@@ -60,6 +63,34 @@ func TestScrubberLoggerKeepsLevel(t *testing.T) {
 	entries := logs.TakeAll()
 	require.Len(t, entries, 2, "the scrubbing logger must keep the levels of the base logger")
 	assert.Equal(t, "warn <hidden>", entries[1].Message, "the message must not have the secret")
+}
+
+// selectorCore drops debug entries of other loggers than selector in Check,
+// as logp does for logging.selectors.
+type selectorCore struct {
+	zapcore.Core
+	selector string
+}
+
+func (c selectorCore) Check(e zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.CheckedEntry {
+	if e.Level == zapcore.DebugLevel && e.LoggerName != c.selector {
+		return ce
+	}
+	return c.Core.Check(e, ce)
+}
+
+func TestScrubberLoggerKeepsSelectors(t *testing.T) {
+	core, logs := observer.New(zapcore.DebugLevel)
+	base, err := logp.NewZapLogger(zap.New(selectorCore{Core: core, selector: "enabled"}))
+	require.NoError(t, err, "the base logger must be created")
+	logger := scrubberFor("s3cr3t-token").Logger(base)
+
+	logger.Named("other").Debug("other s3cr3t-token")
+	logger.Named("enabled").Debug("enabled s3cr3t-token")
+
+	entries := logs.TakeAll()
+	require.Len(t, entries, 1, "debug entries of other selectors must be dropped")
+	assert.Equal(t, "enabled <hidden>", entries[0].Message, "the message must not have the secret")
 }
 
 func TestNilScrubberLogger(t *testing.T) {

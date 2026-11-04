@@ -20,6 +20,8 @@ package secretstores
 import (
 	"context"
 	"errors"
+	"fmt"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -27,6 +29,8 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer"
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
@@ -56,7 +60,11 @@ func TestScrubberString(t *testing.T) {
 		{name: "path encoded", values: []string{"a b/c-secret"}, in: "https://host/a%20b%2Fc-secret", want: "https://host/<hidden>"},
 		{name: "no match", values: []string{"s3cr3t-token"}, in: "nothing to hide", want: "nothing to hide"},
 		{name: "json escaped", values: []string{"line1\n\"quoted\"-secret"}, in: `{"key":"line1\n\"quoted\"-secret"}`, want: `{"key":"<hidden>"}`},
-		{name: "json html escaped", values: []string{"a<b>&c-secret"}, in: `{"key":"a<b>&c-secret"}`, want: `{"key":"<hidden>"}`},
+		{name: "json html escaped", values: []string{"a<b>&c-secret"}, in: `{"key":"a\u003cb\u003e\u0026c-secret"}`, want: `{"key":"<hidden>"}`},
+		{name: "url path", values: []string{"a b,c/d-secret"}, in: (&url.URL{Scheme: "https", Host: "host", Path: "/a b,c/d-secret"}).String(), want: "https://host/<hidden>"},
+		{name: "uri component", values: []string{"a b&c-secret"}, in: "https://host/?t=a%20b%26c-secret", want: "https://host/?t=<hidden>"},
+		{name: "multi-line value", values: []string{"-----BEGIN KEY-----\r\nMIIEvQIBADANBg\r\n-----END KEY-----"}, in: "stdout: MIIEvQIBADANBg", want: "stdout: <hidden>"},
+		{name: "short line of multi-line value", values: []string{"first-line\nabc"}, in: "abc", want: "abc"},
 		{name: "short value", values: []string{"abcde"}, in: "abcde", want: "abcde"},
 		{name: "empty value", values: []string{""}, in: "text", want: "text"},
 	}
@@ -155,6 +163,19 @@ func TestScrubberError(t *testing.T) {
 		assert.Equal(t, "io", r.Type(), "errors default to the io type")
 	})
 
+	t.Run("ecs stack trace", func(t *testing.T) {
+		stack := "at login (token=" + secret + ")"
+		orig := ecserr.NewECSErrWithStack("journey", "FAILED", "step failed", &stack)
+		err := s.Error(fmt.Errorf("wrapped: %w", orig))
+
+		var ecs *ecserr.ECSErr
+		require.ErrorAs(t, err, &ecs, "the error must have an ECS error")
+		require.NotNil(t, ecs.StackTrace, "the stack trace must be kept")
+		assert.Equal(t, "at login (token=<hidden>)", *ecs.StackTrace, "the stack trace must not have the secret")
+		assert.Equal(t, "step failed", ecs.Message, "the message must be kept")
+		assert.Equal(t, "at login (token="+secret+")", *orig.StackTrace, "the original error must not be modified")
+	})
+
 	t.Run("keeps the reason type", func(t *testing.T) {
 		err := s.Error(reason.ValidateFailed(errors.New("invalid " + secret)))
 		r, ok := err.(reason.Reason) //nolint:errorlint // look.Reason does the same.
@@ -162,4 +183,23 @@ func TestScrubberError(t *testing.T) {
 		assert.Equal(t, "validate", r.Type(), "the reason type must be kept")
 		assert.Equal(t, "invalid <hidden>", r.Error(), "the message must not have the secret")
 	})
+}
+
+// TestScrubberErrorInBrowserEvent checks the error a browser monitor
+// publishes, which the summarizer takes from the ECS error in the chain.
+func TestScrubberErrorInBrowserEvent(t *testing.T) {
+	const secret = "s3cr3t-token"
+	stack := "at login (token=" + secret + ")"
+	err := scrubberFor(secret).Error(ecserr.NewECSErrWithStack("journey", "FAILED", "failed with "+secret, &stack))
+
+	event := &beat.Event{Fields: mapstr.M{}}
+	summarizer.NewBrowserErrPlugin().EachEvent(event, err)
+
+	got, getErr := event.GetValue("error")
+	require.NoError(t, getErr, "the event must have an error")
+	ecs, ok := got.(*ecserr.ECSErr)
+	require.True(t, ok, "the error must be an ECS error, got %T", got)
+	assert.Equal(t, "failed with <hidden>", ecs.Message, "error.message must not have the secret")
+	require.NotNil(t, ecs.StackTrace, "error.stack_trace must be kept")
+	assert.Equal(t, "at login (token=<hidden>)", *ecs.StackTrace, "error.stack_trace must not have the secret")
 }

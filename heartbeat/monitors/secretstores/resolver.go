@@ -50,7 +50,8 @@ func NewResolver(logger *logp.Logger) *Resolver {
 // destinations means the monitor type can't use such connections.
 //
 // The Scrubber removes the substituted secret values from what the monitor
-// publishes. It is nil if there is nothing to scrub.
+// publishes. It is nil if there is nothing to scrub. It is also returned with
+// an error, which can quote a value substituted before the failure.
 func (r *Resolver) Resolve(cfg *conf.C, destinations plugin.DestinationsFunc) (*conf.C, *Scrubber, error) {
 	entries, err := configEntries(cfg)
 	if err != nil || len(entries) == 0 {
@@ -68,14 +69,14 @@ func (r *Resolver) Resolve(cfg *conf.C, destinations plugin.DestinationsFunc) (*
 	for i, e := range entries {
 		s, err := sharedStores.get(e, r.logger)
 		if err != nil {
-			return nil, nil, err
+			return nil, t.scrubber(), err
 		}
 		next, err := s.Replace(ctx, resolved, scopes[i])
 		if err != nil {
 			if errors.Is(err, ErrSelection) {
-				return nil, nil, fmt.Errorf("%s: %w", ConfigKey, err)
+				return nil, t.scrubber(), fmt.Errorf("%s: %w", ConfigKey, err)
 			}
-			return nil, nil, fmt.Errorf("could not resolve %s secret references: %w", e.label(), err)
+			return nil, t.scrubber(), fmt.Errorf("could not resolve %s secret references: %w", e.label(), err)
 		}
 		// Replace returns its input when it has no references of the entry.
 		if next != resolved && e.isRestricted() {
@@ -87,7 +88,7 @@ func (r *Resolver) Resolve(cfg *conf.C, destinations plugin.DestinationsFunc) (*
 	// come from secret values.
 	monitorType, _ := cfg.String("type", -1)
 	if err := checkAllowedHosts(usedRestricted, monitorType, destinations, resolved); err != nil {
-		return nil, nil, err
+		return nil, t.scrubber(), err
 	}
 	return resolved, t.scrubber(), nil
 }

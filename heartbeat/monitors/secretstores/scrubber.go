@@ -22,6 +22,7 @@ import (
 	"cmp"
 	"context"
 	"encoding/json"
+	"errors"
 	"maps"
 	"net/url"
 	"slices"
@@ -30,6 +31,7 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -86,8 +88,19 @@ func (t *tracker) scrubber() *Scrubber {
 		}
 		// Settings such as URLs get percent-encoded when published, and
 		// values with quotes or newlines get escaped inside JSON.
-		forms = append(forms, v, url.QueryEscape(v), url.PathEscape(v))
+		query := url.QueryEscape(v)
+		forms = append(forms, v, query, strings.ReplaceAll(query, "+", "%20"),
+			url.PathEscape(v), (&url.URL{Path: v}).EscapedPath())
 		forms = append(forms, jsonEscaped(v)...)
+		// Output read line by line, such as the browser runner's, splits
+		// multi-line values such as PEM keys.
+		if strings.Contains(v, "\n") {
+			for line := range strings.SplitSeq(v, "\n") {
+				if line = strings.TrimSuffix(line, "\r"); len(line) >= minScrubLen {
+					forms = append(forms, line)
+				}
+			}
+		}
 	}
 	if len(forms) == 0 {
 		return nil
@@ -151,13 +164,16 @@ func (s *Scrubber) String(v string) string {
 
 // Error returns err with a message without the secret values. The result
 // wraps err and keeps its reason type, so the monitor reports it as before.
+// An ECS error in its chain, which the event gets as is, comes out of
+// errors.As as a scrubbed copy.
 func (s *Scrubber) Error(err error) error {
 	if s == nil || err == nil {
 		return err
 	}
 	msg := err.Error()
 	clean := s.replace(msg)
-	if clean == msg {
+	ecs := s.ecsErr(err)
+	if clean == msg && ecs == nil {
 		return err
 	}
 	typ := "io"
@@ -165,24 +181,58 @@ func (s *Scrubber) Error(err error) error {
 	if r, ok := err.(reason.Reason); ok {
 		typ = r.Type()
 	}
-	return &scrubbedError{msg: clean, err: err, typ: typ}
+	return &scrubbedError{msg: clean, err: err, typ: typ, ecs: ecs}
+}
+
+// ecsErr returns a copy of the ECS error in the chain of err without the
+// secret values, or nil if there is none or it has no value. Its stack trace
+// is published too, and browser stack traces can quote a param.
+func (s *Scrubber) ecsErr(err error) *ecserr.ECSErr {
+	var orig *ecserr.ECSErr
+	if !errors.As(err, &orig) {
+		return nil
+	}
+	clean := *orig
+	clean.Message = s.replace(orig.Message)
+	changed := clean.Message != orig.Message
+	if orig.StackTrace != nil {
+		stack := s.replace(*orig.StackTrace)
+		clean.StackTrace = &stack
+		changed = changed || stack != *orig.StackTrace
+	}
+	if !changed {
+		return nil
+	}
+	return &clean
 }
 
 type scrubbedError struct {
 	msg string
 	err error
 	typ string
+	ecs *ecserr.ECSErr
 }
 
 func (e *scrubbedError) Error() string { return e.msg }
 func (e *scrubbedError) Unwrap() error { return e.err }
 func (e *scrubbedError) Type() string  { return e.typ }
 
+// As returns the scrubbed copy of the ECS error, which errors.As would
+// otherwise find unscrubbed in the chain.
+func (e *scrubbedError) As(target any) bool {
+	t, ok := target.(**ecserr.ECSErr)
+	if !ok || e.ecs == nil {
+		return false
+	}
+	*t = e.ecs
+	return true
+}
+
 // Event removes the secret values from the fields of event. Maps and slices
 // that hold one are copied, never modified: jobs can share them between
 // events.
 func (s *Scrubber) Event(event *beat.Event) {
-	if s == nil {
+	if s == nil || event == nil {
 		return
 	}
 	if fields, changed := scrubMap(s, event.Fields, ""); changed {

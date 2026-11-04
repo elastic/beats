@@ -27,6 +27,7 @@ import (
 // Logger returns logger writing its messages, and its string and error
 // fields, without the secret values. Plugins log what they run and what their
 // commands print, which can contain the values, before any event is made.
+// Other field types, such as Stringer or Any, are written as they are.
 // It returns logger itself for a nil Scrubber or logger.
 func (s *Scrubber) Logger(logger *logp.Logger) *logp.Logger {
 	if s == nil || logger == nil {
@@ -47,10 +48,12 @@ func (c *scrubbingCore) With(fields []zapcore.Field) zapcore.Core {
 }
 
 func (c *scrubbingCore) Check(e zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.CheckedEntry {
-	if c.Enabled(e.Level) {
-		return ce.AddCore(e, c)
+	// The wrapped core decides: logp filters debug entries by selector in
+	// Check, not only by level.
+	if c.Core.Check(e, nil) == nil {
+		return ce
 	}
-	return ce
+	return ce.AddCore(e, c)
 }
 
 func (c *scrubbingCore) Write(e zapcore.Entry, fields []zapcore.Field) error {
@@ -90,10 +93,15 @@ func (c *scrubbingCore) field(f zapcore.Field) (zapcore.Field, bool) {
 		return f, true
 	case zapcore.ErrorType:
 		err, ok := f.Interface.(error)
-		if !ok || c.s.String(err.Error()) == err.Error() {
+		if !ok {
 			return f, false
 		}
-		return zap.NamedError(f.Key, c.s.Error(err)), true
+		clean := c.s.Error(err)
+		//nolint:errorlint // Error returns a *scrubbedError when it changes err.
+		if _, changed := clean.(*scrubbedError); !changed {
+			return f, false
+		}
+		return zap.NamedError(f.Key, clean), true
 	default:
 		return f, false
 	}
