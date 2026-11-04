@@ -48,11 +48,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch" // register "elasticsearch" output type
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
-<<<<<<< HEAD
-=======
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
-	"github.com/elastic/beats/v7/libbeat/publisher"
->>>>>>> cdce7bf (Set data_stream as a map in the add_data_stream processor (#54224))
 	agentconfig "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -137,14 +133,11 @@ func TestPublish(t *testing.T) {
 	})
 
 	t.Run("data_stream fields are set on logrecord.Attribute", func(t *testing.T) {
-		dataStreamField := mapstr.M{
+		want := map[string]any{
 			"type":      "logs",
 			"namespace": "not_default",
 			"dataset":   "not_elastic_agent",
 		}
-<<<<<<< HEAD
-		event1.Fields["data_stream"] = dataStreamField
-=======
 		for _, tc := range []struct {
 			name  string
 			value any
@@ -158,38 +151,41 @@ func TestPublish(t *testing.T) {
 			})},
 		} {
 			t.Run(tc.name, func(t *testing.T) {
-				event1.Fields["data_stream"] = tc.value
->>>>>>> cdce7bf (Set data_stream as a map in the add_data_stream processor (#54224))
+				event := beat.Event{Fields: mapstr.M{
+					"field":       1,
+					"data_stream": tc.value,
+				}}
+				batch := outest.NewBatch(event)
 
-		batch := outest.NewBatch(event1)
-
-		var countLogs int
-		var attributes pcommon.Map
-		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
-			countLogs = countLogs + ld.LogRecordCount()
-			for i := 0; i < ld.ResourceLogs().Len(); i++ {
-				resourceLog := ld.ResourceLogs().At(i)
-				for j := 0; j < resourceLog.ScopeLogs().Len(); j++ {
-					scopeLog := resourceLog.ScopeLogs().At(j)
-					for k := 0; k < scopeLog.LogRecords().Len(); k++ {
-						LogRecord := scopeLog.LogRecords().At(k)
-						attributes = LogRecord.Attributes()
+				var countLogs int
+				var attributes pcommon.Map
+				otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+					countLogs = countLogs + ld.LogRecordCount()
+					for i := 0; i < ld.ResourceLogs().Len(); i++ {
+						resourceLog := ld.ResourceLogs().At(i)
+						for j := 0; j < resourceLog.ScopeLogs().Len(); j++ {
+							scopeLog := resourceLog.ScopeLogs().At(j)
+							for k := 0; k < scopeLog.LogRecords().Len(); k++ {
+								LogRecord := scopeLog.LogRecords().At(k)
+								attributes = LogRecord.Attributes()
+							}
+						}
 					}
+					return nil
+				})
+
+				err := otelConsumer.Publish(ctx, batch)
+				assert.NoError(t, err)
+				assert.Len(t, batch.Signals, 1)
+				assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+
+				subFields := []string{"dataset", "namespace", "type"}
+				for _, subField := range subFields {
+					gotValue, ok := attributes.Get("data_stream." + subField)
+					require.True(t, ok, "data_stream.%s not found on log record attribute", subField)
+					assert.EqualValues(t, want[subField], gotValue.AsRaw())
 				}
-			}
-			return nil
-		})
-
-		err := otelConsumer.Publish(ctx, batch)
-		assert.NoError(t, err)
-		assert.Len(t, batch.Signals, 1)
-		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
-
-		subFields := []string{"dataset", "namespace", "type"}
-		for _, subField := range subFields {
-			gotValue, ok := attributes.Get("data_stream." + subField)
-			require.True(t, ok, "data_stream.%s not found on log record attribute", subField)
-			assert.EqualValues(t, dataStreamField[subField], gotValue.AsRaw())
+			})
 		}
 	})
 
