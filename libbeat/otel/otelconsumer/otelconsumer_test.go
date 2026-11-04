@@ -49,6 +49,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch" // register "elasticsearch" output type
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	agentconfig "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -146,6 +147,11 @@ func TestPublish(t *testing.T) {
 		}{
 			{"mapstr.M", mapstr.M(want)},
 			{"map[string]any", want},
+			{"add_data_stream", dataStreamFromProcessor(t, add_data_stream.DataStream{
+				Type:      "logs",
+				Namespace: "not_default",
+				Dataset:   "not_elastic_agent",
+			})},
 		} {
 			t.Run(tc.name, func(t *testing.T) {
 				event1.Fields["data_stream"] = tc.value
@@ -922,4 +928,13 @@ type testIndexSelector struct{}
 
 func (testIndexSelector) Select(_ *beat.Event) (string, error) {
 	return "test-index", nil
+}
+
+// dataStreamFromProcessor returns the data_stream field the add_data_stream
+// processor sets on events.
+func dataStreamFromProcessor(t *testing.T, ds add_data_stream.DataStream) any {
+	t.Helper()
+	event, err := add_data_stream.New(ds).Run(&beat.Event{})
+	require.NoError(t, err)
+	return event.Fields["data_stream"]
 }
