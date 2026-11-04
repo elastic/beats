@@ -46,7 +46,7 @@ type Publisher struct {
 	// rejected, if set, is called for each event the queue rejects in
 	// PublishContext.
 	rejected func()
-	// ctx ends the publishes of a scheduled or live publisher (see
+	// ctx, once done, stops the publishes of a scheduled or live publisher (see
 	// NewScheduled and NewLive).
 	ctx context.Context
 	// inPublishContext is set while a client's PublishContext runs. An event
@@ -228,9 +228,10 @@ func (p *Publisher) Publish(index, idValue, idFieldKey, responseID, spaceID, pac
 }
 
 // PublishEach publishes hits one by one and returns how many were handed to
-// the client before stop returned true or ctx ended. stop is called before
-// each hit. ctx stops a hit waiting for room in the queue only if the client
-// implements beat.ContextPublisher; a nil ctx never stops it.
+// the client before stop returned true or ctx was cancelled. stop is called
+// before each hit. A hit waiting for room in the queue stops when ctx is done
+// only if the client implements beat.ContextPublisher; a nil ctx never stops
+// it.
 func (p *Publisher) PublishEach(ctx context.Context, index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any, stop func() bool) int {
 	p.mx.Lock()
 	defer p.mx.Unlock()
@@ -257,7 +258,7 @@ func (p *Publisher) PublishEach(ctx context.Context, index, idValue, idFieldKey,
 
 // publish hands e to c and reports false if the publish was cancelled. With a
 // non-nil ctx and a client that implements beat.ContextPublisher, it stops
-// waiting for room when ctx ends or c closes, and the event is not queued.
+// waiting for room when ctx is done or c closes, and the event is not queued.
 // Otherwise it blocks like Publish and reports true. An event the queue
 // rejects is dropped as Publish would drop it and reported to p.rejected, and
 // publish reports true.
@@ -613,7 +614,7 @@ func hitToEvent(index, eventType, idValue, idFieldKey, responseID, spaceID, pack
 // each event published after its client closed, and rejected for each event
 // the queue rejects.
 //
-// If the clients implement beat.ContextPublisher, ctx ending or a client
+// If the clients implement beat.ContextPublisher, ctx being done or a client
 // closing stops a publish waiting for room in the queue. Such an event is
 // reported to cut, not dropped, and allowed should then return false. A
 // client that does not implement it cannot tell a rejected event from one

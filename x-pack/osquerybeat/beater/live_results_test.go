@@ -546,7 +546,7 @@ func TestLiveClientsCloseDoesNotWaitForStuckPublish(t *testing.T) {
 	published := make(chan struct{})
 	go func() {
 		defer close(published)
-		c.PublishEach(context.Background(), "", "a1", "action_id", "", "", "", "", "", nil, []map[string]any{{}}, nil, nil, func() bool { return false })
+		c.PublishEach(t.Context(), "", "a1", "action_id", "", "", "", "", "", nil, []map[string]any{{}}, nil, nil, func() bool { return false })
 	}()
 	<-made[0].blocked
 
