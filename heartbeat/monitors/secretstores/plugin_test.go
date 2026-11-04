@@ -312,6 +312,42 @@ func TestSecretPluginRedacts(t *testing.T) {
 	}
 }
 
+// TestSecretPluginCloseErrorAfterRotation checks closing the plugin of
+// rotated values, which the redactor no longer has, doesn't log them.
+func TestSecretPluginCloseErrorAfterRotation(t *testing.T) {
+	factory := plugin.PluginFactory{
+		Name: "closing",
+		Make: func(_ string, cfg *conf.C, _ beat.Info) (plugin.Plugin, error) {
+			header, err := cfg.String("header", -1)
+			if err != nil {
+				return plugin.Plugin{}, err
+			}
+			job := func(*beat.Event) ([]jobs.Job, error) { return nil, nil }
+			closer := func() error { return fmt.Errorf("could not close %s", header) }
+			return plugin.Plugin{Jobs: []jobs.Job{job}, Endpoints: 1, DoClose: closer}, nil
+		},
+	}
+	header := "first-secret"
+	resolve := func(cfg *conf.C) (*conf.C, *Scrubber, error) {
+		c := conf.NewConfig()
+		if err := c.Merge(cfg); err != nil {
+			return nil, nil, err
+		}
+		return c, scrubberFor(header), c.SetString("header", -1, header)
+	}
+	logger, logs := logptest.NewTestingLoggerWithObserver(t, "")
+	p := newSecretPlugin(resolve, factory, "closing", newTestConfig(t, map[string]any{}), beat.Info{Logger: logger}, logger, NewRedactor()).plugin()
+	t.Cleanup(func() { _ = p.Close() })
+
+	header = "second-secret"
+	_, err := p.Jobs[0](&beat.Event{})
+	require.NoError(t, err, "the job must run with the rotated value")
+
+	closed := logs.FilterMessageSnippet("Could not close").TakeAll()
+	require.Len(t, closed, 1, "closing the plugin of the first value must be logged")
+	assert.Equal(t, "Could not close the monitor plugin: could not close <hidden>", closed[0].Message, "the close error must not have the rotated value")
+}
+
 func TestWrapFactoryKeepsFactory(t *testing.T) {
 	f := (&innerFactory{}).factory()
 	f.Aliases = []string{"alias"}

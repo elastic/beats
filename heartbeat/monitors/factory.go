@@ -154,13 +154,16 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 	}
 
 	// Only monitors with secret stores resolve secret references. Their
-	// pipeline client removes the resolved values from what they publish.
+	// pipeline client removes the resolved values from what they publish,
+	// and their logger from what they log, such as job errors.
+	info := *f.info
 	var wrapFactory PluginFactoryWrapper
 	var redactor beat.Processor
 	if c.HasField(secretstores.ConfigKey) {
 		r := secretstores.NewRedactor()
 		wrapFactory = func(pf plugin.PluginFactory) plugin.PluginFactory { return f.secrets.WrapFactory(pf, r) }
 		redactor = r
+		info.Logger = r.Logger(info.Logger)
 	}
 
 	configEditor, err := newCommonPublishConfigs(*f.info, f.beatLocation, c, redactor)
@@ -218,7 +221,7 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 		}
 	}
 
-	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, f.stateLoader, *f.info, safeStop, wrapFactory)
+	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, f.stateLoader, info, safeStop, wrapFactory)
 	if err != nil {
 		return nil, fmt.Errorf("factory could not create monitor: %w", err)
 	}

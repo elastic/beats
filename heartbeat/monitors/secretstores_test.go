@@ -257,14 +257,23 @@ func TestMonitorScrubsSecrets(t *testing.T) {
 		Stats: plugin.NewPluginCountersRecorder("leaky", monitoring.NewRegistry()),
 	}), "plugin must be registered")
 
-	// The factory gives the monitor the pipeline client that scrubs.
+	// The factory gives the monitor the pipeline client and logger that scrub.
 	factory, _, closeFactory := makeMockFactory(t, reg)
 	defer closeFactory()
+	logger, logs := logptest.NewTestingLoggerWithObserver(t, "")
+	factory.info.Logger = logger
 	pipel := &MockPipeline{}
 	runner, err := factory.Create(pipel, captureMonitorConf(t, "leaky", true))
 	require.NoError(t, err, "monitor must be created")
 	defer runner.Stop()
 	runner.Start()
+
+	m, ok := runner.(*Monitor)
+	require.True(t, ok, "the runner must be a monitor, got %T", runner)
+	m.logger.Infof("Job failed with: request to https://host/?t=%s failed", secret)
+	logged := logs.FilterMessageSnippet("Job failed with").TakeAll()
+	require.Len(t, logged, 1, "the monitor must log with the factory logger")
+	assert.Equal(t, "Job failed with: request to https://host/?t=<hidden> failed", logged[0].Message, "the monitor logger must not write the secret")
 
 	require.Eventually(t, func() bool { return len(pipel.PublishedEvents()) > 0 }, 5*time.Second, 5*time.Millisecond, "the monitor must publish an event")
 	for _, e := range pipel.PublishedEvents() {

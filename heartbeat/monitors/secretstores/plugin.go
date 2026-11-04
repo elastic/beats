@@ -73,7 +73,9 @@ type secretPlugin struct {
 	// hash is the hash of the resolved config of inner, or of createErr.
 	hash      uint64
 	createErr error
-	closed    bool
+	// scrubber is the one of the resolved config of inner.
+	scrubber *Scrubber
+	closed   bool
 }
 
 func newSecretPlugin(resolve func(*conf.C) (*conf.C, *Scrubber, error), factory plugin.PluginFactory, name string, cfg *conf.C, info beat.Info, logger *logp.Logger, redactor *Redactor) *secretPlugin {
@@ -169,7 +171,7 @@ func (p *secretPlugin) current(job int) (plugin.Plugin, error) {
 	// runs of a job never overlap.
 	_ = p.closeInner()
 	inner, err := p.factory.Make(p.name, resolved, p.info)
-	p.hash = hash
+	p.hash, p.scrubber = hash, scrubber
 	if err != nil {
 		// A plugin can return resources to close along with the error.
 		if closeErr := inner.Close(); closeErr != nil {
@@ -209,8 +211,9 @@ func (p *secretPlugin) closeInner() error {
 	if err == nil {
 		return nil
 	}
-	// The monitor logs it with a logger that doesn't scrub.
-	err = errors.New(p.redactor.scrub(err.Error()))
+	// It can quote the values inner was made with, which the redactor no
+	// longer has after a rotation. The monitor logs it too.
+	err = errors.New(p.scrubber.String(err.Error()))
 	p.logger.Errorf("Could not close the monitor plugin: %v", err)
 	return err
 }

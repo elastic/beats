@@ -28,23 +28,27 @@ import (
 // fields, without the secret values. Plugins log what they run and what their
 // commands print, which can contain the values, before any event is made.
 // Other field types, such as Stringer or Any, are written as they are.
-// It returns logger itself for a nil Redactor or logger.
+// It returns logger itself for a nil Redactor or logger, or a logger r
+// already scrubs.
 func (r *Redactor) Logger(logger *logp.Logger) *logp.Logger {
 	if r == nil || logger == nil {
 		return logger
 	}
+	if c, ok := logger.Core().(*scrubbingCore); ok && c.r == r {
+		return logger
+	}
 	return logger.WithOptions(zap.WrapCore(func(c zapcore.Core) zapcore.Core {
-		return &scrubbingCore{Core: c, scrub: r.scrub}
+		return &scrubbingCore{Core: c, r: r}
 	}))
 }
 
 type scrubbingCore struct {
 	zapcore.Core
-	scrub func(string) string
+	r *Redactor
 }
 
 func (c *scrubbingCore) With(fields []zapcore.Field) zapcore.Core {
-	return &scrubbingCore{Core: c.Core.With(c.fields(fields)), scrub: c.scrub}
+	return &scrubbingCore{Core: c.Core.With(c.fields(fields)), r: c.r}
 }
 
 func (c *scrubbingCore) Check(e zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.CheckedEntry {
@@ -57,7 +61,7 @@ func (c *scrubbingCore) Check(e zapcore.Entry, ce *zapcore.CheckedEntry) *zapcor
 }
 
 func (c *scrubbingCore) Write(e zapcore.Entry, fields []zapcore.Field) error {
-	e.Message = c.scrub(e.Message)
+	e.Message = c.r.scrub(e.Message)
 	return c.Core.Write(e, c.fields(fields))
 }
 
@@ -85,7 +89,7 @@ func (c *scrubbingCore) fields(fields []zapcore.Field) []zapcore.Field {
 func (c *scrubbingCore) field(f zapcore.Field) (zapcore.Field, bool) {
 	switch f.Type {
 	case zapcore.StringType:
-		clean := c.scrub(f.String)
+		clean := c.r.scrub(f.String)
 		if clean == f.String {
 			return f, false
 		}
@@ -97,7 +101,7 @@ func (c *scrubbingCore) field(f zapcore.Field) (zapcore.Field, bool) {
 			return f, false
 		}
 		msg := err.Error()
-		clean := c.scrub(msg)
+		clean := c.r.scrub(msg)
 		if clean == msg {
 			return f, false
 		}

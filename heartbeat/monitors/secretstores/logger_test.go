@@ -99,3 +99,11 @@ func TestNilRedactorLogger(t *testing.T) {
 	assert.Same(t, base, r.Logger(base), "a nil Redactor must return the logger as is")
 	assert.Nil(t, redactorFor("s3cr3t-token").Logger(nil), "a nil logger must stay nil")
 }
+
+func TestRedactorLoggerWrapsOnce(t *testing.T) {
+	base := logptest.NewTestingLogger(t, "")
+	r := redactorFor("s3cr3t-token")
+	logger := r.Logger(base)
+	assert.Same(t, logger, r.Logger(logger), "a logger the redactor already scrubs must be returned as is")
+	assert.NotSame(t, logger, NewRedactor().Logger(logger), "another redactor must wrap it")
+}
