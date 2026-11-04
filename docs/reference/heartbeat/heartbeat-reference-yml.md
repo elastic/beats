@@ -211,6 +211,43 @@ heartbeat.monitors:
   #username: ''
   #password: ''
 
+  # Kerberos/SPNEGO. Mutually exclusive with username/password and ntlm.
+  # Requires a Private Location that can reach the KDC. Not available in FIPS builds.
+  #kerberos:
+    #enabled: true
+    # Authentication type: 'password' or 'keytab'.
+    #auth_type: password
+    # Kerberos realm, e.g. EXAMPLE.COM.
+    #realm: ''
+    # Exactly one of config_path (file on the agent) or krb5_conf (inline body).
+    #config_path: /etc/krb5.conf
+    #krb5_conf: |
+    #  [libdefaults]
+    #    default_realm = EXAMPLE.COM
+    #  [realms]
+    #    EXAMPLE.COM = {
+    #      kdc = kdc.example.com
+    #    }
+    # Credentials when auth_type is 'password'.
+    #username: ''
+    #password: ''
+    # Keytab path when auth_type is 'keytab'.
+    #keytab: ''
+    # Optional SPN override, e.g. HTTP/host.example.com. Empty derives it from the URL.
+    #service_name: ''
+    # Kerberos FAST. Can conflict with some Active Directory setups. Default: false.
+    #enable_krb5_fast: false
+
+  # NTLM. Mutually exclusive with username/password and kerberos. Not available in FIPS builds.
+  #ntlm:
+    #enabled: true
+    #username: ''
+    #password: ''
+    # Optional when username is already "DOMAIN\user" or "user@domain".
+    #domain: ''
+    # Optional client name sent in the negotiate message.
+    #workstation: ''
+
   # TLS/SSL connection settings for use with HTTPS endpoint. If not configured,
   # system defaults will be used.
   #ssl:
@@ -281,6 +318,7 @@ heartbeat.jobs:
   # single file descriptor.
   # This feature is most useful for the browser type
   #browser.limit: 1
+  #api.limit: 4
   #http.limit: 10
   #tcp.limit: 10
   #icmp.limit: 10
@@ -560,7 +598,7 @@ output.elasticsearch:
 
   # Array of hosts to connect to.
   # Scheme and port can be left out and will be set to the default (http and 9200)
-  # In case you specify and additional path, the scheme is required: http://localhost:9200/path
+  # In case you specify an additional path, the scheme is required: http://localhost:9200/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["localhost:9200"]
 
@@ -1506,7 +1544,7 @@ setup.kibana:
 
   # Kibana Host
   # Scheme and port can be left out and will be set to the default (http and 5601)
-  # In case you specify and additional path, the scheme is required: http://localhost:5601/path
+  # In case you specify an additional path, the scheme is required: http://localhost:5601/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
   #host: "localhost:5601"
 
@@ -1662,7 +1700,7 @@ logging.files:
 # sensitive information) together with other log messages, a different
 # log file, only for log entries containing raw events, is used. It will
 # use the same level, selectors and all other configurations from the
-# default logger, but it will have it's own file configuration.
+# default logger, but it will have its own file configuration.
 #
 # Having a different log file for raw events also prevents event data
 # from drowning out the regular log files.
