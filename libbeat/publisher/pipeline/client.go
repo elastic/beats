@@ -160,7 +160,9 @@ func (c *client) PublishContext(ctx context.Context, e beat.Event) error {
 
 	pctx := c.publishCtx(ctx)
 	// The processors may have outlasted the caller's wait, and a queue with
-	// room can take the event without looking at ctx, so check it first.
+	// room can take the event without looking at ctx, so check the caller's
+	// ctx first. A Close during processing may not show in pctx yet; the
+	// producer then reports the client closed.
 	err := pctx.Err()
 	if err == nil {
 		_, err = c.ctxProducer.PublishContext(pctx, publisher.Event{

@@ -134,7 +134,7 @@ func (p *stuckPipeline) fill(t *testing.T) beat.Client {
 		return filler
 	}
 	// The disk queue holds bytes. Publish fillers of decreasing size until it
-	// refuses one of each: the last, without payload, leave less room than
+	// refuses one of each: the last, without payload, leaves less room than
 	// any event a test publishes. The memqueue's TryPublish waits on a full
 	// queue instead of refusing the event, so this works only for the disk
 	// queue.
@@ -510,6 +510,9 @@ func TestLiveStopCancelsBlockedResponse(t *testing.T) {
 			d.stop()
 			assert.Eventually(t, pipe.idle, releaseBound, time.Millisecond,
 				"stopping must release the worker blocked on the full queue")
+			// The worker counts the response after the publish returns.
+			assert.Eventually(t, func() bool { return d.metrics.dropped[dropShutdown].Get() == 1 }, releaseBound, time.Millisecond,
+				"the worker must count the cancelled response")
 
 			c.Close()
 			assert.NoError(t, filler.Close(), "close the filler client")
@@ -527,9 +530,11 @@ func TestLiveTimeoutCancelsBlockedPublish(t *testing.T) {
 		t.Run(q.name, func(t *testing.T) {
 			log := logp.NewNopLogger()
 			pipe := newStuckPipeline(t, q)
-			c := &liveClients{newPublisher: func() liveQueryPublisher { return pub.New(&beat.Beat{Publisher: pipe}, log) }}
-			require.NoError(t, c.Configure([]config.InputConfig{{Datastream: config.DatastreamConfig{Dataset: config.DefaultDataset}}}), "configure live clients")
 			d := newLiveResultDispatcher(monitoring.NewRegistry(), log, 200*time.Millisecond)
+			c := &liveClients{newPublisher: func() liveQueryPublisher {
+				return pub.NewLive(d.ctx, &beat.Beat{Publisher: pipe}, log, d.rejected, d.cut)
+			}}
+			require.NoError(t, c.Configure([]config.InputConfig{{Datastream: config.DatastreamConfig{Dataset: config.DefaultDataset}}}), "configure live clients")
 			hits := make([]map[string]any, stuckRows)
 			for i := range hits {
 				hits[i] = map[string]any{"row": i, "payload": pipe.payload}
@@ -559,12 +564,14 @@ func TestLiveTimeoutCountsCancelledProfile(t *testing.T) {
 			// Fill the queue, so the profile, published before the rows,
 			// is the publish that blocks.
 			filler := pipe.fill(t)
-			c := &liveClients{newPublisher: func() liveQueryPublisher { return pub.New(&beat.Beat{Publisher: pipe}, log) }}
+			d := newLiveResultDispatcher(monitoring.NewRegistry(), log, 200*time.Millisecond)
+			c := &liveClients{newPublisher: func() liveQueryPublisher {
+				return pub.NewLive(d.ctx, &beat.Beat{Publisher: pipe}, log, d.rejected, d.cut)
+			}}
 			require.NoError(t, c.Configure([]config.InputConfig{
 				{Datastream: config.DatastreamConfig{Dataset: config.DefaultDataset}},
 				{Datastream: config.DatastreamConfig{Dataset: config.DefaultQueryProfileDataset}},
 			}), "configure live result and profile clients")
-			d := newLiveResultDispatcher(monitoring.NewRegistry(), log, 200*time.Millisecond)
 			job := liveJob{actionID: "a1", hits: []map[string]any{{"row": 1}, {"row": 2}}, profile: map[string]any{}}
 
 			n, err := d.publishResults(t.Context(), c, job)
