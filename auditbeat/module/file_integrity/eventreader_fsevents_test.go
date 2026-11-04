@@ -23,7 +23,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestGetFileInfoReturnsInfoForExistingPath(t *testing.T) {
@@ -43,7 +43,7 @@ func TestNonRecursiveReaderIsWatched(t *testing.T) {
 	reader, err := NewEventReader(Config{
 		Paths:     []string{watchedDir},
 		Recursive: false,
-	}, logp.NewLogger("test"))
+	}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("NewEventReader returned an unexpected error: %v", err)
 	}
