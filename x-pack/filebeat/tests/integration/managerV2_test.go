@@ -250,7 +250,7 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 
 // TestFailedOutputReportsUnhealthy ensures that if an output
 // fails to start and returns an error, the manager will set it
-// as failed and the inputs will not be started.
+// as failed and the input unit is not reported as failed.
 func TestFailedOutputReportsUnhealthy(t *testing.T) {
 	// First things first, ensure ES is running and we can connect to it.
 	// If ES is not running, the test will timeout and the only way to know
@@ -303,10 +303,9 @@ func TestFailedOutputReportsUnhealthy(t *testing.T) {
 		},
 	}
 
-	// The input unit reports HEALTHY if Filebeat receives it before the
-	// manager's PostInit, which marks every known unit as running, and
-	// STARTING if it arrives afterwards. Which one happens depends on
-	// how long Filebeat takes to start, so accept both.
+	// HEALTHY if the input arrives before PostInit, STARTING if after.
+	// Both are final states: the failed output keeps the input from
+	// ever leaving whichever one it reached.
 	inputStarting := protobuf.CloneOf(units[1])
 	inputStarting.State = proto.State_STARTING
 	unitsInputStarting := []*proto.UnitExpected{units[0], inputStarting}
