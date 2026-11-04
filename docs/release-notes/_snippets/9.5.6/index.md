@@ -1,6 +1,8 @@
 ## 9.5.6 [beats-release-notes-9.5.6]
 
-
+:::{important}
+The 9.5.6 release contains fixes for potential security vulnerabilities. Check our [security advisory](https://discuss.elastic.co/c/announcements/security-announcements/31) for more details.
+:::
 
 ### Features and enhancements [beats-9.5.6-features-enhancements]
 
@@ -47,7 +49,7 @@
 
 **Filebeat**
 
-* Update `github.com/apache/thrift` to v0.25.0 to fix CVE-2026-82458 in Parquet decoding. [#53636](https://github.com/elastic/beats/pull/53636)
+* Update `github.com/apache/thrift` to v0.25.0. [#53636](https://github.com/elastic/beats/pull/53636)
 * Fix cursor inputs losing their saved position when two inputs start at the same time. [#53204](https://github.com/elastic/beats/pull/53204) 
 * Resume CrowdStrike Event Streams after dropped firehose connections without exhausting retries. [#53416](https://github.com/elastic/beats/pull/53416) 
 * Validate the `http_endpoint` input's configuration for HTTP OPTIONS requests at startup. When `options_headers` is set, it must not be empty, and `options_response_code` must be valid. A previously accepted empty `options_headers: {}` now fails at startup. [#53417](https://github.com/elastic/beats/pull/53417)

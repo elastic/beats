@@ -84,6 +84,10 @@ func handleSimpleConfig(raw *proto.UnitExpectedConfig) (map[string]any, error) {
 		return nil, fmt.Errorf("the only supported type is 'filestream', got: %q", kind)
 	}
 
+	// The unit source doubles as the stream source here, so its processors are
+	// the global ones that injectGlobalProcesssors adds.
+	delete(m, "processors")
+
 	return m, nil
 }
 
