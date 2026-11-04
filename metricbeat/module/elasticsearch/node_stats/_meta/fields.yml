@@ -1,7 +1,7 @@
 - name: node.stats
   type: group
   description: >
-    Statistics about each node in a Elasticsearch cluster
+    Statistics about each node in an Elasticsearch cluster
   release: ga
   fields:
     - name: ingest
