@@ -326,8 +326,7 @@ func TestBeatReceiverStart_WiresActionAndDiagnosticExtensions(t *testing.T) {
 	assert.Equal(t, "test-receiver", ext.registeredDiagName, "diagnostic hook should be registered under the receiver's component ID")
 	ext.mu.Unlock()
 
-	// The per-receiver beat_metrics.json must still carry the process-wide
-	// system metrics even though receivers do not register them themselves.
+	// beat_metrics.json carries the shared system metrics and the receiver's beat.info.
 	ext.mu.Lock()
 	hook := ext.diagHook
 	ext.mu.Unlock()
@@ -340,7 +339,7 @@ func TestBeatReceiverStart_WiresActionAndDiagnosticExtensions(t *testing.T) {
 		assert.Contains(t, beatNS, k, "beat_metrics.json should contain beat.%s", k)
 	}
 	assert.Contains(t, snapshot, "system", "beat_metrics.json should contain the system namespace")
-	// The shared system bridge reports itself as "beat" with no version.
+	// The shared bridge reports itself as "beat" with no version.
 	info, _ := beatNS["info"].(map[string]any)
 	assert.Equal(t, b.Info.Version, info["version"], "beat.info must be the receiver's own, not the shared bridge's")
 	assert.NotEqual(t, "beat", info["name"], "beat.info must be the receiver's own, not the shared bridge's")
@@ -722,9 +721,8 @@ func TestReceiverSystemMetrics(t *testing.T) {
 	assert.Contains(t, system, "system", "system namespace")
 }
 
-// TestReceiverHTTPStatsIncludesSystemMetrics checks that a receiver with
-// http.enabled still serves the system metrics on /stats even though it does not
-// register them in its own registry.
+// TestReceiverHTTPStatsIncludesSystemMetrics checks that /stats serves the
+// shared system metrics.
 func TestReceiverHTTPStatsIncludesSystemMetrics(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("uses a unix socket")

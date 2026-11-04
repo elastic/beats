@@ -39,11 +39,8 @@ type routeOptions struct {
 	statsExtra func() mapstr.M
 }
 
-// WithStatsExtra adds the metrics returned by extra to the /stats response,
-// without overwriting metrics the stats registry already reports. It lets a
-// process share metrics that are identical for every Beat in it, such as system
-// metrics, instead of each Beat registering and collecting its own copy. extra
-// is only called when /stats is requested, and may return nil.
+// WithStatsExtra merges the metrics returned by extra into the /stats response
+// without overwriting existing ones. extra is called per request and may return nil.
 func WithStatsExtra(extra func() mapstr.M) RouteOption {
 	return func(o *routeOptions) { o.statsExtra = extra }
 }
@@ -87,8 +84,7 @@ func makeAPIHandler(registry *monitoring.Registry) http.HandlerFunc {
 	return makeStatsHandler(registry, nil)
 }
 
-// makeStatsHandler serves a snapshot of registry, plus the metrics returned by
-// extra if it is not nil.
+// makeStatsHandler serves a snapshot of registry merged with extra, if not nil.
 func makeStatsHandler(registry *monitoring.Registry, extra func() mapstr.M) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")

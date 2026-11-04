@@ -99,10 +99,7 @@ func SetupMetricsOptions(opts MetricOptions) error {
 }
 
 // SetupInfoMetrics registers only the beat.info metrics (name, version,
-// ephemeral ID and uptime) in opts.ProcessMetrics. Unlike SetupMetricsOptions it
-// is cheap: it does not initialize process statistics or register any system
-// metric. Use it when the process-wide system metrics are provided elsewhere
-// and only the identity of this instance needs reporting.
+// ephemeral ID and uptime) in opts.ProcessMetrics.
 func SetupInfoMetrics(opts MetricOptions) {
 	monitoring.NewFunc(opts.ProcessMetrics, "info", infoReporter(processName(opts.Name), opts.Version, opts.EphemeralID), monitoring.Report)
 }

@@ -22,20 +22,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 )
 
-// BenchmarkNReceiverTelemetry measures what each additional receiver costs to
-// start and to have its metrics collected, independent of any input work.
-//
-// Each receiver runs one filestream input over a path that matches nothing, so
-// the measurement is the cost of the Beat itself, which is what every receiver
-// pays. Receivers report to a real OTel SDK MeterProvider, and a collection
-// (the periodic reader's tick) is driven by hand.
-//
-// Reported metrics (lower is better):
-//   - startup-B/receiver : bytes allocated creating and starting one receiver
-//   - collect-B/op       : bytes allocated by one collection across the fleet
-//   - collect-allocs/op  : allocations made by one collection across the fleet
-//
-// ns/op is the time of one fleet-wide collection.
+// BenchmarkNReceiverTelemetry measures the cost of starting N receivers and of
+// one fleet-wide metrics collection (ns/op), with no input work.
 func BenchmarkNReceiverTelemetry(b *testing.B) {
 	for _, n := range []int{1, 10, 50} {
 		b.Run(fmt.Sprintf("receivers=%d", n), func(b *testing.B) {
@@ -97,14 +85,23 @@ func benchNReceiverTelemetry(b *testing.B, nReceivers int) {
 	startup := float64(after.TotalAlloc-before.TotalAlloc) / float64(nReceivers)
 
 	var rm metricdata.ResourceMetrics
-	// The bridge creates instruments for metrics it discovers after start on a
-	// separate goroutine after a collection. Collecting again while that is in
-	// flight can deadlock it against the SDK (the bridge holds its lock while
-	// creating an instrument, the SDK holds its lock while running the bridge's
-	// callback), so let it settle before measuring.
-	for range 3 {
+	// The bridge creates instruments asynchronously after a collection, so
+	// collect until the metric count stops growing before measuring.
+	settled, last := 0, -1
+	deadline := time.Now().Add(30 * time.Second)
+	for settled < 3 {
+		require.True(b, time.Now().Before(deadline), "metrics did not settle")
 		require.NoError(b, reader.Collect(b.Context(), &rm))
-		time.Sleep(time.Second)
+		n := 0
+		for _, sm := range rm.ScopeMetrics {
+			n += len(sm.Metrics)
+		}
+		if n == last {
+			settled++
+		} else {
+			settled, last = 0, n
+		}
+		time.Sleep(50 * time.Millisecond)
 	}
 
 	b.ReportAllocs()

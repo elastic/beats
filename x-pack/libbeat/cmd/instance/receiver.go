@@ -76,22 +76,16 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 	// stats.beat
 	processReg := statsReg.GetOrCreateRegistry("beat")
 
-	// The process-wide system metrics (beat.memstats, beat.cpu, system.*, ...)
-	// are identical for every receiver in the process and are reported once by
-	// the shared system bridge, see AcquireSystemBridge. Registering them here
-	// as well would initialize process statistics per receiver and make every
-	// collection of this receiver's registry read them again, only for the
-	// registry bridge to discard them. Only the identity of this receiver is
-	// registered. Diagnostics merge in the shared metrics, see the hook below.
+	// System metrics are process-wide and reported by the shared system bridge,
+	// see AcquireSystemBridge. Only this receiver's beat.info is registered here.
 	metricreport.SetupInfoMetrics(metricreport.MetricOptions{
 		Name:           b.Info.Name,
 		Version:        b.Info.Version,
 		ProcessMetrics: processReg,
 	})
 
-	// The system bridge is shared by all receivers. Preserve the original
-	// settings so its logs are not permanently tagged with this receiver's
-	// component.* fields.
+	// The bridge is shared by all receivers, so pass the original settings to
+	// keep this receiver's component.* fields out of its logs.
 	releaseSystem, err := oteltelemetry.AcquireSystemBridge(set.TelemetrySettings)
 	if err != nil {
 		return BeatReceiver{}, fmt.Errorf("error acquiring system bridge: %w", err)
@@ -103,8 +97,7 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 		}
 	}()
 
-	// Start the API only once the shared system metrics are available, so
-	// /stats never answers without them.
+	// The API serves the shared system metrics, so it starts after the bridge.
 	if b.Config.HTTP.Enabled() {
 		retryer := backoff.NewRetryer(50, 100*time.Millisecond, 1*time.Second)
 		err := retryer.Retry(ctx, func() error {
@@ -264,8 +257,7 @@ func (br *BeatReceiver) Shutdown(ctx context.Context) error {
 		br.bridge.Shutdown()
 	}
 	if br.releaseSystemBridge != nil {
-		// Release last: the HTTP API, the metrics log reporter and the
-		// diagnostics hook read the shared system metrics until they stop.
+		// Release last: the API, log reporter and diagnostics hook read the bridge.
 		defer br.releaseSystemBridge()
 	}
 
@@ -353,17 +345,13 @@ func (br *BeatReceiver) getESStateStoreExtension(host component.Host, storageExt
 	return reg, nil
 }
 
-// receiverSystemMetrics returns the process-wide system metrics to show next to
-// a receiver's own metrics, in diagnostics and on its HTTP /stats endpoint. The
-// receiver registers no system metrics itself because they are identical for
-// every receiver in the process, see AcquireSystemBridge. It is merged without
-// overwriting, so the receiver's own beat.info wins.
+// receiverSystemMetrics returns the shared system metrics for diagnostics and
+// /stats. They are merged without overwriting, so the receiver's beat.info wins.
 func receiverSystemMetrics() mapstr.M {
 	return mapstr.M(oteltelemetry.SystemMetricsSnapshot())
 }
 
-// stopAPI stops the HTTP API server started by NewBeatReceiver, if any, when
-// the receiver fails to be created.
+// stopAPI stops the HTTP API server started by NewBeatReceiver, if any.
 func stopAPI(b *instance.Beat) {
 	if b.API != nil {
 		_ = b.API.Stop()

@@ -105,10 +105,8 @@ type Reporter struct {
 	registries map[string]*monitoring.Registry
 	startTime  time.Time
 
-	// extraMetrics, if set, is merged into the "metrics" snapshot on every
-	// report, without overwriting metrics the registry already has. It is
-	// only called when a snapshot is taken, so it costs nothing when metrics
-	// logging is disabled.
+	// extraMetrics, if set, is merged into the "metrics" snapshot without
+	// overwriting existing metrics. It is only called when a snapshot is taken.
 	extraMetrics func() monitoring.FlatSnapshot
 
 	// output
@@ -119,9 +117,7 @@ type Reporter struct {
 type Option func(*Reporter)
 
 // WithExtraMetrics merges the metrics returned by extra into the "metrics"
-// namespace of every report, without overwriting metrics the stats registry
-// already reports. It lets a process share metrics that are identical for every
-// Beat in it, such as system metrics, instead of each Beat registering its own.
+// namespace of every report, without overwriting existing metrics.
 func WithExtraMetrics(extra func() monitoring.FlatSnapshot) Option {
 	return func(r *Reporter) { r.extraMetrics = extra }
 }
@@ -247,8 +243,7 @@ func (r *Reporter) logTotals(snaps map[string]monitoring.FlatSnapshot) {
 	r.logger.Infof("Uptime: %v", time.Since(r.startTime))
 }
 
-// snapshot takes a snapshot of reg, merging in the extra metrics for the
-// "metrics" namespace.
+// snapshot takes a snapshot of reg, merging in the extra metrics for "metrics".
 func (r *Reporter) snapshot(name string, reg *monitoring.Registry) monitoring.FlatSnapshot {
 	snap := makeSnapshot(reg)
 	if name == "metrics" && r.extraMetrics != nil {
