@@ -131,6 +131,7 @@ Reasons:
 | `stale` | both | No current policy publishes it: the query was removed, moved to another namespace or changed SQL (also while it was in flight), osqueryd could not resolve its column types, no results stream is configured, or, for a profile or an action response, no profile or action response stream is configured |
 | `shutdown` | both | Osquerybeat was stopping |
 | `timeout` | live | The action stopped waiting after `live.timeout`, or its context ended first |
+| `rejected` | both | The queue refused the event, such as one the disk queue cannot serialize |
 
 For a live action, an item is the action's results and profile, and its rows
 are the rows and profile not handed to the output. The live `queue.*` gauges
@@ -138,7 +139,11 @@ cover only the waiting action, not the action responses queued behind it. A
 live action response dropped because osquerybeat is stopping, or because no
 live clients or no action response stream are configured, counts as its own
 item of one row. An event the pipeline discards while closing counts in
-`dropped_rows.shutdown` only. Each queue logs at most one warning per minute
+`dropped_rows.shutdown` only. An event the queue refuses counts in
+`dropped_rows.rejected` only, and a live action leaves a refused row out of
+its count. Without cancellation support a refused event is not reported as
+such: the scheduled queue cannot tell it from one discarded while closing and
+counts it as `shutdown`, and the live queue counts it as handed over. Each queue logs at most one warning per minute
 about drops, naming the counter that moved.
 
 A scheduled profile dropped once it is queued is counted only under

@@ -203,14 +203,14 @@ type scheduledResultDispatcher struct {
 	// inflight is the lease the worker publishes inflightItem through, if any.
 	inflight     *scheduledResultLease
 	inflightItem scheduledItem
-	newPublisher func(ctx context.Context, allowed func() bool, dropped func(), cut func(rows int)) osquerybeatPublisher
+	newPublisher func(ctx context.Context, allowed func() bool, dropped, rejected func(), cut func(rows int)) osquerybeatPublisher
 	profile      func(*scheduledQueryProfiler, string, QueryInfo, QueryResult, string)
 	// handle resolves and publishes a native result and returns the rows it
 	// could not publish because their types could not be resolved.
 	handle func(context.Context, scheduledQueryClient, scheduledQueryPublisher, string, QueryInfo, QueryResult, string) int
 }
 
-func newScheduledResultDispatcher(reg *monitoring.Registry, log *logp.Logger, maxEvents int, factory func(ctx context.Context, allowed func() bool, dropped func(), cut func(rows int)) osquerybeatPublisher,
+func newScheduledResultDispatcher(reg *monitoring.Registry, log *logp.Logger, maxEvents int, factory func(ctx context.Context, allowed func() bool, dropped, rejected func(), cut func(rows int)) osquerybeatPublisher,
 	handle func(context.Context, scheduledQueryClient, scheduledQueryPublisher, string, QueryInfo, QueryResult, string) int) *scheduledResultDispatcher {
 	if reg == nil {
 		reg = monitoring.NewRegistry()
@@ -245,12 +245,15 @@ func (d *scheduledResultDispatcher) configure(inputs []config.InputConfig, cfg c
 			return in.Datastream.Dataset == config.DefaultQueryProfileDataset
 		})}
 		next.ctx, next.cancel = context.WithCancel(d.ctx)
-		// A blocking client drops events published after it is closed, which
-		// happens when the pipeline closes on shutdown. The rare event the
-		// queue rejects, such as one the disk queue cannot serialize, is
-		// counted here too.
+		// A client drops events published after it is closed, which happens
+		// when the pipeline closes on shutdown. The rare event the queue
+		// rejects, such as one the disk queue cannot serialize, is counted
+		// as rejected, except with a client that does not implement
+		// beat.ContextPublisher: its Publish cannot tell a rejection from a
+		// closed client, so the rejection is counted as shutdown.
 		next.publisher = d.newPublisher(next.ctx, func() bool { return next.allowed(d.current.Load()) },
 			func() { d.metrics.dropRows(dropShutdown, 1) },
+			func() { d.metrics.dropRows(dropRejected, 1) },
 			func(rows int) { next.cut += rows })
 		if err := next.publisher.Configure(inputs); err != nil {
 			next.retire()

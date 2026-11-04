@@ -7,6 +7,7 @@ package beater
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -168,13 +169,13 @@ func (c *countedContextClient) PublishContext(ctx context.Context, e beat.Event)
 // stuckScheduledDispatcher returns a dispatcher publishing to pipe under a
 // policy with result and action response streams in the default namespace,
 // and a scheduled result of stuckRows rows plus its response.
-func stuckScheduledDispatcher(t *testing.T, pipe *stuckPipeline) (*scheduledResultDispatcher, *ConfigPlugin, QueryResult) {
+func stuckScheduledDispatcher(t *testing.T, pipe beat.Pipeline) (*scheduledResultDispatcher, *ConfigPlugin, QueryResult) {
 	t.Helper()
 	log := logp.NewNopLogger()
 	bt := &osquerybeat{log: log}
 	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents,
-		func(ctx context.Context, allowed func() bool, dropped func(), cut func(int)) osquerybeatPublisher {
-			return pub.NewScheduled(ctx, &beat.Beat{Publisher: pipe}, log, allowed, dropped, cut)
+		func(ctx context.Context, allowed func() bool, dropped, rejected func(), cut func(int)) osquerybeatPublisher {
+			return pub.NewScheduled(ctx, &beat.Beat{Publisher: pipe}, log, allowed, dropped, rejected, cut)
 		}, bt.handleScheduledQueryResult)
 	inputs := stuckScheduledInputs("default")
 	require.NoError(t, d.configure(inputs, config.ScheduledPublishingConfig{MaxEvents: config.DefaultScheduledMaxEvents}), "configure scheduled clients")
@@ -289,6 +290,111 @@ func TestScheduledWorkerWithoutContextPublisherBlocks(t *testing.T) {
 	case <-d.done:
 	case <-time.After(5 * time.Second):
 		t.Error("the worker must return once its Publish returns")
+	}
+}
+
+// rejectingPipeline connects clients that implement beat.ContextPublisher and
+// whose queue rejects the reject-th event published through any of them, as
+// the disk queue rejects an event it cannot serialize. They take every other
+// event at once.
+type rejectingPipeline struct {
+	reject int
+
+	mu        sync.Mutex
+	calls     int
+	published int
+}
+
+func (p *rejectingPipeline) Connect() (beat.Client, error) {
+	return p.ConnectWith(beat.ClientConfig{})
+}
+
+func (p *rejectingPipeline) ConnectWith(beat.ClientConfig) (beat.Client, error) {
+	return &rejectingClient{owner: p}, nil
+}
+
+func (*rejectingPipeline) Disconnect(context.Context) error { return nil }
+
+func (p *rejectingPipeline) publishedEvents() int {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	return p.published
+}
+
+type rejectingClient struct{ owner *rejectingPipeline }
+
+func (c *rejectingClient) Publish(e beat.Event) { _ = c.PublishContext(context.Background(), e) }
+
+func (c *rejectingClient) PublishAll(events []beat.Event) {
+	for _, e := range events {
+		c.Publish(e)
+	}
+}
+
+func (*rejectingClient) Close() error { return nil }
+
+func (c *rejectingClient) PublishContext(context.Context, beat.Event) error {
+	p := c.owner
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.calls++
+	if p.calls == p.reject {
+		return fmt.Errorf("%w: cannot serialize the event", beat.ErrRejected)
+	}
+	p.published++
+	return nil
+}
+
+func TestScheduledRejectedRowCountsRejected(t *testing.T) {
+	pipe := &rejectingPipeline{reject: 3}
+	d, plugin, result := stuckScheduledDispatcher(t, pipe)
+	d.enqueue(t.Context(), outageQueryClient{}, plugin, result, nil)
+
+	// Every row but the rejected one, and the response.
+	assert.Eventually(t, func() bool { return pipe.publishedEvents() == stuckRows }, 5*time.Second, time.Millisecond,
+		"every row the queue does not reject and the response must be published")
+	d.stop()
+	<-d.done
+	assert.Equal(t, uint64(1), d.metrics.droppedRows[dropRejected].Get(), "count the rejected row once as rejected")
+	assert.Zero(t, d.metrics.droppedRows[dropShutdown].Get(), "a rejected row is not a shutdown drop")
+	assert.Zero(t, d.metrics.droppedRows[dropStale].Get(), "a rejected row is not a stale drop")
+}
+
+func TestLiveRejectedRowCountsRejected(t *testing.T) {
+	tests := []struct {
+		name      string
+		reject    int // the profile is published first, then the rows
+		wantCount int
+	}{
+		{name: "profile", reject: 1, wantCount: 3},
+		{name: "row", reject: 2, wantCount: 2},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			log := logp.NewNopLogger()
+			pipe := &rejectingPipeline{reject: tc.reject}
+			d := newLiveResultDispatcher(monitoring.NewRegistry(), log, 5*time.Second)
+			c := &liveClients{newPublisher: func() liveQueryPublisher {
+				return pub.NewLive(&beat.Beat{Publisher: pipe}, log, d.rejected)
+			}}
+			require.NoError(t, c.Configure([]config.InputConfig{
+				{Datastream: config.DatastreamConfig{Dataset: config.DefaultDataset}},
+				{Datastream: config.DatastreamConfig{Dataset: config.DefaultQueryProfileDataset}},
+			}), "configure live result and profile clients")
+			job := liveJob{actionID: "a1", hits: []map[string]any{{"row": 1}, {"row": 2}, {"row": 3}}, profile: map[string]any{}}
+
+			n, err := d.publishResults(t.Context(), c, job)
+
+			assert.NoError(t, err, "a rejected event is not an action error")
+			assert.Equal(t, tc.wantCount, n, "the action's count must leave out a rejected row")
+			assert.Equal(t, uint64(1), d.metrics.droppedRows[dropRejected].Get(), "count the rejected event once as rejected")
+			for _, reason := range []string{dropTimeout, dropStale, dropShutdown} {
+				assert.Zero(t, d.metrics.droppedRows[reason].Get(), "a rejected event must not be counted as %s", reason)
+			}
+
+			c.Close()
+			d.stop()
+		})
 	}
 }
 

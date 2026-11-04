@@ -26,7 +26,7 @@ func TestScheduledPublisherGuardAndDeliveryMode(t *testing.T) {
 	var guarded, dropped atomic.Int32
 	var cut atomic.Int64
 	p := NewScheduled(t.Context(), &beat.Beat{Publisher: recorder}, logptest.NewTestingLogger(t, "scheduled"),
-		func() bool { return guarded.Add(1) == 1 }, func() { dropped.Add(1) }, func(rows int) { cut.Add(int64(rows)) })
+		func() bool { return guarded.Add(1) == 1 }, func() { dropped.Add(1) }, func() {}, func(rows int) { cut.Add(int64(rows)) })
 	t.Cleanup(p.Close)
 	require.NoError(t, p.Configure([]config.InputConfig{
 		inputWithNamespace(config.DefaultDataset, "default"),
@@ -56,7 +56,7 @@ func TestScheduledPublisherGuardAndDeliveryMode(t *testing.T) {
 func TestScheduledProfilePreservesSchema(t *testing.T) {
 	// Configure streams by dataset so the test does not depend on input order.
 	p := NewScheduled(t.Context(), &beat.Beat{Publisher: &connectRecorder{}}, logptest.NewTestingLogger(t, "scheduled_profile"),
-		func() bool { return true }, func() {}, func(int) {})
+		func() bool { return true }, func() {}, func() {}, func(int) {})
 	t.Cleanup(p.Close)
 	require.NoError(t, p.Configure([]config.InputConfig{
 		inputWithNamespace(config.DefaultQueryProfileDataset, "profiles"),
@@ -91,7 +91,7 @@ func TestScheduledPublisherReportsCutResponse(t *testing.T) {
 	recorder := &connectRecorder{}
 	var cut atomic.Int64
 	p := NewScheduled(t.Context(), &beat.Beat{Publisher: recorder}, logptest.NewTestingLogger(t, "scheduled_response"),
-		func() bool { return false }, func() {}, func(rows int) { cut.Add(int64(rows)) })
+		func() bool { return false }, func() {}, func() {}, func(rows int) { cut.Add(int64(rows)) })
 	t.Cleanup(p.Close)
 	require.NoError(t, p.Configure([]config.InputConfig{
 		inputWithNamespace(config.DefaultActionResponsesDataset, "default"),
@@ -107,10 +107,10 @@ func TestScheduledPublisherReportsCutResponse(t *testing.T) {
 }
 
 func TestScheduledPublisherCountsRejectedRow(t *testing.T) {
-	var dropped atomic.Int32
+	var dropped, rejected atomic.Int32
 	var cut atomic.Int64
 	p := NewScheduled(t.Context(), &beat.Beat{}, logptest.NewTestingLogger(t, "scheduled_rejected"),
-		func() bool { return true }, func() { dropped.Add(1) }, func(rows int) { cut.Add(int64(rows)) })
+		func() bool { return true }, func() { dropped.Add(1) }, func() { rejected.Add(1) }, func(rows int) { cut.Add(int64(rows)) })
 	t.Cleanup(p.Close)
 	client := &rejectingClient{listener: p.listener}
 	p.client = client
@@ -124,7 +124,8 @@ func TestScheduledPublisherCountsRejectedRow(t *testing.T) {
 		assert.Equal(t, map[string]any{"n": 2}, published[0].Fields["osquery"], "queue the row after the rejected one")
 		assert.Equal(t, map[string]any{"n": 3}, published[1].Fields["osquery"], "queue the last row")
 	}
-	assert.Equal(t, int32(1), dropped.Load(), "count the rejected row as dropped once")
+	assert.Equal(t, int32(1), rejected.Load(), "count the rejected row as rejected once")
+	assert.Zero(t, dropped.Load(), "a rejected row is not a row published after close")
 	assert.Zero(t, cut.Load(), "a rejected row is not cut")
 }
 

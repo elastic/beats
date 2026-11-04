@@ -48,6 +48,7 @@ type liveItem struct {
 	job       liveJob
 	pub       actionQueryPublisher
 	handed    atomic.Int64  // rows of job handed to Publish so far
+	rejected  atomic.Int64  // rows of job, among those handed, the queue rejected
 	profiled  atomic.Bool   // set once job's profile is handed to Publish
 	cancelled atomic.Bool   // set when the waiting action gives up
 	done      chan struct{} // closed when the worker is finished with job
@@ -71,6 +72,10 @@ type liveResultDispatcher struct {
 	start    sync.Once
 	wake     chan struct{}
 	stopping chan struct{}
+	// publishing is the item whose rows the worker is publishing, if any.
+	// Only the worker uses it: rejected runs on the worker, inside that
+	// publish, so it needs no lock.
+	publishing *liveItem
 
 	mu     sync.Mutex
 	queue  []*liveItem
@@ -99,7 +104,8 @@ func (d *liveResultDispatcher) setTimeout(timeout time.Duration) {
 
 // publishResults hands job's profile and hits to the worker and waits until
 // all hits are handed to Publish, ctx is done, the timeout elapses or the
-// dispatcher stops. It returns the number of hits handed over. Hits not
+// dispatcher stops. It returns the number of hits handed over that the queue
+// did not reject. Hits not
 // handed over by then are skipped. A client that implements
 // beat.ContextPublisher stops waiting for the output then; with any other
 // client, a hit already inside a blocked Publish cannot be pulled back and
@@ -147,13 +153,16 @@ func (d *liveResultDispatcher) publishResults(ctx context.Context, pub actionQue
 		bound.Stop()
 	}
 
+	// Rejected rows count as handed, so they are not lost, but the action
+	// does not report them; they are counted as rejected instead.
 	n := int(it.handed.Load())
+	sent := n - int(it.rejected.Load())
 	lost := job.rows() - n
 	if it.profiled.Load() {
 		lost--
 	}
 	if lost == 0 {
-		return n, nil
+		return sent, nil
 	}
 	if reason == "" {
 		// The worker returned early: it was stopping, or there were no clients.
@@ -166,12 +175,12 @@ func (d *liveResultDispatcher) publishResults(ctx context.Context, pub actionQue
 	if n == len(job.hits) {
 		// Only the profile was lost. The action reports its query's outcome,
 		// not the profile's.
-		return n, nil
+		return sent, nil
 	}
 	if ctxErr != nil {
-		return n, fmt.Errorf("%w: %w", errLivePublishTimeout, ctxErr)
+		return sent, fmt.Errorf("%w: %w", errLivePublishTimeout, ctxErr)
 	}
-	return n, liveDropErrors[reason]
+	return sent, liveDropErrors[reason]
 }
 
 // liveCancelWait bounds how long an action that stopped waiting waits for the
@@ -273,8 +282,21 @@ func (d *liveResultDispatcher) publish(it *liveItem) {
 		handed++
 		return d.abandoned(it)
 	}
+	// Only the rows are tracked: a rejected profile or response is counted
+	// by rejected alone.
+	d.publishing = it
 	n := it.pub.PublishEach(it.ctx, j.index, j.actionID, "action_id", j.responseID, j.spaceID, "", "", "", nil, j.hits, j.ecsm, j.reqData, stop)
+	d.publishing = nil
 	it.handed.Store(int64(n))
+}
+
+// rejected counts a live event the queue rejected. The publisher calls it on
+// the worker, during the publish.
+func (d *liveResultDispatcher) rejected() {
+	d.metrics.dropRows(dropRejected, 1)
+	if it := d.publishing; it != nil {
+		it.rejected.Add(1)
+	}
 }
 
 // publishActionResult publishes an action response and reports whether a

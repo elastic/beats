@@ -43,6 +43,9 @@ type Publisher struct {
 	listener              beat.ClientListener
 	allowed               func() bool
 	cut                   func(rows int)
+	// rejected, if set, is called for each event the queue rejects in
+	// PublishContext.
+	rejected func()
 	// ctx ends the publishes of a scheduled publisher (see NewScheduled).
 	ctx context.Context
 	// inPublishContext is set while a client's PublishContext runs. An event
@@ -56,6 +59,13 @@ func New(b *beat.Beat, log *logp.Logger) *Publisher {
 		b:   b,
 		log: log,
 	}
+}
+
+// NewLive creates clients for live query results. rejected is called for
+// each event the queue rejects; such an event is dropped and publishing
+// continues.
+func NewLive(b *beat.Beat, log *logp.Logger, rejected func()) *Publisher {
+	return &Publisher{b: b, log: log, rejected: rejected}
 }
 
 // Configure replaces the clients for the given inputs. It must be called from a
@@ -246,7 +256,8 @@ func (p *Publisher) PublishEach(ctx context.Context, index, idValue, idFieldKey,
 // non-nil ctx and a client that implements beat.ContextPublisher, it stops
 // waiting for room when ctx ends or c closes, and the event is not queued.
 // Otherwise it blocks like Publish and reports true. An event the queue
-// rejects is dropped as Publish would drop it, and publish reports true.
+// rejects is dropped as Publish would drop it and reported to p.rejected, and
+// publish reports true.
 // p.mx must be held.
 func (p *Publisher) publish(ctx context.Context, c beat.Client, e beat.Event) bool {
 	cp, ok := c.(beat.ContextPublisher)
@@ -258,10 +269,10 @@ func (p *Publisher) publish(ctx context.Context, c beat.Client, e beat.Event) bo
 	err := cp.PublishContext(ctx, e)
 	p.inPublishContext = false
 	if errors.Is(err, beat.ErrRejected) {
-		// The listener ignored the drop report made during PublishContext,
-		// so count it here.
-		if l, ok := p.listener.(*scheduledListener); ok {
-			l.dropped()
+		// A listener ignores the drop report made during PublishContext, so
+		// count it here.
+		if p.rejected != nil {
+			p.rejected()
 		}
 		return true
 	}
@@ -596,13 +607,16 @@ func hitToEvent(index, eventType, idValue, idFieldKey, responseID, spaceID, pack
 // reports whether the remaining rows may still be published, for example
 // after the policy was replaced; cut is called with the number of rows skipped
 // because allowed returned false. dropped is called for
-// each event published after its client closed or rejected by the queue.
+// each event published after its client closed, and rejected for each event
+// the queue rejects.
 //
 // If the clients implement beat.ContextPublisher, ctx ending or a client
 // closing stops a publish waiting for room in the queue. Such an event is
-// reported to cut, not dropped, and allowed should then return false.
-func NewScheduled(ctx context.Context, b *beat.Beat, log *logp.Logger, allowed func() bool, dropped func(), cut func(rows int)) *Publisher {
-	p := &Publisher{b: b, log: log, allowed: allowed, cut: cut, ctx: ctx}
+// reported to cut, not dropped, and allowed should then return false. A
+// client that does not implement it cannot tell a rejected event from one
+// published after the client closed, so it reports both to dropped.
+func NewScheduled(ctx context.Context, b *beat.Beat, log *logp.Logger, allowed func() bool, dropped, rejected func(), cut func(rows int)) *Publisher {
+	p := &Publisher{b: b, log: log, allowed: allowed, cut: cut, rejected: rejected, ctx: ctx}
 	p.listener = &scheduledListener{p: p, dropped: dropped}
 	return p
 }

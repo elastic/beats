@@ -19,12 +19,13 @@ const (
 	dropStale    = "stale"    // no active policy or client publishes it
 	dropShutdown = "shutdown" // osquerybeat is stopping
 	dropTimeout  = "timeout"  // a live action stopped waiting for the output
+	dropRejected = "rejected" // the queue refused the event
 )
 
 // dropReasons lists the reasons each queue reports.
 var dropReasons = map[string][]string{
-	"scheduled": {dropOverflow, dropExpired, dropStale, dropShutdown},
-	"live":      {dropStale, dropShutdown, dropTimeout},
+	"scheduled": {dropOverflow, dropExpired, dropStale, dropShutdown, dropRejected},
+	"live":      {dropStale, dropShutdown, dropTimeout, dropRejected},
 }
 
 // publishingMetrics reports one publishing queue under
