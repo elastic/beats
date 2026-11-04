@@ -168,11 +168,18 @@ const (
 // The function waits up to a maximum limit (maxWaitLimit) for the pid to appear in the cache using an exponential delay strategy.
 // If the pid is not found within the time limit, then an error is returned.
 //
+// The wait is only useful while quark may still be catching up with the event,
+// so the time limit is measured from the event's timestamp, not from when the
+// event reaches Sync. An event that has already waited in the pipeline for
+// longer than maxWaitLimit does not wait at all. Without this, a backlog of
+// events for processes that have exited makes every lookup wait the full limit,
+// and the processor can never catch up.
+//
 // The function also maintains a moving window of time for tracking delays, and applies a backoff strategy if the combined wait time
 // exceeds a certain limit (combinedWaitLimit). This is done so that in the case where there are multiple delays, the cumulative delay
 // does not exceed a reasonable threshold that would delay all other events processed by auditbeat. When in the backoff state, enrichment
 // will proceed without waiting for the process data to exist in the cache, likely resulting in missing enrichment data.
-func (p *prvdr) Sync(_ *beat.Event, pid uint32) error {
+func (p *prvdr) Sync(ev *beat.Event, pid uint32) error {
 	// If pid is already in qq, return immediately
 	if _, found := p.lookupLocked(pid); found {
 		return nil
@@ -180,26 +187,55 @@ func (p *prvdr) Sync(_ *beat.Event, pid uint32) error {
 
 	start := time.Now()
 
+	limit := waitLimit(ev, start)
+	if limit <= 0 {
+		// No wait is spent, so this event does not count towards backoff.
+		return fmt.Errorf("process %v was not seen and the event is too old to wait for it", pid)
+	}
+
 	if p.handleBackoff(start) {
 		return nil
 	}
 
-	// Wait until either the process exists within the cache or the maxWaitLimit is exceeded, with an exponential delay
-	nextWait := 5 * time.Millisecond
+	waited, found := waitFor(func() bool {
+		_, ok := p.lookupLocked(pid)
+		return ok
+	}, limit)
+	p.addCombinedWait(waited)
+	if found {
+		p.logger.Debugw("got process that was missing ", "waited", waited)
+		return nil
+	}
+	return fmt.Errorf("process %v was not seen after %v", pid, waited)
+}
+
+// waitLimit returns how long Sync may wait for the process of ev, at most
+// maxWaitLimit. Time the event has already spent in the pipeline counts
+// against the limit. An event with no timestamp is treated as new.
+func waitLimit(ev *beat.Event, now time.Time) time.Duration {
+	if ev == nil || ev.Timestamp.IsZero() {
+		return maxWaitLimit
+	}
+	age := max(0, now.Sub(ev.Timestamp))
+	return max(0, maxWaitLimit-age)
+}
+
+// waitFor polls found with an exponential delay until it returns true or limit
+// has elapsed. It returns the time waited and whether found succeeded.
+func waitFor(found func() bool, limit time.Duration) (time.Duration, bool) {
+	start := time.Now()
+	nextWait := min(5*time.Millisecond, limit)
 	for {
 		waited := time.Since(start)
-		if _, found := p.lookupLocked(pid); found {
-			p.logger.Debugw("got process that was missing ", "waited", waited)
-			p.addCombinedWait(waited)
-			return nil
+		if found() {
+			return waited, true
 		}
-		if waited >= maxWaitLimit {
-			p.addCombinedWait(waited)
-			return fmt.Errorf("process %v was not seen after %v", pid, waited)
+		if waited >= limit {
+			return waited, false
 		}
 		time.Sleep(nextWait)
-		if nextWait*2+waited > maxWaitLimit {
-			nextWait = maxWaitLimit - waited
+		if nextWait*2+waited > limit {
+			nextWait = limit - waited
 		} else {
 			nextWait = nextWait * 2
 		}

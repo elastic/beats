@@ -15,11 +15,30 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux && (amd64 || arm64)
+//go:build linux && (amd64 || arm64) && cgo
 
 package file_integrity
 
-import "github.com/elastic/elastic-agent-libs/logp"
+import (
+	"runtime"
+
+	"github.com/elastic/beats/v7/libbeat/common/seccomp"
+
+	"github.com/elastic/elastic-agent-libs/logp"
+)
+
+func init() {
+	// quark's eBPF backend goes through libbpf, which needs the following
+	if runtime.GOARCH == "amd64" {
+		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall,
+			"bpf",             // program and map loading
+			"memfd_create",    // libbpf placeholder fds while opening the object
+			"perf_event_open", // libbpf attaches kprobes and tracepoints through perf events
+		); err != nil {
+			panic(err)
+		}
+	}
+}
 
 func newEBPFReader(c Config, l *logp.Logger) (EventProducer, error) {
 	paths := make(map[string]struct{})

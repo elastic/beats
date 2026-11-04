@@ -1,4 +1,0 @@
-kind: bug-fix
-summary: Fix osquerybeat sending action responses to the wrong data stream under the OTel runtime.
-component: osquerybeat
-issue: https://github.com/elastic/elastic-agent/issues/15964

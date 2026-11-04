@@ -1,0 +1,9 @@
+kind: bug-fix
+
+# REQUIRED for all kinds
+# Change summary; a 80ish characters long description of the change.
+summary: Beat receivers only look the host FQDN up when features.fqdn is enabled, so a DNS server that does not answer no longer delays their start by a minute.
+
+# REQUIRED for all kinds
+# Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
+component: all
