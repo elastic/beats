@@ -176,7 +176,9 @@ Each `secret_stores` entry takes these options:
     * `approle`: AppRole credentials: `role_id`, `secret_id`, and optionally `mount_path`, which defaults to `approle`.
 
 `ssl`
-:   (Optional) TLS settings of the connection to Vault. You can set `certificate_authorities` to trust a private CA. You can set `verification_mode` to `none` only when the Vault address is loopback. These settings only apply to Vault: the `ssl` settings of the monitor apply to the monitored host. See [SSL](/reference/heartbeat/configuration-ssl.md) for the available settings.
+:   (Optional) TLS settings of the connection to Vault. You can set `certificate_authorities` to trust a private CA. These settings only apply to Vault: the `ssl` settings of the monitor apply to the monitored host. See [SSL](/reference/heartbeat/configuration-ssl.md) for the available settings.
+
+    {applies_to}`stack: ga 9.6+` You can set `verification_mode` to `none` only when the Vault address is a loopback address.
 
 `allowed_hosts`
 :   (Optional) The hosts that the secrets of this connection can be sent to, as host names or IP addresses, without scheme, port, or path. Refer to [Restrict the hosts that receive secrets](#monitor-secret-stores-allowed-hosts). If you don't set this option, or set it to an empty list, any host can receive the secrets.
