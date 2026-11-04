@@ -396,8 +396,13 @@ func prepareAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath string, l
 	}
 
 	if rewrite {
+<<<<<<< HEAD
 		if err := os.WriteFile(extensionAutoloadPath, []byte(mandatoryExtensionPath), 0600); err != nil {
 			return fmt.Errorf("failed write osquery extension autoload file, %w", err)
+=======
+		if err := os.WriteFile(extensionAutoloadPath, []byte(desired), 0600); err != nil {
+			return fmt.Errorf("failed to write osquery extension autoload file: %w", err)
+>>>>>>> 956a6f5 (Fix typos and grammar in Jolokia fields, osquery, filestream and GCP text (#53898))
 		}
 	}
 	return nil
