@@ -48,6 +48,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch" // register "elasticsearch" output type
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+<<<<<<< HEAD
+=======
+	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+>>>>>>> cdce7bf (Set data_stream as a map in the add_data_stream processor (#54224))
 	agentconfig "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -137,7 +142,24 @@ func TestPublish(t *testing.T) {
 			"namespace": "not_default",
 			"dataset":   "not_elastic_agent",
 		}
+<<<<<<< HEAD
 		event1.Fields["data_stream"] = dataStreamField
+=======
+		for _, tc := range []struct {
+			name  string
+			value any
+		}{
+			{"mapstr.M", mapstr.M(want)},
+			{"map[string]any", want},
+			{"add_data_stream", dataStreamFromProcessor(t, add_data_stream.DataStream{
+				Type:      "logs",
+				Namespace: "not_default",
+				Dataset:   "not_elastic_agent",
+			})},
+		} {
+			t.Run(tc.name, func(t *testing.T) {
+				event1.Fields["data_stream"] = tc.value
+>>>>>>> cdce7bf (Set data_stream as a map in the add_data_stream processor (#54224))
 
 		batch := outest.NewBatch(event1)
 
@@ -949,4 +971,13 @@ type testIndexSelector struct{}
 
 func (testIndexSelector) Select(_ *beat.Event) (string, error) {
 	return "test-index", nil
+}
+
+// dataStreamFromProcessor returns the data_stream field the add_data_stream
+// processor sets on events.
+func dataStreamFromProcessor(t *testing.T, ds add_data_stream.DataStream) any {
+	t.Helper()
+	event, err := add_data_stream.New(ds).Run(&beat.Event{})
+	require.NoError(t, err)
+	return event.Fields["data_stream"]
 }
