@@ -8,15 +8,26 @@ import (
 	"fmt"
 	"sync"
 
+	"google.golang.org/protobuf/types/known/structpb"
+
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// streamStatusReporting controls which health states a stream contributes
+// to the unit's aggregate health. Both fields default to true so that
+// existing behaviour is preserved when the config block is absent.
+type streamStatusReporting struct {
+	reportDegraded bool
+	reportFailed   bool
+}
+
 // unitState is the current state of a unit
 type unitState struct {
-	state status.Status
-	msg   string
+	state           status.Status
+	msg             string
+	statusReporting streamStatusReporting
 }
 
 type clientUnit interface {
@@ -68,7 +79,7 @@ func getUnitState(s status.Status) client.UnitState {
 	}
 }
 
-// getUnitState converts status.Status to client.UnitState
+// getStatus converts client.UnitState to status.Status
 func getStatus(s client.UnitState) status.Status {
 	switch s {
 	case client.UnitStateStarting:
@@ -90,6 +101,30 @@ func getStatus(s client.UnitState) status.Status {
 	}
 }
 
+// parseStatusReporting extracts status_reporting from a protobuf Struct source,
+// using fallback as the default when fields are absent.
+func parseStatusReporting(src *structpb.Struct, fallback streamStatusReporting) streamStatusReporting {
+	if src == nil {
+		return fallback
+	}
+	srVal, ok := src.GetFields()["status_reporting"]
+	if !ok {
+		return fallback
+	}
+	srMap := srVal.GetStructValue()
+	if srMap == nil {
+		return fallback
+	}
+	sr := fallback
+	if v, ok := srMap.GetFields()["report_degraded"]; ok {
+		sr.reportDegraded = v.GetBoolValue()
+	}
+	if v, ok := srMap.GetFields()["report_failed"]; ok {
+		sr.reportFailed = v.GetBoolValue()
+	}
+	return sr
+}
+
 func getStreamStates(expected client.Expected) (map[string]unitState, []string) {
 	expectedCfg := expected.Config
 
@@ -97,13 +132,23 @@ func getStreamStates(expected client.Expected) (map[string]unitState, []string) 
 		return nil, nil
 	}
 
+	// Read input-level status_reporting as a default for all streams.
+	inputDefault := parseStatusReporting(
+		expectedCfg.GetSource(),
+		streamStatusReporting{reportDegraded: true, reportFailed: true},
+	)
+
 	streamStates := make(map[string]unitState, len(expectedCfg.Streams))
 	streamIDs := make([]string, len(expectedCfg.Streams))
 
 	for idx, stream := range expectedCfg.Streams {
+		// Stream-level status_reporting overrides the input-level default.
+		sr := parseStatusReporting(stream.GetSource(), inputDefault)
+
 		streamState := unitState{
-			state: status.Unknown,
-			msg:   "",
+			state:           status.Unknown,
+			msg:             "",
+			statusReporting: sr,
 		}
 
 		if id := stream.GetId(); id != "" {
@@ -216,17 +261,25 @@ func (u *agentUnit) calcState() (status.Status, string) {
 		return u.inputLevelState.state, u.inputLevelState.msg
 	}
 
-	// inputLevelState state is marked as running, check the stream states
+	// inputLevelState state is marked as running, check the stream states.
+	// Streams with status_reporting.report_degraded or report_failed set to
+	// false are excluded from the aggregate health for those specific states.
 	reportedStatus := status.Running
 	reportedMsg := "Healthy"
 	for _, streamState := range u.streamStates {
 		switch streamState.state {
 		case status.Degraded:
+			if !streamState.statusReporting.reportDegraded {
+				continue
+			}
 			if reportedStatus != status.Degraded {
 				reportedStatus = status.Degraded
 				reportedMsg = streamState.msg
 			}
 		case status.Failed:
+			if !streamState.statusReporting.reportFailed {
+				continue
+			}
 			// return the first failed stream
 			return streamState.state, streamState.msg
 		}
@@ -307,8 +360,9 @@ func (u *agentUnit) updateStateForStream(streamID string, state status.Status, m
 	}
 
 	u.streamStates[streamID] = unitState{
-		state: state,
-		msg:   msg,
+		state:           state,
+		msg:             msg,
+		statusReporting: u.streamStates[streamID].statusReporting,
 	}
 
 	state, msg = u.calcState()
@@ -347,8 +401,16 @@ func (u *agentUnit) update(cu *client.Unit) {
 
 	newStreamStates, newStreamIDs := getStreamStates(cu.Expected())
 
+	reportingChanged := false
 	for key, state := range newStreamStates {
-		if _, exists := u.streamStates[key]; exists {
+		if existing, exists := u.streamStates[key]; exists {
+			// Preserve current health state but update the status_reporting flags
+			// in case the stream config changed.
+			if existing.statusReporting != state.statusReporting {
+				reportingChanged = true
+			}
+			existing.statusReporting = state.statusReporting
+			u.streamStates[key] = existing
 			continue
 		}
 
@@ -371,6 +433,20 @@ func (u *agentUnit) update(cu *client.Unit) {
 				break
 			}
 		}
+	}
+
+	// If any stream's status_reporting config changed, recompute and publish
+	// the aggregate unit health so the change takes effect immediately.
+	if reportingChanged {
+		state, msg := u.calcState()
+		streamsPayload := make(map[string]interface{}, len(u.streamStates))
+		for id, streamState := range u.streamStates {
+			streamsPayload[id] = map[string]interface{}{
+				"status": getUnitState(streamState.state).String(),
+				"error":  streamState.msg,
+			}
+		}
+		_ = u.clientUnit.UpdateState(getUnitState(state), msg, map[string]interface{}{"streams": streamsPayload})
 	}
 }
 
