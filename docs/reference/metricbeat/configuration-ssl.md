@@ -518,11 +518,21 @@ stack: deprecated 9.5+
 This setting is deprecated in 9.5.0. Use [`certificate_reload.enabled`](#certificate_reload_enabled) instead. Certificates, keys, and CA certificates are now automatically reloaded on each TLS handshake without requiring a process restart.
 :::
 
-This setting no longer has any effect. Metricbeat does not restart when a file listed by `key`, `certificate`, or `certificate_authorities` is modified; those files are reloaded on each TLS handshake instead. Setting it to `true` only logs a deprecation warning at startup.
+{applies_to}`stack: deprecated 9.5+` This setting has no effect. Metricbeat does not restart when a file listed by `key`, `certificate`, or `certificate_authorities` is modified; those files are reloaded on each TLS handshake instead. Setting it to `true` only logs a deprecation warning at startup.
+
+{applies_to}`stack: ga 9.0-9.4` If set to `true` Metricbeat will restart if any file listed by `key`, `certificate`, or `certificate_authorities` is modified.
 
 ::::{note}
 This feature is NOT supported on Windows. The default value is `false`.
 ::::
+
+
+::::{note}
+:applies_to: stack: ga 9.0-9.4
+
+This feature requires the `execve` system call to be enabled. If you have a custom seccomp policy in place, make sure to allow for `execve`.
+::::
+
 
 
 ### `restart_on_cert_change.period` [restart_on_cert_change_period]
@@ -535,5 +545,7 @@ stack: deprecated 9.5+
 This setting is deprecated in 9.5.0. Use [`certificate_reload.reload_interval`](#certificate_reload_reload_interval) instead.
 :::
 
-This setting no longer has any effect: the files are not polled for changes. It is still validated though, so a period of less than 1s results in a validation error and Metricbeat will not start, whether or not `restart_on_cert_change.enabled` is set. The default value is 1m. Use [`certificate_reload.reload_interval`](#certificate_reload_reload_interval) to control how often the certificates are reloaded.
+{applies_to}`stack: deprecated 9.5+` This setting has no effect because the files are no longer polled. It is still validated, so a period of less than 1s causes a validation error and Metricbeat will not start, even when `restart_on_cert_change.enabled` is `false`. The default value is 1m. To control how often certificates are re-read, use [`certificate_reload.reload_interval`](#certificate_reload_reload_interval).
+
+{applies_to}`stack: ga 9.0-9.4` Specifies how often the files are checked for changes. Do not set the period to less than 1s because the modification time of files is often stored in seconds. Setting the period to less than 1s will result in validation error and Metricbeat will not start. The default value is 1m.
 
