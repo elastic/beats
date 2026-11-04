@@ -110,7 +110,7 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 
 	beater, err := creator(&b.Beat, beatConfig)
 	if err != nil {
-		return BeatReceiver{}, fmt.Errorf("error getting %s creator:%w", b.Info.Beat, err)
+		return BeatReceiver{}, fmt.Errorf("error getting %s creator: %w", b.Info.Beat, err)
 	}
 
 	bridge, err := oteltelemetry.NewRegistryBridge(bridgeTelemetrySettings, receiverID.String(), b.Monitoring.StatsRegistry(), b.Monitoring.InputsRegistry())
