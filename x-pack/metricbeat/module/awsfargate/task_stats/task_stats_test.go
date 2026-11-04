@@ -9,9 +9,11 @@ import (
 	"io"
 	"net/http"
 	"testing"
+	"time"
 
 	dcontainer "github.com/moby/moby/api/types/container"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
 	"github.com/elastic/beats/v7/metricbeat/module/docker/cpu"
@@ -108,22 +110,40 @@ func TestGetTask(t *testing.T) {
 }
 
 func TestGetStatsList(t *testing.T) {
-	taskStatsResp := &http.Response{
-		Body: io.NopCloser(bytes.NewReader([]byte(taskStatsJson))),
-	}
-
-	taskStatsOutput, err := getTaskStats(taskStatsResp)
-	assert.NoError(t, err)
-
-	taskResp := &http.Response{
+	taskOutput, err := getTask(&http.Response{
 		Body: io.NopCloser(bytes.NewReader([]byte(taskRespJson))),
+	})
+	require.NoError(t, err, "task metadata must parse")
+
+	tests := []struct {
+		name    string
+		mutate  func(*dcontainer.StatsResponse)
+		wantLen int
+	}{
+		{name: "valid sample", mutate: func(*dcontainer.StatsResponse) {}, wantLen: 1},
+		{name: "empty read", mutate: func(s *dcontainer.StatsResponse) { s.Read = time.Time{} }},
+		{name: "empty preread", mutate: func(s *dcontainer.StatsResponse) { s.PreRead = time.Time{} }},
+		{name: "both empty", mutate: func(s *dcontainer.StatsResponse) {
+			s.Read = time.Time{}
+			s.PreRead = time.Time{}
+		}},
 	}
 
-	taskOutput, err := getTask(taskResp)
-	assert.NoError(t, err)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			taskStatsOutput, err := getTaskStats(&http.Response{
+				Body: io.NopCloser(bytes.NewReader([]byte(taskStatsJson))),
+			})
+			require.NoError(t, err, "task stats must parse")
 
-	formattedStats := getStatsList(taskStatsOutput, taskOutput)
-	assert.Equal(t, 1, len(formattedStats))
+			stats := taskStatsOutput["query-metadata-1"]
+			test.mutate(&stats)
+			taskStatsOutput["query-metadata-1"] = stats
+
+			formattedStats := getStatsList(taskStatsOutput, taskOutput)
+			assert.Len(t, formattedStats, test.wantLen, "unexpected number of formatted stats")
+		})
+	}
 }
 
 func TestGetCPUStats(t *testing.T) {

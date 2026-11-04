@@ -297,7 +297,9 @@ func TestCPUServiceValidSampleOutput(t *testing.T) {
 	assertOptionalFloat(t, cpuStats.TotalUsage, 0.2, true, "total percentage")
 	assertOptionalFloat(t, cpuStats.TotalUsageNormalized, 0.1, true, "normalized total percentage")
 	assertOptionalFloat(t, cpuStats.UsageInKernelmodePercentage, 0.02, true, "kernel percentage")
+	assertOptionalFloat(t, cpuStats.UsageInKernelmodePercentageNormalized, 0.01, true, "normalized kernel percentage")
 	assertOptionalFloat(t, cpuStats.UsageInUsermodePercentage, 0.04, true, "user percentage")
+	assertOptionalFloat(t, cpuStats.UsageInUsermodePercentageNormalized, 0.02, true, "normalized user percentage")
 	assertOptionalFloat(t, cpuStats.SystemUsagePercentage, 2, true, "system percentage")
 	assertOptionalFloat(t, cpuStats.SystemUsagePercentageNormalized, 1, true, "normalized system percentage")
 	assert.Equal(t, mapstr.M{

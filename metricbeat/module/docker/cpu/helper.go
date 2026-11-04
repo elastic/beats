@@ -65,26 +65,9 @@ func (c *CPUService) getCPUStatsList(rawStats []docker.Stat, dedot bool) []CPUSt
 
 func (c *CPUService) getCPUStats(myRawStat *docker.Stat, dedot bool) CPUStats {
 	usage := CPUUsage{Stat: myRawStat}
-	total, totalNormalized := usage.total()
-	kernel, kernelNormalized := usage.inKernelMode()
-	user, userNormalized := usage.inUserMode()
-	system, systemNormalized := usage.system()
-
-	stats := CPUStats{
-		Time:                                  common.Time(myRawStat.Stats.Read),
-		Container:                             docker.NewContainer(myRawStat.Container, dedot),
-		TotalUsage:                            total,
-		TotalUsageNormalized:                  totalNormalized,
-		UsageInKernelmode:                     myRawStat.Stats.CPUStats.CPUUsage.UsageInKernelmode,
-		UsageInKernelmodePercentage:           kernel,
-		UsageInKernelmodePercentageNormalized: kernelNormalized,
-		UsageInUsermode:                       myRawStat.Stats.CPUStats.CPUUsage.UsageInUsermode,
-		UsageInUsermodePercentage:             user,
-		UsageInUsermodePercentageNormalized:   userNormalized,
-		SystemUsage:                           myRawStat.Stats.CPUStats.SystemUsage,
-		SystemUsagePercentage:                 system,
-		SystemUsagePercentageNormalized:       systemNormalized,
-	}
+	stats := usage.Metrics()
+	stats.Time = common.Time(myRawStat.Stats.Read)
+	stats.Container = docker.NewContainer(myRawStat.Container, dedot)
 
 	if c.Cores {
 		stats.PerCPUUsage = usage.PerCPU()
@@ -102,6 +85,30 @@ type CPUUsage struct {
 	systemDelta           uint64
 	systemDeltaCalculated bool
 	systemDeltaValid      bool
+}
+
+// Metrics returns the total, kernel, user and system usage of the sample,
+// computing each raw and normalized percentage pair with a single
+// calculatePercentages call. Time, Container and PerCPUUsage are not set.
+func (u *CPUUsage) Metrics() CPUStats {
+	total, totalNormalized := u.total()
+	kernel, kernelNormalized := u.inKernelMode()
+	user, userNormalized := u.inUserMode()
+	system, systemNormalized := u.system()
+
+	return CPUStats{
+		TotalUsage:                            total,
+		TotalUsageNormalized:                  totalNormalized,
+		UsageInKernelmode:                     u.Stats.CPUStats.CPUUsage.UsageInKernelmode,
+		UsageInKernelmodePercentage:           kernel,
+		UsageInKernelmodePercentageNormalized: kernelNormalized,
+		UsageInUsermode:                       u.Stats.CPUStats.CPUUsage.UsageInUsermode,
+		UsageInUsermodePercentage:             user,
+		UsageInUsermodePercentageNormalized:   userNormalized,
+		SystemUsage:                           u.Stats.CPUStats.SystemUsage,
+		SystemUsagePercentage:                 system,
+		SystemUsagePercentageNormalized:       systemNormalized,
+	}
 }
 
 // CPUS returns the number of cpus. If number of cpus is equal to zero, the field will
