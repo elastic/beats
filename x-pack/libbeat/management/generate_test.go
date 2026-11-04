@@ -89,6 +89,121 @@ func TestGlobalProcessInject(t *testing.T) {
 	findFieldsInProcessors(t, processorFields, cfgMap)
 }
 
+<<<<<<< HEAD
+=======
+func TestGlobalProcessorsInjectedOnceForSimpleConfig(t *testing.T) {
+	addTags := map[string]any{"add_tags": map[string]any{"tags": []any{"global"}}}
+	raw := &proto.UnitExpectedConfig{
+		Id:   "filestream-1",
+		Type: "filestream",
+		Source: requireNewStruct(t, map[string]any{
+			"type":       "filestream",
+			"paths":      []any{"/tmp/*.log"},
+			"processors": []any{addTags},
+		}),
+	}
+	agentInfo := &client.AgentInfo{ID: "beat-ID", Version: "8.0.0"}
+
+	cases := map[string]struct {
+		create func() ([]map[string]any, error)
+		want   []any
+	}{
+		"CreateInputsFromStreams": {
+			create: func() ([]map[string]any, error) {
+				return CreateInputsFromStreams(raw, "logs", agentInfo)
+			},
+			want: []any{
+				mapstr.M{"add_fields": mapstr.M{"fields": mapstr.M{"input_id": "filestream-1"}, "target": "@metadata"}},
+				mapstr.M{"add_fields": mapstr.M{"fields": mapstr.M{"dataset": "generic", "namespace": "default", "type": "logs"}, "target": "data_stream"}},
+				mapstr.M{"add_fields": mapstr.M{"fields": mapstr.M{"dataset": "generic"}, "target": "event"}},
+				mapstr.M{"add_fields": mapstr.M{"fields": mapstr.M{"id": "beat-ID", "snapshot": false, "version": "8.0.0"}, "target": "elastic_agent"}},
+				mapstr.M{"add_fields": mapstr.M{"fields": mapstr.M{"id": "beat-ID"}, "target": "agent"}},
+				addTags,
+			},
+		},
+		"CreateInputsFromStreamsForReceiver": {
+			create: func() ([]map[string]any, error) {
+				return CreateInputsFromStreamsForReceiver(raw, "logs", agentInfo)
+			},
+			want: []any{
+				mapstr.M{"add_agent_metadata": mapstr.M{
+					"data_stream":   mapstr.M{"dataset": "generic", "namespace": "default", "type": "logs"},
+					"elastic_agent": mapstr.M{"id": "beat-ID", "snapshot": false, "version": "8.0.0"},
+					"input_id":      "filestream-1",
+				}},
+				addTags,
+			},
+		},
+	}
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			inputs, err := tc.create()
+			require.NoError(t, err)
+			require.Len(t, inputs, 1)
+			assert.Equal(t, tc.want, inputs[0]["processors"])
+		})
+	}
+}
+
+func TestIndexPrecedence(t *testing.T) {
+
+	withSource := func(source map[string]any) *proto.UnitExpectedConfig {
+		return &proto.UnitExpectedConfig{
+			DataStream: &proto.DataStream{
+				Namespace: "default",
+			},
+			Id:       "filestream-filestream",
+			Type:     "filestream",
+			Name:     "filestream-1",
+			Revision: 1,
+			Meta: &proto.Meta{
+				Package: &proto.Package{
+					Name:    "filestream",
+					Version: "1.3.0",
+				},
+			},
+			Streams: []*proto.Stream{
+				{
+					Id: "filestream-filestream.generic",
+					DataStream: &proto.DataStream{
+						Dataset: "filestream.generic",
+						Type:    "logs",
+					},
+					Source: requireNewStruct(t, source),
+				},
+			},
+		}
+	}
+
+	t.Run("index takes precedence", func(t *testing.T) {
+		source := map[string]any{
+			"data_stream": map[string]any{
+				"dataset": "filestream.generic",
+			},
+			"index": "logs",
+			"paths": []any{"/logs/*"},
+		}
+
+		cfgMap := buildConfigMap(t, withSource(source), &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true})
+		require.Equal(t, "logs", cfgMap["index"])
+		require.Nil(t, cfgMap["data_stream"])
+	})
+
+	t.Run("data_stream forms an index", func(t *testing.T) {
+		source := map[string]any{
+			"data_stream": map[string]any{
+				"dataset": "filestream.generic",
+			},
+			"paths": []any{"/logs/*"},
+		}
+
+		cfgMap := buildConfigMap(t, withSource(source), &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true})
+		require.Equal(t, "logs-filestream.generic-default", cfgMap["index"])
+		require.NotNil(t, cfgMap["data_stream"])
+	})
+}
+
+>>>>>>> 11a0a14 (management: apply global processors once for inputs without streams (#54416))
 func TestMBGenerate(t *testing.T) {
 	sourceStream := requireNewStruct(t, map[string]any{
 		"metricsets": []any{"filesystem"},
