@@ -55,7 +55,7 @@ func TestData(t *testing.T) {
 	}()
 
 	ms := mbtest.NewPushMetricSetV2WithRegistry(t, getConfig(dir), ab.Registry)
-	events := mbtest.RunPushMetricSetV2(10*time.Second, 2, ms)
+	events := mbtest.RunPushMetricSetV2AndWait(10*time.Second, 2, ms)
 	for _, e := range events {
 		if e.Error != nil {
 			t.Fatalf("received error: %+v", e.Error)
@@ -133,7 +133,7 @@ func TestActions(t *testing.T) {
 	require.NoError(t, os.WriteFile(updatedFilepath, []byte("hello world"), 0o600))
 
 	ms := mbtest.NewPushMetricSetV2WithRegistry(t, getConfig(dir, newDir), ab.Registry)
-	events := mbtest.RunPushMetricSetV2(10*time.Second, 5, ms)
+	events := mbtest.RunPushMetricSetV2AndWait(10*time.Second, 5, ms)
 	assert.Len(t, events, 5)
 
 	for _, event := range events {
@@ -192,7 +192,7 @@ func TestExcludedFiles(t *testing.T) {
 		}
 	}()
 
-	events := mbtest.RunPushMetricSetV2(10*time.Second, 3, ms)
+	events := mbtest.RunPushMetricSetV2AndWait(10*time.Second, 3, ms)
 	for _, e := range events {
 		if e.Error != nil {
 			t.Fatalf("received error: %+v", e.Error)
@@ -248,7 +248,7 @@ func TestIncludedExcludedFiles(t *testing.T) {
 		require.NoError(t, os.WriteFile(file, []byte("hello world"), 0o600))
 	}
 
-	events := mbtest.RunPushMetricSetV2(10*time.Second, 3, ms)
+	events := mbtest.RunPushMetricSetV2AndWait(10*time.Second, 3, ms)
 	for _, e := range events {
 		if e.Error != nil {
 			t.Fatalf("received error: %+v", e.Error)
@@ -320,7 +320,7 @@ func TestErrorReporting(t *testing.T) {
 		}
 	}()
 
-	events := mbtest.RunPushMetricSetV2(10*time.Second, 10, ms)
+	events := mbtest.RunPushMetricSetV2AndWait(10*time.Second, 10, ms)
 	close(done)
 	<-ready
 
