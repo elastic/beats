@@ -264,6 +264,46 @@ func TestExecuteReturnsOnShutdown(t *testing.T) {
 	})
 }
 
+// TestQueuedActionReturnsPromptlyOnStop checks that an action still queued
+// behind another when the dispatcher stops does not wait for a worker that
+// will never take it.
+func TestQueuedActionReturnsPromptlyOnStop(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		pub := newGatedLivePublisher(0)
+		d := newLiveResultDispatcher(monitoring.NewRegistry(), logptest.NewTestingLogger(t, ""), time.Minute)
+		first := make(chan struct{})
+		go func() {
+			defer close(first)
+			_, _ = d.publishResults(t.Context(), pub, liveJob{actionID: "a1", hits: make([]map[string]any, 1)})
+		}()
+		synctest.Wait() // the worker is blocked on a1's row
+		type result struct {
+			n   int
+			err error
+		}
+		second := make(chan result)
+		go func() {
+			n, err := d.publishResults(t.Context(), pub, liveJob{actionID: "a2", hits: make([]map[string]any, 2)})
+			second <- result{n, err}
+		}()
+		synctest.Wait() // a2 is queued behind a1
+
+		start := time.Now()
+		d.stop()
+		got := <-second
+		assert.Less(t, time.Since(start), liveCancelWait, "an action queued when the dispatcher stops must not wait for the worker")
+		assert.Zero(t, got.n, "no row of the queued action was handed over")
+		assert.ErrorIs(t, got.err, errLiveShutdown, "the queued action reports the shutdown")
+
+		// a1's row, released before a1 stops waiting, is handed over, so only
+		// a2 is dropped.
+		close(pub.release)
+		<-first
+		assert.Equal(t, uint64(1), d.metrics.dropped[dropShutdown].Get(), "count the queued action as a shutdown drop")
+		assert.Equal(t, uint64(2), d.metrics.droppedRows[dropShutdown].Get(), "count the queued action's rows")
+	})
+}
+
 func TestLiveResponseAfterStopIsDropped(t *testing.T) {
 	pub := newGatedLivePublisher(0)
 	d := newLiveResultDispatcher(monitoring.NewRegistry(), logptest.NewTestingLogger(t, ""), time.Minute)

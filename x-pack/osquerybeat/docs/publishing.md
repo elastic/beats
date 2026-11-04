@@ -97,7 +97,8 @@ for the output is cancelled; without cancellation support, a row already
 inside a blocked `Publish` can still be delivered late. The action's
 response document is published after its rows and is not dropped by the
 timeout, so Kibana learns the outcome unless osquerybeat stops before the
-response is published. If osquerybeat is stopping, the
+response is published. Stopping cancels a response publish waiting for the
+output, when the pipeline supports it. If osquerybeat is stopping, the
 action reports an error instead of a count. If no results stream is configured,
 the action reports that error instead.
 

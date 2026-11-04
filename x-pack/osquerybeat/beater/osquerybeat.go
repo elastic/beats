@@ -170,7 +170,7 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 		checkTimeout:         checkTimeout,
 		log:                  log,
 		pub: &liveClients{newPublisher: func() liveQueryPublisher {
-			return pub.NewLive(b, log, live.rejected)
+			return pub.NewLive(live.ctx, b, log, live.rejected, live.cut)
 		}},
 		liveResults:     live,
 		qp:              newQueryProfiler(log),

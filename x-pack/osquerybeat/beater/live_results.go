@@ -51,9 +51,10 @@ type liveItem struct {
 	rejected  atomic.Int64  // rows of job, among those handed, the queue rejected
 	profiled  atomic.Bool   // set once job's profile is handed to Publish
 	cancelled atomic.Bool   // set when the waiting action gives up
-	done      chan struct{} // closed when the worker is finished with job
-	// ctx is cancelled when the waiting action gives up. Clients that
-	// implement beat.ContextPublisher then stop waiting for the output.
+	done      chan struct{} // closed when the worker is finished with job, or by stop
+	// ctx is cancelled when the waiting action gives up or the dispatcher
+	// stops. Clients that implement beat.ContextPublisher then stop waiting
+	// for the output.
 	ctx    context.Context
 	cancel context.CancelFunc
 
@@ -72,10 +73,16 @@ type liveResultDispatcher struct {
 	start    sync.Once
 	wake     chan struct{}
 	stopping chan struct{}
-	// publishing is the item whose rows the worker is publishing, if any.
-	// Only the worker uses it: rejected runs on the worker, inside that
-	// publish, so it needs no lock.
+	// ctx is cancelled by stop. It ends the publishes of action responses and
+	// is the parent of each item's ctx.
+	ctx    context.Context
+	cancel context.CancelFunc
+	// publishing is the item whose rows the worker is publishing, if any, and
+	// responding is set while it publishes an action response. Only the worker
+	// uses them: rejected and cut run on the worker, inside that publish, so
+	// they need no lock.
 	publishing *liveItem
+	responding bool
 
 	mu     sync.Mutex
 	queue  []*liveItem
@@ -92,6 +99,7 @@ func newLiveResultDispatcher(reg *monitoring.Registry, log *logp.Logger, timeout
 		wake:     make(chan struct{}, 1),
 		stopping: make(chan struct{}),
 	}
+	d.ctx, d.cancel = context.WithCancel(context.Background())
 	d.setTimeout(timeout)
 	return d
 }
@@ -105,18 +113,17 @@ func (d *liveResultDispatcher) setTimeout(timeout time.Duration) {
 // publishResults hands job's profile and hits to the worker and waits until
 // all hits are handed to Publish, ctx is done, the timeout elapses or the
 // dispatcher stops. It returns the number of hits handed over that the queue
-// did not reject. Hits not
-// handed over by then are skipped. A client that implements
-// beat.ContextPublisher stops waiting for the output then; with any other
-// client, a hit already inside a blocked Publish cannot be pulled back and
-// may be delivered late. On the process runtime ctx is the agent client's
+// did not reject. Hits not handed over by then are skipped. A client that
+// implements beat.ContextPublisher stops waiting for the output then; with any
+// other client, a hit already inside a blocked Publish cannot be pulled back
+// and may be delivered late. On the process runtime ctx is the agent client's
 // lifetime context. On the OTel runtime it is the action request's context,
 // which ends at the Fleet action timeout (1 minute by default, or the action's
 // own timeout). So the end of ctx counts as a shutdown only while the
 // dispatcher is stopping, and as a timeout otherwise.
 func (d *liveResultDispatcher) publishResults(ctx context.Context, pub actionQueryPublisher, job liveJob) (int, error) {
 	it := &liveItem{job: job, pub: pub, done: make(chan struct{})}
-	it.ctx, it.cancel = context.WithCancel(context.Background())
+	it.ctx, it.cancel = context.WithCancel(d.ctx)
 	if !d.push(it) {
 		d.metrics.drop(dropShutdown, job.rows())
 		return 0, errLiveShutdown
@@ -263,9 +270,11 @@ func (d *liveResultDispatcher) next() (*liveItem, bool) {
 
 func (d *liveResultDispatcher) publish(it *liveItem) {
 	if it.pub == nil {
+		d.responding = true
 		if !publishActionResult(it.resPub, it.req, it.res) {
 			d.metrics.drop(dropStale, 1)
 		}
+		d.responding = false
 		return
 	}
 	defer close(it.done)
@@ -299,6 +308,16 @@ func (d *liveResultDispatcher) rejected() {
 	}
 }
 
+// cut counts an action response whose publish was cancelled, which happens
+// only when the dispatcher stops. publishResults counts the rows and profile
+// of a job itself, so cut ignores them. The publisher calls it on the worker,
+// during the publish.
+func (d *liveResultDispatcher) cut(rows int) {
+	if d.responding {
+		d.metrics.drop(dropShutdown, rows)
+	}
+}
+
 // publishActionResult publishes an action response and reports whether a
 // client took it. Only liveClients can report a miss.
 func publishActionResult(p actionResultPublisher, req, res map[string]any) bool {
@@ -322,9 +341,10 @@ func (d *liveResultDispatcher) isStopping() bool {
 	}
 }
 
-// stop drops queued action responses and releases waiting actions, which
-// count their own results. It does not join a worker blocked in Publish; the
-// pipeline closing its queue releases it.
+// stop drops queued action responses, releases waiting actions, which count
+// their own results, and cancels the worker's publish. It does not join a
+// worker blocked in a Publish that cannot be cancelled; the pipeline closing
+// its queue releases it.
 func (d *liveResultDispatcher) stop() {
 	d.mu.Lock()
 	if d.closed {
@@ -333,13 +353,18 @@ func (d *liveResultDispatcher) stop() {
 	}
 	d.closed = true
 	close(d.stopping)
+	d.cancel()
 	queued := d.queue
 	d.queue = nil
 	d.mu.Unlock()
 	for _, it := range queued {
 		if it.pub == nil {
 			d.metrics.drop(dropShutdown, 1)
+			continue
 		}
+		// The worker will never take it, so its waiting action would
+		// otherwise wait liveCancelWait for done.
+		close(it.done)
 	}
 }
 

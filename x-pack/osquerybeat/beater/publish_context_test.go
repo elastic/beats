@@ -375,7 +375,7 @@ func TestLiveRejectedRowCountsRejected(t *testing.T) {
 			pipe := &rejectingPipeline{reject: tc.reject}
 			d := newLiveResultDispatcher(monitoring.NewRegistry(), log, 5*time.Second)
 			c := &liveClients{newPublisher: func() liveQueryPublisher {
-				return pub.NewLive(&beat.Beat{Publisher: pipe}, log, d.rejected)
+				return pub.NewLive(d.ctx, &beat.Beat{Publisher: pipe}, log, d.rejected, d.cut)
 			}}
 			require.NoError(t, c.Configure([]config.InputConfig{
 				{Datastream: config.DatastreamConfig{Dataset: config.DefaultDataset}},
@@ -394,6 +394,43 @@ func TestLiveRejectedRowCountsRejected(t *testing.T) {
 
 			c.Close()
 			d.stop()
+		})
+	}
+}
+
+func TestLiveStopCancelsBlockedResponse(t *testing.T) {
+	for _, q := range stuckQueues {
+		t.Run(q.name, func(t *testing.T) {
+			log := logp.NewNopLogger()
+			pipe := newStuckPipeline(t, q.cfg)
+			// Fill the queue, so the response is the publish that blocks.
+			filler, err := pipe.Pipeline.ConnectWith(beat.ClientConfig{})
+			require.NoError(t, err, "connect the filler client")
+			for range 32 {
+				filler.Publish(beat.Event{Timestamp: time.Now(), Fields: mapstr.M{"filler": true}})
+			}
+			d := newLiveResultDispatcher(monitoring.NewRegistry(), log, time.Minute)
+			c := &liveClients{newPublisher: func() liveQueryPublisher {
+				return pub.NewLive(d.ctx, &beat.Beat{Publisher: pipe}, log, d.rejected, d.cut)
+			}}
+			require.NoError(t, c.Configure([]config.InputConfig{
+				{Datastream: config.DatastreamConfig{Dataset: config.DefaultDataset}},
+				{Datastream: config.DatastreamConfig{Dataset: config.DefaultActionResponsesDataset}},
+			}), "configure live result and action response clients")
+
+			d.enqueueResponse(c, map[string]any{"id": "a1"}, map[string]any{})
+			pipe.waitBlocked(t)
+			d.stop()
+			assert.Eventually(t, pipe.idle, releaseBound, time.Millisecond,
+				"stopping must release the worker blocked on the full queue")
+
+			c.Close()
+			assert.NoError(t, filler.Close(), "close the filler client")
+			pipe.close(t)
+			assert.Zero(t, pipe.output.delivered.Load(), "the cancelled response is never delivered")
+			assert.Equal(t, uint64(1), d.metrics.dropped[dropShutdown].Get(), "count the cancelled response once")
+			assert.Equal(t, uint64(1), d.metrics.droppedRows[dropShutdown].Get(), "count the cancelled response as one row")
+			assert.Zero(t, d.metrics.droppedRows[dropStale].Get(), "a cancelled response is not a stale drop")
 		})
 	}
 }

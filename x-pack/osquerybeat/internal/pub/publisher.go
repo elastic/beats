@@ -46,7 +46,8 @@ type Publisher struct {
 	// rejected, if set, is called for each event the queue rejects in
 	// PublishContext.
 	rejected func()
-	// ctx ends the publishes of a scheduled publisher (see NewScheduled).
+	// ctx ends the publishes of a scheduled or live publisher (see
+	// NewScheduled and NewLive).
 	ctx context.Context
 	// inPublishContext is set while a client's PublishContext runs. An event
 	// it does not queue is counted by publish (rejected) or its caller (cut),
@@ -63,9 +64,11 @@ func New(b *beat.Beat, log *logp.Logger) *Publisher {
 
 // NewLive creates clients for live query results. rejected is called for
 // each event the queue rejects; such an event is dropped and publishing
-// continues.
-func NewLive(b *beat.Beat, log *logp.Logger, rejected func()) *Publisher {
-	return &Publisher{b: b, log: log, rejected: rejected}
+// continues. If the clients implement beat.ContextPublisher, ctx being done
+// or a client closing stops a publish waiting for room in the queue, and cut
+// is called with the number of rows skipped because of it.
+func NewLive(ctx context.Context, b *beat.Beat, log *logp.Logger, rejected func(), cut func(rows int)) *Publisher {
+	return &Publisher{b: b, log: log, ctx: ctx, rejected: rejected, cut: cut}
 }
 
 // Configure replaces the clients for the given inputs. It must be called from a
