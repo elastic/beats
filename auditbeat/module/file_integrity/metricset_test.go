@@ -81,10 +81,10 @@ func TestActions(t *testing.T) {
 	defer bucket.Close()
 
 	// First directory
-	dir := t.TempDir()
+	dir := resolvedTempDir(t)
 
 	// Second directory (to be reported with "initial_scan")
-	newDir := t.TempDir()
+	newDir := resolvedTempDir(t)
 
 	createdFilepath := filepath.Join(dir, "created.txt")
 	updatedFilepath := filepath.Join(dir, "updated.txt")
@@ -181,7 +181,7 @@ func TestExcludedFiles(t *testing.T) {
 	}
 	defer bucket.Close()
 
-	dir := t.TempDir()
+	dir := resolvedTempDir(t)
 
 	ms := mbtest.NewPushMetricSetV2WithRegistry(t, getConfig(dir), ab.Registry)
 
@@ -231,7 +231,7 @@ func TestIncludedExcludedFiles(t *testing.T) {
 	}
 	defer bucket.Close()
 
-	dir := t.TempDir()
+	dir := resolvedTempDir(t)
 
 	err = os.Mkdir(filepath.Join(dir, ".ssh"), 0o700)
 	if err != nil {
@@ -944,6 +944,15 @@ func getConfig(path ...string) map[string]any {
 		"paths":         path,
 		"exclude_files": []string{`(?i)\.sw[nop]$`, `[/\\]\.git([/\\]|$)`},
 	}
+}
+
+// resolvedTempDir returns t.TempDir() with symlinks resolved. The metricset
+// reports paths with symlinks resolved (on macOS /var -> /private/var), so
+// expected paths must be resolved too.
+func resolvedTempDir(t testing.TB) string {
+	dir, err := filepath.EvalSymlinks(t.TempDir())
+	require.NoError(t, err, "failed to resolve temp dir symlinks")
+	return dir
 }
 
 func skipOnCIForDarwinAMD64(t testing.TB) {
