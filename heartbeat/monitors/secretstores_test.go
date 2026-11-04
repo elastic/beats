@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"sync"
 	"testing"
 	"time"
@@ -41,6 +42,8 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/secretstores"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beat/events"
+	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 )
 
 const (
@@ -273,4 +276,64 @@ func TestMonitorScrubsSecrets(t *testing.T) {
 	msg, err := pipel.PublishedEvents()[0].Fields.GetValue("error.message")
 	require.NoError(t, err, "the event must have the error")
 	assert.Equal(t, "request to https://host/?t=<hidden> failed", msg, "the error must have the secret replaced")
+}
+
+// TestMonitorScrubbingKeepsHeartbeatFields checks a secret equal to a value
+// of a field Heartbeat sets itself doesn't change it: the common wrappers and
+// the pipeline processors set those fields after the scrubbing.
+func TestMonitorScrubbingKeepsHeartbeatFields(t *testing.T) {
+	const monitorType = "leaky-type"
+	want := map[string]string{
+		"monitor.id":    "secret-monitor",
+		"monitor.name":  "secret monitor",
+		"monitor.type":  monitorType,
+		"event.dataset": monitorType,
+		"event.type":    "heartbeat/summary",
+	}
+	wantDataStream := add_data_stream.DataStream{Type: "synthetics", Dataset: monitorType, Namespace: "default"}
+	secrets := map[string]string{"data_stream.type": wantDataStream.Type, "data_stream.namespace": wantDataStream.Namespace}
+	maps.Copy(secrets, want)
+	for name, secret := range secrets {
+		t.Run(name, func(t *testing.T) {
+			testStore.set(secret, nil)
+			reg := plugin.NewPluginsReg()
+			require.NoError(t, reg.Add(plugin.PluginFactory{
+				Name: monitorType,
+				Make: func(_ string, cfg *conf.C, info beat.Info) (plugin.Plugin, error) {
+					header, err := cfg.String("header", -1)
+					if err != nil {
+						return plugin.Plugin{}, err
+					}
+					job := func(event *beat.Event) ([]jobs.Job, error) {
+						eventext.MergeEventFields(event, mapstr.M{"url": mapstr.M{"full": "https://host/?t=" + header}})
+						return nil, nil
+					}
+					return plugin.Plugin{Jobs: []jobs.Job{job}, Endpoints: 1, Logger: info.Logger}, nil
+				},
+				Stats: plugin.NewPluginCountersRecorder(monitorType, monitoring.NewRegistry()),
+			}), "plugin must be registered")
+			factory, _, closeFactory := makeMockFactory(t, reg)
+			defer closeFactory()
+
+			cfg := captureMonitorConf(t, monitorType, true)
+			require.NoError(t, cfg.Merge(map[string]any{"data_stream": map[string]any{"namespace": "default"}}), "data_stream must merge")
+			pipel := &MockPipeline{}
+			runner, err := factory.Create(pipel, cfg)
+			require.NoError(t, err, "monitor must be created")
+			defer runner.Stop()
+			runner.Start()
+
+			require.Eventually(t, func() bool { return len(pipel.PublishedEvents()) > 0 }, 5*time.Second, 5*time.Millisecond, "the monitor must publish an event")
+			e := pipel.PublishedEvents()[0]
+			fields := e.Fields
+			url, _ := fields.GetValue("url.full")
+			assert.Equal(t, "https://host/?t=<hidden>", url, "the job's field must not have the secret")
+			for f, v := range want {
+				got, _ := fields.GetValue(f)
+				assert.Equal(t, v, got, "secret %q must not change %s", secret, f)
+			}
+			assert.Equal(t, wantDataStream, fields["data_stream"], "secret %q must not change data_stream", secret)
+			assert.Equal(t, "synthetics-leaky-type-default", e.Meta[events.FieldMetaRawIndex], "secret %q must not change the index", secret)
+		})
+	}
 }
