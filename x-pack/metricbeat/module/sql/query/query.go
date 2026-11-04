@@ -307,7 +307,7 @@ func (m *MetricSet) fetch(ctx context.Context, db dbClient, reporter mb.Reporter
 			for _, ms := range mss {
 				if m.Config.MergeResults {
 					if len(mss) > 1 {
-						return ok, fmt.Errorf("cannot merge query resulting with more than one rows: %s", q)
+						return ok, fmt.Errorf("cannot merge query resulting in more than one row: %s", q)
 					} else {
 						for k, v := range ms {
 							_, ok := merged[k]

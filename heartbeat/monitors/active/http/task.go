@@ -388,7 +388,7 @@ func splitHostnamePort(addr string) (string, uint16, error) {
 	}
 	p, err := strconv.ParseUint(port, 10, 16)
 	if err != nil {
-		return "", 0, fmt.Errorf("'%v' is no valid port number in '%v'", port, u.Host)
+		return "", 0, fmt.Errorf("'%v' is not a valid port number in '%v'", port, u.Host)
 	}
 	return host, uint16(p), nil
 }
