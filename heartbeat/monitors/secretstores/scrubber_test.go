@@ -108,6 +108,22 @@ func TestScrubberEvent(t *testing.T) {
 	}, event.Fields, "the event must not have the secret, except in the screenshot blob")
 }
 
+// TestScrubberEventKeepsSyntheticsType checks a secret equal to a synthetics
+// event type doesn't change it: the summarizer reads it to find the end of
+// steps and journeys.
+func TestScrubberEventKeepsSyntheticsType(t *testing.T) {
+	const secret = "journey/end"
+	event := &beat.Event{Fields: mapstr.M{
+		"synthetics": mapstr.M{"type": secret, "payload": mapstr.M{"message": "at " + secret}},
+	}}
+
+	scrubberFor(secret).Event(event)
+
+	assert.Equal(t, mapstr.M{
+		"synthetics": mapstr.M{"type": secret, "payload": mapstr.M{"message": "at <hidden>"}},
+	}, event.Fields, "synthetics.type must be kept, other fields scrubbed")
+}
+
 // TestScrubberEventDoesNotModifySharedValues checks jobs can keep sharing
 // the maps they put in events, as the pipeline can still read them.
 func TestScrubberEventDoesNotModifySharedValues(t *testing.T) {

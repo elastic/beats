@@ -285,8 +285,10 @@ func (s *Scrubber) value(v any, key string) (any, bool) {
 func scrubMap[M ~map[string]any](s *Scrubber, m M, key string) (M, bool) {
 	var out M
 	for k, v := range m {
-		// Screenshots are large, and can't hold a secret.
-		if key == "synthetics" && k == "blob" {
+		// Screenshots are large, and can't hold a secret. The event type is
+		// one of a fixed set, which the summarizer reads to find the end of
+		// steps and journeys: a secret equal to one must not change it.
+		if key == "synthetics" && (k == "blob" || k == "type") {
 			continue
 		}
 		nv, changed := s.value(v, k)
