@@ -250,8 +250,7 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 
 // TestFailedOutputReportsUnhealthy ensures that if an output
 // fails to start and returns an error, the manager will set it
-// as failed and the inputs will not be started, which means
-// staying on the started state.
+// as failed and the inputs will not be started.
 func TestFailedOutputReportsUnhealthy(t *testing.T) {
 	// First things first, ensure ES is running and we can connect to it.
 	// If ES is not running, the test will timeout and the only way to know
@@ -278,8 +277,8 @@ func TestFailedOutputReportsUnhealthy(t *testing.T) {
 					}),
 			},
 		},
-		// Also add an input unit to make sure it never leaves the
-		// starting state
+		// Also add an input unit to make sure the output failure is
+		// not reported on it
 		{
 			Id:             "input-unit",
 			Type:           proto.UnitType_INPUT,
@@ -304,6 +303,14 @@ func TestFailedOutputReportsUnhealthy(t *testing.T) {
 		},
 	}
 
+	// The input unit reports HEALTHY if Filebeat receives it before the
+	// manager's PostInit, which marks every known unit as running, and
+	// STARTING if it arrives afterwards. Which one happens depends on
+	// how long Filebeat takes to start, so accept both.
+	inputStarting := protobuf.CloneOf(units[1])
+	inputStarting.State = proto.State_STARTING
+	unitsInputStarting := []*proto.UnitExpected{units[0], inputStarting}
+
 	server := &mock.StubServerV2{
 		// The Beat will call the check-in function multiple times:
 		// - At least once at startup
@@ -312,7 +319,8 @@ func TestFailedOutputReportsUnhealthy(t *testing.T) {
 		//
 		// So we wait until the state matches the desired state
 		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
-			if management.DoesStateMatch(observed, units, 0) {
+			if management.DoesStateMatch(observed, units, 0) ||
+				management.DoesStateMatch(observed, unitsInputStarting, 0) {
 				finalStateReached.Store(true)
 			}
 
@@ -332,7 +340,7 @@ func TestFailedOutputReportsUnhealthy(t *testing.T) {
 
 	require.Eventually(t, func() bool {
 		return finalStateReached.Load()
-	}, 30*time.Second, 100*time.Millisecond, "Output unit did not report unhealthy or input did not report health")
+	}, 30*time.Second, 100*time.Millisecond, "Output unit did not report unhealthy or input did not report starting or healthy")
 
 	t.Cleanup(server.Stop)
 }
