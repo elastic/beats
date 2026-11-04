@@ -31,10 +31,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
-func TestScrubberLogger(t *testing.T) {
+func TestRedactorLogger(t *testing.T) {
 	const secret = "s3cr3t-token"
 	base, logs := logptest.NewTestingLoggerWithObserver(t, "")
-	logger := scrubberFor(secret).Logger(base).With("param", "p="+secret)
+	logger := redactorFor(secret).Logger(base).With("param", "p="+secret)
 
 	logger.Infow("running --params {\"token\":\""+secret+"\"}",
 		"line", "stdout: "+secret,
@@ -53,9 +53,9 @@ func TestScrubberLogger(t *testing.T) {
 	assert.EqualValues(t, 3, fields["count"], "other fields must be kept")
 }
 
-func TestScrubberLoggerKeepsLevel(t *testing.T) {
+func TestRedactorLoggerKeepsLevel(t *testing.T) {
 	base, logs := logptest.NewTestingLoggerWithObserver(t, "")
-	logger := scrubberFor("s3cr3t-token").Logger(base)
+	logger := redactorFor("s3cr3t-token").Logger(base)
 
 	logger.Debug("debug s3cr3t-token")
 	logger.Warn("warn s3cr3t-token")
@@ -79,11 +79,11 @@ func (c selectorCore) Check(e zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.
 	return c.Core.Check(e, ce)
 }
 
-func TestScrubberLoggerKeepsSelectors(t *testing.T) {
+func TestRedactorLoggerKeepsSelectors(t *testing.T) {
 	core, logs := observer.New(zapcore.DebugLevel)
 	base, err := logp.NewZapLogger(zap.New(selectorCore{Core: core, selector: "enabled"}))
 	require.NoError(t, err, "the base logger must be created")
-	logger := scrubberFor("s3cr3t-token").Logger(base)
+	logger := redactorFor("s3cr3t-token").Logger(base)
 
 	logger.Named("other").Debug("other s3cr3t-token")
 	logger.Named("enabled").Debug("enabled s3cr3t-token")
@@ -93,9 +93,9 @@ func TestScrubberLoggerKeepsSelectors(t *testing.T) {
 	assert.Equal(t, "enabled <hidden>", entries[0].Message, "the message must not have the secret")
 }
 
-func TestNilScrubberLogger(t *testing.T) {
+func TestNilRedactorLogger(t *testing.T) {
 	base := logptest.NewTestingLogger(t, "")
-	var s *Scrubber
-	assert.Same(t, base, s.Logger(base), "a nil Scrubber must return the logger as is")
-	assert.Nil(t, scrubberFor("s3cr3t-token").Logger(nil), "a nil logger must stay nil")
+	var r *Redactor
+	assert.Same(t, base, r.Logger(base), "a nil Redactor must return the logger as is")
+	assert.Nil(t, redactorFor("s3cr3t-token").Logger(nil), "a nil logger must stay nil")
 }

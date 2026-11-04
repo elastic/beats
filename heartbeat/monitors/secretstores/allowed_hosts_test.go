@@ -346,7 +346,7 @@ func TestWrapFactoryUsesPluginDestinations(t *testing.T) {
 			return plugin.Plugin{}, nil
 		},
 		Destinations: fakeDestinations,
-	})
+	}, NewRedactor())
 	cfg, err := ucfg.NewFrom(map[string]any{
 		"type":   "dest",
 		"host":   "attacker.example",
@@ -387,5 +387,5 @@ func TestAllowedHostsErrorIsScrubbed(t *testing.T) {
 	_, scrubber, err := r.Resolve(cfg, destinations)
 	require.Error(t, err, "the destinations error must fail the resolve")
 	assert.Contains(t, err.Error(), "prod-url", "the error quotes the resolved value")
-	assert.NotContains(t, scrubber.Error(err).Error(), "prod-url", "the scrubbed error must not have the secret value")
+	assert.NotContains(t, scrubber.String(err.Error()), "prod-url", "the scrubbed error must not have the secret value")
 }

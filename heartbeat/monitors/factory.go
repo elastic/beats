@@ -153,7 +153,17 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 		return NoopRunner{}, nil
 	}
 
-	configEditor, err := newCommonPublishConfigs(*f.info, f.beatLocation, c)
+	// Only monitors with secret stores resolve secret references. Their
+	// pipeline client removes the resolved values from what they publish.
+	var wrapFactory PluginFactoryWrapper
+	var redactor beat.Processor
+	if c.HasField(secretstores.ConfigKey) {
+		r := secretstores.NewRedactor()
+		wrapFactory = func(pf plugin.PluginFactory) plugin.PluginFactory { return f.secrets.WrapFactory(pf, r) }
+		redactor = r
+	}
+
+	configEditor, err := newCommonPublishConfigs(*f.info, f.beatLocation, c, redactor)
 	if err != nil {
 		return nil, err
 	}
@@ -208,11 +218,6 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 		}
 	}
 
-	// Only monitors with secret stores resolve secret references.
-	var wrapFactory PluginFactoryWrapper
-	if c.HasField(secretstores.ConfigKey) {
-		wrapFactory = f.secrets.WrapFactory
-	}
 	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, f.stateLoader, *f.info, safeStop, wrapFactory)
 	if err != nil {
 		return nil, fmt.Errorf("factory could not create monitor: %w", err)
@@ -254,7 +259,10 @@ func getLocation(beatLocation *config.LocationWithID, sf stdfields.StdMonitorFie
 	return loc
 }
 
-func newCommonPublishConfigs(info beat.Info, beatLocation *config.LocationWithID, cfg *conf.C) (pipetool.ConfigEditor, error) {
+// newCommonPublishConfigs returns the client config of a monitor. redactor,
+// if not nil, runs first: before the processors that set data_stream,
+// event.dataset and the index, so a secret value can't change them.
+func newCommonPublishConfigs(info beat.Info, beatLocation *config.LocationWithID, cfg *conf.C, redactor beat.Processor) (pipetool.ConfigEditor, error) {
 	var settings publishSettings
 	if err := cfg.Unpack(&settings); err != nil {
 		return nil, err
@@ -288,6 +296,9 @@ func newCommonPublishConfigs(info beat.Info, beatLocation *config.LocationWithID
 
 		procs := processors.NewList(info.Logger)
 
+		if redactor != nil {
+			procs.AddProcessor(redactor)
+		}
 		if lst := clientCfg.Processing.Processor; lst != nil {
 			procs.AddProcessor(lst)
 		}

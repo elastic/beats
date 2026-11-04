@@ -19,19 +19,13 @@ package secretstores
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/heartbeat/ecserr"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer"
-	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
@@ -108,20 +102,30 @@ func TestScrubberEvent(t *testing.T) {
 	}, event.Fields, "the event must not have the secret, except in the screenshot blob")
 }
 
-// TestScrubberEventKeepsSyntheticsType checks a secret equal to a synthetics
-// event type doesn't change it: the summarizer reads it to find the end of
-// steps and journeys.
-func TestScrubberEventKeepsSyntheticsType(t *testing.T) {
+// TestScrubberEventKeepsHeartbeatFields checks a secret equal to the value of
+// a field Heartbeat sets itself doesn't change it.
+func TestScrubberEventKeepsHeartbeatFields(t *testing.T) {
 	const secret = "journey/end"
-	event := &beat.Event{Fields: mapstr.M{
-		"synthetics": mapstr.M{"type": secret, "payload": mapstr.M{"message": "at " + secret}},
-	}}
+	kept := mapstr.M{
+		"monitor": mapstr.M{
+			"id": secret, "name": secret, "type": secret, "status": secret, "check_group": secret, "origin": secret,
+			"project": mapstr.M{"id": secret},
+		},
+		"event":      mapstr.M{"type": secret, "dataset": secret},
+		"synthetics": mapstr.M{"type": secret},
+		"summary":    mapstr.M{"status": secret},
+		"state":      mapstr.M{"id": secret},
+	}
+	event := &beat.Event{Fields: kept.Clone()}
+	_, _ = event.Fields.Put("monitor.ip", secret)
+	_, _ = event.Fields.Put("synthetics.payload.message", "at "+secret)
 
 	scrubberFor(secret).Event(event)
 
-	assert.Equal(t, mapstr.M{
-		"synthetics": mapstr.M{"type": secret, "payload": mapstr.M{"message": "at <hidden>"}},
-	}, event.Fields, "synthetics.type must be kept, other fields scrubbed")
+	want := kept.Clone()
+	_, _ = want.Put("monitor.ip", "<hidden>")
+	_, _ = want.Put("synthetics.payload.message", "at <hidden>")
+	assert.Equal(t, want, event.Fields, "the fields Heartbeat sets must be kept, other fields scrubbed")
 }
 
 // TestScrubberEventDoesNotModifySharedValues checks jobs can keep sharing
@@ -148,74 +152,4 @@ func TestScrubberEventWithoutSecrets(t *testing.T) {
 
 	assert.Equal(t, mapstr.M{"url": mapstr.M{"full": "https://host/"}}, event.Fields, "the event must be left as is")
 	assert.Equal(t, fields, event.Fields, "the fields must not be copied without a secret")
-}
-
-func TestScrubberError(t *testing.T) {
-	const secret = "s3cr3t-token"
-	s := scrubberFor(secret)
-
-	t.Run("nil", func(t *testing.T) {
-		assert.NoError(t, s.Error(nil), "no error must stay no error")
-	})
-
-	t.Run("without secret", func(t *testing.T) {
-		err := errors.New("failed")
-		assert.Same(t, err, s.Error(err), "an error without the secret must be returned as is")
-	})
-
-	t.Run("nil scrubber", func(t *testing.T) {
-		err := errors.New("failed with " + secret)
-		assert.Same(t, err, (*Scrubber)(nil).Error(err), "a nil scrubber must return the error as is")
-	})
-
-	t.Run("with secret", func(t *testing.T) {
-		orig := errors.New("failed with " + secret)
-		err := s.Error(orig)
-		assert.EqualError(t, err, "failed with <hidden>", "the message must not have the secret")
-		assert.ErrorIs(t, err, orig, "the original error must be wrapped")
-
-		r, ok := err.(reason.Reason) //nolint:errorlint // look.Reason does the same.
-		require.True(t, ok, "the error must be a reason")
-		assert.Equal(t, "io", r.Type(), "errors default to the io type")
-	})
-
-	t.Run("ecs stack trace", func(t *testing.T) {
-		stack := "at login (token=" + secret + ")"
-		orig := ecserr.NewECSErrWithStack("journey", "FAILED", "step failed", &stack)
-		err := s.Error(fmt.Errorf("wrapped: %w", orig))
-
-		var ecs *ecserr.ECSErr
-		require.ErrorAs(t, err, &ecs, "the error must have an ECS error")
-		require.NotNil(t, ecs.StackTrace, "the stack trace must be kept")
-		assert.Equal(t, "at login (token=<hidden>)", *ecs.StackTrace, "the stack trace must not have the secret")
-		assert.Equal(t, "step failed", ecs.Message, "the message must be kept")
-		assert.Equal(t, "at login (token="+secret+")", *orig.StackTrace, "the original error must not be modified")
-	})
-
-	t.Run("keeps the reason type", func(t *testing.T) {
-		err := s.Error(reason.ValidateFailed(errors.New("invalid " + secret)))
-		r, ok := err.(reason.Reason) //nolint:errorlint // look.Reason does the same.
-		require.True(t, ok, "the error must be a reason")
-		assert.Equal(t, "validate", r.Type(), "the reason type must be kept")
-		assert.Equal(t, "invalid <hidden>", r.Error(), "the message must not have the secret")
-	})
-}
-
-// TestScrubberErrorInBrowserEvent checks the error a browser monitor
-// publishes, which the summarizer takes from the ECS error in the chain.
-func TestScrubberErrorInBrowserEvent(t *testing.T) {
-	const secret = "s3cr3t-token"
-	stack := "at login (token=" + secret + ")"
-	err := scrubberFor(secret).Error(ecserr.NewECSErrWithStack("journey", "FAILED", "failed with "+secret, &stack))
-
-	event := &beat.Event{Fields: mapstr.M{}}
-	summarizer.NewBrowserErrPlugin().EachEvent(event, err)
-
-	got, getErr := event.GetValue("error")
-	require.NoError(t, getErr, "the event must have an error")
-	ecs, ok := got.(*ecserr.ECSErr)
-	require.True(t, ok, "the error must be an ECS error, got %T", got)
-	assert.Equal(t, "failed with <hidden>", ecs.Message, "error.message must not have the secret")
-	require.NotNil(t, ecs.StackTrace, "error.stack_trace must be kept")
-	assert.Equal(t, "at login (token=<hidden>)", *ecs.StackTrace, "error.stack_trace must not have the secret")
 }

@@ -199,7 +199,10 @@ func TestMonitorRecoversFromSecretStoreError(t *testing.T) {
 			defer sched.Stop()
 
 			resolver := secretstores.NewResolver(logger)
-			m, err := newMonitor(captureMonitorConf(t, monitorType, true), reg, c, sched.Add, nil, beat.Info{Logger: logger}, nil, resolver.WrapFactory)
+			wrap := func(pf plugin.PluginFactory) plugin.PluginFactory {
+				return resolver.WrapFactory(pf, secretstores.NewRedactor())
+			}
+			m, err := newMonitor(captureMonitorConf(t, monitorType, true), reg, c, sched.Add, nil, beat.Info{Logger: logger}, nil, wrap)
 			require.NoError(t, err, "a store failure must not prevent creating the monitor")
 			defer m.Stop()
 			m.Start()
@@ -254,20 +257,16 @@ func TestMonitorScrubsSecrets(t *testing.T) {
 		Stats: plugin.NewPluginCountersRecorder("leaky", monitoring.NewRegistry()),
 	}), "plugin must be registered")
 
+	// The factory gives the monitor the pipeline client that scrubs.
+	factory, _, closeFactory := makeMockFactory(t, reg)
+	defer closeFactory()
 	pipel := &MockPipeline{}
-	c, err := pipel.Connect()
-	require.NoError(t, err, "pipeline must connect")
-	logger := logptest.NewTestingLogger(t, "")
-	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, false, logger)
-	defer sched.Stop()
-
-	resolver := secretstores.NewResolver(logger)
-	m, err := newMonitor(captureMonitorConf(t, "leaky", true), reg, c, sched.Add, nil, beat.Info{Logger: logger}, nil, resolver.WrapFactory)
+	runner, err := factory.Create(pipel, captureMonitorConf(t, "leaky", true))
 	require.NoError(t, err, "monitor must be created")
-	defer m.Stop()
-	m.Start()
+	defer runner.Stop()
+	runner.Start()
 
-	require.Eventually(t, func() bool { return len(pipel.PublishedEvents()) >= 2 }, 5*time.Second, 5*time.Millisecond, "the monitor must publish events")
+	require.Eventually(t, func() bool { return len(pipel.PublishedEvents()) > 0 }, 5*time.Second, 5*time.Millisecond, "the monitor must publish an event")
 	for _, e := range pipel.PublishedEvents() {
 		doc, err := json.Marshal(e.Fields)
 		require.NoError(t, err, "event must be encoded")

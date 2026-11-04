@@ -35,14 +35,15 @@ import (
 var errPluginClosed = errors.New("monitor is stopped")
 
 // WrapFactory returns a copy of pf whose plugins resolve the secret
-// references of their config on every run. Making a plugin never fails
-// because of the secret stores: their errors are returned by the jobs, so
-// the monitor reports them and retries on its next run.
-func (r *Resolver) WrapFactory(pf plugin.PluginFactory) plugin.PluginFactory {
+// references of their config on every run, and give the secret values to
+// redactor. Making a plugin never fails because of the secret stores: their
+// errors are returned by the jobs, so the monitor reports them and retries on
+// its next run.
+func (r *Resolver) WrapFactory(pf plugin.PluginFactory, redactor *Redactor) plugin.PluginFactory {
 	inner := pf
 	resolve := func(cfg *conf.C) (*conf.C, *Scrubber, error) { return r.Resolve(cfg, inner.Destinations) }
 	pf.Make = func(name string, cfg *conf.C, info beat.Info) (plugin.Plugin, error) {
-		return newSecretPlugin(resolve, inner, name, cfg, info, r.logger).plugin(), nil
+		return newSecretPlugin(resolve, inner, name, cfg, info, r.logger, redactor).plugin(), nil
 	}
 	return pf
 }
@@ -61,6 +62,7 @@ type secretPlugin struct {
 	name     string
 	info     beat.Info
 	logger   *logp.Logger
+	redactor *Redactor
 	jobCount int
 
 	mu sync.Mutex
@@ -71,25 +73,27 @@ type secretPlugin struct {
 	// hash is the hash of the resolved config of inner, or of createErr.
 	hash      uint64
 	createErr error
-	// scrubber is the one of the resolved config of inner, or of createErr:
-	// the same config has the same secret values.
-	scrubber *Scrubber
-	closed   bool
+	closed    bool
 }
 
-func newSecretPlugin(resolve func(*conf.C) (*conf.C, *Scrubber, error), factory plugin.PluginFactory, name string, cfg *conf.C, info beat.Info, logger *logp.Logger) *secretPlugin {
+func newSecretPlugin(resolve func(*conf.C) (*conf.C, *Scrubber, error), factory plugin.PluginFactory, name string, cfg *conf.C, info beat.Info, logger *logp.Logger, redactor *Redactor) *secretPlugin {
+	// The plugin logs with a logger that scrubs: its log lines can quote
+	// resolved values, such as the params of a browser monitor.
+	info.Logger = redactor.Logger(info.Logger)
 	p := &secretPlugin{
 		resolve:  resolve,
 		factory:  factory,
 		name:     name,
 		info:     info,
-		logger:   logger,
+		logger:   redactor.Logger(logger),
+		redactor: redactor,
 		config:   cfg,
 		jobCount: 1,
 	}
-	inner, scrubber, err := p.current()
+	// The first job's first run replaces the values of this one.
+	inner, err := p.current(0)
 	if err != nil {
-		p.logger.Warnf("Could not create the monitor plugin, retrying on every run: %v", scrubber.Error(err))
+		p.logger.Warnf("Could not create the monitor plugin, retrying on every run: %v", err)
 		return p
 	}
 	p.jobCount = len(inner.Jobs)
@@ -115,73 +119,67 @@ func (p *secretPlugin) plugin() plugin.Plugin {
 	}
 }
 
-// job returns the job running the job i of the inner plugin. The events and
-// errors of the run don't have the secret values of its config.
+// job returns the job running the job i of the inner plugin.
 func (p *secretPlugin) job(i int) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
-		inner, scrubber, err := p.current()
+		inner, err := p.current(i)
 		if err != nil {
-			// The plugin can fail on a resolved value, such as an invalid header.
-			return nil, scrubber.Error(err)
+			return nil, err
 		}
 		if len(inner.Jobs) != p.jobCount {
 			return nil, fmt.Errorf("the number of endpoints changed from %d to %d after resolving the secret references, reconfigure the monitor to apply it", p.jobCount, len(inner.Jobs))
 		}
-		return scrubber.Job(inner.Jobs[i])(event)
+		return inner.Jobs[i](event)
 	}
 }
 
-// current returns the inner plugin for the current resolved config,
-// creating it if the resolved config changed, and the Scrubber of its
-// secret values. The Scrubber is also returned with a resolve or creation
-// error.
-func (p *secretPlugin) current() (plugin.Plugin, *Scrubber, error) {
+// current returns the inner plugin for the current resolved config, creating
+// it if the resolved config changed, for a run of the job.
+func (p *secretPlugin) current(job int) (plugin.Plugin, error) {
 	p.mu.Lock()
 	config := p.config
 	p.mu.Unlock()
 
 	// Resolve without the lock, so a slow secret store doesn't block close.
 	resolved, scrubber, err := p.resolve(config)
+	// Also on failure: the error can quote a value substituted before it.
+	p.redactor.set(job, scrubber)
 	if err != nil {
-		return plugin.Plugin{}, scrubber, err
+		return plugin.Plugin{}, err
 	}
 	hash, err := hashConfig(resolved)
 	if err != nil {
-		return plugin.Plugin{}, scrubber, fmt.Errorf("could not hash the resolved config: %w", err)
+		return plugin.Plugin{}, fmt.Errorf("could not hash the resolved config: %w", err)
 	}
 
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	switch {
 	case p.closed:
-		return plugin.Plugin{}, nil, errPluginClosed
+		return plugin.Plugin{}, errPluginClosed
 	case p.built && p.hash == hash:
-		return p.inner, p.scrubber, nil
+		return p.inner, nil
 	case p.createErr != nil && p.hash == hash:
 		// The same config fails the same way, only a change is worth a retry.
-		return plugin.Plugin{}, p.scrubber, p.createErr
+		return plugin.Plugin{}, p.createErr
 	}
 
 	// Closing the previous plugin here is safe: only browser plugins have
 	// a Close, and they have a single job, whose previous run is over since
 	// runs of a job never overlap.
 	_ = p.closeInner()
-	// The plugin logs with a logger that scrubs too: its log lines can
-	// quote resolved values, such as the params of a browser monitor.
-	info := p.info
-	info.Logger = scrubber.Logger(info.Logger)
-	inner, err := p.factory.Make(p.name, resolved, info)
-	p.hash, p.scrubber = hash, scrubber
+	inner, err := p.factory.Make(p.name, resolved, p.info)
+	p.hash = hash
 	if err != nil {
 		// A plugin can return resources to close along with the error.
 		if closeErr := inner.Close(); closeErr != nil {
-			p.logger.Errorf("Could not close the monitor plugin: %v", scrubber.Error(closeErr))
+			p.logger.Errorf("Could not close the monitor plugin: %v", closeErr)
 		}
 		p.createErr = err
-		return plugin.Plugin{}, scrubber, err
+		return plugin.Plugin{}, err
 	}
 	p.inner, p.built, p.createErr = inner, true, nil
-	return inner, scrubber, nil
+	return inner, nil
 }
 
 // update replaces the config. The next run resolves it, so updating never
@@ -207,10 +205,13 @@ func (p *secretPlugin) closeInner() error {
 	}
 	inner := p.inner
 	p.inner, p.built = plugin.Plugin{}, false
-	err := p.scrubber.Error(inner.Close())
-	if err != nil {
-		p.logger.Errorf("Could not close the monitor plugin: %v", err)
+	err := inner.Close()
+	if err == nil {
+		return nil
 	}
+	// The monitor logs it with a logger that doesn't scrub.
+	err = errors.New(p.redactor.scrub(err.Error()))
+	p.logger.Errorf("Could not close the monitor plugin: %v", err)
 	return err
 }
 

@@ -28,23 +28,23 @@ import (
 // fields, without the secret values. Plugins log what they run and what their
 // commands print, which can contain the values, before any event is made.
 // Other field types, such as Stringer or Any, are written as they are.
-// It returns logger itself for a nil Scrubber or logger.
-func (s *Scrubber) Logger(logger *logp.Logger) *logp.Logger {
-	if s == nil || logger == nil {
+// It returns logger itself for a nil Redactor or logger.
+func (r *Redactor) Logger(logger *logp.Logger) *logp.Logger {
+	if r == nil || logger == nil {
 		return logger
 	}
 	return logger.WithOptions(zap.WrapCore(func(c zapcore.Core) zapcore.Core {
-		return &scrubbingCore{Core: c, s: s}
+		return &scrubbingCore{Core: c, scrub: r.scrub}
 	}))
 }
 
 type scrubbingCore struct {
 	zapcore.Core
-	s *Scrubber
+	scrub func(string) string
 }
 
 func (c *scrubbingCore) With(fields []zapcore.Field) zapcore.Core {
-	return &scrubbingCore{Core: c.Core.With(c.fields(fields)), s: c.s}
+	return &scrubbingCore{Core: c.Core.With(c.fields(fields)), scrub: c.scrub}
 }
 
 func (c *scrubbingCore) Check(e zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.CheckedEntry {
@@ -57,7 +57,7 @@ func (c *scrubbingCore) Check(e zapcore.Entry, ce *zapcore.CheckedEntry) *zapcor
 }
 
 func (c *scrubbingCore) Write(e zapcore.Entry, fields []zapcore.Field) error {
-	e.Message = c.s.String(e.Message)
+	e.Message = c.scrub(e.Message)
 	return c.Core.Write(e, c.fields(fields))
 }
 
@@ -85,7 +85,7 @@ func (c *scrubbingCore) fields(fields []zapcore.Field) []zapcore.Field {
 func (c *scrubbingCore) field(f zapcore.Field) (zapcore.Field, bool) {
 	switch f.Type {
 	case zapcore.StringType:
-		clean := c.s.String(f.String)
+		clean := c.scrub(f.String)
 		if clean == f.String {
 			return f, false
 		}
@@ -96,12 +96,13 @@ func (c *scrubbingCore) field(f zapcore.Field) (zapcore.Field, bool) {
 		if !ok {
 			return f, false
 		}
-		clean := c.s.Error(err)
-		//nolint:errorlint // Error returns a *scrubbedError when it changes err.
-		if _, changed := clean.(*scrubbedError); !changed {
+		msg := err.Error()
+		clean := c.scrub(msg)
+		if clean == msg {
 			return f, false
 		}
-		return zap.NamedError(f.Key, clean), true
+		// Encoded as the error message would be.
+		return zap.String(f.Key, clean), true
 	default:
 		return f, false
 	}

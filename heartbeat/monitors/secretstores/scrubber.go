@@ -22,7 +22,6 @@ import (
 	"cmp"
 	"context"
 	"encoding/json"
-	"errors"
 	"maps"
 	"net/url"
 	"slices"
@@ -31,9 +30,6 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/heartbeat/ecserr"
-	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
@@ -63,7 +59,7 @@ func withTracker(ctx context.Context, t *tracker) context.Context {
 }
 
 // Track records value, a secret that a Store put in the config returned by
-// Replace, so that Heartbeat removes it from the events and errors of the
+// Replace, so that Heartbeat removes it from the events and log lines of the
 // monitor. Stores must call it for every value they substitute, cached or
 // not. It does nothing when ctx isn't the context of a Replace call.
 func Track(ctx context.Context, value string) {
@@ -102,6 +98,24 @@ func (t *tracker) scrubber() *Scrubber {
 			}
 		}
 	}
+	return newScrubber(forms)
+}
+
+// mergeScrubbers returns a Scrubber of the values of all of ss, or nil
+// without any.
+func mergeScrubbers(ss []*Scrubber) *Scrubber {
+	var forms []string
+	for _, s := range ss {
+		if s != nil {
+			forms = append(forms, s.forms...)
+		}
+	}
+	return newScrubber(forms)
+}
+
+// newScrubber returns a Scrubber replacing forms, which it sorts, or nil
+// without any.
+func newScrubber(forms []string) *Scrubber {
 	if len(forms) == 0 {
 		return nil
 	}
@@ -137,7 +151,7 @@ func jsonEscaped(v string) []string {
 }
 
 // Scrubber removes the secret values a Resolver substituted from the events
-// and errors of a monitor. A nil Scrubber does nothing.
+// and log lines of a monitor. A nil Scrubber does nothing.
 type Scrubber struct {
 	forms    []string
 	replacer *strings.Replacer
@@ -162,75 +176,18 @@ func (s *Scrubber) String(v string) string {
 	return s.replace(v)
 }
 
-// Error returns err with a message without the secret values. The result
-// wraps err and keeps its reason type, so the monitor reports it as before.
-// An ECS error in its chain, which the event gets as is, comes out of
-// errors.As as a scrubbed copy.
-func (s *Scrubber) Error(err error) error {
-	if s == nil || err == nil {
-		return err
+// equal reports whether s and o scrub the same values.
+func (s *Scrubber) equal(o *Scrubber) bool {
+	if s == nil || o == nil {
+		return s == o
 	}
-	msg := err.Error()
-	clean := s.replace(msg)
-	ecs := s.ecsErr(err)
-	if clean == msg && ecs == nil {
-		return err
-	}
-	typ := "io"
-	//nolint:errorlint // look.Reason classifies the outermost error only.
-	if r, ok := err.(reason.Reason); ok {
-		typ = r.Type()
-	}
-	return &scrubbedError{msg: clean, err: err, typ: typ, ecs: ecs}
+	return slices.Equal(s.forms, o.forms)
 }
 
-// ecsErr returns a copy of the ECS error in the chain of err without the
-// secret values, or nil if there is none or it has no value. Its stack trace
-// is published too, and browser stack traces can quote a param.
-func (s *Scrubber) ecsErr(err error) *ecserr.ECSErr {
-	var orig *ecserr.ECSErr
-	if !errors.As(err, &orig) {
-		return nil
-	}
-	clean := *orig
-	clean.Message = s.replace(orig.Message)
-	changed := clean.Message != orig.Message
-	if orig.StackTrace != nil {
-		stack := s.replace(*orig.StackTrace)
-		clean.StackTrace = &stack
-		changed = changed || stack != *orig.StackTrace
-	}
-	if !changed {
-		return nil
-	}
-	return &clean
-}
-
-type scrubbedError struct {
-	msg string
-	err error
-	typ string
-	ecs *ecserr.ECSErr
-}
-
-func (e *scrubbedError) Error() string { return e.msg }
-func (e *scrubbedError) Unwrap() error { return e.err }
-func (e *scrubbedError) Type() string  { return e.typ }
-
-// As returns the scrubbed copy of the ECS error, which errors.As would
-// otherwise find unscrubbed in the chain.
-func (e *scrubbedError) As(target any) bool {
-	t, ok := target.(**ecserr.ECSErr)
-	if !ok || e.ecs == nil {
-		return false
-	}
-	*t = e.ecs
-	return true
-}
-
-// Event removes the secret values from the fields of event. Maps and slices
-// that hold one are copied, never modified: jobs can share them between
-// events.
+// Event removes the secret values from the fields of event, except the kept
+// ones. Maps and slices that hold one are copied, never modified: jobs can
+// share them between events. Other values, such as structs, are left as is:
+// the pipeline converts them to maps before the Redactor runs.
 func (s *Scrubber) Event(event *beat.Event) {
 	if s == nil || event == nil {
 		return
@@ -238,21 +195,6 @@ func (s *Scrubber) Event(event *beat.Event) {
 	if fields, changed := scrubMap(s, event.Fields, ""); changed {
 		event.Fields = fields
 	}
-}
-
-// Job returns job, and the continuation jobs it returns, scrubbing the
-// events and errors they produce.
-func (s *Scrubber) Job(job jobs.Job) jobs.Job {
-	if s == nil {
-		return job
-	}
-	return jobs.Wrap(job, func(j jobs.Job) jobs.Job {
-		return func(event *beat.Event) ([]jobs.Job, error) {
-			cont, err := j(event)
-			s.Event(event)
-			return cont, s.Error(err)
-		}
-	})
 }
 
 // value returns v without the secret values, and whether it changed. key is
@@ -285,10 +227,7 @@ func (s *Scrubber) value(v any, key string) (any, bool) {
 func scrubMap[M ~map[string]any](s *Scrubber, m M, key string) (M, bool) {
 	var out M
 	for k, v := range m {
-		// Screenshots are large, and can't hold a secret. The event type is
-		// one of a fixed set, which the summarizer reads to find the end of
-		// steps and journeys: a secret equal to one must not change it.
-		if key == "synthetics" && (k == "blob" || k == "type") {
+		if kept(key, k) {
 			continue
 		}
 		nv, changed := s.value(v, k)
@@ -304,6 +243,28 @@ func scrubMap[M ~map[string]any](s *Scrubber, m M, key string) (M, bool) {
 		return m, false
 	}
 	return out, true
+}
+
+// kept reports whether the field k of the field parent is never scrubbed.
+// Heartbeat sets these from its own fixed values or from the monitor
+// settings, and consumers find, classify and alert on events with them: a
+// secret equal to one of their values must not change them. Screenshots are
+// large, and can't hold a secret.
+func kept(parent, k string) bool {
+	switch parent {
+	case "":
+		return k == "summary" || k == "state"
+	case "monitor":
+		switch k {
+		case "id", "name", "type", "status", "check_group", "origin", "project":
+			return true
+		}
+	case "event":
+		return k == "type" || k == "dataset"
+	case "synthetics":
+		return k == "type" || k == "blob"
+	}
+	return false
 }
 
 func scrubSlice[S ~[]E, E any](s *Scrubber, in S, key string) (S, bool) {

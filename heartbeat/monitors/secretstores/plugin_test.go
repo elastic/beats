@@ -118,7 +118,7 @@ func makeSecretPlugin(t *testing.T, r *testResolver, f *innerFactory) plugin.Plu
 	t.Helper()
 	logger := logptest.NewTestingLogger(t, "")
 	cfg := newTestConfig(t, map[string]any{"header": "fake:token"})
-	p := newSecretPlugin(r.resolve, f.factory(), "inner", cfg, beat.Info{Logger: logger}, logger).plugin()
+	p := newSecretPlugin(r.resolve, f.factory(), "inner", cfg, beat.Info{Logger: logger}, logger, NewRedactor()).plugin()
 	t.Cleanup(func() { _ = p.Close() })
 	return p
 }
@@ -258,13 +258,11 @@ func TestSecretPluginClose(t *testing.T) {
 	assert.Equal(t, int64(1), f.created.Load(), "a closed plugin must not create the inner plugin again")
 }
 
-// TestSecretPluginScrubsSecrets checks the secret value never reaches the
-// events and errors of the inner plugin: from its jobs, their continuations,
-// and its creation.
-func TestSecretPluginScrubsSecrets(t *testing.T) {
+// TestSecretPluginRedacts checks the plugin gives its redactor the secret
+// values of each run, also when the plugin fails on them, and logs through
+// it.
+func TestSecretPluginRedacts(t *testing.T) {
 	const secret = "s3cr3t-token"
-	errRun := errors.New("run failed with " + secret)
-
 	factory := plugin.PluginFactory{
 		Name: "leaky",
 		Make: func(_ string, cfg *conf.C, info beat.Info) (plugin.Plugin, error) {
@@ -276,13 +274,9 @@ func TestSecretPluginScrubsSecrets(t *testing.T) {
 			if header == "invalid" {
 				return plugin.Plugin{}, fmt.Errorf("invalid header %q", secret)
 			}
-			continuation := func(event *beat.Event) ([]jobs.Job, error) {
-				event.Fields = mapstr.M{"continuation": secret}
-				return nil, errRun
-			}
 			job := func(event *beat.Event) ([]jobs.Job, error) {
 				event.Fields = mapstr.M{"url": mapstr.M{"full": "https://host/?t=" + secret}}
-				return []jobs.Job{continuation}, nil
+				return nil, nil
 			}
 			return plugin.Plugin{Jobs: []jobs.Job{job}, Endpoints: 1}, nil
 		},
@@ -295,25 +289,21 @@ func TestSecretPluginScrubsSecrets(t *testing.T) {
 		}
 		return c, scrubberFor(secret), c.SetString("header", -1, header)
 	}
+	redactor := NewRedactor()
 	logger, logs := logptest.NewTestingLoggerWithObserver(t, "")
-	p := newSecretPlugin(resolve, factory, "leaky", newTestConfig(t, map[string]any{}), beat.Info{Logger: logger}, logger).plugin()
+	p := newSecretPlugin(resolve, factory, "leaky", newTestConfig(t, map[string]any{}), beat.Info{Logger: logger}, logger, redactor).plugin()
 	t.Cleanup(func() { _ = p.Close() })
 
 	event := &beat.Event{}
-	cont, err := p.Jobs[0](event)
+	_, err := p.Jobs[0](event)
 	require.NoError(t, err, "the job must run")
-	assert.Equal(t, mapstr.M{"url": mapstr.M{"full": "https://host/?t=<hidden>"}}, event.Fields, "the job must publish without the secret")
-
-	require.Len(t, cont, 1, "the continuation must be returned")
-	event = &beat.Event{}
-	_, err = cont[0](event)
-	assert.Equal(t, mapstr.M{"continuation": "<hidden>"}, event.Fields, "the continuation must publish without the secret")
-	assert.EqualError(t, err, "run failed with <hidden>", "the continuation error must not have the secret")
-	assert.ErrorIs(t, err, errRun, "the scrubbed error must wrap the original")
+	_, _ = redactor.Run(event)
+	assert.Equal(t, mapstr.M{"url": mapstr.M{"full": "https://host/?t=<hidden>"}}, event.Fields, "the redactor must remove the values of the run")
 
 	header = "invalid"
 	_, err = p.Jobs[0](&beat.Event{})
-	assert.EqualError(t, err, `invalid header "<hidden>"`, "the creation error must not have the secret")
+	require.Error(t, err, "the creation error must be returned")
+	assert.Equal(t, `invalid header "<hidden>"`, redactor.scrub(err.Error()), "the redactor must remove the values of a failed run")
 
 	made := logs.FilterMessageSnippet("making with").TakeAll()
 	require.NotEmpty(t, made, "the plugin must log with the logger it is given")
@@ -325,7 +315,7 @@ func TestSecretPluginScrubsSecrets(t *testing.T) {
 func TestWrapFactoryKeepsFactory(t *testing.T) {
 	f := (&innerFactory{}).factory()
 	f.Aliases = []string{"alias"}
-	wrapped := NewResolver(logptest.NewTestingLogger(t, "")).WrapFactory(f)
+	wrapped := NewResolver(logptest.NewTestingLogger(t, "")).WrapFactory(f, NewRedactor())
 	assert.Equal(t, f.Name, wrapped.Name, "the name must be kept")
 	assert.Equal(t, f.Aliases, wrapped.Aliases, "the aliases must be kept")
 }
