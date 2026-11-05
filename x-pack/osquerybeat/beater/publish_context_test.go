@@ -300,7 +300,7 @@ func TestScheduledWorkerCancelsBlockedPublishOnShutdown(t *testing.T) {
 
 			pipe.output.unblock()
 			<-d.done
-			pipe.waitDelivered(t, stuckRows+1-int64(d.metrics.droppedRows[dropShutdown].Get()))
+			pipe.waitDelivered(t, stuckRows+1-int64(d.metrics.droppedRows[dropShutdown].Get())) //nolint:gosec // G115: at most stuckRows+1 rows are dropped
 			pipe.close(t)
 			assert.Equal(t, uint64(1), d.metrics.dropped[dropShutdown].Get(), "count the cut item once")
 			assert.Zero(t, d.metrics.droppedRows[dropStale].Get(), "a shutdown is not a stale drop")
@@ -329,7 +329,7 @@ func TestScheduledPolicyChangeCancelsBlockedPublish(t *testing.T) {
 			d.stop()
 			pipe.output.unblock()
 			<-d.done
-			pipe.waitDelivered(t, stuckRows+1-int64(d.metrics.droppedRows[dropStale].Get()))
+			pipe.waitDelivered(t, stuckRows+1-int64(d.metrics.droppedRows[dropStale].Get())) //nolint:gosec // G115: at most stuckRows+1 rows are dropped
 			pipe.close(t)
 			assert.Equal(t, uint64(1), d.metrics.dropped[dropStale].Get(), "count the cut item once")
 			assert.Zero(t, d.metrics.droppedRows[dropShutdown].Get(), "a policy change is not a shutdown")
