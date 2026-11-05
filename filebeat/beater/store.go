@@ -108,9 +108,13 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 				Logger:     logger,
 			})
 		case "memlog", "":
+			if cfg.MaxLogSize < 0 {
+				return nil, fmt.Errorf("invalid registry.max_log_size %d: must be non-negative", cfg.MaxLogSize)
+			}
 			reg, err = memlog.New(logger, memlog.Settings{
-				Root:     resolvedPath,
-				FileMode: cfg.Permissions,
+				Root:       resolvedPath,
+				FileMode:   cfg.Permissions,
+				MaxLogSize: uint64(cfg.MaxLogSize),
 			})
 		default:
 			return nil, fmt.Errorf("unknown registry backend: %q", cfg.Backend)

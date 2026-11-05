@@ -60,7 +60,7 @@ type entry struct {
 // If an error in in the log file is detected, the store opening routine continues from the last known valid state and will trigger a checkpoint
 // operation on subsequent writes, also truncating the log file.
 // Old data files are scheduled for deletion later.
-func openStore(log *logp.Logger, home string, mode os.FileMode, bufSz uint, ignoreVersionCheck bool, checkpoint CheckpointPredicate) (*store, error) {
+func openStore(log *logp.Logger, home string, mode os.FileMode, bufSz uint, ignoreVersionCheck bool, maxLogSize uint64, checkpoint CheckpointPredicate) (*store, error) {
 	fi, err := os.Stat(home)
 	if os.IsNotExist(err) {
 		err = os.MkdirAll(home, os.ModeDir|0o770)
@@ -149,7 +149,7 @@ func openStore(log *logp.Logger, home string, mode os.FileMode, bufSz uint, igno
 		log.Warnf("Incomplete or corrupted log file in %v. Continue with last known complete and consistent state. Reason: %v", home, err)
 	}
 
-	diskstore, err := newDiskStore(log, home, dataFiles, txid, mode, entries, err != nil, bufSz, checkpoint)
+	diskstore, err := newDiskStore(log, home, dataFiles, txid, mode, entries, err != nil, bufSz, maxLogSize, checkpoint)
 	if err != nil {
 		return nil, err
 	}

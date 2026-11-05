@@ -51,9 +51,17 @@ type Settings struct {
 	// storage files.  Defaults to 4096 if not set.
 	BufferSize uint
 
-	// Checkpoint predicate that can trigger a registry file rotation.  If not
-	// configured, memlog will automatically trigger a checkpoint every 10MB.
+	// Checkpoint predicate that can trigger a registry file rotation. If set,
+	// it takes precedence over the default dynamic checkpoint policy (and
+	// MaxLogSize is ignored). If not configured, memlog uses a dynamic
+	// threshold: the size of the last checkpoint file, bounded below by
+	// DefaultMinLogSize and above by MaxLogSize.
 	Checkpoint CheckpointPredicate
+
+	// MaxLogSize is the maximum size in bytes of the transaction log
+	// (log.json) before a checkpoint is forced when using the default dynamic
+	// checkpoint policy. Defaults to DefaultMaxLogSize when 0.
+	MaxLogSize uint64
 
 	// If set memlog will not check the version of the meta file.
 	IgnoreVersionCheck bool
@@ -63,22 +71,27 @@ type Settings struct {
 // The store executes a checkpoint operation when the predicate returns true.
 type CheckpointPredicate func(fileSize uint64) bool
 
+const (
+	// DefaultMinLogSize is the initial and minimum transaction log size
+	// (10 MiB) that triggers a checkpoint with the default dynamic policy.
+	DefaultMinLogSize uint64 = 10 * 1 << 20
+
+	// DefaultMaxLogSize is the default maximum transaction log size (512 MiB)
+	// that triggers a checkpoint with the default dynamic policy.
+	DefaultMaxLogSize uint64 = 512 * 1 << 20
+)
+
 const defaultFileMode os.FileMode = 0600
 
 const defaultBufferSize = 4 * 1024
-
-func defaultCheckpoint(filesize uint64) bool {
-	const limit = 10 * 1 << 20 // set rotation limit to 10MB by default
-	return filesize >= limit
-}
 
 // New configures a memlog Registry that can be used to open stores.
 func New(log *logp.Logger, settings Settings) (*Registry, error) {
 	if settings.FileMode == 0 {
 		settings.FileMode = defaultFileMode
 	}
-	if settings.Checkpoint == nil {
-		settings.Checkpoint = defaultCheckpoint
+	if settings.MaxLogSize == 0 {
+		settings.MaxLogSize = DefaultMaxLogSize
 	}
 	if settings.BufferSize == 0 {
 		settings.BufferSize = defaultBufferSize
@@ -113,7 +126,7 @@ func (r *Registry) Access(name string) (backend.Store, error) {
 	home := filepath.Join(r.settings.Root, name)
 	fileMode := r.settings.FileMode
 	bufSz := r.settings.BufferSize
-	store, err := openStore(logger, home, fileMode, bufSz, r.settings.IgnoreVersionCheck, r.settings.Checkpoint)
+	store, err := openStore(logger, home, fileMode, bufSz, r.settings.IgnoreVersionCheck, r.settings.MaxLogSize, r.settings.Checkpoint)
 	if err != nil {
 		return nil, err
 	}

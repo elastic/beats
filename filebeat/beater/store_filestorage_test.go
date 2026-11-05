@@ -18,6 +18,9 @@
 package beater
 
 import (
+	"fmt"
+	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -26,6 +29,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/paths"
 )
@@ -169,4 +173,77 @@ func TestFilestorageConfigFromRegistry_PartialMap(t *testing.T) {
 	assert.Equal(t, "0700", fsCfg.DirectoryPermissions)
 	assert.False(t, fsCfg.FSync)
 	assert.NotNil(t, fsCfg.Compaction)
+}
+
+// countCheckpointFiles returns the number of "<txid>.json" checkpoint files in dir.
+func countCheckpointFiles(t *testing.T, dir string) int {
+	t.Helper()
+	matches, err := filepath.Glob(filepath.Join(dir, "[0-9]*.json"))
+	require.NoError(t, err, "glob checkpoint files")
+	return len(matches)
+}
+
+func TestOpenStateStore_MemlogNegativeMaxLogSize(t *testing.T) {
+	beatPaths := paths.New()
+	beatPaths.Data = t.TempDir()
+
+	_, err := openStateStore(t.Context(), beat.Info{Beat: "testbeat", Paths: beatPaths}, logp.NewNopLogger(), config.Registry{
+		Path:          "registry",
+		Permissions:   0o600,
+		CleanInterval: 5 * time.Minute,
+		Backend:       "memlog",
+		MaxLogSize:    cfgtype.ByteSize(-1),
+	})
+	require.Error(t, err, "negative MaxLogSize must be rejected")
+	assert.Contains(t, err.Error(), "invalid registry.max_log_size", "unexpected error message")
+}
+
+func TestOpenStateStore_MemlogMaxLogSize(t *testing.T) {
+	tcs := map[string]struct {
+		maxLogSize         cfgtype.ByteSize
+		wantCheckpointFile bool
+	}{
+		"small max log size forces a checkpoint": {
+			maxLogSize:         cfgtype.ByteSize(2 * 1024),
+			wantCheckpointFile: true,
+		},
+		"unset max log size uses the memlog default": {
+			maxLogSize:         0,
+			wantCheckpointFile: false,
+		},
+	}
+
+	for name, tc := range tcs {
+		t.Run(name, func(t *testing.T) {
+			dir := t.TempDir()
+			beatPaths := paths.New()
+			beatPaths.Data = dir
+
+			fb, err := openStateStore(t.Context(), beat.Info{Beat: "testbeat", Paths: beatPaths}, logp.NewNopLogger(), config.Registry{
+				Path:          "registry",
+				Permissions:   0o600,
+				CleanInterval: 5 * time.Minute,
+				Backend:       "memlog",
+				MaxLogSize:    tc.maxLogSize,
+			})
+			require.NoError(t, err, "openStateStore must succeed")
+			defer fb.Close()
+
+			st, err := fb.StoreFor("filestream", "")
+			require.NoError(t, err, "StoreFor must succeed")
+			defer st.Close()
+
+			// ~50KiB of log data: well above 2KiB, well below the 10MiB minimum.
+			for i := range 100 {
+				require.NoError(t, st.Set(fmt.Sprintf("k%d", i), map[string]any{"n": strings.Repeat("x", 256)}), "Set must succeed")
+			}
+
+			got := countCheckpointFiles(t, filepath.Join(dir, "registry", "testbeat"))
+			if tc.wantCheckpointFile {
+				assert.Positive(t, got, "expecting MaxLogSize to be passed to memlog and trigger a checkpoint")
+			} else {
+				assert.Zero(t, got, "expecting no checkpoint with the default memlog max log size")
+			}
+		})
+	}
 }

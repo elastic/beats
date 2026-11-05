@@ -39,7 +39,8 @@ type diskstore struct {
 	log *logp.Logger
 
 	// store configuration
-	checkpointPred CheckpointPredicate
+	checkpointPred CheckpointPredicate // optional, takes precedence over the dynamic threshold
+	maxLogSize     uint64              // upper bound of the dynamic checkpoint threshold
 	fileMode       os.FileMode
 	bufferSize     int
 
@@ -75,6 +76,7 @@ type diskstore struct {
 type dataFileInfo struct {
 	path string
 	txid uint64
+	size uint64 // size in bytes of the data file
 }
 
 // storeEntry is used to write entries to the checkpoint file only.
@@ -121,8 +123,13 @@ func newDiskStore(
 	entries uint,
 	logInvalid bool,
 	bufferSize uint,
+	maxLogSize uint64,
 	checkpointPred CheckpointPredicate,
 ) (*diskstore, error) {
+	if maxLogSize == 0 {
+		maxLogSize = DefaultMaxLogSize
+	}
+
 	var active dataFileInfo
 	if L := len(dataFiles); L > 0 {
 		active = dataFiles[L-1]
@@ -144,6 +151,7 @@ func newDiskStore(
 		logInvalid:       logInvalid,
 		logNeedsTruncate: false, // only truncate on next checkpoint
 		checkpointPred:   checkpointPred,
+		maxLogSize:       maxLogSize,
 	}
 
 	// delete temporary files from an older instances that was interrupted
@@ -208,9 +216,29 @@ func (s *diskstore) tryOpenLog() error {
 
 // mustCheckpoint returns true if the store is required to execute a checkpoint
 // operation, either by predicate or by some internal state detecting a problem
-// with the log file.
+// with the log file. A custom checkpoint predicate takes precedence over the
+// default dynamic threshold.
 func (s *diskstore) mustCheckpoint() bool {
-	return s.logInvalid || s.checkpointPred(s.logFileSize)
+	if s.logInvalid {
+		return true
+	}
+	if s.checkpointPred != nil {
+		return s.checkpointPred(s.logFileSize)
+	}
+	return s.logFileSize >= s.checkpointThreshold()
+}
+
+// checkpointThreshold returns the transaction log size that triggers a
+// checkpoint with the default dynamic policy. The threshold equals the size of
+// the active checkpoint file (so the log is replayed against a similarly sized
+// base), bounded below by DefaultMinLogSize and above by maxLogSize. If
+// maxLogSize is smaller than DefaultMinLogSize, maxLogSize wins.
+func (s *diskstore) checkpointThreshold() uint64 {
+	maxSize := s.maxLogSize
+	if maxSize == 0 {
+		maxSize = DefaultMaxLogSize
+	}
+	return min(max(DefaultMinLogSize, s.activeDataFile.size), maxSize)
 }
 
 func (s *diskstore) Close() error {
@@ -292,7 +320,7 @@ func (s *diskstore) LogOperation(op op) error {
 // NOTE: due to limitation on some Operating system or file systems, the active
 // marker is not a symlink, but an actual file.
 func (s *diskstore) WriteCheckpoint(state map[string]entry) error {
-	tmpPath, err := s.checkpointTmpFile(filepath.Join(s.home, checkpointTmpFileName), state)
+	tmpPath, checkpointSize, err := s.checkpointTmpFile(filepath.Join(s.home, checkpointTmpFileName), state)
 	if err != nil {
 		return err
 	}
@@ -326,6 +354,7 @@ func (s *diskstore) WriteCheckpoint(state map[string]entry) error {
 	s.activeDataFile = dataFileInfo{
 		path: checkpointPath,
 		txid: fileTxID,
+		size: checkpointSize,
 	}
 
 	// delete old transaction files
@@ -336,10 +365,12 @@ func (s *diskstore) WriteCheckpoint(state map[string]entry) error {
 	return nil
 }
 
-func (s *diskstore) checkpointTmpFile(tempfile string, states map[string]entry) (string, error) {
+// checkpointTmpFile writes all states to tempfile. It returns the file path
+// and the number of bytes written.
+func (s *diskstore) checkpointTmpFile(tempfile string, states map[string]entry) (string, uint64, error) {
 	f, err := os.OpenFile(tempfile, os.O_RDWR|os.O_CREATE|os.O_TRUNC|os.O_SYNC, s.fileMode)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	ok := false
@@ -347,10 +378,11 @@ func (s *diskstore) checkpointTmpFile(tempfile string, states map[string]entry) 
 		f.Close()
 	})
 
-	writer := bufio.NewWriterSize(f, s.bufferSize)
+	counting := &countWriter{w: f}
+	writer := bufio.NewWriterSize(counting, s.bufferSize)
 	enc := newJSONEncoder(writer)
 	if _, err = writer.Write([]byte{'['}); err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	first := true
@@ -361,7 +393,7 @@ func (s *diskstore) checkpointTmpFile(tempfile string, states map[string]entry) 
 			first = false
 		}
 		if _, err = writer.Write(prefix); err != nil {
-			return "", err
+			return "", 0, err
 		}
 
 		err = enc.Encode(storeEntry{
@@ -369,28 +401,28 @@ func (s *diskstore) checkpointTmpFile(tempfile string, states map[string]entry) 
 			Fields: entry.value,
 		})
 		if err != nil {
-			return "", err
+			return "", 0, err
 		}
 	}
 
 	if _, err = writer.Write([]byte("\n]")); err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	if err = writer.Flush(); err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	if err = f.Sync(); err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	ok = true
 	if err = f.Close(); err != nil {
-		return "", err
+		return "", 0, err
 	}
 
-	return tempfile, nil
+	return tempfile, counting.n, nil
 }
 
 func (s *diskstore) checkpointClearLog() {
@@ -494,6 +526,7 @@ func listDataFiles(home string) ([]dataFileInfo, error) {
 			infos = append(infos, dataFileInfo{
 				path: files[i],
 				txid: id,
+				size: uint64(info.Size()), //nolint:gosec // G115: info.Size() is non-negative for a regular file
 			})
 		}
 	}
