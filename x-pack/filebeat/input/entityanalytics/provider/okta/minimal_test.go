@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	ecokta "github.com/elastic/entcollect/provider/okta"
 )
 
@@ -21,8 +22,9 @@ import (
 //     check fails, forcing the developer to update localConf and this test.
 //  2. Functional round-trip — the top-level fields are set to non-default
 //     sentinel values; the returned ecokta.Config must match them, which
-//     catches a field whose config tag is wrong. The oauth2 and request
-//     settings are not covered here.
+//     catches a field whose config tag is wrong. The oauth2 settings are
+//     not covered here; the request and tracer settings are covered by
+//     TestMinimalConfigRequest.
 func TestMinimalConfigRoundTrip(t *testing.T) {
 	const wantFields = 12
 	if got := reflect.TypeFor[ecokta.Config]().NumField(); got != wantFields {
@@ -49,24 +51,25 @@ func TestMinimalConfigRoundTrip(t *testing.T) {
 		"scratch_dir":     scratchDir,
 	})
 
-	_, gotSync, gotUpdate, err := minimalProvider(cfg, nil)
+	ms, err := minimalProvider(cfg, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("minimalProvider returned unexpected error: %v", err)
 	}
-	if gotSync != wantSync {
-		t.Errorf("sync_interval: got %v, want %v", gotSync, wantSync)
+	if ms.FullSync != wantSync {
+		t.Errorf("sync_interval: got %v, want %v", ms.FullSync, wantSync)
 	}
-	if gotUpdate != wantUpdate {
-		t.Errorf("update_interval: got %v, want %v", gotUpdate, wantUpdate)
+	if ms.IncrementalSync != wantUpdate {
+		t.Errorf("update_interval: got %v, want %v", ms.IncrementalSync, wantUpdate)
 	}
 
 	// The provider hides its config, so check the mapping directly. A
 	// field with a wrong struct tag is silently dropped by ucfg and would
 	// otherwise only show up as a default value at run time.
-	got, _, err := minimalConfig(cfg)
+	mc, err := minimalConfig(cfg)
 	if err != nil {
 		t.Fatalf("minimalConfig returned unexpected error: %v", err)
 	}
+	got := mc.provider
 	want := ecokta.Config{
 		Domain:         "test.okta.com",
 		Token:          "test-token",
@@ -106,9 +109,95 @@ func TestMinimalProvider_DualAuth(t *testing.T) {
 		"update_interval":      "15m",
 	})
 
-	_, _, _, err := minimalProvider(cfg, nil)
+	_, err := minimalProvider(cfg, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("minimalProvider rejected dual-auth config: %v — "+
 			"OAuth2 should take precedence over okta_token", err)
+	}
+}
+
+func TestMinimalConfigRequest(t *testing.T) {
+	cfg := config.MustNewConfigFrom(map[string]any{
+		"okta_domain":                             "test.okta.com",
+		"okta_token":                              "test-token",
+		"request.timeout":                         "45s",
+		"request.proxy_url":                       "http://proxy.example.com:3128",
+		"request.keep_alive.disable":              true,
+		"request.keep_alive.max_idle_connections": 5,
+		"request.redirect.forward_headers":        true,
+		"request.redirect.headers_ban_list":       []string{"X-Secret"},
+		"request.redirect.max_redirects":          3,
+		"request.retry.max_attempts":              2,
+		"tracer.enabled":                          true,
+		"tracer.filename":                         "../../logs/okta/http-request-trace-*.ndjson",
+		"tracer.maxbackups":                       5,
+	})
+	mc, err := minimalConfig(cfg)
+	if err != nil {
+		t.Fatalf("minimalConfig returned unexpected error: %v", err)
+	}
+	req := mc.request
+	timeout := 45 * time.Second
+	if req.Transport.Timeout != timeout {
+		t.Errorf("request.timeout = %v; want %v", req.Transport.Timeout, timeout)
+	}
+	if req.Transport.Proxy.URL == nil || req.Transport.Proxy.URL.String() != "http://proxy.example.com:3128" {
+		t.Errorf("request.proxy_url = %v; want http://proxy.example.com:3128", req.Transport.Proxy.URL)
+	}
+	if req.KeepAlive.Disable == nil || !*req.KeepAlive.Disable {
+		t.Errorf("request.keep_alive.disable = %v; want true", req.KeepAlive.Disable)
+	}
+	if req.KeepAlive.MaxIdleConns != 5 {
+		t.Errorf("request.keep_alive.max_idle_connections = %d; want 5", req.KeepAlive.MaxIdleConns)
+	}
+	if !req.RedirectForwardHeaders {
+		t.Error("request.redirect.forward_headers = false; want true")
+	}
+	if !reflect.DeepEqual(req.RedirectHeadersBanList, []string{"X-Secret"}) {
+		t.Errorf("request.redirect.headers_ban_list = %q; want [X-Secret]", req.RedirectHeadersBanList)
+	}
+	if req.RedirectMaxRedirects != 3 {
+		t.Errorf("request.redirect.max_redirects = %d; want 3", req.RedirectMaxRedirects)
+	}
+	if req.Retry == nil {
+		t.Error("request.retry = nil; want it recorded so a warning can be logged")
+	}
+	if mc.tracer == nil {
+		t.Fatal("tracer = nil; want it set")
+	}
+	if mc.tracer.Enabled == nil || !*mc.tracer.Enabled {
+		t.Errorf("mc.tracer.enabled = %v; want true", mc.tracer.Enabled)
+	}
+	if mc.tracer.Filename != "../../logs/okta/http-request-trace-*.ndjson" {
+		t.Errorf("mc.tracer.filename = %q; want ../../logs/okta/http-request-trace-*.ndjson", mc.tracer.Filename)
+	}
+	if mc.tracer.MaxBackups != 5 {
+		t.Errorf("mc.tracer.maxbackups = %d; want 5", mc.tracer.MaxBackups)
+	}
+	if mc.tracer.MaxSize != 1 {
+		t.Errorf("mc.tracer.maxsize = %d; want the 1MB default", mc.tracer.MaxSize)
+	}
+	if _, err := minimalProvider(cfg, logptest.NewTestingLogger(t, "")); err != nil {
+		t.Errorf("minimalProvider returned unexpected error: %v", err)
+	}
+}
+
+func TestMinimalConfigRequestDefaults(t *testing.T) {
+	cfg := config.MustNewConfigFrom(map[string]any{
+		"okta_domain": "test.okta.com",
+		"okta_token":  "test-token",
+	})
+	mc, err := minimalConfig(cfg)
+	if err != nil {
+		t.Fatalf("minimalConfig returned unexpected error: %v", err)
+	}
+	if got, want := mc.request.Transport.Timeout, 30*time.Second; got != want {
+		t.Errorf("request.timeout = %v; want %v", got, want)
+	}
+	if got, want := mc.request.RedirectMaxRedirects, 10; got != want {
+		t.Errorf("request.redirect.max_redirects = %d; want %d", got, want)
+	}
+	if mc.tracer != nil {
+		t.Errorf("tracer = %+v; want nil", mc.tracer)
 	}
 }

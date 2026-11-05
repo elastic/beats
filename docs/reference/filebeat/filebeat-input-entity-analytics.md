@@ -53,6 +53,15 @@ If a full synchronization fails, it is retried after `update_interval`. The wait
 
 Defaults to `false`. The Okta, Microsoft Entra ID and Active Directory integration packages set this to `true` by default.
 
+With `use_minimal_state: true`, the HTTP settings (`request.*` for Jamf and Okta, and the top-level `proxy_url`, `ssl` and `timeout` for Azure Active Directory) and the `tracer.*` settings work as they do in the legacy implementation, with these differences:
+
+- `request.retry.*` is not used. The provider retries failed requests itself, and logs a warning at startup if these options are set.
+- Keep-alive connections stay enabled unless `request.keep_alive.disable` is set to `true`.
+- When `request.redirect.forward_headers` is `true`, the headers in `request.redirect.sensitive_headers` are not forwarded to a different host or port, or from HTTPS to HTTP. It defaults to `["Authorization", "Proxy-Authorization", "Cookie"]`. A list you set replaces the default, and `[]` forwards all headers.
+- For Azure Active Directory, `timeout` defaults to 90 seconds, and the `expand.*` options are not supported.
+
+Before 9.5.N and 9.6.N, these settings were ignored when `use_minimal_state` is `true`.
+
 
 ## Common options [filebeat-input-entity-analytics-common-options]
 
@@ -766,6 +775,8 @@ stack: preview 9.1.0
 
 Add [user query relationship expansions](https://learn.microsoft.com/en-us/graph/api/resources/user?view=graph-rest-1.0#relationships). This is a map of relationship names to attribute lists. By default this is not set. If an empty relationship list is given, the relationship expansion is the same as the users query.
 
+This option is ignored, with a warning, when `use_minimal_state` is `true`, because the Microsoft Graph user delta query that the minimal-state implementation uses doesn't support `$expand`.
+
 
 #### `expand.groups` [_expand_groups]
 
@@ -775,6 +786,8 @@ stack: preview 9.1.0
 
 Add [group query relationship expansions](https://learn.microsoft.com/en-us/graph/api/resources/group?view=graph-rest-1.0#relationships). This is a map of relationship names to attribute lists. By default this is not set. If an empty relationship list is given, the relationship expansion is the same as the groups query.
 
+This option is ignored, with a warning, when `use_minimal_state` is `true`. The minimal-state implementation doesn't support group relationship expansions.
+
 
 #### `expand.devices` [_expand_devices]
 
@@ -783,6 +796,8 @@ stack: preview 9.1.0
 ```
 
 Add [device query relationship expansions](https://learn.microsoft.com/en-us/graph/api/resources/device?view=graph-rest-1.0#relationships). This is a map of relationship names to attribute lists. By default this is not set. If an empty relationship list is given, the relationship expansion is the same as the devices query.
+
+This option is ignored, with a warning, when `use_minimal_state` is `true`, because the Microsoft Graph device delta query that the minimal-state implementation uses doesn't support `$expand`.
 
 
 #### `enrich_with` [_enrich_with_azuread]

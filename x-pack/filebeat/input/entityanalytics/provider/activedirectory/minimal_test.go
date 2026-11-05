@@ -52,15 +52,15 @@ func TestMinimalConfigRoundTrip(t *testing.T) {
 		"update_interval":      wantUpdate.String(),
 	})
 
-	_, gotSync, gotUpdate, err := minimalProvider(cfg, nil)
+	ms, err := minimalProvider(cfg, nil)
 	if err != nil {
 		t.Fatalf("minimalProvider returned unexpected error: %v", err)
 	}
-	if gotSync != wantSync {
-		t.Errorf("sync_interval: got %v, want %v", gotSync, wantSync)
+	if ms.FullSync != wantSync {
+		t.Errorf("sync_interval: got %v, want %v", ms.FullSync, wantSync)
 	}
-	if gotUpdate != wantUpdate {
-		t.Errorf("update_interval: got %v, want %v", gotUpdate, wantUpdate)
+	if ms.IncrementalSync != wantUpdate {
+		t.Errorf("update_interval: got %v, want %v", ms.IncrementalSync, wantUpdate)
 	}
 }
 
@@ -76,11 +76,11 @@ func TestMinimalConfigTLS(t *testing.T) {
 	})
 
 	log := logptest.NewTestingLogger(t, "test")
-	p, _, _, err := minimalProvider(cfg, log)
+	ms, err := minimalProvider(cfg, log)
 	if err != nil {
 		t.Fatalf("minimalProvider returned unexpected error: %v", err)
 	}
-	if p == nil {
+	if ms.Provider == nil {
 		t.Fatal("provider is nil")
 	}
 }
