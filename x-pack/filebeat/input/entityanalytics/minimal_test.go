@@ -295,54 +295,22 @@ func TestMinimalInput_RunFullSyncRetry(t *testing.T) {
 			return nil
 		},
 	}
-	mi := &minimalStateInput{
-		provider:         prov,
-		providerName:     "testprov",
-		fullSyncInterval: time.Hour,
-		incrSyncInterval: 20 * time.Millisecond,
-		logger:           logptest.NewTestingLogger(t, "test"),
-		path:             &paths.Path{Data: t.TempDir()},
-	}
+	mi := newTestMinimalInput(t, prov, time.Hour, 20*time.Millisecond)
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 	recovered := statusUpdate{status.Running, "Successful full sync"}
-	reporter := &statusRecorder{want: recovered, seen: make(chan struct{})}
-	done := make(chan error, 1)
-	go func() {
-		done <- mi.Run(
-			v2.Context{
-				Logger:      logptest.NewTestingLogger(t, "test"),
-				ID:          "test-retry",
-				Cancelation: v2.GoContextFromCanceler(ctx),
-			}.WithStatusReporter(reporter),
-			&fakeConnector{client: &ackingClient{inner: &fakeClient{}}},
-		)
-	}()
+	updates := runUntil(t, mi, func(u []statusUpdate) bool {
+		return slices.Contains(u, recovered)
+	})
 
-	select {
-	case <-reporter.seen:
-	case err := <-done:
-		t.Fatalf("Run returned %v before a full sync succeeded", err)
-	case <-time.After(5 * time.Second):
-		t.Fatalf("full sync was not retried: %d calls", calls.Load())
+	start := []statusUpdate{{status.Starting, ""}, {status.Running, ""}}
+	if len(updates) < 2 || !slices.Equal(updates[:2], start) {
+		t.Errorf("first updates = %v; want %v", updates[:min(2, len(updates))], start)
 	}
-	cancel()
-	select {
-	case err := <-done:
-		if err != nil {
-			t.Errorf("Run = %v; want nil", err)
-		}
-	case <-time.After(5 * time.Second):
-		t.Fatal("Run did not return after cancel")
-	}
-
 	var (
 		sawPanic, sawErr bool
 		failed           = -1
-		success          = -1
+		success          = slices.Index(updates, recovered)
 	)
-	updates := reporter.updates()
 	for i, u := range updates {
 		switch {
 		case u.status == status.Degraded && strings.Contains(u.msg, "sync panic: bad response"):
@@ -352,9 +320,6 @@ func TestMinimalInput_RunFullSyncRetry(t *testing.T) {
 		}
 		if u.status == status.Degraded && failed < 0 {
 			failed = i
-		}
-		if u == recovered && success < 0 {
-			success = i
 		}
 	}
 	if !sawPanic {
@@ -373,14 +338,203 @@ func TestMinimalInput_RunFullSyncRetry(t *testing.T) {
 	}
 }
 
-// statusRecorder records status updates. It closes seen when it first
-// records want.
+// TestMinimalInput_RunFullSyncBackoff checks that the wait between full
+// sync retries grows, and that it starts again from the incremental sync
+// interval after a successful full sync.
+func TestMinimalInput_RunFullSyncBackoff(t *testing.T) {
+	t.Parallel()
+
+	// Full syncs 1 to 4 fail, 5 succeeds, 6 fails and 7 succeeds.
+	var (
+		mu    sync.Mutex
+		times []time.Time
+	)
+	prov := &fakeProvider{
+		fullFunc: func(ctx context.Context, s entcollect.Store, pub entcollect.Publisher, log *slog.Logger) error {
+			mu.Lock()
+			defer mu.Unlock()
+			times = append(times, time.Now())
+			switch len(times) {
+			case 5, 7:
+				return nil
+			}
+			return errors.New("provider failure")
+		},
+	}
+	mi := newTestMinimalInput(t, prov, time.Second, 10*time.Millisecond)
+
+	success := statusUpdate{status.Running, "Successful full sync"}
+	runUntil(t, mi, func(u []statusUpdate) bool {
+		n := 0
+		for _, v := range u {
+			if v == success {
+				n++
+			}
+		}
+		return n == 2
+	})
+
+	mu.Lock()
+	defer mu.Unlock()
+	if len(times) < 7 {
+		t.Fatalf("got %d full syncs; want 7", len(times))
+	}
+	var gaps []time.Duration
+	for i := 1; i < len(times); i++ {
+		gaps = append(gaps, times[i].Sub(times[i-1]))
+	}
+	// Nominal gaps are 10, 20, 40, 80ms, then 1s after the success, then
+	// 10ms again.
+	if gaps[3] <= gaps[0] {
+		t.Errorf("fourth retry wait %v not longer than first %v; want growing waits (gaps %v)", gaps[3], gaps[0], gaps)
+	}
+	if gaps[5] >= gaps[3] {
+		t.Errorf("retry wait after a success %v not shorter than before it %v; want reset (gaps %v)", gaps[5], gaps[3], gaps)
+	}
+}
+
+// TestMinimalInput_RunIncrementalSyncStatus checks that a failed
+// incremental sync is reported as degraded, and that the next successful
+// one reports running.
+func TestMinimalInput_RunIncrementalSyncStatus(t *testing.T) {
+	t.Parallel()
+
+	var calls atomic.Int32
+	prov := &fakeProvider{
+		incrFunc: func(ctx context.Context, s entcollect.Store, pub entcollect.Publisher, log *slog.Logger) error {
+			if calls.Add(1) == 1 {
+				return errors.New("incremental failure")
+			}
+			return nil
+		},
+	}
+	mi := newTestMinimalInput(t, prov, time.Hour, 20*time.Millisecond)
+
+	failed := statusUpdate{status.Degraded, "Error running incremental sync: incremental failure"}
+	recovered := statusUpdate{status.Running, "Successful incremental sync"}
+	updates := runUntil(t, mi, func(u []statusUpdate) bool {
+		i := slices.Index(u, failed)
+		return i >= 0 && slices.Contains(u[i:], recovered)
+	})
+	if i := slices.Index(updates, recovered); i < slices.Index(updates, failed) {
+		t.Errorf("running reported before the failed incremental sync: %v", updates)
+	}
+}
+
+// TestMinimalInput_RunFullSyncClearsIncrementalError checks that a
+// successful full sync reports running even if the last incremental sync
+// failed.
+func TestMinimalInput_RunFullSyncClearsIncrementalError(t *testing.T) {
+	t.Parallel()
+
+	var fullCalls atomic.Int32
+	prov := &fakeProvider{
+		fullFunc: func(ctx context.Context, s entcollect.Store, pub entcollect.Publisher, log *slog.Logger) error {
+			fullCalls.Add(1)
+			return nil
+		},
+		incrFunc: func(ctx context.Context, s entcollect.Store, pub entcollect.Publisher, log *slog.Logger) error {
+			return errors.New("incremental failure")
+		},
+	}
+	mi := newTestMinimalInput(t, prov, 100*time.Millisecond, 20*time.Millisecond)
+
+	failed := statusUpdate{status.Degraded, "Error running incremental sync: incremental failure"}
+	recovered := statusUpdate{status.Running, "Successful full sync"}
+	runUntil(t, mi, func(u []statusUpdate) bool {
+		i := slices.Index(u, failed)
+		return i >= 0 && slices.Contains(u[i:], recovered)
+	})
+	if n := fullCalls.Load(); n < 2 {
+		t.Errorf("got %d full syncs; want at least 2", n)
+	}
+}
+
+func TestRetryBackoff(t *testing.T) {
+	b := retryBackoff{initial: 10 * time.Second, max: time.Minute}
+	steps := []struct {
+		reset bool
+		want  time.Duration
+	}{
+		{want: 10 * time.Second},
+		{want: 20 * time.Second},
+		{want: 40 * time.Second},
+		{want: time.Minute},
+		{want: time.Minute},
+		{reset: true, want: 10 * time.Second},
+		{want: 20 * time.Second},
+	}
+	for i, step := range steps {
+		if step.reset {
+			b.reset()
+		}
+		if got := b.failed(); got != step.want {
+			t.Errorf("step %d: failed() = %v; want %v", i, got, step.want)
+		}
+	}
+}
+
+// newTestMinimalInput returns a minimal-state input using prov with a
+// bbolt store in a temporary directory.
+func newTestMinimalInput(t *testing.T, prov entcollect.Provider, full, incr time.Duration) *minimalStateInput {
+	return &minimalStateInput{
+		provider:         prov,
+		providerName:     "testprov",
+		fullSyncInterval: full,
+		incrSyncInterval: incr,
+		logger:           logptest.NewTestingLogger(t, "test"),
+		path:             &paths.Path{Data: t.TempDir()},
+	}
+}
+
+// runUntil runs mi until the status updates it reports satisfy done, then
+// stops it and returns the updates.
+func runUntil(t *testing.T, mi *minimalStateInput, done func([]statusUpdate) bool) []statusUpdate {
+	t.Helper()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	reporter := &statusRecorder{done: done, seen: make(chan struct{})}
+	runErr := make(chan error, 1)
+	go func() {
+		runErr <- mi.Run(
+			v2.Context{
+				Logger:      logptest.NewTestingLogger(t, "test"),
+				ID:          "test-" + t.Name(),
+				Cancelation: v2.GoContextFromCanceler(ctx),
+			}.WithStatusReporter(reporter),
+			&fakeConnector{client: &ackingClient{inner: &fakeClient{}}},
+		)
+	}()
+
+	select {
+	case <-reporter.seen:
+	case err := <-runErr:
+		t.Fatalf("Run returned %v early; updates: %v", err, reporter.updates())
+	case <-time.After(5 * time.Second):
+		t.Fatalf("timed out waiting for status updates; got %v", reporter.updates())
+	}
+	cancel()
+	select {
+	case err := <-runErr:
+		if err != nil {
+			t.Errorf("Run = %v; want nil", err)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("Run did not return after cancel")
+	}
+	return reporter.updates()
+}
+
+// statusRecorder records status updates. It closes seen the first time
+// the recorded updates satisfy done.
 type statusRecorder struct {
-	want statusUpdate
+	done func([]statusUpdate) bool
 	seen chan struct{}
 
-	mu   sync.Mutex
-	upds []statusUpdate
+	mu     sync.Mutex
+	upds   []statusUpdate
+	closed bool
 }
 
 type statusUpdate struct {
@@ -391,11 +545,11 @@ type statusUpdate struct {
 func (r *statusRecorder) UpdateStatus(s status.Status, msg string) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	u := statusUpdate{s, msg}
-	if u == r.want && !slices.Contains(r.upds, u) {
+	r.upds = append(r.upds, statusUpdate{s, msg})
+	if !r.closed && r.done(r.upds) {
 		close(r.seen)
+		r.closed = true
 	}
-	r.upds = append(r.upds, u)
 }
 
 func (r *statusRecorder) updates() []statusUpdate {

@@ -84,9 +84,7 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 	// The most recent full and incremental sync errors. The input is
 	// degraded while either is set. A successful full sync clears both.
 	var fullErr, incrErr error
-	// retryWait is how long to wait before retrying a failed full sync.
-	// It doubles after each failure, up to the full sync interval.
-	retryWait := n.incrSyncInterval
+	retry := retryBackoff{initial: n.incrSyncInterval, max: n.fullSyncInterval}
 
 	runCtx.UpdateStatus(status.Running, "")
 	for {
@@ -103,15 +101,14 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 			switch {
 			case err == nil:
 				fullErr, incrErr = nil, nil
-				retryWait = n.incrSyncInterval
+				retry.reset()
 			case provider.SyncInterrupted(runCtx, err):
 				log.Infow(provider.SyncInterruptedMsg, "error", err)
 				continue // The input is stopping.
 			default:
 				log.Errorw("Error running full sync", "error", err)
 				fullErr = err
-				wait = min(retryWait, n.fullSyncInterval)
-				retryWait = min(2*retryWait, n.fullSyncInterval)
+				wait = retry.failed()
 			}
 			updateSyncStatus(runCtx, fullErr, incrErr, "Successful full sync")
 			syncTimer.Reset(wait)
@@ -123,12 +120,7 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 				default:
 				}
 			}
-			// Don't run an incremental sync just before a full sync retry.
-			incrWait := n.incrSyncInterval
-			if wait <= incrWait {
-				incrWait = wait + n.incrSyncInterval
-			}
-			incrTimer.Reset(incrWait)
+			incrTimer.Reset(n.incrSyncInterval)
 
 		case <-incrTimer.C:
 			err := recoverSync(runCtx, log, syncer, n.provider, client, slogger, false)
@@ -147,6 +139,29 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 			log.Debugf("Next incremental sync expected at: %v", time.Now().Add(n.incrSyncInterval))
 		}
 	}
+}
+
+// retryBackoff is the wait before retrying a failed full sync. It starts
+// at initial and doubles after each further failure, up to max.
+type retryBackoff struct {
+	initial, max time.Duration
+	next         time.Duration // zero means initial
+}
+
+// failed returns the wait before the next retry, and doubles the wait
+// for the retry after it.
+func (b *retryBackoff) failed() time.Duration {
+	if b.next == 0 {
+		b.next = b.initial
+	}
+	wait := min(b.next, b.max)
+	b.next = min(2*b.next, b.max)
+	return wait
+}
+
+// reset restarts the backoff after a successful full sync.
+func (b *retryBackoff) reset() {
+	b.next = 0
 }
 
 // recoverSync runs a single sync with s. A panic during the sync is
