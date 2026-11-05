@@ -6,7 +6,8 @@ description: |
   The darwin process collector treated the CPU times reported by proc_pidinfo
   as nanoseconds, but they are in Mach absolute-time units. On Intel the two
   are equal, but on Apple Silicon one unit is 125/3 nanoseconds, so
-  system.process.cpu.*.ticks and the CPU percentages derived from them were
-  about 41.67 times too low.
+  system.process.cpu.*.ticks, system.process.cpu.total.value,
+  system.process.cpu.total.pct, system.process.cpu.total.norm.pct and
+  process.cpu.pct were about 41.67 times too low.
 
 component: metricbeat
