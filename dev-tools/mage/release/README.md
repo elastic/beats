@@ -145,9 +145,9 @@ with grouped PRs.
 |------|-----|--------|--------|-------------|---------|
 | 1 | PR-A | `main` | `ff-prep-main-X.Y.0` | `merge:1-ff-day` | Mergify backport rule + `version.go` → next minor |
 | 2 | PR-B | release branch | `ff-release-X.Y.0` | `merge:2-after-branch` | ff-release version, docs, test env, `make update` |
-| 3 | PR-C | `main` | `ff-prep-main-docs-env-X.(Y+1).0` | `merge:3-after-images` | Docs + test env for next minor |
+| 3 | PR-C | `main` | `ff-prep-main-docs-env-X.(Y+1).0` | `merge:3-after-images` | Docs for next minor + test env pinned to latest published release |
 
-Titles use `[Release <CURRENT_RELEASE>] …`. Next-patch bumps are **not** opened here; use `mage release:runPatch` after the patch release trigger.
+Titles use `[Release][<CURRENT_RELEASE>] …`. Next-patch bumps are **not** opened here; use `mage release:runPatch` after the patch release trigger.
 
 5. Pushes release branch and opens PRs (unless `DRY_RUN`). Merge-timing labels are created automatically if missing.
 6. Best-effort: ensures the Beats release checklist issue `[RELEASE <CURRENT_RELEASE>] Instructions & Checklist` exists and lists related Beats `release`-labeled PRs (linked to https://github.com/elastic/ingest-dev/issues/8866). Failures are warnings only.
@@ -199,7 +199,7 @@ has `defaultBeatVersion = "9.4.1"`. The workflow requires patch `> 0` and that
 
 | Step | PR | Target | Branch | Merge label | Changes |
 |------|-----|--------|--------|-------------|---------|
-| 1 | bump | release branch | `update-version-X.Y.Z` | `merge:4-after-release` | `version.go` → CURRENT + test-env (`LATEST=prev`, `CURRENT`) |
+| 1 | bump | release branch | `update-version-X.Y.Z` | `merge:4-after-release` | `version.go` → CURRENT + test-env (`LATEST=prev`) |
 
 3. Opens the PR (unless `DRY_RUN`). Merge-timing labels are created automatically if missing.
 4. Best-effort: ensures the Beats release checklist issue for `CURRENT_RELEASE`. Failures are warnings only.
@@ -282,15 +282,14 @@ mage release:updateDocs 9.3.0
 
 ### UpdateTestEnv
 
-Updates Docker image versions in test environment files:
+Updates Docker image versions in test environment files to the latest published Elastic Stack release:
 
 ```bash
-mage release:updateTestEnv 9.2.0 9.3.0
+mage release:updateTestEnv 9.2.0
 ```
 
 Arguments:
-1. `latest` - Previous version to replace
-2. `current` - New version to use
+1. `latest` - Published Elastic Stack version to pin
 
 **Files updated:**
 - `testing/environments/latest.yml`
@@ -401,8 +400,8 @@ Some workflows create multiple PRs to separate concerns.
 
 **Post-release version bump**
 - Branch: `update-version-X.Y.Z`
-- Title: `[Release X.Y.Z] Update version to X.Y.Z and test environments`
-- Updates: `version.go` → CURRENT + test-env (`LATEST=prev`, `CURRENT`)
+- Title: `[Release][X.Y.Z] Update version to X.Y.Z and test environments`
+- Updates: `version.go` → CURRENT + test-env (`LATEST=prev`)
 - Labels: `release`, `Team:Automation`, `skip-changelog`, `merge:4-after-release`
 - Docs/backport stay off this path (aligned with ingest-dev#10200)
 

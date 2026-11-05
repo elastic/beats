@@ -195,7 +195,7 @@ func prepMainBackportAndVersion(repo *GitRepo, cfg *ReleaseConfig) (workflowPR, 
 	if err := UpdateVersion(cfg.NextProjectMinorVersion); err != nil {
 		return workflowPR{}, err
 	}
-	commitMsg := fmt.Sprintf("[Release %s] Prepare main for %s and mergify backport-%s", cfg.CurrentRelease, cfg.NextProjectMinorVersion, cfg.ReleaseBranch)
+	commitMsg := fmt.Sprintf("[Release][%s] Prepare main for %s and mergify backport-%s", cfg.CurrentRelease, cfg.NextProjectMinorVersion, cfg.ReleaseBranch)
 	if _, err := repo.CommitAll(commitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
 		return workflowPR{}, err
 	}
@@ -206,7 +206,7 @@ func prepMainBackportAndVersion(repo *GitRepo, cfg *ReleaseConfig) (workflowPR, 
 		opts: PROptions{
 			Owner:     cfg.ProjectOwner,
 			Repo:      cfg.ProjectRepo,
-			Title:     fmt.Sprintf("[Release %s] Prepare main for %s and mergify backport-%s", cfg.CurrentRelease, cfg.NextProjectMinorVersion, cfg.ReleaseBranch),
+			Title:     fmt.Sprintf("[Release][%s] Prepare main for %s and mergify backport-%s", cfg.CurrentRelease, cfg.NextProjectMinorVersion, cfg.ReleaseBranch),
 			Head:      branch,
 			Base:      cfg.BaseBranch,
 			Body:      prAMainBody(cfg),
@@ -234,13 +234,13 @@ func prepFFRelease(repo *GitRepo, cfg *ReleaseConfig) (workflowPR, error) {
 	}); err != nil {
 		return workflowPR{}, err
 	}
-	if err := UpdateTestEnv(cfg.LatestRelease, cfg.CurrentRelease); err != nil {
+	if err := UpdateTestEnv(cfg.LatestRelease); err != nil {
 		return workflowPR{}, err
 	}
 	if err := runMakeUpdate(); err != nil {
 		return workflowPR{}, err
 	}
-	commitMsg := fmt.Sprintf("[Release %s] ff-release: update versions %s", cfg.CurrentRelease, cfg.CurrentRelease)
+	commitMsg := fmt.Sprintf("[Release][%s] ff-release: update versions %s", cfg.CurrentRelease, cfg.CurrentRelease)
 	if _, err := repo.CommitAll(commitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
 		return workflowPR{}, err
 	}
@@ -251,7 +251,7 @@ func prepFFRelease(repo *GitRepo, cfg *ReleaseConfig) (workflowPR, error) {
 		opts: PROptions{
 			Owner:     cfg.ProjectOwner,
 			Repo:      cfg.ProjectRepo,
-			Title:     fmt.Sprintf("[Release %s] ff-release: update versions %s", cfg.CurrentRelease, cfg.CurrentRelease),
+			Title:     fmt.Sprintf("[Release][%s] ff-release: update versions %s", cfg.CurrentRelease, cfg.CurrentRelease),
 			Head:      branch,
 			Base:      cfg.ReleaseBranch,
 			Body:      prBReleaseBody(cfg),
@@ -277,10 +277,10 @@ func prepMainDocsAndTestEnv(repo *GitRepo, cfg *ReleaseConfig) (workflowPR, erro
 	}); err != nil {
 		return workflowPR{}, err
 	}
-	if err := UpdateTestEnv(cfg.LatestRelease, cfg.NextProjectMinorVersion); err != nil {
+	if err := UpdateTestEnv(cfg.LatestRelease); err != nil {
 		return workflowPR{}, err
 	}
-	commitMsg := fmt.Sprintf("[Release %s] Update docs and test environment for %s", cfg.CurrentRelease, cfg.NextProjectMinorVersion)
+	commitMsg := fmt.Sprintf("[Release][%s] Update docs for %s and test environment to latest release %s", cfg.CurrentRelease, cfg.NextProjectMinorVersion, cfg.LatestRelease)
 	if _, err := repo.CommitAll(commitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
 		return workflowPR{}, err
 	}
@@ -291,7 +291,7 @@ func prepMainDocsAndTestEnv(repo *GitRepo, cfg *ReleaseConfig) (workflowPR, erro
 		opts: PROptions{
 			Owner:     cfg.ProjectOwner,
 			Repo:      cfg.ProjectRepo,
-			Title:     fmt.Sprintf("[Release %s] Update docs and test environment for %s", cfg.CurrentRelease, cfg.NextProjectMinorVersion),
+			Title:     fmt.Sprintf("[Release][%s] Update docs for %s and test environment to latest release %s", cfg.CurrentRelease, cfg.NextProjectMinorVersion, cfg.LatestRelease),
 			Head:      branch,
 			Base:      cfg.BaseBranch,
 			Body:      prCMainBody(cfg),
@@ -320,10 +320,10 @@ func prepPatchVersionBump(repo *GitRepo, cfg *ReleaseConfig) (workflowPR, error)
 		return workflowPR{}, err
 	}
 	// LATEST = previous patch on this release line (cfg.LatestRelease), not global Agent latest.
-	if err := UpdateTestEnv(cfg.LatestRelease, cfg.CurrentRelease); err != nil {
+	if err := UpdateTestEnv(cfg.LatestRelease); err != nil {
 		return workflowPR{}, err
 	}
-	commitMsg := fmt.Sprintf("[Release %s] Update version to %s and test environments", cfg.CurrentRelease, cfg.CurrentRelease)
+	commitMsg := fmt.Sprintf("[Release][%s] Update version to %s and test environments", cfg.CurrentRelease, cfg.CurrentRelease)
 	if _, err := repo.CommitAll(commitMsg, cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
 		return workflowPR{}, err
 	}
@@ -334,7 +334,7 @@ func prepPatchVersionBump(repo *GitRepo, cfg *ReleaseConfig) (workflowPR, error)
 		opts: PROptions{
 			Owner:     cfg.ProjectOwner,
 			Repo:      cfg.ProjectRepo,
-			Title:     fmt.Sprintf("[Release %s] Update version to %s and test environments", cfg.CurrentRelease, cfg.CurrentRelease),
+			Title:     fmt.Sprintf("[Release][%s] Update version to %s and test environments", cfg.CurrentRelease, cfg.CurrentRelease),
 			Head:      branch,
 			Base:      cfg.ReleaseBranch,
 			Body:      patchVersionBumpBody(cfg),
@@ -345,7 +345,7 @@ func prepPatchVersionBump(repo *GitRepo, cfg *ReleaseConfig) (workflowPR, error)
 }
 
 func prAMainBody(cfg *ReleaseConfig) string {
-	return fmt.Sprintf(`## [Release %s]
+	return fmt.Sprintf(`## [Release][%s]
 
 Prepares %s for the %s feature freeze.
 
@@ -357,7 +357,7 @@ Prepares %s for the %s feature freeze.
 }
 
 func prBReleaseBody(cfg *ReleaseConfig) string {
-	return fmt.Sprintf(`## [Release %s]
+	return fmt.Sprintf(`## [Release][%s]
 
 Feature-freeze release branch updates for %s (version, docs, test env, make update).
 
@@ -366,24 +366,24 @@ Feature-freeze release branch updates for %s (version, docs, test env, make upda
 }
 
 func prCMainBody(cfg *ReleaseConfig) string {
-	return fmt.Sprintf(`## [Release %s]
+	return fmt.Sprintf(`## [Release][%s]
 
-Updates documentation and test environment on %s for the next minor %s.
+Updates documentation on %s for the next minor %s, and keeps test environments on the latest published Elastic Stack release %s.
 
-**Merge:** after the %s branch is created. CI may stay red until Docker images exist.
-`, cfg.CurrentRelease, cfg.BaseBranch, cfg.NextProjectMinorVersion, cfg.ReleaseBranch)
+**Merge:** once CI is green.
+`, cfg.CurrentRelease, cfg.BaseBranch, cfg.NextProjectMinorVersion, cfg.LatestRelease)
 }
 
 func patchVersionBumpBody(cfg *ReleaseConfig) string {
-	return fmt.Sprintf(`## [Release %s]
+	return fmt.Sprintf(`## [Release][%s]
 
 Post-release version bump on %s to %s (ingest-dev prepare-next-patch).
 
 - Bumps libbeat/version/version.go to %s
-- Updates test environments so stack tags use LATEST=%s and CURRENT=%s
+- Updates test environments so stack tags use LATEST=%s
 
 **Merge:** after the patch release job opens this PR (merge promptly).
-`, cfg.CurrentRelease, cfg.ReleaseBranch, cfg.CurrentRelease, cfg.CurrentRelease, cfg.LatestRelease, cfg.CurrentRelease)
+`, cfg.CurrentRelease, cfg.ReleaseBranch, cfg.CurrentRelease, cfg.CurrentRelease, cfg.LatestRelease)
 }
 
 // ensureMajorMinorCurrentReleaseMatchesBase checks out BASE_BRANCH

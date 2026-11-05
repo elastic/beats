@@ -540,8 +540,8 @@ func TestUpdateTestEnv(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	// LATEST=9.3.0, CURRENT=9.4.0 per beats.mak semantics
-	err = UpdateTestEnv("9.3.0", "9.4.0")
+	// Pin test environments to latest published release 9.3.0.
+	err = UpdateTestEnv("9.3.0")
 	if err != nil {
 		t.Fatalf("UpdateTestEnv failed: %v", err)
 	}
@@ -682,7 +682,7 @@ func TestUpdateTestEnvNoChanges(t *testing.T) {
 
 	// TestUpdateTestEnvNoChanges - uses non-matching file content; latest.yml keeps 9.1.0
 	// Same latest version already present — should not modify latest.yml
-	err = UpdateTestEnv("9.1.0", "9.3.0")
+	err = UpdateTestEnv("9.1.0")
 	if err != nil {
 		t.Fatalf("UpdateTestEnv should not fail when no matches found: %v", err)
 	}

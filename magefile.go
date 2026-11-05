@@ -310,9 +310,9 @@ func (Release) UpdateDocs(version string) error {
 	return runReleaseTool("update-docs", version)
 }
 
-// UpdateTestEnv updates docker-compose.yml files with new versions
-func (Release) UpdateTestEnv(latest, current string) error {
-	return runReleaseTool("update-test-env", latest, current)
+// UpdateTestEnv updates docker-compose.yml files to the latest published Stack release.
+func (Release) UpdateTestEnv(latest string) error {
+	return runReleaseTool("update-test-env", latest)
 }
 
 // UpdateMergify updates .mergify.yml backport configuration

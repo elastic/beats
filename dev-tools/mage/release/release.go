@@ -182,9 +182,9 @@ func UpdateDocsWithOptions(opts DocsUpdateOptions) error {
 	return nil
 }
 
-// UpdateTestEnv updates test environment files.
-// latestVersion maps to LATEST and currentVersion maps to CURRENT in beats.mak update-test-env.
-func UpdateTestEnv(latestVersion, currentVersion string) error {
+// UpdateTestEnv updates test environment files to the latest published Elastic Stack release.
+// Aligns with ingest-dev beats.mak update-test-env (LATEST only; CURRENT was unused).
+func UpdateTestEnv(latestVersion string) error {
 	latestYmlRule := replacementRule{
 		pattern:     dockerImageTagPattern,
 		replacement: fmt.Sprintf("$1:%s", latestVersion),
@@ -208,7 +208,7 @@ func UpdateTestEnv(latestVersion, currentVersion string) error {
 		}
 	}
 
-	fmt.Printf("Updated test environment files (latest=%s, current=%s)\n", latestVersion, currentVersion)
+	fmt.Printf("Updated test environment files (latest=%s)\n", latestVersion)
 	return nil
 }
 

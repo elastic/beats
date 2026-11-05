@@ -59,10 +59,10 @@ func run(args []string) error {
 		}
 		return release.UpdateDocs(rest[0])
 	case "update-test-env":
-		if len(rest) != 2 {
-			return fmt.Errorf("usage: beats-release update-test-env <latest> <current>")
+		if len(rest) != 1 {
+			return fmt.Errorf("usage: beats-release update-test-env <latest>")
 		}
-		return release.UpdateTestEnv(rest[0], rest[1])
+		return release.UpdateTestEnv(rest[0])
 	case "update-mergify":
 		if len(rest) != 1 {
 			return fmt.Errorf("usage: beats-release update-mergify <version>")
@@ -108,7 +108,7 @@ func usage() string {
 Commands:
   update-version <version>
   update-docs <version>
-  update-test-env <latest> <current>
+  update-test-env <latest>
   update-mergify <version>
   run-major-minor
   run-patch

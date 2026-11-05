@@ -441,8 +441,8 @@ func TestReleasePRBodiesIncludeReleaseHeader(t *testing.T) {
 		patchVersionBumpBody(cfg),
 	}
 	for i, body := range bodies {
-		if !strings.Contains(body, "## [Release 9.4.1]") {
-			t.Errorf("body %d missing [Release 9.4.1] header:\n%s", i, body)
+		if !strings.Contains(body, "## [Release][9.4.1]") {
+			t.Errorf("body %d missing [Release][9.4.1] header:\n%s", i, body)
 		}
 		if !strings.Contains(body, "**Merge:**") {
 			t.Errorf("body %d missing Merge guidance:\n%s", i, body)
@@ -484,6 +484,7 @@ func TestFormatWorkflowPRLine(t *testing.T) {
 func TestMajorMinorPRTitles(t *testing.T) {
 	cfg := &ReleaseConfig{
 		CurrentRelease:          "9.4.0",
+		LatestRelease:           "9.3.2",
 		NextRelease:             "9.4.1",
 		NextProjectMinorVersion: "9.5.0",
 		ReleaseBranch:           "9.4",
@@ -493,14 +494,24 @@ func TestMajorMinorPRTitles(t *testing.T) {
 		name  string
 		title string
 	}{
-		{"PR-A", fmt.Sprintf("[Release %s] Prepare main for %s and mergify backport-%s", cfg.CurrentRelease, cfg.NextProjectMinorVersion, cfg.ReleaseBranch)},
-		{"PR-B", fmt.Sprintf("[Release %s] ff-release: update versions %s", cfg.CurrentRelease, cfg.CurrentRelease)},
-		{"PR-C", fmt.Sprintf("[Release %s] Update docs and test environment for %s", cfg.CurrentRelease, cfg.NextProjectMinorVersion)},
+		{"PR-A", fmt.Sprintf("[Release][%s] Prepare main for %s and mergify backport-%s", cfg.CurrentRelease, cfg.NextProjectMinorVersion, cfg.ReleaseBranch)},
+		{"PR-B", fmt.Sprintf("[Release][%s] ff-release: update versions %s", cfg.CurrentRelease, cfg.CurrentRelease)},
+		{"PR-C", fmt.Sprintf("[Release][%s] Update docs for %s and test environment to latest release %s", cfg.CurrentRelease, cfg.NextProjectMinorVersion, cfg.LatestRelease)},
 	}
 	for _, tc := range cases {
-		if !strings.HasPrefix(tc.title, "[Release 9.4.0] ") {
+		if !strings.HasPrefix(tc.title, "[Release][9.4.0] ") {
 			t.Errorf("%s title missing release header: %s", tc.name, tc.title)
 		}
+	}
+	if !strings.Contains(cases[2].title, "latest release 9.3.2") {
+		t.Errorf("PR-C title should name the pinned latest release: %s", cases[2].title)
+	}
+	body := prCMainBody(cfg)
+	if strings.Contains(body, "CI may stay red") {
+		t.Error("PR-C body must not claim CI waits for unreleased images")
+	}
+	if !strings.Contains(body, "latest published Elastic Stack release 9.3.2") {
+		t.Errorf("PR-C body should describe latest release pin:\n%s", body)
 	}
 }
 
