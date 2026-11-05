@@ -89,7 +89,7 @@ func benchNReceiverTelemetry(b *testing.B, nReceivers int) {
 	// collect until the metric count stops growing before measuring.
 	settled, last := 0, -1
 	deadline := time.Now().Add(30 * time.Second)
-	for settled < 3 {
+	for settled < 5 {
 		require.True(b, time.Now().Before(deadline), "metrics did not settle")
 		require.NoError(b, reader.Collect(b.Context(), &rm))
 		n := 0

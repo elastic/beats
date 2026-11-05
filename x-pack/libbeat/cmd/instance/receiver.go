@@ -86,19 +86,31 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 
 	// The bridge is shared by all receivers, so pass the original settings to
 	// keep this receiver's component.* fields out of its logs.
-	releaseSystem, err := oteltelemetry.AcquireSystemBridge(set.TelemetrySettings)
-	if err != nil {
-		return BeatReceiver{}, fmt.Errorf("error acquiring system bridge: %w", err)
+	var releaseSystem func()
+	acquireSystem := func() (err error) {
+		releaseSystem, err = oteltelemetry.AcquireSystemBridge(set.TelemetrySettings)
+		if err != nil {
+			return fmt.Errorf("error acquiring system bridge: %w", err)
+		}
+		return nil
 	}
-	started := false
+	created := false
 	defer func() {
-		if !started {
+		if created {
+			return
+		}
+		stopAPI(b)
+		if releaseSystem != nil {
 			releaseSystem()
 		}
 	}()
 
 	// The API serves the shared system metrics, so it starts after the bridge.
+	// Without an API the bridge is acquired only once creation can no longer fail.
 	if b.Config.HTTP.Enabled() {
+		if err := acquireSystem(); err != nil {
+			return BeatReceiver{}, err
+		}
 		retryer := backoff.NewRetryer(50, 100*time.Millisecond, 1*time.Second)
 		err := retryer.Retry(ctx, func() error {
 			var err error
@@ -120,16 +132,20 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 
 	beater, err := creator(&b.Beat, beatConfig)
 	if err != nil {
-		stopAPI(b)
 		return BeatReceiver{}, fmt.Errorf("error getting %s creator:%w", b.Info.Beat, err)
 	}
 
 	bridge, err := oteltelemetry.NewRegistryBridge(bridgeTelemetrySettings, receiverID.String(), b.Monitoring.StatsRegistry(), b.Monitoring.InputsRegistry())
 	if err != nil {
-		stopAPI(b)
 		return BeatReceiver{}, fmt.Errorf("error creating registry bridge: %w", err)
 	}
-	started = true
+
+	if releaseSystem == nil {
+		if err := acquireSystem(); err != nil {
+			return BeatReceiver{}, err
+		}
+	}
+	created = true
 
 	return BeatReceiver{
 		beat:                b,

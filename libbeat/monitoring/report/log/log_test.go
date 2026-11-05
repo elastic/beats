@@ -290,7 +290,7 @@ func TestExtraMetricsNotCalledWhenDisabled(t *testing.T) {
 	called := false
 	r, err := MakeReporter(beat.Info{Logger: logger}, cfg, beatmonitoring.NewGlobalMonitoring(),
 		WithExtraMetrics(func() monitoring.FlatSnapshot { called = true; return monitoring.MakeFlatSnapshot() }))
-	require.NoError(t, err)
+	require.NoError(t, err, "making the reporter should succeed")
 	r.Stop()
 	assert.False(t, called, "extra metrics must not be collected when metrics logging is disabled")
 }

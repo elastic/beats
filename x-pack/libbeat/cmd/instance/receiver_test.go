@@ -711,7 +711,7 @@ func TestBeatReceiverStart_UsesHeadersSetterUserAgent(t *testing.T) {
 
 func TestReceiverSystemMetrics(t *testing.T) {
 	release, err := oteltelemetry.AcquireSystemBridge(componenttest.NewNopTelemetrySettings())
-	require.NoError(t, err)
+	require.NoError(t, err, "acquiring the system bridge should succeed")
 	defer release()
 
 	system := receiverSystemMetrics()
@@ -729,7 +729,7 @@ func TestReceiverHTTPStatsIncludesSystemMetrics(t *testing.T) {
 	}
 	// Unix socket paths are short; t.TempDir is too long on macOS.
 	dir, err := os.MkdirTemp("/tmp", "hb")
-	require.NoError(t, err)
+	require.NoError(t, err, "creating the socket directory should succeed")
 	t.Cleanup(func() { _ = os.RemoveAll(dir) })
 	socket := filepath.Join(dir, "s.sock")
 
@@ -742,15 +742,24 @@ func TestReceiverHTTPStatsIncludesSystemMetrics(t *testing.T) {
 		"http.enabled":            true,
 		"http.host":               "unix://" + socket,
 	}, consumertest.NewNop(), "test-receiver", zapcore.NewNopCore())
-	require.NoError(t, err)
+	require.NoError(t, err, "building the receiver beat should succeed")
 
 	var rs receiver.Settings
 	rs.Logger = zap.NewNop()
 	rs.ID = component.NewIDWithName(component.MustNewType("mockbeatreceiver"), "r1")
 	br, err := NewBeatReceiver(t.Context(), b, creator, rs)
-	require.NoError(t, err)
-	go func() { _ = br.Start(t.Context(), &fakeExtensionHost{}) }()
-	defer func() { _ = br.Shutdown(t.Context()) }()
+	require.NoError(t, err, "creating the beat receiver should succeed")
+	startDone := make(chan error, 1)
+	go func() { startDone <- br.Start(t.Context(), &fakeExtensionHost{}) }()
+	defer func() {
+		_ = br.Shutdown(t.Context())
+		<-startDone
+	}()
+	select {
+	case <-mb.initDone:
+	case <-time.After(30 * time.Second):
+		t.Fatal("beater did not start")
+	}
 
 	client := &http.Client{Transport: &http.Transport{
 		DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {

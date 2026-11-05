@@ -232,7 +232,7 @@ func TestSystemMetricsSnapshot(t *testing.T) {
 	assert.Empty(t, SystemMetricsFlatSnapshot().Ints, "no flat snapshot without a receiver holding the system bridge")
 
 	release, err := AcquireSystemBridge(componenttest.NewNopTelemetrySettings())
-	require.NoError(t, err)
+	require.NoError(t, err, "acquiring the system bridge should succeed")
 
 	snapshot := SystemMetricsSnapshot()
 	require.NotNil(t, snapshot, "snapshot while the system bridge is held")
