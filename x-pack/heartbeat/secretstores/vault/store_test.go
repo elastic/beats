@@ -268,6 +268,8 @@ func TestConfigValidation(t *testing.T) {
 		{name: "token over verified https", entry: tokenEntry("https://vault:8200")},
 		{name: "approle over loopback http", entry: appRoleEntry("http://localhost:8200")},
 		{name: "remote http hostname", entry: tokenEntry("http://vault:8200"), wantErr: "must use https unless its host is loopback"},
+		{name: "remote http with loopback userinfo", entry: tokenEntry("http://localhost@vault.example:8200"), wantErr: "must use https unless its host is loopback"},
+		{name: "remote http hostname resolving to loopback", entry: tokenEntry("http://127.0.0.1.nip.io:8200"), wantErr: "must use https unless its host is loopback"},
 		{name: "remote http private IPv4", entry: tokenEntry("http://10.0.0.5:8200"), wantErr: "must use https unless its host is loopback"},
 		{name: "remote http IPv6", entry: tokenEntry("http://[2001:db8::1]:8200"), wantErr: "must use https unless its host is loopback"},
 		{name: "localhost http", entry: tokenEntry("http://localhost:8200")},
@@ -345,12 +347,13 @@ func TestConfigValidation(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			cfg, err := conf.NewConfigFrom(tc.entry)
 			require.NoError(t, err, "test entry must be valid")
-			_, err = newStore(cfg, logptest.NewTestingLogger(t, ""))
+			store, err := newStore(cfg, logptest.NewTestingLogger(t, ""))
 			if tc.wantErr == "" {
 				assert.NoError(t, err, "config must be valid")
 				return
 			}
 			assert.ErrorContains(t, err, tc.wantErr, "config must be rejected")
+			assert.Nil(t, store, "invalid config must not create a store that can send credentials")
 		})
 	}
 }
