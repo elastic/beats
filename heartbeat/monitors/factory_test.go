@@ -201,10 +201,14 @@ func TestPreProcessors(t *testing.T) {
 			t.Run("event.data_stream", func(t *testing.T) {
 				dataStreamRaw, _ := e.GetValue("data_stream")
 				if tt.expectedDatastream != nil {
-					dataStream, _ := dataStreamRaw.(add_data_stream.DataStream)
-					require.Equal(t, eventDs, dataStream.Dataset, "event.dataset be identical to data_stream.dataset")
+					dataStream, _ := dataStreamRaw.(mapstr.M)
+					require.Equal(t, eventDs, dataStream["dataset"], "event.dataset be identical to data_stream.dataset")
 
-					require.Equal(t, *tt.expectedDatastream, dataStream)
+					require.Equal(t, mapstr.M{
+						"namespace": tt.expectedDatastream.Namespace,
+						"dataset":   tt.expectedDatastream.Dataset,
+						"type":      tt.expectedDatastream.Type,
+					}, dataStream)
 				}
 			})
 		})
