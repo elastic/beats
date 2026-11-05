@@ -3,11 +3,10 @@ kind: security
 summary: Require verified HTTPS for remote Heartbeat Vault secret stores.
 
 description: >
-  Heartbeat now rejects plaintext HTTP and `ssl.verification_mode: none` or
-  `certificate` for non-loopback Vault secret store addresses. Existing remote
-  Vault connections must use HTTPS with certificate and hostname verification.
-  To trust a private CA, configure `ssl.certificate_authorities` instead of
-  weakening verification.
+  Heartbeat now enforces the same HTTPS requirement as Kibana for non-loopback
+  Vault secret store addresses. Remote connections must use HTTPS with certificate
+  and hostname verification. To trust a private CA, configure
+  `ssl.certificate_authorities` instead of weakening verification.
 
 component: heartbeat
 
