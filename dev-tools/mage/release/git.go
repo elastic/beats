@@ -20,7 +20,6 @@ package release
 import (
 	"errors"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/go-git/go-git/v5"
@@ -250,11 +249,10 @@ func (g *GitRepo) HasCommitsAheadOf(baseBranch string) (bool, error) {
 	return true, nil
 }
 
-// Push pushes the current branch to the remote
-func (g *GitRepo) Push(remoteName string) error {
-	token := os.Getenv("GITHUB_TOKEN")
+// Push pushes the current branch to the remote using the given GitHub token.
+func (g *GitRepo) Push(remoteName, token string) error {
 	if token == "" {
-		return fmt.Errorf("GITHUB_TOKEN environment variable is required for pushing")
+		return fmt.Errorf("GitHub token is required for pushing")
 	}
 
 	// Get current branch to push only this branch

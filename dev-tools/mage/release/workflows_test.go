@@ -255,7 +255,8 @@ func TestRunPatchReleaseDryRunBranches(t *testing.T) {
 	tmpDir := setupWorkflowTestRepo(t)
 
 	// Patch workflow starts from an existing release branch whose version.go
-	// already equals CURRENT_RELEASE (set by the previous prepare-next-release).
+	// equals the previous patch (CURRENT_RELEASE - 1). CURRENT_RELEASE is the
+	// version to land (NEW_VERSION from version-bump).
 	runGit := func(args ...string) {
 		t.Helper()
 		cmd := exec.CommandContext(context.Background(), "git", args...)
@@ -274,7 +275,7 @@ const defaultBeatVersion = "9.5.1"
 		t.Fatalf("failed to seed version.go: %v", err)
 	}
 	docsPath := filepath.Join(tmpDir, "libbeat/docs/version.asciidoc")
-	if err := os.WriteFile(docsPath, []byte(`:stack-version: 9.5.0
+	if err := os.WriteFile(docsPath, []byte(`:stack-version: 9.5.1
 :doc-branch: 9.5
 `), 0644); err != nil {
 		t.Fatalf("failed to seed version.asciidoc: %v", err)
@@ -304,9 +305,9 @@ const defaultBeatVersion = "9.5.1"
 	}
 
 	cfg := &ReleaseConfig{
-		CurrentRelease: "9.5.1",
-		LatestRelease:  "9.5.0",
-		NextRelease:    "9.5.2",
+		CurrentRelease: "9.5.2",
+		LatestRelease:  "9.5.1",
+		NextRelease:    "9.5.3",
 		ReleaseBranch:  "9.5",
 		DryRun:         true,
 		GitAuthorName:  "Test User",
@@ -324,8 +325,7 @@ const defaultBeatVersion = "9.5.1"
 
 	wantBranches := []string{
 		"9.5",
-		"patch-release-9.5.1",
-		"ff-prep-next-patch-9.5.2",
+		"update-version-9.5.2",
 	}
 	for _, branch := range wantBranches {
 		exists, err := repo.BranchExists(branch)
@@ -337,13 +337,19 @@ const defaultBeatVersion = "9.5.1"
 		}
 	}
 
-	// PR-A: docs only — version.go and test-env unchanged from release branch.
-	assertGitShowContains(t, tmpDir, "patch-release-9.5.1", "libbeat/version/version.go", `defaultBeatVersion = "9.5.1"`)
-	assertGitShowContains(t, tmpDir, "patch-release-9.5.1", "libbeat/docs/version.asciidoc", ":stack-version: 9.5.1")
-	assertGitShowContains(t, tmpDir, "patch-release-9.5.1", "testing/environments/latest.yml", "elasticsearch:9.5.0")
-	// PR-B: next version + test-env advanced to the just-released CURRENT.
-	assertGitShowContains(t, tmpDir, "ff-prep-next-patch-9.5.2", "libbeat/version/version.go", `defaultBeatVersion = "9.5.2"`)
-	assertGitShowContains(t, tmpDir, "ff-prep-next-patch-9.5.2", "testing/environments/latest.yml", "elasticsearch:9.5.1")
+	exists, err := repo.BranchExists("patch-release-9.5.2")
+	if err != nil {
+		t.Fatalf("failed checking docs branch: %v", err)
+	}
+	if exists {
+		t.Errorf("patch must not create docs branch patch-release-9.5.2")
+	}
+
+	assertGitShowContains(t, tmpDir, "update-version-9.5.2", "libbeat/version/version.go", `defaultBeatVersion = "9.5.2"`)
+	assertGitShowContains(t, tmpDir, "update-version-9.5.2", "testing/environments/latest.yml", "elasticsearch:9.5.1")
+	if cfg.LatestRelease != "9.5.1" {
+		t.Errorf("LatestRelease forced to previous patch = %s, want 9.5.1", cfg.LatestRelease)
+	}
 }
 
 func TestRunPatchReleaseRejectsMismatchedCurrentRelease(t *testing.T) {
@@ -386,9 +392,9 @@ const defaultBeatVersion = "9.5.1"
 	}
 
 	cfg := &ReleaseConfig{
-		CurrentRelease: "9.5.0", // off-by-one vs branch
-		LatestRelease:  "9.4.3",
-		NextRelease:    "9.5.1",
+		CurrentRelease: "9.5.3", // expects branch at 9.5.2
+		LatestRelease:  "9.5.2",
+		NextRelease:    "9.5.4",
 		ReleaseBranch:  "9.5",
 		DryRun:         true,
 		GitAuthorName:  "Test User",
@@ -397,35 +403,25 @@ const defaultBeatVersion = "9.5.1"
 
 	err = RunPatchRelease(cfg)
 	if err == nil {
-		t.Fatal("expected RunPatchRelease to fail when CURRENT_RELEASE mismatches branch version")
+		t.Fatal("expected RunPatchRelease to fail when branch version is not previous patch")
 	}
-	if !strings.Contains(err.Error(), "does not match version on branch") {
+	if !strings.Contains(err.Error(), "expects version") {
 		t.Fatalf("unexpected error: %v", err)
 	}
 }
 
 func TestPatchPrepLabels(t *testing.T) {
-	cases := []struct {
-		name   string
-		labels []string
-		want   string
-	}{
-		{name: "PR-A before-build", labels: patchBeforeBuildPRLabels(), want: mergeLabelBeforeBuild},
-		{name: "PR-B next", labels: prDNextPatchLabels(), want: mergeLabelAfterRelease},
+	labels := patchVersionBumpLabels()
+	if !slices.Contains(labels, mergeLabelAfterRelease) {
+		t.Errorf("patch bump labels should include %q, got %v", mergeLabelAfterRelease, labels)
 	}
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			if !slices.Contains(tc.labels, tc.want) {
-				t.Errorf("%s labels should include %q, got %v", tc.name, tc.want, tc.labels)
-			}
-		})
-	}
-
-	beforeBuild := patchBeforeBuildPRLabels()
-	for _, want := range []string{"docs", "in progress", "release", "Team:Automation", "skip-changelog"} {
-		if !slices.Contains(beforeBuild, want) {
-			t.Errorf("before-build labels should include %q, got %v", want, beforeBuild)
+	for _, want := range []string{"release", "Team:Automation", "skip-changelog"} {
+		if !slices.Contains(labels, want) {
+			t.Errorf("patch bump labels should include %q, got %v", want, labels)
 		}
+	}
+	if slices.Contains(labels, "docs") {
+		t.Errorf("patch bump must not include docs label, got %v", labels)
 	}
 }
 
@@ -442,8 +438,7 @@ func TestReleasePRBodiesIncludeReleaseHeader(t *testing.T) {
 		prAMainBody(cfg),
 		prBReleaseBody(cfg),
 		prCMainBody(cfg),
-		prDNextPatchBody(cfg),
-		patchBeforeBuildPRBody(cfg.CurrentRelease),
+		patchVersionBumpBody(cfg),
 	}
 	for i, body := range bodies {
 		if !strings.Contains(body, "## [Release 9.4.1]") {
@@ -454,11 +449,11 @@ func TestReleasePRBodiesIncludeReleaseHeader(t *testing.T) {
 		}
 	}
 
-	if !strings.Contains(prDNextPatchBody(cfg), "9.4.2") {
-		t.Error("next-patch body should mention next version 9.4.2")
+	if !strings.Contains(patchVersionBumpBody(cfg), "to 9.4.1") {
+		t.Error("patch bump body should mention landing version 9.4.1")
 	}
-	if !strings.Contains(patchBeforeBuildPRBody(cfg.CurrentRelease), "Does **not** bump libbeat/version/version.go") {
-		t.Error("patch before-build body should clarify version.go is not bumped")
+	if strings.Contains(patchVersionBumpBody(cfg), "Merge after the release of") {
+		t.Error("patch bump body must not park with Merge-after-release wording")
 	}
 }
 

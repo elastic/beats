@@ -91,7 +91,7 @@ func UpdateVersion(newVersion string) error {
 }
 
 // UpdateStackVersion updates only :stack-version: in libbeat/docs/version.asciidoc.
-// Not used by prepare-next-release / PR-D (those only bump version.go + test-env).
+// Not used by prepare-next-patch / patch bump (those only bump version.go + test-env).
 func UpdateStackVersion(newVersion string) error {
 	versionRules := []replacementRule{
 		{

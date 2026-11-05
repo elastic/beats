@@ -59,11 +59,12 @@ mage release:runPatch
 
 ## What feature freeze produces
 
-Creates the release branch (e.g. `9.5` from `main`) and opens **4 grouped PRs**.
+Creates the release branch (e.g. `9.5` from `main`) and opens **3 grouped PRs**.
 
 `CURRENT_RELEASE` must already match `libbeat/version/version.go` on `BASE_BRANCH`
 (set by the previous cycle's next-minor version bump). The workflow fails fast if
-they differ.
+they differ. Next-patch bumps are **not** opened here; use `runPatch` after the
+patch release trigger.
 
 Merge order matters; labels encode timing. Titles are prefixed with
 `[Release <CURRENT_RELEASE>]`.
@@ -73,29 +74,26 @@ Merge order matters; labels encode timing. Titles are prefixed with
 | 1 | PR-A | `main` | `merge:1-ff-day` | Mergify backport rule + bump `version.go` to next minor |
 | 2 | PR-B | release branch | `merge:2-after-branch` | Feature-freeze version, docs, test env, `make update` |
 | 3 | PR-C | `main` | `merge:3-after-images` | Docs + test env for the next minor |
-| 4 | PR-D | release branch | `merge:4-after-release` | Next patch version + test env (after release day) |
 
-**RM merge order:** push release branch → merge PR-A → merge PR-B → merge PR-C →
-merge PR-D after release day.
+**RM merge order:** push release branch → merge PR-A → merge PR-B → merge PR-C.
 
 ## What a patch release produces
 
-Runs on the existing release branch and opens **2 grouped PRs**.
+Runs on the existing release branch and opens **1 PR**: the post-release version
+bump to `CURRENT_RELEASE` (`NEW_VERSION` from version-bump), plus Beats test-env.
+Docs stay off this path.
 
-`CURRENT_RELEASE` must already match `libbeat/version/version.go` on the release
-branch (set by the previous release's after-release / prepare-next-release PR).
-The workflow fails fast if they differ.
+`CURRENT_RELEASE` must have patch `> 0`, and `version.go` on the release branch
+must equal the previous patch on the same line. The workflow fails fast otherwise.
 
 | Order | PR | Target | Merge label | Purpose |
 |-------|-----|--------|-------------|---------|
-| 1 | PR-A | release branch | `merge:1-before-build` | Docs + K8s → current patch (no `version.go` / test-env bump) |
-| 2 | PR-B | release branch | `merge:4-after-release` | Next patch `version.go` + test env (after release day) |
+| 1 | bump | release branch | `merge:4-after-release` | `version.go` → CURRENT + test-env (`LATEST=prev`) |
 
-Titles are prefixed with `[Release <CURRENT_RELEASE>]` so the release being cut
-is obvious; PR-B also names the next patch version in the title.
+Titles are prefixed with `[Release <CURRENT_RELEASE>]`.
 
-**RM merge order:** merge PR-A before the final release build → merge PR-B after
-release day. Release notes stay on the separate GitHub Actions workflow.
+**RM merge order:** merge the bump PR promptly after the patch job opens it.
+Release notes stay on the separate GitHub Actions workflow.
 
 Both `runMajorMinor` and `runPatch` finish by ensuring a Beats issue titled
 `[RELEASE <CURRENT_RELEASE>] Instructions & Checklist` exists (create or update).

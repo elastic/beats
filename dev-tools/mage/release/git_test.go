@@ -239,22 +239,13 @@ func TestPushRequiresToken(t *testing.T) {
 		t.Fatalf("Failed to open repo: %v", err)
 	}
 
-	// Unset GITHUB_TOKEN if it exists
-	oldToken := os.Getenv("GITHUB_TOKEN")
-	os.Unsetenv("GITHUB_TOKEN")
-	defer func() {
-		if oldToken != "" {
-			os.Setenv("GITHUB_TOKEN", oldToken)
-		}
-	}()
-
 	// Push should fail without token
-	err = repo.Push("origin")
+	err = repo.Push("origin", "")
 	if err == nil {
-		t.Error("Push() should fail without GITHUB_TOKEN, got nil error")
+		t.Error("Push() should fail without token, got nil error")
 	}
-	if err != nil && err.Error() != "GITHUB_TOKEN environment variable is required for pushing" {
-		t.Errorf("Push() error = %v, want 'GITHUB_TOKEN environment variable is required for pushing'", err)
+	if err != nil && err.Error() != "GitHub token is required for pushing" {
+		t.Errorf("Push() error = %v, want 'GitHub token is required for pushing'", err)
 	}
 }
 

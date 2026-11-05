@@ -72,7 +72,9 @@ func (gh *GitHubClient) CreatePR(opts PROptions) (*github.PullRequest, error) {
 	}
 	if found {
 		fmt.Printf("Open PR already exists #%d: %s\n", existingPR.GetNumber(), existingPR.GetHTMLURL())
-		gh.ensurePRLabels(opts.Owner, opts.Repo, existingPR.GetNumber(), opts.Labels)
+		if err := gh.ensurePRLabels(opts.Owner, opts.Repo, existingPR.GetNumber(), opts.Labels); err != nil {
+			return nil, err
+		}
 		return existingPR, nil
 	}
 
@@ -100,7 +102,9 @@ func (gh *GitHubClient) CreatePR(opts PROptions) (*github.PullRequest, error) {
 		}
 	}
 
-	gh.ensurePRLabels(opts.Owner, opts.Repo, pr.GetNumber(), opts.Labels)
+	if err := gh.ensurePRLabels(opts.Owner, opts.Repo, pr.GetNumber(), opts.Labels); err != nil {
+		return nil, err
+	}
 
 	fmt.Printf("Created PR #%d: %s\n", pr.GetNumber(), pr.GetHTMLURL())
 	return pr, nil
@@ -253,28 +257,25 @@ var mergeLabelDefs = map[string]struct {
 	},
 	mergeLabelAfterRelease: {
 		Color:       "0E8A16",
-		Description: "Merge 4th: after release day",
-	},
-	mergeLabelBeforeBuild: {
-		Color:       "B60205",
-		Description: "Merge before the final patch release build",
+		Description: "Merge after release: post-release version bump",
 	},
 }
 
-func (gh *GitHubClient) ensurePRLabels(owner, repo string, number int, labels []string) {
+func (gh *GitHubClient) ensurePRLabels(owner, repo string, number int, labels []string) error {
 	if len(labels) == 0 {
-		return
+		return nil
 	}
 	for _, label := range labels {
 		if def, ok := mergeLabelDefs[label]; ok {
 			if err := gh.EnsureLabel(owner, repo, label, def.Color, def.Description); err != nil {
-				fmt.Printf("Warning: failed to ensure label %q: %v\n", label, err)
+				return fmt.Errorf("failed to ensure label %q: %w", label, err)
 			}
 		}
 	}
 	if err := gh.AddLabels(owner, repo, number, labels); err != nil {
-		fmt.Printf("Warning: failed to add labels: %v\n", err)
+		return fmt.Errorf("failed to add labels to PR #%d: %w", number, err)
 	}
+	return nil
 }
 
 // EnsureLabel creates a repository label if it does not already exist.

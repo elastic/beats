@@ -321,13 +321,12 @@ func (Release) UpdateMergify(version string) error {
 }
 
 // RunMajorMinor executes the feature-freeze workflow: creates the release branch
-// and 4 grouped PRs (main backport+version, ff-release, main docs+env, next patch).
+// and 3 grouped PRs (main backport+version, ff-release, main docs+env).
 func (Release) RunMajorMinor() error {
 	return runReleaseTool("run-major-minor")
 }
 
-// RunPatch executes the patch release workflow: 2 PRs on the release branch
-// (docs before build; next-patch version + test-env after release).
+// RunPatch executes the post-release patch bump: version + test-env to CURRENT_RELEASE.
 func (Release) RunPatch() error {
 	return runReleaseTool("run-patch")
 }
