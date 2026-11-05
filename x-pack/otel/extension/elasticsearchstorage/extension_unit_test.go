@@ -9,12 +9,15 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/confmap"
+	"go.opentelemetry.io/collector/extension"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
@@ -65,4 +68,75 @@ func TestElasticStorageStartUsesBeatsAuth(t *testing.T) {
 	httpClient, ok := storage.client.HTTP.(*http.Client)
 	require.True(t, ok, "storage client must use an HTTP client")
 	require.Equal(t, elasticsearchRequestTimeout, httpClient.Timeout, "storage client must retain the legacy Elasticsearch request timeout")
+}
+
+func TestElasticStorageStartUsesElasticsearchAuth(t *testing.T) {
+	type request struct {
+		authorization string
+		customHeader  string
+	}
+
+	tests := []struct {
+		name              string
+		newAuthenticator  func(t *testing.T, endpoint string) (component.ID, extension.Extension)
+		wantAuthorization string
+		wantCustomHeader  string
+	}{
+		{
+			name: "basic auth",
+			newAuthenticator: func(t *testing.T, endpoint string) (component.ID, extension.Extension) {
+				return newTestElasticsearchAuthenticator(t, endpoint, "elastic", "password")
+			},
+			wantAuthorization: "Basic " + base64.StdEncoding.EncodeToString([]byte("elastic:password")),
+		},
+		{
+			name: "api key with custom header",
+			newAuthenticator: func(t *testing.T, endpoint string) (component.ID, extension.Extension) {
+				return newTestElasticsearchAPIKeyAuthenticator(t, endpoint, "id-key", map[string]string{"X-Custom-Header": "custom header value"})
+			},
+			wantAuthorization: "ApiKey id-key",
+			wantCustomHeader:  "custom header value",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			var mu sync.Mutex
+			var got request
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				mu.Lock()
+				got = request{
+					authorization: r.Header.Get("Authorization"),
+					customHeader:  r.Header.Get("X-Custom-Header"),
+				}
+				mu.Unlock()
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = io.WriteString(w, `{"version":{"number":"9.42.0","build_flavor":"default"},"name":"fake"}`)
+			}))
+			t.Cleanup(server.Close)
+
+			authenticatorID, authenticator := tc.newAuthenticator(t, server.URL)
+			storage := &elasticStorage{
+				cfg:    newTestStorageConfig(authenticatorID),
+				logger: logp.NewNopLogger(),
+			}
+
+			require.NoError(
+				t,
+				storage.Start(
+					t.Context(),
+					storageTestHost{authenticatorID: authenticator},
+				),
+				"storage must connect through the configured authenticator",
+			)
+			t.Cleanup(func() {
+				require.NoError(t, storage.Shutdown(t.Context()), "storage must shut down")
+			})
+
+			mu.Lock()
+			defer mu.Unlock()
+			require.Equal(t, tc.wantAuthorization, got.authorization, "storage connection ping must carry authenticator credentials")
+			require.Equal(t, tc.wantCustomHeader, got.customHeader, "storage connection ping must carry custom header")
+		})
+	}
 }

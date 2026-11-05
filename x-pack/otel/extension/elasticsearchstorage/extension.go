@@ -15,7 +15,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/es"
-	"github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension"
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	"go.opentelemetry.io/collector/component"
@@ -31,6 +30,12 @@ var (
 	_ backend.Registry                = (*elasticStorage)(nil)
 	_ backend.Store                   = (*lockedStore)(nil)
 )
+
+// EndpointsProvider provides configured Elasticsearch endpoints.
+// beatsauth and elasticsearch auth extensions implement this interface.
+type EndpointsProvider interface {
+	Endpoints() []string
+}
 
 type elasticStorage struct {
 	cfg    *Config
@@ -57,7 +62,7 @@ func (e *elasticStorage) Start(ctx context.Context, host component.Host) error {
 		return fmt.Errorf("get Elasticsearch authenticator: %w", err)
 	}
 
-	endpointProvider, ok := auth.(beatsauthextension.EndpointsProvider)
+	endpointProvider, ok := auth.(EndpointsProvider)
 	if !ok {
 		return errors.New("configured authenticator does not provide Elasticsearch endpoints")
 	}
