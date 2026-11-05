@@ -39,6 +39,12 @@ type invalidMonitorFactory struct {
 	logger *logp.Logger
 }
 
+// Unwrap returns the wrapped factory, so the runner list can still use its
+// config hash function.
+func (f invalidMonitorFactory) Unwrap() cfgfile.RunnerFactory {
+	return f.RunnerFactory
+}
+
 func (f invalidMonitorFactory) Create(p beat.PipelineConnector, cfg *conf.C) (cfgfile.Runner, error) {
 	runner, err := f.RunnerFactory.Create(p, cfg)
 	if err == nil || errors.Is(err, monitors.ErrMonitorDisabled) {

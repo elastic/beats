@@ -19,7 +19,7 @@ type metricbeatReceiver struct {
 
 func (mb *metricbeatReceiver) Start(ctx context.Context, host component.Host) error {
 	mb.Logger.Info("starting metricbeat receiver")
-	if err := mb.BeatReceiver.Start(host); err != nil {
+	if err := mb.BeatReceiver.Start(ctx, host); err != nil {
 		return fmt.Errorf("error starting metricbeat receiver: %w", err)
 	}
 
