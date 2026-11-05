@@ -141,7 +141,7 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 	}
 }
 
-// retryBackoff is the wait before retrying a failed full sync. It starts
+// retryBackoff tracks the wait before retrying a failed full sync. It starts
 // at initial and doubles after each further failure, up to max.
 type retryBackoff struct {
 	initial, max time.Duration
