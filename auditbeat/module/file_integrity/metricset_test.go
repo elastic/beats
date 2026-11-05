@@ -155,7 +155,11 @@ func TestActions(t *testing.T) {
 				assert.Contains(t, actions, "created")
 			case updatedFilepath:
 				assert.Contains(t, actions, "updated")
-				assert.Contains(t, actions, "attributes_modified")
+				// On macOS the FSEvents listener may report this file before the
+				// scanner does, and FSEvents doesn't flag it as attributes_modified.
+				if runtime.GOOS != "darwin" {
+					assert.Contains(t, actions, "attributes_modified")
+				}
 			default:
 				assert.Fail(t, "unexpected path", "path %v", path)
 			}
