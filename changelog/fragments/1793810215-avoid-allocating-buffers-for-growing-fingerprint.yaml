@@ -1,3 +1,3 @@
 kind: feature
-summary: [Filestream] Avoid allocating buffers for growing fingerprint when not needed
+summary: Avoid allocating buffers for growing fingerprint when not needed
 component: Filebeat
