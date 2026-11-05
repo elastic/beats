@@ -101,7 +101,8 @@ type stuckPipeline struct {
 	// payload is added to each row and filler (see stuckQueue).
 	payload string
 	// dataDir holds the disk queue, if the pipeline has one.
-	dataDir string
+	dataDir   string
+	closeOnce sync.Once
 }
 
 func newStuckPipeline(t *testing.T, q stuckQueue) *stuckPipeline {
@@ -118,7 +119,12 @@ func newStuckPipeline(t *testing.T, q stuckQueue) *stuckPipeline {
 		},
 		pipeline.Settings{WaitCloseMode: pipeline.WaitOnPipelineCloseThenForce})
 	require.NoError(t, err, "create the real publisher pipeline")
-	return &stuckPipeline{Pipeline: pipe, output: output, payload: strings.Repeat("x", q.payload), dataDir: dir}
+	p := &stuckPipeline{Pipeline: pipe, output: output, payload: strings.Repeat("x", q.payload), dataDir: dir}
+	// Cleanups run in reverse order, so this closes the disk queue's segment
+	// files before the TempDir cleanup removes them, also when a test stops
+	// early. Windows cannot remove a file that is still open.
+	t.Cleanup(func() { p.close(t) })
+	return p
 }
 
 // fill fills the queue with filler events, so that the next event blocks.
@@ -163,9 +169,13 @@ func (p *stuckPipeline) checkQueue(t *testing.T) {
 	if len(p.payload) == 0 {
 		return
 	}
-	segments, err := filepath.Glob(filepath.Join(p.dataDir, "diskqueue", "*.seg"))
-	require.NoError(t, err, "list the disk queue segments")
-	require.NotEmpty(t, segments, "the disk queue must hold the queued events in segment files under %s", p.dataDir)
+	// The disk queue writes segments from its own goroutine, so they can
+	// appear after the queue has started refusing events.
+	pattern := filepath.Join(p.dataDir, "diskqueue", "*.seg")
+	require.Eventually(t, func() bool {
+		segments, err := filepath.Glob(pattern)
+		return err == nil && len(segments) > 0
+	}, 5*time.Second, 10*time.Millisecond, "the disk queue must hold the queued events in segment files under %s", p.dataDir)
 }
 
 // refusalListener counts the events a DropIfFull client drops.
@@ -221,12 +231,15 @@ func (p *stuckPipeline) waitDelivered(t *testing.T, want int64) {
 }
 
 // close unblocks the output and closes the pipeline, which waits for the
-// queued events of a memory queue to be delivered.
+// queued events of a memory queue to be delivered. Only the first call closes
+// it.
 func (p *stuckPipeline) close(t *testing.T) {
-	p.output.unblock()
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	assert.NoError(t, p.Disconnect(ctx), "close the test pipeline")
+	p.closeOnce.Do(func() {
+		p.output.unblock()
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		assert.NoError(t, p.Disconnect(ctx), "close the test pipeline")
+	})
 }
 
 type countedClient struct {
