@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
@@ -18,9 +17,9 @@ import (
 func TestTxTracker_Add(t *testing.T) {
 	txTracker := NewTxTracker(context.Background())
 
-	require.Equal(t, int64(0), txTracker.pending, "new tracker should have nothing pending")
+	assert.Equal(t, int64(0), txTracker.pending, "new tracker should have nothing pending")
 	txTracker.Add()
-	require.Equal(t, int64(1), txTracker.pending, "Add should increment pending")
+	assert.Equal(t, int64(1), txTracker.pending, "Add should increment pending")
 }
 
 func TestTxTracker_Wait(t *testing.T) {
@@ -70,12 +69,12 @@ func TestTxTracker_Wait(t *testing.T) {
 }
 
 func TestTxACKHandler(t *testing.T) {
-	t.Run("all-ack", func(t *testing.T) {
+	t.Run("all_ack", func(t *testing.T) {
 		txTracker := NewTxTracker(context.Background())
 		handler := NewTxACKHandler()
 
 		txTracker.Add()
-		require.Equal(t, int64(1), txTracker.pending, "Add should increment pending")
+		assert.Equal(t, int64(1), txTracker.pending, "Add should increment pending")
 
 		handler.AddEvent(beat.Event{
 			Private: txTracker,
@@ -84,10 +83,10 @@ func TestTxACKHandler(t *testing.T) {
 
 		txTracker.Wait()
 
-		require.Zero(t, txTracker.pending, "all events should be ACK-ed after Wait")
+		assert.Zero(t, txTracker.pending, "all events should be ACK-ed after Wait")
 	})
 
-	t.Run("wait-ack", func(t *testing.T) {
+	t.Run("wait_ack", func(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 		cancel()
 
@@ -95,7 +94,7 @@ func TestTxACKHandler(t *testing.T) {
 		handler := NewTxACKHandler()
 
 		txTracker.Add()
-		require.Equal(t, int64(1), txTracker.pending, "Add should increment pending")
+		assert.Equal(t, int64(1), txTracker.pending, "Add should increment pending")
 
 		handler.AddEvent(beat.Event{
 			Private: txTracker,
@@ -103,7 +102,7 @@ func TestTxACKHandler(t *testing.T) {
 
 		txTracker.Wait()
 
-		require.Equal(t, int64(1), txTracker.pending, "the event should still be pending after a cancelled Wait")
+		assert.Equal(t, int64(1), txTracker.pending, "the event should still be pending after a cancelled Wait")
 	})
 
 	// ACKs arrive from the pipeline while the sync is still publishing.

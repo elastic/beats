@@ -31,7 +31,7 @@ type TxTracker struct {
 
 // NewTxTracker will create a new TxTracker using the provided context. It
 // is recommended that the parent context has a way of being cancelled,
-// otherwise a call to TxTracker.Wait may not be interruptable.
+// otherwise a call to TxTracker.Wait may not be interruptible.
 func NewTxTracker(ctx context.Context) *TxTracker {
 	return &TxTracker{ctx: ctx, done: make(chan struct{})}
 }

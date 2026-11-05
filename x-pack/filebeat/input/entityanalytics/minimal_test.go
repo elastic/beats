@@ -262,6 +262,7 @@ func TestMinimalInput_RunSync_WaitsForLastACK(t *testing.T) {
 			Timestamp: time.Now(),
 		}
 	}
+	published := make(chan struct{})
 	prov := &fakeProvider{
 		fullFunc: func(ctx context.Context, s entcollect.Store, pub entcollect.Publisher, log *slog.Logger) error {
 			if err := pub(ctx, user("user-1")); err != nil {
@@ -273,6 +274,7 @@ func TestMinimalInput_RunSync_WaitsForLastACK(t *testing.T) {
 			if err := s.Set("cursor", "page-2"); err != nil {
 				return err
 			}
+			defer close(published)
 			return pub(ctx, user("user-2"))
 		},
 	}
@@ -293,6 +295,12 @@ func TestMinimalInput_RunSync_WaitsForLastACK(t *testing.T) {
 		)
 	}()
 
+	select {
+	case <-published:
+	case <-time.After(5 * time.Second):
+		t.Fatal("sync did not publish its last event")
+	}
+	// Give runSync time to commit, which it must not do yet.
 	select {
 	case err := <-done:
 		t.Fatalf("runSync returned %v before the last event was acknowledged", err)
