@@ -308,6 +308,33 @@ mage release:updateMergify 9.5
 
 Idempotent: skips if a `backport-9.5` rule already exists.
 
+`DRY_RUN` does **not** exercise Buildkite reference clones or a real token push.
+Before merging changes under `dev-tools/mage/release/`, run the ingest
+**release smoke** (below).
+
+## Buildkite ingest release smoke (pre-merge)
+
+Pipeline: [observability-robots-ingest-release-smoke](https://buildkite.com/elastic/observability-robots-ingest-release-smoke)
+on [`elastic/observability-robots`](https://github.com/elastic/observability-robots)
+([tools/ingest-release-smoke](https://github.com/elastic/observability-robots/tree/main/tools/ingest-release-smoke)).
+
+It clones this repo at a candidate SHA, seeds `release-smoke/base` on
+`elastic/observability-robots` (never `main`), runs `mage release:runMajorMinor`
+then `mage release:runPatch` with a Vault-minted `GITHUB_TOKEN`, then deletes
+smoke branches/PRs/issues.
+
+Create a build with:
+
+```text
+SOURCE_REPO=beats
+SOURCE_SHA=<pr-head-sha>
+```
+
+Optional: `SOURCE_OWNER` (default `elastic`), `WORKFLOWS` (default
+`major-minor,patch`).
+
+Details: [ingest-release-smoke README](https://github.com/elastic/observability-robots/blob/main/tools/ingest-release-smoke/README.md).
+
 ## DRY_RUN Mode
 
 Always test with `DRY_RUN=true` before running for real.
