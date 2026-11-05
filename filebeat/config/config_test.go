@@ -28,6 +28,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
 	conf "github.com/elastic/beats/v7/pkg/config"
 )
 
@@ -214,5 +216,62 @@ func TestRegistryFileStorageUnpack(t *testing.T) {
 		assert.Equal(t, "otel_file_storage", cfg.Registry.Backend)
 		require.NotNil(t, cfg.Registry.FileStorage)
 		assert.Equal(t, true, cfg.Registry.FileStorage["create_directory"])
+	})
+}
+
+func TestRegistryMaxLogSizeUnpack(t *testing.T) {
+	tcs := map[string]struct {
+		registry map[string]any
+		want     cfgtype.ByteSize
+		wantErr  bool
+	}{
+		"default": {
+			registry: map[string]any{"backend": "memlog"},
+			want:     cfgtype.ByteSize(512 << 20),
+		},
+		"human readable MiB": {
+			registry: map[string]any{"max_log_size": "256MiB"},
+			want:     cfgtype.ByteSize(256 << 20),
+		},
+		"human readable GiB": {
+			registry: map[string]any{"max_log_size": "1GiB"},
+			want:     cfgtype.ByteSize(1 << 30),
+		},
+		"integer bytes": {
+			registry: map[string]any{"max_log_size": 1048576},
+			want:     cfgtype.ByteSize(1 << 20),
+		},
+		"negative human readable": {
+			registry: map[string]any{"max_log_size": "-1MiB"},
+			wantErr:  true,
+		},
+		"negative integer": {
+			registry: map[string]any{"max_log_size": -1},
+			wantErr:  true,
+		},
+		"invalid value": {
+			registry: map[string]any{"max_log_size": "not-a-size"},
+			wantErr:  true,
+		},
+	}
+
+	for name, tc := range tcs {
+		t.Run(name, func(t *testing.T) {
+			raw, err := conf.NewConfigFrom(map[string]any{"registry": tc.registry})
+			require.NoError(t, err, "building config")
+
+			cfg := DefaultConfig
+			err = raw.Unpack(&cfg)
+			if tc.wantErr {
+				require.Error(t, err, "expecting an unpack error")
+				return
+			}
+			require.NoError(t, err, "unpacking config")
+			assert.Equal(t, tc.want, cfg.Registry.MaxLogSize, "unexpected MaxLogSize")
+		})
+	}
+
+	t.Run("DefaultConfig matches memlog.DefaultMaxLogSize", func(t *testing.T) {
+		assert.Equal(t, memlog.DefaultMaxLogSize, uint64(DefaultConfig.Registry.MaxLogSize), "DefaultConfig.Registry.MaxLogSize") //nolint:gosec // test
 	})
 }
