@@ -282,7 +282,24 @@ func TestConfigValidation(t *testing.T) {
 				"auth":    map[string]any{"token": "x"},
 				"ssl":     map[string]any{"verification_mode": "none"},
 			},
-			wantErr: "'ssl.verification_mode' must not be 'none' unless the address host is loopback",
+			wantErr: "'ssl.verification_mode' must be 'full' or 'strict' unless the address host is loopback",
+		},
+		{
+			name: "remote https without hostname verification",
+			entry: map[string]any{
+				"address": "https://vault:8200",
+				"auth":    map[string]any{"token": "x"},
+				"ssl":     map[string]any{"verification_mode": "certificate"},
+			},
+			wantErr: "'ssl.verification_mode' must be 'full' or 'strict' unless the address host is loopback",
+		},
+		{
+			name: "remote https with strict verification",
+			entry: map[string]any{
+				"address": "https://vault:8200",
+				"auth":    map[string]any{"token": "x"},
+				"ssl":     map[string]any{"verification_mode": "strict"},
+			},
 		},
 		{
 			name: "remote https with disabled ssl settings and no verification",
@@ -291,7 +308,7 @@ func TestConfigValidation(t *testing.T) {
 				"auth":    map[string]any{"token": "x"},
 				"ssl":     map[string]any{"enabled": false, "verification_mode": "none"},
 			},
-			wantErr: "'ssl.verification_mode' must not be 'none' unless the address host is loopback",
+			wantErr: "'ssl.verification_mode' must be 'full' or 'strict' unless the address host is loopback",
 		},
 		{
 			name: "loopback https without verification",
@@ -299,6 +316,14 @@ func TestConfigValidation(t *testing.T) {
 				"address": "https://[::1]:8200",
 				"auth":    map[string]any{"token": "x"},
 				"ssl":     map[string]any{"verification_mode": "none"},
+			},
+		},
+		{
+			name: "loopback https without hostname verification",
+			entry: map[string]any{
+				"address": "https://localhost:8200",
+				"auth":    map[string]any{"token": "x"},
+				"ssl":     map[string]any{"verification_mode": "certificate"},
 			},
 		},
 		{name: "missing address", entry: map[string]any{"auth": map[string]any{"token": "x"}}, wantErr: "'address' is required"},

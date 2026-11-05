@@ -61,8 +61,11 @@ func (c *config) validate() error {
 	if u.Scheme == "http" && !isLoopback {
 		return errors.New("'address' must use https unless its host is loopback")
 	}
-	if !isLoopback && c.SSL != nil && c.SSL.VerificationMode == tlscommon.VerifyNone {
-		return errors.New("'ssl.verification_mode' must not be 'none' unless the address host is loopback")
+	if !isLoopback && c.SSL != nil {
+		switch c.SSL.VerificationMode {
+		case tlscommon.VerifyNone, tlscommon.VerifyCertificate:
+			return errors.New("'ssl.verification_mode' must be 'full' or 'strict' unless the address host is loopback")
+		}
 	}
 	if c.KVMount == "" {
 		return errors.New("'kv_mount' must not be empty")
