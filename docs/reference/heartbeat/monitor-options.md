@@ -159,9 +159,7 @@ Each `secret_stores` entry takes these options:
 :   The name that references use to select this entry, as in `vault://prod@my-app/api#token`. Names must be unique.
 
 `address`
-:   The URL of the Vault server. 
-
-    {applies_to}`stack: ga 9.6+` Non-loopback addresses must use `https`. Plain HTTP is allowed only for `localhost`, IPv4 addresses in `127.0.0.0/8`, and the IPv6 address `::1`.
+:   The URL of the Vault server. Non-loopback addresses must use `https`. Plain HTTP is allowed only for `localhost`, IPv4 addresses in `127.0.0.0/8`, and the IPv6 address `::1`.
 
 `namespace`
 :   (Optional) The Vault Enterprise namespace.
