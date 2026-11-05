@@ -20,6 +20,9 @@
 // that logs all operations to an append only log file.
 // Once the log file is considered full the store executes a checkpoint
 // operation. The checkpoint operation serializes all state to a data file.
+// By default the log is considered full once it reaches the size of the last
+// checkpoint file, bounded below by DefaultMinLogSize and above by
+// Settings.MaxLogSize. Settings.Checkpoint overrides this policy.
 //
 // The memory store in memlog holds all key-value pairs in a hashtable, with
 // value represented by map[string]interface{}. As the store must be 'valid'
