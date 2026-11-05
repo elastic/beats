@@ -9,12 +9,15 @@ import (
 	"errors"
 	"log/slog"
 	"path/filepath"
+	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -270,6 +273,128 @@ func TestMinimalInput_RunCancelation(t *testing.T) {
 	case <-time.After(5 * time.Second):
 		t.Fatal("Run did not return after cancel")
 	}
+}
+
+// TestMinimalInput_RunFullSyncRetry checks that a failed or panicking full
+// sync is retried well before the full sync interval, and that the input
+// is reported degraded until a full sync succeeds.
+func TestMinimalInput_RunFullSyncRetry(t *testing.T) {
+	t.Parallel()
+
+	syncErr := errors.New("provider failure")
+	var calls atomic.Int32
+	succeeded := make(chan struct{})
+	prov := &fakeProvider{
+		fullFunc: func(ctx context.Context, s entcollect.Store, pub entcollect.Publisher, log *slog.Logger) error {
+			switch calls.Add(1) {
+			case 1:
+				panic("bad response")
+			case 2:
+				return syncErr
+			case 3:
+				close(succeeded)
+			}
+			return nil
+		},
+	}
+	mi := &minimalStateInput{
+		provider:         prov,
+		providerName:     "testprov",
+		fullSyncInterval: time.Hour,
+		incrSyncInterval: 20 * time.Millisecond,
+		logger:           logptest.NewTestingLogger(t, "test"),
+		path:             &paths.Path{Data: t.TempDir()},
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	reporter := &statusRecorder{}
+	done := make(chan error, 1)
+	go func() {
+		done <- mi.Run(
+			v2.Context{
+				Logger:      logptest.NewTestingLogger(t, "test"),
+				ID:          "test-retry",
+				Cancelation: v2.GoContextFromCanceler(ctx),
+			}.WithStatusReporter(reporter),
+			&fakeConnector{client: &ackingClient{inner: &fakeClient{}}},
+		)
+	}()
+
+	select {
+	case <-succeeded:
+	case err := <-done:
+		t.Fatalf("Run returned %v before a full sync succeeded", err)
+	case <-time.After(5 * time.Second):
+		t.Fatalf("full sync was not retried: %d calls", calls.Load())
+	}
+	cancel()
+	select {
+	case err := <-done:
+		if err != nil {
+			t.Errorf("Run = %v; want nil", err)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("Run did not return after cancel")
+	}
+
+	var (
+		sawPanic, sawErr bool
+		failed           = -1
+		recovered        = -1
+	)
+	updates := reporter.updates()
+	for i, u := range updates {
+		switch {
+		case u.status == status.Degraded && strings.Contains(u.msg, "sync panic: bad response"):
+			sawPanic = true
+		case u.status == status.Degraded && strings.Contains(u.msg, syncErr.Error()):
+			sawErr = true
+		}
+		if u.status == status.Degraded && failed < 0 {
+			failed = i
+		}
+		if u.status == status.Running && u.msg == "Successful full sync" && recovered < 0 {
+			recovered = i
+		}
+	}
+	if !sawPanic {
+		t.Error("no degraded status for the panicking full sync")
+	}
+	if !sawErr {
+		t.Error("no degraded status for the failed full sync")
+	}
+	if failed < 0 || recovered < failed {
+		t.Fatalf("want degraded then running after a successful full sync; got %v", updates)
+	}
+	for _, u := range updates[failed:recovered] {
+		if u.status != status.Degraded {
+			t.Errorf("status %v %q reported before a full sync succeeded; want degraded", u.status, u.msg)
+		}
+	}
+}
+
+// statusRecorder records status updates.
+type statusRecorder struct {
+	mu   sync.Mutex
+	upds []statusUpdate
+}
+
+type statusUpdate struct {
+	status status.Status
+	msg    string
+}
+
+func (r *statusRecorder) UpdateStatus(s status.Status, msg string) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.upds = append(r.upds, statusUpdate{s, msg})
+}
+
+func (r *statusRecorder) updates() []statusUpdate {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return append([]statusUpdate(nil), r.upds...)
 }
 
 // ackingClient wraps a fakeClient and immediately ACKs each event by

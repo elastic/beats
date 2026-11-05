@@ -19,6 +19,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/features"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
@@ -56,6 +57,7 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 		}
 	}()
 
+	runCtx.UpdateStatus(status.Starting, "")
 	log := runCtx.Logger.With("provider", n.providerName)
 
 	client, err := connector.ConnectWith(beat.ClientConfig{
@@ -79,6 +81,14 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 	defer syncTimer.Stop()
 	defer incrTimer.Stop()
 
+	// The most recent full and incremental sync errors. The input is
+	// degraded while either is set. A successful full sync clears both.
+	var fullErr, incrErr error
+	// retryWait is how long to wait before retrying a failed full sync.
+	// It doubles after each failure, up to the full sync interval.
+	retryWait := n.incrSyncInterval
+
+	runCtx.UpdateStatus(status.Running, "")
 	for {
 		select {
 		case <-runCtx.Cancelation.Done():
@@ -88,15 +98,24 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 			return nil
 
 		case <-syncTimer.C:
-			if err := syncer.runSync(runCtx, n.provider, client, slogger, true); err != nil {
-				if provider.SyncInterrupted(runCtx, err) {
-					log.Infow(provider.SyncInterruptedMsg, "error", err)
-				} else {
-					log.Errorw("Error running full sync", "error", err)
-				}
+			err := runSync(runCtx, syncer, n.provider, client, slogger, true)
+			wait := n.fullSyncInterval
+			switch {
+			case err == nil:
+				fullErr, incrErr = nil, nil
+				retryWait = n.incrSyncInterval
+			case provider.SyncInterrupted(runCtx, err):
+				log.Infow(provider.SyncInterruptedMsg, "error", err)
+				continue // The input is stopping.
+			default:
+				log.Errorw("Error running full sync", "error", err)
+				fullErr = err
+				wait = min(retryWait, n.fullSyncInterval)
+				retryWait = min(2*retryWait, n.fullSyncInterval)
 			}
-			syncTimer.Reset(n.fullSyncInterval)
-			log.Debugf("Next full sync expected at: %v", time.Now().Add(n.fullSyncInterval))
+			updateSyncStatus(runCtx, fullErr, incrErr, "Successful full sync")
+			syncTimer.Reset(wait)
+			log.Debugf("Next full sync expected at: %v", time.Now().Add(wait))
 
 			if !incrTimer.Stop() {
 				select {
@@ -107,16 +126,47 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 			incrTimer.Reset(n.incrSyncInterval)
 
 		case <-incrTimer.C:
-			if err := syncer.runSync(runCtx, n.provider, client, slogger, false); err != nil {
-				if provider.SyncInterrupted(runCtx, err) {
-					log.Infow(provider.SyncInterruptedMsg, "error", err)
-				} else {
-					log.Errorw("Error running incremental sync", "error", err)
-				}
+			err := runSync(runCtx, syncer, n.provider, client, slogger, false)
+			switch {
+			case err == nil:
+				incrErr = nil
+			case provider.SyncInterrupted(runCtx, err):
+				log.Infow(provider.SyncInterruptedMsg, "error", err)
+				continue // The input is stopping.
+			default:
+				log.Errorw("Error running incremental sync", "error", err)
+				incrErr = err
 			}
+			updateSyncStatus(runCtx, fullErr, incrErr, "Successful incremental sync")
 			incrTimer.Reset(n.incrSyncInterval)
 			log.Debugf("Next incremental sync expected at: %v", time.Now().Add(n.incrSyncInterval))
 		}
+	}
+}
+
+// runSync runs a single sync with s. A panic during the sync is logged
+// with its stack and returned as an error, so that one failed sync does
+// not stop the input.
+func runSync(runCtx v2.Context, s syncer, provider entcollect.Provider, client beat.Client, slogger *slog.Logger, full bool) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			runCtx.Logger.Errorf("Minimal input %s sync panic: %+v\n%s", runCtx.ID, r, debug.Stack())
+			err = fmt.Errorf("sync panic: %+v", r)
+		}
+	}()
+	return s.runSync(runCtx, provider, client, slogger, full)
+}
+
+// updateSyncStatus reports the input as degraded if the most recent full
+// or incremental sync failed, and as running with msg otherwise.
+func updateSyncStatus(runCtx v2.Context, fullErr, incrErr error, msg string) {
+	switch {
+	case fullErr != nil:
+		runCtx.UpdateStatus(status.Degraded, fmt.Sprintf("Error running full sync: %v", fullErr))
+	case incrErr != nil:
+		runCtx.UpdateStatus(status.Degraded, fmt.Sprintf("Error running incremental sync: %v", incrErr))
+	default:
+		runCtx.UpdateStatus(status.Running, msg)
 	}
 }
 
