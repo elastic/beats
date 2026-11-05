@@ -56,6 +56,14 @@ func TestTxTracker_Wait(t *testing.T) {
 		assert.True(t, returned(done, time.Second), "Wait did not return after the last ACK")
 	})
 
+	t.Run("wait_twice", func(t *testing.T) {
+		txTracker := NewTxTracker(context.Background())
+		txTracker.Add()
+		txTracker.Ack()
+		assert.True(t, returned(waitAsync(txTracker), time.Second), "first Wait did not return")
+		assert.True(t, returned(waitAsync(txTracker), time.Second), "second Wait did not return")
+	})
+
 	t.Run("cancelled", func(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 		txTracker := NewTxTracker(ctx)

@@ -242,6 +242,14 @@ func TestMinimalInput_RunSync_WaitsForLastACK(t *testing.T) {
 	client := &holdingClient{}
 	bucketName := "entcollect.testprov"
 
+	// Start from the state an earlier sync left behind.
+	err = store.RunTransaction(true, func(tx *kvstore.Transaction) error {
+		return kvstore.NewEntcollectStore(tx, bucketName).Set("cursor", "page-1")
+	})
+	if err != nil {
+		t.Fatalf("seeding cursor: %v", err)
+	}
+
 	user := func(id string) entcollect.Document {
 		return entcollect.Document{
 			ID:        id,
@@ -301,8 +309,12 @@ func TestMinimalInput_RunSync_WaitsForLastACK(t *testing.T) {
 		})
 		return cursor, err
 	}
-	if cursor, err := readCursor(); err == nil {
-		t.Errorf("cursor = %q committed before the last event was acknowledged", cursor)
+	cursor, err := readCursor()
+	if err != nil {
+		t.Fatalf("reading cursor: %v", err)
+	}
+	if cursor != "page-1" {
+		t.Errorf("cursor = %q before the last event was acknowledged; want %q", cursor, "page-1")
 	}
 
 	client.ackAll()
@@ -314,7 +326,7 @@ func TestMinimalInput_RunSync_WaitsForLastACK(t *testing.T) {
 	case <-time.After(5 * time.Second):
 		t.Fatal("runSync did not return after the last event was acknowledged")
 	}
-	cursor, err := readCursor()
+	cursor, err = readCursor()
 	if err != nil {
 		t.Fatalf("reading cursor: %v", err)
 	}
