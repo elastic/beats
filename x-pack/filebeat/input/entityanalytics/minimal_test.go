@@ -226,6 +226,95 @@ func TestMinimalInput_RunSync_ErrorDiscardsBuffer(t *testing.T) {
 	}
 }
 
+// TestMinimalInput_RunSync_WaitsForLastACK checks that state is not
+// committed while an event is unacknowledged, even when every event
+// published earlier in the sync has already been acknowledged.
+func TestMinimalInput_RunSync_WaitsForLastACK(t *testing.T) {
+	t.Parallel()
+
+	log := logptest.NewTestingLogger(t, "test")
+	store, err := kvstore.NewStore(log, filepath.Join(t.TempDir(), "test.db"), 0o600)
+	if err != nil {
+		t.Fatalf("NewStore: %v", err)
+	}
+	defer store.Close()
+
+	client := &holdingClient{}
+	bucketName := "entcollect.testprov"
+
+	user := func(id string) entcollect.Document {
+		return entcollect.Document{
+			ID:        id,
+			Kind:      entcollect.KindUser,
+			Action:    entcollect.ActionDiscovered,
+			Timestamp: time.Now(),
+		}
+	}
+	prov := &fakeProvider{
+		fullFunc: func(ctx context.Context, s entcollect.Store, pub entcollect.Publisher, log *slog.Logger) error {
+			if err := pub(ctx, user("user-1")); err != nil {
+				return err
+			}
+			// The output acknowledges everything published so far
+			// while the sync is still running.
+			client.ackAll()
+			if err := s.Set("cursor", "page-2"); err != nil {
+				return err
+			}
+			return pub(ctx, user("user-2"))
+		},
+	}
+
+	s := &bboltSyncer{store: store, bucketName: bucketName}
+	done := make(chan error, 1)
+	go func() {
+		done <- s.runSync(
+			v2.Context{
+				Logger:      log,
+				ID:          "test-input-late-ack",
+				Cancelation: v2.GoContextFromCanceler(t.Context()),
+			},
+			prov,
+			client,
+			slogLogger(log),
+			true,
+		)
+	}()
+
+	select {
+	case err := <-done:
+		t.Fatalf("runSync returned %v before the last event was acknowledged", err)
+	case <-time.After(100 * time.Millisecond):
+	}
+	readCursor := func() (string, error) {
+		var cursor string
+		err := store.RunTransaction(false, func(tx *kvstore.Transaction) error {
+			return tx.Get([]byte(bucketName), []byte("cursor"), &cursor)
+		})
+		return cursor, err
+	}
+	if cursor, err := readCursor(); err == nil {
+		t.Errorf("cursor = %q committed before the last event was acknowledged", cursor)
+	}
+
+	client.ackAll()
+	select {
+	case err := <-done:
+		if err != nil {
+			t.Fatalf("runSync: %v", err)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("runSync did not return after the last event was acknowledged")
+	}
+	cursor, err := readCursor()
+	if err != nil {
+		t.Fatalf("reading cursor: %v", err)
+	}
+	if cursor != "page-2" {
+		t.Errorf("cursor = %q; want %q", cursor, "page-2")
+	}
+}
+
 func TestMinimalInput_RunCancelation(t *testing.T) {
 	t.Parallel()
 
@@ -292,3 +381,37 @@ func (c *ackingClient) PublishAll(events []beat.Event) {
 }
 
 func (c *ackingClient) Close() error { return nil }
+
+// holdingClient holds published events until ackAll is called, as an
+// output with events in flight does.
+type holdingClient struct {
+	mu      sync.Mutex
+	pending []beat.Event
+}
+
+func (c *holdingClient) Publish(event beat.Event) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.pending = append(c.pending, event)
+}
+
+func (c *holdingClient) PublishAll(events []beat.Event) {
+	for _, e := range events {
+		c.Publish(e)
+	}
+}
+
+func (c *holdingClient) Close() error { return nil }
+
+// ackAll acknowledges every event published since the last call.
+func (c *holdingClient) ackAll() {
+	c.mu.Lock()
+	events := c.pending
+	c.pending = nil
+	c.mu.Unlock()
+	for _, e := range events {
+		if t, ok := e.Private.(*kvstore.TxTracker); ok {
+			t.Ack()
+		}
+	}
+}
