@@ -1353,7 +1353,7 @@ tasks information from cluster
 ## tier_stats [_tier_stats]
 
 ```{applies_to}
-stack: beta 9.7.0
+stack: beta 9.4.0
 ```
 
 Number and duration of the requests of a tier of an Elasticsearch Serverless project, for one HTTP status code. There is one document per tier and HTTP status code with requests during the scrape (and always one for the successful, 2xx, requests), which adds the requests of every node of the tier. The first document of a status code only reports that it was returned.
