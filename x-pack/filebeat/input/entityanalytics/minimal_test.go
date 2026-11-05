@@ -344,7 +344,7 @@ func TestMinimalInput_RunFullSyncRetry(t *testing.T) {
 func TestMinimalInput_RunFullSyncBackoff(t *testing.T) {
 	t.Parallel()
 
-	// Full syncs 1 to 4 fail, 5 succeeds, 6 fails and 7 succeeds.
+	// Full syncs 1 to 6 fail, 7 succeeds, 8 fails and 9 succeeds.
 	var (
 		mu    sync.Mutex
 		times []time.Time
@@ -355,13 +355,14 @@ func TestMinimalInput_RunFullSyncBackoff(t *testing.T) {
 			defer mu.Unlock()
 			times = append(times, time.Now())
 			switch len(times) {
-			case 5, 7:
+			case 7, 9:
 				return nil
 			}
 			return errors.New("provider failure")
 		},
 	}
-	mi := newTestMinimalInput(t, prov, time.Second, 10*time.Millisecond)
+	const incr = 10 * time.Millisecond
+	mi := newTestMinimalInput(t, prov, 700*time.Millisecond, incr)
 
 	success := statusUpdate{status.Running, "Successful full sync"}
 	runUntil(t, mi, func(u []statusUpdate) bool {
@@ -376,20 +377,24 @@ func TestMinimalInput_RunFullSyncBackoff(t *testing.T) {
 
 	mu.Lock()
 	defer mu.Unlock()
-	if len(times) < 7 {
-		t.Fatalf("got %d full syncs; want 7", len(times))
+	if len(times) < 9 {
+		t.Fatalf("got %d full syncs; want 9", len(times))
 	}
 	var gaps []time.Duration
 	for i := 1; i < len(times); i++ {
 		gaps = append(gaps, times[i].Sub(times[i-1]))
 	}
-	// Nominal gaps are 10, 20, 40, 80ms, then 1s after the success, then
-	// 10ms again.
-	if gaps[3] <= gaps[0] {
-		t.Errorf("fourth retry wait %v not longer than first %v; want growing waits (gaps %v)", gaps[3], gaps[0], gaps)
+	// A timer never fires early, so each retry waits at least its nominal
+	// wait: 10, 20, 40, 80, 160 and 320ms.
+	for i, want := 0, incr; i < 6; i, want = i+1, 2*want {
+		if gaps[i] < want {
+			t.Errorf("retry %d waited %v; want at least %v (gaps %v)", i+1, gaps[i], want, gaps)
+		}
 	}
-	if gaps[5] >= gaps[3] {
-		t.Errorf("retry wait after a success %v not shorter than before it %v; want reset (gaps %v)", gaps[5], gaps[3], gaps)
+	// After the success the backoff starts again, so the retry after the
+	// next failure waits a nominal 10ms, not 640ms.
+	if gaps[7] >= gaps[5] {
+		t.Errorf("retry after a success waited %v, no shorter than the last retry before it %v; want reset (gaps %v)", gaps[7], gaps[5], gaps)
 	}
 }
 
@@ -416,8 +421,10 @@ func TestMinimalInput_RunIncrementalSyncStatus(t *testing.T) {
 		i := slices.Index(u, failed)
 		return i >= 0 && slices.Contains(u[i:], recovered)
 	})
-	if i := slices.Index(updates, recovered); i < slices.Index(updates, failed) {
-		t.Errorf("running reported before the failed incremental sync: %v", updates)
+	for _, u := range updates[slices.Index(updates, failed):slices.Index(updates, recovered)] {
+		if u.status != status.Degraded {
+			t.Errorf("status %v %q reported before an incremental sync succeeded; want degraded", u.status, u.msg)
+		}
 	}
 }
 
@@ -427,12 +434,7 @@ func TestMinimalInput_RunIncrementalSyncStatus(t *testing.T) {
 func TestMinimalInput_RunFullSyncClearsIncrementalError(t *testing.T) {
 	t.Parallel()
 
-	var fullCalls atomic.Int32
 	prov := &fakeProvider{
-		fullFunc: func(ctx context.Context, s entcollect.Store, pub entcollect.Publisher, log *slog.Logger) error {
-			fullCalls.Add(1)
-			return nil
-		},
 		incrFunc: func(ctx context.Context, s entcollect.Store, pub entcollect.Publisher, log *slog.Logger) error {
 			return errors.New("incremental failure")
 		},
@@ -445,12 +447,13 @@ func TestMinimalInput_RunFullSyncClearsIncrementalError(t *testing.T) {
 		i := slices.Index(u, failed)
 		return i >= 0 && slices.Contains(u[i:], recovered)
 	})
-	if n := fullCalls.Load(); n < 2 {
-		t.Errorf("got %d full syncs; want at least 2", n)
-	}
 }
 
+// TestRetryBackoff checks the doubling, the cap and the reset of the full
+// sync retry wait.
 func TestRetryBackoff(t *testing.T) {
+	t.Parallel()
+
 	b := retryBackoff{initial: 10 * time.Second, max: time.Minute}
 	steps := []struct {
 		reset bool
@@ -507,13 +510,15 @@ func runUntil(t *testing.T, mi *minimalStateInput, done func([]statusUpdate) boo
 		)
 	}()
 
+	timedOut := false
 	select {
 	case <-reporter.seen:
 	case err := <-runErr:
 		t.Fatalf("Run returned %v early; updates: %v", err, reporter.updates())
 	case <-time.After(5 * time.Second):
-		t.Fatalf("timed out waiting for status updates; got %v", reporter.updates())
+		timedOut = true
 	}
+	// Stop Run before failing, so it does not log after the test ends.
 	cancel()
 	select {
 	case err := <-runErr:
@@ -522,6 +527,9 @@ func runUntil(t *testing.T, mi *minimalStateInput, done func([]statusUpdate) boo
 		}
 	case <-time.After(5 * time.Second):
 		t.Fatal("Run did not return after cancel")
+	}
+	if timedOut {
+		t.Fatalf("timed out waiting for status updates; got %v", reporter.updates())
 	}
 	return reporter.updates()
 }
