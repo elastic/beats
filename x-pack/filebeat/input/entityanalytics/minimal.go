@@ -98,7 +98,7 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 			return nil
 
 		case <-syncTimer.C:
-			err := runSync(runCtx, syncer, n.provider, client, slogger, true)
+			err := recoverSync(runCtx, log, syncer, n.provider, client, slogger, true)
 			wait := n.fullSyncInterval
 			switch {
 			case err == nil:
@@ -123,10 +123,15 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 				default:
 				}
 			}
-			incrTimer.Reset(n.incrSyncInterval)
+			// Don't run an incremental sync just before a full sync retry.
+			incrWait := n.incrSyncInterval
+			if wait <= incrWait {
+				incrWait = wait + n.incrSyncInterval
+			}
+			incrTimer.Reset(incrWait)
 
 		case <-incrTimer.C:
-			err := runSync(runCtx, syncer, n.provider, client, slogger, false)
+			err := recoverSync(runCtx, log, syncer, n.provider, client, slogger, false)
 			switch {
 			case err == nil:
 				incrErr = nil
@@ -144,17 +149,17 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 	}
 }
 
-// runSync runs a single sync with s. A panic during the sync is logged
-// with its stack and returned as an error, so that one failed sync does
-// not stop the input.
-func runSync(runCtx v2.Context, s syncer, provider entcollect.Provider, client beat.Client, slogger *slog.Logger, full bool) (err error) {
+// recoverSync runs a single sync with s. A panic during the sync is
+// logged with its stack and returned as an error, so that one failed
+// sync does not stop the input.
+func recoverSync(runCtx v2.Context, log *logp.Logger, s syncer, p entcollect.Provider, client beat.Client, slogger *slog.Logger, full bool) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			runCtx.Logger.Errorf("Minimal input %s sync panic: %+v\n%s", runCtx.ID, r, debug.Stack())
+			log.Errorf("Minimal input %s sync panic: %+v\n%s", runCtx.ID, r, debug.Stack())
 			err = fmt.Errorf("sync panic: %+v", r)
 		}
 	}()
-	return s.runSync(runCtx, provider, client, slogger, full)
+	return s.runSync(runCtx, p, client, slogger, full)
 }
 
 // updateSyncStatus reports the input as degraded if the most recent full

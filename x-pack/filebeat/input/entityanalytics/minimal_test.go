@@ -9,6 +9,7 @@ import (
 	"errors"
 	"log/slog"
 	"path/filepath"
+	"slices"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -283,7 +284,6 @@ func TestMinimalInput_RunFullSyncRetry(t *testing.T) {
 
 	syncErr := errors.New("provider failure")
 	var calls atomic.Int32
-	succeeded := make(chan struct{})
 	prov := &fakeProvider{
 		fullFunc: func(ctx context.Context, s entcollect.Store, pub entcollect.Publisher, log *slog.Logger) error {
 			switch calls.Add(1) {
@@ -291,8 +291,6 @@ func TestMinimalInput_RunFullSyncRetry(t *testing.T) {
 				panic("bad response")
 			case 2:
 				return syncErr
-			case 3:
-				close(succeeded)
 			}
 			return nil
 		},
@@ -308,7 +306,8 @@ func TestMinimalInput_RunFullSyncRetry(t *testing.T) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	reporter := &statusRecorder{}
+	recovered := statusUpdate{status.Running, "Successful full sync"}
+	reporter := &statusRecorder{want: recovered, seen: make(chan struct{})}
 	done := make(chan error, 1)
 	go func() {
 		done <- mi.Run(
@@ -322,7 +321,7 @@ func TestMinimalInput_RunFullSyncRetry(t *testing.T) {
 	}()
 
 	select {
-	case <-succeeded:
+	case <-reporter.seen:
 	case err := <-done:
 		t.Fatalf("Run returned %v before a full sync succeeded", err)
 	case <-time.After(5 * time.Second):
@@ -341,7 +340,7 @@ func TestMinimalInput_RunFullSyncRetry(t *testing.T) {
 	var (
 		sawPanic, sawErr bool
 		failed           = -1
-		recovered        = -1
+		success          = -1
 	)
 	updates := reporter.updates()
 	for i, u := range updates {
@@ -354,8 +353,8 @@ func TestMinimalInput_RunFullSyncRetry(t *testing.T) {
 		if u.status == status.Degraded && failed < 0 {
 			failed = i
 		}
-		if u.status == status.Running && u.msg == "Successful full sync" && recovered < 0 {
-			recovered = i
+		if u == recovered && success < 0 {
+			success = i
 		}
 	}
 	if !sawPanic {
@@ -364,18 +363,22 @@ func TestMinimalInput_RunFullSyncRetry(t *testing.T) {
 	if !sawErr {
 		t.Error("no degraded status for the failed full sync")
 	}
-	if failed < 0 || recovered < failed {
+	if failed < 0 || success < failed {
 		t.Fatalf("want degraded then running after a successful full sync; got %v", updates)
 	}
-	for _, u := range updates[failed:recovered] {
+	for _, u := range updates[failed:success] {
 		if u.status != status.Degraded {
 			t.Errorf("status %v %q reported before a full sync succeeded; want degraded", u.status, u.msg)
 		}
 	}
 }
 
-// statusRecorder records status updates.
+// statusRecorder records status updates. It closes seen when it first
+// records want.
 type statusRecorder struct {
+	want statusUpdate
+	seen chan struct{}
+
 	mu   sync.Mutex
 	upds []statusUpdate
 }
@@ -388,7 +391,11 @@ type statusUpdate struct {
 func (r *statusRecorder) UpdateStatus(s status.Status, msg string) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	r.upds = append(r.upds, statusUpdate{s, msg})
+	u := statusUpdate{s, msg}
+	if u == r.want && !slices.Contains(r.upds, u) {
+		close(r.seen)
+	}
+	r.upds = append(r.upds, u)
 }
 
 func (r *statusRecorder) updates() []statusUpdate {
