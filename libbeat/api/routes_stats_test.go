@@ -44,7 +44,7 @@ func TestStatsHandlerExtra(t *testing.T) {
 
 	get := func(h http.HandlerFunc) map[string]any {
 		rec := httptest.NewRecorder()
-		h(rec, httptest.NewRequest(http.MethodGet, "/stats", nil))
+		h(rec, httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/stats", nil))
 		var out map[string]any
 		require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &out), "response should be JSON")
 		return out
@@ -54,8 +54,11 @@ func TestStatsHandlerExtra(t *testing.T) {
 	assert.NotContains(t, without, "system", "no extra metrics without WithStatsExtra")
 
 	with := get(makeStatsHandler(reg, extra))
-	beatNS := with["beat"].(map[string]any)
-	assert.Equal(t, "mine", beatNS["info"].(map[string]any)["name"], "metrics already in the registry must not be overwritten")
+	beatNS, ok := with["beat"].(map[string]any)
+	require.True(t, ok, "response should have a beat namespace, got %v", with)
+	info, ok := beatNS["info"].(map[string]any)
+	require.True(t, ok, "beat should have an info namespace, got %v", beatNS)
+	assert.Equal(t, "mine", info["name"], "metrics already in the registry must not be overwritten")
 	assert.Contains(t, beatNS, "memstats", "extra metrics are added")
 	assert.Contains(t, with, "system", "extra namespaces are added")
 	assert.Contains(t, with, "libbeat", "registry metrics are kept")

@@ -766,7 +766,9 @@ func TestReceiverHTTPStatsIncludesSystemMetrics(t *testing.T) {
 			return (&net.Dialer{}).DialContext(ctx, "unix", socket)
 		},
 	}}
-	resp, err := client.Get("http://unix/stats")
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://unix/stats", nil)
+	require.NoError(t, err, "building the /stats request should succeed")
+	resp, err := client.Do(req)
 	require.NoError(t, err, "GET /stats")
 	defer resp.Body.Close()
 	var stats map[string]any
