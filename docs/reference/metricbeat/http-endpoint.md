@@ -188,3 +188,21 @@ curl -XGET 'localhost:5066/stats?pretty'
 
 The actual output may contain more metrics specific to Metricbeat
 
+
+
+## Input metrics
+
+`/inputs/` reports an array of metrics for active metricset instances. For example:
+
+```sh
+curl 'localhost:5066/inputs/?pretty'
+```
+
+Each record includes an `input` type, configured `id`, and `ephemeral_id` for the
+instance. Multiple metricsets or hosts can share a configured ID and are reported
+separately. The `type` query parameter filters by input type, for example
+`/inputs/?type=aws/cloudwatch`. The endpoint includes per-instance event counters,
+periodic fetch counts and errors, fetch timing, and event publication wait. See
+[CloudWatch internal collection metrics](/reference/metricbeat/metricbeat-metricset-aws-cloudwatch.md#internal-collection-metrics)
+for metric definitions and additional CloudWatch metrics. Output acknowledgment
+and Elasticsearch indexing are not implied by the publication counters.
