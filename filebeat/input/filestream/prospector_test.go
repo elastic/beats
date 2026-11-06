@@ -1573,13 +1573,14 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 			maps.Copy(store.table, tc.storeEntries)
 
 			p := &fileProspector{logger: logptest.NewTestingLogger(t, "")}
+			p.buildShortFingerprintSet(store)
 			event := loginp.FSEvent{
 				NewPath: tc.currentPath,
 				Descriptor: loginp.FileDescriptor{
 					Fingerprint: loginp.FingerprintID{Raw: tc.currentFingerprint},
 				},
 			}
-			key, found := p.findGrowingFingerprintMatch(store, event)
+			key, found := p.findGrowingFingerprintMatch(event)
 
 			assert.Equal(t, tc.expectedFound, found, "found mismatch")
 			if tc.expectedFound {
@@ -1642,7 +1643,7 @@ func TestHandleGrowingFingerprintLookup_KeyExistsFastPath(t *testing.T) {
 			"prefix entry must remain since migration did not run")
 	})
 
-	t.Run("slow path: key does not exist falls through to scan", func(t *testing.T) {
+	t.Run("slow path: key does not exist falls through to prefix match", func(t *testing.T) {
 		// The old key's tail is the bounded hash of the raw material — the
 		// value hash-based prefix matching compares against.
 		oldKey := "filestream::my-input::fingerprint::" + loginp.HashRawFingerprint("aabb")
@@ -1657,14 +1658,13 @@ func TestHandleGrowingFingerprintLookup_KeyExistsFastPath(t *testing.T) {
 			logger:     logptest.NewTestingLogger(t, ""),
 			identifier: identifier,
 		}
+		p.buildShortFingerprintSet(store)
 
 		hg := newTestHarvesterGroup()
 		p.handleGrowingFingerprintLookup(logptest.NewTestingLogger(t, ""), event, src, store, hg)
 
 		// Migration succeeds via the short fingerprint set prefix match: the
-		// registry is scanned, the old key is migrated to the new identity, and
-		// the old key is removed.
-		assert.Positive(t, store.IterateOnPrefixCalled.Load(), "slow path must scan the registry")
+		// old key is migrated to the new identity and the old key is removed.
 		assert.Positive(t, store.UpdateKeyCalled, "slow path must migrate the matched entry")
 		assert.False(t, store.has(oldKey), "old key must be removed after migration")
 		// migrateGrowingFingerprint keeps the old key's plugin/input prefix and
@@ -1919,14 +1919,26 @@ func TestOnFSEvent_HarvesterStateTable(t *testing.T) {
 
 func TestBuildShortFingerprintSet(t *testing.T) {
 	growingKey := "filestream::input::fingerprint::" + loginp.HashRawFingerprint("aabb")
+	growingMapKey := "filestream::input::fingerprint::" + loginp.HashRawFingerprint("ccdd")
 
 	store := newMockMetadataUpdater()
 	// Growing fingerprint entry (non-zero FingerprintLen) — should be included
 	store.table[growingKey] = growingMeta("/a.log", "aabb")
+	// Growing fingerprint entry loaded from JSON registry (map[string]any with fingerprint_len) — should be included
+	store.table[growingMapKey] = map[string]any{
+		"source":          "/a-map.log",
+		"identifier_name": fingerprintName,
+		"fingerprint_len": float64(2),
+	}
 	// Final SHA-256 entry (zero FingerprintLen) — should be excluded
 	store.table["filestream::input::fingerprint::"+strings.Repeat("ab", 32)] = fileMeta{
 		Source:         "/b.log",
 		IdentifierName: fingerprintName,
+	}
+	// Final SHA-256 entry loaded from JSON registry (map[string]any without fingerprint_len) — should be excluded
+	store.table["filestream::input::fingerprint::"+strings.Repeat("cd", 32)] = map[string]any{
+		"source":          "/b-map.log",
+		"identifier_name": fingerprintName,
 	}
 	// Entry from a registry written before the feature existed
 	// (no FingerprintLen field present → zero on read → treated as final),
@@ -1956,10 +1968,14 @@ func TestBuildShortFingerprintSet(t *testing.T) {
 	p := &fileProspector{logger: logptest.NewTestingLogger(t, "")}
 	p.buildShortFingerprintSet(store)
 
-	require.Len(t, p.shortFingerprints.entries, 1)
+	require.Len(t, p.shortFingerprints.entries, 2, "expected both struct and map growing entries")
 	got, ok := p.shortFingerprints.entries[growingKey]
 	require.True(t, ok, "expected the growing entry to be in the set")
 	assert.Equal(t, rawEntry("aabb", "/a.log"), got, "growing entry mismatch")
+
+	gotMap, ok := p.shortFingerprints.entries[growingMapKey]
+	require.True(t, ok, "expected the map-backed growing entry to be in the set")
+	assert.Equal(t, rawEntry("ccdd", "/a-map.log"), gotMap, "map-backed growing entry mismatch")
 }
 
 func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
