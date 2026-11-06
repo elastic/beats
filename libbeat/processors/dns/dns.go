@@ -69,7 +69,7 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 		return nil, err
 	}
 
-	cache, err := newLookupCache(metrics.GetOrCreateRegistry("cache"), c.cacheConfig, resolver)
+	cache, err := newLookupCache(metrics.GetOrCreateRegistry("cache"), c.CacheConfig, resolver)
 	if err != nil {
 		return nil, err
 	}
