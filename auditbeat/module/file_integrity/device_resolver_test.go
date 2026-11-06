@@ -24,7 +24,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // Benchmark the old linear search approach vs new trie-based approach

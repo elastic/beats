@@ -31,7 +31,7 @@ import (
 
 	"go.yaml.in/yaml/v2"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // Checkpoint persists event log state information to disk.

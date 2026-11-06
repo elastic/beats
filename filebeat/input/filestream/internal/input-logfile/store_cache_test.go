@@ -31,7 +31,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/v2/statemanager"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 func TestStoreCache_AcquireHit(t *testing.T) {

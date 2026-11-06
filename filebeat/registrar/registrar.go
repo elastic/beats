@@ -30,8 +30,8 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/v2/statemanager"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 // ErrStopped is returned by Start when the registrar was already stopped, so
