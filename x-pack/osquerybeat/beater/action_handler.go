@@ -34,7 +34,10 @@ type scheduledResponsePublisher interface {
 }
 
 type queryProfilePublisher interface {
-	PublishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any)
+	// PublishQueryProfile publishes a live query's profile and reports
+	// whether it was handed to the output: false when no profile stream is
+	// configured or ctx cancelled the publish.
+	PublishQueryProfile(ctx context.Context, index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) bool
 }
 
 type scheduledProfilePublisher interface {
@@ -53,8 +56,9 @@ type scheduledQueryPublisher interface {
 
 type actionQueryPublisher interface {
 	// PublishEach publishes hits one by one and returns how many were handed
-	// to the output before stop returned true. stop is called before each hit.
-	PublishEach(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any, stop func() bool) int
+	// to the output before stop returned true or ctx ended. stop is called
+	// before each hit.
+	PublishEach(ctx context.Context, index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any, stop func() bool) int
 	queryProfilePublisher
 }
 

@@ -1,0 +1,605 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
+package beater
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"path/filepath"
+	"strings"
+	"sync"
+	"sync/atomic"
+	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pub"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
+)
+
+// These tests use real time: the pipeline's client reaper waits on a channel
+// created outside any synctest bubble, so synctest.Wait would never return.
+
+// stuckQueue is a queue of the stuck pipeline tests.
+type stuckQueue struct {
+	name string
+	cfg  map[string]any
+	// payload is the size of a payload added to each row and filler, so
+	// that a queue limited by bytes fills up.
+	payload int
+}
+
+// stuckQueues are the queues of the stuck pipeline tests. The memory queues
+// hold 32 events. The disk queue limits bytes and holds at least 10MB, so its
+// rows carry a payload that fills it after about 40 rows.
+var stuckQueues = []stuckQueue{
+	{name: "slabqueue", cfg: map[string]any{"queue.slab.events": 32}},
+	{name: "memqueue", cfg: map[string]any{"queue.mem.events": 32, "queue.mem.flush.min_events": 1, "queue.mem.flush.timeout": time.Millisecond}},
+	{name: "diskqueue", cfg: map[string]any{"queue.disk.max_size": "10MiB"}, payload: 256 * 1024},
+}
+
+// stuckRows is more rows than a stuck queue holds, so publishing them blocks.
+const stuckRows = 64
+
+// releaseBound is how soon a cancelled publish must release its worker. It
+// is generous because it is wall-clock time under -race and load; without
+// cancellation the worker is never released.
+const releaseBound = time.Second
+
+// stillBlocked is how long a publish that must not be cancelled is watched.
+const stillBlocked = 100 * time.Millisecond
+
+// stuckOutput holds every batch until it is unblocked, then counts its
+// events, except filler events, as delivered.
+type stuckOutput struct {
+	release   chan struct{}
+	once      sync.Once
+	delivered atomic.Int64
+}
+
+func (o *stuckOutput) Publish(ctx context.Context, batch publisher.Batch) error {
+	select {
+	case <-o.release:
+		for _, e := range batch.Events() {
+			if _, filler := e.Content.Fields["filler"]; !filler {
+				o.delivered.Add(1)
+			}
+		}
+	case <-ctx.Done():
+	}
+	batch.ACK()
+	return nil
+}
+
+func (o *stuckOutput) Close() error { o.unblock(); return nil }
+func (*stuckOutput) String() string { return "stuck output" }
+func (o *stuckOutput) unblock()     { o.once.Do(func() { close(o.release) }) }
+
+// stuckPipeline is a real pipeline whose output holds every batch until it
+// is unblocked. It counts the publishes its clients start and finish.
+type stuckPipeline struct {
+	*pipeline.Pipeline
+	output *stuckOutput
+	// plain makes its clients implement only beat.Client, as a client
+	// wrapper that does not forward PublishContext does.
+	plain             bool
+	entered, returned atomic.Int64
+	// payload is added to each row and filler (see stuckQueue).
+	payload string
+	// dataDir holds the disk queue, if the pipeline has one.
+	dataDir   string
+	closeOnce sync.Once
+}
+
+func newStuckPipeline(t *testing.T, q stuckQueue) *stuckPipeline {
+	t.Helper()
+	log := logp.NewNopLogger()
+	var cfg pipeline.Config
+	require.NoError(t, conf.MustNewConfigFrom(q.cfg).Unpack(&cfg), "configure the queue")
+	output := &stuckOutput{release: make(chan struct{})}
+	dir := t.TempDir()
+	info := beat.Info{Name: "osquerybeat", Logger: log, Paths: &paths.Path{Home: dir, Config: dir, Data: dir, Logs: dir}}
+	pipe, err := pipeline.LoadWithSettings(info, pipeline.Monitors{}, cfg,
+		func(outputs.Observer) (string, outputs.Group, error) {
+			return "stuck", outputs.Group{BatchSize: 1, Clients: []outputs.Client{output}}, nil
+		},
+		pipeline.Settings{WaitCloseMode: pipeline.WaitOnPipelineCloseThenForce})
+	require.NoError(t, err, "create the real publisher pipeline")
+	p := &stuckPipeline{Pipeline: pipe, output: output, payload: strings.Repeat("x", q.payload), dataDir: dir}
+	// Cleanups run in reverse order, so this closes the disk queue's segment
+	// files before the TempDir cleanup removes them, also when a test stops
+	// early. Windows cannot remove a file that is still open.
+	t.Cleanup(func() { p.close(t) })
+	return p
+}
+
+// fill fills the queue with filler events, so that the next event blocks.
+func (p *stuckPipeline) fill(t *testing.T) beat.Client {
+	t.Helper()
+	if len(p.payload) == 0 {
+		// A memory queue holds 32 events.
+		filler, err := p.Pipeline.ConnectWith(beat.ClientConfig{})
+		require.NoError(t, err, "connect the filler client")
+		for range 32 {
+			filler.Publish(beat.Event{Timestamp: time.Now(), Fields: mapstr.M{"filler": true}})
+		}
+		return filler
+	}
+	// The disk queue holds bytes. Publish fillers of decreasing size until it
+	// refuses one of each: the last, without payload, leaves less room than
+	// any event a test publishes. The memqueue's TryPublish waits on a full
+	// queue instead of refusing the event, so this works only for the disk
+	// queue.
+	var refused atomic.Int64
+	filler, err := p.Pipeline.ConnectWith(beat.ClientConfig{PublishMode: beat.DropIfFull, ClientListener: &refusalListener{refused: &refused}})
+	require.NoError(t, err, "connect the filler client")
+	for _, fields := range []mapstr.M{{"filler": true, "payload": p.payload}, {"filler": true, "payload": p.payload[:4096]}, {"filler": true}} {
+		before := refused.Load()
+		for i := 0; refused.Load() == before; i++ {
+			// The queue also refuses events while write_ahead (2048) frames
+			// wait to be written. Each size fills at most the room the
+			// previous size left, far fewer frames, so a refusal means the
+			// queue is full.
+			require.Less(t, i, 1000, "the queue must fill up")
+			filler.Publish(beat.Event{Timestamp: time.Now(), Fields: fields.Clone()})
+		}
+	}
+	p.checkQueue(t)
+	return filler
+}
+
+// checkQueue checks that a disk queue holds events on disk, so a disk
+// subtest really publishes through the disk queue.
+func (p *stuckPipeline) checkQueue(t *testing.T) {
+	t.Helper()
+	if len(p.payload) == 0 {
+		return
+	}
+	// The disk queue writes segments from its own goroutine, so they can
+	// appear after the queue has started refusing events.
+	pattern := filepath.Join(p.dataDir, "diskqueue", "*.seg")
+	require.Eventually(t, func() bool {
+		segments, err := filepath.Glob(pattern)
+		return err == nil && len(segments) > 0
+	}, 5*time.Second, 10*time.Millisecond, "the disk queue must hold the queued events in segment files under %s", p.dataDir)
+}
+
+// refusalListener counts the events a DropIfFull client drops.
+type refusalListener struct{ refused *atomic.Int64 }
+
+func (*refusalListener) Closing()                      {}
+func (*refusalListener) Closed()                       {}
+func (*refusalListener) NewEvent()                     {}
+func (*refusalListener) Filtered()                     {}
+func (*refusalListener) Published()                    {}
+func (l *refusalListener) DroppedOnPublish(beat.Event) { l.refused.Add(1) }
+
+func (p *stuckPipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
+	c, err := p.Pipeline.ConnectWith(cfg)
+	if err != nil {
+		return nil, err
+	}
+	counted := &countedClient{Client: c, owner: p}
+	if p.plain {
+		return counted, nil
+	}
+	return &countedContextClient{counted}, nil
+}
+
+// waitBlocked waits until a publish has been in flight for 50ms.
+func (p *stuckPipeline) waitBlocked(t *testing.T) {
+	t.Helper()
+	require.Eventually(t, func() bool {
+		r := p.returned.Load()
+		if p.entered.Load() == r {
+			return false
+		}
+		time.Sleep(50 * time.Millisecond)
+		return p.returned.Load() == r
+	}, 5*time.Second, time.Millisecond, "a publish must block on the full queue")
+	p.checkQueue(t)
+}
+
+// idle reports whether no publish is in flight.
+func (p *stuckPipeline) idle() bool {
+	return p.entered.Load() == p.returned.Load()
+}
+
+// waitDelivered unblocks the output and waits until it has delivered want
+// events. Closing the pipeline does not wait for the events in a disk queue,
+// which keeps them for the next run, so a test that counts deliveries waits
+// first.
+func (p *stuckPipeline) waitDelivered(t *testing.T, want int64) {
+	t.Helper()
+	p.output.unblock()
+	assert.Eventually(t, func() bool { return p.output.delivered.Load() >= want }, 5*time.Second, time.Millisecond,
+		"the output must deliver the %d queued events once it recovers", want)
+}
+
+// close unblocks the output and closes the pipeline, which waits for the
+// queued events of a memory queue to be delivered. Only the first call closes
+// it.
+func (p *stuckPipeline) close(t *testing.T) {
+	p.closeOnce.Do(func() {
+		p.output.unblock()
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		assert.NoError(t, p.Disconnect(ctx), "close the test pipeline")
+	})
+}
+
+type countedClient struct {
+	beat.Client
+	owner *stuckPipeline
+}
+
+func (c *countedClient) Publish(e beat.Event) {
+	c.owner.entered.Add(1)
+	defer c.owner.returned.Add(1)
+	c.Client.Publish(e)
+}
+
+type countedContextClient struct{ *countedClient }
+
+func (c *countedContextClient) PublishContext(ctx context.Context, e beat.Event) error {
+	c.owner.entered.Add(1)
+	defer c.owner.returned.Add(1)
+	cp, ok := c.Client.(beat.ContextPublisher)
+	if !ok {
+		return errors.New("the pipeline client does not implement beat.ContextPublisher")
+	}
+	return cp.PublishContext(ctx, e)
+}
+
+// stuckScheduledDispatcher returns a dispatcher publishing to pipe under a
+// policy with result and action response streams in the default namespace,
+// and a scheduled result of stuckRows rows, each carrying payload, plus its
+// response.
+func stuckScheduledDispatcher(t *testing.T, pipe beat.Pipeline, payload string) (*scheduledResultDispatcher, *ConfigPlugin, QueryResult) {
+	t.Helper()
+	log := logp.NewNopLogger()
+	bt := &osquerybeat{log: log}
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents,
+		func(ctx context.Context, allowed func() bool, dropped, rejected func(), cut func(int)) osquerybeatPublisher {
+			return pub.NewScheduled(ctx, &beat.Beat{Publisher: pipe}, log, allowed, dropped, rejected, cut)
+		}, bt.handleScheduledQueryResult)
+	inputs := stuckScheduledInputs("default")
+	require.NoError(t, d.configure(inputs, config.ScheduledPublishingConfig{MaxEvents: config.DefaultScheduledMaxEvents}), "configure scheduled clients")
+	plugin := NewConfigPlugin(log)
+	require.NoError(t, plugin.Set(inputs), "stage the native policy")
+	_, err := plugin.GenerateConfig(t.Context())
+	require.NoError(t, err, "apply the policy")
+	rows := make([]map[string]string, stuckRows)
+	for i := range rows {
+		rows[i] = map[string]string{"value": "row" + payload}
+	}
+	return d, plugin, QueryResult{Name: "scheduled", Action: "snapshot", Hits: rows}
+}
+
+func stuckScheduledInputs(namespace string) []config.InputConfig {
+	return append(outageInputs(namespace), config.InputConfig{
+		Datastream: config.DatastreamConfig{Dataset: config.DefaultActionResponsesDataset, Namespace: namespace},
+	})
+}
+
+func TestScheduledWorkerCancelsBlockedPublishOnShutdown(t *testing.T) {
+	for _, q := range stuckQueues {
+		t.Run(q.name, func(t *testing.T) {
+			pipe := newStuckPipeline(t, q)
+			d, plugin, result := stuckScheduledDispatcher(t, pipe, pipe.payload)
+			d.enqueue(t.Context(), outageQueryClient{}, plugin, result, nil)
+			pipe.waitBlocked(t)
+
+			d.stop()
+			select {
+			case <-d.done:
+			case <-time.After(releaseBound):
+				t.Errorf("the worker blocked on the full queue did not return within %v of shutdown", releaseBound)
+			}
+
+			pipe.output.unblock()
+			<-d.done
+			pipe.waitDelivered(t, stuckRows+1-int64(d.metrics.droppedRows[dropShutdown].Get())) //nolint:gosec // G115: at most stuckRows+1 rows are dropped
+			pipe.close(t)
+			assert.Equal(t, uint64(1), d.metrics.dropped[dropShutdown].Get(), "count the cut item once")
+			assert.Zero(t, d.metrics.droppedRows[dropStale].Get(), "a shutdown is not a stale drop")
+			assert.Positive(t, pipe.output.delivered.Load(), "rows queued before the shutdown are delivered")
+			assert.EqualValues(t, stuckRows+1-pipe.output.delivered.Load(), d.metrics.droppedRows[dropShutdown].Get(),
+				"each row and the response is either delivered or counted once as a shutdown drop, never both")
+		})
+	}
+}
+
+func TestScheduledPolicyChangeCancelsBlockedPublish(t *testing.T) {
+	for _, q := range stuckQueues {
+		t.Run(q.name, func(t *testing.T) {
+			pipe := newStuckPipeline(t, q)
+			d, plugin, result := stuckScheduledDispatcher(t, pipe, pipe.payload)
+			d.enqueue(t.Context(), outageQueryClient{}, plugin, result, nil)
+			pipe.waitBlocked(t)
+
+			// The query moves to another namespace, so the new policy no
+			// longer routes the item in flight.
+			require.NoError(t, d.configure(stuckScheduledInputs("other"), config.ScheduledPublishingConfig{MaxEvents: config.DefaultScheduledMaxEvents}), "change the policy")
+			// The worker counts the cut item when it finishes the item.
+			assert.Eventually(t, func() bool { return d.metrics.dropped[dropStale].Get() == 1 }, releaseBound, time.Millisecond,
+				"a policy that no longer routes the item must release the worker blocked on the full queue")
+
+			d.stop()
+			pipe.output.unblock()
+			<-d.done
+			pipe.waitDelivered(t, stuckRows+1-int64(d.metrics.droppedRows[dropStale].Get())) //nolint:gosec // G115: at most stuckRows+1 rows are dropped
+			pipe.close(t)
+			assert.Equal(t, uint64(1), d.metrics.dropped[dropStale].Get(), "count the cut item once")
+			assert.Zero(t, d.metrics.droppedRows[dropShutdown].Get(), "a policy change is not a shutdown")
+			assert.EqualValues(t, stuckRows+1-pipe.output.delivered.Load(), d.metrics.droppedRows[dropStale].Get(),
+				"each row and the response is either delivered or counted once as a stale drop, never both")
+		})
+	}
+}
+
+func TestScheduledPolicyChangeKeepsRoutedPublish(t *testing.T) {
+	pipe := newStuckPipeline(t, stuckQueues[0])
+	d, plugin, result := stuckScheduledDispatcher(t, pipe, pipe.payload)
+	d.enqueue(t.Context(), outageQueryClient{}, plugin, result, nil)
+	pipe.waitBlocked(t)
+
+	require.NoError(t, d.configure(stuckScheduledInputs("default"), config.ScheduledPublishingConfig{MaxEvents: config.DefaultScheduledMaxEvents}), "change the policy")
+	time.Sleep(stillBlocked)
+	assert.False(t, pipe.idle(), "a policy that still routes the item must not cancel its publish")
+
+	pipe.output.unblock()
+	assert.Eventually(t, func() bool { return pipe.output.delivered.Load() == stuckRows+1 }, 5*time.Second, time.Millisecond,
+		"every row and the response must be delivered once the output recovers")
+	assert.Zero(t, d.metrics.droppedRows[dropStale].Get(), "no rows may be cut")
+
+	d.stop()
+	pipe.close(t)
+	<-d.done
+}
+
+// TestScheduledWorkerWithoutContextPublisherBlocks checks the fallback: with
+// clients that do not implement beat.ContextPublisher, shutdown leaves the
+// worker in Publish until the output frees room.
+func TestScheduledWorkerWithoutContextPublisherBlocks(t *testing.T) {
+	pipe := newStuckPipeline(t, stuckQueues[0])
+	pipe.plain = true
+	d, plugin, result := stuckScheduledDispatcher(t, pipe, pipe.payload)
+	d.enqueue(t.Context(), outageQueryClient{}, plugin, result, nil)
+	pipe.waitBlocked(t)
+
+	d.stop()
+	select {
+	case <-d.done:
+		t.Error("a blocking Publish cannot be cancelled, so the worker must still wait")
+	case <-time.After(stillBlocked):
+	}
+
+	pipe.close(t)
+	select {
+	case <-d.done:
+	case <-time.After(5 * time.Second):
+		t.Error("the worker must return once its Publish returns")
+	}
+}
+
+// rejectingPipeline connects clients that implement beat.ContextPublisher and
+// whose queue rejects the reject-th event published through any of them, as
+// the disk queue rejects an event it cannot serialize. They take every other
+// event at once.
+type rejectingPipeline struct {
+	reject int
+
+	mu        sync.Mutex
+	calls     int
+	published int
+}
+
+func (p *rejectingPipeline) Connect() (beat.Client, error) {
+	return p.ConnectWith(beat.ClientConfig{})
+}
+
+func (p *rejectingPipeline) ConnectWith(beat.ClientConfig) (beat.Client, error) {
+	return &rejectingClient{owner: p}, nil
+}
+
+func (*rejectingPipeline) Disconnect(context.Context) error { return nil }
+
+func (p *rejectingPipeline) publishedEvents() int {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	return p.published
+}
+
+type rejectingClient struct{ owner *rejectingPipeline }
+
+func (c *rejectingClient) Publish(e beat.Event) { _ = c.PublishContext(context.Background(), e) }
+
+func (c *rejectingClient) PublishAll(events []beat.Event) {
+	for _, e := range events {
+		c.Publish(e)
+	}
+}
+
+func (*rejectingClient) Close() error { return nil }
+
+func (c *rejectingClient) PublishContext(context.Context, beat.Event) error {
+	p := c.owner
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.calls++
+	if p.calls == p.reject {
+		return fmt.Errorf("%w: cannot serialize the event", beat.ErrRejected)
+	}
+	p.published++
+	return nil
+}
+
+func TestScheduledRejectedRowCountsRejected(t *testing.T) {
+	pipe := &rejectingPipeline{reject: 3}
+	d, plugin, result := stuckScheduledDispatcher(t, pipe, "")
+	d.enqueue(t.Context(), outageQueryClient{}, plugin, result, nil)
+
+	// Every row but the rejected one, and the response.
+	assert.Eventually(t, func() bool { return pipe.publishedEvents() == stuckRows }, 5*time.Second, time.Millisecond,
+		"every row the queue does not reject and the response must be published")
+	d.stop()
+	<-d.done
+	assert.Equal(t, uint64(1), d.metrics.droppedRows[dropRejected].Get(), "count the rejected row once as rejected")
+	assert.Zero(t, d.metrics.droppedRows[dropShutdown].Get(), "a rejected row is not a shutdown drop")
+	assert.Zero(t, d.metrics.droppedRows[dropStale].Get(), "a rejected row is not a stale drop")
+}
+
+func TestLiveRejectedRowCountsRejected(t *testing.T) {
+	tests := []struct {
+		name      string
+		reject    int // the profile is published first, then the rows
+		wantCount int
+	}{
+		{name: "profile", reject: 1, wantCount: 3},
+		{name: "row", reject: 2, wantCount: 2},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			log := logp.NewNopLogger()
+			pipe := &rejectingPipeline{reject: tc.reject}
+			d := newLiveResultDispatcher(monitoring.NewRegistry(), log, 5*time.Second)
+			c := &liveClients{newPublisher: func() liveQueryPublisher {
+				return pub.NewLive(d.ctx, &beat.Beat{Publisher: pipe}, log, d.rejected, d.cut)
+			}}
+			require.NoError(t, c.Configure([]config.InputConfig{
+				{Datastream: config.DatastreamConfig{Dataset: config.DefaultDataset}},
+				{Datastream: config.DatastreamConfig{Dataset: config.DefaultQueryProfileDataset}},
+			}), "configure live result and profile clients")
+			job := liveJob{actionID: "a1", hits: []map[string]any{{"row": 1}, {"row": 2}, {"row": 3}}, profile: map[string]any{}}
+
+			n, err := d.publishResults(t.Context(), c, job)
+
+			assert.NoError(t, err, "a rejected event is not an action error")
+			assert.Equal(t, tc.wantCount, n, "the action's count must leave out a rejected row")
+			assert.Equal(t, uint64(1), d.metrics.droppedRows[dropRejected].Get(), "count the rejected event once as rejected")
+			for _, reason := range []string{dropTimeout, dropStale, dropShutdown} {
+				assert.Zero(t, d.metrics.droppedRows[reason].Get(), "a rejected event must not be counted as %s", reason)
+			}
+
+			c.Close()
+			d.stop()
+		})
+	}
+}
+
+func TestLiveStopCancelsBlockedResponse(t *testing.T) {
+	for _, q := range stuckQueues {
+		t.Run(q.name, func(t *testing.T) {
+			log := logp.NewNopLogger()
+			pipe := newStuckPipeline(t, q)
+			// Fill the queue, so the response is the publish that blocks.
+			filler := pipe.fill(t)
+			d := newLiveResultDispatcher(monitoring.NewRegistry(), log, time.Minute)
+			c := &liveClients{newPublisher: func() liveQueryPublisher {
+				return pub.NewLive(d.ctx, &beat.Beat{Publisher: pipe}, log, d.rejected, d.cut)
+			}}
+			require.NoError(t, c.Configure([]config.InputConfig{
+				{Datastream: config.DatastreamConfig{Dataset: config.DefaultDataset}},
+				{Datastream: config.DatastreamConfig{Dataset: config.DefaultActionResponsesDataset}},
+			}), "configure live result and action response clients")
+
+			d.enqueueResponse(c, map[string]any{"id": "a1"}, map[string]any{})
+			pipe.waitBlocked(t)
+			d.stop()
+			assert.Eventually(t, pipe.idle, releaseBound, time.Millisecond,
+				"stopping must release the worker blocked on the full queue")
+			// The worker counts the response after the publish returns.
+			assert.Eventually(t, func() bool { return d.metrics.dropped[dropShutdown].Get() == 1 }, releaseBound, time.Millisecond,
+				"the worker must count the cancelled response")
+
+			c.Close()
+			assert.NoError(t, filler.Close(), "close the filler client")
+			pipe.close(t)
+			assert.Zero(t, pipe.output.delivered.Load(), "the cancelled response is never delivered")
+			assert.Equal(t, uint64(1), d.metrics.dropped[dropShutdown].Get(), "count the cancelled response once")
+			assert.Equal(t, uint64(1), d.metrics.droppedRows[dropShutdown].Get(), "count the cancelled response as one row")
+			assert.Zero(t, d.metrics.droppedRows[dropStale].Get(), "a cancelled response is not a stale drop")
+		})
+	}
+}
+
+func TestLiveTimeoutCancelsBlockedPublish(t *testing.T) {
+	for _, q := range stuckQueues {
+		t.Run(q.name, func(t *testing.T) {
+			log := logp.NewNopLogger()
+			pipe := newStuckPipeline(t, q)
+			d := newLiveResultDispatcher(monitoring.NewRegistry(), log, 200*time.Millisecond)
+			c := &liveClients{newPublisher: func() liveQueryPublisher {
+				return pub.NewLive(d.ctx, &beat.Beat{Publisher: pipe}, log, d.rejected, d.cut)
+			}}
+			require.NoError(t, c.Configure([]config.InputConfig{{Datastream: config.DatastreamConfig{Dataset: config.DefaultDataset}}}), "configure live clients")
+			hits := make([]map[string]any, stuckRows)
+			for i := range hits {
+				hits[i] = map[string]any{"row": i, "payload": pipe.payload}
+			}
+
+			n, err := d.publishResults(t.Context(), c, liveJob{actionID: "a1", hits: hits})
+			assert.ErrorIs(t, err, errLivePublishTimeout, "the stuck output must time out the action")
+			assert.Positive(t, n, "rows queued before the queue filled are handed over")
+			assert.EqualValues(t, stuckRows-n, d.metrics.droppedRows[dropTimeout].Get(), "count the rows not handed to the output")
+			assert.Eventually(t, pipe.idle, releaseBound, time.Millisecond,
+				"the timeout must release the worker blocked on the full queue")
+
+			c.Close()
+			d.stop()
+			pipe.waitDelivered(t, int64(n))
+			pipe.close(t)
+			assert.Equal(t, int64(n), pipe.output.delivered.Load(), "only the rows handed over before the timeout are delivered, none late")
+		})
+	}
+}
+
+func TestLiveTimeoutCountsCancelledProfile(t *testing.T) {
+	for _, q := range stuckQueues {
+		t.Run(q.name, func(t *testing.T) {
+			log := logp.NewNopLogger()
+			pipe := newStuckPipeline(t, q)
+			// Fill the queue, so the profile, published before the rows,
+			// is the publish that blocks.
+			filler := pipe.fill(t)
+			d := newLiveResultDispatcher(monitoring.NewRegistry(), log, 200*time.Millisecond)
+			c := &liveClients{newPublisher: func() liveQueryPublisher {
+				return pub.NewLive(d.ctx, &beat.Beat{Publisher: pipe}, log, d.rejected, d.cut)
+			}}
+			require.NoError(t, c.Configure([]config.InputConfig{
+				{Datastream: config.DatastreamConfig{Dataset: config.DefaultDataset}},
+				{Datastream: config.DatastreamConfig{Dataset: config.DefaultQueryProfileDataset}},
+			}), "configure live result and profile clients")
+			job := liveJob{actionID: "a1", hits: []map[string]any{{"row": 1}, {"row": 2}}, profile: map[string]any{}}
+
+			n, err := d.publishResults(t.Context(), c, job)
+			assert.ErrorIs(t, err, errLivePublishTimeout, "the stuck output must time out the action")
+			assert.Zero(t, n, "no row was handed over")
+			assert.Equal(t, uint64(1), d.metrics.dropped[dropTimeout].Get(), "count the timed-out action")
+			assert.Equal(t, uint64(3), d.metrics.droppedRows[dropTimeout].Get(), "count the cancelled profile and both rows")
+			assert.Eventually(t, pipe.idle, releaseBound, time.Millisecond,
+				"the timeout must release the worker blocked on the full queue")
+
+			c.Close()
+			d.stop()
+			assert.NoError(t, filler.Close(), "close the filler client")
+			pipe.close(t)
+			assert.Zero(t, pipe.output.delivered.Load(), "the cancelled profile and rows are never delivered")
+		})
+	}
+}

@@ -160,6 +160,7 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
+	live := newLiveResultDispatcher(b.Monitoring.StatsRegistry(), log, config.DefaultLivePublishTimeout)
 	bt := &osquerybeat{
 		ctx:                  ctx,
 		cancel:               cancel,
@@ -168,11 +169,13 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 		osqueryInstallConfig: installCfg,
 		checkTimeout:         checkTimeout,
 		log:                  log,
-		pub:                  &liveClients{newPublisher: func() liveQueryPublisher { return pub.New(b, log) }},
-		liveResults:          newLiveResultDispatcher(b.Monitoring.StatsRegistry(), log, config.DefaultLivePublishTimeout),
-		qp:                   newQueryProfiler(log),
-		osquerydFactory:      osqd.New,
-		executablePath:       os.Executable,
+		pub: &liveClients{newPublisher: func() liveQueryPublisher {
+			return pub.NewLive(live.ctx, b, log, live.rejected, live.cut)
+		}},
+		liveResults:     live,
+		qp:              newQueryProfiler(log),
+		osquerydFactory: osqd.New,
+		executablePath:  os.Executable,
 		// Resolve the osqueryd data path now, while b.Info.Paths still reflects
 		// this specific receiver's configuration. Run() is called in a goroutine
 		// and may execute after a concurrently-started receiver has overwritten
@@ -181,8 +184,8 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 	}
 
 	bt.scheduledResults = newScheduledResultDispatcher(b.Monitoring.StatsRegistry(), log, config.DefaultScheduledMaxEvents,
-		func(allowed func() bool, dropped func(), cut func(int)) osquerybeatPublisher {
-			return pub.NewScheduled(b, log, allowed, dropped, cut)
+		func(ctx context.Context, allowed func() bool, dropped, rejected func(), cut func(int)) osquerybeatPublisher {
+			return pub.NewScheduled(ctx, b, log, allowed, dropped, rejected, cut)
 		}, bt.handleScheduledQueryResult)
 	bt.scheduledResults.profile = bt.enqueueScheduledProfile
 	bt.profileMetrics = newScheduledProfileMetrics(b.Monitoring.StatsRegistry())

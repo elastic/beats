@@ -19,13 +19,18 @@ const (
 	dropStale    = "stale"    // no active policy or client publishes it
 	dropShutdown = "shutdown" // osquerybeat is stopping
 	dropTimeout  = "timeout"  // a live action stopped waiting for the output
+	dropRejected = "rejected" // the queue refused the event
 )
 
-// dropReasons lists the reasons each queue reports.
+// dropReasons lists the reasons each queue reports in items and rows.
 var dropReasons = map[string][]string{
 	"scheduled": {dropOverflow, dropExpired, dropStale, dropShutdown},
 	"live":      {dropStale, dropShutdown, dropTimeout},
 }
+
+// rowDropReasons lists the reasons every queue reports in rows only, because
+// they count single events, not items.
+var rowDropReasons = []string{dropRejected}
 
 // publishingMetrics reports one publishing queue under
 // osquerybeat.publishing.<queue>. dropped.<reason> counts dropped items and
@@ -51,6 +56,9 @@ func newPublishingMetrics(reg *monitoring.Registry, queue string, log *logp.Logg
 	}
 	for _, reason := range dropReasons[queue] {
 		m.dropped[reason] = monitoring.NewUint(reg, "dropped."+reason)
+		m.droppedRows[reason] = monitoring.NewUint(reg, "dropped_rows."+reason)
+	}
+	for _, reason := range rowDropReasons {
 		m.droppedRows[reason] = monitoring.NewUint(reg, "dropped_rows."+reason)
 	}
 	return m

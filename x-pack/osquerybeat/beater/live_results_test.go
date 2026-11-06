@@ -41,7 +41,7 @@ func newGatedLivePublisher(blockFrom int) *gatedLivePublisher {
 	return &gatedLivePublisher{blockFrom: blockFrom, release: make(chan struct{}), blocked: make(chan struct{}, 16)}
 }
 
-func (p *gatedLivePublisher) PublishEach(_, idValue, _, _, _, _, _, _ string, _ map[string]any, hits []map[string]any, _ ecs.Mapping, _ any, stop func() bool) int {
+func (p *gatedLivePublisher) PublishEach(_ context.Context, _, idValue, _, _, _, _, _, _ string, _ map[string]any, hits []map[string]any, _ ecs.Mapping, _ any, stop func() bool) int {
 	for i := range hits {
 		if stop() {
 			return i
@@ -58,11 +58,12 @@ func (p *gatedLivePublisher) PublishEach(_, idValue, _, _, _, _, _, _ string, _ 
 	return len(hits)
 }
 
-func (p *gatedLivePublisher) PublishQueryProfile(_, _, actionID, _, _ string, _ map[string]any, _ any) {
+func (p *gatedLivePublisher) PublishQueryProfile(_ context.Context, _, _, actionID, _, _ string, _ map[string]any, _ any) bool {
 	if p.blockProfile {
 		<-p.release
 	}
 	p.record(actionID + " profile")
+	return true
 }
 
 func (p *gatedLivePublisher) PublishActionResult(req, _ map[string]any) {
@@ -139,6 +140,42 @@ func TestExecuteHealthyPublishesAll(t *testing.T) {
 		assert.Equal(t, []string{"a1 row 1", "a1 row 2", "a1 row 3", "a1 row 4", "a1 row 5"}, pub.snapshot(),
 			"publish every row in order")
 		assert.Zero(t, d.metrics.droppedRows[dropTimeout].Get(), "a healthy output drops no rows")
+
+		d.stop()
+	})
+}
+
+// queuedOnCancelPublisher blocks on hit blockAt until its context ends, and
+// then reports that hit as queued anyway, as a memqueue PublishContext does
+// when the queue takes the row as the context ends.
+type queuedOnCancelPublisher struct{ blockAt int }
+
+func (p queuedOnCancelPublisher) PublishEach(ctx context.Context, _, _, _, _, _, _, _, _ string, _ map[string]any, hits []map[string]any, _ ecs.Mapping, _ any, stop func() bool) int {
+	for i := range hits {
+		if stop() {
+			return i
+		}
+		if i == p.blockAt {
+			<-ctx.Done()
+		}
+	}
+	return len(hits)
+}
+
+func (queuedOnCancelPublisher) PublishQueryProfile(context.Context, string, string, string, string, string, map[string]any, any) bool {
+	return true
+}
+
+func TestLiveTimeoutCountsRowQueuedAsCancelled(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		d := newLiveResultDispatcher(monitoring.NewRegistry(), logptest.NewTestingLogger(t, ""), 100*time.Millisecond)
+		hits := make([]map[string]any, 5)
+
+		n, err := d.publishResults(t.Context(), queuedOnCancelPublisher{blockAt: 2}, liveJob{actionID: "a1", hits: hits})
+
+		assert.ErrorIs(t, err, errLivePublishTimeout, "the action timed out")
+		assert.Equal(t, 3, n, "the row queued as its publish was cancelled is handed over")
+		assert.Equal(t, uint64(2), d.metrics.droppedRows[dropTimeout].Get(), "count only the rows that were not queued")
 
 		d.stop()
 	})
@@ -224,6 +261,46 @@ func TestExecuteReturnsOnShutdown(t *testing.T) {
 		assert.Equal(t, uint64(1), d.metrics.dropped[dropShutdown].Get(), "count the abandoned action")
 
 		close(pub.release)
+	})
+}
+
+// TestQueuedActionReturnsPromptlyOnStop checks that an action still queued
+// behind another when the dispatcher stops does not wait for a worker that
+// will never take it.
+func TestQueuedActionReturnsPromptlyOnStop(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		pub := newGatedLivePublisher(0)
+		d := newLiveResultDispatcher(monitoring.NewRegistry(), logptest.NewTestingLogger(t, ""), time.Minute)
+		first := make(chan struct{})
+		go func() {
+			defer close(first)
+			_, _ = d.publishResults(t.Context(), pub, liveJob{actionID: "a1", hits: make([]map[string]any, 1)})
+		}()
+		synctest.Wait() // the worker is blocked on a1's row
+		type result struct {
+			n   int
+			err error
+		}
+		second := make(chan result)
+		go func() {
+			n, err := d.publishResults(t.Context(), pub, liveJob{actionID: "a2", hits: make([]map[string]any, 2)})
+			second <- result{n, err}
+		}()
+		synctest.Wait() // a2 is queued behind a1
+
+		start := time.Now()
+		d.stop()
+		got := <-second
+		assert.Less(t, time.Since(start), liveCancelWait, "an action queued when the dispatcher stops must not wait for the worker")
+		assert.Zero(t, got.n, "no row of the queued action was handed over")
+		assert.ErrorIs(t, got.err, errLiveShutdown, "the queued action reports the shutdown")
+
+		// a1's row, released before a1 stops waiting, is handed over, so only
+		// a2 is dropped.
+		close(pub.release)
+		<-first
+		assert.Equal(t, uint64(1), d.metrics.dropped[dropShutdown].Get(), "count the queued action as a shutdown drop")
+		assert.Equal(t, uint64(2), d.metrics.droppedRows[dropShutdown].Get(), "count the queued action's rows")
 	})
 }
 
@@ -469,7 +546,7 @@ func TestLiveClientsCloseDoesNotWaitForStuckPublish(t *testing.T) {
 	published := make(chan struct{})
 	go func() {
 		defer close(published)
-		c.PublishEach("", "a1", "action_id", "", "", "", "", "", nil, []map[string]any{{}}, nil, nil, func() bool { return false })
+		c.PublishEach(t.Context(), "", "a1", "action_id", "", "", "", "", "", nil, []map[string]any{{}}, nil, nil, func() bool { return false })
 	}()
 	<-made[0].blocked
 
