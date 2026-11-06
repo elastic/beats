@@ -12,7 +12,7 @@ Documents the metricbeat-macos-unit-tests GitHub Actions workflow and its config
 
 ## Purpose
 
-Builds and runs unit tests for **metricbeat** on the configured macOS runner using the shared unit-test action. The checked-in source does not state a separate historical rationale.
+Builds and runs unit tests for **metricbeat** on the configured macOS runners using the shared unit-test action. The checked-in source does not state a separate historical rationale.
 
 ## When it runs
 
@@ -24,7 +24,7 @@ Builds and runs unit tests for **metricbeat** on the configured macOS runner usi
 
 | Job | Runs when / runner | Depends on | Configured work |
 | --- | --- | --- | --- |
-| unit-tests | runner `${{ matrix.os }}; matrix '{"os": ["macos-15-intel"]}'` | None declared | Step uses `actions/checkout@v7`; Step uses `./.github/actions/unit-test`; Step input names `["beat"]` |
+| unit-tests | runner `${{ matrix.os }}; matrix '{"os": ["macos-15-intel", "macos-15"]}'` | None declared | Step uses `actions/checkout@v7`; Step uses `./.github/actions/unit-test`; Step input names `["beat"]` |
 
 ## Inputs, outputs, and access
 
