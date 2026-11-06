@@ -80,6 +80,16 @@ func AzureStorageServer() http.Handler {
 
 //nolint:errcheck // We can ignore as response writer errors cannot be handled in this scenario
 func AzureStorageFileServer() http.Handler {
+	// Allowed files to be served from the testdata directory.
+	allowedFiles := map[string]struct{}{
+		"multiline.json":     {},
+		"multiline.json.gz":  {},
+		"log.json":           {},
+		"events-array.json":  {},
+		"log.ndjson":         {},
+		"txn1.csv":           {},
+	}
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		path := strings.Split(strings.TrimLeft(r.URL.Path, "/"), "/")
 		if r.Method == http.MethodGet {
@@ -92,7 +102,14 @@ func AzureStorageFileServer() http.Handler {
 				}
 			case 2:
 				if fileContainers[path[0]] && availableFileBlobs[path[0]][path[1]] {
-					absPath, _ := filepath.Abs("testdata/" + path[1])
+					// Ensure the requested file name is one of the known-safe test files.
+					if _, ok := allowedFiles[path[1]]; !ok {
+						w.WriteHeader(http.StatusNotFound)
+						w.Write([]byte("resource not found"))
+						return
+					}
+
+					absPath, _ := filepath.Abs(filepath.Join("testdata", path[1]))
 					data, _ := os.ReadFile(absPath)
 					switch path[1] {
 					case "multiline.json":
