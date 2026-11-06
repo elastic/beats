@@ -485,7 +485,7 @@ func (p *fileProspector) onFSEvent(
 		// its close.on_state_change.renamed Stop, which targets the new key,
 		// reaches the harvester still reading this file.
 		if p.growingFingerprint {
-			oldKey, found := p.findGrowingFingerprintMatch(updater, event)
+			oldKey, found := p.findGrowingFingerprintMatch(event)
 			if found {
 				if err := p.migrateGrowingFingerprint(updater, group, oldKey, src, event); err != nil {
 					log.Errorf("failed to migrate growing fingerprint on rename: %v", err)
@@ -655,7 +655,7 @@ func (p *fileProspector) handleGrowingFingerprintLookup(
 	}
 
 	// Try to find a prefix match against the event's raw fingerprint material.
-	oldKey, found := p.findGrowingFingerprintMatch(updater, event)
+	oldKey, found := p.findGrowingFingerprintMatch(event)
 	if !found {
 		return src
 	}
@@ -701,13 +701,38 @@ func (p *fileProspector) buildShortFingerprintSet(updater loginp.StateMetadataUp
 			return
 		}
 
-		// typeconv.Convert handles both fileMeta and map[string]any
+		// Fast-path: completed and legacy entries make up the vast majority of
+		// the registry and omit fingerprint_len (zero in fileMeta, absent in the
+		// JSON-decoded map[string]any on startup). Skip them before invoking
+		// reflection-based typeconv.Convert.
 		var fm fileMeta
-		if err := typeconv.Convert(&fm, meta); err != nil {
-			p.logger.Debugf("buildShortFingerprintSet: skipping %s: cannot convert meta to fileMeta: %v",
-				key, err)
-			return
+		switch m := meta.(type) {
+		case fileMeta:
+			if m.FingerprintLen <= 0 {
+				return
+			}
+			fm = m
+		case map[string]any:
+			if _, ok := m["fingerprint_len"]; !ok {
+				return
+			}
+			if err := typeconv.Convert(&fm, m); err != nil {
+				p.logger.Debugf("buildShortFingerprintSet: skipping %s: cannot convert meta to fileMeta: %v",
+					key, err)
+				return
+			}
+		default:
+			// Defensive fallback; in production cursorMeta is fileMeta, map[string]any, or nil.
+			if meta == nil {
+				return
+			}
+			if err := typeconv.Convert(&fm, meta); err != nil {
+				p.logger.Debugf("buildShortFingerprintSet: skipping %s: cannot convert meta to fileMeta: %v",
+					key, err)
+				return
+			}
 		}
+
 		// The key carries the hash, the value the length — exactly what
 		// hash-based prefix matching needs. Add() drops non-growing entries.
 		p.shortFingerprints.Add(key, rk.fingerprintHash(), hex.EncodedLen(int(fm.FingerprintLen)), fm.Source)
@@ -719,7 +744,8 @@ func (p *fileProspector) buildShortFingerprintSet(updater loginp.StateMetadataUp
 // material — i.e. the same file seen earlier with fewer bytes — and returns
 // its key so the caller can migrate it to the current identity. Only still
 // growing entries are searched, making this O(K) in the number of growing
-// entries.
+// entries. Callers must ensure p.shortFingerprints has been initialized (see
+// buildShortFingerprintSet in Run).
 //
 // A single candidate, the descriptor's raw fingerprint material
 // (Fingerprint.Raw), covers both transitions: below threshold it is the
@@ -730,20 +756,15 @@ func (p *fileProspector) buildShortFingerprintSet(updater loginp.StateMetadataUp
 // The match is first attempted against the entry sharing the event's path
 // (high-confidence). Only for a completed (threshold-crossing) event — strong
 // evidence of an identity transition — a path-agnostic fallback then recovers
-// a restart+rename where the stored entry still holds the OLD path. The
-// fallback is gated by isLikelyRename so two distinct files that merely share
-// a content prefix are not confused.
+// a restart+rename where the stored entry still holds the OLD path. Candidates
+// whose stored path still exists on disk are excluded to prevent matching a
+// distinct coexisting file with an identical header prefix.
 func (p *fileProspector) findGrowingFingerprintMatch(
-	updater loginp.StateMetadataUpdater,
 	event loginp.FSEvent,
 ) (oldKey string, found bool) {
 	raw := event.Descriptor.Fingerprint.Raw
 	if raw == "" {
 		return "", false
-	}
-
-	if p.shortFingerprints == nil {
-		p.buildShortFingerprintSet(updater)
 	}
 
 	// shortFingerprints still holds the pre-rename source path, so on rename

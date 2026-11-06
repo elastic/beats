@@ -435,11 +435,6 @@ func (w *fileWatcher) ScanOnce(
 		if tracksHarvesterProgress(fd, scanOpts) {
 			harvesterFiles = append(harvesterFiles, loginp.HarvesterFile{ID: srcID, Size: fd.Info.Size()})
 		}
-
-		if fd.Fingerprint.Complete() && fd.Fingerprint.Raw != "" {
-			fd.Fingerprint.Raw = ""
-			scanResults.Files[path] = *fd
-		}
 	}
 
 	// Only a genuine observation failure is worth warning about. A path that

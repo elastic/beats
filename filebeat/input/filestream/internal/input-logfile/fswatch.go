@@ -249,8 +249,8 @@ type FileScanOptions struct {
 	IgnoreOlder time.Duration
 	// IgnoreInactiveSince is the ignore_inactive reference time.
 	IgnoreInactiveSince time.Time
-    // SuppressBridgingRaw skips attaching the growing-mode bridging header
-    // (Fingerprint.Raw) to complete descriptors.
+	// SuppressBridgingRaw skips attaching the growing-mode bridging header
+	// (Fingerprint.Raw) to complete descriptors.
 	SuppressBridgingRaw bool
 }
 
