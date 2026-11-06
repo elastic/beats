@@ -15,26 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux
+//go:build windows
 
-package ebpf
+package registrar
 
-import (
-	"runtime"
+import commonfile "github.com/elastic/beats/v7/libbeat/common/file"
 
-	"github.com/elastic/beats/v7/libbeat/common/seccomp"
-)
-
-func init() {
-	switch runtime.GOARCH {
-	case "amd64":
-		syscalls := []string{
-			"bpf",
-			"eventfd2",        // needed by ringbuf
-			"perf_event_open", // needed by tracepoints
-		}
-		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall, syscalls...); err != nil {
-			panic(err)
-		}
-	}
+func testStateOS(idx uint64) commonfile.StateOS {
+	return commonfile.StateOS{IdxHi: idx, IdxLo: idx, Vol: 1}
 }

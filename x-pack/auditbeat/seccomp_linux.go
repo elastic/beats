@@ -36,10 +36,14 @@ func init() {
 			panic(err)
 		}
 
-		// The sessionmd processor kerneltracingprovider needs
-		// memfd_create to operate via EBPF
+		// The system/process dataset and the sessionmd kerneltracingprovider
+		// load eBPF programs through quark (libbpf). Allow what libbpf needs
+		// here rather than relying on the OSS file_integrity module, which
+		// happens to extend the policy the same way, being linked in.
 		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall,
-			"memfd_create",
+			"bpf",             // program and map loading
+			"memfd_create",    // libbpf placeholder fds while opening the object
+			"perf_event_open", // libbpf attaches kprobes and tracepoints through perf events
 		); err != nil {
 			panic(err)
 		}

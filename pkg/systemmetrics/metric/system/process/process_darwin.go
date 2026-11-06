@@ -26,6 +26,7 @@ package process
 #include <mach/mach_init.h>
 #include <mach/mach_host.h>
 #include <mach/host_info.h>
+#include <mach/mach_time.h>
 #include <libproc.h>
 #include <sys/resource.h>
 #include <mach/processor_info.h>
@@ -145,12 +146,29 @@ func GetInfoForPid(_ resolve.Resolver, pid int) (ProcState, error) {
 	status.Memory.Size = opt.UintWith(uint64(info.ptinfo.pti_virtual_size))
 	status.Memory.Rss.Bytes = opt.UintWith(uint64(info.ptinfo.pti_resident_size))
 
-	status.CPU.User.Ticks = opt.UintWith(uint64(info.ptinfo.pti_total_user) / uint64(time.Millisecond))
-	status.CPU.System.Ticks = opt.UintWith(uint64(info.ptinfo.pti_total_system) / uint64(time.Millisecond))
+	status.CPU.User.Ticks = opt.UintWith(machTimeToMs(uint64(info.ptinfo.pti_total_user)))
+	status.CPU.System.Ticks = opt.UintWith(machTimeToMs(uint64(info.ptinfo.pti_total_system)))
 	status.CPU.Total.Ticks = opt.UintWith(opt.SumOptUint(status.CPU.User.Ticks, status.CPU.System.Ticks))
 	status.CPU.StartTime = unixTimeMsToTime((uint64(info.pbsd.pbi_start_tvsec) * 1000) + (uint64(info.pbsd.pbi_start_tvusec) / 1000))
 
 	return status, nil
+}
+
+// machTimebase converts Mach absolute-time units to nanoseconds. The ratio is
+// 1/1 on Intel but 125/3 on Apple Silicon.
+var machTimebase = func() C.mach_timebase_info_data_t {
+	var tb C.mach_timebase_info_data_t
+	if C.mach_timebase_info(&tb) != C.KERN_SUCCESS || tb.denom == 0 {
+		return C.mach_timebase_info_data_t{numer: 1, denom: 1}
+	}
+	return tb
+}()
+
+// machTimeToMs converts proc_taskinfo CPU times, which are in Mach
+// absolute-time units rather than nanoseconds, to milliseconds.
+func machTimeToMs(units uint64) uint64 {
+	ns := units * uint64(machTimebase.numer) / uint64(machTimebase.denom)
+	return ns / uint64(time.Millisecond)
 }
 
 // FillPidMetrics is the darwin implementation
