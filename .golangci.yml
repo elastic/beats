@@ -103,6 +103,14 @@ linters:
           recommendations:
             - errors
           reason: This package is deprecated, use `errors.Join` instead
+        - module: gopkg.in/yaml.v2
+          recommendations:
+            - go.yaml.in/yaml/v2
+          reason: This package is deprecated, use `go.yaml.in` instead
+        - module: gopkg.in/yaml.v3
+          recommendations:
+            - go.yaml.in/yaml/v3
+          reason: This package is deprecated, use `go.yaml.in` instead
         - module: gotest.tools/v3
           recommendations:
             - github.com/stretchr/testify
