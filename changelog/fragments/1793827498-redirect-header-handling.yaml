@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Align redirect header handling in Okta and Jamf entity analytics with HTTPJSON and CEL.
+component: filebeat

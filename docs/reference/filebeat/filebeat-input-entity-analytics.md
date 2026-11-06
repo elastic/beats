@@ -949,6 +949,42 @@ The interval in which full synchronizations should occur. The interval must be l
 
 The interval in which incremental updates should occur. The interval must be shorter than the full synchronization interval (`sync_interval`). Expressed as a duration string (e.g., 1m, 3h, 24h). Defaults to `15m` (15 minutes).
 
+#### `request.redirect.forward_headers` [_jamf_request_redirect_forward_headers]
+```{applies_to}
+stack: ga 9.5+
+```
+
+When set to `true`, request headers are forwarded when the API responds with a redirect. Headers listed in `request.redirect.sensitive_headers` are removed on redirects to a different host or port, and on redirects from HTTPS to HTTP. Defaults to `false`.
+
+This option applies only when `use_minimal_state` is `false`.
+
+
+#### `request.redirect.headers_ban_list` [_jamf_request_redirect_headers_ban_list]
+```{applies_to}
+stack: ga 9.5+
+```
+
+When `request.redirect.forward_headers` is `true`, all headers except the ones in this list are forwarded. Defaults to `[]`.
+
+
+#### `request.redirect.sensitive_headers` [_jamf_request_redirect_sensitive_headers]
+```{applies_to}
+stack: ga 9.5+
+```
+
+A list of header names that are removed when a redirect goes to a different host or port, or from HTTPS to HTTP. This stops credentials being sent to an unintended origin. Defaults to `["Authorization", "Proxy-Authorization", "Cookie"]`. A list you set replaces the default list.
+
+Set to `[]` to forward all headers regardless of the redirect target. Do this only if the target shares the authentication domain of the API.
+
+
+#### `request.redirect.max_redirects` [_jamf_request_redirect_max_redirects]
+```{applies_to}
+stack: ga 9.5+
+```
+
+The maximum number of redirects to follow for a request. Defaults to `10`.
+
+
 ### `tracer.enabled` [_tracer_enabled_1]
 
 It is possible to log HTTP requests and responses to the Jamf API to a local file-system for debugging configurations. This option is enabled by setting `tracer.enabled` to true and setting the `tracer.filename` value. Additional options are available to tune log rotation behavior. To delete existing logs, set `tracer.enabled` to false without unsetting the filename option.
@@ -1422,6 +1458,42 @@ stack: preview 9.5.0
 ```
 
 The directory for the temporary file that holds group membership during a full synchronization. This is only used when `use_minimal_state` is `true`. Defaults to the system temporary directory. The directory must already exist and be writable by Filebeat. Use an absolute path: a relative path is resolved against the working directory of the Filebeat process, not against `path.data`.
+
+
+#### `request.redirect.forward_headers` [_okta_request_redirect_forward_headers]
+```{applies_to}
+stack: ga 9.5+
+```
+
+When set to `true`, request headers are forwarded when the API responds with a redirect. Headers listed in `request.redirect.sensitive_headers` are removed on redirects to a different host or port, and on redirects from HTTPS to HTTP. Defaults to `false`.
+
+This option applies only when `use_minimal_state` is `false`.
+
+
+#### `request.redirect.headers_ban_list` [_okta_request_redirect_headers_ban_list]
+```{applies_to}
+stack: ga 9.5+
+```
+
+When `request.redirect.forward_headers` is `true`, all headers except the ones in this list are forwarded. Defaults to `[]`.
+
+
+#### `request.redirect.sensitive_headers` [_okta_request_redirect_sensitive_headers]
+```{applies_to}
+stack: ga 9.5+
+```
+
+A list of header names that are removed when a redirect goes to a different host or port, or from HTTPS to HTTP. This stops credentials being sent to an unintended origin. Defaults to `["Authorization", "Proxy-Authorization", "Cookie"]`. A list you set replaces the default list.
+
+Set to `[]` to forward all headers regardless of the redirect target. Do this only if the target shares the authentication domain of the API.
+
+
+#### `request.redirect.max_redirects` [_okta_request_redirect_max_redirects]
+```{applies_to}
+stack: ga 9.5+
+```
+
+The maximum number of redirects to follow for a request. Defaults to `10`.
 
 
 #### `tracer.enabled` [_tracer_enabled_2]
