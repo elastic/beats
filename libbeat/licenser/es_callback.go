@@ -21,7 +21,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // Verify checks if the connection endpoint is really Elasticsearch.

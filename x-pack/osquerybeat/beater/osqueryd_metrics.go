@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"

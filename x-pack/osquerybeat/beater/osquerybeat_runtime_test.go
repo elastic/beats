@@ -11,8 +11,8 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestResolveOsqueryRuntime_DisabledInstallCleansCustomState(t *testing.T) {
