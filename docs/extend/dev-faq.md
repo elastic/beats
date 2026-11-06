@@ -21,5 +21,5 @@ Make sure that the path to your module and metricset are added as an import path
 
 The metricset is compiled, but not started when starting Metricbeat?
 
-After creating your metricset, make sure you run `make collect`. This command adds the configuration of your metricset to the default configuration. If the metricset still doesn’t start, check your default configuration file to see if the metricset is listed there.
+After creating your metricset, make sure you run `mage update`. This command adds the configuration of your metricset to the default configuration. If the metricset still doesn’t start, check your default configuration file to see if the metricset is listed there.
 
