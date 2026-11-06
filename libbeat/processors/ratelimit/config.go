@@ -20,7 +20,7 @@ package ratelimit
 import (
 	"fmt"
 
-	cfg "github.com/elastic/elastic-agent-libs/config"
+	cfg "github.com/elastic/beats/v7/pkg/config"
 )
 
 // config for rate limit processor.

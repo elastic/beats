@@ -17,7 +17,7 @@
 
 package v2
 
-import conf "github.com/elastic/elastic-agent-libs/config"
+import conf "github.com/elastic/beats/v7/pkg/config"
 
 // Redirector is an optional interface that an InputManager can implement
 // to redirect input creation to a different input type. The Loader checks
