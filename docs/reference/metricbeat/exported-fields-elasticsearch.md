@@ -2152,7 +2152,7 @@ JVM Info.
 
 ## node.stats [_node.stats]
 
-Statistics about each node in a Elasticsearch cluster
+Statistics about each node in an Elasticsearch cluster
 
 **`elasticsearch.node.stats.ingest.total.count`**
 :   type: long
@@ -2963,7 +2963,7 @@ shard fields
 
 
 **`elasticsearch.shard.relocating_node.id`**
-:   The node the shard was relocated from. It has the exact same value than relocating_node.name for compatibility purposes.
+:   The node the shard was relocated from. It has the exact same value as relocating_node.name for compatibility purposes.
 
     type: keyword
 
