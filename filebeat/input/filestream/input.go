@@ -75,6 +75,10 @@ type filestream struct {
 	includeFileFingerprint    bool
 	hasLineFilter             bool
 
+	// followReplacements closes a file read to its end when a larger, different
+	// file takes over its fingerprint. Only the inactive close deletes files.
+	followReplacements bool
+
 	// sliceBudget, when > 0, bounds how long a single ReadSlice call keeps
 	// reading a file that never runs dry, so Poll still runs on schedule for a
 	// continuously-busy file.
@@ -189,6 +193,7 @@ func configure(
 		includeFileFingerprint:    c.IncludeFileFingerprint && c.FileWatcher.Scanner.Fingerprint.Enabled,
 		hasLineFilter:             len(c.Reader.IncludeLines) > 0 || len(c.Reader.ExcludeLines) > 0,
 		deleterConfig:             c.Delete,
+		followReplacements:        c.FileWatcher.Scanner.Fingerprint.Enabled && !c.Delete.Enabled,
 		harvesterState:            harvesterState,
 		waitGracePeriodFn:         waitGracePeriod,
 		tickFn:                    time.Tick,
