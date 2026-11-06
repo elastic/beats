@@ -11,23 +11,12 @@ import (
 	"net/url"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/godror/godror"
-	"github.com/godror/godror/dsn"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
-
-// ConnectionDetails contains all possible data that can be used to create a connection with
-// an Oracle db
-type ConnectionDetails struct {
-	Username string            `config:"username"`
-	Password string            `config:"password"`
-	Driver   string            `config:"driver"`
-	TLS      *tlscommon.Config `config:"ssl"`
-}
 
 const mysqlTLSConfigKey = "custom"
 
@@ -87,27 +76,6 @@ func sanitize(host string) string {
 	}
 
 	return "(redacted)"
-}
-
-func oracleParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
-	params, err := godror.ParseDSN(host)
-	if err != nil {
-		return mb.HostData{}, fmt.Errorf("error trying to parse connection string in field 'hosts': %w", err)
-	}
-	if params.Username == "" {
-		params.Username = config.Username
-	}
-	if params.Password.Secret() == "" {
-		params.StandaloneConnection = godror.Bool(true)
-		params.Password = dsn.NewPassword(config.Password)
-	}
-	return mb.HostData{
-		URI:          params.StringWithPassword(),
-		SanitizedURI: params.ConnectString,
-		Host:         params.String(),
-		User:         params.Username,
-		Password:     params.Password.Secret(),
-	}, nil
 }
 
 func mysqlParseDSN(config ConnectionDetails, host string, logger *logp.Logger) (mb.HostData, error) {
