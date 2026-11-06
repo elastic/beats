@@ -272,7 +272,14 @@ func TestConfiguredReadControlDeadline(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			assert.Equal(t, tc.want, sources[0].(*source).cfg.KeepAlive.readControlDeadline, "read deadline must reflect the effective write deadline")
+			if !assert.Len(t, sources, 1, "expected one configured source") {
+				return
+			}
+			src, ok := sources[0].(*source)
+			if !assert.True(t, ok, "configured source must be a streaming source") {
+				return
+			}
+			assert.Equal(t, tc.want, src.cfg.KeepAlive.readControlDeadline, "read deadline must reflect the effective write deadline")
 		})
 	}
 }
