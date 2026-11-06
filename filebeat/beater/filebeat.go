@@ -322,6 +322,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// every early-exit error path.
 	defer fb.runReady.Close()
 
+<<<<<<< HEAD
 	registryMigrator := registrar.NewMigrator(config.Registry, fb.logger, b.Info.Paths)
 	if err := registryMigrator.Run(); err != nil {
 		fb.logger.Errorf("Failed to migrate registry file: %+v", err)
@@ -336,6 +337,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}()
 
 	stateStore, err := openStateStore(ctx, b.Info, fb.logger.Named("filebeat"), config.Registry)
+=======
+	stateStore, err := openStateStore(fb.ctx, b.Info, fb.logger.Named("filebeat"), config.Registry)
+>>>>>>> a3c5c6e (filebeat/beater: run registry migration under the shared store lock (#54530))
 	if err != nil {
 		fb.logger.Errorf("Failed to open state store: %+v", err)
 		return err
