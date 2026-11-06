@@ -519,8 +519,7 @@ func BenchmarkInjectGlobalProcessors(b *testing.B) {
 				}),
 			}
 
-			b.ResetTimer()
-			for range b.N {
+			for b.Loop() {
 				for range streams {
 					injectGlobalProcesssors(expected, map[string]any{"period": "1m"})
 				}
