@@ -21,12 +21,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions" // Registers the add_fields processor used by inputWithNamespace.
-	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type recordingClient struct {
@@ -544,11 +543,12 @@ func (r *connectRecorder) namespaceOf(t *testing.T, client beat.Client) string {
 		if err != nil {
 			t.Fatalf("running processors: %v", err)
 		}
-		ds, ok := ev.Fields["data_stream"].(add_data_stream.DataStream)
-		if !ok {
+		namespace, err := ev.Fields.GetValue("data_stream.namespace")
+		if err != nil {
 			return ""
 		}
-		return ds.Namespace
+		ns, _ := namespace.(string)
+		return ns
 	}
 	return ""
 }
@@ -590,6 +590,40 @@ func TestConfigureEmptyDataset(t *testing.T) {
 	}
 }
 
+func TestCheckProcessors(t *testing.T) {
+	invalid := func(dataset string) config.InputConfig {
+		in := inputWithNamespace(dataset, "default")
+		in.Processors = processors.PluginConfig{conf.MustNewConfigFrom(map[string]any{"not_a_processor": map[string]any{}})}
+		return in
+	}
+	result := inputWithNamespace(config.DefaultDataset, "default")
+	actions := inputWithNamespace(config.DefaultActionResponsesDataset, "default")
+	profile := inputWithNamespace(config.DefaultQueryProfileDataset, "default")
+	tests := []struct {
+		name    string
+		inputs  []config.InputConfig
+		wantErr bool
+	}{
+		{name: "none", inputs: nil},
+		{name: "valid", inputs: []config.InputConfig{result, actions, profile}},
+		{name: "invalid result", inputs: []config.InputConfig{invalid(config.DefaultDataset), actions, profile}, wantErr: true},
+		{name: "invalid action responses", inputs: []config.InputConfig{result, invalid(config.DefaultActionResponsesDataset), profile}, wantErr: true},
+		{name: "invalid query profile", inputs: []config.InputConfig{result, actions, invalid(config.DefaultQueryProfileDataset)}, wantErr: true},
+		// Configure uses only the first input of each dataset.
+		{name: "invalid unused", inputs: []config.InputConfig{result, actions, invalid(config.DefaultActionResponsesDataset)}},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			err := CheckProcessors(test.inputs, logptest.NewTestingLogger(t, "pub"))
+			if test.wantErr {
+				assert.ErrorContains(t, err, "not_a_processor", "the error must name the invalid processor")
+			} else {
+				assert.NoError(t, err, "the processors Configure uses must build")
+			}
+		})
+	}
+}
+
 func toMap(t *testing.T, s string) map[string]any {
 	var m map[string]any
 	err := json.Unmarshal([]byte(s), &m)
@@ -597,4 +631,23 @@ func toMap(t *testing.T, s string) map[string]any {
 		t.Fatal(err)
 	}
 	return m
+}
+
+func TestPublishEachStops(t *testing.T) {
+	client := &recordingClient{}
+	p := &Publisher{b: &beat.Beat{}, log: logptest.NewTestingLogger(t, "publish_each"), client: client}
+	hits := []map[string]any{{"n": 1}, {"n": 2}, {"n": 3}}
+
+	calls := 0
+	n := p.PublishEach("index", "action", "action_id", "", "", "", "", "", nil, hits, nil, nil, func() bool {
+		calls++
+		return calls > 2
+	})
+
+	assert.Equal(t, 2, n, "return the rows handed to the client before stop returned true")
+	published := client.snapshot()
+	require.Len(t, published, 2, "publish only the rows before stop returned true")
+	assert.Equal(t, map[string]any{"n": 2}, published[1].Fields["osquery"], "publish rows in order")
+	n = p.PublishEach("index", "action", "action_id", "", "", "", "", "", nil, hits, nil, nil, func() bool { return false })
+	assert.Equal(t, 3, n, "publish every row when stop never returns true")
 }
