@@ -10,8 +10,8 @@ import (
 	"sync/atomic"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/pkg/logp"
 	cfcommon "github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type ModuleV1 struct {

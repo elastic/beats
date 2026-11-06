@@ -22,7 +22,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"maps"
 	"sync"
 	"testing"
 	"time"
@@ -30,11 +29,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
@@ -43,7 +42,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 )
 
 const (
@@ -292,16 +290,16 @@ func TestMonitorScrubsSecrets(t *testing.T) {
 func TestMonitorScrubbingKeepsHeartbeatFields(t *testing.T) {
 	const monitorType = "leaky-type"
 	want := map[string]string{
-		"monitor.id":    "secret-monitor",
-		"monitor.name":  "secret monitor",
-		"monitor.type":  monitorType,
-		"event.dataset": monitorType,
-		"event.type":    "heartbeat/summary",
+		"monitor.id":            "secret-monitor",
+		"monitor.name":          "secret monitor",
+		"monitor.type":          monitorType,
+		"event.dataset":         monitorType,
+		"event.type":            "heartbeat/summary",
+		"data_stream.type":      "synthetics",
+		"data_stream.dataset":   monitorType,
+		"data_stream.namespace": "default",
 	}
-	wantDataStream := add_data_stream.DataStream{Type: "synthetics", Dataset: monitorType, Namespace: "default"}
-	secrets := map[string]string{"data_stream.type": wantDataStream.Type, "data_stream.namespace": wantDataStream.Namespace}
-	maps.Copy(secrets, want)
-	for name, secret := range secrets {
+	for name, secret := range want {
 		t.Run(name, func(t *testing.T) {
 			testStore.set(secret, nil)
 			reg := plugin.NewPluginsReg()
@@ -340,7 +338,6 @@ func TestMonitorScrubbingKeepsHeartbeatFields(t *testing.T) {
 				got, _ := fields.GetValue(f)
 				assert.Equal(t, v, got, "secret %q must not change %s", secret, f)
 			}
-			assert.Equal(t, wantDataStream, fields["data_stream"], "secret %q must not change data_stream", secret)
 			assert.Equal(t, "synthetics-leaky-type-default", e.Meta[events.FieldMetaRawIndex], "secret %q must not change the index", secret)
 		})
 	}

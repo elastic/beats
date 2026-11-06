@@ -21,7 +21,7 @@ import (
 	"go.uber.org/zap"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // loggerWithEvent returns a logger enriched with FS-event fields. Enrichment

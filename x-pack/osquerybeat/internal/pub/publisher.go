@@ -7,18 +7,16 @@ package pub
 import (
 	"fmt"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -40,39 +38,27 @@ type Publisher struct {
 	// client for osquery_manager.query_profile
 	queryProfileClient    beat.Client
 	profileDropWarnLogged bool
-
-	// Scheduled profiling must not wait behind a result publication holding mx.
-	scheduledProfileMu      sync.Mutex
-	scheduledProfile        *scheduledProfileSink
-	scheduledProfileClosed  bool
-	scheduledProfileMissing bool
-	scheduledProfileDropped *monitoring.Uint
-	scheduledProfileWarning atomic.Int64
+	listener              beat.ClientListener
+	allowed               func() bool
+	cut                   func(rows int)
 }
 
 func New(b *beat.Beat, log *logp.Logger) *Publisher {
-	reg := b.Monitoring.StatsRegistry()
-	if reg == nil {
-		reg = monitoring.NewRegistry()
-	}
 	return &Publisher{
-		b:                       b,
-		log:                     log,
-		scheduledProfileDropped: monitoring.NewUint(reg.GetOrCreateRegistry("osquerybeat.scheduled_query_profiles"), "dropped.output_full"),
+		b:   b,
+		log: log,
 	}
 }
 
 // Configure replaces the clients for the given inputs. It must be called from a
 // single goroutine; only Close may run concurrently with it.
 func (p *Publisher) Configure(inputs []config.InputConfig) error {
-	// Policy replacement must invalidate delayed profiles even while a result
-	// publication holds mx, and even when all inputs have been removed.
-	p.retireScheduledProfileSink()
-	p.mx.Lock()
-	defer p.mx.Unlock()
 	if len(inputs) == 0 {
 		return nil
 	}
+
+	p.mx.Lock()
+	defer p.mx.Unlock()
 
 	resultInput, actionResponsesInput, profileInput := streamInputs(inputs)
 
@@ -85,6 +71,7 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 		p.log.Debugf("Connect publisher for %s with processors: %d", config.DefaultDataset, len(processors.All()))
 		// Connect publisher
 		client, err := p.b.Publisher.ConnectWith(beat.ClientConfig{
+			ClientListener: p.listener,
 			Processing: beat.ProcessingConfig{
 				Processor: processors,
 			},
@@ -111,6 +98,7 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 		p.log.Debugf("Connect publisher for %s with processors: %d", config.DefaultActionResponsesDataset, len(processors.All()))
 		// Connect publisher
 		client, err := p.b.Publisher.ConnectWith(beat.ClientConfig{
+			ClientListener: p.listener,
 			Processing: beat.ProcessingConfig{
 				Processor: processors,
 			},
@@ -141,6 +129,7 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 		}
 		p.log.Debugf("Connect publisher for %s with processors: %d", config.DefaultQueryProfileDataset, len(processors.All()))
 		client, err := p.b.Publisher.ConnectWith(beat.ClientConfig{
+			ClientListener: p.listener,
 			Processing: beat.ProcessingConfig{
 				Processor: processors,
 			},
@@ -153,11 +142,6 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 		p.profileDropWarnLogged = false
 		if oldClient != nil {
 			oldClient.Close()
-		}
-		if resultInput != nil {
-			if err := p.configureScheduledProfileSink(*resultInput, *profileInput); err != nil {
-				return err
-			}
 		}
 	} else {
 		if p.queryProfileClient != nil {
@@ -218,23 +202,34 @@ func streamInputs(inputs []config.InputConfig) (result, actionResponses, profile
 }
 
 func (p *Publisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any) {
+	n := p.PublishEach(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName, meta, hits, ecsm, reqData, func() bool { return false })
+	p.log.Infof("%d events sent to index %s", n, index)
+}
+
+// PublishEach publishes hits one by one and returns how many were handed to
+// the client before stop returned true. stop is called before each hit.
+func (p *Publisher) PublishEach(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any, stop func() bool) int {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
-	for _, hit := range hits {
+	if p.client == nil {
+		p.log.Info("Results stream is not configured. Results are dropped.")
+		return 0
+	}
+	for i, hit := range hits {
+		if stop() {
+			return i
+		}
+		if p.retired(len(hits) - i) {
+			return i
+		}
 		event := hitToEvent(index, p.b.Info.Name, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName, meta, hit, ecsm, reqData)
 		p.client.Publish(event)
 	}
-	p.log.Infof("%d events sent to index %s", len(hits), index)
+	return len(hits)
 }
 
 func (p *Publisher) Close() {
-	// Once closed is set, configureScheduledProfileSink installs no new lease,
-	// so a single retire covers one installed earlier.
-	p.scheduledProfileMu.Lock()
-	p.scheduledProfileClosed = true
-	p.scheduledProfileMu.Unlock()
-	p.retireScheduledProfileSink()
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
@@ -317,6 +312,9 @@ func (p *Publisher) PublishScheduledResponse(scheduleID, packID, packName, query
 }
 
 func (p *Publisher) publishActionResponseEvent(fields map[string]any, timestamp time.Time) {
+	if p.retired(1) {
+		return
+	}
 	event := beat.Event{
 		Timestamp: timestamp,
 		Fields:    fields,
@@ -325,6 +323,17 @@ func (p *Publisher) publishActionResponseEvent(fields map[string]any, timestamp 
 }
 
 func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) {
+	p.publishProfile(index, queryProfileToEvent(queryName, actionID, responseID, spaceID, profile, reqData, "", 0))
+}
+
+// PublishScheduledProfile publishes the profile of one scheduled query run,
+// correlated with the run's results by its schedule, response ID and
+// execution count.
+func (p *Publisher) PublishScheduledProfile(index, queryName, scheduleID, responseID, spaceID string, scheduleExecutionCount int64, profile map[string]any) {
+	p.publishProfile(index, queryProfileToEvent(queryName, "", responseID, spaceID, profile, nil, scheduleID, scheduleExecutionCount))
+}
+
+func (p *Publisher) publishProfile(index string, fields mapstr.M) {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
@@ -335,8 +344,9 @@ func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID, 
 		}
 		return
 	}
-
-	fields := queryProfileToEvent(queryName, actionID, responseID, spaceID, profile, reqData, "", 0)
+	if p.retired(1) {
+		return
+	}
 
 	event := beat.Event{
 		Timestamp: time.Now(),
@@ -521,3 +531,35 @@ func hitToEvent(index, eventType, idValue, idFieldKey, responseID, spaceID, pack
 
 	return event
 }
+
+// NewScheduled creates policy-bound clients for the asynchronous native logger
+// path. They block for queue space, because on a shared slab queue pool a
+// DropIfFull client loses nearly every race against blocked producers. allowed
+// reports whether the remaining rows may still be published, for example
+// after the policy was replaced; cut is called with the number of rows skipped
+// because allowed returned false. dropped is called for
+// each event published after its client closed.
+func NewScheduled(b *beat.Beat, log *logp.Logger, allowed func() bool, dropped func(), cut func(rows int)) *Publisher {
+	return &Publisher{b: b, log: log, allowed: allowed, cut: cut, listener: &scheduledListener{dropped: dropped}}
+}
+
+// retired reports whether the clients may no longer publish, reporting the
+// rows that are skipped because of it.
+func (p *Publisher) retired(rows int) bool {
+	if p.allowed == nil || p.allowed() {
+		return false
+	}
+	if p.cut != nil {
+		p.cut(rows)
+	}
+	return true
+}
+
+type scheduledListener struct{ dropped func() }
+
+func (*scheduledListener) Closing()                      {}
+func (*scheduledListener) Closed()                       {}
+func (*scheduledListener) NewEvent()                     {}
+func (*scheduledListener) Filtered()                     {}
+func (*scheduledListener) Published()                    {}
+func (l *scheduledListener) DroppedOnPublish(beat.Event) { l.dropped() }
