@@ -19,6 +19,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
@@ -47,7 +48,7 @@ func TestValidLocal(t *testing.T) {
 		},
 		"timeout": timeout,
 	})
-	_, e := NewSourceJob(cfg)
+	_, e := NewSourceJob(cfg, logptest.NewTestingLogger(t, ""))
 	require.Error(t, e)
 }
 
@@ -69,7 +70,7 @@ func TestValidInline(t *testing.T) {
 		},
 		"timeout": timeout,
 	})
-	s, e := NewSourceJob(cfg)
+	s, e := NewSourceJob(cfg, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, e)
 	require.NotNil(t, s)
 	require.Equal(t, script, s.browserCfg.Source.Inline.Script)
@@ -89,7 +90,7 @@ func TestNameRequired(t *testing.T) {
 			},
 		},
 	})
-	_, e := NewSourceJob(cfg)
+	_, e := NewSourceJob(cfg, logptest.NewTestingLogger(t, ""))
 	require.Regexp(t, ErrNameRequired, e)
 }
 
@@ -102,7 +103,7 @@ func TestIDRequired(t *testing.T) {
 			},
 		},
 	})
-	_, e := NewSourceJob(cfg)
+	_, e := NewSourceJob(cfg, logptest.NewTestingLogger(t, ""))
 	require.Regexp(t, ErrIdRequired, e)
 }
 
@@ -110,7 +111,7 @@ func TestEmptySource(t *testing.T) {
 	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"source": mapstr.M{},
 	})
-	s, e := NewSourceJob(cfg)
+	s, e := NewSourceJob(cfg, logptest.NewTestingLogger(t, ""))
 
 	require.Regexp(t, ErrBadConfig(source.ErrInvalidSource), e)
 	require.Nil(t, s)
@@ -273,7 +274,7 @@ func TestEmptyTimeout(t *testing.T) {
 			},
 		},
 	})
-	s, e := NewSourceJob(cfg)
+	s, e := NewSourceJob(cfg, logptest.NewTestingLogger(t, ""))
 
 	require.NoError(t, e)
 	require.NotNil(t, s)
@@ -395,7 +396,7 @@ func TestSourceDecoding(t *testing.T) {
 		},
 		"timeout": timeout,
 	})
-	s, e := NewSourceJob(cfg)
+	s, e := NewSourceJob(cfg, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, e)
 	require.NotNil(t, s)
 	require.Equal(t, script, s.browserCfg.Source.Inline.Script)
@@ -419,7 +420,7 @@ func TestDisabledSourceDecoding(t *testing.T) {
 		},
 		"timeout": timeout,
 	})
-	s, e := NewSourceJob(cfg)
+	s, e := NewSourceJob(cfg, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, e)
 	require.NotNil(t, s)
 	require.Equal(t, encoded, s.browserCfg.Source.Inline.Script)
@@ -447,7 +448,7 @@ func TestUpdateParams(t *testing.T) {
 		},
 		"timeout": timeout,
 	})
-	s, e := NewSourceJob(cfg)
+	s, e := NewSourceJob(cfg, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, e)
 	require.NotNil(t, s)
 	require.Equal(t, testParams, s.Params())
@@ -497,7 +498,7 @@ func TestExtraArgsForAPIMonitor(t *testing.T) {
 				"playwright_options":  mapstr.M{"ignoreHTTPSErrors": true},
 			})
 
-			sj, err := NewSourceJob(cfg)
+			sj, err := NewSourceJob(cfg, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 			args := sj.extraArgs(false)
 
@@ -529,7 +530,7 @@ func TestExtraArgsForBrowserMonitorUnchanged(t *testing.T) {
 		},
 	})
 
-	sj, err := NewSourceJob(cfg)
+	sj, err := NewSourceJob(cfg, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 	args := sj.extraArgs(false)
 

@@ -19,7 +19,9 @@ package monitors
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"sync"
 	"testing"
 	"time"
@@ -30,12 +32,16 @@ import (
 	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/pkg/monitoring"
 
+	"github.com/elastic/beats/v7/heartbeat/eventext"
+	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/secretstores"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beat/events"
 )
 
 const (
@@ -63,12 +69,13 @@ func (s *switchableStore) set(value string, err error) {
 
 func (s *switchableStore) Validate(*conf.C, secretstores.Scope) error { return nil }
 
-func (s *switchableStore) Replace(_ context.Context, cfg *conf.C, _ secretstores.Scope) (*conf.C, error) {
+func (s *switchableStore) Replace(ctx context.Context, cfg *conf.C, _ secretstores.Scope) (*conf.C, error) {
 	s.mtx.Lock()
 	defer s.mtx.Unlock()
 	if s.err != nil {
 		return nil, s.err
 	}
+	secretstores.Track(ctx, s.value)
 	c := conf.NewConfig()
 	if err := c.Merge(cfg); err != nil {
 		return nil, err
@@ -190,7 +197,10 @@ func TestMonitorRecoversFromSecretStoreError(t *testing.T) {
 			defer sched.Stop()
 
 			resolver := secretstores.NewResolver(logger)
-			m, err := newMonitor(captureMonitorConf(t, monitorType, true), reg, c, sched.Add, nil, beat.Info{Logger: logger}, nil, resolver.WrapFactory)
+			wrap := func(pf plugin.PluginFactory) plugin.PluginFactory {
+				return resolver.WrapFactory(pf, secretstores.NewRedactor())
+			}
+			m, err := newMonitor(captureMonitorConf(t, monitorType, true), reg, c, sched.Add, nil, beat.Info{Logger: logger}, nil, wrap)
 			require.NoError(t, err, "a store failure must not prevent creating the monitor")
 			defer m.Stop()
 			m.Start()
@@ -218,6 +228,117 @@ func TestMonitorRecoversFromSecretStoreError(t *testing.T) {
 				return field(events[len(events)-1], "monitor.status") == "up"
 			}, 5*time.Second, 5*time.Millisecond, "the monitor must report up once the store recovers")
 			assert.Equal(t, "resolved", headers()[0], "the plugin must get the resolved header")
+		})
+	}
+}
+
+// TestMonitorScrubsSecrets checks a monitor whose plugin publishes and fails
+// with its resolved secret doesn't leak it in its events.
+func TestMonitorScrubsSecrets(t *testing.T) {
+	const secret = "s3cr3t-token"
+	testStore.set(secret, nil)
+
+	reg := plugin.NewPluginsReg()
+	require.NoError(t, reg.Add(plugin.PluginFactory{
+		Name: "leaky",
+		Make: func(_ string, cfg *conf.C, info beat.Info) (plugin.Plugin, error) {
+			header, err := cfg.String("header", -1)
+			if err != nil {
+				return plugin.Plugin{}, err
+			}
+			job := func(event *beat.Event) ([]jobs.Job, error) {
+				eventext.MergeEventFields(event, mapstr.M{"url": mapstr.M{"full": "https://host/?t=" + header}})
+				return nil, fmt.Errorf("request to https://host/?t=%s failed", header)
+			}
+			return plugin.Plugin{Jobs: []jobs.Job{job}, Endpoints: 1, Logger: info.Logger}, nil
+		},
+		Stats: plugin.NewPluginCountersRecorder("leaky", monitoring.NewRegistry()),
+	}), "plugin must be registered")
+
+	// The factory gives the monitor the pipeline client and logger that scrub.
+	factory, _, closeFactory := makeMockFactory(t, reg)
+	defer closeFactory()
+	logger, logs := logptest.NewTestingLoggerWithObserver(t, "")
+	factory.info.Logger = logger
+	pipel := &MockPipeline{}
+	runner, err := factory.Create(pipel, captureMonitorConf(t, "leaky", true))
+	require.NoError(t, err, "monitor must be created")
+	defer runner.Stop()
+	runner.Start()
+
+	m, ok := runner.(*Monitor)
+	require.True(t, ok, "the runner must be a monitor, got %T", runner)
+	m.logger.Infof("Job failed with: request to https://host/?t=%s failed", secret)
+	logged := logs.FilterMessageSnippet("Job failed with").TakeAll()
+	require.Len(t, logged, 1, "the monitor must log with the factory logger")
+	assert.Equal(t, "Job failed with: request to https://host/?t=<hidden> failed", logged[0].Message, "the monitor logger must not write the secret")
+
+	require.Eventually(t, func() bool { return len(pipel.PublishedEvents()) > 0 }, 5*time.Second, 5*time.Millisecond, "the monitor must publish an event")
+	for _, e := range pipel.PublishedEvents() {
+		doc, err := json.Marshal(e.Fields)
+		require.NoError(t, err, "event must be encoded")
+		assert.NotContains(t, string(doc), secret, "the event must not have the secret")
+	}
+	msg, err := pipel.PublishedEvents()[0].Fields.GetValue("error.message")
+	require.NoError(t, err, "the event must have the error")
+	assert.Equal(t, "request to https://host/?t=<hidden> failed", msg, "the error must have the secret replaced")
+}
+
+// TestMonitorScrubbingKeepsHeartbeatFields checks a secret equal to a value
+// of a field Heartbeat sets itself doesn't change it: the common wrappers and
+// the pipeline processors set those fields after the scrubbing.
+func TestMonitorScrubbingKeepsHeartbeatFields(t *testing.T) {
+	const monitorType = "leaky-type"
+	want := map[string]string{
+		"monitor.id":            "secret-monitor",
+		"monitor.name":          "secret monitor",
+		"monitor.type":          monitorType,
+		"event.dataset":         monitorType,
+		"event.type":            "heartbeat/summary",
+		"data_stream.type":      "synthetics",
+		"data_stream.dataset":   monitorType,
+		"data_stream.namespace": "default",
+	}
+	for name, secret := range want {
+		t.Run(name, func(t *testing.T) {
+			testStore.set(secret, nil)
+			reg := plugin.NewPluginsReg()
+			require.NoError(t, reg.Add(plugin.PluginFactory{
+				Name: monitorType,
+				Make: func(_ string, cfg *conf.C, info beat.Info) (plugin.Plugin, error) {
+					header, err := cfg.String("header", -1)
+					if err != nil {
+						return plugin.Plugin{}, err
+					}
+					job := func(event *beat.Event) ([]jobs.Job, error) {
+						eventext.MergeEventFields(event, mapstr.M{"url": mapstr.M{"full": "https://host/?t=" + header}})
+						return nil, nil
+					}
+					return plugin.Plugin{Jobs: []jobs.Job{job}, Endpoints: 1, Logger: info.Logger}, nil
+				},
+				Stats: plugin.NewPluginCountersRecorder(monitorType, monitoring.NewRegistry()),
+			}), "plugin must be registered")
+			factory, _, closeFactory := makeMockFactory(t, reg)
+			defer closeFactory()
+
+			cfg := captureMonitorConf(t, monitorType, true)
+			require.NoError(t, cfg.Merge(map[string]any{"data_stream": map[string]any{"namespace": "default"}}), "data_stream must merge")
+			pipel := &MockPipeline{}
+			runner, err := factory.Create(pipel, cfg)
+			require.NoError(t, err, "monitor must be created")
+			defer runner.Stop()
+			runner.Start()
+
+			require.Eventually(t, func() bool { return len(pipel.PublishedEvents()) > 0 }, 5*time.Second, 5*time.Millisecond, "the monitor must publish an event")
+			e := pipel.PublishedEvents()[0]
+			fields := e.Fields
+			url, _ := fields.GetValue("url.full")
+			assert.Equal(t, "https://host/?t=<hidden>", url, "the job's field must not have the secret")
+			for f, v := range want {
+				got, _ := fields.GetValue(f)
+				assert.Equal(t, v, got, "secret %q must not change %s", secret, f)
+			}
+			assert.Equal(t, "synthetics-leaky-type-default", e.Meta[events.FieldMetaRawIndex], "secret %q must not change the index", secret)
 		})
 	}
 }
