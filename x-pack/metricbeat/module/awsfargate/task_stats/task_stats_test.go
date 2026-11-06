@@ -17,7 +17,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
 	"github.com/elastic/beats/v7/metricbeat/module/docker/cpu"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 var (
