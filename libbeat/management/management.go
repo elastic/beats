@@ -29,6 +29,16 @@ import (
 // DebugK used as key for all things central management
 var DebugK = "centralmgmt"
 
+// OutputConfigHandler receives the raw expected configuration for an Elastic
+// Agent output unit after the output has reloaded successfully.
+type OutputConfigHandler func(*config.C)
+
+// OutputConfigHandlerRegistrar is implemented by managers that can deliver
+// raw Elastic Agent output-unit configuration changes to a Beat.
+type OutputConfigHandlerRegistrar interface {
+	SetOutputConfigHandler(OutputConfigHandler)
+}
+
 // Manager interacts with the beat to provide status updates and to receive
 // configurations.
 type Manager interface {
