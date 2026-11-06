@@ -1,0 +1,9 @@
+kind: enhancement
+summary: Allow the SQL query metricset with the Oracle driver and the Oracle module in FIPS builds of Metricbeat.
+description: >-
+  FIPS builds of Metricbeat now include the `sql/query` metricset and the `oracle` module.
+  In FIPS builds, `sql/query` accepts only `driver: oracle` and rejects module configurations that use other drivers.
+  Oracle Net cryptography runs in the customer-installed Oracle Instant Client, so FIPS compliance
+  requires that client and the database to use a FIPS 140-3 validated provider.
+component: metricbeat
+issue: https://github.com/elastic/beats/issues/54520
