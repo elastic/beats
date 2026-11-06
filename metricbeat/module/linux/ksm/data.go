@@ -69,7 +69,7 @@ func fetchKSMStats(ksmPath string) (ksmData, error) {
 
 	stableDups, err := linux.ReadIntFromFile(filepath.Join(ksmPath, "stable_node_dups"), 10)
 	if err != nil {
-		return ksmData{}, fmt.Errorf("error reading from stable_node_dups : %w", err)
+		return ksmData{}, fmt.Errorf("error reading from stable_node_dups: %w", err)
 	}
 
 	return ksmData{PagesShared: pshared, PagesSharing: pSharing, PagesUnshared: pUnshared,

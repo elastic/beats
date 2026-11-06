@@ -112,7 +112,7 @@ func (h *FileClientHandler) CheckEnabled() (bool, error) {
 func (h *FileClientHandler) CreatePolicy(policy Policy) error {
 	str := fmt.Sprintf("%s\n", policy.Body.StringToPrint())
 	if err := h.client.Write("policy", policy.Name, str); err != nil {
-		return fmt.Errorf("error printing policy : %w", err)
+		return fmt.Errorf("error printing policy: %w", err)
 	}
 	return nil
 }

@@ -170,7 +170,7 @@ func (u *timeUnfolder) OnArrayStart(ctx gotype.UnfoldCtx, len int, _ structform.
 	}
 
 	if len >= 0 && len != 2 {
-		return fmt.Errorf("%v is no valid encoded timestamp length", len)
+		return fmt.Errorf("%v is not a valid encoded timestamp length", len)
 	}
 
 	u.st = timeUnfoldWaitA
