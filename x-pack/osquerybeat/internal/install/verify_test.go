@@ -11,8 +11,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // setupFiles helper function that creates subdirectory with a given set of files

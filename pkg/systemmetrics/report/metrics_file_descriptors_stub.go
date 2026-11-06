@@ -20,9 +20,9 @@
 package report
 
 import (
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/process"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // FDUsage is only supported on Linux and FreeBSD.

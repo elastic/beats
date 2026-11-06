@@ -25,9 +25,9 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/process"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var (
@@ -91,11 +91,17 @@ func SetupMetricsOptions(opts MetricOptions) error {
 	monitoring.NewFunc(opts.ProcessMetrics, "memstats", MemStatsReporter(opts.Logger, processStats), monitoring.Report)
 	monitoring.NewFunc(opts.ProcessMetrics, "cpu", InstanceCPUReporter(opts.Logger, processStats), monitoring.Report)
 	monitoring.NewFunc(opts.ProcessMetrics, "runtime", ReportRuntime, monitoring.Report)
-	monitoring.NewFunc(opts.ProcessMetrics, "info", infoReporter(opts.Name, opts.Version, opts.EphemeralID), monitoring.Report)
+	SetupInfoMetrics(opts)
 
 	setupPlatformSpecificMetrics(opts.Logger, processStats, opts.SystemMetrics, opts.ProcessMetrics)
 
 	return nil
+}
+
+// SetupInfoMetrics registers only the beat.info metrics (name, version,
+// ephemeral ID and uptime) in opts.ProcessMetrics.
+func SetupInfoMetrics(opts MetricOptions) {
+	monitoring.NewFunc(opts.ProcessMetrics, "info", infoReporter(processName(opts.Name), opts.Version, opts.EphemeralID), monitoring.Report)
 }
 
 // processName truncates the name if it is longer than 15 characters, so we don't fail process checks later on
