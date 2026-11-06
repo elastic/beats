@@ -31,7 +31,7 @@ After enabling the module, open `modules.d/sql.yml` and set the required fields:
 `driver`
 :   The driver can be any driver that has a {{metricbeat}} module, such as `mssql` or `postgres`.
 
-    {applies_to}`stack: ga 9.7+` In FIPS-compatible {{metricbeat}}, set `driver` to `oracle`. {{metricbeat}} stops at startup if you configure any other driver. For the Oracle client requirements, refer to [FIPS mode](/reference/metricbeat/metricbeat-module-oracle.md#_fips_mode) in the Oracle module documentation.
+    {applies_to}`stack: ga 9.7+` In FIPS-compatible {{metricbeat}}, set `driver` to `oracle`. {{metricbeat}} rejects a module configuration that uses any other driver and logs an error naming the driver. For the Oracle client requirements, refer to [FIPS mode](/reference/metricbeat/metricbeat-module-oracle.md#_fips_mode) in the Oracle module documentation.
 
 `fetch_from_all_databases`
 :   Expects either `true` or `false` and it is by default set to `false`. Setting this to true enables execution of `sql_queries` or `sql_query` for all databases on a server. Currently only `mssql` driver supports this feature. For other drivers, if enabled, "fetch from all databases feature is not supported for driver: <driver_name>" error would be logged.
