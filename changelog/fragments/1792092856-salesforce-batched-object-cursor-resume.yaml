@@ -1,0 +1,23 @@
+kind: bug-fix
+
+# Change summary; a 80ish characters long description of the change.
+summary: Fix Salesforce batched object cursor resume on upgrades and mid-window restarts.
+
+# Long description; in case the summary is not enough to describe the change
+# this field accommodate a description without length limits.
+description: |
+  Two cursor-resume defects in bounded-batch Object collection could skip or
+  replay Salesforce events. First, the upgrade seed for the initial batched
+  window read first_event_time before last_event_time, which is correct for
+  descending real-time templates (login / logout) but replays the final
+  pre-upgrade poll window for ascending ones (aura_request); the window is now
+  seeded from the newer of the two watermarks. Second, runObjectQuery advanced
+  first_event_time / last_event_time / last_event_id per row even on the batched
+  path, so a crash or page failure after an ACKed first page but before the
+  window completed could persist a watermark past the un-ACKed later rows and
+  drop them on restart; the batched path now leaves those watermarks untouched
+  and advances only progress_time once a whole window has been published.
+component: filebeat
+
+# Issue URL; the batching mechanism this hardens.
+issue: https://github.com/elastic/beats/issues/48196
