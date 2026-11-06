@@ -227,14 +227,23 @@ of your WebSocket connections and prevent them from idling out.
 The `keep_alive` setting has the following configuration options:
 
 * `enable`: Indicates whether Keep-Alive is enabled. By default, this is set to `false`.
-* `interval`: Interval between Keep-Alive messages, expressed as a time duration value. The default value is `30s`. When keep-alive is enabled, the interval must be greater than zero and shorter than three times `write_control_deadline`.
-* `write_control_deadline`: Deadline for writing control frames, like `PING`, `PONG`, or `CLOSE`, on a WebSocket connection. The timeout, expressed as a time duration value, helps prevent indefinite blocking when the server or client is not responding to control frame requests. The default value is `10s`. When keep-alive is enabled, this value must be greater than zero. It also sets the read timeout to three times its value. Only a `PONG` frame resets the read timeout; receiving data frames does not reset it.
+* `interval`: Interval between Keep-Alive messages, expressed as a time duration value. The default value is `30s`.
+* `write_control_deadline`: Deadline for writing control frames, like `PING`, `PONG`, or `CLOSE`, on a WebSocket connection. The timeout, expressed as a time duration value, helps prevent indefinite blocking when the server or client is not responding to control frame requests. The default value is `10s`.
 
-When you enable keep-alive, configure a compatible interval and write deadline. For example, use `interval: 15s` with the default `write_control_deadline: 10s`, which gives a `30s` read timeout. Enabling keep-alive with both default durations is rejected because the `30s` interval equals the read timeout. Very small write deadlines can cause repeated reconnects if a `PONG` does not arrive before the read timeout.
+Only a `PONG` frame resets the read timeout. Receiving data frames does not reset it.
 
 ::::{note}
 Don't use the `blanket_retries` and `infinite_retries` configuration options together with the `keep_alive` settings. The purpose of `keep_alive` is to keep the connection open so you don't need to `retry` and reconnect all the time. In some scenarios `keep_alive` might not work if the host WebSocket server is not configured to handle `ping` frames.
 ::::
+
+### Read timeout and validation
+```{applies_to}
+  stack: preview 9.7
+```
+
+When keep-alive is enabled, `write_control_deadline` also sets the read timeout to three times its value. Both `interval` and `write_control_deadline` must be greater than zero. The interval must be shorter than the read timeout.
+
+Configure a compatible interval and write deadline before enabling keep-alive. For example, use `interval: 15s` with the default `write_control_deadline: 10s`, which gives a `30s` read timeout. Enabling keep-alive with both default durations is rejected because the `30s` interval equals the read timeout. Very small write deadlines can cause repeated reconnects if a `PONG` does not arrive before the read timeout.
 
 ## Input state [input-state-streaming]
 
