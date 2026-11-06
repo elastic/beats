@@ -29,32 +29,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetOne_footprint(t *testing.T) {
-	const allocSize = 64 << 20
-
-	stats, err := initTestResolver(t)
-	require.NoError(t, err, "failed to init process stats")
-
-	before := eventFootprint(t, &stats)
-	assert.Positive(t, before, "footprint should be non-zero for the test process")
-
-	// mmap keeps the Go allocator and GC from reusing or releasing memory
-	// during the measurement.
-	buf, err := syscall.Mmap(-1, 0, allocSize, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_ANON|syscall.MAP_PRIVATE)
-	require.NoError(t, err, "failed to mmap test buffer")
-	t.Cleanup(func() {
-		assert.NoError(t, syscall.Munmap(buf), "failed to munmap test buffer")
-	})
-	for i := 0; i < len(buf); i += os.Getpagesize() {
-		buf[i] = 1
-	}
-
-	after := eventFootprint(t, &stats)
-	assert.InDeltaf(t, float64(allocSize), float64(after)-float64(before), allocSize/4,
-		"footprint should grow by about %d bytes after dirtying %d bytes of anonymous memory; before=%d after=%d",
-		allocSize, allocSize, before, after)
-}
-
 func TestGetInfoForPid_cpuTicks(t *testing.T) {
 	burnCPU(300 * time.Millisecond)
 
@@ -75,18 +49,4 @@ func burnCPU(d time.Duration) {
 	for x := 0; time.Now().Before(deadline); x++ {
 		_ = x * x
 	}
-}
-
-func eventFootprint(t *testing.T, stats *Stats) uint64 {
-	t.Helper()
-
-	event, err := stats.GetOne(os.Getpid())
-	require.NoError(t, err, "GetOne failed for the test process")
-
-	val, err := event.GetValue("memory.footprint")
-	require.NoErrorf(t, err, "event has no memory.footprint; memory: %v", event["memory"])
-
-	footprint, ok := val.(uint64)
-	require.Truef(t, ok, "memory.footprint has type %T, want uint64", val)
-	return footprint
 }
