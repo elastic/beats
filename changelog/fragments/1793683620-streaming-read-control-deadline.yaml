@@ -1,10 +1,22 @@
-kind: bug-fix
-summary: Honour the configured WebSocket write deadline when deriving the read timeout
+kind: breaking-change
+summary: Reject incompatible streaming WebSocket keep-alive settings
 component: filebeat
 description: |
-  The WebSocket read timeout is three times keep_alive.write_control_deadline and
-  is reset only by PONG frames. With keep-alive enabled, nonpositive deadlines or
-  intervals and intervals at least three times the write deadline are now rejected,
-  including the default 30s interval with the default 10s write deadline. Previously
-  accepted configurations may need a shorter interval or a longer write deadline.
-  Very small deadlines can cause repeated reconnects.
+  The streaming input's WebSocket read timeout is now three times
+  `keep_alive.write_control_deadline` and is reset only by PONG frames. With
+  keep-alive enabled, nonpositive deadlines or intervals and intervals at least
+  three times the write deadline are rejected. Very small deadlines can still
+  cause repeated reconnects.
+impact: |
+  Existing inputs with `keep_alive.enable: true`, the default `30s` interval,
+  and the default `10s` write deadline now fail to start. Previously, these
+  inputs reconnected about every 30 seconds but could still receive data.
+  This includes existing Proofpoint On Demand policies that retain the old
+  `30s` interval; changing the integration's default only affects new policies.
+action: |
+  Before upgrading, update affected existing policies so that
+  `keep_alive.interval` is shorter than three times
+  `keep_alive.write_control_deadline`. For example, shorten the interval to
+  `15s` with the default `10s` write deadline, or increase the write deadline
+  to `15s` while keeping a `30s` interval. Both durations must be greater than
+  zero.
