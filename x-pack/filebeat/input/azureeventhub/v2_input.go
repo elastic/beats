@@ -601,13 +601,7 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 //
 // Sets up a pipelineClient for publishing events and receive notification of their ACKs.
 func initializePartitionResources(ctx context.Context, partitionClient partitionCheckpointer, pipeline beat.Pipeline, log *logp.Logger) (beat.Client, error) {
-	// The pipeline runs ACK callbacks on the queue's ACK goroutine, while
-	// records dropped by processors are acknowledged synchronously inside
-	// Publish when nothing is in flight. The two can overlap, so writes are
-	// serialized and a delayed callback must never move the persisted
-	// checkpoint backwards.
-	var checkpointMu sync.Mutex
-	var lastCheckpoint *checkpointMetadata
+	writeCheckpoint := newCheckpointWriter(ctx, partitionClient, log)
 
 	return pipeline.ConnectWith(beat.ClientConfig{
 		EventListener: acker.EventPrivateReporter(func(acked int, data []any) {
@@ -640,33 +634,7 @@ func initializePartitionResources(ctx context.Context, partitionClient partition
 				return
 			}
 
-			checkpointMu.Lock()
-			defer checkpointMu.Unlock()
-			if lastCheckpoint != nil && checkpoint.sequenceNumber <= lastCheckpoint.sequenceNumber {
-				return
-			}
-
-			err := partitionClient.UpdateCheckpoint(ctx, &azeventhubs.ReceivedEventData{
-				Offset:         checkpoint.offset,
-				SequenceNumber: checkpoint.sequenceNumber,
-			}, nil)
-			if err != nil {
-				log.Errorw(
-					"error updating checkpoint",
-					"partition_id", partitionClient.PartitionID(),
-					"error", err,
-				)
-				return
-			}
-			lastCheckpoint = checkpoint
-
-			log.Debugw(
-				"checkpoint updated",
-				"partition_id", partitionClient.PartitionID(),
-				"acked", acked,
-				"sequence_number", checkpoint.sequenceNumber,
-				"offset", checkpoint.offset,
-			)
+			writeCheckpoint(acked, checkpoint)
 		}),
 		Processing: beat.ProcessingConfig{
 			// This input only produces events with basic types so normalization
@@ -674,6 +642,48 @@ func initializePartitionResources(ctx context.Context, partitionClient partition
 			EventNormalization: new(false),
 		},
 	})
+}
+
+// newCheckpointWriter serializes writes for one partition client and ignores
+// markers at or behind the last successfully persisted message.
+func newCheckpointWriter(ctx context.Context, partitionClient partitionCheckpointer, log *logp.Logger) func(int, *checkpointMetadata) {
+	// The pipeline runs ACK callbacks on the queue's ACK goroutine, while
+	// records dropped by processors are acknowledged synchronously inside
+	// Publish when nothing is in flight. The two can overlap, so writes are
+	// serialized and a delayed callback must never move the persisted
+	// checkpoint backwards.
+	var checkpointMu sync.Mutex
+	var lastCheckpoint *checkpointMetadata
+
+	return func(acked int, checkpoint *checkpointMetadata) {
+		checkpointMu.Lock()
+		defer checkpointMu.Unlock()
+		if lastCheckpoint != nil && checkpoint.sequenceNumber <= lastCheckpoint.sequenceNumber {
+			return
+		}
+
+		err := partitionClient.UpdateCheckpoint(ctx, &azeventhubs.ReceivedEventData{
+			Offset:         checkpoint.offset,
+			SequenceNumber: checkpoint.sequenceNumber,
+		}, nil)
+		if err != nil {
+			log.Errorw(
+				"error updating checkpoint",
+				"partition_id", partitionClient.PartitionID(),
+				"error", err,
+			)
+			return
+		}
+		lastCheckpoint = checkpoint
+
+		log.Debugw(
+			"checkpoint updated",
+			"partition_id", partitionClient.PartitionID(),
+			"acked", acked,
+			"sequence_number", checkpoint.sequenceNumber,
+			"offset", checkpoint.offset,
+		)
+	}
 }
 
 // partitionCheckpointer is the subset of *azeventhubs.ProcessorPartitionClient
