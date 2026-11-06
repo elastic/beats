@@ -19,7 +19,7 @@ package channel
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 )
 
 // ConnectorFunc is an adapter for using ordinary functions as Connector.

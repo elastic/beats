@@ -22,7 +22,7 @@ import (
 	"slices"
 	"sync"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // Map stores a map of id -> MapStrPointer
