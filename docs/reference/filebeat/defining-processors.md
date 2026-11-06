@@ -1,4 +1,5 @@
 ---
+navigation_title: "Define processors"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/defining-processors.html
 applies_to:
@@ -6,7 +7,7 @@ applies_to:
   serverless: ga
 ---
 
-# Define processors [defining-processors]
+# Define processors in Filebeat [defining-processors]
 
 You can use processors to filter and enhance data before sending it to the configured output. To define a processor, you specify the processor name, an optional condition, and a set of parameters:
 

@@ -1,4 +1,6 @@
 ---
+meta_title: "Packetbeat outputs: Elasticsearch, Logstash, Kafka"
+description: "Configure where Packetbeat sends events by enabling one output in the outputs section of packetbeat.yml: Elasticsearch, Logstash, Kafka, Redis, File, Console, or Discard."
 navigation_title: "Output"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/configuring-output.html
@@ -7,7 +9,7 @@ applies_to:
   serverless: ga
 ---
 
-# Configure the output [configuring-output]
+# Configure the output in Packetbeat [configuring-output]
 
 
 You configure Packetbeat to write to a specific output by setting options in the Outputs section of the `packetbeat.yml` config file. Only a single output may be defined.
