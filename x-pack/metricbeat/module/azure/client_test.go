@@ -63,7 +63,7 @@ func TestInitResources(t *testing.T) {
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)
 		err := client.InitResources(mockMapResourceMetrics)
-		assert.Error(t, err, "no resources were found based on all the configurations options entered")
+		assert.Error(t, err, "no resources were found based on all the configuration options entered")
 		assert.Empty(t, client.ResourceConfigurations.Metrics)
 		m.AssertExpectations(t)
 	})
