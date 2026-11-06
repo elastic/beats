@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Correct field descriptions, module docs and error text in the etcd, redis, memcached, postgresql, sql and kubernetes modules and in Heartbeat
+component: all
