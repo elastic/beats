@@ -147,7 +147,7 @@ require (
 	cloud.google.com/go v0.123.0
 	cloud.google.com/go/compute v1.74.0
 	cloud.google.com/go/redis v1.28.0
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.23.3
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.24.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.15.0
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/v2 v2.0.2
 	github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics v1.3.0
@@ -274,7 +274,7 @@ require (
 	go.uber.org/goleak v1.3.0
 	go.uber.org/zap/exp v0.3.0
 	go.yaml.in/yaml/v2 v2.4.4
-	go.yaml.in/yaml/v3 v3.0.5
+	go.yaml.in/yaml/v3 v3.0.6
 	gopkg.in/mcuadros/go-syslog.v2 v2.3.0
 	sigs.k8s.io/kind v0.29.0
 	www.velocidex.com/golang/go-ntfs v0.2.1-0.20250322152626-3c09d909d740
