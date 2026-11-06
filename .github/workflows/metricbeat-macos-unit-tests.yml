@@ -12,6 +12,7 @@ on:
       - go.mod
       - dev-tools/**
       - libbeat/**
+      - pkg/systemmetrics/**
       # Workflow
       - .github/workflows/metricbeat-macos-unit-tests.yml
       - .github/actions/unit-test/action.yml
@@ -24,6 +25,7 @@ on:
       - go.mod
       - dev-tools/**
       - libbeat/**
+      - pkg/systemmetrics/**
       # Workflow
       - .github/workflows/metricbeat-macos-unit-tests.yml
       - .github/actions/unit-test/action.yml
