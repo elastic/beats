@@ -9,9 +9,9 @@ import (
 	"regexp"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/safemapstr"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/safemapstr"
 )
 
 var (

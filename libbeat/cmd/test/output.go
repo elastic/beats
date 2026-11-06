@@ -26,7 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/outputs"
-	"github.com/elastic/elastic-agent-libs/testing"
+	"github.com/elastic/beats/v7/pkg/testing"
 )
 
 func GenTestOutputCmd(settings instance.Settings) *cobra.Command {
