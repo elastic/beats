@@ -72,6 +72,61 @@ func AzureNewClientAssertionCredential(params AzureParams) (*azidentity.ClientAs
 	return azidentity.NewClientAssertionCredential(params.TenantID, params.ClientID, getAssertion, params.Options)
 }
 
+// AzureWIIParams configures the Azure client assertion credential flow with a
+// workload-identity-issuer token.
+//
+// Authentication chain:
+//  1. Fetch JWT from the workload-identity issuer via TokenSource on each token refresh
+//  2. ClientAssertionCredential(TenantID, ClientID, JWT) → Azure access token
+type AzureWIIParams struct {
+	// TenantID is the Azure Active Directory tenant ID.
+	TenantID string
+	// ClientID is the Azure application (client) ID.
+	ClientID string
+	// TokenSource fetches the JWT from the workload-identity issuer. Its audience must
+	// match the audience of the federated identity credential in the customer tenant.
+	TokenSource *WIITokenSource
+	// Options are passed directly to azidentity.NewClientAssertionCredential.
+	Options *azidentity.ClientAssertionCredentialOptions
+}
+
+func (p AzureWIIParams) validate() error {
+	var errs []error
+	if p.TenantID == "" {
+		errs = append(errs, errors.New("TenantID is required"))
+	}
+	if p.ClientID == "" {
+		errs = append(errs, errors.New("ClientID is required"))
+	}
+	if p.TokenSource == nil {
+		errs = append(errs, errors.New("TokenSource is required"))
+	}
+	if len(errs) > 0 {
+		return fmt.Errorf("invalid Azure identity federation params: %w", errors.Join(errs...))
+	}
+	return nil
+}
+
+// AzureNewWIIClientAssertionCredential creates an Azure credential that uses a JWT from
+// the workload-identity issuer as the client assertion. The token source caches the JWT
+// and refreshes it before it expires.
+func AzureNewWIIClientAssertionCredential(params AzureWIIParams) (*azidentity.ClientAssertionCredential, error) {
+	if err := params.validate(); err != nil {
+		return nil, err
+	}
+
+	tokenSource := params.TokenSource
+	getAssertion := func(_ context.Context) (string, error) {
+		token, err := tokenSource.GetIdentityToken()
+		if err != nil {
+			return "", err
+		}
+		return string(token), nil
+	}
+
+	return azidentity.NewClientAssertionCredential(params.TenantID, params.ClientID, getAssertion, params.Options)
+}
+
 // AzureReadJWT reads and validates a JWT token from the given file path.
 // It trims whitespace and performs a basic structural check (three dot-separated parts).
 func AzureReadJWT(filePath string) (string, error) {
