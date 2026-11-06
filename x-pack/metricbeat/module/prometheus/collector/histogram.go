@@ -44,7 +44,7 @@ func PromHistogramToES(cc CounterCache, name string, labels mapstr.M, histogram 
 	var sumCount, prevCount uint64
 	for _, bucket := range histogram.GetBucket() {
 		// Ignore non-numbers
-		if bucket.GetCumulativeCount() == uint64(math.NaN()) || bucket.GetCumulativeCount() == uint64(math.Inf(0)) {
+		if math.IsNaN(bucket.GetCumulativeCount()) || math.IsInf(bucket.GetCumulativeCount(), 0) {
 			continue
 		}
 
@@ -64,14 +64,14 @@ func PromHistogramToES(cc CounterCache, name string, labels mapstr.M, histogram 
 		}
 
 		// Take count for this period (rate)
-		countRate, found := cc.RateUint64(name+labels.String()+fmt.Sprintf("%f", bucketUpperBound), bucket.GetCumulativeCount())
+		countRate, found := cc.RateUint64(name+labels.String()+fmt.Sprintf("%f", bucketUpperBound), uint64(bucket.GetCumulativeCount()))
 
 		switch {
 		case !found:
 			// This is a new bucket, consider it zero by now, but still increase the
 			// sum to don't deviate following buckets that are not new.
 			counts = append(counts, 0)
-			sumCount += bucket.GetCumulativeCount() - prevCount
+			sumCount += uint64(bucket.GetCumulativeCount()) - prevCount
 		case countRate < sumCount:
 			// This should never happen, this means something is wrong in the
 			// prometheus response. Handle it to avoid overflowing when deaccumulating.
@@ -81,7 +81,7 @@ func PromHistogramToES(cc CounterCache, name string, labels mapstr.M, histogram 
 			counts = append(counts, countRate-sumCount)
 			sumCount = countRate
 		}
-		prevCount = bucket.GetCumulativeCount()
+		prevCount = uint64(bucket.GetCumulativeCount())
 	}
 
 	res := mapstr.M{
