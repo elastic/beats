@@ -21,6 +21,7 @@ package journalctl
 
 import (
 	"bufio"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -30,7 +31,6 @@ import (
 	"sync"
 	"syscall"
 
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -42,7 +42,7 @@ type journalctl struct {
 	stderr   io.ReadCloser
 
 	logger   *logp.Logger
-	canceler input.Canceler
+	canceler context.Context
 	waitDone sync.WaitGroup
 
 	// Stop chan and StopOnce are used to ensure the stdout reader goroutine
@@ -65,7 +65,7 @@ type journalctl struct {
 //
 // The returned type is an interface to allow mocking for testing
 func NewFactory(chroot, journalctlPath string) JctlFactory {
-	return func(canceller input.Canceler, logger *logp.Logger, args ...string) (Jctl, error) {
+	return func(canceller context.Context, logger *logp.Logger, args ...string) (Jctl, error) {
 		//nolint:noctx,gosec // we use the canceller to stop the process; journalctlPath is operator-configured, not user input
 		cmd := exec.Command(journalctlPath, args...)
 
@@ -209,7 +209,7 @@ func (j *journalctl) Kill() error {
 // journalctl finished returning all data and exited successfully, if journalctl
 // exited unexpectedly, then `err` is non-nil, `finished` is false and an empty
 // byte array is returned.
-func (j *journalctl) Next(cancel input.Canceler) ([]byte, error) {
+func (j *journalctl) Next(cancel context.Context) ([]byte, error) {
 	// Fast path: an entry is already available (or the input is cancelled), so no
 	// timer is needed.
 	select {

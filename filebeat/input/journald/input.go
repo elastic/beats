@@ -20,6 +20,7 @@
 package journald
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -44,7 +45,7 @@ import (
 //go:generate moq -out journalReadMock_test.go . journalReader
 type journalReader interface {
 	Close() error
-	Next(cancel input.Canceler) (journalctl.JournalEntry, error)
+	Next(cancel context.Context) (journalctl.JournalEntry, error)
 }
 
 type journald struct {
@@ -311,7 +312,7 @@ func getCursorUpdate(priv any) any {
 //     more human friendly
 type readerAdapter struct {
 	r                  journalReader
-	canceler           input.Canceler
+	canceler           context.Context
 	converter          *journalfield.Converter
 	saveRemoteHostname bool
 }

@@ -24,7 +24,6 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -107,7 +106,7 @@ func (inp *managedInput) Run(
 ) (err error) {
 	// Setup cancellation using a custom cancel context. All workers will be
 	// stopped if one failed badly by returning an error.
-	cancelCtx, cancel := context.WithCancel(ctxtool.FromCanceller(ctx.Cancelation))
+	cancelCtx, cancel := context.WithCancel(ctx.Cancelation)
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 

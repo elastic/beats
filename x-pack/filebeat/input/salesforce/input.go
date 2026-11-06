@@ -36,7 +36,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/go-concert/ctxtool"
 )
 
 const (
@@ -110,7 +109,7 @@ func (s *salesforceInput) Setup(env v2.Context, src inputcursor.Source, cursor *
 
 	cfg := srcSource.cfg
 
-	ctx := ctxtool.FromCanceller(env.Cancelation)
+	ctx := env.Cancelation
 	childCtx, cancel := context.WithCancelCause(ctx)
 
 	s.srcConfig = &cfg

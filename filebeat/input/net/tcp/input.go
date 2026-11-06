@@ -33,7 +33,6 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/tcp"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/go-concert/ctxtool"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -149,5 +148,5 @@ func (s *server) Run(ctx input.Context, evtChan chan<- netinput.DataMetadata, m 
 	ctx.Logger.Debug("tcp input initialized")
 	ctx.UpdateStatus(status.Running, "")
 
-	return server.Run(ctxtool.FromCanceller(ctx.Cancelation))
+	return server.Run(ctx.Cancelation)
 }

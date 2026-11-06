@@ -10,7 +10,6 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry"
-	"github.com/elastic/go-concert/ctxtool"
 )
 
 // inputV2 defines a Cloudfoundry input that uses the consumer V2 API
@@ -51,7 +50,7 @@ func (i *inputV2) Run(ctx v2.Context, publisher stateless.Publisher) error {
 		return err
 	}
 
-	listener.Start(ctxtool.FromCanceller(ctx.Cancelation))
+	listener.Start(ctx.Cancelation)
 	listener.Wait()
 	return nil
 }

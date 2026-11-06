@@ -30,7 +30,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/go-concert/ctxtool"
 )
 
 const (
@@ -109,7 +108,7 @@ func (input input) Test(src inputcursor.Source, _ v2.TestContext) error {
 func (input *input) Run(ctxt v2.Context, src inputcursor.Source, resumeCursor inputcursor.Cursor, pub inputcursor.Publisher) error {
 	reg := ctxt.MetricsRegistry
 
-	stdCtx := ctxtool.FromCanceller(ctxt.Cancelation)
+	stdCtx := ctxt.Cancelation
 	log := ctxt.Logger.With("source", src.Name())
 
 	startFrom, err := loadCursor(resumeCursor, log)

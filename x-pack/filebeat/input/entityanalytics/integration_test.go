@@ -176,7 +176,7 @@ func runInputOnce(t *testing.T, dataDir string, providerName string, prov entcol
 			v2.Context{
 				Logger:      log,
 				ID:          "integ-" + providerName,
-				Cancelation: v2.GoContextFromCanceler(ctx),
+				Cancelation: ctx,
 			},
 			connector,
 		)
@@ -244,7 +244,7 @@ func runIncrementalOnce(t *testing.T, dataDir string, providerName string, prov 
 		v2.Context{
 			Logger:      log,
 			ID:          "integ-" + providerName,
-			Cancelation: v2.GoContextFromCanceler(ctx),
+			Cancelation: ctx,
 		},
 		prov,
 		acking,
