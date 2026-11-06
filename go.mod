@@ -3,8 +3,8 @@ module github.com/elastic/beats/v7
 go 1.26.10
 
 require (
-	cloud.google.com/go/bigquery v1.86.0
-	cloud.google.com/go/monitoring v1.32.0
+	cloud.google.com/go/bigquery v1.86.1
+	cloud.google.com/go/monitoring v1.32.1
 	cloud.google.com/go/pubsub v1.51.1
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
 	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
@@ -130,7 +130,7 @@ require (
 	golang.org/x/time v0.16.0
 	golang.org/x/tools v0.51.0
 	google.golang.org/api v0.307.0
-	google.golang.org/genproto v0.0.0-20260715232425-e75dac1f907d // indirect
+	google.golang.org/genproto v0.0.0-20261012220534-4341edf3f941 // indirect
 	google.golang.org/grpc v1.84.0
 	google.golang.org/protobuf v1.36.12
 	gopkg.in/inf.v0 v0.9.1
@@ -145,8 +145,8 @@ require (
 
 require (
 	cloud.google.com/go v0.123.0
-	cloud.google.com/go/compute v1.74.0
-	cloud.google.com/go/redis v1.28.0
+	cloud.google.com/go/compute v1.74.1
+	cloud.google.com/go/redis v1.29.0
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.23.3
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.15.0
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/v2 v2.0.2
@@ -183,7 +183,7 @@ require (
 	github.com/go-resty/resty/v2 v2.17.2
 	github.com/gofrs/uuid/v5 v5.3.2
 	github.com/golang-jwt/jwt/v5 v5.3.1
-	github.com/googleapis/gax-go/v2 v2.26.2
+	github.com/googleapis/gax-go/v2 v2.27.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
 	github.com/hashicorp/golang-lru/v2 v2.0.7
@@ -220,7 +220,7 @@ require (
 	go.opentelemetry.io/collector/receiver v1.70.0
 	go.uber.org/mock v0.5.0
 	golang.org/x/term v0.47.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20260803160001-6ac0973c030d
+	google.golang.org/genproto/googleapis/api v0.0.0-20261012220534-4341edf3f941
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -259,7 +259,7 @@ require (
 	go.opentelemetry.io/collector/processor/processorhelper v0.164.0
 	go.opentelemetry.io/collector/receiver/receivertest v0.164.0
 	go.opentelemetry.io/collector/service v0.164.0
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.70.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.72.0
 	go.opentelemetry.io/otel v1.47.0
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.45.0
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp v1.45.0
@@ -311,11 +311,11 @@ require (
 	al.essio.dev/pkg/shellescape v1.5.1 // indirect
 	aqwari.net/xml v0.0.0-20210331023308-d9421b293817 // indirect
 	cel.dev/expr v0.25.2 // indirect
-	cloud.google.com/go/auth v0.24.1 // indirect
-	cloud.google.com/go/auth/oauth2adapt v0.3.0 // indirect
+	cloud.google.com/go/auth v0.24.2 // indirect
+	cloud.google.com/go/auth/oauth2adapt v0.3.1 // indirect
 	cloud.google.com/go/compute/metadata v0.10.0 // indirect
-	cloud.google.com/go/iam v1.15.0 // indirect
-	cloud.google.com/go/longrunning v1.4.0 // indirect
+	cloud.google.com/go/iam v1.15.1 // indirect
+	cloud.google.com/go/longrunning v1.4.1 // indirect
 	cloud.google.com/go/pubsub/v2 v2.8.0 // indirect
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f // indirect
 	filippo.io/edwards25519 v1.2.0 // indirect
@@ -539,7 +539,7 @@ require (
 	go.opentelemetry.io/collector/receiver/xreceiver v0.164.0 // indirect
 	go.opentelemetry.io/collector/service/hostcapabilities v0.164.0 // indirect
 	go.opentelemetry.io/contrib/bridges/otelzap v0.20.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.68.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.72.0 // indirect
 	go.opentelemetry.io/contrib/otelconf v0.25.0 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.45.0 // indirect
 	go.opentelemetry.io/ebpf-profiler v0.0.202640 // indirect
