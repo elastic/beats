@@ -9,6 +9,7 @@ These pages describe the checked-in GitHub Actions workflow definitions in this 
 - [Buildkite Test Flaky](docs/buildkite-test-flaky.md) (`buildkite-test-flaky.yml`)
 - [bump-elastic-stack-snapshot](docs/bump-elastic-stack-snapshot.md) (`bump-elastic-stack-snapshot.yml`)
 - [bump-golang](docs/bump-golang.md) (`bump-golang.yml`)
+- [bump-npcap](docs/bump-npcap.md) (`bump-npcap.yml`)
 - [bump-osquery](docs/bump-osquery.md) (`bump-osquery.yml`)
 - [bump-vm-images](docs/bump-vm-images.md) (`bump-vm-images.yml`)
 - [catalog-info](docs/catalog-info.md) (`catalog-info.yml`)

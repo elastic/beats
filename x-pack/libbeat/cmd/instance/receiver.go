@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring/report/log"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/pkg/monitoring"
 	metricreport "github.com/elastic/beats/v7/pkg/systemmetrics/report"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
@@ -75,28 +76,49 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 	// stats.beat
 	processReg := statsReg.GetOrCreateRegistry("beat")
 
-	// stats.system
-	systemReg := statsReg.GetOrCreateRegistry("system")
-
-	err = metricreport.SetupMetricsOptions(metricreport.MetricOptions{
-		Logger:         b.Info.Logger.Named("metrics"),
+	// System metrics are process-wide and reported by the shared system bridge,
+	// see AcquireSystemBridge. Only this receiver's beat.info is registered here.
+	metricreport.SetupInfoMetrics(metricreport.MetricOptions{
 		Name:           b.Info.Name,
 		Version:        b.Info.Version,
-		SystemMetrics:  systemReg,
 		ProcessMetrics: processReg,
 	})
-	if err != nil {
-		return BeatReceiver{}, fmt.Errorf("error setting up metrics report: %w", err)
-	}
 
+	// The bridge is shared by all receivers, so pass the original settings to
+	// keep this receiver's component.* fields out of its logs.
+	var releaseSystem func()
+	acquireSystem := func() (err error) {
+		releaseSystem, err = oteltelemetry.AcquireSystemBridge(set.TelemetrySettings)
+		if err != nil {
+			return fmt.Errorf("error acquiring system bridge: %w", err)
+		}
+		return nil
+	}
+	created := false
+	defer func() {
+		if created {
+			return
+		}
+		stopAPI(b)
+		if releaseSystem != nil {
+			releaseSystem()
+		}
+	}()
+
+	// The API serves the shared system metrics, so it starts after the bridge.
+	// Without an API the bridge is acquired only once creation can no longer fail.
 	if b.Config.HTTP.Enabled() {
+		if err := acquireSystem(); err != nil {
+			return BeatReceiver{}, err
+		}
 		retryer := backoff.NewRetryer(50, 100*time.Millisecond, 1*time.Second)
 		err := retryer.Retry(ctx, func() error {
 			var err error
 			b.API, err = api.NewWithDefaultRoutes(
 				b.Info.Logger.Named("metrics.http"),
 				b.Config.HTTP,
-				b.Monitoring)
+				b.Monitoring,
+				api.WithStatsExtra(receiverSystemMetrics))
 			if err != nil {
 				return fmt.Errorf("could not start the HTTP server for the API: %w", err)
 			}
@@ -118,13 +140,12 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 		return BeatReceiver{}, fmt.Errorf("error creating registry bridge: %w", err)
 	}
 
-	// The system bridge is shared by all receivers. Preserve the original
-	// settings so its logs are not permanently tagged with this receiver's
-	// component.* fields.
-	releaseSystem, err := oteltelemetry.AcquireSystemBridge(set.TelemetrySettings)
-	if err != nil {
-		return BeatReceiver{}, fmt.Errorf("error acquiring system bridge: %w", err)
+	if releaseSystem == nil {
+		if err := acquireSystem(); err != nil {
+			return BeatReceiver{}, err
+		}
 	}
+	created = true
 
 	return BeatReceiver{
 		beat:                b,
@@ -174,6 +195,7 @@ func (br *BeatReceiver) Start(ctx context.Context, host component.Host) (retErr 
 			diagExt.RegisterDiagnosticHook(br.beat.Info.ComponentID, "Metrics from the default monitoring namespace and expvar.",
 				"beat_metrics.json", "application/json", func() []byte {
 					m := monitoring.CollectStructSnapshot((br.beat.Monitoring.StatsRegistry()), monitoring.Full, true)
+					mapstr.M(m).DeepUpdateNoOverwrite(receiverSystemMetrics())
 					data, err := json.MarshalIndent(m, "", "  ")
 					if err != nil {
 						return fmt.Appendf(nil, "Failed to collect beat metric snapshot for Agent diagnostics: %v", err)
@@ -214,7 +236,8 @@ func (br *BeatReceiver) Start(ctx context.Context, host component.Host) (retErr 
 	if br.beat.Config.MetricLogging == nil || br.beat.Config.MetricLogging.Enabled() {
 		r, err := log.MakeReporter(br.beat.Info,
 			br.beat.Config.MetricLogging,
-			br.beat.Monitoring)
+			br.beat.Monitoring,
+			log.WithExtraMetrics(oteltelemetry.SystemMetricsFlatSnapshot))
 		if err != nil {
 			return fmt.Errorf("error creating metric reporter: %w", err)
 		}
@@ -250,7 +273,8 @@ func (br *BeatReceiver) Shutdown(ctx context.Context) error {
 		br.bridge.Shutdown()
 	}
 	if br.releaseSystemBridge != nil {
-		br.releaseSystemBridge()
+		// Release last: the API, log reporter and diagnostics hook read the bridge.
+		defer br.releaseSystemBridge()
 	}
 
 	// If the Shutdown was called before the Start, do not wait for beater.Run to return.
@@ -335,6 +359,20 @@ func (br *BeatReceiver) getESStateStoreExtension(host component.Host, storageExt
 		return nil, fmt.Errorf("extension '%s' is not a backend.Registry", componentID.String())
 	}
 	return reg, nil
+}
+
+// receiverSystemMetrics returns the shared system metrics for diagnostics and
+// /stats. They are merged without overwriting, so the receiver's beat.info wins.
+func receiverSystemMetrics() mapstr.M {
+	return mapstr.M(oteltelemetry.SystemMetricsSnapshot())
+}
+
+// stopAPI stops the HTTP API server started by NewBeatReceiver, if any.
+func stopAPI(b *instance.Beat) {
+	if b.API != nil {
+		_ = b.API.Stop()
+		b.API = nil
+	}
 }
 
 const (

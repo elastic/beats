@@ -81,7 +81,7 @@ func TestPublish(t *testing.T) {
 			logsConsumer: logConsumer,
 			beatInfo:     beatInfo,
 			log:          logger.Named("otelconsumer"),
-			retry:        retryConfig{init: 1 * time.Millisecond, max: 2 * time.Millisecond},
+			retry:        newRetryBackoff(1*time.Millisecond, 2*time.Millisecond),
 		}
 	}
 
@@ -284,26 +284,33 @@ func TestPublish(t *testing.T) {
 		assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag)
 	})
 
-	t.Run("retryable errors wait a per-attempt jittered backoff", func(t *testing.T) {
-		const initBackoff = 50 * time.Millisecond
-
+	t.Run("logs retryable errors once per back-off", func(t *testing.T) {
+		var result error
 		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
-			return errors.New("retryable error")
+			return result
 		})
-		otelConsumer.retry = retryConfig{init: initBackoff, max: 500 * time.Millisecond}
+		// A back-off far longer than the test lasts until the success below.
+		otelConsumer.retry = newRetryBackoff(time.Hour, time.Hour)
+		logger, observed := logptest.NewTestingLoggerWithObserver(t, "")
+		otelConsumer.log = logger
 
-		const margin = 45 * time.Millisecond
-		for range 4 {
-			batch := outest.NewBatch(event1)
-			start := time.Now()
-			err := otelConsumer.Publish(ctx, batch)
-			d := time.Since(start)
-			require.NoError(t, err, "Publish should not return an error")
-			require.Len(t, batch.Signals, 1, "expected exactly one signal from Publish")
-			assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag, "batch should be retried")
-			assert.GreaterOrEqual(t, d, initBackoff, "retry delay should be at least init")
-			assert.Less(t, d, 2*initBackoff+margin, "retry delay should not escalate past ~2*init (got %v)", d)
+		// A cancelled context makes Publish return right after recording a failure.
+		cancelledCtx, cancelFn := context.WithCancel(ctx)
+		cancelFn()
+		publish := func(err error) {
+			result = err
+			require.NoError(t, otelConsumer.Publish(cancelledCtx, outest.NewBatch(event1)), "Publish should not return an error")
 		}
+		logged := func() int { return observed.FilterMessageSnippet("failed to publish").Len() }
+
+		retryable := errors.New("retryable error")
+		publish(retryable)
+		publish(retryable)
+		assert.Equal(t, 1, logged(), "failures during a back-off should be logged once")
+
+		publish(nil)
+		publish(retryable)
+		assert.Equal(t, 2, logged(), "a failure after a success should start a new back-off")
 	})
 
 	t.Run("cancels batch when context is cancelled during backoff", func(t *testing.T) {
@@ -313,7 +320,7 @@ func TestPublish(t *testing.T) {
 		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
 			return errors.New("retryable error")
 		})
-		otelConsumer.retry = retryConfig{init: 10 * time.Second, max: 10 * time.Second}
+		otelConsumer.retry = newRetryBackoff(10*time.Second, 10*time.Second)
 
 		publishDone := make(chan struct{})
 		go func() {
@@ -729,7 +736,7 @@ func collectOtelDocViaPublish(t *testing.T, ctx context.Context, logger *logp.Lo
 		logsConsumer: logConsumer,
 		beatInfo:     beat.Info{Name: "testbeat", Version: "0.0.0"},
 		log:          logger.Named("otelconsumer"),
-		retry:        retryConfig{init: 1 * time.Millisecond, max: 2 * time.Millisecond},
+		retry:        newRetryBackoff(1*time.Millisecond, 2*time.Millisecond),
 	}
 	require.NoError(t, oc.Publish(ctx, outest.NewBatch(beatEvent)))
 	select {

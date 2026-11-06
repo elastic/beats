@@ -32,8 +32,26 @@ import (
 
 type LookupFunc func(string) *monitoring.Registry
 
+// RouteOption customizes the routes created by NewWithDefaultRoutes.
+type RouteOption func(*routeOptions)
+
+type routeOptions struct {
+	statsExtra func() mapstr.M
+}
+
+// WithStatsExtra merges the metrics returned by extra into the /stats response
+// without overwriting existing ones. extra is called per request and may return nil.
+func WithStatsExtra(extra func() mapstr.M) RouteOption {
+	return func(o *routeOptions) { o.statsExtra = extra }
+}
+
 // NewWithDefaultRoutes creates a new server with default API routes.
-func NewWithDefaultRoutes(log *logp.Logger, config *config.C, mon beatmonitoring.Monitoring) (*Server, error) {
+func NewWithDefaultRoutes(log *logp.Logger, config *config.C, mon beatmonitoring.Monitoring, opts ...RouteOption) (*Server, error) {
+	var options routeOptions
+	for _, opt := range opts {
+		opt(&options)
+	}
+
 	api, err := New(log, config)
 	if err != nil {
 		return nil, err
@@ -42,7 +60,7 @@ func NewWithDefaultRoutes(log *logp.Logger, config *config.C, mon beatmonitoring
 	err = errors.Join(
 		api.AttachHandler("/", makeRootAPIHandler(makeAPIHandler(mon.InfoRegistry()))),
 		api.AttachHandler("/state", makeAPIHandler(mon.StateRegistry())),
-		api.AttachHandler("/stats", makeAPIHandler(mon.StatsRegistry())),
+		api.AttachHandler("/stats", makeStatsHandler(mon.StatsRegistry(), options.statsExtra)),
 		api.AttachHandler("/dataset", makeAPIHandler(mon.InputsRegistry())),
 	)
 	if err != nil {
@@ -63,6 +81,11 @@ func makeRootAPIHandler(handler http.HandlerFunc) http.HandlerFunc {
 }
 
 func makeAPIHandler(registry *monitoring.Registry) http.HandlerFunc {
+	return makeStatsHandler(registry, nil)
+}
+
+// makeStatsHandler serves a snapshot of registry merged with extra, if not nil.
+func makeStatsHandler(registry *monitoring.Registry, extra func() mapstr.M) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
@@ -71,6 +94,9 @@ func makeAPIHandler(registry *monitoring.Registry) http.HandlerFunc {
 			monitoring.Full,
 			false,
 		)
+		if extra != nil {
+			mapstr.M(data).DeepUpdateNoOverwrite(extra())
+		}
 
 		prettyPrint(w, data, r.URL)
 	}
