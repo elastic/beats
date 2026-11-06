@@ -76,6 +76,38 @@ Maximum wait time for event requests from the output to be fulfilled. If set to 
 The default value is 10s.
 
 
+## Configure the slab queue [configuration-internal-queue-slab]
+
+```{applies_to}
+stack: ga 9.5.0
+```
+
+The slab queue is a second in-memory queue. Like the memory queue it holds all events in memory and never writes to disk, but it keeps events in a pool of slots that several publishing pipelines can share while each pipeline keeps its own FIFO. A stalled output on one pipeline therefore does not hold up the others, and the pool bounds the total number of events held across all of them.
+
+This is the queue a Beat uses when it runs as an OpenTelemetry receiver, where several receivers share one event budget. A standalone Beat has a single pipeline, so the isolation does not come into play; what it offers there is a lighter publishing path than the memory queue.
+
+To use it, configure it in place of `queue.mem`:
+
+```yaml
+queue.slab:
+  events: 4096
+```
+
+The slab queue does not support the memory queue's `flush.min_events` and `flush.timeout` options, and setting them under `queue.slab` has no effect. Once at least one event is queued, the queue applies a short coalescing delay and then hands over everything it holds, up to the number of events the output asks for, so batch size is governed by the output's `bulk_max_size` rather than by queue settings.
+
+
+### Configuration options [configuration-internal-queue-slab-reference]
+
+You can specify the following options in the `queue.slab` section of the `winlogbeat.yml` config file:
+
+
+#### `events` [queue-slab-events-option]
+
+Number of events the queue can store. The smallest accepted value is 32.
+
+The default value is 3200 events.
+
+
 ## Configure the disk queue [configuration-internal-queue-disk]
 
 The disk queue stores pending events on the disk rather than main memory. This allows Beats to queue a larger number of events than is possible with the memory queue, and to save events when a Beat or device is restarted. This increased reliability comes with a performance tradeoff, as every incoming event must be written and read from the device’s disk. However, for setups where the disk is not the main bottleneck, the disk queue gives a simple and relatively low-overhead way to add a layer of robustness to incoming event data.
