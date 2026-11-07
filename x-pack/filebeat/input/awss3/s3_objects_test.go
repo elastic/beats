@@ -7,14 +7,20 @@ package awss3
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+	"testing/iotest"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/ratelimit"
+	"github.com/aws/aws-sdk-go-v2/aws/retry"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/stretchr/testify/assert"
@@ -338,6 +344,73 @@ func TestS3ObjectProcessor(t *testing.T) {
 
 	t.Run("text file without end of line marker but with newline", func(t *testing.T) {
 		testProcessS3Object(t, "testdata/no-eol-twolines.txt", "text/plain", 2)
+	})
+}
+
+// TestDownloadErrorNeedsBackoff runs GetObject through an S3 client configured
+// like the input's against a server that always fails, so the errors are
+// wrapped exactly as the AWS SDK wraps them.
+func TestDownloadErrorNeedsBackoff(t *testing.T) {
+	tests := []struct {
+		name              string
+		status            int
+		code              string
+		exhaustRetryQuota bool
+		wantBackoff       bool
+	}{
+		{name: "throttled on every attempt", status: http.StatusServiceUnavailable, code: "SlowDown", wantBackoff: true},
+		{name: "server error on every attempt", status: http.StatusInternalServerError, code: "InternalError", wantBackoff: true},
+		{name: "throttled with retry quota exhausted", status: http.StatusServiceUnavailable, code: "SlowDown", exhaustRetryQuota: true, wantBackoff: true},
+		{name: "access denied", status: http.StatusForbidden, code: "AccessDenied", wantBackoff: false},
+		{name: "archived object", status: http.StatusForbidden, code: "InvalidObjectState", wantBackoff: false},
+		{name: "deleted object", status: http.StatusNotFound, code: "NoSuchKey", wantBackoff: false},
+	}
+	// AWS_NEW_RETRIES_2026 opts in to the SDK's upcoming retry behaviour; cover
+	// both modes so the wrapping can't change unnoticed when it becomes the default.
+	for _, newRetries := range []string{"false", "true"} {
+		t.Run("AWS_NEW_RETRIES_2026="+newRetries, func(t *testing.T) {
+			t.Setenv("AWS_NEW_RETRIES_2026", newRetries)
+
+			for _, tc := range tests {
+				t.Run(tc.name, func(t *testing.T) {
+					srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+						w.Header().Set("Content-Type", "application/xml")
+						w.WriteHeader(tc.status)
+						fmt.Fprintf(w, "<Error><Code>%s</Code><Message>test</Message></Error>", tc.code)
+					}))
+					defer srv.Close()
+
+					awsCfg := awssdk.Config{
+						Region:      "us-east-1",
+						Credentials: awssdk.AnonymousCredentials{},
+						HTTPClient:  srv.Client(),
+					}
+					client := s3.NewFromConfig(awsCfg, config{}.s3ConfigModifier, func(o *s3.Options) {
+						o.BaseEndpoint = awssdk.String(srv.URL)
+						o.UsePathStyle = true
+						if tc.exhaustRetryQuota {
+							o.Retryer = retry.NewStandard(func(so *retry.StandardOptions) {
+								so.RateLimiter = ratelimit.NewTokenRateLimit(0)
+							})
+						}
+						// Keep the retries but not their delays.
+						o.Retryer = retry.AddWithMaxBackoffDelay(o.Retryer, time.Millisecond)
+					})
+
+					_, err := newAWSs3API(client, logptest.NewTestingLogger(t, inputName)).GetObject(t.Context(), "", "bucket", "key")
+					require.Error(t, err, "GetObject should fail")
+
+					assert.Equalf(t, tc.wantBackoff, downloadErrorNeedsBackoff(err), "downloadErrorNeedsBackoff(%v)", err)
+				})
+			}
+		})
+	}
+
+	t.Run("truncated body", func(t *testing.T) {
+		_, err := io.ReadAll(s3DownloadFailedWrappedReader{r: iotest.ErrReader(io.ErrUnexpectedEOF)})
+		require.Error(t, err, "reading the body should fail")
+
+		assert.Truef(t, downloadErrorNeedsBackoff(err), "downloadErrorNeedsBackoff(%v)", err)
 	})
 }
 
