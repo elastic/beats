@@ -61,8 +61,20 @@ processors:
     copy_from: '@timestamp'
     field: event.created
 - date:
+    if: ctx.event?.timezone == null
     field: redis.log.timestamp
     target_field: '@timestamp'
+    formats:
+    - dd MMM yyyy H:m:s.SSS
+    - dd MMM H:m:s.SSS
+    - dd MMM H:m:s
+    - UNIX
+    ignore_failure: true
+- date:
+    if: ctx.event?.timezone != null
+    field: redis.log.timestamp
+    target_field: '@timestamp'
+    timezone: '{{ event.timezone }}'
     formats:
     - dd MMM yyyy H:m:s.SSS
     - dd MMM H:m:s.SSS
