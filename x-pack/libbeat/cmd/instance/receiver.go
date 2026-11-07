@@ -50,7 +50,7 @@ type BeatReceiver struct {
 	reporter            *log.Reporter
 	Logger              *logp.Logger
 	bridge              *oteltelemetry.RegistryBridge
-	diagExt             otelmanager.DiagnosticExtension
+	diagExts            []otelmanager.DiagnosticExtension // extensions that got hooks of this receiver
 	releaseSystemBridge func()
 	startHook           func(component.Host) error
 	startCalled         chan struct{} // closed when Start is called
@@ -191,7 +191,7 @@ func (br *BeatReceiver) Start(ctx context.Context, host component.Host) (retErr 
 				m.SetDiagnosticExtension(br.beat.Info.ComponentID, diagExt)
 			}
 
-			br.diagExt = diagExt
+			br.diagExts = append(br.diagExts, diagExt)
 			statsRegistry := br.beat.Monitoring.StatsRegistry()
 			diagExt.RegisterDiagnosticHook(br.beat.Info.ComponentID, "Metrics from the default monitoring namespace and expvar.",
 				"beat_metrics.json", "application/json", func() []byte {
@@ -310,8 +310,10 @@ func (br *BeatReceiver) Shutdown(ctx context.Context) error {
 	}
 
 	// Done after Run returns, because beaters also register hooks from Run.
-	if u, ok := br.diagExt.(otelmanager.DiagnosticHooksUnregisterer); ok {
-		u.UnregisterDiagnosticHooks(br.beat.Info.ComponentID)
+	for _, ext := range br.diagExts {
+		if u, ok := ext.(otelmanager.DiagnosticHooksUnregisterer); ok {
+			u.UnregisterDiagnosticHooks(br.beat.Info.ComponentID)
+		}
 	}
 
 	// Now disconnect the publisher pipeline (this waits for outstanding events

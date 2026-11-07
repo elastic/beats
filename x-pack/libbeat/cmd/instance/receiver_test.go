@@ -822,6 +822,45 @@ func (f *fakeUnregisterHookExtension) UnregisterDiagnosticHooks(name string) {
 	delete(f.hooks, name)
 }
 
+// startStopHookReceiver starts a beat receiver whose beater registers a hook
+// from Run, as metricbeat and filebeat do, calls whileRunning and shuts it down.
+func startStopHookReceiver(t *testing.T, host component.Host, componentID string, whileRunning func()) {
+	t.Helper()
+	b, err := NewBeatForReceiver(
+		cmd.FilebeatSettings("filebeat"),
+		map[string]any{"path.home": t.TempDir(), "management.otel.enabled": true},
+		consumertest.NewNop(),
+		componentID,
+		zapcore.NewNopCore(),
+	)
+	require.NoError(t, err, "building the receiver beat should succeed")
+
+	mb := &mockReceiverBeater{
+		acked:    &atomic.Int64{},
+		initDone: make(chan struct{}),
+		done:     make(chan struct{}),
+		runCalledHook: func() {
+			b.Manager.RegisterDiagnosticHook("input_metrics", "", "input_metrics.json", "application/json", func() []byte { return nil })
+		},
+	}
+	creator := func(*beat.Beat, *conf.C) (beat.Beater, error) { return mb, nil }
+
+	var rs receiver.Settings
+	rs.Logger = zap.NewNop()
+	rs.ID = component.NewIDWithName(component.MustNewType("mockbeatreceiver"), componentID)
+	br, err := NewBeatReceiver(t.Context(), b, creator, rs)
+	require.NoError(t, err, "creating the beat receiver should succeed")
+
+	require.NoError(t, br.Start(t.Context(), host), "starting the beat receiver should succeed")
+	select {
+	case <-mb.initDone:
+	case <-time.After(30 * time.Second):
+		t.Fatal("beater did not start")
+	}
+	whileRunning()
+	require.NoError(t, br.Shutdown(t.Context()), "shutting down the beat receiver should succeed")
+}
+
 // TestBeatReceiverShutdownUnregistersDiagnosticHooks restarts receivers the way
 // a collector config reload does and checks that the diagnostics extension
 // only holds the hooks of the live receiver.
@@ -851,45 +890,36 @@ func TestBeatReceiverShutdownUnregistersDiagnosticHooks(t *testing.T) {
 				component.MustNewID("elastic_diagnostics"): tc.ext,
 			}}
 			for cycle := range cycles {
-				componentID := fmt.Sprintf("test-receiver-%d", cycle)
-				b, err := NewBeatForReceiver(
-					cmd.FilebeatSettings("filebeat"),
-					map[string]any{"path.home": t.TempDir(), "management.otel.enabled": true},
-					consumertest.NewNop(),
-					componentID,
-					zapcore.NewNopCore(),
-				)
-				require.NoError(t, err, "building the receiver beat should succeed")
-
-				mb := &mockReceiverBeater{
-					acked:    &atomic.Int64{},
-					initDone: make(chan struct{}),
-					done:     make(chan struct{}),
-					// Beaters such as metricbeat and filebeat register their own
-					// hooks from Run through the manager.
-					runCalledHook: func() {
-						b.Manager.RegisterDiagnosticHook("input_metrics", "", "input_metrics.json", "application/json", func() []byte { return nil })
-					},
-				}
-				creator := func(*beat.Beat, *conf.C) (beat.Beater, error) { return mb, nil }
-
-				var rs receiver.Settings
-				rs.Logger = zap.NewNop()
-				rs.ID = component.NewIDWithName(component.MustNewType("mockbeatreceiver"), componentID)
-				br, err := NewBeatReceiver(t.Context(), b, creator, rs)
-				require.NoError(t, err, "creating the beat receiver should succeed")
-
-				require.NoError(t, br.Start(t.Context(), host), "starting the beat receiver should succeed")
-				select {
-				case <-mb.initDone:
-				case <-time.After(30 * time.Second):
-					t.Fatal("beater did not start")
-				}
-				assert.Equal(t, tc.keptPerReceiver*cycle+2, tc.ext.hookCount(), "cycle %d: hooks while the receiver runs", cycle)
-
-				require.NoError(t, br.Shutdown(t.Context()), "shutting down the beat receiver should succeed")
+				startStopHookReceiver(t, host, fmt.Sprintf("test-receiver-%d", cycle), func() {
+					assert.Equal(t, tc.keptPerReceiver*cycle+2, tc.ext.hookCount(), "cycle %d: hooks while the receiver runs", cycle)
+				})
 				assert.Equal(t, tc.keptPerReceiver*(cycle+1), tc.ext.hookCount(), "cycle %d: hooks after shutdown", cycle)
 			}
 		})
 	}
+}
+
+// TestBeatReceiverShutdownUnregistersFromAllExtensions checks that Shutdown
+// removes the receiver's hooks from every diagnostics extension that supports
+// it, not only one, and tolerates extensions that don't.
+func TestBeatReceiverShutdownUnregistersFromAllExtensions(t *testing.T) {
+	defer management.SetUnderAgent(false) // reset global state set by NewBeatForReceiver
+
+	first := &fakeUnregisterHookExtension{fakeHookExtension{hooks: map[string]int{}}}
+	second := &fakeUnregisterHookExtension{fakeHookExtension{hooks: map[string]int{}}}
+	old := &fakeHookExtension{hooks: map[string]int{}}
+	host := &fakeExtensionHost{extensions: map[component.ID]component.Component{
+		component.MustNewIDWithName("elastic_diagnostics", "first"):  first,
+		component.MustNewIDWithName("elastic_diagnostics", "second"): second,
+		component.MustNewIDWithName("elastic_diagnostics", "old"):    old,
+	}}
+
+	startStopHookReceiver(t, host, "test-receiver", func() {
+		assert.Positive(t, first.hookCount(), "first extension should get hooks")
+		assert.Positive(t, second.hookCount(), "second extension should get hooks")
+		assert.Positive(t, old.hookCount(), "old extension should get hooks")
+	})
+	assert.Zero(t, first.hookCount(), "first extension should have no hooks after shutdown")
+	assert.Zero(t, second.hookCount(), "second extension should have no hooks after shutdown")
+	assert.Positive(t, old.hookCount(), "an extension without unregister keeps its hooks")
 }
