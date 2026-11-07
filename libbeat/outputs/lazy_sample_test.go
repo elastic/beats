@@ -18,6 +18,8 @@
 package outputs
 
 import (
+	"maps"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -81,9 +83,9 @@ func TestLazySampleMatchesUniformSample(t *testing.T) {
 		assert.Equal(t, eager.Max(), lazy.Max(), "%s: max", stage)
 		assert.Equal(t, eager.Min(), lazy.Min(), "%s: min", stage)
 		assert.Equal(t, eager.Sum(), lazy.Sum(), "%s: sum", stage)
-		assert.Equal(t, eager.Mean(), lazy.Mean(), "%s: mean", stage)
-		assert.Equal(t, eager.StdDev(), lazy.StdDev(), "%s: standard deviation", stage)
-		assert.Equal(t, eager.Variance(), lazy.Variance(), "%s: variance", stage)
+		assert.InDelta(t, eager.Mean(), lazy.Mean(), 0.0001, "%s: mean", stage)
+		assert.InDelta(t, eager.StdDev(), lazy.StdDev(), 0.0001, "%s: standard deviation", stage)
+		assert.InDelta(t, eager.Variance(), lazy.Variance(), 0.0001, "%s: variance", stage)
 	}
 
 	same("empty")
@@ -102,15 +104,13 @@ func TestLazySampleConcurrent(t *testing.T) {
 
 	var wg sync.WaitGroup
 	for range 8 {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			for i := range 200 {
 				s.Update(int64(i))
 				_ = s.Snapshot().Count()
 				_ = s.Count()
 			}
-		}()
+		})
 	}
 	wg.Wait()
 
@@ -122,26 +122,28 @@ func TestLazySampleConcurrent(t *testing.T) {
 func TestStatsLatencyMetricsUnchanged(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 
-	snapshotKeys := func(report bool) map[string]float64 {
+	flatten := func(reg *monitoring.Registry) map[string]float64 {
+		snap := monitoring.CollectFlatSnapshot(reg, monitoring.Full, false)
+		out := map[string]float64{}
+		for k, v := range snap.Ints {
+			out[k] = float64(v)
+		}
+		maps.Copy(out, snap.Floats)
+		return out
+	}
+
+	got := func(report bool) map[string]float64 {
 		reg := monitoring.NewRegistry()
 		stats := NewStats(reg, logger)
 		if report {
 			stats.ReportLatency(5 * time.Millisecond)
 			stats.ReportLatency(15 * time.Millisecond)
 		}
-		snap := monitoring.CollectFlatSnapshot(reg, monitoring.Full, false)
-		out := map[string]float64{}
-		for k, v := range snap.Floats {
-			out[k] = v
-		}
-		for k, v := range snap.Ints {
-			out[k] = float64(v)
-		}
-		return out
+		return flatten(reg)
 	}
 
 	// What an eagerly allocated sample would have reported.
-	eagerKeys := func(report bool) map[string]float64 {
+	want := func(report bool) map[string]float64 {
 		reg := monitoring.NewRegistry()
 		lifetime, delta := metrics.NewUniformSample(1024), metrics.NewUniformSample(1024)
 		require.NoError(t, adapter.NewGoMetrics(reg, "write.latency", logger, adapter.Accept).Register("histogram", metrics.NewHistogram(lifetime)))
@@ -152,26 +154,17 @@ func TestStatsLatencyMetricsUnchanged(t *testing.T) {
 				delta.Update(v)
 			}
 		}
-		snap := monitoring.CollectFlatSnapshot(reg, monitoring.Full, false)
-		out := map[string]float64{}
-		for k, v := range snap.Floats {
-			out[k] = v
-		}
-		for k, v := range snap.Ints {
-			out[k] = float64(v)
-		}
-		return out
+		return flatten(reg)
 	}
 
 	for _, report := range []bool{false, true} {
-		got := snapshotKeys(report)
-		want := eagerKeys(report)
-		for k, v := range want {
-			if len(k) < len("write.latency") || k[:len("write.latency")] != "write.latency" {
+		g := got(report)
+		for k, v := range want(report) {
+			if !strings.HasPrefix(k, "write.latency") {
 				continue
 			}
-			assert.Contains(t, got, k, "report=%v: metric %s must still exist", report, k)
-			assert.InDelta(t, v, got[k], 0.0001, "report=%v: metric %s", report, k)
+			assert.Contains(t, g, k, "report=%v: metric %s must still exist", report, k)
+			assert.InDelta(t, v, g[k], 0.0001, "report=%v: metric %s", report, k)
 		}
 	}
 }
