@@ -19,6 +19,13 @@ type DiagnosticExtension interface {
 	RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook func() []byte)
 }
 
+// DiagnosticHooksUnregisterer is implemented by diagnostic extensions that can
+// remove the hooks registered for a component. Older elastic-agent versions
+// don't implement it, so callers must check for it with a type assertion.
+type DiagnosticHooksUnregisterer interface {
+	UnregisterDiagnosticHooks(name string)
+}
+
 type WithDiagnosticExtension interface {
 	// name is the beat name
 	// ext is the extension that implements the DiagnosticExtension interface

@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"maps"
 	"net"
 	"net/http"
@@ -782,4 +783,113 @@ func TestReceiverHTTPStatsIncludesSystemMetrics(t *testing.T) {
 	assert.Contains(t, stats, "system", "/stats should contain the system namespace")
 	info, _ := beatNS["info"].(map[string]any)
 	assert.NotEqual(t, "beat", info["name"], "beat.info must be the receiver's own")
+}
+
+// fakeHookExtension models a diagnostics extension that keeps every hook it is
+// given, like elastic-agent versions before hooks could be unregistered.
+type fakeHookExtension struct {
+	mu    sync.Mutex
+	hooks map[string][]func() []byte
+}
+
+func (f *fakeHookExtension) Start(context.Context, component.Host) error { return nil }
+func (f *fakeHookExtension) Shutdown(context.Context) error              { return nil }
+
+func (f *fakeHookExtension) RegisterDiagnosticHook(name, _, _, _ string, hook func() []byte) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.hooks[name] = append(f.hooks[name], hook)
+}
+
+func (f *fakeHookExtension) hookCount() int {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	n := 0
+	for _, hooks := range f.hooks {
+		n += len(hooks)
+	}
+	return n
+}
+
+// fakeUnregisterHookExtension also supports removing a component's hooks.
+type fakeUnregisterHookExtension struct {
+	fakeHookExtension
+}
+
+func (f *fakeUnregisterHookExtension) UnregisterDiagnosticHooks(name string) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	delete(f.hooks, name)
+}
+
+// TestBeatReceiverShutdownUnregistersDiagnosticHooks restarts receivers the way
+// a collector config reload does and checks that the diagnostics extension
+// only holds the hooks of the live receiver.
+func TestBeatReceiverShutdownUnregistersDiagnosticHooks(t *testing.T) {
+	const cycles = 5
+	defer management.SetUnderAgent(false) // reset global state set by NewBeatForReceiver
+
+	tests := map[string]struct {
+		ext interface {
+			component.Component
+			hookCount() int
+		}
+		hooksAfterStop func(cycle int) int
+	}{
+		"extension can unregister": {
+			ext:            &fakeUnregisterHookExtension{fakeHookExtension{hooks: map[string][]func() []byte{}}},
+			hooksAfterStop: func(int) int { return 0 },
+		},
+		"extension cannot unregister": {
+			ext:            &fakeHookExtension{hooks: map[string][]func() []byte{}},
+			hooksAfterStop: func(cycle int) int { return 2 * (cycle + 1) },
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			host := &fakeExtensionHost{extensions: map[component.ID]component.Component{
+				component.MustNewID("elastic_diagnostics"): tc.ext,
+			}}
+			for cycle := range cycles {
+				componentID := fmt.Sprintf("test-receiver-%d", cycle)
+				b, err := NewBeatForReceiver(
+					cmd.FilebeatSettings("filebeat"),
+					map[string]any{"path.home": t.TempDir(), "management.otel.enabled": true},
+					consumertest.NewNop(),
+					componentID,
+					zapcore.NewNopCore(),
+				)
+				require.NoError(t, err, "building the receiver beat should succeed")
+
+				mb := &mockReceiverBeater{
+					acked:    &atomic.Int64{},
+					initDone: make(chan struct{}),
+					done:     make(chan struct{}),
+					// Beaters such as metricbeat and filebeat register their own
+					// hooks from Run through the manager.
+					runCalledHook: func() {
+						b.Manager.RegisterDiagnosticHook("input_metrics", "", "input_metrics.json", "application/json", func() []byte { return nil })
+					},
+				}
+				creator := func(*beat.Beat, *conf.C) (beat.Beater, error) { return mb, nil }
+
+				var rs receiver.Settings
+				rs.Logger = zap.NewNop()
+				rs.ID = component.NewIDWithName(component.MustNewType("mockbeatreceiver"), componentID)
+				br, err := NewBeatReceiver(t.Context(), b, creator, rs)
+				require.NoError(t, err, "creating the beat receiver should succeed")
+
+				require.NoError(t, br.Start(t.Context(), host), "starting the beat receiver should succeed")
+				select {
+				case <-mb.initDone:
+				case <-time.After(30 * time.Second):
+					t.Fatal("beater did not start")
+				}
+				assert.Equal(t, tc.hooksAfterStop(cycle-1)+2, tc.ext.hookCount(), "cycle %d: hooks while the receiver runs", cycle)
+
+				require.NoError(t, br.Shutdown(t.Context()), "shutting down the beat receiver should succeed")
+				assert.Equal(t, tc.hooksAfterStop(cycle), tc.ext.hookCount(), "cycle %d: hooks after shutdown", cycle)
+			}
+		})
+	}
 }
