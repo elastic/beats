@@ -337,6 +337,12 @@ func (m *mockDiagExtension) RegisterDiagnosticHook(name string, description stri
 	})
 }
 
+func (m *mockDiagExtension) UnregisterDiagnosticHooks(name string) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	delete(m.hooks, name)
+}
+
 func (m *mockDiagExtension) getHooks(name string) ([]hook, bool) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -353,13 +359,13 @@ func TestReceiverHook(t *testing.T, config component.Config, factory receiver.Fa
 	require.NotNil(t, logs)
 	require.NoError(t, logs.Start(t.Context(), &mockHost{diagExt: diagExt}))
 
-	defer func() {
-		require.NoError(t, logs.Shutdown(t.Context()))
-	}()
-
 	assert.EventuallyWithT(t, func(c *assert.CollectT) {
 		hooks, ok := diagExt.getHooks(set.ID.String())
 		assert.True(c, ok, "expected hooks to contain key %s", set.ID.String())
 		assert.Len(c, hooks, expectedHooks)
 	}, 5*time.Second, 100*time.Millisecond, "expected hook to be registered")
+
+	require.NoError(t, logs.Shutdown(t.Context()))
+	_, ok := diagExt.getHooks(set.ID.String())
+	assert.False(t, ok, "expected shutdown to unregister the hooks of %s", set.ID.String())
 }

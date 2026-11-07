@@ -789,24 +789,24 @@ func TestReceiverHTTPStatsIncludesSystemMetrics(t *testing.T) {
 // given, like elastic-agent versions before hooks could be unregistered.
 type fakeHookExtension struct {
 	mu    sync.Mutex
-	hooks map[string][]func() []byte
+	hooks map[string]int // hooks registered per component
 }
 
 func (f *fakeHookExtension) Start(context.Context, component.Host) error { return nil }
 func (f *fakeHookExtension) Shutdown(context.Context) error              { return nil }
 
-func (f *fakeHookExtension) RegisterDiagnosticHook(name, _, _, _ string, hook func() []byte) {
+func (f *fakeHookExtension) RegisterDiagnosticHook(name, _, _, _ string, _ func() []byte) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
-	f.hooks[name] = append(f.hooks[name], hook)
+	f.hooks[name]++
 }
 
 func (f *fakeHookExtension) hookCount() int {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	n := 0
-	for _, hooks := range f.hooks {
-		n += len(hooks)
+	for _, c := range f.hooks {
+		n += c
 	}
 	return n
 }
@@ -834,15 +834,15 @@ func TestBeatReceiverShutdownUnregistersDiagnosticHooks(t *testing.T) {
 			component.Component
 			hookCount() int
 		}
-		hooksAfterStop func(cycle int) int
+		keptPerReceiver int // hooks a stopped receiver leaves behind
 	}{
 		"extension can unregister": {
-			ext:            &fakeUnregisterHookExtension{fakeHookExtension{hooks: map[string][]func() []byte{}}},
-			hooksAfterStop: func(int) int { return 0 },
+			ext:             &fakeUnregisterHookExtension{fakeHookExtension{hooks: map[string]int{}}},
+			keptPerReceiver: 0,
 		},
 		"extension cannot unregister": {
-			ext:            &fakeHookExtension{hooks: map[string][]func() []byte{}},
-			hooksAfterStop: func(cycle int) int { return 2 * (cycle + 1) },
+			ext:             &fakeHookExtension{hooks: map[string]int{}},
+			keptPerReceiver: 2,
 		},
 	}
 	for name, tc := range tests {
@@ -885,10 +885,10 @@ func TestBeatReceiverShutdownUnregistersDiagnosticHooks(t *testing.T) {
 				case <-time.After(30 * time.Second):
 					t.Fatal("beater did not start")
 				}
-				assert.Equal(t, tc.hooksAfterStop(cycle-1)+2, tc.ext.hookCount(), "cycle %d: hooks while the receiver runs", cycle)
+				assert.Equal(t, tc.keptPerReceiver*cycle+2, tc.ext.hookCount(), "cycle %d: hooks while the receiver runs", cycle)
 
 				require.NoError(t, br.Shutdown(t.Context()), "shutting down the beat receiver should succeed")
-				assert.Equal(t, tc.hooksAfterStop(cycle), tc.ext.hookCount(), "cycle %d: hooks after shutdown", cycle)
+				assert.Equal(t, tc.keptPerReceiver*(cycle+1), tc.ext.hookCount(), "cycle %d: hooks after shutdown", cycle)
 			}
 		})
 	}
