@@ -24,7 +24,7 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/elastic/elastic-agent-libs/iobuf"
+	"github.com/elastic/beats/v7/pkg/iobuf"
 )
 
 var beatFieldsCacheMu sync.Mutex

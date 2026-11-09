@@ -25,8 +25,8 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/include"
 
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (

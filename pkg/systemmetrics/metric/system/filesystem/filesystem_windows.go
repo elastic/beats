@@ -20,7 +20,7 @@ package filesystem
 import (
 	"fmt"
 
-	"github.com/elastic/elastic-agent-libs/opt"
+	"github.com/elastic/beats/v7/pkg/opt"
 	"github.com/elastic/gosigar/sys/windows"
 )
 

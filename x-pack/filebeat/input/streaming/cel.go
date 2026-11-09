@@ -23,8 +23,8 @@ import (
 	"github.com/google/cel-go/common/types/traits"
 
 	"github.com/elastic/beats/v7/libbeat/version"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/useragent"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/useragent"
 	"github.com/elastic/mito/lib"
 )
 

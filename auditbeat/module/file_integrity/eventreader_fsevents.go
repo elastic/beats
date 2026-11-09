@@ -28,7 +28,7 @@ import (
 
 	"github.com/fsnotify/fsevents"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 type fsEventsReader struct {
