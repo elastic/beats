@@ -128,7 +128,10 @@ func TestProcessReceivedEventsUpdatesProcessingTimeOnce(t *testing.T) {
 		"processingTime should be updated once per call, not once per event")
 }
 
-func TestProcessReceivedEventsRetainsOnlyCheckpointMetadata(t *testing.T) {
+// TestProcessReceivedEventsMarksLastRecordOfEachMessage verifies that only
+// the last record of each message carries checkpoint metadata, and that the
+// metadata excludes the message payload and AMQP metadata.
+func TestProcessReceivedEventsMarksLastRecordOfEachMessage(t *testing.T) {
 	now := time.Now()
 	logger := logptest.NewTestingLogger(t, inputName)
 	metrics := newInputMetrics(monitoring.NewRegistry(), logger)
@@ -164,15 +167,14 @@ func TestProcessReceivedEventsRetainsOnlyCheckpointMetadata(t *testing.T) {
 	require.NoError(t, input.processReceivedEvents(received, "0", client), "messages should be published")
 	require.Len(t, client.publishedEvents, 3, "the first message should expand into two records")
 
-	for i, source := range []*azeventhubs.ReceivedEventData{received[0], received[0], received[1]} {
+	assert.Nil(t, client.publishedEvents[0].Private, "a non-final record must not carry checkpoint metadata")
+	for i, source := range map[int]*azeventhubs.ReceivedEventData{1: received[0], 2: received[1]} {
 		checkpoint, ok := client.publishedEvents[i].Private.(*checkpointMetadata)
-		require.True(t, ok, "event %d should carry checkpoint metadata accepted by the ACK callback", i)
+		require.True(t, ok, "event %d is the last record of its message and should carry checkpoint metadata", i)
 		assert.Equal(t, &checkpointMetadata{
 			offset: source.Offset, sequenceNumber: source.SequenceNumber,
 		}, checkpoint, "event %d should retain only checkpoint metadata", i)
 	}
-	assert.Same(t, client.publishedEvents[0].Private, client.publishedEvents[1].Private,
-		"records from the same message should share checkpoint metadata")
 }
 
 // TestProcessReceivedEventsConcurrentConversion verifies that the events
