@@ -1,4 +1,7 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+# Tests every package under pkg/. It still runs as the beats-pkg-systemmetrics
+# pipeline from this path because that is how it is registered in
+# catalog-info.yaml.
 name: "beats-pkg-systemmetrics"
 
 env:
@@ -17,15 +20,25 @@ env:
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
+# This section is used to define the plugins that will be used in the pipeline.
+# See https://buildkite.com/docs/pipelines/integrations/plugins/using#using-yaml-anchors-with-plugins
+common:
+  - test_collector: &test_collector
+      test-collector#v1.10.2:
+        files: "pkg/build/TEST-*.xml"
+        format: "junit"
+        branches: "main"
+        debug: true
+
 steps:
   - group: "Check/Update"
-    key: "systemmetrics-check-update"
+    key: "pkg-check-update"
 
     steps:
-      - label: "pkg/systemmetrics: Run check"
+      - label: "pkg: Run check"
         command: |
           set -eo pipefail
-          make -C pkg/systemmetrics check
+          make -C pkg check
           make check-no-changes
         retry:
           automatic:
@@ -37,23 +50,23 @@ steps:
           useCustomGlobalHooks: true
         notify:
           - github_commit_status:
-              context: "pkg/systemmetrics: check"
+              context: "pkg: check"
 
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
     # for other cases, e.g. merge commits, we want to run mandatory test independently of other tests
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
-    depends_on: "systemmetrics-check-update"
+    depends_on: "pkg-check-update"
 
   - group: "Mandatory Tests"
     key: "mandatory-tests"
 
     steps:
-      - label: ":ubuntu: pkg/systemmetrics: Ubuntu x86_64 Unit Tests"
-        key: "mandatory-systemmetrics-unit-test"
+      - label: ":ubuntu: pkg: Ubuntu x86_64 Unit Tests"
+        key: "mandatory-pkg-unit-test"
         command: |
           set -euo pipefail
-          cd pkg/systemmetrics
+          cd pkg
           mage goUnitTest
         retry:
           automatic:
@@ -63,22 +76,67 @@ steps:
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
-          - "pkg/systemmetrics/build/*.xml"
-          - "pkg/systemmetrics/build/*.json"
+          - "pkg/build/*.xml"
+          - "pkg/build/*.json"
         plugins:
-          - test-collector#v1.10.2:
-              files: "pkg/systemmetrics/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
+          - *test_collector
         notify:
           - github_commit_status:
-              context: "pkg/systemmetrics: Ubuntu x86_64 Unit Tests"
+              context: "pkg: Ubuntu x86_64 Unit Tests"
 
-      - label: ":windows: pkg/systemmetrics: Win 2022 Unit Tests"
-        key: "mandatory-systemmetrics-win-2022-unit-test"
+      - label: ":ubuntu: pkg: Ubuntu x86_64 Unit Tests with requirefips build tag"
+        key: "mandatory-pkg-unit-test-fips-tag"
         command: |
-          Set-Location -Path pkg\systemmetrics
+          set -euo pipefail
+          cd pkg
+          mage goUnitTest
+        env:
+          FIPS: "true"
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "pkg/build/*.xml"
+          - "pkg/build/*.json"
+        plugins:
+          - *test_collector
+        notify:
+          - github_commit_status:
+              context: "pkg: Ubuntu x86_64 Unit Tests with requirefips build tag"
+
+      # Guards against accidentally adding crypto that is not FIPS compliant.
+      - label: ":ubuntu: pkg: Ubuntu x86_64 fips140=only Unit Tests"
+        key: "mandatory-pkg-unit-test-fips-only"
+        command: |
+          set -euo pipefail
+          cd pkg
+          mage goFIPSOnlyUnitTest
+        env:
+          FIPS: "true"
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "pkg/build/*.xml"
+          - "pkg/build/*.json"
+        plugins:
+          - *test_collector
+        notify:
+          - github_commit_status:
+              context: "pkg: Ubuntu x86_64 fips140=only Unit Tests"
+
+      - label: ":windows: pkg: Win 2022 Unit Tests"
+        key: "mandatory-pkg-win-2022-unit-test"
+        command: |
+          Set-Location -Path pkg
           mage goUnitTest
         retry:
           automatic:
@@ -90,29 +148,55 @@ steps:
           disk_size: 100
           disk_type: "pd-ssd"
         artifact_paths:
-          - "pkg/systemmetrics/build/*.xml"
-          - "pkg/systemmetrics/build/*.json"
+          - "pkg/build/*.xml"
+          - "pkg/build/*.json"
         notify:
           - github_commit_status:
-              context: "pkg/systemmetrics: Win 2022 Unit Tests"
+              context: "pkg: Win 2022 Unit Tests"
+
+      # Integration-tagged tests outside systemmetrics only need a Docker
+      # daemon on the host, no docker-compose stack.
+      - label: ":ubuntu: pkg: Ubuntu x86_64 Go Integration Tests"
+        key: "mandatory-pkg-integ-test"
+        command: |
+          set -euo pipefail
+          cd pkg
+          mage goIntegTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "pkg/build/*.xml"
+          - "pkg/build/*.json"
+        plugins:
+          - *test_collector
+        notify:
+          - github_commit_status:
+              context: "pkg: Ubuntu x86_64 Go Integration Tests"
 
       # Container-System tests spin up their own Docker containers under
-      # ./tests/... via `mage goIntegTest` and only need a Docker daemon (no
+      # ./systemmetrics/tests/... and only need a Docker daemon (no
       # Elasticsearch compose stack). Run across images to keep coverage of:
       #   - RHEL 9
       #   - Ubuntu 20.04 (cgroup v1 host exercising metric/system/cgroup/cgv1)
       #   - Ubuntu 22.04 (cgroup v2)
       - label: ":linux: pkg/systemmetrics: Container-System Tests -- {{matrix.image}}"
+        # The memory integration test keys its zswap expectations on this
+        # step key (see ciExpectations in pkg/systemmetrics/metric/memory).
         key: "mandatory-systemmetrics-container-tests"
         # Matrix values are not exposed in the environment; the memory
         # integration test needs the host image to pick the right zswap
-        # expectations (see ciExpectations in metric/memory).
+        # expectations.
         env:
           HOST_OS_IMAGE: "{{matrix.image}}"
         command: |
           set -euo pipefail
-          cd pkg/systemmetrics
-          mage goIntegTest
+          cd pkg
+          mage goSystemMetricsContainerTest
         retry:
           automatic:
             - limit: 1
@@ -121,14 +205,10 @@ steps:
           image: "{{matrix.image}}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
-          - "pkg/systemmetrics/build/*.xml"
-          - "pkg/systemmetrics/build/*.json"
+          - "pkg/build/*.xml"
+          - "pkg/build/*.json"
         plugins:
-          - test-collector#v1.10.2:
-              files: "pkg/systemmetrics/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
+          - *test_collector
         notify:
           - github_commit_status:
               context: "pkg/systemmetrics: Container-System Tests"

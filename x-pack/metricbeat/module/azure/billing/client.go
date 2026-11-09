@@ -14,8 +14,8 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Client represents the azure client which will make use of the azure sdk go metrics related clients

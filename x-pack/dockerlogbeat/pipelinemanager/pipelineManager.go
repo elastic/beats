@@ -15,8 +15,8 @@ import (
 
 	"github.com/gohugoio/hashstructure"
 
+	"github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
-	"github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/moby/moby/v2/daemon/logger"
 	"github.com/moby/moby/v2/daemon/logger/jsonfilelog"
@@ -26,7 +26,7 @@ import (
 	protoio "github.com/gogo/protobuf/io"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // containerConfig is the config.C unpacking type

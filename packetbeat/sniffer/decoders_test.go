@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	_ "github.com/elastic/beats/v7/packetbeat/protos/dns"
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 )
 
 func TestDecoderAndProtocolCleanupStopsAllGoroutines(t *testing.T) {

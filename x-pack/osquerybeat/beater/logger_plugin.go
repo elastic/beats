@@ -10,8 +10,8 @@ import (
 
 	"github.com/osquery/osquery-go/plugin/logger"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqlog"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type QueryResult struct {
