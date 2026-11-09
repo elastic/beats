@@ -13,8 +13,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter/internal"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // enqueueWorkPolling is a copy of the sleep-and-retry implementation that
