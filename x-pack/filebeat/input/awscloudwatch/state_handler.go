@@ -44,12 +44,18 @@ type stateHandler struct {
 	lock sync.Mutex
 }
 
-func newStateHandler(log *logp.Logger, cfg config, store statestore.States) (*stateHandler, error) {
+func newStateHandler(log *logp.Logger, cfg config, store statestore.States, inputID string) (*stateHandler, error) {
 	id, err := generateID(cfg)
 	if err != nil {
 		return nil, err
 	}
+<<<<<<< HEAD
 	st, err := store.StoreFor("")
+=======
+	// The input type and ID route state to the Elasticsearch-backed store on
+	// agentless, where the local registry does not survive pod replacement.
+	st, err := store.StoreFor(inputName, inputID)
+>>>>>>> 7a889ce (x-pack/filebeat/input/awscloudwatch: use ES state store on agentless (#54573))
 	if err != nil {
 		return nil, fmt.Errorf("error accessing persistence store: %w", err)
 	}
