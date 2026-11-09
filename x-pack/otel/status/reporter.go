@@ -8,8 +8,6 @@ import (
 	"errors"
 	"sync"
 
-	"go.opentelemetry.io/collector/pdata/pcommon"
-
 	"github.com/elastic/beats/v7/libbeat/management/status"
 
 	"go.opentelemetry.io/collector/component"
@@ -23,13 +21,18 @@ type runnerState struct {
 	msg   string
 }
 
-// toPdata converts a runnerState to a pdata.Map
+// Equals reports whether both states have the same status and message.
+func (r *runnerState) Equals(other *runnerState) bool {
+	return r.state == other.state && r.msg == other.msg
+}
+
+// raw converts a runnerState to the map reported for its input.
 // The format is the same as the healthcheckv2 extension
-func toPdata(r *runnerState) pcommon.Map {
-	pcommonMap := pcommon.NewMap()
-	pcommonMap.PutStr("status", beatStatusToOtelStatus(r.state).String())
-	pcommonMap.PutStr("error", r.msg)
-	return pcommonMap
+func (r *runnerState) raw() map[string]any {
+	return map[string]any{
+		"status": beatStatusToOtelStatus(r.state).String(),
+		"error":  r.msg,
+	}
 }
 
 // RunnerReporter defines an interface that returns a StatusReporter for a specific runner.
@@ -73,15 +76,15 @@ func (r *reporter) updateStatusForRunner(id string, state status.Status, msg str
 	if r.runnerStates == nil {
 		r.runnerStates = make(map[string]*runnerState)
 	}
+	newState := runnerState{state: state, msg: msg}
 	if rState, ok := r.runnerStates[id]; ok {
-		rState.msg = msg
-		rState.state = state
+		if rState.Equals(&newState) {
+			return
+		}
+		*rState = newState
 	} else {
 		// add status for the runner to the map, if not preset
-		r.runnerStates[id] = &runnerState{
-			state: state,
-			msg:   msg,
-		}
+		r.runnerStates[id] = &newState
 	}
 
 	// report aggregated status for all sub-components
@@ -119,12 +122,14 @@ func (r *reporter) calculateOtelStatus() *componentstatus.Event {
 	}
 	evt = componentstatus.NewEvent(otelStatus, eventBuilderOpts...)
 
-	inputStatusesPdata := evt.Attributes().PutEmptyMap(inputStatusAttributesKey)
-
+	// Build the map in one pass: PutEmptyMap looks the key up linearly, which is
+	// quadratic in the number of runners.
+	inputStatuses := make(map[string]any, len(r.runnerStates))
 	for id, rs := range r.runnerStates {
-		inputStatePdata := toPdata(rs)
-		m := inputStatusesPdata.PutEmptyMap(id)
-		inputStatePdata.MoveTo(m)
+		inputStatuses[id] = rs.raw()
+	}
+	if err := evt.Attributes().PutEmptyMap(inputStatusAttributesKey).FromRaw(inputStatuses); err != nil {
+		return nil
 	}
 
 	return evt
