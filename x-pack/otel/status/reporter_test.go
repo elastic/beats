@@ -164,7 +164,7 @@ func TestUnchangedRunnerStatusIsNotReported(t *testing.T) {
 func BenchmarkCalculateOtelStatus(b *testing.B) {
 	for _, runners := range []int{100, 1000, 10000} {
 		b.Run(fmt.Sprint(runners), func(b *testing.B) {
-			reporter := NewGroupStatusReporter(&oteltest.MockHost{}).(*reporter)
+			reporter := &reporter{host: &oteltest.MockHost{}, runnerStates: make(map[string]*runnerState)}
 			for i := range runners {
 				reporter.runnerStates[fmt.Sprintf("monitor-%d", i)] = &runnerState{state: status.Running}
 			}
