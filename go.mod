@@ -230,6 +230,7 @@ require (
 	github.com/apache/arrow-go/v18 v18.7.0
 	github.com/cilium/ebpf v0.22.0
 	github.com/coder/websocket v1.8.14
+	github.com/elastic/elastic-agent-libs v0.7.2
 	github.com/elastic/entcollect v0.0.0-20260916061436-646037f10512
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/elastic/lumberjack v0.0.0-20260715013204-c5b60bbeaaab
@@ -288,7 +289,6 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cenkalti/backoff/v7 v7.0.1 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
-	github.com/elastic/elastic-agent-libs v0.7.2 // indirect
 	github.com/go-openapi/swag/pools v0.28.0 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/hashicorp/go-hclog v1.6.3 // indirect
