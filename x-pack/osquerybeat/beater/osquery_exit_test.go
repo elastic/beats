@@ -21,10 +21,10 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func TestOsqueryExit(t *testing.T) {
@@ -339,7 +339,7 @@ func TestRunOsqueryLogsCancelledExitAtInfo(t *testing.T) {
 	ctx, cancel := context.WithCancel(t.Context())
 	cancel()
 	runner := &killedOnCancelRunner{err: osqueryKilledError(t)}
-	rah := newResetableActionHandler(ob.pub, log)
+	rah := newResetableActionHandler(ob.liveResults, ob.pub, log)
 	metrics := newOsquerydMetrics(monitoring.NewRegistry(), log)
 	err := ob.runOsquery(ctx, b, runner, nil, config.ExtensionsConfig{}, make(chan []config.InputConfig), rah, metrics)
 	assert.ErrorIs(t, err, context.Canceled, "shutdown must report cancellation")

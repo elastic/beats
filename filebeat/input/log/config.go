@@ -32,8 +32,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/multiline"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readjson"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 type config struct {
@@ -58,7 +58,7 @@ type config struct {
 	FileIdentity   *conf.Namespace `config:"file_identity"`
 
 	// Harvester
-	BufferSize int    `config:"harvester_buffer_size"`
+	BufferSize int    `config:"harvester_buffer_size" validate:"min=0,nonzero"`
 	Encoding   string `config:"encoding"`
 	ScanOrder  string `config:"scan.order"`
 	ScanSort   string `config:"scan.sort"`

@@ -28,7 +28,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // fingerprintFnFor returns a constant callback, or nil for an empty value.

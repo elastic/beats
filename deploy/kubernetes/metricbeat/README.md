@@ -9,7 +9,7 @@ We use official [Metricbeat Docker images](https://www.docker.elastic.co/r/beats
 
 * [metricbeat-daemonset-configmap.yaml](metricbeat-daemonset-configmap.yaml) to create the [ConfigMap](https://kubernetes.io/docs/concepts/configuration/configmap/) necessary to [metricbeat-daemonset.yaml](metricbeat-daemonset.yaml).
 
-* [metricbeat-daemonset.yaml](metricbeat-daemonset.yaml) to create a [DeamonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/). This way we ensure we get a running metricbeat daemon on each node of the cluster.
+* [metricbeat-daemonset.yaml](metricbeat-daemonset.yaml) to create a [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/). This way we ensure we get a running metricbeat daemon on each node of the cluster.
 This file uses a set of environment variables to configure Elasticsearch output. We have two different sets:
   * [Self-managed](https://www.elastic.co/guide/en/beats/metricbeat/current/elasticsearch-output.html) Elasticsearch service:
 
@@ -46,7 +46,7 @@ This way we can see the usage of our Metricbeat DaemonSet.
 
 - [Kubectl](https://kubernetes.io/docs/tasks/tools/) to run commands against Kubernetes clusters.
 - [For option 1](#Option-1.-Run-locally-on-Kind): [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/) for running local Kubernetes clusters.
-- [For option 2](#Option-2.-Run-on-GKE): [gcloud Cli](https://cloud.google.com/sdk/docs/install).
+- [For option 2](#Option-2.-Run-on-GKE): [gcloud CLI](https://cloud.google.com/sdk/docs/install).
 
 #### Option 1. Run locally on Kind
 

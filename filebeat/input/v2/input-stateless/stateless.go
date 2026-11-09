@@ -23,7 +23,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 )
 
 // InputManager provides an InputManager for transient inputs, that do not store

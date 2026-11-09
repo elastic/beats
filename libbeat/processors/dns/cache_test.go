@@ -24,7 +24,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 type stubResolver struct{}

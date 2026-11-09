@@ -22,8 +22,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors"
-	"github.com/elastic/elastic-agent-libs/transport"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/beats/v7/pkg/transport"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 )
 
 type config struct {

@@ -67,7 +67,7 @@ require (
 	github.com/elastic/go-sysinfo v1.15.5
 	github.com/elastic/go-ucfg v0.9.2
 	github.com/elastic/gosigar v0.14.4
-	github.com/fatih/color v1.18.0 // indirect
+	github.com/fatih/color v1.18.0
 	github.com/fearful-symmetry/gorapl v0.0.4
 	github.com/fsnotify/fsevents v0.1.1
 	github.com/fsnotify/fsnotify v1.10.1
@@ -97,7 +97,7 @@ require (
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/lib/pq v1.12.3
 	github.com/magefile/mage v1.17.2
-	github.com/mattn/go-colorable v0.1.14 // indirect
+	github.com/mattn/go-colorable v0.1.14
 	github.com/miekg/dns v1.1.72
 	github.com/moby/moby/v2 v2.0.0-beta.14
 	github.com/osquery/osquery-go v0.0.0-20260226222546-0cc22f415e57
@@ -134,7 +134,7 @@ require (
 	google.golang.org/grpc v1.84.0
 	google.golang.org/protobuf v1.36.12
 	gopkg.in/inf.v0 v0.9.1
-	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools/gotestsum v1.7.0
 	howett.net/plist v1.0.1
 	k8s.io/api v0.35.4
@@ -169,13 +169,11 @@ require (
 	github.com/brianvoe/gofakeit v3.18.0+incompatible
 	github.com/dgraph-io/badger/v4 v4.6.0
 	github.com/elastic/bayeux v1.0.5
-	github.com/elastic/ebpfevents v0.12.0
-	github.com/elastic/elastic-agent-libs v0.47.0
 	github.com/elastic/go-elasticsearch/v8 v8.19.7
 	github.com/elastic/go-freelru v0.16.0
 	github.com/elastic/go-quark v0.10.0
 	github.com/elastic/go-sfdc v0.0.0-20260504130806-a46e22d049d9
-	github.com/elastic/mito v1.28.1
+	github.com/elastic/mito v1.28.2
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
 	github.com/elastic/sarama v1.19.1-0.20260310070522-abae92ca1603
 	github.com/elastic/tk-btf v0.3.0
@@ -277,6 +275,7 @@ require (
 	go.uber.org/zap/exp v0.3.0
 	go.yaml.in/yaml/v2 v2.4.4
 	go.yaml.in/yaml/v3 v3.0.5
+	gopkg.in/mcuadros/go-syslog.v2 v2.3.0
 	sigs.k8s.io/kind v0.29.0
 	www.velocidex.com/golang/go-ntfs v0.2.1-0.20250322152626-3c09d909d740
 	www.velocidex.com/golang/regparser v0.0.0-20250203141505-31e704a67ef7
@@ -289,6 +288,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cenkalti/backoff/v7 v7.0.1 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
+	github.com/elastic/elastic-agent-libs v0.7.2 // indirect
 	github.com/go-openapi/swag/pools v0.28.0 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/hashicorp/go-hclog v1.6.3 // indirect
@@ -375,7 +375,7 @@ require (
 	github.com/eapache/go-xerial-snappy v0.0.0-20230731223053-c322873962e3 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
 	github.com/ebitengine/purego v0.11.1 // indirect
-	github.com/elastic/elastic-transport-go/v8 v8.9.0 // indirect
+	github.com/elastic/elastic-transport-go/v8 v8.9.0
 	github.com/elastic/go-docappender/v2 v2.15.0 // indirect
 	github.com/elastic/go-windows v1.0.2
 	github.com/elazarl/goproxy v0.0.0-20240909085733-6741dbfc16a1 // indirect
@@ -509,10 +509,10 @@ require (
 	go.elastic.co/fastjson v1.5.1 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
-	go.opentelemetry.io/collector/config/configcompression v1.70.0 // indirect
-	go.opentelemetry.io/collector/config/configmiddleware v1.70.0 // indirect
+	go.opentelemetry.io/collector/config/configcompression v1.70.0
+	go.opentelemetry.io/collector/config/configmiddleware v1.70.0
 	go.opentelemetry.io/collector/config/confignet v1.70.0 // indirect
-	go.opentelemetry.io/collector/config/configopaque v1.70.0 // indirect
+	go.opentelemetry.io/collector/config/configopaque v1.70.0
 	go.opentelemetry.io/collector/config/configretry v1.70.0 // indirect
 	go.opentelemetry.io/collector/config/configtelemetry v0.164.0 // indirect
 	go.opentelemetry.io/collector/confmap/xconfmap v0.164.0 // indirect

@@ -17,7 +17,7 @@
 
 package http
 
-import "github.com/elastic/elastic-agent-libs/transport/tlscommon"
+import "github.com/elastic/beats/v7/pkg/transport/tlscommon"
 
 type HttpConfig struct {
 	Host string                  `config:"host"`

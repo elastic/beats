@@ -22,7 +22,7 @@ package memcache
 
 import (
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 type commandType struct {

@@ -35,7 +35,7 @@
     - name: shared_drive_id
       type: keyword
       description: >
-        The unique identifier of the Team Drive. Only populated for for events relating to a Team Drive or item contained inside a Team Drive.
+        The unique identifier of the Team Drive. Only populated for events relating to a Team Drive or item contained inside a Team Drive.
     - name: visibility
       type: keyword
       description: >
@@ -62,7 +62,7 @@
     - name: target_domain
       type: keyword
       description: >
-        The domain for which the acccess scope was changed. This can also be the alias all to indicate the access scope was changed for all domains that have visibility for this document.
+        The domain for which the access scope was changed. This can also be the alias all to indicate the access scope was changed for all domains that have visibility for this document.
     - name: added_role
       type: keyword
       description: >
