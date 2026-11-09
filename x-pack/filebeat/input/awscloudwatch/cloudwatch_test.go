@@ -178,7 +178,7 @@ func TestReceive(t *testing.T) {
 		cfg := defaultConfig()
 		cfg.LogGroupName = "LogGroup"
 
-		handler, err := newStateHandler(nil, cfg, createTestInputStore())
+		handler, err := newStateHandler(nil, cfg, createTestInputStore(), "test-id")
 		assert.Nil(t, err)
 
 		p := &cloudwatchPoller{
