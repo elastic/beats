@@ -76,6 +76,8 @@ func downloadErrorNeedsBackoff(err error) bool {
 	var maxAttemptsErr *retry.MaxAttemptsError
 	return errors.As(err, &maxAttemptsErr) ||
 		errors.As(err, &ratelimit.QuotaExceededError{}) ||
+		// The SDK doesn't retry body reads, and net/http returns this when the
+		// connection ends before the announced Content-Length.
 		errors.Is(err, io.ErrUnexpectedEOF)
 }
 
