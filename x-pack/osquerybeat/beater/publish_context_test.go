@@ -107,6 +107,10 @@ type stuckPipeline struct {
 
 func newStuckPipeline(t *testing.T, q stuckQueue) *stuckPipeline {
 	t.Helper()
+	if raceEnabled && q.payload > 0 {
+		// TODO: remove once the disk queue shutdown race is fixed.
+		t.Skip("the disk queue has a data race at shutdown: https://github.com/elastic/beats/issues/54565")
+	}
 	log := logp.NewNopLogger()
 	var cfg pipeline.Config
 	require.NoError(t, conf.MustNewConfigFrom(q.cfg).Unpack(&cfg), "configure the queue")
