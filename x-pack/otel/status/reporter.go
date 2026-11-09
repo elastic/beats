@@ -122,18 +122,13 @@ func (r *reporter) calculateOtelStatus() *componentstatus.Event {
 	}
 	evt = componentstatus.NewEvent(otelStatus, eventBuilderOpts...)
 
-<<<<<<< HEAD
-	inputStatusesPdata := evt.Attributes().PutEmptyMap(inputStatusAttributesKey)
-
-=======
 	// Build the map in one pass: PutEmptyMap looks the key up linearly, which is
 	// quadratic in the number of runners.
 	inputStatuses := make(map[string]any, len(r.runnerStates))
->>>>>>> 2913021 (otel/status: skip unchanged runner updates and build reports in one pass (#53723))
 	for id, rs := range r.runnerStates {
 		inputStatuses[id] = rs.raw()
 	}
-	if err := evt.Attributes().PutEmptyMap(InputStatusAttributesKey).FromRaw(inputStatuses); err != nil {
+	if err := evt.Attributes().PutEmptyMap(inputStatusAttributesKey).FromRaw(inputStatuses); err != nil {
 		return nil
 	}
 
