@@ -58,9 +58,16 @@ func newFingerprintIdentifier(_ *conf.C, _ *logp.Logger) (fileIdentifier, error)
 	return &fingerprintIdentifier{}, nil
 }
 
+// GetSource drops a completed fingerprint's raw header from the retained source.
+// The event keeps it for growing-fingerprint prefix matching.
 func (i *fingerprintIdentifier) GetSource(e loginp.FSEvent) fileSource {
+	desc := e.Descriptor
+	if desc.Fingerprint.Complete() {
+		desc.Fingerprint.Raw = ""
+	}
+
 	return fileSource{
-		desc:                e.Descriptor,
+		desc:                desc,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,

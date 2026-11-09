@@ -73,6 +73,14 @@ type fileWatcher struct {
 	// lastPostponedWarn is when the "postponing delete detection" warning was last
 	// emitted.
 	lastPostponedWarn time.Time
+
+	// hasGrowingEntries reports whether the prospector registry still holds
+	// sub-threshold fingerprint entries (optional; set by fileProspector.Run).
+	hasGrowingEntries func() bool
+	// hasIncompletePrev and prevScanned summarize whether the last ScanOnce
+	// retained any still-growing descriptor in w.prev.
+	hasIncompletePrev bool
+	prevScanned       bool
 }
 
 // Ensure fileWatcher implements loginp.FSWatcher
@@ -131,6 +139,24 @@ func defaultFileWatcherConfig() fileWatcherConfig {
 	}
 }
 
+func (w *fileWatcher) needsBridgingRaw() bool {
+	if !w.growingFingerprint {
+		return false
+	}
+	if w.hasGrowingEntries != nil && w.hasGrowingEntries() {
+		return true
+	}
+	if w.prevScanned {
+		return w.hasIncompletePrev
+	}
+	for _, fd := range w.prev {
+		if fd.Fingerprint.GrowingRaw() != "" {
+			return true
+		}
+	}
+	return false
+}
+
 // HarvesterClosed records the offset a closing harvester reached. It is called
 // directly from the harvester's goroutine and only takes a mutex, so it never
 // waits on a running scan, which can last minutes.
@@ -168,7 +194,9 @@ func (w *fileWatcher) ScanOnce(
 		CurrentTime:         now,
 		IgnoreOlder:         ignoreOlder,
 		IgnoreInactiveSince: ignoreInactiveSince,
+		SuppressBridgingRaw: !w.needsBridgingRaw(),
 	}
+	w.prevScanned = false
 	scanResults := w.scanner.GetFiles(scanOpts)
 	metrics.UpdateFileScanMetrics(scanResults.Metrics)
 
@@ -440,6 +468,7 @@ func (w *fileWatcher) ScanOnce(
 	//     why the prospector's enumeration scans must not seed it.
 	if w.growingFingerprint {
 		completed := make(map[string]struct{}, len(scanResults.Files))
+		hasIncomplete := false
 		for p, fd := range scanResults.Files {
 			if fd.Fingerprint.Complete() {
 				completed[p] = struct{}{}
@@ -447,8 +476,12 @@ func (w *fileWatcher) ScanOnce(
 					fd.Fingerprint.Raw = ""
 					scanResults.Files[p] = fd
 				}
+			} else if fd.Fingerprint.GrowingRaw() != "" {
+				hasIncomplete = true
 			}
 		}
+		w.hasIncompletePrev = hasIncomplete
+		w.prevScanned = true
 		if fs, ok := w.scanner.(*fileScanner); ok {
 			fs.completedFingerprints = completed
 		}
@@ -566,9 +599,8 @@ func notChangedEvent(path string, fd loginp.FileDescriptor, srcID string) loginp
 
 // GetFiles runs a one-off enumeration scan for the prospector's Init and
 // TakeOver phases. Unlike the watch loop it does not advance the scanner's
-// completedFingerprints set, so these pre-watch scans cannot suppress the
-// bridging raw header a still-growing entry needs to migrate its registry key
-// after a restart.
+// completedFingerprints set. Enumeration scans always suppress the bridging
+// raw header on already-complete files because Init/TakeOver never need it.
 //
 // The dir-cache is bypassed: Init scans happen before the watch loop writes
 // any files, so caching their results would stale-serve the first watch scan.
@@ -578,5 +610,6 @@ func (w *fileWatcher) GetFiles(opts loginp.FileScanOptions) loginp.ScanResults {
 		fs.dirCache = nil
 		defer func() { fs.dirCache = dc }()
 	}
+	opts.SuppressBridgingRaw = true
 	return w.scanner.GetFiles(opts)
 }
