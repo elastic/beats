@@ -15,7 +15,7 @@ import (
 	"github.com/apache/arrow-go/v18/parquet/file"
 	"github.com/apache/arrow-go/v18/parquet/pqarrow"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // BufferedReader parses parquet inputs from io streams.

@@ -25,7 +25,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // GlobManager allows to manage a directory of conf files. Using a glob pattern

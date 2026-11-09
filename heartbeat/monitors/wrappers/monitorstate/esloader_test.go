@@ -33,7 +33,7 @@ import (
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/esutil"

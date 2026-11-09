@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/pkg/config"
 	ecokta "github.com/elastic/entcollect/provider/okta"
 )
 

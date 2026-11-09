@@ -11,7 +11,7 @@ import (
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/heartbeat/security"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 func init() {

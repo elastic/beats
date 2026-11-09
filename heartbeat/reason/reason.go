@@ -17,7 +17,7 @@
 
 package reason
 
-import "github.com/elastic/elastic-agent-libs/mapstr"
+import "github.com/elastic/beats/v7/pkg/mapstr"
 
 type Reason interface {
 	error

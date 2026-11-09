@@ -22,8 +22,8 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/mapping"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/version"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/version"
 )
 
 var v640 = version.MustNew("6.4.0")

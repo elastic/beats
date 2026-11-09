@@ -16,9 +16,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestOsqueryRecoveryBackoffExhaustsBudget(t *testing.T) {

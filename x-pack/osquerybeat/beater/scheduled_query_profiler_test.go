@@ -14,10 +14,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pub"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type profileQueryFunc func(context.Context, string, time.Duration) ([]map[string]any, error)

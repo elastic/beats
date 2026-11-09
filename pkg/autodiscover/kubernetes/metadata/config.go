@@ -18,7 +18,7 @@
 package metadata
 
 import (
-	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/pkg/config"
 )
 
 // Config declares supported configuration for metadata generation

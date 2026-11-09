@@ -36,8 +36,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/slabqueue"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/paths"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/paths"
 )
 
 // reaperInterval is how often the reaper re-checks pending clients whose events
