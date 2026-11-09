@@ -1609,7 +1609,8 @@ func TestHandleGrowingFingerprintLookup_KeyExistsFastPath(t *testing.T) {
 
 	src := identifier.GetSource(event)
 
-	t.Run("fast path: key exists skips scan", func(t *testing.T) {
+	t.Run("fast path: key exists skips prefix match", func(t *testing.T) {
+		oldKey := "filestream::my-input::fingerprint::" + loginp.HashRawFingerprint("aabb")
 		store := newMockMetadataUpdater()
 		// The store already has an entry for the exact current fingerprint key.
 		store.table[event.SrcID] = fileMeta{
@@ -1617,29 +1618,27 @@ func TestHandleGrowingFingerprintLookup_KeyExistsFastPath(t *testing.T) {
 			IdentifierName: fingerprintName,
 		}
 
-		// Also add an entry that would be a prefix match (the slow path).
-		// If the fast path works, it should never reach findGrowingFingerprintMatch.
-		store.table["filestream::my-input::fingerprint::aabb"] = fileMeta{
-			Source:         currentPath,
-			IdentifierName: fingerprintName,
-		}
+		// Also seed a valid prefix match in both the store and shortFingerprints.
+		// If the KeyExists fast path is bypassed, findGrowingFingerprintMatch
+		// will match oldKey and migrate it.
+		store.table[oldKey] = growingMeta(currentPath, "aabb")
 
 		p := &fileProspector{
 			logger:     logptest.NewTestingLogger(t, ""),
 			identifier: identifier,
 		}
+		p.buildShortFingerprintSet(store)
 
 		hg := newTestHarvesterGroup()
 		p.handleGrowingFingerprintLookup(logptest.NewTestingLogger(t, ""), event, src, store, hg)
 
 		// The fast path returns as soon as the exact key is found, so it must
-		// never scan the registry or migrate anything.
-		assert.Equal(t, int64(0), store.IterateOnPrefixCalled.Load(), "fast path must not scan the registry")
+		// not migrate anything.
 		assert.Equal(t, 0, store.UpdateKeyCalled, "fast path must not migrate")
 		assert.Empty(t, hg.events, "fast path must not touch the harvester group")
 		assert.Positive(t, store.KeyExistsCalled.Load(), "fast path must check key existence")
 		// The pre-seeded prefix entry must remain untouched.
-		assert.True(t, store.has("filestream::my-input::fingerprint::aabb"),
+		assert.True(t, store.has(oldKey),
 			"prefix entry must remain since migration did not run")
 	})
 

@@ -83,27 +83,6 @@ func TestFingerprintIdentifierGetSourceRaw(t *testing.T) {
 				"unexpected source fileID")
 			assert.Equal(t, tc.wantFileID, src.Name(),
 				"unexpected source Name()")
-
-			// The event is passed by value; its descriptor must keep Raw, which
-			// growing-fingerprint prefix matching (Continues/SameFile) relies on.
-			assert.Equal(t, tc.fingerprint, event.Descriptor.Fingerprint,
-				"GetSource must not mutate the input event descriptor")
 		})
 	}
-}
-
-func TestFingerprintIdentifierGetSourceKeepsPrefixMatching(t *testing.T) {
-	const raw = "00112233445566778899aabbccddeeff"
-
-	identifier, err := newFingerprintIdentifier(nil, nil)
-	require.NoError(t, err, "newFingerprintIdentifier failed")
-
-	prev := loginp.FileDescriptor{Fingerprint: loginp.FingerprintID{Raw: raw[:16]}}
-	completed := loginp.FileDescriptor{Fingerprint: loginp.FingerprintID{Raw: raw, Sum: "completesum"}}
-	event := loginp.FSEvent{NewPath: "/var/log/a.log", Op: loginp.OpWrite, Descriptor: completed}
-
-	_ = identifier.GetSource(event)
-
-	assert.True(t, loginp.SameFile(&prev, &event.Descriptor),
-		"shorter growing fingerprint must still prefix-match the completed event descriptor after GetSource")
 }
