@@ -24,10 +24,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
-	"github.com/elastic/beats/v7/pkg/config"
-	"github.com/elastic/beats/v7/pkg/logp"
-	"github.com/elastic/beats/v7/pkg/mapstr"
-	"github.com/elastic/beats/v7/pkg/monitoring"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // These tests use the real publisher pipeline, drop_event processor, input ACK
