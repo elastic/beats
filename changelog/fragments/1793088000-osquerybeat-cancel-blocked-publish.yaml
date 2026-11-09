@@ -18,7 +18,14 @@ summary: Osquerybeat stops waiting on a stuck output at shutdown and live query 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-# description:
+description: |
+  Osquerybeat stops waiting for a stuck output on shutdown, on a policy change
+  that no longer routes the result, and when a live query reaches
+  publishing.live.timeout, if the pipeline supports it. Events the queue
+  refuses are now counted in the new
+  osquerybeat.publishing.{scheduled,live}.dropped_rows.rejected metric, not in
+  dropped_rows.shutdown. A live query's reported count leaves out rows the
+  queue refused, so it can be lower than before.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:
