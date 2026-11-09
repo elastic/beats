@@ -89,6 +89,60 @@ func TestGlobalProcessInject(t *testing.T) {
 	findFieldsInProcessors(t, processorFields, cfgMap)
 }
 
+func TestGlobalProcessorsInjectedOnceForSimpleConfig(t *testing.T) {
+	addTags := map[string]any{"add_tags": map[string]any{"tags": []any{"global"}}}
+	raw := &proto.UnitExpectedConfig{
+		Id:   "filestream-1",
+		Type: "filestream",
+		Source: requireNewStruct(t, map[string]any{
+			"type":       "filestream",
+			"paths":      []any{"/tmp/*.log"},
+			"processors": []any{addTags},
+		}),
+	}
+	agentInfo := &client.AgentInfo{ID: "beat-ID", Version: "8.0.0"}
+
+	cases := map[string]struct {
+		create func() ([]map[string]any, error)
+		want   []any
+	}{
+		"CreateInputsFromStreams": {
+			create: func() ([]map[string]any, error) {
+				return CreateInputsFromStreams(raw, "logs", agentInfo)
+			},
+			want: []any{
+				mapstr.M{"add_fields": mapstr.M{"fields": mapstr.M{"input_id": "filestream-1"}, "target": "@metadata"}},
+				mapstr.M{"add_fields": mapstr.M{"fields": mapstr.M{"dataset": "generic", "namespace": "default", "type": "logs"}, "target": "data_stream"}},
+				mapstr.M{"add_fields": mapstr.M{"fields": mapstr.M{"dataset": "generic"}, "target": "event"}},
+				mapstr.M{"add_fields": mapstr.M{"fields": mapstr.M{"id": "beat-ID", "snapshot": false, "version": "8.0.0"}, "target": "elastic_agent"}},
+				mapstr.M{"add_fields": mapstr.M{"fields": mapstr.M{"id": "beat-ID"}, "target": "agent"}},
+				addTags,
+			},
+		},
+		"CreateInputsFromStreamsForReceiver": {
+			create: func() ([]map[string]any, error) {
+				return CreateInputsFromStreamsForReceiver(raw, "logs", agentInfo)
+			},
+			want: []any{
+				mapstr.M{"add_agent_metadata": mapstr.M{
+					"data_stream":   mapstr.M{"dataset": "generic", "namespace": "default", "type": "logs"},
+					"elastic_agent": mapstr.M{"id": "beat-ID", "snapshot": false, "version": "8.0.0"},
+					"input_id":      "filestream-1",
+				}},
+				addTags,
+			},
+		},
+	}
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			inputs, err := tc.create()
+			require.NoError(t, err)
+			require.Len(t, inputs, 1)
+			assert.Equal(t, tc.want, inputs[0]["processors"])
+		})
+	}
+}
+
 func TestIndexPrecedence(t *testing.T) {
 
 	withSource := func(source map[string]any) *proto.UnitExpectedConfig {

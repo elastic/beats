@@ -23,8 +23,18 @@ import (
 	"github.com/elastic/entcollect"
 
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
+
+func TestComponentLifecycle(t *testing.T) {
+	srv := newFakeES(t)
+	defer srv.Close()
+
+	oteltest.CheckExtensionLifecycle(t, NewFactory(), &Config{
+		ElasticsearchConfig: map[string]any{"hosts": []string{srv.URL}},
+	})
+}
 
 // TestElasticStorage_Access_Concurrent_Race documents and guards against the
 // data race in the elasticsearch_storage OTel extension: a single
