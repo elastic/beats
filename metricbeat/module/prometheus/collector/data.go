@@ -23,7 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/helper/labelhash"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 )

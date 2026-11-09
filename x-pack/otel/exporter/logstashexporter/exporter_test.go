@@ -26,8 +26,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/pkg/transport"
 	"github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter/internal"
-	"github.com/elastic/elastic-agent-libs/transport"
 )
 
 const (

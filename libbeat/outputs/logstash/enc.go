@@ -23,7 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec/json"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 func makeLogstashEventEncoder(log *logp.Logger, beatVersion string, escapeHTML bool, index string) func(any) ([]byte, error) {

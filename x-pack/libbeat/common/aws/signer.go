@@ -19,7 +19,7 @@ import (
 	v4 "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	awslogging "github.com/aws/smithy-go/logging"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // SignerInputConfig is the top-level configuration for the input aws auth method,

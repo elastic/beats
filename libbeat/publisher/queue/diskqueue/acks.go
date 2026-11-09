@@ -21,7 +21,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // queuePosition represents the position of a data frame within the queue: the

@@ -21,8 +21,8 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/pkg/autodiscover/utils"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/safemapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/safemapstr"
 )
 
 // ExtractContainerName strips the `/` characters that frequently appear in container names

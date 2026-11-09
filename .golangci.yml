@@ -59,10 +59,10 @@ linters:
       check-type-assertions: true
       check-blank: false
       exclude-functions:
-        - (github.com/elastic/elastic-agent-libs/mapstr.M).Delete
-        - (github.com/elastic/elastic-agent-libs/mapstr.M).Put
-        - github.com/elastic/elastic-agent-libs/logp.TestingSetup
-        - github.com/elastic/elastic-agent-libs/logp.DevelopmentSetup
+        - (github.com/elastic/beats/v7/pkg/mapstr.M).Delete
+        - (github.com/elastic/beats/v7/pkg/mapstr.M).Put
+        - github.com/elastic/beats/v7/pkg/logp.TestingSetup
+        - github.com/elastic/beats/v7/pkg/logp.DevelopmentSetup
     errorlint:
       errorf: true
       asserts: true
