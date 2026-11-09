@@ -25,6 +25,8 @@ import (
 	"sync"
 	"time"
 
+	"go.uber.org/zap"
+
 	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
@@ -499,7 +501,7 @@ func (g *harvesterRunner) enqueue(ctx inputv2.Context, src Source) {
 	// for propagation.
 	hctx, cancel := context.WithCancel(context.Background())
 	ctx.Cancelation = hctx
-	ctx.Logger = ctx.Logger.With("source_file", src.LogPath())
+	ctx.Logger = ctx.Logger.WithLazy(zap.String("source_file", src.LogPath()))
 
 	state := &sourceState{
 		runner: g,
