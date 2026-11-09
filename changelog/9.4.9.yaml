@@ -159,7 +159,7 @@ entries:
         name: 1791207256-fix-malformed-synthetics-runner-log-messages.yaml
         checksum: 85d9b6e11ff476095057fcef54c934fb653d5b1e
     - kind: security
-      summary: Update github.com/apache/thrift to v0.25.0 to fix CVE-2026-82458 in Parquet decoding.
+      summary: Update github.com/apache/thrift to v0.25.0.
       description: ""
       component: filebeat
       pr:

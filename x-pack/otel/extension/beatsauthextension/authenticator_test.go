@@ -32,6 +32,7 @@ import (
 	"go.uber.org/zap/zaptest"
 	"go.uber.org/zap/zaptest/observer"
 
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommontest"
 )
 
@@ -670,4 +671,8 @@ func (m *mockHost) Report(event *componentstatus.Event) {
 	if m.reportStatusFunc != nil {
 		m.reportStatusFunc(event)
 	}
+}
+
+func TestComponentLifecycle(t *testing.T) {
+	oteltest.CheckExtensionLifecycle(t, NewFactory(), &Config{})
 }

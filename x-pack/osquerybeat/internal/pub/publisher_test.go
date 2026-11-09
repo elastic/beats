@@ -21,7 +21,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions" // Registers the add_fields processor used by inputWithNamespace.
-	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
@@ -544,11 +543,12 @@ func (r *connectRecorder) namespaceOf(t *testing.T, client beat.Client) string {
 		if err != nil {
 			t.Fatalf("running processors: %v", err)
 		}
-		ds, ok := ev.Fields["data_stream"].(add_data_stream.DataStream)
-		if !ok {
+		namespace, err := ev.Fields.GetValue("data_stream.namespace")
+		if err != nil {
 			return ""
 		}
-		return ds.Namespace
+		ns, _ := namespace.(string)
+		return ns
 	}
 	return ""
 }
@@ -587,6 +587,40 @@ func TestConfigureEmptyDataset(t *testing.T) {
 	}
 	if p.client == nil {
 		t.Error("p.client is nil; empty-dataset input was not bound as result stream")
+	}
+}
+
+func TestCheckProcessors(t *testing.T) {
+	invalid := func(dataset string) config.InputConfig {
+		in := inputWithNamespace(dataset, "default")
+		in.Processors = processors.PluginConfig{conf.MustNewConfigFrom(map[string]any{"not_a_processor": map[string]any{}})}
+		return in
+	}
+	result := inputWithNamespace(config.DefaultDataset, "default")
+	actions := inputWithNamespace(config.DefaultActionResponsesDataset, "default")
+	profile := inputWithNamespace(config.DefaultQueryProfileDataset, "default")
+	tests := []struct {
+		name    string
+		inputs  []config.InputConfig
+		wantErr bool
+	}{
+		{name: "none", inputs: nil},
+		{name: "valid", inputs: []config.InputConfig{result, actions, profile}},
+		{name: "invalid result", inputs: []config.InputConfig{invalid(config.DefaultDataset), actions, profile}, wantErr: true},
+		{name: "invalid action responses", inputs: []config.InputConfig{result, invalid(config.DefaultActionResponsesDataset), profile}, wantErr: true},
+		{name: "invalid query profile", inputs: []config.InputConfig{result, actions, invalid(config.DefaultQueryProfileDataset)}, wantErr: true},
+		// Configure uses only the first input of each dataset.
+		{name: "invalid unused", inputs: []config.InputConfig{result, actions, invalid(config.DefaultActionResponsesDataset)}},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			err := CheckProcessors(test.inputs, logptest.NewTestingLogger(t, "pub"))
+			if test.wantErr {
+				assert.ErrorContains(t, err, "not_a_processor", "the error must name the invalid processor")
+			} else {
+				assert.NoError(t, err, "the processors Configure uses must build")
+			}
+		})
 	}
 }
 
