@@ -7,7 +7,9 @@ package vault
 import (
 	"errors"
 	"fmt"
+	"net"
 	"net/url"
+	"strings"
 
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
@@ -55,6 +57,16 @@ func (c *config) validate() error {
 	if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" {
 		return fmt.Errorf("'address' must be an http or https URL, got %q", c.Address)
 	}
+	isLoopback := isLoopbackHost(u.Hostname())
+	if u.Scheme == "http" && !isLoopback {
+		return errors.New("'address' must use https unless its host is loopback")
+	}
+	if !isLoopback && c.SSL != nil {
+		switch c.SSL.VerificationMode {
+		case tlscommon.VerifyNone, tlscommon.VerifyCertificate:
+			return errors.New("'ssl.verification_mode' must be 'full' or 'strict' unless the address host is loopback")
+		}
+	}
 	if c.KVMount == "" {
 		return errors.New("'kv_mount' must not be empty")
 	}
@@ -75,4 +87,13 @@ func (c *config) validate() error {
 		return errors.New("'auth' must have one method: 'token' or 'approle'")
 	}
 	return nil
+}
+
+// isLoopbackHost reports whether host names the local host without resolving it.
+func isLoopbackHost(host string) bool {
+	if strings.EqualFold(host, "localhost") {
+		return true
+	}
+	ip := net.ParseIP(host)
+	return ip != nil && ip.IsLoopback()
 }

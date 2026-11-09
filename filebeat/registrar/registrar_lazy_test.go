@@ -18,6 +18,7 @@
 package registrar
 
 import (
+	"errors"
 	"sync"
 	"testing"
 	"time"
@@ -99,9 +100,9 @@ func TestRegistrarStartAfterStop(t *testing.T) {
 func TestRegistrarStartErrorIsSticky(t *testing.T) {
 	goroutines := resources.NewGoroutinesChecker()
 
-	memBackend, r, _ := newLazyTestRegistrar(t, file.State{Id: "on-disk", Source: "/a.log", TTL: -1})
-	// Closing the store makes loading the states fail.
-	require.NoError(t, memBackend.Stores[testStoreName].Close())
+	logger := logptest.NewTestingLogger(t, "")
+	r, err := New(&erroringStateStore{}, &spyLogger{}, time.Second, logger)
+	require.NoError(t, err)
 
 	first := r.Start()
 	require.Error(t, first, "Start must fail when the states cannot be loaded")
@@ -111,6 +112,19 @@ func TestRegistrarStartErrorIsSticky(t *testing.T) {
 	assert.EqualError(t, r.Start(), first.Error(), "Stop must not replace the original start failure")
 	requireNoLeakedGoroutines(t, goroutines)
 }
+
+// erroringStateStore always fails to open a store, pinning Start's failure
+// path without depending on the backend's reopen-on-access semantics, which
+// would otherwise heal a store closed before Start's first, lazy open.
+type erroringStateStore struct{}
+
+func (erroringStateStore) StoreFor(_, _ string) (*statestore.Store, error) {
+	return nil, errors.New("store unavailable")
+}
+
+func (erroringStateStore) StoreKey(_, _ string) string { return "erroring" }
+
+func (erroringStateStore) CleanupInterval() time.Duration { return time.Second }
 
 // TestRegistrarStopIsIdempotent pins that Stop can be called more than once.
 func TestRegistrarStopIsIdempotent(t *testing.T) {
