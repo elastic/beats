@@ -1,0 +1,13 @@
+kind: bug-fix
+
+summary: Use the Elasticsearch state store for the aws-cloudwatch input on agentless.
+
+description: >-
+  The aws-cloudwatch input did not request the Elasticsearch-backed state
+  store with its input type, so on agentless its lastSync checkpoint was kept
+  in the pod-local registry and lost on every pod replacement, causing the
+  whole log group to be reread. The input now requests the store with its
+  type and input ID. Behavior is unchanged when the Elasticsearch state store
+  is not enabled for the input.
+
+component: filebeat
