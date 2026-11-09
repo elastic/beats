@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/config"
+	"github.com/elastic/beats/v7/filebeat/registrar"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -77,6 +78,11 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 
 	shared, ok := globalStores[key]
 	if !ok {
+		// Migrate only on first open: the shared store may be writing.
+		if err := registrar.NewMigrator(cfg, logger, info.Paths).Run(); err != nil {
+			return nil, fmt.Errorf("failed to migrate registry file: %w", err)
+		}
+
 		var (
 			reg backend.Registry
 			err error
