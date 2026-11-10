@@ -176,7 +176,7 @@ require (
 	github.com/elastic/go-sfdc v0.0.0-20260504130806-a46e22d049d9
 	github.com/elastic/mito v1.27.1
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
-	github.com/elastic/sarama v1.19.1-0.20260310070522-abae92ca1603
+	github.com/elastic/sarama v1.19.1-0.20261105163725-10d0ecc585be
 	github.com/elastic/tk-btf v0.3.0
 	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
 	github.com/go-ldap/ldap/v3 v3.4.13
