@@ -44897,11 +44897,19 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/andybalholm/brotli
+<<<<<<< HEAD
 Version: v1.2.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/andybalholm/brotli@v1.2.0/LICENSE:
+=======
+Version: v1.2.7
+Licence type (autodetected): MIT
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/github.com/andybalholm/brotli@v1.2.7/LICENSE:
+>>>>>>> 81f8463 (Update Brotli for CVE-2026-111497 (#54234))
 
 Copyright (c) 2009, 2010, 2013-2016 by the Brotli Authors.
 
