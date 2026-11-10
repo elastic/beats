@@ -26,8 +26,6 @@ var GetClusterInfoValue = func() func() string {
 	})
 }
 
-var checkedCloudConnectedMode bool = false
-
 // This method should be invoked via any given MetricSet's init function to automatically register
 // each AutoOpsMetricSet.
 func AddAutoOpsMetricSet[T any](name string, routePath string, mapper EventsMapper[T]) {
@@ -72,13 +70,8 @@ func newAutoOpsMetricSet[T any](base mb.BaseMetricSet, routePath string, mapper 
 		return nil, err
 	}
 
-	// metricsets are not started asynchronously, so there is no need for synchronization here
-	if !checkedCloudConnectedMode {
-		checkedCloudConnectedMode = true
-
-		if err := maybeRegisterCloudConnectedCluster(ms, GetInfo); err != nil {
-			return nil, fmt.Errorf("failed to register Cloud Connected cluster: %w", err)
-		}
+	if err := registerCloudConnectedClusterOnce(ms); err != nil {
+		return nil, err
 	}
 
 	return &AutoOpsMetricSet[T]{
