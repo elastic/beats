@@ -23,7 +23,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/metricbeat/module/ceph/mgr"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 type OsdTreeResponse struct {

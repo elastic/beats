@@ -28,7 +28,7 @@ These pages describe the checked-in GitHub Actions workflow definitions in this 
 - [metricbeat-macos-unit-tests](docs/metricbeat-macos-unit-tests.md) (`metricbeat-macos-unit-tests.yml`)
 - [notify-stalled-snapshots](docs/notify-stalled-snapshots.md) (`notify-stalled-snapshots.yml`)
 - [packetbeat-macos-unit-tests](docs/packetbeat-macos-unit-tests.md) (`packetbeat-macos-unit-tests.yml`)
-- [pkg-systemmetrics-macos-unit-tests](docs/pkg-systemmetrics-macos-unit-tests.md) (`pkg-systemmetrics-macos-unit-tests.yml`)
+- [pkg-macos-unit-tests](docs/pkg-macos-unit-tests.md) (`pkg-macos-unit-tests.yml`)
 - [Add issue to Ingest project](docs/platform-ingest-project-board.md) (`platform-ingest-project-board.yml`)
 - [post-dependabot](docs/post-dependabot.md) (`post-dependabot.yml`)
 - [pre-commit](docs/pre-commit.md) (`pre-commit.yml`)

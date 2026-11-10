@@ -1,0 +1,3 @@
+kind: feature
+summary: Avoid allocating buffers for growing fingerprint when not needed
+component: Filebeat

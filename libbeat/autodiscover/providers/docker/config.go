@@ -24,7 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/pkg/autodiscover/docker"
-	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/pkg/config"
 )
 
 // AllSupportedHints includes the set of all supported hints for both logs and metrics autodiscovery

@@ -26,7 +26,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 )
 
 type mockedMessage struct {
