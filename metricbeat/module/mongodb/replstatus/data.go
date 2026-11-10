@@ -20,7 +20,7 @@
 package replstatus
 
 import (
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func eventMapping(oplogInfo oplogInfo, replStatus MongoReplStatus) mapstr.M {
