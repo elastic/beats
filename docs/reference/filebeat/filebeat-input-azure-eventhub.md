@@ -120,20 +120,13 @@ filebeat.inputs:
 When using `managed_identity` authentication, the managed identity must have the appropriate Azure RBAC permissions. Refer to [Required permissions](#_required_permissions) for details.
 :::
 
-### Workload identity federation (processor v2) [_workload_identity]
+### Workload identity federation (processor v2)
 
 ```{applies_to}
 stack: ga 9.7
 ```
 
-Use workload identity federation to read Event Hubs and write Blob checkpoints from Kubernetes, including clusters outside Azure, without client secrets or connection strings.
-
-Before starting {{filebeat}}:
-
-1. Configure an Entra app registration or user-assigned managed identity to trust your cluster's OIDC issuer, service account subject, and token audience. For setup instructions, refer to [Configure an app to trust an external identity provider](https://learn.microsoft.com/en-us/entra/workload-id/workload-identity-federation-create-trust).
-2. Project a Kubernetes service account token with audience `api://AzureADTokenExchange` into the {{filebeat}} container. Kubernetes must rotate this file as tokens expire. Keep the file mounted for the lifetime of the input.
-3. Grant the identity the [required Event Hubs and Blob Storage permissions](#_required_permissions). The input also attempts to create the checkpoint container if it does not exist. Scope your storage permissions accordingly.
-4. Set `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, and `AZURE_FEDERATED_TOKEN_FILE` in the {{filebeat}} process environment. The token-file variable must contain the path inside the container.
+For deployment prerequisites and identity settings, refer to [Workload identity federation](#_workload_identity).
 
 ```yaml
 filebeat.inputs:
@@ -147,10 +140,6 @@ filebeat.inputs:
   storage_account_container: "your-storage-container"
 ```
 
-You can instead set `tenant_id`, `client_id`, and `federated_token_file` in the input configuration. Each nonempty setting overrides its corresponding environment variable. Both the Event Hubs consumer and Blob checkpoint storage use these identity settings. For sovereign clouds, configure [`authority_host`](#_authority_host).
-
-This authentication method uses the projected token directly and does not require a managed identity endpoint or sidecar.
-
 ## Authentication [_authentication]
 
 The azure-eventhub input supports multiple authentication methods. The [`auth_type` configuration option](#_auth_type) controls the authentication method used for both Event Hub and Storage Account.
@@ -163,6 +152,33 @@ The following authentication types are supported:
 - {applies_to}`stack: ga 9.3.0` **`client_secret`**: Uses Azure Active Directory service principal with client secret credentials.
 - {applies_to}`stack: ga 9.2.6+` {applies_to}`stack: ga 8.19.12+` **`managed_identity`**: Uses Azure Managed Identity. Supports both system-assigned and user-assigned managed identities. Available starting from {{filebeat}} 9.2.6 and later, 9.3.1 and later, 9.4.0 and later, and {{stack}} 8.19.12 and later.
 - {applies_to}`stack: ga 9.7` **`workload_identity`**: Uses a projected Kubernetes service account token for [workload identity federation](#_workload_identity). Requires processor v2.
+
+### Workload identity federation [_workload_identity]
+
+```{applies_to}
+stack: ga 9.7
+```
+
+Use workload identity federation to read Event Hubs and write Blob checkpoints from Kubernetes, including clusters outside Azure, without client secrets or connection strings.
+
+Before starting {{filebeat}}:
+
+1. Configure an Entra app registration or user-assigned managed identity to trust your cluster's OIDC issuer, service account subject, and token audience. For setup instructions, refer to [Configure an app to trust an external identity provider](https://learn.microsoft.com/en-us/entra/workload-id/workload-identity-federation-create-trust).
+2. Project a Kubernetes service account token with audience `api://AzureADTokenExchange` into the {{filebeat}} container. Kubernetes must rotate this file as tokens expire. Keep the file mounted for the lifetime of the input.
+3. Grant the identity the [required Event Hubs and Blob Storage permissions](#_required_permissions). The input also attempts to create the checkpoint container if it does not exist. Scope your storage permissions accordingly.
+4. Supply the identity settings below.
+
+For each identity value, provide either the input setting or its environment variable. A nonempty input setting takes precedence.
+
+| Input setting | Environment variable |
+| --- | --- |
+| [`tenant_id`](#_tenant_id) | `AZURE_TENANT_ID` |
+| [`client_id`](#_client_id) | `AZURE_CLIENT_ID` |
+| [`federated_token_file`](#_federated_token_file) | `AZURE_FEDERATED_TOKEN_FILE` |
+
+Both the Event Hubs consumer and Blob checkpoint storage use these identity settings. For sovereign clouds, configure [`authority_host`](#_authority_host).
+
+This authentication method uses the projected token directly and does not require a managed identity endpoint or sidecar.
 
 ### Required permissions [_required_permissions]
 
@@ -243,7 +259,7 @@ stack: ga 9.3.0
 
 The Azure Active Directory tenant ID. Required when using `client_secret` authentication for Event Hub or Storage Account.
 
-{applies_to}`stack: ga 9.7` With `workload_identity`, this setting overrides `AZURE_TENANT_ID`. You must provide either the setting or the environment variable.
+{applies_to}`stack: ga 9.7` With `workload_identity`, refer to [identity settings](#_workload_identity).
 
 ### `client_id` [_client_id]
 
@@ -253,7 +269,7 @@ stack: ga 9.3.0
 
 The Azure Active Directory application (client) ID. Required when using `client_secret` authentication for Event Hub or Storage Account.
 
-{applies_to}`stack: ga 9.7` With `workload_identity`, this setting overrides `AZURE_CLIENT_ID`. You must provide either the setting or the environment variable.
+{applies_to}`stack: ga 9.7` With `workload_identity`, refer to [identity settings](#_workload_identity).
 
 ### `federated_token_file` [_federated_token_file]
 
@@ -261,7 +277,7 @@ The Azure Active Directory application (client) ID. Required when using `client_
 stack: ga 9.7
 ```
 
-The path to the projected Kubernetes service account token file inside the {{filebeat}} container. Used only with `auth_type: workload_identity`. Overrides `AZURE_FEDERATED_TOKEN_FILE`. You must provide either the setting or the environment variable. For deployment prerequisites, refer to [Workload identity federation](#_workload_identity).
+The path to the projected Kubernetes service account token file inside the {{filebeat}} container. Used only with `auth_type: workload_identity`. For identity settings and deployment prerequisites, refer to [Workload identity federation](#_workload_identity).
 
 ### `client_secret` [_client_secret]
 
