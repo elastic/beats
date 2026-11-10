@@ -22,7 +22,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // ErrClosed is returned by Producer.PublishContext when the producer or queue

@@ -24,7 +24,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 const initialSize = 20 // initialSize specifies the initial size of the Register.

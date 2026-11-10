@@ -14,9 +14,9 @@ import (
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/metadata"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const metadataPrefix = "aws.ec2.instance."

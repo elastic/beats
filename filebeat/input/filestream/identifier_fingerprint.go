@@ -19,8 +19,8 @@ package filestream
 
 import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // fingerprintIdentityConfig holds the user-facing configuration for the
@@ -58,9 +58,16 @@ func newFingerprintIdentifier(_ *conf.C, _ *logp.Logger) (fileIdentifier, error)
 	return &fingerprintIdentifier{}, nil
 }
 
+// GetSource drops a completed fingerprint's raw header from the retained source.
+// The event keeps it for growing-fingerprint prefix matching.
 func (i *fingerprintIdentifier) GetSource(e loginp.FSEvent) fileSource {
+	desc := e.Descriptor
+	if desc.Fingerprint.Complete() {
+		desc.Fingerprint.Raw = ""
+	}
+
 	return fileSource{
-		desc:                e.Descriptor,
+		desc:                desc,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
