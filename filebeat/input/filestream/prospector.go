@@ -91,6 +91,10 @@ type fileProspector struct {
 	shortFingerprints     *shortFingerprintSet
 	growingFingerprint    bool
 	harvesterState        *fileStateTable
+
+	// forceDefaultPreset is set for the copytruncate prospector, which always
+	// runs the default preset, whatever the configuration selects.
+	forceDefaultPreset bool
 }
 
 func (p *fileProspector) previousID(name string, fd loginp.FileDescriptor, v loginp.TakeOverState) string {

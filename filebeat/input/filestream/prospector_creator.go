@@ -167,6 +167,19 @@ func newProspector(
 					"the experimental 'rotation.external.strategy.copytruncate' setting is unnecessary and is ignored for this input")
 				return &fileprospector, nil
 			}
+
+			// The copytruncate prospector always runs the default preset.
+			var sel presetSelection
+			sel, err = config.presetSelection()
+			if err != nil {
+				return nil, fmt.Errorf("invalid preset: %w", err)
+			}
+			if sel.explicit && sel.name != presetDefault {
+				return nil, fmt.Errorf(
+					"'rotation.external.strategy.copytruncate' cannot be used together with 'preset.%s', "+
+						"use 'preset.default' instead", sel.name)
+			}
+
 			experimentalWarning.Do(func() {
 				log.Warn(cfgwarn.Experimental("rotation.external.copytruncate is used."))
 			})
@@ -181,6 +194,7 @@ func newProspector(
 				return nil, fmt.Errorf("invalid suffix regex for copytruncate rotation")
 			}
 			fileprospector.stateChangeCloser.Renamed = false
+			fileprospector.forceDefaultPreset = true
 			return &copyTruncateFileProspector{
 				fileprospector,
 				suffix,

@@ -25,6 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
@@ -162,6 +163,110 @@ rotation.external.strategy.copytruncate:
 				require.True(t, ok, "expected the standard file prospector, got %T", p)
 				assert.True(t, fp.growingFingerprint,
 					"growing fingerprint must stay enabled when copytruncate is ignored")
+			})
+		}
+	})
+
+	t.Run("copytruncate rotation and preset", func(t *testing.T) {
+		const copytruncate = `
+rotation.external.strategy.copytruncate:
+  suffix_regex: '\.\d$'
+`
+		const noGrowing = "file_identity.fingerprint.growing: false"
+		const growing = "file_identity.fingerprint: ~"
+
+		cases := []struct {
+			name             string
+			fileIdentity     string
+			rotation         string
+			preset           string
+			wantCopyTruncate bool
+			wantErr          []string
+		}{
+			{
+				name:             "preset not set runs the copytruncate prospector forced to default",
+				fileIdentity:     noGrowing,
+				rotation:         copytruncate,
+				wantCopyTruncate: true,
+			},
+			{
+				name:             "preset.default runs the copytruncate prospector forced to default",
+				fileIdentity:     noGrowing,
+				rotation:         copytruncate,
+				preset:           "preset.default: ~",
+				wantCopyTruncate: true,
+			},
+			{
+				name:         "preset.auto is rejected",
+				fileIdentity: noGrowing,
+				rotation:     copytruncate,
+				preset:       "preset.auto: ~",
+				wantErr:      []string{"rotation.external.strategy.copytruncate", "preset.auto", "preset.default"},
+			},
+			{
+				name:         "preset.high_cardinality is rejected",
+				fileIdentity: noGrowing,
+				rotation:     copytruncate,
+				preset:       "preset.high_cardinality: ~",
+				wantErr:      []string{"rotation.external.strategy.copytruncate", "preset.high_cardinality", "preset.default"},
+			},
+			{
+				name:         "growing fingerprint accepts preset.high_cardinality",
+				fileIdentity: growing,
+				rotation:     copytruncate,
+				preset:       "preset.high_cardinality: ~",
+			},
+			{
+				name:         "growing fingerprint accepts preset.auto",
+				fileIdentity: growing,
+				rotation:     copytruncate,
+				preset:       "preset.auto: ~",
+			},
+			{
+				name:         "no rotation accepts preset.high_cardinality",
+				fileIdentity: growing,
+				preset:       "preset.high_cardinality: ~",
+			},
+			{
+				name:         "no rotation without preset",
+				fileIdentity: growing,
+			},
+		}
+
+		for _, tc := range cases {
+			t.Run(tc.name, func(t *testing.T) {
+				logger := logp.NewNopLogger()
+				cfgStr := fmt.Sprintf("paths: ['some']\n%s\n%s\n%s\n", tc.fileIdentity, tc.rotation, tc.preset)
+
+				c, err := conf.NewConfigWithYAML([]byte(cfgStr), cfgStr)
+				require.NoError(t, err, "test config must be valid YAML")
+
+				cfg := defaultConfig()
+				require.NoError(t, c.Unpack(&cfg), "test config must unpack into filestream config")
+				require.NoError(t, normalizeConfig(c, &cfg, logger), "normalizeConfig must succeed")
+
+				p, err := newProspector(cfg, logger, mustSourceIdentifier("foo-id"), nil, nil)
+				if len(tc.wantErr) > 0 {
+					require.Error(t, err, "newProspector must reject the configuration")
+					for _, want := range tc.wantErr {
+						assert.ErrorContains(t, err, want, "the error must name the conflicting options")
+					}
+					return
+				}
+				require.NoError(t, err, "creating the prospector must succeed")
+
+				if tc.wantCopyTruncate {
+					ct, ok := p.(*copyTruncateFileProspector)
+					require.True(t, ok, "expected the copytruncate prospector, got %T", p)
+					assert.True(t, ct.forceDefaultPreset,
+						"the copytruncate prospector must be forced to the default preset")
+					return
+				}
+
+				fp, ok := p.(*fileProspector)
+				require.True(t, ok, "expected the standard file prospector, got %T", p)
+				assert.False(t, fp.forceDefaultPreset,
+					"only the copytruncate prospector is forced to the default preset")
 			})
 		}
 	})

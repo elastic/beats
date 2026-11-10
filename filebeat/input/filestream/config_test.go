@@ -296,6 +296,102 @@ read_until_eof.enabled: false
 		})
 	})
 
+	// Valid presets are covered by TestPresetSelection, which also checks
+	// what they select.
+	t.Run("invalid preset", func(t *testing.T) {
+		const paths = "paths: [/foo/bar*]\n"
+
+		tcs := []struct {
+			name    string
+			cfg     string
+			wantErr string
+		}{
+			{
+				name:    "unknown preset",
+				cfg:     paths + "preset.unknown: ~",
+				wantErr: `unknown preset "unknown", must be one of: "auto", "default", "high_cardinality"`,
+			},
+			{
+				name:    "two presets",
+				cfg:     paths + "preset.auto: ~\npreset.default: ~",
+				wantErr: "more than one namespace configured",
+			},
+			{
+				name:    "negative files_above",
+				cfg:     paths + "preset.auto.high_cardinality.files_above: -1",
+				wantErr: "requires value >= 0 accessing 'preset.auto.high_cardinality.files_above'",
+			},
+			{
+				name:    "scalar form is rejected",
+				cfg:     paths + "preset: auto",
+				wantErr: "type mismatch accessing 'preset'",
+			},
+		}
+
+		for _, tc := range tcs {
+			t.Run(tc.name, func(t *testing.T) {
+				_, err := unpackTestConfig(t, tc.cfg)
+				assert.ErrorContains(t, err, tc.wantErr, "the configuration must be rejected")
+			})
+		}
+	})
+
+	// A preset that is not set and preset.default never conflict, see
+	// TestPresetSelection.
+	t.Run("explicit auto and high_cardinality presets conflict with delete.enabled and clean_inactive", func(t *testing.T) {
+		tcs := []struct {
+			name string
+			cfg  string
+			// conflict holds the options the error must name. Empty when
+			// the options are not enabled, so the configuration is accepted.
+			conflict string
+		}{
+			{
+				name:     "delete.enabled",
+				cfg:      "delete.enabled: true",
+				conflict: "'delete.enabled'",
+			},
+			{
+				name:     "clean_inactive",
+				cfg:      "ignore_older: 30m\nclean_inactive: 1h",
+				conflict: "'clean_inactive'",
+			},
+			{
+				name:     "clean_inactive 0 with legacy_clean_inactive",
+				cfg:      "clean_inactive: 0\nlegacy_clean_inactive: true",
+				conflict: "'clean_inactive'",
+			},
+			{
+				name:     "delete.enabled and clean_inactive",
+				cfg:      "delete.enabled: true\nignore_older: 30m\nclean_inactive: 1h",
+				conflict: "'delete.enabled' and 'clean_inactive'",
+			},
+			{name: "delete.enabled false", cfg: "delete.enabled: false"},
+			{name: "clean_inactive 0", cfg: "clean_inactive: 0"},
+			{name: "clean_inactive -1", cfg: "clean_inactive: -1"},
+			{name: "clean_inactive -1 with legacy_clean_inactive", cfg: "clean_inactive: -1\nlegacy_clean_inactive: true"},
+		}
+
+		for _, tc := range tcs {
+			for _, preset := range []string{presetAuto, presetHighCardinality} {
+				t.Run(tc.name+"/"+preset, func(t *testing.T) {
+					_, err := unpackTestConfig(t,
+						fmt.Sprintf("paths: [/foo/bar*]\n%s\npreset.%s: ~", tc.cfg, preset))
+
+					if tc.conflict == "" {
+						assert.NoError(t, err, "options that are not enabled must not conflict with preset.%s", preset)
+						return
+					}
+
+					want := fmt.Sprintf("'preset.%s' cannot be used together with %s, use 'preset.default' instead",
+						preset, tc.conflict)
+					assert.ErrorContains(t, err, want,
+						"the error must name the preset, the conflicting options and the way out")
+				})
+			}
+		}
+	})
+
 	t.Run("buffer_size must be positive", func(t *testing.T) {
 		tcs := map[string]string{
 			"zero":     `0`,
@@ -316,6 +412,149 @@ buffer_size: %s
 			})
 		}
 	})
+}
+
+// unpackTestConfig parses the YAML and unpacks it into a default filestream
+// config. Unpack runs Validate, so the returned error includes validation
+// errors.
+func unpackTestConfig(t *testing.T, yaml string) (config, error) {
+	raw, err := conf.NewConfigFrom(yaml)
+	require.NoError(t, err, "could not create config from string")
+
+	got := defaultConfig()
+	err = raw.Unpack(&got)
+	return got, err
+}
+
+func TestPresetSelection(t *testing.T) {
+	const paths = "paths: [/foo/bar*]\n"
+
+	// notSet is the selection of a preset that is not set.
+	notSet := presetSelection{name: presetAuto, threshold: 5000}
+
+	// forcedDefault is the selection of a preset that is not set while opts,
+	// options that cannot be used with auto and high_cardinality, are enabled.
+	forcedDefault := func(opts string) presetSelection {
+		return presetSelection{
+			name:      presetDefault,
+			threshold: 5000,
+			forcedDefaultReason: "'preset' is not set and " + opts +
+				" cannot be used with 'preset.auto' or 'preset.high_cardinality'",
+		}
+	}
+
+	tcs := []struct {
+		name string
+		cfg  string
+		want presetSelection
+	}{
+		{
+			name: "not set selects auto",
+			cfg:  paths,
+			want: notSet,
+		},
+		{
+			name: "auto without settings uses the default threshold",
+			cfg:  paths + "preset.auto: ~",
+			want: presetSelection{name: presetAuto, explicit: true, threshold: 5000},
+		},
+		{
+			name: "auto with an empty object uses the default threshold",
+			cfg:  paths + "preset.auto: {}",
+			want: presetSelection{name: presetAuto, explicit: true, threshold: 5000},
+		},
+		{
+			name: "auto with files_above",
+			cfg:  paths + "preset.auto.high_cardinality.files_above: 42",
+			want: presetSelection{name: presetAuto, explicit: true, threshold: 42},
+		},
+		{
+			name: "auto with files_above 0",
+			cfg:  paths + "preset.auto.high_cardinality.files_above: 0",
+			want: presetSelection{name: presetAuto, explicit: true, threshold: 0},
+		},
+		{
+			name: "default",
+			cfg:  paths + "preset.default: ~",
+			want: presetSelection{name: presetDefault, explicit: true, threshold: 5000},
+		},
+		{
+			name: "high_cardinality",
+			cfg:  paths + "preset.high_cardinality: ~",
+			want: presetSelection{name: presetHighCardinality, explicit: true, threshold: 5000},
+		},
+		{
+			name: "empty namespace is not set",
+			cfg:  paths + "preset: {}",
+			want: notSet,
+		},
+		{
+			name: "disabled preset is not set",
+			cfg:  paths + "preset.high_cardinality.enabled: false",
+			want: notSet,
+		},
+
+		// preset not set, incompatible options enabled: forced to default.
+		{
+			name: "not set with delete.enabled selects default",
+			cfg:  paths + "delete.enabled: true",
+			want: forcedDefault("'delete.enabled'"),
+		},
+		{
+			name: "not set with clean_inactive selects default",
+			cfg:  paths + "ignore_older: 30m\nclean_inactive: 1h",
+			want: forcedDefault("'clean_inactive'"),
+		},
+		{
+			name: "not set with clean_inactive 0 and legacy_clean_inactive selects default",
+			cfg:  paths + "clean_inactive: 0\nlegacy_clean_inactive: true",
+			want: forcedDefault("'clean_inactive'"),
+		},
+		{
+			name: "not set with delete.enabled and clean_inactive selects default",
+			cfg:  paths + "delete.enabled: true\nignore_older: 30m\nclean_inactive: 1h",
+			want: forcedDefault("'delete.enabled' and 'clean_inactive'"),
+		},
+
+		// preset not set, the same options not enabled: still auto.
+		{
+			name: "not set with delete.enabled false selects auto",
+			cfg:  paths + "delete.enabled: false",
+			want: notSet,
+		},
+		{
+			name: "not set with clean_inactive 0 selects auto",
+			cfg:  paths + "clean_inactive: 0",
+			want: notSet,
+		},
+		{
+			name: "not set with clean_inactive -1 selects auto",
+			cfg:  paths + "clean_inactive: -1",
+			want: notSet,
+		},
+		{
+			name: "not set with clean_inactive -1 and legacy_clean_inactive selects auto",
+			cfg:  paths + "clean_inactive: -1\nlegacy_clean_inactive: true",
+			want: notSet,
+		},
+
+		{
+			name: "explicit default with delete.enabled and clean_inactive is not forced",
+			cfg:  paths + "preset.default: ~\ndelete.enabled: true\nignore_older: 30m\nclean_inactive: 1h",
+			want: presetSelection{name: presetDefault, explicit: true, threshold: 5000},
+		},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			c, err := unpackTestConfig(t, tc.cfg)
+			require.NoError(t, err, "Unpack must accept the configuration")
+
+			got, err := c.presetSelection()
+			require.NoError(t, err, "presetSelection must not fail for a valid configuration")
+			assert.Equal(t, tc.want, got, "unexpected preset selection")
+		})
+	}
 }
 
 func TestNormalizeConfig(t *testing.T) {
