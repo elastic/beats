@@ -11,7 +11,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	confpkg "github.com/elastic/elastic-agent-libs/config"
+	confpkg "github.com/elastic/beats/v7/pkg/config"
 )
 
 func Test_validateConfig(t *testing.T) {

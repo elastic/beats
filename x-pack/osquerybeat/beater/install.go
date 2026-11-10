@@ -10,9 +10,9 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func installOsquery(ctx context.Context) error {

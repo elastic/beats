@@ -19,7 +19,7 @@ package dialchain
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/transport"
+	"github.com/elastic/beats/v7/pkg/transport"
 )
 
 // DialerChain composes builders for multiple network layers, used to build

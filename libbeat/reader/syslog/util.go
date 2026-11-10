@@ -20,7 +20,7 @@ package syslog
 import (
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // stringToInt converts a string, assumed to be ASCII numeric characters, to an int.

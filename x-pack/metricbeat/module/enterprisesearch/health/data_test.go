@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/enterprisesearch"
 )
