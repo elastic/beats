@@ -23,7 +23,7 @@ import (
 	gomock "go.uber.org/mock/gomock"
 
 	beat "github.com/elastic/beats/v7/libbeat/beat"
-	logp "github.com/elastic/elastic-agent-libs/logp"
+	logp "github.com/elastic/beats/v7/pkg/logp"
 )
 
 // MockSQSAPI is a mock of sqsAPI interface.

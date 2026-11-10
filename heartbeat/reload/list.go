@@ -31,9 +31,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 
 	"github.com/gohugoio/hashstructure"
 )
@@ -261,7 +261,16 @@ func (r *HBRunnerList) Has(hash uint64) bool {
 
 // HashConfig hashes a given config.C
 func (r *HBRunnerList) HashConfig(c *config.C) (uint64, error) {
-	hbfactory, ok := r.factory.(monitors.HBRunnerFactory)
+	factory := r.factory
+	// Wrappers, such as the OTel status wrapper, hide the factory's hash function.
+	for {
+		w, ok := factory.(interface{ Unwrap() cfgfile.RunnerFactory })
+		if !ok {
+			break
+		}
+		factory = w.Unwrap()
+	}
+	hbfactory, ok := factory.(monitors.HBRunnerFactory)
 	if !ok {
 		r.logger.Debugf("plugin factory does not implement HBRunnerFactory, defaulting to config hash")
 		return DefaultHashConfig(c)

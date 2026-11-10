@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 var _ http.RoundTripper = (*rateLimitTransport)(nil)

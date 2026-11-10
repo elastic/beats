@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/transport"
+	"github.com/elastic/beats/v7/pkg/transport"
 )
 
 // Builder is a dialer builder.

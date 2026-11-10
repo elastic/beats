@@ -27,9 +27,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	metrics "github.com/elastic/beats/v7/pkg/systemmetrics/metric/cpu"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {

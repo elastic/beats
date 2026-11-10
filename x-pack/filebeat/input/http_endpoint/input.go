@@ -34,13 +34,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
+	"github.com/elastic/beats/v7/pkg/monitoring/adapter"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 const (
@@ -526,6 +526,7 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 			hmacType:       c.HMACType,
 			hmacPrefix:     c.HMACPrefix,
 			maxBodySize:    -1,
+			maxInFlight:    c.MaxInFlight,
 			optionsHeaders: c.OptionsHeaders,
 			optionsStatus:  c.OptionsStatus,
 		},
@@ -543,6 +544,7 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 	}
 	// Initialize accepting to true so we start by accepting requests.
 	h.accepting.Store(true)
+	h.validator.inFlight = &h.inFlight
 	if h.status == nil {
 		h.status = noopReporter{}
 	}

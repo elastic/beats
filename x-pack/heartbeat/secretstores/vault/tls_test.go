@@ -22,8 +22,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 // newTLSFakeVault returns a fake Vault served over TLS, with a certificate
@@ -98,7 +98,7 @@ func TestClientTLSConfig(t *testing.T) {
 		"without ssl":                     {wantMinVersion: tls.VersionTLS12},
 		"ssl without supported_protocols": {ssl: map[string]any{"verification_mode": "full"}, wantMinVersion: tls.VersionTLS12},
 		"ssl with supported_protocols":    {ssl: map[string]any{"supported_protocols": []any{"TLSv1.3"}}, wantMinVersion: tls.VersionTLS13},
-		"disabled ssl":                    {ssl: map[string]any{"enabled": false, "verification_mode": "none"}, wantMinVersion: tls.VersionTLS12},
+		"disabled ssl":                    {ssl: map[string]any{"enabled": false}, wantMinVersion: tls.VersionTLS12},
 		"missing CA file":                 {ssl: map[string]any{"certificate_authorities": []any{caFile}}, wantErr: "invalid 'ssl'"},
 		"invalid verification mode":       {ssl: map[string]any{"verification_mode": "sometimes"}, wantErr: "verification_mode"},
 	}

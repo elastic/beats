@@ -40,8 +40,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 const pluginName = "filestream"
@@ -552,7 +552,7 @@ func (inp *filestream) openFile(
 	f, err := inp.newFile(rawFile)
 	if err != nil {
 		return nil, nil, false,
-			fmt.Errorf("failed to create a File from a os.File: %w", err)
+			fmt.Errorf("failed to create a File from an os.File: %w", err)
 	}
 
 	ok := false

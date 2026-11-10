@@ -1,4 +1,5 @@
 import os
+import re
 import time
 import unittest
 import platform
@@ -16,8 +17,12 @@ def is_root():
 
 
 def is_version_below(version, target):
-    t = list(map(int, target.split('.')))
-    v = list(map(int, version.split('.')))
+    # Keep the leading dotted digits of a release such as 6.17.9+deb14-amd64,
+    # e.g. [6, 17, 9]
+    def parse(s):
+        return [int(x) for x in re.match(r'[\d.]*\d', s).group().split('.')]
+    t = parse(target)
+    v = parse(version)
     v += [0] * (len(t) - len(v))
     for i in range(len(t)):
         if v[i] != t[i]:
@@ -106,8 +111,8 @@ class Test(BaseTest):
                 return False
             if size is not None and event.get("file.size") != size:
                 return False
-            # The ebpf backend reports the full st_mode (0100777), the
-            # others only the permission bits (0777).
+            # Mask to the permission bits so the check does not depend on
+            # whether a backend reports the full st_mode.
             if mode is not None and int(event.get("file.mode", "0"), 8) & 0o7777 != mode:
                 return False
             return True

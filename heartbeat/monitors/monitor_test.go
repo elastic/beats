@@ -19,17 +19,19 @@ package monitors
 
 import (
 	"fmt"
+	"runtime"
 	"testing"
 	"time"
+	"weak"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
@@ -192,4 +194,42 @@ func TestStatusReporter(t *testing.T) {
 	sched.WaitForRunOnce()
 
 	require.True(t, failed)
+}
+
+// TestMonitorDoesNotRetainConfig makes sure a monitor does not keep its config tree alive
+// after creation. With thousands of monitors a retained tree per monitor is a large share
+// of Heartbeat's heap.
+func TestMonitorDoesNotRetainConfig(t *testing.T) {
+	tests := map[string]struct {
+		id       string
+		expectID string
+	}{
+		"explicit id": {id: "myId", expectID: "myId"},
+		// the auto-generated ID is derived from a hash of the config
+		"generated id": {id: "", expectID: "auto-test-"},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			reg, _, _ := mockPluginsReg()
+			pipel := &MockPipeline{}
+			sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, false, logptest.NewTestingLogger(t, ""))
+			defer sched.Stop()
+
+			c, err := pipel.Connect()
+			require.NoError(t, err)
+
+			cfg := mockPluginConf(t, tc.id, "myName", "@every 10s", "http://example.net")
+			cfgRef := weak.Make(cfg)
+			mon, err := newMonitor(cfg, reg, c, sched.Add, nil, beat.Info{Logger: logptest.NewTestingLogger(t, "")}, nil, nil)
+			require.NoError(t, err)
+			cfg = nil //nolint:ineffassign,wastedassign // drop the test's own reference before collecting
+
+			runtime.GC()
+
+			assert.Nil(t, cfgRef.Value(), "the monitor should not keep its config alive")
+			assert.Contains(t, mon.stdFields.ID, tc.expectID, "the monitor ID should be set from the config")
+			runtime.KeepAlive(mon)
+		})
+	}
 }

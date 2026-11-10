@@ -23,7 +23,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/beats/v7/pkg/paths"
 )
 
 func TestDirectoryPath(t *testing.T) {

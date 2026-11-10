@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 )
 
 func TestNewMetricSet(t *testing.T) {

@@ -11,9 +11,9 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestExtensionsDiagnosticsPayload(t *testing.T) {
@@ -57,7 +57,7 @@ func TestExtensionsDiagnosticsPayload(t *testing.T) {
 		Timeout: 20,
 		Require: []string{"valid_ext"},
 	}, dataDir)
-	bt.setDiagnosticsQueryExecutor(&mockExecutor{result: loaded})
+	bt.setDiagnosticsQueryExecutor(profilingQueryExecutor{runCtx: t.Context(), executor: &mockExecutor{result: loaded}})
 
 	payload := bt.extensionsDiagnosticsPayload(context.Background())
 

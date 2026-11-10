@@ -10,7 +10,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/pkg/config"
 
 	"github.com/gohugoio/hashstructure"
 )
@@ -34,6 +34,12 @@ func (s *statusFactory) Create(p beat.PipelineConnector, config *config.C) (cfgf
 		runnerWithStatus.SetStatusReporter(statusReporter)
 	}
 	return runner, nil
+}
+
+// Unwrap returns the wrapped factory, so callers can use its optional
+// interfaces, such as Heartbeat's config hash function.
+func (s *statusFactory) Unwrap() cfgfile.RunnerFactory {
+	return s.factory
 }
 
 func (s *statusFactory) CheckConfig(config *config.C) error {
