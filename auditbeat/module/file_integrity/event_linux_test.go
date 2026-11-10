@@ -31,7 +31,7 @@ import (
 
 	quark "github.com/elastic/go-quark"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 const testContainerID = "d12fe576354a1805165303a4e34a69e5fe8db791ceb7e545f17811d1fbfba68f"
