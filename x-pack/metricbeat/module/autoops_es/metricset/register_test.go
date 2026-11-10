@@ -20,7 +20,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
@@ -743,7 +742,7 @@ func (f ccmFixture) newMetricSets(t *testing.T, kinds ...string) []error {
 		})
 		require.NoError(t, err)
 
-		_, _, err = mb.NewModule(c, registry, beat.Info{Paths: paths.New(), UserAgent: "test", Logger: logptest.NewTestingLogger(t, "")})
+		_, _, err = mb.NewModule(c, registry, paths.New(), logptest.NewTestingLogger(t, ""))
 
 		errs = append(errs, err)
 	}
