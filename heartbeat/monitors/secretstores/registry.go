@@ -35,8 +35,8 @@ import (
 	"regexp"
 	"sync"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // ConfigKey is the monitor setting holding the secret store connections.

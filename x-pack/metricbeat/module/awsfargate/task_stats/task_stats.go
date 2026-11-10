@@ -18,8 +18,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/docker/cpu"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/awsfargate"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (
@@ -215,6 +215,12 @@ func getStatsList(taskStatsOutput map[string]dcontainer.StatsResponse, taskOutpu
 
 	var formattedStats []Stats
 	for id, taskStats := range taskStatsOutput {
+		// An empty current or previous sample (e.g. the container started
+		// between the daemon's two reads) would yield invalid CPU deltas.
+		if taskStats.Read.IsZero() || taskStats.PreRead.IsZero() {
+			continue
+		}
+
 		if c, ok := containersInfo[id]; ok {
 			statsPerContainer := Stats{
 				Time:         common.Time(taskStats.Read),

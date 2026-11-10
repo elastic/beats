@@ -26,7 +26,7 @@ import (
 	rd "github.com/gomodule/redigo/redis"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 )
 
 // MetricSet for fetching Redis server information and statistics.

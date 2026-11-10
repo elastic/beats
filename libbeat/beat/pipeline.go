@@ -22,7 +22,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // Pipeline is the entry point for publishing events in libbeat. A Beater

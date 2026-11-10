@@ -17,8 +17,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
+	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
-	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // defaultReaderConfig is a default readerConfig state that is used to evaluate
