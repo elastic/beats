@@ -75,13 +75,11 @@ type filestream struct {
 	includeFileFingerprint    bool
 	hasLineFilter             bool
 
-	// sliceBudget, when > 0, bounds how long a single ReadSlice call keeps
-	// reading a file that never runs dry, so Poll still runs on schedule for a
-	// continuously-busy file.
-	sliceBudget time.Duration
-
 	// harvesterState shares file state with this input's prospector.
 	harvesterState *fileStateTable
+
+	// preset is shared with this input's prospector, which resolves it in Init.
+	preset *resolvedPreset
 
 	// Function references for testing
 	waitGracePeriodFn func(
@@ -167,7 +165,7 @@ func configure(
 	c.TakeOver.LogWarnings(log)
 
 	harvesterState := newFileStateTable()
-	prospector, err := newProspector(c, log, src, dc, harvesterState)
+	prospector, preset, err := newProspector(c, log, src, dc, harvesterState)
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
 	}
@@ -190,16 +188,11 @@ func configure(
 		hasLineFilter:             len(c.Reader.IncludeLines) > 0 || len(c.Reader.ExcludeLines) > 0,
 		deleterConfig:             c.Delete,
 		harvesterState:            harvesterState,
+		preset:                    preset,
 		waitGracePeriodFn:         waitGracePeriod,
 		tickFn:                    time.Tick,
 		removeFn:                  os.Remove,
 		statFn:                    os.Stat,
-	}
-
-	// Bound slice duration only when something depends on Poll running while a
-	// file stays continuously busy.
-	if c.HarvesterLimit > 0 || c.Close.OnStateChange.Renamed || c.Close.Reader.AfterInterval > 0 {
-		filestream.sliceBudget = c.Close.OnStateChange.CheckInterval
 	}
 
 	// Read the scan interval from the prospector so we can use during the
@@ -212,8 +205,16 @@ func configure(
 // normalizeConfig reconciles filestream defaults with file_identity semantics.
 // Scanner fingerprinting is derived from the file identity: enabled for
 // fingerprint, disabled otherwise. The deprecated
-// 'prospector.scanner.fingerprint.enabled' setting is ignored.
+// 'prospector.scanner.fingerprint.enabled' setting is ignored. It also records
+// whether 'prospector.scanner.check_interval' is set, which only the raw
+// configuration can tell.
 func normalizeConfig(cfg *conf.C, c *config, logger *logp.Logger) error {
+	checkIntervalSet, err := cfg.Has("prospector.scanner.check_interval", -1)
+	if err != nil {
+		return fmt.Errorf("cannot read 'prospector.scanner.check_interval': %w", err)
+	}
+	c.checkIntervalSet = checkIntervalSet
+
 	fingerprintIdentity := c.FileIdentity == nil || c.FileIdentity.Name() == fingerprintName
 
 	if fingerprintIdentity {
@@ -243,6 +244,24 @@ func normalizeConfig(cfg *conf.C, c *config, logger *logp.Logger) error {
 }
 
 func (inp *filestream) Name() string { return pluginName }
+
+// sliceBudget, when > 0, bounds how long a single ReadSlice call keeps
+// reading a file that never runs dry, so Poll still runs on schedule for a
+// continuously-busy file.
+//
+// The budget is only needed when something depends on Poll running while a
+// file stays continuously busy. It uses the resolved harvester limit, which is
+// only known after the prospector's Init, so it cannot be computed in
+// configure.
+func (inp *filestream) sliceBudget() time.Duration {
+	if inp.preset.harvesterLimit > 0 ||
+		inp.closerConfig.OnStateChange.Renamed ||
+		inp.closerConfig.Reader.AfterInterval > 0 {
+		return inp.closerConfig.OnStateChange.CheckInterval
+	}
+
+	return 0
+}
 
 func (inp *filestream) Test(src loginp.Source, ctx input.TestContext) error {
 	fs, ok := src.(fileSource)
@@ -459,10 +478,14 @@ func (inp *filestream) buildPipeline(
 ) (reader.Reader, *logFile, error) {
 	log.Debug("newLogFileReader with config.MaxBytes:", inp.readerConfig.MaxBytes)
 
-	// if the file is archived, it means that it is not going to be updated in the future
-	// thus, when EOF is reached, it can be closed
 	closerCfg := inp.closerConfig
-	if fs.archived && !inp.closerConfig.Reader.OnEOF {
+	if inp.preset.highCardinality {
+		// The prospector decides per file whether it is closed at EOF, so the
+		// configured 'close.reader.on_eof' does not apply.
+		closerCfg.Reader.OnEOF = !fs.keepOpen
+	} else if fs.archived && !inp.closerConfig.Reader.OnEOF {
+		// if the file is archived, it means that it is not going to be updated in the future
+		// thus, when EOF is reached, it can be closed
 		closerCfg = closerConfig{
 			Reader: readerCloserConfig{
 				OnEOF:         true,

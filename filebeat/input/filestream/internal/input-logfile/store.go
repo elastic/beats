@@ -112,6 +112,11 @@ type resource struct {
 	// invalid indicates if the resource has been marked for deletion, if yes, it cannot be overwritten
 	// in the persistent state.
 	invalid bool
+	// endedAtEOF is true when the last harvester of this entry ended by reading
+	// to EOF, see HarvesterSession.EndedAtEOF. It lives in memory only and is
+	// never written to the registry file, so it is false after a restart. It is
+	// guarded by stateMutex.
+	endedAtEOF bool
 
 	activeCursorOperations uint
 	internalState          stateInternal
@@ -217,6 +222,11 @@ func (s *sourceStore) Remove(src Source) error {
 func (s *sourceStore) ResetCursor(src Source, cur any) error {
 	key := s.identifier.ID(src)
 	return s.store.resetCursor(key, cur)
+}
+
+func (s *sourceStore) FindCursor(src Source, to any) (CursorInfo, error) {
+	key := s.identifier.ID(src)
+	return s.store.findCursor(key, to)
 }
 
 // IterateOnPrefix iterates over all entries that match this input's prefix.
@@ -723,11 +733,36 @@ func (s *store) resetCursor(key string, cur any) error {
 	r.activeCursorOperations = 0
 	r.pendingCursorValue = nil
 	r.pendingUpdate = nil
+	r.endedAtEOF = false
 	typeconv.Convert(&r.cursor, cur) //nolint:errcheck // not changing behaviour on this commit
 
 	s.writeState(r)
 
 	return nil
+}
+
+// findCursor unpacks the in-memory cursor of key into to. See
+// [StateMetadataUpdater.FindCursor] for the contract.
+func (s *store) findCursor(key string, to any) (CursorInfo, error) {
+	r := s.ephemeralStore.Find(key, false)
+	if r == nil {
+		return CursorInfo{}, nil
+	}
+	defer r.Release()
+
+	// One critical section so the cursor and the flag are a consistent snapshot.
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
+
+	if r.unsafeIsNew() {
+		return CursorInfo{}, nil
+	}
+
+	if err := typeconv.Convert(to, r.activeCursor()); err != nil {
+		return CursorInfo{}, fmt.Errorf("cannot unpack cursor of '%s': %w", key, err)
+	}
+
+	return CursorInfo{Found: true, EndedAtEOF: r.endedAtEOF}, nil
 }
 
 // Removes marks an entry for removal by setting its TTL to zero.
@@ -818,6 +853,13 @@ func (s *states) unsafeFind(key string, create bool) *resource {
 func (r *resource) IsNew() bool {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
+	return r.unsafeIsNew()
+}
+
+// unsafeIsNew DOES NOT LOCK THE RESOURCE!!!
+// Only call unsafeIsNew if you're currently holding the
+// lock from resource.stateMutex
+func (r *resource) unsafeIsNew() bool {
 	return r.pendingCursorValue == nil && r.pendingUpdate == nil && r.cursor == nil
 }
 
@@ -826,6 +868,22 @@ func (r *resource) isDeleted() bool {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
 	return r.unsafeIsDeleted()
+}
+
+// EndedAtEOF locks stateMutex then reports whether the last harvester of
+// [resource] ended by reading to EOF.
+func (r *resource) EndedAtEOF() bool {
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
+	return r.endedAtEOF
+}
+
+// setEndedAtEOF locks stateMutex then records whether the last harvester of
+// [resource] ended by reading to EOF.
+func (r *resource) setEndedAtEOF(v bool) {
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
+	r.endedAtEOF = v
 }
 
 // unsafeIsDeleted DOES NOT LOCK THE RESOURCE!!!

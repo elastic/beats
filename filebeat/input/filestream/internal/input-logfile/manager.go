@@ -289,6 +289,12 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		return nil, err
 	}
 
+	// The prospector may resolve the limit in Init, so it can only be read now.
+	harvesterLimit := settings.HarvesterLimit
+	if hl, ok := prospector.(HarvesterLimiter); ok {
+		harvesterLimit = hl.HarvesterLimit()
+	}
+
 	return &managedInput{
 		manager:            cim,
 		ackCH:              entry.ackCH,
@@ -302,7 +308,7 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		previousMatchers:   previousMatchers,
 		takeOverAnyID:      settings.TakeOver.FromAnyID,
 		cleanTimeout:       settings.CleanInactive,
-		harvesterLimit:     settings.HarvesterLimit,
+		harvesterLimit:     harvesterLimit,
 	}, nil
 }
 

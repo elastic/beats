@@ -1172,6 +1172,74 @@ func TestHarvesterRunner_StopWhileQueuedOnLimit(t *testing.T) {
 	require.NoError(t, g.StopHarvesters())
 }
 
+// TestHarvesterRunner_EndedAtEOF asserts the runner stores what the session
+// reported about EOF into the resource's flag when it tears the source down.
+// Why the session ended is the session's business and is tested there.
+func TestHarvesterRunner_EndedAtEOF(t *testing.T) {
+	tcs := []struct {
+		name       string
+		sessionEOF bool
+		initial    bool
+		want       bool
+	}{
+		{name: "session reports EOF sets the flag", sessionEOF: true, initial: false, want: true},
+		{name: "session does not report EOF clears the flag", sessionEOF: false, initial: true, want: false},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			h := &fakeHarvester{readFn: blockUntilCancelled, eof: tc.sessionEOF}
+			g := testHarvesterRunner(t, h, 0)
+			g.start()
+
+			src := &testSource{name: "/path/to/test"}
+			id := g.identifier.ID(src)
+			res := g.store.Get(id)
+			defer res.Release()
+			res.setEndedAtEOF(tc.initial)
+
+			g.Start(startContext(t), src)
+			requireEventually(t, func() bool { return h.opens() == 1 && h.lastSession().readCount() == 1 },
+				"the source should be reading")
+
+			g.Stop(src)
+			requireEventually(t, func() bool { return !g.hasID(id) }, "the source should be torn down")
+
+			assert.Equal(t, tc.want, res.EndedAtEOF(), "unexpected ended-at-EOF flag after teardown")
+			require.NoError(t, g.StopHarvesters(), "stopping the harvesters must succeed")
+		})
+	}
+}
+
+// TestHarvesterRunner_EndedAtEOFUntouchedWithoutSession asserts a source that
+// never opened a session leaves the flag as it was.
+func TestHarvesterRunner_EndedAtEOFUntouchedWithoutSession(t *testing.T) {
+	h := &fakeHarvester{readFn: blockUntilCancelled}
+	g := testHarvesterRunner(t, h, 1) // single open-file slot
+	g.start()
+
+	src1 := &testSource{name: "/path/to/test/1"}
+	src2 := &testSource{name: "/path/to/test/2"}
+	id2 := g.identifier.ID(src2)
+	res := g.store.Get(id2)
+	defer res.Release()
+	res.setEndedAtEOF(true)
+
+	g.Start(startContext(t), src1)
+	requireEventually(t, func() bool { return h.opens() == 1 }, "src1 should hold the only slot")
+	g.Start(startContext(t), src2) // no slot: queued, no session
+	requireEventually(t, func() bool {
+		s, ok := g.statusOf(id2)
+		return ok && s == statusWaiting
+	}, "src2 should be queued")
+
+	g.Stop(src2)
+	requireEventually(t, func() bool { return !g.hasID(id2) }, "src2 should be torn down while queued")
+
+	assert.True(t, res.EndedAtEOF(), "a source without a session must not change the flag")
+	require.NoError(t, g.StopHarvesters(), "stopping the harvesters must succeed")
+}
+
 // TestHarvesterRunner_RunSkipsAlreadyActive asserts run does not spawn a second
 // reader for a source that is already running or being torn down.
 func TestHarvesterRunner_RunSkipsAlreadyActive(t *testing.T) {
@@ -1577,6 +1645,7 @@ type fakeHarvester struct {
 	mu       sync.Mutex
 	openErr  error
 	gzip     bool // sessions report IsGZIP() == true
+	eof      bool // sessions report EndedAtEOF() == true
 	readFn   func(call int, ctx v2.Context) (SliceVerdict, error)
 	pollFn   func(call int) PollResult
 	sessions []*fakeSession
@@ -1598,7 +1667,7 @@ func (h *fakeHarvester) OpenSession(
 	if h.openErr != nil {
 		return nil, h.openErr
 	}
-	s := &fakeSession{readFn: h.readFn, pollFn: h.pollFn, gzip: h.gzip, openedAs: src}
+	s := &fakeSession{readFn: h.readFn, pollFn: h.pollFn, gzip: h.gzip, eof: h.eof, openedAs: src}
 	h.sessions = append(h.sessions, s)
 	return s, nil
 }
@@ -1631,6 +1700,7 @@ type fakeSession struct {
 	offset int64
 	closed bool
 	gzip   bool
+	eof    bool // reported by EndedAtEOF
 
 	readFn func(call int, ctx v2.Context) (SliceVerdict, error)
 	pollFn func(call int) PollResult
@@ -1695,6 +1765,12 @@ func (s *fakeSession) IsGZIP() bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.gzip
+}
+
+func (s *fakeSession) EndedAtEOF() bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.eof
 }
 
 func (s *fakeSession) Close() error {
