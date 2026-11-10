@@ -652,6 +652,13 @@ packetbeat.procs.enabled: false
 # kernel_tracing when available and falls back to procfs otherwise.
 #packetbeat.procs.backend: procfs
 
+# The minimum time between full scans of the OS socket table for each
+# transport. On Linux a scan reads the file descriptors of every process on
+# the host, so a lower value costs more CPU on busy hosts. Lookups that miss
+# within this time return no process. Zero selects the default. A negative
+# value disables the limit.
+#packetbeat.procs.max_proc_read_freq: 1s
+
 # If you want to ignore transactions created by the server on which the shipper
 # is installed you can enable this option. This option is useful to remove
 # duplicates if shippers are installed on multiple servers. Default value is

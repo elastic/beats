@@ -79,6 +79,28 @@ The backend keeps closed connections resolvable for the flow timeout plus the fl
 The kernel tracer delivers a new connection to Packetbeat a fraction of a second after it is established. A protocol transaction that completes before that, on a connection that lasts only a few tens of milliseconds, may still be published without process information. The flow events for that connection are reported later and are enriched.
 
 
+### `max_proc_read_freq` [_max_proc_read_freq]
+
+```{applies_to}
+stack: ga 9.5+
+```
+
+The minimum time between full scans of the OS socket table, kept separately for TCP and UDP. On Linux, a scan reads the file descriptors of every process on the host, so on hosts with many processes it can use a lot of CPU. When a lookup finds no process for a local endpoint, Packetbeat only scans again if at least this long has passed since the previous scan finished. Until then, lookups that miss return no process, so a connection first seen shortly after a scan is not enriched until a later lookup.
+
+The default is `1s`. Use a larger value to reduce CPU use on busy hosts, at the cost of missing more new connections. A process found by a scan stays associated with its endpoint for at least this long plus a few seconds, so long-lived services stay enriched between scans. Zero selects the default. A negative value, such as `-1s`, disables the limit, so every miss triggers a scan. When several streams set this option, the largest value is used, unless any of them is negative, in which case the limit is disabled.
+
+Earlier patch releases of 9.5 accept this option but ignore it.
+
+This option applies to the `procfs` mechanism, including the lookups that the `kernel_tracing` and `auto` backends fall back to.
+
+Example configuration:
+
+```yaml
+packetbeat.procs.enabled: true
+packetbeat.procs.max_proc_read_freq: 5s
+```
+
+
 ### `shutdown_timeout` [shutdown-timeout]
 
 How long Packetbeat waits on shutdown. By default, this option is disabled. Packetbeat will wait for `shutdown_timeout` and then close. It will not track if all events were sent previously.

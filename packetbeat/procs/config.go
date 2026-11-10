@@ -78,8 +78,12 @@ func (b *Backend) Unpack(s string) error {
 }
 
 type ProcsConfig struct {
-	Enabled         bool          `config:"enabled"`
-	Backend         Backend       `config:"backend"`
+	Enabled bool    `config:"enabled"`
+	Backend Backend `config:"backend"`
+	// MaxProcReadFreq is the minimum time between full scans of the
+	// OS socket table for a transport. Lookups that miss during that
+	// time return no process. Zero selects DefaultMaxProcReadFreq and
+	// a negative value disables the limit.
 	MaxProcReadFreq time.Duration `config:"max_proc_read_freq"`
 	Monitored       []ProcConfig  `config:"monitored"`
 	RefreshPidsFreq time.Duration `config:"refresh_pids_freq"`
@@ -93,6 +97,10 @@ type ProcsConfig struct {
 }
 
 const (
+	// DefaultMaxProcReadFreq is the default minimum time between full
+	// socket table scans.
+	DefaultMaxProcReadFreq = time.Second
+
 	// DefaultKernelTracingGraceTime is the kernel_tracing grace time
 	// used when flows are disabled. Protocol plugins look processes up
 	// as soon as a transaction completes, so only a short window past
