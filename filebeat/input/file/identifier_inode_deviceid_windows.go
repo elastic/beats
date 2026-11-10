@@ -22,8 +22,8 @@ package file
 import (
 	"fmt"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 func newINodeMarkerIdentifier(cfg *conf.C, _ *logp.Logger) (StateIdentifier, error) {

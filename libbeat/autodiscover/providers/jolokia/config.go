@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/pkg/config"
 )
 
 var (

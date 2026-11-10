@@ -17,7 +17,7 @@
 
 package beatmonitoring
 
-import "github.com/elastic/elastic-agent-libs/monitoring"
+import "github.com/elastic/beats/v7/pkg/monitoring"
 
 type Monitoring struct {
 	// Previously monitoring.GetNamespace("info")

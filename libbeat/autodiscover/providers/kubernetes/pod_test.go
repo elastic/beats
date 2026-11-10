@@ -39,9 +39,9 @@ import (
 	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
 	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes/metadata"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func TestGenerateHints(t *testing.T) {

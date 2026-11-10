@@ -13,9 +13,9 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type scheduledQueryClient interface {
