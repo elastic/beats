@@ -64,6 +64,10 @@ type fileSource struct {
 	oldPath   string
 	truncated bool
 	archived  bool
+	// keepOpen is set by the prospector under the high_cardinality preset for
+	// a file that must stay open after EOF; false means the file is closed at
+	// EOF under that preset. The default preset does not use it.
+	keepOpen bool
 
 	fileID              string
 	identifierGenerator string

@@ -20,6 +20,7 @@ package filestream
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/fs"
 	"maps"
@@ -34,6 +35,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap/zapcore"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -97,10 +99,102 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 				identifier:   mustPathIdentifier(false),
 				cleanRemoved: testCase.cleanRemoved,
 				filewatcher:  newMockFileWatcherWithFiles(testCase.filesOnDisk),
+				preset:       &resolvedPreset{},
 			}
 			p.Init(testStore, newMockStoreUpdater(nil), func(loginp.Source) string { return "" })
 
 			assert.ElementsMatch(t, testCase.expectedCleanedKeys, testStore.cleanedKeys)
+		})
+	}
+}
+
+func TestProspectorInitResolvesPreset(t *testing.T) {
+	explicitAuto := presetSelection{name: presetAuto, explicit: true, threshold: 3}
+	explicitHighCardinality := presetSelection{name: presetHighCardinality, explicit: true}
+
+	cases := []struct {
+		name                string
+		inputs              presetInputs
+		fileCount           int
+		copyTruncate        bool
+		wantHighCardinality bool
+		wantHarvesterLimit  uint64
+		wantOnEOFWarning    bool
+	}{
+		{
+			name:      "auto with one file less than the threshold runs default",
+			inputs:    presetInputs{selection: explicitAuto, closeOnEOF: true},
+			fileCount: 2,
+		},
+		{
+			name:                "auto with as many files as the threshold runs high_cardinality",
+			inputs:              presetInputs{selection: explicitAuto, closeOnEOF: true},
+			fileCount:           3,
+			wantHighCardinality: true,
+			wantHarvesterLimit:  highCardinalityHarvesterLimit,
+			wantOnEOFWarning:    true,
+		},
+		{
+			// A selection that would run high_cardinality shows that forceDefault
+			// reaches the resolution through the promoted Init.
+			name:         "copytruncate prospector runs default",
+			inputs:       presetInputs{selection: explicitHighCardinality, forceDefault: true},
+			copyTruncate: true,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			files := make(map[string]loginp.FileDescriptor, tc.fileCount)
+			for i := range tc.fileCount {
+				files[fmt.Sprintf("/path/file-%d.log", i)] = loginp.FileDescriptor{}
+			}
+
+			shared := &resolvedPreset{}
+			logger, observed := logptest.NewTestingLoggerWithObserver(t, "")
+			fp := fileProspector{
+				logger:       logger,
+				identifier:   mustPathIdentifier(false),
+				filewatcher:  newMockFileWatcherWithFiles(files),
+				presetInputs: tc.inputs,
+				preset:       shared,
+			}
+
+			newID := func(loginp.Source) string { return "" }
+			var got *resolvedPreset
+			var prospector loginp.Prospector
+			if tc.copyTruncate {
+				ct := &copyTruncateFileProspector{fileProspector: fp}
+				prospector = ct
+				got = ct.preset
+			} else {
+				prospector = &fp
+				got = fp.preset
+			}
+			require.NoError(t, prospector.Init(newMockStoreUpdater(nil), newMockStoreUpdater(nil), newID),
+				"Init must succeed")
+
+			assert.Same(t, shared, got, "Init must write into the shared value, not replace it")
+			assert.Equal(t, tc.wantHighCardinality, got.highCardinality,
+				"unexpected preset resolved for %d files", tc.fileCount)
+
+			limiter, ok := prospector.(loginp.HarvesterLimiter)
+			require.True(t, ok, "the prospector must implement loginp.HarvesterLimiter")
+			assert.Equal(t, tc.wantHarvesterLimit, limiter.HarvesterLimit(),
+				"unexpected harvester limit after Init")
+
+			// Asserted on every row: the default preset must not warn.
+			wantWarnings := 0
+			if tc.wantOnEOFWarning {
+				wantWarnings = 1
+			}
+			assert.Len(
+				t,
+				observed.FilterLevelExact(zapcore.WarnLevel).
+					FilterMessageSnippet("'close.reader.on_eof' is ignored").
+					All(),
+				wantWarnings,
+				"unexpected number of 'close.reader.on_eof' warnings")
 		})
 	}
 }
@@ -165,6 +259,7 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 				logger:      logp.NewNopLogger(),
 				identifier:  mustPathIdentifier(false),
 				filewatcher: newMockFileWatcherWithFiles(testCase.filesOnDisk),
+				preset:      &resolvedPreset{},
 			}
 			err := p.Init(testStore, newMockStoreUpdater(nil), func(loginp.Source) string { return testCase.newKey })
 			require.NoError(t, err, "prospector Init must succeed")
@@ -233,6 +328,7 @@ func TestProspector_UpdateIdentifiersOnlyForSameFiles(t *testing.T) {
 					map[string]loginp.FileDescriptor{
 						sourcePath: currentDescriptor,
 					}),
+				preset: &resolvedPreset{},
 			}
 
 			err = p.Init(newMockStoreUpdater(nil), globalStore, inputIdentifier.ID)
@@ -338,6 +434,7 @@ func TestMigrateRegistryToFingerprint(t *testing.T) {
 				logger:      logp.NewNopLogger(),
 				identifier:  tc.newIdentifier,
 				filewatcher: newMockFileWatcherWithFiles(filesOnDisk),
+				preset:      &resolvedPreset{},
 			}
 
 			err = p.Init(
@@ -450,6 +547,7 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 	for name, test := range testCases {
 		t.Run(name, func(t *testing.T) {
 			p := fileProspector{
+				preset:      &resolvedPreset{},
 				logger:      logp.NewNopLogger(),
 				filewatcher: newMockFileWatcher(test.events, len(test.events)),
 				identifier:  mustPathIdentifier(false),
@@ -461,6 +559,100 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 			p.Run(ctx, newMockMetadataUpdater(), hg, nil)
 
 			assert.ElementsMatch(t, test.expectedEvents, hg.events, "expected different harvester events")
+		})
+	}
+}
+
+func TestProspectorHighCardinalityStart(t *testing.T) {
+	const (
+		path = "/path/to/file"
+		id   = "path::" + path
+		size = 10
+	)
+
+	cases := []struct {
+		name          string
+		op            loginp.Operation
+		cursor        *mockCursor
+		findErr       error
+		defaultPreset bool
+		wantStarted   bool
+		wantKeepOpen  bool
+	}{
+		{
+			name:        "new file without cursor is closed at EOF",
+			op:          loginp.OpCreate,
+			wantStarted: true,
+		},
+		{
+			name:   "fully read file is not started",
+			op:     loginp.OpCreate,
+			cursor: &mockCursor{cur: state{Offset: size}},
+		},
+		{
+			name:         "grown file whose last harvester ended at EOF is kept open",
+			op:           loginp.OpWrite,
+			cursor:       &mockCursor{cur: state{Offset: 5}, endedAtEOF: true},
+			wantStarted:  true,
+			wantKeepOpen: true,
+		},
+		{
+			// The cursor would keep the file open if it could be read.
+			name:        "unreadable cursor is closed at EOF",
+			op:          loginp.OpWrite,
+			cursor:      &mockCursor{cur: state{Offset: 5}, endedAtEOF: true},
+			findErr:     errors.New("cannot unpack cursor"),
+			wantStarted: true,
+		},
+		{
+			name:          "default preset starts a fully read file",
+			op:            loginp.OpCreate,
+			cursor:        &mockCursor{cur: state{Offset: size}},
+			defaultPreset: true,
+			wantStarted:   true,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			store := newMockMetadataUpdater()
+			if tc.cursor != nil {
+				store.setCursor(id, tc.cursor.cur, tc.cursor.endedAtEOF)
+			}
+			store.FindCursorErr = tc.findErr
+
+			tbl := newFileStateTable()
+			h := publishHandle(tbl, id, growingDesc(""))
+
+			events := []loginp.FSEvent{{
+				Op:         tc.op,
+				NewPath:    path,
+				Descriptor: createTestFileDescriptorWithInfo(&testFileInfo{path, size, time.Now(), nil}),
+			}}
+			p := fileProspector{
+				preset:         &resolvedPreset{highCardinality: !tc.defaultPreset},
+				logger:         logp.NewNopLogger(),
+				filewatcher:    newMockFileWatcher(events, len(events)),
+				identifier:     mustPathIdentifier(false),
+				harvesterState: tbl,
+			}
+			ctx := newDrainContext(t, p.filewatcher)
+			hg := newTestHarvesterGroup()
+
+			p.Run(ctx, store, hg, nil)
+
+			assert.Equal(t, !tc.defaultPreset, store.FindCursorCalled.Load() > 0,
+				"FindCursor must be called only under the high_cardinality preset")
+			assert.Equal(t, "fingerprint", h.FingerprintSum(),
+				"the open file's descriptor must be updated whether or not a harvester is started")
+			if !tc.wantStarted {
+				assert.Empty(t, hg.started, "no harvester must be started")
+				return
+			}
+			require.Len(t, hg.started, 1, "exactly one harvester must be started")
+			started, ok := hg.started[0].(fileSource)
+			require.True(t, ok, "the started source must be a fileSource, got %T", hg.started[0])
+			assert.Equal(t, tc.wantKeepOpen, started.keepOpen, "unexpected keepOpen on the started source")
 		})
 	}
 }
@@ -488,6 +680,7 @@ func TestProspectorHarvesterUpdateIgnoredFiles(t *testing.T) {
 
 	filewatcher := newMockFileWatcher([]loginp.FSEvent{eventCreate}, 2)
 	p := fileProspector{
+		preset:      &resolvedPreset{},
 		logger:      logp.NewNopLogger(),
 		filewatcher: filewatcher,
 		identifier:  mustPathIdentifier(false),
@@ -548,6 +741,7 @@ func TestProspectorDeletedFile(t *testing.T) {
 	for name, test := range testCases {
 		t.Run(name, func(t *testing.T) {
 			p := fileProspector{
+				preset:       &resolvedPreset{},
 				logger:       logp.NewNopLogger(),
 				filewatcher:  newMockFileWatcher(test.events, len(test.events)),
 				identifier:   mustPathIdentifier(false),
@@ -628,6 +822,7 @@ func TestProspectorRenamedFile(t *testing.T) {
 	for name, test := range testCases {
 		t.Run(name, func(t *testing.T) {
 			p := fileProspector{
+				preset:            &resolvedPreset{},
 				logger:            logp.NewNopLogger(),
 				filewatcher:       newMockFileWatcher(test.events, len(test.events)),
 				identifier:        mustPathIdentifier(test.trackRename),
@@ -682,6 +877,8 @@ func (h harvesterGroupStop) String() string { return "stop" }
 type testHarvesterGroup struct {
 	events   []harvesterEvent
 	migrated func(next loginp.Source)
+	// started holds the sources passed to Start, in order.
+	started []loginp.Source
 }
 
 func newTestHarvesterGroup() *testHarvesterGroup {
@@ -690,6 +887,7 @@ func newTestHarvesterGroup() *testHarvesterGroup {
 
 func (t *testHarvesterGroup) Start(_ input.Context, s loginp.Source) {
 	t.events = append(t.events, harvesterStart(s.Name()))
+	t.started = append(t.started, s)
 }
 
 func (t *testHarvesterGroup) Restart(_ input.Context, s loginp.Source) {
@@ -814,12 +1012,32 @@ type mockMetadataUpdater struct {
 	KeyExistsCalled       atomic.Int64
 	UpdateKeyCalled       int
 	UpdateKeyErr          error
+	FindCursorCalled      atomic.Int64
+	FindCursorErr         error
+
+	// cursors is what FindCursor reports, kept apart from table because the
+	// store keeps an entry's cursor apart from its metadata, which OpCreate
+	// writes into table.
+	cursors map[string]mockCursor
+}
+
+type mockCursor struct {
+	cur        state
+	endedAtEOF bool
 }
 
 func newMockMetadataUpdater() *mockMetadataUpdater {
 	return &mockMetadataUpdater{
-		table: make(map[string]any),
+		table:   make(map[string]any),
+		cursors: make(map[string]mockCursor),
 	}
+}
+
+// setCursor makes FindCursor report cur and endedAtEOF for id.
+func (mu *mockMetadataUpdater) setCursor(id string, cur state, endedAtEOF bool) {
+	mu.mu.Lock()
+	defer mu.mu.Unlock()
+	mu.cursors[id] = mockCursor{cur: cur, endedAtEOF: endedAtEOF}
 }
 
 func (mu *mockMetadataUpdater) set(id string) {
@@ -874,6 +1092,23 @@ func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v any) error {
 		return fmt.Errorf("no such id [%q]", s.Name())
 	}
 	return typeconv.Convert(v, meta)
+}
+
+func (mu *mockMetadataUpdater) FindCursor(s loginp.Source, to any) (loginp.CursorInfo, error) {
+	mu.mu.RLock()
+	defer mu.mu.RUnlock()
+	mu.FindCursorCalled.Add(1)
+	if mu.FindCursorErr != nil {
+		return loginp.CursorInfo{}, mu.FindCursorErr
+	}
+	c, ok := mu.cursors[s.Name()]
+	if !ok {
+		return loginp.CursorInfo{}, nil
+	}
+	if err := typeconv.Convert(to, c.cur); err != nil {
+		return loginp.CursorInfo{}, err
+	}
+	return loginp.CursorInfo{Found: true, EndedAtEOF: c.endedAtEOF}, nil
 }
 
 func (mu *mockMetadataUpdater) ResetCursor(s loginp.Source, cur any) error {
@@ -1034,6 +1269,7 @@ func TestOnRenameFileIdentity(t *testing.T) {
 	for k, tc := range testCases {
 		t.Run(k, func(t *testing.T) {
 			p := fileProspector{
+				preset:            &resolvedPreset{},
 				logger:            logp.NewNopLogger(),
 				filewatcher:       newMockFileWatcher(tc.events, len(tc.events)),
 				identifier:        mustPathIdentifier(true),
@@ -1224,6 +1460,7 @@ func TestFileProspector_previousID(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			p := &fileProspector{
+				preset:                &resolvedPreset{},
 				logger:                logp.NewNopLogger(),
 				takeOver:              tc.takeOverConfig,
 				filestreamIdentifiers: filestreamFileIdentifiers(logp.NewNopLogger(), tc.takeOverConfig.Stream),
@@ -1388,6 +1625,7 @@ func TestFileProspector_takeOverFn(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			p := &fileProspector{
+				preset:     &resolvedPreset{},
 				logger:     logp.NewNopLogger(),
 				identifier: tc.identifier,
 				takeOver: loginp.TakeOverConfig{
@@ -1572,7 +1810,7 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 			store := newMockMetadataUpdater()
 			maps.Copy(store.table, tc.storeEntries)
 
-			p := &fileProspector{logger: logptest.NewTestingLogger(t, "")}
+			p := &fileProspector{logger: logptest.NewTestingLogger(t, ""), preset: &resolvedPreset{}}
 			p.buildShortFingerprintSet(store)
 			event := loginp.FSEvent{
 				NewPath: tc.currentPath,
@@ -1624,6 +1862,7 @@ func TestHandleGrowingFingerprintLookup_KeyExistsFastPath(t *testing.T) {
 		store.table[oldKey] = growingMeta(currentPath, "aabb")
 
 		p := &fileProspector{
+			preset:     &resolvedPreset{},
 			logger:     logptest.NewTestingLogger(t, ""),
 			identifier: identifier,
 		}
@@ -1654,6 +1893,7 @@ func TestHandleGrowingFingerprintLookup_KeyExistsFastPath(t *testing.T) {
 		store.table[oldKey] = growingMeta(currentPath, "aabb")
 
 		p := &fileProspector{
+			preset:     &resolvedPreset{},
 			logger:     logptest.NewTestingLogger(t, ""),
 			identifier: identifier,
 		}
@@ -1714,6 +1954,7 @@ func TestOnFSEvent_GrowingFingerprintMigration(t *testing.T) {
 		store := newMockMetadataUpdater()
 		store.table[oldKey] = growingMeta(path, oldFingerprint)
 		p := &fileProspector{
+			preset:             &resolvedPreset{},
 			logger:             log,
 			identifier:         identifier,
 			shortFingerprints:  newShortFingerprintSet(),
@@ -1763,6 +2004,7 @@ func TestOnFSEvent_GrowingFingerprintMigration(t *testing.T) {
 		tbl := newFileStateTable()
 		h := publishHandle(tbl, "fingerprint::"+oldFingerprint, growingDesc(oldFingerprint))
 		p := &fileProspector{
+			preset:             &resolvedPreset{},
 			logger:             log,
 			identifier:         identifier,
 			shortFingerprints:  newShortFingerprintSet(),
@@ -1826,6 +2068,7 @@ func TestOnFSEvent_GrowingFingerprintMigration(t *testing.T) {
 		}
 		newKey = "filestream::" + inputID + "::fingerprint::" + desc.Fingerprint.Key()
 		p = &fileProspector{
+			preset:             &resolvedPreset{},
 			logger:             log,
 			identifier:         identifier,
 			shortFingerprints:  newShortFingerprintSet(),
@@ -1896,6 +2139,7 @@ func TestOnFSEvent_HarvesterStateTable(t *testing.T) {
 			tbl := newFileStateTable()
 			h := publishHandle(tbl, "path::"+path, growingDesc(""))
 			p := &fileProspector{
+				preset:         &resolvedPreset{},
 				logger:         log,
 				identifier:     mustPathIdentifier(false),
 				harvesterState: tbl,
@@ -1964,7 +2208,7 @@ func TestBuildShortFingerprintSet(t *testing.T) {
 		FingerprintLen: 2,
 	}
 
-	p := &fileProspector{logger: logptest.NewTestingLogger(t, "")}
+	p := &fileProspector{logger: logptest.NewTestingLogger(t, ""), preset: &resolvedPreset{}}
 	p.buildShortFingerprintSet(store)
 
 	require.Len(t, p.shortFingerprints.entries, 2, "expected both struct and map growing entries")
@@ -1996,6 +2240,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 
 	t.Run("OpCreate with growing entry adds entry", func(t *testing.T) {
 		p := &fileProspector{
+			preset:            &resolvedPreset{},
 			logger:            logptest.NewTestingLogger(t, ""),
 			identifier:        identifier,
 			shortFingerprints: newShortFingerprintSet(),
@@ -2021,6 +2266,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 		// short-fingerprint set: they cannot participate in prefix matching.
 		const sha = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 		p := &fileProspector{
+			preset:            &resolvedPreset{},
 			logger:            logptest.NewTestingLogger(t, ""),
 			identifier:        identifier,
 			shortFingerprints: newShortFingerprintSet(),
@@ -2039,6 +2285,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 	t.Run("OpDelete removes entry", func(t *testing.T) {
 		srcID := "filestream::input::fingerprint::aabb"
 		p := &fileProspector{
+			preset:            &resolvedPreset{},
 			logger:            logptest.NewTestingLogger(t, ""),
 			identifier:        identifier,
 			shortFingerprints: newShortFingerprintSet(),
@@ -2059,6 +2306,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 	t.Run("OpRename updates source path", func(t *testing.T) {
 		srcID := "filestream::input::fingerprint::aabb"
 		p := &fileProspector{
+			preset:            &resolvedPreset{},
 			logger:            logptest.NewTestingLogger(t, ""),
 			identifier:        identifier,
 			shortFingerprints: newShortFingerprintSet(),
@@ -2092,6 +2340,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 		// would stop prefix-matching after a restart.
 		srcID := "filestream::input::fingerprint::" + loginp.HashRawFingerprint("aabb")
 		p := &fileProspector{
+			preset:            &resolvedPreset{},
 			logger:            logptest.NewTestingLogger(t, ""),
 			identifier:        identifier,
 			shortFingerprints: newShortFingerprintSet(),
@@ -2126,6 +2375,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 		// After truncation, the SrcID is based on the NEW (truncated) fingerprint
 		truncatedSrcID := "filestream::input::fingerprint::xx"
 		p := &fileProspector{
+			preset:            &resolvedPreset{},
 			logger:            logptest.NewTestingLogger(t, ""),
 			identifier:        identifier,
 			shortFingerprints: newShortFingerprintSet(),
@@ -2160,6 +2410,7 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 		store.table[oldKey] = growingMeta(path, oldFingerprint)
 
 		p := &fileProspector{
+			preset:            &resolvedPreset{},
 			logger:            logptest.NewTestingLogger(t, ""),
 			identifier:        identifier,
 			shortFingerprints: newShortFingerprintSet(),
@@ -2202,6 +2453,7 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 		store.table[oldKey] = growingMeta(path, oldFingerprint)
 
 		p := &fileProspector{
+			preset:            &resolvedPreset{},
 			logger:            logptest.NewTestingLogger(t, ""),
 			identifier:        identifier,
 			shortFingerprints: newShortFingerprintSet(),
@@ -2242,6 +2494,7 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 		store.table[oldKey] = growingMeta(path, oldFingerprint)
 
 		p := &fileProspector{
+			preset:            &resolvedPreset{},
 			logger:            logptest.NewTestingLogger(t, ""),
 			identifier:        identifier,
 			shortFingerprints: newShortFingerprintSet(),
@@ -2288,6 +2541,7 @@ func TestShortFingerprintEntries_FullLifecycle(t *testing.T) {
 	}
 
 	p := &fileProspector{
+		preset:             &resolvedPreset{},
 		logger:             log,
 		identifier:         identifier,
 		shortFingerprints:  newShortFingerprintSet(),
@@ -2450,7 +2704,7 @@ func (c *countingWatcher) ScanOnce(_ unison.Canceler, _ loginp.FSEventSink, _ *l
 func TestProspectorScanLoop(t *testing.T) {
 	run := func(t *testing.T, interval time.Duration) (*countingWatcher, context.CancelFunc, <-chan struct{}) {
 		cw := &countingWatcher{}
-		p := fileProspector{filewatcher: cw, checkInterval: interval}
+		p := fileProspector{filewatcher: cw, preset: &resolvedPreset{checkInterval: interval}}
 		ctx, cancel := context.WithCancel(context.Background())
 		t.Cleanup(cancel)
 		done := make(chan struct{})

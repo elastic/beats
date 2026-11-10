@@ -503,6 +503,68 @@ func TestInputManager_CreateOnlyAcquiresOneStoreReference(t *testing.T) {
 	manager.Close()
 }
 
+// limitingProspector is a HarvesterLimiter that only knows its limit after Init.
+type limitingProspector struct {
+	noopProspector
+	resolved uint64
+	limit    uint64
+}
+
+func (p *limitingProspector) Init(_, _ StoreUpdater, _ func(Source) string) error {
+	p.limit = p.resolved
+	return nil
+}
+
+func (p *limitingProspector) HarvesterLimit() uint64 { return p.limit }
+
+func TestInputManager_CreateHarvesterLimit(t *testing.T) {
+	cases := []struct {
+		name       string
+		prospector Prospector
+		configured uint64
+		want       uint64
+	}{
+		{
+			name:       "a HarvesterLimiter limit wins over the configured one",
+			prospector: &limitingProspector{resolved: 500},
+			configured: 3,
+			want:       500,
+		},
+		{
+			name:       "without HarvesterLimiter the configured limit applies",
+			prospector: &noopProspector{},
+			configured: 7,
+			want:       7,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			setupCacheForTest(t)
+
+			manager := &InputManager{
+				Logger:     logp.NewNopLogger(),
+				StateStore: createSampleStore(t, nil).WithGCPeriod(time.Minute),
+				Type:       "filestream",
+				Configure: func(_ *config.C, _ *logp.Logger, _ *SourceIdentifier) (Prospector, Harvester, error) {
+					return tc.prospector, &mockHarvester{}, nil
+				},
+			}
+			t.Cleanup(manager.Close)
+
+			inp, err := manager.Create(config.MustNewConfigFrom(map[string]any{
+				"id":              "test",
+				"harvester_limit": tc.configured,
+			}))
+			require.NoError(t, err, "Create must succeed")
+			mi, ok := inp.(*managedInput)
+			require.True(t, ok, "expected *managedInput, got %T", inp)
+
+			assert.Equal(t, tc.want, mi.harvesterLimit, "unexpected harvester limit")
+		})
+	}
+}
+
 func initInputManager(t *testing.T, cim *InputManager) {
 	t.Helper()
 	if cim.StateStore.CleanupInterval() <= 0 {
