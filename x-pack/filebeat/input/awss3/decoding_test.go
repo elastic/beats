@@ -15,8 +15,8 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 
+	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
-	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // all test files are read from the "testdata" directory

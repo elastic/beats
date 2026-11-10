@@ -20,9 +20,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/sync/errgroup"
 
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestOsqueryExit(t *testing.T) {

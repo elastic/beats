@@ -10,7 +10,7 @@ import (
 	"slices"
 	"strconv"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/events"
 

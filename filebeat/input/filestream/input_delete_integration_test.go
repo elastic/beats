@@ -37,8 +37,8 @@ import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 func TestFilestreamDelete(t *testing.T) {

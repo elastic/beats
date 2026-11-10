@@ -12,7 +12,7 @@ import (
 	"code.cloudfoundry.org/go-loggregator/conversion"
 	"code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 type RlpListenerCallbacks struct {

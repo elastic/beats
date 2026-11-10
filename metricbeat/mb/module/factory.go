@@ -22,7 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 )
 
 // Factory creates new Runner instances from configuration objects.

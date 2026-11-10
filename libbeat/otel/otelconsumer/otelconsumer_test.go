@@ -49,10 +49,10 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch" // register "elasticsearch" output type
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
-	agentconfig "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	agentconfig "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	mockesapi "github.com/elastic/mock-es/pkg/api"
 )
 

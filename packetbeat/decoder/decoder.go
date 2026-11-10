@@ -30,7 +30,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/protos/icmp"
 	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
 	"github.com/elastic/beats/v7/packetbeat/protos/udp"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 type Decoder struct {

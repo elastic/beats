@@ -16,9 +16,9 @@ import (
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	metricreport "github.com/elastic/beats/v7/pkg/systemmetrics/report"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func resetSystemBridgeForTest() {

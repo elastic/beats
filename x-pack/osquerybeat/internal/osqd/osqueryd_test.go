@@ -19,7 +19,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
