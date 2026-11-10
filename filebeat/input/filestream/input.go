@@ -83,6 +83,9 @@ type filestream struct {
 	// harvesterState shares file state with this input's prospector.
 	harvesterState *fileStateTable
 
+	// preset is shared with this input's prospector, which resolves it in Init.
+	preset *resolvedPreset
+
 	// Function references for testing
 	waitGracePeriodFn func(
 		ctx input.Context,
@@ -167,7 +170,7 @@ func configure(
 	c.TakeOver.LogWarnings(log)
 
 	harvesterState := newFileStateTable()
-	prospector, err := newProspector(c, log, src, dc, harvesterState)
+	prospector, preset, err := newProspector(c, log, src, dc, harvesterState)
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
 	}
@@ -190,6 +193,7 @@ func configure(
 		hasLineFilter:             len(c.Reader.IncludeLines) > 0 || len(c.Reader.ExcludeLines) > 0,
 		deleterConfig:             c.Delete,
 		harvesterState:            harvesterState,
+		preset:                    preset,
 		waitGracePeriodFn:         waitGracePeriod,
 		tickFn:                    time.Tick,
 		removeFn:                  os.Remove,
@@ -212,8 +216,16 @@ func configure(
 // normalizeConfig reconciles filestream defaults with file_identity semantics.
 // Scanner fingerprinting is derived from the file identity: enabled for
 // fingerprint, disabled otherwise. The deprecated
-// 'prospector.scanner.fingerprint.enabled' setting is ignored.
+// 'prospector.scanner.fingerprint.enabled' setting is ignored. It also records
+// whether 'prospector.scanner.check_interval' is set, which only the raw
+// configuration can tell.
 func normalizeConfig(cfg *conf.C, c *config, logger *logp.Logger) error {
+	checkIntervalSet, err := cfg.Has("prospector.scanner.check_interval", -1)
+	if err != nil {
+		return fmt.Errorf("cannot read 'prospector.scanner.check_interval': %w", err)
+	}
+	c.checkIntervalSet = checkIntervalSet
+
 	fingerprintIdentity := c.FileIdentity == nil || c.FileIdentity.Name() == fingerprintName
 
 	if fingerprintIdentity {

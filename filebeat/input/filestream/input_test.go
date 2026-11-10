@@ -482,6 +482,69 @@ paths:
 	})
 }
 
+func TestConfigurePreset(t *testing.T) {
+	logger := logp.NewNopLogger()
+	srcIdentifier, err := loginp.NewSourceIdentifier(pluginName, "test")
+	require.NoError(t, err, "creating the source identifier must succeed")
+
+	cases := []struct {
+		name  string
+		extra string
+		want  resolvedPreset
+	}{
+		{
+			name: "preset not set keeps the configured values",
+			want: resolvedPreset{checkInterval: 10 * time.Second},
+		},
+		{
+			name:  "high_cardinality fills in its values",
+			extra: "preset.high_cardinality: ~",
+			want: resolvedPreset{
+				highCardinality: true,
+				harvesterLimit:  highCardinalityHarvesterLimit,
+				checkInterval:   highCardinalityCheckInterval,
+			},
+		},
+		{
+			name: "high_cardinality keeps an explicit check_interval equal to the default",
+			extra: `preset.high_cardinality: ~
+harvester_limit: 100
+prospector.scanner.check_interval: 10s`,
+			want: resolvedPreset{
+				highCardinality: true,
+				harvesterLimit:  100,
+				checkInterval:   10 * time.Second,
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := conf.MustNewConfigFrom(fmt.Sprintf(`
+type: filestream
+id: test
+paths:
+  - %s
+%s
+`, filepath.Join(t.TempDir(), "*.log"), tc.extra))
+			prospector, harvester, err := configure(cfg, logger, srcIdentifier, nil)
+			require.NoError(t, err, "configure must succeed")
+			fs, ok := harvester.(*filestream)
+			require.True(t, ok, "expected *filestream, got %T", harvester)
+			fp, ok := prospector.(*fileProspector)
+			require.True(t, ok, "expected *fileProspector, got %T", prospector)
+
+			require.NotNil(t, fs.preset, "configure must give the harvester a preset")
+			assert.Same(t, fs.preset, fp.preset, "harvester and prospector must share the preset")
+
+			err = prospector.Init(newMockStoreUpdater(nil), newMockStoreUpdater(nil),
+				func(loginp.Source) string { return "" })
+			require.NoError(t, err, "Init must succeed")
+			assert.Equal(t, tc.want, *fs.preset, "unexpected resolved preset")
+		})
+	}
+}
+
 func TestNewFile(t *testing.T) {
 	tempDir := t.TempDir()
 

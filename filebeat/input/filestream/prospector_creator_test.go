@@ -48,7 +48,7 @@ func TestCreateProspector(t *testing.T) {
 			t.Run(name, func(t *testing.T) {
 				c := defaultConfig()
 				c.IgnoreInactive = ignoreInactiveSettings[test.ignore_inactive_since]
-				p, err := newProspector(c, logptest.NewTestingLogger(t, ""), mustSourceIdentifier("foo-id"), nil, nil)
+				p, _, err := newProspector(c, logptest.NewTestingLogger(t, ""), mustSourceIdentifier("foo-id"), nil, nil)
 				require.NoError(t, err)
 				fileProspector := p.(*fileProspector) //nolint:errcheck // we know the type
 				assert.Equal(t, fileProspector.ignoreInactiveSince, ignoreInactiveSettings[test.ignore_inactive_since])
@@ -110,7 +110,7 @@ prospector.scanner.fingerprint.enabled: false
 				require.NoError(t, err)
 				require.NoError(t, normalizeConfig(c, &cfg, logger))
 
-				_, err = newProspector(cfg, logger, mustSourceIdentifier("foo-id"), nil, nil)
+				_, _, err = newProspector(cfg, logger, mustSourceIdentifier("foo-id"), nil, nil)
 				require.NoError(t, err)
 			})
 		}
@@ -151,7 +151,7 @@ rotation.external.strategy.copytruncate:
 				require.NoError(t, c.Unpack(&cfg), "test config must unpack into filestream config")
 				require.NoError(t, normalizeConfig(c, &cfg, logger), "normalizeConfig must succeed")
 
-				p, err := newProspector(cfg, logger, mustSourceIdentifier("foo-id"), nil, nil)
+				p, _, err := newProspector(cfg, logger, mustSourceIdentifier("foo-id"), nil, nil)
 				require.NoError(t, err, "creating the prospector must succeed")
 
 				if tc.wantCopyTruncate {
@@ -245,7 +245,7 @@ rotation.external.strategy.copytruncate:
 				require.NoError(t, c.Unpack(&cfg), "test config must unpack into filestream config")
 				require.NoError(t, normalizeConfig(c, &cfg, logger), "normalizeConfig must succeed")
 
-				p, err := newProspector(cfg, logger, mustSourceIdentifier("foo-id"), nil, nil)
+				p, _, err := newProspector(cfg, logger, mustSourceIdentifier("foo-id"), nil, nil)
 				if len(tc.wantErr) > 0 {
 					require.Error(t, err, "newProspector must reject the configuration")
 					for _, want := range tc.wantErr {
@@ -258,14 +258,14 @@ rotation.external.strategy.copytruncate:
 				if tc.wantCopyTruncate {
 					ct, ok := p.(*copyTruncateFileProspector)
 					require.True(t, ok, "expected the copytruncate prospector, got %T", p)
-					assert.True(t, ct.forceDefaultPreset,
+					assert.True(t, ct.presetInputs.forceDefault,
 						"the copytruncate prospector must be forced to the default preset")
 					return
 				}
 
 				fp, ok := p.(*fileProspector)
 				require.True(t, ok, "expected the standard file prospector, got %T", p)
-				assert.False(t, fp.forceDefaultPreset,
+				assert.False(t, fp.presetInputs.forceDefault,
 					"only the copytruncate prospector is forced to the default preset")
 			})
 		}

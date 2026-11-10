@@ -47,8 +47,8 @@ const (
 
 // Preset names, the keys accepted under the 'preset' option.
 const (
-	// presetAuto selects high_cardinality when the input has more files than
-	// the configured threshold, otherwise default.
+	// presetAuto selects high_cardinality when the input has at least as
+	// many files as the configured threshold, otherwise default.
 	presetAuto = "auto"
 	// presetDefault keeps the configured values and the regular behaviour.
 	presetDefault = "default"
@@ -56,9 +56,9 @@ const (
 	presetHighCardinality = "high_cardinality"
 )
 
-// defaultFilesAbove is the number of files above which the auto
-// preset selects high_cardinality.
-const defaultFilesAbove = 5000
+// defaultMinFiles is the number of files from which the auto preset
+// selects high_cardinality.
+const defaultMinFiles = 5000
 
 // config stores the options of a file stream.
 type config struct {
@@ -105,6 +105,11 @@ type config struct {
 	// underneath. Nil means it is not set, which behaves like auto.
 	Preset *conf.Namespace `config:"preset"`
 
+	// checkIntervalSet is true when 'prospector.scanner.check_interval' is
+	// written in the configuration, which a value comparison cannot tell
+	// when it equals the default. Set by normalizeConfig.
+	checkIntervalSet bool `config:"-"`
+
 	// TakeOver is also independently parsed by InputManager.Create
 	// (see internal/input-logfile/manager.go).
 	TakeOver loginp.TakeOverConfig `config:"take_over"`
@@ -126,9 +131,9 @@ type presetAutoConfig struct {
 
 // highCardinalityConfig holds the settings of 'preset.auto.high_cardinality'.
 type highCardinalityConfig struct {
-	// FilesAbove is the file count that has to be exceeded, strictly, for
-	// the auto preset to select high_cardinality.
-	FilesAbove int `config:"files_above" validate:"min=0"`
+	// MinFiles is the file count from which the auto preset selects
+	// high_cardinality: an input with at least that many files runs it.
+	MinFiles int `config:"min_files" validate:"min=0"`
 }
 
 // presetSelection is the preset chosen by a configuration.
@@ -138,7 +143,7 @@ type presetSelection struct {
 	name string
 	// explicit is true when the user wrote the preset.
 	explicit bool
-	// threshold is the file count above which presetAuto selects
+	// threshold is the file count from which presetAuto selects
 	// high_cardinality.
 	threshold int
 	// forcedDefaultReason explains why a preset that is not set resolved to
@@ -151,7 +156,7 @@ type presetSelection struct {
 func unpackPresetAuto(ns *conf.Namespace) (presetAutoConfig, error) {
 	autoCfg := presetAutoConfig{
 		HighCardinality: highCardinalityConfig{
-			FilesAbove: defaultFilesAbove,
+			MinFiles: defaultMinFiles,
 		},
 	}
 	if err := ns.Config().Unpack(&autoCfg); err != nil {
@@ -200,7 +205,7 @@ func quoteOptions(opts []string) string {
 func (c *config) presetSelection() (presetSelection, error) {
 	sel := presetSelection{
 		name:      presetAuto,
-		threshold: defaultFilesAbove,
+		threshold: defaultMinFiles,
 	}
 	if c.Preset == nil || c.Preset.Name() == "" {
 		if opts := c.presetIncompatibleOptions(); len(opts) > 0 {
@@ -220,7 +225,7 @@ func (c *config) presetSelection() (presetSelection, error) {
 		if err != nil {
 			return presetSelection{}, err
 		}
-		sel.threshold = autoCfg.HighCardinality.FilesAbove
+		sel.threshold = autoCfg.HighCardinality.MinFiles
 	case presetDefault, presetHighCardinality:
 		// no settings
 	default:

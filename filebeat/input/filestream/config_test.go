@@ -317,9 +317,9 @@ read_until_eof.enabled: false
 				wantErr: "more than one namespace configured",
 			},
 			{
-				name:    "negative files_above",
-				cfg:     paths + "preset.auto.high_cardinality.files_above: -1",
-				wantErr: "requires value >= 0 accessing 'preset.auto.high_cardinality.files_above'",
+				name:    "negative min_files",
+				cfg:     paths + "preset.auto.high_cardinality.min_files: -1",
+				wantErr: "requires value >= 0 accessing 'preset.auto.high_cardinality.min_files'",
 			},
 			{
 				name:    "scalar form is rejected",
@@ -464,13 +464,13 @@ func TestPresetSelection(t *testing.T) {
 			want: presetSelection{name: presetAuto, explicit: true, threshold: 5000},
 		},
 		{
-			name: "auto with files_above",
-			cfg:  paths + "preset.auto.high_cardinality.files_above: 42",
+			name: "auto with min_files",
+			cfg:  paths + "preset.auto.high_cardinality.min_files: 42",
 			want: presetSelection{name: presetAuto, explicit: true, threshold: 42},
 		},
 		{
-			name: "auto with files_above 0",
-			cfg:  paths + "preset.auto.high_cardinality.files_above: 0",
+			name: "auto with min_files 0",
+			cfg:  paths + "preset.auto.high_cardinality.min_files: 0",
 			want: presetSelection{name: presetAuto, explicit: true, threshold: 0},
 		},
 		{

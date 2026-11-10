@@ -91,10 +91,10 @@ type fileProspector struct {
 	shortFingerprints     *shortFingerprintSet
 	growingFingerprint    bool
 	harvesterState        *fileStateTable
-
-	// forceDefaultPreset is set for the copytruncate prospector, which always
-	// runs the default preset, whatever the configuration selects.
-	forceDefaultPreset bool
+	presetInputs          presetInputs
+	// preset is shared with the input's harvester and written once in Init.
+	// It must not be nil.
+	preset *resolvedPreset
 }
 
 func (p *fileProspector) previousID(name string, fd loginp.FileDescriptor, v loginp.TakeOverState) string {
@@ -185,6 +185,9 @@ func (p *fileProspector) Init(
 	newID func(loginp.Source) string,
 ) error {
 	files := p.filewatcher.GetFiles(loginp.FileScanOptions{}).Files
+
+	*p.preset = resolvePreset(p.presetInputs, len(files))
+	p.logger.Info(presetMessage(p.presetInputs, len(files), *p.preset))
 
 	// If this fileProspector belongs to an input that did not have an ID
 	// this will find its files in the registry and update them to use the

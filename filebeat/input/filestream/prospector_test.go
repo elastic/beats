@@ -97,10 +97,78 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 				identifier:   mustPathIdentifier(false),
 				cleanRemoved: testCase.cleanRemoved,
 				filewatcher:  newMockFileWatcherWithFiles(testCase.filesOnDisk),
+				preset:       &resolvedPreset{},
 			}
 			p.Init(testStore, newMockStoreUpdater(nil), func(loginp.Source) string { return "" })
 
 			assert.ElementsMatch(t, testCase.expectedCleanedKeys, testStore.cleanedKeys)
+		})
+	}
+}
+
+func TestProspectorInitResolvesPreset(t *testing.T) {
+	explicitAuto := presetSelection{name: presetAuto, explicit: true, threshold: 3}
+	explicitHighCardinality := presetSelection{name: presetHighCardinality, explicit: true}
+
+	cases := []struct {
+		name                string
+		inputs              presetInputs
+		fileCount           int
+		copyTruncate        bool
+		wantHighCardinality bool
+	}{
+		{
+			name:      "auto with one file less than the threshold runs default",
+			inputs:    presetInputs{selection: explicitAuto},
+			fileCount: 2,
+		},
+		{
+			name:                "auto with as many files as the threshold runs high_cardinality",
+			inputs:              presetInputs{selection: explicitAuto},
+			fileCount:           3,
+			wantHighCardinality: true,
+		},
+		{
+			// A selection that would run high_cardinality shows that forceDefault
+			// reaches the resolution through the promoted Init.
+			name:         "copytruncate prospector runs default",
+			inputs:       presetInputs{selection: explicitHighCardinality, forceDefault: true},
+			copyTruncate: true,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			files := make(map[string]loginp.FileDescriptor, tc.fileCount)
+			for i := range tc.fileCount {
+				files[fmt.Sprintf("/path/file-%d.log", i)] = loginp.FileDescriptor{}
+			}
+
+			shared := &resolvedPreset{}
+			fp := fileProspector{
+				logger:       logp.NewNopLogger(),
+				identifier:   mustPathIdentifier(false),
+				filewatcher:  newMockFileWatcherWithFiles(files),
+				presetInputs: tc.inputs,
+				preset:       shared,
+			}
+
+			newID := func(loginp.Source) string { return "" }
+			var got *resolvedPreset
+			if tc.copyTruncate {
+				ct := &copyTruncateFileProspector{fileProspector: fp}
+				require.NoError(t, ct.Init(newMockStoreUpdater(nil), newMockStoreUpdater(nil), newID),
+					"Init must succeed")
+				got = ct.preset
+			} else {
+				require.NoError(t, fp.Init(newMockStoreUpdater(nil), newMockStoreUpdater(nil), newID),
+					"Init must succeed")
+				got = fp.preset
+			}
+
+			assert.Same(t, shared, got, "Init must write into the shared value, not replace it")
+			assert.Equal(t, tc.wantHighCardinality, got.highCardinality,
+				"unexpected preset resolved for %d files", tc.fileCount)
 		})
 	}
 }
@@ -165,6 +233,7 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 				logger:      logp.NewNopLogger(),
 				identifier:  mustPathIdentifier(false),
 				filewatcher: newMockFileWatcherWithFiles(testCase.filesOnDisk),
+				preset:      &resolvedPreset{},
 			}
 			err := p.Init(testStore, newMockStoreUpdater(nil), func(loginp.Source) string { return testCase.newKey })
 			require.NoError(t, err, "prospector Init must succeed")
@@ -233,6 +302,7 @@ func TestProspector_UpdateIdentifiersOnlyForSameFiles(t *testing.T) {
 					map[string]loginp.FileDescriptor{
 						sourcePath: currentDescriptor,
 					}),
+				preset: &resolvedPreset{},
 			}
 
 			err = p.Init(newMockStoreUpdater(nil), globalStore, inputIdentifier.ID)
@@ -338,6 +408,7 @@ func TestMigrateRegistryToFingerprint(t *testing.T) {
 				logger:      logp.NewNopLogger(),
 				identifier:  tc.newIdentifier,
 				filewatcher: newMockFileWatcherWithFiles(filesOnDisk),
+				preset:      &resolvedPreset{},
 			}
 
 			err = p.Init(
