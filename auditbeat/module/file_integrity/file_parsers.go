@@ -20,7 +20,7 @@ package file_integrity
 import (
 	"regexp"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // FileParser is a file analyser providing enrichment for file.* fields.

@@ -5,7 +5,7 @@
 package awss3
 
 import (
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // pollingStrategy defines the strategy interface for S3 polling behavior.

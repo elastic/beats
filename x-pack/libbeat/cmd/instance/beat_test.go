@@ -18,8 +18,8 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/log"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management"
+	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
-	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestManager(t *testing.T) {
