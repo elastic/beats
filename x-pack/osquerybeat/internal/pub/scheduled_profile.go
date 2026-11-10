@@ -12,8 +12,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // ScheduledProfileSink is a lease on one policy's scheduled-profile stream.

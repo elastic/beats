@@ -35,9 +35,9 @@ import (
 	"github.com/cespare/xxhash/v2"
 	"golang.org/x/sys/windows"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type EventRenderer interface {

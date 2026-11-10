@@ -23,7 +23,6 @@ import (
 	"runtime"
 
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
-
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

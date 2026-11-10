@@ -27,7 +27,7 @@ import (
 	"github.com/godbus/dbus/v5"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // Ensure MetricSet implements mb.Closer so dbus connections are released on stop/reload.

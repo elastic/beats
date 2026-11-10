@@ -28,7 +28,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/transport"
+	"github.com/elastic/beats/v7/pkg/transport"
 )
 
 const (

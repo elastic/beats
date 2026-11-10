@@ -17,7 +17,7 @@
 
 package autodiscover
 
-import "github.com/elastic/elastic-agent-libs/config"
+import "github.com/elastic/beats/v7/pkg/config"
 
 // Config settings for Autodiscover
 type Config struct {
