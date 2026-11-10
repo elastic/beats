@@ -42,6 +42,14 @@ type Prospector interface {
 	Test() error
 }
 
+// HarvesterLimiter is implemented by prospectors that decide the harvester
+// limit of their input, for example because it depends on what Init finds.
+// It is optional: without it the configured 'harvester_limit' applies.
+// HarvesterLimit is called once, after Init, and 0 means no limit.
+type HarvesterLimiter interface {
+	HarvesterLimit() uint64
+}
+
 // StateMetadataUpdater updates and removes the state information for a given Source.
 type StateMetadataUpdater interface {
 	// FindCursorMeta retrieves and unpacks the cursor metadata of an entry of the given Source.

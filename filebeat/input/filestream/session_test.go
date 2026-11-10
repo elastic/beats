@@ -251,8 +251,10 @@ func TestHarvestSession_ReadSlice(t *testing.T) {
 
 	t.Run("a slice budget yields before EOF even though more data remains", func(t *testing.T) {
 		content := strings.Repeat("line\n", 100)
-		s := newReadSession(t, closerConfig{}, content, 0)
-		s.inp.sliceBudget = -time.Hour
+		closer := closerConfig{OnStateChange: stateChangeCloserConfig{CheckInterval: -time.Hour}}
+		s := newReadSession(t, closer, content, 0)
+		// The budget is only in effect with a resolved harvester limit.
+		s.inp.preset.harvesterLimit = 1
 		pub := &countingPublisher{}
 
 		verdict, err := s.ReadSlice(backgroundCtx(), pub)
@@ -459,6 +461,7 @@ func testFilestream(t *testing.T, closer closerConfig) *filestream {
 	encFactory, ok := encoding.FindEncoding("")
 	require.True(t, ok, "the default encoding must be available")
 	return &filestream{
+		preset:          &resolvedPreset{},
 		compression:     CompressionNone,
 		encodingFactory: encFactory,
 		readerConfig:    readerConfig{BufferSize: 1024, MaxBytes: 1 << 20, LineTerminator: readfile.AutoLineTerminator},

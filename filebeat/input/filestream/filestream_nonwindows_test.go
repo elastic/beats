@@ -129,6 +129,7 @@ func TestLogFileRemoved(t *testing.T) {
 func createTestLogFile(t *testing.T) File {
 	t.Helper()
 	fs := filestream{
+		preset:       &resolvedPreset{},
 		readerConfig: readerConfig{BufferSize: 512},
 		compression:  CompressionNone,
 	}

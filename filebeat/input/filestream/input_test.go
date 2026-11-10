@@ -428,58 +428,73 @@ paths:
 	}
 }
 
-// TestConfigure_SliceBudget asserts configure only bounds ReadSlice's duration
-// (filestream.sliceBudget, at close.on_state_change.check_interval) when
-// something depends on Poll running while a file stays continuously busy:
-// harvester_limit needs a close condition to free its slot, and
+// TestConfigure_SliceBudget asserts a filestream input only bounds ReadSlice's
+// duration (filestream.sliceBudget(), at close.on_state_change.check_interval)
+// when something depends on Poll running while a file stays continuously busy:
+// the resolved harvester_limit needs a close condition to free its slot, and
 // close.on_state_change.renamed only matters for a file still being written to
 // under its old name. Otherwise it's left unbounded to avoid the extra
-// pipeline-rebuild/stat overhead where nothing needs it.
+// pipeline-rebuild/stat overhead where nothing needs it. The limit is only
+// resolved by the prospector's Init, so the budget is read after it.
 func TestConfigure_SliceBudget(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	srcIdentifier, err := loginp.NewSourceIdentifier(pluginName, "test")
-	require.NoError(t, err)
+	require.NoError(t, err, "creating the source identifier must succeed")
 
-	build := func(t *testing.T, extra string) *filestream {
-		t.Helper()
-		cfg := conf.MustNewConfigFrom(fmt.Sprintf(`
+	cases := []struct {
+		name       string
+		extra      string
+		wantBudget bool
+	}{
+		{name: "unset by default"},
+		{name: "set when harvester_limit is enabled", extra: "harvester_limit: 5", wantBudget: true},
+		{
+			name:       "set when close.on_state_change.renamed is enabled",
+			extra:      "close.on_state_change.renamed: true",
+			wantBudget: true,
+		},
+		{
+			name:       "set when close.reader.after_interval is enabled",
+			extra:      "close.reader.after_interval: 30s",
+			wantBudget: true,
+		},
+		{
+			name:  "unaffected by settings that don't need it",
+			extra: "close.on_state_change.inactive: 1m\nclose.on_state_change.removed: true",
+		},
+		{
+			name:       "set when high_cardinality resolves a harvester_limit",
+			extra:      "preset.high_cardinality: ~",
+			wantBudget: true,
+		},
+		{name: "unset under the default preset", extra: "preset.default: ~"},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := conf.MustNewConfigFrom(fmt.Sprintf(`
 type: filestream
 id: test
 paths:
-  - /var/log/foo
+  - %s
 %s
-`, extra))
-		_, harvester, err := configure(cfg, logger, srcIdentifier, nil)
-		require.NoError(t, err)
-		fs, ok := harvester.(*filestream)
-		require.True(t, ok)
-		return fs
+`, filepath.Join(t.TempDir(), "*.log"), tc.extra))
+			prospector, harvester, err := configure(cfg, logger, srcIdentifier, nil)
+			require.NoError(t, err, "configure must succeed")
+			fs, ok := harvester.(*filestream)
+			require.True(t, ok, "expected *filestream, got %T", harvester)
+
+			err = prospector.Init(newMockStoreUpdater(nil), newMockStoreUpdater(nil),
+				func(loginp.Source) string { return "" })
+			require.NoError(t, err, "Init must succeed")
+
+			var want time.Duration
+			if tc.wantBudget {
+				want = fs.closerConfig.OnStateChange.CheckInterval
+			}
+			assert.Equal(t, want, fs.sliceBudget(), "unexpected slice budget")
+		})
 	}
-
-	t.Run("unset by default", func(t *testing.T) {
-		fs := build(t, "")
-		assert.Zero(t, fs.sliceBudget, "no setting needs a bounded slice")
-	})
-
-	t.Run("set when harvester_limit is enabled", func(t *testing.T) {
-		fs := build(t, "harvester_limit: 5")
-		assert.Equal(t, fs.closerConfig.OnStateChange.CheckInterval, fs.sliceBudget)
-	})
-
-	t.Run("set when close.on_state_change.renamed is enabled", func(t *testing.T) {
-		fs := build(t, "close.on_state_change.renamed: true")
-		assert.Equal(t, fs.closerConfig.OnStateChange.CheckInterval, fs.sliceBudget)
-	})
-
-	t.Run("set when close.reader.after_interval is enabled", func(t *testing.T) {
-		fs := build(t, "close.reader.after_interval: 30s")
-		assert.Equal(t, fs.closerConfig.OnStateChange.CheckInterval, fs.sliceBudget)
-	})
-
-	t.Run("unaffected by settings that don't need it", func(t *testing.T) {
-		fs := build(t, "close.on_state_change.inactive: 1m\nclose.on_state_change.removed: true")
-		assert.Zero(t, fs.sliceBudget)
-	})
 }
 
 func TestConfigurePreset(t *testing.T) {
@@ -617,6 +632,7 @@ func TestNewFile(t *testing.T) {
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			inp := &filestream{
+				preset:       &resolvedPreset{},
 				compression:  tc.compression,
 				readerConfig: defaultReaderConfig(),
 			}
@@ -688,6 +704,7 @@ func TestOpenFile_GZIPNeverTruncated(t *testing.T) {
 
 	for _, tc := range tcs {
 		inp := filestream{
+			preset:          &resolvedPreset{},
 			compression:     tc.compression,
 			encodingFactory: encoding.Plain,
 			readerConfig:    readerConfig{BufferSize: 32},

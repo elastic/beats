@@ -79,7 +79,6 @@ func init() {
 type fileProspector struct {
 	logger                *logp.Logger
 	filewatcher           loginp.FSWatcher
-	checkInterval         time.Duration
 	identifier            fileIdentifier
 	ignoreOlder           time.Duration
 	ignoreInactiveSince   ignoreInactiveType
@@ -95,6 +94,14 @@ type fileProspector struct {
 	// preset is shared with the input's harvester and written once in Init.
 	// It must not be nil.
 	preset *resolvedPreset
+}
+
+var _ loginp.HarvesterLimiter = (*fileProspector)(nil)
+
+// HarvesterLimit returns the harvester limit the input runs with, 0 means no
+// limit. It is valid after Init, which resolves the preset.
+func (p *fileProspector) HarvesterLimit() uint64 {
+	return p.preset.harvesterLimit
 }
 
 func (p *fileProspector) previousID(name string, fd loginp.FileDescriptor, v loginp.TakeOverState) string {
@@ -376,8 +383,8 @@ func (p *fileProspector) Run(
 }
 
 // scanLoop scans the file system on the calling goroutine, handing each event
-// to sink, until ctx is cancelled. A non-positive checkInterval disables
-// re-scanning after the initial scan.
+// to sink, until ctx is cancelled. It re-scans every resolved check interval;
+// a non-positive one disables re-scanning after the initial scan.
 func (p *fileProspector) scanLoop(
 	ctx unison.Canceler,
 	metrics *loginp.Metrics,
@@ -387,12 +394,12 @@ func (p *fileProspector) scanLoop(
 	defer metrics.Cleanup()
 
 	p.filewatcher.ScanOnce(ctx, sink, metrics, p.ignoreOlder, ignoreInactiveSince)
-	if p.checkInterval <= 0 {
+	if p.preset.checkInterval <= 0 {
 		<-ctx.Done()
 		return
 	}
 
-	ticker := time.NewTicker(p.checkInterval)
+	ticker := time.NewTicker(p.preset.checkInterval)
 	defer ticker.Stop()
 	for {
 		select {

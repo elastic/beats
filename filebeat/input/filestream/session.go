@@ -177,10 +177,10 @@ func (s *harvestSession) ReadSlice(
 	defer r.Close() // keepFileOpen: closes the pipeline, leaves the fd open
 
 	var deadline time.Time
-	if s.inp.sliceBudget != 0 {
+	if budget := s.inp.sliceBudget(); budget != 0 {
 		// A negative budget makes the deadline already past, so the slice yields on
 		// its first budget check without reading.
-		deadline = time.Now().Add(s.inp.sliceBudget)
+		deadline = time.Now().Add(budget)
 	}
 
 	for ctx.Cancelation.Err() == nil {

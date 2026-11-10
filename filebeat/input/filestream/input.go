@@ -75,11 +75,6 @@ type filestream struct {
 	includeFileFingerprint    bool
 	hasLineFilter             bool
 
-	// sliceBudget, when > 0, bounds how long a single ReadSlice call keeps
-	// reading a file that never runs dry, so Poll still runs on schedule for a
-	// continuously-busy file.
-	sliceBudget time.Duration
-
 	// harvesterState shares file state with this input's prospector.
 	harvesterState *fileStateTable
 
@@ -200,12 +195,6 @@ func configure(
 		statFn:                    os.Stat,
 	}
 
-	// Bound slice duration only when something depends on Poll running while a
-	// file stays continuously busy.
-	if c.HarvesterLimit > 0 || c.Close.OnStateChange.Renamed || c.Close.Reader.AfterInterval > 0 {
-		filestream.sliceBudget = c.Close.OnStateChange.CheckInterval
-	}
-
 	// Read the scan interval from the prospector so we can use during the
 	// grace period of the delete
 	filestream.scannerCheckInterval = c.FileWatcher.Interval
@@ -255,6 +244,24 @@ func normalizeConfig(cfg *conf.C, c *config, logger *logp.Logger) error {
 }
 
 func (inp *filestream) Name() string { return pluginName }
+
+// sliceBudget, when > 0, bounds how long a single ReadSlice call keeps
+// reading a file that never runs dry, so Poll still runs on schedule for a
+// continuously-busy file.
+//
+// The budget is only needed when something depends on Poll running while a
+// file stays continuously busy. It uses the resolved harvester limit, which is
+// only known after the prospector's Init, so it cannot be computed in
+// configure.
+func (inp *filestream) sliceBudget() time.Duration {
+	if inp.preset.harvesterLimit > 0 ||
+		inp.closerConfig.OnStateChange.Renamed ||
+		inp.closerConfig.Reader.AfterInterval > 0 {
+		return inp.closerConfig.OnStateChange.CheckInterval
+	}
+
+	return 0
+}
 
 func (inp *filestream) Test(src loginp.Source, ctx input.TestContext) error {
 	fs, ok := src.(fileSource)

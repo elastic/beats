@@ -133,7 +133,6 @@ func newProspector(
 
 	fileprospector := fileProspector{
 		filewatcher:           filewatcher,
-		checkInterval:         config.FileWatcher.Interval,
 		identifier:            identifier,
 		ignoreOlder:           config.IgnoreOlder,
 		ignoreInactiveSince:   config.IgnoreInactive,
