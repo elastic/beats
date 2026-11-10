@@ -283,7 +283,6 @@ require (
 	github.com/Masterminds/semver/v3 v3.5.0 // indirect
 	github.com/brunoscheufler/aws-ecs-metadata-go v0.0.0-20221221133751-67e37ae746cd // indirect
 	github.com/cenkalti/backoff/v7 v7.0.1 // indirect
-	github.com/elastic/elastic-agent-libs v0.7.2 // indirect
 	github.com/go-openapi/swag/pools v0.28.0 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/hashicorp/go-hclog v1.6.3 // indirect
