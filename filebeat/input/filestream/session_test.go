@@ -138,6 +138,7 @@ func TestHarvestSession_ReadSlice(t *testing.T) {
 		require.Equal(t, loginp.SliceDone, verdict)
 		require.Len(t, pub.events, 3, "all three lines should be published")
 		require.Equal(t, int64(6), s.state.Offset, "offset should advance to EOF")
+		assert.True(t, s.EndedAtEOF(), "a read that reaches EOF and closes the file must be reported")
 	})
 
 	t.Run("a GZIP source updates the GZIP-specific metrics", func(t *testing.T) {
@@ -170,6 +171,7 @@ func TestHarvestSession_ReadSlice(t *testing.T) {
 		require.Len(t, pub.events, 2, "only the two terminated lines are published")
 		require.Equal(t, int64(len("a\nb\n")), s.state.Offset, "published offset lags the partial line")
 		require.Equal(t, int64(len(content)), s.readOffset, "readOffset reaches EOF including the partial line")
+		assert.False(t, s.EndedAtEOF(), "a tailing file that yields has not ended")
 
 		require.Equal(t, loginp.PollPark, s.Poll(), "an unchanged file must park, not resume")
 	})
@@ -214,6 +216,7 @@ func TestHarvestSession_ReadSlice(t *testing.T) {
 		verdict, err := s.ReadSlice(input.Context{Logger: logp.NewNopLogger(), Cancelation: ctx}, &countingPublisher{})
 		require.Equal(t, loginp.SliceDone, verdict)
 		require.ErrorIs(t, err, context.Canceled)
+		assert.False(t, s.EndedAtEOF(), "a cancelled read did not end at EOF")
 	})
 
 	t.Run("a publish error stops the read and is counted", func(t *testing.T) {
@@ -239,6 +242,7 @@ func TestHarvestSession_ReadSlice(t *testing.T) {
 		verdict, err := s.ReadSlice(backgroundCtx(), &countingPublisher{})
 		require.NoError(t, err)
 		require.Equal(t, loginp.SliceDone, verdict)
+		assert.False(t, s.EndedAtEOF(), "a truncated file did not end at EOF")
 	})
 
 	t.Run("an unexpected read error ends the slice", func(t *testing.T) {
@@ -247,6 +251,7 @@ func TestHarvestSession_ReadSlice(t *testing.T) {
 		verdict, err := s.ReadSlice(backgroundCtx(), &countingPublisher{})
 		require.NoError(t, err, "an unexpected read error ends the slice without surfacing the error")
 		require.Equal(t, loginp.SliceDone, verdict)
+		assert.False(t, s.EndedAtEOF(), "a read error did not end at EOF")
 	})
 
 	t.Run("a slice budget yields before EOF even though more data remains", func(t *testing.T) {
@@ -269,7 +274,7 @@ func TestHarvestSession_ReadSlice(t *testing.T) {
 		// slice) must not change behaviour: the slice still runs to EOF.
 		content := strings.Repeat("line\n", 100)
 		s := newReadSession(t, closerConfig{Reader: readerCloserConfig{OnEOF: true}}, content, 0)
-		require.Zero(t, s.inp.sliceBudget)
+		require.Zero(t, s.inp.sliceBudget())
 		pub := &countingPublisher{}
 
 		verdict, err := s.ReadSlice(backgroundCtx(), pub)

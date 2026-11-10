@@ -112,6 +112,11 @@ type resource struct {
 	// invalid indicates if the resource has been marked for deletion, if yes, it cannot be overwritten
 	// in the persistent state.
 	invalid bool
+	// endedAtEOF is true when the last harvester of this entry ended by reading
+	// to EOF, see HarvesterSession.EndedAtEOF. It lives in memory only and is
+	// never written to the registry file, so it is false after a restart. It is
+	// guarded by stateMutex.
+	endedAtEOF bool
 
 	activeCursorOperations uint
 	internalState          stateInternal
@@ -723,6 +728,7 @@ func (s *store) resetCursor(key string, cur any) error {
 	r.activeCursorOperations = 0
 	r.pendingCursorValue = nil
 	r.pendingUpdate = nil
+	r.endedAtEOF = false
 	typeconv.Convert(&r.cursor, cur) //nolint:errcheck // not changing behaviour on this commit
 
 	s.writeState(r)
@@ -826,6 +832,22 @@ func (r *resource) isDeleted() bool {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
 	return r.unsafeIsDeleted()
+}
+
+// EndedAtEOF locks stateMutex then reports whether the last harvester of
+// [resource] ended by reading to EOF.
+func (r *resource) EndedAtEOF() bool {
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
+	return r.endedAtEOF
+}
+
+// setEndedAtEOF locks stateMutex then records whether the last harvester of
+// [resource] ended by reading to EOF.
+func (r *resource) setEndedAtEOF(v bool) {
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
+	r.endedAtEOF = v
 }
 
 // unsafeIsDeleted DOES NOT LOCK THE RESOURCE!!!

@@ -61,6 +61,7 @@ type harvestSession struct {
 	done          bool      // terminal reached at open (e.g. GZIP already at EOF)
 	closed        bool      // Close has been called
 	pendingDelete bool      // a worker must delete the file on the next slice
+	endedAtEOF    bool      // a read reached EOF and closed the session; see EndedAtEOF
 	openedAt      time.Time // when the session was opened; for close.reader.after_interval
 	lastData      time.Time // last time a slice read a message; for close_inactive
 
@@ -202,6 +203,7 @@ func (s *harvestSession) ReadSlice(
 				// EOF only reaches here for closeable files (close_eof, GZIP,
 				// archived); tailing files yield via ErrWouldBlock instead.
 				s.log.Debugf("EOF has been reached. Closing. Path='%s'", s.src.newPath)
+				s.endedAtEOF = true
 				if s.inp.deleterConfig.Enabled {
 					if derr := s.inp.deleteFile(ctx, s.log, s.cursor, s.src.newPath); derr != nil {
 						return loginp.SliceDone,
@@ -368,6 +370,10 @@ func (s *harvestSession) Offset() int64 { return s.state.Offset }
 
 // IsGZIP reports whether the session reads a GZIP-compressed source.
 func (s *harvestSession) IsGZIP() bool { return s.src.desc.GZIP }
+
+// EndedAtEOF reports whether a read reached EOF and ended the session. It is
+// false for every other end.
+func (s *harvestSession) EndedAtEOF() bool { return s.endedAtEOF }
 
 // Close releases the file handle held by the session.
 func (s *harvestSession) Close() error {

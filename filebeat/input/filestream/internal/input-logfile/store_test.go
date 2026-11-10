@@ -355,6 +355,69 @@ func TestStore_ResetCursor(t *testing.T) {
 	})
 }
 
+func TestStore_EndedAtEOF(t *testing.T) {
+	t.Run("ResetCursor clears it", func(t *testing.T) {
+		store := testOpenStore(t, "test", nil)
+		defer store.Release()
+
+		res := store.Get("test::key")
+		defer res.Release()
+		res.setEndedAtEOF(true)
+
+		require.NoError(t, store.resetCursor("test::key", map[string]any{"offset": 0}),
+			"resetting the cursor must succeed")
+
+		assert.False(t, res.EndedAtEOF(), "resetting the cursor must clear the flag")
+	})
+
+	t.Run("UpdateKey keeps it", func(t *testing.T) {
+		s := testOpenStore(t, "test", createSampleStore(t, map[string]state{
+			"test::old": {TTL: 60 * time.Second},
+		}))
+		defer s.Release()
+		store := &sourceStore{identifier: &SourceIdentifier{"test"}, store: s}
+
+		res := s.Get("test::old")
+		defer res.Release()
+		res.setEndedAtEOF(true)
+
+		require.NoError(t, store.UpdateKey("test::old", "test::new", testMeta{}),
+			"updating the key must succeed")
+
+		rekeyed := s.Get("test::new")
+		defer rekeyed.Release()
+		assert.True(t, rekeyed.EndedAtEOF(), "a re-keyed entry is the same file, the flag must stay")
+	})
+
+	t.Run("a migrated copy starts clear", func(t *testing.T) {
+		src := resource{lock: unison.MakeMutex()}
+		src.setEndedAtEOF(true)
+
+		dst := src.copyWithNewKey("test::new")
+
+		assert.False(t, dst.EndedAtEOF(), "the flag must not be copied to the migrated entry")
+	})
+
+	t.Run("is not persisted", func(t *testing.T) {
+		backend := createSampleStore(t, nil)
+		store := testOpenStore(t, "test", backend)
+		defer store.Release()
+
+		res := store.Get("test::key")
+		defer res.Release()
+		res.setEndedAtEOF(true)
+		store.UpdateTTL(res, 60*time.Second) // writes the entry without resetting the cursor
+		require.Contains(t, backend.snapshot(), "test::key", "the entry must be in the persistent store")
+
+		reopened := testOpenStore(t, "test", backend)
+		defer reopened.Release()
+		loaded := reopened.Get("test::key")
+		defer loaded.Release()
+
+		assert.False(t, loaded.EndedAtEOF(), "the flag must be false after a restart")
+	})
+}
+
 type testMeta struct {
 	IdentifierName string `json:"identifier_name" struct:"identifier_name"`
 }
