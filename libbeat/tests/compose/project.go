@@ -28,7 +28,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // CreateOptions are the options when containers are created

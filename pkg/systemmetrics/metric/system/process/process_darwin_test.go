@@ -23,6 +23,7 @@ import (
 	"os"
 	"syscall"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -52,6 +53,28 @@ func TestGetOne_footprint(t *testing.T) {
 	assert.InDeltaf(t, float64(allocSize), float64(after)-float64(before), allocSize/4,
 		"footprint should grow by about %d bytes after dirtying %d bytes of anonymous memory; before=%d after=%d",
 		allocSize, allocSize, before, after)
+}
+
+func TestGetInfoForPid_cpuTicks(t *testing.T) {
+	burnCPU(300 * time.Millisecond)
+
+	state, err := GetInfoForPid(nil, os.Getpid())
+	require.NoError(t, err, "GetInfoForPid failed for the test process")
+
+	var rusage syscall.Rusage
+	require.NoError(t, syscall.Getrusage(syscall.RUSAGE_SELF, &rusage), "getrusage failed")
+	wantMs := float64(time.Duration(rusage.Utime.Nano()+rusage.Stime.Nano()) / time.Millisecond)
+
+	gotMs := float64(state.CPU.Total.Ticks.ValueOr(0))
+	assert.InDeltaf(t, wantMs, gotMs, max(50, wantMs*0.2),
+		"cpu.total.ticks should match the CPU time reported by getrusage; ticks=%v getrusage=%vms", gotMs, wantMs)
+}
+
+func burnCPU(d time.Duration) {
+	deadline := time.Now().Add(d)
+	for x := 0; time.Now().Before(deadline); x++ {
+		_ = x * x
+	}
 }
 
 func eventFootprint(t *testing.T, stats *Stats) uint64 {

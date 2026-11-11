@@ -61,6 +61,14 @@ Example:
 tags: ["my-service", "hardware", "test"]
 ```
 
+::::{note}
+:applies_to: stack: ga 9.6+
+
+When the Beat is managed by {{agent}}, [tags applied to the {{agent}}](docs-content://reference/fleet/filter-agent-list-by-tags.md) are also added to the `tags` field of every event.
+
+{{agent}} tags are appended to any tags already on the event rather than replacing them. For example, a Beat configured with `tags: ["my-service"]` and an agent tagged `production` publishes events with `tags: ["my-service", "production"]`. Tags are not de-duplicated, so a tag set both here and on the {{agent}} appears twice.
+::::
+
 
 ### `fields` [libbeat-configuration-fields]
 

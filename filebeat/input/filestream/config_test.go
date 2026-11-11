@@ -30,8 +30,8 @@ import (
 	"go.uber.org/zap/zaptest/observer"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 func TestConfigValidate(t *testing.T) {
@@ -294,6 +294,27 @@ read_until_eof.enabled: false
 			assert.False(t, got.ReadUntilEOF.Enabled,
 				"read_until_eof.enabled should be false")
 		})
+	})
+
+	t.Run("buffer_size must be positive", func(t *testing.T) {
+		tcs := map[string]string{
+			"zero":     `0`,
+			"negative": `-1`,
+		}
+		for name, size := range tcs {
+			t.Run(name, func(t *testing.T) {
+				c, err := conf.NewConfigFrom(fmt.Sprintf(`
+id: 'some id'
+paths: [/foo/bar*]
+buffer_size: %s
+`, size))
+				require.NoError(t, err, "could not create config from string")
+
+				got := defaultConfig()
+				err = c.Unpack(&got)
+				assert.ErrorContains(t, err, "accessing 'buffer_size'")
+			})
+		}
 	})
 }
 

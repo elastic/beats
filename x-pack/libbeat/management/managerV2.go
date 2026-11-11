@@ -25,10 +25,10 @@ import (
 	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/version"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // diagnosticHandler is a wrapper type that's a bit of a hack, the compiler won't let us send the raw unit struct,
@@ -278,6 +278,11 @@ func (cm *BeatV2Manager) UpdateStatus(status status.Status, msg string) {
 
 // Enabled returns true if config management is enabled.
 func (cm *BeatV2Manager) Enabled() bool {
+	return cm.config.Enabled
+}
+
+// ConfigFromControlProtocol returns true if beat is running in process mode inside elastic-agent.
+func (cm *BeatV2Manager) ConfigFromControlProtocol() bool {
 	return cm.config.Enabled
 }
 

@@ -20,7 +20,7 @@ package add_kubernetes_metadata
 import (
 	"sync"
 
-	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/pkg/config"
 )
 
 // Indexing is the singleton Register instance where all Indexers and Matchers

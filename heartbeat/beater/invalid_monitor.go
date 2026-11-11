@@ -26,8 +26,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // invalidMonitorFactory replaces a monitor whose config cannot be loaded with an
@@ -37,6 +37,12 @@ import (
 type invalidMonitorFactory struct {
 	cfgfile.RunnerFactory
 	logger *logp.Logger
+}
+
+// Unwrap returns the wrapped factory, so the runner list can still use its
+// config hash function.
+func (f invalidMonitorFactory) Unwrap() cfgfile.RunnerFactory {
+	return f.RunnerFactory
 }
 
 func (f invalidMonitorFactory) Create(p beat.PipelineConnector, cfg *conf.C) (cfgfile.Runner, error) {

@@ -6,7 +6,7 @@ package awss3
 
 import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // stateRegistryV2 wraps the existing stateRegistry interface for use by

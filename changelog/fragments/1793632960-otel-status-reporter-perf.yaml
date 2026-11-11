@@ -1,0 +1,8 @@
+kind: enhancement
+summary: Build the input status report of beat receivers in time linear in the number of inputs.
+description: >
+  Each status report of a beat receiver built the map of its input statuses
+  with a linear key lookup per input, which is quadratic in the number of
+  inputs. It is now built in one pass, and an input reporting the status and
+  message it already had no longer schedules a report.
+component: all

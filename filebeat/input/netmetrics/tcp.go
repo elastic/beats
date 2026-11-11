@@ -28,9 +28,9 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
+	"github.com/elastic/beats/v7/pkg/monitoring/adapter"
 )
 
 // TCP handles the TCP metric reporting.
@@ -39,7 +39,7 @@ type TCP struct {
 }
 
 // NewTCP returns a new TCP input metricset. Note that if the id is empty then a nil TCP metricset is returned.
-func NewTCP(reg *monitoring.Registry, device string, poll time.Duration, log *logp.Logger) *TCP {
+func NewTCP(reg *monitoring.Registry, device, network string, poll time.Duration, log *logp.Logger) *TCP {
 	out := &TCP{
 		netMetrics: newNetMetrics(reg),
 	}
@@ -52,7 +52,7 @@ func NewTCP(reg *monitoring.Registry, device string, poll time.Duration, log *lo
 	out.device.Set(device)
 
 	if poll > 0 && runtime.GOOS == "linux" {
-		addr4, addr6, err := addrs(device, log)
+		addr4, addr6, err := addrs(device, network, log)
 		if err != nil {
 			log.Warn(err)
 			return out

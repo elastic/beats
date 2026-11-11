@@ -22,8 +22,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 const (
@@ -122,7 +122,8 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 
 	const pollInterval = time.Minute
 	if env.ID != "" {
-		n.udpMetrics = netmetrics.NewUDP(env.MetricsRegistry, n.cfg.Host, uint64(n.cfg.ReadBuffer), pollInterval, n.logger)
+		//nolint:gosec // read_buffer is a byte size, never negative
+		n.udpMetrics = netmetrics.NewUDP(env.MetricsRegistry, n.cfg.Host, n.cfg.Network, uint64(n.cfg.ReadBuffer), pollInterval, n.logger)
 		defer n.udpMetrics.Close()
 	}
 

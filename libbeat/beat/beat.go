@@ -27,9 +27,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/version"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/keystore"
-	"github.com/elastic/elastic-agent-libs/useragent"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/keystore"
+	"github.com/elastic/beats/v7/pkg/useragent"
 )
 
 // Creator initializes and configures a new Beater instance used to execute
@@ -114,7 +114,7 @@ func (beat *Beat) userAgentMode() useragent.AgentManagementMode {
 	if beat.Manager == nil {
 		return useragent.AgentManagementModeUnknown
 	}
-	if !beat.Manager.Enabled() {
+	if !management.UnderAgent() {
 		return useragent.AgentManagementModeStandalone
 	}
 
@@ -130,7 +130,7 @@ func (beat *Beat) userAgentMode() useragent.AgentManagementMode {
 }
 
 func (beat *Beat) userAgentUnprivilegedMode() useragent.AgentUnprivilegedMode {
-	if beat.Manager == nil || !beat.Manager.Enabled() {
+	if beat.Manager == nil || !management.UnderAgent() {
 		return useragent.AgentUnprivilegedModeUnknown
 	}
 	if beat.Manager.AgentInfo().Unprivileged {
