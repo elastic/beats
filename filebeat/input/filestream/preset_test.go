@@ -23,6 +23,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+
+	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 )
 
 func TestResolvePreset(t *testing.T) {
@@ -150,6 +152,78 @@ func TestResolvePreset(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			assert.Equal(t, tc.want, resolvePreset(tc.in, tc.fileCount), "unexpected resolved preset")
+		})
+	}
+}
+
+func TestHighCardinalityAction(t *testing.T) {
+	found := loginp.CursorInfo{Found: true}
+	endedAtEOF := loginp.CursorInfo{Found: true, EndedAtEOF: true}
+
+	cases := []struct {
+		name string
+		info loginp.CursorInfo
+		cur  state
+		size int64
+		gzip bool
+		want startAction
+	}{
+		{
+			name: "no cursor",
+			size: 10,
+			want: startCloseAtEOF,
+		},
+		{
+			name: "GZIP read to EOF",
+			info: found,
+			cur:  state{Offset: 100, EOF: true},
+			size: 10,
+			gzip: true,
+			want: startSkip,
+		},
+		{
+			// Kept open if it were not GZIP.
+			name: "GZIP not read to EOF",
+			info: endedAtEOF,
+			cur:  state{Offset: 5},
+			size: 10,
+			gzip: true,
+			want: startCloseAtEOF,
+		},
+		{
+			name: "offset equal to size",
+			info: endedAtEOF,
+			cur:  state{Offset: 10},
+			size: 10,
+			want: startSkip,
+		},
+		{
+			name: "offset above size",
+			info: endedAtEOF,
+			cur:  state{Offset: 20},
+			size: 10,
+			want: startCloseAtEOF,
+		},
+		{
+			name: "offset below size, last harvester did not end at EOF",
+			info: found,
+			cur:  state{Offset: 5},
+			size: 10,
+			want: startCloseAtEOF,
+		},
+		{
+			name: "offset below size, last harvester ended at EOF",
+			info: endedAtEOF,
+			cur:  state{Offset: 5},
+			size: 10,
+			want: startKeepOpen,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.want, highCardinalityAction(tc.info, tc.cur, tc.size, tc.gzip),
+				"unexpected action for cursor %+v, %+v, size %d, gzip %t", tc.info, tc.cur, tc.size, tc.gzip)
 		})
 	}
 }

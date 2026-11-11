@@ -22,6 +22,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 )
 
 const (
@@ -73,6 +75,9 @@ type presetInputs struct {
 	// checkIntervalSet is true when the user wrote
 	// 'prospector.scanner.check_interval', even with the default value.
 	checkIntervalSet bool
+	// closeOnEOF is the configured 'close.reader.on_eof', which the
+	// high_cardinality preset ignores.
+	closeOnEOF bool
 }
 
 // fileCountDecides reports whether the number of files found at input start
@@ -115,6 +120,44 @@ func resolvePreset(in presetInputs, fileCount int) resolvedPreset {
 	}
 
 	return res
+}
+
+// startAction is what the high_cardinality preset does with a file the
+// prospector would start a harvester for.
+type startAction uint8
+
+const (
+	// startSkip does not start a harvester.
+	startSkip startAction = iota
+	// startCloseAtEOF starts a harvester that closes the file at EOF.
+	startCloseAtEOF
+	// startKeepOpen starts a harvester that keeps the file open after EOF.
+	startKeepOpen
+)
+
+// highCardinalityAction decides from the registry cursor of a file what the
+// high_cardinality preset does with it, so that idle files hold no harvester.
+// A fully read file is not started. A file is only kept open when it grew
+// after its last harvester read it to EOF, which means it is being written
+// to; any other file is read to EOF and closed. GZIP offsets are on the
+// decompressed stream, so the cursor's EOF flag replaces the size comparison,
+// and a GZIP file is always closed at EOF by the reader. A cursor past the
+// file size means the file was truncated, which openFile handles.
+func highCardinalityAction(info loginp.CursorInfo, cur state, size int64, gzip bool) startAction {
+	switch {
+	case !info.Found:
+		return startCloseAtEOF
+	case gzip && cur.EOF:
+		return startSkip
+	case gzip:
+		return startCloseAtEOF
+	case cur.Offset == size:
+		return startSkip
+	case cur.Offset < size && info.EndedAtEOF:
+		return startKeepOpen
+	default:
+		return startCloseAtEOF
+	}
 }
 
 // presetMessage describes how the preset of an input was resolved, for the

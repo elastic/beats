@@ -136,6 +136,16 @@ func (e *inputTestingEnvironment) waitUntilInputStops() {
 	e.getManager().(*filestreamInputManager).Close()
 }
 
+// restartManager stops the environment as waitUntilInputStops does, then
+// replaces the closed input manager with a new one over the same state store.
+// Closing the last manager releases the shared in-memory store, so the new
+// manager reads the registry back from the persistent store, as after a
+// Filebeat restart.
+func (e *inputTestingEnvironment) restartManager() {
+	e.waitUntilInputStops()
+	e.plugin = Plugin(e.testLogger.Logger, e.stateStore)
+}
+
 // mustWriteToFile writes data to file and returns the full path
 func (e *inputTestingEnvironment) mustWriteToFile(filename string, data []byte) string {
 	path := e.abspath(filename)

@@ -478,10 +478,14 @@ func (inp *filestream) buildPipeline(
 ) (reader.Reader, *logFile, error) {
 	log.Debug("newLogFileReader with config.MaxBytes:", inp.readerConfig.MaxBytes)
 
-	// if the file is archived, it means that it is not going to be updated in the future
-	// thus, when EOF is reached, it can be closed
 	closerCfg := inp.closerConfig
-	if fs.archived && !inp.closerConfig.Reader.OnEOF {
+	if inp.preset.highCardinality {
+		// The prospector decides per file whether it is closed at EOF, so the
+		// configured 'close.reader.on_eof' does not apply.
+		closerCfg.Reader.OnEOF = !fs.keepOpen
+	} else if fs.archived && !inp.closerConfig.Reader.OnEOF {
+		// if the file is archived, it means that it is not going to be updated in the future
+		// thus, when EOF is reached, it can be closed
 		closerCfg = closerConfig{
 			Reader: readerCloserConfig{
 				OnEOF:         true,

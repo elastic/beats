@@ -149,6 +149,7 @@ func newProspector(
 			harvesterLimit:   uint64(config.HarvesterLimit),
 			checkInterval:    config.FileWatcher.Interval,
 			checkIntervalSet: config.checkIntervalSet,
+			closeOnEOF:       config.Close.Reader.OnEOF,
 		},
 		preset: preset,
 	}

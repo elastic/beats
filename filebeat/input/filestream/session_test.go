@@ -284,6 +284,40 @@ func TestHarvestSession_ReadSlice(t *testing.T) {
 	})
 }
 
+func TestHarvestSession_ReadSliceHighCardinality(t *testing.T) {
+	// Each row sets close.reader.on_eof to the opposite of what keepOpen asks
+	// for, so the configured option cannot be what decides.
+	cases := []struct {
+		name        string
+		closer      closerConfig
+		keepOpen    bool
+		wantVerdict loginp.SliceVerdict
+	}{
+		{
+			name:        "closed at EOF without close.reader.on_eof",
+			wantVerdict: loginp.SliceDone,
+		},
+		{
+			name:        "kept open with close.reader.on_eof",
+			closer:      closerConfig{Reader: readerCloserConfig{OnEOF: true}},
+			keepOpen:    true,
+			wantVerdict: loginp.SliceYield,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			s := newReadSession(t, tc.closer, "a\nb\n", 0)
+			s.inp.preset.highCardinality = true
+			s.src.keepOpen = tc.keepOpen
+
+			verdict, err := s.ReadSlice(backgroundCtx(), &countingPublisher{})
+			require.NoError(t, err, "reading a plain file must not fail")
+			assert.Equal(t, tc.wantVerdict, verdict, "keepOpen, not close.reader.on_eof, must decide the verdict at EOF")
+		})
+	}
+}
+
 // --- Close --------------------------------------------------------------
 
 func TestHarvestSession_Close(t *testing.T) {

@@ -20,6 +20,7 @@ package filestream
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/fs"
 	"maps"
@@ -34,6 +35,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap/zapcore"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -117,18 +119,20 @@ func TestProspectorInitResolvesPreset(t *testing.T) {
 		copyTruncate        bool
 		wantHighCardinality bool
 		wantHarvesterLimit  uint64
+		wantOnEOFWarning    bool
 	}{
 		{
 			name:      "auto with one file less than the threshold runs default",
-			inputs:    presetInputs{selection: explicitAuto},
+			inputs:    presetInputs{selection: explicitAuto, closeOnEOF: true},
 			fileCount: 2,
 		},
 		{
 			name:                "auto with as many files as the threshold runs high_cardinality",
-			inputs:              presetInputs{selection: explicitAuto},
+			inputs:              presetInputs{selection: explicitAuto, closeOnEOF: true},
 			fileCount:           3,
 			wantHighCardinality: true,
 			wantHarvesterLimit:  highCardinalityHarvesterLimit,
+			wantOnEOFWarning:    true,
 		},
 		{
 			// A selection that would run high_cardinality shows that forceDefault
@@ -147,8 +151,9 @@ func TestProspectorInitResolvesPreset(t *testing.T) {
 			}
 
 			shared := &resolvedPreset{}
+			logger, observed := logptest.NewTestingLoggerWithObserver(t, "")
 			fp := fileProspector{
-				logger:       logp.NewNopLogger(),
+				logger:       logger,
 				identifier:   mustPathIdentifier(false),
 				filewatcher:  newMockFileWatcherWithFiles(files),
 				presetInputs: tc.inputs,
@@ -177,6 +182,19 @@ func TestProspectorInitResolvesPreset(t *testing.T) {
 			require.True(t, ok, "the prospector must implement loginp.HarvesterLimiter")
 			assert.Equal(t, tc.wantHarvesterLimit, limiter.HarvesterLimit(),
 				"unexpected harvester limit after Init")
+
+			// Asserted on every row: the default preset must not warn.
+			wantWarnings := 0
+			if tc.wantOnEOFWarning {
+				wantWarnings = 1
+			}
+			assert.Len(
+				t,
+				observed.FilterLevelExact(zapcore.WarnLevel).
+					FilterMessageSnippet("'close.reader.on_eof' is ignored").
+					All(),
+				wantWarnings,
+				"unexpected number of 'close.reader.on_eof' warnings")
 		})
 	}
 }
@@ -545,6 +563,100 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 	}
 }
 
+func TestProspectorHighCardinalityStart(t *testing.T) {
+	const (
+		path = "/path/to/file"
+		id   = "path::" + path
+		size = 10
+	)
+
+	cases := []struct {
+		name          string
+		op            loginp.Operation
+		cursor        *mockCursor
+		findErr       error
+		defaultPreset bool
+		wantStarted   bool
+		wantKeepOpen  bool
+	}{
+		{
+			name:        "new file without cursor is closed at EOF",
+			op:          loginp.OpCreate,
+			wantStarted: true,
+		},
+		{
+			name:   "fully read file is not started",
+			op:     loginp.OpCreate,
+			cursor: &mockCursor{cur: state{Offset: size}},
+		},
+		{
+			name:         "grown file whose last harvester ended at EOF is kept open",
+			op:           loginp.OpWrite,
+			cursor:       &mockCursor{cur: state{Offset: 5}, endedAtEOF: true},
+			wantStarted:  true,
+			wantKeepOpen: true,
+		},
+		{
+			// The cursor would keep the file open if it could be read.
+			name:        "unreadable cursor is closed at EOF",
+			op:          loginp.OpWrite,
+			cursor:      &mockCursor{cur: state{Offset: 5}, endedAtEOF: true},
+			findErr:     errors.New("cannot unpack cursor"),
+			wantStarted: true,
+		},
+		{
+			name:          "default preset starts a fully read file",
+			op:            loginp.OpCreate,
+			cursor:        &mockCursor{cur: state{Offset: size}},
+			defaultPreset: true,
+			wantStarted:   true,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			store := newMockMetadataUpdater()
+			if tc.cursor != nil {
+				store.setCursor(id, tc.cursor.cur, tc.cursor.endedAtEOF)
+			}
+			store.FindCursorErr = tc.findErr
+
+			tbl := newFileStateTable()
+			h := publishHandle(tbl, id, growingDesc(""))
+
+			events := []loginp.FSEvent{{
+				Op:         tc.op,
+				NewPath:    path,
+				Descriptor: createTestFileDescriptorWithInfo(&testFileInfo{path, size, time.Now(), nil}),
+			}}
+			p := fileProspector{
+				preset:         &resolvedPreset{highCardinality: !tc.defaultPreset},
+				logger:         logp.NewNopLogger(),
+				filewatcher:    newMockFileWatcher(events, len(events)),
+				identifier:     mustPathIdentifier(false),
+				harvesterState: tbl,
+			}
+			ctx := newDrainContext(t, p.filewatcher)
+			hg := newTestHarvesterGroup()
+
+			p.Run(ctx, store, hg, nil)
+
+			assert.Equal(t, !tc.defaultPreset, store.FindCursorCalled.Load() > 0,
+				"FindCursor must be called only under the high_cardinality preset")
+			assert.Equal(t, "fingerprint", h.FingerprintSum(),
+				"the open file's descriptor must be updated whether or not a harvester is started")
+			if !tc.wantStarted {
+				assert.Empty(t, hg.started, "no harvester must be started")
+				return
+			}
+			require.Len(t, hg.started, 1, "exactly one harvester must be started")
+			started, ok := hg.started[0].(fileSource)
+			require.True(t, ok, "the started source must be a fileSource, got %T", hg.started[0])
+			assert.Equal(t, tc.wantKeepOpen, started.keepOpen, "unexpected keepOpen on the started source")
+		})
+	}
+}
+
 // TestProspectorHarvesterUpdateIgnoredFiles checks if the prospector can
 // save the size of an ignored file to the registry. If the ignored
 // file is updated, and has to be collected, a new harvester is started.
@@ -765,6 +877,8 @@ func (h harvesterGroupStop) String() string { return "stop" }
 type testHarvesterGroup struct {
 	events   []harvesterEvent
 	migrated func(next loginp.Source)
+	// started holds the sources passed to Start, in order.
+	started []loginp.Source
 }
 
 func newTestHarvesterGroup() *testHarvesterGroup {
@@ -773,6 +887,7 @@ func newTestHarvesterGroup() *testHarvesterGroup {
 
 func (t *testHarvesterGroup) Start(_ input.Context, s loginp.Source) {
 	t.events = append(t.events, harvesterStart(s.Name()))
+	t.started = append(t.started, s)
 }
 
 func (t *testHarvesterGroup) Restart(_ input.Context, s loginp.Source) {
@@ -897,12 +1012,32 @@ type mockMetadataUpdater struct {
 	KeyExistsCalled       atomic.Int64
 	UpdateKeyCalled       int
 	UpdateKeyErr          error
+	FindCursorCalled      atomic.Int64
+	FindCursorErr         error
+
+	// cursors is what FindCursor reports, kept apart from table because the
+	// store keeps an entry's cursor apart from its metadata, which OpCreate
+	// writes into table.
+	cursors map[string]mockCursor
+}
+
+type mockCursor struct {
+	cur        state
+	endedAtEOF bool
 }
 
 func newMockMetadataUpdater() *mockMetadataUpdater {
 	return &mockMetadataUpdater{
-		table: make(map[string]any),
+		table:   make(map[string]any),
+		cursors: make(map[string]mockCursor),
 	}
+}
+
+// setCursor makes FindCursor report cur and endedAtEOF for id.
+func (mu *mockMetadataUpdater) setCursor(id string, cur state, endedAtEOF bool) {
+	mu.mu.Lock()
+	defer mu.mu.Unlock()
+	mu.cursors[id] = mockCursor{cur: cur, endedAtEOF: endedAtEOF}
 }
 
 func (mu *mockMetadataUpdater) set(id string) {
@@ -959,8 +1094,21 @@ func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v any) error {
 	return typeconv.Convert(v, meta)
 }
 
-func (mu *mockMetadataUpdater) FindCursor(loginp.Source, any) (loginp.CursorInfo, error) {
-	return loginp.CursorInfo{}, nil
+func (mu *mockMetadataUpdater) FindCursor(s loginp.Source, to any) (loginp.CursorInfo, error) {
+	mu.mu.RLock()
+	defer mu.mu.RUnlock()
+	mu.FindCursorCalled.Add(1)
+	if mu.FindCursorErr != nil {
+		return loginp.CursorInfo{}, mu.FindCursorErr
+	}
+	c, ok := mu.cursors[s.Name()]
+	if !ok {
+		return loginp.CursorInfo{}, nil
+	}
+	if err := typeconv.Convert(to, c.cur); err != nil {
+		return loginp.CursorInfo{}, err
+	}
+	return loginp.CursorInfo{Found: true, EndedAtEOF: c.endedAtEOF}, nil
 }
 
 func (mu *mockMetadataUpdater) ResetCursor(s loginp.Source, cur any) error {

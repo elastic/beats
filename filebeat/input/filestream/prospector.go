@@ -195,6 +195,9 @@ func (p *fileProspector) Init(
 
 	*p.preset = resolvePreset(p.presetInputs, len(files))
 	p.logger.Info(presetMessage(p.presetInputs, len(files), *p.preset))
+	if p.preset.highCardinality && p.presetInputs.closeOnEOF {
+		p.logger.Warn("'close.reader.on_eof' is ignored: the high_cardinality preset decides per file whether it is closed at EOF")
+	}
 
 	// If this fileProspector belongs to an input that did not have an ID
 	// this will find its files in the registry and update them to use the
@@ -465,7 +468,9 @@ func (p *fileProspector) onFSEvent(
 		// After a growing-fingerprint key migration the running harvester is
 		// already registered under src (see HarvesterGroup.Migrate), so this
 		// Start no-ops instead of spawning a duplicate.
-		group.Start(ctx, src)
+		if start, ok := p.sourceToStart(log, event, src, updater); ok {
+			group.Start(ctx, start)
+		}
 
 	case loginp.OpTruncate:
 		log.Debugf("File %s has been truncated setting offset to 0", event.NewPath)
@@ -528,6 +533,47 @@ func (p *fileProspector) onFSEvent(
 		}
 		p.harvesterState.UpdateDescriptor(src.Name(), event.Descriptor)
 	}
+}
+
+// sourceToStart returns the source to start a harvester for, and false when
+// none must be started. Under the high_cardinality preset the registry cursor
+// decides, see highCardinalityAction. Not starting a harvester does not stop
+// one that is already running.
+func (p *fileProspector) sourceToStart(
+	log *logp.Logger,
+	event loginp.FSEvent,
+	src loginp.Source,
+	updater loginp.StateMetadataUpdater,
+) (loginp.Source, bool) {
+	if !p.preset.highCardinality {
+		return src, true
+	}
+
+	// TODO: FindCursor runs for every OpCreate and OpWrite under this preset.
+	// Benchmark it on an input with many files and explore reading the cursor
+	// with a type switch instead of typeconv.Convert, as
+	// buildShortFingerprintSet does for the cursor metadata.
+	var cur state
+	info, err := updater.FindCursor(src, &cur)
+	if err != nil {
+		log.Errorf("cannot read the registry cursor of %s, the file will be closed at EOF: %v", event.NewPath, err)
+		return src, true
+	}
+
+	size := event.Descriptor.Info.Size()
+	switch highCardinalityAction(info, cur, size, event.Descriptor.GZIP) {
+	case startSkip:
+		log.Debugf("File %s is already read, not starting a harvester: offset %d, size %d", event.NewPath, cur.Offset, size)
+		return nil, false
+	case startKeepOpen:
+		// Sources come from fileIdentifier.GetSource, so this always holds.
+		// A source of another type is started as it is and closed at EOF.
+		if fs, ok := src.(fileSource); ok {
+			fs.keepOpen = true
+			return fs, true
+		}
+	}
+	return src, true
 }
 
 func (p *fileProspector) isFileIgnored(log *logp.Logger, fe loginp.FSEvent, ignoreInactiveSince time.Time) bool {
