@@ -60,7 +60,7 @@ func (runnerFactoryMock) CheckConfig(config *conf.C) error {
 }
 
 // Assert runs various checks for the clients created by the wrapped pipeline connector
-// We check that the processing configuration does not reference the same addresses as before,
+// We check that the processing configuration, except read-only Fields, does not reference the same addresses as before,
 // re-using some parts of the processing configuration will result in various issues, such as:
 // * closing processors multiple times
 // * using closed processors
@@ -83,7 +83,10 @@ func (r runnerFactoryMock) Assert(t *testing.T) {
 				}
 
 				require.Falsef(t, sameBacking(c1.Processing.Meta, c2.Processing.Meta), "`Processing.Meta` cannot be re-used")
-				require.Falsef(t, sameBacking(c1.Processing.Fields, c2.Processing.Fields), "`Processing.Fields` cannot be re-used")
+				if sameBacking(c1.Processing.Fields, c2.Processing.Fields) {
+					require.Truef(t, c1.Processing.FieldsReadOnly && c2.Processing.FieldsReadOnly,
+						"`Processing.Fields` can only be re-used when marked read-only")
+				}
 			}
 		}
 	})
