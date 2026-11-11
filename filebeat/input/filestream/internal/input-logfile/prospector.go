@@ -50,10 +50,34 @@ type HarvesterLimiter interface {
 	HarvesterLimit() uint64
 }
 
+// CursorInfo describes the cursor FindCursor looked up.
+type CursorInfo struct {
+	// Found is true when the registry holds a cursor for the source. An entry
+	// that only has cursor metadata has no cursor.
+	Found bool
+	// EndedAtEOF is true when the last harvester of the source ended by
+	// reading to EOF. It is kept in memory only, so it is false after a
+	// restart. It is only meaningful when Found is true.
+	EndedAtEOF bool
+}
+
 // StateMetadataUpdater updates and removes the state information for a given Source.
 type StateMetadataUpdater interface {
 	// FindCursorMeta retrieves and unpacks the cursor metadata of an entry of the given Source.
 	FindCursorMeta(s Source, v any) error
+	// FindCursor unpacks the in-memory cursor of the given Source into to. That
+	// is the value a starting harvester resumes from, so it includes updates
+	// that were published but not yet ACKed.
+	//
+	// CursorInfo.Found is false, with a nil error and to untouched, when there
+	// is no entry, the entry is marked for deletion, or the entry has no cursor
+	// yet. The prospector writes cursor metadata on OpCreate, before any
+	// harvester ran, so an entry can exist without a cursor: FindCursorMeta or
+	// KeyExists succeeding does not imply a cursor.
+	//
+	// An error means the cursor exists but could not be unpacked.
+	// FindCursor never creates an entry.
+	FindCursor(s Source, to any) (CursorInfo, error)
 	// UpdateMetadata updates the source metadata of a registry entry of a given Source.
 	UpdateMetadata(s Source, v any) error
 	// Remove marks a state for deletion of a given Source.

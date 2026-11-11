@@ -224,6 +224,11 @@ func (s *sourceStore) ResetCursor(src Source, cur any) error {
 	return s.store.resetCursor(key, cur)
 }
 
+func (s *sourceStore) FindCursor(src Source, to any) (CursorInfo, error) {
+	key := s.identifier.ID(src)
+	return s.store.findCursor(key, to)
+}
+
 // IterateOnPrefix iterates over all entries that match this input's prefix.
 // The callback receives the key and cursor metadata for each entry.
 func (s *sourceStore) IterateOnPrefix(fn func(key string, meta any)) {
@@ -736,6 +741,30 @@ func (s *store) resetCursor(key string, cur any) error {
 	return nil
 }
 
+// findCursor unpacks the in-memory cursor of key into to. See
+// [StateMetadataUpdater.FindCursor] for the contract.
+func (s *store) findCursor(key string, to any) (CursorInfo, error) {
+	r := s.ephemeralStore.Find(key, false)
+	if r == nil {
+		return CursorInfo{}, nil
+	}
+	defer r.Release()
+
+	// One critical section so the cursor and the flag are a consistent snapshot.
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
+
+	if r.unsafeIsNew() {
+		return CursorInfo{}, nil
+	}
+
+	if err := typeconv.Convert(to, r.activeCursor()); err != nil {
+		return CursorInfo{}, fmt.Errorf("cannot unpack cursor of '%s': %w", key, err)
+	}
+
+	return CursorInfo{Found: true, EndedAtEOF: r.endedAtEOF}, nil
+}
+
 // Removes marks an entry for removal by setting its TTL to zero.
 func (s *store) remove(key string) error {
 	resource := s.ephemeralStore.Find(key, false)
@@ -824,6 +853,13 @@ func (s *states) unsafeFind(key string, create bool) *resource {
 func (r *resource) IsNew() bool {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
+	return r.unsafeIsNew()
+}
+
+// unsafeIsNew DOES NOT LOCK THE RESOURCE!!!
+// Only call unsafeIsNew if you're currently holding the
+// lock from resource.stateMutex
+func (r *resource) unsafeIsNew() bool {
 	return r.pendingCursorValue == nil && r.pendingUpdate == nil && r.cursor == nil
 }
 

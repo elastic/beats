@@ -959,6 +959,10 @@ func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v any) error {
 	return typeconv.Convert(v, meta)
 }
 
+func (mu *mockMetadataUpdater) FindCursor(loginp.Source, any) (loginp.CursorInfo, error) {
+	return loginp.CursorInfo{}, nil
+}
+
 func (mu *mockMetadataUpdater) ResetCursor(s loginp.Source, cur any) error {
 	mu.mu.Lock()
 	defer mu.mu.Unlock()

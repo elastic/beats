@@ -763,6 +763,123 @@ func TestSourceStore_CleanIf(t *testing.T) {
 	})
 }
 
+func TestSourceStore_FindCursor(t *testing.T) {
+	type cur struct {
+		Offset int64 `struct:"offset"`
+	}
+	// untouched is the offset `to` starts with, to detect writes on not found.
+	const untouched = int64(-1)
+
+	seed := map[string]state{
+		"test::stored":  {TTL: time.Minute, Cursor: cur{Offset: 6}},
+		"test::eof":     {TTL: time.Minute, Cursor: cur{Offset: 6}},
+		"test::pending": {TTL: time.Minute, Cursor: cur{Offset: 6}},
+		"test::deleted": {TTL: time.Minute, Cursor: cur{Offset: 6}},
+		"test::bad":     {TTL: time.Minute, Cursor: map[string]any{"offset": "not-a-number"}},
+	}
+
+	tests := []struct {
+		name       string
+		source     string
+		setup      func(t *testing.T, ss *sourceStore)
+		want       CursorInfo
+		wantOffset int64
+		wantErr    bool
+	}{
+		{
+			name:       "unknown key",
+			source:     "unknown",
+			wantOffset: untouched,
+		},
+		{
+			// The prospector writes metadata on OpCreate, before any harvester ran.
+			name:   "entry with metadata only",
+			source: "meta-only",
+			setup: func(t *testing.T, ss *sourceStore) {
+				require.NoError(t, ss.UpdateMetadata(&testSource{name: "meta-only"}, testMeta{}),
+					"creating the entry with metadata only must succeed")
+			},
+			wantOffset: untouched,
+		},
+		{
+			name:       "stored cursor",
+			source:     "stored",
+			want:       CursorInfo{Found: true},
+			wantOffset: 6,
+		},
+		{
+			name:   "ended at EOF",
+			source: "eof",
+			setup: func(_ *testing.T, ss *sourceStore) {
+				res := ss.store.Get("test::eof")
+				defer res.Release()
+				res.setEndedAtEOF(true)
+			},
+			want:       CursorInfo{Found: true, EndedAtEOF: true},
+			wantOffset: 6,
+		},
+		{
+			name:   "published and not ACKed update",
+			source: "pending",
+			setup: func(t *testing.T, ss *sourceStore) {
+				res, err := lock(input.Context{}, ss.store, "test::pending")
+				require.NoError(t, err, "locking the entry must succeed")
+				op, err := createUpdateOp(res, cur{Offset: 42})
+				require.NoError(t, err, "creating the update operation must succeed")
+				t.Cleanup(func() {
+					op.done(1)
+					releaseResource(res)
+				})
+			},
+			want:       CursorInfo{Found: true},
+			wantOffset: 42,
+		},
+		{
+			name:   "soft-deleted entry",
+			source: "deleted",
+			setup: func(t *testing.T, ss *sourceStore) {
+				require.NoError(t, ss.store.remove("test::deleted"), "removing the entry must succeed")
+			},
+			wantOffset: untouched,
+		},
+		{
+			name:    "cursor that cannot be unpacked",
+			source:  "bad",
+			wantErr: true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			s := testOpenStore(t, "test", createSampleStore(t, seed))
+			// Registered first so it runs after the cleanups of setup.
+			t.Cleanup(s.Release)
+			ss := &sourceStore{identifier: &SourceIdentifier{"test::"}, store: s}
+			if tc.setup != nil {
+				tc.setup(t, ss)
+			}
+			entries := func() int {
+				s.ephemeralStore.mu.Lock()
+				defer s.ephemeralStore.mu.Unlock()
+				return len(s.ephemeralStore.table)
+			}
+			before := entries()
+
+			got := cur{Offset: untouched}
+			info, err := ss.FindCursor(&testSource{name: tc.source}, &got)
+
+			assert.Equal(t, tc.want, info, "unexpected CursorInfo")
+			assert.Equal(t, before, entries(), "FindCursor must not create an entry")
+			if tc.wantErr {
+				assert.Error(t, err, "an unpack failure must be reported as an error")
+				return
+			}
+			assert.NoError(t, err, "FindCursor must not fail")
+			assert.Equal(t, tc.wantOffset, got.Offset, "unexpected unpacked offset")
+		})
+	}
+}
+
 func closeStoreWith(fn func(s *store)) func() {
 	old := closeStore
 	closeStore = fn
