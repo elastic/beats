@@ -28,6 +28,7 @@ actions:
         - dependencies
         - backport-skip
         - skip-changelog
+        - windows
       title: '[{{ requiredEnv "BRANCH_NAME" }}][Automation] Bump VM Image version to {{ source "latestVersion" }}'
 
 sources:
@@ -45,6 +46,20 @@ conditions:
     disablesourceinput: true
     spec:
       command: 'grep -q -v {{ source "latestVersion" }} .buildkite/packaging.pipeline.yml'
+
+  noDowngrade-check:
+    name: Check that no image version is newer than the latest version
+    kind: shell
+    disablesourceinput: true
+    spec:
+      command: |
+        latest={{ source "latestVersion" }}
+        for v in $(grep -rhoE 'IMAGE_[A-Z0-9_]+: "[^"]*[0-9]{10,}"' .buildkite | grep -oE '[0-9]{10,}'); do
+          if [ "$v" -gt "$latest" ]; then
+            echo "image version $v is newer than the latest version $latest" >&2
+            exit 1
+          fi
+        done
 
 # NOTE: if you add a new target file, please update the .mergify.yml file
 #       to include the new file for the approval and automatic merge
