@@ -19,8 +19,8 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"golang.org/x/oauth2/google"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 )
 
 // testBoxPEMForConfig is the plain testBoxPlainKey reformatted for use in

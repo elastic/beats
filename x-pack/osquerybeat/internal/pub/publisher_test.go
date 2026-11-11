@@ -21,12 +21,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions" // Registers the add_fields processor used by inputWithNamespace.
-	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type recordingClient struct {
@@ -544,11 +543,12 @@ func (r *connectRecorder) namespaceOf(t *testing.T, client beat.Client) string {
 		if err != nil {
 			t.Fatalf("running processors: %v", err)
 		}
-		ds, ok := ev.Fields["data_stream"].(add_data_stream.DataStream)
-		if !ok {
+		namespace, err := ev.Fields.GetValue("data_stream.namespace")
+		if err != nil {
 			return ""
 		}
-		return ds.Namespace
+		ns, _ := namespace.(string)
+		return ns
 	}
 	return ""
 }

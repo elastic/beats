@@ -29,7 +29,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	_ "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 func TestFetchRedisInfo(t *testing.T) {

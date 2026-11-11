@@ -5,15 +5,16 @@
 package management
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestBareConfig(t *testing.T) {
@@ -341,7 +342,7 @@ func TestOutputIndex(t *testing.T) {
 
 }
 
-func requireNewStruct(t *testing.T, v map[string]any) *structpb.Struct {
+func requireNewStruct(t testing.TB, v map[string]any) *structpb.Struct {
 	str, err := structpb.NewStruct(v)
 	if err != nil {
 		require.NoError(t, err)
@@ -545,4 +546,38 @@ func buildConfigMap(t *testing.T, unitRaw *proto.UnitExpectedConfig, agentInfo *
 	err = reloadCfg[0].Config.Unpack(&cfgMap)
 	require.NoError(t, err, "error in unpack for config %#v", reloadCfg[0].Config)
 	return cfgMap
+}
+
+// BenchmarkInjectGlobalProcessors injects the global processors into every
+// stream of a unit, the cost per stream must not grow with the stream count.
+func BenchmarkInjectGlobalProcessors(b *testing.B) {
+	for _, streams := range []int{500, 2000, 8000} {
+		b.Run(strconv.Itoa(streams), func(b *testing.B) {
+			protoStreams := make([]*proto.Stream, streams)
+			for i := range protoStreams {
+				protoStreams[i] = &proto.Stream{
+					Id:     "stream-" + strconv.Itoa(i),
+					Source: requireNewStruct(b, map[string]any{"period": "1m"}),
+				}
+			}
+			// The source of the unit holds every stream.
+			streamList := make([]any, streams)
+			for i := range streamList {
+				streamList[i] = map[string]any{"id": "stream-" + strconv.Itoa(i), "period": "1m"}
+			}
+			expected := &proto.UnitExpectedConfig{
+				Streams: protoStreams,
+				Source: requireNewStruct(b, map[string]any{
+					"processors": []any{map[string]any{"add_fields": map[string]any{"target": "orchestrator"}}},
+					"streams":    streamList,
+				}),
+			}
+
+			for b.Loop() {
+				for range streams {
+					injectGlobalProcesssors(expected, map[string]any{"period": "1m"})
+				}
+			}
+		})
+	}
 }

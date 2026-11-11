@@ -24,8 +24,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/dev-tools/systemtests"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestCounterLength(t *testing.T) {

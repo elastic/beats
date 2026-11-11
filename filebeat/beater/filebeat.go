@@ -46,9 +46,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 
 	// Add filebeat level processors
 	_ "github.com/elastic/beats/v7/libbeat/processors/decode_csv_fields"
@@ -333,12 +333,6 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// must be closed before Stop is called to avoid a 5-second timeout on
 	// every early-exit error path.
 	defer fb.runReady.Close()
-
-	registryMigrator := registrar.NewMigrator(config.Registry, fb.logger, b.Info.Paths)
-	if err := registryMigrator.Run(); err != nil {
-		fb.logger.Errorf("Failed to migrate registry file: %+v", err)
-		return err
-	}
 
 	stateStore, err := openStateStore(fb.ctx, b.Info, fb.logger.Named("filebeat"), config.Registry)
 	if err != nil {

@@ -28,7 +28,7 @@ import (
 	"github.com/vmware/govmomi/vim25/types"
 	"go.uber.org/mock/gomock"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 // Run 'go generate' to create mocks that are used in tests.
