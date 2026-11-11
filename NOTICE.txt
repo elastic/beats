@@ -14974,11 +14974,11 @@ limitations under the License.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/sarama
-Version: v1.19.1-0.20260310070522-abae92ca1603
+Version: v1.19.1-0.20261105163725-10d0ecc585be
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/sarama@v1.19.1-0.20260310070522-abae92ca1603/LICENSE.md:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/sarama@v1.19.1-0.20261105163725-10d0ecc585be/LICENSE.md:
 
 # MIT License
 
@@ -46858,11 +46858,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/andybalholm/brotli
-Version: v1.2.2
+Version: v1.2.7
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/andybalholm/brotli@v1.2.2/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/andybalholm/brotli@v1.2.7/LICENSE:
 
 Copyright (c) 2009, 2010, 2013-2016 by the Brotli Authors.
 

@@ -295,12 +295,11 @@ func injectAgentInfoRule(inputs map[string]any, agentInfo *client.AgentInfo) (ma
 
 // injectGlobalProcesssors re-injects any global processors into the individual streams
 func injectGlobalProcesssors(expected *proto.UnitExpectedConfig, stream map[string]any) map[string]any {
-	rootMap := expected.GetSource().AsMap()
-	globalProcFound, ok := rootMap["processors"]
+	globalProcFound, ok := expected.GetSource().GetFields()["processors"]
 	if !ok {
 		return stream
 	}
-	globalList, ok := globalProcFound.([]any)
+	globalList, ok := globalProcFound.AsInterface().([]any)
 	if !ok {
 		return stream
 	}
