@@ -60,7 +60,7 @@ With `use_minimal_state: true`, the HTTP settings (`request.*` for Jamf and Okta
 - When `request.redirect.forward_headers` is `true`, the headers in `request.redirect.sensitive_headers` are not forwarded to a different host or port, or from HTTPS to HTTP. It defaults to `["Authorization", "Proxy-Authorization", "Cookie"]`. A list you set replaces the default, and `[]` forwards all headers.
 - For Azure Active Directory, `timeout` defaults to 90 seconds, and the `expand.*` options are not supported.
 
-Before 9.5.N and 9.6.N, these settings were ignored when `use_minimal_state` is `true`.
+In earlier patch releases of 9.5 and 9.6, these settings were ignored when `use_minimal_state` is `true`.
 
 
 ## Common options [filebeat-input-entity-analytics-common-options]
