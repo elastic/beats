@@ -56,6 +56,15 @@ func highCardinalityInputConfig(env *inputTestingEnvironment, glob string) (stri
 	}
 }
 
+// autoInputConfig is highCardinalityInputConfig with 'preset.auto' selecting
+// high_cardinality from minFiles files.
+func autoInputConfig(env *inputTestingEnvironment, glob string, minFiles int) (string, map[string]any) {
+	id, cfg := highCardinalityInputConfig(env, glob)
+	delete(cfg, "preset.high_cardinality")
+	cfg["preset.auto.high_cardinality.min_files"] = minFiles
+	return id, cfg
+}
+
 // mustCreateHighCardinalityInput creates the input and fails the test if the
 // preset did not resolve to high_cardinality, so no scenario can pass on the
 // default preset.
@@ -113,10 +122,19 @@ func requireKeptOpen(t *testing.T, env *inputTestingEnvironment, id, path string
 		10*time.Second,
 		"a file that grew after an EOF close must be kept open at EOF")
 	waitFileCounts(t, env, id, want, "the file must be open after it was read to EOF")
+	requireStableCounts(t, env, id, want)
+}
+
+// requireStableCounts asserts that the counters of input id stay at want for
+// keptOpenWindow, which proves that no file is closed or opened. Call it after
+// waiting for want, so the window starts with the counters at their final
+// value.
+func requireStableCounts(t *testing.T, env *inputTestingEnvironment, id string, want fileCounts) {
+	t.Helper()
 	require.Never(t, func() bool {
 		got, _ := readFileCounts(env, id)
 		return got != want
-	}, keptOpenWindow, 10*time.Millisecond, "a kept-open file must stay open while it is active")
+	}, keptOpenWindow, 10*time.Millisecond, "the file counters must not change after the files are read")
 }
 
 // messages returns the message of every published event, in publishing order
@@ -232,6 +250,60 @@ func TestHighCardinalityLifecycle(t *testing.T) {
 
 	cancel()
 	env.waitUntilInputStops()
+}
+
+// TestHighCardinalityAutoSelection uses a threshold of 3 files.
+func TestHighCardinalityAutoSelection(t *testing.T) {
+	writeFiles := func(env *inputTestingEnvironment, names ...string) {
+		for _, name := range names {
+			env.mustWriteToFile(name, []byte(name+" line\n"))
+		}
+	}
+
+	t.Run("below the threshold runs default and is not re-resolved", func(t *testing.T) {
+		env := newInputTestingEnvironment(t)
+		id, cfg := autoInputConfig(env, "*.log", 3)
+		// The preset is resolved when the input is created, so the files
+		// must exist by then.
+		writeFiles(env, "a.log", "b.log")
+		inp := env.mustCreateInput(cfg)
+		env.logContains("preset resolved: default; selected by 'preset.auto';")
+
+		ctx, cancel := context.WithCancel(t.Context())
+		env.startInput(ctx, id, inp)
+		env.waitUntilEventCount(2)
+		want := fileCounts{opened: 2, closed: 0, active: 2}
+		waitFileCounts(t, env, id, want, "files must stay open after EOF under the default preset")
+		requireStableCounts(t, env, id, want)
+
+		// Four files are above the threshold, but the preset is not
+		// resolved again.
+		writeFiles(env, "c.log", "d.log")
+		env.waitUntilEventCount(4)
+		want = fileCounts{opened: 4, closed: 0, active: 4}
+		waitFileCounts(t, env, id, want, "files found after the input started must stay open after EOF")
+		requireStableCounts(t, env, id, want)
+
+		cancel()
+		env.waitUntilInputStops()
+	})
+
+	t.Run("at the threshold runs high_cardinality", func(t *testing.T) {
+		env := newInputTestingEnvironment(t)
+		id, cfg := autoInputConfig(env, "*.log", 3)
+		writeFiles(env, "a.log", "b.log", "c.log")
+		inp := env.mustCreateInput(cfg)
+		env.logContains("preset resolved: high_cardinality; selected by 'preset.auto';")
+
+		ctx, cancel := context.WithCancel(t.Context())
+		env.startInput(ctx, id, inp)
+		env.waitUntilEventCount(3)
+		waitFileCounts(t, env, id, fileCounts{opened: 3, closed: 3, active: 0},
+			"files must be closed at EOF under the high_cardinality preset")
+
+		cancel()
+		env.waitUntilInputStops()
+	})
 }
 
 // TestHighCardinalityWarnsAboutCloseOnEOF is the only test that reaches the

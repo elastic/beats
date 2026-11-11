@@ -34,11 +34,6 @@ const (
 	// high_cardinality preset when 'prospector.scanner.check_interval' is
 	// not set.
 	highCardinalityCheckInterval = 30 * time.Second
-
-	// autoByDefault gates the auto preset for inputs that do not set
-	// 'preset'. While it is false, a preset that is not set runs default.
-	// It is flipped when the feature is enabled by default.
-	autoByDefault = false
 )
 
 // resolvedPreset is the preset an input runs and the values it implies.
@@ -81,11 +76,9 @@ type presetInputs struct {
 }
 
 // fileCountDecides reports whether the number of files found at input start
-// selects the preset, which only happens for an auto preset that is in effect.
+// selects the preset, which only happens for the auto preset, set or not.
 func (in presetInputs) fileCountDecides() bool {
-	return !in.forceDefault &&
-		in.selection.name == presetAuto &&
-		(in.selection.explicit || autoByDefault)
+	return !in.forceDefault && in.selection.name == presetAuto
 }
 
 // resolvePreset returns the preset an input runs given its configuration and

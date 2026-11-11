@@ -232,9 +232,14 @@ prospector.scanner.fingerprint.enabled: true
 file_identity.fingerprint:
   growing: true`
 	}
+	// preset.default keeps every row on the same code path: without it the
+	// rows with at least 5000 files would resolve to high_cardinality (500
+	// harvesters, close.reader.on_eof ignored) and stop being comparable with
+	// the other rows and with earlier results.
 	return fmt.Sprintf(`
 id: benchmark
 type: filestream
+preset.default: ~
 prospector.scanner.check_interval: 100ms
 close.reader.on_eof: true%s
 paths:
@@ -502,23 +507,32 @@ func TestConfigurePreset(t *testing.T) {
 	srcIdentifier, err := loginp.NewSourceIdentifier(pluginName, "test")
 	require.NoError(t, err, "creating the source identifier must succeed")
 
+	highCardinality := resolvedPreset{
+		highCardinality: true,
+		harvesterLimit:  highCardinalityHarvesterLimit,
+		checkInterval:   highCardinalityCheckInterval,
+	}
+
 	cases := []struct {
 		name  string
 		extra string
+		// files is the number of files the scan finds at input start.
+		files int
 		want  resolvedPreset
 	}{
 		{
-			name: "preset not set keeps the configured values",
+			name: "preset not set below the threshold keeps the configured values",
 			want: resolvedPreset{checkInterval: 10 * time.Second},
+		},
+		{
+			name:  "preset not set with files at the threshold runs high_cardinality",
+			files: defaultMinFiles,
+			want:  highCardinality,
 		},
 		{
 			name:  "high_cardinality fills in its values",
 			extra: "preset.high_cardinality: ~",
-			want: resolvedPreset{
-				highCardinality: true,
-				harvesterLimit:  highCardinalityHarvesterLimit,
-				checkInterval:   highCardinalityCheckInterval,
-			},
+			want:  highCardinality,
 		},
 		{
 			name: "high_cardinality keeps an explicit check_interval equal to the default",
@@ -535,13 +549,21 @@ prospector.scanner.check_interval: 10s`,
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
+			dir := t.TempDir()
+			for i := range tc.files {
+				name := filepath.Join(dir, fmt.Sprintf("%d.log", i))
+				// Distinct content: the default fingerprint identity counts
+				// files with the same content as one file.
+				require.NoError(t, os.WriteFile(name, fmt.Appendf(nil, "line %d\n", i), 0o644),
+					"writing the test file must succeed")
+			}
 			cfg := conf.MustNewConfigFrom(fmt.Sprintf(`
 type: filestream
 id: test
 paths:
   - %s
 %s
-`, filepath.Join(t.TempDir(), "*.log"), tc.extra))
+`, filepath.Join(dir, "*.log"), tc.extra))
 			prospector, harvester, err := configure(cfg, logger, srcIdentifier, nil)
 			require.NoError(t, err, "configure must succeed")
 			fs, ok := harvester.(*filestream)

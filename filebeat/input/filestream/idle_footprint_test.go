@@ -64,9 +64,13 @@ func benchmarkFilestreamIdleFootprint(b *testing.B, fileCount, linesPerFile int)
 
 	// Realistic tailing defaults: native identity (cheap), keep reading the file
 	// (no close_on_eof), and the default close_inactive (5m) keeps idle files open
-	// well past this short measurement.
+	// well past this short measurement. preset.default keeps the files open
+	// for every file count: with 5000 files or more, an input without it
+	// resolves to high_cardinality and closes idle files at EOF, which is not
+	// what this benchmark measures.
 	cfg := fmt.Sprintf(`
 type: filestream
+preset.default: ~
 prospector.scanner.check_interval: 100ms
 prospector.scanner.fingerprint.enabled: false
 file_identity.native: ~

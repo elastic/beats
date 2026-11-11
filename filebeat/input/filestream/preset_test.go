@@ -126,18 +126,8 @@ func TestResolvePreset(t *testing.T) {
 			want: resolvedPreset{harvesterLimit: 100, checkInterval: 5 * time.Minute},
 		},
 		{
-			// Changes to high_cardinality when autoByDefault is flipped.
-			name: "auto not set runs default above the threshold",
-			in: presetInputs{
-				selection:     presetSelection{name: presetAuto, threshold: 5},
-				checkInterval: 10 * time.Second,
-			},
-			fileCount: 6,
-			want:      defaultValues,
-		},
-		{
-			// The copytruncate prospector with 'preset' not set. Once
-			// autoByDefault is flipped only forceDefault keeps it on default.
+			// The copytruncate prospector with 'preset' not set, which
+			// selects auto: only forceDefault keeps it on default.
 			name: "forceDefault with auto not set runs default above the threshold",
 			in: presetInputs{
 				selection:     presetSelection{name: presetAuto, threshold: 5},
@@ -249,18 +239,19 @@ func TestPresetMessage(t *testing.T) {
 		notSetOnce  bool
 	}{
 		{
-			name:      "not set",
+			name:      "not set shows the threshold",
 			in:        presetInputs{selection: notSet},
-			fileCount: 6000,
-			res:       defaultValues,
+			fileCount: 5000,
+			res:       highCardinalityValues,
 			contains: []string{
-				"preset resolved: default",
+				"preset resolved: high_cardinality",
 				"'preset' is not set",
-				"6000 files found",
-				"harvester limit: no limit",
-				"check interval: 10s",
+				"5000 files found",
+				"threshold: 5000 files",
+				"harvester limit: 500",
+				"check interval: 30s",
 			},
-			notContains: []string{"threshold", "selected by"},
+			notContains: []string{"selected by"},
 		},
 		{
 			name: "explicit auto shows the threshold",
