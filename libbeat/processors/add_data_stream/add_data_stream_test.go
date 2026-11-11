@@ -24,7 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func TestAddDataStream(t *testing.T) {
@@ -87,7 +87,11 @@ func TestAddDataStream(t *testing.T) {
 				return
 			}
 			require.Equal(t, tt.wantIndex, got.Meta[events.FieldMetaRawIndex])
-			require.Equal(t, tt.wantDataStream, got.Fields["data_stream"])
+			require.Equal(t, mapstr.M{
+				"namespace": tt.wantDataStream.Namespace,
+				"dataset":   tt.wantDataStream.Dataset,
+				"type":      tt.wantDataStream.Type,
+			}, got.Fields["data_stream"])
 			require.Equal(t, tt.wantDataStream.Dataset, got.Fields["event"].(mapstr.M)["dataset"])
 		})
 	}

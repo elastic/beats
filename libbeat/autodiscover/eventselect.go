@@ -21,7 +21,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
-	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/pkg/config"
 )
 
 type queryConfigFrom string

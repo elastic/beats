@@ -28,8 +28,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/flows"
@@ -37,7 +37,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
 	"github.com/elastic/beats/v7/packetbeat/sniffer"
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 )
 
 type processor struct {

@@ -20,7 +20,7 @@ package sniffer
 import (
 	"github.com/google/gopacket/layers"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/decoder"

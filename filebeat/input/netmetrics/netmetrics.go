@@ -27,7 +27,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // addrs returns the linux /proc/net/tcp or /proc/net/udp addresses for the

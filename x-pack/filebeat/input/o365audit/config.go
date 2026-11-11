@@ -10,9 +10,9 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/auth"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 // Config for the O365 audit API input.

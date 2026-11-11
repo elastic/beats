@@ -29,7 +29,7 @@ import (
 	wmi "github.com/microsoft/wmi/pkg/wmiinstance"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 type MockWmiSession struct {

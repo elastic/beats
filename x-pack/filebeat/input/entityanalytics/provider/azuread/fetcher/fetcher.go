@@ -9,7 +9,7 @@ package fetcher
 import (
 	"context"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // Fetcher provides an interface for retrieving identity assets, such as users
