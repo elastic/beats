@@ -57,7 +57,6 @@ With `use_minimal_state: true`, the HTTP settings (`request.*` for Jamf and Okta
 
 - `request.retry.*` is not used. The provider retries failed requests itself, and logs a warning at startup if these options are set.
 - Keep-alive connections stay enabled unless `request.keep_alive.disable` is set to `true`.
-- When `request.redirect.forward_headers` is `true`, the headers in `request.redirect.sensitive_headers` are not forwarded to a different host or port, or from HTTPS to HTTP. It defaults to `["Authorization", "Proxy-Authorization", "Cookie"]`. A list you set replaces the default, and `[]` forwards all headers.
 - For Azure Active Directory, `timeout` defaults to 90 seconds, and the `expand.*` options are not supported.
 
 In earlier patch releases of 9.5 and 9.6, these settings were ignored when `use_minimal_state` is `true`.
@@ -973,8 +972,6 @@ The interval in which incremental updates should occur. The interval must be sho
 
 When set to `true`, request headers are forwarded when the API responds with a redirect. Headers listed in `request.redirect.sensitive_headers` are removed on redirects to a different host or port, and on redirects from HTTPS to HTTP. Defaults to `false`.
 
-The `request.redirect.*` options apply only when `use_minimal_state` is `false`.
-
 
 #### `request.redirect.headers_ban_list` [_jamf_request_redirect_headers_ban_list]
 
@@ -1474,8 +1471,6 @@ The directory for the temporary file that holds group membership during a full s
 #### `request.redirect.forward_headers` [_okta_request_redirect_forward_headers]
 
 When set to `true`, request headers are forwarded when the API responds with a redirect. Headers listed in `request.redirect.sensitive_headers` are removed on redirects to a different host or port, and on redirects from HTTPS to HTTP. Defaults to `false`.
-
-The `request.redirect.*` options apply only when `use_minimal_state` is `false`.
 
 
 #### `request.redirect.headers_ban_list` [_okta_request_redirect_headers_ban_list]
