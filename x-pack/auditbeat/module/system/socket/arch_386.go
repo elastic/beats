@@ -6,7 +6,7 @@
 
 package socket
 
-import "github.com/elastic/elastic-agent-libs/mapstr"
+import "github.com/elastic/beats/v7/pkg/mapstr"
 
 var archVariables = mapstr.M{
 	// Regular function call parameters 1 to 6

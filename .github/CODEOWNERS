@@ -120,8 +120,7 @@ changelog/fragments/
 /metricbeat/module/windows/wmi @elastic/obs-signals-integrations-team
 /metricbeat/module/zookeeper @elastic/obs-signals-integrations-team
 /packetbeat/ @elastic/security-service-integrations
-/pkg/systemmetrics/ @elastic/elastic-agent-data-plane
-/pkg/autodiscover/ @elastic/elastic-agent-data-plane
+/pkg/ @elastic/elastic-agent-data-plane
 /script/ @elastic/elastic-agent-data-plane
 /testing/ @elastic/elastic-agent-data-plane
 /tools/ @elastic/elastic-agent-data-plane

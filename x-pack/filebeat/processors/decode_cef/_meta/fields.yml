@@ -740,7 +740,7 @@
 
             - name: categoryOutcome
               type: keyword
-              description: Outcome of the event (e.g. sucess, failure, or attempt).
+              description: Outcome of the event (e.g. success, failure, or attempt).
 
             - name: managerReceiptTime
               type: date

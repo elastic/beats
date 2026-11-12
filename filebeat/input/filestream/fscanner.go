@@ -38,7 +38,7 @@ import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	commonfile "github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 const (
@@ -453,7 +453,9 @@ func (st *scanState) process(filename string, orderIndex int) {
 		delete(st.fdByName, known.name)
 	}
 	st.uniqueIDs[fileID] = matchedTarget{name: filename, order: orderIndex}
-	s.attachBridgingRaw(&fd)
+	if !opts.SuppressBridgingRaw {
+		s.attachBridgingRaw(&fd)
+	}
 	st.fdByName[filename] = fd
 	if isFileIgnored(fd, opts) {
 		st.metrics.FilesIgnored++
