@@ -109,7 +109,10 @@ func TestRunCmdWorkdirLifecycle(t *testing.T) {
 		t.Run(mode, func(t *testing.T) {
 			tempRoot := t.TempDir()
 			t.Setenv("TMPDIR", tempRoot)
-			agentDir := t.TempDir()
+			// macOS exposes temporary paths through /var -> /private/var.
+			// Exercise an alias on every platform so cwd comparisons cannot rely on spelling.
+			agentDir := filepath.Join(t.TempDir(), "agent-state")
+			require.NoError(t, os.Symlink(t.TempDir(), agentDir), "create an alias for the command directory")
 			staleCache := filepath.Join(agentDir, ".synthetics")
 			require.NoError(t, os.Mkdir(staleCache, 0500), "simulate Agent-reset cache permissions")
 			t.Cleanup(func() { _ = os.Chmod(staleCache, 0700) })
@@ -131,7 +134,13 @@ func TestRunCmdWorkdirLifecycle(t *testing.T) {
 			dir, ok := ready.Payload["workdir"].(string)
 			require.True(t, ok, "child must report a workdir path")
 			assert.Equal(t, tempRoot, filepath.Dir(dir), "scratch space must be outside Agent state")
-			assert.Equal(t, agentDir, ready.Payload["cwd"], "configuration discovery must retain the command directory")
+			cwd, ok := ready.Payload["cwd"].(string)
+			require.True(t, ok, "child must report its working directory")
+			expectedDir, err := os.Stat(agentDir)
+			require.NoError(t, err, "inspect the command directory")
+			actualDir, err := os.Stat(cwd)
+			require.NoError(t, err, "inspect the child working directory")
+			assert.True(t, os.SameFile(expectedDir, actualDir), "configuration discovery must retain the command directory")
 			cache, ok := ready.Payload["cache"].(string)
 			require.True(t, ok, "child must report a cache path")
 			assert.FileExists(t, filepath.Join(cache, "screenshot"), "cache remains available while the child runs")
