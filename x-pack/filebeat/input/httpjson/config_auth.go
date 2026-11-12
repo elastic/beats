@@ -21,6 +21,7 @@ import (
 	"golang.org/x/oauth2/google"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
@@ -168,6 +169,9 @@ type oAuth2Config struct {
 	// microsoft azure specific
 	AzureTenantID string `config:"azure.tenant_id"`
 	AzureResource string `config:"azure.resource"`
+	// AzureUseCloudConnectors authenticates the client ID with identity
+	// federation instead of a client secret.
+	AzureUseCloudConnectors bool `config:"azure.use_cloud_connectors"`
 
 	// okta specific RSA JWK private key
 	OktaJWKFile string          `config:"okta.jwk_file"`
@@ -197,7 +201,7 @@ func (o *oAuth2Config) clientCredentialsGrant(ctx context.Context, _ *http.Clien
 }
 
 // Client wraps the given http.Client and returns a new one that will use the oauth authentication.
-func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.Client, error) {
+func (o *oAuth2Config) client(ctx context.Context, client, tokenClient *http.Client, log *logp.Logger) (*http.Client, error) {
 	ctx = context.WithValue(ctx, oauth2.HTTPClient, client)
 
 	switch o.getProvider() {
@@ -220,6 +224,9 @@ func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.C
 			return o.clientCredentialsGrant(ctx, client), nil
 		}
 	case oAuth2ProviderAzure:
+		if o.AzureUseCloudConnectors {
+			return o.azureCloudConnectorsClient(ctx, tokenClient, log)
+		}
 		return o.clientCredentialsGrant(ctx, client), nil
 	case oAuth2ProviderGoogle:
 		if len(o.GoogleJWTJSON) != 0 {
@@ -299,6 +306,10 @@ func (o oAuth2Config) getEndpointParams() map[string][]string {
 func (o *oAuth2Config) Validate() error {
 	if !o.isEnabled() {
 		return nil
+	}
+
+	if o.AzureUseCloudConnectors && o.getProvider() != oAuth2ProviderAzure {
+		return errors.New("azure.use_cloud_connectors can only be used with the azure provider")
 	}
 
 	switch o.getProvider() {
@@ -427,6 +438,9 @@ func populateJSONFromFile(file string, dst *common.JSONBlob) error {
 }
 
 func (o *oAuth2Config) validateAzureProvider() error {
+	if o.AzureUseCloudConnectors {
+		return o.validateAzureCloudConnectors()
+	}
 	if o.TokenURL == "" && o.AzureTenantID == "" {
 		return errors.New("at least one of token_url or tenant_id must be provided")
 	}
@@ -437,5 +451,47 @@ func (o *oAuth2Config) validateAzureProvider() error {
 		return errors.New("client credentials must be provided")
 	}
 
+	return nil
+}
+
+func (o *oAuth2Config) validateAzureCloudConnectors() error {
+	if !azureCloudConnectorsSupported {
+		return errors.New("azure.use_cloud_connectors is not supported in FIPS builds")
+	}
+	if o.AzureTenantID == "" {
+		return errors.New("tenant_id must be provided with azure.use_cloud_connectors")
+	}
+	if o.TokenURL != "" {
+		return errors.New("token_url can't be used with azure.use_cloud_connectors; use tenant_id")
+	}
+	if o.ClientID == "" {
+		return errors.New("client.id must be provided with azure.use_cloud_connectors")
+	}
+	if maybeString(o.ClientSecret) != "" {
+		return errors.New("client.secret can't be used with azure.use_cloud_connectors")
+	}
+	if o.User != "" || o.Password != "" {
+		return errors.New("user and password can't be used with azure.use_cloud_connectors")
+	}
+	if len(o.EndpointParams) != 0 {
+		return errors.New("endpoint_params can't be used with azure.use_cloud_connectors")
+	}
+	if len(o.azureScopes()) == 0 {
+		return errors.New("scopes or azure.resource must be provided with azure.use_cloud_connectors")
+	}
+	return nil
+}
+
+// azureScopes returns the scopes of the Azure access token. A resource is
+// converted to its Microsoft identity platform v2.0 scope, "<resource>/.default".
+// The resource is preserved exactly because its trailing slash can be part of
+// the identifier expected in the access token audience.
+func (o *oAuth2Config) azureScopes() []string {
+	if len(o.Scopes) != 0 {
+		return o.Scopes
+	}
+	if o.AzureResource != "" {
+		return []string{o.AzureResource + "/.default"}
+	}
 	return nil
 }

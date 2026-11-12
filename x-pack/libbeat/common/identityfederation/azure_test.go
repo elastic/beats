@@ -9,11 +9,14 @@ package identityfederation
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -65,6 +68,49 @@ func newEntraTestServer(t *testing.T) (*httptest.Server, *atomic.Value) {
 	}))
 	t.Cleanup(srv.Close)
 	return srv, &assertion
+}
+
+// newShortLivedEntraTestServer serves Entra access tokens that expire in 5 seconds,
+// inside the refresh windows of both oauth2.ReuseTokenSource and azidentity, so
+// every token request reaches the server. It records the client assertion of
+// each token request in order.
+func newShortLivedEntraTestServer(t *testing.T) (*httptest.Server, func() []string) {
+	t.Helper()
+	var (
+		mu         sync.Mutex
+		assertions []string
+	)
+	var srv *httptest.Server
+	srv = httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		switch r.URL.Path {
+		case "/" + testTenantID + "/v2.0/.well-known/openid-configuration":
+			_ = json.NewEncoder(w).Encode(map[string]string{
+				"issuer":                 srv.URL + "/" + testTenantID + "/v2.0",
+				"authorization_endpoint": srv.URL + "/" + testTenantID + "/oauth2/v2.0/authorize",
+				"token_endpoint":         srv.URL + "/" + testTenantID + "/oauth2/v2.0/token",
+			})
+		case "/" + testTenantID + "/oauth2/v2.0/token":
+			assert.NoError(t, r.ParseForm())
+			mu.Lock()
+			assertions = append(assertions, r.PostForm.Get("client_assertion"))
+			n := len(assertions)
+			mu.Unlock()
+			_ = json.NewEncoder(w).Encode(map[string]any{
+				"access_token": fmt.Sprintf("azure-access-token-%d", n),
+				"token_type":   "Bearer",
+				"expires_in":   5,
+			})
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	t.Cleanup(srv.Close)
+	return srv, func() []string {
+		mu.Lock()
+		defer mu.Unlock()
+		return append([]string(nil), assertions...)
+	}
 }
 
 func entraTestOptions(srv *httptest.Server) *azidentity.ClientAssertionCredentialOptions {
@@ -441,5 +487,127 @@ func TestAzureNewCloudConnectorCredential(t *testing.T) {
 
 		_, err := AzureNewCloudConnectorCredential("", "", nil, logptest.NewTestingLogger(t, ""))
 		require.ErrorContains(t, err, "TenantID is required")
+	})
+}
+
+type fakeTokenCredential struct {
+	token  azcore.AccessToken
+	err    error
+	scopes []string
+}
+
+func (c *fakeTokenCredential) GetToken(_ context.Context, opts policy.TokenRequestOptions) (azcore.AccessToken, error) {
+	c.scopes = opts.Scopes
+	return c.token, c.err
+}
+
+func TestAzureTokenSource(t *testing.T) {
+	t.Run("maps the Azure access token to an OAuth 2.0 bearer token", func(t *testing.T) {
+		expiry := time.Now().Add(time.Hour).Truncate(time.Second)
+		cred := &fakeTokenCredential{token: azcore.AccessToken{Token: "azure-access-token", ExpiresOn: expiry}}
+		source := &azureTokenSource{ctx: t.Context(), cred: cred, scopes: []string{"https://graph.microsoft.com/.default"}}
+
+		token, err := source.Token()
+		require.NoError(t, err)
+		assert.Equal(t, "azure-access-token", token.AccessToken)
+		assert.Equal(t, "Bearer", token.TokenType)
+		assert.Equal(t, expiry, token.Expiry)
+		assert.Equal(t, []string{"https://graph.microsoft.com/.default"}, cred.scopes)
+	})
+
+	t.Run("reports credential errors", func(t *testing.T) {
+		cred := &fakeTokenCredential{err: errors.New("entra unavailable")}
+		source := &azureTokenSource{ctx: t.Context(), cred: cred, scopes: []string{"scope"}}
+
+		_, err := source.Token()
+		require.ErrorContains(t, err, "getting Azure access token: entra unavailable")
+	})
+}
+
+func TestAzureNewCloudConnectorTokenSource(t *testing.T) {
+	t.Run("serves access tokens from Entra", func(t *testing.T) {
+		t.Setenv(WIIIssuerURLEnvVar, "")
+		p := filepath.Join(t.TempDir(), "jwt")
+		require.NoError(t, os.WriteFile(p, []byte(fakeJWT), 0o600))
+		t.Setenv(CloudConnectorsIDTokenFileEnvVar, p)
+		entra, assertion := newEntraTestServer(t)
+
+		source, err := AzureNewCloudConnectorTokenSource(t.Context(), testTenantID, testClientID,
+			[]string{"https://management.azure.com/.default"}, entraTestOptions(entra), logptest.NewTestingLogger(t, ""))
+		require.NoError(t, err)
+
+		token, err := source.Token()
+		require.NoError(t, err)
+		assert.Equal(t, "azure-access-token", token.AccessToken)
+		assert.True(t, token.Valid(), "expected a token that has not expired")
+		assert.Equal(t, fakeJWT, assertion.Load())
+	})
+
+	t.Run("sends the rotated token file on refresh", func(t *testing.T) {
+		const rotatedJWT = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyb3RhdGVkIn0.signature"
+		t.Setenv(WIIIssuerURLEnvVar, "")
+		p := filepath.Join(t.TempDir(), "jwt")
+		require.NoError(t, os.WriteFile(p, []byte(fakeJWT), 0o600))
+		t.Setenv(CloudConnectorsIDTokenFileEnvVar, p)
+		entra, assertions := newShortLivedEntraTestServer(t)
+
+		source, err := AzureNewCloudConnectorTokenSource(t.Context(), testTenantID, testClientID,
+			[]string{"https://management.azure.com//.default"}, entraTestOptions(entra), logptest.NewTestingLogger(t, ""))
+		require.NoError(t, err)
+
+		first, err := source.Token()
+		require.NoError(t, err)
+		require.NoError(t, os.WriteFile(p, []byte(rotatedJWT), 0o600))
+		second, err := source.Token()
+		require.NoError(t, err)
+
+		assert.Equal(t, []string{fakeJWT, rotatedJWT}, assertions())
+		assert.NotEqual(t, first.AccessToken, second.AccessToken)
+	})
+
+	t.Run("sends the rotated workload-identity token on refresh", func(t *testing.T) {
+		wiiTokens := []string{
+			"eyJhbGciOiJSUzI1NiJ9.wii-first.sig",
+			"eyJhbGciOiJSUzI1NiJ9.wii-second.sig",
+		}
+		pki := newWIITestPKI(t)
+		t.Setenv(WIISSLCAFileEnvVar, pki.caPEMPath)
+		var wiiCalls atomic.Int32
+		wii := newWIITestServer(t, pki, func(w http.ResponseWriter, _ *http.Request) {
+			n := int(wiiCalls.Add(1))
+			// An expiry inside the WII refresh window forces a new issuer request each time.
+			_, _ = w.Write(tokenResponse(wiiTokens[min(n, len(wiiTokens))-1], time.Now().Add(30*time.Second)))
+		})
+		t.Setenv(WIIIssuerURLEnvVar, wii.URL)
+		t.Setenv(WIISSLCertFileEnvVar, pki.certPath)
+		t.Setenv(WIISSLKeyFileEnvVar, pki.keyPath)
+		t.Setenv(CloudConnectorsIDTokenFileEnvVar, "")
+		entra, assertions := newShortLivedEntraTestServer(t)
+
+		source, err := AzureNewCloudConnectorTokenSource(t.Context(), testTenantID, testClientID,
+			[]string{"https://management.azure.com//.default"}, entraTestOptions(entra), logptest.NewTestingLogger(t, ""))
+		require.NoError(t, err)
+
+		first, err := source.Token()
+		require.NoError(t, err)
+		second, err := source.Token()
+		require.NoError(t, err)
+
+		assert.Equal(t, wiiTokens, assertions())
+		assert.Equal(t, int32(2), wiiCalls.Load())
+		assert.NotEqual(t, first.AccessToken, second.AccessToken)
+	})
+
+	t.Run("requires a scope", func(t *testing.T) {
+		_, err := AzureNewCloudConnectorTokenSource(t.Context(), testTenantID, testClientID, nil, nil, logptest.NewTestingLogger(t, ""))
+		require.ErrorContains(t, err, "at least one scope is required")
+	})
+
+	t.Run("reports credential errors", func(t *testing.T) {
+		t.Setenv(WIIIssuerURLEnvVar, "")
+		t.Setenv(CloudConnectorsIDTokenFileEnvVar, "")
+
+		_, err := AzureNewCloudConnectorTokenSource(t.Context(), testTenantID, testClientID, []string{"scope"}, nil, logptest.NewTestingLogger(t, ""))
+		require.ErrorContains(t, err, "no identity token source configured")
 	})
 }

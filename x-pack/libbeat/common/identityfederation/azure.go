@@ -18,7 +18,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"golang.org/x/oauth2"
 
 	"github.com/elastic/beats/v7/pkg/logp"
 )
@@ -173,6 +176,38 @@ func AzureNewCloudConnectorCredential(tenantID, clientID string, options *aziden
 
 	return nil, fmt.Errorf("no identity token source configured (set %s or %s)",
 		WIIIssuerURLEnvVar, CloudConnectorsIDTokenFileEnvVar)
+}
+
+// AzureNewCloudConnectorTokenSource returns an OAuth 2.0 token source that serves
+// Azure access tokens for scopes, using the cloud connector credential from
+// AzureNewCloudConnectorCredential.
+func AzureNewCloudConnectorTokenSource(ctx context.Context, tenantID, clientID string, scopes []string, options *azidentity.ClientAssertionCredentialOptions, logger *logp.Logger) (oauth2.TokenSource, error) {
+	if len(scopes) == 0 {
+		return nil, errors.New("at least one scope is required for an Azure access token")
+	}
+	cred, err := AzureNewCloudConnectorCredential(tenantID, clientID, options, logger)
+	if err != nil {
+		return nil, err
+	}
+	return oauth2.ReuseTokenSource(nil, &azureTokenSource{ctx: ctx, cred: cred, scopes: scopes}), nil
+}
+
+type azureTokenSource struct {
+	ctx    context.Context
+	cred   azcore.TokenCredential
+	scopes []string
+}
+
+func (s *azureTokenSource) Token() (*oauth2.Token, error) {
+	token, err := s.cred.GetToken(s.ctx, policy.TokenRequestOptions{Scopes: s.scopes})
+	if err != nil {
+		return nil, fmt.Errorf("getting Azure access token: %w", err)
+	}
+	return &oauth2.Token{
+		AccessToken: token.Token,
+		TokenType:   "Bearer",
+		Expiry:      token.ExpiresOn,
+	}, nil
 }
 
 // AzureReadJWT reads and validates a JWT token from the given file path.
