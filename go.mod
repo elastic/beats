@@ -172,7 +172,7 @@ require (
 	github.com/elastic/ebpfevents v0.12.0
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
-	github.com/elastic/go-quark v0.6.0
+	github.com/elastic/go-quark v0.9.0
 	github.com/elastic/go-sfdc v0.0.0-20260504130806-a46e22d049d9
 	github.com/elastic/mito v1.23.2
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
