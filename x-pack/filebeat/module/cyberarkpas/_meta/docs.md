@@ -78,7 +78,7 @@ Edit the `cyberarkpas.yml` configuration. The following sample configuration wil
     #  key: /path/to/privatekey.pem
     #  key_passphrase: 'password for my key'
 
-    # Uncoment to keep the original syslog event under event.original.
+    # Uncomment to keep the original syslog event under event.original.
     # var.preserve_original_event: true
 
     # Set paths for the log files when file input is used.
@@ -105,7 +105,7 @@ For encrypted communications, follow the [CyberArk documentation](https://docs.c
       key: /path/to/privatekey.pem
       key_passphrase: 'password for my key'
 
-    # Uncoment to keep the original syslog event under event.original.
+    # Uncomment to keep the original syslog event under event.original.
     # var.preserve_original_event: true
 
     # Set paths for the log files when file input is used.
