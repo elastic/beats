@@ -13,8 +13,8 @@ import (
 	"strings"
 	"testing"
 
+	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
-	agentconfig "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestCheckRedirectSensitiveHeaders(t *testing.T) {
@@ -258,7 +258,7 @@ func TestSensitiveHeadersConfig(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			c := defaultConfig()
-			u, err := agentconfig.NewConfigWithYAML([]byte(base+test.yaml), "")
+			u, err := conf.NewConfigWithYAML([]byte(base+test.yaml), "")
 			if err != nil {
 				t.Fatalf("failed to parse config: %v", err)
 			}

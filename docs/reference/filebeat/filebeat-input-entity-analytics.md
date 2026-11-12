@@ -950,19 +950,13 @@ The interval in which full synchronizations should occur. The interval must be l
 The interval in which incremental updates should occur. The interval must be shorter than the full synchronization interval (`sync_interval`). Expressed as a duration string (e.g., 1m, 3h, 24h). Defaults to `15m` (15 minutes).
 
 #### `request.redirect.forward_headers` [_jamf_request_redirect_forward_headers]
-```{applies_to}
-stack: ga 9.5+
-```
 
 When set to `true`, request headers are forwarded when the API responds with a redirect. Headers listed in `request.redirect.sensitive_headers` are removed on redirects to a different host or port, and on redirects from HTTPS to HTTP. Defaults to `false`.
 
-This option applies only when `use_minimal_state` is `false`.
+The `request.redirect.*` options apply only when `use_minimal_state` is `false`.
 
 
 #### `request.redirect.headers_ban_list` [_jamf_request_redirect_headers_ban_list]
-```{applies_to}
-stack: ga 9.5+
-```
 
 When `request.redirect.forward_headers` is `true`, all headers except the ones in this list are forwarded. Defaults to `[]`.
 
@@ -978,9 +972,6 @@ Set to `[]` to forward all headers regardless of the redirect target. Do this on
 
 
 #### `request.redirect.max_redirects` [_jamf_request_redirect_max_redirects]
-```{applies_to}
-stack: ga 9.5+
-```
 
 The maximum number of redirects to follow for a request. Defaults to `10`.
 
@@ -1461,19 +1452,13 @@ The directory for the temporary file that holds group membership during a full s
 
 
 #### `request.redirect.forward_headers` [_okta_request_redirect_forward_headers]
-```{applies_to}
-stack: ga 9.5+
-```
 
 When set to `true`, request headers are forwarded when the API responds with a redirect. Headers listed in `request.redirect.sensitive_headers` are removed on redirects to a different host or port, and on redirects from HTTPS to HTTP. Defaults to `false`.
 
-This option applies only when `use_minimal_state` is `false`.
+The `request.redirect.*` options apply only when `use_minimal_state` is `false`.
 
 
 #### `request.redirect.headers_ban_list` [_okta_request_redirect_headers_ban_list]
-```{applies_to}
-stack: ga 9.5+
-```
 
 When `request.redirect.forward_headers` is `true`, all headers except the ones in this list are forwarded. Defaults to `[]`.
 
@@ -1489,9 +1474,6 @@ Set to `[]` to forward all headers regardless of the redirect target. Do this on
 
 
 #### `request.redirect.max_redirects` [_okta_request_redirect_max_redirects]
-```{applies_to}
-stack: ga 9.5+
-```
 
 The maximum number of redirects to follow for a request. Defaults to `10`.
 
