@@ -12,6 +12,8 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -21,6 +23,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/identityfederation"
 )
 
 func TestAPIKeyPolicy_SetsHeader(t *testing.T) {
@@ -75,6 +78,43 @@ func TestNewMetricsClient_ClientSecret(t *testing.T) {
 	client, err := newMetricsClient(cfg, logger)
 	require.NoError(t, err, "client secret client construction should succeed for valid inputs")
 	require.NotNil(t, client, "metricsClient must not be nil")
+
+	cfg.TenantId = "invalid tenant"
+	_, err = newMetricsClient(cfg, logger)
+	require.ErrorContains(t, err, "failed to create client secret credential", "an invalid tenant ID should be reported")
+}
+
+func TestNewMetricsClient_CloudConnectors(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+
+	cfg := Config{
+		ApplicationId:      "app-id",
+		TenantId:           "00000000-0000-0000-0000-000000000000",
+		ClientId:           "00000000-0000-0000-0000-000000000001",
+		UseCloudConnectors: true,
+	}
+	require.NoError(t, cfg.Validate(), "cloud connectors config should be valid")
+	assert.Equal(t, AuthTypeClientSecret, cfg.AuthType, "cloud connectors should default auth_type to client_secret")
+
+	t.Run("creates the client", func(t *testing.T) {
+		p := filepath.Join(t.TempDir(), "id-token")
+		require.NoError(t, os.WriteFile(p, []byte("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.signature"), 0o600), "writing the token file should not fail")
+		t.Setenv(identityfederation.WIIIssuerURLEnvVar, "")
+		t.Setenv(identityfederation.CloudConnectorsIDTokenFileEnvVar, p)
+
+		client, err := newMetricsClient(cfg, logger)
+		require.NoError(t, err, "identity federation client construction should succeed")
+		require.NotNil(t, client, "metricsClient must not be nil")
+	})
+
+	t.Run("fails without an identity token source", func(t *testing.T) {
+		t.Setenv(identityfederation.WIIIssuerURLEnvVar, "")
+		t.Setenv(identityfederation.CloudConnectorsIDTokenFileEnvVar, "")
+
+		_, err := newMetricsClient(cfg, logger)
+		require.ErrorContains(t, err, "failed to create identity federation credential", "the identity federation error should be reported")
+		require.ErrorContains(t, err, "no identity token source configured", "the cause should be reported")
+	})
 }
 
 func TestMetricsClient_GetMultiple(t *testing.T) {

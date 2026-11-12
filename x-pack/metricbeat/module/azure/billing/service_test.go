@@ -8,6 +8,8 @@ package billing
 
 import (
 	"maps"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
@@ -15,6 +17,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/identityfederation"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
 
@@ -80,6 +83,36 @@ func TestBillingCloudConfiguration(t *testing.T) {
 			assert.Equal(t, test.wantADHost, configuration.ActiveDirectoryAuthorityHost, "billing AD authority must preserve existing behavior")
 		})
 	}
+}
+
+func TestNewServiceWithCloudConnectors(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	config := azure.Config{
+		TenantId:                "00000000-0000-0000-0000-000000000000",
+		ClientId:                "00000000-0000-0000-0000-000000000001",
+		ActiveDirectoryEndpoint: "https://login.microsoftonline.com/",
+		UseCloudConnectors:      true,
+	}
+
+	t.Run("creates the service", func(t *testing.T) {
+		p := filepath.Join(t.TempDir(), "id-token")
+		require.NoError(t, os.WriteFile(p, []byte("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.signature"), 0o600), "expected the token file to be written")
+		t.Setenv(identityfederation.WIIIssuerURLEnvVar, "")
+		t.Setenv(identityfederation.CloudConnectorsIDTokenFileEnvVar, p)
+
+		service, err := NewService(config, logger)
+		require.NoError(t, err, "billing service must be created with identity federation")
+		require.NotNil(t, service.usageDetailsClient, "billing usage details client must be constructed")
+		require.NotNil(t, service.forecastClient, "billing forecast client must be constructed")
+	})
+
+	t.Run("fails without an identity token source", func(t *testing.T) {
+		t.Setenv(identityfederation.WIIIssuerURLEnvVar, "")
+		t.Setenv(identityfederation.CloudConnectorsIDTokenFileEnvVar, "")
+
+		_, err := NewService(config, logger)
+		require.ErrorContains(t, err, "no identity token source configured", "billing service must report the identity federation error")
+	})
 }
 
 func TestNewServiceDoesNotMutateSDKCloudConfigurations(t *testing.T) {
