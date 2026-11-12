@@ -20,8 +20,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
@@ -178,7 +178,7 @@ func runCmd(
 	filterJourneys FilterJourneyConfig,
 	sFields stdfields.StdMonitorFields,
 	traceID string,
-) (mpx *ExecMultiplexer, err error) {
+) (_ *ExecMultiplexer, err error) {
 	// Attach sysproc attrs to ensure subprocesses are properly killed
 	platformCmdMutate(cmd)
 
@@ -202,17 +202,16 @@ func runCmd(
 	}()
 	cmd.Args = append(cmd.Args, "--workdir", workdir)
 
-	mpx = NewExecMultiplexer()
+	mpx := NewExecMultiplexer()
 	// Setup a pipe for JSON structured output
 	jsonReader, jsonWriter, err := os.Pipe()
 	if err != nil {
 		return nil, err
 	}
-
 	defer func() {
-		if !started {
-			_ = jsonReader.Close()
+		if err != nil {
 			_ = jsonWriter.Close()
+			_ = jsonReader.Close()
 		}
 	}()
 
@@ -255,9 +254,6 @@ func runCmd(
 		cmd.Stdin = strings.NewReader(*stdinStr)
 	}
 
-	wg := sync.WaitGroup{}
-
-	// Send stdout into the output
 	stdoutPipe, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, fmt.Errorf("could not open stdout pipe: %w", err)
@@ -284,26 +280,40 @@ func runCmd(
 		}
 	}()
 
+	// Scan output from before cmd.Start: cmd.Wait closes these pipes as soon as
+	// the command exits, losing anything not read yet. A failed cmd.Start
+	// closes them too, so these scanners return without being waited on.
+	var wg sync.WaitGroup
+	wg.Go(func() {
+		err := scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
+		if err != nil {
+			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
+			logp.L().Warnf("could not scan stdout events from synthetics: %s", err)
+		}
+	})
+	wg.Go(func() {
+		err := scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)
+		if err != nil {
+			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
+			logp.L().Warnf("could not scan stderr events from synthetics: %s", err)
+		}
+	})
+
 	// This use of channels for results is awkward, but required for the thread locking below
 	cmdStarted := make(chan error)
 	cmdDone := make(chan error)
-	readersReady := make(chan struct{})
 	go func() {
 		// We must idle this thread and ensure it is not killed while the external program is running
 		// see https://github.com/golang/go/issues/27505#issuecomment-713706104 . Otherwise, the Pdeathsig
 		// could cause the subprocess to die prematurely
 		runtime.LockOSThread()
 		defer runtime.UnlockOSThread()
-		startErr := cmd.Start()
-		cmdStarted <- startErr
-		if startErr != nil {
-			return
+		err := cmd.Start()
+		cmdStarted <- err
+		// Nobody receives from cmdDone after a failed start.
+		if err == nil {
+			cmdDone <- cmd.Wait()
 		}
-
-		// Wait closes stdout/stderr pipes, so start their readers first.
-		<-readersReady
-		err := cmd.Wait()
-		cmdDone <- err
 	}()
 
 	err = <-cmdStarted
@@ -315,24 +325,8 @@ func runCmd(
 
 	started = true
 
-	wg.Go(func() {
-		err := scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
-		if err != nil {
-			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-			logp.L().Warnf("could not scan stdout events from synthetics: %s", err)
-		}
-
-	})
-
-	wg.Go(func() {
-		err := scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)
-		if err != nil {
-			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
-			logp.L().Warnf("could not scan stderr events from synthetics: %s", err)
-		}
-	})
-
-	// Send the test results into the output
+	// The results reader closes jsonReader, which cmd.Start reads as one of
+	// the ExtraFiles, so it starts only once cmd.Start has returned.
 	wg.Go(func() {
 		defer jsonReader.Close()
 
@@ -353,10 +347,7 @@ func runCmd(
 
 			mpx.writeSynthEvent(&se)
 		}
-
 	})
-
-	close(readersReady)
 
 	// Get timeout from parent ctx
 	timeout, _ := ctx.Value(SynthexecTimeoutKey).(time.Duration)

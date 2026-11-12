@@ -29,8 +29,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/packetbeat/npcap"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 const installTimeout = 120 * time.Second
@@ -118,8 +118,8 @@ func canInstallNpcap(b *beat.Beat, rawcfg *conf.C, log *logp.Logger) (bool, erro
 		NeverInstall bool   `config:"npcap.never_install"`
 	}
 
-	// Agent managed case.
-	if b.Manager.Enabled() {
+	// Agent managed case: rawcfg is in the agent stream layout.
+	if b.Manager.ConfigFromControlProtocol() {
 		var cfg struct {
 			Streams []npcapInstallCfg `config:"streams"`
 		}

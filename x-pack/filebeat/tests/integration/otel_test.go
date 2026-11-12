@@ -38,11 +38,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/features"
 	esoutput "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/testing/estools"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/testing/estools"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 	"github.com/elastic/mock-es/pkg/api"
@@ -1655,15 +1655,20 @@ func TestFilebeatOTelHTTPJSONStateStoreIsPerInputID(t *testing.T) {
     path.home: {{ $.PathHome }}
 {{- end }}
 extensions:
-  elasticsearch_storage:
-    hosts:
+  beatsauth/state:
+    endpoints:
       - {{ .ESURL }}
-    username: {{ .Username }}
-    password: {{ .Password }}
+    auth:
+      username: {{ .Username }}
+      password: {{ .Password }}
+  elasticsearch_storage:
+    auth:
+      authenticator: beatsauth/state
 exporters:
   debug:
 service:
   extensions:
+    - beatsauth/state
     - elasticsearch_storage
   pipelines:
     logs:

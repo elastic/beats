@@ -5,15 +5,16 @@
 package management
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestBareConfig(t *testing.T) {
@@ -33,7 +34,7 @@ func TestBareConfig(t *testing.T) {
 		},
 	}
 
-	cfgMap := buildConfigMap(t, &rawExpected, &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true})
+	cfgMap := buildConfigMap(t, &rawExpected, &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true, Tags: []string{"production", "team-payments"}})
 
 	// Actual checks
 	processorFields := map[string]any{
@@ -43,6 +44,45 @@ func TestBareConfig(t *testing.T) {
 		"add_fields.fields.type":      "log",
 		"add_fields.fields.input_id":  "system/metrics-system-default-system",
 		"add_fields.fields.id":        "beat-ID",
+		"add_tags.tags":               []any{"production", "team-payments"},
+	}
+	findFieldsInProcessors(t, processorFields, cfgMap)
+}
+
+func TestBareConfigForReceiver(t *testing.T) {
+	// config with datastreams, metadata, etc, removed
+	rawExpected := proto.UnitExpectedConfig{
+		Id:   "system/metrics-system-default-system",
+		Type: "system/metrics",
+		Name: "system-1",
+		Streams: []*proto.Stream{
+			{
+				Id: "system/metrics-system.filesystem-default-system",
+				Source: requireNewStruct(t, map[string]any{
+					"metricsets": []any{"filesystem"},
+					"period":     "1m",
+				}),
+			},
+		},
+	}
+
+	streams, err := CreateInputsFromStreamsForReceiver(&rawExpected, "log", &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true, Tags: []string{"production", "team-payments"}})
+	require.NoError(t, err, "error in CreateInputsFromStreamsForReceiver")
+	reloadCfg, err := CreateReloadConfigFromInputs(streams)
+	require.NoError(t, err, "error in CreateReloadConfigFromInputs")
+	cfgMap := mapstr.M{}
+	err = reloadCfg[0].Config.Unpack(&cfgMap)
+	require.NoError(t, err, "error in unpack for config %#v", reloadCfg[0].Config)
+
+	// Actual checks
+	processorFields := map[string]any{
+		"add_agent_metadata.stream_id":             "system/metrics-system.filesystem-default-system",
+		"add_agent_metadata.data_stream.dataset":   "generic",
+		"add_agent_metadata.data_stream.namespace": "default",
+		"add_agent_metadata.data_stream.type":      "log",
+		"add_agent_metadata.input_id":              "system/metrics-system-default-system",
+		"add_agent_metadata.elastic_agent.id":      "beat-ID",
+		"add_agent_metadata.tags":                  []any{"production", "team-payments"},
 	}
 	findFieldsInProcessors(t, processorFields, cfgMap)
 }
@@ -87,6 +127,60 @@ func TestGlobalProcessInject(t *testing.T) {
 		"add_fields.target":              "orchestrator",
 	}
 	findFieldsInProcessors(t, processorFields, cfgMap)
+}
+
+func TestGlobalProcessorsInjectedOnceForSimpleConfig(t *testing.T) {
+	addTags := map[string]any{"add_tags": map[string]any{"tags": []any{"global"}}}
+	raw := &proto.UnitExpectedConfig{
+		Id:   "filestream-1",
+		Type: "filestream",
+		Source: requireNewStruct(t, map[string]any{
+			"type":       "filestream",
+			"paths":      []any{"/tmp/*.log"},
+			"processors": []any{addTags},
+		}),
+	}
+	agentInfo := &client.AgentInfo{ID: "beat-ID", Version: "8.0.0"}
+
+	cases := map[string]struct {
+		create func() ([]map[string]any, error)
+		want   []any
+	}{
+		"CreateInputsFromStreams": {
+			create: func() ([]map[string]any, error) {
+				return CreateInputsFromStreams(raw, "logs", agentInfo)
+			},
+			want: []any{
+				mapstr.M{"add_fields": mapstr.M{"fields": mapstr.M{"input_id": "filestream-1"}, "target": "@metadata"}},
+				mapstr.M{"add_fields": mapstr.M{"fields": mapstr.M{"dataset": "generic", "namespace": "default", "type": "logs"}, "target": "data_stream"}},
+				mapstr.M{"add_fields": mapstr.M{"fields": mapstr.M{"dataset": "generic"}, "target": "event"}},
+				mapstr.M{"add_fields": mapstr.M{"fields": mapstr.M{"id": "beat-ID", "snapshot": false, "version": "8.0.0"}, "target": "elastic_agent"}},
+				mapstr.M{"add_fields": mapstr.M{"fields": mapstr.M{"id": "beat-ID"}, "target": "agent"}},
+				addTags,
+			},
+		},
+		"CreateInputsFromStreamsForReceiver": {
+			create: func() ([]map[string]any, error) {
+				return CreateInputsFromStreamsForReceiver(raw, "logs", agentInfo)
+			},
+			want: []any{
+				mapstr.M{"add_agent_metadata": mapstr.M{
+					"data_stream":   mapstr.M{"dataset": "generic", "namespace": "default", "type": "logs"},
+					"elastic_agent": mapstr.M{"id": "beat-ID", "snapshot": false, "version": "8.0.0"},
+					"input_id":      "filestream-1",
+				}},
+				addTags,
+			},
+		},
+	}
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			inputs, err := tc.create()
+			require.NoError(t, err)
+			require.Len(t, inputs, 1)
+			assert.Equal(t, tc.want, inputs[0]["processors"])
+		})
+	}
 }
 
 func TestIndexPrecedence(t *testing.T) {
@@ -248,7 +342,7 @@ func TestOutputIndex(t *testing.T) {
 
 }
 
-func requireNewStruct(t *testing.T, v map[string]any) *structpb.Struct {
+func requireNewStruct(t testing.TB, v map[string]any) *structpb.Struct {
 	str, err := structpb.NewStruct(v)
 	if err != nil {
 		require.NoError(t, err)
@@ -260,7 +354,7 @@ func findFieldsInProcessors(t *testing.T, configFields map[string]any, cfgMap ma
 	for key, val := range configFields {
 		gotKey := false
 		gotVal := false
-		errStr := ""
+		var got any
 		procList, ok := cfgMap["processors"].([]any)
 		require.True(t, ok, "must be a list of objects")
 		for _, proc := range procList {
@@ -273,18 +367,16 @@ func findFieldsInProcessors(t *testing.T, configFields map[string]any, cfgMap ma
 				if val == nil {
 					gotVal = true
 				} else {
-					if val == found {
+					if assert.ObjectsAreEqual(val, found) {
 						gotVal = true
 					} else {
-						s, ok := found.(string)
-						require.True(t, ok, "must be a string")
-						errStr = s
+						got = found
 					}
 				}
 			}
 		}
 		assert.True(t, gotKey, "did not find key for %s", key)
-		assert.True(t, gotVal, "got incorrect key for %s, expected %s, got %s", key, val, errStr)
+		assert.True(t, gotVal, "got incorrect value for %s, expected %v, got %v", key, val, got)
 	}
 }
 
@@ -454,4 +546,38 @@ func buildConfigMap(t *testing.T, unitRaw *proto.UnitExpectedConfig, agentInfo *
 	err = reloadCfg[0].Config.Unpack(&cfgMap)
 	require.NoError(t, err, "error in unpack for config %#v", reloadCfg[0].Config)
 	return cfgMap
+}
+
+// BenchmarkInjectGlobalProcessors injects the global processors into every
+// stream of a unit, the cost per stream must not grow with the stream count.
+func BenchmarkInjectGlobalProcessors(b *testing.B) {
+	for _, streams := range []int{500, 2000, 8000} {
+		b.Run(strconv.Itoa(streams), func(b *testing.B) {
+			protoStreams := make([]*proto.Stream, streams)
+			for i := range protoStreams {
+				protoStreams[i] = &proto.Stream{
+					Id:     "stream-" + strconv.Itoa(i),
+					Source: requireNewStruct(b, map[string]any{"period": "1m"}),
+				}
+			}
+			// The source of the unit holds every stream.
+			streamList := make([]any, streams)
+			for i := range streamList {
+				streamList[i] = map[string]any{"id": "stream-" + strconv.Itoa(i), "period": "1m"}
+			}
+			expected := &proto.UnitExpectedConfig{
+				Streams: protoStreams,
+				Source: requireNewStruct(b, map[string]any{
+					"processors": []any{map[string]any{"add_fields": map[string]any{"target": "orchestrator"}}},
+					"streams":    streamList,
+				}),
+			}
+
+			for b.Loop() {
+				for range streams {
+					injectGlobalProcesssors(expected, map[string]any{"period": "1m"})
+				}
+			}
+		})
+	}
 }

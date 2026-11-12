@@ -15,7 +15,7 @@ import (
 
 	fbint "github.com/elastic/beats/v7/filebeat/testing/integration"
 	lbint "github.com/elastic/beats/v7/libbeat/testing/integration"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func TestWinInputs(t *testing.T) {

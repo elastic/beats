@@ -25,10 +25,10 @@ import (
 	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/version"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // diagnosticHandler is a wrapper type that's a bit of a hack, the compiler won't let us send the raw unit struct,
@@ -107,6 +107,9 @@ type BeatV2Manager struct {
 
 	// set with the last applied input configs
 	lastInputCfgs map[string]*proto.UnitExpectedConfig
+
+	// set with the agent info of the last applied input configs
+	lastAgentInfo *client.AgentInfo
 
 	// set with the last applied APM config
 	lastAPMCfg *proto.APMConfig
@@ -241,11 +244,10 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 // ================================
 
 func (cm *BeatV2Manager) AgentInfo() lbmanagement.AgentInfo {
-	if cm.client.AgentInfo() == nil {
+	info := cm.client.AgentInfo()
+	if info == nil {
 		return lbmanagement.AgentInfo{}
 	}
-
-	info := *cm.client.AgentInfo()
 
 	return lbmanagement.AgentInfo{
 		ID:           info.ID,
@@ -253,6 +255,7 @@ func (cm *BeatV2Manager) AgentInfo() lbmanagement.AgentInfo {
 		Snapshot:     info.Snapshot,
 		ManagedMode:  lbmanagement.AgentManagedMode(info.ManagedMode),
 		Unprivileged: info.Unprivileged,
+		Tags:         info.Tags,
 	}
 }
 
@@ -275,6 +278,11 @@ func (cm *BeatV2Manager) UpdateStatus(status status.Status, msg string) {
 
 // Enabled returns true if config management is enabled.
 func (cm *BeatV2Manager) Enabled() bool {
+	return cm.config.Enabled
+}
+
+// ConfigFromControlProtocol returns true if beat is running in process mode inside elastic-agent.
+func (cm *BeatV2Manager) ConfigFromControlProtocol() bool {
 	return cm.config.Enabled
 }
 
@@ -915,7 +923,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 		inputBeatCfgs = append(inputBeatCfgs, inputCfg...)
 	}
 
-	if !didChange(cm.lastInputCfgs, inputCfgs) && !cm.forceReload {
+	if !didChange(cm.lastInputCfgs, inputCfgs) && cm.lastAgentInfo.Equal(agentInfo) && !cm.forceReload {
 		cm.logger.Debug("Skipped reloading input units; configuration didn't change")
 		return nil
 	}
@@ -975,6 +983,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 	}
 
 	cm.lastInputCfgs = inputCfgs
+	cm.lastAgentInfo = agentInfo
 	cm.lastBeatInputCfgs = inputBeatCfgs
 	return nil
 }

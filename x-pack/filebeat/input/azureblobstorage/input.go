@@ -19,8 +19,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 type azurebsInput struct {
@@ -91,7 +91,7 @@ func configure(cfg *conf.C, logger *logp.Logger) ([]cursor.Source, cursor.Input,
 	var urL string
 	if len(config.StorageURL) != 0 {
 		if _, err := url.ParseRequestURI(config.StorageURL); err != nil {
-			return nil, nil, fmt.Errorf("error parsing url : %w", err)
+			return nil, nil, fmt.Errorf("error parsing url: %w", err)
 		}
 		urL = config.StorageURL
 	} else {

@@ -38,7 +38,7 @@
                   description: An operation type that distinguishes the actual message.
                 - name: length
                   type: long
-                  description: A integer representing the length of the body of the frame (a frame is limited to 256MB in length).
+                  description: An integer representing the length of the body of the frame (a frame is limited to 256MB in length).
             - name: query
               type: keyword
               description: The CQL query which client send to cassandra.
@@ -65,7 +65,7 @@
                   description: An operation type that distinguishes the actual message.
                 - name: length
                   type: long
-                  description: A integer representing the length of the body of the frame (a frame is limited to 256MB in length).
+                  description: An integer representing the length of the body of the frame (a frame is limited to 256MB in length).
 
 
             - name: result
@@ -247,7 +247,7 @@
 
             - name: error
               type: group
-              description: Indicates an error processing a request. The body of the message will be an  error code followed by a error message. Then, depending on the exception, more content may follow.
+              description: Indicates an error processing a request. The body of the message will be an error code followed by an error message. Then, depending on the exception, more content may follow.
               fields:
                 - name: code
                   type: long

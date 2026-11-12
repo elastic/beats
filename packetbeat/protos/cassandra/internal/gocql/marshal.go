@@ -28,7 +28,7 @@ import (
 
 	"gopkg.in/inf.v0"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // TypeInfo describes a Cassandra specific data type.
@@ -346,6 +346,7 @@ const (
 	protoVersion4      = 0x04
 
 	maxFrameSize = 256 * 1024 * 1024
+	maxPkeyCount = 1 << 16
 )
 
 type protoVersion byte

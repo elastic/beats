@@ -20,8 +20,8 @@ package schema
 import (
 	"errors"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // Schema describes how a map[string]interface{} object can be parsed and converted into

@@ -21,7 +21,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
@@ -48,7 +48,7 @@ var RootCmd *cmd.BeatsRootCmd
 // ShowCmd to display extra information.
 var ShowCmd = &cobra.Command{
 	Use:   "show",
-	Short: "Show modules information",
+	Short: "Show module information",
 }
 
 // withECSVersion is a modifier that adds ecs.version to events.

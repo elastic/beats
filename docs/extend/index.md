@@ -24,18 +24,18 @@ In the pull request, describe what your changes do and mention any bugs/issues r
 
 ## Setting Up Your Dev Environment [setting-up-dev-environment]
 
-The Beats are Go programs, so install the 1.22.10 version of [Go](http://golang.org/) which is being used for Beats development.
+The Beats are Go programs, so install the version of [Go](http://golang.org/) which is being used for Beats development. That version is pinned in [`.go-version`](https://github.com/elastic/beats/blob/main/.go-version) at the root of the repository, which is also what CI installs.
 
 After [installing Go](https://golang.org/doc/install), set the [GOPATH](https://golang.org/doc/code.md#GOPATH) environment variable to point to your workspace location, and make sure `$GOPATH/bin` is in your PATH.
 
 ::::{note}
-One deterministic manner to install the proper Go version to work with Beats is to use the [GVM](https://github.com/andrewkroh/gvm) Go version manager. An example for Mac users would be:
+One deterministic manner to install the proper Go version to work with Beats is to use the [GVM](https://github.com/andrewkroh/gvm) Go version manager. Run it from the root of your Beats clone so that it picks up the pinned version. An example for Mac users would be:
 ::::
 
 
 ```shell
-gvm use 1.22.10
-eval $(gvm 1.22.10)
+gvm use $(cat .go-version)
+eval $(gvm $(cat .go-version))
 ```
 
 Then you can clone Beats git repository:

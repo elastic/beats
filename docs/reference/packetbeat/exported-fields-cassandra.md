@@ -61,7 +61,7 @@ Cassandra request headers.
 
 
 **`cassandra.request.headers.length`**
-:   A integer representing the length of the body of the frame (a frame is limited to 256MB in length).
+:   An integer representing the length of the body of the frame (a frame is limited to 256MB in length).
 
     type: long
 
@@ -105,7 +105,7 @@ Cassandra response headers, the structure is as same as request's header.
 
 
 **`cassandra.response.headers.length`**
-:   A integer representing the length of the body of the frame (a frame is limited to 256MB in length).
+:   An integer representing the length of the body of the frame (a frame is limited to 256MB in length).
 
     type: long
 
@@ -410,7 +410,7 @@ The events details related to schema change.
 
 ## error [_error]
 
-Indicates an error processing a request. The body of the message will be an  error code followed by a error message. Then, depending on the exception, more content may follow.
+Indicates an error processing a request. The body of the message will be an error code followed by an error message. Then, depending on the exception, more content may follow.
 
 **`cassandra.response.error.code`**
 :   The error code of the Cassandra response.
