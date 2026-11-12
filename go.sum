@@ -2,15 +2,8 @@ al.essio.dev/pkg/shellescape v1.5.1 h1:86HrALUujYS/h+GtqoB26SBEdkWfmMI6FubjXlsXy
 al.essio.dev/pkg/shellescape v1.5.1/go.mod h1:6sIqp7X2P6mThCQ7twERpZTuigpr6KbZWtls1U8I890=
 aqwari.net/xml v0.0.0-20210331023308-d9421b293817 h1:+3Rh5EaTzNLnzWx3/uy/mAaH/dGI7svJ6e0oOIDcPuE=
 aqwari.net/xml v0.0.0-20210331023308-d9421b293817/go.mod h1:c7kkWzc7HS/t8Q2DcVY8P2d1dyWNEhEVT5pL0ZHO11c=
-<<<<<<< HEAD
-cel.dev/expr v0.25.2 h1:K6j46C81hXtZQfuX60cVWQFBJahKSE2gfRbNuvr5bFs=
-cel.dev/expr v0.25.2/go.mod h1:hrXvqGP6G6gyx8UAHSHJ5RGk//1Oj5nXQ2NI02Nrsg4=
-=======
-cel.dev/cel-go v0.32.0 h1:irvpFKr5EuGPyxeME03ERh0rii1TX+BDAnB9eL3IvNk=
-cel.dev/cel-go v0.32.0/go.mod h1:DnVip7tpJSsgZymwfT+m1tnEVy3ivAjSMXPx12YrMkU=
 cel.dev/expr v0.25.3 h1:A2jO8jwOugrrovveCWfj0KEZOfqiLgAcwjpHPhzIGw0=
 cel.dev/expr v0.25.3/go.mod h1:hrXvqGP6G6gyx8UAHSHJ5RGk//1Oj5nXQ2NI02Nrsg4=
->>>>>>> 65bae9e (chore(deps): update OTel Collector dependencies from 0.164.x to 0.165.x (#54611))
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.123.0 h1:2NAUJwPR47q+E35uaJeYoNhuNEM9kM8SjgRgdeOJUSE=
@@ -202,45 +195,24 @@ github.com/aws/aws-sdk-go-v2 v1.47.5 h1:5yA+A+BiXbDq1ZLbYwPViwhEGDMdR0MEhL8Jh2Ln
 github.com/aws/aws-sdk-go-v2 v1.47.5/go.mod h1:iNIkogrRvFwm+1OQIUOP2lPBtlXZboOIUWiCa+pHEMw=
 github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.22 h1:oiEmPz/YMMeh/JvAE8xSxNCIsvWE6lpFe4ZPlyFykQI=
 github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.22/go.mod h1:QWUDuRi9PFjBHIU2iH1Pkldbe7zqLfXJC4wWLbF8nuQ=
-<<<<<<< HEAD
-github.com/aws/aws-sdk-go-v2/config v1.33.9 h1:Hv6bcQUJVnmuWaKjqD6Ot8sE75NrWsWV20oGT5aWle0=
-github.com/aws/aws-sdk-go-v2/config v1.33.9/go.mod h1:ivowmrZNfBQLcg4QkaItgi5wae4Bzot9RzIdbY1hfTg=
-github.com/aws/aws-sdk-go-v2/credentials v1.20.9 h1:SNO55PnWhaDafsOcv16lCA0kdoFMl/YlegWoVsU02s0=
-github.com/aws/aws-sdk-go-v2/credentials v1.20.9/go.mod h1:+2reOTRtdD3VSBqpRDNwrZIYy8yMCYa7oK3WKTJ/I1I=
-github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.20.3 h1:gr3b87OLB29jymWPzp/CAyXwQRJVE+sC4Wm0qBIKHsk=
-github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.20.3/go.mod h1:BRjf4L/Yx2hY54o+ZibPbLJyMMeSwqYQXwcJfqW66a8=
-github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.23.10 h1:OYuXRtpSLUZA6TrtqfU42xi1zTS8uCpQlTode7VhDjE=
-github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.23.10/go.mod h1:rWXRqN139C+pJzsA88pZRee5NBB1FqcDIo7dG9NlX48=
-github.com/aws/aws-sdk-go-v2/internal/configsources v1.5.6 h1:CqL8NN3p4I0JTwwV5MEoatIl4Y2amZ2X9dRD+0hbRL0=
-github.com/aws/aws-sdk-go-v2/internal/configsources v1.5.6/go.mod h1:exdJ32hMqXl0Wyo6NwqEC5yIhtua3+PDaKE8P29m4qE=
-github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.8.6 h1:FpBq24TG6WVSObTNhQOv7Q0088rounUUlwn3zlNItkM=
-github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.8.6/go.mod h1:ONzdPVYC95oBOu0VWNEsKEntcoemP3xVKjT+qWml1s4=
-github.com/aws/aws-sdk-go-v2/internal/v4a v1.5.6 h1:Qmn60RWuk9+bd2ddvJJqwf3Cpac3VvGMOdbGemtUhX4=
-github.com/aws/aws-sdk-go-v2/internal/v4a v1.5.6/go.mod h1:h/YJhe4AVyQxEUMluph10iqV7mjajH7A9L+BHF5ppis=
-github.com/aws/aws-sdk-go-v2/service/apigateway v1.50.0 h1:qqmEcIHue+Qj2+JpmbJiBaBuTD6/m5VazEAXj2lxtpI=
-github.com/aws/aws-sdk-go-v2/service/apigateway v1.50.0/go.mod h1:vohdhhN7O8YZl/zdlHuso9wV8Z3PRLlF98asxJAVVds=
-github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.44.0 h1:+PUmMN8TCOMwE5sk/fblfq9rBDhFpcS0tVub1jEifmU=
-github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.44.0/go.mod h1:gy2IdCAIthzCjcS6WsPsW2GD+64llLAC3d3XOIH8p7g=
-=======
 github.com/aws/aws-sdk-go-v2/config v1.33.13 h1:u52x6ISQOx172tpwM0VRxhJzEsTJYpMcEYUGM2A1wrw=
 github.com/aws/aws-sdk-go-v2/config v1.33.13/go.mod h1:/ixtz6XPHb42zekjQ0LqD9XjTpTysNWhIGwufY1OzI4=
 github.com/aws/aws-sdk-go-v2/credentials v1.20.13 h1:j4z41OtspmQ3ftQycaDunJ26b69a9SHfaSVUPqgRv8k=
 github.com/aws/aws-sdk-go-v2/credentials v1.20.13/go.mod h1:SgPA1oS3b+dlMxZb618jDmGNscpXSCaxz15igS52OlE=
 github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.20.5 h1:iXjy2SFhGYNB1jWZBhQqq8HbhsbPF23w+/zbMvPXsTg=
 github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.20.5/go.mod h1:k0RUiBnyXU0AXRJ9tJmY2jQke6XUIX2PNVnWtvgaPtc=
-github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.23.14 h1:nX4dV32e7e2GSg60GojffG61w4tvYxVpvEGWfSlcImo=
-github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.23.14/go.mod h1:dNw78YbA0ylhEVJ1h84fPdtIiWkVTaszT7oHkE/cq5E=
+github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.23.10 h1:OYuXRtpSLUZA6TrtqfU42xi1zTS8uCpQlTode7VhDjE=
+github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.23.10/go.mod h1:rWXRqN139C+pJzsA88pZRee5NBB1FqcDIo7dG9NlX48=
 github.com/aws/aws-sdk-go-v2/internal/configsources v1.5.8 h1:gzIWc3DTPfPbWKrQnmL6BV6WD7NPD1htxzgdk/bQ/Z4=
 github.com/aws/aws-sdk-go-v2/internal/configsources v1.5.8/go.mod h1:vvUA5cDAZWGo4R14FZPZfXfJCmgsafOWEq78Kg0D+ug=
 github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.8.8 h1:PWv+vG8aCLS8qd+HPdYhK7Vees90aKHWFFQ1AGYD/8E=
 github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.8.8/go.mod h1:xxPZEpflYHJA12366ZGyq66z9dHPCoeCIu99Jck+MPw=
 github.com/aws/aws-sdk-go-v2/internal/v4a v1.5.8 h1:WOp5De9iWdEHDPh2Kb0tBP3vGBm/dVAuRGh4a4tqduo=
 github.com/aws/aws-sdk-go-v2/internal/v4a v1.5.8/go.mod h1:z8W8YgfhbWl62XqcTtK+CxPrE+iHGRVUOtrrbIOp7ZY=
-github.com/aws/aws-sdk-go-v2/service/apigateway v1.52.1 h1:HS9Q/6aYTyP8jcXWyfB/b1niWvoLKBXtQOFl3YoH0wQ=
-github.com/aws/aws-sdk-go-v2/service/apigateway v1.52.1/go.mod h1:cUXC0iIPmclKz17McBbA4J6bKj5oLDO9BrtBfIwB1y0=
-github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.46.1 h1:dUbC1GsDJpyZK+p+AnzBdkihCkQ/oxZyUXjZIpMkHCk=
-github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.46.1/go.mod h1:tRcyrZcVgmh2kmIEb7na8EZUz/vdtjxUIeKN8RBpUhE=
->>>>>>> 65bae9e (chore(deps): update OTel Collector dependencies from 0.164.x to 0.165.x (#54611))
+github.com/aws/aws-sdk-go-v2/service/apigateway v1.50.0 h1:qqmEcIHue+Qj2+JpmbJiBaBuTD6/m5VazEAXj2lxtpI=
+github.com/aws/aws-sdk-go-v2/service/apigateway v1.50.0/go.mod h1:vohdhhN7O8YZl/zdlHuso9wV8Z3PRLlF98asxJAVVds=
+github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.44.0 h1:+PUmMN8TCOMwE5sk/fblfq9rBDhFpcS0tVub1jEifmU=
+github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.44.0/go.mod h1:gy2IdCAIthzCjcS6WsPsW2GD+64llLAC3d3XOIH8p7g=
 github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.73.3 h1:VmR1+YQW2vc3Sy2fLGSFtijUq9bAOMzzFxNC1zmHiA0=
 github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.73.3/go.mod h1:Q6H59zrEAgECYo4bjSh3IAvr+A+KklmThMoZjqnXbHY=
 github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.89.3 h1:Ko7t4Gcbo6KG3EHz+aE7mNmkGeTnFOCweeqCM8v3k/o=
@@ -275,16 +247,6 @@ github.com/aws/aws-sdk-go-v2/service/signin v1.12.1 h1:WZLC+k/CZx11kZGQDqu9mpA8y
 github.com/aws/aws-sdk-go-v2/service/signin v1.12.1/go.mod h1:wxAk0D2oVBSjuXEIzvcKxTZfM90zticdAbh/VD42L0Y=
 github.com/aws/aws-sdk-go-v2/service/sqs v1.52.4 h1:D+Zmdt3T3P770MrqTmZvalbj6ADO7xA7n+qnNakGvrI=
 github.com/aws/aws-sdk-go-v2/service/sqs v1.52.4/go.mod h1:dUYH3ia3qEO5ogaWDLp2tjtb4u4Y9xRbae7tOr1ClIA=
-<<<<<<< HEAD
-github.com/aws/aws-sdk-go-v2/service/sso v1.38.4 h1:ChCtagixSFOxltv0o6E3NT8F7ksvZtZGPwUBynO5Nmk=
-github.com/aws/aws-sdk-go-v2/service/sso v1.38.4/go.mod h1:+FEO9jrVMpc9oN3CdAxJbtlQEu3z8UddDPSedpeM3PY=
-github.com/aws/aws-sdk-go-v2/service/ssooidc v1.43.4 h1:j6c+HA4AoS0EBEjArPjavFEBrucJEryfrQU0TffmACk=
-github.com/aws/aws-sdk-go-v2/service/ssooidc v1.43.4/go.mod h1:RhghaXUk9q66VtOQUX1FdPddQuHnqQZzbB0fEYXmPRA=
-github.com/aws/aws-sdk-go-v2/service/sts v1.51.4 h1:OKEfbf2tcfsF2pBk/S9QqNpo6alaAtiBs4hysCsBjPw=
-github.com/aws/aws-sdk-go-v2/service/sts v1.51.4/go.mod h1:mCd6qGo9b8hTtfjgsmNkFlzwjyce4owd7HDVFnCLXhM=
-github.com/aws/smithy-go v1.28.5 h1:OqbqKtzY9NUnr2yAe9+hiTdFb20tNaK/lI0PMOGXX9k=
-github.com/aws/smithy-go v1.28.5/go.mod h1:YE2RhdIuDbA5E5bTdciG9KrW3+TiEONeUWCqxX9i1Fc=
-=======
 github.com/aws/aws-sdk-go-v2/service/sso v1.39.1 h1:4VB/dnDo7pmXSLQMszSoBzWndENuc7mzwTpD6lQn77A=
 github.com/aws/aws-sdk-go-v2/service/sso v1.39.1/go.mod h1:UGsEYgWz4Gi+46vDQ5zkFLqUgJziyOE2SXjZjgmfmHc=
 github.com/aws/aws-sdk-go-v2/service/ssooidc v1.44.1 h1:w8yui2ZqdHmGwVBDGvazoIvKw/DnLENBLkYnN8q8iqo=
@@ -293,9 +255,6 @@ github.com/aws/aws-sdk-go-v2/service/sts v1.51.6 h1:BVjKrtRUtSYKztBCCfE1oAB+d3Vi
 github.com/aws/aws-sdk-go-v2/service/sts v1.51.6/go.mod h1:eSukFLeLkPMm+1OxDR+F0joauZdyBkF47Ow7MqjZiJw=
 github.com/aws/smithy-go v1.28.7 h1:h/n1SHrwVtaDYLz8mR1/Kq4Xh4RaFbFW7bOYckg9mfE=
 github.com/aws/smithy-go v1.28.7/go.mod h1:YE2RhdIuDbA5E5bTdciG9KrW3+TiEONeUWCqxX9i1Fc=
-github.com/beevik/ntp v1.4.3 h1:PlbTvE5NNy4QHmA4Mg57n7mcFTmr1W1j3gcK7L1lqho=
-github.com/beevik/ntp v1.4.3/go.mod h1:Unr8Zg+2dRn7d8bHFuehIMSvvUYssHMxW3Q5Nx4RW5Q=
->>>>>>> 65bae9e (chore(deps): update OTel Collector dependencies from 0.164.x to 0.165.x (#54611))
 github.com/benbjohnson/clock v1.3.0 h1:ip6w0uFQkncKQ979AypyG0ER7mqUSBdKLOgAle/AT8A=
 github.com/benbjohnson/clock v1.3.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
@@ -503,24 +462,15 @@ github.com/felixge/httpsnoop v1.1.0/go.mod h1:Zqxgdd+1Rkcz8euOqdr7lqgCRJztwr5hp9
 github.com/form3tech-oss/jwt-go v3.2.2+incompatible/go.mod h1:pbq4aXjuKjdthFRnoDwaVPLA+WlJuPGy+QneDUgJi2k=
 github.com/fortytw2/leaktest v1.3.0 h1:u8491cBMTQ8ft8aeV+adlcytMZylmA5nnwwkRZjI8vw=
 github.com/fortytw2/leaktest v1.3.0/go.mod h1:jDsjWgpAGjm2CA7WthBh/CdZYEPF31XHquHwclZch5g=
-<<<<<<< HEAD
-github.com/foxboron/go-tpm-keyfiles v0.0.0-20251226215517-609e4778396f h1:RJ+BDPLSHQO7cSjKBqjPJSbi1qfk9WcsjQDtZiw3dZw=
-github.com/foxboron/go-tpm-keyfiles v0.0.0-20251226215517-609e4778396f/go.mod h1:VHbbch/X4roIY22jL1s3qRbZhCiRIgUAF/PdSUcx2io=
+github.com/foxboron/go-tpm-keyfiles v0.0.0-20260902202739-8c9c2d1005f4 h1:zqtQvVnFZ71RsyDMNVAaWf4g2OVEDH5LDs26MZFHy7s=
+github.com/foxboron/go-tpm-keyfiles v0.0.0-20260902202739-8c9c2d1005f4/go.mod h1:wxFx38LbEL4RF0JH6PR3lf7ZJ6ZO0yQWQstLCTQQNjA=
 github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15 h1:nLPjjvpUAODOR6vY/7o0hBIk8iTr19Fvmf8aFx/kC7A=
 github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15/go.mod h1:tPg4cp4nseejPd+UKxtCVQ2hUxNTZ7qQZJa7CLriIeo=
 github.com/frankban/quicktest v1.14.6 h1:7Xjx+VpznH+oBnejlPUj8oUpdxnVs4f8XU8WnHkI4W8=
 github.com/frankban/quicktest v1.14.6/go.mod h1:4ptaffx2x8+WTWXmUCuVU6aPUX1/Mz7zb5vbUoiM6w0=
-github.com/fxamacker/cbor/v2 v2.9.2 h1:X4Ksno9+x3cz0TZv69ec1hxP/+tymuR8PXQJyDwfh78=
-github.com/fxamacker/cbor/v2 v2.9.2/go.mod h1:vM4b+DJCtHn+zz7h3FFp/hDAI9WNWCsZj23V5ytsSxQ=
-github.com/go-asn1-ber/asn1-ber v1.5.5/go.mod h1:hEBeB/ic+5LoWskz+yKT7vGhhPYkProFKoKdwZRWMe0=
-=======
-github.com/foxboron/go-tpm-keyfiles v0.0.0-20260902202739-8c9c2d1005f4 h1:zqtQvVnFZ71RsyDMNVAaWf4g2OVEDH5LDs26MZFHy7s=
-github.com/foxboron/go-tpm-keyfiles v0.0.0-20260902202739-8c9c2d1005f4/go.mod h1:wxFx38LbEL4RF0JH6PR3lf7ZJ6ZO0yQWQstLCTQQNjA=
-github.com/frankban/quicktest v1.14.6 h1:7Xjx+VpznH+oBnejlPUj8oUpdxnVs4f8XU8WnHkI4W8=
-github.com/frankban/quicktest v1.14.6/go.mod h1:4ptaffx2x8+WTWXmUCuVU6aPUX1/Mz7zb5vbUoiM6w0=
 github.com/fxamacker/cbor/v2 v2.9.4 h1:xwjVlxEMR3S605oUlgBjKLTTeGFciYPGYCtF/35LKGo=
 github.com/fxamacker/cbor/v2 v2.9.4/go.mod h1:vM4b+DJCtHn+zz7h3FFp/hDAI9WNWCsZj23V5ytsSxQ=
->>>>>>> 65bae9e (chore(deps): update OTel Collector dependencies from 0.164.x to 0.165.x (#54611))
+github.com/go-asn1-ber/asn1-ber v1.5.5/go.mod h1:hEBeB/ic+5LoWskz+yKT7vGhhPYkProFKoKdwZRWMe0=
 github.com/go-asn1-ber/asn1-ber v1.5.8-0.20250403174932-29230038a667 h1:BP4M0CvQ4S3TGls2FvczZtj5Re/2ZzkV9VwqPHH/3Bo=
 github.com/go-asn1-ber/asn1-ber v1.5.8-0.20250403174932-29230038a667/go.mod h1:hEBeB/ic+5LoWskz+yKT7vGhhPYkProFKoKdwZRWMe0=
 github.com/go-faker/faker/v4 v4.2.0 h1:dGebOupKwssrODV51E0zbMrv5e2gO9VWSLNC1WDCpWg=
@@ -588,15 +538,8 @@ github.com/go-sourcemap/sourcemap v2.1.2+incompatible/go.mod h1:F8jJfvm2KbVjc5Nq
 github.com/go-sql-driver/mysql v1.10.0 h1:Q+1LV8DkHJvSYAdR83XzuhDaTykuDx0l6fkXxoWCWfw=
 github.com/go-sql-driver/mysql v1.10.0/go.mod h1:M+cqaI7+xxXGG9swrdeUIoPG3Y3KCkF0pZej+SK+nWk=
 github.com/go-stack/stack v1.8.0/go.mod h1:v0f6uXyyMGvRgIKkXu+yp6POWl0qKG85gN/melR3HDY=
-<<<<<<< HEAD
-github.com/go-task/slim-sprig/v3 v3.0.0 h1:sUs3vkvUymDpBKi3qH1YSqBQk9+9D/8M2mN1vB6EwHI=
-github.com/go-task/slim-sprig/v3 v3.0.0/go.mod h1:W848ghGpv3Qj3dhTPRyJypKRiqCdHZiAzKg9hl15HA8=
-=======
 github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 h1:tfuBGBXKqDEevZMzYi5KSi8KkcZtzBcTgAUUtapy0OI=
 github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572/go.mod h1:9Pwr4B2jHnOSGXyyzV8ROjYa2ojvAY6HCGYYfMoC3Ls=
-github.com/go-test/deep v1.1.1 h1:0r/53hagsehfO4bzD2Pgr/+RgHqhmf+k1Bpse2cTu1U=
-github.com/go-test/deep v1.1.1/go.mod h1:5C2ZWiW0ErCdrYzpqxLbTX7MG14M9iiw8DgHncVwcsE=
->>>>>>> 65bae9e (chore(deps): update OTel Collector dependencies from 0.164.x to 0.165.x (#54611))
 github.com/go-viper/mapstructure/v2 v2.5.0 h1:vM5IJoUAy3d7zRSVtIwQgBj7BiWtMPfmPEgAXnvj1Ro=
 github.com/go-viper/mapstructure/v2 v2.5.0/go.mod h1:oJDH3BJKyqBA2TXFhDsKDGDTlndYOZ6rGS0BRZIxGhM=
 github.com/gobwas/glob v0.2.3 h1:A4xDbljILXROh+kObIiy5kIaPYD8e96x1tgBhUI5J+Y=
@@ -914,42 +857,12 @@ github.com/onsi/ginkgo v1.6.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+W
 github.com/onsi/ginkgo/v2 v2.16.0 h1:7q1w9frJDzninhXxjZd+Y/x54XNjG/UlRLIYPZafsPM=
 github.com/onsi/ginkgo/v2 v2.16.0/go.mod h1:llBI3WDLL9Z6taip6f33H76YcWtJv+7R3HigUjbIBOs=
 github.com/onsi/gomega v1.4.3/go.mod h1:ex+gbHU/CVuBBDIJjb2X0qEXbFg53c61hWP/1CpauHY=
-<<<<<<< HEAD
-github.com/onsi/gomega v1.38.2 h1:eZCjf2xjZAqe+LeWvKb5weQ+NcPwX84kqJ0cZNxok2A=
-github.com/onsi/gomega v1.38.2/go.mod h1:W2MJcYxRGV63b418Ai34Ud0hEdTVXq9NW9+Sx6uXf3k=
-github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.164.1 h1:oE0v7eTwjuVGAdgmPPc+WS2ku1dDOwurRiC4625ijiM=
-github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.164.1/go.mod h1:SUwd78Kulwi7Xzcfcn6ZpQbCrvGzTjV+L+bl8NGQnlg=
-github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.164.1 h1:P6/081QfS1o5veXofGmv6XL8nQBgsdN72g7NXa49JsM=
-github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.164.1/go.mod h1:hXrZX8g9stdCCV+Y2ZkgchWiIT8FSb2dy3PfEeajIF8=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.164.1 h1:5+44oST0peleWGUqVhqQA7ZhFt/nQkPA7ybk+Y+aaDw=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.164.1/go.mod h1:eLfC73/Pj5cz02QFvyQYzkZEw4/7gO8B4fEk+JavBtQ=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.164.1 h1:zB10y9j1xfHGCvKRj6WrDoS2GcPsGVF1I7D2J3w2FJE=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.164.1/go.mod h1:UZK0fRcijPLciVYGNeYY/P3jyIA0hp0uWH1BQqzWNQU=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/kafka v0.164.1 h1:bVfVu6hz2c3o+nKV7oQURlFWjWzQPDnN1VREoPCupLA=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/kafka v0.164.1/go.mod h1:AnYgUp7jyljAonDp3v0CsEbYSfbKbIdll85vx/YwrLQ=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/batchpersignal v0.164.1 h1:ZnV+ybXoTX+jPWDl9+X/qhZJPmYHkiIo5Itlg4NWWL8=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/batchpersignal v0.164.1/go.mod h1:GEnxSUNU2Jf3yazettCyS68P4RlWcNGJpGFmvQHt9II=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/core/xidutils v0.164.1 h1:koJl0nLLf/4vZQePVbg/XMecHXQTWw1ZyXBcgeE5hv4=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/core/xidutils v0.164.1/go.mod h1:FoK7g1853Na1EWcA8+MvCuscGWxgN0gbvx0tVDvKl0A=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/kafka/configkafka v0.164.1 h1:jHQbDSrGEyO9i4/kbe3vr1L1QkcSk+GO2NtzI5vjlyQ=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/kafka/configkafka v0.164.1/go.mod h1:8SyrqzmgG02cknXvf8yOgCWhf+6xeaJiv9J+5IySepU=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/kafka/topic v0.164.1 h1:EBa1W5YbBcoVCsJucDpnJ0DOOme+qAY/lHOlGBGBtuw=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/kafka/topic v0.164.1/go.mod h1:5dBCwOfN6cYeWrCgcnUJFa0F4iF4IcqgBi+0w31tkk4=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/pdatatest v0.164.1 h1:Xmj/ptkrKnMGPaaWcLplVw0czXI1txV0VQW4LvIP+z0=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/pdatatest v0.164.1/go.mod h1:m35oPRTuzmdit0lfy0EzfAUlvnqpIZIyLBqm4rGQMPY=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/jaeger v0.164.1 h1:cmzoQ27s+aIQ8YzlN9D/+t90sYBCO+ccvu4+GrkHlrw=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/jaeger v0.164.1/go.mod h1:B/Rlv91guZXZKsZHvUDPaX0PqDUjNNLLgWYrm3GWGJ4=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/zipkin v0.164.1 h1:GOOzMkwowJvqJktCztvbA5uy4A9tVq+dDop3uqlpbmY=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/zipkin v0.164.1/go.mod h1:r5/4KZ3vqCYJdrZ+1T2lSblMxzYsER8j0UtO5+fyfLc=
-=======
 github.com/onsi/gomega v1.32.0 h1:JRYU78fJ1LPxlckP6Txi/EYqJvjtMrDC04/MM5XRHPk=
 github.com/onsi/gomega v1.32.0/go.mod h1:a4x4gW6Pz2yK1MAmvluYme5lvYTn61afQ2ETw/8n4Lg=
 github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.165.1 h1:3Lk2m/u+ssab7A8DL0RC9xxyhp+SQUpjE78+ImM07j4=
 github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.165.1/go.mod h1:eG1DgfNUE9FKAxXmIDbw95hflcitQFepDEzf+GTv8d4=
 github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.165.1 h1:asFki9ZI/w41ZQ/Yqr3vFWToEcbMmUwqhftQJ41pmo4=
 github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.165.1/go.mod h1:MIOPGk0GLPeCx6h2C/UGIUxAx2/jwhbMdZOrOqWoVM8=
-github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage v0.165.1 h1:ijwufg+zTaSZBzrcAx3r8oLm1lywj6tfJ8trTg37E4w=
-github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage v0.165.1/go.mod h1:GPMD8itkRYL4w39cU7Bx6+Ez4gt4zz0x8RldjvcVrcM=
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.165.1 h1:bNMJTnuIS+llNVQrwhMj0c6kd0hljNeiPMHmJfYYhDw=
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.165.1/go.mod h1:xgjaCv2AeoKdTW1TwaNiPB8aQO9U2Lxmbl1cJIIvQ00=
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.165.1 h1:SOoC7ntFrBwKN72W+snLCZ6d5qiUvdINKVlhdRvnstg=
@@ -970,7 +883,6 @@ github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/jaeger 
 github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/jaeger v0.165.1/go.mod h1:zlCoZSsM4dxJDBqY10c6WQW74/t9ad57bVCym3+0keA=
 github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/zipkin v0.165.1 h1:qWbdpdd1Vge46Jdnx2BQuR+LInKkrLDCVCwPxsGX2lc=
 github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/zipkin v0.165.1/go.mod h1:hFT320FRlDj0liTvIgQzUM3FcGIfj8eHkEBCbDr79CQ=
->>>>>>> 65bae9e (chore(deps): update OTel Collector dependencies from 0.164.x to 0.165.x (#54611))
 github.com/opencontainers/go-digest v1.0.0 h1:apOUWs51W5PlhuyGyz9FCeeBIOUDA/6nW8Oi/yOhh5U=
 github.com/opencontainers/go-digest v1.0.0/go.mod h1:0JzlMkj0TRzQZfJkVvzbP0HBR3IKzErnv2BNG4W4MAM=
 github.com/opencontainers/image-spec v1.1.1 h1:y0fUlFfIZhPF1W537XOLg0/fcx6zcHCJwooC2xJA040=
