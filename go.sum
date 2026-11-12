@@ -2,15 +2,8 @@ al.essio.dev/pkg/shellescape v1.5.1 h1:86HrALUujYS/h+GtqoB26SBEdkWfmMI6FubjXlsXy
 al.essio.dev/pkg/shellescape v1.5.1/go.mod h1:6sIqp7X2P6mThCQ7twERpZTuigpr6KbZWtls1U8I890=
 aqwari.net/xml v0.0.0-20210331023308-d9421b293817 h1:+3Rh5EaTzNLnzWx3/uy/mAaH/dGI7svJ6e0oOIDcPuE=
 aqwari.net/xml v0.0.0-20210331023308-d9421b293817/go.mod h1:c7kkWzc7HS/t8Q2DcVY8P2d1dyWNEhEVT5pL0ZHO11c=
-<<<<<<< HEAD
-cel.dev/expr v0.25.2 h1:K6j46C81hXtZQfuX60cVWQFBJahKSE2gfRbNuvr5bFs=
-cel.dev/expr v0.25.2/go.mod h1:hrXvqGP6G6gyx8UAHSHJ5RGk//1Oj5nXQ2NI02Nrsg4=
-=======
-cel.dev/cel-go v0.32.0 h1:irvpFKr5EuGPyxeME03ERh0rii1TX+BDAnB9eL3IvNk=
-cel.dev/cel-go v0.32.0/go.mod h1:DnVip7tpJSsgZymwfT+m1tnEVy3ivAjSMXPx12YrMkU=
 cel.dev/expr v0.25.3 h1:A2jO8jwOugrrovveCWfj0KEZOfqiLgAcwjpHPhzIGw0=
 cel.dev/expr v0.25.3/go.mod h1:hrXvqGP6G6gyx8UAHSHJ5RGk//1Oj5nXQ2NI02Nrsg4=
->>>>>>> 65bae9e (chore(deps): update OTel Collector dependencies from 0.164.x to 0.165.x (#54611))
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.123.0 h1:2NAUJwPR47q+E35uaJeYoNhuNEM9kM8SjgRgdeOJUSE=
@@ -482,14 +475,9 @@ github.com/foxboron/go-tpm-keyfiles v0.0.0-20260902202739-8c9c2d1005f4 h1:zqtQvV
 github.com/foxboron/go-tpm-keyfiles v0.0.0-20260902202739-8c9c2d1005f4/go.mod h1:wxFx38LbEL4RF0JH6PR3lf7ZJ6ZO0yQWQstLCTQQNjA=
 github.com/frankban/quicktest v1.14.6 h1:7Xjx+VpznH+oBnejlPUj8oUpdxnVs4f8XU8WnHkI4W8=
 github.com/frankban/quicktest v1.14.6/go.mod h1:4ptaffx2x8+WTWXmUCuVU6aPUX1/Mz7zb5vbUoiM6w0=
-<<<<<<< HEAD
-github.com/fxamacker/cbor/v2 v2.9.2 h1:X4Ksno9+x3cz0TZv69ec1hxP/+tymuR8PXQJyDwfh78=
-github.com/fxamacker/cbor/v2 v2.9.2/go.mod h1:vM4b+DJCtHn+zz7h3FFp/hDAI9WNWCsZj23V5ytsSxQ=
-github.com/go-asn1-ber/asn1-ber v1.5.5/go.mod h1:hEBeB/ic+5LoWskz+yKT7vGhhPYkProFKoKdwZRWMe0=
-=======
 github.com/fxamacker/cbor/v2 v2.9.4 h1:xwjVlxEMR3S605oUlgBjKLTTeGFciYPGYCtF/35LKGo=
 github.com/fxamacker/cbor/v2 v2.9.4/go.mod h1:vM4b+DJCtHn+zz7h3FFp/hDAI9WNWCsZj23V5ytsSxQ=
->>>>>>> 65bae9e (chore(deps): update OTel Collector dependencies from 0.164.x to 0.165.x (#54611))
+github.com/go-asn1-ber/asn1-ber v1.5.5/go.mod h1:hEBeB/ic+5LoWskz+yKT7vGhhPYkProFKoKdwZRWMe0=
 github.com/go-asn1-ber/asn1-ber v1.5.8-0.20250403174932-29230038a667 h1:BP4M0CvQ4S3TGls2FvczZtj5Re/2ZzkV9VwqPHH/3Bo=
 github.com/go-asn1-ber/asn1-ber v1.5.8-0.20250403174932-29230038a667/go.mod h1:hEBeB/ic+5LoWskz+yKT7vGhhPYkProFKoKdwZRWMe0=
 github.com/go-faker/faker/v4 v4.2.0 h1:dGebOupKwssrODV51E0zbMrv5e2gO9VWSLNC1WDCpWg=
@@ -557,15 +545,8 @@ github.com/go-sourcemap/sourcemap v2.1.2+incompatible/go.mod h1:F8jJfvm2KbVjc5Nq
 github.com/go-sql-driver/mysql v1.10.0 h1:Q+1LV8DkHJvSYAdR83XzuhDaTykuDx0l6fkXxoWCWfw=
 github.com/go-sql-driver/mysql v1.10.0/go.mod h1:M+cqaI7+xxXGG9swrdeUIoPG3Y3KCkF0pZej+SK+nWk=
 github.com/go-stack/stack v1.8.0/go.mod h1:v0f6uXyyMGvRgIKkXu+yp6POWl0qKG85gN/melR3HDY=
-<<<<<<< HEAD
-github.com/go-task/slim-sprig/v3 v3.0.0 h1:sUs3vkvUymDpBKi3qH1YSqBQk9+9D/8M2mN1vB6EwHI=
-github.com/go-task/slim-sprig/v3 v3.0.0/go.mod h1:W848ghGpv3Qj3dhTPRyJypKRiqCdHZiAzKg9hl15HA8=
-=======
 github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 h1:tfuBGBXKqDEevZMzYi5KSi8KkcZtzBcTgAUUtapy0OI=
 github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572/go.mod h1:9Pwr4B2jHnOSGXyyzV8ROjYa2ojvAY6HCGYYfMoC3Ls=
-github.com/go-test/deep v1.1.1 h1:0r/53hagsehfO4bzD2Pgr/+RgHqhmf+k1Bpse2cTu1U=
-github.com/go-test/deep v1.1.1/go.mod h1:5C2ZWiW0ErCdrYzpqxLbTX7MG14M9iiw8DgHncVwcsE=
->>>>>>> 65bae9e (chore(deps): update OTel Collector dependencies from 0.164.x to 0.165.x (#54611))
 github.com/go-viper/mapstructure/v2 v2.5.0 h1:vM5IJoUAy3d7zRSVtIwQgBj7BiWtMPfmPEgAXnvj1Ro=
 github.com/go-viper/mapstructure/v2 v2.5.0/go.mod h1:oJDH3BJKyqBA2TXFhDsKDGDTlndYOZ6rGS0BRZIxGhM=
 github.com/gobwas/glob v0.2.3 h1:A4xDbljILXROh+kObIiy5kIaPYD8e96x1tgBhUI5J+Y=
@@ -878,16 +859,9 @@ github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822/go.mod h1:+n7T8m
 github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=
 github.com/mwitkow/go-conntrack v0.0.0-20190716064945-2f068394615f h1:KUppIJq7/+SVif2QVs3tOP0zanoHgBEVAwHxUSIzRqU=
 github.com/mwitkow/go-conntrack v0.0.0-20190716064945-2f068394615f/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=
-<<<<<<< HEAD
-github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f h1:y5//uYreIhSUg3J1GEMiLbxo1LJaP8RfCpH6pymGZus=
-github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f/go.mod h1:ZdcZmHo+o7JKHSa8/e818NopupXU1YMK5fe1lsApnBw=
-github.com/oklog/ulid/v2 v2.1.1 h1:suPZ4ARWLOJLegGFiZZ1dFAkqzhMjL3J1TzI+5wHz8s=
-github.com/oklog/ulid/v2 v2.1.1/go.mod h1:rcEKHmBBKfef9DhnvX7y1HZBYxjXb0cP5ExxNsTT1QQ=
-github.com/olekukonko/tablewriter v0.0.0-20180912035003-be2c049b30cc/go.mod h1:vsDQFd/mU46D+Z4whnwzcISnGGzXWMclvtLoiIKAKIo=
-=======
 github.com/oklog/ulid/v2 v2.1.2 h1:IEclFb9JNvzYA6MW2SCxbLzcHTVsfqm3PrqGQJH5zec=
 github.com/oklog/ulid/v2 v2.1.2/go.mod h1:rcEKHmBBKfef9DhnvX7y1HZBYxjXb0cP5ExxNsTT1QQ=
->>>>>>> 65bae9e (chore(deps): update OTel Collector dependencies from 0.164.x to 0.165.x (#54611))
+github.com/olekukonko/tablewriter v0.0.0-20180912035003-be2c049b30cc/go.mod h1:vsDQFd/mU46D+Z4whnwzcISnGGzXWMclvtLoiIKAKIo=
 github.com/olekukonko/tablewriter v0.0.5 h1:P2Ga83D34wi1o9J6Wh1mRuqd4mF/x/lgBS7N7AbDhec=
 github.com/olekukonko/tablewriter v0.0.5/go.mod h1:hPp6KlRPjbx+hW8ykQs1w3UBbZlj6HuIJcUGPhkA7kY=
 github.com/onsi/ginkgo v1.6.0 h1:Ix8l273rp3QzYgXSR+c8d1fTG7UPgYkOSELPhiY/YGw=
@@ -895,42 +869,12 @@ github.com/onsi/ginkgo v1.6.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+W
 github.com/onsi/ginkgo/v2 v2.16.0 h1:7q1w9frJDzninhXxjZd+Y/x54XNjG/UlRLIYPZafsPM=
 github.com/onsi/ginkgo/v2 v2.16.0/go.mod h1:llBI3WDLL9Z6taip6f33H76YcWtJv+7R3HigUjbIBOs=
 github.com/onsi/gomega v1.4.3/go.mod h1:ex+gbHU/CVuBBDIJjb2X0qEXbFg53c61hWP/1CpauHY=
-<<<<<<< HEAD
-github.com/onsi/gomega v1.38.2 h1:eZCjf2xjZAqe+LeWvKb5weQ+NcPwX84kqJ0cZNxok2A=
-github.com/onsi/gomega v1.38.2/go.mod h1:W2MJcYxRGV63b418Ai34Ud0hEdTVXq9NW9+Sx6uXf3k=
-github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.164.1 h1:oE0v7eTwjuVGAdgmPPc+WS2ku1dDOwurRiC4625ijiM=
-github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.164.1/go.mod h1:SUwd78Kulwi7Xzcfcn6ZpQbCrvGzTjV+L+bl8NGQnlg=
-github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.164.1 h1:P6/081QfS1o5veXofGmv6XL8nQBgsdN72g7NXa49JsM=
-github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.164.1/go.mod h1:hXrZX8g9stdCCV+Y2ZkgchWiIT8FSb2dy3PfEeajIF8=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.164.1 h1:5+44oST0peleWGUqVhqQA7ZhFt/nQkPA7ybk+Y+aaDw=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.164.1/go.mod h1:eLfC73/Pj5cz02QFvyQYzkZEw4/7gO8B4fEk+JavBtQ=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.164.1 h1:zB10y9j1xfHGCvKRj6WrDoS2GcPsGVF1I7D2J3w2FJE=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.164.1/go.mod h1:UZK0fRcijPLciVYGNeYY/P3jyIA0hp0uWH1BQqzWNQU=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/kafka v0.164.1 h1:bVfVu6hz2c3o+nKV7oQURlFWjWzQPDnN1VREoPCupLA=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/kafka v0.164.1/go.mod h1:AnYgUp7jyljAonDp3v0CsEbYSfbKbIdll85vx/YwrLQ=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/batchpersignal v0.164.1 h1:ZnV+ybXoTX+jPWDl9+X/qhZJPmYHkiIo5Itlg4NWWL8=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/batchpersignal v0.164.1/go.mod h1:GEnxSUNU2Jf3yazettCyS68P4RlWcNGJpGFmvQHt9II=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/core/xidutils v0.164.1 h1:koJl0nLLf/4vZQePVbg/XMecHXQTWw1ZyXBcgeE5hv4=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/core/xidutils v0.164.1/go.mod h1:FoK7g1853Na1EWcA8+MvCuscGWxgN0gbvx0tVDvKl0A=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/kafka/configkafka v0.164.1 h1:jHQbDSrGEyO9i4/kbe3vr1L1QkcSk+GO2NtzI5vjlyQ=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/kafka/configkafka v0.164.1/go.mod h1:8SyrqzmgG02cknXvf8yOgCWhf+6xeaJiv9J+5IySepU=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/kafka/topic v0.164.1 h1:EBa1W5YbBcoVCsJucDpnJ0DOOme+qAY/lHOlGBGBtuw=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/kafka/topic v0.164.1/go.mod h1:5dBCwOfN6cYeWrCgcnUJFa0F4iF4IcqgBi+0w31tkk4=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/pdatatest v0.164.1 h1:Xmj/ptkrKnMGPaaWcLplVw0czXI1txV0VQW4LvIP+z0=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/pdatatest v0.164.1/go.mod h1:m35oPRTuzmdit0lfy0EzfAUlvnqpIZIyLBqm4rGQMPY=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/jaeger v0.164.1 h1:cmzoQ27s+aIQ8YzlN9D/+t90sYBCO+ccvu4+GrkHlrw=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/jaeger v0.164.1/go.mod h1:B/Rlv91guZXZKsZHvUDPaX0PqDUjNNLLgWYrm3GWGJ4=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/zipkin v0.164.1 h1:GOOzMkwowJvqJktCztvbA5uy4A9tVq+dDop3uqlpbmY=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/zipkin v0.164.1/go.mod h1:r5/4KZ3vqCYJdrZ+1T2lSblMxzYsER8j0UtO5+fyfLc=
-=======
 github.com/onsi/gomega v1.32.0 h1:JRYU78fJ1LPxlckP6Txi/EYqJvjtMrDC04/MM5XRHPk=
 github.com/onsi/gomega v1.32.0/go.mod h1:a4x4gW6Pz2yK1MAmvluYme5lvYTn61afQ2ETw/8n4Lg=
 github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.165.1 h1:3Lk2m/u+ssab7A8DL0RC9xxyhp+SQUpjE78+ImM07j4=
 github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.165.1/go.mod h1:eG1DgfNUE9FKAxXmIDbw95hflcitQFepDEzf+GTv8d4=
 github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.165.1 h1:asFki9ZI/w41ZQ/Yqr3vFWToEcbMmUwqhftQJ41pmo4=
 github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.165.1/go.mod h1:MIOPGk0GLPeCx6h2C/UGIUxAx2/jwhbMdZOrOqWoVM8=
-github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage v0.165.1 h1:ijwufg+zTaSZBzrcAx3r8oLm1lywj6tfJ8trTg37E4w=
-github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage v0.165.1/go.mod h1:GPMD8itkRYL4w39cU7Bx6+Ez4gt4zz0x8RldjvcVrcM=
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.165.1 h1:bNMJTnuIS+llNVQrwhMj0c6kd0hljNeiPMHmJfYYhDw=
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.165.1/go.mod h1:xgjaCv2AeoKdTW1TwaNiPB8aQO9U2Lxmbl1cJIIvQ00=
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.165.1 h1:SOoC7ntFrBwKN72W+snLCZ6d5qiUvdINKVlhdRvnstg=
@@ -951,7 +895,6 @@ github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/jaeger 
 github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/jaeger v0.165.1/go.mod h1:zlCoZSsM4dxJDBqY10c6WQW74/t9ad57bVCym3+0keA=
 github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/zipkin v0.165.1 h1:qWbdpdd1Vge46Jdnx2BQuR+LInKkrLDCVCwPxsGX2lc=
 github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/zipkin v0.165.1/go.mod h1:hFT320FRlDj0liTvIgQzUM3FcGIfj8eHkEBCbDr79CQ=
->>>>>>> 65bae9e (chore(deps): update OTel Collector dependencies from 0.164.x to 0.165.x (#54611))
 github.com/opencontainers/go-digest v1.0.0 h1:apOUWs51W5PlhuyGyz9FCeeBIOUDA/6nW8Oi/yOhh5U=
 github.com/opencontainers/go-digest v1.0.0/go.mod h1:0JzlMkj0TRzQZfJkVvzbP0HBR3IKzErnv2BNG4W4MAM=
 github.com/opencontainers/image-spec v1.1.1 h1:y0fUlFfIZhPF1W537XOLg0/fcx6zcHCJwooC2xJA040=
