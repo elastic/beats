@@ -11,11 +11,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"math"
 	"math/rand/v2"
 	"net"
 	"net/http"
 	"net/url"
+	"slices"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -61,11 +63,11 @@ type keepAlive struct {
 
 func (l *loggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	resp, err := l.rt.RoundTrip(req)
-	// avoided logging request and and response body as it may contain sensitive information and can be huge
+	// Avoid logging header values and request and response bodies as they may contain credentials, and the bodies can be huge.
 	if l.log.Core().Enabled(zapcore.DebugLevel) {
-		l.log.Debugf("request: %v %v\nHeaders: %v\n", req.Method, req.URL, req.Header)
+		l.log.Debugf("request: %v %v\nHeaders: %v\n", req.Method, req.URL, slices.Sorted(maps.Keys(req.Header)))
 		if err == nil {
-			l.log.Debugf("response: %v\nHeaders: %v\n", resp.Status, resp.Header)
+			l.log.Debugf("response: %v\nHeaders: %v\n", resp.Status, slices.Sorted(maps.Keys(resp.Header)))
 		}
 	}
 	return resp, err

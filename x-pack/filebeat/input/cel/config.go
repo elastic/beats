@@ -169,10 +169,17 @@ func defaultConfig() config {
 				WaitMin:     &waitMin,
 				WaitMax:     &waitMax,
 			},
+<<<<<<< HEAD
 			RedirectForwardHeaders:   false,
 			RedirectSensitiveHeaders: []string{"Authorization", "Proxy-Authorization", "Cookie"},
 			RedirectMaxRedirects:     10,
 			Transport:                transport,
+=======
+			RedirectFollow:         true,
+			RedirectForwardHeaders: false,
+			RedirectMaxRedirects:   10,
+			Transport:              transport,
+>>>>>>> f86f36b (x-pack/filebeat/input/{cel,httpjson,streaming,entityanalytics/provider/{okta,jamf}}: log header names only (#54493))
 		},
 	}
 }
