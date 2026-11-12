@@ -48,7 +48,7 @@ var RootCmd *cmd.BeatsRootCmd
 // ShowCmd to display extra information.
 var ShowCmd = &cobra.Command{
 	Use:   "show",
-	Short: "Show modules information",
+	Short: "Show module information",
 }
 
 // withECSVersion is a modifier that adds ecs.version to events.
