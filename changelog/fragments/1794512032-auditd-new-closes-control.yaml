@@ -1,0 +1,8 @@
+kind: bug-fix
+summary: Fix auditd module leaking a socket when it fails to create its data client.
+description: |
+  When the auditd module could not create its data client, for example because
+  the process had no file descriptors left, it returned an error without
+  closing the control client it had already created. That socket stayed open
+  for the life of the process. It is now closed.
+component: auditbeat
