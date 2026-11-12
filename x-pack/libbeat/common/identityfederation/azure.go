@@ -19,7 +19,12 @@ import (
 	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+
+	"github.com/elastic/beats/v7/pkg/logp"
 )
+
+// AzureWIIAudience is the audience Entra requires on federated client assertions.
+const AzureWIIAudience = "api://AzureADTokenExchange"
 
 // AzureParams configures the Azure client assertion credential flow.
 //
@@ -70,6 +75,104 @@ func AzureNewClientAssertionCredential(params AzureParams) (*azidentity.ClientAs
 	}
 
 	return azidentity.NewClientAssertionCredential(params.TenantID, params.ClientID, getAssertion, params.Options)
+}
+
+// AzureWIIParams configures the Azure client assertion credential flow with a
+// workload-identity-issuer token.
+//
+// Authentication chain:
+//  1. Fetch JWT from the workload-identity issuer via TokenSource on each token refresh
+//  2. ClientAssertionCredential(TenantID, ClientID, JWT) → Azure access token
+type AzureWIIParams struct {
+	// TenantID is the Azure Active Directory tenant ID.
+	TenantID string
+	// ClientID is the Azure application (client) ID.
+	ClientID string
+	// TokenSource fetches the JWT from the workload-identity issuer. Its audience must
+	// match the audience of the federated identity credential in the customer tenant.
+	TokenSource *WIITokenSource
+	// Options are passed directly to azidentity.NewClientAssertionCredential.
+	Options *azidentity.ClientAssertionCredentialOptions
+}
+
+func (p AzureWIIParams) validate() error {
+	var errs []error
+	if p.TenantID == "" {
+		errs = append(errs, errors.New("TenantID is required"))
+	}
+	if p.ClientID == "" {
+		errs = append(errs, errors.New("ClientID is required"))
+	}
+	if p.TokenSource == nil {
+		errs = append(errs, errors.New("TokenSource is required"))
+	}
+	if len(errs) > 0 {
+		return fmt.Errorf("invalid Azure identity federation params: %w", errors.Join(errs...))
+	}
+	return nil
+}
+
+// AzureNewWIIClientAssertionCredential creates an Azure credential that uses a JWT from
+// the workload-identity issuer as the client assertion. The token source caches the JWT
+// and refreshes it before it expires.
+func AzureNewWIIClientAssertionCredential(params AzureWIIParams) (*azidentity.ClientAssertionCredential, error) {
+	if err := params.validate(); err != nil {
+		return nil, err
+	}
+
+	tokenSource := params.TokenSource
+	getAssertion := func(ctx context.Context) (string, error) {
+		token, err := tokenSource.GetIdentityTokenContext(ctx)
+		if err != nil {
+			return "", err
+		}
+		return string(token), nil
+	}
+
+	return azidentity.NewClientAssertionCredential(params.TenantID, params.ClientID, getAssertion, params.Options)
+}
+
+// AzureNewCloudConnectorCredential creates the Azure credential for a cloud connector.
+//
+// The identity token source is selected from the environment:
+//   - WII path (WORKLOAD_IDENTITY_ISSUER_URL is set): the token is fetched from the
+//     workload-identity issuer over mTLS, using WORKLOAD_IDENTITY_SSL_CERT_FILE and
+//     WORKLOAD_IDENTITY_SSL_KEY_FILE.
+//   - Token file path (CLOUD_CONNECTORS_ID_TOKEN_FILE is set): the token is read
+//     from the file on each refresh.
+func AzureNewCloudConnectorCredential(tenantID, clientID string, options *azidentity.ClientAssertionCredentialOptions, logger *logp.Logger) (*azidentity.ClientAssertionCredential, error) {
+	if issuerURL := os.Getenv(WIIIssuerURLEnvVar); issuerURL != "" {
+		certFile := os.Getenv(WIISSLCertFileEnvVar)
+		keyFile := os.Getenv(WIISSLKeyFileEnvVar)
+		if certFile == "" || keyFile == "" {
+			return nil, fmt.Errorf("%s and %s are required when %s is set",
+				WIISSLCertFileEnvVar, WIISSLKeyFileEnvVar, WIIIssuerURLEnvVar)
+		}
+		tokenSource, err := NewWIITokenSource(issuerURL, certFile, keyFile, AzureWIIAudience, logger)
+		if err != nil {
+			return nil, fmt.Errorf("configuring WII token source: %w", err)
+		}
+		logger.Info("Using Azure identity federation with the workload-identity issuer")
+		return AzureNewWIIClientAssertionCredential(AzureWIIParams{
+			TenantID:    tenantID,
+			ClientID:    clientID,
+			TokenSource: tokenSource,
+			Options:     options,
+		})
+	}
+
+	if jwtFilePath := os.Getenv(CloudConnectorsIDTokenFileEnvVar); jwtFilePath != "" {
+		logger.Info("Using Azure identity federation with the cloud connectors token file")
+		return AzureNewClientAssertionCredential(AzureParams{
+			TenantID:    tenantID,
+			ClientID:    clientID,
+			JWTFilePath: jwtFilePath,
+			Options:     options,
+		})
+	}
+
+	return nil, fmt.Errorf("no identity token source configured (set %s or %s)",
+		WIIIssuerURLEnvVar, CloudConnectorsIDTokenFileEnvVar)
 }
 
 // AzureReadJWT reads and validates a JWT token from the given file path.

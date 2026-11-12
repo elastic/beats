@@ -25,7 +25,7 @@ import (
 // Environment variables set by the agentless-controller for Identity Federation.
 const (
 	AWSGlobalRoleARNEnvVar   = "CLOUD_CONNECTORS_GLOBAL_ROLE"
-	AWSIDTokenFileEnvVar     = "CLOUD_CONNECTORS_ID_TOKEN_FILE"
+	AWSIDTokenFileEnvVar     = CloudConnectorsIDTokenFileEnvVar
 	AWSCloudResourceIDEnvVar = "CLOUD_RESOURCE_ID"
 	// AWSIRSATokenFileEnvVar is the standard AWS SDK env var for IRSA (IAM Roles
 	// for Service Accounts) on EKS. When set, the pod authenticates via its

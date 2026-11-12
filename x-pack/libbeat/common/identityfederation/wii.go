@@ -19,7 +19,6 @@ import (
 	"net/url"
 	"os"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/pkg/logp"
@@ -54,7 +53,10 @@ type WIITokenSource struct {
 	audience      string
 	logger        *logp.Logger
 
-	mu           sync.Mutex
+	// refreshing holds one slot while the cache is read or refreshed. It is a
+	// channel rather than a mutex so that a waiting caller can give up when its
+	// context ends.
+	refreshing   chan struct{}
 	cachedToken  []byte
 	cachedExpiry time.Time
 }
@@ -70,6 +72,7 @@ func NewWIITokenSource(issuerURL, certFile, keyFile, audience string, logger *lo
 		keyFile:       keyFile,
 		audience:      audience,
 		logger:        logger.Named("wii"),
+		refreshing:    make(chan struct{}, 1),
 	}, nil
 }
 
@@ -97,15 +100,32 @@ func resolveWIITokenEndpoint(issuerURL string) (string, error) {
 }
 
 func (w *WIITokenSource) GetIdentityToken() ([]byte, error) {
-	w.mu.Lock()
-	defer w.mu.Unlock()
+	return w.GetIdentityTokenContext(context.Background())
+}
 
+// GetIdentityTokenContext returns a cached identity token or fetches a new one.
+// Canceling ctx interrupts the issuer request, any retry wait, and any wait for
+// another caller's refresh.
+func (w *WIITokenSource) GetIdentityTokenContext(ctx context.Context) ([]byte, error) {
+	select {
+	case w.refreshing <- struct{}{}:
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+	defer func() { <-w.refreshing }()
+
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	if w.cachedToken != nil && time.Now().Before(w.cachedExpiry.Add(-wiiRefreshBeforeExpiry)) {
 		return w.cachedToken, nil
 	}
 
-	token, expiresAt, err := w.fetchTokenWithRetry()
+	token, expiresAt, err := w.fetchTokenWithRetry(ctx)
 	if err != nil {
+		if ctxErr := ctx.Err(); ctxErr != nil {
+			return nil, ctxErr
+		}
 		// Fall back to the cached token if it has not yet hard-expired. The refresh
 		// will be retried on the next call.
 		if w.cachedToken != nil && time.Now().Before(w.cachedExpiry) {
@@ -137,13 +157,16 @@ func isRetryableWIIError(err error) bool {
 	return errors.As(err, &urlErr)
 }
 
-func (w *WIITokenSource) fetchTokenWithRetry() ([]byte, time.Time, error) {
+func (w *WIITokenSource) fetchTokenWithRetry(ctx context.Context) ([]byte, time.Time, error) {
 	var errs []error
 	delayBound := wiiRetryInitialDelay
 	for attempt := 1; ; attempt++ {
-		token, expiresAt, err := w.fetchToken()
+		token, expiresAt, err := w.fetchToken(ctx)
 		if err == nil {
 			return token, expiresAt, nil
+		}
+		if ctxErr := ctx.Err(); ctxErr != nil {
+			return nil, time.Time{}, ctxErr
 		}
 		errs = append(errs, err)
 		if attempt >= wiiRetryMaxAttempts || !isRetryableWIIError(err) {
@@ -151,12 +174,25 @@ func (w *WIITokenSource) fetchTokenWithRetry() ([]byte, time.Time, error) {
 				"fetching workload-identity token from %s (%d attempts): %w",
 				w.tokenEndpoint, attempt, errors.Join(errs...))
 		}
-		time.Sleep(rand.N(delayBound) + 1)
+		if err := waitForWIIRetry(ctx, rand.N(delayBound)+1); err != nil {
+			return nil, time.Time{}, err
+		}
 		delayBound = min(delayBound*2, wiiRetryMaxDelay)
 	}
 }
 
-func (w *WIITokenSource) fetchToken() ([]byte, time.Time, error) {
+func waitForWIIRetry(ctx context.Context, delay time.Duration) error {
+	timer := time.NewTimer(delay)
+	defer timer.Stop()
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-timer.C:
+		return nil
+	}
+}
+
+func (w *WIITokenSource) fetchToken(ctx context.Context) ([]byte, time.Time, error) {
 	tlsCfg := &tls.Config{
 		GetClientCertificate: func(*tls.CertificateRequestInfo) (*tls.Certificate, error) {
 			cert, err := tls.LoadX509KeyPair(w.certFile, w.keyFile)
@@ -194,7 +230,7 @@ func (w *WIITokenSource) fetchToken() ([]byte, time.Time, error) {
 	if err != nil {
 		return nil, time.Time{}, fmt.Errorf("encoding WII token request: %w", err)
 	}
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, w.tokenEndpoint, bytes.NewReader(body))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, w.tokenEndpoint, bytes.NewReader(body))
 	if err != nil {
 		return nil, time.Time{}, fmt.Errorf("creating WII token request: %w", err)
 	}
