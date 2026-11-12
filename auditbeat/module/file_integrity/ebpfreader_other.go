@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux && !(amd64 || arm64)
+//go:build linux && !((amd64 || arm64) && cgo)
 
 package file_integrity
 
