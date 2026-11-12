@@ -7,8 +7,14 @@ package cel
 import (
 	"net/http"
 	"net/url"
+<<<<<<< HEAD
+=======
+	"slices"
+	"strings"
+>>>>>>> f86f36b (x-pack/filebeat/input/{cel,httpjson,streaming,entityanalytics/provider/{okta,jamf}}: log header names only (#54493))
 	"testing"
 
+	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
@@ -114,6 +120,109 @@ func TestCheckRedirectSensitiveHeaders(t *testing.T) {
 	}
 }
 
+<<<<<<< HEAD
+=======
+func TestRedirectCrossHost(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "")
+
+	tests := []struct {
+		name             string
+		downloadHostname string // Hostname used for the redirect target; empty to use the API's.
+		forwardHeaders   bool
+		sensitiveHeaders []string
+		wantAuth         bool
+	}{
+		{
+			name:             "different_hostname_headers_not_forwarded",
+			downloadHostname: "localhost",
+			sensitiveHeaders: []string{"Authorization"},
+			wantAuth:         false,
+		},
+		{
+			name:             "different_hostname_forwarded_sensitive_stripped",
+			downloadHostname: "localhost",
+			forwardHeaders:   true,
+			sensitiveHeaders: []string{"Authorization"},
+			wantAuth:         false,
+		},
+		{
+			name:             "different_hostname_forwarded_no_sensitive_headers",
+			downloadHostname: "localhost",
+			forwardHeaders:   true,
+			sensitiveHeaders: []string{},
+			wantAuth:         true,
+		},
+		{
+			// The standard library compares hostnames without the port,
+			// so it does not strip headers when only the port differs.
+			name:             "same_hostname_different_port_headers_not_forwarded",
+			sensitiveHeaders: []string{"Authorization"},
+			wantAuth:         true,
+		},
+		{
+			// checkRedirect compares URL hosts including the port.
+			name:             "same_hostname_different_port_forwarded_sensitive_stripped",
+			forwardHeaders:   true,
+			sensitiveHeaders: []string{"Authorization"},
+			wantAuth:         false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			var gotAuth string
+			download := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				gotAuth = r.Header.Get("Authorization")
+				_, _ = w.Write([]byte("hello"))
+			}))
+			defer download.Close()
+
+			target := download.URL + "/file"
+			if test.downloadHostname != "" {
+				target = strings.Replace(target, "127.0.0.1", test.downloadHostname, 1)
+			}
+			api := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Location", target)
+				w.Header().Set("Content-Length", "2")
+				w.WriteHeader(http.StatusFound)
+				_, _ = w.Write([]byte("{}"))
+			}))
+			defer api.Close()
+
+			cfg := &ResourceConfig{
+				RedirectFollow:           true,
+				RedirectForwardHeaders:   test.forwardHeaders,
+				RedirectSensitiveHeaders: test.sensitiveHeaders,
+				RedirectMaxRedirects:     10,
+			}
+			client := &http.Client{CheckRedirect: checkRedirect(cfg, log)}
+
+			req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, api.URL, nil)
+			if err != nil {
+				t.Fatalf("failed to create request: %v", err)
+			}
+			req.Header.Set("Authorization", "Bearer secret")
+			resp, err := client.Do(req)
+			if err != nil {
+				t.Fatalf("request failed: %v", err)
+			}
+			defer resp.Body.Close()
+			body, err := io.ReadAll(resp.Body)
+			if err != nil {
+				t.Fatalf("failed to read body: %v", err)
+			}
+
+			if string(body) != "hello" {
+				t.Errorf("unexpected body: got:%q want:%q", body, "hello")
+			}
+			if gotAuth != "" != test.wantAuth {
+				t.Errorf("unexpected Authorization at download server: got:%q want present:%t", gotAuth, test.wantAuth)
+			}
+		})
+	}
+}
+
+>>>>>>> f86f36b (x-pack/filebeat/input/{cel,httpjson,streaming,entityanalytics/provider/{okta,jamf}}: log header names only (#54493))
 func check(t *testing.T, h http.Header, key string, wantPresent bool) {
 	t.Helper()
 	_, got := h[key]
@@ -133,4 +242,38 @@ func mustParseURL(t *testing.T, raw string) *url.URL {
 		t.Fatalf("failed to parse URL %q: %v", raw, err)
 	}
 	return u
+}
+
+func TestSensitiveHeadersConfig(t *testing.T) {
+	const base = "interval: 1m\nprogram: \"{}\"\nresource.url: http://example.com\n"
+	tests := []struct {
+		name string
+		yaml string
+		want []string
+	}{
+		{name: "unset_uses_defaults", yaml: "", want: []string{"Authorization", "Proxy-Authorization", "Cookie"}},
+		{name: "null_uses_defaults", yaml: "resource.redirect.sensitive_headers: ~\n", want: []string{"Authorization", "Proxy-Authorization", "Cookie"}},
+		{name: "empty_disables", yaml: "resource.redirect.sensitive_headers: []\n", want: []string{}},
+		{name: "custom_replaces_defaults", yaml: "resource.redirect.sensitive_headers: [X-Api-Key]\n", want: []string{"X-Api-Key"}},
+		{name: "longer_custom_replaces_defaults", yaml: "resource.redirect.sensitive_headers: [A, B, C, D]\n", want: []string{"A", "B", "C", "D"}},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			c := defaultConfig()
+			u, err := conf.NewConfigWithYAML([]byte(base+test.yaml), "")
+			if err != nil {
+				t.Fatalf("failed to parse config: %v", err)
+			}
+			err = u.Unpack(&c)
+			if err != nil {
+				t.Fatalf("failed to unpack config: %v", err)
+			}
+
+			got := sensitiveHeaders(c.Resource.RedirectSensitiveHeaders)
+			if !slices.Equal(got, test.want) {
+				t.Errorf("sensitive headers = %v; want %v", got, test.want)
+			}
+		})
+	}
 }
