@@ -3905,8 +3905,8 @@ func TestRunWithMixedMonitoringMethodsContinuesEventLogFileAfterObjectTickerFail
 // quick. getCtx is plumbed unchanged into newClient.
 func newClientForCancellationTest(t *testing.T, getCtx func() context.Context, maxAttempts int) *http.Client {
 	t.Helper()
-	waitMin := 100 * time.Millisecond
-	waitMax := 500 * time.Millisecond
+	waitMin := 500 * time.Millisecond
+	waitMax := 1 * time.Second
 	transport := httpcommon.DefaultHTTPTransportSettings()
 	transport.Timeout = 5 * time.Second
 	cfg := config{
@@ -3958,8 +3958,8 @@ func TestNewClientShortCircuitsRetryOnContextCancel(t *testing.T) {
 		case <-time.After(2 * time.Second):
 			return
 		}
-		// Cancel mid-backoff: retryablehttp's first sleep is 100ms, so
-		// 50ms gives it time to enter the wait before we cancel.
+		// Cancel mid-backoff: retryablehttp's first sleep is 500ms, so
+		// 50ms leaves a wide margin for scheduler lag on loaded runners.
 		time.Sleep(50 * time.Millisecond)
 		cancel()
 	}()
@@ -3976,10 +3976,10 @@ func TestNewClientShortCircuitsRetryOnContextCancel(t *testing.T) {
 
 	require.Error(t, err, "client.Do should surface the cancellation as an error")
 	require.ErrorIs(t, err, context.Canceled, "cancellation should propagate as context.Canceled")
-	// Without the fix, retryablehttp runs the full backoff (~1.7s with
-	// these settings: 100+200+400+500+500 ms) and the server receives 5
+	// Without the fix, retryablehttp runs the full backoff (~4s with
+	// these settings: 500+1000+1000+1000+1000 ms) and the server receives 5
 	// attempts. With the fix retryablehttp bails after attempt 1.
-	require.Less(t, elapsed, 1*time.Second, "retryablehttp ran the full backoff instead of honoring input cancellation (took %s)", elapsed)
+	require.Less(t, elapsed, 500*time.Millisecond, "retryablehttp ran the full backoff instead of honoring input cancellation (took %s)", elapsed)
 	require.LessOrEqual(t, int(attempts.Load()), 1, "server received %d attempts; retryablehttp should have stopped after the first once the input context was cancelled", attempts.Load())
 }
 
