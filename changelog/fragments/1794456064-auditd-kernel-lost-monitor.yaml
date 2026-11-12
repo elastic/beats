@@ -1,0 +1,11 @@
+kind: bug-fix
+summary: Fix auditd lost event monitor leaking a socket and crashing without a client.
+description: |
+  The kernel lost event monitor closed the wrong audit client when it stopped,
+  leaving its own netlink socket open. If creating that client failed, the
+  monitor still started and crashed on its first poll, which stopped
+  Auditbeat, or the Elastic Agent process running it as a receiver. The
+  monitor now closes its own client. If the client cannot be created,
+  Auditbeat reports the error and stops updating the kernel lost events
+  metric instead of crashing.
+component: auditbeat
