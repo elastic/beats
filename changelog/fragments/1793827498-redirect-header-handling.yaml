@@ -1,3 +1,6 @@
 kind: bug-fix
-summary: Align redirect header handling in Okta and Jamf entity analytics with HTTPJSON and CEL.
+summary: Align redirect header handling in Okta and Jamf entity analytics with HTTP JSON and CEL.
+description: >
+  The HTTP JSON, CEL, Okta, Jamf and streaming inputs no longer write header values to the debug log, only header names.
+  A configured redirect.sensitive_headers list in HTTP JSON and CEL now replaces the default list, and an empty list disables the removal.
 component: filebeat
