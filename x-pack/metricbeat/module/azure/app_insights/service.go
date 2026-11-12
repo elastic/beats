@@ -12,11 +12,13 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 
 	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/identityfederation"
 )
 
 const (
@@ -74,10 +76,21 @@ func newMetricsClient(cfg Config, logger *logp.Logger) (*metricsClient, error) {
 	var perCall, perRetry []policy.Policy
 	switch cfg.AuthType {
 	case AuthTypeClientSecret:
-		logger.Debug("Using client secret authentication for App Insights")
-		cred, err := azidentity.NewClientSecretCredential(cfg.TenantId, cfg.ClientId, cfg.ClientSecret, nil)
-		if err != nil {
-			return nil, fmt.Errorf("failed to create client secret credential: %w", err)
+		var cred azcore.TokenCredential
+		if cfg.UseCloudConnectors {
+			logger.Debug("Using identity federation authentication for App Insights")
+			fedCred, err := identityfederation.AzureNewCloudConnectorCredential(cfg.TenantId, cfg.ClientId, nil, logger)
+			if err != nil {
+				return nil, fmt.Errorf("failed to create identity federation credential: %w", err)
+			}
+			cred = fedCred
+		} else {
+			logger.Debug("Using client secret authentication for App Insights")
+			secretCred, err := azidentity.NewClientSecretCredential(cfg.TenantId, cfg.ClientId, cfg.ClientSecret, nil)
+			if err != nil {
+				return nil, fmt.Errorf("failed to create client secret credential: %w", err)
+			}
+			cred = secretCred
 		}
 		perRetry = append(perRetry, runtime.NewBearerTokenPolicy(cred, []string{appInsightsScope}, nil))
 	default:

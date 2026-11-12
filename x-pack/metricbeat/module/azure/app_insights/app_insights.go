@@ -7,6 +7,7 @@
 package app_insights
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -43,10 +44,18 @@ type Config struct {
 	TenantId     string `config:"tenant_id"`
 	ClientId     string `config:"client_id"`
 	ClientSecret string `config:"client_secret"`
+
+	// UseCloudConnectors authenticates the Microsoft Entra ID identity with
+	// identity federation instead of the client secret.
+	UseCloudConnectors bool `config:"use_cloud_connectors"`
 }
 
 // Validate checks that the authentication configuration is complete.
 func (c *Config) Validate() error {
+	if c.UseCloudConnectors {
+		return c.validateCloudConnectorsAuth()
+	}
+
 	if c.AuthType == "" {
 		c.AuthType = AuthTypeAPIKey
 	}
@@ -77,6 +86,22 @@ func (c *Config) validateClientSecretAuth() error {
 	}
 	if c.ClientSecret == "" {
 		return fmt.Errorf("client_secret is required when auth_type is %s", AuthTypeClientSecret)
+	}
+	return nil
+}
+
+func (c *Config) validateCloudConnectorsAuth() error {
+	if c.AuthType == "" {
+		c.AuthType = AuthTypeClientSecret
+	}
+	if c.AuthType != AuthTypeClientSecret {
+		return fmt.Errorf("use_cloud_connectors requires auth_type %s", AuthTypeClientSecret)
+	}
+	if c.TenantId == "" {
+		return errors.New("tenant_id is required when use_cloud_connectors is enabled")
+	}
+	if c.ClientId == "" {
+		return errors.New("client_id is required when use_cloud_connectors is enabled")
 	}
 	return nil
 }

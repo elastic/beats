@@ -136,6 +136,68 @@ func TestConfigValidate(t *testing.T) {
 			wantErr: "client_secret is required when auth_type is client_secret",
 		},
 		{
+			name: "valid config with cloud connectors (default auth_type)",
+			config: Config{
+				ApplicationId:      "app-id",
+				TenantId:           "tenant-id",
+				ClientId:           "client-id",
+				UseCloudConnectors: true,
+			},
+			wantErr: "",
+		},
+		{
+			name: "valid config with cloud connectors (explicit client_secret auth_type)",
+			config: Config{
+				ApplicationId:      "app-id",
+				AuthType:           "client_secret",
+				TenantId:           "tenant-id",
+				ClientId:           "client-id",
+				UseCloudConnectors: true,
+			},
+			wantErr: "",
+		},
+		{
+			name: "valid config with cloud connectors and an unused client secret",
+			config: Config{
+				ApplicationId:      "app-id",
+				TenantId:           "tenant-id",
+				ClientId:           "client-id",
+				ClientSecret:       "client-secret",
+				UseCloudConnectors: true,
+			},
+			wantErr: "",
+		},
+		{
+			name: "invalid config - cloud connectors with api_key auth_type",
+			config: Config{
+				ApplicationId:      "app-id",
+				AuthType:           "api_key",
+				ApiKey:             "test-api-key",
+				TenantId:           "tenant-id",
+				ClientId:           "client-id",
+				UseCloudConnectors: true,
+			},
+			wantErr: "use_cloud_connectors requires auth_type client_secret",
+		},
+		{
+			name: "invalid config - cloud connectors missing tenant_id",
+			config: Config{
+				ApplicationId:      "app-id",
+				ClientId:           "client-id",
+				UseCloudConnectors: true,
+			},
+			wantErr: "tenant_id is required when use_cloud_connectors is enabled",
+		},
+		{
+			name: "invalid config - cloud connectors missing client_id",
+			config: Config{
+				ApplicationId:      "app-id",
+				TenantId:           "tenant-id",
+				UseCloudConnectors: true,
+			},
+			wantErr: "client_id is required when use_cloud_connectors is enabled",
+		},
+		{
 			name: "invalid config - unknown auth_type",
 			config: Config{
 				ApplicationId: "app-id",
