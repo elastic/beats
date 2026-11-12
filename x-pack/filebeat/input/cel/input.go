@@ -5,6 +5,7 @@
 package cel
 
 import (
+	"compress/bzip2"
 	"compress/gzip"
 	"context"
 	"encoding/json"
@@ -1530,7 +1531,9 @@ var (
 	// mimetypes holds supported MIME type mappings.
 	mimetypes = map[string]any{
 		"application/gzip":         func(r io.Reader) (io.Reader, error) { return gzip.NewReader(r) },
+		"application/x-bzip2":      func(r io.Reader) io.Reader { return bzip2.NewReader(r) },
 		"application/x-ndjson":     lib.NDJSON,
+		"application/x-tar":        lib.Tar,
 		"application/zip":          lib.Zip,
 		"text/csv; header=absent":  lib.CSVNoHeader,
 		"text/csv; header=present": lib.CSVHeader,
