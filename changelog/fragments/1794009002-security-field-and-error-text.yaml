@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Correct exported field descriptions and error text in Auditbeat, Winlogbeat, Osquerybeat and the security Filebeat modules
+component: all
