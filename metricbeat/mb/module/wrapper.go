@@ -72,8 +72,9 @@ type Wrapper struct {
 // running the MetricSet. It contains a pointer to the parent Module.
 type metricSetWrapper struct {
 	mb.MetricSet
-	module *Wrapper // Parent Module.
-	stats  *stats   // stats for this MetricSet.
+	module  *Wrapper // Parent Module.
+	stats   *stats   // stats for this MetricSet.
+	metrics *inputMetrics
 
 	periodic         bool // Set to true if this metricset is a periodic fetcher
 	failureThreshold uint // threshold of consecutive errors needed to set the stream as degraded
@@ -140,6 +141,7 @@ func createWrapper(module mb.Module, metricSets []mb.MetricSet, monitoring beatm
 			MetricSet:        metricSet,
 			module:           wrapper,
 			stats:            getMetricSetStats(monitoring, wrapper.Name(), metricSet.Name()),
+			metrics:          newInputMetrics(metricSet.Metrics(), logger),
 			failureThreshold: failureThreshold,
 		}
 	}
@@ -290,21 +292,32 @@ func (msw *metricSetWrapper) startPeriodicFetching(ctx context.Context, reporter
 // the result using the publisher client. This method will recover from panics
 // and log a stack track if one occurs.
 func (msw *metricSetWrapper) fetch(ctx context.Context, reporter reporter) {
+	started := time.Now()
+	var fetchErr error
+	msw.metrics.beginFetch(started)
+	completed := false
+	defer func() {
+		if !completed {
+			fetchErr = errors.New("fetch panicked")
+		}
+		msw.metrics.endFetch(started, fetchErr)
+	}()
 	switch fetcher := msw.MetricSet.(type) {
 	case mb.ReportingMetricSetV2:
 		reporter.StartFetchTimer()
 		fetcher.Fetch(reporter.V2())
 	case mb.ReportingMetricSetV2Error:
 		reporter.StartFetchTimer()
-		err := fetcher.Fetch(reporter.V2())
-		msw.handleFetchError(err, reporter.V2())
+		fetchErr = fetcher.Fetch(reporter.V2())
+		msw.handleFetchError(fetchErr, reporter.V2())
 	case mb.ReportingMetricSetV2WithContext:
 		reporter.StartFetchTimer()
-		err := fetcher.Fetch(ctx, reporter.V2())
-		msw.handleFetchError(err, reporter.V2())
+		fetchErr = fetcher.Fetch(ctx, reporter.V2())
+		msw.handleFetchError(fetchErr, reporter.V2())
 	default:
 		panic(fmt.Sprintf("unexpected fetcher type for %v", msw))
 	}
+	completed = true
 }
 
 // close closes the underlying MetricSet if it implements the mb.Closer
@@ -421,18 +434,32 @@ func (r reporterV2) Event(event mb.Event) bool {
 
 	if event.Error == nil {
 		r.msw.stats.success.Add(1)
+		if r.msw.metrics != nil {
+			r.msw.metrics.success.Inc()
+		}
 	} else {
 		r.msw.stats.failures.Add(1)
+		if r.msw.metrics != nil {
+			r.msw.metrics.failures.Inc()
+		}
 	}
 
 	if event.Namespace == "" {
 		event.Namespace = r.msw.Registration().Namespace
 	}
 	beatEvent := event.BeatEvent(r.msw.module.Name(), r.msw.Name(), r.msw.module.eventModifiers...)
-	if !writeEvent(r.done, r.out, beatEvent) {
+	started := time.Now()
+	written := writeEvent(r.done, r.out, beatEvent)
+	if r.msw.metrics != nil {
+		r.msw.metrics.publishWait.Update(time.Since(started).Nanoseconds())
+	}
+	if !written {
 		return false
 	}
 	r.msw.stats.events.Add(1)
+	if r.msw.metrics != nil {
+		r.msw.metrics.events.Inc()
+	}
 
 	return true
 }
