@@ -14,7 +14,6 @@ import (
 	"github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
-	"github.com/elastic/entcollect"
 	ecad "github.com/elastic/entcollect/provider/ad"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
@@ -27,7 +26,7 @@ func init() {
 	}
 }
 
-func minimalProvider(cfg *config.C, log *logp.Logger) (entcollect.Provider, time.Duration, time.Duration, error) {
+func minimalProvider(cfg *config.C, log *logp.Logger) (provider.MinimalState, error) {
 	// localConf mirrors ecad.Config with config:"" tags for ucfg Unpack.
 	// If ecad.Config gains a new field, add it here and in the mapping
 	// below; TestMinimalConfigRoundTrip (minimal_test.go) will catch any drift.
@@ -56,7 +55,7 @@ func minimalProvider(cfg *config.C, log *logp.Logger) (entcollect.Provider, time
 		UpdateInterval: d.UpdateInterval,
 	}
 	if err := cfg.Unpack(&lc); err != nil {
-		return nil, 0, 0, err
+		return provider.MinimalState{}, err
 	}
 
 	ec := ecad.Config{
@@ -78,18 +77,18 @@ func minimalProvider(cfg *config.C, log *logp.Logger) (entcollect.Provider, time
 
 	tc, err := buildTLS(lc.URL, lc.TLS, log)
 	if err != nil {
-		return nil, 0, 0, err
+		return provider.MinimalState{}, err
 	}
 	ec.TLS = tc
 
 	if err := ec.Validate(); err != nil {
-		return nil, 0, 0, err
+		return provider.MinimalState{}, err
 	}
 	p, err := ecad.New(ec)
 	if err != nil {
-		return nil, 0, 0, err
+		return provider.MinimalState{}, err
 	}
-	return p, ec.SyncInterval, ec.UpdateInterval, nil
+	return provider.MinimalState{Provider: p, FullSync: ec.SyncInterval, IncrementalSync: ec.UpdateInterval}, nil
 }
 
 func buildTLS(rawURL string, tc *tlscommon.Config, log *logp.Logger) (*tls.Config, error) {

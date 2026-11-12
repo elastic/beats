@@ -15,9 +15,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/logp"
-	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
-	"github.com/elastic/entcollect"
 	ecokta "github.com/elastic/entcollect/provider/okta"
 )
 
@@ -45,21 +43,33 @@ func (o *minimalOAuth2Conf) isEnabled() bool {
 	return o != nil && (o.Enabled == nil || *o.Enabled)
 }
 
-func minimalProvider(cfg *config.C, log *logp.Logger) (entcollect.Provider, time.Duration, time.Duration, error) {
-	ec, transport, err := minimalConfig(cfg)
+func minimalProvider(cfg *config.C, log *logp.Logger) (provider.MinimalState, error) {
+	mc, err := minimalConfig(cfg)
 	if err != nil {
-		return nil, 0, 0, err
+		return provider.MinimalState{}, err
 	}
-	client, err := transport.Client(httpcommon.WithLogger(log), httpcommon.WithAPMHTTPInstrumentation())
+	client, err := mc.request.Client(log)
 	if err != nil {
-		return nil, 0, 0, fmt.Errorf("creating HTTP client: %w", err)
+		return provider.MinimalState{}, fmt.Errorf("creating HTTP client: %w", err)
 	}
-	return ecokta.NewWithClient(ec, client), ec.SyncInterval, ec.UpdateInterval, nil
+	return provider.MinimalState{
+		Provider:        ecokta.NewWithClient(mc.provider, client),
+		FullSync:        mc.provider.SyncInterval,
+		IncrementalSync: mc.provider.UpdateInterval,
+		Client:          client,
+		Tracer:          mc.tracer,
+	}, nil
 }
 
-// minimalConfig unpacks cfg into a validated ecokta.Config and the HTTP
-// transport settings used to build the provider's client.
-func minimalConfig(cfg *config.C) (ecokta.Config, httpcommon.HTTPTransportSettings, error) {
+// minimalConf is the minimal-state configuration of the Okta provider.
+type minimalConf struct {
+	provider ecokta.Config
+	request  provider.RequestConfig
+	tracer   *provider.TracerConfig
+}
+
+// minimalConfig unpacks cfg into a validated minimalConf.
+func minimalConfig(cfg *config.C) (minimalConf, error) {
 	// localConf mirrors ecokta.Config with config:"" tags for ucfg Unpack.
 	// If ecokta.Config gains a new field, add it here and in the mapping
 	// below; TestMinimalConfigRoundTrip (minimal_test.go) will catch any drift.
@@ -81,11 +91,10 @@ func minimalConfig(cfg *config.C) (ecokta.Config, httpcommon.HTTPTransportSettin
 
 		ScratchDir string `config:"scratch_dir"`
 
-		Transport httpcommon.HTTPTransportSettings `config:"request"`
+		Request provider.RequestConfig `config:"request"`
+		Tracer  *provider.TracerConfig `config:"tracer"`
 	}
 
-	transport := httpcommon.DefaultHTTPTransportSettings()
-	transport.Timeout = 30 * time.Second
 	d := ecokta.DefaultConfig()
 	lc := localConf{
 		EnrichWith:     d.EnrichWith,
@@ -93,10 +102,10 @@ func minimalConfig(cfg *config.C) (ecokta.Config, httpcommon.HTTPTransportSettin
 		UpdateInterval: d.UpdateInterval,
 		IDSetShards:    d.IDSetShards,
 		LimitWindow:    d.LimitWindow,
-		Transport:      transport,
+		Request:        provider.DefaultRequestConfig(30 * time.Second),
 	}
 	if err := cfg.Unpack(&lc); err != nil {
-		return ecokta.Config{}, httpcommon.HTTPTransportSettings{}, err
+		return minimalConf{}, err
 	}
 
 	ec := ecokta.Config{
@@ -117,7 +126,7 @@ func minimalConfig(cfg *config.C) (ecokta.Config, httpcommon.HTTPTransportSettin
 		ec.Token = "" // OAuth2 takes precedence over okta_token.
 		jwk, err := resolveJWK(lc.OAuth2)
 		if err != nil {
-			return ecokta.Config{}, httpcommon.HTTPTransportSettings{}, fmt.Errorf("oauth2 jwk: %w", err)
+			return minimalConf{}, fmt.Errorf("oauth2 jwk: %w", err)
 		}
 		ec.OAuth2 = &ecokta.OAuth2Config{
 			ClientID:     lc.OAuth2.ClientID,
@@ -129,9 +138,9 @@ func minimalConfig(cfg *config.C) (ecokta.Config, httpcommon.HTTPTransportSettin
 	}
 
 	if err := ec.Validate(); err != nil {
-		return ecokta.Config{}, httpcommon.HTTPTransportSettings{}, err
+		return minimalConf{}, err
 	}
-	return ec, lc.Transport, nil
+	return minimalConf{provider: ec, request: lc.Request, tracer: lc.Tracer}, nil
 }
 
 // resolveJWK converts one of the three JWK input forms (JSON, file, PEM)

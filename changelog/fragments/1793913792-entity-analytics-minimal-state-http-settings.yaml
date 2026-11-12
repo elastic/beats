@@ -1,0 +1,15 @@
+kind: bug-fix
+summary: Apply HTTP and tracer settings in entity analytics minimal-state providers.
+description: |
+  With use_minimal_state, the Azure Active Directory provider ignored proxy_url,
+  ssl, timeout and tracer, the Jamf provider ignored request and tracer, and
+  the Okta provider ignored tracer and the request keep-alive and redirect
+  options. They are now applied. Azure Active Directory requests now time out
+  (the Fleet integration default is 30s, otherwise 90s) where before they had
+  no timeout, and its token requests are kept out of the request trace. Invalid
+  values for these settings, such as an unreadable ssl CA file or a tracer
+  enabled without a filename, now stop the input from starting. A shorter
+  select list for Azure Active Directory now replaces the default list instead
+  of being merged into it. request.retry and the Azure Active Directory expand
+  options are not supported in this mode and are ignored with a warning.
+component: filebeat

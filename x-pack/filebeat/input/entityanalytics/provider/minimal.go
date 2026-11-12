@@ -5,6 +5,7 @@
 package provider
 
 import (
+	"net/http"
 	"sync"
 	"time"
 
@@ -13,10 +14,31 @@ import (
 	"github.com/elastic/entcollect"
 )
 
-// MinimalStateProviderFactory creates an entcollect.Provider from the
-// input configuration, returning the provider and its full/incremental
-// sync intervals. Sessions 2-5 register factories here.
-type MinimalStateProviderFactory func(cfg *config.C, log *logp.Logger) (p entcollect.Provider, fullSync, incrementalSync time.Duration, err error)
+// MinimalStateProviderFactory creates a minimal-state provider from the
+// input configuration.
+type MinimalStateProviderFactory func(cfg *config.C, log *logp.Logger) (MinimalState, error)
+
+// MinimalState is a minimal-state provider and the settings the input
+// needs to run it.
+type MinimalState struct {
+	Provider entcollect.Provider
+
+	// FullSync and IncrementalSync are the intervals between full and
+	// incremental syncs.
+	FullSync        time.Duration
+	IncrementalSync time.Duration
+
+	// Client is the HTTP client Provider uses, or nil if it does not
+	// use HTTP. Before the first sync, the input wraps the client's
+	// transport with the request tracer configured by Tracer, which
+	// needs the input's ID and so cannot be set up here.
+	Client *http.Client
+	Tracer *TracerConfig
+
+	// Untraced holds URL prefixes of requests that are never traced,
+	// because their bodies carry credentials.
+	Untraced []string
+}
 
 var (
 	minimalStateProviderRegistry   = map[string]MinimalStateProviderFactory{}
