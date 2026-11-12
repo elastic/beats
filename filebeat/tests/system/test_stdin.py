@@ -103,5 +103,5 @@ class Test(BaseTest):
 
         filebeat = self.start_beat()
         filebeat.check_wait(exit_code=1)
-        msg = "Exiting: stdin requires to be run in exclusive mode, configured inputs: stdin, udp"
+        msg = "Exiting: stdin must be run in exclusive mode, configured inputs: stdin, udp"
         assert self.log_contains(msg), f"did not find '{msg}' in the logs"

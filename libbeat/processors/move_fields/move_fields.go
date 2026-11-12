@@ -81,14 +81,14 @@ func (u moveFields) Run(event *beat.Event) (*beat.Event, error) {
 			continue
 		}
 		if err != nil {
-			return nil, fmt.Errorf("move field read field from parent, sub key: %s, failed: %w", k, err)
+			return nil, fmt.Errorf("failed to read field from parent (sub key: %s): %w", k, err)
 		}
 		if err = parent.Delete(k); err != nil {
-			return nil, fmt.Errorf("move field delete field from parent sub key: %s, failed: %w", k, err)
+			return nil, fmt.Errorf("failed to delete field from parent (sub key: %s): %w", k, err)
 		}
 		newKey := fmt.Sprintf("%s%s", u.config.To, k)
 		if _, err = root.Put(newKey, v); err != nil {
-			return nil, fmt.Errorf("move field write field to sub key: %s, new key: %s, failed: %w", k, newKey, err)
+			return nil, fmt.Errorf("failed to write field to destination (sub key: %s, new key: %s): %w", k, newKey, err)
 		}
 	}
 
