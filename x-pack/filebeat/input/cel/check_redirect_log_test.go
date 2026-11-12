@@ -14,7 +14,7 @@ import (
 
 func TestCheckRedirectLogOutput(t *testing.T) {
 	log, logs := logptest.NewTestingLoggerWithObserver(t, "")
-	cfg := &ResourceConfig{RedirectFollow: true, RedirectForwardHeaders: true, RedirectMaxRedirects: 10}
+	cfg := &ResourceConfig{RedirectForwardHeaders: true, RedirectMaxRedirects: 10}
 	prev := &http.Request{
 		URL:    mustParseURL(t, "https://api.example.com/"),
 		Header: http.Header{"Authorization": {"Bearer super-secret-token"}},
