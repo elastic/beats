@@ -20,17 +20,17 @@ func TestNewProjectPackageJSONIncludesAllowScripts(t *testing.T) {
 	raw, err := json.Marshal(pkg)
 	require.NoError(t, err)
 
-	var decoded map[string]interface{}
+	var decoded map[string]any
 	require.NoError(t, json.Unmarshal(raw, &decoded))
 
 	assert.Equal(t, "project-journey", decoded["name"])
 	assert.Equal(t, true, decoded["private"])
 
-	deps, ok := decoded["dependencies"].(map[string]interface{})
+	deps, ok := decoded["dependencies"].(map[string]any)
 	require.True(t, ok)
 	assert.Equal(t, symlinkPath, deps["@elastic/synthetics"])
 
-	allow, ok := decoded["allowScripts"].(map[string]interface{})
+	allow, ok := decoded["allowScripts"].(map[string]any)
 	require.True(t, ok, "package.json must include allowScripts for npm >= 11.16")
 	assert.Equal(t, true, allow["@elastic/synthetics"])
 	assert.Equal(t, true, allow[symlinkPath])
