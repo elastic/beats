@@ -46,7 +46,12 @@ In agentless deployments, state is stored in Elasticsearch (index `agentless-sta
 
 When running with a local file store (the default for non-agentless deployments), state is stored in a bbolt database under the Filebeat data directory.
 
-Defaults to `false`. In Fleet-managed agentless deployments, integration packages set this to `true` automatically.
+If a full synchronization fails, it is retried after `update_interval`. The wait doubles after each further failure, up to `sync_interval`. The input reports a degraded status when a synchronization fails:
+
+* After a failed full synchronization, the status stays degraded until a full synchronization succeeds.
+* After a failed incremental synchronization, it stays degraded until a later synchronization of either kind succeeds.
+
+Defaults to `false`. The Okta, Microsoft Entra ID and Active Directory integration packages set this to `true` by default.
 
 
 ## Common options [filebeat-input-entity-analytics-common-options]
