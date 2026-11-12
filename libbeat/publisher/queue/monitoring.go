@@ -148,8 +148,14 @@ func (ob *queueObserver) RemoveEvents(eventCount int, byteCount int) {
 func (ob *queueObserver) updateFilledPct() {
 	if maxBytes := ob.maxBytes.Get(); maxBytes > 0 {
 		ob.filledPct.Set(float64(ob.filledBytes.Get()) / float64(maxBytes))
+	} else if maxEvents := ob.maxEvents.Get(); maxEvents > 0 {
+		ob.filledPct.Set(float64(ob.filledEvents.Get()) / float64(maxEvents))
 	} else {
-		ob.filledPct.Set(float64(ob.filledEvents.Get()) / float64(ob.maxEvents.Get()))
+		// No finite limit is configured, e.g. a disk queue with
+		// max_size: 0 (unlimited). The queue can never fill up, so
+		// report 0 instead of dividing by zero, which would set
+		// filled.pct to +Inf or NaN and break monitoring output.
+		ob.filledPct.Set(0)
 	}
 }
 
