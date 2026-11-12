@@ -910,4 +910,1192 @@ func TestJWTBearerFlowTokenURL(t *testing.T) {
 		assert.Equal(t, 0, urlHits, "url should NOT receive requests when token_url is set")
 		assert.Equal(t, 1, tokenURLHits, "token_url should receive the OAuth request")
 	})
+<<<<<<< HEAD
+=======
+
+	t.Run("full token_url endpoint is normalized before request", func(t *testing.T) {
+		t.Parallel()
+
+		var urlHits, tokenURLHits int
+		urlSrv := httptest.NewServer(oauthHandler(&urlHits))
+		tokenURLSrv := httptest.NewServer(oauthHandler(&tokenURLHits))
+		t.Cleanup(urlSrv.Close)
+		t.Cleanup(tokenURLSrv.Close)
+
+		cfg := newConfig(urlSrv.URL, tokenURLSrv.URL+"/services/oauth2/token", keyPath)
+
+		input := &salesforceInput{config: *cfg, log: logptest.NewTestingLogger(t, "test")}
+		sfdcCfg, err := input.getSFDCConfig(cfg)
+		require.NoError(t, err)
+
+		input.sfdcConfig = sfdcCfg
+		_, err = input.SetupSFClientConnection()
+		require.NoError(t, err, "expected a full jwt_bearer_flow.token_url endpoint to be normalized before go-sfdc appends its path")
+
+		assert.Equal(t, 0, urlHits, "url should NOT receive requests when token_url is set")
+		assert.Equal(t, 1, tokenURLHits, "token_url should receive the OAuth request on the canonical path")
+	})
+}
+
+func TestGetSFDCConfigRejectsNilOAuth2(t *testing.T) {
+	cfg := defaultConfig()
+	cfg.Auth = &authConfig{}
+
+	input := &salesforceInput{config: cfg, log: logptest.NewTestingLogger(t, "test")}
+
+	var (
+		sfdcCfg *sfdc.Configuration
+		err     error
+	)
+	require.NotPanics(t, func() {
+		sfdcCfg, err = input.getSFDCConfig(&cfg)
+	}, "expected getSFDCConfig to reject nil OAuth2 without panicking")
+
+	assert.Nil(t, sfdcCfg, "expected no Salesforce config when OAuth2 is missing")
+	require.Error(t, err, "expected getSFDCConfig to reject nil OAuth2")
+	assert.ErrorContains(t, err, "no auth provider enabled")
+}
+
+func TestRunWithMixedMonitoringMethodsStartsEventLogFileBeforeObject(t *testing.T) {
+	logptest.NewTestingLogger(t, "")
+
+	var (
+		requestKinds []string
+		server       *httptest.Server
+	)
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == defaultLoginEventLogFileQuery:
+			requestKinds = append(requestKinds, "elf_soql")
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileFirstResponseJSON))
+		case r.RequestURI == "/services/data/v58.0/sobjects/EventLogFile/0AT5j00002LqQTxGAN/LogFile":
+			requestKinds = append(requestKinds, "elf_log_get")
+			w.Header().Set("content-type", "text/csv")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileSecondResponseCSV))
+		case r.FormValue("q") == defaultLoginObjectQuery:
+			requestKinds = append(requestKinds, "object_soql")
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneObjectEvents))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	baseConfig := map[string]any{
+		"url":         server.URL,
+		"version":     56,
+		"auth.oauth2": defaultUserPasswordFlowMap,
+		"event_monitoring_method": map[string]any{
+			"event_log_file": defaultEventLogFileMonitoringMethodMap,
+			"object":         defaultObjectMonitoringMethodConfigMap,
+		},
+	}
+	authOAuth2, _ := baseConfig["auth.oauth2"].(map[string]any)
+	userPasswordFlow, _ := authOAuth2["user_password_flow"].(map[string]any)
+	userPasswordFlow["token_url"] = server.URL
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(baseConfig).Unpack(&cfg)
+	require.NoError(t, err, "expected mixed event monitoring config to unpack")
+
+	timeoutCtx, cancelTimeout := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelTimeout()
+
+	inputCtx := v2.Context{
+		Logger: logptest.NewTestingLogger(t, "salesforce"),
+		ID:     "test_id",
+	}
+
+	var client publisher
+	ctx, cancel := context.WithCancelCause(timeoutCtx)
+	client.done = func() {
+		if len(client.published) >= 2 {
+			cancel(nil)
+		}
+	}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancel,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		publisher: &client,
+		log:       logptest.NewTestingLogger(t, "").With("input_url", "salesforce"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.run(inputCtx)
+	require.NoError(t, err, "expected mixed event monitoring run to stop cleanly after collecting both startup events")
+
+	assert.Equal(t, []string{"elf_soql", "elf_log_get", "object_soql"}, requestKinds, "expected initial EventLogFile collection to complete before initial object collection starts")
+	require.Len(t, client.published, 2, "expected one ELF event and one object event from the mixed startup path")
+	elfMsg, ok := client.published[0].Fields["message"].(string)
+	require.True(t, ok, "expected ELF event message to be a string")
+	objMsg, ok := client.published[1].Fields["message"].(string)
+	require.True(t, ok, "expected object event message to be a string")
+	assert.JSONEq(t, expectedELFEvent, elfMsg, "expected the first published startup event to come from EventLogFile")
+	assert.JSONEq(t, expectedObjectEvent, objMsg, "expected the second published startup event to come from Object monitoring")
+}
+
+func TestRunWithMixedMonitoringMethodsRunsBothTickersAfterStartup(t *testing.T) {
+	logptest.NewTestingLogger(t, "")
+
+	const valueLoginEventLogFileQueryWithCursor = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND (CreatedDate > 2023-12-19T21:04:35.000+0000 OR (CreatedDate = 2023-12-19T21:04:35.000+0000 AND Id > '0AT5j00002LqQTxGAN')) ORDER BY CreatedDate ASC NULLS FIRST, Id ASC"
+
+	var (
+		requestKinds []string
+		server       *httptest.Server
+		mu           sync.Mutex
+	)
+	countKindLocked := func(kind string) int {
+		count := 0
+		for _, requestKind := range requestKinds {
+			if requestKind == kind {
+				count++
+			}
+		}
+		return count
+	}
+
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == defaultLoginEventLogFileQuery, r.FormValue("q") == valueLoginEventLogFileQueryWithCursor:
+			mu.Lock()
+			requestKinds = append(requestKinds, "elf_soql")
+			mu.Unlock()
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileFirstResponseJSON))
+		case r.RequestURI == "/services/data/v58.0/sobjects/EventLogFile/0AT5j00002LqQTxGAN/LogFile":
+			mu.Lock()
+			requestKinds = append(requestKinds, "elf_log_get")
+			mu.Unlock()
+			w.Header().Set("content-type", "text/csv")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileSecondResponseCSV))
+		case r.FormValue("q") == defaultLoginObjectQuery, r.FormValue("q") == defaultLoginObjectQueryWithCursor:
+			mu.Lock()
+			requestKinds = append(requestKinds, "object_soql")
+			mu.Unlock()
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneObjectEvents))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	baseConfig := map[string]any{
+		"url":                         server.URL,
+		"version":                     56,
+		"resource.retry.max_attempts": 1,
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]any{
+			"event_log_file": map[string]any{
+				"interval": "50ms",
+				"enabled":  true,
+				"query": map[string]any{
+					"default": defaultLoginEventLogFileQuery,
+					"value":   valueLoginEventLogFileQuery,
+				},
+				"cursor": map[string]any{
+					"field": "CreatedDate",
+				},
+			},
+			"object": map[string]any{
+				"interval": "80ms",
+				"enabled":  true,
+				"query": map[string]any{
+					"default": defaultLoginObjectQuery,
+					"value":   valueLoginObjectQuery,
+				},
+				"cursor": map[string]any{
+					"field": "EventDate",
+				},
+			},
+		},
+	}
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(baseConfig).Unpack(&cfg)
+	require.NoError(t, err, "expected mixed event monitoring config to unpack")
+
+	timeoutCtx, cancelTimeout := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelTimeout()
+
+	inputCtx := v2.Context{
+		Logger: logptest.NewTestingLogger(t, "salesforce"),
+		ID:     "test_id",
+	}
+
+	var client publisher
+	ctx, cancelCause := context.WithCancelCause(timeoutCtx)
+	// Cancel once the publisher has observed at least two ELF and two
+	// Object events. Gating cancellation on published events (rather than
+	// inbound server requests) guarantees the in-flight SOQL response that
+	// produced the second event was fully consumed before the input's
+	// context is cancelled; otherwise input cancellation would abort the
+	// in-flight HTTP request through ctxTransport and the test would count
+	// fewer publications than requests.
+	client.done = func() {
+		var elfCount, objectCount int
+		for _, ev := range client.published {
+			switch ev.Fields["message"] {
+			case expectedELFEvent:
+				elfCount++
+			case expectedObjectEvent:
+				objectCount++
+			}
+		}
+		if elfCount >= 2 && objectCount >= 2 {
+			cancelCause(nil)
+		}
+	}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancelCause,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		publisher: &client,
+		log:       logptest.NewTestingLogger(t, "").With("input_url", "salesforce"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.run(inputCtx)
+	require.NoError(t, err, "expected mixed event monitoring run to stop cleanly after both ticker branches ran")
+
+	mu.Lock()
+	requestKindsCopy := append([]string(nil), requestKinds...)
+	elfSOQLCount := countKindLocked("elf_soql")
+	elfLogGetCount := countKindLocked("elf_log_get")
+	objectSOQLCount := countKindLocked("object_soql")
+	mu.Unlock()
+
+	require.GreaterOrEqual(t, len(requestKindsCopy), 6, "expected startup plus at least one ticker run for each mixed monitoring method")
+	assert.Equal(t, []string{"elf_soql", "elf_log_get", "object_soql"}, requestKindsCopy[:3], "expected mixed startup ordering to remain unchanged before ticker work starts")
+	assert.GreaterOrEqual(t, elfSOQLCount, 2, "expected EventLogFile SOQL to run at startup and at least once from its ticker")
+	assert.GreaterOrEqual(t, elfLogGetCount, 2, "expected EventLogFile log fetch to run at startup and at least once from its ticker")
+	assert.GreaterOrEqual(t, objectSOQLCount, 2, "expected Object SOQL to run at startup and at least once from its ticker")
+
+	var elfPublished, objectPublished int
+	for _, event := range client.published {
+		if event.Fields["message"] == expectedELFEvent {
+			elfPublished++
+		}
+		if event.Fields["message"] == expectedObjectEvent {
+			objectPublished++
+		}
+	}
+	assert.GreaterOrEqual(t, elfPublished, 2, "expected EventLogFile to publish at startup and at least once from ticker-driven collection")
+	assert.GreaterOrEqual(t, objectPublished, 2, "expected Object monitoring to publish at startup and at least once from ticker-driven collection")
+}
+
+func TestRunEventLogFileSkipsQueuedTickerAfterFailure(t *testing.T) {
+	logptest.NewTestingLogger(t, "")
+
+	const valueLoginEventLogFileQueryWithCursor = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND (CreatedDate > 2023-12-19T21:04:35.000+0000 OR (CreatedDate = 2023-12-19T21:04:35.000+0000 AND Id > '0AT5j00002LqQTxGAN')) ORDER BY CreatedDate ASC NULLS FIRST, Id ASC"
+
+	var (
+		cancel           context.CancelCauseFunc
+		firstFailureSeen bool
+		requestKinds     []string
+		server           *httptest.Server
+		mu               sync.Mutex
+	)
+
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == defaultLoginEventLogFileQuery:
+			mu.Lock()
+			requestKinds = append(requestKinds, "elf_soql")
+			mu.Unlock()
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileFirstResponseJSON))
+		case r.RequestURI == "/services/data/v58.0/sobjects/EventLogFile/0AT5j00002LqQTxGAN/LogFile":
+			mu.Lock()
+			requestKinds = append(requestKinds, "elf_log_get")
+			mu.Unlock()
+			w.Header().Set("content-type", "text/csv")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileSecondResponseCSV))
+		case r.FormValue("q") == valueLoginEventLogFileQueryWithCursor:
+			mu.Lock()
+			requestKinds = append(requestKinds, "elf_soql_error")
+			shouldCancelSoon := !firstFailureSeen
+			firstFailureSeen = true
+			mu.Unlock()
+
+			time.Sleep(150 * time.Millisecond)
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(`{"error":"boom"}`))
+
+			if shouldCancelSoon && cancel != nil {
+				go func() {
+					time.Sleep(20 * time.Millisecond)
+					cancel(nil)
+				}()
+			}
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	baseConfig := map[string]any{
+		"url":                         server.URL,
+		"version":                     56,
+		"resource.retry.max_attempts": 1,
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]any{
+			"event_log_file": map[string]any{
+				"interval": "50ms",
+				"enabled":  true,
+				"query": map[string]any{
+					"default": defaultLoginEventLogFileQuery,
+					"value":   valueLoginEventLogFileQuery,
+				},
+				"cursor": map[string]any{
+					"field": "CreatedDate",
+				},
+			},
+		},
+	}
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(baseConfig).Unpack(&cfg)
+	require.NoError(t, err, "expected EventLogFile monitoring config to unpack")
+
+	timeoutCtx, cancelTimeout := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelTimeout()
+
+	inputCtx := v2.Context{
+		Logger: logptest.NewTestingLogger(t, "salesforce"),
+		ID:     "test_id",
+	}
+
+	var client publisher
+	client.done = func() {}
+	ctx, cancelCause := context.WithCancelCause(timeoutCtx)
+	cancel = cancelCause
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancelCause,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		publisher: &client,
+		log:       logptest.NewTestingLogger(t, "").With("input_url", "salesforce"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.run(inputCtx)
+	require.NoError(t, err, "expected EventLogFile run loop to stop cleanly after the first failed ticker run")
+
+	mu.Lock()
+	requestKindsCopy := append([]string(nil), requestKinds...)
+	mu.Unlock()
+
+	var failureCount int
+	for _, kind := range requestKindsCopy {
+		if kind == "elf_soql_error" {
+			failureCount++
+		}
+	}
+
+	require.GreaterOrEqual(t, len(requestKindsCopy), 3, "expected startup EventLogFile requests followed by a ticker-driven failure")
+	assert.Equal(t, []string{"elf_soql", "elf_log_get", "elf_soql_error"}, requestKindsCopy[:3], "expected startup EventLogFile requests before the first ticker failure")
+	assert.Equal(t, 1, failureCount, "expected a failed EventLogFile ticker run to wait for a fresh interval before retrying instead of immediately consuming a queued tick")
+}
+
+func TestRunWithMixedMonitoringMethodsContinuesObjectAfterEventLogFileTickerFailure(t *testing.T) {
+	logptest.NewTestingLogger(t, "")
+
+	const valueLoginEventLogFileQueryWithCursor = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND (CreatedDate > 2023-12-19T21:04:35.000+0000 OR (CreatedDate = 2023-12-19T21:04:35.000+0000 AND Id > '0AT5j00002LqQTxGAN')) ORDER BY CreatedDate ASC NULLS FIRST, Id ASC"
+
+	var (
+		requestKinds []string
+		server       *httptest.Server
+		mu           sync.Mutex
+	)
+	countKindLocked := func(kind string) int {
+		count := 0
+		for _, requestKind := range requestKinds {
+			if requestKind == kind {
+				count++
+			}
+		}
+		return count
+	}
+
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == defaultLoginEventLogFileQuery:
+			mu.Lock()
+			requestKinds = append(requestKinds, "elf_soql")
+			mu.Unlock()
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileFirstResponseJSON))
+		case r.FormValue("q") == valueLoginEventLogFileQueryWithCursor:
+			mu.Lock()
+			requestKinds = append(requestKinds, "elf_soql_error")
+			mu.Unlock()
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(`{"error":"boom"}`))
+		case r.RequestURI == "/services/data/v58.0/sobjects/EventLogFile/0AT5j00002LqQTxGAN/LogFile":
+			mu.Lock()
+			requestKinds = append(requestKinds, "elf_log_get")
+			mu.Unlock()
+			w.Header().Set("content-type", "text/csv")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileSecondResponseCSV))
+		case r.FormValue("q") == defaultLoginObjectQuery, r.FormValue("q") == defaultLoginObjectQueryWithCursor:
+			mu.Lock()
+			requestKinds = append(requestKinds, "object_soql")
+			mu.Unlock()
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneObjectEvents))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	baseConfig := map[string]any{
+		"url":                         server.URL,
+		"version":                     56,
+		"resource.retry.max_attempts": 1,
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]any{
+			"event_log_file": map[string]any{
+				"interval": "40ms",
+				"enabled":  true,
+				"query": map[string]any{
+					"default": defaultLoginEventLogFileQuery,
+					"value":   valueLoginEventLogFileQuery,
+				},
+				"cursor": map[string]any{
+					"field": "CreatedDate",
+				},
+			},
+			"object": map[string]any{
+				"interval": "80ms",
+				"enabled":  true,
+				"query": map[string]any{
+					"default": defaultLoginObjectQuery,
+					"value":   valueLoginObjectQuery,
+				},
+				"cursor": map[string]any{
+					"field": "EventDate",
+				},
+			},
+		},
+	}
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(baseConfig).Unpack(&cfg)
+	require.NoError(t, err, "expected mixed event monitoring config to unpack")
+
+	timeoutCtx, cancelTimeout := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelTimeout()
+
+	inputCtx := v2.Context{
+		Logger: logptest.NewTestingLogger(t, "salesforce"),
+		ID:     "test_id",
+	}
+
+	var client publisher
+	ctx, cancelCause := context.WithCancelCause(timeoutCtx)
+	// Cancel once at least two Object events have been published so the
+	// in-flight Object response has been fully consumed before ctxTransport
+	// propagates the cancelled ctx into outstanding HTTP reads. The failing
+	// ELF ticker request is allowed to complete on its own schedule since
+	// the test also asserts elfSOQLErrorCount >= 1 independently.
+	var elfFailSeen bool
+	client.done = func() {
+		var objectCount int
+		for _, ev := range client.published {
+			if ev.Fields["message"] == expectedObjectEvent {
+				objectCount++
+			}
+		}
+		mu.Lock()
+		elfFailSeen = elfFailSeen || countKindLocked("elf_soql_error") >= 1
+		mu.Unlock()
+		if elfFailSeen && objectCount >= 2 {
+			cancelCause(nil)
+		}
+	}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancelCause,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		publisher: &client,
+		log:       logptest.NewTestingLogger(t, "").With("input_url", "salesforce"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.run(inputCtx)
+	require.NoError(t, err, "expected mixed event monitoring run to stop cleanly after ELF ticker failure and later object progress")
+
+	mu.Lock()
+	requestKindsCopy := append([]string(nil), requestKinds...)
+	elfSOQLErrorCount := countKindLocked("elf_soql_error")
+	elfLogGetCount := countKindLocked("elf_log_get")
+	objectSOQLCount := countKindLocked("object_soql")
+	mu.Unlock()
+
+	require.GreaterOrEqual(t, len(requestKindsCopy), 4, "expected startup requests plus the failing ELF ticker request and a later object request")
+	assert.Equal(t, []string{"elf_soql", "elf_log_get", "object_soql"}, requestKindsCopy[:3], "expected mixed startup ordering to remain unchanged before the failing ELF ticker run")
+	assert.GreaterOrEqual(t, elfSOQLErrorCount, 1, "expected at least one ticker-driven EventLogFile SOQL failure")
+	assert.Equal(t, 1, elfLogGetCount, "expected no additional EventLogFile log fetch after the ticker-driven SOQL failure")
+	assert.GreaterOrEqual(t, objectSOQLCount, 2, "expected Object monitoring to keep running after EventLogFile ticker failure")
+
+	var elfPublished, objectPublished int
+	for _, event := range client.published {
+		if event.Fields["message"] == expectedELFEvent {
+			elfPublished++
+		}
+		if event.Fields["message"] == expectedObjectEvent {
+			objectPublished++
+		}
+	}
+	assert.Equal(t, 1, elfPublished, "expected only the startup EventLogFile run to publish when later ticker SOQL requests fail")
+	assert.GreaterOrEqual(t, objectPublished, 2, "expected Object monitoring to continue publishing after EventLogFile ticker failure")
+}
+
+func TestRunWithMixedMonitoringMethodsContinuesEventLogFileAfterObjectTickerFailure(t *testing.T) {
+	logptest.NewTestingLogger(t, "")
+
+	const valueLoginEventLogFileQueryWithCursor = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND (CreatedDate > 2023-12-19T21:04:35.000+0000 OR (CreatedDate = 2023-12-19T21:04:35.000+0000 AND Id > '0AT5j00002LqQTxGAN')) ORDER BY CreatedDate ASC NULLS FIRST, Id ASC"
+
+	var (
+		requestKinds []string
+		server       *httptest.Server
+		mu           sync.Mutex
+	)
+	countKindLocked := func(kind string) int {
+		count := 0
+		for _, requestKind := range requestKinds {
+			if requestKind == kind {
+				count++
+			}
+		}
+		return count
+	}
+	maybeCancelLocked := func() {
+		// This test cancels from publisher.done so the second ELF publish is
+		// observed after the object ticker failure.
+	}
+
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == defaultLoginEventLogFileQuery, r.FormValue("q") == valueLoginEventLogFileQueryWithCursor:
+			mu.Lock()
+			requestKinds = append(requestKinds, "elf_soql")
+			maybeCancelLocked()
+			mu.Unlock()
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileFirstResponseJSON))
+		case r.RequestURI == "/services/data/v58.0/sobjects/EventLogFile/0AT5j00002LqQTxGAN/LogFile":
+			mu.Lock()
+			requestKinds = append(requestKinds, "elf_log_get")
+			maybeCancelLocked()
+			mu.Unlock()
+			w.Header().Set("content-type", "text/csv")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileSecondResponseCSV))
+		case r.FormValue("q") == defaultLoginObjectQuery:
+			mu.Lock()
+			requestKinds = append(requestKinds, "object_soql")
+			maybeCancelLocked()
+			mu.Unlock()
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneObjectEvents))
+		case r.FormValue("q") == defaultLoginObjectQueryWithCursor:
+			mu.Lock()
+			requestKinds = append(requestKinds, "object_soql_error")
+			maybeCancelLocked()
+			mu.Unlock()
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(`{"error":"boom"}`))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	baseConfig := map[string]any{
+		"url":                         server.URL,
+		"version":                     56,
+		"resource.retry.max_attempts": 1,
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]any{
+			"event_log_file": map[string]any{
+				"interval": "80ms",
+				"enabled":  true,
+				"query": map[string]any{
+					"default": defaultLoginEventLogFileQuery,
+					"value":   valueLoginEventLogFileQuery,
+				},
+				"cursor": map[string]any{
+					"field": "CreatedDate",
+				},
+			},
+			"object": map[string]any{
+				"interval": "40ms",
+				"enabled":  true,
+				"query": map[string]any{
+					"default": defaultLoginObjectQuery,
+					"value":   valueLoginObjectQuery,
+				},
+				"cursor": map[string]any{
+					"field": "EventDate",
+				},
+			},
+		},
+	}
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(baseConfig).Unpack(&cfg)
+	require.NoError(t, err, "expected mixed event monitoring config to unpack")
+
+	timeoutCtx, cancelTimeout := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelTimeout()
+
+	inputCtx := v2.Context{
+		Logger: logptest.NewTestingLogger(t, "salesforce"),
+		ID:     "test_id",
+	}
+
+	var client publisher
+	ctx, cancelCause := context.WithCancelCause(timeoutCtx)
+	client.done = func() {
+		mu.Lock()
+		objectSOQLErrorCount := countKindLocked("object_soql_error")
+		mu.Unlock()
+
+		elfPublished := 0
+		for _, event := range client.published {
+			if event.Fields["message"] == expectedELFEvent {
+				elfPublished++
+			}
+		}
+		if objectSOQLErrorCount >= 1 && elfPublished >= 2 {
+			cancelCause(nil)
+		}
+	}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancelCause,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		publisher: &client,
+		log:       logptest.NewTestingLogger(t, "").With("input_url", "salesforce"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.run(inputCtx)
+	require.NoError(t, err, "expected mixed event monitoring run to stop cleanly after object ticker failure and later EventLogFile progress")
+
+	mu.Lock()
+	requestKindsCopy := append([]string(nil), requestKinds...)
+	elfSOQLCount := countKindLocked("elf_soql")
+	elfLogGetCount := countKindLocked("elf_log_get")
+	objectSOQLErrorCount := countKindLocked("object_soql_error")
+	mu.Unlock()
+
+	require.GreaterOrEqual(t, len(requestKindsCopy), 5, "expected startup requests plus failing object ticker request and later EventLogFile requests")
+	assert.Equal(t, []string{"elf_soql", "elf_log_get", "object_soql"}, requestKindsCopy[:3], "expected mixed startup ordering to remain unchanged before the failing object ticker run")
+	assert.GreaterOrEqual(t, objectSOQLErrorCount, 1, "expected at least one ticker-driven object SOQL failure")
+	assert.GreaterOrEqual(t, elfSOQLCount, 2, "expected EventLogFile SOQL to continue after object ticker failure")
+	assert.GreaterOrEqual(t, elfLogGetCount, 2, "expected EventLogFile log fetch to continue after object ticker failure")
+
+	var elfPublished, objectPublished int
+	for _, event := range client.published {
+		if event.Fields["message"] == expectedELFEvent {
+			elfPublished++
+		}
+		if event.Fields["message"] == expectedObjectEvent {
+			objectPublished++
+		}
+	}
+	assert.GreaterOrEqual(t, elfPublished, 2, "expected EventLogFile to keep publishing after object ticker failure")
+	assert.Equal(t, 1, objectPublished, "expected only the startup Object run to publish when later ticker SOQL requests fail")
+}
+
+// newClientForCancellationTest builds a Salesforce HTTP client through the
+// production newClient with short retry waits so cancellation tests stay
+// quick. getCtx is plumbed unchanged into newClient.
+func newClientForCancellationTest(t *testing.T, getCtx func() context.Context, maxAttempts int) *http.Client {
+	t.Helper()
+	waitMin := 500 * time.Millisecond
+	waitMax := 1 * time.Second
+	transport := httpcommon.DefaultHTTPTransportSettings()
+	transport.Timeout = 5 * time.Second
+	cfg := config{
+		Resource: &resourceConfig{
+			Retry: retryConfig{
+				MaxAttempts: &maxAttempts,
+				WaitMin:     &waitMin,
+				WaitMax:     &waitMax,
+			},
+			Transport: transport,
+		},
+	}
+	c, err := newClient(cfg, getCtx, logptest.NewTestingLogger(t, "salesforce-test"))
+	require.NoError(t, err, "newClient should succeed with valid retry config")
+	return c
+}
+
+// TestNewClientShortCircuitsRetryOnContextCancel asserts that cancelling
+// the input context while the retryablehttp wrapper is mid-backoff returns
+// promptly instead of running the full attempt budget. ctxTransport on the
+// inner http.Transport alone is not enough — retryablehttp inspects
+// req.Context() (which go-sfdc leaves as context.Background) when deciding
+// whether to retry, so the input context must also be threaded through the
+// retryablehttp boundary.
+func TestNewClientShortCircuitsRetryOnContextCancel(t *testing.T) {
+	logptest.NewTestingLogger(t, "")
+
+	var attempts atomic.Int32
+	firstSeen := make(chan struct{}, 1)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if attempts.Add(1) == 1 {
+			select {
+			case firstSeen <- struct{}{}:
+			default:
+			}
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+	defer server.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	client := newClientForCancellationTest(t, func() context.Context { return ctx }, 5)
+
+	go func() {
+		select {
+		case <-firstSeen:
+		case <-time.After(2 * time.Second):
+			return
+		}
+		// Cancel mid-backoff: retryablehttp's first sleep is 500ms, so
+		// 50ms leaves a wide margin for scheduler lag on loaded runners.
+		time.Sleep(50 * time.Millisecond)
+		cancel()
+	}()
+
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, server.URL, nil)
+	require.NoError(t, err)
+
+	start := time.Now()
+	resp, err := client.Do(req)
+	elapsed := time.Since(start)
+	if resp != nil {
+		_ = resp.Body.Close()
+	}
+
+	require.Error(t, err, "client.Do should surface the cancellation as an error")
+	require.ErrorIs(t, err, context.Canceled, "cancellation should propagate as context.Canceled")
+	// Without the fix, retryablehttp runs the full backoff (~4s with
+	// these settings: 500+1000+1000+1000+1000 ms) and the server receives 5
+	// attempts. With the fix retryablehttp bails after attempt 1.
+	require.Less(t, elapsed, 500*time.Millisecond, "retryablehttp ran the full backoff instead of honoring input cancellation (took %s)", elapsed)
+	require.LessOrEqual(t, int(attempts.Load()), 1, "server received %d attempts; retryablehttp should have stopped after the first once the input context was cancelled", attempts.Load())
+}
+
+// TestNewClientPreCancelledContextShortCircuits asserts that when the
+// input context is already cancelled before a request is issued, the
+// retryablehttp wrapper returns immediately and the request never makes
+// it through more than a single attempt.
+func TestNewClientPreCancelledContextShortCircuits(t *testing.T) {
+	logptest.NewTestingLogger(t, "")
+
+	var attempts atomic.Int32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		attempts.Add(1)
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	client := newClientForCancellationTest(t, func() context.Context { return ctx }, 5)
+
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, server.URL, nil)
+	require.NoError(t, err)
+
+	start := time.Now()
+	resp, err := client.Do(req)
+	elapsed := time.Since(start)
+	if resp != nil {
+		_ = resp.Body.Close()
+	}
+
+	require.Error(t, err, "client.Do should fail when the input context is already cancelled")
+	require.ErrorIs(t, err, context.Canceled)
+	require.Less(t, elapsed, 200*time.Millisecond, "pre-cancelled context should short-circuit (took %s)", elapsed)
+	require.LessOrEqual(t, int(attempts.Load()), 1, "pre-cancelled context should not produce a full retry storm; server saw %d attempts", attempts.Load())
+}
+
+// TestNewClientNilGetCtxStillRetries asserts the retry behavior is
+// unchanged when no input context is plumbed through (getCtx == nil),
+// covering the unit-test path and any other caller that constructs a
+// client without an active input.
+func TestNewClientNilGetCtxStillRetries(t *testing.T) {
+	logptest.NewTestingLogger(t, "")
+
+	var attempts atomic.Int32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		attempts.Add(1)
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+	defer server.Close()
+
+	const maxAttempts = 2
+	client := newClientForCancellationTest(t, nil, maxAttempts)
+
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, server.URL, nil)
+	require.NoError(t, err)
+
+	resp, err := client.Do(req)
+	require.NoError(t, err, "retryablehttp surfaces the last 5xx response without an error")
+	require.NotNil(t, resp)
+	defer resp.Body.Close()
+
+	require.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+	// retryablehttp counts retries, not total attempts, so MaxAttempts=N
+	// produces 1 initial + N retries = N+1 hits at the server.
+	require.Equal(t, int32(maxAttempts+1), attempts.Load(), "with no input context plumbed in, retryablehttp should still run the full attempt budget")
+}
+
+// TestRunObjectCooldownSuppressesNextTickerTick exercises the steady-state
+// post-failure cooldown documented in doc.go: a failed Object collection is
+// expected to suppress the next ticker tick so a sustained outage produces one
+// failed Salesforce API call per (2 * interval), not one per interval. A naive
+// "now + interval" cooldown races the ticker — the next tick fires at the same
+// instant the cooldown expires (time.NewTicker(interval) keeps that cadence),
+// so time.Now().Before(backoff) evaluates to false at every tick and no tick
+// is ever skipped.
+//
+// The test fails fast on every Object SOQL call (no handler latency) and lets
+// the natural ticker cadence run for ~5 intervals. Without a safety margin
+// every tick fires a request; with the cooldown padded past the next tick,
+// every other tick is suppressed.
+func TestRunObjectCooldownSuppressesNextTickerTick(t *testing.T) {
+	logptest.NewTestingLogger(t, "")
+
+	const interval = 100 * time.Millisecond
+	const runFor = 550 * time.Millisecond
+
+	var (
+		objectFailureCount atomic.Int32
+		server             *httptest.Server
+	)
+
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case strings.Contains(r.FormValue("q"), "FROM LoginEvent"):
+			objectFailureCount.Add(1)
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(`{"error":"boom"}`))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	baseConfig := map[string]any{
+		"url":                         server.URL,
+		"version":                     56,
+		"resource.retry.max_attempts": 1,
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]any{
+			"object": map[string]any{
+				"interval": interval.String(),
+				"enabled":  true,
+				"query": map[string]any{
+					"default": defaultLoginObjectQuery,
+					"value":   valueLoginObjectQuery,
+				},
+				"cursor": map[string]any{
+					"field": "EventDate",
+				},
+			},
+		},
+	}
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(baseConfig).Unpack(&cfg)
+	require.NoError(t, err, "expected Object monitoring config to unpack")
+
+	timeoutCtx, cancelTimeout := context.WithTimeout(context.Background(), runFor)
+	defer cancelTimeout()
+
+	inputCtx := v2.Context{
+		Logger: logptest.NewTestingLogger(t, "salesforce"),
+		ID:     "test_id",
+	}
+
+	var client publisher
+	client.done = func() {}
+	ctx, cancelCause := context.WithCancelCause(timeoutCtx)
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancelCause,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		publisher: &client,
+		log:       logptest.NewTestingLogger(t, "").With("input_url", "salesforce"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.run(inputCtx)
+	require.NoError(t, err, "expected Object run loop to stop cleanly when the timeout fires")
+
+	got := int(objectFailureCount.Load())
+	// Without the cooldown fix the loop runs the initial request plus a
+	// failed request on every tick, so over ~5 intervals we observe 5 or
+	// more requests. With the cooldown firing once per failure, every
+	// second tick is suppressed and the count stays at <= 3 (initial run +
+	// at most two ticker-driven retries within the 550ms window).
+	require.LessOrEqual(t, got, 3, "expected the post-failure cooldown to suppress alternating Object ticks under sustained failure (got %d Object SOQL hits in %s with interval=%s)", got, runFor, interval)
+	require.GreaterOrEqual(t, got, 1, "expected at least the startup Object SOQL request to reach the server")
+}
+
+// TestRunObjectInitialFailureSetsCooldown asserts that a failure during the
+// startup-phase Object collection (the run() invocation that happens BEFORE
+// the ticker starts) also installs the cooldown. Without it, the very first
+// ticker tick after a startup failure always fires a fresh request because
+// the startup error path increments objectFails and updates status but
+// leaves objectBackoffUntil zero — so the first ticker tick sees no backoff
+// and runs another doomed request one interval later.
+func TestRunObjectInitialFailureSetsCooldown(t *testing.T) {
+	logptest.NewTestingLogger(t, "")
+
+	const interval = 100 * time.Millisecond
+	const runFor = 180 * time.Millisecond
+
+	var (
+		objectFailureCount atomic.Int32
+		server             *httptest.Server
+	)
+
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case strings.Contains(r.FormValue("q"), "FROM LoginEvent"):
+			objectFailureCount.Add(1)
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(`{"error":"boom"}`))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	baseConfig := map[string]any{
+		"url":                         server.URL,
+		"version":                     56,
+		"resource.retry.max_attempts": 1,
+		"auth.oauth2": map[string]any{
+			"user_password_flow": map[string]any{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]any{
+			"object": map[string]any{
+				"interval": interval.String(),
+				"enabled":  true,
+				"query": map[string]any{
+					"default": defaultLoginObjectQuery,
+					"value":   valueLoginObjectQuery,
+				},
+				"cursor": map[string]any{
+					"field": "EventDate",
+				},
+			},
+		},
+	}
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(baseConfig).Unpack(&cfg)
+	require.NoError(t, err, "expected Object monitoring config to unpack")
+
+	timeoutCtx, cancelTimeout := context.WithTimeout(context.Background(), runFor)
+	defer cancelTimeout()
+
+	inputCtx := v2.Context{
+		Logger: logptest.NewTestingLogger(t, "salesforce"),
+		ID:     "test_id",
+	}
+
+	var client publisher
+	client.done = func() {}
+	ctx, cancelCause := context.WithCancelCause(timeoutCtx)
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancelCause,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		publisher: &client,
+		log:       logptest.NewTestingLogger(t, "").With("input_url", "salesforce"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.run(inputCtx)
+	require.NoError(t, err, "expected Object run loop to stop cleanly when the timeout fires")
+
+	got := int(objectFailureCount.Load())
+	// Window is initial run (T~0) + the first ticker tick (T~interval) + a
+	// small buffer. With the bug the first ticker tick fires a second
+	// request because the startup failure path leaves objectBackoffUntil
+	// zero. With the fix the cooldown installed by the startup failure
+	// suppresses the first tick, so only the startup request is observed.
+	require.Equal(t, 1, got, "expected the startup Object failure to install a cooldown that suppresses the first ticker tick (got %d Object SOQL hits in %s with interval=%s)", got, runFor, interval)
+>>>>>>> 0894882 (increase timeouts, should make runs on busy CI machines less flaky (#54548))
 }
