@@ -73,7 +73,7 @@ Required credentials for the `azure` module:
 :   The unique identifier for the application (also known as Application Id)
 
 `client_secret`
-:   The client/application secret/key
+:   The client/application secret/key. Not required when `use_cloud_connectors` is enabled.
 
 `subscription_id`
 :   The unique identifier for the azure subscription
@@ -82,6 +82,9 @@ Required credentials for the `azure` module:
 :   The unique identifier of the Azure Active Directory instance
 
 The azure credentials keys can be used if configured `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`
+
+`use_cloud_connectors` {applies_to}`stack: ga 9.7.0`
+:   *boolean* Optional, `false` by default. When enabled, the module authenticates `client_id` with identity federation instead of `client_secret`: it exchanges an identity token provided by the environment for a Microsoft Entra ID access token. This option is intended for Elastic Agentless deployments, which provide the identity token. Only the Azure public cloud is supported.
 
 `resource_manager_endpoint`
 :   *string* Optional, by default the Azure public cloud is used. Set it to the resource manager endpoint of a sovereign cloud to target that environment; the module automatically derives the matching token audiences for all Azure APIs (including the metrics batch API) from this value for Azure Public, Azure US Government, and Azure China. Ex: [https://management.azure.com/](https://management.azure.com/) for Azure Public, [https://management.usgovcloudapi.net/](https://management.usgovcloudapi.net/) for Azure US Government, [https://management.chinacloudapi.cn/](https://management.chinacloudapi.cn/) for Azure China. The legacy Azure Germany endpoint [https://management.microsoftazure.de/](https://management.microsoftazure.de/) remains accepted for compatibility when `resource_manager_audience` is configured explicitly.

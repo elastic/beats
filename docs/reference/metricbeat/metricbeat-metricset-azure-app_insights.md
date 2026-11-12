@@ -48,7 +48,10 @@ Set `auth_type: "client_secret"` and provide the following options:
 `client_secret`
 :   (*string*) The client secret associated with the service principal.
 
-All three of `tenant_id`, `client_id`, and `client_secret` are required when `auth_type` is `client_secret`.
+When `auth_type` is `client_secret`, `tenant_id` and `client_id` are required. `client_secret` is also required unless `use_cloud_connectors` is enabled.
+
+`use_cloud_connectors` {applies_to}`stack: ga 9.7.0`
+:   (*boolean*) Optional, `false` by default. When enabled, the metricset authenticates `client_id` with identity federation instead of `client_secret`: it exchanges an identity token provided by the environment for a Microsoft Entra ID access token. `tenant_id` and `client_id` are required, `client_secret` is not, and `auth_type` defaults to `client_secret` (`api_key` can't be used). This option is intended for Elastic Agentless deployments, which provide the identity token. Only the Azure public cloud is supported.
 
 **Required permissions:** The service principal must be assigned a role that grants read access to Application Insights data. The minimum built-in role is **Monitoring Reader**, assigned at the Application Insights resource scope. Other roles that include the required permissions are **Monitoring Contributor**, **Contributor**, and **Owner**. For more details, see [Azure built-in roles for Monitor](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles/monitor).
 

@@ -388,7 +388,7 @@ The client ID used as part of the authentication flow. It is always required exc
 
 ### `auth.oauth2.client.secret` [_auth_oauth2_client_secret_3]
 
-The client secret used as part of the authentication flow. It is always required except if using `google` or `okta` as provider. Required for providers: `default`, `azure`.
+The client secret used as part of the authentication flow. It is always required except if using `google` or `okta` as provider. Required for providers: `default`, `azure` (except with `azure.use_cloud_connectors`).
 
 
 ### `auth.oauth2.user` [_auth_oauth2_user_3]
@@ -447,6 +447,29 @@ For information about where to find it, you can refer to [https://docs.microsoft
 ### `auth.oauth2.azure.resource` [_auth_oauth2_azure_resource_2]
 
 The accessed WebAPI resource when using `azure` provider. It is not required.
+
+
+### `auth.oauth2.azure.use_cloud_connectors` [_auth_oauth2_azure_use_cloud_connectors_2]
+
+```{applies_to}
+stack: ga 9.7.0
+```
+
+When `true`, the `azure` provider authenticates `client.id` with identity federation instead of `client.secret`: it exchanges an identity token provided by the environment for a Microsoft Entra ID access token. This option is intended for Elastic Agentless deployments, which provide the identity token. It defaults to `false`.
+
+When enabled, `azure.tenant_id` and `client.id` are required, `client.secret` is not required. `client.secret`, `token_url`, `user`, `password` and `endpoint_params` can't be used. Either `scopes` or `azure.resource` is required; `azure.resource` is requested as the `<resource>/.default` scope. Only the Azure public cloud is supported, and the option is not available in FIPS builds.
+
+With this option, redirects to a different scheme, host or port are refused, so that the access token is not sent to another origin.
+
+```yaml
+- type: httpjson
+  auth.oauth2:
+    provider: azure
+    client.id: <client_id>
+    azure.tenant_id: <tenant_id>
+    azure.use_cloud_connectors: true
+    azure.resource: https://management.azure.com/
+```
 
 
 ### `auth.oauth2.google.credentials_file` [_auth_oauth2_google_credentials_file_2]
