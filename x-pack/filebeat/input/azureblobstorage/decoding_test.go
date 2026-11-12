@@ -90,6 +90,19 @@ func TestDecoding(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:      "parquet",
+			file:      "../../../../libbeat/reader/parquet/testdata/vpc_flow.gz.parquet",
+			numEvents: 652,
+			config: decoder.Config{
+				Codec: &decoder.CodecConfig{
+					Parquet: &decoder.ParquetCodecConfig{
+						Enabled:   true,
+						BatchSize: 1,
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -119,6 +132,15 @@ func TestDecoding(t *testing.T) {
 			}
 
 			events := p.events
+
+			ids := make(map[any]struct{}, len(events))
+			for _, event := range events {
+				ids[event.Meta["_id"]] = struct{}{}
+			}
+			assert.Len(t, ids, len(events), "events from the same object must have unique IDs")
+			if tc.numEvents != 0 {
+				assert.Len(t, events, tc.numEvents, "unexpected number of events")
+			}
 			if tc.assertAgainst != "" {
 				targetData := readJSONFromFile(t, filepath.Join(testDataPath, tc.assertAgainst))
 				assert.Equal(t, len(targetData), len(events))
