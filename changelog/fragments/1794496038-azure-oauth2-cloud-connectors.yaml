@@ -1,0 +1,3 @@
+kind: feature
+summary: Add identity federation authentication to the CEL and HTTP JSON Azure OAuth2 provider
+component: filebeat
