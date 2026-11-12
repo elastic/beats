@@ -27,8 +27,8 @@ import (
 	// are performed.
 	"unsafe"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func connectionStartMethod(m *amqpMessage, args []byte, logger *logp.Logger) (bool, bool) {

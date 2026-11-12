@@ -20,9 +20,9 @@ import (
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 )
 
 // OptionalGovCloudFIPS is a list of services on AWS GovCloud that is not FIPS by default.

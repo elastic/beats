@@ -24,7 +24,7 @@ import (
 	"github.com/prometheus/common/model"
 	promlabels "github.com/prometheus/prometheus/model/labels"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/labelhash"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"

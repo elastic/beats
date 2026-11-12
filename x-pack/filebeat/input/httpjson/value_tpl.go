@@ -28,8 +28,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/version"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/useragent"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/useragent"
 )
 
 // we define custom delimiters to prevent issues when using template values as part of other Go templates.

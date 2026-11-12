@@ -12,7 +12,7 @@ import (
 
 	"github.com/elastic/beats/v7/auditbeat/tracing"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // baseTemplateVars contains the substitution variables useful to write KProbes

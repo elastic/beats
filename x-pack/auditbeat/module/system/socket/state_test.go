@@ -22,9 +22,9 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/tracing"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type logWrapper testing.T

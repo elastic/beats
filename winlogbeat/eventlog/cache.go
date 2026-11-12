@@ -27,9 +27,9 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
 	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Stats for the message file caches.

@@ -12,10 +12,10 @@ import (
 	"github.com/elastic/beats/v7/filebeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/filebeat/include"
 	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
 	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"

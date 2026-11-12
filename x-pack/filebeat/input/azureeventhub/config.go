@@ -13,8 +13,8 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 )
 
 const ephContainerName = "filebeat"

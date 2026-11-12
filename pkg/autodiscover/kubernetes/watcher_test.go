@@ -30,7 +30,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	cachetest "k8s.io/client-go/tools/cache/testing"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 func TestWatcherStartAndStop(t *testing.T) {

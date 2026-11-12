@@ -23,9 +23,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/testing/estools"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/testing/estools"
 )
 
 func TestMetricbeatOTelE2E(t *testing.T) {

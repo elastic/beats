@@ -23,8 +23,8 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"go.opentelemetry.io/collector/consumer"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/paths"
 )
 
 // Info stores a beats instance meta data.
