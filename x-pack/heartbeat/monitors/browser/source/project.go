@@ -103,6 +103,25 @@ type PackageJSON struct {
 	Name         string   `json:"name"`
 	Private      bool     `json:"private"`
 	Dependencies mapstr.M `json:"dependencies"`
+	AllowScripts mapstr.M `json:"allowScripts,omitempty"`
+}
+
+func newProjectPackageJSON(symlinkPath string) PackageJSON {
+	return PackageJSON{
+		Name:    "project-journey",
+		Private: true,
+		Dependencies: mapstr.M{
+			"@elastic/synthetics": symlinkPath,
+		},
+		// npm 11.16+ warns and npm 12 blocks unlisted install/prepare scripts.
+		AllowScripts: mapstr.M{
+			"@elastic/synthetics": true,
+			symlinkPath:           true,
+			"esbuild":             true,
+			"playwright-chromium": true,
+			"sharp":               true,
+		},
+	}
 }
 
 // setupProjectDir sets ups the required package.json file and
@@ -120,13 +139,7 @@ func setupProjectDir(workdir string) error {
 
 	globalPath := strings.Replace(fname, "bin/elastic-synthetics", "lib/node_modules/@elastic/synthetics", 1)
 	symlinkPath := fmt.Sprintf("file:%s", globalPath)
-	pkgJson := PackageJSON{
-		Name:    "project-journey",
-		Private: true,
-		Dependencies: mapstr.M{
-			"@elastic/synthetics": symlinkPath,
-		},
-	}
+	pkgJson := newProjectPackageJSON(symlinkPath)
 	pkgJsonContent, err := json.MarshalIndent(pkgJson, "", "  ")
 	if err != nil {
 		return err
