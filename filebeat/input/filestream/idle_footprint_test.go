@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"runtime"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -36,10 +37,11 @@ import (
 )
 
 // BenchmarkIdleResourceFootprint measures the steady-state goroutine count and
-// live heap of the filestream input once a fleet of files has been read and is
-// idle (open and tailed, but not being written to). This is the scenario where
-// the run-to-EOF-then-park model wins over one-goroutine-per-open-file: idle
-// files cost no goroutine and no live reader pipeline.
+// live heap of the filestream input once a fleet of files has been read, its
+// events ACKed, and is idle (open and tailed, but not being written to). This
+// is the scenario where the run-to-EOF-then-park model wins over
+// one-goroutine-per-open-file: idle files cost no goroutine and no live reader
+// pipeline.
 //
 // Reported metrics (lower is better):
 //   - goroutines/file : resident goroutines per open idle file
@@ -100,11 +102,12 @@ paths:
 		runtime.ReadMemStats(&base)
 
 		var count int64
+		pipeline := &countingPipeline{count: &count}
 		var runErr error
 		done := make(chan struct{})
 		go func() {
 			defer close(done)
-			runErr = input.Run(v2ctx, &countingPipeline{count: &count})
+			runErr = input.Run(v2ctx, pipeline)
 		}()
 
 		// Wait for the whole fleet to be ingested, then let it settle into idle.
@@ -112,6 +115,7 @@ paths:
 			func() bool { return atomic.LoadInt64(&count) >= wantEvents },
 			120*time.Second, 50*time.Millisecond,
 			"all files should be fully ingested")
+		pipeline.ackAll()
 		time.Sleep(3 * time.Second) // settle: harvesters reach EOF and park / back off
 
 		runtime.GC()
@@ -139,19 +143,50 @@ paths:
 }
 
 // countingPipeline counts published events without ever stopping the input, so
-// the harvesters stay alive and idle after reaching EOF.
-type countingPipeline struct{ count *int64 }
-
-func (p *countingPipeline) ConnectWith(beat.ClientConfig) (beat.Client, error) {
-	return &countingClient{p.count}, nil
+// the harvesters stay alive and idle after reaching EOF. ackAll ACKs every
+// published event in one batch per client, like an output would.
+type countingPipeline struct {
+	count   *int64
+	mu      sync.Mutex
+	clients []*countingClient
 }
-func (p *countingPipeline) Connect() (beat.Client, error)    { return &countingClient{p.count}, nil }
+
+func (p *countingPipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
+	c := &countingClient{count: p.count, listener: cfg.EventListener}
+	p.mu.Lock()
+	p.clients = append(p.clients, c)
+	p.mu.Unlock()
+	return c, nil
+}
+func (p *countingPipeline) Connect() (beat.Client, error)    { return p.ConnectWith(beat.ClientConfig{}) }
 func (p *countingPipeline) Disconnect(context.Context) error { return nil }
 
-type countingClient struct{ count *int64 }
+func (p *countingPipeline) ackAll() {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	for _, c := range p.clients {
+		if n := c.pending.Swap(0); n > 0 {
+			c.listener.ACKEvents(int(n))
+		}
+	}
+}
 
-func (c *countingClient) Publish(beat.Event) { atomic.AddInt64(c.count, 1) }
+type countingClient struct {
+	count    *int64
+	listener beat.EventListener
+	pending  atomic.Int64
+}
+
+func (c *countingClient) Publish(e beat.Event) {
+	if c.listener != nil {
+		c.listener.AddEvent(e, true)
+		c.pending.Add(1)
+	}
+	atomic.AddInt64(c.count, 1)
+}
 func (c *countingClient) PublishAll(es []beat.Event) {
-	atomic.AddInt64(c.count, int64(len(es)))
+	for _, e := range es {
+		c.Publish(e)
+	}
 }
 func (c *countingClient) Close() error { return nil }

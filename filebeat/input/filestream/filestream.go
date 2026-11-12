@@ -23,8 +23,7 @@ import (
 	"io"
 	"os"
 	"sync"
-
-	"github.com/elastic/go-concert/ctxtool"
+	"sync/atomic"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/pkg/logp"
@@ -49,9 +48,11 @@ var (
 // end, ErrFileTruncate when the file shrank, or ErrWouldBlock when an active file
 // has nothing to read yet.
 type logFile struct {
-	file      File
-	log       *logp.Logger
-	readerCtx ctxtool.CancelContext
+	file File
+	log  *logp.Logger
+
+	canceler input.Canceler
+	closed   atomic.Bool
 
 	closeOnEOF bool
 
@@ -76,7 +77,7 @@ func newFileReader(
 		log:        log,
 		closeOnEOF: closerConfig.Reader.OnEOF,
 		offset:     offset,
-		readerCtx:  ctxtool.WithCancelContext(ctxtool.FromCanceller(canceler)),
+		canceler:   canceler,
 	}, nil
 }
 
@@ -85,9 +86,9 @@ func newFileReader(
 //   - io.EOF when close_on_eof (or a GZIP file) reaches the end;
 //   - ErrFileTruncate when the file shrank;
 //   - ErrWouldBlock when an active file has no data right now;
-//   - ErrClosed when the reader's context was cancelled.
+//   - ErrClosed when the reader was closed or its canceler cancelled.
 func (f *logFile) Read(buf []byte) (int, error) {
-	if f.readerCtx.Err() != nil {
+	if f.closed.Load() || f.canceler.Err() != nil {
 		return 0, ErrClosed
 	}
 
@@ -184,7 +185,7 @@ func (f *logFile) handleEOF() error {
 // Close cancels the reader. It does NOT close the underlying file handle, which
 // is owned by the harvester session.
 func (f *logFile) Close() error {
-	f.readerCtx.Cancel()
+	f.closed.Store(true)
 	f.log.Debugf("Closed reader. Path='%s'", f.file.Name())
 	return nil
 }
