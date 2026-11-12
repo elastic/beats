@@ -75,7 +75,7 @@ stack: ga 9.7+
 
 FIPS-compatible Metricbeat includes the Oracle module. Metricbeat doesn't encrypt the connection to Oracle Database itself. The Oracle Instant Client that you install on the Metricbeat host encrypts it.
 
-To run the module in a FIPS-compliant deployment, configure the Oracle Instant Client and Oracle Database to use a FIPS 140-3 validated cryptographic provider. Elastic doesn't ship or configure the Oracle Instant Client, so this configuration is your responsibility. For the settings, refer to the Oracle Database documentation.
+To run the module in a FIPS-compliant deployment, configure the Oracle Instant Client and Oracle Database to use a FIPS 140-3 validated cryptographic provider. Elastic doesn't ship or configure the Oracle Instant Client, so this configuration is your responsibility. For the settings, refer to the [Oracle Database documentation](https://docs.oracle.com/en/database).
 
 For other FIPS limitations, refer to [FIPS mode for Ingest tools](docs-content://deploy-manage/security/fips-ingest.md).
 
