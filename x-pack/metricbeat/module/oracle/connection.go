@@ -13,6 +13,7 @@ import (
 	"github.com/godror/godror"
 	"github.com/godror/godror/dsn"
 
+	sqlhelper "github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -26,7 +27,11 @@ type ConnectionDetails struct {
 
 // HostParser parses host and extracts connection information and returns it to HostData
 // HostData can then be used to make connection to SQL
-func HostParser(mod mb.Module, rawURL string) (mb.HostData, error) {
+func HostParser(mod mb.Module, rawURL string) (_ mb.HostData, parseErr error) {
+	defer func() {
+		parseErr = sqlhelper.SanitizeError(parseErr, rawURL)
+	}()
+
 	params, err := godror.ParseDSN(rawURL)
 	if err != nil {
 		return mb.HostData{}, fmt.Errorf("error trying to parse connection string in field 'hosts': %w", err)
