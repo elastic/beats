@@ -465,13 +465,8 @@ func checkRedirect(config *requestConfig, log *logp.Logger) func(*http.Request, 
 
 		prev := via[len(via)-1] // previous request to get headers from
 
-<<<<<<< HEAD
-		log.Debugf("http client: forwarding headers from previous request: %#v", prev.Header)
-		req.Header = prev.Header.Clone()
-=======
 		log.Debugf("http client: forwarding headers from previous request: %v", slices.Sorted(maps.Keys(prev.Header)))
 		req.Header = prev.Header.Clone() //nolint:gosec // G119: sensitive headers are removed below for cross-origin redirects via config.RedirectSensitiveHeaders
->>>>>>> f86f36b (x-pack/filebeat/input/{cel,httpjson,streaming,entityanalytics/provider/{okta,jamf}}: log header names only (#54493))
 
 		if req.URL.Host != prev.URL.Host || (prev.URL.Scheme == "https" && req.URL.Scheme == "http") {
 			for _, k := range sensitiveHeaders(config.RedirectSensitiveHeaders) {
