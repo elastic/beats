@@ -7,7 +7,7 @@ applies_to:
   serverless: ga
 ---
 
-# Dissect strings [dissect]
+# Dissect strings in Filebeat [dissect]
 
 
 The `dissect` processor tokenizes incoming strings using defined patterns.
