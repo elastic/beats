@@ -12,10 +12,7 @@ toc:
     children:
       - file: import-dashboards.md
       - file: build-dashboards.md
-      - file: generate-index-pattern.md
       - file: export-dashboards.md
-      - file: archive-dashboards.md
-      - file: share-beat-dashboards.md
   - file: new-protocol.md
     children:
       - file: getting-ready-new-protocol.md
@@ -29,4 +26,3 @@ toc:
       - file: creating-metricbeat-module.md
       - file: dev-faq.md
   - file: filebeat-modules-devguide.md
-  - file: _migrating_dashboards_from_kibana_5_x_to_6_x.md
