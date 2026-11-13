@@ -9,15 +9,9 @@ entries:
         request is now sent on the control socket.
       component: auditbeat
       pr:
-        - https://github.com/elastic/beats/pull/54279
-        - https://github.com/elastic/beats/pull/54573
-        - https://github.com/elastic/beats/pull/54634
-        - https://github.com/elastic/beats/pull/51019
-        - https://github.com/elastic/beats/pull/54650
-        - https://github.com/elastic/beats/pull/54693
-        - https://github.com/elastic/beats/pull/54695
+        - https://github.com/elastic/beats/pull/53707
       issue:
-        - https://github.com/elastic/beats/issues/54257
+        - https://github.com/elastic/beats/issues/50189
       impact: ""
       action: ""
       timestamp: 1791841937
@@ -36,15 +30,8 @@ entries:
         already waited longer than the limit are not delayed further.
       component: auditbeat
       pr:
-        - https://github.com/elastic/beats/pull/54279
-        - https://github.com/elastic/beats/pull/54573
-        - https://github.com/elastic/beats/pull/54634
-        - https://github.com/elastic/beats/pull/51019
-        - https://github.com/elastic/beats/pull/54650
-        - https://github.com/elastic/beats/pull/54693
-        - https://github.com/elastic/beats/pull/54695
-      issue:
-        - https://github.com/elastic/beats/issues/54257
+        - https://github.com/elastic/beats/pull/53853
+      issue: []
       impact: ""
       action: ""
       timestamp: 1792363230
@@ -56,15 +43,8 @@ entries:
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/54279
-        - https://github.com/elastic/beats/pull/54573
-        - https://github.com/elastic/beats/pull/54634
-        - https://github.com/elastic/beats/pull/51019
-        - https://github.com/elastic/beats/pull/54650
-        - https://github.com/elastic/beats/pull/54693
-        - https://github.com/elastic/beats/pull/54695
-      issue:
-        - https://github.com/elastic/beats/issues/54257
+        - https://github.com/elastic/beats/pull/54067
+      issue: []
       impact: ""
       action: ""
       timestamp: 1793010748
@@ -77,15 +57,8 @@ entries:
         The kprobes backend of the file_integrity module stopped at the first /proc/kallsyms entry whose name started with the probed symbol, so on kernels that list a cold-path fragment such as fsnotify.cold ahead of fsnotify it reported "symbol fsnotify is optimised" and failed to start. Symbol lookup now scans the whole table, prefers an exact match, and ignores .cold fragments, which are not compiler clones of the function.
       component: auditbeat
       pr:
-        - https://github.com/elastic/beats/pull/54279
-        - https://github.com/elastic/beats/pull/54573
-        - https://github.com/elastic/beats/pull/54634
-        - https://github.com/elastic/beats/pull/51019
-        - https://github.com/elastic/beats/pull/54650
-        - https://github.com/elastic/beats/pull/54693
-        - https://github.com/elastic/beats/pull/54695
-      issue:
-        - https://github.com/elastic/beats/issues/54257
+        - https://github.com/elastic/beats/pull/54106
+      issue: []
       impact: ""
       action: ""
       timestamp: 1793095203
@@ -102,15 +75,8 @@ entries:
         and localized labels (e.g. German Name=/Wert=) are parsed.
       component: winlogbeat
       pr:
-        - https://github.com/elastic/beats/pull/54279
-        - https://github.com/elastic/beats/pull/54573
-        - https://github.com/elastic/beats/pull/54634
-        - https://github.com/elastic/beats/pull/51019
-        - https://github.com/elastic/beats/pull/54650
-        - https://github.com/elastic/beats/pull/54693
-        - https://github.com/elastic/beats/pull/54695
-      issue:
-        - https://github.com/elastic/beats/issues/54257
+        - https://github.com/elastic/beats/pull/54115
+      issue: []
       impact: ""
       action: ""
       timestamp: 1793099380
@@ -122,15 +88,9 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/54279
-        - https://github.com/elastic/beats/pull/54573
-        - https://github.com/elastic/beats/pull/54634
-        - https://github.com/elastic/beats/pull/51019
-        - https://github.com/elastic/beats/pull/54650
-        - https://github.com/elastic/beats/pull/54693
-        - https://github.com/elastic/beats/pull/54695
+        - https://github.com/elastic/beats/pull/54143
       issue:
-        - https://github.com/elastic/beats/issues/54257
+        - https://github.com/elastic/beats/issues/50021
       impact: ""
       action: ""
       timestamp: 1793100000
@@ -142,15 +102,8 @@ entries:
       description: ""
       component: heartbeat
       pr:
-        - https://github.com/elastic/beats/pull/54279
-        - https://github.com/elastic/beats/pull/54573
-        - https://github.com/elastic/beats/pull/54634
-        - https://github.com/elastic/beats/pull/51019
-        - https://github.com/elastic/beats/pull/54650
-        - https://github.com/elastic/beats/pull/54693
-        - https://github.com/elastic/beats/pull/54695
-      issue:
-        - https://github.com/elastic/beats/issues/54257
+        - https://github.com/elastic/beats/pull/52405
+      issue: []
       impact: ""
       action: ""
       timestamp: 1793193287
@@ -162,15 +115,8 @@ entries:
       description: ""
       component: libbeat
       pr:
-        - https://github.com/elastic/beats/pull/54279
-        - https://github.com/elastic/beats/pull/54573
-        - https://github.com/elastic/beats/pull/54634
-        - https://github.com/elastic/beats/pull/51019
-        - https://github.com/elastic/beats/pull/54650
-        - https://github.com/elastic/beats/pull/54693
-        - https://github.com/elastic/beats/pull/54695
-      issue:
-        - https://github.com/elastic/beats/issues/54257
+        - https://github.com/elastic/beats/pull/54224
+      issue: []
       impact: ""
       action: ""
       timestamp: 1793285753
@@ -192,15 +138,8 @@ entries:
         are not read as object paths.
       component: winlogbeat
       pr:
-        - https://github.com/elastic/beats/pull/54279
-        - https://github.com/elastic/beats/pull/54573
-        - https://github.com/elastic/beats/pull/54634
-        - https://github.com/elastic/beats/pull/51019
-        - https://github.com/elastic/beats/pull/54650
-        - https://github.com/elastic/beats/pull/54693
-        - https://github.com/elastic/beats/pull/54695
-      issue:
-        - https://github.com/elastic/beats/issues/54257
+        - https://github.com/elastic/beats/pull/54260
+      issue: []
       impact: ""
       action: ""
       timestamp: 1793354900
@@ -232,15 +171,8 @@ entries:
         are not idempotent, such as add_tags or script, produced wrong results.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/54279
-        - https://github.com/elastic/beats/pull/54573
-        - https://github.com/elastic/beats/pull/54634
-        - https://github.com/elastic/beats/pull/51019
-        - https://github.com/elastic/beats/pull/54650
-        - https://github.com/elastic/beats/pull/54693
-        - https://github.com/elastic/beats/pull/54695
-      issue:
-        - https://github.com/elastic/beats/issues/54257
+        - https://github.com/elastic/beats/pull/54416
+      issue: []
       impact: ""
       action: ""
       timestamp: 1793716381
