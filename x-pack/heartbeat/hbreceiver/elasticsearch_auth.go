@@ -33,7 +33,7 @@ func beatsAuthStartHook(
 	ctx context.Context,
 	reference string,
 	heartbeat *beater.Heartbeat,
-	userAgent string,
+	userAgent func() string,
 	logger *logp.Logger,
 	setRequester func(*eslegclient.Connection),
 ) func(component.Host) error {
@@ -65,7 +65,7 @@ func beatsAuthStartHook(
 			return fmt.Errorf("heartbeat instance was not captured for monitor_state.elasticsearch extension %q", extensionID.String())
 		}
 
-		requester, err := newESClient(ctx, auth, userAgent, logger)
+		requester, err := newESClient(ctx, auth, userAgent(), logger)
 		if err != nil {
 			if ctx.Err() != nil {
 				return ctx.Err()

@@ -82,9 +82,7 @@ func (n *OtelManager) Stop() {
 	}
 }
 
-// Enabled returns false because many places inside beats call manager.Enabled() for various purposes
-// Returning true might lead to side effects.
-func (n *OtelManager) Enabled() bool                      { return false }
+func (n *OtelManager) ConfigFromControlProtocol() bool    { return false }
 func (n *OtelManager) AgentInfo() management.AgentInfo    { return management.AgentInfo{} }
 func (n *OtelManager) PreInit() error                     { return nil }
 func (n *OtelManager) PostInit()                          {}
