@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 )
 
 type config struct {
@@ -74,10 +74,9 @@ func defaultConfig() config {
 				WaitMin:     &waitMin,
 				WaitMax:     &waitMax,
 			},
-			RedirectForwardHeaders:   false,
-			RedirectSensitiveHeaders: []string{"Authorization", "Proxy-Authorization", "Cookie"},
-			RedirectMaxRedirects:     10,
-			Transport:                transport,
+			RedirectForwardHeaders: false,
+			RedirectMaxRedirects:   10,
+			Transport:              transport,
 		},
 		Response: &responseConfig{},
 	}

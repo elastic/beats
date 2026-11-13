@@ -23,11 +23,11 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	util "github.com/elastic/beats/v7/pkg/systemmetrics/metric"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/memory"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/transform/typeconv"
+	"github.com/elastic/beats/v7/pkg/transform/typeconv"
 )
 
 // FetchLinuxMemStats gets page_stat and huge pages data for linux

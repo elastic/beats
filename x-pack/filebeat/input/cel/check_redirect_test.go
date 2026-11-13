@@ -7,9 +7,11 @@ package cel
 import (
 	"net/http"
 	"net/url"
+	"slices"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 func TestCheckRedirectSensitiveHeaders(t *testing.T) {
@@ -133,4 +135,38 @@ func mustParseURL(t *testing.T, raw string) *url.URL {
 		t.Fatalf("failed to parse URL %q: %v", raw, err)
 	}
 	return u
+}
+
+func TestSensitiveHeadersConfig(t *testing.T) {
+	const base = "interval: 1m\nprogram: \"{}\"\nresource.url: http://example.com\n"
+	tests := []struct {
+		name string
+		yaml string
+		want []string
+	}{
+		{name: "unset_uses_defaults", yaml: "", want: []string{"Authorization", "Proxy-Authorization", "Cookie"}},
+		{name: "null_uses_defaults", yaml: "resource.redirect.sensitive_headers: ~\n", want: []string{"Authorization", "Proxy-Authorization", "Cookie"}},
+		{name: "empty_disables", yaml: "resource.redirect.sensitive_headers: []\n", want: []string{}},
+		{name: "custom_replaces_defaults", yaml: "resource.redirect.sensitive_headers: [X-Api-Key]\n", want: []string{"X-Api-Key"}},
+		{name: "longer_custom_replaces_defaults", yaml: "resource.redirect.sensitive_headers: [A, B, C, D]\n", want: []string{"A", "B", "C", "D"}},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			c := defaultConfig()
+			u, err := conf.NewConfigWithYAML([]byte(base+test.yaml), "")
+			if err != nil {
+				t.Fatalf("failed to parse config: %v", err)
+			}
+			err = u.Unpack(&c)
+			if err != nil {
+				t.Fatalf("failed to unpack config: %v", err)
+			}
+
+			got := sensitiveHeaders(c.Resource.RedirectSensitiveHeaders)
+			if !slices.Equal(got, test.want) {
+				t.Errorf("sensitive headers = %v; want %v", got, test.want)
+			}
+		})
+	}
 }

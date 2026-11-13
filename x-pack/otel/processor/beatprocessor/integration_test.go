@@ -18,8 +18,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v7/pkg/testing/estools"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
-	"github.com/elastic/elastic-agent-libs/testing/estools"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
@@ -103,11 +103,10 @@ exporters:
     user: admin
     password: testing
     logs_index: {{.Index}}
-    batcher:
+    sending_queue:
       enabled: true
-      flush_timeout: 1s
-    mapping:
-      mode: bodymap
+      batch:
+        flush_timeout: 1s
 `
 	var renderedConfig bytes.Buffer
 	require.NoError(t, template.Must(template.New("config").Parse(configTemplate)).Execute(&renderedConfig, configParameters))
@@ -176,11 +175,10 @@ exporters:
     user: admin
     password: testing
     logs_index: %s
-    batcher:
+    sending_queue:
       enabled: true
-      flush_timeout: 1s
-    mapping:
-      mode: bodymap
+      batch:
+        flush_timeout: 1s
 `
 	logFilePath := filepath.Join(filebeatWithReceiver.TempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, wantEvents)

@@ -11,7 +11,6 @@ updates:
     allow:
       # Team:Elastic-Agent-Data-Plane
       - dependency-name: github.com/elastic/elastic-agent-client/*
-      - dependency-name: github.com/elastic/elastic-agent-libs
       - dependency-name: github.com/elastic/elastic-agent-shipper-client
       - dependency-name: github.com/elastic/go-concert
       - dependency-name: github.com/elastic/go-elasticsearch/*
@@ -32,7 +31,6 @@ updates:
       - dependency-name: github.com/elastic/go-perf
       - dependency-name: github.com/elastic/go-seccomp-bpf
       - dependency-name: github.com/elastic/toutoumomoma
-      - dependency-name: github.com/elastic/ebpfevents
       # Team:Team:obs-ds-hosted-services, Team:obs-signals-integrations-team
       # AWS SDK dependencies
       - dependency-name: github.com/aws/aws-sdk-go-v2/*
