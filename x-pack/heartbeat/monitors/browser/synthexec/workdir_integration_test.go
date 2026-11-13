@@ -34,9 +34,13 @@ func TestSyntheticsWorkdirIntegration(t *testing.T) {
 	}
 	cli := os.Getenv("SYNTHETICS_WORKDIR_CLI")
 	if cli == "" {
-		var err error
-		cli, err = exec.LookPath("elastic-synthetics")
-		require.NoError(t, err, "install a synthetics CLI supporting --workdir")
+		// Version managers can expose shell shims rather than symlinks on PATH.
+		// Resolve the npm installation so fixture imports use the same package as the CLI.
+		npmRoot, err := exec.CommandContext(t.Context(), "npm", "root", "-g").Output()
+		require.NoError(t, err, "resolve the global npm package directory")
+		root := strings.TrimSpace(string(npmRoot))
+		require.NotEmpty(t, root, "npm must report its global package directory")
+		cli = filepath.Join(root, "@elastic", "synthetics", "dist", "cli.js")
 	}
 	cli, err := filepath.EvalSymlinks(cli)
 	require.NoError(t, err, "resolve CLI installation")
