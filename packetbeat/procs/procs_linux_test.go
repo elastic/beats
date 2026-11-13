@@ -26,6 +26,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
@@ -147,4 +148,21 @@ func assertUint64ArraysAreEqual(t *testing.T, expected []uint64, result []uint64
 		}
 	}
 	return true
+}
+
+func TestGetProcessVanishedPID(t *testing.T) {
+	logger, logs := logptest.NewTestingLoggerWithObserver(t, "")
+	procs := ProcessesWatcher{}
+	err := procs.Init(ProcsConfig{Enabled: true}, logger)
+	require.NoError(t, err)
+
+	// A PID far above any kernel pid_max, standing in for a process that
+	// exited after the socket scan.
+	p := procs.GetProcess(1 << 30)
+	require.Nil(t, p, "process for a vanished PID")
+
+	for _, e := range logs.All() {
+		require.Less(t, e.Level, zapcore.ErrorLevel, "vanished PID logged at %s: %s", e.Level, e.Message)
+	}
+	require.NotZero(t, logs.FilterMessageSnippet("Unable to get command-line for PID").Len(), "expected a debug message for the vanished PID")
 }

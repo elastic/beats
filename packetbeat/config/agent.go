@@ -20,6 +20,7 @@ package config
 import (
 	"fmt"
 	"runtime"
+	"time"
 
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	conf "github.com/elastic/beats/v7/pkg/config"
@@ -92,7 +93,7 @@ func (i agentInput) addProcessorsAndIndex(cfg *conf.C) (*conf.C, error) {
 }
 
 func mergeProcsConfig(one, two procs.ProcsConfig) procs.ProcsConfig {
-	maxProcReadFreq := max(two.MaxProcReadFreq, one.MaxProcReadFreq)
+	maxProcReadFreq := mergeMaxProcReadFreq(one.MaxProcReadFreq, two.MaxProcReadFreq)
 
 	refreshPidsFreq := min(two.RefreshPidsFreq, one.RefreshPidsFreq)
 
@@ -105,6 +106,17 @@ func mergeProcsConfig(one, two procs.ProcsConfig) procs.ProcsConfig {
 		RefreshPidsFreq: refreshPidsFreq,
 		Monitored:       append(one.Monitored, two.Monitored...),
 	}
+}
+
+// mergeMaxProcReadFreq combines two max_proc_read_freq values. A negative
+// value disables the scan limit and wins over any other value; otherwise the
+// larger value wins. A plain max would turn a negative value into zero, which
+// selects the default limit.
+func mergeMaxProcReadFreq(one, two time.Duration) time.Duration {
+	if one < 0 || two < 0 {
+		return -1
+	}
+	return max(one, two)
 }
 
 // NewAgentConfig allows the packetbeat configuration to understand

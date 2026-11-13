@@ -99,7 +99,8 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 		inodes, err := findSocketsOfPid("", pid, proc.procLogger)
 		if err != nil {
 			if os.IsNotExist(err) {
-				proc.logger.Infof("FindSocketsOfPid: %s", err)
+				// A process exiting during the scan is normal.
+				proc.procLogger.Debugf("FindSocketsOfPid: %s", err)
 			} else {
 				proc.logger.Errorf("FindSocketsOfPid: %s", err)
 			}
