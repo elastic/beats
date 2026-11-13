@@ -65,7 +65,7 @@
     - name: cluster.operation.completion_time.value
       type: object
       object_type: histogram
-      description: The time operations took to complete from the time the user submits a operation to the time Dataproc reports it is completed.
+      description: The time operations took to complete from the time the user submits an operation to the time Dataproc reports it is completed.
     - name: cluster.operation.duration.value
       type: object
       object_type: histogram
