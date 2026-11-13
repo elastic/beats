@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"net/url"
 	"regexp"
 	"time"
@@ -101,6 +102,27 @@ type keepAliveConfig struct {
 	// this is internally set to 3x the value of the writeControlDeadline to account for network latency/jitter.
 	readControlDeadline time.Duration
 }
+
+// validate checks effective keep-alive settings after defaults are applied.
+func (c keepAliveConfig) validate() error {
+	if !c.Enable {
+		return nil
+	}
+	if c.WriteControlDeadline <= 0 {
+		return errors.New("keep_alive.write_control_deadline must be greater than zero")
+	}
+	if c.WriteControlDeadline > time.Duration(math.MaxInt64/3) {
+		return errors.New("keep_alive.write_control_deadline is too large: three times its value must fit in a duration")
+	}
+	if c.Interval <= 0 {
+		return errors.New("keep_alive.interval must be greater than zero")
+	}
+	if c.Interval >= 3*c.WriteControlDeadline {
+		return errors.New("keep_alive.interval must be less than three times keep_alive.write_control_deadline")
+	}
+	return nil
+}
+
 type authConfig struct {
 	// Custom auth config to use for authentication.
 	CustomAuth *customAuthConfig `config:"custom"`
