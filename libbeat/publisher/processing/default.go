@@ -60,7 +60,14 @@ type builder struct {
 	processors *group
 
 	alwaysCopy bool
+
+	// Processors shared by every client chain. They must stay safe for
+	// concurrent use and must not implement processors.Closer.
+	generalize map[generalizeKey]beat.Processor
+	debugPrint beat.Processor
 }
+
+type generalizeKey struct{ keepNull, inPlace bool }
 
 type modifier interface {
 	// BuiltinFields defines global fields to be added to every event.
@@ -234,6 +241,14 @@ func newBuilder(
 		b.builtinMeta = builtin
 	}
 
+	b.generalize = map[generalizeKey]beat.Processor{}
+	for _, keepNull := range []bool{false, true} {
+		for _, inPlace := range []bool{false, true} {
+			b.generalize[generalizeKey{keepNull, inPlace}] = newGeneralizeProcessor(keepNull, inPlace, log)
+		}
+	}
+	b.debugPrint = debugPrintProcessor(info, log)
+
 	if len(eventMeta.Fields) > 0 {
 		b.fields = mapstr.M{}
 		if err := mapstr.MergeFields(b.fields, eventMeta.Fields.Clone(), eventMeta.FieldsUnderRoot); err != nil {
@@ -326,12 +341,12 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	}
 
 	// setup 1: generalize/normalize output (P)
+	normalize := !b.skipNormalize
 	if cfg.EventNormalization != nil {
-		if *cfg.EventNormalization {
-			processors.add(newGeneralizeProcessor(cfg.KeepNull, cfg.NormalizeInPlace, b.log))
-		}
-	} else if !b.skipNormalize {
-		processors.add(newGeneralizeProcessor(cfg.KeepNull, cfg.NormalizeInPlace, b.log))
+		normalize = *cfg.EventNormalization
+	}
+	if normalize {
+		processors.add(b.generalize[generalizeKey{cfg.KeepNull, cfg.NormalizeInPlace}])
 	}
 
 	// setup 2: add Meta from client config (C)
@@ -351,11 +366,21 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	}
 
 	// setup 3, 4, 5: client config fields + pipeline fields + client fields + dyn metadata
-	fields := cfg.Fields.Clone()
-	fields.DeepUpdate(b.fields.Clone())
-	if em := cfg.EventMetadata; len(em.Fields) > 0 {
-		if err := mapstr.MergeFieldsDeep(fields, em.Fields.Clone(), em.FieldsUnderRoot); err != nil {
-			return nil, fmt.Errorf("failed merging client event metadata into fields: %w", err)
+	em := cfg.EventMetadata
+	var fields mapstr.M
+	// A read-only map is kept when nothing is merged into it. Event.DeepUpdate
+	// removes and restores @timestamp and @metadata on its argument, so a map
+	// holding either key needs a private copy.
+	if cfg.FieldsReadOnly && len(b.fields) == 0 && len(em.Fields) == 0 &&
+		!hasKey(cfg.Fields, beat.TimestampFieldKey) && !hasKey(cfg.Fields, beat.MetadataFieldKey) {
+		fields = cfg.Fields
+	} else {
+		fields = cfg.Fields.Clone()
+		fields.DeepUpdate(b.fields.Clone())
+		if len(em.Fields) > 0 {
+			if err := mapstr.MergeFieldsDeep(fields, em.Fields.Clone(), em.FieldsUnderRoot); err != nil {
+				return nil, fmt.Errorf("failed merging client event metadata into fields: %w", err)
+			}
 		}
 	}
 
@@ -402,7 +427,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 
 	// setup 10: debug print final event (P)
 	if b.log.IsDebug() || management.UnderAgent() {
-		processors.add(debugPrintProcessor(b.info, b.log))
+		processors.add(b.debugPrint)
 	}
 
 	// setup 11: drop all events if outputs are disabled (P)
