@@ -25,6 +25,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -69,9 +70,10 @@ type Rotator struct {
 	mutex sync.Mutex
 }
 
-// Logger allows the rotator to write debug information.
+// Logger allows the rotator to write debug information and report failures.
 type Logger interface {
 	Debugw(msg string, keysAndValues ...any) // Debug
+	Warnw(msg string, keysAndValues ...any)  // Warn
 }
 
 // RotatorOption is a configuration option for Rotator.
@@ -270,9 +272,7 @@ func (r *Rotator) openNew() error {
 		if err = r.rot.Rotate(reason, t); err != nil {
 			return fmt.Errorf("failed to rotate backups: %w", err)
 		}
-		if err = r.purge(); err != nil {
-			return fmt.Errorf("failed to purge unnecessary rotated files: %w", err)
-		}
+		r.purgeAndReport()
 	}
 
 	return r.openFile()
@@ -324,9 +324,22 @@ func (r *Rotator) rotateWithTime(reason rotateReason, rotationTime time.Time) er
 		return fmt.Errorf("failed to rotate backups: %w", err)
 	}
 
-	return r.purge()
+	r.purgeAndReport()
+	return nil
 }
 
+// purgeAndReport logs purge failures instead of returning them
+func (r *Rotator) purgeAndReport() {
+	err := r.purge()
+	if err == nil || r.log == nil {
+		return
+	}
+	if r.log != nil {
+		r.log.Warnw("Failed to purge rotated files", "error", err)
+	}
+}
+
+// purge removes the oldest rotated files beyond maxBackups.
 func (r *Rotator) purge() error {
 	rotatedFiles := r.rot.RotatedFiles()
 	count := uint(len(rotatedFiles))
@@ -336,21 +349,14 @@ func (r *Rotator) purge() error {
 
 	purgeUntil := count - r.maxBackups
 	filesToPurge := rotatedFiles[:purgeUntil]
+	var errs []error
 	for _, name := range filesToPurge {
-		_, err := os.Stat(name)
-		switch {
-		case err == nil:
-			if err = os.Remove(name); err != nil {
-				return fmt.Errorf("failed to delete %v during rotation: %w", name, err)
-			}
-		case os.IsNotExist(err):
-			return nil
-		default:
-			return fmt.Errorf("failed on %v during rotation: %w", name, err)
+		if err := os.Remove(name); err != nil && !errors.Is(err, fs.ErrNotExist) {
+			errs = append(errs, fmt.Errorf("failed to delete %v during rotation: %w", name, err))
 		}
 	}
 
-	return nil
+	return errors.Join(errs...)
 }
 
 func (r *Rotator) isRotationTriggered(dataLen uint) (rotateReason, time.Time) {
@@ -448,7 +454,7 @@ func newDateRotater(log Logger, filename, extension string, clock clock) rotater
 	d.extensionLen = len(d.extension)
 
 	d.currentFilename = d.filenamePrefix + d.clock.Now().Format(d.format) + d.extension
-	files, err := filepath.Glob(d.filenamePrefix + "*" + d.extension)
+	files, err := d.globLogs(d.filenamePrefix)
 	if err != nil {
 		return d
 	}
@@ -478,7 +484,7 @@ func (d *dateRotator) Rotate(reason rotateReason, rotateTime time.Time) error {
 	d.logOrderCache = make(map[string]logOrder, 0)
 
 	newFileNamePrefix := d.filenamePrefix + rotateTime.Format(d.format)
-	files, err := filepath.Glob(newFileNamePrefix + "*" + d.extension)
+	files, err := d.globLogs(newFileNamePrefix)
 	if err != nil {
 		return fmt.Errorf("failed to get possible files: %w", err)
 	}
@@ -497,7 +503,7 @@ func (d *dateRotator) Rotate(reason rotateReason, rotateTime time.Time) error {
 }
 
 func (d *dateRotator) RotatedFiles() []string {
-	files, err := filepath.Glob(d.filenamePrefix + "*" + d.extension)
+	files, err := d.globLogs(d.filenamePrefix)
 	if err != nil {
 		if d.log != nil {
 			d.log.Debugw("failed to list existing logs: %+v", err)
@@ -513,6 +519,43 @@ func (d *dateRotator) RotatedFiles() []string {
 
 	d.SortModTimeLogs(files)
 	return files
+}
+
+// globLogs returns the files starting with prefix that follow the
+// {filename}-{datetime}[-{index}]{extension} naming scheme. The glob alone also
+// matches unrelated files sharing the prefix, such as
+// elastic-agent-metrics.ndjson, which must never be rotated or purged.
+func (d *dateRotator) globLogs(prefix string) ([]string, error) {
+	files, err := filepath.Glob(prefix + "*" + d.extension)
+	if err != nil {
+		return nil, err
+	}
+	logs := files[:0]
+	for _, name := range files {
+		if d.isRotatorFile(name) {
+			logs = append(logs, name)
+		}
+	}
+	return logs, nil
+}
+
+func (d *dateRotator) isRotatorFile(filename string) bool {
+	if len(filename) < d.filenameLen+d.extensionLen ||
+		!strings.HasPrefix(filename, d.filenamePrefix) ||
+		!strings.HasSuffix(filename, d.extension) {
+		return false
+	}
+	if _, err := time.Parse(d.format, filename[d.prefixLen:d.filenameLen]); err != nil {
+		return false
+	}
+	if !d.isFilenameWithIndex(filename) {
+		return true
+	}
+	if filename[d.filenameLen] != '-' {
+		return false
+	}
+	index, err := d.filenameIndex(filename)
+	return err == nil && index > 0
 }
 
 // SortModTimeLogs puts newest file to the last
