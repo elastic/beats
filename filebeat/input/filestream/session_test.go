@@ -124,6 +124,40 @@ func TestHarvestSession_Poll(t *testing.T) {
 		s.file = &fakeFile{statErr: errors.New("boom")}
 		require.Equal(t, loginp.PollPark, s.Poll())
 	})
+
+	t.Run("a different file with the same identity", func(t *testing.T) {
+		tests := map[string]struct {
+			scanned  string
+			unread   bool
+			disabled bool
+			want     loginp.PollResult
+		}{
+			"closes when it is larger":           {scanned: "hello\nworld\n", want: loginp.PollClose},
+			"stays parked when it is a copy":     {scanned: "hello\n", want: loginp.PollPark},
+			"waits for the open file's end":      {scanned: "hello\nworld\n", unread: true, want: loginp.PollResume},
+			"stays parked when following is off": {scanned: "hello\nworld\n", disabled: true, want: loginp.PollPark},
+		}
+		for name, tc := range tests {
+			t.Run(name, func(t *testing.T) {
+				s := newPollSession(t, closerConfig{}, "hello\n")
+				scanIdentityIn(t, s, tc.scanned)
+				s.inp.followReplacements = !tc.disabled
+				if tc.unread {
+					s.readOffset = 0
+				}
+
+				require.Equal(t, tc.want, s.Poll())
+			})
+		}
+	})
+}
+
+// scanIdentityIn makes the scanner report s's identity in a different file with content.
+func scanIdentityIn(t *testing.T, s *harvestSession, content string) {
+	t.Helper()
+	s.inp.followReplacements = true
+	s.harvesterState = publishHandle(newFileStateTable(), "id", tempFileSource(t, content).desc)
+	s.harvesterState.PinOSState(s.src.desc.Info.GetOSState())
 }
 
 // --- ReadSlice ----------------------------------------------------------
@@ -172,6 +206,32 @@ func TestHarvestSession_ReadSlice(t *testing.T) {
 		require.Equal(t, int64(len(content)), s.readOffset, "readOffset reaches EOF including the partial line")
 
 		require.Equal(t, loginp.PollPark, s.Poll(), "an unchanged file must park, not resume")
+	})
+
+	t.Run("a longer file with the same identity is switched to after the slice parks", func(t *testing.T) {
+		s := newReadSession(t, closerConfig{}, "a\nb\n", 0)
+		scanIdentityIn(t, s, "a\nb\nc\n")
+		pub := &countingPublisher{}
+
+		verdict, err := s.ReadSlice(backgroundCtx(), pub)
+		require.NoError(t, err)
+		require.Equal(t, loginp.SliceYield, verdict)
+		require.Len(t, pub.events, 2, "the open file must be read to its end first")
+		require.Equal(t, loginp.PollClose, s.Poll())
+	})
+
+	t.Run("a slice that stops on its budget resumes on poll", func(t *testing.T) {
+		s := newReadSession(t, closerConfig{}, "a\nb\nc\n", 0)
+		scanIdentityIn(t, s, "a\nb\nc\nd\n")
+		// Publishing outlasts the budget, so the slice stops with buffered lines unpublished.
+		s.inp.sliceBudget = time.Millisecond
+		pub := &countingPublisher{delay: 5 * time.Millisecond}
+
+		verdict, err := s.ReadSlice(backgroundCtx(), pub)
+		require.NoError(t, err)
+		require.Equal(t, loginp.SliceBudget, verdict)
+		require.Less(t, len(pub.events), 3, "the budget must stop the slice before the last line")
+		require.Equal(t, loginp.PollResume, s.Poll(), "unpublished lines must be read before switching files")
 	})
 
 	t.Run("reading filtered-out lines still counts as activity for close_inactive", func(t *testing.T) {
@@ -491,7 +551,7 @@ func tempFileSource(t *testing.T, content string) fileSource {
 	require.NoError(t, os.WriteFile(path, []byte(content), 0o644))
 	fi, err := os.Stat(path)
 	require.NoError(t, err)
-	return fileSource{newPath: path, fileID: "id", desc: loginp.FileDescriptor{Info: file.ExtendFileInfo(fi)}}
+	return fileSource{newPath: path, fileID: "id", desc: loginp.FileDescriptor{Filename: path, Info: file.ExtendFileInfo(fi)}}
 }
 
 // newPollSession builds a harvestSession over a real file with its offset at the
@@ -530,14 +590,17 @@ func newReadSession(t *testing.T, closer closerConfig, content string, offset in
 	return s
 }
 
-// countingPublisher records published events; err, when set, fails Publish.
+// countingPublisher records published events; err, when set, fails Publish,
+// and delay, when set, slows it down.
 type countingPublisher struct {
 	mu     sync.Mutex
 	events []beat.Event
 	err    error
+	delay  time.Duration
 }
 
 func (p *countingPublisher) Publish(e beat.Event, _ any) error {
+	time.Sleep(p.delay)
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	if p.err != nil {
