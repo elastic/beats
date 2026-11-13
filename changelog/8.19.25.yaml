@@ -1,0 +1,249 @@
+version: 8.19.25
+entries:
+    - kind: bug-fix
+      summary: 'Fix auditd module failing or dropping events when `immutable: true` is set.'
+      description: |
+        With `immutable: true`, the auditd module could fail at startup with
+        `Failure setting audit config as immutable` and stop collecting events, or
+        drop audit events that arrived while it waited for the kernel's reply. The
+        request is now sent on the control socket.
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54279
+        - https://github.com/elastic/beats/pull/54573
+        - https://github.com/elastic/beats/pull/54634
+        - https://github.com/elastic/beats/pull/51019
+        - https://github.com/elastic/beats/pull/54650
+        - https://github.com/elastic/beats/pull/54693
+        - https://github.com/elastic/beats/pull/54695
+      issue:
+        - https://github.com/elastic/beats/issues/54257
+      impact: ""
+      action: ""
+      timestamp: 1791841937
+      file:
+        name: 1791841937-auditd-immutable-control-socket.yaml
+        checksum: 169eb891f3c7e4670a87c6aa52a2d98f977037ed
+    - kind: bug-fix
+      summary: Stop auditbeat add_session_metadata stalling audit event reading after falling behind.
+      description: |
+        The kernel_tracing backend of add_session_metadata waited up to 1.2 seconds
+        for each process missing from its cache, regardless of how old the event
+        was. Once auditbeat fell behind, every event in the backlog was for a process
+        that had already exited and waited the full time, so auditbeat never caught
+        up, stopped reading the audit socket, and the kernel dropped audit messages.
+        The wait is now measured from the event's timestamp, so events that have
+        already waited longer than the limit are not delayed further.
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54279
+        - https://github.com/elastic/beats/pull/54573
+        - https://github.com/elastic/beats/pull/54634
+        - https://github.com/elastic/beats/pull/51019
+        - https://github.com/elastic/beats/pull/54650
+        - https://github.com/elastic/beats/pull/54693
+        - https://github.com/elastic/beats/pull/54695
+      issue:
+        - https://github.com/elastic/beats/issues/54257
+      impact: ""
+      action: ""
+      timestamp: 1792363230
+      file:
+        name: 1792363230-auditbeat-session-metadata-event-age-wait.yaml
+        checksum: db68c8c4c6ffd0057f3d865aaafebfabde267cda
+    - kind: bug-fix
+      summary: Fix length and count decoding in the Packetbeat Cassandra parser.
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54279
+        - https://github.com/elastic/beats/pull/54573
+        - https://github.com/elastic/beats/pull/54634
+        - https://github.com/elastic/beats/pull/51019
+        - https://github.com/elastic/beats/pull/54650
+        - https://github.com/elastic/beats/pull/54693
+        - https://github.com/elastic/beats/pull/54695
+      issue:
+        - https://github.com/elastic/beats/issues/54257
+      impact: ""
+      action: ""
+      timestamp: 1793010748
+      file:
+        name: 1793010748-packetbeat-cassandra-check-bytes-length.yaml
+        checksum: ed5331b5365e7e67159c7d191d05e9ab88ac1336
+    - kind: bug-fix
+      summary: Fix file_integrity kprobes backend failing on kernels that list .cold symbols first
+      description: |
+        The kprobes backend of the file_integrity module stopped at the first /proc/kallsyms entry whose name started with the probed symbol, so on kernels that list a cold-path fragment such as fsnotify.cold ahead of fsnotify it reported "symbol fsnotify is optimised" and failed to start. Symbol lookup now scans the whole table, prefers an exact match, and ignores .cold fragments, which are not compiler clones of the function.
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54279
+        - https://github.com/elastic/beats/pull/54573
+        - https://github.com/elastic/beats/pull/54634
+        - https://github.com/elastic/beats/pull/51019
+        - https://github.com/elastic/beats/pull/54650
+        - https://github.com/elastic/beats/pull/54693
+        - https://github.com/elastic/beats/pull/54695
+      issue:
+        - https://github.com/elastic/beats/issues/54257
+      impact: ""
+      action: ""
+      timestamp: 1793095203
+      file:
+        name: 1793095203-auditbeat-fim-kprobes-cold-symbols.yaml
+        checksum: 028c6f5ddbf1ecf60edfc6d6497df3bb22b886d5
+    - kind: bug-fix
+      summary: Fix PowerShell module pipeline failure on unexpected or localized ParameterBinding lines.
+      description: |
+        The powershell and powershell_operational ingest pipelines threw
+        "Index 4 out of bounds for length 4" when a ParameterBinding line did not
+        match the English-only name/value labels, marking the document with
+        event.kind pipeline_error. Unexpected lines are now kept as the raw value,
+        and localized labels (e.g. German Name=/Wert=) are parsed.
+      component: winlogbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54279
+        - https://github.com/elastic/beats/pull/54573
+        - https://github.com/elastic/beats/pull/54634
+        - https://github.com/elastic/beats/pull/51019
+        - https://github.com/elastic/beats/pull/54650
+        - https://github.com/elastic/beats/pull/54693
+        - https://github.com/elastic/beats/pull/54695
+      issue:
+        - https://github.com/elastic/beats/issues/54257
+      impact: ""
+      action: ""
+      timestamp: 1793099380
+      file:
+        name: 1793099380-fix-winlogbeat-powershell-parameterbinding.yaml
+        checksum: 7d55e8c9223c37c0c59e4e98c3662204f7dcfbee
+    - kind: bug-fix
+      summary: Fix awss3 input rejecting non_aws_bucket_name configs that set only default_region.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54279
+        - https://github.com/elastic/beats/pull/54573
+        - https://github.com/elastic/beats/pull/54634
+        - https://github.com/elastic/beats/pull/51019
+        - https://github.com/elastic/beats/pull/54650
+        - https://github.com/elastic/beats/pull/54693
+        - https://github.com/elastic/beats/pull/54695
+      issue:
+        - https://github.com/elastic/beats/issues/54257
+      impact: ""
+      action: ""
+      timestamp: 1793100000
+      file:
+        name: 1793100000-awss3-non-aws-default-region.yaml
+        checksum: 14f73be2c2599b2498353bf65c496597bc252024
+    - kind: bug-fix
+      summary: Stop leaking a thread per run when a browser monitor's synthetics command fails to start
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54279
+        - https://github.com/elastic/beats/pull/54573
+        - https://github.com/elastic/beats/pull/54634
+        - https://github.com/elastic/beats/pull/51019
+        - https://github.com/elastic/beats/pull/54650
+        - https://github.com/elastic/beats/pull/54693
+        - https://github.com/elastic/beats/pull/54695
+      issue:
+        - https://github.com/elastic/beats/issues/54257
+      impact: ""
+      action: ""
+      timestamp: 1793193287
+      file:
+        name: 1793193287-fix-synthexec-start-failure-leak.yaml
+        checksum: 3ad277fa1ea86acdc7a5ae056a6f89a504e4165c
+    - kind: bug-fix
+      summary: Encode the data_stream field set by the add_data_stream processor with lowercase keys in beat receivers
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54279
+        - https://github.com/elastic/beats/pull/54573
+        - https://github.com/elastic/beats/pull/54634
+        - https://github.com/elastic/beats/pull/51019
+        - https://github.com/elastic/beats/pull/54650
+        - https://github.com/elastic/beats/pull/54693
+        - https://github.com/elastic/beats/pull/54695
+      issue:
+        - https://github.com/elastic/beats/issues/54257
+      impact: ""
+      action: ""
+      timestamp: 1793285753
+      file:
+        name: 1793285753-add-data-stream-field-names.yaml
+        checksum: ce58c037f0e4a9ef21d52c531414399980a8133e
+    - kind: bug-fix
+      summary: Fix PowerShell module pipeline failure on event 4103 with multi-line ContextInfo values.
+      description: |
+        The powershell_operational ingest pipeline failed with "field
+        [winlog.event_data.ContextInfo] does not contain value_split [[:=]]" when
+        Host Application held a multi-line script, for example one passed to
+        powershell.exe -Command. The ContextInfo block is now parsed by a script
+        that uses its fixed 16-key layout, so the full script is kept in
+        process.command_line and script lines that look like keys are not taken as
+        keys. Localized keys, including ones with non-ASCII letters or apostrophes,
+        are still parsed as separate fields, and dots are removed from event_data
+        keys (for example the Spanish "Id. de host" becomes "Iddehost") so they
+        are not read as object paths.
+      component: winlogbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54279
+        - https://github.com/elastic/beats/pull/54573
+        - https://github.com/elastic/beats/pull/54634
+        - https://github.com/elastic/beats/pull/51019
+        - https://github.com/elastic/beats/pull/54650
+        - https://github.com/elastic/beats/pull/54693
+        - https://github.com/elastic/beats/pull/54695
+      issue:
+        - https://github.com/elastic/beats/issues/54257
+      impact: ""
+      action: ""
+      timestamp: 1793354900
+      file:
+        name: 1793354900-fix-winlogbeat-powershell-contextinfo-multiline.yaml
+        checksum: 4fd594a4a8eab5dfaae039c40ed3c1d0cf7dcc57
+    - kind: bug-fix
+      summary: Fix Auditbeat file_integrity realtime events on macOS when recursive is false.
+      description: |
+        Corrected FSEvents file info handling so successful stat calls are not returned as errors. This restores
+        realtime change event processing for non-recursive macOS file integrity watches.
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54279
+      issue:
+        - https://github.com/elastic/beats/issues/54257
+      impact: ""
+      action: ""
+      timestamp: 1793462400
+      file:
+        name: 1793462400-auditbeat-fim-fsevents-nonrecursive.yaml
+        checksum: 665a057187ea4b4413d56bd947186db2a4f63c1c
+    - kind: bug-fix
+      summary: Fix processors being applied twice to Elastic Agent filestream inputs configured without streams.
+      description: |
+        When Elastic Agent sent a filestream input whose configuration had no
+        streams, the input-level processors were added to the generated input
+        configuration twice, so each event ran through them twice. Processors that
+        are not idempotent, such as add_tags or script, produced wrong results.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54279
+        - https://github.com/elastic/beats/pull/54573
+        - https://github.com/elastic/beats/pull/54634
+        - https://github.com/elastic/beats/pull/51019
+        - https://github.com/elastic/beats/pull/54650
+        - https://github.com/elastic/beats/pull/54693
+        - https://github.com/elastic/beats/pull/54695
+      issue:
+        - https://github.com/elastic/beats/issues/54257
+      impact: ""
+      action: ""
+      timestamp: 1793716381
+      file:
+        name: 1793716381-fix-global-processors-applied-twice-for-elastic-agent-inputs-without-streams.yaml
+        checksum: c6546999173f85b32ef3e358246123945aa0d98f
