@@ -2162,6 +2162,175 @@ func TestRunObjectWithBatchingPaginationFailureRetriesSameWindow(t *testing.T) {
 	assert.Equal(t, "2024-01-01T11:55:00.000Z", objectCursor["progress_time"], "expected retry to advance progress only after the full paginated window succeeds")
 }
 
+// TestRunObjectWithBatchingRestartMidWindowReplaysSameWindow guards against a
+// data-loss regression on the batched path. When a paginated batched window
+// publishes (and the registry ACKs) its first page and then the process
+// crashes before the window completes, the input restarts by reconstructing
+// its cursor from the last persisted (ACKed) cursor — not the in-memory
+// snapshot that runObjectBatches reverts. If runObjectQuery advanced
+// first_event_time / last_event_time per row on the batched path, that ACKed
+// page-1 cursor would carry a watermark newer than the un-ACKed later rows, so
+// the post-restart window would start past them and silently drop them. The
+// batched path must therefore leave the legacy watermarks untouched so the
+// reconstructed cursor replays the exact same (Start, End] window, letting the
+// fingerprint _id dedupe the already-ingested page.
+func TestRunObjectWithBatchingRestartMidWindowReplaysSameWindow(t *testing.T) {
+	mockTimeNow(time.Date(2024, time.January, 1, 12, 0, 0, 0, time.UTC))
+	t.Cleanup(resetTimeNow)
+
+	const (
+		// With an empty cursor and initial_interval=10m, runEnd=12:00 yields
+		// the first window (11:50:00, 11:55:00]. The restart must land on this
+		// exact window again.
+		batchedQuery = "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > 2024-01-01T11:50:00.000Z AND EventDate <= 2024-01-01T11:55:00.000Z ORDER BY EventDate DESC"
+		// DESC order: page 1 holds the newer row (11:54:30), page 2 the older
+		// row (11:53:30). Under the old per-row behaviour, page 1 would ACK a
+		// cursor with first/last_event_time=11:54:30, and the restart window
+		// would start at 11:54:30 and skip the 11:53:30 row from page 2.
+		firstBatchPageJSON  = `{ "totalSize": 2, "done": false, "nextRecordsUrl": "/nextRecords/LoginEvents/RESTART", "records": [ { "attributes": { "type": "LoginEvent", "url": "/services/data/v58.0/sobjects/LoginEvent/000000000000041AAA" }, "Id": "000000000000041AAA", "EventDate": "2024-01-01T11:54:30.000+0000" } ] }`
+		secondBatchPageJSON = `{ "totalSize": 2, "done": true, "records": [ { "attributes": { "type": "LoginEvent", "url": "/services/data/v58.0/sobjects/LoginEvent/000000000000042AAA" }, "Id": "000000000000042AAA", "EventDate": "2024-01-01T11:53:30.000+0000" } ] }`
+	)
+
+	var (
+		batchQueryCount int
+		nextPageCount   int
+		failNextPage    = true
+		server          *httptest.Server
+	)
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == batchedQuery:
+			batchQueryCount++
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(firstBatchPageJSON))
+		case r.RequestURI == "/nextRecords/LoginEvents/RESTART":
+			nextPageCount++
+			if failNextPage {
+				w.WriteHeader(http.StatusInternalServerError)
+				_, _ = w.Write([]byte(`{"error":"boom"}`))
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(secondBatchPageJSON))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(map[string]interface{}{
+		"url":                         server.URL,
+		"version":                     56,
+		"resource.retry.max_attempts": 1,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"object": map[string]interface{}{
+				"interval": "5s",
+				"enabled":  true,
+				"batch": map[string]interface{}{
+					"enabled":             true,
+					"initial_interval":    "10m",
+					"max_windows_per_run": 1,
+					"window":              "5m",
+				},
+				"query": map[string]interface{}{
+					"default": defaultLoginObjectQuery,
+					"value":   valueBatchedLoginObjectQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "EventDate",
+				},
+			},
+		},
+	}).Unpack(&cfg)
+	require.NoError(t, err, "batched object config should unpack")
+
+	ctx, cancel := context.WithCancelCause(context.Background())
+	defer cancel(nil)
+
+	// First process: page 1 publishes+ACKs, page 2 fails mid-window.
+	firstPublisher := publisher{}
+	firstPublisher.done = func() {}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancel,
+		publisher: &firstPublisher,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.RunObject()
+	require.Error(t, err, "expected paginated batch failure to bubble up")
+	require.Len(t, firstPublisher.published, 1, "expected only page 1 to publish before the failure")
+	require.Len(t, firstPublisher.cursors, 1, "expected page 1 to ACK exactly one cursor")
+
+	// The ACKed page-1 cursor must not carry a watermark that would advance
+	// the post-restart window past the un-ACKed page-2 row.
+	assert.Empty(t, firstPublisher.cursors[0]["object"].(map[string]interface{})["first_event_time"], "batched page-1 ACK must not persist first_event_time")
+	assert.Empty(t, firstPublisher.cursors[0]["object"].(map[string]interface{})["last_event_time"], "batched page-1 ACK must not persist last_event_time")
+	assert.Empty(t, firstPublisher.cursors[0]["object"].(map[string]interface{})["progress_time"], "batched page-1 ACK must not persist progress_time before the window completes")
+
+	// Second process (registry restart): reconstruct the cursor from the last
+	// persisted ACK, exactly as the cursor input manager would on startup.
+	var resumedState state
+	require.NoError(t, typeconv.Convert(&resumedState, firstPublisher.cursors[0]), "expected persisted cursor to be convertible")
+
+	failNextPage = false
+	resumedPublisher := publisher{}
+	resumedPublisher.done = func() {}
+
+	resumed := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancel,
+		publisher: &resumedPublisher,
+		cursor:    &resumedState,
+		srcConfig: &cfg,
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
+	}
+	resumed.sfdcConfig, err = resumed.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed on restart")
+	resumed.soqlr, err = resumed.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed on restart")
+
+	err = resumed.RunObject()
+	require.NoError(t, err, "expected the restarted run to complete the window")
+
+	// The restarted run must issue the SAME window query, re-fetching both
+	// pages so the previously un-ACKed older row is not skipped.
+	assert.Equal(t, 2, batchQueryCount, "expected the restart to re-query the identical window, not skip ahead")
+	assert.Len(t, resumedPublisher.published, 2, "expected the restarted window to publish both pages, including the previously un-ACKed older row")
+
+	var cursorState map[string]interface{}
+	require.NoError(t, typeconv.Convert(&cursorState, resumed.cursor), "expected cursor state to be convertible")
+	objectCursor, ok := cursorState["object"].(map[string]interface{})
+	require.True(t, ok, "expected object cursor state to be present")
+	assert.Equal(t, "2024-01-01T11:55:00.000Z", objectCursor["progress_time"], "expected progress to advance only after the full window completes post-restart")
+}
+
 func TestRunObjectWithBatchingResumesFromLastSuccessfulWindowAfterLaterWindowFailure(t *testing.T) {
 	mockTimeNow(time.Date(2024, time.January, 1, 12, 0, 0, 0, time.UTC))
 	t.Cleanup(resetTimeNow)
