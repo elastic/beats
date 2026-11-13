@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Correct exported field and module descriptions for the Elasticsearch and Kibana modules
+component: all
