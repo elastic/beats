@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: Isolate Heartbeat synthetics runtime files from Elastic Agent state.
+component: heartbeat
+description: Use a private temporary directory for each synthetics invocation to prevent browser and API monitor failures after Elastic Agent resets state directory permissions.

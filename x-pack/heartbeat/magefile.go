@@ -110,11 +110,9 @@ func Config() error {
 	return devtools.Config(devtools.AllConfigTypes, heartbeat.ConfigFileParams(), ".")
 }
 
-// syntheticsPinnedCommit is the @elastic/synthetics commit that introduces the
-// apiJourney(...) DSL (elastic/synthetics#997). apiJourney is unreleased, so the
-// api monitor scenario tests need this specific build. Once it ships in a
-// release, drop InstallSyntheticsAgent and install @elastic/synthetics@<release>.
-const syntheticsPinnedCommit = "f2bf619857d44694267983deeb830da551ad3d9e"
+// syntheticsPinnedCommit is the gitHead recorded in @elastic/synthetics 1.29.0.
+// This build supports both apiJourney(...) and the --workdir option.
+const syntheticsPinnedCommit = "9878ba9f8774cfaa499cae3f205e4a233c67f507"
 
 // InstallSyntheticsAgent installs the apiJourney-capable @elastic/synthetics
 // agent globally so the api monitor scenario tests (ELASTIC_SYNTHETICS_API_CAPABLE)

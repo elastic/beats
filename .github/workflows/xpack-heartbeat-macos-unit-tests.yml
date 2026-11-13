@@ -58,7 +58,8 @@ jobs:
         with:
           node-version: ${{ env.NODEJS_VERSION }}
 
-      - run: npm i -g @elastic/synthetics
+      # Pin a release that supports Heartbeat's required --workdir option.
+      - run: npm i -g @elastic/synthetics@1.29.0
 
       - uses: ./.github/actions/unit-test
         with:

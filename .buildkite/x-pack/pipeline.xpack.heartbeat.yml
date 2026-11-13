@@ -95,10 +95,8 @@ steps:
         key: "mandatory-linux-unit-test"
         command: |
           set -euo pipefail
-          # apiJourney() ships only in unreleased @elastic/synthetics; mage installSyntheticsAgent
-          # clones, builds, and globally installs the pinned capable commit (elastic/synthetics#997)
-          # so the api monitor scenarios run the same way in CI and locally. Drop the goal and
-          # ELASTIC_SYNTHETICS_API_CAPABLE once apiJourney ships in a release.
+          # Build the commit published as @elastic/synthetics 1.29.0, which supports
+          # apiJourney() and --workdir, using the same installer as local tests.
           cd x-pack/heartbeat
           echo "~~~ Installing apiJourney-capable @elastic/synthetics (pinned commit)"
           mage installSyntheticsAgent
