@@ -91,6 +91,10 @@ type HarvesterSession interface {
 	// IsGZIP reports whether the session reads a GZIP-compressed source, so the
 	// runner can maintain the GZIP-specific lifecycle metrics.
 	IsGZIP() bool
+	// EndedAtEOF reports whether the session ended because a read reached EOF.
+	// It is false for every other end and while the session is still reading.
+	// The runner reads it when it tears the session down.
+	EndedAtEOF() bool
 	// Close releases the file handle and resources held by the session.
 	Close() error
 	// TrackSource tells the session its source's current identity.

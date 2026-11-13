@@ -47,6 +47,7 @@ func TestLogFileCloseOnEOF(t *testing.T) {
 
 	for _, tc := range testCases {
 		fs := filestream{
+			preset:       &resolvedPreset{},
 			readerConfig: readerConfig{BufferSize: 512},
 			compression:  CompressionAuto}
 		f, err := fs.newFile(tc.createFile(t))
@@ -114,6 +115,7 @@ func TestLogFileTruncated(t *testing.T) {
 			osFile := tc.createFile(t)
 
 			fs := filestream{
+				preset:       &resolvedPreset{},
 				readerConfig: readerConfig{BufferSize: 512},
 				compression:  CompressionAuto}
 
@@ -195,6 +197,7 @@ func readUntilError(reader *logFile) error {
 func TestLogFileNonBlocking(t *testing.T) {
 	osFile := createTestPlainLogFile(t)
 	fs := filestream{
+		preset:       &resolvedPreset{},
 		readerConfig: readerConfig{BufferSize: 512},
 		compression:  CompressionAuto,
 	}

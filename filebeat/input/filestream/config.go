@@ -45,6 +45,21 @@ const (
 	CompressionAuto = "auto"
 )
 
+// Preset names, the keys accepted under the 'preset' option.
+const (
+	// presetAuto selects high_cardinality when the input has at least as
+	// many files as the configured threshold, otherwise default.
+	presetAuto = "auto"
+	// presetDefault keeps the configured values and the regular behaviour.
+	presetDefault = "default"
+	// presetHighCardinality tunes the input for a large number of files.
+	presetHighCardinality = "high_cardinality"
+)
+
+// defaultMinFiles is the number of files from which the auto preset
+// selects high_cardinality.
+const defaultMinFiles = 5000
+
 // config stores the options of a file stream.
 type config struct {
 	Reader readerConfig `config:",inline"`
@@ -85,6 +100,16 @@ type config struct {
 	Rotation       *conf.Namespace    `config:"rotation"`
 	Delete         deleterConfig      `config:"delete"`
 
+	// Preset selects how the input tunes itself. It holds exactly one of
+	// the preset names (auto, default, high_cardinality) with its settings
+	// underneath. Nil means it is not set, which behaves like auto.
+	Preset *conf.Namespace `config:"preset"`
+
+	// checkIntervalSet is true when 'prospector.scanner.check_interval' is
+	// written in the configuration, which a value comparison cannot tell
+	// when it equals the default. Set by normalizeConfig.
+	checkIntervalSet bool `config:"-"`
+
 	// TakeOver is also independently parsed by InputManager.Create
 	// (see internal/input-logfile/manager.go).
 	TakeOver loginp.TakeOverConfig `config:"take_over"`
@@ -97,6 +122,118 @@ type config struct {
 	// effectively preserving the old, buggy, behaviour.
 	// (see internal/input-logfile/manager.go)
 	LegacyCleanInactive bool `config:"legacy_clean_inactive"`
+}
+
+// presetAutoConfig holds the settings of 'preset.auto'.
+type presetAutoConfig struct {
+	HighCardinality highCardinalityConfig `config:"high_cardinality"`
+}
+
+// highCardinalityConfig holds the settings of 'preset.auto.high_cardinality'.
+type highCardinalityConfig struct {
+	// MinFiles is the file count from which the auto preset selects
+	// high_cardinality: an input with at least that many files runs it.
+	MinFiles int `config:"min_files" validate:"min=0"`
+}
+
+// presetSelection is the preset chosen by a configuration.
+type presetSelection struct {
+	// name is the selected preset: presetAuto, presetDefault or
+	// presetHighCardinality.
+	name string
+	// explicit is true when the user wrote the preset.
+	explicit bool
+	// threshold is the file count from which presetAuto selects
+	// high_cardinality.
+	threshold int
+	// forcedDefaultReason explains why a preset that is not set resolved to
+	// presetDefault instead of presetAuto. Empty otherwise.
+	forcedDefaultReason string
+}
+
+// unpackPresetAuto reads the settings of the 'preset.auto' namespace and
+// applies their defaults.
+func unpackPresetAuto(ns *conf.Namespace) (presetAutoConfig, error) {
+	autoCfg := presetAutoConfig{
+		HighCardinality: highCardinalityConfig{
+			MinFiles: defaultMinFiles,
+		},
+	}
+	if err := ns.Config().Unpack(&autoCfg); err != nil {
+		return presetAutoConfig{}, fmt.Errorf("cannot read 'preset.%s' config: %w", presetAuto, err)
+	}
+
+	return autoCfg, nil
+}
+
+// cleanInactiveEnabled reports whether clean_inactive is in effect. Zero only
+// counts with legacy_clean_inactive, the same answer before and after
+// configure rewrites 'clean_inactive: 0' to -1.
+func (c *config) cleanInactiveEnabled() bool {
+	return c.CleanInactive > 0 || (c.CleanInactive == 0 && c.LegacyCleanInactive)
+}
+
+// presetIncompatibleOptions returns the enabled options that cannot be used
+// with the auto and high_cardinality presets, named as the user writes them.
+func (c *config) presetIncompatibleOptions() []string {
+	var opts []string
+	if c.Delete.Enabled {
+		opts = append(opts, "delete.enabled")
+	}
+	if c.cleanInactiveEnabled() {
+		opts = append(opts, "clean_inactive")
+	}
+
+	return opts
+}
+
+// quoteOptions formats option names for messages: each one in single quotes,
+// joined with " and ".
+func quoteOptions(opts []string) string {
+	quoted := make([]string, 0, len(opts))
+	for _, o := range opts {
+		quoted = append(quoted, "'"+o+"'")
+	}
+
+	return strings.Join(quoted, " and ")
+}
+
+// presetSelection returns the preset selected by the configuration. It does
+// not depend on Validate having run. A preset that is not set selects
+// presetAuto with the default threshold, or presetDefault when an option
+// incompatible with the other presets is enabled.
+func (c *config) presetSelection() (presetSelection, error) {
+	sel := presetSelection{
+		name:      presetAuto,
+		threshold: defaultMinFiles,
+	}
+	if c.Preset == nil || c.Preset.Name() == "" {
+		if opts := c.presetIncompatibleOptions(); len(opts) > 0 {
+			sel.name = presetDefault
+			sel.forcedDefaultReason = fmt.Sprintf(
+				"'preset' is not set and %s cannot be used with 'preset.auto' or 'preset.high_cardinality'",
+				quoteOptions(opts))
+		}
+		return sel, nil
+	}
+
+	sel.name = c.Preset.Name()
+	sel.explicit = true
+	switch sel.name {
+	case presetAuto:
+		autoCfg, err := unpackPresetAuto(c.Preset)
+		if err != nil {
+			return presetSelection{}, err
+		}
+		sel.threshold = autoCfg.HighCardinality.MinFiles
+	case presetDefault, presetHighCardinality:
+		// no settings
+	default:
+		return presetSelection{}, fmt.Errorf("unknown preset %q, must be one of: %q, %q, %q",
+			sel.name, presetAuto, presetDefault, presetHighCardinality)
+	}
+
+	return sel, nil
 }
 
 type deleterConfig struct {
@@ -240,6 +377,17 @@ func (c *config) Validate() error {
 	default:
 		return fmt.Errorf("invalid compression value %q, must be one of: %q, %q, %q",
 			c.Compression, CompressionNone, CompressionGZIP, CompressionAuto)
+	}
+
+	sel, err := c.presetSelection()
+	if err != nil {
+		return fmt.Errorf("invalid preset: %w", err)
+	}
+	if sel.explicit && sel.name != presetDefault {
+		if opts := c.presetIncompatibleOptions(); len(opts) > 0 {
+			return fmt.Errorf("'preset.%s' cannot be used together with %s, use 'preset.default' instead",
+				sel.name, quoteOptions(opts))
+		}
 	}
 
 	if c.ID == "" && c.TakeOver.Enabled {
