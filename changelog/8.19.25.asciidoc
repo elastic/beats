@@ -3,62 +3,39 @@
 [[release-notes-8.19.25]]
 ==  8.19.25
 
-Review important information about the  8.19.25 release.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Review important information about the 8.19.25 release.
 
 [discrete]
 [[bug-fixes-8.19.25]]
 === Bug fixes
 
-
-
-
 **Auditbeat**
 
-* Fix auditd module failing or dropping events when `immutable: true` is set. https://github.com/elastic/beats/pull/54279[#54279] https://github.com/elastic/beats/pull/54573[#54573] https://github.com/elastic/beats/pull/54634[#54634] https://github.com/elastic/beats/pull/51019[#51019] https://github.com/elastic/beats/pull/54650[#54650] https://github.com/elastic/beats/pull/54693[#54693] https://github.com/elastic/beats/pull/54695[#54695] https://github.com/elastic/beats/issues/54257[#54257]
-* Stop auditbeat add_session_metadata stalling audit event reading after falling behind. https://github.com/elastic/beats/pull/54279[#54279] https://github.com/elastic/beats/pull/54573[#54573] https://github.com/elastic/beats/pull/54634[#54634] https://github.com/elastic/beats/pull/51019[#51019] https://github.com/elastic/beats/pull/54650[#54650] https://github.com/elastic/beats/pull/54693[#54693] https://github.com/elastic/beats/pull/54695[#54695] https://github.com/elastic/beats/issues/54257[#54257]
-* Fix file_integrity kprobes backend failing on kernels that list .cold symbols first. https://github.com/elastic/beats/pull/54279[#54279] https://github.com/elastic/beats/pull/54573[#54573] https://github.com/elastic/beats/pull/54634[#54634] https://github.com/elastic/beats/pull/51019[#51019] https://github.com/elastic/beats/pull/54650[#54650] https://github.com/elastic/beats/pull/54693[#54693] https://github.com/elastic/beats/pull/54695[#54695] https://github.com/elastic/beats/issues/54257[#54257]
-* Fix Auditbeat file_integrity realtime events on macOS when recursive is false. https://github.com/elastic/beats/pull/54279[#54279] https://github.com/elastic/beats/issues/54257[#54257]
-
+* Fix `auditd` module failing or dropping events when `immutable: true` is set. https://github.com/elastic/beats/pull/53707[#53707] https://github.com/elastic/beats/issues/50189[#50189]
+* Stop Auditbeat `add_session_metadata` stalling audit event reading after falling behind. https://github.com/elastic/beats/pull/53853[#53853] 
+* Fix `file_integrity` kprobes backend failing on kernels that list `.cold` symbols first. https://github.com/elastic/beats/pull/54106[#54106]
+* Fix Auditbeat `file_integrity` realtime events on macOS when recursive is `false`. https://github.com/elastic/beats/pull/54279[#54279] https://github.com/elastic/beats/issues/54257[#54257]
 
 **Filebeat**
 
-* Fix awss3 input rejecting non_aws_bucket_name configs that set only default_region. https://github.com/elastic/beats/pull/54279[#54279] https://github.com/elastic/beats/pull/54573[#54573] https://github.com/elastic/beats/pull/54634[#54634] https://github.com/elastic/beats/pull/51019[#51019] https://github.com/elastic/beats/pull/54650[#54650] https://github.com/elastic/beats/pull/54693[#54693] https://github.com/elastic/beats/pull/54695[#54695] https://github.com/elastic/beats/issues/54257[#54257]
-* Fix processors being applied twice to Elastic Agent filestream inputs configured without streams. https://github.com/elastic/beats/pull/54279[#54279] https://github.com/elastic/beats/pull/54573[#54573] https://github.com/elastic/beats/pull/54634[#54634] https://github.com/elastic/beats/pull/51019[#51019] https://github.com/elastic/beats/pull/54650[#54650] https://github.com/elastic/beats/pull/54693[#54693] https://github.com/elastic/beats/pull/54695[#54695] https://github.com/elastic/beats/issues/54257[#54257]
-
+* Fix `awss3` input rejecting `non_aws_bucket_name` configs that set only `default_region`. https://github.com/elastic/beats/pull/54143[#54143] https://github.com/elastic/beats/issues/50021[#50021]
+* Fix processors being applied twice to Elastic Agent `filestream` inputs configured without streams. https://github.com/elastic/beats/pull/54416[#54416]
 
 **Heartbeat**
 
-* Stop leaking a thread per run when a browser monitor&#39;s synthetics command fails to start. https://github.com/elastic/beats/pull/54279[#54279] https://github.com/elastic/beats/pull/54573[#54573] https://github.com/elastic/beats/pull/54634[#54634] https://github.com/elastic/beats/pull/51019[#51019] https://github.com/elastic/beats/pull/54650[#54650] https://github.com/elastic/beats/pull/54693[#54693] https://github.com/elastic/beats/pull/54695[#54695] https://github.com/elastic/beats/issues/54257[#54257]
-
+* Stop leaking a thread per run when a browser monitor's synthetics command fails to start. https://github.com/elastic/beats/pull/52405[#52405]
 
 **Libbeat**
 
-* Encode the data_stream field set by the add_data_stream processor with lowercase keys in beat receivers. https://github.com/elastic/beats/pull/54279[#54279] https://github.com/elastic/beats/pull/54573[#54573] https://github.com/elastic/beats/pull/54634[#54634] https://github.com/elastic/beats/pull/51019[#51019] https://github.com/elastic/beats/pull/54650[#54650] https://github.com/elastic/beats/pull/54693[#54693] https://github.com/elastic/beats/pull/54695[#54695] https://github.com/elastic/beats/issues/54257[#54257]
-
+* Encode the `data_stream` field set by the `add_data_stream` processor with lowercase keys in Beat receivers. https://github.com/elastic/beats/pull/54224[#54224]
 
 **Packetbeat**
 
-* Fix length and count decoding in the Packetbeat Cassandra parser. https://github.com/elastic/beats/pull/54279[#54279] https://github.com/elastic/beats/pull/54573[#54573] https://github.com/elastic/beats/pull/54634[#54634] https://github.com/elastic/beats/pull/51019[#51019] https://github.com/elastic/beats/pull/54650[#54650] https://github.com/elastic/beats/pull/54693[#54693] https://github.com/elastic/beats/pull/54695[#54695] https://github.com/elastic/beats/issues/54257[#54257]
-
+* Fix length and count decoding in the Packetbeat Cassandra parser. https://github.com/elastic/beats/pull/54067[#54067]
 
 **Winlogbeat**
 
-* Fix PowerShell module pipeline failure on unexpected or localized ParameterBinding lines. https://github.com/elastic/beats/pull/54279[#54279] https://github.com/elastic/beats/pull/54573[#54573] https://github.com/elastic/beats/pull/54634[#54634] https://github.com/elastic/beats/pull/51019[#51019] https://github.com/elastic/beats/pull/54650[#54650] https://github.com/elastic/beats/pull/54693[#54693] https://github.com/elastic/beats/pull/54695[#54695] https://github.com/elastic/beats/issues/54257[#54257]
-* Fix PowerShell module pipeline failure on event 4103 with multi-line ContextInfo values. https://github.com/elastic/beats/pull/54279[#54279] https://github.com/elastic/beats/pull/54573[#54573] https://github.com/elastic/beats/pull/54634[#54634] https://github.com/elastic/beats/pull/51019[#51019] https://github.com/elastic/beats/pull/54650[#54650] https://github.com/elastic/beats/pull/54693[#54693] https://github.com/elastic/beats/pull/54695[#54695] https://github.com/elastic/beats/issues/54257[#54257]
+* Fix PowerShell module pipeline failure on unexpected or localized ParameterBinding lines. https://github.com/elastic/beats/pull/54115[#54115]
+* Fix PowerShell module pipeline failure on event 4103 with multi-line ContextInfo values. https://github.com/elastic/beats/pull/54260[#54260]
 
 // end 8.19.25 relnotes
