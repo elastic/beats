@@ -103,7 +103,7 @@ func (p *promEventGenerator) GeneratePromEvents(mf *p.MetricFamily) []PromEvent 
 					Data: mapstr.M{
 						"metrics": mapstr.M{
 							name + "_sum":   summary.GetSampleSum(),
-							name + "_count": summary.GetSampleCount(),
+							name + "_count": uint64(summary.GetSampleCount()),
 						},
 					},
 					Labels: labels,
@@ -135,7 +135,7 @@ func (p *promEventGenerator) GeneratePromEvents(mf *p.MetricFamily) []PromEvent 
 					Data: mapstr.M{
 						"metrics": mapstr.M{
 							name + "_sum":   histogram.GetSampleSum(),
-							name + "_count": histogram.GetSampleCount(),
+							name + "_count": uint64(histogram.GetSampleCount()),
 						},
 					},
 					Labels: labels,
@@ -143,7 +143,7 @@ func (p *promEventGenerator) GeneratePromEvents(mf *p.MetricFamily) []PromEvent 
 			}
 
 			for _, bucket := range histogram.GetBucket() {
-				if bucket.GetCumulativeCount() == uint64(math.NaN()) || bucket.GetCumulativeCount() == uint64(math.Inf(0)) {
+				if math.IsNaN(bucket.GetCumulativeCount()) || math.IsInf(bucket.GetCumulativeCount(), 0) {
 					continue
 				}
 
@@ -153,7 +153,7 @@ func (p *promEventGenerator) GeneratePromEvents(mf *p.MetricFamily) []PromEvent 
 				events = append(events, PromEvent{
 					Data: mapstr.M{
 						"metrics": mapstr.M{
-							name + "_bucket": bucket.GetCumulativeCount(),
+							name + "_bucket": uint64(bucket.GetCumulativeCount()),
 						},
 					},
 					Labels: bucketLabels,
