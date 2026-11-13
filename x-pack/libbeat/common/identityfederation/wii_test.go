@@ -5,6 +5,7 @@
 package identityfederation
 
 import (
+	"context"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
@@ -14,12 +15,14 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"io"
 	"math/big"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -324,6 +327,105 @@ func TestWIITokenSourceRetriesTransientErrors(t *testing.T) {
 	require.Equal(t, int32(3), requests.Load(), "two 503s then success within the attempt budget")
 }
 
+func TestWIITokenSourceRequestCanBeCanceled(t *testing.T) {
+	pki := newWIITestPKI(t)
+	t.Setenv(WIISSLCAFileEnvVar, pki.caPEMPath)
+
+	started := make(chan struct{})
+	srv := newWIITestServer(t, pki, func(_ http.ResponseWriter, r *http.Request) {
+		// The server detects a client disconnect only after the body is consumed.
+		_, _ = io.Copy(io.Discard, r.Body)
+		close(started)
+		<-r.Context().Done()
+	})
+
+	source, err := NewWIITokenSource(srv.URL, pki.certPath, pki.keyPath, "sts.amazonaws.com", logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	ctx, cancel := context.WithCancel(t.Context())
+	result := make(chan error, 1)
+	go func() {
+		_, err := source.GetIdentityTokenContext(ctx)
+		result <- err
+	}()
+
+	select {
+	case <-started:
+	case err := <-result:
+		t.Fatalf("the WII request ended before reaching the issuer: %v", err)
+	case <-time.After(5 * time.Second):
+		t.Fatal("the WII request did not reach the issuer")
+	}
+	cancel()
+	select {
+	case err := <-result:
+		require.ErrorIs(t, err, context.Canceled)
+	case <-time.After(time.Second):
+		t.Fatal("canceling the context did not interrupt the WII request")
+	}
+}
+
+func TestWIITokenSourceWaitForRefreshCanBeCanceled(t *testing.T) {
+	pki := newWIITestPKI(t)
+	t.Setenv(WIISSLCAFileEnvVar, pki.caPEMPath)
+
+	started := make(chan struct{})
+	var startOnce sync.Once
+	release := make(chan struct{})
+	srv := newWIITestServer(t, pki, func(w http.ResponseWriter, r *http.Request) {
+		_, _ = io.Copy(io.Discard, r.Body)
+		startOnce.Do(func() { close(started) })
+		select {
+		case <-release:
+			_, _ = w.Write(tokenResponse("eyJrefreshed", time.Now().Add(time.Hour)))
+		case <-r.Context().Done():
+		}
+	})
+
+	source, err := NewWIITokenSource(srv.URL, pki.certPath, pki.keyPath, "sts.amazonaws.com", logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	refresh := make(chan error, 1)
+	go func() {
+		_, err := source.GetIdentityToken()
+		refresh <- err
+	}()
+	select {
+	case <-started:
+	case err := <-refresh:
+		t.Fatalf("the refresh ended before reaching the issuer: %v", err)
+	case <-time.After(5 * time.Second):
+		t.Fatal("the refresh did not reach the issuer")
+	}
+
+	ctx, cancel := context.WithCancel(t.Context())
+	waiter := make(chan error, 1)
+	go func() {
+		_, err := source.GetIdentityTokenContext(ctx)
+		waiter <- err
+	}()
+	cancel()
+	select {
+	case err := <-waiter:
+		require.ErrorIs(t, err, context.Canceled)
+	case <-time.After(time.Second):
+		t.Fatal("a canceled caller kept waiting for the refresh in progress")
+	}
+
+	close(release)
+	require.NoError(t, <-refresh, "the refresh in progress must still complete")
+}
+
+func TestWaitForWIIRetryCanBeCanceled(t *testing.T) {
+	ctx, cancel := context.WithCancel(t.Context())
+	cancel()
+
+	start := time.Now()
+	err := waitForWIIRetry(ctx, time.Hour)
+	require.ErrorIs(t, err, context.Canceled)
+	require.Less(t, time.Since(start), time.Second)
+}
+
 func TestWIITokenSourceDoesNotRetryClientErrors(t *testing.T) {
 	pki := newWIITestPKI(t)
 	t.Setenv(WIISSLCAFileEnvVar, pki.caPEMPath)
@@ -371,6 +473,51 @@ func TestWIITokenSourceServesCachedTokenOnRefreshFailure(t *testing.T) {
 	token, err = source.GetIdentityToken()
 	require.NoError(t, err)
 	require.Equal(t, []byte("eyJcached-token"), token, "cached token must be returned when refresh fails but token is still valid")
+}
+
+func TestWIITokenSourceCanceledRefreshDoesNotServeCachedToken(t *testing.T) {
+	pki := newWIITestPKI(t)
+	t.Setenv(WIISSLCAFileEnvVar, pki.caPEMPath)
+
+	var requests atomic.Int32
+	started := make(chan struct{})
+	srv := newWIITestServer(t, pki, func(w http.ResponseWriter, r *http.Request) {
+		_, _ = io.Copy(io.Discard, r.Body)
+		if requests.Add(1) == 1 {
+			_, _ = w.Write(tokenResponse("eyJcached-token", time.Now().Add(wiiRefreshBeforeExpiry/2)))
+			return
+		}
+		close(started)
+		<-r.Context().Done()
+	})
+
+	source, err := NewWIITokenSource(srv.URL, pki.certPath, pki.keyPath, "sts.amazonaws.com", logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	token, err := source.GetIdentityToken()
+	require.NoError(t, err)
+	require.Equal(t, []byte("eyJcached-token"), token)
+
+	ctx, cancel := context.WithCancel(t.Context())
+	result := make(chan error, 1)
+	go func() {
+		_, err := source.GetIdentityTokenContext(ctx)
+		result <- err
+	}()
+	select {
+	case <-started:
+	case err := <-result:
+		t.Fatalf("the refresh ended before reaching the issuer: %v", err)
+	case <-time.After(5 * time.Second):
+		t.Fatal("the refresh did not reach the issuer")
+	}
+	cancel()
+	select {
+	case err := <-result:
+		require.ErrorIs(t, err, context.Canceled, "a canceled refresh must not be reported as a success")
+	case <-time.After(time.Second):
+		t.Fatal("canceling the context did not interrupt the refresh")
+	}
 }
 
 func TestWIITokenSourcePicksUpRotatedCert(t *testing.T) {

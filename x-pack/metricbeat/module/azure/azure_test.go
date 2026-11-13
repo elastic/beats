@@ -101,6 +101,56 @@ func TestConfigUnpackValidatesBillingDurations(t *testing.T) {
 	}
 }
 
+func TestConfigClientSecretRequirement(t *testing.T) {
+	tests := []struct {
+		name    string
+		values  map[string]any
+		wantErr string
+	}{
+		{
+			name:   "accepts a client secret",
+			values: map[string]any{},
+		},
+		{
+			name:    "requires a client secret without cloud connectors",
+			values:  map[string]any{"client_secret": ""},
+			wantErr: "client_secret is required unless use_cloud_connectors is enabled",
+		},
+		{
+			name:   "does not require a client secret with cloud connectors",
+			values: map[string]any{"client_secret": "", "use_cloud_connectors": true},
+		},
+		{
+			name:   "accepts a client secret with cloud connectors",
+			values: map[string]any{"use_cloud_connectors": true},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			rawConfig, err := config.NewConfigFrom(validConfig(test.values))
+			require.NoError(t, err, "expected the test configuration to be created")
+
+			var cfg Config
+			err = rawConfig.Unpack(&cfg)
+			if test.wantErr == "" {
+				assert.NoError(t, err, "expected the authentication configuration to be accepted")
+				return
+			}
+			assert.ErrorContains(t, err, test.wantErr, "expected the authentication configuration to be rejected")
+		})
+	}
+
+	t.Run("unpacks use_cloud_connectors", func(t *testing.T) {
+		rawConfig, err := config.NewConfigFrom(validConfig(map[string]any{"use_cloud_connectors": true}))
+		require.NoError(t, err, "expected the test configuration to be created")
+
+		var cfg Config
+		require.NoError(t, rawConfig.Unpack(&cfg), "expected the configuration to be accepted")
+		assert.True(t, cfg.UseCloudConnectors, "expected use_cloud_connectors to be unpacked")
+	})
+}
+
 func validConfig(values map[string]any) map[string]any {
 	cfg := map[string]any{
 		"client_id":       "client",

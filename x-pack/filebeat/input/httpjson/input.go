@@ -332,11 +332,18 @@ func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *request
 	case authCfg.OAuth2.isEnabled():
 		client = authCfg.OAuth2.prepared
 		if client == nil {
+			var tokenClient *http.Client
+			if authCfg.OAuth2.AzureUseCloudConnectors {
+				tokenClient, err = requestCfg.Transport.Client(networkClientOptions(requestCfg.KeepAlive.settings(), log)...)
+				if err != nil {
+					return nil, err
+				}
+			}
 			client, err = newNetHTTPClient(ctx, requestCfg, log, reg)
 			if err != nil {
 				return nil, err
 			}
-			client, err = authCfg.OAuth2.client(ctx, client)
+			client, err = authCfg.OAuth2.client(ctx, client, tokenClient, log)
 			if err != nil {
 				return nil, err
 			}
@@ -417,11 +424,7 @@ func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings, logge
 	default:
 		fallthrough
 	case !ok:
-		return []httpcommon.TransportOption{
-			httpcommon.WithLogger(logger),
-			httpcommon.WithAPMHTTPInstrumentation(),
-			keepalive,
-		}
+		return networkClientOptions(keepalive, logger)
 
 	// We set the host for the unix socket and Windows named
 	// pipes schemes because the http.Transport expects to
@@ -440,6 +443,16 @@ func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings, logge
 		httpcommon.WithAPMHTTPInstrumentation(),
 		keepalive,
 		httpcommon.WithBaseDialer(dialer),
+	}
+}
+
+// networkClientOptions returns the client configuration options for a network
+// connection. Unlike clientOptions, it does not modify the request URL.
+func networkClientOptions(keepalive httpcommon.WithKeepaliveSettings, logger *logp.Logger) []httpcommon.TransportOption {
+	return []httpcommon.TransportOption{
+		httpcommon.WithLogger(logger),
+		httpcommon.WithAPMHTTPInstrumentation(),
+		keepalive,
 	}
 }
 

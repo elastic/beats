@@ -44,7 +44,7 @@ func normalizeResourceManagerEndpoint(endpoint string) string {
 type Config struct {
 	// shared config options
 	ClientId       string        `config:"client_id"  validate:"required"`
-	ClientSecret   string        `config:"client_secret"  validate:"required"`
+	ClientSecret   string        `config:"client_secret"`
 	TenantId       string        `config:"tenant_id"  validate:"required"`
 	SubscriptionId string        `config:"subscription_id"  validate:"required"`
 	Period         time.Duration `config:"period" validate:"nonzero,required"`
@@ -54,6 +54,7 @@ type Config struct {
 	ResourceManagerEndpoint string        `config:"resource_manager_endpoint"`
 	ResourceManagerAudience string        `config:"resource_manager_audience"`
 	ActiveDirectoryEndpoint string        `config:"active_directory_endpoint"`
+	UseCloudConnectors      bool          `config:"use_cloud_connectors"`
 	// specific to resource metrics
 	Resources           []ResourceConfig `config:"resources"`
 	RefreshListInterval time.Duration    `config:"refresh_list_interval"`
@@ -124,6 +125,9 @@ type DimensionConfig struct {
 }
 
 func (conf *Config) Validate() error {
+	if conf.ClientSecret == "" && !conf.UseCloudConnectors {
+		return fmt.Errorf("client_secret is required unless use_cloud_connectors is enabled")
+	}
 	if err := validateBillingDuration("billing_usage_lookback", conf.BillingUsageLookback); err != nil {
 		return err
 	}

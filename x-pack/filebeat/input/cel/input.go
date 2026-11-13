@@ -1193,6 +1193,15 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
+	redirect := checkRedirect(cfg.Resource, log)
+	var tokenClient *http.Client
+	if cfg.Auth.OAuth2.azureCloudConnectorsEnabled() {
+		redirect = azureCloudConnectorsCheckRedirect(redirect)
+		tokenClient, err = cfg.Resource.Transport.Client(networkClientOptions(cfg.Resource.KeepAlive.settings(), log)...)
+		if err != nil {
+			return nil, nil, nil, nil, err
+		}
+	}
 
 	if cfg.Auth.Digest.isEnabled() {
 		var noReuse bool
@@ -1265,7 +1274,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	}
 
 	c.Transport = otelTransport
-	c.CheckRedirect = checkRedirect(cfg.Resource, log)
+	c.CheckRedirect = redirect
 
 	// outside the otel RoundTripper
 	contextInjector := otel.NewContextInjector(c.Transport, ctx)
@@ -1285,7 +1294,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		}).StandardClient()
 		// The retrying client returns redirect responses that the inner
 		// client declined to follow, so the outer client needs the policy too.
-		c.CheckRedirect = checkRedirect(cfg.Resource, log)
+		c.CheckRedirect = redirect
 	}
 
 	c.Transport = userAgentDecorator{
@@ -1296,7 +1305,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	}
 
 	if cfg.Auth.OAuth2.isEnabled() {
-		c, err = cfg.Auth.OAuth2.client(ctx, c)
+		c, err = cfg.Auth.OAuth2.client(ctx, c, tokenClient, log)
 		if err != nil {
 			return nil, nil, nil, nil, err
 		}
@@ -1370,11 +1379,7 @@ func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings, log *
 	default:
 		fallthrough
 	case !ok:
-		return []httpcommon.TransportOption{
-			httpcommon.WithLogger(log),
-			httpcommon.WithAPMHTTPInstrumentation(),
-			keepalive,
-		}
+		return networkClientOptions(keepalive, log)
 
 	// We set the host for the unix socket and Windows named
 	// pipes schemes because the http.Transport expects to
@@ -1394,6 +1399,16 @@ func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings, log *
 		httpcommon.WithAPMHTTPInstrumentation(),
 		keepalive,
 		httpcommon.WithBaseDialer(dialer),
+	}
+}
+
+// networkClientOptions returns the client configuration options for a network
+// connection. Unlike clientOptions, it does not modify the request URL.
+func networkClientOptions(keepalive httpcommon.WithKeepaliveSettings, log *logp.Logger) []httpcommon.TransportOption {
+	return []httpcommon.TransportOption{
+		httpcommon.WithLogger(log),
+		httpcommon.WithAPMHTTPInstrumentation(),
+		keepalive,
 	}
 }
 
