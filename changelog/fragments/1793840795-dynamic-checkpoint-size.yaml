@@ -1,0 +1,4 @@
+kind: feature
+summary: Improve performance when ingesting large number of files (hundreds of thousands) by dynamically calculating the registry checkpoint threshold.
+component: Filebeat
+issue: https://github.com/elastic/beats/issues/33382
