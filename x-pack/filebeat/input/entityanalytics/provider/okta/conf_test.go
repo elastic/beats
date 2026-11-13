@@ -7,6 +7,7 @@ package okta
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"testing"
 	"time"
 
@@ -179,6 +180,40 @@ func TestKeepAliveSetting(t *testing.T) {
 			got := conf.Request.KeepAlive.settings()
 			if got != test.want {
 				t.Errorf("unexpected setting for %s: got: %#v\nwant:%#v", test.name, got, test.want)
+			}
+		})
+	}
+}
+
+func TestSensitiveHeadersConfig(t *testing.T) {
+	const base = "okta_domain: example.okta.com\nokta_token: t\n"
+	tests := []struct {
+		name string
+		yaml string
+		want []string
+	}{
+		{name: "unset_uses_defaults", yaml: "", want: []string{"Authorization", "Proxy-Authorization", "Cookie"}},
+		{name: "null_uses_defaults", yaml: "request.redirect.sensitive_headers: ~\n", want: []string{"Authorization", "Proxy-Authorization", "Cookie"}},
+		{name: "empty_disables", yaml: "request.redirect.sensitive_headers: []\n", want: []string{}},
+		{name: "custom_replaces_defaults", yaml: "request.redirect.sensitive_headers: [X-Api-Key]\n", want: []string{"X-Api-Key"}},
+		{name: "longer_custom_replaces_defaults", yaml: "request.redirect.sensitive_headers: [A, B, C, D]\n", want: []string{"A", "B", "C", "D"}},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			c := defaultConfig()
+			u, err := config.NewConfigWithYAML([]byte(base+test.yaml), "")
+			if err != nil {
+				t.Fatalf("failed to parse config: %v", err)
+			}
+			err = u.Unpack(&c)
+			if err != nil {
+				t.Fatalf("failed to unpack config: %v", err)
+			}
+
+			got := sensitiveHeaders(c.Request.RedirectSensitiveHeaders)
+			if !slices.Equal(got, test.want) {
+				t.Errorf("sensitive headers = %v; want %v", got, test.want)
 			}
 		})
 	}
