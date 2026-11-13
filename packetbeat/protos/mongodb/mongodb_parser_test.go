@@ -115,6 +115,56 @@ func TestMongodbParser_OpMsg(t *testing.T) {
 	}
 }
 
+func buildMinimalMongoMessage(opCode int32, responseTo int32) []byte {
+	var data []byte
+	data = addInt32(data, mongoHeaderSize)
+	data = addInt32(data, 1)
+	data = addInt32(data, responseTo)
+	data = addInt32(data, opCode)
+	return data
+}
+
+func TestMongodbParser_additionalOpCodes(t *testing.T) {
+	tests := []struct {
+		name       string
+		opCode     int32
+		responseTo int32
+		wantMethod string
+		wantResp   bool
+	}{
+		{
+			name:       "opCommand",
+			opCode:     int32(opCommand),
+			wantMethod: "command",
+		},
+		{
+			name:       "opCommandReply",
+			opCode:     int32(opCommandRep),
+			wantMethod: "commandReply",
+			wantResp:   true,
+		},
+		{
+			name:       "opCompressed",
+			opCode:     int32(opCompressed),
+			wantMethod: "compressed",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			data := buildMinimalMongoMessage(tc.opCode, tc.responseTo)
+			st := &stream{data: data, message: new(mongodbMessage)}
+
+			ok, complete := mongodbMessageParser(st, logptest.NewTestingLogger(t, ""))
+
+			assert.True(t, ok, "Parsing should succeed")
+			assert.True(t, complete, "Expecting a complete message")
+			assert.Equal(t, tc.wantMethod, st.message.method)
+			assert.Equal(t, tc.wantResp, st.message.isResponse)
+		})
+	}
+}
+
 func TestMongodbParser_unknownOpCode(t *testing.T) {
 	var data []byte
 	data = addInt32(data, 16)   // length = 16
