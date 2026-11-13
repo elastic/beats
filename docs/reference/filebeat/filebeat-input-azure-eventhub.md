@@ -120,6 +120,26 @@ filebeat.inputs:
 When using `managed_identity` authentication, the managed identity must have the appropriate Azure RBAC permissions. Refer to [Required permissions](#_required_permissions) for details.
 :::
 
+### Workload identity federation (processor v2)
+
+```{applies_to}
+stack: ga 9.7
+```
+
+For deployment prerequisites and identity settings, refer to [Workload identity federation](#_workload_identity).
+
+```yaml
+filebeat.inputs:
+- type: azure-eventhub
+  processor_version: "v2"
+  auth_type: "workload_identity"
+  eventhub: "insights-operational-logs"
+  eventhub_namespace: "your-namespace.servicebus.windows.net"
+  consumer_group: "$Default"
+  storage_account: "your-storage-account"
+  storage_account_container: "your-storage-container"
+```
+
 ## Authentication [_authentication]
 
 The azure-eventhub input supports multiple authentication methods. The [`auth_type` configuration option](#_auth_type) controls the authentication method used for both Event Hub and Storage Account.
@@ -131,10 +151,38 @@ The following authentication types are supported:
 - **`connection_string`** (default if `auth_type` is not specified): Uses Azure Event Hubs and Storage Account connection strings.
 - {applies_to}`stack: ga 9.3.0` **`client_secret`**: Uses Azure Active Directory service principal with client secret credentials.
 - {applies_to}`stack: ga 9.2.6+` {applies_to}`stack: ga 8.19.12+` **`managed_identity`**: Uses Azure Managed Identity. Supports both system-assigned and user-assigned managed identities. Available starting from {{filebeat}} 9.2.6 and later, 9.3.1 and later, 9.4.0 and later, and {{stack}} 8.19.12 and later.
+- {applies_to}`stack: ga 9.7` **`workload_identity`**: Uses a projected Kubernetes service account token for [workload identity federation](#_workload_identity). Requires processor v2.
+
+### Workload identity federation [_workload_identity]
+
+```{applies_to}
+stack: ga 9.7
+```
+
+Use workload identity federation to read Event Hubs and write Blob checkpoints from Kubernetes, including clusters outside Azure, without client secrets or connection strings.
+
+Before starting {{filebeat}}:
+
+1. Configure an Entra app registration or user-assigned managed identity to trust your cluster's OIDC issuer, service account subject, and token audience. For setup instructions, refer to [Configure an app to trust an external identity provider](https://learn.microsoft.com/en-us/entra/workload-id/workload-identity-federation-create-trust).
+2. Project a Kubernetes service account token with audience `api://AzureADTokenExchange` into the {{filebeat}} container. Kubernetes must rotate this file as tokens expire. Keep the file mounted for the lifetime of the input.
+3. Grant the identity the [required Event Hubs and Blob Storage permissions](#_required_permissions). The input also attempts to create the checkpoint container if it does not exist. Scope your storage permissions accordingly.
+4. Supply the identity settings below.
+
+For each identity value, provide either the input setting or its environment variable. A nonempty input setting takes precedence.
+
+| Input setting | Environment variable |
+| --- | --- |
+| [`tenant_id`](#_tenant_id) | `AZURE_TENANT_ID` |
+| [`client_id`](#_client_id) | `AZURE_CLIENT_ID` |
+| [`federated_token_file`](#_federated_token_file) | `AZURE_FEDERATED_TOKEN_FILE` |
+
+Both the Event Hubs consumer and Blob checkpoint storage use these identity settings. For sovereign clouds, configure [`authority_host`](#_authority_host).
+
+This authentication method uses the projected token directly and does not require a managed identity endpoint or sidecar.
 
 ### Required permissions [_required_permissions]
 
-When using `client_secret` or `managed_identity` authentication, the identity (service principal or managed identity) needs the following Azure RBAC permissions:
+When using credential-based authentication, the identity (service principal or managed identity) needs the following Azure RBAC permissions:
 
 **For Azure Event Hubs:**
 - `Azure Event Hubs Data Receiver` role on the Event Hubs namespace or Event Hub
@@ -182,6 +230,7 @@ Valid values include:
 - `connection_string` (default): Uses connection string authentication. You _must_ provide a [`connection_string`](#_connection_string).
 - `client_secret`: Uses Azure Active Directory service principal with client secret credentials.
 - {applies_to}`stack: ga 9.2.6+` {applies_to}`stack: ga 8.19.12+` `managed_identity`: Uses Azure Managed Identity. Ideal for workloads running on Azure infrastructure. Available starting from {{filebeat}} 9.2.6 and later, 9.3.1 and later, 9.4.0 and later, and {{stack}} 8.19.12 and later.
+- {applies_to}`stack: ga 9.7` `workload_identity`: Uses [workload identity federation](#_workload_identity) for both Event Hubs and Blob Storage. Requires processor v2.
 
 ### `connection_string` [_connection_string]
 
@@ -200,7 +249,7 @@ A Blob Storage account is required to store, retrieve, or update the offset or s
 stack: ga 9.3.0
 ```
 
-The fully qualified namespace for the Event Hub. Required when using credential-based authentication methods (such as `client_secret` or `managed_identity`). Not required when using `connection_string` authentication, as the namespace is embedded in the connection string. Format: `your-eventhub-namespace.servicebus.windows.net`
+The fully qualified namespace for the Event Hub. Required when using credential-based authentication methods. Not required when using `connection_string` authentication, as the namespace is embedded in the connection string. Format: `your-eventhub-namespace.servicebus.windows.net`
 
 ### `tenant_id` [_tenant_id]
 
@@ -210,6 +259,8 @@ stack: ga 9.3.0
 
 The Azure Active Directory tenant ID. Required when using `client_secret` authentication for Event Hub or Storage Account.
 
+{applies_to}`stack: ga 9.7` With `workload_identity`, refer to [identity settings](#_workload_identity).
+
 ### `client_id` [_client_id]
 
 ```{applies_to}
@@ -217,6 +268,16 @@ stack: ga 9.3.0
 ```
 
 The Azure Active Directory application (client) ID. Required when using `client_secret` authentication for Event Hub or Storage Account.
+
+{applies_to}`stack: ga 9.7` With `workload_identity`, refer to [identity settings](#_workload_identity).
+
+### `federated_token_file` [_federated_token_file]
+
+```{applies_to}
+stack: ga 9.7
+```
+
+The path to the projected Kubernetes service account token file inside the {{filebeat}} container. Used only with `auth_type: workload_identity`. For identity settings and deployment prerequisites, refer to [Workload identity federation](#_workload_identity).
 
 ### `client_secret` [_client_secret]
 
@@ -232,7 +293,7 @@ The Azure Active Directory application client secret. Required when using `clien
 stack: ga 9.3.0
 ```
 
-The Azure Active Directory authority host. Optional when using `client_secret` or `managed_identity` authentication. Defaults to Azure Public Cloud (`https://login.microsoftonline.com`).
+The Azure Active Directory authority host. Optional when using credential-based authentication. Defaults to Azure Public Cloud (`https://login.microsoftonline.com`).
 
 Supported values:
 - `https://login.microsoftonline.com` (Azure Public Cloud - default)
@@ -325,7 +386,7 @@ stack: ga 9.4+
 
 The connection string for the storage account used for checkpoint storage (processor v2 only). When not set, the input attempts to construct it from `storage_account` and `storage_account_key` if both are present.
 
-When using `client_secret` or `managed_identity` authentication with processor v2, this option is not needed — the storage account uses the same credentials as Event Hub.
+When using credential-based authentication with processor v2, this option is not needed — the storage account uses the same credentials as Event Hub.
 
 ## Metrics [_metrics_3]
 
