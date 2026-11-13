@@ -33,7 +33,6 @@ import (
 	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/monitoring"
-	"github.com/elastic/go-concert/ctxtool"
 )
 
 func Plugin() input.Plugin {
@@ -130,5 +129,5 @@ func (s *server) Run(ctx input.Context, evtChan chan<- netinput.DataMetadata, me
 	logger.Debug("udp input initialized")
 	ctx.UpdateStatus(status.Running, "")
 
-	return server.Run(ctxtool.FromCanceller(ctx.Cancelation))
+	return server.Run(ctx.Cancelation)
 }

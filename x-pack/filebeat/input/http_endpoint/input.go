@@ -181,9 +181,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metr
 	// Derive a per-input handler context from the input's cancellation.
 	// This context is cancelled during deregistration so in-flight ACK
 	// waits abort before the pipeline client is closed.
-	handlerCtx, handlerCancel := context.WithCancel(
-		v2.GoContextFromCanceler(ctx.Cancelation),
-	)
+	handlerCtx, handlerCancel := context.WithCancel(ctx.Cancelation)
 
 	p.mu.Lock()
 	s, ok := p.servers[e.addr]
