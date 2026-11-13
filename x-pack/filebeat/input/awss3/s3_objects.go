@@ -17,6 +17,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws/ratelimit"
+	"github.com/aws/aws-sdk-go-v2/aws/retry"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -62,9 +64,22 @@ const (
 )
 
 // errS3DownloadFailed reports problems downloading an S3 object. Download errors
-// should never treated as permanent, they are just an indication to apply a
-// retry backoff until the connection is healthy again.
+// should never be treated as permanent; downloadErrorNeedsBackoff tells which of
+// them should also slow the workers down.
 var errS3DownloadFailed = errors.New("S3 download failure")
+
+// downloadErrorNeedsBackoff reports whether a download error means S3 or the
+// connection is unhealthy. The SDK wraps only retryable errors in
+// MaxAttemptsError or QuotaExceededError; per-object errors such as
+// AccessDenied must not hold up the objects listed after them.
+func downloadErrorNeedsBackoff(err error) bool {
+	var maxAttemptsErr *retry.MaxAttemptsError
+	return errors.As(err, &maxAttemptsErr) ||
+		errors.As(err, &ratelimit.QuotaExceededError{}) ||
+		// The SDK doesn't retry body reads, and net/http returns this when the
+		// connection ends before the announced Content-Length.
+		errors.Is(err, io.ErrUnexpectedEOF)
+}
 
 func newS3ObjectProcessorFactory(metrics *inputMetrics,
 	s3 s3API,
