@@ -1,8 +1,0 @@
-kind: bug-fix
-summary: Fix "ApiVersionsRequest V3" errors on Kafka broker connections by updating the sarama fork.
-description: >-
-  Updates the sarama fork to include the upstream fix that corrects how the
-  client version is reported, which caused "ApiVersionsRequest V3" errors when
-  connecting to Kafka brokers.
-component: all
-pr: https://github.com/elastic/beats/pull/54546

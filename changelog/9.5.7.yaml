@@ -1,0 +1,419 @@
+version: 9.5.7
+entries:
+    - kind: bug-fix
+      summary: 'Fix auditd module failing or dropping events when `immutable: true` is set.'
+      description: |
+        With `immutable: true`, the auditd module could fail at startup with
+        `Failure setting audit config as immutable` and stop collecting events, or
+        drop audit events that arrived while it waited for the kernel's reply. The
+        request is now sent on the control socket.
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1791841937
+      file:
+        name: 1791841937-auditd-immutable-control-socket.yaml
+        checksum: 169eb891f3c7e4670a87c6aa52a2d98f977037ed
+    - kind: bug-fix
+      summary: Stop scheduled query profiling from stalling osquery scheduled results
+      description: Scheduled query profiles are now collected outside osqueryd's logger callback, so the osquery_schedule query no longer deadlocks on osqueryd's schedule mutex. Profiles are published best effort; on the OTel runtime's slab queue a full queue drops the profile, while on the memory queue a profile publish can wait for a slot, as scheduled result publishes already do. Scheduled query profile documents are now actually published, so ingest volume rises where profiling is enabled. Scheduled profiles carry the new fields schedule_id and schedule_execution_count. Profiles are published after their result, and their @timestamp is the collection time. New counters under osquerybeat.scheduled_query_profiles report collected, failed and dropped profiles.
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue:
+        - https://github.com/elastic/beats/issues/53697
+      impact: ""
+      action: ""
+      timestamp: 1791965041
+      file:
+        name: 1791965041-fix-osquery-scheduled-profiling.yaml
+        checksum: bfdefb5f12d25f5e7cef865d3f779325be867fb0
+    - kind: bug-fix
+      summary: Stop auditbeat add_session_metadata stalling audit event reading after falling behind.
+      description: |
+        The kernel_tracing backend of add_session_metadata waited up to 1.2 seconds
+        for each process missing from its cache, regardless of how old the event
+        was. Once auditbeat fell behind, every event in the backlog was for a process
+        that had already exited and waited the full time, so auditbeat never caught
+        up, stopped reading the audit socket, and the kernel dropped audit messages.
+        The wait is now measured from the event's timestamp, so events that have
+        already waited longer than the limit are not delayed further.
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1792363230
+      file:
+        name: 1792363230-auditbeat-session-metadata-event-age-wait.yaml
+        checksum: db68c8c4c6ffd0057f3d865aaafebfabde267cda
+    - kind: bug-fix
+      summary: Restart osqueryd with backoff when it exits unexpectedly after startup.
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue:
+        - https://github.com/elastic/beats/issues/53645
+      impact: ""
+      action: ""
+      timestamp: 1792532859
+      file:
+        name: 1792532859-bound-osquery-outage-recovery.yaml
+        checksum: cd4ba7e73cf2de8d6012f8bfee686f6fafe0a4ef
+    - kind: bug-fix
+      summary: Fix the osquerybeat receiver hanging when it is shut down right after starting.
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue:
+        - https://github.com/elastic/beats/issues/53865
+      impact: ""
+      action: ""
+      timestamp: 1792532860
+      file:
+        name: 1792532860-osquerybeat-stop-before-run.yaml
+        checksum: fe35c9b94c2d3706c858f27a306110f59a3d5f85
+    - kind: bug-fix
+      summary: Keep osqueryd running when the output is slow by queueing scheduled osquery results.
+      description: Osquerybeat now publishes native scheduled query results from its own queue, so a slow output no longer makes osqueryd exit with code 78. The scheduled queue holds up to osquery.elastic_options.publishing.scheduled.max_events rows (default 3200) and, when full, drops the oldest items; publishing.scheduled.max_age optionally drops items that waited too long. Queued results survive osqueryd restarts and are dropped when osquerybeat stops. Drops are counted under osquerybeat.publishing.scheduled. A policy with invalid publishing settings is rejected before any of it is applied. See x-pack/osquerybeat/docs/publishing.md.
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue:
+        - https://github.com/elastic/beats/issues/53645
+      impact: ""
+      action: ""
+      timestamp: 1792557755
+      file:
+        name: 1792557755-osquery-result-publisher.yaml
+        checksum: 6a2bb52db5b699bc6bea077391dc4e7d67b87e63
+    - kind: feature
+      summary: Add tier_stats metricset to the autoops_es module to collect the number and the duration of the requests of the search and indexing tiers of an Elasticsearch Serverless project.
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1793083803
+      file:
+        name: 1793083803-autoops-es-tier-stats.yaml
+        checksum: 08d414894970837de26c53d1959fa78b3b53a855
+    - kind: bug-fix
+      summary: Fix file_integrity kprobes backend failing on kernels that list .cold symbols first
+      description: |
+        The kprobes backend of the file_integrity module stopped at the first /proc/kallsyms entry whose name started with the probed symbol, so on kernels that list a cold-path fragment such as fsnotify.cold ahead of fsnotify it reported "symbol fsnotify is optimised" and failed to start. Symbol lookup now scans the whole table, prefers an exact match, and ignores .cold fragments, which are not compiler clones of the function.
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1793095203
+      file:
+        name: 1793095203-auditbeat-fim-kprobes-cold-symbols.yaml
+        checksum: 028c6f5ddbf1ecf60edfc6d6497df3bb22b886d5
+    - kind: bug-fix
+      summary: Fix PowerShell module pipeline failure on unexpected or localized ParameterBinding lines.
+      description: |
+        The powershell and powershell_operational ingest pipelines threw
+        "Index 4 out of bounds for length 4" when a ParameterBinding line did not
+        match the English-only name/value labels, marking the document with
+        event.kind pipeline_error. Unexpected lines are now kept as the raw value,
+        and localized labels (e.g. German Name=/Wert=) are parsed.
+      component: winlogbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1793099380
+      file:
+        name: 1793099380-fix-winlogbeat-powershell-parameterbinding.yaml
+        checksum: 7d55e8c9223c37c0c59e4e98c3662204f7dcfbee
+    - kind: bug-fix
+      summary: Fix awss3 input rejecting non_aws_bucket_name configs that set only default_region.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1793100000
+      file:
+        name: 1793100000-awss3-non-aws-default-region.yaml
+        checksum: 14f73be2c2599b2498353bf65c496597bc252024
+    - kind: bug-fix
+      summary: Stop leaking a thread per run when a browser monitor's synthetics command fails to start
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1793193287
+      file:
+        name: 1793193287-fix-synthexec-start-failure-leak.yaml
+        checksum: 3ad277fa1ea86acdc7a5ae056a6f89a504e4165c
+    - kind: bug-fix
+      summary: Encode the data_stream field set by the add_data_stream processor with lowercase keys in beat receivers
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1793285753
+      file:
+        name: 1793285753-add-data-stream-field-names.yaml
+        checksum: ce58c037f0e4a9ef21d52c531414399980a8133e
+    - kind: security
+      summary: Update Brotli to 1.2.7 to fix a decoder panic on malformed input.
+      description: Addresses GHSA-c9gr-gmg4-2vqv, the Go decoder panic related to CVE-2026-111497.
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1793295453
+      file:
+        name: 1793295453-update-brotli-to-1.2.7-to-fix-malformed-input-decoding.yaml
+        checksum: 0de7d438f65e51f5e0b27123015d554152812c23
+    - kind: bug-fix
+      summary: Reject osquery policies that cannot be applied instead of stopping osquerybeat.
+      description: 'An osquery policy that fails validation, for example one with an invalid processor, an invalid ECS mapping or an invalid query schedule, is now rejected before any of it is applied: on the process runtime the osquery unit is marked failed, the previous policy keeps running, and the next valid policy clears the failure. Before, a configuration that failed to parse was ignored and the unit stayed healthy, and a policy osquerybeat could not apply stopped osquerybeat. On the OTel runtime the policy is the receiver''s static configuration and such a configuration still stops the receiver.'
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1793349097
+      file:
+        name: 1793349097-osquery-reject-unappliable-policy.yaml
+        checksum: 97ef27faaa93e0fb82271e1a7b37fc41c01d91c3
+    - kind: bug-fix
+      summary: Fix PowerShell module pipeline failure on event 4103 with multi-line ContextInfo values.
+      description: |
+        The powershell_operational ingest pipeline failed with "field
+        [winlog.event_data.ContextInfo] does not contain value_split [[:=]]" when
+        Host Application held a multi-line script, for example one passed to
+        powershell.exe -Command. The ContextInfo block is now parsed by a script
+        that uses its fixed 16-key layout, so the full script is kept in
+        process.command_line and script lines that look like keys are not taken as
+        keys. Localized keys, including ones with non-ASCII letters or apostrophes,
+        are still parsed as separate fields, and dots are removed from event_data
+        keys (for example the Spanish "Id. de host" becomes "Iddehost") so they
+        are not read as object paths.
+      component: winlogbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1793354900
+      file:
+        name: 1793354900-fix-winlogbeat-powershell-contextinfo-multiline.yaml
+        checksum: 4fd594a4a8eab5dfaae039c40ed3c1d0cf7dcc57
+    - kind: bug-fix
+      summary: Reduce retries and repeated error logs from Beats receivers while the output is unreachable
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1793376430
+      file:
+        name: 1793376430-escalate-beat-receiver-retry-back-off-during-output-outages.yaml
+        checksum: 9962b083786d808abfec00e9c79dee125acea000
+    - kind: bug-fix
+      summary: Fix Auditbeat file_integrity realtime events on macOS when recursive is false.
+      description: |
+        Corrected FSEvents file info handling so successful stat calls are not returned as errors. This restores
+        realtime change event processing for non-recursive macOS file integrity watches.
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54279
+      issue:
+        - https://github.com/elastic/beats/issues/54257
+      impact: ""
+      action: ""
+      timestamp: 1793462400
+      file:
+        name: 1793462400-auditbeat-fim-fsevents-nonrecursive.yaml
+        checksum: 665a057187ea4b4413d56bd947186db2a4f63c1c
+    - kind: enhancement
+      summary: Build the input status report of beat receivers in time linear in the number of inputs.
+      description: |
+        Each status report of a beat receiver built the map of its input statuses with a linear key lookup per input, which is quadratic in the number of inputs. It is now built in one pass, and an input reporting the status and message it already had no longer schedules a report.
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1793632960
+      file:
+        name: 1793632960-otel-status-reporter-perf.yaml
+        checksum: 69feb16ac3c4bc9528888cda3b620e913498e565
+    - kind: bug-fix
+      summary: Fix processors being applied twice to Elastic Agent filestream inputs configured without streams.
+      description: |
+        When Elastic Agent sent a filestream input whose configuration had no
+        streams, the input-level processors were added to the generated input
+        configuration twice, so each event ran through them twice. Processors that
+        are not idempotent, such as add_tags or script, produced wrong results.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1793716381
+      file:
+        name: 1793716381-fix-global-processors-applied-twice-for-elastic-agent-inputs-without-streams.yaml
+        checksum: c6546999173f85b32ef3e358246123945aa0d98f
+    - kind: bug-fix
+      summary: Update mito to v1.27.1, fixing redirects with a body and lost errors in the CEL lazy stream decoders.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1793738700
+      file:
+        name: 1793738700-mito1_27_1.yaml
+        checksum: 9c160d9660560a49311287ea1d84ad5ebdee2da8
+    - kind: bug-fix
+      summary: Write Azure Event Hub v2 checkpoints once per message, after all its records complete
+      description: |
+        The Azure Event Hub input (processor v2) now writes a checkpoint only after
+        every record decoded from a message has been acknowledged by the output or
+        dropped by a processor, and at most once per message.
+
+        Previously, when processors dropped records with drop_event, the input wrote
+        the same checkpoint once per dropped record (for example, 45 writes for a
+        message with 45 records), which multiplied Azure Storage operations and made
+        consumption wait on storage latency. It could also write a message's
+        checkpoint after the output had acknowledged only some of its records, so a
+        restart at that moment skipped the remaining records.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1793865564
+      file:
+        name: 1793865564-fix-azure-eventhub-checkpoint-coalescing.yaml
+        checksum: 2e3c7fc5a9dd53edb1c27369c75980fe58ead958
+    - kind: bug-fix
+      summary: Fix process CPU ticks and percentages being under-reported about 40 times on Apple Silicon macOS.
+      description: |
+        The darwin process collector treated the CPU times reported by proc_pidinfo
+        as nanoseconds, but they are in Mach absolute-time units. On Intel the two
+        are equal, but on Apple Silicon one unit is 125/3 nanoseconds, so
+        system.process.cpu.*.ticks, system.process.cpu.total.value,
+        system.process.cpu.total.pct, system.process.cpu.total.norm.pct and
+        process.cpu.pct were about 41.67 times too low.
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1793874000
+      file:
+        name: 1793874000-fix-darwin-arm64-process-cpu-ticks.yaml
+        checksum: 54475e14f461574783e4b51915d3285f0b992d07
+    - kind: bug-fix
+      summary: Fix repeated re-reads in azure-blob-storage and gcs inputs with mixed-case file names.
+      description: A mismatch in case sensitivity between checkpoint selection and filtering caused the azure-blob-storage and gcs inputs to re-read files on every poll when file names mixed upper- and lower-case letters, increasing ingest lag and output load. Affected inputs read those files once more after upgrading, then stop re-reading them.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1793881228
+      file:
+        name: 1793881228-fix-abs-gcs-checkpoint-name-case.yaml
+        checksum: 2251758a29047a90301d81408437cb386dd6c0ee
+    - kind: bug-fix
+      summary: Fix Filebeat receivers that share a registry failing to start together on Windows.
+      description: When several Filebeat receivers in the same process shared a registry path and started at the same time with a new registry, one of them could fail on Windows with "Failed to migrate registry file" and stop without starting its inputs.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1793959621
+      file:
+        name: 1793959621-fix-registry-migration-race-windows.yaml
+        checksum: 595c0e667c1a396fa9de5652a57cdffb034e1c10
+    - kind: bug-fix
+      summary: Use the Elasticsearch state store for the aws-cloudwatch input on agentless.
+      description: The aws-cloudwatch input did not request the Elasticsearch-backed state store with its input type, so on agentless its lastSync checkpoint was kept in the pod-local registry and lost on every pod replacement, causing the whole log group to be reread. The input now requests the store with its type and input ID. Behavior is unchanged when the Elasticsearch state store is not enabled for the input.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54616
+        - https://github.com/elastic/beats/pull/54650
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1794000000
+      file:
+        name: 1794000000-aws-cloudwatch-es-state-store.yaml
+        checksum: 0693b65134a8ff18fdfbd2a64a5d210607e7840d
+    - kind: bug-fix
+      summary: Fix "ApiVersionsRequest V3" errors on Kafka broker connections by updating the sarama fork.
+      description: Updates the sarama fork to include the upstream fix that corrects how the client version is reported, which caused "ApiVersionsRequest V3" errors when connecting to Kafka brokers.
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/54546
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1794000000
+      file:
+        name: 1794000000-update-sarama-fork-api-versions-v3.yaml
+        checksum: 7c97363e8e8386971f12e672cf0d9eeec9d244e0
