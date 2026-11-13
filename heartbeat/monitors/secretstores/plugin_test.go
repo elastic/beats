@@ -19,6 +19,7 @@ package secretstores
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -90,21 +91,21 @@ func (r *testResolver) set(header string, endpoints int, err error) {
 	r.header, r.endpoints, r.err = header, endpoints, err
 }
 
-func (r *testResolver) resolve(cfg *conf.C) (*conf.C, error) {
+func (r *testResolver) resolve(cfg *conf.C) (*conf.C, *Scrubber, error) {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
 	r.calls++
 	if r.err != nil {
-		return nil, r.err
+		return nil, nil, r.err
 	}
 	c := conf.NewConfig()
 	if err := c.Merge(cfg); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if err := c.SetString("header", -1, r.header); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return c, c.SetInt("endpoints", -1, int64(r.endpoints))
+	return c, nil, c.SetInt("endpoints", -1, int64(r.endpoints))
 }
 
 func (r *testResolver) callCount() int {
@@ -117,7 +118,7 @@ func makeSecretPlugin(t *testing.T, r *testResolver, f *innerFactory) plugin.Plu
 	t.Helper()
 	logger := logptest.NewTestingLogger(t, "")
 	cfg := newTestConfig(t, map[string]any{"header": "fake:token"})
-	p := newSecretPlugin(r.resolve, f.factory(), "inner", cfg, beat.Info{Logger: logger}, logger).plugin()
+	p := newSecretPlugin(r.resolve, f.factory(), "inner", cfg, beat.Info{Logger: logger}, logger, NewRedactor()).plugin()
 	t.Cleanup(func() { _ = p.Close() })
 	return p
 }
@@ -257,10 +258,100 @@ func TestSecretPluginClose(t *testing.T) {
 	assert.Equal(t, int64(1), f.created.Load(), "a closed plugin must not create the inner plugin again")
 }
 
+// TestSecretPluginRedacts checks the plugin gives its redactor the secret
+// values of each run, also when the plugin fails on them, and logs through
+// it.
+func TestSecretPluginRedacts(t *testing.T) {
+	const secret = "s3cr3t-token"
+	factory := plugin.PluginFactory{
+		Name: "leaky",
+		Make: func(_ string, cfg *conf.C, info beat.Info) (plugin.Plugin, error) {
+			info.Logger.Infof("making with %s", secret)
+			header, err := cfg.String("header", -1)
+			if err != nil {
+				return plugin.Plugin{}, err
+			}
+			if header == "invalid" {
+				return plugin.Plugin{}, fmt.Errorf("invalid header %q", secret)
+			}
+			job := func(event *beat.Event) ([]jobs.Job, error) {
+				event.Fields = mapstr.M{"url": mapstr.M{"full": "https://host/?t=" + secret}}
+				return nil, nil
+			}
+			return plugin.Plugin{Jobs: []jobs.Job{job}, Endpoints: 1}, nil
+		},
+	}
+	header := "valid"
+	resolve := func(cfg *conf.C) (*conf.C, *Scrubber, error) {
+		c := conf.NewConfig()
+		if err := c.Merge(cfg); err != nil {
+			return nil, nil, err
+		}
+		return c, scrubberFor(secret), c.SetString("header", -1, header)
+	}
+	redactor := NewRedactor()
+	logger, logs := logptest.NewTestingLoggerWithObserver(t, "")
+	p := newSecretPlugin(resolve, factory, "leaky", newTestConfig(t, map[string]any{}), beat.Info{Logger: logger}, logger, redactor).plugin()
+	t.Cleanup(func() { _ = p.Close() })
+
+	event := &beat.Event{}
+	_, err := p.Jobs[0](event)
+	require.NoError(t, err, "the job must run")
+	_, _ = redactor.Run(event)
+	assert.Equal(t, mapstr.M{"url": mapstr.M{"full": "https://host/?t=<hidden>"}}, event.Fields, "the redactor must remove the values of the run")
+
+	header = "invalid"
+	_, err = p.Jobs[0](&beat.Event{})
+	require.Error(t, err, "the creation error must be returned")
+	assert.Equal(t, `invalid header "<hidden>"`, redactor.scrub(err.Error()), "the redactor must remove the values of a failed run")
+
+	made := logs.FilterMessageSnippet("making with").TakeAll()
+	require.NotEmpty(t, made, "the plugin must log with the logger it is given")
+	for _, e := range made {
+		assert.Equal(t, "making with <hidden>", e.Message, "the plugin logger must not write the secret")
+	}
+}
+
+// TestSecretPluginCloseErrorAfterRotation checks closing the plugin of
+// rotated values, which the redactor no longer has, doesn't log them.
+func TestSecretPluginCloseErrorAfterRotation(t *testing.T) {
+	factory := plugin.PluginFactory{
+		Name: "closing",
+		Make: func(_ string, cfg *conf.C, _ beat.Info) (plugin.Plugin, error) {
+			header, err := cfg.String("header", -1)
+			if err != nil {
+				return plugin.Plugin{}, err
+			}
+			job := func(*beat.Event) ([]jobs.Job, error) { return nil, nil }
+			closer := func() error { return fmt.Errorf("could not close %s", header) }
+			return plugin.Plugin{Jobs: []jobs.Job{job}, Endpoints: 1, DoClose: closer}, nil
+		},
+	}
+	header := "first-secret"
+	resolve := func(cfg *conf.C) (*conf.C, *Scrubber, error) {
+		c := conf.NewConfig()
+		if err := c.Merge(cfg); err != nil {
+			return nil, nil, err
+		}
+		return c, scrubberFor(header), c.SetString("header", -1, header)
+	}
+	logger, logs := logptest.NewTestingLoggerWithObserver(t, "")
+	p := newSecretPlugin(resolve, factory, "closing", newTestConfig(t, map[string]any{}), beat.Info{Logger: logger}, logger, NewRedactor()).plugin()
+	t.Cleanup(func() { _ = p.Close() })
+
+	header = "second-secret"
+	_, err := p.Jobs[0](&beat.Event{})
+	require.NoError(t, err, "the job must run with the rotated value")
+
+	closed := logs.FilterMessageSnippet("Could not close").TakeAll()
+	require.Len(t, closed, 1, "closing the plugin of the first value must be logged")
+	assert.Equal(t, "Could not close the monitor plugin: could not close <hidden>", closed[0].Message, "the close error must not have the rotated value")
+}
+
 func TestWrapFactoryKeepsFactory(t *testing.T) {
 	f := (&innerFactory{}).factory()
 	f.Aliases = []string{"alias"}
-	wrapped := NewResolver(logptest.NewTestingLogger(t, "")).WrapFactory(f)
+	wrapped := NewResolver(logptest.NewTestingLogger(t, "")).WrapFactory(f, NewRedactor())
 	assert.Equal(t, f.Name, wrapped.Name, "the name must be kept")
 	assert.Equal(t, f.Aliases, wrapped.Aliases, "the aliases must be kept")
 }

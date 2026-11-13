@@ -19,6 +19,7 @@ package secretstores
 
 import (
 	"context"
+	"fmt"
 	"maps"
 	"testing"
 
@@ -315,7 +316,7 @@ func TestAllowedHosts(t *testing.T) {
 				destinations = nil
 			}
 
-			_, err := r.Resolve(newTestConfig(t, m), destinations)
+			_, _, err := r.Resolve(newTestConfig(t, m), destinations)
 			if tc.wantErr == "" {
 				assert.NoError(t, err, "the monitor must be allowed")
 				return
@@ -345,7 +346,7 @@ func TestWrapFactoryUsesPluginDestinations(t *testing.T) {
 			return plugin.Plugin{}, nil
 		},
 		Destinations: fakeDestinations,
-	})
+	}, NewRedactor())
 	cfg, err := ucfg.NewFrom(map[string]any{
 		"type":   "dest",
 		"host":   "attacker.example",
@@ -364,4 +365,27 @@ func TestWrapFactoryUsesPluginDestinations(t *testing.T) {
 	_, err = runJob(t, p.Jobs[0])
 	assert.ErrorIs(t, err, ErrNotAllowed, "the job must report the policy error")
 	assert.Zero(t, made, "the inner plugin must not be made with the secret")
+}
+
+// TestAllowedHostsErrorIsScrubbed checks the Scrubber comes with an error
+// failing after a substitution, which can quote a secret value.
+func TestAllowedHostsErrorIsScrubbed(t *testing.T) {
+	resetSharedStores(t)
+	r := NewResolver(logptest.NewTestingLogger(t, ""))
+	cfg := newTestConfig(t, map[string]any{
+		"type": "dest",
+		"url":  "fake:prod@url",
+		ConfigKey: []any{map[string]any{
+			"type": fakeType, "name": "prod", "id": "prod", allowedHostsKey: []any{"api.example.com"},
+		}},
+	})
+	destinations := func(cfg *conf.C) ([]string, error) {
+		u, _ := cfg.String("url", -1)
+		return nil, fmt.Errorf("parse %q: invalid URL", u)
+	}
+
+	_, scrubber, err := r.Resolve(cfg, destinations)
+	require.Error(t, err, "the destinations error must fail the resolve")
+	assert.Contains(t, err.Error(), "prod-url", "the error quotes the resolved value")
+	assert.NotContains(t, scrubber.String(err.Error()), "prod-url", "the scrubbed error must not have the secret value")
 }

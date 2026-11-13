@@ -48,30 +48,35 @@ func NewResolver(logger *logp.Logger) *Resolver {
 // If a connection with allowed_hosts replaced references, every host that
 // destinations returns for the resolved config must be allowed. A nil
 // destinations means the monitor type can't use such connections.
-func (r *Resolver) Resolve(cfg *conf.C, destinations plugin.DestinationsFunc) (*conf.C, error) {
+//
+// The Scrubber removes the substituted secret values from what the monitor
+// publishes. It is nil if there is nothing to scrub. It is also returned with
+// an error, which can quote a value substituted before the failure.
+func (r *Resolver) Resolve(cfg *conf.C, destinations plugin.DestinationsFunc) (*conf.C, *Scrubber, error) {
 	entries, err := configEntries(cfg)
 	if err != nil || len(entries) == 0 {
-		return cfg, err
+		return cfg, nil, err
 	}
 
 	resolved, err := withoutSecretStores(cfg)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	ctx := context.Background()
+	t := newTracker()
+	ctx := withTracker(context.Background(), t)
 	scopes := scopes(entries)
 	var usedRestricted []entry
 	for i, e := range entries {
 		s, err := sharedStores.get(e, r.logger)
 		if err != nil {
-			return nil, err
+			return nil, t.scrubber(), err
 		}
 		next, err := s.Replace(ctx, resolved, scopes[i])
 		if err != nil {
 			if errors.Is(err, ErrSelection) {
-				return nil, fmt.Errorf("%s: %w", ConfigKey, err)
+				return nil, t.scrubber(), fmt.Errorf("%s: %w", ConfigKey, err)
 			}
-			return nil, fmt.Errorf("could not resolve %s secret references: %w", e.label(), err)
+			return nil, t.scrubber(), fmt.Errorf("could not resolve %s secret references: %w", e.label(), err)
 		}
 		// Replace returns its input when it has no references of the entry.
 		if next != resolved && e.isRestricted() {
@@ -83,9 +88,9 @@ func (r *Resolver) Resolve(cfg *conf.C, destinations plugin.DestinationsFunc) (*
 	// come from secret values.
 	monitorType, _ := cfg.String("type", -1)
 	if err := checkAllowedHosts(usedRestricted, monitorType, destinations, resolved); err != nil {
-		return nil, err
+		return nil, t.scrubber(), err
 	}
-	return resolved, nil
+	return resolved, t.scrubber(), nil
 }
 
 // Validate checks the secret_stores setting and lets each configured store
