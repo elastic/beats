@@ -1,0 +1,16 @@
+kind: bug-fix
+
+summary: Fix disk queue filled percentage reporting +Inf when max_size is 0
+
+description: |
+  A disk queue configured with `max_size: 0` is unlimited, but the queue
+  monitoring observer divided by the zero maximum to compute
+  `queue.filled.pct`. The metric became +Inf (or NaN for an empty queue),
+  which made the monitoring reporter log "json: unsupported value: +Inf"
+  and broke the HTTP monitoring endpoint (`GET /stats` returned
+  "No valid json"). The filled percentage is now reported as 0 when no
+  finite byte or event limit is configured.
+
+component: libbeat
+
+issue: https://github.com/elastic/beats/issues/54639
