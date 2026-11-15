@@ -114,16 +114,16 @@ func TestNewPublisher_TrackerAddBeforePublish(t *testing.T) {
 		}
 	}
 
-	if got := tracker.pending; got != n {
-		t.Fatalf("tracker.pending = %d; want %d (Add must be called once per Publish)", got, n)
+	if got := tracker.count(); got != n {
+		t.Fatalf("tracker.count() = %d; want %d (Add must be called once per Publish)", got, n)
 	}
 
 	for range n {
 		tracker.Ack()
 	}
 	tracker.Wait()
-	if got := tracker.pending; got != 0 {
-		t.Errorf("tracker.pending after Wait = %d; want 0", got)
+	if got := tracker.count(); got != 0 {
+		t.Errorf("tracker.count() after Wait = %d; want 0", got)
 	}
 }
 
