@@ -19,7 +19,7 @@ summary: Fix duplicate event IDs for codec-decoded objects in the GCS and Azure 
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
 description: |
-  Events produced by a decoding codec (CSV, Parquet) from the same object all
+  Events produced by a decoding codec (CSV) from the same object all
   got the same `_id` and `log.offset: 0`, so only the first record of each
   object was indexed. Each event now gets a unique ID derived from its record
   index, and `log.offset` holds that index.

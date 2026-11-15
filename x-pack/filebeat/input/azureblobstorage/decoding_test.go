@@ -83,19 +83,6 @@ func TestDecoding(t *testing.T) {
 				},
 			},
 		},
-		{
-			name:      "parquet",
-			file:      "../../../../libbeat/reader/parquet/testdata/vpc_flow.gz.parquet",
-			numEvents: 652,
-			config: decoder.Config{
-				Codec: &decoder.CodecConfig{
-					Parquet: &decoder.ParquetCodecConfig{
-						Enabled:   true,
-						BatchSize: 1,
-					},
-				},
-			},
-		},
 	}
 
 	for _, tc := range testCases {

@@ -214,6 +214,7 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 			}
 			evt := j.createEvent(string(msg), evtOffset)
 			j.publish(evt, !dec.more(), id)
+			evtOffset++
 		}
 
 	case decoder:
@@ -229,12 +230,8 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 				return err
 			}
 			evt := j.createEvent(string(msg), evtOffset)
-<<<<<<< HEAD
 			j.publish(evt, !dec.more(), id)
-=======
-			j.publish(evt, !dec.More(), id)
 			evtOffset++
->>>>>>> 1ffb1d7 ([filebeat][gcs][abs] Fix duplicate event IDs for codec-decoded objects (#54157))
 		}
 
 	default:
