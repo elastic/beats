@@ -220,7 +220,12 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 				}
 			}
 			evt := j.createEvent(msg, val, evtOffset)
+<<<<<<< HEAD
 			j.publish(evt, !dec.more(), id)
+=======
+			j.publish(evt, !dec.More(), id)
+			evtOffset++
+>>>>>>> 1ffb1d7 ([filebeat][gcs][abs] Fix duplicate event IDs for codec-decoded objects (#54157))
 		}
 
 	case decoder:
@@ -242,7 +247,12 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 				}
 			}
 			evt := j.createEvent(msg, val, evtOffset)
+<<<<<<< HEAD
 			j.publish(evt, !dec.more(), id)
+=======
+			j.publish(evt, !dec.More(), id)
+			evtOffset++
+>>>>>>> 1ffb1d7 ([filebeat][gcs][abs] Fix duplicate event IDs for codec-decoded objects (#54157))
 		}
 
 	default:
