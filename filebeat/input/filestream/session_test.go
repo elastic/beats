@@ -434,6 +434,47 @@ func TestLogFile_Read(t *testing.T) {
 	})
 }
 
+// TestLogFile_ReadAfterClose checks that a reader stops on Close or on its
+// source's cancellation, and that Close leaves the source running.
+func TestLogFile_ReadAfterClose(t *testing.T) {
+	cases := []struct {
+		name         string
+		cancelSource bool
+		closeReader  bool
+		wantN        int
+		wantErr      error
+	}{
+		{name: "open reader returns data", wantN: 2},
+		{name: "closed reader returns ErrClosed", closeReader: true, wantErr: ErrClosed},
+		{name: "cancelled source returns ErrClosed", cancelSource: true, wantErr: ErrClosed},
+		{name: "closed reader on a cancelled source returns ErrClosed", cancelSource: true, closeReader: true, wantErr: ErrClosed},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			f := &fakeFile{readFunc: func(b []byte) (int, error) { return copy(b, "hi"), nil }}
+			r, err := newFileReader(logp.NewNopLogger(), ctx, f, closerConfig{})
+			require.NoError(t, err)
+
+			if tc.cancelSource {
+				cancel()
+			}
+			if tc.closeReader {
+				assert.NoError(t, r.Close())
+			}
+
+			n, err := r.Read(make([]byte, 8))
+			assert.Equal(t, tc.wantN, n)
+			assert.Equal(t, tc.wantErr, err)
+			if !tc.cancelSource {
+				assert.NoError(t, ctx.Err(), "closing the reader must not cancel its source")
+			}
+		})
+	}
+}
+
 func TestFilestream_Test(t *testing.T) {
 	inp := testFilestream(t, closerConfig{Reader: readerCloserConfig{OnEOF: true}})
 

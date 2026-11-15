@@ -134,7 +134,17 @@ func (inp *managedInput) Run(
 }
 
 func newInputACKHandler(ch *updateChan) beat.EventListener {
-	return acker.EventPrivateReporter(func(acked int, private []any) {
+	return acker.EventPrivateReporter(cursorACKHandler(ch))
+}
+
+func cursorACKHandler(ch *updateChan) func(acked int, private []any) {
+	return func(_ int, private []any) {
+		// private shares its array with the acker, which moves past ACKed
+		// entries without zeroing them. Without clearing, they keep the ops and
+		// their cursor deltas in memory until the acker reallocates the array,
+		// and that does not happen while an open file gets no new lines.
+		defer clear(private)
+
 		var n uint
 		var last int
 		for i := range private {
@@ -155,8 +165,8 @@ func newInputACKHandler(ch *updateChan) beat.EventListener {
 			return
 		}
 
-		//nolint:errcheck // We know it is alwys the correct type
+		//nolint:errcheck // We know it is always the correct type
 		op := private[last].(*updateOp)
 		ch.Send(scheduledUpdate{op: op, n: n})
-	})
+	}
 }
