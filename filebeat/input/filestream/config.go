@@ -30,8 +30,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // Compression mode constants
@@ -127,7 +127,7 @@ type stateChangeCloserConfig struct {
 
 type readerConfig struct {
 	Backoff        loginp.BackoffConfig    `config:"backoff"`
-	BufferSize     int                     `config:"buffer_size"`
+	BufferSize     int                     `config:"buffer_size" validate:"min=0,nonzero"`
 	Encoding       string                  `config:"encoding"`
 	ExcludeLines   []match.Matcher         `config:"exclude_lines"`
 	IncludeLines   []match.Matcher         `config:"include_lines"`

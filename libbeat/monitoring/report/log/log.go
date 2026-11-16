@@ -25,10 +25,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 // List of metrics that are gauges. This is used to identify metrics that should
@@ -105,14 +105,27 @@ type Reporter struct {
 	registries map[string]*monitoring.Registry
 	startTime  time.Time
 
+	// extraMetrics, if set, is merged into the "metrics" snapshot without
+	// overwriting existing metrics. It is only called when a snapshot is taken.
+	extraMetrics func() monitoring.FlatSnapshot
+
 	// output
 	logger *logp.Logger
+}
+
+// Option customizes a Reporter.
+type Option func(*Reporter)
+
+// WithExtraMetrics merges the metrics returned by extra into the "metrics"
+// namespace of every report, without overwriting existing metrics.
+func WithExtraMetrics(extra func() monitoring.FlatSnapshot) Option {
+	return func(r *Reporter) { r.extraMetrics = extra }
 }
 
 // MakeReporter returns a new Reporter that periodically reports
 // metrics via logp. If cfg is nil defaults will be used.  If pointers
 // to monitoring registries are nil, defaults will be used.
-func MakeReporter(beat beat.Info, cfg *conf.C, mon beatmonitoring.Monitoring) (report.Reporter, error) {
+func MakeReporter(beat beat.Info, cfg *conf.C, mon beatmonitoring.Monitoring, opts ...Option) (report.Reporter, error) {
 	config := defaultConfig()
 	if cfg != nil {
 		if err := cfg.Unpack(&config); err != nil {
@@ -128,17 +141,43 @@ func MakeReporter(beat beat.Info, cfg *conf.C, mon beatmonitoring.Monitoring) (r
 		registries: map[string]*monitoring.Registry{},
 	}
 
-	// That 'stats' namespace is reported as 'metrics' in the Elasticsearch
-	// reporter so use the same name for consistency.
-	r.registries["metrics"] = mon.StatsRegistry()
-	r.registries["info"] = mon.InfoRegistry()
-	r.registries["state"] = mon.StateRegistry()
-	r.registries["dataset"] = mon.InputsRegistry()
+	for _, opt := range opts {
+		opt(r)
+	}
+
+	for _, ns := range config.Namespaces {
+		name, reg := registryForNamespace(mon, ns)
+		if name == "" {
+			r.logger.Warnf("Ignoring unknown namespace %q in logging.metrics.namespaces", ns)
+			continue
+		}
+		if reg == nil {
+			continue
+		}
+		r.registries[name] = reg
+	}
 
 	r.wg.Go(func() {
 		r.snapshotLoop()
 	})
 	return r, nil
+}
+
+func registryForNamespace(mon beatmonitoring.Monitoring, ns string) (string, *monitoring.Registry) {
+	switch ns {
+	case "stats", "metrics":
+		// That 'stats' namespace is reported as 'metrics' in the Elasticsearch
+		// reporter so use the same name for consistency.
+		return "metrics", mon.StatsRegistry()
+	case "info":
+		return "info", mon.InfoRegistry()
+	case "state":
+		return "state", mon.StateRegistry()
+	case "dataset":
+		return "dataset", mon.InputsRegistry()
+	default:
+		return "", nil
+	}
 }
 
 func (r *Reporter) Stop() {
@@ -156,8 +195,7 @@ func (r *Reporter) snapshotLoop() {
 	defer func() {
 		snaps := map[string]monitoring.FlatSnapshot{}
 		for name, reg := range r.registries {
-			snap := makeSnapshot(reg)
-			snaps[name] = snap
+			snaps[name] = r.snapshot(name, reg)
 		}
 		r.logTotals(snaps)
 	}()
@@ -175,7 +213,7 @@ func (r *Reporter) snapshotLoop() {
 
 		snaps := make(map[string]monitoring.FlatSnapshot, len(r.registries))
 		for name, reg := range r.registries {
-			snap := makeSnapshot(reg)
+			snap := r.snapshot(name, reg)
 			lastSnap := lastSnaps[name]
 			lastSnaps[name] = snap
 			delta := makeDeltaSnapshot(lastSnap, snap)
@@ -203,6 +241,32 @@ func (r *Reporter) logSnapshot(snaps map[string]monitoring.FlatSnapshot) {
 func (r *Reporter) logTotals(snaps map[string]monitoring.FlatSnapshot) {
 	r.logger.Infow("Total metrics", toKeyValuePairs(snaps)...)
 	r.logger.Infof("Uptime: %v", time.Since(r.startTime))
+}
+
+// snapshot takes a snapshot of reg, merging in the extra metrics for "metrics".
+func (r *Reporter) snapshot(name string, reg *monitoring.Registry) monitoring.FlatSnapshot {
+	snap := makeSnapshot(reg)
+	if name == "metrics" && r.extraMetrics != nil {
+		mergeSnapshot(&snap, r.extraMetrics())
+	}
+	return snap
+}
+
+// mergeSnapshot adds the metrics of extra to dst, keeping dst's value on conflict.
+func mergeSnapshot(dst *monitoring.FlatSnapshot, extra monitoring.FlatSnapshot) {
+	mergeNoOverwrite(dst.Bools, extra.Bools)
+	mergeNoOverwrite(dst.Ints, extra.Ints)
+	mergeNoOverwrite(dst.Floats, extra.Floats)
+	mergeNoOverwrite(dst.Strings, extra.Strings)
+	mergeNoOverwrite(dst.StringSlices, extra.StringSlices)
+}
+
+func mergeNoOverwrite[V any](dst, src map[string]V) {
+	for k, v := range src {
+		if _, ok := dst[k]; !ok {
+			dst[k] = v
+		}
+	}
 }
 
 func makeSnapshot(R *monitoring.Registry) monitoring.FlatSnapshot {

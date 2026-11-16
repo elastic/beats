@@ -13,8 +13,8 @@ import (
 	"github.com/dop251/goja"
 	"go.uber.org/zap"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 const (

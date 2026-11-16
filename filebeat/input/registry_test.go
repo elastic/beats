@@ -23,8 +23,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 var fakeFactory = func(_ *conf.C, _ channel.Connector, _ Context, _ *logp.Logger) (Input, error) {

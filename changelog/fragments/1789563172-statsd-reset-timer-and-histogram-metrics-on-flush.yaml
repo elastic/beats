@@ -1,0 +1,23 @@
+kind: bug-fix
+
+summary: Reset statsd timer and histogram metrics on every flush
+
+description: |
+  The statsd module reset counters and sets on every flush but never reset
+  timers (`ms`) and histograms (`h`), so their `count` grew monotonically and
+  their `min`, `max`, `mean`, `stddev` and percentiles aggregated every
+  measurement ever recorded, until the metric went stale and was dropped by
+  `ttl`.
+
+  Timers and histograms now aggregate a single flush interval, as counters and
+  sets already did, and a timer or histogram that received no measurements
+  during an interval is no longer reported for that interval. The moving
+  average rates (`1m_rate`, `5m_rate`, `15m_rate`, `mean_rate`) are unchanged:
+  they are defined over fixed time windows and are not tied to the flush
+  interval.
+
+  Also fixes https://github.com/elastic/beats/issues/41002.
+
+component: metricbeat
+
+issue: https://github.com/elastic/beats/issues/39987

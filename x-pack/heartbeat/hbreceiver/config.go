@@ -7,8 +7,8 @@ package hbreceiver
 import (
 	"fmt"
 
+	conf "github.com/elastic/beats/v7/pkg/config"
 	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
-	conf "github.com/elastic/elastic-agent-libs/config"
 
 	"go.opentelemetry.io/collector/confmap"
 )

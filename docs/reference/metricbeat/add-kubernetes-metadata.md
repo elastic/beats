@@ -151,10 +151,10 @@ The `add_kubernetes_metadata` processor has the following configuration settings
 :   (Optional) Enable or disable default pod matchers when you want to specify your own.
 
 `labels.dedot`
-:   (Optional) Default to be true. If set to true, then `.` in labels will be replaced with `_`.
+:   (Optional) Defaults to true. If set to true, then `.` in labels will be replaced with `_`.
 
 `annotations.dedot`
-:   (Optional) Default to be true. If set to true, then `.` in labels will be replaced with `_`.
+:   (Optional) Defaults to true. If set to true, then `.` in annotations will be replaced with `_`.
 
 `wait_for_metadata` {applies_to}`stack: ga 9.5`
 :   When `true`, startup is blocked until the processor is initialized. If the processor can't connect to the Kubernetes API within the duration set in `wait_for_metadata_timeout`, startup fails and the process exits. When `false`, the processor is initialized asynchronously. Defaults to `false`.

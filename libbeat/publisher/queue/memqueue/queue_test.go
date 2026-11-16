@@ -34,8 +34,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 var seed int64
@@ -267,11 +267,18 @@ func TestDoubleClose(t *testing.T) {
 
 func makeTestQueue(sz, minEvents int, flushTimeout time.Duration) queuetest.QueueFactory {
 	return func(t *testing.T) queue.Queue[publisher.Event] {
-		return NewQueue[publisher.Event](logptest.NewTestingLogger(t, ""), nil, Settings{
+		q := NewQueue[publisher.Event](logptest.NewTestingLogger(t, ""), nil, Settings{
 			Events:        sz,
 			MaxGetRequest: minEvents,
 			FlushTimeout:  flushTimeout,
 		}, 0, nil)
+		t.Cleanup(func() {
+			assert.NoError(t, q.Close(true), "test queue must close successfully")
+			// Done signals cancellation, not worker exit. Join the workers so
+			// they cannot log through t after the test finishes.
+			q.wg.Wait()
+		})
+		return q
 	}
 }
 

@@ -14,8 +14,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/metricset"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Tests that Cluster Info is consistently reported and the Templates are properly reported

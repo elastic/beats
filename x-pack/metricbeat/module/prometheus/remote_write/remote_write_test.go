@@ -14,8 +14,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	xcollector "github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus/collector"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func BenchmarkGenerateEvents(b *testing.B) {

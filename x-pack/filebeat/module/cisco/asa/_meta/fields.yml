@@ -129,12 +129,12 @@
   - name: privilege.old
     type: keyword
     description: >
-      When a users privilege is changed this is the old value
+      When a user's privilege is changed this is the old value
 
   - name: privilege.new
     type: keyword
     description: >
-      When a users privilege is changed this is the new value
+      When a user's privilege is changed this is the new value
 
   - name: burst.object
     type: keyword

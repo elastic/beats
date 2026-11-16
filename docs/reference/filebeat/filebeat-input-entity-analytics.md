@@ -46,7 +46,12 @@ In agentless deployments, state is stored in Elasticsearch (index `agentless-sta
 
 When running with a local file store (the default for non-agentless deployments), state is stored in a bbolt database under the Filebeat data directory.
 
-Defaults to `false`. In Fleet-managed agentless deployments, integration packages set this to `true` automatically.
+If a full synchronization fails, it is retried after `update_interval`. The wait doubles after each further failure, up to `sync_interval`. The input reports a degraded status when a synchronization fails:
+
+* After a failed full synchronization, the status stays degraded until a full synchronization succeeds.
+* After a failed incremental synchronization, it stays degraded until a later synchronization of either kind succeeds.
+
+Defaults to `false`. The Okta, Microsoft Entra ID and Active Directory integration packages set this to `true` by default.
 
 
 ## Common options [filebeat-input-entity-analytics-common-options]
@@ -949,6 +954,33 @@ The interval in which full synchronizations should occur. The interval must be l
 
 The interval in which incremental updates should occur. The interval must be shorter than the full synchronization interval (`sync_interval`). Expressed as a duration string (e.g., 1m, 3h, 24h). Defaults to `15m` (15 minutes).
 
+#### `request.redirect.forward_headers` [_jamf_request_redirect_forward_headers]
+
+When set to `true`, request headers are forwarded when the API responds with a redirect. Headers listed in `request.redirect.sensitive_headers` are removed on redirects to a different host or port, and on redirects from HTTPS to HTTP. Defaults to `false`.
+
+The `request.redirect.*` options apply only when `use_minimal_state` is `false`.
+
+
+#### `request.redirect.headers_ban_list` [_jamf_request_redirect_headers_ban_list]
+
+When `request.redirect.forward_headers` is `true`, all headers except the ones in this list are forwarded. Defaults to `[]`.
+
+
+#### `request.redirect.sensitive_headers` [_jamf_request_redirect_sensitive_headers]
+```{applies_to}
+stack: ga 9.5+
+```
+
+A list of header names that are removed when a redirect goes to a different host or port, or from HTTPS to HTTP. This stops credentials being sent to an unintended origin. Defaults to `["Authorization", "Proxy-Authorization", "Cookie"]`. A list you set replaces the default list.
+
+Set to `[]` to forward all headers regardless of the redirect target. Do this only if the target shares the authentication domain of the API.
+
+
+#### `request.redirect.max_redirects` [_jamf_request_redirect_max_redirects]
+
+The maximum number of redirects to follow for a request. Defaults to `10`.
+
+
 ### `tracer.enabled` [_tracer_enabled_1]
 
 It is possible to log HTTP requests and responses to the Jamf API to a local file-system for debugging configurations. This option is enabled by setting `tracer.enabled` to true and setting the `tracer.filename` value. Additional options are available to tune log rotation behavior. To delete existing logs, set `tracer.enabled` to false without unsetting the filename option.
@@ -1415,6 +1447,42 @@ The pagination batch size for requests. If it is zero or negative, the API defau
 The number of requests to allow in each limit window, if set. This parameter should only be set in exceptional cases. When it is set, rate limit information in API responses will be ignored in favor of the fixed limit. The limit is applied separately to each endpoint. Defaults to unset.
 
 
+#### `scratch_dir` [_scratch_dir]
+
+```{applies_to}
+stack: preview 9.5.0
+```
+
+The directory for the temporary file that holds group membership during a full synchronization. This is only used when `use_minimal_state` is `true`. Defaults to the system temporary directory. The directory must already exist and be writable by Filebeat. Use an absolute path: a relative path is resolved against the working directory of the Filebeat process, not against `path.data`.
+
+
+#### `request.redirect.forward_headers` [_okta_request_redirect_forward_headers]
+
+When set to `true`, request headers are forwarded when the API responds with a redirect. Headers listed in `request.redirect.sensitive_headers` are removed on redirects to a different host or port, and on redirects from HTTPS to HTTP. Defaults to `false`.
+
+The `request.redirect.*` options apply only when `use_minimal_state` is `false`.
+
+
+#### `request.redirect.headers_ban_list` [_okta_request_redirect_headers_ban_list]
+
+When `request.redirect.forward_headers` is `true`, all headers except the ones in this list are forwarded. Defaults to `[]`.
+
+
+#### `request.redirect.sensitive_headers` [_okta_request_redirect_sensitive_headers]
+```{applies_to}
+stack: ga 9.5+
+```
+
+A list of header names that are removed when a redirect goes to a different host or port, or from HTTPS to HTTP. This stops credentials being sent to an unintended origin. Defaults to `["Authorization", "Proxy-Authorization", "Cookie"]`. A list you set replaces the default list.
+
+Set to `[]` to forward all headers regardless of the redirect target. Do this only if the target shares the authentication domain of the API.
+
+
+#### `request.redirect.max_redirects` [_okta_request_redirect_max_redirects]
+
+The maximum number of redirects to follow for a request. Defaults to `10`.
+
+
 #### `tracer.enabled` [_tracer_enabled_2]
 
 It is possible to log HTTP requests and responses to the Okta API to a local file-system for debugging configurations. This option is enabled by setting `tracer.enabled` to true and setting the `tracer.filename` value. Additional options are available to tune log rotation behavior. To delete existing logs, set `tracer.enabled` to false without unsetting the filename option.
@@ -1472,7 +1540,9 @@ The ceiling is determined by API call count multiplied by per-call latency. Grap
 
 If a sync cannot complete within `update_interval`, the system cannot converge. Increase `update_interval` for larger environments.
 
-### Scratch storage (EntraID)
+### Scratch storage
+
+The EntraID and Okta providers write temporary bbolt files during synchronization when `use_minimal_state` is `true`.
 
 The EntraID membership graph is stored in a temporary file (bbolt) rather than in-memory. This bounds Go heap usage for large directories — the heap holds only the BFS working set, not the full adjacency data. The trade-off is ephemeral disk usage:
 
@@ -1480,7 +1550,11 @@ The EntraID membership graph is stored in a temporary file (bbolt) rather than i
 - Mmap'd pages are OS-reclaimable under memory pressure and do not contribute to OOM kills in cgroup-limited containers.
 - Build time is dominated by API call latency, not local I/O.
 
-The `scratch_dir` provider configuration option overrides the default temporary directory. Files use the prefix `entcollect-scratch-*`.
+The Okta provider uses a scratch file to hold group membership during a full synchronization, when users are collected and `groups` is in `enrich_with`, which is the default. No file is created with `dataset: devices`.
+
+The `scratch_dir` provider configuration option overrides the default temporary directory for both providers. The directory must exist and be writable. Use an absolute path: unlike the state files, which are kept under `path.data`, a relative `scratch_dir` is resolved against the working directory of the Filebeat process. Files use the prefix `entcollect-scratch-*`.
+
+A scratch file is removed when the synchronization ends. If Filebeat is killed (for example by SIGKILL or the out-of-memory killer), the file is left behind and nothing removes it later. If stale `entcollect-scratch-*.db` files build up in `scratch_dir`, delete them.
 
 ### Rate limiting
 

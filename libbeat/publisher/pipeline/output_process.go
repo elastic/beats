@@ -27,9 +27,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 // closedChan is a pre-closed channel returned by producers that have no events
@@ -329,6 +329,10 @@ type emptyProducer struct{}
 
 func (emptyProducer) Publish(_ publisher.Event) (queue.EntryID, bool) {
 	return 0, false
+}
+
+func (emptyProducer) PublishContext(context.Context, publisher.Event) (queue.EntryID, error) {
+	return 0, queue.ErrRejected
 }
 
 func (emptyProducer) TryPublish(_ publisher.Event) (queue.EntryID, bool) {

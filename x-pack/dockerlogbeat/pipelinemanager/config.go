@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/pkg/config"
 )
 
 // ContainerOutputConfig has all the options we'll expect from --log-opts

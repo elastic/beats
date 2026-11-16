@@ -36,8 +36,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/slabqueue"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/paths"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/paths"
 )
 
 // Pipeline implementation providint all beats publisher functionality.
@@ -404,6 +404,10 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		// This can only happen if the pipeline was shut down while clients
 		// were still waiting to connect.
 		return nil, fmt.Errorf("client failed to connect because the pipeline is shutting down")
+	}
+	client.ctxProducer = cancellableProducer(client.producer, cfg.EventListener)
+	if client.ctxProducer != nil {
+		client.closeCtx, client.closeCancel = context.WithCancel(context.Background())
 	}
 
 	// Register the client so the Pipeline can finalize it (stage two of

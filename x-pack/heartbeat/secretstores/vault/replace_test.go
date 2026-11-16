@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/secretstores"
 	ucfg "github.com/elastic/go-ucfg"
@@ -224,6 +224,12 @@ func TestReplaceNamedConnections(t *testing.T) {
 	require.NoError(t, got.Unpack(&resolved), "resolved config must unpack")
 	assert.Equal(t, map[string]any{"mine": "bob", "other": "vault://stg@app/creds#user"}, resolved,
 		"only the references naming the entry must be replaced")
+
+	// allowed_hosts only applies to the connections whose Replace changed the config.
+	onlyOther := newMonitorConfig(t, map[string]any{"other": "vault://stg@app/creds#user"})
+	got, err = s.Replace(context.Background(), onlyOther, scope)
+	require.NoError(t, err, "references of other connections must be kept")
+	assert.Same(t, onlyOther, got, "a config without references of the entry must be returned as is")
 
 	_, err = s.Replace(context.Background(), newMonitorConfig(t, map[string]any{"v": "vault://dev@app/creds#user"}), scope)
 	assert.ErrorContains(t, err, `no entry has the connection name of the reference, available names: "prod", "stg"`, "an unknown connection must fail")

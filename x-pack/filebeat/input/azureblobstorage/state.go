@@ -5,7 +5,6 @@
 package azureblobstorage
 
 import (
-	"strings"
 	"sync"
 	"time"
 )
@@ -41,7 +40,7 @@ func (s *state) saveForTx(name string, lastModifiedOn time.Time) (cp *Checkpoint
 	s.mu.Lock()
 	if len(s.cp.BlobName) == 0 {
 		s.cp.BlobName = name
-	} else if strings.ToLower(name) > strings.ToLower(s.cp.BlobName) {
+	} else if name > s.cp.BlobName {
 		s.cp.BlobName = name
 	}
 	if s.cp.LatestEntryTime.IsZero() {

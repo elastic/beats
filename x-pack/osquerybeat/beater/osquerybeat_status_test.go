@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"slices"
 	"sync"
 	"testing"
 	"time"
@@ -17,12 +18,13 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	agentconfig "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/paths"
+	agentconfig "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/paths"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
@@ -152,6 +154,10 @@ func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquer
 
 	ob, ok := beater.(*osquerybeat)
 	require.True(t, ok)
+	// b has no pipeline, so scheduled results get a mock publisher too.
+	ob.scheduledResults.newPublisher = func(func() bool, func(), func(int)) osquerybeatPublisher {
+		return &mockBeatPublisher{}
+	}
 	for _, override := range overrides {
 		override(ob)
 	}
@@ -207,6 +213,50 @@ func TestOsquerybeatManagerInitializationWaitsForCheck(t *testing.T) {
 	select {
 	case err := <-errCh:
 		require.ErrorIs(t, err, context.Canceled, "Run should stop after cancellation")
+	case <-time.After(5 * time.Second):
+		t.Fatal("Run did not stop")
+	}
+}
+
+func TestOsquerybeatRejectedPolicyKeepsRunning(t *testing.T) {
+	ob, b, mgr := newStatusTestBeater(t, func(ob *osquerybeat) {
+		ob.osquerydFactory = func(string, ...osqd.Option) (osqd.Runner, error) {
+			return &mockOsqueryd{runErr: context.Canceled}, nil
+		}
+	})
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- ob.Run(b)
+	}()
+	require.Eventually(t, func() bool {
+		mgr.mx.Lock()
+		defer mgr.mx.Unlock()
+		return mgr.postInitialized
+	}, 5*time.Second, 10*time.Millisecond, "osquerybeat should finish initialization")
+
+	// The ECS mapping for user.id has an empty field and no value, so
+	// osquerybeat cannot apply this policy.
+	bad := agentconfig.MustNewConfigFrom(map[string]any{
+		"data_stream": map[string]any{"dataset": config.DefaultDataset},
+		"osquery": map[string]any{"schedule": map[string]any{"users": map[string]any{
+			"query": "SELECT 1", "interval": 60,
+			"ecs_mapping": map[string]any{"user": map[string]any{"id": map[string]any{"field": ""}}},
+		}}},
+	})
+	err := b.Registry.GetInputList().Reload([]*reload.ConfigWithMeta{{Config: bad, InputUnitID: "osquery-unit"}})
+	var unitErr cfgfile.UnitError
+	assert.ErrorAs(t, err, &unitErr, "a policy with an invalid ECS mapping must fail its unit")
+	select {
+	case err := <-errCh:
+		t.Fatalf("Run returned after a rejected policy: %v", err)
+	case <-time.After(200 * time.Millisecond):
+	}
+	assert.Nil(t, ob.scheduledResults.current.Load(), "a rejected policy must not reach the scheduled results dispatcher")
+
+	ob.Stop()
+	select {
+	case err := <-errCh:
+		assert.ErrorIs(t, err, context.Canceled, "Run should stop after cancellation")
 	case <-time.After(5 * time.Second):
 		t.Fatal("Run did not stop")
 	}
@@ -357,6 +407,38 @@ func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
 	// Last status should be Stopped
 	lastEvent := events[eventCount-1]
 	assert.Equal(t, status.Stopped, lastEvent.Status, "last status should be Stopped")
+}
+
+// A runner failure must stay FAILED until Run returns. Reporting Stopping in
+// between shows the OTel host FAILED, then OK, then FAILED again. A terminal
+// startup failure takes the same path as an exhausted restart budget without
+// waiting for the production backoff.
+func TestOsquerybeatRunnerFailureDoesNotReportStopping(t *testing.T) {
+	failure := errors.New("osqueryd failed to start")
+	ob, b, mgr := newStatusTestBeater(t, func(ob *osquerybeat) {
+		ob.pub = &mockBeatPublisher{}
+		ob.config.Inputs = []config.InputConfig{{Name: "osquery-manager-1", Type: osqueryInputType}}
+		ob.osquerydFactory = func(string, ...osqd.Option) (osqd.Runner, error) {
+			return &mockOsqueryd{runErr: failure}, nil
+		}
+	})
+	errCh := make(chan error, 1)
+	go func() { errCh <- ob.Run(b) }()
+	select {
+	case err := <-errCh:
+		require.ErrorIs(t, err, failure, "Run must return the runner failure")
+	case <-time.After(5 * time.Second):
+		ob.Stop()
+		t.Fatal("Run did not return the runner failure")
+	}
+	mgr.mx.Lock()
+	events := append([]statusEvent(nil), mgr.events...)
+	mgr.mx.Unlock()
+	first := slices.IndexFunc(events, func(e statusEvent) bool { return e.Status == status.Failed })
+	require.NotEqual(t, -1, first, "the runner must report its failure: %v", events)
+	for _, event := range events[first:] {
+		assert.Equal(t, status.Failed, event.Status, "nothing may follow the runner failure but FAILED: %v", events)
+	}
 }
 
 func newTestBeatPaths(t *testing.T) *paths.Path {
@@ -552,7 +634,7 @@ func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 	ob := &osquerybeat{
 		qp: newQueryProfiler(logptest.NewTestingLogger(t, "")),
 	}
-	ob.setDiagnosticsQueryExecutor(&diagnosticsQueryExecutor{
+	ob.setDiagnosticsQueryExecutor(profilingQueryExecutor{runCtx: t.Context(), executor: &diagnosticsQueryExecutor{
 		rows: []map[string]any{
 			{
 				"name":              "pack_test_query",
@@ -570,7 +652,7 @@ func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 				"last_memory":       int64(6000),
 			},
 		},
-	})
+	}})
 
 	ob.registerDiagnosticHooks(b)
 

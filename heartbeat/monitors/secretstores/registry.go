@@ -35,8 +35,8 @@ import (
 	"regexp"
 	"sync"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // ConfigKey is the monitor setting holding the secret store connections.
@@ -51,7 +51,9 @@ type Store interface {
 	Validate(cfg *conf.C, scope Scope) error
 	// Replace returns a copy of the monitor config cfg with the references
 	// of scope replaced by their secret values, and the others left as they
-	// are. cfg must not be modified.
+	// are. cfg must not be modified. Without references of scope, it must
+	// return cfg itself: allowed_hosts only applies to connections whose
+	// references were replaced.
 	Replace(ctx context.Context, cfg *conf.C, scope Scope) (*conf.C, error)
 }
 

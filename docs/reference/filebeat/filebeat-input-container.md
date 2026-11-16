@@ -193,7 +193,7 @@ See [Regular expression support](/reference/filebeat/regexp-support.md) for a li
 
 #### `harvester_buffer_size` [_harvester_buffer_size]
 
-The size in bytes of the buffer that each harvester uses when fetching a file. The default is 16384.
+The size in bytes of the buffer that each harvester uses when fetching a file. The value must be greater than zero. The default is 16384.
 
 
 #### `max_bytes` [_max_bytes]

@@ -19,9 +19,9 @@ import (
 
 	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 func TestRunUpdatesStatusToStartingAndFailed(t *testing.T) {
@@ -126,6 +126,55 @@ func TestProcessReceivedEventsUpdatesProcessingTimeOnce(t *testing.T) {
 	// not once per event (which was the bug).
 	assert.Equal(t, 1, metrics.processingTime.Size(),
 		"processingTime should be updated once per call, not once per event")
+}
+
+// TestProcessReceivedEventsMarksLastRecordOfEachMessage verifies that only
+// the last record of each message carries checkpoint metadata, and that the
+// metadata excludes the message payload and AMQP metadata.
+func TestProcessReceivedEventsMarksLastRecordOfEachMessage(t *testing.T) {
+	now := time.Now()
+	logger := logptest.NewTestingLogger(t, inputName)
+	metrics := newInputMetrics(monitoring.NewRegistry(), logger)
+	sanitizers, err := newSanitizers(defaultTestConfig.Sanitizers, defaultTestConfig.LegacySanitizeOptions)
+	require.NoError(t, err, "sanitizers should initialize")
+	input := &eventHubInputV2{
+		config:  defaultTestConfig,
+		log:     logger,
+		metrics: metrics,
+		messageDecoder: messageDecoder{
+			config: defaultTestConfig, log: logger, metrics: metrics, sanitizers: sanitizers,
+		},
+	}
+	received := []*azeventhubs.ReceivedEventData{
+		{
+			EventData: azeventhubs.EventData{
+				Body:       []byte(`{"records":[{"msg":"one"},{"msg":"two"}]}`),
+				Properties: map[string]any{"application": "test"},
+			},
+			Offset:           "1234",
+			SequenceNumber:   42,
+			EnqueuedTime:     &now,
+			RawAMQPMessage:   &azeventhubs.AMQPAnnotatedMessage{},
+			SystemProperties: map[string]any{"service": "test"},
+		},
+		{
+			EventData:      azeventhubs.EventData{Body: []byte(`{"msg":"three"}`)},
+			Offset:         "5678",
+			SequenceNumber: 43,
+		},
+	}
+	client := &fakeClient{}
+	require.NoError(t, input.processReceivedEvents(received, "0", client), "messages should be published")
+	require.Len(t, client.publishedEvents, 3, "the first message should expand into two records")
+
+	assert.Nil(t, client.publishedEvents[0].Private, "a non-final record must not carry checkpoint metadata")
+	for i, source := range map[int]*azeventhubs.ReceivedEventData{1: received[0], 2: received[1]} {
+		checkpoint, ok := client.publishedEvents[i].Private.(*checkpointMetadata)
+		require.True(t, ok, "event %d is the last record of its message and should carry checkpoint metadata", i)
+		assert.Equal(t, &checkpointMetadata{
+			offset: source.Offset, sequenceNumber: source.SequenceNumber,
+		}, checkpoint, "event %d should retain only checkpoint metadata", i)
+	}
 }
 
 // TestProcessReceivedEventsConcurrentConversion verifies that the events

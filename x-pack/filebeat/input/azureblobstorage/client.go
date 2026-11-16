@@ -17,7 +17,7 @@ import (
 	azcontainer "github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/service"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 func fetchServiceClientAndCreds(cfg config, retryCfg retryConfig, url string, log *logp.Logger) (*service.Client, *serviceCredentials, error) {

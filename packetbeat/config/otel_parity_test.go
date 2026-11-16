@@ -28,8 +28,8 @@ import (
 
 	ucfgyaml "github.com/elastic/go-ucfg/yaml"
 
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 // TestFromStaticOTelParity checks that FromStatic, which is used when

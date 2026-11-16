@@ -8,7 +8,7 @@ import (
 	"context"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/entcollect"
 )
 

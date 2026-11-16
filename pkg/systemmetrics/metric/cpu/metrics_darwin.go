@@ -22,7 +22,7 @@ import (
 
 	"github.com/shirou/gopsutil/v4/cpu"
 
-	"github.com/elastic/elastic-agent-libs/opt"
+	"github.com/elastic/beats/v7/pkg/opt"
 )
 
 // Get is the Darwin implementation of Get
