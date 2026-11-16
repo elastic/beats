@@ -21,6 +21,7 @@ import (
 	"go.opentelemetry.io/collector/consumer/consumertest"
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
+	"google.golang.org/grpc/credentials"
 
 	"github.com/elastic/beats/v7/heartbeat/beater"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
@@ -70,6 +71,30 @@ func (f *fakeBeatsAuthExtension) RoundTripper(_ http.RoundTripper) (http.RoundTr
 	return f.roundTripper, f.roundTripErr
 }
 
+func emptyUserAgent() string { return "" }
+
+// fakeHeadersSetter models the headers_setter extension Elastic Agent adds to
+// the collector to propagate its User-Agent.
+type fakeHeadersSetter struct {
+	headers map[string]string
+}
+
+func (f *fakeHeadersSetter) Start(context.Context, component.Host) error { return nil }
+func (f *fakeHeadersSetter) Shutdown(context.Context) error              { return nil }
+func (f *fakeHeadersSetter) PerRPCCredentials() (credentials.PerRPCCredentials, error) {
+	return fakePerRPC{headers: f.headers}, nil
+}
+
+type fakePerRPC struct {
+	headers map[string]string
+}
+
+func (f fakePerRPC) GetRequestMetadata(context.Context, ...string) (map[string]string, error) {
+	return f.headers, nil
+}
+
+func (fakePerRPC) RequireTransportSecurity() bool { return false }
+
 func TestBeatsAuthStartHookErrors(t *testing.T) {
 	missingID := component.MustNewIDWithName("beatsauth", "missing")
 	wrongTypeID := component.MustNewIDWithName("beatsauth", "wrong-type")
@@ -113,7 +138,7 @@ func TestBeatsAuthStartHookErrors(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			err := beatsAuthStartHook(t.Context(), test.reference, nil, "", logp.NewNopLogger(), func(*eslegclient.Connection) {})(test.host)
+			err := beatsAuthStartHook(t.Context(), test.reference, nil, emptyUserAgent, logp.NewNopLogger(), func(*eslegclient.Connection) {})(test.host)
 			require.Error(t, err, "start hook should reject an invalid Elasticsearch authentication extension")
 			assert.Contains(t, err.Error(), test.wantError, "start hook should return the expected resolver error")
 		})
@@ -121,7 +146,7 @@ func TestBeatsAuthStartHookErrors(t *testing.T) {
 }
 
 func TestBeatsAuthStartHookEmptyReference(t *testing.T) {
-	require.NoError(t, beatsAuthStartHook(t.Context(), "", nil, "", logp.NewNopLogger(), func(*eslegclient.Connection) {})(nil), "empty Beats auth reference should be a no-op")
+	require.NoError(t, beatsAuthStartHook(t.Context(), "", nil, emptyUserAgent, logp.NewNopLogger(), func(*eslegclient.Connection) {})(nil), "empty Beats auth reference should be a no-op")
 }
 
 func TestBeatsAuthStartHookESClientFailureIsBestEffort(t *testing.T) {
@@ -135,7 +160,7 @@ func TestBeatsAuthStartHookESClientFailureIsBestEffort(t *testing.T) {
 		t.Context(),
 		authID.String(),
 		&beater.Heartbeat{},
-		"",
+		emptyUserAgent,
 		logp.NewNopLogger(),
 		func(*eslegclient.Connection) { requesterSet = true },
 	)(host)
@@ -186,13 +211,18 @@ func TestBeatsAuthStartHookInjectsBeforeRun(t *testing.T) {
 		management.SetUnderAgent(previousUnderAgent)
 	})
 
+	const agentUserAgent = "Elastic-Agent-Test-User-Agent"
 	requested := make(chan struct{})
+	var searchUserAgent string
 	var once sync.Once
 	transport := &closableRoundTripper{
 		closed: make(chan struct{}),
 		roundTripperFunc: func(request *http.Request) (*http.Response, error) {
 			if strings.HasSuffix(request.URL.Path, "_search") {
-				once.Do(func() { close(requested) })
+				once.Do(func() {
+					searchUserAgent = request.Header.Get("User-Agent")
+					close(requested)
+				})
 				return &http.Response{
 					StatusCode: http.StatusOK,
 					Status:     "200 OK",
@@ -215,6 +245,9 @@ func TestBeatsAuthStartHookInjectsBeforeRun(t *testing.T) {
 	}
 	host := elasticsearchAuthTestHost{extensions: map[component.ID]component.Component{
 		extensionID: extension,
+		component.MustNewIDWithName("headers_setter", "_agent-component/default"): &fakeHeadersSetter{
+			headers: map[string]string{"User-Agent": agentUserAgent},
+		},
 	}}
 	cfg := &Config{
 		MonitorState: MonitorStateConfig{
@@ -253,6 +286,7 @@ func TestBeatsAuthStartHookInjectsBeforeRun(t *testing.T) {
 	case <-time.After(10 * time.Second):
 		t.Fatal("Heartbeat did not use the injected Elasticsearch requester")
 	}
+	assert.Equal(t, agentUserAgent, searchUserAgent, "monitor state requests should use the User-Agent from the headers_setter extension")
 
 	shutdownCtx, cancel := context.WithTimeout(t.Context(), 10*time.Second)
 	defer cancel()

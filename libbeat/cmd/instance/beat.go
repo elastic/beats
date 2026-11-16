@@ -376,12 +376,12 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 
 	// Report central management state
 	mgmt := b.Monitoring.StateRegistry().GetOrCreateRegistry("management")
-	monitoring.NewBool(mgmt, "enabled").Set(b.Manager.Enabled())
+	monitoring.NewBool(mgmt, "enabled").Set(b.Manager.ConfigFromControlProtocol())
 
 	log.Debug("Initializing output plugins")
 	outputEnabled := b.Config.Output.IsSet() && b.Config.Output.Config().Enabled()
 	if !outputEnabled {
-		if b.Manager.Enabled() {
+		if b.Manager.ConfigFromControlProtocol() {
 			b.Info.Logger.Info("Output is configured through Central Management")
 		} else {
 			msg := "no outputs are defined, please define one under the output section"
@@ -1414,7 +1414,7 @@ func (b *Beat) logSystemInfo(log *logp.Logger) {
 		"information about the system.")
 	log = log.With(logp.Namespace("system_info"))
 
-	if b.Manager.Enabled() {
+	if management.UnderAgent() {
 		return
 	}
 

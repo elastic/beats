@@ -231,4 +231,4 @@ type boolManager struct {
 	management.Manager
 }
 
-func (m boolManager) Enabled() bool { return m.managed }
+func (m boolManager) ConfigFromControlProtocol() bool { return m.managed }
