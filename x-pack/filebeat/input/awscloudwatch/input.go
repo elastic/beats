@@ -90,7 +90,7 @@ func (in *cloudwatchInput) Test(ctx v2.TestContext) error {
 }
 
 func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
-	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
+	ctx := inputContext.Cancelation
 	log := inputContext.Logger
 
 	// setup status reporter

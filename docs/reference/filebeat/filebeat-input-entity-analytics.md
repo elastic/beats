@@ -46,7 +46,20 @@ In agentless deployments, state is stored in Elasticsearch (index `agentless-sta
 
 When running with a local file store (the default for non-agentless deployments), state is stored in a bbolt database under the Filebeat data directory.
 
-Defaults to `false`. In Fleet-managed agentless deployments, integration packages set this to `true` automatically.
+If a full synchronization fails, it is retried after `update_interval`. The wait doubles after each further failure, up to `sync_interval`. The input reports a degraded status when a synchronization fails:
+
+* After a failed full synchronization, the status stays degraded until a full synchronization succeeds.
+* After a failed incremental synchronization, it stays degraded until a later synchronization of either kind succeeds.
+
+Defaults to `false`. The Okta, Microsoft Entra ID and Active Directory integration packages set this to `true` by default.
+
+With `use_minimal_state: true`, the HTTP settings (`request.*` for Jamf and Okta, and the top-level `proxy_url`, `ssl` and `timeout` for Azure Active Directory) and the `tracer.*` settings work as they do in the legacy implementation, with these differences:
+
+- `request.retry.*` is not used. The provider retries failed requests itself, and logs a warning at startup if these options are set.
+- Keep-alive connections stay enabled unless `request.keep_alive.disable` is set to `true`.
+- For Azure Active Directory, `timeout` defaults to 90 seconds, and the `expand.*` options are not supported.
+
+In earlier patch releases of 9.5 and 9.6, these settings were ignored when `use_minimal_state` is `true`.
 
 
 ## Common options [filebeat-input-entity-analytics-common-options]
@@ -761,6 +774,8 @@ stack: preview 9.1.0
 
 Add [user query relationship expansions](https://learn.microsoft.com/en-us/graph/api/resources/user?view=graph-rest-1.0#relationships). This is a map of relationship names to attribute lists. By default this is not set. If an empty relationship list is given, the relationship expansion is the same as the users query.
 
+This option is ignored, with a warning, when `use_minimal_state` is `true`, because the Microsoft Graph user delta query that the minimal-state implementation uses doesn't support `$expand`.
+
 
 #### `expand.groups` [_expand_groups]
 
@@ -770,6 +785,8 @@ stack: preview 9.1.0
 
 Add [group query relationship expansions](https://learn.microsoft.com/en-us/graph/api/resources/group?view=graph-rest-1.0#relationships). This is a map of relationship names to attribute lists. By default this is not set. If an empty relationship list is given, the relationship expansion is the same as the groups query.
 
+This option is ignored, with a warning, when `use_minimal_state` is `true`. The minimal-state implementation doesn't support group relationship expansions.
+
 
 #### `expand.devices` [_expand_devices]
 
@@ -778,6 +795,8 @@ stack: preview 9.1.0
 ```
 
 Add [device query relationship expansions](https://learn.microsoft.com/en-us/graph/api/resources/device?view=graph-rest-1.0#relationships). This is a map of relationship names to attribute lists. By default this is not set. If an empty relationship list is given, the relationship expansion is the same as the devices query.
+
+This option is ignored, with a warning, when `use_minimal_state` is `true`, because the Microsoft Graph device delta query that the minimal-state implementation uses doesn't support `$expand`.
 
 
 #### `enrich_with` [_enrich_with_azuread]
@@ -948,6 +967,31 @@ The interval in which full synchronizations should occur. The interval must be l
 #### `update_interval` [_update_interval_3]
 
 The interval in which incremental updates should occur. The interval must be shorter than the full synchronization interval (`sync_interval`). Expressed as a duration string (e.g., 1m, 3h, 24h). Defaults to `15m` (15 minutes).
+
+#### `request.redirect.forward_headers` [_jamf_request_redirect_forward_headers]
+
+When set to `true`, request headers are forwarded when the API responds with a redirect. Headers listed in `request.redirect.sensitive_headers` are removed on redirects to a different host or port, and on redirects from HTTPS to HTTP. Defaults to `false`.
+
+
+#### `request.redirect.headers_ban_list` [_jamf_request_redirect_headers_ban_list]
+
+When `request.redirect.forward_headers` is `true`, all headers except the ones in this list are forwarded. Defaults to `[]`.
+
+
+#### `request.redirect.sensitive_headers` [_jamf_request_redirect_sensitive_headers]
+```{applies_to}
+stack: ga 9.5+
+```
+
+A list of header names that are removed when a redirect goes to a different host or port, or from HTTPS to HTTP. This stops credentials being sent to an unintended origin. Defaults to `["Authorization", "Proxy-Authorization", "Cookie"]`. A list you set replaces the default list.
+
+Set to `[]` to forward all headers regardless of the redirect target. Do this only if the target shares the authentication domain of the API.
+
+
+#### `request.redirect.max_redirects` [_jamf_request_redirect_max_redirects]
+
+The maximum number of redirects to follow for a request. Defaults to `10`.
+
 
 ### `tracer.enabled` [_tracer_enabled_1]
 
@@ -1422,6 +1466,31 @@ stack: preview 9.5.0
 ```
 
 The directory for the temporary file that holds group membership during a full synchronization. This is only used when `use_minimal_state` is `true`. Defaults to the system temporary directory. The directory must already exist and be writable by Filebeat. Use an absolute path: a relative path is resolved against the working directory of the Filebeat process, not against `path.data`.
+
+
+#### `request.redirect.forward_headers` [_okta_request_redirect_forward_headers]
+
+When set to `true`, request headers are forwarded when the API responds with a redirect. Headers listed in `request.redirect.sensitive_headers` are removed on redirects to a different host or port, and on redirects from HTTPS to HTTP. Defaults to `false`.
+
+
+#### `request.redirect.headers_ban_list` [_okta_request_redirect_headers_ban_list]
+
+When `request.redirect.forward_headers` is `true`, all headers except the ones in this list are forwarded. Defaults to `[]`.
+
+
+#### `request.redirect.sensitive_headers` [_okta_request_redirect_sensitive_headers]
+```{applies_to}
+stack: ga 9.5+
+```
+
+A list of header names that are removed when a redirect goes to a different host or port, or from HTTPS to HTTP. This stops credentials being sent to an unintended origin. Defaults to `["Authorization", "Proxy-Authorization", "Cookie"]`. A list you set replaces the default list.
+
+Set to `[]` to forward all headers regardless of the redirect target. Do this only if the target shares the authentication domain of the API.
+
+
+#### `request.redirect.max_redirects` [_okta_request_redirect_max_redirects]
+
+The maximum number of redirects to follow for a request. Defaults to `10`.
 
 
 #### `tracer.enabled` [_tracer_enabled_2]

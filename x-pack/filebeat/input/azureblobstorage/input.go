@@ -91,7 +91,7 @@ func configure(cfg *conf.C, logger *logp.Logger) ([]cursor.Source, cursor.Input,
 	var urL string
 	if len(config.StorageURL) != 0 {
 		if _, err := url.ParseRequestURI(config.StorageURL); err != nil {
-			return nil, nil, fmt.Errorf("error parsing url : %w", err)
+			return nil, nil, fmt.Errorf("error parsing url: %w", err)
 		}
 		urL = config.StorageURL
 	} else {
