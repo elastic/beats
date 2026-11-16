@@ -5,12 +5,12 @@
 package jamf
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/logp"
 
-	"github.com/elastic/entcollect"
 	ecjamf "github.com/elastic/entcollect/provider/jamf"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
@@ -23,7 +23,33 @@ func init() {
 	}
 }
 
-func minimalProvider(cfg *config.C, _ *logp.Logger) (entcollect.Provider, time.Duration, time.Duration, error) {
+func minimalProvider(cfg *config.C, log *logp.Logger) (provider.MinimalState, error) {
+	mc, err := minimalConfig(cfg)
+	if err != nil {
+		return provider.MinimalState{}, err
+	}
+	client, err := mc.request.Client(log)
+	if err != nil {
+		return provider.MinimalState{}, fmt.Errorf("creating HTTP client: %w", err)
+	}
+	return provider.MinimalState{
+		Provider:        ecjamf.NewWithClient(mc.provider, client),
+		FullSync:        mc.provider.SyncInterval,
+		IncrementalSync: mc.provider.UpdateInterval,
+		Client:          client,
+		Tracer:          mc.tracer,
+	}, nil
+}
+
+// minimalConf is the minimal-state configuration of the Jamf provider.
+type minimalConf struct {
+	provider ecjamf.Config
+	request  provider.RequestConfig
+	tracer   *provider.TracerConfig
+}
+
+// minimalConfig unpacks cfg into a validated minimalConf.
+func minimalConfig(cfg *config.C) (minimalConf, error) {
 	// localConf mirrors ecjamf.Config with config:"" tags for UCF Unpack.
 	// If ecjamf.Config gains a new field, add it here and in the mapping
 	// below; TestMinimalConfigRoundTrip (minimal_test.go) will catch any drift.
@@ -36,6 +62,9 @@ func minimalProvider(cfg *config.C, _ *logp.Logger) (entcollect.Provider, time.D
 		TokenGrace     time.Duration `config:"token_grace_period"`
 		SyncInterval   time.Duration `config:"sync_interval"`
 		UpdateInterval time.Duration `config:"update_interval"`
+
+		Request provider.RequestConfig `config:"request"`
+		Tracer  *provider.TracerConfig `config:"tracer"`
 	}
 
 	d := ecjamf.DefaultConfig()
@@ -45,9 +74,10 @@ func minimalProvider(cfg *config.C, _ *logp.Logger) (entcollect.Provider, time.D
 		TokenGrace:     d.TokenGrace,
 		SyncInterval:   d.SyncInterval,
 		UpdateInterval: d.UpdateInterval,
+		Request:        provider.DefaultRequestConfig(30 * time.Second),
 	}
 	if err := cfg.Unpack(&lc); err != nil {
-		return nil, 0, 0, err
+		return minimalConf{}, err
 	}
 	ec := ecjamf.Config{
 		TenantID:       lc.TenantID,
@@ -60,7 +90,7 @@ func minimalProvider(cfg *config.C, _ *logp.Logger) (entcollect.Provider, time.D
 		UpdateInterval: lc.UpdateInterval,
 	}
 	if err := ec.Validate(); err != nil {
-		return nil, 0, 0, err
+		return minimalConf{}, err
 	}
-	return ecjamf.New(ec), ec.SyncInterval, ec.UpdateInterval, nil
+	return minimalConf{provider: ec, request: lc.Request, tracer: lc.Tracer}, nil
 }
