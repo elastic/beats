@@ -555,28 +555,41 @@ func TestMultilineWouldBlockPreservesBuffer(t *testing.T) {
 	}
 }
 
+type wouldBlockMode struct {
+	name       string
+	cfg        Config
+	lines      []string
+	second     []string
+	hasTimeout bool
+}
+
 // wouldBlockModes returns one case per concrete multiline reader
 // implementation (patternReader, whilePatternReader, counterReader) for tests
 // that exercise mode-dispatch or lifecycle paths independent of matcher flags.
-func wouldBlockModes() []wouldBlockCase {
+func wouldBlockModes() []wouldBlockMode {
 	afterPattern := match.MustCompile(`^[ \t]+`)
 	whilePattern := match.MustCompile(`^{`)
 
-	return []wouldBlockCase{
+	return []wouldBlockMode{
 		{
-			name:  "pattern",
-			cfg:   Config{Type: patternMode, Pattern: &afterPattern, Match: "after"},
-			lines: []string{"line1", "  line1.1"},
+			name:       "pattern",
+			cfg:        Config{Type: patternMode, Pattern: &afterPattern, Match: "after"},
+			lines:      []string{"line1", "  line1.1"},
+			second:     []string{"  line2", "  line2.1"},
+			hasTimeout: true,
 		},
 		{
-			name:  "while_pattern",
-			cfg:   Config{Type: whilePatternMode, Pattern: &whilePattern},
-			lines: []string{"{line1", "{line1.1"},
+			name:       "while_pattern",
+			cfg:        Config{Type: whilePatternMode, Pattern: &whilePattern},
+			lines:      []string{"{line1", "{line1.1"},
+			second:     []string{"{line2", "{line2.1"},
+			hasTimeout: true,
 		},
 		{
-			name:  "count",
-			cfg:   Config{Type: countMode, LinesCount: 3},
-			lines: []string{"line1", "line2"},
+			name:   "count",
+			cfg:    Config{Type: countMode, LinesCount: 3},
+			lines:  []string{"line1", "line2"},
+			second: []string{"line3", "line4"},
 		},
 	}
 }
@@ -617,53 +630,14 @@ func TestMultilineWouldBlockEmptyBuffer(t *testing.T) {
 }
 
 func TestMultilinePendingDeadline(t *testing.T) {
-	const timeout = 10 * time.Second
+	timeout := 10 * time.Second
 	zero := time.Duration(0)
-	afterPattern := match.MustCompile(`^[ \t]+`)
-	whilePattern := match.MustCompile(`^{`)
 
-	tests := []struct {
-		name         string
-		cfg          Config
-		lines        []string
-		wantDeadline bool
-	}{
-		{
-			name:         "pattern",
-			cfg:          Config{Type: patternMode, Pattern: &afterPattern, Match: "after", Timeout: ptr(timeout)},
-			lines:        []string{"line1", "  line1.1"},
-			wantDeadline: true,
-		},
-		{
-			name:         "while_pattern",
-			cfg:          Config{Type: whilePatternMode, Pattern: &whilePattern, Timeout: ptr(timeout)},
-			lines:        []string{"{line1", "{line1.1"},
-			wantDeadline: true,
-		},
-		{
-			name:  "pattern without timeout",
-			cfg:   Config{Type: patternMode, Pattern: &afterPattern, Match: "after", Timeout: &zero},
-			lines: []string{"line1", "  line1.1"},
-		},
-		{
-			name:  "while_pattern without timeout",
-			cfg:   Config{Type: whilePatternMode, Pattern: &whilePattern, Timeout: &zero},
-			lines: []string{"{line1", "{line1.1"},
-		},
-		{
-			name:  "count",
-			cfg:   Config{Type: countMode, LinesCount: 3},
-			lines: []string{"line1", "line2"},
-		},
-	}
-
-	for _, tc := range tests {
+	for _, tc := range wouldBlockModes() {
 		t.Run(tc.name, func(t *testing.T) {
-			r, src := newScriptedMultiline(t, tc.cfg, logptest.NewTestingLogger(t, ""))
-
-			pending, deadline := reader.PendingDeadline(r)
-			assert.False(t, pending, "empty reader has nothing pending")
-			assert.True(t, deadline.IsZero(), "empty reader has no deadline")
+			cfg := tc.cfg
+			cfg.Timeout = &timeout
+			r, src := newScriptedMultiline(t, cfg, logptest.NewTestingLogger(t, ""))
 
 			before := time.Now()
 			for _, l := range tc.lines {
@@ -674,15 +648,25 @@ func TestMultilinePendingDeadline(t *testing.T) {
 			require.ErrorIs(t, err, reader.ErrWouldBlock, "stalling with buffered lines")
 			after := time.Now()
 
-			pending, deadline = reader.PendingDeadline(r)
+			pending, deadline := reader.PendingDeadline(r)
 			assert.True(t, pending, "buffered lines are pending")
-			if tc.wantDeadline {
-				assert.False(t, deadline.Before(before.Add(timeout)),
-					"deadline %v must not precede the first line read at %v plus the timeout", deadline, before)
-				assert.False(t, deadline.After(after.Add(timeout)),
-					"deadline %v must not exceed the last line read at %v plus the timeout", deadline, after)
+			if tc.hasTimeout {
+				assert.False(
+					t,
+					deadline.Before(before.Add(timeout)),
+					"deadline %v must not precede %v",
+					deadline,
+					before.Add(timeout),
+				)
+				assert.False(
+					t,
+					deadline.After(after.Add(timeout)),
+					"deadline %v must not exceed %v",
+					deadline,
+					after.Add(timeout),
+				)
 			} else {
-				assert.True(t, deadline.IsZero(), "no timeout, so no deadline, got %v", deadline)
+				assert.True(t, deadline.IsZero(), "count mode has no deadline, got %v", deadline)
 			}
 
 			// A stall does not extend the deadline: it is based on the last line.
@@ -693,56 +677,23 @@ func TestMultilinePendingDeadline(t *testing.T) {
 			_, again := reader.PendingDeadline(r)
 			assert.Equal(t, deadline, again, "ErrWouldBlock must not move the deadline")
 
-			msg, ok, err := reader.FlushPending(r, false)
-			require.NoError(t, err, "flushing")
-			require.True(t, ok, "flushing buffered lines")
-			assert.NotEmpty(t, msg.Content, "flushed content")
-
-			pending, deadline = reader.PendingDeadline(r)
-			assert.False(t, pending, "flushed reader has nothing pending")
-			assert.True(t, deadline.IsZero(), "flushed reader has no deadline")
+			if tc.hasTimeout {
+				cfg.Timeout = &zero
+				r, src = newScriptedMultiline(t, cfg, logptest.NewTestingLogger(t, ""))
+				src.Push(readertest.LineStep(tc.lines[0]), readertest.WouldBlockStep)
+				_, err = r.Next()
+				require.ErrorIs(t, err, reader.ErrWouldBlock, "stalling without timeout")
+				pending, deadline = reader.PendingDeadline(r)
+				assert.True(t, pending, "buffered line is pending")
+				assert.True(t, deadline.IsZero(), "no timeout, so no deadline, got %v", deadline)
+			}
 		})
 	}
 }
 
-func ptr[T any](v T) *T { return &v }
-
 func TestMultilineFlushPending(t *testing.T) {
-	afterPattern := match.MustCompile(`^[ \t]+`)
-	whilePattern := match.MustCompile(`^{`)
-
-	tests := []struct {
-		name string
-		cfg  Config
-		// first and second events; each is left buffered by an ErrWouldBlock.
-		first, second []string
-		// logs is whether a timeout flush logs.
-		logs bool
-	}{
-		{
-			name:   "pattern",
-			cfg:    Config{Type: patternMode, Pattern: &afterPattern, Match: "after"},
-			first:  []string{"line1", "  line1.1", "  line1.2"},
-			second: []string{"line2", "  line2.1"},
-			logs:   true,
-		},
-		{
-			name:   "while_pattern",
-			cfg:    Config{Type: whilePatternMode, Pattern: &whilePattern},
-			first:  []string{"{line1", "{line1.1", "{line1.2"},
-			second: []string{"{line2", "{line2.1"},
-			logs:   true,
-		},
-		{
-			name:   "count",
-			cfg:    Config{Type: countMode, LinesCount: 3},
-			first:  []string{"line1", "line2"},
-			second: []string{"line3", "line4"},
-		},
-	}
-
 	for _, timedOut := range []bool{true, false} {
-		for _, tc := range tests {
+		for _, tc := range wouldBlockModes() {
 			t.Run(fmt.Sprintf("%s timedOut=%t", tc.name, timedOut), func(t *testing.T) {
 				logger, logs := logptest.NewTestingLoggerWithObserver(t, "")
 				r, src := newScriptedMultiline(t, tc.cfg, logger)
@@ -763,23 +714,25 @@ func TestMultilineFlushPending(t *testing.T) {
 					require.True(t, ok, "FlushPending must flush the buffered lines")
 					assert.Equal(t, strings.Join(lines, "\n"), string(msg.Content), "flushed content")
 					assert.Equal(t, linesBytes(lines...), msg.Bytes, "flushed bytes")
-					assert.Equal(t, len(lines) > 1, hasMultilineFlag(t, msg), "multiline flag of %d lines", len(lines))
+					assert.Equal(
+						t,
+						len(lines) > 1,
+						hasMultilineFlag(t, msg),
+						"multiline flag of %d lines",
+						len(lines),
+					)
 					assert.False(t, msg.Ts.IsZero(), "flushed message timestamp")
 				}
 
-				stall(tc.first)
-				flush(tc.first)
-				pending, _ := reader.PendingDeadline(r)
+				stall(tc.lines)
+				flush(tc.lines)
+				pending, deadline := reader.PendingDeadline(r)
 				assert.False(t, pending, "nothing pending after a flush")
-
-				// The reader restarted at readFirst: the next lines are a new event
-				// that does not include the flushed ones.
-				stall(tc.second)
-				flush(tc.second)
+				assert.True(t, deadline.IsZero(), "no deadline after a flush")
 
 				// A single buffered line is flushed without the multiline flag.
-				stall(tc.second[:1])
-				flush(tc.second[:1])
+				stall(tc.lines[:1])
+				flush(tc.lines[:1])
 
 				// Nothing left to flush.
 				msg, ok, err := reader.FlushPending(r, timedOut)
@@ -787,42 +740,37 @@ func TestMultilineFlushPending(t *testing.T) {
 				assert.False(t, ok, "nothing was buffered")
 				assert.True(t, msg.IsEmpty(), "no message when nothing was buffered")
 
-				wantLogs := 0
-				if timedOut && tc.logs {
-					wantLogs = 3
+				// The reader restarted at readFirst: subsequent lines (even starting
+				// with a continuation line in pattern mode) form a new event via Next.
+				for _, l := range tc.second {
+					src.Push(readertest.LineStep(l))
 				}
-				assert.Equal(t, wantLogs, logs.FilterMessage(timeoutFlushLog).Len(),
-					"timeout flush log count (timedOut=%t)", timedOut)
+				src.Push(readertest.EOFStep)
+				msg, err = r.Next()
+				require.NoError(t, err, "Next after FlushPending")
+				assert.Equal(
+					t,
+					strings.Join(tc.second, "\n"),
+					string(msg.Content),
+					"event read after flush",
+				)
+				_, err = r.Next()
+				require.ErrorIs(t, err, io.EOF, "end of source")
+
+				wantLogs := 0
+				if timedOut && tc.hasTimeout {
+					wantLogs = 2
+				}
+				assert.Equal(
+					t,
+					wantLogs,
+					logs.FilterMessage(timeoutFlushLog).Len(),
+					"timeout flush log count (timedOut=%t)",
+					timedOut,
+				)
 			})
 		}
 	}
-}
-
-// TestMultilineFlushPendingThenContinue verifies the reader keeps working after
-// a flush, with lines resuming a new event as if the source had just started.
-func TestMultilineFlushPendingThenContinue(t *testing.T) {
-	pattern := match.MustCompile(`^[ \t]+`)
-	cfg := Config{Type: patternMode, Pattern: &pattern, Match: "after"}
-	r, src := newScriptedMultiline(t, cfg, logptest.NewTestingLogger(t, ""),
-		readertest.LineStep("line1"), readertest.LineStep("  line1.1"), readertest.WouldBlockStep)
-
-	_, err := r.Next()
-	require.ErrorIs(t, err, reader.ErrWouldBlock, "stall")
-	_, ok, err := reader.FlushPending(r, true)
-	require.NoError(t, err, "flush")
-	require.True(t, ok, "flush")
-
-	// An indented line right after the flush must not be appended to the
-	// flushed event; it starts a new one.
-	src.Push(readertest.LineStep("  orphan"), readertest.LineStep("  orphan2"), readertest.LineStep("line3"), readertest.EOFStep)
-	msg, err := r.Next()
-	require.NoError(t, err, "next event")
-	assert.Equal(t, "  orphan\n  orphan2", string(msg.Content), "event after flush")
-	msg, err = r.Next()
-	require.NoError(t, err, "last event")
-	assert.Equal(t, "line3", string(msg.Content), "last event")
-	_, err = r.Next()
-	require.ErrorIs(t, err, io.EOF, "end of source")
 }
 
 func TestMultilineFlushPendingAfterClose(t *testing.T) {

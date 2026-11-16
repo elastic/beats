@@ -863,9 +863,8 @@ func TestFlushPendingThroughParsers(t *testing.T) {
 		check       func(t *testing.T, msg reader.Message)
 	}{
 		"multiline": {
-			parsers:  []map[string]any{multilineCfg},
-			maxBytes: 1024,
-			lines:    []string{"line1", "  line1.1"},
+			parsers: []map[string]any{multilineCfg},
+			lines:   []string{"line1", "  line1.1"},
 			check: func(t *testing.T, msg reader.Message) {
 				assert.Equal(t, "line1\n  line1.1", string(msg.Content), "content")
 				assert.Equal(t, []string{"multiline"}, logFlags(t, msg), "flags")
@@ -885,8 +884,7 @@ func TestFlushPendingThroughParsers(t *testing.T) {
 				multilineCfg,
 				{"ndjson": map[string]any{"target": "json"}},
 			},
-			maxBytes: 1024,
-			lines:    []string{`{"msg":"a",`, `  "n":1}`},
+			lines: []string{`{"msg":"a",`, `  "n":1}`},
 			check: func(t *testing.T, msg reader.Message) {
 				assert.Empty(t, string(msg.Content), "content is replaced by the decoded JSON")
 				v, err := msg.Fields.GetValue("json.msg")
@@ -903,7 +901,6 @@ func TestFlushPendingThroughParsers(t *testing.T) {
 				multilineCfg,
 				{"syslog": map[string]any{"format": "rfc5424"}},
 			},
-			maxBytes: 1024,
 			lines: []string{
 				`<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog 1024 ID47 - first`,
 				`  second`,
@@ -922,8 +919,7 @@ func TestFlushPendingThroughParsers(t *testing.T) {
 				multilineCfg,
 				{"include_message": map[string]any{"patterns": []string{"^ERROR"}}},
 			},
-			maxBytes: 1024,
-			lines:    []string{"ERROR boom", "  at main"},
+			lines: []string{"ERROR boom", "  at main"},
 			check: func(t *testing.T, msg reader.Message) {
 				assert.Equal(t, "ERROR boom\n  at main", string(msg.Content), "content")
 				assert.False(t, msg.IsEmpty(), "matching message must not be dropped")
@@ -934,8 +930,7 @@ func TestFlushPendingThroughParsers(t *testing.T) {
 				multilineCfg,
 				{"include_message": map[string]any{"patterns": []string{"^ERROR"}}},
 			},
-			maxBytes: 1024,
-			lines:    []string{"INFO fine", "  at main"},
+			lines: []string{"INFO fine", "  at main"},
 			check: func(t *testing.T, msg reader.Message) {
 				assert.True(t, msg.IsEmpty(), "dropped message must be empty so it is not published")
 				assert.Empty(t, msg.Content, "dropped message content")
@@ -948,12 +943,16 @@ func TestFlushPendingThroughParsers(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
+			maxBytes := tc.maxBytes
+			if maxBytes == 0 {
+				maxBytes = 1024
+			}
 			src := readertest.NewScriptedReader()
 			for _, l := range tc.lines {
 				src.Push(readertest.LineStep(l))
 			}
 			src.Push(readertest.WouldBlockStep)
-			r := createFlushPipeline(t, src, tc.maxBytes, tc.parsers...)
+			r := createFlushPipeline(t, src, maxBytes, tc.parsers...)
 
 			pending, _ := reader.PendingDeadline(r)
 			assert.False(t, pending, "nothing pending before reading")

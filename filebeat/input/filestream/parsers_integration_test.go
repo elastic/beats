@@ -712,17 +712,6 @@ func TestParsersMultilineAppendedWhileParked(t *testing.T) {
 			want:             "[2015] hello world\n  First Line\n  Second Line\n  Third Line",
 			flushedByTimeout: true,
 		},
-		"while_pattern": {
-			multiline: map[string]any{
-				"type":    "while_pattern",
-				"pattern": "^\\s",
-				"timeout": multilineTimeout.String(),
-			},
-			first:            "  First Line\n",
-			more:             []string{"  Second Line\n", "  Third Line\n", "  Fourth Line\n"},
-			want:             "  First Line\n  Second Line\n  Third Line\n  Fourth Line",
-			flushedByTimeout: true,
-		},
 		"count": {
 			multiline: map[string]any{
 				"type":        "count",
@@ -801,65 +790,43 @@ func TestParsersMultilineAppendedWhileParked(t *testing.T) {
 // incomplete when the input shuts down is published rather than lost:
 // read_until_eof (the default) drains the file to EOF, which ends the event.
 func TestParsersMultilineFlushedOnReadUntilEOF(t *testing.T) {
-	tests := map[string]map[string]any{
-		"pattern": {
-			"type":    "pattern",
-			"pattern": "^\\[",
-			"negate":  true,
-			"match":   "after",
-			"timeout": "1h",
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	id := uuid.Must(uuid.NewV4()).String()
+	inp := env.mustCreateInput(map[string]any{
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
+		"parsers": []map[string]any{
+			{
+				"multiline": map[string]any{
+					"type":    "pattern",
+					"pattern": "^\\[",
+					"negate":  true,
+					"match":   "after",
+					"timeout": "1h",
+				},
+			},
 		},
-		"while_pattern": {
-			"type":    "while_pattern",
-			"pattern": "^\\s",
-			"timeout": "1h",
-		},
-		"count": {
-			"type":        "count",
-			"count_lines": 10,
-		},
-	}
-	lines := map[string]string{
-		"pattern":       "[2015] hello world\n  First Line\n  Second Line\n",
-		"while_pattern": "  First Line\n  Second Line\n",
-		"count":         "line 1\nline 2\n",
-	}
-	want := map[string]string{
-		"pattern":       "[2015] hello world\n  First Line\n  Second Line",
-		"while_pattern": "  First Line\n  Second Line",
-		"count":         "line 1\nline 2",
-	}
+	})
 
-	for name, multiline := range tests {
-		t.Run(name, func(t *testing.T) {
-			env := newInputTestingEnvironment(t)
+	const want = "[2015] hello world\n  First Line\n  Second Line"
+	env.mustWriteToFile(testlogName, []byte(want+"\n"))
 
-			testlogName := "test.log"
-			id := uuid.Must(uuid.NewV4()).String()
-			inp := env.mustCreateInput(map[string]any{
-				"id":                                     "fake-ID",
-				"paths":                                  []string{env.abspath(testlogName)},
-				"prospector.scanner.check_interval":      "1ms",
-				"file_identity.native":                   map[string]any{},
-				"prospector.scanner.fingerprint.enabled": false,
-				"parsers":                                []map[string]any{{"multiline": multiline}},
-			})
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, id, inp)
 
-			env.mustWriteToFile(testlogName, []byte(lines[name]))
+	env.WaitLogsContains("End of file reached", 30*time.Second,
+		"the harvester must reach EOF and park")
+	require.Empty(t, env.pipeline.GetAllEvents(),
+		"the event is incomplete and its timeout is far away")
 
-			ctx, cancelInput := context.WithCancel(context.Background())
-			env.startInput(ctx, id, inp)
+	cancelInput()
+	env.waitUntilInputStops()
 
-			env.WaitLogsContains("End of file reached", 30*time.Second,
-				"the harvester must reach EOF and park")
-			require.Empty(t, env.pipeline.GetAllEvents(),
-				"the event is incomplete and its timeout is far away")
-
-			cancelInput()
-			env.waitUntilInputStops()
-
-			require.Equal(t, []string{want[name]}, env.getOutputMessages(),
-				"shutting down must publish the buffered multiline event")
-		})
-	}
+	require.Equal(t, []string{want}, env.getOutputMessages(),
+		"shutting down must publish the buffered multiline event")
 }

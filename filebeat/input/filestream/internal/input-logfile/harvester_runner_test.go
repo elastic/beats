@@ -1411,7 +1411,7 @@ func TestHarvesterRunner_ReadUntilEOFDrainsPastBudgetYields(t *testing.T) {
 }
 
 // TestHarvesterRunner_NoDrainWhenDisabled asserts that with read_until_eof
-// disabled a parked source is torn down on stop without an extra read.
+// disabled a parked source is torn down on stop without an extra read or flush.
 func TestHarvesterRunner_NoDrainWhenDisabled(t *testing.T) {
 	var reads atomic.Int64
 	h := &fakeHarvester{
@@ -1436,6 +1436,8 @@ func TestHarvesterRunner_NoDrainWhenDisabled(t *testing.T) {
 
 	require.NoError(t, g.StopHarvesters())
 	require.Equal(t, readsBeforeStop, reads.Load(), "no drain read when read_until_eof is disabled")
+	require.Zero(t, h.lastSession().flushCount(), "no flush when read_until_eof is disabled")
+	require.True(t, h.lastSession().isClosed())
 	require.False(t, g.hasID(id))
 }
 
@@ -1509,82 +1511,33 @@ func TestHarvesterRunner_ReadUntilEOFFlushesBeforeFinish(t *testing.T) {
 	}
 }
 
-// TestHarvesterRunner_NoFlushWhenNotDraining asserts that without
-// read_until_eof the stop path does not flush: nothing is read, so there is no
-// EOF to conclude buffered state is complete.
-func TestHarvesterRunner_NoFlushWhenNotDraining(t *testing.T) {
-	h := &fakeHarvester{
-		readFn: func(_ int, _ v2.Context) (SliceVerdict, error) { return SliceYield, nil },
-		pollFn: func(int) PollResult { return PollPark },
-	}
-	g := testHarvesterRunner(t, h, 0) // read_until_eof disabled
-	g.start()
-	src := &testSource{name: "/path/to/test"}
-	id := g.identifier.ID(src)
-	g.Start(startContext(t), src)
-
-	requireEventually(t, func() bool {
-		s, ok := g.statusOf(id)
-		return ok && s == statusParked
-	}, "source should park")
-	sess := h.lastSession()
-
-	require.NoError(t, g.StopHarvesters())
-	require.Zero(t, sess.flushCount(), "no flush is expected when read_until_eof is disabled")
-	require.True(t, sess.isClosed(), "the source must still be closed")
-}
-
 // TestHarvesterRunner_ParkCapsDueAtPendingDeadline asserts park schedules the
 // next poll no later than the session's pending deadline, however long the
 // backoff and the state-check interval are, and leaves the schedule alone when
 // there is no deadline or it is later.
 func TestHarvesterRunner_ParkCapsDueAtPendingDeadline(t *testing.T) {
+	g := testHarvesterRunner(t, &fakeHarvester{}, 0)
+	g.stateCheckInterval = time.Hour
+
 	now := time.Now()
-	tests := map[string]struct {
+	for _, tc := range []struct {
+		name     string
 		deadline time.Time
-		// wantDue is how far from park time the next poll must be due.
-		wantDue time.Duration
+		wantDue  time.Duration
 	}{
-		"deadline earlier than backoff and state check caps due": {
-			deadline: now.Add(2 * time.Second),
-			wantDue:  2 * time.Second,
-		},
-		"no deadline leaves due alone": {
-			deadline: time.Time{},
-			wantDue:  time.Hour,
-		},
-		"deadline later than due leaves due alone": {
-			deadline: now.Add(3 * time.Hour),
-			wantDue:  time.Hour,
-		},
-		"elapsed deadline makes the source due at once": {
-			deadline: now.Add(-time.Minute),
-			wantDue:  -time.Minute,
-		},
-	}
+		{"earlier deadline caps due", now.Add(2 * time.Second), 2 * time.Second},
+		{"no deadline leaves due alone", time.Time{}, time.Hour},
+		{"later deadline leaves due alone", now.Add(3 * time.Hour), time.Hour},
+		{"elapsed deadline is due at once", now.Add(-time.Minute), -time.Minute},
+	} {
+		state := &sourceState{session: &fakeSession{pendingDeadline: tc.deadline}}
+		g.mu.Lock()
+		before := time.Now()
+		g.park(state, time.Hour)
+		due := state.nextCheck
+		g.mu.Unlock()
 
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			g := testHarvesterRunner(t, &fakeHarvester{}, 0)
-			g.stateCheckInterval = time.Hour
-
-			state := &sourceState{
-				srcID:   "x",
-				ctx:     startContext(t),
-				done:    make(chan struct{}),
-				session: &fakeSession{pendingDeadline: tc.deadline},
-			}
-			g.mu.Lock()
-			g.states["x"] = state
-
-			before := time.Now()
-			g.park(state, time.Hour)
-			due := state.nextCheck
-			g.mu.Unlock()
-
-			assert.WithinDuration(t, before.Add(tc.wantDue), due, 500*time.Millisecond,
-				"unexpected next poll time")
-		})
+		assert.WithinDuration(t, before.Add(tc.wantDue), due, 500*time.Millisecond, tc.name)
 	}
 }
 
@@ -1630,21 +1583,13 @@ func TestHarvesterRunner_BufferedProgressResetsBackoff(t *testing.T) {
 	h := &fakeHarvester{
 		bufferOnly: true,
 		readFn:     func(_ int, _ v2.Context) (SliceVerdict, error) { return SliceYield, nil },
-		pollFn:     func(call int) PollResult { return PollResume },
+		pollFn:     func(int) PollResult { return PollResume },
 	}
 	g := testHarvesterRunner(t, h, 0)
 	src := &testSource{name: "/path/to/test"}
-	id := g.identifier.ID(src)
-	g.Start(startContext(t), src)
-
-	requireEventually(t, func() bool {
-		s, ok := g.statusOf(id)
-		return ok && s == statusParked
-	}, "source should park after its first read")
+	id, state := startParkedAndClaimDue(t, g, src)
 
 	// Resume it: the second read again only buffers.
-	state := g.popDueNow()
-	require.NotNil(t, state, "the parked source should be due")
 	g.pollParked(state)
 
 	requireEventually(t, func() bool { return h.lastSession().readCount() == 2 }, "source should be read again")

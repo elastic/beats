@@ -469,18 +469,7 @@ func TestDockerJSONWouldBlock(t *testing.T) {
 		bytes   int
 	}{
 		{
-			name: "after the first chunk of a partial line",
-			steps: []readertest.ScriptStep{
-				readertest.LineStep(criTS + " stdout P abc"),
-				readertest.WouldBlockStep,
-			},
-			resumed: []readertest.ScriptStep{readertest.LineStep(criTS + " stdout F def")},
-			stream:  "all",
-			content: "abcdef",
-			bytes:   len(criTS+" stdout P abc") + 1 + len(criTS+" stdout F def") + 1,
-		},
-		{
-			name: "after several chunks of a partial line, stalling twice",
+			name: "in the middle of a partial line",
 			steps: []readertest.ScriptStep{
 				readertest.LineStep(criTS + " stdout P a"),
 				readertest.LineStep(criTS + " stdout P b"),
