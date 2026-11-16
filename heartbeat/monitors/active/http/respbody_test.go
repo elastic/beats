@@ -23,7 +23,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"runtime"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -257,4 +259,67 @@ func Test_readPrefixAndHash(t *testing.T) {
 
 func simpleHTTPResponse() *http.Response {
 	return &http.Response{Body: io.NopCloser(strings.NewReader("hello"))}
+}
+
+// plainBody hides the io.WriterTo of the underlying reader, like a real
+// http.Response.Body, so copying from it needs a buffer.
+type plainBody struct{ io.Reader }
+
+func (plainBody) Close() error { return nil }
+
+func newPlainBody(s string) io.ReadCloser { return plainBody{strings.NewReader(s)} }
+
+// readPrefixAndHash runs on every check of every http monitor and the body is
+// usually tiny, so it must not allocate copy buffers per call.
+func Test_readPrefixAndHashDoesNotAllocateCopyBuffers(t *testing.T) {
+	const runs = 200
+	body := strings.Repeat("a", 100)
+
+	// Warm the buffer pool.
+	_, _, _, err := readPrefixAndHash(newPlainBody(body), 128)
+	require.NoError(t, err)
+
+	var before, after runtime.MemStats
+	runtime.ReadMemStats(&before)
+	for range runs {
+		_, _, _, err := readPrefixAndHash(newPlainBody(body), 128)
+		require.NoError(t, err)
+	}
+	runtime.ReadMemStats(&after)
+
+	perRun := (after.TotalAlloc - before.TotalAlloc) / runs
+	// Without the pool this is two buffers, 2*copyBufSize. The race detector
+	// makes sync.Pool drop some Puts, so allow for an occasional new buffer.
+	assert.Less(t, perRun, uint64(copyBufSize/2),
+		"readPrefixAndHash allocated %d bytes per call, a copy buffer is %d", perRun, copyBufSize)
+}
+
+func Test_readPrefixAndHashConcurrent(t *testing.T) {
+	var wg sync.WaitGroup
+	for i := range 16 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			body := strings.Repeat(string(rune('a'+i)), 70000+i)
+			expected := sha256.Sum256([]byte(body))
+			for range 20 {
+				size, prefix, hash, err := readPrefixAndHash(newPlainBody(body), 10)
+				assert.NoError(t, err)
+				assert.Equal(t, len(body), size)
+				assert.Equal(t, body[:10], prefix)
+				assert.Equal(t, hex.EncodeToString(expected[:]), hash)
+			}
+		}()
+	}
+	wg.Wait()
+}
+
+func BenchmarkReadPrefixAndHash(b *testing.B) {
+	body := strings.Repeat("a", 100)
+	b.ReportAllocs()
+	for b.Loop() {
+		if _, _, _, err := readPrefixAndHash(newPlainBody(body), 128); err != nil {
+			b.Fatal(err)
+		}
+	}
 }
