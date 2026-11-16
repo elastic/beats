@@ -159,9 +159,19 @@ func newSessionProperties(sessionName string, conf Config) *EventTraceProperties
 	// See https://learn.microsoft.com/en-us/windows/win32/etw/wnode-header
 	sessionProperties.Wnode.ClientContext = 1
 	sessionProperties.Wnode.Flags = WNODE_FLAG_TRACED_GUID
-	// Set logging mode to real-time
+	// Set logging mode to real-time and independent. Without
+	// EVENT_TRACE_INDEPENDENT_SESSION_MODE, an event that cannot be written
+	// to any one session enabled for its provider is not written to any of
+	// them, so a full session elsewhere (for example the event log session
+	// of an analytic channel) silently drops events from this one. Those
+	// losses are counted on the other session, not this one.
+	// STOP_ON_HYBRID_SHUTDOWN is set explicitly rather than leaving ETW to
+	// choose a default; the session belongs to this process and is
+	// recreated on start.
 	// See https://learn.microsoft.com/en-us/windows/win32/etw/logging-mode-constants
-	sessionProperties.LogFileMode = EVENT_TRACE_REAL_TIME_MODE
+	sessionProperties.LogFileMode = EVENT_TRACE_REAL_TIME_MODE |
+		EVENT_TRACE_INDEPENDENT_SESSION_MODE |
+		EVENT_TRACE_STOP_ON_HYBRID_SHUTDOWN
 	sessionProperties.LogFileNameOffset = 0 // Can be specified to log to a file as well as to a real-time session
 	if conf.BufferSize == 0 {
 		conf.BufferSize = 64 // Default buffer size if not specified

@@ -33,6 +33,7 @@ import (
 	"sort"
 	"strings"
 	"sync/atomic"
+	"syscall"
 	"testing"
 	"time"
 
@@ -561,4 +562,60 @@ func checkForBadDataRecursive(value any, eventIdx, propIdx int, propName string,
 		}
 	}
 	return badCount
+}
+
+// TestRealtimeSessionIndependent checks what Windows reports for the logging
+// mode of a running session, the way an input sees it when it attaches to an
+// existing one. StartTrace can accept a logging mode and still not apply all
+// of it, so only a query of the running session shows what is in effect.
+func TestRealtimeSessionIndependent(t *testing.T) {
+	if !isRunningAsAdmin() {
+		t.Skip("creating an ETW session requires administrator privileges")
+	}
+
+	tests := []struct {
+		name string
+		mode uint32 // LogFileMode requested from StartTrace; 0 keeps the default.
+		want bool
+	}{
+		{name: "default", want: true},
+		{name: "real-time only", mode: EVENT_TRACE_REAL_TIME_MODE, want: false},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			name := uniqueSessionName("IndependentTestETW")
+			namePtr, err := syscall.UTF16PtrFromString(name)
+			if err != nil {
+				t.Fatalf("UTF16PtrFromString(%q) failed: %v", name, err)
+			}
+			props := newSessionProperties(name, Config{})
+			if tc.mode != 0 {
+				props.LogFileMode = tc.mode
+			}
+			var handle uintptr
+			if err := _StartTrace(&handle, namePtr, props); err != nil {
+				t.Fatalf("StartTrace(%q, mode %#010x) failed: %v", name, props.LogFileMode, err)
+			}
+			t.Cleanup(func() {
+				if err := _ControlTrace(handle, nil, newSessionProperties(name, Config{}), EVENT_TRACE_CONTROL_STOP); err != nil {
+					t.Errorf("stopping session %q failed: %v", name, err)
+				}
+			})
+
+			attached, err := NewSession(Config{Session: name}, logptest.NewTestingLogger(t, ""))
+			if err != nil {
+				t.Fatalf("NewSession(attach %q) failed: %v", name, err)
+			}
+			// Clear the mode preset by newSessionProperties so that only the
+			// query can set it.
+			attached.properties.LogFileMode = 0
+			if err := attached.AttachToExistingSession(); err != nil {
+				t.Fatalf("AttachToExistingSession() failed: %v", err)
+			}
+			if got := attached.Independent(); got != tc.want {
+				t.Errorf("Independent() = %t for session started with mode %#010x, reported mode %#010x; want %t",
+					got, props.LogFileMode, attached.properties.LogFileMode, tc.want)
+			}
+		})
+	}
 }

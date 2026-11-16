@@ -1,0 +1,13 @@
+kind: bug-fix
+summary: Create ETW input sessions in independent mode so events are not lost when another session on the same provider is full.
+description: |
+  Without EVENT_TRACE_INDEPENDENT_SESSION_MODE, Windows does not write an
+  event to any session if it cannot write it to one of the sessions enabled
+  for its provider. A full session elsewhere, such as the event log session
+  for an analytic channel, then silently drops events from the input's
+  session, and the loss is not counted on the input's session. The input now
+  also warns when it attaches to an existing session that was not created in
+  independent mode. The Auditbeat file integrity ETW backend shares the
+  session code and gets the same change.
+component: filebeat
+issue: https://github.com/elastic/beats/issues/50966
