@@ -27,7 +27,7 @@ import (
 	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/beats/v7/filebeat/input/file"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 const overlapWarning = "harvested by more than one receiver"

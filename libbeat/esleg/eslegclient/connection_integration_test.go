@@ -33,10 +33,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 )
 
 func TestConnect(t *testing.T) {

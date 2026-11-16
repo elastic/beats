@@ -30,10 +30,6 @@ import (
 	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-
-	//mage:import
-	"github.com/elastic/elastic-agent-libs/dev-tools/mage"
-
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
 
@@ -78,9 +74,32 @@ var (
 // Aliases are shortcuts to long target names.
 // nolint: deadcode // it's used by `mage`.
 var Aliases = map[string]interface{}{
-	"llc":  mage.Linter.LastChange,
-	"lint": mage.Linter.All,
+	"llc":  Linter.LastChange,
+	"lint": Linter.All,
 }
+
+// Linter contains targets related to linting the Go code. It delegates to
+// devtools.Linter; the namespace is redeclared here because mage only exposes
+// targets declared in (or //mage:import-ed into) the magefile package.
+type Linter mg.Namespace
+
+// All runs the linter against the entire codebase.
+func (Linter) All() error { return devtools.Linter{}.All() }
+
+// LastChange runs the linter against all files changed since the fork point from `main`.
+func (Linter) LastChange() error { return devtools.Linter{}.LastChange() }
+
+// Install installs golangci-lint to `./build` if it is not there yet.
+func (Linter) Install() error { return devtools.Linter{}.Install() }
+
+// ForceInstall installs golangci-lint regardless of whether it exists or not.
+func (Linter) ForceInstall() error { return devtools.Linter{}.ForceInstall() }
+
+// CheckConfig makes sure that the `.golangci.yml` does not have uncommitted changes.
+func (Linter) CheckConfig() error { return devtools.Linter{}.CheckConfig() }
+
+// Version prints the version of the linter in use.
+func (Linter) Version() error { return devtools.Linter{}.Version() }
 
 // PackageBeatDashboards packages the dashboards from all Beats into a zip
 // file. The dashboards must be generated first.

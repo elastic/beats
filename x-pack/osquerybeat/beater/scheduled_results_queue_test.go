@@ -18,12 +18,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pub"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type outageTestOutput struct {

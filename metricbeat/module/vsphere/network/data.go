@@ -20,7 +20,7 @@ package network
 import (
 	"github.com/vmware/govmomi/vim25/mo"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func (m *NetworkMetricSet) mapEvent(net mo.Network, data *metricData) mapstr.M {

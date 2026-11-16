@@ -38,7 +38,7 @@ import (
 	"github.com/moby/moby/api/types/mount"
 	"github.com/moby/moby/client"
 
-	"github.com/elastic/elastic-agent-libs/testing/fs"
+	"github.com/elastic/beats/v7/pkg/testing/fs"
 )
 
 func TestJournaldChroot(t *testing.T) {

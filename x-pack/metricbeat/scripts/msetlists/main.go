@@ -13,8 +13,8 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/scripts/msetlists"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/pkg/logp"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/include"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func main() {

@@ -25,8 +25,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 type onCreateFactory struct {

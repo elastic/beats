@@ -23,9 +23,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
-	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // Readiness must travel from osqueryd's first configuration pull through the

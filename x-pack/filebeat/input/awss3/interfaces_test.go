@@ -9,7 +9,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 func TestAWSS3API_clientFor(t *testing.T) {

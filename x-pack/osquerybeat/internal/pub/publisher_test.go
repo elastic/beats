@@ -22,10 +22,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions" // Registers the add_fields processor used by inputWithNamespace.
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type recordingClient struct {

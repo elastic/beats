@@ -20,7 +20,7 @@ package otelmap
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"go.opentelemetry.io/collector/pdata/pcommon"
 )

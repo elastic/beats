@@ -5,7 +5,6 @@
 package gcs
 
 import (
-	"strings"
 	"sync"
 	"time"
 )
@@ -49,7 +48,7 @@ func (s *state) saveForTx(name string, lastModifiedOn time.Time, metrics *inputM
 	if _, ok := s.cp.FailedJobs[name]; !ok {
 		if len(s.cp.ObjectName) == 0 {
 			s.cp.ObjectName = name
-		} else if strings.ToLower(name) > strings.ToLower(s.cp.ObjectName) {
+		} else if name > s.cp.ObjectName {
 			s.cp.ObjectName = name
 		}
 

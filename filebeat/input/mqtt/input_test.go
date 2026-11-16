@@ -30,9 +30,9 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func TestNewInput_MissingConfigField(t *testing.T) {

@@ -51,7 +51,7 @@ func TestGroupStatus(t *testing.T) {
 	require.Equalf(t, "beatreceiver failed to start", m.GetEvent().Err().Error(), "expected 'beatreceiver failed to start', got %v", m.GetEvent().Err())
 }
 
-func TestToPdata(t *testing.T) {
+func TestRunnerStateRaw(t *testing.T) {
 	tests := []struct {
 		name     string
 		state    status.Status
@@ -93,12 +93,12 @@ func TestToPdata(t *testing.T) {
 				state: tt.state,
 				msg:   tt.msg,
 			}
-			result := toPdata(rs)
+			result := rs.raw()
 
 			for key, expectedVal := range tt.wantKeys {
-				val, ok := result.Get(key)
+				val, ok := result[key]
 				require.True(t, ok, "expected key %q to exist", key)
-				require.Equal(t, expectedVal, val.Str(), "expected %q=%q, got %q", key, expectedVal, val.Str())
+				require.Equal(t, expectedVal, val, "expected %q=%q, got %q", key, expectedVal, val)
 			}
 		})
 	}
@@ -148,6 +148,19 @@ func TestInputStatusesInEventAttributes(t *testing.T) {
 	runner2Error, ok := runner2Map.Get("error")
 	require.True(t, ok)
 	assert.Equal(t, "some warning", runner2Error.Str())
+}
+
+func TestUnchangedRunnerStatusIsNotReported(t *testing.T) {
+	m := &oteltest.MockHost{}
+	reporter := newGroupStatusReporter(m, 0) // report every change
+	sub := reporter.GetReporterForRunner("runner-1")
+
+	sub.UpdateStatus(status.Running, "")
+	sub.UpdateStatus(status.Running, "")
+	sub.UpdateStatus(status.Degraded, "slow")
+	sub.UpdateStatus(status.Degraded, "slow")
+
+	assert.Len(t, m.GetEvents(), 2, "only the two changes should be reported")
 }
 
 // TestGroupStatusHasNoInputStatuses checks that a status reported for the
@@ -238,4 +251,18 @@ func TestRunnerChangeAfterGroupStatusIsReported(t *testing.T) {
 		_, ok := m.GetEvent().Attributes().Get(InputStatusAttributesKey)
 		assert.True(t, ok, "expected the last event to be a runner report")
 	})
+}
+
+func BenchmarkCalculateOtelStatus(b *testing.B) {
+	for _, runners := range []int{100, 1000, 10000} {
+		b.Run(fmt.Sprint(runners), func(b *testing.B) {
+			reporter := newGroupStatusReporter(&oteltest.MockHost{}, 0)
+			for i := range runners {
+				reporter.runnerStates[fmt.Sprintf("monitor-%d", i)] = &runnerState{state: status.Running}
+			}
+			for b.Loop() {
+				reporter.calculateOtelStatus()
+			}
+		})
+	}
 }
