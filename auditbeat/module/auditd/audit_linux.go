@@ -192,39 +192,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 	}
 
 	if ms.kernelLost.enabled {
-		client, err := libaudit.NewAuditClient(nil)
-		if err != nil {
-			reporter.Error(err)
-			ms.log.Errorw("Failure creating audit monitoring client", "error", err)
-		}
-		go func() {
-			defer func() { // Close the most recently allocated "client" instance.
-				if client != nil {
-					ms.client.Close()
-				}
-			}()
-			timer := time.NewTicker(lostEventsUpdateInterval)
-			defer timer.Stop()
-			for {
-				select {
-				case <-reporter.Done():
-					return
-				case <-timer.C:
-					if status, err := client.GetStatus(); err == nil {
-						ms.updateKernelLostMetric(status.Lost)
-					} else {
-						ms.log.Error("get status request failed:", err)
-						client.Close()
-						client, err = libaudit.NewAuditClient(nil)
-						if err != nil {
-							ms.log.Errorw("Failure creating audit monitoring client", "error", err)
-							reporter.Error(err)
-							return
-						}
-					}
-				}
-			}
-		}()
+		go ms.monitorKernelLost(reporter, newMonitorClient, lostEventsUpdateInterval)
 	}
 
 	// Spawn the stream buffer consumers
@@ -440,6 +408,50 @@ func (ms *MetricSet) setPID(retries int) (err error) {
 	return fmt.Errorf("could not set PID for audit process after %d attempts", retries)
 }
 
+// monitorKernelLost polls the kernel's lost event counter every interval until
+// the reporter is done or an audit client cannot be created. It uses its own
+// client, made by newClient, so that requests do not compete with the event
+// stream, and closes the client before returning.
+func (ms *MetricSet) monitorKernelLost(reporter mb.PushReporterV2, newClient func() (*libaudit.AuditClient, error), interval time.Duration) {
+	client, err := newClient()
+	if err != nil {
+		err = fmt.Errorf("failed to create audit client for lost event monitoring: %w", err)
+		reporter.Error(err)
+		ms.log.Errorw("Failure creating audit monitoring client", "error", err)
+		return
+	}
+	// client is replaced below, so close whichever one is current on return.
+	defer func() {
+		if client != nil {
+			client.Close()
+		}
+	}()
+
+	timer := time.NewTicker(interval)
+	defer timer.Stop()
+	for {
+		select {
+		case <-reporter.Done():
+			return
+		case <-timer.C:
+			status, err := client.GetStatus()
+			if err == nil {
+				ms.updateKernelLostMetric(status.Lost)
+				continue
+			}
+			ms.log.Errorw("Failure getting audit status for lost event monitoring", "error", err)
+			client.Close()
+			client, err = newClient()
+			if err != nil {
+				err = fmt.Errorf("failed to create audit client for lost event monitoring: %w", err)
+				ms.log.Errorw("Failure creating audit monitoring client", "error", err)
+				reporter.Error(err)
+				return
+			}
+		}
+	}
+}
+
 func (ms *MetricSet) updateKernelLostMetric(lost uint32) {
 	if !ms.kernelLost.enabled {
 		return
@@ -456,6 +468,10 @@ func (ms *MetricSet) updateKernelLostMetric(lost uint32) {
 		ms.log.Warnf("kernel lost event counter reset from %d to %d", ms.kernelLost.counter, lost)
 	}
 	ms.kernelLost.counter = lost
+}
+
+func newMonitorClient() (*libaudit.AuditClient, error) {
+	return libaudit.NewAuditClient(nil)
 }
 
 func (ms *MetricSet) receiveEvents(done <-chan struct{}) (<-chan []*auparse.AuditMessage, error) {
