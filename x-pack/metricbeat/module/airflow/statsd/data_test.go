@@ -19,8 +19,8 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/statsd/server"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {

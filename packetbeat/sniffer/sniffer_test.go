@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/decoder"
 	"github.com/elastic/beats/v7/packetbeat/flows"
 	"github.com/elastic/beats/v7/packetbeat/protos"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 func TestSniffer_afpacketComputeSize(t *testing.T) {

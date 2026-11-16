@@ -18,7 +18,7 @@
 package icmp
 
 import (
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 )
 
 // destinations returns the hosts of the monitor. ICMP sends no configured

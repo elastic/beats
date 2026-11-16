@@ -15,9 +15,9 @@ import (
 
 	"go.yaml.in/yaml/v3"
 
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/lumberjack"
 	"github.com/elastic/mito/lib"
 )
@@ -190,11 +190,10 @@ func defaultConfig() config {
 				WaitMin:     &waitMin,
 				WaitMax:     &waitMax,
 			},
-			RedirectFollow:           true,
-			RedirectForwardHeaders:   false,
-			RedirectSensitiveHeaders: []string{"Authorization", "Proxy-Authorization", "Cookie"},
-			RedirectMaxRedirects:     10,
-			Transport:                transport,
+			RedirectFollow:         true,
+			RedirectForwardHeaders: false,
+			RedirectMaxRedirects:   10,
+			Transport:              transport,
 		},
 	}
 }

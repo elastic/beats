@@ -105,3 +105,38 @@ func TestProperlyIgnoresValuesFromResponse(t *testing.T) {
 func TestProperlyHandlesMultiResponse(t *testing.T) {
 	metricset.RunTestsForServerlessMetricSetWithGlobFiles(t, "./_meta/test/tasks.multi.*.json", TasksMetricSet, eventsMapping, expectValidParsedMultiTasks)
 }
+
+// Tests that a running snapshot-create task is reported as a single event with its action, description and timing intact
+func expectValidParsedSnapshotTask(taskId string, description string, runningTimeInNanos int64) func(*testing.T, metricset.FetcherData[GroupedTasks]) {
+	return func(t *testing.T, data metricset.FetcherData[GroupedTasks]) {
+		require.NoError(t, data.Error, "snapshot response should parse without error")
+		require.Equal(t, 0, len(data.Reporter.GetErrors()), "snapshot response should not report errors")
+
+		events := data.Reporter.GetEvents()
+
+		require.Equal(t, 1, len(events), "a snapshot task over the threshold should produce exactly one event")
+
+		event := events[0]
+
+		auto_ops_testing.CheckEventWithoutTransactionId(t, event, data.ClusterInfo)
+
+		require.Equal(t, taskId, auto_ops_testing.GetObjectValue(event.MetricSetFields, "task.task_id"))
+		require.Equal(t, "transport", auto_ops_testing.GetObjectValue(event.MetricSetFields, "task.task_type"))
+		require.Equal(t, "cluster:admin/snapshot/create", auto_ops_testing.GetObjectValue(event.MetricSetFields, "task.action"))
+		require.Equal(t, description, auto_ops_testing.GetObjectValue(event.MetricSetFields, "task.description"))
+		require.EqualValues(t, runningTimeInNanos, auto_ops_testing.GetObjectValue(event.MetricSetFields, "task.running_time_in_nanos"))
+		require.Equal(t, false, auto_ops_testing.GetObjectValue(event.MetricSetFields, "task.cancellable"))
+	}
+}
+
+// Expect a running SLM snapshot to create an event
+func TestProperlyHandlesSnapshotSLMResponse(t *testing.T) {
+	metricset.RunTestsForServerlessMetricSetWithGlobFiles(t, "./_meta/test/tasks.snapshot_slm.*.json", TasksMetricSet, eventsMapping,
+		expectValidParsedSnapshotTask("GKfQWFJxTaikL5NG2a5XTQ:35965", "snapshot [fixture-repo:fixture-slm-2026.10.26-tteojpfaqjmggwvb8w1wlg]", 70123456789))
+}
+
+// Expect a running manual snapshot with wait_for_completion=true to create an event
+func TestProperlyHandlesSnapshotSyncResponse(t *testing.T) {
+	metricset.RunTestsForServerlessMetricSetWithGlobFiles(t, "./_meta/test/tasks.snapshot_sync.*.json", TasksMetricSet, eventsMapping,
+		expectValidParsedSnapshotTask("GKfQWFJxTaikL5NG2a5XTQ:37250", "snapshot [fixture-repo:manual-sync]", 85234567890))
+}

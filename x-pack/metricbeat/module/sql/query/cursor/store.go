@@ -13,7 +13,7 @@ import (
 	"github.com/cespare/xxhash/v2"
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // StateVersion is the current version of the state format.

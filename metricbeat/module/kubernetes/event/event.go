@@ -26,10 +26,10 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/safemapstr"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/safemapstr"
 )
 
 // init registers the MetricSet with the central registry.
@@ -51,8 +51,8 @@ type MetricSet struct {
 }
 
 // dedotConfig defines LabelsDedot and AnnotationsDedot.
-// If set to true, replace dots in labels with `_`.
-// Default to be true.
+// If set to true, replace dots in labels and annotations with `_`.
+// Defaults to true.
 type dedotConfig struct {
 	LabelsDedot      bool `config:"labels.dedot"`
 	AnnotationsDedot bool `config:"annotations.dedot"`

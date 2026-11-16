@@ -17,8 +17,8 @@ Builds and runs unit tests for **metricbeat** on the configured macOS runner usi
 ## When it runs
 
 - `workflow_dispatch`.
-- `pull_request`: paths: `["metricbeat/**", "go.mod", "dev-tools/**", "libbeat/**", ".github/workflows/metricbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
-- `push`: branches: `["main"]`; paths: `["metricbeat/**", "go.mod", "dev-tools/**", "libbeat/**", ".github/workflows/metricbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `pull_request`: paths: `["metricbeat/**", "go.mod", "dev-tools/**", "libbeat/**", "pkg/systemmetrics/**", ".github/workflows/metricbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `push`: branches: `["main"]`; paths: `["metricbeat/**", "go.mod", "dev-tools/**", "libbeat/**", "pkg/systemmetrics/**", ".github/workflows/metricbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
 
 ## Execution flow
 

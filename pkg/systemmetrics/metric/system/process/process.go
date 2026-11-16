@@ -30,12 +30,12 @@ import (
 
 	psutil "github.com/shirou/gopsutil/v4/process"
 
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/opt"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/network"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/opt"
-	"github.com/elastic/elastic-agent-libs/transform/typeconv"
+	"github.com/elastic/beats/v7/pkg/transform/typeconv"
 	"github.com/elastic/go-sysinfo"
 	sysinfotypes "github.com/elastic/go-sysinfo/types"
 )

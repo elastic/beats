@@ -26,9 +26,9 @@ import (
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
 	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func TestFieldMatcher(t *testing.T) {

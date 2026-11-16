@@ -17,7 +17,7 @@
     #var.session_token: session_token
 
     # Maximum duration before AWS API request will be interrupted
-    # Default to be 120s
+    # Defaults to 120s
     #var.api_timeout: 120s
 
     # Custom endpoint used to access AWS APIs

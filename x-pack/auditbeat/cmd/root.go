@@ -10,9 +10,9 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	auditbeatcmd "github.com/elastic/beats/v7/auditbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd"

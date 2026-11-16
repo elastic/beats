@@ -27,7 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/packetbeat/flows"
 	"github.com/elastic/beats/v7/packetbeat/protos"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"

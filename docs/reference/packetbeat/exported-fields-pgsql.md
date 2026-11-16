@@ -27,10 +27,10 @@ PostgreSQL-specific event fields.
 
 
 **`pgsql.num_fields`**
-:   If the SELECT query if successful, this field is set to the number of fields returned.
+:   If the SELECT query is successful, this field is set to the number of fields returned.
 
 
 **`pgsql.num_rows`**
-:   If the SELECT query if successful, this field is set to the number of rows returned.
+:   If the SELECT query is successful, this field is set to the number of rows returned.
 
 

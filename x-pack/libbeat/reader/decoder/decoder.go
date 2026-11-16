@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // decoder is an interface for decoding data from an io.Reader.

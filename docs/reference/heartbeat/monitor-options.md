@@ -159,7 +159,7 @@ Each `secret_stores` entry takes these options:
 :   The name that references use to select this entry, as in `vault://prod@my-app/api#token`. Names must be unique.
 
 `address`
-:   The URL of the Vault server.
+:   The URL of the Vault server. Non-loopback addresses must use `https`. Plain HTTP is allowed only for `localhost`, IPv4 addresses in `127.0.0.0/8`, and the IPv6 address `::1`.
 
 `namespace`
 :   (Optional) The Vault Enterprise namespace.
@@ -174,7 +174,7 @@ Each `secret_stores` entry takes these options:
     * `approle`: AppRole credentials: `role_id`, `secret_id`, and optionally `mount_path`, which defaults to `approle`.
 
 `ssl`
-:   (Optional) TLS settings of the connection to Vault, such as `certificate_authorities` to trust a private CA. They only apply to Vault: the `ssl` settings of the monitor apply to the monitored host. See [SSL](/reference/heartbeat/configuration-ssl.md) for the available settings.
+:   (Optional) TLS settings of the connection to Vault. You can set `certificate_authorities` to trust a private CA. For a non-loopback Vault address, `verification_mode` must be `full` (the default) or `strict`. These settings only apply to Vault: the `ssl` settings of the monitor apply to the monitored host. See [SSL](/reference/heartbeat/configuration-ssl.md) for the available settings.
 
 `allowed_hosts`
 :   (Optional) The hosts that the secrets of this connection can be sent to, as host names or IP addresses, without scheme, port, or path. Refer to [Restrict the hosts that receive secrets](#monitor-secret-stores-allowed-hosts). If you don't set this option, or set it to an empty list, any host can receive the secrets.

@@ -1,0 +1,66 @@
+[
+  {
+    "@timestamp": "2020-02-26T09:38:01.0000000Z",
+    "event": {
+      "action": "Pipeline Execution Details",
+      "code": "800",
+      "kind": "event",
+      "provider": "PowerShell"
+    },
+    "host": {
+      "name": "vagrant-2019"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "Pipeline execution details for command line: Get-Date -Format yyyy-MM-dd. \n\nContext Information: \n\tDetailSequence=1\n\tDetailTotal=1\n\n\tSequenceNumber=18\n\n\tUserId=VAGRANT-2019\\vagrant\n\tHostName=ConsoleHost\n\tHostVersion=5.1.17763.1007\n\tHostId=ac3c99ce-7983-4996-807e-6a689eaba50b\n\tHostApplication=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\n\tEngineVersion=5.1.17763.1007\n\tRunspaceId=6a447a2c-693e-4d41-948d-129b455b2569\n\tPipelineId=1\n\tScriptName=\n\tCommandLine=Get-Date -Format yyyy-MM-dd\n \n\nDetails: \nCommandInvocation(Get-Date): \"Get-Date\"\nParameterBinding(Get-Date): Name=\"Format\"; Wert=\"yyyy-MM-dd\"",
+    "winlog": {
+      "channel": "Windows PowerShell",
+      "computer_name": "vagrant-2019",
+      "event_data": {
+        "param1": "Get-Date -Format yyyy-MM-dd",
+        "param2": "\tDetailSequence=1\n\tDetailTotal=1\n\n\tSequenceNumber=18\n\n\tUserId=VAGRANT-2019\\vagrant\n\tHostName=ConsoleHost\n\tHostVersion=5.1.17763.1007\n\tHostId=ac3c99ce-7983-4996-807e-6a689eaba50b\n\tHostApplication=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\n\tEngineVersion=5.1.17763.1007\n\tRunspaceId=6a447a2c-693e-4d41-948d-129b455b2569\n\tPipelineId=1\n\tScriptName=\n\tCommandLine=Get-Date -Format yyyy-MM-dd",
+        "param3": "CommandInvocation(Get-Date): \"Get-Date\"\nParameterBinding(Get-Date): Name=\"Format\"; Wert=\"yyyy-MM-dd\""
+      },
+      "event_id": "800",
+      "keywords": [
+        "Classic"
+      ],
+      "provider_name": "PowerShell",
+      "record_id": 192,
+      "task": "Pipeline Execution Details"
+    }
+  },
+  {
+    "@timestamp": "2020-02-26T09:38:02.0000000Z",
+    "event": {
+      "action": "Pipeline Execution Details",
+      "code": "800",
+      "kind": "event",
+      "provider": "PowerShell"
+    },
+    "host": {
+      "name": "vagrant-2019"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "Pipeline execution details for command line: Write-Output hello. \n\nContext Information: \n\tDetailSequence=1\n\tDetailTotal=1\n\n\tSequenceNumber=19\n\n\tUserId=VAGRANT-2019\\vagrant\n\tHostName=ConsoleHost\n\tHostVersion=5.1.17763.1007\n\tHostId=ac3c99ce-7983-4996-807e-6a689eaba50b\n\tHostApplication=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\n\tEngineVersion=5.1.17763.1007\n\tRunspaceId=6a447a2c-693e-4d41-948d-129b455b2569\n\tPipelineId=1\n\tScriptName=\n\tCommandLine=Write-Output hello\n \n\nDetails: \nCommandInvocation(Write-Output): \"Write-Output\"\nParameterBinding(Write-Output): unexpected format\nParameterBinding(Write-Output):",
+    "winlog": {
+      "channel": "Windows PowerShell",
+      "computer_name": "vagrant-2019",
+      "event_data": {
+        "param1": "Write-Output hello",
+        "param2": "\tDetailSequence=1\n\tDetailTotal=1\n\n\tSequenceNumber=19\n\n\tUserId=VAGRANT-2019\\vagrant\n\tHostName=ConsoleHost\n\tHostVersion=5.1.17763.1007\n\tHostId=ac3c99ce-7983-4996-807e-6a689eaba50b\n\tHostApplication=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\n\tEngineVersion=5.1.17763.1007\n\tRunspaceId=6a447a2c-693e-4d41-948d-129b455b2569\n\tPipelineId=1\n\tScriptName=\n\tCommandLine=Write-Output hello",
+        "param3": "CommandInvocation(Write-Output): \"Write-Output\"\nParameterBinding(Write-Output): unexpected format\nParameterBinding(Write-Output):"
+      },
+      "event_id": "800",
+      "keywords": [
+        "Classic"
+      ],
+      "provider_name": "PowerShell",
+      "record_id": 193,
+      "task": "Pipeline Execution Details"
+    }
+  }
+]

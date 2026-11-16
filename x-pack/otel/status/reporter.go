@@ -7,8 +7,7 @@ package status
 import (
 	"errors"
 	"sync"
-
-	"go.opentelemetry.io/collector/pdata/pcommon"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
 
@@ -16,20 +15,29 @@ import (
 	"go.opentelemetry.io/collector/component/componentstatus"
 )
 
-const inputStatusAttributesKey = "inputs"
+// InputStatusAttributesKey is the event attribute holding the status of each
+// runner. Only events aggregated from runner statuses carry it; events from
+// RunnerReporter.UpdateStatus, which report the status of the whole group,
+// never do.
+const InputStatusAttributesKey = "inputs"
 
 type runnerState struct {
 	state status.Status
 	msg   string
 }
 
-// toPdata converts a runnerState to a pdata.Map
+// Equals reports whether both states have the same status and message.
+func (r *runnerState) Equals(other *runnerState) bool {
+	return r.state == other.state && r.msg == other.msg
+}
+
+// raw converts a runnerState to the map reported for its input.
 // The format is the same as the healthcheckv2 extension
-func toPdata(r *runnerState) pcommon.Map {
-	pcommonMap := pcommon.NewMap()
-	pcommonMap.PutStr("status", beatStatusToOtelStatus(r.state).String())
-	pcommonMap.PutStr("error", r.msg)
-	return pcommonMap
+func (r *runnerState) raw() map[string]any {
+	return map[string]any{
+		"status": beatStatusToOtelStatus(r.state).String(),
+		"error":  r.msg,
+	}
 }
 
 // RunnerReporter defines an interface that returns a StatusReporter for a specific runner.
@@ -41,10 +49,25 @@ type RunnerReporter interface {
 	UpdateStatus(status status.Status, msg string)
 }
 
+// reportInterval is the minimum time between two status reports aggregated from
+// the runners. Each report carries the status of every runner, so reporting
+// every change made a burst of changes, like starting many runners, quadratic.
+// A change after a quiet interval is reported right away; changes within the
+// interval are coalesced into one report at its end.
+const reportInterval = 500 * time.Millisecond
+
 type reporter struct {
 	runnerStates map[string]*runnerState
 	host         component.Host
 	mtx          sync.Mutex
+
+	interval   time.Duration
+	lastReport time.Time
+	// pending is the report scheduled at the end of the current interval, if any.
+	pending *time.Timer
+	// dirty is set when a runner status changed since the last report. A
+	// scheduled report is skipped if a newer report made it redundant.
+	dirty bool
 }
 
 // NewGroupStatusReporter creates a reporter that aggregates the statuses of multiple runners
@@ -52,9 +75,14 @@ type reporter struct {
 // This is needed because multiple modules can report different statuses, and we want to avoid
 // repeatedly flipping the parent's status.
 func NewGroupStatusReporter(host component.Host) RunnerReporter {
+	return newGroupStatusReporter(host, reportInterval)
+}
+
+func newGroupStatusReporter(host component.Host, interval time.Duration) *reporter {
 	return &reporter{
 		host:         host,
 		runnerStates: make(map[string]*runnerState),
+		interval:     interval,
 	}
 }
 
@@ -73,20 +101,47 @@ func (r *reporter) updateStatusForRunner(id string, state status.Status, msg str
 	if r.runnerStates == nil {
 		r.runnerStates = make(map[string]*runnerState)
 	}
+	newState := runnerState{state: state, msg: msg}
 	if rState, ok := r.runnerStates[id]; ok {
-		rState.msg = msg
-		rState.state = state
+		if rState.Equals(&newState) {
+			return
+		}
+		*rState = newState
 	} else {
 		// add status for the runner to the map, if not preset
-		r.runnerStates[id] = &runnerState{
-			state: state,
-			msg:   msg,
-		}
+		r.runnerStates[id] = &newState
 	}
 
 	// report aggregated status for all sub-components
-	evt := r.calculateOtelStatus()
-	componentstatus.ReportStatus(r.host, evt)
+	r.dirty = true
+	r.reportLocked()
+}
+
+// reportLocked reports the aggregated status of the runners now, or at the end
+// of the current interval if a report was sent recently. r.mtx must be held.
+func (r *reporter) reportLocked() {
+	if r.pending != nil {
+		// the scheduled report will include this change
+		return
+	}
+	if wait := r.interval - time.Since(r.lastReport); wait > 0 {
+		r.pending = time.AfterFunc(wait, func() {
+			r.mtx.Lock()
+			defer r.mtx.Unlock()
+			r.pending = nil
+			if r.dirty {
+				r.sendLocked()
+			}
+		})
+		return
+	}
+	r.sendLocked()
+}
+
+func (r *reporter) sendLocked() {
+	r.dirty = false
+	r.lastReport = time.Now()
+	componentstatus.ReportStatus(r.host, r.calculateOtelStatus())
 }
 
 // UpdateStatus reports the overall status of the group.
@@ -102,6 +157,12 @@ func (r *reporter) UpdateStatus(status status.Status, msg string) {
 		eventBuilderOpts = append(eventBuilderOpts, componentstatus.WithError(errors.New(msg)))
 	}
 	evt := componentstatus.NewEvent(otelStatus, eventBuilderOpts...)
+
+	r.mtx.Lock()
+	defer r.mtx.Unlock()
+	// a scheduled report would override this status with runner statuses older
+	// than it; only runner changes made after it should be reported
+	r.dirty = false
 	componentstatus.ReportStatus(r.host, evt)
 }
 
@@ -119,12 +180,14 @@ func (r *reporter) calculateOtelStatus() *componentstatus.Event {
 	}
 	evt = componentstatus.NewEvent(otelStatus, eventBuilderOpts...)
 
-	inputStatusesPdata := evt.Attributes().PutEmptyMap(inputStatusAttributesKey)
-
+	// Build the map in one pass: PutEmptyMap looks the key up linearly, which is
+	// quadratic in the number of runners.
+	inputStatuses := make(map[string]any, len(r.runnerStates))
 	for id, rs := range r.runnerStates {
-		inputStatePdata := toPdata(rs)
-		m := inputStatusesPdata.PutEmptyMap(id)
-		inputStatePdata.MoveTo(m)
+		inputStatuses[id] = rs.raw()
+	}
+	if err := evt.Attributes().PutEmptyMap(InputStatusAttributesKey).FromRaw(inputStatuses); err != nil {
+		return nil
 	}
 
 	return evt

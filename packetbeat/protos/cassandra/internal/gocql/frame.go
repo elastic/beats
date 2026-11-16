@@ -24,7 +24,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 var (
@@ -386,6 +386,9 @@ func (f *Framer) parseResultMetadata(getPKinfo bool) map[string]any {
 		// only for prepared result
 		if f.proto >= protoVersion4 {
 			pkeyCount := decoder.ReadInt()
+			if pkeyCount < 0 || pkeyCount > maxPkeyCount {
+				panic(fmt.Errorf("invalid pkey count: %d", pkeyCount))
+			}
 			pkeys := make([]int, pkeyCount)
 			for i := range pkeyCount {
 				pkeys[i] = int(decoder.ReadShort())

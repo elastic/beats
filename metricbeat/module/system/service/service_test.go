@@ -27,7 +27,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 var exampleUnits = []dbus.UnitStatus{

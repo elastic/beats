@@ -18,17 +18,20 @@
 package log
 
 import (
+	"maps"
+	"slices"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 var (
@@ -182,6 +185,72 @@ func TestZeroPeriodConfig(t *testing.T) {
 	assert.Equal(t, time.Duration(0), reporter.Period)
 }
 
+func TestMakeReporterNamespaces(t *testing.T) {
+	for _, tc := range []struct {
+		name               string
+		cfg                map[string]any
+		bm                 beatmonitoring.Monitoring
+		want               []string
+		expectWarnLog      bool
+		expectedWarnLogMsg string
+	}{
+		{
+			name: "default logs only metrics",
+			cfg:  map[string]any{},
+			bm:   beatmonitoring.NewMonitoring(),
+			want: []string{"metrics"},
+		},
+		{
+			name: "dataset is opt-in",
+			cfg: map[string]any{
+				"namespaces": []string{"stats", "dataset"},
+			},
+			bm:   beatmonitoring.NewMonitoring(),
+			want: []string{"metrics", "dataset"},
+		},
+		{
+			name: "unknown namespace ignored",
+			cfg: map[string]any{
+				"namespaces": []string{"stats", "bogus"},
+			},
+			bm:                 beatmonitoring.NewMonitoring(),
+			want:               []string{"metrics"},
+			expectWarnLog:      true,
+			expectedWarnLogMsg: "Ignoring unknown namespace \"bogus\" in logging.metrics.namespaces",
+		},
+		{
+			name: "nil beatmonitoring returns default 'metrics' registry",
+			cfg: map[string]any{
+				"namespaces": []string{"stats"},
+			},
+			bm:            beatmonitoring.Monitoring{},
+			want:          nil,
+			expectWarnLog: false,
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			logger, zapLogs := logptest.NewTestingLoggerWithObserver(t, "")
+			rep, err := MakeReporter(beat.Info{Logger: logger}, conf.MustNewConfigFrom(tc.cfg), tc.bm)
+			require.NoError(t, err)
+			r, ok := rep.(*Reporter)
+			require.True(t, ok)
+			defer r.Stop()
+
+			assert.ElementsMatch(t, tc.want, slices.Collect(maps.Keys(r.registries)))
+
+			const warningSnippet = "Ignoring unknown namespace"
+			warnings := zapLogs.FilterMessageSnippet(warningSnippet)
+			if tc.expectWarnLog {
+				if assert.Equal(t, 1, warnings.Len(), "expected exactly one warning msg") {
+					assert.Equal(t, tc.expectedWarnLogMsg, warnings.All()[0].Message)
+				}
+			} else {
+				assert.Zero(t, warnings.Len(), "didn't expect a warning log")
+			}
+		})
+	}
+}
+
 func assertMapHas(t *testing.T, m map[string]any, key string, expectedValue any) {
 	t.Helper()
 	v, err := mapstr.M(m).GetValue(key)
@@ -189,4 +258,39 @@ func assertMapHas(t *testing.T, m map[string]any, key string, expectedValue any)
 		t.Fatal(err)
 	}
 	assert.EqualValues(t, expectedValue, v)
+}
+
+func TestReporterExtraMetrics(t *testing.T) {
+	reg := monitoring.NewRegistry()
+	monitoring.NewInt(reg, "own").Set(1)
+	monitoring.NewString(reg, "shared").Set("receiver")
+
+	extraCalls := 0
+	r := &Reporter{extraMetrics: func() monitoring.FlatSnapshot {
+		extraCalls++
+		s := monitoring.MakeFlatSnapshot()
+		s.Ints["beat.memstats.rss"] = 42
+		s.Strings["shared"] = "extra"
+		return s
+	}}
+
+	snap := r.snapshot("metrics", reg)
+	assert.EqualValues(t, 1, snap.Ints["own"], "registry metric kept")
+	assert.EqualValues(t, 42, snap.Ints["beat.memstats.rss"], "extra metric merged")
+	assert.Equal(t, "receiver", snap.Strings["shared"], "extra must not overwrite registry metrics")
+
+	snap = r.snapshot("info", reg)
+	assert.NotContains(t, snap.Ints, "beat.memstats.rss", "extra only applies to the metrics namespace")
+	assert.Equal(t, 1, extraCalls, "extra is only called for the metrics namespace")
+}
+
+func TestExtraMetricsNotCalledWhenDisabled(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	cfg := conf.MustNewConfigFrom(map[string]any{"period": 0})
+	called := false
+	r, err := MakeReporter(beat.Info{Logger: logger}, cfg, beatmonitoring.NewGlobalMonitoring(),
+		WithExtraMetrics(func() monitoring.FlatSnapshot { called = true; return monitoring.MakeFlatSnapshot() }))
+	require.NoError(t, err, "making the reporter should succeed")
+	r.Stop()
+	assert.False(t, called, "extra metrics must not be collected when metrics logging is disabled")
 }

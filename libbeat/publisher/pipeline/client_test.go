@@ -37,11 +37,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 func makePipeline(t *testing.T, settings Settings, qu queue.Queue[publisher.Event]) *Pipeline {
@@ -65,14 +65,14 @@ func makePipeline(t *testing.T, settings Settings, qu queue.Queue[publisher.Even
 
 func TestClient(t *testing.T) {
 	t.Run("client close", func(t *testing.T) {
-		// Note: no asserts. If closing fails we have a deadlock, because Publish
-		// would block forever
+		// Note: no asserts. The test deadlocks unless Close and a concurrent
+		// Publish, which may be blocked in the queue, both return once the
+		// pipeline disconnects.
 
 		routinesChecker := resources.NewGoroutinesChecker()
 		defer routinesChecker.Check(t)
 
 		pipeline := makePipeline(t, Settings{}, makeTestQueue())
-		defer func() { _ = pipeline.Disconnect(t.Context()) }()
 
 		client, err := pipeline.ConnectWith(beat.ClientConfig{})
 		if err != nil {
@@ -83,13 +83,22 @@ func TestClient(t *testing.T) {
 		wg.Go(func() {
 			client.Publish(beat.Event{})
 		})
+		wg.Go(func() {
+			client.Close()
+		})
 
-		client.Close()
+		// If Publish reaches the queue first, it blocks there holding the
+		// client mutex, and Close waits for it. Only closing the queue
+		// releases it, as with a full memqueue.
+		_ = pipeline.Disconnect(t.Context())
 		wg.Wait()
 	})
 
 	t.Run("no infinite loop when processing fails", func(t *testing.T) {
-		l := logptest.NewTestingLogger(t, "")
+		// The queue's ack loop can still be logging after the test ends, and
+		// nothing outside memqueue can wait for it: Done signals cancellation,
+		// not worker exit. Use a nop logger so it never writes through t.
+		l := logp.NewNopLogger()
 
 		// a small in-memory queue with a very short flush interval
 		q := memqueue.NewQueue[publisher.Event](l, nil, memqueue.Settings{

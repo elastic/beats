@@ -28,6 +28,7 @@ import (
 	"go.opentelemetry.io/collector/confmap"
 
 	"github.com/elastic/beats/v7/filebeat/config"
+	"github.com/elastic/beats/v7/filebeat/registrar"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -35,8 +36,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/es"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/otelstorage"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/paths"
 )
 
 var (
@@ -81,6 +82,11 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 
 	shared, ok := globalStores[key]
 	if !ok {
+		// Migrate only on first open: the shared store may be writing.
+		if err := registrar.NewMigrator(cfg, logger, info.Paths).Run(); err != nil {
+			return nil, fmt.Errorf("failed to migrate registry file: %w", err)
+		}
+
 		var (
 			reg backend.Registry
 			err error
