@@ -208,8 +208,6 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		bt.monitorFactory = bt.otelStatusFactoryWrapper(invalidMonitorFactory{RunnerFactory: bt.monitorFactory, logger: bt.logger})
 	}
 
-	waitMonitors := monitors.NewSignalWait()
-
 	// It is important this appear before we check for run once mode
 	// In run once mode we depend on these monitors being loaded, but not other more
 	// dynamic types.
@@ -218,10 +216,6 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		return err
 	}
 	defer stopStaticMonitors()
-
-	if bt.config.RunOnce {
-		waitMonitors.Add(monitors.WithLog(sched.WaitForRunOnce, "Ending run_once run.", bt.logger))
-	}
 
 	if b.Manager.ConfigFromControlProtocol() {
 		bt.RunCentralMgmtMonitors(b)
@@ -252,9 +246,16 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		defer bt.autodiscover.Stop()
 	}
 
-	// Wait until run_once ends or bt is being shut down
-	waitMonitors.AddChan(bt.done)
-	waitMonitors.Wait()
+	// Wait until run_once ends or bt is being shut down. Outside of run_once
+	// only bt.done can end the wait, so don't spend goroutines on a signalWait.
+	if bt.config.RunOnce {
+		waitMonitors := monitors.NewSignalWait()
+		waitMonitors.Add(monitors.WithLog(sched.WaitForRunOnce, "Ending run_once run.", bt.logger))
+		waitMonitors.AddChan(bt.done)
+		waitMonitors.Wait()
+	} else {
+		<-bt.done
+	}
 
 	bt.logger.Info("Shutting down, waiting for output to complete")
 
