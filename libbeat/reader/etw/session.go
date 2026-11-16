@@ -164,13 +164,12 @@ func newSessionProperties(sessionName string, conf Config) *EventTraceProperties
 	// to any one session enabled for its provider is not written to any of
 	// them, so a full session elsewhere (for example the event log session
 	// of an analytic channel) drops events from this one.
-	// STOP_ON_HYBRID_SHUTDOWN is set explicitly rather than leaving ETW to
-	// choose a default; the session belongs to this process and is
-	// recreated on start.
+	// No hybrid shutdown flag is set: ETW then keeps the session through a
+	// hybrid shutdown when the caller runs in Session 0, as a service does
+	// and its consumer survives, and stops it otherwise.
 	// See https://learn.microsoft.com/en-us/windows/win32/etw/logging-mode-constants
 	sessionProperties.LogFileMode = EVENT_TRACE_REAL_TIME_MODE |
-		EVENT_TRACE_INDEPENDENT_SESSION_MODE |
-		EVENT_TRACE_STOP_ON_HYBRID_SHUTDOWN
+		EVENT_TRACE_INDEPENDENT_SESSION_MODE
 	sessionProperties.LogFileNameOffset = 0 // Can be specified to log to a file as well as to a real-time session
 	if conf.BufferSize == 0 {
 		conf.BufferSize = 64 // Default buffer size if not specified
