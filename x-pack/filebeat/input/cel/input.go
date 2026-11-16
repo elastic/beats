@@ -38,10 +38,10 @@ import (
 	"go.uber.org/zap/zapcore"
 	"golang.org/x/time/rate"
 
-	"github.com/google/cel-go/cel"
-	"github.com/google/cel-go/common/decls"
-	"github.com/google/cel-go/common/types"
-	"github.com/google/cel-go/ext"
+	"cel.dev/cel-go/cel"
+	"cel.dev/cel-go/common/decls"
+	"cel.dev/cel-go/common/types"
+	"cel.dev/cel-go/ext"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -50,15 +50,15 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
+	"github.com/elastic/beats/v7/pkg/transport"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/transport"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 	"github.com/elastic/mito/lib"
@@ -465,7 +465,8 @@ func (s *runSession) runCycle(ctx context.Context) error {
 			return err
 		}
 		if result.action.retry() {
-			continue
+			// If we hit a 429, try again subject to budget limits.
+			goto nextTry
 		}
 
 		// Empty or nil events finish the execution without setting runSpan status.
@@ -477,6 +478,7 @@ func (s *runSession) runCycle(ctx context.Context) error {
 			okSpans(runSpan)
 			return nil
 		}
+	nextTry:
 		budget--
 		if budget <= 0 {
 			msg := "reached maximum number of CEL executions"
@@ -658,6 +660,9 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 		errorSpans(err, execSpan)
 		return result, err
 	}
+	// Drop events from state when we're done. If we fail
+	// during the publication, we will re-request these events.
+	defer delete(s.state, "events")
 
 	if s.emitter.hadCursor {
 		var n int
@@ -728,9 +733,6 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 	s.metrics.AddReceivedEvents(execCtx, uint(len(events)))
 	result.eventCount = len(events)
 	execSpan.SetAttributes(attribute.Int("cel.program.event_count", len(events)))
-	// Drop events from state. If we fail during the publication,
-	// we will re-request these events.
-	delete(s.state, "events")
 
 	// Get cursors if they exist.
 	var (
@@ -1143,6 +1145,8 @@ func handleRateLimit(log *logp.Logger, rateLimit map[string]any, header http.Hea
 				}
 				limiter.SetLimitAt(waitUntil, next)
 				limiter.SetBurstAt(waitUntil, burst)
+			case nil:
+				log.Errorw("unexpected nil returned for rate limit reset", "rate_limit", mapstr.M(rateLimit))
 			default:
 				log.Errorw("unexpected type returned for rate limit reset", "type", reflect.TypeOf(w).String(), "rate_limit", mapstr.M(rateLimit))
 			}
@@ -1176,6 +1180,8 @@ func getLimit(which string, rateLimit map[string]any, log *logp.Logger) (limit r
 			return limit, false
 		}
 		limit = rate.Inf
+	case nil:
+		log.Errorw("unexpected nil returned for rate limit "+which, "rate_limit", mapstr.M(rateLimit))
 	default:
 		log.Errorw("unexpected type returned for rate limit "+which, "type", reflect.TypeOf(r).String(), "rate_limit", mapstr.M(rateLimit))
 	}
@@ -1277,6 +1283,9 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 			Backoff:      retryablehttp.DefaultBackoff,
 			ErrorHandler: retryErrorHandler(maxAttempts, log),
 		}).StandardClient()
+		// The retrying client returns redirect responses that the inner
+		// client declined to follow, so the outer client needs the policy too.
+		c.CheckRedirect = checkRedirect(cfg.Resource, log)
 	}
 
 	c.Transport = userAgentDecorator{
@@ -1332,8 +1341,8 @@ func getResourceAttributes(env v2.Context, cfg config) []attribute.KeyValue {
 		seen[attr.Key] = true
 	}
 
-	pairs := strings.Split(attributes, ",")
-	for _, pair := range pairs {
+	pairs := strings.SplitSeq(attributes, ",")
+	for pair := range pairs {
 		key, val, ok := strings.Cut(pair, "=")
 		if !ok || key == "" || seen[attribute.Key(key)] {
 			continue
@@ -1405,6 +1414,10 @@ func (d socketDialer) DialContext(ctx context.Context, _, _ string) (net.Conn, e
 func checkRedirect(cfg *ResourceConfig, log *logp.Logger) func(*http.Request, []*http.Request) error {
 	return func(req *http.Request, via []*http.Request) error {
 		log.Debug("http client: checking redirect")
+		if !cfg.RedirectFollow {
+			log.Debug("http client: not following redirect")
+			return http.ErrUseLastResponse
+		}
 		if len(via) >= cfg.RedirectMaxRedirects {
 			log.Debug("http client: max redirects exceeded")
 			return fmt.Errorf("stopped after %d redirects", cfg.RedirectMaxRedirects)
@@ -1417,11 +1430,11 @@ func checkRedirect(cfg *ResourceConfig, log *logp.Logger) func(*http.Request, []
 
 		prev := via[len(via)-1] // previous request to get headers from
 
-		log.Debugf("http client: forwarding headers from previous request: %#v", prev.Header)
+		log.Debugf("http client: forwarding headers from previous request: %v", slices.Sorted(maps.Keys(prev.Header)))
 		req.Header = prev.Header.Clone()
 
 		if req.URL.Host != prev.URL.Host || (prev.URL.Scheme == "https" && req.URL.Scheme == "http") {
-			for _, k := range cfg.RedirectSensitiveHeaders {
+			for _, k := range sensitiveHeaders(cfg.RedirectSensitiveHeaders) {
 				log.Debugf("http client: cross-origin redirect to %s: removing sensitive header %s", req.URL.Host, k)
 				req.Header.Del(k)
 			}
@@ -1434,6 +1447,22 @@ func checkRedirect(cfg *ResourceConfig, log *logp.Logger) func(*http.Request, []
 
 		return nil
 	}
+}
+
+// defaultSensitiveHeaders are removed on cross-origin redirects when
+// redirect.sensitive_headers is not configured. The default is applied here
+// rather than in defaultConfig because go-ucfg merges a configured list into
+// a default list element by element, so a configured list could not replace
+// the defaults and an empty list could not disable them.
+var defaultSensitiveHeaders = []string{"Authorization", "Proxy-Authorization", "Cookie"}
+
+// sensitiveHeaders returns the configured headers, or the defaults if the
+// option is unset. An empty, non-nil list disables stripping.
+func sensitiveHeaders(configured []string) []string {
+	if configured == nil {
+		return defaultSensitiveHeaders
+	}
+	return configured
 }
 
 // retryErrorHandler returns a retryablehttp.ErrorHandler that will log retry resignation
@@ -1499,7 +1528,7 @@ func regexpsFromConfig(cfg config) (map[string]*regexp.Regexp, error) {
 
 var (
 	// mimetypes holds supported MIME type mappings.
-	mimetypes = map[string]interface{}{
+	mimetypes = map[string]any{
 		"application/gzip":         func(r io.Reader) (io.Reader, error) { return gzip.NewReader(r) },
 		"application/x-ndjson":     lib.NDJSON,
 		"application/zip":          lib.Zip,
@@ -1566,7 +1595,7 @@ func newProgram(ctx context.Context, src, root string, vars map[string]string, c
 			}
 			return m
 		}),
-		lib.Globals(map[string]interface{}{
+		lib.Globals(map[string]any{
 			"useragent":            userAgent,
 			"env":                  vars,
 			"remaining_executions": 0, // placeholder
@@ -1619,9 +1648,9 @@ func debug(log *logp.Logger, trace *httplog.LoggingRoundTripper) func(string, an
 	}
 }
 
-func evalWith(ctx context.Context, contextInjector *otel.ContextInjector, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time, details bool, budget int) (map[string]interface{}, error) {
+func evalWith(ctx context.Context, contextInjector *otel.ContextInjector, prg cel.Program, ast *cel.Ast, state map[string]any, now time.Time, details bool, budget int) (map[string]any, error) {
 	contextInjector.SetContext(ctx)
-	out, det, err := prg.ContextEval(ctx, map[string]interface{}{
+	out, det, err := prg.ContextEval(ctx, map[string]any{
 		// Replace global program "now" with current time. This is necessary
 		// as the lib.Time now global is static at program instantiation time
 		// which will persist over multiple evaluations. The lib.Time behaviour
@@ -1653,7 +1682,7 @@ func evalWith(ctx context.Context, contextInjector *otel.ContextInjector, prg ce
 		return state, fmt.Errorf("failed eval: %w", err)
 	}
 
-	v, err := out.ConvertToNative(reflect.TypeOf((*structpb.Struct)(nil)))
+	v, err := out.ConvertToNative(reflect.TypeFor[*structpb.Struct]())
 	if err != nil {
 		state["events"] = errorMessage(fmt.Sprintf("failed proto conversion: %v", err))
 		clearWantMore(state)
@@ -1705,14 +1734,14 @@ func (e dumpError) writeToFile(path string) (err error) {
 // It leaves state intact if there is no "want_more" element, and sets the element to false
 // if there is. This is necessary instead of just doing delete(state, "want_more") as
 // client CEL code may expect the want_more field to be present.
-func clearWantMore(state map[string]interface{}) {
+func clearWantMore(state map[string]any) {
 	if _, ok := state["want_more"]; ok {
 		state["want_more"] = false
 	}
 }
 
-func errorMessage(msg string) map[string]interface{} {
-	return map[string]interface{}{"error": map[string]interface{}{"message": msg}}
+func errorMessage(msg string) map[string]any {
+	return map[string]any{"error": map[string]any{"message": msg}}
 }
 
 // retryLog is a shim for the retryablehttp.Client.Logger.
@@ -1722,10 +1751,10 @@ func newRetryLog(log *logp.Logger) *retryLog {
 	return &retryLog{log: log.Named("retryablehttp").WithOptions(zap.AddCallerSkip(1))}
 }
 
-func (l *retryLog) Error(msg string, kv ...interface{}) { l.log.Errorw(msg, kv...) }
-func (l *retryLog) Info(msg string, kv ...interface{})  { l.log.Infow(msg, kv...) }
-func (l *retryLog) Debug(msg string, kv ...interface{}) { l.log.Debugw(msg, kv...) }
-func (l *retryLog) Warn(msg string, kv ...interface{})  { l.log.Warnw(msg, kv...) }
+func (l *retryLog) Error(msg string, kv ...any) { l.log.Errorw(msg, kv...) }
+func (l *retryLog) Info(msg string, kv ...any)  { l.log.Infow(msg, kv...) }
+func (l *retryLog) Debug(msg string, kv ...any) { l.log.Debugw(msg, kv...) }
+func (l *retryLog) Warn(msg string, kv ...any)  { l.log.Warnw(msg, kv...) }
 
 func test(url *url.URL) error {
 	port := func() string {
@@ -1784,8 +1813,8 @@ func cloneMap(dst, src mapstr.M) {
 			d := make(mapstr.M, len(v))
 			dst[k] = d
 			cloneMap(d, v)
-		case map[string]interface{}:
-			d := make(map[string]interface{}, len(v))
+		case map[string]any:
+			d := make(map[string]any, len(v))
 			dst[k] = d
 			cloneMap(d, v)
 		case []mapstr.M:
@@ -1796,10 +1825,10 @@ func cloneMap(dst, src mapstr.M) {
 				a = append(a, d)
 			}
 			dst[k] = a
-		case []map[string]interface{}:
-			a := make([]map[string]interface{}, 0, len(v))
+		case []map[string]any:
+			a := make([]map[string]any, 0, len(v))
 			for _, m := range v {
-				d := make(map[string]interface{}, len(m))
+				d := make(map[string]any, len(m))
 				cloneMap(d, m)
 				a = append(a, d)
 			}
@@ -1825,22 +1854,22 @@ func walkMap(m mapstr.M, path string, fn func(parent mapstr.M, key string)) {
 	switch v := v.(type) {
 	case mapstr.M:
 		walkMap(v, rest, fn)
-	case map[string]interface{}:
+	case map[string]any:
 		walkMap(v, rest, fn)
 	case []mapstr.M:
 		for _, m := range v {
 			walkMap(m, rest, fn)
 		}
-	case []map[string]interface{}:
+	case []map[string]any:
 		for _, m := range v {
 			walkMap(m, rest, fn)
 		}
-	case []interface{}:
+	case []any:
 		for _, v := range v {
 			switch m := v.(type) {
 			case mapstr.M:
 				walkMap(m, rest, fn)
-			case map[string]interface{}:
+			case map[string]any:
 				walkMap(m, rest, fn)
 			}
 		}

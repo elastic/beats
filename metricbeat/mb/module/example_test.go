@@ -31,9 +31,9 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/paths"
 )
 
 // ExampleWrapper demonstrates how to create a single Wrapper
@@ -41,7 +41,7 @@ import (
 // module.
 func ExampleWrapper() {
 	// Build a configuration object.
-	config, err := conf.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]any{
 		"module":     moduleName,
 		"metricsets": []string{reportingFetcherName},
 	})
@@ -67,9 +67,7 @@ func ExampleWrapper() {
 
 	// Process events from the output channel until it is closed.
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		for event := range output {
 			event.Fields.Put("event.duration", 111)
 
@@ -78,7 +76,7 @@ func ExampleWrapper() {
 				fmt.Println(output)
 			}
 		}
-	}()
+	})
 
 	// Simulate running for a while.
 	time.Sleep(50 * time.Millisecond)
@@ -125,7 +123,7 @@ func ExampleRunner() {
 	// for demonstration purposes.
 	var b *beat.Beat
 
-	config, err := conf.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]any{
 		"module":     moduleName,
 		"metricsets": []string{reportingFetcherName},
 	})
@@ -174,7 +172,7 @@ func encodeEvent(event beat.Event) (string, error) {
 	// FIX: need to parse and re-encode, so fields ordering in final json document
 	//      keeps stable.
 
-	var tmp interface{}
+	var tmp any
 	if err := stdjson.Unmarshal(output, &tmp); err != nil {
 		panic(err)
 	}

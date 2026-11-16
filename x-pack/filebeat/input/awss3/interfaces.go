@@ -23,7 +23,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // Run 'go generate' to create mocks that are used in tests.
@@ -131,13 +131,6 @@ func (a *awsSQSAPI) ReceiveMessage(ctx context.Context, maxMessages int) ([]type
 	}
 
 	return receiveMessageOutput.Messages, nil
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }
 
 func (a *awsSQSAPI) DeleteMessage(ctx context.Context, msg *types.Message) error {

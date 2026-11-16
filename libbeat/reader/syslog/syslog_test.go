@@ -26,8 +26,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 var _ reader.Reader = &testReader{}
@@ -100,11 +100,11 @@ func TestNewParser(t *testing.T) {
 								"procid":   "1024",
 								"msgid":    "ID47",
 								"version":  "1",
-								"structured_data": map[string]interface{}{
-									"examplePriority@32473": map[string]interface{}{
+								"structured_data": map[string]any{
+									"examplePriority@32473": map[string]any{
 										"class": "high",
 									},
-									"exampleSDID@32473": map[string]interface{}{
+									"exampleSDID@32473": map[string]any{
 										"eventID":     "1011",
 										"eventSource": "Application",
 										"iut":         "3",
@@ -148,7 +148,6 @@ func TestNewParser(t *testing.T) {
 
 	logger := logptest.NewTestingLogger(t, "")
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 

@@ -19,7 +19,7 @@ package eventext
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // MergeEventFields merges the given mapstr.M into the given Event's Fields.
@@ -41,7 +41,7 @@ func CancelEvent(event *beat.Event) {
 	}
 }
 
-func SetMeta(event *beat.Event, k string, v interface{}) {
+func SetMeta(event *beat.Event, k string, v any) {
 	if event.Meta == nil {
 		event.Meta = mapstr.M{}
 	}

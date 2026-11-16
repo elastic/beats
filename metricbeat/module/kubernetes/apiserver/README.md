@@ -10,7 +10,7 @@
 - June 2019, `v1.14.3`
 
     `apiserver_request_total` will be used in spite of `apiserver_request_count`.
-    An _ugly trick_ has been put in place that will read both values, using `apiserver_request_total` if exists. The deprecated value is being configured under the bogus name `request.beforev14.count` and renamed to `request.count` if the newer does not exists.
+    An _ugly trick_ has been put in place that will read both values, using `apiserver_request_total` if it exists. The deprecated value is being configured under the bogus name `request.beforev14.count` and renamed to `request.count` if the newer one does not exist.
 
 ## Resources
 

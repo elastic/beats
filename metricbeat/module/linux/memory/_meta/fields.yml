@@ -1,6 +1,6 @@
 - name: memory
   type: group
-  release: beta
+  release: ga
   description: >
     Linux memory data
   fields:

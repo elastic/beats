@@ -21,8 +21,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -415,4 +415,23 @@ func TestReceiverHook(t *testing.T) {
 	// For auditbeatreceiver, we expect 2 hooks to be registered:
 	// 	one for beat metrics and one for input metrics.
 	oteltest.TestReceiverHook(t, &cfg, NewFactoryWithSettings(Settings{Home: t.TempDir()}), receiverSettings, 2)
+}
+
+func TestComponentLifecycle(t *testing.T) {
+	cfg := &Config{
+		Beatconfig: map[string]any{
+			"auditbeat": map[string]any{
+				"modules": []map[string]any{
+					{
+						"module":        "file_integrity",
+						"enabled":       true,
+						"paths":         []string{t.TempDir()},
+						"scan_at_start": false,
+					},
+				},
+			},
+			"path.home": t.TempDir(),
+		},
+	}
+	oteltest.CheckReceiverLifecycle(t, NewFactoryWithSettings(Settings{Home: t.TempDir()}), cfg)
 }

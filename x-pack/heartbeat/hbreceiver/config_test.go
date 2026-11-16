@@ -13,6 +13,30 @@ import (
 )
 
 func TestUnmarshal(t *testing.T) {
+	t.Run("monitor state is receiver-only", func(t *testing.T) {
+		cfg := &Config{}
+		userConf := confmap.NewFromStringMap(map[string]any{
+			"monitor_state": map[string]any{
+				"elasticsearch": "beatsauth/_agent-component/default",
+			},
+			"heartbeat": map[string]any{"monitors": []any{}},
+		})
+
+		require.NoError(t, cfg.Unmarshal(userConf), "receiver config should unmarshal")
+		assert.Equal(
+			t,
+			"beatsauth/_agent-component/default",
+			cfg.MonitorState.Elasticsearch,
+			"receiver should decode the Elasticsearch monitor-state extension reference",
+		)
+		assert.NotContains(
+			t,
+			cfg.Beatconfig,
+			"monitor_state",
+			"receiver-only monitor-state configuration should not reach the Beat config",
+		)
+	})
+
 	t.Run("partial path override preserves defaults", func(t *testing.T) {
 		cfg := &Config{
 			Beatconfig: map[string]any{
@@ -35,6 +59,32 @@ func TestUnmarshal(t *testing.T) {
 		assert.Equal(t, "/custom/home", pathMap["home"], "user override should win")
 		assert.Equal(t, "/default/data", pathMap["data"], "unspecified default should be preserved")
 		assert.Contains(t, cfg.Beatconfig, "heartbeat")
+	})
+
+	t.Run("scheduler_group is a receiver setting, not beat config", func(t *testing.T) {
+		cfg := &Config{}
+
+		userConf := confmap.NewFromStringMap(map[string]any{
+			"scheduler_group": "synthetics/synthetics-browser-default",
+			"heartbeat":       map[string]any{"monitors": []any{}},
+		})
+
+		require.NoError(t, cfg.Unmarshal(userConf))
+
+		assert.Equal(t, "synthetics/synthetics-browser-default", cfg.SchedulerGroup)
+		assert.NotContains(t, cfg.Beatconfig, "scheduler_group",
+			"scheduler_group must not be passed down to heartbeat as beat config")
+	})
+
+	t.Run("scheduler_group defaults to empty", func(t *testing.T) {
+		cfg := &Config{}
+
+		userConf := confmap.NewFromStringMap(map[string]any{
+			"heartbeat": map[string]any{"monitors": []any{}},
+		})
+
+		require.NoError(t, cfg.Unmarshal(userConf))
+		assert.Empty(t, cfg.SchedulerGroup)
 	})
 
 	t.Run("no defaults does not error", func(t *testing.T) {
@@ -96,6 +146,21 @@ func TestValidate(t *testing.T) {
 			hasError:    false,
 			errorString: "",
 		},
+		"run_once disabled": {
+			c:           &Config{Beatconfig: map[string]any{"heartbeat": map[string]any{"run_once": false}}},
+			hasError:    false,
+			errorString: "",
+		},
+		"run_once enabled": {
+			c:           &Config{Beatconfig: map[string]any{"heartbeat": map[string]any{"run_once": true}}},
+			hasError:    true,
+			errorString: "'heartbeat.run_once' is not supported by the heartbeat receiver",
+		},
+		"run_once enabled as a string": {
+			c:           &Config{Beatconfig: map[string]any{"heartbeat": map[string]any{"run_once": "true"}}},
+			hasError:    true,
+			errorString: "'heartbeat.run_once' is not supported by the heartbeat receiver",
+		},
 	}
 	for name, tc := range tests {
 		err := tc.c.Validate()
@@ -105,5 +170,21 @@ func TestValidate(t *testing.T) {
 		} else {
 			assert.NoErrorf(t, err, "%s failed, should not have error", name)
 		}
+	}
+}
+
+// TestRunOnceIsRejected checks that run_once is rejected however the key is
+// spelled in the collector configuration.
+func TestRunOnceIsRejected(t *testing.T) {
+	for name, userConf := range map[string]map[string]any{
+		"nested":       {"heartbeat": map[string]any{"run_once": true, "monitors": []any{}}},
+		"dotted":       {"heartbeat.run_once": true, "heartbeat.monitors": []any{}},
+		"dotted group": {"heartbeat": map[string]any{"monitors": []any{}}, "heartbeat.run_once": true},
+	} {
+		t.Run(name, func(t *testing.T) {
+			cfg := &Config{}
+			require.NoError(t, cfg.Unmarshal(confmap.NewFromStringMap(userConf)), "unmarshalling must succeed")
+			assert.ErrorContains(t, cfg.Validate(), "run_once", "a run_once receiver must be rejected")
+		})
 	}
 }

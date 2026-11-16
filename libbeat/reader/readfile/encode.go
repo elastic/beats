@@ -24,8 +24,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // Reader produces lines by reading lines from an io.Reader
@@ -75,4 +75,9 @@ func (r EncoderReader) Next() (reader.Message, error) {
 
 func (r EncoderReader) Close() error {
 	return r.reader.Close()
+}
+
+// SetReadDeadline delegates to the underlying line reader (see reader.DeadlineSetter).
+func (r EncoderReader) SetReadDeadline(t time.Time) bool {
+	return r.reader.SetReadDeadline(t)
 }

@@ -22,8 +22,8 @@ import (
 
 	cloudwatchlogstypes "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
 
+	"go.yaml.in/yaml/v2"
 	"golang.org/x/sync/errgroup"
-	"gopkg.in/yaml.v2"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
@@ -32,8 +32,8 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 const (

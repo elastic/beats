@@ -20,7 +20,7 @@ package host
 import (
 	"github.com/vmware/govmomi/vim25/mo"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func (m *HostMetricSet) mapEvent(hs mo.HostSystem, data *metricData) mapstr.M {
@@ -70,7 +70,7 @@ func (m *HostMetricSet) mapEvent(hs mo.HostSystem, data *metricData) mapstr.M {
 	return event
 }
 
-func mapPerfMetricToEvent(event mapstr.M, perfMetricMap map[string]interface{}) {
+func mapPerfMetricToEvent(event mapstr.M, perfMetricMap map[string]any) {
 	const bytesMultiplier int64 = 1024
 	if val, exist := perfMetricMap["disk.capacity.usage.average"]; exist {
 		event.Put("disk.capacity.usage.bytes", val.(int64)*bytesMultiplier)

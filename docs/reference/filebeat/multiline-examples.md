@@ -57,7 +57,7 @@ Filebeat takes all the lines that do not start with `[` and combines them with t
 ```
 
 **`multiline.type`**
-:   Defines which aggregation method to use. The default is `pattern`. The other options are `count` which lets you aggregate constant number of lines and `while_pattern` which aggregate lines by pattern without match option.
+:   Defines which aggregation method to use. The default is `pattern`. The other options are `count` which lets you aggregate constant number of lines and `while_pattern` which aggregates lines by pattern without a match option.
 
 **`multiline.pattern`**
 :   Specifies the regular expression pattern to match. Note that the regexp patterns supported by Filebeat differ somewhat from the patterns supported by Logstash. See [Regular expression support](/reference/filebeat/regexp-support.md) for a list of supported regexp patterns. Depending on how you configure other multiline options, lines that match the specified regular expression are considered either continuations of a previous line or the start of a new multiline event. You can set the `negate` option to negate the pattern.

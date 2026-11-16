@@ -27,15 +27,15 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 
-	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/beats/v7/pkg/paths"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 type countFilter struct {
@@ -399,7 +399,7 @@ func requireImplements[T any](t *testing.T, v any) T {
 
 func TestConditionErrorClosesProcessor(t *testing.T) {
 	cons, p := newMockCloserConstructor()
-	wrapped := NewConditional(SafeWrap(cons))
+	wrapped := NewConditional(SafeWrap("test-cond-close-on-error", cons))
 
 	cfg, err := conf.NewConfigFrom(map[string]any{"when": map[string]any{}})
 	require.NoError(t, err)

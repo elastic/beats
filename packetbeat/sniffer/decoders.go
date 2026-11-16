@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
 	"github.com/elastic/beats/v7/packetbeat/protos/udp"
 	"github.com/elastic/beats/v7/packetbeat/publish"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // Decoders functions return a Decoder able to process the provided network

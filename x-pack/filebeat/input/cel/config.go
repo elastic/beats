@@ -13,11 +13,11 @@ import (
 	"regexp"
 	"time"
 
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/lumberjack"
 	"github.com/elastic/mito/lib"
 )
@@ -50,7 +50,7 @@ type config struct {
 	// program. If it has a cursor field, that field will
 	// be overwritten by any stored cursor, but will be
 	// available if no stored cursor exists.
-	State map[string]interface{} `config:"state"`
+	State map[string]any `config:"state"`
 	// SecretState holds secret key-value pairs that are
 	// stored encrypted by Fleet (via secret: true) and
 	// placed at state.secret before CEL program execution.
@@ -108,12 +108,12 @@ func (c config) GetPackageData(key string) string {
 // to their stored string values. See
 // https://github.com/elastic/kibana/issues/267859
 type secretState struct {
-	m map[string]interface{}
+	m map[string]any
 }
 
-func (s *secretState) Unpack(v interface{}) error {
+func (s *secretState) Unpack(v any) error {
 	switch v := v.(type) {
-	case map[string]interface{}:
+	case map[string]any:
 		s.m = v
 		return nil
 	case string:
@@ -190,10 +190,10 @@ func defaultConfig() config {
 				WaitMin:     &waitMin,
 				WaitMax:     &waitMax,
 			},
-			RedirectForwardHeaders:   false,
-			RedirectSensitiveHeaders: []string{"Authorization", "Proxy-Authorization", "Cookie"},
-			RedirectMaxRedirects:     10,
-			Transport:                transport,
+			RedirectFollow:         true,
+			RedirectForwardHeaders: false,
+			RedirectMaxRedirects:   10,
+			Transport:              transport,
 		},
 	}
 }
@@ -288,6 +288,7 @@ type ResourceConfig struct {
 	URL                      *urlConfig       `config:"url" validate:"required"`
 	Headers                  http.Header      `config:"headers"`
 	Retry                    retryConfig      `config:"retry"`
+	RedirectFollow           bool             `config:"redirect.follow"`
 	RedirectForwardHeaders   bool             `config:"redirect.forward_headers"`
 	RedirectHeadersBanList   []string         `config:"redirect.headers_ban_list"`
 	RedirectSensitiveHeaders []string         `config:"redirect.sensitive_headers"`

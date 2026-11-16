@@ -25,15 +25,15 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/transport"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/transport"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 )
 
 // TLSLayer configures the TLS layer in a DialerChain.
 // The layer will update the active event with the TLS RTT and
 // crypto/cert details.
-func TLSLayer(cfg *tlscommon.TLSConfig, to time.Duration) Layer {
+func TLSLayer(cfg *tlscommon.TLSConfig, to time.Duration, logger *logp.Logger) Layer {
 	return func(event *beat.Event, next transport.Dialer) (transport.Dialer, error) {
 		var timer timer
 
@@ -41,7 +41,7 @@ func TLSLayer(cfg *tlscommon.TLSConfig, to time.Duration) Layer {
 		// This gets us the timestamp for when the TLS layer will start the handshake.
 		next = startTimerAfterDial(&timer, next)
 
-		dialer := transport.TLSDialer(next, cfg, to, logp.NewLogger(""))
+		dialer := transport.TLSDialer(next, cfg, to, logger)
 		return afterDial(dialer, func(conn net.Conn) (net.Conn, error) {
 			tlsConn, ok := conn.(*cryptoTLS.Conn)
 			if !ok {

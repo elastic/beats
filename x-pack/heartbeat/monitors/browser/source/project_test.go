@@ -12,10 +12,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func TestProjectSource(t *testing.T) {
@@ -113,7 +113,7 @@ func fetchAndValidate(t *testing.T, psrc *ProjectSource) {
 	require.True(t, os.IsNotExist(err), "TargetDirectory %s should have been deleted", psrc.TargetDirectory)
 }
 
-func dummyPSource(conf map[string]interface{}) (*ProjectSource, error) {
+func dummyPSource(conf map[string]any) (*ProjectSource, error) {
 	psrc := &ProjectSource{}
 	y, _ := yaml.Marshal(conf)
 	c, err := config.NewConfigWithYAML(y, string(y))

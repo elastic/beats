@@ -13,7 +13,7 @@ import (
 
 	"maps"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
@@ -60,6 +60,11 @@ type JSONShard struct {
 	SegmentsCount    json.Number `json:"sc"`
 	SearchQueryTime  json.Number `json:"sqti"`
 	SearchQueryTotal json.Number `json:"sqto"`
+
+	BulkTotalSizeInBytes    json.Number `json:"btsi"`
+	BulkTotalOperations     json.Number `json:"bto"`
+	TotalDataSetSizeInBytes json.Number `json:"dataset"`
+	DenseVectorCount        json.Number `json:"dvc"`
 
 	// only used for unassigned state
 	UnassignedReason  *string `json:"ur"`

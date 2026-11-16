@@ -24,11 +24,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 )
 
 func TestErrorMissingPath(t *testing.T) {
-	c := conf.MustNewConfigFrom(map[string]interface{}{
+	c := conf.MustNewConfigFrom(map[string]any{
 		"timeout":          1,
 		"max_message_size": 1,
 	})
@@ -39,7 +39,7 @@ func TestErrorMissingPath(t *testing.T) {
 }
 
 func TestErrorOnEmptyLineDelimiterWhenStreamSocket(t *testing.T) {
-	c := conf.MustNewConfigFrom(map[string]interface{}{
+	c := conf.MustNewConfigFrom(map[string]any{
 		"timeout":          1,
 		"max_message_size": 1,
 		"path":             "my-path",
@@ -52,7 +52,7 @@ func TestErrorOnEmptyLineDelimiterWhenStreamSocket(t *testing.T) {
 }
 
 func TestInvalidSocketType(t *testing.T) {
-	c := conf.MustNewConfigFrom(map[string]interface{}{
+	c := conf.MustNewConfigFrom(map[string]any{
 		"timeout":          1,
 		"max_message_size": 1,
 		"path":             "my-path",

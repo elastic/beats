@@ -35,8 +35,8 @@ import (
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func TestFetch(t *testing.T) {
@@ -96,8 +96,8 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string) map[string]any {
+	return map[string]any{
 		"module":     "mongodb",
 		"metricsets": []string{"replstatus"},
 		"hosts":      []string{host},

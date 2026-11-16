@@ -20,11 +20,12 @@ package partition
 import (
 	"errors"
 	"fmt"
+	"slices"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/kafka"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/sarama"
 )
 
@@ -204,10 +205,5 @@ func queryOffsetRange(
 }
 
 func hasID(id int32, lst []int32) bool {
-	for _, other := range lst {
-		if id == other {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(lst, id)
 }

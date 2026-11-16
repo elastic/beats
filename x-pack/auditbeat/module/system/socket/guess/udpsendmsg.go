@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package guess
 
@@ -11,8 +10,8 @@ import (
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/auditbeat/tracing"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // guess udp_sendmsg arguments:
@@ -76,7 +75,7 @@ func (g *guessUDPSendMsg) Probes() ([]helper.ProbeDef, error) {
 				Address:   "udp_sendmsg",
 				Fetchargs: "c={{.P3}} d={{.P4}}",
 			},
-			Decoder: helper.NewStructDecoder(func() interface{} { return new(udpSendMsgCountGuess) }),
+			Decoder: helper.NewStructDecoder(func() any { return new(udpSendMsgCountGuess) }),
 		},
 	}, nil
 }
@@ -90,7 +89,7 @@ func (g *guessUDPSendMsg) Terminate() error {
 	return g.cs.Cleanup()
 }
 
-func (g *guessUDPSendMsg) Extract(ev interface{}) (mapstr.M, bool) {
+func (g *guessUDPSendMsg) Extract(ev any) (mapstr.M, bool) {
 	if g.length == 0 {
 		return nil, false
 	}

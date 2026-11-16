@@ -7,11 +7,12 @@ package okta
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"testing"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 	"github.com/elastic/lumberjack"
 )
 
@@ -67,7 +68,7 @@ var validateTests = []struct {
 			cfg.OktaDomain = "test.okta.com"
 			cfg.OktaToken = "test-token"
 			cfg.Tracer = &tracerConfig{
-				Enabled: ptrTo(false),
+				Enabled: new(false),
 				Logger:  lumberjack.Logger{Filename: "/var/logs/path.log"},
 			}
 			return cfg
@@ -81,7 +82,7 @@ var validateTests = []struct {
 			cfg.OktaDomain = "test.okta.com"
 			cfg.OktaToken = "test-token"
 			cfg.Tracer = &tracerConfig{
-				Enabled: ptrTo(true),
+				Enabled: new(true),
 				Logger:  lumberjack.Logger{Filename: "okta/logs/path.log"},
 			}
 			return cfg
@@ -94,15 +95,13 @@ var validateTests = []struct {
 			cfg.OktaDomain = "test.okta.com"
 			cfg.OktaToken = "test-token"
 			cfg.Tracer = &tracerConfig{
-				Enabled: ptrTo(true),
+				Enabled: new(true),
 				Logger:  lumberjack.Logger{Filename: "/var/logs/path.log"},
 			}
 			return cfg
 		}(),
 	},
 }
-
-func ptrTo[T any](v T) *T { return &v }
 
 func TestConfValidate(t *testing.T) {
 	for _, test := range validateTests {
@@ -128,32 +127,32 @@ func sameError(a, b error) bool {
 
 var keepAliveTests = []struct {
 	name    string
-	input   map[string]interface{}
+	input   map[string]any
 	want    httpcommon.WithKeepaliveSettings
 	wantErr error
 }{
 	{
 		name:  "keep_alive_none", // Default to the old behaviour of true.
-		input: map[string]interface{}{},
+		input: map[string]any{},
 		want:  httpcommon.WithKeepaliveSettings{Disable: true},
 	},
 	{
 		name: "keep_alive_true",
-		input: map[string]interface{}{
+		input: map[string]any{
 			"request.keep_alive.disable": true,
 		},
 		want: httpcommon.WithKeepaliveSettings{Disable: true},
 	},
 	{
 		name: "keep_alive_false",
-		input: map[string]interface{}{
+		input: map[string]any{
 			"request.keep_alive.disable": false,
 		},
 		want: httpcommon.WithKeepaliveSettings{Disable: false},
 	},
 	{
 		name: "keep_alive_invalid_max",
-		input: map[string]interface{}{
+		input: map[string]any{
 			"request.keep_alive.disable":              false,
 			"request.keep_alive.max_idle_connections": -1,
 		},
@@ -179,6 +178,40 @@ func TestKeepAliveSetting(t *testing.T) {
 			got := conf.Request.KeepAlive.settings()
 			if got != test.want {
 				t.Errorf("unexpected setting for %s: got: %#v\nwant:%#v", test.name, got, test.want)
+			}
+		})
+	}
+}
+
+func TestSensitiveHeadersConfig(t *testing.T) {
+	const base = "okta_domain: example.okta.com\nokta_token: t\n"
+	tests := []struct {
+		name string
+		yaml string
+		want []string
+	}{
+		{name: "unset_uses_defaults", yaml: "", want: []string{"Authorization", "Proxy-Authorization", "Cookie"}},
+		{name: "null_uses_defaults", yaml: "request.redirect.sensitive_headers: ~\n", want: []string{"Authorization", "Proxy-Authorization", "Cookie"}},
+		{name: "empty_disables", yaml: "request.redirect.sensitive_headers: []\n", want: []string{}},
+		{name: "custom_replaces_defaults", yaml: "request.redirect.sensitive_headers: [X-Api-Key]\n", want: []string{"X-Api-Key"}},
+		{name: "longer_custom_replaces_defaults", yaml: "request.redirect.sensitive_headers: [A, B, C, D]\n", want: []string{"A", "B", "C", "D"}},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			c := defaultConfig()
+			u, err := config.NewConfigWithYAML([]byte(base+test.yaml), "")
+			if err != nil {
+				t.Fatalf("failed to parse config: %v", err)
+			}
+			err = u.Unpack(&c)
+			if err != nil {
+				t.Fatalf("failed to unpack config: %v", err)
+			}
+
+			got := sensitiveHeaders(c.Request.RedirectSensitiveHeaders)
+			if !slices.Equal(got, test.want) {
+				t.Errorf("sensitive headers = %v; want %v", got, test.want)
 			}
 		})
 	}

@@ -1,0 +1,48 @@
+# Source: okta/data_stream/system/agent/stream/httpjson.yml.hbs
+# rendered with default variable values; type injected by elastic-agent from
+# the stream manifest (input: httpjson). Dotted keys in the template (e.g.
+# request.url) are expanded to nested maps by elastic-agent before delivery.
+type: httpjson
+config_version: "2"
+interval: 60s
+request:
+  tracer:
+    enabled: false
+    filename: ../../logs/httpjson/http-request-trace-*.ndjson
+    maxbackups: 5
+  method: GET
+  keep_alive:
+    disable: false
+  url: https://example.okta.com/api/v1/logs
+  rate_limit:
+    limit: '[[.last_response.header.Get "X-Rate-Limit-Limit"]]'
+    remaining: '[[.last_response.header.Get "X-Rate-Limit-Remaining"]]'
+    reset: '[[.last_response.header.Get "X-Rate-Limit-Reset"]]'
+  transforms:
+    - set:
+        target: url.params.limit
+        value: '1000'
+    - set:
+        target: url.params.since
+        value: '[[.cursor.published]]'
+        default: '[[formatDate (now (parseDuration "-24h")) "RFC3339"]]'
+response:
+  pagination:
+    - set:
+        target: url.value
+        value: '[[ if (ge (len .last_response.body) 1000 )]][[ getRFC5988Link "next" .last_response.header.Link ]][[end]]'
+        fail_on_template_error: true
+        do_not_log_failure: true
+cursor:
+  published:
+    value: '[[.last_event.published]]'
+tags:
+  - okta-system
+fields_under_root: true
+fields:
+  _conf:
+    remove_flattened_debug: false
+data_stream:
+  dataset: okta.system
+  type: logs
+  namespace: default

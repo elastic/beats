@@ -20,8 +20,8 @@ package add_cloud_metadata
 import (
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // DigitalOcean Metadata Service
@@ -31,7 +31,7 @@ var doMetadataFetcher = provider{
 	DefaultEnabled: true,
 
 	Create: func(provider string, config *conf.C) (metadataFetcher, error) {
-		doSchema := func(m map[string]interface{}) mapstr.M {
+		doSchema := func(m map[string]any) mapstr.M {
 			m["serviceName"] = "Droplets"
 			out, _ := s.Schema{
 				"instance": s.Object{

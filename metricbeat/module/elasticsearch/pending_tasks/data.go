@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 var (
@@ -41,7 +41,7 @@ var (
 
 func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXpack bool) error {
 	tasksStruct := struct {
-		Tasks []map[string]interface{} `json:"tasks"`
+		Tasks []map[string]any `json:"tasks"`
 	}{}
 
 	err := json.Unmarshal(content, &tasksStruct)

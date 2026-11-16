@@ -25,7 +25,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 var cleanupTests = []struct {
@@ -81,7 +81,6 @@ var cleanupTests = []struct {
 
 func TestCleanup(t *testing.T) {
 	for _, test := range cleanupTests {
-		test := test
 		t.Run(test.title, func(t *testing.T) {
 			states := NewStates(logptest.NewTestingLogger(t, ""))
 			states.SetStates([]State{test.state})

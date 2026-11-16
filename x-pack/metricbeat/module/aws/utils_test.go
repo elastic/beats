@@ -198,10 +198,7 @@ func (m *MockCloudwatchClientMultiplePages) ListMetrics(ctx context.Context, inp
 		startIndex = index
 	}
 
-	endIndex := startIndex + pageSize
-	if endIndex > len(allMetrics) {
-		endIndex = len(allMetrics)
-	}
+	endIndex := min(startIndex+pageSize, len(allMetrics))
 
 	nextToken := ""
 	if endIndex < len(allMetrics) {

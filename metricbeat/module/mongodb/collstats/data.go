@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func eventMapping(key string, data mapstr.M) (mapstr.M, error) {
@@ -134,7 +134,7 @@ func eventMapping(key string, data mapstr.M) (mapstr.M, error) {
 	return event, nil
 }
 
-func mustGetMapStrValue(m mapstr.M, key string) interface{} {
+func mustGetMapStrValue(m mapstr.M, key string) any {
 	v, _ := m.GetValue(key)
 	return v
 }

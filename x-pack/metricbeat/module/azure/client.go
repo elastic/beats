@@ -16,8 +16,8 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 // MetricCollectionInfo contains information about the last time
@@ -317,9 +317,9 @@ func (client *BaseClient) GetVMForMetadata(resource *Resource, referencePoint Ke
 	vm.Name = *expandedResource.Name
 
 	if expandedResource.Properties != nil {
-		if properties, ok := expandedResource.Properties.(map[string]interface{}); ok {
+		if properties, ok := expandedResource.Properties.(map[string]any); ok {
 			if hardware, ok := properties["hardwareProfile"]; ok {
-				if vmSz, ok := hardware.(map[string]interface{}); ok {
+				if vmSz, ok := hardware.(map[string]any); ok {
 					if vmSz, ok := vmSz["vmSize"]; ok {
 						vm.Size, _ = vmSz.(string)
 					}

@@ -18,7 +18,6 @@
 package filestream
 
 import (
-	"errors"
 	"os"
 	"regexp"
 	"sort"
@@ -28,8 +27,7 @@ import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/go-concert/unison"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 const (
@@ -211,33 +209,11 @@ func (p *copyTruncateFileProspector) Run(
 
 	defer p.stopHarvesterGroup(log, hg)
 
-	var tg unison.MultiErrGroup
-
 	ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
-
-	tg.Go(func() error {
-		p.filewatcher.Run(ctx.Cancelation, metrics, p.ignoreOlder, ignoreInactiveSince)
-		return nil
+	p.scanLoop(ctx.Cancelation, metrics, ignoreInactiveSince, func(fe loginp.FSEvent) {
+		src := p.identifier.GetSource(fe)
+		p.onFSEvent(loggerWithEvent(log, fe), ctx, fe, src, s, hg, ignoreInactiveSince)
 	})
-
-	tg.Go(func() error {
-		for ctx.Cancelation.Err() == nil {
-			fe := p.filewatcher.Event()
-
-			if fe.Op == loginp.OpDone {
-				return nil
-			}
-
-			src := p.identifier.GetSource(fe)
-			p.onFSEvent(loggerWithEvent(log, fe), ctx, fe, src, s, hg, ignoreInactiveSince)
-		}
-		return nil
-	})
-
-	errs := tg.Wait()
-	if len(errs) > 0 {
-		log.Errorf("running prospector failed: %v", errors.Join(errs...))
-	}
 }
 
 func (p *copyTruncateFileProspector) onFSEvent(log *logp.Logger, ctx input.Context, event loginp.FSEvent, src loginp.Source, updater loginp.StateMetadataUpdater, group loginp.HarvesterGroup, ignoreSince time.Time) {

@@ -27,6 +27,7 @@ type AgentInfo struct {
 	Snapshot     bool
 	ManagedMode  AgentManagedMode
 	Unprivileged bool
+	Tags         []string
 }
 
 // Copy of Copy of github.com/elastic/elastic-agent-client/v7/pkg/proto.AgentManagedMode to avoid the ELv2 License

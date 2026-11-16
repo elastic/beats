@@ -27,9 +27,9 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
+	"github.com/elastic/beats/v7/pkg/monitoring/adapter"
 )
 
 var (
@@ -44,7 +44,7 @@ var (
 // incrementMetric increments a value in the specified expvar.Map. The key
 // should be a windows syscall.Errno or a string. Any other types will be
 // reported under the "other" key.
-func incrementMetric(v *expvar.Map, key interface{}) {
+func incrementMetric(v *expvar.Map, key any) {
 	switch t := key.(type) {
 	default:
 		v.Add("other", 1)

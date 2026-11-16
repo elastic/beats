@@ -22,7 +22,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -43,9 +43,9 @@ var (
 )
 
 type response struct {
-	Actions     map[string]interface{} `json:"cluster_actions"`
-	Kibana      map[string]interface{} `json:"kibana"`
-	ClusterUuid string                 `json:"cluster_uuid"`
+	Actions     map[string]any `json:"cluster_actions"`
+	Kibana      map[string]any `json:"kibana"`
+	ClusterUuid string         `json:"cluster_uuid"`
 }
 
 func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {

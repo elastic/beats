@@ -18,16 +18,15 @@
 package thrift
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 func thriftIdlForTesting(t *testing.T, content string) *thriftIdl {
-	f, _ := ioutil.TempFile("", "")
+	f, _ := os.CreateTemp("", "")
 	defer os.Remove(f.Name())
 
 	f.WriteString(content)

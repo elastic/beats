@@ -27,8 +27,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // DockerJSONReader processor renames a given field
@@ -308,4 +308,9 @@ func stripNewLineWin(msg *reader.Message) {
 
 func (p *DockerJSONReader) Close() error {
 	return p.reader.Close()
+}
+
+// SetReadDeadline delegates to the wrapped reader (see reader.DeadlineSetter).
+func (p *DockerJSONReader) SetReadDeadline(t time.Time) bool {
+	return reader.SetReadDeadline(p.reader, t)
 }

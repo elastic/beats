@@ -20,10 +20,11 @@ package filter
 import (
 	"context"
 	"io"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/match"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/match"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -90,4 +91,9 @@ func (p *FilterParser) matchAny(text string) bool {
 func (p *FilterParser) Close() error {
 	p.ctx.Cancel()
 	return p.r.Close()
+}
+
+// SetReadDeadline delegates to the wrapped reader (see reader.DeadlineSetter).
+func (p *FilterParser) SetReadDeadline(t time.Time) bool {
+	return reader.SetReadDeadline(p.r, t)
 }

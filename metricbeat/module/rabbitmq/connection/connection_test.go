@@ -22,7 +22,7 @@ import (
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/rabbitmq/mtest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"github.com/stretchr/testify/assert"
 
@@ -67,8 +67,8 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, 60938, peer["port"])
 }
 
-func getConfig(url string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(url string) map[string]any {
+	return map[string]any{
 		"module":     "rabbitmq",
 		"metricsets": []string{"connection"},
 		"hosts":      []string{url},

@@ -7,8 +7,8 @@ package httpjson
 import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 type cursor struct {
@@ -77,4 +77,15 @@ func (c *cursor) clone() mapstr.M {
 		return mapstr.M{}
 	}
 	return c.state.Clone()
+}
+
+func (c *cursor) restore(state mapstr.M) {
+	if c == nil {
+		return
+	}
+	if len(state) == 0 {
+		c.state = nil
+		return
+	}
+	c.state = state
 }

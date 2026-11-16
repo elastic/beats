@@ -19,8 +19,8 @@ import (
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/poll"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const contentType = "Audit.AzureActiveDirectory"
@@ -100,7 +100,7 @@ func (f *fakePoll) PagedSearchQuery(t testing.TB, lb poll.Transaction, db []blob
 	return f.deliverResult(t, lb, result, nextUrl)
 }
 
-func (f *fakePoll) deliverResult(t testing.TB, pl poll.Transaction, msg interface{}, nextUrl string) (urls []string, next poll.Transaction) {
+func (f *fakePoll) deliverResult(t testing.TB, pl poll.Transaction, msg any, nextUrl string) (urls []string, next poll.Transaction) {
 	js, err := json.Marshal(msg)
 	if !assert.NoError(t, err) {
 		t.Fatal(err)

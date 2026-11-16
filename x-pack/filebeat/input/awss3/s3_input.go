@@ -22,8 +22,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/libbeat/statusreporterhelper"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/timed"
 )
 
@@ -81,8 +81,10 @@ func (in *s3PollerInput) Run(
 	in.pipeline = pipeline
 	var err error
 
-	// Load the persistent S3 polling state.
-	in.registry, err = newStateRegistry(in.log, in.store, in.config.BucketListPrefix, in.config.LexicographicalOrdering, in.config.LexicographicalLookbackKeys)
+	// Load the persistent S3 polling state, scoped to this input's bucket. The
+	// underlying store is shared by all aws-s3 inputs of the process.
+	bucketName := getBucketNameFromARN(in.config.getBucketARN())
+	in.registry, err = newStateRegistry(in.log, in.store, bucketName, in.config.BucketListPrefix, in.config.LexicographicalOrdering, in.config.LexicographicalLookbackKeys)
 	if err != nil {
 		err = fmt.Errorf("can not start persistent store: %w", err)
 		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failure: %s", err.Error()))

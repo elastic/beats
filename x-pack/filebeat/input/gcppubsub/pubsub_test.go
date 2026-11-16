@@ -21,10 +21,10 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcppubsub/testutil"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 const (
@@ -45,10 +45,10 @@ func ifNotDone(ctx context.Context, f func()) func() {
 }
 
 func defaultTestConfig() *conf.C {
-	return conf.MustNewConfigFrom(map[string]interface{}{
+	return conf.MustNewConfigFrom(map[string]any{
 		"project_id": emulatorProjectID,
 		"topic":      emulatorTopic,
-		"subscription": map[string]interface{}{
+		"subscription": map[string]any{
 			"name":   emulatorSubscription,
 			"create": true,
 		},
@@ -147,10 +147,7 @@ func (o *stubOutleter) waitForEvents(numEvents int) ([]beat.Event, bool) {
 		o.cond.Wait()
 	}
 
-	size := numEvents
-	if size >= len(o.Events) {
-		size = len(o.Events)
-	}
+	size := min(numEvents, len(o.Events))
 
 	out := make([]beat.Event, size)
 	copy(out, o.Events)
@@ -314,6 +311,45 @@ func TestEndToEndACK(t *testing.T) {
 		out.Close()
 		if err := group.Wait(); err != nil {
 			t.Fatal(err)
+		}
+	})
+}
+
+func TestAPIEndpointOverride(t *testing.T) {
+	cfg := defaultTestConfig()
+	err := cfg.SetString("api_endpoint", -1, "invalid-custom-endpoint.example.com:443")
+	assert.NoError(t, err, "failed to set api_endpoint configuration")
+
+	runTest(t, cfg, func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T) {
+		err := input.run()
+		assert.Error(t, err, "expected input.run() to fail when using an unreachable custom API endpoint")
+	})
+}
+
+func TestAPIEndpointOverrideSuccess(t *testing.T) {
+	host := testutil.EnsureEmulator(t)
+
+	cfg := defaultTestConfig()
+	err := cfg.SetString("api_endpoint", -1, host)
+	assert.NoError(t, err, "failed to set api_endpoint configuration")
+
+	runTest(t, cfg, func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T) {
+		testutil.CreateTopic(t, client)
+		testutil.CreateSubscription(t, emulatorSubscription, client)
+		testutil.PublishMessages(t, client, 5)
+
+		var group errgroup.Group
+		group.Go(input.run)
+
+		time.AfterFunc(10*time.Second, func() { out.Close() })
+		events, ok := out.waitForEvents(5)
+		if !ok {
+			t.Errorf("Expected 5 events, but got %d.", len(events))
+		}
+		input.Stop()
+
+		if err := group.Wait(); err != nil {
+			t.Errorf("unexpected error from errgroup: %v", err)
 		}
 	})
 }

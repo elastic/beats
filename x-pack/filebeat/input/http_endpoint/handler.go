@@ -22,10 +22,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/google/cel-go/cel"
-	"github.com/google/cel-go/checker/decls"
-	"github.com/google/cel-go/common/types"
-	"github.com/google/cel-go/common/types/ref"
+	"cel.dev/cel-go/cel"
+	"cel.dev/cel-go/checker/decls"
+	"cel.dev/cel-go/common/types"
+	"cel.dev/cel-go/common/types/ref"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -34,9 +34,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/mito/lib"
 )
 
@@ -98,6 +98,11 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	txID := h.nextTxID()
 	h.log.Debugw("request", "url", r.URL, "method", r.Method, "tx_id", txID)
 	code, err := h.validator.validateRequest(r)
+	if errors.Is(err, errMaxInFlightExceeded) {
+		h.sendMaxInFlightResponse(w)
+		h.metrics.apiErrors.Add(1)
+		return
+	}
 	if err != nil {
 		h.status.UpdateStatus(status.Degraded, "request did not validate: "+err.Error())
 		h.sendAPIErrorResponse(txID, w, r, h.log, code, err)
@@ -175,6 +180,17 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// An empty body must be detected here, before the reader is wrapped
+	// below; the in-flight counter, body size limit and request tracer
+	// wrappers all defeat the http.NoBody identity comparison that
+	// httpReadJSON makes.
+	if body == http.NoBody {
+		h.sendAPIErrorResponse(txID, w, r, h.log, http.StatusNotAcceptable, errBodyEmpty)
+		h.status.UpdateStatus(status.Degraded, "unable to read message JSON: "+errBodyEmpty.Error())
+		h.metrics.apiErrors.Add(1)
+		return
+	}
+
 	// If we are tracking in flight bytes, wrap body with countReader for
 	// just-in-time byte counting. The countReader tracks bytes as they are read.
 	// On return Close releases the bytes. In the error case this is immediate,
@@ -204,17 +220,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	objs, code, err := httpReadJSON(body, h.program)
 	if err != nil {
 		if errors.Is(err, errMaxInFlightExceeded) {
-			w.Header().Set("Content-Type", "application/json")
-			w.Header().Set("Retry-After", strconv.Itoa(h.retryAfter*2))
-			w.WriteHeader(http.StatusServiceUnavailable)
-			_, werr := fmt.Fprintf(w,
-				`{"error":"max in flight bytes exceeded during read","max_in_flight":%d,"in_flight":%d}`,
-				h.maxInFlight, h.inFlight.Load(),
-			)
-			if werr != nil {
-				h.log.Errorw("failed to write 503", "error", werr)
-			}
-			h.status.UpdateStatus(status.Degraded, "max in flight bytes exceeded during read")
+			h.sendMaxInFlightResponse(w)
 			h.metrics.apiErrors.Add(1)
 			return
 		}
@@ -224,25 +230,29 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var headers map[string]interface{}
+	var headers map[string]any
 	if len(h.includeHeaders) != 0 {
 		headers = getIncludedHeaders(r, h.includeHeaders)
 	}
 
-	var (
-		respCode int
-		respBody string
-	)
+	// The configured response is sent for any well-formed request, including
+	// one that holds no events; it is only replaced by a CRC validator's
+	// response when the request is a CRC challenge.
+	respCode, respBody := h.responseCode, h.responseBody
 
 	h.metrics.batchSize.Update(int64(len(objs)))
 	for _, obj := range objs {
-		var err error
 		if h.crc != nil {
-			respCode, respBody, err = h.crc.validate(obj)
+			// Keep the validator's results out of respCode and respBody until
+			// we know the object is a CRC challenge; validate returns zero
+			// values for objects that are not.
+			code, body, err := h.crc.validate(obj)
 			if err == nil {
-				// CRC request processed
+				// CRC request processed.
+				respCode, respBody = code, body
 				break
-			} else if !errors.Is(err, errNotCRC) {
+			}
+			if !errors.Is(err, errNotCRC) {
 				h.metrics.apiErrors.Add(1)
 				h.status.UpdateStatus(status.Degraded, "request did not validate with CRC: "+err.Error())
 				h.sendAPIErrorResponse(txID, w, r, h.log, http.StatusBadRequest, err)
@@ -251,14 +261,13 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 		acker.Add()
-		if err = h.publishEvent(obj, headers, acker); err != nil {
+		if err := h.publishEvent(obj, headers, acker); err != nil {
 			h.metrics.apiErrors.Add(1)
 			h.status.UpdateStatus(status.Degraded, "failed to publish event: "+err.Error())
 			h.sendAPIErrorResponse(txID, w, r, h.log, http.StatusInternalServerError, err)
 			return
 		}
 		h.metrics.eventsPublished.Add(1)
-		respCode, respBody = h.responseCode, h.responseBody
 	}
 
 	acker.Ready()
@@ -290,6 +299,22 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	h.metrics.batchProcessingTime.Update(time.Since(start).Nanoseconds())
 	h.metrics.batchesPublished.Add(1)
+}
+
+// sendMaxInFlightResponse sends the 503 response for a request that exceeded
+// the max_in_flight_bytes limit while its body was being read.
+func (h *handler) sendMaxInFlightResponse(w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Retry-After", strconv.Itoa(h.retryAfter*2))
+	w.WriteHeader(http.StatusServiceUnavailable)
+	_, err := fmt.Fprintf(w,
+		`{"error":"max in flight bytes exceeded during read","max_in_flight":%d,"in_flight":%d}`,
+		h.maxInFlight, h.inFlight.Load(),
+	)
+	if err != nil {
+		h.log.Errorw("failed to write 503", "error", err)
+	}
+	h.status.UpdateStatus(status.Degraded, "max in flight bytes exceeded during read")
 }
 
 var errTookTooLong = errors.New("could not publish event within timeout")
@@ -349,13 +374,31 @@ func (h *handler) sendAPIErrorResponse(txID string, w http.ResponseWriter, r *ht
 	}
 	enc := json.NewEncoder(mw)
 	enc.SetEscapeHTML(false)
-	err := enc.Encode(map[string]interface{}{"message": apiError.Error()})
+	err := enc.Encode(map[string]any{"message": apiError.Error()})
 	if err != nil {
 		log.Debugw("Failed to write HTTP response.", "error", err, "client.address", r.RemoteAddr)
 	}
 	if h.reqLogger != nil {
+		// The request may have been rejected before its body was read, so
+		// do not let the logger read all of what the client sends. One byte
+		// more than is logged is read so that truncation is still reported.
+		r.Body = limitBody(r.Body, maxLogBodyLen+1)
 		h.logRequest(txID, r, status, buf.Bytes())
 	}
+}
+
+// maxLogBodyLen is the largest request body logged by the request tracer.
+const maxLogBodyLen = 10 * (1 << 10)
+
+// limitBody returns b limited to reading n bytes, with Close closing b.
+func limitBody(b io.ReadCloser, n int64) io.ReadCloser {
+	if b == nil || b == http.NoBody {
+		return b
+	}
+	return struct {
+		io.Reader
+		io.Closer
+	}{io.LimitReader(b, n), b}
 }
 
 func (h *handler) logRequest(txID string, r *http.Request, status int, respBody []byte) {
@@ -385,9 +428,7 @@ func (h *handler) logRequest(txID string, r *http.Request, status int, respBody 
 		)
 	}
 	h.log.Debugw("new request trace transaction", "id", txID)
-	// Limit request logging body size to 10kiB.
-	const maxBodyLen = 10 * (1 << 10)
-	httplog.LogRequest(h.reqLogger.With(zap.String("transaction.id", txID)), r, []string{"Authorization"}, maxBodyLen, extra...)
+	httplog.LogRequest(h.reqLogger.With(zap.String("transaction.id", txID)), r, []string{"Authorization"}, maxLogBodyLen, extra...)
 	if scheme != "" {
 		r.URL.Scheme = scheme
 	}
@@ -460,7 +501,7 @@ func decodeJSON(body io.Reader, prg *program) (objs []mapstr.M, err error) {
 			return nil, fmt.Errorf("malformed JSON object at stream position %d: %w", decoder.InputOffset(), err)
 		}
 
-		var obj interface{}
+		var obj any
 		if err = newJSONDecoder(bytes.NewReader(raw)).Decode(&obj); err != nil {
 			return nil, fmt.Errorf("malformed JSON object at stream position %d: %w", decoder.InputOffset(), err)
 		}
@@ -470,7 +511,7 @@ func decodeJSON(body io.Reader, prg *program) (objs []mapstr.M, err error) {
 			if err != nil {
 				return nil, err
 			}
-			if _, ok := obj.([]interface{}); ok {
+			if _, ok := obj.([]any); ok {
 				// Re-marshal to ensure the raw bytes agree with the constructed object.
 				// This is only necessary when the program constructs an array return.
 				raw, err = json.Marshal(obj)
@@ -481,9 +522,9 @@ func decodeJSON(body io.Reader, prg *program) (objs []mapstr.M, err error) {
 		}
 
 		switch v := obj.(type) {
-		case map[string]interface{}:
+		case map[string]any:
 			objs = append(objs, v)
-		case []interface{}:
+		case []any:
 			nobjs, err := decodeJSONArray(bytes.NewReader(raw))
 			if err != nil {
 				return nil, fmt.Errorf("recursive error %d: %w", decoder.InputOffset(), err)
@@ -592,14 +633,14 @@ func (a *numberAdapter) NativeToValue(value any) ref.Val {
 	return a.fallback.NativeToValue(value)
 }
 
-func (p *program) eval(obj interface{}) (interface{}, error) {
-	out, _, err := p.prg.Eval(map[string]interface{}{"obj": obj})
+func (p *program) eval(obj any) (any, error) {
+	out, _, err := p.prg.Eval(map[string]any{"obj": obj})
 	if err != nil {
 		err = lib.DecoratedError{AST: p.ast, Err: err}
 		return nil, fmt.Errorf("failed eval: %w", err)
 	}
 
-	v, err := out.ConvertToNative(reflect.TypeOf((*structpb.Value)(nil)))
+	v, err := out.ConvertToNative(reflect.TypeFor[*structpb.Value]())
 	if err != nil {
 		return nil, fmt.Errorf("failed proto conversion: %w", err)
 	}
@@ -634,12 +675,12 @@ func decodeJSONArray(raw *bytes.Reader) (objs []mapstr.M, err error) {
 			return nil, fmt.Errorf("malformed JSON object at stream position %d: %w", dec.InputOffset(), err)
 		}
 
-		var obj interface{}
+		var obj any
 		if err := newJSONDecoder(bytes.NewReader(raw)).Decode(&obj); err != nil {
 			return nil, fmt.Errorf("malformed JSON object at stream position %d: %w", dec.InputOffset(), err)
 		}
 
-		m, ok := obj.(map[string]interface{})
+		m, ok := obj.(map[string]any)
 		if ok {
 			objs = append(objs, m)
 		}

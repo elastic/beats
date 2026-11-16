@@ -27,7 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 var errKeyUnknown = errors.New("key unknown")
@@ -109,10 +109,6 @@ func (s *storeFromClient) Each(fn func(string, backend.ValueDecoder) (bool, erro
 		}
 		return nil, nil
 	})
-}
-
-func (s *storeFromClient) SetID(_ string) {
-	// NOOP
 }
 
 type jsonValueDecoder struct {

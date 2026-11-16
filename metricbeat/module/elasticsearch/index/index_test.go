@@ -24,7 +24,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/version"
+	"github.com/elastic/beats/v7/pkg/version"
 )
 
 func TestGetServiceURIExpectedPath(t *testing.T) {
@@ -72,7 +72,7 @@ func TestGetServiceURIMultipleCalls(t *testing.T) {
 
 		var uri string
 		var err error
-		for i := uint(0); i < numCalls; i++ {
+		for range numCalls {
 			uri, err = getServicePath(*version.MustNew("8.0.0"))
 			if err != nil {
 				return false

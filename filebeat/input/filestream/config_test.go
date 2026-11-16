@@ -30,8 +30,8 @@ import (
 	"go.uber.org/zap/zaptest/observer"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 func TestConfigValidate(t *testing.T) {
@@ -295,6 +295,27 @@ read_until_eof.enabled: false
 				"read_until_eof.enabled should be false")
 		})
 	})
+
+	t.Run("buffer_size must be positive", func(t *testing.T) {
+		tcs := map[string]string{
+			"zero":     `0`,
+			"negative": `-1`,
+		}
+		for name, size := range tcs {
+			t.Run(name, func(t *testing.T) {
+				c, err := conf.NewConfigFrom(fmt.Sprintf(`
+id: 'some id'
+paths: [/foo/bar*]
+buffer_size: %s
+`, size))
+				require.NoError(t, err, "could not create config from string")
+
+				got := defaultConfig()
+				err = c.Unpack(&got)
+				assert.ErrorContains(t, err, "accessing 'buffer_size'")
+			})
+		}
+	})
 }
 
 func TestNormalizeConfig(t *testing.T) {
@@ -304,6 +325,7 @@ func TestNormalizeConfig(t *testing.T) {
 		wantErr     string
 		wantEnabled bool
 		wantGrowing bool
+		wantWarn    bool
 	}{
 		{
 			name: "path identity disables fingerprint",
@@ -320,7 +342,7 @@ func TestNormalizeConfig(t *testing.T) {
 			wantEnabled: false,
 		},
 		{
-			name: "scanner enabled=true overrides path identity",
+			name: "explicit scanner enabled=true is ignored for path identity",
 			cfg: map[string]any{
 				"file_identity": map[string]any{"path": nil},
 				"prospector": map[string]any{
@@ -329,10 +351,11 @@ func TestNormalizeConfig(t *testing.T) {
 					},
 				},
 			},
-			wantEnabled: true,
+			wantEnabled: false,
+			wantWarn:    true,
 		},
 		{
-			name: "scanner enabled=false overrides fingerprint identity",
+			name: "explicit scanner enabled=false is ignored for fingerprint identity",
 			cfg: map[string]any{
 				"file_identity": map[string]any{"fingerprint": nil},
 				"prospector": map[string]any{
@@ -341,7 +364,46 @@ func TestNormalizeConfig(t *testing.T) {
 					},
 				},
 			},
+			wantEnabled: true,
+			wantGrowing: true,
+			wantWarn:    true,
+		},
+		{
+			name: "explicit scanner enabled=false is ignored for default identity",
+			cfg: map[string]any{
+				"prospector": map[string]any{
+					"scanner": map[string]any{
+						"fingerprint": map[string]any{"enabled": false},
+					},
+				},
+			},
+			wantEnabled: true,
+			wantGrowing: true,
+			wantWarn:    true,
+		},
+		{
+			name: "explicit scanner enabled=false matching native identity does not warn",
+			cfg: map[string]any{
+				"file_identity": map[string]any{"native": nil},
+				"prospector": map[string]any{
+					"scanner": map[string]any{
+						"fingerprint": map[string]any{"enabled": false},
+					},
+				},
+			},
 			wantEnabled: false,
+		},
+		{
+			name: "explicit scanner enabled=true matching fingerprint identity does not warn",
+			cfg: map[string]any{
+				"file_identity": map[string]any{"fingerprint": nil},
+				"prospector": map[string]any{
+					"scanner": map[string]any{
+						"fingerprint": map[string]any{"enabled": true},
+					},
+				},
+			},
+			wantEnabled: true,
 			wantGrowing: true,
 		},
 		{
@@ -437,7 +499,8 @@ func TestNormalizeConfig(t *testing.T) {
 			require.NoError(t, raw.Unpack(&c),
 				"unpack should succeed; rejection happens in normalizeConfig")
 
-			err := normalizeConfig(raw, &c)
+			logger, obs := logptest.NewTestingLoggerWithObserver(t, "")
+			err := normalizeConfig(raw, &c, logger)
 			if tc.wantErr != "" {
 				assert.ErrorContains(t, err, tc.wantErr)
 				return
@@ -450,6 +513,13 @@ func TestNormalizeConfig(t *testing.T) {
 			assert.Equal(t,
 				tc.wantGrowing, c.FileWatcher.Scanner.Fingerprint.Growing,
 				"FileWatcher.Scanner.Fingerprint.Growing did not match")
+
+			wantWarnings := 0
+			if tc.wantWarn {
+				wantWarnings = 1
+			}
+			assert.Len(t, obs.FilterMessageSnippet("'prospector.scanner.fingerprint.enabled' is deprecated").All(), wantWarnings,
+				"unexpected number of scanner fingerprint deprecation warnings")
 		})
 	}
 }

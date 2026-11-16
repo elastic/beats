@@ -24,13 +24,13 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
 
+	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/eventlog"
-	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const pluginName = "winlog"
@@ -70,10 +70,10 @@ func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 	}
 }
 
-func configure(cfg *conf.C, _ *logp.Logger) ([]cursor.Source, cursor.Input, error) {
+func configure(cfg *conf.C, logger *logp.Logger) ([]cursor.Source, cursor.Input, error) {
 	// TODO: do we want to allow to read multiple eventLogs using a single config
 	//       as is common for other inputs?
-	eventLog, err := eventlog.New(cfg)
+	eventLog, err := eventlog.New(cfg, logger)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create new event log. %w", err)
 	}

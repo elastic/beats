@@ -24,7 +24,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	awshttp "github.com/aws/aws-sdk-go-v2/aws/transport/http"
@@ -34,9 +34,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 )
 
 const (
@@ -69,7 +69,7 @@ var ec2MetadataFetcher = provider{
 	DefaultEnabled: true,
 
 	Create: func(_ string, config *conf.C) (metadataFetcher, error) {
-		ec2Schema := func(m map[string]interface{}) mapstr.M {
+		ec2Schema := func(m map[string]any) mapstr.M {
 			meta := mapstr.M{
 				"cloud": mapstr.M{
 					"service": mapstr.M{
@@ -188,7 +188,7 @@ func getTagsFromIMDS(ctx context.Context, client IMDSClient, logger *logp.Logger
 		return tags, false
 	}
 
-	for _, tag := range strings.Split(string(b), "\n") {
+	for tag := range strings.SplitSeq(string(b), "\n") {
 		tagPath := fmt.Sprintf("%s/%s", tagsCategory, tag)
 		b, err := getMetadataHelper(ctx, client, tagPath, logger)
 		if err != nil {

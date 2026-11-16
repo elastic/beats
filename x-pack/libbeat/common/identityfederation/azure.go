@@ -2,6 +2,13 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// Azure identity federation is excluded from FIPS builds because the Azure SDK
+// transitively imports golang.org/x/crypto/pkcs12, which uses RC2 and DES —
+// algorithms not approved under FIPS 140.  See
+// https://github.com/Azure/azure-sdk-for-go/issues/24336.
+//
+//go:build !requirefips
+
 package identityfederation
 
 import (

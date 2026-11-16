@@ -13,8 +13,8 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 type statelessInput struct {
@@ -39,7 +39,7 @@ type statelessPublisher struct {
 	wrapped stateless.Publisher
 }
 
-func (pub statelessPublisher) Publish(event beat.Event, _ interface{}) error {
+func (pub statelessPublisher) Publish(event beat.Event, _ any) error {
 	pub.wrapped.Publish(event)
 	return nil
 }

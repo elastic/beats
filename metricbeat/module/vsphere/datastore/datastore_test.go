@@ -95,8 +95,8 @@ func TestDataStoreMetricSetData(t *testing.T) {
 	assert.NoError(t, err, "failed to write events with reporter")
 }
 
-func getConfig(ts *simulator.Server) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(ts *simulator.Server) map[string]any {
+	return map[string]any{
 		"module":     "vsphere",
 		"metricsets": []string{"datastore"},
 		"hosts":      []string{ts.URL.String()},

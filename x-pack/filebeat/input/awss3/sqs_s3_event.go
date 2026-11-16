@@ -19,8 +19,8 @@ import (
 	"github.com/aws/smithy-go"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 const (
@@ -181,11 +181,9 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 
 	// Start SQS keepalive worker.
 	var keepaliveWg sync.WaitGroup
-	keepaliveWg.Add(1)
-	go func() {
-		defer keepaliveWg.Done()
+	keepaliveWg.Go(func() {
 		p.keepalive(keepaliveCtx, log, msg)
-	}()
+	})
 
 	receiveCount := getSQSReceiveCount(msg.Attributes)
 	if receiveCount == 1 {

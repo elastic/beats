@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func ReportMetricsForOrganization(reporter mb.ReporterV2, organizationID string, metrics ...[]mapstr.M) {
@@ -43,7 +43,7 @@ func ReportMetricsForOrganization(reporter mb.ReporterV2, organizationID string,
 	}
 }
 
-func isEmpty(value interface{}) bool {
+func isEmpty(value any) bool {
 	// we make use of the fact that all the dashboard API responses utilize
 	// pointers for non-string types to filter out empty values from metric events.
 
@@ -53,7 +53,7 @@ func isEmpty(value interface{}) bool {
 
 	t := reflect.TypeOf(value)
 
-	if t.Kind() == reflect.Ptr {
+	if t.Kind() == reflect.Pointer {
 		return reflect.ValueOf(value).IsNil()
 	}
 

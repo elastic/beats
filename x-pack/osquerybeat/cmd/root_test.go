@@ -18,7 +18,7 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func TestOsquerybeatCfg(t *testing.T) {
@@ -72,7 +72,7 @@ func readRawIn(filename string, rawIn *proto.UnitExpectedConfig) error {
 	return err
 }
 
-func readOut(filename string) (cfg []map[string]interface{}, err error) {
+func readOut(filename string) (cfg []map[string]any, err error) {
 	b, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
@@ -84,15 +84,15 @@ func readOut(filename string) (cfg []map[string]interface{}, err error) {
 	return cfg, err
 }
 
-func cfgToArrMap(cfg []*reload.ConfigWithMeta) ([]map[string]interface{}, error) {
-	res := make([]map[string]interface{}, 0, len(cfg))
+func cfgToArrMap(cfg []*reload.ConfigWithMeta) ([]map[string]any, error) {
+	res := make([]map[string]any, 0, len(cfg))
 	for _, c := range cfg {
 		var m mapstr.M
 		err := c.Config.Unpack(&m)
 		if err != nil {
 			return nil, err
 		}
-		res = append(res, map[string]interface{}(m))
+		res = append(res, map[string]any(m))
 	}
 	return res, nil
 }

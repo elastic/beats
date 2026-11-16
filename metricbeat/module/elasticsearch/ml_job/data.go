@@ -23,7 +23,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -49,7 +49,7 @@ var (
 )
 
 type jobsStruct struct {
-	Jobs []map[string]interface{} `json:"jobs"`
+	Jobs []map[string]any `json:"jobs"`
 }
 
 func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXpack bool) error {
@@ -82,7 +82,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 		event.ModuleFields.Put("cluster.id", info.ClusterID)
 
 		if node, exists := job["node"]; exists {
-			nodeHash, ok := node.(map[string]interface{})
+			nodeHash, ok := node.(map[string]any)
 			if !ok {
 				errs = append(errs, errors.New("job[node] is not a map"))
 				continue

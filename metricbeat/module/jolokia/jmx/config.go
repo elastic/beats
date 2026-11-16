@@ -25,8 +25,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 type JMXMapping struct {
@@ -75,11 +75,11 @@ type Target struct {
 //
 // ]
 type RequestBlock struct {
-	Type      string                 `json:"type"`
-	MBean     string                 `json:"mbean"`
-	Attribute []string               `json:"attribute"`
-	Config    map[string]interface{} `json:"config"`
-	Target    *TargetBlock           `json:"target,omitempty"`
+	Type      string         `json:"type"`
+	MBean     string         `json:"mbean"`
+	Attribute []string       `json:"attribute"`
+	Config    map[string]any `json:"config"`
+	Target    *TargetBlock   `json:"target,omitempty"`
 }
 
 // TargetBlock is used to build the target blocks of the following format into RequestBlock.
@@ -424,7 +424,7 @@ func (pc *JolokiaHTTPPostFetcher) buildRequestBodyAndMapping(mappings []JMXMappi
 	// So use canonicalized names everywhere.
 	// If Jolokia returns non-canonicalized MBean names, then we'll need to canonicalize
 	// them or change our approach to mappings.
-	config := map[string]interface{}{
+	config := map[string]any{
 		"ignoreErrors":    true,
 		"canonicalNaming": true,
 	}

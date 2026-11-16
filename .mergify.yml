@@ -365,3 +365,11 @@ pull_request_rules:
       backport:
         branches:
           - "9.5"
+  - name: backport patches to 9.6 branch
+    conditions:
+      - merged
+      - label=backport-9.6
+    actions:
+      backport:
+        branches:
+          - "9.6"

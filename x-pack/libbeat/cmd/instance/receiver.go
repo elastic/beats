@@ -8,6 +8,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/api"
@@ -18,16 +20,19 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report/log"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
+	metricreport "github.com/elastic/beats/v7/pkg/systemmetrics/report"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
 	otelstatus "github.com/elastic/beats/v7/x-pack/otel/status"
 	oteltelemetry "github.com/elastic/beats/v7/x-pack/otel/telemetry"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
-	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/extension/extensionauth"
 	"go.opentelemetry.io/collector/receiver"
+	"go.uber.org/zap"
 )
 
 // contextStopper is an optional extension of beat.Beater for beaters that can
@@ -46,13 +51,19 @@ type BeatReceiver struct {
 	Logger              *logp.Logger
 	bridge              *oteltelemetry.RegistryBridge
 	releaseSystemBridge func()
-	runDone             chan error // receives the error from beater.Run; closed when Run returns
+	startHook           func(component.Host) error
+	startCalled         chan struct{} // closed when Start is called
+	runDone             chan error    // receives the error from beater.Run; closed when Run returns
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
 func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator, set receiver.Settings) (BeatReceiver, error) {
 	receiverID := set.ID
-	ts := set.TelemetrySettings
+	bridgeTelemetrySettings := set.TelemetrySettings
+	// The Beat logger is built from the collector logger core and includes the
+	// component.* fields configured for this receiver, they're necessary to
+	// route the logs to the correct datastream.
+	bridgeTelemetrySettings.Logger = zap.New(b.Info.Logger.Core())
 	beatConfig, err := b.BeatConfig()
 	if err != nil {
 		return BeatReceiver{}, fmt.Errorf("error getting beat config: %w", err)
@@ -65,28 +76,49 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 	// stats.beat
 	processReg := statsReg.GetOrCreateRegistry("beat")
 
-	// stats.system
-	systemReg := statsReg.GetOrCreateRegistry("system")
-
-	err = metricreport.SetupMetricsOptions(metricreport.MetricOptions{
-		Logger:         b.Info.Logger.Named("metrics"),
+	// System metrics are process-wide and reported by the shared system bridge,
+	// see AcquireSystemBridge. Only this receiver's beat.info is registered here.
+	metricreport.SetupInfoMetrics(metricreport.MetricOptions{
 		Name:           b.Info.Name,
 		Version:        b.Info.Version,
-		SystemMetrics:  systemReg,
 		ProcessMetrics: processReg,
 	})
-	if err != nil {
-		return BeatReceiver{}, fmt.Errorf("error setting up metrics report: %w", err)
-	}
 
+	// The bridge is shared by all receivers, so pass the original settings to
+	// keep this receiver's component.* fields out of its logs.
+	var releaseSystem func()
+	acquireSystem := func() (err error) {
+		releaseSystem, err = oteltelemetry.AcquireSystemBridge(set.TelemetrySettings)
+		if err != nil {
+			return fmt.Errorf("error acquiring system bridge: %w", err)
+		}
+		return nil
+	}
+	created := false
+	defer func() {
+		if created {
+			return
+		}
+		stopAPI(b)
+		if releaseSystem != nil {
+			releaseSystem()
+		}
+	}()
+
+	// The API serves the shared system metrics, so it starts after the bridge.
+	// Without an API the bridge is acquired only once creation can no longer fail.
 	if b.Config.HTTP.Enabled() {
+		if err := acquireSystem(); err != nil {
+			return BeatReceiver{}, err
+		}
 		retryer := backoff.NewRetryer(50, 100*time.Millisecond, 1*time.Second)
 		err := retryer.Retry(ctx, func() error {
 			var err error
 			b.API, err = api.NewWithDefaultRoutes(
 				b.Info.Logger.Named("metrics.http"),
 				b.Config.HTTP,
-				b.Monitoring)
+				b.Monitoring,
+				api.WithStatsExtra(receiverSystemMetrics))
 			if err != nil {
 				return fmt.Errorf("could not start the HTTP server for the API: %w", err)
 			}
@@ -100,18 +132,20 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 
 	beater, err := creator(&b.Beat, beatConfig)
 	if err != nil {
-		return BeatReceiver{}, fmt.Errorf("error getting %s creator:%w", b.Info.Beat, err)
+		return BeatReceiver{}, fmt.Errorf("error getting %s creator: %w", b.Info.Beat, err)
 	}
 
-	bridge, err := oteltelemetry.NewRegistryBridge(ts, receiverID.String(), b.Monitoring.StatsRegistry(), b.Monitoring.InputsRegistry())
+	bridge, err := oteltelemetry.NewRegistryBridge(bridgeTelemetrySettings, receiverID.String(), b.Monitoring.StatsRegistry(), b.Monitoring.InputsRegistry())
 	if err != nil {
 		return BeatReceiver{}, fmt.Errorf("error creating registry bridge: %w", err)
 	}
 
-	releaseSystem, err := oteltelemetry.AcquireSystemBridge(ts)
-	if err != nil {
-		return BeatReceiver{}, fmt.Errorf("error acquiring system bridge: %w", err)
+	if releaseSystem == nil {
+		if err := acquireSystem(); err != nil {
+			return BeatReceiver{}, err
+		}
 	}
+	created = true
 
 	return BeatReceiver{
 		beat:                b,
@@ -119,12 +153,20 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 		Logger:              b.Info.Logger,
 		bridge:              bridge,
 		releaseSystemBridge: releaseSystem,
+		startCalled:         make(chan struct{}),
 		runDone:             make(chan error, 1),
 	}, nil
 }
 
+// SetStartHook configures a hook that runs synchronously in Start before the
+// beater's Run method is launched.
+func (br *BeatReceiver) SetStartHook(hook func(component.Host) error) {
+	br.startHook = hook
+}
+
 // BeatReceiver.Start() starts the beat receiver.
-func (br *BeatReceiver) Start(host component.Host) (retErr error) {
+func (br *BeatReceiver) Start(ctx context.Context, host component.Host) (retErr error) {
+	close(br.startCalled)
 	// If Start returns an error before the beater.Run goroutine is launched,
 	// signal runDone so that a concurrent Shutdown does not block forever on it.
 	defer func() {
@@ -153,6 +195,7 @@ func (br *BeatReceiver) Start(host component.Host) (retErr error) {
 			diagExt.RegisterDiagnosticHook(br.beat.Info.ComponentID, "Metrics from the default monitoring namespace and expvar.",
 				"beat_metrics.json", "application/json", func() []byte {
 					m := monitoring.CollectStructSnapshot((br.beat.Monitoring.StatsRegistry()), monitoring.Full, true)
+					mapstr.M(m).DeepUpdateNoOverwrite(receiverSystemMetrics())
 					data, err := json.MarshalIndent(m, "", "  ")
 					if err != nil {
 						return fmt.Appendf(nil, "Failed to collect beat metric snapshot for Agent diagnostics: %v", err)
@@ -169,6 +212,11 @@ func (br *BeatReceiver) Start(host component.Host) (retErr error) {
 				m.SetActionExtension(br.beat.Info.ComponentID, actionExt)
 			}
 		}
+	}
+
+	if ua := userAgentFromHeaders(headersFromExtensions(ctx, extensions, br.Logger)); ua != "" {
+		br.Logger.Debugf("using User-Agent from headers_setter extension: %q", ua)
+		br.beat.Info.UserAgent = ua
 	}
 
 	if w, ok := br.beater.(backend.WithESStateStoreExtension); ok {
@@ -188,7 +236,8 @@ func (br *BeatReceiver) Start(host component.Host) (retErr error) {
 	if br.beat.Config.MetricLogging == nil || br.beat.Config.MetricLogging.Enabled() {
 		r, err := log.MakeReporter(br.beat.Info,
 			br.beat.Config.MetricLogging,
-			br.beat.Monitoring)
+			br.beat.Monitoring,
+			log.WithExtraMetrics(oteltelemetry.SystemMetricsFlatSnapshot))
 		if err != nil {
 			return fmt.Errorf("error creating metric reporter: %w", err)
 		}
@@ -197,6 +246,12 @@ func (br *BeatReceiver) Start(host component.Host) (retErr error) {
 			return fmt.Errorf("error creating metric log reporter")
 		}
 		br.reporter = rep
+	}
+
+	if br.startHook != nil {
+		if err := br.startHook(host); err != nil {
+			return fmt.Errorf("error running Beat receiver start hook: %w", err)
+		}
 	}
 
 	go func() {
@@ -218,32 +273,39 @@ func (br *BeatReceiver) Shutdown(ctx context.Context) error {
 		br.bridge.Shutdown()
 	}
 	if br.releaseSystemBridge != nil {
-		br.releaseSystemBridge()
-	}
-	// The Beater owns shutdown sequencing: stop it first so it can close its
-	// inputs and finalize acknowledgments before the pipeline is disconnected.
-	// See https://github.com/elastic/beats/issues/49794.
-	// Pass ctx so beaters that implement contextStopper don't exhaust the OTel
-	// shutdown deadline during their ready-state wait.
-	if cs, ok := br.beater.(contextStopper); ok {
-		cs.StopWithContext(ctx)
-	} else {
-		br.beater.Stop()
+		// Release last: the API, log reporter and diagnostics hook read the bridge.
+		defer br.releaseSystemBridge()
 	}
 
-	// Trigger the stop callback. Some beaters (e.g. metricbeat) call
-	// Manager.Stop() in their Run() method, but others (e.g. packetbeat in
-	// static mode) do not. The OtelManager.stopOnce ensures the callback runs
-	// exactly once regardless.
-	br.beat.Manager.Stop()
-
-	// Wait for beater.Run to return before disconnecting the pipeline, so the
-	// beater owns its full shutdown drain and the pipeline is not torn down
-	// while inputs are still active. Bounded by ctx so a hung beater does not
-	// block Shutdown indefinitely.
+	// If the Shutdown was called before the Start, do not wait for beater.Run to return.
 	select {
-	case <-br.runDone:
-	case <-ctx.Done():
+	case <-br.startCalled:
+		// The Beater owns shutdown sequencing: stop it first so it can close its
+		// inputs and finalize acknowledgments before the pipeline is disconnected.
+		// See https://github.com/elastic/beats/issues/49794.
+		// Pass ctx so beaters that implement contextStopper don't exhaust the OTel
+		// shutdown deadline during their ready-state wait.
+		if cs, ok := br.beater.(contextStopper); ok {
+			cs.StopWithContext(ctx)
+		} else {
+			br.beater.Stop()
+		}
+
+		// Trigger the stop callback. Some beaters (e.g. metricbeat) call
+		// Manager.Stop() in their Run() method, but others (e.g. packetbeat in
+		// static mode) do not. The OtelManager.stopOnce ensures the callback runs
+		// exactly once regardless.
+		br.beat.Manager.Stop()
+
+		// Wait for beater.Run to return before disconnecting the pipeline, so the
+		// beater owns its full shutdown drain and the pipeline is not torn down
+		// while inputs are still active. Bounded by ctx so a hung beater does not
+		// block Shutdown indefinitely.
+		select {
+		case <-br.runDone:
+		case <-ctx.Done():
+		}
+	default:
 	}
 
 	// Now disconnect the publisher pipeline (this waits for outstanding events
@@ -297,4 +359,75 @@ func (br *BeatReceiver) getESStateStoreExtension(host component.Host, storageExt
 		return nil, fmt.Errorf("extension '%s' is not a backend.Registry", componentID.String())
 	}
 	return reg, nil
+}
+
+// receiverSystemMetrics returns the shared system metrics for diagnostics and
+// /stats. They are merged without overwriting, so the receiver's beat.info wins.
+func receiverSystemMetrics() mapstr.M {
+	return mapstr.M(oteltelemetry.SystemMetricsSnapshot())
+}
+
+// stopAPI stops the HTTP API server started by NewBeatReceiver, if any.
+func stopAPI(b *instance.Beat) {
+	if b.API != nil {
+		_ = b.API.Stop()
+		b.API = nil
+	}
+}
+
+const (
+	headersSetterType    = "headers_setter"
+	agentComponentPrefix = "_agent-component/"
+)
+
+// headersFromExtensions returns the headers configured on headers_setter extension.
+// Elastic Agent adds one per collector, shared by all receivers.
+func headersFromExtensions(ctx context.Context, extensions map[component.ID]component.Component, log *logp.Logger) map[string]string {
+	var ids []component.ID
+	for id := range extensions {
+		if id.Type().String() == headersSetterType && strings.HasPrefix(id.Name(), agentComponentPrefix) {
+			ids = append(ids, id)
+		}
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	sort.Slice(ids, func(i, j int) bool { return ids[i].String() < ids[j].String() })
+	if len(ids) > 1 {
+		log.Debugf("found %d headers_setter extensions (%v); using %s", len(ids), ids, ids[0])
+	}
+	id := ids[0]
+
+	grpcClient, ok := extensions[id].(extensionauth.GRPCClient)
+	if !ok {
+		log.Warnf("extension %s does not implement extensionauth.GRPCClient; its headers cannot be read", id)
+		return nil
+	}
+	creds, err := grpcClient.PerRPCCredentials()
+	if err != nil {
+		// Only fails when additional_auth is configured and that extension is
+		// missing or broken.
+		log.Warnf("extension %s: could not get PerRPCCredentials, ignoring its headers: %v", id, err)
+		return nil
+	}
+	if creds == nil {
+		return nil
+	}
+	headers, err := creds.GetRequestMetadata(ctx)
+	if err != nil {
+		log.Warnf("extension %s: could not resolve headers, ignoring them: %v", id, err)
+		return nil
+	}
+	return headers
+}
+
+// userAgentFromHeaders returns the User-Agent value in headers, matched
+// case-insensitively, or "" if there is none.
+func userAgentFromHeaders(headers map[string]string) string {
+	for k, v := range headers {
+		if strings.EqualFold(k, "User-Agent") {
+			return v
+		}
+	}
+	return ""
 }

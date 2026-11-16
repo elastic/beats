@@ -24,11 +24,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/keystore"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/paths"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/keystore"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-ucfg"
 )
@@ -93,18 +93,14 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	}
 
 	// Set the default shutdown timeout to 5s. The beat default is 1s, which can be too short for the otel pipeline.
-	// Packetbeat is excluded because its shutdown_timeout has different semantics.
-	// See https://github.com/elastic/beats/issues/52031
-	if b.Info.Beat != "packetbeat" {
-		switch beatSection := receiverConfig[b.Info.Beat].(type) {
-		case map[string]any:
-			if _, alreadySet := beatSection["shutdown_timeout"]; !alreadySet {
-				beatSection["shutdown_timeout"] = receiverPublisherCloseTimeout.String()
-			}
-		case nil:
-			receiverConfig[b.Info.Beat] = map[string]any{
-				"shutdown_timeout": receiverPublisherCloseTimeout.String(),
-			}
+	switch beatSection := receiverConfig[b.Info.Beat].(type) {
+	case map[string]any:
+		if _, alreadySet := beatSection["shutdown_timeout"]; !alreadySet {
+			beatSection["shutdown_timeout"] = receiverPublisherCloseTimeout.String()
+		}
+	case nil:
+		receiverConfig[b.Info.Beat] = map[string]any{
+			"shutdown_timeout": receiverPublisherCloseTimeout.String(),
 		}
 	}
 
@@ -181,6 +177,9 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	if err := features.UpdateFromConfig(b.RawConfig); err != nil {
 		return nil, fmt.Errorf("could not parse features: %w", err)
 	}
+
+	b.ApplyHostname(b.Config.Hostname, "config hostname field")
+
 	b.RegisterHostname(features.FQDN())
 
 	b.Beat.Config = &b.Config.BeatConfig
@@ -204,15 +203,21 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 
 	logger.Infof("Beat ID: %v", b.Info.ID)
 
-	// Try to get the host's FQDN and set it.
-	fqdn, err := fqdnOnce()
-	if err != nil {
-		// FQDN lookup is "best effort".  We log the error, fallback to
-		// the OS-reported hostname, and move on.
-		logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
+	if b.HostnameOverride() == "" {
+		// Info.FQDN is only read when features.fqdn is enabled, so only look the
+		// FQDN up then. The lookup can wait up to a minute when the DNS server
+		// does not answer for the host name, and every receiver waits for it.
 		b.Info.FQDN = b.Info.Hostname
-	} else {
-		b.Info.FQDN = fqdn
+		if features.FQDN() {
+			fqdn, err := fqdnOnce()
+			if err != nil {
+				// FQDN lookup is "best effort".  We log the error, fallback to
+				// the OS-reported hostname, and move on.
+				logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
+			} else {
+				b.Info.FQDN = fqdn
+			}
+		}
 	}
 
 	// register NewOtelManager
@@ -239,9 +244,6 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		b.Info.Version = b.Manager.AgentInfo().Version
 		version.SetPackageVersion(b.Info.Version)
 	}
-
-	// build the user-agent string to be used by the outputs
-	b.GenerateUserAgent()
 
 	if err := b.Manager.CheckRawConfig(b.RawConfig); err != nil {
 		return nil, fmt.Errorf("error checking raw config: %w", err)

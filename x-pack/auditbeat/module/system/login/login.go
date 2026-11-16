@@ -15,9 +15,9 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -98,7 +98,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", system.ModuleName, metricsetName, err)
 	}
 
-	bucket, err := datastore.OpenBucket(bucketName, base.GetPath())
+	bucket, err := datastore.OpenBucket(bucketName, base.GetPath(), base.Logger())
 	if err != nil {
 		return nil, fmt.Errorf("failed to open persistent datastore: %w", err)
 	}

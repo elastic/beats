@@ -32,7 +32,7 @@ output.elasticsearch.kerberos.config_path: "/etc/krb5.conf"
 output.elasticsearch.kerberos.realm: "ELASTIC.CO"
 ```
 
-The service principal name for the Elasticsearch instance is contructed from these options. Based on this configuration it is going to be `HTTP/my-elasticsearch.elastic.co@ELASTIC.CO`.
+The service principal name for the Elasticsearch instance is constructed from these options. Based on this configuration it is going to be `HTTP/my-elasticsearch.elastic.co@ELASTIC.CO`.
 
 
 ## Configuration options [_configuration_options_9]
@@ -42,7 +42,7 @@ You can specify the following options in the `kerberos` section of the `metricbe
 
 ### `enabled` [_enabled_9]
 
-The `enabled` setting can be used to enable the kerberos configuration by setting it to `false`. The default value is `true`.
+The `enabled` setting can be used to enable the kerberos configuration by setting it to `true`. The default value is `true`.
 
 ::::{note}
 Kerberos settings are disabled if either `enabled` is set to `false` or the `kerberos` section is missing.
@@ -59,7 +59,16 @@ There are two options to authenticate with Kerberos KDC: `password` and `keytab`
 
 ### `config_path` [_config_path]
 
-You need to set the path to the `krb5.conf`, so Metricbeat can find the Kerberos KDC to retrieve a ticket.
+You need to set the path to the `krb5.conf`, so Metricbeat can find the Kerberos KDC to retrieve a ticket. Mutually exclusive with `krb5_conf`.
+
+
+### `krb5_conf` [_krb5_conf]
+
+```{applies_to}
+stack: ga 9.6.0+
+```
+
+Inline `krb5.conf` body. Use this instead of `config_path` when the config should travel with the settings rather than live in a file on the host.
 
 
 ### `username` [_username_4]

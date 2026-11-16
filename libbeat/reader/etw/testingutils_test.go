@@ -320,7 +320,7 @@ func (g *ETWEventGenerator) close() error {
 
 // generateEvents generates n random events, alternating between the two event types
 func (g *ETWEventGenerator) generateEvents(n int, wait time.Duration) error {
-	for i := 0; i < n; i++ {
+	for i := range n {
 		if i%2 == 0 {
 			if err := g.writeAllDataTypesEvent(); err != nil {
 				return err

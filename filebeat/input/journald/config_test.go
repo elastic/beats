@@ -25,7 +25,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 )
 
 func TestConfigIncludeMatches(t *testing.T) {
@@ -60,4 +60,42 @@ include_matches:
 
 		verify(t, yaml)
 	})
+}
+
+func TestConfigValidateFacilities(t *testing.T) {
+	tests := []struct {
+		name    string
+		yaml    string
+		wantErr string
+	}{
+		{
+			name: "valid facilities",
+			yaml: "facilities: [0, 4, 23, 127]",
+		},
+		{
+			name:    "negative facility",
+			yaml:    "facilities: [-1]",
+			wantErr: "facility -1 is invalid",
+		},
+		{
+			name:    "facility above 127",
+			yaml:    "facilities: [128]",
+			wantErr: "facility 128 is invalid",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			c, err := conf.NewConfigWithYAML([]byte(tc.yaml), "source")
+			require.NoError(t, err)
+
+			config := defaultConfig()
+			err = c.Unpack(&config)
+			if tc.wantErr == "" {
+				assert.NoError(t, err)
+			} else {
+				assert.ErrorContains(t, err, tc.wantErr)
+			}
+		})
+	}
 }

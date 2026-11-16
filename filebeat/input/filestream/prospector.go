@@ -29,7 +29,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -79,6 +79,7 @@ func init() {
 type fileProspector struct {
 	logger                *logp.Logger
 	filewatcher           loginp.FSWatcher
+	checkInterval         time.Duration
 	identifier            fileIdentifier
 	ignoreOlder           time.Duration
 	ignoreInactiveSince   ignoreInactiveType
@@ -89,6 +90,7 @@ type fileProspector struct {
 	logIdentifiers        map[string]file.StateIdentifier
 	shortFingerprints     *shortFingerprintSet
 	growingFingerprint    bool
+	harvesterState        *fileStateTable
 }
 
 func (p *fileProspector) previousID(name string, fd loginp.FileDescriptor, v loginp.TakeOverState) string {
@@ -178,7 +180,7 @@ func (p *fileProspector) Init(
 	globalStore loginp.StoreUpdater,
 	newID func(loginp.Source) string,
 ) error {
-	files, _ := p.filewatcher.GetFiles(loginp.FileScanOptions{})
+	files := p.filewatcher.GetFiles(loginp.FileScanOptions{}).Files
 
 	// If this fileProspector belongs to an input that did not have an ID
 	// this will find its files in the registry and update them to use the
@@ -319,7 +321,7 @@ func (p *fileProspector) TakeOver(prospectorStore loginp.StoreUpdater, newID fun
 		return nil
 	}
 
-	files, _ := p.filewatcher.GetFiles(loginp.FileScanOptions{})
+	files := p.filewatcher.GetFiles(loginp.FileScanOptions{}).Files
 
 	// Take over states from other Filestream inputs or the log input
 	prospectorStore.TakeOver(func(v loginp.TakeOverState) (string, any) {
@@ -346,35 +348,52 @@ func (p *fileProspector) Run(
 	// we use this logger instead of the prospector logger.
 	defer p.stopHarvesterGroup(ctx.Logger, hg)
 
-	var tg unison.MultiErrGroup
-
 	// The harvester needs to notify the FileWatcher
 	// when it closes
-	hg.SetObserver(p.filewatcher.NotifyChan())
+	hg.SetObserver(p.filewatcher)
+
+	if p.growingFingerprint {
+		if p.shortFingerprints == nil {
+			p.buildShortFingerprintSet(s)
+		}
+		if fw, ok := p.filewatcher.(*fileWatcher); ok {
+			fw.hasGrowingEntries = func() bool { return p.shortFingerprints.Len() > 0 }
+		}
+	}
 
 	ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
-	tg.Go(func() error {
-		p.filewatcher.Run(ctx.Cancelation, metrics, p.ignoreOlder, ignoreInactiveSince)
-		return nil
+	p.scanLoop(ctx.Cancelation, metrics, ignoreInactiveSince, func(fe loginp.FSEvent) {
+		src := p.identifier.GetSource(fe)
+		p.onFSEvent(loggerWithEvent(p.logger, fe), ctx, fe, src, s, hg, ignoreInactiveSince)
 	})
+}
 
-	tg.Go(func() error {
-		for ctx.Cancelation.Err() == nil {
-			fe := p.filewatcher.Event()
+// scanLoop scans the file system on the calling goroutine, handing each event
+// to sink, until ctx is cancelled. A non-positive checkInterval disables
+// re-scanning after the initial scan.
+func (p *fileProspector) scanLoop(
+	ctx unison.Canceler,
+	metrics *loginp.Metrics,
+	ignoreInactiveSince time.Time,
+	sink loginp.FSEventSink,
+) {
+	defer metrics.Cleanup()
 
-			if fe.Op == loginp.OpDone {
-				return nil
-			}
+	p.filewatcher.ScanOnce(ctx, sink, metrics, p.ignoreOlder, ignoreInactiveSince)
+	if p.checkInterval <= 0 {
+		<-ctx.Done()
+		return
+	}
 
-			src := p.identifier.GetSource(fe)
-			p.onFSEvent(loggerWithEvent(p.logger, fe), ctx, fe, src, s, hg, ignoreInactiveSince)
+	ticker := time.NewTicker(p.checkInterval)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ticker.C:
+			p.filewatcher.ScanOnce(ctx, sink, metrics, p.ignoreOlder, ignoreInactiveSince)
+		case <-ctx.Done():
+			return
 		}
-		return nil
-	})
-
-	errs := tg.Wait()
-	if len(errs) > 0 {
-		p.logger.Errorf("running prospector failed: %v", errors.Join(errs...))
 	}
 }
 
@@ -466,7 +485,7 @@ func (p *fileProspector) onFSEvent(
 		// its close.on_state_change.renamed Stop, which targets the new key,
 		// reaches the harvester still reading this file.
 		if p.growingFingerprint {
-			oldKey, found := p.findGrowingFingerprintMatch(updater, event)
+			oldKey, found := p.findGrowingFingerprintMatch(event)
 			if found {
 				if err := p.migrateGrowingFingerprint(updater, group, oldKey, src, event); err != nil {
 					log.Errorf("failed to migrate growing fingerprint on rename: %v", err)
@@ -486,6 +505,14 @@ func (p *fileProspector) onFSEvent(
 
 	default:
 		log.Errorf("Unknown operation '%s'", event.Op.String())
+	}
+
+	// Update the descriptor after any migration moves the table entry.
+	if event.Op != loginp.OpDelete {
+		if event.Descriptor.Fingerprint.Complete() {
+			event.Descriptor.Fingerprint.Raw = ""
+		}
+		p.harvesterState.UpdateDescriptor(src.Name(), event.Descriptor)
 	}
 }
 
@@ -628,7 +655,7 @@ func (p *fileProspector) handleGrowingFingerprintLookup(
 	}
 
 	// Try to find a prefix match against the event's raw fingerprint material.
-	oldKey, found := p.findGrowingFingerprintMatch(updater, event)
+	oldKey, found := p.findGrowingFingerprintMatch(event)
 	if !found {
 		return src
 	}
@@ -674,13 +701,38 @@ func (p *fileProspector) buildShortFingerprintSet(updater loginp.StateMetadataUp
 			return
 		}
 
-		// typeconv.Convert handles both fileMeta and map[string]any
+		// Fast-path: completed and legacy entries make up the vast majority of
+		// the registry and omit fingerprint_len (zero in fileMeta, absent in the
+		// JSON-decoded map[string]any on startup). Skip them before invoking
+		// reflection-based typeconv.Convert.
 		var fm fileMeta
-		if err := typeconv.Convert(&fm, meta); err != nil {
-			p.logger.Debugf("buildShortFingerprintSet: skipping %s: cannot convert meta to fileMeta: %v",
-				key, err)
-			return
+		switch m := meta.(type) {
+		case fileMeta:
+			if m.FingerprintLen <= 0 {
+				return
+			}
+			fm = m
+		case map[string]any:
+			if _, ok := m["fingerprint_len"]; !ok {
+				return
+			}
+			if err := typeconv.Convert(&fm, m); err != nil {
+				p.logger.Debugf("buildShortFingerprintSet: skipping %s: cannot convert meta to fileMeta: %v",
+					key, err)
+				return
+			}
+		default:
+			// Defensive fallback; in production cursorMeta is fileMeta, map[string]any, or nil.
+			if meta == nil {
+				return
+			}
+			if err := typeconv.Convert(&fm, meta); err != nil {
+				p.logger.Debugf("buildShortFingerprintSet: skipping %s: cannot convert meta to fileMeta: %v",
+					key, err)
+				return
+			}
 		}
+
 		// The key carries the hash, the value the length — exactly what
 		// hash-based prefix matching needs. Add() drops non-growing entries.
 		p.shortFingerprints.Add(key, rk.fingerprintHash(), hex.EncodedLen(int(fm.FingerprintLen)), fm.Source)
@@ -692,7 +744,8 @@ func (p *fileProspector) buildShortFingerprintSet(updater loginp.StateMetadataUp
 // material — i.e. the same file seen earlier with fewer bytes — and returns
 // its key so the caller can migrate it to the current identity. Only still
 // growing entries are searched, making this O(K) in the number of growing
-// entries.
+// entries. Callers must ensure p.shortFingerprints has been initialized (see
+// buildShortFingerprintSet in Run).
 //
 // A single candidate, the descriptor's raw fingerprint material
 // (Fingerprint.Raw), covers both transitions: below threshold it is the
@@ -703,20 +756,15 @@ func (p *fileProspector) buildShortFingerprintSet(updater loginp.StateMetadataUp
 // The match is first attempted against the entry sharing the event's path
 // (high-confidence). Only for a completed (threshold-crossing) event — strong
 // evidence of an identity transition — a path-agnostic fallback then recovers
-// a restart+rename where the stored entry still holds the OLD path. The
-// fallback is gated by isLikelyRename so two distinct files that merely share
-// a content prefix are not confused.
+// a restart+rename where the stored entry still holds the OLD path. Candidates
+// whose stored path still exists on disk are excluded to prevent matching a
+// distinct coexisting file with an identical header prefix.
 func (p *fileProspector) findGrowingFingerprintMatch(
-	updater loginp.StateMetadataUpdater,
 	event loginp.FSEvent,
 ) (oldKey string, found bool) {
 	raw := event.Descriptor.Fingerprint.Raw
 	if raw == "" {
 		return "", false
-	}
-
-	if p.shortFingerprints == nil {
-		p.buildShortFingerprintSet(updater)
 	}
 
 	// shortFingerprints still holds the pre-rename source path, so on rename

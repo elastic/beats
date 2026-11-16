@@ -12,10 +12,10 @@ import (
 
 func TestSysmetricCollectorCalculateQuery(t *testing.T) {
 	type fields struct {
-		patterns []interface{}
+		patterns []any
 	}
 	strpatterns := []string{"foo%", "%bar", "%foobar%"}
-	patterns := make([]interface{}, len(strpatterns))
+	patterns := make([]any, len(strpatterns))
 	for i, v := range strpatterns {
 		patterns[i] = v
 	}

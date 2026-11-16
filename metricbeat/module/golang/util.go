@@ -21,15 +21,15 @@ import (
 	"bytes"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // GetCmdStr Convert cmd array to cmd line
-func GetCmdStr(v interface{}, logger *logp.Logger) interface{} {
+func GetCmdStr(v any, logger *logp.Logger) any {
 	switch t := v.(type) {
-	case []interface{}:
+	case []any:
 		var buffer bytes.Buffer
-		strs := v.([]interface{})
+		strs := v.([]any)
 		for _, v := range strs {
 			buffer.WriteString(v.(string))
 			buffer.WriteString(" ")

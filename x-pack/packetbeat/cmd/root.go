@@ -13,11 +13,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	packetbeatCmd "github.com/elastic/beats/v7/packetbeat/cmd"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 
@@ -91,14 +91,14 @@ func defaultProcessors() []mapstr.M {
 	return []mapstr.M{
 		{
 			"if.contains.tags": "forwarded",
-			"then": []interface{}{
+			"then": []any{
 				mapstr.M{
 					"drop_fields": mapstr.M{
-						"fields": []interface{}{"host"},
+						"fields": []any{"host"},
 					},
 				},
 			},
-			"else": []interface{}{
+			"else": []any{
 				mapstr.M{
 					"add_host_metadata": nil,
 				},

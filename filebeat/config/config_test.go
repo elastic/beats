@@ -28,7 +28,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 )
 
 func TestLoadConfig2(t *testing.T) {
@@ -48,7 +48,7 @@ func TestLoadConfig2(t *testing.T) {
 }
 
 func TestEnabledInputs(t *testing.T) {
-	stdinEnabled, err := conf.NewConfigFrom(map[string]interface{}{
+	stdinEnabled, err := conf.NewConfigFrom(map[string]any{
 		"type":    "stdin",
 		"enabled": true,
 	})
@@ -56,7 +56,7 @@ func TestEnabledInputs(t *testing.T) {
 		return
 	}
 
-	udpDisabled, err := conf.NewConfigFrom(map[string]interface{}{
+	udpDisabled, err := conf.NewConfigFrom(map[string]any{
 		"type":    "udp",
 		"enabled": false,
 	})
@@ -64,7 +64,7 @@ func TestEnabledInputs(t *testing.T) {
 		return
 	}
 
-	logDisabled, err := conf.NewConfigFrom(map[string]interface{}{
+	logDisabled, err := conf.NewConfigFrom(map[string]any{
 		"type":    "log",
 		"enabled": false,
 	})

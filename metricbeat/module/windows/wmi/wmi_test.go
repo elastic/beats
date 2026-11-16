@@ -28,7 +28,7 @@ import (
 func TestShouldSkipNilOrEmptyValue(t *testing.T) {
 	tests := []struct {
 		key                string
-		propertyValue      interface{}
+		propertyValue      any
 		includeNull        bool
 		includeEmptyString bool
 		expectedShouldSkip bool

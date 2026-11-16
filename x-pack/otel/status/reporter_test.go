@@ -5,7 +5,10 @@
 package status
 
 import (
+	"fmt"
 	"testing"
+	"testing/synctest"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -17,7 +20,7 @@ import (
 
 func TestGroupStatus(t *testing.T) {
 	m := &oteltest.MockHost{}
-	reporter := NewGroupStatusReporter(m)
+	reporter := newGroupStatusReporter(m, 0) // report every change
 
 	subReporter1, subReporter2, subReporter3 := reporter.GetReporterForRunner("1"), reporter.GetReporterForRunner("2"), reporter.GetReporterForRunner("3")
 
@@ -25,30 +28,30 @@ func TestGroupStatus(t *testing.T) {
 	subReporter2.UpdateStatus(status.Running, "")
 	subReporter3.UpdateStatus(status.Running, "")
 
-	require.Equalf(t, componentstatus.StatusOK, m.Evt.Status(), "expected StatusOK, got %v", m.Evt.Status())
-	require.NoErrorf(t, m.Evt.Err(), "expected nil, got %v", m.Evt.Err())
+	require.Equalf(t, componentstatus.StatusOK, m.GetEvent().Status(), "expected StatusOK, got %v", m.GetEvent().Status())
+	require.NoErrorf(t, m.GetEvent().Err(), "expected nil, got %v", m.GetEvent().Err())
 
 	subReporter1.UpdateStatus(status.Degraded, "Degrade Runner1")
-	require.Equalf(t, componentstatus.StatusRecoverableError, m.Evt.Status(), "expected StatusDegraded, got %v", m.Evt.Status())
-	require.Error(t, m.Evt.Err(), "expected non-nil error, got nil")
-	require.Equalf(t, "Degrade Runner1", m.Evt.Err().Error(), "expected 'Degrade Runner1', got %v", m.Evt.Err())
+	require.Equalf(t, componentstatus.StatusRecoverableError, m.GetEvent().Status(), "expected StatusDegraded, got %v", m.GetEvent().Status())
+	require.Error(t, m.GetEvent().Err(), "expected non-nil error, got nil")
+	require.Equalf(t, "Degrade Runner1", m.GetEvent().Err().Error(), "expected 'Degrade Runner1', got %v", m.GetEvent().Err())
 
 	subReporter3.UpdateStatus(status.Degraded, "Degrade Runner3")
 	subReporter2.UpdateStatus(status.Failed, "Failed Runner2")
 
-	require.Equalf(t, componentstatus.StatusPermanentError, m.Evt.Status(), "expected StatusPermanentError, got %v", m.Evt.Status())
-	require.Error(t, m.Evt.Err(), "expected non-nil error, got nil")
-	require.Equalf(t, "Failed Runner2", m.Evt.Err().Error(), "expected 'Failed Runner1', got %v", m.Evt.Err())
+	require.Equalf(t, componentstatus.StatusPermanentError, m.GetEvent().Status(), "expected StatusPermanentError, got %v", m.GetEvent().Status())
+	require.Error(t, m.GetEvent().Err(), "expected non-nil error, got nil")
+	require.Equalf(t, "Failed Runner2", m.GetEvent().Err().Error(), "expected 'Failed Runner1', got %v", m.GetEvent().Err())
 
 	// group reporter is updated directly
 	reporter.UpdateStatus(status.Failed, "beatreceiver failed to start")
 
-	require.Equalf(t, componentstatus.StatusPermanentError, m.Evt.Status(), "expected StatusPermanentError, got %v", m.Evt.Status())
-	require.Error(t, m.Evt.Err(), "expected non-nil error, got nil")
-	require.Equalf(t, "beatreceiver failed to start", m.Evt.Err().Error(), "expected 'beatreceiver failed to start', got %v", m.Evt.Err())
+	require.Equalf(t, componentstatus.StatusPermanentError, m.GetEvent().Status(), "expected StatusPermanentError, got %v", m.GetEvent().Status())
+	require.Error(t, m.GetEvent().Err(), "expected non-nil error, got nil")
+	require.Equalf(t, "beatreceiver failed to start", m.GetEvent().Err().Error(), "expected 'beatreceiver failed to start', got %v", m.GetEvent().Err())
 }
 
-func TestToPdata(t *testing.T) {
+func TestRunnerStateRaw(t *testing.T) {
 	tests := []struct {
 		name     string
 		state    status.Status
@@ -90,12 +93,12 @@ func TestToPdata(t *testing.T) {
 				state: tt.state,
 				msg:   tt.msg,
 			}
-			result := toPdata(rs)
+			result := rs.raw()
 
 			for key, expectedVal := range tt.wantKeys {
-				val, ok := result.Get(key)
+				val, ok := result[key]
 				require.True(t, ok, "expected key %q to exist", key)
-				require.Equal(t, expectedVal, val.Str(), "expected %q=%q, got %q", key, expectedVal, val.Str())
+				require.Equal(t, expectedVal, val, "expected %q=%q, got %q", key, expectedVal, val)
 			}
 		})
 	}
@@ -103,7 +106,7 @@ func TestToPdata(t *testing.T) {
 
 func TestInputStatusesInEventAttributes(t *testing.T) {
 	m := &oteltest.MockHost{}
-	reporter := NewGroupStatusReporter(m)
+	reporter := newGroupStatusReporter(m, 0) // report every change
 
 	subReporter1 := reporter.GetReporterForRunner("runner-1")
 	subReporter2 := reporter.GetReporterForRunner("runner-2")
@@ -111,11 +114,11 @@ func TestInputStatusesInEventAttributes(t *testing.T) {
 	subReporter1.UpdateStatus(status.Running, "")
 	subReporter2.UpdateStatus(status.Degraded, "some warning")
 
-	require.NotNil(t, m.Evt)
+	require.NotNil(t, m.GetEvent())
 
 	// Verify inputs attribute exists
-	attrs := m.Evt.Attributes()
-	inputsVal, ok := attrs.Get(inputStatusAttributesKey)
+	attrs := m.GetEvent().Attributes()
+	inputsVal, ok := attrs.Get(InputStatusAttributesKey)
 	require.True(t, ok, "expected 'inputs' attribute to exist")
 
 	inputsMap := inputsVal.Map()
@@ -145,4 +148,121 @@ func TestInputStatusesInEventAttributes(t *testing.T) {
 	runner2Error, ok := runner2Map.Get("error")
 	require.True(t, ok)
 	assert.Equal(t, "some warning", runner2Error.Str())
+}
+
+func TestUnchangedRunnerStatusIsNotReported(t *testing.T) {
+	m := &oteltest.MockHost{}
+	reporter := newGroupStatusReporter(m, 0) // report every change
+	sub := reporter.GetReporterForRunner("runner-1")
+
+	sub.UpdateStatus(status.Running, "")
+	sub.UpdateStatus(status.Running, "")
+	sub.UpdateStatus(status.Degraded, "slow")
+	sub.UpdateStatus(status.Degraded, "slow")
+
+	assert.Len(t, m.GetEvents(), 2, "only the two changes should be reported")
+}
+
+// TestGroupStatusHasNoInputStatuses checks that a status reported for the
+// whole group carries no input statuses, even once runners reported theirs.
+// The Heartbeat receiver relies on this to tell a failed monitor from a failed
+// receiver.
+func TestGroupStatusHasNoInputStatuses(t *testing.T) {
+	m := &oteltest.MockHost{}
+	reporter := NewGroupStatusReporter(m)
+
+	reporter.GetReporterForRunner("runner-1").UpdateStatus(status.Failed, "runner failed")
+	require.NotNil(t, m.GetEvent(), "expected the runner status to be reported")
+	_, ok := m.GetEvent().Attributes().Get(InputStatusAttributesKey)
+	require.True(t, ok, "expected the runner status event to carry input statuses")
+
+	reporter.UpdateStatus(status.Failed, "beatreceiver failed to start")
+	require.NotNil(t, m.GetEvent(), "expected the group status to be reported")
+	assert.Equal(t, componentstatus.StatusPermanentError, m.GetEvent().Status(), "expected the group failure to be permanent")
+	_, ok = m.GetEvent().Attributes().Get(InputStatusAttributesKey)
+	assert.False(t, ok, "expected the group status event to carry no input statuses")
+}
+
+func TestGroupStatusCoalescesBursts(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		m := &oteltest.MockHost{}
+		reporter := newGroupStatusReporter(m, 100*time.Millisecond)
+
+		// a change after a quiet interval is reported right away
+		reporter.GetReporterForRunner("runner-0").UpdateStatus(status.Running, "")
+		require.Len(t, m.GetEvents(), 1, "the first change should be reported right away")
+
+		// a burst of changes is reported once, at the end of the interval
+		for i := 1; i < 1000; i++ {
+			reporter.GetReporterForRunner(fmt.Sprintf("runner-%d", i)).UpdateStatus(status.Running, "")
+		}
+		reporter.GetReporterForRunner("runner-1").UpdateStatus(status.Degraded, "degraded")
+
+		time.Sleep(100*time.Millisecond - time.Nanosecond)
+		synctest.Wait()
+		require.Len(t, m.GetEvents(), 1, "changes within the interval should not be reported before it ends")
+
+		time.Sleep(time.Nanosecond)
+		synctest.Wait()
+		require.Len(t, m.GetEvents(), 2, "changes within the interval should be reported once at its end")
+
+		evt := m.GetEvent()
+		assert.Equal(t, componentstatus.StatusRecoverableError, evt.Status(), "the report should include the last change")
+		inputs, ok := evt.Attributes().Get(InputStatusAttributesKey)
+		require.True(t, ok, "expected 'inputs' attribute to exist")
+		assert.Equal(t, 1000, inputs.Map().Len(), "the report should include every runner")
+
+		time.Sleep(time.Second)
+		synctest.Wait()
+		assert.Len(t, m.GetEvents(), 2, "no reports without changes")
+	})
+}
+
+func TestGroupStatusOverridesScheduledReport(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		m := &oteltest.MockHost{}
+		reporter := newGroupStatusReporter(m, 100*time.Millisecond)
+
+		reporter.GetReporterForRunner("runner-0").UpdateStatus(status.Running, "")
+		reporter.GetReporterForRunner("runner-1").UpdateStatus(status.Running, "")
+		reporter.UpdateStatus(status.Failed, "beatreceiver failed")
+
+		time.Sleep(time.Second)
+		synctest.Wait()
+		assert.Len(t, m.GetEvents(), 2, "the scheduled report should be skipped")
+		assert.Equal(t, componentstatus.StatusPermanentError, m.GetEvent().Status(), "the scheduled report must not override the receiver status")
+	})
+}
+
+func TestRunnerChangeAfterGroupStatusIsReported(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		m := &oteltest.MockHost{}
+		reporter := newGroupStatusReporter(m, 100*time.Millisecond)
+
+		reporter.GetReporterForRunner("runner-0").UpdateStatus(status.Running, "")
+		reporter.GetReporterForRunner("runner-1").UpdateStatus(status.Running, "")
+		reporter.UpdateStatus(status.Failed, "beatreceiver failed")
+		reporter.GetReporterForRunner("runner-1").UpdateStatus(status.Degraded, "degraded")
+
+		time.Sleep(time.Second)
+		synctest.Wait()
+		assert.Len(t, m.GetEvents(), 3, "the runner change after the group status should be reported once")
+		assert.Equal(t, componentstatus.StatusRecoverableError, m.GetEvent().Status(), "the runner change should override the group status")
+		_, ok := m.GetEvent().Attributes().Get(InputStatusAttributesKey)
+		assert.True(t, ok, "expected the last event to be a runner report")
+	})
+}
+
+func BenchmarkCalculateOtelStatus(b *testing.B) {
+	for _, runners := range []int{100, 1000, 10000} {
+		b.Run(fmt.Sprint(runners), func(b *testing.B) {
+			reporter := newGroupStatusReporter(&oteltest.MockHost{}, 0)
+			for i := range runners {
+				reporter.runnerStates[fmt.Sprintf("monitor-%d", i)] = &runnerState{state: status.Running}
+			}
+			for b.Loop() {
+				reporter.calculateOtelStatus()
+			}
+		})
+	}
 }

@@ -21,18 +21,18 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/transport"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/transport"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 )
 
 const (
@@ -108,11 +108,9 @@ func makeRedis(
 
 	clients := make([]outputs.NetworkClient, len(hosts))
 	for i, h := range hosts {
-		hasScheme := true
-		if parts := strings.SplitN(h, "://", 2); len(parts) != 2 {
-			h = fmt.Sprintf("%s://%s", redisScheme, h)
-			hasScheme = false
-		}
+		originalHost := h
+		h = common.WithDefaultScheme(redisScheme)(h)
+		hasScheme := h == originalHost
 
 		hostUrl, err := url.Parse(h)
 		if err != nil {

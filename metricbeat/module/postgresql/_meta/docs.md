@@ -17,7 +17,7 @@ Default metricsets are `activity`, `bgwriter` and `database`.
 
 ## Dashboard [_dashboard_37]
 
-The PostgreSQL module comes with a predefined dashboard showing databse related metrics. For example:
+The PostgreSQL module comes with a predefined dashboard showing database-related metrics. For example:
 
 ![metricbeat postgresql overview](images/metricbeat-postgresql-overview.png)
 

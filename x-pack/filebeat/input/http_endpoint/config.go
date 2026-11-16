@@ -12,7 +12,7 @@ import (
 	"net/textproto"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 	"github.com/elastic/lumberjack"
 )
 
@@ -119,6 +119,18 @@ func (c *config) Validate() error {
 		}
 	} else if c.CRCSecret != "" {
 		return errors.New("crc.provider is required when crc.secret is defined")
+	}
+
+	// net/http panics for status codes outside this range, which would drop
+	// the client's connection with no response at all.
+	if c.ResponseCode < 100 || c.ResponseCode > 999 {
+		return fmt.Errorf("response_code must be a valid HTTP status code: %d", c.ResponseCode)
+	}
+	if c.OptionsHeaders != nil && len(c.OptionsHeaders) == 0 {
+		return fmt.Errorf("options_headers must be non-empty if configured")
+	}
+	if c.OptionsHeaders != nil && (c.OptionsStatus < 100 || 999 < c.OptionsStatus) {
+		return fmt.Errorf("options_response_code must be a valid HTTP status code: %d", c.OptionsStatus)
 	}
 
 	if c.MaxBodySize != nil && *c.MaxBodySize < 0 {

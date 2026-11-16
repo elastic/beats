@@ -10,10 +10,10 @@ import (
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
@@ -149,7 +149,7 @@ func osquerybeatCfgFromStreams(rawIn *proto.UnitExpectedConfig, agentInfo *clien
 			streamList[iter]["type"] = rawIn.Type
 		}
 		if v, ok := streamList[iter]["data_stream"]; ok {
-			if m, ok := v.(map[string]interface{}); ok {
+			if m, ok := v.(map[string]any); ok {
 				if _, ok := m["namespace"]; !ok {
 					m["namespace"] = ns
 				}

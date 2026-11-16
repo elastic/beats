@@ -28,8 +28,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 var _ resolver = (*miekgResolver)(nil)
@@ -75,7 +75,7 @@ func TestMiekgResolverLookupPTR(t *testing.T) {
 
 	// Validate that our metrics exist.
 	var metricCount int
-	reg.Do(monitoring.Full, func(name string, v interface{}) {
+	reg.Do(monitoring.Full, func(name string, v any) {
 		if strings.Contains(name, "processor.dns") {
 			metricCount++
 		}
@@ -130,7 +130,7 @@ func TestMiekgResolverLookupPTRTLS(t *testing.T) {
 
 	// Validate that our metrics exist.
 	var metricCount int
-	reg.Do(monitoring.Full, func(name string, v interface{}) {
+	reg.Do(monitoring.Full, func(name string, v any) {
 		if strings.Contains(name, "processor.dns") {
 			metricCount++
 		}

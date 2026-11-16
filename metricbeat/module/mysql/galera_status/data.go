@@ -20,7 +20,7 @@ package galera_status
 import (
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 var (
@@ -95,7 +95,7 @@ var (
 // Map data to MapStr of server stats variables: http://galeracluster.com/documentation-webpages/galerastatusvariables.html
 // queryMode specifies, which subset of the available Variables is used.
 func eventMapping(status map[string]string) mapstr.M {
-	source := map[string]interface{}{}
+	source := map[string]any{}
 	for key, val := range status {
 		source[key] = val
 	}

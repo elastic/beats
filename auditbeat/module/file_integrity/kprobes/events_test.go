@@ -76,7 +76,7 @@ func BenchmarkEventAllocation(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		for j := 0; j < 10000; j++ {
+		for range 10000 {
 			p = &ProbeEvent{}
 			_ = p
 			p = &ProbeEvent{MaskMonitor: 1}
@@ -93,7 +93,7 @@ func BenchmarkEventPool(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		for j := 0; j < 10000; j++ {
+		for range 10000 {
 			p = allocProbeEvent()
 			_ = p
 			releaseProbeEvent(p.(*ProbeEvent))

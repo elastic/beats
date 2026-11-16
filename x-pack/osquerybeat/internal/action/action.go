@@ -20,10 +20,13 @@ var (
 )
 
 type Action struct {
-	Query     string
-	ID        string
+	Query string
+	ID    string
+	// SpaceID is the optional Kibana space the action originated from.
+	// It scopes query results and responses to that space in Kibana.
+	SpaceID   string
 	Platforms []string
-	// The optional action timeout
+	// Timeout is the optional query timeout.
 	Timeout    time.Duration
 	ECSMapping ecs.Mapping
 	// Profile is the optional per-action profiling override. When nil the global
@@ -31,7 +34,7 @@ type Action struct {
 	Profile *bool
 }
 
-func FromMap(m map[string]interface{}) (a Action, err error) {
+func FromMap(m map[string]any) (a Action, err error) {
 	if len(m) == 0 {
 		return a, ErrActionRequest
 	}
@@ -52,8 +55,8 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 		profile   *bool
 	)
 	if v, ok := m["data"]; ok {
-		var data map[string]interface{}
-		if data, ok = v.(map[string]interface{}); !ok {
+		var data map[string]any
+		if data, ok = v.(map[string]any); !ok {
 			return a, fmt.Errorf("invalid data: %w", ErrActionRequest)
 		}
 
@@ -71,7 +74,7 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 		}
 		// Parse optional ECS Mapping
 		if v, ok := data["ecs_mapping"]; ok && v != nil {
-			m, ok := v.(map[string]interface{})
+			m, ok := v.(map[string]any)
 			if !ok {
 				return a, fmt.Errorf("invalid ECS mapping: %w", ErrActionRequest)
 			}
@@ -99,9 +102,14 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 		return a, fmt.Errorf("missing query: %w", ErrActionRequest)
 	}
 
+	// A non-string space_id is ignored rather than failing the action;
+	// losing the field only affects space-scoped reads in Kibana.
+	spaceID, _ := m["space_id"].(string)
+
 	a = Action{
 		Query:      query,
 		ID:         id,
+		SpaceID:    strings.TrimSpace(spaceID),
 		Platforms:  platforms,
 		ECSMapping: ecsm,
 		Profile:    profile,
@@ -167,20 +175,20 @@ func platformMatches(goos string, platforms []string) bool {
 	return false
 }
 
-func parseECSMapping(m map[string]interface{}) (ecsm ecs.Mapping, err error) {
+func parseECSMapping(m map[string]any) (ecsm ecs.Mapping, err error) {
 	ecsm = make(ecs.Mapping)
 	for k, v := range m {
 		k = strings.TrimSpace(k)
 		if k == "" {
 			return ecsm, ErrActionRequest
 		}
-		valmap, ok := v.(map[string]interface{})
+		valmap, ok := v.(map[string]any)
 		if !ok {
 			return ecsm, ErrActionRequest
 		}
 
 		var (
-			val   interface{}
+			val   any
 			field string
 		)
 
@@ -210,7 +218,7 @@ func parseECSMapping(m map[string]interface{}) (ecsm ecs.Mapping, err error) {
 	return ecsm, err
 }
 
-func convertToInt64(i interface{}) (int64, error) {
+func convertToInt64(i any) (int64, error) {
 	switch v := i.(type) {
 	case int8:
 		return int64(v), nil

@@ -22,12 +22,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 )
 
 var DefaultDataStreams = "synthetics-*,heartbeat-*"
@@ -41,8 +40,15 @@ func (e LoaderError) Error() string {
 	return e.err.Error()
 }
 
+// ElasticsearchRequester issues authenticated Elasticsearch REST requests.
+//
+// The interface matches eslegclient.Connection.Request.
+type ElasticsearchRequester interface {
+	Request(method, path, pipeline string, params map[string]string, body any) (int, []byte, error)
+}
+
 func MakeESLoader(
-	esc *eslegclient.Connection,
+	esc ElasticsearchRequester,
 	indexPattern string,
 	beatLocation *config.LocationWithID,
 	logger *logp.Logger,

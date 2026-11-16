@@ -25,7 +25,7 @@ import (
 	"github.com/vmware/govmomi/simulator"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func TestFetchEventContents(t *testing.T) {
@@ -101,10 +101,10 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig(ts *simulator.Server) map[string]interface{} {
+func getConfig(ts *simulator.Server) map[string]any {
 	urlSimulator := ts.URL.Scheme + "://" + ts.URL.Host + ts.URL.Path
 
-	return map[string]interface{}{
+	return map[string]any{
 		"module":     "vsphere",
 		"metricsets": []string{"virtualmachine"},
 		"hosts":      []string{urlSimulator},

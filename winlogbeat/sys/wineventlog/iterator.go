@@ -26,7 +26,7 @@ import (
 
 	"golang.org/x/sys/windows"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 const (
@@ -90,11 +90,11 @@ func WithBatchSize(size int) EventIteratorOption {
 
 // NewEventIterator creates an iterator to read event handles from a subscription.
 // The iterator is thread-safe.
-func NewEventIterator(opts ...EventIteratorOption) (*EventIterator, error) {
+func NewEventIterator(logger *logp.Logger, opts ...EventIteratorOption) (*EventIterator, error) {
 	itr := &EventIterator{
 		batchSize: evtNextDefaultHandles,
 		evtNext:   _EvtNext,
-		log:       logp.NewLogger("wineventlog.iterator"),
+		log:       logger.Named("wineventlog.iterator"),
 	}
 
 	for _, opt := range opts {

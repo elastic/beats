@@ -10,7 +10,7 @@ import (
 	"os"
 	"syscall"
 
-	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/pkg/config"
 
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
@@ -19,7 +19,7 @@ import (
 )
 
 func init() {
-	plugin.RegisterWithHashFunc("browser", hashConfig, create, "synthetic", "synthetics/synthetic")
+	plugin.RegisterWithHashFunc("browser", HashConfig, create, "synthetic", "synthetics/synthetic")
 }
 
 func create(name string, cfg *config.C, _ beat.Info) (p plugin.Plugin, err error) {
@@ -40,5 +40,5 @@ func create(name string, cfg *config.C, _ beat.Info) (p plugin.Plugin, err error
 		return plugin.Plugin{}, err
 	}
 
-	return s.plugin(), nil
+	return s.Plugin(), nil
 }

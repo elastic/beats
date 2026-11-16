@@ -39,10 +39,10 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	testingfs "github.com/elastic/elastic-agent-libs/testing/fs"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	testingfs "github.com/elastic/beats/v7/pkg/testing/fs"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -455,7 +455,7 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 				identifier:  mustPathIdentifier(false),
 				ignoreOlder: test.ignoreOlder,
 			}
-			ctx := input.Context{Logger: logp.NewNopLogger(), Cancelation: context.Background()}
+			ctx := newDrainContext(t, p.filewatcher)
 			hg := newTestHarvesterGroup()
 
 			p.Run(ctx, newMockMetadataUpdater(), hg, nil)
@@ -493,7 +493,7 @@ func TestProspectorHarvesterUpdateIgnoredFiles(t *testing.T) {
 		identifier:  mustPathIdentifier(false),
 		ignoreOlder: 10 * time.Second,
 	}
-	ctx := input.Context{Logger: logp.NewNopLogger(), Cancelation: context.Background()}
+	ctx := newDrainContext(t, p.filewatcher)
 	hg := newTestHarvesterGroup()
 	testStore := newMockMetadataUpdater()
 	var wg sync.WaitGroup
@@ -553,7 +553,7 @@ func TestProspectorDeletedFile(t *testing.T) {
 				identifier:   mustPathIdentifier(false),
 				cleanRemoved: test.cleanRemoved,
 			}
-			ctx := input.Context{Logger: logp.NewNopLogger(), Cancelation: context.Background()}
+			ctx := newDrainContext(t, p.filewatcher)
 
 			testStore := newMockMetadataUpdater()
 			testStore.set("path::/path/to/file")
@@ -633,7 +633,7 @@ func TestProspectorRenamedFile(t *testing.T) {
 				identifier:        mustPathIdentifier(test.trackRename),
 				stateChangeCloser: stateChangeCloserConfig{Renamed: test.closeRenamed},
 			}
-			ctx := input.Context{Logger: logp.NewNopLogger(), Cancelation: context.Background()}
+			ctx := newDrainContext(t, p.filewatcher)
 
 			testStore := newMockMetadataUpdater()
 			testStore.set("path::/old/path/to/file")
@@ -680,11 +680,12 @@ type harvesterGroupStop struct{}
 func (h harvesterGroupStop) String() string { return "stop" }
 
 type testHarvesterGroup struct {
-	events []harvesterEvent
+	events   []harvesterEvent
+	migrated func(next loginp.Source)
 }
 
 func newTestHarvesterGroup() *testHarvesterGroup {
-	return &testHarvesterGroup{make([]harvesterEvent, 0)}
+	return &testHarvesterGroup{events: make([]harvesterEvent, 0)}
 }
 
 func (t *testHarvesterGroup) Start(_ input.Context, s loginp.Source) {
@@ -713,6 +714,9 @@ func (t *testHarvesterGroup) Migrate(oldID string, next loginp.Source, updateSto
 		return err
 	}
 	t.events = append(t.events, harvesterMigrate(oldID+" -> "+newID))
+	if t.migrated != nil {
+		t.migrated(next)
+	}
 	return nil
 }
 
@@ -722,7 +726,7 @@ func (t *testHarvesterGroup) StopHarvesters() error {
 }
 
 // SetObserver is a no-op
-func (t *testHarvesterGroup) SetObserver(c chan loginp.HarvesterStatus) {
+func (t *testHarvesterGroup) SetObserver(loginp.HarvesterObserver) {
 }
 
 type mockFileWatcher struct {
@@ -733,7 +737,7 @@ type mockFileWatcher struct {
 
 	out chan loginp.FSEvent
 
-	c chan loginp.HarvesterStatus
+	cancel context.CancelFunc
 }
 
 // newMockFileWatcher creates an FSWatch mock, so you can read
@@ -743,7 +747,6 @@ func newMockFileWatcher(events []loginp.FSEvent, eventCount int) *mockFileWatche
 		events:     events,
 		eventCount: eventCount,
 		out:        make(chan loginp.FSEvent, eventCount),
-		c:          make(chan loginp.HarvesterStatus),
 	}
 
 	for _, evt := range events {
@@ -763,25 +766,36 @@ func newMockFileWatcherWithFiles(filesOnDisk map[string]loginp.FileDescriptor) *
 	}
 }
 
-func (m *mockFileWatcher) Event() loginp.FSEvent {
-	if m.outputCount == m.eventCount {
-		close(m.out)
-		return loginp.FSEvent{}
+// ScanOnce hands the mock's events to sink, then cancels the context from
+// newDrainContext so the prospector's Run returns.
+func (m *mockFileWatcher) ScanOnce(ctx unison.Canceler, sink loginp.FSEventSink, _ *loginp.Metrics, _ time.Duration, _ time.Time) {
+	for range m.eventCount {
+		select {
+		case evt := <-m.out:
+			sink(evt)
+		case <-ctx.Done():
+			return
+		}
 	}
-	evt := <-m.out
-	m.outputCount = m.outputCount + 1
-	return evt
+	if m.cancel != nil {
+		m.cancel()
+	}
 }
 
-func (m *mockFileWatcher) Run(_ unison.Canceler, _ *loginp.Metrics, _ time.Duration, _ time.Time) {}
-
-func (m *mockFileWatcher) GetFiles(loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
-	return m.filesOnDisk, loginp.FileScanMetrics{}
+// newDrainContext returns a context that is cancelled once the mock file
+// watcher has delivered all its events.
+func newDrainContext(t *testing.T, w loginp.FSWatcher) input.Context {
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	w.(*mockFileWatcher).cancel = cancel
+	return input.Context{Logger: logp.NewNopLogger(), Cancelation: ctx}
 }
 
-func (m *mockFileWatcher) NotifyChan() chan loginp.HarvesterStatus {
-	return m.c
+func (m *mockFileWatcher) GetFiles(loginp.FileScanOptions) loginp.ScanResults {
+	return loginp.ScanResults{Files: m.filesOnDisk}
 }
+
+func (m *mockFileWatcher) HarvesterClosed(loginp.HarvesterStatus) {}
 
 // mockMetadataUpdater is a test implementation of loginp.MetadataUpdater whose
 // methods may be invoked from the prospector's goroutines while the test
@@ -1025,7 +1039,7 @@ func TestOnRenameFileIdentity(t *testing.T) {
 				identifier:        mustPathIdentifier(true),
 				stateChangeCloser: stateChangeCloserConfig{Renamed: true},
 			}
-			ctx := input.Context{Logger: logp.NewNopLogger(), Cancelation: context.Background()}
+			ctx := newDrainContext(t, p.filewatcher)
 
 			path := "/new/path/to/file"
 			expectedIdentifier := tc.identifier
@@ -1559,13 +1573,14 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 			maps.Copy(store.table, tc.storeEntries)
 
 			p := &fileProspector{logger: logptest.NewTestingLogger(t, "")}
+			p.buildShortFingerprintSet(store)
 			event := loginp.FSEvent{
 				NewPath: tc.currentPath,
 				Descriptor: loginp.FileDescriptor{
 					Fingerprint: loginp.FingerprintID{Raw: tc.currentFingerprint},
 				},
 			}
-			key, found := p.findGrowingFingerprintMatch(store, event)
+			key, found := p.findGrowingFingerprintMatch(event)
 
 			assert.Equal(t, tc.expectedFound, found, "found mismatch")
 			if tc.expectedFound {
@@ -1594,7 +1609,8 @@ func TestHandleGrowingFingerprintLookup_KeyExistsFastPath(t *testing.T) {
 
 	src := identifier.GetSource(event)
 
-	t.Run("fast path: key exists skips scan", func(t *testing.T) {
+	t.Run("fast path: key exists skips prefix match", func(t *testing.T) {
+		oldKey := "filestream::my-input::fingerprint::" + loginp.HashRawFingerprint("aabb")
 		store := newMockMetadataUpdater()
 		// The store already has an entry for the exact current fingerprint key.
 		store.table[event.SrcID] = fileMeta{
@@ -1602,33 +1618,31 @@ func TestHandleGrowingFingerprintLookup_KeyExistsFastPath(t *testing.T) {
 			IdentifierName: fingerprintName,
 		}
 
-		// Also add an entry that would be a prefix match (the slow path).
-		// If the fast path works, it should never reach findGrowingFingerprintMatch.
-		store.table["filestream::my-input::fingerprint::aabb"] = fileMeta{
-			Source:         currentPath,
-			IdentifierName: fingerprintName,
-		}
+		// Also seed a valid prefix match in both the store and shortFingerprints.
+		// If the KeyExists fast path is bypassed, findGrowingFingerprintMatch
+		// will match oldKey and migrate it.
+		store.table[oldKey] = growingMeta(currentPath, "aabb")
 
 		p := &fileProspector{
 			logger:     logptest.NewTestingLogger(t, ""),
 			identifier: identifier,
 		}
+		p.buildShortFingerprintSet(store)
 
 		hg := newTestHarvesterGroup()
 		p.handleGrowingFingerprintLookup(logptest.NewTestingLogger(t, ""), event, src, store, hg)
 
 		// The fast path returns as soon as the exact key is found, so it must
-		// never scan the registry or migrate anything.
-		assert.Equal(t, int64(0), store.IterateOnPrefixCalled.Load(), "fast path must not scan the registry")
+		// not migrate anything.
 		assert.Equal(t, 0, store.UpdateKeyCalled, "fast path must not migrate")
 		assert.Empty(t, hg.events, "fast path must not touch the harvester group")
 		assert.Positive(t, store.KeyExistsCalled.Load(), "fast path must check key existence")
 		// The pre-seeded prefix entry must remain untouched.
-		assert.True(t, store.has("filestream::my-input::fingerprint::aabb"),
+		assert.True(t, store.has(oldKey),
 			"prefix entry must remain since migration did not run")
 	})
 
-	t.Run("slow path: key does not exist falls through to scan", func(t *testing.T) {
+	t.Run("slow path: key does not exist falls through to prefix match", func(t *testing.T) {
 		// The old key's tail is the bounded hash of the raw material — the
 		// value hash-based prefix matching compares against.
 		oldKey := "filestream::my-input::fingerprint::" + loginp.HashRawFingerprint("aabb")
@@ -1643,14 +1657,13 @@ func TestHandleGrowingFingerprintLookup_KeyExistsFastPath(t *testing.T) {
 			logger:     logptest.NewTestingLogger(t, ""),
 			identifier: identifier,
 		}
+		p.buildShortFingerprintSet(store)
 
 		hg := newTestHarvesterGroup()
 		p.handleGrowingFingerprintLookup(logptest.NewTestingLogger(t, ""), event, src, store, hg)
 
 		// Migration succeeds via the short fingerprint set prefix match: the
-		// registry is scanned, the old key is migrated to the new identity, and
-		// the old key is removed.
-		assert.Positive(t, store.IterateOnPrefixCalled.Load(), "slow path must scan the registry")
+		// old key is migrated to the new identity and the old key is removed.
 		assert.Positive(t, store.UpdateKeyCalled, "slow path must migrate the matched entry")
 		assert.False(t, store.has(oldKey), "old key must be removed after migration")
 		// migrateGrowingFingerprint keeps the old key's plugin/input prefix and
@@ -1747,11 +1760,14 @@ func TestOnFSEvent_GrowingFingerprintMigration(t *testing.T) {
 
 		store := newMockMetadataUpdater()
 		store.table[oldKey] = growingMeta(path, oldFingerprint)
+		tbl := newFileStateTable()
+		h := publishHandle(tbl, "fingerprint::"+oldFingerprint, growingDesc(oldFingerprint))
 		p := &fileProspector{
 			logger:             log,
 			identifier:         identifier,
 			shortFingerprints:  newShortFingerprintSet(),
 			growingFingerprint: true,
+			harvesterState:     tbl,
 		}
 		p.shortFingerprints.AddRaw(oldKey, oldFingerprint, path)
 
@@ -1770,6 +1786,8 @@ func TestOnFSEvent_GrowingFingerprintMigration(t *testing.T) {
 		src := identifier.GetSource(event)
 
 		hg := newTestHarvesterGroup()
+		// The runner tells the open session about the migration.
+		hg.migrated = (&harvestSession{harvesterState: h}).TrackSource
 		p.onFSEvent(log, input.Context{}, event, src, store, hg, time.Time{})
 
 		assert.False(t, store.has(oldKey), "old key should have been removed by migration")
@@ -1791,6 +1809,12 @@ func TestOnFSEvent_GrowingFingerprintMigration(t *testing.T) {
 		// The running harvester's registration is re-keyed along with the entry.
 		assert.Contains(t, hg.events, harvesterMigrate(oldKey+" -> "+newKey),
 			"migration must re-key the running harvester's registration")
+
+		// So is the open file's state table entry.
+		assert.Len(t, tbl.entries, 1, "the state table must hold only the migrated entry")
+		assert.Same(t, h, tbl.entries[src.Name()], "the open file must be listed under its new identity")
+		assert.Equal(t, sha256Fingerprint, h.FingerprintSum(),
+			"the open file must expose the completed fingerprint")
 	})
 
 	// runGrowthEvent drives one below-threshold OpWrite growth event for the
@@ -1855,16 +1879,65 @@ func TestOnFSEvent_GrowingFingerprintMigration(t *testing.T) {
 	})
 }
 
+// TestOnFSEvent_HarvesterStateTable covers descriptor updates for open files.
+func TestOnFSEvent_HarvesterStateTable(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "")
+	path := "/var/log/app.log"
+
+	for _, tc := range []struct {
+		op      loginp.Operation
+		newPath string
+		wantSum string
+	}{
+		{op: loginp.OpWrite, newPath: path, wantSum: "the-sum"},
+		{op: loginp.OpDelete, wantSum: ""},
+	} {
+		t.Run(tc.op.String(), func(t *testing.T) {
+			tbl := newFileStateTable()
+			h := publishHandle(tbl, "path::"+path, growingDesc(""))
+			p := &fileProspector{
+				logger:         log,
+				identifier:     mustPathIdentifier(false),
+				harvesterState: tbl,
+			}
+			event := loginp.FSEvent{
+				Op:         tc.op,
+				OldPath:    path,
+				NewPath:    tc.newPath,
+				Descriptor: completeDesc("the-sum"),
+			}
+			src := p.identifier.GetSource(event)
+
+			p.onFSEvent(log, input.Context{}, event, src, newMockMetadataUpdater(), newTestHarvesterGroup(), time.Time{})
+
+			assert.Equal(t, tc.wantSum, h.FingerprintSum(),
+				"only non-delete events must refresh the open file's descriptor")
+		})
+	}
+}
+
 func TestBuildShortFingerprintSet(t *testing.T) {
 	growingKey := "filestream::input::fingerprint::" + loginp.HashRawFingerprint("aabb")
+	growingMapKey := "filestream::input::fingerprint::" + loginp.HashRawFingerprint("ccdd")
 
 	store := newMockMetadataUpdater()
 	// Growing fingerprint entry (non-zero FingerprintLen) — should be included
 	store.table[growingKey] = growingMeta("/a.log", "aabb")
+	// Growing fingerprint entry loaded from JSON registry (map[string]any with fingerprint_len) — should be included
+	store.table[growingMapKey] = map[string]any{
+		"source":          "/a-map.log",
+		"identifier_name": fingerprintName,
+		"fingerprint_len": float64(2),
+	}
 	// Final SHA-256 entry (zero FingerprintLen) — should be excluded
 	store.table["filestream::input::fingerprint::"+strings.Repeat("ab", 32)] = fileMeta{
 		Source:         "/b.log",
 		IdentifierName: fingerprintName,
+	}
+	// Final SHA-256 entry loaded from JSON registry (map[string]any without fingerprint_len) — should be excluded
+	store.table["filestream::input::fingerprint::"+strings.Repeat("cd", 32)] = map[string]any{
+		"source":          "/b-map.log",
+		"identifier_name": fingerprintName,
 	}
 	// Entry from a registry written before the feature existed
 	// (no FingerprintLen field present → zero on read → treated as final),
@@ -1894,10 +1967,14 @@ func TestBuildShortFingerprintSet(t *testing.T) {
 	p := &fileProspector{logger: logptest.NewTestingLogger(t, "")}
 	p.buildShortFingerprintSet(store)
 
-	require.Len(t, p.shortFingerprints.entries, 1)
+	require.Len(t, p.shortFingerprints.entries, 2, "expected both struct and map growing entries")
 	got, ok := p.shortFingerprints.entries[growingKey]
 	require.True(t, ok, "expected the growing entry to be in the set")
 	assert.Equal(t, rawEntry("aabb", "/a.log"), got, "growing entry mismatch")
+
+	gotMap, ok := p.shortFingerprints.entries[growingMapKey]
+	require.True(t, ok, "expected the map-backed growing entry to be in the set")
+	assert.Equal(t, rawEntry("ccdd", "/a-map.log"), gotMap, "map-backed growing entry mismatch")
 }
 
 func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
@@ -2355,4 +2432,62 @@ func mustInodeMarker(t *testing.T) fileIdentifier {
 		t.Fatalf("cannot create inode marker identifier: %s", err)
 	}
 	return identifier
+}
+
+// countingWatcher counts ScanOnce calls and optionally blocks them until released.
+type countingWatcher struct {
+	mockFileWatcher
+	scans   atomic.Int64
+	started chan struct{}
+}
+
+func (c *countingWatcher) ScanOnce(_ unison.Canceler, _ loginp.FSEventSink, _ *loginp.Metrics, _ time.Duration, _ time.Time) {
+	if c.scans.Add(1) == 1 && c.started != nil {
+		close(c.started)
+	}
+}
+
+func TestProspectorScanLoop(t *testing.T) {
+	run := func(t *testing.T, interval time.Duration) (*countingWatcher, context.CancelFunc, <-chan struct{}) {
+		cw := &countingWatcher{}
+		p := fileProspector{filewatcher: cw, checkInterval: interval}
+		ctx, cancel := context.WithCancel(context.Background())
+		t.Cleanup(cancel)
+		done := make(chan struct{})
+		go func() {
+			defer close(done)
+			p.scanLoop(ctx, nil, time.Time{}, func(loginp.FSEvent) {})
+		}()
+		return cw, cancel, done
+	}
+
+	t.Run("rescans every check_interval and stops on cancel", func(t *testing.T) {
+		cw, cancel, done := run(t, 5*time.Millisecond)
+		assert.Eventually(t, func() bool { return cw.scans.Load() >= 3 }, time.Second, time.Millisecond, "expected repeated scans")
+		cancel()
+		select {
+		case <-done:
+		case <-time.After(time.Second):
+			t.Fatal("scanLoop did not return after cancellation")
+		}
+	})
+
+	for _, interval := range []time.Duration{0, -time.Second} {
+		t.Run(fmt.Sprintf("check_interval %s scans once and blocks until cancel", interval), func(t *testing.T) {
+			cw, cancel, done := run(t, interval)
+			assert.Eventually(t, func() bool { return cw.scans.Load() == 1 }, time.Second, time.Millisecond, "expected the initial scan")
+			select {
+			case <-done:
+				t.Fatal("scanLoop returned before cancellation")
+			case <-time.After(50 * time.Millisecond):
+			}
+			assert.EqualValues(t, 1, cw.scans.Load(), "re-scanning must stay disabled")
+			cancel()
+			select {
+			case <-done:
+			case <-time.After(time.Second):
+				t.Fatal("scanLoop did not return after cancellation")
+			}
+		})
+	}
 }

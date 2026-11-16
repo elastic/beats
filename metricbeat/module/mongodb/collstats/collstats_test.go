@@ -28,7 +28,7 @@ import (
 )
 
 func TestFlattenAggregationResult_NoStorageStats(t *testing.T) {
-	input := map[string]interface{}{
+	input := map[string]any{
 		"size": float64(10),
 	}
 	out := flattenAggregationResult(input)
@@ -39,8 +39,8 @@ func TestFlattenAggregationResult_NoStorageStats(t *testing.T) {
 }
 
 func TestFlattenAggregationResult_WithStorageStats(t *testing.T) {
-	input := map[string]interface{}{
-		"storageStats": map[string]interface{}{
+	input := map[string]any{
+		"storageStats": map[string]any{
 			"size":            float64(1000),
 			"count":           int64(50),
 			"avgObjSize":      float64(20),
@@ -82,9 +82,9 @@ func TestFlattenAggregationResult_WithStorageStats(t *testing.T) {
 }
 
 func TestFlattenAggregationResult_DoesNotOverrideExisting(t *testing.T) {
-	input := map[string]interface{}{
+	input := map[string]any{
 		"count": int64(999), // pre-existing value should not be overridden
-		"storageStats": map[string]interface{}{
+		"storageStats": map[string]any{
 			"count": int64(50),
 		},
 	}
@@ -98,7 +98,7 @@ func TestFlattenAggregationResult_DoesNotOverrideExisting(t *testing.T) {
 func TestApplyOptionsToStats_NoClientRescale(t *testing.T) {
 	metricset := &Metricset{options: CollStatsOptions{Scale: 1024}}
 	// Simulate server already applied scale (so values are post-scale). We expect applyOptionsToStats to leave them untouched.
-	stats := map[string]interface{}{
+	stats := map[string]any{
 		"size":           float64(2048), // Already scaled KB value
 		"storageSize":    float64(4096),
 		"totalIndexSize": float64(1024),
@@ -116,7 +116,7 @@ func TestApplyOptionsToStats_NoClientRescale(t *testing.T) {
 
 func TestApplyOptionsToStats_NoShardRescale(t *testing.T) {
 	metricset := &Metricset{options: CollStatsOptions{Scale: 1024}}
-	stats := map[string]interface{}{
+	stats := map[string]any{
 		"size": float64(3000), // Already scaled total (KB)
 		// shards.* breakdown not collected
 	}
@@ -142,14 +142,14 @@ func TestApplyOptionsToStats_NilStats(t *testing.T) {
 func TestMergeShardedCollStats(t *testing.T) {
 	tests := []struct {
 		name          string
-		shardResults  []map[string]interface{}
+		shardResults  []map[string]any
 		expectedCount int64
 		expectedSize  float64
 		expectedErr   bool
 	}{
 		{
 			name: "single shard",
-			shardResults: []map[string]interface{}{
+			shardResults: []map[string]any{
 				{
 					"ns":          "test.collection",
 					"shard":       "shard01",
@@ -166,7 +166,7 @@ func TestMergeShardedCollStats(t *testing.T) {
 		},
 		{
 			name: "multiple shards with summable fields",
-			shardResults: []map[string]interface{}{
+			shardResults: []map[string]any{
 				{
 					"ns":          "test.collection",
 					"shard":       "shard01",
@@ -192,7 +192,7 @@ func TestMergeShardedCollStats(t *testing.T) {
 		},
 		{
 			name: "shards with index sizes (ignored)",
-			shardResults: []map[string]interface{}{
+			shardResults: []map[string]any{
 				{
 					"ns":    "test.collection",
 					"shard": "shard01",
@@ -216,7 +216,7 @@ func TestMergeShardedCollStats(t *testing.T) {
 		},
 		{
 			name:          "empty shard results",
-			shardResults:  []map[string]interface{}{},
+			shardResults:  []map[string]any{},
 			expectedCount: 0,
 			expectedSize:  0,
 			expectedErr:   true,
@@ -266,7 +266,7 @@ func TestMergeShardedCollStats(t *testing.T) {
 func TestConvertToFloat64(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    interface{}
+		input    any
 		expected float64
 		success  bool
 	}{
@@ -368,7 +368,7 @@ func TestConvertToFloat64(t *testing.T) {
 }
 
 func TestMergeShardedCollStats_WeightedAverages(t *testing.T) {
-	shardResults := []map[string]interface{}{
+	shardResults := []map[string]any{
 		{
 			"shard":      "shard01",
 			"count":      int64(1000),
@@ -392,7 +392,7 @@ func TestMergeShardedCollStats_WeightedAverages(t *testing.T) {
 }
 
 func TestMergeShardedCollStats_SumsFreeStorageSize(t *testing.T) {
-	shardResults := []map[string]interface{}{
+	shardResults := []map[string]any{
 		{
 			"shard":           "shard01",
 			"count":           int64(10),
@@ -413,7 +413,7 @@ func TestMergeShardedCollStats_SumsFreeStorageSize(t *testing.T) {
 func TestMergeShardedCollStats_ZeroDocsSetsAvgObjSizeZero(t *testing.T) {
 	// When no documents exist across shards, avgObjSize must be 0 (mongosh parity)
 	// even if a shard reports a stale avgObjSize.
-	shardResults := []map[string]interface{}{
+	shardResults := []map[string]any{
 		{"shard": "shard01", "count": int64(0), "avgObjSize": float64(50)},
 		{"shard": "shard02", "count": int64(0), "avgObjSize": float64(75)},
 	}
@@ -425,7 +425,7 @@ func TestMergeShardedCollStats_ZeroDocsSetsAvgObjSizeZero(t *testing.T) {
 
 func TestMergeShardedCollStats_WeightedAvgSkipsShardsMissingCount(t *testing.T) {
 	// A shard missing count must not contribute to the weighted avgObjSize.
-	shardResults := []map[string]interface{}{
+	shardResults := []map[string]any{
 		{"shard": "shard01", "count": int64(100), "avgObjSize": float64(40)},
 		// no count -> excluded from weighting AND from totalDocCount
 		{"shard": "shard02", "avgObjSize": float64(1000)},
@@ -438,7 +438,7 @@ func TestMergeShardedCollStats_WeightedAvgSkipsShardsMissingCount(t *testing.T) 
 }
 
 func TestMergeShardedCollStats_MaxFieldsTakeMaximum(t *testing.T) {
-	shardResults := []map[string]interface{}{
+	shardResults := []map[string]any{
 		{"shard": "shard01", "count": int64(1), "max": int64(100), "maxSize": float64(2048)},
 		{"shard": "shard02", "count": int64(1), "max": int64(500), "maxSize": float64(1024)},
 	}
@@ -450,7 +450,7 @@ func TestMergeShardedCollStats_MaxFieldsTakeMaximum(t *testing.T) {
 }
 
 func TestMergeShardedCollStats_RemovesLocalTimeMetadata(t *testing.T) {
-	shardResults := []map[string]interface{}{
+	shardResults := []map[string]any{
 		{"shard": "shard01", "host": "h1", "localTime": "t1", "count": int64(5)},
 	}
 
@@ -462,7 +462,7 @@ func TestMergeShardedCollStats_RemovesLocalTimeMetadata(t *testing.T) {
 
 func TestMergeShardedCollStats_IgnoresNonNumericSummableFields(t *testing.T) {
 	// A non-numeric value for a summable field must be skipped, not crash or coerce.
-	shardResults := []map[string]interface{}{
+	shardResults := []map[string]any{
 		{"shard": "shard01", "count": "not-a-number", "size": float64(10)},
 		{"shard": "shard02", "count": int64(7), "size": float64(20)},
 	}
@@ -477,16 +477,16 @@ func TestMergeShardedCollStats_IgnoresNonNumericSummableFields(t *testing.T) {
 func TestHasShardMetadata(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    map[string]interface{}
+		input    map[string]any
 		expected bool
 	}{
 		{name: "nil", input: nil, expected: false},
-		{name: "no metadata", input: map[string]interface{}{"count": int64(1)}, expected: false},
-		{name: "has shard", input: map[string]interface{}{"shard": "s1"}, expected: true},
+		{name: "no metadata", input: map[string]any{"count": int64(1)}, expected: false},
+		{name: "has shard", input: map[string]any{"shard": "s1"}, expected: true},
 		// "host" alone is NOT a sharding signal: $collStats always emits a
 		// top-level host (the serving node), including on standalone/replica set.
-		{name: "host only (standalone $collStats)", input: map[string]interface{}{"host": "h1"}, expected: false},
-		{name: "has both", input: map[string]interface{}{"shard": "s1", "host": "h1"}, expected: true},
+		{name: "host only (standalone $collStats)", input: map[string]any{"host": "h1"}, expected: false},
+		{name: "has both", input: map[string]any{"shard": "s1", "host": "h1"}, expected: true},
 	}
 
 	for _, tt := range tests {
@@ -502,7 +502,7 @@ func TestFlattenAggregationResult_NilInput(t *testing.T) {
 
 func TestFlattenAggregationResult_StorageStatsWrongType(t *testing.T) {
 	// storageStats present but not a map must be returned unchanged (no panic).
-	input := map[string]interface{}{
+	input := map[string]any{
 		"storageStats": "unexpected-string",
 		"size":         float64(5),
 	}
@@ -516,8 +516,8 @@ func TestFlattenAggregationResult_StorageStatsWrongType(t *testing.T) {
 
 func TestFlattenAggregationResult_DefaultsScaleFactorWhenAbsent(t *testing.T) {
 	// storageStats present without scaleFactor -> default to 1.
-	input := map[string]interface{}{
-		"storageStats": map[string]interface{}{
+	input := map[string]any{
+		"storageStats": map[string]any{
 			"size": float64(100),
 		},
 	}
@@ -740,7 +740,7 @@ func TestCacheMongoVersion_PermanentFailureUsesLegacyPath(t *testing.T) {
 		},
 	}
 
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		ms.cacheMongoVersion(nil)
 		assert.Empty(t, ms.mongoVersion, "version must remain uncached after failure #%d", i+1)
 		assert.False(t, isVersionAtLeast(ms.mongoVersion, "6.2.0"), "must use legacy path when version unknown")

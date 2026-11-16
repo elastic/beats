@@ -18,13 +18,16 @@
 package registrar
 
 import (
+	"fmt"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 type spyLogger struct {
@@ -42,8 +45,12 @@ type testStateStore struct {
 	registry *statestore.Registry
 }
 
-func (s *testStateStore) StoreFor(string) (*statestore.Store, error) {
+func (s *testStateStore) StoreFor(_, _ string) (*statestore.Store, error) {
 	return s.registry.Get(testStoreName)
+}
+
+func (s *testStateStore) StoreKey(_, _ string) string {
+	return fmt.Sprintf("test:%p", s.registry)
 }
 
 func (s *testStateStore) CleanupInterval() time.Duration {
@@ -51,8 +58,8 @@ func (s *testStateStore) CleanupInterval() time.Duration {
 }
 
 // TestRunDrainsPendingBatchOnShutdown verifies the shutdown property: a state
-// already in the channel when done fires is persisted and acked, so it is not
-// replayed on restart.
+// already in the channel when Stop is called is persisted and acked, so it is
+// not replayed on restart.
 func TestRunDrainsPendingBatchOnShutdown(t *testing.T) {
 	testCases := []struct {
 		name    string
@@ -70,25 +77,18 @@ func TestRunDrainsPendingBatchOnShutdown(t *testing.T) {
 
 			spy := &spyLogger{}
 			r, err := New(stateStore, spy, tc.timeout, logger)
-			if err != nil {
-				t.Fatal(err)
-			}
+			require.NoError(t, err, "registrar must be created")
 
 			state := file.State{Id: "test-id", Source: "/path/to/file.log", TTL: -1}
 
 			r.Channel <- []file.State{state}
-			close(r.done)
-
-			r.Run()
+			require.NoError(t, r.Start(), "registrar must start")
+			r.Stop()
 
 			table := memBackend.Stores[testStoreName].Table
-			if _, ok := table[fileStatePrefix+state.Id]; !ok {
-				t.Fatalf("expected drained state %q to be persisted, store has: %v", state.Id, table)
-			}
-
-			if spy.n != 1 {
-				t.Fatalf("expected commitStateUpdates to ack the single drained state once, got Published count %d", spy.n)
-			}
+			_, ok := table[fileStatePrefix+state.Id]
+			require.True(t, ok, "drained state %q must be persisted, store has: %v", state.Id, table)
+			require.Equal(t, 1, spy.n, "the single drained state must be acked exactly once")
 		})
 	}
 }
@@ -103,17 +103,12 @@ func TestRunEmptyChannelShutdown(t *testing.T) {
 
 	spy := &spyLogger{}
 	r, err := New(stateStore, spy, 0, logger)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err, "registrar must be created")
 
-	close(r.done)
+	require.NoError(t, r.Start(), "registrar must start")
+	r.Stop()
 
-	r.Run()
-
-	if spy.n != 0 {
-		t.Fatalf("expected no states to be acked, got Published count %d", spy.n)
-	}
+	require.Equal(t, 0, spy.n, "no states must be acked when the channel is empty")
 }
 
 // TestRunConcurrentShutdownAndBatch runs Run in a background goroutine (via

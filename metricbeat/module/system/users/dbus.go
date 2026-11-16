@@ -65,11 +65,13 @@ func initDbusConnection() (*dbus.Conn, error) {
 
 	err = conn.Auth([]dbus.Auth{auth})
 	if err != nil {
+		conn.Close()
 		return nil, fmt.Errorf("error authenticating: %w", err)
 	}
 
 	err = conn.Hello()
 	if err != nil {
+		conn.Close()
 		return nil, fmt.Errorf("error in Hello: %w", err)
 	}
 
@@ -92,7 +94,7 @@ func getSessionProps(conn *dbus.Conn, path dbus.ObjectPath) (sessionInfo, error)
 
 func formatSessionProps(props map[string]dbus.Variant) (sessionInfo, error) {
 	if len(props) < 8 {
-		return sessionInfo{}, fmt.Errorf("wrong number of fields in  info: %v", props)
+		return sessionInfo{}, fmt.Errorf("wrong number of fields in info: %v", props)
 	}
 
 	remote, ok := props["Remote"].Value().(bool)

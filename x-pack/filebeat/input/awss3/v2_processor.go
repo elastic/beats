@@ -20,10 +20,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	x_reader "github.com/elastic/beats/v7/x-pack/libbeat/reader"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // objectProcessorV2 downloads and decodes an S3 object into beat.Events.
@@ -175,7 +175,7 @@ type downloadedObject struct {
 	body        io.ReadCloser
 	contentType string
 	requestURL  string
-	metadata    map[string]interface{}
+	metadata    map[string]any
 }
 
 func (op *objectProcessorV2) download(ctx context.Context, obj s3EventV2, rc *readerConfig) (*downloadedObject, error) {
@@ -378,7 +378,7 @@ type eventBuilderV2 struct {
 	obj        s3EventV2
 	hash       string
 	requestURL string
-	metadata   map[string]interface{}
+	metadata   map[string]any
 }
 
 func (b *eventBuilderV2) newEvent(message string, offset int64) beat.Event {

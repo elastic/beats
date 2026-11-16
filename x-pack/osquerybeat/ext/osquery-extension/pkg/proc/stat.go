@@ -85,8 +85,8 @@ func ReadStatFS(sysfs fs.FS, pid string) (stat ProcStat, err error) {
 		return
 	}
 
-	lines := bytes.Split(b, []byte{'\n'})
-	for _, line := range lines {
+	lines := bytes.SplitSeq(b, []byte{'\n'})
+	for line := range lines {
 		detail := bytes.SplitN(line, []byte{':'}, 2)
 		if len(detail) != 2 {
 			continue

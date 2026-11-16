@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/pkg/config"
 )
 
 var outputReg = map[string]Factory{}
@@ -82,7 +82,7 @@ type Group struct {
 // RegisterType registers a new output type.
 func RegisterType(name string, f Factory) {
 	if outputReg[name] != nil {
-		panic(fmt.Errorf("output type  '%v' exists already", name))
+		panic(fmt.Errorf("output type '%v' exists already", name))
 	}
 	outputReg[name] = f
 }

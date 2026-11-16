@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package guess
 
@@ -14,8 +13,8 @@ import (
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/auditbeat/tracing"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 /*
@@ -144,7 +143,7 @@ func (g *guessSockaddrIn6) Trigger() error {
 
 // Extract receives the dumped struct sockaddr_in6 and scans it for the
 // expected values.
-func (g *guessSockaddrIn6) Extract(ev interface{}) (mapstr.M, bool) {
+func (g *guessSockaddrIn6) Extract(ev any) (mapstr.M, bool) {
 	arr := ev.([]byte)
 	if len(arr) < 8 {
 		return nil, false

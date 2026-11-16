@@ -75,7 +75,7 @@ func TestFBEncodeDecode(t *testing.T) {
 	}
 
 	assert.Equal(t, len(p), len(out))
-	for i := 0; i < len(p); i++ {
+	for i := range p {
 		assert.Equal(t, p[i], out[i])
 	}
 }
@@ -87,7 +87,7 @@ func TestPoolPoison(t *testing.T) {
 
 	var wg sync.WaitGroup
 
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		wg.Add(1)
 		go poolPoison(input[i%2], t, &wg)
 	}
@@ -98,7 +98,7 @@ func poolPoison(p []*Package, t *testing.T, wg *sync.WaitGroup) {
 	builder, release := fbGetBuilder()
 	defer release()
 
-	for k := 0; k < 1000; k++ {
+	for range 1000 {
 		builder.Reset()
 
 		data := encodePackages(builder, p)
@@ -114,7 +114,7 @@ func poolPoison(p []*Package, t *testing.T, wg *sync.WaitGroup) {
 		}
 
 		assert.Equal(t, len(p), len(out))
-		for i := 0; i < len(p); i++ {
+		for i := range p {
 			assert.Equal(t, p[i], out[i])
 		}
 	}

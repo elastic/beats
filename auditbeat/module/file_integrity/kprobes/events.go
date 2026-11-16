@@ -26,7 +26,7 @@ import (
 )
 
 var probeEventPool = sync.Pool{
-	New: func() interface{} {
+	New: func() any {
 		return &ProbeEvent{}
 	},
 }

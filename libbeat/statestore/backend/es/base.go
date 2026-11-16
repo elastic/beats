@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 type baseStore struct {
@@ -179,17 +179,6 @@ func (b *baseStore) Remove(key string) error {
 
 func (b *baseStore) Close() error {
 	return nil
-}
-
-func (b *baseStore) SetID(id string) {
-	if b == nil {
-		return
-	}
-
-	if id == "" {
-		return
-	}
-	b.index = renderIndexName(id)
 }
 
 type queryResult struct {

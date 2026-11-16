@@ -152,6 +152,20 @@ name: "my-shipper"
 ```
 
 
+### `hostname` [_hostname]
+```{applies_to}
+stack: ga 9.6
+```
+
+Sets the hostname the Beat reports in `host.name` and `observer.hostname` (when `add_observer_metadata` is configured). Use this when the Beat cannot determine its own hostname, for example in Kubernetes environments where `os.Hostname()` returns a pod name instead of the node name.
+
+Example:
+
+```yaml
+hostname: "k8s-node-01"
+```
+
+
 ### `tags` [_tags_30]
 
 A list of tags that the Beat includes in the `tags` field of each published transaction. Tags make it easy to group servers by different logical properties. For example, if you have a cluster of web servers, you can add the "webservers" tag to the Beat on each server, and then use filters and queries in the Kibana web interface to get visualisations for the whole group of servers.
@@ -161,6 +175,14 @@ Example:
 ```yaml
 tags: ["my-service", "hardware", "test"]
 ```
+
+::::{note}
+:applies_to: stack: ga 9.6+
+
+When the Beat is managed by {{agent}}, [tags applied to the {{agent}}](docs-content://reference/fleet/filter-agent-list-by-tags.md) are also added to the `tags` field of every event.
+
+{{agent}} tags are appended to any tags already on the event rather than replacing them. For example, a Beat configured with `tags: ["my-service"]` and an agent tagged `production` publishes events with `tags: ["my-service", "production"]`. Tags are not de-duplicated, so a tag set both here and on the {{agent}} appears twice.
+::::
 
 
 ### `fields` [libbeat-configuration-fields]

@@ -28,9 +28,9 @@ import (
 	"strconv"
 	"testing"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
@@ -107,8 +107,8 @@ func TestTLSInvalidCert(t *testing.T) {
 			hbtest.SummaryStateChecks(0, 1),
 			hbtest.SimpleURLChecks(t, "ssl", mismatchedHostname, port),
 			hbtest.ResolveChecks(ip),
-			lookslike.MustCompile(map[string]interface{}{
-				"error": map[string]interface{}{
+			lookslike.MustCompile(map[string]any{
+				"error": map[string]any{
 					"message": x509.HostnameError{Certificate: cert, Host: mismatchedHostname}.Error(),
 					"type":    "io",
 				},

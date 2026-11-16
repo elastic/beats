@@ -25,15 +25,15 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
 	"github.com/elastic/beats/v7/libbeat/version"
-	"github.com/elastic/elastic-agent-libs/config"
-	kbn "github.com/elastic/elastic-agent-libs/kibana"
+	"github.com/elastic/beats/v7/pkg/config"
+	kbn "github.com/elastic/beats/v7/pkg/kibana"
 )
 
 // GenDashboardCmd is the command used to export a dashboard.
 func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 	genTemplateConfigCmd := &cobra.Command{
 		Use:   "dashboard",
-		Short: "Export defined dashboard to stdout",
+		Short: "Export dashboards to files",
 		Run: func(cmd *cobra.Command, args []string) {
 			dashboard, _ := cmd.Flags().GetString("id")
 			yml, _ := cmd.Flags().GetString("yml")
@@ -101,7 +101,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 	}
 
 	genTemplateConfigCmd.Flags().String("id", "", "Dashboard id")
-	genTemplateConfigCmd.Flags().String("yml", "", "Yaml file containing list of dashboard ID and filename pairs")
+	genTemplateConfigCmd.Flags().String("yml", "", "YAML file containing dashboard ID and filename pairs")
 	genTemplateConfigCmd.Flags().String("folder", "", "Target folder to save exported assets")
 
 	return genTemplateConfigCmd

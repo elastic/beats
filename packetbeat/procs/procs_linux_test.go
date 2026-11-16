@@ -22,11 +22,12 @@ package procs
 import (
 	"os"
 	"path/filepath"
+	"slices"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 func TestFindSocketsOfPid(t *testing.T) {
@@ -139,13 +140,7 @@ func createFakeDirectoryStructure(prefix string, files []testProcFile) error {
 
 func assertUint64ArraysAreEqual(t *testing.T, expected []uint64, result []uint64) bool {
 	for _, ex := range expected {
-		found := false
-		for _, res := range result {
-			if ex == res {
-				found = true
-				break
-			}
-		}
+		found := slices.Contains(result, ex)
 		if !found {
 			t.Errorf("Expected array %v but got %v", expected, result)
 			return false

@@ -13,18 +13,5 @@ import (
 
 func getCPUStats(taskStats dcontainer.StatsResponse) cpu.CPUStats {
 	usage := cpu.CPUUsage{Stat: &docker.Stat{Stats: taskStats}}
-
-	return cpu.CPUStats{
-		TotalUsage:                            usage.Total(),
-		TotalUsageNormalized:                  usage.TotalNormalized(),
-		UsageInKernelmode:                     taskStats.CPUStats.CPUUsage.UsageInKernelmode,
-		UsageInKernelmodePercentage:           usage.InKernelMode(),
-		UsageInKernelmodePercentageNormalized: usage.InKernelModeNormalized(),
-		UsageInUsermode:                       taskStats.CPUStats.CPUUsage.UsageInUsermode,
-		UsageInUsermodePercentage:             usage.InUserMode(),
-		UsageInUsermodePercentageNormalized:   usage.InUserModeNormalized(),
-		SystemUsage:                           taskStats.CPUStats.SystemUsage,
-		SystemUsagePercentage:                 usage.System(),
-		SystemUsagePercentageNormalized:       usage.SystemNormalized(),
-	}
+	return usage.Metrics()
 }

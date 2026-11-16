@@ -21,7 +21,7 @@ import (
 	"testing"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -87,10 +87,10 @@ func TestClusterMetricSetData(t *testing.T) {
 	assert.NoError(t, err, "failed to write events with reporter")
 }
 
-func getConfig(ts *simulator.Server) map[string]interface{} {
+func getConfig(ts *simulator.Server) map[string]any {
 	urlSimulator := ts.URL.Scheme + "://" + ts.URL.Host + ts.URL.Path
 
-	return map[string]interface{}{
+	return map[string]any{
 		"module":     "vsphere",
 		"metricsets": []string{"cluster"},
 		"hosts":      []string{urlSimulator},

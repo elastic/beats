@@ -34,14 +34,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/util"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/features"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/go-sysinfo/types"
 )
 
@@ -192,6 +192,87 @@ func TestConfigName(t *testing.T) {
 			assert.Equal(t, configValue, v, "Could not find in %s", newEvent)
 		})
 	}
+}
+
+func TestHostnameOverride(t *testing.T) {
+	beat.SetHostnameOverride("Override-Host")
+	t.Cleanup(func() { beat.SetHostnameOverride("") })
+
+	event := &beat.Event{
+		Fields:    mapstr.M{},
+		Timestamp: time.Now(),
+	}
+
+	testConfig, err := conf.NewConfigFrom(map[string]any{})
+	require.NoError(t, err)
+
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	newEvent, err := p.Run(event)
+	require.NoError(t, err)
+
+	v, err := newEvent.GetValue("host.name")
+	require.NoError(t, err)
+	assert.Equal(t, "Override-Host", v, "host.name preserves casing of the override")
+}
+
+func TestHostnameOverrideLosesToConfigName(t *testing.T) {
+	beat.SetHostnameOverride("override-host")
+	t.Cleanup(func() { beat.SetHostnameOverride("") })
+
+	event := &beat.Event{
+		Fields:    mapstr.M{},
+		Timestamp: time.Now(),
+	}
+
+	testConfig, err := conf.NewConfigFrom(map[string]any{"name": "explicit-config-name"})
+	require.NoError(t, err)
+
+	p, err := New(testConfig, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	newEvent, err := p.Run(event)
+	require.NoError(t, err)
+
+	v, err := newEvent.GetValue("host.name")
+	require.NoError(t, err)
+	assert.Equal(t, "explicit-config-name", v)
+}
+
+func TestHostnameOverrideTakesPrecedenceOverFQDN(t *testing.T) {
+	beat.SetHostnameOverride("override-host")
+	t.Cleanup(func() { beat.SetHostnameOverride("") })
+
+	err := features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]any{
+		"features.fqdn.enabled": true,
+	}))
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		_ = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]any{
+			"features.fqdn.enabled": false,
+		}))
+	})
+
+	testConfig, err := conf.NewConfigFrom(map[string]any{})
+	require.NoError(t, err)
+
+	p, err := newWithHostInfoFactory(testConfig, logptest.NewTestingLogger(t, ""), func() (hostInfo, error) {
+		return &mockHostInfo{Hostname: "os-host", FQDN: "os-host.internal"}, nil
+	})
+	require.NoError(t, err)
+
+	newEvent, err := p.Run(&beat.Event{Fields: mapstr.M{}})
+	require.NoError(t, err)
+
+	v, err := newEvent.GetValue("host.name")
+	require.NoError(t, err)
+	assert.Equal(t, "override-host", v)
+
+	// host.hostname keeps the OS hostname even with an override active.
+	v, err = newEvent.GetValue("host.hostname")
+	require.NoError(t, err)
+	assert.Equal(t, "os-host", v)
 }
 
 func TestConfigGeoEnabled(t *testing.T) {

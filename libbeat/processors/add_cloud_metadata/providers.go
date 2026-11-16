@@ -27,9 +27,9 @@ import (
 	"strings"
 	"time"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 type provider struct {
@@ -90,7 +90,7 @@ func providersFilter(configList providerList, allProviders map[string]provider) 
 		// this environment variable as a workaround in case the
 		// configured/default providers misbehave.
 		configList = nil
-		for _, name := range strings.Split(v, ",") {
+		for name := range strings.SplitSeq(v, ",") {
 			configList = append(configList, strings.TrimSpace(name))
 		}
 		if len(configList) == 0 {

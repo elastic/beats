@@ -33,9 +33,9 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/go-libaudit/v2"
 	"github.com/elastic/go-libaudit/v2/aucoalesce"
 	"github.com/elastic/go-libaudit/v2/auparse"
@@ -105,7 +105,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("failed to unpack the auditd config: %w", err)
 	}
 
-	log := logp.NewLogger(moduleName)
+	log := base.Logger().Named(moduleName)
 	_, _, kernel, _ := kernelVersion()
 	log.Infof("auditd module is running as euid=%v on kernel=%v", os.Geteuid(), kernel)
 
@@ -181,8 +181,10 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 		return
 	}
 
+	// Use the control socket: ms.client is being read by the receive
+	// goroutine, which can consume the ACK that SetImmutable waits for.
 	if ms.config.Immutable && status.Enabled != auditLocked {
-		if err := ms.client.SetImmutable(libaudit.WaitForReply); err != nil {
+		if err := ms.control.SetImmutable(libaudit.WaitForReply); err != nil {
 			reporter.Error(err)
 			ms.log.Errorw("Failure setting audit config as immutable", "error", err)
 			return
@@ -398,7 +400,7 @@ func (ms *MetricSet) setPID(retries int) (err error) {
 	}
 
 	// run the SetPID logic in a retry loop, since the startup process can be fragile.
-	for i := 0; i < retries; i++ {
+	for range retries {
 		// This call will block on send, which isn't great, but the reply can *also* time out
 		// or return something like ENOBUFS.
 		err = ms.client.SetPID(libaudit.WaitForReply)
@@ -413,7 +415,7 @@ func (ms *MetricSet) setPID(retries int) (err error) {
 			// the netlink connection is losing data. Try to drain and send again.
 			// This is technically dropping data, but auditbeat is configured as best-effort anyway, and we'll drop events under high load anyway.
 			maxRecv := 10000
-			for i := 0; i < maxRecv; i++ {
+			for range maxRecv {
 				var retryOuter bool // hack because of how switch/break statements work
 				_, err = ms.client.Netlink.Receive(true, noParse)
 				switch {

@@ -42,7 +42,7 @@ func ConfigFileParams() devtools.ConfigFileParams {
 	if SelectLogic == devtools.XPackProject {
 		p.Templates = append(p.Templates, devtools.XPackBeatDir("_meta/config/*.tmpl"))
 	}
-	p.ExtraVars = map[string]interface{}{
+	p.ExtraVars = map[string]any{
 		"device": device,
 	}
 	return p

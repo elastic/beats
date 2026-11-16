@@ -19,9 +19,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // all test files are read from the "testdata" directory
@@ -53,7 +53,7 @@ func TestDecoding(t *testing.T) {
 				Codec: &decoder.CodecConfig{
 					CSV: &decoder.CSVCodecConfig{
 						Enabled: true,
-						Comma:   ptr[decoder.Rune](' '),
+						Comma:   new(decoder.Rune(' ')),
 					},
 				},
 			},
@@ -67,7 +67,20 @@ func TestDecoding(t *testing.T) {
 				Codec: &decoder.CodecConfig{
 					CSV: &decoder.CSVCodecConfig{
 						Enabled: true,
-						Comma:   ptr[decoder.Rune](' '),
+						Comma:   new(decoder.Rune(' ')),
+					},
+				},
+			},
+		},
+		{
+			name:      "parquet",
+			file:      "../../../../libbeat/reader/parquet/testdata/vpc_flow.gz.parquet",
+			numEvents: 652,
+			config: decoder.Config{
+				Codec: &decoder.CodecConfig{
+					Parquet: &decoder.ParquetCodecConfig{
+						Enabled:   true,
+						BatchSize: 1,
 					},
 				},
 			},
@@ -94,6 +107,15 @@ func TestDecoding(t *testing.T) {
 			}
 
 			events := p.events
+
+			ids := make(map[any]struct{}, len(events))
+			for _, event := range events {
+				ids[event.Meta["_id"]] = struct{}{}
+			}
+			assert.Len(t, ids, len(events), "events from the same object must have unique IDs")
+			if tc.numEvents != 0 {
+				assert.Len(t, events, tc.numEvents, "unexpected number of events")
+			}
 			if tc.assertAgainst != "" {
 				targetData := readJSONFromFile(t, filepath.Join(testDataPath, tc.assertAgainst))
 				assert.Equal(t, len(targetData), len(events))
@@ -113,7 +135,7 @@ type pub struct {
 	events []beat.Event
 }
 
-func (p *pub) Publish(e beat.Event, _cursor interface{}) error {
+func (p *pub) Publish(e beat.Event, _cursor any) error {
 	p.t.Logf("%v\n", e.Fields)
 	p.events = append(p.events, e)
 	return nil
@@ -153,7 +175,7 @@ codec:
 			Codec: &decoder.CodecConfig{
 				CSV: &decoder.CSVCodecConfig{
 					Enabled: true,
-					Comma:   ptr[decoder.Rune](' '),
+					Comma:   new(decoder.Rune(' ')),
 					Comment: '#',
 				},
 			}},
@@ -184,7 +206,7 @@ codec:
 			Codec: &decoder.CodecConfig{
 				CSV: &decoder.CSVCodecConfig{
 					Enabled: true,
-					Comma:   ptr[decoder.Rune]('\x00'),
+					Comma:   new(decoder.Rune('\x00')),
 				},
 			}},
 	},
@@ -231,5 +253,3 @@ func sameError(a, b error) bool {
 		return a.Error() == b.Error()
 	}
 }
-
-func ptr[T any](v T) *T { return &v }

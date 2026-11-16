@@ -26,8 +26,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // store implements an actual memlog based store.
@@ -283,10 +283,6 @@ func (m *memstore) Remove(key string) bool {
 	}
 	delete(m.table, key)
 	return true
-}
-
-func (s *store) SetID(_ string) {
-	// NOOP
 }
 
 func (e entry) Decode(to any) error {

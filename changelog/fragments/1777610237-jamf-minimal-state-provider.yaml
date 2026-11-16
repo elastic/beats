@@ -1,3 +1,0 @@
-kind: feature
-summary: Add Jamf provider support for entity analytics minimal-state mode.
-component: filebeat

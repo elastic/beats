@@ -24,7 +24,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/transport"
+	"github.com/elastic/beats/v7/pkg/transport"
 )
 
 // UnixDialerBuilder creates a builder to dial over unix domain socket.

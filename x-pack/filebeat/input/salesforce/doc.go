@@ -204,5 +204,5 @@
 //   - input_manager.go - v2 InputManager and cursor wiring.
 //   - soql.go          - SOQL querier implementing go-sfdc's QueryFormatter.
 //   - value_tpl.go     - template engine shared by "default" / "value" queries.
-//   - helper.go        - small utilities (timeNow indirection, generic pointer helper).
+//   - helper.go        - small utilities (timeNow indirection).
 package salesforce

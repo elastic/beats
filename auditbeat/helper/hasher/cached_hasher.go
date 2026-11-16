@@ -26,7 +26,7 @@ import (
 	lru "github.com/hashicorp/golang-lru/v2"
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // CachedHasher is a metadata aware FileHasher with a LRU cache on top of it.
@@ -53,7 +53,7 @@ type hashEntry struct {
 }
 
 // NewFileHasherWithCache creates a CachedHasher with space up to size elements.
-func NewFileHasherWithCache(c Config, size int) (*CachedHasher, error) {
+func NewFileHasherWithCache(c Config, size int, logger *logp.Logger) (*CachedHasher, error) {
 	// We don't rate limit our hashes, we cache
 	c.ScanRateBytesPerSec = 0
 	hasher, err := NewFileHasher(c, nil)
@@ -71,7 +71,7 @@ func NewFileHasherWithCache(c Config, size int) (*CachedHasher, error) {
 		hasher:   hasher,
 		hashLRU:  hashLRU,
 		hasStatx: hasStatx,
-		log:      logp.NewLogger("cached_hasher"),
+		log:      logger.Named("cached_hasher"),
 	}, nil
 }
 

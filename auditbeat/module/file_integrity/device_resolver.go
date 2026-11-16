@@ -27,7 +27,7 @@ import (
 	lru "github.com/hashicorp/golang-lru/v2"
 	"golang.org/x/sys/windows"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // trieNode represents a node in the trie structure used to map device paths to drive letters.
@@ -172,7 +172,7 @@ func (dr *deviceResolver) buildDeviceMap() (map[string]string, error) {
 	}
 
 	// Query each drive letter
-	for i := 0; i < 26; i++ {
+	for i := range 26 {
 		if (bitmask>>i)&1 == 1 {
 			driveLetter := string(byte('A' + i))
 			drivePath := driveLetter + ":"

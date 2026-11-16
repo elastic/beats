@@ -15,8 +15,8 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo/types"
 )
 
@@ -41,8 +41,8 @@ func TestData(t *testing.T) {
 	mbtest.WriteEventToDataJSON(t, fullEvent, "")
 }
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
+func getConfig() map[string]any {
+	return map[string]any{
 		"module":   system.ModuleName,
 		"datasets": []string{"process"},
 
@@ -65,7 +65,7 @@ func TestProcessEvent(t *testing.T) {
 		assert.False(t, containsError)
 	}
 
-	expectedRootFields := map[string]interface{}{
+	expectedRootFields := map[string]any{
 		"event.kind":     "event",
 		"event.category": []string{"process"},
 		"event.type":     []string{"start"},

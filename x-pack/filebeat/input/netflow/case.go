@@ -9,8 +9,8 @@ import (
 	"sync"
 	"unicode"
 
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var fieldNameConverter = caseConverter{
@@ -34,7 +34,7 @@ func (c *caseConverter) memoize(nfName, converted string) string {
 }
 
 func (c *caseConverter) ToSnakeCase(orig record.Map) mapstr.M {
-	result := mapstr.M(make(map[string]interface{}, len(orig)))
+	result := mapstr.M(make(map[string]any, len(orig)))
 	c.rwMutex.RLock()
 	defer c.rwMutex.RUnlock()
 

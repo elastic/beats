@@ -10,8 +10,8 @@ import (
 	"slices"
 
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	libversion "github.com/elastic/beats/v7/pkg/version"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
-	libversion "github.com/elastic/elastic-agent-libs/version"
 )
 
 const MinimumEsVersion = "7.17.0"

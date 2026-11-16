@@ -11,9 +11,9 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -26,7 +26,7 @@ const (
 
 // nativeOsqueryOptionDefaults are applied to the options map when building the
 // config for osqueryd, only when each key is not already set in the native config.
-var nativeOsqueryOptionDefaults = map[string]interface{}{
+var nativeOsqueryOptionDefaults = map[string]any{
 	"schedule_splay_percent": 10,
 	"schedule_max_drift":     60,
 }
@@ -117,9 +117,9 @@ func NewConfigPlugin(log *logp.Logger) *ConfigPlugin {
 
 // Set replaces the in-memory osquery policy, rebuilds query lookup state, and resets the cached
 // osqueryd config string. Validation errors (invalid ECS mapping, incompatible native vs RRULE
-// scheduling, pack schedule defaults, and so on) are returned immediately: callers that treat
-// a failed Set as fatal—such as runOsquery's input loop—will stop the osquery runner until policy
-// is corrected and a new input arrives.
+// scheduling, pack schedule defaults, and so on) are returned immediately and leave the current
+// policy in place. Policy updates are validated by the input reloader before they reach Set, so
+// for them a failure here is unexpected.
 func (p *ConfigPlugin) Set(inputs []config.InputConfig) error {
 	p.mx.Lock()
 	defer p.mx.Unlock()
@@ -130,8 +130,8 @@ func (p *ConfigPlugin) Set(inputs []config.InputConfig) error {
 // EffectiveOsqueryConfig returns the osquery policy snapshot last applied successfully by Set,
 // including merged pack-level schedule defaults. RRULE execution should read this snapshot only
 // after osqueryd has applied generated config (for example from a post-GenerateConfig hook), so
-// native and RRULE schedules stay aligned. Do not assume inputs[0].Osquery remains the canonical
-// merged struct across refactors.
+// native and RRULE schedules stay aligned. Do not assume the result input's
+// Osquery remains the canonical merged struct across refactors.
 func (p *ConfigPlugin) EffectiveOsqueryConfig() *config.OsqueryConfig {
 	p.mx.RLock()
 	defer p.mx.RUnlock()
@@ -184,6 +184,36 @@ func (p *ConfigPlugin) LookupQueryProfile(name string) bool {
 	return false
 }
 
+// scheduledProfileMatches rejects work captured before a policy or namespace
+// replacement. Pending policy changes take effect for profiling immediately,
+// while result query metadata retains its existing native-refresh behavior.
+func (p *ConfigPlugin) scheduledProfileMatches(request scheduledProfileRequest) bool {
+	p.mx.RLock()
+	defer p.mx.RUnlock()
+	namespace, ok := p.namespaces[request.name]
+	if !ok || namespace != request.namespace {
+		return false
+	}
+	query, ok := p.queryInfoMap[request.name]
+	if !ok || query.Query != request.query || query.SpaceID != request.spaceID || idOrDefault(query.ScheduleID, request.name) != request.scheduleID {
+		return false
+	}
+	if p.newQueryInfoMap != nil {
+		query, ok = p.newQueryInfoMap[request.name]
+		if !ok || query.Query != request.query || query.SpaceID != request.spaceID || idOrDefault(query.ScheduleID, request.name) != request.scheduleID {
+			return false
+		}
+	}
+	return query.Profile
+}
+
+func idOrDefault(id, dflt string) string {
+	if id != "" {
+		return id
+	}
+	return dflt
+}
+
 // GlobalProfileEnabled returns the fleet-wide profiling default applied to queries
 // that do not set their own profile override (notably live ad-hoc queries).
 func (p *ConfigPlugin) GlobalProfileEnabled() bool {
@@ -234,7 +264,7 @@ func newOsqueryConfig(osqueryConfig *config.OsqueryConfig) *config.OsqueryConfig
 		osqueryConfig = &config.OsqueryConfig{}
 	}
 	if osqueryConfig.Options == nil {
-		osqueryConfig.Options = make(map[string]interface{})
+		osqueryConfig.Options = make(map[string]any)
 	}
 	// Apply native osquery option defaults only when not already set in config
 	for k, v := range nativeOsqueryOptionDefaults {
@@ -258,10 +288,7 @@ func (p *ConfigPlugin) render() (string, error) {
 }
 
 func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
-
-	p.configString = ""
-	p.namespace = ""
-
+	namespace := ""
 	queriesCount := 0
 	osqueryConfig := &config.OsqueryConfig{}
 	newQueryInfoMap := make(map[string]QueryInfo)
@@ -273,6 +300,8 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		if err != nil {
 			return
 		}
+		p.configString = ""
+		p.namespace = namespace
 		p.osqueryConfig = osqueryConfig
 		p.newQueryInfoMap = newQueryInfoMap
 		p.namespaces = namespaces
@@ -285,16 +314,17 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		return nil
 	}
 
-	// Read namespace from the first input as of 7.16
-	p.namespace = inputs[0].Datastream.Namespace
-	if p.namespace == "" {
-		p.namespace = config.DefaultNamespace
+	// Read namespace from the result input as of 7.16
+	result := config.ResultInput(inputs)
+	namespace = result.Datastream.Namespace
+	if namespace == "" {
+		namespace = config.DefaultNamespace
 	}
 
 	// Since 7.16 version only one integration/input is expected
-	// The inputs[0].Osquery can be nil if this is pre 7.16 integration configuration
-	if inputs[0].Osquery != nil {
-		osqueryConfig = inputs[0].Osquery
+	// The result input's Osquery can be nil if this is pre 7.16 integration configuration
+	if result.Osquery != nil {
+		osqueryConfig = result.Osquery
 	}
 
 	// Common code to register query with lookup maps, enforce snapshot and increment queries count.
@@ -335,7 +365,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		if err := config.ValidateQueryScheduleMode(qi); err != nil {
 			return fmt.Errorf("osquery.schedule[%q]: %w", name, err)
 		}
-		qi, err = registerQuery(name, p.namespace, qi, "", "", name)
+		qi, err = registerQuery(name, namespace, qi, "", "", name)
 		if err != nil {
 			return err
 		}
@@ -356,7 +386,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 			if err != nil {
 				return fmt.Errorf("osquery.packs[%q].queries[%q]: %w", packName, name, err)
 			}
-			qi, err = registerQuery(getPackQueryName(packName, name), p.namespace, qi, packID, pack.PackName, name)
+			qi, err = registerQuery(getPackQueryName(packName, name), namespace, qi, packID, pack.PackName, name)
 			if err != nil {
 				return err
 			}
@@ -391,7 +421,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 				Profiling:  stream.Profiling,
 			}
 
-			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), p.namespace, qi, input.Name, "", stream.ID)
+			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), namespace, qi, input.Name, "", stream.ID)
 			if err != nil {
 				return err
 			}
@@ -416,7 +446,7 @@ func getPackQueryName(packName, queryName string) string {
 // Due to current configuration passing between the agent and beats the keys that contain dots (".")
 // are split into the nested tree-like structure.
 // This converts this dynamic map[string]interface{} tree into strongly typed flat map.
-func flattenECSMapping(m map[string]interface{}) (ecs.Mapping, error) {
+func flattenECSMapping(m map[string]any) (ecs.Mapping, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -433,7 +463,7 @@ func flattenECSMapping(m map[string]interface{}) (ecs.Mapping, error) {
 	return ecsm, nil
 }
 
-func traverseTree(depth int, ecsm ecs.Mapping, path []string, v interface{}) error {
+func traverseTree(depth int, ecsm ecs.Mapping, path []string, v any) error {
 
 	if path[len(path)-1] == keyField {
 		if s, ok := v.(string); ok {
@@ -462,7 +492,7 @@ func traverseTree(depth int, ecsm ecs.Mapping, path []string, v interface{}) err
 			Value: v,
 		}
 		return nil
-	} else if m, ok := v.(map[string]interface{}); ok {
+	} else if m, ok := v.(map[string]any); ok {
 		if depth < maxECSMappingDepth {
 			for k, v := range m {
 				if strings.TrimSpace(k) == "" {
@@ -478,4 +508,12 @@ func traverseTree(depth int, ecsm ecs.Mapping, path []string, v interface{}) err
 		}
 	}
 	return nil
+}
+
+func (p *ConfigPlugin) lookupResultMetadata(name string) (string, QueryInfo, bool) {
+	p.mx.RLock()
+	defer p.mx.RUnlock()
+	query, ok := p.queryInfoMap[name]
+	namespace, routed := p.namespaces[name]
+	return namespace, query, ok && routed
 }

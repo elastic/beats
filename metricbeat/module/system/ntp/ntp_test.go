@@ -40,8 +40,8 @@ func (n *ntpSuccess) validate(_ *ntp.Response) error {
 	return nil
 }
 
-func getTestConfig() map[string]interface{} {
-	return map[string]interface{}{
+func getTestConfig() map[string]any {
+	return map[string]any{
 		"module":      "system",
 		"metricsets":  []string{"ntp"},
 		"ntp.servers": []string{"0.time.tom.com", "1.time.tom.com"},

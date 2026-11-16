@@ -10,8 +10,8 @@ import "os"
 
 // GetConfig returns the required configuration options for testing a MSSQL
 // metricset.
-func GetConfig(host string, metricSets ...string) map[string]interface{} {
-	return map[string]interface{}{
+func GetConfig(host string, metricSets ...string) map[string]any {
+	return map[string]any{
 		"module":     "mssql",
 		"metricsets": metricSets,
 		"hosts":      []string{host},

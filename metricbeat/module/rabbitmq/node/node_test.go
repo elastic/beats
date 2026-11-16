@@ -22,7 +22,7 @@ import (
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/rabbitmq/mtest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -39,7 +39,7 @@ func testFetch(t *testing.T, collect string) {
 	server := mtest.Server(t, mtest.DefaultServerConfig)
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":       "rabbitmq",
 		"metricsets":   []string{"node"},
 		"hosts":        []string{server.URL},

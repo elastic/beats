@@ -36,7 +36,7 @@ var (
 	}
 )
 
-func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, data *map[string]interface{}) error {
+func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, data *map[string]any) error {
 	metricSetFields, err := schema.Apply(*data)
 
 	if err != nil {

@@ -22,8 +22,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 
 	as "github.com/aerospike/aerospike-client-go/v7"
 )
@@ -98,10 +98,10 @@ func ParseHost(host string) (*as.Host, error) {
 	return as.NewHost(pieces[0], port), nil
 }
 
-func ParseInfo(info string) map[string]interface{} {
-	result := make(map[string]interface{})
+func ParseInfo(info string) map[string]any {
+	result := make(map[string]any)
 
-	for _, keyValueStr := range strings.Split(info, ";") {
+	for keyValueStr := range strings.SplitSeq(info, ";") {
 		KeyValArr := strings.Split(keyValueStr, "=")
 		if len(KeyValArr) == 2 {
 			result[KeyValArr[0]] = KeyValArr[1]

@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
@@ -222,11 +222,11 @@ func getVM(vmName string, vms []VmResource) (VmResource, bool) {
 
 // Helper function to generate a string key for the dimensions
 func getDimensionKey(dimensions []Dimension) string {
-	var dimensionKey string
+	var dimensionKey strings.Builder
 	for _, dimension := range dimensions {
-		dimensionKey += dimension.Name + ","
+		dimensionKey.WriteString(dimension.Name + ",")
 	}
-	return dimensionKey
+	return dimensionKey.String()
 }
 
 // Function to get the resource IDs from the batch of metrics

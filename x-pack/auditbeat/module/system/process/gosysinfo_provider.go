@@ -19,8 +19,8 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
 	"github.com/elastic/beats/v7/libbeat/common/capabilities"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/cache"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -80,7 +80,7 @@ func (p Process) toMapStr() mapstr.M {
 
 // NewFromSysInfo constructs a new MetricSet backed by go-sysinfo.
 func NewFromSysInfo(ms MetricSet) (mb.MetricSet, error) {
-	bucket, err := datastore.OpenBucket(bucketName, ms.paths)
+	bucket, err := datastore.OpenBucket(bucketName, ms.paths, ms.log)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open persistent datastore: %w", err)
 	}

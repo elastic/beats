@@ -19,18 +19,18 @@ package filestream
 
 import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // fingerprintIdentityConfig holds the user-facing configuration for the
 // fingerprint file identity. The fields are propagated to the scanner's
 // fingerprint config via normalizeConfig before the prospector is created.
 type fingerprintIdentityConfig struct {
-	// Growing opts into the Enhanced Fingerprint behavior: files smaller
-	// than the configured fingerprint size (prospector.scanner.fingerprint.
-	// offset + prospector.scanner.fingerprint.length) are tracked using the
-	// raw bytes available so far, instead of being skipped as too small.
+	// Growing tracks files smaller than the configured fingerprint size
+	// (prospector.scanner.fingerprint.offset +
+	// prospector.scanner.fingerprint.length) using the raw bytes available
+	// so far, instead of skipping them as too small.
 	// Once such a file grows past the threshold it is automatically rekeyed
 	// to the same SHA-256 hex the static fingerprint produces, so existing
 	// static-fingerprint state is reused with no data duplication.
@@ -52,15 +52,22 @@ type fingerprintIdentifier struct {
 
 // newFingerprintIdentifier constructs the fingerprint file identifier. The
 // `file_identity.fingerprint` sub-config (e.g. `growing`) is consumed and
-// validated later by normalizeConfig; the identifier itself does not
-// currently need those values at runtime.
+// validated by normalizeConfig; the identifier itself does not currently
+// need those values at runtime.
 func newFingerprintIdentifier(_ *conf.C, _ *logp.Logger) (fileIdentifier, error) {
 	return &fingerprintIdentifier{}, nil
 }
 
+// GetSource drops a completed fingerprint's raw header from the retained source.
+// The event keeps it for growing-fingerprint prefix matching.
 func (i *fingerprintIdentifier) GetSource(e loginp.FSEvent) fileSource {
+	desc := e.Descriptor
+	if desc.Fingerprint.Complete() {
+		desc.Fingerprint.Raw = ""
+	}
+
 	return fileSource{
-		desc:                e.Descriptor,
+		desc:                desc,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,

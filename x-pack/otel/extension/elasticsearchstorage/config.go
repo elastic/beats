@@ -5,11 +5,18 @@
 package elasticsearchstorage
 
 import (
+	"errors"
+
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/config/configauth"
 )
 
+var errMissingAuthenticator = errors.New("an Elasticsearch authenticator must be configured")
+
 type Config struct {
-	ElasticsearchConfig map[string]any `mapstructure:",remain"`
+	// Auth identifies the Elasticsearch authenticator that provides the
+	// destination endpoints and authenticated HTTP transport.
+	Auth configauth.Config `mapstructure:"auth"`
 }
 
 func createDefaultConfig() component.Config {
@@ -17,5 +24,8 @@ func createDefaultConfig() component.Config {
 }
 
 func (c *Config) Validate() error {
+	if c.Auth.AuthenticatorID == (component.ID{}) {
+		return errMissingAuthenticator
+	}
 	return nil
 }

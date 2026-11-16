@@ -16,10 +16,11 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/cmd"
 	"github.com/elastic/beats/v7/filebeat/input/log"
-	libbeatinstance "github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/management"
+	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
-	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestManager(t *testing.T) {
@@ -85,23 +86,38 @@ type: "log"`)
 	})
 }
 
-func TestNewBeatForReceiverDoesNotSetPacketbeatShutdownTimeout(t *testing.T) {
+func TestReceiverHostnameConfigField(t *testing.T) {
+	t.Cleanup(func() { beat.SetHostnameOverride("") })
+
 	cfg := map[string]any{
-		"packetbeat": map[string]any{},
-		"path.home":  t.TempDir(),
+		"path.home": t.TempDir(),
+		"hostname":  "receiver-node",
 	}
 
-	_, err := NewBeatForReceiver(
-		libbeatinstance.Settings{Name: "packetbeat"},
-		cfg,
-		consumertest.NewNop(),
-		"testcomponent",
-		zapcore.NewNopCore(),
-	)
+	b, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), cfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
 	require.NoError(t, err)
 
-	assert.NotContains(t, cfg["packetbeat"], "shutdown_timeout",
-		"packetbeat must retain its own shutdown timeout semantics")
+	assert.Equal(t, "receiver-node", b.Info.Hostname)
+	assert.Equal(t, "receiver-node", b.Info.FQDN)
+	assert.Equal(t, "receiver-node", beat.GetHostnameOverride())
+	assert.NotEqual(t, "receiver-node", b.Info.Name, "hostname: must not affect agent.name")
+}
+
+func TestReceiverNameAndHostnameAreIndependent(t *testing.T) {
+	t.Cleanup(func() { beat.SetHostnameOverride("") })
+
+	cfg := map[string]any{
+		"path.home": t.TempDir(),
+		"hostname":  "receiver-node",
+		"name":      "custom-name",
+	}
+
+	b, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), cfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
+	require.NoError(t, err)
+
+	assert.Equal(t, "receiver-node", b.Info.Hostname)
+	assert.Equal(t, "custom-name", b.Info.Name)
+	assert.Equal(t, "receiver-node", beat.GetHostnameOverride())
 }
 
 func TestNewBeatForReceiverMetricLoggingDefault(t *testing.T) {
@@ -164,5 +180,43 @@ func TestNewBeatForReceiverMetricLoggingDefault(t *testing.T) {
 		require.NoError(t, beat.Config.MetricLogging.Unpack(&metricCfg))
 		assert.True(t, metricCfg.Enabled)
 		assert.Equal(t, time.Duration(0), metricCfg.Period)
+	})
+}
+
+func TestReceiverFQDNLookupFollowsFeatureFlag(t *testing.T) {
+	origLookup := fqdnOnce
+	t.Cleanup(func() {
+		fqdnOnce = origLookup
+		require.NoError(t, features.UpdateFromConfig(conf.NewConfig()))
+	})
+	lookups := 0
+	fqdnOnce = func() (string, error) {
+		lookups++
+		return "host.example.com", nil
+	}
+
+	t.Run("skipped when features.fqdn is disabled", func(t *testing.T) {
+		lookups = 0
+		cfg := map[string]any{"path.home": t.TempDir()}
+
+		b, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), cfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
+		require.NoError(t, err)
+
+		assert.Zero(t, lookups, "the FQDN must not be looked up when the feature is disabled")
+		assert.Equal(t, b.Info.Hostname, b.Info.FQDN, "the FQDN must fall back to the hostname")
+	})
+
+	t.Run("runs when features.fqdn is enabled", func(t *testing.T) {
+		lookups = 0
+		cfg := map[string]any{
+			"path.home": t.TempDir(),
+			"features":  map[string]any{"fqdn": map[string]any{"enabled": true}},
+		}
+
+		b, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), cfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
+		require.NoError(t, err)
+
+		assert.Equal(t, 1, lookups, "the FQDN must be looked up when the feature is enabled")
+		assert.Equal(t, "host.example.com", b.Info.FQDN)
 	})
 }

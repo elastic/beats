@@ -28,8 +28,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/paths"
 )
 
 // diskQueueSegments encapsulates segment-related queue metadata.
@@ -549,17 +549,17 @@ func (w *segmentWriter) UpdateCount(count uint32) error {
 	// Seek to count on disk
 	_, err = w.dst.Seek(4, io.SeekStart)
 	if err != nil {
-		return fmt.Errorf("cound not seek to count position: %w", err)
+		return fmt.Errorf("could not seek to count position: %w", err)
 	}
 	// Write the count
 	err = binary.Write(w.dst, binary.LittleEndian, count)
 	if err != nil {
-		return fmt.Errorf("cound not write count: %w", err)
+		return fmt.Errorf("could not write count: %w", err)
 	}
 	// Return to previous location
 	_, err = w.dst.Seek(offset, io.SeekStart)
 	if err != nil {
-		return fmt.Errorf("cound not seek back to count position: %w", err)
+		return fmt.Errorf("could not seek back to count position: %w", err)
 	}
 	return nil
 }

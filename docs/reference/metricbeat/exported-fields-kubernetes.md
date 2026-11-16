@@ -69,7 +69,7 @@ Kubernetes API server metrics
 
 
 **`kubernetes.apiserver.request.dry_run`**
-:   Wether the request uses dry run
+:   Whether the request uses dry run
 
     type: keyword
 
@@ -1693,7 +1693,7 @@ kubernetes deployment metrics
 
 
 **`kubernetes.deployment.status.progressing`**
-:   Deployment Progresing Condition status (true, false or unknown)
+:   Deployment Progressing Condition status (true, false or unknown)
 
     type: keyword
 

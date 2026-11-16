@@ -24,10 +24,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
-func (m *MetricSet) processBody(response *http.Response, jsonBody interface{}) mb.Event {
+func (m *MetricSet) processBody(response *http.Response, jsonBody any) mb.Event {
 	var event mapstr.M
 
 	if m.deDotEnabled {

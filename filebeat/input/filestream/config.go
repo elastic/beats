@@ -30,8 +30,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // Compression mode constants
@@ -126,8 +126,8 @@ type stateChangeCloserConfig struct {
 }
 
 type readerConfig struct {
-	Backoff        backoffConfig           `config:"backoff"`
-	BufferSize     int                     `config:"buffer_size"`
+	Backoff        loginp.BackoffConfig    `config:"backoff"`
+	BufferSize     int                     `config:"buffer_size" validate:"min=0,nonzero"`
 	Encoding       string                  `config:"encoding"`
 	ExcludeLines   []match.Matcher         `config:"exclude_lines"`
 	IncludeLines   []match.Matcher         `config:"include_lines"`
@@ -136,11 +136,6 @@ type readerConfig struct {
 	Tail           bool                    `config:"seek_to_tail"`
 
 	Parsers parser.Config `config:",inline"`
-}
-
-type backoffConfig struct {
-	Init time.Duration `config:"init" validate:"nonzero"`
-	Max  time.Duration `config:"max" validate:"nonzero"`
 }
 
 type rotationConfig struct {
@@ -175,7 +170,7 @@ func defaultConfig() config {
 func defaultCloserConfig() closerConfig {
 	return closerConfig{
 		OnStateChange: stateChangeCloserConfig{
-			CheckInterval: 5 * time.Second,
+			CheckInterval: loginp.DefaultStateCheckInterval,
 			Removed:       defaultCloserOnStateChangeRemoved(),
 			Inactive:      5 * time.Minute,
 			Renamed:       false,
@@ -189,10 +184,7 @@ func defaultCloserConfig() closerConfig {
 
 func defaultReaderConfig() readerConfig {
 	return readerConfig{
-		Backoff: backoffConfig{
-			Init: 2 * time.Second,
-			Max:  10 * time.Second,
-		},
+		Backoff:        loginp.DefaultBackoffConfig(),
 		BufferSize:     16 * humanize.KiByte,
 		LineTerminator: readfile.AutoLineTerminator,
 		MaxBytes:       10 * humanize.MiByte,

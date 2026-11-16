@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package guess
 
@@ -13,8 +12,8 @@ import (
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/auditbeat/tracing"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Guess the offset of (struct socket*)->sk (type struct sock*)
@@ -75,7 +74,7 @@ func (g *guessSocketSock) Probes() ([]helper.ProbeDef, error) {
 				Address:   "sock_init_data",
 				Fetchargs: "sock={{.P2}}",
 			},
-			Decoder: helper.NewStructDecoder(func() interface{} { return new(sockEvent) }),
+			Decoder: helper.NewStructDecoder(func() any { return new(sockEvent) }),
 		},
 
 		{
@@ -112,7 +111,7 @@ func (g *guessSocketSock) Trigger() error {
 
 // Extract first receives the sock* from sock_init_data, then uses it to
 // scan the dump from inet_release.
-func (g *guessSocketSock) Extract(ev interface{}) (mapstr.M, bool) {
+func (g *guessSocketSock) Extract(ev any) (mapstr.M, bool) {
 	if v, ok := ev.(*sockEvent); ok {
 		if g.initData != nil {
 			return nil, false

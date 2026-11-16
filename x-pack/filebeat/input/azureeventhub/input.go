@@ -15,9 +15,8 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/go-concert/unison"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 const (
@@ -64,10 +63,8 @@ type eventHubInputManager struct {
 	log *logp.Logger
 }
 
-// Init initializes the input manager.
-func (m *eventHubInputManager) Init(unison.Group) error {
-	return nil
-}
+// Close is a no-op; this manager holds no resources to release.
+func (m *eventHubInputManager) Close() {}
 
 // Create creates a new azure-eventhub input based on the configuration.
 func (m *eventHubInputManager) Create(cfg *conf.C) (v2.Input, error) {

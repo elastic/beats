@@ -19,6 +19,7 @@ package readfile
 
 import (
 	"bytes"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
 )
@@ -84,4 +85,9 @@ func (p *StripNewline) autoLineEndingChars(l []byte) int {
 
 func (p *StripNewline) Close() error {
 	return p.reader.Close()
+}
+
+// SetReadDeadline delegates to the wrapped reader (see reader.DeadlineSetter).
+func (p *StripNewline) SetReadDeadline(t time.Time) bool {
+	return reader.SetReadDeadline(p.reader, t)
 }

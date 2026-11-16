@@ -18,7 +18,7 @@ import (
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/prometheus"
 	_ "github.com/elastic/beats/v7/metricbeat/module/prometheus/collector"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 func init() {
@@ -39,8 +39,8 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
 }
 
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string) map[string]any {
+	return map[string]any{
 		"module":                "redisenterprise",
 		"metricsets":            []string{"proxy"},
 		"hosts":                 []string{host},

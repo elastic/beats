@@ -21,10 +21,11 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func TestLegacyServiceNameConfig(t *testing.T) {
@@ -64,4 +65,27 @@ func TestLegacyServiceNameConfig(t *testing.T) {
 		})
 	}
 
+}
+
+func TestIsSyntheticsType(t *testing.T) {
+	cases := []struct {
+		monitorType string
+		want        bool
+	}{
+		{"browser", true},
+		{"synthetic", true},
+		{"synthetics/synthetic", true},
+		{"api", true},
+		{"synthetics/api", true},
+		{"http", false},
+		{"tcp", false},
+		{"icmp", false},
+		{"", false},
+	}
+	for _, c := range cases {
+		t.Run(c.monitorType, func(t *testing.T) {
+			assert.Equal(t, c.want, IsSyntheticsType(c.monitorType))
+			assert.Equal(t, c.want, StdMonitorFields{Type: c.monitorType}.IsSyntheticsType())
+		})
+	}
 }

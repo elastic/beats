@@ -22,8 +22,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 var canInstallNpcapTests = []struct {
@@ -231,4 +231,4 @@ type boolManager struct {
 	management.Manager
 }
 
-func (m boolManager) Enabled() bool { return m.managed }
+func (m boolManager) ConfigFromControlProtocol() bool { return m.managed }

@@ -24,8 +24,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // The current typical usage of the state storage is such that the consumer
@@ -51,7 +51,6 @@ type store struct {
 	mx     sync.Mutex
 	cli    *eslegclient.Connection
 	cliErr error
-	id     string
 
 	base *baseStore
 }
@@ -89,20 +88,6 @@ func (s *store) waitReady() error {
 	case <-s.chReady:
 		return s.cliErr
 	}
-}
-
-func (s *store) SetID(id string) {
-	s.mx.Lock()
-	s.id = id
-	s.mx.Unlock()
-
-	if err := s.waitReady(); err != nil {
-		return
-	}
-	s.mx.Lock()
-	defer s.mx.Unlock()
-
-	s.base.SetID(s.id)
 }
 
 func (s *store) Close() error {
@@ -188,9 +173,6 @@ func (s *store) configure(ctx context.Context, c *conf.C) {
 		s.cliErr = err
 	} else {
 		s.base = NewStore(ctx, s.log, cli, s.name)
-		if s.id != "" {
-			s.base.SetID(s.id)
-		}
 		s.cli = cli
 	}
 

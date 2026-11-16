@@ -33,8 +33,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 var update = flag.Bool("update", false, "update expected parser output json file")
@@ -62,7 +62,7 @@ func (t *testReader) Next() (reader.Message, error) {
 }
 
 // auditdLogField returns the value of a field within msg.Fields["auditd"]["log"].
-func auditdLogField(fields mapstr.M, key string) (interface{}, bool) {
+func auditdLogField(fields mapstr.M, key string) (any, bool) {
 	auditd, ok := fields["auditd"].(mapstr.M)
 	if !ok {
 		return nil, false

@@ -21,10 +21,10 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
-func eventMapping(keyspace uint, info map[string]interface{}) mb.Event {
+func eventMapping(keyspace uint, info map[string]any) mb.Event {
 	info["id"] = fmt.Sprintf("%d:%s", keyspace, info["name"])
 	return mb.Event{
 		MetricSetFields: info,

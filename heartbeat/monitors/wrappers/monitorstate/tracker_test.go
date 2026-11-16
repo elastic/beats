@@ -25,7 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 func TestTrackerRecord(t *testing.T) {
@@ -34,7 +34,7 @@ func TestTrackerRecord(t *testing.T) {
 	require.Equal(t, StatusUp, ms.Status)
 	requireMSStatusCount(t, ms, StatusUp, 1)
 
-	for i := 0; i < FlappingThreshold; i++ {
+	for range FlappingThreshold {
 		_ = mst.RecordStatus(TestSf, StatusDown, true)
 		ms = mst.RecordStatus(TestSf, StatusUp, true)
 	}
@@ -42,7 +42,7 @@ func TestTrackerRecord(t *testing.T) {
 	requireMSCounts(t, ms, FlappingThreshold+1, FlappingThreshold)
 
 	// Restore stable state
-	for i := 0; i < FlappingThreshold; i++ {
+	for range FlappingThreshold {
 		_ = mst.RecordStatus(TestSf, StatusDown, true)
 	}
 
@@ -57,7 +57,7 @@ func TestTrackerRecordFlappingDisabled(t *testing.T) {
 	require.Equal(t, StatusUp, ms.Status)
 	requireMSStatusCount(t, ms, StatusUp, 1)
 
-	for i := 0; i < FlappingThreshold; i++ {
+	for range FlappingThreshold {
 		_ = mst.RecordStatus(TestSf, StatusDown, true)
 		ms = mst.RecordStatus(TestSf, StatusUp, true)
 	}

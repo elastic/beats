@@ -26,10 +26,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
+	"github.com/elastic/beats/v7/pkg/monitoring/adapter"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 	"github.com/elastic/sarama"
 )
 
@@ -87,6 +87,7 @@ type rebalanceStrategy int
 const (
 	rebalanceStrategyRange rebalanceStrategy = iota
 	rebalanceStrategyRoundRobin
+	rebalanceStrategySticky
 )
 
 type isolationLevel int
@@ -104,6 +105,7 @@ var (
 	rebalanceStrategies = map[string]rebalanceStrategy{
 		"range":      rebalanceStrategyRange,
 		"roundrobin": rebalanceStrategyRoundRobin,
+		"sticky":     rebalanceStrategySticky,
 	}
 	isolationLevels = map[string]isolationLevel{
 		"read_uncommitted": isolationLevelReadUncommitted,
@@ -155,8 +157,11 @@ func (c *kafkaInputConfig) Validate() error {
 
 	if c.Username != "" && c.Password == "" {
 		return fmt.Errorf("password must be set when username is configured")
+	} else if c.Username == "" && c.Password != "" {
+		return fmt.Errorf("username must be set when password is configured")
 	}
-	return nil
+
+	return c.Sasl.ValidateWithUsernameAndPassword(c.Username != "")
 }
 
 func newSaramaConfig(config kafkaInputConfig, logger *logp.Logger) (*sarama.Config, error) {
@@ -232,19 +237,24 @@ func newSaramaConfig(config kafkaInputConfig, logger *logp.Logger) (*sarama.Conf
 	// configure client ID
 	k.ClientID = config.ClientID
 
+	if err := k.Validate(); err != nil {
+		return nil, err
+	}
+	return k, nil
+}
+
+func attachSaramaMetrics(k *sarama.Config, parent *monitoring.Registry, logger *logp.Logger) {
+	if parent == nil {
+		parent = monitoring.NewRegistry()
+	}
 	k.MetricRegistry = adapter.GetGoMetrics(
-		monitoring.Default,
-		"filebeat.inputs.kafka",
+		parent,
+		"kafka",
 		logger,
 		adapter.Rename("incoming-byte-rate", "bytes_read"),
 		adapter.Rename("outgoing-byte-rate", "bytes_write"),
 		adapter.GoMetricsNilify,
 	)
-
-	if err := k.Validate(); err != nil {
-		return nil, err
-	}
-	return k, nil
 }
 
 // asSaramaOffset converts an initialOffset enum to the corresponding
@@ -270,6 +280,7 @@ func (st rebalanceStrategy) asSaramaStrategy() sarama.BalanceStrategy {
 	return map[rebalanceStrategy]sarama.BalanceStrategy{
 		rebalanceStrategyRange:      sarama.NewBalanceStrategyRange(),
 		rebalanceStrategyRoundRobin: sarama.NewBalanceStrategyRoundRobin(),
+		rebalanceStrategySticky:     sarama.NewBalanceStrategySticky(),
 	}[st]
 }
 

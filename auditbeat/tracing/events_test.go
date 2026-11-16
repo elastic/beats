@@ -90,7 +90,7 @@ func BenchmarkMapDecoder(b *testing.B) {
 		if err != nil {
 			b.Fatal(err)
 		}
-		m := iface.(map[string]interface{})
+		m := iface.(map[string]any)
 
 		for _, c := range m["exe"].(string) {
 			sum += int(c)
@@ -140,7 +140,7 @@ func BenchmarkStructDecoder(b *testing.B) {
 		Arg5   uint16   `kprobe:"arg5"`
 		Arg6   uint32   `kprobe:"arg6"`
 	}
-	var myAlloc AllocateFn = func() interface{} {
+	var myAlloc AllocateFn = func() any {
 		return new(myStruct)
 	}
 
@@ -243,7 +243,7 @@ func TestKProbeReal(t *testing.T) {
 			CX  int32  `kprobe:"cx"`
 			DX  uint16 `kprobe:"dx"`
 		}
-		allocFn := func() interface{} {
+		allocFn := func() any {
 			return new(myStruct)
 		}
 		if decoder, err = NewStructDecoder(desc, allocFn); err != nil {
@@ -279,7 +279,7 @@ func TestKProbeReal(t *testing.T) {
 				break
 			}
 			if true {
-				data := iface.(map[string]interface{})
+				data := iface.(map[string]any)
 				_, err = fmt.Fprintf(os.Stderr, "Got event len=%d\n", len(data))
 				if err != nil {
 					panic(err)

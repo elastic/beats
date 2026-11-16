@@ -14,8 +14,8 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Client represents the azure client which will make use of the azure sdk go metrics related clients
@@ -27,6 +27,10 @@ type Client struct {
 
 // Usage contains the usage details and forecast values.
 type Usage struct {
+	// Scope is the Azure scope the data was queried for: "subscriptions/{id}",
+	// "/providers/Microsoft.Billing/departments/{id}", or
+	// "/providers/Microsoft.Billing/billingAccounts/{id}".
+	Scope        string
 	UsageDetails []armconsumption.UsageDetailClassification
 	Forecasts    armcostmanagement.QueryResult
 }
@@ -59,6 +63,7 @@ func (client *Client) GetMetrics(timeOpts TimeIntervalOptions) (Usage, error) {
 	} else if client.Config.BillingScopeAccountId != "" {
 		scope = fmt.Sprintf("/providers/Microsoft.Billing/billingAccounts/%s", client.Config.BillingScopeAccountId)
 	}
+	usage.Scope = scope
 
 	//
 	// Fetch the usage details
@@ -71,7 +76,7 @@ func (client *Client) GetMetrics(timeOpts TimeIntervalOptions) (Usage, error) {
 		Infow("Getting usage details for scope")
 
 	filter := fmt.Sprintf(
-		"properties/usageStart eq '%s' and properties/usageEnd eq '%s'",
+		"properties/usageStart ge '%s' and properties/usageEnd le '%s'",
 		timeOpts.usageStart.Format(time.RFC3339Nano),
 		timeOpts.usageEnd.Format(time.RFC3339Nano),
 	)

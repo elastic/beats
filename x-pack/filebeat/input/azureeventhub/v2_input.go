@@ -13,7 +13,9 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"slices"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/coder/websocket"
@@ -29,9 +31,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/libbeat/statusreporterhelper"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -66,6 +69,12 @@ type eventHubInputV2 struct {
 	migrationAssistant *migrationAssistant
 	setupFn            func(ctx context.Context) error
 	status             status.StatusReporter
+}
+
+// checkpointMetadata excludes payloads and AMQP metadata from pending acknowledgments.
+type checkpointMetadata struct {
+	offset         string
+	sequenceNumber int64
 }
 
 // newEventHubInputV2 creates a new instance of the Azure Event Hub input v2,
@@ -233,8 +242,7 @@ func (in *eventHubInputV2) run(ctx context.Context) error {
 			in.config.ConsumerGroup,
 		)
 		if err != nil {
-			in.log.Errorw("error migrating checkpoint store", "error", err)
-			// FIXME: should we return here?
+			return fmt.Errorf("checkpoint migration failed: %w", err)
 		}
 	}
 
@@ -278,7 +286,7 @@ func (in *eventHubInputV2) run(ctx context.Context) error {
 		// On cancellation, it will return a nil error.
 		if err := processor.Run(ctx); err != nil {
 			// The processor encountered an unrecoverable error.
-			in.log.Errorw("processor encountered an unrecoverable error and needs to be restarted", "error", err)
+			in.log.Errorw("processor stopped with error; restarting after backoff", "error", err)
 
 			// The underlying error type for authentication is internal so we can't cast to it.
 			// Instead, we'll check the error message for the status code.
@@ -537,7 +545,26 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 		// We create a new event for each record.
 		records := in.messageDecoder.Decode(receivedEventData.Body)
 
-		for _, record := range records {
+		// Only the last record of a message carries checkpoint metadata.
+		// The acker reports completed events in publish order, so this
+		// marker is reported only after every record of the message has
+		// been acknowledged by the output or filtered by processors. This
+		// prevents writing a checkpoint for a partially delivered message,
+		// and it limits checkpoint writes to one per message when drop_event
+		// discards records (each dropped record is acknowledged immediately).
+		//
+		// Only checkpoint metadata is retained until acknowledgment, so the
+		// message body and AMQP metadata can be collected sooner.
+		checkpoint := &checkpointMetadata{
+			offset:         receivedEventData.Offset,
+			sequenceNumber: receivedEventData.SequenceNumber,
+		}
+
+		for i, record := range records {
+			var private any
+			if i == len(records)-1 {
+				private = checkpoint
+			}
 
 			event := beat.Event{
 				// this is the default value for the @timestamp field; usually the ingest
@@ -545,9 +572,12 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 				Timestamp: processingStartTime,
 				Fields: mapstr.M{
 					"message": record,
-					"azure":   eventHubMetadata,
+					// Each event needs its own copy: event normalization is
+					// disabled, so published events reference this map directly
+					// and outputs may read it on other goroutines.
+					"azure": eventHubMetadata.Clone(),
 				},
-				Private: receivedEventData,
+				Private: private,
 			}
 
 			// Publish the event to the Beats pipeline.
@@ -570,46 +600,41 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 // initializePartitionResources initializes any partition specific resources for your application.
 //
 // Sets up a pipelineClient for publishing events and receive notification of their ACKs.
-func initializePartitionResources(ctx context.Context, partitionClient *azeventhubs.ProcessorPartitionClient, pipeline beat.Pipeline, log *logp.Logger) (beat.Client, error) {
-	// initialize things that might be partition specific, like a
-	// database connection.
+func initializePartitionResources(ctx context.Context, partitionClient partitionCheckpointer, pipeline beat.Pipeline, log *logp.Logger) (beat.Client, error) {
+	writeCheckpoint := newCheckpointWriter(ctx, partitionClient, log)
+
 	return pipeline.ConnectWith(beat.ClientConfig{
-		EventListener: acker.LastEventPrivateReporter(func(acked int, data any) {
-			// Update the checkpoint for the given partition.
-			//
-			// The pipeline calls this function when events have been
-			// successfully published and acknowledged by the output.
-			//
-			// The data parameter contains the private data of the last
-			// acknowledged event.
-			receivedEventData, ok := data.(*azeventhubs.ReceivedEventData)
-			if !ok {
-				log.Errorw(
-					"error updating checkpoint",
-					"partition_id", partitionClient.PartitionID(),
-					"acked", acked,
-					"error", "invalid data type",
-					"type", fmt.Sprintf("%T", data),
-				)
+		EventListener: acker.EventPrivateReporter(func(acked int, data []any) {
+			// The pipeline calls this function with the private data of
+			// a contiguous run of completed events, in publish order.
+			// Only the last record of each message carries checkpoint
+			// metadata, so the newest marker in the run identifies the
+			// latest fully completed message.
+			var checkpoint *checkpointMetadata
+			for _, value := range slices.Backward(data) {
+				if value == nil {
+					continue
+				}
+				var ok bool
+				checkpoint, ok = value.(*checkpointMetadata)
+				if !ok {
+					log.Errorw(
+						"error updating checkpoint",
+						"partition_id", partitionClient.PartitionID(),
+						"acked", acked,
+						"error", "invalid data type",
+						"type", fmt.Sprintf("%T", value),
+					)
+					return
+				}
+				break
+			}
+			if checkpoint == nil {
+				// The run ended in the middle of a message.
 				return
 			}
 
-			err := partitionClient.UpdateCheckpoint(ctx, receivedEventData, nil)
-			if err != nil {
-				log.Errorw(
-					"error updating checkpoint",
-					"error", err,
-				)
-			}
-
-			log.Debugw(
-				"checkpoint updated",
-				"partition_id", partitionClient.PartitionID(),
-				"acked", acked,
-				"sequence_number", receivedEventData.SequenceNumber,
-				"offset", receivedEventData.Offset,
-				"enqueued_time", receivedEventData.EnqueuedTime,
-			)
+			writeCheckpoint(acked, checkpoint)
 		}),
 		Processing: beat.ProcessingConfig{
 			// This input only produces events with basic types so normalization
@@ -617,6 +642,55 @@ func initializePartitionResources(ctx context.Context, partitionClient *azeventh
 			EventNormalization: new(false),
 		},
 	})
+}
+
+// newCheckpointWriter serializes writes for one partition client and ignores
+// markers at or behind the last successfully persisted message.
+func newCheckpointWriter(ctx context.Context, partitionClient partitionCheckpointer, log *logp.Logger) func(int, *checkpointMetadata) {
+	// The pipeline runs ACK callbacks on the queue's ACK goroutine, while
+	// records dropped by processors are acknowledged synchronously inside
+	// Publish when nothing is in flight. The two can overlap, so writes are
+	// serialized and a delayed callback must never move the persisted
+	// checkpoint backwards.
+	var checkpointMu sync.Mutex
+	var lastCheckpoint *checkpointMetadata
+
+	return func(acked int, checkpoint *checkpointMetadata) {
+		checkpointMu.Lock()
+		defer checkpointMu.Unlock()
+		if lastCheckpoint != nil && checkpoint.sequenceNumber <= lastCheckpoint.sequenceNumber {
+			return
+		}
+
+		err := partitionClient.UpdateCheckpoint(ctx, &azeventhubs.ReceivedEventData{
+			Offset:         checkpoint.offset,
+			SequenceNumber: checkpoint.sequenceNumber,
+		}, nil)
+		if err != nil {
+			log.Errorw(
+				"error updating checkpoint",
+				"partition_id", partitionClient.PartitionID(),
+				"error", err,
+			)
+			return
+		}
+		lastCheckpoint = checkpoint
+
+		log.Debugw(
+			"checkpoint updated",
+			"partition_id", partitionClient.PartitionID(),
+			"acked", acked,
+			"sequence_number", checkpoint.sequenceNumber,
+			"offset", checkpoint.offset,
+		)
+	}
+}
+
+// partitionCheckpointer is the subset of *azeventhubs.ProcessorPartitionClient
+// used by the ACK callback, so tests can replace Azure checkpoint writes.
+type partitionCheckpointer interface {
+	PartitionID() string
+	UpdateCheckpoint(context.Context, *azeventhubs.ReceivedEventData, *azeventhubs.UpdateCheckpointOptions) error
 }
 
 func shutdownPartitionResources(ctx context.Context, partitionClient *azeventhubs.ProcessorPartitionClient, pipelineClient beat.Client) {
@@ -629,25 +703,24 @@ func shutdownPartitionResources(ctx context.Context, partitionClient *azeventhub
 	defer pipelineClient.Close()
 }
 
-// newWebSocketConn creates a WebSocket connection for AMQP-over-WebSocket transport.
-//
-// This function is used when the transport configuration is set to "websocket".
-// It enables connectivity through HTTP proxies and firewalls that block the
-// standard AMQP port (5671) but allow HTTPS traffic on port 443.
-//
-// HTTP proxy configuration is automatically detected from environment variables:
-// - HTTP_PROXY / http_proxy
-// - HTTPS_PROXY / https_proxy
-// - NO_PROXY / no_proxy
-func newWebSocketConn(ctx context.Context, args azeventhubs.WebSocketConnParams) (net.Conn, error) {
-	opts := &websocket.DialOptions{
-		Subprotocols: []string{"amqp"},
-	}
+// newWebSocketDialer returns a WebSocket dialer for AMQP-over-WebSocket transport.
+// The returned function captures the given proxy settings so that per-policy
+// proxy_url configuration is forwarded to the WebSocket HTTP upgrade request.
+// When proxy settings are at their defaults, the dialer inherits proxy
+// configuration from environment variables (HTTPS_PROXY, NO_PROXY).
+func newWebSocketDialer(proxy httpcommon.HTTPClientProxySettings) func(ctx context.Context, args azeventhubs.WebSocketConnParams) (net.Conn, error) {
+	client := proxyHTTPClient(proxy)
+	return func(ctx context.Context, args azeventhubs.WebSocketConnParams) (net.Conn, error) {
+		opts := &websocket.DialOptions{
+			Subprotocols: []string{"amqp"},
+			HTTPClient:   client,
+		}
 
-	wssConn, _, err := websocket.Dial(ctx, args.Host, opts)
-	if err != nil {
-		return nil, err
-	}
+		wssConn, _, err := websocket.Dial(ctx, args.Host, opts) //nolint:bodyclose // resp.Body is nil on success; coder/websocket hijacks the conn and nils the body (dial.go:148).
+		if err != nil {
+			return nil, err
+		}
 
-	return websocket.NetConn(ctx, wssConn, websocket.MessageBinary), nil
+		return websocket.NetConn(ctx, wssConn, websocket.MessageBinary), nil
+	}
 }

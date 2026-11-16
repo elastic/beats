@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	ecad "github.com/elastic/entcollect/provider/ad"
 )
 
@@ -27,7 +27,7 @@ import (
 //     least the duration fields are wired through end-to-end.
 func TestMinimalConfigRoundTrip(t *testing.T) {
 	const wantFields = 15 // includes TLS which is json:"-" but still a struct field
-	if got := reflect.TypeOf(ecad.Config{}).NumField(); got != wantFields {
+	if got := reflect.TypeFor[ecad.Config]().NumField(); got != wantFields {
 		t.Fatalf("ecad.Config has %d exported fields, want %d; "+
 			"update localConf inside minimalProvider and this test", got, wantFields)
 	}

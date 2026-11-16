@@ -17,8 +17,8 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 // BatchClient represents the azure batch client which will make use of the azure sdk go metrics related clients
@@ -173,10 +173,7 @@ func (client *BatchClient) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCr
 			filter = strings.Join(filterList, " AND ")
 		}
 		for i := 0; i < len(metricsDefinitions); i += BatchApiResourcesLimit {
-			end := i + BatchApiResourcesLimit
-			if end > len(metricsDefinitions) {
-				end = len(metricsDefinitions)
-			}
+			end := min(i+BatchApiResourcesLimit, len(metricsDefinitions))
 
 			// Slice the metrics to form the batch request
 			batchMetrics := metricsDefinitions[i:end]
@@ -184,10 +181,7 @@ func (client *BatchClient) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCr
 			// Slice the Metric Names by batches of 20 due to batch api limitation
 			names := strings.Split(criteria.Names, ",")
 			for j := 0; j < len(names); j += metricNameLimit {
-				endMetric := j + metricNameLimit
-				if endMetric > len(names) {
-					endMetric = len(names)
-				}
+				endMetric := min(j+metricNameLimit, len(names))
 
 				// Make the batch API call (adjust parameters as needed)
 				response, err := client.AzureMonitorService.QueryResources(

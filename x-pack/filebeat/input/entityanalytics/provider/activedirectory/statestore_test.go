@@ -14,9 +14,9 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/activedirectory/internal/activedirectory"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestStateStore(t *testing.T) {
@@ -360,8 +360,6 @@ func TestErrIsItemFound(t *testing.T) {
 		})
 	}
 }
-
-func ptr[T any](v T) *T { return &v }
 
 func testSetupStore(t *testing.T, path string) *kvstore.Store {
 	t.Helper()

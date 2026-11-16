@@ -2,8 +2,8 @@
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-linux.html
 applies_to:
-  stack: beta
-  serverless: beta
+  stack: ga
+  serverless: ga
 ---
 
 % This file is generated! See dev-tools/mage/generate_fields_docs.go
@@ -17,10 +17,6 @@ linux module
 linux system metrics
 
 ## conntrack [_conntrack]
-
-```{applies_to}
-stack: beta
-```
 
 conntrack
 
@@ -77,10 +73,6 @@ summary of nf_conntrack statistics, summed across CPU cores
 
 
 ## iostat [_iostat]
-
-```{applies_to}
-stack: beta
-```
 
 iostat
 
@@ -168,10 +160,6 @@ iostat
 
 ## ksm [_ksm]
 
-```{applies_to}
-stack: beta
-```
-
 ksm
 
 ## stats [_stats]
@@ -215,10 +203,6 @@ KSM statistics
 
 
 ## memory [_memory]
-
-```{applies_to}
-stack: beta
-```
 
 Linux memory data
 
@@ -403,10 +387,6 @@ This group contains statistics related to the swap memory usage on the system.
 
 
 ## pageinfo [_pageinfo]
-
-```{applies_to}
-stack: beta
-```
 
 pageinfo
 

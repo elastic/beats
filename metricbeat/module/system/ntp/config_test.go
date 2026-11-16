@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	ucfg "github.com/elastic/elastic-agent-libs/config"
+	ucfg "github.com/elastic/beats/v7/pkg/config"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -51,7 +51,7 @@ func TestUnpackConfigReplacesServers(t *testing.T) {
 		Version: 4,
 	}
 
-	userCfg := ucfg.MustNewConfigFrom(map[string]interface{}{
+	userCfg := ucfg.MustNewConfigFrom(map[string]any{
 		"ntp.servers": []string{"custom.ntp.org"},
 	})
 

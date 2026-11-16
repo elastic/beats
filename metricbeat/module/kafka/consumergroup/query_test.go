@@ -20,13 +20,14 @@ package consumergroup
 import (
 	"fmt"
 	"io"
+	"maps"
 	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func TestFetchGroupInfo(t *testing.T) {
@@ -280,9 +281,7 @@ func testEvent(
 	}
 
 	for _, extra := range fields {
-		for k, v := range extra {
-			event[k] = v
-		}
+		maps.Copy(event, extra)
 	}
 	return event
 }

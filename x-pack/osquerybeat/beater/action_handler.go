@@ -10,10 +10,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/action"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (
@@ -22,11 +22,11 @@ var (
 )
 
 type actionResultPublisher interface {
-	PublishActionResult(req map[string]interface{}, res map[string]interface{})
+	PublishActionResult(req map[string]any, res map[string]any)
 }
 
 type queryResultPublisher interface {
-	Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{})
+	Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any)
 }
 
 type scheduledResponsePublisher interface {
@@ -34,26 +34,32 @@ type scheduledResponsePublisher interface {
 }
 
 type queryProfilePublisher interface {
-	PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]interface{}, reqData interface{})
+	PublishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any)
+}
+
+type scheduledProfilePublisher interface {
+	PublishScheduledProfile(index, queryName, scheduleID, responseID, spaceID string, scheduleExecutionCount int64, profile map[string]any)
 }
 
 type liveProfileRecorder interface {
-	RecordLiveProfile(query string, profile map[string]interface{})
+	RecordLiveProfile(query string, profile map[string]any)
 }
 
 type scheduledQueryPublisher interface {
 	queryResultPublisher
 	scheduledResponsePublisher
-	queryProfilePublisher
+	scheduledProfilePublisher
 }
 
 type actionQueryPublisher interface {
-	queryResultPublisher
+	// PublishEach publishes hits one by one and returns how many were handed
+	// to the output before stop returned true. stop is called before each hit.
+	PublishEach(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any, stop func() bool) int
 	queryProfilePublisher
 }
 
 type queryExecutor interface {
-	Query(ctx context.Context, sql string, timeout time.Duration) ([]map[string]interface{}, error)
+	Query(ctx context.Context, sql string, timeout time.Duration) ([]map[string]any, error)
 }
 
 type namespaceProvider interface {
@@ -70,6 +76,7 @@ type actionHandler struct {
 	log             *logp.Logger
 	inputType       string
 	publisher       actionQueryPublisher
+	live            *liveResultDispatcher
 	queryExec       queryExecutor
 	np              namespaceProvider
 	profiles        liveProfileRecorder
@@ -91,26 +98,28 @@ func (a *actionHandler) Name() string {
 }
 
 // Execute handles the action request.
-func (a *actionHandler) Execute(ctx context.Context, req map[string]interface{}) (map[string]interface{}, error) {
+func (a *actionHandler) Execute(ctx context.Context, req map[string]any) (map[string]any, error) {
 
 	start := time.Now().UTC()
 	count, err := a.execute(ctx, req)
 	end := time.Now().UTC()
 
-	res := map[string]interface{}{
+	res := map[string]any{
 		"started_at":   start.Format(time.RFC3339Nano),
 		"completed_at": end.Format(time.RFC3339Nano),
 	}
 
 	if err != nil {
 		res["error"] = err.Error()
-	} else {
+	}
+	// A publish timeout reports the rows handed to the output too.
+	if err == nil || errors.Is(err, errLivePublishTimeout) {
 		res["count"] = count
 	}
 	return res, nil
 }
 
-func (a *actionHandler) execute(ctx context.Context, req map[string]interface{}) (int, error) {
+func (a *actionHandler) execute(ctx context.Context, req map[string]any) (int, error) {
 	ac, err := action.FromMap(req)
 	if err != nil {
 		return 0, fmt.Errorf("%w: %w", err, ErrQueryExecution)
@@ -132,7 +141,7 @@ func (a *actionHandler) namespace() string {
 	return config.DefaultNamespace
 }
 
-func (a *actionHandler) executeQuery(ctx context.Context, index string, ac action.Action, responseID string, req map[string]interface{}) (int, error) {
+func (a *actionHandler) executeQuery(ctx context.Context, index string, ac action.Action, responseID string, req map[string]any) (int, error) {
 
 	if a.queryExec == nil {
 		return 0, ErrNoQueryExecutor
@@ -143,6 +152,7 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 
 	a.log.Debugf("Execute query: %s", ac.Query)
 
+	job := liveJob{index: index, actionID: ac.ID, responseID: responseID, spaceID: ac.SpaceID, ecsm: ac.ECSMapping, reqData: req["data"]}
 	var before runtimeSnapshot
 	beforeReady := false
 	publishProfile := a.profileEnabled(ac.Profile)
@@ -172,7 +182,7 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 				a.profiles.RecordLiveProfile(ac.Query, profile)
 			}
 			if publishProfile {
-				a.publisher.PublishQueryProfile(config.QueryProfileDatastream(a.namespace()), "", ac.ID, responseID, profile, req["data"])
+				job.profileIndex, job.profile = config.QueryProfileDatastream(a.namespace()), profile
 			}
 		}
 	} else if shouldCollect && !beforeReady {
@@ -185,12 +195,16 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 
 	if err != nil {
 		a.log.Errorf("Failed to execute query, err: %v", err)
+		if job.profile != nil {
+			// The action reports the query error, not the profile's outcome.
+			_, _ = a.live.publishResults(ctx, a.publisher, job)
+		}
 		return 0, err
 	}
 
 	a.log.Debugf("Completed query in: %v", duration)
 
-	a.publisher.Publish(index, ac.ID, "action_id", responseID, "", "", "", "", nil, hits, ac.ECSMapping, req["data"])
-
-	return len(hits), nil
+	// The publish timeout starts now, so a slow query never reports partial.
+	job.hits = hits
+	return a.live.publishResults(ctx, a.publisher, job)
 }

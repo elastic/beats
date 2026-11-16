@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"hash"
 	"io"
+	"maps"
 	"math"
 	"os"
 	"os/user"
@@ -35,7 +36,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // Source identifies the source of an event (i.e. what triggered it).
@@ -429,9 +430,7 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		}
 		file["hash"] = hashes
 	}
-	for k, v := range e.ParserResults {
-		file[k] = v
-	}
+	maps.Copy(file, e.ParserResults)
 
 	out.MetricSetFields.Put("event.kind", "event")
 	out.MetricSetFields.Put("event.category", []string{"file"})

@@ -27,11 +27,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/keystore"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/paths"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/keystore"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/paths"
 )
 
 const (
@@ -78,7 +78,7 @@ func NewAutodiscover(name string, pipeline beat.PipelineConnector, factory cfgfi
 	// Init providers
 	var providers []Provider
 	for _, providerCfg := range c.Providers {
-		provider, err := Registry.BuildProvider(name, bus, providerCfg, keystore, path)
+		provider, err := Registry.BuildProvider(logger, name, bus, providerCfg, keystore, path)
 		if err != nil {
 			return nil, fmt.Errorf("error in autodiscover provider settings: %w", err)
 		}

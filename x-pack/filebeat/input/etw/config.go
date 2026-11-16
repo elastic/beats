@@ -57,6 +57,14 @@ type config struct {
 	BufferSize     uint32      `config:"buffer_size"`
 	MinimumBuffers uint32      `config:"minimum_buffers"`
 	MaximumBuffers uint32      `config:"maximum_buffers"`
+	// FailureThreshold is the number of consecutive events that must fail to
+	// render before the input reports Degraded. 0 disables Degraded reporting
+	// for render failures.
+	FailureThreshold uint `config:"failure_threshold"`
+	// RecoveryThreshold is the number of consecutive events that must render
+	// successfully, after the input has reported Degraded, before it reports
+	// Running again. Must be at least 1 when FailureThreshold is non-zero.
+	RecoveryThreshold uint `config:"recovery_threshold"`
 }
 
 type EventFilter struct {
@@ -90,13 +98,31 @@ func convertConfig(cfg config) etw.Config {
 	}
 }
 
+// provider returns whichever provider identifier the user configured, for
+// use in log and status messages. Validate guarantees at most one is set.
+func (c *config) provider() string {
+	if c.ProviderName != "" {
+		return c.ProviderName
+	}
+	return c.ProviderGUID
+}
+
 func defaultConfig() config {
 	return config{
-		TraceLevel:      "verbose",
-		MatchAnyKeyword: 0xffffffffffffffff,
-		BufferSize:      64,
+		TraceLevel:        "verbose",
+		MatchAnyKeyword:   0xffffffffffffffff,
+		BufferSize:        64,
+		FailureThreshold:  defaultFailureThreshold,
+		RecoveryThreshold: defaultRecoveryThreshold,
 	}
 }
+
+// The health thresholds follow the Kubernetes probe defaults (three failures
+// to go unhealthy, one success to recover), which the awss3 input also uses.
+const (
+	defaultFailureThreshold  = 3
+	defaultRecoveryThreshold = 1
+)
 
 func (c *config) Validate() error {
 	if c.ProviderName == "" && c.ProviderGUID == "" && c.Logfile == "" && c.Session == "" {
@@ -132,6 +158,10 @@ func (c *config) Validate() error {
 		if c.Session != "" {
 			return fmt.Errorf("configuration constraint error: file and existing session cannot be defined together")
 		}
+	}
+
+	if c.FailureThreshold > 0 && c.RecoveryThreshold == 0 {
+		return fmt.Errorf("recovery_threshold must be at least 1 if failure_threshold is set")
 	}
 
 	return nil

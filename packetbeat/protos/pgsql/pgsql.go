@@ -24,10 +24,10 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
@@ -201,14 +201,14 @@ func (pgsql *pgsqlPlugin) getTransaction(k common.HashableTCPTuple) []*pgsqlTran
 }
 
 //go:inline
-func (pgsql *pgsqlPlugin) debugf(format string, v ...interface{}) {
+func (pgsql *pgsqlPlugin) debugf(format string, v ...any) {
 	if pgsql.isDebug {
 		pgsql.debug.Debugf(format, v...)
 	}
 }
 
 //go:inline
-func (pgsql *pgsqlPlugin) detailf(format string, v ...interface{}) {
+func (pgsql *pgsqlPlugin) detailf(format string, v ...any) {
 	if pgsql.isDetail {
 		pgsql.detail.Debugf(format, v...)
 	}

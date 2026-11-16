@@ -19,8 +19,8 @@ package processors
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 type Constructor func(config *config.C, logger *logp.Logger) (beat.Processor, error)
@@ -28,7 +28,7 @@ type Constructor func(config *config.C, logger *logp.Logger) (beat.Processor, er
 var registry = NewNamespace()
 
 func RegisterPlugin(name string, constructor Constructor) {
-	err := registry.Register(name, SafeWrap(constructor))
+	err := registry.Register(name, SafeWrap(name, constructor))
 	if err != nil {
 		panic(err)
 	}

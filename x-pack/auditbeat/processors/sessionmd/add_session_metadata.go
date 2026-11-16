@@ -15,16 +15,16 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	cfg "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/processdb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/procfs"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/kerneltracingprovider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/procfsprovider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
-	cfg "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -241,7 +241,7 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 }
 
 // pidToUInt32 converts PID value to uint32
-func pidToUInt32(value interface{}) (pid uint32, err error) {
+func pidToUInt32(value any) (pid uint32, err error) {
 	switch v := value.(type) {
 	case string:
 		nr, err := strconv.Atoi(v)
@@ -267,11 +267,11 @@ func pidToUInt32(value interface{}) (pid uint32, err error) {
 	return pid, nil
 }
 
-func tryToMapStr(v interface{}) (mapstr.M, bool) {
+func tryToMapStr(v any) (mapstr.M, bool) {
 	switch m := v.(type) {
 	case mapstr.M:
 		return m, true
-	case map[string]interface{}:
+	case map[string]any:
 		return mapstr.M(m), true
 	default:
 		return nil, false

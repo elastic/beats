@@ -7,15 +7,16 @@ package decode_cef
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/filebeat/processors/decode_cef/cef"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -227,14 +228,12 @@ func appendErrorMessage(m mapstr.M, msg string) error {
 			m.Put(field, []string{v, msg})
 		}
 	case []string:
-		for _, existingTag := range v {
-			if msg == existingTag {
-				// Duplicate
-				return nil
-			}
+		if slices.Contains(v, msg) {
+			// Duplicate
+			return nil
 		}
 		m.Put(field, append(v, msg))
-	case []interface{}:
+	case []any:
 		for _, existingTag := range v {
 			if msg == existingTag {
 				// Duplicate

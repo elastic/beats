@@ -12,9 +12,9 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -132,7 +132,7 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupConfig{}, logp.NewNopLogger())
-		registry, err := newStateRegistry(nil, store, listPrefix, false, 0)
+		registry, err := newStateRegistry(nil, store, "", listPrefix, false, 0)
 		require.NoError(t, err, "registry creation must succeed")
 
 		cfg := config{
@@ -249,7 +249,7 @@ func TestS3Poller(t *testing.T) {
 		log := logptest.NewTestingLogger(t, inputName)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupCfg, logp.NewNopLogger())
-		registry, err := newStateRegistry(nil, store, listPrefix, cfg.LexicographicalOrdering, cfg.LexicographicalLookbackKeys)
+		registry, err := newStateRegistry(nil, store, "", listPrefix, cfg.LexicographicalOrdering, cfg.LexicographicalLookbackKeys)
 		require.NoError(t, err, "registry creation must succeed")
 
 		poller := &s3PollerInput{
@@ -366,7 +366,7 @@ func TestS3Poller(t *testing.T) {
 		log := logptest.NewTestingLogger(t, inputName)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupCfg, logp.NewNopLogger())
-		registry, err := newStateRegistry(nil, store, "", cfg.LexicographicalOrdering, cfg.LexicographicalLookbackKeys)
+		registry, err := newStateRegistry(nil, store, "", "", cfg.LexicographicalOrdering, cfg.LexicographicalLookbackKeys)
 		require.NoError(t, err, "registry creation must succeed")
 
 		poller := &s3PollerInput{
@@ -504,7 +504,7 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3, nil, backupConfig{}, logp.NewNopLogger())
-		registry, err := newStateRegistry(nil, store, listPrefix, false, 0)
+		registry, err := newStateRegistry(nil, store, "", listPrefix, false, 0)
 		require.NoError(t, err, "registry creation must succeed")
 
 		cfg := config{
@@ -550,7 +550,7 @@ func TestS3Poller(t *testing.T) {
 		mockPager := NewMockS3Pager(ctrl)
 		pipeline := newFakePipeline()
 
-		registry, err := newStateRegistry(nil, store, "", true, 100)
+		registry, err := newStateRegistry(nil, store, "", "", true, 100)
 		require.NoError(t, err, "registry creation must succeed")
 
 		// This will be used as startAfterKey
@@ -651,7 +651,7 @@ func TestS3Poller(t *testing.T) {
 		pipeline := newFakePipeline()
 
 		// Create empty registry
-		registry, err := newStateRegistry(nil, store, "", true, 100)
+		registry, err := newStateRegistry(nil, store, "", "", true, 100)
 		require.NoError(t, err, "registry creation must succeed")
 
 		startAfterKey := registry.GetStartAfterKey()
@@ -740,7 +740,7 @@ func TestS3Poller(t *testing.T) {
 		pipeline := newFakePipeline()
 
 		// Non-lexicographical mode
-		registry, err := newStateRegistry(nil, store, "", false, 0)
+		registry, err := newStateRegistry(nil, store, "", "", false, 0)
 		require.NoError(t, err, "registry creation must succeed")
 
 		// Expect ListObjectsPaginator to be called with empty startAfterKey
@@ -824,7 +824,7 @@ func TestS3Poller(t *testing.T) {
 		mockPager := NewMockS3Pager(ctrl)
 		pipeline := newFakePipeline()
 
-		registry, err := newStateRegistry(nil, store, "", false, 0)
+		registry, err := newStateRegistry(nil, store, "", "", false, 0)
 		require.NoError(t, err, "registry creation must succeed")
 
 		// Expect ListObjectsPaginator to be called
@@ -1181,7 +1181,7 @@ func Test_S3StateHandling(t *testing.T) {
 			mockS3ObjectHandler.EXPECT().FinalizeS3Object().AnyTimes().Return(nil)
 
 			store := openTestStatestore()
-			s3Registry, err := newStateRegistry(logger, store, "", false, 0)
+			s3Registry, err := newStateRegistry(logger, store, "", "", false, 0)
 			require.NoError(t, err, "Registry creation must succeed")
 
 			// Note - add init states as if we are deriving them from registry
@@ -1248,6 +1248,48 @@ func TestCreateS3API(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, api)
 		require.Equal(t, cfg.RegionName, input.awsConfig.Region)
+	})
+
+	// InitializeAWSConfig has already set the region from default_region
+	// when the environment and profile provide none.
+	t.Run("non-AWS bucket with default_region only", func(t *testing.T) {
+		cfg := config{NonAWSBucketName: "my-bucket"}
+		cfg.AWSConfig.DefaultRegion = "auto"
+		input := &s3PollerInput{
+			config:    cfg,
+			awsConfig: aws.Config{Region: "auto"},
+		}
+
+		api, err := input.createS3API(context.Background())
+		require.NoError(t, err)
+		require.NotNil(t, api)
+		require.Equal(t, "auto", input.awsConfig.Region)
+	})
+
+	t.Run("non-AWS bucket env or profile region takes precedence over default_region", func(t *testing.T) {
+		cfg := config{NonAWSBucketName: "my-bucket"}
+		cfg.AWSConfig.DefaultRegion = "auto"
+		input := &s3PollerInput{
+			config:    cfg,
+			awsConfig: aws.Config{Region: "us-west-2"},
+		}
+
+		_, err := input.createS3API(context.Background())
+		require.NoError(t, err)
+		require.Equal(t, "us-west-2", input.awsConfig.Region)
+	})
+
+	t.Run("non-AWS bucket region takes precedence over the AWS config region", func(t *testing.T) {
+		cfg := config{NonAWSBucketName: "my-bucket", RegionName: "us-west-2"}
+		cfg.AWSConfig.DefaultRegion = "auto"
+		input := &s3PollerInput{
+			config:    cfg,
+			awsConfig: aws.Config{Region: "auto"},
+		}
+
+		_, err := input.createS3API(context.Background())
+		require.NoError(t, err)
+		require.Equal(t, "us-west-2", input.awsConfig.Region)
 	})
 
 	// "non-AWS bucket without region" is invalid and rejected by config.Validate();

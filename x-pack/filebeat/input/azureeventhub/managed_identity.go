@@ -12,7 +12,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // newManagedIdentityCredential creates a new managed identity credential.
@@ -27,6 +27,9 @@ func newManagedIdentityCredential(config *azureInputConfig, log *logp.Logger) (a
 		ClientOptions: azcore.ClientOptions{
 			Cloud: getAzureCloud(config.AuthorityHost),
 		},
+	}
+	if httpClient := proxyHTTPClient(config.Proxy); httpClient != nil {
+		credentialOptions.Transport = httpClient
 	}
 
 	// If a client ID is provided, use user-assigned managed identity

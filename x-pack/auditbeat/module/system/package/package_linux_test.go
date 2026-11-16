@@ -14,8 +14,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/user"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestRPMParallel(t *testing.T) {
@@ -32,7 +32,7 @@ func TestRPMParallel(t *testing.T) {
 	useUID := getUser(t)
 
 	t.Logf("Starting...")
-	for i := 0; i < count; i++ {
+	for i := range count {
 		inner := i
 		go func() {
 			defer waiter.Done()

@@ -29,10 +29,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	c "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	c "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 // instanceID is used to assign each instance a unique monitoring namespace.
@@ -116,6 +116,11 @@ func (p *rateLimit) Run(event *beat.Event) (*beat.Event, error) {
 	p.metrics.Dropped.Inc()
 	return nil, nil
 }
+
+// Unshareable opts rate_limit out of process-wide processor sharing: the
+// algorithm keeps a token bucket, so sharing one instance across owners would
+// enforce a single global limit instead of an independent per-owner limit.
+func (p *rateLimit) Unshareable() {}
 
 func (p *rateLimit) String() string {
 	return fmt.Sprintf(

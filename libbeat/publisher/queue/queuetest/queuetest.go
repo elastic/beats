@@ -25,7 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // QueueFactory is used to create a per test queue instance.
@@ -203,11 +203,11 @@ func runTestCases(t *testing.T, tests []testCase, queueFactory QueueFactory) {
 			queue := queueFactory(t)
 			defer func() {
 				err := queue.Close(false)
-				require.NoError(t, err)
-				// close again to verify this doesn't cause any issues
-				err = queue.Close(true)
-				require.NoError(t, err)
+				require.NoError(t, err, "queue must close successfully")
+				// Force-closing before pending ACKs finish can strand a queue worker.
 				<-queue.Done()
+				err = queue.Close(true)
+				require.NoError(t, err, "closing the queue again must succeed")
 			}()
 
 			var wg sync.WaitGroup

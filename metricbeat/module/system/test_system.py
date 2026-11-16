@@ -181,6 +181,7 @@ class Test(metricbeat.BaseTest):
 
         for evt in output:
             self.assert_fields_are_documented(evt)
+            self.assertIn("system", evt, f"expected 'system' key in event, got: {list(evt.keys())}")
             cpu_stats = evt["system"]["cpu"]
             self.assert_fields_for_platform(SYSTEM_CPU_ALL, cpu_stats)
 
@@ -201,6 +202,7 @@ class Test(metricbeat.BaseTest):
 
         for evt in output:
             self.assert_fields_are_documented(evt)
+            self.assertIn("system", evt, f"expected 'system' key in event, got: {list(evt.keys())}")
             core_stats = evt["system"]["core"]
             if sys.platform == metricbeat.P_LINUX and not is_cpuinfo_supported():
                 for f in SYSTEM_CORE_CPUINFO_FIELDS:
@@ -227,6 +229,7 @@ class Test(metricbeat.BaseTest):
 
         for evt in output:
             self.assert_fields_are_documented(evt)
+            self.assertIn("system", evt, f"expected 'system' key in event, got: {list(evt.keys())}")
             core_stats = evt["system"]["core"]
             if sys.platform == metricbeat.P_LINUX and not is_cpuinfo_supported():
                 for f in SYSTEM_CORE_CPUINFO_FIELDS:
@@ -249,6 +252,7 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
         self.assert_fields_are_documented(evt)
+        self.assertIn("system", evt, f"expected 'system' key in event, got: {list(evt.keys())}")
 
         cpu = evt["system"]["load"]
         self.assertCountEqual(self.de_dot(SYSTEM_LOAD_FIELDS), cpu.keys())
@@ -306,6 +310,7 @@ class Test(metricbeat.BaseTest):
 
         for evt in output:
             self.assert_fields_are_documented(evt)
+            self.assertIn("system", evt, f"expected 'system' key in event, got: {list(evt.keys())}")
             filesystem = evt["system"]["filesystem"]
             self.assert_fields_for_platform(SYSTEM_FILESYSTEM, filesystem)
 
@@ -325,6 +330,7 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
         self.assert_fields_are_documented(evt)
+        self.assertIn("system", evt, f"expected 'system' key in event, got: {list(evt.keys())}")
 
         fsstat = evt["system"]["fsstat"]
         self.assertCountEqual(SYSTEM_FSSTAT_FIELDS, fsstat.keys())
@@ -345,6 +351,7 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
         self.assert_fields_are_documented(evt)
+        self.assertIn("system", evt, f"expected 'system' key in event, got: {list(evt.keys())}")
 
         memory = evt["system"]["memory"]
         # these fields may not be on the event depending on the host system
@@ -422,6 +429,7 @@ class Test(metricbeat.BaseTest):
             # we've encoutered an event. Turn off the flag
             only_errors_encountered = False
 
+            self.assertIn("system", evt, f"expected 'system' key in event, got: {list(evt.keys())}")
             summary = evt["system"]["process"]["summary"]
             assert isinstance(summary["total"], int)
 
@@ -467,6 +475,7 @@ class Test(metricbeat.BaseTest):
             # we've encoutered an event. Turn off the flag
             only_errors_encountered = False
 
+            self.assertIn("system", evt, f"expected 'system' key in event, got: {list(evt.keys())}")
             process = evt["system"]["process"]
             # Not all process will have 'cmdline' due to permission issues,
             # especially on Windows. Therefore we ensure at least some of
@@ -540,6 +549,7 @@ class Test(metricbeat.BaseTest):
 
             found_cwd |= "working_directory" in evt["process"]
 
+            self.assertIn("system", evt, f"expected 'system' key in event, got: {list(evt.keys())}")
             process = evt["system"]["process"]
             found_fd |= "fd" in process
             found_env |= "env" in process
@@ -612,6 +622,7 @@ class Test(metricbeat.BaseTest):
 
         for evt in output:
             self.assert_fields_are_documented(evt)
+            self.assertIn("system", evt, f"expected 'system' key in event, got: {list(evt.keys())}")
 
             summary = evt["system"]["socket"]["summary"]
             a = summary["all"]

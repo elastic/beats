@@ -35,7 +35,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/reader/etw"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // ETW keyword constants for enabling specific event categories
@@ -216,7 +216,7 @@ func newETWReader(c Config, l *logp.Logger) (EventProducer, error) {
 		BufferSize:     1024,
 		MinimumBuffers: 8,
 		MaximumBuffers: 16,
-	})
+	}, l)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing ETW session: %w", err)
 	}

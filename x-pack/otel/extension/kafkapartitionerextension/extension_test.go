@@ -14,6 +14,8 @@ import (
 	"go.opentelemetry.io/collector/component/componenttest"
 	"go.opentelemetry.io/collector/extension/extensiontest"
 	"go.uber.org/zap/zaptest"
+
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 )
 
 func newTestPartitioner(t *testing.T, partitionerConfig map[string]any) *kafkaPartitioner {
@@ -234,4 +236,8 @@ func TestE2E_MultiFieldHash_MapMessages(t *testing.T) {
 			"service=%s env=%s: second pass must land on the same partition",
 			se.service, se.env)
 	}
+}
+
+func TestComponentLifecycle(t *testing.T) {
+	oteltest.CheckExtensionLifecycle(t, NewFactory(), &Config{})
 }

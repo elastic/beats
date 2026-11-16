@@ -25,7 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/mysql"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -93,8 +93,8 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig(host string, raw bool) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string, raw bool) map[string]any {
+	return map[string]any{
 		"module":     "mysql",
 		"metricsets": []string{"status"},
 		"hosts":      []string{mysql.GetMySQLEnvDSN(host)},

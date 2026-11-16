@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // VertexAILogRow represents a single row from BigQuery vertex AI logs table
@@ -84,7 +84,7 @@ func processJSONField(jsonStr, fieldName string, fields mapstr.M, logger *logp.L
 		return nil
 	}
 
-	var parsedJSON interface{}
+	var parsedJSON any
 	if err := json.Unmarshal([]byte(jsonStr), &parsedJSON); err != nil {
 		// If JSON parsing fails, store the raw string in a structured way
 		fields[fieldName] = mapstr.M{"raw": jsonStr}

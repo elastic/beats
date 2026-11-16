@@ -26,9 +26,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	"github.com/elastic/beats/v7/libbeat/processors/util"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/go-sysinfo"
 )
 
@@ -121,15 +121,21 @@ func (p *observerMetadata) loadData() error {
 		return nil
 	}
 
-	h, err := sysinfo.Host()
-	if err != nil {
-		return err
+	// Avoid querying sysinfo when the hostname was supplied explicitly.
+	hostname := beat.GetHostnameOverride()
+	if hostname != "" {
+		p.logger.Debugf("using hostname override %q for observer.hostname", hostname)
+	} else {
+		h, err := sysinfo.Host()
+		if err != nil {
+			return err
+		}
+		hostname = h.Info().Hostname
 	}
 
-	hostInfo := h.Info()
 	data := mapstr.M{
 		"observer": mapstr.M{
-			"hostname": hostInfo.Hostname,
+			"hostname": hostname,
 		},
 	}
 	if p.config.NetInfoEnabled {

@@ -59,7 +59,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	if err != nil {
 		return fmt.Errorf("error in http fetch: %w", err)
 	}
-	var stats map[string]interface{}
+	var stats map[string]any
 	err = json.Unmarshal(content, &stats)
 	if err != nil {
 		return fmt.Errorf("error unmarshalling json: %w", err)

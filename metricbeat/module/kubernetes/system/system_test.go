@@ -20,14 +20,15 @@
 package system
 
 import (
-	"io/ioutil"
+	"io"
+
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 const testFile = "../_meta/test/stats_summary.json"
@@ -38,7 +39,7 @@ func TestEventMapping(t *testing.T) {
 	f, err := os.Open(testFile)
 	assert.NoError(t, err, "cannot open test file "+testFile)
 
-	body, err := ioutil.ReadAll(f)
+	body, err := io.ReadAll(f)
 	assert.NoError(t, err, "cannot read test file "+testFile)
 
 	events, err := eventMapping(body, logger)
@@ -46,7 +47,7 @@ func TestEventMapping(t *testing.T) {
 
 	assert.Len(t, events, 1, "got wrong number of events")
 
-	testCases := map[string]interface{}{
+	testCases := map[string]any{
 		"container": "kubelet",
 
 		"memory.usage.bytes":      36683776,
@@ -64,7 +65,7 @@ func TestEventMapping(t *testing.T) {
 	}
 }
 
-func testValue(t *testing.T, event mapstr.M, field string, value interface{}) {
+func testValue(t *testing.T, event mapstr.M, field string, value any) {
 	data, err := event.GetValue(field)
 	assert.NoError(t, err, "Could not read field "+field)
 	assert.EqualValues(t, data, value, "Wrong value for field "+field)

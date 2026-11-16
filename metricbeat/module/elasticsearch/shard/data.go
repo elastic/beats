@@ -23,7 +23,7 @@ import (
 	"strconv"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"fmt"
 
@@ -52,7 +52,7 @@ type stateStruct struct {
 	} `json:"nodes"`
 	RoutingTable struct {
 		Indices map[string]struct {
-			Shards map[string][]map[string]interface{} `json:"shards"`
+			Shards map[string][]map[string]any `json:"shards"`
 		} `json:"indices"`
 	} `json:"routing_table"`
 }

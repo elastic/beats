@@ -13,7 +13,7 @@ import (
 	"net/http"
 
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 var (
@@ -38,14 +38,14 @@ func decodeJSON(body io.Reader) ([]mapstr.M, error) {
 			return nil, fmt.Errorf("malformed JSON object at stream position %d: %w", decoder.InputOffset(), err)
 		}
 
-		var obj interface{}
+		var obj any
 		if err := newJSONDecoder(bytes.NewReader(raw)).Decode(&obj); err != nil {
 			return nil, fmt.Errorf("malformed JSON object at stream position %d: %w", decoder.InputOffset(), err)
 		}
 		switch v := obj.(type) {
-		case map[string]interface{}:
+		case map[string]any:
 			objs = append(objs, v)
-		case []interface{}:
+		case []any:
 			nobjs, err := decodeJSONArray(bytes.NewReader(raw), decoder.InputOffset())
 			if err != nil {
 				return nil, fmt.Errorf("recursive error %d: %w", decoder.InputOffset(), err)
@@ -84,12 +84,12 @@ func decodeJSONArray(raw *bytes.Reader, parentOffset int64) ([]mapstr.M, error) 
 			return nil, fmt.Errorf("malformed JSON object at stream position %d: %w", parentOffset+dec.InputOffset(), err)
 		}
 
-		var obj interface{}
+		var obj any
 		if err := newJSONDecoder(bytes.NewReader(raw)).Decode(&obj); err != nil {
 			return nil, fmt.Errorf("malformed JSON object at stream position %d: %w", parentOffset+dec.InputOffset(), err)
 		}
 
-		m, ok := obj.(map[string]interface{})
+		m, ok := obj.(map[string]any)
 		if ok {
 			objs = append(objs, m)
 		}

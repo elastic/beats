@@ -26,14 +26,14 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // BrowserErrPlugins handles the logic for writing the `error` field
 // for browser monitors, preferentially using the journey/end event's
 // error field for errors.
 type BrowserErrPlugin struct {
-	summaryErrVal  interface{}
+	summaryErrVal  any
 	summaryErr     error
 	stepCount      int
 	journeyEndRcvd bool
@@ -134,7 +134,7 @@ func (esp *LightweightErrPlugin) BeforeEachEvent(event *beat.Event) {
 }
 
 // errToFieldVal reflects on the error and returns either an *ecserr.ECSErr if possible, and a look.Reason otherwise
-func errToFieldVal(eventErr error) (errVal interface{}) {
+func errToFieldVal(eventErr error) (errVal any) {
 	var asECS *ecserr.ECSErr
 	if errors.As(eventErr, &asECS) {
 		// Override the message of the error in the event it was wrapped
@@ -146,6 +146,6 @@ func errToFieldVal(eventErr error) (errVal interface{}) {
 	return errVal
 }
 
-func mergeErrVal(event *beat.Event, errVal interface{}) {
+func mergeErrVal(event *beat.Event, errVal any) {
 	eventext.MergeEventFields(event, mapstr.M{"error": errVal})
 }

@@ -25,7 +25,7 @@ To add the Beats repository for APT:
 1. Download and install the Public Signing Key:
 
     ```shell
-    wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+    wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elasticsearch-keyring.gpg
     ```
 
 2. You may need to install the `apt-transport-https` package on Debian before proceeding:
@@ -37,19 +37,19 @@ To add the Beats repository for APT:
 3. Save the repository definition to _/etc/apt/sources.list.d/elastic-{{ version.stack | M.x }}.list_:
 
     ```shell subs=true
-    echo "deb https://artifacts.elastic.co/packages/{{ version.stack | M.x }}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{{ version.stack | M.x }}.list
+    echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/{{ version.stack | M.x }}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{{ version.stack | M.x }}.list
     ```
 
     :::{note}
     The package is free to use under the Elastic license. An alternative package which contains only features that are available under the Apache 2.0 license is also available. To install it, use the following sources list:
 
     ```shell subs=true
-    echo "deb https://artifacts.elastic.co/packages/oss-{{ version.stack | M.x }}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{{ version.stack | M.x }}.list
+    echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/oss-{{ version.stack | M.x }}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{{ version.stack | M.x }}.list
     ```
     :::
 
     :::{warning}
-    To add the Elastic repository, make sure that you use the `echo` method  shown in the example. Do not use `add-apt-repository` because it will add a `deb-src` entry, but we do not provide a source package.
+    To add the Elastic repository, make sure that you use the `echo` method shown in the example. Do not use `add-apt-repository` because it will add a `deb-src` entry, but we do not provide a source package.
 
     If you have added the `deb-src` entry by mistake, you will see an error like the following:
 
@@ -115,7 +115,3 @@ To add the Beats repository for YUM:
     ```
     sudo systemctl enable metricbeat
     ```
-
-
-
-

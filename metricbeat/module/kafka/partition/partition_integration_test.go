@@ -32,8 +32,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 const (
@@ -166,13 +166,13 @@ func generateKafkaData(t *testing.T, host string, topic string) {
 	}
 }
 
-func getConfig(host string, topic string) map[string]interface{} {
+func getConfig(host string, topic string) map[string]any {
 	var topics []string
 	if topic != "" {
 		topics = []string{topic}
 	}
 
-	return map[string]interface{}{
+	return map[string]any{
 		"module":     "kafka",
 		"metricsets": []string{"partition"},
 		"hosts":      []string{host},

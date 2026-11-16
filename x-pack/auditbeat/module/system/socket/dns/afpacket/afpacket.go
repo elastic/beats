@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build linux
-// +build linux
 
 package afpacket
 
@@ -25,8 +24,8 @@ import (
 	"github.com/google/gopacket/afpacket"
 	"github.com/google/gopacket/layers"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	parent "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var udpSrcPort53Filter = []bpf.RawInstruction{
@@ -68,7 +67,7 @@ func newAFPacketSniffer(base mb.BaseMetricSet, log *logp.Logger) (parent.Sniffer
 		return nil, err
 	}
 
-	opts := []interface{}{
+	opts := []any{
 		afpacket.OptFrameSize(frameSize),
 		afpacket.OptBlockSize(blockSize),
 		afpacket.OptNumBlocks(numBlocks),

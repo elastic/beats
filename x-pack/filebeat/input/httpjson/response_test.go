@@ -13,8 +13,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func TestTemplateValues(t *testing.T) {
@@ -53,7 +53,7 @@ func TestTemplateValuesBodyType(t *testing.T) {
 	// that the String method produces valid JSON for use in templates
 	// with value_type: json. See elastic/beats#50384.
 	resp := &response{
-		body: map[string]interface{}{
+		body: map[string]any{
 			"key": "value",
 		},
 	}
@@ -161,7 +161,7 @@ var asTransformablesTests = []struct {
 func TestAsTransformables(t *testing.T) {
 	for _, test := range asTransformablesTests {
 		t.Run(test.name, func(t *testing.T) {
-			var data interface{}
+			var data any
 			err := json.Unmarshal([]byte(test.message), &data)
 			if err != nil {
 				t.Fatalf("error unmarshalling json: %s", err)

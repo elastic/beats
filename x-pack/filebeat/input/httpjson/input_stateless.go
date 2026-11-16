@@ -8,7 +8,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 )
 
 type statelessInput struct {
@@ -39,7 +39,7 @@ type statelessPublisher struct {
 	wrapped stateless.Publisher
 }
 
-func (pub statelessPublisher) Publish(event beat.Event, _ interface{}) error {
+func (pub statelessPublisher) Publish(event beat.Event, _ any) error {
 	pub.wrapped.Publish(event)
 	return nil
 }

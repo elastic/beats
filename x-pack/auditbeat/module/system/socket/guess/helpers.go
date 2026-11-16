@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package guess
 
@@ -12,10 +11,11 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"slices"
 
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func createSocket(bindAddr unix.SockaddrInet4) (fd int, addr unix.SockaddrInet4, err error) {
@@ -136,11 +136,8 @@ func consolidate(partials []mapstr.M) (result mapstr.M, err error) {
 			}
 			var newList []int
 			for _, num := range baseList {
-				for _, nn := range list {
-					if num == nn {
-						newList = append(newList, num)
-						break
-					}
+				if slices.Contains(list, num) {
+					newList = append(newList, num)
 				}
 			}
 			baseList = newList

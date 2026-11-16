@@ -30,7 +30,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	_ "github.com/elastic/beats/v7/metricbeat/module/traefik"
 )
@@ -46,7 +46,7 @@ func TestFetchEventContents(t *testing.T) {
 	}))
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "traefik",
 		"metricsets": []string{"health"},
 		"hosts":      []string{server.URL},

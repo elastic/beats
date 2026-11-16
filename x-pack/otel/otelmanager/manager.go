@@ -11,8 +11,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 type DiagnosticExtension interface {
@@ -82,9 +82,7 @@ func (n *OtelManager) Stop() {
 	}
 }
 
-// Enabled returns false because many places inside beats call manager.Enabled() for various purposes
-// Returning true might lead to side effects.
-func (n *OtelManager) Enabled() bool                      { return false }
+func (n *OtelManager) ConfigFromControlProtocol() bool    { return false }
 func (n *OtelManager) AgentInfo() management.AgentInfo    { return management.AgentInfo{} }
 func (n *OtelManager) PreInit() error                     { return nil }
 func (n *OtelManager) PostInit()                          {}

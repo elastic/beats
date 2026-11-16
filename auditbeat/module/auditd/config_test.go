@@ -29,8 +29,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 func TestConfig(t *testing.T) {
@@ -141,7 +141,6 @@ audit_rules: |
 		}
 
 		for _, tc := range tcs {
-			tc := tc
 			t.Run(tc.name, func(t *testing.T) {
 				config := defaultConfig
 				config.SocketType = tc.socketType

@@ -28,10 +28,10 @@ import (
 	"unicode/utf8"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
@@ -526,7 +526,7 @@ func (thrift *thriftPlugin) readListOrSet(data []byte) (value string, ok bool, c
 	fields := []string{}
 	offset := 5
 
-	for i := 0; i < sz; i++ {
+	for i := range sz {
 		value, ok, complete, bytesRead := funcReader(data[offset:])
 		if !ok {
 			return "", false, false, 0
@@ -590,7 +590,7 @@ func (thrift *thriftPlugin) readMap(data []byte) (value string, ok bool, complet
 	fields := []string{}
 	offset := 6
 
-	for i := 0; i < sz; i++ {
+	for i := range sz {
 		key, ok, complete, bytesRead := funcReaderKey(data[offset:])
 		if !ok {
 			return "", false, false, 0

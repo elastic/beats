@@ -188,7 +188,7 @@ func renderStructArray(cache providerCache, eventInfo *cachedEventInfo, propInfo
 	}
 
 	result := make([]any, arraySize)
-	for j := 0; j < arraySize; j++ {
+	for j := range arraySize {
 		value, err := renderStruct(cache, eventInfo, propInfo, r, ptrSize, buf, bufferPools)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse struct member %d: %w", j, err)
@@ -221,7 +221,7 @@ func renderSimpleArray(cache providerCache, eventInfo *cachedEventInfo, propInfo
 	}
 
 	result := make([]any, count)
-	for i := uint32(0); i < count; i++ {
+	for i := range count {
 		// For each array element, process it as a single property
 		value, err := renderSingleProperty(cache, eventInfo, propInfo, r, ptrSize, buf, mapInfo, cachedMapInfo, bufferPools)
 		if err != nil {

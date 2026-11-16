@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 type parserConfig struct {
@@ -77,7 +77,7 @@ func newParser(config *parserConfig, logger *logp.Logger) *parser {
 }
 
 //go:inline
-func (p *parser) debugf(format string, args ...interface{}) {
+func (p *parser) debugf(format string, args ...any) {
 	if p.isDebug {
 		p.logger.Debugf(format, args...)
 	}

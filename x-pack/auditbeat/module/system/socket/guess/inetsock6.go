@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package guess
 
@@ -15,9 +14,9 @@ import (
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/auditbeat/tracing"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 /*
@@ -159,7 +158,7 @@ func (g *guessInetSockIPv6) Condition(ctx Context) (bool, error) {
 
 // eventWrapper is used to wrap events from one of the probes for differentiation.
 type eventWrapper struct {
-	event interface{}
+	event any
 }
 
 // decoderWrapper takes an inner decoder and wraps it so that the returned events
@@ -169,7 +168,7 @@ type decoderWrapper struct {
 }
 
 // Decode wraps events from the inner decoder into a the wrapper type.
-func (d *decoderWrapper) Decode(raw []byte, meta tracing.Metadata) (event interface{}, err error) {
+func (d *decoderWrapper) Decode(raw []byte, meta tracing.Metadata) (event any, err error) {
 	if event, err = d.inner.Decode(raw, meta); err != nil {
 		return event, err
 	}
@@ -283,7 +282,7 @@ func (g *guessInetSockIPv6) Trigger() error {
 
 // Extract scans stores the events from the two different kprobes and then
 // looks for the result in one of them.
-func (g *guessInetSockIPv6) Extract(event interface{}) (mapstr.M, bool) {
+func (g *guessInetSockIPv6) Extract(event any) (mapstr.M, bool) {
 	if w, ok := event.(eventWrapper); ok {
 		g.ptrDump = w.event.([]byte)
 	} else {

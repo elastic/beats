@@ -22,7 +22,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -126,7 +126,7 @@ var (
 )
 
 func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
-	var data map[string]interface{}
+	var data map[string]any
 	err := json.Unmarshal(content, &data)
 	if err != nil {
 		return fmt.Errorf("failure parsing Kibana Stats API response: %w", err)
@@ -175,7 +175,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	event.Host = fmt.Sprintf("%v", serviceAddress)
 
 	// Set process PID
-	process, ok := data["process"].(map[string]interface{})
+	process, ok := data["process"].(map[string]any)
 	if !ok {
 		event.Error = elastic.MakeErrorForMissingField("process", elastic.Kibana)
 		return event.Error

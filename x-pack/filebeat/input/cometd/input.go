@@ -18,11 +18,11 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	bay "github.com/elastic/bayeux"
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 )
 
 const (
@@ -37,9 +37,7 @@ const (
 func (in *cometdInput) Run() {
 	var err error
 	in.workerOnce.Do(func() {
-		in.workerWg.Add(1)
-		go func() {
-			defer in.workerWg.Done()
+		in.workerWg.Go(func() {
 			defer in.workerCancel()
 			in.log.Info("Input worker has started.")
 			defer in.log.Info("Input worker has stopped.")
@@ -74,7 +72,7 @@ func (in *cometdInput) Run() {
 					}
 				}
 			}
-		}()
+		})
 	})
 }
 
@@ -94,7 +92,7 @@ func (in *cometdInput) run() error {
 			// log warning every 5 seconds only to avoid to many unnecessary logs
 			select {
 			case <-ticker.C:
-				in.log.Errorw("Retrying...! facing issue while collecting data from CometD", "error", e.Error())
+				in.log.Errorw("retrying: error while collecting data from CometD", "error", e.Error())
 			default:
 			}
 		} else if !e.Msg.Successful {

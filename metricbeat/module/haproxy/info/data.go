@@ -24,7 +24,7 @@ import (
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/haproxy"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"reflect"
 	"strconv"
@@ -165,7 +165,7 @@ func eventMapping(info *haproxy.Info, r mb.ReporterV2) (mb.Event, error) {
 
 	st := reflect.ValueOf(info).Elem()
 	typeOfT := st.Type()
-	source := map[string]interface{}{}
+	source := map[string]any{}
 
 	for i := 0; i < st.NumField(); i++ {
 		f := st.Field(i)

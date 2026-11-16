@@ -31,10 +31,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	"github.com/elastic/beats/v7/libbeat/reader/syslog"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 const (
@@ -206,7 +206,7 @@ func appendStringField(m mapstr.M, field, value string) {
 		_, _ = m.Put(field, []string{t, value})
 	case []string:
 		_, _ = m.Put(field, append(t, value))
-	case []interface{}:
+	case []any:
 		_, _ = m.Put(field, append(t, value))
 	}
 }

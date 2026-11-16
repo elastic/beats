@@ -13,7 +13,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // Client represents the azure client which calls the Application Insights
@@ -41,7 +41,6 @@ func (client *Client) GetMetricValues() (ListMetricsResultsItem, error) {
 	var bodyMetrics []MetricsBatchRequestItem
 	var result ListMetricsResultsItem
 	for _, metrics := range client.Config.Metrics {
-		metrics := metrics
 		// Clone so each batch entry owns its slices; sharing the same backing
 		// array across requests would couple unrelated metric configs together.
 		aggregations := slices.Clone(metrics.Aggregation)

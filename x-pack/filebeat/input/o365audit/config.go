@@ -10,9 +10,9 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/auth"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 // Config for the O365 audit API input.
@@ -164,13 +164,13 @@ func (c *Config) Validate() (err error) {
 type stringList []string
 
 // Unpack populates the stringList with either a single string value or an array.
-func (s *stringList) Unpack(value interface{}) error {
+func (s *stringList) Unpack(value any) error {
 	switch v := value.(type) {
 	case string:
 		*s = []string{v}
 	case []string:
 		*s = v
-	case []interface{}:
+	case []any:
 		*s = make([]string, len(v))
 		for idx, ival := range v {
 			str, ok := ival.(string)

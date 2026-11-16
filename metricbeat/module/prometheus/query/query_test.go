@@ -29,7 +29,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func TestQueryFetchEventContentInstantVector(t *testing.T) {
@@ -51,7 +51,7 @@ func TestQueryFetchEventContentInstantVector(t *testing.T) {
 	}))
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "prometheus",
 		"metricsets": []string{"query"},
 		"hosts":      []string{server.URL},
@@ -100,7 +100,7 @@ func TestQueryFetchEventContentRangeVector(t *testing.T) {
 	}))
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "prometheus",
 		"metricsets": []string{"query"},
 		"hosts":      []string{server.URL},
@@ -146,7 +146,7 @@ func TestQueryFetchEventContentScalar(t *testing.T) {
 	}))
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "prometheus",
 		"metricsets": []string{"query"},
 		"hosts":      []string{server.URL},
@@ -189,7 +189,7 @@ func TestQueryFetchEventContentString(t *testing.T) {
 	}))
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "prometheus",
 		"metricsets": []string{"query"},
 		"hosts":      []string{server.URL},
@@ -228,7 +228,7 @@ func TestHTTPErrorCodeHandling(t *testing.T) {
 	}))
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "prometheus",
 		"metricsets": []string{"query"},
 		"hosts":      []string{server.URL},
@@ -278,7 +278,7 @@ func TestQueryFetchPartialError(t *testing.T) {
 	}))
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "prometheus",
 		"metricsets": []string{"query"},
 		"hosts":      []string{server.URL},
@@ -330,7 +330,7 @@ func TestQueryFetchAllQueriesFailed(t *testing.T) {
 	}))
 	defer server.Close()
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":     "prometheus",
 		"metricsets": []string{"query"},
 		"hosts":      []string{server.URL},

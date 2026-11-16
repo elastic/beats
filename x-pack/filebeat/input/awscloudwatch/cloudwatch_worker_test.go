@@ -13,7 +13,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 func TestAckTracker(t *testing.T) {
@@ -67,7 +67,7 @@ func TestAckTracker(t *testing.T) {
 
 	t.Run("increments should not get blocked even if wait is not called", func(t *testing.T) {
 		tracker := newACKTracker()
-		done := make(chan interface{})
+		done := make(chan any)
 
 		go func() {
 			tracker.increaseAck(1)

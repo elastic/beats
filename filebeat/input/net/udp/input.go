@@ -30,9 +30,9 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -92,7 +92,8 @@ func (s *server) Test(_ input.TestContext) error {
 }
 
 func (s *server) InitMetrics(id string, reg *monitoring.Registry, logger *logp.Logger) netinput.Metrics {
-	s.metrics = netmetrics.NewUDP(reg, s.Host, uint64(s.ReadBuffer), time.Second, logger)
+	//nolint:gosec // read_buffer is a byte size, never negative
+	s.metrics = netmetrics.NewUDP(reg, s.Host, s.Network, uint64(s.ReadBuffer), time.Second, logger)
 	return s.metrics
 }
 
@@ -116,10 +117,13 @@ func (s *server) Run(ctx input.Context, evtChan chan<- netinput.DataMetadata, me
 			"remote_address", remoteAddr,
 			"truncated", metadata.Truncated)
 
-		evtChan <- netinput.DataMetadata{
+		select {
+		case evtChan <- netinput.DataMetadata{
 			Data:      data,
 			Metadata:  metadata,
 			Timestamp: now,
+		}:
+		case <-ctx.Cancelation.Done():
 		}
 	}, logger)
 

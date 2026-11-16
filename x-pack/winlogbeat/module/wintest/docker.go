@@ -135,7 +135,7 @@ func dockerCompose(env map[string]string, verbose bool) error {
 	}
 	var err error
 	const retries = 2
-	for n := 0; n < retries; n++ {
+	for range retries {
 		_, err = sh.Exec(
 			env,
 			out,

@@ -8,9 +8,9 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 const deleteName = "delete"
@@ -19,13 +19,13 @@ type deleteConfig struct {
 	Target string `config:"target"`
 }
 
-type delete struct {
+type deleteTransform struct {
 	targetInfo targetInfo
 
 	runFunc func(ctx *transformContext, transformable transformable, key string) error
 }
 
-func (delete) transformName() string { return deleteName }
+func (deleteTransform) transformName() string { return deleteName }
 
 func newDeleteRequest(cfg *conf.C, _ status.StatusReporter, _ *logp.Logger) (transform, error) {
 	delete, err := newDelete(cfg)
@@ -83,23 +83,23 @@ func newDeletePagination(cfg *conf.C, _ status.StatusReporter, _ *logp.Logger) (
 	return &delete, nil
 }
 
-func newDelete(cfg *conf.C) (delete, error) {
+func newDelete(cfg *conf.C) (deleteTransform, error) {
 	c := &deleteConfig{}
 	if err := cfg.Unpack(c); err != nil {
-		return delete{}, fmt.Errorf("fail to unpack the delete configuration: %w", err)
+		return deleteTransform{}, fmt.Errorf("fail to unpack the delete configuration: %w", err)
 	}
 
 	ti, err := getTargetInfo(c.Target)
 	if err != nil {
-		return delete{}, err
+		return deleteTransform{}, err
 	}
 
-	return delete{
+	return deleteTransform{
 		targetInfo: ti,
 	}, nil
 }
 
-func (delete *delete) run(ctx *transformContext, tr transformable) (transformable, error) {
+func (delete *deleteTransform) run(ctx *transformContext, tr transformable) (transformable, error) {
 	if err := delete.runFunc(ctx, tr, delete.targetInfo.Name); err != nil {
 		return transformable{}, err
 	}

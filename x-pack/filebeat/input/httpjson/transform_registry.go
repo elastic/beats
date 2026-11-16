@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // registry is a collection of namespaced transform constructors.
@@ -48,14 +48,14 @@ func (reg registry) String() string {
 		return "(empty registry)"
 	}
 
-	var str string
+	var str strings.Builder
 	for namespace, m := range reg {
 		names := make([]string, 0, len(m))
 		for k := range m {
 			names = append(names, k)
 		}
-		str += fmt.Sprintf("%s: (%s)\n", namespace, strings.Join(names, ", "))
+		str.WriteString(fmt.Sprintf("%s: (%s)\n", namespace, strings.Join(names, ", ")))
 	}
 
-	return str
+	return str.String()
 }

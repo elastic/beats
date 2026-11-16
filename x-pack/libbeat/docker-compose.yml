@@ -27,9 +27,26 @@ services:
     ports:
       - 9200:9200
 
+  elasticsearch_setup:
+    extends:
+      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: elasticsearch
+    entrypoint: ["/bin/bash"]
+    command:
+      - -ec
+      - |
+        curl --fail --silent --show-error -u admin:testing \
+          -H 'Content-Type: application/json' \
+          -X PUT http://elasticsearch:9200/_index_template/beats-integration-workflow-replicas \
+          -d '{"index_patterns":[".workflows-*"],"priority":500,"template":{"settings":{"index.number_of_replicas":0}}}'
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
   kibana:
     depends_on:
-      - elasticsearch
+      elasticsearch_setup:
+        condition: service_completed_successfully
     extends:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: kibana

@@ -27,9 +27,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
@@ -1239,6 +1239,29 @@ func TestAmqp_MultipleBodyFrames(t *testing.T) {
 	trans := expectTransaction(t, results)
 	assert.Equal(t, "basic.publish", trans["method"])
 	assert.Equal(t, "***hello I like to publish big messages***", trans["request"])
+}
+
+func TestAmqp_OrphanedHeaderFrame(t *testing.T) {
+	//nolint:staticcheck // SA1019: the map based dispatch makes this difficult.
+	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
+
+	_, amqp, err := amqpModForTests()
+	assert.NoError(t, err)
+
+	data, err := hex.DecodeString("02000100000010003c0000000000000000000080000178ce")
+	assert.NoError(t, err)
+	stream := &amqpStream{data: data, message: new(amqpMessage)}
+
+	var ok, complete bool
+	assert.NotPanics(t, func() {
+		ok, complete = amqp.amqpMessageParser(stream)
+	})
+	if !ok {
+		t.Errorf("Parsing should succeed")
+	}
+	if !complete {
+		t.Errorf("Message should be complete: body-size is 0")
+	}
 }
 
 func TestAmqp_BasicReturnMethod_ParsesOffsets(t *testing.T) {

@@ -18,8 +18,8 @@
 package add_cloud_metadata
 
 import (
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 const (
@@ -35,7 +35,7 @@ var hetznerMetadataFetcher = provider{
 	Name:           "hetzner-cloud",
 	DefaultEnabled: true,
 	Create: func(_ string, c *conf.C) (metadataFetcher, error) {
-		hetznerSchema := func(m map[string]interface{}) mapstr.M {
+		hetznerSchema := func(m map[string]any) mapstr.M {
 			m["service"] = mapstr.M{
 				"name": "Cloud",
 			}

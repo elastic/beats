@@ -21,7 +21,7 @@ import (
 
 	// Import common fields for validation
 	_ "github.com/elastic/beats/v7/metricbeat/module/prometheus"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func TestData(t *testing.T) {
@@ -43,7 +43,7 @@ func TestFetchEventForCountingMetrics(t *testing.T) {
 
 	host := strings.TrimPrefix(server.URL, "http://")
 
-	config := map[string]interface{}{
+	config := map[string]any{
 		"module":        "prometheus",
 		"metricsets":    []string{"collector"},
 		"hosts":         []string{server.URL},

@@ -9,15 +9,16 @@ package application_pool
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 	"syscall"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/go-sysinfo"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 const ecsProcessId = "process.pid"
@@ -303,10 +304,8 @@ func getProcessIds(counterValues map[string][]pdh.CounterValue) []WorkerProcess 
 func hasWorkerProcess(instance string, workers []WorkerProcess, pids []int) bool {
 	for _, worker := range workers {
 		if worker.instanceName == instance {
-			for _, pid := range pids {
-				if pid == worker.processId {
-					return true
-				}
+			if slices.Contains(pids, worker.processId) {
+				return true
 			}
 		}
 	}

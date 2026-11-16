@@ -7,7 +7,7 @@
 package kerneltracingprovider
 
 import (
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 // / Stats tracks the quark internal stats, which are integrated into the beats monitoring runtime
@@ -17,6 +17,7 @@ type Stats struct {
 	Aggregations    *monitoring.Uint
 	NonAggregations *monitoring.Uint
 	Lost            *monitoring.Uint
+	Stalls          *monitoring.Uint
 }
 
 // / NewStats creates a new stats object
@@ -27,5 +28,6 @@ func NewStats(reg *monitoring.Registry) *Stats {
 		Aggregations:    monitoring.NewUint(reg, "aggregations"),
 		NonAggregations: monitoring.NewUint(reg, "nonaggregations"),
 		Lost:            monitoring.NewUint(reg, "lost"),
+		Stalls:          monitoring.NewUint(reg, "stalls"),
 	}
 }

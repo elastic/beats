@@ -8,14 +8,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/go-concert/unison"
-
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 )
 
 // compile-time check if querier implements InputManager
@@ -75,11 +73,6 @@ type source struct{ cfg config }
 
 func (s *source) Name() string { return s.cfg.URL }
 
-// Init initializes both wrapped input managers.
-func (m InputManager) Init(grp unison.Group) error {
-	return m.cursor.Init(grp)
-}
-
 // Create creates a cursor input manager.
 func (m InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	config := defaultConfig()
@@ -88,3 +81,6 @@ func (m InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	}
 	return m.cursor.Create(cfg)
 }
+
+// Close releases resources held by the underlying cursor input manager.
+func (m InputManager) Close() { m.cursor.Close() }

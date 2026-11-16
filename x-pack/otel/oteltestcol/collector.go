@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/osqreceiver"
 	"github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter"
 	"github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension"
+	"github.com/elastic/beats/v7/x-pack/otel/extension/elasticsearchauth"
 	"github.com/elastic/beats/v7/x-pack/otel/extension/elasticsearchstorage"
 	"github.com/elastic/beats/v7/x-pack/otel/processor/beatprocessor"
 	"github.com/elastic/beats/v7/x-pack/packetbeat/pbreceiver"
@@ -40,7 +41,7 @@ import (
 	"go.opentelemetry.io/collector/exporter/debugexporter"
 	"go.opentelemetry.io/collector/otelcol"
 	"go.opentelemetry.io/collector/service/telemetry/otelconftelemetry"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 )
 
 type Collector struct {
@@ -236,6 +237,7 @@ func getComponent() (otelcol.Factories, error) {
 
 	extensions, err := otelcol.MakeFactoryMap(
 		beatsauthextension.NewFactory(),
+		elasticsearchauth.NewFactory(),
 		elasticsearchstorage.NewFactory(),
 	)
 	if err != nil {

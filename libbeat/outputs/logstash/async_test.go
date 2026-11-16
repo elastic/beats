@@ -29,9 +29,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport/transptest"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/transport"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/transport"
 
 	"github.com/stretchr/testify/require"
 )
@@ -72,7 +72,7 @@ func makeAsyncTestClient(conn *transport.Client) testClientDriver {
 
 func TestClientSendCloseDoesNotPanic(t *testing.T) {
 	require.NotPanics(t, func() {
-		for i := 0; i < 10; i++ {
+		for range 10 {
 			testClientSendCloseDoesNotPanic(t)
 		}
 	})
@@ -112,9 +112,7 @@ func newAsyncTestDriver(client outputs.NetworkClient) *testAsyncDriver {
 		returns: nil,
 	}
 
-	driver.wg.Add(1)
-	go func() {
-		defer driver.wg.Done()
+	driver.wg.Go(func() {
 
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
@@ -136,7 +134,7 @@ func newAsyncTestDriver(client outputs.NetworkClient) *testAsyncDriver {
 				driver.returns = append(driver.returns, testClientReturn{cmd.batch, err})
 			}
 		}
-	}()
+	})
 
 	return driver
 }

@@ -25,8 +25,8 @@ import (
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 var (
@@ -99,7 +99,7 @@ var (
 	}
 )
 
-func applySchema(event mapstr.M, fullEvent map[string]interface{}) error {
+func applySchema(event mapstr.M, fullEvent map[string]any) error {
 	applicableSchema := schema
 	if _, found := fullEvent["ServerUptimeSeconds"]; !found {
 		applicableSchema = schemaOld
@@ -125,7 +125,7 @@ func eventMapping(scanner *bufio.Scanner, hostname string, logger *logp.Logger) 
 		totalAll        int
 	)
 
-	fullEvent := map[string]interface{}{}
+	fullEvent := map[string]any{}
 
 	// Iterate through all events to gather data
 	for scanner.Scan() {

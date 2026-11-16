@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 
 	"github.com/stretchr/testify/assert"
 
@@ -70,10 +70,10 @@ func TestSessionMap_GetOrCreate(t *testing.T) {
 		C := make(chan *SessionState, N*Iters)
 		wg := sync.WaitGroup{}
 		wg.Add(N)
-		for i := 0; i < N; i++ {
+		for range N {
 			go func() {
 				last := sm.GetOrCreate(key)
-				for iter := 0; iter < Iters; iter++ {
+				for range Iters {
 					s := sm.GetOrCreate(key)
 					if last != s {
 						C <- last

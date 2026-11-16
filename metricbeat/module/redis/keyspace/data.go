@@ -24,7 +24,7 @@ import (
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/redis"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // Map data to MapStr
@@ -72,7 +72,7 @@ func parseKeyspaceStats(keyspaceMap map[string]string) map[string]mapstr.M {
 		dbInfo := redis.ParseRedisLine(v, ",")
 
 		if len(dbInfo) == 3 || len(dbInfo) == 4 {
-			db := map[string]interface{}{}
+			db := map[string]any{}
 			for _, dbEntry := range dbInfo {
 				stats := redis.ParseRedisLine(dbEntry, "=")
 

@@ -26,7 +26,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kibana"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 var (
@@ -68,7 +68,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	event.RootFields = mapstr.M{}
 	event.RootFields.Put("service.name", kibana.ModuleName)
 
-	var data map[string]interface{}
+	var data map[string]any
 	err := json.Unmarshal(content, &data)
 	if err != nil {
 		return fmt.Errorf("failure parsing Kibana Status API response: %w", err)

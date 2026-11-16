@@ -23,7 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
 	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 
 	gocql "github.com/elastic/beats/v7/packetbeat/protos/cassandra/internal/gocql"
 )
@@ -59,8 +59,8 @@ type message struct {
 	failed  bool
 	ignored bool
 
-	data   map[string]interface{}
-	header map[string]interface{}
+	data   map[string]any
+	header map[string]any
 	// list element use by 'transactions' for correlation
 	next *message
 
@@ -87,7 +87,7 @@ func (p *parser) init(
 
 }
 
-func (p *parser) debugf(format string, args ...interface{}) {
+func (p *parser) debugf(format string, args ...any) {
 	if p.isDebug {
 		p.logger.Debugf(format, args...)
 	}

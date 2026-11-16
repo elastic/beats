@@ -1,0 +1,11 @@
+kind: enhancement
+summary: Add multi-record coalescing mode to auditd filestream parser
+description: >
+  The auditd filestream parser now supports a "coalesce" mode that groups
+  related audit records by sequence number using go-libaudit's Reassembler
+  and produces compound events via aucoalesce.CoalesceMessages. The output
+  uses the auditd.data.* namespace (matching the auditd_manager integration)
+  and populates ECS root fields (process.*, user.*, event.*, file.*). This
+  enables detection rules that require compound-event fields to target the
+  auditd integration alongside auditd_manager.
+component: filebeat

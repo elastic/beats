@@ -337,7 +337,7 @@ Provides information about RDB persistence
 
 
 **`redis.info.persistence.rdb.copy_on_write.last_size`**
-:   The size in bytes of copy-on-write allocations during the last RBD save operation
+:   The size in bytes of copy-on-write allocations during the last RDB save operation
 
     type: long
 
@@ -346,7 +346,7 @@ Provides information about RDB persistence
 
 ## aof [_aof]
 
-Provides information about AOF persitence
+Provides information about AOF persistence
 
 **`redis.info.persistence.aof.enabled`**
 :   Flag indicating AOF logging is activated
@@ -355,7 +355,7 @@ Provides information about AOF persitence
 
 
 **`redis.info.persistence.aof.rewrite.in_progress`**
-:   Flag indicating a AOF rewrite operation is on-going
+:   Flag indicating an AOF rewrite operation is on-going
 
     type: boolean
 
@@ -391,7 +391,7 @@ Provides information about AOF persitence
 
 
 **`redis.info.persistence.aof.bgrewrite.last_status`**
-:   Status of the last AOF rewrite operatio
+:   Status of the last AOF rewrite operation
 
     type: keyword
 
@@ -403,7 +403,7 @@ Provides information about AOF persitence
 
 
 **`redis.info.persistence.aof.copy_on_write.last_size`**
-:   The size in bytes of copy-on-write allocations during the last RBD save operation
+:   The size in bytes of copy-on-write allocations during the last RDB save operation
 
     type: long
 

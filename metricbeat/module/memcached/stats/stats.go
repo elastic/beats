@@ -69,7 +69,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	scanner := bufio.NewScanner(conn)
 
-	data := map[string]interface{}{}
+	data := map[string]any{}
 
 	for scanner.Scan() {
 		text := scanner.Text()

@@ -4,9 +4,14 @@ extensions:
   pprof:
     endpoint: 0.0.0.0:1777
   beatsauth:
-  elasticsearch_storage:
-    hosts:
+    endpoints:
       - http://localhost:9200
+  elasticsearchauth:
+    endpoints:
+      - http://localhost:9200
+  elasticsearch_storage:
+    auth:
+      authenticator: beatsauth
   kafkapartitioner:
 
 receivers:
@@ -29,6 +34,8 @@ receivers:
           count: 1
 
   heartbeatreceiver:
+    monitor_state:
+      elasticsearch: beatsauth
     heartbeat:
       monitors:
         - type: tcp
@@ -117,7 +124,7 @@ exporters:
 connectors:
 
 service:
-  extensions: [health_check, pprof, beatsauth, elasticsearch_storage, kafkapartitioner]
+  extensions: [health_check, pprof, beatsauth, elasticsearchauth, elasticsearch_storage, kafkapartitioner]
   
   pipelines:
     logs:

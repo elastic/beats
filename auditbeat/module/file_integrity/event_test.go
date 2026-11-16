@@ -34,7 +34,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 var testEventTime = time.Now().UTC()
@@ -368,7 +368,7 @@ func BenchmarkHashFile(b *testing.B) {
 
 	zeros := make([]byte, 100)
 	const iterations = 1024 * 1024 // 100 MiB
-	for i := 0; i < iterations; i++ {
+	for range iterations {
 		if _, err = f.Write(zeros); err != nil {
 			b.Fatal(err)
 		}

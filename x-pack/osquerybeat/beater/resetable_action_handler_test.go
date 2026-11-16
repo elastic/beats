@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
-	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/google/go-cmp/cmp"
 )
@@ -22,9 +22,9 @@ type mockActionHandler struct {
 	err error
 }
 
-func (a *mockActionHandler) Execute(ctx context.Context, req map[string]interface{}) (map[string]interface{}, error) {
+func (a *mockActionHandler) Execute(ctx context.Context, req map[string]any) (map[string]any, error) {
 	now := time.Now().UTC()
-	res := map[string]interface{}{
+	res := map[string]any{
 		"started_at":   now.Format(time.RFC3339Nano),
 		"completed_at": now.Format(time.RFC3339Nano),
 	}
@@ -41,17 +41,16 @@ func (a *mockActionHandler) Name() string {
 }
 
 type mockActionResultPublisher struct {
-	req, res map[string]interface{}
+	req, res map[string]any
 }
 
-func (p *mockActionResultPublisher) PublishActionResult(req map[string]interface{}, res map[string]interface{}) {
+func (p *mockActionResultPublisher) PublishActionResult(req map[string]any, res map[string]any) {
 	p.req = req
 	p.res = res
 }
 
 func TestResetableActionHandler(t *testing.T) {
-	ctx, cn := context.WithCancel(context.Background())
-	defer cn()
+	ctx := t.Context()
 
 	log := logp.NewLogger("resetable_action_handler_test")
 
@@ -88,7 +87,9 @@ func TestResetableActionHandler(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			pub := &mockActionResultPublisher{}
-			rah := newResetableActionHandler(pub, log, resetableActionHandlerWithTimeout(testActionHandlerTimeout))
+			live := newLiveResultDispatcher(nil, log, time.Second)
+			defer live.stop()
+			rah := newResetableActionHandler(live, pub, log, resetableActionHandlerWithTimeout(testActionHandlerTimeout))
 			defer rah.Clear()
 
 			if tc.ah != nil {

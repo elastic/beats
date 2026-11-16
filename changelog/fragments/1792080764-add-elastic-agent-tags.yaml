@@ -1,0 +1,5 @@
+kind: feature
+summary: Add the Elastic Agent tags to the tags field of events
+description: >-
+  Beats that run under Elastic Agent now add the agent tags to the tags field of every event.
+component: all

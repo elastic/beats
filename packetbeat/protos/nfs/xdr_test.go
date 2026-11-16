@@ -38,7 +38,7 @@ var testMsg = []byte{
 func BytesToUint32(b []byte) []uint32 {
 	n := len(b) / 4
 	out := make([]uint32, n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		out[i] = binary.BigEndian.Uint32(b[i*4:])
 	}
 	return out

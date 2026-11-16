@@ -12,11 +12,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/eventlog"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-sysinfo/providers/windows"
 )
 
@@ -67,7 +68,7 @@ func testCollectionPipeline(t testing.TB, evtx string, p *params) {
 	log, err := eventlog.New(config.MustNewConfigFrom(mapstr.M{
 		"name":           path,
 		"no_more_events": "stop",
-	}))
+	}), logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}

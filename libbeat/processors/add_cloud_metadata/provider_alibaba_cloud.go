@@ -18,8 +18,8 @@
 package add_cloud_metadata
 
 import (
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // Alibaba Cloud Metadata Service
@@ -35,7 +35,7 @@ var alibabaCloudMetadataFetcher = provider{
 		ecsMetadataRegionURI := "/latest/meta-data/region-id"
 		ecsMetadataZoneURI := "/latest/meta-data/zone-id"
 
-		ecsSchema := func(m map[string]interface{}) mapstr.M {
+		ecsSchema := func(m map[string]any) mapstr.M {
 			m["service"] = mapstr.M{
 				"name": "ECS",
 			}

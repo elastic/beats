@@ -23,7 +23,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -126,10 +126,10 @@ var (
 )
 
 type response struct {
-	AutoFollowStats map[string]interface{} `json:"auto_follow_stats"`
+	AutoFollowStats map[string]any `json:"auto_follow_stats"`
 	FollowStats     struct {
 		Indices []struct {
-			Shards []map[string]interface{} `json:"shards"`
+			Shards []map[string]any `json:"shards"`
 		} `json:"indices"`
 	} `json:"follow_stats"`
 }

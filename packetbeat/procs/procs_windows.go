@@ -115,7 +115,7 @@ func parseTable(data []byte, extractor extractor) error {
 	if lim < n*rowSize+sizeOfDWORD {
 		return errors.New("data table too small for its contents")
 	}
-	for i := 0; i < n; i++ {
+	for i := range n {
 		ptr := unsafe.Pointer(&data[sizeOfDWORD+i*rowSize])
 		extractor.Extract(ptr)
 	}

@@ -18,8 +18,21 @@
 package queue
 
 import (
-	"github.com/elastic/elastic-agent-libs/logp"
+	"context"
+	"errors"
+	"time"
+
+	"github.com/elastic/beats/v7/pkg/logp"
 )
+
+// ErrClosed is returned by Producer.PublishContext when the producer or queue
+// is closed.
+var ErrClosed = errors.New("queue: closed")
+
+// ErrRejected is wrapped, with the reason, by the error that
+// Producer.PublishContext returns when the queue refused an entry while the
+// producer and queue were open, for example because it is too large.
+var ErrRejected = errors.New("queue: cannot accept entry")
 
 // Queue is responsible for accepting, forwarding and ACKing events.
 // A queue will receive and buffer single events from its producers.
@@ -50,6 +63,17 @@ type Queue[T any] interface {
 	// Get retrieves a batch of up to eventCount events. If eventCount <= 0,
 	// there is no bound on the number of returned events.
 	Get(eventCount int) (Batch[T], error)
+}
+
+type UnblockingQueue[T any] interface {
+	Queue[T]
+	// Unblocking Get retrieves a batch of up to eventCount events without blocking.
+	// If the queue is empty, it returns nil.
+	TryGet(eventCount int) (Batch[T], error)
+	// ReadyChan returns a channel that notifies when the queue is ready to be read.
+	ReadyChan() <-chan struct{}
+	// GetDebounce returns the debounce time of the queue.
+	GetDebounce() time.Duration
 }
 
 // If encoderFactory is provided, then the resulting queue must use it to
@@ -88,6 +112,17 @@ type Producer[T any] interface {
 	// Publish adds an entry to the queue, blocking if necessary, and returns
 	// the new entry's id and true on success.
 	Publish(entry T) (EntryID, bool)
+
+	// PublishContext adds an entry to the queue like Publish, but stops waiting
+	// for room when ctx is done. It returns the new entry's id and nil on
+	// success, ctx.Err() if ctx ended first (the entry was not added),
+	// ErrClosed if the producer or queue is closed (where Publish would return
+	// false; the entry was not added), or an error wrapping ErrRejected, with
+	// the reason, if the queue refused the entry. A nil error means the entry
+	// was added, even if ctx is done by the time PublishContext returns. If ctx
+	// is already done when PublishContext is called, an entry that fits
+	// without waiting may still be added; check ctx first to avoid that.
+	PublishContext(ctx context.Context, entry T) (EntryID, error)
 
 	// TryPublish adds an entry to the queue if doing so will not block the
 	// caller, otherwise it immediately returns. The reasons a publish attempt

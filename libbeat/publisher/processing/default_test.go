@@ -30,11 +30,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/paths"
 )
 
 func TestGenerateProcessorList(t *testing.T) {
@@ -343,21 +343,29 @@ func TestEventNormalizationOverride(t *testing.T) {
 func TestNormalization(t *testing.T) {
 	cases := map[string]struct {
 		normalize bool
+		inPlace   bool
 		in        mapstr.M
 		mod       mapstr.M
 		want      mapstr.M
 	}{
 		"no sharing if normalized": {
 			normalize: true,
-			in:        mapstr.M{"a": "b"},
-			mod:       mapstr.M{"change": "x"},
-			want:      mapstr.M{"a": "b"},
+			in:        mapstr.M{"a": "b", "nested": mapstr.M{"n": "1"}},
+			mod:       mapstr.M{"change": "x", "nested": mapstr.M{"deep": "y"}},
+			want:      mapstr.M{"a": "b", "nested": mapstr.M{"n": "1"}},
 		},
 		"data sharing if not normalized": {
 			normalize: false,
 			in:        mapstr.M{"a": "b"},
 			mod:       mapstr.M{"change": "x"},
 			want:      mapstr.M{"a": "b", "change": "x"},
+		},
+		"data sharing if normalized in place": {
+			normalize: true,
+			inPlace:   true,
+			in:        mapstr.M{"a": "b", "drop": nil, "nested": mapstr.M{"n": "1", "drop": nil}},
+			mod:       mapstr.M{"change": "x", "nested": mapstr.M{"deep": "y"}},
+			want:      mapstr.M{"a": "b", "change": "x", "nested": mapstr.M{"n": "1", "deep": "y"}},
 		},
 	}
 
@@ -368,7 +376,7 @@ func TestNormalization(t *testing.T) {
 			s, err := MakeDefaultSupport(test.normalize, nil)(beat.Info{Paths: tmpPaths(t)}, logp.L(), config.NewConfig())
 			require.NoError(t, err)
 
-			prog, err := s.Create(beat.ProcessingConfig{}, false)
+			prog, err := s.Create(beat.ProcessingConfig{NormalizeInPlace: test.inPlace}, false)
 			require.NoError(t, err)
 
 			fields := test.in.Clone()

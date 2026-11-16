@@ -1,0 +1,13 @@
+kind: enhancement
+
+summary: Enable Kafka SASL SCRAM-SHA-256/512 in FIPS builds.
+
+description: |
+  github.com/xdg-go/scram v1.2.0 uses the Go standard library crypto/pbkdf2
+  package on Go 1.24+, which is inside the certified Go Cryptographic Module
+  boundary (GOFIPS140=v1.0.0, CMVP #5247). The custom PBKDF2 implementation
+  that originally required disabling SCRAM in FIPS builds (PR #43062) is no
+  longer used when building with Go 1.24 or later, which is the minimum required
+  version for this module.
+
+component: libbeat

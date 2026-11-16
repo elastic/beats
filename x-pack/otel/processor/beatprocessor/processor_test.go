@@ -14,8 +14,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	_ "github.com/elastic/beats/v7/libbeat/cmd/instance" // needed for registering processors
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -553,4 +554,12 @@ func (c *closerProcessor) String() string                             { return "
 func (c *closerProcessor) Close() error {
 	c.closeCalls++
 	return c.err
+}
+
+func TestComponentLifecycle(t *testing.T) {
+	oteltest.CheckProcessorLifecycle(t, NewFactory(), &Config{
+		Processors: []map[string]any{
+			{"add_fields": map[string]any{"fields": map[string]any{"key": "value"}}},
+		},
+	})
 }

@@ -37,9 +37,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func TestDeprecatedUse(t *testing.T) {
@@ -333,7 +333,7 @@ func (t TestFileInfo) Size() int64        { return 0 }
 func (t TestFileInfo) Mode() os.FileMode  { return 0 }
 func (t TestFileInfo) ModTime() time.Time { return t.time }
 func (t TestFileInfo) IsDir() bool        { return false }
-func (t TestFileInfo) Sys() interface{}   { return nil }
+func (t TestFileInfo) Sys() any           { return nil }
 
 type eventCapturer struct {
 	closed    bool

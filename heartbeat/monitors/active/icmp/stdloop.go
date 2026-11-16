@@ -33,7 +33,7 @@ import (
 	"golang.org/x/net/ipv4"
 	"golang.org/x/net/ipv6"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 type stdICMPLoop struct {
@@ -334,7 +334,7 @@ func (l *stdICMPLoop) sendEchoRequest(addr *net.IPAddr) (*requestContext, error)
 		proto = protocolIPv6ICMP
 		typ = ipv6.ICMPTypeEchoRequest
 	} else {
-		return nil, fmt.Errorf("%v is unknown ip address", addr)
+		return nil, fmt.Errorf("%v is an unknown IP address", addr)
 	}
 
 	id := requestID{

@@ -14,8 +14,8 @@ import (
 	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/pkg/errors" //nolint:gomodguard // go-cfclient uses pkg/errors internally, must be upgraded to at least https://github.com/cloudfoundry-community/go-cfclient/commit/0ada4e9452
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/libbeat/persistentcache"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // cfClient interface is provided so unit tests can mock the actual client.

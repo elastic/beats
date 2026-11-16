@@ -13,7 +13,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
@@ -106,7 +106,7 @@ func ReadFields(d Decoder, buf *bytes.Buffer, count int) (record template.Templa
 	knownFields := d.GetFields()
 	logger := d.GetLogger()
 	record.Fields = make([]template.FieldTemplate, count)
-	for i := 0; i < count; i++ {
+	for i := range count {
 		key, length, err := d.ReadFieldDefinition(buf)
 		if err != nil {
 			return template.Template{}, io.EOF

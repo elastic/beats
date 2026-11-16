@@ -1,0 +1,11 @@
+kind: enhancement
+summary: Apply ignore_older, event_id, level and provider filters to Windows events before rendering the event data and message.
+description: |
+  Winlogbeat event logs and the Filebeat winlog input render only the system
+  properties of an event before applying the ignore_older, event_id, level and
+  provider filters. Events that do not match skip the rendering of event data
+  and message formatting, which roughly quarters the time spent on them. This
+  mainly speeds up the first read of a large channel when ignore_older is set,
+  and channels where most events are filtered out. Checkpointing is unchanged;
+  filtered events still advance the bookmark.
+component: winlogbeat, filebeat

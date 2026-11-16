@@ -19,9 +19,6 @@ var _ entcollect.Store = (*StateStoreAdapter)(nil)
 // StateStoreAdapter wraps a *statestore.Store to satisfy the
 // entcollect.Store interface. It is used when the ES-backed state
 // store is enabled for agentless deployments.
-//
-// Callers must call store.SetID before constructing the adapter to
-// ensure per-input isolation in the ES backend.
 type StateStoreAdapter struct {
 	store *statestore.Store
 }
@@ -91,8 +88,7 @@ func (a *StateStoreAdapter) Each(fn func(key string, decode func(any) error) (bo
 // propagates a formatted error containing "404 Not Found" (see
 // libbeat/statestore/backend/es/base.go Remove). We match both.
 func isKeyUnknown(err error) bool {
-	var opErr *statestore.ErrorOperation
-	if errors.As(err, &opErr) {
+	if opErr, ok := errors.AsType[*statestore.ErrorOperation](err); ok {
 		cause := opErr.Unwrap()
 		if cause == nil {
 			return false

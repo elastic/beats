@@ -151,7 +151,7 @@ func mustNextHandle(t *testing.T, log EvtHandle) EvtHandle {
 	return h
 }
 
-func logAsJSON(t testing.TB, object interface{}) {
+func logAsJSON(t testing.TB, object any) {
 	data, err := json.MarshalIndent(object, "", "  ")
 	if err != nil {
 		t.Fatal(err)

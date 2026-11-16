@@ -24,7 +24,7 @@ import (
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 var (
@@ -38,7 +38,7 @@ var (
 )
 
 func eventsMapping(content []byte, r mb.ReporterV2) error {
-	var shovels []map[string]interface{}
+	var shovels []map[string]any
 	err := json.Unmarshal(content, &shovels)
 	if err != nil {
 		return fmt.Errorf("error in mapping: %w", err)
@@ -52,7 +52,7 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 	return nil
 }
 
-func eventMapping(shovel map[string]interface{}) mb.Event {
+func eventMapping(shovel map[string]any) mb.Event {
 	fields, _ := schema.Apply(shovel)
 
 	moduleFields := mapstr.M{}

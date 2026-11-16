@@ -26,11 +26,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/paths"
 )
-
-const logName = "processors"
 
 // Processors is
 type Processors struct {
@@ -51,6 +49,13 @@ type Closer interface {
 // with beat-specific paths. This method must be called before the processor can be used.
 type PathSetter interface {
 	SetPaths(*paths.Path) error
+}
+
+// Unshareable opts a processor out of sharing with other owners using the same
+// configuration. Implement it when sharing would change per-owner semantics.
+// Its marker method is never called.
+type Unshareable interface {
+	Unshareable()
 }
 
 // PdataProcessor is an optional interface that beat processors can implement to

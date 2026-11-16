@@ -15,10 +15,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/paths"
 )
 
 var (
@@ -43,7 +43,7 @@ var (
 		"resources": []mapstr.M{
 			{
 				"resource_id": "test",
-				"metrics": []map[string]interface{}{
+				"metrics": []map[string]any{
 					{
 						"namespace": "namespace_name",
 						"name":      []string{"metric_name"},

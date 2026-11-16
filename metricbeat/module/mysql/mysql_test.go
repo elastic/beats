@@ -46,7 +46,7 @@ func TestParseDSN(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		c := map[string]interface{}{
+		c := map[string]any{
 			"username": test.username,
 			"password": test.password,
 		}

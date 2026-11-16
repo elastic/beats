@@ -23,7 +23,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 )
@@ -85,7 +85,7 @@ func TestURLFields(t *testing.T) {
 			require.NoError(t, err)
 
 			got := URLFields(parsed)
-			testslike.Test(t, lookslike.MustCompile(map[string]interface{}(tt.want)), got)
+			testslike.Test(t, lookslike.MustCompile(map[string]any(tt.want)), got)
 		})
 	}
 }

@@ -1,0 +1,207 @@
+version: 9.5.3
+entries:
+    - kind: bug-fix
+      summary: Emit pack_name and query_name in osquerybeat scheduled query results
+      description: |
+        Scheduled pack queries (both osquery native interval schedules and osquerybeat
+        RRULE schedules) now include two additional fields in their result and response
+        documents: pack_name, taken from the new optional `pack_name` config field on a
+        pack (alongside the existing pack_id), and query_name, taken from the pack's
+        queries config map key. Both fields are only emitted when set. These fields are
+        required by the Osquery Manager dashboards, which group and label scheduled
+        query results by pack and query name; without them the dashboards cannot render
+        those results correctly.
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/51781
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1783335960
+      file:
+        name: 1783335960-osquerybeat-pack-name-query-name.yaml
+        checksum: e0aef2a18877957556412324bafbd89f9fd50ee4
+    - kind: enhancement
+      summary: Reduce Filestream memory use with multiple Filebeat receivers
+      description: |
+        Filebeat now shares Filestream registry state between Filebeat receiver instances that use the same persistent registry. This avoids keeping a separate in-memory copy of the same state for each receiver, reducing memory use in workloads with a large number of inputs, like Kubernetes.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52326
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1785856472
+      file:
+        name: 1785856472-filestream-share-otel-registry-state.yaml
+        checksum: e6a2d6321e965f7fae0850b79b144208d07a73b2
+    - kind: bug-fix
+      summary: Fix auditd filestream parser to emit "unset" for unset auid and ses fields.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52614
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1786601758
+      file:
+        name: 1786601758-fix-auditd-parser-unset-auid-ses.yaml
+        checksum: 6f318cd94929de4e7830ab067a08ce1a4b22e09c
+    - kind: bug-fix
+      summary: Censor HTTP parameters for mixed-case `hide_keywords` entries
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52650
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1786714344
+      file:
+        name: 1786714344-packetbeat-http-hide-keywords-case-insensitive.yaml
+        checksum: 3ac132ed9ca140905c99f4bdfd4c1c624e0e6601
+    - kind: enhancement
+      summary: Log Npcap installer diagnostic files on installation failure.
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52667
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1787010547
+      file:
+        name: 1787010547-npcap-log-installer-diagnostics.yaml
+        checksum: 86c0f010c8c2dc857eafa03e81ae3dce8ddedc38
+    - kind: bug-fix
+      summary: Fix CEL input panic on nil rate-limit fields and 429 retry hot-loop.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52684
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1787090989
+      file:
+        name: 1787090989-cel-rate-limit-budget.yaml
+        checksum: 584eca37ad66d01789c564b258f1bb169a2d21e0
+    - kind: bug-fix
+      summary: Scope the aws-s3 polling state registry to the input's bucket.
+      description: |
+        All aws-s3 inputs of a process share one persistent state registry. Each
+        polling input loaded every input's states into memory, and its periodic
+        registry cleanup then deleted from the shared store all entries missing
+        from its own bucket listing, including the other inputs' states. After a
+        restart the affected inputs found no persisted state and re-ingested
+        their buckets. Loading is now scoped to the input's bucket and key
+        prefix. This also removes the duplicated memory usage of the registry
+        when several polling inputs run in one process.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52728
+      issue:
+        - https://github.com/elastic/beats/issues/52721
+      impact: ""
+      action: ""
+      timestamp: 1787214552
+      file:
+        name: 1787214552-awss3-bucket-scoped-state-registry.yaml
+        checksum: e00ae0002d539f6c44db66bfaa9ab8cca290c4a3
+    - kind: enhancement
+      summary: Update Go to 1.26.7
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/52750
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1787328794
+      file:
+        name: 1787328794-update-go-to-1.26.7.yaml
+        checksum: 4f69e7c044ff634129706c229644d1eb8d0a277c
+    - kind: bug-fix
+      summary: Fix bounds-check panics in Packetbeat TLS and Cassandra protocol parsers.
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52870
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1787808118
+      file:
+        name: 1787808118-fix-packetbeat-tls-cassandra-parser-panics.yaml
+        checksum: 3c4938a9577fb91641c5b412bd47750fdfc2dcdc
+    - kind: bug-fix
+      summary: Rename log key `component` to `log.logger` to prevent mapping conflict on Elasticsearch
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/52912
+      issue:
+        - https://github.com/elastic/beats/issues/52888
+      impact: ""
+      action: ""
+      timestamp: 1787946152
+      file:
+        name: 1787946152-osquerybeat-rename-log-key-component-to-log.logger.yaml
+        checksum: bcfc885703d375c16694c4e1907dfaaf98f82fe1
+    - kind: bug-fix
+      summary: Stamp space_id on Osquerybeat live query result and profile documents so results are visible in non-default Kibana spaces.
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/52915
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1788155659
+      file:
+        name: 1788155659-osquerybeat-live-query-space-id.yaml
+        checksum: 1d7234df679a106c634de1aea37ff2866800d078
+    - kind: bug-fix
+      summary: Fix network flow collection under the Elastic Agent OTel runtime.
+      description: |
+        Under the Elastic Agent OTel runtime, the flows stream is delivered in the
+        protocols list, where Packetbeat dropped it as an unknown protocol plugin,
+        collecting no flow events. Flow entries in the protocols list are now routed
+        to the flows configuration, and unknown protocol entries mark Packetbeat as
+        degraded instead of being silently ignored.
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52932
+      issue:
+        - https://github.com/elastic/beats/issues/52931
+      impact: ""
+      action: ""
+      timestamp: 1788187531
+      file:
+        name: 1788187531-fix-otel-packetbeat-flows.yaml
+        checksum: aff3292b57949bd0e0ae25df310a814c77bba275
+    - kind: bug-fix
+      summary: Log entity analytics sync interruption by input shutdown or reconfiguration at info level instead of error, and no longer mark the input degraded for it.
+      description: |
+        When an entity analytics sync was interrupted because the input's
+        context was cancelled — agent shutdown, restart, or a policy change
+        re-rendering the input mid-sync — the failure was logged as an error
+        such as "Error running full sync: ... context canceled" and the
+        input was marked Degraded. This routine lifecycle event is now
+        logged at info level as a sync interruption and no longer degrades
+        the input's status. All entity analytics providers
+        (activedirectory, azuread, jamf, okta) and the minimal-state runner
+        are covered. Other errors, including context deadline expiry, keep
+        the previous error treatment.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/52950
+      issue:
+        - https://github.com/elastic/beats/issues/52945
+      impact: ""
+      action: ""
+      timestamp: 1788204683
+      file:
+        name: 1788204683-entityanalytics-canceled-sync-logging.yaml
+        checksum: 84d4c0bde41ff4a6ade4eb227a679589efc61d05

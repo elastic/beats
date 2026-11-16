@@ -25,5 +25,5 @@ type collectedData struct {
 // which refers to the origin of the data for organization purposes.
 type sysmetricCollector struct {
 	db       *sql.DB
-	patterns []interface{}
+	patterns []any
 }

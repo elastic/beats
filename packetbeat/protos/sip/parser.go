@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
 	"github.com/elastic/beats/v7/packetbeat/protos"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // sip Message
@@ -107,14 +107,14 @@ func (pi *parsingInfo) prepareForNewMessage() {
 }
 
 //go:inline
-func (pi *parsingInfo) debugf(format string, args ...interface{}) {
+func (pi *parsingInfo) debugf(format string, args ...any) {
 	if pi.isDebug {
 		pi.sipLogger.Debugf(format, args...)
 	}
 }
 
 //go:inline
-func (pi *parsingInfo) detailedf(format string, args ...interface{}) {
+func (pi *parsingInfo) detailedf(format string, args ...any) {
 	if pi.isDetailedDebug {
 		pi.sipDetailedLogger.Debugf(format, args...)
 	}

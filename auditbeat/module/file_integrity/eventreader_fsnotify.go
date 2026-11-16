@@ -29,7 +29,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 
 	"github.com/elastic/beats/v7/auditbeat/module/file_integrity/monitor"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 type fsNotifyReader struct {
@@ -42,7 +42,7 @@ type fsNotifyReader struct {
 }
 
 func (r *fsNotifyReader) Start(done <-chan struct{}) (<-chan Event, error) {
-	watcher, err := monitor.New(r.config.Recursive, r.config.IsExcludedPath)
+	watcher, err := monitor.New(r.config.Recursive, r.config.IsExcludedPath, r.log)
 	if err != nil {
 		return nil, err
 	}

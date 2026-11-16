@@ -145,7 +145,7 @@ AWS Health metrics
 
 
 **`aws.awshealth.affected_entities`**
-:   Information about an entity affected by a AWS Health event.
+:   Information about an entity affected by an AWS Health event.
 
     type: array
 

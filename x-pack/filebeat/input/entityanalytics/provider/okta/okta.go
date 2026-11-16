@@ -12,6 +12,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"net/http"
 	"net/url"
 	"slices"
@@ -27,15 +28,15 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/paths"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta/internal/okta"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/paths"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -143,9 +144,13 @@ func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 		case <-syncTimer.C:
 			start := time.Now()
 			if err := p.runFullSync(inputCtx, store, client); err != nil {
-				msg := "Error running full sync"
-				p.logger.Errorw(msg, "error", err)
-				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				if provider.SyncInterrupted(inputCtx, err) {
+					p.logger.Infow(provider.SyncInterruptedMsg, "error", err)
+				} else {
+					msg := "Error running full sync"
+					p.logger.Errorw(msg, "error", err)
+					inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				}
 				p.metrics.syncError.Inc()
 			} else {
 				inputCtx.UpdateStatus(status.Running, "Successful full sync")
@@ -167,9 +172,13 @@ func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 		case <-updateTimer.C:
 			start := time.Now()
 			if err := p.runIncrementalUpdate(inputCtx, store, client); err != nil {
-				msg := "Error running incremental update"
-				p.logger.Errorw(msg, "error", err)
-				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				if provider.SyncInterrupted(inputCtx, err) {
+					p.logger.Infow(provider.SyncInterruptedMsg, "error", err)
+				} else {
+					msg := "Error running incremental update"
+					p.logger.Errorw(msg, "error", err)
+					inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
+				}
 				p.metrics.updateError.Inc()
 			} else {
 				inputCtx.UpdateStatus(status.Running, "Successful incremental update")
@@ -270,8 +279,15 @@ func checkRedirect(cfg *requestConfig, log *logp.Logger) func(*http.Request, []*
 
 		prev := via[len(via)-1] // previous request to get headers from
 
-		log.Debugf("http client: forwarding headers from previous request: %#v", prev.Header)
+		log.Debugf("http client: forwarding headers from previous request: %v", slices.Sorted(maps.Keys(prev.Header)))
 		req.Header = prev.Header.Clone()
+
+		if req.URL.Host != prev.URL.Host || (prev.URL.Scheme == "https" && req.URL.Scheme == "http") {
+			for _, k := range sensitiveHeaders(cfg.RedirectSensitiveHeaders) {
+				log.Debugf("http client: cross-origin redirect to %s: removing sensitive header %s", req.URL.Host, k)
+				req.Header.Del(k)
+			}
+		}
 
 		for _, k := range cfg.RedirectHeadersBanList {
 			log.Debugf("http client: ban header %v", k)
@@ -282,6 +298,22 @@ func checkRedirect(cfg *requestConfig, log *logp.Logger) func(*http.Request, []*
 	}
 }
 
+// defaultSensitiveHeaders are removed on cross-origin redirects when
+// redirect.sensitive_headers is not configured. The default is applied here
+// rather than in defaultConfig because go-ucfg merges a configured list into
+// a default list element by element, so a configured list could not replace
+// the defaults and an empty list could not disable them.
+var defaultSensitiveHeaders = []string{"Authorization", "Proxy-Authorization", "Cookie"}
+
+// sensitiveHeaders returns the configured headers, or the defaults if the
+// option is unset. An empty, non-nil list disables stripping.
+func sensitiveHeaders(configured []string) []string {
+	if configured == nil {
+		return defaultSensitiveHeaders
+	}
+	return configured
+}
+
 // retryLog is a shim for the retryablehttp.Client.Logger.
 type retryLog struct{ log *logp.Logger }
 
@@ -289,10 +321,10 @@ func newRetryLog(log *logp.Logger) *retryLog {
 	return &retryLog{log: log.Named("retryablehttp").WithOptions(zap.AddCallerSkip(1))}
 }
 
-func (l *retryLog) Error(msg string, kv ...interface{}) { l.log.Errorw(msg, kv...) }
-func (l *retryLog) Info(msg string, kv ...interface{})  { l.log.Infow(msg, kv...) }
-func (l *retryLog) Debug(msg string, kv ...interface{}) { l.log.Debugw(msg, kv...) }
-func (l *retryLog) Warn(msg string, kv ...interface{})  { l.log.Warnw(msg, kv...) }
+func (l *retryLog) Error(msg string, kv ...any) { l.log.Errorw(msg, kv...) }
+func (l *retryLog) Info(msg string, kv ...any)  { l.log.Infow(msg, kv...) }
+func (l *retryLog) Debug(msg string, kv ...any) { l.log.Debugw(msg, kv...) }
+func (l *retryLog) Warn(msg string, kv ...any)  { l.log.Warnw(msg, kv...) }
 
 // runFullSync performs a full synchronization. It will fetch user and group
 // identities from Azure Active Directory, enrich users with group memberships,

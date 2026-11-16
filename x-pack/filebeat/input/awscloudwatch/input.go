@@ -22,11 +22,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/beats/v7/x-pack/libbeat/statusreporterhelper"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/go-concert/unison"
 )
 
 const (
@@ -48,9 +47,7 @@ type cloudwatchInputManager struct {
 	logger *logp.Logger
 }
 
-func (im *cloudwatchInputManager) Init(grp unison.Group) error {
-	return nil
-}
+func (im *cloudwatchInputManager) Close() {}
 
 func (im *cloudwatchInputManager) Create(cfg *conf.C) (v2.Input, error) {
 	config := defaultConfig()
@@ -100,7 +97,7 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	in.status = statusreporterhelper.New(inputContext, log, "CloudWatch")
 	in.status.UpdateStatus(status.Starting, "Input starting")
 
-	handler, err := newStateHandler(log, in.config, in.store)
+	handler, err := newStateHandler(log, in.config, in.store, inputContext.ID)
 	if err != nil {
 		in.status.UpdateStatus(status.Failed, fmt.Sprintf("State registry creation failure: %s", err.Error()))
 		return fmt.Errorf("failed to create state handler: %w", err)

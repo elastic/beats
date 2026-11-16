@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder"
 )
@@ -57,7 +57,7 @@ func main() {
 		}
 
 		for _, r := range records {
-			evt, err := json.Marshal(map[string]interface{}{
+			evt, err := json.Marshal(map[string]any{
 				"@timestamp": r.Timestamp,
 				"type":       r.Type,
 				"exporter":   r.Exporter,

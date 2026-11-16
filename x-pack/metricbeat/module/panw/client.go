@@ -17,7 +17,7 @@ const Vsys = ""
 
 // PanwClient interface with an Op function
 type PanwClient interface {
-	Op(req interface{}, vsys string, extras, ans interface{}) ([]byte, error)
+	Op(req any, vsys string, extras, ans any) ([]byte, error)
 }
 
 type PanwFirewallClient struct {
@@ -29,7 +29,7 @@ type PanwTestClient struct {
 
 // Op is a mock function for testing that returns sample XML output based on the initial req parameter
 // XML output is stored in the testdata directory, one file per query string
-func (c *PanwTestClient) Op(req interface{}, vsys string, extras, ans interface{}) ([]byte, error) {
+func (c *PanwTestClient) Op(req any, vsys string, extras, ans any) ([]byte, error) {
 	return nil, nil
 }
 

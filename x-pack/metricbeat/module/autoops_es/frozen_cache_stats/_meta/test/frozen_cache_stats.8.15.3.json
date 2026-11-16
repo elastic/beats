@@ -1,0 +1,28 @@
+{
+  "nodes": {
+    "eerrtBMtQEisohZzxBLUSw": {
+      "shared_cache": {
+        "reads": 6051,
+        "bytes_read_in_bytes": 5448829,
+        "writes": 37,
+        "bytes_written_in_bytes": 1208320,
+        "evictions": 5,
+        "num_regions": 65536,
+        "size_in_bytes": 1099511627776,
+        "region_size_in_bytes": 16777216
+      }
+    },
+    "DFUEPmkQS5OIhRDTnGPJnA": {
+      "shared_cache": {
+        "reads": 2100,
+        "bytes_read_in_bytes": 1887436,
+        "writes": 12,
+        "bytes_written_in_bytes": 401408,
+        "evictions": 1,
+        "num_regions": 65536,
+        "size_in_bytes": 1099511627776,
+        "region_size_in_bytes": 16777216
+      }
+    }
+  }
+}

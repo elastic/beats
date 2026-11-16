@@ -28,13 +28,12 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/consumer/consumererror"
@@ -47,6 +46,9 @@ const (
 	// esDocumentIDAttribute is the attribute key used to store the document ID in the log record.
 	esDocumentIDAttribute = "elasticsearch.document_id"
 
+	// esIndexAttribute matches elasticsearchexporter/internal/elasticsearch.IndexAttributeName.
+	esIndexAttribute = "elasticsearch.index"
+
 	// receivertestUniqueIDAttrName mirrors receivertest.UniqueIDAttrName.
 	// It is duplicated here to avoid importing the receivertest package
 	// (and pulling its testify/testing deps) into production binaries.
@@ -56,11 +58,6 @@ const (
 	retryBackoffMax  = 60 * time.Second
 )
 
-type retryConfig struct {
-	init time.Duration
-	max  time.Duration
-}
-
 type otelConsumer struct {
 	observer       outputs.Observer
 	logsConsumer   consumer.Logs
@@ -68,15 +65,15 @@ type otelConsumer struct {
 	log            *logp.Logger
 	isReceiverTest bool // whether we are running in receivertest context
 
-	retry retryConfig
+	retry *retryBackoff
 }
 
 func MakeOtelConsumer(beat beat.Info, observer outputs.Observer) (outputs.Group, error) {
 	isReceiverTest := os.Getenv("OTELCONSUMER_RECEIVERTEST") == "1"
 
-	retry := retryConfig{init: retryBackoffInit, max: retryBackoffMax}
+	retry := newRetryBackoff(retryBackoffInit, retryBackoffMax)
 	if isReceiverTest {
-		retry = retryConfig{init: 1 * time.Millisecond, max: 2 * time.Millisecond}
+		retry = newRetryBackoff(1*time.Millisecond, 2*time.Millisecond)
 	}
 
 	client := &otelConsumer{
@@ -115,12 +112,6 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 
 	err := out.logsConsumer.ConsumeLogs(otelctx.NewConsumerContext(ctx, out.beatInfo), pLogs)
 	if err != nil {
-		// Queue full errors are expected backpressure signals, not true errors.
-		// Skip logging to avoid log spam since we already track this via metrics.
-		if !errors.Is(err, exporterhelper.ErrQueueIsFull) {
-			out.log.Errorf("failed to publish batch events to otel collector pipeline: %v", err)
-		}
-
 		// Permanent errors shouldn't be retried. This typically means
 		// the data cannot be serialized by the exporter that is attached
 		// to the pipeline or when the destination refuses the data because
@@ -128,15 +119,24 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		//
 		// See https://github.com/open-telemetry/opentelemetry-collector/blob/1c47d89/receiver/doc.go#L23-L40
 		if consumererror.IsPermanent(err) {
+			out.log.Errorf("failed to publish batch events to otel collector pipeline: %v", err)
 			st.PermanentErrors(len(events))
 			batch.Drop()
-		} else {
-			st.RetryableErrors(len(events))
-			bo := backoff.NewEqualJitterBackoff(out.retry.init, out.retry.max)
-			if !bo.Wait(ctx) {
-				batch.Cancelled()
-				return nil
-			}
+			return nil
+		}
+
+		st.RetryableErrors(len(events))
+		wait, started := out.retry.next()
+		// Failures joining a back-off repeat the error that started it for
+		// other in-flight batches. Queue full errors are expected backpressure.
+		// The metrics above count both, so skip logging them.
+		if started && !errors.Is(err, exporterhelper.ErrQueueIsFull) {
+			out.log.Errorf("failed to publish batch events to otel collector pipeline: %v", err)
+		}
+		select {
+		case <-ctx.Done():
+			batch.Cancelled()
+		case <-time.After(wait):
 			batch.Retry()
 		}
 		return nil
@@ -144,6 +144,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 
 	batch.ACK()
 	st.AckedEvents(len(events))
+	out.retry.reset()
 	return nil
 }
 
@@ -224,6 +225,12 @@ func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, bea
 			observedTimestamp = pcommon.NewTimestampFromTime(created)
 		case common.Time:
 			observedTimestamp = pcommon.NewTimestampFromTime(time.Time(created))
+		case string:
+			t, err := time.Parse(time.RFC3339Nano, created)
+			if err != nil {
+				t = time.Now()
+			}
+			observedTimestamp = pcommon.NewTimestampFromTime(t)
 		case nil:
 			// not set
 		default:
@@ -241,6 +248,14 @@ func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, bea
 		}
 		// temporary workaround for https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/49337
 		applyNonStandardDataStreamIndex(logRecord, ds)
+	}
+
+	// If raw_index is set on event metadata, propagate it as the
+	// Elasticsearch index, potentially overwriting the non-standard
+	// data stream index. This matches the behavior of the Beats
+	// index selector.
+	if s, ok := event.Content.Meta["raw_index"].(string); ok {
+		logRecord.Attributes().PutStr(esIndexAttribute, s)
 	}
 
 	bodyMap := logRecord.Body().SetEmptyMap()
@@ -278,9 +293,6 @@ func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, bea
 // that restriction. Remove this function and sanitizeDataStreamField when upstream adds support.
 func applyNonStandardDataStreamIndex(logRecord plog.LogRecord, ds mapstr.M) {
 	const (
-		// esIndexAttribute matches elasticsearchexporter/internal/elasticsearch.IndexAttributeName.
-		esIndexAttribute = "elasticsearch.index"
-
 		// maxDataStreamBytes and disallowed* mirror the sanitisation constants in
 		// elasticsearchexporter so the computed index name matches exactly.
 		maxDataStreamBytes       = 100

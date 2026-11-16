@@ -13,8 +13,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestData(t *testing.T) {
@@ -48,8 +48,8 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string) map[string]any {
+	return map[string]any{
 		"module":     "oracle",
 		"metricsets": []string{"sysmetric"},
 		"hosts":      []string{oracle.GetOracleConnectionDetails(host)},

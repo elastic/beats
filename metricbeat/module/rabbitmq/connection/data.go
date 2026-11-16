@@ -24,7 +24,7 @@ import (
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 var (
@@ -60,7 +60,7 @@ var (
 )
 
 func eventsMapping(content []byte, r mb.ReporterV2) error {
-	var connections []map[string]interface{}
+	var connections []map[string]any
 	err := json.Unmarshal(content, &connections)
 	if err != nil {
 		return fmt.Errorf("error in unmarshal: %w", err)
@@ -73,7 +73,7 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 	return nil
 }
 
-func eventMapping(connection map[string]interface{}) mb.Event {
+func eventMapping(connection map[string]any) mb.Event {
 	fields, _ := schema.Apply(connection, s.FailOnRequired)
 
 	rootFields := mapstr.M{}

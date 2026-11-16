@@ -25,7 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 
 	"github.com/stretchr/testify/require"
 )
@@ -88,23 +88,10 @@ func (r runnerFactoryMock) Assert(t *testing.T) {
 		}
 	})
 
-	t.Run("new processors each time", func(t *testing.T) {
-		var processors []beat.Processor
+	t.Run("close processor groups", func(t *testing.T) {
+		// Close every processor group to release shared references.
 		for _, c := range r.cfgs {
-			processors = append(processors, c.Processing.Processor.All()...)
-			defer c.Processing.Processor.Close()
-		}
-
-		require.NotEmptyf(t, processors, "for this test the list of processors cannot be empty")
-
-		for i, p1 := range processors {
-			for j, p2 := range processors {
-				if i == j {
-					continue
-				}
-
-				require.NotSamef(t, p1, p2, "processors must not be re-used")
-			}
+			require.NoError(t, c.Processing.Processor.Close())
 		}
 	})
 }

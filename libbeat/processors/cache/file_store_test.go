@@ -32,7 +32,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 var keep = flag.Bool("keep", false, "keep testdata after test complete")
@@ -59,7 +59,7 @@ var fileStoreTests = []struct {
 				Effort:   10,
 			},
 			Put: &putConfig{
-				TTL: ptrTo(time.Second),
+				TTL: new(time.Second),
 			},
 		},
 		want: &fileStore{path: "testdata/new_put", memStore: memStore{
@@ -140,7 +140,7 @@ var fileStoreTests = []struct {
 							Effort:   10,
 						},
 						Put: &putConfig{
-							TTL: ptrTo(time.Second),
+							TTL: new(time.Second),
 						},
 					}
 					s.add(putCfg)
@@ -186,7 +186,7 @@ var fileStoreTests = []struct {
 							Effort:   10,
 						},
 						Put: &putConfig{
-							TTL: ptrTo(time.Second),
+							TTL: new(time.Second),
 						},
 					}
 					s.add(putCfg)
@@ -381,7 +381,7 @@ var fileStoreTests = []struct {
 							Effort:   10,
 						},
 						Put: &putConfig{
-							TTL: ptrTo(time.Second),
+							TTL: new(time.Second),
 						},
 					}
 					s.add(putCfg)

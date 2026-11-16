@@ -18,6 +18,18 @@ This functionality is in beta and is subject to change. The design and code is l
 This is the `login` dataset of the system module.
 
 
+## Required privileges [_required_privileges_login]
+
+The `login` dataset reads the binary utmp files `/var/log/wtmp` (successful logins) and `/var/log/btmp` (failed logins). On most Linux distributions, these files are owned by root and readable by the `utmp` group.
+
+* **Minimum**: Membership in the `utmp` group is sufficient. Root is not required.
+* **Docker**: No host namespace is needed. Mount the host log directory if the files are not already visible inside the container:
+
+    ```sh
+    docker run -v /var/log:/var/log:ro ...
+    ```
+
+
 ## Implementation [_implementation]
 
 The `login` dataset is implemented for Linux only.

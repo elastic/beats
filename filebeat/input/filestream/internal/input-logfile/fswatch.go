@@ -249,28 +249,49 @@ type FileScanOptions struct {
 	IgnoreOlder time.Duration
 	// IgnoreInactiveSince is the ignore_inactive reference time.
 	IgnoreInactiveSince time.Time
+	// SuppressBridgingRaw skips attaching the growing-mode bridging header
+	// (Fingerprint.Raw) to complete descriptors.
+	SuppressBridgingRaw bool
+}
+
+// ScanResults is the outcome of a single FSScanner.GetFiles scan.
+type ScanResults struct {
+	// Files are the monitored files found by the scan, keyed by path. Each value
+	// is the descriptor holding all necessary information about the file.
+	Files map[string]FileDescriptor
+	// Metrics is this scan's metrics snapshot.
+	Metrics FileScanMetrics
+	// Unobservable is the list of "unobservable" path prefixes (a directory covers
+	// its subtree, a file covers itself) the scan could not observe because of a
+	// resource or permission error, as opposed to being gone.
+	Unobservable []string
+	// Vanished is the list of paths the scan listed but could no longer find when
+	// it inspected them, typically because of a concurrent rename or delete.
+	// Their state must be held until a later, consistent scan can tell a
+	// rename from a deletion.
+	Vanished []string
 }
 
 // FSScanner retrieves a list of files from the file system.
 type FSScanner interface {
-	// GetFiles returns the list of monitored files.
-	// The keys of the map are the paths to the files and
-	// the values are the file descriptors that contain all necessary information about the file.
-	GetFiles(FileScanOptions) (map[string]FileDescriptor, FileScanMetrics)
+	// GetFiles scans the file system once and returns the result.
+	GetFiles(FileScanOptions) ScanResults
 }
+
+// FSEventSink receives the events produced by [FSWatcher.ScanOnce]. It is
+// called on the goroutine running the scan.
+type FSEventSink func(FSEvent)
 
 // FSWatcher returns file events of the monitored files.
 type FSWatcher interface {
 	FSScanner
+	// HarvesterObserver is how closing harvesters report the offset they
+	// reached, so the next scan does not lose lines on a restart.
+	HarvesterObserver
 
-	// Run is the event loop which watches for changes
-	// in the file system and returns events based on the data.
-	// Aside from the metrics struct it also has ignore older
-	// and ignore inactive as arguments.
-	Run(ctx unison.Canceler, metrics *Metrics, ignoreOlder time.Duration, ignoreInactiveSince time.Time)
-	// Event returns the next event captured by FSWatcher.
-	Event() FSEvent
-	// NotifyChan returns the channel used to listen for
-	// harvester closing notifications
-	NotifyChan() chan HarvesterStatus
+	// ScanOnce scans the file system once and calls sink synchronously for
+	// every event, so the caller owns the scan loop. Aside from the metrics
+	// struct it also has ignore older and ignore inactive as arguments.
+	// It stops early when ctx is cancelled.
+	ScanOnce(ctx unison.Canceler, sink FSEventSink, metrics *Metrics, ignoreOlder time.Duration, ignoreInactiveSince time.Time)
 }

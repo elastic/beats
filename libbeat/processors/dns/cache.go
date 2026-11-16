@@ -22,7 +22,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 type successRecord struct {
@@ -221,13 +221,6 @@ func (c lookupCache) Lookup(q string, qt queryType) (*result, error) {
 
 	c.success.set(now, q, r)
 	return r, nil
-}
-
-func max(a, b uint32) uint32 {
-	if a >= b {
-		return a
-	}
-	return b
 }
 
 // safeUint32 converts a float64 to a uint32, protecting against out-of-bounds

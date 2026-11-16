@@ -18,11 +18,13 @@
 package mtest
 
 // GetConfig returns config for kibana module
-func GetConfig(metricset string, host string) map[string]interface{} {
-	config := map[string]interface{}{
+func GetConfig(metricset string, host string) map[string]any {
+	config := map[string]any{
 		"module":     "kibana",
 		"metricsets": []string{metricset},
 		"hosts":      []string{host},
+		"username":   "admin",
+		"password":   "testing",
 	}
 
 	return config

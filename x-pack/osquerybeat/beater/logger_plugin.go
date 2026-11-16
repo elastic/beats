@@ -10,8 +10,8 @@ import (
 
 	"github.com/osquery/osquery-go/plugin/logger"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqlog"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type QueryResult struct {
@@ -47,7 +47,7 @@ func (p *LoggerPlugin) Log(ctx context.Context, typ logger.LogType, logText stri
 	if typ == logger.LogTypeSnapshot || typ == logger.LogTypeString {
 		var res QueryResult
 		if err := json.Unmarshal([]byte(logText), &res); err != nil {
-			p.log.Errorf("failed to unmarshal shapshot result: %v", err)
+			p.log.Errorf("failed to unmarshal snapshot result: %v", err)
 			return err
 		}
 

@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
@@ -54,13 +55,7 @@ func discoverUsers(log *logger.Logger) []string {
 					continue
 				}
 
-				found := false
-				for _, existing := range userDirs {
-					if existing == match { // Compare full paths, not just usernames
-						found = true
-						break
-					}
-				}
+				found := slices.Contains(userDirs, match)
 				if !found {
 					log.Infof("discovered user: %s, fullPath: %s", username, match)
 					userDirs = append(userDirs, match) // Store full path instead of just username

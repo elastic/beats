@@ -19,8 +19,8 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/statsd/server"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
@@ -32,8 +32,8 @@ const (
 	STATSD_PORT = 8126
 )
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
+func getConfig() map[string]any {
+	return map[string]any{
 		"module":     "airflow",
 		"metricsets": []string{"statsd"},
 		"host":       STATSD_HOST,
@@ -62,7 +62,7 @@ func TestData(t *testing.T) {
 	ms := mbtest.NewPushMetricSetV2(t, getConfig())
 	var events []mb.Event
 	var reporter mb.PushReporterV2
-	done := make(chan interface{})
+	done := make(chan any)
 	wg := new(sync.WaitGroup)
 	wg.Add(1)
 	go func(wg *sync.WaitGroup) {

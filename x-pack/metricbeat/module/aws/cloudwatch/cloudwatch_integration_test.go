@@ -37,9 +37,9 @@ func TestData(t *testing.T) {
 	metricSet.WriteEvents(t, "/")
 }
 
-func addCloudwatchMetricsToConfig(config map[string]interface{}) map[string]interface{} {
-	cloudwatchMetricsConfig := []map[string]interface{}{}
-	cloudwatchMetric := map[string]interface{}{}
+func addCloudwatchMetricsToConfig(config map[string]any) map[string]any {
+	cloudwatchMetricsConfig := []map[string]any{}
+	cloudwatchMetric := map[string]any{}
 	cloudwatchMetric["namespace"] = "AWS/RDS"
 	cloudwatchMetricsConfig = append(cloudwatchMetricsConfig, cloudwatchMetric)
 	config["metrics"] = cloudwatchMetricsConfig

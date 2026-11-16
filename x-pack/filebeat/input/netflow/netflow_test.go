@@ -21,19 +21,19 @@ import (
 	"github.com/google/gopacket/pcapgo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemock"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/protocol"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/test"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var (
@@ -495,7 +495,7 @@ func TestReverseFlows(t *testing.T) {
 		t.Fatal()
 	}
 	for _, key := range reverseFlowsTestKeys {
-		var keys [2]interface{}
+		var keys [2]any
 		for i := range keys {
 			var err error
 			if keys[i], err = evs[i].Fields.GetValue(key); err != nil {

@@ -20,8 +20,23 @@ package beat
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestSetHostnameOverride(t *testing.T) {
+	t.Cleanup(func() { SetHostnameOverride("") })
+
+	SetHostnameOverride("  Node-A  ")
+	assert.Equal(t, "Node-A", GetHostnameOverride(), "should trim only, casing is preserved")
+
+	SetHostnameOverride("  ")
+	assert.Empty(t, GetHostnameOverride(), "whitespace-only should be treated as empty")
+
+	SetHostnameOverride("foo.bar")
+	SetHostnameOverride("")
+	assert.Empty(t, GetHostnameOverride(), "empty clears the override")
+}
 
 func TestFQDNAwareHostname(t *testing.T) {
 	info := Info{

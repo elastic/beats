@@ -24,7 +24,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 )
 
 type validationTestCase struct {
@@ -51,7 +51,7 @@ func TestConfigValidate(t *testing.T) {
 		{
 			WinlogbeatConfig{
 				EventLogs: []*conf.C{
-					newConfig(map[string]interface{}{
+					newConfig(map[string]any{
 						"Name": "App",
 					}),
 				},
@@ -69,7 +69,7 @@ func TestConfigValidate(t *testing.T) {
 	}
 }
 
-func newConfig(from map[string]interface{}) *conf.C {
+func newConfig(from map[string]any) *conf.C {
 	cfg, err := conf.NewConfigFrom(from)
 	if err != nil {
 		panic(err)

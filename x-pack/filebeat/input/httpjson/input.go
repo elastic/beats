@@ -11,9 +11,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"net"
 	"net/http"
 	"net/url"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -31,15 +33,15 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
+	"github.com/elastic/beats/v7/pkg/transport"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/private"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/transport"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 )
@@ -65,19 +67,19 @@ func newRetryLogger(log *logp.Logger) *retryLogger {
 	}
 }
 
-func (log *retryLogger) Error(msg string, keysAndValues ...interface{}) {
+func (log *retryLogger) Error(msg string, keysAndValues ...any) {
 	log.log.Errorw(msg, keysAndValues...)
 }
 
-func (log *retryLogger) Info(msg string, keysAndValues ...interface{}) {
+func (log *retryLogger) Info(msg string, keysAndValues ...any) {
 	log.log.Infow(msg, keysAndValues...)
 }
 
-func (log *retryLogger) Debug(msg string, keysAndValues ...interface{}) {
+func (log *retryLogger) Debug(msg string, keysAndValues ...any) {
 	log.log.Debugw(msg, keysAndValues...)
 }
 
-func (log *retryLogger) Warn(msg string, keysAndValues ...interface{}) {
+func (log *retryLogger) Warn(msg string, keysAndValues ...any) {
 	log.log.Warnw(msg, keysAndValues...)
 }
 
@@ -98,13 +100,13 @@ type redact struct {
 func (r redact) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	v, err := private.Redact(r.value, "", r.fields)
 	if err != nil {
-		return fmt.Errorf("could not redact value: %v", err)
+		return fmt.Errorf("could not redact value: %w", err)
 	}
 	return v.MarshalLogObject(enc)
 }
 
 // mapstrM is a non-mutating version of mapstr.M.
-// See https://github.com/elastic/elastic-agent-libs/issues/232.
+// See https://github.com/elastic/beats/v7/pkg/issues/232.
 type mapstrM mapstr.M
 
 // MarshalLogObject implements the zapcore.ObjectMarshaler interface and allows
@@ -133,11 +135,11 @@ func (m mapstrM) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	return nil
 }
 
-func tryToMapStr(v interface{}) (mapstrM, bool) {
+func tryToMapStr(v any) (mapstrM, bool) {
 	switch m := v.(type) {
 	case mapstrM:
 		return m, true
-	case map[string]interface{}:
+	case map[string]any:
 		return mapstrM(m), true
 	default:
 		return nil, false
@@ -156,7 +158,8 @@ func test(url *url.URL) error {
 		return "80"
 	}()
 
-	_, err := net.DialTimeout("tcp", net.JoinHostPort(url.Hostname(), port), time.Second)
+	d := &net.Dialer{Timeout: time.Second}
+	_, err := d.DialContext(context.Background(), "tcp", net.JoinHostPort(url.Hostname(), port))
 	if err != nil {
 		return fmt.Errorf("url %q is unreachable", url)
 	}
@@ -234,7 +237,7 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 			return err
 		}
 	}
-	pagination := newPagination(cfg, client, ctx, log)
+	pagination := newPagination(cfg, client, ctx, log, ctx.Agent.UserAgent)
 	responseProcessor := newResponseProcessor(cfg, pagination, xmlDetails, metrics, ctx, log)
 	requester := newRequester(client, requestFactory, responseProcessor, metrics, ctx, log)
 
@@ -446,7 +449,8 @@ type socketDialer struct {
 }
 
 func (d socketDialer) Dial(_, _ string) (net.Conn, error) {
-	return net.Dial("unix", d.path)
+	var nd net.Dialer
+	return nd.DialContext(context.Background(), "unix", d.path)
 }
 
 func (d socketDialer) DialContext(ctx context.Context, _, _ string) (net.Conn, error) {
@@ -469,11 +473,11 @@ func checkRedirect(config *requestConfig, log *logp.Logger) func(*http.Request, 
 
 		prev := via[len(via)-1] // previous request to get headers from
 
-		log.Debugf("http client: forwarding headers from previous request: %#v", prev.Header)
-		req.Header = prev.Header.Clone()
+		log.Debugf("http client: forwarding headers from previous request: %v", slices.Sorted(maps.Keys(prev.Header)))
+		req.Header = prev.Header.Clone() //nolint:gosec // G119: sensitive headers are removed below for cross-origin redirects via config.RedirectSensitiveHeaders
 
 		if req.URL.Host != prev.URL.Host || (prev.URL.Scheme == "https" && req.URL.Scheme == "http") {
-			for _, k := range config.RedirectSensitiveHeaders {
+			for _, k := range sensitiveHeaders(config.RedirectSensitiveHeaders) {
 				log.Debugf("http client: cross-origin redirect to %s: removing sensitive header %s", req.URL.Host, k)
 				req.Header.Del(k)
 			}
@@ -486,6 +490,22 @@ func checkRedirect(config *requestConfig, log *logp.Logger) func(*http.Request, 
 
 		return nil
 	}
+}
+
+// defaultSensitiveHeaders are removed on cross-origin redirects when
+// redirect.sensitive_headers is not configured. The default is applied here
+// rather than in defaultConfig because go-ucfg merges a configured list into
+// a default list element by element, so a configured list could not replace
+// the defaults and an empty list could not disable them.
+var defaultSensitiveHeaders = []string{"Authorization", "Proxy-Authorization", "Cookie"}
+
+// sensitiveHeaders returns the configured headers, or the defaults if the
+// option is unset. An empty, non-nil list disables stripping.
+func sensitiveHeaders(configured []string) []string {
+	if configured == nil {
+		return defaultSensitiveHeaders
+	}
+	return configured
 }
 
 func makeEvent(body mapstr.M) (beat.Event, error) {

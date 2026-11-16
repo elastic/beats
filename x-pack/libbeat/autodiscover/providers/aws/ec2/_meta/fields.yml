@@ -1,7 +1,7 @@
 - key: aws.ec2
-  title: "EC2 Listener"
+  title: "EC2 Instance"
   description: >
-    AWS EC2 Listeners
+    AWS EC2 Instances
   short_config: false
   release: experimental
   fields:
@@ -9,7 +9,7 @@
       default_field: true
       type: group
       description: >
-        Represents an AWS EC2 Listener, e.g. state of an EC2.
+        Represents an AWS EC2 instance, e.g. state of an EC2 instance.
       fields:
         - name: architecture
           type: keyword
@@ -40,10 +40,10 @@
           description: The device name of the root device volume (for example, /dev/sda1).
         - name: state.code
           type: keyword
-          description:  The reason code for the state change.
+          description: The instance state code. The low byte is 0 (pending), 16 (running), 32 (shutting-down), 48 (terminated), 64 (stopping) or 80 (stopped).
         - name: state.name
           type: keyword
-          description: A message that describes the state change.
+          description: The instance state name (pending | running | shutting-down | terminated | stopping | stopped).
         - name: subnet.id
           type: keyword
           description: The ID of the subnet in which the instance is running.

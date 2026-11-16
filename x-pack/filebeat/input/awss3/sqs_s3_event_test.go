@@ -21,8 +21,8 @@ import (
 	"go.uber.org/mock/gomock"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/go-concert/timed"
 )
 
@@ -197,7 +197,6 @@ func TestSqsProcessor_keepalive(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 
 		// Test will call ChangeMessageVisibility once and then keepalive will
 		// exit because the SQS receipt handle is not usable.

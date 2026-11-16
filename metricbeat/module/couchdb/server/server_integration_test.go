@@ -51,14 +51,14 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig(host string) map[string]interface{} {
+func getConfig(host string) map[string]any {
 	h := os.Getenv("COUCHDB_HOST")
 
 	if h != "" {
 		host = h
 	}
 
-	return map[string]interface{}{
+	return map[string]any{
 		"module":     "couchdb",
 		"metricsets": []string{"server"},
 		"hosts":      []string{host},

@@ -35,9 +35,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/testing"
-	"github.com/elastic/elastic-agent-libs/transport"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/testing"
+	"github.com/elastic/beats/v7/pkg/transport"
 )
 
 type client struct {
@@ -427,7 +427,7 @@ func (r *msgRef) fail(msg *message, err error) {
 
 	// drop event if it exceeds size larger than max_message_bytes
 	case strings.Contains(err.Error(), "Attempt to produce message larger than configured Producer.MaxMessageBytes"):
-		r.client.log.Errorf("Kafka (topic=%v): dropping message as it exceeds max_mesage_bytes:", msg.topic)
+		r.client.log.Errorf("Kafka (topic=%v): dropping message as it exceeds max_message_bytes:", msg.topic)
 		r.client.observer.PermanentErrors(1)
 
 	case isAuthError(err):

@@ -280,8 +280,8 @@ func testData(t *testing.T, cfg testFetchConfig, postfix string) {
 	m.WriteEvents(t, postfix)
 }
 
-func getConfig(cfg testFetchConfig) map[string]interface{} {
-	values := map[string]interface{}{
+func getConfig(cfg testFetchConfig) map[string]any {
+	values := map[string]any{
 		"module":           "sql",
 		"metricsets":       []string{"query"},
 		"hosts":            []string{cfg.Host},
@@ -386,7 +386,7 @@ func waitForOracleConnection(t *testing.T, host, port string) {
 	maxRetries := 30
 	baseDelay := 2 * time.Second
 
-	for i := 0; i < maxRetries; i++ {
+	for i := range maxRetries {
 		// First check if the port is open
 		conn, err := (&net.Dialer{Timeout: 10 * time.Second}).DialContext(t.Context(), "tcp", net.JoinHostPort(host, port))
 		if err == nil {
@@ -397,11 +397,9 @@ func waitForOracleConnection(t *testing.T, host, port string) {
 		}
 
 		// (1<<uint(i)) == 2^i, which doubles the delay at each iteration, then multiply by baseDelay
-		delay := time.Duration(1<<uint(i)) * baseDelay
-		// But don't let the delay get too long; max out at 30 seconds
-		if delay > 30*time.Second {
-			delay = 30 * time.Second
-		}
+		delay := min(
+			// But don't let the delay get too long; max out at 30 seconds
+			time.Duration(1<<uint(i))*baseDelay, 30*time.Second)
 
 		t.Logf("Oracle not ready yet (attempt %d/%d), waiting %v: %v", i+1, maxRetries, delay, err)
 		time.Sleep(delay)

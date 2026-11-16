@@ -6,6 +6,7 @@ package gcp
 
 import (
 	"fmt"
+	"maps"
 	"sync"
 	"time"
 
@@ -14,7 +15,7 @@ import (
 	"google.golang.org/api/dataproc/v1"
 	"google.golang.org/api/sqladmin/v1"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // Cache represents a generic cache with metadata and mutex
@@ -60,9 +61,7 @@ func (c *Cache[T]) EnsureFresh(refreshFunc func() (map[string]T, error)) error {
 	}
 
 	c.data = make(map[string]T, len(newData))
-	for k, v := range newData {
-		c.data[k] = v
-	}
+	maps.Copy(c.data, newData)
 	c.lastRefreshed = time.Now()
 
 	return nil

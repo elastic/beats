@@ -9,7 +9,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -23,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/command"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 
 	osquerybeat "github.com/elastic/beats/v7/x-pack/osquerybeat/scripts/mage"
 
@@ -31,12 +34,14 @@ import (
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/docker"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
+	test.RegisterDeps(IntegTest)
+
 	devtools.BeatDescription = "Osquerybeat is a beat implementation for osquery."
 	devtools.BeatLicense = "Elastic License"
 }
@@ -52,6 +57,130 @@ func AddLicenseHeaders() {
 func Check() error {
 	mg.Deps(Generate)
 	return devtools.Check()
+}
+
+// IntegTest executes integration tests (it uses Docker to run the tests).
+func IntegTest() {
+	mg.SerialDeps(GoIntegTest)
+}
+
+// GoIntegTest starts the docker containers and executes the Go integration tests.
+func GoIntegTest(ctx context.Context) error {
+	mg.Deps(FetchOsquerydForTesting)
+
+	args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
+	// ES_USER must be admin for the Go integration tests to function because they require
+	// indices:data/read/search
+	args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
+	args.Env["ES_PASS"] = args.Env["ES_SUPERUSER_PASS"]
+
+	// On macOS with GCC as the default CGO compiler, the system headers in the macOS 26
+	// SDK use Objective-C block syntax (^) which GCC doesn't support. Use clang instead.
+	if runtime.GOOS == "darwin" {
+		if clang, err := exec.LookPath("clang"); err == nil {
+			args.Env["CC"] = clang
+		}
+	}
+
+	// Expand ~/go/bin (and any other tilde paths) in PATH so that exec.LookPath finds
+	// binaries installed by "go install" (like gotestsum). Shell configs often set PATH
+	// with a literal "~" which is not expanded by exec.LookPath in Go, causing the lookup
+	// to silently fail. We also pass the expanded PATH to the subprocess environment.
+	if gopathOut, err := exec.Command("go", "env", "GOPATH").Output(); err == nil {
+		gopathBin := filepath.Join(strings.TrimSpace(string(gopathOut)), "bin")
+		currentPath := os.Getenv("PATH")
+		if !strings.Contains(currentPath, gopathBin) {
+			expandedPath := gopathBin + string(filepath.ListSeparator) + currentPath
+			os.Setenv("PATH", expandedPath) //nolint:errcheck // best-effort
+			args.Env["PATH"] = expandedPath
+		}
+	}
+
+	// Tell osquerybeat (both the in-process OTel receiver and the subprocess
+	// standalone beat) where to find the osqueryd binary, so tests don't
+	// require it to be installed system-wide.
+	osarch := distro.OSArch{OS: runtime.GOOS, Arch: runtime.GOARCH}
+	binDir, err := filepath.Abs(distro.GetDataInstallDir(osarch))
+	if err == nil {
+		if _, statErr := os.Stat(osqd.OsquerydPathForPlatform(runtime.GOOS, binDir)); statErr == nil {
+			args.Env["OSQUERYBEAT_BINARY_DIR"] = binDir
+		}
+		// osquerybeat requires osquery-extension alongside osqueryd; build and copy it if absent.
+		if extErr := ensureExtensionInBinDir(binDir); extErr != nil {
+			return fmt.Errorf("failed to ensure osquery-extension in %s: %w", binDir, extErr)
+		}
+	}
+
+	// Elasticsearch has no Windows Docker image; skip container lifecycle on Windows
+	// and run the tests directly. ES-dependent tests skip themselves via runtime.GOOS checks.
+	if runtime.GOOS == "windows" {
+		return devtools.GoTest(ctx, args)
+	}
+	return devtools.GoIntegTestFromHost(ctx, args)
+}
+
+// FetchOsquerydForTesting downloads the osqueryd binary for the current host
+// platform using the same infrastructure as the package build. The binary is
+// placed at build/data/install/{os}/{arch}/osqueryd.
+func FetchOsquerydForTesting() error {
+	prevPlatforms := devtools.Platforms
+	devtools.Platforms = devtools.NewPlatformList(runtime.GOOS + "/" + runtime.GOARCH)
+	defer func() { devtools.Platforms = prevPlatforms }()
+	return osquerybeat.FetchOsqueryDistros()
+}
+
+// UpdateOsquery updates the bundled osquery version and artifact checksums.
+// Set OSQUERY_VERSION to select a specific release; the latest stable release
+// is used by default.
+func UpdateOsquery() error {
+	args := []string{"run", "./scripts/update_osquery"}
+	if version := strings.TrimSpace(os.Getenv("OSQUERY_VERSION")); version != "" {
+		args = append(args, "-version", version)
+	}
+	cmd := exec.Command("go", args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+// ensureExtensionInBinDir places osquery-extension in binDir, building it first if absent.
+func ensureExtensionInBinDir(binDir string) error {
+	extName := "osquery-extension.ext"
+	if runtime.GOOS == "windows" {
+		extName = "osquery-extension.exe"
+	}
+	destPath := filepath.Join(binDir, extName)
+	if _, err := os.Stat(destPath); err == nil {
+		return nil
+	}
+	if _, err := os.Stat(extName); os.IsNotExist(err) {
+		if err := BuildExt(); err != nil {
+			return err
+		}
+	}
+	return copyFile(extName, destPath)
+}
+
+func copyFile(src, dst string) error {
+	info, err := os.Stat(src)
+	if err != nil {
+		return err
+	}
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+	if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
+		return err
+	}
+	out, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, info.Mode())
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+	_, err = io.Copy(out, in)
+	return err
 }
 
 // Generate runs osquery-extension code generators and metadata generators.
@@ -98,6 +227,7 @@ func BuildExt() error {
 	params.InputFiles = []string{"./ext/osquery-extension/."}
 	params.Name = "osquery-extension"
 	params.CGO = true
+	disableSqliteLFS(params.Env)
 	err := devtools.Build(params)
 	if err != nil {
 		return err
@@ -111,6 +241,30 @@ func BuildExt() error {
 		}
 	}
 	return nil
+}
+
+// disableSqliteLFS adds -DSQLITE_DISABLE_LFS to CGO_CFLAGS on 64-bit Linux.
+// The SQLite amalgamation (github.com/mattn/go-sqlite3, used by the
+// osquery-extension) enables POSIX large file support (_FILE_OFFSET_BITS=64),
+// which makes glibc >= 2.28 headers redirect fcntl calls to the
+// fcntl64@GLIBC_2.28 symbol, raising the minimum glibc required at runtime
+// and breaking supported distributions with older glibc, such as Ubuntu
+// 18.04 (glibc 2.27). On 64-bit platforms off_t is 64 bits regardless, so
+// disabling LFS only removes the fcntl64 reference; it does not limit the
+// SQLite database file size. It must not be applied to 32-bit platforms,
+// where it would cap SQLite files at 2 GiB. In builds that compile no SQLite
+// C code (osquerybeat itself) the macro is defined but unused.
+func disableSqliteLFS(env map[string]string) {
+	if devtools.GOOS != "linux" || (devtools.GOARCH != "amd64" && devtools.GOARCH != "arm64") {
+		return
+	}
+	// Setting CGO_CFLAGS discards cgo's default "-O2 -g", so preserve any
+	// existing flags or restate the defaults.
+	cflags := os.Getenv("CGO_CFLAGS")
+	if cflags == "" {
+		cflags = "-O2 -g"
+	}
+	env["CGO_CFLAGS"] = cflags + " -DSQLITE_DISABLE_LFS"
 }
 
 // Clean cleans all generated files and build artifacts.
@@ -200,7 +354,9 @@ func GolangCrossBuild() error {
 		return err
 	}
 
-	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
+	args := devtools.DefaultGolangCrossBuildArgs()
+	disableSqliteLFS(args.Env)
+	return devtools.GolangCrossBuild(args)
 }
 
 // CrossBuild cross-builds the beat for all target platforms.

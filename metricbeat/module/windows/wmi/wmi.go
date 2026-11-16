@@ -24,7 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	wmi "github.com/microsoft/wmi/pkg/wmiinstance"
 )
@@ -88,7 +88,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // This function handles the skip conditions
-func (m *MetricSet) shouldSkipNilOrEmptyValue(propertyValue interface{}) bool {
+func (m *MetricSet) shouldSkipNilOrEmptyValue(propertyValue any) bool {
 	if propertyValue == nil {
 		if !m.config.IncludeNullProperties {
 			return true // Skip if it's nil and IncludeNullProperties is false
@@ -222,7 +222,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				for _, propertyName := range properties {
 					propertyValue, err := instance.GetProperty(propertyName)
 					if err != nil {
-						m.Logger().Error("Unable to get propery by name: %v", err)
+						m.Logger().Error("Unable to get property by name: %v", err)
 						continue
 					}
 

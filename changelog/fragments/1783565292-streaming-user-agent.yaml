@@ -1,3 +1,0 @@
-kind: enhancement
-summary: Add configurable User-Agent header to the CrowdStrike streaming input.
-component: filebeat

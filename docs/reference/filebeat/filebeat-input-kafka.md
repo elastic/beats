@@ -12,7 +12,7 @@ applies_to:
 
 Use the `kafka` input to read from topics in a Kafka cluster.
 
-To configure this input, specify a list of one or more [`hosts`](/reference/filebeat/logstash-output.md#hosts) in the cluster to bootstrap the connection with, a list of [`topics`](#topics) to track, and a [`group_id`](#groupid) for the connection.
+To configure this input, specify a list of one or more [`hosts`](#kafka-hosts) in the cluster to bootstrap the connection with, a list of [`topics`](#topics) to track, and a [`group_id`](#groupid) for the connection.
 
 Example configuration:
 
@@ -199,7 +199,7 @@ This setting will be able to split the messages under the group value (*records*
 Kafka rebalance settings:
 
 **`strategy`**
-:   Either `"range"` or `"roundrobin"`. Defaults to `"range"`.
+:   `"range"`, `"roundrobin"`, or `"sticky"`. Defaults to `"range"`. Use `"sticky"` to minimize partition movement across rebalances (KIP-54).
 
 **`timeout`**
 :   How long to wait for an attempted rebalance. Defaults to 60s.

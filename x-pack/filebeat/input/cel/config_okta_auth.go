@@ -9,11 +9,8 @@ import (
 	"context"
 	"crypto"
 	"crypto/rsa"
-	"crypto/x509"
 	"encoding/base64"
 	"encoding/json"
-	"encoding/pem"
-	"errors"
 	"fmt"
 	"math/big"
 	"net/http"
@@ -69,7 +66,7 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context) (*http.Client, 
 			}
 		}
 		var err error
-		key, err = pemPKCS8PrivateKey([]byte(o.DPoPKeyPEM))
+		key, err = pemPKCS8PrivateKey([]byte(o.DPoPKeyPEM), "")
 		if err != nil {
 			return nil, fmt.Errorf("failed to decode dpop signer: %w", err)
 		}
@@ -206,30 +203,11 @@ func (i *base64int) UnmarshalJSON(b []byte) error {
 }
 
 func generateOktaJWTPEM(pemdata string, cnf *oauth2.Config) (string, error) {
-	key, err := pemPKCS8PrivateKey([]byte(pemdata))
+	key, err := pemPKCS8PrivateKey([]byte(pemdata), "")
 	if err != nil {
 		return "", err
 	}
 	return signJWT(cnf, key)
-}
-
-func pemPKCS8PrivateKey(pemdata []byte) (crypto.Signer, error) {
-	blk, rest := pem.Decode(pemdata)
-	if rest := bytes.TrimSpace(rest); len(rest) != 0 {
-		return nil, fmt.Errorf("PEM text has trailing data: %d bytes", len(rest))
-	}
-	if blk == nil {
-		return nil, errors.New("no PEM data")
-	}
-	key, err := x509.ParsePKCS8PrivateKey(blk.Bytes)
-	if err != nil {
-		return nil, err
-	}
-	signer, ok := key.(crypto.Signer)
-	if !ok {
-		return nil, fmt.Errorf("key is not a signer: %T", key)
-	}
-	return signer, nil
 }
 
 // signJWT creates a JWT token using required claims and sign it with the

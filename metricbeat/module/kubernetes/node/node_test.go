@@ -20,14 +20,15 @@
 package node
 
 import (
-	"io/ioutil"
+	"io"
+
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // this file is used for the tests to compare expected result
@@ -46,7 +47,7 @@ func (s *NodeTestSuite) ReadTestFile(testFile string) []byte {
 	f, err := os.Open(testFile)
 	s.NoError(err, "cannot open test file "+testFile)
 
-	body, err := ioutil.ReadAll(f)
+	body, err := io.ReadAll(f)
 	s.NoError(err, "cannot read test file "+testFile)
 
 	return body
@@ -59,7 +60,7 @@ func (s *NodeTestSuite) TestEventMapping() {
 	s.basicTests(event, err)
 }
 
-func (s *NodeTestSuite) testValue(event mapstr.M, field string, expected interface{}) {
+func (s *NodeTestSuite) testValue(event mapstr.M, field string, expected any) {
 	data, err := event.GetValue(field)
 	s.NoError(err, "Could not read field "+field)
 	s.EqualValues(expected, data, "Wrong value for field "+field)
@@ -68,7 +69,7 @@ func (s *NodeTestSuite) testValue(event mapstr.M, field string, expected interfa
 func (s *NodeTestSuite) basicTests(event mapstr.M, err error) {
 	s.NoError(err, "error mapping "+testFile)
 
-	basicTestCases := map[string]interface{}{
+	basicTestCases := map[string]any{
 		"cpu.usage.core.ns":   int64(4189523881380),
 		"cpu.usage.nanocores": 18691146,
 
@@ -101,7 +102,7 @@ func (s *NodeTestSuite) basicTests(event mapstr.M, err error) {
 	s.RunMetricsTests(event, basicTestCases)
 }
 
-func (s *NodeTestSuite) RunMetricsTests(event mapstr.M, testCases map[string]interface{}) {
+func (s *NodeTestSuite) RunMetricsTests(event mapstr.M, testCases map[string]any) {
 	for k, v := range testCases {
 		s.testValue(event, k, v)
 	}

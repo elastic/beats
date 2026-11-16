@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 func TestDefaults(t *testing.T) {
@@ -83,6 +83,20 @@ func TestDefaults(t *testing.T) {
 			"911",
 			"icmp",
 			911,
+		},
+		{
+			"API default is 4 when nothing is overridden",
+			"FOO",
+			"bar",
+			"api",
+			4,
+		},
+		{
+			"API monitor override",
+			"SYNTHETICS_LIMIT_API",
+			"321",
+			"api",
+			321,
 		},
 	}
 

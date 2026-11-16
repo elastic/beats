@@ -158,7 +158,7 @@ func fillInEntryFromKey(e Entry, key *regparser.CM_KEY_NODE, log *logger.Logger)
 			}
 		case reflect.Struct:
 			switch field.Type() {
-			case reflect.TypeOf(time.Time{}):
+			case reflect.TypeFor[time.Time]():
 				timeString := strings.TrimRight(value.ValueData().String, "\x00")
 				timestamp, err := time.Parse("01/02/2006 15:04:05", timeString)
 				if err != nil {

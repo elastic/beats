@@ -25,13 +25,13 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/paths"
 )
 
 const logName = "modules"
@@ -175,7 +175,7 @@ func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, f
 
 		moduleConfig, err := mcfgFromConfig(cfg)
 		if err != nil {
-			return nil, fmt.Errorf("error unpacking module config :%w", err)
+			return nil, fmt.Errorf("error unpacking module config: %w", err)
 		}
 		mcfgs = append(mcfgs, moduleConfig)
 	}

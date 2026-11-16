@@ -22,7 +22,7 @@ import (
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 var (
@@ -63,7 +63,7 @@ var (
 )
 
 func eventMapping(content []byte) mapstr.M {
-	var data map[string]interface{}
+	var data map[string]any
 	json.Unmarshal(content, &data)
 	event, _ := schema.Apply(data)
 	return event

@@ -7,6 +7,8 @@ package beater
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"slices"
 	"sync"
 	"testing"
 	"time"
@@ -16,12 +18,13 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	agentconfig "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
+	agentconfig "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/paths"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
@@ -30,21 +33,28 @@ import (
 // Mock osqueryd implementation for testing
 type mockOsqueryd struct {
 	checkErr error
+	checkFn  func(context.Context) error
 	runErr   error
 	runDelay time.Duration
 }
 
 func (m *mockOsqueryd) Check(ctx context.Context) error {
+	if m.checkFn != nil {
+		return m.checkFn(ctx)
+	}
 	return m.checkErr
 }
 
-func (m *mockOsqueryd) Run(ctx context.Context, flags osqd.Flags) error {
+func (m *mockOsqueryd) Run(ctx context.Context, flags osqd.Flags, onExit func(error)) error {
 	if m.runDelay > 0 {
 		select {
 		case <-time.After(m.runDelay):
 		case <-ctx.Done():
 			return ctx.Err()
 		}
+	}
+	if onExit != nil {
+		onExit(m.runErr)
 	}
 	return m.runErr
 }
@@ -65,20 +75,23 @@ type statusEvent struct {
 }
 
 type testManager struct {
-	events   []statusEvent
-	started  bool
-	stopped  bool
-	startErr error
-	diagHook map[string]management.DiagnosticHook
-	mx       sync.Mutex
+	events          []statusEvent
+	started         bool
+	preInitialized  bool
+	postInitialized bool
+	stopped         bool
+	startErr        error
+	preInitErr      error
+	diagHook        map[string]management.DiagnosticHook
+	mx              sync.Mutex
 }
 
 type diagnosticsQueryExecutor struct {
-	rows []map[string]interface{}
+	rows []map[string]any
 	err  error
 }
 
-func (e *diagnosticsQueryExecutor) Query(context.Context, string, time.Duration) ([]map[string]interface{}, error) {
+func (e *diagnosticsQueryExecutor) Query(context.Context, string, time.Duration) ([]map[string]any, error) {
 	return e.rows, e.err
 }
 
@@ -88,14 +101,29 @@ func (m *testManager) UpdateStatus(s status.Status, msg string) {
 	m.events = append(m.events, statusEvent{Status: s, Message: msg})
 }
 func (m *testManager) Start() error {
+	m.mx.Lock()
+	defer m.mx.Unlock()
 	m.started = true
 	return m.startErr
 }
-func (m *testManager) PreInit() error                      { return nil }
-func (m *testManager) PostInit()                           {}
-func (m *testManager) Stop()                               { m.stopped = true }
+func (m *testManager) PreInit() error {
+	m.mx.Lock()
+	defer m.mx.Unlock()
+	m.preInitialized = true
+	return m.preInitErr
+}
+func (m *testManager) PostInit() {
+	m.mx.Lock()
+	defer m.mx.Unlock()
+	m.postInitialized = true
+}
+func (m *testManager) Stop() {
+	m.mx.Lock()
+	defer m.mx.Unlock()
+	m.stopped = true
+}
 func (m *testManager) SetPayload(map[string]any)           {}
-func (m *testManager) Enabled() bool                       { return true }
+func (m *testManager) ConfigFromControlProtocol() bool     { return true }
 func (m *testManager) AgentInfo() management.AgentInfo     { return management.AgentInfo{} }
 func (m *testManager) SetStopCallback(func())              {}
 func (m *testManager) CheckRawConfig(*agentconfig.C) error { return nil }
@@ -113,7 +141,7 @@ func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquer
 
 	mgr := &testManager{}
 	b := &beat.Beat{
-		Info:       beat.Info{Logger: logp.NewLogger("test")},
+		Info:       beat.Info{Logger: logptest.NewTestingLogger(t, "")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
@@ -126,10 +154,152 @@ func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquer
 
 	ob, ok := beater.(*osquerybeat)
 	require.True(t, ok)
+	// b has no pipeline, so scheduled results get a mock publisher too.
+	ob.scheduledResults.newPublisher = func(func() bool, func(), func(int)) osquerybeatPublisher {
+		return &mockBeatPublisher{}
+	}
 	for _, override := range overrides {
 		override(ob)
 	}
 	return ob, b, mgr
+}
+
+func TestOsquerybeatManagerInitializationWaitsForCheck(t *testing.T) {
+	checkStarted := make(chan struct{})
+	checkReleased := make(chan struct{})
+
+	ob, b, mgr := newStatusTestBeater(t, func(ob *osquerybeat) {
+		ob.osquerydFactory = func(string, ...osqd.Option) (osqd.Runner, error) {
+			return &mockOsqueryd{
+				checkFn: func(ctx context.Context) error {
+					close(checkStarted)
+					select {
+					case <-checkReleased:
+						return nil
+					case <-ctx.Done():
+						return ctx.Err()
+					}
+				},
+				runErr: context.Canceled,
+			}, nil
+		}
+	})
+
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- ob.Run(b)
+	}()
+
+	select {
+	case <-checkStarted:
+	case <-time.After(5 * time.Second):
+		t.Fatal("osqueryd check did not start")
+	}
+
+	mgr.mx.Lock()
+	assert.True(t, mgr.preInitialized, "manager PreInit should run before the osqueryd check")
+	assert.False(t, mgr.postInitialized, "manager PostInit should wait for the osqueryd check")
+	assert.False(t, mgr.started, "deprecated manager Start should not be called")
+	mgr.mx.Unlock()
+
+	close(checkReleased)
+	require.Eventually(t, func() bool {
+		mgr.mx.Lock()
+		defer mgr.mx.Unlock()
+		return mgr.postInitialized
+	}, 5*time.Second, 10*time.Millisecond, "manager PostInit should run after the osqueryd check succeeds")
+
+	ob.Stop()
+	select {
+	case err := <-errCh:
+		require.ErrorIs(t, err, context.Canceled, "Run should stop after cancellation")
+	case <-time.After(5 * time.Second):
+		t.Fatal("Run did not stop")
+	}
+}
+
+func TestOsquerybeatRejectedPolicyKeepsRunning(t *testing.T) {
+	ob, b, mgr := newStatusTestBeater(t, func(ob *osquerybeat) {
+		ob.osquerydFactory = func(string, ...osqd.Option) (osqd.Runner, error) {
+			return &mockOsqueryd{runErr: context.Canceled}, nil
+		}
+	})
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- ob.Run(b)
+	}()
+	require.Eventually(t, func() bool {
+		mgr.mx.Lock()
+		defer mgr.mx.Unlock()
+		return mgr.postInitialized
+	}, 5*time.Second, 10*time.Millisecond, "osquerybeat should finish initialization")
+
+	// The ECS mapping for user.id has an empty field and no value, so
+	// osquerybeat cannot apply this policy.
+	bad := agentconfig.MustNewConfigFrom(map[string]any{
+		"data_stream": map[string]any{"dataset": config.DefaultDataset},
+		"osquery": map[string]any{"schedule": map[string]any{"users": map[string]any{
+			"query": "SELECT 1", "interval": 60,
+			"ecs_mapping": map[string]any{"user": map[string]any{"id": map[string]any{"field": ""}}},
+		}}},
+	})
+	err := b.Registry.GetInputList().Reload([]*reload.ConfigWithMeta{{Config: bad, InputUnitID: "osquery-unit"}})
+	var unitErr cfgfile.UnitError
+	assert.ErrorAs(t, err, &unitErr, "a policy with an invalid ECS mapping must fail its unit")
+	select {
+	case err := <-errCh:
+		t.Fatalf("Run returned after a rejected policy: %v", err)
+	case <-time.After(200 * time.Millisecond):
+	}
+	assert.Nil(t, ob.scheduledResults.current.Load(), "a rejected policy must not reach the scheduled results dispatcher")
+
+	ob.Stop()
+	select {
+	case err := <-errCh:
+		assert.ErrorIs(t, err, context.Canceled, "Run should stop after cancellation")
+	case <-time.After(5 * time.Second):
+		t.Fatal("Run did not stop")
+	}
+}
+
+func TestOsquerybeatEarlyShutdownDuringCheck(t *testing.T) {
+	checkStarted := make(chan struct{})
+	ob, b, mgr := newStatusTestBeater(t, func(ob *osquerybeat) {
+		ob.osquerydFactory = func(string, ...osqd.Option) (osqd.Runner, error) {
+			return &mockOsqueryd{
+				checkFn: func(ctx context.Context) error {
+					close(checkStarted)
+					<-ctx.Done()
+					return ctx.Err()
+				},
+			}, nil
+		}
+	})
+
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- ob.Run(b)
+	}()
+
+	select {
+	case <-checkStarted:
+	case <-time.After(5 * time.Second):
+		t.Fatal("osqueryd check did not start")
+	}
+	ob.Stop()
+
+	select {
+	case err := <-errCh:
+		require.ErrorIs(t, err, context.Canceled, "Run should preserve cancellation from the osqueryd check")
+	case <-time.After(5 * time.Second):
+		t.Fatal("Run did not stop after cancellation")
+	}
+
+	mgr.mx.Lock()
+	defer mgr.mx.Unlock()
+	assert.True(t, mgr.preInitialized, "manager PreInit should run before the osqueryd check")
+	assert.False(t, mgr.postInitialized, "manager PostInit should not run after early shutdown")
+	assert.True(t, mgr.stopped, "an early-initialized manager should be stopped")
 }
 
 // TestOsquerybeatStatusReporting_Lifecycle tests the full lifecycle status reporting
@@ -137,7 +307,7 @@ func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquer
 func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{
-		Info:       beat.Info{Logger: logp.NewLogger("test")},
+		Info:       beat.Info{Logger: logptest.NewTestingLogger(t, "")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
@@ -239,6 +409,38 @@ func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
 	assert.Equal(t, status.Stopped, lastEvent.Status, "last status should be Stopped")
 }
 
+// A runner failure must stay FAILED until Run returns. Reporting Stopping in
+// between shows the OTel host FAILED, then OK, then FAILED again. A terminal
+// startup failure takes the same path as an exhausted restart budget without
+// waiting for the production backoff.
+func TestOsquerybeatRunnerFailureDoesNotReportStopping(t *testing.T) {
+	failure := errors.New("osqueryd failed to start")
+	ob, b, mgr := newStatusTestBeater(t, func(ob *osquerybeat) {
+		ob.pub = &mockBeatPublisher{}
+		ob.config.Inputs = []config.InputConfig{{Name: "osquery-manager-1", Type: osqueryInputType}}
+		ob.osquerydFactory = func(string, ...osqd.Option) (osqd.Runner, error) {
+			return &mockOsqueryd{runErr: failure}, nil
+		}
+	})
+	errCh := make(chan error, 1)
+	go func() { errCh <- ob.Run(b) }()
+	select {
+	case err := <-errCh:
+		require.ErrorIs(t, err, failure, "Run must return the runner failure")
+	case <-time.After(5 * time.Second):
+		ob.Stop()
+		t.Fatal("Run did not return the runner failure")
+	}
+	mgr.mx.Lock()
+	events := append([]statusEvent(nil), mgr.events...)
+	mgr.mx.Unlock()
+	first := slices.IndexFunc(events, func(e statusEvent) bool { return e.Status == status.Failed })
+	require.NotEqual(t, -1, first, "the runner must report its failure: %v", events)
+	for _, event := range events[first:] {
+		assert.Equal(t, status.Failed, event.Status, "nothing may follow the runner failure but FAILED: %v", events)
+	}
+}
+
 func newTestBeatPaths(t *testing.T) *paths.Path {
 	t.Helper()
 	root := t.TempDir()
@@ -254,50 +456,53 @@ func newTestBeatPaths(t *testing.T) *paths.Path {
 	return p
 }
 
-// TestOsquerybeatStatusReporting_CheckFailure tests status reporting when osqueryd check fails.
+// TestOsquerybeatStatusReporting_CheckFailure tests status reporting when osqueryd
+// fails or times out during its startup check.
 func TestOsquerybeatStatusReporting_CheckFailure(t *testing.T) {
-	mgr := &testManager{}
-	b := &beat.Beat{
-		Info:       beat.Info{Logger: logp.NewLogger("test")},
-		Manager:    mgr,
-		Registry:   reload.NewRegistry(),
-		Monitoring: beatmonitoring.NewMonitoring(),
-	}
-	b.Info.Paths = newTestBeatPaths(t)
-
-	cfg := agentconfig.NewConfig()
-	beater, err := New(b, cfg)
-	require.NoError(t, err)
-
-	// Inject mock osqueryd that fails the check
-	ob, ok := beater.(*osquerybeat)
-	require.True(t, ok)
-	ob.osquerydFactory = func(socketPath string, opts ...osqd.Option) (osqd.Runner, error) {
-		return &mockOsqueryd{
-			checkErr: assert.AnError, // Check fails
-		}, nil
+	tests := []struct {
+		name     string
+		checkErr error
+	}{
+		{
+			name:     "ordinary failure",
+			checkErr: assert.AnError,
+		},
+		{
+			name:     "timeout",
+			checkErr: errors.New("osqueryd check timed out after 15s: context deadline exceeded"),
+		},
 	}
 
-	err = beater.Run(b)
-	require.Error(t, err)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			ob, b, mgr := newStatusTestBeater(t, func(ob *osquerybeat) {
+				ob.osquerydFactory = func(string, ...osqd.Option) (osqd.Runner, error) {
+					return &mockOsqueryd{checkErr: tc.checkErr}, nil
+				}
+			})
 
-	// Should have Failed status
-	mgr.mx.Lock()
-	defer mgr.mx.Unlock()
+			err := ob.Run(b)
+			require.ErrorIs(t, err, tc.checkErr, "Run should return the osqueryd check error")
 
-	require.GreaterOrEqual(t, len(mgr.events), 1, "should have at least one status event")
-
-	// Last event should be Failed
-	lastEvent := mgr.events[len(mgr.events)-1]
-	assert.Equal(t, status.Failed, lastEvent.Status, "should report Failed status on check failure")
-	assert.Contains(t, lastEvent.Message, "Failed to check osqueryd")
+			mgr.mx.Lock()
+			defer mgr.mx.Unlock()
+			require.NotEmpty(t, mgr.events, "should report at least one status event")
+			lastEvent := mgr.events[len(mgr.events)-1]
+			assert.Equal(t, status.Failed, lastEvent.Status, "should report Failed status on check failure")
+			assert.Contains(t, lastEvent.Message, "Failed to check osqueryd", "status should identify the failed check")
+			assert.Contains(t, lastEvent.Message, tc.checkErr.Error(), "status should include the check error")
+			assert.True(t, mgr.preInitialized, "manager PreInit should run before the osqueryd check")
+			assert.False(t, mgr.postInitialized, "manager PostInit should not run after a failed check")
+			assert.True(t, mgr.stopped, "manager should stop after an early startup failure")
+		})
+	}
 }
 
 // TestOsquerybeatStatusReporting_CreateOsquerydFailure tests status reporting when osqueryd creation fails.
 func TestOsquerybeatStatusReporting_CreateOsquerydFailure(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{
-		Info:       beat.Info{Logger: logp.NewLogger("test")},
+		Info:       beat.Info{Logger: logptest.NewTestingLogger(t, "")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
@@ -330,13 +535,14 @@ func TestOsquerybeatStatusReporting_CreateOsquerydFailure(t *testing.T) {
 	assert.Contains(t, lastEvent.Message, "Failed to create osqueryd")
 }
 
-// TestOsquerybeatStatusReporting_ManagerStartFailure tests status reporting when manager start fails.
-func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
+// TestOsquerybeatStatusReporting_ManagerPreInitFailure tests status reporting
+// when manager pre-initialization fails.
+func TestOsquerybeatStatusReporting_ManagerPreInitFailure(t *testing.T) {
 	mgr := &testManager{
-		startErr: assert.AnError, // Manager.Start() will fail
+		preInitErr: assert.AnError,
 	}
 	b := &beat.Beat{
-		Info:       beat.Info{Logger: logp.NewLogger("test")},
+		Info:       beat.Info{Logger: logptest.NewTestingLogger(t, "")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
@@ -346,15 +552,6 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
 	require.NoError(t, err)
-
-	// Inject mock osqueryd that works fine
-	ob, ok := beater.(*osquerybeat)
-	require.True(t, ok)
-	ob.osquerydFactory = func(socketPath string, opts ...osqd.Option) (osqd.Runner, error) {
-		return &mockOsqueryd{
-			checkErr: nil,
-		}, nil
-	}
 
 	err = beater.Run(b)
 	require.Error(t, err)
@@ -367,18 +564,78 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 
 	// Last event should be Failed
 	lastEvent := mgr.events[len(mgr.events)-1]
-	assert.Equal(t, status.Failed, lastEvent.Status, "should report Failed status on manager start failure")
-	assert.Contains(t, lastEvent.Message, "Failed to start manager")
+	assert.Equal(t, status.Failed, lastEvent.Status, "should report Failed status on manager PreInit failure")
+	assert.Contains(t, lastEvent.Message, "Failed to pre-initialize manager")
+	assert.False(t, mgr.stopped, "manager should not be stopped when PreInit itself fails")
+}
+
+func TestNewCheckTimeout(t *testing.T) {
+	newBeat := func(t *testing.T) *beat.Beat {
+		t.Helper()
+		b := &beat.Beat{
+			Info:       beat.Info{Logger: logptest.NewTestingLogger(t, "")},
+			Registry:   reload.NewRegistry(),
+			Monitoring: beatmonitoring.NewMonitoring(),
+		}
+		b.Info.Paths = newTestBeatPaths(t)
+		return b
+	}
+
+	t.Run("defaults to 15s", func(t *testing.T) {
+		beater, err := New(newBeat(t), agentconfig.NewConfig())
+		require.NoError(t, err, "New should succeed with empty config")
+		ob, ok := beater.(*osquerybeat)
+		require.True(t, ok, "New should return *osquerybeat")
+		assert.Equal(t, 15*time.Second, ob.checkTimeout, "unset check_timeout should default to 15s")
+	})
+
+	t.Run("reads elastic_options.check_timeout", func(t *testing.T) {
+		cfg, err := agentconfig.NewConfigFrom(map[string]any{
+			"inputs": []map[string]any{
+				{
+					"osquery": map[string]any{
+						"elastic_options": map[string]any{
+							"check_timeout": "30s",
+						},
+					},
+				},
+			},
+		})
+		require.NoError(t, err, "test config should build")
+		beater, err := New(newBeat(t), cfg)
+		require.NoError(t, err, "New should accept a valid check_timeout")
+		ob, ok := beater.(*osquerybeat)
+		require.True(t, ok, "New should return *osquerybeat")
+		assert.Equal(t, 30*time.Second, ob.checkTimeout, "checkTimeout should match elastic_options.check_timeout")
+	})
+
+	t.Run("rejects invalid check_timeout", func(t *testing.T) {
+		cfg, err := agentconfig.NewConfigFrom(map[string]any{
+			"inputs": []map[string]any{
+				{
+					"osquery": map[string]any{
+						"elastic_options": map[string]any{
+							"check_timeout": "nope",
+						},
+					},
+				},
+			},
+		})
+		require.NoError(t, err, "test config should build")
+		_, err = New(newBeat(t), cfg)
+		require.Error(t, err, "New should reject an invalid check_timeout")
+		assert.Contains(t, err.Error(), "check_timeout", "error should identify check_timeout")
+	})
 }
 
 func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{Manager: mgr}
 	ob := &osquerybeat{
-		qp: newQueryProfiler(logp.NewLogger("test")),
+		qp: newQueryProfiler(logptest.NewTestingLogger(t, "")),
 	}
-	ob.setDiagnosticsQueryExecutor(&diagnosticsQueryExecutor{
-		rows: []map[string]interface{}{
+	ob.setDiagnosticsQueryExecutor(profilingQueryExecutor{runCtx: t.Context(), executor: &diagnosticsQueryExecutor{
+		rows: []map[string]any{
 			{
 				"name":              "pack_test_query",
 				"query":             "select * from users limit 1",
@@ -395,14 +652,14 @@ func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 				"last_memory":       int64(6000),
 			},
 		},
-	})
+	}})
 
 	ob.registerDiagnosticHooks(b)
 
 	hook, ok := mgr.diagHook["scheduled_query_profiles"]
 	require.True(t, ok, "expected scheduled profiles diagnostics hook")
 
-	var payload map[string]interface{}
+	var payload map[string]any
 	err := json.Unmarshal(hook(), &payload)
 	require.NoError(t, err)
 
@@ -411,11 +668,11 @@ func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 	//nolint:testifylint // We're comparing integers from a JSON
 	assert.Equal(t, float64(1), count)
 
-	profiles, ok := payload["osquery_schedule"].([]interface{})
+	profiles, ok := payload["osquery_schedule"].([]any)
 	require.True(t, ok)
 	require.Len(t, profiles, 1)
 
-	p0, ok := profiles[0].(map[string]interface{})
+	p0, ok := profiles[0].(map[string]any)
 	require.True(t, ok)
 	assert.Equal(t, "select * from users limit 1", p0["query"])
 
@@ -424,7 +681,7 @@ func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 	//nolint:testifylint // We're comparing integers from a JSON
 	assert.Equal(t, float64(0), liveCount)
 
-	liveProfiles, ok := payload["live_query_profiles"].([]interface{})
+	liveProfiles, ok := payload["live_query_profiles"].([]any)
 	require.True(t, ok)
 	assert.Empty(t, liveProfiles)
 }

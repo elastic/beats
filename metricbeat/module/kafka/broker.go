@@ -24,12 +24,13 @@ import (
 	"io"
 	"net"
 	"os"
+	"slices"
 	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/sarama"
 )
 
@@ -562,10 +563,8 @@ func fromSaramaGroupMemberDescription(memberDescr *sarama.GroupMemberDescription
 
 func anyIPsMatch(as, bs []net.IP) bool {
 	for _, a := range as {
-		for _, b := range bs {
-			if a.Equal(b) {
-				return true
-			}
+		if slices.ContainsFunc(bs, a.Equal) {
+			return true
 		}
 	}
 	return false

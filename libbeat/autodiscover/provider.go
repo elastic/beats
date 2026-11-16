@@ -25,10 +25,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/keystore"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/keystore"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/paths"
 )
 
 // Provider for autodiscover
@@ -72,7 +72,14 @@ func (r *registry) GetProvider(name string) ProviderBuilder {
 }
 
 // BuildProvider reads provider configuration and instantiate one
-func (r *registry) BuildProvider(beatName string, bus bus.Bus, c *config.C, keystore keystore.Keystore, path *paths.Path) (Provider, error) {
+func (r *registry) BuildProvider(
+	logger *logp.Logger,
+	beatName string,
+	bus bus.Bus,
+	c *config.C,
+	keystore keystore.Keystore,
+	path *paths.Path,
+) (Provider, error) {
 	var config ProviderConfig
 	err := c.Unpack(&config)
 	if err != nil {
@@ -89,5 +96,5 @@ func (r *registry) BuildProvider(beatName string, bus bus.Bus, c *config.C, keys
 		return nil, err
 	}
 
-	return builder(beatName, bus, uuid, c, keystore, r.logger, path)
+	return builder(beatName, bus, uuid, c, keystore, logger, path)
 }

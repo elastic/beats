@@ -18,8 +18,8 @@
 package add_cloud_metadata
 
 import (
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // Tencent Cloud Metadata Service
@@ -35,7 +35,7 @@ var qcloudMetadataFetcher = provider{
 		qcloudMetadataRegionURI := "/meta-data/placement/region"
 		qcloudMetadataZoneURI := "/meta-data/placement/zone"
 
-		qcloudSchema := func(m map[string]interface{}) mapstr.M {
+		qcloudSchema := func(m map[string]any) mapstr.M {
 			m["service"] = mapstr.M{
 				"name": "CVM",
 			}

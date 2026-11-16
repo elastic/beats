@@ -1,0 +1,38 @@
+---
+name: bump-osquery
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 7 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: .go-version
+          cache: false
+
+      - uses: elastic/oblt-actions/updatecli/run@v1
+        with:
+          command: pipeline apply --config .github/workflows/updatecli.d/bump-osquery.yml --values .github/workflows/updatecli.d/values.d/scm.yml
+          version-file: .updatecli-version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - if: ${{ failure() }}
+        uses: elastic/oblt-actions/slack/send@v1
+        with:
+          bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel-id: "#ingest-notifications"
+          message: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, please look what's going on <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>"

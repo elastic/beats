@@ -22,10 +22,10 @@ import (
 	"go.uber.org/mock/gomock"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 func newS3Object(t testing.TB, filename, contentType string) (s3EventV2, *s3.GetObjectOutput) {
@@ -513,10 +513,7 @@ func newMockS3Pager(ctrl *gomock.Controller, pageSize int, s3Objects []types.Obj
 	})
 	mockS3Pager.EXPECT().NextPage(gomock.Any()).AnyTimes().DoAndReturn(func(_ context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
 		startIdx := currentPage * pageSize
-		endIdx := currentPage + 1*pageSize
-		if endIdx > len(s3Objects) {
-			endIdx = len(s3Objects)
-		}
+		endIdx := min(currentPage+1*pageSize, len(s3Objects))
 		return &s3.ListObjectsV2Output{
 			Contents: s3Objects[startIdx:endIdx],
 		}, nil

@@ -25,10 +25,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/testing/estools"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/testing/estools"
 )
 
 // loopbackDevice returns the platform-specific loopback interface name.
@@ -73,7 +73,7 @@ func serverPort(t *testing.T, srv *httptest.Server) int {
 // sendHTTPRequests sends numRequests GET requests to url, ignoring errors.
 func sendHTTPRequests(url string, numRequests int) {
 	client := &http.Client{Timeout: 5 * time.Second}
-	for i := 0; i < numRequests; i++ {
+	for range numRequests {
 		resp, err := client.Get(url) //nolint:noctx // fine for tests
 		if err == nil {
 			resp.Body.Close()
@@ -364,6 +364,7 @@ output.elasticsearch:
   index: %s
 setup.template.enabled: false
 queue.mem.flush.timeout: 0s
+packetbeat.shutdown_timeout: 30s
 `, pbIndex)
 
 	pb := integration.NewBeat(t, "packetbeat", "../../packetbeat.test")

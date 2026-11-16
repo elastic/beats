@@ -202,8 +202,8 @@ func TestEmpty(t *testing.T) {
 	require.Equal(t, 0, len(reporter.GetEvents()))
 }
 
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(host string) map[string]any {
+	return map[string]any{
 		"module":                     elasticsearch.ModuleName,
 		"metricsets":                 []string{"index_summary"},
 		"hosts":                      []string{host},

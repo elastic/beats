@@ -23,7 +23,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -64,8 +64,8 @@ var (
 
 func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXpack bool) error {
 	nodesStruct := struct {
-		ClusterName string                            `json:"cluster_name"`
-		Nodes       map[string]map[string]interface{} `json:"nodes"`
+		ClusterName string                    `json:"cluster_name"`
+		Nodes       map[string]map[string]any `json:"nodes"`
 	}{}
 
 	err := json.Unmarshal(content, &nodesStruct)

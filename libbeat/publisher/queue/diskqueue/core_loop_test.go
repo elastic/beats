@@ -20,11 +20,21 @@ package diskqueue
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
+	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
+	"github.com/elastic/beats/v7/pkg/paths"
+	"github.com/elastic/beats/v7/pkg/testing/fs"
 )
 
 func TestHandleProducerWriteRequest(t *testing.T) {
@@ -58,9 +68,12 @@ func TestHandleProducerWriteRequest(t *testing.T) {
 		// The value to set shouldBlock to in the producer write request
 		shouldBlock bool
 
-		// The result we expect on the requests's response channel, or
-		// nil if there should be none.
+		// Whether we expect the request's response channel to report success
+		// (a nil error), or nil if there should be no response.
 		expectedResult *bool
+
+		// The error we expect a failure response to wrap.
+		expectedErr error
 
 		// The segment the frame should be assigned to in pendingFrames.
 		// This is ignored unless expectedResult is &true.
@@ -78,6 +91,7 @@ func TestHandleProducerWriteRequest(t *testing.T) {
 			frameSize:      1001,
 			shouldBlock:    true,
 			expectedResult: new(false),
+			expectedErr:    queue.ErrRejected,
 		},
 		"accept with frame in new segment if current segment is full": {
 			segments: diskQueueSegments{
@@ -99,6 +113,7 @@ func TestHandleProducerWriteRequest(t *testing.T) {
 			frameSize:      500,
 			shouldBlock:    false,
 			expectedResult: new(false),
+			expectedErr:    errQueueFull,
 		},
 		"block when full and shouldBlock=true": {
 			segments: diskQueueSegments{
@@ -115,6 +130,7 @@ func TestHandleProducerWriteRequest(t *testing.T) {
 			frameSize:        500,
 			shouldBlock:      false,
 			expectedResult:   new(false),
+			expectedErr:      errQueueFull,
 		},
 		"block when blockedProducers is nonempty and shouldBlock=true": {
 			blockedProducers: true,
@@ -147,15 +163,19 @@ func TestHandleProducerWriteRequest(t *testing.T) {
 		request := producerWriteRequest{
 			frame:        makeWriteFrameWithSize(test.frameSize),
 			shouldBlock:  test.shouldBlock,
-			responseChan: make(chan bool, 1),
+			responseChan: make(chan error, 1),
 		}
 
 		dq.handleProducerWriteRequest(request)
 
 		var result *bool
 		select {
-		case r := <-request.responseChan:
-			result = &r
+		case err := <-request.responseChan:
+			result = new(err == nil)
+			if test.expectedErr != nil && !errors.Is(err, test.expectedErr) {
+				t.Errorf("%s: expected an error wrapping %v, got %v",
+					description, test.expectedErr, err)
+			}
 		default:
 			// No response, result can stay nil.
 		}
@@ -753,9 +773,10 @@ func TestMaybeUnblockProducers(t *testing.T) {
 
 	settings := DefaultSettings()
 	settings.MaxBufferSize = 1000
-	responseChans := []chan bool{
-		make(chan bool, 1), make(chan bool, 1), make(chan bool, 1)}
+	responseChans := []chan error{
+		make(chan error, 1), make(chan error, 1), make(chan error, 1)}
 	dq := &diskQueue{
+		observer: queue.NewQueueObserver(nil),
 		settings: settings,
 		segments: diskQueueSegments{
 			writing: []*queueSegment{segmentWithSize(100)},
@@ -786,8 +807,8 @@ func TestMaybeUnblockProducers(t *testing.T) {
 	for i := range 3 {
 		select {
 		case response := <-responseChans[i]:
-			if i < 2 && !response {
-				t.Errorf("Expected success response for producer %v, got failure", i)
+			if i < 2 && response != nil {
+				t.Errorf("Expected success response for producer %v, got %v", i, response)
 			} else if i == 2 {
 				t.Fatalf("Expected no response for producer 2, got %v", response)
 			}
@@ -813,8 +834,8 @@ func TestMaybeUnblockProducers(t *testing.T) {
 		case response := <-responseChans[i]:
 			if i < 2 {
 				t.Errorf("Expected no response for producer %v, got %v", i, response)
-			} else if !response {
-				t.Errorf("Expected success response for producer 2, got failure")
+			} else if response != nil {
+				t.Errorf("Expected success response for producer 2, got %v", response)
 			}
 		default:
 			if i == 2 {
@@ -822,6 +843,81 @@ func TestMaybeUnblockProducers(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestHandleProducerCancel(t *testing.T) {
+	// handleProducerCancel should remove only the blocked request with the
+	// given response channel, answer it with errCancelled, and keep the other
+	// requests in order without answering them. An unknown channel belongs to
+	// a request that was already answered, so nothing changes.
+	// Every frame is too large for the remaining space, so none of the
+	// requests left behind is unblocked.
+	settings := DefaultSettings()
+	settings.MaxBufferSize = 1000
+	responseChans := []chan error{
+		make(chan error, 1), make(chan error, 1), make(chan error, 1)}
+	dq := &diskQueue{
+		observer: queue.NewQueueObserver(nil),
+		settings: settings,
+		segments: diskQueueSegments{
+			writing: []*queueSegment{segmentWithSize(100)},
+		},
+	}
+	for _, c := range responseChans {
+		dq.blockedProducers = append(dq.blockedProducers, producerWriteRequest{
+			frame: makeWriteFrameWithSize(950), responseChan: c, shouldBlock: true})
+	}
+
+	dq.handleProducerCancel(responseChans[1])
+	require.Len(t, dq.blockedProducers, 2, "only the cancelled request should be removed")
+	assert.Equal(t, responseChans[0], dq.blockedProducers[0].responseChan, "the first request should stay first")
+	assert.Equal(t, responseChans[2], dq.blockedProducers[1].responseChan, "the last request should follow the first")
+	for i, c := range responseChans {
+		select {
+		case err := <-c:
+			if i == 1 {
+				assert.ErrorIs(t, err, errCancelled, "the cancelled request should be answered with errCancelled")
+			} else {
+				assert.Failf(t, "unexpected response", "request %d should get no response, got %v", i, err)
+			}
+		default:
+			assert.NotEqual(t, 1, i, "the cancelled request should be answered")
+		}
+	}
+
+	dq.handleProducerCancel(make(chan error, 1))
+	assert.Len(t, dq.blockedProducers, 2, "cancelling an unknown request should change nothing")
+}
+
+func TestHandleProducerCancelUnblocksNext(t *testing.T) {
+	// Withdrawing a blocked request that does not fit should let a request
+	// behind it that fits into the queue at once, rather than wait for the
+	// next writer or deleter response.
+	settings := DefaultSettings()
+	settings.MaxBufferSize = 1000
+	head, next := make(chan error, 1), make(chan error, 1)
+	dq := &diskQueue{
+		observer: queue.NewQueueObserver(nil),
+		settings: settings,
+		segments: diskQueueSegments{
+			writing: []*queueSegment{segmentWithSize(100)},
+		},
+		blockedProducers: []producerWriteRequest{
+			{frame: makeWriteFrameWithSize(950), responseChan: head},
+			{frame: makeWriteFrameWithSize(200), responseChan: next},
+		},
+	}
+
+	dq.handleProducerCancel(head)
+	assert.ErrorIs(t, <-head, errCancelled, "the withdrawn request should be answered with errCancelled")
+	select {
+	case err := <-next:
+		assert.NoError(t, err, "the request behind the withdrawn one should be added")
+	default:
+		t.Error("the request behind the withdrawn one should be answered at once")
+	}
+	assert.Empty(t, dq.blockedProducers, "no request should stay blocked")
+	assert.Len(t, dq.pendingFrames, 1, "the unblocked request's frame should be pending")
 }
 
 func TestCanAcceptFrameOfSize(t *testing.T) {
@@ -972,7 +1068,7 @@ func TestObserverAddEvent(t *testing.T) {
 	eventFrame := &writeFrame{serialized: make([]byte, 123)}
 	request := producerWriteRequest{
 		frame:        eventFrame,
-		responseChan: make(chan bool, 1),
+		responseChan: make(chan error, 1),
 	}
 	dq.handleProducerWriteRequest(request)
 	assertRegistryUint(t, reg, "queue.added.events", 1, "handleProducerWriteRequest should report the added event")
@@ -1015,6 +1111,178 @@ func TestObserverDeleteSegment(t *testing.T) {
 	dq.handleDeleterLoopResponse(deleterLoopResponse{results: []error{nil}})
 	assertRegistryUint(t, reg, "queue.removed.events", 50+25, "Deleted events should be reported")
 	assertRegistryUint(t, reg, "queue.removed.bytes", 1234+567, "Deleted bytes should be reported")
+}
+
+func TestDiskQueueMetricsAfterBlockedPublish(t *testing.T) {
+	settings := DefaultSettings()
+	settings.Path = fs.TempDir(t)
+	settings.MaxBufferSize = 64 * 1024
+	settings.MaxSegmentSize = 16 * 1024
+	settings.ReadAheadLimit = 64
+	settings.WriteAheadLimit = 1024
+
+	reg := monitoring.NewRegistry()
+	dq, err := NewQueue(
+		logptest.NewTestingLogger(t, ""),
+		queue.NewQueueObserver(reg),
+		settings,
+		nil,
+		&paths.Path{},
+	)
+	require.NoError(t, err, "Disk queue should be created")
+
+	var queueInstance queue.Queue[publisher.Event] = dq
+	defer func() {
+		assert.NoError(t, queueInstance.Close(true), "Disk queue cleanup should succeed")
+		select {
+		case <-queueInstance.Done():
+		case <-time.After(5 * time.Second):
+			assert.Fail(t, "Disk queue cleanup timed out")
+		}
+	}()
+
+	producer := queueInstance.Producer(queue.ProducerConfig{})
+	defer producer.Close()
+	event := queuetest.MakeEvent(mapstr.M{
+		"message": strings.Repeat("x", 4*1024),
+	})
+
+	type publishResult struct {
+		accepted int
+		ok       bool
+	}
+
+	accepted := 0
+	consumed := 0
+	for {
+		_, ok := producer.TryPublish(event)
+		if !ok {
+			break
+		}
+		accepted++
+		require.Less(t, accepted, 200, "Disk queue should reach its configured capacity")
+	}
+
+	blockedResult := make(chan publishResult, 1)
+	go func() {
+		_, blockedPublishOK := producer.Publish(event)
+		if !blockedPublishOK {
+			blockedResult <- publishResult{}
+			return
+		}
+
+		// Model a live input that keeps publishing after capacity is freed.
+		// The follow-up request also dispatches the recovered event.
+		_, nextPublishOK := producer.Publish(event)
+		blockedResult <- publishResult{
+			accepted: 2,
+			ok:       nextPublishOK,
+		}
+	}()
+
+	// No batch has been acknowledged yet, so no segment can have been removed
+	// to free space. This Publish must therefore be blocked.
+	select {
+	case result := <-blockedResult:
+		require.FailNowf(t, "Publish should block on a full disk queue",
+			"Publish returned early with results %+v", result)
+	case <-time.After(50 * time.Millisecond):
+	}
+
+	publishUnblocked := false
+	for !publishUnblocked {
+		select {
+		case result := <-blockedResult:
+			require.True(t, result.ok,
+				"Blocked and follow-up publishes should succeed after capacity is freed")
+			require.Equal(t, 2, result.accepted,
+				"Continuous producer should publish every expected event")
+			accepted += result.accepted
+			publishUnblocked = true
+		default:
+			batch := getDiskQueueBatch(t, queueInstance)
+			consumed += batch.Count()
+			batch.Done()
+		}
+	}
+
+	// Ensure the queue is drained
+	for consumed < accepted {
+		batch := getDiskQueueBatch(t, queueInstance)
+		consumed += batch.Count()
+		batch.Done()
+	}
+
+	producer.Close()
+	require.NoError(t, queueInstance.Close(false), "Drained disk queue should close")
+	select {
+	case <-queueInstance.Done():
+	case <-time.After(5 * time.Second):
+		require.FailNow(t, "Drained disk queue should finish closing")
+	}
+
+	snapshot := monitoring.CollectFlatSnapshot(reg, monitoring.Full, false)
+	assert.Equal(
+		t,
+		int64(accepted),
+		snapshot.Ints["queue.added.events"],
+		"Added events should include the publish that blocked",
+	)
+
+	assert.LessOrEqual(
+		t,
+		snapshot.Ints["queue.filled.events"],
+		int64(accepted),
+		"Filled event count should not exceed all accepted events",
+	)
+
+	assert.LessOrEqual(
+		t,
+		snapshot.Ints["queue.filled.bytes"],
+		int64(settings.MaxBufferSize), //nolint:gosec // it's a safe conversion
+		"Filled byte count should not exceed queue capacity",
+	)
+
+	assert.GreaterOrEqual(
+		t,
+		snapshot.Floats["queue.filled.pct"],
+		float64(0),
+		"Queue fill percentage should not be negative",
+	)
+
+	assert.LessOrEqual(
+		t,
+		snapshot.Floats["queue.filled.pct"],
+		float64(1),
+		"Queue fill percentage should not exceed one",
+	)
+}
+
+func getDiskQueueBatch(
+	t *testing.T,
+	queueInstance queue.Queue[publisher.Event],
+) queue.Batch[publisher.Event] {
+	t.Helper()
+
+	type result struct {
+		batch queue.Batch[publisher.Event]
+		err   error
+	}
+	resultChan := make(chan result, 1)
+	go func() {
+		batch, err := queueInstance.Get(1)
+		resultChan <- result{batch: batch, err: err}
+	}()
+
+	select {
+	case result := <-resultChan:
+		require.NoError(t, result.err, "Reading from disk queue should succeed")
+		require.NotNil(t, result.batch, "Disk queue should return a batch")
+		return result.batch
+	case <-time.After(5 * time.Second):
+		require.FailNow(t, "Timed out reading from disk queue")
+		return nil
+	}
 }
 
 // Convenience helper that creates a frame that will have the given size on

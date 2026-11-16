@@ -24,8 +24,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 var (
@@ -1505,8 +1505,8 @@ func TestInsertTags(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			subIdentifiers := strings.Split(c.identifier, dimensionSeparator)
-			for _, subIdentifier := range subIdentifiers {
+			subIdentifiers := strings.SplitSeq(c.identifier, dimensionSeparator)
+			for subIdentifier := range subIdentifiers {
 				insertTags(events, c.identifier, subIdentifier, resourceTagMap)
 			}
 			value, err := events[c.identifier].RootFields.GetValue(c.expectedTagKey)

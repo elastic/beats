@@ -86,10 +86,7 @@ func readMax(reader io.Reader, maxSize int) (result []byte, err error) {
 	const minSize = 512
 	for used := 0; ; {
 		if len(result)-used < minSize {
-			grow := len(result) >> 1
-			if grow < minSize {
-				grow = minSize
-			}
+			grow := max(len(result)>>1, minSize)
 			result = append(result, make([]byte, grow)...)
 		}
 		n, err := reader.Read(result[used:])

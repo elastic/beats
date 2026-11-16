@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package guess
 
@@ -14,8 +13,8 @@ import (
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/auditbeat/tracing"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Guess how to get a struct sock* and an sk_buff* from an ip_local_out() call.
@@ -111,7 +110,7 @@ func (g *guessIPLocalOut) Probes() ([]helper.ProbeDef, error) {
 				Fetchargs: "arg={{if ne .IP_LOCAL_OUT \"ip_local_out_sk\"}}{{.P2}}{{else}}{{.P1}}{{end}} dump=" +
 					helper.MakeMemoryDump("{{if ne .IP_LOCAL_OUT \"ip_local_out_sk\"}}{{.P1}}{{else}}{{.P2}}{{end}}", 0, skbuffDumpSize),
 			},
-			Decoder: helper.NewStructDecoder(func() interface{} { return new(skbuffSockGuess) }),
+			Decoder: helper.NewStructDecoder(func() any { return new(skbuffSockGuess) }),
 		},
 		{
 			Probe: tracing.Probe{
@@ -119,7 +118,7 @@ func (g *guessIPLocalOut) Probes() ([]helper.ProbeDef, error) {
 				Address:   "tcp_sendmsg",
 				Fetchargs: "sock={{.TCP_SENDMSG_SOCK}}",
 			},
-			Decoder: helper.NewStructDecoder(func() interface{} { return new(sockArgumentGuess) }),
+			Decoder: helper.NewStructDecoder(func() any { return new(sockArgumentGuess) }),
 		},
 	}, nil
 }
@@ -149,7 +148,7 @@ func (g *guessIPLocalOut) Trigger() error {
 // Extract first receives and saves the sock* from tcp_sendmsg.
 // Once ip_local_out is called, it analyses the captured arguments to determine
 // their layout.
-func (g *guessIPLocalOut) Extract(ev interface{}) (mapstr.M, bool) {
+func (g *guessIPLocalOut) Extract(ev any) (mapstr.M, bool) {
 	switch v := ev.(type) {
 	case *sockArgumentGuess:
 		g.sock = v.Sock

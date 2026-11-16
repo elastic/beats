@@ -13,9 +13,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/poll"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type contentStore struct {
@@ -30,7 +30,7 @@ func (n noopReporter) UpdateStatus(status status.Status, msg string) {}
 
 var errStopped = errors.New("stopped")
 
-func (s *contentStore) onEvent(b beat.Event, checkpointUpdate interface{}) error {
+func (s *contentStore) onEvent(b beat.Event, checkpointUpdate any) error {
 	b.Private = checkpointUpdate
 	s.events = append(s.events, b)
 	if s.stopped {

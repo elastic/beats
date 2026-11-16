@@ -6,10 +6,9 @@ package kvstore
 
 import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
-	"github.com/elastic/go-concert/unison"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/paths"
 )
 
 // Manager is used to create, manage, and coordinate inputs which use a key/value
@@ -33,10 +32,8 @@ type managerConfig struct {
 	ID string `config:"id" validate:"required"`
 }
 
-// Init initializes any required resources. It is currently a no-op.
-func (m *Manager) Init(grp unison.Group) error {
-	return nil
-}
+// Close is a no-op; this manager holds no resources to release.
+func (m *Manager) Close() {}
 
 // Create makes a new v2.Input using the provided config.C which will be
 // used in the Manager's Configure function.

@@ -28,8 +28,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 const (
@@ -1085,5 +1085,40 @@ func TestOpenMetricsKeyLabels(t *testing.T) {
 				continue
 			}
 		}
+	}
+}
+
+func TestOpLabelKeyPrefixRemover(t *testing.T) {
+	testCases := []struct {
+		name     string
+		prefix   string
+		labels   mapstr.M
+		expected mapstr.M
+	}{
+		{
+			name:     "prefix shorter than six with a short key",
+			prefix:   "ex_",
+			labels:   mapstr.M{"ex_j": "v"},
+			expected: mapstr.M{"j": "v"},
+		},
+		{
+			name:     "short key without the prefix is left untouched",
+			prefix:   "ex_",
+			labels:   mapstr.M{"ab": "v"},
+			expected: mapstr.M{"ab": "v"},
+		},
+		{
+			name:     "prefix longer than six",
+			prefix:   "prefixed_",
+			labels:   mapstr.M{"prefixed_name": "v"},
+			expected: mapstr.M{"name": "v"},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			_, _, labels := OpLabelKeyPrefixRemover(tc.prefix).Process("", nil, tc.labels)
+			assert.Equal(t, tc.expected, labels)
+		})
 	}
 }

@@ -21,12 +21,13 @@ import (
 	"fmt"
 	"sync"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	"github.com/elastic/beats/v7/heartbeat/monitors/secretstores"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
@@ -60,6 +61,7 @@ type RunnerFactory struct {
 	logger                *logp.Logger
 	pipelineClientFactory PipelineClientFactory
 	beatLocation          *config.LocationWithID
+	secrets               *secretstores.Resolver
 }
 
 type PipelineClientFactory func(pipeline beat.Pipeline) (beat.Client, error)
@@ -104,6 +106,7 @@ func NewFactory(fp FactoryParams) *RunnerFactory {
 		pipelineClientFactory: fp.PipelineClientFactory,
 		beatLocation:          fp.BeatRunFrom,
 		stateLoader:           fp.StateLoader,
+		secrets:               secretstores.NewResolver(fp.BeatInfo.Logger),
 	}
 }
 
@@ -194,8 +197,8 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 	loc := getLocation(f.beatLocation, sf)
 	if loc != nil {
 		geoMap, _ := util.GeoConfigToMap(loc.Geo)
-		err = c.Merge(map[string]interface{}{
-			"run_from": map[string]interface{}{
+		err = c.Merge(map[string]any{
+			"run_from": map[string]any{
 				"id":  loc.ID,
 				"geo": geoMap,
 			},
@@ -205,7 +208,12 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 		}
 	}
 
-	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, f.stateLoader, *f.info, safeStop)
+	// Only monitors with secret stores resolve secret references.
+	var wrapFactory PluginFactoryWrapper
+	if c.HasField(secretstores.ConfigKey) {
+		wrapFactory = f.secrets.WrapFactory
+	}
+	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, f.stateLoader, *f.info, safeStop, wrapFactory)
 	if err != nil {
 		return nil, fmt.Errorf("factory could not create monitor: %w", err)
 	}
@@ -225,6 +233,10 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 func (f *RunnerFactory) CheckConfig(config *conf.C) error {
 	if !config.Enabled() {
 		return nil
+	}
+	// Validated offline: checking a config never contacts a secret store.
+	if err := f.secrets.Validate(config); err != nil {
+		return err
 	}
 	return checkMonitorConfig(config, plugin.GlobalPluginsReg, *f.info)
 }
@@ -332,12 +344,9 @@ func preProcessors(info beat.Info, location *config.LocationWithID, settings pub
 		procs.AddProcessor(addfields.NewAddFields(obsFields, true, true))
 	}
 
-	// always use synthetics data streams for browser monitors, there is no good reason not to
-	// the default `heartbeat` data stream won't split out network and screenshot data.
-	// at some point we should make all monitors use the `synthetics` datastreams and retire
-	// the heartbeat one, but browser is the only beta one, and it would be a breaking change
-	// to do so otherwise.
-	if monitorType == "browser" && settings.DataStream == nil {
+	// Synthetics-driven monitors (browser, api) use the synthetics data streams so
+	// network/screenshot/api-network sub-streams split out; the default heartbeat one can't.
+	if stdfields.IsSyntheticsType(monitorType) && settings.DataStream == nil {
 		settings.DataStream = &add_data_stream.DataStream{}
 	}
 

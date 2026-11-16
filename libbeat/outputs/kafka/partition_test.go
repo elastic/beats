@@ -32,16 +32,16 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 type partTestScenario func(*testing.T, bool, sarama.Partitioner) error
 
 func TestPartitioners(t *testing.T) {
-	type obj map[string]interface{}
-	type arr []interface{}
+	type obj map[string]any
+	type arr []any
 
 	nonHashScenarios := []partTestScenario{
 		partTestSimple(100, false),

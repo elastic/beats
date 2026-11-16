@@ -29,7 +29,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/reader"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func createTestFileInfo() file.ExtendedFileInfo {
@@ -88,12 +88,12 @@ func TestCachedMetaSizing(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			r := &FileMetaReader{
-				reader:       msgReader([]reader.Message{msg}),
-				path:         "test/path",
-				fi:           fi,
-				includeOwner: tc.includeOwner,
-				includeGroup: tc.includeGroup,
-				fingerprint:  tc.fingerprint,
+				reader:        msgReader([]reader.Message{msg}),
+				path:          "test/path",
+				fi:            fi,
+				includeOwner:  tc.includeOwner,
+				includeGroup:  tc.includeGroup,
+				fingerprintFn: fingerprintFnFor(tc.fingerprint),
 			}
 			_, err := r.Next()
 			require.NoError(t, err)

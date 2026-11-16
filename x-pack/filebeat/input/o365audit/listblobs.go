@@ -88,7 +88,7 @@ func (l listBlob) RequestDecorators() []autorest.PrepareDecorator {
 		autorest.WithPath(l.env.tenantID),
 		autorest.WithPath("activity/feed/subscriptions/content"),
 		autorest.WithQueryParameters(
-			map[string]interface{}{
+			map[string]any{
 				"contentType": l.env.contentType,
 				"startTime":   l.startTime.Format(apiDateFormat),
 				"endTime":     l.endTime.Format(apiDateFormat),
@@ -274,7 +274,7 @@ func (l listBlob) handleError(response *http.Response) (actions []poll.Action) {
 	return append(actions, poll.Fetch(l))
 }
 
-func readJSONBody(response *http.Response, dest interface{}) error {
+func readJSONBody(response *http.Response, dest any) error {
 	defer autorest.Respond(response,
 		autorest.ByDiscardingBody(),
 		autorest.ByClosing())

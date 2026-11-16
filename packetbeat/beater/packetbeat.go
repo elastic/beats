@@ -30,9 +30,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/service"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/service"
 
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/module"
@@ -96,8 +96,10 @@ type packetbeat struct {
 
 // New returns a new Packetbeat beat.Beater.
 func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
+	// Configuration delivered over the control protocol uses the agent
+	// stream layout rather than the static packetbeat.yml layout.
 	configurator := config.NewAgentConfig
-	if !b.Manager.Enabled() {
+	if !b.Manager.ConfigFromControlProtocol() {
 		configurator = initialConfig().FromStatic
 	}
 
@@ -116,7 +118,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	}
 
 	var overwritePipelines bool
-	if !b.Manager.Enabled() {
+	if !management.UnderAgent() {
 		// Pipeline overwrite is only enabled on standalone packetbeat
 		// since pipelines are managed by fleet otherwise.
 		config, err := configurator(rawConfig, logger)
@@ -182,7 +184,7 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 		factory = pb.otelStatusFactoryWrapper(factory)
 	}
 
-	if !b.Manager.Enabled() {
+	if !b.Manager.ConfigFromControlProtocol() {
 		if beat.SetupPipelinesEnabled(b.BeatConfig) {
 			if b.Config.Output.Name() == "elasticsearch" {
 				_, err := elasticsearch.RegisterConnectCallback(func(esClient *eslegclient.Connection, _ *logp.Logger) error {

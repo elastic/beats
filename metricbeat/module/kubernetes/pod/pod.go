@@ -25,7 +25,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 const (
@@ -85,7 +85,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
-	m.enricher.Start(m.mod.GetResourceWatchers())
+	if !m.enricher.Start(m.mod.GetResourceWatchers()) {
+		return
+	}
 
 	body, err := m.mod.GetKubeletStats(m.http)
 	if err != nil {

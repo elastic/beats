@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package guess
 
@@ -14,8 +13,8 @@ import (
 	"syscall"
 
 	"github.com/elastic/beats/v7/auditbeat/tracing"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 /*
@@ -112,7 +111,7 @@ func (g *guessDeref) MaxRepeats() int {
 
 // Extract receives the memory read through a null pointer and checks if it's
 // zero or garbage.
-func (g *guessDeref) Extract(ev interface{}) (mapstr.M, bool) {
+func (g *guessDeref) Extract(ev any) (mapstr.M, bool) {
 	raw := ev.([]byte)
 	if len(raw) != credDumpBytes {
 		return nil, false

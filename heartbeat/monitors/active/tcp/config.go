@@ -22,8 +22,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors"
-	"github.com/elastic/elastic-agent-libs/transport"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/beats/v7/pkg/transport"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 )
 
 type config struct {
@@ -55,7 +55,7 @@ func defaultConfig() config {
 func (c *config) Validate() error {
 	if c.Socks5.URL != "" {
 		if c.Mode.Mode != monitors.PingAny && !c.Socks5.LocalResolve {
-			return errors.New("ping all ips only supported if proxy_use_local_resolver is enabled`")
+			return errors.New("ping all IPs is only supported if proxy_use_local_resolver is enabled")
 		}
 	}
 

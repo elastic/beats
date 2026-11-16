@@ -30,7 +30,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func init() {
@@ -80,7 +80,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return fmt.Errorf("failed to retrieve 'serverStatus': %w", err)
 	}
 
-	result := map[string]interface{}{}
+	result := map[string]any{}
 	if err = res.Decode(&result); err != nil {
 		return fmt.Errorf("could not decode 'serverStatus' response: %w", err)
 	}

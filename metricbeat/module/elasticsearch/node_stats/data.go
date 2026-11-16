@@ -23,7 +23,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -428,7 +428,7 @@ var (
 )
 
 type nodesStruct struct {
-	Nodes map[string]map[string]interface{} `json:"nodes"`
+	Nodes map[string]map[string]any `json:"nodes"`
 }
 
 func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticsearch.Info, content []byte, isXpack bool) error {

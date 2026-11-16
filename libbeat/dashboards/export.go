@@ -28,11 +28,11 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 
-	"github.com/elastic/elastic-agent-libs/kibana"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/version"
+	"github.com/elastic/beats/v7/pkg/kibana"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/version"
 )
 
 const (

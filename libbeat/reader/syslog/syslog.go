@@ -24,8 +24,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/reader"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // Note: When re-generating these files, it may be necessary to remove the
@@ -204,4 +204,9 @@ func NewParser(r reader.Reader, cfg *Config, logger *logp.Logger) *Parser {
 		reader: r,
 		logger: logger.Named("reader_syslog"),
 	}
+}
+
+// SetReadDeadline delegates to the wrapped reader (see reader.DeadlineSetter).
+func (p *Parser) SetReadDeadline(t time.Time) bool {
+	return reader.SetReadDeadline(p.reader, t)
 }

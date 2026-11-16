@@ -13,7 +13,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // Validator is a CRC validation function type. It applies the provided validator
@@ -74,7 +74,7 @@ func validateZoomCRC(crc *crcValidator, obj mapstr.M) (status int, resp string, 
 		return 0, "", errNotCRC
 	}
 
-	payload, ok := obj["payload"].(map[string]interface{})
+	payload, ok := obj["payload"].(map[string]any)
 	if !ok {
 		return 0, "", errNotCRC
 	}

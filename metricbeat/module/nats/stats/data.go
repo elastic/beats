@@ -25,7 +25,7 @@ import (
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/nats/util"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 var (
@@ -74,7 +74,7 @@ var (
 
 func eventMapping(r mb.ReporterV2, content []byte) error {
 	var metricsetMetrics mapstr.M
-	var inInterface map[string]interface{}
+	var inInterface map[string]any
 
 	err := json.Unmarshal(content, &inInterface)
 	if err != nil {

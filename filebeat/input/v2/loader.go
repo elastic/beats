@@ -22,9 +22,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/version"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/go-concert/unison"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // Loader can be used to create Inputs from configurations.
@@ -63,14 +62,11 @@ func NewLoader(log *logp.Logger, plugins []Plugin, typeField, defaultType string
 	}, nil
 }
 
-// Init runs Init on all InputManagers for all plugins known to the loader.
-func (l *Loader) Init(group unison.Group) error {
+// Close releases resources owned by all input managers.
+func (l *Loader) Close() {
 	for _, p := range l.registry {
-		if err := p.Manager.Init(group); err != nil {
-			return err
-		}
+		p.Manager.Close()
 	}
-	return nil
 }
 
 // Configure creates a new input from a Config object.

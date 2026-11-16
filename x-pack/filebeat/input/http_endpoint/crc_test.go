@@ -11,7 +11,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func Test_validateZoomCRC(t *testing.T) {
@@ -27,7 +27,7 @@ func Test_validateZoomCRC(t *testing.T) {
 			name: "valid request",
 			crc:  newCRC("Zoom", "secretValueTest"),
 			inputJSON: mapstr.M{
-				"payload": map[string]interface{}{
+				"payload": map[string]any{
 					"plainToken": "qgg8vlvZRS6UYooatFL8Aw",
 				},
 				"event_ts": int64(1654503849680),
@@ -51,7 +51,7 @@ func Test_validateZoomCRC(t *testing.T) {
 			name: "empty challenge value",
 			crc:  newCRC("Zoom", "secretValueTest"),
 			inputJSON: mapstr.M{
-				"payload": map[string]interface{}{
+				"payload": map[string]any{
 					"plainToken": "",
 				},
 				"event_ts": int64(1654503849680),

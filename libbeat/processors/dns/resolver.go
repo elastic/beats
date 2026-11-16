@@ -30,9 +30,9 @@ import (
 	"github.com/miekg/dns"
 	"github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
+	"github.com/elastic/beats/v7/pkg/monitoring/adapter"
 )
 
 const etcResolvConf = "/etc/resolv.conf"
@@ -257,13 +257,6 @@ func (res *miekgResolver) getOrCreateNameserverStats(ns string) *nameserverStats
 	res.nsStats[ns] = stats
 
 	return stats
-}
-
-func min(a, b uint32) uint32 {
-	if a < b {
-		return a
-	}
-	return b
 }
 
 func isIPv6Address(addr string) bool {

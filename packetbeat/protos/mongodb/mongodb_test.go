@@ -30,9 +30,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 type eventStore struct {
@@ -240,11 +240,11 @@ func TestReconstructQuery(t *testing.T) {
 			Input: transaction{
 				resource: "test.col",
 				method:   "find",
-				event: map[string]interface{}{
+				event: map[string]any{
 					"numberToSkip":   3,
 					"numberToReturn": 2,
 				},
-				params: map[string]interface{}{
+				params: map[string]any{
 					"me": "you",
 				},
 			},
@@ -255,7 +255,7 @@ func TestReconstructQuery(t *testing.T) {
 			Input: transaction{
 				resource: "test.col",
 				method:   "insert",
-				params: map[string]interface{}{
+				params: map[string]any{
 					"documents": "you",
 				},
 			},
@@ -266,7 +266,7 @@ func TestReconstructQuery(t *testing.T) {
 			Input: transaction{
 				resource: "test.col",
 				method:   "insert",
-				params: map[string]interface{}{
+				params: map[string]any{
 					"documents": "you",
 				},
 			},
@@ -286,7 +286,7 @@ func TestMaxDocs(t *testing.T) {
 
 	// more docs than configured
 	trans := transaction{
-		documents: []interface{}{
+		documents: []any{
 			1, 2, 3, 4, 5, 6, 7, 8,
 		},
 	}
@@ -303,7 +303,7 @@ func TestMaxDocs(t *testing.T) {
 
 	// exactly the same number of docs
 	trans = transaction{
-		documents: []interface{}{
+		documents: []any{
 			1, 2, 3,
 		},
 	}
@@ -314,7 +314,7 @@ func TestMaxDocs(t *testing.T) {
 
 	// less docs
 	trans = transaction{
-		documents: []interface{}{
+		documents: []any{
 			1, 2,
 		},
 	}
@@ -325,7 +325,7 @@ func TestMaxDocs(t *testing.T) {
 
 	// unlimited
 	trans = transaction{
-		documents: []interface{}{
+		documents: []any{
 			1, 2, 3, 4,
 		},
 	}
@@ -339,7 +339,7 @@ func TestMaxDocSize(t *testing.T) {
 
 	// more docs than configured
 	trans := transaction{
-		documents: []interface{}{
+		documents: []any{
 			"1234567",
 			"123",
 			"12",

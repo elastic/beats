@@ -24,7 +24,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 func TestSni(t *testing.T) {
@@ -168,7 +168,7 @@ func TestParseSupportedVersions(t *testing.T) {
 	for _, testCase := range []struct {
 		title    string
 		data     string
-		expected interface{}
+		expected any
 	}{
 		{
 			title:    "negotiation",

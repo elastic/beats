@@ -1,0 +1,26 @@
+# Kind can be one of:
+# - breaking-change: a change to previously-documented behavior
+# - deprecation: functionality that is being removed in a later release
+# - bug-fix: fixes a problem in a previous version
+# - enhancement: extends functionality but does not break or fix existing behavior
+# - feature: new functionality
+# - known-issue: problems that we are aware of in a given version
+# - security: impacts on the security of a product or a user’s deployment.
+# - upgrade: important information for someone upgrading from a prior version
+# - other: does not fit into any of the other categories
+kind: enhancement
+
+# Change summary; a 80ish characters long description of the change.
+summary: Add max_object_depth to decode_json_fields to keep deeply nested JSON as strings.
+
+# Long description; in case the summary is not enough to describe the change
+# this field accommodate a description without length limits.
+description: >
+  The max_depth option of decode_json_fields only limits how many times
+  JSON-encoded strings are decoded; it never limited nested objects. The new
+  max_object_depth option stores objects and arrays nested deeper than the
+  given level as JSON strings, which prevents mapping explosions from deeply
+  nested input. The documentation for max_depth now describes its behaviour.
+
+# Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
+component: all

@@ -22,7 +22,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -156,7 +156,7 @@ func eventMapping(r mb.ReporterV2, info beat.Info, clusterUUID string, content [
 		event.ModuleFields.Put("elasticsearch.cluster.id", clusterUUID)
 	}
 
-	var data map[string]interface{}
+	var data map[string]any
 	err := json.Unmarshal(content, &data)
 	if err != nil {
 		return fmt.Errorf("failure parsing Beat's Stats API response: %w", err)

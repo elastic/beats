@@ -17,7 +17,7 @@
             Deployment Available Condition status (true, false or unknown)
         - name: progressing
           type: keyword
-          description: Deployment Progresing Condition status (true, false or unknown)
+          description: Deployment Progressing Condition status (true, false or unknown)
     - name: replicas
       type: group
       description: >

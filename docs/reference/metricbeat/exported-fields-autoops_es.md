@@ -938,6 +938,98 @@ component template information from the cluster
     type: keyword
 
 
+## frozen_cache_stats [_frozen_cache_stats]
+
+```{applies_to}
+stack: beta 9.5.0
+```
+
+Searchable snapshot shared cache statistics per node.
+
+**`autoops_es.frozen_cache_stats.id`**
+:   Node ID.
+
+    type: keyword
+
+
+**`autoops_es.frozen_cache_stats.shared_cache.reads`**
+:   Total number of shared cache reads (counter).
+
+    type: long
+
+
+**`autoops_es.frozen_cache_stats.shared_cache.writes`**
+:   Total number of shared cache writes (counter).
+
+    type: long
+
+
+**`autoops_es.frozen_cache_stats.shared_cache.evictions`**
+:   Total number of shared cache evictions (counter).
+
+    type: long
+
+
+**`autoops_es.frozen_cache_stats.shared_cache.size_in_bytes`**
+:   Total size of the shared cache in bytes (gauge).
+
+    type: long
+
+
+**`autoops_es.frozen_cache_stats.shared_cache.region_size_in_bytes`**
+:   Size of each cache region in bytes.
+
+    type: long
+
+
+**`autoops_es.frozen_cache_stats.shared_cache.num_regions`**
+:   Number of cache regions.
+
+    type: long
+
+
+**`autoops_es.frozen_cache_stats.shared_cache.bytes_written_in_bytes`**
+:   Total bytes written to the shared cache (counter).
+
+    type: long
+
+
+**`autoops_es.frozen_cache_stats.shared_cache.bytes_read_in_bytes`**
+:   Total bytes read from the shared cache (counter).
+
+    type: long
+
+
+**`autoops_es.frozen_cache_stats.shared_cache_reads_per_second`**
+:   Rate of shared cache reads per second.
+
+    type: float
+
+
+**`autoops_es.frozen_cache_stats.shared_cache_writes_per_second`**
+:   Rate of shared cache writes per second.
+
+    type: float
+
+
+**`autoops_es.frozen_cache_stats.shared_cache_evictions_per_second`**
+:   Rate of shared cache evictions per second.
+
+    type: float
+
+
+**`autoops_es.frozen_cache_stats.shared_cache_bytes_written_per_second`**
+:   Rate of bytes written to the shared cache per second.
+
+    type: float
+
+
+**`autoops_es.frozen_cache_stats.shared_cache_bytes_read_per_second`**
+:   Rate of bytes read from the shared cache per second.
+
+    type: float
+
+
 ## index_template [_index_template]
 
 ```{applies_to}
@@ -1256,5 +1348,43 @@ tasks information from cluster
 :   task parent id
 
     type: keyword
+
+
+## tier_stats [_tier_stats]
+
+```{applies_to}
+stack: beta 9.4.0
+```
+
+Number and duration of the requests of a tier of an Elasticsearch Serverless project, for one HTTP status code. There is one document per tier and HTTP status code with requests during the scrape (and always one for the successful, 2xx, requests), which adds the requests of every node of the tier. The first document of a status code only reports that it was returned.
+
+**`autoops_es.tier_stats.tier`**
+:   The tier that served the requests, such as `search` or `index`.
+
+    type: keyword
+
+
+**`autoops_es.tier_stats.status_code`**
+:   HTTP status code of the responses.
+
+    type: integer
+
+
+**`autoops_es.tier_stats.status_group`**
+:   Class of the HTTP status code, such as `2xx` or `5xx`.
+
+    type: keyword
+
+
+**`autoops_es.tier_stats.count_delta`**
+:   Number of requests since the previous scrape. It is not reported the first time that a status code is returned, because there is no previous scrape to subtract from.
+
+    type: long
+
+
+**`autoops_es.tier_stats.duration_delta_in_millis`**
+:   Total duration of those requests in milliseconds. It is not reported when `count_delta` is not.
+
+    type: float
 
 

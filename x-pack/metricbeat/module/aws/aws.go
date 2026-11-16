@@ -20,8 +20,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type describeRegionsClient interface {
@@ -330,7 +330,7 @@ func InitEvent(regionName string, accountName string, accountID string, timestam
 
 // CheckTagFiltersExist compare tags filter with a set of tags to see if tags
 // filter is a subset of tags
-func CheckTagFiltersExist(tagsFilter []Tag, tags interface{}) bool {
+func CheckTagFiltersExist(tagsFilter []Tag, tags any) bool {
 	var tagKeys []string
 	var tagValues []string
 

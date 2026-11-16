@@ -20,8 +20,8 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestData(t *testing.T) {
@@ -260,7 +260,7 @@ func TestBtmp(t *testing.T) {
 		"Timestamp is not equal: %+v", events[3].Timestamp)
 }
 
-func checkFieldValue(t *testing.T, mapstr mapstr.M, fieldName string, fieldValue interface{}) {
+func checkFieldValue(t *testing.T, mapstr mapstr.M, fieldName string, fieldValue any) {
 	value, err := mapstr.GetValue(fieldName)
 	if assert.NoError(t, err) {
 		switch v := value.(type) {
@@ -272,8 +272,8 @@ func checkFieldValue(t *testing.T, mapstr mapstr.M, fieldName string, fieldValue
 	}
 }
 
-func getBaseConfig() map[string]interface{} {
-	return map[string]interface{}{
+func getBaseConfig() map[string]any {
+	return map[string]any{
 		"module":   system.ModuleName,
 		"datasets": []string{"login"},
 	}

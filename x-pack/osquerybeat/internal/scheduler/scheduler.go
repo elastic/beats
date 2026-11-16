@@ -11,8 +11,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // QueryFunc is the function type for executing a query.
@@ -85,7 +85,7 @@ type scheduledJob struct {
 // New creates a new recurrence scheduler
 func New(log *logp.Logger, queryFunc QueryFunc) *Scheduler {
 	return &Scheduler{
-		log:       log.With("component", "recurrence-scheduler"),
+		log:       log.With("log.logger", "recurrence-scheduler"),
 		queries:   make(map[string]*scheduledJob),
 		queryFunc: queryFunc,
 	}
@@ -274,10 +274,7 @@ func (s *Scheduler) runJob(ctx context.Context, job *scheduledJob) {
 
 		scheduledTime := nextRun.Add(splayDuration)
 
-		waitDuration := time.Until(scheduledTime)
-		if waitDuration < 0 {
-			waitDuration = 0
-		}
+		waitDuration := max(time.Until(scheduledTime), 0)
 
 		s.log.Debugf("Query '%s' scheduled for %v (splay: %v)", sq.Name, scheduledTime, splayDuration)
 

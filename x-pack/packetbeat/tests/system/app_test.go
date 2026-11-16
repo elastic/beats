@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build integration
-// +build integration
 
 package system
 
@@ -26,7 +25,7 @@ import (
 )
 
 // Keep in sync with NpcapVersion in magefile.go.
-const NpcapVersion = "1.87"
+const NpcapVersion = "1.89"
 
 func TestWindowsNpcapInstaller(t *testing.T) {
 	if runtime.GOOS != "windows" {

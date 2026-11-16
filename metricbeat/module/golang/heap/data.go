@@ -21,13 +21,13 @@ import (
 	"runtime"
 
 	"github.com/elastic/beats/v7/metricbeat/module/golang"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // Stats contains the memory info that we get from the fetch request
 type Stats struct {
 	MemStats runtime.MemStats
-	Cmdline  []interface{}
+	Cmdline  []any
 }
 
 func eventMapping(stats Stats, m *MetricSet) mapstr.M {
