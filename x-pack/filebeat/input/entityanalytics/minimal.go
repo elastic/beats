@@ -232,7 +232,7 @@ func (n *minimalStateInput) newBBoltSyncer(runCtx v2.Context, log *logp.Logger) 
 }
 
 func (s *bboltSyncer) runSync(runCtx v2.Context, provider entcollect.Provider, client beat.Client, slogger *slog.Logger, full bool) error {
-	ctx := v2.GoContextFromCanceler(runCtx.Cancelation)
+	ctx := runCtx.Cancelation
 	tx, err := s.store.BeginTx(true)
 	if err != nil {
 		return fmt.Errorf("unable to begin transaction: %w", err)
@@ -294,7 +294,7 @@ func (n *minimalStateInput) newESSyncer(runCtx v2.Context, log *logp.Logger) (*e
 }
 
 func (s *esSyncer) runSync(runCtx v2.Context, provider entcollect.Provider, client beat.Client, slogger *slog.Logger, full bool) error {
-	ctx := v2.GoContextFromCanceler(runCtx.Cancelation)
+	ctx := runCtx.Cancelation
 
 	es := kvstore.NewStateStoreAdapter(s.store)
 	buf := entcollect.NewBuffer(es)
