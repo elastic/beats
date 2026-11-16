@@ -27,6 +27,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader/readertest"
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/pkg/mapstr"
@@ -451,3 +452,56 @@ func (m *mockReader) Next() (reader.Message, error) {
 }
 
 func (m *mockReader) Close() error { return nil }
+
+const criTS = "2017-10-12T13:32:21.232861448Z"
+
+// TestDockerJSONWouldBlock verifies that ErrWouldBlock during partial-line
+// joining or after skipped lines neither reports consumed bytes nor loses state.
+func TestDockerJSONWouldBlock(t *testing.T) {
+	cri := func(tag, msg string) readertest.ScriptStep {
+		return readertest.LineStep(criTS + " " + tag + " " + msg)
+	}
+	tests := []struct {
+		name, stream, content string
+		stalls                int
+		steps, resumed        []readertest.ScriptStep
+		bytes                 int
+	}{
+		{
+			name:    "in the middle of a partial line",
+			stream:  "all",
+			stalls:  2,
+			steps:   []readertest.ScriptStep{cri("stdout P", "a"), cri("stdout P", "b"), readertest.WouldBlockStep, readertest.WouldBlockStep},
+			resumed: []readertest.ScriptStep{cri("stdout P", "c"), cri("stdout F", "d")},
+			content: "abcd",
+			bytes:   4 * (len(criTS+" stdout P a") + 1),
+		},
+		{
+			name:    "after skipped lines",
+			stream:  "stdout",
+			stalls:  1,
+			steps:   []readertest.ScriptStep{readertest.LineStep("not a log line"), cri("stderr F", "filtered out"), readertest.WouldBlockStep},
+			resumed: []readertest.ScriptStep{cri("stdout F", "kept")},
+			content: "kept",
+			bytes:   len("not a log line") + 1 + len(criTS+" stderr F filtered out") + 1 + len(criTS+" stdout F kept") + 1,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			src := readertest.NewScriptedReader(tc.steps...)
+			p := New(src, tc.stream, true, "cri", true, 0, logp.NewNopLogger())
+			for i := range tc.stalls {
+				msg, err := p.Next()
+				require.ErrorIs(t, err, reader.ErrWouldBlock, "stall %d", i)
+				assert.True(t, msg.IsEmpty(), "stall %d: no message may be returned", i)
+				assert.Zero(t, msg.Bytes, "stall %d: bytes must be zero", i)
+			}
+			src.Push(tc.resumed...)
+			msg, err := p.Next()
+			require.NoError(t, err, "resumed read")
+			assert.Equal(t, tc.content, string(msg.Content), "joined content")
+			assert.Equal(t, tc.bytes, msg.Bytes, "all bytes consumed since last message")
+		})
+	}
+}
