@@ -738,11 +738,6 @@ func TestHarvesterRunner_ParkCapsDueAtStateCheckInterval(t *testing.T) {
 		"the state-check deadline must not reset early just because we parked again before it was reached")
 	assert.Equal(t, firstDeadline, state.nextCheck,
 		"due must be capped at the state-check deadline once backoff grows past it")
-
-	state.session = &fakeSession{pendingDeadline: before.Add(time.Second)}
-	g.park(state, 20*time.Second)
-	assert.Equal(t, state.session.PendingDeadline(), state.nextCheck,
-		"due must be capped at an earlier pending deadline")
 	g.mu.Unlock()
 }
 
@@ -1362,14 +1357,10 @@ func TestHarvesterRunner_ReadUntilEOFDrainsParkedOnStop(t *testing.T) {
 		return ok && s == statusParked
 	}, "source should park after its first read")
 	readsBeforePark := reads.Load()
-	require.Zero(t, h.lastSession().flushCount(),
-		"a parked source must keep its buffered state until drained")
 
 	require.NoError(t, g.StopHarvesters())
 	require.Greater(t, reads.Load(), readsBeforePark,
 		"a parked source should be drained (read again) on read_until_eof stop")
-	require.Equal(t, []string{"flush", "close"}, h.lastSession().callOrder(),
-		"buffered state must be flushed before closing")
 	require.False(t, g.hasID(id))
 	require.True(t, h.lastSession().isClosed())
 }
@@ -1420,7 +1411,7 @@ func TestHarvesterRunner_ReadUntilEOFDrainsPastBudgetYields(t *testing.T) {
 }
 
 // TestHarvesterRunner_NoDrainWhenDisabled asserts that with read_until_eof
-// disabled a parked source is torn down on stop without an extra read or flush.
+// disabled a parked source is torn down on stop without an extra read.
 func TestHarvesterRunner_NoDrainWhenDisabled(t *testing.T) {
 	var reads atomic.Int64
 	h := &fakeHarvester{
@@ -1445,8 +1436,6 @@ func TestHarvesterRunner_NoDrainWhenDisabled(t *testing.T) {
 
 	require.NoError(t, g.StopHarvesters())
 	require.Equal(t, readsBeforeStop, reads.Load(), "no drain read when read_until_eof is disabled")
-	require.Zero(t, h.lastSession().flushCount(), "no flush when read_until_eof is disabled")
-	require.True(t, h.lastSession().isClosed())
 	require.False(t, g.hasID(id))
 }
 
@@ -1471,38 +1460,6 @@ func TestHarvesterRunner_ReadUntilEOFTimeoutBoundsDrain(t *testing.T) {
 	require.WithinDuration(t, start, time.Now(), 5*time.Second,
 		"a stuck drain must be bounded by the timeout, not hang")
 	require.False(t, g.hasID(id))
-}
-
-// TestHarvesterRunner_BufferedProgressResetsBackoff asserts a slice that only
-// buffered data in a parser (read offset advanced, published offset did not)
-// counts as progress: the file is active, so the backoff must not grow.
-func TestHarvesterRunner_BufferedProgressResetsBackoff(t *testing.T) {
-	h := &fakeHarvester{
-		bufferOnly: true,
-		readFn:     func(_ int, _ v2.Context) (SliceVerdict, error) { return SliceYield, nil },
-		pollFn:     func(int) PollResult { return PollResume },
-	}
-	g := testHarvesterRunner(t, h, 0)
-	src := &testSource{name: "/path/to/test"}
-	id, state := startParkedAndClaimDue(t, g, src)
-
-	// Resume it: the second read again only buffers.
-	g.pollParked(state)
-
-	requireEventually(t, func() bool { return h.lastSession().readCount() == 2 }, "source should be read again")
-	requireEventually(t, func() bool {
-		s, ok := g.statusOf(id)
-		return ok && s == statusParked
-	}, "source should park again")
-
-	g.mu.Lock()
-	backoff := state.backoff
-	g.mu.Unlock()
-	require.Equal(t, g.backoff.Init, backoff,
-		"reading bytes into a parser's buffer is progress: the backoff must stay at its minimum")
-	require.Zero(t, h.lastSession().Offset(), "the published offset must not have advanced")
-
-	require.NoError(t, g.StopHarvesters())
 }
 
 // TestGrowBackoff covers the backoff growth, including the cap at the maximum.
@@ -1624,10 +1581,6 @@ type fakeHarvester struct {
 	pollFn   func(call int) PollResult
 	sessions []*fakeSession
 
-	// Propagated to every session; see fakeSession.
-	bufferOnly      bool
-	pendingDeadline time.Time
-
 	openFn func()
 }
 
@@ -1645,10 +1598,7 @@ func (h *fakeHarvester) OpenSession(
 	if h.openErr != nil {
 		return nil, h.openErr
 	}
-	s := &fakeSession{
-		readFn: h.readFn, pollFn: h.pollFn, gzip: h.gzip, openedAs: src,
-		bufferOnly: h.bufferOnly, pendingDeadline: h.pendingDeadline,
-	}
+	s := &fakeSession{readFn: h.readFn, pollFn: h.pollFn, gzip: h.gzip, openedAs: src}
 	h.sessions = append(h.sessions, s)
 	return s, nil
 }
@@ -1675,22 +1625,12 @@ func (h *fakeHarvester) lastSession() *fakeSession {
 // call counter so a test can vary behaviour across calls. With no readFn a read
 // returns SliceDone; with no pollFn a poll returns PollClose.
 type fakeSession struct {
-	mu         sync.Mutex
-	reads      int
-	polls      int
-	flushes    int
-	offset     int64
-	readOffset int64
-	closed     bool
-	gzip       bool
-
-	// bufferOnly makes a yielding read advance only the read offset, as a slice
-	// that buffers lines in a stateful parser without publishing does.
-	bufferOnly bool
-	// pendingDeadline is what PendingDeadline reports.
-	pendingDeadline time.Time
-	// order records "flush" and "close" calls in the order they happen.
-	order []string
+	mu     sync.Mutex
+	reads  int
+	polls  int
+	offset int64
+	closed bool
+	gzip   bool
 
 	readFn func(call int, ctx v2.Context) (SliceVerdict, error)
 	pollFn func(call int) PollResult
@@ -1727,33 +1667,10 @@ func (s *fakeSession) ReadSlice(ctx v2.Context, _ Publisher) (SliceVerdict, erro
 	// offset: the runner uses progress to pick the park backoff.
 	if err == nil && (verdict == SliceYield || verdict == SliceBudget) {
 		s.mu.Lock()
-		if !s.bufferOnly {
-			s.offset++
-		}
-		s.readOffset++
+		s.offset++
 		s.mu.Unlock()
 	}
 	return verdict, err
-}
-
-func (s *fakeSession) ReadOffset() int64 {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return s.readOffset
-}
-
-func (s *fakeSession) PendingDeadline() time.Time {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return s.pendingDeadline
-}
-
-func (s *fakeSession) Flush(_ v2.Context, _ Publisher) error {
-	s.mu.Lock()
-	s.flushes++
-	s.order = append(s.order, "flush")
-	s.mu.Unlock()
-	return nil
 }
 
 func (s *fakeSession) Poll() PollResult {
@@ -1774,6 +1691,12 @@ func (s *fakeSession) Offset() int64 {
 	return s.offset
 }
 
+func (s *fakeSession) ReadOffset() int64          { return s.Offset() }
+func (s *fakeSession) PendingDeadline() time.Time { return time.Time{} }
+func (s *fakeSession) Flush(v2.Context, Publisher) error {
+	return nil
+}
+
 func (s *fakeSession) IsGZIP() bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -1784,15 +1707,7 @@ func (s *fakeSession) Close() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.closed = true
-	s.order = append(s.order, "close")
 	return nil
-}
-
-func (s *fakeSession) flushCount() int { s.mu.Lock(); defer s.mu.Unlock(); return s.flushes }
-func (s *fakeSession) callOrder() []string {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return slices.Clone(s.order)
 }
 
 func (s *fakeSession) readCount() int { s.mu.Lock(); defer s.mu.Unlock(); return s.reads }

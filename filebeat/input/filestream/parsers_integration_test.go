@@ -750,6 +750,20 @@ func TestParsersMultilineAppendedWhileParked(t *testing.T) {
 	require.Equal(t, []string{want}, env.getOutputMessages(),
 		"the lines must be published as one multiline event")
 
+	// Append a second incomplete event and shut down before multiline.timeout:
+	// read_until_eof must drain and flush the buffered lines on stop.
+	const shutdownEvent = "[2015] before shutdown\n  trailing line\n"
+	total += len(shutdownEvent)
+	env.mustAppendToFile(testlogName, []byte(shutdownEvent))
+
 	cancelInput()
 	env.waitUntilInputStops()
+
+	env.requireOffsetInRegistry(testlogName, "fake-ID", total)
+	require.Equal(
+		t,
+		[]string{want, "[2015] before shutdown\n  trailing line"},
+		env.getOutputMessages(),
+		"shutting down must flush the incomplete multiline event",
+	)
 }
