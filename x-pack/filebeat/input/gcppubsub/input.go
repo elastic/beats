@@ -13,6 +13,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"path"
 	"sync"
 	"time"
 
@@ -327,7 +328,7 @@ func makeEvent(topicID string, msg *pubsub.Message) beat.Event {
 }
 
 func (in *pubsubInput) getOrCreateSubscription(ctx context.Context, client *pubsub.Client) (*pubsub.Subscriber, error) {
-	sub := fmt.Sprintf("projects/%s/subscriptions/%s", client.Project(), in.Subscription.Name)
+	sub := path.Join("projects", client.Project(), "subscriptions", in.Subscription.Name)
 	_, err := client.SubscriptionAdminClient.GetSubscription(ctx, &pubsubpb.GetSubscriptionRequest{
 		Subscription: sub,
 	})
@@ -344,7 +345,7 @@ func (in *pubsubInput) getOrCreateSubscription(ctx context.Context, client *pubs
 	if in.Subscription.Create {
 		sub, err := client.SubscriptionAdminClient.CreateSubscription(ctx, &pubsubpb.Subscription{
 			Name:  sub,
-			Topic: fmt.Sprintf("projects/%s/topics/%s", client.Project(), in.Topic),
+			Topic: path.Join("projects", client.Project(), "topics", in.Topic),
 		})
 		if err != nil {
 			return nil, fmt.Errorf("failed to create subscription: %w", err)

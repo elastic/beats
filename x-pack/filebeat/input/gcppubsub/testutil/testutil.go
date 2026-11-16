@@ -11,6 +11,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path"
 	"strconv"
 	"sync"
 	"testing"
@@ -93,7 +94,7 @@ func CreateTopic(t *testing.T, client *pubsub.Client) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	topic := fmt.Sprintf("projects/%s/topics/%s", client.Project(), emulatorTopic)
+	topic := path.Join("projects", client.Project(), "topics", emulatorTopic)
 
 	_, err := client.TopicAdminClient.GetTopic(ctx, &pubsubpb.GetTopicRequest{
 		Topic: topic,
@@ -119,7 +120,7 @@ func CreateSubscription(t *testing.T, subscription string, client *pubsub.Client
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	sub := fmt.Sprintf("projects/%s/subscriptions/%s", client.Project(), subscription)
+	sub := path.Join("projects", client.Project(), "subscriptions", subscription)
 
 	_, err := client.SubscriptionAdminClient.GetSubscription(ctx, &pubsubpb.GetSubscriptionRequest{
 		Subscription: sub,
@@ -134,7 +135,7 @@ func CreateSubscription(t *testing.T, subscription string, client *pubsub.Client
 
 	pbSub, err := client.SubscriptionAdminClient.CreateSubscription(ctx, &pubsubpb.Subscription{
 		Name:  sub,
-		Topic: fmt.Sprintf("projects/%s/topics/%s", client.Project(), emulatorTopic),
+		Topic: path.Join("projects", client.Project(), "topics", emulatorTopic),
 	})
 	if err != nil {
 		t.Fatalf("failed to create subscription: %v", err)
@@ -170,7 +171,7 @@ func resetPubSub(t *testing.T, client *pubsub.Client) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	proj := fmt.Sprintf("projects/%s", client.Project())
+	proj := path.Join("projects/", client.Project())
 
 	// Clear topics.
 	topics := client.TopicAdminClient.ListTopics(ctx, &pubsubpb.ListTopicsRequest{
