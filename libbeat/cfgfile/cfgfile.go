@@ -102,7 +102,7 @@ func GetDefaultCfgfile() string {
 // flags.  This also stores if -E management.enabled=true was set on
 // command line to determine if running the Beat under agent.  It will
 // call Initialize() to register the flags like `-E`.
-func HandleFlags() error {
+func HandleFlags(logger *logp.Logger) error {
 	Initialize()
 	// default for the home path is the binary location
 	home, err := filepath.Abs(filepath.Dir(os.Args[0]))
@@ -117,7 +117,7 @@ func HandleFlags() error {
 	_ = defaults.SetString("path.home", -1, home)
 
 	if len(overwrites.GetFields()) > 0 {
-		common.PrintConfigDebugf(overwrites, "CLI setting overwrites (-E flag):")
+		common.PrintConfigDebugf(logger, overwrites, "CLI setting overwrites (-E flag):")
 	}
 
 	// Enable check to see if beat is running under Agent
@@ -149,7 +149,7 @@ func HandleFlags() error {
 // line flag.
 // This function cares about the underlying fleet setting, and if beats is running with
 // the management.enabled flag, Load() will bypass reading a config file, and merely merge any overrides.
-func Load(path string, beatOverrides []ConditionalOverride) (*config.C, error) {
+func Load(logger *logp.Logger, path string, beatOverrides []ConditionalOverride) (*config.C, error) {
 	var c *config.C
 	var err error
 
@@ -165,12 +165,12 @@ func Load(path string, beatOverrides []ConditionalOverride) (*config.C, error) {
 					list = append(list, cfg)
 				}
 			}
-			c, err = common.LoadFiles(list...)
+			c, err = common.LoadFiles(logger, list...)
 		} else {
 			if !filepath.IsAbs(path) {
 				path = filepath.Join(cfgpath, path)
 			}
-			c, err = common.LoadFile(path)
+			c, err = common.LoadFile(logger, path)
 		}
 		if err != nil {
 			return nil, err
@@ -208,14 +208,14 @@ func Load(path string, beatOverrides []ConditionalOverride) (*config.C, error) {
 		}
 	}
 
-	common.PrintConfigDebugf(c, "Complete configuration loaded:")
+	common.PrintConfigDebugf(logger, c, "Complete configuration loaded:")
 	return c, nil
 }
 
 // LoadList loads a list of configs data from the given file.
 func LoadList(file string, logger *logp.Logger) ([]*config.C, error) {
 	logger.Named("cfgfile").Debugf("Load config from file: %s", file)
-	rawConfig, err := common.LoadFile(file)
+	rawConfig, err := common.LoadFile(logger, file)
 	if err != nil {
 		return nil, fmt.Errorf("invalid config: %w", err)
 	}

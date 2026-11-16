@@ -811,7 +811,7 @@ var HostnameFlag string
 
 // handleFlags invokes the HandleFlags callback if implemented by the Beat.
 func (b *Beat) handleFlags() error {
-	return cfgfile.HandleFlags()
+	return cfgfile.HandleFlags(logp.NewLogger(""))
 }
 
 // ApplyHostname sets Info.Hostname and Info.FQDN to h and updates the process-wide
@@ -844,7 +844,7 @@ func (b *Beat) configure(settings Settings) error {
 
 	b.InputQueueSize = settings.InputQueueSize
 
-	cfg, err := cfgfile.Load("", settings.ConfigOverrides)
+	cfg, err := cfgfile.Load(logp.NewLogger(""), "", settings.ConfigOverrides)
 	if err != nil {
 		return fmt.Errorf("error loading config file: %w", err)
 	}

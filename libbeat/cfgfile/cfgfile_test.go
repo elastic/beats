@@ -28,6 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 type TestConfig struct {
@@ -54,7 +55,7 @@ func TestLoad(t *testing.T) {
 
 	config := &TestConfig{}
 
-	cfg, err := Load(absPath+"/config.yml", nil)
+	cfg, err := Load(logptest.NewTestingLogger(t, ""), absPath+"/config.yml", nil)
 	assert.NoError(t, err)
 
 	err = cfg.Unpack(config)
@@ -72,20 +73,20 @@ func TestManagementFlag(t *testing.T) {
 		Initialize()
 		flag.Set("E", "management.enabled=true")
 		flag.Parse()
-		HandleFlags()
+		HandleFlags(logptest.NewTestingLogger(t, ""))
 		assert.True(t, management.UnderAgent())
 	})
 	t.Run("management.enabled=false", func(t *testing.T) {
 		Initialize()
 		flag.Set("E", "management.enabled=false")
 		flag.Parse()
-		HandleFlags()
+		HandleFlags(logptest.NewTestingLogger(t, ""))
 		assert.False(t, management.UnderAgent())
 	})
 	t.Run("management.enabled not set", func(t *testing.T) {
 		Initialize()
 		flag.Parse()
-		HandleFlags()
+		HandleFlags(logptest.NewTestingLogger(t, ""))
 		assert.False(t, management.UnderAgent())
 	})
 }
