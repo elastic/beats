@@ -21,11 +21,13 @@ type watcher struct {
 	ticker      *time.Ticker
 	period      time.Duration
 	lbListeners map[string]uint64
+	logger      *logp.Logger
 }
 
 func newWatcher(
 	fetcher fetcher,
 	period time.Duration,
+	logger *logp.Logger,
 	onStart func(uuid string, lblMap *lbListener),
 	onStop func(uuid string)) *watcher {
 	return &watcher{
@@ -36,6 +38,7 @@ func newWatcher(
 		ticker:      time.NewTicker(period),
 		period:      period,
 		lbListeners: map[string]uint64{},
+		logger:      logger.Named("autodiscover-elb-listeners"),
 	}
 }
 
@@ -56,7 +59,7 @@ func (w *watcher) forever() {
 		case <-w.ticker.C:
 			err := w.once()
 			if err != nil {
-				logp.Err("error while fetching AWS ELBs: %s", err)
+				w.logger.Error("error while fetching AWS ELBs: %s", err)
 			}
 		}
 	}
@@ -72,7 +75,7 @@ func (w *watcher) once() error {
 	if err != nil {
 		return err
 	}
-	logp.Debug("autodiscover-elb-listeners", "fetched %d load balancer listeners from AWS for autodiscovery", len(fetchedLbls))
+	w.logger.Debug("fetched %d load balancer listeners from AWS for autodiscovery", len(fetchedLbls))
 
 	oldGen := w.gen
 	w.gen++

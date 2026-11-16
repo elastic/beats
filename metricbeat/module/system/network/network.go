@@ -32,8 +32,6 @@ import (
 	"github.com/shirou/gopsutil/v4/net"
 )
 
-var debugf = logp.MakeDebug("system-network")
-
 func init() {
 	mb.Registry.MustAddMetricSet("system", "network", New,
 		mb.WithHostParser(parse.EmptyHostParser),

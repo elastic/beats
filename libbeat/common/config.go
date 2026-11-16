@@ -54,25 +54,21 @@ const (
 	selectorConfigWithPassword = "config-with-passwords"
 )
 
-// make hasSelector and configDebugf available for unit testing
-var hasSelector = logp.HasSelector
-var configDebugf = logp.Debug
-
 func PrintConfigDebugf(c *config.C, msg string, params ...any) {
 	selector := selectorConfigWithPassword
 	filtered := false
-	if !hasSelector(selector) {
+	if !logp.HasSelector(selector) {
 		selector = selectorConfig
 		filtered = true
 
-		if !hasSelector(selector) {
+		if !logp.HasSelector(selector) {
 			return
 		}
 	}
 
 	debugStr := config.DebugString(c, filtered)
 	if debugStr != "" {
-		configDebugf(selector, "%s\n%s", fmt.Sprintf(msg, params...), debugStr)
+		logp.Debug(selector, "%s\n%s", fmt.Sprintf(msg, params...), debugStr)
 	}
 }
 

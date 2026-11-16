@@ -70,7 +70,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch fetches filesystem metrics for all mounted filesystems and returns
 // a single event containing aggregated data.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	fsList, err := fs.GetFilesystems(m.sys, fs.BuildFilterWithList(m.config.IgnoreTypes))
+	fsList, err := fs.GetFilesystems(m.Logger(), m.sys, fs.BuildFilterWithList(m.config.IgnoreTypes))
 	if err != nil {
 		return fmt.Errorf("error fetching filesystem list: %w", err)
 	}

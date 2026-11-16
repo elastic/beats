@@ -39,22 +39,22 @@ type Matchers struct {
 }
 
 // MatcherConstructor builds a new Matcher from its settings
-type MatcherConstructor func(config conf.C, log *logp.Logger) (Matcher, error)
+type MatcherConstructor func(config conf.C, logger *logp.Logger) (Matcher, error)
 
 // NewMatchers builds a Matchers object from its configurations
-func NewMatchers(configs PluginConfig, log *logp.Logger) *Matchers {
+func NewMatchers(configs PluginConfig, logger *logp.Logger) *Matchers {
 	matchers := []Matcher{}
 	for _, pluginConfigs := range configs {
 		for name, pluginConfig := range pluginConfigs {
 			matchFunc := Indexing.GetMatcher(name)
 			if matchFunc == nil {
-				logp.Warn("Unable to find matcher plugin %s", name)
+				logger.Warn("Unable to find matcher plugin %s", name)
 				continue
 			}
 
-			matcher, err := matchFunc(pluginConfig, log)
+			matcher, err := matchFunc(pluginConfig, logger)
 			if err != nil {
-				logp.Warn("Unable to initialize matcher plugin %s due to error %v", name, err)
+				logger.Warn("Unable to initialize matcher plugin %s due to error %v", name, err)
 				continue
 			}
 

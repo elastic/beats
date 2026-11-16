@@ -25,23 +25,6 @@ import (
 	"go.uber.org/zap"
 )
 
-// MakeDebug returns a function that logs at debug level.
-// Deprecated: Use logp.NewLogger.
-func MakeDebug(selector string) func(string, ...any) {
-	return func(format string, v ...any) {
-		log := globalLogger().Named(selector)
-		if log.Core().Enabled(zap.DebugLevel) {
-			log.Debug(fmt.Sprintf(format, v...))
-		}
-	}
-}
-
-// IsDebug returns true if the given selector would be logged.
-// Deprecated: Use logp.NewLogger.
-func IsDebug(selector string) bool {
-	return globalLogger().Named(selector).Check(zap.DebugLevel, "") != nil
-}
-
 // Debug uses fmt.Sprintf to construct and log a message.
 // Deprecated: Use logp.NewLogger.
 func Debug(selector string, format string, v ...any) {

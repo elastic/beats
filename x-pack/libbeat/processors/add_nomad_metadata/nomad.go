@@ -79,7 +79,7 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 		return nil, err
 	}
 
-	indexers := NewIndexers(config.Indexers, metaGen)
+	indexers := NewIndexers(config.Indexers, metaGen, log)
 	matchers := NewMatchers(config.Matchers, log)
 
 	log.Named("nomad").Debugf("Using node: %s", config.Node)

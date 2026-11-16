@@ -78,7 +78,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/schema"
-	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
@@ -114,7 +113,6 @@ func (convMap ConvMap) Map(key string, event mapstr.M, data map[string]any) []er
 	default:
 		msg := fmt.Sprintf("expected dictionary, found %T", subData)
 		err := schema.NewWrongFormatError(convMap.Key, msg)
-		logp.Err("%s", err.Error())
 		return []error{err}
 	}
 }

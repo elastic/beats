@@ -81,7 +81,7 @@ func NewFileHasherWithCache(c Config, size int, logger *logp.Logger) (*CachedHas
 // and refreshed.
 func (ch *CachedHasher) HashFile(path string) (map[HashType]Digest, error) {
 	var x time.Time
-	if logp.IsDebug("cached_hasher") {
+	if ch.log.IsDebug() {
 		x = time.Now()
 	}
 

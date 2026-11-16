@@ -42,6 +42,7 @@ import (
 )
 
 type testParser struct {
+	t        testing.TB
 	payloads []string
 	http     *httpPlugin
 	stream   *stream
@@ -62,11 +63,12 @@ func (e *eventStore) publish(event beat.Event) {
 	e.events = append(e.events, event)
 }
 
-func newTestParser(http *httpPlugin, payloads ...string) *testParser {
+func newTestParser(t testing.TB, http *httpPlugin, payloads ...string) *testParser {
 	if http == nil {
-		http = httpModForTests(nil)
+		http = httpModForTests(t, nil)
 	}
 	tp := &testParser{
+		t:        t,
 		http:     http,
 		payloads: payloads,
 		stream:   &stream{data: []byte{}, message: new(message)},
@@ -81,26 +83,26 @@ func (tp *testParser) parse() (*message, bool, bool) {
 		tp.payloads = tp.payloads[1:]
 	}
 
-	parser := newParserForTest(&tp.http.parserConfig, logp.NewNopLogger())
+	parser := newParserForTest(&tp.http.parserConfig, logptest.NewTestingLogger(tp.t, ""))
 	ok, complete := parser.parse(st, 0)
 	return st.message, ok, complete
 }
 
-func httpModForTests(store *eventStore) *httpPlugin {
+func httpModForTests(t testing.TB, store *eventStore) *httpPlugin {
 	callback := func(beat.Event) {}
 	if store != nil {
 		callback = store.publish
 	}
 
-	http, err := New(false, callback, &procs.ProcessesWatcher{}, conf.NewConfig(), logp.NewNopLogger())
+	http, err := New(false, callback, &procs.ProcessesWatcher{}, conf.NewConfig(), logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		panic(err)
 	}
 	return http.(*httpPlugin)
 }
 
-func testParse(http *httpPlugin, data string) (*message, bool, bool) {
-	tp := newTestParser(http, data)
+func testParse(t *testing.T, http *httpPlugin, data string) (*message, bool, bool) {
+	tp := newTestParser(t, http, data)
 	return tp.parse()
 }
 
@@ -121,7 +123,7 @@ func TestHttpParser_simpleResponse(t *testing.T) {
 		"X-XSS-Protection: 1; mode=block\r\n" +
 		"X-Frame-Options: SAMEORIGIN\r\n" +
 		"\r\n"
-	message, ok, complete := testParse(nil, data)
+	message, ok, complete := testParse(t, nil, data)
 
 	assert.True(t, ok)
 	assert.True(t, complete)
@@ -145,7 +147,7 @@ func TestHttpParser_simpleResponseCaseInsensitive(t *testing.T) {
 		"X-XSS-Protection: 1; mode=block\r\n" +
 		"X-Frame-Options: SAMEORIGIN\r\n" +
 		"\r\n"
-	message, ok, complete := testParse(nil, data)
+	message, ok, complete := testParse(t, nil, data)
 
 	assert.True(t, ok)
 	assert.True(t, complete)
@@ -158,7 +160,7 @@ func TestHttpParser_simpleResponseCaseInsensitive(t *testing.T) {
 }
 
 func TestHttpParser_simpleRequest(t *testing.T) {
-	http := httpModForTests(nil)
+	http := httpModForTests(t, nil)
 	http.parserConfig.sendHeaders = true
 	http.parserConfig.sendAllHeaders = true
 
@@ -176,7 +178,7 @@ func TestHttpParser_simpleRequest(t *testing.T) {
 		"\r\n" +
 		"garbage"
 
-	message, ok, complete := testParse(http, data)
+	message, ok, complete := testParse(t, http, data)
 
 	assert.True(t, ok)
 	assert.True(t, complete)
@@ -189,7 +191,7 @@ func TestHttpParser_simpleRequest(t *testing.T) {
 }
 
 func TestHttpParser_Request_ContentLength_0(t *testing.T) {
-	http := httpModForTests(nil)
+	http := httpModForTests(t, nil)
 	http.parserConfig.sendHeaders = true
 	http.parserConfig.sendAllHeaders = true
 
@@ -201,15 +203,13 @@ func TestHttpParser_Request_ContentLength_0(t *testing.T) {
 		"connection: close\r\n" +
 		"\r\n"
 
-	_, ok, complete := testParse(http, data)
+	_, ok, complete := testParse(t, http, data)
 	assert.True(t, ok)
 	assert.True(t, complete)
 }
 
 func TestHttpParser_eatBody(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("http", "httpdetailed"))
-
-	http := httpModForTests(nil)
+	http := httpModForTests(t, nil)
 	http.parserConfig.sendHeaders = true
 	http.parserConfig.sendAllHeaders = true
 
@@ -241,9 +241,7 @@ func TestHttpParser_eatBody(t *testing.T) {
 }
 
 func TestHttpParser_eatBody_connclose(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("http", "httpdetailed"))
-
-	http := httpModForTests(nil)
+	http := httpModForTests(t, nil)
 	http.parserConfig.sendHeaders = true
 	http.parserConfig.sendAllHeaders = true
 
@@ -285,7 +283,7 @@ func TestHttpParser_splitResponse(t *testing.T) {
 		"X-XSS-Protection: 1; mode=block\r\n" +
 		"X-Frame-Options: SAMEORIGIN\r\n" +
 		"\r\n"
-	tp := newTestParser(nil, data1, data2)
+	tp := newTestParser(t, nil, data1, data2)
 
 	_, ok, complete := tp.parse()
 	assert.True(t, ok)
@@ -297,7 +295,7 @@ func TestHttpParser_splitResponse(t *testing.T) {
 }
 
 func TestHttpParser_splitResponse_midHeaderName(t *testing.T) {
-	http := httpModForTests(nil)
+	http := httpModForTests(t, nil)
 	http.parserConfig.sendHeaders = true
 	http.parserConfig.sendAllHeaders = true
 
@@ -313,7 +311,7 @@ func TestHttpParser_splitResponse_midHeaderName(t *testing.T) {
 		"X-XSS-Protection: 1; mode=block\r\n" +
 		"X-Frame-Options: SAMEORIGIN\r\n" +
 		"\r\n"
-	tp := newTestParser(http, data1, data2)
+	tp := newTestParser(t, http, data1, data2)
 
 	_, ok, complete := tp.parse()
 	assert.True(t, ok)
@@ -343,7 +341,7 @@ func TestHttpParser_splitResponse_midHeaderValue(t *testing.T) {
 		"X-XSS-Protection: 1; mode=block\r\n" +
 		"X-Frame-Options: SAMEORIGIN\r\n" +
 		"\r\n"
-	tp := newTestParser(nil, data1, data2)
+	tp := newTestParser(t, nil, data1, data2)
 
 	_, ok, complete := tp.parse()
 	assert.True(t, ok)
@@ -367,7 +365,7 @@ func TestHttpParser_splitResponse_midNewLine(t *testing.T) {
 		"X-XSS-Protection: 1; mode=block\r\n" +
 		"X-Frame-Options: SAMEORIGIN\r\n" +
 		"\r\n"
-	tp := newTestParser(nil, data1, data2)
+	tp := newTestParser(t, nil, data1, data2)
 
 	_, ok, complete := tp.parse()
 	assert.True(t, ok)
@@ -392,7 +390,7 @@ func TestHttpParser_ResponseWithBody(t *testing.T) {
 		"\r\n" +
 		"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" +
 		"garbage"
-	tp := newTestParser(nil, data)
+	tp := newTestParser(t, nil, data)
 
 	message, ok, complete := tp.parse()
 	assert.True(t, ok)
@@ -410,7 +408,7 @@ func TestHttpParser_Response_HTTP_10_without_content_length(t *testing.T) {
 		"\r\n" +
 		"test"
 
-	message, ok, complete := testParse(nil, data)
+	message, ok, complete := testParse(t, nil, data)
 	assert.True(t, ok)
 	assert.False(t, complete)
 	assert.Equal(t, 4, message.contentLength)
@@ -426,7 +424,7 @@ func TestHttpParser_Response_without_phrase(t *testing.T) {
 		{true, true, 301, "HTTP/1.1 301\r\nContent-Length: 0\r\n\r\n"},
 	} {
 		msg := fmt.Sprintf("failed test case[%d]: \"%s\"", idx, testCase.request)
-		r, ok, complete := testParse(nil, testCase.request)
+		r, ok, complete := testParse(t, nil, testCase.request)
 		assert.Equal(t, testCase.ok, ok, msg)
 		assert.Equal(t, testCase.complete, complete, msg)
 		assert.Equal(t, testCase.code, int(r.statusCode), msg)
@@ -449,7 +447,7 @@ func TestHttpParser_splitResponse_midBody(t *testing.T) {
 		"\r\n" +
 		"xxxxxxxxxx"
 	data3 := "xxxxxxxxxxxxxxxxxxxx"
-	tp := newTestParser(nil, data1, data2, data3)
+	tp := newTestParser(t, nil, data1, data2, data3)
 
 	_, ok, complete := tp.parse()
 	assert.True(t, ok)
@@ -467,8 +465,6 @@ func TestHttpParser_splitResponse_midBody(t *testing.T) {
 }
 
 func TestHttpParser_RequestResponse(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("http", "httpdetailed"))
-
 	data := "GET / HTTP/1.1\r\n" +
 		"Host: www.google.ro\r\n" +
 		"Connection: keep-alive\r\n" +
@@ -493,7 +489,7 @@ func TestHttpParser_RequestResponse(t *testing.T) {
 		"X-Frame-Options: SAMEORIGIN\r\n" +
 		"\r\n"
 
-	tp := newTestParser(nil, data)
+	tp := newTestParser(t, nil, data)
 	_, ok, complete := tp.parse()
 	assert.True(t, ok)
 	assert.True(t, complete)
@@ -532,7 +528,7 @@ func TestHttpParser_RequestResponseBody(t *testing.T) {
 		"X-Frame-Options: SAMEORIGIN\r\n" +
 		"\r\n"
 	data := data1 + data2
-	tp := newTestParser(nil, data)
+	tp := newTestParser(t, nil, data)
 	msg, ok, complete := tp.parse()
 	assert.True(t, ok)
 	assert.True(t, complete)
@@ -567,14 +563,13 @@ func TestHttpParser_301_response(t *testing.T) {
 		"<address>Apache Server at hotnews.ro Port 80</address>\r\n" +
 		"</body></html>"
 
-	msg, ok, complete := testParse(nil, data)
+	msg, ok, complete := testParse(t, nil, data)
 	assert.True(t, ok)
 	assert.True(t, complete)
 	assert.Equal(t, 290, msg.contentLength)
 }
 
 func TestHttpParser_PhraseContainsSpaces(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("http"))
 	response_404 := "HTTP/1.1 404 Not Found\r\n" +
 		"Server: Apache-Coyote/1.1\r\n" +
 		"Content-Type: text/html;charset=utf-8\r\n" +
@@ -583,7 +578,7 @@ func TestHttpParser_PhraseContainsSpaces(t *testing.T) {
 		"\r\n" +
 		"Http Response Body"
 
-	r, ok, complete := testParse(nil, response_404)
+	r, ok, complete := testParse(t, nil, response_404)
 	assert.True(t, ok)
 	assert.True(t, complete)
 	assert.Equal(t, 18, r.contentLength)
@@ -597,7 +592,7 @@ func TestHttpParser_PhraseContainsSpaces(t *testing.T) {
 		"Date: Mon, 30 Jul 2017 00:00:00 GMT\r\n" +
 		"\r\n" +
 		"xx"
-	r, ok, complete = testParse(nil, response_500)
+	r, ok, complete = testParse(t, nil, response_500)
 	assert.True(t, ok)
 	assert.True(t, complete)
 	assert.Equal(t, 2, r.contentLength)
@@ -611,7 +606,7 @@ func TestHttpParser_PhraseContainsSpaces(t *testing.T) {
 		"Date: Mon, 30 Jul 2017 00:00:00 GMT\r\n" +
 		"\r\n" +
 		"xx"
-	r, ok, complete = testParse(nil, broken)
+	r, ok, complete = testParse(t, nil, broken)
 	assert.True(t, ok)
 	assert.True(t, complete)
 	assert.Equal(t, 2, r.contentLength)
@@ -691,7 +686,7 @@ func TestEatBodyChunked(t *testing.T) {
 }
 
 func TestEatBodyChunkedWaitCRLF(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("http", "httpdetailed"))
+	logger := logptest.NewTestingLogger(t, "")
 
 	msgs := [][]byte{
 		[]byte("03\r\n123\r\n0\r\n\r"),
@@ -707,7 +702,7 @@ func TestEatBodyChunkedWaitCRLF(t *testing.T) {
 		chunkedLength: 5,
 		contentLength: 0,
 	}
-	parser := newParserForTest(&testParserConfig, logptest.NewTestingLogger(t, ""))
+	parser := newParserForTest(&testParserConfig, logger)
 
 	cont, ok, complete := parser.parseBodyChunkedStart(st, msg)
 	if cont != true || ok != true || complete != false {
@@ -733,7 +728,7 @@ func TestEatBodyChunkedWaitCRLF(t *testing.T) {
 		t.Error("Unexpected state", st.parseState)
 	}
 
-	logp.Debug("http", "parseOffset: %d", st.parseOffset)
+	logger.Named("http").Debug("parseOffset: %d", st.parseOffset)
 
 	ok, complete = parser.parseBodyChunkedWaitFinalCRLF(st, msg)
 	if ok != true || complete != false {
@@ -759,9 +754,7 @@ func TestParseBodyChunkedStartNegativeLength(t *testing.T) {
 }
 
 func TestHttpParser_requestURIWithSpace(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("http", "httpdetailed"))
-
-	http := httpModForTests(nil)
+	http := httpModForTests(t, nil)
 	http.hideKeywords = []string{"password", "pass"}
 	http.parserConfig.sendHeaders = true
 	http.parserConfig.sendAllHeaders = true
@@ -782,7 +775,7 @@ func TestHttpParser_requestURIWithSpace(t *testing.T) {
 		"Cookie: PREF=ID=6b67d166417efec4:U=69097d4080ae0e15:FF=0:TM=1340891937:LM=1340891938:S=8t97UBiUwKbESvVX; NID=61=sf10OV-t02wu5PXrc09AhGagFrhSAB2C_98ZaI53-uH4jGiVG_yz9WmE3vjEBcmJyWUogB1ZF5puyDIIiB-UIdLd4OEgPR3x1LHNyuGmEDaNbQ_XaxWQqqQ59mX1qgLQ\r\n" +
 		"\r\n" +
 		"username=ME&pass=twosecret"
-	tp := newTestParser(http, data1)
+	tp := newTestParser(t, http, data1)
 
 	msg, ok, complete := tp.parse()
 	assert.True(t, ok)
@@ -795,9 +788,7 @@ func TestHttpParser_requestURIWithSpace(t *testing.T) {
 }
 
 func TestHttpParser_censorPasswordURL(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("http", "httpdetailed"))
-
-	http := httpModForTests(nil)
+	http := httpModForTests(t, nil)
 	http.hideKeywords = []string{"password", "pass"}
 	http.parserConfig.sendHeaders = true
 	http.parserConfig.sendAllHeaders = true
@@ -817,7 +808,7 @@ func TestHttpParser_censorPasswordURL(t *testing.T) {
 		"Cookie: PREF=ID=6b67d166417efec4:U=69097d4080ae0e15:FF=0:TM=1340891937:LM=1340891938:S=8t97UBiUwKbESvVX; NID=61=sf10OV-t02wu5PXrc09AhGagFrhSAB2C_98ZaI53-uH4jGiVG_yz9WmE3vjEBcmJyWUogB1ZF5puyDIIiB-UIdLd4OEgPR3x1LHNyuGmEDaNbQ_XaxWQqqQ59mX1qgLQ\r\n" +
 		"\r\n" +
 		"username=ME&pass=secret"
-	tp := newTestParser(http, data1)
+	tp := newTestParser(t, http, data1)
 
 	msg, ok, complete := tp.parse()
 	assert.True(t, ok)
@@ -829,9 +820,7 @@ func TestHttpParser_censorPasswordURL(t *testing.T) {
 }
 
 func TestHttpParser_censorPasswordPOST(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("http", "httpdetailed"))
-
-	http := httpModForTests(nil)
+	http := httpModForTests(t, nil)
 	http.hideKeywords = []string{"password"}
 	http.parserConfig.sendHeaders = true
 	http.parserConfig.sendAllHeaders = true
@@ -842,7 +831,7 @@ func TestHttpParser_censorPasswordPOST(t *testing.T) {
 		"Content-Length: 28\r\n" +
 		"\r\n" +
 		"username=ME&password=secret\r\n"
-	tp := newTestParser(http, data1)
+	tp := newTestParser(t, http, data1)
 
 	msg, ok, complete := tp.parse()
 	assert.True(t, ok)
@@ -856,9 +845,7 @@ func TestHttpParser_censorPasswordPOST(t *testing.T) {
 }
 
 func TestHttpParser_censorPasswordGET(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("http", "httpdetailed"))
-
-	http := httpModForTests(nil)
+	http := httpModForTests(t, nil)
 	http.hideKeywords = []string{"password"}
 	http.parserConfig.sendHeaders = true
 	http.parserConfig.sendAllHeaders = true
@@ -887,7 +874,7 @@ func TestHttpParser_censorPasswordGET(t *testing.T) {
 	if err != nil {
 		t.Errorf("Failed to parse parameters")
 	}
-	logp.Debug("httpdetailed", "parameters %s", params)
+	logptest.NewTestingLogger(t, "httpdetailed").Debug("parameters %s", params)
 
 	if path != "/users/login" {
 		t.Errorf("Wrong path: %s", path)
@@ -899,7 +886,7 @@ func TestHttpParser_censorPasswordGET(t *testing.T) {
 }
 
 func TestHttp_hideKeywordsCaseInsensitive(t *testing.T) {
-	http := httpModForTests(nil)
+	http := httpModForTests(t, nil)
 	config := defaultConfig
 	config.HideKeywords = []string{"Password", "AUTH_Token"}
 	http.setFromConfig(&config)
@@ -923,9 +910,7 @@ func TestHttp_hideKeywordsCaseInsensitive(t *testing.T) {
 }
 
 func TestHttpParser_RedactAuthorization(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("http", "httpdetailed"))
-
-	http := httpModForTests(nil)
+	http := httpModForTests(t, nil)
 	http.redactAuthorization = true
 	http.parserConfig.sendHeaders = true
 	http.parserConfig.sendAllHeaders = true
@@ -965,9 +950,7 @@ func TestHttpParser_RedactAuthorization(t *testing.T) {
 }
 
 func TestExtractBasicAuthUser(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("http", "httpdetailed"))
-
-	http := httpModForTests(nil)
+	http := httpModForTests(t, nil)
 	http.parserConfig.sendHeaders = true
 	http.parserConfig.sendAllHeaders = true
 
@@ -995,7 +978,7 @@ func TestExtractBasicAuthUser(t *testing.T) {
 }
 
 func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
-	http := httpModForTests(nil)
+	http := httpModForTests(t, nil)
 	http.redactAuthorization = true
 	http.parserConfig.sendHeaders = false
 	http.parserConfig.sendAllHeaders = false
@@ -1030,7 +1013,7 @@ func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
 }
 
 func TestHttpParser_RedactAuthorization_Proxy_raw(t *testing.T) {
-	http := httpModForTests(nil)
+	http := httpModForTests(t, nil)
 	http.redactAuthorization = true
 	http.parserConfig.sendHeaders = false
 	http.parserConfig.sendAllHeaders = false
@@ -1065,9 +1048,7 @@ func TestHttpParser_RedactAuthorization_Proxy_raw(t *testing.T) {
 }
 
 func TestHttpParser_RedactHeaders(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("http", "httpdetailed"))
-
-	http := httpModForTests(nil)
+	http := httpModForTests(t, nil)
 	http.redactAuthorization = true
 	http.parserConfig.sendHeaders = true
 	http.parserConfig.sendAllHeaders = true
@@ -1180,7 +1161,7 @@ func Test_splitCookiesHeader(t *testing.T) {
 // If a TCP gap (lost packets) happen while we're waiting for
 // headers, drop the stream.
 func Test_gap_in_headers(t *testing.T) {
-	http := httpModForTests(nil)
+	http := httpModForTests(t, nil)
 
 	data1 := []byte("HTTP/1.1 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
@@ -1201,7 +1182,7 @@ func Test_gap_in_headers(t *testing.T) {
 // If a TCP gap (lost packets) happen while we're waiting for
 // parts of the body, it's ok.
 func Test_gap_in_body(t *testing.T) {
-	http := httpModForTests(nil)
+	http := httpModForTests(t, nil)
 
 	data1 := []byte("HTTP/1.1 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
@@ -1233,7 +1214,7 @@ func Test_gap_in_body(t *testing.T) {
 // If a TCP gap (lost packets) happen while we're waiting for
 // parts of the body, it's ok.
 func Test_gap_in_body_http1dot0(t *testing.T) {
-	http := httpModForTests(nil)
+	http := httpModForTests(t, nil)
 
 	data1 := []byte("HTTP/1.0 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
@@ -1264,10 +1245,10 @@ func TestHttpParser_composedHeaders(t *testing.T) {
 		"Set-Cookie: aCookie=yummy\r\n" +
 		"Set-Cookie: anotherCookie=why%20not\r\n" +
 		"\r\n"
-	http := httpModForTests(nil)
+	http := httpModForTests(t, nil)
 	http.parserConfig.sendHeaders = true
 	http.parserConfig.sendAllHeaders = true
-	message, ok, complete := testParse(http, data)
+	message, ok, complete := testParse(t, http, data)
 
 	assert.True(t, ok)
 	assert.True(t, complete)
@@ -1293,7 +1274,7 @@ func TestHttpParser_includeBodyFor(t *testing.T) {
 		"done.")
 
 	var store eventStore
-	http := httpModForTests(&store)
+	http := httpModForTests(t, &store)
 	http.parserConfig.includeRequestBodyFor = []string{"application/x-foo", "text/plain"}
 	http.parserConfig.includeResponseBodyFor = []string{"application/x-foo", "text/plain"}
 
@@ -1330,7 +1311,7 @@ func TestHttpParser_sendRequestResponse(t *testing.T) {
 	respWithBody := resp + "not found"
 
 	var store eventStore
-	http := httpModForTests(&store)
+	http := httpModForTests(t, &store)
 	http.sendRequest = true
 	http.sendResponse = true
 
@@ -1383,9 +1364,8 @@ func expectTransaction(t *testing.T, e *eventStore) mapstr.M {
 }
 
 func Test_gap_in_body_http1dot0_fin(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("http", "httpdetailed"))
 	var store eventStore
-	http := httpModForTests(&store)
+	http := httpModForTests(t, &store)
 
 	data1 := []byte("GET / HTTP/1.0\r\n\r\n")
 
@@ -1412,7 +1392,7 @@ func Test_gap_in_body_http1dot0_fin(t *testing.T) {
 
 	private = http.Parse(&resp, tcptuple, 1, private)
 
-	logp.Debug("http", "Now sending gap..")
+	logptest.NewTestingLogger(t, "http").Debug("Now sending gap..")
 
 	private, drop := http.GapInStream(tcptuple, 1, 10, private)
 	assert.Equal(t, false, drop)
@@ -1427,7 +1407,7 @@ func Test_gap_in_body_http1dot0_fin(t *testing.T) {
 }
 
 func TestHttp_configsSettingAll(t *testing.T) {
-	http := httpModForTests(nil)
+	http := httpModForTests(t, nil)
 	config := defaultConfig
 
 	// Assign config vars
@@ -1463,7 +1443,7 @@ func TestHttp_configsSettingAll(t *testing.T) {
 }
 
 func TestHttp_configsSettingHeaders(t *testing.T) {
-	http := httpModForTests(nil)
+	http := httpModForTests(t, nil)
 	config := defaultConfig
 
 	// Assign config vars
@@ -1494,7 +1474,7 @@ func TestHttp_includeBodies(t *testing.T) {
 		"\r\n" +
 		"done."
 	var store eventStore
-	http := httpModForTests(&store)
+	http := httpModForTests(t, &store)
 	config := defaultConfig
 	config.IncludeBodyFor = []string{"both"}
 	config.IncludeRequestBodyFor = []string{"req1", "req2"}
@@ -1557,7 +1537,7 @@ func TestHTTP_Encodings(t *testing.T) {
 	})
 
 	var store eventStore
-	http := httpModForTests(&store)
+	http := httpModForTests(t, &store)
 	config := defaultConfig
 	config.IncludeResponseBodyFor = []string{""}
 	http.setFromConfig(&config)
@@ -1737,7 +1717,7 @@ func TestHTTP_Decoding_disabled(t *testing.T) {
 	deflateBody := common.NetString{0xcb, 0xc8, 0xcf, 0x49, 0xe4, 0x02, 0x00}
 
 	var store eventStore
-	http := httpModForTests(&store)
+	http := httpModForTests(t, &store)
 	config := defaultConfig
 	config.IncludeResponseBodyFor = []string{""}
 	config.DecodeBody = false
@@ -1776,7 +1756,7 @@ func TestHttpParser_hostHeader(t *testing.T) {
 		"Host: %s\r\n" +
 		"\r\n"
 	var store eventStore
-	http := httpModForTests(&store)
+	http := httpModForTests(t, &store)
 	for _, test := range []struct {
 		title, host string
 		port        uint16
@@ -1894,7 +1874,7 @@ func TestHttpParser_Extension(t *testing.T) {
 		"Host: abc.com\r\n" +
 		"\r\n"
 	var store eventStore
-	http := httpModForTests(&store)
+	http := httpModForTests(t, &store)
 	for _, test := range []struct {
 		title, path string
 		expected    mapstr.M
@@ -1971,7 +1951,7 @@ func TestExtractHostHeader(t *testing.T) {
 }
 
 func benchmarkHTTPMessage(b *testing.B, data []byte) {
-	http := httpModForTests(nil)
+	http := httpModForTests(b, nil)
 	parser := newParserForTest(&http.parserConfig, logp.NewNopLogger())
 
 	for i := 0; i < b.N; i++ {
@@ -2030,7 +2010,7 @@ func BenchmarkHTTPSplitResponse(b *testing.B) {
 		"X-Frame-Options: SAMEORIGIN\r\n" +
 		"\r\n")
 
-	http := httpModForTests(nil)
+	http := httpModForTests(b, nil)
 	parser := newParserForTest(&http.parserConfig, logp.NewNopLogger())
 
 	for i := 0; i < b.N; i++ {
@@ -2074,7 +2054,7 @@ func BenchmarkHttpSimpleTransaction(b *testing.B) {
 		"X-Frame-Options: SAMEORIGIN\r\n" +
 		"\r\n"
 
-	http := httpModForTests(nil)
+	http := httpModForTests(b, nil)
 	tcptuple := testCreateTCPTuple()
 	req := protos.Packet{Payload: []byte(data1)}
 	resp := protos.Packet{Payload: []byte(data2)}
@@ -2099,7 +2079,7 @@ func BenchmarkHttpLargeResponseBody(b *testing.B) {
 		bodyPayload.Payload[i] = byte(0x30 + (i % 10))
 	}
 
-	http := httpModForTests(nil)
+	http := httpModForTests(b, nil)
 	tcptuple := testCreateTCPTuple()
 	header := fmt.Sprintf("HTTP/1.1 200 OK\r\n"+
 		"Host: some.server\r\n"+

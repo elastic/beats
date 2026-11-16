@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"github.com/elastic/beats/v7/packetbeat/procs"
@@ -487,7 +488,7 @@ func Test_gap_in_response(t *testing.T) {
 	private = pgsql.Parse(&req, tcptuple, 0, private)
 	private = pgsql.Parse(&resp, tcptuple, 1, private)
 
-	logp.Debug("pgsql", "Now sending gap..")
+	logptest.NewTestingLogger(t, "pgsql").Debug("Now sending gap..")
 
 	_, drop := pgsql.GapInStream(tcptuple, 1, 10, private)
 	assert.Equal(t, true, drop)

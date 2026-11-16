@@ -34,8 +34,6 @@ import (
 	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
-var debugf = logp.MakeDebug("scheduler")
-
 // ErrInvalidTransition is returned from start/stop when making an invalid state transition, say from preRunning to stopped
 var ErrInvalidTransition = fmt.Errorf("invalid state transition")
 
@@ -122,7 +120,7 @@ func Create(
 			waitingTasks:       waitingTasksGauge,
 			jobsMissedDeadline: jobsMissedDeadlineCounter,
 		},
-		logger: logger,
+		logger: logger.Named("scheduler"),
 	}
 
 	sched.timerQueue.Start()
@@ -191,12 +189,12 @@ func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id strin
 	taskFn = func(now time.Time) {
 		select {
 		case <-jobCtx.Done():
-			debugf("Job '%v' canceled", id)
+			s.logger.Debug("Job '%v' canceled", id)
 			return
 		default:
 		}
 		s.stats.activeJobs.Inc()
-		debugf("Job '%s' started", id)
+		s.logger.Debug("Job '%s' started", id)
 		sj := newSchedJob(jobCtx, s, id, jobType, entrypoint, s.logger)
 
 		var activeMainWin *maintwin.ParsedMaintWin
@@ -223,7 +221,7 @@ func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id strin
 			// Schedule the next run
 			s.runTaskOnce(sched.Next(lastRanAt), taskFn, true)
 		}
-		debugf("Job '%v' returned at %v", id, time.Now())
+		s.logger.Debug("Job '%v' returned at %v", id, time.Now())
 	}
 
 	if s.runOnce {
@@ -239,7 +237,7 @@ func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id strin
 	}
 
 	return func() {
-		debugf("Remove scheduler job '%v'", id)
+		s.logger.Debug("Remove scheduler job '%v'", id)
 		jobCtxCancel()
 	}, nil
 }
