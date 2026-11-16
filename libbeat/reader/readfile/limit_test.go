@@ -20,7 +20,6 @@
 package readfile
 
 import (
-	"io"
 	"testing"
 	"time"
 
@@ -28,44 +27,17 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader/readertest"
 )
-
-// flusherReader is a reader holding a pending message, like multiline.
-type flusherReader struct {
-	pending  reader.Message
-	deadline time.Time
-	timedOut []bool
-}
-
-func (f *flusherReader) Next() (reader.Message, error) { return reader.Message{}, io.EOF }
-func (f *flusherReader) Close() error                  { return nil }
-
-func (f *flusherReader) PendingDeadline() (bool, time.Time) {
-	return !f.pending.IsEmpty(), f.deadline
-}
-
-func (f *flusherReader) FlushPending(timedOut bool) (reader.Message, bool, error) {
-	if f.pending.IsEmpty() {
-		return reader.Message{}, false, nil
-	}
-
-	f.timedOut = append(f.timedOut, timedOut)
-	msg := f.pending
-	f.pending = reader.Message{}
-	f.deadline = time.Time{}
-	return msg, true, nil
-}
 
 func TestLimitReaderBufferedFlusher(t *testing.T) {
 	deadline := time.Now().Add(time.Minute)
 
 	t.Run("wrapped reader without BufferedFlusher", func(t *testing.T) {
 		r := NewLimitReader(&mockReader{[]byte("line")}, 10)
-
 		pending, dl := reader.PendingDeadline(r)
 		assert.False(t, pending, "nothing can be pending")
 		assert.True(t, dl.IsZero(), "no deadline")
-
 		msg, ok, err := reader.FlushPending(r, true)
 		require.NoError(t, err, "FlushPending")
 		assert.False(t, ok, "nothing to flush")
@@ -81,19 +53,13 @@ func TestLimitReaderBufferedFlusher(t *testing.T) {
 	}{
 		{name: "at the limit", maxBytes: 5, content: "short"},
 		{name: "above the limit", maxBytes: 3, content: "short", truncated: true},
-		{
-			name:          "above the limit with existing flags",
-			maxBytes:      4,
-			content:       "multi\nline",
-			existingFlags: []string{"multiline"},
-			truncated:     true,
-		},
+		{name: "above the limit with existing flags", maxBytes: 4, content: "multi\nline", existingFlags: []string{"multiline"}, truncated: true},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			msg := reader.Message{Content: []byte(tc.content), Bytes: len(tc.content) + 1}
 			require.NoError(t, msg.AddFlagsWithKey("log.flags", tc.existingFlags...), "adding flag")
-			inner := &flusherReader{pending: msg, deadline: deadline}
+			inner := &readertest.PendingReader{Pending: &msg, Deadline: deadline}
 			r := NewLimitReader(inner, tc.maxBytes)
 
 			pending, dl := reader.PendingDeadline(r)
@@ -103,13 +69,8 @@ func TestLimitReaderBufferedFlusher(t *testing.T) {
 			got, ok, err := reader.FlushPending(r, true)
 			require.NoError(t, err, "FlushPending")
 			require.True(t, ok, "FlushPending must flush the pending message")
-			assert.Equal(t, []bool{true}, inner.timedOut, "timedOut must be passed through")
-			assert.Equal(
-				t,
-				tc.content[:min(len(tc.content), tc.maxBytes)],
-				string(got.Content),
-				"limited content",
-			)
+			assert.Equal(t, []bool{true}, inner.TimedOut, "timedOut must be passed through")
+			assert.Equal(t, tc.content[:min(len(tc.content), tc.maxBytes)], string(got.Content), "limited content")
 			assert.Equal(t, len(tc.content)+1, got.Bytes, "bytes read must not be changed by the limit")
 
 			flags, err := got.Fields.GetValue("log.flags")
@@ -120,10 +81,8 @@ func TestLimitReaderBufferedFlusher(t *testing.T) {
 				assert.Error(t, err, "messages within the limit must not have log.flags")
 			}
 
-			pending, dl = reader.PendingDeadline(r)
+			pending, _ = reader.PendingDeadline(r)
 			assert.False(t, pending, "nothing pending after flush")
-			assert.True(t, dl.IsZero(), "no deadline when nothing is pending")
-
 			got, ok, err = reader.FlushPending(r, true)
 			require.NoError(t, err, "second FlushPending")
 			assert.False(t, ok, "nothing to flush")

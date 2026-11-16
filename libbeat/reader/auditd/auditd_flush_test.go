@@ -20,7 +20,6 @@
 package auditd
 
 import (
-	"io"
 	"testing"
 	"time"
 
@@ -28,59 +27,33 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader/readertest"
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
-// pendingReader holds a message to flush, like a multiline reader.
-type pendingReader struct {
-	pending  *reader.Message
-	deadline time.Time
-}
-
-func (*pendingReader) Next() (reader.Message, error) { return reader.Message{}, io.EOF }
-func (*pendingReader) Close() error                  { return nil }
-
-func (p *pendingReader) PendingDeadline() (bool, time.Time) { return p.pending != nil, p.deadline }
-
-func (p *pendingReader) FlushPending(bool) (reader.Message, bool, error) {
-	if p.pending == nil {
-		return reader.Message{}, false, nil
-	}
-	msg := *p.pending
-	p.pending = nil
-	return msg, true, nil
-}
-
 func TestParserBufferedFlusher(t *testing.T) {
 	const line = `type=SYSCALL msg=audit(1485893834.891:18877199): arch=c000003e syscall=59 success=yes exit=0 a0=7f095d0a4b88 items=2 ppid=1234 pid=5678 auid=1000 uid=0 gid=0 comm="ls" exe="/bin/ls" key=(null)`
 	deadline := time.Now().Add(time.Minute)
-
-	newPending := func() *pendingReader {
-		return &pendingReader{
-			pending:  &reader.Message{Content: []byte(line), Bytes: len(line) + 1, Fields: mapstr.M{}},
-			deadline: deadline,
+	newParser := func(mode Mode) reader.Reader {
+		cfg := DefaultConfig()
+		cfg.Mode = mode
+		src := &readertest.PendingReader{
+			Pending:  &reader.Message{Content: []byte(line), Bytes: len(line) + 1, Fields: mapstr.M{}},
+			Deadline: deadline,
 		}
+		return NewParser(src, cfg, logptest.NewTestingLogger(t, ""))
 	}
 
-	tests := map[string]struct {
-		mode Mode
-		// whether the flushed message is parsed by the mode
+	for _, tc := range []struct {
+		mode   Mode
 		parsed bool
-	}{
-		"parse": {mode: ModeParse, parsed: true},
-		"none":  {mode: ModeNone},
-	}
-
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			cfg := DefaultConfig()
-			cfg.Mode = tc.mode
-			p := NewParser(newPending(), cfg, logptest.NewTestingLogger(t, ""))
-
+	}{{ModeParse, true}, {ModeNone, false}} {
+		t.Run(string(tc.mode), func(t *testing.T) {
+			p := newParser(tc.mode)
 			pending, dl := reader.PendingDeadline(p)
-			assert.True(t, pending, "pending message of the wrapped reader")
-			assert.Equal(t, deadline, dl, "deadline of the wrapped reader")
+			assert.True(t, pending, "pending message of wrapped reader")
+			assert.Equal(t, deadline, dl, "deadline of wrapped reader")
 
 			msg, ok, err := reader.FlushPending(p, true)
 			require.NoError(t, err, "FlushPending")
@@ -89,7 +62,7 @@ func TestParserBufferedFlusher(t *testing.T) {
 			assert.Equal(t, len(line)+1, msg.Bytes, "bytes")
 
 			v, parsed := auditdLogField(msg.Fields, "syscall")
-			assert.Equal(t, tc.parsed, parsed, "the flushed message is parsed only in parse mode")
+			assert.Equal(t, tc.parsed, parsed, "flushed message parsed only in parse mode")
 			if tc.parsed {
 				assert.Equal(t, "execve", v, "auditd.log.syscall")
 				assert.Equal(t, int64(1485893834), msg.Ts.Unix(), "timestamp")
@@ -102,15 +75,12 @@ func TestParserBufferedFlusher(t *testing.T) {
 	}
 
 	t.Run("coalesce does not delegate", func(t *testing.T) {
-		cfg := DefaultConfig()
-		cfg.Mode = ModeCoalesce
-		p := NewParser(newPending(), cfg, logptest.NewTestingLogger(t, ""))
+		p := newParser(ModeCoalesce)
 		t.Cleanup(func() { _ = p.Close() })
-
 		pending, _ := reader.PendingDeadline(p)
-		assert.False(t, pending, "the coalescing parser must not expose the reader below it")
+		assert.False(t, pending, "coalescing parser must not expose wrapped reader")
 		_, ok, err := reader.FlushPending(p, true)
 		require.NoError(t, err, "FlushPending")
-		assert.False(t, ok, "the coalescing parser must not flush the reader below it")
+		assert.False(t, ok, "coalescing parser must not flush wrapped reader")
 	})
 }

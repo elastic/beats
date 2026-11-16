@@ -81,3 +81,23 @@ func (s *ScriptedReader) Next() (reader.Message, error) {
 
 // Close implements reader.Reader.
 func (s *ScriptedReader) Close() error { return nil }
+
+// PendingReader is a reader holding a pending message, like multiline.
+type PendingReader struct {
+	Pending  *reader.Message
+	Deadline time.Time
+	TimedOut []bool
+}
+
+func (*PendingReader) Next() (reader.Message, error)        { return reader.Message{}, io.EOF }
+func (*PendingReader) Close() error                         { return nil }
+func (p *PendingReader) PendingDeadline() (bool, time.Time) { return p.Pending != nil, p.Deadline }
+func (p *PendingReader) FlushPending(timedOut bool) (reader.Message, bool, error) {
+	if p.Pending == nil {
+		return reader.Message{}, false, nil
+	}
+	p.TimedOut = append(p.TimedOut, timedOut)
+	msg := *p.Pending
+	p.Pending = nil
+	return msg, true, nil
+}

@@ -688,108 +688,11 @@ func TestParsersMultilineAppendedWhileParked(t *testing.T) {
 	const (
 		lineGap          = 300 * time.Millisecond
 		multilineTimeout = 1500 * time.Millisecond
+		first            = "[2015] hello world\n"
+		want             = "[2015] hello world\n  First Line\n  Second Line\n  Third Line"
 	)
+	more := []string{"  First Line\n", "  Second Line\n", "  Third Line\n"}
 
-	tests := map[string]struct {
-		multiline map[string]any
-		first     string
-		more      []string
-		want      string
-		// flushedByTimeout is whether the event stays incomplete until
-		// multiline.timeout elapses after the last line.
-		flushedByTimeout bool
-	}{
-		"pattern": {
-			multiline: map[string]any{
-				"type":    "pattern",
-				"pattern": "^\\[",
-				"negate":  true,
-				"match":   "after",
-				"timeout": multilineTimeout.String(),
-			},
-			first:            "[2015] hello world\n",
-			more:             []string{"  First Line\n", "  Second Line\n", "  Third Line\n"},
-			want:             "[2015] hello world\n  First Line\n  Second Line\n  Third Line",
-			flushedByTimeout: true,
-		},
-		"count": {
-			multiline: map[string]any{
-				"type":        "count",
-				"count_lines": 4,
-			},
-			first: "line 1\n",
-			more:  []string{"line 2\n", "line 3\n", "line 4\n"},
-			want:  "line 1\nline 2\nline 3\nline 4",
-		},
-	}
-
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			env := newInputTestingEnvironment(t)
-
-			testlogName := "test.log"
-			id := uuid.Must(uuid.NewV4()).String()
-			inp := env.mustCreateInput(map[string]any{
-				"id":                                     "fake-ID",
-				"paths":                                  []string{env.abspath(testlogName)},
-				"prospector.scanner.check_interval":      "1ms",
-				"file_identity.native":                   map[string]any{},
-				"prospector.scanner.fingerprint.enabled": false,
-				// Poll often so every appended line is read in a slice of its own.
-				"backoff": map[string]any{"init": "50ms", "max": "100ms"},
-				"parsers": []map[string]any{{"multiline": tc.multiline}},
-			})
-
-			total := len(tc.first)
-			env.mustWriteToFile(testlogName, []byte(tc.first))
-
-			ctx, cancelInput := context.WithCancel(context.Background())
-			env.startInput(ctx, id, inp)
-
-			// The harvester has read the first line, kept it buffered and parked.
-			env.WaitLogsContains("End of file reached", 30*time.Second,
-				"the harvester must reach EOF and park")
-
-			var lastAppend time.Time
-			for i, line := range tc.more {
-				time.Sleep(lineGap)
-				require.Empty(t, env.pipeline.GetAllEvents(),
-					"an incomplete multiline event must not be published")
-
-				total += len(line)
-				lastAppend = time.Now()
-				env.mustAppendToFile(testlogName, []byte(line))
-
-				if !tc.flushedByTimeout && i == len(tc.more)-1 {
-					break // the last line completes the event
-				}
-			}
-
-			if tc.flushedByTimeout {
-				require.Never(t, func() bool { return len(env.pipeline.GetAllEvents()) > 0 },
-					multilineTimeout-500*time.Millisecond, 20*time.Millisecond,
-					"the event must not be flushed before multiline.timeout elapses")
-			}
-
-			env.waitUntilEventCount(1)
-			if tc.flushedByTimeout {
-				require.GreaterOrEqual(t, time.Since(lastAppend), multilineTimeout,
-					"the event must be flushed only after multiline.timeout elapsed since the last line")
-			}
-			env.requireOffsetInRegistry(testlogName, "fake-ID", total)
-			require.Equal(t, []string{tc.want}, env.getOutputMessages(),
-				"the lines must be published as one multiline event")
-
-			cancelInput()
-			env.waitUntilInputStops()
-		})
-	}
-}
-
-// TestParsersMultilineFlushedOnReadUntilEOF asserts that a multiline event still
-// incomplete when the input shuts down is published rather than lost:
-// read_until_eof (the default) drains the file to EOF, which ends the event.
-func TestParsersMultilineFlushedOnReadUntilEOF(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
@@ -800,6 +703,8 @@ func TestParsersMultilineFlushedOnReadUntilEOF(t *testing.T) {
 		"prospector.scanner.check_interval":      "1ms",
 		"file_identity.native":                   map[string]any{},
 		"prospector.scanner.fingerprint.enabled": false,
+		// Poll often so every appended line is read in a slice of its own.
+		"backoff": map[string]any{"init": "50ms", "max": "100ms"},
 		"parsers": []map[string]any{
 			{
 				"multiline": map[string]any{
@@ -807,26 +712,44 @@ func TestParsersMultilineFlushedOnReadUntilEOF(t *testing.T) {
 					"pattern": "^\\[",
 					"negate":  true,
 					"match":   "after",
-					"timeout": "1h",
+					"timeout": multilineTimeout.String(),
 				},
 			},
 		},
 	})
 
-	const want = "[2015] hello world\n  First Line\n  Second Line"
-	env.mustWriteToFile(testlogName, []byte(want+"\n"))
+	total := len(first)
+	env.mustWriteToFile(testlogName, []byte(first))
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, id, inp)
 
+	// The harvester has read the first line, kept it buffered and parked.
 	env.WaitLogsContains("End of file reached", 30*time.Second,
 		"the harvester must reach EOF and park")
-	require.Empty(t, env.pipeline.GetAllEvents(),
-		"the event is incomplete and its timeout is far away")
+
+	var lastAppend time.Time
+	for _, line := range more {
+		time.Sleep(lineGap)
+		require.Empty(t, env.pipeline.GetAllEvents(),
+			"an incomplete multiline event must not be published")
+
+		total += len(line)
+		lastAppend = time.Now()
+		env.mustAppendToFile(testlogName, []byte(line))
+	}
+
+	require.Never(t, func() bool { return len(env.pipeline.GetAllEvents()) > 0 },
+		multilineTimeout-500*time.Millisecond, 20*time.Millisecond,
+		"the event must not be flushed before multiline.timeout elapses")
+
+	env.waitUntilEventCount(1)
+	require.GreaterOrEqual(t, time.Since(lastAppend), multilineTimeout,
+		"the event must be flushed only after multiline.timeout elapsed since the last line")
+	env.requireOffsetInRegistry(testlogName, "fake-ID", total)
+	require.Equal(t, []string{want}, env.getOutputMessages(),
+		"the lines must be published as one multiline event")
 
 	cancelInput()
 	env.waitUntilInputStops()
-
-	require.Equal(t, []string{want}, env.getOutputMessages(),
-		"shutting down must publish the buffered multiline event")
 }

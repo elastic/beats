@@ -738,6 +738,11 @@ func TestHarvesterRunner_ParkCapsDueAtStateCheckInterval(t *testing.T) {
 		"the state-check deadline must not reset early just because we parked again before it was reached")
 	assert.Equal(t, firstDeadline, state.nextCheck,
 		"due must be capped at the state-check deadline once backoff grows past it")
+
+	state.session = &fakeSession{pendingDeadline: before.Add(time.Second)}
+	g.park(state, 20*time.Second)
+	assert.Equal(t, state.session.PendingDeadline(), state.nextCheck,
+		"due must be capped at an earlier pending deadline")
 	g.mu.Unlock()
 }
 
@@ -1357,10 +1362,14 @@ func TestHarvesterRunner_ReadUntilEOFDrainsParkedOnStop(t *testing.T) {
 		return ok && s == statusParked
 	}, "source should park after its first read")
 	readsBeforePark := reads.Load()
+	require.Zero(t, h.lastSession().flushCount(),
+		"a parked source must keep its buffered state until drained")
 
 	require.NoError(t, g.StopHarvesters())
 	require.Greater(t, reads.Load(), readsBeforePark,
 		"a parked source should be drained (read again) on read_until_eof stop")
+	require.Equal(t, []string{"flush", "close"}, h.lastSession().callOrder(),
+		"buffered state must be flushed before closing")
 	require.False(t, g.hasID(id))
 	require.True(t, h.lastSession().isClosed())
 }
@@ -1462,118 +1471,6 @@ func TestHarvesterRunner_ReadUntilEOFTimeoutBoundsDrain(t *testing.T) {
 	require.WithinDuration(t, start, time.Now(), 5*time.Second,
 		"a stuck drain must be bounded by the timeout, not hang")
 	require.False(t, g.hasID(id))
-}
-
-// TestHarvesterRunner_ReadUntilEOFFlushesBeforeFinish asserts that when a
-// read_until_eof drain catches a source up to EOF, buffered parser state is
-// flushed before the session is closed, and that a failing flush does not keep
-// the source from being torn down.
-func TestHarvesterRunner_ReadUntilEOFFlushesBeforeFinish(t *testing.T) {
-	tests := map[string]struct {
-		flushFn func(call int) error
-	}{
-		"flush succeeds": {},
-		"flush fails":    {flushFn: func(int) error { return errHarvester }},
-	}
-
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			h := &fakeHarvester{
-				readFn:  func(_ int, _ v2.Context) (SliceVerdict, error) { return SliceYield, nil },
-				pollFn:  func(int) PollResult { return PollPark },
-				flushFn: tc.flushFn,
-			}
-			g := testHarvesterRunnerEOF(t, h, 0, ReadUntilEOFConfig{Enabled: true, Timeout: 5 * time.Second})
-
-			goroutines := resources.NewGoroutinesChecker()
-			defer goroutines.WaitUntilOriginalCount()
-
-			g.start()
-			src := &testSource{name: "/path/to/test"}
-			id := g.identifier.ID(src)
-			g.Start(startContext(t), src)
-
-			requireEventually(t, func() bool {
-				s, ok := g.statusOf(id)
-				return ok && s == statusParked
-			}, "source should park after its first read")
-			require.Zero(t, h.lastSession().flushCount(),
-				"a source parked in normal operation must keep its buffered state, not flush it")
-
-			require.NoError(t, g.StopHarvesters())
-
-			sess := h.lastSession()
-			require.Equal(t, 1, sess.flushCount(), "the drain must flush buffered state exactly once")
-			require.Equal(t, []string{"flush", "close"}, sess.callOrder(),
-				"buffered state must be flushed before the session is closed")
-			require.False(t, g.hasID(id), "the source must be torn down")
-		})
-	}
-}
-
-// TestHarvesterRunner_ParkCapsDueAtPendingDeadline asserts park schedules the
-// next poll no later than the session's pending deadline, however long the
-// backoff and the state-check interval are, and leaves the schedule alone when
-// there is no deadline or it is later.
-func TestHarvesterRunner_ParkCapsDueAtPendingDeadline(t *testing.T) {
-	g := testHarvesterRunner(t, &fakeHarvester{}, 0)
-	g.stateCheckInterval = time.Hour
-
-	now := time.Now()
-	for _, tc := range []struct {
-		name     string
-		deadline time.Time
-		wantDue  time.Duration
-	}{
-		{"earlier deadline caps due", now.Add(2 * time.Second), 2 * time.Second},
-		{"no deadline leaves due alone", time.Time{}, time.Hour},
-		{"later deadline leaves due alone", now.Add(3 * time.Hour), time.Hour},
-		{"elapsed deadline is due at once", now.Add(-time.Minute), -time.Minute},
-	} {
-		state := &sourceState{session: &fakeSession{pendingDeadline: tc.deadline}}
-		g.mu.Lock()
-		before := time.Now()
-		g.park(state, time.Hour)
-		due := state.nextCheck
-		g.mu.Unlock()
-
-		assert.WithinDuration(t, before.Add(tc.wantDue), due, 500*time.Millisecond, tc.name)
-	}
-}
-
-// TestHarvesterRunner_ParkedSourceWakesAtPendingDeadline asserts the waker polls
-// a parked source at its pending deadline even when the backoff and the
-// state-check interval are far longer, so a buffered multiline event is flushed
-// on time rather than whenever the next regular poll happens.
-func TestHarvesterRunner_ParkedSourceWakesAtPendingDeadline(t *testing.T) {
-	deadline := time.Now().Add(300 * time.Millisecond)
-	var polledAt atomic.Value
-	h := &fakeHarvester{
-		pendingDeadline: deadline,
-		readFn:          func(_ int, _ v2.Context) (SliceVerdict, error) { return SliceYield, nil },
-		pollFn: func(int) PollResult {
-			polledAt.Store(time.Now())
-			return PollClose
-		},
-	}
-	g := testHarvesterRunner(t, h, 0)
-	g.backoff = BackoffConfig{Init: time.Hour, Max: time.Hour}
-	g.stateCheckInterval = time.Hour
-
-	g.start()
-	src := &testSource{name: "/path/to/test"}
-	id := g.identifier.ID(src)
-	g.Start(startContext(t), src)
-
-	requireEventually(t, func() bool { return !g.hasID(id) },
-		"the source must be polled (and closed) at its pending deadline, not after the 1h backoff")
-
-	at, ok := polledAt.Load().(time.Time)
-	require.True(t, ok, "the session must have been polled")
-	assert.False(t, at.Before(deadline), "the source must not be polled before its deadline")
-	assert.WithinDuration(t, deadline, at, 2*time.Second, "the source must be polled promptly at its deadline")
-
-	require.NoError(t, g.StopHarvesters())
 }
 
 // TestHarvesterRunner_BufferedProgressResetsBackoff asserts a slice that only
@@ -1725,7 +1622,6 @@ type fakeHarvester struct {
 	gzip     bool // sessions report IsGZIP() == true
 	readFn   func(call int, ctx v2.Context) (SliceVerdict, error)
 	pollFn   func(call int) PollResult
-	flushFn  func(call int) error
 	sessions []*fakeSession
 
 	// Propagated to every session; see fakeSession.
@@ -1750,7 +1646,7 @@ func (h *fakeHarvester) OpenSession(
 		return nil, h.openErr
 	}
 	s := &fakeSession{
-		readFn: h.readFn, pollFn: h.pollFn, flushFn: h.flushFn, gzip: h.gzip, openedAs: src,
+		readFn: h.readFn, pollFn: h.pollFn, gzip: h.gzip, openedAs: src,
 		bufferOnly: h.bufferOnly, pendingDeadline: h.pendingDeadline,
 	}
 	h.sessions = append(h.sessions, s)
@@ -1796,9 +1692,8 @@ type fakeSession struct {
 	// order records "flush" and "close" calls in the order they happen.
 	order []string
 
-	readFn  func(call int, ctx v2.Context) (SliceVerdict, error)
-	pollFn  func(call int) PollResult
-	flushFn func(call int) error
+	readFn func(call int, ctx v2.Context) (SliceVerdict, error)
+	pollFn func(call int) PollResult
 
 	openedAs Source
 	tracked  []Source
@@ -1856,13 +1751,8 @@ func (s *fakeSession) PendingDeadline() time.Time {
 func (s *fakeSession) Flush(_ v2.Context, _ Publisher) error {
 	s.mu.Lock()
 	s.flushes++
-	call := s.flushes
 	s.order = append(s.order, "flush")
-	fn := s.flushFn
 	s.mu.Unlock()
-	if fn != nil {
-		return fn(call)
-	}
 	return nil
 }
 

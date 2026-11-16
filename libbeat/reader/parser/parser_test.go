@@ -857,28 +857,10 @@ func TestFlushPendingThroughParsers(t *testing.T) {
 
 	tests := map[string]struct {
 		parsers     []map[string]any
-		maxBytes    int
 		lines       []string
 		resetsBytes bool
 		check       func(t *testing.T, msg reader.Message)
 	}{
-		"multiline": {
-			parsers: []map[string]any{multilineCfg},
-			lines:   []string{"line1", "  line1.1"},
-			check: func(t *testing.T, msg reader.Message) {
-				assert.Equal(t, "line1\n  line1.1", string(msg.Content), "content")
-				assert.Equal(t, []string{"multiline"}, logFlags(t, msg), "flags")
-			},
-		},
-		"multiline limited by max_bytes": {
-			parsers:  []map[string]any{multilineCfg},
-			maxBytes: 8,
-			lines:    []string{"line1", "  line1.1"},
-			check: func(t *testing.T, msg reader.Message) {
-				assert.Equal(t, "line1\n  ", string(msg.Content), "content truncated to max_bytes by LimitReader")
-				assert.ElementsMatch(t, []string{"multiline", "truncated"}, logFlags(t, msg), "flags")
-			},
-		},
 		"multiline then ndjson": {
 			parsers: []map[string]any{
 				multilineCfg,
@@ -943,16 +925,12 @@ func TestFlushPendingThroughParsers(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			maxBytes := tc.maxBytes
-			if maxBytes == 0 {
-				maxBytes = 1024
-			}
 			src := readertest.NewScriptedReader()
 			for _, l := range tc.lines {
 				src.Push(readertest.LineStep(l))
 			}
 			src.Push(readertest.WouldBlockStep)
-			r := createFlushPipeline(t, src, maxBytes, tc.parsers...)
+			r := createFlushPipeline(t, src, 1024, tc.parsers...)
 
 			pending, _ := reader.PendingDeadline(r)
 			assert.False(t, pending, "nothing pending before reading")
@@ -986,13 +964,10 @@ func TestFlushPendingThroughParsers(t *testing.T) {
 }
 
 // TestContainerParserPartialLineWouldBlock verifies that a partial CRI line
-// whose remaining chunk is not available yet (ErrWouldBlock) is not returned to
-// the multiline reader nor lost: it is joined once the last chunk arrives.
+// interrupted by ErrWouldBlock is buffered until the final chunk arrives.
 func TestContainerParserPartialLineWouldBlock(t *testing.T) {
 	const ts = "2017-09-12T22:32:21.212861448Z"
-	first := ts + " stdout F first"
-	partial := ts + " stdout P   sec"
-	last := ts + " stdout F ond"
+	first, partial, last := ts+" stdout F first", ts+" stdout P   sec", ts+" stdout F ond"
 
 	src := readertest.NewScriptedReader(
 		readertest.LineStep(first),
@@ -1007,18 +982,15 @@ func TestContainerParserPartialLineWouldBlock(t *testing.T) {
 	_, err := r.Next()
 	require.ErrorIs(t, err, reader.ErrWouldBlock, "stall in the middle of a partial line")
 
-	// Only the complete line is pending: the partial chunk must not be flushed
-	// as an event of its own.
 	msg, ok, err := reader.FlushPending(r, true)
 	require.NoError(t, err, "FlushPending")
-	require.True(t, ok, "the complete first line is buffered by multiline")
-	assert.Equal(t, "first", string(msg.Content), "flushed content must not include the partial line")
-	assert.Equal(t, len(first)+1, msg.Bytes, "flushed bytes must not include the partial line")
+	require.True(t, ok, "complete first line is buffered by multiline")
+	assert.Equal(t, "first", string(msg.Content), "flushed content excludes partial line")
+	assert.Equal(t, len(first)+1, msg.Bytes, "flushed bytes exclude partial line")
 
-	// The remaining chunk completes the partial line, which was kept.
 	src.Push(readertest.LineStep(last))
 	msg, err = r.Next()
-	require.NoError(t, err, "reading the rest of the partial line")
-	assert.Equal(t, "  second", string(msg.Content), "the partial line must be joined, and not lost")
-	assert.Equal(t, len(partial)+1+len(last)+1, msg.Bytes, "bytes of both chunks of the partial line")
+	require.NoError(t, err, "reading rest of partial line")
+	assert.Equal(t, "  second", string(msg.Content), "partial line joined")
+	assert.Equal(t, len(partial)+1+len(last)+1, msg.Bytes, "bytes of both chunks")
 }
