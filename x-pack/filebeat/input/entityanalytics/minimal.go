@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
 	"path/filepath"
 	"runtime/debug"
@@ -26,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
 	"github.com/elastic/entcollect"
+	"github.com/elastic/go-concert/ctxtool"
 )
 
 // minimalStateInput implements v2.Input for the minimal-state path.
@@ -34,9 +36,19 @@ type minimalStateInput struct {
 	providerName     string
 	fullSyncInterval time.Duration
 	incrSyncInterval time.Duration
-	logger           *logp.Logger
-	store            statestore.States
-	path             *paths.Path
+
+	// client is the provider's HTTP client, or nil. Run sets its
+	// transport to transport, wrapped with the request tracer that
+	// tracer configures, except for requests to the URL prefixes in
+	// untraced.
+	client    *http.Client
+	transport http.RoundTripper
+	tracer    *provider.TracerConfig
+	untraced  []string
+
+	logger *logp.Logger
+	store  statestore.States
+	path   *paths.Path
 }
 
 var _ v2.Input = (*minimalStateInput)(nil)
@@ -59,6 +71,19 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 
 	runCtx.UpdateStatus(status.Starting, "")
 	log := runCtx.Logger.With("provider", n.providerName)
+
+	if n.client != nil {
+		ctx := ctxtool.FromCanceller(runCtx.Cancelation)
+		var traced http.RoundTripper
+		traced, err = provider.TraceRequests(ctx, n.transport, n.tracer, runCtx.Agent.Paths, n.providerName, runCtx.IDWithoutName, log)
+		if err != nil {
+			return fmt.Errorf("could not set up request tracer: %w", err)
+		}
+		n.client.Transport, err = provider.SkipTracing(traced, n.transport, n.untraced)
+		if err != nil {
+			return fmt.Errorf("could not set up request tracer: %w", err)
+		}
+	}
 
 	client, err := connector.ConnectWith(beat.ClientConfig{
 		EventListener: kvstore.NewTxACKHandler(),
