@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: fix multiline parser: events are correctly flushed at the timeout instead of at every eof
+component: filebeat
+issue: https://github.com/elastic/beats/issues/54599
