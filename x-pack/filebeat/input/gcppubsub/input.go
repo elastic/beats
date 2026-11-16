@@ -327,10 +327,10 @@ func makeEvent(topicID string, msg *pubsub.Message) beat.Event {
 }
 
 func (in *pubsubInput) getOrCreateSubscription(ctx context.Context, client *pubsub.Client) (*pubsub.Subscriber, error) {
-	getReq := &pubsubpb.GetSubscriptionRequest{
-		Subscription: fmt.Sprintf("projects/%s/subscriptions/%s", client.Project(), in.Subscription.Name),
-	}
-	_, err := client.SubscriptionAdminClient.GetSubscription(ctx, getReq)
+	sub := fmt.Sprintf("projects/%s/subscriptions/%s", client.Project(), in.Subscription.Name)
+	_, err := client.SubscriptionAdminClient.GetSubscription(ctx, &pubsubpb.GetSubscriptionRequest{
+		Subscription: sub,
+	})
 	if err == nil {
 		sub := client.Subscriber(in.Subscription.Name)
 		return sub, nil
@@ -342,11 +342,10 @@ func (in *pubsubInput) getOrCreateSubscription(ctx context.Context, client *pubs
 
 	// Create subscription.
 	if in.Subscription.Create {
-		createReq := &pubsubpb.Subscription{
-			Name:  fmt.Sprintf("projects/%s/subscriptions/%s", client.Project(), in.Subscription.Name),
+		sub, err := client.SubscriptionAdminClient.CreateSubscription(ctx, &pubsubpb.Subscription{
+			Name:  sub,
 			Topic: fmt.Sprintf("projects/%s/topics/%s", client.Project(), in.Topic),
-		}
-		sub, err := client.SubscriptionAdminClient.CreateSubscription(ctx, createReq)
+		})
 		if err != nil {
 			return nil, fmt.Errorf("failed to create subscription: %w", err)
 		}

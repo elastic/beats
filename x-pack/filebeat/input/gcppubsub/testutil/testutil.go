@@ -93,10 +93,11 @@ func CreateTopic(t *testing.T, client *pubsub.Client) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	getReq := &pubsubpb.GetTopicRequest{
-		Topic: fmt.Sprintf("projects/%s/topics/%s", client.Project(), emulatorTopic),
-	}
-	_, err := client.TopicAdminClient.GetTopic(ctx, getReq)
+	topic := fmt.Sprintf("projects/%s/topics/%s", client.Project(), emulatorTopic)
+
+	_, err := client.TopicAdminClient.GetTopic(ctx, &pubsubpb.GetTopicRequest{
+		Topic: topic,
+	})
 	if err == nil {
 		return
 	}
@@ -105,25 +106,24 @@ func CreateTopic(t *testing.T, client *pubsub.Client) {
 		t.Fatalf("failed to check if topic exists: %v", err)
 	}
 
-	topicpb := &pubsubpb.Topic{
-		Name: fmt.Sprintf("projects/%s/topics/%s", client.Project(), emulatorTopic),
-	}
-
-	topic, err := client.TopicAdminClient.CreateTopic(ctx, topicpb)
+	pbTopic, err := client.TopicAdminClient.CreateTopic(ctx, &pubsubpb.Topic{
+		Name: topic,
+	})
 	if err != nil {
 		t.Fatalf("failed to create the topic: %v", err)
 	}
-	t.Log("Topic created:", topic.Name)
+	t.Log("Topic created:", pbTopic.Name)
 }
 
 func CreateSubscription(t *testing.T, subscription string, client *pubsub.Client) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	getReq := &pubsubpb.GetSubscriptionRequest{
-		Subscription: fmt.Sprintf("projects/%s/subscriptions/%s", client.Project(), subscription),
-	}
-	_, err := client.SubscriptionAdminClient.GetSubscription(ctx, getReq)
+	sub := fmt.Sprintf("projects/%s/subscriptions/%s", client.Project(), subscription)
+
+	_, err := client.SubscriptionAdminClient.GetSubscription(ctx, &pubsubpb.GetSubscriptionRequest{
+		Subscription: sub,
+	})
 	if err == nil {
 		return
 	}
@@ -132,15 +132,14 @@ func CreateSubscription(t *testing.T, subscription string, client *pubsub.Client
 		t.Fatalf("failed to check if sub exists: %v", err)
 	}
 
-	s := &pubsubpb.Subscription{
-		Name:  fmt.Sprintf("projects/%s/subscriptions/%s", client.Project(), subscription),
+	pbSub, err := client.SubscriptionAdminClient.CreateSubscription(ctx, &pubsubpb.Subscription{
+		Name:  sub,
 		Topic: fmt.Sprintf("projects/%s/topics/%s", client.Project(), emulatorTopic),
-	}
-	sub, err := client.SubscriptionAdminClient.CreateSubscription(ctx, s)
+	})
 	if err != nil {
 		t.Fatalf("failed to create subscription: %v", err)
 	}
-	t.Log("New subscription created:", sub.Name)
+	t.Log("New subscription created:", pbSub.Name)
 }
 
 func PublishMessages(t *testing.T, client *pubsub.Client, numMsgs int) []string {
@@ -171,11 +170,12 @@ func resetPubSub(t *testing.T, client *pubsub.Client) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	proj := fmt.Sprintf("projects/%s", client.Project())
+
 	// Clear topics.
-	listTopics := &pubsubpb.ListTopicsRequest{
-		Project: fmt.Sprintf("projects/%s", client.Project()),
-	}
-	topics := client.TopicAdminClient.ListTopics(ctx, listTopics)
+	topics := client.TopicAdminClient.ListTopics(ctx, &pubsubpb.ListTopicsRequest{
+		Project: proj,
+	})
 	for {
 		topic, err := topics.Next()
 		if errors.Is(err, iterator.Done) {
@@ -184,19 +184,18 @@ func resetPubSub(t *testing.T, client *pubsub.Client) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		req := &pubsubpb.DeleteTopicRequest{
+
+		if err = client.TopicAdminClient.DeleteTopic(ctx, &pubsubpb.DeleteTopicRequest{
 			Topic: topic.Name,
-		}
-		if err = client.TopicAdminClient.DeleteTopic(ctx, req); err != nil {
+		}); err != nil {
 			t.Fatalf("failed to delete topic %v: %v", topic.Name, err)
 		}
 	}
 
 	// Clear subscriptions.
-	listSubs := &pubsubpb.ListSubscriptionsRequest{
-		Project: fmt.Sprintf("projects/%s", client.Project()),
-	}
-	subs := client.SubscriptionAdminClient.ListSubscriptions(ctx, listSubs)
+	subs := client.SubscriptionAdminClient.ListSubscriptions(ctx, &pubsubpb.ListSubscriptionsRequest{
+		Project: proj,
+	})
 	for {
 		sub, err := subs.Next()
 		if errors.Is(err, iterator.Done) {
@@ -206,10 +205,9 @@ func resetPubSub(t *testing.T, client *pubsub.Client) {
 			t.Fatal(err)
 		}
 
-		req := &pubsubpb.DeleteSubscriptionRequest{
+		if err = client.SubscriptionAdminClient.DeleteSubscription(ctx, &pubsubpb.DeleteSubscriptionRequest{
 			Subscription: sub.Name,
-		}
-		if err = client.SubscriptionAdminClient.DeleteSubscription(ctx, req); err != nil {
+		}); err != nil {
 			t.Fatalf("failed to delete subscription %v: %v", sub.Name, err)
 		}
 	}
