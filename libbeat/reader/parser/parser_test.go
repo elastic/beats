@@ -22,11 +22,15 @@ import (
 
 	"strings"
 	"testing"
+	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/multiline"
+	"github.com/elastic/beats/v7/libbeat/reader/readertest"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	"github.com/elastic/beats/v7/pkg/config"
@@ -817,4 +821,205 @@ func (r *messageReader) Close() error {
 	r.message = reader.Message{}
 	r.read = false
 	return nil
+}
+
+// createFlushPipeline builds the parsers on top of src followed by a
+// readfile.LimitReader, like filestream's reader pipeline.
+func createFlushPipeline(t *testing.T, src reader.Reader, maxBytes int, parsers ...map[string]any) reader.Reader {
+	t.Helper()
+	cfg := config.MustNewConfigFrom(map[string]any{"parsers": parsers})
+	var parsersConfig testParsersConfig
+	require.NoError(t, cfg.Unpack(&parsersConfig), "unpacking parsers config")
+	c, err := NewConfig(CommonConfig{MaxBytes: cfgtype.ByteSize(maxBytes), LineTerminator: readfile.AutoLineTerminator}, parsersConfig.Parsers)
+	require.NoError(t, err, "creating parsers config")
+	return readfile.NewLimitReader(c.Create(src, logp.NewNopLogger()), maxBytes)
+}
+
+func logFlags(t *testing.T, msg reader.Message) []string {
+	t.Helper()
+	v, err := msg.Fields.GetValue("log.flags")
+	if err != nil {
+		return nil
+	}
+	flags, ok := v.([]string)
+	require.True(t, ok, "log.flags must be a []string, got %T", v)
+	return flags
+}
+
+// TestFlushPendingThroughParsers verifies that PendingDeadline and
+// FlushPending reach a multiline reader through every parser that can wrap it,
+// and that a flushed message is processed by those parsers like a message
+// returned by Next.
+func TestFlushPendingThroughParsers(t *testing.T) {
+	multilineCfg := map[string]any{
+		"multiline": map[string]any{"type": "pattern", "pattern": `^[ \t]+`, "match": "after"},
+	}
+
+	tests := map[string]struct {
+		parsers     []map[string]any
+		maxBytes    int
+		lines       []string
+		resetsBytes bool
+		check       func(t *testing.T, msg reader.Message)
+	}{
+		"multiline": {
+			parsers:  []map[string]any{multilineCfg},
+			maxBytes: 1024,
+			lines:    []string{"line1", "  line1.1"},
+			check: func(t *testing.T, msg reader.Message) {
+				assert.Equal(t, "line1\n  line1.1", string(msg.Content), "content")
+				assert.Equal(t, []string{"multiline"}, logFlags(t, msg), "flags")
+			},
+		},
+		"multiline limited by max_bytes": {
+			parsers:  []map[string]any{multilineCfg},
+			maxBytes: 8,
+			lines:    []string{"line1", "  line1.1"},
+			check: func(t *testing.T, msg reader.Message) {
+				assert.Equal(t, "line1\n  ", string(msg.Content), "content truncated to max_bytes by LimitReader")
+				assert.ElementsMatch(t, []string{"multiline", "truncated"}, logFlags(t, msg), "flags")
+			},
+		},
+		"multiline then ndjson": {
+			parsers: []map[string]any{
+				multilineCfg,
+				{"ndjson": map[string]any{"target": "json"}},
+			},
+			maxBytes: 1024,
+			lines:    []string{`{"msg":"a",`, `  "n":1}`},
+			check: func(t *testing.T, msg reader.Message) {
+				assert.Empty(t, string(msg.Content), "content is replaced by the decoded JSON")
+				v, err := msg.Fields.GetValue("json.msg")
+				require.NoError(t, err, "json.msg must be decoded from the flushed message")
+				assert.Equal(t, "a", v, "json.msg")
+				v, err = msg.Fields.GetValue("json.n")
+				require.NoError(t, err, "json.n must be decoded from the flushed message")
+				assert.EqualValues(t, 1, v, "json.n")
+				assert.Equal(t, []string{"multiline"}, logFlags(t, msg), "flags kept from multiline")
+			},
+		},
+		"multiline then syslog": {
+			parsers: []map[string]any{
+				multilineCfg,
+				{"syslog": map[string]any{"format": "rfc5424"}},
+			},
+			maxBytes: 1024,
+			lines: []string{
+				`<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog 1024 ID47 - first`,
+				`  second`,
+			},
+			resetsBytes: true,
+			check: func(t *testing.T, msg reader.Message) {
+				assert.Equal(t, "first\n  second", string(msg.Content), "syslog message")
+				v, err := msg.Fields.GetValue("log.syslog.hostname")
+				require.NoError(t, err, "syslog fields must be added to the flushed message")
+				assert.Equal(t, "mymachine.example.com", v, "syslog hostname")
+				assert.Equal(t, time.Date(2003, 10, 11, 22, 14, 15, 3000000, time.UTC), msg.Ts.UTC(), "syslog timestamp")
+			},
+		},
+		"multiline then include_message matching": {
+			parsers: []map[string]any{
+				multilineCfg,
+				{"include_message": map[string]any{"patterns": []string{"^ERROR"}}},
+			},
+			maxBytes: 1024,
+			lines:    []string{"ERROR boom", "  at main"},
+			check: func(t *testing.T, msg reader.Message) {
+				assert.Equal(t, "ERROR boom\n  at main", string(msg.Content), "content")
+				assert.False(t, msg.IsEmpty(), "matching message must not be dropped")
+			},
+		},
+		"multiline then include_message dropping": {
+			parsers: []map[string]any{
+				multilineCfg,
+				{"include_message": map[string]any{"patterns": []string{"^ERROR"}}},
+			},
+			maxBytes: 1024,
+			lines:    []string{"INFO fine", "  at main"},
+			check: func(t *testing.T, msg reader.Message) {
+				assert.True(t, msg.IsEmpty(), "dropped message must be empty so it is not published")
+				assert.Empty(t, msg.Content, "dropped message content")
+				assert.Zero(t, msg.Bytes, "dropped message bytes")
+				assert.Equal(t, len("INFO fine")+1+len("  at main")+1, msg.Offset,
+					"the dropped bytes of both lines (with newlines) must be reported in Offset")
+			},
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			src := readertest.NewScriptedReader()
+			for _, l := range tc.lines {
+				src.Push(readertest.LineStep(l))
+			}
+			src.Push(readertest.WouldBlockStep)
+			r := createFlushPipeline(t, src, tc.maxBytes, tc.parsers...)
+
+			pending, _ := reader.PendingDeadline(r)
+			assert.False(t, pending, "nothing pending before reading")
+
+			_, err := r.Next()
+			require.ErrorIs(t, err, reader.ErrWouldBlock, "ErrWouldBlock must reach the caller")
+
+			pending, deadline := reader.PendingDeadline(r)
+			require.True(t, pending, "multiline must report its buffered lines through the parsers")
+			assert.False(t, deadline.IsZero(), "multiline timeout must yield a deadline")
+
+			msg, ok, err := reader.FlushPending(r, true)
+			require.NoError(t, err, "FlushPending")
+			require.True(t, ok, "FlushPending must reach the multiline reader")
+			if tc.check != nil {
+				tc.check(t, msg)
+			}
+			// The syslog parser replaces Bytes with the length of the parsed message.
+			// TODO(Tiago): File an issue for syslog parser
+			if !msg.IsEmpty() && !tc.resetsBytes {
+				assert.Equal(t, len(tc.lines[0])+1+len(tc.lines[1])+1, msg.Bytes, "bytes read by the flushed message")
+			}
+
+			pending, _ = reader.PendingDeadline(r)
+			assert.False(t, pending, "nothing pending after the flush")
+			_, ok, err = reader.FlushPending(r, true)
+			require.NoError(t, err, "second FlushPending")
+			assert.False(t, ok, "nothing left to flush")
+		})
+	}
+}
+
+// TestContainerParserPartialLineWouldBlock verifies that a partial CRI line
+// whose remaining chunk is not available yet (ErrWouldBlock) is not returned to
+// the multiline reader nor lost: it is joined once the last chunk arrives.
+func TestContainerParserPartialLineWouldBlock(t *testing.T) {
+	const ts = "2017-09-12T22:32:21.212861448Z"
+	first := ts + " stdout F first"
+	partial := ts + " stdout P   sec"
+	last := ts + " stdout F ond"
+
+	src := readertest.NewScriptedReader(
+		readertest.LineStep(first),
+		readertest.LineStep(partial),
+		readertest.WouldBlockStep,
+	)
+	r := createFlushPipeline(t, src, 1024,
+		map[string]any{"container": map[string]any{"format": "cri"}},
+		map[string]any{"multiline": map[string]any{"type": "pattern", "pattern": `^[ \t]+`, "match": "after"}},
+	)
+
+	_, err := r.Next()
+	require.ErrorIs(t, err, reader.ErrWouldBlock, "stall in the middle of a partial line")
+
+	// Only the complete line is pending: the partial chunk must not be flushed
+	// as an event of its own.
+	msg, ok, err := reader.FlushPending(r, true)
+	require.NoError(t, err, "FlushPending")
+	require.True(t, ok, "the complete first line is buffered by multiline")
+	assert.Equal(t, "first", string(msg.Content), "flushed content must not include the partial line")
+	assert.Equal(t, len(first)+1, msg.Bytes, "flushed bytes must not include the partial line")
+
+	// The remaining chunk completes the partial line, which was kept.
+	src.Push(readertest.LineStep(last))
+	msg, err = r.Next()
+	require.NoError(t, err, "reading the rest of the partial line")
+	assert.Equal(t, "  second", string(msg.Content), "the partial line must be joined, and not lost")
+	assert.Equal(t, len(partial)+1+len(last)+1, msg.Bytes, "bytes of both chunks of the partial line")
 }

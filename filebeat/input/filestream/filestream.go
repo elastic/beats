@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/go-concert/ctxtool"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/pkg/logp"
 )
 
@@ -36,8 +37,10 @@ var (
 
 	// ErrWouldBlock is returned by Read when the file has no data available
 	// right now. Reading is non-blocking: the harvester runner's waker decides
-	// when to retry, so the read path never waits on a backoff.
-	ErrWouldBlock = errors.New("no data available, would block")
+	// when to retry, so the read path never waits on a backoff. It aliases
+	// reader.ErrWouldBlock so stateful readers further down the pipeline (e.g.
+	// multiline) recognise it and keep their buffered state.
+	ErrWouldBlock = reader.ErrWouldBlock
 )
 
 // logFile is a non-blocking reader over a single open file.

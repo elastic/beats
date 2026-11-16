@@ -32,15 +32,20 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap/zaptest/observer"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
@@ -452,7 +457,507 @@ func TestFilestream_Test(t *testing.T) {
 	})
 }
 
+// --- Buffered parser state across slices (multiline) --------------------
+
+// TestHarvestSession_MultilineAcrossSlices asserts the lines of one multiline
+// event that arrive in different slices end up in a single event: the pipeline
+// is retained while it buffers lines, nothing is published before the multiline
+// timeout, and the event is flushed once the timeout elapses even though the
+// file never changed again.
+func TestHarvestSession_MultilineAcrossSlices(t *testing.T) {
+	tests := map[string]struct {
+		multiline map[string]any
+		first     string
+		more      []string
+		want      string
+	}{
+		"pattern": {
+			multiline: map[string]any{
+				"type": "pattern", "pattern": `^\[`, "negate": true, "match": "after", "timeout": "300ms",
+			},
+			first: "[2015] hello\n",
+			more:  []string{"  first\n", "  second\n"},
+			want:  "[2015] hello\n  first\n  second",
+		},
+		"while_pattern": {
+			multiline: map[string]any{"type": "while_pattern", "pattern": `^\s`, "timeout": "300ms"},
+			first:     "  one\n",
+			more:      []string{"  two\n", "  three\n"},
+			want:      "  one\n  two\n  three",
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			s, logs := newMultilineSession(t, closerConfig{}, tc.multiline, tc.first)
+			pub := &countingPublisher{}
+			total := int64(len(tc.first))
+
+			verdict, err := s.ReadSlice(backgroundCtx(), pub)
+			require.NoError(t, err, "first slice must not fail")
+			require.Equal(t, loginp.SliceYield, verdict, "first slice must yield at EOF")
+			require.Empty(t, pub.events, "an unfinished multiline event must not be published")
+			require.NotNil(t, s.pipeline, "the pipeline must be retained while it buffers lines")
+			firstDeadline := s.PendingDeadline()
+			require.False(t, firstDeadline.IsZero(), "a buffered multiline event must have a flush deadline")
+			require.Zero(t, s.Offset(), "the published offset must not advance past buffered lines")
+			require.Equal(t, total, s.ReadOffset(), "the read offset must include buffered lines")
+			require.Equal(t, loginp.PollPark, s.Poll(), "an unchanged file with a future deadline must stay parked")
+
+			for _, line := range tc.more {
+				appendToFile(t, s.src.newPath, line)
+				total += int64(len(line))
+
+				require.Equal(t, loginp.PollResume, s.Poll(), "a grown file must resume")
+				verdict, err = s.ReadSlice(backgroundCtx(), pub)
+				require.NoError(t, err, "continuation slice must not fail")
+				require.Equal(t, loginp.SliceYield, verdict, "continuation slice must yield at EOF")
+				require.Empty(t, pub.events, "no event may be published before the multiline timeout")
+				require.NotNil(t, s.pipeline, "the pipeline must stay retained across continuation slices")
+				require.Zero(t, s.Offset(), "the published offset must not advance past buffered lines")
+				require.Equal(t, total, s.ReadOffset(), "the read offset must include buffered lines")
+			}
+			require.True(t, s.PendingDeadline().After(firstDeadline),
+				"each continuation line must postpone the flush deadline")
+			require.Equal(t, loginp.PollPark, s.Poll(), "before the deadline the session must stay parked")
+
+			lastDataBeforeFlush := s.lastData
+			time.Sleep(time.Until(s.PendingDeadline()) + 20*time.Millisecond)
+
+			require.Equal(t, loginp.PollResume, s.Poll(),
+				"an elapsed deadline must resume the session even though the file did not change")
+			verdict, err = s.ReadSlice(backgroundCtx(), pub)
+			require.NoError(t, err, "flush slice must not fail")
+			require.Equal(t, loginp.SliceYield, verdict, "flush slice must yield at EOF")
+			require.Len(t, pub.events, 1, "the buffered lines must be published as a single event")
+			require.Equal(t, tc.want, messageOf(t, pub.events[0]), "unexpected multiline event content")
+			require.Equal(t, total, s.Offset(), "the published offset must reach the end of the event")
+			require.Nil(t, s.pipeline, "the pipeline must be released once nothing is buffered")
+			require.True(t, s.PendingDeadline().IsZero(), "no deadline may remain after the flush")
+			require.Equal(t, 1, logs.FilterMessageSnippet("Multiline event flushed because timeout reached.").Len(),
+				"the timeout flush must be logged")
+			require.Equal(t, lastDataBeforeFlush, s.lastData,
+				"flushing buffered lines reads no data and must not count as file activity")
+			require.Equal(t, loginp.PollPark, s.Poll(), "after the flush the idle file must park")
+		})
+	}
+}
+
+// TestHarvestSession_MultilineCompletedByNextEvent asserts a retained pipeline
+// is not re-seeked: lines buffered by an earlier slice are completed by a later
+// one without being duplicated or lost.
+func TestHarvestSession_MultilineCompletedByNextEvent(t *testing.T) {
+	ml := map[string]any{"type": "pattern", "pattern": `^\[`, "negate": true, "match": "after", "timeout": "1h"}
+	first := "[1] a\n"
+	s, _ := newMultilineSession(t, closerConfig{}, ml, first)
+	pub := &countingPublisher{}
+
+	verdict, err := s.ReadSlice(backgroundCtx(), pub)
+	require.NoError(t, err, "first slice must not fail")
+	require.Equal(t, loginp.SliceYield, verdict, "first slice must yield")
+	require.Empty(t, pub.events, "the first event is still incomplete")
+
+	more := "  b\n[2] c\n"
+	appendToFile(t, s.src.newPath, more)
+	require.Equal(t, loginp.PollResume, s.Poll(), "a grown file must resume")
+
+	verdict, err = s.ReadSlice(backgroundCtx(), pub)
+	require.NoError(t, err, "second slice must not fail")
+	require.Equal(t, loginp.SliceYield, verdict, "second slice must yield")
+	require.Len(t, pub.events, 1, "the next event's first line completes the previous one")
+	require.Equal(t, "[1] a\n  b", messageOf(t, pub.events[0]), "unexpected completed event")
+	require.Equal(t, int64(len("[1] a\n  b\n")), s.Offset(), "only the completed event may be published")
+	require.Equal(t, int64(len(first+more)), s.ReadOffset(), "the read offset must cover the buffered line too")
+	require.NotNil(t, s.pipeline, "the new event's line is buffered, so the pipeline must stay retained")
+}
+
+// TestHarvestSession_MultilineCount asserts count mode, which has no timeout,
+// keeps buffering across slices until enough lines arrive, never asks to be
+// polled for a deadline, and publishes a single event once complete.
+func TestHarvestSession_MultilineCount(t *testing.T) {
+	s, _ := newMultilineSession(t, closerConfig{}, map[string]any{"type": "count", "count_lines": 3}, "a\n")
+	pub := &countingPublisher{}
+
+	verdict, err := s.ReadSlice(backgroundCtx(), pub)
+	require.NoError(t, err, "first slice must not fail")
+	require.Equal(t, loginp.SliceYield, verdict, "first slice must yield")
+	require.Empty(t, pub.events, "1 of 3 lines must not be published")
+	require.NotNil(t, s.pipeline, "the pipeline must be retained while lines are buffered")
+	require.True(t, s.PendingDeadline().IsZero(), "count mode has no flush deadline")
+	require.Equal(t, loginp.PollPark, s.Poll(), "count mode must park without a deadline")
+
+	appendToFile(t, s.src.newPath, "b\n")
+	require.Equal(t, loginp.PollResume, s.Poll(), "a grown file must resume")
+	verdict, err = s.ReadSlice(backgroundCtx(), pub)
+	require.NoError(t, err, "second slice must not fail")
+	require.Equal(t, loginp.SliceYield, verdict, "second slice must yield")
+	require.Empty(t, pub.events, "2 of 3 lines must not be published")
+	require.NotNil(t, s.pipeline, "the pipeline must stay retained")
+	require.Equal(t, loginp.PollPark, s.Poll(), "count mode must keep parking")
+
+	appendToFile(t, s.src.newPath, "c\n")
+	require.Equal(t, loginp.PollResume, s.Poll(), "a grown file must resume")
+	verdict, err = s.ReadSlice(backgroundCtx(), pub)
+	require.NoError(t, err, "third slice must not fail")
+	require.Equal(t, loginp.SliceYield, verdict, "third slice must yield")
+	require.Len(t, pub.events, 1, "3 lines must be published as one event")
+	require.Equal(t, "a\nb\nc", messageOf(t, pub.events[0]), "unexpected count event content")
+	require.Equal(t, int64(len("a\nb\nc\n")), s.Offset(), "the published offset must cover all three lines")
+	require.Nil(t, s.pipeline, "the pipeline must be released once the event is published")
+}
+
+// TestHarvestSession_PendingFlushedOnClose asserts a close condition met while
+// the pipeline buffers lines does not drop them: Poll hands the session to a
+// worker, which publishes the buffered event and then finishes the session.
+func TestHarvestSession_PendingFlushedOnClose(t *testing.T) {
+	pattern := map[string]any{"type": "pattern", "pattern": `^\[`, "negate": true, "match": "after", "timeout": "1h"}
+	count := map[string]any{"type": "count", "count_lines": 5}
+
+	tests := map[string]struct {
+		closer  closerConfig
+		ml      map[string]any
+		want    string
+		trigger func(t *testing.T, s *harvestSession)
+		skipWin bool
+	}{
+		"after_interval": {
+			closer: closerConfig{Reader: readerCloserConfig{AfterInterval: time.Hour}},
+			ml:     pattern,
+			want:   "[1] a\n  b",
+			trigger: func(_ *testing.T, s *harvestSession) {
+				s.openedAt = time.Now().Add(-2 * time.Hour)
+			},
+		},
+		"inactive": {
+			closer: closerConfig{OnStateChange: stateChangeCloserConfig{Inactive: time.Minute}},
+			ml:     pattern,
+			want:   "[1] a\n  b",
+			trigger: func(_ *testing.T, s *harvestSession) {
+				s.lastData = time.Now().Add(-time.Hour)
+			},
+		},
+		"inactive flushes a partial count": {
+			closer: closerConfig{OnStateChange: stateChangeCloserConfig{Inactive: time.Minute}},
+			ml:     count,
+			want:   "[1] a\n  b",
+			trigger: func(_ *testing.T, s *harvestSession) {
+				s.lastData = time.Now().Add(-time.Hour)
+			},
+		},
+		"removed": {
+			closer:  closerConfig{OnStateChange: stateChangeCloserConfig{Removed: true}},
+			ml:      pattern,
+			want:    "[1] a\n  b",
+			skipWin: true,
+			trigger: func(t *testing.T, s *harvestSession) {
+				require.NoError(t, os.Remove(s.src.newPath), "removing the file must succeed")
+			},
+		},
+		"renamed": {
+			closer:  closerConfig{OnStateChange: stateChangeCloserConfig{Renamed: true}},
+			ml:      pattern,
+			want:    "[1] a\n  b",
+			skipWin: true,
+			trigger: func(t *testing.T, s *harvestSession) {
+				require.NoError(t, os.Rename(s.src.newPath, s.src.newPath+".moved"), "renaming the file must succeed")
+			},
+		},
+	}
+
+	content := "[1] a\n  b\n"
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			if tc.skipWin && runtime.GOOS == "windows" {
+				t.Skip("removing/renaming an open file is not supported on Windows")
+			}
+			s, _ := newMultilineSession(t, tc.closer, tc.ml, content)
+			pub := &countingPublisher{}
+
+			verdict, err := s.ReadSlice(backgroundCtx(), pub)
+			require.NoError(t, err, "buffering slice must not fail")
+			require.Equal(t, loginp.SliceYield, verdict, "buffering slice must yield")
+			require.Empty(t, pub.events, "the event is incomplete, nothing may be published yet")
+			require.NotNil(t, s.pipeline, "the pipeline must be retained")
+
+			tc.trigger(t, s)
+
+			require.Equal(t, loginp.PollResume, s.Poll(),
+				"a close condition with buffered lines must resume so a worker can publish them")
+			require.True(t, s.pendingClose, "the session must be flagged for closing")
+
+			verdict, err = s.ReadSlice(backgroundCtx(), pub)
+			require.NoError(t, err, "closing slice must not fail")
+			require.Equal(t, loginp.SliceDone, verdict, "the session must finish after flushing")
+			require.Len(t, pub.events, 1, "the buffered lines must be published before closing")
+			require.Equal(t, tc.want, messageOf(t, pub.events[0]), "unexpected flushed event content")
+			require.Equal(t, int64(len(content)), s.Offset(), "the published offset must cover the flushed lines")
+			require.Nil(t, s.pipeline, "the pipeline must be released")
+			require.False(t, s.pendingClose, "the close flag must be consumed")
+		})
+	}
+}
+
+// TestHarvestSession_CloseWithoutPendingClosesImmediately asserts the worker
+// hand-off is only used when lines are buffered: an idle session is closed by
+// Poll directly.
+func TestHarvestSession_CloseWithoutPendingClosesImmediately(t *testing.T) {
+	ml := map[string]any{"type": "pattern", "pattern": `^\[`, "negate": true, "match": "after", "timeout": "1h"}
+	closer := closerConfig{Reader: readerCloserConfig{AfterInterval: time.Hour}}
+	// An empty file leaves nothing buffered.
+	s, _ := newMultilineSession(t, closer, ml, "")
+
+	verdict, err := s.ReadSlice(backgroundCtx(), &countingPublisher{})
+	require.NoError(t, err, "slice must not fail")
+	require.Equal(t, loginp.SliceYield, verdict, "slice must yield at EOF")
+	require.Nil(t, s.pipeline, "an idle file with multiline configured must not retain a pipeline")
+	require.True(t, s.PendingDeadline().IsZero(), "an idle file must have no flush deadline")
+
+	s.openedAt = time.Now().Add(-2 * time.Hour)
+	require.Equal(t, loginp.PollClose, s.Poll(), "nothing buffered: Poll must close without a worker")
+	require.False(t, s.pendingClose, "the close flag must stay unset")
+}
+
+// TestHarvestSession_PendingFlushedBeforeDelete asserts that on close_inactive
+// with delete.enabled, buffered lines are published before the file is removed,
+// so no data is lost with the file.
+func TestHarvestSession_PendingFlushedBeforeDelete(t *testing.T) {
+	ml := map[string]any{"type": "pattern", "pattern": `^\[`, "negate": true, "match": "after", "timeout": "1h"}
+	closer := closerConfig{OnStateChange: stateChangeCloserConfig{Inactive: time.Minute}}
+	content := "[1] a\n  b\n"
+	s, _ := newMultilineSession(t, closer, ml, content)
+	pub := &countingPublisher{}
+
+	var removed []string
+	var publishedAtRemove int
+	s.cursor = loginp.NewCursorForTest("id", 0, 0)
+	s.inp.deleterConfig.Enabled = true
+	s.inp.waitGracePeriodFn = func(input.Context, *logp.Logger, loginp.Cursor, string, time.Duration, time.Duration, func(string) (os.FileInfo, error)) (bool, error) {
+		return true, nil
+	}
+	s.inp.removeFn = func(path string) error {
+		pub.mu.Lock()
+		publishedAtRemove = len(pub.events)
+		pub.mu.Unlock()
+		removed = append(removed, path)
+		return nil
+	}
+
+	verdict, err := s.ReadSlice(backgroundCtx(), pub)
+	require.NoError(t, err, "buffering slice must not fail")
+	require.Equal(t, loginp.SliceYield, verdict, "buffering slice must yield")
+	require.NotNil(t, s.pipeline, "the pipeline must be retained")
+
+	s.lastData = time.Now().Add(-time.Hour)
+	require.Equal(t, loginp.PollResume, s.Poll(), "inactive + delete must resume for a worker")
+	require.True(t, s.pendingDelete, "the session must be flagged for deletion")
+
+	verdict, err = s.ReadSlice(backgroundCtx(), pub)
+	require.NoError(t, err, "delete slice must not fail")
+	require.Equal(t, loginp.SliceDone, verdict, "the session must finish")
+	require.Equal(t, 1, publishedAtRemove, "the buffered event must be published before the file is removed")
+	require.Equal(t, []string{s.src.newPath}, removed, "the file must be removed exactly once")
+	require.Equal(t, int64(len(content)), s.Offset(), "the whole file must have been published")
+	require.Nil(t, s.pipeline, "the pipeline must be released")
+}
+
+// TestHarvestSession_SliceBudgetKeepsPending asserts a slice cut short by its
+// time budget keeps a pipeline that buffers lines, but not one that buffers
+// nothing.
+func TestHarvestSession_SliceBudgetKeepsPending(t *testing.T) {
+	ml := map[string]any{"type": "pattern", "pattern": `^\[`, "negate": true, "match": "after", "timeout": "1h"}
+	s, _ := newMultilineSession(t, closerConfig{}, ml, "[1] a\n")
+	pub := &countingPublisher{}
+
+	verdict, err := s.ReadSlice(backgroundCtx(), pub)
+	require.NoError(t, err, "buffering slice must not fail")
+	require.Equal(t, loginp.SliceYield, verdict, "buffering slice must yield")
+	require.NotNil(t, s.pipeline, "the pipeline must be retained")
+
+	s.inp.sliceBudget = -time.Hour // already elapsed: yields before reading
+	verdict, err = s.ReadSlice(backgroundCtx(), pub)
+	require.NoError(t, err, "budget slice must not fail")
+	require.Equal(t, loginp.SliceBudget, verdict, "an elapsed budget must report SliceBudget")
+	require.NotNil(t, s.pipeline, "buffered lines must survive a budget yield")
+	require.Empty(t, pub.events, "nothing may be published")
+
+	s.inp.sliceBudget = 0
+	appendToFile(t, s.src.newPath, "  b\n")
+	verdict, err = s.ReadSlice(backgroundCtx(), pub)
+	require.NoError(t, err, "continuation slice must not fail")
+	require.Equal(t, loginp.SliceYield, verdict, "continuation slice must yield")
+	require.NotNil(t, s.pipeline, "the pipeline must still hold the combined lines")
+	require.EqualValues(t, len("[1] a\n  b\n"), s.ReadOffset(), "the continuation line must be read once")
+
+	// Without buffered state a budget yield releases the pipeline, as before.
+	s2 := newReadSession(t, closerConfig{}, strings.Repeat("line\n", 10), 0)
+	s2.inp.sliceBudget = -time.Hour
+	verdict, err = s2.ReadSlice(backgroundCtx(), &countingPublisher{})
+	require.NoError(t, err, "budget slice must not fail")
+	require.Equal(t, loginp.SliceBudget, verdict, "an elapsed budget must report SliceBudget")
+	require.Nil(t, s2.pipeline, "without buffered state no pipeline may be retained")
+}
+
+// TestHarvestSession_FlushReleasesPending asserts Flush (the read_until_eof
+// drain) publishes buffered lines and releases the pipeline, and is a no-op
+// afterwards or when the context was cancelled.
+func TestHarvestSession_FlushReleasesPending(t *testing.T) {
+	ml := map[string]any{"type": "pattern", "pattern": `^\[`, "negate": true, "match": "after", "timeout": "1h"}
+	content := "[1] a\n  b\n"
+
+	t.Run("publishes buffered lines", func(t *testing.T) {
+		s, _ := newMultilineSession(t, closerConfig{}, ml, content)
+		pub := &countingPublisher{}
+		_, err := s.ReadSlice(backgroundCtx(), pub)
+		require.NoError(t, err, "buffering slice must not fail")
+		require.Empty(t, pub.events, "the event is incomplete")
+
+		require.NoError(t, s.Flush(backgroundCtx(), pub), "Flush must not fail")
+		require.Len(t, pub.events, 1, "Flush must publish the buffered event")
+		require.Equal(t, "[1] a\n  b", messageOf(t, pub.events[0]), "unexpected flushed event content")
+		require.Equal(t, int64(len(content)), s.Offset(), "the published offset must cover the flushed lines")
+		require.Nil(t, s.pipeline, "Flush must release the pipeline")
+
+		require.NoError(t, s.Flush(backgroundCtx(), pub), "a second Flush must be a no-op")
+		require.Len(t, pub.events, 1, "a second Flush must not publish again")
+	})
+
+	t.Run("cancelled context publishes nothing and releases the pipeline", func(t *testing.T) {
+		s, _ := newMultilineSession(t, closerConfig{}, ml, content)
+		pub := &countingPublisher{}
+		_, err := s.ReadSlice(backgroundCtx(), pub)
+		require.NoError(t, err, "buffering slice must not fail")
+
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+		err = s.Flush(input.Context{Logger: logp.NewNopLogger(), Cancelation: ctx}, pub)
+		require.ErrorIs(t, err, context.Canceled, "Flush must report the cancellation")
+		require.Empty(t, pub.events, "nothing may be published after cancellation")
+		require.Nil(t, s.pipeline, "the pipeline must be released")
+	})
+
+	t.Run("nothing buffered is a no-op", func(t *testing.T) {
+		s := newReadSession(t, closerConfig{}, "a\n", 0)
+		pub := &countingPublisher{}
+		require.NoError(t, s.Flush(backgroundCtx(), pub), "Flush must not fail")
+		require.Empty(t, pub.events, "nothing may be published")
+	})
+}
+
+// TestHarvestSession_CloseReleasesPipeline asserts closing a parked session
+// that retains a pipeline closes the pipeline too.
+func TestHarvestSession_CloseReleasesPipeline(t *testing.T) {
+	ml := map[string]any{"type": "pattern", "pattern": `^\[`, "negate": true, "match": "after", "timeout": "1h"}
+	s, _ := newMultilineSession(t, closerConfig{}, ml, "[1] a\n")
+	_, err := s.ReadSlice(backgroundCtx(), &countingPublisher{})
+	require.NoError(t, err, "buffering slice must not fail")
+	require.NotNil(t, s.pipeline, "the pipeline must be retained")
+	require.NotNil(t, s.logReader, "the file reader must be retained")
+
+	pipeline, logReader := s.pipeline, s.logReader
+
+	require.NoError(t, s.Close(), "Close must not fail")
+	require.Nil(t, s.pipeline, "Close must release the retained pipeline")
+	require.Nil(t, s.logReader, "Close must release the retained file reader")
+	require.Nil(t, s.file, "Close must release the file")
+
+	pending, _ := reader.PendingDeadline(pipeline)
+	require.False(t, pending, "Close must close the top of the retained pipeline")
+	_, err = logReader.Read(make([]byte, 1))
+	require.ErrorIs(t, err, ErrClosed, "Close must propagate to the bottom of the retained pipeline")
+}
+
+// TestHarvestSession_PendingAndTruncation asserts a file truncated while lines
+// are buffered still publishes them and ends the session.
+func TestHarvestSession_PendingAndTruncation(t *testing.T) {
+	ml := map[string]any{"type": "pattern", "pattern": `^\[`, "negate": true, "match": "after", "timeout": "1h"}
+	s, _ := newMultilineSession(t, closerConfig{}, ml, "[1] a\n  b\n")
+	pub := &countingPublisher{}
+
+	_, err := s.ReadSlice(backgroundCtx(), pub)
+	require.NoError(t, err, "buffering slice must not fail")
+	require.NotNil(t, s.pipeline, "the pipeline must be retained")
+
+	require.NoError(t, os.Truncate(s.src.newPath, 3), "truncating the file must succeed")
+	require.Equal(t, loginp.PollResume, s.Poll(), "a size change must resume")
+
+	verdict, err := s.ReadSlice(backgroundCtx(), pub)
+	require.NoError(t, err, "truncation must end the slice without an error")
+	require.Equal(t, loginp.SliceDone, verdict, "truncation must finish the session")
+	require.Len(t, pub.events, 1, "buffered lines must be published before the session ends")
+	require.Nil(t, s.pipeline, "the pipeline must be released")
+}
+
+// TestHarvestSession_PollFlushesTimedOutPendingOnStatError asserts an elapsed
+// deadline resumes the session even if stat keeps failing, so the buffered
+// lines are flushed and the waker does not spin on the elapsed deadline.
+func TestHarvestSession_PollFlushesTimedOutPendingOnStatError(t *testing.T) {
+	ml := map[string]any{"type": "pattern", "pattern": `^\[`, "negate": true, "match": "after", "timeout": "100ms"}
+	s, _ := newMultilineSession(t, closerConfig{OnStateChange: stateChangeCloserConfig{Removed: true}}, ml, "[1] a\n")
+	_, err := s.ReadSlice(backgroundCtx(), &countingPublisher{})
+	require.NoError(t, err, "buffering slice must not fail")
+
+	s.file = &fakeFile{statErr: errors.New("boom")}
+	require.Equal(t, loginp.PollPark, s.Poll(), "before the deadline a stat error keeps the session parked")
+
+	time.Sleep(time.Until(s.PendingDeadline()) + 20*time.Millisecond)
+	require.Equal(t, loginp.PollResume, s.Poll(), "after the deadline a stat error must still resume to flush")
+}
+
+// TestHarvestSession_ReadActivityRefreshesLastData asserts bytes buffered by a
+// parser count as file activity for close_inactive, even though no message is
+// returned by the pipeline.
+func TestHarvestSession_ReadActivityRefreshesLastData(t *testing.T) {
+	ml := map[string]any{"type": "pattern", "pattern": `^\[`, "negate": true, "match": "after", "timeout": "1h"}
+	s, _ := newMultilineSession(t, closerConfig{}, ml, "[1] a\n")
+	s.lastData = time.Now().Add(-time.Hour)
+
+	_, err := s.ReadSlice(backgroundCtx(), &countingPublisher{})
+	require.NoError(t, err, "slice must not fail")
+	require.WithinDuration(t, time.Now(), s.lastData, time.Minute,
+		"reading bytes into a parser's buffer must refresh close_inactive activity")
+
+	// A slice that reads nothing new must not refresh it.
+	s.lastData = time.Now().Add(-time.Hour)
+	_, err = s.ReadSlice(backgroundCtx(), &countingPublisher{})
+	require.NoError(t, err, "slice must not fail")
+	require.Greater(t, time.Since(s.lastData), 30*time.Minute,
+		"a slice that read nothing new must not refresh close_inactive activity")
+}
+
 // --- scaffolding --------------------------------------------------------
+
+// newMultilineSession is newReadSession with a multiline parser configured and
+// an observable logger, to assert on the parser's log output.
+func newMultilineSession(
+	t *testing.T,
+	closer closerConfig,
+	multiline map[string]any,
+	content string,
+) (*harvestSession, *observer.ObservedLogs) {
+	t.Helper()
+	s := newReadSession(t, closer, content, 0)
+
+	cfg, err := conf.NewConfigFrom(map[string]any{
+		"parsers": []map[string]any{{"multiline": multiline}},
+	})
+	require.NoError(t, err, "building the parsers config must succeed")
+	var pc parser.Config
+	require.NoError(t, cfg.Unpack(&pc), "unpacking the parsers config must succeed")
+	s.inp.parsers = pc
+
+	log, logs := logptest.NewTestingLoggerWithObserver(t, "")
+	s.log = log
+	return s, logs
+}
+
+func messageOf(t *testing.T, e beat.Event) string {
+	t.Helper()
+	v, err := e.Fields.GetValue("message")
+	require.NoError(t, err, "event must have a message field")
+	msg, ok := v.(string)
+	require.Truef(t, ok, "message must be a string, got %T", v)
+	return msg
+}
 
 func testFilestream(t *testing.T, closer closerConfig) *filestream {
 	t.Helper()
@@ -524,6 +1029,7 @@ func newReadSession(t *testing.T, closer closerConfig, content string, offset in
 	t.Helper()
 	s := newPollSession(t, closer, content)
 	s.state.Offset = offset
+	s.readOffset = offset // nothing read yet, as after OpenSession
 	enc, err := s.inp.encodingFactory(s.file)
 	require.NoError(t, err)
 	s.enc = enc

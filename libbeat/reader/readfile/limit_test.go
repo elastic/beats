@@ -20,12 +20,122 @@
 package readfile
 
 import (
+	"io"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
 )
+
+// flusherReader is a reader holding a pending message, like multiline.
+type flusherReader struct {
+	pending  reader.Message
+	deadline time.Time
+	timedOut []bool
+}
+
+func (f *flusherReader) Next() (reader.Message, error) { return reader.Message{}, io.EOF }
+func (f *flusherReader) Close() error                  { return nil }
+
+func (f *flusherReader) PendingDeadline() (bool, time.Time) {
+	return !f.pending.IsEmpty(), f.deadline
+}
+
+func (f *flusherReader) FlushPending(timedOut bool) (reader.Message, bool, error) {
+	if f.pending.IsEmpty() {
+		return reader.Message{}, false, nil
+	}
+
+	f.timedOut = append(f.timedOut, timedOut)
+	msg := f.pending
+	f.pending = reader.Message{}
+	return msg, true, nil
+}
+
+func TestLimitReaderBufferedFlusher(t *testing.T) {
+	deadline := time.Now().Add(time.Minute)
+
+	t.Run("wrapped reader without BufferedFlusher", func(t *testing.T) {
+		r := NewLimitReader(&mockReader{[]byte("line")}, 10)
+
+		pending, dl := reader.PendingDeadline(r)
+		assert.False(t, pending, "nothing can be pending")
+		assert.True(t, dl.IsZero(), "no deadline")
+
+		msg, ok, err := reader.FlushPending(r, true)
+		require.NoError(t, err, "FlushPending")
+		assert.False(t, ok, "nothing to flush")
+		assert.True(t, msg.IsEmpty(), "no message")
+	})
+
+	t.Run("nothing pending", func(t *testing.T) {
+		r := NewLimitReader(&flusherReader{}, 10)
+
+		pending, dl := reader.PendingDeadline(r)
+		assert.False(t, pending, "nothing pending")
+		assert.True(t, dl.IsZero(), "no deadline")
+
+		_, ok, err := reader.FlushPending(r, true)
+		require.NoError(t, err, "FlushPending")
+		assert.False(t, ok, "nothing to flush")
+	})
+
+	t.Run("delegates the deadline", func(t *testing.T) {
+		r := NewLimitReader(&flusherReader{pending: reader.Message{Content: []byte("a"), Bytes: 1}, deadline: deadline}, 10)
+
+		pending, dl := reader.PendingDeadline(r)
+		assert.True(t, pending, "pending message of the wrapped reader")
+		assert.Equal(t, deadline, dl, "deadline of the wrapped reader")
+	})
+
+	tests := []struct {
+		name      string
+		maxBytes  int
+		content   string
+		truncated bool
+	}{
+		{name: "at the limit", maxBytes: 5, content: "short"},
+		{name: "above the limit", maxBytes: 3, content: "short", truncated: true},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			msg := reader.Message{Content: []byte(tc.content), Bytes: len(tc.content) + 1}
+			inner := &flusherReader{pending: msg}
+			r := NewLimitReader(inner, tc.maxBytes)
+
+			got, ok, err := reader.FlushPending(r, true)
+			require.NoError(t, err, "FlushPending")
+			require.True(t, ok, "FlushPending must flush the pending message")
+			assert.Equal(t, []bool{true}, inner.timedOut, "timedOut must be passed through")
+			assert.Equal(t, tc.content[:min(len(tc.content), tc.maxBytes)], string(got.Content), "limited content")
+			assert.Equal(t, len(tc.content)+1, got.Bytes, "bytes read must not be changed by the limit")
+
+			flags, err := got.Fields.GetValue("log.flags")
+			if tc.truncated {
+				require.NoError(t, err, "truncated messages must have log.flags")
+				assert.Equal(t, []string{"truncated"}, flags, "log.flags")
+			} else {
+				assert.Error(t, err, "messages within the limit must not have log.flags")
+			}
+		})
+	}
+
+	t.Run("truncation keeps existing flags", func(t *testing.T) {
+		msg := reader.Message{Content: []byte("multi\nline"), Bytes: 11}
+		require.NoError(t, msg.AddFlagsWithKey("log.flags", "multiline"), "adding flag")
+		r := NewLimitReader(&flusherReader{pending: msg}, 4)
+
+		got, ok, err := reader.FlushPending(r, true)
+		require.NoError(t, err, "FlushPending")
+		require.True(t, ok, "FlushPending")
+		flags, err := got.Fields.GetValue("log.flags")
+		require.NoError(t, err, "log.flags")
+		assert.ElementsMatch(t, []string{"multiline", "truncated"}, flags, "log.flags")
+	})
+}
 
 type mockReader struct {
 	line []byte

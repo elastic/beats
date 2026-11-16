@@ -27,6 +27,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader/readertest"
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/pkg/mapstr"
@@ -451,3 +452,92 @@ func (m *mockReader) Next() (reader.Message, error) {
 }
 
 func (m *mockReader) Close() error { return nil }
+
+const criTS = "2017-10-12T13:32:21.232861448Z"
+
+// TestDockerJSONWouldBlock verifies that ErrWouldBlock while joining partial
+// lines, or after skipped lines, does not return the bytes consumed so far
+// with the error, and that the next call resumes where it stopped.
+func TestDockerJSONWouldBlock(t *testing.T) {
+	tests := []struct {
+		name  string
+		steps []readertest.ScriptStep
+		// resumed are the steps available after the first ErrWouldBlock.
+		resumed []readertest.ScriptStep
+		stream  string
+		content string
+		bytes   int
+	}{
+		{
+			name: "after the first chunk of a partial line",
+			steps: []readertest.ScriptStep{
+				readertest.LineStep(criTS + " stdout P abc"),
+				readertest.WouldBlockStep,
+			},
+			resumed: []readertest.ScriptStep{readertest.LineStep(criTS + " stdout F def")},
+			stream:  "all",
+			content: "abcdef",
+			bytes:   len(criTS+" stdout P abc") + 1 + len(criTS+" stdout F def") + 1,
+		},
+		{
+			name: "after several chunks of a partial line, stalling twice",
+			steps: []readertest.ScriptStep{
+				readertest.LineStep(criTS + " stdout P a"),
+				readertest.LineStep(criTS + " stdout P b"),
+				readertest.WouldBlockStep,
+				readertest.WouldBlockStep,
+			},
+			resumed: []readertest.ScriptStep{
+				readertest.LineStep(criTS + " stdout P c"),
+				readertest.LineStep(criTS + " stdout F d"),
+			},
+			stream:  "all",
+			content: "abcd",
+			bytes: len(criTS+" stdout P a") + 1 + len(criTS+" stdout P b") + 1 +
+				len(criTS+" stdout P c") + 1 + len(criTS+" stdout F d") + 1,
+		},
+		{
+			name: "after skipped lines",
+			steps: []readertest.ScriptStep{
+				readertest.LineStep("not a log line"),
+				readertest.LineStep(criTS + " stderr F filtered out"),
+				readertest.WouldBlockStep,
+			},
+			resumed: []readertest.ScriptStep{readertest.LineStep(criTS + " stdout F kept")},
+			stream:  "stdout",
+			content: "kept",
+			bytes: len("not a log line") + 1 + len(criTS+" stderr F filtered out") + 1 +
+				len(criTS+" stdout F kept") + 1,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			src := readertest.NewScriptedReader(tc.steps...)
+			p := New(src, tc.stream, true, "cri", true, 0, logp.NewNopLogger())
+
+			stalls := 0
+			for _, s := range tc.steps {
+				if s.Err != nil {
+					stalls++
+				}
+			}
+			for i := range stalls {
+				msg, err := p.Next()
+				require.ErrorIs(t, err, reader.ErrWouldBlock, "stall %d", i)
+				assert.True(
+					t,
+					msg.IsEmpty(),
+					"stall %d: no message, nor consumed bytes, may be returned: %+v", i, msg,
+				)
+				assert.Zero(t, msg.Bytes, "stall %d: bytes", i)
+			}
+
+			src.Push(tc.resumed...)
+			msg, err := p.Next()
+			require.NoError(t, err, "resumed read")
+			assert.Equal(t, tc.content, string(msg.Content), "joined content")
+			assert.Equal(t, tc.bytes, msg.Bytes, "all bytes consumed since the last message")
+		})
+	}
+}
