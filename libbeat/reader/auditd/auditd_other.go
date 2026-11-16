@@ -40,6 +40,20 @@ func NewParser(r reader.Reader, _ Config, _ *logp.Logger) *Parser {
 
 func (p *Parser) Next() (reader.Message, error) { return p.r.Next() }
 
+var _ reader.BufferedFlusher = (*Parser)(nil)
+
+// PendingDeadline implements reader.BufferedFlusher by delegating to the
+// wrapped reader.
+func (p *Parser) PendingDeadline() (bool, time.Time) {
+	return reader.PendingDeadline(p.r)
+}
+
+// FlushPending implements reader.BufferedFlusher by delegating to the wrapped
+// reader.
+func (p *Parser) FlushPending(timedOut bool) (reader.Message, bool, error) {
+	return reader.FlushPending(p.r, timedOut)
+}
+
 func (p *Parser) SetReadDeadline(t time.Time) bool {
 	return reader.SetReadDeadline(p.r, t)
 }

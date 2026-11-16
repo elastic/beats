@@ -18,6 +18,8 @@
 package multiline
 
 import (
+	"time"
+
 	"github.com/elastic/beats/v7/libbeat/reader"
 )
 
@@ -33,6 +35,11 @@ type messageBuffer struct {
 	err            error // last seen error
 	message        reader.Message
 	privates       []any
+
+	// lastActivity is when a line was last added to the buffer. It is the base
+	// for the multiline timeout of sources that never block (ErrWouldBlock),
+	// where a deadline cannot be enforced inside a blocking read.
+	lastActivity time.Time
 }
 
 func newMessageBuffer(maxBytes, maxLines int, separator []byte, skipNewline bool) *messageBuffer {
@@ -69,6 +76,7 @@ func (b *messageBuffer) clear() {
 	b.truncated = 0
 	b.err = nil
 	b.privates = nil
+	b.lastActivity = time.Time{}
 }
 
 // addLine adds the read content to the message
@@ -78,6 +86,8 @@ func (b *messageBuffer) addLine(m reader.Message) {
 	if m.Bytes <= 0 {
 		return
 	}
+
+	b.lastActivity = time.Now()
 
 	sz := len(b.message.Content)
 	addSeparator := len(b.message.Content) > 0 && len(b.separator) > 0 && !b.skipNewline
@@ -158,4 +168,21 @@ func (b *messageBuffer) isEmpty() bool {
 
 func (b *messageBuffer) isEmptyMessage() bool {
 	return b.message.Bytes == 0
+}
+
+// hasPending reports whether the buffer holds at least one line that was read
+// from the source but not yet returned, including lines dropped by the
+// max_bytes/max_lines limits.
+func (b *messageBuffer) hasPending() bool {
+	return !b.isEmptyMessage()
+}
+
+// idleDeadline returns the time at which the buffered lines expire after the
+// given timeout without new lines. A non-positive timeout never expires and
+// yields the zero time.
+func (b *messageBuffer) idleDeadline(timeout time.Duration) time.Time {
+	if timeout <= 0 {
+		return time.Time{}
+	}
+	return b.lastActivity.Add(timeout)
 }

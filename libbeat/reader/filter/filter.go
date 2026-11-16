@@ -73,18 +73,50 @@ func (p *FilterParser) Next() (message reader.Message, err error) {
 		if err != nil {
 			return message, err
 		}
-		if p.matchAny(string(message.Content)) {
+		if p.matchAny(message.Content) {
 			return message, err
 		}
 		discardedOffset += message.Bytes
-		p.logger.Debug("dropping message because it does not match any of the provided patterns [%v]: %s", p.matchers, string(message.Content))
+		if p.logger.IsDebug() {
+			p.logger.Debugf("dropping message because it does not match any of the provided patterns [%v]: %s", p.matchers, message.Content)
+		}
 	}
 	return reader.Message{}, io.EOF
 }
 
-func (p *FilterParser) matchAny(text string) bool {
+var _ reader.BufferedFlusher = (*FilterParser)(nil)
+
+// PendingDeadline implements reader.BufferedFlusher by delegating to the
+// wrapped reader.
+func (p *FilterParser) PendingDeadline() (bool, time.Time) {
+	return reader.PendingDeadline(p.r)
+}
+
+// FlushPending implements reader.BufferedFlusher. A message flushed from the
+// wrapped reader is filtered like one returned by Next. If it does not match,
+// it is dropped: ok stays true and an empty message (Bytes == 0, so
+// Message.IsEmpty reports true) carrying the dropped bytes in Offset is
+// returned. The caller advances its offset by Bytes+Offset before skipping
+// empty messages, so the dropped bytes are accounted for without publishing.
+func (p *FilterParser) FlushPending(timedOut bool) (reader.Message, bool, error) {
+	message, ok, err := reader.FlushPending(p.r, timedOut)
+	if !ok || err != nil {
+		return message, ok, err
+	}
+
+	if p.matchAny(message.Content) {
+		return message, true, nil
+	}
+
+	if p.logger.IsDebug() {
+		p.logger.Debugf("dropping message because it does not match any of the provided patterns [%v]: %s", p.matchers, message.Content)
+	}
+	return reader.Message{Offset: message.Bytes + message.Offset}, true, nil
+}
+
+func (p *FilterParser) matchAny(text []byte) bool {
 	for _, m := range p.matchers {
-		if m.MatchString(text) {
+		if m.Match(text) {
 			return true
 		}
 	}

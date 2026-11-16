@@ -18,6 +18,8 @@
 package input_logfile
 
 import (
+	"time"
+
 	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
 )
 
@@ -83,11 +85,32 @@ type HarvesterSession interface {
 	ReadSlice(ctx inputv2.Context, p Publisher) (SliceVerdict, error)
 	// Poll is called by the runner's waker for a parked session to decide
 	// whether to resume reading, keep parking, or close (inactive/removed/
-	// renamed). It must not read or publish.
+	// renamed) or flush parser state whose deadline elapsed. A close condition
+	// met while parser state is buffered is reported as PollResume so a worker
+	// can publish that state first; the following ReadSlice then returns
+	// SliceDone. It must not read or publish.
 	Poll() PollResult
-	// Offset returns the current read offset; the runner uses it to detect
-	// whether a slice made progress.
+	// Offset returns the offset up to which events have been published. The
+	// runner reports it to the observer on close and uses it, together with
+	// ReadOffset, to detect whether a slice made progress.
 	Offset() int64
+	// ReadOffset returns how far into the source the session has consumed data,
+	// including bytes held in buffered parser state (e.g. an unfinished
+	// multiline event) that are not yet published. It is always >= Offset. The
+	// runner uses it to tell an active source (whose backoff must not grow) from
+	// an idle one.
+	ReadOffset() int64
+	// PendingDeadline returns the time at which parser state buffered across
+	// slices must be flushed (e.g. a multiline timeout), or the zero time if
+	// nothing is buffered or the buffered state has no timeout. The runner caps
+	// a parked source's next poll at this deadline. It must be cheap and must
+	// not read or publish.
+	PendingDeadline() time.Time
+	// Flush publishes any parser state buffered across slices and releases it.
+	// The runner calls it when it is about to tear a source down after draining
+	// it to EOF (read_until_eof), so no buffered event is lost. It is a no-op
+	// when nothing is buffered.
+	Flush(ctx inputv2.Context, p Publisher) error
 	// IsGZIP reports whether the session reads a GZIP-compressed source, so the
 	// runner can maintain the GZIP-specific lifecycle metrics.
 	IsGZIP() bool

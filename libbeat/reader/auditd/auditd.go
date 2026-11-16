@@ -54,6 +54,22 @@ func NewParser(r reader.Reader, cfg Config, logger *logp.Logger) *Parser {
 
 func (p *Parser) Next() (reader.Message, error) { return p.r.Next() }
 
+var _ reader.BufferedFlusher = (*Parser)(nil)
+
+// PendingDeadline implements reader.BufferedFlusher by delegating to the
+// wrapped parser. The coalescing parser does not implement it, so in
+// ModeCoalesce nothing is delegated and the records it holds are only
+// released by its own logic.
+func (p *Parser) PendingDeadline() (bool, time.Time) {
+	return reader.PendingDeadline(p.r)
+}
+
+// FlushPending implements reader.BufferedFlusher by delegating to the wrapped
+// parser (see PendingDeadline).
+func (p *Parser) FlushPending(timedOut bool) (reader.Message, bool, error) {
+	return reader.FlushPending(p.r, timedOut)
+}
+
 // SetReadDeadline delegates to the wrapped reader (see reader.DeadlineSetter).
 func (p *Parser) SetReadDeadline(t time.Time) bool {
 	return reader.SetReadDeadline(p.r, t)
@@ -86,6 +102,30 @@ func (p *parseParser) Next() (reader.Message, error) {
 		return msg, err
 	}
 
+	return p.processMessage(msg), nil
+}
+
+var _ reader.BufferedFlusher = (*parseParser)(nil)
+
+// PendingDeadline implements reader.BufferedFlusher by delegating to the
+// wrapped reader.
+func (p *parseParser) PendingDeadline() (bool, time.Time) {
+	return reader.PendingDeadline(p.reader)
+}
+
+// FlushPending implements reader.BufferedFlusher. A message flushed from the
+// wrapped reader is parsed exactly like one returned by Next.
+func (p *parseParser) FlushPending(timedOut bool) (reader.Message, bool, error) {
+	msg, ok, err := reader.FlushPending(p.reader, timedOut)
+	if !ok || err != nil {
+		return msg, ok, err
+	}
+	return p.processMessage(msg), true, nil
+}
+
+// processMessage parses msg, read from or flushed by the wrapped reader, as an
+// auditd log record.
+func (p *parseParser) processMessage(msg reader.Message) reader.Message {
 	line, nodeVal := stripNodePrefix(string(msg.Content))
 	auditMsg, err := auparse.ParseLogLine(line)
 	if err != nil {
@@ -97,7 +137,7 @@ func (p *parseParser) Next() (reader.Message, error) {
 				"error": mapstr.M{"message": "error parsing auditd log line: " + err.Error()},
 			})
 		}
-		return msg, nil
+		return msg
 	}
 
 	msg.Ts = auditMsg.Timestamp
@@ -160,7 +200,7 @@ func (p *parseParser) Next() (reader.Message, error) {
 
 	msg.AddFields(mapstr.M{"auditd": mapstr.M{"log": logFields}})
 
-	return msg, nil
+	return msg
 }
 
 // stripNodePrefix removes the "node=<value> " prefix that userspace auditd

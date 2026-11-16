@@ -19,6 +19,7 @@ package readfile
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
 )
@@ -38,6 +39,13 @@ func NewLimitReader(r reader.Reader, maxBytes int) *LimitReader {
 // Next returns the next line.
 func (r *LimitReader) Next() (reader.Message, error) {
 	message, err := r.reader.Next()
+	return r.limit(message, err)
+}
+
+// limit truncates the message content to maxBytes, flagging the message as
+// truncated. It is shared by Next and FlushPending so a flushed message is
+// limited exactly like any other.
+func (r *LimitReader) limit(message reader.Message, err error) (reader.Message, error) {
 	if len(message.Content) > r.maxBytes {
 		tmp := make([]byte, r.maxBytes)
 		n := copy(tmp, message.Content)
@@ -48,6 +56,25 @@ func (r *LimitReader) Next() (reader.Message, error) {
 		message.AddFlagsWithKey("log.flags", "truncated")
 	}
 	return message, err
+}
+
+var _ reader.BufferedFlusher = (*LimitReader)(nil)
+
+// PendingDeadline implements reader.BufferedFlusher by delegating to the
+// wrapped reader.
+func (r *LimitReader) PendingDeadline() (bool, time.Time) {
+	return reader.PendingDeadline(r.reader)
+}
+
+// FlushPending implements reader.BufferedFlusher. A message flushed from the
+// wrapped reader is truncated to maxBytes like the ones returned by Next.
+func (r *LimitReader) FlushPending(timedOut bool) (reader.Message, bool, error) {
+	message, ok, err := reader.FlushPending(r.reader, timedOut)
+	if !ok {
+		return message, ok, err
+	}
+	message, err = r.limit(message, err)
+	return message, ok, err
 }
 
 func (r *LimitReader) Close() error {
