@@ -11,8 +11,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const defaultTimeout = 15 * time.Second // expecting the osquery to be restarted within 15 secs for the action to be retried

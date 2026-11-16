@@ -18,8 +18,8 @@
 package elasticsearch
 
 import (
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 func makeSnapshot(R *monitoring.Registry) mapstr.M {

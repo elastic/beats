@@ -16,7 +16,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 	"github.com/elastic/lumberjack"
 )
 
@@ -197,11 +197,12 @@ func (t *tracerConfig) enabled() bool {
 }
 
 type requestConfig struct {
-	Retry                  retryConfig `config:"retry"`
-	RedirectForwardHeaders bool        `config:"redirect.forward_headers"`
-	RedirectHeadersBanList []string    `config:"redirect.headers_ban_list"`
-	RedirectMaxRedirects   int         `config:"redirect.max_redirects"`
-	KeepAlive              keepAlive   `config:"keep_alive"`
+	Retry                    retryConfig `config:"retry"`
+	RedirectForwardHeaders   bool        `config:"redirect.forward_headers"`
+	RedirectHeadersBanList   []string    `config:"redirect.headers_ban_list"`
+	RedirectSensitiveHeaders []string    `config:"redirect.sensitive_headers"`
+	RedirectMaxRedirects     int         `config:"redirect.max_redirects"`
+	KeepAlive                keepAlive   `config:"keep_alive"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 }

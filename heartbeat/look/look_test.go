@@ -27,7 +27,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	reason2 "github.com/elastic/beats/v7/heartbeat/reason"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // helper

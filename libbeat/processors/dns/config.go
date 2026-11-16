@@ -25,7 +25,7 @@ import (
 
 	"github.com/miekg/dns"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // config defines the configuration options for the DNS processor.

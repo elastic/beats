@@ -11,8 +11,8 @@ import (
 	"cloud.google.com/go/storage"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 func TestCheckpointMixedCaseObjectNames(t *testing.T) {

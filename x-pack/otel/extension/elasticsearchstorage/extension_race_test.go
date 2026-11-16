@@ -23,8 +23,8 @@ import (
 	"github.com/elastic/entcollect"
 
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestComponentLifecycle(t *testing.T) {

@@ -1,0 +1,11 @@
+kind: upgrade
+summary: Update go-quark for quark 0.9 boottime handling
+description: >
+  quark 0.9 removed quark.TimeToWallclock() and quark.UpdateBoottime(),
+  the boottime epoch from quark.Boottime() is now self-maintaining and
+  only moves on a system clock step. Auditbeat now converts
+  process.start/process.end to wallclock by fetching the epoch once per
+  batch and adding it to quark's since-boot timestamps, instead of one
+  cgo call per timestamp. Emitted events are unchanged.
+component: auditbeat
+pr: https://github.com/elastic/beats/pull/53284

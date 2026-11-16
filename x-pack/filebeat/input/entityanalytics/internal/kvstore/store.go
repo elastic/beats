@@ -10,7 +10,7 @@ import (
 
 	"go.etcd.io/bbolt"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 type TxDoneFunc func(tx *Transaction, err error) error
