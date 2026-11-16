@@ -163,8 +163,7 @@ func newSessionProperties(sessionName string, conf Config) *EventTraceProperties
 	// EVENT_TRACE_INDEPENDENT_SESSION_MODE, an event that cannot be written
 	// to any one session enabled for its provider is not written to any of
 	// them, so a full session elsewhere (for example the event log session
-	// of an analytic channel) silently drops events from this one. Those
-	// losses are counted on the other session, not this one.
+	// of an analytic channel) drops events from this one.
 	// STOP_ON_HYBRID_SHUTDOWN is set explicitly rather than leaving ETW to
 	// choose a default; the session belongs to this process and is
 	// recreated on start.
