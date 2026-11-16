@@ -378,7 +378,6 @@ func TestAdditionalOpCodesInPluginContext(t *testing.T) {
 		wantMethod string
 	}{
 		{name: "OP_COMMAND", opCode: int32(opCommand), wantMethod: "command"},
-		{name: "OP_COMMANDREPLY", opCode: int32(opCommandRep), responseTo: 1, wantMethod: "commandReply"},
 		{name: "OP_COMPRESSED", opCode: int32(opCompressed), wantMethod: "compressed"},
 	}
 
@@ -400,6 +399,19 @@ func TestAdditionalOpCodesInPluginContext(t *testing.T) {
 			assert.Equal(t, tc.wantMethod, trans["method"])
 		})
 	}
+
+	t.Run("OP_COMMANDREPLY without matching request", func(t *testing.T) {
+		results, mongodb := mongodbModForTests(t)
+		data := buildMinimalMongoMessage(int32(opCommandRep), 1)
+		private := mongodb.Parse(
+			&protos.Packet{Payload: data},
+			testTCPTuple(),
+			0,
+			protos.ProtocolData(new(mongodbConnectionData)),
+		)
+		assert.NotNil(t, private)
+		assert.Empty(t, results.events, "orphan replies are cached until a request appears")
+	})
 }
 
 // Test for a (recovered) panic parsing document length in request/response messages
