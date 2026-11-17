@@ -512,7 +512,7 @@ func runUntil(t *testing.T, mi *minimalStateInput, done func([]statusUpdate) boo
 			v2.Context{
 				Logger:      logptest.NewTestingLogger(t, "test"),
 				ID:          "test-" + t.Name(),
-				Cancelation: v2.GoContextFromCanceler(ctx),
+				Cancelation: ctx,
 			}.WithStatusReporter(reporter),
 			&fakeConnector{client: &ackingClient{inner: &fakeClient{}}},
 		)
@@ -732,7 +732,7 @@ func runTracedInput(t *testing.T, cfg, name, want string, n int) []byte {
 					ID:            id,
 					IDWithoutName: id,
 					Agent:         beat.Info{Paths: &paths.Path{Logs: logs}},
-					Cancelation:   v2.GoContextFromCanceler(ctx),
+					Cancelation:   ctx,
 				},
 				&fakeConnector{client: &fakeClient{}},
 			)
