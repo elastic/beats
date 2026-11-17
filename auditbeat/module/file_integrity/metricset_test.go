@@ -23,6 +23,7 @@ import (
 	"reflect"
 	"runtime"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -32,8 +33,11 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/pkg/paths"
 )
@@ -391,6 +395,7 @@ func TestErrorReporting(t *testing.T) {
 type testReporter struct {
 	events []mb.Event
 	errors []error
+	done   chan struct{}
 }
 
 func (t *testReporter) Event(event mb.Event) bool {
@@ -404,7 +409,7 @@ func (t *testReporter) Error(err error) bool {
 }
 
 func (t *testReporter) Done() <-chan struct{} {
-	return nil
+	return t.done
 }
 
 func (t *testReporter) Clear() {
@@ -938,6 +943,132 @@ func TestEventDelete(t *testing.T) {
 	})
 }
 
+type stubProducer struct {
+	events       int
+	releaseClose <-chan struct{}
+	waitingClose chan struct{}
+	stopped      atomic.Bool
+}
+
+func (p *stubProducer) Start(done <-chan struct{}) (<-chan Event, error) {
+	ch := make(chan Event, 1)
+	go func() {
+		defer func() {
+			if p.waitingClose != nil {
+				close(p.waitingClose)
+			}
+			if p.releaseClose != nil {
+				<-p.releaseClose
+			}
+			p.stopped.Store(true)
+			close(ch)
+		}()
+		for i := range p.events {
+			ch <- Event{Path: filepath.Join("/stub", string(rune('a'+i)))}
+		}
+		<-done
+		ch <- Event{Path: "/stub/post-done"}
+	}()
+	return ch, nil
+}
+
+func TestRunDrainsProducersOnShutdown(t *testing.T) {
+	dir := t.TempDir()
+	for i := range 5 {
+		p := filepath.Join(dir, string(rune('a'+i)))
+		require.NoError(
+			t,
+			os.WriteFile(p, []byte("payload"), 0o600),
+			"failed to create test file",
+		)
+	}
+
+	cfg := getConfig(dir)
+	cfg["scan_at_start"] = true
+	rawCfg, err := conf.NewConfigFrom(cfg)
+	require.NoError(t, err, "creating config must succeed")
+
+	_, metricsets, err := mb.NewModule(
+		rawCfg,
+		ab.Registry,
+		beat.Info{
+			Paths:     testPaths(t.TempDir()),
+			UserAgent: "test",
+			Logger:    logp.NewNopLogger(),
+		},
+	)
+	require.NoError(t, err, "creating module must succeed")
+	require.Len(t, metricsets, 1, "expected a single metricset")
+
+	ms, ok := metricsets[0].(*MetricSet)
+	require.True(t, ok, "expected *MetricSet instance")
+	defer func() {
+		assert.NoError(t, ms.Close(), "closing metricset must succeed")
+	}()
+
+	releaseReader := make(chan struct{})
+	waitingReader := make(chan struct{})
+	reader := &stubProducer{
+		events:       3,
+		releaseClose: releaseReader,
+		waitingClose: waitingReader,
+	}
+	ms.reader = reader
+
+	reporter := &testReporter{done: make(chan struct{})}
+	close(reporter.done)
+
+	var readerStoppedOnReturn atomic.Bool
+	runDone := make(chan struct{})
+	go func() {
+		defer close(runDone)
+		ms.Run(reporter)
+		readerStoppedOnReturn.Store(reader.stopped.Load())
+	}()
+
+	select {
+	case <-waitingReader:
+	case <-runDone:
+		close(releaseReader)
+		t.Fatal("MetricSet.Run returned before reader producer closed its channel")
+	case <-time.After(5 * time.Second):
+		close(releaseReader)
+		t.Fatal("timed out waiting for reader producer events to be drained")
+	}
+
+	select {
+	case <-runDone:
+		close(releaseReader)
+		t.Fatal("MetricSet.Run returned while reader channel was still open")
+	default:
+	}
+
+	close(releaseReader)
+
+	select {
+	case <-runDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("MetricSet.Run did not return after producers closed their channels")
+	}
+
+	assert.True(
+		t,
+		readerStoppedOnReturn.Load(),
+		"reader producer must finish before MetricSet.Run returns",
+	)
+	assert.Nil(
+		t,
+		ms.eventChan,
+		"eventChan must be drained until closed before MetricSet.Run returns",
+	)
+	assert.Nil(
+		t,
+		ms.scanChan,
+		"scanChan must be drained until closed before MetricSet.Run returns",
+	)
+}
+
+// ==================================================
 func getConfig(path ...string) map[string]any {
 	return map[string]any{
 		"module":        "file_integrity",

@@ -165,7 +165,26 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 
 			ms.reportEvent(reporter, &event)
 		case <-reporter.Done():
+			// Drain and discard remaining events until both producers close their
+			// channels; once reporter.Done() is closed, reporter drops events and
+			// Close() may concurrently close the underlying datastore bucket.
+			ms.drain()
 			return
+		}
+	}
+}
+
+func (ms *MetricSet) drain() {
+	for ms.eventChan != nil || ms.scanChan != nil {
+		select {
+		case _, ok := <-ms.eventChan:
+			if !ok {
+				ms.eventChan = nil
+			}
+		case _, ok := <-ms.scanChan:
+			if !ok {
+				ms.scanChan = nil
+			}
 		}
 	}
 }
