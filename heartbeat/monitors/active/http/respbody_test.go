@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"runtime"
 	"strings"
 	"sync"
 	"testing"
@@ -272,26 +271,20 @@ func newPlainBody(s string) io.ReadCloser { return plainBody{strings.NewReader(s
 // readPrefixAndHash runs on every check of every http monitor and the body is
 // usually tiny, so it must not allocate copy buffers per call.
 func Test_readPrefixAndHashDoesNotAllocateCopyBuffers(t *testing.T) {
-	const runs = 200
-	body := strings.Repeat("a", 100)
+	const content = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+	reader := strings.NewReader(content)
+	body := plainBody{reader}
 
-	// Warm the buffer pool.
-	_, _, _, err := readPrefixAndHash(newPlainBody(body), 128)
-	require.NoError(t, err)
-
-	var before, after runtime.MemStats
-	runtime.ReadMemStats(&before)
-	for range runs {
-		_, _, _, err := readPrefixAndHash(newPlainBody(body), 128)
-		require.NoError(t, err)
-	}
-	runtime.ReadMemStats(&after)
-
-	perRun := (after.TotalAlloc - before.TotalAlloc) / runs
-	// Without the pool this is two buffers, 2*copyBufSize. The race detector
-	// makes sync.Pool drop some Puts, so allow for an occasional new buffer.
-	assert.Less(t, perRun, uint64(copyBufSize/2),
-		"readPrefixAndHash allocated %d bytes per call, a copy buffer is %d", perRun, copyBufSize)
+	allocs := testing.AllocsPerRun(200, func() {
+		reader.Reset(content)
+		if _, _, _, err := readPrefixAndHash(body, 128); err != nil {
+			t.Error(err)
+		}
+	})
+	// Measured: 9 allocations with the pool, 11 without it (one copy buffer for
+	// each of the two copies), so 10 fails if either buffer is allocated per call.
+	assert.LessOrEqual(t, allocs, float64(10),
+		"readPrefixAndHash made %v allocations per call, expected the copy buffers to be pooled", allocs)
 }
 
 func Test_readPrefixAndHashConcurrent(t *testing.T) {
