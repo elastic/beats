@@ -154,27 +154,29 @@ func testServerClientCAReload(t *testing.T, serve func(*http.Server, net.Listene
 	roots := x509.NewCertPool()
 	roots.AddCert(srv.cert)
 	// Like a client with certificate reloading, present the certificate
-	// whatever CAs the server advertises, so only the server decides.
-	request := func(client caReloadKeyPair) (negotiatedProto string, err error) {
+	// whatever CAs the server advertises, so only the server decides. The
+	// advertised CA names are returned so they can be checked.
+	request := func(client caReloadKeyPair) (negotiatedProto string, acceptableCAs [][]byte, err error) {
 		c := http.Client{Timeout: 5 * time.Second, Transport: &http.Transport{
 			DisableKeepAlives: true,
 			ForceAttemptHTTP2: true,
 			TLSClientConfig: &tls.Config{
 				RootCAs: roots,
-				GetClientCertificate: func(*tls.CertificateRequestInfo) (*tls.Certificate, error) {
+				GetClientCertificate: func(info *tls.CertificateRequestInfo) (*tls.Certificate, error) {
+					acceptableCAs = info.AcceptableCAs
 					return &client.tlsCert, nil
 				},
 			},
 		}}
 		req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "https://"+addr+"/", nil)
 		if err != nil {
-			return "", err
+			return "", nil, err
 		}
 		resp, err := c.Do(req)
 		if err != nil {
-			return "", err
+			return "", acceptableCAs, err
 		}
-		return resp.TLS.NegotiatedProtocol, resp.Body.Close()
+		return resp.TLS.NegotiatedProtocol, acceptableCAs, resp.Body.Close()
 	}
 
 	steps := []struct {
@@ -194,8 +196,11 @@ func testServerClientCAReload(t *testing.T, serve func(*http.Server, net.Listene
 		}
 		// the CA reloader re-reads the bundle on the first handshake after the reload interval
 		require.EventuallyWithT(t, func(c *assert.CollectT) {
-			proto, err := request(step.client)
+			proto, cas, err := request(step.client)
 			assert.Equal(c, step.wantAccepted, err == nil, "%s: request error: %v", step.name, err)
+			// The server must not advertise the CA names captured at startup, which
+			// would mislead clients choosing a certificate once the bundle changes.
+			assert.Empty(c, cas, "%s: advertised CA names", step.name)
 			if err == nil {
 				assert.Equal(c, wantProto, proto, "%s: negotiated protocol", step.name)
 			}
