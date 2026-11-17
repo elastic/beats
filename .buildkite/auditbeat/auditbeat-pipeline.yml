@@ -204,8 +204,8 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
-          diskType: "hyperdisk-balanced"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
+          diskType: "hyperdisk-balanced"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
