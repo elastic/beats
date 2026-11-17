@@ -86,6 +86,38 @@ func newCAReloadKeyPair(t *testing.T, cn string, server bool) caReloadKeyPair {
 // currently on disk: a CA added to the bundle after startup must be accepted,
 // and a CA removed from it rejected, without a restart.
 func TestServerClientCAReload(t *testing.T) {
+	tests := []struct {
+		name string
+		// serve starts server on ln using cfg, the way callers in this repo do.
+		serve func(server *http.Server, ln net.Listener, cfg *tls.Config)
+		// wantProto is the application protocol expected to be negotiated.
+		wantProto string
+	}{
+		{
+			name: "tls.NewListener",
+			serve: func(server *http.Server, ln net.Listener, cfg *tls.Config) {
+				_ = server.Serve(tls.NewListener(ln, cfg))
+			},
+		},
+		{
+			// net/http sets up ALPN on its own copy of the config since Go 1.27, so
+			// this catches the reload handling dropping changes made to copies.
+			name: "ServeTLS",
+			serve: func(server *http.Server, ln net.Listener, cfg *tls.Config) {
+				server.TLSConfig = cfg
+				_ = server.ServeTLS(ln, "", "")
+			},
+			wantProto: "h2",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			testServerClientCAReload(t, tc.serve, tc.wantProto)
+		})
+	}
+}
+
+func testServerClientCAReload(t *testing.T, serve func(*http.Server, net.Listener, *tls.Config), wantProto string) {
 	const reloadInterval = time.Second
 
 	srv := newCAReloadKeyPair(t, "server", true)
@@ -115,7 +147,7 @@ func TestServerClientCAReload(t *testing.T) {
 		Handler:           http.HandlerFunc(func(http.ResponseWriter, *http.Request) {}),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
-	go func() { _ = server.Serve(tls.NewListener(ln, common.BuildServerConfig("127.0.0.1"))) }()
+	go serve(server, ln, common.BuildServerConfig("127.0.0.1"))
 	t.Cleanup(func() { _ = server.Close() })
 	addr := ln.Addr().String()
 
@@ -123,9 +155,10 @@ func TestServerClientCAReload(t *testing.T) {
 	roots.AddCert(srv.cert)
 	// Like a client with certificate reloading, present the certificate
 	// whatever CAs the server advertises, so only the server decides.
-	request := func(client caReloadKeyPair) error {
+	request := func(client caReloadKeyPair) (negotiatedProto string, err error) {
 		c := http.Client{Timeout: 5 * time.Second, Transport: &http.Transport{
 			DisableKeepAlives: true,
+			ForceAttemptHTTP2: true,
 			TLSClientConfig: &tls.Config{
 				RootCAs: roots,
 				GetClientCertificate: func(*tls.CertificateRequestInfo) (*tls.Certificate, error) {
@@ -135,13 +168,13 @@ func TestServerClientCAReload(t *testing.T) {
 		}}
 		req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "https://"+addr+"/", nil)
 		if err != nil {
-			return err
+			return "", err
 		}
 		resp, err := c.Do(req)
 		if err != nil {
-			return err
+			return "", err
 		}
-		return resp.Body.Close()
+		return resp.TLS.NegotiatedProtocol, resp.Body.Close()
 	}
 
 	steps := []struct {
@@ -161,8 +194,11 @@ func TestServerClientCAReload(t *testing.T) {
 		}
 		// the CA reloader re-reads the bundle on the first handshake after the reload interval
 		require.EventuallyWithT(t, func(c *assert.CollectT) {
-			err := request(step.client)
+			proto, err := request(step.client)
 			assert.Equal(c, step.wantAccepted, err == nil, "%s: request error: %v", step.name, err)
+			if err == nil {
+				assert.Equal(c, wantProto, proto, "%s: negotiated protocol", step.name)
+			}
 		}, 5*reloadInterval, 100*time.Millisecond, step.name)
 	}
 }
