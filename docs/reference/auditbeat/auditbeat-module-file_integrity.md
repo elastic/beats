@@ -132,7 +132,9 @@ This module also supports the [standard configuration options](#module-standard-
 :   The maximum size of a file in bytes for which Auditbeat will compute hashes and run file parsers. Files larger than this size will not be hashed or analysed by configured file parsers. The default value is 100 MiB. For convenience, units can be specified as a suffix to the value. The supported units are `b` (default), `kib`, `kb`, `mib`, `mb`, `gib`, `gb`, `tib`, `tb`, `pib`, `pb`, `eib`, and `eb`.
 
 **`hash_types`**
-:   A list of hash types to compute when the file changes. The supported hash types are `blake2b_256`, `blake2b_384`, `blake2b_512`, `md5`, `sha1`, `sha224`, `sha256`, `sha384`, `sha512`, `sha512_224`, `sha512_256`, `sha3_224`, `sha3_256`, `sha3_384`, `sha3_512`, and `xxh64`. The default value is `sha1` in standard builds and `sha256` in FIPS builds. FIPS builds do not support the `blake2b_*`, `md5` and `sha1` hash types.
+:   A list of hash types to compute when the file changes. The supported hash types are `blake2b_256`, `blake2b_384`, `blake2b_512`, `md5`, `sha1`, `sha224`, `sha256`, `sha384`, `sha512`, `sha512_224`, `sha512_256`, `sha3_224`, `sha3_256`, `sha3_384`, `sha3_512`, and `xxh64`. The default value is `sha1`.
+
+    {applies_to}`stack: ga 9.1+` In FIPS builds, the default value is `sha256`, and the `blake2b_*`, `md5`, and `sha1` hash types aren't supported.
 
 **`file_parsers`**
 :   A list of `file_integrity` fields under `file` that will be populated by file format parsers. The available fields that can be analysed are listed in the auditbeat.reference.yml file. File parsers are run on all files within the `max_file_size` limit in the configured paths during a scan or when a file event involves the file. Files that are not targets of the specific file parser are only sniffed to examine whether analysis should proceed. This will usually only involve reading a small number of bytes.
