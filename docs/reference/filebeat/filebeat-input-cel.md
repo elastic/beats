@@ -173,7 +173,7 @@ filebeat.inputs:
 - type: cel
   resource.url: https://example.com/api/export
   program: |
-    bytes(state.url.get(state.header).Body).as(body,
+    bytes(get(state.url).Body).as(body,
       body.stream_gzip().decode_json_stream_lazy().emit(e, e, state.cursor).as(r,
         has(r.error) ?
           {"events": [{"error": r.error}]}
@@ -197,7 +197,7 @@ filebeat.inputs:
 - type: cel
   resource.url: https://example.com/api/archive.tar.bz2
   program: |
-    bytes(state.url.get(state.header).Body).as(body,
+    bytes(get(state.url).Body).as(body,
       body.stream_bzip2().stream_tar().stream_bzip2().decode_json_stream_lazy().emit(e, e).as(r,
         {"events": []}
       )
