@@ -1,10 +1,13 @@
 kind: bug-fix
-summary: Limit Packetbeat /proc rescans to once per second per transport (max_proc_read_freq).
+summary: Limit Packetbeat process enrichment /proc scans so they cannot saturate the sniffer.
 description: >-
   Each lookup miss used to walk every file descriptor of every process on the
-  host, which could saturate the sniffer. Full scans are now limited to one per
-  second per transport by default, controlled by max_proc_read_freq. A
-  connection first seen shortly after a scan may be published without process
-  information. Mappings confirmed by a scan stay valid for at least 10s after
-  that scan, and vanished PIDs are logged at debug level.
+  host, which could saturate the sniffer. On Linux the walk is now skipped when
+  the socket table shows no open socket on the port. Lookups are also spaced so
+  that, for each transport, they take about a tenth of the time, and
+  max_proc_read_freq can add a fixed minimum interval between full scans. A
+  connection opened and closed between scans may be published without process
+  information. Mappings confirmed by a
+  scan stay valid for at least 10s after that scan, and vanished PIDs are
+  logged at debug level.
 component: packetbeat

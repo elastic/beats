@@ -111,7 +111,7 @@ func mergeProcsConfig(one, two procs.ProcsConfig) procs.ProcsConfig {
 // mergeMaxProcReadFreq combines two max_proc_read_freq values. A negative
 // value disables the scan limit and wins over any other value; otherwise the
 // larger value wins. A plain max would turn a negative value into zero, which
-// selects the default limit.
+// adds no fixed limit.
 func mergeMaxProcReadFreq(one, two time.Duration) time.Duration {
 	if one < 0 || two < 0 {
 		return -1

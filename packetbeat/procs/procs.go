@@ -46,6 +46,11 @@ const (
 	// scanMargin is added to the scan interval when it exceeds mappingTTL,
 	// so that a mapping outlives the wait for the next permitted scan.
 	scanMargin = 5 * time.Second
+
+	// scanCostFactor sets the wait after a socket table lookup as a
+	// multiple of how long the lookup took. With 9, lookups for each
+	// transport hold the watcher's lock for about a tenth of the time.
+	scanCostFactor = 9
 )
 
 var (
@@ -67,12 +72,11 @@ type ProcessesWatcher struct {
 	watcher processWatcher
 
 	// minScanGap is the minimum time between the end of one full
-	// socket table scan and the start of the next for a transport.
-	// Zero or negative disables the limit.
+	// scan and the start of the next for a transport, in addition to
+	// the wait set by scanCostFactor. A negative value disables both.
 	minScanGap time.Duration
-	// lastScan is the time at which the last scan for each transport
-	// finished.
-	lastScan map[applayer.Transport]time.Time
+	// scans holds the throttling state of each transport.
+	scans map[applayer.Transport]scanState
 	// now returns the current time. It is replaced in tests.
 	now func() time.Time
 
@@ -84,6 +88,13 @@ type ProcessesWatcher struct {
 	logger, procLogger, procDetailedLogger *logp.Logger
 
 	isProcEnabled, isProcDetailedEnabled bool
+}
+
+// scanState records the most recent socket table lookups for a transport.
+type scanState struct {
+	checked time.Time     // checked is when the last lookup finished.
+	cost    time.Duration // cost is how long the last lookup took.
+	scanned time.Time     // scanned is when the last full scan finished.
 }
 
 // endpoint is a network address/port number complex.
@@ -134,8 +145,10 @@ type tupleWatcher interface {
 // processWatcher allows the OS-dependent implementation to be replaced by a mock for testing
 type processWatcher interface {
 	// GetLocalPortToPIDMapping returns the list of local port numbers and the PID
-	// that owns them.
-	GetLocalPortToPIDMapping(transport applayer.Transport) (ports map[endpoint]int, err error)
+	// that owns them. It is called when a lookup for port misses. It may skip
+	// the full scan, and return no mappings, when no open socket uses port;
+	// scanned reports whether the full scan was done.
+	GetLocalPortToPIDMapping(transport applayer.Transport, port uint16) (ports map[endpoint]int, scanned bool, err error)
 
 	// GetProcess returns the process metadata.
 	GetProcess(pid int) *process
@@ -164,10 +177,7 @@ func (proc *ProcessesWatcher) init(config ProcsConfig, watcher processWatcher, l
 	proc.processCache = make(map[int]*process)
 
 	proc.minScanGap = config.MaxProcReadFreq
-	if proc.minScanGap == 0 {
-		proc.minScanGap = DefaultMaxProcReadFreq
-	}
-	proc.lastScan = make(map[applayer.Transport]time.Time)
+	proc.scans = make(map[applayer.Transport]scanState)
 	if proc.now == nil {
 		proc.now = time.Now
 	}
@@ -304,8 +314,7 @@ func (proc *ProcessesWatcher) findProc(address net.IP, port uint16, transport ap
 	if proc.scanThrottled(transport) {
 		return nil
 	}
-	proc.updateMap(transport)
-	proc.lastScan[transport] = proc.now()
+	proc.updateMap(transport, port)
 
 	p, exists = lookupMapping(address, port, procMap, proc.now(), proc.procLogger)
 	if exists {
@@ -315,14 +324,24 @@ func (proc *ProcessesWatcher) findProc(address net.IP, port uint16, transport ap
 	return nil
 }
 
-// scanThrottled returns whether a scan for the transport finished too
-// recently to start another. proc.mu must be locked.
+// scanThrottled returns whether a socket table lookup for the transport
+// happened too recently to start another. The wait after a lookup scales
+// with its cost, so misses are only lost on hosts where lookups are
+// expensive. A fixed minScanGap also spaces full scans, but not the cheap
+// lookups that find no socket and skip the scan. proc.mu must be locked.
 func (proc *ProcessesWatcher) scanThrottled(transport applayer.Transport) bool {
-	if proc.minScanGap <= 0 {
+	if proc.minScanGap < 0 {
 		return false
 	}
-	last, ok := proc.lastScan[transport]
-	return ok && proc.now().Sub(last) < proc.minScanGap
+	s, ok := proc.scans[transport]
+	if !ok {
+		return false
+	}
+	now := proc.now()
+	if now.Sub(s.checked) < scanCostFactor*s.cost {
+		return true
+	}
+	return proc.minScanGap > 0 && !s.scanned.IsZero() && now.Sub(s.scanned) < proc.minScanGap
 }
 
 // proc.mu must be locked
@@ -365,15 +384,22 @@ func lookupMapping(address net.IP, port uint16, procMap map[endpoint]portProcMap
 }
 
 // proc.mu must be locked
-func (proc *ProcessesWatcher) updateMap(transport applayer.Transport) {
-	if proc.isProcDetailedEnabled {
-		start := time.Now()
-		defer func() {
-			proc.procDetailedLogger.Debugf("updateMap() took %v", time.Since(start))
-		}()
+func (proc *ProcessesWatcher) updateMap(transport applayer.Transport, port uint16) {
+	// The state is recorded before the mappings are updated, so that
+	// their lifetime follows the wait this lookup sets.
+	start := proc.now()
+	endpoints, scanned, err := proc.watcher.GetLocalPortToPIDMapping(transport, port)
+	end := proc.now()
+	s := proc.scans[transport]
+	s.checked = end
+	s.cost = end.Sub(start)
+	if scanned {
+		s.scanned = end
 	}
-
-	endpoints, err := proc.watcher.GetLocalPortToPIDMapping(transport)
+	proc.scans[transport] = s
+	if proc.isProcDetailedEnabled {
+		proc.procDetailedLogger.Debugf("GetLocalPortToPIDMapping() took %v, full scan: %t", s.cost, scanned)
+	}
 	if err != nil {
 		proc.logger.Errorf("unable to list local ports: %v", err)
 	}
@@ -396,10 +422,12 @@ func (proc *ProcessesWatcher) expireProcessCache() {
 }
 
 // mappingLife returns how long a mapping is trusted after a scan sees it.
-// It is at least as long as the scan interval, otherwise a long-lived
-// listener would lose its mapping while the throttle blocks the rescan.
-func (proc *ProcessesWatcher) mappingLife() time.Duration {
-	return max(mappingTTL, proc.minScanGap+scanMargin)
+// It is at least as long as the wait for the next full scan, otherwise a
+// long-lived listener would lose its mapping while the throttle blocks the
+// rescan. proc.mu must be locked.
+func (proc *ProcessesWatcher) mappingLife(transport applayer.Transport) time.Duration {
+	gap := max(proc.minScanGap, scanCostFactor*proc.scans[transport].cost)
+	return max(mappingTTL, gap+scanMargin)
 }
 
 // proc.mu must be locked
@@ -409,7 +437,7 @@ func (proc *ProcessesWatcher) updateMappingEntry(transport applayer.Transport, e
 		// This port->pid mapping already exists. Extend its life since
 		// the scan has just confirmed it, otherwise stable listeners
 		// expire and force a rescan.
-		prev.expires = proc.now().Add(proc.mappingLife())
+		prev.expires = proc.now().Add(proc.mappingLife(transport))
 		proc.portProcMap[transport][e] = prev
 		return
 	}
@@ -432,7 +460,7 @@ func (proc *ProcessesWatcher) updateMappingEntry(transport applayer.Transport, e
 		endpoint: e,
 		pid:      pid,
 		proc:     p,
-		expires:  proc.now().Add(proc.mappingLife()),
+		expires:  proc.now().Add(proc.mappingLife(transport)),
 	}
 
 	if proc.isProcDetailedEnabled {

@@ -20,6 +20,7 @@
 package procs
 
 import (
+	"net"
 	"os"
 	"path/filepath"
 	"slices"
@@ -165,4 +166,26 @@ func TestGetProcessVanishedPID(t *testing.T) {
 		require.Less(t, e.Level, zapcore.ErrorLevel, "vanished PID logged at %s: %s", e.Level, e.Message)
 	}
 	require.NotZero(t, logs.FilterMessageSnippet("Unable to get command-line for PID").Len(), "expected a debug message for the vanished PID")
+}
+
+func TestHasSocket(t *testing.T) {
+	socks := []*socketInfo{
+		{srcIP: net.ParseIP("127.0.0.53"), srcPort: 53, inode: 100},
+		{srcIP: net.IPv4zero, srcPort: 8080, inode: 101},
+		{srcIP: net.ParseIP("10.0.0.1"), srcPort: 40000, inode: 0}, // TIME_WAIT
+	}
+	for _, tc := range []struct {
+		port uint16
+		want bool
+	}{
+		{53, true},
+		{8080, true},   // Wildcard address.
+		{40000, false}, // No owning process.
+		{40001, false}, // Closed.
+	} {
+		got := hasSocket(socks, tc.port)
+		if got != tc.want {
+			t.Errorf("hasSocket(socks, %d) = %t; want %t", tc.port, got, tc.want)
+		}
+	}
 }
