@@ -22,7 +22,8 @@ steps:
     agents:
       provider: "gcp"
       image: "${IMAGE_UBUNTU_X86_64}"
-      machineType: "n2-standard-8"
+      diskType: "hyperdisk-balanced"
+      machineType: "n4d-standard-8"
     artifact_paths:
       - "x-pack/heartbeat/build/distributions/*"
       - "x-pack/heartbeat/build/heartbeat-ironbank-*-docker-build-context/*"
