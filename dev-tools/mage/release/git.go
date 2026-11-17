@@ -24,33 +24,50 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"time"
 
+	"github.com/go-git/go-billy/v5/osfs"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/cache"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/go-git/go-git/v5/storage/filesystem"
 )
 
 const (
 	// pushTimeout bounds native git push so Buildkite jobs fail fast instead of
 	// hanging until the step timeout (go-git push stalls on reference clones).
 	pushTimeout = 10 * time.Minute
+	// pushWaitDelay bounds CombinedOutput after context cancel when a git
+	// helper (for example git-remote-http) keeps an I/O pipe open.
+	pushWaitDelay = 10 * time.Second
 )
 
-// GitRepo wraps go-git Repository with helper methods
+// GitRepo wraps go-git Repository with helper methods.
 type GitRepo struct {
 	repo *git.Repository
 	path string
 }
 
-// OpenRepo opens a git repository at the specified path
+// OpenRepo opens a git repository at the specified path.
 func OpenRepo(path string) (*GitRepo, error) {
 	repo, err := git.PlainOpen(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open repository: %w", err)
 	}
+
+	// Buildkite reference clones borrow objects outside the repository's .git directory.
+	storage, ok := repo.Storer.(*filesystem.Storage)
+	if !ok {
+		return nil, fmt.Errorf("open repository: unexpected storage type %T", repo.Storer)
+	}
+	root := filepath.VolumeName(storage.Filesystem().Root()) + string(filepath.Separator)
+	repo.Storer = filesystem.NewStorageWithOptions(storage.Filesystem(), cache.NewObjectLRUDefault(), filesystem.Options{
+		AlternatesFS: osfs.New(root),
+	})
 
 	return &GitRepo{
 		repo: repo,
@@ -311,30 +328,32 @@ func isTokenPushRemoteURL(u string) bool {
 		strings.HasPrefix(u, "file://")
 }
 
-// gitHTTPSAuthExtraHeader returns a git http.extraHeader value for GitHub
-// HTTPS pushes. Git-over-HTTPS rejects Bearer for App/Vault tokens; use Basic
-// with x-access-token (same scheme as observability-robots ingest-release-smoke).
-//
-// Caught by ingest-release-smoke build 8:
-// https://buildkite.com/elastic/observability-robots-ingest-release-smoke/builds/8
+// gitHTTPSAuthExtraHeader returns the git http.extraHeader value for GitHub
+// token auth. GitHub documents x-access-token as the Basic auth user name for
+// App installation tokens; git-over-HTTPS rejects Bearer for those tokens.
 func gitHTTPSAuthExtraHeader(token string) string {
 	auth := base64.StdEncoding.EncodeToString([]byte("x-access-token:" + token))
 	return "Authorization: Basic " + auth
 }
 
-// gitPushEnv adds a process-local http.extraHeader via GIT_CONFIG_* so the
-// token never appears in argv (keeps gosec G204 clean and out of process lists).
+// gitPushEnv adds process-local git config and disables interactive prompts so
+// the token never appears in argv and a failed auth cannot hang on a TTY.
+// An empty http.https://github.com/.extraHeader first clears headers that other
+// git configuration may set for github.com, then the auth header is set.
 func gitPushEnv(baseEnv []string, token string) []string {
 	return append(append([]string{}, baseEnv...),
-		"GIT_CONFIG_COUNT=1",
-		"GIT_CONFIG_KEY_0=http.extraHeader",
-		"GIT_CONFIG_VALUE_0="+gitHTTPSAuthExtraHeader(token),
+		"GIT_TERMINAL_PROMPT=0",
+		"GIT_CONFIG_COUNT=2",
+		"GIT_CONFIG_KEY_0=http.https://github.com/.extraHeader",
+		"GIT_CONFIG_VALUE_0=",
+		"GIT_CONFIG_KEY_1=http.https://github.com/.extraHeader",
+		"GIT_CONFIG_VALUE_1="+gitHTTPSAuthExtraHeader(token),
 	)
 }
 
 // Push pushes the current branch to the remote using the given GitHub token.
-// It uses the git CLI (not go-git) so Buildkite reference clones can pack and
-// upload objects from shared mirrors; go-git Push hangs in that layout.
+// It uses the git CLI so Buildkite reference clones can pack and upload; go-git
+// Push hangs in that layout.
 func (g *GitRepo) Push(remoteName, token string) error {
 	if token == "" {
 		return fmt.Errorf("GitHub token is required for pushing")
@@ -357,10 +376,11 @@ func (g *GitRepo) Push(remoteName, token string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), pushTimeout)
 	defer cancel()
 
-	// Literal argv only (gosec G204). Auth is injected through GIT_CONFIG_* so
-	// the token is not passed as a command-line argument. `git push origin HEAD`
-	// updates the remote branch that matches the current local branch name.
+	// Auth is injected through GIT_CONFIG_* so the token is not passed as a
+	// command-line argument. `git push origin HEAD` updates the remote branch
+	// that matches the current local branch name.
 	cmd := exec.CommandContext(ctx, "git", "push", "origin", "HEAD")
+	cmd.WaitDelay = pushWaitDelay
 	cmd.Dir = g.path
 	cmd.Env = gitPushEnv(os.Environ(), token)
 	output, err := cmd.CombinedOutput()

@@ -218,6 +218,51 @@ func TestGitHTTPSAuthExtraHeader(t *testing.T) {
 	}
 }
 
+func TestOpenRepo(t *testing.T) {
+	_, tmpDir := createTestRepo(t)
+
+	gitRepo, err := OpenRepo(tmpDir)
+	if err != nil {
+		t.Fatalf("OpenRepo() error = %v", err)
+	}
+	if gitRepo == nil || gitRepo.repo == nil {
+		t.Fatal("OpenRepo() returned nil repo")
+	}
+
+	if _, err := OpenRepo("/non/existent/path"); err == nil {
+		t.Fatal("OpenRepo() should fail for non-existent path")
+	}
+}
+
+func TestOpenRepoWithAlternateObjects(t *testing.T) {
+	_, source := createTestRepo(t)
+	assertReferenceCloneIsClean := func(t *testing.T) {
+		t.Helper()
+		clone := filepath.Join(t.TempDir(), "checkout")
+		runGit(t, source, "clone", "--no-local", "--reference", source, source, clone)
+
+		repo, err := OpenRepo(clone)
+		if err != nil {
+			t.Fatalf("OpenRepo() error = %v", err)
+		}
+		clean, err := repo.IsClean()
+		if err != nil {
+			t.Fatalf("IsClean() error = %v", err)
+		}
+		if !clean {
+			t.Fatalf("IsClean() = false, want true on reference clone")
+		}
+	}
+	t.Run("reference clone with loose objects", func(t *testing.T) {
+		assertReferenceCloneIsClean(t)
+	})
+	t.Run("reference clone with packed objects", func(t *testing.T) {
+		runGit(t, source, "repack", "-a", "-d")
+		runGit(t, source, "prune-packed")
+		assertReferenceCloneIsClean(t)
+	})
+}
+
 func TestGitPushEnv(t *testing.T) {
 	env := gitPushEnv([]string{"PATH=/usr/bin"}, "test-token")
 	wantHeader := gitHTTPSAuthExtraHeader("test-token")
@@ -232,14 +277,23 @@ func TestGitPushEnv(t *testing.T) {
 	if got["PATH"] != "/usr/bin" {
 		t.Fatalf("PATH = %q, want /usr/bin", got["PATH"])
 	}
-	if got["GIT_CONFIG_COUNT"] != "1" {
-		t.Fatalf("GIT_CONFIG_COUNT = %q, want 1", got["GIT_CONFIG_COUNT"])
+	if got["GIT_TERMINAL_PROMPT"] != "0" {
+		t.Fatalf("GIT_TERMINAL_PROMPT = %q, want 0", got["GIT_TERMINAL_PROMPT"])
 	}
-	if got["GIT_CONFIG_KEY_0"] != "http.extraHeader" {
-		t.Fatalf("GIT_CONFIG_KEY_0 = %q, want http.extraHeader", got["GIT_CONFIG_KEY_0"])
+	if got["GIT_CONFIG_COUNT"] != "2" {
+		t.Fatalf("GIT_CONFIG_COUNT = %q, want 2", got["GIT_CONFIG_COUNT"])
 	}
-	if got["GIT_CONFIG_VALUE_0"] != wantHeader {
-		t.Fatalf("GIT_CONFIG_VALUE_0 = %q, want %q", got["GIT_CONFIG_VALUE_0"], wantHeader)
+	if got["GIT_CONFIG_KEY_0"] != "http.https://github.com/.extraHeader" {
+		t.Fatalf("GIT_CONFIG_KEY_0 = %q, want http.https://github.com/.extraHeader", got["GIT_CONFIG_KEY_0"])
+	}
+	if got["GIT_CONFIG_VALUE_0"] != "" {
+		t.Fatalf("GIT_CONFIG_VALUE_0 = %q, want empty clear header", got["GIT_CONFIG_VALUE_0"])
+	}
+	if got["GIT_CONFIG_KEY_1"] != "http.https://github.com/.extraHeader" {
+		t.Fatalf("GIT_CONFIG_KEY_1 = %q, want http.https://github.com/.extraHeader", got["GIT_CONFIG_KEY_1"])
+	}
+	if got["GIT_CONFIG_VALUE_1"] != wantHeader {
+		t.Fatalf("GIT_CONFIG_VALUE_1 = %q, want %q", got["GIT_CONFIG_VALUE_1"], wantHeader)
 	}
 }
 
