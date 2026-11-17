@@ -24,7 +24,7 @@ Buildkite pipeline triggers and branch filters are not specified in this checked
 | --- | --- | --- | --- |
 | Deploy/K8S / Deploy/K8S: Run pre-commit | agents `{"cpu": "2000m", "image": "${IMAGE_BEATS_WITH_HOOKS_LATEST}", "memory": "4Gi", "useCustomGlobalHooks": true}` | None declared | runs configured command |
 | Deploy/K8S / Checks | agents `{"image": "${IMAGE_UBUNTU_X86_64}", "machineType": "${GCP_HI_PERF_MACHINE_TYPE}", "provider": "gcp"}` | None declared | runs configured command |
-| Deploy/K8S / K8S Test/K8S version: {{matrix}} | agents `{"image": "${IMAGE_UBUNTU_X86_64}", "machineType": "${GCP_HI_PERF_MACHINE_TYPE}", "provider": "gcp"}` | None declared | matrix `["v1.36.1", "v1.35.0", "v1.34.0", "v1.33.0"]`; retry policy `{"automatic": [{"limit": 1}]}` |
+| Deploy/K8S / K8S Test/K8S version: `{{matrix}}` | agents `{"image": "${IMAGE_UBUNTU_X86_64}", "machineType": "${GCP_HI_PERF_MACHINE_TYPE}", "provider": "gcp"}` | None declared | matrix `["v1.36.1", "v1.35.0", "v1.34.0", "v1.33.0"]`; retry policy `{"automatic": [{"limit": 1}]}` |
 
 ## Inputs, outputs, and access
 

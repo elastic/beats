@@ -21,7 +21,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // FileClientHandler implements the Loader interface for writing to a file.
@@ -112,7 +112,7 @@ func (h *FileClientHandler) CheckEnabled() (bool, error) {
 func (h *FileClientHandler) CreatePolicy(policy Policy) error {
 	str := fmt.Sprintf("%s\n", policy.Body.StringToPrint())
 	if err := h.client.Write("policy", policy.Name, str); err != nil {
-		return fmt.Errorf("error printing policy : %w", err)
+		return fmt.Errorf("error printing policy: %w", err)
 	}
 	return nil
 }

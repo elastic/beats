@@ -24,7 +24,7 @@ import (
 
 	"github.com/shirou/gopsutil/v4/disk"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // IOStat carries disk statistics for all devices

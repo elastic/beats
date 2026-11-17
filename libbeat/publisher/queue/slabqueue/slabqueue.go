@@ -59,8 +59,8 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	c "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	c "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // QueueType is the user-facing queue type selector. It mirrors

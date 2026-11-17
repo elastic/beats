@@ -22,9 +22,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	agentconfig "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/paths"
+	agentconfig "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/paths"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
@@ -155,7 +155,7 @@ func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquer
 	ob, ok := beater.(*osquerybeat)
 	require.True(t, ok)
 	// b has no pipeline, so scheduled results get a mock publisher too.
-	ob.scheduledResults.newPublisher = func(func() bool, func(), func(int)) osquerybeatPublisher {
+	ob.scheduledResults.newPublisher = func(context.Context, func() bool, func(), func(), func(int)) osquerybeatPublisher {
 		return &mockBeatPublisher{}
 	}
 	for _, override := range overrides {

@@ -28,8 +28,8 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/hasher"
 	"github.com/elastic/beats/v7/heartbeat/look"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 )
 
 // UnknownTLSHandshakeDuration to be used in AddTLSMetadata when the duration of the TLS handshake can't be determined.
@@ -103,7 +103,7 @@ func CertFields(hostCert *x509.Certificate, verifiedChains [][]*x509.Certificate
 	// due to the implementation in elastic-agent-libs
 	// which only gives us the chain metadata in that scenario, unlike
 	// the go stdlib
-	// https://github.com/elastic/elastic-agent-libs/blob/main/transport/tlscommon/tls_config.go#L240
+	// https://github.com/elastic/beats/v7/pkg/blob/main/transport/tlscommon/tls_config.go#L240
 	var latestChainExpiration time.Time
 	now := time.Now()
 	for _, chain := range verifiedChains {

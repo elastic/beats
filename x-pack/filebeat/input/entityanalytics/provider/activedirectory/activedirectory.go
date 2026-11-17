@@ -20,15 +20,14 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/paths"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/activedirectory/internal/activedirectory"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/paths"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
-	"github.com/elastic/go-concert/ctxtool"
 )
 
 func init() {
@@ -242,7 +241,7 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 	wantEmptyGroups := p.cfg.wantEmptyGroups()
 	if wantUsers || wantDevices || wantEmptyGroups {
 		var users, devices, groups []*User
-		ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
+		ctx := inputCtx.Cancelation
 		p.logger.Debugf("Starting fetch...")
 		if wantUsers {
 			users, err = p.doFetchUsers(ctx, state, true)
@@ -364,7 +363,7 @@ func (p *adInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store
 	}()
 
 	var updatedUsers, updatedDevices, updatedGroups []*User
-	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
+	ctx := inputCtx.Cancelation
 	if p.cfg.wantUsers() {
 		updatedUsers, err = p.doFetchUsers(ctx, state, false)
 		if err != nil {

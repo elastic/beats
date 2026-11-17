@@ -9,8 +9,15 @@ import (
 	"io"
 	"net/http"
 	"testing"
+	"time"
 
+	dcontainer "github.com/moby/moby/api/types/container"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/metricbeat/module/docker"
+	"github.com/elastic/beats/v7/metricbeat/module/docker/cpu"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 var (
@@ -103,22 +110,40 @@ func TestGetTask(t *testing.T) {
 }
 
 func TestGetStatsList(t *testing.T) {
-	taskStatsResp := &http.Response{
-		Body: io.NopCloser(bytes.NewReader([]byte(taskStatsJson))),
-	}
-
-	taskStatsOutput, err := getTaskStats(taskStatsResp)
-	assert.NoError(t, err)
-
-	taskResp := &http.Response{
+	taskOutput, err := getTask(&http.Response{
 		Body: io.NopCloser(bytes.NewReader([]byte(taskRespJson))),
+	})
+	require.NoError(t, err, "task metadata must parse")
+
+	tests := []struct {
+		name    string
+		mutate  func(*dcontainer.StatsResponse)
+		wantLen int
+	}{
+		{name: "valid sample", mutate: func(*dcontainer.StatsResponse) {}, wantLen: 1},
+		{name: "empty read", mutate: func(s *dcontainer.StatsResponse) { s.Read = time.Time{} }},
+		{name: "empty preread", mutate: func(s *dcontainer.StatsResponse) { s.PreRead = time.Time{} }},
+		{name: "both empty", mutate: func(s *dcontainer.StatsResponse) {
+			s.Read = time.Time{}
+			s.PreRead = time.Time{}
+		}},
 	}
 
-	taskOutput, err := getTask(taskResp)
-	assert.NoError(t, err)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			taskStatsOutput, err := getTaskStats(&http.Response{
+				Body: io.NopCloser(bytes.NewReader([]byte(taskStatsJson))),
+			})
+			require.NoError(t, err, "task stats must parse")
 
-	formattedStats := getStatsList(taskStatsOutput, taskOutput)
-	assert.Equal(t, 1, len(formattedStats))
+			stats := taskStatsOutput["query-metadata-1"]
+			test.mutate(&stats)
+			taskStatsOutput["query-metadata-1"] = stats
+
+			formattedStats := getStatsList(taskStatsOutput, taskOutput)
+			assert.Len(t, formattedStats, test.wantLen, "unexpected number of formatted stats")
+		})
+	}
 }
 
 func TestGetCPUStats(t *testing.T) {
@@ -131,8 +156,49 @@ func TestGetCPUStats(t *testing.T) {
 	assert.Equal(t, 1, len(taskStatsOutput))
 
 	cpuStats := getCPUStats(taskStatsOutput["query-metadata-1"])
-	assert.Equal(t, 0.4, cpuStats.TotalUsage)
-	assert.Equal(t, 0.2, cpuStats.TotalUsageNormalized)
+	assert.True(t, cpuStats.TotalUsage.Exists(), "total CPU usage must be present")
+	assert.InDelta(t, 0.4, cpuStats.TotalUsage.ValueOr(0), 1e-12, "total CPU usage must match")
+	assert.True(t, cpuStats.TotalUsageNormalized.Exists(), "normalized total CPU usage must be present")
+	assert.InDelta(t, 0.2, cpuStats.TotalUsageNormalized.ValueOr(0), 1e-12, "normalized total CPU usage must match")
+}
+
+func TestCreateCPUFieldsOmitsUnavailablePercentages(t *testing.T) {
+	// The total and kernel counters reset; user, system and per-CPU[1]
+	// increased. The whole sample must be invalidated.
+	taskStats := dcontainer.StatsResponse{
+		PreCPUStats: dcontainer.CPUStats{
+			SystemUsage: 1000,
+			CPUUsage: dcontainer.CPUUsage{
+				TotalUsage:        100,
+				UsageInKernelmode: 80,
+				UsageInUsermode:   20,
+				PercpuUsage:       []uint64{60, 40},
+			},
+		},
+		CPUStats: dcontainer.CPUStats{
+			SystemUsage: 2000,
+			OnlineCPUs:  2,
+			CPUUsage: dcontainer.CPUUsage{
+				TotalUsage:        50,
+				UsageInKernelmode: 40,
+				UsageInUsermode:   30,
+				PercpuUsage:       []uint64{10, 50},
+			},
+		},
+	}
+
+	cpuStats := getCPUStats(taskStats)
+	cpuStats.PerCPUUsage = (&cpu.CPUUsage{Stat: &docker.Stat{Stats: taskStats}}).PerCPU()
+	fields := createCPUFields(&Stats{cpuStats: cpuStats})
+
+	assert.NotContains(t, fields, "total", "total percentages must be omitted after a counter reset")
+	assert.Equal(t, mapstr.M{"ticks": uint64(40)}, fields["kernel"], "kernel must retain ticks only")
+	assert.Equal(t, mapstr.M{"ticks": uint64(30)}, fields["user"], "user must retain ticks only after a sample-wide reset")
+	assert.Equal(t, mapstr.M{"ticks": uint64(2000)}, fields["system"], "system must retain ticks only after a sample-wide reset")
+	assert.Equal(t, mapstr.M{
+		"0": mapstr.M{"ticks": uint64(10)},
+		"1": mapstr.M{"ticks": uint64(50)},
+	}, fields["core"], "core must retain ticks only after a sample-wide reset")
 }
 
 func TestGetRegionAndClusterName(t *testing.T) {

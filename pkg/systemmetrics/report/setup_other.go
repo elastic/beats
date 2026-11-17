@@ -23,3 +23,6 @@ func SetupMetricsOptions(opts MetricOptions) error {
 	opts.Logger.Warn("Metrics not implemented for this OS.")
 	return nil
 }
+
+// SetupInfoMetrics is a no-op on platforms without metrics support.
+func SetupInfoMetrics(opts MetricOptions) {}

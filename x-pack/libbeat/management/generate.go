@@ -9,10 +9,10 @@ import (
 	"slices"
 	"strings"
 
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 )
@@ -295,12 +295,11 @@ func injectAgentInfoRule(inputs map[string]any, agentInfo *client.AgentInfo) (ma
 
 // injectGlobalProcesssors re-injects any global processors into the individual streams
 func injectGlobalProcesssors(expected *proto.UnitExpectedConfig, stream map[string]any) map[string]any {
-	rootMap := expected.GetSource().AsMap()
-	globalProcFound, ok := rootMap["processors"]
+	globalProcFound, ok := expected.GetSource().GetFields()["processors"]
 	if !ok {
 		return stream
 	}
-	globalList, ok := globalProcFound.([]any)
+	globalList, ok := globalProcFound.AsInterface().([]any)
 	if !ok {
 		return stream
 	}

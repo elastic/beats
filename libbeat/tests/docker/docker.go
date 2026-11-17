@@ -25,7 +25,7 @@ import (
 	"io"
 
 	"github.com/elastic/beats/v7/pkg/autodiscover/docker"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 
 	"github.com/moby/moby/api/types/container"
 	"github.com/moby/moby/client"

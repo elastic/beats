@@ -1,0 +1,4 @@
+kind: security
+summary: Update Brotli to 1.2.7 to fix a decoder panic on malformed input.
+description: Addresses GHSA-c9gr-gmg4-2vqv, the Go decoder panic related to CVE-2026-111497.
+component: all

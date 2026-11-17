@@ -52,16 +52,7 @@ func (b *EqualJitterBackoff) Reset() {
 
 // Wait blocks until either the timer is completed or the context is cancelled.
 func (b *EqualJitterBackoff) Wait(ctx context.Context) bool {
-	// Make sure we have always some minimal back off and jitter.
-	temp := int64(b.duration / 2)
-	backoff := time.Duration(temp + rand.Int64N(temp))
-
-	// increase duration for next wait.
-	b.duration *= 2
-	if b.duration > b.max {
-		b.duration = b.max
-	}
-
+	backoff := b.Next()
 	select {
 	case <-ctx.Done():
 		return false
@@ -69,6 +60,18 @@ func (b *EqualJitterBackoff) Wait(ctx context.Context) bool {
 		b.last = time.Now()
 		return true
 	}
+}
+
+// Next returns how long the next wait should last and escalates the one after
+// it, without blocking. It is for callers that schedule the wait themselves.
+func (b *EqualJitterBackoff) Next() time.Duration {
+	// Make sure we have always some minimal back off and jitter.
+	half := b.duration / 2
+	backoff := half + rand.N(half)
+
+	// increase duration for next wait.
+	b.duration = min(b.max, 2*b.duration)
+	return backoff
 }
 
 // Last returns the time when the last call to Wait returned

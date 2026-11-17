@@ -13,9 +13,9 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
 
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type mockExecutor struct {
@@ -48,7 +48,7 @@ type mockPublisher struct {
 	profileSpaceID string
 }
 
-func (p *mockPublisher) PublishEach(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any, _ func() bool) int {
+func (p *mockPublisher) PublishEach(_ context.Context, index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any, _ func() bool) int {
 	p.index = index
 	p.idValue = idValue
 	p.idFieldKey = idFieldKey
@@ -64,9 +64,10 @@ func (p *mockPublisher) PublishEach(index, idValue, idFieldKey, responseID, spac
 	return len(hits)
 }
 
-func (p *mockPublisher) PublishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) {
+func (p *mockPublisher) PublishQueryProfile(_ context.Context, index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) bool {
 	p.profile = profile
 	p.profileSpaceID = spaceID
+	return true
 }
 
 func TestActionHandlerExecute(t *testing.T) {

@@ -25,7 +25,7 @@ import (
 
 	"golang.org/x/net/idna"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 )

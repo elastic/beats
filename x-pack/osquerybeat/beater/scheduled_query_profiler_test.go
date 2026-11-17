@@ -13,9 +13,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type profileQueryFunc func(context.Context, string, time.Duration) ([]map[string]any, error)
@@ -362,7 +362,7 @@ func TestScheduledProfileAdmission(t *testing.T) {
 			publisher := &profileCallbackPublisher{responses: make(chan scheduledProfileResponse, 1), profiles: make(chan collectedProfile, 1)}
 			bt := &osquerybeat{log: log}
 			d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents,
-				func(func() bool, func(), func(int)) osquerybeatPublisher { return publisher }, bt.handleScheduledQueryResult)
+				func(context.Context, func() bool, func(), func(), func(int)) osquerybeatPublisher { return publisher }, bt.handleScheduledQueryResult)
 			d.profile = bt.enqueueScheduledProfile
 			require.NoError(t, d.configure(policy, config.ScheduledPublishingConfig{MaxEvents: config.DefaultScheduledMaxEvents}), "configure the scheduled clients")
 			stopOnCleanup(t, d)
@@ -415,7 +415,7 @@ func TestLoggerReturnsWhileScheduledProfileRPCWaits(t *testing.T) {
 	publisher := &profileCallbackPublisher{responses: make(chan scheduledProfileResponse, 1), profiles: make(chan collectedProfile, 1)}
 	bt := &osquerybeat{log: log}
 	dispatcher := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents,
-		func(func() bool, func(), func(int)) osquerybeatPublisher { return publisher }, bt.handleScheduledQueryResult)
+		func(context.Context, func() bool, func(), func(), func(int)) osquerybeatPublisher { return publisher }, bt.handleScheduledQueryResult)
 	dispatcher.profile = bt.enqueueScheduledProfile
 	require.NoError(t, dispatcher.configure(inputs, config.ScheduledPublishingConfig{MaxEvents: config.DefaultScheduledMaxEvents}), "configure the scheduled result handoff")
 	t.Cleanup(func() {

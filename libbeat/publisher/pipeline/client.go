@@ -28,7 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 var (
@@ -158,10 +158,18 @@ func (c *client) PublishContext(ctx context.Context, e beat.Event) error {
 		return nil // filtered out
 	}
 
-	_, err := c.ctxProducer.PublishContext(c.publishCtx(ctx), publisher.Event{
-		Content: e,
-		Flags:   c.eventFlags,
-	})
+	pctx := c.publishCtx(ctx)
+	// The processors may have outlasted the caller's wait, and a queue with
+	// room can take the event without looking at ctx, so check the caller's
+	// ctx first. A Close during processing may not show in pctx yet; the
+	// producer then reports the client closed.
+	err := pctx.Err()
+	if err == nil {
+		_, err = c.ctxProducer.PublishContext(pctx, publisher.Event{
+			Content: e,
+			Flags:   c.eventFlags,
+		})
+	}
 	if err != nil {
 		c.onDroppedOnPublish(e)
 		switch {

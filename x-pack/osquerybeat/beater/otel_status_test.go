@@ -14,9 +14,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	otelstatus "github.com/elastic/beats/v7/x-pack/otel/status"
-	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestOsqueryInputStatusFollowsDaemonRecovery(t *testing.T) {

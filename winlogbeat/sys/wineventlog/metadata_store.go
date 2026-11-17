@@ -29,9 +29,9 @@ import (
 	"text/template"
 	"text/template/parse"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (
@@ -487,7 +487,7 @@ func (em *EventMetadata) initEventMessage(itr *EventMetadataIterator, publisher 
 
 	msg, err := getMessageString(publisher, NilHandle, messageID, templateInserts.Slice())
 	if err != nil {
-		return fmt.Errorf("failed to get message string using message ID %v for for event ID %v: %w", messageID, em.EventID, err)
+		return fmt.Errorf("failed to get message string using message ID %v for event ID %v: %w", messageID, em.EventID, err)
 	}
 
 	return em.setMessage(msg)

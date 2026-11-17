@@ -28,7 +28,7 @@ import (
 
 	quark "github.com/elastic/go-quark"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // ebpfReader receives file events from the eBPF backend in quark.
