@@ -17,8 +17,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-jose/go-jose/v4/testutils/require"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/sys/windows"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
