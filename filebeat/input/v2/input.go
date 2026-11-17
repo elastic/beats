@@ -21,7 +21,6 @@ package v2
 
 import (
 	"context"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
@@ -100,10 +99,10 @@ type Context struct {
 	// Cancelation is used by Beats to signal the input to shut down.
 	//
 	// An input started with a Context parameter, ctx, must shut down when
-	// <-ctx.Cancelation.Done() does not block or when ctx.Cancelation.Error()
+	// <-ctx.Cancelation.Done() does not block or when ctx.Cancelation.Err()
 	// returns a non-nil error. If an input is started with a specific Context
 	// it should only shut down in response to that Context's Cancelation.
-	Cancelation Canceler
+	Cancelation context.Context
 
 	// statusReporter provides a method to update the status of the underlying unit
 	// that maps to the config. Note: Under standalone execution of Filebeat this is
@@ -238,30 +237,8 @@ type TestContext struct {
 	// Cancelation is used by Beats to signal the input to shut down.
 	//
 	// An input started with a Context parameter, ctx, must shut down when
-	// <-ctx.Cancelation.Done() does not block or when ctx.Cancelation.Error()
+	// <-ctx.Cancelation.Done() does not block or when ctx.Cancelation.Err()
 	// returns a non-nil error. If an input is started with a specific Context
 	// it should only shut down in response to that Context's Cancelation.
-	Cancelation Canceler
-}
-
-// Canceler is used to provide shutdown handling to the Context.
-type Canceler interface {
-	Done() <-chan struct{}
-	Err() error
-}
-
-type cancelerCtx struct {
-	Canceler
-}
-
-func GoContextFromCanceler(c Canceler) context.Context {
-	return cancelerCtx{c}
-}
-
-func (c cancelerCtx) Deadline() (deadline time.Time, ok bool) {
-	return time.Time{}, false
-}
-
-func (c cancelerCtx) Value(_ any) any {
-	return nil
+	Cancelation context.Context
 }
