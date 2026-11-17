@@ -6,7 +6,7 @@ env:
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
-  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
+  GCP_WIN_MACHINE_TYPE: "n4d-standard-8"
 
   # The following images are defined here and their values will be updated by updatecli
   # Please do not change them manually.
@@ -204,9 +204,8 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 200
-          disk_type: "pd-ssd"
+          diskType: "hyperdisk-balanced"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
@@ -230,9 +229,8 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 200
-          disk_type: "pd-ssd"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          diskType: "hyperdisk-balanced"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
@@ -256,9 +254,8 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2025}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 200
-          disk_type: "pd-ssd"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          diskType: "hyperdisk-balanced"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
@@ -386,9 +383,8 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          diskType: "hyperdisk-balanced"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"

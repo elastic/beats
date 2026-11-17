@@ -7,7 +7,7 @@ env:
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
-  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
+  GCP_WIN_MACHINE_TYPE: "n4d-standard-8"
 
   IMAGE_RHEL9_X86_64: "platform-ingest-beats-rhel-9-1794230330"
   IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1794230330"
@@ -142,9 +142,8 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          diskType: "hyperdisk-balanced"
         artifact_paths:
           - "packetbeat/build/*.xml"
           - "packetbeat/build/*.json"
@@ -168,9 +167,8 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          diskType: "hyperdisk-balanced"
         artifact_paths:
           - "packetbeat/build/*.xml"
           - "packetbeat/build/*.json"
@@ -194,9 +192,8 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2025}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          diskType: "hyperdisk-balanced"
         artifact_paths:
           - "packetbeat/build/*.xml"
           - "packetbeat/build/*.json"
@@ -280,8 +277,7 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
+          diskType: "hyperdisk-balanced"
         artifact_paths:
           - "packetbeat/build/*.xml"
           - "packetbeat/build/*.json"
@@ -352,8 +348,7 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
+          diskType: "hyperdisk-balanced"
         notify:
           - github_commit_status:
               context: "packetbeat: Packaging Linux"
