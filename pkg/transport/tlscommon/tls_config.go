@@ -268,18 +268,26 @@ func (c *TLSConfig) BuildServerConfig(host string) *tls.Config {
 	config.ServerName = host
 	config.VerifyConnection = makeVerifyServerConnection(c)
 
-	if c.clientCAs != nil && c.clientCAs.IsDynamic() {
+	if c.clientCAs != nil && c.clientCAs.IsDynamic() && c.Verification != VerifyNone {
 		// Go verifies client certificates against config.ClientCAs before
-		// VerifyConnection runs, and advertises its subjects in the
-		// CertificateRequest. ClientCAs is a snapshot taken when the config is
-		// built, so CAs added to the reloaded files later would be rejected
-		// (and not advertised). Hand each handshake a copy with the current pool.
-		config.GetConfigForClient = func(*tls.ClientHelloInfo) (*tls.Config, error) {
-			cfg := config.Clone()
-			cfg.GetConfigForClient = nil
-			cfg.ClientCAs = c.currentClientCAs()
-			return cfg, nil
+		// VerifyConnection runs. ClientCAs is a snapshot taken when the config
+		// is built, so a CA added to the reloaded files later would be rejected
+		// before verifyClientChain, which uses the current pool, ever runs.
+		// Leave verification to VerifyConnection by asking Go to only request
+		// (not verify) the certificate, and drop the stale snapshot so the
+		// CertificateRequest does not advertise outdated CA names.
+		//
+		// This is preferred over GetConfigForClient: a config cloned inside it
+		// does not see changes made to copies of this one afterwards, such as
+		// the NextProtos net/http sets on its own copy since Go 1.27, which
+		// silently disables HTTP/2.
+		switch config.ClientAuth {
+		case tls.RequireAndVerifyClientCert:
+			config.ClientAuth = tls.RequireAnyClientCert
+		case tls.VerifyClientCertIfGiven:
+			config.ClientAuth = tls.RequestClientCert
 		}
+		config.ClientCAs = nil
 	}
 
 	return config
