@@ -13,8 +13,12 @@ The module supports the following types of metrics:
 **Timer (ms)**
 :   Time measurement (in milliseconds) of an event.
 
+    {applies_to}`stack: ga 9.6+` Aggregated until flushed (values reset, except the moving average rates).
+
 **Histogram (h)**
 :   Time measurement, alias for timer.
+
+    {applies_to}`stack: ga 9.6+` Aggregated until flushed (values reset).
 
 **Set (s)**
 :   Measurement which counts unique occurrences until flushed (value set to 0).
@@ -43,6 +47,8 @@ The `statsd` module has these additional config options:
 
 **`ttl`**
 :   It defines how long a metric will be reported after it was last recorded. Irrespective of the given ttl, metrics will be reported at least once. A ttl of zero means metrics will never expire.
+
+    {applies_to}`stack: ga 9.6+` It controls how long a metric is kept, not what it aggregates: counters, sets, timers and histograms report what was recorded since the previous flush. Timers and histograms that received no measurements are not reported for that flush.
 
 **`statsd.mappings`**
 :   It defines how metrics will mapped from the original metric label to the event json. Here’s an example configuration:

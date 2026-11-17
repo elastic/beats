@@ -5,8 +5,10 @@
 package telemetry
 
 import (
+	"context"
 	"runtime"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -16,9 +18,9 @@ import (
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	metricreport "github.com/elastic/beats/v7/pkg/systemmetrics/report"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func resetSystemBridgeForTest() {
@@ -220,4 +222,76 @@ func TestSystemBridgeLiveValues(t *testing.T) {
 
 	rm = collectMetrics(t, reader)
 	assert.NotNil(t, findMetricByName(rm, "beat.memstats.rss"))
+}
+
+func TestSystemMetricsSnapshot(t *testing.T) {
+	resetSystemBridgeForTest()
+	t.Cleanup(resetSystemBridgeForTest)
+
+	assert.Nil(t, SystemMetricsSnapshot(), "no snapshot without a receiver holding the system bridge")
+	assert.Empty(t, SystemMetricsFlatSnapshot().Ints, "no flat snapshot without a receiver holding the system bridge")
+
+	release, err := AcquireSystemBridge(componenttest.NewNopTelemetrySettings())
+	require.NoError(t, err, "acquiring the system bridge should succeed")
+
+	snapshot := SystemMetricsSnapshot()
+	require.NotNil(t, snapshot, "snapshot while the system bridge is held")
+	beatNS, ok := snapshot["beat"].(map[string]any)
+	require.True(t, ok, "snapshot should have a beat namespace, got %v", snapshot)
+	assert.Contains(t, beatNS, "memstats", "snapshot should contain beat.memstats")
+	assert.Contains(t, beatNS, "cpu", "snapshot should contain beat.cpu")
+	assert.Contains(t, snapshot, "system", "snapshot should contain the system namespace")
+	assert.Contains(t, SystemMetricsFlatSnapshot().Ints, "beat.memstats.rss", "flat snapshot should contain beat.memstats.rss")
+
+	release()
+	assert.Nil(t, SystemMetricsSnapshot(), "no snapshot after the last release")
+}
+
+// TestSystemBridgeShutdownDoesNotDeadlockWithCollection checks that shutdown
+// does not hold b.mu while it unregisters the callback. Unregister waits for an
+// in-flight callback and the callback takes b.mu, so doing both at once
+// deadlocks. Collections run continuously while bridges are shut down.
+func TestSystemBridgeShutdownDoesNotDeadlockWithCollection(t *testing.T) {
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for range 200 {
+			reader := metric.NewManualReader()
+			settings := componenttest.NewNopTelemetrySettings()
+			settings.MeterProvider = metric.NewMeterProvider(metric.WithReader(reader))
+
+			reg := monitoring.NewRegistry()
+			monitoring.NewUint(reg, "beat.memstats.memory_alloc").Set(1)
+			bridge, err := newSystemRegistryBridge(settings, reg)
+			if err != nil {
+				t.Errorf("newSystemRegistryBridge: %v", err)
+				return
+			}
+
+			stop := make(chan struct{})
+			collecting := make(chan struct{})
+			go func() {
+				defer close(collecting)
+				var rm metricdata.ResourceMetrics
+				for {
+					select {
+					case <-stop:
+						return
+					default:
+						_ = reader.Collect(context.Background(), &rm)
+					}
+				}
+			}()
+
+			bridge.shutdown()
+			close(stop)
+			<-collecting
+		}
+	}()
+
+	select {
+	case <-done:
+	case <-time.After(60 * time.Second):
+		t.Fatal("deadlock: shutting down the system bridge while it is being collected did not finish")
+	}
 }

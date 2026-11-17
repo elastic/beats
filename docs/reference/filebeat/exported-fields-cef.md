@@ -1087,7 +1087,7 @@ Collection of key-value pairs carried in the CEF extension field.
 
 
 **`cef.extensions.categoryOutcome`**
-:   Outcome of the event (e.g. sucess, failure, or attempt).
+:   Outcome of the event (e.g. success, failure, or attempt).
 
     type: keyword
 

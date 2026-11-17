@@ -802,7 +802,7 @@ See [Regular expression support](/reference/filebeat/regexp-support.md) for a li
 
 ### `buffer_size` [_buffer_size]
 
-The size in bytes of the buffer that each harvester uses when fetching a file. The default is 16384.
+The size in bytes of the buffer that each harvester uses when fetching a file. The value must be greater than zero. The default is 16384.
 
 ### `compression` [filebeat-input-filestream-compression]
 ```{applies_to}

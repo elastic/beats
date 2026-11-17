@@ -19,7 +19,7 @@ type auditbeatReceiver struct {
 
 func (ab *auditbeatReceiver) Start(ctx context.Context, host component.Host) error {
 	ab.Logger.Info("starting auditbeat receiver")
-	if err := ab.BeatReceiver.Start(host); err != nil {
+	if err := ab.BeatReceiver.Start(ctx, host); err != nil {
 		return fmt.Errorf("error starting auditbeat receiver: %w", err)
 	}
 	return nil

@@ -6,7 +6,6 @@ package vault
 
 import (
 	"errors"
-	"fmt"
 	"net/url"
 	"strings"
 )
@@ -17,20 +16,20 @@ import (
 // ".." segments: the Vault client cleans the request path, so they would
 // read outside the KV mount.
 func parseReference(content string) (path, field string, err error) {
-	// "@" is reserved to select a named secret_stores connection.
+	// The connection name is removed before, a second "@" is not valid.
 	if strings.Contains(content, "@") {
-		return "", "", errors.New(`named connections are not supported yet, percent-encode "@" as %40`)
+		return "", "", errors.New(`must not contain "@", percent-encode it as %40`)
 	}
 	rawPath, rawField, ok := strings.Cut(content, "#")
 	if !ok {
-		return "", "", errors.New("must have the form vault://<path>#<field>")
+		return "", "", errors.New("must have the form vault://<name>@<path>#<field>")
 	}
 	if strings.Contains(rawField, "#") {
 		return "", "", errors.New(`field must not contain "#", percent-encode it as %23`)
 	}
 	path, err = url.PathUnescape(rawPath)
 	if err != nil {
-		return "", "", fmt.Errorf("invalid path: %w", err)
+		return "", "", errors.New("invalid percent-encoding in path")
 	}
 	path = strings.Trim(path, "/")
 	for segment := range strings.SplitSeq(path, "/") {
@@ -40,7 +39,7 @@ func parseReference(content string) (path, field string, err error) {
 	}
 	field, err = url.PathUnescape(rawField)
 	if err != nil {
-		return "", "", fmt.Errorf("invalid field: %w", err)
+		return "", "", errors.New("invalid percent-encoding in field")
 	}
 	if path == "" || field == "" {
 		return "", "", errors.New("empty path or field")

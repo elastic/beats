@@ -15,7 +15,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 )
 
 // Default index name for ad-hoc queries, since the dataset is defined at the stream level, for example:
@@ -348,6 +348,33 @@ func GetOsqueryCheckTimeout(inputs []InputConfig) (time.Duration, error) {
 		return DefaultCheckTimeout, nil
 	}
 	return ParseCheckTimeout(in.Osquery.ElasticOptions.CheckTimeout)
+}
+
+// GetPublishingConfig returns the publishing queue settings
+// (elastic_options.publishing) from the result input. Unset or zero values use
+// the defaults; negative values are an error.
+func GetPublishingConfig(inputs []InputConfig) (PublishingConfig, error) {
+	cfg := PublishingConfig{
+		Scheduled: ScheduledPublishingConfig{MaxEvents: DefaultScheduledMaxEvents},
+		Live:      LivePublishingConfig{Timeout: DefaultLivePublishTimeout},
+	}
+	in := ResultInput(inputs)
+	if in == nil || in.Osquery == nil || in.Osquery.ElasticOptions == nil || in.Osquery.ElasticOptions.Publishing == nil {
+		return cfg, nil
+	}
+	set := *in.Osquery.ElasticOptions.Publishing
+	// Unpacking already validated set; this guards configurations built in code.
+	if err := set.Validate(); err != nil {
+		return PublishingConfig{}, err
+	}
+	if set.Scheduled.MaxEvents > 0 {
+		cfg.Scheduled.MaxEvents = set.Scheduled.MaxEvents
+	}
+	cfg.Scheduled.MaxAge = set.Scheduled.MaxAge
+	if set.Live.Timeout > 0 {
+		cfg.Live.Timeout = set.Live.Timeout
+	}
+	return cfg, nil
 }
 
 // GetOsqueryExtensions returns customer-managed osquery extension settings

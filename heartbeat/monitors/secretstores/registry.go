@@ -35,8 +35,8 @@ import (
 	"regexp"
 	"sync"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // ConfigKey is the monitor setting holding the secret store connections.
@@ -46,12 +46,15 @@ const ConfigKey = "secret_stores"
 // Implementations must be safe for concurrent use, and must never include
 // secret values or credentials in returned errors or logs.
 type Store interface {
-	// Validate checks the references in the monitor config cfg without
-	// contacting the secret store.
-	Validate(cfg *conf.C) error
+	// Validate checks the references of scope in the monitor config cfg
+	// without contacting the secret store.
+	Validate(cfg *conf.C, scope Scope) error
 	// Replace returns a copy of the monitor config cfg with the references
-	// replaced by their secret values. cfg must not be modified.
-	Replace(ctx context.Context, cfg *conf.C) (*conf.C, error)
+	// of scope replaced by their secret values, and the others left as they
+	// are. cfg must not be modified. Without references of scope, it must
+	// return cfg itself: allowed_hosts only applies to connections whose
+	// references were replaced.
+	Replace(ctx context.Context, cfg *conf.C, scope Scope) (*conf.C, error)
 }
 
 // Factory creates a Store from one secret_stores entry. It must validate the

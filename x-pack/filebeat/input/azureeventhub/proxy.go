@@ -9,7 +9,7 @@ package azureeventhub
 import (
 	"net/http"
 
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 )
 
 // proxyHTTPClient returns an HTTP client configured with the given proxy

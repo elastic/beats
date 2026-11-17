@@ -48,7 +48,7 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 	beatCreator := beater.New(inputs.Init)
 	br, err := xpInstance.NewBeatReceiver(ctx, b, beatCreator, set)
 	if err != nil {
-		return nil, fmt.Errorf("error creating %s:%w", Name, err)
+		return nil, fmt.Errorf("error creating %s: %w", Name, err)
 	}
 
 	return &filebeatReceiver{BeatReceiver: br}, nil

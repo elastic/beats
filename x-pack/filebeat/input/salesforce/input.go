@@ -33,10 +33,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/go-concert/ctxtool"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 )
 
 const (
@@ -110,7 +109,7 @@ func (s *salesforceInput) Setup(env v2.Context, src inputcursor.Source, cursor *
 
 	cfg := srcSource.cfg
 
-	ctx := ctxtool.FromCanceller(env.Cancelation)
+	ctx := env.Cancelation
 	childCtx, cancel := context.WithCancelCause(ctx)
 
 	s.srcConfig = &cfg

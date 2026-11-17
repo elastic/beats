@@ -26,16 +26,16 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/version"
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
-	"github.com/elastic/elastic-agent-libs/useragent"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
+	"github.com/elastic/beats/v7/pkg/useragent"
 )
 
 func init() {
-	plugin.Register("http", create, "synthetics/http")
+	plugin.RegisterWithDestinations("http", destinations, create, "synthetics/http")
 }
 
 var userAgent = useragent.UserAgent("Heartbeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())

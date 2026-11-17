@@ -24,7 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/version"
-	libversion "github.com/elastic/elastic-agent-libs/version"
+	libversion "github.com/elastic/beats/v7/pkg/version"
 )
 
 type stdoutClient struct {

@@ -19,7 +19,7 @@ type filebeatReceiver struct {
 
 func (fb *filebeatReceiver) Start(ctx context.Context, host component.Host) error {
 	fb.Logger.Info("starting filebeat receiver")
-	if err := fb.BeatReceiver.Start(host); err != nil {
+	if err := fb.BeatReceiver.Start(ctx, host); err != nil {
 		return fmt.Errorf("error starting filebeat receiver: %w", err)
 	}
 

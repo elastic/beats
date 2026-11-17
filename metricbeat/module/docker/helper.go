@@ -21,7 +21,7 @@ import (
 	"github.com/moby/moby/api/types/container"
 
 	helpers "github.com/elastic/beats/v7/pkg/autodiscover/docker"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // Container is a struct representation of a container

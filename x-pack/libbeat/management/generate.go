@@ -6,12 +6,13 @@ package management
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 )
@@ -82,6 +83,10 @@ func handleSimpleConfig(raw *proto.UnitExpectedConfig) (map[string]any, error) {
 	if kind != "filestream" {
 		return nil, fmt.Errorf("the only supported type is 'filestream', got: %q", kind)
 	}
+
+	// The unit source doubles as the stream source here, so its processors are
+	// the global ones that injectGlobalProcesssors adds.
+	delete(m, "processors")
 
 	return m, nil
 }
@@ -279,6 +284,9 @@ func injectAgentInfoRule(inputs map[string]any, agentInfo *client.AgentInfo) (ma
 	processors = append(processors, generateAddFieldsProcessor(
 		mapstr.M{"id": agentInfo.ID},
 		"agent"))
+	if len(agentInfo.Tags) > 0 {
+		processors = append(processors, generateAddTagsProcessor(slices.Clone(agentInfo.Tags)))
+	}
 
 	inputs["processors"] = prependProcessors(inputs, processors)
 
@@ -287,12 +295,11 @@ func injectAgentInfoRule(inputs map[string]any, agentInfo *client.AgentInfo) (ma
 
 // injectGlobalProcesssors re-injects any global processors into the individual streams
 func injectGlobalProcesssors(expected *proto.UnitExpectedConfig, stream map[string]any) map[string]any {
-	rootMap := expected.GetSource().AsMap()
-	globalProcFound, ok := rootMap["processors"]
+	globalProcFound, ok := expected.GetSource().GetFields()["processors"]
 	if !ok {
 		return stream
 	}
-	globalList, ok := globalProcFound.([]any)
+	globalList, ok := globalProcFound.AsInterface().([]any)
 	if !ok {
 		return stream
 	}
@@ -390,6 +397,14 @@ func generateAddFieldsProcessor(fields mapstr.M, target string) mapstr.M {
 	}
 }
 
+func generateAddTagsProcessor(tags []string) mapstr.M {
+	return mapstr.M{
+		"add_tags": mapstr.M{
+			"tags": tags,
+		},
+	}
+}
+
 func generateAgentMetadataProcessor(agentInfo *client.AgentInfo, inputID, streamID, dataStreamType, dataset, namespace string) mapstr.M {
 	cfg := mapstr.M{
 		"data_stream": mapstr.M{
@@ -408,6 +423,9 @@ func generateAgentMetadataProcessor(agentInfo *client.AgentInfo, inputID, stream
 	}
 	if streamID != "" {
 		cfg["stream_id"] = streamID
+	}
+	if len(agentInfo.Tags) > 0 {
+		cfg["tags"] = slices.Clone(agentInfo.Tags)
 	}
 	return mapstr.M{"add_agent_metadata": cfg}
 }

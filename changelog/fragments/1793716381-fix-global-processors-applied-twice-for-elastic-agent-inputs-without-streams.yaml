@@ -1,0 +1,11 @@
+kind: bug-fix
+
+summary: Fix processors being applied twice to Elastic Agent filestream inputs configured without streams.
+
+description: |
+  When Elastic Agent sent a filestream input whose configuration had no
+  streams, the input-level processors were added to the generated input
+  configuration twice, so each event ran through them twice. Processors that
+  are not idempotent, such as add_tags or script, produced wrong results.
+
+component: filebeat

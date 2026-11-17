@@ -20,6 +20,7 @@
 package journald
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -37,14 +38,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 //go:generate moq -out journalReadMock_test.go . journalReader
 type journalReader interface {
 	Close() error
-	Next(cancel input.Canceler) (journalctl.JournalEntry, error)
+	Next(cancel context.Context) (journalctl.JournalEntry, error)
 }
 
 type journald struct {
@@ -133,7 +134,7 @@ func Configure(cfg *conf.C, logger *logp.Logger) ([]cursor.Source, cursor.Input,
 		}
 		chrootStat, err := os.Stat(config.Chroot)
 		if err != nil {
-			return nil, nil, fmt.Errorf("cannot stat chroot:  %w", err)
+			return nil, nil, fmt.Errorf("cannot stat chroot: %w", err)
 		}
 		if !chrootStat.IsDir() {
 			return nil, nil, fmt.Errorf("provided chroot (%s) is not a directory", config.Chroot)
@@ -311,7 +312,7 @@ func getCursorUpdate(priv any) any {
 //     more human friendly
 type readerAdapter struct {
 	r                  journalReader
-	canceler           input.Canceler
+	canceler           context.Context
 	converter          *journalfield.Converter
 	saveRemoteHostname bool
 }

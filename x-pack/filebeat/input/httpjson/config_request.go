@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 	"github.com/elastic/lumberjack"
 )
 

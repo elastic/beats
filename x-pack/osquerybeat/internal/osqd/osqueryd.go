@@ -23,9 +23,9 @@ import (
 	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/libbeat/common/proc"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqlog"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -473,7 +473,7 @@ func prepareAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath string, e
 
 	if rewrite {
 		if err := os.WriteFile(extensionAutoloadPath, []byte(desired), 0600); err != nil {
-			return fmt.Errorf("failed write osquery extension autoload file, %w", err)
+			return fmt.Errorf("failed to write osquery extension autoload file: %w", err)
 		}
 	}
 	return nil

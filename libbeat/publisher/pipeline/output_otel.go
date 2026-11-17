@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/slabqueue"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 var _ outputController = (*otelOutputController)(nil)
@@ -80,7 +80,8 @@ type otelOutputController struct {
 // during shutdown — so Close is safe to call from both paths and only ever
 // closes the underlying producer once.
 //
-// Publish and TryPublish are promoted from the embedded producer unchanged.
+// Publish, PublishContext and TryPublish are promoted from the embedded
+// producer unchanged.
 type trackedProducer struct {
 	queue.Producer[publisher.Event]
 	controller *otelOutputController

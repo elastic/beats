@@ -227,7 +227,7 @@ Fields to extend the top-level url object.
 
 
 **`panw.panos.repeatcnt`**
-:   The number of sessions with the same source IP address, destination IP address, application, and subtype that GlobalProtect has detected within the last five seconds. An integer associated with any errors that occurred.
+:   The number of sessions with the same source IP address, destination IP address, application, and subtype that GlobalProtect has detected within the last five seconds.
 
     type: integer
 
@@ -347,7 +347,7 @@ A sequence of identification numbers that indicate the device group’s location
 
 
 **`panw.panos.connect_method`**
-:   A string showing the how the GlobalProtect app connects to Gateway
+:   A string showing how the GlobalProtect app connects to the gateway
 
     type: keyword
 

@@ -5,7 +5,8 @@
 // Package vault implements the "vault" secret store for Heartbeat monitors:
 // HashiCorp Vault KV v2 secrets, read with token or AppRole authentication.
 //
-// References have the form vault://<path>#<field>, where path is relative to
+// References have the form vault://<name>@<path>#<field>, where name is the
+// name of the secret_stores entry and path is relative to
 // the configured KV mount. Path and field are percent-decoded.
 package vault
 
@@ -26,9 +27,9 @@ import (
 	vaultapi "github.com/hashicorp/vault/api"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/secretstores"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 )
 
 // storeType is the secret_stores type and the reference prefix.

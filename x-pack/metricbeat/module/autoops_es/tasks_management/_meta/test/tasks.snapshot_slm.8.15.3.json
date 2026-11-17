@@ -1,0 +1,15 @@
+{
+    "tasks": {
+        "GKfQWFJxTaikL5NG2a5XTQ:35965": {
+            "node": "GKfQWFJxTaikL5NG2a5XTQ",
+            "id": 35965,
+            "type": "transport",
+            "action": "cluster:admin/snapshot/create",
+            "description": "snapshot [fixture-repo:fixture-slm-2026.10.26-tteojpfaqjmggwvb8w1wlg]",
+            "start_time_in_millis": 1793047826772,
+            "running_time_in_nanos": 70123456789,
+            "cancellable": false,
+            "headers": {}
+        }
+    }
+}

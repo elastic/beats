@@ -596,7 +596,7 @@ More information about specific fields can be found at https://developers.google
 
 
 **`google_workspace.drive.shared_drive_id`**
-:   The unique identifier of the Team Drive. Only populated for for events relating to a Team Drive or item contained inside a Team Drive.
+:   The unique identifier of the Team Drive. Only populated for events relating to a Team Drive or item contained inside a Team Drive.
 
     type: keyword
 
@@ -638,7 +638,7 @@ More information about specific fields can be found at https://developers.google
 
 
 **`google_workspace.drive.target_domain`**
-:   The domain for which the acccess scope was changed. This can also be the alias all to indicate the access scope was changed for all domains that have visibility for this document.
+:   The domain for which the access scope was changed. This can also be the alias all to indicate the access scope was changed for all domains that have visibility for this document.
 
     type: keyword
 

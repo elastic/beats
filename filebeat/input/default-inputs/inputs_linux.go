@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux && !securityonly
+//go:build linux && !edr
 
 package inputs
 

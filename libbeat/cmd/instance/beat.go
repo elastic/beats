@@ -64,21 +64,21 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/file"
+	"github.com/elastic/beats/v7/pkg/keystore"
+	kbn "github.com/elastic/beats/v7/pkg/kibana"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/configure"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
+	"github.com/elastic/beats/v7/pkg/monitoring/report/buffer"
+	"github.com/elastic/beats/v7/pkg/paths"
+	svc "github.com/elastic/beats/v7/pkg/service"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/host"
 	metricreport "github.com/elastic/beats/v7/pkg/systemmetrics/report"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/file"
-	"github.com/elastic/elastic-agent-libs/keystore"
-	kbn "github.com/elastic/elastic-agent-libs/kibana"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/configure"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/monitoring/report/buffer"
-	"github.com/elastic/elastic-agent-libs/paths"
-	svc "github.com/elastic/elastic-agent-libs/service"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
-	libversion "github.com/elastic/elastic-agent-libs/version"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
+	libversion "github.com/elastic/beats/v7/pkg/version"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 	"github.com/elastic/go-ucfg"
@@ -376,12 +376,12 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 
 	// Report central management state
 	mgmt := b.Monitoring.StateRegistry().GetOrCreateRegistry("management")
-	monitoring.NewBool(mgmt, "enabled").Set(b.Manager.Enabled())
+	monitoring.NewBool(mgmt, "enabled").Set(b.Manager.ConfigFromControlProtocol())
 
 	log.Debug("Initializing output plugins")
 	outputEnabled := b.Config.Output.IsSet() && b.Config.Output.Config().Enabled()
 	if !outputEnabled {
-		if b.Manager.Enabled() {
+		if b.Manager.ConfigFromControlProtocol() {
 			b.Info.Logger.Info("Output is configured through Central Management")
 		} else {
 			msg := "no outputs are defined, please define one under the output section"
@@ -1414,7 +1414,7 @@ func (b *Beat) logSystemInfo(log *logp.Logger) {
 		"information about the system.")
 	log = log.With(logp.Namespace("system_info"))
 
-	if b.Manager.Enabled() {
+	if management.UnderAgent() {
 		return
 	}
 

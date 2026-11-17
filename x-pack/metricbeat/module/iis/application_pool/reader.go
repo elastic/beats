@@ -14,11 +14,11 @@ import (
 	"syscall"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/go-sysinfo"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 const ecsProcessId = "process.pid"

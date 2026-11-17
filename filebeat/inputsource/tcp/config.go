@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 )
 
 // Name is the human readable name and identifier.

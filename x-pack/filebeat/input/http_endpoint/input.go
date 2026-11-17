@@ -34,13 +34,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
+	"github.com/elastic/beats/v7/pkg/monitoring/adapter"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 const (
@@ -181,9 +181,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metr
 	// Derive a per-input handler context from the input's cancellation.
 	// This context is cancelled during deregistration so in-flight ACK
 	// waits abort before the pipeline client is closed.
-	handlerCtx, handlerCancel := context.WithCancel(
-		v2.GoContextFromCanceler(ctx.Cancelation),
-	)
+	handlerCtx, handlerCancel := context.WithCancel(ctx.Cancelation)
 
 	p.mu.Lock()
 	s, ok := p.servers[e.addr]
@@ -528,6 +526,7 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 			hmacType:       c.HMACType,
 			hmacPrefix:     c.HMACPrefix,
 			maxBodySize:    -1,
+			maxInFlight:    c.MaxInFlight,
 			optionsHeaders: c.OptionsHeaders,
 			optionsStatus:  c.OptionsStatus,
 		},
@@ -545,6 +544,7 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 	}
 	// Initialize accepting to true so we start by accepting requests.
 	h.accepting.Store(true)
+	h.validator.inFlight = &h.inFlight
 	if h.status == nil {
 		h.status = noopReporter{}
 	}

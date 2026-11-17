@@ -6,9 +6,12 @@ extensions:
   beatsauth:
     endpoints:
       - http://localhost:9200
-  elasticsearch_storage:
-    hosts:
+  elasticsearchauth:
+    endpoints:
       - http://localhost:9200
+  elasticsearch_storage:
+    auth:
+      authenticator: beatsauth
   kafkapartitioner:
 
 receivers:
@@ -121,7 +124,7 @@ exporters:
 connectors:
 
 service:
-  extensions: [health_check, pprof, beatsauth, elasticsearch_storage, kafkapartitioner]
+  extensions: [health_check, pprof, beatsauth, elasticsearchauth, elasticsearch_storage, kafkapartitioner]
   
   pipelines:
     logs:

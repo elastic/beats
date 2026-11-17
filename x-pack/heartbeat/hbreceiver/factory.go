@@ -12,7 +12,7 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/receiver"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 
 	"github.com/elastic/beats/v7/heartbeat/beater"
 	"github.com/elastic/beats/v7/heartbeat/cmd"
@@ -97,7 +97,7 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 			hbReceiver.ctx,
 			cfg.MonitorState.Elasticsearch,
 			creator.heartbeat,
-			b.Info.UserAgent,
+			func() string { return b.Info.UserAgent },
 			b.Info.Logger,
 			func(requester *eslegclient.Connection) {
 				hbReceiver.elasticsearchAuthRequester = requester

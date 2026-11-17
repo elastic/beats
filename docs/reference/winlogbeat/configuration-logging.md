@@ -177,7 +177,7 @@ If the log file already exists on startup, immediately rotate it and start writi
 
 ### `logging.files.redirect_stderr` [preview] [_logging_files_redirect_stderr]
 
-When true, diagnostic messages printed to Winlogbeat’s standard error output will also be logged to the log file. This can be helpful in situations were Winlogbeat terminates unexpectedly because an error has been detected by Go’s runtime but diagnostic information is not present in the log file. This feature is only available when logging to files (`logging.to_files` is true). Disabled by default.
+When true, diagnostic messages printed to Winlogbeat’s standard error output will also be logged to the log file. This can be helpful in situations where Winlogbeat terminates unexpectedly because an error has been detected by Go’s runtime but diagnostic information is not present in the log file. This feature is only available when logging to files (`logging.to_files` is true). Disabled by default.
 
 
 ## Logging format [_logging_format]

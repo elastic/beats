@@ -18,6 +18,7 @@
 package slabqueue
 
 import (
+	"context"
 	"io"
 	"sync"
 	"sync/atomic"
@@ -162,12 +163,30 @@ func (q *Queue[T]) tryReserve() bool {
 }
 
 // reserve takes one unit of this queue's live-event budget, blocking until the
-// queue is under its cap or the queue is closed. It returns false only when the
-// queue is closing. Like the pool's acquire, it re-checks after registering as a
-// waiter so a release between the failed fast path and the park is not lost.
-func (q *Queue[T]) reserve() bool {
+// queue is under its cap, the queue is closed, or ctx is done. It returns
+// queue.ErrClosed when the queue is closing and ctx.Err() when ctx ends first.
+// Like the pool's acquire, it re-checks after registering as a waiter so a
+// release between the failed fast path and the park is not lost. limCond is
+// only ever Broadcast, so a waiter leaving on ctx consumes no wake-up that
+// another waiter needed.
+func (q *Queue[T]) reserve(ctx context.Context) error {
 	if q.tryReserve() {
-		return true
+		return nil
+	}
+	return q.reserveSlow(ctx)
+}
+
+// reserveSlow is reserve's blocking path, kept separate so the fast path
+// carries no defer.
+func (q *Queue[T]) reserveSlow(ctx context.Context) error {
+	if ctx.Done() != nil {
+		// Wake parked producers when ctx ends so this one sees ctx.Err().
+		stop := context.AfterFunc(ctx, func() {
+			q.limMu.Lock()
+			q.limCond.Broadcast()
+			q.limMu.Unlock()
+		})
+		defer stop()
 	}
 	for {
 		q.limMu.Lock()
@@ -175,21 +194,27 @@ func (q *Queue[T]) reserve() bool {
 		if q.tryReserve() {
 			q.limWaiters.Add(-1)
 			q.limMu.Unlock()
-			return true
+			return nil
 		}
 		if q.isClosing() {
 			q.limWaiters.Add(-1)
 			q.limMu.Unlock()
-			return false
+			return queue.ErrClosed
+		}
+		err := ctx.Err()
+		if err != nil {
+			q.limWaiters.Add(-1)
+			q.limMu.Unlock()
+			return err
 		}
 		q.limCond.Wait()
 		q.limWaiters.Add(-1)
 		q.limMu.Unlock()
 		if q.isClosing() {
-			return false
+			return queue.ErrClosed
 		}
 		if q.tryReserve() {
-			return true
+			return nil
 		}
 	}
 }

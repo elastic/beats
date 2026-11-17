@@ -23,8 +23,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/elastic/beats/v7/pkg/opt"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cgroup/cgcommon"
-	"github.com/elastic/elastic-agent-libs/opt"
 )
 
 // MemorySubsystem contains the metrics and limits from the "memory" subsystem.

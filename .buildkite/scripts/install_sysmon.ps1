@@ -53,4 +53,22 @@ if ($sysmonPath) {
     Write-Host "Sysmon executable not found in the downloaded archive."
 }
 
-Remove-Item -Path $tempFolder -Force -Recurse
+# Sysmon64.exe can stay locked for a moment after it exits, for example while
+# antivirus scans it. The folder is no longer needed, so failing to remove it
+# must not fail the job.
+$attempts=0
+do
+{
+    $attempts++
+    try {
+        Remove-Item -Path $tempFolder -Force -Recurse -ErrorAction Stop
+        break
+    }
+    catch {
+        if ($attempts -ge 5) {
+            Write-Warning "Could not remove ${tempFolder}: $_"
+            break
+        }
+        Start-Sleep -Seconds 2
+    }
+} while ($true)

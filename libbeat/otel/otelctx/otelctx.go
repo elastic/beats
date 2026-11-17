@@ -26,37 +26,25 @@ import (
 )
 
 const (
-	BeatNameCtxKey        = "beat_name"
 	BeatVersionCtxKey     = "beat_version"
 	BeatIndexPrefixCtxKey = "beat_index_prefix"
 
-	MetadataBeatKey        = "beat"
 	MetadataVersionKey     = "version"
 	MetadataIndexPrefixKey = "index_prefix"
 )
 
 // NewConsumerContext creates a new context.Context adding the beats metadata
-// to the client.Info. This is used to pass the beat name, version and index prefix to the
+// to the client.Info. This is used to pass the version and index prefix to the
 // Collector, so it can be used by the components to access that data.
+// Currently, only used by the Logstash exporter.
 func NewConsumerContext(ctx context.Context, beatInfo beat.Info) context.Context {
 	clientInfo := client.Info{
 		Metadata: client.NewMetadata(map[string][]string{
-			BeatNameCtxKey:        {beatInfo.Beat},
 			BeatVersionCtxKey:     {beatInfo.Version},
 			BeatIndexPrefixCtxKey: {beatInfo.IndexPrefix},
 		}),
 	}
 	return client.NewContext(ctx, clientInfo)
-}
-
-// GetBeatName retrieves the beat name from the context metadata
-// If the name is not found, it returns an empty string.
-func GetBeatName(ctx context.Context) string {
-	clientInfo := client.FromContext(ctx)
-	if values := clientInfo.Metadata.Get(BeatNameCtxKey); len(values) > 0 {
-		return values[0]
-	}
-	return ""
 }
 
 // GetBeatVersion retrieves the version of the beat from the context metadata

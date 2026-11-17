@@ -27,7 +27,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 
 	"github.com/stretchr/testify/require"
 

@@ -1,0 +1,31 @@
+{
+    "persistent": {
+        "cluster": {
+            "metadata": {
+                "display_name": "my-search-project"
+            }
+        },
+        "serverless": {
+            "search": {
+                "boost_window": "1d",
+                "search_power_max": "200",
+                "search_power_min": "200",
+                "min_search_vcu": "4"
+            }
+        }
+    },
+    "transient": {},
+    "defaults": {
+        "cluster": {
+            "max_shards_per_node": "20000"
+        },
+        "path": {
+            "data": ["/usr/share/elasticsearch/data"]
+        },
+        "serverless": {
+            "search": {
+                "min_search_vcu": "-1"
+            }
+        }
+    }
+}
