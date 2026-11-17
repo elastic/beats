@@ -297,10 +297,8 @@ func Test_readPrefixAndHashDoesNotAllocateCopyBuffers(t *testing.T) {
 func Test_readPrefixAndHashConcurrent(t *testing.T) {
 	var wg sync.WaitGroup
 	for i := range 16 {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			body := strings.Repeat(string(rune('a'+i)), 70000+i)
+		wg.Go(func() {
+			body := strings.Repeat(string([]byte{byte('a' + i%26)}), 70000+i)
 			expected := sha256.Sum256([]byte(body))
 			for range 20 {
 				size, prefix, hash, err := readPrefixAndHash(newPlainBody(body), 10)
@@ -309,7 +307,7 @@ func Test_readPrefixAndHashConcurrent(t *testing.T) {
 				assert.Equal(t, body[:10], prefix)
 				assert.Equal(t, hex.EncodeToString(expected[:]), hash)
 			}
-		}()
+		})
 	}
 	wg.Wait()
 }
