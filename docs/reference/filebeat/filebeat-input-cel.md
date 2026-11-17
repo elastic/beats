@@ -190,7 +190,13 @@ filebeat.inputs:
 When emit encounters an error, the result map contains an `"error"` key. The example above checks for this with `has(r.error)` and returns an error object instead of advancing the cursor. This prevents the input from skipping past data that was not fully processed.
 
 
-Reading every record in a tar archive of bzip2 compressed NDJSON files, where the archive is itself bzip2 compressed. {applies_to}`stack: ga 9.7+`
+### Example: Read a compressed tar archive
+
+```{applies_to}
+stack: ga 9.7+
+```
+
+Read every record in a tar archive of bzip2-compressed NDJSON files, where the archive is itself bzip2-compressed:
 
 ```yaml
 filebeat.inputs:
@@ -254,7 +260,9 @@ As noted above the `cel` input provides functions, macros, and global variables 
     * [HMAC]({{mito_docs}}@{{mito_version}}/lib#hdr-HMAC-Crypto)
     * [UUID]({{mito_docs}}@{{mito_version}}/lib#hdr-UUID-Crypto)
 
-* [File]({{mito_docs}}@{{mito_version}}/lib#File) — the file extension is initialized with MIME handlers for "application/gzip", "application/x-bzip2" {applies_to}`stack: ga 9.7+`, ["application/x-ndjson"]({{mito_docs}}@{{mito_version}}/lib#NDJSON), ["application/x-tar"]({{mito_docs}}@{{mito_version}}/lib#Tar) {applies_to}`stack: ga 9.7+`, ["application/zip"]({{mito_docs}}@{{mito_version}}/lib#Zip), ["text/csv; header=absent"]({{mito_docs}}@{{mito_version}}/lib#CSVNoHeader), and ["text/csv; header=present"]({{mito_docs}}@{{mito_version}}/lib#CSVHeader).
+* [File]({{mito_docs}}@{{mito_version}}/lib#File) — the file extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"]({{mito_docs}}@{{mito_version}}/lib#NDJSON), ["application/zip"]({{mito_docs}}@{{mito_version}}/lib#Zip), ["text/csv; header=absent"]({{mito_docs}}@{{mito_version}}/lib#CSVNoHeader), and ["text/csv; header=present"]({{mito_docs}}@{{mito_version}}/lib#CSVHeader).
+
+    {applies_to}`stack: ga 9.7+` The file extension also has MIME handlers for "application/x-bzip2" and ["application/x-tar"]({{mito_docs}}@{{mito_version}}/lib#Tar).
 
     * [Dir]({{mito_docs}}@{{mito_version}}/lib#hdr-Dir-File)
     * [File]({{mito_docs}}@{{mito_version}}/lib#hdr-File-File)
@@ -291,7 +299,9 @@ As noted above the `cel` input provides functions, macros, and global variables 
 
     * [Rate Limit]({{mito_docs}}@{{mito_version}}/lib#hdr-Rate_Limit-Limit)
 
-* [MIME]({{mito_docs}}@{{mito_version}}/lib#MIME) — the MIME extension is initialized with MIME handlers for "application/gzip", "application/x-bzip2" {applies_to}`stack: ga 9.7+`, ["application/x-ndjson"]({{mito_docs}}@{{mito_version}}/lib#NDJSON), ["application/x-tar"]({{mito_docs}}@{{mito_version}}/lib#Tar) {applies_to}`stack: ga 9.7+`, ["application/zip"]({{mito_docs}}@{{mito_version}}/lib#Zip), ["text/csv; header=absent"]({{mito_docs}}@{{mito_version}}/lib#CSVNoHeader), and ["text/csv; header=present"]({{mito_docs}}@{{mito_version}}/lib#CSVHeader).
+* [MIME]({{mito_docs}}@{{mito_version}}/lib#MIME) — the MIME extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"]({{mito_docs}}@{{mito_version}}/lib#NDJSON), ["application/zip"]({{mito_docs}}@{{mito_version}}/lib#Zip), ["text/csv; header=absent"]({{mito_docs}}@{{mito_version}}/lib#CSVNoHeader), and ["text/csv; header=present"]({{mito_docs}}@{{mito_version}}/lib#CSVHeader).
+
+    {applies_to}`stack: ga 9.7+` The MIME extension also has MIME handlers for "application/x-bzip2" and ["application/x-tar"]({{mito_docs}}@{{mito_version}}/lib#Tar).
 
     * [MIME]({{mito_docs}}@{{mito_version}}/lib#hdr-MIME-MIME)
 
@@ -334,10 +344,12 @@ As noted above the `cel` input provides functions, macros, and global variables 
 
 * [Emit]({{mito_docs}}@{{mito_version}}/lib#Emit) — the emit macro publishes events during CEL evaluation instead of collecting them in the `events` array. See [Emit macro](#cel-emit-macro) for details. {applies_to}`stack: ga 9.5+`
 
-* [Stream]({{mito_docs}}@{{mito_version}}/lib#Stream) — stream producers wrap decompression and archive readers around in-memory bytes or another stream, returning an opaque stream value for use with lazy decode functions. {applies_to}`stack: ga 9.5+`
+* [Stream]({{mito_docs}}@{{mito_version}}/lib#Stream) — stream producers wrap decompression readers around in-memory bytes, returning an opaque stream value for use with lazy decode functions. {applies_to}`stack: ga 9.5+`
+
+    {applies_to}`stack: ga 9.7+` `stream_bzip2`, `stream_gzip`, and `stream_tar` also accept another stream as their receiver, so you can chain them. For example, you can decompress an archive, then read the files inside it.
 
     * [stream_bzip2]({{mito_docs}}@{{mito_version}}/lib#hdr-stream_bzip2-Stream) {applies_to}`stack: ga 9.7+`
-    * [stream_gzip]({{mito_docs}}@{{mito_version}}/lib#hdr-stream_gzip-Stream) — {applies_to}`stack: ga 9.7+` also accepts a stream as its receiver
+    * [stream_gzip]({{mito_docs}}@{{mito_version}}/lib#hdr-stream_gzip-Stream)
     * [stream_tar]({{mito_docs}}@{{mito_version}}/lib#hdr-stream_tar-Stream) — the contents of one entry, selected by a zero-based index that counts only regular files, or of all regular file entries joined together. {applies_to}`stack: ga 9.7+`
     * [stream_zip]({{mito_docs}}@{{mito_version}}/lib#hdr-stream_zip-Stream)
 
