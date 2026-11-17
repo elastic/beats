@@ -655,9 +655,9 @@ packetbeat.procs.enabled: false
 # kernel_tracing when available and falls back to procfs otherwise.
 #packetbeat.procs.backend: procfs
 
-# The minimum time between full scans of the OS socket table for each
-# transport. On Linux a scan reads the file descriptors of every process on
-# the host, so a lower value costs more CPU on busy hosts. Lookups that miss
+# The minimum time between full scans of process sockets for each
+# transport. On Linux a full scan reads the file descriptors of every process
+# on the host, so a lower value costs more CPU on busy hosts. Lookups that miss
 # within this time return no process. Lookups are always spaced by nine times
 # their own duration, so they take about a tenth of the time; the default (0)
 # adds no fixed minimum. A negative value disables both limits.

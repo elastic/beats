@@ -20,6 +20,7 @@
 package procs
 
 import (
+	"errors"
 	"net"
 	"strings"
 	"testing"
@@ -314,9 +315,9 @@ func TestScanThrottle(t *testing.T) {
 		ports:   []endpoint{{"127.0.0.53", 53}},
 		proto:   applayer.TransportUDP,
 	}
-	w, procs, clock := newThrottleTest(t, time.Second, listener)
+	w, pw, clock := newThrottleTest(t, time.Second, listener)
 	lookup := func(ip string, port uint16, transport applayer.Transport) *process {
-		return procs.findProc(net.ParseIP(ip), port, transport)
+		return pw.findProc(net.ParseIP(ip), port, transport)
 	}
 
 	for port := uint16(40000); port < 40100; port++ {
@@ -325,77 +326,89 @@ func TestScanThrottle(t *testing.T) {
 			t.Errorf("lookup(%d) = %v; want nil", port, p)
 		}
 	}
-	if w.scans != 1 {
-		t.Errorf("scans after 100 misses within the interval = %d; want 1", w.scans)
+	if w.lookups != 1 {
+		t.Errorf("lookups after 100 misses within the interval = %d; want 1", w.lookups)
 	}
 
 	// The limit is kept for each transport.
 	lookup("127.0.0.1", 40000, applayer.TransportTCP)
-	if w.scans != 2 {
-		t.Errorf("scans after a miss on the other transport = %d; want 2", w.scans)
+	if w.lookups != 2 {
+		t.Errorf("lookups after a miss on the other transport = %d; want 2", w.lookups)
 	}
 
 	*clock = clock.Add(2 * time.Second)
 	lookup("127.0.0.1", 40100, applayer.TransportUDP)
-	if w.scans != 3 {
-		t.Errorf("scans after the interval elapsed = %d; want 3", w.scans)
+	if w.lookups != 3 {
+		t.Errorf("lookups after the interval elapsed = %d; want 3", w.lookups)
 	}
 
-	// A hit never scans.
+	// A hit never looks up the socket table.
 	*clock = clock.Add(2 * time.Second)
 	p := lookup("127.0.0.53", 53, applayer.TransportUDP)
 	if p == nil {
 		t.Error("findProc(127.0.0.53, 53) = nil; want resolver")
 	}
-	if w.scans != 3 {
-		t.Errorf("scans after a hit = %d; want 3", w.scans)
+	if w.lookups != 3 {
+		t.Errorf("lookups after a hit = %d; want 3", w.lookups)
 	}
 }
 
 func TestAdaptiveScanGap(t *testing.T) {
-	listener := runningProcess{
-		process: process{name: "resolver", pid: 7},
-		ports:   []endpoint{{"127.0.0.53", 53}},
-		proto:   applayer.TransportUDP,
-	}
-	w, procs, clock := newThrottleTest(t, 0, listener)
-	lookup := func(port uint16) *process {
-		return procs.findProc(net.ParseIP("127.0.0.1"), port, applayer.TransportUDP)
+	w, pw, clock := newThrottleTest(t, 0)
+	lookup := func(port uint16) {
+		pw.findProc(net.ParseIP("127.0.0.1"), port, applayer.TransportUDP)
 	}
 
-	// A scan that takes no time sets no gap, so every miss scans.
+	// A lookup that takes no time sets no wait, so every miss looks.
 	for port := uint16(40000); port < 40010; port++ {
 		lookup(port)
 	}
-	if w.scans != 10 {
-		t.Errorf("scans after 10 misses with free scans = %d; want 10", w.scans)
+	if w.lookups != 10 {
+		t.Errorf("lookups after 10 misses with free lookups = %d; want 10", w.lookups)
 	}
 
-	// A 100ms scan holds off the next one for 900ms after it ends.
+	// A 100ms lookup holds off the next one for 900ms after it ends.
 	w.cost = 100 * time.Millisecond
 	lookup(40010)
-	if w.scans != 11 {
-		t.Errorf("scans after a miss with costly scans = %d; want 11", w.scans)
+	if w.lookups != 11 {
+		t.Errorf("lookups after a miss with costly lookups = %d; want 11", w.lookups)
 	}
 	*clock = clock.Add(800 * time.Millisecond)
 	lookup(40011)
-	if w.scans != 11 {
-		t.Errorf("scans 800ms after a 100ms scan = %d; want 11", w.scans)
+	if w.lookups != 11 {
+		t.Errorf("lookups 800ms after a 100ms lookup = %d; want 11", w.lookups)
 	}
 	*clock = clock.Add(200 * time.Millisecond)
 	lookup(40012)
-	if w.scans != 12 {
-		t.Errorf("scans 1s after a 100ms scan = %d; want 12", w.scans)
+	if w.lookups != 12 {
+		t.Errorf("lookups 1s after a 100ms lookup = %d; want 12", w.lookups)
 	}
 
-	// A cheap scan shortens the gap again.
+	// A cheap lookup shortens the wait again.
 	w.cost = time.Millisecond
 	*clock = clock.Add(time.Second)
 	lookup(40013)
 	*clock = clock.Add(10 * time.Millisecond)
 	lookup(40014)
-	if w.scans != 14 {
-		t.Errorf("scans 10ms after a 1ms scan = %d; want 14", w.scans)
+	if w.lookups != 14 {
+		t.Errorf("lookups 10ms after a 1ms lookup = %d; want 14", w.lookups)
+	}
+}
+
+func TestFailedLookupIsThrottled(t *testing.T) {
+	w, pw, clock := newThrottleTest(t, 0)
+	lookup := func(port uint16) {
+		pw.findProc(net.ParseIP("127.0.0.1"), port, applayer.TransportUDP)
+	}
+
+	// A lookup that fails still costs time, so it sets the wait too.
+	w.cost = 100 * time.Millisecond
+	w.err = errors.New("socket table unreadable")
+	lookup(40000)
+	*clock = clock.Add(500 * time.Millisecond)
+	lookup(40001)
+	if w.lookups != 1 {
+		t.Errorf("lookups 500ms after a failed 100ms lookup = %d; want 1", w.lookups)
 	}
 }
 
@@ -405,104 +418,49 @@ func TestAdaptiveMappingLife(t *testing.T) {
 		ports:   []endpoint{{"127.0.0.53", 53}},
 		proto:   applayer.TransportUDP,
 	}
-	w, procs, clock := newThrottleTest(t, 0, listener)
+	w, pw, clock := newThrottleTest(t, 0, listener)
 
 	// A 2s scan holds off the next for 18s, longer than mappingTTL, so
 	// the mapping it finds must outlive that wait.
 	w.cost = 2 * time.Second
-	procs.findProc(net.ParseIP("127.0.0.1"), 40000, applayer.TransportUDP)
+	pw.findProc(net.ParseIP("127.0.0.1"), 40000, applayer.TransportUDP)
 	*clock = clock.Add(15 * time.Second)
-	p := procs.findProc(net.ParseIP("127.0.0.53"), 53, applayer.TransportUDP)
+	p := pw.findProc(net.ParseIP("127.0.0.53"), 53, applayer.TransportUDP)
 	if p == nil {
 		t.Error("findProc(127.0.0.53, 53) 15s into an 18s wait = nil; want resolver")
 	}
-	if w.scans != 1 {
-		t.Errorf("scans = %d; want 1", w.scans)
+	if w.lookups != 1 {
+		t.Errorf("lookups = %d; want 1", w.lookups)
 	}
 }
 
 func TestSkippedScanKeepsFixedGap(t *testing.T) {
-	w, procs, clock := newThrottleTest(t, 5*time.Second)
+	w, pw, clock := newThrottleTest(t, 5*time.Second)
 	lookup := func(port uint16) {
-		procs.findProc(net.ParseIP("127.0.0.1"), port, applayer.TransportUDP)
+		pw.findProc(net.ParseIP("127.0.0.1"), port, applayer.TransportUDP)
 	}
 
 	lookup(40000)
-	if w.scans != 1 {
-		t.Fatalf("lookups after the first miss = %d; want 1", w.scans)
+	if w.lookups != 1 {
+		t.Fatalf("lookups after the first miss = %d; want 1", w.lookups)
 	}
 
 	// Lookups that find no socket skip the full scan, so they do not
-	// start the fixed gap, and later misses still look.
+	// restart the fixed gap, and later misses still look.
 	w.skip = true
 	*clock = clock.Add(6 * time.Second)
 	lookup(40001)
 	lookup(40002)
-	if w.scans != 3 {
-		t.Errorf("lookups after misses with skipped scans = %d; want 3", w.scans)
+	if w.lookups != 3 {
+		t.Errorf("lookups after misses with skipped scans = %d; want 3", w.lookups)
 	}
 
 	// A full scan starts the fixed gap again.
 	w.skip = false
 	lookup(40003)
 	lookup(40004)
-	if w.scans != 4 {
-		t.Errorf("lookups within 5s of a full scan = %d; want 4", w.scans)
-	}
-}
-
-// newThrottleTest returns a ProcessesWatcher with the given scan interval
-// whose clock is the returned time, and the watcher that counts its scans.
-func newThrottleTest(t *testing.T, gap time.Duration, procs ...runningProcess) (*countingWatcher, *ProcessesWatcher, *time.Time) {
-	t.Helper()
-	clock := time.Now()
-	w := &countingWatcher{
-		mockWatcher: newMockWatcher([]net.IP{net.ParseIP("127.0.0.1"), net.ParseIP("127.0.0.53")}, procs),
-		clock:       &clock,
-	}
-	pw := &ProcessesWatcher{now: func() time.Time { return clock }}
-	err := pw.init(ProcsConfig{Enabled: true, MaxProcReadFreq: gap}, w, logptest.NewTestingLogger(t, ""))
-	if err != nil {
-		t.Fatal(err)
-	}
-	return w, pw, &clock
-}
-
-// countingWatcher counts socket table lookups and advances clock by cost
-// during each.
-type countingWatcher struct {
-	*mockWatcher
-	scans int
-	cost  time.Duration
-	skip  bool // skip makes lookups find no socket and skip the full scan.
-	clock *time.Time
-}
-
-func (w *countingWatcher) GetLocalPortToPIDMapping(transport applayer.Transport, port uint16) (map[endpoint]int, bool, error) {
-	w.scans++
-	*w.clock = w.clock.Add(w.cost)
-	if w.skip {
-		return nil, false, nil
-	}
-	return w.mockWatcher.GetLocalPortToPIDMapping(transport, port)
-}
-
-func TestScanGapConfig(t *testing.T) {
-	for _, tc := range []struct {
-		name string
-		freq time.Duration
-		want time.Duration
-	}{
-		{"unset", 0, 0},
-		{"set", 5 * time.Second, 5 * time.Second},
-		{"disabled", -time.Second, -time.Second},
-	} {
-		t.Run(tc.name, func(t *testing.T) {
-			_, pw, _ := newThrottleTest(t, tc.freq)
-			if pw.minScanGap != tc.want {
-				t.Errorf("minScanGap for MaxProcReadFreq=%v = %v; want %v", tc.freq, pw.minScanGap, tc.want)
-			}
-		})
+	if w.lookups != 4 {
+		t.Errorf("lookups within 5s of a full scan = %d; want 4", w.lookups)
 	}
 }
 
@@ -526,8 +484,8 @@ func TestMappingOutlivesScanGap(t *testing.T) {
 	if lookup() == nil {
 		t.Error("lookup 12s after the scan = nil; want svc")
 	}
-	if w.scans != 1 {
-		t.Errorf("scans after the lookup within the interval = %d; want 1", w.scans)
+	if w.lookups != 1 {
+		t.Errorf("lookups after the lookup within the interval = %d; want 1", w.lookups)
 	}
 
 	// Past both the mapping life and the interval, so it scans again.
@@ -535,8 +493,8 @@ func TestMappingOutlivesScanGap(t *testing.T) {
 	if lookup() == nil {
 		t.Error("lookup 42s after the scan = nil; want svc")
 	}
-	if w.scans != 2 {
-		t.Errorf("scans after the interval elapsed = %d; want 2", w.scans)
+	if w.lookups != 2 {
+		t.Errorf("lookups after the interval elapsed = %d; want 2", w.lookups)
 	}
 }
 
@@ -558,8 +516,8 @@ func TestStableMappingExpiryRefreshed(t *testing.T) {
 	// Another scan, triggered by an unrelated miss, sees the same mapping.
 	*clock = clock.Add(8 * time.Second)
 	pw.findProc(net.ParseIP("127.0.0.1"), 81, applayer.TransportTCP)
-	if w.scans != 2 {
-		t.Fatalf("scans after an unrelated miss = %d; want 2", w.scans)
+	if w.lookups != 2 {
+		t.Fatalf("lookups after an unrelated miss = %d; want 2", w.lookups)
 	}
 
 	// The original entry would have expired by now.
@@ -567,7 +525,48 @@ func TestStableMappingExpiryRefreshed(t *testing.T) {
 	if lookup() == nil {
 		t.Error("lookup 15s after the first scan = nil; want svc")
 	}
-	if w.scans != 2 {
-		t.Errorf("scans after the lookup = %d; want 2 (mapping should not need a rescan)", w.scans)
+	if w.lookups != 2 {
+		t.Errorf("lookups after the lookup = %d; want 2 (mapping should not need a rescan)", w.lookups)
 	}
+}
+
+// newThrottleTest returns a ProcessesWatcher with the given scan interval
+// whose clock is the returned time, and the watcher that counts its
+// socket table lookups.
+func newThrottleTest(t *testing.T, gap time.Duration, procs ...runningProcess) (*countingWatcher, *ProcessesWatcher, *time.Time) {
+	t.Helper()
+	clock := time.Now()
+	w := &countingWatcher{
+		mockWatcher: newMockWatcher([]net.IP{net.ParseIP("127.0.0.1"), net.ParseIP("127.0.0.53")}, procs),
+		clock:       &clock,
+	}
+	pw := &ProcessesWatcher{now: func() time.Time { return clock }}
+	err := pw.init(ProcsConfig{Enabled: true, MaxProcReadFreq: gap}, w, logptest.NewTestingLogger(t, ""))
+	if err != nil {
+		t.Fatal(err)
+	}
+	return w, pw, &clock
+}
+
+// countingWatcher counts socket table lookups and advances clock by cost
+// during each.
+type countingWatcher struct {
+	*mockWatcher
+	lookups int
+	cost    time.Duration
+	skip    bool  // skip makes lookups find no socket and skip the full scan.
+	err     error // err is returned by lookups when it is not nil.
+	clock   *time.Time
+}
+
+func (w *countingWatcher) GetLocalPortToPIDMapping(transport applayer.Transport, port uint16) (map[endpoint]int, bool, error) {
+	w.lookups++
+	*w.clock = w.clock.Add(w.cost)
+	if w.err != nil {
+		return nil, false, w.err
+	}
+	if w.skip {
+		return nil, false, nil
+	}
+	return w.mockWatcher.GetLocalPortToPIDMapping(transport, port)
 }

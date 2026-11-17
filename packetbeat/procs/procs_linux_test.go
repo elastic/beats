@@ -26,9 +26,11 @@ import (
 	"slices"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zapcore"
 
+	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
@@ -160,12 +162,40 @@ func TestGetProcessVanishedPID(t *testing.T) {
 	// A PID far above any kernel pid_max, standing in for a process that
 	// exited after the socket scan.
 	p := procs.GetProcess(1 << 30)
-	require.Nil(t, p, "process for a vanished PID")
+	assert.Nil(t, p, "process for a vanished PID")
 
 	for _, e := range logs.All() {
-		require.Less(t, e.Level, zapcore.ErrorLevel, "vanished PID logged at %s: %s", e.Level, e.Message)
+		assert.Less(t, e.Level, zapcore.ErrorLevel, "vanished PID logged at %s: %s", e.Level, e.Message)
 	}
-	require.NotZero(t, logs.FilterMessageSnippet("Unable to get command-line for PID").Len(), "expected a debug message for the vanished PID")
+	assert.NotZero(t, logs.FilterMessageSnippet("Unable to get command-line for PID").Len(), "expected a debug message for the vanished PID")
+}
+
+func TestGetLocalPortToPIDMappingSkipsClosedPort(t *testing.T) {
+	// A socket table with one UDP socket on 127.0.0.53:53 and no IPv6
+	// table.
+	dir := t.TempDir()
+	udp := filepath.Join(dir, "udp")
+	const table = `  sl  local_address rem_address   st tx_queue rx_queue tr tm->when retrnsmt   uid  timeout inode ref pointer drops
+  1: 3500007F:0035 00000000:0000 07 00000000:00000000 00:00000000 00000000   101        0 12345 2 0000000000000000 0
+`
+	err := os.WriteFile(udp, []byte(table), 0o600)
+	require.NoError(t, err)
+	orig := procFiles[applayer.TransportUDP]
+	procFiles[applayer.TransportUDP] = struct{ ipv4, ipv6 string }{udp, filepath.Join(dir, "udp6")}
+	t.Cleanup(func() { procFiles[applayer.TransportUDP] = orig })
+
+	var procs ProcessesWatcher
+	err = procs.Init(ProcsConfig{Enabled: true}, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	ports, scanned, err := procs.GetLocalPortToPIDMapping(applayer.TransportUDP, 40000)
+	assert.NoError(t, err, "lookup of a closed port")
+	assert.False(t, scanned, "full scan for a port with no socket")
+	assert.Empty(t, ports, "mappings for a port with no socket")
+
+	_, scanned, err = procs.GetLocalPortToPIDMapping(applayer.TransportUDP, 53)
+	assert.NoError(t, err, "lookup of an open port")
+	assert.True(t, scanned, "full scan for a port with a socket")
 }
 
 func TestHasSocket(t *testing.T) {

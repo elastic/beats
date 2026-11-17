@@ -48,8 +48,10 @@ const (
 	scanMargin = 5 * time.Second
 
 	// scanCostFactor sets the wait after a socket table lookup as a
-	// multiple of how long the lookup took. With 9, lookups for each
-	// transport hold the watcher's lock for about a tenth of the time.
+	// multiple of how long the lookup took, including reading details of
+	// new processes. With 9, lookups for each transport hold the
+	// watcher's lock for about a tenth of the time. The transports share
+	// the lock, so together they can hold it for about a fifth.
 	scanCostFactor = 9
 )
 
@@ -324,26 +326,6 @@ func (proc *ProcessesWatcher) findProc(address net.IP, port uint16, transport ap
 	return nil
 }
 
-// scanThrottled returns whether a socket table lookup for the transport
-// happened too recently to start another. The wait after a lookup scales
-// with its cost, so misses are only lost on hosts where lookups are
-// expensive. A fixed minScanGap also spaces full scans, but not the cheap
-// lookups that find no socket and skip the scan. proc.mu must be locked.
-func (proc *ProcessesWatcher) scanThrottled(transport applayer.Transport) bool {
-	if proc.minScanGap < 0 {
-		return false
-	}
-	s, ok := proc.scans[transport]
-	if !ok {
-		return false
-	}
-	now := proc.now()
-	if now.Sub(s.checked) < scanCostFactor*s.cost {
-		return true
-	}
-	return proc.minScanGap > 0 && !s.scanned.IsZero() && now.Sub(s.scanned) < proc.minScanGap
-}
-
 // proc.mu must be locked
 func lookupMapping(address net.IP, port uint16, procMap map[endpoint]portProcMapping, now time.Time, logger *logp.Logger) (portProcMapping, bool) {
 	key := endpoint{address.String(), port}
@@ -383,23 +365,33 @@ func lookupMapping(address net.IP, port uint16, procMap map[endpoint]portProcMap
 	return p, found
 }
 
-// proc.mu must be locked
+// scanThrottled returns whether a socket table lookup for the transport
+// happened too recently to start another. The wait after a lookup scales
+// with its cost, so misses are only lost on hosts where lookups are
+// expensive. A fixed minScanGap also blocks lookups until that long after
+// the last full scan; lookups that skip the full scan do not restart it.
+// proc.mu must be locked.
+func (proc *ProcessesWatcher) scanThrottled(transport applayer.Transport) bool {
+	if proc.minScanGap < 0 {
+		return false
+	}
+	s, ok := proc.scans[transport]
+	if !ok {
+		return false
+	}
+	now := proc.now()
+	if now.Sub(s.checked) < scanCostFactor*s.cost {
+		return true
+	}
+	return proc.minScanGap > 0 && !s.scanned.IsZero() && now.Sub(s.scanned) < proc.minScanGap
+}
+
+// updateMap looks up the socket table for the transport after a miss on
+// port, and records the mappings found and the cost of the lookup.
+// proc.mu must be locked.
 func (proc *ProcessesWatcher) updateMap(transport applayer.Transport, port uint16) {
-	// The state is recorded before the mappings are updated, so that
-	// their lifetime follows the wait this lookup sets.
 	start := proc.now()
 	endpoints, scanned, err := proc.watcher.GetLocalPortToPIDMapping(transport, port)
-	end := proc.now()
-	s := proc.scans[transport]
-	s.checked = end
-	s.cost = end.Sub(start)
-	if scanned {
-		s.scanned = end
-	}
-	proc.scans[transport] = s
-	if proc.isProcDetailedEnabled {
-		proc.procDetailedLogger.Debugf("GetLocalPortToPIDMapping() took %v, full scan: %t", s.cost, scanned)
-	}
 	if err != nil {
 		proc.logger.Errorf("unable to list local ports: %v", err)
 	}
@@ -409,11 +401,38 @@ func (proc *ProcessesWatcher) updateMap(transport applayer.Transport, port uint1
 	for e, pid := range endpoints {
 		proc.updateMappingEntry(transport, e, pid)
 	}
+
+	// The cost includes reading the details of new processes, since
+	// that is also done while holding the lock.
+	end := proc.now()
+	s := proc.scans[transport]
+	s.checked = end
+	s.cost = end.Sub(start)
+	if scanned {
+		s.scanned = end
+	}
+	proc.scans[transport] = s
+	if proc.isProcDetailedEnabled {
+		proc.procDetailedLogger.Debugf("updateMap() took %v, full scan: %t", s.cost, scanned)
+	}
+
+	// Every mapping the scan saw, new or confirmed, is trusted until
+	// after the next full scan is allowed. Extending confirmed mappings
+	// stops stable listeners from expiring and forcing a rescan.
+	expires := end.Add(proc.mappingLife(transport))
+	for e, pid := range endpoints {
+		m, ok := proc.portProcMap[transport][e]
+		if !ok || m.pid != pid {
+			continue
+		}
+		m.expires = expires
+		proc.portProcMap[transport][e] = m
+	}
 }
 
 // proc.mu must be locked
 func (proc *ProcessesWatcher) expireProcessCache() {
-	now := time.Now()
+	now := proc.now()
 	for pid, info := range proc.processCache {
 		if now.After(info.expires) {
 			delete(proc.processCache, pid)
@@ -421,24 +440,11 @@ func (proc *ProcessesWatcher) expireProcessCache() {
 	}
 }
 
-// mappingLife returns how long a mapping is trusted after a scan sees it.
-// It is at least as long as the wait for the next full scan, otherwise a
-// long-lived listener would lose its mapping while the throttle blocks the
-// rescan. proc.mu must be locked.
-func (proc *ProcessesWatcher) mappingLife(transport applayer.Transport) time.Duration {
-	gap := max(proc.minScanGap, scanCostFactor*proc.scans[transport].cost)
-	return max(mappingTTL, gap+scanMargin)
-}
-
-// proc.mu must be locked
+// updateMappingEntry records that pid owns e, unless that is already
+// known. The caller sets the expiry. proc.mu must be locked.
 func (proc *ProcessesWatcher) updateMappingEntry(transport applayer.Transport, e endpoint, pid int) {
 	prev, ok := proc.portProcMap[transport][e]
 	if ok && prev.pid == pid {
-		// This port->pid mapping already exists. Extend its life since
-		// the scan has just confirmed it, otherwise stable listeners
-		// expire and force a rescan.
-		prev.expires = proc.now().Add(proc.mappingLife(transport))
-		proc.portProcMap[transport][e] = prev
 		return
 	}
 
@@ -454,13 +460,12 @@ func (proc *ProcessesWatcher) updateMappingEntry(transport applayer.Transport, e
 	// fine to have old entries lingering, as long as we don't
 	// trust them on subsequent connections.
 	//
-	// If the source port is re-used within the hardcoded 10
-	// seconds window, we might end up hitting an old mapping.
+	// If the source port is re-used within the mapping's lifetime,
+	// we might end up hitting an old mapping.
 	proc.portProcMap[transport][e] = portProcMapping{
 		endpoint: e,
 		pid:      pid,
 		proc:     p,
-		expires:  proc.now().Add(proc.mappingLife(transport)),
 	}
 
 	if proc.isProcDetailedEnabled {
@@ -531,7 +536,7 @@ func (proc *ProcessesWatcher) GetProcess(pid int) *process {
 		cwd:       info.CWD,
 		args:      info.Args,
 		startTime: info.StartTime,
-		expires:   time.Now().Add(processCacheExpiration),
+		expires:   proc.now().Add(processCacheExpiration),
 	}
 }
 
@@ -544,6 +549,15 @@ func (proc *ProcessesWatcher) logProcessError(pid int, err error) {
 		return
 	}
 	proc.logger.Errorf("Unable to get command-line for PID %d: %v", pid, err)
+}
+
+// mappingLife returns how long a mapping is trusted after a scan sees it.
+// It is at least as long as the wait for the next full scan, otherwise a
+// long-lived listener would lose its mapping while the throttle blocks the
+// rescan. proc.mu must be locked.
+func (proc *ProcessesWatcher) mappingLife(transport applayer.Transport) time.Duration {
+	gap := max(proc.minScanGap, scanCostFactor*proc.scans[transport].cost)
+	return max(mappingTTL, gap+scanMargin)
 }
 
 // GetLocalIPs returns the list of local addresses.
