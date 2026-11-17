@@ -537,7 +537,7 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-          diskType: "hyperdisk-balanced"
+          diskType: "pd-ssd"
         notify:
           - github_commit_status:
               context: "x-pack/metricbeat: Packaging Linux"
@@ -581,7 +581,7 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-          diskType: "hyperdisk-balanced"
+          diskType: "pd-ssd"
         notify:
           - github_commit_status:
               context: "x-pack/metricbeat: Packaging Linux amd64 FIPS"
@@ -626,7 +626,7 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-          diskType: "hyperdisk-balanced"
+          diskType: "pd-ssd"
         notify:
           - github_commit_status:
               context: "x-pack/metricbeat: Packaging Windows amd64 FIPS"

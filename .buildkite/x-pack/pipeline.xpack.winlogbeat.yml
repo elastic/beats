@@ -101,7 +101,7 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-          diskType: "hyperdisk-balanced"
+          diskType: "pd-ssd"
         artifact_paths:
           - "x-pack/winlogbeat/build/*.xml"
           - "x-pack/winlogbeat/build/*.json"
@@ -335,7 +335,7 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-          diskType: "hyperdisk-balanced"
+          diskType: "pd-ssd"
         notify:
           - github_commit_status:
               context: "x-pack/winlogbeat: Packaging Linux"
