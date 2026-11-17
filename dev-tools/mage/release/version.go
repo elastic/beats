@@ -73,27 +73,3 @@ func inferLatestRelease(currentRelease string) (string, error) {
 	}
 	return devtools.InferLatestRelease(v), nil
 }
-
-func inferNextRelease(currentRelease string) string {
-	v, err := parseReleaseVersion(currentRelease)
-	if err != nil {
-		return ""
-	}
-	return devtools.InferNextRelease(v)
-}
-
-func inferNextProjectMinorVersion(currentRelease string) (string, error) {
-	v, err := parseReleaseVersion(currentRelease)
-	if err != nil {
-		return "", err
-	}
-	return devtools.InferNextProjectMinorVersion(v), nil
-}
-
-func inferNextProjectMinorBranch(currentRelease string) string {
-	v, err := parseReleaseVersion(currentRelease)
-	if err != nil {
-		return ""
-	}
-	return devtools.InferNextProjectMinorBranch(v)
-}

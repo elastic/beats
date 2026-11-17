@@ -289,9 +289,9 @@ func (gh *GitHubClient) EnsureLabel(owner, repo, name, color, description string
 	}
 
 	_, _, err = gh.client.Issues.CreateLabel(gh.ctx, owner, repo, &github.Label{
-		Name:        github.Ptr(name),
-		Color:       github.Ptr(color),
-		Description: github.Ptr(description),
+		Name:        new(name),
+		Color:       new(color),
+		Description: new(description),
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create label %q: %w", name, err)
