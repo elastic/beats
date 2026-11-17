@@ -429,7 +429,7 @@ Google Cloud Dataproc metrics
 
 
 **`gcp.dataproc.cluster.operation.completion_time.value`**
-:   The time operations took to complete from the time the user submits a operation to the time Dataproc reports it is completed.
+:   The time operations took to complete from the time the user submits an operation to the time Dataproc reports it is completed.
 
     type: object
 
