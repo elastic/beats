@@ -21,15 +21,15 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/google/go-github/v68/github"
 )
 
 func TestReleaseIssueTitle(t *testing.T) {
 	got := releaseIssueTitle("9.4.1")
 	want := "[RELEASE 9.4.1] Instructions & Checklist"
-	if got != want {
-		t.Fatalf("releaseIssueTitle() = %q, want %q", got, want)
-	}
+	require.Equal(t, want, got)
 }
 
 func TestIsMajorMinorRelease(t *testing.T) {
@@ -168,9 +168,7 @@ func TestEnsureReleaseIssueTrackerDryRun(t *testing.T) {
 		DryRun:         true,
 	}
 	pr := &github.PullRequest{HTMLURL: github.Ptr("https://github.com/elastic/beats/pull/99")}
-	if err := EnsureReleaseIssueTracker(cfg, []*github.PullRequest{pr}); err != nil {
-		t.Fatalf("dry-run ensureIssueTracker should not call GitHub: %v", err)
-	}
+	require.NoError(t, EnsureReleaseIssueTracker(cfg, []*github.PullRequest{pr}), "dry-run ensureIssueTracker should not call GitHub")
 }
 
 func TestWarnEnsureReleaseIssueTrackerDoesNotPanicOnError(t *testing.T) {

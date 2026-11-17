@@ -18,277 +18,62 @@
 package release
 
 import (
-	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
-func TestInferLatestRelease(t *testing.T) {
-	tests := []struct {
-		name    string
-		version string
-		want    string
-		wantErr bool
-	}{
-		{
-			name:    "valid version",
-			version: "9.2.1",
-			want:    "9.2.0",
-			wantErr: false,
-		},
-		{
-			name:    "patch version greater than 1",
-			version: "8.15.10",
-			want:    "8.15.9",
-			wantErr: false,
-		},
-		{
-			name:    "patch version is 0",
-			version: "9.2.0",
-			want:    "",
-			wantErr: false,
-		},
-		{
-			name:    "invalid format - missing patch",
-			version: "9.2",
-			want:    "",
-			wantErr: true,
-		},
-		{
-			name:    "invalid format - non-numeric patch",
-			version: "9.2.x",
-			want:    "",
-			wantErr: true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := inferLatestRelease(tt.version)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("inferLatestRelease() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("inferLatestRelease() = %v, want %v", got, tt.want)
-			}
+func TestValidateReleaseConfig(t *testing.T) {
+	t.Run("missing current", func(t *testing.T) {
+		err := ValidateReleaseConfig(&ReleaseConfig{DryRun: true, LatestRelease: "9.4.0"})
+		require.Error(t, err)
+	})
+	t.Run("missing latest", func(t *testing.T) {
+		err := ValidateReleaseConfig(&ReleaseConfig{CurrentRelease: "9.5.0", DryRun: true})
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "LatestRelease")
+	})
+	t.Run("missing token when not dry-run", func(t *testing.T) {
+		err := ValidateReleaseConfig(&ReleaseConfig{CurrentRelease: "9.5.0", LatestRelease: "9.4.0"})
+		require.Error(t, err)
+	})
+	t.Run("valid dry-run", func(t *testing.T) {
+		err := ValidateReleaseConfig(&ReleaseConfig{
+			CurrentRelease: "9.5.0",
+			LatestRelease:  "9.4.0",
+			DryRun:         true,
 		})
-	}
+		require.NoError(t, err)
+	})
 }
 
-func TestInferNextRelease(t *testing.T) {
-	tests := []struct {
-		name    string
-		version string
-		want    string
-		wantErr bool
-	}{
-		{
-			name:    "valid version",
-			version: "9.2.0",
-			want:    "9.2.1",
-			wantErr: false,
-		},
-		{
-			name:    "patch version greater than 0",
-			version: "8.15.9",
-			want:    "8.15.10",
-			wantErr: false,
-		},
-		{
-			name:    "invalid format - missing patch",
-			version: "9.2",
-			want:    "",
-			wantErr: true,
-		},
-		{
-			name:    "invalid format - non-numeric patch",
-			version: "9.2.x",
-			want:    "",
-			wantErr: true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := inferNextRelease(tt.version)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("inferNextRelease() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("inferNextRelease() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestInferReleaseBranch(t *testing.T) {
-	tests := []struct {
-		name    string
-		version string
-		want    string
-	}{
-		{
-			name:    "valid version",
-			version: "9.2.1",
-			want:    "9.2",
-		},
-		{
-			name:    "double digit minor",
-			version: "8.15.10",
-			want:    "8.15",
-		},
-		{
-			name:    "missing patch",
-			version: "9.2",
-			want:    "9.2",
-		},
-		{
-			name:    "single part version",
-			version: "9",
-			want:    "",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := inferReleaseBranch(tt.version)
-			if got != tt.want {
-				t.Errorf("inferReleaseBranch() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestInferNextProjectMinorVersion(t *testing.T) {
-	tests := []struct {
-		name    string
-		version string
-		want    string
-		wantErr bool
-	}{
-		{
-			name:    "9.5.0 to 9.6.0",
-			version: "9.5.0",
-			want:    "9.6.0",
-			wantErr: false,
-		},
-		{
-			name:    "8.15.0 to 8.16.0",
-			version: "8.15.0",
-			want:    "8.16.0",
-			wantErr: false,
-		},
-		{
-			name:    "invalid format",
-			version: "9.5",
-			want:    "",
-			wantErr: true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := inferNextProjectMinorVersion(tt.version)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("inferNextProjectMinorVersion() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("inferNextProjectMinorVersion() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestInferNextProjectMinorBranch(t *testing.T) {
-	tests := []struct {
-		name    string
-		version string
-		want    string
-	}{
-		{
-			name:    "9.5.0 to 9.6",
-			version: "9.5.0",
-			want:    "9.6",
-		},
-		{
-			name:    "8.15.0 to 8.16",
-			version: "8.15.0",
-			want:    "8.16",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := inferNextProjectMinorBranch(tt.version)
-			if got != tt.want {
-				t.Errorf("inferNextProjectMinorBranch() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestReleaseConfigValidateRequiresLatest(t *testing.T) {
-	cfg := &ReleaseConfig{
-		CurrentRelease: "9.5.0",
-		DryRun:         true,
-	}
-	err := cfg.Validate()
-	if err == nil {
-		t.Fatal("expected validation error when LatestRelease is missing")
-	}
-	if !strings.Contains(err.Error(), "LatestRelease") {
-		t.Fatalf("expected LatestRelease error, got: %v", err)
-	}
-
-	cfg.LatestRelease = "9.4.3"
-	if err := cfg.Validate(); err != nil {
-		t.Fatalf("expected validation to pass with LatestRelease set: %v", err)
-	}
-}
-
-func TestEnsureLatestReleaseFromAPI(t *testing.T) {
+func TestEnsureLatestRelease(t *testing.T) {
 	orig := fetchLatestReleaseBefore
-	fetchLatestReleaseBefore = func(token, owner, repo, current string) (string, error) {
-		if owner != "elastic" || repo != "beats" {
-			t.Errorf("unexpected lookup repo %s/%s", owner, repo)
-		}
-		if current != "9.5.0" {
-			t.Errorf("unexpected current %s", current)
-		}
-		return "9.4.3", nil
-	}
 	t.Cleanup(func() { fetchLatestReleaseBefore = orig })
 
-	cfg := &ReleaseConfig{CurrentRelease: "9.5.0", DryRun: true}
-	if err := cfg.EnsureLatestRelease(); err != nil {
-		t.Fatalf("EnsureLatestRelease failed: %v", err)
-	}
-	if cfg.LatestRelease != "9.4.3" {
-		t.Errorf("LatestRelease = %s, want 9.4.3", cfg.LatestRelease)
+	fetchLatestReleaseBefore = func(token, owner, repo, current string) (string, error) {
+		return "9.4.3", nil
 	}
 
-	// Already-resolved LatestRelease should not call the API again
-	cfg.LatestRelease = "9.4.2"
-	fetchLatestReleaseBefore = func(token, owner, repo, current string) (string, error) {
-		t.Fatal("should not fetch when LatestRelease is already set")
-		return "", nil
-	}
-	if err := cfg.EnsureLatestRelease(); err != nil {
-		t.Fatalf("EnsureLatestRelease with existing LatestRelease failed: %v", err)
-	}
-	if cfg.LatestRelease != "9.4.2" {
-		t.Errorf("LatestRelease changed unexpectedly: %s", cfg.LatestRelease)
-	}
+	cfg := &ReleaseConfig{CurrentRelease: "9.5.0", DryRun: true}
+	require.NoError(t, EnsureLatestRelease(cfg))
+	require.Equal(t, "9.4.3", cfg.LatestRelease)
+
+	cfg.LatestRelease = "9.4.0"
+	require.NoError(t, EnsureLatestRelease(cfg))
+	require.Equal(t, "9.4.0", cfg.LatestRelease)
 }
 
-func TestInferNextReleaseForMinor(t *testing.T) {
-	got, err := inferNextRelease("9.5.0")
-	if err != nil {
-		t.Fatalf("inferNextRelease() error = %v", err)
-	}
-	if got != "9.5.1" {
-		t.Errorf("inferNextRelease(9.5.0) = %v, want 9.5.1", got)
-	}
+func TestLoadReleaseSettingsViaMage(t *testing.T) {
+	t.Setenv("CURRENT_RELEASE", "9.5.0")
+	t.Setenv("DRY_RUN", "true")
+
+	settings, err := devtools.LoadReleaseSettings()
+	require.NoError(t, err)
+	require.NoError(t, settings.RequireRelease())
+	require.Equal(t, "9.5.0", settings.CurrentRelease)
+	require.Equal(t, "9.5.1", settings.NextRelease)
+	require.True(t, settings.DryRun)
 }

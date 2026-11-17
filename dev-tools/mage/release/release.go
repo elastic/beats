@@ -108,7 +108,11 @@ func UpdateStackVersion(newVersion string) error {
 
 // UpdateDocs updates version references using release-branch defaults.
 func UpdateDocs(newVersion string) error {
-	releaseBranch := inferReleaseBranch(newVersion)
+	parsed, err := parseReleaseVersion(newVersion)
+	if err != nil {
+		return err
+	}
+	releaseBranch := inferReleaseBranch(parsed.String())
 	return UpdateDocsWithOptions(DocsUpdateOptions{
 		BaseBranch:     releaseBranch,
 		CurrentVersion: newVersion,
@@ -123,7 +127,11 @@ func UpdateDocsWithOptions(opts DocsUpdateOptions) error {
 		return fmt.Errorf("CurrentVersion is required")
 	}
 	if opts.ReleaseBranch == "" {
-		opts.ReleaseBranch = inferReleaseBranch(opts.CurrentVersion)
+		parsed, err := parseReleaseVersion(opts.CurrentVersion)
+		if err != nil {
+			return err
+		}
+		opts.ReleaseBranch = inferReleaseBranch(parsed.String())
 	}
 	if opts.BaseBranch == "" {
 		opts.BaseBranch = opts.ReleaseBranch

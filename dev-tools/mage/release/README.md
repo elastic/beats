@@ -587,23 +587,20 @@ curl -H "Authorization: token $GITHUB_TOKEN" \
 
 ## Development
 
-This directory is its own Go module. Always run `go` commands from here (or with
-`-C ./dev-tools/mage/release` from the repo root). Do not add release tooling
-dependencies to the root `go.mod`.
+Release tooling lives in the root Beats module. Run `go` commands from the
+repository root. Configuration loads through `dev-tools/mage` release settings.
 
 ### Running Tests
 
 ```bash
-cd dev-tools/mage/release
-go test ./...
+go test ./dev-tools/mage/release/ ./dev-tools/mage/ -count=1 -run 'Release|Infer|ParseRelease|LoadRelease'
 ```
 
 ### Test Coverage
 
 ```bash
-cd dev-tools/mage/release
-go test -cover ./...
-go test -coverprofile=coverage.out ./...
+go test -cover ./dev-tools/mage/release/...
+go test -coverprofile=coverage.out ./dev-tools/mage/release/...
 go tool cover -html=coverage.out
 ```
 

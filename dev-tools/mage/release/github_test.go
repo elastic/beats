@@ -19,6 +19,7 @@ package release
 
 import (
 	"testing"
+
 	"time"
 
 	"github.com/google/go-github/v68/github"

@@ -22,6 +22,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestUpdateVersion(t *testing.T) {
@@ -31,9 +33,7 @@ func TestUpdateVersion(t *testing.T) {
 	// Create libbeat/version directory
 	versionDir := filepath.Join(tmpDir, "libbeat", "version")
 	err := os.MkdirAll(versionDir, 0755)
-	if err != nil {
-		t.Fatalf("Failed to create version dir: %v", err)
-	}
+	require.NoError(t, err, "Failed to create version dir")
 
 	// Create version.go file
 	versionFile := filepath.Join(versionDir, "version.go")
@@ -42,52 +42,38 @@ func TestUpdateVersion(t *testing.T) {
 const defaultBeatVersion = "9.3.0"
 `
 	err = os.WriteFile(versionFile, []byte(initialContent), 0644)
-	if err != nil {
-		t.Fatalf("Failed to create version file: %v", err)
-	}
+	require.NoError(t, err, "Failed to create version file")
 
 	// Change to temp directory
 	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("Failed to get current directory: %v", err)
-	}
+	require.NoError(t, err, "Failed to get current directory")
 	defer func() {
 		if err := os.Chdir(origDir); err != nil {
 			t.Errorf("Failed to restore directory: %v", err)
 		}
 	}()
-	if err := os.Chdir(tmpDir); err != nil {
-		t.Fatalf("Failed to change to temp directory: %v", err)
-	}
+	require.NoError(t, os.Chdir(tmpDir), "Failed to change to temp directory")
 
 	got, err := ReadBeatVersion()
-	if err != nil {
-		t.Fatalf("ReadBeatVersion failed: %v", err)
-	}
+	require.NoError(t, err, "ReadBeatVersion failed")
 	if got != "9.3.0" {
 		t.Fatalf("ReadBeatVersion = %q, want 9.3.0", got)
 	}
 
 	// Test updating version
 	err = UpdateVersion("9.4.0")
-	if err != nil {
-		t.Fatalf("UpdateVersion failed: %v", err)
-	}
+	require.NoError(t, err, "UpdateVersion failed")
 
 	// Verify the file was updated
 	content, err := os.ReadFile(versionFile)
-	if err != nil {
-		t.Fatalf("Failed to read updated file: %v", err)
-	}
+	require.NoError(t, err, "Failed to read updated file")
 
 	if !strings.Contains(string(content), `const defaultBeatVersion = "9.4.0"`) {
 		t.Errorf("Version not updated correctly. Got:\n%s", string(content))
 	}
 
 	got, err = ReadBeatVersion()
-	if err != nil {
-		t.Fatalf("ReadBeatVersion after update failed: %v", err)
-	}
+	require.NoError(t, err, "ReadBeatVersion after update failed")
 	if got != "9.4.0" {
 		t.Fatalf("ReadBeatVersion after update = %q, want 9.4.0", got)
 	}
@@ -98,9 +84,7 @@ func TestUpdateVersionIdempotent(t *testing.T) {
 
 	versionDir := filepath.Join(tmpDir, "libbeat", "version")
 	err := os.MkdirAll(versionDir, 0755)
-	if err != nil {
-		t.Fatalf("Failed to create version dir: %v", err)
-	}
+	require.NoError(t, err, "Failed to create version dir")
 
 	versionFile := filepath.Join(versionDir, "version.go")
 	initialContent := `package version
@@ -108,32 +92,22 @@ func TestUpdateVersionIdempotent(t *testing.T) {
 const defaultBeatVersion = "9.4.0"
 `
 	err = os.WriteFile(versionFile, []byte(initialContent), 0644)
-	if err != nil {
-		t.Fatalf("Failed to create version file: %v", err)
-	}
+	require.NoError(t, err, "Failed to create version file")
 
 	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("Failed to get current directory: %v", err)
-	}
+	require.NoError(t, err, "Failed to get current directory")
 	defer func() {
 		if err := os.Chdir(origDir); err != nil {
 			t.Errorf("Failed to restore directory: %v", err)
 		}
 	}()
-	if err := os.Chdir(tmpDir); err != nil {
-		t.Fatalf("Failed to change to temp directory: %v", err)
-	}
+	require.NoError(t, os.Chdir(tmpDir), "Failed to change to temp directory")
 
 	err = UpdateVersion("9.4.0")
-	if err != nil {
-		t.Fatalf("UpdateVersion should succeed when version is already set: %v", err)
-	}
+	require.NoError(t, err, "UpdateVersion should succeed when version is already set")
 
 	content, err := os.ReadFile(versionFile)
-	if err != nil {
-		t.Fatalf("Failed to read version file: %v", err)
-	}
+	require.NoError(t, err, "Failed to read version file")
 	if string(content) != initialContent {
 		t.Errorf("Idempotent UpdateVersion should not modify file. Got:\n%s", string(content))
 	}
@@ -160,46 +134,34 @@ func TestUpdateDocs(t *testing.T) {
 :doc-branch: 9.3
 `
 	err := os.WriteFile(versionAsciidoc, []byte(versionContent), 0644)
-	if err != nil {
-		t.Fatalf("Failed to create version.asciidoc: %v", err)
-	}
+	require.NoError(t, err, "Failed to create version.asciidoc")
 
 	// Create K8s manifest with wolfi image tag (matches production manifests)
 	k8sFile := filepath.Join(tmpDir, "deploy/kubernetes/metricbeat-kubernetes.yaml")
 	k8sContent := `image: docker.elastic.co/beats/metricbeat-wolfi:9.3.0
 `
 	err = os.WriteFile(k8sFile, []byte(k8sContent), 0644)
-	if err != nil {
-		t.Fatalf("Failed to create K8s file: %v", err)
-	}
+	require.NoError(t, err, "Failed to create K8s file")
 
 	heartbeatFile := filepath.Join(tmpDir, "deploy/kubernetes/heartbeat-kubernetes.yaml")
 	heartbeatContent := `image: docker.elastic.co/beats/heartbeat-wolfi:9.3.0
 `
 	err = os.WriteFile(heartbeatFile, []byte(heartbeatContent), 0644)
-	if err != nil {
-		t.Fatalf("Failed to create heartbeat K8s file: %v", err)
-	}
+	require.NoError(t, err, "Failed to create heartbeat K8s file")
 
 	// Change to temp directory
 	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("Failed to get current directory: %v", err)
-	}
+	require.NoError(t, err, "Failed to get current directory")
 	defer func() {
 		if err := os.Chdir(origDir); err != nil {
 			t.Errorf("Failed to restore directory: %v", err)
 		}
 	}()
-	if err := os.Chdir(tmpDir); err != nil {
-		t.Fatalf("Failed to change to temp directory: %v", err)
-	}
+	require.NoError(t, os.Chdir(tmpDir), "Failed to change to temp directory")
 
 	// Test updating docs
 	err = UpdateDocs("9.4.0")
-	if err != nil {
-		t.Fatalf("UpdateDocs failed: %v", err)
-	}
+	require.NoError(t, err, "UpdateDocs failed")
 
 	// Verify version.asciidoc was updated
 	content, _ := os.ReadFile(versionAsciidoc)
@@ -226,41 +188,29 @@ func TestUpdateStackVersion(t *testing.T) {
 	tmpDir := t.TempDir()
 	docsDir := filepath.Join(tmpDir, "libbeat/docs")
 	err := os.MkdirAll(docsDir, 0755)
-	if err != nil {
-		t.Fatalf("Failed to create docs dir: %v", err)
-	}
+	require.NoError(t, err, "Failed to create docs dir")
 
 	versionAsciidoc := filepath.Join(docsDir, "version.asciidoc")
 	versionContent := `:stack-version: 9.3.0
 :doc-branch: current
 `
 	err = os.WriteFile(versionAsciidoc, []byte(versionContent), 0644)
-	if err != nil {
-		t.Fatalf("Failed to create version.asciidoc: %v", err)
-	}
+	require.NoError(t, err, "Failed to create version.asciidoc")
 
 	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("Failed to get current directory: %v", err)
-	}
+	require.NoError(t, err, "Failed to get current directory")
 	defer func() {
 		if err := os.Chdir(origDir); err != nil {
 			t.Errorf("Failed to restore directory: %v", err)
 		}
 	}()
-	if err := os.Chdir(tmpDir); err != nil {
-		t.Fatalf("Failed to change to temp directory: %v", err)
-	}
+	require.NoError(t, os.Chdir(tmpDir), "Failed to change to temp directory")
 
 	err = UpdateStackVersion("9.5.1")
-	if err != nil {
-		t.Fatalf("UpdateStackVersion failed: %v", err)
-	}
+	require.NoError(t, err, "UpdateStackVersion failed")
 
 	content, err := os.ReadFile(versionAsciidoc)
-	if err != nil {
-		t.Fatalf("Failed to read version.asciidoc: %v", err)
-	}
+	require.NoError(t, err, "Failed to read version.asciidoc")
 	if !strings.Contains(string(content), ":stack-version: 9.5.1") {
 		t.Errorf("stack-version not updated. Got:\n%s", string(content))
 	}
@@ -273,45 +223,33 @@ func TestUpdateDocsDocBranchCurrent(t *testing.T) {
 	tmpDir := t.TempDir()
 	docsDir := filepath.Join(tmpDir, "libbeat/docs")
 	err := os.MkdirAll(docsDir, 0755)
-	if err != nil {
-		t.Fatalf("Failed to create docs dir: %v", err)
-	}
+	require.NoError(t, err, "Failed to create docs dir")
 
 	versionAsciidoc := filepath.Join(docsDir, "version.asciidoc")
 	versionContent := `:stack-version: 9.3.0
 :doc-branch: current
 `
 	err = os.WriteFile(versionAsciidoc, []byte(versionContent), 0644)
-	if err != nil {
-		t.Fatalf("Failed to create version.asciidoc: %v", err)
-	}
+	require.NoError(t, err, "Failed to create version.asciidoc")
 
 	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("Failed to get current directory: %v", err)
-	}
+	require.NoError(t, err, "Failed to get current directory")
 	defer func() {
 		if err := os.Chdir(origDir); err != nil {
 			t.Errorf("Failed to restore directory: %v", err)
 		}
 	}()
-	if err := os.Chdir(tmpDir); err != nil {
-		t.Fatalf("Failed to change to temp directory: %v", err)
-	}
+	require.NoError(t, os.Chdir(tmpDir), "Failed to change to temp directory")
 
 	err = UpdateDocsWithOptions(DocsUpdateOptions{
 		BaseBranch:     "9.5",
 		CurrentVersion: "9.5.1",
 		ReleaseBranch:  "9.5",
 	})
-	if err != nil {
-		t.Fatalf("UpdateDocsWithOptions failed: %v", err)
-	}
+	require.NoError(t, err, "UpdateDocsWithOptions failed")
 
 	content, err := os.ReadFile(versionAsciidoc)
-	if err != nil {
-		t.Fatalf("Failed to read version.asciidoc: %v", err)
-	}
+	require.NoError(t, err, "Failed to read version.asciidoc")
 	if !strings.Contains(string(content), ":stack-version: 9.5.1") {
 		t.Errorf("stack-version not updated. Got:\n%s", string(content))
 	}
@@ -333,25 +271,17 @@ func TestUpdateDocsIncludeHeartbeat(t *testing.T) {
 		t.Fatalf("Failed to write version.asciidoc: %v", err)
 	}
 	heartbeat := filepath.Join(tmpDir, "deploy/kubernetes/heartbeat-kubernetes.yaml")
-	if err := os.WriteFile(heartbeat, []byte("image: docker.elastic.co/beats/heartbeat-wolfi:9.4.0\n"), 0644); err != nil {
-		t.Fatalf("Failed to write heartbeat yaml: %v", err)
-	}
-	if err := os.WriteFile(filepath.Join(tmpDir, "README.md"), []byte("Docs: /9.4/\n"), 0644); err != nil {
-		t.Fatalf("Failed to write README: %v", err)
-	}
+	require.NoError(t, os.WriteFile(heartbeat, []byte("image: docker.elastic.co/beats/heartbeat-wolfi:9.4.0\n"), 0644), "Failed to write heartbeat yaml")
+	require.NoError(t, os.WriteFile(filepath.Join(tmpDir, "README.md"), []byte("Docs: /9.4/\n"), 0644), "Failed to write README")
 
 	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("Failed to get cwd: %v", err)
-	}
+	require.NoError(t, err, "Failed to get cwd")
 	defer func() {
 		if err := os.Chdir(origDir); err != nil {
 			t.Errorf("Failed to restore cwd: %v", err)
 		}
 	}()
-	if err := os.Chdir(tmpDir); err != nil {
-		t.Fatalf("Failed to chdir: %v", err)
-	}
+	require.NoError(t, os.Chdir(tmpDir), "Failed to chdir")
 
 	if err := UpdateDocsWithOptions(DocsUpdateOptions{
 		BaseBranch:       "9.4",
@@ -363,9 +293,7 @@ func TestUpdateDocsIncludeHeartbeat(t *testing.T) {
 	}
 
 	content, err := os.ReadFile(heartbeat)
-	if err != nil {
-		t.Fatalf("Failed to read heartbeat yaml: %v", err)
-	}
+	require.NoError(t, err, "Failed to read heartbeat yaml")
 	if !strings.Contains(string(content), "heartbeat-wolfi:9.4.1") {
 		t.Errorf("heartbeat image not updated. Got:\n%s", string(content))
 	}
@@ -375,31 +303,23 @@ func TestUpdateDocsDocBranchExplicitMain(t *testing.T) {
 	tmpDir := t.TempDir()
 	docsDir := filepath.Join(tmpDir, "libbeat/docs")
 	err := os.MkdirAll(docsDir, 0755)
-	if err != nil {
-		t.Fatalf("Failed to create docs dir: %v", err)
-	}
+	require.NoError(t, err, "Failed to create docs dir")
 
 	versionAsciidoc := filepath.Join(docsDir, "version.asciidoc")
 	versionContent := `:stack-version: 9.4.3
 :doc-branch: 9.4
 `
 	err = os.WriteFile(versionAsciidoc, []byte(versionContent), 0644)
-	if err != nil {
-		t.Fatalf("Failed to create version.asciidoc: %v", err)
-	}
+	require.NoError(t, err, "Failed to create version.asciidoc")
 
 	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("Failed to get current directory: %v", err)
-	}
+	require.NoError(t, err, "Failed to get current directory")
 	defer func() {
 		if err := os.Chdir(origDir); err != nil {
 			t.Errorf("Failed to restore directory: %v", err)
 		}
 	}()
-	if err := os.Chdir(tmpDir); err != nil {
-		t.Fatalf("Failed to change to temp directory: %v", err)
-	}
+	require.NoError(t, os.Chdir(tmpDir), "Failed to change to temp directory")
 
 	// PR-B: ff-release keeps :doc-branch: main for 9.x cumulative docs
 	err = UpdateDocsWithOptions(DocsUpdateOptions{
@@ -408,14 +328,10 @@ func TestUpdateDocsDocBranchExplicitMain(t *testing.T) {
 		ReleaseBranch:  "9.5",
 		DocBranch:      "main",
 	})
-	if err != nil {
-		t.Fatalf("UpdateDocsWithOptions failed: %v", err)
-	}
+	require.NoError(t, err, "UpdateDocsWithOptions failed")
 
 	content, err := os.ReadFile(versionAsciidoc)
-	if err != nil {
-		t.Fatalf("Failed to read version.asciidoc: %v", err)
-	}
+	require.NoError(t, err, "Failed to read version.asciidoc")
 	if !strings.Contains(string(content), ":stack-version: 9.5.0") {
 		t.Errorf("stack-version not updated. Got:\n%s", string(content))
 	}
@@ -428,38 +344,28 @@ func TestUpdateDocsDocBranchExplicitMainNextMinor(t *testing.T) {
 	tmpDir := t.TempDir()
 	docsDir := filepath.Join(tmpDir, "libbeat/docs")
 	err := os.MkdirAll(docsDir, 0755)
-	if err != nil {
-		t.Fatalf("Failed to create docs dir: %v", err)
-	}
+	require.NoError(t, err, "Failed to create docs dir")
 
 	versionAsciidoc := filepath.Join(docsDir, "version.asciidoc")
 	versionContent := `:stack-version: 9.5.0
 :doc-branch: main
 `
 	err = os.WriteFile(versionAsciidoc, []byte(versionContent), 0644)
-	if err != nil {
-		t.Fatalf("Failed to create version.asciidoc: %v", err)
-	}
+	require.NoError(t, err, "Failed to create version.asciidoc")
 
 	readmePath := filepath.Join(tmpDir, "README.md")
 	readmeContent := "# Beats\n\nhttps://github.com/elastic/beats/tree/main/libbeat\n"
 	err = os.WriteFile(readmePath, []byte(readmeContent), 0644)
-	if err != nil {
-		t.Fatalf("Failed to create README.md: %v", err)
-	}
+	require.NoError(t, err, "Failed to create README.md")
 
 	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("Failed to get current directory: %v", err)
-	}
+	require.NoError(t, err, "Failed to get current directory")
 	defer func() {
 		if err := os.Chdir(origDir); err != nil {
 			t.Errorf("Failed to restore directory: %v", err)
 		}
 	}()
-	if err := os.Chdir(tmpDir); err != nil {
-		t.Fatalf("Failed to change to temp directory: %v", err)
-	}
+	require.NoError(t, os.Chdir(tmpDir), "Failed to change to temp directory")
 
 	// PR-C: prepare-next-dev-minor uses BASE=main RELEASE=main (README no-op).
 	err = UpdateDocsWithOptions(DocsUpdateOptions{
@@ -468,14 +374,10 @@ func TestUpdateDocsDocBranchExplicitMainNextMinor(t *testing.T) {
 		ReleaseBranch:  "main",
 		DocBranch:      "main",
 	})
-	if err != nil {
-		t.Fatalf("UpdateDocsWithOptions failed: %v", err)
-	}
+	require.NoError(t, err, "UpdateDocsWithOptions failed")
 
 	content, err := os.ReadFile(versionAsciidoc)
-	if err != nil {
-		t.Fatalf("Failed to read version.asciidoc: %v", err)
-	}
+	require.NoError(t, err, "Failed to read version.asciidoc")
 	if !strings.Contains(string(content), ":stack-version: 9.6.0") {
 		t.Errorf("stack-version not updated. Got:\n%s", string(content))
 	}
@@ -484,9 +386,7 @@ func TestUpdateDocsDocBranchExplicitMainNextMinor(t *testing.T) {
 	}
 
 	readme, err := os.ReadFile(readmePath)
-	if err != nil {
-		t.Fatalf("Failed to read README.md: %v", err)
-	}
+	require.NoError(t, err, "Failed to read README.md")
 	if string(readme) != readmeContent {
 		t.Errorf("README.md should be unchanged when ReleaseBranch equals BaseBranch. Got:\n%s", string(readme))
 	}
@@ -498,9 +398,7 @@ func TestUpdateTestEnv(t *testing.T) {
 	// Create test env directory
 	testEnvDir := filepath.Join(tmpDir, "testing/environments")
 	err := os.MkdirAll(testEnvDir, 0755)
-	if err != nil {
-		t.Fatalf("Failed to create test env dir: %v", err)
-	}
+	require.NoError(t, err, "Failed to create test env dir")
 
 	// Create latest.yml
 	latestYml := filepath.Join(testEnvDir, "latest.yml")
@@ -509,42 +407,30 @@ func TestUpdateTestEnv(t *testing.T) {
     image: docker.elastic.co/elasticsearch/elasticsearch:9.2.2
 `
 	err = os.WriteFile(latestYml, []byte(latestContent), 0644)
-	if err != nil {
-		t.Fatalf("Failed to create latest.yml: %v", err)
-	}
+	require.NoError(t, err, "Failed to create latest.yml")
 
 	composeDir := filepath.Join(tmpDir, "metricbeat")
 	err = os.MkdirAll(composeDir, 0755)
-	if err != nil {
-		t.Fatalf("Failed to create metricbeat dir: %v", err)
-	}
+	require.NoError(t, err, "Failed to create metricbeat dir")
 	composeFile := filepath.Join(composeDir, "docker-compose.yml")
 	composeContent := `image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-9.2.2}-1
 `
 	err = os.WriteFile(composeFile, []byte(composeContent), 0644)
-	if err != nil {
-		t.Fatalf("Failed to create docker-compose.yml: %v", err)
-	}
+	require.NoError(t, err, "Failed to create docker-compose.yml")
 
 	// Change to temp directory
 	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("Failed to get current directory: %v", err)
-	}
+	require.NoError(t, err, "Failed to get current directory")
 	defer func() {
 		if err := os.Chdir(origDir); err != nil {
 			t.Errorf("Failed to restore directory: %v", err)
 		}
 	}()
-	if err := os.Chdir(tmpDir); err != nil {
-		t.Fatalf("Failed to change to temp directory: %v", err)
-	}
+	require.NoError(t, os.Chdir(tmpDir), "Failed to change to temp directory")
 
 	// Pin test environments to latest published release 9.3.0.
 	err = UpdateTestEnv("9.3.0")
-	if err != nil {
-		t.Fatalf("UpdateTestEnv failed: %v", err)
-	}
+	require.NoError(t, err, "UpdateTestEnv failed")
 
 	// latest.yml uses LATEST version
 	content, _ := os.ReadFile(latestYml)
@@ -613,28 +499,21 @@ func TestCheckRequirements(t *testing.T) {
 
 			// Change to temp directory
 			origDir, err := os.Getwd()
-			if err != nil {
-				t.Fatalf("Failed to get current directory: %v", err)
-			}
+			require.NoError(t, err, "Failed to get current directory")
 			defer func() {
 				if err := os.Chdir(origDir); err != nil {
 					t.Errorf("Failed to restore directory: %v", err)
 				}
 			}()
-			if err := os.Chdir(tmpDir); err != nil {
-				t.Fatalf("Failed to change to temp directory: %v", err)
-			}
+			require.NoError(t, os.Chdir(tmpDir), "Failed to change to temp directory")
 
 			// Initialize git repo (this will fail if git is not available, but that's ok for this test)
 			// We're mainly testing the version validation logic
 			err = checkRequirements(cfg)
 
 			if tt.shouldError {
-				if err == nil {
-					t.Errorf("Expected error for version %s, got nil", tt.version)
-				} else if tt.errorMsg != "" && !strings.Contains(err.Error(), tt.errorMsg) {
-					t.Errorf("Expected error containing '%s', got: %v", tt.errorMsg, err)
-				}
+				require.Error(t, err, "Expected error for version %s", tt.version)
+				require.Contains(t, err.Error(), tt.errorMsg)
 			} else if err != nil && !strings.Contains(err.Error(), "repository") {
 				// Allow errors about repository not existing, but not version validation errors
 				if strings.Contains(err.Error(), "deprecated") {
@@ -651,9 +530,7 @@ func TestUpdateTestEnvNoChanges(t *testing.T) {
 	// Create test env directory
 	testEnvDir := filepath.Join(tmpDir, "testing/environments")
 	err := os.MkdirAll(testEnvDir, 0755)
-	if err != nil {
-		t.Fatalf("Failed to create test env dir: %v", err)
-	}
+	require.NoError(t, err, "Failed to create test env dir")
 
 	// Create latest.yml with a version that won't match
 	latestYml := filepath.Join(testEnvDir, "latest.yml")
@@ -662,30 +539,22 @@ func TestUpdateTestEnvNoChanges(t *testing.T) {
     image: docker.elastic.co/elasticsearch/elasticsearch:9.1.0
 `
 	err = os.WriteFile(latestYml, []byte(latestContent), 0644)
-	if err != nil {
-		t.Fatalf("Failed to create latest.yml: %v", err)
-	}
+	require.NoError(t, err, "Failed to create latest.yml")
 
 	// Change to temp directory
 	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("Failed to get current directory: %v", err)
-	}
+	require.NoError(t, err, "Failed to get current directory")
 	defer func() {
 		if err := os.Chdir(origDir); err != nil {
 			t.Errorf("Failed to restore directory: %v", err)
 		}
 	}()
-	if err := os.Chdir(tmpDir); err != nil {
-		t.Fatalf("Failed to change to temp directory: %v", err)
-	}
+	require.NoError(t, os.Chdir(tmpDir), "Failed to change to temp directory")
 
 	// TestUpdateTestEnvNoChanges - uses non-matching file content; latest.yml keeps 9.1.0
 	// Same latest version already present — should not modify latest.yml
 	err = UpdateTestEnv("9.1.0")
-	if err != nil {
-		t.Fatalf("UpdateTestEnv should not fail when no matches found: %v", err)
-	}
+	require.NoError(t, err, "UpdateTestEnv should not fail when no matches found")
 
 	// Verify file was NOT updated (version should still be 9.1.0)
 	content, _ := os.ReadFile(latestYml)

@@ -22,6 +22,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 const mergifyFixture = `pull_request_rules:
@@ -38,35 +40,23 @@ const mergifyFixture = `pull_request_rules:
 func TestUpdateMergifyAppendsRule(t *testing.T) {
 	tmpDir := t.TempDir()
 	mergifyFile := filepath.Join(tmpDir, ".mergify.yml")
-	if err := os.WriteFile(mergifyFile, []byte(mergifyFixture), 0644); err != nil {
-		t.Fatalf("failed to write fixture: %v", err)
-	}
+	require.NoError(t, os.WriteFile(mergifyFile, []byte(mergifyFixture), 0644), "failed to write fixture")
 
 	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("failed to get cwd: %v", err)
-	}
+	require.NoError(t, err, "failed to get cwd")
 	defer func() {
 		if err := os.Chdir(origDir); err != nil {
 			t.Errorf("failed to restore cwd: %v", err)
 		}
 	}()
-	if err := os.Chdir(tmpDir); err != nil {
-		t.Fatalf("failed to chdir: %v", err)
-	}
+	require.NoError(t, os.Chdir(tmpDir), "failed to chdir")
 
-	if err := UpdateMergify("9.5"); err != nil {
-		t.Fatalf("UpdateMergify failed: %v", err)
-	}
+	require.NoError(t, UpdateMergify("9.5"), "UpdateMergify failed")
 
 	content, err := os.ReadFile(mergifyFile)
-	if err != nil {
-		t.Fatalf("failed to read mergify file: %v", err)
-	}
+	require.NoError(t, err, "failed to read mergify file")
 	body := string(content)
-	if !strings.Contains(body, "label=backport-9.5") {
-		t.Errorf("expected backport-9.5 label in mergify file, got:\n%s", body)
-	}
+	require.Contains(t, body, "label=backport-9.5")
 	if !strings.Contains(body, `branches:`) || !strings.Contains(body, `- "9.5"`) {
 		t.Errorf("expected backport branch 9.5 in mergify file, got:\n%s", body)
 	}
@@ -75,38 +65,24 @@ func TestUpdateMergifyAppendsRule(t *testing.T) {
 func TestUpdateMergifyIdempotent(t *testing.T) {
 	tmpDir := t.TempDir()
 	mergifyFile := filepath.Join(tmpDir, ".mergify.yml")
-	if err := os.WriteFile(mergifyFile, []byte(mergifyFixture), 0644); err != nil {
-		t.Fatalf("failed to write fixture: %v", err)
-	}
+	require.NoError(t, os.WriteFile(mergifyFile, []byte(mergifyFixture), 0644), "failed to write fixture")
 
 	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("failed to get cwd: %v", err)
-	}
+	require.NoError(t, err, "failed to get cwd")
 	defer func() {
 		if err := os.Chdir(origDir); err != nil {
 			t.Errorf("failed to restore cwd: %v", err)
 		}
 	}()
-	if err := os.Chdir(tmpDir); err != nil {
-		t.Fatalf("failed to chdir: %v", err)
-	}
+	require.NoError(t, os.Chdir(tmpDir), "failed to chdir")
 
-	if err := UpdateMergify("9.5"); err != nil {
-		t.Fatalf("first UpdateMergify failed: %v", err)
-	}
+	require.NoError(t, UpdateMergify("9.5"), "first UpdateMergify failed")
 	afterFirst, err := os.ReadFile(mergifyFile)
-	if err != nil {
-		t.Fatalf("failed to read mergify file: %v", err)
-	}
+	require.NoError(t, err, "failed to read mergify file")
 
-	if err := UpdateMergify("9.5"); err != nil {
-		t.Fatalf("second UpdateMergify failed: %v", err)
-	}
+	require.NoError(t, UpdateMergify("9.5"), "second UpdateMergify failed")
 	afterSecond, err := os.ReadFile(mergifyFile)
-	if err != nil {
-		t.Fatalf("failed to read mergify file: %v", err)
-	}
+	require.NoError(t, err, "failed to read mergify file")
 
 	if string(afterFirst) != string(afterSecond) {
 		t.Errorf("idempotent UpdateMergify should not modify file twice")

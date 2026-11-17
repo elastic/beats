@@ -27,6 +27,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/google/go-github/v68/github"
 )
 
@@ -63,17 +65,13 @@ const defaultBeatVersion = "9.5.0"
 	runGit("commit", "-m", "seed main at 9.5.0")
 
 	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("failed to get cwd: %v", err)
-	}
+	require.NoError(t, err, "failed to get cwd")
 	defer func() {
 		if err := os.Chdir(origDir); err != nil {
 			t.Errorf("failed to restore cwd: %v", err)
 		}
 	}()
-	if err := os.Chdir(tmpDir); err != nil {
-		t.Fatalf("failed to chdir: %v", err)
-	}
+	require.NoError(t, os.Chdir(tmpDir), "failed to chdir")
 
 	cfg := &ReleaseConfig{
 		CurrentRelease:          "9.5.0",
@@ -88,14 +86,10 @@ const defaultBeatVersion = "9.5.0"
 		GitAuthorEmail:          "test@example.com",
 	}
 
-	if err := RunMajorMinorRelease(cfg); err != nil {
-		t.Fatalf("RunMajorMinorRelease dry run failed: %v", err)
-	}
+	require.NoError(t, RunMajorMinorRelease(cfg), "RunMajorMinorRelease dry run failed")
 
 	repo, err := OpenRepo(".")
-	if err != nil {
-		t.Fatalf("failed to open repo: %v", err)
-	}
+	require.NoError(t, err, "failed to open repo")
 
 	wantBranches := []string{
 		"main",
@@ -116,9 +110,7 @@ const defaultBeatVersion = "9.5.0"
 
 	// Next-patch is owned by RunPatchRelease, not minor/FF.
 	exists, err := repo.BranchExists("ff-prep-next-patch-9.5.1")
-	if err != nil {
-		t.Fatalf("failed checking next-patch branch: %v", err)
-	}
+	require.NoError(t, err, "failed checking next-patch branch")
 	if exists {
 		t.Errorf("minor/FF must not create ff-prep-next-patch-9.5.1")
 	}
@@ -143,17 +135,13 @@ func TestRunMajorMinorReleaseRejectsMismatchedCurrentRelease(t *testing.T) {
 	tmpDir := setupWorkflowTestRepo(t) // version.go is 9.4.3
 
 	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("failed to get cwd: %v", err)
-	}
+	require.NoError(t, err, "failed to get cwd")
 	defer func() {
 		if err := os.Chdir(origDir); err != nil {
 			t.Errorf("failed to restore cwd: %v", err)
 		}
 	}()
-	if err := os.Chdir(tmpDir); err != nil {
-		t.Fatalf("failed to chdir: %v", err)
-	}
+	require.NoError(t, os.Chdir(tmpDir), "failed to chdir")
 
 	cfg := &ReleaseConfig{
 		CurrentRelease:          "9.5.0", // off-by-one vs main
@@ -168,12 +156,8 @@ func TestRunMajorMinorReleaseRejectsMismatchedCurrentRelease(t *testing.T) {
 	}
 
 	err = RunMajorMinorRelease(cfg)
-	if err == nil {
-		t.Fatal("expected RunMajorMinorRelease to fail when CURRENT_RELEASE mismatches main version")
-	}
-	if !strings.Contains(err.Error(), "does not match version on main") {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	require.Error(t, err, "expected RunMajorMinorRelease to fail when CURRENT_RELEASE mismatches main version")
+	require.Contains(t, err.Error(), "does not match version on main")
 }
 
 func assertGitShowContains(t *testing.T, dir, branch, file, want string) {
@@ -182,9 +166,7 @@ func assertGitShowContains(t *testing.T, dir, branch, file, want string) {
 	if err != nil {
 		t.Fatalf("git show %s:%s: %v (%s)", branch, file, err, out)
 	}
-	if !strings.Contains(string(out), want) {
-		t.Errorf("%s:%s should contain %q, got:\n%s", branch, file, want, out)
-	}
+	require.Contains(t, string(out), want)
 }
 
 func assertGitShowNotContains(t *testing.T, dir, branch, file, forbid string) {
@@ -292,17 +274,13 @@ const defaultBeatVersion = "9.5.1"
 	runGit("checkout", "main")
 
 	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("failed to get cwd: %v", err)
-	}
+	require.NoError(t, err, "failed to get cwd")
 	defer func() {
 		if err := os.Chdir(origDir); err != nil {
 			t.Errorf("failed to restore cwd: %v", err)
 		}
 	}()
-	if err := os.Chdir(tmpDir); err != nil {
-		t.Fatalf("failed to chdir: %v", err)
-	}
+	require.NoError(t, os.Chdir(tmpDir), "failed to chdir")
 
 	cfg := &ReleaseConfig{
 		CurrentRelease: "9.5.2",
@@ -314,14 +292,10 @@ const defaultBeatVersion = "9.5.1"
 		GitAuthorEmail: "test@example.com",
 	}
 
-	if err := RunPatchRelease(cfg); err != nil {
-		t.Fatalf("RunPatchRelease dry run failed: %v", err)
-	}
+	require.NoError(t, RunPatchRelease(cfg), "RunPatchRelease dry run failed")
 
 	repo, err := OpenRepo(".")
-	if err != nil {
-		t.Fatalf("failed to open repo: %v", err)
-	}
+	require.NoError(t, err, "failed to open repo")
 
 	wantBranches := []string{
 		"9.5",
@@ -379,17 +353,13 @@ const defaultBeatVersion = "9.5.1"
 	runGit("checkout", "main")
 
 	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("failed to get cwd: %v", err)
-	}
+	require.NoError(t, err, "failed to get cwd")
 	defer func() {
 		if err := os.Chdir(origDir); err != nil {
 			t.Errorf("failed to restore cwd: %v", err)
 		}
 	}()
-	if err := os.Chdir(tmpDir); err != nil {
-		t.Fatalf("failed to chdir: %v", err)
-	}
+	require.NoError(t, os.Chdir(tmpDir), "failed to chdir")
 
 	cfg := &ReleaseConfig{
 		CurrentRelease: "9.5.3", // expects branch at 9.5.2
@@ -402,12 +372,8 @@ const defaultBeatVersion = "9.5.1"
 	}
 
 	err = RunPatchRelease(cfg)
-	if err == nil {
-		t.Fatal("expected RunPatchRelease to fail when branch version is not previous patch")
-	}
-	if !strings.Contains(err.Error(), "expects version") {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	require.Error(t, err, "expected RunPatchRelease to fail when branch version is not previous patch")
+	require.Contains(t, err.Error(), "expects version")
 }
 
 func TestPatchPrepLabels(t *testing.T) {
@@ -440,13 +406,9 @@ func TestReleasePRBodiesIncludeReleaseHeader(t *testing.T) {
 		prCMainBody(cfg),
 		patchVersionBumpBody(cfg),
 	}
-	for i, body := range bodies {
-		if !strings.Contains(body, "## [Release][9.4.1]") {
-			t.Errorf("body %d missing [Release][9.4.1] header:\n%s", i, body)
-		}
-		if !strings.Contains(body, "**Merge:**") {
-			t.Errorf("body %d missing Merge guidance:\n%s", i, body)
-		}
+	for _, body := range bodies {
+		require.Contains(t, body, "## [Release][9.4.1]")
+		require.Contains(t, body, "**Merge:**")
 	}
 
 	if !strings.Contains(patchVersionBumpBody(cfg), "to 9.4.1") {
@@ -467,18 +429,14 @@ func TestFormatWorkflowPRLine(t *testing.T) {
 	}
 	got := formatWorkflowPRLine(1, withPR)
 	want := "PR 1: https://github.com/elastic/beats/pull/42 (open)"
-	if got != want {
-		t.Fatalf("got %q, want %q", got, want)
-	}
+	require.Equal(t, want, got)
 
 	skipped := workflowPRResult{
 		item: workflowPR{branch: "patch-release-9.3.1", base: "9.3"},
 	}
 	got = formatWorkflowPRLine(1, skipped)
 	want = "PR 1: skipped (no related open/merged PR for patch-release-9.3.1 → 9.3)"
-	if got != want {
-		t.Fatalf("got %q, want %q", got, want)
-	}
+	require.Equal(t, want, got)
 }
 
 func TestMajorMinorPRTitles(t *testing.T) {

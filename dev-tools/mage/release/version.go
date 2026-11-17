@@ -19,75 +19,81 @@ package release
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
+
+	"github.com/Masterminds/semver"
+
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
-type semver struct {
-	major, minor, patch int
-}
-
-func parseSemver(version string) (semver, error) {
-	version = strings.TrimPrefix(strings.TrimSpace(version), "v")
-	parts := strings.Split(version, ".")
-	if len(parts) != 3 {
-		return semver{}, fmt.Errorf("invalid version format: %s (expected major.minor.patch)", version)
-	}
-	major, err := strconv.Atoi(parts[0])
-	if err != nil {
-		return semver{}, fmt.Errorf("invalid major version: %s", parts[0])
-	}
-	minor, err := strconv.Atoi(parts[1])
-	if err != nil {
-		return semver{}, fmt.Errorf("invalid minor version: %s", parts[1])
-	}
-	patch, err := strconv.Atoi(parts[2])
-	if err != nil {
-		return semver{}, fmt.Errorf("invalid patch version: %s", parts[2])
-	}
-	return semver{major: major, minor: minor, patch: patch}, nil
-}
-
-func (v semver) String() string {
-	return fmt.Sprintf("%d.%d.%d", v.major, v.minor, v.patch)
-}
-
-func (v semver) less(other semver) bool {
-	if v.major != other.major {
-		return v.major < other.major
-	}
-	if v.minor != other.minor {
-		return v.minor < other.minor
-	}
-	return v.patch < other.patch
+func parseReleaseVersion(raw string) (*semver.Version, error) {
+	return devtools.ParseReleaseVersion(raw)
 }
 
 // selectLatestReleaseBefore picks the highest same-major version strictly less than current.
 func selectLatestReleaseBefore(versions []string, currentVersion string) (string, error) {
-	current, err := parseSemver(currentVersion)
+	current, err := parseReleaseVersion(currentVersion)
 	if err != nil {
 		return "", err
 	}
 
-	var best *semver
+	var best *semver.Version
 	for _, raw := range versions {
-		candidate, err := parseSemver(raw)
+		candidate, err := parseReleaseVersion(raw)
 		if err != nil {
 			continue
 		}
-		if candidate.major != current.major {
+		if candidate.Major() != current.Major() {
 			continue
 		}
-		if !candidate.less(current) {
+		if !candidate.LessThan(current) {
 			continue
 		}
-		if best == nil || best.less(candidate) {
-			c := candidate
-			best = &c
+		if best == nil || best.LessThan(candidate) {
+			best = candidate
 		}
 	}
 	if best == nil {
 		return "", fmt.Errorf("no published release found before %s (same major)", currentVersion)
 	}
 	return best.String(), nil
+}
+
+func inferReleaseBranch(currentRelease string) string {
+	v, err := parseReleaseVersion(currentRelease)
+	if err != nil {
+		return ""
+	}
+	return devtools.InferReleaseBranch(v)
+}
+
+func inferLatestRelease(currentRelease string) (string, error) {
+	v, err := parseReleaseVersion(currentRelease)
+	if err != nil {
+		return "", err
+	}
+	return devtools.InferLatestRelease(v), nil
+}
+
+func inferNextRelease(currentRelease string) string {
+	v, err := parseReleaseVersion(currentRelease)
+	if err != nil {
+		return ""
+	}
+	return devtools.InferNextRelease(v)
+}
+
+func inferNextProjectMinorVersion(currentRelease string) (string, error) {
+	v, err := parseReleaseVersion(currentRelease)
+	if err != nil {
+		return "", err
+	}
+	return devtools.InferNextProjectMinorVersion(v), nil
+}
+
+func inferNextProjectMinorBranch(currentRelease string) string {
+	v, err := parseReleaseVersion(currentRelease)
+	if err != nil {
+		return ""
+	}
+	return devtools.InferNextProjectMinorBranch(v)
 }

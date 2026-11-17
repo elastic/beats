@@ -19,6 +19,8 @@ package release
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestSelectLatestReleaseBefore(t *testing.T) {
@@ -67,9 +69,7 @@ func TestSelectLatestReleaseBefore(t *testing.T) {
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if got != tt.want {
-				t.Errorf("got %q, want %q", got, tt.want)
-			}
+			require.Equal(t, tt.want, got)
 		})
 	}
 }
