@@ -267,6 +267,21 @@ func (c *TLSConfig) BuildServerConfig(host string) *tls.Config {
 	config := c.ToConfig()
 	config.ServerName = host
 	config.VerifyConnection = makeVerifyServerConnection(c)
+
+	if c.clientCAs != nil && c.clientCAs.IsDynamic() {
+		// Go verifies client certificates against config.ClientCAs before
+		// VerifyConnection runs, and advertises its subjects in the
+		// CertificateRequest. ClientCAs is a snapshot taken when the config is
+		// built, so CAs added to the reloaded files later would be rejected
+		// (and not advertised). Hand each handshake a copy with the current pool.
+		config.GetConfigForClient = func(*tls.ClientHelloInfo) (*tls.Config, error) {
+			cfg := config.Clone()
+			cfg.GetConfigForClient = nil
+			cfg.ClientCAs = c.currentClientCAs()
+			return cfg, nil
+		}
+	}
+
 	return config
 }
 
