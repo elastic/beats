@@ -12,6 +12,8 @@ import (
 	"sync"
 	"time"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	gproto "google.golang.org/protobuf/proto"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
@@ -173,7 +175,9 @@ func (m *UnitsManager) run() {
 		case <-m.stop:
 			return
 		case err := <-m.client.Errors():
-			if !errors.Is(err, context.Canceled) {
+			// Stopping the client cancels its gRPC streams, which then fail
+			// with a Canceled status rather than context.Canceled.
+			if !errors.Is(err, context.Canceled) && status.Code(err) != codes.Canceled {
 				m.logger.Errorf("elastic-agent-client error: %v", err)
 			}
 		case change := <-m.client.UnitChanges():

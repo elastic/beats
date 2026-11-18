@@ -15,6 +15,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -91,6 +92,20 @@ func TestUnitsManagerStopStopsInputs(t *testing.T) {
 		_, inputs, m := startReadyUnitsManager(t, outputUnit(), inputUnit(t, "a", "@every 1m", 1))
 		m.Stop()
 		assert.Equal(t, [][]string{{"a"}, nil}, inputs.reloads(), "Stop should stop the inputs")
+	})
+}
+
+func TestUnitsManagerStopsWithoutErrors(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		agent, _, m := newTestUnitsManager(t)
+		logger, logs := logptest.NewTestingLoggerWithObserver(t, "")
+		m.logger = logger
+		agent.setUnits(outputUnit(), inputUnit(t, "a", "@every 1m", 1))
+		require.NoError(t, m.Start())
+		time.Sleep(unitsDebounce)
+		synctest.Wait()
+		m.Stop()
+		assert.Empty(t, logs.FilterLevelExact(zapcore.ErrorLevel).All(), "stopping the manager should not log errors")
 	})
 }
 
