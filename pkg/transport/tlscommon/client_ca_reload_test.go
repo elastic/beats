@@ -123,6 +123,9 @@ func testServerClientCAReload(t *testing.T, serve func(*http.Server, net.Listene
 	srv := newCAReloadKeyPair(t, "server", true)
 	oldClient := newCAReloadKeyPair(t, "agent-old", false)
 	newClient := newCAReloadKeyPair(t, "agent-new", false)
+	// Trusted by the server, but only for serving: it must not authenticate a client.
+	serverOnly := newCAReloadKeyPair(t, "server-only", true)
+	extraClient := newCAReloadKeyPair(t, "agent-extra", false)
 
 	dir := t.TempDir()
 	certPath, keyPath := filepath.Join(dir, "srv.crt"), filepath.Join(dir, "srv.key")
@@ -189,6 +192,15 @@ func testServerClientCAReload(t *testing.T, serve func(*http.Server, net.Listene
 		{name: "CA not in the bundle is rejected", client: newClient},
 		{name: "CA added to the bundle is accepted", bundle: newClient.certPEM, client: newClient, wantAccepted: true},
 		{name: "CA removed from the bundle is rejected", client: oldClient},
+		{
+			// Accepting a CA only present in this bundle shows it was reloaded, so the
+			// next step fails because of the key usage and not a stale bundle.
+			name:         "bundle with a serverAuth-only certificate accepts clientAuth certificates",
+			bundle:       append(append([]byte{}, extraClient.certPEM...), serverOnly.certPEM...),
+			client:       extraClient,
+			wantAccepted: true,
+		},
+		{name: "trusted certificate without the clientAuth key usage is rejected", client: serverOnly},
 	}
 	for _, step := range steps {
 		if step.bundle != nil {

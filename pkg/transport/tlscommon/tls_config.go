@@ -529,7 +529,12 @@ func verifyClientChain(cfg *TLSConfig) func(tls.ConnectionState) error {
 		opts := x509.VerifyOptions{
 			Roots:         cfg.currentClientCAs(),
 			Intermediates: x509.NewCertPool(),
-			KeyUsages:     []x509.ExtKeyUsage{x509.ExtKeyUsageAny},
+			// Same key usage Go requires when it verifies client certificates itself.
+			KeyUsages: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+		}
+		// Honor the configured clock, like Go's own verification does.
+		if cfg.time != nil {
+			opts.CurrentTime = cfg.time()
 		}
 		chains, err := verifyCertsWithOpts(cs.PeerCertificates, cfg.CASha256, opts)
 		if err != nil {
