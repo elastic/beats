@@ -349,8 +349,8 @@ func (gh *GitHubClient) FindIssueByTitle(owner, repo, title string) (*github.Iss
 // CreateIssue creates a repository issue with the given labels.
 func (gh *GitHubClient) CreateIssue(owner, repo, title, body string, labels []string) (*github.Issue, error) {
 	req := &github.IssueRequest{
-		Title: github.Ptr(title),
-		Body:  github.Ptr(body),
+		Title: new(title),
+		Body:  new(body),
 	}
 	if len(labels) > 0 {
 		req.Labels = &labels
@@ -365,7 +365,7 @@ func (gh *GitHubClient) CreateIssue(owner, repo, title, body string, labels []st
 // UpdateIssueBody replaces the body of an existing issue.
 func (gh *GitHubClient) UpdateIssueBody(owner, repo string, number int, body string) error {
 	_, _, err := gh.client.Issues.Edit(gh.ctx, owner, repo, number, &github.IssueRequest{
-		Body: github.Ptr(body),
+		Body: new(body),
 	})
 	if err != nil {
 		return fmt.Errorf("failed to update issue #%d body: %w", number, err)
@@ -405,10 +405,10 @@ func (gh *GitHubClient) ListReleaseLabeledPRsForVersion(owner, repo, version str
 			}
 			seen[num] = struct{}{}
 			prs = append(prs, &github.PullRequest{
-				Number:  github.Ptr(num),
-				HTMLURL: github.Ptr(issue.GetHTMLURL()),
-				Title:   github.Ptr(issue.GetTitle()),
-				State:   github.Ptr(issue.GetState()),
+				Number:  new(num),
+				HTMLURL: new(issue.GetHTMLURL()),
+				Title:   new(issue.GetTitle()),
+				State:   new(issue.GetState()),
 			})
 		}
 		if resp == nil || resp.NextPage == 0 {
