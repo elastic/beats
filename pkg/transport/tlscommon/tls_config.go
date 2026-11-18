@@ -267,6 +267,29 @@ func (c *TLSConfig) BuildServerConfig(host string) *tls.Config {
 	config := c.ToConfig()
 	config.ServerName = host
 	config.VerifyConnection = makeVerifyServerConnection(c)
+
+	if c.clientCAs != nil && c.clientCAs.IsDynamic() && c.Verification != VerifyNone {
+		// Go verifies client certificates against config.ClientCAs before
+		// VerifyConnection runs. ClientCAs is a snapshot taken when the config
+		// is built, so a CA added to the reloaded files later would be rejected
+		// before verifyClientChain, which uses the current pool, ever runs.
+		// Leave verification to VerifyConnection by asking Go to only request
+		// (not verify) the certificate, and drop the stale snapshot so the
+		// CertificateRequest does not advertise outdated CA names.
+		//
+		// This is preferred over GetConfigForClient: a config cloned inside it
+		// does not see changes made to copies of this one afterwards, such as
+		// the NextProtos net/http sets on its own copy since Go 1.27, which
+		// silently disables HTTP/2.
+		switch config.ClientAuth {
+		case tls.RequireAndVerifyClientCert:
+			config.ClientAuth = tls.RequireAnyClientCert
+		case tls.VerifyClientCertIfGiven:
+			config.ClientAuth = tls.RequestClientCert
+		}
+		config.ClientCAs = nil
+	}
+
 	return config
 }
 
@@ -506,7 +529,12 @@ func verifyClientChain(cfg *TLSConfig) func(tls.ConnectionState) error {
 		opts := x509.VerifyOptions{
 			Roots:         cfg.currentClientCAs(),
 			Intermediates: x509.NewCertPool(),
-			KeyUsages:     []x509.ExtKeyUsage{x509.ExtKeyUsageAny},
+			// Same key usage Go requires when it verifies client certificates itself.
+			KeyUsages: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+		}
+		// Honor the configured clock, like Go's own verification does.
+		if cfg.time != nil {
+			opts.CurrentTime = cfg.time()
 		}
 		chains, err := verifyCertsWithOpts(cs.PeerCertificates, cfg.CASha256, opts)
 		if err != nil {
