@@ -1,0 +1,17 @@
+kind: bug-fix
+summary: Limit Heartbeat HTTP response body validation to 4 MiB by default.
+description: >-
+  Add response.check_body_max_bytes to configure the buffered response body used
+  by HTTP body and JSON checks, replacing the fixed 100 MiB limit with a 4 MiB
+  default. A larger response.include_body_max_bytes increases this limit when
+  response.include_body is always or on_error. The full response is still
+  downloaded and hashed.
+impact: >-
+  Checks that require content beyond the new default limit can fail. JSON checks
+  can fail to parse a response that exceeds the limit.
+action: >-
+  Set response.check_body_max_bytes to a larger positive byte count for monitors
+  that validate larger response bodies. Use 104857600 to restore the previous
+  100 MiB validation limit.
+component: heartbeat
+pr: https://github.com/elastic/beats/pull/52983
