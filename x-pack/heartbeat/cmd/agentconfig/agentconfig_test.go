@@ -25,9 +25,7 @@ import (
 
 func TestTransform(t *testing.T) {
 	matches, err := filepath.Glob("testdata/*.in.json")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	for _, match := range matches {
 		dir := filepath.Dir(match)
@@ -38,19 +36,13 @@ func TestTransform(t *testing.T) {
 			return func(t *testing.T) {
 				var rawIn proto.UnitExpectedConfig
 				err := readRawIn(in, &rawIn)
-				if err != nil {
-					t.Fatal(err)
-				}
+				require.NoError(t, err)
 
 				want, err := readOut(out)
-				if err != nil {
-					t.Fatal(err)
-				}
+				require.NoError(t, err)
 
 				cfg, err := Transform(&rawIn, &client.AgentInfo{ID: "abc7d0a8-ce04-4663-95da-ff6d537c268f", Version: "8.13.1"})
-				if err != nil {
-					t.Fatal(err)
-				}
+				require.NoError(t, err)
 				got, err := cfgToArrMap(cfg)
 				require.NoError(t, err)
 
