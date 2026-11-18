@@ -23,6 +23,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/packetbeat/procs"
 	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
