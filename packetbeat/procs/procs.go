@@ -18,15 +18,9 @@
 package procs
 
 import (
-<<<<<<< HEAD
-	"net"
-=======
 	"errors"
-	"fmt"
 	"net"
 	"os"
-	"slices"
->>>>>>> 59a62be (packetbeat/procs: limit how often /proc is rescanned (#54606))
 	"strings"
 	"sync"
 	"time"
@@ -77,8 +71,6 @@ type ProcessesWatcher struct {
 	// watcher is the OS-dependent engine for the ProcessWatcher.
 	watcher processWatcher
 
-<<<<<<< HEAD
-=======
 	// minScanGap is the minimum time between the end of one full
 	// scan and the start of the next for a transport, in addition to
 	// the wait set by scanCostFactor. A negative value disables both.
@@ -88,12 +80,6 @@ type ProcessesWatcher struct {
 	// now returns the current time. It is replaced in tests.
 	now func() time.Time
 
-	// kernelTracing is the quark-backed tuple resolver used by the
-	// kernel_tracing backend. It is nil when the backend is procfs or
-	// when kernel tracing is unavailable.
-	kernelTracing tupleWatcher
-
->>>>>>> 59a62be (packetbeat/procs: limit how often /proc is rescanned (#54606))
 	logger, procLogger, procDetailedLogger *logp.Logger
 
 	isProcEnabled, isProcDetailedEnabled bool

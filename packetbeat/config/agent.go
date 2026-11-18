@@ -93,14 +93,7 @@ func (i agentInput) addProcessorsAndIndex(cfg *conf.C) (*conf.C, error) {
 }
 
 func mergeProcsConfig(one, two procs.ProcsConfig) procs.ProcsConfig {
-<<<<<<< HEAD
-	maxProcReadFreq := one.MaxProcReadFreq
-	if two.MaxProcReadFreq > maxProcReadFreq {
-		maxProcReadFreq = two.MaxProcReadFreq
-	}
-=======
 	maxProcReadFreq := mergeMaxProcReadFreq(one.MaxProcReadFreq, two.MaxProcReadFreq)
->>>>>>> 59a62be (packetbeat/procs: limit how often /proc is rescanned (#54606))
 
 	refreshPidsFreq := one.RefreshPidsFreq
 	if two.RefreshPidsFreq < refreshPidsFreq {
