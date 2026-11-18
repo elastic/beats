@@ -118,8 +118,8 @@ func canInstallNpcap(b *beat.Beat, rawcfg *conf.C, log *logp.Logger) (bool, erro
 		NeverInstall bool   `config:"npcap.never_install"`
 	}
 
-	// Agent managed case.
-	if b.Manager.Enabled() {
+	// Agent managed case: rawcfg is in the agent stream layout.
+	if b.Manager.ConfigFromControlProtocol() {
 		var cfg struct {
 			Streams []npcapInstallCfg `config:"streams"`
 		}

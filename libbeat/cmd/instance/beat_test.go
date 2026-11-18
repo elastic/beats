@@ -634,13 +634,20 @@ func TestLogSystemInfo(t *testing.T) {
 	b.Info.Logger = log
 	require.NoError(t, err, "could not create beat")
 
+	// logSystemInfo reads the process-wide UnderAgent flag, so reset it after
+	// the test to avoid leaking into other tests in this package.
+	t.Cleanup(func() { management.SetUnderAgent(false) })
+
 	for _, tc := range tcs {
-		buff.Reset()
+		t.Run(tc.name, func(t *testing.T) {
+			buff.Reset()
 
-		b.Manager = mockManager{enabled: tc.managed}
-		b.logSystemInfo(log)
+			management.SetUnderAgent(tc.managed)
+			b.Manager = mockManager{enabled: tc.managed}
+			b.logSystemInfo(log)
 
-		tc.assertFn(t, buff)
+			tc.assertFn(t, buff)
+		})
 	}
 }
 
@@ -650,7 +657,7 @@ type mockManager struct {
 
 func (m mockManager) AgentInfo() management.AgentInfo         { return management.AgentInfo{} }
 func (m mockManager) CheckRawConfig(cfg *config.C) error      { return nil }
-func (m mockManager) Enabled() bool                           { return m.enabled }
+func (m mockManager) ConfigFromControlProtocol() bool         { return m.enabled }
 func (m mockManager) RegisterAction(action management.Action) {}
 func (m mockManager) RegisterDiagnosticHook(name, description, filename, contentType string, hook management.DiagnosticHook) {
 }
@@ -683,7 +690,6 @@ func TestManager(t *testing.T) {
 		b, err := NewInitializedBeat(Settings{})
 		require.NoError(t, err)
 		require.NotNil(t, b)
-		require.True(t, b.Manager.Enabled())
 		require.True(t, management.UnderAgent())
 		require.IsType(t, mockManager{}, b.Manager)
 	})
@@ -697,7 +703,6 @@ func TestManager(t *testing.T) {
 		b, err := NewInitializedBeat(Settings{})
 		require.NoError(t, err)
 		require.NotNil(t, b)
-		require.False(t, b.Manager.Enabled())
 		require.False(t, management.UnderAgent())
 	})
 	t.Run("management.enabled not set", func(t *testing.T) {
@@ -710,7 +715,6 @@ func TestManager(t *testing.T) {
 		b, err := NewInitializedBeat(Settings{})
 		require.NoError(t, err)
 		require.NotNil(t, b)
-		require.False(t, b.Manager.Enabled())
 		require.False(t, management.UnderAgent())
 	})
 }
