@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: Persist the complete frame count when shutting down the disk queue.
+component: libbeat
+issue: https://github.com/elastic/beats/issues/54565

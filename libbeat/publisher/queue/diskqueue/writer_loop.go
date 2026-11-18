@@ -85,8 +85,11 @@ type writerLoop struct {
 	responseChan chan writerLoopResponse
 
 	// The most recent segment that has been written to, if there is one.
-	// This segment
 	currentSegment *queueSegment
+
+	// Count completed writes here because the core loop may still be applying
+	// the final response when the writer closes the segment.
+	currentFrameCount uint32
 
 	// The file handle corresponding to currentSegment. When currentSegment
 	// changes, this handle is closed and a new one is created.
@@ -124,7 +127,7 @@ func (wl *writerLoop) run() {
 			// The request channel is closed, we are done. If there is an active
 			// segment file, finalize its frame count and close it.
 			if wl.outputFile != nil {
-				_ = wl.outputFile.UpdateCount(wl.currentSegment.frameCount)
+				_ = wl.outputFile.UpdateCount(wl.currentFrameCount)
 				_ = wl.outputFile.Sync()
 				wl.outputFile.Close()
 				wl.outputFile = nil
@@ -168,7 +171,7 @@ outerLoop:
 			if wl.outputFile != nil {
 				// Update the header with the frame count (including the ones we
 				// just wrote), try to sync to disk, then close the file.
-				_ = wl.outputFile.UpdateCount(wl.currentSegment.frameCount + curSegmentResponse.framesWritten)
+				_ = wl.outputFile.UpdateCount(wl.currentFrameCount)
 				_ = wl.outputFile.Sync()
 				wl.outputFile.Close()
 				wl.outputFile = nil
@@ -178,6 +181,7 @@ outerLoop:
 				curSegmentResponse = writerLoopSegmentResponse{}
 			}
 			wl.currentSegment = frameRequest.segment
+			wl.currentFrameCount = 0
 			file, err := wl.currentSegment.getWriterWithRetry(
 				wl.settings, wl.paths, wl.retryCallback)
 			if err != nil {
@@ -222,6 +226,7 @@ outerLoop:
 		// abort while a frame is partially written, we only report up to the
 		// last complete frame. (This almost never matters, but it allows for
 		// more controlled recovery after a bad shutdown.)
+		wl.currentFrameCount++
 		curSegmentResponse.framesWritten++
 		curSegmentResponse.bytesWritten += uint64(frameSize)
 

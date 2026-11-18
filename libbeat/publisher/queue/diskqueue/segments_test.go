@@ -19,9 +19,13 @@ package diskqueue
 
 import (
 	"io"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 func TestSegmentsRoundTrip(t *testing.T) {
@@ -173,5 +177,32 @@ func TestSegmentReaderSeekLocations(t *testing.T) {
 		// seek to location
 		_, err = sr.Seek(tc.location, io.SeekStart)
 		assert.Error(t, err, name)
+	}
+}
+
+func TestWriterFinalizesSegmentBeforeCoreAppliesResponse(t *testing.T) {
+	settings := DefaultSettings()
+	settings.Path = t.TempDir()
+	wl := newWriterLoop(logptest.NewTestingLogger(t, ""), settings, nil)
+	first, last := &queueSegment{id: 0}, &queueSegment{id: 1}
+	frame := &writeFrame{serialized: []byte("event"), producer: &diskQueueProducer{}}
+	a := segmentedFrame{segment: first, frame: frame}
+	b := segmentedFrame{segment: last, frame: frame}
+
+	response := wl.processRequest(writerLoopRequest{frames: []segmentedFrame{a}})
+	first.frameCount += response.segments[0].framesWritten
+	wl.processRequest(writerLoopRequest{frames: []segmentedFrame{a, b, b, b}})
+	// Shutdown can close the request channel before the core loop applies
+	// the final response to its in-memory segment counters.
+	close(wl.requestChan)
+	wl.run()
+
+	for id, want := range map[segmentID]uint32{first.id: 2, last.id: 3} {
+		file, err := os.Open(settings.segmentPath(id, nil))
+		require.NoError(t, err, "open segment %d", id)
+		header, err := readSegmentHeader(file)
+		assert.NoError(t, file.Close(), "close segment %d", id)
+		require.NoError(t, err, "read segment %d header", id)
+		assert.Equal(t, want, header.frameCount, "persisted frame count for segment %d", id)
 	}
 }
