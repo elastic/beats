@@ -598,55 +598,75 @@ func TestMinimalInput_RunFullSyncBackoff(t *testing.T) {
 	}
 }
 
-// TestMinimalInput_RunIncrementalSyncStatus checks that a failed or
-// incomplete incremental sync is reported as degraded, and that the next
-// successful one reports running.
+// TestMinimalInput_RunIncrementalSyncStatus checks that a failed incremental
+// sync is reported as degraded, and that the next successful one reports
+// running.
 func TestMinimalInput_RunIncrementalSyncStatus(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
-		name string
-		err  error
-		want string
-	}{
-		{
-			name: "failed",
-			err:  errors.New("incremental failure"),
-			want: "Error running incremental sync: incremental failure",
-		},
-		{
-			name: "incomplete",
-			err:  &entcollect.IncompleteError{Err: errors.New("enrichment skipped")},
-			want: "Incomplete incremental sync: enrichment skipped",
+	var calls atomic.Int32
+	prov := &fakeProvider{
+		incrFunc: func(ctx context.Context, s entcollect.Store, pub entcollect.Publisher, log *slog.Logger) error {
+			if calls.Add(1) == 1 {
+				return errors.New("incremental failure")
+			}
+			return nil
 		},
 	}
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			t.Parallel()
+	mi := newTestMinimalInput(t, prov, time.Hour, 20*time.Millisecond)
 
-			var calls atomic.Int32
-			prov := &fakeProvider{
-				incrFunc: func(ctx context.Context, s entcollect.Store, pub entcollect.Publisher, log *slog.Logger) error {
-					if calls.Add(1) == 1 {
-						return test.err
-					}
-					return nil
-				},
-			}
-			mi := newTestMinimalInput(t, prov, time.Hour, 20*time.Millisecond)
+	failed := statusUpdate{status.Degraded, "Error running incremental sync: incremental failure"}
+	recovered := statusUpdate{status.Running, "Successful incremental sync"}
+	updates := runUntil(t, mi, func(u []statusUpdate) bool {
+		i := slices.Index(u, failed)
+		return i >= 0 && slices.Contains(u[i:], recovered)
+	})
+	for _, u := range updates[slices.Index(updates, failed):slices.Index(updates, recovered)] {
+		if u.status != status.Degraded {
+			t.Errorf("status %v %q reported before an incremental sync succeeded; want degraded", u.status, u.msg)
+		}
+	}
+}
 
-			failed := statusUpdate{status.Degraded, test.want}
-			recovered := statusUpdate{status.Running, "Successful incremental sync"}
-			updates := runUntil(t, mi, func(u []statusUpdate) bool {
-				i := slices.Index(u, failed)
-				return i >= 0 && slices.Contains(u[i:], recovered)
-			})
-			for _, u := range updates[slices.Index(updates, failed):slices.Index(updates, recovered)] {
-				if u.status != status.Degraded {
-					t.Errorf("status %v %q reported before an incremental sync succeeded; want degraded", u.status, u.msg)
-				}
+// TestMinimalInput_RunIncompleteIncrementalSync checks that an incomplete
+// incremental sync is reported as degraded until the next full sync, even
+// when a later incremental sync fails and the ones after it succeed.
+func TestMinimalInput_RunIncompleteIncrementalSync(t *testing.T) {
+	t.Parallel()
+
+	var calls atomic.Int32
+	prov := &fakeProvider{
+		incrFunc: func(ctx context.Context, s entcollect.Store, pub entcollect.Publisher, log *slog.Logger) error {
+			switch calls.Add(1) {
+			case 1:
+				return &entcollect.IncompleteError{Err: errors.New("enrichment skipped")}
+			case 2:
+				return errors.New("incremental failure")
+			default:
+				return nil
 			}
-		})
+		},
+	}
+	mi := newTestMinimalInput(t, prov, time.Hour, 10*time.Millisecond)
+
+	incomplete := statusUpdate{status.Degraded, "Incomplete incremental sync: enrichment skipped"}
+	failed := statusUpdate{status.Degraded, "Error running incremental sync: incremental failure"}
+	updates := runUntil(t, mi, func(u []statusUpdate) bool {
+		i := slices.Index(u, failed)
+		return i >= 0 && len(u)-i >= 4
+	})
+
+	i := slices.Index(updates, incomplete)
+	if i < 0 || i > slices.Index(updates, failed) {
+		t.Fatalf("got updates %v; want %v before %v", updates, incomplete, failed)
+	}
+	for _, u := range updates[i:] {
+		if u != incomplete && u != failed {
+			t.Errorf("status %v %q reported after an incomplete incremental sync; want %v", u.status, u.msg, incomplete)
+		}
+	}
+	if got := updates[len(updates)-1]; got != incomplete {
+		t.Errorf("last status = %v %q; want %v", got.status, got.msg, incomplete)
 	}
 }
 
@@ -685,23 +705,45 @@ func TestMinimalInput_RunIncompleteFullSync(t *testing.T) {
 
 // TestMinimalInput_RunFullSyncClearsIncrementalError checks that a
 // successful full sync reports running even if the last incremental sync
-// failed.
+// failed or was incomplete.
 func TestMinimalInput_RunFullSyncClearsIncrementalError(t *testing.T) {
 	t.Parallel()
 
-	prov := &fakeProvider{
-		incrFunc: func(ctx context.Context, s entcollect.Store, pub entcollect.Publisher, log *slog.Logger) error {
-			return errors.New("incremental failure")
+	tests := []struct {
+		name string
+		err  error
+		want string
+	}{
+		{
+			name: "failed",
+			err:  errors.New("incremental failure"),
+			want: "Error running incremental sync: incremental failure",
+		},
+		{
+			name: "incomplete",
+			err:  &entcollect.IncompleteError{Err: errors.New("enrichment skipped")},
+			want: "Incomplete incremental sync: enrichment skipped",
 		},
 	}
-	mi := newTestMinimalInput(t, prov, 100*time.Millisecond, 20*time.Millisecond)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
 
-	failed := statusUpdate{status.Degraded, "Error running incremental sync: incremental failure"}
-	recovered := statusUpdate{status.Running, "Successful full sync"}
-	runUntil(t, mi, func(u []statusUpdate) bool {
-		i := slices.Index(u, failed)
-		return i >= 0 && slices.Contains(u[i:], recovered)
-	})
+			prov := &fakeProvider{
+				incrFunc: func(ctx context.Context, s entcollect.Store, pub entcollect.Publisher, log *slog.Logger) error {
+					return test.err
+				},
+			}
+			mi := newTestMinimalInput(t, prov, 100*time.Millisecond, 20*time.Millisecond)
+
+			failed := statusUpdate{status.Degraded, test.want}
+			recovered := statusUpdate{status.Running, "Successful full sync"}
+			runUntil(t, mi, func(u []statusUpdate) bool {
+				i := slices.Index(u, failed)
+				return i >= 0 && slices.Contains(u[i:], recovered)
+			})
+		})
+	}
 }
 
 func TestDegradedMsg(t *testing.T) {

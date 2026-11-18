@@ -49,7 +49,8 @@ When running with a local file store (the default for non-agentless deployments)
 If a full synchronization fails, it is retried after `update_interval`. The wait doubles after each further failure, up to `sync_interval`. The input reports a degraded status when a synchronization fails or is incomplete:
 
 * After a failed or incomplete full synchronization, the status stays degraded until a full synchronization succeeds.
-* After a failed or incomplete incremental synchronization, it stays degraded until a later synchronization of either kind succeeds.
+* After a failed incremental synchronization, it stays degraded until a later synchronization of either kind succeeds.
+* After an incomplete incremental synchronization, it stays degraded until a full synchronization succeeds.
 
 A synchronization is incomplete when it finishes but could not collect some data, for example when some Okta enrichment requests still fail after retrying. Its changes are kept, and the missing data is collected again by the next full synchronization, so an incomplete full synchronization is not retried early.
 

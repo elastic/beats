@@ -106,9 +106,13 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 	defer syncTimer.Stop()
 	defer incrTimer.Stop()
 
-	// The most recent full and incremental sync errors. The input is
-	// degraded while either is set. A successful full sync clears both.
-	var fullErr, incrErr error
+	// The most recent full sync error, the most recent failed incremental
+	// sync and the most recent incomplete incremental sync. The input is
+	// degraded while any is set. A failed incremental sync is redone by the
+	// next one, so the next sync of either kind that commits clears it. What
+	// an incomplete one skipped is only collected again by a full sync, so
+	// only a successful full sync clears it, as it clears the other two.
+	var fullErr, incrErr, incrIncomplete error
 	retry := retryBackoff{initial: n.incrSyncInterval, max: n.fullSyncInterval}
 
 	runCtx.UpdateStatus(status.Running, "")
@@ -125,7 +129,7 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 			wait := n.fullSyncInterval
 			switch {
 			case err == nil:
-				fullErr, incrErr = nil, nil
+				fullErr, incrErr, incrIncomplete = nil, nil, nil
 				retry.reset()
 			case provider.SyncInterrupted(runCtx, err):
 				log.Infow(provider.SyncInterruptedMsg, "error", err)
@@ -141,7 +145,7 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 				fullErr = err
 				wait = retry.failed()
 			}
-			updateSyncStatus(runCtx, fullErr, incrErr, "Successful full sync")
+			updateSyncStatus(runCtx, fullErr, incrErr, incrIncomplete, "Successful full sync")
 			syncTimer.Reset(wait)
 			log.Debugf("Next full sync expected at: %v", time.Now().Add(wait))
 
@@ -163,12 +167,12 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 				continue // The input is stopping.
 			case incomplete(err):
 				log.Warnw("Incomplete incremental sync", "error", err)
-				incrErr = err
+				incrErr, incrIncomplete = nil, err
 			default:
 				log.Errorw("Error running incremental sync", "error", err)
 				incrErr = err
 			}
-			updateSyncStatus(runCtx, fullErr, incrErr, "Successful incremental sync")
+			updateSyncStatus(runCtx, fullErr, incrErr, incrIncomplete, "Successful incremental sync")
 			incrTimer.Reset(n.incrSyncInterval)
 			log.Debugf("Next incremental sync expected at: %v", time.Now().Add(n.incrSyncInterval))
 		}
@@ -218,15 +222,17 @@ func incomplete(err error) bool {
 	return errors.As(err, &ie)
 }
 
-// updateSyncStatus reports the input as degraded if the most recent full
-// or incremental sync failed or was incomplete, and as running with msg
-// otherwise.
-func updateSyncStatus(runCtx v2.Context, fullErr, incrErr error, msg string) {
+// updateSyncStatus reports the input as degraded if any of the full sync
+// error, the failed incremental sync error or the incomplete incremental
+// sync error is set, and as running with msg otherwise.
+func updateSyncStatus(runCtx v2.Context, fullErr, incrErr, incrIncomplete error, msg string) {
 	switch {
 	case fullErr != nil:
 		runCtx.UpdateStatus(status.Degraded, degradedMsg("full", fullErr))
 	case incrErr != nil:
 		runCtx.UpdateStatus(status.Degraded, degradedMsg("incremental", incrErr))
+	case incrIncomplete != nil:
+		runCtx.UpdateStatus(status.Degraded, degradedMsg("incremental", incrIncomplete))
 	default:
 		runCtx.UpdateStatus(status.Running, msg)
 	}
