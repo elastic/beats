@@ -35,14 +35,18 @@ import (
 	"github.com/elastic/beats/v7/pkg/paths"
 )
 
-// New creates the control client before the data client. If the data client
-// cannot be created, the control client's socket must not be left open.
+// TestNew_DataClientFailureClosesControlClient checks that New closes the
+// control client's socket when it cannot create the data client. New creates
+// the control client first.
 //
 // The data client is made to fail by leaving the process one free file
 // descriptor, which the control client takes. Other threads in the process
 // open and close files too, so the control client can lose the descriptor and
 // fail, or the data client can be given another and succeed. Neither attempt
 // says anything about the cleanup, so both are repeated.
+//
+// The file descriptor limit is for the whole process, so this test must not
+// call t.Parallel.
 func TestNew_DataClientFailureClosesControlClient(t *testing.T) {
 	c, err := conf.NewConfigFrom(getConfig())
 	if err != nil {
@@ -51,18 +55,30 @@ func TestNew_DataClientFailureClosesControlClient(t *testing.T) {
 	info := beat.Info{Paths: paths.New(), UserAgent: "test", Logger: logptest.NewTestingLogger(t, "")}
 
 	const attempts = 20
+	var controlFailures int
+	var controlErr error
 	for range attempts {
 		before := socketCount(t)
 		release := useUpFileDescriptors(t, 1)
 		_, sets, err := mb.NewModule(c, ab.Registry, info)
 		release()
 		closeClients(sets)
-		if err == nil || strings.Contains(err.Error(), "failed to create audit control client") {
+		controlFailed := err != nil && strings.Contains(err.Error(), "failed to create audit control client")
+		if controlFailed {
+			controlFailures++
+			controlErr = err
+		}
+		if err == nil || controlFailed {
 			continue
 		}
 
 		assert.ErrorContains(t, err, "failed to create audit data client", "error from creating the module")
 		assert.Equal(t, before, socketCount(t), "open sockets after a failed New")
+		return
+	}
+	if controlFailures == attempts {
+		// For example, a container without audit netlink support.
+		t.Errorf("the audit control client could not be created in any of %d attempts: %v", attempts, controlErr)
 		return
 	}
 	t.Errorf("no attempt in %d reached a failure to create the data client", attempts)
