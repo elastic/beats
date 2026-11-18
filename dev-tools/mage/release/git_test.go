@@ -108,12 +108,12 @@ func TestIsClean(t *testing.T) {
 			}
 
 			// Test IsClean
-			repo, err := OpenRepo(tmpDir)
+			repo, err := openRepo(tmpDir)
 			if err != nil {
 				t.Fatalf("Failed to open repo: %v", err)
 			}
 
-			clean, err := repo.IsClean()
+			clean, err := repo.isClean()
 			if err != nil {
 				t.Fatalf("IsClean failed: %v", err)
 			}
@@ -166,12 +166,12 @@ func TestGetCurrentBranch(t *testing.T) {
 	}
 
 	// Test on default branch
-	repo, err := OpenRepo(tmpDir)
+	repo, err := openRepo(tmpDir)
 	if err != nil {
 		t.Fatalf("Failed to open repo: %v", err)
 	}
 
-	branch, err := repo.GetCurrentBranch()
+	branch, err := repo.getCurrentBranch()
 	if err != nil {
 		t.Fatalf("GetCurrentBranch failed: %v", err)
 	}
@@ -182,15 +182,15 @@ func TestGetCurrentBranch(t *testing.T) {
 	}
 
 	// Create and checkout new branch
-	if err := repo.CreateBranch("test-branch"); err != nil {
+	if err := repo.createBranch("test-branch"); err != nil {
 		t.Fatalf("CreateBranch failed: %v", err)
 	}
-	if err := repo.CheckoutBranch("test-branch"); err != nil {
+	if err := repo.checkoutBranch("test-branch"); err != nil {
 		t.Fatalf("CheckoutBranch failed: %v", err)
 	}
 
 	// Test on new branch
-	branch, err = repo.GetCurrentBranch()
+	branch, err = repo.getCurrentBranch()
 	if err != nil {
 		t.Fatalf("GetCurrentBranch failed: %v", err)
 	}
@@ -221,16 +221,16 @@ func TestGitHTTPSAuthExtraHeader(t *testing.T) {
 func TestOpenRepo(t *testing.T) {
 	_, tmpDir := createTestRepo(t)
 
-	gitRepo, err := OpenRepo(tmpDir)
+	gitRepo, err := openRepo(tmpDir)
 	if err != nil {
-		t.Fatalf("OpenRepo() error = %v", err)
+		t.Fatalf("openRepo() error = %v", err)
 	}
 	if gitRepo == nil || gitRepo.repo == nil {
-		t.Fatal("OpenRepo() returned nil repo")
+		t.Fatal("openRepo() returned nil repo")
 	}
 
-	if _, err := OpenRepo("/non/existent/path"); err == nil {
-		t.Fatal("OpenRepo() should fail for non-existent path")
+	if _, err := openRepo("/non/existent/path"); err == nil {
+		t.Fatal("openRepo() should fail for non-existent path")
 	}
 }
 
@@ -241,11 +241,11 @@ func TestOpenRepoWithAlternateObjects(t *testing.T) {
 		clone := filepath.Join(t.TempDir(), "checkout")
 		runGit(t, source, "clone", "--no-local", "--reference", source, source, clone)
 
-		repo, err := OpenRepo(clone)
+		repo, err := openRepo(clone)
 		if err != nil {
-			t.Fatalf("OpenRepo() error = %v", err)
+			t.Fatalf("openRepo() error = %v", err)
 		}
-		clean, err := repo.IsClean()
+		clean, err := repo.isClean()
 		if err != nil {
 			t.Fatalf("IsClean() error = %v", err)
 		}
@@ -300,7 +300,7 @@ func TestGitPushEnv(t *testing.T) {
 func TestPushRequiresToken(t *testing.T) {
 	gitRepo, _ := createTestRepo(t)
 
-	err := gitRepo.Push("origin", "")
+	err := gitRepo.push("origin", "")
 	if err == nil {
 		t.Error("Push() should fail without a token, got nil error")
 	}
@@ -309,7 +309,7 @@ func TestPushRequiresToken(t *testing.T) {
 func TestPushRequiresOriginRemote(t *testing.T) {
 	gitRepo, _ := createTestRepo(t)
 
-	err := gitRepo.Push("upstream", "test-token")
+	err := gitRepo.push("upstream", "test-token")
 	if err == nil {
 		t.Fatal("Push() should reject non-origin remotes")
 	}
@@ -326,20 +326,20 @@ func TestPushToLocalRemote(t *testing.T) {
 		t.Fatalf("failed to init bare remote: %v", err)
 	}
 	remoteURL := "file://" + bareDir
-	if err := gitRepo.SetRemoteURL("origin", remoteURL); err != nil {
+	if err := gitRepo.setRemoteURL("origin", remoteURL); err != nil {
 		t.Fatalf("SetRemoteURL() error = %v", err)
 	}
 
 	branch := "release-9.6"
-	if err := gitRepo.CreateBranch(branch); err != nil {
+	if err := gitRepo.createBranch(branch); err != nil {
 		t.Fatalf("CreateBranch() error = %v", err)
 	}
-	if err := gitRepo.CheckoutBranch(branch); err != nil {
+	if err := gitRepo.checkoutBranch(branch); err != nil {
 		t.Fatalf("CheckoutBranch() error = %v", err)
 	}
 
 	// Token is unused for file:// remotes but required by Push.
-	if err := gitRepo.Push("origin", "test-token"); err != nil {
+	if err := gitRepo.push("origin", "test-token"); err != nil {
 		t.Fatalf("Push() error = %v", err)
 	}
 
@@ -401,7 +401,7 @@ func TestGithubHTTPSPushURL(t *testing.T) {
 func TestEnsureHTTPSRemote(t *testing.T) {
 	t.Run("rewrites ssh to https", func(t *testing.T) {
 		gitRepo, _ := createTestRepo(t)
-		if err := gitRepo.SetRemoteURL("origin", "git@github.com:elastic/beats.git"); err != nil {
+		if err := gitRepo.setRemoteURL("origin", "git@github.com:elastic/beats.git"); err != nil {
 			t.Fatalf("SetRemoteURL() error = %v", err)
 		}
 		if err := gitRepo.ensureHTTPSRemote("origin"); err != nil {
@@ -420,7 +420,7 @@ func TestEnsureHTTPSRemote(t *testing.T) {
 	t.Run("leaves https unchanged", func(t *testing.T) {
 		gitRepo, _ := createTestRepo(t)
 		want := "https://github.com/elastic/beats.git"
-		if err := gitRepo.SetRemoteURL("origin", want); err != nil {
+		if err := gitRepo.setRemoteURL("origin", want); err != nil {
 			t.Fatalf("SetRemoteURL() error = %v", err)
 		}
 		if err := gitRepo.ensureHTTPSRemote("origin"); err != nil {
@@ -437,7 +437,7 @@ func TestEnsureHTTPSRemote(t *testing.T) {
 
 	t.Run("rejects non-https remote", func(t *testing.T) {
 		gitRepo, _ := createTestRepo(t)
-		if err := gitRepo.SetRemoteURL("origin", "git@gitlab.com:group/repo.git"); err != nil {
+		if err := gitRepo.setRemoteURL("origin", "git@gitlab.com:group/repo.git"); err != nil {
 			t.Fatalf("SetRemoteURL() error = %v", err)
 		}
 		err := gitRepo.ensureHTTPSRemote("origin")
@@ -453,7 +453,7 @@ func TestEnsureHTTPSRemote(t *testing.T) {
 func TestSetRemoteURL(t *testing.T) {
 	gitRepo, _ := createTestRepo(t)
 
-	err := gitRepo.SetRemoteURL("origin", "https://github.com/test/repo.git")
+	err := gitRepo.setRemoteURL("origin", "https://github.com/test/repo.git")
 	if err != nil {
 		t.Errorf("SetRemoteURL() error = %v", err)
 		return
@@ -509,24 +509,24 @@ func TestCreateAndCheckoutBranch(t *testing.T) {
 		t.Skipf("Failed to create initial commit: %v", err)
 	}
 
-	repo, err := OpenRepo(tmpDir)
+	repo, err := openRepo(tmpDir)
 	if err != nil {
 		t.Fatalf("Failed to open repo: %v", err)
 	}
 
 	// Create new branch
 	branchName := "feature-branch"
-	if err := repo.CreateBranch(branchName); err != nil {
+	if err := repo.createBranch(branchName); err != nil {
 		t.Fatalf("CreateBranch failed: %v", err)
 	}
 
 	// Checkout the branch
-	if err := repo.CheckoutBranch(branchName); err != nil {
+	if err := repo.checkoutBranch(branchName); err != nil {
 		t.Fatalf("CheckoutBranch failed: %v", err)
 	}
 
 	// Verify we're on the new branch
-	currentBranch, err := repo.GetCurrentBranch()
+	currentBranch, err := repo.getCurrentBranch()
 	if err != nil {
 		t.Fatalf("GetCurrentBranch failed: %v", err)
 	}
@@ -536,7 +536,7 @@ func TestCreateAndCheckoutBranch(t *testing.T) {
 	}
 
 	// Creating the same branch again should be idempotent
-	if err := repo.CreateBranch(branchName); err != nil {
+	if err := repo.createBranch(branchName); err != nil {
 		t.Fatalf("CreateBranch failed on second call: %v", err)
 	}
 }
@@ -581,7 +581,7 @@ func TestCommitAll(t *testing.T) {
 		t.Skipf("Failed to create initial commit: %v", err)
 	}
 
-	repo, err := OpenRepo(tmpDir)
+	repo, err := openRepo(tmpDir)
 	if err != nil {
 		t.Fatalf("Failed to open repo: %v", err)
 	}
@@ -592,7 +592,7 @@ func TestCommitAll(t *testing.T) {
 	}
 
 	// Commit the change
-	committed, err := repo.CommitAll("test commit", "Test User", "test@example.com")
+	committed, err := repo.commitAll("test commit", "Test User", "test@example.com")
 	if err != nil {
 		t.Fatalf("CommitAll failed: %v", err)
 	}
@@ -601,7 +601,7 @@ func TestCommitAll(t *testing.T) {
 	}
 
 	// Verify repo is clean after commit
-	clean, err := repo.IsClean()
+	clean, err := repo.isClean()
 	if err != nil {
 		t.Fatalf("IsClean failed: %v", err)
 	}
@@ -611,7 +611,7 @@ func TestCommitAll(t *testing.T) {
 	}
 
 	// Second commit attempt should be a no-op
-	committed, err = repo.CommitAll("test commit", "Test User", "test@example.com")
+	committed, err = repo.commitAll("test commit", "Test User", "test@example.com")
 	if err != nil {
 		t.Fatalf("CommitAll failed on second call: %v", err)
 	}
@@ -681,12 +681,12 @@ func TestHasCommitsAheadOf(t *testing.T) {
 			dir := initGitRepo(t)
 			tt.setup(t, dir, tt.baseName)
 
-			repo, err := OpenRepo(dir)
+			repo, err := openRepo(dir)
 			if err != nil {
 				t.Fatalf("OpenRepo failed: %v", err)
 			}
 
-			got, err := repo.HasCommitsAheadOf(tt.baseName)
+			got, err := repo.hasCommitsAheadOf(tt.baseName)
 			if tt.wantErr {
 				if err == nil {
 					t.Fatal("HasCommitsAheadOf() error = nil, want error")
@@ -703,7 +703,7 @@ func TestHasCommitsAheadOf(t *testing.T) {
 	}
 }
 
-func createTestRepo(t *testing.T) (*GitRepo, string) {
+func createTestRepo(t *testing.T) (*gitRepo, string) {
 	t.Helper()
 
 	tmpDir := t.TempDir()
@@ -753,7 +753,7 @@ func createTestRepo(t *testing.T) (*GitRepo, string) {
 	}
 	_ = repo.Storer.RemoveReference(plumbing.NewBranchReferenceName("master"))
 
-	return &GitRepo{repo: repo, path: tmpDir}, tmpDir
+	return &gitRepo{repo: repo, path: tmpDir}, tmpDir
 }
 
 func initGitRepo(t *testing.T) string {

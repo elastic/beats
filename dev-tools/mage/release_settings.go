@@ -30,6 +30,7 @@ import (
 // release targets call RequireRelease() before running workflows.
 type ReleaseSettings struct {
 	CurrentRelease          string
+	CurrentReleaseVersion   *semver.Version // parsed CURRENT_RELEASE; set when provided
 	LatestRelease           string
 	NextRelease             string
 	NextProjectMinorVersion string
@@ -116,6 +117,7 @@ func (s *ReleaseSettings) populateReleaseFromCurrent(currentRelease string) erro
 		return fmt.Errorf("invalid CURRENT_RELEASE: %w", err)
 	}
 
+	s.CurrentReleaseVersion = parsed
 	s.CurrentRelease = parsed.String()
 	s.LatestRelease = InferLatestRelease(parsed)
 	s.NextRelease = InferNextRelease(parsed)

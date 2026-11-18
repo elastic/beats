@@ -83,6 +83,8 @@ func TestLoadReleaseSettingsFromEnv(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, s.RequireRelease())
 	require.Equal(t, "9.5.0", s.CurrentRelease)
+	require.NotNil(t, s.CurrentReleaseVersion)
+	require.Equal(t, "9.5.0", s.CurrentReleaseVersion.String())
 	require.Equal(t, "9.5.1", s.NextRelease)
 	require.Equal(t, "9.5", s.ReleaseBranch)
 	require.Equal(t, "9.6.0", s.NextProjectMinorVersion)

@@ -25,6 +25,8 @@ import (
 	"strings"
 
 	"golang.org/x/sys/execabs"
+
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
 var (
@@ -47,17 +49,15 @@ type DocsUpdateOptions struct {
 var defaultBeatVersionPattern = regexp.MustCompile(`const defaultBeatVersion = "([^"]+)"`)
 
 // ReadBeatVersion returns defaultBeatVersion from libbeat/version/version.go.
+// It reads the file on disk (not the cached mage BeatVersion) so workflows can
+// compare CURRENT_RELEASE after checkoutBranch.
 func ReadBeatVersion() (string, error) {
 	versionFile := "libbeat/version/version.go"
 	content, err := os.ReadFile(versionFile)
 	if err != nil {
 		return "", fmt.Errorf("failed to read %s: %w", versionFile, err)
 	}
-	match := defaultBeatVersionPattern.FindSubmatch(content)
-	if match == nil {
-		return "", fmt.Errorf("version pattern not found in %s", versionFile)
-	}
-	return string(match[1]), nil
+	return devtools.ParseBeatVersion(content)
 }
 
 // UpdateVersion updates the version in libbeat/version/version.go

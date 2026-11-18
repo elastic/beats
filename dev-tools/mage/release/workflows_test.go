@@ -88,7 +88,7 @@ const defaultBeatVersion = "9.5.0"
 
 	require.NoError(t, RunMajorMinorRelease(cfg), "RunMajorMinorRelease dry run failed")
 
-	repo, err := OpenRepo(".")
+	repo, err := openRepo(".")
 	require.NoError(t, err, "failed to open repo")
 
 	wantBranches := []string{
@@ -99,7 +99,7 @@ const defaultBeatVersion = "9.5.0"
 		"ff-prep-main-docs-env-9.6.0",
 	}
 	for _, branch := range wantBranches {
-		exists, err := repo.BranchExists(branch)
+		exists, err := repo.branchExists(branch)
 		if err != nil {
 			t.Fatalf("failed checking branch %s: %v", branch, err)
 		}
@@ -109,7 +109,7 @@ const defaultBeatVersion = "9.5.0"
 	}
 
 	// Next-patch is owned by RunPatchRelease, not minor/FF.
-	exists, err := repo.BranchExists("ff-prep-next-patch-9.5.1")
+	exists, err := repo.branchExists("ff-prep-next-patch-9.5.1")
 	require.NoError(t, err, "failed checking next-patch branch")
 	if exists {
 		t.Errorf("minor/FF must not create ff-prep-next-patch-9.5.1")
@@ -294,7 +294,7 @@ const defaultBeatVersion = "9.5.1"
 
 	require.NoError(t, RunPatchRelease(cfg), "RunPatchRelease dry run failed")
 
-	repo, err := OpenRepo(".")
+	repo, err := openRepo(".")
 	require.NoError(t, err, "failed to open repo")
 
 	wantBranches := []string{
@@ -302,7 +302,7 @@ const defaultBeatVersion = "9.5.1"
 		"update-version-9.5.2",
 	}
 	for _, branch := range wantBranches {
-		exists, err := repo.BranchExists(branch)
+		exists, err := repo.branchExists(branch)
 		if err != nil {
 			t.Fatalf("failed checking branch %s: %v", branch, err)
 		}
@@ -311,7 +311,7 @@ const defaultBeatVersion = "9.5.1"
 		}
 	}
 
-	exists, err := repo.BranchExists("patch-release-9.5.2")
+	exists, err := repo.branchExists("patch-release-9.5.2")
 	if err != nil {
 		t.Fatalf("failed checking docs branch: %v", err)
 	}
