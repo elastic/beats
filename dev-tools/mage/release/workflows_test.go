@@ -45,7 +45,7 @@ func TestRunMajorMinorReleaseDryRunBranches(t *testing.T) {
 
 	tmpDir := setupWorkflowTestRepo(t)
 
-	// Feature freeze expects BASE_BRANCH version.go to already equal CURRENT_RELEASE
+	// Feature freeze expects BASE_BRANCH version.go to already equal NEXT_RELEASE
 	// (set by the previous cycle's next-minor bump on main).
 	runGit := func(args ...string) {
 		t.Helper()
@@ -74,9 +74,8 @@ const defaultBeatVersion = "9.5.0"
 	require.NoError(t, os.Chdir(tmpDir), "failed to chdir")
 
 	cfg := &ReleaseConfig{
-		CurrentRelease:          "9.5.0",
+		NextRelease:             "9.5.0",
 		LatestRelease:           "9.4.3",
-		NextRelease:             "9.5.1",
 		NextProjectMinorVersion: "9.6.0",
 		NextProjectMinorBranch:  "9.6",
 		BaseBranch:              "main",
@@ -121,7 +120,7 @@ const defaultBeatVersion = "9.5.0"
 	assertGitShowContains(t, tmpDir, "ff-prep-main-docs-env-9.6.0", "libbeat/docs/version.asciidoc", ":stack-version: 9.6.0")
 }
 
-func TestRunMajorMinorReleaseRejectsMismatchedCurrentRelease(t *testing.T) {
+func TestRunMajorMinorReleaseRejectsMismatchedNextRelease(t *testing.T) {
 	origMakeUpdate := runMakeUpdate
 	runMakeUpdate = func() error { return nil }
 	t.Cleanup(func() { runMakeUpdate = origMakeUpdate })
@@ -144,9 +143,8 @@ func TestRunMajorMinorReleaseRejectsMismatchedCurrentRelease(t *testing.T) {
 	require.NoError(t, os.Chdir(tmpDir), "failed to chdir")
 
 	cfg := &ReleaseConfig{
-		CurrentRelease:          "9.5.0", // off-by-one vs main
+		NextRelease:             "9.5.0", // off-by-one vs main
 		LatestRelease:           "9.4.3",
-		NextRelease:             "9.5.1",
 		NextProjectMinorVersion: "9.6.0",
 		BaseBranch:              "main",
 		ReleaseBranch:           "9.5",
@@ -156,7 +154,7 @@ func TestRunMajorMinorReleaseRejectsMismatchedCurrentRelease(t *testing.T) {
 	}
 
 	err = RunMajorMinorRelease(cfg)
-	require.Error(t, err, "expected RunMajorMinorRelease to fail when CURRENT_RELEASE mismatches main version")
+	require.Error(t, err, "expected RunMajorMinorRelease to fail when NEXT_RELEASE mismatches main version")
 	require.Contains(t, err.Error(), "does not match version on main")
 }
 
@@ -182,8 +180,7 @@ func assertGitShowNotContains(t *testing.T, dir, branch, file, forbid string) {
 
 func TestMajorMinorPrepBranchNames(t *testing.T) {
 	cfg := &ReleaseConfig{
-		CurrentRelease:          "9.5.0",
-		NextRelease:             "9.5.1",
+		NextRelease:             "9.5.0",
 		NextProjectMinorVersion: "9.6.0",
 		ReleaseBranch:           "9.5",
 		BaseBranch:              "main",
@@ -193,8 +190,8 @@ func TestMajorMinorPrepBranchNames(t *testing.T) {
 		name   string
 		branch string
 	}{
-		{name: "PR-A", branch: fmt.Sprintf("ff-prep-main-%s", cfg.CurrentRelease)},
-		{name: "PR-B", branch: fmt.Sprintf("ff-release-%s", cfg.CurrentRelease)},
+		{name: "PR-A", branch: fmt.Sprintf("ff-prep-main-%s", cfg.NextRelease)},
+		{name: "PR-B", branch: fmt.Sprintf("ff-release-%s", cfg.NextRelease)},
 		{name: "PR-C", branch: fmt.Sprintf("ff-prep-main-docs-env-%s", cfg.NextProjectMinorVersion)},
 	}
 
@@ -237,7 +234,7 @@ func TestRunPatchReleaseDryRunBranches(t *testing.T) {
 	tmpDir := setupWorkflowTestRepo(t)
 
 	// Patch workflow starts from an existing release branch whose version.go
-	// equals the previous patch (CURRENT_RELEASE - 1). CURRENT_RELEASE is the
+	// equals the previous patch (NEXT_RELEASE - 1). NEXT_RELEASE is the
 	// version to land (NEW_VERSION from version-bump).
 	runGit := func(args ...string) {
 		t.Helper()
@@ -283,9 +280,8 @@ const defaultBeatVersion = "9.5.1"
 	require.NoError(t, os.Chdir(tmpDir), "failed to chdir")
 
 	cfg := &ReleaseConfig{
-		CurrentRelease: "9.5.2",
+		NextRelease:    "9.5.2",
 		LatestRelease:  "9.5.1",
-		NextRelease:    "9.5.3",
 		ReleaseBranch:  "9.5",
 		DryRun:         true,
 		GitAuthorName:  "Test User",
@@ -326,7 +322,7 @@ const defaultBeatVersion = "9.5.1"
 	}
 }
 
-func TestRunPatchReleaseRejectsMismatchedCurrentRelease(t *testing.T) {
+func TestRunPatchReleaseRejectsMismatchedNextRelease(t *testing.T) {
 	origMakeUpdate := runMakeUpdate
 	runMakeUpdate = func() error { return nil }
 	t.Cleanup(func() { runMakeUpdate = origMakeUpdate })
@@ -362,9 +358,8 @@ const defaultBeatVersion = "9.5.1"
 	require.NoError(t, os.Chdir(tmpDir), "failed to chdir")
 
 	cfg := &ReleaseConfig{
-		CurrentRelease: "9.5.3", // expects branch at 9.5.2
+		NextRelease:    "9.5.3", // expects branch at 9.5.2
 		LatestRelease:  "9.5.2",
-		NextRelease:    "9.5.4",
 		ReleaseBranch:  "9.5",
 		DryRun:         true,
 		GitAuthorName:  "Test User",
@@ -393,9 +388,8 @@ func TestPatchPrepLabels(t *testing.T) {
 
 func TestReleasePRBodiesIncludeReleaseHeader(t *testing.T) {
 	cfg := &ReleaseConfig{
-		CurrentRelease:          "9.4.1",
+		NextRelease:             "9.4.1",
 		LatestRelease:           "9.4.0",
-		NextRelease:             "9.4.2",
 		NextProjectMinorVersion: "9.5.0",
 		ReleaseBranch:           "9.4",
 	}
@@ -441,9 +435,8 @@ func TestFormatWorkflowPRLine(t *testing.T) {
 
 func TestMajorMinorPRTitles(t *testing.T) {
 	cfg := &ReleaseConfig{
-		CurrentRelease:          "9.4.0",
+		NextRelease:             "9.4.0",
 		LatestRelease:           "9.3.2",
-		NextRelease:             "9.4.1",
 		NextProjectMinorVersion: "9.5.0",
 		ReleaseBranch:           "9.4",
 		BaseBranch:              "main",
@@ -452,9 +445,9 @@ func TestMajorMinorPRTitles(t *testing.T) {
 		name  string
 		title string
 	}{
-		{"PR-A", fmt.Sprintf("[Release][%s] Prepare main for %s and mergify backport-%s", cfg.CurrentRelease, cfg.NextProjectMinorVersion, cfg.ReleaseBranch)},
-		{"PR-B", fmt.Sprintf("[Release][%s] ff-release: update versions %s", cfg.CurrentRelease, cfg.CurrentRelease)},
-		{"PR-C", fmt.Sprintf("[Release][%s] Update docs for %s and test environment to latest release %s", cfg.CurrentRelease, cfg.NextProjectMinorVersion, cfg.LatestRelease)},
+		{"PR-A", fmt.Sprintf("[Release][%s] Prepare main for %s and mergify backport-%s", cfg.NextRelease, cfg.NextProjectMinorVersion, cfg.ReleaseBranch)},
+		{"PR-B", fmt.Sprintf("[Release][%s] ff-release: update versions %s", cfg.NextRelease, cfg.NextRelease)},
+		{"PR-C", fmt.Sprintf("[Release][%s] Update docs for %s and test environment to latest release %s", cfg.NextRelease, cfg.NextProjectMinorVersion, cfg.LatestRelease)},
 	}
 	for _, tc := range cases {
 		if !strings.HasPrefix(tc.title, "[Release][9.4.0] ") {

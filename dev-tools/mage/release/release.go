@@ -50,7 +50,7 @@ var defaultBeatVersionPattern = regexp.MustCompile(`const defaultBeatVersion = "
 
 // readBeatVersion returns defaultBeatVersion from libbeat/version/version.go.
 // It reads the file on disk (not the cached mage BeatVersion) so workflows can
-// compare CURRENT_RELEASE after checkoutBranch.
+// compare NEXT_RELEASE after checkoutBranch.
 func readBeatVersion() (string, error) {
 	versionFile := "libbeat/version/version.go"
 	content, err := os.ReadFile(versionFile)

@@ -493,8 +493,8 @@ func TestCheckRequirements(t *testing.T) {
 			tmpDir := t.TempDir()
 
 			cfg := &ReleaseConfig{
-				CurrentRelease: tt.version,
-				BaseBranch:     "main",
+				NextRelease: tt.version,
+				BaseBranch:  "main",
 			}
 
 			// Change to temp directory

@@ -31,19 +31,19 @@ func TestValidateReleaseConfig(t *testing.T) {
 		require.Error(t, err)
 	})
 	t.Run("missing latest", func(t *testing.T) {
-		err := validateReleaseConfig(&ReleaseConfig{CurrentRelease: "9.5.0", DryRun: true})
+		err := validateReleaseConfig(&ReleaseConfig{NextRelease: "9.5.0", DryRun: true})
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "LatestRelease")
 	})
 	t.Run("missing token when not dry-run", func(t *testing.T) {
-		err := validateReleaseConfig(&ReleaseConfig{CurrentRelease: "9.5.0", LatestRelease: "9.4.0"})
+		err := validateReleaseConfig(&ReleaseConfig{NextRelease: "9.5.0", LatestRelease: "9.4.0"})
 		require.Error(t, err)
 	})
 	t.Run("valid dry-run", func(t *testing.T) {
 		err := validateReleaseConfig(&ReleaseConfig{
-			CurrentRelease: "9.5.0",
-			LatestRelease:  "9.4.0",
-			DryRun:         true,
+			NextRelease:   "9.5.0",
+			LatestRelease: "9.4.0",
+			DryRun:        true,
 		})
 		require.NoError(t, err)
 	})
@@ -57,7 +57,7 @@ func TestEnsureLatestRelease(t *testing.T) {
 		return "9.4.3", nil
 	}
 
-	cfg := &ReleaseConfig{CurrentRelease: "9.5.0", DryRun: true}
+	cfg := &ReleaseConfig{NextRelease: "9.5.0", DryRun: true}
 	require.NoError(t, ensureLatestRelease(cfg))
 	require.Equal(t, "9.4.3", cfg.LatestRelease)
 
@@ -67,13 +67,12 @@ func TestEnsureLatestRelease(t *testing.T) {
 }
 
 func TestLoadReleaseSettingsViaMage(t *testing.T) {
-	t.Setenv("CURRENT_RELEASE", "9.5.0")
+	t.Setenv("NEXT_RELEASE", "9.5.0")
 	t.Setenv("DRY_RUN", "true")
 
 	settings, err := devtools.LoadReleaseSettings()
 	require.NoError(t, err)
 	require.NoError(t, settings.RequireRelease())
-	require.Equal(t, "9.5.0", settings.CurrentRelease)
-	require.Equal(t, "9.5.1", settings.NextRelease)
+	require.Equal(t, "9.5.0", settings.NextRelease)
 	require.True(t, settings.DryRun)
 }

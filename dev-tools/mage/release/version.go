@@ -58,16 +58,16 @@ func selectLatestReleaseBefore(versions []string, currentVersion string) (string
 	return best.String(), nil
 }
 
-func inferReleaseBranch(currentRelease string) string {
-	v, err := parseReleaseVersion(currentRelease)
+func inferReleaseBranch(nextRelease string) string {
+	v, err := parseReleaseVersion(nextRelease)
 	if err != nil {
 		return ""
 	}
 	return devtools.InferReleaseBranch(v)
 }
 
-func inferLatestRelease(currentRelease string) (string, error) {
-	v, err := parseReleaseVersion(currentRelease)
+func inferLatestRelease(nextRelease string) (string, error) {
+	v, err := parseReleaseVersion(nextRelease)
 	if err != nil {
 		return "", err
 	}

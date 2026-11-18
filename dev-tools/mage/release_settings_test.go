@@ -48,12 +48,6 @@ func TestInferLatestRelease(t *testing.T) {
 	}
 }
 
-func TestInferNextRelease(t *testing.T) {
-	parsed, err := ParseReleaseVersion("9.2.0")
-	require.NoError(t, err)
-	require.Equal(t, "9.2.1", InferNextRelease(parsed))
-}
-
 func TestInferReleaseBranch(t *testing.T) {
 	parsed, err := ParseReleaseVersion("9.2.1")
 	require.NoError(t, err)
@@ -66,15 +60,15 @@ func TestInferNextProjectMinorVersion(t *testing.T) {
 	require.Equal(t, "9.6.0", InferNextProjectMinorVersion(parsed))
 }
 
-func TestLoadReleaseSettingsRequiresCurrentForRelease(t *testing.T) {
-	t.Setenv("CURRENT_RELEASE", "")
+func TestLoadReleaseSettingsRequiresNextForRelease(t *testing.T) {
+	t.Setenv("NEXT_RELEASE", "")
 	s, err := LoadReleaseSettings()
 	require.NoError(t, err)
 	require.Error(t, s.RequireRelease())
 }
 
 func TestLoadReleaseSettingsFromEnv(t *testing.T) {
-	t.Setenv("CURRENT_RELEASE", "9.5.0")
+	t.Setenv("NEXT_RELEASE", "9.5.0")
 	t.Setenv("DRY_RUN", "true")
 	t.Setenv("PROJECT_OWNER", "elastic")
 	t.Setenv("PROJECT_REPO", "beats")
@@ -82,10 +76,9 @@ func TestLoadReleaseSettingsFromEnv(t *testing.T) {
 	s, err := LoadReleaseSettings()
 	require.NoError(t, err)
 	require.NoError(t, s.RequireRelease())
-	require.Equal(t, "9.5.0", s.CurrentRelease)
-	require.NotNil(t, s.CurrentReleaseVersion)
-	require.Equal(t, "9.5.0", s.CurrentReleaseVersion.String())
-	require.Equal(t, "9.5.1", s.NextRelease)
+	require.Equal(t, "9.5.0", s.NextRelease)
+	require.NotNil(t, s.NextReleaseVersion)
+	require.Equal(t, "9.5.0", s.NextReleaseVersion.String())
 	require.Equal(t, "9.5", s.ReleaseBranch)
 	require.Equal(t, "9.6.0", s.NextProjectMinorVersion)
 	require.True(t, s.DryRun)

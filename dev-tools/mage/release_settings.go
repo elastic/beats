@@ -26,13 +26,12 @@ import (
 )
 
 // ReleaseSettings holds configuration for release automation (feature freeze / patch).
-// Loaded via LoadReleaseSettings(). CURRENT_RELEASE is optional during general loads;
+// Loaded via LoadReleaseSettings(). NEXT_RELEASE is optional during general loads;
 // release targets call RequireRelease() before running workflows.
 type ReleaseSettings struct {
-	CurrentRelease          string
-	CurrentReleaseVersion   *semver.Version // parsed CURRENT_RELEASE; set when provided
-	LatestRelease           string
 	NextRelease             string
+	NextReleaseVersion      *semver.Version // parsed NEXT_RELEASE; set when provided
+	LatestRelease           string
 	NextProjectMinorVersion string
 	NextProjectMinorBranch  string
 
@@ -60,10 +59,10 @@ func LoadReleaseSettings() (*ReleaseSettings, error) {
 	return s, nil
 }
 
-// RequireRelease ensures CURRENT_RELEASE was provided so inferred release fields are set.
+// RequireRelease ensures NEXT_RELEASE was provided so inferred release fields are set.
 func (s *ReleaseSettings) RequireRelease() error {
-	if s.CurrentRelease == "" {
-		return fmt.Errorf("CURRENT_RELEASE environment variable is required")
+	if s.NextRelease == "" {
+		return fmt.Errorf("NEXT_RELEASE environment variable is required")
 	}
 	return nil
 }
@@ -104,23 +103,22 @@ func (s *ReleaseSettings) loadReleaseSettingsFromEnv() error {
 		s.ProjectReviewers = strings.Split(v, ",")
 	}
 
-	currentRelease := os.Getenv("CURRENT_RELEASE")
-	if currentRelease == "" {
+	nextRelease := os.Getenv("NEXT_RELEASE")
+	if nextRelease == "" {
 		return nil
 	}
-	return s.populateReleaseFromCurrent(currentRelease)
+	return s.populateReleaseFromNext(nextRelease)
 }
 
-func (s *ReleaseSettings) populateReleaseFromCurrent(currentRelease string) error {
-	parsed, err := ParseReleaseVersion(currentRelease)
+func (s *ReleaseSettings) populateReleaseFromNext(nextRelease string) error {
+	parsed, err := ParseReleaseVersion(nextRelease)
 	if err != nil {
-		return fmt.Errorf("invalid CURRENT_RELEASE: %w", err)
+		return fmt.Errorf("invalid NEXT_RELEASE: %w", err)
 	}
 
-	s.CurrentReleaseVersion = parsed
-	s.CurrentRelease = parsed.String()
+	s.NextReleaseVersion = parsed
+	s.NextRelease = parsed.String()
 	s.LatestRelease = InferLatestRelease(parsed)
-	s.NextRelease = InferNextRelease(parsed)
 	s.ReleaseBranch = InferReleaseBranch(parsed)
 	s.NextProjectMinorVersion = InferNextProjectMinorVersion(parsed)
 	s.NextProjectMinorBranch = InferNextProjectMinorBranch(parsed)
@@ -129,17 +127,17 @@ func (s *ReleaseSettings) populateReleaseFromCurrent(currentRelease string) erro
 
 // ParseReleaseVersion parses a release version string as major.minor.patch with no
 // prerelease or build metadata. A leading "v" is stripped.
-func ParseReleaseVersion(currentRelease string) (*semver.Version, error) {
-	tag := strings.TrimPrefix(strings.TrimSpace(currentRelease), "v")
+func ParseReleaseVersion(nextRelease string) (*semver.Version, error) {
+	tag := strings.TrimPrefix(strings.TrimSpace(nextRelease), "v")
 	if len(strings.Split(tag, ".")) != 3 {
-		return nil, fmt.Errorf("invalid version format: %s (expected major.minor.patch)", currentRelease)
+		return nil, fmt.Errorf("invalid version format: %s (expected major.minor.patch)", nextRelease)
 	}
 	parsed, err := semver.NewVersion(tag)
 	if err != nil {
-		return nil, fmt.Errorf("invalid version format: %s (expected major.minor.patch): %w", currentRelease, err)
+		return nil, fmt.Errorf("invalid version format: %s (expected major.minor.patch): %w", nextRelease, err)
 	}
 	if parsed.Prerelease() != "" || parsed.Metadata() != "" {
-		return nil, fmt.Errorf("invalid version format: %s (expected major.minor.patch without prerelease/build metadata)", currentRelease)
+		return nil, fmt.Errorf("invalid version format: %s (expected major.minor.patch without prerelease/build metadata)", nextRelease)
 	}
 	return parsed, nil
 }
@@ -151,11 +149,6 @@ func InferLatestRelease(v *semver.Version) string {
 		return ""
 	}
 	return fmt.Sprintf("%d.%d.%d", v.Major(), v.Minor(), v.Patch()-1)
-}
-
-// InferNextRelease returns the next patch version (patch + 1).
-func InferNextRelease(v *semver.Version) string {
-	return fmt.Sprintf("%d.%d.%d", v.Major(), v.Minor(), v.Patch()+1)
 }
 
 // InferReleaseBranch returns the major.minor release branch name.

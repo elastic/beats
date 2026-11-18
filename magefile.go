@@ -347,7 +347,7 @@ func (Release) RunMajorMinor() error {
 	return release.RunMajorMinorRelease(cfg)
 }
 
-// RunPatch executes the post-release patch bump: version + test-env to CURRENT_RELEASE.
+// RunPatch executes the post-release patch bump: version + test-env to NEXT_RELEASE.
 func (Release) RunPatch() error {
 	cfg, err := loadReleaseConfig()
 	if err != nil {
@@ -357,7 +357,7 @@ func (Release) RunPatch() error {
 }
 
 // EnsureIssueTracker creates or updates the Beats release checklist issue for
-// CURRENT_RELEASE, linking related Beats PRs labeled "release".
+// NEXT_RELEASE, linking related Beats PRs labeled "release".
 func (Release) EnsureIssueTracker() error {
 	cfg, err := loadReleaseConfig()
 	if err != nil {

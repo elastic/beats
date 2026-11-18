@@ -39,7 +39,7 @@ targets in the `Release` namespace import it and call its functions directly.
 
 **Workflows supported:**
 1. **Major/Minor Release (feature-freeze)** - Creates release branch + 3 grouped PRs (backport+version on main, ff-release, docs+test-env on main). Does **not** open next-patch bumps.
-2. **Patch Release** - Opens one post-release version + test-env bump PR to `CURRENT_RELEASE` (`NEW_VERSION`). Docs stay off this path. This is the only workflow that opens those bumps.
+2. **Patch Release** - Opens one post-release version + test-env bump PR to `NEXT_RELEASE` (`NEW_VERSION`). Docs stay off this path. This is the only workflow that opens those bumps.
 
 Release notes are handled separately via `.github/workflows/release-notes.yml`.
 
@@ -77,7 +77,7 @@ mage -l | grep release
 
 You should see:
 ```
-release:ensureIssueTracker  Creates/updates the Beats release checklist issue for CURRENT_RELEASE
+release:ensureIssueTracker  Creates/updates the Beats release checklist issue for NEXT_RELEASE
 release:runMajorMinor       Feature-freeze workflow (release branch + 3 grouped PRs)
 release:runPatch            Executes the complete patch release workflow
 release:updateDocs          Updates version references in documentation and K8s manifests
@@ -94,7 +94,7 @@ All configuration is done via environment variables.
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `CURRENT_RELEASE` | Version to release | `"9.3.0"` |
+| `NEXT_RELEASE` | FF: version on base; patch: version to land | `"9.3.0"` |
 | `GITHUB_TOKEN` | GitHub API token | `"ghp_..."` |
 
 ### Optional Variables
@@ -109,17 +109,17 @@ All configuration is done via environment variables.
 | `GIT_AUTHOR_NAME` | `"github-actions[bot]"` | Git commit author name |
 | `GIT_AUTHOR_EMAIL` | `"github-actions[bot]@users.noreply.github.com"` | Git commit author email |
 
-`LatestRelease`, `NextRelease`, and `ReleaseBranch` are always inferred from `CURRENT_RELEASE` (and GitHub releases for minor versions). They are not configurable via environment variables.
+`LatestRelease` and `ReleaseBranch` are always inferred from `NEXT_RELEASE` (and GitHub releases for minor versions). They are not configurable via environment variables.
 
 ### Example Configuration
 
 ```bash
 # Minimal configuration
-export CURRENT_RELEASE="9.3.0"
+export NEXT_RELEASE="9.3.0"
 export GITHUB_TOKEN="ghp_your_token"
 
 # Full configuration
-export CURRENT_RELEASE="9.3.0"
+export NEXT_RELEASE="9.3.0"
 export BASE_BRANCH="main"
 export GITHUB_TOKEN="ghp_your_token"
 export PROJECT_REVIEWERS="elastic/elastic-agent-release,user1,user2"
@@ -136,7 +136,7 @@ with grouped PRs.
 
 **What it does:**
 1. Validates version and checks for deprecated releases
-2. Requires `CURRENT_RELEASE` to match `libbeat/version/version.go` on
+2. Requires `NEXT_RELEASE` to match `libbeat/version/version.go` on
    `BASE_BRANCH` before cutting the release branch
 3. Creates release branch from `BASE_BRANCH` (e.g., `9.5`)
 4. Prepares **3 grouped PRs** (merge order matters):
@@ -147,10 +147,10 @@ with grouped PRs.
 | 2 | PR-B | release branch | `ff-release-X.Y.0` | `merge:2-after-branch` | ff-release version, docs, test env, `make update` |
 | 3 | PR-C | `main` | `ff-prep-main-docs-env-X.(Y+1).0` | `merge:3-after-images` | Docs for next minor + test env pinned to latest published release |
 
-Titles use `[Release][<CURRENT_RELEASE>] …`. Next-patch bumps are **not** opened here; use `mage release:runPatch` after the patch release trigger.
+Titles use `[Release][<NEXT_RELEASE>] …`. Next-patch bumps are **not** opened here; use `mage release:runPatch` after the patch release trigger.
 
 5. Pushes release branch and opens PRs (unless `DRY_RUN`). Merge-timing labels are created automatically if missing.
-6. Best-effort: ensures the Beats release checklist issue `[RELEASE <CURRENT_RELEASE>] Instructions & Checklist` exists and lists related Beats `release`-labeled PRs (linked to https://github.com/elastic/ingest-dev/issues/8866). Failures are warnings only.
+6. Best-effort: ensures the Beats release checklist issue `[RELEASE <NEXT_RELEASE>] Instructions & Checklist` exists and lists related Beats `release`-labeled PRs (linked to https://github.com/elastic/ingest-dev/issues/8866). Failures are warnings only.
 
 **RM merge order:** push branch → merge PR-A on `main` → merge PR-B on release branch → merge PR-C on `main`.
 
@@ -158,7 +158,7 @@ Titles use `[Release][<CURRENT_RELEASE>] …`. Next-patch bumps are **not** open
 
 ```bash
 # Test first with DRY_RUN
-export CURRENT_RELEASE="9.5.0"
+export NEXT_RELEASE="9.5.0"
 export GITHUB_TOKEN="ghp_your_token"
 export DRY_RUN=true
 
@@ -172,7 +172,7 @@ export DRY_RUN=false
 mage release:runMajorMinor
 ```
 
-`LatestRelease` is resolved automatically from published `elastic/beats` GitHub releases (highest same-major version strictly less than `CURRENT_RELEASE`, e.g. `9.5.0` → `9.4.3`).
+`LatestRelease` is resolved automatically from published `elastic/beats` GitHub releases (highest same-major version strictly less than `NEXT_RELEASE`, e.g. `9.5.0` → `9.4.3`).
 
 **Blocked versions:**
 - 6.x minor releases (6.5.0, etc.)
@@ -187,9 +187,9 @@ Opens the post-release version bump on an existing release branch. Equivalent to
 ingest-dev `prepare-next-patch` / `create-prs-next-patch` (version + test-env
 grouped into one PR). Docs and backport stay off this path.
 
-**`CURRENT_RELEASE` meaning:** the version to land on the release branch
+**`NEXT_RELEASE` meaning:** the version to land on the release branch
 (`NEW_VERSION` from the version-bump orchestrator). Example: after releasing
-`9.4.1`, bump to `9.4.2` with `CURRENT_RELEASE=9.4.2` while branch `9.4` still
+`9.4.1`, bump to `9.4.2` with `NEXT_RELEASE=9.4.2` while branch `9.4` still
 has `defaultBeatVersion = "9.4.1"`. The workflow requires patch `> 0` and that
 `version.go` equals the previous patch on the same line.
 
@@ -202,7 +202,7 @@ has `defaultBeatVersion = "9.4.1"`. The workflow requires patch `> 0` and that
 | 1 | bump | release branch | `update-version-X.Y.Z` | `merge:4-after-release` | `version.go` → CURRENT + test-env (`LATEST=prev`) |
 
 3. Opens the PR (unless `DRY_RUN`). Merge-timing labels are created automatically if missing.
-4. Best-effort: ensures the Beats release checklist issue for `CURRENT_RELEASE`. Failures are warnings only.
+4. Best-effort: ensures the Beats release checklist issue for `NEXT_RELEASE`. Failures are warnings only.
 
 **RM merge order:** merge the bump PR promptly after the patch job opens it.
 
@@ -213,8 +213,8 @@ has `defaultBeatVersion = "9.4.1"`. The workflow requires patch `> 0` and that
 git checkout 9.2
 git pull
 
-# Test first with DRY_RUN (CURRENT_RELEASE = version to land)
-export CURRENT_RELEASE="9.2.1"
+# Test first with DRY_RUN (NEXT_RELEASE = version to land)
+export NEXT_RELEASE="9.2.1"
 export GITHUB_TOKEN="ghp_your_token"
 export DRY_RUN=true
 
@@ -236,7 +236,7 @@ For manual updates or testing individual steps.
 
 ### EnsureIssueTracker
 
-Creates or updates the Beats release checklist issue for `CURRENT_RELEASE`:
+Creates or updates the Beats release checklist issue for `NEXT_RELEASE`:
 
 - Title: `[RELEASE <version>] Instructions & Checklist`
 - Links the global ingest tracker: https://github.com/elastic/ingest-dev/issues/8866
@@ -245,7 +245,7 @@ Creates or updates the Beats release checklist issue for `CURRENT_RELEASE`:
 - When invoked from `runMajorMinor` / `runPatch`, failures are warnings only (non-blocking). The standalone target still returns an error.
 
 ```bash
-export CURRENT_RELEASE="9.4.1"
+export NEXT_RELEASE="9.4.1"
 export GITHUB_TOKEN="ghp_your_token"
 mage release:ensureIssueTracker
 ```
@@ -355,7 +355,7 @@ Always test with `DRY_RUN=true` before running for real.
 
 ```bash
 # Step 1: Test with DRY_RUN
-export CURRENT_RELEASE="9.3.0"
+export NEXT_RELEASE="9.3.0"
 export GITHUB_TOKEN="ghp_your_token"  # Still needed for validation
 export DRY_RUN=true
 
@@ -474,7 +474,7 @@ Use DRY_RUN mode:
 
 ```bash
 export DRY_RUN=true
-export CURRENT_RELEASE="9.3.0"
+export NEXT_RELEASE="9.3.0"
 # GITHUB_TOKEN not required in DRY_RUN mode
 mage release:runMajorMinor
 ```
@@ -497,7 +497,7 @@ Yes! These are designed for both local and CI/CD use:
 # GitHub Actions example
 - name: Run major/minor release
   env:
-    CURRENT_RELEASE: ${{ inputs.version }}
+    NEXT_RELEASE: ${{ inputs.version }}
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   run: mage release:runMajorMinor
 ```
@@ -517,13 +517,13 @@ git add .
 git commit -m "WIP"
 ```
 
-### Error: "CURRENT_RELEASE environment variable is required"
+### Error: "NEXT_RELEASE environment variable is required"
 
 **Cause:** Missing required environment variable.
 
 **Solution:**
 ```bash
-export CURRENT_RELEASE="9.3.0"
+export NEXT_RELEASE="9.3.0"
 ```
 
 ### Error: "GITHUB_TOKEN is required when not in dry-run mode"

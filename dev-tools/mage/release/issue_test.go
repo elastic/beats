@@ -164,15 +164,15 @@ func TestMergeReleaseIssueBodyAddsTrackerWhenMissing(t *testing.T) {
 
 func TestEnsureReleaseIssueTrackerDryRun(t *testing.T) {
 	cfg := &ReleaseConfig{
-		CurrentRelease: "9.4.1",
-		DryRun:         true,
+		NextRelease: "9.4.1",
+		DryRun:      true,
 	}
 	pr := &github.PullRequest{HTMLURL: new("https://github.com/elastic/beats/pull/99")}
 	require.NoError(t, EnsureReleaseIssueTracker(cfg, []*github.PullRequest{pr}), "dry-run ensureIssueTracker should not call GitHub")
 }
 
 func TestWarnEnsureReleaseIssueTrackerDoesNotPanicOnError(t *testing.T) {
-	// Missing CURRENT_RELEASE makes EnsureReleaseIssueTracker fail; the warn wrapper
+	// Missing NEXT_RELEASE makes EnsureReleaseIssueTracker fail; the warn wrapper
 	// must swallow the error so release workflows stay successful.
 	warnEnsureReleaseIssueTracker(&ReleaseConfig{}, nil)
 }
