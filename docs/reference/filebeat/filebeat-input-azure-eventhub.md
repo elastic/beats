@@ -165,7 +165,7 @@ Before starting {{filebeat}}:
 
 1. Configure an Entra app registration or user-assigned managed identity to trust your cluster's OpenID Connect (OIDC) issuer, service account subject, and token audience. For setup instructions, refer to [Configure an app to trust an external identity provider](https://learn.microsoft.com/en-us/entra/workload-id/workload-identity-federation-create-trust).
 2. Project a Kubernetes service account token with audience `api://AzureADTokenExchange` into the {{filebeat}} container. Kubernetes rotates the file as tokens expire, so keep it mounted for the lifetime of the input.
-3. Grant the identity the [required Event Hubs and Blob Storage permissions](#_required_permissions). The input also attempts to create the checkpoint container if it does not exist. Scope your storage permissions accordingly.
+3. Grant the identity the [required Event Hubs and Blob Storage permissions](#_required_permissions).
 4. Set the identity values in the following table.
 
 For each identity value, provide either the input setting or its environment variable. A nonempty input setting takes precedence.
@@ -191,7 +191,7 @@ When using credential-based authentication, the identity (service principal or m
   - `Microsoft.EventHub/namespaces/eventhubs/consumergroups/read`
 
 **For Azure Storage Account:**
-- `Storage Blob Data Contributor` role on the Storage Account or container
+- `Storage Blob Data Contributor` role scoped to the checkpoint container or storage account. Container scope limits access to that container and its blobs. You can assign the role at the container scope before the container exists. The input creates the container if needed. Storage account scope grants access to all containers in the account.
 - Alternatively, a custom role with the following permissions:
   - `Microsoft.Storage/storageAccounts/blobServices/containers/read`
   - `Microsoft.Storage/storageAccounts/blobServices/containers/write`
