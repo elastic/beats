@@ -54,10 +54,10 @@ const defaultBeatVersion = "9.3.0"
 	}()
 	require.NoError(t, os.Chdir(tmpDir), "Failed to change to temp directory")
 
-	got, err := ReadBeatVersion()
-	require.NoError(t, err, "ReadBeatVersion failed")
+	got, err := readBeatVersion()
+	require.NoError(t, err, "readBeatVersion failed")
 	if got != "9.3.0" {
-		t.Fatalf("ReadBeatVersion = %q, want 9.3.0", got)
+		t.Fatalf("readBeatVersion = %q, want 9.3.0", got)
 	}
 
 	// Test updating version
@@ -72,10 +72,10 @@ const defaultBeatVersion = "9.3.0"
 		t.Errorf("Version not updated correctly. Got:\n%s", string(content))
 	}
 
-	got, err = ReadBeatVersion()
-	require.NoError(t, err, "ReadBeatVersion after update failed")
+	got, err = readBeatVersion()
+	require.NoError(t, err, "readBeatVersion after update failed")
 	if got != "9.4.0" {
-		t.Fatalf("ReadBeatVersion after update = %q, want 9.4.0", got)
+		t.Fatalf("readBeatVersion after update = %q, want 9.4.0", got)
 	}
 }
 
@@ -206,8 +206,8 @@ func TestUpdateStackVersion(t *testing.T) {
 	}()
 	require.NoError(t, os.Chdir(tmpDir), "Failed to change to temp directory")
 
-	err = UpdateStackVersion("9.5.1")
-	require.NoError(t, err, "UpdateStackVersion failed")
+	err = updateStackVersion("9.5.1")
+	require.NoError(t, err, "updateStackVersion failed")
 
 	content, err := os.ReadFile(versionAsciidoc)
 	require.NoError(t, err, "Failed to read version.asciidoc")
@@ -241,12 +241,12 @@ func TestUpdateDocsDocBranchCurrent(t *testing.T) {
 	}()
 	require.NoError(t, os.Chdir(tmpDir), "Failed to change to temp directory")
 
-	err = UpdateDocsWithOptions(DocsUpdateOptions{
+	err = updateDocsWithOptions(docsUpdateOptions{
 		BaseBranch:     "9.5",
 		CurrentVersion: "9.5.1",
 		ReleaseBranch:  "9.5",
 	})
-	require.NoError(t, err, "UpdateDocsWithOptions failed")
+	require.NoError(t, err, "updateDocsWithOptions failed")
 
 	content, err := os.ReadFile(versionAsciidoc)
 	require.NoError(t, err, "Failed to read version.asciidoc")
@@ -283,13 +283,13 @@ func TestUpdateDocsIncludeHeartbeat(t *testing.T) {
 	}()
 	require.NoError(t, os.Chdir(tmpDir), "Failed to chdir")
 
-	if err := UpdateDocsWithOptions(DocsUpdateOptions{
+	if err := updateDocsWithOptions(docsUpdateOptions{
 		BaseBranch:       "9.4",
 		CurrentVersion:   "9.4.1",
 		ReleaseBranch:    "9.4",
 		IncludeHeartbeat: true,
 	}); err != nil {
-		t.Fatalf("UpdateDocsWithOptions failed: %v", err)
+		t.Fatalf("updateDocsWithOptions failed: %v", err)
 	}
 
 	content, err := os.ReadFile(heartbeat)
@@ -322,13 +322,13 @@ func TestUpdateDocsDocBranchExplicitMain(t *testing.T) {
 	require.NoError(t, os.Chdir(tmpDir), "Failed to change to temp directory")
 
 	// PR-B: ff-release keeps :doc-branch: main for 9.x cumulative docs
-	err = UpdateDocsWithOptions(DocsUpdateOptions{
+	err = updateDocsWithOptions(docsUpdateOptions{
 		BaseBranch:     "main",
 		CurrentVersion: "9.5.0",
 		ReleaseBranch:  "9.5",
 		DocBranch:      "main",
 	})
-	require.NoError(t, err, "UpdateDocsWithOptions failed")
+	require.NoError(t, err, "updateDocsWithOptions failed")
 
 	content, err := os.ReadFile(versionAsciidoc)
 	require.NoError(t, err, "Failed to read version.asciidoc")
@@ -368,13 +368,13 @@ func TestUpdateDocsDocBranchExplicitMainNextMinor(t *testing.T) {
 	require.NoError(t, os.Chdir(tmpDir), "Failed to change to temp directory")
 
 	// PR-C: prepare-next-dev-minor uses BASE=main RELEASE=main (README no-op).
-	err = UpdateDocsWithOptions(DocsUpdateOptions{
+	err = updateDocsWithOptions(docsUpdateOptions{
 		BaseBranch:     "main",
 		CurrentVersion: "9.6.0",
 		ReleaseBranch:  "main",
 		DocBranch:      "main",
 	})
-	require.NoError(t, err, "UpdateDocsWithOptions failed")
+	require.NoError(t, err, "updateDocsWithOptions failed")
 
 	content, err := os.ReadFile(versionAsciidoc)
 	require.NoError(t, err, "Failed to read version.asciidoc")

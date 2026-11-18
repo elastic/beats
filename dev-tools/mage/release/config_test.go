@@ -27,20 +27,20 @@ import (
 
 func TestValidateReleaseConfig(t *testing.T) {
 	t.Run("missing current", func(t *testing.T) {
-		err := ValidateReleaseConfig(&ReleaseConfig{DryRun: true, LatestRelease: "9.4.0"})
+		err := validateReleaseConfig(&ReleaseConfig{DryRun: true, LatestRelease: "9.4.0"})
 		require.Error(t, err)
 	})
 	t.Run("missing latest", func(t *testing.T) {
-		err := ValidateReleaseConfig(&ReleaseConfig{CurrentRelease: "9.5.0", DryRun: true})
+		err := validateReleaseConfig(&ReleaseConfig{CurrentRelease: "9.5.0", DryRun: true})
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "LatestRelease")
 	})
 	t.Run("missing token when not dry-run", func(t *testing.T) {
-		err := ValidateReleaseConfig(&ReleaseConfig{CurrentRelease: "9.5.0", LatestRelease: "9.4.0"})
+		err := validateReleaseConfig(&ReleaseConfig{CurrentRelease: "9.5.0", LatestRelease: "9.4.0"})
 		require.Error(t, err)
 	})
 	t.Run("valid dry-run", func(t *testing.T) {
-		err := ValidateReleaseConfig(&ReleaseConfig{
+		err := validateReleaseConfig(&ReleaseConfig{
 			CurrentRelease: "9.5.0",
 			LatestRelease:  "9.4.0",
 			DryRun:         true,
@@ -58,11 +58,11 @@ func TestEnsureLatestRelease(t *testing.T) {
 	}
 
 	cfg := &ReleaseConfig{CurrentRelease: "9.5.0", DryRun: true}
-	require.NoError(t, EnsureLatestRelease(cfg))
+	require.NoError(t, ensureLatestRelease(cfg))
 	require.Equal(t, "9.4.3", cfg.LatestRelease)
 
 	cfg.LatestRelease = "9.4.0"
-	require.NoError(t, EnsureLatestRelease(cfg))
+	require.NoError(t, ensureLatestRelease(cfg))
 	require.Equal(t, "9.4.0", cfg.LatestRelease)
 }
 

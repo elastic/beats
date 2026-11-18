@@ -35,8 +35,8 @@ var (
 	composeDefaultPattern  = regexp.MustCompile(`:-\d+\.\d+\.\d+}`)
 )
 
-// DocsUpdateOptions configures documentation and manifest updates.
-type DocsUpdateOptions struct {
+// docsUpdateOptions configures documentation and manifest updates.
+type docsUpdateOptions struct {
 	BaseBranch     string
 	CurrentVersion string
 	ReleaseBranch  string
@@ -48,10 +48,10 @@ type DocsUpdateOptions struct {
 
 var defaultBeatVersionPattern = regexp.MustCompile(`const defaultBeatVersion = "([^"]+)"`)
 
-// ReadBeatVersion returns defaultBeatVersion from libbeat/version/version.go.
+// readBeatVersion returns defaultBeatVersion from libbeat/version/version.go.
 // It reads the file on disk (not the cached mage BeatVersion) so workflows can
 // compare CURRENT_RELEASE after checkoutBranch.
-func ReadBeatVersion() (string, error) {
+func readBeatVersion() (string, error) {
 	versionFile := "libbeat/version/version.go"
 	content, err := os.ReadFile(versionFile)
 	if err != nil {
@@ -90,9 +90,9 @@ func UpdateVersion(newVersion string) error {
 	return nil
 }
 
-// UpdateStackVersion updates only :stack-version: in libbeat/docs/version.asciidoc.
+// updateStackVersion updates only :stack-version: in libbeat/docs/version.asciidoc.
 // Not used by prepare-next-patch / patch bump (those only bump version.go + test-env).
-func UpdateStackVersion(newVersion string) error {
+func updateStackVersion(newVersion string) error {
 	versionRules := []replacementRule{
 		{
 			pattern:     regexp.MustCompile(`:stack-version:\s*\d+\.\d+\.\d+`),
@@ -113,16 +113,16 @@ func UpdateDocs(newVersion string) error {
 		return err
 	}
 	releaseBranch := inferReleaseBranch(parsed.String())
-	return UpdateDocsWithOptions(DocsUpdateOptions{
+	return updateDocsWithOptions(docsUpdateOptions{
 		BaseBranch:     releaseBranch,
 		CurrentVersion: newVersion,
 		ReleaseBranch:  releaseBranch,
 	})
 }
 
-// UpdateDocsWithOptions updates documentation, K8s manifests, and docs URLs.
+// updateDocsWithOptions updates documentation, K8s manifests, and docs URLs.
 // Mirrors ingest-dev release_scripts/beats.mak update-docs.
-func UpdateDocsWithOptions(opts DocsUpdateOptions) error {
+func updateDocsWithOptions(opts docsUpdateOptions) error {
 	if opts.CurrentVersion == "" {
 		return fmt.Errorf("CurrentVersion is required")
 	}
@@ -252,11 +252,6 @@ func applyReplacements(filePath string, rules []replacementRule) error {
 	}
 
 	return nil
-}
-
-// RunMakeUpdate runs 'make --silent update' in the repository.
-func RunMakeUpdate() error {
-	return runMakeUpdate()
 }
 
 // runMakeUpdate is the default implementation; tests may replace it.
