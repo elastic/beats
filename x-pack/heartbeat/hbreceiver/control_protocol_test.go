@@ -78,13 +78,17 @@ func TestReceiverWithControlProtocol(t *testing.T) {
 		}
 	})
 
+	// Elastic Agent sends an empty monitor list in the receiver config, as the
+	// monitors come over the control protocol.
 	config := Config{
 		Beatconfig: map[string]any{
+			"heartbeat":                          map[string]any{"monitors": []any{}},
 			"logging":                            map[string]any{"level": "debug", "selectors": []string{"*"}},
 			"path.home":                          t.TempDir(),
 			"management.agent.connection_secret": agent.connectionSecret,
 		},
 	}
+	require.NoError(t, config.Validate(), "the collector validates the receiver config")
 	rec, err := factory.CreateLogs(t.Context(), settings, &config, sink)
 	require.NoError(t, err)
 	diagExt := &fakeDiagnosticExtension{hooks: map[string]func() []byte{}}
