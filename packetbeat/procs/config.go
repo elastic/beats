@@ -20,7 +20,12 @@ package procs
 import "time"
 
 type ProcsConfig struct {
-	Enabled         bool          `config:"enabled"`
+	Enabled bool `config:"enabled"`
+	// MaxProcReadFreq is the minimum time between full scans of
+	// process sockets for a transport. Lookups that miss during that
+	// time return no process. A wait based on the cost of each socket
+	// table lookup applies in addition. Zero adds no fixed minimum, and
+	// a negative value disables both.
 	MaxProcReadFreq time.Duration `config:"max_proc_read_freq"`
 	Monitored       []ProcConfig  `config:"monitored"`
 	RefreshPidsFreq time.Duration `config:"refresh_pids_freq"`
