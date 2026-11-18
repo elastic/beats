@@ -94,6 +94,33 @@ func TestUnitsManagerStopStopsInputs(t *testing.T) {
 	})
 }
 
+// The receiver can stop the manager before the beat starts it. The manager must
+// then not connect to Elastic Agent, as nothing would stop it again. synctest
+// fails the test if the client's goroutines are left running.
+func TestUnitsManagerStopBeforeStart(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		agent, inputs, m := newTestUnitsManager(t)
+		agent.setUnits(outputUnit(), inputUnit(t, "a", "@every 1m", 1))
+		m.Stop()
+		require.NoError(t, m.Start())
+		time.Sleep(unitsDebounce)
+		synctest.Wait()
+		assert.Empty(t, inputs.reloads(), "a stopped manager must not apply units")
+	})
+}
+
+func TestUnitsManagerStopDuringStart(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		agent, _, m := newTestUnitsManager(t)
+		agent.setUnits(outputUnit(), inputUnit(t, "a", "@every 1m", 1))
+		var wg sync.WaitGroup
+		wg.Go(func() { assert.NoError(t, m.Start()) })
+		wg.Go(m.Stop)
+		wg.Wait()
+		m.Stop()
+	})
+}
+
 func TestUnitsManagerRendersConfig(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		_, _, m := startReadyUnitsManager(t, outputUnit(), inputUnit(t, "a", "@every 1m", 1))
@@ -126,9 +153,17 @@ func applyUnits(agent *unitsAgent, units ...*proto.UnitExpected) {
 }
 
 // startUnitsManager starts a UnitsManager connected to a fake agent, without
-// calling PostInit. Everything runs over in-memory connections, so it works in
-// a synctest bubble. The manager is stopped when the test ends.
+// calling PostInit. The manager is stopped when the test ends.
 func startUnitsManager(t *testing.T) (*unitsAgent, *recordingInputs, *UnitsManager) {
+	agent, inputs, m := newTestUnitsManager(t)
+	require.NoError(t, m.PreInit())
+	return agent, inputs, m
+}
+
+// newTestUnitsManager returns a UnitsManager connected to a fake agent, without
+// starting it. Everything runs over in-memory connections, so it works in a
+// synctest bubble. The manager is stopped when the test ends.
+func newTestUnitsManager(t *testing.T) (*unitsAgent, *recordingInputs, *UnitsManager) {
 	agent := newUnitsAgent(t)
 	agentClient := client.NewV2("pipe", "token", client.VersionInfo{Name: "test"},
 		client.WithGRPCDialOptions(
@@ -141,7 +176,6 @@ func startUnitsManager(t *testing.T) (*unitsAgent, *recordingInputs, *UnitsManag
 	registry.MustRegisterInput(inputs)
 
 	m := NewUnitsManager(agentClient, registry, scheduleTransform, logptest.NewTestingLogger(t, ""))
-	require.NoError(t, m.PreInit())
 	t.Cleanup(m.Stop)
 	return agent, inputs, m
 }

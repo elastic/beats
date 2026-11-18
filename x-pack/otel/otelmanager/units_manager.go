@@ -48,8 +48,14 @@ type UnitsManager struct {
 	ready     chan struct{}
 	readyOnce sync.Once
 	stop      chan struct{}
-	stopOnce  sync.Once
 	wg        sync.WaitGroup
+
+	// lifecycleMx guards started and stopped. The beat starts the manager from
+	// its Run goroutine, while the receiver can stop it at any time, even
+	// before the beat started it.
+	lifecycleMx sync.Mutex
+	started     bool
+	stopped     bool
 
 	// owned by the run loop
 	units      map[string]*client.Unit
@@ -100,11 +106,18 @@ func (m *UnitsManager) AgentInfo() management.AgentInfo {
 	}
 }
 
-// PreInit connects to Elastic Agent. Units are applied after PostInit.
+// PreInit connects to Elastic Agent. Units are applied after PostInit. It does
+// nothing once the manager is stopped.
 func (m *UnitsManager) PreInit() error {
+	m.lifecycleMx.Lock()
+	defer m.lifecycleMx.Unlock()
+	if m.stopped || m.started {
+		return nil
+	}
 	if err := m.client.Start(context.Background()); err != nil {
 		return err
 	}
+	m.started = true
 	// The receiver sets the diagnostics extension before running the beat, so
 	// the hook reaches it. This is the same file a beat process provides.
 	m.RegisterDiagnosticHook("beat-rendered-config", "the rendered config used by the beat",
@@ -131,18 +144,23 @@ func (m *UnitsManager) Start() error {
 // the beat. The receiver can outlive the beat in the collector, so the inputs
 // must not keep running.
 func (m *UnitsManager) Stop() {
-	m.stopOnce.Do(func() {
-		// The client blocks until its channels are read, so stop it while the
-		// run loop still reads them.
-		m.client.Stop()
-		close(m.stop)
-		m.wg.Wait()
-		if list := m.registry.GetInputList(); list != nil && m.lastInputs != nil {
-			if err := list.Reload(nil); err != nil {
-				m.logger.Errorf("failed to stop inputs: %v", err)
+	m.lifecycleMx.Lock()
+	if !m.stopped {
+		m.stopped = true
+		if m.started {
+			// The client blocks until its channels are read, so stop it while
+			// the run loop still reads them.
+			m.client.Stop()
+			close(m.stop)
+			m.wg.Wait()
+			if list := m.registry.GetInputList(); list != nil && m.lastInputs != nil {
+				if err := list.Reload(nil); err != nil {
+					m.logger.Errorf("failed to stop inputs: %v", err)
+				}
 			}
 		}
-	})
+	}
+	m.lifecycleMx.Unlock()
 	m.OtelManager.Stop()
 }
 
