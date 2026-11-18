@@ -167,7 +167,7 @@ func TestEnsureReleaseIssueTrackerDryRun(t *testing.T) {
 		CurrentRelease: "9.4.1",
 		DryRun:         true,
 	}
-	pr := &github.PullRequest{HTMLURL: github.Ptr("https://github.com/elastic/beats/pull/99")}
+	pr := &github.PullRequest{HTMLURL: new("https://github.com/elastic/beats/pull/99")}
 	require.NoError(t, EnsureReleaseIssueTracker(cfg, []*github.PullRequest{pr}), "dry-run ensureIssueTracker should not call GitHub")
 }
 
@@ -180,7 +180,7 @@ func TestWarnEnsureReleaseIssueTrackerDoesNotPanicOnError(t *testing.T) {
 func TestPrURLsFromPullRequestsSkipsNil(t *testing.T) {
 	got := prURLsFromPullRequests([]*github.PullRequest{
 		nil,
-		{HTMLURL: github.Ptr("https://github.com/elastic/beats/pull/1")},
+		{HTMLURL: new("https://github.com/elastic/beats/pull/1")},
 	})
 	if len(got) != 1 || got[0] != "https://github.com/elastic/beats/pull/1" {
 		t.Fatalf("unexpected URLs: %v", got)

@@ -27,14 +27,14 @@ import (
 
 func TestPickRelatedPRPrefersOpenThenMerged(t *testing.T) {
 	mergedAt := time.Now()
-	open := &github.PullRequest{Number: github.Ptr(1), State: github.Ptr("open")}
+	open := &github.PullRequest{Number: new(1), State: new("open")}
 	merged := &github.PullRequest{
-		Number:   github.Ptr(2),
-		State:    github.Ptr("closed"),
-		Merged:   github.Ptr(true),
+		Number:   new(2),
+		State:    new("closed"),
+		Merged:   new(true),
 		MergedAt: &github.Timestamp{Time: mergedAt},
 	}
-	closed := &github.PullRequest{Number: github.Ptr(3), State: github.Ptr("closed")}
+	closed := &github.PullRequest{Number: new(3), State: new("closed")}
 
 	got := pickRelatedPR([]*github.PullRequest{closed, merged, open})
 	if got == nil || got.GetNumber() != 1 {
@@ -64,17 +64,17 @@ func TestPRDisplayState(t *testing.T) {
 		want string
 	}{
 		{name: "nil", pr: nil, want: "unknown"},
-		{name: "open", pr: &github.PullRequest{State: github.Ptr("open")}, want: "open"},
+		{name: "open", pr: &github.PullRequest{State: new("open")}, want: "open"},
 		{
 			name: "merged",
 			pr: &github.PullRequest{
-				State:    github.Ptr("closed"),
-				Merged:   github.Ptr(true),
+				State:    new("closed"),
+				Merged:   new(true),
 				MergedAt: &github.Timestamp{Time: mergedAt},
 			},
 			want: "merged",
 		},
-		{name: "closed", pr: &github.PullRequest{State: github.Ptr("closed")}, want: "closed"},
+		{name: "closed", pr: &github.PullRequest{State: new("closed")}, want: "closed"},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {

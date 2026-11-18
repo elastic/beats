@@ -423,8 +423,8 @@ func TestFormatWorkflowPRLine(t *testing.T) {
 	withPR := workflowPRResult{
 		item: workflowPR{branch: "patch-release-9.3.1", base: "9.3"},
 		pr: &github.PullRequest{
-			HTMLURL: github.Ptr("https://github.com/elastic/beats/pull/42"),
-			State:   github.Ptr("open"),
+			HTMLURL: new("https://github.com/elastic/beats/pull/42"),
+			State:   new("open"),
 		},
 	}
 	got := formatWorkflowPRLine(1, withPR)
