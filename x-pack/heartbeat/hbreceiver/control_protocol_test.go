@@ -248,11 +248,12 @@ func (a *fakeAgent) setUnits(units []*proto.UnitExpected) {
 }
 
 func (a *fakeAgent) CheckinV2(server proto.ElasticAgent_CheckinV2Server) error {
-	recvDone := make(chan error, 1)
+	// recvDone is closed when the client stops sending.
+	recvDone := make(chan struct{})
 	go func() {
+		defer close(recvDone)
 		for {
 			if _, err := server.Recv(); err != nil {
-				recvDone <- err
 				return
 			}
 		}
