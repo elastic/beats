@@ -19,6 +19,7 @@ package config
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -100,4 +101,21 @@ streams:
 	require.Equal(t, "en1", config.Interfaces[1].Device)
 	require.Equal(t, "en2", config.Interfaces[2].Device)
 	require.Len(t, config.Procs.Monitored, 3)
+}
+
+func TestMergeProcsConfigMaxProcReadFreq(t *testing.T) {
+	for _, tc := range []struct {
+		one, two, want time.Duration
+	}{
+		{0, 0, 0},
+		{0, 5 * time.Second, 5 * time.Second},
+		{5 * time.Second, time.Second, 5 * time.Second},
+		{0, -1, -1},
+		{-1, 0, -1},
+		{-1, 5 * time.Second, -1},
+		{5 * time.Second, -1, -1},
+	} {
+		got := mergeProcsConfig(procs.ProcsConfig{MaxProcReadFreq: tc.one}, procs.ProcsConfig{MaxProcReadFreq: tc.two})
+		require.Equal(t, tc.want, got.MaxProcReadFreq, "merge(%v, %v)", tc.one, tc.two)
+	}
 }
