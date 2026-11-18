@@ -21,6 +21,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/management"
 	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
@@ -92,6 +93,34 @@ func TestUnitsManagerStopStopsInputs(t *testing.T) {
 		_, inputs, m := startReadyUnitsManager(t, outputUnit(), inputUnit(t, "a", "@every 1m", 1))
 		m.Stop()
 		assert.Equal(t, [][]string{{"a"}, nil}, inputs.reloads(), "Stop should stop the inputs")
+	})
+}
+
+func TestUnitsManagerAgentInfo(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		agent, _, m := newTestUnitsManager(t)
+		agent.mx.Lock()
+		agent.agentInfo = &proto.AgentInfo{
+			Id:           "agent-id",
+			Version:      "9.9.9",
+			Snapshot:     true,
+			Mode:         proto.AgentManagedMode_MANAGED,
+			Unprivileged: true,
+			Tags:         []string{"tag-a", "tag-b"},
+		}
+		agent.mx.Unlock()
+		agent.setUnits(outputUnit())
+		require.NoError(t, m.Start())
+		synctest.Wait()
+
+		assert.Equal(t, management.AgentInfo{
+			ID:           "agent-id",
+			Version:      "9.9.9",
+			Snapshot:     true,
+			ManagedMode:  management.AgentManagedMode_MANAGED,
+			Unprivileged: true,
+			Tags:         []string{"tag-a", "tag-b"},
+		}, m.AgentInfo())
 	})
 }
 
@@ -249,9 +278,10 @@ type unitsAgent struct {
 
 	listener *pipeListener
 
-	mx      sync.Mutex
-	units   []*proto.UnitExpected
-	changed chan struct{}
+	mx        sync.Mutex
+	agentInfo *proto.AgentInfo
+	units     []*proto.UnitExpected
+	changed   chan struct{}
 }
 
 func newUnitsAgent(t *testing.T) *unitsAgent {
@@ -283,7 +313,7 @@ func (a *unitsAgent) CheckinV2(server proto.ElasticAgent_CheckinV2Server) error 
 	}()
 	for {
 		a.mx.Lock()
-		expected := &proto.CheckinExpected{Units: a.units}
+		expected := &proto.CheckinExpected{AgentInfo: a.agentInfo, Units: a.units}
 		changed := a.changed
 		a.mx.Unlock()
 		if err := server.Send(expected); err != nil {

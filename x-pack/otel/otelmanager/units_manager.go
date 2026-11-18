@@ -105,6 +105,7 @@ func (m *UnitsManager) AgentInfo() management.AgentInfo {
 		Snapshot:     info.Snapshot,
 		ManagedMode:  management.AgentManagedMode(info.ManagedMode),
 		Unprivileged: info.Unprivileged,
+		Tags:         info.Tags,
 	}
 }
 
