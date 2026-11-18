@@ -167,7 +167,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 	}
 
 	if config.IsInputEnabled("stdin") && len(enabledInputs) > 1 {
-		return nil, fmt.Errorf("stdin requires to be run in exclusive mode, configured inputs: %s", strings.Join(enabledInputs, ", "))
+		return nil, fmt.Errorf("stdin must be run in exclusive mode, configured inputs: %s", strings.Join(enabledInputs, ", "))
 	}
 
 	ctx, cn := context.WithCancel(context.Background())

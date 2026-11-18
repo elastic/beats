@@ -11,9 +11,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"net"
 	"net/http"
 	"net/url"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -40,7 +42,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/private"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 )
 
@@ -175,7 +176,7 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	ctx.UpdateStatus(status.Configuring, "")
 
 	log := ctx.Logger.With("input_url", cfg.Request.URL)
-	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
+	stdCtx := ctx.Cancelation
 
 	if cfg.Request.Tracer != nil {
 		resolved, err := httplog.ResolveTraceFilename(ctx.Agent.Paths, inputName, ctx.IDWithoutName, cfg.Request.Tracer.Filename)
@@ -471,11 +472,11 @@ func checkRedirect(config *requestConfig, log *logp.Logger) func(*http.Request, 
 
 		prev := via[len(via)-1] // previous request to get headers from
 
-		log.Debugf("http client: forwarding headers from previous request: %#v", prev.Header)
+		log.Debugf("http client: forwarding headers from previous request: %v", slices.Sorted(maps.Keys(prev.Header)))
 		req.Header = prev.Header.Clone() //nolint:gosec // G119: sensitive headers are removed below for cross-origin redirects via config.RedirectSensitiveHeaders
 
 		if req.URL.Host != prev.URL.Host || (prev.URL.Scheme == "https" && req.URL.Scheme == "http") {
-			for _, k := range config.RedirectSensitiveHeaders {
+			for _, k := range sensitiveHeaders(config.RedirectSensitiveHeaders) {
 				log.Debugf("http client: cross-origin redirect to %s: removing sensitive header %s", req.URL.Host, k)
 				req.Header.Del(k)
 			}
@@ -488,6 +489,22 @@ func checkRedirect(config *requestConfig, log *logp.Logger) func(*http.Request, 
 
 		return nil
 	}
+}
+
+// defaultSensitiveHeaders are removed on cross-origin redirects when
+// redirect.sensitive_headers is not configured. The default is applied here
+// rather than in defaultConfig because go-ucfg merges a configured list into
+// a default list element by element, so a configured list could not replace
+// the defaults and an empty list could not disable them.
+var defaultSensitiveHeaders = []string{"Authorization", "Proxy-Authorization", "Cookie"}
+
+// sensitiveHeaders returns the configured headers, or the defaults if the
+// option is unset. An empty, non-nil list disables stripping.
+func sensitiveHeaders(configured []string) []string {
+	if configured == nil {
+		return defaultSensitiveHeaders
+	}
+	return configured
 }
 
 func makeEvent(body mapstr.M) (beat.Event, error) {

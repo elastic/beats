@@ -95,7 +95,7 @@ func convertValue(fc Conversion, value any) (any, error) {
 	if fc.IsInteger {
 		strValue, isString := value.(string)
 		if !isString {
-			return nil, fmt.Errorf("value  '%[1]v', type %[1]T is not a string", value)
+			return nil, fmt.Errorf("value '%[1]v', type %[1]T is not a string", value)
 		}
 		v, err := strconv.ParseInt(strValue, 10, 64)
 		if err != nil {

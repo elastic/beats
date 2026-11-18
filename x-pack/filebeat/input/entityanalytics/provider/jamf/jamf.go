@@ -11,8 +11,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
 	"net/http"
 	"net/url"
+	"slices"
 	"strconv"
 	"time"
 
@@ -33,7 +35,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/jamf/internal/jamf"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
-	"github.com/elastic/go-concert/ctxtool"
 )
 
 func init() {
@@ -118,7 +119,7 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	}
 
 	var err error
-	p.client, err = newClient(ctxtool.FromCanceller(inputCtx.Cancelation), p.cfg, p.logger)
+	p.client, err = newClient(inputCtx.Cancelation, p.cfg, p.logger)
 	if err != nil {
 		return err
 	}
@@ -262,8 +263,15 @@ func checkRedirect(cfg *requestConfig, log *logp.Logger) func(*http.Request, []*
 
 		prev := via[len(via)-1] // previous request to get headers from
 
-		log.Debugf("http client: forwarding headers from previous request: %#v", prev.Header)
+		log.Debugf("http client: forwarding headers from previous request: %v", slices.Sorted(maps.Keys(prev.Header)))
 		req.Header = prev.Header.Clone()
+
+		if req.URL.Host != prev.URL.Host || (prev.URL.Scheme == "https" && req.URL.Scheme == "http") {
+			for _, k := range sensitiveHeaders(cfg.RedirectSensitiveHeaders) {
+				log.Debugf("http client: cross-origin redirect to %s: removing sensitive header %s", req.URL.Host, k)
+				req.Header.Del(k)
+			}
+		}
 
 		for _, k := range cfg.RedirectHeadersBanList {
 			log.Debugf("http client: ban header %v", k)
@@ -272,6 +280,22 @@ func checkRedirect(cfg *requestConfig, log *logp.Logger) func(*http.Request, []*
 
 		return nil
 	}
+}
+
+// defaultSensitiveHeaders are removed on cross-origin redirects when
+// redirect.sensitive_headers is not configured. The default is applied here
+// rather than in defaultConfig because go-ucfg merges a configured list into
+// a default list element by element, so a configured list could not replace
+// the defaults and an empty list could not disable them.
+var defaultSensitiveHeaders = []string{"Authorization", "Proxy-Authorization", "Cookie"}
+
+// sensitiveHeaders returns the configured headers, or the defaults if the
+// option is unset. An empty, non-nil list disables stripping.
+func sensitiveHeaders(configured []string) []string {
+	if configured == nil {
+		return defaultSensitiveHeaders
+	}
+	return configured
 }
 
 // retryLog is a shim for the retryablehttp.Client.Logger.
@@ -306,7 +330,7 @@ func (p *jamfInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, clien
 		}
 	}()
 
-	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
+	ctx := inputCtx.Cancelation
 	p.logger.Debugf("Starting fetch...")
 	_, err = p.doFetchComputers(ctx, state, true)
 	if err != nil {
@@ -358,7 +382,7 @@ func (p *jamfInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Sto
 		}
 	}()
 
-	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
+	ctx := inputCtx.Cancelation
 	updatedDevices, err := p.doFetchComputers(ctx, state, false)
 	if err != nil {
 		return err
