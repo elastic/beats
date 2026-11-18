@@ -6,53 +6,78 @@ package kvstore
 
 import (
 	"context"
-	"sync/atomic"
+	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 )
 
 // TxTracker implements a transaction tracker. Individual beat events which
-// compose a transaction can be added to a pending count via Ack. As events are
+// compose a transaction are added to a pending count with Add. As events are
 // ACK-ed, the pending count is decremented (see NewTxACKHandler). Calling Wait
-// will block until all events are ACK-ed or the parent context is cancelled.
+// after the last Add will block until all events are ACK-ed or the parent
+// context is cancelled.
+//
+// The pending count may reach zero while events are still being published,
+// so reaching zero only releases Wait once Wait has been called.
 type TxTracker struct {
-	pending atomic.Int64
-	ctx     context.Context
-	cancel  context.CancelFunc
-}
+	ctx context.Context
 
-// Add increments the pending count.
-func (t *TxTracker) Add() {
-	t.pending.Add(1)
-}
-
-// Ack decrements the pending count. If pending goes to zero, then the
-// context on TxTracker is cancelled.
-func (t *TxTracker) Ack() {
-	if t.pending.Add(-1) == 0 {
-		t.cancel()
-	}
-}
-
-// Wait will block until the pending count is 0. If pending is zero, then
-// the context on TxTracker is cancelled.
-func (t *TxTracker) Wait() {
-	if t.pending.Load() == 0 {
-		t.cancel()
-	}
-
-	<-t.ctx.Done()
+	mu      sync.Mutex
+	pending int64
+	waiting bool
+	done    chan struct{} // closed when pending is zero after Wait is called
 }
 
 // NewTxTracker will create a new TxTracker using the provided context. It
 // is recommended that the parent context has a way of being cancelled,
-// otherwise a call to TxTracker.Wait may not be interruptable.
+// otherwise a call to TxTracker.Wait may not be interruptible.
 func NewTxTracker(ctx context.Context) *TxTracker {
-	t := TxTracker{}
-	t.ctx, t.cancel = context.WithCancel(ctx)
+	return &TxTracker{ctx: ctx, done: make(chan struct{})}
+}
 
-	return &t
+// Add increments the pending count.
+func (t *TxTracker) Add() {
+	t.mu.Lock()
+	t.pending++
+	t.mu.Unlock()
+}
+
+// Ack decrements the pending count. If Wait has been called and pending
+// goes to zero, Wait is released.
+func (t *TxTracker) Ack() {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	t.pending--
+	if t.waiting && t.pending == 0 {
+		t.release()
+	}
+}
+
+// Wait blocks until the pending count is 0 or the parent context is
+// cancelled. It must be called after the last call to Add.
+func (t *TxTracker) Wait() {
+	t.mu.Lock()
+	t.waiting = true
+	if t.pending == 0 {
+		t.release()
+	}
+	t.mu.Unlock()
+
+	select {
+	case <-t.done:
+	case <-t.ctx.Done():
+	}
+}
+
+// release closes t.done if it is not already closed. It must be called
+// with t.mu held.
+func (t *TxTracker) release() {
+	select {
+	case <-t.done:
+	default:
+		close(t.done)
+	}
 }
 
 // NewTxACKHandler creates a new beat.EventListener. As events are ACK-ed and if the event
