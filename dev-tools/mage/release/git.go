@@ -136,7 +136,6 @@ func (g *gitRepo) ensureBranchFrom(baseBranch, branchName string) error {
 	return g.checkoutBranch(branchName)
 }
 
-
 // checkoutBranch checks out an existing branch.
 // It is idempotent when the branch is already checked out.
 func (g *gitRepo) checkoutBranch(branchName string) error {
@@ -429,4 +428,3 @@ func (g *gitRepo) isClean() (bool, error) {
 
 	return status.IsClean(), nil
 }
-
