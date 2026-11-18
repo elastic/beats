@@ -126,7 +126,7 @@ When using `managed_identity` authentication, the managed identity must have the
 stack: ga 9.7
 ```
 
-For deployment prerequisites and identity settings, refer to [Workload identity federation](#_workload_identity).
+For the prerequisites and the identity settings you need to set, refer to [Workload identity federation](#_workload_identity).
 
 ```yaml
 filebeat.inputs:
@@ -163,10 +163,10 @@ Use workload identity federation to read Event Hubs and write Blob checkpoints f
 
 Before starting {{filebeat}}:
 
-1. Configure an Entra app registration or user-assigned managed identity to trust your cluster's OIDC issuer, service account subject, and token audience. For setup instructions, refer to [Configure an app to trust an external identity provider](https://learn.microsoft.com/en-us/entra/workload-id/workload-identity-federation-create-trust).
-2. Project a Kubernetes service account token with audience `api://AzureADTokenExchange` into the {{filebeat}} container. Kubernetes must rotate this file as tokens expire. Keep the file mounted for the lifetime of the input.
+1. Configure an Entra app registration or user-assigned managed identity to trust your cluster's OpenID Connect (OIDC) issuer, service account subject, and token audience. For setup instructions, refer to [Configure an app to trust an external identity provider](https://learn.microsoft.com/en-us/entra/workload-id/workload-identity-federation-create-trust).
+2. Project a Kubernetes service account token with audience `api://AzureADTokenExchange` into the {{filebeat}} container. Kubernetes rotates the file as tokens expire, so keep it mounted for the lifetime of the input.
 3. Grant the identity the [required Event Hubs and Blob Storage permissions](#_required_permissions). The input also attempts to create the checkpoint container if it does not exist. Scope your storage permissions accordingly.
-4. Supply the identity settings below.
+4. Set the identity values in the following table.
 
 For each identity value, provide either the input setting or its environment variable. A nonempty input setting takes precedence.
 
@@ -277,7 +277,7 @@ The Azure Active Directory application (client) ID. Required when using `client_
 stack: ga 9.7
 ```
 
-The path to the projected Kubernetes service account token file inside the {{filebeat}} container. Used only with `auth_type: workload_identity`. For identity settings and deployment prerequisites, refer to [Workload identity federation](#_workload_identity).
+The path to the projected Kubernetes service account token file inside the {{filebeat}} container. Used only with `auth_type: workload_identity`. If you don't set this option, {{filebeat}} reads the path from the `AZURE_FEDERATED_TOKEN_FILE` environment variable. For identity settings and deployment prerequisites, refer to [Workload identity federation](#_workload_identity).
 
 ### `client_secret` [_client_secret]
 
