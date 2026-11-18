@@ -17,8 +17,8 @@ Builds and runs unit tests for **x-pack filebeat** on the configured macOS runne
 ## When it runs
 
 - `workflow_dispatch`.
-- `pull_request`: paths: `["filebeat/**", "x-pack/filebeat/**", "x-pack/libbeat/**", "go.mod", "pytest.ini", "dev-tools/**", "libbeat/**", ".github/workflows/xpack-filebeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
-- `push`: branches: `["main"]`; paths: `["filebeat/**", "x-pack/filebeat/**", "x-pack/libbeat/**", "go.mod", "pytest.ini", "dev-tools/**", "libbeat/**", ".github/workflows/xpack-filebeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `pull_request`: paths: `["filebeat/**", "x-pack/filebeat/**", "x-pack/libbeat/**", "go.mod", ".python-version", "pytest.ini", "dev-tools/**", "libbeat/**", ".github/workflows/xpack-filebeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `push`: branches: `["main"]`; paths: `["filebeat/**", "x-pack/filebeat/**", "x-pack/libbeat/**", "go.mod", ".python-version", "pytest.ini", "dev-tools/**", "libbeat/**", ".github/workflows/xpack-filebeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
 
 ## Execution flow
 
