@@ -14,7 +14,7 @@ env:
   IMAGE_UBUNTU_2004_X86_64: "platform-ingest-beats-ubuntu-2004-1791307588"
   IMAGE_UBUNTU_2004_ARM64: "platform-ingest-beats-ubuntu-2004-aarch64-1791307588"
   IMAGE_UBUNTU_2204_X86_64: "platform-ingest-beats-ubuntu-2204-1794998613"
-  IMAGE_UBUNTU_2204_ARM64: "platform-ingest-beats-ubuntu-2204-aarch64-1794998613"
+  IMAGE_UBUNTU_2204_ARM64: "platform-ingest-beats-ubuntu-2204-aarch64-1794230330"
   IMAGE_UBUNTU_2404_X86_64: "platform-ingest-beats-ubuntu-2404-1794230330"
   IMAGE_UBUNTU_2404_ARM64: "platform-ingest-beats-ubuntu-2404-aarch64-1794230330"
   IMAGE_WIN_10: "platform-ingest-beats-windows-10-pro"
@@ -101,6 +101,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_2204_X86_64}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "auditbeat/build/*.xml"
@@ -126,6 +127,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_2204_X86_64}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         env:
           FIPS: "true"
@@ -153,6 +155,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_2204_X86_64}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         env:
           FIPS: "true"
@@ -483,6 +486,7 @@ steps:
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_2204_X86_64}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         notify:
           - github_commit_status:

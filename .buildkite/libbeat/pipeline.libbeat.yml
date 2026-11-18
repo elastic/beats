@@ -80,6 +80,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "libbeat/build/*.xml"
@@ -105,6 +106,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         env:
           FIPS: "true"
@@ -133,6 +135,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         env:
           FIPS: "true"
@@ -160,6 +163,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths:
           - "libbeat/build/*.xml"
@@ -220,6 +224,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths: "libbeat/libbeat-stress-test.xml"
         notify:

@@ -3,7 +3,7 @@ name: "beats-xpack-otel"
 
 env:
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1794998613"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1794230330"
 
   IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1794998613"
 
@@ -62,6 +62,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         notify:
           - github_commit_status:
@@ -78,6 +79,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/otel/build/*.xml"

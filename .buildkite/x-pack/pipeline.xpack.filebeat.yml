@@ -3,7 +3,7 @@ name: "beats-xpack-filebeat"
 
 env:
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1794998613"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1794230330"
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
@@ -98,6 +98,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
@@ -123,6 +124,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         env:
           FIPS: "true"
@@ -150,6 +152,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         env:
           FIPS: "true"
@@ -177,6 +180,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
@@ -203,6 +207,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
@@ -237,6 +242,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
@@ -279,6 +285,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
@@ -557,6 +564,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
@@ -602,6 +610,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
@@ -648,6 +657,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
