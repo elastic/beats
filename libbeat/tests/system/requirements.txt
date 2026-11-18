@@ -3,7 +3,7 @@ urllib3==2.6.0
 docker==7.1.0
 async-timeout==4.0.3
 attrs==19.3.0
-autopep8==1.5.4
+autopep8==2.3.2
 backoff==2.2.1
 backports.ssl-match-hostname==3.5.0.1
 bcrypt==4.1.2
@@ -48,7 +48,7 @@ paramiko==3.4.0
 pluggy==0.13.1
 protobuf==3.19.5
 py==1.11.0
-pycodestyle==2.6.0
+pycodestyle==2.15.0
 pycparser==2.21
 PyNaCl==1.5.0
 pyparsing==2.4.7
