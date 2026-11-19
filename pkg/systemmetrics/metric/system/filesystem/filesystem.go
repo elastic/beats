@@ -175,7 +175,7 @@ func avoidFileSystem(logger *logp.Logger, fs FSStat) bool {
 	// Ignore relative mount points, which are present for example
 	// in /proc/mounts on Linux with network namespaces.
 	if !filepath.IsAbs(fs.Directory) {
-		logger.Debug("Filtering filesystem with relative mountpoint %+v", fs)
+		logger.Debugf("Filtering filesystem with relative mountpoint %+v", fs)
 		return false
 	}
 
@@ -190,7 +190,7 @@ func avoidFileSystem(logger *logp.Logger, fs FSStat) bool {
 		// don't count it as it'd be counting again its parent filesystem.
 		devFileInfo, err := os.Stat(fs.Device)
 		if err != nil {
-			logger.Debug("error stating filesystem: %s", err)
+			logger.Debugf("error stating filesystem: %s", err)
 		}
 		if devFileInfo != nil && devFileInfo.IsDir() {
 			return false
