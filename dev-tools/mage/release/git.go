@@ -33,7 +33,6 @@ import (
 	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/cache"
-	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/storage/filesystem"
 )
 
@@ -44,6 +43,10 @@ const (
 	// pushWaitDelay bounds CombinedOutput after context cancel when a git
 	// helper (for example git-remote-http) keeps an I/O pipe open.
 	pushWaitDelay = 10 * time.Second
+	// worktreeCmdTimeout bounds git checkout/status/add/commit used instead of
+	// go-git on Buildkite reference clones. go-git Status/Checkout can take tens
+	// of minutes on large trees with object alternates.
+	worktreeCmdTimeout = 10 * time.Minute
 )
 
 // gitRepo wraps go-git Repository with helper methods.
@@ -136,8 +139,18 @@ func (g *gitRepo) ensureBranchFrom(baseBranch, branchName string) error {
 	return g.checkoutBranch(branchName)
 }
 
-// checkoutBranch checks out an existing branch.
-// It is idempotent when the branch is already checked out.
+// runGit runs git in the repository path with a deadline (Buildkite-safe).
+func (g *gitRepo) runGit(ctx context.Context, args ...string) ([]byte, error) {
+	cmd := exec.CommandContext(ctx, "git", args...)
+	cmd.WaitDelay = pushWaitDelay
+	cmd.Dir = g.path
+	return cmd.CombinedOutput()
+}
+
+// checkoutBranch checks out an existing branch via the git CLI.
+// It is idempotent when the branch is already checked out. go-git Checkout is
+// avoided: with Buildkite reference clones it can take tens of minutes on large
+// trees (see ingest-release-smoke beats timeout on observability-robots).
 func (g *gitRepo) checkoutBranch(branchName string) error {
 	currentBranch, err := g.getCurrentBranch()
 	if err == nil && currentBranch == branchName {
@@ -145,58 +158,67 @@ func (g *gitRepo) checkoutBranch(branchName string) error {
 		return nil
 	}
 
-	w, err := g.repo.Worktree()
-	if err != nil {
-		return fmt.Errorf("failed to get worktree: %w", err)
-	}
+	ctx, cancel := context.WithTimeout(context.Background(), worktreeCmdTimeout)
+	defer cancel()
 
-	err = w.Checkout(&git.CheckoutOptions{
-		Branch: plumbing.NewBranchReferenceName(branchName),
-	})
+	output, err := g.runGit(ctx, "checkout", branchName)
 	if err != nil {
-		return fmt.Errorf("failed to checkout branch %s: %w", branchName, err)
+		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			return fmt.Errorf("failed to checkout branch %s: timed out after %s: %w", branchName, worktreeCmdTimeout, err)
+		}
+		return fmt.Errorf("failed to checkout branch %s: %w: %s", branchName, err, strings.TrimSpace(string(output)))
 	}
 
 	fmt.Printf("Checked out branch: %s\n", branchName)
 	return nil
 }
 
-// commitAll stages all changes and creates a commit.
+// commitAll stages all changes and creates a commit via the git CLI.
 // It is idempotent and returns committed=false when there is nothing to commit.
+// go-git AddGlob/Status/Commit are avoided for the same reference-clone cost as
+// checkoutBranch.
 func (g *gitRepo) commitAll(message, authorName, authorEmail string) (bool, error) {
-	w, err := g.repo.Worktree()
-	if err != nil {
-		return false, fmt.Errorf("failed to get worktree: %w", err)
+	ctx, cancel := context.WithTimeout(context.Background(), worktreeCmdTimeout)
+	defer cancel()
+
+	if output, err := g.runGit(ctx, "add", "-A"); err != nil {
+		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			return false, fmt.Errorf("failed to stage changes: timed out after %s: %w", worktreeCmdTimeout, err)
+		}
+		return false, fmt.Errorf("failed to stage changes: %w: %s", err, strings.TrimSpace(string(output)))
 	}
 
-	// Add all changes
-	err = w.AddGlob(".")
+	statusOut, err := g.runGit(ctx, "status", "--porcelain")
 	if err != nil {
-		return false, fmt.Errorf("failed to stage changes: %w", err)
+		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			return false, fmt.Errorf("failed to get status: timed out after %s: %w", worktreeCmdTimeout, err)
+		}
+		return false, fmt.Errorf("failed to get status: %w: %s", err, strings.TrimSpace(string(statusOut)))
 	}
-
-	status, err := w.Status()
-	if err != nil {
-		return false, fmt.Errorf("failed to get status: %w", err)
-	}
-	if status.IsClean() {
+	if len(strings.TrimSpace(string(statusOut))) == 0 {
 		fmt.Println("No changes to commit")
 		return false, nil
 	}
 
-	// Create commit
-	commit, err := w.Commit(message, &git.CommitOptions{
-		Author: &object.Signature{
-			Name:  authorName,
-			Email: authorEmail,
-			When:  time.Now(),
-		},
-	})
+	commitOut, err := g.runGit(ctx,
+		"-c", "user.name="+authorName,
+		"-c", "user.email="+authorEmail,
+		"commit",
+		"--author", authorName+" <"+authorEmail+">",
+		"-m", message,
+	)
 	if err != nil {
-		return false, fmt.Errorf("failed to commit: %w", err)
+		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			return false, fmt.Errorf("failed to commit: timed out after %s: %w", worktreeCmdTimeout, err)
+		}
+		return false, fmt.Errorf("failed to commit: %w: %s", err, strings.TrimSpace(string(commitOut)))
 	}
 
-	fmt.Printf("Created commit: %s\n", commit.String())
+	hashOut, err := g.runGit(ctx, "rev-parse", "HEAD")
+	if err != nil {
+		return false, fmt.Errorf("failed to read commit hash: %w: %s", err, strings.TrimSpace(string(hashOut)))
+	}
+	fmt.Printf("Created commit: %s\n", strings.TrimSpace(string(hashOut)))
 	return true, nil
 }
 
@@ -414,17 +436,19 @@ func (g *gitRepo) getCurrentBranch() (string, error) {
 	return headRef.Name().Short(), nil
 }
 
-// isClean checks if the working directory is clean (no uncommitted changes)
+// isClean reports whether the working directory has no uncommitted changes.
+// Uses git status --porcelain; go-git Status is too slow on Buildkite reference
+// clones of large trees (tens of minutes observed on beats smoke).
 func (g *gitRepo) isClean() (bool, error) {
-	w, err := g.repo.Worktree()
-	if err != nil {
-		return false, fmt.Errorf("failed to get worktree: %w", err)
-	}
+	ctx, cancel := context.WithTimeout(context.Background(), worktreeCmdTimeout)
+	defer cancel()
 
-	status, err := w.Status()
+	output, err := g.runGit(ctx, "status", "--porcelain")
 	if err != nil {
-		return false, fmt.Errorf("failed to get status: %w", err)
+		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			return false, fmt.Errorf("failed to get status: timed out after %s: %w", worktreeCmdTimeout, err)
+		}
+		return false, fmt.Errorf("failed to get status: %w: %s", err, strings.TrimSpace(string(output)))
 	}
-
-	return status.IsClean(), nil
+	return len(strings.TrimSpace(string(output))) == 0, nil
 }
