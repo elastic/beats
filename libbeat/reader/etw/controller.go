@@ -69,6 +69,15 @@ func (s *Session) AttachToExistingSession() error {
 	}
 }
 
+// Independent reports whether the session's logging mode includes
+// EVENT_TRACE_INDEPENDENT_SESSION_MODE. After AttachToExistingSession it
+// reflects the mode of the session that was attached to. A session that is
+// not independent loses events when another session enabled for the same
+// provider cannot accept them.
+func (s *Session) Independent() bool {
+	return s.properties != nil && s.properties.LogFileMode&EVENT_TRACE_INDEPENDENT_SESSION_MODE != 0
+}
+
 // CreateRealtimeSession initializes and starts a new real-time ETW session.
 func (s *Session) CreateRealtimeSession() error {
 	// Convert the session name to UTF16 format for Windows API compatibility.
