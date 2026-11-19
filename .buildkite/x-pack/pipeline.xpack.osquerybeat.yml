@@ -101,6 +101,27 @@ steps:
           - github_commit_status:
               context: "x-pack/osquerybeat: Ubuntu x86_64 Unit Tests"
 
+      - label: ":ubuntu: x-pack/osquerybeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
+        key: "mandatory-linux-unit-test-fips-tag"
+        command: |
+          cd x-pack/osquerybeat
+          mage unitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        env:
+          FIPS: "true"
+        artifact_paths:
+          - "x-pack/osquerybeat/build/*.xml"
+          - "x-pack/osquerybeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/osquerybeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
+
       - label: ":ubuntu: x-pack/osquerybeat: Go Integration Tests"
         command: |
           cd x-pack/osquerybeat
