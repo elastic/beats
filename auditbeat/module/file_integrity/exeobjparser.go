@@ -52,6 +52,9 @@ import (
 //	  go_imports_names_entropy
 //	  go_imports_names_var_entropy
 //	  go_stripped
+//
+// The import_hash, imphash, symhash and go_import_hash fields are MD5
+// hashes, and are not available in FIPS builds. The other fields are.
 type exeObjParser map[string]bool
 
 func (fields exeObjParser) Parse(dst mapstr.M, path string) (err error) {
@@ -167,30 +170,34 @@ func (fields exeObjParser) Parse(dst mapstr.M, path string) (err error) {
 		}
 	}
 
-	if wantFields(fields,
+	wantImportHash := wantFields(fields,
 		"file.pe.imphash",
 		"file.macho.symhash",
 		"file."+typ+".import_hash",
+	)
+	if wantImportHash || wantFields(fields,
 		"file."+typ+".imports",
 		"file."+typ+".imports_names_entropy",
 		"file."+typ+".imports_names_var_entropy",
 	) {
-		h, symbols, err := f.ImportHash()
+		h, symbols, err := imports(f, wantImportHash)
 		if err != nil {
 			return err
 		}
-		imphash := Digest(h)
-		if wantFields(fields, "file."+typ+".import_hash") {
-			details["import_hash"] = imphash
-		}
-		switch typ {
-		case "pe":
-			if wantFields(fields, "file.pe.imphash") {
-				details["imphash"] = imphash
+		if h != nil {
+			imphash := Digest(h)
+			if wantFields(fields, "file."+typ+".import_hash") {
+				details["import_hash"] = imphash
 			}
-		case "macho":
-			if wantFields(fields, "file.macho.symhash") {
-				details["symhash"] = imphash
+			switch typ {
+			case "pe":
+				if wantFields(fields, "file.pe.imphash") {
+					details["imphash"] = imphash
+				}
+			case "macho":
+				if wantFields(fields, "file.macho.symhash") {
+					details["symhash"] = imphash
+				}
 			}
 		}
 		if len(symbols) != 0 {
@@ -211,20 +218,19 @@ func (fields exeObjParser) Parse(dst mapstr.M, path string) (err error) {
 		}
 	}
 
-	if wantFields(fields,
-		"file."+typ+".go_import_hash",
+	wantGoImportHash := wantFields(fields, "file."+typ+".go_import_hash")
+	if wantGoImportHash || wantFields(fields,
 		"file."+typ+".go_imports",
 		"file."+typ+".go_imports_names_entropy",
 		"file."+typ+".go_imports_names_var_entropy",
 	) {
-		h, symbols, err := f.GoSymbolHash(false)
-		if err != nil {
-			if err == toutoumomoma.ErrNotGoExecutable {
-				return nil
-			}
+		// A non-Go executable has no Go symbols, but later fields
+		// may still apply, so continue with nil h and symbols.
+		h, symbols, err := goSymbols(f, wantGoImportHash)
+		if err != nil && !errors.Is(err, toutoumomoma.ErrNotGoExecutable) {
 			return err
 		}
-		if wantFields(fields, "file."+typ+".go_import_hash") {
+		if h != nil {
 			details["go_import_hash"] = Digest(h)
 		}
 		if len(symbols) != 0 {
@@ -232,7 +238,7 @@ func (fields exeObjParser) Parse(dst mapstr.M, path string) (err error) {
 				details["go_imports"] = symbols
 			}
 			wantEntropy := wantFields(fields, "file."+typ+".go_imports_names_entropy")
-			wantVariance := wantFields(fields, "file."+typ+".go_imports_names_variance")
+			wantVariance := wantFields(fields, "file."+typ+".go_imports_names_var_entropy")
 			if wantEntropy || wantVariance {
 				entropy, varEntropy := toutoumomoma.NameEntropy(symbols)
 				if wantEntropy {
@@ -254,6 +260,34 @@ func (fields exeObjParser) Parse(dst mapstr.M, path string) (err error) {
 	}
 
 	return nil
+}
+
+// imports returns the dynamic imports of f and, if hash is true, their
+// import hash. The hash is nil if hash is false or if the hash is not
+// available, as is the case in FIPS builds where MD5 cannot be used.
+func imports(f *toutoumomoma.File, hash bool) (h []byte, symbols []string, err error) {
+	if hash {
+		h, symbols, err = f.ImportHash()
+		if !errors.Is(err, errors.ErrUnsupported) {
+			return h, symbols, err
+		}
+	}
+	symbols, err = f.Imports()
+	return nil, symbols, err
+}
+
+// goSymbols returns the third-party Go symbols of f and, if hash is true,
+// their symbol hash. The hash is nil if hash is false or if the hash is not
+// available, as is the case in FIPS builds where MD5 cannot be used.
+func goSymbols(f *toutoumomoma.File, hash bool) (h []byte, symbols []string, err error) {
+	if hash {
+		h, symbols, err = f.GoSymbolHash(false)
+		if !errors.Is(err, errors.ErrUnsupported) {
+			return h, symbols, err
+		}
+	}
+	symbols, err = f.GoSymbols(false)
+	return nil, symbols, err
 }
 
 type objSection struct {
