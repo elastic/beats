@@ -5,9 +5,16 @@
 package entityanalytics
 
 import (
+	"bytes"
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"log/slog"
+	"net/http"
+	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -19,6 +26,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/pkg/paths"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
@@ -135,7 +143,7 @@ func TestMinimalInput_RunSync_FullCycle(t *testing.T) {
 		v2.Context{
 			Logger:      log,
 			ID:          "test-input-1",
-			Cancelation: v2.GoContextFromCanceler(ctx),
+			Cancelation: ctx,
 		},
 		prov,
 		ackClient,
@@ -209,7 +217,7 @@ func TestMinimalInput_RunSync_ErrorDiscardsBuffer(t *testing.T) {
 		v2.Context{
 			Logger:      log,
 			ID:          "test-input-err",
-			Cancelation: v2.GoContextFromCanceler(ctx),
+			Cancelation: ctx,
 		},
 		prov,
 		ackClient,
@@ -227,6 +235,115 @@ func TestMinimalInput_RunSync_ErrorDiscardsBuffer(t *testing.T) {
 	})
 	if txErr == nil {
 		t.Fatal("cursor should not exist after failed sync, but Get succeeded")
+	}
+}
+
+// TestMinimalInput_RunSync_WaitsForLastACK checks that state is not
+// committed while an event is unacknowledged, even when every event
+// published earlier in the sync has already been acknowledged.
+func TestMinimalInput_RunSync_WaitsForLastACK(t *testing.T) {
+	t.Parallel()
+
+	log := logptest.NewTestingLogger(t, "test")
+	store, err := kvstore.NewStore(log, filepath.Join(t.TempDir(), "test.db"), 0o600)
+	if err != nil {
+		t.Fatalf("NewStore: %v", err)
+	}
+	defer store.Close()
+
+	client := &holdingClient{}
+	bucketName := "entcollect.testprov"
+
+	// Start from the state an earlier sync left behind.
+	err = store.RunTransaction(true, func(tx *kvstore.Transaction) error {
+		return kvstore.NewEntcollectStore(tx, bucketName).Set("cursor", "page-1")
+	})
+	if err != nil {
+		t.Fatalf("seeding cursor: %v", err)
+	}
+
+	user := func(id string) entcollect.Document {
+		return entcollect.Document{
+			ID:        id,
+			Kind:      entcollect.KindUser,
+			Action:    entcollect.ActionDiscovered,
+			Timestamp: time.Now(),
+		}
+	}
+	published := make(chan struct{})
+	prov := &fakeProvider{
+		fullFunc: func(ctx context.Context, s entcollect.Store, pub entcollect.Publisher, log *slog.Logger) error {
+			if err := pub(ctx, user("user-1")); err != nil {
+				return err
+			}
+			// The output acknowledges everything published so far
+			// while the sync is still running.
+			client.ackAll()
+			if err := s.Set("cursor", "page-2"); err != nil {
+				return err
+			}
+			defer close(published)
+			return pub(ctx, user("user-2"))
+		},
+	}
+
+	s := &bboltSyncer{store: store, bucketName: bucketName}
+	done := make(chan error, 1)
+	go func() {
+		done <- s.runSync(
+			v2.Context{
+				Logger:      log,
+				ID:          "test-input-late-ack",
+				Cancelation: t.Context(),
+			},
+			prov,
+			client,
+			slogLogger(log),
+			true,
+		)
+	}()
+
+	select {
+	case <-published:
+	case <-time.After(5 * time.Second):
+		t.Fatal("sync did not publish its last event")
+	}
+	// Give runSync time to commit, which it must not do yet.
+	select {
+	case err := <-done:
+		t.Fatalf("runSync returned %v before the last event was acknowledged", err)
+	case <-time.After(100 * time.Millisecond):
+	}
+	readCursor := func() (string, error) {
+		var cursor string
+		err := store.RunTransaction(false, func(tx *kvstore.Transaction) error {
+			return tx.Get([]byte(bucketName), []byte("cursor"), &cursor)
+		})
+		return cursor, err
+	}
+	cursor, err := readCursor()
+	if err != nil {
+		t.Fatalf("reading cursor: %v", err)
+	}
+	if cursor != "page-1" {
+		t.Errorf("cursor = %q before the last event was acknowledged; want %q", cursor, "page-1")
+	}
+
+	client.ackAll()
+	select {
+	case err := <-done:
+		if err != nil {
+			t.Fatalf("runSync: %v", err)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("runSync did not return after the last event was acknowledged")
+	}
+	cursor, err = readCursor()
+	if err != nil {
+		t.Fatalf("reading cursor: %v", err)
+	}
+	if cursor != "page-2" {
+		t.Errorf("cursor = %q; want %q", cursor, "page-2")
 	}
 }
 
@@ -256,7 +373,7 @@ func TestMinimalInput_RunCancelation(t *testing.T) {
 			v2.Context{
 				Logger:      logptest.NewTestingLogger(t, "test"),
 				ID:          "test-cancel",
-				Cancelation: v2.GoContextFromCanceler(ctx),
+				Cancelation: ctx,
 			},
 			connector,
 		)
@@ -504,7 +621,7 @@ func runUntil(t *testing.T, mi *minimalStateInput, done func([]statusUpdate) boo
 			v2.Context{
 				Logger:      logptest.NewTestingLogger(t, "test"),
 				ID:          "test-" + t.Name(),
-				Cancelation: v2.GoContextFromCanceler(ctx),
+				Cancelation: ctx,
 			}.WithStatusReporter(reporter),
 			&fakeConnector{client: &ackingClient{inner: &fakeClient{}}},
 		)
@@ -586,3 +703,232 @@ func (c *ackingClient) PublishAll(events []beat.Event) {
 }
 
 func (c *ackingClient) Close() error { return nil }
+
+// TestMinimalInput_RequestTracer creates minimal-state inputs from
+// configurations like those users and the Fleet integrations send, runs
+// each against test TLS servers that need ssl.verification_mode: none,
+// and checks that the configured client is used, that requests are
+// written to the input's trace file in the logs directory, and that
+// credentials are not.
+func TestMinimalInput_RequestTracer(t *testing.T) {
+	t.Run("jamf", func(t *testing.T) {
+		fixture := newAtomicFixture(makeComputersJSON(t,
+			testComputer{Name: "laptop", UDID: "TRACE-1", Managed: true},
+		))
+		srv := startJamfIntegServer(t, fixture)
+		cfg := fmt.Sprintf(`
+provider: jamf
+use_minimal_state: true
+jamf_tenant: %s
+jamf_username: testuser
+jamf_password: testpass
+request.ssl.verification_mode: none
+tracer.filename: "../../logs/jamf/http-request-trace-*.ndjson"
+`, hostFromURL(t, srv.URL))
+		// The input may be run again after a restart of its runner;
+		// each run must trace each request once.
+		trace := runTracedInput(t, cfg, "jamf", "/api/preview/computers", 2)
+		// Jamf sends the credentials as HTTP basic auth.
+		creds := base64.StdEncoding.EncodeToString([]byte("testuser:testpass"))
+		if bytes.Contains(trace, []byte(creds)) {
+			t.Errorf("trace records the credentials:\n%s", trace)
+		}
+	})
+
+	t.Run("azure-ad", func(t *testing.T) {
+		login := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			_ = json.NewEncoder(w).Encode(map[string]any{"access_token": "ACCESS-TOKEN-VALUE", "token_type": "Bearer", "expires_in": 3600})
+		}))
+		defer login.Close()
+		var graphURL string
+		graph := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			resp := map[string]any{"value": []any{}}
+			if strings.HasSuffix(r.URL.Path, "/delta") {
+				resp["@odata.deltaLink"] = graphURL + r.URL.Path + "?$deltatoken=x"
+			}
+			_ = json.NewEncoder(w).Encode(resp)
+		}))
+		defer graph.Close()
+		graphURL = graph.URL
+		// Rendered from the entityanalytics_entra_id template with
+		// minimal state, the request tracer, an ssl block and the
+		// direct reports option enabled.
+		cfg := fmt.Sprintf(`
+provider: azure-ad
+use_minimal_state: true
+tracer.filename: "../../logs/azure-ad/http-request-trace-*.ndjson"
+tracer.maxbackups: 5
+tracer.maxsize: 1
+client_id: test-client
+tenant_id: test-tenant
+secret: SUPER-SECRET-VALUE
+login_endpoint: %s
+api_endpoint: %s/v1.0
+dataset: all
+login_scopes:
+  - https://graph.microsoft.com/.default
+expand.users:
+  - directReports
+ssl:
+  verification_mode: none
+timeout: 30s
+`, login.URL, graph.URL)
+		trace := runTracedInput(t, cfg, "azure-ad", "/v1.0/users/delta", 1)
+		for _, secret := range []string{"SUPER-SECRET-VALUE", "ACCESS-TOKEN-VALUE"} {
+			if bytes.Contains(trace, []byte(secret)) {
+				t.Errorf("trace records %s:\n%s", secret, trace)
+			}
+		}
+	})
+
+	t.Run("okta", func(t *testing.T) {
+		srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			_, _ = w.Write([]byte("[]"))
+		}))
+		defer srv.Close()
+		// Rendered from the entityanalytics_okta template with minimal
+		// state, the request tracer and an ssl block.
+		cfg := fmt.Sprintf(`
+provider: okta
+use_minimal_state: true
+tracer.enabled: true
+tracer.filename: "../../logs/okta/http-request-trace-*.ndjson"
+tracer.maxbackups: 5
+okta_domain: %s
+okta_token: SUPER-SECRET-TOKEN
+dataset: users
+enrich_with:
+  - groups
+request.ssl.verification_mode: none
+`, hostFromURL(t, srv.URL))
+		trace := runTracedInput(t, cfg, "okta", "/api/v1/users", 1)
+		if bytes.Contains(trace, []byte("SUPER-SECRET-TOKEN")) {
+			t.Errorf("trace records the API token:\n%s", trace)
+		}
+	})
+}
+
+// runTracedInput creates an input from the YAML configuration cfg and runs
+// it n times. Each run waits until the trace file for the named provider
+// records one more successful response to a request whose path starts
+// with want, and checks that no sync failed. It returns the trace file
+// contents.
+func runTracedInput(t *testing.T, cfg, name, want string, n int) []byte {
+	t.Helper()
+	c, err := config.NewConfigWithYAML([]byte(cfg), "test")
+	if err != nil {
+		t.Fatalf("parsing config: %v", err)
+	}
+	home := t.TempDir()
+	logs := filepath.Join(home, "logs")
+	log, obs := logptest.NewTestingLoggerWithObserver(t, "")
+	plugin := Plugin(log, nil, &paths.Path{Home: home, Data: filepath.Join(home, "data"), Logs: logs})
+	inp, err := plugin.Manager.Create(c)
+	if err != nil {
+		t.Fatalf("Create: %v", err)
+	}
+
+	const id = "trace-test"
+	trace := filepath.Join(logs, name, "http-request-trace-"+id+".ndjson")
+	var b []byte
+	for run := 1; run <= n; run++ {
+		ctx, cancel := context.WithCancel(t.Context())
+		done := make(chan error, 1)
+		go func() {
+			done <- inp.Run(
+				v2.Context{
+					Logger:        log,
+					ID:            id,
+					IDWithoutName: id,
+					Agent:         beat.Info{Paths: &paths.Path{Logs: logs}},
+					Cancelation:   ctx,
+				},
+				&fakeConnector{client: &fakeClient{}},
+			)
+		}()
+		deadline := time.Now().Add(10 * time.Second)
+		for time.Now().Before(deadline) {
+			b, _ = os.ReadFile(trace)
+			if tracedRequests(b, want) >= run {
+				break
+			}
+			time.Sleep(50 * time.Millisecond)
+		}
+		cancel()
+		if err := <-done; err != nil {
+			t.Errorf("run %d: Run = %v; want nil", run, err)
+		}
+		if errs := obs.FilterMessageSnippet("Error running").All(); len(errs) != 0 {
+			t.Fatalf("run %d: sync failed: %v", run, errs)
+		}
+		if got := tracedRequests(b, want); got != run {
+			t.Fatalf("run %d: trace %s records %d requests to %s; want %d\n%s", run, trace, got, want, run, b)
+		}
+	}
+	return b
+}
+
+// tracedRequests returns the number of 200 responses in trace to requests
+// whose path starts with path. The tracer logs each response after the
+// round trip completes, so a request that failed, for example on a TLS
+// error, is not counted. Responses are matched to their requests by
+// transaction ID.
+func tracedRequests(trace []byte, path string) int {
+	type entry struct {
+		Message string `json:"message"`
+		TxID    string `json:"transaction.id"`
+		Path    string `json:"url.path"`
+		Status  int    `json:"http.response.status_code"`
+	}
+	wanted := make(map[string]bool)
+	var n int
+	for line := range bytes.Lines(trace) {
+		var e entry
+		if json.Unmarshal(line, &e) != nil {
+			continue
+		}
+		switch e.Message {
+		case "HTTP request":
+			wanted[e.TxID] = strings.HasPrefix(e.Path, path)
+		case "HTTP response":
+			if wanted[e.TxID] && e.Status == http.StatusOK {
+				n++
+			}
+		}
+	}
+	return n
+}
+
+// holdingClient holds published events until ackAll is called, as an
+// output with events in flight does.
+type holdingClient struct {
+	mu      sync.Mutex
+	pending []beat.Event
+}
+
+func (c *holdingClient) Publish(event beat.Event) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.pending = append(c.pending, event)
+}
+
+func (c *holdingClient) PublishAll(events []beat.Event) {
+	for _, e := range events {
+		c.Publish(e)
+	}
+}
+
+func (c *holdingClient) Close() error { return nil }
+
+// ackAll acknowledges every event published since the last call.
+func (c *holdingClient) ackAll() {
+	c.mu.Lock()
+	events := c.pending
+	c.pending = nil
+	c.mu.Unlock()
+	for _, e := range events {
+		if t, ok := e.Private.(*kvstore.TxTracker); ok {
+			t.Ack()
+		}
+	}
+}

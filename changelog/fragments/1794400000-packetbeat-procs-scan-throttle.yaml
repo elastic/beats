@@ -1,0 +1,12 @@
+kind: bug-fix
+summary: Limit how often Packetbeat process enrichment scans /proc.
+description: >-
+  Each lookup miss used to walk every file descriptor of every process on the
+  host, which could saturate the sniffer. On Linux the walk is now skipped when
+  the socket table shows no open socket on the port. Lookups are also spaced so
+  that, for each transport, they take about a tenth of the time, and
+  max_proc_read_freq can add a fixed minimum interval between full scans. A
+  connection opened and closed between scans may be published without process
+  information. Mappings confirmed by a scan stay valid for at least 10s after
+  that scan, and on Linux vanished PIDs are logged at debug level.
+component: packetbeat
