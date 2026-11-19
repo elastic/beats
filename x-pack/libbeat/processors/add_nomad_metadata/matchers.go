@@ -48,13 +48,13 @@ func NewMatchers(configs PluginConfig, logger *logp.Logger) *Matchers {
 		for name, pluginConfig := range pluginConfigs {
 			matchFunc := Indexing.GetMatcher(name)
 			if matchFunc == nil {
-				logger.Warn("Unable to find matcher plugin %s", name)
+				logger.Warnf("Unable to find matcher plugin %s", name)
 				continue
 			}
 
 			matcher, err := matchFunc(pluginConfig, logger)
 			if err != nil {
-				logger.Warn("Unable to initialize matcher plugin %s due to error %v", name, err)
+				logger.Warnf("Unable to initialize matcher plugin %s due to error %v", name, err)
 				continue
 			}
 
@@ -167,7 +167,7 @@ func (f *FieldFormatMatcher) MetadataIndex(event mapstr.M) string {
 	})
 
 	if err != nil {
-		f.logger.Named("nomand").Debugf("Unable to apply field format pattern on event")
+		f.logger.Named("nomand").Debug("Unable to apply field format pattern on event")
 	}
 
 	if len(bytes) == 0 {
