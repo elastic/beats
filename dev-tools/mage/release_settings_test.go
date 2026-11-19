@@ -43,7 +43,7 @@ func TestInferLatestRelease(t *testing.T) {
 				return
 			}
 			require.NoError(t, err)
-			require.Equal(t, tt.want, InferLatestRelease(parsed))
+			require.Equal(t, tt.want, VersionString(InferLatestRelease(parsed)))
 		})
 	}
 }
@@ -57,7 +57,7 @@ func TestInferReleaseBranch(t *testing.T) {
 func TestInferNextProjectMinorVersion(t *testing.T) {
 	parsed, err := ParseReleaseVersion("9.5.0")
 	require.NoError(t, err)
-	require.Equal(t, "9.6.0", InferNextProjectMinorVersion(parsed))
+	require.Equal(t, "9.6.0", VersionString(InferNextProjectMinorVersion(parsed)))
 }
 
 func TestLoadReleaseSettingsRequiresNextForRelease(t *testing.T) {

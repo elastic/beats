@@ -112,7 +112,7 @@ func UpdateDocs(newVersion string) error {
 	if err != nil {
 		return err
 	}
-	releaseBranch := inferReleaseBranch(parsed.String())
+	releaseBranch := devtools.InferReleaseBranch(parsed)
 	return updateDocsWithOptions(docsUpdateOptions{
 		BaseBranch:     releaseBranch,
 		CurrentVersion: newVersion,
@@ -131,7 +131,7 @@ func updateDocsWithOptions(opts docsUpdateOptions) error {
 		if err != nil {
 			return err
 		}
-		opts.ReleaseBranch = inferReleaseBranch(parsed.String())
+		opts.ReleaseBranch = devtools.InferReleaseBranch(parsed)
 	}
 	if opts.BaseBranch == "" {
 		opts.BaseBranch = opts.ReleaseBranch

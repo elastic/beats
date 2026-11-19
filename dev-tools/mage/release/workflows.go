@@ -19,9 +19,10 @@ package release
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/google/go-github/v68/github"
+
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
 // PR label sets match elastic-vault-github-plugin-prod release PRs (e.g. #48155, #49435).
@@ -61,25 +62,15 @@ func patchVersionBumpLabels() []string {
 
 // checkRequirements validates prerequisites before running a release workflow
 func checkRequirements(cfg *ReleaseConfig) error {
-	// Block deprecated releases (6.x, 7.x, 8.x minor releases)
-	version := cfg.NextRelease
-	parts := strings.Split(version, ".")
-	if len(parts) < 2 {
-		return fmt.Errorf("invalid version format: %s", version)
+	if err := cfg.EnsureParsedVersions(); err != nil {
+		return err
 	}
 
-	major := parts[0]
-	patch := ""
-	if len(parts) >= 3 {
-		patch = parts[2]
+	v := cfg.NextReleaseVersion
+	if (v.Major() == 6 || v.Major() == 7 || v.Major() == 8) && v.Patch() == 0 {
+		return fmt.Errorf("minor releases for version %d.x are deprecated and blocked", v.Major())
 	}
 
-	// Block minor releases for versions 6.x, 7.x, 8.x
-	if (major == "6" || major == "7" || major == "8") && patch == "0" {
-		return fmt.Errorf("minor releases for version %s.x are deprecated and blocked", major)
-	}
-
-	// Check if repository is clean
 	repo, err := openRepo(".")
 	if err != nil {
 		return err
@@ -432,7 +423,7 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 	}
 
 	if cfg.ReleaseBranch == "" {
-		cfg.ReleaseBranch = inferReleaseBranch(cfg.NextRelease)
+		cfg.ReleaseBranch = devtools.InferReleaseBranch(cfg.NextReleaseVersion)
 	}
 
 	if err := ensurePatchBranchReadyForBump(repo, cfg); err != nil {
@@ -474,17 +465,18 @@ func RunPatchRelease(cfg *ReleaseConfig) error {
 // NEXT_RELEASE (the version to land). Forces LatestRelease to that previous
 // patch for test-env (branch-local), matching ingest-dev define-versions patch.
 func ensurePatchBranchReadyForBump(repo *gitRepo, cfg *ReleaseConfig) error {
-	prev, err := inferLatestRelease(cfg.NextRelease)
-	if err != nil {
+	if err := cfg.EnsureParsedVersions(); err != nil {
 		return err
 	}
-	if prev == "" {
+	prev := devtools.InferLatestRelease(cfg.NextReleaseVersion)
+	if prev == nil {
 		return fmt.Errorf(
 			"prepare-next-patch requires NEXT_RELEASE with patch > 0 (got %s)",
 			cfg.NextRelease,
 		)
 	}
-	cfg.LatestRelease = prev
+	cfg.LatestReleaseVersion = prev
+	cfg.LatestRelease = prev.String()
 
 	if err := repo.checkoutBranch(cfg.ReleaseBranch); err != nil {
 		return err
@@ -499,11 +491,11 @@ func ensurePatchBranchReadyForBump(repo *gitRepo, cfg *ReleaseConfig) error {
 			cfg.NextRelease, cfg.ReleaseBranch,
 		)
 	}
-	if branchVersion != prev {
+	if branchVersion != cfg.LatestRelease {
 		return fmt.Errorf(
 			"NEXT_RELEASE=%s expects version %s on branch %s (got %s in libbeat/version/version.go); "+
 				"set NEXT_RELEASE to the version to land (NEW_VERSION from version-bump)",
-			cfg.NextRelease, prev, cfg.ReleaseBranch, branchVersion,
+			cfg.NextRelease, cfg.LatestRelease, cfg.ReleaseBranch, branchVersion,
 		)
 	}
 	fmt.Printf("Verified branch %s is at %s; will bump to NEXT_RELEASE=%s\n", cfg.ReleaseBranch, branchVersion, cfg.NextRelease)

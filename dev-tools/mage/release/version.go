@@ -30,6 +30,7 @@ func parseReleaseVersion(raw string) (*semver.Version, error) {
 }
 
 // selectLatestReleaseBefore picks the highest same-major version strictly less than current.
+// GitHub release tags are external input, so they are parsed here at the boundary.
 func selectLatestReleaseBefore(versions []string, currentVersion string) (string, error) {
 	current, err := parseReleaseVersion(currentVersion)
 	if err != nil {
@@ -56,20 +57,4 @@ func selectLatestReleaseBefore(versions []string, currentVersion string) (string
 		return "", fmt.Errorf("no published release found before %s (same major)", currentVersion)
 	}
 	return best.String(), nil
-}
-
-func inferReleaseBranch(nextRelease string) string {
-	v, err := parseReleaseVersion(nextRelease)
-	if err != nil {
-		return ""
-	}
-	return devtools.InferReleaseBranch(v)
-}
-
-func inferLatestRelease(nextRelease string) (string, error) {
-	v, err := parseReleaseVersion(nextRelease)
-	if err != nil {
-		return "", err
-	}
-	return devtools.InferLatestRelease(v), nil
 }
