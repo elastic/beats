@@ -460,13 +460,8 @@ github.com/fortytw2/leaktest v1.3.0 h1:u8491cBMTQ8ft8aeV+adlcytMZylmA5nnwwkRZjI8
 github.com/fortytw2/leaktest v1.3.0/go.mod h1:jDsjWgpAGjm2CA7WthBh/CdZYEPF31XHquHwclZch5g=
 github.com/foxboron/go-tpm-keyfiles v0.0.0-20260902202739-8c9c2d1005f4 h1:zqtQvVnFZ71RsyDMNVAaWf4g2OVEDH5LDs26MZFHy7s=
 github.com/foxboron/go-tpm-keyfiles v0.0.0-20260902202739-8c9c2d1005f4/go.mod h1:wxFx38LbEL4RF0JH6PR3lf7ZJ6ZO0yQWQstLCTQQNjA=
-<<<<<<< HEAD
 github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15 h1:nLPjjvpUAODOR6vY/7o0hBIk8iTr19Fvmf8aFx/kC7A=
 github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15/go.mod h1:tPg4cp4nseejPd+UKxtCVQ2hUxNTZ7qQZJa7CLriIeo=
-github.com/frankban/quicktest v1.14.6 h1:7Xjx+VpznH+oBnejlPUj8oUpdxnVs4f8XU8WnHkI4W8=
-github.com/frankban/quicktest v1.14.6/go.mod h1:4ptaffx2x8+WTWXmUCuVU6aPUX1/Mz7zb5vbUoiM6w0=
-=======
->>>>>>> 07e4391 (auditbeat/module/file_integrity: allow hash-free executable fields in FIPS builds (#54711))
 github.com/fxamacker/cbor/v2 v2.9.4 h1:xwjVlxEMR3S605oUlgBjKLTTeGFciYPGYCtF/35LKGo=
 github.com/fxamacker/cbor/v2 v2.9.4/go.mod h1:vM4b+DJCtHn+zz7h3FFp/hDAI9WNWCsZj23V5ytsSxQ=
 github.com/go-asn1-ber/asn1-ber v1.5.5/go.mod h1:hEBeB/ic+5LoWskz+yKT7vGhhPYkProFKoKdwZRWMe0=

@@ -110,10 +110,6 @@ func TestExeObjParser(t *testing.T) {
 	}
 }
 
-<<<<<<< HEAD
-func approxHash(format, builder string) func(a, b interface{}) bool {
-	return func(a, b interface{}) bool {
-=======
 // hashAvailable returns whether the build provides the MD5-based import
 // and symbol hash fields.
 func hashAvailable() bool {
@@ -217,9 +213,8 @@ func TestExeObjParserNotGo(t *testing.T) {
 	}
 }
 
-func approxHash(format, builder string) func(a, b any) bool {
-	return func(a, b any) bool {
->>>>>>> 07e4391 (auditbeat/module/file_integrity: allow hash-free executable fields in FIPS builds (#54711))
+func approxHash(format, builder string) func(a, b interface{}) bool {
+	return func(a, b interface{}) bool {
 		as := fmt.Sprint(a)
 		bs := fmt.Sprint(b)
 		if len(as) != len(bs) {

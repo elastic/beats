@@ -177,14 +177,9 @@ require (
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
 	github.com/elastic/sarama v1.19.1-0.20261105163725-10d0ecc585be
 	github.com/elastic/tk-btf v0.3.0
-<<<<<<< HEAD
-	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
+	github.com/elastic/toutoumomoma v0.0.0-20261115195231-8e972b20fa5e
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
 	github.com/go-ldap/ldap/v3 v3.4.8
-=======
-	github.com/elastic/toutoumomoma v0.0.0-20261115195231-8e972b20fa5e
-	github.com/go-ldap/ldap/v3 v3.4.13
->>>>>>> 07e4391 (auditbeat/module/file_integrity: allow hash-free executable fields in FIPS builds (#54711))
 	github.com/go-ole/go-ole v1.3.0
 	github.com/go-resty/resty/v2 v2.17.2
 	github.com/gofrs/uuid/v5 v5.3.2
@@ -271,7 +266,6 @@ require (
 	github.com/evanphx/json-patch/v5 v5.6.0 // indirect
 	github.com/go-openapi/swag/pools v0.29.2 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
-	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/twmb/franz-go v1.22.2 // indirect
 	go.opentelemetry.io/collector/exporter v1.71.0 // indirect
 	go.opentelemetry.io/collector/exporter/exportertest v0.165.0 // indirect
