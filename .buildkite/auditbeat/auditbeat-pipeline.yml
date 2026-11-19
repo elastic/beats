@@ -14,7 +14,7 @@ env:
   IMAGE_UBUNTU_2004_X86_64: "platform-ingest-beats-ubuntu-2004-1794715280"
   IMAGE_UBUNTU_2004_ARM64: "platform-ingest-beats-ubuntu-2004-aarch64-1794715280"
   IMAGE_UBUNTU_2204_X86_64: "platform-ingest-beats-ubuntu-2204-1794998613"
-  IMAGE_UBUNTU_2204_ARM64: "platform-ingest-beats-ubuntu-2204-aarch64-1794715280"
+  IMAGE_UBUNTU_2204_ARM64: "test-platform-ingest-beats-ubuntu-2204-aarch64-1794998613"
   IMAGE_UBUNTU_2404_X86_64: "platform-ingest-beats-ubuntu-2404-1794715280"
   IMAGE_UBUNTU_2404_ARM64: "platform-ingest-beats-ubuntu-2404-aarch64-1794715280"
   IMAGE_WIN_10: "platform-ingest-beats-windows-10-pro"
