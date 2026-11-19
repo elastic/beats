@@ -28,7 +28,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/auditbeat/ab"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
@@ -52,7 +51,7 @@ func TestNew_DataClientFailureClosesControlClient(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	info := beat.Info{Paths: paths.New(), UserAgent: "test", Logger: logptest.NewTestingLogger(t, "")}
+	logger := logptest.NewTestingLogger(t, "")
 
 	const attempts = 20
 	var controlFailures int
@@ -60,7 +59,7 @@ func TestNew_DataClientFailureClosesControlClient(t *testing.T) {
 	for range attempts {
 		before := socketCount(t)
 		release := useUpFileDescriptors(t, 1)
-		_, sets, err := mb.NewModule(c, ab.Registry, info)
+		_, sets, err := mb.NewModule(c, ab.Registry, paths.New(), logger)
 		release()
 		closeClients(sets)
 		controlFailed := err != nil && strings.Contains(err.Error(), "failed to create audit control client")
