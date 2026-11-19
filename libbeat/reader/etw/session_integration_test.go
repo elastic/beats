@@ -36,15 +36,9 @@ import (
 	"syscall"
 	"testing"
 	"time"
-<<<<<<< HEAD
-=======
 	"unsafe"
 
 	"golang.org/x/sys/windows"
-
-	"github.com/elastic/beats/v7/pkg/logp"
-	"github.com/elastic/beats/v7/pkg/logp/logptest"
->>>>>>> 21984d7 (libbeat/reader/etw: create sessions in independent mode (#54725))
 )
 
 var (
@@ -608,7 +602,7 @@ func TestRealtimeSessionIndependent(t *testing.T) {
 				}
 			})
 
-			attached, err := NewSession(Config{Session: name}, logptest.NewTestingLogger(t, ""))
+			attached, err := NewSession(Config{Session: name})
 			if err != nil {
 				t.Fatalf("NewSession(attach %q) failed: %v", name, err)
 			}
@@ -735,7 +729,7 @@ type testConsumer struct {
 func startTestConsumer(t *testing.T, prefix string, mode uint32, callback func(*EventRecord) uintptr) *testConsumer {
 	t.Helper()
 	cfg := createTestSessionConfig(uniqueSessionName(prefix))
-	s, err := NewSession(cfg, logptest.NewTestingLogger(t, ""))
+	s, err := NewSession(cfg)
 	if err != nil {
 		t.Fatalf("NewSession(%q) failed: %v", cfg.SessionName, err)
 	}
