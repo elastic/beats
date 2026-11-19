@@ -189,12 +189,12 @@ func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id strin
 	taskFn = func(now time.Time) {
 		select {
 		case <-jobCtx.Done():
-			s.logger.Debug("Job '%v' canceled", id)
+			s.logger.Debugf("Job '%v' canceled", id)
 			return
 		default:
 		}
 		s.stats.activeJobs.Inc()
-		s.logger.Debug("Job '%s' started", id)
+		s.logger.Debugf("Job '%s' started", id)
 		sj := newSchedJob(jobCtx, s, id, jobType, entrypoint, s.logger)
 
 		var activeMainWin *maintwin.ParsedMaintWin
@@ -221,7 +221,7 @@ func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id strin
 			// Schedule the next run
 			s.runTaskOnce(sched.Next(lastRanAt), taskFn, true)
 		}
-		s.logger.Debug("Job '%v' returned at %v", id, time.Now())
+		s.logger.Debugf("Job '%v' returned at %v", id, time.Now())
 	}
 
 	if s.runOnce {
@@ -237,7 +237,7 @@ func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id strin
 	}
 
 	return func() {
-		s.logger.Debug("Remove scheduler job '%v'", id)
+		s.logger.Debugf("Remove scheduler job '%v'", id)
 		jobCtxCancel()
 	}, nil
 }
