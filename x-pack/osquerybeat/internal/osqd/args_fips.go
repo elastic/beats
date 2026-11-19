@@ -76,10 +76,23 @@ var fipsFlags = Flags{
 // fipsDisabledTables are the tables that FIPS builds always disable, whatever
 // the policy asks for. enable_tables cannot re-enable them.
 //
-// The first group can make TLS or other remote calls. yara is not listed
-// because it is an alias of yara_file, and disabling yara_file removes the
-// alias. The rpm tables are disabled because librpm verifies package headers
-// with the bundled OpenSSL.
+// One principle decides what is on the list: a FIPS build should not have a
+// table that can give a user false confidence on the strength of non-FIPS
+// code. That means a security assurance, such as "this connection was
+// protected" or "this package is intact", that a FIPS user would take to rest
+// on validated cryptography when it rests on the bundled OpenSSL, which has no
+// FIPS module. There are two kinds of table.
+//
+// The first group can make TLS or other remote calls, so a user would take the
+// transfer to be protected by validated cryptography. The rpm tables imply
+// that a package passed an integrity check, because librpm verifies package
+// digests and signatures with the bundled OpenSSL when it reads the RPM
+// database, and drops a package that fails.
+//
+// Tables that only report values, such as hash and certificates, are not on
+// the list. They use OpenSSL, but they assert nothing about trust. yara is not
+// listed because it is an alias of yara_file, and disabling yara_file removes
+// the alias.
 var fipsDisabledTables = []string{
 	"carves",
 	"curl",
