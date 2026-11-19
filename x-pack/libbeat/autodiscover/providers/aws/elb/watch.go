@@ -59,7 +59,7 @@ func (w *watcher) forever() {
 		case <-w.ticker.C:
 			err := w.once()
 			if err != nil {
-				w.logger.Error("error while fetching AWS ELBs: %s", err)
+				w.logger.Errorf("error while fetching AWS ELBs: %s", err)
 			}
 		}
 	}
@@ -75,7 +75,7 @@ func (w *watcher) once() error {
 	if err != nil {
 		return err
 	}
-	w.logger.Debug("fetched %d load balancer listeners from AWS for autodiscovery", len(fetchedLbls))
+	w.logger.Debugf("fetched %d load balancer listeners from AWS for autodiscovery", len(fetchedLbls))
 
 	oldGen := w.gen
 	w.gen++
