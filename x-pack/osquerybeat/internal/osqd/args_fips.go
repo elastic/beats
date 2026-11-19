@@ -62,9 +62,9 @@ func EnforceFIPSOptions(options map[string]any) map[string]any {
 // policy asks for. They turn off the features that can use osqueryd's bundled
 // OpenSSL, which has no FIPS module, for TLS.
 //
-// In osquery 5.24.0 only disable_distributed and yara_sigurl_authenticate can
-// be changed through the options in the osquery config. The other three are
-// CLI-only.
+// In osquery 5.24.0 and 5.24.1 only disable_distributed and
+// yara_sigurl_authenticate can be changed through the options in the osquery
+// config. The other three are CLI-only.
 var fipsFlags = Flags{
 	"disable_distributed":      true,
 	"disable_enrollment":       true,
