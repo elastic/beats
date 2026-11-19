@@ -282,6 +282,7 @@ func (e *etwInput) runSession(ctx input.Context, cancelCtx context.Context, firs
 // creating fails with ERROR_ALREADY_EXISTS the input attaches instead, which
 // is also how it picks a session back up after a reconnect races the owner.
 func (e *etwInput) connect() error {
+	var adopted bool // The input wanted its own session but found one with that name.
 	switch e.etwSession.NewSession {
 	case true:
 		createErr := e.operator.createRealtimeSession(e.etwSession)
@@ -297,6 +298,7 @@ func (e *etwInput) connect() error {
 			}
 		}
 		e.log.Debug("session already exists, trying to attach to it")
+		adopted = true
 		fallthrough
 	case false:
 		if err := e.operator.attachToExistingSession(e.etwSession); err != nil {
@@ -306,6 +308,13 @@ func (e *etwInput) connect() error {
 			}
 		}
 		e.log.Debug("attached to existing session")
+	}
+	if adopted && !e.etwSession.Independent() {
+		// A session left over from an earlier run, possibly by an older
+		// version, keeps the logging mode it was created with.
+		e.log.Warnf("attached to existing session %q, which was not created in independent mode: "+
+			"events may be lost when another session enabled for the same provider cannot accept them; "+
+			"stop the session (logman stop %q -ets) and restart the input to recreate it", e.etwSession.Name, e.etwSession.Name)
 	}
 	return nil
 }
