@@ -6,12 +6,8 @@ entries:
         quark 0.8 hands out process timestamps as nanoseconds since boot instead of since the epoch. Auditbeat now converts process.start/process.end to wallclock with quark.TimeToWallclock() and keeps quark's boottime epoch fresh, so timestamps stay correct even when the system clock is stepped, as when NTP corrects a clock that was wrong at boot. Emitted events are unchanged.
       component: auditbeat
       pr:
-        - https://github.com/elastic/beats/pull/54651
-        - https://github.com/elastic/beats/pull/54811
-        - https://github.com/elastic/beats/pull/54710
-        - https://github.com/elastic/beats/pull/54711
-      issue:
-        - https://github.com/elastic/beats/issues/54644
+        - https://github.com/elastic/beats/pull/52623
+      issue: []
       impact: ""
       action: ""
       timestamp: 1786630989
@@ -41,12 +37,8 @@ entries:
         count towards max_in_flight_bytes when it is set.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/54651
-        - https://github.com/elastic/beats/pull/54811
-        - https://github.com/elastic/beats/pull/54710
-        - https://github.com/elastic/beats/pull/54711
-      issue:
-        - https://github.com/elastic/beats/issues/54644
+        - https://github.com/elastic/beats/pull/53937
+      issue: []
       impact: ""
       action: ""
       timestamp: 1792400000
@@ -62,10 +54,7 @@ entries:
         index, and `log.offset` holds that index.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/54651
-        - https://github.com/elastic/beats/pull/54811
-        - https://github.com/elastic/beats/pull/54710
-        - https://github.com/elastic/beats/pull/54711
+        - https://github.com/elastic/beats/pull/54157
       issue:
         - https://github.com/elastic/beats/issues/53659
       impact: ""
@@ -90,12 +79,9 @@ entries:
         container's process IDs instead.
       component: auditbeat
       pr:
-        - https://github.com/elastic/beats/pull/54651
-        - https://github.com/elastic/beats/pull/54811
-        - https://github.com/elastic/beats/pull/54710
-        - https://github.com/elastic/beats/pull/54711
+        - https://github.com/elastic/beats/pull/53507
       issue:
-        - https://github.com/elastic/beats/issues/54644
+        - https://github.com/elastic/beats/issues/22396
       impact: |
         Without `--pid=host` or `hostPID: true`, file events from processes that were
         already running when Auditbeat started are dropped, and events from processes
@@ -117,12 +103,8 @@ entries:
       description: Addresses GHSA-c9gr-gmg4-2vqv, the Go decoder panic related to CVE-2026-111497.
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/54651
-        - https://github.com/elastic/beats/pull/54811
-        - https://github.com/elastic/beats/pull/54710
-        - https://github.com/elastic/beats/pull/54711
-      issue:
-        - https://github.com/elastic/beats/issues/54644
+        - https://github.com/elastic/beats/pull/54234
+      issue: []
       impact: ""
       action: ""
       timestamp: 1793295453
@@ -135,12 +117,8 @@ entries:
         The HTTP JSON, CEL, Okta, Jamf and streaming inputs no longer write header values to the debug log, only header names. A configured redirect.sensitive_headers list in HTTP JSON and CEL now replaces the default list, and an empty list disables the removal.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/54651
-        - https://github.com/elastic/beats/pull/54811
-        - https://github.com/elastic/beats/pull/54710
-        - https://github.com/elastic/beats/pull/54711
-      issue:
-        - https://github.com/elastic/beats/issues/54644
+        - https://github.com/elastic/beats/pull/54493
+      issue: []
       impact: ""
       action: ""
       timestamp: 1793827498
@@ -152,12 +130,9 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/54651
-        - https://github.com/elastic/beats/pull/54811
-        - https://github.com/elastic/beats/pull/54710
-        - https://github.com/elastic/beats/pull/54711
+        - https://github.com/elastic/beats/pull/54494
       issue:
-        - https://github.com/elastic/beats/issues/54644
+        - https://github.com/elastic/beats/issues/54432
       impact: ""
       action: ""
       timestamp: 1793840779
@@ -179,12 +154,8 @@ entries:
         restart at that moment skipped the remaining records.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/54651
-        - https://github.com/elastic/beats/pull/54811
-        - https://github.com/elastic/beats/pull/54710
-        - https://github.com/elastic/beats/pull/54711
-      issue:
-        - https://github.com/elastic/beats/issues/54644
+        - https://github.com/elastic/beats/pull/54503
+      issue: []
       impact: ""
       action: ""
       timestamp: 1793865564
@@ -202,12 +173,8 @@ entries:
         process.cpu.pct were about 41.67 times too low.
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/54651
-        - https://github.com/elastic/beats/pull/54811
-        - https://github.com/elastic/beats/pull/54710
-        - https://github.com/elastic/beats/pull/54711
-      issue:
-        - https://github.com/elastic/beats/issues/54644
+        - https://github.com/elastic/beats/pull/54502
+      issue: []
       impact: ""
       action: ""
       timestamp: 1793874000
@@ -233,12 +200,8 @@ entries:
       description: A mismatch in case sensitivity between checkpoint selection and filtering caused the azure-blob-storage and gcs inputs to re-read files on every poll when file names mixed upper- and lower-case letters, increasing ingest lag and output load. Affected inputs read those files once more after upgrading, then stop re-reading them.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/54651
-        - https://github.com/elastic/beats/pull/54811
-        - https://github.com/elastic/beats/pull/54710
-        - https://github.com/elastic/beats/pull/54711
-      issue:
-        - https://github.com/elastic/beats/issues/54644
+        - https://github.com/elastic/beats/pull/54512
+      issue: []
       impact: ""
       action: ""
       timestamp: 1793881228
@@ -263,12 +226,8 @@ entries:
       description: Each lookup miss used to walk every file descriptor of every process on the host, which could saturate the sniffer. On Linux the walk is now skipped when the socket table shows no open socket on the port. Lookups are also spaced so that, for each transport, they take about a tenth of the time, and max_proc_read_freq can add a fixed minimum interval between full scans. A connection opened and closed between scans may be published without process information. Mappings confirmed by a scan stay valid for at least 10s after that scan, and on Linux vanished PIDs are logged at debug level.
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/54651
-        - https://github.com/elastic/beats/pull/54811
-        - https://github.com/elastic/beats/pull/54710
-        - https://github.com/elastic/beats/pull/54711
-      issue:
-        - https://github.com/elastic/beats/issues/54644
+        - https://github.com/elastic/beats/pull/54606
+      issue: []
       impact: ""
       action: ""
       timestamp: 1794400000
@@ -287,12 +246,8 @@ entries:
         metric instead of crashing.
       component: auditbeat
       pr:
-        - https://github.com/elastic/beats/pull/54651
-        - https://github.com/elastic/beats/pull/54811
-        - https://github.com/elastic/beats/pull/54710
-        - https://github.com/elastic/beats/pull/54711
-      issue:
-        - https://github.com/elastic/beats/issues/54644
+        - https://github.com/elastic/beats/pull/54645
+      issue: []
       impact: ""
       action: ""
       timestamp: 1794456064
@@ -309,9 +264,6 @@ entries:
       component: auditbeat
       pr:
         - https://github.com/elastic/beats/pull/54651
-        - https://github.com/elastic/beats/pull/54811
-        - https://github.com/elastic/beats/pull/54710
-        - https://github.com/elastic/beats/pull/54711
       issue:
         - https://github.com/elastic/beats/issues/54644
       impact: ""
@@ -332,12 +284,9 @@ entries:
         advertise acceptable CAs to clients.
       component: libbeat
       pr:
-        - https://github.com/elastic/beats/pull/54651
-        - https://github.com/elastic/beats/pull/54811
-        - https://github.com/elastic/beats/pull/54710
-        - https://github.com/elastic/beats/pull/54711
+        - https://github.com/elastic/beats/pull/54749
       issue:
-        - https://github.com/elastic/beats/issues/54644
+        - https://github.com/elastic/beats/issues/54742
       impact: ""
       action: ""
       timestamp: 1794930537
