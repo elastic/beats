@@ -143,9 +143,9 @@ func (m *UnitsManager) Start() error {
 	return nil
 }
 
-// Stop disconnects from Elastic Agent, stops the inputs it started, and stops
-// the beat. The receiver can outlive the beat in the collector, so the inputs
-// must not keep running.
+// Stop disconnects from Elastic Agent, stops the inputs it started, and calls
+// OtelManager.Stop, which runs the stop callback if one was set. The receiver
+// can outlive the beat in the collector, so the inputs must not keep running.
 func (m *UnitsManager) Stop() {
 	m.lifecycleMx.Lock()
 	if !m.stopped {
