@@ -168,7 +168,7 @@ func getDisks(logger *logp.Logger, path string) (DiskStates, error) {
 		case "spare":
 			disks.Spare++
 		default:
-			logger.Debug("Unknown disk state %s", disk)
+			logger.Debugf("Unknown disk state %s", disk)
 		}
 
 		if _, ok := disks.States[disk]; !ok {
