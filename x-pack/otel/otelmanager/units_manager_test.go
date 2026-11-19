@@ -153,6 +153,10 @@ func TestUnitsManagerStopBeforeStart(t *testing.T) {
 	})
 }
 
+// The beat's Run goroutine can start the manager while the receiver stops it.
+// Either can go first, so this asserts nothing about the outcome: it checks
+// that the two don't race (with -race), and that whichever order they run in,
+// no goroutines are left behind (synctest fails the test if any are).
 func TestUnitsManagerStopDuringStart(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		agent, _, m := newTestUnitsManager(t)
