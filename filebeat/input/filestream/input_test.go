@@ -577,7 +577,12 @@ paths:
 			err = prospector.Init(newMockStoreUpdater(nil), newMockStoreUpdater(nil),
 				func(loginp.Source) string { return "" })
 			require.NoError(t, err, "Init must succeed")
-			assert.Equal(t, tc.want, *fs.preset, "unexpected resolved preset")
+			assert.Equal(
+				t,
+				tc.want,
+				fs.preset.load(),
+				"unexpected resolved preset",
+			)
 		})
 	}
 }
@@ -654,7 +659,7 @@ func TestNewFile(t *testing.T) {
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			inp := &filestream{
-				preset:       &resolvedPreset{},
+				preset:       &sharedPreset{},
 				compression:  tc.compression,
 				readerConfig: defaultReaderConfig(),
 			}
@@ -726,7 +731,7 @@ func TestOpenFile_GZIPNeverTruncated(t *testing.T) {
 
 	for _, tc := range tcs {
 		inp := filestream{
-			preset:          &resolvedPreset{},
+			preset:          &sharedPreset{},
 			compression:     tc.compression,
 			encodingFactory: encoding.Plain,
 			readerConfig:    readerConfig{BufferSize: 32},

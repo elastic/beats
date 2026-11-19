@@ -983,6 +983,18 @@ func (g *harvesterRunner) StopHarvesters() error {
 	return g.stopNow() // holds and releases g.mu
 }
 
+// stopForRestart tears down this input's harvesters without draining, even
+// with read_until_eof enabled, and keeps the engine reference, which the
+// runner replacing this one takes over. See Restarter.
+func (g *harvesterRunner) stopForRestart() error {
+	g.mu.Lock()
+	if g.closed {
+		g.mu.Unlock()
+		return nil
+	}
+	return g.stopNow() // holds and releases g.mu
+}
+
 // stopNow cancels every source of this input and tears them down without
 // draining. The caller holds g.mu; stopNow releases it.
 func (g *harvesterRunner) stopNow() error {

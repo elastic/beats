@@ -325,3 +325,139 @@ func TestPresetMessage(t *testing.T) {
 		})
 	}
 }
+
+func TestNeedsHighCardinalityRestart(t *testing.T) {
+	notSet := presetSelection{name: presetAuto, threshold: 3}
+	explicitAuto := presetSelection{name: presetAuto, explicit: true, threshold: 3}
+	explicitDefault := presetSelection{name: presetDefault, explicit: true, threshold: 3}
+	explicitHighCardinality := presetSelection{
+		name:      presetHighCardinality,
+		explicit:  true,
+		threshold: 3,
+	}
+	forcedDefault := presetSelection{
+		name:                presetDefault,
+		threshold:           3,
+		forcedDefaultReason: "'delete.enabled' is set",
+	}
+	running := resolvedPreset{}
+	runningHighCardinality := resolvedPreset{highCardinality: true}
+
+	cases := []struct {
+		name      string
+		in        presetInputs
+		res       resolvedPreset
+		fileCount int
+		want      bool
+	}{
+		{
+			name:      "not set at the threshold restarts",
+			in:        presetInputs{selection: notSet},
+			res:       running,
+			fileCount: 3,
+			want:      true,
+		},
+		{
+			name:      "explicit auto above the threshold restarts",
+			in:        presetInputs{selection: explicitAuto},
+			res:       running,
+			fileCount: 4,
+			want:      true,
+		},
+		{
+			name:      "auto below the threshold does not restart",
+			in:        presetInputs{selection: explicitAuto},
+			res:       running,
+			fileCount: 2,
+		},
+		{
+			name:      "auto already running high_cardinality does not restart",
+			in:        presetInputs{selection: explicitAuto},
+			res:       runningHighCardinality,
+			fileCount: 4,
+		},
+		{
+			name:      "explicit default does not restart",
+			in:        presetInputs{selection: explicitDefault},
+			res:       running,
+			fileCount: 4,
+		},
+		{
+			name:      "default forced by an option does not restart",
+			in:        presetInputs{selection: forcedDefault},
+			res:       running,
+			fileCount: 4,
+		},
+		{
+			name:      "explicit high_cardinality does not restart",
+			in:        presetInputs{selection: explicitHighCardinality},
+			res:       runningHighCardinality,
+			fileCount: 4,
+		},
+		{
+			name:      "copytruncate does not restart",
+			in:        presetInputs{selection: notSet, forceDefault: true},
+			res:       running,
+			fileCount: 4,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := needsHighCardinalityRestart(tc.in, tc.res, tc.fileCount)
+			assert.Equal(
+				t,
+				tc.want,
+				got,
+				"unexpected restart decision for %d files",
+				tc.fileCount,
+			)
+		})
+	}
+}
+
+func TestPresetRestartMessage(t *testing.T) {
+	in := presetInputs{selection: presetSelection{name: presetAuto, threshold: 3}}
+	res := resolvedPreset{
+		highCardinality: true,
+		harvesterLimit:  500,
+		checkInterval:   30 * time.Second,
+	}
+
+	msg := presetRestartMessage(in, 4, res)
+	for _, want := range []string{
+		"preset changed from default to high_cardinality, restarting the input",
+		"4 files found",
+		"threshold: 3 files",
+		"harvester limit: 500",
+		"check interval: 30s",
+	} {
+		assert.Contains(
+			t,
+			msg,
+			want,
+			"the restart message must contain %q",
+			want,
+		)
+	}
+}
+
+func TestSharedPreset(t *testing.T) {
+	var zero sharedPreset
+	assert.Equal(
+		t,
+		resolvedPreset{},
+		zero.load(),
+		"the zero value must hold the zero preset",
+	)
+
+	want := resolvedPreset{highCardinality: true, harvesterLimit: 7}
+	zero.store(want)
+	assert.Equal(t, want, zero.load(), "load must return the stored preset")
+	assert.Equal(
+		t,
+		want,
+		newSharedPreset(want).load(),
+		"newSharedPreset must hold the preset it is given",
+	)
+}

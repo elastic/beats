@@ -63,7 +63,7 @@ func (w *testWatcher) sink(ctx unison.Canceler) loginp.FSEventSink {
 
 // watch runs one scan, sending its events to w.events.
 func (w *testWatcher) watch(ctx unison.Canceler, metrics *loginp.Metrics, ignoreOlder time.Duration, ignoreInactiveSince time.Time) {
-	w.ScanOnce(ctx, w.sink(ctx), metrics, ignoreOlder, ignoreInactiveSince)
+	w.ScanOnce(ctx, w.sink(ctx), metrics, ignoreOlder, ignoreInactiveSince, nil)
 }
 
 // Run scans every check interval until ctx is cancelled, like the prospector,

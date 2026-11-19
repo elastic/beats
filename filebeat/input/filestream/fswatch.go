@@ -167,6 +167,20 @@ func (w *fileWatcher) HarvesterClosed(evt loginp.HarvesterStatus) {
 	w.closedHarvestersMutex.Unlock()
 }
 
+// reset forgets the previous scan, so the next one reports every file it
+// finds as created, like the first scan after the prospector's Init.
+func (w *fileWatcher) reset() {
+	w.prev = make(map[string]loginp.FileDescriptor)
+	w.prevScanned = false
+	w.hasIncompletePrev = false
+	w.closedHarvestersMutex.Lock()
+	clear(w.closedHarvesters)
+	w.closedHarvestersMutex.Unlock()
+	if fs, ok := w.scanner.(*fileScanner); ok {
+		fs.completedFingerprints = nil
+	}
+}
+
 // ScanOnce scans the file system once and hands every resulting event to sink,
 // on the calling goroutine. It stops early, dropping the remaining events,
 // once ctx is cancelled.
@@ -176,6 +190,7 @@ func (w *fileWatcher) ScanOnce(
 	metrics *loginp.Metrics,
 	ignoreOlder time.Duration,
 	ignoreInactiveSince time.Time,
+	gate loginp.ScanGate,
 ) {
 	w.log.Debug("Start next scan")
 
@@ -196,9 +211,13 @@ func (w *fileWatcher) ScanOnce(
 		IgnoreInactiveSince: ignoreInactiveSince,
 		SuppressBridgingRaw: !w.needsBridgingRaw(),
 	}
-	w.prevScanned = false
 	scanResults := w.scanner.GetFiles(scanOpts)
 	metrics.UpdateFileScanMetrics(scanResults.Metrics)
+	if gate != nil && !gate(len(scanResults.Files)) {
+		w.log.Debugw("File scan dropped", "total", len(scanResults.Files))
+		return
+	}
+	w.prevScanned = false
 
 	// for debugging purposes
 	writtenCount := 0

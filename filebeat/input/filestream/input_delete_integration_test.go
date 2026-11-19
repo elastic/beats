@@ -130,7 +130,7 @@ func TestFilestreamDeleteFile(t *testing.T) {
 		env := newInputTestingEnvironment(t)
 
 		f := filestream{
-			preset: &resolvedPreset{},
+			preset: &sharedPreset{},
 			deleterConfig: deleterConfig{
 				retryBackoff: 10 * time.Millisecond,
 			},
@@ -181,7 +181,7 @@ func TestFilestreamDeleteFileRemoveRetries(t *testing.T) {
 	tickChan := make(chan time.Time)
 
 	f := filestream{
-		preset: &resolvedPreset{},
+		preset: &sharedPreset{},
 		deleterConfig: deleterConfig{
 			retries:      2,
 			retryBackoff: 10 * time.Millisecond,
@@ -433,7 +433,7 @@ func TestFilestreamDeleteFileReturnsError(t *testing.T) {
 
 	for name, tc := range testCases {
 		f := filestream{
-			preset:          &resolvedPreset{},
+			preset:          &sharedPreset{},
 			readerConfig:    defaultReaderConfig(),
 			encodingFactory: encodingFactory,
 			deleterConfig: deleterConfig{

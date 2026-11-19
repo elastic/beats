@@ -4,7 +4,8 @@ description: |
   Add the `preset` option to the Filestream input, with the `auto`, `default`
   and `high_cardinality` presets. `auto` is used when `preset` is not set and
   selects `high_cardinality` when the input finds at least
-  `preset.auto.high_cardinality.min_files` files at start (5000 by default).
+  `preset.auto.high_cardinality.min_files` files (5000 by default), at start
+  or on any later scan, in which case the input restarts itself once.
   Under `high_cardinality`, fully read files are not opened and only files
   that are still being written to stay open. `harvester_limit` defaults to 500
   and `prospector.scanner.check_interval` to 30s, and `close.reader.on_eof` is
