@@ -728,7 +728,7 @@ func TestEatBodyChunkedWaitCRLF(t *testing.T) {
 		t.Error("Unexpected state", st.parseState)
 	}
 
-	logger.Named("http").Debug("parseOffset: %d", st.parseOffset)
+	logger.Named("http").Debugf("parseOffset: %d", st.parseOffset)
 
 	ok, complete = parser.parseBodyChunkedWaitFinalCRLF(st, msg)
 	if ok != true || complete != false {
@@ -874,7 +874,7 @@ func TestHttpParser_censorPasswordGET(t *testing.T) {
 	if err != nil {
 		t.Errorf("Failed to parse parameters")
 	}
-	logptest.NewTestingLogger(t, "httpdetailed").Debug("parameters %s", params)
+	logptest.NewTestingLogger(t, "httpdetailed").Debugf("parameters %s", params)
 
 	if path != "/users/login" {
 		t.Errorf("Wrong path: %s", path)
