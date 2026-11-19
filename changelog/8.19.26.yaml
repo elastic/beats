@@ -1,0 +1,346 @@
+version: 8.19.26
+entries:
+    - kind: upgrade
+      summary: Update go-quark for quark 0.8 since-boot timestamps
+      description: |
+        quark 0.8 hands out process timestamps as nanoseconds since boot instead of since the epoch. Auditbeat now converts process.start/process.end to wallclock with quark.TimeToWallclock() and keeps quark's boottime epoch fresh, so timestamps stay correct even when the system clock is stepped, as when NTP corrects a clock that was wrong at boot. Emitted events are unchanged.
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54651
+        - https://github.com/elastic/beats/pull/54811
+        - https://github.com/elastic/beats/pull/54710
+        - https://github.com/elastic/beats/pull/54711
+      issue:
+        - https://github.com/elastic/beats/issues/54644
+      impact: ""
+      action: ""
+      timestamp: 1786630989
+      file:
+        name: 1786630989-auditbeat-quark-0.8.yaml
+        checksum: 2b331924b52580290b971998c7e783f49ddaff80
+    - kind: upgrade
+      summary: Update go-quark for quark 0.9 boottime handling
+      description: |
+        quark 0.9 removed quark.TimeToWallclock() and quark.UpdateBoottime(), the boottime epoch from quark.Boottime() is now self-maintaining and only moves on a system clock step. Auditbeat now converts process.start/process.end to wallclock by fetching the epoch once per batch and adding it to quark's since-boot timestamps, instead of one cgo call per timestamp. Emitted events are unchanged.
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/53284
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1789463004
+      file:
+        name: 1789463004-auditbeat-quark-0.9-boottime.yaml
+        checksum: 1d22cc771b51ffb9558925143bf140c0be318186
+    - kind: bug-fix
+      summary: Limit HTTP Endpoint request bodies buffered for HMAC validation to 25 MiB when max_body_bytes is not set
+      description: |
+        The http_endpoint input buffers the whole request body in memory to check
+        an HMAC signature. That read now stops at 25 MiB when max_body_bytes is not
+        set, and larger bodies are rejected with a 413 status. The bytes read also
+        count towards max_in_flight_bytes when it is set.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54651
+        - https://github.com/elastic/beats/pull/54811
+        - https://github.com/elastic/beats/pull/54710
+        - https://github.com/elastic/beats/pull/54711
+      issue:
+        - https://github.com/elastic/beats/issues/54644
+      impact: ""
+      action: ""
+      timestamp: 1792400000
+      file:
+        name: 1792400000-http_endpoint-bound-hmac-body-read.yaml
+        checksum: 20cd14bb7b549a5e891487d8c32a1c4f7e50e317
+    - kind: bug-fix
+      summary: Fix duplicate event IDs for codec-decoded objects in the GCS and Azure Blob Storage inputs.
+      description: |
+        Events produced by a decoding codec (CSV) from the same object all
+        got the same `_id` and `log.offset: 0`, so only the first record of each
+        object was indexed. Each event now gets a unique ID derived from its record
+        index, and `log.offset` holds that index.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54651
+        - https://github.com/elastic/beats/pull/54811
+        - https://github.com/elastic/beats/pull/54710
+        - https://github.com/elastic/beats/pull/54711
+      issue:
+        - https://github.com/elastic/beats/issues/53659
+      impact: ""
+      action: ""
+      timestamp: 1793120788
+      file:
+        name: 1793120788-fix-duplicate-event-ids-for-codec-decoded-objects-in-gcs-and-azure-blob-storage-inputs.yaml
+        checksum: ed87e21fd9067ecbc1128c3d9c4477424c4aeb6c
+    - kind: breaking-change
+      summary: The file_integrity ebpf backend requires the host PID namespace when run in Docker/K8s
+      description: |
+        The file_integrity module's ebpf backend now sources file events through
+        quark instead of the ebpfevents library, removing the dependency on
+        elastic/ebpfevents and elastic/ebpf. Configuration is unchanged. Each
+        operation is still reported as its own event, and `file.mode` now reports
+        only the permission bits, consistent with the `fsnotify` backend.
+
+        quark attributes each event to a process by looking up the process ID the
+        kernel reports in a table built from `/proc` and kept current from kernel
+        events. The kernel reports host process IDs. When Auditbeat runs in a Docker
+        container or K8s pod with its own PID namespace, that table is built from the
+        container's process IDs instead.
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54651
+        - https://github.com/elastic/beats/pull/54811
+        - https://github.com/elastic/beats/pull/54710
+        - https://github.com/elastic/beats/pull/54711
+      issue:
+        - https://github.com/elastic/beats/issues/54644
+      impact: |
+        Without `--pid=host` or `hostPID: true`, file events from processes that were
+        already running when Auditbeat started are dropped, and events from processes
+        started later can be attributed to the wrong process when a host process ID
+        happens to match a container one. The `system/process` dataset and the
+        `add_session_metadata` processor with kernel tracing already have this
+        requirement. Deployments outside Docker/K8s, and the `fsnotify` and `kprobes`
+        backends, are unaffected.
+      action: |
+        Add `--pid=host` to the `docker run` command, alongside the existing
+        `--cap-add=SYS_ADMIN --cap-add=BPF` and the `/sys` bind mount. In Kubernetes,
+        set `hostPID: true` on the pod.
+      timestamp: 1793136201
+      file:
+        name: 1793136201-auditbeat-fim-ebpf-docker-pid-host.yaml
+        checksum: 095b52ecea9021f43505b05297e5f72a3f744f47
+    - kind: security
+      summary: Update Brotli to 1.2.7 to fix a decoder panic on malformed input.
+      description: Addresses GHSA-c9gr-gmg4-2vqv, the Go decoder panic related to CVE-2026-111497.
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/54651
+        - https://github.com/elastic/beats/pull/54811
+        - https://github.com/elastic/beats/pull/54710
+        - https://github.com/elastic/beats/pull/54711
+      issue:
+        - https://github.com/elastic/beats/issues/54644
+      impact: ""
+      action: ""
+      timestamp: 1793295453
+      file:
+        name: 1793295453-update-brotli-to-1.2.7-to-fix-malformed-input-decoding.yaml
+        checksum: 0de7d438f65e51f5e0b27123015d554152812c23
+    - kind: bug-fix
+      summary: Align redirect header handling in Okta and Jamf entity analytics with HTTP JSON and CEL.
+      description: |
+        The HTTP JSON, CEL, Okta, Jamf and streaming inputs no longer write header values to the debug log, only header names. A configured redirect.sensitive_headers list in HTTP JSON and CEL now replaces the default list, and an empty list disables the removal.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54651
+        - https://github.com/elastic/beats/pull/54811
+        - https://github.com/elastic/beats/pull/54710
+        - https://github.com/elastic/beats/pull/54711
+      issue:
+        - https://github.com/elastic/beats/issues/54644
+      impact: ""
+      action: ""
+      timestamp: 1793827498
+      file:
+        name: 1793827498-redirect-header-handling.yaml
+        checksum: 15356ee2eccd93fca630d161c76c76cc5b5356fa
+    - kind: bug-fix
+      summary: Fix entity analytics input committing sync state before all events are acknowledged.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54651
+        - https://github.com/elastic/beats/pull/54811
+        - https://github.com/elastic/beats/pull/54710
+        - https://github.com/elastic/beats/pull/54711
+      issue:
+        - https://github.com/elastic/beats/issues/54644
+      impact: ""
+      action: ""
+      timestamp: 1793840779
+      file:
+        name: 1793840779-fix-entityanalytics-early-state-commit.yaml
+        checksum: 9987be2d883983960004aa8185881fd955ae7592
+    - kind: bug-fix
+      summary: Write Azure Event Hub v2 checkpoints once per message, after all its records complete
+      description: |
+        The Azure Event Hub input (processor v2) now writes a checkpoint only after
+        every record decoded from a message has been acknowledged by the output or
+        dropped by a processor, and at most once per message.
+
+        Previously, when processors dropped records with drop_event, the input wrote
+        the same checkpoint once per dropped record (for example, 45 writes for a
+        message with 45 records), which multiplied Azure Storage operations and made
+        consumption wait on storage latency. It could also write a message's
+        checkpoint after the output had acknowledged only some of its records, so a
+        restart at that moment skipped the remaining records.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54651
+        - https://github.com/elastic/beats/pull/54811
+        - https://github.com/elastic/beats/pull/54710
+        - https://github.com/elastic/beats/pull/54711
+      issue:
+        - https://github.com/elastic/beats/issues/54644
+      impact: ""
+      action: ""
+      timestamp: 1793865564
+      file:
+        name: 1793865564-fix-azure-eventhub-checkpoint-coalescing.yaml
+        checksum: 2e3c7fc5a9dd53edb1c27369c75980fe58ead958
+    - kind: bug-fix
+      summary: Fix process CPU ticks and percentages being under-reported about 40 times on Apple Silicon macOS.
+      description: |
+        The darwin process collector treated the CPU times reported by proc_pidinfo
+        as nanoseconds, but they are in Mach absolute-time units. On Intel the two
+        are equal, but on Apple Silicon one unit is 125/3 nanoseconds, so
+        system.process.cpu.*.ticks, system.process.cpu.total.value,
+        system.process.cpu.total.pct, system.process.cpu.total.norm.pct and
+        process.cpu.pct were about 41.67 times too low.
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54651
+        - https://github.com/elastic/beats/pull/54811
+        - https://github.com/elastic/beats/pull/54710
+        - https://github.com/elastic/beats/pull/54711
+      issue:
+        - https://github.com/elastic/beats/issues/54644
+      impact: ""
+      action: ""
+      timestamp: 1793874000
+      file:
+        name: 1793874000-fix-darwin-arm64-process-cpu-ticks.yaml
+        checksum: 54475e14f461574783e4b51915d3285f0b992d07
+    - kind: bug-fix
+      summary: Fix histogram values of zero being filtered out on non-amd64 platforms for openmetrics and prometheus.
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/44750
+      issue:
+        - https://github.com/elastic/beats/issues/34235
+      impact: ""
+      action: ""
+      timestamp: 1793874747
+      file:
+        name: 1793874747-prometheus-histogram-zero-values-non-amd64.yaml
+        checksum: 67d4b44df71b7dd90ee20500bb343990a7057eae
+    - kind: bug-fix
+      summary: Fix repeated re-reads in azure-blob-storage and gcs inputs with mixed-case file names.
+      description: A mismatch in case sensitivity between checkpoint selection and filtering caused the azure-blob-storage and gcs inputs to re-read files on every poll when file names mixed upper- and lower-case letters, increasing ingest lag and output load. Affected inputs read those files once more after upgrading, then stop re-reading them.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54651
+        - https://github.com/elastic/beats/pull/54811
+        - https://github.com/elastic/beats/pull/54710
+        - https://github.com/elastic/beats/pull/54711
+      issue:
+        - https://github.com/elastic/beats/issues/54644
+      impact: ""
+      action: ""
+      timestamp: 1793881228
+      file:
+        name: 1793881228-fix-abs-gcs-checkpoint-name-case.yaml
+        checksum: 2251758a29047a90301d81408437cb386dd6c0ee
+    - kind: bug-fix
+      summary: Fix "ApiVersionsRequest V3" errors on Kafka broker connections by updating the sarama fork.
+      description: Updates the sarama fork to include the upstream fix that corrects how the client version is reported, which caused "ApiVersionsRequest V3" errors when connecting to Kafka brokers.
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/54546
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1794000000
+      file:
+        name: 1794000000-update-sarama-fork-api-versions-v3.yaml
+        checksum: 7c97363e8e8386971f12e672cf0d9eeec9d244e0
+    - kind: bug-fix
+      summary: Limit how often Packetbeat process enrichment scans /proc.
+      description: Each lookup miss used to walk every file descriptor of every process on the host, which could saturate the sniffer. On Linux the walk is now skipped when the socket table shows no open socket on the port. Lookups are also spaced so that, for each transport, they take about a tenth of the time, and max_proc_read_freq can add a fixed minimum interval between full scans. A connection opened and closed between scans may be published without process information. Mappings confirmed by a scan stay valid for at least 10s after that scan, and on Linux vanished PIDs are logged at debug level.
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54651
+        - https://github.com/elastic/beats/pull/54811
+        - https://github.com/elastic/beats/pull/54710
+        - https://github.com/elastic/beats/pull/54711
+      issue:
+        - https://github.com/elastic/beats/issues/54644
+      impact: ""
+      action: ""
+      timestamp: 1794400000
+      file:
+        name: 1794400000-packetbeat-procs-scan-throttle.yaml
+        checksum: f26f645f2cf966999db4629ba63e0cb4126c0f32
+    - kind: bug-fix
+      summary: Fix auditd lost event monitor leaking a socket and crashing without a client.
+      description: |
+        The kernel lost event monitor closed the wrong audit client when it stopped,
+        leaving its own netlink socket open. If creating that client failed, the
+        monitor still started and crashed on its first poll, which stopped
+        Auditbeat, or the Elastic Agent process running it as a receiver. The
+        monitor now closes its own client. If the client cannot be created,
+        Auditbeat reports the error and stops updating the kernel lost events
+        metric instead of crashing.
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54651
+        - https://github.com/elastic/beats/pull/54811
+        - https://github.com/elastic/beats/pull/54710
+        - https://github.com/elastic/beats/pull/54711
+      issue:
+        - https://github.com/elastic/beats/issues/54644
+      impact: ""
+      action: ""
+      timestamp: 1794456064
+      file:
+        name: 1794456064-auditd-kernel-lost-monitor.yaml
+        checksum: d5866b37b7da7c358bda97784f409e4a66d38f41
+    - kind: bug-fix
+      summary: Fix auditd module leaking a socket when it fails to create its data client.
+      description: |
+        When the auditd module could not create its data client, for example because
+        the process had no file descriptors left, it returned an error without
+        closing the control client it had already created. That socket stayed open
+        for the life of the process. It is now closed.
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54651
+        - https://github.com/elastic/beats/pull/54811
+        - https://github.com/elastic/beats/pull/54710
+        - https://github.com/elastic/beats/pull/54711
+      issue:
+        - https://github.com/elastic/beats/issues/54644
+      impact: ""
+      action: ""
+      timestamp: 1794512032
+      file:
+        name: 1794512032-auditd-new-closes-control.yaml
+        checksum: b8552c2da807194adce60513a3640c204a80faa3
+    - kind: bug-fix
+      summary: Accept client certificates signed by CAs added to `certificate_authorities` while a TLS server is running.
+      description: |
+        With `ssl.certificate_reload` enabled (the default when `certificate_authorities`
+        is set), a running TLS server reloaded `certificate_authorities` from disk but
+        still rejected client certificates signed by a CA added after startup, because
+        the Go TLS stack verified them against the CA pool captured when the server
+        was configured. Removing a CA already took effect. The server now uses the
+        current CA pool for each handshake, both to verify client certificates and to
+        advertise acceptable CAs to clients.
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54651
+        - https://github.com/elastic/beats/pull/54811
+        - https://github.com/elastic/beats/pull/54710
+        - https://github.com/elastic/beats/pull/54711
+      issue:
+        - https://github.com/elastic/beats/issues/54644
+      impact: ""
+      action: ""
+      timestamp: 1794930537
+      file:
+        name: 1794930537-tlscommon-client-ca-reload.yaml
+        checksum: 3b91228358028610d4b1c3b89aabc0d80645abdd
