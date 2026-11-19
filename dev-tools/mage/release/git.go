@@ -43,9 +43,9 @@ const (
 	// pushWaitDelay bounds CombinedOutput after context cancel when a git
 	// helper (for example git-remote-http) keeps an I/O pipe open.
 	pushWaitDelay = 10 * time.Second
-	// worktreeCmdTimeout bounds git checkout/status/add/commit used instead of
-	// go-git on Buildkite reference clones. go-git Status/Checkout can take tens
-	// of minutes on large trees with object alternates.
+	// worktreeCmdTimeout bounds git checkout/status/add/commit/merge-base used
+	// instead of go-git on Buildkite reference clones. go-git Status/Checkout
+	// can take tens of minutes on large trees with object alternates.
 	worktreeCmdTimeout = 10 * time.Minute
 )
 
@@ -225,46 +225,69 @@ func (g *gitRepo) commitAll(message, authorName, authorEmail string) (bool, erro
 // hasCommitsAheadOf reports whether HEAD has commits not reachable from baseBranch.
 // Equal or behind returns false; ahead or diverged returns true.
 // A missing base branch is treated as ahead (true).
+// Uses the git CLI so mixed CLI commits and reference-clone object stores do not
+// hit go-git MergeBase "object not found" failures.
 func (g *gitRepo) hasCommitsAheadOf(baseBranch string) (bool, error) {
-	headRef, err := g.repo.Head()
-	if err != nil {
-		return false, fmt.Errorf("failed to get HEAD: %w", err)
-	}
+	ctx, cancel := context.WithTimeout(context.Background(), worktreeCmdTimeout)
+	defer cancel()
 
-	baseRef, err := g.repo.Reference(plumbing.NewBranchReferenceName(baseBranch), true)
-	if err != nil {
-		if errors.Is(err, plumbing.ErrReferenceNotFound) {
-			return true, nil
+	if _, err := g.runGit(ctx, "show-ref", "--verify", "--quiet", "refs/heads/"+baseBranch); err != nil {
+		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			return false, fmt.Errorf(
+				"failed to verify base branch %s: timed out after %s: %w",
+				baseBranch, worktreeCmdTimeout, err,
+			)
 		}
-		return false, fmt.Errorf("failed to get base branch %s: %w", baseBranch, err)
+		// Missing local branch: treat as ahead (prior go-git ErrReferenceNotFound).
+		return true, nil
 	}
 
-	if headRef.Hash() == baseRef.Hash() {
+	headOut, err := g.runGit(ctx, "rev-parse", "HEAD")
+	if err != nil {
+		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			return false, fmt.Errorf("failed to get HEAD: timed out after %s: %w", worktreeCmdTimeout, err)
+		}
+		return false, fmt.Errorf("failed to get HEAD: %w: %s", err, strings.TrimSpace(string(headOut)))
+	}
+	baseOut, err := g.runGit(ctx, "rev-parse", baseBranch)
+	if err != nil {
+		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			return false, fmt.Errorf(
+				"failed to get base branch %s: timed out after %s: %w",
+				baseBranch, worktreeCmdTimeout, err,
+			)
+		}
+		return false, fmt.Errorf(
+			"failed to get base branch %s: %w: %s",
+			baseBranch, err, strings.TrimSpace(string(baseOut)),
+		)
+	}
+	headHash := strings.TrimSpace(string(headOut))
+	baseHash := strings.TrimSpace(string(baseOut))
+	if headHash == baseHash {
 		return false, nil
 	}
 
-	headCommit, err := g.repo.CommitObject(headRef.Hash())
+	mbOut, err := g.runGit(ctx, "merge-base", "HEAD", baseBranch)
 	if err != nil {
-		return false, fmt.Errorf("failed to get HEAD commit: %w", err)
-	}
-	baseCommit, err := g.repo.CommitObject(baseRef.Hash())
-	if err != nil {
-		return false, fmt.Errorf("failed to get base commit %s: %w", baseBranch, err)
-	}
-
-	// HEAD has commits not on base iff HEAD is not a merge-base of (HEAD, base).
-	// Behind/equal: merge-base is HEAD. Ahead/diverged: merge-base is not HEAD.
-	bases, err := headCommit.MergeBase(baseCommit)
-	if err != nil {
-		return false, fmt.Errorf("failed to compare commits with %s: %w", baseBranch, err)
-	}
-	if len(bases) == 0 {
-		return true, nil
-	}
-	for _, mb := range bases {
-		if mb.Hash == headRef.Hash() {
-			return false, nil
+		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			return false, fmt.Errorf(
+				"failed to compare commits with %s: timed out after %s: %w",
+				baseBranch, worktreeCmdTimeout, err,
+			)
 		}
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) && exitErr.ExitCode() == 1 {
+			// No common ancestor → treat as ahead (diverged / unrelated).
+			return true, nil
+		}
+		return false, fmt.Errorf(
+			"failed to compare commits with %s: %w: %s",
+			baseBranch, err, strings.TrimSpace(string(mbOut)),
+		)
+	}
+	if strings.TrimSpace(string(mbOut)) == headHash {
+		return false, nil
 	}
 	return true, nil
 }
