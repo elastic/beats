@@ -101,7 +101,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	kernelVersionOnce.Do(func() {
 		var err error
 		if kernelVersion, err = linux.KernelVersion(); err != nil {
-			base.Logger().Error("Failed fetching Linux kernel version: %v", err)
+			base.Logger().Errorf("Failed fetching Linux kernel version: %v", err)
 		}
 	})
 
