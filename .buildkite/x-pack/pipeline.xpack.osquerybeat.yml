@@ -300,7 +300,7 @@ steps:
         retry:
           automatic:
             - limit: 1
-        timeout_in_minutes: 20
+        timeout_in_minutes: 30
         plugins:
           - *dockerhub_login_plugin
           - *docker_elastic_login_plugin
