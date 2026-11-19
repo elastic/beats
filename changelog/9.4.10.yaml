@@ -5,8 +5,9 @@ entries:
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/54792
-      issue: []
+        - https://github.com/elastic/beats/pull/53726
+      issue:
+        - https://github.com/elastic/beats/issues/53731
       impact: ""
       action: ""
       timestamp: 1791600300
@@ -22,8 +23,9 @@ entries:
         request is now sent on the control socket.
       component: auditbeat
       pr:
-        - https://github.com/elastic/beats/pull/54792
-      issue: []
+        - https://github.com/elastic/beats/pull/53707
+      issue:
+        - https://github.com/elastic/beats/issues/50189
       impact: ""
       action: ""
       timestamp: 1791841937
@@ -42,7 +44,7 @@ entries:
         already waited longer than the limit are not delayed further.
       component: auditbeat
       pr:
-        - https://github.com/elastic/beats/pull/54792
+        - https://github.com/elastic/beats/pull/53853
       issue: []
       impact: ""
       action: ""
@@ -55,7 +57,7 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/54792
+        - https://github.com/elastic/beats/pull/54117
       issue: []
       impact: ""
       action: ""
@@ -69,7 +71,7 @@ entries:
         The kprobes backend of the file_integrity module stopped at the first /proc/kallsyms entry whose name started with the probed symbol, so on kernels that list a cold-path fragment such as fsnotify.cold ahead of fsnotify it reported "symbol fsnotify is optimised" and failed to start. Symbol lookup now scans the whole table, prefers an exact match, and ignores .cold fragments, which are not compiler clones of the function.
       component: auditbeat
       pr:
-        - https://github.com/elastic/beats/pull/54792
+        - https://github.com/elastic/beats/pull/54106
       issue: []
       impact: ""
       action: ""
@@ -87,7 +89,7 @@ entries:
         and localized labels (e.g. German Name=/Wert=) are parsed.
       component: winlogbeat
       pr:
-        - https://github.com/elastic/beats/pull/54792
+        - https://github.com/elastic/beats/pull/54115
       issue: []
       impact: ""
       action: ""
@@ -100,7 +102,7 @@ entries:
       description: ""
       component: heartbeat
       pr:
-        - https://github.com/elastic/beats/pull/54792
+        - https://github.com/elastic/beats/pull/52405
       issue: []
       impact: ""
       action: ""
@@ -113,7 +115,7 @@ entries:
       description: ""
       component: libbeat
       pr:
-        - https://github.com/elastic/beats/pull/54792
+        - https://github.com/elastic/beats/pull/54224
       issue: []
       impact: ""
       action: ""
@@ -126,7 +128,7 @@ entries:
       description: Addresses GHSA-c9gr-gmg4-2vqv, the Go decoder panic related to CVE-2026-111497.
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/54792
+        - https://github.com/elastic/beats/pull/54234
       issue: []
       impact: ""
       action: ""
@@ -149,7 +151,7 @@ entries:
         are not read as object paths.
       component: winlogbeat
       pr:
-        - https://github.com/elastic/beats/pull/54792
+        - https://github.com/elastic/beats/pull/54260
       issue: []
       impact: ""
       action: ""
@@ -179,8 +181,9 @@ entries:
         Each status report of a beat receiver built the map of its input statuses with a linear key lookup per input, which is quadratic in the number of inputs. It is now built in one pass, and an input reporting the status and message it already had no longer schedules a report.
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/54792
-      issue: []
+        - https://github.com/elastic/beats/pull/53723
+      issue:
+        - https://github.com/elastic/beats/issues/53730
       impact: ""
       action: ""
       timestamp: 1793632960
@@ -196,7 +199,7 @@ entries:
         are not idempotent, such as add_tags or script, produced wrong results.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/54792
+        - https://github.com/elastic/beats/pull/54416
       issue: []
       impact: ""
       action: ""
@@ -215,7 +218,7 @@ entries:
         process.cpu.pct were about 41.67 times too low.
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/54792
+        - https://github.com/elastic/beats/pull/54502
       issue: []
       impact: ""
       action: ""
@@ -228,7 +231,7 @@ entries:
       description: A mismatch in case sensitivity between checkpoint selection and filtering caused the azure-blob-storage and gcs inputs to re-read files on every poll when file names mixed upper- and lower-case letters, increasing ingest lag and output load. Affected inputs read those files once more after upgrading, then stop re-reading them.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/54792
+        - https://github.com/elastic/beats/pull/54512
       issue: []
       impact: ""
       action: ""
@@ -241,7 +244,7 @@ entries:
       description: When several Filebeat receivers in the same process shared a registry path and started at the same time with a new registry, one of them could fail on Windows with "Failed to migrate registry file" and stop without starting its inputs.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/54792
+        - https://github.com/elastic/beats/pull/54530
       issue: []
       impact: ""
       action: ""
@@ -274,8 +277,9 @@ entries:
         advertise acceptable CAs to clients.
       component: libbeat
       pr:
-        - https://github.com/elastic/beats/pull/54792
-      issue: []
+        - https://github.com/elastic/beats/pull/54749
+      issue:
+        - https://github.com/elastic/beats/issues/54742
       impact: ""
       action: ""
       timestamp: 1794930537
