@@ -12,7 +12,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
@@ -36,10 +35,7 @@ func TestHostParserRedactsInvalidHosts(t *testing.T) {
 			})
 			require.NoError(t, err, "building the module config should not fail")
 
-			_, _, err = mb.NewModule(c, mb.Registry, beat.Info{
-				Paths:  &paths.Path{Data: t.TempDir()},
-				Logger: logptest.NewTestingLogger(t, ""),
-			})
+			_, _, err = mb.NewModule(c, mb.Registry, &paths.Path{Data: t.TempDir()}, logptest.NewTestingLogger(t, ""))
 			require.Error(t, err, "host %q should fail to parse", host)
 			assert.Contains(t, err.Error(), "error trying to parse connection string", "error should come from the host parser")
 			assert.NotContains(t, err.Error(), "TigerSecret", "error must not leak the password from the host")
