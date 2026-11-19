@@ -20,4 +20,6 @@ There are additional configuration options that you can use to close file handle
 
 The `close.on_state_change.renamed` and `close.on_state_change.removed` options can be useful on Windows to resolve issues related to file rotation. See [Open file handlers cause issues with Windows file rotation](/reference/filebeat/windows-file-rotation.md). The `close.reader.on_eof` option can be useful in environments with a large number of files that have only very few entries. The `close.reader.after_interval` option is useful in environments where closing file handlers is more important than sending all log lines. For more details, see [Inputs](/reference/filebeat/configuration-filebeat-options.md).
 
+{applies_to}`stack: ga 9.7.0` Filestream inputs that find 5000 files or more when they start run the `high_cardinality` [preset](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-preset), which only keeps open the files that are being written to. Refer to [Reading a large number of files](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-high-cardinality).
+
 Make sure that you read the documentation for these configuration options before using any of them.
