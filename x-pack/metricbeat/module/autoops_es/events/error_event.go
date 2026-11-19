@@ -31,7 +31,7 @@ func LogAndSendErrorEventWithoutClusterInfo(logger *logp.Logger, err error, r mb
 
 // LogAndSendErrorEvent sends an error event to the reporter with the provided details.
 func LogAndSendErrorEvent(logger *logp.Logger, err error, clusterInfo *utils.ClusterInfo, r mb.ReporterV2, metricSetName string, path string, transactionID string) {
-	logger.Error("Error fetching data for metricset %s: %s", metricSetName, err)
+	logger.Errorf("Error fetching data for metricset %s: %s", metricSetName, err)
 
 	r.Event(createError(clusterInfo, err, path, transactionID))
 }
