@@ -53,13 +53,13 @@ func NewIndexers(configs PluginConfig, metaGen nomad.MetaGenerator, logger *logp
 		for name, pluginConfig := range pluginConfigs {
 			indexFunc := Indexing.GetIndexer(name)
 			if indexFunc == nil {
-				logger.Warn("Unable to find indexing plugin %s", name)
+				logger.Warnf("Unable to find indexing plugin %s", name)
 				continue
 			}
 
 			indexer, err := indexFunc(pluginConfig, metaGen)
 			if err != nil {
-				logger.Warn("Unable to initialize indexing plugin %s due to error %v", name, err)
+				logger.Warnf("Unable to initialize indexing plugin %s due to error %v", name, err)
 				continue
 			}
 
