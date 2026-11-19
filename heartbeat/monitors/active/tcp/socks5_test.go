@@ -124,7 +124,7 @@ func startSocks5Server(t *testing.T) (host string, port uint16, ip string, close
 	wg := sync.WaitGroup{}
 	wg.Go(func() {
 		if err := server.Serve(listener); err != nil {
-			logger.Debug("Error in SOCKS5 Test Server %v", err)
+			logger.Debugf("Error in SOCKS5 Test Server %v", err)
 		}
 	})
 
