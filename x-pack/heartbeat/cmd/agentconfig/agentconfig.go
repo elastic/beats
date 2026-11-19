@@ -67,8 +67,9 @@ func extractBrowserParams(rawInputs []map[string]any) (map[streamRef]*conf.C, er
 	for i, input := range rawInputs {
 		streams, _ := input["streams"].([]any)
 		for j, s := range streams {
-			stream, ok := s.(map[string]any)
-			if kind, _ := stream["type"].(string); !ok || kind != "browser" {
+			// A stream that isn't a map is nil here, and has no type.
+			stream, _ := s.(map[string]any)
+			if kind, _ := stream["type"].(string); kind != "browser" {
 				continue
 			}
 			if params, ok := stream["params"].(map[string]any); ok {
