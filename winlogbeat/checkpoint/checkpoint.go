@@ -199,11 +199,11 @@ func (c *Checkpoint) persist() bool {
 
 	err := c.flush()
 	if err != nil {
-		c.logger.Error("%v", err)
+		c.logger.Errorf("%v", err)
 		return false
 	}
 
-	c.logger.Debug("Checkpoint saved to disk. numUpdates=%d",
+	c.logger.Debugf("Checkpoint saved to disk. numUpdates=%d",
 		c.numUpdates)
 	c.numUpdates = 0
 	return true
@@ -288,6 +288,6 @@ func (c *Checkpoint) read() (*PersistedState, error) {
 // directory does not already exist.
 func (c *Checkpoint) createDir() error {
 	dir := filepath.Dir(c.file)
-	c.logger.Info("Creating %s if it does not exist.", dir)
+	c.logger.Infof("Creating %s if it does not exist.", dir)
 	return os.MkdirAll(dir, os.FileMode(0o750))
 }
