@@ -1401,7 +1401,7 @@ func handleError(logger *logp.Logger, err error) error {
 
 	// logp may not be initialized so log the err to stderr too.
 	if logger != nil {
-		logger.Error("Exiting: %v", err)
+		logger.Errorf("Exiting: %v", err)
 	}
 	fmt.Fprintf(os.Stderr, "Exiting: %v\n", err)
 	return err
