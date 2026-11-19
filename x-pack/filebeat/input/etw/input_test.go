@@ -304,7 +304,7 @@ func Test_connect_warnsOnDependentSession(t *testing.T) {
 
 	// A session made by etw.NewSession carries the default logging mode,
 	// which is independent; a bare etw.Session has no logging mode at all.
-	independent, err := etw.NewSession(etw.Config{SessionName: "MySession"}, logp.NewNopLogger())
+	independent, err := etw.NewSession(etw.Config{SessionName: "MySession"})
 	require.NoError(t, err, "creating a session value should succeed")
 	independent.Realtime = true
 
