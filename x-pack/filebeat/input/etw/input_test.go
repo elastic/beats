@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/sys/windows"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -297,6 +298,48 @@ func Test_RunEtwInput_CreateRealtimeSessionAlreadyExists(t *testing.T) {
 	assert.True(t, attached, "input should attach when the session already exists")
 	assert.Equal(t, []status.Status{status.Starting, status.Configuring, status.Running}, reporter.statuses(),
 		"falling back to attach should still end up Running")
+}
+
+func Test_connect_warnsOnDependentSession(t *testing.T) {
+	const warning = "which was not created in independent mode"
+
+	// A session made by etw.NewSession carries the default logging mode,
+	// which is independent; a bare etw.Session has no logging mode at all.
+	independent, err := etw.NewSession(etw.Config{SessionName: "MySession"}, logp.NewNopLogger())
+	require.NoError(t, err, "creating a session value should succeed")
+	independent.Realtime = true
+
+	tests := []struct {
+		name     string
+		session  *etw.Session
+		exists   bool // createRealtimeSession fails with ERROR_ALREADY_EXISTS.
+		wantWarn bool
+	}{
+		{name: "adopted dependent", session: &etw.Session{Name: "MySession", Realtime: true, NewSession: true}, exists: true, wantWarn: true},
+		{name: "adopted independent", session: independent, exists: true, wantWarn: false},
+		{name: "created", session: &etw.Session{Name: "MySession", Realtime: true, NewSession: true}, wantWarn: false},
+		{name: "configured session", session: &etw.Session{Name: "MySession", Realtime: true}, wantWarn: false},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			op := &mockSessionOperator{
+				createRealtimeSessionFunc: func(*etw.Session) error {
+					if tc.exists {
+						return fmt.Errorf("session already exists: %w", etw.ERROR_ALREADY_EXISTS)
+					}
+					return nil
+				},
+				attachToExistingSessionFunc: func(*etw.Session) error { return nil },
+			}
+			log := logptest.NewFileLogger(t, "")
+			e := &etwInput{etwSession: tc.session, operator: op, log: log.Logger}
+
+			require.NoError(t, e.connect(), "connect should succeed")
+			got, err := log.FindInLogs(warning)
+			require.NoError(t, err, "reading the test logs should succeed")
+			assert.Equal(t, tc.wantWarn, got, "whether connect warns about a session that is not independent")
+		})
+	}
 }
 
 func Test_RunEtwInput_StartConsumerError(t *testing.T) {
