@@ -50,6 +50,24 @@ type HarvesterLimiter interface {
 	HarvesterLimit() uint64
 }
 
+// Restarter is implemented by prospectors that can ask their input to run
+// them again, in place, for example to apply a configuration they only
+// decide while running. It is optional.
+//
+// The input calls RestartRequested every time Run returns. When it is true,
+// Run left the harvesters of the HarvesterGroup running: the input stops them
+// without draining them (read_until_eof does not apply), calls Restart, reads
+// HarvesterLimit again and calls Run with a new HarvesterGroup. Init and
+// TakeOver are not called again. When the input is shutting down it stops the
+// harvesters as usual instead.
+type Restarter interface {
+	RestartRequested() bool
+	// Restart prepares the next Run. It is called after the harvesters of the
+	// previous Run were stopped, although one stuck in a blocked publish can
+	// outlive the stop.
+	Restart()
+}
+
 // CursorInfo describes the cursor FindCursor looked up.
 type CursorInfo struct {
 	// Found is true when the registry holds a cursor for the source. An entry

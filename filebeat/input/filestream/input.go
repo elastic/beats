@@ -79,8 +79,9 @@ type filestream struct {
 	// harvesterState shares file state with this input's prospector.
 	harvesterState *fileStateTable
 
-	// preset is shared with this input's prospector, which resolves it in Init.
-	preset *resolvedPreset
+	// preset is shared with this input's prospector, which resolves it in Init
+	// and on a restart into high_cardinality.
+	preset *sharedPreset
 
 	// Function references for testing
 	waitGracePeriodFn func(
@@ -255,7 +256,7 @@ func (inp *filestream) Name() string { return pluginName }
 // only known after the prospector's Init, so it cannot be computed in
 // configure.
 func (inp *filestream) sliceBudget() time.Duration {
-	if inp.preset.harvesterLimit > 0 ||
+	if inp.preset.load().harvesterLimit > 0 ||
 		inp.closerConfig.OnStateChange.Renamed ||
 		inp.closerConfig.Reader.AfterInterval > 0 {
 		return inp.closerConfig.OnStateChange.CheckInterval
@@ -480,7 +481,7 @@ func (inp *filestream) buildPipeline(
 	log.Debug("newLogFileReader with config.MaxBytes:", inp.readerConfig.MaxBytes)
 
 	closerCfg := inp.closerConfig
-	if inp.preset.highCardinality {
+	if inp.preset.load().highCardinality {
 		// The prospector decides per file whether it is closed at EOF, so the
 		// configured 'close.reader.on_eof' does not apply.
 		closerCfg.Reader.OnEOF = !fs.keepOpen

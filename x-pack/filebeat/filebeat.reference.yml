@@ -2402,8 +2402,9 @@ filebeat.inputs:
 
   # Selects how the input tunes itself for the number of files it reads.
   # Set only one of: auto, default, high_cardinality.
-  # auto (used when preset is not set) runs high_cardinality when the input
-  # finds at least min_files files when it starts, otherwise default.
+  # auto (used when preset is not set) runs default until the input finds at
+  # least min_files files, at start or on a later scan, then restarts the
+  # input once into high_cardinality. It never switches back.
   # high_cardinality only starts harvesters for files with unread data, keeps
   # files open only while they are written to and ignores close.reader.on_eof.
   # Unless set, it uses harvester_limit: 500 and
