@@ -229,6 +229,6 @@ steps:
         matrix:
           setup:
             image:
-              - "${IMAGE_UBUNTU_X86_64}"
+              - "platform-ingest-beats-ubuntu-2204-1794715280"
               - "${IMAGE_RHEL9_X86_64}"
               - "${IMAGE_UBUNTU_2004_X86_64}"
