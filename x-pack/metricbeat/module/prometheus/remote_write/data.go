@@ -172,9 +172,8 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 			if err != nil {
 				continue
 			}
-			v := uint64(val)
 			b := &p.Bucket{
-				CumulativeCount: &v,
+				CumulativeCount: &val,
 				UpperBound:      &bucket,
 			}
 			hist, ok := histograms[histKey]

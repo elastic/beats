@@ -28,7 +28,7 @@ The eBPF backend uses modern eBPF features and supports 5.10.16+ kernels.
 The `Kprobes` backend uses tracefs and supports 3.10+ kernels.
 FSNotify doesn't have the ability to associate user data to file events.
 The preferred backend can be selected by specifying the `backend` config option.
-Since eBPF and Kprobes are in technical preview, `auto` will default to `fsnotify`.
+Since eBPF and Kprobes are in technical preview, `auto` defaults to `fsnotify`.
 * macOS (Darwin) - Uses the `FSEvents` API, present since macOS 10.5. This API
 coalesces multiple changes to a file into a single event. {beatname_uc} translates
 this coalesced changes into a meaningful sequence of actions. However,
@@ -147,5 +147,17 @@ usually only involve reading a small number of bytes.
 
 *`backend`*:: (*Linux only*) Select the backend which will be used to
 source events. Valid values: `auto`, `fsnotify`, `kprobes`, `ebpf`. Default: `fsnotify`.
++
+Starting with version 8.19.26, the `ebpf` backend must run in the host PID
+namespace when {beatname_uc} runs in a container. In Docker, add `--pid=host`.
+In Kubernetes, set `hostPID: true` on the pod, as the reference DaemonSet
+manifest already does. The backend attributes each file event to the process
+that made the change by looking the process up in a table built from the
+host's `/proc` and kept current from kernel events. The kernel reports host
+process IDs, but without the host PID namespace the table is built from the
+container's own process IDs. Events from processes that were already running
+when {beatname_uc} started are then dropped, or attributed to the wrong process
+when a host process ID happens to match a container one. {beatname_uc} logs a
+warning at startup when it isn't running in the host PID namespace.
 
 include::{docdir}/auditbeat-options.asciidoc[]

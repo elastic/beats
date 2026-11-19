@@ -526,6 +526,7 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 			hmacType:       c.HMACType,
 			hmacPrefix:     c.HMACPrefix,
 			maxBodySize:    -1,
+			maxInFlight:    c.MaxInFlight,
 			optionsHeaders: c.OptionsHeaders,
 			optionsStatus:  c.OptionsStatus,
 		},
@@ -543,6 +544,7 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 	}
 	// Initialize accepting to true so we start by accepting requests.
 	h.accepting.Store(true)
+	h.validator.inFlight = &h.inFlight
 	if h.status == nil {
 		h.status = noopReporter{}
 	}

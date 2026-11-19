@@ -814,6 +814,36 @@ The interval in which incremental updates should occur. The interval must be
 shorter than the full synchronization interval (`sync_interval`). Expressed as a
 duration string (e.g., 1m, 3h, 24h). Defaults to `15m` (15 minutes).
 
+[float]
+===== `request.redirect.forward_headers`
+
+When set to `true`, request headers are forwarded when the API responds with a
+redirect. Headers listed in `request.redirect.sensitive_headers` are removed on
+redirects to a different host or port, and on redirects from HTTPS to HTTP.
+Defaults to `false`.
+
+[float]
+===== `request.redirect.headers_ban_list`
+
+When `request.redirect.forward_headers` is `true`, all headers except the ones
+in this list are forwarded. Defaults to `[]`.
+
+[float]
+===== `request.redirect.sensitive_headers`
+
+A list of header names that are removed when a redirect goes to a different host
+or port, or from HTTPS to HTTP. This stops credentials being sent to an
+unintended origin. Defaults to `["Authorization", "Proxy-Authorization", "Cookie"]`.
+A list you set replaces the default list.
+
+Set to `[]` to forward all headers regardless of the redirect target. Do this
+only if the target shares the authentication domain of the API.
+
+[float]
+===== `request.redirect.max_redirects`
+
+The maximum number of redirects to follow for a request. Defaults to `10`.
+
 +==== `tracer.enabled`
 
 It is possible to log HTTP requests and responses to the Jamf API to a local file-system for debugging configurations.
@@ -1148,6 +1178,36 @@ The number of requests to allow in each limit window, if set.
 This parameter should only be set in exceptional cases. When it is set, rate
 limit information in API responses will be ignored in favor of the fixed limit.
 The limit is applied separately to each endopint. Defaults to unset.
+
+[float]
+===== `request.redirect.forward_headers`
+
+When set to `true`, request headers are forwarded when the API responds with a
+redirect. Headers listed in `request.redirect.sensitive_headers` are removed on
+redirects to a different host or port, and on redirects from HTTPS to HTTP.
+Defaults to `false`.
+
+[float]
+===== `request.redirect.headers_ban_list`
+
+When `request.redirect.forward_headers` is `true`, all headers except the ones
+in this list are forwarded. Defaults to `[]`.
+
+[float]
+===== `request.redirect.sensitive_headers`
+
+A list of header names that are removed when a redirect goes to a different host
+or port, or from HTTPS to HTTP. This stops credentials being sent to an
+unintended origin. Defaults to `["Authorization", "Proxy-Authorization", "Cookie"]`.
+A list you set replaces the default list.
+
+Set to `[]` to forward all headers regardless of the redirect target. Do this
+only if the target shares the authentication domain of the API.
+
+[float]
+===== `request.redirect.max_redirects`
+
+The maximum number of redirects to follow for a request. Defaults to `10`.
 
 [float]
 ===== `tracer.enabled`

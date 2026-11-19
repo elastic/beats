@@ -221,6 +221,7 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 			}
 			evt := j.createEvent(msg, val, evtOffset)
 			j.publish(evt, !dec.more(), id)
+			evtOffset++
 		}
 
 	case decoder:
@@ -243,6 +244,7 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 			}
 			evt := j.createEvent(msg, val, evtOffset)
 			j.publish(evt, !dec.more(), id)
+			evtOffset++
 		}
 
 	default:
