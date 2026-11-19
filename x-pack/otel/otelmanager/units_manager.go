@@ -60,9 +60,10 @@ type UnitsManager struct {
 	stopped     bool
 
 	// owned by the run loop
-	units      map[string]*client.Unit
-	lastOutput *proto.UnitExpectedConfig
-	lastInputs map[string]*proto.UnitExpectedConfig
+	units         map[string]*client.Unit
+	lastOutput    *proto.UnitExpectedConfig
+	lastInputs    map[string]*proto.UnitExpectedConfig
+	lastAgentInfo *client.AgentInfo
 
 	// the configs last applied, for the beat-rendered-config diagnostic
 	renderedMx     sync.Mutex
@@ -262,12 +263,15 @@ func (m *UnitsManager) applyInputs(inputs map[string]*proto.UnitExpectedConfig) 
 		m.logger.Error("beat has no reloadable input list")
 		return
 	}
-	if m.lastInputs != nil && maps.EqualFunc(m.lastInputs, inputs, func(a, b *proto.UnitExpectedConfig) bool { return gproto.Equal(a, b) }) {
+	// The transform adds the agent info to the inputs, so a change to it needs
+	// a reload too.
+	agentInfo := m.client.AgentInfo()
+	if m.lastInputs != nil && m.lastAgentInfo.Equal(agentInfo) &&
+		maps.EqualFunc(m.lastInputs, inputs, func(a, b *proto.UnitExpectedConfig) bool { return gproto.Equal(a, b) }) {
 		return
 	}
 
 	var configs []*reload.ConfigWithMeta
-	agentInfo := m.client.AgentInfo()
 	for _, id := range slices.Sorted(maps.Keys(inputs)) {
 		unitConfigs, err := m.transform(inputs[id], agentInfo)
 		if err != nil {
@@ -286,6 +290,7 @@ func (m *UnitsManager) applyInputs(inputs map[string]*proto.UnitExpectedConfig) 
 		m.logger.Errorf("failed to reload inputs: %v", err)
 	}
 	m.lastInputs = inputs
+	m.lastAgentInfo = agentInfo
 	m.renderedMx.Lock()
 	m.renderedInputs = configs
 	m.renderedMx.Unlock()

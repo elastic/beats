@@ -88,6 +88,20 @@ func TestUnitsManagerSkipsUnchangedConfigs(t *testing.T) {
 	})
 }
 
+func TestUnitsManagerReloadsOnAgentInfoChange(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		agent, inputs, _ := startReadyUnitsManager(t, outputUnit(), inputUnit(t, "a", "@every 1m", 1))
+
+		// The transform adds the agent info to the inputs, so a change to it
+		// alone must reload them.
+		agent.mx.Lock()
+		agent.agentInfo = &proto.AgentInfo{Id: "agent-id", Version: "9.9.9"}
+		agent.mx.Unlock()
+		applyUnits(agent, outputUnit(), inputUnit(t, "a", "@every 1m", 1))
+		assert.Len(t, inputs.reloads(), 2, "inputs should be reloaded when the agent info changes")
+	})
+}
+
 func TestUnitsManagerStopStopsInputs(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		_, inputs, m := startReadyUnitsManager(t, outputUnit(), inputUnit(t, "a", "@every 1m", 1))
