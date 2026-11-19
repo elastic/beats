@@ -68,7 +68,7 @@ func PrintConfigDebugf(logger *logp.Logger, c *config.C, msg string, params ...a
 
 	debugStr := config.DebugString(c, filtered)
 	if debugStr != "" {
-		logger.Debug(selector, "%s\n%s", fmt.Sprintf(msg, params...), debugStr)
+		logger.Named(selector).Debugf("%s\n%s", fmt.Sprintf(msg, params...), debugStr)
 	}
 }
 
