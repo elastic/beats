@@ -157,7 +157,9 @@ func (m *UnitsManager) Stop() {
 			m.client.Stop()
 			close(m.stop)
 			m.wg.Wait()
-			if list := m.registry.GetInputList(); list != nil && m.lastInputs != nil {
+			// A failed reload can still start inputs, so stop them even if no
+			// reload succeeded.
+			if list := m.registry.GetInputList(); list != nil {
 				if err := list.Reload(nil); err != nil {
 					m.logger.Errorf("failed to stop inputs: %v", err)
 				}
@@ -286,8 +288,11 @@ func (m *UnitsManager) applyInputs(inputs map[string]*proto.UnitExpectedConfig) 
 		configs = append(configs, unitConfigs...)
 	}
 	// Input errors are reported through the collector status by the inputs.
+	// After a failed reload the configs aren't remembered, so the next update
+	// retries them, as with the process manager.
 	if err := list.Reload(configs); err != nil {
 		m.logger.Errorf("failed to reload inputs: %v", err)
+		return
 	}
 	m.lastInputs = inputs
 	m.lastAgentInfo = agentInfo

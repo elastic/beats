@@ -6,6 +6,7 @@ package otelmanager
 
 import (
 	"context"
+	"errors"
 	"net"
 	"slices"
 	"sync"
@@ -99,6 +100,42 @@ func TestUnitsManagerReloadsOnAgentInfoChange(t *testing.T) {
 		agent.mx.Unlock()
 		applyUnits(agent, outputUnit(), inputUnit(t, "a", "@every 1m", 1))
 		assert.Len(t, inputs.reloads(), 2, "inputs should be reloaded when the agent info changes")
+	})
+}
+
+func TestUnitsManagerRetriesFailedReload(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		agent, inputs, m := startUnitsManager(t)
+		inputs.failReloads(errors.New("reload failed"))
+		agent.setUnits(outputUnit(), inputUnit(t, "a", "@every 1m", 1))
+		synctest.Wait()
+		m.PostInit()
+		synctest.Wait()
+		require.Len(t, inputs.reloads(), 1)
+
+		// A log level change modifies the unit, but not its config. As the last
+		// reload failed, the inputs are reloaded anyway.
+		inputs.failReloads(nil)
+		unit := inputUnit(t, "a", "@every 1m", 1)
+		unit.LogLevel = proto.UnitLogLevel_TRACE
+		applyUnits(agent, outputUnit(), unit)
+		assert.Equal(t, [][]string{{"a"}, {"a"}}, inputs.reloads(), "a failed reload should be retried")
+	})
+}
+
+func TestUnitsManagerStopStopsInputsAfterFailedReload(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		agent, inputs, m := startUnitsManager(t)
+		inputs.failReloads(errors.New("reload failed"))
+		agent.setUnits(outputUnit(), inputUnit(t, "a", "@every 1m", 1))
+		synctest.Wait()
+		m.PostInit()
+		synctest.Wait()
+
+		// A failed reload can still start some inputs, so Stop must stop them.
+		inputs.failReloads(nil)
+		m.Stop()
+		assert.Equal(t, [][]string{{"a"}, nil}, inputs.reloads(), "Stop should stop the inputs")
 	})
 }
 
@@ -258,6 +295,14 @@ type recordingInputs struct {
 	mx        sync.Mutex
 	unitIDs   [][]string
 	schedules []string
+	err       error
+}
+
+// failReloads makes every following reload return err, after recording it.
+func (r *recordingInputs) failReloads(err error) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+	r.err = err
 }
 
 func (r *recordingInputs) Reload(configs []*reload.ConfigWithMeta) error {
@@ -274,7 +319,7 @@ func (r *recordingInputs) Reload(configs []*reload.ConfigWithMeta) error {
 	}
 	r.unitIDs = append(r.unitIDs, ids)
 	r.schedules = schedules
-	return nil
+	return r.err
 }
 
 func (r *recordingInputs) reloads() [][]string {
