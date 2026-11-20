@@ -29,6 +29,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 func TestLoadConfig2(t *testing.T) {
@@ -41,7 +42,7 @@ func TestLoadConfig2(t *testing.T) {
 	config := &Config{}
 
 	// Reads second config file
-	cfg, err := cfgfile.Load(absPath+"/config2.yml", nil)
+	cfg, err := cfgfile.Load(logptest.NewTestingLogger(t, ""), absPath+"/config2.yml", nil)
 	assert.NoError(t, err)
 	err = cfg.Unpack(config)
 	assert.NoError(t, err)

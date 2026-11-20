@@ -101,13 +101,13 @@ type IndexerConstructor func(config config.C, metaGen metadata.MetaGen) (Indexer
 // NewIndexers builds indexers object
 // imageSource, when not empty, is forwarded to every indexer config that does
 // not set its own image_metadata_source.
-func NewIndexers(configs PluginConfig, metaGen metadata.MetaGen, imageSource string) *Indexers {
+func NewIndexers(configs PluginConfig, metaGen metadata.MetaGen, imageSource string, logger *logp.Logger) *Indexers {
 	indexers := []Indexer{}
 	for _, pluginConfigs := range configs {
 		for name, pluginConfig := range pluginConfigs {
 			indexFunc := Indexing.GetIndexer(name)
 			if indexFunc == nil {
-				logp.Warn("Unable to find indexing plugin %s", name)
+				logger.Warnf("Unable to find indexing plugin %s", name)
 				continue
 			}
 
@@ -115,11 +115,11 @@ func NewIndexers(configs PluginConfig, metaGen metadata.MetaGen, imageSource str
 				// Default indexer configs are shared through the registry, so work on a copy.
 				withSource := config.NewConfig()
 				if err := withSource.Merge(&pluginConfig); err != nil {
-					logp.Warn("Unable to copy config for indexing plugin %s due to error %v", name, err)
+					logger.Warnf("Unable to copy config for indexing plugin %s due to error %v", name, err)
 					continue
 				}
 				if err := withSource.SetString(ImageMetadataSourceKey, -1, imageSource); err != nil {
-					logp.Warn("Unable to set %s for indexing plugin %s due to error %v", ImageMetadataSourceKey, name, err)
+					logger.Warnf("Unable to set %s for indexing plugin %s due to error %v", ImageMetadataSourceKey, name, err)
 					continue
 				}
 				pluginConfig = *withSource
@@ -127,7 +127,7 @@ func NewIndexers(configs PluginConfig, metaGen metadata.MetaGen, imageSource str
 
 			indexer, err := indexFunc(pluginConfig, metaGen)
 			if err != nil {
-				logp.Warn("Unable to initialize indexing plugin %s due to error %v", name, err)
+				logger.Warnf("Unable to initialize indexing plugin %s due to error %v", name, err)
 				continue
 			}
 

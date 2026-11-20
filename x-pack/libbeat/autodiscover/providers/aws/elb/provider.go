@@ -124,6 +124,7 @@ func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *awsauto.Config, fetche
 	p.watcher = newWatcher(
 		fetcher,
 		config.Period,
+		logger,
 		p.onWatcherStart,
 		p.onWatcherStop,
 	)

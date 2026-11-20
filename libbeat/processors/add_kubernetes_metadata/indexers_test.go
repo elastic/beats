@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
 	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes/metadata"
 	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"github.com/stretchr/testify/assert"
@@ -774,7 +775,7 @@ func TestNewIndexersForwardsImageSource(t *testing.T) {
 		}},
 	}
 	shared := *config.NewConfig()
-	indexers := NewIndexers(PluginConfig{{ContainerIndexerName: shared}}, metagen, ImageSourceSpec)
+	indexers := NewIndexers(PluginConfig{{ContainerIndexerName: shared}}, metagen, ImageSourceSpec, logptest.NewTestingLogger(t, ""))
 	assert.False(t, shared.HasField(ImageMetadataSourceKey), "NewIndexers must not mutate the caller's indexer config")
 	md := indexers.GetMetadata(&pod)
 	require.Len(t, md, 1)

@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/pkg/version"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/auto_ops_testing"
@@ -289,7 +290,7 @@ func TestLogAndSendErrorEventDefaultValues(t *testing.T) {
 	metricSetName := "test_metricset"
 	path := "/test/path?query=string&other=param"
 
-	LogAndSendErrorEvent(err, clusterInfo, mockReporter, metricSetName, path, "test-transaction-id")
+	LogAndSendErrorEvent(logptest.NewTestingLogger(t, ""), err, clusterInfo, mockReporter, metricSetName, path, "test-transaction-id")
 
 	mockReporter.AssertCalled(t, "Event", mock.MatchedBy(func(event mb.Event) bool {
 		errorField, ok := event.RootFields["error"].(mapstr.M)
@@ -333,7 +334,7 @@ func TestLogAndSendErrorEventNonDefaultValues(t *testing.T) {
 	metricSetName := "custom_metricset"
 	path := "/custom/path?param=value"
 
-	LogAndSendErrorEvent(err, clusterInfo, mockReporter, metricSetName, path, "custom-transaction-id")
+	LogAndSendErrorEvent(logptest.NewTestingLogger(t, ""), err, clusterInfo, mockReporter, metricSetName, path, "custom-transaction-id")
 
 	mockReporter.AssertCalled(t, "Event", mock.MatchedBy(func(event mb.Event) bool {
 		clusterField, ok := event.ModuleFields["cluster"].(mapstr.M)

@@ -63,7 +63,7 @@ func blockto1024(b int64) int64 {
 
 // Fetch fetches one event for each device
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	devices, err := blockinfo.ListAll(m.mod.ResolveHostFS("/sys/block"))
+	devices, err := blockinfo.ListAll(m.Logger(), m.mod.ResolveHostFS("/sys/block"))
 	if err != nil {
 		return fmt.Errorf("failed to list RAID devices: %w", err)
 	}

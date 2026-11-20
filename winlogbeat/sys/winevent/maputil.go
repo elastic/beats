@@ -66,10 +66,7 @@ func AddPairs(m mapstr.M, key string, pairs []KeyValue) mapstr.M {
 
 		// Do not overwrite.
 		_, exists := h[k]
-		if exists {
-			debugf("Dropping key/value (k=%s, v=%s) pair because key already "+
-				"exists. event=%+v", k, kv.Value, m)
-		} else {
+		if !exists {
 			h[k] = sys.RemoveWindowsLineEndings(kv.Value)
 		}
 	}

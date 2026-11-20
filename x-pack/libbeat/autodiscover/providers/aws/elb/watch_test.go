@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/stretchr/testify/require"
 
 	"github.com/stretchr/testify/assert"
@@ -26,6 +27,7 @@ func TestWatchTicks(t *testing.T) {
 	watcher := newWatcher(
 		fetcher,
 		time.Millisecond,
+		logptest.NewTestingLogger(t, ""),
 		func(uuid string, lbListener *lbListener) {
 			lock.Lock()
 			defer lock.Unlock()

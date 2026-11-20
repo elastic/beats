@@ -20,7 +20,6 @@ package schema
 import (
 	"errors"
 
-	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
@@ -61,7 +60,6 @@ func (conv Conv) Map(key string, event mapstr.M, data map[string]any) []error {
 			keyErr.Required = conv.Required
 		}
 		if conv.IgnoreAllErrors {
-			logp.Debug("schema", "ignoring error for key %q: %s", key, err)
 			return nil
 		}
 		return []error{err}

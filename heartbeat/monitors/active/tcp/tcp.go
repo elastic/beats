@@ -45,8 +45,6 @@ func init() {
 	plugin.RegisterWithDestinations("tcp", destinations, create, "synthetics/tcp")
 }
 
-var debugf = logp.MakeDebug("tcp")
-
 func create(
 	name string,
 	cfg *conf.C,
@@ -232,7 +230,7 @@ func (jf *jobFactory) execDialer(
 
 	conn, err := dialer.Dial("tcp", addr)
 	if err != nil {
-		debugf("dial failed with: %v", err)
+		jf.logger.Debugf("dial failed with: %v", err)
 		var certErr x509.CertificateInvalidError
 		if errors.As(err, &certErr) {
 			tlsFields := tlsmeta.CertFields(certErr.Cert, nil)
@@ -247,14 +245,14 @@ func (jf *jobFactory) execDialer(
 	}
 
 	if err := conn.SetDeadline(deadline); err != nil {
-		debugf("setting connection deadline failed with: %v", err)
+		jf.logger.Debugf("setting connection deadline failed with: %v", err)
 		return reason.IOFailed(err)
 	}
 
 	validateStart := time.Now()
 	err = jf.dataCheck.Check(conn)
 	if err != nil && !errors.Is(err, errRecvMismatch) {
-		debugf("check failed with: %v", err)
+		jf.logger.Debugf("check failed with: %v", err)
 		return reason.IOFailed(err)
 	}
 

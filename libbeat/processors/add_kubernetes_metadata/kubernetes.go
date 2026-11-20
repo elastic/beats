@@ -317,7 +317,7 @@ func (k *kubernetesAnnotator) init(ctx context.Context, config kubeAnnotatorConf
 		// TODO: refactor the above section to a common function to be used by NeWPodEventer too
 		metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, jobWatcher, &metaConf)
 
-		indexers := NewIndexers(config.Indexers, metaGen, config.ImageMetadataSource)
+		indexers := NewIndexers(config.Indexers, metaGen, config.ImageMetadataSource, k.log)
 
 		watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 			AddFunc: func(obj any) {

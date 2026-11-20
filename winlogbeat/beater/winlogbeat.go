@@ -126,7 +126,7 @@ func (eb *Winlogbeat) setup(b *beat.Beat) error {
 	config := &eb.config
 
 	var err error
-	eb.checkpoint, err = checkpoint.NewCheckpoint(config.RegistryFile, config.RegistryFlush)
+	eb.checkpoint, err = checkpoint.NewCheckpoint(config.RegistryFile, config.RegistryFlush, b.Info.Logger)
 	if err != nil {
 		return fmt.Errorf("failed to initialize checkpoint registry: %w", err)
 	}

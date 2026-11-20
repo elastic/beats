@@ -144,7 +144,7 @@ func TestSimpleFindLimit1(t *testing.T) {
 	assert.Equal(t, "find", trans["method"])
 	assert.Equal(t, "mongodb", trans["type"])
 
-	logp.Debug("mongodb", "Trans: %v", trans)
+	logptest.NewTestingLogger(t, "mongodb").Debugf("Trans: %v", trans)
 }
 
 // Test simple request / response, where the response is split in
@@ -226,7 +226,7 @@ func TestSimpleFindLimit1_split(t *testing.T) {
 	assert.Equal(t, "find", trans["method"])
 	assert.Equal(t, "mongodb", trans["type"])
 
-	logp.Debug("mongodb", "Trans: %v", trans)
+	logptest.NewTestingLogger(t, "mongodb").Debugf("Trans: %v", trans)
 }
 
 func TestReconstructQuery(t *testing.T) {

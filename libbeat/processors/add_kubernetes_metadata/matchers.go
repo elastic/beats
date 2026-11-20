@@ -212,10 +212,11 @@ func (f *FieldMatcher) MetadataIndexCandidatesPdata(body pcommon.Map) []string {
 }
 
 type FieldFormatMatcher struct {
-	Codec codec.Codec
+	Codec  codec.Codec
+	logger *logp.Logger
 }
 
-func NewFieldFormatMatcher(cfg config.C, _ *logp.Logger) (Matcher, error) {
+func NewFieldFormatMatcher(cfg config.C, logger *logp.Logger) (Matcher, error) {
 	config := struct {
 		Format string `config:"format"`
 	}{}
@@ -231,6 +232,7 @@ func NewFieldFormatMatcher(cfg config.C, _ *logp.Logger) (Matcher, error) {
 
 	return &FieldFormatMatcher{
 		Codec: format.New(fmtstr.MustCompileEvent(config.Format)),
+		logger: logger.Named("kubernetes"),
 	}, nil
 
 }
@@ -241,7 +243,7 @@ func (f *FieldFormatMatcher) MetadataIndexCandidates(event mapstr.M) []string {
 	})
 
 	if err != nil {
-		logp.Debug("kubernetes", "Unable to apply field format pattern on event")
+		f.logger.Debug("Unable to apply field format pattern on event")
 	}
 
 	if len(bytes) == 0 {

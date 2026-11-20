@@ -25,7 +25,6 @@ import (
 	"time"
 
 	libxml "github.com/elastic/beats/v7/libbeat/common/encoding/xml"
-	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
 )
@@ -33,11 +32,6 @@ import (
 // Debug selectors used in this package.
 const (
 	debugSelector = "winevent"
-)
-
-// Debug logging functions for this package.
-var (
-	debugf = logp.MakeDebug(debugSelector)
 )
 
 // Keyword Constants
