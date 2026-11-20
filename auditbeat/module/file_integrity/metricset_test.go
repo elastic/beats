@@ -55,7 +55,7 @@ func TestData(t *testing.T) {
 	}()
 
 	ms := mbtest.NewPushMetricSetV2WithRegistry(t, getConfig(dir), ab.Registry)
-	events := mbtest.RunPushMetricSetV2(10*time.Second, 2, ms)
+	events := mbtest.RunPushMetricSetV2AndWait(10*time.Second, 2, ms)
 	for _, e := range events {
 		if e.Error != nil {
 			t.Fatalf("received error: %+v", e.Error)
@@ -67,12 +67,8 @@ func TestData(t *testing.T) {
 }
 
 func TestActions(t *testing.T) {
-	skipOnCIForDarwinAMD64(t)
-
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3016 is solved
 	skipOnBuildkiteWindows(t)
-	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
-	skipOnBuildkiteDarwinArm(t)
 
 	bucket, err := datastore.OpenBucket(bucketName, paths.New(), logptest.NewTestingLogger(t, ""))
 	if err != nil {
@@ -81,10 +77,10 @@ func TestActions(t *testing.T) {
 	defer bucket.Close()
 
 	// First directory
-	dir := t.TempDir()
+	dir := resolvedTempDir(t)
 
 	// Second directory (to be reported with "initial_scan")
-	newDir := t.TempDir()
+	newDir := resolvedTempDir(t)
 
 	createdFilepath := filepath.Join(dir, "created.txt")
 	updatedFilepath := filepath.Join(dir, "updated.txt")
@@ -133,7 +129,7 @@ func TestActions(t *testing.T) {
 	require.NoError(t, os.WriteFile(updatedFilepath, []byte("hello world"), 0o600))
 
 	ms := mbtest.NewPushMetricSetV2WithRegistry(t, getConfig(dir, newDir), ab.Registry)
-	events := mbtest.RunPushMetricSetV2(10*time.Second, 5, ms)
+	events := mbtest.RunPushMetricSetV2AndWait(10*time.Second, 5, ms)
 	assert.Len(t, events, 5)
 
 	for _, event := range events {
@@ -159,7 +155,11 @@ func TestActions(t *testing.T) {
 				assert.Contains(t, actions, "created")
 			case updatedFilepath:
 				assert.Contains(t, actions, "updated")
-				assert.Contains(t, actions, "attributes_modified")
+				// On macOS the FSEvents listener may report this file before the
+				// scanner does, and FSEvents doesn't flag it as attributes_modified.
+				if runtime.GOOS != "darwin" {
+					assert.Contains(t, actions, "attributes_modified")
+				}
 			default:
 				assert.Fail(t, "unexpected path", "path %v", path)
 			}
@@ -168,12 +168,8 @@ func TestActions(t *testing.T) {
 }
 
 func TestExcludedFiles(t *testing.T) {
-	skipOnCIForDarwinAMD64(t)
-
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3016 is solved
 	skipOnBuildkiteWindows(t)
-	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
-	skipOnBuildkiteDarwinArm(t)
 
 	bucket, err := datastore.OpenBucket(bucketName, paths.New(), logptest.NewTestingLogger(t, ""))
 	if err != nil {
@@ -181,7 +177,7 @@ func TestExcludedFiles(t *testing.T) {
 	}
 	defer bucket.Close()
 
-	dir := t.TempDir()
+	dir := resolvedTempDir(t)
 
 	ms := mbtest.NewPushMetricSetV2WithRegistry(t, getConfig(dir), ab.Registry)
 
@@ -192,7 +188,7 @@ func TestExcludedFiles(t *testing.T) {
 		}
 	}()
 
-	events := mbtest.RunPushMetricSetV2(10*time.Second, 3, ms)
+	events := mbtest.RunPushMetricSetV2AndWait(10*time.Second, 3, ms)
 	for _, e := range events {
 		if e.Error != nil {
 			t.Fatalf("received error: %+v", e.Error)
@@ -218,12 +214,8 @@ func TestExcludedFiles(t *testing.T) {
 }
 
 func TestIncludedExcludedFiles(t *testing.T) {
-	skipOnCIForDarwinAMD64(t)
-
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3016 is solved
 	skipOnBuildkiteWindows(t)
-	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
-	skipOnBuildkiteDarwinArm(t)
 
 	bucket, err := datastore.OpenBucket(bucketName, paths.New(), logptest.NewTestingLogger(t, ""))
 	if err != nil {
@@ -231,7 +223,7 @@ func TestIncludedExcludedFiles(t *testing.T) {
 	}
 	defer bucket.Close()
 
-	dir := t.TempDir()
+	dir := resolvedTempDir(t)
 
 	err = os.Mkdir(filepath.Join(dir, ".ssh"), 0o700)
 	if err != nil {
@@ -248,7 +240,7 @@ func TestIncludedExcludedFiles(t *testing.T) {
 		require.NoError(t, os.WriteFile(file, []byte("hello world"), 0o600))
 	}
 
-	events := mbtest.RunPushMetricSetV2(10*time.Second, 3, ms)
+	events := mbtest.RunPushMetricSetV2AndWait(10*time.Second, 3, ms)
 	for _, e := range events {
 		if e.Error != nil {
 			t.Fatalf("received error: %+v", e.Error)
@@ -320,7 +312,7 @@ func TestErrorReporting(t *testing.T) {
 		}
 	}()
 
-	events := mbtest.RunPushMetricSetV2(10*time.Second, 10, ms)
+	events := mbtest.RunPushMetricSetV2AndWait(10*time.Second, 10, ms)
 	close(done)
 	<-ready
 
@@ -946,20 +938,17 @@ func getConfig(path ...string) map[string]any {
 	}
 }
 
-func skipOnCIForDarwinAMD64(t testing.TB) {
-	if os.Getenv("CI") == "true" && runtime.GOOS == "darwin" && runtime.GOARCH == "amd64" {
-		t.Skip("Skip test on CI for darwin/amd64")
-	}
+// resolvedTempDir returns t.TempDir() with symlinks resolved. The metricset
+// reports paths with symlinks resolved (on macOS /var -> /private/var), so
+// expected paths must be resolved too.
+func resolvedTempDir(t testing.TB) string {
+	dir, err := filepath.EvalSymlinks(t.TempDir())
+	require.NoError(t, err, "failed to resolve temp dir symlinks")
+	return dir
 }
 
 func skipOnBuildkiteWindows(t testing.TB) {
 	if os.Getenv("BUILDKITE") == "true" && runtime.GOOS == "windows" {
 		t.Skip("Skip on Buildkite Windows: Shortened TMP problem")
-	}
-}
-
-func skipOnBuildkiteDarwinArm(t testing.TB) {
-	if os.Getenv("BUILDKITE") == "true" && runtime.GOOS == "darwin" && runtime.GOARCH == "arm64" {
-		t.Skip("Skip test on Buldkite: unexpected path error")
 	}
 }
