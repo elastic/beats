@@ -1,0 +1,8 @@
+kind: bug-fix
+summary: Fix beat receivers staying in memory after they stop.
+description: >-
+  Beat receivers did not remove their diagnostics hooks from the Elastic Agent
+  diagnostics extension when they stopped, so every receiver restart on a
+  collector config reload left the stopped receiver in memory. Receivers now
+  remove their hooks on shutdown when the extension supports it.
+component: all
