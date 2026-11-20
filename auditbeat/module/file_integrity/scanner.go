@@ -90,8 +90,8 @@ func (s *scanner) Start(done <-chan struct{}) (<-chan Event, error) {
 // scan iterates over the configured paths and generates events for each file.
 func (s *scanner) scan() {
 	s.log.Debugw("File system scanner is starting", "file_path", s.config.Paths, "new_path", s.newPaths)
-	defer s.log.Debug("File system scanner is stopping")
 	defer close(s.eventC)
+	defer s.log.Debug("File system scanner is stopping")
 	startTime := time.Now()
 
 	for _, path := range s.config.Paths {

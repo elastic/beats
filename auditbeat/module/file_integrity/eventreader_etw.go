@@ -266,7 +266,7 @@ func (r *etwReader) Start(done <-chan struct{}) (<-chan Event, error) {
 			case <-timer.C:
 				ops := r.correlator.flushExpiredGroups(interval)
 				for _, op := range ops {
-					r.sendEvent(op)
+					r.sendEvent(op, r.done)
 				}
 			}
 		}
@@ -291,12 +291,6 @@ func (r *etwReader) Start(done <-chan struct{}) (<-chan Event, error) {
 		// Wait for the main consumer loop and all in-flight events to finish processing.
 		r.inflightWG.Wait()
 		flushWg.Wait()
-
-		// flush any remaining operations
-		ops := r.correlator.flushExpiredGroups(0)
-		for _, op := range ops {
-			r.sendEvent(op)
-		}
 
 		close(r.eventC)
 		r.eventC = nil
@@ -366,7 +360,7 @@ func (r *etwReader) handleFileEvent(record *etw.EventRecord) uintptr {
 	}
 
 	for _, op := range r.correlator.processEvent(path, &etwEvent) {
-		r.sendEvent(op)
+		r.sendEvent(op, r.stopC)
 	}
 
 	if etwEvent.EventID == fileClose {
@@ -412,7 +406,7 @@ func (r *etwReader) getEventPath(etwEvent *etw.RenderedEtwEvent) string {
 	return r.deviceResolver.translateDevicePath(getRawPathFromEvent(etwEvent))
 }
 
-func (r *etwReader) sendEvent(op *etwOp) {
+func (r *etwReader) sendEvent(op *etwOp, cancel <-chan struct{}) {
 	if op == nil || op.action == None {
 		return
 	}
@@ -452,7 +446,10 @@ func (r *etwReader) sendEvent(op *etwOp) {
 	event.rtt = time.Since(start)
 
 	if r.eventC != nil {
-		r.eventC <- event
+		select {
+		case r.eventC <- event:
+		case <-cancel:
+		}
 	}
 }
 

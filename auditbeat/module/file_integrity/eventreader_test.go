@@ -420,3 +420,48 @@ func rename(t *testing.T, oldPath, newPath string) {
 		t.Fatal(err)
 	}
 }
+
+func TestEventReaderStopsWhenEventChannelFull(t *testing.T) {
+	dir := t.TempDir()
+
+	config := defaultConfig
+	config.Paths = []string{dir}
+	r, err := NewEventReader(config, logp.NewNopLogger())
+	require.NoError(t, err, "creating event reader must succeed")
+
+	done := make(chan struct{})
+	events, err := r.Start(done)
+	require.NoError(t, err, "starting event reader must succeed")
+
+	for i := range 10 {
+		p := filepath.Join(dir, fmt.Sprintf("file-%d.txt", i))
+		require.NoError(
+			t,
+			os.WriteFile(p, []byte("hello"), 0o600),
+			"writing watched file must succeed",
+		)
+	}
+
+	assert.Eventually(
+		t,
+		func() bool { return len(events) > 0 },
+		5*time.Second,
+		10*time.Millisecond,
+		"event channel buffer must fill before shutdown",
+	)
+
+	close(done)
+
+	timer := time.NewTimer(5 * time.Second)
+	defer timer.Stop()
+	for {
+		select {
+		case _, ok := <-events:
+			if !ok {
+				return
+			}
+		case <-timer.C:
+			t.Fatal("event reader did not close event channel after done closed")
+		}
+	}
+}

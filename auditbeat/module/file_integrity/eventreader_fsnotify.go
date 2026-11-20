@@ -117,7 +117,12 @@ func (r *fsNotifyReader) consumeEvents(done <-chan struct{}) {
 			r.log.Debug("fsnotify reader terminated")
 			return
 		}
-		r.eventC <- *ev
+		select {
+		case r.eventC <- *ev:
+		case <-done:
+			r.log.Debug("fsnotify reader terminated")
+			return
+		}
 	}
 }
 

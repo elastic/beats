@@ -173,7 +173,12 @@ func (r *fsEventsReader) consumeEvents(done <-chan struct{}) {
 					r.config.MaxFileSizeBytes, r.config.HashTypes, r.parsers)
 
 				e.rtt = time.Since(start)
-				r.eventC <- e
+				select {
+				case r.eventC <- e:
+				case <-done:
+					r.log.Debug("FSEvents reader terminated")
+					return
+				}
 			}
 		}
 	}

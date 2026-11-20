@@ -146,7 +146,12 @@ func (r kProbesReader) consumeEvents(done <-chan struct{}) {
 			r.log.Debug("kprobes reader terminated")
 			return
 		}
-		r.eventC <- *ev
+		select {
+		case r.eventC <- *ev:
+		case <-done:
+			r.log.Debug("kprobes reader terminated")
+			return
+		}
 	}
 }
 
