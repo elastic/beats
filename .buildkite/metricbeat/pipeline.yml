@@ -29,7 +29,7 @@ env:
   BEAT_PATH: "metricbeat"
 
   # Other deps
-  ASDF_MAGE_VERSION: 1.15.0
+  ASDF_MAGE_VERSION: 1.17.2
 
   # Unit tests
   RACE_DETECTOR: "true"

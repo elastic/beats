@@ -15,7 +15,7 @@ env:
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
   #Deps
-  ASDF_MAGE_VERSION: 1.15.0
+  ASDF_MAGE_VERSION: 1.17.2
 
   # Unit tests
   RACE_DETECTOR: "true"

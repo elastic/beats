@@ -12,7 +12,7 @@ env:
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
 
   #Deps
-  ASDF_MAGE_VERSION: 1.15.0
+  ASDF_MAGE_VERSION: 1.17.2
 
   # Unit tests
   RACE_DETECTOR: "true"
