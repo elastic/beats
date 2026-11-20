@@ -31,6 +31,6 @@ func procName(info types.ProcessInfo) string {
 
 // GetLocalPortToPIDMapping returns the list of local port numbers and the PID
 // that owns them.
-func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transport) (ports map[endpoint]int, err error) {
-	return nil, nil
+func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transport, _ uint16) (ports map[endpoint]int, scanned bool, err error) {
+	return nil, false, nil
 }

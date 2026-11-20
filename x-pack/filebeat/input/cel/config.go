@@ -190,11 +190,10 @@ func defaultConfig() config {
 				WaitMin:     &waitMin,
 				WaitMax:     &waitMax,
 			},
-			RedirectFollow:           true,
-			RedirectForwardHeaders:   false,
-			RedirectSensitiveHeaders: []string{"Authorization", "Proxy-Authorization", "Cookie"},
-			RedirectMaxRedirects:     10,
-			Transport:                transport,
+			RedirectFollow:         true,
+			RedirectForwardHeaders: false,
+			RedirectMaxRedirects:   10,
+			Transport:              transport,
 		},
 	}
 }

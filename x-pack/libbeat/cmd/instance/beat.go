@@ -241,9 +241,6 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		version.SetPackageVersion(b.Info.Version)
 	}
 
-	// build the user-agent string to be used by the outputs
-	b.GenerateUserAgent()
-
 	if err := b.Manager.CheckRawConfig(b.RawConfig); err != nil {
 		return nil, fmt.Errorf("error checking raw config: %w", err)
 	}
