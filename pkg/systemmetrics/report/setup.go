@@ -70,16 +70,9 @@ func SetupMetricsOptions(opts MetricOptions) error {
 		IncludeTop:   process.IncludeTopConfig{},
 		Logger:       opts.Logger,
 
-		// Always use the local filesystem for self-monitoring metrics.
-		// Metricbeat will use the hostfs to set the environment variables:
-		// - HOST_PROC
-		// - HOST_SYS
-		// - HOST_ETC
-		// which are read by github.com/shirou/gopsutil/v4 and used when fetching metrics.
-		// This causes a miss match, because the PID we get does not take into consideration
-		// the hostfs, thus it cannot be used to get metrics from it.
-		// The hostfs configuration is read after this function is ran, so we cannot even
-		// rely on the environment variables set by Metricbeat.
+		// Always use the local filesystem for self-monitoring metrics, ignoring
+		// any HOST_PROC/HOST_SYS/HOST_ETC set in the environment, because our
+		// own PID is only valid in the local /proc.
 		Hostfs: localProcResolver{},
 	}
 

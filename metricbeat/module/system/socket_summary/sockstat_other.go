@@ -20,6 +20,8 @@
 package socket_summary
 
 import (
+	"context"
+
 	"github.com/shirou/gopsutil/v4/net"
 
 	"github.com/elastic/beats/v7/pkg/mapstr"
@@ -33,6 +35,6 @@ func applyEnhancements(data mapstr.M, sys resolve.Resolver) (mapstr.M, error) {
 }
 
 // connections gets connection information
-func connections(kind string) ([]net.ConnectionStat, error) {
-	return net.Connections(kind)
+func connections(sys resolve.Resolver, kind string) ([]net.ConnectionStat, error) {
+	return net.ConnectionsWithContext(resolve.Context(context.Background(), sys), kind)
 }
