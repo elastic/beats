@@ -17,8 +17,8 @@ Builds and runs unit tests for **heartbeat** on the configured macOS runner usin
 ## When it runs
 
 - `workflow_dispatch`.
-- `pull_request`: paths: `["heartbeat/**", "go.mod", "dev-tools/**", "libbeat/**", ".github/workflows/heartbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
-- `push`: branches: `["main"]`; paths: `["heartbeat/**", "go.mod", "dev-tools/**", "libbeat/**", ".github/workflows/heartbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `pull_request`: paths: `["heartbeat/**", "go.mod", ".python-version", "dev-tools/**", "libbeat/**", ".github/workflows/heartbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `push`: branches: `["main"]`; paths: `["heartbeat/**", "go.mod", ".python-version", "dev-tools/**", "libbeat/**", ".github/workflows/heartbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
 
 ## Execution flow
 

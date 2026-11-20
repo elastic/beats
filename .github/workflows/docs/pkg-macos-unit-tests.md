@@ -17,8 +17,8 @@ Builds and runs unit tests for all packages under **pkg** on the configured macO
 ## When it runs
 
 - `workflow_dispatch`.
-- `pull_request`: paths: `["pkg/**", "go.mod", "dev-tools/**", ".github/workflows/pkg-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
-- `push`: branches: `["main"]`; paths: `["pkg/**", "go.mod", "dev-tools/**", ".github/workflows/pkg-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `pull_request`: paths: `["pkg/**", "go.mod", ".python-version", "dev-tools/**", ".github/workflows/pkg-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `push`: branches: `["main"]`; paths: `["pkg/**", "go.mod", ".python-version", "dev-tools/**", ".github/workflows/pkg-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
 
 ## Execution flow
 
