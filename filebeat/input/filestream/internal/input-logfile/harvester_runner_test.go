@@ -1507,6 +1507,69 @@ func TestHarvesterRunner_NoDrainWhenDisabled(t *testing.T) {
 	require.False(t, g.hasID(id))
 }
 
+// TestHarvesterRunner_StopForRestartDoesNotDrain asserts that a restart stop
+// tears a parked source down without reading it again, even with
+// read_until_eof enabled, and leaves the engine reference to the next runner.
+func TestHarvesterRunner_StopForRestartDoesNotDrain(t *testing.T) {
+	var reads atomic.Int64
+	h := &fakeHarvester{
+		readFn: func(_ int, _ v2.Context) (SliceVerdict, error) {
+			reads.Add(1)
+			return SliceYield, nil
+		},
+		pollFn: func(int) PollResult { return PollPark },
+	}
+	logger := logptest.NewTestingLogger(t, "")
+	engine := newEngine(logger)
+	t.Cleanup(engine.stop)
+	var releases atomic.Int64
+	release := func() { releases.Add(1) }
+	g := newHarvesterRunnerOn(
+		t,
+		engine,
+		release,
+		h,
+		0,
+		ReadUntilEOFConfig{Enabled: true, Timeout: 5 * time.Second},
+	)
+
+	g.start()
+	src := &testSource{name: "/path/to/test"}
+	id := g.identifier.ID(src)
+	g.Start(startContext(t), src)
+	requireEventually(
+		t,
+		func() bool {
+			s, ok := g.statusOf(id)
+			return ok && s == statusParked
+		},
+		"source should park after its first read",
+	)
+	readsBeforeStop := reads.Load()
+
+	require.NoError(t, g.stopForRestart(), "the restart stop must succeed")
+	assert.Equal(
+		t,
+		readsBeforeStop,
+		reads.Load(),
+		"a restart stop must not drain the source",
+	)
+	assert.False(t, g.hasID(id), "the source must be torn down")
+	assert.True(t, h.lastSession().isClosed(), "the session must be closed")
+	assert.Zero(
+		t,
+		releases.Load(),
+		"a restart stop must keep the engine reference",
+	)
+
+	require.NoError(t, g.StopHarvesters(), "a later stop must succeed")
+	assert.Zero(
+		t,
+		releases.Load(),
+		"a stopped runner must not release the engine again",
+	)
+}
+
 // TestHarvesterRunner_ReadUntilEOFTimeoutBoundsDrain asserts that a source stuck
 // mid-read is cancelled after the configured Timeout so shutdown cannot hang.
 func TestHarvesterRunner_ReadUntilEOFTimeoutBoundsDrain(t *testing.T) {

@@ -97,27 +97,33 @@ func (inp *managedInput) Run(
 	metrics := NewMetrics(ctx.MetricsRegistry, inp.manager.Logger)
 
 	// The harvester scheduler is shared by every filestream input in the process.
+	// Every harvester group of this input holds the same reference: only the
+	// last one releases it.
 	engine, releaseEngine := acquireEngine(inp.manager.Logger)
 	defer releaseEngine()
 
-	hg := newHarvesterRunner(
-		engine,
-		releaseEngine,
-		ctx,
-		inp.harvesterLimit,
-		pipeline,
-		inp.harvester,
-		inp.cleanTimeout,
-		groupStore,
-		inp.ackCH,
-		inp.sourceIdentifier,
-		metrics,
-		inp.id,
-		inp.readUntilEOF,
-		inp.backoff,
-		inp.stateCheckInterval,
-	)
-	hg.start()
+	startHarvesterGroup := func(limit uint64) *harvesterRunner {
+		hg := newHarvesterRunner(
+			engine,
+			releaseEngine,
+			ctx,
+			limit,
+			pipeline,
+			inp.harvester,
+			inp.cleanTimeout,
+			groupStore,
+			inp.ackCH,
+			inp.sourceIdentifier,
+			metrics,
+			inp.id,
+			inp.readUntilEOF,
+			inp.backoff,
+			inp.stateCheckInterval,
+		)
+		hg.start()
+		return hg
+	}
+	hg := startHarvesterGroup(inp.harvesterLimit)
 
 	if err := inp.prospector.TakeOver(sourceStore, inp.sourceIdentifier.ID); err != nil {
 		return fmt.Errorf("prospector failed to take over states: %w", err)
@@ -127,9 +133,29 @@ func (inp *managedInput) Run(
 	// Any errors encountered by harvester will change state to Degraded
 	ctx.UpdateStatus(status.Running, "")
 
-	inp.prospector.Run(ctx, sourceStore, hg, metrics)
+	restarter, _ := inp.prospector.(Restarter)
+	for {
+		inp.prospector.Run(ctx, sourceStore, hg, metrics)
+		if restarter == nil || !restarter.RestartRequested() {
+			return nil
+		}
+		if ctx.Cancelation.Err() != nil {
+			if err := hg.StopHarvesters(); err != nil {
+				ctx.Logger.Errorf("Error while stopping harvester group: %v", err)
+			}
+			return nil
+		}
 
-	return nil
+		if err := hg.stopForRestart(); err != nil {
+			ctx.Logger.Errorf("Error while stopping harvester group for a restart: %v", err)
+		}
+		restarter.Restart()
+		limit := inp.harvesterLimit
+		if hl, ok := inp.prospector.(HarvesterLimiter); ok {
+			limit = hl.HarvesterLimit()
+		}
+		hg = startHarvesterGroup(limit)
+	}
 }
 
 func newInputACKHandler(ch *updateChan) beat.EventListener {

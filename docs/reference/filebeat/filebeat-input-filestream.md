@@ -323,8 +323,8 @@ producing any data.
 
 The [`preset`](#filebeat-input-filestream-preset) option lets the input tune
 itself for this case. When `preset` is not set, the input runs `preset.auto`:
-if it finds 5000 files or more when it starts, it runs the `high_cardinality`
-preset, otherwise it keeps the regular behavior.
+it runs the `high_cardinality` preset once it finds 5000 files or more, and
+keeps the regular behavior until then.
 
 With the `high_cardinality` preset, the input uses the registry state of each
 file to decide whether to start a harvester for it:
@@ -378,13 +378,16 @@ for an overview. Set exactly one of the following presets:
 
 **`auto`**
 :   Runs `high_cardinality` when the input finds at least
-    `preset.auto.high_cardinality.min_files` files when it starts, and
-    `default` otherwise. `min_files` defaults to `5000`. This is the preset
-    used when `preset` is not set.
+    `preset.auto.high_cardinality.min_files` files, and `default` otherwise.
+    `min_files` defaults to `5000`. This is the preset used when `preset` is
+    not set.
 
-    The number of files is only counted when the input starts. An input that
-    grows past `min_files` while running keeps its preset until it is
-    restarted.
+    The number of files is counted when the input starts and on every scan.
+    When an input running `default` reaches `min_files`, it restarts itself
+    once into `high_cardinality`: it stops all its harvesters and starts again
+    with the `high_cardinality` behavior and defaults, without data loss or
+    duplication. An input never switches back to `default`, even if the number
+    of files drops below `min_files` again.
 
     ```yaml
     preset.auto:
@@ -418,8 +421,9 @@ for an overview. Set exactly one of the following presets:
     preset.high_cardinality: ~
     ```
 
-The input logs the preset it runs when it starts, together with the number of
-files found and the harvester limit and check interval in use.
+The input logs the preset it runs when it starts, and when `preset.auto`
+restarts it into `high_cardinality`, together with the number of files found
+and the harvester limit and check interval in use.
 
 The `auto` and `high_cardinality` presets do not start a harvester for every
 file, so they cannot be used with the options that need one:

@@ -282,6 +282,12 @@ type FSScanner interface {
 // called on the goroutine running the scan.
 type FSEventSink func(FSEvent)
 
+// ScanGate is called by [FSWatcher.ScanOnce] with the number of files a scan
+// found, the same count as len(GetFiles(...).Files), before any event of that
+// scan reaches the sink. Returning false drops the scan: no event is emitted
+// and the watcher keeps the state it had before the scan.
+type ScanGate func(fileCount int) bool
+
 // FSWatcher returns file events of the monitored files.
 type FSWatcher interface {
 	FSScanner
@@ -292,6 +298,13 @@ type FSWatcher interface {
 	// ScanOnce scans the file system once and calls sink synchronously for
 	// every event, so the caller owns the scan loop. Aside from the metrics
 	// struct it also has ignore older and ignore inactive as arguments.
-	// It stops early when ctx is cancelled.
-	ScanOnce(ctx unison.Canceler, sink FSEventSink, metrics *Metrics, ignoreOlder time.Duration, ignoreInactiveSince time.Time)
+	// It stops early when ctx is cancelled. A nil gate admits every scan.
+	ScanOnce(
+		ctx unison.Canceler,
+		sink FSEventSink,
+		metrics *Metrics,
+		ignoreOlder time.Duration,
+		ignoreInactiveSince time.Time,
+		gate ScanGate,
+	)
 }
