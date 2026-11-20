@@ -80,6 +80,82 @@ func TestValidInline(t *testing.T) {
 	require.NoError(t, e)
 }
 
+func TestAPIInlineUsesPersistentRunner(t *testing.T) {
+	cfg := conf.MustNewConfigFrom(mapstr.M{
+		"type": "api",
+		"name": "My API monitor",
+		"id":   "my-api-monitor",
+		"source": mapstr.M{
+			"inline": mapstr.M{
+				"script": "step('request', async () => {})",
+			},
+		},
+	})
+	s, err := NewSourceJob(cfg)
+	require.NoError(t, err, "API source job must parse")
+	t.Cleanup(func() {
+		assert.NoError(t, s.Close(), "API source job must close its persistent runner")
+	})
+
+	jobs := s.jobs()
+	assert.Len(t, jobs, 1, "API source job must expose one scheduled job")
+	assert.NotNil(t, s.apiRunner, "API source job without arbitrary CLI arguments must use a persistent runner")
+}
+
+func TestAPIInlineSharesPersistentRunner(t *testing.T) {
+	newJob := func(id string) *SourceJob {
+		cfg := conf.MustNewConfigFrom(mapstr.M{
+			"type": "api",
+			"name": "My API monitor",
+			"id":   id,
+			"source": mapstr.M{
+				"inline": mapstr.M{
+					"script": "step('request', async () => {})",
+				},
+			},
+		})
+		job, err := NewSourceJob(cfg)
+		require.NoError(t, err, "API source job must parse")
+		job.jobs()
+		return job
+	}
+
+	first := newJob("first")
+	second := newJob("second")
+	require.Same(t, first.apiRunner, second.apiRunner, "inline API monitors must share the worker-pool process")
+	runner := first.apiRunner
+
+	require.NoError(t, first.Close(), "first source job must release its runner lease")
+	assert.False(t, second.apiRunner.Closed(), "releasing one source job must leave the shared runner available")
+	require.NoError(t, second.Close(), "second source job must release its runner lease")
+	assert.True(t, runner.Closed(), "final source job release must stop the shared runner")
+}
+
+func TestAPIWithSyntheticsArgsUsesOneShotRunner(t *testing.T) {
+	cfg := conf.MustNewConfigFrom(mapstr.M{
+		"type": "api",
+		"name": "My API monitor",
+		"id":   "my-api-monitor",
+		"synthetics_args": []string{
+			"--capability", "trace",
+		},
+		"source": mapstr.M{
+			"inline": mapstr.M{
+				"script": "step('request', async () => {})",
+			},
+		},
+	})
+	s, err := NewSourceJob(cfg)
+	require.NoError(t, err, "API source job must parse")
+	t.Cleanup(func() {
+		assert.NoError(t, s.Close(), "API source job must close cleanly")
+	})
+
+	jobs := s.jobs()
+	assert.Len(t, jobs, 1, "API source job must expose one scheduled job")
+	assert.Nil(t, s.apiRunner, "API source job with arbitrary CLI arguments must preserve the one-shot runner")
+}
+
 func TestNameRequired(t *testing.T) {
 	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"id": "myId",

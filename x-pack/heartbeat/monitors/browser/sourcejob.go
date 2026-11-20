@@ -29,6 +29,8 @@ type SourceJob struct {
 	ctx        context.Context
 	cancel     context.CancelFunc
 	mtx        sync.Mutex
+	apiRunner  *synthexec.HeartbeatRunner
+	apiLease   *synthexec.HeartbeatRunnerLease
 }
 
 func NewSourceJob(rawCfg *config.C) (*SourceJob, error) {
@@ -94,6 +96,18 @@ func (sj *SourceJob) StdFields() stdfields.StdMonitorFields {
 }
 
 func (sj *SourceJob) Close() error {
+	sj.mtx.Lock()
+	apiRunner := sj.apiRunner
+	apiLease := sj.apiLease
+	sj.apiRunner = nil
+	sj.apiLease = nil
+	sj.mtx.Unlock()
+	if apiLease != nil {
+		apiLease.Close()
+	} else if apiRunner != nil {
+		_ = apiRunner.Close()
+	}
+
 	if sj.browserCfg.Source.ActiveMemo != nil {
 		sj.browserCfg.Source.ActiveMemo.Close()
 	}
@@ -199,6 +213,13 @@ func (sj *SourceJob) extraArgs(uiOrigin bool) []string {
 }
 
 func (sj *SourceJob) jobs() []jobs.Job {
+	// The persistent runner supports the structured options that Heartbeat owns.
+	// Retain the one-shot path for arbitrary synthetics_args until the daemon
+	// protocol exposes an equivalent typed option for every CLI flag.
+	if sj.browserCfg.IsAPI() && len(sj.browserCfg.SyntheticsArgs) == 0 {
+		return sj.apiJobs()
+	}
+
 	var j jobs.Job
 
 	isScript := sj.browserCfg.Source.Inline != nil
@@ -223,6 +244,63 @@ func (sj *SourceJob) jobs() []jobs.Job {
 		}
 	}
 	return []jobs.Job{j}
+}
+
+func (sj *SourceJob) apiJobs() []jobs.Job {
+	isScript := sj.browserCfg.Source.Inline != nil
+	ctx := context.WithValue(sj.ctx, synthexec.SynthexecTimeoutKey, sj.browserCfg.Timeout+30*time.Second)
+	sFields := sj.StdFields()
+	filterJourneys := sj.FilterJourneys()
+	playwrightOptions := sj.browserCfg.PlaywrightOpts
+	ignoreHTTPSErrors := sj.browserCfg.IgnoreHTTPSErrors
+
+	if isScript {
+		runner := sj.inlineAPIRunner()
+		return []jobs.Job{runner.InlineJourneyJob(ctx, sj.browserCfg.Source.Inline.Script, sj.Params, filterJourneys, sFields, playwrightOptions, ignoreHTTPSErrors)}
+	}
+
+	return []jobs.Job{func(event *beat.Event) ([]jobs.Job, error) {
+		if err := sj.Fetch(); err != nil {
+			return nil, fmt.Errorf("could not fetch for api source job: %w", err)
+		}
+		runner, err := sj.projectAPIRunner(sj.Workdir())
+		if err != nil {
+			return nil, err
+		}
+		return runner.ProjectJourneyJob(ctx, sj.Workdir(), sj.Params, filterJourneys, sFields, playwrightOptions, ignoreHTTPSErrors)(event)
+	}}
+}
+
+func (sj *SourceJob) inlineAPIRunner() *synthexec.HeartbeatRunner {
+	sj.mtx.Lock()
+	defer sj.mtx.Unlock()
+	if sj.apiRunner == nil || sj.apiRunner.Closed() {
+		if sj.apiLease != nil {
+			sj.apiLease.Close()
+		}
+		sj.apiLease = synthexec.AcquireHeartbeatInlineRunner()
+		sj.apiRunner = sj.apiLease.Runner
+	}
+	return sj.apiRunner
+}
+
+func (sj *SourceJob) projectAPIRunner(projectPath string) (*synthexec.HeartbeatRunner, error) {
+	sj.mtx.Lock()
+	defer sj.mtx.Unlock()
+	if sj.apiRunner != nil && !sj.apiRunner.Closed() {
+		return sj.apiRunner, nil
+	}
+
+	if sj.apiLease != nil {
+		sj.apiLease.Close()
+	}
+	lease, err := synthexec.AcquireHeartbeatProjectRunner(projectPath)
+	if err != nil {
+		return nil, err
+	}
+	sj.apiLease = lease
+	sj.apiRunner = lease.Runner
+	return sj.apiRunner, nil
 }
 
 // Plugin exposes the SourceJob as a monitor plugin. Exported so the `api`
