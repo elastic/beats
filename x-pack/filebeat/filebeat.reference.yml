@@ -3363,6 +3363,12 @@ filebeat.inputs:
 # The interval which to run the registry clean up
 #filebeat.registry.cleanup_interval: 5m
 
+# The maximum size of the registry transaction log (log.json) before a registry
+# checkpoint is forced. The checkpoint threshold starts at 10MiB and grows with
+# the size of the last checkpoint file, up to this value. The default value is
+# 512MiB.
+#filebeat.registry.max_log_size: 512MiB
+
 # Starting with Filebeat 7.0, the registry uses a new directory format to store
 # Filebeat state. After you upgrade, Filebeat will automatically migrate a 6.x
 # registry file to use the new directory format. If you changed
