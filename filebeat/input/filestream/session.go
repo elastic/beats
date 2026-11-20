@@ -185,7 +185,9 @@ func (s *harvestSession) ReadSlice(
 
 	for ctx.Cancelation.Err() == nil {
 		if !deadline.IsZero() && time.Now().After(deadline) {
-			s.readOffset = logReader.ReadOffset()
+			// Lines buffered up to the end of the file are not published yet, so
+			// Poll must resume instead of treating the file as read.
+			s.readOffset = s.state.Offset
 			s.log.Debugf("Slice time budget reached: %s; yielding.", s.src.newPath)
 			return loginp.SliceBudget, nil
 		}
@@ -337,6 +339,14 @@ func (s *harvestSession) Poll() loginp.PollResult {
 	// is invalid; resume until the session reads to EOF (SliceDone).
 	if s.src.desc.GZIP || fi.Size() != s.readOffset {
 		return loginp.PollResume
+	}
+
+	// The file has no new data, so it is read to its current end.
+	if s.inp.followReplacements {
+		if path := s.harvesterState.LongerReplacement(s.readOffset); path != "" {
+			s.log.Infof("Closing %s at its end because %s has the same file identity and more data", s.src.newPath, path)
+			return loginp.PollClose
+		}
 	}
 
 	if closer.Inactive > 0 && time.Since(s.lastData) > closer.Inactive {
