@@ -98,7 +98,6 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
@@ -124,7 +123,6 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         env:
           FIPS: "true"
@@ -152,7 +150,6 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         env:
           FIPS: "true"
@@ -180,7 +177,6 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
@@ -207,7 +203,6 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
@@ -242,7 +237,6 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
@@ -285,7 +279,6 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
@@ -564,7 +557,6 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
@@ -610,7 +602,6 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
@@ -657,7 +648,6 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"

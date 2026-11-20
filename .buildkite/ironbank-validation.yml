@@ -22,7 +22,6 @@ steps:
     agents:
       provider: "gcp"
       image: "${IMAGE_UBUNTU_X86_64}"
-      imageProject: elastic-images-qa
       machineType: "n2-standard-8"
     artifact_paths:
       - "x-pack/heartbeat/build/distributions/*"

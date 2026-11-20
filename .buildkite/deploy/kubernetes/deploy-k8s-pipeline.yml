@@ -34,7 +34,6 @@ steps:
       agents:
         provider: "gcp"
         image: "${IMAGE_UBUNTU_X86_64}"
-        imageProject: elastic-images-qa
         machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
       notify:
         - github_commit_status:
@@ -63,7 +62,6 @@ steps:
       agents:
         provider: "gcp"
         image: "${IMAGE_UBUNTU_X86_64}"
-        imageProject: elastic-images-qa
         machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
       notify:
         - github_commit_status:

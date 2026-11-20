@@ -66,7 +66,6 @@ steps:
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         timeout_in_minutes: 40
         retry:
@@ -92,7 +91,6 @@ steps:
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         timeout_in_minutes: 40
         retry:
@@ -125,7 +123,6 @@ steps:
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         timeout_in_minutes: 40
         retry:
@@ -201,7 +198,6 @@ steps:
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         timeout_in_minutes: 40
         retry:
@@ -262,7 +258,6 @@ steps:
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         timeout_in_minutes: 40
         retry:
@@ -341,7 +336,6 @@ steps:
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         timeout_in_minutes: 40
         retry:

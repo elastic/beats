@@ -101,7 +101,6 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_2204_X86_64}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "auditbeat/build/*.xml"
@@ -127,7 +126,6 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_2204_X86_64}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         env:
           FIPS: "true"
@@ -155,7 +153,6 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_2204_X86_64}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         env:
           FIPS: "true"
@@ -486,7 +483,6 @@ steps:
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_2204_X86_64}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         notify:
           - github_commit_status:

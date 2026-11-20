@@ -86,7 +86,6 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/dockerlogbeat/build/*.xml"
@@ -105,7 +104,6 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/dockerlogbeat/build/*.xml"
@@ -168,7 +166,6 @@ steps:
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         notify:
           - github_commit_status:
