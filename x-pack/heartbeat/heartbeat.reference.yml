@@ -298,6 +298,7 @@ heartbeat.jobs:
   # single file descriptor.
   # This feature is most useful for the browser type
   #browser.limit: 1
+  #api.limit: 4
   #http.limit: 10
   #tcp.limit: 10
   #icmp.limit: 10
@@ -1682,7 +1683,7 @@ logging.files:
 # sensitive information) together with other log messages, a different
 # log file, only for log entries containing raw events, is used. It will
 # use the same level, selectors and all other configurations from the
-# default logger, but it will have it's own file configuration.
+# default logger, but it will have its own file configuration.
 #
 # Having a different log file for raw events also prevents event data
 # from drowning out the regular log files.
