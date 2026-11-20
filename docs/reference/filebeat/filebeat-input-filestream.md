@@ -161,6 +161,8 @@ This functionality is in technical preview and may be changed or removed in a fu
 
 If the log rotating application copies the contents of the active file and then truncates the original file, use these options to help Filebeat to read files correctly.
 
+{applies_to}`stack: ga 9.7.0` When this strategy is used, the input always runs the `default` [preset](#filebeat-input-filestream-preset), and fails to start if `preset.auto` or `preset.high_cardinality` is set.
+
 Set the option `suffix_regex` so Filebeat can tell active and rotated files apart. There are two supported suffix types in the input: numberic and date.
 
 
@@ -278,6 +280,10 @@ are met:
 - EOF has been reached.
 - All events have been acknowledged by the output.
 
+{applies_to}`stack: ga 9.7.0` This option cannot be used with the `auto` or
+`high_cardinality` [preset](#filebeat-input-filestream-preset). When `preset`
+is not set, the input runs the `default` preset.
+
 ### `delete.grace_period` [filebeat-input-filestream-delete-grace-period]
 
 An interval to wait after the reader is closed and all events have
@@ -302,6 +308,37 @@ might replace/move the files {{filebeat}} will delete after
 ingestion. This can cause files not fully ingested to be accidentally
 removed.
 :::
+
+## Reading a large number of files [filebeat-input-filestream-high-cardinality]
+
+```{applies_to}
+stack: ga 9.7.0
+```
+
+By default, Filestream keeps a harvester, and its file handler, for every file
+it reads until the file is closed by one of the [`close.*`](#filebeat-input-filestream-close-options)
+options. When an input reads thousands of files and most of them are no longer
+written to, those idle harvesters use file handlers, memory and CPU without
+producing any data.
+
+The [`preset`](#filebeat-input-filestream-preset) option lets the input tune
+itself for this case. When `preset` is not set, the input runs `preset.auto`:
+if it finds 5000 files or more when it starts, it runs the `high_cardinality`
+preset, otherwise it keeps the regular behavior.
+
+With the `high_cardinality` preset, the input uses the registry state of each
+file to decide whether to start a harvester for it:
+
+* A file that was fully read is not opened.
+* A file that grew after its last harvester read it to the end is opened and
+  kept open, because it is still being written to. It is closed by the
+  regular `close.*` options, for example
+  [`close.on_state_change.inactive`](#filebeat-input-filestream-close-inactive).
+* Any other file, including a file the input has never read, is read to the
+  end and closed.
+
+As a result, idle files hold no harvester, and only the files that are being
+written to stay open.
 
 ## Input options [filebeat-input-filestream-settings]
 
@@ -328,6 +365,72 @@ Duplicated IDs will lead to data duplication and some input instances will not p
 A list of glob-based paths that will be crawled and fetched. All patterns supported by [Go Glob](https://golang.org/pkg/path/filepath/#Glob) are also supported here. For example, to fetch all files from a predefined level of subdirectories, the following pattern can be used: `/var/log/*/*.log`. This fetches all `.log` files from the subfolders of `/var/log`. It does not fetch log files from the `/var/log` folder itself. It is possible to recursively fetch all files in all subdirectories of a directory using the optional [`recursive_glob`](#filestream-recursive-glob) settings.
 
 Filebeat starts a harvester for each file that it finds under the specified paths. You can specify one path per line. Each line begins with a dash (-).
+
+### `preset` [filebeat-input-filestream-preset]
+
+```{applies_to}
+stack: ga 9.7.0
+```
+
+Selects how the input tunes itself for the number of files it reads. Refer to
+[Reading a large number of files](#filebeat-input-filestream-high-cardinality)
+for an overview. Set exactly one of the following presets:
+
+**`auto`**
+:   Runs `high_cardinality` when the input finds at least
+    `preset.auto.high_cardinality.min_files` files when it starts, and
+    `default` otherwise. `min_files` defaults to `5000`. This is the preset
+    used when `preset` is not set.
+
+    The number of files is only counted when the input starts. An input that
+    grows past `min_files` while running keeps its preset until it is
+    restarted.
+
+    ```yaml
+    preset.auto:
+      high_cardinality.min_files: 200
+    ```
+
+**`default`**
+:   Keeps the configured values and the regular behavior, whatever the number
+    of files.
+
+    ```yaml
+    preset.default: ~
+    ```
+
+**`high_cardinality`**
+:   Always runs the high cardinality behavior. It starts harvesters only for
+    files that have unread data, and keeps files open only while they are
+    written to. It also changes the following defaults:
+
+    * [`harvester_limit`](#filebeat-input-filestream-harvester-limit) defaults
+      to `500`.
+    * [`prospector.scanner.check_interval`](#filebeat-input-filestream-scan-frequency)
+      defaults to `30s`.
+
+    Values you set for these options are used instead of the preset defaults.
+    The input decides for each file whether it is closed at the end of the
+    file, so [`close.reader.on_eof`](#filebeat-input-filestream-close-eof) is
+    ignored, and a warning is logged when it is set.
+
+    ```yaml
+    preset.high_cardinality: ~
+    ```
+
+The input logs the preset it runs when it starts, together with the number of
+files found and the harvester limit and check interval in use.
+
+The `auto` and `high_cardinality` presets do not start a harvester for every
+file, so they cannot be used with the options that need one:
+
+* [`delete.enabled`](#filebeat-input-filestream-delete-enabled)
+* [`clean_inactive`](#filebeat-input-filestream-clean-inactive)
+* [`rotation.external.strategy.copytruncate`](#_rotation_external_strategy_copytruncate)
+
+If you set `preset.auto` or `preset.high_cardinality` together with any of
+them, the input fails to start. If `preset` is not set, the input runs the
+`default` preset instead.
 
 ### `take_over` [filebeat-input-filestream-take-over]
 
@@ -581,6 +684,8 @@ Only use this option if you understand that data loss is a potential side effect
 
 When this option is enabled, Filebeat closes a file as soon as the end of a file is reached. This is useful when your files are only written once and not updated from time to time. For example, this happens when you are writing every single log event to a new file. This option is disabled by default.
 
+{applies_to}`stack: ga 9.7.0` This option is ignored when the input runs the `high_cardinality` [preset](#filebeat-input-filestream-preset).
+
 
 #### `close.reader.after_interval` [filebeat-input-filestream-close-timeout]
 
@@ -667,6 +772,8 @@ When this option is enabled, Filebeat removes the state of a file after the spec
 
 The `clean_inactive` configuration option is useful to reduce the size of the registry file, especially if a large amount of new files are generated every day.
 
+{applies_to}`stack: ga 9.7.0` When enabled, this option cannot be used with the `auto` or `high_cardinality` [preset](#filebeat-input-filestream-preset). When `preset` is not set, the input runs the `default` preset.
+
 This config option is also useful to prevent Filebeat problems resulting from inode reuse on Linux. For more information, see [Inode reuse causes Filebeat to skip lines](/reference/filebeat/inode-reuse-issue.md).
 
 To disable, set `clean_inactive` to either:
@@ -732,6 +839,8 @@ A file counts against the limit for the whole time it is being harvested, includ
 When the limit is reached, newly discovered files are queued and started in the order they were discovered (first in, first out) as open files are closed and slots become available.
 
 This configuration option applies per input. You can use this option to indirectly set higher priorities on certain inputs by assigning a higher limit of harvesters.
+
+{applies_to}`stack: ga 9.7.0` When the input runs the `high_cardinality` [preset](#filebeat-input-filestream-preset), the default is `500`.
 
 ### `include_file_owner_name` [filestream-input-include_file_owner_name]
 ```{applies_to}
@@ -1229,7 +1338,7 @@ How often Filebeat checks for new files in the paths that are specified for harv
 
 If you require log lines to be sent in near real time do not use a very low `check_interval` but adjust `close.on_state_change.inactive` so the file handler stays open and constantly polls your files.
 
-The default setting is 10s.
+The default setting is 10s. {applies_to}`stack: ga 9.7.0` When the input runs the `high_cardinality` [preset](#filebeat-input-filestream-preset), the default is 30s.
 
 
 #### `prospector.scanner.fingerprint` [filebeat-input-filestream-scan-fingerprint]

@@ -232,9 +232,14 @@ prospector.scanner.fingerprint.enabled: true
 file_identity.fingerprint:
   growing: true`
 	}
+	// preset.default keeps every row on the same code path: without it the
+	// rows with at least 5000 files would resolve to high_cardinality (500
+	// harvesters, close.reader.on_eof ignored) and stop being comparable with
+	// the other rows and with earlier results.
 	return fmt.Sprintf(`
 id: benchmark
 type: filestream
+preset.default: ~
 prospector.scanner.check_interval: 100ms
 close.reader.on_eof: true%s
 paths:
@@ -428,58 +433,153 @@ paths:
 	}
 }
 
-// TestConfigure_SliceBudget asserts configure only bounds ReadSlice's duration
-// (filestream.sliceBudget, at close.on_state_change.check_interval) when
-// something depends on Poll running while a file stays continuously busy:
-// harvester_limit needs a close condition to free its slot, and
+// TestConfigure_SliceBudget asserts a filestream input only bounds ReadSlice's
+// duration (filestream.sliceBudget(), at close.on_state_change.check_interval)
+// when something depends on Poll running while a file stays continuously busy:
+// the resolved harvester_limit needs a close condition to free its slot, and
 // close.on_state_change.renamed only matters for a file still being written to
 // under its old name. Otherwise it's left unbounded to avoid the extra
-// pipeline-rebuild/stat overhead where nothing needs it.
+// pipeline-rebuild/stat overhead where nothing needs it. The limit is only
+// resolved by the prospector's Init, so the budget is read after it.
 func TestConfigure_SliceBudget(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	srcIdentifier, err := loginp.NewSourceIdentifier(pluginName, "test")
-	require.NoError(t, err)
+	require.NoError(t, err, "creating the source identifier must succeed")
 
-	build := func(t *testing.T, extra string) *filestream {
-		t.Helper()
-		cfg := conf.MustNewConfigFrom(fmt.Sprintf(`
+	cases := []struct {
+		name       string
+		extra      string
+		wantBudget bool
+	}{
+		{name: "unset by default"},
+		{name: "set when harvester_limit is enabled", extra: "harvester_limit: 5", wantBudget: true},
+		{
+			name:       "set when close.on_state_change.renamed is enabled",
+			extra:      "close.on_state_change.renamed: true",
+			wantBudget: true,
+		},
+		{
+			name:       "set when close.reader.after_interval is enabled",
+			extra:      "close.reader.after_interval: 30s",
+			wantBudget: true,
+		},
+		{
+			name:  "unaffected by settings that don't need it",
+			extra: "close.on_state_change.inactive: 1m\nclose.on_state_change.removed: true",
+		},
+		{
+			name:       "set when high_cardinality resolves a harvester_limit",
+			extra:      "preset.high_cardinality: ~",
+			wantBudget: true,
+		},
+		{name: "unset under the default preset", extra: "preset.default: ~"},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := conf.MustNewConfigFrom(fmt.Sprintf(`
 type: filestream
 id: test
 paths:
-  - /var/log/foo
+  - %s
 %s
-`, extra))
-		_, harvester, err := configure(cfg, logger, srcIdentifier, nil)
-		require.NoError(t, err)
-		fs, ok := harvester.(*filestream)
-		require.True(t, ok)
-		return fs
+`, filepath.Join(t.TempDir(), "*.log"), tc.extra))
+			prospector, harvester, err := configure(cfg, logger, srcIdentifier, nil)
+			require.NoError(t, err, "configure must succeed")
+			fs, ok := harvester.(*filestream)
+			require.True(t, ok, "expected *filestream, got %T", harvester)
+
+			err = prospector.Init(newMockStoreUpdater(nil), newMockStoreUpdater(nil),
+				func(loginp.Source) string { return "" })
+			require.NoError(t, err, "Init must succeed")
+
+			var want time.Duration
+			if tc.wantBudget {
+				want = fs.closerConfig.OnStateChange.CheckInterval
+			}
+			assert.Equal(t, want, fs.sliceBudget(), "unexpected slice budget")
+		})
+	}
+}
+
+func TestConfigurePreset(t *testing.T) {
+	logger := logp.NewNopLogger()
+	srcIdentifier, err := loginp.NewSourceIdentifier(pluginName, "test")
+	require.NoError(t, err, "creating the source identifier must succeed")
+
+	highCardinality := resolvedPreset{
+		highCardinality: true,
+		harvesterLimit:  highCardinalityHarvesterLimit,
+		checkInterval:   highCardinalityCheckInterval,
 	}
 
-	t.Run("unset by default", func(t *testing.T) {
-		fs := build(t, "")
-		assert.Zero(t, fs.sliceBudget, "no setting needs a bounded slice")
-	})
+	cases := []struct {
+		name  string
+		extra string
+		// files is the number of files the scan finds at input start.
+		files int
+		want  resolvedPreset
+	}{
+		{
+			name: "preset not set below the threshold keeps the configured values",
+			want: resolvedPreset{checkInterval: 10 * time.Second},
+		},
+		{
+			name:  "preset not set with files at the threshold runs high_cardinality",
+			files: defaultMinFiles,
+			want:  highCardinality,
+		},
+		{
+			name:  "high_cardinality fills in its values",
+			extra: "preset.high_cardinality: ~",
+			want:  highCardinality,
+		},
+		{
+			name: "high_cardinality keeps an explicit check_interval equal to the default",
+			extra: `preset.high_cardinality: ~
+harvester_limit: 100
+prospector.scanner.check_interval: 10s`,
+			want: resolvedPreset{
+				highCardinality: true,
+				harvesterLimit:  100,
+				checkInterval:   10 * time.Second,
+			},
+		},
+	}
 
-	t.Run("set when harvester_limit is enabled", func(t *testing.T) {
-		fs := build(t, "harvester_limit: 5")
-		assert.Equal(t, fs.closerConfig.OnStateChange.CheckInterval, fs.sliceBudget)
-	})
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			dir := t.TempDir()
+			for i := range tc.files {
+				name := filepath.Join(dir, fmt.Sprintf("%d.log", i))
+				// Distinct content: the default fingerprint identity counts
+				// files with the same content as one file.
+				require.NoError(t, os.WriteFile(name, fmt.Appendf(nil, "line %d\n", i), 0o644),
+					"writing the test file must succeed")
+			}
+			cfg := conf.MustNewConfigFrom(fmt.Sprintf(`
+type: filestream
+id: test
+paths:
+  - %s
+%s
+`, filepath.Join(dir, "*.log"), tc.extra))
+			prospector, harvester, err := configure(cfg, logger, srcIdentifier, nil)
+			require.NoError(t, err, "configure must succeed")
+			fs, ok := harvester.(*filestream)
+			require.True(t, ok, "expected *filestream, got %T", harvester)
+			fp, ok := prospector.(*fileProspector)
+			require.True(t, ok, "expected *fileProspector, got %T", prospector)
 
-	t.Run("set when close.on_state_change.renamed is enabled", func(t *testing.T) {
-		fs := build(t, "close.on_state_change.renamed: true")
-		assert.Equal(t, fs.closerConfig.OnStateChange.CheckInterval, fs.sliceBudget)
-	})
+			require.NotNil(t, fs.preset, "configure must give the harvester a preset")
+			assert.Same(t, fs.preset, fp.preset, "harvester and prospector must share the preset")
 
-	t.Run("set when close.reader.after_interval is enabled", func(t *testing.T) {
-		fs := build(t, "close.reader.after_interval: 30s")
-		assert.Equal(t, fs.closerConfig.OnStateChange.CheckInterval, fs.sliceBudget)
-	})
-
-	t.Run("unaffected by settings that don't need it", func(t *testing.T) {
-		fs := build(t, "close.on_state_change.inactive: 1m\nclose.on_state_change.removed: true")
-		assert.Zero(t, fs.sliceBudget)
-	})
+			err = prospector.Init(newMockStoreUpdater(nil), newMockStoreUpdater(nil),
+				func(loginp.Source) string { return "" })
+			require.NoError(t, err, "Init must succeed")
+			assert.Equal(t, tc.want, *fs.preset, "unexpected resolved preset")
+		})
+	}
 }
 
 func TestNewFile(t *testing.T) {
@@ -554,6 +654,7 @@ func TestNewFile(t *testing.T) {
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			inp := &filestream{
+				preset:       &resolvedPreset{},
 				compression:  tc.compression,
 				readerConfig: defaultReaderConfig(),
 			}
@@ -625,6 +726,7 @@ func TestOpenFile_GZIPNeverTruncated(t *testing.T) {
 
 	for _, tc := range tcs {
 		inp := filestream{
+			preset:          &resolvedPreset{},
 			compression:     tc.compression,
 			encodingFactory: encoding.Plain,
 			readerConfig:    readerConfig{BufferSize: 32},

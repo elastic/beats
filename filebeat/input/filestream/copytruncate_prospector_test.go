@@ -122,6 +122,7 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			p := copyTruncateFileProspector{
 				fileProspector{
+					preset:      &resolvedPreset{},
 					filewatcher: newMockFileWatcher(test.events, len(test.events)),
 					identifier:  mustPathIdentifier(false),
 				},
