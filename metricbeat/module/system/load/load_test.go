@@ -20,6 +20,7 @@
 package load
 
 import (
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -38,6 +39,26 @@ func TestFetch(t *testing.T) {
 	}
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 		events[0].BeatEvent("system", "load").Fields.StringToPrint())
+}
+
+func TestFetchHostFS(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("test requires linux")
+	}
+	conf := getConfig()
+	conf["hostfs"] = "./_meta/testdata"
+	f := mbtest.NewReportingMetricSetV2Error(t, conf)
+	t.Setenv("HOST_PROC", "/a/broken/path")
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	assert.Empty(t, errs, "fetch must not fail")
+	if !assert.Len(t, events, 1, "fetch must report one event") {
+		return
+	}
+
+	fields := events[0].MetricSetFields
+	assert.InDelta(t, 12.34, fields["1"], 1e-9, "1m load must come from the hostfs fixture")
+	assert.InDelta(t, 5.67, fields["5"], 1e-9, "5m load must come from the hostfs fixture")
+	assert.InDelta(t, 8.91, fields["15"], 1e-9, "15m load must come from the hostfs fixture")
 }
 
 func TestData(t *testing.T) {

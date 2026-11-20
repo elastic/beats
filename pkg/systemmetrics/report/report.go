@@ -26,7 +26,6 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/shirou/gopsutil/v4/common"
 	psprocess "github.com/shirou/gopsutil/v4/process"
 
 	"github.com/elastic/beats/v7/pkg/logp"
@@ -50,7 +49,7 @@ func MemStatsReporter(logger *logp.Logger, processStats *process.Stats) func(mon
 
 	ctx := context.Background()
 	if processStats != nil && processStats.Hostfs != nil && processStats.Hostfs.IsSet() {
-		ctx = context.WithValue(context.Background(), common.EnvKey, common.EnvMap{common.HostProcEnvKey: processStats.Hostfs.ResolveHostFS("/proc")})
+		ctx = resolve.Context(ctx, processStats.Hostfs)
 	}
 
 	return func(m monitoring.Mode, V monitoring.Visitor) {
@@ -89,7 +88,7 @@ func InstanceCPUReporter(logger *logp.Logger, processStats *process.Stats) func(
 
 	ctx := context.Background()
 	if processStats != nil && processStats.Hostfs != nil && processStats.Hostfs.IsSet() {
-		ctx = context.WithValue(context.Background(), common.EnvKey, common.EnvMap{common.HostProcEnvKey: processStats.Hostfs.ResolveHostFS("/proc")})
+		ctx = resolve.Context(ctx, processStats.Hostfs)
 	}
 
 	return func(_ monitoring.Mode, V monitoring.Visitor) {
@@ -133,7 +132,7 @@ func ReportSystemLoadAverage(logger *logp.Logger) func(monitoring.Mode, monitori
 		V.OnRegistryStart()
 		defer V.OnRegistryFinished()
 
-		ctx := context.WithValue(context.Background(), common.EnvKey, common.EnvMap{common.HostProcEnvKey: localProcResolver{}.ResolveHostFS("/proc")})
+		ctx := resolve.Context(context.Background(), localProcResolver{})
 		load, err := cpu.LoadWithContextAndLogger(ctx, logger)
 		if err != nil {
 			logger.Errorf("Error retrieving load average: %v", err)
