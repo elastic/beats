@@ -278,6 +278,14 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 // RunStaticMonitors runs the `heartbeat.monitors` portion of the yaml config if present.
 func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat, pipeline beat.Pipeline) (stop func(), err error) {
 	runners := make([]cfgfile.Runner, 0, len(bt.config.Monitors))
+	enabledMonitors := make([]*conf.C, 0, len(bt.config.Monitors))
+	for _, cfg := range bt.config.Monitors {
+		if cfg.Enabled() {
+			enabledMonitors = append(enabledMonitors, cfg)
+		}
+	}
+	cfgfile.SetRunnerConfigs(bt.monitorFactory, bt, enabledMonitors)
+
 	for _, cfg := range bt.config.Monitors {
 		created, err := bt.monitorFactory.Create(pipeline, cfg)
 		if err != nil {

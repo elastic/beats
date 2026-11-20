@@ -91,13 +91,20 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 
 	r.logger.Debugf("Starting reload procedure, current runners: %d", len(stopList))
 
-	// diff current & desired state, create action lists
+	enabled := make([]*reload.ConfigWithMeta, 0, len(configs))
+	enabledConfigs := make([]*config.C, 0, len(configs))
 	for _, config := range configs {
 		if !config.Config.Enabled() {
 			r.logger.Debug("Runner config is disabled, skipping")
 			continue
 		}
+		enabled = append(enabled, config)
+		enabledConfigs = append(enabledConfigs, config.Config)
+	}
+	SetRunnerConfigs(r.factory, r, enabledConfigs)
 
+	// diff current & desired state, create action lists
+	for _, config := range enabled {
 		hash, err := HashConfig(config.Config)
 		if err != nil {
 			r.logger.Errorf("Unable to hash given config: %s", err)
@@ -190,6 +197,9 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 func (r *RunnerList) Stop() {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
+
+	// The configs were set even if their runners failed to start.
+	SetRunnerConfigs(r.factory, r, nil)
 
 	if len(r.runners) == 0 {
 		return
