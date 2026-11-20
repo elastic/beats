@@ -21,11 +21,75 @@ package readfile
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader/readertest"
 )
+
+func TestLimitReaderBufferedFlusher(t *testing.T) {
+	deadline := time.Now().Add(time.Minute)
+
+	t.Run("wrapped reader without BufferedFlusher", func(t *testing.T) {
+		r := NewLimitReader(&mockReader{[]byte("line")}, 10)
+		pending, dl := reader.PendingDeadline(r)
+		assert.False(t, pending, "nothing can be pending")
+		assert.True(t, dl.IsZero(), "no deadline")
+		msg, ok, err := reader.FlushPending(r, true)
+		require.NoError(t, err, "FlushPending")
+		assert.False(t, ok, "nothing to flush")
+		assert.True(t, msg.IsEmpty(), "no message")
+	})
+
+	tests := []struct {
+		name          string
+		maxBytes      int
+		content       string
+		existingFlags []string
+		truncated     bool
+	}{
+		{name: "at the limit", maxBytes: 5, content: "short"},
+		{name: "above the limit", maxBytes: 3, content: "short", truncated: true},
+		{name: "above the limit with existing flags", maxBytes: 4, content: "multi\nline", existingFlags: []string{"multiline"}, truncated: true},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			msg := reader.Message{Content: []byte(tc.content), Bytes: len(tc.content) + 1}
+			require.NoError(t, msg.AddFlagsWithKey("log.flags", tc.existingFlags...), "adding flag")
+			inner := &readertest.PendingReader{Pending: &msg, Deadline: deadline}
+			r := NewLimitReader(inner, tc.maxBytes)
+
+			pending, dl := reader.PendingDeadline(r)
+			assert.True(t, pending, "pending message of the wrapped reader")
+			assert.Equal(t, deadline, dl, "deadline of the wrapped reader")
+
+			got, ok, err := reader.FlushPending(r, true)
+			require.NoError(t, err, "FlushPending")
+			require.True(t, ok, "FlushPending must flush the pending message")
+			assert.Equal(t, []bool{true}, inner.TimedOut, "timedOut must be passed through")
+			assert.Equal(t, tc.content[:min(len(tc.content), tc.maxBytes)], string(got.Content), "limited content")
+			assert.Equal(t, len(tc.content)+1, got.Bytes, "bytes read must not be changed by the limit")
+
+			flags, err := got.Fields.GetValue("log.flags")
+			if tc.truncated {
+				require.NoError(t, err, "truncated messages must have log.flags")
+				assert.ElementsMatch(t, append([]string{"truncated"}, tc.existingFlags...), flags, "log.flags")
+			} else {
+				assert.Error(t, err, "messages within the limit must not have log.flags")
+			}
+
+			pending, _ = reader.PendingDeadline(r)
+			assert.False(t, pending, "nothing pending after flush")
+			got, ok, err = reader.FlushPending(r, true)
+			require.NoError(t, err, "second FlushPending")
+			assert.False(t, ok, "nothing to flush")
+			assert.True(t, got.IsEmpty(), "no message when nothing is pending")
+		})
+	}
+}
 
 type mockReader struct {
 	line []byte
