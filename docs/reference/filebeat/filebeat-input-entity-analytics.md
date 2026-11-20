@@ -46,10 +46,13 @@ In agentless deployments, state is stored in Elasticsearch (index `agentless-sta
 
 When running with a local file store (the default for non-agentless deployments), state is stored in a bbolt database under the Filebeat data directory.
 
-If a full synchronization fails, it is retried after `update_interval`. The wait doubles after each further failure, up to `sync_interval`. The input reports a degraded status when a synchronization fails:
+If a full synchronization fails, it is retried after `update_interval`. The wait doubles after each further failure, up to `sync_interval`. The input reports a degraded status when a synchronization fails or is incomplete:
 
-* After a failed full synchronization, the status stays degraded until a full synchronization succeeds.
+* After a failed or incomplete full synchronization, the status stays degraded until a full synchronization succeeds.
 * After a failed incremental synchronization, it stays degraded until a later synchronization of either kind succeeds.
+* After an incomplete incremental synchronization, it stays degraded until a full synchronization succeeds.
+
+A synchronization is incomplete when it finishes but could not collect some data, for example when some Okta enrichment requests still fail after retrying. Its changes are kept, and the missing data is collected again by the next full synchronization, so an incomplete full synchronization is not retried early.
 
 Defaults to `false`. The Okta, Microsoft Entra ID and Active Directory integration packages set this to `true` by default.
 
@@ -365,7 +368,7 @@ The set of directory attributes to request from the Active Directory server when
 
 #### `ad_paging_size` [_ad_paging_size]
 
-The number of records to request from the Active Directory server for each page, if set.
+The number of records to request from the Active Directory server for each page, if set. When `use_minimal_state` is `true`, it defaults to `500`. Otherwise, searches are not paged unless it is set.
 
 
 #### `ad_password` [_ad_password]
@@ -941,7 +944,7 @@ The `jamf` provider supports the following configuration:
 
 #### `jamf_tenant` [_jamf_tenant]
 
-The Jamf tenant host. Field is required.
+The Jamf tenant host. Field is required. When `use_minimal_state` is `true`, a value that isn't a host name or address, optionally followed by a port, is rejected at startup.
 
 
 #### `jamf_username` [_jamf_username]
@@ -956,7 +959,7 @@ The Jamf user password, used for authentication. Field is required.
 
 #### `page_size` [_page_size]
 
-The number of computer records to collect with each API request. Defaults to [API default](https://developer.jamf.com/jamf-pro/reference/get_preview-computers).
+The number of computer records to collect with each API request. Defaults to [API default](https://developer.jamf.com/jamf-pro/reference/get_preview-computers). When `use_minimal_state` is `true`, a negative value is rejected at startup.
 
 
 #### `sync_interval` [_sync_interval_3]
@@ -1321,7 +1324,7 @@ The `okta` provider supports the following configuration:
 
 #### `okta_domain` [_okta_domain]
 
-The Okta domain. Field is required.
+The Okta domain. Field is required. When `use_minimal_state` is `true`, the domain may start with `https://`, and a value that isn't a host name or address, optionally followed by a port, is rejected at startup.
 
 
 #### `okta_token` [_okta_token]
@@ -1378,7 +1381,7 @@ List of OAuth2 scopes required for the application. Common scopes include:
 stack: ga 9.2.0
 ```
 
-The OAuth2 token endpoint URL. Typically `https://your-domain.okta.com/oauth2/v1/token`.
+The OAuth2 token endpoint URL. Typically `https://your-domain.okta.com/oauth2/v1/token`. When `use_minimal_state` is `true`, it must be an absolute `https` URL.
 
 ##### `oauth2.jwk_file`
 
@@ -1442,7 +1445,7 @@ The interval in which incremental updates should occur. The interval must be sho
 
 #### `limit_window` [_limit_window]
 
-The time between Okta API rate limit resets. Expressed as a duration string (e.g., 1m, 3h, 24h). Defaults to `1m` (1 minute).
+The time between Okta API rate limit resets. Expressed as a duration string (e.g., 1m, 3h, 24h). Defaults to `1m` (1 minute). When `use_minimal_state` is `true`, it must be positive.
 
 
 #### `batch_size` [_batch_size]
@@ -1451,12 +1454,12 @@ The time between Okta API rate limit resets. Expressed as a duration string (e.g
 stack: preview 9.0.1
 ```
 
-The pagination batch size for requests. If it is zero or negative, the API default is used. The default is 200.
+The pagination batch size for requests. If it is zero or negative, the API default is used. The default is 200. When `use_minimal_state` is `true`, a negative value is rejected at startup.
 
 
 #### `limit_fixed` [_limit_fixed]
 
-The number of requests to allow in each limit window, if set. This parameter should only be set in exceptional cases. When it is set, rate limit information in API responses will be ignored in favor of the fixed limit. The limit is applied separately to each endpoint. Defaults to unset.
+The number of requests to allow in each limit window, if set. This parameter should only be set in exceptional cases. When it is set, rate limit information in API responses will be ignored in favor of the fixed limit. The limit is applied separately to each endpoint. Defaults to unset. When `use_minimal_state` is `true`, it must be positive if set.
 
 
 #### `scratch_dir` [_scratch_dir]
@@ -1569,6 +1572,12 @@ A scratch file is removed when the synchronization ends. If Filebeat is killed (
 ### Rate limiting
 
 EntraID APIs may return 429 (Too Many Requests) with `Retry-After` headers. Throttle wait time is additive to baseline sync duration. For example, at 1,000 groups with a policy of one throttle per 50 requests, expect ~20 throttle events adding ~20s total.
+
+### Request retries and timeouts
+
+The Okta provider retries a request that fails with a server error, a 429 (Too Many Requests) response, a timeout, or an empty or unreadable response, up to five attempts with increasing waits. For a 429 response, it waits as long as the `Retry-After` header says, up to 30 minutes. Requests that enrich individual users share a limit of 20 retries in any five minutes. When an enrichment request still fails, the user is published without that enrichment and the synchronization is incomplete (see [`use_minimal_state`](#_use_minimal_state)).
+
+The Active Directory provider stops waiting for an LDAP request after three minutes, and stops in-flight requests when the input stops.
 
 ### Document size
 
