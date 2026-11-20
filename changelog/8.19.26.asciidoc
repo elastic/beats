@@ -1,0 +1,123 @@
+// begin 8.19.26 relnotes
+
+[[release-notes-8.19.26]]
+==  8.19.26
+
+Review important information about the  8.19.26 release.
+
+[discrete]
+[[security-updates-8.19.26]]
+=== Security updates
+
+
+
+
+**All**
+
+* Update Brotli to 1.2.7 to fix a decoder panic on malformed input. https://github.com/elastic/beats/pull/54234[#54234] 
+
+[discrete]
+[[breaking-changes-8.19.26]]
+=== Breaking changes
+
+Breaking changes can prevent your application from optimal operation and
+performance. Before you upgrade, review the breaking changes, then mitigate the
+impact to your application.
+
+// TODO: add details and impact
+
+
+
+**Auditbeat**
+
+[discrete]
+[[breaking-https://github.com/elastic/beats/pull/53507]]
+.The file_integrity ebpf backend requires the host PID namespace when run in Docker/K8s. https://github.com/elastic/beats/pull/53507[#53507] https://github.com/elastic/beats/issues/22396[#22396]
+[%collapsible]
+====
+The file_integrity module&#39;s ebpf backend now sources file events through
+quark instead of the ebpfevents library, removing the dependency on
+elastic/ebpfevents and elastic/ebpf. Configuration is unchanged. Each
+operation is still reported as its own event, and `file.mode` now reports
+only the permission bits, consistent with the `fsnotify` backend.
+
+quark attributes each event to a process by looking up the process ID the
+kernel reports in a table built from `/proc` and kept current from kernel
+events. The kernel reports host process IDs. When Auditbeat runs in a Docker
+container or K8s pod with its own PID namespace, that table is built from the
+container&#39;s process IDs instead.
+
+====
+
+
+
+
+
+
+
+
+
+
+[discrete]
+[[upgrades-8.19.26]]
+=== Upgrades
+
+
+
+
+**Auditbeat**
+
+* Update go-quark for quark 0.8 since-boot timestamps. https://github.com/elastic/beats/pull/52623[#52623] 
++
+quark 0.8 hands out process timestamps as nanoseconds since boot instead of since the epoch. Auditbeat now converts process.start/process.end to wallclock with quark.TimeToWallclock() and keeps quark&#39;s boottime epoch fresh, so timestamps stay correct even when the system clock is stepped, as when NTP corrects a clock that was wrong at boot. Emitted events are unchanged.
+
+* Update go-quark for quark 0.9 boottime handling. https://github.com/elastic/beats/pull/53284[#53284] 
++
+quark 0.9 removed quark.TimeToWallclock() and quark.UpdateBoottime(), the boottime epoch from quark.Boottime() is now self-maintaining and only moves on a system clock step. Auditbeat now converts process.start/process.end to wallclock by fetching the epoch once per batch and adding it to quark&#39;s since-boot timestamps, instead of one cgo call per timestamp. Emitted events are unchanged.
+
+
+
+[discrete]
+[[bug-fixes-8.19.26]]
+=== Bug fixes
+
+
+
+
+**All**
+
+* Fix &#34;ApiVersionsRequest V3&#34; errors on Kafka broker connections by updating the sarama fork. https://github.com/elastic/beats/pull/54546[#54546] 
+
+
+**Auditbeat**
+
+* Fix auditd lost event monitor leaking a socket and crashing without a client. https://github.com/elastic/beats/pull/54645[#54645] 
+* Fix auditd module leaking a socket when it fails to create its data client. https://github.com/elastic/beats/pull/54651[#54651] https://github.com/elastic/beats/issues/54644[#54644]
+
+
+**Filebeat**
+
+* Limit HTTP Endpoint request bodies buffered for HMAC validation to 25 MiB when max_body_bytes is not set. https://github.com/elastic/beats/pull/53937[#53937] 
+* Fix duplicate event IDs for codec-decoded objects in the GCS and Azure Blob Storage inputs. https://github.com/elastic/beats/pull/54157[#54157] https://github.com/elastic/beats/issues/53659[#53659]
+* Align redirect header handling in Okta and Jamf entity analytics with HTTP JSON and CEL. https://github.com/elastic/beats/pull/54493[#54493] 
+* Fix entity analytics input committing sync state before all events are acknowledged. https://github.com/elastic/beats/pull/54494[#54494] https://github.com/elastic/beats/issues/54432[#54432]
+* Write Azure Event Hub v2 checkpoints once per message, after all its records complete. https://github.com/elastic/beats/pull/54503[#54503] 
+* Fix repeated re-reads in azure-blob-storage and gcs inputs with mixed-case file names. https://github.com/elastic/beats/pull/54512[#54512] 
+
+
+**Libbeat**
+
+* Accept client certificates signed by CAs added to `certificate_authorities` while a TLS server is running. https://github.com/elastic/beats/pull/54749[#54749] https://github.com/elastic/beats/issues/54742[#54742]
+
+
+**Metricbeat**
+
+* Fix process CPU ticks and percentages being under-reported about 40 times on Apple Silicon macOS. https://github.com/elastic/beats/pull/54502[#54502] 
+* Fix histogram values of zero being filtered out on non-amd64 platforms for openmetrics and prometheus. https://github.com/elastic/beats/pull/44750[#44750] https://github.com/elastic/beats/issues/34235[#34235]
+
+
+**Packetbeat**
+
+* Limit how often Packetbeat process enrichment scans /proc. https://github.com/elastic/beats/pull/54606[#54606] 
+
+// end 8.19.26 relnotes
