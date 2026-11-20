@@ -1,0 +1,11 @@
+kind: feature
+summary: Add workload-identity-issuer client assertions for Azure identity federation
+description: >
+  Adds `AzureNewWIIClientAssertionCredential`, which builds an Azure client
+  assertion credential from a workload-identity-issuer token source. Callers
+  running in agentless deployments with cloud connectors can exchange the
+  controller-provisioned mTLS client certificate for a short-lived JWT at the
+  workload-identity-issuer `POST /token` endpoint and present it directly to the
+  customer's federated identity credential, replacing the legacy cloud-connector
+  token file. GCP identity federation keeps its existing flow.
+component: all
