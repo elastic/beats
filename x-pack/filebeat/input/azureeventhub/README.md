@@ -389,7 +389,7 @@ I see we have the following folder:
 filebeat-activitylogs-zmoog-0005 / mbranca-general.servicebus.windows.net / eventhubsdkupgrade / $Default / checkpoint
 ```
 
-The folder containts four blobs `0`, `1`, `2`, and `3`
+The folder contains four blobs `0`, `1`, `2`, and `3`
 
 The metadata of blobs `0`, `2`, and `3`:
 
@@ -403,7 +403,7 @@ The metadata of blob `1` is:
 
 #### check that the 10 events are not processed again
 
-The index `filebeat-8.15.0` still contains 10 documents, so the input did not reprocessed the same events.
+The index `filebeat-8.15.0` still contains 10 documents, so the input did not reprocess the same events.
 
 ### Scenario 002: ingest 100 events (1 input)
 

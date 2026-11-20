@@ -197,7 +197,7 @@ func (client *BatchClient) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCr
 					criteria.Location,
 				)
 				if err != nil {
-					err = fmt.Errorf("error while listing metric values by resource ID %s and namespace  %s: %w", metricsDefinitions[0].ResourceSubId, metricsDefinitions[0].Namespace, err)
+					err = fmt.Errorf("error while listing metric values by resource ID %s and namespace %s: %w", metricsDefinitions[0].ResourceSubId, metricsDefinitions[0].Namespace, err)
 					client.Log.Error(err)
 					reporter.Error(err)
 					continue
