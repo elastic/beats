@@ -21,6 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"reflect"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -34,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
+	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
@@ -214,6 +216,22 @@ func connectProcessors(t testing.TB, connector beat.PipelineConnector) beat.Proc
 	require.True(t, ok)
 	require.NotNil(t, rc.cfg.Processing.Processor)
 	return rc.cfg.Processing.Processor
+}
+
+// connectProcessing returns the processing settings the input passed to the
+// pipeline for a client connecting with processing.
+func connectProcessing(t *testing.T, connector beat.PipelineConnector, processing beat.ProcessingConfig) beat.ProcessingConfig {
+	t.Helper()
+	client, err := connector.ConnectWith(beat.ClientConfig{Processing: processing})
+	require.NoError(t, err)
+	rc, ok := client.(*recordedClient)
+	require.Truef(t, ok, "client is %T, want *recordedClient", client)
+	t.Cleanup(func() { assert.NoError(t, rc.cfg.Processing.Processor.Close()) })
+	return rc.cfg.Processing
+}
+
+func sameMap(a, b mapstr.M) bool {
+	return reflect.ValueOf(a).UnsafePointer() == reflect.ValueOf(b).UnsafePointer()
 }
 
 func chanEvent() *beat.Event {
@@ -506,5 +524,108 @@ func TestContractInputConcurrentHarvesters(t *testing.T) {
 	for _, id := range ids {
 		chanAssertAllClosed(t, id)
 		chanAssertLifecycleInvariants(t, id)
+	}
+}
+
+func TestContractInputClientsShareFields(t *testing.T) {
+	filestream := mapstr.M{"type": "filestream"}
+	cases := map[string]struct {
+		input        mapstr.M
+		client       beat.ProcessingConfig
+		wantFields   mapstr.M
+		wantReadOnly bool
+	}{
+		"no client fields": {
+			input:        filestream,
+			wantFields:   mapstr.M{"input": mapstr.M{"type": "filestream"}},
+			wantReadOnly: true,
+		},
+		"module input": {
+			input: mapstr.M{"type": "log", "_module_name": "nginx", "_fileset_name": "access"},
+			wantFields: mapstr.M{
+				"input":   mapstr.M{"type": "log"},
+				"fileset": mapstr.M{"name": "access"},
+				"service": mapstr.M{"type": "nginx"},
+				"event":   mapstr.M{"module": "nginx", "dataset": "nginx.access"},
+			},
+			wantReadOnly: true,
+		},
+		"type disabled": {
+			input:      filestream,
+			client:     beat.ProcessingConfig{DisableType: true},
+			wantFields: mapstr.M{},
+		},
+		"client fields": {
+			input:      filestream,
+			client:     beat.ProcessingConfig{Fields: mapstr.M{"client": "c"}},
+			wantFields: mapstr.M{"client": "c", "input": mapstr.M{"type": "filestream"}},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			connector := createInputConnector(t, tc.input)
+			a := connectProcessing(t, connector, tc.client)
+			b := connectProcessing(t, connector, tc.client)
+
+			for _, got := range []beat.ProcessingConfig{a, b} {
+				assert.Equal(t, tc.wantFields, got.Fields)
+				assert.Equal(t, tc.wantReadOnly, got.FieldsReadOnly, "FieldsReadOnly")
+			}
+			assert.Equal(t, tc.wantReadOnly, sameMap(a.Fields, b.Fields), "clients of one input share the fields map")
+		})
+	}
+
+	t.Run("separate inputs", func(t *testing.T) {
+		a := connectProcessing(t, createInputConnector(t, filestream), beat.ProcessingConfig{})
+		b := connectProcessing(t, createInputConnector(t, filestream), beat.ProcessingConfig{})
+		assert.False(t, sameMap(a.Fields, b.Fields), "separate inputs share the fields map")
+	})
+}
+
+// TestContractInputSharedFieldsWithProcessing runs events of two clients of one
+// input through chains built by the processing builder.
+func TestContractInputSharedFieldsWithProcessing(t *testing.T) {
+	cases := map[string]struct {
+		input     mapstr.M
+		wantInput mapstr.M
+	}{
+		"no processors": {
+			input:     mapstr.M{"type": "filestream"},
+			wantInput: mapstr.M{"type": "filestream"},
+		},
+		"processor writing into the input fields": {
+			input: mapstr.M{
+				"type": "filestream",
+				"processors": []mapstr.M{
+					{"add_fields": mapstr.M{"target": "input", "fields": mapstr.M{"extra": "x"}}},
+				},
+			},
+			wantInput: mapstr.M{"type": "filestream", "extra": "x"},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			support, err := processing.MakeDefaultSupport(true, nil)(chanBeatInfo(t), logptest.NewTestingLogger(t, ""), conf.NewConfig())
+			require.NoError(t, err)
+			t.Cleanup(func() { assert.NoError(t, support.Close()) })
+			connector := createInputConnector(t, tc.input)
+
+			for c := range 2 {
+				cfg := connectProcessing(t, connector, beat.ProcessingConfig{})
+				chain, err := support.Create(cfg, false)
+				require.NoError(t, err)
+
+				for range 2 {
+					out, err := chain.Run(chanEvent())
+					require.NoError(t, err)
+					require.NotNil(t, out)
+					assert.Equalf(t, mapstr.M{"message": "contract-test", "input": tc.wantInput}, out.Fields, "client %d event", c)
+				}
+				assert.Equalf(t, mapstr.M{"input": mapstr.M{"type": "filestream"}}, cfg.Fields,
+					"client %d fields after its events ran", c)
+			}
+		})
 	}
 }

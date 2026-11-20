@@ -199,29 +199,30 @@ func makeAddDynMetaProcessor(
 	})
 }
 
+// debugPrintProcessor logs each event at debug level. All clients of a builder
+// run one instance concurrently, so each call borrows an encoder from a pool.
 func debugPrintProcessor(info beat.Info, log *logp.Logger) *processorFn {
-	// ensure only one go-routine is using the encoder (in case
-	// beat.Client is shared between multiple go-routines by accident)
-	var mux sync.Mutex
-
-	encoder := json.New(info.Version, json.Config{
-		Pretty:     true,
-		EscapeHTML: false,
-	})
+	encoders := sync.Pool{New: func() any {
+		return json.New(info.Version, json.Config{
+			Pretty:     true,
+			EscapeHTML: false,
+		})
+	}}
 	return newProcessor("debugPrint", func(event *beat.Event) (*beat.Event, error) {
 		if !log.IsDebug() {
 			return event, nil
 		}
 
-		mux.Lock()
-		defer mux.Unlock()
-
+		// An encoder that failed or panicked can keep partial state, so only one
+		// that succeeded goes back to the pool.
+		encoder, _ := encoders.Get().(*json.Encoder)
 		b, err := encoder.Encode(info.Beat, event)
 		if err != nil {
 			return event, nil
 		}
 
 		log.Debugw(fmt.Sprintf("Publish event: %s", b), logp.TypeKey, logp.EventType)
+		encoders.Put(encoder)
 		return event, nil
 	})
 }

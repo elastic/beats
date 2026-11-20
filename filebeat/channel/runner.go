@@ -133,6 +133,10 @@ func newCommonConfigEditor(
 		serviceType = config.Module
 	}
 
+	// Clients without their own fields or DisableType share one map instead of
+	// building and keeping a copy each.
+	sharedFields := config.eventFields(nil, serviceType, false)
+
 	return func(clientCfg beat.ClientConfig) (beat.ClientConfig, error) {
 		var indexProcessor beat.Processor
 		if !config.Index.IsEmpty() {
@@ -150,20 +154,13 @@ func newCommonConfigEditor(
 		}
 
 		meta := clientCfg.Processing.Meta.Clone()
-		fields := clientCfg.Processing.Fields.Clone()
-
 		setOptional(meta, "pipeline", config.Pipeline)
-		setOptional(fields, "fileset.name", config.Fileset)
-		setOptional(fields, "service.type", serviceType)
-		if !clientCfg.Processing.DisableType {
-			setOptional(fields, "input.type", config.Type)
-		}
-		if config.Module != "" {
-			event := mapstr.M{"module": config.Module}
-			if config.Fileset != "" {
-				event["dataset"] = config.Module + "." + config.Fileset
-			}
-			fields["event"] = event
+
+		disableType := clientCfg.Processing.DisableType
+		fieldsShared := len(clientCfg.Processing.Fields) == 0 && !disableType
+		fields := sharedFields
+		if !fieldsShared {
+			fields = config.eventFields(clientCfg.Processing.Fields, serviceType, disableType)
 		}
 
 		// assemble the processors. Ordering is important.
@@ -184,12 +181,31 @@ func newCommonConfigEditor(
 		clientCfg.Processing.EventMetadata = config.EventMetadata
 		clientCfg.Processing.Meta = meta
 		clientCfg.Processing.Fields = fields
+		clientCfg.Processing.FieldsReadOnly = fieldsShared
 		clientCfg.Processing.Processor = procs
 		clientCfg.Processing.KeepNull = config.KeepNull
 		clientCfg.Processing.DisableHost = config.PublisherPipeline.DisableHost
 
 		return clientCfg, nil
 	}, nil
+}
+
+// eventFields returns a copy of base with the fields this input adds to every event.
+func (c *commonInputConfig) eventFields(base mapstr.M, serviceType string, disableType bool) mapstr.M {
+	fields := base.Clone()
+	setOptional(fields, "fileset.name", c.Fileset)
+	setOptional(fields, "service.type", serviceType)
+	if !disableType {
+		setOptional(fields, "input.type", c.Type)
+	}
+	if c.Module != "" {
+		event := mapstr.M{"module": c.Module}
+		if c.Fileset != "" {
+			event["dataset"] = c.Module + "." + c.Fileset
+		}
+		fields["event"] = event
+	}
+	return fields
 }
 
 func setOptional(to mapstr.M, key string, value string) {

@@ -19,6 +19,12 @@ package processing
 
 import (
 	"encoding/json"
+	"fmt"
+	"maps"
+	"reflect"
+	"slices"
+	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -28,6 +34,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/ecs"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
 	"github.com/elastic/beats/v7/pkg/config"
@@ -493,6 +500,461 @@ func TestProcessingClose(t *testing.T) {
 	assert.True(t, factoryProcessor.closed)
 }
 
+func TestCreateSharesGeneralize(t *testing.T) {
+	support, err := MakeDefaultSupport(true, nil)(beat.Info{Paths: tmpPaths(t)}, logp.NewNopLogger(), config.NewConfig())
+	require.NoError(t, err)
+	t.Cleanup(func() { assert.NoError(t, support.Close()) })
+
+	clientProcessors := newGroup("test", logp.NewNopLogger())
+	clientProcessors.add(&processorWithClose{})
+
+	cases := map[string]struct {
+		a, b beat.ProcessingConfig
+		same bool
+	}{
+		"default config": {
+			same: true,
+		},
+		"keep null and in place": {
+			a:    beat.ProcessingConfig{KeepNull: true, NormalizeInPlace: true},
+			b:    beat.ProcessingConfig{KeepNull: true, NormalizeInPlace: true},
+			same: true,
+		},
+		"one with client processors": {
+			b:    beat.ProcessingConfig{Processor: clientProcessors},
+			same: true,
+		},
+		"different keep null": {
+			b: beat.ProcessingConfig{KeepNull: true},
+		},
+		"different in place": {
+			b: beat.ProcessingConfig{NormalizeInPlace: true},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			a, err := support.Create(tc.a, false)
+			require.NoError(t, err)
+			b, err := support.Create(tc.b, false)
+			require.NoError(t, err)
+
+			same := chainProcessor(t, a, "generalizeEvent") == chainProcessor(t, b, "generalizeEvent")
+			assert.Equal(t, tc.same, same, "chains share the generalize processor")
+		})
+	}
+}
+
+func TestCreateSelectsGeneralizeVariant(t *testing.T) {
+	support, err := MakeDefaultSupport(true, nil)(beat.Info{Paths: tmpPaths(t)}, logp.NewNopLogger(), config.NewConfig())
+	require.NoError(t, err)
+	t.Cleanup(func() { assert.NoError(t, support.Close()) })
+
+	cases := map[string]struct {
+		cfg         beat.ProcessingConfig
+		want        mapstr.M
+		wantInPlace bool
+	}{
+		"default": {
+			want: mapstr.M{"a": "b"},
+		},
+		"keep null": {
+			cfg:  beat.ProcessingConfig{KeepNull: true},
+			want: mapstr.M{"a": "b", "null": nil},
+		},
+		"in place": {
+			cfg:         beat.ProcessingConfig{NormalizeInPlace: true},
+			want:        mapstr.M{"a": "b"},
+			wantInPlace: true,
+		},
+		"keep null and in place": {
+			cfg:         beat.ProcessingConfig{KeepNull: true, NormalizeInPlace: true},
+			want:        mapstr.M{"a": "b", "null": nil},
+			wantInPlace: true,
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			chain, err := support.Create(tc.cfg, false)
+			require.NoError(t, err)
+
+			in := mapstr.M{"a": "b", "null": nil}
+			out, err := chain.Run(&beat.Event{Timestamp: time.Now(), Fields: in})
+			require.NoError(t, err)
+			require.NotNil(t, out)
+			assert.Equal(t, tc.want, out.Fields)
+
+			in["added"] = "later"
+			_, sharesInput := out.Fields["added"]
+			assert.Equal(t, tc.wantInPlace, sharesInput, "output fields alias the input map")
+		})
+	}
+}
+
+// TestCreateSharedProcessorsConcurrentUse runs one chain per goroutine, as
+// pipeline clients do, so the processors the chains share run concurrently.
+func TestCreateSharedProcessorsConcurrentUse(t *testing.T) {
+	info, builtin := testBuiltinFields(t)
+	support, err := MakeDefaultBeatSupport(true)(info, logp.NewNopLogger(), config.NewConfig())
+	require.NoError(t, err)
+	t.Cleanup(func() { assert.NoError(t, support.Close()) })
+
+	const goroutines, events = 16, 200
+	var wg sync.WaitGroup
+	for g := range goroutines {
+		cfg := beat.ProcessingConfig{KeepNull: g%2 == 1, NormalizeInPlace: g%8 >= 4}
+		if g%4 >= 2 {
+			clientProcessors := newGroup("test", logp.NewNopLogger())
+			clientProcessors.add(addfields.NewAddFields(mapstr.M{"client": g}, true, true))
+			cfg.Processor = clientProcessors
+		}
+		chain, err := support.Create(cfg, false)
+		require.NoError(t, err)
+
+		wg.Go(func() {
+			for i := range events {
+				id := fmt.Sprintf("%d-%d", g, i)
+				fields := mapstr.M{"id": id, "nested": mapstr.M{"n": i, "null": nil}}
+				out, err := chain.Run(&beat.Event{Timestamp: time.Now(), Fields: fields})
+				if !assert.NoError(t, err) || !assert.NotNil(t, out) {
+					return
+				}
+
+				want := builtin.Clone()
+				want["id"] = id
+				want["nested"] = mapstr.M{"n": i}
+				if cfg.KeepNull {
+					want["nested"] = mapstr.M{"n": i, "null": nil}
+				}
+				if cfg.Processor != nil {
+					want["client"] = g
+				}
+				assert.Equal(t, want, out.Fields)
+			}
+		})
+	}
+	wg.Wait()
+}
+
+func TestCreateCloseKeepsSharedProcessors(t *testing.T) {
+	info, builtin := testBuiltinFields(t)
+	support, err := MakeDefaultBeatSupport(true)(info, logp.NewNopLogger(), config.NewConfig())
+	require.NoError(t, err)
+	t.Cleanup(func() { assert.NoError(t, support.Close()) })
+
+	b, ok := support.(*builder)
+	require.Truef(t, ok, "support is %T, want *builder", support)
+	shared := append(slices.Collect(maps.Values(b.generalize)), b.debugPrint)
+	for _, p := range shared {
+		assert.NotImplementsf(t, (*processors.Closer)(nil), p, "shared processor %s", p)
+	}
+
+	closing := &processorWithClose{}
+	clientProcessors := newGroup("test", logp.NewNopLogger())
+	clientProcessors.add(closing)
+	closed, err := support.Create(beat.ProcessingConfig{Processor: clientProcessors}, false)
+	require.NoError(t, err)
+	open, err := support.Create(beat.ProcessingConfig{}, false)
+	require.NoError(t, err)
+
+	require.NoError(t, processors.Close(closed))
+	assert.True(t, closing.closed, "client processor of the closed chain")
+
+	out, err := open.Run(&beat.Event{Timestamp: time.Now(), Fields: mapstr.M{"a": "b"}})
+	require.NoError(t, err)
+	require.NotNil(t, out)
+	want := builtin.Clone()
+	want["a"] = "b"
+	assert.Equal(t, want, out.Fields)
+}
+
+// TestCreateReadOnlyFields changes the client's fields after Create to observe
+// whether the chain kept that map or a copy of it.
+func TestCreateReadOnlyFields(t *testing.T) {
+	const late = "added after Create"
+	dynamic := mapstr.NewPointer(mapstr.M{"dyn": "d"})
+	clientProcessors := processors.NewList(logp.NewNopLogger())
+	clientProcessors.AddProcessor(addfields.NewAddFields(mapstr.M{"proc": "p"}, true, true))
+
+	cases := map[string]struct {
+		globalFields mapstr.M
+		cfg          beat.ProcessingConfig
+		wantKept     bool
+		wantAliased  bool
+		wantExtra    mapstr.M
+	}{
+		"read only": {
+			cfg:         beat.ProcessingConfig{FieldsReadOnly: true},
+			wantKept:    true,
+			wantAliased: true,
+		},
+		"not read only": {},
+		"read only with global fields": {
+			globalFields: mapstr.M{"g": "global"},
+			cfg:          beat.ProcessingConfig{FieldsReadOnly: true},
+			wantExtra:    mapstr.M{"fields": mapstr.M{"g": "global"}},
+		},
+		"read only with client event metadata fields": {
+			cfg: beat.ProcessingConfig{
+				FieldsReadOnly: true,
+				EventMetadata:  mapstr.EventMetadata{Fields: mapstr.M{"c": "client"}},
+			},
+			wantExtra: mapstr.M{"fields": mapstr.M{"c": "client"}},
+		},
+		"read only with client processors": {
+			cfg:       beat.ProcessingConfig{FieldsReadOnly: true, Processor: clientProcessors},
+			wantKept:  true,
+			wantExtra: mapstr.M{"proc": "p"},
+		},
+		"read only with dynamic fields": {
+			cfg:       beat.ProcessingConfig{FieldsReadOnly: true, DynamicFields: &dynamic},
+			wantKept:  true,
+			wantExtra: mapstr.M{"dyn": "d"},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			beatCfg := config.NewConfig()
+			if tc.globalFields != nil {
+				beatCfg = config.MustNewConfigFrom(mapstr.M{"fields": tc.globalFields})
+			}
+			support, err := MakeDefaultSupport(true, nil)(beat.Info{Paths: tmpPaths(t)}, logp.NewNopLogger(), beatCfg)
+			require.NoError(t, err)
+			t.Cleanup(func() { assert.NoError(t, support.Close()) })
+
+			input := mapstr.M{"type": "filestream"}
+			cfg := tc.cfg
+			cfg.Fields = mapstr.M{"input": input}
+			chain, err := support.Create(cfg, false)
+			require.NoError(t, err)
+			input["late"] = late
+
+			out, err := chain.Run(&beat.Event{Timestamp: time.Now(), Fields: mapstr.M{"message": "m"}})
+			require.NoError(t, err)
+			require.NotNil(t, out)
+
+			wantInput := mapstr.M{"type": "filestream"}
+			if tc.wantKept {
+				wantInput["late"] = late
+			}
+			want := mapstr.M{"message": "m", "input": wantInput}
+			want.DeepUpdate(tc.wantExtra)
+			assert.Equal(t, want, out.Fields)
+			assert.Equal(t, mapstr.M{"input": mapstr.M{"type": "filestream", "late": late}}, cfg.Fields,
+				"client fields must not be modified by Create or Run")
+			outInput, _ := out.Fields["input"].(mapstr.M)
+			assert.Equal(t, tc.wantAliased, sameMap(input, outInput), "event references the client's input map")
+		})
+	}
+}
+
+// TestCreateReadOnlyFieldsConcurrentUse runs one chain per goroutine on one
+// read-only fields map, so a write to that map by any chain shows as a race.
+func TestCreateReadOnlyFieldsConcurrentUse(t *testing.T) {
+	eventTime := time.Date(2026, 11, 7, 11, 0, 0, 0, time.UTC)
+	fieldsTime := time.Date(2026, 11, 7, 12, 0, 0, 0, time.UTC)
+	cases := map[string]struct {
+		fields      mapstr.M
+		wantMeta    mapstr.M
+		wantTime    time.Time
+		wantAliased bool
+	}{
+		"input fields": {
+			fields:      mapstr.M{"input": mapstr.M{"type": "filestream"}},
+			wantTime:    eventTime,
+			wantAliased: true,
+		},
+		"metadata key": {
+			fields:   mapstr.M{"input": mapstr.M{"type": "filestream"}, beat.MetadataFieldKey: mapstr.M{"pipeline": "p"}},
+			wantMeta: mapstr.M{"pipeline": "p"},
+			wantTime: eventTime,
+		},
+		"timestamp key": {
+			fields:   mapstr.M{"input": mapstr.M{"type": "filestream"}, beat.TimestampFieldKey: fieldsTime},
+			wantTime: fieldsTime,
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			support, err := MakeDefaultSupport(true, nil)(beat.Info{Paths: tmpPaths(t)}, logp.NewNopLogger(), config.NewConfig())
+			require.NoError(t, err)
+			t.Cleanup(func() { assert.NoError(t, support.Close()) })
+
+			shared := tc.fields.Clone()
+			sharedInput, _ := shared["input"].(mapstr.M)
+			const goroutines, events = 8, 200
+			var wg sync.WaitGroup
+			for g := range goroutines {
+				chain, err := support.Create(beat.ProcessingConfig{Fields: shared, FieldsReadOnly: true}, false)
+				require.NoError(t, err)
+
+				wg.Go(func() {
+					for i := range events {
+						id := fmt.Sprintf("%d-%d", g, i)
+						out, err := chain.Run(&beat.Event{Timestamp: eventTime, Fields: mapstr.M{"id": id}})
+						if !assert.NoError(t, err) || !assert.NotNil(t, out) {
+							return
+						}
+						assert.Equal(t, mapstr.M{"id": id, "input": mapstr.M{"type": "filestream"}}, out.Fields)
+						assert.Equal(t, tc.wantMeta, out.Meta)
+						assert.Equal(t, tc.wantTime, out.Timestamp)
+						outInput, _ := out.Fields["input"].(mapstr.M)
+						assert.Equal(t, tc.wantAliased, sameMap(sharedInput, outInput), "event references the shared input map")
+					}
+				})
+			}
+			wg.Wait()
+			assert.Equal(t, tc.fields, shared, "shared fields map after all events")
+		})
+	}
+}
+
+func TestDebugPrintOutput(t *testing.T) {
+	log, observed := logptest.NewTestingLoggerWithObserver(t, "")
+	support, err := MakeDefaultSupport(true, nil)(beat.Info{Beat: "test", Version: "0.1", Paths: tmpPaths(t)}, log, config.NewConfig())
+	require.NoError(t, err)
+	t.Cleanup(func() { assert.NoError(t, support.Close()) })
+
+	chain, err := support.Create(beat.ProcessingConfig{}, false)
+	require.NoError(t, err)
+	_, err = chain.Run(&beat.Event{
+		Timestamp: time.Date(2026, 11, 7, 12, 30, 0, 123000000, time.UTC),
+		Meta:      mapstr.M{"id": "abc"},
+		// One key per map keeps the encoded key order deterministic.
+		Fields: mapstr.M{"nested": mapstr.M{"list": []any{"<a & b>", 1, 1.5}}},
+	})
+	require.NoError(t, err)
+
+	const want = `Publish event: {
+  "@timestamp": "2026-11-07T12:30:00.123Z",
+  "@metadata": {
+    "beat": "test",
+    "type": "_doc",
+    "version": "0.1",
+    "id": "abc"
+  },
+  "nested": {
+    "list": [
+      "<a & b>",
+      1,
+      1.5
+    ]
+  }
+}`
+	entries := observed.FilterMessageSnippet("Publish event").All()
+	require.Len(t, entries, 1, "debug event log entries")
+	assert.Equal(t, want, entries[0].Message)
+	assert.Equal(t, map[string]any{logp.TypeKey: logp.EventType}, entries[0].ContextMap())
+}
+
+func TestCreateSharesDebugPrint(t *testing.T) {
+	underAgent := management.UnderAgent()
+	t.Cleanup(func() { management.SetUnderAgent(underAgent) })
+
+	support, err := MakeDefaultSupport(true, nil)(beat.Info{Paths: tmpPaths(t)}, logp.NewNopLogger(), config.NewConfig())
+	require.NoError(t, err)
+	t.Cleanup(func() { assert.NoError(t, support.Close()) })
+
+	management.SetUnderAgent(false)
+	standalone, err := support.Create(beat.ProcessingConfig{}, false)
+	require.NoError(t, err)
+	assert.NotContains(t, standalone.String(), "debugPrint", "chain without debug logging or Agent")
+
+	clientProcessors := newGroup("test", logp.NewNopLogger())
+	clientProcessors.add(&processorWithClose{})
+	management.SetUnderAgent(true)
+	a, err := support.Create(beat.ProcessingConfig{}, false)
+	require.NoError(t, err)
+	b, err := support.Create(beat.ProcessingConfig{KeepNull: true, Processor: clientProcessors}, false)
+	require.NoError(t, err)
+	assert.Same(t, chainProcessor(t, a, "debugPrint"), chainProcessor(t, b, "debugPrint"), "debugPrint processor under Agent")
+}
+
+// TestDebugPrintAfterEncoderPanic checks that an event that makes the shared
+// debugPrint processor's encoder panic does not stop other clients' events
+// from being logged.
+func TestDebugPrintAfterEncoderPanic(t *testing.T) {
+	log, observed := logptest.NewTestingLoggerWithObserver(t, "")
+	support, err := MakeDefaultSupport(true, nil)(beat.Info{Beat: "test", Version: "0.1", Paths: tmpPaths(t)}, log, config.NewConfig())
+	require.NoError(t, err)
+	t.Cleanup(func() { assert.NoError(t, support.Close()) })
+
+	panicking, err := support.Create(beat.ProcessingConfig{}, false)
+	require.NoError(t, err)
+	healthy, err := support.Create(beat.ProcessingConfig{}, false)
+	require.NoError(t, err)
+
+	// Meta is not normalized, and the encoder panics on the typed nil
+	// *time.Time after it has started the array.
+	assert.Panics(t, func() {
+		_, _ = panicking.Run(&beat.Event{
+			Timestamp: time.Now(),
+			Meta:      mapstr.M{"ts": []any{"first", (*time.Time)(nil)}},
+			Fields:    mapstr.M{"a": "b"},
+		})
+	}, "encoding a typed nil *time.Time")
+
+	const events = 5
+	for range events {
+		_, err := healthy.Run(&beat.Event{Timestamp: time.Now(), Fields: mapstr.M{"a": "b"}})
+		require.NoError(t, err)
+	}
+	assert.Len(t, observed.FilterMessageSnippet("Publish event").All(), events, "debug log entries of the healthy client")
+}
+
+// TestDebugPrintConcurrentUse runs one chain per goroutine with debug logging
+// on, so the shared debugPrint processor encodes events concurrently.
+func TestDebugPrintConcurrentUse(t *testing.T) {
+	log, observed := logptest.NewTestingLoggerWithObserver(t, "")
+	support, err := MakeDefaultSupport(true, nil)(beat.Info{Beat: "test", Version: "0.1", Paths: tmpPaths(t)}, log, config.NewConfig())
+	require.NoError(t, err)
+	t.Cleanup(func() { assert.NoError(t, support.Close()) })
+
+	const format = `Publish event: {
+  "@timestamp": "2026-11-07T12:30:00.000Z",
+  "@metadata": {
+    "beat": "test",
+    "type": "_doc",
+    "version": "0.1"
+  },
+  "id": %q
+}`
+	const goroutines, events = 16, 100
+	var want []string
+	var wg sync.WaitGroup
+	for g := range goroutines {
+		chain, err := support.Create(beat.ProcessingConfig{}, false)
+		require.NoError(t, err)
+
+		ids := make([]string, events)
+		for i := range ids {
+			ids[i] = fmt.Sprintf("%d-%d-%s", g, i, strings.Repeat("x", i%10))
+			want = append(want, fmt.Sprintf(format, ids[i]))
+		}
+		wg.Go(func() {
+			for _, id := range ids {
+				_, err := chain.Run(&beat.Event{
+					Timestamp: time.Date(2026, 11, 7, 12, 30, 0, 0, time.UTC),
+					Fields:    mapstr.M{"id": id},
+				})
+				assert.NoError(t, err)
+			}
+		})
+	}
+	wg.Wait()
+
+	var got []string
+	for _, entry := range observed.FilterMessageSnippet("Publish event").All() {
+		got = append(got, entry.Message)
+	}
+	slices.Sort(want)
+	slices.Sort(got)
+	assert.Equal(t, want, got, "debug event log messages")
+}
+
 func TestProcessingDiagnostics(t *testing.T) {
 	factory, err := MakeDefaultSupport(true, nil)(beat.Info{Paths: tmpPaths(t)}, logp.L(), config.NewConfig())
 	require.NoError(t, err)
@@ -537,4 +999,45 @@ func tmpPaths(t testing.TB) *paths.Path {
 		Data:   dir,
 		Logs:   dir,
 	}
+}
+
+// testBuiltinFields returns a beat.Info and the builtin fields that
+// MakeDefaultBeatSupport adds to every event for it.
+func testBuiltinFields(t *testing.T) (beat.Info, mapstr.M) {
+	info := beat.Info{
+		Beat:    "test",
+		Name:    "test.host.name",
+		Version: "0.1",
+		Paths:   tmpPaths(t),
+	}
+	return info, mapstr.M{
+		"ecs":  mapstr.M{"version": ecs.Version},
+		"host": mapstr.M{"name": "test.host.name"},
+		"agent": mapstr.M{
+			"ephemeral_id": uuid.Nil.String(),
+			"id":           uuid.Nil.String(),
+			"name":         "test.host.name",
+			"type":         "test",
+			"version":      "0.1",
+		},
+	}
+}
+
+// chainProcessor returns the first processor of chain whose String starts with
+// prefix.
+func chainProcessor(t *testing.T, chain beat.Processor, prefix string) beat.Processor {
+	t.Helper()
+	g, ok := chain.(*group)
+	require.Truef(t, ok, "chain is %T, want *group", chain)
+	for _, p := range g.list {
+		if strings.HasPrefix(p.String(), prefix) {
+			return p
+		}
+	}
+	require.Failf(t, "processor not found", "no processor with prefix %q in %s", prefix, g)
+	return nil
+}
+
+func sameMap(a, b mapstr.M) bool {
+	return reflect.ValueOf(a).UnsafePointer() == reflect.ValueOf(b).UnsafePointer()
 }
