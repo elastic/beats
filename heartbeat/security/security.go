@@ -60,7 +60,7 @@ func setNodeProcAttr(localUserName string) error {
 
 	localUser, err := user.Lookup(localUserName)
 	if err != nil {
-		return fmt.Errorf("could not lookup '%s': %w", localUser, err)
+		return fmt.Errorf("could not lookup '%s': %w", localUserName, err)
 	}
 	localUserUID, err := strconv.Atoi(localUser.Uid)
 	if err != nil {
@@ -68,7 +68,7 @@ func setNodeProcAttr(localUserName string) error {
 	}
 	localUserGID, err := strconv.Atoi(localUser.Gid)
 	if err != nil {
-		return fmt.Errorf("could not parse GID '%s' as int: %w", localUser.Uid, err)
+		return fmt.Errorf("could not parse GID '%s' as int: %w", localUser.Gid, err)
 	}
 
 	// We include the root group because the docker image contains many directories (data,logs)
