@@ -40,6 +40,10 @@ type Settings struct {
 
 	DisableConfigResolver bool
 
+	// SkipProcessorInitialization prevents commands that do not create an event
+	// pipeline from initializing global processors and their side effects.
+	SkipProcessorInitialization bool
+
 	// load custom index manager. The config object will be the Beats root configuration.
 	IndexManagement idxmgmt.SupportFactory
 	ILM             lifecycle.SupportFactory
