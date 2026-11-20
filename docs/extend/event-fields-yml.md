@@ -35,7 +35,7 @@ Define the field mappings in the `fields` array:
 
 1. `name`: The field name
 2. `type`: The field type. The value of `type` can be any datatype [available in {{es}}](elasticsearch://reference/elasticsearch/mapping-reference/field-data-types.md). If no value is specified, the default type is `keyword`.
-3. `required`: Whether or not a field value is required
+3. `required`: Whether a field value is required
 4. `description`: Some information about the field contents
 
 
@@ -44,7 +44,7 @@ Define the field mappings in the `fields` array:
 You can specify other mapping parameters for each field. See the [{{es}} Reference](elasticsearch://reference/elasticsearch/mapping-reference/mapping-parameters.md) for more details about each parameter.
 
 `format`
-:   Specify a custom date format used by the field.
+:   How {{kib}} displays the field, for example `bytes` or `percent`. The Beat sets it as the field format in the {{kib}} index pattern it generates. It is not added to the {{es}} mapping.
 
 `multi_fields`
 :   For `text` or `keyword` fields, use `multi_fields` to define multi-field mappings.

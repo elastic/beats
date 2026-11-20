@@ -17,7 +17,7 @@ Before building your own dashboards or customizing the existing ones, you need t
 * the Beat index pattern, which specifies how Kibana should display the Beat fields
 * the Beat dashboards that you want to customize
 
-For the Elastic Beats, the index pattern is available in the Beat package under `kibana/*/index-pattern`. The index-pattern is automatically generated from the `fields.yml` file, available in the Beat package. For more details check the [generate index pattern](/extend/generate-index-pattern.md) section.
+The Beat generates the index pattern from its `fields.yml` file and loads it together with the dashboards when you run `setup --dashboards`. To change how Kibana displays a field, set the `format` option for that field in `fields.yml`. Refer to [Defining field mappings](/extend/event-fields-yml.md).
 
 All Beats dashboards, visualizations and saved searches must follow common naming conventions:
 
@@ -35,5 +35,5 @@ The naming convention rules can be verified with the tool `mage check`. The comm
 * unexpected dashboard title format (missing prefix `[BeatName ModuleName]`)
 * unexpected visualization title format (missing suffix `[BeatName Module]`)
 
-After creating your own dashboards in Kibana, you can [export the Kibana dashboards](/extend/export-dashboards.md) to a local directory, and then [archive the dashboards](/extend/archive-dashboards.md) in order to be able to share the dashboards with the community.
+After creating your own dashboards in Kibana, you can [export the Kibana dashboards](/extend/export-dashboards.md) to a local directory.
 
