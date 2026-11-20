@@ -34,6 +34,7 @@ var _ reader.Reader = &testReader{}
 
 type testReader struct {
 	messages      [][]byte
+	fields        mapstr.M
 	currentLine   int
 	referenceTime time.Time
 }
@@ -50,8 +51,8 @@ func (t *testReader) Next() (reader.Message, error) {
 	m := reader.Message{
 		Ts:      t.referenceTime,
 		Content: t.messages[t.currentLine],
-		Bytes:   len(t.messages[t.currentLine]),
-		Fields:  mapstr.M{},
+		Bytes:   len(t.messages[t.currentLine]) + 1, // Include the line delimiter consumed by the reader.
+		Fields:  t.fields.Clone(),
 	}
 	t.currentLine++
 
@@ -172,9 +173,9 @@ func TestNewParser(t *testing.T) {
 
 			assert.Len(t, got, len(tc.want))
 			for i, want := range tc.want {
+				assert.Equal(t, len(tc.in[i])+1, got[i].Bytes)
 				if want.wantErr {
 					assert.Equal(t, tc.in[i], got[i].Content)
-					assert.Equal(t, len(tc.in[i]), got[i].Bytes)
 					assert.Equal(t, referenceTime, got[i].Ts)
 
 					if tc.config.AddErrorKey {
@@ -184,10 +185,27 @@ func TestNewParser(t *testing.T) {
 				} else {
 					assert.Equal(t, want.timestamp, got[i].Ts)
 					assert.Equal(t, want.content, got[i].Content)
-					assert.Equal(t, len(want.content), got[i].Bytes)
 					assert.Equal(t, want.fields, got[i].Fields)
 				}
 			}
 		})
 	}
+}
+
+func TestHeaderOnlyMessage(t *testing.T) {
+	raw := []byte("<165>1 2003-10-11T22:14:15.003Z host app 1024 ID47 -")
+	cfg := DefaultConfig()
+	input := &testReader{
+		messages: [][]byte{raw},
+		fields:   mapstr.M{"log": mapstr.M{"offset": 46}},
+	}
+	parser := NewParser(input, &cfg, logptest.NewTestingLogger(t, ""))
+	msg, err := parser.Next()
+	assert.NoError(t, err)
+	assert.Empty(t, msg.Content)
+	assert.Equal(t, len(raw)+1, msg.Bytes)
+	assert.False(t, msg.IsEmpty())
+	offset, err := msg.Fields.GetValue("log.offset")
+	assert.NoError(t, err)
+	assert.Equal(t, 46, offset)
 }

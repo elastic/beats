@@ -1,0 +1,8 @@
+kind: bug-fix
+summary: Preserve file offsets when parsing syslog records with Filebeat.
+component: filebeat
+description: |
+  The syslog parser now preserves the input byte count when it extracts a message.
+  This prevents filestream from reading the same bytes again and keeps records
+  that have a syslog header but no message body.
+issue: https://github.com/elastic/beats/issues/54845
