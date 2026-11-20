@@ -29,9 +29,16 @@ type SourceJob struct {
 	ctx        context.Context
 	cancel     context.CancelFunc
 	mtx        sync.Mutex
+	logger     *logp.Logger
 }
 
-func NewSourceJob(rawCfg *config.C) (*SourceJob, error) {
+// NewSourceJob returns the job of a browser monitor. logger is also used for
+// what the synthetics runner prints, so it must be the logger of the monitor:
+// it removes the values of secret references.
+func NewSourceJob(rawCfg *config.C, logger *logp.Logger) (*SourceJob, error) {
+	if logger == nil {
+		logger = logp.NewNopLogger()
+	}
 	// Global browser context to cancel all jobs
 	// on close
 	ctx, cancel := context.WithCancel(context.Background())
@@ -42,6 +49,7 @@ func NewSourceJob(rawCfg *config.C) (*SourceJob, error) {
 		ctx:        ctx,
 		cancel:     cancel,
 		mtx:        sync.Mutex{},
+		logger:     logger,
 	}
 	err := rawCfg.Unpack(s.browserCfg)
 	if err != nil {
@@ -87,8 +95,7 @@ func (sj *SourceJob) StdFields() stdfields.StdMonitorFields {
 	// Should be impossible since outer monitor.go should run this same code elsewhere
 	// TODO: Just pass stdfields in to remove second deserialize
 	if err != nil {
-		//nolint:forbidigo // StdFields() has no logger handle and the error is "should never happen"; matches the pre-existing pattern.
-		logp.L().Warnf("Could not deserialize monitor fields for %q monitor, this should never happen: %s", sj.browserCfg.Type, err)
+		sj.logger.Warnf("Could not deserialize monitor fields for %q monitor, this should never happen: %s", sj.browserCfg.Type, err)
 	}
 	return sFields
 }
@@ -153,8 +160,7 @@ func (sj *SourceJob) extraArgs(uiOrigin bool) []string {
 		s, err := json.Marshal(sj.browserCfg.PlaywrightOpts)
 		if err != nil {
 			// This should never happen, if it was parsed as a config it should be serializable
-			//nolint:forbidigo // extraArgs has no logger handle and the error is "should never happen"; matches the pre-existing pattern.
-			logp.L().Warnf("could not serialize playwright options '%v': %v", sj.browserCfg.PlaywrightOpts, err)
+			sj.logger.Warnf("could not serialize playwright options '%v': %v", sj.browserCfg.PlaywrightOpts, err)
 		} else {
 			extraArgs = append(extraArgs, "--playwright-options", string(s))
 		}
@@ -186,8 +192,7 @@ func (sj *SourceJob) extraArgs(uiOrigin bool) []string {
 			case map[string]any:
 				j, err := json.Marshal(t)
 				if err != nil {
-					//nolint:forbidigo // extraArgs has no logger handle and the error is "should never happen"; matches the pre-existing pattern.
-					logp.L().Warnf("could not serialize throttling config to JSON: %s", err)
+					sj.logger.Warnf("could not serialize throttling config to JSON: %s", err)
 				} else {
 					extraArgs = append(extraArgs, "--throttling", string(j))
 				}
@@ -207,7 +212,7 @@ func (sj *SourceJob) jobs() []jobs.Job {
 
 	if isScript {
 		src := sj.browserCfg.Source.Inline.Script
-		j = synthexec.InlineJourneyJob(ctx, src, sj.Params, sFields, sj.extraArgs(sFields.Origin != "")...)
+		j = synthexec.InlineJourneyJob(ctx, sj.logger, src, sj.Params, sFields, sj.extraArgs(sFields.Origin != "")...)
 	} else {
 		j = func(event *beat.Event) ([]jobs.Job, error) {
 			err := sj.Fetch()
@@ -215,7 +220,7 @@ func (sj *SourceJob) jobs() []jobs.Job {
 				return nil, fmt.Errorf("could not fetch for browser source job: %w", err)
 			}
 
-			sj, err := synthexec.ProjectJob(ctx, sj.Workdir(), sj.Params, sj.FilterJourneys(), sFields, sj.extraArgs(sFields.Origin != "")...)
+			sj, err := synthexec.ProjectJob(ctx, sj.logger, sj.Workdir(), sj.Params, sj.FilterJourneys(), sFields, sj.extraArgs(sFields.Origin != "")...)
 			if err != nil {
 				return nil, err
 			}
