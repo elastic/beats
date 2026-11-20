@@ -182,6 +182,26 @@ func runCmd(
 	// Attach sysproc attrs to ensure subprocesses are properly killed
 	platformCmdMutate(cmd)
 
+	// Keep runtime artifacts out of the Agent-managed working directory, whose
+	// permissions may be reset on restart. Each invocation owns its scratch space.
+	workdir, err := newWorkdir(cmd)
+	if err != nil {
+		return nil, err
+	}
+	cleanup := func() {
+		if err := os.RemoveAll(workdir); err != nil {
+			//nolint:forbidigo // runCmd uses the existing global logger.
+			logp.L().Warnf("could not remove synthetics work directory %q: %s", workdir, err)
+		}
+	}
+	started := false
+	defer func() {
+		if !started {
+			cleanup()
+		}
+	}()
+	cmd.Args = append(cmd.Args, "--workdir", workdir)
+
 	mpx := NewExecMultiplexer()
 	// Setup a pipe for JSON structured output
 	jsonReader, jsonWriter, err := os.Pipe()
@@ -238,10 +258,27 @@ func runCmd(
 	if err != nil {
 		return nil, fmt.Errorf("could not open stdout pipe: %w", err)
 	}
+	defer func() {
+		if !started {
+			_ = stdoutPipe.Close()
+			// Start normally closes the child end, but setup can fail before it.
+			if writer, ok := cmd.Stdout.(io.Closer); ok {
+				_ = writer.Close()
+			}
+		}
+	}()
 	stderrPipe, err := cmd.StderrPipe()
 	if err != nil {
 		return nil, fmt.Errorf("could not open stderr pipe: %w", err)
 	}
+	defer func() {
+		if !started {
+			_ = stderrPipe.Close()
+			if writer, ok := cmd.Stderr.(io.Closer); ok {
+				_ = writer.Close()
+			}
+		}
+	}()
 
 	// Scan output from before cmd.Start: cmd.Wait closes these pipes as soon as
 	// the command exits, losing anything not read yet. A failed cmd.Start
@@ -286,6 +323,8 @@ func runCmd(
 		return nil, err
 	}
 
+	started = true
+
 	// The results reader closes jsonReader, which cmd.Start reads as one of
 	// the ExtraFiles, so it starts only once cmd.Start has returned.
 	wg.Go(func() {
@@ -316,13 +355,8 @@ func runCmd(
 	go func() {
 		<-ctx.Done()
 
-		// ProcessState can be null if it hasn't reported back yet
-		if cmd.ProcessState != nil && cmd.ProcessState.Exited() {
-			return
-		}
-
 		err := cmd.Process.Kill()
-		if err != nil {
+		if err != nil && !errors.Is(err, os.ErrProcessDone) {
 			//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
 			logp.L().Warnf("could not kill synthetics process: %s", err)
 		}
@@ -357,11 +391,35 @@ func runCmd(
 		})
 
 		wg.Wait()
+		cleanup()
 		mpx.Close()
 		cancel()
 	}()
 
 	return mpx, nil
+}
+
+// newWorkdir creates private scratch space accessible to the subprocess user.
+func newWorkdir(cmd *SynthCmd) (string, error) {
+	// Resolve TMPDIR before passing it to a command with a different cmd.Dir.
+	base, err := filepath.Abs(os.TempDir())
+	if err != nil {
+		return "", fmt.Errorf("could not resolve synthetics temporary directory: %w", err)
+	}
+	dir, err := os.MkdirTemp(base, "heartbeat-synthetics-")
+	if err != nil {
+		return "", fmt.Errorf("could not create synthetics work directory: %w", err)
+	}
+	if cmd.SysProcAttr != nil && cmd.SysProcAttr.Credential != nil {
+		cred := cmd.SysProcAttr.Credential
+		if int(cred.Uid) != os.Geteuid() || int(cred.Gid) != os.Getegid() {
+			if err := os.Chown(dir, int(cred.Uid), int(cred.Gid)); err != nil {
+				_ = os.RemoveAll(dir)
+				return "", fmt.Errorf("could not assign synthetics work directory ownership: %w", err)
+			}
+		}
+	}
+	return dir, nil
 }
 
 // scanToSynthEvents takes a reader, a transform function, and a callback, and processes
