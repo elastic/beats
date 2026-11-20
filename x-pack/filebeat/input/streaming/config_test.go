@@ -8,10 +8,12 @@ import (
 	"fmt"
 	"net/url"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
 	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 var configTests = []struct {
@@ -248,5 +250,91 @@ func TestRegexpConfig(t *testing.T) {
 	err := cfg.Validate()
 	if err != nil {
 		t.Errorf("failed to validate config with regexps: %v", err)
+	}
+}
+
+func TestConfiguredReadControlDeadline(t *testing.T) {
+	for _, tc := range []struct {
+		name          string
+		writeDeadline string
+		want          time.Duration
+	}{
+		{"default", "", 30 * time.Second},
+		{"custom", "25s", 75 * time.Second},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			keepAlive := map[string]any{"enable": true, "interval": "15s"}
+			if tc.writeDeadline != "" {
+				keepAlive["write_control_deadline"] = tc.writeDeadline
+			}
+			cfg := conf.MustNewConfigFrom(map[string]any{"url": "wss://example.org/stream", "keep_alive": keepAlive})
+			sources, _, err := cursorConfigure(cfg, logptest.NewTestingLogger(t, "streaming"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !assert.Len(t, sources, 1, "expected one configured source") {
+				return
+			}
+			src, ok := sources[0].(*source)
+			if !assert.True(t, ok, "configured source must be a streaming source") {
+				return
+			}
+			assert.Equal(t, tc.want, src.cfg.KeepAlive.readControlDeadline, "read deadline must reflect the effective write deadline")
+		})
+	}
+}
+
+// TestKeepAliveConfiguration exercises the two unpack passes used by Create:
+// a zero-valued config followed by cursorConfigure's defaulted config.
+func TestKeepAliveConfiguration(t *testing.T) {
+	for _, tc := range []struct {
+		name       string
+		streamType string
+		keepAlive  map[string]any
+		wantErr    string
+	}{
+		{name: "omitted"},
+		{name: "disabled", keepAlive: map[string]any{"enable": false, "write_control_deadline": "0s", "interval": "0s"}},
+		{name: "default_deadline", keepAlive: map[string]any{"enable": true, "interval": "15s"}},
+		{name: "default_interval", keepAlive: map[string]any{"enable": true, "write_control_deadline": "25s"}},
+		{name: "default_boundary", keepAlive: map[string]any{"enable": true}, wantErr: "keep_alive.interval must be less than three times keep_alive.write_control_deadline"},
+		{name: "zero_deadline", keepAlive: map[string]any{"enable": true, "write_control_deadline": "0s"}, wantErr: "keep_alive.write_control_deadline must be greater than zero"},
+		{name: "negative_deadline", keepAlive: map[string]any{"enable": true, "write_control_deadline": "-1s"}, wantErr: "keep_alive.write_control_deadline must be greater than zero"},
+		{name: "small_deadline", keepAlive: map[string]any{"enable": true, "write_control_deadline": "10ms"}, wantErr: "keep_alive.interval must be less than three times keep_alive.write_control_deadline"},
+		{name: "equal_interval", keepAlive: map[string]any{"enable": true, "write_control_deadline": "25s", "interval": "75s"}, wantErr: "keep_alive.interval must be less than three times keep_alive.write_control_deadline"},
+		{name: "long_interval", keepAlive: map[string]any{"enable": true, "write_control_deadline": "25s", "interval": "76s"}, wantErr: "keep_alive.interval must be less than three times keep_alive.write_control_deadline"},
+		{name: "just_below_boundary", keepAlive: map[string]any{"enable": true, "write_control_deadline": "25s", "interval": "74.999999999s"}},
+		{name: "small_valid_pair", keepAlive: map[string]any{"enable": true, "write_control_deadline": "10ms", "interval": "10ms"}},
+		{name: "zero_interval", keepAlive: map[string]any{"enable": true, "interval": "0s"}, wantErr: "keep_alive.interval must be greater than zero"},
+		{name: "negative_interval", keepAlive: map[string]any{"enable": true, "interval": "-1s"}, wantErr: "keep_alive.interval must be greater than zero"},
+		{name: "overflow_deadline", keepAlive: map[string]any{"enable": true, "write_control_deadline": "3074457345618258603ns"}, wantErr: "keep_alive.write_control_deadline is too large: three times its value must fit in a duration"},
+		{name: "largest_deadline", keepAlive: map[string]any{"enable": true, "write_control_deadline": "3074457345618258602ns"}},
+		{name: "explicit_websocket", streamType: "websocket", keepAlive: map[string]any{"enable": true, "interval": "15s"}},
+		{name: "crowdstrike_ignores_keep_alive", streamType: "crowdstrike", keepAlive: map[string]any{"enable": true, "write_control_deadline": "0s"}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			url := "wss://example.org/stream"
+			if tc.streamType == "crowdstrike" {
+				url = "https://example.org/stream"
+			}
+			settings := map[string]any{"url": url, "stream_type": tc.streamType}
+			if tc.keepAlive != nil {
+				settings["keep_alive"] = tc.keepAlive
+			}
+			cfg := conf.MustNewConfigFrom(settings)
+			var initial config
+			if !assert.NoError(t, cfg.Unpack(&initial), "the initial unpack must allow unset durations") {
+				return
+			}
+			sources, _, err := cursorConfigure(cfg, logptest.NewTestingLogger(t, "streaming"))
+			if tc.wantErr != "" {
+				assert.EqualError(t, err, tc.wantErr, "invalid effective keep-alive settings must be rejected")
+				assert.Empty(t, sources, "invalid settings must not create a source")
+				return
+			}
+			if assert.NoError(t, err, "valid effective settings must configure successfully") {
+				assert.Len(t, sources, 1, "valid settings must create a source")
+			}
+		})
 	}
 }
