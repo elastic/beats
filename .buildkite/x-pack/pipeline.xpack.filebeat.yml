@@ -7,7 +7,7 @@ env:
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
-  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
+  GCP_WIN_MACHINE_TYPE: "n4d-standard-8"
 
   IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1794715280"
   IMAGE_WIN_10: "platform-ingest-beats-windows-10-pro"
@@ -332,9 +332,8 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          diskType: "hyperdisk-balanced"
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
           - "x-pack/filebeat/build/*.json"
@@ -359,9 +358,8 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          diskType: "hyperdisk-balanced"
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
           - "x-pack/filebeat/build/*.json"
@@ -392,8 +390,7 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
+          diskType: "hyperdisk-balanced"
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
           - "x-pack/filebeat/build/*.json"
@@ -558,8 +555,7 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
+          diskType: "pd-ssd"
         notify:
           - github_commit_status:
               context: "x-pack/filebeat: Packaging Linux"
@@ -603,8 +599,7 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
+          diskType: "pd-ssd"
         notify:
           - github_commit_status:
               context: "x-pack/filebeat: Packaging Linux amd64 FIPS"
@@ -649,8 +644,7 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
+          diskType: "pd-ssd"
         notify:
           - github_commit_status:
               context: "x-pack/filebeat: Packaging Windows amd64 FIPS"
