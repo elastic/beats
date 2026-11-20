@@ -7,7 +7,7 @@ applies_to:
   serverless: ga
 ---
 
-# Decode XML [decode-xml]
+# Decode XML in Filebeat [decode-xml]
 
 
 The `decode_xml` processor decodes XML data that is stored under the `field` key. It outputs the result into the `target_field`.

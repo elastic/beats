@@ -7,7 +7,7 @@ applies_to:
   serverless: ga
 ---
 
-# Configure the output [configuring-output]
+# Configure the output in Filebeat [configuring-output]
 
 
 You configure Filebeat to write to a specific output by setting options in the Outputs section of the `filebeat.yml` config file. Only a single output may be defined.

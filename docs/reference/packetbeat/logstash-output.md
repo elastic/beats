@@ -1,4 +1,5 @@
 ---
+description: "Send Packetbeat events to Logstash over the Beats (lumberjack) protocol. Configure hosts, load balancing, SSL, pipelining, and the Beats input on the Logstash side."
 navigation_title: "Logstash"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/logstash-output.html
@@ -7,7 +8,7 @@ applies_to:
   serverless: ga
 ---
 
-# Configure the Logstash output [logstash-output]
+# Configure the Logstash output in Packetbeat [logstash-output]
 
 
 The {{ls}} output sends events directly to {{ls}} by using the lumberjack protocol, which runs over TCP. {{ls}} allows for additional processing and routing of generated events.

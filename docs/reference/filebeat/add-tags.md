@@ -7,7 +7,7 @@ applies_to:
   serverless: ga
 ---
 
-# Add tags [add-tags]
+# Add tags in Filebeat [add-tags]
 
 
 The `add_tags` processor adds tags to a list of tags. If the target field already exists, the tags are appended to the existing list of tags.
