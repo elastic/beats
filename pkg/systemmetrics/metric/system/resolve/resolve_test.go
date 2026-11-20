@@ -15,27 +15,26 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package sysinit
+package resolve
 
 import (
-	"os"
+	"context"
 	"path/filepath"
+	"testing"
 
-	"github.com/elastic/beats/v7/pkg/logp"
-	"github.com/elastic/gosigar"
+	"github.com/shirou/gopsutil/v4/common"
+	"github.com/stretchr/testify/assert"
 )
 
-func InitModule(config string, _ *logp.Logger) {
-	configureHostFS(config)
-}
-
-func configureHostFS(config string) {
-	dir := config
-	// Set environment variables for gopsutil.
-	os.Setenv("HOST_PROC", filepath.Join(dir, "/proc"))
-	os.Setenv("HOST_SYS", filepath.Join(dir, "/sys"))
-	os.Setenv("HOST_ETC", filepath.Join(dir, "/etc"))
-
-	// Set proc location for gosigar.
-	gosigar.Procd = filepath.Join(dir, "/proc")
+func TestContext(t *testing.T) {
+	ctx := Context(context.Background(), NewTestResolver("/hostfs"))
+	env, ok := ctx.Value(common.EnvKey).(common.EnvMap)
+	if !assert.True(t, ok, "context must carry a gopsutil EnvMap") {
+		return
+	}
+	assert.Equal(t, common.EnvMap{
+		common.HostProcEnvKey: filepath.Join("/hostfs", "proc"),
+		common.HostSysEnvKey:  filepath.Join("/hostfs", "sys"),
+		common.HostEtcEnvKey:  filepath.Join("/hostfs", "etc"),
+	}, env, "all host paths must be resolved through the resolver")
 }
