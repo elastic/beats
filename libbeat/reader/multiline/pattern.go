@@ -47,9 +47,17 @@ type patternReader struct {
 	flushMatcher *match.Matcher
 	stateMu      sync.Mutex
 	state        func(*patternReader) (reader.Message, error)
+	closed       bool // guarded by stateMu
 	logger       *logp.Logger
 	msgBuffer    *messageBuffer
+
+	// timeout is the idle time after which buffered lines are flushed. It is
+	// enforced by TimeoutReader for blocking sources and via PendingDeadline
+	// for non-blocking ones (reader.ErrWouldBlock). Zero disables it.
+	timeout time.Duration
 }
+
+var _ reader.BufferedFlusher = (*patternReader)(nil)
 
 const (
 	// Default maximum number of lines to return in one multi-line event
@@ -101,6 +109,7 @@ func newMultilinePatternReader(
 		state:        (*patternReader).readFirst,
 		msgBuffer:    newMessageBuffer(maxBytes, maxLines, []byte(separator), config.SkipNewLine),
 		logger:       logger.Named("reader_multiline"),
+		timeout:      tout,
 	}
 	return pr, nil
 }
@@ -148,9 +157,8 @@ func (pr *patternReader) readFirst() (reader.Message, error) {
 				continue
 			}
 
-			pr.logger.Debug("Multiline event flushed because timeout reached.")
-
-			// pass error to caller (next layer) for handling
+			// No lines are buffered here, so there is nothing to flush: pass the
+			// error (including reader.ErrWouldBlock) to the caller (next layer).
 			return message, err
 		}
 
@@ -183,6 +191,14 @@ func (pr *patternReader) readNext() (reader.Message, error) {
 				msg := pr.msgBuffer.finalize()
 				pr.resetState()
 				return msg, nil
+			}
+
+			// The source has no data right now but is not finished: keep the
+			// buffered lines and state (readNext) so the event can be completed by
+			// later lines, or flushed via FlushPending. Sources guarantee no bytes
+			// are consumed alongside ErrWouldBlock.
+			if message.Bytes == 0 && errors.Is(err, reader.ErrWouldBlock) {
+				return reader.Message{}, err
 			}
 
 			// handle error without any bytes returned from reader
@@ -267,8 +283,44 @@ func (pr *patternReader) setState(next func(pr *patternReader) (reader.Message, 
 }
 
 func (pr *patternReader) Close() error {
-	pr.setState((*patternReader).readClosed)
+	pr.stateMu.Lock()
+	pr.closed = true
+	pr.state = (*patternReader).readClosed
+	pr.stateMu.Unlock()
 	return pr.reader.Close()
+}
+
+func (pr *patternReader) isClosed() bool {
+	pr.stateMu.Lock()
+	defer pr.stateMu.Unlock()
+	return pr.closed
+}
+
+// PendingDeadline implements reader.BufferedFlusher. Buffered lines expire
+// after the configured timeout without new lines; with a zero timeout they wait
+// indefinitely. It must be called from the goroutine calling Next.
+func (pr *patternReader) PendingDeadline() (bool, time.Time) {
+	if pr.isClosed() || !pr.msgBuffer.hasPending() {
+		return false, time.Time{}
+	}
+	return true, pr.msgBuffer.idleDeadline(pr.timeout)
+}
+
+// FlushPending implements reader.BufferedFlusher. It returns the buffered
+// lines as one event and resets the reader so the next line starts a new event.
+// It must be called from the goroutine calling Next.
+func (pr *patternReader) FlushPending(timedOut bool) (reader.Message, bool, error) {
+	if pr.isClosed() || !pr.msgBuffer.hasPending() {
+		return reader.Message{}, false, nil
+	}
+
+	if timedOut {
+		pr.logger.Debug("Multiline event flushed because timeout reached.")
+	}
+
+	msg := pr.msgBuffer.finalize()
+	pr.resetState()
+	return msg, true, nil
 }
 
 func (pr *patternReader) readClosed() (reader.Message, error) {

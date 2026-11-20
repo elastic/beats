@@ -329,9 +329,13 @@ func (g *harvesterRunner) readOnce(state *sourceState) {
 	}
 
 	for {
-		before := state.session.Offset()
+		beforePublished, beforeRead := state.session.Offset(), state.session.ReadOffset()
 		verdict, err := state.session.ReadSlice(state.ctx, state.publisher)
-		after := state.session.Offset()
+		afterPublished, afterRead := state.session.Offset(), state.session.ReadOffset()
+		// Bytes buffered by a stateful parser (e.g. multiline) advance the read
+		// offset without advancing the published one; the source is still
+		// active, so that counts as progress.
+		progressed := afterPublished > beforePublished || afterRead > beforeRead
 
 		g.mu.Lock()
 		if state.status == statusClosing || state.finished {
@@ -364,16 +368,22 @@ func (g *harvesterRunner) readOnce(state *sourceState) {
 		}
 
 		// SliceYield: caught up to EOF. During a read_until_eof shutdown the source
-		// has now been drained, so tear it down instead of parking it.
+		// has now been drained, so publish whatever a stateful parser still
+		// buffers (it would otherwise be lost: nothing more is coming) and tear
+		// the source down instead of parking it. Flush runs outside g.mu, as it
+		// publishes; the cancel drainAndStop issues on timeout unblocks it.
 		if g.draining {
 			g.mu.Unlock()
+			if err := state.session.Flush(state.ctx, state.publisher); err != nil {
+				state.ctx.Logger.Debugf("Harvester flush stopped with error: %v", err)
+			}
 			g.finish(state)
 			return
 		}
 
 		// Park for the waker and exit the goroutine. A slice that made progress resets
 		// the backoff; one that read nothing grows it.
-		if after > before {
+		if progressed {
 			g.park(state, g.backoff.Init)
 		} else {
 			g.park(state, growBackoff(state.backoff, g.backoff.Init, g.backoff.Max))
@@ -605,6 +615,14 @@ func (g *harvesterRunner) park(state *sourceState, backoff time.Duration) {
 	due := now.Add(backoff)
 	if state.nextStateCheck.Before(due) {
 		due = state.nextStateCheck
+	}
+	// Parser state buffered across slices (e.g. a multiline event) must be
+	// flushed when its deadline elapses, however far the backoff has grown. A
+	// deadline already in the past makes the source due immediately.
+	if state.session != nil {
+		if deadline := state.session.PendingDeadline(); !deadline.IsZero() && deadline.Before(due) {
+			due = deadline
+		}
 	}
 	state.nextCheck = due
 	g.setStatus(state, statusParked)

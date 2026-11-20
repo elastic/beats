@@ -35,11 +35,15 @@ var (
 //
 // It enforces the timeout via a read deadline: the wrapped reader (or one it
 // wraps) must implement reader.DeadlineSetter so the underlying blocking wait
-// can be bounded. filestream's file reader, the log input's file reader,
-// journald and kafka all honor deadlines. When the wrapped reader does not (a
-// finite source such as awss3's object reads, which return on their own via EOF
-// or the SDK request timeout), TimeoutReader reads directly: there is no
-// never-returning read to bound, so no timeout is needed.
+// can be bounded. Blocking sources (the log input's file reader, journald and
+// kafka) honor deadlines this way. Sources that never block do not use
+// TimeoutReader deadlines: filestream's file reader returns reader.ErrWouldBlock
+// when no data is available, and the timeout of stateful readers such as
+// multiline is driven by the caller through reader.BufferedFlusher. When the
+// wrapped reader does not honor deadlines (also a finite source such as awss3's
+// object reads, which return on their own via EOF or the SDK request timeout),
+// TimeoutReader reads directly: there is no never-returning read to bound, so
+// no timeout is needed.
 type TimeoutReader struct {
 	reader  reader.Reader
 	timeout time.Duration

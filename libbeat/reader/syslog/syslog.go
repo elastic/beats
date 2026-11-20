@@ -172,6 +172,30 @@ func (p *Parser) Next() (reader.Message, error) {
 		return msg, err
 	}
 
+	return p.processMessage(msg), nil
+}
+
+var _ reader.BufferedFlusher = (*Parser)(nil)
+
+// PendingDeadline implements reader.BufferedFlusher by delegating to the
+// wrapped reader.
+func (p *Parser) PendingDeadline() (bool, time.Time) {
+	return reader.PendingDeadline(p.reader)
+}
+
+// FlushPending implements reader.BufferedFlusher. A message flushed from the
+// wrapped reader is parsed exactly like one returned by Next.
+func (p *Parser) FlushPending(timedOut bool) (reader.Message, bool, error) {
+	msg, ok, err := reader.FlushPending(p.reader, timedOut)
+	if !ok || err != nil {
+		return msg, ok, err
+	}
+	return p.processMessage(msg), true, nil
+}
+
+// processMessage parses the syslog message in msg, a message read from, or
+// flushed by, the wrapped reader.
+func (p *Parser) processMessage(msg reader.Message) reader.Message {
 	fields, ts, err := ParseMessage(string(msg.Content), p.cfg.Format, p.cfg.TimeZone.Location())
 	if err != nil {
 		if p.cfg.LogErrors {
@@ -194,7 +218,7 @@ func (p *Parser) Next() (reader.Message, error) {
 		msg.Ts = ts
 	}
 
-	return msg, nil
+	return msg
 }
 
 // NewParser creates a new Syslog parser.
