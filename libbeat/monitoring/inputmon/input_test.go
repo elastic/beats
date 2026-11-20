@@ -357,3 +357,24 @@ func TestMetricSnapshotJSON_regNil(t *testing.T) {
 	require.NoError(t, err, "MetricSnapshotJSON should not return an error")
 	assert.Equal(t, "[]", string(got))
 }
+
+func TestSnapshotPreservesMetricsetInstances(t *testing.T) {
+	root := monitoring.NewRegistry()
+	for _, instance := range []string{"cloudwatch-a", "cloudwatch-b", "ec2"} {
+		reg := root.GetOrCreateRegistry(instance)
+		monitoring.NewString(reg, "id").Set("shared-module-id")
+		monitoring.NewString(reg, "input").Set("aws/cloudwatch")
+		monitoring.NewString(reg, "ephemeral_id").Set(instance)
+	}
+	data, err := MetricSnapshotJSON(root)
+	require.NoError(t, err, "metricset snapshots must serialize")
+	var records []map[string]any
+	require.NoError(t, json.Unmarshal(data, &records), "snapshot must contain valid JSON")
+	assert.Len(t, records, 3, "a configured module ID must not collapse distinct metricset instances")
+	instances := make([]string, 0, len(records))
+	for _, record := range records {
+		assert.Equal(t, "shared-module-id", record["id"], "configured IDs must be preserved")
+		instances = append(instances, record["ephemeral_id"].(string))
+	}
+	assert.ElementsMatch(t, []string{"cloudwatch-a", "cloudwatch-b", "ec2"}, instances, "every instance must survive export")
+}
