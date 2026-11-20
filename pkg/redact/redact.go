@@ -164,6 +164,7 @@ func redactMap[K comparable](obj map[K]any, ro *redactOptions) {
 				// Recursively process each element in the slice so that we also walk
 				// through lists (e.g. inputs[4].streams[0]). This is required to
 				// reach redaction markers that are inside slice items.
+				sensitive := isSensitiveKey(key, ro)
 				for i, value := range cast {
 					switch m := value.(type) {
 					case map[string]any:
@@ -172,10 +173,24 @@ func redactMap[K comparable](obj map[K]any, ro *redactOptions) {
 						redactMap(m, ro)
 					case map[int]any:
 						redactMap(m, ro)
-					case string:
-						if redactedValue, redact := redactURL(m); redact {
-							cast[i] = redactedValue
+					case nil:
+					default:
+						if sensitive {
+							cast[i] = REDACTED
+						} else if s, ok := m.(string); ok {
+							if redactedValue, redact := redactURL(s); redact {
+								cast[i] = redactedValue
+							}
 						}
+					}
+				}
+			case []string:
+				sensitive := isSensitiveKey(key, ro)
+				for i, s := range cast {
+					if sensitive {
+						cast[i] = REDACTED
+					} else if redactedValue, redact := redactURL(s); redact {
+						cast[i] = redactedValue
 					}
 				}
 			case string:
@@ -271,6 +286,11 @@ func parseHeaderPairs(val string) []headerPair {
 		pairs = append(pairs, headerPair{name: seg[:idx], value: seg[idx+1:]})
 	}
 	return pairs
+}
+
+func isSensitiveKey[K comparable](key K, ro *redactOptions) bool {
+	keyString, ok := any(key).(string)
+	return ok && redactKey(keyString, ro)
 }
 
 func redactKey(k string, ro *redactOptions) bool {

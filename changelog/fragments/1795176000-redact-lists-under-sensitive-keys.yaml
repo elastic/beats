@@ -1,0 +1,10 @@
+kind: security
+summary: Redact list values under sensitive keys, such as `tokens`, in diagnostics.
+description: |
+  `pkg/redact` replaced string values under keys like `token` or `password` with
+  `REDACTED`, but for list values it only removed credentials embedded in URLs.
+  A setting such as `bearertokenauth.tokens: [a, b]` was therefore written to
+  diagnostics in plain text. Every non-map item of a list under a sensitive key
+  is now redacted, and map items are still redacted recursively. `[]string`
+  values, which were previously skipped entirely, are handled the same way.
+component: libbeat
