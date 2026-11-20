@@ -335,7 +335,7 @@ func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *request
 			if err != nil {
 				return nil, err
 			}
-			client, err = authCfg.OAuth2.client(ctx, client)
+			client, err = authCfg.OAuth2.client(ctx, client, log)
 			if err != nil {
 				return nil, err
 			}

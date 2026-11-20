@@ -1295,7 +1295,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	}
 
 	if cfg.Auth.OAuth2.isEnabled() {
-		c, err = cfg.Auth.OAuth2.client(ctx, c)
+		c, err = cfg.Auth.OAuth2.client(ctx, c, log)
 		if err != nil {
 			return nil, nil, nil, nil, err
 		}

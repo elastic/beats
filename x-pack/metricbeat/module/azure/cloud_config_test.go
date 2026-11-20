@@ -99,7 +99,7 @@ func TestBuildCloudConfig(t *testing.T) {
 
 		for _, test := range tests {
 			t.Run(test.name, func(t *testing.T) {
-				config := Config{ResourceManagerEndpoint: test.resourceManagerEndpoint}
+				config := Config{ClientSecret: "secret", ResourceManagerEndpoint: test.resourceManagerEndpoint}
 				config.InitDefaults()
 				require.NoError(t, config.Validate(), "known cloud endpoint must validate without a trailing slash")
 				cfg := BuildCloudConfig(config)
@@ -139,6 +139,7 @@ func TestBuildCloudConfig(t *testing.T) {
 
 	t.Run("legacy German cloud remains supported as an explicit override", func(t *testing.T) {
 		config := Config{
+			ClientSecret:            "secret",
 			ResourceManagerEndpoint: "https://management.microsoftazure.de/",
 			ResourceManagerAudience: "https://management.microsoftazure.de/",
 		}

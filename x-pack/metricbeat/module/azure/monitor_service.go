@@ -20,7 +20,6 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
-	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
@@ -64,12 +63,9 @@ func NewService(config Config, logger *logp.Logger) (*MonitorService, error) {
 		}
 	}
 
-	credential, err := azidentity.NewClientSecretCredential(config.TenantId, config.ClientId, config.ClientSecret,
-		&azidentity.ClientSecretCredentialOptions{
-			ClientOptions: clientOptions,
-		})
+	credential, err := NewCredential(config, clientOptions, logger)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't create client credentials: %w", err)
+		return nil, err
 	}
 
 	metricsClient, err := armmonitor.NewMetricsClient(config.SubscriptionId, credential, &arm.ClientOptions{
