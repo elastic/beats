@@ -43,6 +43,17 @@ On Windows, the default paths assume that Redis was installed from the Chocolate
 The Redis `slowlog` fileset was tested with Redis 3.0.2 and 2.4.6. We expect compatibility with any Redis version newer than 2.2.12, when the SLOWLOG command was added.
 
 
+## Time zone support [_time_zone_support_redis]
+
+This module parses logs that don't contain time zone information. For these logs, Filebeat reads the local time zone and uses it when parsing to convert the timestamp to UTC. The time zone to be used for parsing is included in the event in the `event.timezone` field.
+
+To disable this conversion, the `event.timezone` field can be removed with the `drop_fields` processor.
+
+If logs are originated from systems or applications with a different time zone to the local one, the `event.timezone` field can be overwritten with the original time zone using the `add_fields` processor.
+
+See [Processors](/reference/filebeat/filtering-enhancing-data.md) for information about specifying processors in your config.
+
+
 ## Configure the module [configuring-redis-module]
 
 You can further refine the behavior of the `redis` module by specifying [variable settings](#redis-settings) in the `modules.d/redis.yml` file, or overriding settings at the command line.
