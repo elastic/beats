@@ -40,10 +40,10 @@ func procName(info types.ProcessInfo) string {
 
 // GetLocalPortToPIDMapping returns the list of local port numbers and the PID
 // that owns them.
-func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transport) (ports map[endpoint]int, err error) {
+func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transport, _ uint16) (ports map[endpoint]int, scanned bool, err error) {
 	tables, ok := tablesByTransport[transport]
 	if !ok {
-		return nil, fmt.Errorf("unsupported transport protocol id: %d", transport)
+		return nil, false, fmt.Errorf("unsupported transport protocol id: %d", transport)
 	}
 
 	storeResults := func(localIP net.IP, localPort uint16, pid int) {
@@ -54,14 +54,14 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 	for _, table := range tables {
 		data, err := getNetTable(table.function, false, table.family, table.class)
 		if err != nil {
-			return nil, err
+			return nil, false, err
 		}
 		err = parseTable(data, table.extractor(storeResults))
 		if err != nil {
-			return nil, err
+			return nil, false, err
 		}
 	}
-	return ports, nil
+	return ports, true, nil
 }
 
 type extractor interface {
