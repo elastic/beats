@@ -75,7 +75,7 @@ steps:
               context: "heartbeat: check/update"
 
       - label: "Heartbeat: Run pre-commit"
-        command: "python3 -m pip install pre-commit && python3 -m pre_commit run --all-files"
+        command: "pre-commit run --all-files"
         agents:
           image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
           memory: "2Gi"
