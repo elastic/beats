@@ -75,7 +75,7 @@ The `journald` input supports the following configuration options plus the [Comm
 
 ### `id` [filebeat-input-journald-id]
 
-An unique identifier for the input. By providing a unique `id` you can operate multiple inputs on the same journal. This allows each input’s cursor to be persisted independently in the registry file. Each journald input must have an unique ID.
+A unique identifier for the input. By providing a unique `id` you can operate multiple inputs on the same journal. This allows each input’s cursor to be persisted independently in the registry file. Each journald input must have a unique ID.
 
 ```yaml
 filebeat.inputs:

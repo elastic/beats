@@ -10,7 +10,9 @@ applies_to:
 # HTTP Endpoint input [filebeat-input-http_endpoint]
 
 
-The HTTP Endpoint input initializes a listening HTTP server that collects incoming HTTP POST requests containing a JSON body. The body must be either an object or an array of objects, otherwise a Common Expression Language expression that converts the JSON body to these types can be provided. Any other data types will result in an HTTP 400 (Bad Request) response. For arrays, one document is created for each object in the array.
+The HTTP Endpoint input initializes a listening HTTP server that collects incoming HTTP POST requests containing a JSON body. The body must be either an object or an array of objects, otherwise a Common Expression Language expression that converts the JSON body to these types can be provided. A body whose top-level value is some other data type, such as a bare number, results in an HTTP 400 (Bad Request) response. For arrays, one document is created for each object in the array; array elements that are not objects are discarded without failing the request.
+
+A well-formed request that produces no events is accepted and receives the configured response, not a 400. This covers an empty array, an array holding only non-objects, a whitespace-only body, and a Common Expression Language program that returns an empty array. A request with no body at all is still rejected with a 406 (Not Acceptable).
 
 gzip encoded request bodies are supported if a `Content-Encoding: gzip` header is sent with the request.
 
@@ -22,7 +24,7 @@ These are the possible response codes from the server.
 
 | HTTP Response Code | Name | Reason |
 | --- | --- | --- |
-| 200 | OK | Returned on success. |
+| 200 | OK | Returned on success, including for a well-formed request that produces no events. |
 | 400 | Bad Request | Returned if JSON body decoding fails, if an OPTIONS request is made and `options_headers` has not been set in the config, or if `wait_for_completion_timeout` query validation fails. |
 | 401 | Unauthorized | Returned when basic auth, secret header, or HMAC validation fails. |
 | 405 | Method Not Allowed | Returned if methods other than POST are used. |

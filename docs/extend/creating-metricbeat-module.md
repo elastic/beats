@@ -170,21 +170,15 @@ It’s now sending data to your local Elasticsearch instance. If you need to mod
 
 ### Run Environment tests for one module [_run_environment_tests_for_one_module]
 
-All the environments are setup with docker. `make integration-tests-environment` and `make system-tests-environment` can be used to run tests for all modules. In case you are developing a module it is convenient to run the tests only for one module and directly run it on your machine.
+All the environments are set up with docker. `mage integTest` can be used to run the integration and system tests for all modules. In case you are developing a module it is convenient to run the tests only for one module.
 
-First you need to start the environment for your module to test and expose the port to your local machine. For this you can run the following command inside the metricbeat directory:
-
-```bash
-MODULE=apache PORT=80 make run-module
-```
-
-Note: The apache module with port 80 is taken here as an example. You must put the name and port for your own module here.
-
-This will start the environment and you must wait until the service is completely started. After that you can run the test which require an environment:
+Set `MODULE` to the module you want to test and run the following command inside the metricbeat directory:
 
 ```bash
-MODULE=apache make test-module
+MODULE=apache mage integTest
 ```
 
-This will run the integration and system tests connecting to the environment in your docker container.
+Note: The apache module is taken here as an example. You must put the name of your own module here.
+
+This starts the module's docker compose services, waits until they are healthy, and then runs both the Go integration tests and the Python system tests against them. To run only one of the two, use `MODULE=apache mage goIntegTest` or `MODULE=apache mage pythonIntegTest`.
 

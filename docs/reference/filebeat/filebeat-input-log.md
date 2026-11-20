@@ -352,7 +352,7 @@ The `close_*` configuration options are used to close the harvester after a cert
 
 When this option is enabled, Filebeat closes the file handle if a file has not been harvested for the specified duration. The counter for the defined period starts when the last log line was read by the harvester. It is not based on the modification time of the file. If the closed file changes again, a new harvester is started and the latest changes will be picked up after `scan_frequency` has elapsed.
 
-We recommended that you set `close_inactive` to a value that is larger than the least frequent updates to your log files. For example, if your log files get updated every few seconds, you can safely set `close_inactive` to `1m`. If there are log files with very different update rates, you can use multiple configurations with different values.
+We recommend that you set `close_inactive` to a value that is larger than the least frequent updates to your log files. For example, if your log files get updated every few seconds, you can safely set `close_inactive` to `1m`. If there are log files with very different update rates, you can use multiple configurations with different values.
 
 Setting `close_inactive` to a lower value means that file handles are closed sooner. However this has the side effect that new log lines are not sent in near real time if the harvester is closed.
 

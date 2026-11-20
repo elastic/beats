@@ -15,7 +15,7 @@ This functionality is in beta and is subject to change. The design and code is l
 ::::
 
 
-This is the metrics endpoint metricset of the etcd module. This metrics is being read from the Etcd V3 endpoint and won’t show any activity regarding Etcd V2.
+This is the metrics endpoint metricset of the etcd module. These metrics are being read from the Etcd V3 endpoint and won’t show any activity regarding Etcd V2.
 
 ## Fields [_fields]
 

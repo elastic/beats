@@ -17,7 +17,7 @@ This functionality is in beta and is subject to change. The design and code is l
 
 This module periodically fetches metrics from [Redis Enterprise Software](https://redislabs.com/redis-enterprise/).
 
-The defaut metricsets are `node` and `proxy`.
+The default metricsets are `node` and `proxy`.
 
 
 ## Module-specific configuration notes [_module_specific_configuration_notes_19]
@@ -30,7 +30,7 @@ The `redisenterprise` module has these additional config options:
 
 ## Compatibility [_compatibility_46]
 
-The metricsets `node` and `proxy` are compatible with Redis Enterprise Software (RES). There were tested with RES 5.4.10-22 and are expected to work with all versions >= 5.0.2.
+The metricsets `node` and `proxy` are compatible with Redis Enterprise Software (RES). They were tested with RES 5.4.10-22 and are expected to work with all versions >= 5.0.2.
 
 
 ## Dashboard [_dashboard_40]

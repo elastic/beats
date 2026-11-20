@@ -13,7 +13,7 @@ Beats development requires Python >= 3.7.
 
 ## Installing Python and venv [installing-python]
 
-Python uses to be installed in many operating systems. If it is not installed in your system you can follow the instructions available in [https://www.python.org/downloads/](https://www.python.org/downloads/)
+Python is usually already installed in many operating systems. If it is not installed in your system you can follow the instructions available in [https://www.python.org/downloads/](https://www.python.org/downloads/)
 
 In Ubuntu/Debian systems, Python 3 can be installed with:
 
