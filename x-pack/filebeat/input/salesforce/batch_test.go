@@ -108,13 +108,32 @@ func TestNextObjectBatchWindow(t *testing.T) {
 			},
 			wantErr: `unsupported Salesforce cursor time format: "not-a-time"`,
 		},
-		"legacy first_event_time seeds upgrade window": {
+		// Descending templates (login / logout, ORDER BY EventDate DESC)
+		// persist the newest row as first_event_time, so it is the newer of
+		// the two legacy watermarks and must drive the seed.
+		"legacy descending seeds upgrade window from newer first_event_time": {
 			cursor: dateTimeCursor{
 				FirstEventTime: "2024-01-01T11:55:00.000+0000",
 				LastEventTime:  "2024-01-01T11:54:30.000+0000",
 			},
 			want: objectBatchWindow{
 				Start: time.Date(2024, time.January, 1, 11, 55, 0, 0, time.UTC),
+				End:   time.Date(2024, time.January, 1, 12, 0, 0, 0, time.UTC),
+			},
+			wantOK: true,
+		},
+		// Ascending templates (aura_request, ORDER BY Timestamp ASC) persist
+		// the newest row as last_event_time while first_event_time holds the
+		// oldest row of the final pre-upgrade poll. The seed must take the
+		// newer last_event_time; seeding from first_event_time would replay
+		// the whole final poll window on every upgraded install.
+		"legacy ascending seeds upgrade window from newer last_event_time": {
+			cursor: dateTimeCursor{
+				FirstEventTime: "2024-01-01T11:54:30.000+0000",
+				LastEventTime:  "2024-01-01T11:57:00.000+0000",
+			},
+			want: objectBatchWindow{
+				Start: time.Date(2024, time.January, 1, 11, 57, 0, 0, time.UTC),
 				End:   time.Date(2024, time.January, 1, 12, 0, 0, 0, time.UTC),
 			},
 			wantOK: true,
