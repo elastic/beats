@@ -184,12 +184,14 @@ func (p *Parser) Next() (reader.Message, error) {
 
 	if textString, _ := fields["message"].(string); textString != "" {
 		msg.Content = []byte(textString)
-		msg.Bytes = len(msg.Content)
 	} else if err == nil {
 		msg.Content = nil
-		msg.Bytes = 0
 	}
-	msg.AddFields(fields)
+	if msg.Fields == nil {
+		msg.Fields = fields
+	} else {
+		msg.Fields.DeepUpdate(fields)
+	}
 	if !ts.IsZero() {
 		msg.Ts = ts
 	}
