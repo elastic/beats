@@ -121,8 +121,7 @@ func redactMap[K comparable](obj map[K]any, ro *redactOptions) {
 		// - name: Authorization
 		//   value: Bearer SecretValue
 		if keyString, ok := any(key).(string); ok && strings.ToLower(keyString) == "name" {
-			keyVal, ok := val.(string)
-			if ok && redactKey(keyVal, ro) {
+			if isSensitiveKey(val, ro) {
 				for vk := range obj {
 					if vs, ok := any(vk).(string); ok && strings.ToLower(vs) == "value" {
 						obj[vk] = REDACTED
@@ -194,7 +193,7 @@ func redactMap[K comparable](obj map[K]any, ro *redactOptions) {
 					}
 				}
 			case string:
-				if keyString, ok := any(key).(string); ok && redactKey(keyString, ro) {
+				if isSensitiveKey(key, ro) {
 					val = REDACTED
 				} else if redactedValue, redact := redactURL(cast); redact {
 					val = redactedValue
