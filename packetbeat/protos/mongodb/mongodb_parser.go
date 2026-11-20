@@ -111,6 +111,16 @@ func mongodbMessageParser(s *stream, logger *logp.Logger) (bool, bool) {
 	case opKillCursor:
 		s.message.method = "killCursors"
 		return opKillCursorsParse(d, s.message)
+	case opCommand:
+		s.message.method = "command"
+		return true, true
+	case opCommandRep:
+		s.message.isResponse = true
+		s.message.method = "commandReply"
+		return true, true
+	case opCompressed:
+		s.message.method = "compressed"
+		return true, true
 	case opMsg:
 		s.message.method = "msg"
 		// The assumption is that the message with responseTo == 0 is the request
