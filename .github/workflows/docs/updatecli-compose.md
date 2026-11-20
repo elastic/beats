@@ -23,13 +23,13 @@ Runs the configured `compose` job(s) for **updatecli-compose**. The checked-in s
 
 | Job | Runs when / runner | Depends on | Configured work |
 | --- | --- | --- | --- |
-| compose | runner `ubuntu-latest` | None declared | Step uses `actions/checkout@v7`; Step uses `docker/login-action@dbcb813823bdd20940b903addbd779551569679f`; Step input names `["registry", "username", "password"]`; Step uses `elastic/oblt-actions/updatecli/run-and-notify@v1`; Step input names `["command", "slack-bot-token", "slack-channel-id", "slack-message", "slack-send-when", "version-file"]`; Step uses `elastic/oblt-actions/updatecli/run-and-notify@v1`; Step input names `["command", "slack-bot-token", "slack-channel-id", "slack-message", "slack-send-when", "version-file"]` |
+| compose | runner `ubuntu-latest` | None declared | Step uses `actions/checkout@v7`; Step uses `docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6`; Step input names `["registry", "username", "password"]`; Step uses `elastic/oblt-actions/updatecli/run-and-notify@v1`; Step input names `["command", "slack-bot-token", "slack-channel-id", "slack-message", "slack-send-when", "version-file"]`; Step uses `elastic/oblt-actions/updatecli/run-and-notify@v1`; Step input names `["command", "slack-bot-token", "slack-channel-id", "slack-message", "slack-send-when", "version-file"]` |
 
 ## Inputs, outputs, and access
 
 | Item | Details |
 | --- | --- |
-| Inputs | docker/login-action@dbcb813823bdd20940b903addbd779551569679f input names: registry, username, password; elastic/oblt-actions/updatecli/run-and-notify@v1 input names: command, slack-bot-token, slack-channel-id, slack-message, slack-send-when, version-file; elastic/oblt-actions/updatecli/run-and-notify@v1 input names: command, slack-bot-token, slack-channel-id, slack-message, slack-send-when, version-file |
+| Inputs | docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 input names: registry, username, password; elastic/oblt-actions/updatecli/run-and-notify@v1 input names: command, slack-bot-token, slack-channel-id, slack-message, slack-send-when, version-file; elastic/oblt-actions/updatecli/run-and-notify@v1 input names: command, slack-bot-token, slack-channel-id, slack-message, slack-send-when, version-file |
 | Outputs | No job outputs, artifact upload, or cache action declared in this workflow. |
 | Permissions | workflow: `{"contents": "read"}`; compose: `{"contents": "write", "packages": "read", "pull-requests": "write"}` |
 | Secrets | `GITHUB_TOKEN`, `SLACK_BOT_TOKEN` |
