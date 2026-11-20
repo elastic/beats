@@ -116,6 +116,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	client, err := newAuditClient(&config, log)
 	if err != nil {
+		control.Close()
 		return nil, fmt.Errorf("failed to create audit data client: %w", err)
 	}
 
