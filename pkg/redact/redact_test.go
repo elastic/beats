@@ -540,7 +540,6 @@ func TestRedact(t *testing.T) {
 		},
 		{
 			name: "[]string values are redacted",
-			//nolint:gosec // this test is meant to redact sensitive values
 			input: map[string]any{
 				"tokens": []string{"secret-1", "secret-2"},
 				"hosts":  []string{"https://user:pass@es:9200", "https://es:9200"},
