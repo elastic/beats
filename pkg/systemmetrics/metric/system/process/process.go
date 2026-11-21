@@ -73,7 +73,7 @@ func ListStates(hostfs resolve.Resolver) ([]ProcState, error) {
 func GetPIDState(hostfs resolve.Resolver, pid int) (PidState, error) {
 	// This library still doesn't have a good cross-platform way to distinguish between "does not eixst" and other process errors.
 	// This is a fairly difficult problem to solve in a cross-platform way
-	exists, err := psutil.PidExistsWithContext(context.Background(), int32(pid)) //nolint:gosec // G115 — PID fits in int32 on supported platforms
+	exists, err := psutil.PidExistsWithContext(resolve.Context(context.Background(), hostfs), int32(pid)) //nolint:gosec // G115 — PID fits in int32 on supported platforms
 	if err != nil {
 		return "", fmt.Errorf("Error trying to find process: %d: %w", pid, err)
 	}
