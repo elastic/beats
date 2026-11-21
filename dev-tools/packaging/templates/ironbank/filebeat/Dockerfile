@@ -4,7 +4,7 @@
 ################################################################################
 ARG BASE_REGISTRY=registry1.dsop.io
 ARG BASE_IMAGE=redhat/ubi/ubi10
-ARG BASE_TAG=10.2
+ARG BASE_TAG=10.3
 
 FROM ${BASE_REGISTRY}/${BASE_IMAGE}:${BASE_TAG} as builder
 
