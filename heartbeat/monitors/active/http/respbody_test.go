@@ -24,6 +24,7 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -257,4 +258,59 @@ func Test_readPrefixAndHash(t *testing.T) {
 
 func simpleHTTPResponse() *http.Response {
 	return &http.Response{Body: io.NopCloser(strings.NewReader("hello"))}
+}
+
+// plainBody hides the io.WriterTo of the underlying reader, like a real
+// http.Response.Body, so copying from it needs a buffer.
+type plainBody struct{ io.Reader }
+
+func (plainBody) Close() error { return nil }
+
+func newPlainBody(s string) io.ReadCloser { return plainBody{strings.NewReader(s)} }
+
+// readPrefixAndHash runs on every check of every http monitor and the body is
+// usually tiny, so it must not allocate copy buffers per call.
+func Test_readPrefixAndHashDoesNotAllocateCopyBuffers(t *testing.T) {
+	const content = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+	reader := strings.NewReader(content)
+	body := plainBody{reader}
+
+	allocs := testing.AllocsPerRun(200, func() {
+		reader.Reset(content)
+		if _, _, _, err := readPrefixAndHash(body, 128); err != nil {
+			t.Error(err)
+		}
+	})
+	// Measured: 9 allocations with the pool, 11 without it (one copy buffer for
+	// each of the two copies), so 10 fails if either buffer is allocated per call.
+	assert.LessOrEqual(t, allocs, float64(10),
+		"readPrefixAndHash made %v allocations per call, expected the copy buffers to be pooled", allocs)
+}
+
+func Test_readPrefixAndHashConcurrent(t *testing.T) {
+	var wg sync.WaitGroup
+	for i := range 16 {
+		wg.Go(func() {
+			body := strings.Repeat(string([]byte{byte('a' + i%26)}), 70000+i)
+			expected := sha256.Sum256([]byte(body))
+			for range 20 {
+				size, prefix, hash, err := readPrefixAndHash(newPlainBody(body), 10)
+				assert.NoError(t, err)
+				assert.Equal(t, len(body), size)
+				assert.Equal(t, body[:10], prefix)
+				assert.Equal(t, hex.EncodeToString(expected[:]), hash)
+			}
+		})
+	}
+	wg.Wait()
+}
+
+func BenchmarkReadPrefixAndHash(b *testing.B) {
+	body := strings.Repeat("a", 100)
+	b.ReportAllocs()
+	for b.Loop() {
+		if _, _, _, err := readPrefixAndHash(newPlainBody(body), 128); err != nil {
+			b.Fatal(err)
+		}
+	}
 }

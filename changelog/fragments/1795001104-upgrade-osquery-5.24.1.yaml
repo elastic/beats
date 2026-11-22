@@ -1,0 +1,13 @@
+kind: upgrade
+
+summary: upgrade osquery version to 5.24.1
+
+description: >
+  Upgrade the bundled osquery runtime to version 5.24.1. It restores the
+  bpf_process_events and bpf_socket_events tables that were removed by mistake
+  in 5.24.0 (osquery/osquery#9225), so queries on those tables work again. It
+  also includes security fixes: an updated Mozilla CA certificate bundle,
+  TLS 1.0 and 1.1 disabled in curl_certificate and the OpenSSL build, and
+  hardening against malformed input in several table parsers.
+
+component: osquerybeat

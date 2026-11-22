@@ -23,15 +23,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/metricbeat/internal/sysinit"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestDataNameFilter(t *testing.T) {
-	sysinit.InitModule("./_meta/testdata", logptest.NewTestingLogger(t, ""))
 	conf := map[string]any{
 		"module":                 "system",
 		"metricsets":             []string{"diskio"},
