@@ -24,6 +24,7 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/dpop"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/jwtauth"
 )
 
 // oktaTokenSource is a custom implementation of the oauth2.TokenSource interface.
@@ -66,7 +67,7 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context) (*http.Client, 
 			}
 		}
 		var err error
-		key, err = pemPKCS8PrivateKey([]byte(o.DPoPKeyPEM), "")
+		key, err = jwtauth.ParsePrivateKey([]byte(o.DPoPKeyPEM), "")
 		if err != nil {
 			return nil, fmt.Errorf("failed to decode dpop signer: %w", err)
 		}
@@ -203,7 +204,7 @@ func (i *base64int) UnmarshalJSON(b []byte) error {
 }
 
 func generateOktaJWTPEM(pemdata string, cnf *oauth2.Config) (string, error) {
-	key, err := pemPKCS8PrivateKey([]byte(pemdata), "")
+	key, err := jwtauth.ParsePrivateKey([]byte(pemdata), "")
 	if err != nil {
 		return "", err
 	}

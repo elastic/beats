@@ -1,0 +1,10 @@
+kind: enhancement
+summary: Add JWT authentication to the CEL input.
+description: |
+  The new auth.jwt block signs a JWT with a configured private key, with an
+  optional passphrase for encrypted PKCS#8 keys. In direct mode the JWT is sent
+  as the bearer token, as Snowflake key-pair authentication requires. In grant
+  mode it is exchanged at a token URL with the OAuth2 JWT bearer grant, as
+  DocuSign requires. A client_assertion mode authenticates to the token
+  endpoint with the JWT. Tokens are refreshed when they expire.
+component: filebeat

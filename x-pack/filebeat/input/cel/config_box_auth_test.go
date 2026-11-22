@@ -435,35 +435,3 @@ func TestExchangeBoxAssertion_ClockSkewRetry(t *testing.T) {
 		t.Errorf("callCount: got %d want 2 (1 failure + 1 retry)", callCount)
 	}
 }
-
-func TestPemPKCS8PrivateKey(t *testing.T) {
-	tests := []struct {
-		name    string
-		pem     string
-		pass    string
-		wantErr string
-	}{
-		{name: "plain", pem: testBoxPlainKey},
-		{name: "encrypted", pem: testBoxEncryptedKey, pass: "testpassphrase"},
-		{name: "encrypted_wrong_pass", pem: testBoxEncryptedKey, pass: "bad", wantErr: "decrypting private key:"},
-		{name: "no_pem", pem: "not pem", wantErr: "no PEM data"},
-		{name: "trailing_data", pem: testBoxPlainKey + "extra", wantErr: "trailing data"},
-	}
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			_, err := pemPKCS8PrivateKey([]byte(test.pem), test.pass)
-			if test.wantErr != "" {
-				if err == nil {
-					t.Fatalf("got nil error; want error containing %q", test.wantErr)
-				}
-				if !strings.Contains(err.Error(), test.wantErr) {
-					t.Errorf("error %q does not contain %q", err.Error(), test.wantErr)
-				}
-				return
-			}
-			if err != nil {
-				t.Fatalf("unexpected error: %v", err)
-			}
-		})
-	}
-}

@@ -25,6 +25,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/go-cmp/cmp"
 	"github.com/icholy/digest"
 	"go.opentelemetry.io/otel/attribute"
@@ -39,6 +40,7 @@ import (
 	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/beats/v7/pkg/paths"
 	"github.com/elastic/beats/v7/pkg/useragent"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/jwtauth"
 )
 
 var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints")
@@ -2249,6 +2251,98 @@ var inputTests = []struct {
 	},
 
 	{
+		name: "JWT direct",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]any{
+			"interval":             1,
+			"auth.jwt.mode":        "direct",
+			"auth.jwt.key_id":      "k1",
+			"auth.jwt.lifetime":    "10m",
+			"auth.jwt.private_key": testBoxPEMForConfig,
+			"auth.jwt.claims": map[string]any{
+				"iss": "ACCT.USER.%{public_key_sha256}",
+				"sub": "ACCT.USER",
+			},
+			"program": `
+	bytes(post(state.url, '', '').Body).as(body, {
+		"events": body.decode_json()
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			jwtHandler(w, r, "ACCT.USER.")
+		},
+		want: []map[string]any{
+			{"hello": "world"},
+		},
+	},
+	{
+		name: "JWT grant",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			config["auth.jwt.token_url"] = s.URL + "/token"
+			t.Cleanup(s.Close)
+		},
+		config: map[string]any{
+			"interval":             1,
+			"auth.jwt.mode":        "grant",
+			"auth.jwt.private_key": testBoxPEMForConfig,
+			"auth.jwt.claims": map[string]any{
+				"iss":   "integration_key",
+				"sub":   "user_guid",
+				"aud":   "account.example.com",
+				"scope": "signature impersonation",
+			},
+			"auth.jwt.endpoint_params": map[string]any{
+				"param1": "v1",
+			},
+			"program": `
+	bytes(post(state.url, '', '').Body).as(body, {
+		"events": body.decode_json()
+	})
+	`,
+		},
+		handler: jwtGrantHandler,
+		want: []map[string]any{
+			{"hello": "world"},
+		},
+	},
+
+	{
+		name: "JWT client_assertion",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			config["auth.jwt.token_url"] = s.URL + "/token"
+			t.Cleanup(s.Close)
+		},
+		config: map[string]any{
+			"interval":             1,
+			"auth.jwt.mode":        "client_assertion",
+			"auth.jwt.private_key": testBoxPEMForConfig,
+			"auth.jwt.client.id":   "a_client_id",
+			"auth.jwt.scopes":      []string{"scope1", "scope2"},
+			"auth.jwt.claims": map[string]any{
+				"iss": "a_client_id",
+				"sub": "a_client_id",
+			},
+			"program": `
+	bytes(post(state.url, '', '').Body).as(body, {
+		"events": body.decode_json()
+	})
+	`,
+		},
+		handler: jwtClientAssertionHandler,
+		want: []map[string]any{
+			{"hello": "world"},
+		},
+	},
+	{
 		name: "Auth AWS V4 Signer",
 		server: func(t *testing.T, h http.HandlerFunc, config map[string]any) {
 			s := httptest.NewServer(h)
@@ -3163,6 +3257,123 @@ func oauth2Handler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"error":"wrong bearer"}`))
 	default:
 		w.Write([]byte(`{"hello":"world"}`))
+	}
+}
+
+// jwtHandler checks that the request is authenticated with a Bearer JWT signed
+// with the test key, whose iss claim starts with issPrefix, and that the
+// fingerprint in the iss claim matches the test key.
+//
+//nolint:errcheck // No point checking errors in test server.
+func jwtHandler(w http.ResponseWriter, r *http.Request, issPrefix string) {
+	w.Header().Set("content-type", "application/json")
+	raw, ok := strings.CutPrefix(r.Header.Get("Authorization"), "Bearer ")
+	if !ok {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(`{"error":"no bearer"}`))
+		return
+	}
+	claims, tok, err := parseTestJWT(raw)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+	const fp = testBoxPEMFingerprint
+	switch {
+	case claims["iss"] != issPrefix+fp:
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]any{"error": "wrong iss", "iss": claims["iss"]})
+	case claims["sub"] != "ACCT.USER":
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(`{"error":"wrong sub"}`))
+	case tok.Header["kid"] != "k1":
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(`{"error":"wrong kid"}`))
+	default:
+		w.Write([]byte(`{"hello":"world"}`))
+	}
+}
+
+func parseTestJWT(raw string) (jwt.MapClaims, *jwt.Token, error) {
+	key, err := jwtauth.ParsePrivateKey([]byte(testBoxPEMForConfig), "")
+	if err != nil {
+		return nil, nil, err
+	}
+	claims := jwt.MapClaims{}
+	tok, err := jwt.ParseWithClaims(raw, claims, func(*jwt.Token) (any, error) {
+		return key.Public(), nil
+	}, jwt.WithValidMethods([]string{"RS256"}), jwt.WithExpirationRequired(), jwt.WithIssuedAt())
+	return claims, tok, err
+}
+
+// jwtGrantHandler is a token endpoint for the JWT bearer grant that issues the
+// token "abcd", and a resource that requires it.
+//
+//nolint:errcheck // No point checking errors in test server.
+func jwtGrantHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/token" {
+		oauth2Handler(w, r)
+		return
+	}
+	w.Header().Set("content-type", "application/json")
+	r.ParseForm()
+	claims, _, err := parseTestJWT(r.FormValue("assertion"))
+	switch {
+	case r.FormValue("grant_type") != "urn:ietf:params:oauth:grant-type:jwt-bearer":
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error":"wrong grant_type"}`))
+	case err != nil:
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "invalid_grant", "error_description": err.Error()})
+	case claims["iss"] != "integration_key" || claims["sub"] != "user_guid" || claims["aud"] != "account.example.com" || claims["scope"] != "signature impersonation":
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error":"wrong claims"}`))
+	case r.FormValue("param1") != "v1":
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error":"wrong param1"}`))
+	default:
+		w.Write([]byte(`{"token_type": "Bearer", "expires_in": "60", "access_token": "abcd"}`))
+	}
+}
+
+// jwtClientAssertionHandler is a token endpoint for the client credentials
+// grant with a JWT client assertion that issues the token "abcd", and a
+// resource that requires it.
+//
+//nolint:errcheck // No point checking errors in test server.
+func jwtClientAssertionHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/token" {
+		oauth2Handler(w, r)
+		return
+	}
+	w.Header().Set("content-type", "application/json")
+	r.ParseForm()
+	claims, _, err := parseTestJWT(r.FormValue("client_assertion"))
+	switch {
+	case r.FormValue("grant_type") != "client_credentials":
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error":"wrong grant_type"}`))
+	case r.FormValue("client_assertion_type") != "urn:ietf:params:oauth:client-assertion-type:jwt-bearer":
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error":"wrong client_assertion_type"}`))
+	case err != nil:
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "invalid_client", "error_description": err.Error()})
+	case claims["iss"] != "a_client_id" || claims["sub"] != "a_client_id":
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error":"wrong claims"}`))
+	case !strings.HasPrefix(fmt.Sprint(claims["aud"]), "http://127.0.0.1:") || !strings.HasSuffix(fmt.Sprint(claims["aud"]), "/token"):
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error":"aud is not the token url"}`))
+	case r.FormValue("client_id") != "a_client_id":
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error":"wrong client_id"}`))
+	case r.FormValue("scope") != "scope1 scope2":
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error":"wrong scope"}`))
+	default:
+		w.Write([]byte(`{"token_type": "Bearer", "expires_in": "60", "access_token": "abcd"}`))
 	}
 }
 

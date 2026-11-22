@@ -55,6 +55,13 @@ A7JN9GvuuK/jTvNqCQDmIb0=
 -----END PRIVATE KEY-----
 `
 
+// testBoxPEMFingerprint is the SHA-256 fingerprint of the public key of
+// testBoxPEMForConfig, computed with:
+//
+//	openssl pkey -in key.pem -pubout -outform DER |
+//	  openssl dgst -sha256 -binary | openssl enc -base64 -A
+const testBoxPEMFingerprint = "SHA256:Tvq/+IIPVW7431HDrncaSXHADRMkRTAKyYC8r2pGiwo="
+
 // boxTestKeyOneLiner is testBoxPEMForConfig with newlines escaped as \n so
 // the key can be embedded directly in a JSON string literal.
 var boxTestKeyOneLiner = strings.ReplaceAll(strings.TrimSpace(testBoxPEMForConfig), "\n", `\n`)

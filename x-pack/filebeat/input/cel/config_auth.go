@@ -5,12 +5,8 @@
 package cel
 
 import (
-	"bytes"
 	"context"
-	"crypto"
-	"crypto/x509"
 	"encoding/json"
-	"encoding/pem"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -20,13 +16,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/youmark/pkcs8"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 	"golang.org/x/oauth2/endpoints"
 	"golang.org/x/oauth2/google"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/jwtauth"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
@@ -36,6 +32,7 @@ type authConfig struct {
 	Digest *digestAuthConfig      `config:"digest"`
 	File   *fileAuthConfig        `config:"file"`
 	OAuth2 *oAuth2Config          `config:"oauth2"`
+	JWT    *jwtAuthConfig         `config:"jwt"`
 	AWS    *aws.SignerInputConfig `config:"aws"`
 }
 
@@ -59,6 +56,9 @@ func (c authConfig) Validate() error {
 		n++
 	}
 	if c.OAuth2.isEnabled() {
+		n++
+	}
+	if c.JWT.isEnabled() {
 		n++
 	}
 	if c.AWS.IsEnabled() {
@@ -462,7 +462,7 @@ func (o *oAuth2Config) validateOktaProvider() error {
 	}
 	// jwk_pem
 	if o.OktaJWKPEM != "" {
-		_, err := pemPKCS8PrivateKey([]byte(o.OktaJWKPEM), "")
+		_, err := jwtauth.ParsePrivateKey([]byte(o.OktaJWKPEM), "")
 		if err != nil {
 			return fmt.Errorf("okta validation error: %w", err)
 		}
@@ -478,41 +478,6 @@ func (o *oAuth2Config) validateOktaProvider() error {
 	}
 
 	return fmt.Errorf("okta validation error: no authentication credentials were configured or detected")
-}
-
-// pemPKCS8PrivateKey decodes a PEM block and parses it as a PKCS#8 private key.
-// If the block type is "ENCRYPTED PRIVATE KEY" it is decrypted using pass before
-// parsing. pass may be empty for unencrypted keys.
-func pemPKCS8PrivateKey(pemdata []byte, pass string) (crypto.Signer, error) {
-	blk, rest := pem.Decode(pemdata)
-	if blk == nil {
-		return nil, errors.New("no PEM data")
-	}
-	if rest := bytes.TrimSpace(rest); len(rest) != 0 {
-		return nil, fmt.Errorf("PEM text has trailing data: %d bytes", len(rest))
-	}
-
-	var (
-		key any
-		err error
-	)
-	if blk.Type == "ENCRYPTED PRIVATE KEY" {
-		key, err = pkcs8.ParsePKCS8PrivateKey(blk.Bytes, []byte(pass))
-		if err != nil {
-			return nil, fmt.Errorf("decrypting private key: %w", err)
-		}
-	} else {
-		key, err = x509.ParsePKCS8PrivateKey(blk.Bytes)
-		if err != nil {
-			return nil, fmt.Errorf("parsing private key: %w", err)
-		}
-	}
-
-	signer, ok := key.(crypto.Signer)
-	if !ok {
-		return nil, fmt.Errorf("key is not a signer: %T", key)
-	}
-	return signer, nil
 }
 
 func populateJSONFromFile(file string, dst *common.JSONBlob) error {
