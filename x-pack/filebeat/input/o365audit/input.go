@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/poll"
-	"github.com/elastic/go-concert/timed"
 )
 
 const (
@@ -135,7 +134,10 @@ func (inp *o365input) Run(ctx v2.Context, src cursor.Source, cursor cursor.Curso
 			ctx.UpdateStatus(status.Degraded, err.Error())
 			ctx.Logger.Errorf("Input failed: %v", err)
 			ctx.Logger.Infof("Restarting in %v", inp.config.API.ErrorRetryInterval)
-			timed.Wait(ctx.Cancelation, inp.config.API.ErrorRetryInterval)
+			select {
+			case <-ctx.Cancelation.Done():
+			case <-time.After(inp.config.API.ErrorRetryInterval):
+			}
 		}
 	}
 

@@ -18,6 +18,7 @@
 package filestream
 
 import (
+	"context"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -30,7 +31,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/pkg/logp"
-	"github.com/elastic/go-concert/unison"
 )
 
 type (
@@ -372,7 +372,7 @@ func (p *fileProspector) Run(
 // to sink, until ctx is cancelled. A non-positive checkInterval disables
 // re-scanning after the initial scan.
 func (p *fileProspector) scanLoop(
-	ctx unison.Canceler,
+	ctx context.Context,
 	metrics *loginp.Metrics,
 	ignoreInactiveSince time.Time,
 	sink loginp.FSEventSink,

@@ -13,6 +13,7 @@ import (
 	"slices"
 	"sort"
 	"sync"
+	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	azruntime "github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
@@ -23,7 +24,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/monitoring"
-	"github.com/elastic/go-concert/timed"
 )
 
 // transientListStatusCodes are the HTTP status codes treated as transient when
@@ -131,10 +131,11 @@ func (s *scheduler) schedule(ctx context.Context) error {
 			return err
 		}
 
-		err = timed.Wait(ctx, s.src.PollInterval)
-		if err != nil {
+		select {
+		case <-ctx.Done():
 			s.metrics.errorsTotal.Inc()
-			return err
+			return ctx.Err()
+		case <-time.After(s.src.PollInterval):
 		}
 	}
 }

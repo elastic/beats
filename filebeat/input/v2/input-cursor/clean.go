@@ -21,8 +21,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/elastic/go-concert/timed"
-
 	"github.com/elastic/beats/v7/pkg/logp"
 )
 
@@ -31,11 +29,15 @@ import (
 // managed by the process-wide globalCache entry for each (backend, type) pair.
 func runCleaner(ctx context.Context, log *logp.Logger, store *store, interval time.Duration) {
 	started := time.Now()
-	//nolint:errcheck // gcStore does not return an error
-	timed.Periodic(ctx, interval, func() error {
-		gcStore(log, started, store)
-		return nil
-	})
+	ch := time.Tick(interval)
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ch:
+			gcStore(log, started, store)
+		}
+	}
 }
 
 // gcStore looks for resources to remove and deletes these. `gcStore` receives

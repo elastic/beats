@@ -24,7 +24,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/libbeat/statusreporterhelper"
-	"github.com/elastic/go-concert/timed"
 )
 
 // var instead of const so it can be reduced during unit tests (instead of waiting
@@ -132,7 +131,10 @@ func (in *s3PollerInput) run(ctx context.Context) {
 		in.metrics.s3PollingRunTime.Update(runElapsedTime.Nanoseconds())
 		in.metrics.s3PollingRunTimeTotal.Add(uint64(runElapsedTime.Nanoseconds())) //nolint:gosec // runElapsedTime is non-negative from time.Since
 
-		_ = timed.Wait(ctx, in.config.BucketListInterval)
+		select {
+		case <-ctx.Done():
+		case <-time.After(in.config.BucketListInterval):
+		}
 	}
 }
 

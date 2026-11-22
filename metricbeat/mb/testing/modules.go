@@ -64,8 +64,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/go-concert/timed"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
@@ -272,24 +270,28 @@ func PeriodicReportingFetchV2Error(metricSet mb.ReportingMetricSetV2Error, perio
 	defer cancel()
 
 	r := &CapturingReporterV2{}
-	_ = timed.Periodic(ctx, period, func() error {
-		// Fetch the metrics and store them in the
-		// reporter.
-		if err := metricSet.Fetch(r); err != nil {
-			r.Error(err)
-			return err
-		}
+	ch := time.Tick(period)
+	for ctx.Err() == nil {
+		select {
+		case <-ctx.Done():
+		case <-ch:
+			// Fetch the metrics and store them in the
+			// reporter.
+			if err := metricSet.Fetch(r); err != nil {
+				r.Error(err)
+				continue
+			}
 
-		if len(r.GetEvents()) > 0 {
-			// We have metrics, stop the periodic
-			// and return the metrics.
-			cancel()
-		}
+			if len(r.GetEvents()) > 0 {
+				// We have metrics, stop the periodic
+				// and return the metrics.
+				cancel()
+			}
 
-		// No metrics yet, retry again
-		// in the next period.
-		return nil
-	})
+			// No metrics yet, retry again
+			// in the next period.
+		}
+	}
 
 	return r.GetEvents(), r.GetErrors()
 }

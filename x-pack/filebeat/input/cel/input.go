@@ -59,7 +59,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-	"github.com/elastic/go-concert/timed"
 	"github.com/elastic/mito/lib"
 )
 
@@ -970,9 +969,17 @@ func periodically(ctx context.Context, each time.Duration, fn func(context.Conte
 	if err != nil {
 		return err
 	}
-	return timed.Periodic(ctx, each, func() error {
-		return fn(ctx)
-	})
+	ch := time.Tick(each)
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-ch:
+			if err := fn(ctx); err != nil {
+				return err
+			}
+		}
+	}
 }
 
 // handleResponse checks the response status code and handles rate limit changes.

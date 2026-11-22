@@ -43,7 +43,6 @@ import (
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	testingfs "github.com/elastic/beats/v7/pkg/testing/fs"
-	"github.com/elastic/go-concert/unison"
 )
 
 func TestProspector_InitCleanIfRemoved(t *testing.T) {
@@ -768,7 +767,7 @@ func newMockFileWatcherWithFiles(filesOnDisk map[string]loginp.FileDescriptor) *
 
 // ScanOnce hands the mock's events to sink, then cancels the context from
 // newDrainContext so the prospector's Run returns.
-func (m *mockFileWatcher) ScanOnce(ctx unison.Canceler, sink loginp.FSEventSink, _ *loginp.Metrics, _ time.Duration, _ time.Time) {
+func (m *mockFileWatcher) ScanOnce(ctx context.Context, sink loginp.FSEventSink, _ *loginp.Metrics, _ time.Duration, _ time.Time) {
 	for range m.eventCount {
 		select {
 		case evt := <-m.out:
@@ -2441,7 +2440,7 @@ type countingWatcher struct {
 	started chan struct{}
 }
 
-func (c *countingWatcher) ScanOnce(_ unison.Canceler, _ loginp.FSEventSink, _ *loginp.Metrics, _ time.Duration, _ time.Time) {
+func (c *countingWatcher) ScanOnce(_ context.Context, _ loginp.FSEventSink, _ *loginp.Metrics, _ time.Duration, _ time.Time) {
 	if c.scans.Add(1) == 1 && c.started != nil {
 		close(c.started)
 	}
