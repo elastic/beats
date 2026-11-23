@@ -1,0 +1,33 @@
+kind: breaking-change
+summary: Winlogbeat now runs on the Filebeat winlog input.
+description: |
+  Winlogbeat is now a thin wrapper around the Filebeat beater and its `winlog`
+  input. The binary, the beat name and existing `winlogbeat.yml` files are
+  unchanged. The following behaviour changes:
+
+  * State is now kept in the Filebeat registry at `registry/winlogbeat` under
+    `path.data`. The old state file (`.winlogbeat.yml`, or the path in
+    `winlogbeat.registry_file`) is only read at start-up, and only as the
+    starting position for an event log that has no position in the new registry
+    yet. It is never modified, renamed or deleted. If it exists but cannot be
+    parsed, Winlogbeat fails to start. `winlogbeat.registry_flush` now sets the
+    registry flush interval.
+  * Every event has the field `input.type` set to `winlog`.
+  * `keep_null` on an event log now takes effect. It was parsed but ignored
+    before.
+  * When `winlogbeat.shutdown_timeout` is not set, Winlogbeat waits up to 1s for
+    acknowledgements on shutdown.
+  * The `published_events` metrics are removed. Filebeat's per-input metrics
+    replace them.
+impact: |
+  Dashboards, alerts and monitoring that use the `published_events` metrics stop
+  receiving data. Events carry the new `input.type` field. Event logs that set
+  `keep_null` now keep null fields in the output. Downgrading to an earlier
+  version does not use the new registry, so it resumes from the old state file,
+  which may be out of date.
+action: |
+  Replace uses of the `published_events` metrics with Filebeat's per-input
+  metrics. To read event logs from the beginning again, delete both the
+  `registry/` directory under `path.data` and the old state file. No changes to
+  `winlogbeat.yml` are needed.
+component: winlogbeat

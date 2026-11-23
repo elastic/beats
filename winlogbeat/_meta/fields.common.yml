@@ -17,6 +17,11 @@
         purposes. The data in the fields reported by Winlogbeat can be compared
         to the data in the XML to diagnose problems.
 
+    - name: input.type
+      type: keyword
+      description: >
+        The input type from which the event was generated. Always `winlog`.
+
     - name: winlog
       type: group
       description: >
