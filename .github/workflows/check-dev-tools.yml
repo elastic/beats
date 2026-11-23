@@ -21,10 +21,16 @@ jobs:
     - uses: actions/setup-go@v5
       with:
         go-version-file: .go-version
+<<<<<<< HEAD
     - uses: actions/setup-python@v5
+=======
+    # ubuntu-latest (26.04+) has no actions/python-versions build for 3.9.x
+    - name: Setup Python
+      uses: actions/setup-python@v7
+>>>>>>> b159139 (ci(ff): support feature freeze automation (#51831))
       with:
         cache: "pip"
-        python-version-file: .python-version
+        python-version: '3.10'
     - name: Run check/update
       run: |
         go install github.com/magefile/mage
