@@ -105,7 +105,7 @@ require (
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/elastic/gosigar v0.14.4
 	github.com/elastic/lumberjack v0.0.0-20260715013204-c5b60bbeaaab
-	github.com/elastic/mito v1.28.2
+	github.com/elastic/mito v1.29.0
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
 	github.com/elastic/sarama v1.19.1-0.20261105163725-10d0ecc585be
 	github.com/elastic/tk-btf v0.3.0

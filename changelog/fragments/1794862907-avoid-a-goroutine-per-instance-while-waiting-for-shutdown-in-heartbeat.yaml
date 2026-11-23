@@ -9,47 +9,30 @@
 # - security: impacts on the security of a product or a user’s deployment.
 # - upgrade: important information for someone upgrading from a prior version
 # - other: does not fit into any of the other categories
-kind: breaking-change
+kind: enhancement
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: The file_integrity ebpf backend requires the host PID namespace when run in Docker/K8s
+summary: Reduce Heartbeat idle resource usage by not spawning a goroutine to wait for shutdown.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
 description: |
-  The file_integrity module's ebpf backend now sources file events through
-  quark instead of the ebpfevents library, removing the dependency on
-  elastic/ebpfevents and elastic/ebpf. Configuration is unchanged. Each
-  operation is still reported as its own event, and `file.mode` now reports
-  only the permission bits, consistent with the `fsnotify` backend.
-
-  quark attributes each event to a process by looking up the process ID the
-  kernel reports in a table built from `/proc` and kept current from kernel
-  events. The kernel reports host process IDs. When Auditbeat runs in a Docker
-  container or K8s pod with its own PID namespace, that table is built from the
-  container's process IDs instead.
+  Outside of run_once mode Heartbeat waited for shutdown through a helper that
+  spawned a goroutine and a channel per instance. It now blocks directly on the
+  shutdown channel, lowering the idle footprint of each Heartbeat instance, which
+  matters when many are run as receivers in the Elastic Agent OTel collector.
 
 # REQUIRED for breaking-change, deprecation, known-issue
-impact: |
-  Without `--pid=host` or `hostPID: true`, file events from processes that were
-  already running when Auditbeat started are dropped, and events from processes
-  started later can be attributed to the wrong process when a host process ID
-  happens to match a container one. The `system/process` dataset and the
-  `add_session_metadata` processor with kernel tracing already have this
-  requirement. Deployments outside Docker/K8s, and the `fsnotify` and `kprobes`
-  backends, are unaffected.
+# impact:
 
 # REQUIRED for breaking-change, deprecation, known-issue
-action: |
-  Add `--pid=host` to the `docker run` command, alongside the existing
-  `--cap-add=SYS_ADMIN --cap-add=BPF` and the `/sys` bind mount. In Kubernetes,
-  set `hostPID: true` on the pod.
+# action:
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: auditbeat
+component: heartbeat
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs
