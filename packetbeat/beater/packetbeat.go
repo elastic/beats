@@ -212,6 +212,7 @@ const pipelinesWarning = "Packetbeat is unable to load the ingest pipelines for 
 // runStatic constructs a packetbeat runner and starts it, returning on cancellation
 // or the first fatal error.
 func (pb *packetbeat) runStatic(b *beat.Beat, factory cfgfile.RunnerFactory) error {
+	cfgfile.SetRunnerConfigs(factory, pb, []*conf.C{pb.config})
 	runner, err := factory.Create(b.Publisher, pb.config)
 	if err != nil {
 		return err

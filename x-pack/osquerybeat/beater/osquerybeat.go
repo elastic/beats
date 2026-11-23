@@ -313,18 +313,29 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		if otelFactory == nil {
 			return
 		}
+		type newInput struct {
+			key string
+			cfg *conf.C
+		}
 		newKeys := make(map[string]struct{}, len(inputs))
+		rawCfgs := make([]*conf.C, 0, len(inputs))
+		var added []newInput
 		for i := range inputs {
 			key := inputKey(i, inputs[i])
 			newKeys[key] = struct{}{}
-			if _, exists := otelRunners[key]; exists {
-				continue
-			}
 			rawCfg, cfgErr := conf.NewConfigFrom(&inputs[i])
 			if cfgErr != nil {
 				bt.log.Warnf("otel status: failed to build config for input %s: %v", key, cfgErr)
 				continue
 			}
+			rawCfgs = append(rawCfgs, rawCfg)
+			if _, exists := otelRunners[key]; !exists {
+				added = append(added, newInput{key: key, cfg: rawCfg})
+			}
+		}
+		cfgfile.SetRunnerConfigs(otelFactory, bt, rawCfgs)
+		for _, in := range added {
+			key, rawCfg := in.key, in.cfg
 			runner, cfgErr := otelFactory.Create(b.Publisher, rawCfg)
 			if cfgErr != nil {
 				bt.log.Warnf("otel status: failed to create status runner for input %s: %v", key, cfgErr)
