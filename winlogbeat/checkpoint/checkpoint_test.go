@@ -22,141 +22,80 @@ package checkpoint
 import (
 	"os"
 	"path/filepath"
-	"runtime"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func eventually(t *testing.T, predicate func() (bool, error), timeout time.Duration) {
-	const minInterval = time.Millisecond * 5
-	const maxInterval = time.Millisecond * 500
+func TestRead(t *testing.T) {
+	writeFile := func(t *testing.T, content string) string {
+		t.Helper()
+		file := filepath.Join(t.TempDir(), ".winlogbeat.yml")
+		require.NoError(t, os.WriteFile(file, []byte(content), 0o600), "failed to write fixture")
+		return file
+	}
 
-	checkInterval := min(max(timeout/100, minInterval), maxInterval)
-	for deadline, first := time.Now().Add(timeout), true; first || time.Now().Before(deadline); first = false {
-		ok, err := predicate()
-		if err != nil {
-			t.Fatal("predicate failed with error:", err)
-			return
+	t.Run("missing file", func(t *testing.T) {
+		got, err := Read(filepath.Join(t.TempDir(), "missing.yml"))
+		assert.NoError(t, err, "missing file should not be an error")
+		assert.Empty(t, got, "missing file should give an empty map")
+	})
+
+	t.Run("valid file", func(t *testing.T) {
+		file := writeFile(t, `update_time: 2026-01-02T03:04:05Z
+event_logs:
+- name: Security
+  record_number: 42
+  timestamp: 2026-01-02T03:04:00Z
+  bookmark: "<BookmarkList><Bookmark Channel='Security' RecordId='42'/></BookmarkList>"
+- name: my-id
+  record_number: 7
+  timestamp: 2026-01-02T03:03:00Z
+`)
+		got, err := Read(file)
+		require.NoError(t, err, "valid file should be read")
+		want := map[string]EventLogState{
+			"Security": {
+				Name:         "Security",
+				RecordNumber: 42,
+				Timestamp:    time.Date(2026, 1, 2, 3, 4, 0, 0, time.UTC),
+				Bookmark:     "<BookmarkList><Bookmark Channel='Security' RecordId='42'/></BookmarkList>",
+			},
+			"my-id": {
+				Name:         "my-id",
+				RecordNumber: 7,
+				Timestamp:    time.Date(2026, 1, 2, 3, 3, 0, 0, time.UTC),
+			},
 		}
-		if ok {
-			return
+		require.Len(t, got, len(want), "unexpected number of states")
+		for name, w := range want {
+			g := got[name]
+			assert.Equal(t, w.Name, g.Name, "name of %s", name)
+			assert.Equal(t, w.RecordNumber, g.RecordNumber, "record number of %s", name)
+			assert.True(t, w.Timestamp.Equal(g.Timestamp), "timestamp of %s: got %v want %v", name, g.Timestamp, w.Timestamp)
+			assert.Equal(t, w.Bookmark, g.Bookmark, "bookmark of %s", name)
 		}
-		time.Sleep(checkInterval)
-	}
-	t.Fatal("predicate is not true after", timeout)
-}
+	})
 
-// Test that a write is triggered when the maximum time period since the last
-// write is reached.
-func TestWriteTimedFlush(t *testing.T) {
-	dir, err := os.MkdirTemp("", "wlb-checkpoint-test")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		err := os.RemoveAll(dir)
-		if err != nil {
-			t.Fatal(err)
-		}
-	}()
+	t.Run("invalid file", func(t *testing.T) {
+		file := writeFile(t, "event_logs: [")
+		_, err := Read(file)
+		require.Error(t, err, "invalid YAML should be an error")
+		assert.Contains(t, err.Error(), file, "error should name the file")
+	})
 
-	file := filepath.Join(dir, ".winlogbeat.yml")
-	if !assert.False(t, fileExists(file), "%s should not exist", file) {
-		return
-	}
-
-	const timeout = 5 * time.Second
-	cp, err := NewCheckpoint(file, timeout)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer cp.Shutdown()
-
-	// Send update then wait longer than the flush interval and it should be
-	// on disk.
-	start := time.Now()
-	cp.Persist("App", 1, time.Now(), "")
-	eventually(t, func() (bool, error) {
-		ps, err := cp.read()
-		return ps != nil && len(ps.States) > 0, err
-	}, 3*timeout)
-	took := time.Since(start)
-	assert.True(t, took >= timeout)
-	ps, err := cp.read()
-	if err != nil {
-		t.Fatal("read failed", err)
-	}
-	if assert.Len(t, ps.States, 1) {
-		assert.Equal(t, "App", ps.States[0].Name)
-		assert.Equal(t, uint64(1), ps.States[0].RecordNumber)
-	}
-}
-
-// Test that createDir creates the directory with 0750 permissions.
-func TestCreateDir(t *testing.T) {
-	dir, err := os.MkdirTemp("", "wlb-checkpoint-test")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		err := os.RemoveAll(dir)
-		if err != nil {
-			t.Fatal(err)
-		}
-	}()
-
-	stateDir := filepath.Join(dir, "state", "dir", "does", "not", "exists")
-	file := filepath.Join(stateDir, ".winlogbeat.yml")
-	cp := &Checkpoint{file: file}
-
-	if !assert.False(t, fileExists(file), "%s should not exist", file) {
-		return
-	}
-	if err = cp.createDir(); err != nil {
-		t.Fatal("createDir", err)
-	}
-	if !assert.True(t, fileExists(stateDir), "%s should exist", file) {
-		return
-	}
-
-	// mkdir on Windows does not pass the POSIX mode to the CreateDirectory
-	// syscall so doesn't test the mode.
-	if runtime.GOOS != "windows" {
-		fileInfo, err := os.Stat(stateDir)
-		if assert.NoError(t, err) {
-			assert.Equal(t, true, fileInfo.IsDir())
-			assert.Equal(t, os.FileMode(0o750), fileInfo.Mode().Perm())
-		}
-	}
-}
-
-// Test createDir when the directory already exists to verify that no error is
-// returned.
-func TestCreateDirAlreadyExists(t *testing.T) {
-	dir, err := os.MkdirTemp("", "wlb-checkpoint-test")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		err := os.RemoveAll(dir)
-		if err != nil {
-			t.Fatal(err)
-		}
-	}()
-
-	file := filepath.Join(dir, ".winlogbeat.yml")
-	cp := &Checkpoint{file: file}
-
-	if !assert.True(t, fileExists(dir), "%s should exist", file) {
-		return
-	}
-	assert.NoError(t, cp.createDir())
-}
-
-// fileExists returns true if the specified file exists.
-func fileExists(file string) bool {
-	_, err := os.Stat(file)
-	return !os.IsNotExist(err)
+	t.Run("duplicate names", func(t *testing.T) {
+		file := writeFile(t, `event_logs:
+- name: Security
+  record_number: 1
+- name: Security
+  record_number: 2
+`)
+		got, err := Read(file)
+		require.NoError(t, err, "valid file should be read")
+		assert.Len(t, got, 1, "duplicates should collapse to one entry")
+		assert.Equal(t, uint64(2), got["Security"].RecordNumber, "last entry should win")
+	})
 }
