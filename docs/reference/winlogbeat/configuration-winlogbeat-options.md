@@ -56,7 +56,7 @@ The forward slashes (/) in the path are automatically changed to backslashes (\)
 
 The registry flush interval. It controls when registry entries are written to disk (flushed). When an unwritten update exceeds this value, it triggers a write to disk. When flush is set to 0s, the registry is written to disk after each batch of events has been published successfully.
 
-The default value is 5s.
+The default value is 1s.
 
 Valid time units are `ns`, `us`, `ms`, `s`, `m`, `h`.
 
