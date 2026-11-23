@@ -57,8 +57,8 @@ type entry struct {
 // The directory and intermediate directories will be created if it does not exist.
 // The open routine loads the full key-value store into memory by first reading the data file and finally applying all outstanding updates
 // from the update log file.
-// If an error in in the log file is detected, the store opening routine continues from the last known valid state and will trigger a checkpoint
-// operation on subsequent writes, also truncating the log file.
+// If a data or log file is corrupt, opening continues from the last valid state.
+// A subsequent write checkpoints the state and truncates the log.
 // Old data files are scheduled for deletion later.
 func openStore(log *logp.Logger, home string, mode os.FileMode, bufSz uint, ignoreVersionCheck bool, maxLogSize uint64, checkpoint CheckpointPredicate) (*store, error) {
 	fi, err := os.Stat(home)
@@ -118,11 +118,13 @@ func openStore(log *logp.Logger, home string, mode os.FileMode, bufSz uint, igno
 
 	tbl := map[string]entry{}
 	var txid uint64
+	var mustCheckpoint bool
 	if L := len(dataFiles); L > 0 {
 		active := dataFiles[L-1]
 		txid = active.txid
 		if err := loadDataFile(active.path, tbl); err != nil {
 			if errors.Is(err, ErrCorruptStore) {
+				mustCheckpoint = true
 				corruptFilePath := active.path + ".corrupted"
 				err := os.Rename(active.path, corruptFilePath)
 				if err != nil {
@@ -149,7 +151,7 @@ func openStore(log *logp.Logger, home string, mode os.FileMode, bufSz uint, igno
 		log.Warnf("Incomplete or corrupted log file in %v. Continue with last known complete and consistent state. Reason: %v", home, err)
 	}
 
-	diskstore, err := newDiskStore(log, home, dataFiles, txid, mode, entries, err != nil, bufSz, maxLogSize, checkpoint)
+	diskstore, err := newDiskStore(log, home, dataFiles, txid, mode, entries, mustCheckpoint || err != nil, bufSz, maxLogSize, checkpoint)
 	if err != nil {
 		return nil, err
 	}

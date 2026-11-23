@@ -27,6 +27,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/pkg/mapstr"
 )
@@ -262,4 +263,88 @@ func TestListDataFilesReportsSize(t *testing.T) {
 	require.NoError(t, err, "listDataFiles must succeed")
 	require.Len(t, infos, 1, "expecting one data file")
 	assert.Equal(t, uint64(len(content)), infos[0].size, "size must be populated from the file on disk")
+}
+
+func TestRecoverFromCorruptCheckpoint(t *testing.T) {
+	home := filepath.Join(t.TempDir(), "store")
+	logger := logp.NewNopLogger()
+
+	store, err := openStore(logger.Named("test"), home, 0o660, 4096, false, DefaultMaxLogSize, nil)
+	require.NoError(t, err, "initial openStore must succeed")
+	require.NoError(
+		t,
+		store.Set("checkpoint-only", mapstr.M{"v": "one"}),
+		"Set must succeed",
+	)
+	require.NoError(t, store.Checkpoint(), "Checkpoint must succeed")
+
+	type value struct {
+		key   string
+		value string
+	}
+	want := []value{
+		{key: "replayed-1", value: "two"},
+		{key: "replayed-2", value: "three"},
+	}
+	for _, v := range want {
+		require.NoError(
+			t,
+			store.Set(v.key, mapstr.M{"v": v.value}),
+			"Set %q must succeed",
+			v.key,
+		)
+	}
+	require.NoError(t, store.Close(), "initial Close must succeed")
+
+	dataFiles, err := listDataFiles(home)
+	require.NoError(t, err, "listDataFiles must succeed")
+	require.Len(t, dataFiles, 1, "one checkpoint must exist")
+	require.NoError(
+		t,
+		os.WriteFile(dataFiles[0].path, []byte("["), 0o660),
+		"corrupt checkpoint",
+	)
+
+	store, err = openStore(logger.Named("test"), home, 0o660, 4096, false, DefaultMaxLogSize, nil)
+	require.NoError(t, err, "openStore must recover from a corrupt checkpoint")
+	assert.True(
+		t,
+		store.disk.logInvalid,
+		"corrupt checkpoint must invalidate disk state",
+	)
+	assert.True(t, store.disk.mustCheckpoint(), "recovery must force a checkpoint")
+
+	assertValues := func() {
+		t.Helper()
+		for _, v := range want {
+			var got mapstr.M
+			require.NoError(t, store.Get(v.key, &got), "Get %q must succeed", v.key)
+			assert.Equal(
+				t,
+				mapstr.M{"v": v.value},
+				got,
+				"unexpected value for %q",
+				v.key,
+			)
+		}
+	}
+	assertValues()
+
+	require.NoError(
+		t,
+		store.Set("after-recovery", mapstr.M{"v": "four"}),
+		"first mutation after recovery must succeed",
+	)
+	assert.False(
+		t,
+		store.disk.logInvalid,
+		"checkpoint must clear the invalid state",
+	)
+	want = append(want, value{key: "after-recovery", value: "four"})
+	require.NoError(t, store.Close(), "Close after recovery must succeed")
+
+	store, err = openStore(logger.Named("test"), home, 0o660, 4096, false, DefaultMaxLogSize, nil)
+	require.NoError(t, err, "re-open after recovery must succeed")
+	assertValues()
+	require.NoError(t, store.Close(), "final Close must succeed")
 }
