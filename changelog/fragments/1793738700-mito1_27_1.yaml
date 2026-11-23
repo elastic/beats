@@ -1,3 +1,0 @@
-kind: bug-fix
-summary: Update mito to v1.27.1, fixing redirects with a body and lost errors in the CEL lazy stream decoders.
-component: filebeat
