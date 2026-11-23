@@ -1050,6 +1050,12 @@ The access token or JWT is refreshed when it expires.
 
 In `grant` and `client_assertion` modes the first token is requested when the input starts, and the input fails to start if the request fails.
 
+The `iat` and `exp` claims of each JWT come from the clock of the host that runs Filebeat. In `grant` and `client_assertion` modes, if the token endpoint rejects the assertion with `invalid_grant` and its response has a `Date` header, the request is retried once with the time from that header. Nothing else corrects for a clock that differs from the server's: in `direct` mode, and when a server reports a bad assertion in another way, JWTs signed on a host with a clock that is too far out are rejected.
+
+::::{note}
+In `grant` and `client_assertion` modes, the token request and response bodies are written to the request trace log when `resource.tracer` is enabled. They contain the signed assertion, `client.secret` if it is set, and the access token.
+::::
+
 
 ### `auth.jwt.private_key` [_auth_jwt_private_key]
 
@@ -1140,6 +1146,14 @@ auth.jwt:
 ```
 
 The account and user names must be in upper case. For the account identifier, `.` must be replaced with `-`, and an account locator must not include the region.
+
+Snowflake infers the type of the token, so the `X-Snowflake-Authorization-Token-Type` header is optional. To send it, set it with `resource.headers`:
+
+```yaml
+resource.headers:
+  X-Snowflake-Authorization-Token-Type:
+    - KEYPAIR_JWT
+```
 
 For DocuSign:
 

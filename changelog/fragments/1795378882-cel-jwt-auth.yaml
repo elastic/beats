@@ -7,4 +7,13 @@ description: |
   mode it is exchanged at a token URL with the OAuth2 JWT bearer grant, as
   DocuSign requires. A client_assertion mode authenticates to the token
   endpoint with the JWT. Tokens are refreshed when they expire.
+
+  The key parser is shared with the Box and Okta providers, which are changed
+  in these ways. Unencrypted PKCS#1 RSA and SEC 1 EC keys are accepted in
+  addition to PKCS#8 keys. PEM blocks with a label other than PRIVATE KEY,
+  ENCRYPTED PRIVATE KEY, RSA PRIVATE KEY and EC PRIVATE KEY, and blocks that use
+  the legacy PEM encryption (a DEK-Info header), are rejected with an error
+  instead of being read as PKCS#8. Decrypting a key in FIPS 140-only mode
+  returns an error instead of panicking when the key was encrypted with a salt
+  that is too short.
 component: filebeat
