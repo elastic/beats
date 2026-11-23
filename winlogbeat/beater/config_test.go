@@ -57,18 +57,20 @@ event_logs:
 			want: map[string]any{
 				"inputs": []any{
 					map[string]any{
-						"type":         "winlog",
-						"name":         "Security",
-						"id":           "sec",
-						"processors":   []any{map[string]any{"drop_fields": map[string]any{"fields": []any{"message"}}}},
-						"tags":         []any{"a", "b"},
-						"fields":       map[string]any{"env": "prod"},
-						"index":        "my-index",
-						"ignore_older": "72h",
+						"type":           "winlog",
+						"name":           "Security",
+						"id":             "sec",
+						"processors":     []any{map[string]any{"drop_fields": map[string]any{"fields": []any{"message"}}}},
+						"tags":           []any{"a", "b"},
+						"fields":         map[string]any{"env": "prod"},
+						"index":          "my-index",
+						"ignore_older":   "72h",
+						"clean_inactive": neverCleanInactive,
 					},
 					map[string]any{
-						"type": "winlog",
-						"name": "Application",
+						"type":           "winlog",
+						"name":           "Application",
+						"clean_inactive": neverCleanInactive,
 					},
 				},
 			},
@@ -84,7 +86,7 @@ registry_file: state/x.yml
 registry_flush: 10s
 `,
 			want: map[string]any{
-				"inputs":   []any{map[string]any{"type": "winlog", "name": "Security"}},
+				"inputs":   []any{map[string]any{"type": "winlog", "name": "Security", "clean_inactive": neverCleanInactive}},
 				"registry": map[string]any{"flush": "10s"},
 			},
 			wantRegistryFile: "state/x.yml",
@@ -97,7 +99,7 @@ event_logs:
 - name: Security
 `,
 			want: map[string]any{
-				"inputs": []any{map[string]any{"type": "winlog", "name": "Security"}},
+				"inputs": []any{map[string]any{"type": "winlog", "name": "Security", "clean_inactive": neverCleanInactive}},
 			},
 			wantRegistryFile: ".winlogbeat.yml",
 			wantEventLogs:    1,
@@ -111,7 +113,7 @@ shutdown_timeout: 30s
 overwrite_pipelines: true
 `,
 			want: map[string]any{
-				"inputs":              []any{map[string]any{"type": "winlog", "name": "Security"}},
+				"inputs":              []any{map[string]any{"type": "winlog", "name": "Security", "clean_inactive": neverCleanInactive}},
 				"shutdown_timeout":    "30s",
 				"overwrite_pipelines": true,
 			},
@@ -138,7 +140,7 @@ event_logs:
   enabled: false
 `,
 			want: map[string]any{
-				"inputs": []any{map[string]any{"type": "winlog", "name": "Security"}},
+				"inputs": []any{map[string]any{"type": "winlog", "name": "Security", "clean_inactive": neverCleanInactive}},
 			},
 			wantRegistryFile: ".winlogbeat.yml",
 			wantEventLogs:    1,
@@ -152,7 +154,7 @@ registry_file: a.yml
 registry.path: custom
 `,
 			want: map[string]any{
-				"inputs":   []any{map[string]any{"type": "winlog", "name": "Security"}},
+				"inputs":   []any{map[string]any{"type": "winlog", "name": "Security", "clean_inactive": neverCleanInactive}},
 				"registry": map[string]any{"path": "custom"},
 			},
 			wantRegistryFile: "a.yml",
@@ -166,10 +168,27 @@ event_logs:
   type: something
 `,
 			want: map[string]any{
-				"inputs": []any{map[string]any{"type": "winlog", "name": "Security"}},
+				"inputs": []any{map[string]any{"type": "winlog", "name": "Security", "clean_inactive": neverCleanInactive}},
 			},
 			wantRegistryFile: ".winlogbeat.yml",
 			wantEventLogs:    1,
+		},
+		{
+			name: "clean_inactive kept",
+			in: `
+event_logs:
+- name: Security
+  clean_inactive: 10m
+- name: Application
+`,
+			want: map[string]any{
+				"inputs": []any{
+					map[string]any{"type": "winlog", "name": "Security", "clean_inactive": "10m"},
+					map[string]any{"type": "winlog", "name": "Application", "clean_inactive": neverCleanInactive},
+				},
+			},
+			wantRegistryFile: ".winlogbeat.yml",
+			wantEventLogs:    2,
 		},
 	}
 
@@ -177,8 +196,13 @@ event_logs:
 		t.Run(test.name, func(t *testing.T) {
 			old, err := conf.NewConfigWithYAML([]byte(test.in), "test")
 			require.NoError(t, err, "failed to parse test config")
+			var before map[string]any
+			require.NoError(t, old.Unpack(&before), "failed to unpack test config")
 
 			got, err := translateConfig(old)
+			var after map[string]any
+			require.NoError(t, old.Unpack(&after), "failed to unpack test config after translation")
+			assert.Equal(t, before, after, "translateConfig modified its input")
 			if test.wantErr != "" {
 				require.Error(t, err, "expected an error")
 				assert.Contains(t, err.Error(), test.wantErr, "unexpected error text")
@@ -194,4 +218,34 @@ event_logs:
 			assert.Len(t, got.EventLogs, test.wantEventLogs, "unexpected number of EventLogs")
 		})
 	}
+}
+
+// TestTranslateConfigEscapes checks that escaped variables ($${...}) reach the
+// translated config as literal text and are not expanded again.
+func TestTranslateConfigEscapes(t *testing.T) {
+	old, err := conf.NewConfigWithYAML([]byte(`
+event_logs:
+- name: Security
+  processors:
+  - script:
+      lang: javascript
+      source: 'function process(event) { event.Put("x", "$${x}"); }'
+  fields:
+    v: "$${HOME}"
+`), "test")
+	require.NoError(t, err, "failed to parse test config")
+
+	got, err := translateConfig(old)
+	require.NoError(t, err, "unexpected error")
+
+	in, err := got.Filebeat.Child("inputs", 0)
+	require.NoError(t, err, "failed to get translated input")
+	script, err := in.Child("processors", 0)
+	require.NoError(t, err, "failed to get script processor")
+	src, err := script.String("script.source", -1)
+	require.NoError(t, err, "failed to read script source")
+	assert.Equal(t, `function process(event) { event.Put("x", "${x}"); }`, src, "unexpected script source")
+	v, err := in.String("fields.v", -1)
+	require.NoError(t, err, "failed to read fields.v")
+	assert.Equal(t, "${HOME}", v, "unexpected fields.v")
 }

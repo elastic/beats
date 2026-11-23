@@ -142,7 +142,11 @@ func (w *winlogbeat) Run(b *beat.Beat) error {
 func (w *winlogbeat) loadLegacyState() error {
 	states, err := checkpoint.Read(w.registryFile)
 	if err != nil {
+		// The error already names the file.
 		return err
+	}
+	if len(states) != 0 {
+		w.log.Infof("Loaded start positions for %d event logs from legacy state file %s", len(states), w.registryFile)
 	}
 	w.mu.Lock()
 	w.legacy = states

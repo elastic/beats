@@ -25,6 +25,12 @@ import (
 
 const defaultRegistryFile = ".winlogbeat.yml"
 
+// neverCleanInactive is the clean_inactive set on each input unless the user
+// sets one. The cursor input has no "never" value (zero or less removes a
+// position as soon as its reader stops), and old Winlogbeat kept positions
+// forever, so use about 100 years.
+const neverCleanInactive = "876000h"
+
 type settings struct {
 	// Filebeat is the translated config section to hand to the Filebeat beater.
 	Filebeat *conf.C
@@ -45,6 +51,7 @@ func translateConfig(old *conf.C) (settings, error) {
 	typed := struct {
 		EventLogs          []*conf.C `config:"event_logs"`
 		RegistryFile       string    `config:"registry_file"`
+		RegistryFlush      any       `config:"registry_flush"`
 		OverwritePipelines bool      `config:"overwrite_pipelines"`
 	}{RegistryFile: defaultRegistryFile}
 	err := old.Unpack(&typed)
@@ -52,53 +59,58 @@ func translateConfig(old *conf.C) (settings, error) {
 		return settings{}, err
 	}
 
-	var (
-		eventLogs []*conf.C
-		inputs    []any
-	)
+	// Copy and edit config values rather than unpacking and re-parsing
+	// them, so that escaped variables ($${...}) are not expanded again.
+	fb := conf.NewConfig()
+	err = fb.Merge(old)
+	if err != nil {
+		return settings{}, err
+	}
+	for _, key := range []string{"event_logs", "registry_file", "registry_flush"} {
+		_, err = fb.Remove(key, -1)
+		if err != nil {
+			return settings{}, err
+		}
+	}
+
+	var eventLogs []*conf.C
 	for _, cfg := range typed.EventLogs {
 		if !cfg.Enabled() {
 			continue
 		}
-		var in map[string]any
-		err = cfg.Unpack(&in)
+		in := conf.NewConfig()
+		err = in.Merge(cfg)
 		if err != nil {
 			return settings{}, err
 		}
-		if in == nil {
-			in = make(map[string]any)
+		err = in.SetString("type", -1, "winlog")
+		if err != nil {
+			return settings{}, err
 		}
-		in["type"] = "winlog"
-		inputs = append(inputs, in)
+		if !in.HasField("clean_inactive") {
+			err = in.SetString("clean_inactive", -1, neverCleanInactive)
+			if err != nil {
+				return settings{}, err
+			}
+		}
+		err = fb.SetChild("inputs", len(eventLogs), in)
+		if err != nil {
+			return settings{}, err
+		}
 		eventLogs = append(eventLogs, cfg)
 	}
 	if len(eventLogs) == 0 {
 		return settings{}, errors.New("at least one event log must be configured as part of event_logs")
 	}
 
-	var raw map[string]any
-	err = old.Unpack(&raw)
-	if err != nil {
-		return settings{}, err
-	}
-	delete(raw, "event_logs")
-	delete(raw, "registry_file")
-	raw["inputs"] = inputs
-	flush, ok := raw["registry_flush"]
-	if ok {
-		delete(raw, "registry_flush")
-		registry, _ := raw["registry"].(map[string]any)
-		if registry == nil {
-			registry = make(map[string]any)
+	if typed.RegistryFlush != nil {
+		// A flush interval is a duration, so it has no variables to expand.
+		err = fb.Merge(map[string]any{"registry": map[string]any{"flush": typed.RegistryFlush}})
+		if err != nil {
+			return settings{}, err
 		}
-		registry["flush"] = flush
-		raw["registry"] = registry
 	}
 
-	fb, err := conf.NewConfigFrom(raw)
-	if err != nil {
-		return settings{}, err
-	}
 	return settings{
 		Filebeat:           fb,
 		EventLogs:          eventLogs,
