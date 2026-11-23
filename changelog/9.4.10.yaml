@@ -266,6 +266,27 @@ entries:
         name: 1794000000-update-sarama-fork-api-versions-v3.yaml
         checksum: 7c97363e8e8386971f12e672cf0d9eeec9d244e0
     - kind: bug-fix
+      summary: Create ETW input sessions in independent mode so events are not lost when another session on the same provider is full.
+      description: |
+        Without EVENT_TRACE_INDEPENDENT_SESSION_MODE, Windows does not write an
+        event to any session if it cannot write it to one of the sessions enabled
+        for its provider. A full session elsewhere, such as the event log session
+        for an analytic channel, then drops events from the input's session as
+        well. The input now also warns when it attaches to an existing session that
+        was not created in independent mode. The Auditbeat file integrity ETW
+        backend shares the session code and gets the same change.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54725
+      issue:
+        - https://github.com/elastic/beats/issues/50966
+      impact: ""
+      action: ""
+      timestamp: 1794827692
+      file:
+        name: 1794827692-etw-independent-session-mode.yaml
+        checksum: dfb9dc685c8b26a76f554266705eebca46f88207
+    - kind: bug-fix
       summary: Accept client certificates signed by CAs added to `certificate_authorities` while a TLS server is running.
       description: |
         With `ssl.certificate_reload` enabled (the default when `certificate_authorities`
@@ -286,3 +307,22 @@ entries:
       file:
         name: 1794930537-tlscommon-client-ca-reload.yaml
         checksum: 3b91228358028610d4b1c3b89aabc0d80645abdd
+    - kind: upgrade
+      summary: upgrade osquery version to 5.24.1
+      description: >
+        Upgrade the bundled osquery runtime to version 5.24.1. It restores the
+        bpf_process_events and bpf_socket_events tables that were removed by mistake
+        in 5.24.0 (osquery/osquery#9225), so queries on those tables work again. It
+        also includes security fixes: an updated Mozilla CA certificate bundle,
+        TLS 1.0 and 1.1 disabled in curl_certificate and the OpenSSL build, and
+        hardening against malformed input in several table parsers.
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/54777
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1795001104
+      file:
+        name: 1795001104-upgrade-osquery-5.24.1.yaml
+        checksum: 16209a040f0a3f462c6ce692cab6b986f764bcd5

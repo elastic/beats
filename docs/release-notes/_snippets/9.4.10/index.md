@@ -13,6 +13,10 @@
 
 * Add the `tier_stats` metricset to the `autoops_es` module to collect the number and the duration of the requests of the search and indexing tiers of an Elasticsearch Serverless project. [#54117](https://github.com/elastic/beats/pull/54117)
 
+**Osquerybeat**
+
+* Update the bundled Osquery to 5.24.1. [#54777](https://github.com/elastic/beats/pull/54777)
+
 
 ### Fixes [beats-9.4.10-fixes]
 
@@ -35,6 +39,7 @@
 * Fix processors being applied twice to Elastic Agent filestream inputs configured without streams. [#54416](https://github.com/elastic/beats/pull/54416)
 * Fix the `azure-blob-storage` and `gcs` inputs re-reading files on every poll when file names have mixed case. [#54512](https://github.com/elastic/beats/pull/54512)
 * Fix Filebeat receivers that share a registry failing to start together on Windows. [#54530](https://github.com/elastic/beats/pull/54530)
+* Create ETW input sessions in independent mode so events are not lost when another session on the same provider is full. [#54725](https://github.com/elastic/beats/pull/54725) [#50966](https://github.com/elastic/beats/issues/50966)
 
 **Heartbeat**
 
