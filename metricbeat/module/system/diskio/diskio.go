@@ -20,6 +20,8 @@
 package diskio
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"runtime"
 
@@ -40,6 +42,7 @@ func init() {
 // MetricSet for fetching system disk IO metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
+	sys            resolve.Resolver
 	statistics     *diskio.IOStat
 	includeDevices []string
 	prevCounters   diskCounter
@@ -53,6 +56,11 @@ type diskCounter struct {
 
 // New is a mb.MetricSetFactory that returns a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	sys, ok := base.Module().(resolve.Resolver)
+	if !ok {
+		return nil, errors.New("base.Module is not resolve.Resolver")
+	}
+
 	config := struct {
 		IncludeDevices []string `config:"diskio.include_devices"`
 	}{IncludeDevices: []string{}}
@@ -63,6 +71,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet:  base,
+		sys:            sys,
 		statistics:     diskio.NewDiskIOStat(),
 		includeDevices: config.IncludeDevices,
 		prevCounters:   diskCounter{},
@@ -71,13 +80,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches disk IO metrics from the OS.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	stats, err := diskio.IOCounters(m.Logger(), m.includeDevices...)
+	ctx := resolve.Context(context.Background(), m.sys)
+	stats, err := diskio.IOCounters(ctx, m.Logger(), m.includeDevices...)
 	if err != nil {
 		return fmt.Errorf("disk io counters: %w", err)
 	}
 
 	// Sample the current cpu counter
-	err = m.statistics.OpenSampling()
+	err = m.statistics.OpenSampling(ctx)
 	// CPU sampling does not seem to be used by any of the diskio metrics we're using. Mostly used by iostat.
 	if err != nil {
 		m.Logger().Warnf("Error in CPU sampling for diskio: %v", err)
@@ -162,9 +172,5 @@ func (m *MetricSet) Diagnostics() []diagnostics.DiagnosticSetup {
 }
 
 func (m *MetricSet) diagDiskstats() []byte {
-	sys, ok := m.Module().(resolve.Resolver)
-	if !ok {
-		return fmt.Appendf(nil, "Error fetching data: module %T does not implement resolve.Resolver", m.Module())
-	}
-	return diagnostics.GetRawFileOrErrorString(sys, "/proc/diskstats")
+	return diagnostics.GetRawFileOrErrorString(m.sys, "/proc/diskstats")
 }
