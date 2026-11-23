@@ -1,0 +1,39 @@
+[!windows] skip 'requires Windows'
+
+write-event 'First event'
+wait-for-event-log 1
+
+# Place an invalid bookmark (future record number) in the legacy state file.
+# There is no registry yet, so this is the only start position.
+envsubst invalid-checkpoint.yml
+cp invalid-checkpoint.yml $WORK/data/.winlogbeat.yml
+
+# winlogbeat should detect the stale bookmark and restart from the beginning,
+# reading the first event.
+exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
+check-event-count output 1
+check-event-field output 0 message 'First event'
+
+-- winlogbeat.yml --
+winlogbeat.shutdown_timeout: 30s
+winlogbeat.event_logs:
+  - name: ${PROVIDER:?missing PROVIDER}
+    no_more_events: stop
+output.file:
+  path: ${WORK:?missing WORK}/output
+  filename: winlogbeat
+  rotate_every_kb: 10000
+queue.mem:
+  events: 4096
+  flush.min_events: 1
+  flush.timeout: 0.1s
+logging.level: warning
+logging.to_files: false
+
+-- invalid-checkpoint.yml --
+update_time: 2100-01-01T00:00:00Z
+event_logs:
+  - name: $PROVIDER
+    record_number: 1000
+    timestamp: 2100-01-01T00:00:00Z
+    bookmark: "<BookmarkList>\r\n  <Bookmark Channel='$PROVIDER' RecordId='1000' IsCurrent='true'/>\r\n</BookmarkList>"
