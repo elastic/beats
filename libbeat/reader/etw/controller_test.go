@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/sys/windows"
 )
 
@@ -321,4 +322,30 @@ func TestStopSession_NoWaitWithoutConsumer(t *testing.T) {
 	start := time.Now()
 	assert.NoError(t, session.StopSession(), "stopping a session without a consumer should succeed")
 	assert.Less(t, time.Since(start), time.Second/2, "no consumer is processing, so there should be no wait for flushed events")
+}
+
+func TestIndependent(t *testing.T) {
+	tests := []struct {
+		name  string
+		props *EventTraceProperties // nil for a session that has none, as when reading a log file.
+		mode  uint32                // LogFileMode reported by the query.
+		want  bool
+	}{
+		{name: "no properties", want: false},
+		{name: "real-time only", props: newSessionProperties("TestSession", Config{}), mode: EVENT_TRACE_REAL_TIME_MODE, want: false},
+		{name: "independent", props: newSessionProperties("TestSession", Config{}), mode: EVENT_TRACE_REAL_TIME_MODE | EVENT_TRACE_INDEPENDENT_SESSION_MODE, want: true},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			session := &Session{Name: "TestSession", properties: tc.props}
+			if tc.props != nil {
+				session.controlTrace = func(_ uintptr, _ *uint16, p *EventTraceProperties, _ uint32) error {
+					p.LogFileMode = tc.mode
+					return nil
+				}
+				require.NoError(t, session.AttachToExistingSession(), "attaching with a mocked query should succeed")
+			}
+			assert.Equal(t, tc.want, session.Independent(), "Independent() for reported mode %#010x", tc.mode)
+		})
+	}
 }
