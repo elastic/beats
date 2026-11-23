@@ -82,7 +82,8 @@ func TestWorkloadIdentityConfig(t *testing.T) {
 				t.Setenv(key, value)
 			}
 			settings := map[string]any{
-				"auth_type": "workload_identity", "eventhub": "test-hub",
+				"processor_version": processorV2,
+				"auth_type":         "workload_identity", "eventhub": "test-hub",
 				"eventhub_namespace": "test.servicebus.windows.net", "storage_account": "teststorage",
 				"tenant_id": "tenant", "client_id": "client", "federated_token_file": tokenFilePath,
 			}
