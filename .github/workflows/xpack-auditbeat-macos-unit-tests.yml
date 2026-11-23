@@ -11,6 +11,7 @@ on:
       - x-pack/auditbeat/**
       # OSS
       - go.mod
+      - .python-version
       - pytest.ini
       - dev-tools/**
       - libbeat/**
@@ -26,6 +27,7 @@ on:
       - x-pack/auditbeat/**
       # OSS
       - go.mod
+      - .python-version
       - pytest.ini
       - dev-tools/**
       - libbeat/**
