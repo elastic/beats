@@ -3,6 +3,110 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+// begin 8.19.26 relnotes
+
+[[release-notes-8.19.26]]
+== Beats version 8.19.26
+
+https://github.com/elastic/beats/compare/v8.19.25\...v8.19.26[View commits]
+
+[discrete]
+[[security-updates-8.19.26]]
+=== Security updates
+
+**All**
+
+* Update Brotli to 1.2.7 to fix a decoder panic on malformed input. https://github.com/elastic/beats/pull/54234[#54234]
+
+[discrete]
+[[breaking-changes-8.19.26]]
+=== Breaking changes
+
+Breaking changes can prevent your application from optimal operation and
+performance. Before you upgrade, review the breaking changes, then mitigate the
+impact to your application.
+
+**Auditbeat**
+
+[discrete]
+[[breaking-https://github.com/elastic/beats/pull/53507]]
+.The `file_integrity` `ebpf` backend requires the host PID namespace when run in Docker/Kubernetes. https://github.com/elastic/beats/pull/53507[#53507] https://github.com/elastic/beats/issues/22396[#22396]
+[%collapsible]
+====
+The `file_integrity` module's `ebpf` backend now sources file events through
+quark instead of the `ebpfevents` library, removing the dependency on
+`elastic/ebpfevents` and `elastic/ebpf`. Configuration is unchanged. Each
+operation is still reported as its own event, and `file.mode` now reports
+only the permission bits, consistent with the `fsnotify` backend.
+
+quark attributes each event to a process by looking up the process ID the
+kernel reports in a table built from `/proc` and kept current from kernel
+events. The kernel reports host process IDs. When Auditbeat runs in a Docker
+container or Kubernetes pod with its own PID namespace, that table is built from the
+container's process IDs instead.
+
+*Impact* +
+Without `--pid=host` or `hostPID: true`, file events from processes that were
+already running when Auditbeat started are dropped, and events from processes
+started later can be attributed to the wrong process when a host process ID
+happens to match a container one. The `system/process` dataset and the
+`add_session_metadata` processor with kernel tracing already have this
+requirement. Deployments outside Docker/Kubernetes, and the `fsnotify` and `kprobes`
+backends, are unaffected.
+
+*Action* +
+Add `--pid=host` to the `docker run` command, alongside the existing
+`--cap-add=SYS_ADMIN --cap-add=BPF` and the `/sys` bind mount. In Kubernetes,
+set `hostPID: true` on the pod.
+
+====
+
+[discrete]
+[[upgrades-8.19.26]]
+=== Upgrades
+
+**Auditbeat**
+
+* Update `go-quark` for quark 0.8 since-boot timestamps. Emitted events are unchanged. https://github.com/elastic/beats/pull/52623[#52623]
+* Update `go-quark` for quark 0.9 boottime handling. Emitted events are unchanged. https://github.com/elastic/beats/pull/53284[#53284]
+
+[discrete]
+[[bug-fixes-8.19.26]]
+=== Bug fixes
+
+**All**
+
+* Fix "ApiVersionsRequest V3" errors on Kafka broker connections by updating the Sarama fork. https://github.com/elastic/beats/pull/54546[#54546]
+
+**Auditbeat**
+
+* Fix the `auditd` module's lost event monitor leaking a socket and crashing without a client. https://github.com/elastic/beats/pull/54645[#54645]
+* Fix the `auditd` module leaking a socket when it fails to create its data client. https://github.com/elastic/beats/pull/54651[#54651] https://github.com/elastic/beats/issues/54644[#54644]
+
+**Filebeat**
+
+* Limit request bodies buffered by the `http_endpoint` input for HMAC validation to 25 MiB when `max_body_bytes` is not set. https://github.com/elastic/beats/pull/53937[#53937]
+* Fix duplicate event IDs for codec-decoded objects in the `gcs` and `azure-blob-storage` inputs. https://github.com/elastic/beats/pull/54157[#54157] https://github.com/elastic/beats/issues/53659[#53659]
+* Align redirect header handling in Okta and Jamf entity analytics with `httpjson` and CEL. https://github.com/elastic/beats/pull/54493[#54493]
+* Fix the entity analytics input committing sync state before all events are acknowledged. https://github.com/elastic/beats/pull/54494[#54494] https://github.com/elastic/beats/issues/54432[#54432]
+* Write Azure Event Hub v2 checkpoints once per message, after all of its records are processed. https://github.com/elastic/beats/pull/54503[#54503]
+* Fix the `azure-blob-storage` and `gcs` inputs re-reading files on every poll when file names have mixed case. https://github.com/elastic/beats/pull/54512[#54512]
+
+**Libbeat**
+
+* Accept client certificates signed by CAs added to `certificate_authorities` while a TLS server is running. https://github.com/elastic/beats/pull/54749[#54749] https://github.com/elastic/beats/issues/54742[#54742]
+
+**Metricbeat**
+
+* Fix process CPU ticks and percentages being under-reported about 40 times on Apple Silicon macOS. https://github.com/elastic/beats/pull/54502[#54502]
+* Fix histogram values of zero being filtered out on non-amd64 platforms for `openmetrics` and `prometheus`. https://github.com/elastic/beats/pull/44750[#44750] https://github.com/elastic/beats/issues/34235[#34235]
+
+**Packetbeat**
+
+* Limit how often Packetbeat process enrichment scans `/proc`. https://github.com/elastic/beats/pull/54606[#54606]
+
+// end 8.19.26 relnotes
+
 // begin 8.19.25 relnotes
 
 [[release-notes-8.19.25]]
