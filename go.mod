@@ -13,7 +13,7 @@ require (
 	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest v0.11.30
 	github.com/Azure/go-autorest/autorest/date v0.3.1
-	github.com/Masterminds/semver v1.5.0 // indirect
+	github.com/Masterminds/semver v1.5.0
 	github.com/Microsoft/go-winio v0.6.4
 	github.com/PaesslerAG/gval v1.2.2
 	github.com/PaesslerAG/jsonpath v0.1.1
@@ -232,24 +232,13 @@ require (
 	github.com/coder/websocket v1.8.14
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/elastic/lumberjack v0.0.0-20260715013204-c5b60bbeaaab
-<<<<<<< HEAD
+	github.com/go-git/go-billy/v5 v5.9.2
+	github.com/go-git/go-git/v5 v5.19.3
+	github.com/google/go-github/v68 v68.0.0
 	github.com/gorilla/mux v1.8.1
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 	github.com/mitchellh/gox v1.0.1
 	github.com/otiai10/copy v1.14.1
-=======
-	github.com/go-git/go-billy/v5 v5.9.2
-	github.com/go-git/go-git/v5 v5.19.3
-	github.com/google/go-github/v68 v68.0.0
-	github.com/hashicorp/vault/api v1.23.0
-	github.com/jimlambrt/gldap v0.1.14
-	github.com/mattn/go-sqlite3 v1.14.32
-	github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage v0.165.1
-	github.com/parsiya/golnk v0.0.0-20251207220015-443df11fe4fb
-	github.com/richardlehane/mscfb v1.0.6
-	github.com/rogpeppe/go-internal v1.14.1
-	github.com/twmb/franz-go v1.22.2
->>>>>>> b159139 (ci(ff): support feature freeze automation (#51831))
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78
 	go.opentelemetry.io/collector/client v1.71.0
 	go.opentelemetry.io/collector/component/componenttest v0.165.0
@@ -270,48 +259,33 @@ require (
 )
 
 require (
-<<<<<<< HEAD
 	al.essio.dev/pkg/shellescape v1.5.1 // indirect
-=======
 	dario.cat/mergo v1.0.2 // indirect
->>>>>>> b159139 (ci(ff): support feature freeze automation (#51831))
 	github.com/Azure/azure-sdk-for-go/sdk/storage/internal v0.1.0 // indirect
 	github.com/BurntSushi/toml v1.6.0 // indirect
 	github.com/Masterminds/semver/v3 v3.5.0 // indirect
 	github.com/ProtonMail/go-crypto v1.3.0 // indirect
 	github.com/brunoscheufler/aws-ecs-metadata-go v0.0.0-20221221133751-67e37ae746cd // indirect
 	github.com/cenkalti/backoff/v7 v7.0.3 // indirect
-<<<<<<< HEAD
+	github.com/cloudflare/circl v1.6.3 // indirect
 	github.com/elastic/elastic-agent-libs v0.7.2 // indirect
+	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/evanphx/json-patch/v5 v5.6.0 // indirect
+	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-openapi/swag/pools v0.29.2 // indirect
+	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
+	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
+	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
+	github.com/pjbgf/sha1cd v0.7.0 // indirect
+	github.com/skeema/knownhosts v1.3.1 // indirect
 	github.com/twmb/franz-go v1.22.2 // indirect
+	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	go.opentelemetry.io/collector/exporter v1.71.0 // indirect
 	go.opentelemetry.io/collector/exporter/exportertest v0.165.0 // indirect
 	go.opentelemetry.io/collector/extension/extensiontest v0.165.0 // indirect
 	go.opentelemetry.io/collector/pipeline v1.71.0 // indirect
 	go.opentelemetry.io/collector/receiver/receivertest v0.165.0 // indirect
-=======
-	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
-	github.com/cloudflare/circl v1.6.3 // indirect
-	github.com/elastic/elastic-agent-libs v0.7.2 // indirect
-	github.com/emirpasic/gods v1.18.1 // indirect
-	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
-	github.com/go-openapi/swag/pools v0.29.2 // indirect
-	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
-	github.com/hashicorp/go-hclog v1.6.3 // indirect
-	github.com/hashicorp/go-secure-stdlib/parseutil v0.2.0 // indirect
-	github.com/hashicorp/go-secure-stdlib/strutil v0.1.2 // indirect
-	github.com/hashicorp/go-sockaddr v1.0.7 // indirect
-	github.com/hashicorp/hcl v1.0.1-vault-7 // indirect
-	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
-	github.com/kevinburke/ssh_config v1.2.0 // indirect
-	github.com/pjbgf/sha1cd v0.7.0 // indirect
-	github.com/ryanuber/go-glob v1.0.0 // indirect
-	github.com/skeema/knownhosts v1.3.1 // indirect
-	github.com/xanzy/ssh-agent v0.3.3 // indirect
->>>>>>> b159139 (ci(ff): support feature freeze automation (#51831))
 	go.opentelemetry.io/contrib/detectors/aws/ec2/v2 v2.6.0 // indirect
 	go.opentelemetry.io/contrib/detectors/aws/ecs v1.47.0 // indirect
 	go.opentelemetry.io/contrib/detectors/aws/eks v1.47.0 // indirect
@@ -322,7 +296,6 @@ require (
 	go.opentelemetry.io/contrib/propagators/aws v1.47.0 // indirect
 	go.opentelemetry.io/contrib/propagators/jaeger v1.47.0 // indirect
 	go.opentelemetry.io/contrib/propagators/ot v1.47.0 // indirect
-<<<<<<< HEAD
 	go.opentelemetry.io/otel v1.47.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.47.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp v1.47.0 // indirect
@@ -333,9 +306,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.47.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.47.0 // indirect
 	go.opentelemetry.io/otel/trace v1.47.0 // indirect
-=======
 	gopkg.in/warnings.v0 v0.1.2 // indirect
->>>>>>> b159139 (ci(ff): support feature freeze automation (#51831))
 	k8s.io/streaming v0.37.1 // indirect
 )
 
