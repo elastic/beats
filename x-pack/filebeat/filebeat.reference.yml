@@ -3364,9 +3364,10 @@ filebeat.inputs:
 #filebeat.registry.cleanup_interval: 5m
 
 # The maximum size of the registry transaction log (log.json) before a registry
-# checkpoint is forced. The checkpoint threshold starts at 10MiB and grows with
-# the size of the last checkpoint file, up to this value. The default value is
-# 512MiB.
+# checkpoint is forced. This option applies only to the "memlog" registry
+# backend. The checkpoint threshold starts at 10MiB, then follows the size of
+# the last checkpoint file, up to this value. The default value is 512MiB. Set
+# it to 10MiB to keep a fixed 10MiB threshold.
 #filebeat.registry.max_log_size: 512MiB
 
 # Starting with Filebeat 7.0, the registry uses a new directory format to store
