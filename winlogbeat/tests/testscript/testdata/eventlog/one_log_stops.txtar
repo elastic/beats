@@ -3,7 +3,9 @@
 write-event 'Hello world!'
 wait-for-event-log 1
 
-# A second event log that cannot be opened must not stop the first one.
+# A second event log that stops early must not stop the first one. It reads
+# the same channel under its own id, drops every event with its event_id
+# filter, and stops at the end of the channel (no_more_events: stop).
 # The process is expected to fail only because it is killed below. Killing a
 # process that has already exited is an error, so this also checks that
 # winlogbeat was still running.
@@ -20,8 +22,10 @@ wait
 winlogbeat.shutdown_timeout: 30s
 winlogbeat.event_logs:
   - name: ${PROVIDER:?missing PROVIDER}
-  - name: DoesNotExist-${PROVIDER:?missing PROVIDER}
-    ignore_missing_channel: false
+  - name: ${PROVIDER:?missing PROVIDER}
+    id: stops-early
+    event_id: '4242'
+    no_more_events: stop
 output.file:
   path: ${WORK:?missing WORK}/output
   filename: winlogbeat
