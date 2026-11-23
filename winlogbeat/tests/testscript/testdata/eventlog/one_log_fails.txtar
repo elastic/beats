@@ -10,6 +10,9 @@ wait-for-event-log 1
 ! exec winlogbeat -c winlogbeat.yml --path.data $WORK/data &
 wait-for-event-count output 1
 check-event-field output 0 message 'Hello world!'
+
+# Give a wrongly stopping winlogbeat time to exit, so kill finds it dead and fails.
+sleep 5s
 kill
 wait
 
