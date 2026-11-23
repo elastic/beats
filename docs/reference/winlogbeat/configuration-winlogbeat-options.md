@@ -30,21 +30,21 @@ You can specify the following options in the `winlogbeat` section of the `winlog
 
 ### `registry_file` [_registry_file]
 
-Winlogbeat now keeps the information that it uses to resume monitoring after a restart in the registry at `registry/winlogbeat` under `path.data`. This setting only names the old state file. By default, the old state file is `.winlogbeat.yml` under `path.data`.
+Winlogbeat keeps the information that it uses to resume monitoring after a restart in the registry at `registry/winlogbeat` under `path.data`.
 
-When Winlogbeat starts, it reads the old state file if it exists. For each event log that has no position in the new registry yet, it uses the position from the old state file as the starting position. Winlogbeat never modifies, renames or deletes the old state file. If the file exists but cannot be parsed, Winlogbeat fails to start.
+This setting names the old state file from earlier versions of Winlogbeat. By default, the old state file is `.winlogbeat.yml` under `path.data`. You only need to set this option if the old state file is somewhere else.
+
+When Winlogbeat starts collecting events, it reads the old state file if it exists. For each event log that has no position in the registry yet, it uses the position from the old state file as the starting position. Winlogbeat never modifies, renames or deletes the old state file. If the file exists but cannot be parsed, Winlogbeat fails to start.
 
 To read event logs from the beginning again, delete both the `registry/` directory under `path.data` and the old state file.
-
-When you run the process as a Windows service and the old state file is in a different location, set the value to that location, for example `C:/Program Files/Winlogbeat-Data/.winlogbeat.yml`.
 
 ```yaml
 winlogbeat.registry_file: C:/Program Files/Winlogbeat-Data/.winlogbeat.yml
 ```
 
-The default location varies:
-* {applies_to}`stack: ga 9.1+` `C:/Program Files/Winlogbeat-Data/.winlogbeat.yml`
-* {applies_to}`stack: ga =9.0` `C:/ProgramData/winlogbeat/.winlogbeat.yml`
+The default location of `path.data`, and so of both the old state file and the `registry/` directory, varies:
+* {applies_to}`stack: ga 9.1+` `C:/Program Files/Winlogbeat-Data`
+* {applies_to}`stack: ga =9.0` `C:/ProgramData/winlogbeat`
 
 ::::{note}
 The forward slashes (/) in the path are automatically changed to backslashes (\) for Windows compatibility. You can use either forward or backslashes. Forward slashes are easier to work with in YAML because there is no need to escape them.
