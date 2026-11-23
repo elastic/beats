@@ -10,6 +10,7 @@ on:
       - metricbeat/**
       # OSS
       - go.mod
+      - .python-version
       - dev-tools/**
       - libbeat/**
       - pkg/systemmetrics/**
@@ -23,6 +24,7 @@ on:
       - metricbeat/**
       # OSS
       - go.mod
+      - .python-version
       - dev-tools/**
       - libbeat/**
       - pkg/systemmetrics/**

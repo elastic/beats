@@ -6,6 +6,7 @@ on:
       - '.github/workflows/check-dev-tools.yml'
       - 'dev-tools/**'
       - 'libbeat/scripts/Makefile'
+      - '.python-version'
 
 env:
   BEAT_MODULE: 'dev-tools'
