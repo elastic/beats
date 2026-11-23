@@ -15,7 +15,10 @@ import (
 // NewPublisher returns an entcollect.Publisher that converts each
 // Document to a beat.Event and publishes it via client. The tracker
 // is incremented before each Publish so that TxTracker.Wait blocks
-// until the pipeline ACKs every event.
+// until the pipeline ACKs every event. The returned Publisher must not
+// be called once tracker.Wait has been called, for example from a
+// goroutine that outlives the caller, because events published after
+// Wait is released are not waited for.
 func NewPublisher(client beat.Client, inputID string, tracker *TxTracker) entcollect.Publisher {
 	return func(ctx context.Context, doc entcollect.Document) error {
 		fields := mapstr.M{}

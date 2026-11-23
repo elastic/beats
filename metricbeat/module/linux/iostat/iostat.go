@@ -20,11 +20,14 @@
 package iostat
 
 import (
+	"context"
+	"errors"
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/diskio"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -41,6 +44,7 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
+	sys            resolve.Resolver
 	stats          *diskio.IOStat
 	includeDevices []string
 }
@@ -48,6 +52,11 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	sys, ok := base.Module().(resolve.Resolver)
+	if !ok {
+		return nil, errors.New("base.Module is not resolve.Resolver")
+	}
+
 	config := struct {
 		IncludeDevices []string `config:"iostat.include_devices"`
 	}{IncludeDevices: []string{}}
@@ -57,6 +66,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet:  base,
+		sys:            sys,
 		includeDevices: config.IncludeDevices,
 		stats:          diskio.NewDiskIOStat(),
 	}, nil
@@ -66,13 +76,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	IOstats, err := diskio.IOCounters(m.Logger(), m.includeDevices...)
+	ctx := resolve.Context(context.Background(), m.sys)
+	IOstats, err := diskio.IOCounters(ctx, m.Logger(), m.includeDevices...)
 	if err != nil {
 		return fmt.Errorf("disk io counters: %w", err)
 	}
 
 	// Sample the current cpu counter
-	if err := m.stats.OpenSampling(); err != nil {
+	if err := m.stats.OpenSampling(ctx); err != nil {
 		return fmt.Errorf("open disk io sampling: %w", err)
 	}
 

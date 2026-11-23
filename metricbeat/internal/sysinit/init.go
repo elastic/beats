@@ -52,25 +52,14 @@ func InitSystemModule(base mb.BaseModule) (mb.Module, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error fetching config value: %w", err)
 	}
+	once.Do(func() {
+		InitModule(logger)
+	})
 	if management.UnderAgent() {
 		logger.Infof("initializing HostFS values under agent: %s", hostfs)
-		return fleetInit(base, hostfs, userSet)
+		return &Module{BaseModule: base, HostFS: hostfs, UserSetHostFS: userSet}, nil
 	}
 	return metricbeatInit(base, hostfs)
-}
-
-func fleetInit(base mb.BaseModule, modulepath string, moduleSet bool) (mb.Module, error) {
-	once.Do(func() {
-		InitModule(modulepath, base.Logger)
-	})
-
-	// The multiple invocations here might seem buggy, but we're dealing with a case were agent's config schemea (local, per-datastream) must mesh with the global HostFS scheme used by some libraries
-	// Strictly speaking, we can't guarantee that agent will send consistent HostFS config values across all datastreams, as it treats a global value as per-datastream.
-	if moduleSet {
-		InitModule(modulepath, base.Logger)
-	}
-
-	return &Module{BaseModule: base, HostFS: modulepath, UserSetHostFS: moduleSet}, nil
 }
 
 // Deal with the legacy configs available to metricbeat
@@ -83,9 +72,6 @@ func metricbeatInit(base mb.BaseModule, modulePath string) (mb.Module, error) {
 		userSet = true
 	}
 
-	once.Do(func() {
-		InitModule(hostfs, base.Logger)
-	})
 	return &Module{BaseModule: base, HostFS: hostfs, UserSetHostFS: userSet}, nil
 
 }

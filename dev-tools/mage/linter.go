@@ -32,7 +32,7 @@ import (
 )
 
 const (
-	defaultLinterVersion = "v2.12.2"
+	defaultLinterVersion = "v2.15.0"
 	linterInstallURL     = "https://golangci-lint.run/install.sh"
 )
 

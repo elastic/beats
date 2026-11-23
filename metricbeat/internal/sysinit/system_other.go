@@ -15,12 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !linux && !windows
+//go:build !windows
 
 package sysinit
 
 import "github.com/elastic/beats/v7/pkg/logp"
 
-func InitModule(config string, logger *logp.Logger) {
-	// Stub method for non-linux.
-}
+func InitModule(_ *logp.Logger) {}
