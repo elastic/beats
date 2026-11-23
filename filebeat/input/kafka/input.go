@@ -458,11 +458,11 @@ func (l *listFromFieldReader) Next() (reader.Message, error) {
 			return reader.Message{}, io.EOF
 		}
 
-		timestamp, kafkaFields := composeEventMetadata(l.claim, l.groupHandler, msg)
 		messages := l.parseMultipleMessages(msg.Value)
 		if len(messages) == 0 {
 			continue
 		}
+		timestamp, kafkaFields := composeEventMetadata(l.claim, l.groupHandler, msg)
 
 		neededAcks := atomic.Int64{}
 		neededAcks.Add(int64(len(messages)))
