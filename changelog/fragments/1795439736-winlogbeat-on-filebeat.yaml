@@ -38,3 +38,4 @@ action: |
   `registry/` directory under `path.data` and the old state file. No changes to
   `winlogbeat.yml` are needed.
 component: winlogbeat
+pr: https://github.com/elastic/beats/pull/54876
