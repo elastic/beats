@@ -39,7 +39,8 @@ import (
 // TestReceiverWithControlProtocol checks that a receiver configured with
 // management.agent.connection_secret gets its monitors from Elastic Agent over the
 // control protocol, that changing one monitor leaves the others running, and
-// that monitor status is still reported to the collector.
+// that the collector gets the status of the configured monitors, and of no
+// others.
 func TestReceiverWithControlProtocol(t *testing.T) {
 	// Registered first so it runs after the receiver and the fake agent stop.
 	t.Cleanup(func() { oteltest.VerifyNoLeaks(t) })
@@ -47,7 +48,8 @@ func TestReceiverWithControlProtocol(t *testing.T) {
 	target := startTCPTarget(t)
 
 	// Version 1 runs monitors a and b, plus an invalid monitor. Version 2 keeps a,
-	// replaces b with c, and removes the invalid monitor.
+	// replaces b with c, and removes the invalid monitor. Versions 3 and 4 are
+	// defined below.
 	unitsV1 := []*proto.UnitExpected{
 		outputUnit(1),
 		monitorUnit(t, "monitor-a", target, "@every 1s", 1),
@@ -152,16 +154,18 @@ func TestReceiverWithControlProtocol(t *testing.T) {
 	require.Len(t, stopped, 1)
 	assert.Contains(t, stopped[0].Message, "monitor-b")
 
-	// Removing the invalid monitor clears its failure.
+	// Removing the invalid monitor clears its failure, and removed monitors are
+	// no longer reported.
 	require.EventuallyWithT(t, func(c *assert.CollectT) {
 		evt := host.GetEvent()
 		if !assert.NotNil(c, evt) {
 			return
 		}
 		assert.Equal(c, componentstatus.StatusOK, evt.Status())
-		status, _ := inputStatus(evt, "synthetics/tcp-monitor-invalid")
-		assert.Equal(c, componentstatus.StatusStopped.String(), status)
+		assert.ElementsMatch(c, []string{"synthetics/tcp-monitor-a", "synthetics/tcp-monitor-c"}, inputIDs(evt),
+			"only the configured monitors should be reported")
 	}, 30*time.Second, 100*time.Millisecond)
+	removedAt := len(host.GetEvents())
 	assert.Empty(t, host.rejectedChanges(), "the collector would reject these status changes")
 
 	// Monitor status goes to the collector, keyed by monitor ID. Heartbeat names
@@ -183,6 +187,61 @@ func TestReceiverWithControlProtocol(t *testing.T) {
 			}
 		}
 	}, 30*time.Second, 100*time.Millisecond)
+
+	// Version 3 edits monitor-a, which restarts its runner under the same ID,
+	// and brings back the removed invalid monitor's ID with a valid schedule.
+	unitsV3 := []*proto.UnitExpected{
+		outputUnit(1),
+		monitorUnit(t, "monitor-a", target, "@every 2s", 2),
+		monitorUnit(t, "monitor-c", target, "@every 1s", 2),
+		monitorUnit(t, "monitor-invalid", target, "@every 1s", 3),
+	}
+	agent.setUnits(unitsV3)
+	require.EventuallyWithT(t, func(c *assert.CollectT) {
+		evt := host.GetEvent()
+		if !assert.NotNil(c, evt) {
+			return
+		}
+		assert.Equal(c, componentstatus.StatusOK, evt.Status())
+		ids := []string{"synthetics/tcp-monitor-a", "synthetics/tcp-monitor-c", "synthetics/tcp-monitor-invalid"}
+		assert.ElementsMatch(c, ids, inputIDs(evt), "the configured monitors should be reported")
+		for _, id := range ids {
+			status, msg := inputStatus(evt, id)
+			assert.Equal(c, componentstatus.StatusOK.String(), status, "status of %s: %s", id, msg)
+		}
+	}, 30*time.Second, 100*time.Millisecond)
+	stopped = zapLogs.FilterMessageSnippet("Stopping runner: Monitor<").All()
+	assert.Len(t, stopped, 2, "editing monitor-a should restart it")
+
+	// Version 4 removes every monitor.
+	agent.setUnits([]*proto.UnitExpected{outputUnit(1)})
+	require.EventuallyWithT(t, func(c *assert.CollectT) {
+		evt := host.GetEvent()
+		if !assert.NotNil(c, evt) {
+			return
+		}
+		assert.Equal(c, componentstatus.StatusOK, evt.Status())
+		assert.Empty(c, inputIDs(evt), "no monitors should be reported")
+	}, 30*time.Second, 100*time.Millisecond)
+
+	// A removed monitor never comes back, even if it reports while stopping.
+	for i, evt := range host.GetEvents()[removedAt:] {
+		assert.NotContains(t, inputIDs(evt), "synthetics/tcp-monitor-b", "event %d after the removal reports monitor-b", removedAt+i)
+	}
+	assert.Empty(t, host.rejectedChanges(), "the collector would reject these status changes")
+}
+
+// inputIDs returns the IDs of the inputs whose status evt reports.
+func inputIDs(evt *componentstatus.Event) []string {
+	inputs, ok := evt.Attributes().Get("inputs")
+	if !ok {
+		return nil
+	}
+	ids := []string{}
+	for id := range inputs.Map().All() {
+		ids = append(ids, id)
+	}
+	return ids
 }
 
 // fakeAgent serves the control protocol over mutual TLS on a unix socket, and

@@ -75,6 +75,14 @@ func (c *crawler) Start(
 
 	log.Infof("Loading Inputs: %d", len(c.inputConfigs))
 
+	enabledConfigs := make([]*conf.C, 0, len(c.inputConfigs))
+	for _, inputConfig := range c.inputConfigs {
+		if inputConfig.Enabled() {
+			enabledConfigs = append(enabledConfigs, inputConfig)
+		}
+	}
+	cfgfile.SetRunnerConfigs(c.inputsFactory, c, enabledConfigs)
+
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, inputConfig := range c.inputConfigs {
 		err := c.startInput(pipeline, inputConfig)
