@@ -1,0 +1,9 @@
+kind: bug-fix
+summary: Fix IIS application_pool metrics missing on non-English Windows
+description: >
+  On Windows with a non-English display language, the expanded performance
+  counter paths are localized, so the worker process ID counter was not
+  recognized and application_pool events contained only the pool name.
+  The process ID counter is now identified by its registered field instead
+  of its English counter path.
+component: metricbeat
