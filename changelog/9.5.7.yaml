@@ -1,5 +1,47 @@
 version: 9.5.7
 entries:
+    - kind: upgrade
+      summary: Update go-quark for quark 0.8 since-boot timestamps
+      description: |
+        quark 0.8 hands out process timestamps as nanoseconds since boot instead of since the epoch. Auditbeat now converts process.start/process.end to wallclock with quark.TimeToWallclock() and keeps quark's boottime epoch fresh, so timestamps stay correct even when the system clock is stepped, as when NTP corrects a clock that was wrong at boot. Emitted events are unchanged.
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/52623
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1786630989
+      file:
+        name: 1786630989-auditbeat-quark-0.8.yaml
+        checksum: 2b331924b52580290b971998c7e783f49ddaff80
+    - kind: upgrade
+      summary: Update go-quark for quark 0.9 boottime handling
+      description: |
+        quark 0.9 removed quark.TimeToWallclock() and quark.UpdateBoottime(), the boottime epoch from quark.Boottime() is now self-maintaining and only moves on a system clock step. Auditbeat now converts process.start/process.end to wallclock by fetching the epoch once per batch and adding it to quark's since-boot timestamps, instead of one cgo call per timestamp. Emitted events are unchanged.
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/53284
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1789463004
+      file:
+        name: 1789463004-auditbeat-quark-0.9-boottime.yaml
+        checksum: 1d22cc771b51ffb9558925143bf140c0be318186
+    - kind: bug-fix
+      summary: Fix quadratic cost of building the receiver config for units with many streams.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/53726
+      issue:
+        - https://github.com/elastic/beats/issues/53731
+      impact: ""
+      action: ""
+      timestamp: 1791600300
+      file:
+        name: 1791600300-management-global-processors-perf.yaml
+        checksum: 4327a900a320c1feeea2404ff7b6b1e0d7627c37
     - kind: bug-fix
       summary: 'Fix auditd module failing or dropping events when `immutable: true` is set.'
       description: |
@@ -51,6 +93,23 @@ entries:
       file:
         name: 1792363230-auditbeat-session-metadata-event-age-wait.yaml
         checksum: db68c8c4c6ffd0057f3d865aaafebfabde267cda
+    - kind: bug-fix
+      summary: Limit HTTP Endpoint request bodies buffered for HMAC validation to 25 MiB when max_body_bytes is not set
+      description: |
+        The http_endpoint input buffers the whole request body in memory to check
+        an HMAC signature. That read now stops at 25 MiB when max_body_bytes is not
+        set, and larger bodies are rejected with a 413 status. The bytes read also
+        count towards max_in_flight_bytes when it is set.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/53937
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1792400000
+      file:
+        name: 1792400000-http_endpoint-bound-hmac-body-read.yaml
+        checksum: 20cd14bb7b549a5e891487d8c32a1c4f7e50e317
     - kind: bug-fix
       summary: Restart osqueryd with backoff when it exits unexpectedly after startup.
       description: ""
@@ -151,6 +210,59 @@ entries:
       file:
         name: 1793100000-awss3-non-aws-default-region.yaml
         checksum: 14f73be2c2599b2498353bf65c496597bc252024
+    - kind: bug-fix
+      summary: Fix duplicate event IDs for codec-decoded objects in the GCS and Azure Blob Storage inputs.
+      description: |
+        Events produced by a decoding codec (CSV, Parquet) from the same object all
+        got the same `_id` and `log.offset: 0`, so only the first record of each
+        object was indexed. Each event now gets a unique ID derived from its record
+        index, and `log.offset` holds that index.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54157
+      issue:
+        - https://github.com/elastic/beats/issues/53659
+      impact: ""
+      action: ""
+      timestamp: 1793120788
+      file:
+        name: 1793120788-fix-duplicate-event-ids-for-codec-decoded-objects-in-gcs-and-azure-blob-storage-inputs.yaml
+        checksum: f80f4b83b29e8afc8e7eb7b7dbacd0cb9082f031
+    - kind: breaking-change
+      summary: The file_integrity ebpf backend requires the host PID namespace when run in Docker/K8s
+      description: |
+        The file_integrity module's ebpf backend now sources file events through
+        quark instead of the ebpfevents library, removing the dependency on
+        elastic/ebpfevents and elastic/ebpf. Configuration is unchanged. Each
+        operation is still reported as its own event, and `file.mode` now reports
+        only the permission bits, consistent with the `fsnotify` backend.
+
+        quark attributes each event to a process by looking up the process ID the
+        kernel reports in a table built from `/proc` and kept current from kernel
+        events. The kernel reports host process IDs. When Auditbeat runs in a Docker
+        container or K8s pod with its own PID namespace, that table is built from the
+        container's process IDs instead.
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/53507
+      issue:
+        - https://github.com/elastic/beats/issues/22396
+      impact: |
+        Without `--pid=host` or `hostPID: true`, file events from processes that were
+        already running when Auditbeat started are dropped, and events from processes
+        started later can be attributed to the wrong process when a host process ID
+        happens to match a container one. The `system/process` dataset and the
+        `add_session_metadata` processor with kernel tracing already have this
+        requirement. Deployments outside Docker/K8s, and the `fsnotify` and `kprobes`
+        backends, are unaffected.
+      action: |
+        Add `--pid=host` to the `docker run` command, alongside the existing
+        `--cap-add=SYS_ADMIN --cap-add=BPF` and the `/sys` bind mount. In Kubernetes,
+        set `hostPID: true` on the pod.
+      timestamp: 1793136201
+      file:
+        name: 1793136201-auditbeat-fim-ebpf-docker-pid-host.yaml
+        checksum: 095b52ecea9021f43505b05297e5f72a3f744f47
     - kind: bug-fix
       summary: Stop leaking a thread per run when a browser monitor's synthetics command fails to start
       description: ""
@@ -300,6 +412,48 @@ entries:
         name: 1793738700-mito1_27_1.yaml
         checksum: 9c160d9660560a49311287ea1d84ad5ebdee2da8
     - kind: bug-fix
+      summary: Align redirect header handling in Okta and Jamf entity analytics with HTTP JSON and CEL.
+      description: |
+        The HTTP JSON, CEL, Okta, Jamf and streaming inputs no longer write header values to the debug log, only header names. A configured redirect.sensitive_headers list in HTTP JSON and CEL now replaces the default list, and an empty list disables the removal.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54493
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1793827498
+      file:
+        name: 1793827498-redirect-header-handling.yaml
+        checksum: 15356ee2eccd93fca630d161c76c76cc5b5356fa
+    - kind: bug-fix
+      summary: Fix entity analytics input committing sync state before all events are acknowledged.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54494
+      issue:
+        - https://github.com/elastic/beats/issues/54432
+      impact: ""
+      action: ""
+      timestamp: 1793840779
+      file:
+        name: 1793840779-fix-entityanalytics-early-state-commit.yaml
+        checksum: 9987be2d883983960004aa8185881fd955ae7592
+    - kind: bug-fix
+      summary: Report entity analytics minimal-state input health and retry failed full syncs sooner.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54496
+      issue:
+        - https://github.com/elastic/beats/issues/54436
+      impact: ""
+      action: ""
+      timestamp: 1793841055
+      file:
+        name: 1793841055-fix-entityanalytics-minimal-status-retry.yaml
+        checksum: 699ab6d4e632bb48179b3cd7203e764ec14cf8ef
+    - kind: bug-fix
       summary: Write Azure Event Hub v2 checkpoints once per message, after all its records complete
       description: |
         The Azure Event Hub input (processor v2) now writes a checkpoint only after
@@ -355,6 +509,19 @@ entries:
         name: 1793881228-fix-abs-gcs-checkpoint-name-case.yaml
         checksum: 2251758a29047a90301d81408437cb386dd6c0ee
     - kind: bug-fix
+      summary: Apply HTTP and tracer settings in entity analytics minimal-state providers.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/54557
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1793913792
+      file:
+        name: 1793913792-entity-analytics-minimal-state-http-settings.yaml
+        checksum: eff0722ca07bbe97b66786a700c30e364314daed
+    - kind: bug-fix
       summary: Fix Filebeat receivers that share a registry failing to start together on Windows.
       description: When several Filebeat receivers in the same process shared a registry path and started at the same time with a new registry, one of them could fail on Windows with "Failed to migrate registry file" and stop without starting its inputs.
       component: filebeat
@@ -393,3 +560,94 @@ entries:
       file:
         name: 1794000000-update-sarama-fork-api-versions-v3.yaml
         checksum: 7c97363e8e8386971f12e672cf0d9eeec9d244e0
+    - kind: bug-fix
+      summary: Limit how often Packetbeat process enrichment scans /proc.
+      description: Each lookup miss used to walk every file descriptor of every process on the host, which could saturate the sniffer. On Linux the walk is now skipped when the socket table shows no open socket on the port. Lookups are also spaced so that, for each transport, they take about a tenth of the time, and max_proc_read_freq can add a fixed minimum interval between full scans. A connection opened and closed between scans may be published without process information. Mappings confirmed by a scan stay valid for at least 10s after that scan, and on Linux vanished PIDs are logged at debug level.
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54606
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1794400000
+      file:
+        name: 1794400000-packetbeat-procs-scan-throttle.yaml
+        checksum: f26f645f2cf966999db4629ba63e0cb4126c0f32
+    - kind: bug-fix
+      summary: Fix auditd lost event monitor leaking a socket and crashing without a client.
+      description: |
+        The kernel lost event monitor closed the wrong audit client when it stopped,
+        leaving its own netlink socket open. If creating that client failed, the
+        monitor still started and crashed on its first poll, which stopped
+        Auditbeat, or the Elastic Agent process running it as a receiver. The
+        monitor now closes its own client. If the client cannot be created,
+        Auditbeat reports the error and stops updating the kernel lost events
+        metric instead of crashing.
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54645
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1794456064
+      file:
+        name: 1794456064-auditd-kernel-lost-monitor.yaml
+        checksum: d5866b37b7da7c358bda97784f409e4a66d38f41
+    - kind: bug-fix
+      summary: Fix auditd module leaking a socket when it fails to create its data client.
+      description: |
+        When the auditd module could not create its data client, for example because
+        the process had no file descriptors left, it returned an error without
+        closing the control client it had already created. That socket stayed open
+        for the life of the process. It is now closed.
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54651
+      issue:
+        - https://github.com/elastic/beats/issues/54644
+      impact: ""
+      action: ""
+      timestamp: 1794512032
+      file:
+        name: 1794512032-auditd-new-closes-control.yaml
+        checksum: b8552c2da807194adce60513a3640c204a80faa3
+    - kind: bug-fix
+      summary: Accept client certificates signed by CAs added to `certificate_authorities` while a TLS server is running.
+      description: |
+        With `ssl.certificate_reload` enabled (the default when `certificate_authorities`
+        is set), a running TLS server reloaded `certificate_authorities` from disk but
+        still rejected client certificates signed by a CA added after startup, because
+        the Go TLS stack verified them against the CA pool captured when the server
+        was configured. Removing a CA already took effect. The server now uses the
+        current CA pool for each handshake, both to verify client certificates and to
+        advertise acceptable CAs to clients.
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/54749
+      issue:
+        - https://github.com/elastic/beats/issues/54742
+      impact: ""
+      action: ""
+      timestamp: 1794930537
+      file:
+        name: 1794930537-tlscommon-client-ca-reload.yaml
+        checksum: 3b91228358028610d4b1c3b89aabc0d80645abdd
+    - kind: upgrade
+      summary: upgrade osquery version to 5.24.1
+      description: >
+        Upgrade the bundled osquery runtime to version 5.24.1. It restores the
+        bpf_process_events and bpf_socket_events tables that were removed by mistake
+        in 5.24.0 (osquery/osquery#9225), so queries on those tables work again. It
+        also includes security fixes: an updated Mozilla CA certificate bundle,
+        TLS 1.0 and 1.1 disabled in curl_certificate and the OpenSSL build, and
+        hardening against malformed input in several table parsers.
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/54777
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1795001104
+      file:
+        name: 1795001104-upgrade-osquery-5.24.1.yaml
+        checksum: 16209a040f0a3f462c6ce692cab6b986f764bcd5
