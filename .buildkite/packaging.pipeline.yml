@@ -434,7 +434,7 @@ steps:
 
   - label: ":wastebasket: Delete build artifacts"
     key: "delete_build_artifacts"
-    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main'
+    if: build.env('RUN_SNAPSHOT') == "true") || build.env('RUN_STAGING') == "true") || build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main'
     command: "true"
     plugins:
       - elastic/vault-secrets#v0.1.1:
