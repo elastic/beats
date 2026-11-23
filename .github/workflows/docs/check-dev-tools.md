@@ -16,7 +16,7 @@ Runs the configured `check` job(s) for **check-dev-tools**. The checked-in sourc
 
 ## When it runs
 
-- `pull_request`: paths: `[".github/workflows/check-dev-tools.yml", "dev-tools/**", "libbeat/scripts/Makefile"]`
+- `pull_request`: paths: `[".github/workflows/check-dev-tools.yml", "dev-tools/**", "libbeat/scripts/Makefile", ".python-version"]`
 
 ## Execution flow
 
