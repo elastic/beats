@@ -52,6 +52,13 @@ type winlogbeat struct {
 	inner    beat.Beater // The Filebeat beater.
 	settings settings
 	log      *logp.Logger
+
+	// registryFile is the resolved path of the legacy state file. It is
+	// read in Run so that commands like setup and export do not touch it.
+	registryFile string
+
+	mu     sync.Mutex
+	legacy map[string]checkpoint.EventLogState
 }
 
 // New returns a new Winlogbeat.
@@ -71,20 +78,16 @@ func New(b *beat.Beat, _ *conf.C) (beat.Beater, error) {
 		}
 	}
 
-	legacy, err := checkpoint.Read(b.Info.Paths.Resolve(paths.Data, s.RegistryFile))
-	if err != nil {
-		return nil, err
+	w := &winlogbeat{
+		settings:     s,
+		log:          b.Info.Logger,
+		registryFile: b.Info.Paths.Resolve(paths.Data, s.RegistryFile),
 	}
-
-	w := &winlogbeat{settings: s, log: b.Info.Logger}
 	tracker := newStopTracker(len(s.EventLogs), func() { go w.Stop() })
 	factory := func(info beat.Info, store statestore.States) []v2.Plugin {
 		return []v2.Plugin{winlog.PluginWithOptions(info.Logger, store, winlog.Options{
-			InitialState: func(name string) (checkpoint.EventLogState, bool) {
-				st, ok := legacy[name]
-				return st, ok
-			},
-			OnStopped: tracker.stopped,
+			InitialState: w.initialState,
+			OnStopped:    tracker.stopped,
 		})}
 	}
 
@@ -109,9 +112,14 @@ func New(b *beat.Beat, _ *conf.C) (beat.Beater, error) {
 	return w, nil
 }
 
-// Run registers Winlogbeat's ingest pipeline loading and runs the Filebeat
-// beater.
+// Run loads the legacy state, registers Winlogbeat's ingest pipeline loading
+// and runs the Filebeat beater.
 func (w *winlogbeat) Run(b *beat.Beat) error {
+	err := w.loadLegacyState()
+	if err != nil {
+		return err
+	}
+
 	if beat.SetupPipelinesEnabled(b.BeatConfig) {
 		if b.Config.Output.Name() == "elasticsearch" {
 			callback := func(esClient *eslegclient.Connection, _ *logp.Logger) error {
@@ -127,6 +135,28 @@ func (w *winlogbeat) Run(b *beat.Beat) error {
 		}
 	}
 	return w.inner.Run(b)
+}
+
+// loadLegacyState reads the state file written by Winlogbeat versions that
+// kept their own registry.
+func (w *winlogbeat) loadLegacyState() error {
+	states, err := checkpoint.Read(w.registryFile)
+	if err != nil {
+		return err
+	}
+	w.mu.Lock()
+	w.legacy = states
+	w.mu.Unlock()
+	return nil
+}
+
+// initialState returns the legacy start position for the named event log.
+// It is called from input goroutines.
+func (w *winlogbeat) initialState(name string) (checkpoint.EventLogState, bool) {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	st, ok := w.legacy[name]
+	return st, ok
 }
 
 // Stop stops the Filebeat beater.

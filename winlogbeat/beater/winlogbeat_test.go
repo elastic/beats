@@ -19,12 +19,53 @@ package beater
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"sync"
 	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/paths"
 )
+
+func TestLegacyStateReadInRun(t *testing.T) {
+	data := t.TempDir()
+	file := filepath.Join(data, ".winlogbeat.yml")
+	require.NoError(t, os.WriteFile(file, []byte("event_logs: ["), 0o600), "failed to write legacy state file")
+
+	cfg, err := conf.NewConfigWithYAML([]byte("event_logs:\n- name: Security\n"), "test")
+	require.NoError(t, err, "failed to parse test config")
+	b := &beat.Beat{
+		Info: beat.Info{
+			Logger: logptest.NewTestingLogger(t, ""),
+			Paths:  &paths.Path{Home: data, Config: data, Data: data, Logs: data},
+		},
+		Config:     &beat.BeatConfig{},
+		BeatConfig: cfg,
+		// Skips eventlog.New, which only works on Windows.
+		InSetupCmd: true,
+	}
+	bt, err := New(b, nil)
+	require.NoError(t, err, "New should not read the legacy state file")
+	w, ok := bt.(*winlogbeat)
+	require.True(t, ok, "New returned %T; want *winlogbeat", bt)
+
+	err = w.loadLegacyState()
+	require.Error(t, err, "corrupt legacy state file should fail the load in Run")
+	assert.Contains(t, err.Error(), "failed to read persisted state from "+file, "unexpected error text")
+
+	require.NoError(t, os.WriteFile(file, []byte("event_logs:\n- name: Security\n  record_number: 42\n"), 0o600), "failed to write legacy state file")
+	require.NoError(t, w.loadLegacyState(), "valid legacy state file should load")
+	st, ok := w.initialState("Security")
+	assert.True(t, ok, "initialState should find the loaded event log")
+	assert.Equal(t, uint64(42), st.RecordNumber, "initialState should return the loaded record number")
+}
 
 func TestStopTracker(t *testing.T) {
 	t.Run("all distinct names stop", func(t *testing.T) {
