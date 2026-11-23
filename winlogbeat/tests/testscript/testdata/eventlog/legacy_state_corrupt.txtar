@@ -4,6 +4,7 @@ write-event 'First event'
 wait-for-event-log 1
 
 # A corrupt legacy state file makes a real run fail.
+mkdir $WORK/data
 cp corrupt.yml $WORK/data/.winlogbeat.yml
 ! exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
 stderr 'failed to read persisted state from'

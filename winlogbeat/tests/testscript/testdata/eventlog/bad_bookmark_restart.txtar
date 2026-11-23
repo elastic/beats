@@ -7,9 +7,12 @@ exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
 check-event-count output 1
 check-event-field output 0 message 'First event'
 
-# Overwrite the checkpoint with an invalid bookmark (future record number).
+# Write a legacy state file with an invalid bookmark (future record number) and
+# remove the registry, so that the legacy file is the only start position. A
+# position in the registry would take precedence over the legacy file.
 envsubst invalid-checkpoint.yml
 cp invalid-checkpoint.yml $WORK/data/.winlogbeat.yml
+rm $WORK/data/registry
 rm $WORK/output
 
 # Second run: winlogbeat should detect the stale bookmark and restart from the
