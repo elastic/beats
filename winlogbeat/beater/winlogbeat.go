@@ -92,12 +92,11 @@ func New(b *beat.Beat, _ *conf.C) (beat.Beater, error) {
 	}
 
 	b.BeatConfig = s.Filebeat
-	w.inner, err = fbbeater.New(factory)(b, s.Filebeat)
+	w.inner, err = fbbeater.New(factory, fbbeater.WithoutModules())(b, s.Filebeat)
 	if err != nil {
 		return nil, err
 	}
 
-	// Set after the Filebeat beater, which installs its own callback.
 	b.OverwritePipelinesCallback = func(esConfig *conf.C) error {
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()

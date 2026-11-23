@@ -67,6 +67,31 @@ func TestLegacyStateReadInRun(t *testing.T) {
 	assert.Equal(t, uint64(42), st.RecordNumber, "initialState should return the loaded record number")
 }
 
+func TestNewNoFilebeatModuleLogs(t *testing.T) {
+	// The home directory has no module directory and the output is not
+	// Elasticsearch.
+	home := t.TempDir()
+	cfg, err := conf.NewConfigWithYAML([]byte("event_logs:\n- name: Security\n"), "test")
+	require.NoError(t, err, "failed to parse test config")
+	logger, logs := logptest.NewTestingLoggerWithObserver(t, "")
+	b := &beat.Beat{
+		Info: beat.Info{
+			Logger: logger,
+			Paths:  &paths.Path{Home: home, Config: home, Data: home, Logs: home},
+		},
+		Config:     &beat.BeatConfig{},
+		BeatConfig: cfg,
+		// Skips eventlog.New, which only works on Windows.
+		InSetupCmd: true,
+	}
+	_, err = New(b, nil)
+	require.NoError(t, err, "New failed")
+
+	assert.Zero(t, logs.FilterMessageSnippet("Not loading modules").Len(), "Filebeat module directory error logged")
+	assert.Zero(t, logs.FilterMessageSnippet("unable to load the ingest pipelines for the configured modules").Len(), "Filebeat pipelines warning logged")
+	assert.NotNil(t, b.OverwritePipelinesCallback, "Winlogbeat pipeline callback not installed")
+}
+
 func TestStopTracker(t *testing.T) {
 	t.Run("all distinct names stop", func(t *testing.T) {
 		var calls atomic.Int32
