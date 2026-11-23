@@ -14,6 +14,7 @@ import (
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 )
 
 const (
@@ -277,7 +278,7 @@ func newOsqueryConfig(osqueryConfig *config.OsqueryConfig) *config.OsqueryConfig
 
 func (p *ConfigPlugin) render() (string, error) {
 	if p.configString == "" {
-		raw, err := newOsqueryConfig(p.osqueryConfig).Render()
+		raw, err := withFIPSOptions(newOsqueryConfig(p.osqueryConfig)).Render()
 		if err != nil {
 			return "", err
 		}
@@ -285,6 +286,16 @@ func (p *ConfigPlugin) render() (string, error) {
 	}
 
 	return p.configString, nil
+}
+
+// withFIPSOptions returns a copy of c whose options carry the settings that FIPS
+// builds enforce. It leaves the options of c alone, because the runner also
+// reads that map for the osqueryd flags. It changes nothing without the
+// requirefips tag.
+func withFIPSOptions(c *config.OsqueryConfig) *config.OsqueryConfig {
+	out := *c
+	out.Options = osqd.EnforceFIPSOptions(c.Options)
+	return &out
 }
 
 func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
