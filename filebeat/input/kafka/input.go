@@ -447,7 +447,8 @@ func (l *listFromFieldReader) Close() error {
 
 func (l *listFromFieldReader) Next() (reader.Message, error) {
 	// Loop until a message yields events: returning EOF/err would abort
-	// ConsumeClaim, and zero-event messages must be acked so their offset advances.
+	// ConsumeClaim, and the next message that yields events will advance the
+	// committed offset past any skipped zero-event messages once acknowledged.
 	for len(l.buffer) == 0 {
 		msg, ok, timedOut := l.recv(l.claim.Messages())
 		if timedOut {
@@ -460,7 +461,6 @@ func (l *listFromFieldReader) Next() (reader.Message, error) {
 		timestamp, kafkaFields := composeEventMetadata(l.claim, l.groupHandler, msg)
 		messages := l.parseMultipleMessages(msg.Value)
 		if len(messages) == 0 {
-			l.groupHandler.ack(msg)
 			continue
 		}
 

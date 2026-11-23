@@ -3,8 +3,8 @@ summary: Fix Filebeat Kafka input panic when expand_event_list_from_field yields
 description: |
   When `expand_event_list_from_field` was configured and a Kafka message
   expanded to zero events (for example, an empty list, a missing or non-array
-  field, or invalid JSON), Filebeat panicked and failed to acknowledge the
-  message, causing a crash loop on restart. Filebeat now acknowledges and skips
-  these messages so ingestion continues normally.
+  field, or invalid JSON), Filebeat panicked and failed to advance past the
+  message, causing a crash loop on restart. Filebeat now skips these messages so
+  ingestion continues normally.
 component: filebeat
 issue: https://github.com/elastic/beats/issues/36684

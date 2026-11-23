@@ -199,10 +199,10 @@ func TestListFromFieldReaderZeroEventMessages(t *testing.T) {
 			msg, err := r.Next()
 			require.NoError(t, err, "expected Next to skip zero-event message and return the next valid event")
 			assert.JSONEq(t, `{"id":"good"}`, string(msg.Content), "unexpected expanded event content")
-			assert.Equal(t, []int64{0}, session.marked, "expected zero-event message to be acknowledged")
+			assert.Empty(t, session.marked, "expected no offset to be marked before the valid event is acknowledged")
 
 			ackEventPrivate(msg.Private)
-			assert.Equal(t, []int64{0, 1}, session.marked, "expected valid message to be acknowledged after event ack")
+			assert.Equal(t, []int64{1}, session.marked, "expected valid message offset to be marked after event ack")
 
 			_, err = r.Next()
 			require.ErrorIs(t, err, io.EOF, "expected io.EOF after all messages are consumed")
