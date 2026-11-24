@@ -30,6 +30,7 @@ import (
 	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/sarama"
 )
 
 func TestNewInputDone(t *testing.T) {
@@ -42,9 +43,8 @@ func TestNewInputDone(t *testing.T) {
 	AssertNotStartedInputCanBeDone(t, config)
 }
 
-// TestNoPanicOnClientError checks that the context of an input can be
-// done before starting the input, and it doesn't leak goroutines. This is
-// important to confirm that leaks don't happen with CheckConfig.
+// TestNoPanicOnClientError checks that Test returns an error instead of
+// panicking when the broker connection fails.
 func TestNoPanicOnClientError(t *testing.T) {
 	k := &kafkaInput{
 		config:       kafkaInputConfig{Hosts: []string{"127.0.0.1:1"}, Topics: []string{"topic-a"}},
