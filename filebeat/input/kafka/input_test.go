@@ -25,10 +25,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/sarama"
 )
 
 func TestNewInputDone(t *testing.T) {
@@ -39,6 +41,18 @@ func TestNewInputDone(t *testing.T) {
 	})
 
 	AssertNotStartedInputCanBeDone(t, config)
+}
+
+// TestNoPanicOnClientError checks that Test returns an error instead of
+// panicking when the broker connection fails.
+func TestNoPanicOnClientError(t *testing.T) {
+	k := &kafkaInput{
+		config:       kafkaInputConfig{Hosts: []string{"127.0.0.1:1"}, Topics: []string{"topic-a"}},
+		saramaConfig: sarama.NewConfig(),
+	}
+
+	err := k.Test(input.TestContext{Logger: logp.NewLogger("kafka-repro")})
+	require.Error(t, err)
 }
 
 // AssertNotStartedInputCanBeDone checks that the context of an input can be
