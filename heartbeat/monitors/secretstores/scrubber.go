@@ -23,8 +23,10 @@ import (
 	"context"
 	"encoding/json"
 	"maps"
+	"net"
 	"net/url"
 	"slices"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -82,12 +84,12 @@ func (t *tracker) scrubber() *Scrubber {
 		if len(v) < minScrubLen {
 			continue
 		}
-		// Settings such as URLs get percent-encoded when published, and
-		// values with quotes or newlines get escaped inside JSON.
-		query := url.QueryEscape(v)
-		forms = append(forms, v, query, strings.ReplaceAll(query, "+", "%20"),
-			url.PathEscape(v), (&url.URL{Path: v}).EscapedPath())
-		forms = append(forms, jsonEscaped(v)...)
+		forms = appendForms(forms, v)
+		// URLs and host:port endpoints are split into url.* fields,
+		// monitor.ip, and dial errors.
+		for _, part := range endpointParts(v) {
+			forms = appendForms(forms, part)
+		}
 		// Output read line by line, such as the browser runner's, splits
 		// multi-line values such as PEM keys.
 		if strings.Contains(v, "\n") {
@@ -99,6 +101,47 @@ func (t *tracker) scrubber() *Scrubber {
 		}
 	}
 	return newScrubber(forms)
+}
+
+func appendForms(forms []string, v string) []string {
+	if len(v) < minScrubLen {
+		return forms
+	}
+	// Settings such as URLs get percent-encoded when published, and
+	// values with quotes or newlines get escaped inside JSON.
+	query := url.QueryEscape(v)
+	forms = append(forms, v, query, strings.ReplaceAll(query, "+", "%20"),
+		url.PathEscape(v), (&url.URL{Path: v}).EscapedPath())
+	return append(forms, jsonEscaped(v)...)
+}
+
+// endpointParts returns the sub-values Heartbeat splits out of a URL or
+// host:port secret when publishing url.* fields or dialing the target.
+func endpointParts(v string) []string {
+	if u, err := url.Parse(v); err == nil && u.Scheme != "" && u.Host != "" {
+		parts := []string{
+			u.String(), u.Host, u.Hostname(), u.Path, u.EscapedPath(),
+			u.RawQuery, u.Fragment, u.EscapedFragment(),
+		}
+		if u.User != nil {
+			parts = append(parts, u.User.Username())
+			if pass, ok := u.User.Password(); ok {
+				parts = append(parts, pass)
+				// URLFields replaces the password with <hidden> before
+				// building url.full, so url.full no longer matches v verbatim.
+				sanitized := *u
+				sanitized.User = url.UserPassword(u.User.Username(), scrubbed)
+				parts = append(parts, sanitized.String())
+			}
+		}
+		return parts
+	}
+	if host, port, err := net.SplitHostPort(v); err == nil && host != "" {
+		if _, err := strconv.ParseUint(port, 10, 16); err == nil {
+			return []string{host}
+		}
+	}
+	return nil
 }
 
 // mergeScrubbers returns a Scrubber of the values of all of ss, or nil

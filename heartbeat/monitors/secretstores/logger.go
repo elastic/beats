@@ -18,6 +18,8 @@
 package secretstores
 
 import (
+	"errors"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -105,8 +107,8 @@ func (c *scrubbingCore) field(f zapcore.Field) (zapcore.Field, bool) {
 		if clean == msg {
 			return f, false
 		}
-		// Encoded as the error message would be.
-		return zap.String(f.Key, clean), true
+		// Keep ErrorType so ECS encoders still emit error.message as an object.
+		return zap.NamedError(f.Key, errors.New(clean)), true
 	default:
 		return f, false
 	}

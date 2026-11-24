@@ -18,11 +18,14 @@
 package secretstores
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
@@ -51,6 +54,36 @@ func TestRedactorLogger(t *testing.T) {
 	assert.Equal(t, "stdout: <hidden>", fields["line"], "the string field must not have the secret")
 	assert.Equal(t, "failed with <hidden>", fields["error"], "the error field must not have the secret")
 	assert.EqualValues(t, 3, fields["count"], "other fields must be kept")
+
+	var errField zapcore.Field
+	for _, f := range e.Context {
+		if f.Key == "error" {
+			errField = f
+			break
+		}
+	}
+	assert.Equal(t, zapcore.ErrorType, errField.Type, "scrubbed error field must keep ErrorType")
+}
+
+func TestRedactorLoggerErrorKeepsECSObject(t *testing.T) {
+	const secret = "s3cr3t-token"
+	var buf bytes.Buffer
+	enc := zapcore.NewJSONEncoder(ecszap.ECSCompatibleEncoderConfig(zapcore.EncoderConfig{
+		MessageKey: "message",
+		LevelKey:   "log.level",
+	}))
+	core := ecszap.WrapCore(zapcore.NewCore(enc, zapcore.AddSync(&buf), zapcore.DebugLevel))
+	base, err := logp.NewZapLogger(zap.New(core))
+	require.NoError(t, err, "the base logger must be created")
+
+	logger := redactorFor(secret).Logger(base)
+	logger.Errorw("request failed", zap.Error(errors.New("dial "+secret)))
+
+	var got map[string]any
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &got), "the log entry must be valid JSON")
+	errObj, ok := got["error"].(map[string]any)
+	require.True(t, ok, "error field must stay an ECS object, got %T", got["error"])
+	assert.Equal(t, "dial <hidden>", errObj["message"], "error.message must be scrubbed")
 }
 
 func TestRedactorLoggerKeepsLevel(t *testing.T) {

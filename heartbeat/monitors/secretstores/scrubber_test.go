@@ -23,9 +23,11 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/pkg/mapstr"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
@@ -175,4 +177,78 @@ func TestScrubberEventWithoutSecrets(t *testing.T) {
 
 	assert.Equal(t, mapstr.M{"url": mapstr.M{"full": "https://host/"}}, event.Fields, "the event must be left as is")
 	assert.Equal(t, fields, event.Fields, "the fields must not be copied without a secret")
+}
+
+// TestScrubberEventURLAndHostPortSecrets checks that secrets containing a full
+// URL or host:port don't leak through the split url.*, monitor.ip, or error
+// fields that Heartbeat derives from them.
+func TestScrubberEventURLAndHostPortSecrets(t *testing.T) {
+	t.Run("full URL with query and path", func(t *testing.T) {
+		const rawURL = "https://target.internal.example:8443/private/hook?k=v4lu3123&a=b"
+		u, err := url.Parse(rawURL)
+		require.NoError(t, err, "test URL must parse")
+
+		event := &beat.Event{Fields: mapstr.M{
+			"url": wraputil.URLFields(u),
+			"error": mapstr.M{
+				"message": `Get "` + rawURL + `": dial tcp: lookup target.internal.example: no such host`,
+			},
+		}}
+		scrubberFor(rawURL).Event(event)
+
+		assert.Equal(t, mapstr.M{
+			"url":   mapstr.M{"scheme": "https", "port": uint16(8443)},
+			"error": mapstr.M{"message": `Get "<hidden>": dial tcp: lookup <hidden>: no such host`},
+		}, event.Fields, "all URL parts derived from the secret URL must be scrubbed")
+	})
+
+	t.Run("full URL with userinfo", func(t *testing.T) {
+		u := &url.URL{
+			Scheme:   "https",
+			User:     url.UserPassword("myuser", "myvalue99"),
+			Host:     "target.internal.example",
+			Path:     "/private/hook",
+			RawQuery: "k=v4lu3123",
+		}
+		rawURL := u.String()
+
+		event := &beat.Event{Fields: mapstr.M{
+			"url":   wraputil.URLFields(u),
+			"error": mapstr.M{"message": "auth failed for myuser with myvalue99"},
+		}}
+		scrubberFor(rawURL).Event(event)
+
+		assert.Equal(t, mapstr.M{
+			"url":   mapstr.M{"scheme": "https", "port": uint16(443), "password": "<hidden>"},
+			"error": mapstr.M{"message": "auth failed for <hidden> with <hidden>"},
+		}, event.Fields, "userinfo, url.full, and split URL fields must be scrubbed")
+	})
+
+	t.Run("host:port endpoint", func(t *testing.T) {
+		for _, tc := range []struct {
+			name     string
+			endpoint string
+			host     string
+			full     string
+		}{
+			{name: "ipv4", endpoint: "10.0.0.5:5432", host: "10.0.0.5", full: "tcp://10.0.0.5:5432"},
+			{name: "hostname", endpoint: "db.internal.example:5432", host: "db.internal.example", full: "tcp://db.internal.example:5432"},
+			{name: "ipv6", endpoint: "[2001:db8::1]:5432", host: "2001:db8::1", full: "tcp://[2001:db8::1]:5432"},
+		} {
+			t.Run(tc.name, func(t *testing.T) {
+				event := &beat.Event{Fields: mapstr.M{
+					"monitor": mapstr.M{"ip": tc.host, "status": "down"},
+					"url":     mapstr.M{"full": tc.full, "domain": tc.host, "port": uint16(5432)},
+					"error":   mapstr.M{"message": "lookup " + tc.host + ": no such host"},
+				}}
+				scrubberFor(tc.endpoint).Event(event)
+
+				assert.Equal(t, mapstr.M{
+					"monitor": mapstr.M{"status": "down"},
+					"url":     mapstr.M{"full": "tcp://<hidden>", "port": uint16(5432)},
+					"error":   mapstr.M{"message": "lookup <hidden>: no such host"},
+				}, event.Fields, "host split from host:port secret must be scrubbed")
+			})
+		}
+	})
 }
