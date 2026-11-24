@@ -23,15 +23,15 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/paths"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/paths"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/lumberjack"
 )
 
@@ -310,8 +310,11 @@ func (f *graph) Devices(ctx context.Context, deltaLink string) ([]*fetcher.Devic
 			}
 			f.logger.Debugf("Got device %q from API", device.ID)
 
-			f.addRegistered(ctx, device, "registeredOwners", &device.RegisteredOwners)
-			f.addRegistered(ctx, device, "registeredUsers", &device.RegisteredUsers)
+			if !device.Deleted {
+				ownersOK := f.addRegistered(ctx, device, "registeredOwners", &device.RegisteredOwners)
+				usersOK := f.addRegistered(ctx, device, "registeredUsers", &device.RegisteredUsers)
+				device.RegisteredFetched = ownersOK && usersOK
+			}
 
 			devices = append(devices, device)
 		}
@@ -330,17 +333,20 @@ func (f *graph) Devices(ctx context.Context, deltaLink string) ([]*fetcher.Devic
 	}
 }
 
-// addRegistered adds registered owner or user UUIDs to the provided device.
-func (f *graph) addRegistered(ctx context.Context, device *fetcher.Device, typ string, set *collections.UUIDSet) {
+// addRegistered fetches registered owner or user UUIDs and adds them to set.
+// It returns true if the fetch completed without an unexpected error.
+func (f *graph) addRegistered(ctx context.Context, device *fetcher.Device, typ string, set *collections.UUIDSet) bool {
 	usersLink := fmt.Sprintf("%s/%s/%s", f.deviceOwnerUserURL, device.ID, typ) // ID here is the object ID.
 	users, _, err := f.Users(ctx, usersLink)
 	switch {
 	case err == nil, errors.Is(err, nextLinkLoopError{"users"}), errors.Is(err, missingLinkError{"users"}):
+		for _, u := range users {
+			set.Add(u.ID)
+		}
+		return true
 	default:
 		f.logger.Errorw("Failed to obtain some registered user data", "error", err)
-	}
-	for _, u := range users {
-		set.Add(u.ID)
+		return false
 	}
 }
 

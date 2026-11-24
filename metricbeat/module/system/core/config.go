@@ -23,8 +23,8 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/elastic-agent-libs/logp"
-	metrics "github.com/elastic/elastic-agent-system-metrics/metric/cpu"
+	"github.com/elastic/beats/v7/pkg/logp"
+	metrics "github.com/elastic/beats/v7/pkg/systemmetrics/metric/cpu"
 )
 
 // Core metric types.

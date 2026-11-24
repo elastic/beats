@@ -30,7 +30,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
@@ -122,7 +122,7 @@ func TestGetOpenMetricsEventsFromMetricFamily(t *testing.T) {
 				Metric: []*p.OpenMetric{
 					{
 						Summary: &p.Summary{
-							SampleCount: proto.Uint64(10),
+							SampleCount: proto.Float64(10),
 							SampleSum:   proto.Float64(10),
 							Quantile: []*p.Quantile{
 								{
@@ -166,12 +166,12 @@ func TestGetOpenMetricsEventsFromMetricFamily(t *testing.T) {
 				Metric: []*p.OpenMetric{
 					{
 						Histogram: &p.Histogram{
-							SampleCount: proto.Uint64(10),
+							SampleCount: proto.Float64(10),
 							SampleSum:   proto.Float64(10),
 							Bucket: []*p.Bucket{
 								{
 									UpperBound:      proto.Float64(0.99),
-									CumulativeCount: proto.Uint64(10),
+									CumulativeCount: proto.Float64(10),
 								},
 							},
 						},
@@ -299,7 +299,7 @@ func TestSkipMetricFamily(t *testing.T) {
 			Metric: []*p.OpenMetric{
 				{
 					Summary: &p.Summary{
-						SampleCount: proto.Uint64(10),
+						SampleCount: proto.Float64(10),
 						SampleSum:   proto.Float64(10),
 						Quantile: []*p.Quantile{
 							{
@@ -318,12 +318,12 @@ func TestSkipMetricFamily(t *testing.T) {
 			Metric: []*p.OpenMetric{
 				{
 					Histogram: &p.Histogram{
-						SampleCount: proto.Uint64(10),
+						SampleCount: proto.Float64(10),
 						SampleSum:   proto.Float64(10),
 						Bucket: []*p.Bucket{
 							{
 								UpperBound:      proto.Float64(0.99),
-								CumulativeCount: proto.Uint64(10),
+								CumulativeCount: proto.Float64(10),
 							},
 						},
 					},

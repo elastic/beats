@@ -12,8 +12,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	libversion "github.com/elastic/beats/v7/pkg/version"
 	"github.com/elastic/beats/v7/winlogbeat/module"
-	libversion "github.com/elastic/elastic-agent-libs/version"
 )
 
 // GenTemplateConfigCmd is the command used to export the elasticsearch template.

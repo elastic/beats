@@ -19,7 +19,7 @@
 
 package sysinit
 
-import "github.com/elastic/elastic-agent-libs/logp"
+import "github.com/elastic/beats/v7/pkg/logp"
 
 func InitModule(config string, logger *logp.Logger) {
 	// Stub method for non-linux.

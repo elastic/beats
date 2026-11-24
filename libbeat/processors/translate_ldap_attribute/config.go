@@ -20,7 +20,7 @@
 package translate_ldap_attribute
 
 import (
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 )
 
 type config struct {

@@ -25,11 +25,13 @@ import (
 	"sync"
 	"time"
 
+	"go.uber.org/zap"
+
 	"github.com/elastic/beats/v7/filebeat/input/filestream/internal/task"
 	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -246,7 +248,7 @@ func startHarvester(
 		}()
 
 		// We clone the logger here where we need it to avoid redundant copies that increase memory pressure.
-		ctx.Logger = ctx.Logger.With("source_file", srcID)
+		ctx.Logger = ctx.Logger.WithLazy(zap.String("source_file", srcID))
 
 		if restart {
 			// stop previous harvester

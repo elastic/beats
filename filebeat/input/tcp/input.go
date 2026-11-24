@@ -33,8 +33,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -103,7 +103,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	ctx.UpdateStatus(status.Configuring, "")
 
 	const pollInterval = time.Minute
-	metrics := netmetrics.NewTCP(ctx.ID, ctx.MetricsRegistry, s.config.Host, pollInterval, log)
+	metrics := netmetrics.NewTCP(ctx.ID, ctx.MetricsRegistry, s.config.Host, s.config.Network, pollInterval, log)
 	defer metrics.Close()
 
 	split, err := streaming.SplitFunc(s.Framing, []byte(s.LineDelimiter))

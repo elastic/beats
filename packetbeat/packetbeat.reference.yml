@@ -643,6 +643,14 @@ packetbeat.protocols:
 # This feature works on Linux and Windows.
 packetbeat.procs.enabled: false
 
+# The minimum time between full scans of process sockets for each
+# transport. On Linux a full scan reads the file descriptors of every process
+# on the host, so a lower value costs more CPU on busy hosts. Lookups that miss
+# within this time return no process. Lookups are always spaced by nine times
+# their own duration, so they take about a tenth of the time; the default (0)
+# adds no fixed minimum. A negative value disables both limits.
+#packetbeat.procs.max_proc_read_freq: 0
+
 # If you want to ignore transactions created by the server on which the shipper
 # is installed you can enable this option. This option is useful to remove
 # duplicates if shippers are installed on multiple servers. Default value is
@@ -1067,7 +1075,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -1215,7 +1223,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -1428,7 +1436,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -1607,7 +1615,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -1930,7 +1938,7 @@ setup.kibana:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -2183,7 +2191,7 @@ logging.files:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are

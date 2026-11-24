@@ -26,7 +26,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 
 	"github.com/stretchr/testify/assert"
 

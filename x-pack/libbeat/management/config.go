@@ -8,7 +8,7 @@ import (
 	"errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 )
 
 // Config for central management

@@ -25,7 +25,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // MetricMap defines the mapping from Prometheus metric to a Metricbeat field
@@ -223,7 +223,7 @@ func (m *commonMetric) GetValue(metric *OpenMetric) any {
 		value := mapstr.M{}
 		if !math.IsNaN(summary.GetSampleSum()) && !math.IsInf(summary.GetSampleSum(), 0) {
 			value["sum"] = summary.GetSampleSum()
-			value["count"] = summary.GetSampleCount()
+			value["count"] = uint64(summary.GetSampleCount())
 		}
 
 		quantiles := summary.GetQuantile()
@@ -247,15 +247,15 @@ func (m *commonMetric) GetValue(metric *OpenMetric) any {
 		value := mapstr.M{}
 		if !math.IsNaN(histogram.GetSampleSum()) && !math.IsInf(histogram.GetSampleSum(), 0) {
 			value["sum"] = histogram.GetSampleSum()
-			value["count"] = histogram.GetSampleCount()
+			value["count"] = uint64(histogram.GetSampleCount())
 		}
 
 		buckets := histogram.GetBucket()
 		bucketMap := mapstr.M{}
 		for _, bucket := range buckets {
-			if bucket.GetCumulativeCount() != uint64(math.NaN()) && bucket.GetCumulativeCount() != uint64(math.Inf(0)) {
+			if !math.IsNaN(bucket.GetCumulativeCount()) && !math.IsInf(bucket.GetCumulativeCount(), 0) {
 				key := strconv.FormatFloat(bucket.GetUpperBound(), 'f', -1, 64)
-				bucketMap[key] = bucket.GetCumulativeCount()
+				bucketMap[key] = uint64(bucket.GetCumulativeCount())
 			}
 		}
 

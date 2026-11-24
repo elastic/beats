@@ -27,8 +27,8 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // Server takes care of correctly starting the HTTP component of the API

@@ -22,7 +22,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/winlog"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 func osInputs(info beat.Info, log *logp.Logger, components statestore.States) []v2.Plugin {

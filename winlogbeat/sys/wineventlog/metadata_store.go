@@ -30,9 +30,9 @@ import (
 
 	"go.uber.org/multierr"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (

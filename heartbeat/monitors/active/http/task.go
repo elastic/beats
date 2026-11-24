@@ -33,13 +33,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
 
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
@@ -239,7 +239,7 @@ func execPing(
 
 	// Send the HTTP request. We don't immediately return on error since
 	// we may want to add additional fields to contextualize the error.
-	start, resp, errReason := execRequest(client, req)
+	start, resp, errReason := execRequest(client, req) //nolint:bodyclose // the body is closed by readBody, reached through processBody below
 	// If we have no response object or an error was set there probably was an IO error, we can skip the rest of the logic
 	// since that logic is for adding metadata relating to completed HTTP transactions that have errored
 	// in other ways

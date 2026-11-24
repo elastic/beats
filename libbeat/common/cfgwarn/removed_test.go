@@ -24,7 +24,7 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/pkg/config"
 )
 
 func TestRemovedSetting(t *testing.T) {

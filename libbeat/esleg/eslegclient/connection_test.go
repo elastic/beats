@@ -32,14 +32,14 @@ import (
 	"strings"
 	"testing"
 
-	cfg "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	cfg "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/libbeat/version"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 func TestAPIKeyEncoding(t *testing.T) {

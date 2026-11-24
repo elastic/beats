@@ -28,7 +28,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
 	vSphereClientUtil "github.com/elastic/beats/v7/metricbeat/module/vsphere/client"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere/security"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/object"

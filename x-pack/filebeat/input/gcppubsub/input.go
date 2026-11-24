@@ -30,11 +30,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/version"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/elastic-agent-libs/useragent"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
+	"github.com/elastic/beats/v7/pkg/useragent"
 )
 
 const (
@@ -359,6 +359,13 @@ func (in *pubsubInput) newPubsubClient(ctx context.Context) (*pubsub.Client, err
 			return nil, fmt.Errorf("cannot connect to alternative host %q: %w", in.AlternativeHost, err)
 		}
 		opts = append(opts, option.WithGRPCConn(conn), option.WithTelemetryDisabled())
+	}
+
+	if in.APIEndpoint != "" {
+		in.log.Infof("Configuring GCP Pub/Sub client with custom API endpoint: %s", in.APIEndpoint)
+		opts = append(opts, option.WithEndpoint(in.APIEndpoint))
+	} else {
+		in.log.Info("Configuring GCP Pub/Sub client with default Google Cloud API endpoint")
 	}
 
 	if in.CredentialsFile != "" {

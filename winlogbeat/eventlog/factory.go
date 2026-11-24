@@ -23,7 +23,7 @@ import (
 	"sort"
 	"strings"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 )
 
 // ConfigCommon is the common configuration data used to instantiate a new

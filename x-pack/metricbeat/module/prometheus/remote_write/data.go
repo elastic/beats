@@ -18,9 +18,9 @@ import (
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	rw "github.com/elastic/beats/v7/metricbeat/module/prometheus/remote_write"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus/collector"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -172,9 +172,8 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 			if err != nil {
 				continue
 			}
-			v := uint64(val)
 			b := &p.Bucket{
-				CumulativeCount: &v,
+				CumulativeCount: &val,
 				UpperBound:      &bucket,
 			}
 			hist, ok := histograms[histKey]

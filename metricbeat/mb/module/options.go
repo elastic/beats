@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // Option specifies some optional arguments used for configuring the behavior

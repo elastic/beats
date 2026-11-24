@@ -20,11 +20,12 @@ package config
 import (
 	"fmt"
 	"runtime"
+	"time"
 
 	"github.com/elastic/beats/v7/packetbeat/procs"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/go-ucfg"
 )
 
@@ -92,10 +93,7 @@ func (i agentInput) addProcessorsAndIndex(cfg *conf.C) (*conf.C, error) {
 }
 
 func mergeProcsConfig(one, two procs.ProcsConfig) procs.ProcsConfig {
-	maxProcReadFreq := one.MaxProcReadFreq
-	if two.MaxProcReadFreq > maxProcReadFreq {
-		maxProcReadFreq = two.MaxProcReadFreq
-	}
+	maxProcReadFreq := mergeMaxProcReadFreq(one.MaxProcReadFreq, two.MaxProcReadFreq)
 
 	refreshPidsFreq := one.RefreshPidsFreq
 	if two.RefreshPidsFreq < refreshPidsFreq {
@@ -108,6 +106,17 @@ func mergeProcsConfig(one, two procs.ProcsConfig) procs.ProcsConfig {
 		RefreshPidsFreq: refreshPidsFreq,
 		Monitored:       append(one.Monitored, two.Monitored...),
 	}
+}
+
+// mergeMaxProcReadFreq combines two max_proc_read_freq values. A negative
+// value disables the scan limit and wins over any other value; otherwise the
+// larger value wins. A plain max would turn a negative value into zero, which
+// adds no fixed limit.
+func mergeMaxProcReadFreq(one, two time.Duration) time.Duration {
+	if one < 0 || two < 0 {
+		return -1
+	}
+	return max(one, two)
 }
 
 // NewAgentConfig allows the packetbeat configuration to understand

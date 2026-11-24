@@ -18,16 +18,16 @@ import (
 	klogger "github.com/osquery/osquery-go/plugin/logger"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/proc"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pub"
-	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 var (
@@ -119,8 +119,11 @@ func (bt *osquerybeat) close() {
 		bt.cancel = nil
 	}
 
-	// Start watching the parent process.
-	// The beat exits if the process gets orphaned.
+	// Start watching the parent process only now, as a fallback for a
+	// shutdown that never completes (for example when the management client
+	// blocks after Elastic Agent has gone). The beat exits if the process
+	// gets orphaned. See https://github.com/elastic/beats/pull/31931 and
+	// https://github.com/elastic/elastic-agent/issues/556.
 	if bt.watcher != nil {
 		go bt.watcher.Run()
 		bt.watcher = nil

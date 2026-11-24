@@ -8,6 +8,8 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"flag"
 	"io"
@@ -25,10 +27,12 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	confpkg "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/beats/v7/testing/testutils"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/lumberjack"
 )
 
@@ -113,6 +117,35 @@ func Test_httpReadJSON(t *testing.T) {
 			wantStatus: http.StatusOK,
 		},
 		{
+			// An empty batch is a well-formed request with no events; it
+			// must not be treated as an error. See also the empty batch
+			// cases in Test_apiResponse.
+			name:       "empty array accepted",
+			body:       `[]`,
+			wantStatus: http.StatusOK,
+		},
+		{
+			name:       "nested empty array accepted",
+			body:       `[[]]`,
+			wantStatus: http.StatusOK,
+		},
+		{
+			name:       "array of non-objects accepted and dropped",
+			body:       `[1,null]`,
+			wantStatus: http.StatusOK,
+		},
+		{
+			name:       "whitespace only accepted",
+			body:       "  \n\t ",
+			wantStatus: http.StatusOK,
+		},
+		{
+			name:       "program returning empty array accepted",
+			body:       `{"records":[]}`,
+			program:    `obj.records.map(r, {"event": r})`,
+			wantStatus: http.StatusOK,
+		},
+		{
 			name: "numbers",
 			body: `{"a":1} [{"a":false},{"a":3.14}] {"a":-4}`,
 			wantObjs: []mapstr.M{
@@ -184,6 +217,19 @@ func Test_httpReadJSON(t *testing.T) {
 				t.Errorf("httpReadJSON() gotStatus = %v, want %v", gotStatus, tt.wantStatus)
 			}
 		})
+	}
+}
+
+func Test_httpReadJSONEmptyBody(t *testing.T) {
+	objs, status, err := httpReadJSON(http.NoBody, nil)
+	if !errors.Is(err, errBodyEmpty) {
+		t.Errorf("unexpected error: got:%v want:%v", err, errBodyEmpty)
+	}
+	if status != http.StatusNotAcceptable {
+		t.Errorf("unexpected status: got:%d want:%d", status, http.StatusNotAcceptable)
+	}
+	if objs != nil {
+		t.Errorf("unexpected objects: %v", objs)
 	}
 }
 
@@ -266,22 +312,6 @@ func Test_apiResponse(t *testing.T) {
 				c.OptionsHeaders = http.Header{
 					"optional-response-header": {"Optional-response-value"},
 				}
-				return c
-			}(),
-			request: func() *http.Request {
-				req := httptest.NewRequest(http.MethodOptions, "/", nil)
-				req.Header.Set("Content-Type", "application/json")
-				return req
-			}(),
-			events:       []mapstr.M{},
-			wantStatus:   http.StatusOK,
-			wantResponse: "",
-		},
-		{
-			name: "options_empty_headers",
-			conf: func() config {
-				c := defaultConfig()
-				c.OptionsHeaders = http.Header{}
 				return c
 			}(),
 			request: func() *http.Request {
@@ -515,6 +545,107 @@ func Test_apiResponse(t *testing.T) {
 			},
 			wantStatus:   http.StatusOK,
 			wantResponse: `{"message": "success"}`,
+		},
+		{
+			// empty_array is the primary regression test for SDH-7605. Without
+			// the fix, httptest.ResponseRecorder.WriteHeader panics with
+			// "invalid WriteHeader code 0".
+			name: "empty_array",
+			conf: defaultConfig(),
+			request: func() *http.Request {
+				req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", bytes.NewBufferString(`[]`))
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       nil,
+			wantStatus:   http.StatusOK,
+			wantResponse: `{"message": "success"}`,
+		},
+		{
+			name: "nested_empty_array",
+			conf: defaultConfig(),
+			request: func() *http.Request {
+				req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", bytes.NewBufferString(`[[]]`))
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       nil,
+			wantStatus:   http.StatusOK,
+			wantResponse: `{"message": "success"}`,
+		},
+		{
+			// Non-object array elements are dropped by decodeJSONArray, so
+			// this is a well-formed request that yields no events.
+			name: "array_of_non_objects",
+			conf: defaultConfig(),
+			request: func() *http.Request {
+				req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", bytes.NewBufferString(`[1,null]`))
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       nil,
+			wantStatus:   http.StatusOK,
+			wantResponse: `{"message": "success"}`,
+		},
+		{
+			name: "whitespace_only_body",
+			conf: defaultConfig(),
+			request: func() *http.Request {
+				req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", bytes.NewBufferString("  \n  "))
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       nil,
+			wantStatus:   http.StatusOK,
+			wantResponse: `{"message": "success"}`,
+		},
+		{
+			// The ACK path has its own call to sendResponse, so an empty
+			// batch must be covered there too.
+			name: "empty_array_wait_for_completion",
+			conf: defaultConfig(),
+			request: func() *http.Request {
+				req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/?wait_for_completion_timeout=1s", bytes.NewBufferString(`[]`))
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       nil,
+			wantStatus:   http.StatusOK,
+			wantResponse: `{"message": "success"}`,
+		},
+		{
+			// A request with no body at all is rejected, unlike a request
+			// whose body holds no events. httptest.NewRequestWithContext only
+			// yields http.NoBody when it is passed explicitly.
+			name: "no_body",
+			conf: defaultConfig(),
+			request: func() *http.Request {
+				req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", http.NoBody)
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       nil,
+			wantStatus:   http.StatusNotAcceptable,
+			wantResponse: `{"message":"body cannot be empty"}`,
+		},
+		{
+			// The empty body check must not be defeated by the body size
+			// limit wrapper.
+			name: "no_body_with_max_body_bytes",
+			conf: func() config {
+				c := defaultConfig()
+				n := int64(1 << 20)
+				c.MaxBodySize = &n
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", http.NoBody)
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       nil,
+			wantStatus:   http.StatusNotAcceptable,
+			wantResponse: `{"message":"body cannot be empty"}`,
 		},
 		{
 			name: "validate_CRC_request",
@@ -892,4 +1023,107 @@ func TestConcurrentRequestsExceedHighWater(t *testing.T) {
 	assert.Equal(t, http.StatusOK, slowReqStatus)
 	// The fast request should be rejected with 503 (in-flight was above high water).
 	assert.Equal(t, http.StatusServiceUnavailable, fastReqStatus)
+}
+
+func TestHMACMaxInFlightResponse(t *testing.T) {
+	// Unpack the configuration as the input does, so that derived
+	// defaults such as the in-flight water marks are set.
+	c := defaultConfig()
+	cfg, err := confpkg.NewConfigWithYAML([]byte(`
+hmac.header: Test-HMAC
+hmac.key: Test-HMAC-Key-Longer-Than-112-Bits
+hmac.type: sha256
+max_in_flight_bytes: 50
+retry_after: 7
+`), "hmac_max_in_flight")
+	if err != nil {
+		t.Fatalf("failed to parse YAML config: %v", err)
+	}
+	err = cfg.Unpack(&c)
+	if err != nil {
+		t.Fatalf("failed to unpack config: %v", err)
+	}
+
+	var pub publisher
+	metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+	h, ok := newHandler(t.Context(), c, nil, pub.Publish, nil, logptest.NewTestingLogger(t, ""), metrics).(*handler)
+	if !ok {
+		t.Fatal("newHandler did not return a *handler")
+	}
+
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", bytes.NewReader(make([]byte, 100)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Test-HMAC", hex.EncodeToString(make([]byte, sha256.Size)))
+	rec := httptest.NewRecorder()
+
+	h.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusServiceUnavailable {
+		t.Errorf("ServeHTTP() status = %d; want %d", rec.Code, http.StatusServiceUnavailable)
+	}
+	if got, want := rec.Header().Get("Retry-After"), "14"; got != want {
+		t.Errorf("ServeHTTP() Retry-After = %q; want %q", got, want)
+	}
+	if got, want := rec.Header().Get("Content-Type"), "application/json"; got != want {
+		t.Errorf("ServeHTTP() Content-Type = %q; want %q", got, want)
+	}
+	if got := h.inFlight.Load(); got != 0 {
+		t.Errorf("in-flight bytes after ServeHTTP() = %d; want 0", got)
+	}
+}
+
+// tallyReader counts the bytes read through it.
+type tallyReader struct {
+	r io.Reader
+	n int64
+}
+
+func (t *tallyReader) Read(p []byte) (int, error) {
+	n, err := t.r.Read(p)
+	t.n += int64(n)
+	return n, err
+}
+
+func TestHMACBodyLimitWithTracer(t *testing.T) {
+	c := defaultConfig()
+	cfg, err := confpkg.NewConfigWithYAML([]byte(`
+hmac.header: Test-HMAC
+hmac.key: Test-HMAC-Key-Longer-Than-112-Bits
+hmac.type: sha256
+tracer:
+  enabled: true
+  filename: `+filepath.Join(t.TempDir(), "trace.ndjson")+`
+`), "hmac_tracer")
+	if err != nil {
+		t.Fatalf("failed to parse YAML config: %v", err)
+	}
+	err = cfg.Unpack(&c)
+	if err != nil {
+		t.Fatalf("failed to unpack config: %v", err)
+	}
+
+	var pub publisher
+	metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+	h := newHandler(t.Context(), c, nil, pub.Publish, nil, logptest.NewTestingLogger(t, ""), metrics)
+
+	// The request is rejected as too large, and the request tracer must
+	// not then read the rest of what the client is sending.
+	body := &tallyReader{r: bytes.NewReader(make([]byte, hmacBodyLimit+10*maxLogBodyLen))}
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", body)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Test-HMAC", hex.EncodeToString(make([]byte, sha256.Size)))
+	rec := httptest.NewRecorder()
+
+	h.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusRequestEntityTooLarge {
+		t.Errorf("ServeHTTP() status = %d; want %d", rec.Code, http.StatusRequestEntityTooLarge)
+	}
+	// The validator reads one byte past its limit, and the tracer at most
+	// one byte past what it logs. The lower bound guards against the tally
+	// not counting, which would make the upper bound pass vacuously.
+	lo, hi := int64(hmacBodyLimit+1), int64(hmacBodyLimit+1+maxLogBodyLen+1)
+	if body.n < lo || body.n > hi {
+		t.Errorf("ServeHTTP() read %d bytes of the body; want between %d and %d", body.n, lo, hi)
+	}
 }

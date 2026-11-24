@@ -28,12 +28,13 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
 
 	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/go-sysinfo/types"
 	"github.com/elastic/gosigar"
 )
@@ -55,15 +56,12 @@ func procName(info types.ProcessInfo) string {
 var warnIPv6Once sync.Once
 
 // GetLocalPortToPIDMapping returns the list of local port numbers and the PID
-// that owns them.
-func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transport) (ports map[endpoint]int, err error) {
+// that owns them. It returns no mappings, without reading the file
+// descriptors of every process, when no open socket uses port.
+func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transport, port uint16) (ports map[endpoint]int, scanned bool, err error) {
 	sourceFiles, ok := procFiles[transport]
 	if !ok {
-		return nil, fmt.Errorf("unsupported transport protocol id: %d", transport)
-	}
-	var pids gosigar.ProcList
-	if err = pids.Get(); err != nil {
-		return nil, err
+		return nil, false, fmt.Errorf("unsupported transport protocol id: %d", transport)
 	}
 
 	proc.procLogger.Debug("getLocalPortsToPIDs()")
@@ -71,7 +69,7 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 	ipv4socks, err := socketsFromProc(sourceFiles.ipv4, false, proc.procLogger)
 	if err != nil {
 		proc.logger.Errorf("GetLocalPortToPIDMapping: parsing '%s': %s", sourceFiles.ipv4, err)
-		return nil, err
+		return nil, false, err
 	}
 
 	ipv6socks, err := socketsFromProc(sourceFiles.ipv6, true, proc.procLogger)
@@ -83,9 +81,25 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 			})
 		} else {
 			proc.logger.Errorf("GetLocalPortToPIDMapping: parsing '%s': %s", sourceFiles.ipv6, err)
-			return nil, err
+			return nil, false, err
 		}
 	}
+
+	// The socket table is much cheaper to read than every process's file
+	// descriptors. A socket that is not in it has closed or belongs to
+	// another network namespace, so the walk below could not find it.
+	if !hasSocket(ipv4socks, port) && !hasSocket(ipv6socks, port) {
+		if proc.isProcEnabled {
+			proc.procLogger.Debugf("No open %s socket on port %d, skipping process scan", transport, port)
+		}
+		return nil, false, nil
+	}
+
+	var pids gosigar.ProcList
+	if err = pids.Get(); err != nil {
+		return nil, false, err
+	}
+
 	socksMap := map[uint64]*socketInfo{}
 	for _, s := range ipv4socks {
 		socksMap[s.inode] = s
@@ -99,7 +113,8 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 		inodes, err := findSocketsOfPid("", pid, proc.procLogger)
 		if err != nil {
 			if os.IsNotExist(err) {
-				proc.logger.Infof("FindSocketsOfPid: %s", err)
+				// A process exiting during the scan is normal.
+				proc.procLogger.Debugf("FindSocketsOfPid: %s", err)
 			} else {
 				proc.logger.Errorf("FindSocketsOfPid: %s", err)
 			}
@@ -113,7 +128,17 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 		}
 	}
 
-	return ports, nil
+	return ports, true, nil
+}
+
+// hasSocket returns whether socks holds a socket on the local port that a
+// process can own. Sockets without an inode, such as TCP connections in
+// TIME_WAIT, belong to no process. The address is not compared, so that
+// sockets bound to a wildcard address are not missed.
+func hasSocket(socks []*socketInfo, port uint16) bool {
+	return slices.ContainsFunc(socks, func(s *socketInfo) bool {
+		return s.srcPort == port && s.inode != 0
+	})
 }
 
 var procFiles = map[applayer.Transport]struct {

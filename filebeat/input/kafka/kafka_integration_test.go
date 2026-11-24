@@ -32,11 +32,12 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/beats/v7/testing/testutils"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -458,13 +459,13 @@ func TestTest(t *testing.T) {
 		"group_id": "filebeat",
 	})
 
-	inp, err := Plugin(logptest.NewTestingLogger(t, "")).Manager.Create(config)
+	inp, err := Plugin(logp.NewNopLogger()).Manager.Create(config)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	err = inp.Test(v2.TestContext{
-		Logger: logptest.NewTestingLogger(t, "kafka_test"),
+		Logger: logp.NewNopLogger(),
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -690,8 +691,9 @@ func newV2Context() (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
 	logger, _ := logp.NewDevelopmentLogger("kafka_test")
 	return v2.Context{
-		Logger:      logger,
-		ID:          "test_id",
-		Cancelation: ctx,
+		Logger:          logger,
+		ID:              "test_id",
+		Cancelation:     ctx,
+		MetricsRegistry: monitoring.NewRegistry(),
 	}, cancel
 }

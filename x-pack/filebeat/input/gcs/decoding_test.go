@@ -19,8 +19,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // all test files are read from the "testdata" directory
@@ -93,6 +93,15 @@ func TestDecoding(t *testing.T) {
 			}
 
 			events := p.events
+
+			ids := make(map[any]struct{}, len(events))
+			for _, event := range events {
+				ids[event.Meta["_id"]] = struct{}{}
+			}
+			assert.Len(t, ids, len(events), "events from the same object must have unique IDs")
+			if tc.numEvents != 0 {
+				assert.Len(t, events, tc.numEvents, "unexpected number of events")
+			}
 			if tc.assertAgainst != "" {
 				targetData := readJSONFromFile(t, filepath.Join(testDataPath, tc.assertAgainst))
 				assert.Equal(t, len(targetData), len(events))

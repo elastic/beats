@@ -2713,7 +2713,7 @@ filebeat.inputs:
   # Configure cipher suites to be used for SSL connections.
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites.
+  # Configure curve types for TLS key exchange.
   #ssl.curve_types: []
 
   # Configure what types of client authentication are supported. Valid options
@@ -2851,7 +2851,7 @@ filebeat.inputs:
     # Configure cipher suites to be used for SSL connections.
     #ssl.cipher_suites: []
 
-    # Configure curve types for ECDHE based cipher suites.
+    # Configure curve types for TLS key exchange.
     #ssl.curve_types: []
 
     # Configure what types of client authentication are supported. Valid options
@@ -3004,6 +3004,9 @@ filebeat.inputs:
   # Path to a JSON file containing the credentials and key used to subscribe.
   credentials_file: ${path.config}/my-pubsub-subscriber-credentials.json
 
+  # Optional API endpoint to override the default Google Cloud Pub/Sub endpoint.
+  #api_endpoint: custom-pubsub-endpoint.googleapis.com:443
+
 #------------------------------ AWS S3 input --------------------------------
 # Beta: Config options for AWS S3 input
 #- type: aws-s3
@@ -3047,7 +3050,7 @@ filebeat.inputs:
   #access_point_arn: arn:aws:s3:us-east-1:123456789:accesspoint/my-accesspoint
 
   # Bucket Name used for polling non-AWS S3 buckets
-  # Note: `region` is required when non_aws_bucket_name is given.
+  # Note: `region` or `default_region` is required when non_aws_bucket_name is given.
   #non_aws_bucket_name: test-s3-bucket
 
   # Configures the AWS S3 API to use path style instead of virtual host style (default)
@@ -3701,7 +3704,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -3849,7 +3852,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -4062,7 +4065,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -4241,7 +4244,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -4564,7 +4567,7 @@ setup.kibana:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -4817,7 +4820,7 @@ logging.files:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE-based cipher suites
+  # Configure curve types for TLS key exchange
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are

@@ -13,7 +13,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // newClientSecretCredential creates a new client secret credential(Oauth2).
@@ -35,6 +35,9 @@ func newClientSecretCredential(config *azureInputConfig, log *logp.Logger) (azco
 		ClientOptions: azcore.ClientOptions{
 			Cloud: getAzureCloud(config.AuthorityHost),
 		},
+	}
+	if httpClient := proxyHTTPClient(config.Proxy); httpClient != nil {
+		credentialOptions.Transport = httpClient
 	}
 
 	// Create the credential

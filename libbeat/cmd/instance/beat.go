@@ -64,22 +64,21 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/version"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/file"
-
-	"github.com/elastic/elastic-agent-libs/keystore"
-	kbn "github.com/elastic/elastic-agent-libs/kibana"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/configure"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/monitoring/report/buffer"
-	"github.com/elastic/elastic-agent-libs/paths"
-	svc "github.com/elastic/elastic-agent-libs/service"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
-	libversion "github.com/elastic/elastic-agent-libs/version"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/host"
-	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/file"
+	"github.com/elastic/beats/v7/pkg/keystore"
+	kbn "github.com/elastic/beats/v7/pkg/kibana"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/configure"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
+	"github.com/elastic/beats/v7/pkg/monitoring/report/buffer"
+	"github.com/elastic/beats/v7/pkg/paths"
+	svc "github.com/elastic/beats/v7/pkg/service"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/host"
+	metricreport "github.com/elastic/beats/v7/pkg/systemmetrics/report"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
+	libversion "github.com/elastic/beats/v7/pkg/version"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 	"github.com/elastic/go-ucfg"
@@ -189,6 +188,7 @@ func Run(settings Settings, bt beat.Creator) error {
 	return handleError(func() error {
 		defer func() {
 			if r := recover(); r != nil {
+				//nolint:forbidigo // top-level panic handler in Run; no *logp.Logger is in scope here.
 				logp.NewLogger(settings.Name).Fatalw("Failed due to panic.",
 					"panic", r, zap.Stack("stack"))
 			}
@@ -770,10 +770,10 @@ func (b *Beat) configure(settings Settings) error {
 
 	b.Monitoring = beat.NewGlobalMonitoring()
 
-	if err := InitPaths(cfg); err != nil {
+	b.Info.Paths, err = InitPaths(cfg)
+	if err != nil {
 		return err
 	}
-	b.Info.Paths = paths.Paths
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
@@ -803,7 +803,7 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error unpacking config data: %w", err)
 	}
 
-	b.Info.Logger, err = configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType)
+	b.Info.Logger, err = configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, b.Info.Paths, logp.TypeKey, logp.EventType)
 	if err != nil {
 		return fmt.Errorf("error initializing logging: %w", err)
 	}
@@ -1446,7 +1446,7 @@ func isElasticsearchOutput(name string) bool {
 	return name == "elasticsearch"
 }
 
-func InitPaths(cfg *config.C) error {
+func InitPaths(cfg *config.C) (*paths.Path, error) {
 	// To Fix the chicken-egg problem with the Keystore and the loading of the configuration
 	// files we are doing a partial unpack of the configuration file and only take into consideration
 	// the paths field. After we will unpack the complete configuration and keystore reference
@@ -1456,13 +1456,14 @@ func InitPaths(cfg *config.C) error {
 	}{}
 
 	if err := cfg.Unpack(&partialConfig); err != nil {
-		return fmt.Errorf("error extracting default paths: %w", err)
+		return nil, fmt.Errorf("error extracting default paths: %w", err)
 	}
 
-	if err := paths.InitPaths(&partialConfig.Path); err != nil {
-		return fmt.Errorf("error setting default paths: %w", err)
+	p := paths.New()
+	if err := p.InitPaths(&partialConfig.Path); err != nil {
+		return nil, fmt.Errorf("error setting default paths: %w", err)
 	}
-	return nil
+	return p, nil
 }
 
 // every IP address received from `Info()` has a netmask suffix

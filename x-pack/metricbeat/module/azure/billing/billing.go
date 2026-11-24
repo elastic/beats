@@ -12,8 +12,8 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // init registers the MetricSet with the central registry as soon as the program

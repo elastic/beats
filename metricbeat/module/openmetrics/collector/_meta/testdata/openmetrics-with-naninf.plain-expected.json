@@ -1,0 +1,206 @@
+[
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:41121",
+                "job": "openmetrics",
+                "le": "1"
+            },
+            "metrics": {
+                "http_request_duration_seconds_bucket": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:41121",
+                "job": "openmetrics",
+                "le": "5"
+            },
+            "metrics": {
+                "http_request_duration_seconds_bucket": 3
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "help": "request duration histogram",
+            "labels": {
+                "instance": "127.0.0.1:41121",
+                "job": "openmetrics"
+            },
+            "metrics": {
+                "http_request_duration_seconds_count": 3,
+                "http_request_duration_seconds_sum": 6
+            },
+            "type": "histogram"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:41121",
+                "job": "openmetrics",
+                "le": "+Inf"
+            },
+            "metrics": {
+                "http_request_duration_seconds_bucket": 3
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:41121",
+                "job": "openmetrics"
+            },
+            "metrics": {
+                "up": 1
+            },
+            "type": "gauge"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:41121",
+                "job": "openmetrics",
+                "le": "2"
+            },
+            "metrics": {
+                "http_request_duration_seconds_bucket": 2
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:41121",
+                "job": "openmetrics",
+                "le": "3"
+            },
+            "metrics": {
+                "http_request_duration_seconds_bucket": 3
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "help": "Total number of connections opened to the listener of a given name.",
+            "labels": {
+                "instance": "127.0.0.1:41121",
+                "job": "openmetrics",
+                "listener_name": "http"
+            },
+            "metrics": {
+                "net_conntrack_listener_conn_accepted_total": 3
+            },
+            "type": "counter"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    }
+]

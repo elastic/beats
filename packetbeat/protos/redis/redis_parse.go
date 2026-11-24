@@ -23,7 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 type parser struct {
@@ -348,6 +348,12 @@ func (p *parser) parseString(buf *streambuf.Buffer) (common.NetString, bool, boo
 		return empty, false, false
 	}
 
+	// RESP defines -1 as nil (handled above). Other negative lengths
+	// are malformed and can cause invalid slice bounds in CollectWithSuffix.
+	if length < 0 {
+		return empty, false, false
+	}
+
 	content, err := buf.CollectWithSuffix(int(length), []byte("\r\n"))
 	if err != nil {
 		if err != streambuf.ErrNoMoreBytes {
@@ -380,8 +386,10 @@ func (p *parser) parseArray(depth int, buf *streambuf.Buffer) (common.NetString,
 		p.logger.Errorf("Failed to read number of bulk messages: %s", err)
 		return empty, false, false, false
 	}
+	// RESP defines *-1 as nil (handled above). Other negative lengths
+	// are malformed and must be rejected, matching bulk-string handling.
 	if count < 0 {
-		return nilStr, false, true, true
+		return empty, false, false, false
 	} else if count == 0 {
 		// should not happen, but handle just in case ParseInt did return 0
 		return emptyArr, false, true, true

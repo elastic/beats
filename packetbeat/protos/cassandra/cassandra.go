@@ -21,8 +21,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
@@ -110,7 +110,7 @@ func (cassandra *cassandra) setFromConfig(config *cassandraConfig) error {
 
 	// set parser's compressor, only `snappy` supported right now
 	if config.Compressor == gocql.Snappy {
-		parser.compressor = gocql.SnappyCompressor{}
+		parser.compressor = gocql.SnappyCompressor{MaxDecodedLen: parser.maxBytes}
 	} else {
 		parser.compressor = nil
 	}

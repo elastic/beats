@@ -27,7 +27,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/mattn/go-colorable"
 
-	libtesting "github.com/elastic/elastic-agent-libs/testing"
+	libtesting "github.com/elastic/beats/v7/pkg/testing"
 )
 
 // ConsoleDriver outputs test result to the given stdout/stderr descriptors

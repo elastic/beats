@@ -1,4 +1,5 @@
 import os
+import re
 import time
 import unittest
 import platform
@@ -16,8 +17,12 @@ def is_root():
 
 
 def is_version_below(version, target):
-    t = list(map(int, target.split('.')))
-    v = list(map(int, version.split('.')))
+    # Keep the leading dotted digits of a release such as 6.17.9+deb14-amd64,
+    # e.g. [6, 17, 9]
+    def parse(s):
+        return [int(x) for x in re.match(r'[\d.]*\d', s).group().split('.')]
+    t = parse(target)
+    v = parse(version)
     v += [0] * (len(t) - len(v))
     for i in range(len(t)):
         if v[i] != t[i]:
@@ -80,8 +85,8 @@ def wrap_except(expr):
 
 
 class Test(BaseTest):
-    def wait_output(self, min_events):
-        self.wait_until(lambda: wrap_except(lambda: len(self.read_output()) >= min_events))
+    def wait_output(self, min_events, max_timeout=20):
+        self.wait_until(lambda: wrap_except(lambda: len(self.read_output()) >= min_events), max_timeout=max_timeout)
         # wait for the number of lines in the file to stay constant for 10 seconds
         prev_lines = -1
         print(f"starting  wait_output with min_events: {min_events}")
@@ -94,10 +99,39 @@ class Test(BaseTest):
             else:
                 break
 
+    def wait_file_event(self, path, action, after=0, size=None, mode=None):
+        """
+        Waits for an event with the given action for path among the output
+        events after the first `after`. If given, file.size must equal size
+        and the permission bits of file.mode must equal mode.
+        """
+        def matches(event):
+            actions = event.get("event.action", [])
+            if isinstance(actions, str):
+                actions = [actions]
+            if event.get("file.path") != path or action not in actions:
+                return False
+            if size is not None and event.get("file.size") != size:
+                return False
+            # Mask to the permission bits so the check does not depend on
+            # whether a backend reports the full st_mode.
+            if mode is not None and int(event.get("file.mode", "0"), 8) & 0o7777 != mode:
+                return False
+            return True
+
+        self.wait_until(
+            lambda: wrap_except(
+                lambda: any(matches(event) for event in self.read_output()[after:])
+            ),
+            max_timeout=20,
+            name="file_event",
+            err_msg=f"Expected {action} for {path} (size={size}, mode={mode})",
+        )
+
     def wait_startup(self, backend, dir):
         if backend == "ebpf":
             self.wait_log_contains("started ebpf watcher", max_timeout=90, ignore_case=True)
-        if backend == "kprobes":
+        elif backend == "kprobes":
             self.wait_log_contains("Started kprobes watcher", max_timeout=90, ignore_case=True)
         else:
             # wait until the directories to watch are printed in the logs
@@ -148,7 +182,8 @@ class Test(BaseTest):
 
             # wait until file1 is reported before deleting. Otherwise the hash
             # might not be calculated
-            self.wait_log_contains("\"path\":\"{0}\"".format(escape_path(file1)), ignore_case=True)
+            timeout = 30 if backend in ("kprobes", "ebpf") else 10
+            self.wait_log_contains("\"path\":\"{0}\"".format(escape_path(file1)), ignore_case=True, max_timeout=timeout)
 
             os.unlink(file1)
 
@@ -195,7 +230,6 @@ class Test(BaseTest):
         self._test_non_recursive("fsnotify")
 
     @unittest.skipUnless(is_root(), "Requires root")
-    @unittest.skip("Flaky test: https://github.com/elastic/beats/issues/46719")
     def test_non_recursive__ebpf(self):
         self._test_non_recursive("ebpf")
 
@@ -244,9 +278,11 @@ class Test(BaseTest):
             self.create_file(file2, "")
 
             if backend == "fsnotify" or backend == "kprobes":
-                self.wait_output(4)
+                timeout = 30 if backend == "kprobes" else 20
+                self.wait_output(4, max_timeout=timeout)
                 self.wait_until(lambda: any(
-                    'file.path' in obj and obj['file.path'].lower() == subdir2.lower() for obj in self.read_output()))
+                    'file.path' in obj and obj['file.path'].lower() == subdir2.lower() for obj in self.read_output()),
+                    max_timeout=timeout)
             else:
                 # ebpf backend doesn't catch directory creation
                 self.wait_output(2)
@@ -276,7 +312,6 @@ class Test(BaseTest):
         self._test_recursive("fsnotify")
 
     @unittest.skipUnless(is_root(), "Requires root")
-    @unittest.skip("Flaky test: https://github.com/elastic/beats/issues/46719")
     def test_recursive__ebpf(self):
         self._test_recursive("ebpf")
 
@@ -308,31 +343,32 @@ class Test(BaseTest):
             proc = self.start_beat()
             self.wait_startup(backend, dirs[0])
 
+            # Wait for each operation's resulting file state rather than for an
+            # event count: some kernels report extra attributes_modified events
+            # (e.g. on create with the ebpf backend).
+
             # Event 1: file create
             f = os.path.join(dirs[0], f'file_{backend}.txt')
             self.create_file(f, "hello world!")
-
-            # Wait for file creation to be reported
-            self.wait_output(1)
+            self.wait_file_event(f, "created", size=12)
 
             # Event 2: chmod
+            count = len(self.read_output())
             os.chmod(f, 0o777)
-
-            # Wait for mode change to be reported
-            self.wait_output(2)
+            self.wait_file_event(f, "attributes_modified", after=count, mode=0o777)
 
             with open(f, "w") as fd:
                 # Event 3: write
+                count = len(self.read_output())
                 fd.write("data")
                 fd.flush()
-                # Wait for write to be reported
-                self.wait_output(3)
+                self.wait_file_event(f, "updated", after=count, size=4)
 
                 # Event 4: truncate
+                count = len(self.read_output())
                 fd.truncate(0)
                 fd.flush()
-                # Wait for truncate to be reported
-                self.wait_output(4)
+                self.wait_file_event(f, "updated", after=count, size=0)
 
             proc.check_kill_and_wait()
             self.assert_no_logged_warnings()
@@ -348,7 +384,6 @@ class Test(BaseTest):
 
     @unittest.skipIf(platform.system() != 'Linux', 'Non linux, skipping.')
     @unittest.skipUnless(is_root(), "Requires root")
-    @unittest.skip("Flaky test: https://github.com/elastic/beats/issues/46719")
     def test_file_modified__ebpf(self):
         self._test_file_modified("ebpf")
 

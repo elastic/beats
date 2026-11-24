@@ -30,7 +30,7 @@ import (
 	"sync"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 type journalctl struct {

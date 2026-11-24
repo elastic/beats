@@ -36,10 +36,10 @@ import (
 	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/testing/estools"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/testing/estools"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 	"github.com/elastic/mock-es/pkg/api"
@@ -488,8 +488,6 @@ exporters:
       enabled: true
       batch:
         flush_timeout: 1s
-    mapping:
-      mode: bodymap
 service:
   pipelines:
     logs:
@@ -907,6 +905,12 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 				// Request-level failures: entire HTTP request fails with the specified status code
 				var attemptCount atomic.Int64
 				mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+					// Only fail bulk requests, so that other requests made by the exporter
+					// (e.g. version detection at startup) do not consume the failure budget.
+					if !strings.HasSuffix(r.URL.Path, "/_bulk") {
+						baseHandler.ServeHTTP(w, r)
+						return
+					}
 					currentAttempt := attemptCount.Add(1)
 
 					// For retryable status codes (429, 503), fail for failuresPerEvent times, then forward to deterministic handler

@@ -14,7 +14,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 
 	"cloud.google.com/go/pubsub"
 	"golang.org/x/oauth2/google"
@@ -41,6 +41,9 @@ type config struct {
 
 	// JSON blob containing authentication credentials and key.
 	CredentialsJSON common.JSONBlob `config:"credentials_json"`
+
+	// Pub/Sub API endpoint to override the default Google Cloud Pub/Sub endpoint.
+	APIEndpoint string `config:"api_endpoint"`
 
 	// Overrides the default Pub/Sub service address and disables TLS. For testing.
 	AlternativeHost string `config:"alternative_host"`

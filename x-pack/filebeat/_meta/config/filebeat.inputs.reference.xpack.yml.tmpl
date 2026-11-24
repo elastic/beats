@@ -63,6 +63,9 @@
   # Path to a JSON file containing the credentials and key used to subscribe.
   credentials_file: ${path.config}/my-pubsub-subscriber-credentials.json
 
+  # Optional API endpoint to override the default Google Cloud Pub/Sub endpoint.
+  #api_endpoint: custom-pubsub-endpoint.googleapis.com:443
+
 #------------------------------ AWS S3 input --------------------------------
 # Beta: Config options for AWS S3 input
 #- type: aws-s3
@@ -106,7 +109,7 @@
   #access_point_arn: arn:aws:s3:us-east-1:123456789:accesspoint/my-accesspoint
 
   # Bucket Name used for polling non-AWS S3 buckets
-  # Note: `region` is required when non_aws_bucket_name is given.
+  # Note: `region` or `default_region` is required when non_aws_bucket_name is given.
   #non_aws_bucket_name: test-s3-bucket
 
   # Configures the AWS S3 API to use path style instead of virtual host style (default)

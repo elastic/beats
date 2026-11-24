@@ -25,8 +25,8 @@ import (
 	"regexp"
 
 	"github.com/elastic/beats/v7/libbeat/mapping"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/version"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/version"
 )
 
 type IndexPatternGenerator struct {

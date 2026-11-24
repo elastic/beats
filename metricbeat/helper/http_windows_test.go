@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/api/npipe"
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 func TestOverNamedpipe(t *testing.T) {

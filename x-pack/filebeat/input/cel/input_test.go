@@ -32,11 +32,11 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/paths"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
+	"github.com/elastic/beats/v7/pkg/paths"
 )
 
 var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints")
@@ -2262,6 +2262,29 @@ var inputTests = []struct {
  | .........................................................^`,
 				},
 			},
+		},
+	},
+
+	{
+		name: "empty_events_not_retained",
+		config: map[string]any{
+			"interval": 1,
+			// The first evaluation returns an empty events array and asks
+			// for another evaluation. The second reports whether the empty
+			// array was left in state.
+			"program": `int(state.n).as(n, {
+							"events":    n == 0 ? [] : [{"had_events": has(state.events)}],
+							"n":         n+1,
+							"want_more": n == 0,
+						})`,
+			"state": map[string]any{"n": 0},
+			"resource": map[string]any{
+				"url": "",
+			},
+		},
+		time: func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
+		want: []map[string]any{
+			{"had_events": false},
 		},
 	},
 

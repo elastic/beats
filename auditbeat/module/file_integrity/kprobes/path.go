@@ -263,7 +263,8 @@ func (r *pTraverser) waitForWalk(ctx context.Context) error {
 		return nil
 	}
 
-	r.waitQueueChan = make(chan struct{})
+	waitCh := make(chan struct{})
+	r.waitQueueChan = waitCh
 	r.mtx.Unlock()
 
 	select {
@@ -273,8 +274,9 @@ func (r *pTraverser) waitForWalk(ctx context.Context) error {
 	// ctx of walk is done
 	case <-ctx.Done():
 		return ctx.Err()
-	// statQueue is empty
-	case <-r.waitQueueChan:
+	// statQueue is empty; use the local so the select does not race with
+	// GetMonitorPath's concurrent write of waitQueueChan = nil.
+	case <-waitCh:
 		return nil
 	// timeout
 	case <-time.After(r.sMatchTimeout):

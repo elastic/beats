@@ -23,7 +23,7 @@ import (
 
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/pkg/config"
 )
 
 func checkRemovedSettings(cfg *config.C, settings ...string) error {
