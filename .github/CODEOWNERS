@@ -145,6 +145,7 @@ changelog/fragments/
 /x-pack/filebeat/input/internal/dpop @elastic/security-service-integrations
 /x-pack/filebeat/input/internal/httplog @elastic/security-service-integrations
 /x-pack/filebeat/input/internal/httpmon @elastic/security-service-integrations
+/x-pack/filebeat/input/internal/jwtauth @elastic/security-service-integrations
 /x-pack/filebeat/input/internal/private @elastic/security-service-integrations
 /x-pack/filebeat/input/lumberjack/ @elastic/security-service-integrations
 /x-pack/filebeat/input/netflow/ @elastic/security-service-integrations
