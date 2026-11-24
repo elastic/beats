@@ -23,6 +23,7 @@ import (
 	"errors"
 	"maps"
 	"strings"
+	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -45,10 +46,17 @@ const fakePrefix = "fake:"
 
 var errFakeUnavailable = errors.New("fake: store unavailable")
 
+var fakeStoreCloses atomic.Int64
+
 // fakeStore replaces top-level "fake:<name>" values by "<id>-<name>".
 type fakeStore struct {
 	id   string
 	fail bool
+}
+
+func (s *fakeStore) Close() error {
+	fakeStoreCloses.Add(1)
+	return nil
 }
 
 func (s *fakeStore) Validate(cfg *conf.C, scope Scope) error {
@@ -157,8 +165,9 @@ func fakeStores(extra ...map[string]any) []any {
 func resetSharedStores(t *testing.T) {
 	t.Helper()
 	sharedStores.mu.Lock()
-	sharedStores.stores = map[string]Store{}
+	sharedStores.stores = map[string]*cachedStore{}
 	sharedStores.mu.Unlock()
+	fakeStoreCloses.Store(0)
 }
 
 func sharedStoreCount() int {
