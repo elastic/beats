@@ -429,3 +429,19 @@ steps:
     concurrency_group: "dra-gate-staging-$BUILDKITE_BRANCH"
     concurrency: 1
     key: end-gate-staging
+
+  - wait: ~
+
+  - label: ":wastebasket: Delete build artifacts"
+    key: "delete_build_artifacts"
+    if: build.env('RUN_SNAPSHOT') == "true" || build.env('RUN_STAGING') == "true" || build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main'
+    command: "true"
+    plugins:
+      - elastic/vault-secrets#v0.1.1:
+          path: "kv/ci-shared/manage-buildkite-artifacts/delete"
+          field: "token"
+          env_var: "BUILDKITE_API_TOKEN"
+      - elastic/delete-build-artifacts#v0.1.0:
+          continue-on-error: true
+    agents:
+      provider: k8s
