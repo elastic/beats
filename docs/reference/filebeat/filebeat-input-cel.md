@@ -25,6 +25,7 @@ This input supports:
     * {applies_to}`stack: ga 9.3.0` File
     * OAuth2
     * {applies_to}`stack: ga 9.3.0` AWS
+    * {applies_to}`stack: ga 9.7.0` JWT
 
 * Retrieval at a configurable interval
 * Pagination
@@ -350,8 +351,9 @@ Additionally, it supports authentication via:
 * file-based headers {applies_to}`stack: ga 9.3+`
 * token authentication {applies_to}`stack: ga 9.1+`
 * AWS Authentication {applies_to}`stack: ga 9.3+`
+* JWT authentication {applies_to}`stack: ga 9.7.0`
 
-As described in Mito's [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP) documentation, configuration for Basic Authentication or token authentication will only affect direct HEAD, GET and POST method calls, not explicity constructed requests run with `.do_request()`. Configuration for Digest Authentication, file-based headers or OAuth2 will be used for all requests made from CEL.
+As described in Mito's [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP) documentation, configuration for Basic Authentication or token authentication will only affect direct HEAD, GET and POST method calls, not explicity constructed requests run with `.do_request()`. Configuration for Digest Authentication, file-based headers, OAuth2 or JWT authentication will be used for all requests made from CEL.
 
 Example configurations with authentication:
 
