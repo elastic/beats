@@ -414,26 +414,16 @@ func (l *listFromFieldReader) Next() (reader.Message, error) {
 	// ConsumeClaim, and the next message that yields events will advance the
 	// committed offset past any skipped zero-event messages once acknowledged.
 	for len(l.buffer) == 0 {
-		msg, ok, timedOut := l.recv(l.claim.Messages())
-		if timedOut {
-			return reader.Message{}, reader.ErrReadDeadline
-		}
+		msg, ok := <-l.claim.Messages()
 		if !ok {
 			return reader.Message{}, io.EOF
 		}
 
-<<<<<<< HEAD
-	msg, ok := <-l.claim.Messages()
-	if !ok {
-		return reader.Message{}, io.EOF
-	}
-=======
 		messages := l.parseMultipleMessages(msg.Value)
 		if len(messages) == 0 {
 			continue
 		}
 		timestamp, kafkaFields := composeEventMetadata(l.claim, l.groupHandler, msg)
->>>>>>> d11e228 (fix(kafka): skip messages yielding zero events without panicking (#54902))
 
 		neededAcks := atomic.Int64{}
 		neededAcks.Add(int64(len(messages)))

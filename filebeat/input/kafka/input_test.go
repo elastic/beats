@@ -30,6 +30,7 @@ import (
 	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/sarama"
 )
 
 func TestNewInputDone(t *testing.T) {
