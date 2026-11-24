@@ -23,7 +23,7 @@ import (
 	"maps"
 	"os"
 
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 
 	"github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/cfgutil"

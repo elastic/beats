@@ -13,7 +13,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v2"
 
 	"github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/mapstr"

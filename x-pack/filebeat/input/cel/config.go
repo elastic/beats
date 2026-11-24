@@ -13,7 +13,7 @@ import (
 	"regexp"
 	"time"
 
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
