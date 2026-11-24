@@ -30,9 +30,6 @@ import (
 )
 
 func TestNewMetadata(t *testing.T) {
-	// Can be removed after https://github.com/elastic/beats/issues/37701 is solved
-	skipOnBuildkiteDarwin(t, "Group check")
-
 	f, err := os.CreateTemp(t.TempDir(), "metadata")
 	if err != nil {
 		t.Fatal(err)
@@ -44,6 +41,7 @@ func TestNewMetadata(t *testing.T) {
 	}
 	require.NoError(t, f.Sync())
 	f.Close()
+	setPrimaryGroup(t, f.Name())
 
 	info, err := os.Lstat(f.Name())
 	if err != nil {
@@ -98,9 +96,6 @@ func TestNewMetadata(t *testing.T) {
 }
 
 func TestSetUIDSetGIDBits(t *testing.T) {
-	// Can be removed after https://github.com/elastic/beats/issues/37701 is solved
-	skipOnBuildkiteDarwin(t, "Wheel permission issue")
-
 	f, err := os.CreateTemp(t.TempDir(), "setuid")
 	if err != nil {
 		t.Fatal(err)
@@ -112,6 +107,7 @@ func TestSetUIDSetGIDBits(t *testing.T) {
 	}
 	require.NoError(t, f.Sync())
 	f.Close()
+	setPrimaryGroup(t, f.Name())
 
 	info, err := os.Lstat(f.Name())
 	if err != nil {
@@ -133,7 +129,7 @@ func TestSetUIDSetGIDBits(t *testing.T) {
 	for _, flags := range []os.FileMode{
 		0o600 | os.ModeSetuid,
 		0o600 | os.ModeSetgid,
-		0o600 | os.ModeSetuid | os.ModeSetuid,
+		0o600 | os.ModeSetuid | os.ModeSetgid,
 	} {
 		msg := fmt.Sprintf("checking flags %04o", flags)
 		if err = os.Chmod(f.Name(), flags); err != nil {
@@ -155,8 +151,20 @@ func TestSetUIDSetGIDBits(t *testing.T) {
 	}
 }
 
-func skipOnBuildkiteDarwin(t testing.TB, reason string) {
-	if os.Getenv("BUILDKITE") == "true" && runtime.GOOS == "darwin" {
-		t.Skip("Skip test on Buildkite MacOS: Wheel permission while expected staff")
+// setPrimaryGroup sets the group of the named file to the current user's
+// primary group. BSD-derived systems such as macOS give new files the group of
+// their parent directory (wheel for /tmp) rather than the creator's primary
+// group, and chmod silently drops the setgid bit when the caller is not a
+// member of the file's group.
+func setPrimaryGroup(t testing.TB, name string) {
+	t.Helper()
+
+	if runtime.GOOS == "windows" {
+		return
 	}
+	u, err := user.Current()
+	require.NoError(t, err, "getting current user")
+	gid, err := strconv.Atoi(u.Gid)
+	require.NoError(t, err, "parsing primary group ID")
+	require.NoError(t, os.Chown(name, -1, gid), "setting primary group")
 }

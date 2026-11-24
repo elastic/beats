@@ -160,6 +160,7 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
+	live := newLiveResultDispatcher(b.Monitoring.StatsRegistry(), log, config.DefaultLivePublishTimeout)
 	bt := &osquerybeat{
 		ctx:                  ctx,
 		cancel:               cancel,
@@ -168,11 +169,13 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 		osqueryInstallConfig: installCfg,
 		checkTimeout:         checkTimeout,
 		log:                  log,
-		pub:                  &liveClients{newPublisher: func() liveQueryPublisher { return pub.New(b, log) }},
-		liveResults:          newLiveResultDispatcher(b.Monitoring.StatsRegistry(), log, config.DefaultLivePublishTimeout),
-		qp:                   newQueryProfiler(log),
-		osquerydFactory:      osqd.New,
-		executablePath:       os.Executable,
+		pub: &liveClients{newPublisher: func() liveQueryPublisher {
+			return pub.NewLive(live.ctx, b, log, live.rejected, live.cut)
+		}},
+		liveResults:     live,
+		qp:              newQueryProfiler(log),
+		osquerydFactory: osqd.New,
+		executablePath:  os.Executable,
 		// Resolve the osqueryd data path now, while b.Info.Paths still reflects
 		// this specific receiver's configuration. Run() is called in a goroutine
 		// and may execute after a concurrently-started receiver has overwritten
@@ -181,8 +184,8 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 	}
 
 	bt.scheduledResults = newScheduledResultDispatcher(b.Monitoring.StatsRegistry(), log, config.DefaultScheduledMaxEvents,
-		func(allowed func() bool, dropped func(), cut func(int)) osquerybeatPublisher {
-			return pub.NewScheduled(b, log, allowed, dropped, cut)
+		func(ctx context.Context, allowed func() bool, dropped, rejected func(), cut func(int)) osquerybeatPublisher {
+			return pub.NewScheduled(ctx, b, log, allowed, dropped, rejected, cut)
 		}, bt.handleScheduledQueryResult)
 	bt.scheduledResults.profile = bt.enqueueScheduledProfile
 	bt.profileMetrics = newScheduledProfileMetrics(b.Monitoring.StatsRegistry())
@@ -313,18 +316,29 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		if otelFactory == nil {
 			return
 		}
+		type newInput struct {
+			key string
+			cfg *conf.C
+		}
 		newKeys := make(map[string]struct{}, len(inputs))
+		rawCfgs := make([]*conf.C, 0, len(inputs))
+		var added []newInput
 		for i := range inputs {
 			key := inputKey(i, inputs[i])
 			newKeys[key] = struct{}{}
-			if _, exists := otelRunners[key]; exists {
-				continue
-			}
 			rawCfg, cfgErr := conf.NewConfigFrom(&inputs[i])
 			if cfgErr != nil {
 				bt.log.Warnf("otel status: failed to build config for input %s: %v", key, cfgErr)
 				continue
 			}
+			rawCfgs = append(rawCfgs, rawCfg)
+			if _, exists := otelRunners[key]; !exists {
+				added = append(added, newInput{key: key, cfg: rawCfg})
+			}
+		}
+		cfgfile.SetRunnerConfigs(otelFactory, bt, rawCfgs)
+		for _, in := range added {
+			key, rawCfg := in.key, in.cfg
 			runner, cfgErr := otelFactory.Create(b.Publisher, rawCfg)
 			if cfgErr != nil {
 				bt.log.Warnf("otel status: failed to create status runner for input %s: %v", key, cfgErr)

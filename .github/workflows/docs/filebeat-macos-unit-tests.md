@@ -17,8 +17,8 @@ Builds and runs unit tests for **filebeat** on the configured macOS runner using
 ## When it runs
 
 - `workflow_dispatch`.
-- `pull_request`: paths: `["filebeat/**", "go.mod", "dev-tools/**", "libbeat/**", ".github/workflows/filebeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
-- `push`: branches: `["main"]`; paths: `["filebeat/**", "go.mod", "dev-tools/**", "libbeat/**", ".github/workflows/filebeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `pull_request`: paths: `["filebeat/**", "go.mod", ".python-version", "dev-tools/**", "libbeat/**", ".github/workflows/filebeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `push`: branches: `["main"]`; paths: `["filebeat/**", "go.mod", ".python-version", "dev-tools/**", "libbeat/**", ".github/workflows/filebeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
 
 ## Execution flow
 

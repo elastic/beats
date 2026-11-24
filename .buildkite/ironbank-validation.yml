@@ -2,9 +2,9 @@
 
 env:
   # Other deps
-  ASDF_MAGE_VERSION: 1.15.0
+  ASDF_MAGE_VERSION: 1.17.2
 
-  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1791307588"
+  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1795338029"
 
 steps:
   - label: ":package: :test_tube: Package and Validate Iron Bank for x-pack/heartbeat"

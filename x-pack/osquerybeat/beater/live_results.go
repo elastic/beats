@@ -48,9 +48,15 @@ type liveItem struct {
 	job       liveJob
 	pub       actionQueryPublisher
 	handed    atomic.Int64  // rows of job handed to Publish so far
+	rejected  atomic.Int64  // rows of job, among those handed, the queue rejected
 	profiled  atomic.Bool   // set once job's profile is handed to Publish
 	cancelled atomic.Bool   // set when the waiting action gives up
-	done      chan struct{} // closed when the worker is finished with job
+	done      chan struct{} // closed when the worker is finished with job, or by stop
+	// ctx is cancelled when the waiting action gives up or the dispatcher
+	// stops. Clients that implement beat.ContextPublisher then stop waiting
+	// for the output.
+	ctx    context.Context
+	cancel context.CancelFunc
 
 	resPub   actionResultPublisher
 	req, res map[string]any
@@ -67,6 +73,16 @@ type liveResultDispatcher struct {
 	start    sync.Once
 	wake     chan struct{}
 	stopping chan struct{}
+	// ctx is cancelled by stop. It ends the publishes of action responses and
+	// is the parent of each item's ctx.
+	ctx    context.Context
+	cancel context.CancelFunc
+	// publishing is the item whose rows the worker is publishing, if any, and
+	// responding is set while it publishes an action response. Only the worker
+	// uses them: rejected and cut run on the worker, inside that publish, so
+	// they need no lock.
+	publishing *liveItem
+	responding bool
 
 	mu     sync.Mutex
 	queue  []*liveItem
@@ -83,6 +99,7 @@ func newLiveResultDispatcher(reg *monitoring.Registry, log *logp.Logger, timeout
 		wake:     make(chan struct{}, 1),
 		stopping: make(chan struct{}),
 	}
+	d.ctx, d.cancel = context.WithCancel(context.Background())
 	d.setTimeout(timeout)
 	return d
 }
@@ -95,15 +112,18 @@ func (d *liveResultDispatcher) setTimeout(timeout time.Duration) {
 
 // publishResults hands job's profile and hits to the worker and waits until
 // all hits are handed to Publish, ctx is done, the timeout elapses or the
-// dispatcher stops. It returns the number of hits handed over. Hits not
-// handed over by then are skipped; one already inside a blocked Publish cannot
-// be pulled back and may be delivered late. On the process runtime ctx is
-// the agent client's lifetime context. On the OTel runtime it is the action
-// request's context, which ends at the Fleet action timeout (1 minute by
-// default, or the action's own timeout). So the end of ctx counts as a
-// shutdown only while the dispatcher is stopping, and as a timeout otherwise.
+// dispatcher stops. It returns the number of hits handed over that the queue
+// did not reject. Hits not handed over by then are skipped. A client that
+// implements beat.ContextPublisher stops waiting for the output then; with any
+// other client, a hit already inside a blocked Publish cannot be pulled back
+// and may be delivered late. On the process runtime ctx is the agent client's
+// lifetime context. On the OTel runtime it is the action request's context,
+// which ends at the Fleet action timeout (1 minute by default, or the action's
+// own timeout). So the end of ctx counts as a shutdown only while the
+// dispatcher is stopping, and as a timeout otherwise.
 func (d *liveResultDispatcher) publishResults(ctx context.Context, pub actionQueryPublisher, job liveJob) (int, error) {
 	it := &liveItem{job: job, pub: pub, done: make(chan struct{})}
+	it.ctx, it.cancel = context.WithCancel(d.ctx)
 	if !d.push(it) {
 		d.metrics.drop(dropShutdown, job.rows())
 		return 0, errLiveShutdown
@@ -127,15 +147,29 @@ func (d *liveResultDispatcher) publishResults(ctx context.Context, pub actionQue
 		}
 	case <-d.stopping:
 	}
-	d.abandon(it)
+	if !d.abandon(it) {
+		// The worker has it. Cancelling made a cancellable publish return,
+		// so wait for the worker's own count: a row can still have been
+		// queued as the publish was cancelled. A blocking Publish cannot be
+		// cancelled, so wait only briefly for it.
+		bound := time.NewTimer(liveCancelWait)
+		select {
+		case <-it.done:
+		case <-bound.C:
+		}
+		bound.Stop()
+	}
 
+	// Rejected rows count as handed, so they are not lost, but the action
+	// does not report them; they are counted as rejected instead.
 	n := int(it.handed.Load())
+	sent := n - int(it.rejected.Load())
 	lost := job.rows() - n
 	if it.profiled.Load() {
 		lost--
 	}
 	if lost == 0 {
-		return n, nil
+		return sent, nil
 	}
 	if reason == "" {
 		// The worker returned early: it was stopping, or there were no clients.
@@ -148,13 +182,17 @@ func (d *liveResultDispatcher) publishResults(ctx context.Context, pub actionQue
 	if n == len(job.hits) {
 		// Only the profile was lost. The action reports its query's outcome,
 		// not the profile's.
-		return n, nil
+		return sent, nil
 	}
 	if ctxErr != nil {
-		return n, fmt.Errorf("%w: %w", errLivePublishTimeout, ctxErr)
+		return sent, fmt.Errorf("%w: %w", errLivePublishTimeout, ctxErr)
 	}
-	return n, liveDropErrors[reason]
+	return sent, liveDropErrors[reason]
 }
+
+// liveCancelWait bounds how long an action that stopped waiting waits for the
+// worker to return from a cancelled publish.
+const liveCancelWait = 100 * time.Millisecond
 
 // liveDropErrors are the action errors for each drop reason.
 var liveDropErrors = map[string]error{
@@ -187,12 +225,15 @@ func (d *liveResultDispatcher) push(it *liveItem) bool {
 }
 
 // abandon tells the worker to skip its remaining rows, and drops it if the
-// worker has not reached it.
-func (d *liveResultDispatcher) abandon(it *liveItem) {
+// worker has not reached it. It reports whether it dropped it.
+func (d *liveResultDispatcher) abandon(it *liveItem) bool {
 	it.cancelled.Store(true)
+	it.cancel()
 	d.mu.Lock()
 	defer d.mu.Unlock()
+	n := len(d.queue)
 	d.queue = slices.DeleteFunc(d.queue, func(q *liveItem) bool { return q == it })
+	return len(d.queue) < n
 }
 
 func (d *liveResultDispatcher) run() {
@@ -229,15 +270,17 @@ func (d *liveResultDispatcher) next() (*liveItem, bool) {
 
 func (d *liveResultDispatcher) publish(it *liveItem) {
 	if it.pub == nil {
+		d.responding = true
 		if !publishActionResult(it.resPub, it.req, it.res) {
 			d.metrics.drop(dropStale, 1)
 		}
+		d.responding = false
 		return
 	}
 	defer close(it.done)
 	j := it.job
 	if j.profile != nil && !d.abandoned(it) &&
-		publishQueryProfile(it.pub, j.profileIndex, j.actionID, j.responseID, j.spaceID, j.profile, j.reqData) {
+		it.pub.PublishQueryProfile(it.ctx, j.profileIndex, "", j.actionID, j.responseID, j.spaceID, j.profile, j.reqData) {
 		it.profiled.Store(true)
 	}
 	// stop runs before each hit, so its call count is the number of hits
@@ -248,8 +291,31 @@ func (d *liveResultDispatcher) publish(it *liveItem) {
 		handed++
 		return d.abandoned(it)
 	}
-	n := it.pub.PublishEach(j.index, j.actionID, "action_id", j.responseID, j.spaceID, "", "", "", nil, j.hits, j.ecsm, j.reqData, stop)
+	// Only the rows are tracked: a rejected profile or response is counted
+	// by rejected alone.
+	d.publishing = it
+	n := it.pub.PublishEach(it.ctx, j.index, j.actionID, "action_id", j.responseID, j.spaceID, "", "", "", nil, j.hits, j.ecsm, j.reqData, stop)
+	d.publishing = nil
 	it.handed.Store(int64(n))
+}
+
+// rejected counts a live event the queue rejected. The publisher calls it on
+// the worker, during the publish.
+func (d *liveResultDispatcher) rejected() {
+	d.metrics.dropRows(dropRejected, 1)
+	if it := d.publishing; it != nil {
+		it.rejected.Add(1)
+	}
+}
+
+// cut counts an action response whose publish was cancelled, which happens
+// only when the dispatcher stops. publishResults counts the rows and profile
+// of a job itself, so cut ignores them. The publisher calls it on the worker,
+// during the publish.
+func (d *liveResultDispatcher) cut(rows int) {
+	if d.responding {
+		d.metrics.drop(dropShutdown, rows)
+	}
 }
 
 // publishActionResult publishes an action response and reports whether a
@@ -259,16 +325,6 @@ func publishActionResult(p actionResultPublisher, req, res map[string]any) bool 
 		return c.publishActionResult(req, res)
 	}
 	p.PublishActionResult(req, res)
-	return true
-}
-
-// publishQueryProfile publishes a live query's profile and reports whether a
-// client took it. Only liveClients can report a miss.
-func publishQueryProfile(p actionQueryPublisher, index, actionID, responseID, spaceID string, profile map[string]any, reqData any) bool {
-	if c, ok := p.(*liveClients); ok {
-		return c.publishQueryProfile(index, "", actionID, responseID, spaceID, profile, reqData)
-	}
-	p.PublishQueryProfile(index, "", actionID, responseID, spaceID, profile, reqData)
 	return true
 }
 
@@ -285,9 +341,10 @@ func (d *liveResultDispatcher) isStopping() bool {
 	}
 }
 
-// stop drops queued action responses and releases waiting actions, which
-// count their own results. It does not join a worker blocked in Publish; the
-// pipeline closing its queue releases it.
+// stop drops queued action responses, releases waiting actions, which count
+// their own results, and cancels the worker's publish. It does not join a
+// worker blocked in a Publish that cannot be cancelled; the pipeline closing
+// its queue releases it.
 func (d *liveResultDispatcher) stop() {
 	d.mu.Lock()
 	if d.closed {
@@ -296,13 +353,18 @@ func (d *liveResultDispatcher) stop() {
 	}
 	d.closed = true
 	close(d.stopping)
+	d.cancel()
 	queued := d.queue
 	d.queue = nil
 	d.mu.Unlock()
 	for _, it := range queued {
 		if it.pub == nil {
 			d.metrics.drop(dropShutdown, 1)
+			continue
 		}
+		// The worker will never take it, so its waiting action would
+		// otherwise wait liveCancelWait for done.
+		close(it.done)
 	}
 }
 
@@ -360,22 +422,22 @@ func (c *liveClients) swap(next *liveLease) {
 	}
 }
 
-func (c *liveClients) PublishEach(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any, stop func() bool) int {
+func (c *liveClients) PublishEach(ctx context.Context, index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any, stop func() bool) int {
 	l := c.acquire()
 	if l == nil {
 		return 0
 	}
 	defer l.release()
-	return l.pub.PublishEach(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName, meta, hits, ecsm, reqData, stop)
+	return l.pub.PublishEach(ctx, index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName, meta, hits, ecsm, reqData, stop)
 }
 
-func (c *liveClients) PublishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) {
-	c.publishQueryProfile(index, queryName, actionID, responseID, spaceID, profile, reqData)
+func (c *liveClients) PublishQueryProfile(ctx context.Context, index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) bool {
+	return c.publishQueryProfile(ctx, index, queryName, actionID, responseID, spaceID, profile, reqData)
 }
 
 // publishQueryProfile is PublishQueryProfile, reporting false when no clients
 // or no profile stream are configured.
-func (c *liveClients) publishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) bool {
+func (c *liveClients) publishQueryProfile(ctx context.Context, index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) bool {
 	l := c.acquire()
 	if l == nil {
 		return false
@@ -384,8 +446,7 @@ func (c *liveClients) publishQueryProfile(index, queryName, actionID, responseID
 	if !l.profiles {
 		return false
 	}
-	l.pub.PublishQueryProfile(index, queryName, actionID, responseID, spaceID, profile, reqData)
-	return true
+	return l.pub.PublishQueryProfile(ctx, index, queryName, actionID, responseID, spaceID, profile, reqData)
 }
 
 func (c *liveClients) PublishActionResult(req, res map[string]any) {

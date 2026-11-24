@@ -111,7 +111,7 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 		n.mtx.Unlock()
 		return nil
 	}
-	n.ctx, n.cancelFunc = context.WithCancel(v2.GoContextFromCanceler(env.Cancelation))
+	n.ctx, n.cancelFunc = context.WithCancel(env.Cancelation)
 	n.started = true
 	n.mtx.Unlock()
 

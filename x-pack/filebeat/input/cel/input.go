@@ -5,6 +5,7 @@
 package cel
 
 import (
+	"compress/bzip2"
 	"compress/gzip"
 	"context"
 	"encoding/json"
@@ -59,7 +60,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 	"github.com/elastic/mito/lib"
 )
@@ -162,7 +162,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 
 	metrics, reg := newInputMetrics(env.MetricsRegistry, env.Logger)
 
-	ctx := ctxtool.FromCanceller(env.Cancelation)
+	ctx := env.Cancelation
 	otelTracerProvider := i.tracerProvider
 	if otelTracerProvider == nil {
 		var err error
@@ -1430,11 +1430,11 @@ func checkRedirect(cfg *ResourceConfig, log *logp.Logger) func(*http.Request, []
 
 		prev := via[len(via)-1] // previous request to get headers from
 
-		log.Debugf("http client: forwarding headers from previous request: %#v", prev.Header)
+		log.Debugf("http client: forwarding headers from previous request: %v", slices.Sorted(maps.Keys(prev.Header)))
 		req.Header = prev.Header.Clone()
 
 		if req.URL.Host != prev.URL.Host || (prev.URL.Scheme == "https" && req.URL.Scheme == "http") {
-			for _, k := range cfg.RedirectSensitiveHeaders {
+			for _, k := range sensitiveHeaders(cfg.RedirectSensitiveHeaders) {
 				log.Debugf("http client: cross-origin redirect to %s: removing sensitive header %s", req.URL.Host, k)
 				req.Header.Del(k)
 			}
@@ -1447,6 +1447,22 @@ func checkRedirect(cfg *ResourceConfig, log *logp.Logger) func(*http.Request, []
 
 		return nil
 	}
+}
+
+// defaultSensitiveHeaders are removed on cross-origin redirects when
+// redirect.sensitive_headers is not configured. The default is applied here
+// rather than in defaultConfig because go-ucfg merges a configured list into
+// a default list element by element, so a configured list could not replace
+// the defaults and an empty list could not disable them.
+var defaultSensitiveHeaders = []string{"Authorization", "Proxy-Authorization", "Cookie"}
+
+// sensitiveHeaders returns the configured headers, or the defaults if the
+// option is unset. An empty, non-nil list disables stripping.
+func sensitiveHeaders(configured []string) []string {
+	if configured == nil {
+		return defaultSensitiveHeaders
+	}
+	return configured
 }
 
 // retryErrorHandler returns a retryablehttp.ErrorHandler that will log retry resignation
@@ -1514,7 +1530,9 @@ var (
 	// mimetypes holds supported MIME type mappings.
 	mimetypes = map[string]any{
 		"application/gzip":         func(r io.Reader) (io.Reader, error) { return gzip.NewReader(r) },
+		"application/x-bzip2":      func(r io.Reader) io.Reader { return bzip2.NewReader(r) },
 		"application/x-ndjson":     lib.NDJSON,
+		"application/x-tar":        lib.Tar,
 		"application/zip":          lib.Zip,
 		"text/csv; header=absent":  lib.CSVNoHeader,
 		"text/csv; header=present": lib.CSVHeader,

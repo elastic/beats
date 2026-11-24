@@ -215,6 +215,12 @@ func getStatsList(taskStatsOutput map[string]dcontainer.StatsResponse, taskOutpu
 
 	var formattedStats []Stats
 	for id, taskStats := range taskStatsOutput {
+		// An empty current or previous sample (e.g. the container started
+		// between the daemon's two reads) would yield invalid CPU deltas.
+		if taskStats.Read.IsZero() || taskStats.PreRead.IsZero() {
+			continue
+		}
+
 		if c, ok := containersInfo[id]; ok {
 			statsPerContainer := Stats{
 				Time:         common.Time(taskStats.Read),

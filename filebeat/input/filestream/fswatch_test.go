@@ -3545,3 +3545,107 @@ func TestLeafPrefilterNeverDropsAMatch(t *testing.T) {
 		}
 	}
 }
+
+func growingFileWatcher(t *testing.T, paths []string) *testWatcher {
+	t.Helper()
+	cfg := defaultFileWatcherConfig()
+	cfg.Scanner.Fingerprint = fingerprintConfig{
+		Enabled: true,
+		Offset:  0,
+		Length:  1024,
+		Growing: true,
+	}
+	w, err := newTestFileWatcher(
+		logp.NewNopLogger(),
+		paths,
+		cfg,
+		CompressionNone,
+		false,
+		mustPathIdentifier(false),
+		mustSourceIdentifier("bridging-raw-test"),
+	)
+	require.NoError(t, err, "could not create growing file watcher")
+	return w
+}
+
+// TestFileWatcherGetFilesSuppressesBridgingRaw verifies Init/TakeOver enumeration
+// scans never attach the bridging raw header on already-complete files.
+func TestFileWatcherGetFilesSuppressesBridgingRaw(t *testing.T) {
+	dir := t.TempDir()
+	filename := filepath.Join(dir, "complete.log")
+	require.NoError(t, os.WriteFile(filename, []byte(strings.Repeat("a", 1500)), 0o644))
+
+	w := growingFileWatcher(t, []string{filename})
+	res := w.GetFiles(loginp.FileScanOptions{})
+	require.Contains(t, res.Files, filename)
+	fd := res.Files[filename]
+	require.True(t, fd.Fingerprint.Complete(), "file must be complete")
+	assert.Empty(t, fd.Fingerprint.Raw,
+		"fileWatcher.GetFiles must suppress bridging raw on complete files")
+}
+
+// TestFileWatcherScanOnceSuppressesBridgingRawWithoutGrowingEntries verifies the
+// first watch scan omits bridging raw on complete files when neither w.prev nor
+// the prospector short-fingerprint index holds growing entries.
+func TestFileWatcherScanOnceSuppressesBridgingRawWithoutGrowingEntries(t *testing.T) {
+	dir := t.TempDir()
+	filename := filepath.Join(dir, "complete.log")
+	require.NoError(t, os.WriteFile(filename, []byte(strings.Repeat("b", 1500)), 0o644))
+
+	w := growingFileWatcher(t, []string{filename})
+	m := newTestMetrics()
+	w.watch(t.Context(), m, 0, time.Time{})
+	events := drainPendingFSEvents(w.events)
+	require.Len(t, events, 1, "first scan must emit one create")
+	require.Equal(t, loginp.OpCreate, events[0].Op)
+	assert.True(t, events[0].Descriptor.Fingerprint.Complete())
+	assert.Empty(t, events[0].Descriptor.Fingerprint.Raw,
+		"create on a greenfield complete file must not carry bridging raw")
+}
+
+// TestFileWatcherScanOnceAttachesBridgingRawWhenNeeded covers the two cases where
+// bridging raw must still be emitted: a still-growing prev entry, and persisted
+// short fingerprints reported via hasGrowingEntries.
+func TestFileWatcherScanOnceAttachesBridgingRawWhenNeeded(t *testing.T) {
+	const length = 1024
+
+	t.Run("prev still growing", func(t *testing.T) {
+		dir := t.TempDir()
+		filename := filepath.Join(dir, "growing.log")
+		w := growingFileWatcher(t, []string{filename})
+		m := newTestMetrics()
+
+		require.NoError(t, os.WriteFile(filename, []byte(strings.Repeat("c", 200)), 0o644))
+		w.watch(t.Context(), m, 0, time.Time{})
+		drainPendingFSEvents(w.events)
+
+		require.NoError(t, os.WriteFile(filename, []byte(strings.Repeat("c", 1500)), 0o644))
+		w.watch(t.Context(), m, 0, time.Time{})
+		events := drainPendingFSEvents(w.events)
+		require.Len(t, events, 1, "threshold crossing must emit one write")
+		require.Equal(t, loginp.OpWrite, events[0].Op)
+		require.True(t, events[0].Descriptor.Fingerprint.Complete())
+		assert.NotEmpty(t, events[0].Descriptor.Fingerprint.Raw,
+			"crossing scan must carry bridging raw while prev held a growing entry")
+
+		expectedRaw := hex.EncodeToString([]byte(strings.Repeat("c", int(length))))
+		assert.Equal(t, expectedRaw, events[0].Descriptor.Fingerprint.Raw)
+	})
+
+	t.Run("hasGrowingEntries callback", func(t *testing.T) {
+		dir := t.TempDir()
+		filename := filepath.Join(dir, "complete.log")
+		require.NoError(t, os.WriteFile(filename, []byte(strings.Repeat("d", 1500)), 0o644))
+
+		w := growingFileWatcher(t, []string{filename})
+		w.hasGrowingEntries = func() bool { return true }
+		m := newTestMetrics()
+		w.watch(t.Context(), m, 0, time.Time{})
+		events := drainPendingFSEvents(w.events)
+		require.Len(t, events, 1)
+		require.Equal(t, loginp.OpCreate, events[0].Op)
+		require.True(t, events[0].Descriptor.Fingerprint.Complete())
+		assert.NotEmpty(t, events[0].Descriptor.Fingerprint.Raw,
+			"create must carry bridging raw when short fingerprint entries exist in the registry")
+	})
+}

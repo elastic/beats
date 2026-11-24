@@ -43,6 +43,13 @@ func (r *runnerState) raw() map[string]any {
 // RunnerReporter defines an interface that returns a StatusReporter for a specific runner.
 // This is used for grouping and managing statuses of multiple runners
 type RunnerReporter interface {
+	// SetRunners sets the IDs of the runners source wants running. The group
+	// reports a status for each runner some source wants running, and for no
+	// other runner.
+	SetRunners(source any, ids []string)
+
+	// GetReporterForRunner returns the reporter for the runner with id, or nil
+	// if no source wants that runner running.
 	GetReporterForRunner(id string) status.StatusReporter
 
 	// UpdateStatus updates the group status of a runnerReporter
@@ -57,9 +64,12 @@ type RunnerReporter interface {
 const reportInterval = 500 * time.Millisecond
 
 type reporter struct {
+	// runnerStates has an entry for every runner some source wants running.
 	runnerStates map[string]*runnerState
-	host         component.Host
-	mtx          sync.Mutex
+	// sources holds the IDs of the runners each source wants running.
+	sources map[any][]string
+	host    component.Host
+	mtx     sync.Mutex
 
 	interval   time.Duration
 	lastReport time.Time
@@ -82,13 +92,61 @@ func newGroupStatusReporter(host component.Host, interval time.Duration) *report
 	return &reporter{
 		host:         host,
 		runnerStates: make(map[string]*runnerState),
+		sources:      make(map[any][]string),
 		interval:     interval,
+	}
+}
+
+// SetRunners sets the IDs of the runners source wants running. Runners that
+// a source newly wants are reported as starting until they report a status,
+// from the next report on; runners that no source wants anymore are no longer
+// reported, and their later updates are dropped.
+//
+// The status entries follow the configuration rather than the runners, as not
+// every runner reports that it stopped. Otherwise runners that come and go,
+// such as with config reloading, would leave entries behind.
+func (r *reporter) SetRunners(source any, ids []string) {
+	r.mtx.Lock()
+	defer r.mtx.Unlock()
+	if len(ids) == 0 {
+		delete(r.sources, source)
+	} else {
+		r.sources[source] = ids
+	}
+
+	wanted := make(map[string]struct{}, len(r.runnerStates))
+	for _, sourceIDs := range r.sources {
+		for _, id := range sourceIDs {
+			wanted[id] = struct{}{}
+		}
+	}
+	for id := range wanted {
+		if _, ok := r.runnerStates[id]; !ok {
+			r.runnerStates[id] = &runnerState{state: status.Starting}
+		}
+	}
+	removed := false
+	for id := range r.runnerStates {
+		if _, ok := wanted[id]; !ok {
+			delete(r.runnerStates, id)
+			removed = true
+		}
+	}
+	// Added runners don't change the group status, and their own first update
+	// reports them. Reporting them here would delay that update by the report
+	// interval, which can hide a short-lived runner's status entirely.
+	if removed {
+		r.dirty = true
+		r.reportLocked()
 	}
 }
 
 func (r *reporter) GetReporterForRunner(id string) status.StatusReporter {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
+	if _, ok := r.runnerStates[id]; !ok {
+		return nil
+	}
 	return &subReporter{
 		id: id,
 		r:  r,
@@ -98,19 +156,16 @@ func (r *reporter) GetReporterForRunner(id string) status.StatusReporter {
 func (r *reporter) updateStatusForRunner(id string, state status.Status, msg string) {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
-	if r.runnerStates == nil {
-		r.runnerStates = make(map[string]*runnerState)
+	rState, ok := r.runnerStates[id]
+	if !ok {
+		// no source wants the runner anymore, so it is stopping or stopped
+		return
 	}
 	newState := runnerState{state: state, msg: msg}
-	if rState, ok := r.runnerStates[id]; ok {
-		if rState.Equals(&newState) {
-			return
-		}
-		*rState = newState
-	} else {
-		// add status for the runner to the map, if not preset
-		r.runnerStates[id] = &newState
+	if rState.Equals(&newState) {
+		return
 	}
+	*rState = newState
 
 	// report aggregated status for all sub-components
 	r.dirty = true

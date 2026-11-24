@@ -513,13 +513,13 @@ Fields for Cisco ASA Firewall.
 
 
 **`cisco.asa.privilege.old`**
-:   When a users privilege is changed this is the old value
+:   When a user's privilege is changed this is the old value
 
     type: keyword
 
 
 **`cisco.asa.privilege.new`**
-:   When a users privilege is changed this is the new value
+:   When a user's privilege is changed this is the new value
 
     type: keyword
 
