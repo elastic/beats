@@ -71,11 +71,11 @@ func TestGetProcessIds(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			workerProcesses := getProcessIds(tc.counterValues, tc.counterFields)
-			if !assert.Len(t, workerProcesses, 1) {
+			if !assert.Len(t, workerProcesses, 1, "expected exactly one worker process from the PID counter") {
 				return
 			}
-			assert.Equal(t, 124, workerProcesses[0].processId)
-			assert.Equal(t, "w3wp#1", workerProcesses[0].instanceName)
+			assert.Equal(t, 124, workerProcesses[0].processId, "worker process ID should come from the PID counter value")
+			assert.Equal(t, "w3wp#1", workerProcesses[0].instanceName, "worker instance name should come from the PID counter instance")
 		})
 	}
 }
