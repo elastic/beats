@@ -1,0 +1,13 @@
+services:
+  opcua:
+    image: mcr.microsoft.com/iotedge/opc-plc:${OPC_PLC_VERSION:-2.15.14}
+    command:
+      - --pn=50000
+      - --autoaccept
+      - --unsecuretransport
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/50000"]
+      interval: 2s
+      retries: 30
+    ports:
+      - 50000

@@ -1,0 +1,9 @@
+services:
+  plc4x:
+    image: docker.elastic.co/integrations-ci/beats-plc4x-modbus:${PYMODBUS_VERSION:-3.16.1}-1
+    build:
+      context: ./_meta
+      args:
+        PYMODBUS_VERSION: ${PYMODBUS_VERSION:-3.16.1}
+    ports:
+      - 5020

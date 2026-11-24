@@ -1,0 +1,73 @@
+- name: node
+  type: group
+  description: >
+    The value of one OPC UA node, read in one request together with the other
+    configured nodes.
+  release: beta
+  fields:
+    - name: id
+      type: keyword
+      description: >
+        The node id, as configured, for example ns=3;s=StepUp.
+    - name: label
+      type: keyword
+      description: >
+        The label configured for the node.
+    - name: name
+      type: keyword
+      description: >
+        The display name of the node, read from the server.
+    - name: data_type
+      type: keyword
+      description: >
+        The OPC UA built-in data type of the value, for example Double or Int32. Arrays end in [] and are not indexed.
+    - name: value
+      type: group
+      description: >
+        The value of the node. Exactly one of the typed fields is set, depending on the data type.
+      fields:
+        - name: double
+          type: double
+          description: >
+            Float and Double values, and UInt64 values above the range of a long.
+        - name: long
+          type: long
+          description: >
+            Integer values and status codes.
+        - name: boolean
+          type: boolean
+          description: >
+            Boolean values.
+        - name: keyword
+          type: keyword
+          description: >
+            String, LocalizedText, QualifiedName, NodeId and Guid values.
+        - name: date
+          type: date
+          description: >
+            DateTime values.
+    - name: status
+      type: group
+      description: >
+        The status code of the value.
+      fields:
+        - name: code
+          type: long
+          description: >
+            The numeric status code.
+        - name: name
+          type: keyword
+          description: >
+            The name of the status code, for example Good or StatusBadNodeIDUnknown.
+        - name: severity
+          type: keyword
+          description: >
+            The severity of the status code: good, uncertain or bad.
+    - name: source_timestamp
+      type: date
+      description: >
+        The time the value was produced by its source.
+    - name: server_timestamp
+      type: date
+      description: >
+        The time the server received or updated the value.

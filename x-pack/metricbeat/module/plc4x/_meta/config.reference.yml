@@ -1,0 +1,16 @@
+- module: plc4x
+  metricsets: ["tag"]
+  period: 10s
+  # PLC4X connection strings. Only the modbus-tcp driver is supported, for
+  # example modbus-tcp://plc.example.com:502?unit-identifier=1.
+  hosts: ["modbus-tcp://localhost:502"]
+  # Timeout for connecting and for each read request.
+  #timeout: 10s
+
+  # PLC tags to read, in PLC4X address syntax <area>:<address>:<data type>, for
+  # example holding-register:1:REAL or input-register:5:UINT. Addresses are
+  # 1-based. Modbus coils and discrete inputs are not supported yet. The
+  # optional name is added to the event.
+  plc_tags:
+    - address: "holding-register:1:REAL"
+      name: "temperature"

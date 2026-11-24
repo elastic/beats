@@ -1,0 +1,11 @@
+- key: plc4x
+  title: "PLC4X"
+  description: >
+    PLC4X module
+  release: beta
+  fields:
+    - name: plc4x
+      type: group
+      description: >
+        Values read from PLCs with Apache PLC4X.
+      fields:

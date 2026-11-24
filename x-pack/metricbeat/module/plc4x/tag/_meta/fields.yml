@@ -1,0 +1,47 @@
+- name: tag
+  type: group
+  description: >
+    The value of one PLC tag.
+  release: beta
+  fields:
+    - name: address
+      type: keyword
+      description: >
+        The tag address, as configured, for example holding-register:1:REAL.
+    - name: name
+      type: keyword
+      description: >
+        The name configured for the tag.
+    - name: data_type
+      type: keyword
+      description: >
+        The IEC 61131-3 data type of the value, for example REAL or INT. Lists and structures are reported as List and Struct and are not indexed.
+    - name: response_code
+      type: keyword
+      description: >
+        The PLC4X response code of the read, for example OK or INVALID_ADDRESS.
+    - name: value
+      type: group
+      description: >
+        The value of the tag. Exactly one of the typed fields is set, depending on the data type.
+      fields:
+        - name: double
+          type: double
+          description: >
+            REAL and LREAL values, and unsigned 64-bit values above the range of a long.
+        - name: long
+          type: long
+          description: >
+            Integer and bit string values.
+        - name: boolean
+          type: boolean
+          description: >
+            BOOL values.
+        - name: keyword
+          type: keyword
+          description: >
+            CHAR, WCHAR, STRING and WSTRING values.
+        - name: date
+          type: date
+          description: >
+            DATE and DATE_AND_TIME values.

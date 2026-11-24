@@ -1,0 +1,27 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "plc4x.tag",
+        "duration": 115000,
+        "module": "plc4x"
+    },
+    "metricset": {
+        "name": "tag",
+        "period": 10000
+    },
+    "plc4x": {
+        "tag": {
+            "address": "holding-register:1:REAL",
+            "data_type": "REAL",
+            "name": "temperature",
+            "response_code": "OK",
+            "value": {
+                "double": 21.5
+            }
+        }
+    },
+    "service": {
+        "address": "localhost:41625",
+        "type": "plc4x"
+    }
+}
