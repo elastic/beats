@@ -7,9 +7,11 @@ package jwtauth
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -198,6 +200,61 @@ func TestGrant_clockSkewRetry(t *testing.T) {
 	}
 	if got, want := int64(second["iat"].(float64)), serverTime.Unix(); got < want-1 || got > want+1 {
 		t.Errorf("retry iat = %d; want about %d", got, want)
+	}
+}
+
+// TestGrant_clockSkewLimit checks that the assertion is only signed again with
+// the server's time when that time is within maxClockSkew of the local clock.
+//
+//nolint:errcheck // No point checking errors in test server.
+func TestGrant_clockSkewLimit(t *testing.T) {
+	tests := []struct {
+		name         string
+		skew         time.Duration // The server's clock minus ours.
+		wantRetry    bool
+		wantRequests int
+	}{
+		{name: "just_under_limit", skew: maxClockSkew - time.Hour, wantRetry: true, wantRequests: 2},
+		{name: "just_over_limit", skew: maxClockSkew + time.Hour, wantRequests: 1},
+		{name: "a_year_ahead", skew: 365 * 24 * time.Hour, wantRequests: 1},
+		{name: "a_year_behind", skew: -365 * 24 * time.Hour, wantRequests: 1},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			serverTime := time.Now().Add(test.skew)
+			srv := newTokenServer(t, func(w http.ResponseWriter, form url.Values, n int) {
+				if n == 1 {
+					w.Header().Set("Date", serverTime.UTC().Format(http.TimeFormat))
+					w.Header().Set("Content-Type", "application/json")
+					w.WriteHeader(http.StatusBadRequest)
+					w.Write([]byte(`{"error":"invalid_grant","error_description":"bad assertion"}`))
+					return
+				}
+				okToken(w, form, n)
+			})
+			s := testSigner(t, 45*time.Second, map[string]any{"iss": "key"})
+
+			_, err := Grant(context.Background(), s, GrantConfig{TokenURL: srv.URL}).Token()
+			if got := len(srv.forms); got != test.wantRequests {
+				t.Errorf("got %d requests; want %d", got, test.wantRequests)
+			}
+			if test.wantRetry {
+				if err != nil {
+					t.Errorf("Token() error = %v; want nil", err)
+				}
+				return
+			}
+			if err == nil {
+				t.Fatal("Token() error = nil; want the original error")
+			}
+			var rerr *oauth2.RetrieveError
+			if !errors.As(err, &rerr) || rerr.ErrorCode != "invalid_grant" {
+				t.Errorf("Token() error = %v; want it to wrap the invalid_grant error", err)
+			}
+			if !strings.Contains(err.Error(), "differs from the server's Date header") {
+				t.Errorf("Token() error = %q; want it to say that the clocks differ", err)
+			}
+		})
 	}
 }
 

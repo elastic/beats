@@ -7,6 +7,7 @@ package jwtauth
 import (
 	"context"
 	"errors"
+	"fmt"
 	"maps"
 	"net/http"
 	"net/url"
@@ -16,6 +17,14 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 )
+
+// maxClockSkew is the largest difference between the local clock and the
+// Date header of a token endpoint for which Grant and ClientAssertion sign
+// the assertion again with the server's time after it was rejected. A larger
+// difference means that the local clock is badly wrong, or that the Date header
+// cannot be trusted, and the original error is returned instead. A day covers
+// a clock that was set to local time instead of UTC.
+const maxClockSkew = 24 * time.Hour
 
 // Direct returns a token source whose tokens are the JWTs signed by s. No
 // request is made. Each token expires shortly before the JWT does, so that a
@@ -118,7 +127,8 @@ type exchangeSource struct {
 }
 
 func (e exchangeSource) Token() (*oauth2.Token, error) {
-	tok, err := e.exchange(time.Now())
+	now := time.Now()
+	tok, err := e.exchange(now)
 	if err == nil {
 		return tok, nil
 	}
@@ -129,6 +139,11 @@ func (e exchangeSource) Token() (*oauth2.Token, error) {
 	serverTime, perr := http.ParseTime(rerr.Response.Header.Get("Date"))
 	if perr != nil || serverTime.IsZero() {
 		return nil, err
+	}
+	skew := serverTime.Sub(now).Abs()
+	if skew > maxClockSkew {
+		return nil, fmt.Errorf("%w (the local clock differs from the server's Date header by %s, more than the %s allowed for a retry)",
+			err, skew.Round(time.Second), maxClockSkew)
 	}
 	return e.exchange(serverTime)
 }
