@@ -24,7 +24,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // RemoveIndexPattern removes the index pattern entry from a given dashboard export

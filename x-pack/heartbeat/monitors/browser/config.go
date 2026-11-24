@@ -10,9 +10,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
-	"github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/gohugoio/hashstructure"
 )

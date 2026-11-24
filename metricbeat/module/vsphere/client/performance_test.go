@@ -28,11 +28,11 @@ import (
 	"github.com/vmware/govmomi/vim25/types"
 	"go.uber.org/mock/gomock"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 // Run 'go generate' to create mocks that are used in tests.
-//go:generate go run go.uber.org/mock/mockgen -source=performance.go -destination=mock_performance.go -package client -mock_names=Logouter=MockPerfManager
+//go:generate go run go.uber.org/mock/mockgen -source=performance.go -destination=mock_performance_test.go -package client -mock_names=Logouter=MockPerfManager
 
 func TestGetPerfMetrics(t *testing.T) {
 	var tPeriod int32 = 5

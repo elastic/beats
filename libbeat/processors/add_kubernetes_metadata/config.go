@@ -23,7 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
 	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes/metadata"
-	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/pkg/config"
 )
 
 type kubeAnnotatorConfig struct {
@@ -43,6 +43,7 @@ type kubeAnnotatorConfig struct {
 	DefaultIndexers Enabled       `config:"default_indexers"`
 
 	AddResourceMetadata *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
+	AppendFields        bool                                `config:"append_fields"`
 }
 
 type Enabled struct {

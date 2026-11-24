@@ -20,7 +20,7 @@ package actions
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func TestAddFields(t *testing.T) {

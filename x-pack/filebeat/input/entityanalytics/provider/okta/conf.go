@@ -16,7 +16,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 	"github.com/elastic/lumberjack"
 )
 

@@ -21,7 +21,7 @@ import (
 	"go.opentelemetry.io/collector/component/componenttest"
 
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 // TestElasticStorage_Access_Concurrent_Race documents and guards against the

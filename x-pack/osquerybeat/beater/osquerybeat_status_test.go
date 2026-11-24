@@ -20,9 +20,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	agentconfig "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/paths"
+	agentconfig "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/paths"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
@@ -43,13 +43,16 @@ func (m *mockOsqueryd) Check(ctx context.Context) error {
 	return m.checkErr
 }
 
-func (m *mockOsqueryd) Run(ctx context.Context, flags osqd.Flags) error {
+func (m *mockOsqueryd) Run(ctx context.Context, flags osqd.Flags, onExit func(error)) error {
 	if m.runDelay > 0 {
 		select {
 		case <-time.After(m.runDelay):
 		case <-ctx.Done():
 			return ctx.Err()
 		}
+	}
+	if onExit != nil {
+		onExit(m.runErr)
 	}
 	return m.runErr
 }

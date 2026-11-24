@@ -13,8 +13,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
+	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
-	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // Default retry settings. These mirror the Azure SDK's own pipeline retry

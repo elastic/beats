@@ -30,8 +30,8 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/monitors/maintwin"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/timerqueue"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 var debugf = logp.MakeDebug("scheduler")

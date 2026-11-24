@@ -28,8 +28,8 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/testing/testutils"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestExeObjParser(t *testing.T) {

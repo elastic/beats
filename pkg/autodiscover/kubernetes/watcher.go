@@ -36,7 +36,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 const (
@@ -304,6 +304,14 @@ func (w *watcher) Start() error {
 	}
 
 	w.logger.Debugf("cache sync done")
+
+	// Drain the initial queue items synchronously so all registered event handlers
+	// have processed the initial list before Start() returns. This closes the gap
+	// where WaitForCacheSync guarantees the informer store is populated but the
+	// work queue (and therefore dependent caches) is not yet.
+	for n := w.queue.Len(); n > 0; n-- {
+		w.process(w.ctx)
+	}
 
 	// Wrap the process function with wait.Until so that if the controller crashes, it starts up again after a second.
 	go wait.Until(func() {

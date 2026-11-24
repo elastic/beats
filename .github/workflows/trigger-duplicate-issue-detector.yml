@@ -6,6 +6,7 @@ on:
 permissions:
   actions: read
   contents: read
+  copilot-requests: write
   discussions: write
   issues: write
   pull-requests: read
@@ -16,6 +17,5 @@ jobs:
       contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association)
     uses: elastic/ai-github-actions/.github/workflows/gh-aw-duplicate-issue-detector.lock.yml@v0
     with:
+      report-failure-as-issue: false
       detect-related-issues: false
-    secrets:
-      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}

@@ -33,8 +33,8 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 const testPluginName = "my_test_plugin"
@@ -512,6 +512,38 @@ take_over:
 		},
 		"invalid legacy config": {
 			cfgYAML:   "take_over: 42",
+			expectErr: true,
+		},
+		"from_any_id enabled": {
+			cfgYAML: `
+take_over:
+  enabled: true
+  from_any_id: true`,
+			expected: TakeOverConfig{
+				Enabled:   true,
+				FromAnyID: true,
+			},
+		},
+		"from_any_id disabled": {
+			cfgYAML: `
+take_over:
+  enabled: true
+  from_any_id: false`,
+			expected: TakeOverConfig{
+				Enabled:   true,
+				FromAnyID: false,
+			},
+		},
+		"from_any_id invalid type": {
+			cfgYAML:   `take_over.from_any_id: "yes"`,
+			expectErr: true,
+		},
+		"from_any_id and from_ids are mutually exclusive": {
+			cfgYAML: `
+take_over:
+  enabled: true
+  from_any_id: true
+  from_ids: ["foo"]`,
 			expectErr: true,
 		},
 	}

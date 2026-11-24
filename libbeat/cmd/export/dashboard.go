@@ -25,8 +25,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
 	"github.com/elastic/beats/v7/libbeat/version"
-	"github.com/elastic/elastic-agent-libs/config"
-	kbn "github.com/elastic/elastic-agent-libs/kibana"
+	"github.com/elastic/beats/v7/pkg/config"
+	kbn "github.com/elastic/beats/v7/pkg/kibana"
 )
 
 // GenDashboardCmd is the command used to export a dashboard.

@@ -33,8 +33,8 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/process"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestFetch(t *testing.T) {

@@ -354,7 +354,7 @@ type ipLocalOutCall struct {
 func (e *ipLocalOutCall) asFlow() flow {
 	return flow{
 		sock:     e.Sock,
-		pid:      e.Meta.PID,
+		pid:      0, // softirq context
 		inetType: inetTypeIPv4,
 		lastSeen: kernelTime(e.Meta.Timestamp),
 		local:    newEndpointIPv4(e.LAddr, e.LPort, 1, uint64(e.Size)),
@@ -406,7 +406,7 @@ type inet6CskXmitCall struct {
 func (e *inet6CskXmitCall) asFlow() flow {
 	return flow{
 		sock:     e.Sock,
-		pid:      e.Meta.PID,
+		pid:      0, // softirq context
 		inetType: inetTypeIPv6,
 		proto:    protoTCP,
 		lastSeen: kernelTime(e.Meta.Timestamp),
@@ -445,7 +445,7 @@ type tcpV4DoRcv struct {
 func (e *tcpV4DoRcv) asFlow() flow {
 	return flow{
 		sock:     e.Sock,
-		pid:      e.Meta.PID,
+		pid:      0, // softirq context
 		inetType: inetTypeIPv4,
 		proto:    protoTCP,
 		lastSeen: kernelTime(e.Meta.Timestamp),
@@ -486,7 +486,7 @@ type tcpV6DoRcv struct {
 func (e *tcpV6DoRcv) asFlow() flow {
 	return flow{
 		sock:     e.Sock,
-		pid:      e.Meta.PID,
+		pid:      0, // softirq context
 		inetType: inetTypeIPv6,
 		proto:    protoTCP,
 		lastSeen: kernelTime(e.Meta.Timestamp),
@@ -650,7 +650,7 @@ func validIPv6Headers(ipHdr uint16, udpHdr uint16, data []byte) bool {
 func (e *udpQueueRcvSkb) asFlow() flow {
 	f := flow{
 		sock:     e.Sock,
-		pid:      e.Meta.PID,
+		pid:      0, // softirq context
 		inetType: inetTypeIPv4,
 		proto:    protoUDP,
 		dir:      directionIngress,
@@ -724,7 +724,7 @@ type udpv6QueueRcvSkb struct {
 func (e *udpv6QueueRcvSkb) asFlow() flow {
 	f := flow{
 		sock:     e.Sock,
-		pid:      e.Meta.PID,
+		pid:      0, // softirq context
 		inetType: inetTypeIPv6,
 		proto:    protoUDP,
 		dir:      directionIngress,

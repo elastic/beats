@@ -26,10 +26,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	metrics "github.com/elastic/beats/v7/pkg/systemmetrics/metric/memory"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/transform/typeconv"
+	"github.com/elastic/beats/v7/pkg/transform/typeconv"
 )
 
 func init() {

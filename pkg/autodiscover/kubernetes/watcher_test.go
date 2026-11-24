@@ -30,7 +30,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	cachetest "k8s.io/client-go/tools/cache/testing"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 func TestWatcherStartAndStop(t *testing.T) {
@@ -135,6 +135,41 @@ func TestWatcherStartRejectsInvalidLifecycleStates(t *testing.T) {
 
 		require.ErrorIs(t, w.Start(), ErrWatcherStopped, "expected ErrWatcherStopped")
 	})
+}
+
+// TestWatcherStartDrainsInitialQueue verifies that Start() processes all
+// objects that were listed during cache sync before returning, so that
+// registered event handlers (and any caches they populate) are ready
+// immediately after Start() returns.
+func TestWatcherStartDrainsInitialQueue(t *testing.T) {
+	client := fake.NewSimpleClientset()
+	listWatch := cachetest.NewFakeControllerSource()
+	resource := &Pod{}
+	informer := cache.NewSharedInformer(listWatch, resource, 0)
+	w, err := NewNamedWatcherWithInformer("test", client, resource, informer, logptest.NewTestingLogger(t, ""), WatchOptions{})
+	require.NoError(t, err)
+
+	pod := &Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            "test-pod",
+			UID:             types.UID("poduid"),
+			Namespace:       "default",
+			ResourceVersion: "1",
+		},
+	}
+	listWatch.Add(pod)
+
+	var added bool
+	w.AddEventHandler(ResourceEventHandlerFuncs{
+		AddFunc: func(obj any) {
+			added = true
+		},
+	})
+
+	require.NoError(t, w.Start())
+	defer w.Stop()
+
+	assert.True(t, added, "event handler should have been called before Start() returned")
 }
 
 func TestWatcherHandlers(t *testing.T) {

@@ -23,14 +23,16 @@ import (
 	"testing"
 	"time"
 
+	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 var _ protos.UDPPlugin = &dhcpv4Plugin{}
@@ -276,4 +278,15 @@ func normalizeEvent(t testing.TB, event beat.Event) any {
 		t.Fatal(err)
 	}
 	return out
+}
+
+func TestOptionsToMapRejectsShortTimeOffsetOption(t *testing.T) {
+	v4, err := dhcpv4.New(
+		dhcpv4.WithOption(dhcpv4.OptGeneric(dhcpv4.OptionTimeOffset, []byte{0x00})),
+	)
+	require.NoError(t, err)
+
+	assert.NotPanics(t, func() {
+		_, _ = optionsToMap(v4)
+	}, "malformed OptionTimeOffset must not panic")
 }

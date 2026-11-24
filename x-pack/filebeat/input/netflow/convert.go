@@ -19,8 +19,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/flowhash"
 	"github.com/elastic/beats/v7/libbeat/conditions"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func toBeatEvent(flow record.Record, internalNetworks []string) (event beat.Event) {

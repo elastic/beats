@@ -28,9 +28,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	c "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/file"
-	"github.com/elastic/elastic-agent-libs/logp"
+	c "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/file"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 func init() {

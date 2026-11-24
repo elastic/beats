@@ -51,16 +51,16 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
+	"github.com/elastic/beats/v7/pkg/transport"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
+	"github.com/elastic/beats/v7/pkg/useragent"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/transport"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/elastic-agent-libs/useragent"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 	"github.com/elastic/mito/lib"
@@ -524,6 +524,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				errorSpans(err, end{execSpan}, runSpan)
 				return err
 			}
+			// Drop events from state now that we hold them. If we fail
+			// during the publication, we will re-request these events.
+			delete(state, "events")
 			var events []interface{}
 			switch e := e.(type) {
 			case []interface{}:
@@ -577,10 +580,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			metricsRecorder.AddReceivedEvents(execCtx, uint(len(events)))
 			runSpanEventCount += len(events)
 			execSpan.SetAttributes(attribute.Int("cel.program.event_count", len(events)))
-			// Drop events from state. If we fail during the publication,
-			// we will re-request these events.
-			delete(state, "events")
-
 			// Get cursors if they exist.
 			var (
 				cursors      []interface{}

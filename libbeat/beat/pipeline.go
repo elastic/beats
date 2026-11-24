@@ -20,7 +20,7 @@ package beat
 import (
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // Pipeline provides access to libbeat event publishing by creating a Client
