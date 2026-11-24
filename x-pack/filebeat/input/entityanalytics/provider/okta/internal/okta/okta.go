@@ -487,30 +487,44 @@ func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, end
 		if err != nil {
 			return nil, nil, err
 		}
-		resp, err := cli.Do(req)
-		if err != nil {
-			return nil, nil, err
-		}
-		defer resp.Body.Close()
-		err = lim.Update(endpoint, resp.Header, log)
-		if err != nil {
-			io.Copy(io.Discard, resp.Body)
-			return nil, nil, err
-		}
 
+		var (
+			resp *http.Response
+			body bytes.Buffer
+		)
+		err = func() error {
+			resp, err = cli.Do(req) //nolint:bodyclose // closed in the closure; resp is captured so the linter can't trace it
+			if err != nil {
+				return err
+			}
+			defer resp.Body.Close()
+			err = lim.Update(endpoint, resp.Header, log)
+			if err != nil {
+				io.Copy(io.Discard, resp.Body) //nolint:errcheck // this is a discard; we don't care about the error
+				return err
+			}
+
+			if resp.StatusCode == http.StatusTooManyRequests {
+				return nil
+			}
+
+			n, err := io.Copy(&body, resp.Body)
+			if err != nil {
+				return err
+			}
+			if n == 0 {
+				return errors.New("empty response body")
+			}
+
+			return nil
+		}()
 		if resp.StatusCode == http.StatusTooManyRequests {
 			log.Warnw("received 429 Too Many Requests")
 			retryCount++
 			continue
 		}
-
-		var body bytes.Buffer
-		n, err := io.Copy(&body, resp.Body)
 		if err != nil {
 			return nil, nil, err
-		}
-		if n == 0 {
-			return nil, nil, errors.New("empty response body")
 		}
 
 		if resp.StatusCode != http.StatusOK {
