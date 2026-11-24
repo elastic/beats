@@ -2,14 +2,7 @@
 name: "beats-xpack-winlogbeat"
 
 env:
-<<<<<<< HEAD
-  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1794715280"
-=======
-  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1795338029"
-
   IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1795338029"
->>>>>>> ab5602e (Update .python-version to 3.13.17  (#54771))
   IMAGE_WIN_10: "platform-ingest-beats-windows-10-pro"
   IMAGE_WIN_11: "platform-ingest-beats-windows-11-pro"
   IMAGE_WIN_10_VERSION: "1.0.1795338029"
