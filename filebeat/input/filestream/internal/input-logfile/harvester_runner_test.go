@@ -1691,6 +1691,12 @@ func (s *fakeSession) Offset() int64 {
 	return s.offset
 }
 
+func (s *fakeSession) ReadOffset() int64          { return s.Offset() }
+func (s *fakeSession) PendingDeadline() time.Time { return time.Time{} }
+func (s *fakeSession) Flush(v2.Context, Publisher) error {
+	return nil
+}
+
 func (s *fakeSession) IsGZIP() bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()

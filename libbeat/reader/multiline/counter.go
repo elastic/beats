@@ -18,8 +18,10 @@
 package multiline
 
 import (
+	"errors"
 	"io"
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
 )
@@ -30,7 +32,10 @@ type counterReader struct {
 	state      func(*counterReader) (reader.Message, error)
 	linesCount int // number of lines to collect
 	msgBuffer  *messageBuffer
+	closed     bool // guarded by stateMu
 }
+
+var _ reader.BufferedFlusher = (*counterReader)(nil)
 
 func newMultilineCountReader(
 	r reader.Reader,
@@ -88,6 +93,14 @@ func (cr *counterReader) readNext() (reader.Message, error) {
 	for {
 		message, err := cr.reader.Next()
 		if err != nil {
+			// The source has no data right now but is not finished: keep the
+			// buffered lines and state (readNext) until the remaining lines
+			// arrive, or flush them via FlushPending. Sources guarantee no bytes
+			// are consumed alongside ErrWouldBlock.
+			if message.Bytes == 0 && errors.Is(err, reader.ErrWouldBlock) {
+				return reader.Message{}, err
+			}
+
 			// handle error without any bytes returned from reader
 			if message.Bytes == 0 {
 				// no lines buffered -> return error
@@ -145,8 +158,41 @@ func (cr *counterReader) setState(next func(cr *counterReader) (reader.Message, 
 }
 
 func (cr *counterReader) Close() error {
-	cr.setState((*counterReader).readClosed)
+	cr.stateMu.Lock()
+	cr.closed = true
+	cr.state = (*counterReader).readClosed
+	cr.stateMu.Unlock()
 	return cr.reader.Close()
+}
+
+func (cr *counterReader) isClosed() bool {
+	cr.stateMu.Lock()
+	defer cr.stateMu.Unlock()
+	return cr.closed
+}
+
+// PendingDeadline implements reader.BufferedFlusher. Count mode has no
+// timeout: buffered lines wait indefinitely (zero deadline) for the remaining
+// lines or for the source to close. It must be called from the goroutine
+// calling Next.
+func (cr *counterReader) PendingDeadline() (bool, time.Time) {
+	if cr.isClosed() || !cr.msgBuffer.hasPending() {
+		return false, time.Time{}
+	}
+	return true, time.Time{}
+}
+
+// FlushPending implements reader.BufferedFlusher. It returns the buffered lines
+// (fewer than lines_count) as one event and resets the reader so the next line
+// starts a new event. It must be called from the goroutine calling Next.
+func (cr *counterReader) FlushPending(_ bool) (reader.Message, bool, error) {
+	if cr.isClosed() || !cr.msgBuffer.hasPending() {
+		return reader.Message{}, false, nil
+	}
+
+	msg := cr.msgBuffer.finalize()
+	cr.resetState()
+	return msg, true, nil
 }
 
 func (cr *counterReader) readClosed() (reader.Message, error) {

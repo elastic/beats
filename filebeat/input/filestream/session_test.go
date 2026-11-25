@@ -524,6 +524,7 @@ func newReadSession(t *testing.T, closer closerConfig, content string, offset in
 	t.Helper()
 	s := newPollSession(t, closer, content)
 	s.state.Offset = offset
+	s.readOffset = offset // nothing read yet, as after OpenSession
 	enc, err := s.inp.encodingFactory(s.file)
 	require.NoError(t, err)
 	s.enc = enc

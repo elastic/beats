@@ -123,10 +123,38 @@ func (r *JSONReader) Next() (reader.Message, error) {
 		return message, err
 	}
 
+	return r.processMessage(message)
+}
+
+// processMessage decodes the JSON content of a message read from, or flushed
+// by, the wrapped reader.
+func (r *JSONReader) processMessage(message reader.Message) (reader.Message, error) {
 	var fields mapstr.M
 	message.Content, fields = r.decode(message.Content)
 	message.AddFields(mapstr.M{"json": fields})
 	return message, nil
+}
+
+var (
+	_ reader.BufferedFlusher = (*JSONReader)(nil)
+	_ reader.BufferedFlusher = (*JSONParser)(nil)
+)
+
+// PendingDeadline implements reader.BufferedFlusher by delegating to the
+// wrapped reader. It is promoted to JSONParser through the embedded JSONReader.
+func (r *JSONReader) PendingDeadline() (bool, time.Time) {
+	return reader.PendingDeadline(r.reader)
+}
+
+// FlushPending implements reader.BufferedFlusher. A message flushed from the
+// wrapped reader is decoded exactly like one returned by Next.
+func (r *JSONReader) FlushPending(timedOut bool) (reader.Message, bool, error) {
+	message, ok, err := reader.FlushPending(r.reader, timedOut)
+	if !ok || err != nil {
+		return message, ok, err
+	}
+	message, err = r.processMessage(message)
+	return message, true, err
 }
 
 func (r *JSONReader) Close() error {
@@ -150,6 +178,26 @@ func (p *JSONParser) Next() (reader.Message, error) {
 		return message, err
 	}
 
+	return p.processMessage(message)
+}
+
+// FlushPending implements reader.BufferedFlusher. It overrides the promoted
+// JSONReader.FlushPending so a flushed message goes through the same JSONParser
+// processing as one returned by Next.
+func (p *JSONParser) FlushPending(timedOut bool) (reader.Message, bool, error) {
+	message, ok, err := reader.FlushPending(p.reader, timedOut)
+	if !ok || err != nil {
+		return message, ok, err
+	}
+	message, err = p.processMessage(message)
+	return message, true, err
+}
+
+// processMessage decodes the JSON in a message read from, or flushed by, the
+// wrapped reader and merges it into the message according to the parser config.
+// It shadows JSONReader.processMessage.
+func (p *JSONParser) processMessage(message reader.Message) (reader.Message, error) {
+	var err error
 	var ok bool
 	from := message.Content
 	if p.field != "" {

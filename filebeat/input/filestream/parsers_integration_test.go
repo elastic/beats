@@ -22,6 +22,7 @@ package filestream
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
@@ -444,12 +445,15 @@ func TestParsersMultilineTimeout(t *testing.T) {
   First Line
   Second Line
 `)
+	start := time.Now()
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(1)
+	require.GreaterOrEqual(t, time.Since(start), 100*time.Millisecond,
+		"the multiline event must not be flushed before multiline.timeout elapses")
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
 
 	moreLines := []byte(`  This should not be third
@@ -673,4 +677,93 @@ func TestParsersMultilineInvalidConfig(t *testing.T) {
 		},
 	})
 	require.ErrorContains(t, err, "multiline.pattern cannot be empty")
+}
+
+// TestParsersMultilineAppendedWhileParked reproduces
+// https://github.com/elastic/beats/issues/54599: the lines of one multiline
+// event arrive after the harvester caught up with the file and parked, each in
+// its own read slice, with pauses shorter than multiline.timeout. They must be
+// published as a single event rather than split at every slice boundary.
+func TestParsersMultilineAppendedWhileParked(t *testing.T) {
+	const (
+		lineGap          = 300 * time.Millisecond
+		multilineTimeout = 1500 * time.Millisecond
+		first            = "[2015] hello world\n"
+		want             = "[2015] hello world\n  First Line\n  Second Line\n  Third Line"
+	)
+	more := []string{"  First Line\n", "  Second Line\n", "  Third Line\n"}
+
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	id := uuid.Must(uuid.NewV4()).String()
+	inp := env.mustCreateInput(map[string]any{
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
+		// Poll often so every appended line is read in a slice of its own.
+		"backoff": map[string]any{"init": "50ms", "max": "100ms"},
+		"parsers": []map[string]any{
+			{
+				"multiline": map[string]any{
+					"type":    "pattern",
+					"pattern": "^\\[",
+					"negate":  true,
+					"match":   "after",
+					"timeout": multilineTimeout.String(),
+				},
+			},
+		},
+	})
+
+	total := len(first)
+	env.mustWriteToFile(testlogName, []byte(first))
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, id, inp)
+
+	// The harvester has read the first line, kept it buffered and parked.
+	env.WaitLogsContains("End of file reached", 30*time.Second,
+		"the harvester must reach EOF and park")
+
+	var lastAppend time.Time
+	for _, line := range more {
+		time.Sleep(lineGap)
+		require.Empty(t, env.pipeline.GetAllEvents(),
+			"an incomplete multiline event must not be published")
+
+		total += len(line)
+		lastAppend = time.Now()
+		env.mustAppendToFile(testlogName, []byte(line))
+	}
+
+	require.Never(t, func() bool { return len(env.pipeline.GetAllEvents()) > 0 },
+		multilineTimeout-500*time.Millisecond, 20*time.Millisecond,
+		"the event must not be flushed before multiline.timeout elapses")
+
+	env.waitUntilEventCount(1)
+	require.GreaterOrEqual(t, time.Since(lastAppend), multilineTimeout,
+		"the event must be flushed only after multiline.timeout elapsed since the last line")
+	env.requireOffsetInRegistry(testlogName, "fake-ID", total)
+	require.Equal(t, []string{want}, env.getOutputMessages(),
+		"the lines must be published as one multiline event")
+
+	// Append a second incomplete event and shut down before multiline.timeout:
+	// read_until_eof must drain and flush the buffered lines on stop.
+	const shutdownEvent = "[2015] before shutdown\n  trailing line\n"
+	total += len(shutdownEvent)
+	env.mustAppendToFile(testlogName, []byte(shutdownEvent))
+
+	cancelInput()
+	env.waitUntilInputStops()
+
+	env.requireOffsetInRegistry(testlogName, "fake-ID", total)
+	require.Equal(
+		t,
+		[]string{want, "[2015] before shutdown\n  trailing line"},
+		env.getOutputMessages(),
+		"shutting down must flush the incomplete multiline event",
+	)
 }

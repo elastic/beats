@@ -52,6 +52,24 @@ type DockerJSONReader struct {
 	stripNewLine func(msg *reader.Message)
 
 	logger *logp.Logger
+
+	// state is the progress of a Next call interrupted by reader.ErrWouldBlock.
+	state readState
+}
+
+// readState is the progress of reading a log line that spans several chunks
+// (partial CRI/Docker lines), kept across calls interrupted by
+// reader.ErrWouldBlock.
+type readState struct {
+	// bytes consumed so far from the wrapped reader, including skipped lines.
+	bytes int
+	// message holds the chunks joined so far, valid when joining is true.
+	message reader.Message
+	line    logLine
+	// truncated is set when the max_bytes limit was reached while joining.
+	truncated bool
+	// joining is set when message is a partial line waiting for more chunks.
+	joining bool
 }
 
 type logLine struct {
@@ -218,79 +236,111 @@ func (p *DockerJSONReader) parseAuto(message *reader.Message, msg *logLine) erro
 }
 
 // Next returns the next line.
+//
+// If the wrapped reader returns reader.ErrWouldBlock while a partial line is
+// being joined (or after lines that were skipped), the progress made so far is
+// kept in the reader and resumed by the next call, which returns
+// reader.ErrWouldBlock with an empty message. This keeps the already consumed
+// chunks from being returned as a standalone message, or lost, when the caller
+// retains the reader across non-blocking reads.
 func (p *DockerJSONReader) Next() (reader.Message, error) {
-	var bytes int
+	st := p.state
+	p.state = readState{}
+
 	for {
-		message, err := p.reader.Next()
+		if !st.joining {
+			message, err := p.reader.Next()
 
-		// keep the right bytes count even if we return an error
-		bytes += message.Bytes
-		message.Bytes = bytes
+			// keep the right bytes count even if we return an error
+			st.bytes += message.Bytes
+			message.Bytes = st.bytes
 
-		if err != nil {
-			return message, err
-		}
+			if err != nil {
+				return p.fail(&st, message, err)
+			}
 
-		var logLine logLine
-		err = p.parseLine(&message, &logLine)
-		if err != nil {
-			p.logger.Errorf("Parse line error: %v", err)
-			continue
+			st.message = message
+			st.line = logLine{}
+			st.truncated = false
+			err = p.parseLine(&st.message, &st.line)
+			if err != nil {
+				p.logger.Errorf("Parse line error: %v", err)
+				continue
+			}
 		}
 
 		// Handle multiline messages, join partial lines
-		truncated := false
-		for p.partial && logLine.Partial {
+		for p.partial && st.line.Partial {
 			next, err := p.reader.Next()
 
 			// keep the right bytes count even if we return an error
-			bytes += next.Bytes
-			message.Bytes = bytes
+			st.bytes += next.Bytes
+			st.message.Bytes = st.bytes
 
 			if err != nil {
-				return message, err
+				st.joining = true
+				return p.fail(&st, st.message, err)
 			}
-			err = p.parseLine(&next, &logLine)
+			err = p.parseLine(&next, &st.line)
 			if err != nil {
 				p.logger.Errorf("Parse line error: %v", err)
 				continue
 			}
 
-			// Enforce max_bytes during partial line reassembly to prevent unbounded
-			// memory growth. Once the limit is reached, drain remaining partial
-			// chunks (updating the byte counter only) so the reader stays aligned
-			// to logical line boundaries for the next Next() call.
-			if truncated {
-				continue
-			}
-			if p.maxBytes > 0 && len(message.Content)+len(next.Content) > p.maxBytes {
-				remaining := p.maxBytes - len(message.Content)
-				if remaining < 0 {
-					// Just cutting the slice won't shrink the underlying array,
-					// so we create a slice the size we want and copy the data.
-					msg := make([]byte, p.maxBytes)
-					copy(msg, message.Content[:p.maxBytes])
-					message.Content = msg
-				} else if remaining > 0 {
-					message.Content = append(message.Content, next.Content[:remaining]...)
-					// Make sure the underlaying array is the same size as the content
-					msg := make([]byte, p.maxBytes)
-					copy(msg, message.Content)
-					message.Content = msg
-				}
-				_ = message.AddFlagsWithKey("log.flags", "truncated")
-				truncated = true
-			} else {
-				message.Content = append(message.Content, next.Content...)
-			}
+			p.appendChunk(&st, next)
 		}
+		st.joining = false
 
-		if p.stream != "all" && p.stream != logLine.Stream {
+		if p.stream != "all" && p.stream != st.line.Stream {
 			continue
 		}
 
-		return message, err
+		return st.message, nil
 	}
+}
+
+// fail handles an error returned by the wrapped reader. reader.ErrWouldBlock
+// parks the state for the next call and returns an empty message; any other
+// error is returned with the message holding the bytes consumed so far.
+func (p *DockerJSONReader) fail(st *readState, message reader.Message, err error) (reader.Message, error) {
+	if errors.Is(err, reader.ErrWouldBlock) {
+		p.state = *st
+		return reader.Message{}, err
+	}
+	return message, err
+}
+
+// appendChunk appends the parsed chunk next to the partial line in st.
+func (p *DockerJSONReader) appendChunk(st *readState, next reader.Message) {
+	message := &st.message
+
+	// Enforce max_bytes during partial line reassembly to prevent unbounded
+	// memory growth. Once the limit is reached, drain remaining partial
+	// chunks (updating the byte counter only) so the reader stays aligned
+	// to logical line boundaries for the next Next() call.
+	if st.truncated {
+		return
+	}
+	if p.maxBytes > 0 && len(message.Content)+len(next.Content) > p.maxBytes {
+		remaining := p.maxBytes - len(message.Content)
+		if remaining < 0 {
+			// Just cutting the slice won't shrink the underlying array,
+			// so we create a slice the size we want and copy the data.
+			msg := make([]byte, p.maxBytes)
+			copy(msg, message.Content[:p.maxBytes])
+			message.Content = msg
+		} else if remaining > 0 {
+			message.Content = append(message.Content, next.Content[:remaining]...)
+			// Make sure the underlaying array is the same size as the content
+			msg := make([]byte, p.maxBytes)
+			copy(msg, message.Content)
+			message.Content = msg
+		}
+		_ = message.AddFlagsWithKey("log.flags", "truncated")
+		st.truncated = true
+		return
+	}
+	message.Content = append(message.Content, next.Content...)
 }
 
 func stripNewLine(msg *reader.Message) {
