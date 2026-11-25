@@ -22,6 +22,7 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/security"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 // TestSyntheticsWorkdirIntegration requires a CLI with --workdir support and its
@@ -114,7 +115,7 @@ func TestSyntheticsWorkdirIntegration(t *testing.T) {
 					cmd = factory()
 				}
 				ctx := context.WithValue(context.Background(), SynthexecTimeoutKey, time.Minute)
-				mpx, err := runCmd(ctx, cmd, stdin, nil, FilterJourneyConfig{}, stdfields.StdMonitorFields{}, "")
+				mpx, err := runCmd(ctx, logptest.NewTestingLogger(t, ""), cmd, stdin, nil, FilterJourneyConfig{}, stdfields.StdMonitorFields{}, "")
 				require.NoError(t, err, "launch actual synthetics CLI")
 				events := drainWorkdirEvents(t, mpx)
 				for _, event := range events {

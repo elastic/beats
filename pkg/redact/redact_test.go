@@ -499,6 +499,67 @@ func TestRedact(t *testing.T) {
 			},
 		},
 		{
+			name: "slice items under a sensitive key are redacted",
+			input: map[string]any{
+				"auth": map[string]any{
+					"bearertokenauth": map[string]any{
+						"filename": "/var/run/tok",
+						"token":    "secret",
+						"tokens":   []any{"list-secret-1", "list-secret-2"},
+					},
+				},
+				"api_keys": []any{"key-1", int64(42), nil},
+				"hosts":    []any{"es-1:9200", "es-2:9200"},
+			},
+			expect: map[string]any{
+				"auth": map[string]any{
+					"bearertokenauth": map[string]any{
+						"filename": "/var/run/tok",
+						"token":    REDACTED,
+						"tokens":   []any{REDACTED, REDACTED},
+					},
+				},
+				"api_keys": []any{REDACTED, REDACTED, nil},
+				"hosts":    []any{"es-1:9200", "es-2:9200"},
+			},
+		},
+		{
+			name: "map items under a sensitive key are still walked",
+			input: map[string]any{
+				"tokens": []any{
+					map[string]any{"id": "a", "secret": "s1"},
+					"plain-secret",
+				},
+			},
+			expect: map[string]any{
+				"tokens": []any{
+					map[string]any{"id": "a", "secret": REDACTED},
+					REDACTED,
+				},
+			},
+		},
+		{
+			name: "[]string values are redacted",
+			input: map[string]any{
+				"tokens": []string{"secret-1", "secret-2"},
+				"hosts":  []string{"https://user:pass@es:9200", "https://es:9200"},
+			},
+			expect: map[string]any{
+				"tokens": []string{REDACTED, REDACTED},
+				"hosts":  []string{"https://" + redactedURL + "@es:9200", "https://es:9200"},
+			},
+		},
+		{
+			name: "ignored keys are not redacted for slices",
+			input: map[string]any{
+				"routekeys": []any{"a", "b"},
+			},
+			opts: []RedactOption{WithIgnoreKeys("routekeys")},
+			expect: map[string]any{
+				"routekeys": []any{"a", "b"},
+			},
+		},
+		{
 			name: "ignored keys and markers coexist",
 			input: map[string]any{
 				"routekey":              "should-not-redact",

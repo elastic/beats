@@ -12,6 +12,7 @@ on:
       - x-pack/heartbeat/**
       # OSS
       - go.mod
+      - .python-version
       - dev-tools/**
       - libbeat/**
       - x-pack/libbeat/**
@@ -26,6 +27,7 @@ on:
       - x-pack/heartbeat/**
       # OSS
       - go.mod
+      - .python-version
       - dev-tools/**
       - libbeat/**
       - x-pack/libbeat/**

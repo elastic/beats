@@ -17,8 +17,8 @@ Builds and runs unit tests for **x-pack heartbeat** on the configured macOS runn
 ## When it runs
 
 - `workflow_dispatch`.
-- `pull_request`: paths: `["heartbeat/**", "x-pack/heartbeat/**", "go.mod", "dev-tools/**", "libbeat/**", "x-pack/libbeat/**", ".github/workflows/xpack-heartbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
-- `push`: branches: `["main"]`; paths: `["heartbeat/**", "x-pack/heartbeat/**", "go.mod", "dev-tools/**", "libbeat/**", "x-pack/libbeat/**", ".github/workflows/xpack-heartbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `pull_request`: paths: `["heartbeat/**", "x-pack/heartbeat/**", "go.mod", ".python-version", "dev-tools/**", "libbeat/**", "x-pack/libbeat/**", ".github/workflows/xpack-heartbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `push`: branches: `["main"]`; paths: `["heartbeat/**", "x-pack/heartbeat/**", "go.mod", ".python-version", "dev-tools/**", "libbeat/**", "x-pack/libbeat/**", ".github/workflows/xpack-heartbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
 
 ## Execution flow
 

@@ -20,6 +20,7 @@
 package diskio
 
 import (
+	"context"
 	"errors"
 
 	"github.com/shirou/gopsutil/v4/disk"
@@ -40,7 +41,7 @@ func NewDiskIOStat() *IOStat {
 }
 
 // OpenSampling stub for linux implementation.
-func (stat *IOStat) OpenSampling() error {
+func (stat *IOStat) OpenSampling(_ context.Context) error {
 	return nil
 }
 
@@ -53,6 +54,6 @@ func (stat *IOStat) CalcIOStatistics(rcounter disk.IOCountersStat) (IOMetric, er
 func (stat *IOStat) CloseSampling() {}
 
 // IOCounters should map functionality to disk package for linux os.
-func IOCounters(_ *logp.Logger, names ...string) (map[string]disk.IOCountersStat, error) {
-	return disk.IOCounters(names...)
+func IOCounters(ctx context.Context, _ *logp.Logger, names ...string) (map[string]disk.IOCountersStat, error) {
+	return disk.IOCountersWithContext(ctx, names...)
 }

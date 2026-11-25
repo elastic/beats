@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/security"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 // TestWorkdirSubprocess exercises the actual child process boundary without Node.
@@ -126,7 +127,7 @@ func TestRunCmdWorkdirLifecycle(t *testing.T) {
 			}
 			ctx, cancel := context.WithCancel(context.WithValue(context.Background(), SynthexecTimeoutKey, timeout))
 			defer cancel()
-			mpx, err := runCmd(ctx, cmd, nil, nil, FilterJourneyConfig{}, stdfields.StdMonitorFields{}, "")
+			mpx, err := runCmd(ctx, logptest.NewTestingLogger(t, ""), cmd, nil, nil, FilterJourneyConfig{}, stdfields.StdMonitorFields{}, "")
 			require.NoError(t, err, "start helper with isolated scratch directory")
 			ready := nextWorkdirEvent(t, mpx)
 			require.NotNil(t, ready, "child must report its runtime cache")
@@ -182,7 +183,7 @@ func TestRunCmdConcurrentWorkdirs(t *testing.T) {
 	var streams []*ExecMultiplexer
 	var dirs []string
 	for range 4 {
-		mpx, err := runCmd(ctx, workdirCommand(t, "success"), nil, nil, FilterJourneyConfig{}, stdfields.StdMonitorFields{}, "")
+		mpx, err := runCmd(ctx, logptest.NewTestingLogger(t, ""), workdirCommand(t, "success"), nil, nil, FilterJourneyConfig{}, stdfields.StdMonitorFields{}, "")
 		require.NoError(t, err, "start concurrent run")
 		ready := nextWorkdirEvent(t, mpx)
 		require.NotNil(t, ready, "concurrent child must initialize")
@@ -219,7 +220,7 @@ func TestRunCmdWorkdirSetupFailures(t *testing.T) {
 			case "start":
 				cmd.Path = filepath.Join(root, "missing-command")
 			}
-			mpx, err := runCmd(context.Background(), cmd, nil, nil, FilterJourneyConfig{}, stdfields.StdMonitorFields{}, "")
+			mpx, err := runCmd(context.Background(), logptest.NewTestingLogger(t, ""), cmd, nil, nil, FilterJourneyConfig{}, stdfields.StdMonitorFields{}, "")
 			require.Error(t, err, "setup failure must reach caller")
 			assert.Nil(t, mpx, "failed setup must not expose an event stream")
 			if mode == "stderr-pipe" || mode == "start" {
@@ -290,7 +291,7 @@ func TestRunCmdWorkdirRestrictedUser(t *testing.T) {
 	for range 2 {
 		cmd := workdirCommand(t, "success")
 		cmd.Dir = agentDir
-		mpx, err := runCmd(ctx, cmd, nil, nil, FilterJourneyConfig{}, stdfields.StdMonitorFields{}, "")
+		mpx, err := runCmd(ctx, logptest.NewTestingLogger(t, ""), cmd, nil, nil, FilterJourneyConfig{}, stdfields.StdMonitorFields{}, "")
 		require.NoError(t, err, "start synthetics as restricted user")
 		ready := nextWorkdirEvent(t, mpx)
 		require.NotNil(t, ready, "restricted user must report initialization")

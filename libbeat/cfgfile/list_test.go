@@ -160,6 +160,52 @@ func TestReloadSkipsDisabledConfigs(t *testing.T) {
 	assert.Len(t, factory.runners, 2, "disabled configs should not be passed to the runner factory")
 }
 
+// configsFactory records the configs passed to SetRunnerConfigs.
+type configsFactory struct {
+	runnerFactory
+	configs map[any][]int64
+}
+
+func (f *configsFactory) SetRunnerConfigs(source any, configs []*conf.C) {
+	ids := make([]int64, 0, len(configs))
+	for _, c := range configs {
+		id, _ := c.Int("id", -1)
+		ids = append(ids, id)
+	}
+	if f.configs == nil {
+		f.configs = make(map[any][]int64)
+	}
+	f.configs[source] = ids
+}
+
+// wrappingFactory wraps a factory, as the OTel status factory does.
+type wrappingFactory struct {
+	RunnerFactory
+}
+
+func (f wrappingFactory) Unwrap() RunnerFactory { return f.RunnerFactory }
+
+func TestReloadSetsRunnerConfigs(t *testing.T) {
+	factory := &configsFactory{}
+	logger := logptest.NewTestingLogger(t, "")
+	list := NewRunnerList("", wrappingFactory{factory}, nil, logger)
+
+	err := list.Reload([]*reload.ConfigWithMeta{
+		createConfig(1),
+		createDisabledConfig(2),
+		createConfig(-1), // fails to start
+	})
+	require.Error(t, err, "the invalid config should fail to start")
+	assert.Equal(t, []int64{1, -1}, factory.configs[list], "every enabled config should be set, including those that fail to start")
+
+	err = list.Reload([]*reload.ConfigWithMeta{createConfig(3)})
+	require.NoError(t, err, "reloading a valid config should succeed")
+	assert.Equal(t, []int64{3}, factory.configs[list], "the configs should be replaced on reload")
+
+	list.Stop()
+	assert.Empty(t, factory.configs[list], "no configs should be set once the list stopped")
+}
+
 func TestReloadSameConfigs(t *testing.T) {
 	factory := &runnerFactory{}
 	logger := logptest.NewTestingLogger(t, "")
