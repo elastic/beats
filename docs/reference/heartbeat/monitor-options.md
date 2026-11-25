@@ -187,7 +187,15 @@ References in the `source.inline.script` setting of browser monitors are not res
 
 If a monitor with several URLs or hosts starts while Vault is unavailable, or if the resolved values change its number of URLs or hosts, it reports an error until you change its configuration or restart Heartbeat.
 
+::::{note}
+:applies_to: stack: preview 9.7+
+Heartbeat replaces resolved values with `<hidden>` in the events and logs of the monitor, for example in `url.full`, `url.query`, `error.message`, `error.stack_trace`, and the output of the browser runner. It also replaces their common percent-encoded and JSON-escaped forms, and each line of a multi-line value such as a PEM key. If the whole value of a field is a resolved value, such as `monitor.ip` when the host is a secret IP address, Heartbeat leaves the field out of the event, because `<hidden>` isn't valid for fields such as IP addresses. Fields that Heartbeat sets itself to identify and classify events, such as `monitor.id`, `monitor.name`, `event.type`, or `synthetics.type`, are never changed.
+
+Heartbeat doesn't hide values shorter than 6 characters, values transformed in other ways such as base64 or lowercase percent-encoding, screenshots, or what the browser runner records itself, such as network events. Prefer settings that aren't published for secrets, such as `username`, `password`, request headers, or TLS settings.
+::::
+
 ::::{warning}
+:applies_to: stack: preview =9.6
 Heartbeat uses the resolved values as they are. A secret in a setting that is published in events, such as a URL or a host, is visible in those events, for example in `url.full`, `url.query`, or `error.message`, as with any other secret in the configuration. Use settings that are not published for secrets, such as `username`, `password`, request headers, or TLS settings.
 ::::
 
@@ -250,7 +258,7 @@ In this example, the secrets of the `prod` connection can only be sent to `api.s
       allowed_hosts: ["api.stripe.com"]
 ```
 
-`allowed_hosts` restricts where secrets are sent, not who can see them. A secret in a setting that Heartbeat publishes is visible in events, as described in the [`secret_stores`](#monitor-secret-stores) warning.
+`allowed_hosts` restricts where secrets are sent, not who can see them. To learn how secrets appear in published events and logs, refer to [`secret_stores`](#monitor-secret-stores).
 
 
 ## `fields` [monitor-fields]
