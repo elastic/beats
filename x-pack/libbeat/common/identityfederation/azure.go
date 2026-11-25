@@ -19,7 +19,13 @@ import (
 	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+
+	"github.com/elastic/beats/v7/pkg/logp"
 )
+
+// AzureTokenExchangeAudience is the audience Microsoft Entra expects in a
+// federated identity credential.
+const AzureTokenExchangeAudience = "api://AzureADTokenExchange" //nolint:gosec // G101: a public audience URI, not a credential
 
 // AzureParams configures the Azure client assertion credential flow.
 //
@@ -70,6 +76,73 @@ func AzureNewClientAssertionCredential(params AzureParams) (*azidentity.ClientAs
 	}
 
 	return azidentity.NewClientAssertionCredential(params.TenantID, params.ClientID, getAssertion, params.Options)
+}
+
+// AzureWIIParams configures a client assertion credential that uses a workload-identity-issuer JWT.
+type AzureWIIParams struct {
+	TenantID    string
+	ClientID    string
+	TokenSource *WIITokenSource
+	Options     *azidentity.ClientAssertionCredentialOptions
+}
+
+func (p AzureWIIParams) validate() error {
+	var errs []error
+	if p.TenantID == "" {
+		errs = append(errs, errors.New("TenantID is required"))
+	}
+	if p.ClientID == "" {
+		errs = append(errs, errors.New("ClientID is required"))
+	}
+	if p.TokenSource == nil {
+		errs = append(errs, errors.New("TokenSource is required"))
+	}
+	if len(errs) > 0 {
+		return fmt.Errorf("invalid Azure identity federation params: %w", errors.Join(errs...))
+	}
+	return nil
+}
+
+// AzureNewWIIClientAssertionCredential asks the token source for a JWT on each Entra token refresh.
+func AzureNewWIIClientAssertionCredential(params AzureWIIParams) (*azidentity.ClientAssertionCredential, error) {
+	if err := params.validate(); err != nil {
+		return nil, err
+	}
+
+	tokenSource := params.TokenSource
+	getAssertion := func(_ context.Context) (string, error) {
+		token, err := tokenSource.GetIdentityToken()
+		if err != nil {
+			return "", err
+		}
+		return string(token), nil
+	}
+
+	return azidentity.NewClientAssertionCredential(params.TenantID, params.ClientID, getAssertion, params.Options)
+}
+
+// AzureNewWIIClientAssertionCredentialFromEnv reads the WII environment that the agentless controller sets.
+func AzureNewWIIClientAssertionCredentialFromEnv(tenantID, clientID string, opts *azidentity.ClientAssertionCredentialOptions, logger *logp.Logger) (*azidentity.ClientAssertionCredential, error) {
+	wiiIssuerURL := os.Getenv(WIIIssuerURLEnvVar)
+	wiiCertFile := os.Getenv(WIISSLCertFileEnvVar)
+	wiiKeyFile := os.Getenv(WIISSLKeyFileEnvVar)
+
+	if wiiIssuerURL == "" {
+		return nil, fmt.Errorf("identity federation for Azure requires the workload-identity-issuer environment set by the agentless controller: %s is not set", WIIIssuerURLEnvVar)
+	}
+	if wiiCertFile == "" || wiiKeyFile == "" {
+		return nil, fmt.Errorf("%s and %s must be set when %s is configured", WIISSLCertFileEnvVar, WIISSLKeyFileEnvVar, WIIIssuerURLEnvVar)
+	}
+	tokenSource, err := NewWIITokenSource(wiiIssuerURL, wiiCertFile, wiiKeyFile, AzureTokenExchangeAudience, logger)
+	if err != nil {
+		return nil, fmt.Errorf("configuring WII token source: %w", err)
+	}
+	return AzureNewWIIClientAssertionCredential(AzureWIIParams{
+		TenantID:    tenantID,
+		ClientID:    clientID,
+		TokenSource: tokenSource,
+		Options:     opts,
+	})
 }
 
 // AzureReadJWT reads and validates a JWT token from the given file path.
