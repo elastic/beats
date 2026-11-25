@@ -4,6 +4,7 @@ beats:
   - filebeat
   - metricbeat
   - heartbeat
+  - osquerybeat
 compile:
   env:
     # See https://go.dev/doc/security/fips140#go-cryptographic-module-v100
