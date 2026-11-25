@@ -124,9 +124,15 @@ func (re *Reader) groupToSingleEvent(counters map[string][]pdh.CounterValue) mb.
 	event := mb.Event{
 		MetricSetFields: mapstr.M{},
 	}
-	measurements := make(map[string]float64, 0)
+	measurements := make(map[string]float64)
+	instanceCounts := make(map[string]float64)
+	// Query fields that can match any number of instances, so a count of one is meaningful.
+	wildcards := make(map[string]bool)
 	for counterPath, values := range counters {
 		if hasCounter, readerCounter := re.getCounter(counterPath); hasCounter {
+			if isWildcard(readerCounter.ChildQueries, readerCounter.InstanceName) {
+				wildcards[readerCounter.QueryField] = true
+			}
 			for _, val := range values {
 				// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 				// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
@@ -149,26 +155,26 @@ func (re *Reader) groupToSingleEvent(counters map[string][]pdh.CounterValue) mb.
 				default:
 					counterVal, _ = val.Measurement.(float64)
 				}
-				if _, ok := measurements[readerCounter.QueryField]; !ok {
-					measurements[readerCounter.QueryField] = counterVal
-					measurements[readerCounter.QueryField+instanceCountLabel] = 1
-				} else {
-					measurements[readerCounter.QueryField+instanceCountLabel] = measurements[readerCounter.QueryField+instanceCountLabel] + 1
-					measurements[readerCounter.QueryField] = measurements[readerCounter.QueryField] + counterVal
-				}
+				measurements[readerCounter.QueryField] += counterVal
+				instanceCounts[readerCounter.QueryField]++
 			}
 		}
 	}
-	for key, val := range measurements {
-		if strings.Contains(key, instanceCountLabel) {
-			if val == 1 {
-				continue
-			} else {
-				event.MetricSetFields.Put(fmt.Sprintf("%s.%s", strings.Split(key, ".")[0], re.config.GroupAllCountersTo), val)
-			}
-		} else {
-			event.MetricSetFields.Put(key, val)
+	for field, val := range measurements {
+		event.MetricSetFields.Put(field, val)
+	}
+	// All the counters of a namespace share one instance count. A counter can be missing the value of
+	// some instances, for example when a rate is not valid yet, so use the highest count.
+	namespaceCounts := make(map[string]float64)
+	for field, count := range instanceCounts {
+		if count == 1 && !wildcards[field] {
+			continue
 		}
+		namespace, _, _ := strings.Cut(field+instanceCountLabel, ".")
+		namespaceCounts[namespace] = max(namespaceCounts[namespace], count)
+	}
+	for namespace, count := range namespaceCounts {
+		event.MetricSetFields.Put(namespace+"."+re.config.GroupAllCountersTo, count)
 	}
 	return event
 }
