@@ -99,8 +99,7 @@ func (se SynthEvent) ToMap() (m mapstr.M) {
 			_, _ = m.Put("url", mapstr.M{"full": se.URL})
 			// Neither the URL nor e, which quotes it, are logged: the URL can
 			// hold a secret value, and this logger doesn't scrub.
-			var urlErr *url.Error
-			if errors.As(e, &urlErr) {
+			if urlErr, ok := errors.AsType[*url.Error](e); ok {
 				e = urlErr.Err
 			}
 			//nolint:forbidigo // ToMap has no logger handle; matches the pre-existing pattern in this package.
