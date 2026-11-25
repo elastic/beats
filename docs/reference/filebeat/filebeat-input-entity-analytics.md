@@ -51,6 +51,8 @@ If a full synchronization fails, it is retried after `update_interval`. The wait
 * After a failed full synchronization, the status stays degraded until a full synchronization succeeds.
 * After a failed incremental synchronization, it stays degraded until a later synchronization of either kind succeeds.
 
+The legacy implementation works in the same way. In earlier releases, it retries a failed full synchronization only after `sync_interval`, and a successful incremental synchronization clears the degraded status.
+
 Defaults to `false`. The Okta, Microsoft Entra ID and Active Directory integration packages set this to `true` by default.
 
 With `use_minimal_state: true`, the HTTP settings (`request.*` for Jamf and Okta, and the top-level `proxy_url`, `ssl` and `timeout` for Azure Active Directory) and the `tracer.*` settings work as they do in the legacy implementation, with these differences:

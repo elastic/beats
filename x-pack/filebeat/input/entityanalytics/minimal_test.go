@@ -566,34 +566,6 @@ func TestMinimalInput_RunFullSyncClearsIncrementalError(t *testing.T) {
 	})
 }
 
-// TestRetryBackoff checks the doubling, the cap and the reset of the full
-// sync retry wait.
-func TestRetryBackoff(t *testing.T) {
-	t.Parallel()
-
-	b := retryBackoff{initial: 10 * time.Second, max: time.Minute}
-	steps := []struct {
-		reset bool
-		want  time.Duration
-	}{
-		{want: 10 * time.Second},
-		{want: 20 * time.Second},
-		{want: 40 * time.Second},
-		{want: time.Minute},
-		{want: time.Minute},
-		{reset: true, want: 10 * time.Second},
-		{want: 20 * time.Second},
-	}
-	for i, step := range steps {
-		if step.reset {
-			b.reset()
-		}
-		if got := b.failed(); got != step.want {
-			t.Errorf("step %d: failed() = %v; want %v", i, got, step.want)
-		}
-	}
-}
-
 // newTestMinimalInput returns a minimal-state input using prov with a
 // bbolt store in a temporary directory.
 func newTestMinimalInput(t *testing.T, prov entcollect.Provider, full, incr time.Duration) *minimalStateInput {

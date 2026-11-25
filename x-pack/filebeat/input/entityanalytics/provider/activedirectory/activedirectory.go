@@ -124,79 +124,31 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 	p.metrics = newMetrics(inputCtx.MetricsRegistry, inputCtx.Logger)
 
 	lastSyncTime, _ := getLastSync(store)
-	syncWaitTime := time.Until(lastSyncTime.Add(p.cfg.SyncInterval))
 	lastUpdateTime, _ := getLastUpdate(store)
-	updateWaitTime := time.Until(lastUpdateTime.Add(p.cfg.UpdateInterval))
-
-	syncTimer := time.NewTimer(syncWaitTime)
-	updateTimer := time.NewTimer(updateWaitTime)
 
 	p.cfg.UserAttrs = withMandatory(p.cfg.UserAttrs, "distinguishedName", "whenChanged")
 	p.cfg.GrpAttrs = withMandatory(p.cfg.GrpAttrs, "distinguishedName", "whenChanged")
 
-	inputCtx.UpdateStatus(status.Running, "")
-	var (
-		last time.Time
-		err  error
-	)
-	for {
-		select {
-		case <-inputCtx.Cancelation.Done():
-			if !errors.Is(inputCtx.Cancelation.Err(), context.Canceled) {
-				err := inputCtx.Cancelation.Err()
-				inputCtx.UpdateStatus(status.Stopping, err.Error())
-				return err
-			}
-			inputCtx.UpdateStatus(status.Stopping, "Deadline passed")
-			return nil
-		case start := <-syncTimer.C:
-			last, err = p.runFullSync(inputCtx, store, client)
-			if err != nil {
-				if provider.SyncInterrupted(inputCtx, err) {
-					p.logger.Infow(provider.SyncInterruptedMsg, "error", err)
-				} else {
-					msg := "Error running full sync"
-					p.logger.Errorw(msg, "error", err)
-					inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
-				}
-				p.metrics.syncError.Inc()
-			} else {
-				inputCtx.UpdateStatus(status.Running, "Successful full sync")
-			}
-			p.metrics.syncTotal.Inc()
-			p.metrics.syncProcessingTime.Update(time.Since(start).Nanoseconds())
-
-			syncTimer.Reset(p.cfg.SyncInterval)
-			p.logger.Debugf("Next sync expected at: %v", time.Now().Add(p.cfg.SyncInterval))
-
-			// Reset the update timer and wait the configured interval. If the
-			// update timer has already fired, then drain the timer's channel
-			// before resetting.
-			if !updateTimer.Stop() {
-				<-updateTimer.C
-			}
-			updateTimer.Reset(p.cfg.UpdateInterval)
-			p.logger.Debugf("Next update expected at: %v", time.Now().Add(p.cfg.UpdateInterval))
-		case start := <-updateTimer.C:
-			last, err = p.runIncrementalUpdate(inputCtx, store, last, client)
-			if err != nil {
-				if provider.SyncInterrupted(inputCtx, err) {
-					p.logger.Infow(provider.SyncInterruptedMsg, "error", err)
-				} else {
-					msg := "Error running incremental update"
-					p.logger.Errorw(msg, "error", err)
-					inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
-				}
-				p.metrics.updateError.Inc()
-			} else {
-				inputCtx.UpdateStatus(status.Running, "Successful incremental update")
-			}
-			p.metrics.updateTotal.Inc()
-			p.metrics.updateProcessingTime.Update(time.Since(start).Nanoseconds())
-			updateTimer.Reset(p.cfg.UpdateInterval)
-			p.logger.Debugf("Next update expected at: %v", time.Now().Add(p.cfg.UpdateInterval))
-		}
+	var last time.Time
+	loop := provider.SyncLoop{
+		Logger:         p.logger,
+		Metrics:        p.metrics.syncMetrics(),
+		SyncInterval:   p.cfg.SyncInterval,
+		UpdateInterval: p.cfg.UpdateInterval,
+		LastSync:       lastSyncTime,
+		LastUpdate:     lastUpdateTime,
+		FullSync: func() error {
+			latest, err := p.runFullSync(inputCtx, store, client)
+			last = latest
+			return err
+		},
+		IncrementalUpdate: func() error {
+			latest, err := p.runIncrementalUpdate(inputCtx, store, last, client)
+			last = latest
+			return err
+		},
 	}
+	return loop.Run(inputCtx)
 }
 
 // withMandatory adds the required attribute names to attr unless attr is empty.
