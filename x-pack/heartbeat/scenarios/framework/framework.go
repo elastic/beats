@@ -11,12 +11,12 @@ import (
 	"sync"
 	"testing"
 	"time"
+	"uuid"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/pkg/config"
@@ -275,8 +275,8 @@ func runMonitorOnce(t *testing.T, monitorConfig mapstr.M, meta ScenarioRunMeta, 
 }
 
 func setupFactoryAndSched(t *testing.T, location *hbconfig.LocationWithID, stateLoader monitorstate.StateLoader) (factory *monitors.RunnerFactory, sched *scheduler.Scheduler, close func()) {
-	id, _ := uuid.NewV4()
-	eid, _ := uuid.NewV4()
+	id := uuid.NewV4()
+	eid := uuid.NewV4()
 	info := beat.Info{
 		Beat:            "heartbeat",
 		IndexPrefix:     "heartbeat",

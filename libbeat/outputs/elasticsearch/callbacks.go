@@ -19,11 +19,10 @@ package elasticsearch
 
 import (
 	"sync"
+	"uuid"
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/pkg/logp"
-
-	"github.com/gofrs/uuid/v5"
 )
 
 // ConnectCallback defines the type for the function to be called when the Elasticsearch client successfully connects to the cluster
@@ -56,13 +55,9 @@ func RegisterGlobalCallback(callback ConnectCallback) (uuid.UUID, error) {
 
 	// find the next unique key
 	var key uuid.UUID
-	var err error
 	exists := true
 	for exists {
-		key, err = uuid.NewV4()
-		if err != nil {
-			return uuid.Nil, err
-		}
+		key = uuid.NewV4()
 		_, exists = globalCallbackRegistry.callbacks[key]
 	}
 
@@ -79,13 +74,9 @@ func RegisterConnectCallback(callback ConnectCallback) (uuid.UUID, error) {
 
 	// find the next unique key
 	var key uuid.UUID
-	var err error
 	exists := true
 	for exists {
-		key, err = uuid.NewV4()
-		if err != nil {
-			return uuid.Nil, err
-		}
+		key = uuid.NewV4()
 		_, exists = connectCallbackRegistry.callbacks[key]
 	}
 

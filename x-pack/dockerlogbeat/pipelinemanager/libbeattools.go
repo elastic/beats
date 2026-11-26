@@ -10,8 +10,7 @@ import (
 	"io"
 	"os"
 	"time"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cloudid"
@@ -94,10 +93,7 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 func getBeatInfo(pluginOpts ContainerOutputConfig, hostname string, logger *logp.Logger) (beat.Info, error) {
 	vers := version.GetDefaultVersion()
 
-	eid, err := uuid.NewV4()
-	if err != nil {
-		return beat.Info{}, fmt.Errorf("error creating ephemeral ID: %w", err)
-	}
+	eid := uuid.NewV4()
 
 	id, err := loadMeta("/tmp/meta.json")
 	if err != nil {
@@ -134,7 +130,7 @@ func loadMeta(metaPath string) (uuid.UUID, error) {
 	// check for an existing file
 	f, err := openRegular(metaPath)
 	if err != nil && !os.IsNotExist(err) {
-		return uuid.Nil, fmt.Errorf("beat meta file %s failed to open: %w", metaPath, err)
+		return uuid.Nil(), fmt.Errorf("beat meta file %s failed to open: %w", metaPath, err)
 	}
 
 	//return the UUID if it exists
@@ -142,46 +138,44 @@ func loadMeta(metaPath string) (uuid.UUID, error) {
 		m := meta{}
 		if err := json.NewDecoder(f).Decode(&m); err != nil && err != io.EOF {
 			f.Close()
-			return uuid.Nil, fmt.Errorf("error reading %s: %w", metaPath, err)
+			return uuid.Nil(), fmt.Errorf("error reading %s: %w", metaPath, err)
 		}
 
 		f.Close()
-		if m.UUID != uuid.Nil {
+		if m.UUID != uuid.Nil() {
 			return m.UUID, nil
 		}
 	}
 
 	// file does not exist or ID is invalid, let's create a new one
-	newID, err := uuid.NewV4()
-	if err != nil {
-		return uuid.Nil, fmt.Errorf("error creating ID: %w", err)
-	}
+	newID := uuid.NewV4()
+
 	// write temporary file first
 	tempFile := metaPath + ".new"
 	f, err = os.OpenFile(tempFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		return uuid.Nil, fmt.Errorf("failed to create Beat meta file at %s: %w", tempFile, err)
+		return uuid.Nil(), fmt.Errorf("failed to create Beat meta file at %s: %w", tempFile, err)
 	}
 
 	encodeErr := json.NewEncoder(f).Encode(meta{UUID: newID})
 	err = f.Sync()
 	if err != nil {
-		return uuid.Nil, fmt.Errorf("beat meta file at %s failed to write: %w", tempFile, err)
+		return uuid.Nil(), fmt.Errorf("beat meta file at %s failed to write: %w", tempFile, err)
 	}
 
 	err = f.Close()
 	if err != nil {
-		return uuid.Nil, fmt.Errorf("beat meta file at %s failed to close: %w", tempFile, err)
+		return uuid.Nil(), fmt.Errorf("beat meta file at %s failed to close: %w", tempFile, err)
 	}
 
 	if encodeErr != nil {
-		return uuid.Nil, fmt.Errorf("beat meta file at %s failed to write: %w", tempFile, err)
+		return uuid.Nil(), fmt.Errorf("beat meta file at %s failed to write: %w", tempFile, err)
 	}
 
 	// move temporary file into final location
 	err = file.SafeFileRotate(metaPath, tempFile)
 	if err != nil {
-		return uuid.Nil, fmt.Errorf("error rotating file to %s: %w", metaPath, err)
+		return uuid.Nil(), fmt.Errorf("error rotating file to %s: %w", metaPath, err)
 	}
 	return newID, nil
 }

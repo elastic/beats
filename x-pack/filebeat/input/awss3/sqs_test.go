@@ -11,10 +11,10 @@ import (
 	"errors"
 	"testing"
 	"time"
+	"uuid"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
@@ -217,7 +217,8 @@ func newSQSMessage(events ...s3EventV2) (types.Message, error) {
 	}
 
 	hash := sha256.Sum256(body)
-	id, _ := uuid.FromBytes(hash[:16])
+	var id uuid.UUID
+	copy(id[:], hash[:16])
 	messageID := id.String()
 	receipt := "receipt-" + messageID
 	bodyStr := string(body)
@@ -239,7 +240,8 @@ func newSNSSQSMessage() (types.Message, error) {
 	}
 
 	hash := sha256.Sum256(body)
-	id, _ := uuid.FromBytes(hash[:16])
+	var id uuid.UUID
+	copy(id[:], hash[:16])
 	messageID := id.String()
 	receipt := "receipt-" + messageID
 	bodyStr := string(body)
@@ -254,7 +256,8 @@ func newSNSSQSMessage() (types.Message, error) {
 func newEventBridgeSQSMessage() (types.Message, error) {
 	body := []byte("{ \"version\": \"0\", \"id\": \"f17994c0-7cb9-ee01-79fd-ae46df89e3a4\", \"detail-type\": \"Object Created\", \"source\": \"aws.s3\", \"account\": \"952856826737\", \"time\": \"2024-06-24T08:31:26Z\", \"region\": \"eu-west-1\", \"resources\": [\"arn:aws:s3:::vpc-flow-logs-ks\" ], \"detail\": {\"version\": \"0\",\"bucket\": { \"name\": \"vpc-flow-logs-ks\"},\"object\": { \"key\": \"test-object-key\", \"size\": 744, \"etag\": \"2ba6b152f13c75a9155b87b5b072963c\", \"version-id\": \"uoW5awQhqux4rhi4Nuh6il967FzQlsHJ\", \"sequencer\": \"0066792EC46EC0B037\"},\"request-id\": \"Q93BVWXD5G6FKWC2\",\"requester\": \"516635408544\",\"source-ip-address\": \"10.0.27.95\",\"reason\": \"PutObject\" }}")
 	hash := sha256.Sum256(body)
-	id, _ := uuid.FromBytes(hash[:16])
+	var id uuid.UUID
+	copy(id[:], hash[:16])
 	messageID := id.String()
 	receipt := "receipt-" + messageID
 	bodyStr := string(body)

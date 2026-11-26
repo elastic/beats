@@ -14,8 +14,8 @@ import (
 	"testing"
 	"text/template"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -65,8 +65,8 @@ func runSocketInputOTelE2E(
 	user := host.User.Username()
 	password, _ := host.User.Password()
 
-	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
-	fbNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	otelNamespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
+	fbNamespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 
 	otelIndex := "logs-integration-" + otelNamespace
 	fbIndex := "logs-integration-" + fbNamespace

@@ -31,8 +31,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
@@ -139,7 +139,7 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) 
 	go func() {
 		defer e.wg.Done()
 
-		id := uuid.Must(uuid.NewV4()).String()
+		id := uuid.NewV4().String()
 		inputCtx := v2.Context{
 			ID:              id,
 			IDWithoutName:   id,

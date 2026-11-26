@@ -33,8 +33,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"go.uber.org/zap"
 
 	"github.com/elastic/beats/v7/libbeat/api"
@@ -1069,7 +1069,7 @@ func (b *Beat) LoadMeta(metaPath string) error {
 		if !m.FirstStart.IsZero() {
 			b.Info.FirstStart = m.FirstStart
 		}
-		valid := m.UUID != uuid.Nil
+		valid := m.UUID != uuid.Nil()
 		if valid {
 			b.Info.ID = m.UUID
 		}

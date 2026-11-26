@@ -26,8 +26,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/go-elasticsearch/v8"
@@ -163,7 +163,7 @@ func newESTestContext(t *testing.T) *esTestContext {
 			Name: "TestGeoName",
 		},
 	}
-	namespace, _ := uuid.NewV4()
+	namespace := uuid.NewV4()
 	esc := IntegApiClient(t)
 	ec := IntegES(t)
 	etc := &esTestContext{
@@ -180,7 +180,7 @@ func newESTestContext(t *testing.T) *esTestContext {
 }
 
 func (etc *esTestContext) createTestMonitorStateInES(t *testing.T, s StateStatus) (sf stdfields.StdMonitorFields) {
-	mUUID, _ := uuid.NewV4()
+	mUUID := uuid.NewV4()
 	sf = stdfields.StdMonitorFields{
 		ID:   mUUID.String(),
 		Type: "test_type",

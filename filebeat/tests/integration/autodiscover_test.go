@@ -32,8 +32,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/moby/moby/api/types/container"
 	"github.com/moby/moby/client"
 	"github.com/stretchr/testify/assert"
@@ -205,7 +205,7 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 	loadDockerImageIntoKind(t, clusterName, filebeatImage)
 	grantClusterAdminToDefaultServiceAccount(t, kubeConfigPath)
 
-	filebeatPodName := "filebeat-pod-" + uuid.Must(uuid.NewV4()).String()
+	filebeatPodName := "filebeat-pod-" + uuid.NewV4().String()
 	logInputConfigPath := filepath.Join(workDir, "filebeat-log.yml")
 	filestreamInputConfigPath := filepath.Join(workDir, "filebeat-filestream.yml")
 
@@ -217,7 +217,7 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 	esUser := esURL.User.Username()
 	esPass, _ := esURL.User.Password()
 
-	index := fmt.Sprintf("test-autodiscover-take-over-%s", uuid.Must(uuid.NewV4()).String())
+	index := fmt.Sprintf("test-autodiscover-take-over-%s", uuid.NewV4().String())
 	t.Cleanup(func() {
 		if t.Failed() {
 			t.Logf("Elasticsearch index used: %q", index)
@@ -338,7 +338,7 @@ func createKindCluster(
 	options ...cluster.CreateOption,
 ) (kubeConfigPath, clusterName string) {
 
-	uid := uuid.Must(uuid.NewV4()).String()
+	uid := uuid.NewV4().String()
 
 	defer func() {
 		if t.Failed() {
@@ -393,7 +393,7 @@ func startFlogKubernetesWithAnnotations(
 ) (nodeName, podName, containerID string) {
 	clientset := newK8sClientsetFromKubeConfigPath(t, kubeConfigPath)
 
-	podName = "flog-pod-" + uuid.Must(uuid.NewV4()).String()
+	podName = "flog-pod-" + uuid.NewV4().String()
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        podName,
@@ -586,7 +586,7 @@ func kindNodeGatewayIP(t *testing.T, nodeName string) string {
 func grantClusterAdminToDefaultServiceAccount(t *testing.T, kubeConfigPath string) {
 	cs := newK8sClientsetFromKubeConfigPath(t, kubeConfigPath)
 
-	bindingName := "filebeat-autodiscover-admin-" + uuid.Must(uuid.NewV4()).String()
+	bindingName := "filebeat-autodiscover-admin-" + uuid.NewV4().String()
 	_, err := cs.RbacV1().ClusterRoleBindings().Create(t.Context(), &rbacv1.ClusterRoleBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: bindingName,

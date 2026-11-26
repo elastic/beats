@@ -26,8 +26,7 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 
 	"github.com/elastic/beats/v7/filebeat/input/net/nettest"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
@@ -123,7 +122,7 @@ func TestNetInputsCanReadWithBlockedOutput(t *testing.T) {
 				"../../filebeat.test",
 			)
 
-			id := uuid.Must(uuid.NewV4())
+			id := uuid.NewV4()
 			data := []string{}
 			for range tc.events {
 				data = append(data, strings.Repeat("FooBar", 50))

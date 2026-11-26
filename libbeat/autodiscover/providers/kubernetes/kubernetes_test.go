@@ -25,8 +25,8 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	v1 "k8s.io/api/coordination/v1"
@@ -61,8 +61,7 @@ func applyLease(client kubernetes.Interface, lease *v1.Lease) error {
 func TestLeaseConfigurableFields(t *testing.T) {
 	client := k8sfake.NewSimpleClientset()
 
-	uuid, err := uuid.NewV4()
-	require.NoError(t, err)
+	uuid := uuid.NewV4()
 
 	startLeadingFunc := func(uuid string, eventID string) {}
 	stopLeadingFunc := func(uuid string, eventID string) {}
@@ -100,8 +99,7 @@ func TestLeaderElectionManagerStopWaitsForElector(t *testing.T) {
 	client := k8sfake.NewSimpleClientset()
 	require.NoError(t, applyLease(client, createLease()), "the lease should be created")
 
-	id, err := uuid.NewV4()
-	require.NoError(t, err, "a uuid should be generated")
+	id := uuid.NewV4()
 
 	leading := make(chan struct{}, 1)
 	var stoppedLeading atomic.Bool
@@ -159,8 +157,7 @@ func TestNewLeaderElectionManager(t *testing.T) {
 	err := applyLease(client, lease)
 	require.NoError(t, err)
 
-	uuid, err := uuid.NewV4()
-	require.NoError(t, err)
+	uuid := uuid.NewV4()
 
 	waitForNewLeader := make(chan string)
 	var loosingLeader atomic.Pointer[string]

@@ -24,8 +24,8 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"go.opentelemetry.io/collector/component/componenttest"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/pcommon"
@@ -581,8 +581,7 @@ func TestReceiverStatus(t *testing.T) {
 
 func genSocketPath(t *testing.T) string {
 	t.Helper()
-	socketName, err := uuid.NewV4()
-	require.NoError(t, err)
+	socketName := uuid.NewV4()
 	// Use os.TempDir() for short Unix socket paths
 	sockPath := filepath.Join(os.TempDir(), socketName.String()+".sock")
 	t.Cleanup(func() { _ = os.Remove(sockPath) })

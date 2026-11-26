@@ -19,8 +19,8 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -39,7 +39,7 @@ func TestHeartbeatOTelBeatsAuthLoadsMonitorState(t *testing.T) {
 	esURL := fmt.Sprintf("%s://%s", esHost.Scheme, esHost.Host)
 	es := integration.GetESAdminClient(t, "http")
 
-	namespace := uuid.Must(uuid.NewV4()).String()
+	namespace := uuid.NewV4().String()
 	stateIndex := "heartbeat-auth-state-" + namespace
 	eventIndex := "logs-heartbeat-auth-" + namespace
 	monitorID := "auth-state-test-" + namespace

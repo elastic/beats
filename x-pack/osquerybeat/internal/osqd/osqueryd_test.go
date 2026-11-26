@@ -16,6 +16,7 @@ import (
 	"sync"
 	"testing"
 	"time"
+	"uuid"
 
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
@@ -23,7 +24,6 @@ import (
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -123,7 +123,7 @@ func TestWithCheckTimeoutIgnoredWhenNonPositive(t *testing.T) {
 }
 
 func TestVerifyAutoloadFileMissing(t *testing.T) {
-	dir := uuid.Must(uuid.NewV4()).String()
+	dir := uuid.NewV4().String()
 	extensionAutoloadPath := filepath.Join(dir, osqueryAutoload)
 	mandatoryExtensionPath := filepath.Join(dir, extensionName)
 	err := verifyAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath)

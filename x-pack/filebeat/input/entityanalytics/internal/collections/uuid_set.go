@@ -8,8 +8,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"sort"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 )
 
 type UUIDSet struct {

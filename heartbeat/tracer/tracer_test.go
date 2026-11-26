@@ -26,8 +26,8 @@ import (
 	"path/filepath"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
@@ -64,8 +64,7 @@ func TestSockTracer(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			sockName, err := uuid.NewV4()
-			require.NoError(t, err)
+			sockName := uuid.NewV4()
 			sockPath := filepath.Join(os.TempDir(), sockName.String())
 
 			listenRes := make(chan []string)
@@ -95,8 +94,7 @@ func TestSockTracerWaitSuccess(t *testing.T) {
 	waitFor := 5 * time.Second
 	delay := time.Millisecond * 1500
 
-	sockName, err := uuid.NewV4()
-	require.NoError(t, err)
+	sockName := uuid.NewV4()
 	sockPath := filepath.Join(os.TempDir(), sockName.String())
 
 	listenCh := make(chan net.Listener)

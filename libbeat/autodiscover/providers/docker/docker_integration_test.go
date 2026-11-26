@@ -22,8 +22,8 @@ package docker
 import (
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
@@ -44,10 +44,7 @@ func TestDockerStart(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	UUID, err := uuid.NewV4()
-	if err != nil {
-		t.Fatal(err)
-	}
+	UUID := uuid.NewV4()
 	bus := bus.New(log, "test")
 	config := defaultConfig()
 	config.CleanupTimeout = 0

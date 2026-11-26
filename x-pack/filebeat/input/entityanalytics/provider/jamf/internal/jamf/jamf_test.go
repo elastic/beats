@@ -15,10 +15,10 @@ import (
 	"os"
 	"testing"
 	"time"
+	"uuid"
 
 	_ "embed"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/jamf/testjamf"
@@ -81,7 +81,7 @@ var jamfTests = []struct {
 					w.Write([]byte("{\n  \"httpStatus\" : 405,\n  \"errors\" : [ ]\n}"))
 					return
 				}
-				tok.Token = uuid.Must(uuid.NewV4()).String()
+				tok.Token = uuid.NewV4().String()
 				tok.Expires = time.Now().In(time.UTC).Add(time.Hour)
 				fmt.Fprintf(w, "{\n  \"token\" : \"%s\",\n  \"expires\" : \"%s\"\n}", tok.Token, tok.Expires.Format(time.RFC3339))
 			}))

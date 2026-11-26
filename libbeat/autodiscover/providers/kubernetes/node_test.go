@@ -22,8 +22,8 @@ package kubernetes
 import (
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -119,14 +119,11 @@ func TestEmitEvent_Node(t *testing.T) {
 	name := "metricbeat"
 	nodeIP := "192.168.0.1"
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
-	UUID, err := uuid.NewV4()
+	UUID := uuid.NewV4()
 
 	typeMeta := metav1.TypeMeta{
 		Kind:       "Node",
 		APIVersion: "v1",
-	}
-	if err != nil {
-		t.Fatal(err)
 	}
 
 	tests := []struct {

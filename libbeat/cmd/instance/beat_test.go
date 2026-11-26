@@ -28,6 +28,7 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+	"uuid"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -42,7 +43,6 @@ import (
 	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/go-ucfg/yaml"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -225,10 +225,7 @@ func TestNewInstanceUUID(t *testing.T) {
 	}
 
 	// Make sure the ID's are different
-	differentUUID, err := uuid.NewV4()
-	if err != nil {
-		t.Fatalf("error while generating ID: %v", err)
-	}
+	differentUUID := uuid.NewV4()
 	assert.NotEqual(t, b.Info.ID, differentUUID)
 }
 
@@ -295,7 +292,7 @@ func TestEmptyMetaJson(t *testing.T) {
 	err = b.LoadMeta(metaPath)
 
 	assert.Equal(t, nil, err, "Unable to load meta file properly")
-	assert.NotEqual(t, uuid.Nil, b.Info.ID, "Beats UUID is not set")
+	assert.NotEqual(t, uuid.Nil(), b.Info.ID, "Beats UUID is not set")
 }
 
 func TestMetaJsonWithTimestamp(t *testing.T) {

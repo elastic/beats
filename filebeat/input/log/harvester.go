@@ -36,8 +36,8 @@ import (
 	"os"
 	"sync"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"golang.org/x/text/transform"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -132,10 +132,7 @@ func NewHarvester(
 	publishState func(file.State) bool,
 	outletFactory OutletFactory,
 ) (*Harvester, error) {
-	id, err := uuid.NewV4()
-	if err != nil {
-		return nil, err
-	}
+	id := uuid.NewV4()
 
 	logger = logger.Named("harvester").With("harvester_id", id)
 	h := &Harvester{

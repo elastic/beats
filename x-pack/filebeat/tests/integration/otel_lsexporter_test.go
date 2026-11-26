@@ -21,9 +21,9 @@ import (
 	"sort"
 	"testing"
 	"time"
+	"uuid"
 
 	"github.com/brianvoe/gofakeit"
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -85,7 +85,7 @@ processors:
       fields:
         testcase: %s
 `
-	testCaseName := uuid.Must(uuid.NewV4()).String()
+	testCaseName := uuid.NewV4().String()
 	events := generateEvents(numEvents)
 
 	tmpdir := t.TempDir()
@@ -184,7 +184,7 @@ func TestLogstashExporterProxyURL(t *testing.T) {
 	// ensure the size of events is big enough
 	numEvents := 3
 
-	testCaseName := uuid.Must(uuid.NewV4()).String()
+	testCaseName := uuid.NewV4().String()
 	events := generateEvents(numEvents)
 
 	// Create OTel collector configuration with filebeatreceiver
@@ -194,7 +194,7 @@ func TestLogstashExporterProxyURL(t *testing.T) {
 
 	otelConfig := fmt.Sprintf(`receivers:
   filebeatreceiver:
-    include_metadata: true  
+    include_metadata: true
     filebeat:
       inputs:
         - type: filestream
@@ -288,7 +288,7 @@ func generateEvents(numEvents int) []string {
 		kvArrayField[3] = rand.IntN(2) == 0 // bool
 
 		ev := event{
-			ID:           uuid.Must(uuid.NewV4()).String(),
+			ID:           uuid.NewV4().String(),
 			Timestamp:    time.Now().Format(time.RFC3339Nano),
 			StringField:  gofakeit.Sentence(2),
 			NumberField:  rand.IntN(1000),

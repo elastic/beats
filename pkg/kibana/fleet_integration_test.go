@@ -26,8 +26,7 @@ import (
 	"os"
 	"testing"
 	"text/template"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 
 	"github.com/stretchr/testify/require"
 )
@@ -140,8 +139,7 @@ func TestUpdatePolicyKibana(t *testing.T) {
 	client, err := NewClientWithConfig(&cfg, "", "", "", "")
 	require.NoError(t, err)
 
-	uid, err := uuid.NewV4()
-	require.NoError(t, err)
+	uid := uuid.NewV4()
 
 	basePolicy := AgentPolicy{
 		Name:        "TestUpdatePolicyKibana-" + uid.String(),
@@ -238,7 +236,7 @@ func TestFleetPackage(t *testing.T) {
 	client, err := NewClientWithConfig(&cfg, "", "", "", "")
 	require.NoError(t, err)
 
-	policyUUID := uuid.Must(uuid.NewV4()).String()
+	policyUUID := uuid.NewV4().String()
 	require.NoError(t, err)
 
 	req := AgentPolicy{
@@ -256,7 +254,7 @@ func TestFleetPackage(t *testing.T) {
 	require.NoError(t, err)
 
 	// Install package
-	packagePolicyID := uuid.Must(uuid.NewV4()).String()
+	packagePolicyID := uuid.NewV4().String()
 	packRes, err := installElasticDefendPackage(t, client, res.ID, packagePolicyID)
 	require.NoError(t, err)
 
@@ -322,7 +320,7 @@ func TestCreateEnrollmentAPIKey(t *testing.T) {
 	require.NoError(t, err)
 
 	testPolicy := AgentPolicy{
-		Name:        fmt.Sprintf("TestCreateEnrollmentAPIKey-%s", uuid.Must(uuid.NewV4()).String()),
+		Name:        fmt.Sprintf("TestCreateEnrollmentAPIKey-%s", uuid.NewV4().String()),
 		Namespace:   "defaultttest",
 		Description: "original policy",
 	}
@@ -364,7 +362,7 @@ func TestGetAgent(t *testing.T) {
 	require.NoError(t, err)
 
 	// Test get non-existent Agent
-	nonExistentAgentID := uuid.Must(uuid.NewV4()).String()
+	nonExistentAgentID := uuid.NewV4().String()
 	agentResp, err := client.GetAgent(ctx, GetAgentRequest{ID: nonExistentAgentID})
 
 	require.Error(t, err)
@@ -390,7 +388,7 @@ func TestUnenrollAgent(t *testing.T) {
 	require.NoError(t, err)
 
 	// Test unenroll non-existent Agent
-	nonExistentAgentID := uuid.Must(uuid.NewV4()).String()
+	nonExistentAgentID := uuid.NewV4().String()
 	_, err = client.UnEnrollAgent(ctx, UnEnrollAgentRequest{ID: nonExistentAgentID})
 
 	require.Error(t, err)
@@ -417,7 +415,7 @@ func TestCreateFleetServerHosts(t *testing.T) {
 	client, err := NewClientWithConfig(&cfg, "", "", "", "")
 	require.NoError(t, err)
 
-	id := uuid.Must(uuid.NewV4()).String()
+	id := uuid.NewV4().String()
 	req := ListFleetServerHostsRequest{
 		ID:        "CreateFleetServerHosts" + id,
 		Name:      "CreateFleetServerHosts" + id,
@@ -471,7 +469,7 @@ func TestCreateFleetProxy(t *testing.T) {
 	}
 
 	for _, tc := range tcs {
-		id := uuid.Must(uuid.NewV4()).String()
+		id := uuid.NewV4().String()
 		tc.Req.ID += id
 		tc.Req.Name += id
 

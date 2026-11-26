@@ -23,10 +23,10 @@ import (
 	"fmt"
 	"sync"
 	"time"
+	"uuid"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	"github.com/gofrs/uuid/v5"
 	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/v7/pkg/autodiscover/bus"

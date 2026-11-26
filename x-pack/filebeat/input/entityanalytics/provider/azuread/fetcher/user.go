@@ -6,8 +6,7 @@ package fetcher
 
 import (
 	"maps"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 
 	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"

@@ -7,17 +7,13 @@ package test
 import (
 	"os"
 	"testing"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 )
 
 func GetConfigFromEnv(t *testing.T) map[string]any {
 	t.Helper()
 
-	shardID, err := uuid.NewV4()
-	if err != nil {
-		t.Fatalf("Unable to create a random shard ID: %v", err)
-	}
+	shardID := uuid.NewV4()
 
 	config := map[string]any{
 		"api_address":   lookupEnv(t, "CLOUDFOUNDRY_API_ADDRESS"),

@@ -24,8 +24,7 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"

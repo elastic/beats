@@ -13,8 +13,8 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	vaultapi "github.com/hashicorp/vault/api"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -60,7 +60,7 @@ func setupVault(t *testing.T) itFixture {
 	require.NoError(t, err, "admin client must be created")
 	admin.SetToken(itRootToken)
 
-	token := uuid.Must(uuid.NewV4()).String()
+	token := uuid.NewV4().String()
 	_, err = admin.KVv2("secret").Put(ctx, itPath, map[string]any{"token": token})
 	require.NoError(t, err, "secret must be written")
 

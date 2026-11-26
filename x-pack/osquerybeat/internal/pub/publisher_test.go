@@ -11,8 +11,8 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -131,7 +131,7 @@ func TestHitToEvent(t *testing.T) {
 			p.idFieldKey = "action_id"
 		}
 		if mask>>3&1 > 0 {
-			p.responseID = uuid.Must(uuid.NewV4()).String()
+			p.responseID = uuid.NewV4().String()
 		}
 		if mask>>2&1 > 0 {
 			p.hit = map[string]any{
@@ -331,7 +331,7 @@ func TestHitToEvent_SpaceID(t *testing.T) {
 		"osquery_manager",
 		"sched-123",
 		"schedule_id",
-		uuid.Must(uuid.NewV4()).String(),
+		uuid.NewV4().String(),
 		spaceID,
 		"",
 		"",
@@ -354,7 +354,7 @@ func TestHitToEvent_PackID(t *testing.T) {
 		"osquery_manager",
 		"sched-123",
 		"schedule_id",
-		uuid.Must(uuid.NewV4()).String(),
+		uuid.NewV4().String(),
 		"",
 		packID,
 		"",
@@ -378,7 +378,7 @@ func TestHitToEvent_PackNameAndQueryName(t *testing.T) {
 		"osquery_manager",
 		"sched-123",
 		"schedule_id",
-		uuid.Must(uuid.NewV4()).String(),
+		uuid.NewV4().String(),
 		"",
 		"pack-xyz",
 		packName,
@@ -403,7 +403,7 @@ func TestHitToEvent_NoPackNameOrQueryName(t *testing.T) {
 		"osquery_manager",
 		"action-123",
 		"action_id",
-		uuid.Must(uuid.NewV4()).String(),
+		uuid.NewV4().String(),
 		"",
 		"",
 		"",

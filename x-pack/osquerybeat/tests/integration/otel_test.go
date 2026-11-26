@@ -17,8 +17,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -96,7 +96,7 @@ func TestOsquerybeatOtelE2E(t *testing.T) {
 	esPass, _ := host.User.Password()
 	esURL := fmt.Sprintf("%s://%s", host.Scheme, host.Host)
 
-	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	namespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 	otelIndex := "logs-integration-" + namespace
 	osqIndex := "logs-osquery_manager.result-" + namespace
 
@@ -258,7 +258,7 @@ func TestOsquerybeatOtelMultipleReceiversE2E(t *testing.T) {
 	esPass, _ := host.User.Password()
 	esURL := fmt.Sprintf("%s://%s", host.Scheme, host.Host)
 
-	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	namespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 	index := "logs-integration-" + namespace
 
 	type receiverEntry struct {

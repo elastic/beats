@@ -12,8 +12,7 @@ import (
 	"errors"
 	"fmt"
 	"time"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"

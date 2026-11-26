@@ -11,8 +11,8 @@ import (
 	"strconv"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -191,7 +191,7 @@ func BenchmarkPut(b *testing.B) {
 				cache := c.factory(b, b.Name())
 				defer cache.Close()
 
-				value := uuid.Must(uuid.NewV4()).String()
+				value := uuid.NewV4().String()
 
 				b.ResetTimer()
 				for i := 0; i < b.N; i++ {
@@ -218,7 +218,7 @@ func BenchmarkPut(b *testing.B) {
 				cache := c.factory(b, b.Name())
 				defer cache.Close()
 
-				value := entry{ID: uuid.Must(uuid.NewV4()).String()}
+				value := entry{ID: uuid.NewV4().String()}
 
 				b.ResetTimer()
 				for i := 0; i < b.N; i++ {
@@ -241,7 +241,7 @@ func BenchmarkPut(b *testing.B) {
 				defer cache.Close()
 
 				value := map[string]string{
-					"id": uuid.Must(uuid.NewV4()).String(),
+					"id": uuid.NewV4().String(),
 				}
 
 				b.ResetTimer()
@@ -265,7 +265,7 @@ func BenchmarkPut(b *testing.B) {
 			objects := make([]entry, size)
 			for i := range size {
 				objects[i] = entry{
-					ID: uuid.Must(uuid.NewV4()).String(),
+					ID: uuid.NewV4().String(),
 				}
 			}
 
@@ -319,7 +319,7 @@ func BenchmarkOpen(b *testing.B) {
 				cache := c.factory(b, cacheName)
 				for range size {
 					e := entry{
-						ID: uuid.Must(uuid.NewV4()).String(),
+						ID: uuid.NewV4().String(),
 					}
 					err := cache.Put(e.ID, e)
 					require.NoError(b, err)
@@ -374,7 +374,7 @@ func BenchmarkGet(b *testing.B) {
 				cache := c.factory(b, cacheName)
 				for i := range size {
 					e := entry{
-						ID: uuid.Must(uuid.NewV4()).String(),
+						ID: uuid.NewV4().String(),
 					}
 					objects[i] = e
 					err := cache.Put(e.ID, e)

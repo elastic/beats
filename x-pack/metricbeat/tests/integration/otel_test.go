@@ -16,8 +16,8 @@ import (
 	"testing"
 	"text/template"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -36,7 +36,7 @@ func TestMetricbeatOTelE2E(t *testing.T) {
 	password, _ := host.User.Password()
 
 	// create a random uuid and make sure it doesn't contain dashes/
-	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	namespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 	mbIndex := "logs-integration-mb-" + namespace
 	mbReceiverIndex := "logs-integration-mbreceiver-" + namespace
 
@@ -231,7 +231,7 @@ func TestMetricbeatOTelMultipleReceiversE2E(t *testing.T) {
 	}
 
 	es := integration.GetESClient(t, "http")
-	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	namespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 	index := "logs-integration-" + namespace
 	t.Cleanup(func() {
 		_, err := es.Indices.DeleteDataStream([]string{

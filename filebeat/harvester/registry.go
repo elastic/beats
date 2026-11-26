@@ -20,8 +20,7 @@ package harvester
 import (
 	"errors"
 	"sync"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 
 	"github.com/elastic/beats/v7/pkg/logp"
 )

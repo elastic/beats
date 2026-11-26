@@ -21,8 +21,8 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
@@ -699,7 +699,7 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 	testServer := httptest.NewServer(http.HandlerFunc(h.handler))
 	defer testServer.Close()
 
-	inputID := "httpjson-generic-" + uuid.Must(uuid.NewV4()).String()
+	inputID := "httpjson-generic-" + uuid.NewV4().String()
 	inputUnit := &proto.UnitExpected{
 		Id:             inputID,
 		Type:           proto.UnitType_INPUT,

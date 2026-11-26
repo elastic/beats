@@ -19,8 +19,7 @@ package report
 
 import (
 	"time"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 )
 
 var (
@@ -31,7 +30,7 @@ var (
 func init() {
 	startTime = time.Now()
 
-	ephemeralID, _ = uuid.NewV4()
+	ephemeralID = uuid.NewV4()
 }
 
 // EphemeralID returns generated EphemeralID

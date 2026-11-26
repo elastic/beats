@@ -13,11 +13,10 @@ import (
 	"sync"
 	"testing"
 	"time"
+	"uuid"
 
 	// For testdata/computers.json
 	_ "embed"
-
-	"github.com/gofrs/uuid/v5"
 )
 
 //go:embed testdata/computers.json
@@ -57,7 +56,7 @@ func StartServer(t *testing.T) (tenant, username, password string, client *http.
 		}
 
 		tokenMu.Lock()
-		currentToken = uuid.Must(uuid.NewV4()).String()
+		currentToken = uuid.NewV4().String()
 		tok := currentToken
 		tokenMu.Unlock()
 

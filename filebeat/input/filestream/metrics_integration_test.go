@@ -22,8 +22,8 @@ package filestream
 import (
 	"context"
 	"testing"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
@@ -34,7 +34,7 @@ func TestFilestreamMetrics(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := uuid.Must(uuid.NewV4()).String()
+	id := uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -87,7 +87,7 @@ func TestFilestreamMessageMaxBytesTruncatedMetric(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := uuid.Must(uuid.NewV4()).String()
+	id := uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -128,7 +128,7 @@ func TestFilestreamMultilineMaxLinesTruncatedMetric(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := uuid.Must(uuid.NewV4()).String()
+	id := uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},

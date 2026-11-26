@@ -25,8 +25,8 @@ import (
 	"os"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -153,10 +153,7 @@ func newRawESClient(t *testing.T) ESClient {
 }
 
 func makeName(base string) string {
-	id, err := uuid.NewV4()
-	if err != nil {
-		panic(err)
-	}
+	id := uuid.NewV4()
 	return fmt.Sprintf("%v-%v", base, id.String())
 }
 

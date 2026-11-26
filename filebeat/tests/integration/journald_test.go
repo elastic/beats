@@ -37,8 +37,8 @@ import (
 	"syscall"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
@@ -60,7 +60,7 @@ func TestJournaldInputRunsAndRecoversFromJournalctlFailures(t *testing.T) {
 	)
 
 	// render configuration
-	syslogID := fmt.Sprintf("%s-%s", t.Name(), uuid.Must(uuid.NewV4()).String())
+	syslogID := fmt.Sprintf("%s-%s", t.Name(), uuid.NewV4().String())
 	yamlCfg := fmt.Sprintf(journaldInputCfg, syslogID, filebeat.TempDir())
 
 	generateJournaldLogs(t, syslogID, 3, 100)
@@ -98,7 +98,7 @@ func TestJournaldInputDoesNotDuplicateData(t *testing.T) {
 	)
 
 	// render configuration
-	syslogID := fmt.Sprintf("%s-%s", t.Name(), uuid.Must(uuid.NewV4()).String())
+	syslogID := fmt.Sprintf("%s-%s", t.Name(), uuid.NewV4().String())
 	yamlCfg := fmt.Sprintf(journaldInputCfg, syslogID, filebeat.TempDir())
 
 	defer func() {
@@ -146,7 +146,7 @@ func TestJournaldLargeLines(t *testing.T) {
 	)
 
 	// render configuration
-	syslogID := fmt.Sprintf("%s-%s", t.Name(), uuid.Must(uuid.NewV4()).String())
+	syslogID := fmt.Sprintf("%s-%s", t.Name(), uuid.NewV4().String())
 	yamlCfg := fmt.Sprintf(journaldInputCfg, syslogID, filebeat.TempDir())
 
 	defer func() {

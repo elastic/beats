@@ -9,8 +9,7 @@ package billing
 import (
 	"fmt"
 	"time"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -88,10 +87,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// reference time used to calculate usage and forecast time intervals.
 	referenceTime := time.Now()
 
-	fetchID, err := uuid.NewV4()
-	if err != nil {
-		return fmt.Errorf("error generating the fetch ID: %w", err)
-	}
+	fetchID := uuid.NewV4()
 	fetch := FetchContext{ID: fetchID.String(), Time: referenceTime.UTC()}
 
 	usageStart, usageEnd := usageIntervalFrom(referenceTime, m.client.Config.BillingUsageLookback)

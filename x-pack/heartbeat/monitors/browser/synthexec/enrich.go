@@ -8,16 +8,14 @@ package synthexec
 import (
 	"fmt"
 	"time"
-
-	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
-	"github.com/elastic/beats/v7/pkg/mapstr"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beat/events"
+	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 type enricher func(event *beat.Event, se *SynthEvent) error
@@ -54,10 +52,7 @@ func newJourneyEnricher(senr *streamEnricher) *journeyEnricher {
 }
 
 func makeUuid() string {
-	u, err := uuid.NewV1()
-	if err != nil {
-		panic("Cannot generate v1 UUID, this should never happen!")
-	}
+	u := uuid.NewV7()
 	return u.String()
 }
 

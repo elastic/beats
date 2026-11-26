@@ -16,8 +16,8 @@ import (
 	"testing"
 	"text/template"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -36,7 +36,7 @@ func TestUnixInputOTelE2E(t *testing.T) {
 	password, _ := host.User.Password()
 
 	otelHome := t.TempDir()
-	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	namespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 	shortNamespace := namespace[:12]
 
 	otelIndex := "logs-integration-" + namespace
@@ -82,7 +82,7 @@ path.home: {{ .PathHome }}
             - add_docker_metadata: ~
             - add_kubernetes_metadata: ~
         queue.mem.flush.timeout: 0s
-        setup.template.enabled: false		
+        setup.template.enabled: false
 ` + otelElasticsearchServiceYAML
 
 	optionsValue := options{

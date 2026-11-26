@@ -11,9 +11,9 @@ import (
 	"runtime"
 	"strconv"
 	"time"
+	"uuid"
 
 	"github.com/cespare/xxhash/v2"
-	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
@@ -167,10 +167,7 @@ func (ms *SysInfoMetricSet) reportState(report mb.ReporterV2) error {
 	}
 	ms.log.Debugf("Found %v processes", len(processes))
 
-	stateID, err := uuid.NewV4()
-	if err != nil {
-		return fmt.Errorf("error generating state ID: %w", err)
-	}
+	stateID := uuid.NewV4()
 	for _, p := range processes {
 		ms.enrichProcess(p)
 

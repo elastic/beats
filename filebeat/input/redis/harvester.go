@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	rd "github.com/gomodule/redigo/redis"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -65,10 +65,7 @@ type log struct {
 
 // NewHarvester creates a new harvester with the given connection
 func NewHarvester(conn rd.Conn, logger *logp.Logger) (*Harvester, error) {
-	id, err := uuid.NewV4()
-	if err != nil {
-		return nil, err
-	}
+	id := uuid.NewV4()
 
 	return &Harvester{
 		id:     id,

@@ -22,9 +22,9 @@ import (
 	"strings"
 	"syscall"
 	"time"
+	"uuid"
 
 	"github.com/cespare/xxhash/v2"
-	"github.com/gofrs/uuid/v5"
 	"go.etcd.io/bbolt"
 
 	"github.com/elastic/beats/v7/auditbeat/ab"
@@ -295,10 +295,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 		return fmt.Errorf("failed to get packages: %w", err)
 	}
 
-	stateID, err := uuid.NewV4()
-	if err != nil {
-		return fmt.Errorf("error generating state ID: %w", err)
-	}
+	stateID := uuid.NewV4()
 
 	for _, pkg := range packages {
 		event := ms.packageEvent(pkg, eventTypeState, eventActionExistingPackage)

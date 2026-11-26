@@ -32,8 +32,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/klauspost/compress/gzip"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -59,7 +59,7 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	// than close.on_state_change.check_interval to make sure
 	// the Harvester detects the rename first thus allowing
 	// the output to receive the event and then close the source file.
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName) + "*"},
@@ -104,7 +104,7 @@ func TestFilestreamMetadataUpdatedOnRename(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName) + "*"},
@@ -161,7 +161,7 @@ func TestFilestreamCloseRemoved(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName) + "*"},
@@ -204,7 +204,7 @@ func TestFilestreamCloseEOF(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -242,7 +242,7 @@ func TestFilestreamEmptyLine(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -283,7 +283,7 @@ func TestFilestreamEmptyLinesOnly(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -309,7 +309,7 @@ func TestFilestreamExceedBuffer(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -340,7 +340,7 @@ func TestFilestreamBOMUTF8(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -384,7 +384,7 @@ func TestFilestreamUTF16BOMs(t *testing.T) {
 			env := newInputTestingEnvironment(t)
 
 			testlogName := "test.log"
-			id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+			id := "fake-ID-" + uuid.NewV4().String()
 			inp := env.mustCreateInput(map[string]any{
 				"id":                                     id,
 				"paths":                                  []string{env.abspath(testlogName)},
@@ -419,7 +419,7 @@ func TestFilestreamCloseTimeout(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -455,7 +455,7 @@ func TestFilestreamCloseAfterInterval(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -485,7 +485,7 @@ func TestFilestreamCloseAfterIntervalRemoved(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                   id,
 		"paths":                                []string{env.abspath(testlogName)},
@@ -520,7 +520,7 @@ func TestFilestreamCloseAfterIntervalRenamed(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                   id,
 		"paths":                                []string{env.abspath(testlogName)},
@@ -557,7 +557,7 @@ func TestFilestreamCloseAfterIntervalRotatedAndRemoved(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                   id,
 		"paths":                                []string{env.abspath(testlogName)},
@@ -595,7 +595,7 @@ func TestFilestreamCloseAfterIntervalRotatedAndNewRemoved(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -641,7 +641,7 @@ func TestFilestreamTruncatedFileOpen(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -677,7 +677,7 @@ func TestFilestreamTruncatedFileClosed(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -717,7 +717,7 @@ func TestFilestreamTruncateWithSymlink(t *testing.T) {
 
 	testlogName := "test.log"
 	symlinkName := "test.log.symlink"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
@@ -764,7 +764,7 @@ func TestFilestreamTruncateBigScannerInterval(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -798,7 +798,7 @@ func TestFilestreamTruncateCheckOffset(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -830,7 +830,7 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 	env.pipeline = &mockPipelineConnector{blocking: true}
 
 	testlogName := "test.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -883,7 +883,7 @@ func TestFilestreamIgnoreSymlink(t *testing.T) {
 
 	testlogName := "test.log"
 	symlinkName := "test.log.symlink"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
@@ -915,7 +915,7 @@ func TestFilestreamSymlinksEnabled(t *testing.T) {
 
 	testlogName := "test.log"
 	symlinkName := "test.log.symlink"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
@@ -949,7 +949,7 @@ func TestFilestreamSymlinkRotated(t *testing.T) {
 	firstTestlogName := "test1.log"
 	secondTestlogName := "test2.log"
 	symlinkName := "test.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
@@ -1001,7 +1001,7 @@ func TestFilestreamSymlinkRemoved(t *testing.T) {
 
 	testlogName := "test.log"
 	symlinkName := "test.log.symlink"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
@@ -1047,7 +1047,7 @@ func TestFilestreamSymlinkAndFile(t *testing.T) {
 
 	testlogName := "test.log"
 	symlinkName := "test.log.symlink"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
@@ -1081,7 +1081,7 @@ func TestFilestreamTruncate(t *testing.T) {
 
 	testlogName := "test.log"
 	symlinkName := "test.log.symlink"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
@@ -1130,7 +1130,7 @@ func TestFilestreamDecodeError(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -1175,7 +1175,7 @@ func TestFilestreamDebugReader(t *testing.T) {
 	env.testLogger.Logger = l
 
 	testlogName := "test.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -1229,7 +1229,7 @@ func TestRotatingCloseInactiveLargerWriteRate(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
@@ -1278,7 +1278,7 @@ func TestRotatingCloseInactiveLowWriteRate(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id": id,
 		"paths": []string{
@@ -1329,7 +1329,7 @@ func TestDataAddedAfterCloseInactive(t *testing.T) {
 
 	integration.WriteLogFile(t, logFilePath, 50, false)
 
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	// Close check interval needs to be smaller than the prospector check
 	// interval. Inactive timeout should be shorter than backoff so the
 	// reader context is cancelled while waiting on backoff.
@@ -1368,7 +1368,7 @@ func TestDataAddedAfterCloseInactive(t *testing.T) {
 // harvesterInputConfig returns a base filestream config used by the harvester
 // behavior tests below (read/tail, open-files cap, close-on-EOF, gzip).
 func harvesterInputConfig(env *inputTestingEnvironment, pathGlob string) (string, map[string]any) {
-	id := "harvester-" + uuid.Must(uuid.NewV4()).String()
+	id := "harvester-" + uuid.NewV4().String()
 	return id, map[string]any{
 		"id":                                     id,
 		"paths":                                  []string{pathGlob},
@@ -1467,7 +1467,7 @@ func TestHarvesterGZIP(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	logName := "data.log.gz"
-	id := "harvester-gzip-" + uuid.Must(uuid.NewV4()).String()
+	id := "harvester-gzip-" + uuid.NewV4().String()
 	// compression=auto requires the fingerprint file identity. Use a small
 	// fingerprint length so the (small) gzip file is not skipped by the scanner.
 	cfg := map[string]any{
@@ -1518,7 +1518,7 @@ func TestFilestreamGrowingFingerprintEmitsLiveFingerprint(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	logName := "growing.log"
-	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	id := "fake-ID-" + uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                    id,
 		"paths":                                 []string{env.abspath(logName)},

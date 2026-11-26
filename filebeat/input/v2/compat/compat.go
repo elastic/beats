@@ -25,8 +25,8 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gohugoio/hashstructure"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -217,11 +217,7 @@ func (f *factory) generateCheckConfig(config *conf.C) (*conf.C, error) {
 		return nil, fmt.Errorf("failed to create new config: %w", err)
 	}
 
-	uid, err := uuid.NewV4()
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate check config id: %w", err)
-	}
-
+	uid := uuid.NewV4()
 	finalID := uid.String()
 	// if 'id' is present, use it as a prefix
 	if testCfg.HasField("id") {
