@@ -76,10 +76,8 @@ var testBrowserMonFields = stdfields.StdMonitorFields{
 func testCommonWrap(t *testing.T, tt testDef) {
 	t.Helper()
 	t.Run(tt.name, func(t *testing.T) {
-		wrapped := WrapCommon(tt.jobs, tt.sFields, nil, logptest.NewTestingLogger(t, ""))
-
 		log, observedLogs := logptest.NewTestingLoggerWithObserver(t, "t")
-		logger.SetLogger(log)
+		wrapped := WrapCommon(tt.jobs, tt.sFields, nil, log)
 
 		results, err := jobs.ExecJobsAndConts(t, wrapped)
 		assert.NoError(t, err)
@@ -99,7 +97,9 @@ func testCommonWrap(t *testing.T, tt testDef) {
 		}
 
 		if tt.logValidator != nil {
-			tt.logValidator(t, results, observedLogs.All())
+			// The wrapped jobs share the logger, so other logs (e.g. monitor state) are
+			// present too; the validators only care about the run log.
+			tt.logValidator(t, results, observedLogs.FilterMessage("Monitor finished").All())
 		}
 	})
 }

@@ -150,7 +150,7 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 
 			if !retry {
 				// on final run emits a metric for the service when summary events are complete
-				logger.LogRun(event)
+				logger.LogRun(s.logger, event)
 			} else {
 				// Bump the job summary for the next attempt
 				s.contsRemaining = 1

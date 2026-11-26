@@ -20,7 +20,6 @@ package logger
 import (
 	"encoding/json"
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
@@ -28,9 +27,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/pkg/logp"
 )
-
-var mtx = sync.Mutex{}
-var eventLogger *logp.Logger = nil
 
 const ActionMonitorRun = "monitor.run"
 
@@ -62,23 +58,6 @@ func (m *MonitorRunInfo) MarshalJSON() ([]byte, error) {
 		MonitorRunInfoAlias: (*MonitorRunInfoAlias)(m),
 		DurationMS:          DurationLoggable{Mills: time.Duration(m.Duration * int64(time.Microsecond)).Milliseconds()},
 	})
-}
-
-func SetLogger(l *logp.Logger) *logp.Logger {
-	eventLogger = l
-	return eventLogger
-}
-
-func getLogger() *logp.Logger {
-	mtx.Lock()
-	defer mtx.Unlock()
-
-	if eventLogger == nil {
-		// Fall back to the global logger if SetLogger was never called (early/misconfigured paths).
-		return SetLogger(logp.L()) //nolint:forbidigo // intentional fallback before SetLogger is called
-	}
-
-	return eventLogger
 }
 
 func extractRunInfo(event *beat.Event) (*MonitorRunInfo, error) {
@@ -176,14 +155,21 @@ func extractNetworkInfo(event *beat.Event, monitorType string) NetworkInfo {
 	return networkInfo
 }
 
-func LogRun(event *beat.Event) {
+// LogRun writes the "Monitor finished" log for the event through log, the
+// logger of the beat/receiver that owns the monitor. A package-level cached
+// logger can't be used: in receiver mode several receivers share a process.
+func LogRun(log *logp.Logger, event *beat.Event) {
+	if log == nil {
+		log = logp.L() //nolint:forbidigo // intentional fallback when the caller has no logger
+	}
+
 	monitor, err := extractRunInfo(event)
 	if err != nil {
-		getLogger().Error(fmt.Errorf("error gathering information to log event: %w", err))
+		log.Error(fmt.Errorf("error gathering information to log event: %w", err))
 		return
 	}
 
-	getLogger().Infow(
+	log.Infow(
 		"Monitor finished",
 		logp.Any("event", map[string]string{"action": ActionMonitorRun}),
 		logp.Any("monitor", monitor),

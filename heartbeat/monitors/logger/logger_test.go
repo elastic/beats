@@ -58,7 +58,6 @@ func generateFakeNetworkInfo() NetworkInfo {
 func TestLogRun(t *testing.T) {
 	t.Run("should log the monitor completion", func(t *testing.T) {
 		log, observed := logptest.NewTestingLoggerWithObserver(t, "t")
-		SetLogger(log)
 
 		durationUs := int64(5000 * time.Microsecond)
 		steps := 1337
@@ -73,7 +72,7 @@ func TestLogRun(t *testing.T) {
 		event := beat.Event{Fields: fields}
 		eventext.SetMeta(&event, META_STEP_COUNT, steps)
 
-		LogRun(&event)
+		LogRun(log, &event)
 
 		observedEntries := observed.All()
 		require.Len(t, observedEntries, 1)
@@ -96,7 +95,6 @@ func TestLogRun(t *testing.T) {
 
 	t.Run("should log network information if available", func(t *testing.T) {
 		log, observed := logptest.NewTestingLoggerWithObserver(t, "t")
-		SetLogger(log)
 
 		durationUs := int64(5000 * time.Microsecond)
 		steps := 1337
@@ -114,7 +112,7 @@ func TestLogRun(t *testing.T) {
 		event := beat.Event{Fields: fields}
 		eventext.SetMeta(&event, META_STEP_COUNT, steps)
 
-		LogRun(&event)
+		LogRun(log, &event)
 
 		observedEntries := observed.All()
 		require.Len(t, observedEntries, 1)
