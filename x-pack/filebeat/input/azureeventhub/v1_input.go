@@ -96,7 +96,7 @@ func (in *eventHubInputV1) Run(
 		sanitizers: sanitizers,
 	}
 
-	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
+	ctx := inputContext.Cancelation
 
 	// Initialize the input components
 	// in preparation for the main run loop.

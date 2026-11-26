@@ -3,16 +3,16 @@ name: "beats-xpack-otel"
 
 env:
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1794230330"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1795338029"
 
-  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1794230330"
+  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1795338029"
 
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
 
   #Deps
-  ASDF_MAGE_VERSION: 1.15.0
+  ASDF_MAGE_VERSION: 1.17.2
 
   # Unit tests
   RACE_DETECTOR: "true"

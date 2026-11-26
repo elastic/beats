@@ -5,6 +5,8 @@
 package pub
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -41,6 +43,16 @@ type Publisher struct {
 	listener              beat.ClientListener
 	allowed               func() bool
 	cut                   func(rows int)
+	// rejected, if set, is called for each event the queue rejects in
+	// PublishContext.
+	rejected func()
+	// ctx, once done, stops the publishes of a scheduled or live publisher (see
+	// NewScheduled and NewLive).
+	ctx context.Context
+	// inPublishContext is set while a client's PublishContext runs. An event
+	// it does not queue is counted by publish (rejected) or its caller (cut),
+	// so the listener must not count it again.
+	inPublishContext bool
 }
 
 func New(b *beat.Beat, log *logp.Logger) *Publisher {
@@ -48,6 +60,15 @@ func New(b *beat.Beat, log *logp.Logger) *Publisher {
 		b:   b,
 		log: log,
 	}
+}
+
+// NewLive creates clients for live query results. rejected is called for
+// each event the queue rejects; such an event is dropped and publishing
+// continues. If the clients implement beat.ContextPublisher, ctx being done
+// or a client closing stops a publish waiting for room in the queue, and cut
+// is called with the number of rows skipped because of it.
+func NewLive(ctx context.Context, b *beat.Beat, log *logp.Logger, rejected func(), cut func(rows int)) *Publisher {
+	return &Publisher{b: b, log: log, ctx: ctx, rejected: rejected, cut: cut}
 }
 
 // Configure replaces the clients for the given inputs. It must be called from a
@@ -202,13 +223,16 @@ func streamInputs(inputs []config.InputConfig) (result, actionResponses, profile
 }
 
 func (p *Publisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any) {
-	n := p.PublishEach(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName, meta, hits, ecsm, reqData, func() bool { return false })
+	n := p.PublishEach(p.ctx, index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName, meta, hits, ecsm, reqData, func() bool { return false })
 	p.log.Infof("%d events sent to index %s", n, index)
 }
 
 // PublishEach publishes hits one by one and returns how many were handed to
-// the client before stop returned true. stop is called before each hit.
-func (p *Publisher) PublishEach(index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any, stop func() bool) int {
+// the client before stop returned true or ctx was cancelled. stop is called
+// before each hit. A hit waiting for room in the queue stops when ctx is done
+// only if the client implements beat.ContextPublisher; a nil ctx never stops
+// it.
+func (p *Publisher) PublishEach(ctx context.Context, index, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName string, meta map[string]any, hits []map[string]any, ecsm ecs.Mapping, reqData any, stop func() bool) int {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
@@ -224,9 +248,47 @@ func (p *Publisher) PublishEach(index, idValue, idFieldKey, responseID, spaceID,
 			return i
 		}
 		event := hitToEvent(index, p.b.Info.Name, idValue, idFieldKey, responseID, spaceID, packID, packName, queryName, meta, hit, ecsm, reqData)
-		p.client.Publish(event)
+		if !p.publish(ctx, p.client, event) {
+			p.skip(len(hits) - i)
+			return i
+		}
 	}
 	return len(hits)
+}
+
+// publish hands e to c and reports false if the publish was cancelled. With a
+// non-nil ctx and a client that implements beat.ContextPublisher, it stops
+// waiting for room when ctx is done or c closes, and the event is not queued.
+// Otherwise it blocks like Publish and reports true. An event the queue
+// rejects is dropped as Publish would drop it and reported to p.rejected, and
+// publish reports true.
+// p.mx must be held.
+func (p *Publisher) publish(ctx context.Context, c beat.Client, e beat.Event) bool {
+	cp, ok := c.(beat.ContextPublisher)
+	if ctx == nil || !ok {
+		c.Publish(e)
+		return true
+	}
+	p.inPublishContext = true
+	err := cp.PublishContext(ctx, e)
+	p.inPublishContext = false
+	if errors.Is(err, beat.ErrRejected) {
+		// A listener ignores the drop report made during PublishContext, so
+		// count it here.
+		if p.rejected != nil {
+			p.rejected()
+		}
+		return true
+	}
+	return err == nil
+}
+
+// skip reports rows that were not published because their publish was
+// cancelled.
+func (p *Publisher) skip(rows int) {
+	if p.cut != nil {
+		p.cut(rows)
+	}
 }
 
 func (p *Publisher) Close() {
@@ -319,21 +381,28 @@ func (p *Publisher) publishActionResponseEvent(fields map[string]any, timestamp 
 		Timestamp: timestamp,
 		Fields:    fields,
 	}
-	p.actionResponsesClient.Publish(event)
+	if !p.publish(p.ctx, p.actionResponsesClient, event) {
+		p.skip(1)
+	}
 }
 
-func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) {
-	p.publishProfile(index, queryProfileToEvent(queryName, actionID, responseID, spaceID, profile, reqData, "", 0))
+// PublishQueryProfile publishes a live query's profile and reports whether it
+// was handed to the client. ctx stops it waiting for room in the queue, as in
+// PublishEach.
+func (p *Publisher) PublishQueryProfile(ctx context.Context, index, queryName, actionID, responseID, spaceID string, profile map[string]any, reqData any) bool {
+	return p.publishProfile(ctx, index, queryProfileToEvent(queryName, actionID, responseID, spaceID, profile, reqData, "", 0))
 }
 
 // PublishScheduledProfile publishes the profile of one scheduled query run,
 // correlated with the run's results by its schedule, response ID and
 // execution count.
 func (p *Publisher) PublishScheduledProfile(index, queryName, scheduleID, responseID, spaceID string, scheduleExecutionCount int64, profile map[string]any) {
-	p.publishProfile(index, queryProfileToEvent(queryName, "", responseID, spaceID, profile, nil, scheduleID, scheduleExecutionCount))
+	p.publishProfile(p.ctx, index, queryProfileToEvent(queryName, "", responseID, spaceID, profile, nil, scheduleID, scheduleExecutionCount))
 }
 
-func (p *Publisher) publishProfile(index string, fields mapstr.M) {
+// publishProfile publishes a profile document and reports whether it was handed
+// to the client.
+func (p *Publisher) publishProfile(ctx context.Context, index string, fields mapstr.M) bool {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
@@ -342,10 +411,10 @@ func (p *Publisher) publishProfile(index string, fields mapstr.M) {
 			p.log.Info("Query profile stream is not configured. Query profile events will be dropped.")
 			p.profileDropWarnLogged = true
 		}
-		return
+		return false
 	}
 	if p.retired(1) {
-		return
+		return false
 	}
 
 	event := beat.Event{
@@ -358,7 +427,11 @@ func (p *Publisher) publishProfile(index string, fields mapstr.M) {
 
 	p.log.Debugf("Query profile event is sent, fields: %#v", fields)
 
-	p.queryProfileClient.Publish(event)
+	if !p.publish(ctx, p.queryProfileClient, event) {
+		p.skip(1)
+		return false
+	}
+	return true
 }
 
 // queryProfileToEvent builds the field set for a query profile document.
@@ -538,9 +611,18 @@ func hitToEvent(index, eventType, idValue, idFieldKey, responseID, spaceID, pack
 // reports whether the remaining rows may still be published, for example
 // after the policy was replaced; cut is called with the number of rows skipped
 // because allowed returned false. dropped is called for
-// each event published after its client closed.
-func NewScheduled(b *beat.Beat, log *logp.Logger, allowed func() bool, dropped func(), cut func(rows int)) *Publisher {
-	return &Publisher{b: b, log: log, allowed: allowed, cut: cut, listener: &scheduledListener{dropped: dropped}}
+// each event published after its client closed, and rejected for each event
+// the queue rejects.
+//
+// If the clients implement beat.ContextPublisher, ctx being done or a client
+// closing stops a publish waiting for room in the queue. Such an event is
+// reported to cut, not dropped, and allowed should then return false. A
+// client that does not implement it cannot tell a rejected event from one
+// published after the client closed, so it reports both to dropped.
+func NewScheduled(ctx context.Context, b *beat.Beat, log *logp.Logger, allowed func() bool, dropped, rejected func(), cut func(rows int)) *Publisher {
+	p := &Publisher{b: b, log: log, allowed: allowed, cut: cut, rejected: rejected, ctx: ctx}
+	p.listener = &scheduledListener{p: p, dropped: dropped}
+	return p
 }
 
 // retired reports whether the clients may no longer publish, reporting the
@@ -555,11 +637,20 @@ func (p *Publisher) retired(rows int) bool {
 	return true
 }
 
-type scheduledListener struct{ dropped func() }
+type scheduledListener struct {
+	p       *Publisher
+	dropped func()
+}
 
-func (*scheduledListener) Closing()                      {}
-func (*scheduledListener) Closed()                       {}
-func (*scheduledListener) NewEvent()                     {}
-func (*scheduledListener) Filtered()                     {}
-func (*scheduledListener) Published()                    {}
-func (l *scheduledListener) DroppedOnPublish(beat.Event) { l.dropped() }
+func (*scheduledListener) Closing()   {}
+func (*scheduledListener) Closed()    {}
+func (*scheduledListener) NewEvent()  {}
+func (*scheduledListener) Filtered()  {}
+func (*scheduledListener) Published() {}
+
+// DroppedOnPublish runs on the publishing goroutine, which holds p.mx.
+func (l *scheduledListener) DroppedOnPublish(beat.Event) {
+	if !l.p.inPublishContext {
+		l.dropped()
+	}
+}

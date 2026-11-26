@@ -9,6 +9,7 @@ package azureeventhub
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 	"unicode"
@@ -47,18 +48,21 @@ type azureInputConfig struct {
 
 	// AuthType specifies the authentication method to use for both Event Hub and Storage Account.
 	// If not specified, defaults to connection_string for backwards compatibility.
-	// Valid values: connection_string, client_secret, managed_identity
+	// Valid values: connection_string, client_secret, managed_identity, workload_identity
 	AuthType string `config:"auth_type"`
 
 	// EventHubNamespace is the fully qualified namespace for the Event Hub.
-	// Required when using credential-based authentication (client_secret, managed_identity).
+	// Required when using credential-based authentication.
 	EventHubNamespace string `config:"eventhub_namespace"`
 	// TenantID is the Azure Active Directory tenant ID.
-	// Required when using client_secret authentication.
+	// Required for client_secret; workload_identity also accepts AZURE_TENANT_ID.
 	TenantID string `config:"tenant_id"`
 	// ClientID is the Azure Active Directory application (client) ID.
-	// Required when using client_secret authentication.
+	// Required for client_secret; workload_identity also accepts AZURE_CLIENT_ID.
 	ClientID string `config:"client_id"`
+	// FederatedTokenFile is the projected Kubernetes service account token file.
+	// Only used when auth_type is workload_identity. Defaults to AZURE_FEDERATED_TOKEN_FILE.
+	FederatedTokenFile string `config:"federated_token_file"`
 	// ClientSecret is the Azure Active Directory application client secret.
 	// Required when using client_secret authentication.
 	ClientSecret string `config:"client_secret"`
@@ -269,8 +273,10 @@ func (conf *azureInputConfig) validateAuth() error {
 		return conf.validateClientSecretAuth()
 	case AuthTypeManagedIdentity:
 		return conf.validateManagedIdentityAuth()
+	case AuthTypeWorkloadIdentity:
+		return conf.validateWorkloadIdentityAuth()
 	default:
-		return fmt.Errorf("unknown auth_type: %s (valid values: connection_string, client_secret, managed_identity)", conf.AuthType)
+		return fmt.Errorf("unknown auth_type: %s (valid values: connection_string, client_secret, managed_identity, workload_identity)", conf.AuthType)
 	}
 }
 
@@ -365,6 +371,29 @@ func (conf *azureInputConfig) validateManagedIdentityAuth() error {
 	return nil
 }
 
+// validateWorkloadIdentityAuth validates workload identity federation configuration.
+func (conf *azureInputConfig) validateWorkloadIdentityAuth() error {
+	if conf.ProcessorVersion != processorV2 {
+		return errors.New("workload_identity authentication requires processor_version v2")
+	}
+	if conf.EventHubNamespace == "" {
+		return errors.New("eventhub_namespace is required when using workload_identity authentication")
+	}
+	// Match the SDK's environment fallbacks without freezing environment values into the config.
+	for _, setting := range []struct {
+		name, value, env string
+	}{
+		{"tenant_id", conf.TenantID, "AZURE_TENANT_ID"},
+		{"client_id", conf.ClientID, "AZURE_CLIENT_ID"},
+		{"federated_token_file", conf.FederatedTokenFile, "AZURE_FEDERATED_TOKEN_FILE"},
+	} {
+		if setting.value == "" && os.Getenv(setting.env) == "" {
+			return fmt.Errorf("%s or %s is required when using workload_identity authentication", setting.name, setting.env)
+		}
+	}
+	return nil
+}
+
 // validateRequiredFields validates that all required fields are present.
 func (conf *azureInputConfig) validateRequiredFields() error {
 	if conf.EventHubName == "" {
@@ -451,7 +480,7 @@ func (conf *azureInputConfig) validateStorageAccountConfig(logger *logp.Logger) 
 func (conf *azureInputConfig) validateStorageAccountConfigV2(logger *logp.Logger) error {
 	// For processor v2, storage account authentication depends on auth_type:
 	// - connection_string: needs SAConnectionString (can be auto-constructed from SAName+SAKey)
-	// - client_secret: uses the same credentials as Event Hub, no connection string needed
+	// - credential authentication: uses the same identity settings as Event Hub, no connection string needed
 	if conf.AuthType == AuthTypeConnectionString {
 		if conf.SAConnectionString == "" {
 			if conf.SAName != "" && conf.SAKey != "" {
@@ -484,7 +513,7 @@ func (conf *azureInputConfig) validateStorageAccountConfigV2(logger *logp.Logger
 			}
 		}
 	}
-	// For client_secret auth with processor v2, storage account uses the same credentials
+	// For credential authentication with processor v2, storage account uses the same identity settings
 	// No connection string validation needed
 	return nil
 }
@@ -500,10 +529,10 @@ func (conf *azureInputConfig) GetFullyQualifiedEventHubNamespace() (string, erro
 			return "", fmt.Errorf("failed to parse connection string: %w", err)
 		}
 		return connectionStringProperties.FullyQualifiedNamespace, nil
-	case AuthTypeClientSecret, AuthTypeManagedIdentity:
-		// When using client_secret auth, use EventHubNamespace directly
+	case AuthTypeClientSecret, AuthTypeManagedIdentity, AuthTypeWorkloadIdentity:
+		// Credential authentication uses EventHubNamespace directly.
 		if conf.EventHubNamespace == "" {
-			return "", fmt.Errorf("eventhub_namespace is required when using client_secret authentication")
+			return "", fmt.Errorf("eventhub_namespace is required when using %s authentication", conf.AuthType)
 		}
 		return conf.EventHubNamespace, nil
 	default:

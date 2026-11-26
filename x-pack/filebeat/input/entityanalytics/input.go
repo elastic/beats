@@ -86,18 +86,25 @@ func (m *manager) createMinimalStateInput(cfg *config.C, c *conf) (v2.Input, err
 		return nil, fmt.Errorf("provider %q does not support minimal state mode: %w", c.Provider, err)
 	}
 
-	p, fullSync, incrSync, err := factoryFn(cfg, m.logger)
+	ms, err := factoryFn(cfg, m.logger)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create minimal-state provider %q: %w", c.Provider, err)
 	}
 
-	return &minimalStateInput{
-		provider:         p,
+	in := &minimalStateInput{
+		provider:         ms.Provider,
 		providerName:     c.Provider,
-		fullSyncInterval: fullSync,
-		incrSyncInterval: incrSync,
+		fullSyncInterval: ms.FullSync,
+		incrSyncInterval: ms.IncrementalSync,
+		client:           ms.Client,
+		tracer:           ms.Tracer,
+		untraced:         ms.Untraced,
 		logger:           m.logger,
 		store:            m.store,
 		path:             m.path,
-	}, nil
+	}
+	if ms.Client != nil {
+		in.transport = ms.Client.Transport
+	}
+	return in, nil
 }

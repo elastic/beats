@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
 	"path/filepath"
 	"runtime/debug"
@@ -26,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
 	"github.com/elastic/entcollect"
+	"github.com/elastic/go-concert/ctxtool"
 )
 
 // minimalStateInput implements v2.Input for the minimal-state path.
@@ -34,9 +36,19 @@ type minimalStateInput struct {
 	providerName     string
 	fullSyncInterval time.Duration
 	incrSyncInterval time.Duration
-	logger           *logp.Logger
-	store            statestore.States
-	path             *paths.Path
+
+	// client is the provider's HTTP client, or nil. Run sets its
+	// transport to transport, wrapped with the request tracer that
+	// tracer configures, except for requests to the URL prefixes in
+	// untraced.
+	client    *http.Client
+	transport http.RoundTripper
+	tracer    *provider.TracerConfig
+	untraced  []string
+
+	logger *logp.Logger
+	store  statestore.States
+	path   *paths.Path
 }
 
 var _ v2.Input = (*minimalStateInput)(nil)
@@ -60,6 +72,19 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 	runCtx.UpdateStatus(status.Starting, "")
 	log := runCtx.Logger.With("provider", n.providerName)
 
+	if n.client != nil {
+		ctx := ctxtool.FromCanceller(runCtx.Cancelation)
+		var traced http.RoundTripper
+		traced, err = provider.TraceRequests(ctx, n.transport, n.tracer, runCtx.Agent.Paths, n.providerName, runCtx.IDWithoutName, log)
+		if err != nil {
+			return fmt.Errorf("could not set up request tracer: %w", err)
+		}
+		n.client.Transport, err = provider.SkipTracing(traced, n.transport, n.untraced)
+		if err != nil {
+			return fmt.Errorf("could not set up request tracer: %w", err)
+		}
+	}
+
 	client, err := connector.ConnectWith(beat.ClientConfig{
 		EventListener: kvstore.NewTxACKHandler(),
 	})
@@ -81,9 +106,13 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 	defer syncTimer.Stop()
 	defer incrTimer.Stop()
 
-	// The most recent full and incremental sync errors. The input is
-	// degraded while either is set. A successful full sync clears both.
-	var fullErr, incrErr error
+	// The most recent full sync error, the most recent failed incremental
+	// sync and the most recent incomplete incremental sync. The input is
+	// degraded while any is set. A failed incremental sync is redone by the
+	// next one, so the next sync of either kind that commits clears it. What
+	// an incomplete one skipped is only collected again by a full sync, so
+	// only a successful full sync clears it, as it clears the other two.
+	var fullErr, incrErr, incrIncomplete error
 	retry := retryBackoff{initial: n.incrSyncInterval, max: n.fullSyncInterval}
 
 	runCtx.UpdateStatus(status.Running, "")
@@ -100,17 +129,23 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 			wait := n.fullSyncInterval
 			switch {
 			case err == nil:
-				fullErr, incrErr = nil, nil
+				fullErr, incrErr, incrIncomplete = nil, nil, nil
 				retry.reset()
 			case provider.SyncInterrupted(runCtx, err):
 				log.Infow(provider.SyncInterruptedMsg, "error", err)
 				continue // The input is stopping.
+			case incomplete(err):
+				// The sync was committed. What it could not collect is
+				// collected again by the next full sync, so don't retry early.
+				log.Warnw("Incomplete full sync", "error", err)
+				fullErr = err
+				retry.reset()
 			default:
 				log.Errorw("Error running full sync", "error", err)
 				fullErr = err
 				wait = retry.failed()
 			}
-			updateSyncStatus(runCtx, fullErr, incrErr, "Successful full sync")
+			updateSyncStatus(runCtx, fullErr, incrErr, incrIncomplete, "Successful full sync")
 			syncTimer.Reset(wait)
 			log.Debugf("Next full sync expected at: %v", time.Now().Add(wait))
 
@@ -130,11 +165,14 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 			case provider.SyncInterrupted(runCtx, err):
 				log.Infow(provider.SyncInterruptedMsg, "error", err)
 				continue // The input is stopping.
+			case incomplete(err):
+				log.Warnw("Incomplete incremental sync", "error", err)
+				incrErr, incrIncomplete = nil, err
 			default:
 				log.Errorw("Error running incremental sync", "error", err)
 				incrErr = err
 			}
-			updateSyncStatus(runCtx, fullErr, incrErr, "Successful incremental sync")
+			updateSyncStatus(runCtx, fullErr, incrErr, incrIncomplete, "Successful incremental sync")
 			incrTimer.Reset(n.incrSyncInterval)
 			log.Debugf("Next incremental sync expected at: %v", time.Now().Add(n.incrSyncInterval))
 		}
@@ -177,17 +215,40 @@ func recoverSync(runCtx v2.Context, log *logp.Logger, s syncer, p entcollect.Pro
 	return s.runSync(runCtx, p, client, slogger, full)
 }
 
-// updateSyncStatus reports the input as degraded if the most recent full
-// or incremental sync failed, and as running with msg otherwise.
-func updateSyncStatus(runCtx v2.Context, fullErr, incrErr error, msg string) {
+// incomplete reports whether err is an *entcollect.IncompleteError: the
+// sync finished and was committed, but some data could not be collected.
+func incomplete(err error) bool {
+	var ie *entcollect.IncompleteError
+	return errors.As(err, &ie)
+}
+
+// updateSyncStatus reports the input as degraded if any of the full sync
+// error, the failed incremental sync error or the incomplete incremental
+// sync error is set, and as running with msg otherwise.
+func updateSyncStatus(runCtx v2.Context, fullErr, incrErr, incrIncomplete error, msg string) {
 	switch {
 	case fullErr != nil:
-		runCtx.UpdateStatus(status.Degraded, fmt.Sprintf("Error running full sync: %v", fullErr))
+		runCtx.UpdateStatus(status.Degraded, degradedMsg("full", fullErr))
 	case incrErr != nil:
-		runCtx.UpdateStatus(status.Degraded, fmt.Sprintf("Error running incremental sync: %v", incrErr))
+		runCtx.UpdateStatus(status.Degraded, degradedMsg("incremental", incrErr))
+	case incrIncomplete != nil:
+		runCtx.UpdateStatus(status.Degraded, degradedMsg("incremental", incrIncomplete))
 	default:
 		runCtx.UpdateStatus(status.Running, msg)
 	}
+}
+
+// degradedMsg returns the status message for a failed or incomplete sync
+// of the given kind, "full" or "incremental".
+func degradedMsg(kind string, err error) string {
+	var ie *entcollect.IncompleteError
+	if !errors.As(err, &ie) {
+		return fmt.Sprintf("Error running %s sync: %v", kind, err)
+	}
+	if ie.Err == nil {
+		return fmt.Sprintf("Incomplete %s sync", kind)
+	}
+	return fmt.Sprintf("Incomplete %s sync: %v", kind, ie.Err)
 }
 
 // syncer abstracts state storage for sync operations. The bbolt
@@ -232,7 +293,7 @@ func (n *minimalStateInput) newBBoltSyncer(runCtx v2.Context, log *logp.Logger) 
 }
 
 func (s *bboltSyncer) runSync(runCtx v2.Context, provider entcollect.Provider, client beat.Client, slogger *slog.Logger, full bool) error {
-	ctx := v2.GoContextFromCanceler(runCtx.Cancelation)
+	ctx := runCtx.Cancelation
 	tx, err := s.store.BeginTx(true)
 	if err != nil {
 		return fmt.Errorf("unable to begin transaction: %w", err)
@@ -254,7 +315,8 @@ func (s *bboltSyncer) runSync(runCtx v2.Context, provider entcollect.Provider, c
 	// Always wait for in-flight events to be ACKed, even on error.
 	tracker.Wait()
 
-	if err != nil {
+	// An incomplete sync is committed, and its error returned after.
+	if err != nil && !incomplete(err) {
 		buf.Discard()
 		return err
 	}
@@ -270,7 +332,7 @@ func (s *bboltSyncer) runSync(runCtx v2.Context, provider entcollect.Provider, c
 	if err := tx.Commit(); err != nil {
 		return fmt.Errorf("unable to commit transaction: %w", err)
 	}
-	return nil
+	return err // The sync's IncompleteError, if any.
 }
 
 func (s *bboltSyncer) close() {
@@ -294,7 +356,7 @@ func (n *minimalStateInput) newESSyncer(runCtx v2.Context, log *logp.Logger) (*e
 }
 
 func (s *esSyncer) runSync(runCtx v2.Context, provider entcollect.Provider, client beat.Client, slogger *slog.Logger, full bool) error {
-	ctx := v2.GoContextFromCanceler(runCtx.Cancelation)
+	ctx := runCtx.Cancelation
 
 	es := kvstore.NewStateStoreAdapter(s.store)
 	buf := entcollect.NewBuffer(es)
@@ -312,7 +374,8 @@ func (s *esSyncer) runSync(runCtx v2.Context, provider entcollect.Provider, clie
 	// Always wait for in-flight events to be ACKed, even on error.
 	tracker.Wait()
 
-	if err != nil {
+	// An incomplete sync is committed, and its error returned after.
+	if err != nil && !incomplete(err) {
 		buf.Discard()
 		return err
 	}
@@ -325,7 +388,7 @@ func (s *esSyncer) runSync(runCtx v2.Context, provider entcollect.Provider, clie
 	if err := buf.Commit(); err != nil {
 		return fmt.Errorf("unable to commit buffer: %w", err)
 	}
-	return nil
+	return err // The sync's IncompleteError, if any.
 }
 
 func (s *esSyncer) close() {

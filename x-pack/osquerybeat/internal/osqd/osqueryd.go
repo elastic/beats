@@ -747,7 +747,7 @@ func (q *OSQueryD) args(userFlags Flags) Args {
 	for k, userValue := range userFlags {
 		// Skip enable_tables and disable_tables flags, they are set later in this function
 		// after merging with default disabled tables
-		if k == flagEnableTables || flagEnableTables == flagDisableTables {
+		if k == flagEnableTables || k == flagDisableTables {
 			continue
 		}
 		flags[k] = userValue
@@ -829,7 +829,9 @@ func (q *OSQueryD) args(userFlags Flags) Args {
 		flags[flagDisableTables] = strings.Join(disabledTables, ",")
 	}
 
-	return convertToArgs(flags)
+	// Enforce the FIPS settings on the finished flags, so that nothing above
+	// can undo them. This changes nothing without the requirefips tag.
+	return convertToArgs(enforceFIPSFlags(flags, q.log))
 }
 
 func arrayToSet(arr []string) map[string]struct{} {

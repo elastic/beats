@@ -35,14 +35,15 @@ import (
 var errPluginClosed = errors.New("monitor is stopped")
 
 // WrapFactory returns a copy of pf whose plugins resolve the secret
-// references of their config on every run. Making a plugin never fails
-// because of the secret stores: their errors are returned by the jobs, so
-// the monitor reports them and retries on its next run.
-func (r *Resolver) WrapFactory(pf plugin.PluginFactory) plugin.PluginFactory {
+// references of their config on every run, and give the secret values to
+// redactor. Making a plugin never fails because of the secret stores: their
+// errors are returned by the jobs, so the monitor reports them and retries on
+// its next run.
+func (r *Resolver) WrapFactory(pf plugin.PluginFactory, redactor *Redactor) plugin.PluginFactory {
 	inner := pf
-	resolve := func(cfg *conf.C) (*conf.C, error) { return r.Resolve(cfg, inner.Destinations) }
+	resolve := func(cfg *conf.C) (*conf.C, *Scrubber, error) { return r.Resolve(cfg, inner.Destinations) }
 	pf.Make = func(name string, cfg *conf.C, info beat.Info) (plugin.Plugin, error) {
-		return newSecretPlugin(resolve, inner, name, cfg, info, r.logger).plugin(), nil
+		return newSecretPlugin(resolve, inner, name, cfg, info, r.logger, redactor).plugin(), nil
 	}
 	return pf
 }
@@ -56,11 +57,12 @@ func (r *Resolver) WrapFactory(pf plugin.PluginFactory) plugin.PluginFactory {
 // Each job is scheduled on its own, so the number of jobs is fixed when the
 // plugin is made. Without an inner plugin at that time, there is one job.
 type secretPlugin struct {
-	resolve  func(*conf.C) (*conf.C, error)
+	resolve  func(*conf.C) (*conf.C, *Scrubber, error)
 	factory  plugin.PluginFactory
 	name     string
 	info     beat.Info
 	logger   *logp.Logger
+	redactor *Redactor
 	jobCount int
 
 	mu sync.Mutex
@@ -71,20 +73,27 @@ type secretPlugin struct {
 	// hash is the hash of the resolved config of inner, or of createErr.
 	hash      uint64
 	createErr error
-	closed    bool
+	// scrubber is the one of the resolved config of inner.
+	scrubber *Scrubber
+	closed   bool
 }
 
-func newSecretPlugin(resolve func(*conf.C) (*conf.C, error), factory plugin.PluginFactory, name string, cfg *conf.C, info beat.Info, logger *logp.Logger) *secretPlugin {
+func newSecretPlugin(resolve func(*conf.C) (*conf.C, *Scrubber, error), factory plugin.PluginFactory, name string, cfg *conf.C, info beat.Info, logger *logp.Logger, redactor *Redactor) *secretPlugin {
+	// The plugin logs with a logger that scrubs: its log lines can quote
+	// resolved values, such as the params of a browser monitor.
+	info.Logger = redactor.Logger(info.Logger)
 	p := &secretPlugin{
 		resolve:  resolve,
 		factory:  factory,
 		name:     name,
 		info:     info,
-		logger:   logger,
+		logger:   redactor.Logger(logger),
+		redactor: redactor,
 		config:   cfg,
 		jobCount: 1,
 	}
-	inner, err := p.current()
+	// The first job's first run replaces the values of this one.
+	inner, err := p.current(0)
 	if err != nil {
 		p.logger.Warnf("Could not create the monitor plugin, retrying on every run: %v", err)
 		return p
@@ -115,7 +124,7 @@ func (p *secretPlugin) plugin() plugin.Plugin {
 // job returns the job running the job i of the inner plugin.
 func (p *secretPlugin) job(i int) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
-		inner, err := p.current()
+		inner, err := p.current(i)
 		if err != nil {
 			return nil, err
 		}
@@ -126,15 +135,17 @@ func (p *secretPlugin) job(i int) jobs.Job {
 	}
 }
 
-// current returns the inner plugin for the current resolved config,
-// creating it if the resolved config changed.
-func (p *secretPlugin) current() (plugin.Plugin, error) {
+// current returns the inner plugin for the current resolved config, creating
+// it if the resolved config changed, for a run of the job.
+func (p *secretPlugin) current(job int) (plugin.Plugin, error) {
 	p.mu.Lock()
 	config := p.config
 	p.mu.Unlock()
 
 	// Resolve without the lock, so a slow secret store doesn't block close.
-	resolved, err := p.resolve(config)
+	resolved, scrubber, err := p.resolve(config)
+	// Also on failure: the error can quote a value substituted before it.
+	p.redactor.set(job, scrubber)
 	if err != nil {
 		return plugin.Plugin{}, err
 	}
@@ -160,7 +171,7 @@ func (p *secretPlugin) current() (plugin.Plugin, error) {
 	// runs of a job never overlap.
 	_ = p.closeInner()
 	inner, err := p.factory.Make(p.name, resolved, p.info)
-	p.hash = hash
+	p.hash, p.scrubber = hash, scrubber
 	if err != nil {
 		// A plugin can return resources to close along with the error.
 		if closeErr := inner.Close(); closeErr != nil {
@@ -197,9 +208,13 @@ func (p *secretPlugin) closeInner() error {
 	inner := p.inner
 	p.inner, p.built = plugin.Plugin{}, false
 	err := inner.Close()
-	if err != nil {
-		p.logger.Errorf("Could not close the monitor plugin: %v", err)
+	if err == nil {
+		return nil
 	}
+	// It can quote the values inner was made with, which the redactor no
+	// longer has after a rotation. The monitor logs it too.
+	err = errors.New(p.scrubber.String(err.Error()))
+	p.logger.Errorf("Could not close the monitor plugin: %v", err)
 	return err
 }
 

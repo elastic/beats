@@ -206,6 +206,14 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 
 	runners := make(map[uint64]cfgfile.Runner) // Active list of module runners.
 
+	enabledModules := make([]*conf.C, 0, len(bt.config.Modules))
+	for _, moduleCfg := range bt.config.Modules {
+		if moduleCfg.Enabled() {
+			enabledModules = append(enabledModules, moduleCfg)
+		}
+	}
+	cfgfile.SetRunnerConfigs(factory, bt, enabledModules)
+
 	for _, moduleCfg := range bt.config.Modules {
 		if !moduleCfg.Enabled() {
 			continue
