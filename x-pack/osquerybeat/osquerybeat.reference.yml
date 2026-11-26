@@ -69,8 +69,8 @@ osquerybeat:
 #            #ssl.key: "/etc/pki/client/cert.key"
 #            # NOTE: custom osquery is installed in the bundled osquery directory.
 #            # NOTE: if custom artifact install/validation fails, osquerybeat startup fails.
-#            # NOTE: FIPS builds reject this setting, because custom osquery is not
-#            # built against a FIPS-validated cryptographic module.
+#            # NOTE: FIPS builds reject this setting, because the FIPS settings that
+#            # osquerybeat enforces only cover the bundled osqueryd.
 #          extensions:
 #            # Customer-managed osquery extensions to autoload. These extensions are
 #            # NOT developed, validated, or supported by Elastic; customers are fully
@@ -78,7 +78,7 @@ osquerybeat:
 #            # them at their own risk.
 #            #
 #            # FIPS builds reject this setting, because extensions are separate
-#            # programs that Elastic cannot show to use FIPS-validated cryptography.
+#            # programs that the FIPS settings osquerybeat enforces do not cover.
 #            #
 #            # Each entry is an absolute path and may be a directory (every extension
 #            # binary in it is autoloaded; files ending in ".ext" on Unix or ".exe" on
