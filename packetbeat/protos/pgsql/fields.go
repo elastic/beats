@@ -32,9 +32,5 @@ func init() {
 // AssetPgsql returns asset data.
 // This is the base64 encoded zlib format compressed contents of protos/pgsql.
 func AssetPgsql() string {
-<<<<<<< HEAD
-	return "eJzEkcFu6jAURPf5ihHrBx+QBRJCPAkJtRTYI0gmwapjB1+bKn9fhaTF0GbBqllF1z4zR9djvLNJUZdy1gnglddMMVpb8aXj9m01SoCckjlVe2VNimkCALcLY6mZqUJl4IXGo1DUuUwS9H/p9f4Y5lDxVtR+vqmZonQ21P0kJmKKzlm3z2zO76MHq92JkVMHoAUmEdEVamvKZKCiosihfK6lZyZDmcILnfLNU6FfUKxfWxF11NxfDjowWlPXudhsXjcPs/+z3Wz1MFvPXpbzn7ImVPtu/0Oi07ugZQF/IraL1WK+wznQNVAFJGQZRYqg/8GflHRvCiUQenh7hUyojnR3cbboXx+OPjjD/JeFto7OfvyZYdsd+30GAAD//yg57bo="
-=======
-	return "eJzEkkFuwjAQRfc5xRfrhgNkgYQQlZBQS4E9guQnWHXs4LGpcvsqJC0uLQtWVbKwZvzmP42c4p1thqaSk04Ar7xmhtHKiq8cN2/LUQIUlNypxitrMkwSALheSKVhrkqVg2caj1JRFzJOMJyyy/0UZl/zGtR9vm2YoXI2NEMlJmKKzlm3y23B79aN1fbIyKkH0AHjiOgDtTVVcieipsi+eixlYMb3ZgrPdMq3Dw39gmL9xoqog+buvNeB0Zq6P8V8vX5d39Sep9vp8qa2mr4sZr9lTah3/f7viU6iBrAo4Y/EZr6cz7Y4BboWSiAhzylSBv0Ef1TSv4JLhx7eXiAT6gPdj3G2HN4LHH1whsUfC+0cnf34N8MuO/b7HAA4Re3U"
->>>>>>> 3a323f1 (chore(deps): update Go to 1.27.4 (#54741))
+	return "eJzEkkFuwjAQRfc5xRfrhgNkgYQQlZBQS4E9guQnWHXs4LGpcvsqJC0uLQtWVbKwxn7zn0aT4p1thqaSk04Ar7xmhtHKiq8cN2/LUQIUlNypxitrMkwSALg+SKVhrkqVg2caj1JRFzJOMJyyy/sUZl/zGtR9vm2YoXI2NEMlJmKKzlm3y23B76sbq+2RkVMPoAPGEdEHamuq5E5ETZF99VjKwIzv9RSe6ZRvH2r6BcX6jRVRB83dea8DozF1f4r5ev26vqk9T7fT5U1tNX1ZzH7LmlDv+vnfE51EF8CihD8Sm/lyPtviFOhaqBIS8pwiZdBP8Ecl/RZACYQe3l4gE+oD3Y92thz2BY4+OMPij4F2js5+/Jthlx37fQ4AKDntug=="
 }
