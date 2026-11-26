@@ -6,6 +6,8 @@ package kvstore
 
 import (
 	"context"
+	"maps"
+	"slices"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/pkg/mapstr"
@@ -25,8 +27,11 @@ func NewPublisher(client beat.Client, inputID string, tracker *TxTracker) entcol
 		_, _ = fields.Put("labels.identity_source", inputID)
 		_, _ = fields.Put("event.action", doc.Kind.String()+"-"+doc.Action.String())
 		_, _ = fields.Put("event.kind", "asset")
-		for k, v := range doc.Fields {
-			_, _ = fields.Put(k, v)
+		// Put a key before any dotted key under it, so a map value
+		// under "a" can't replace an "a.b" value that was put first.
+		// A key sorts before every key it is a prefix of.
+		for _, k := range slices.Sorted(maps.Keys(doc.Fields)) {
+			_, _ = fields.Put(k, doc.Fields[k])
 		}
 
 		event := beat.Event{
