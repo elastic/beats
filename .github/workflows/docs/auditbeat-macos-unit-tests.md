@@ -17,8 +17,8 @@ Builds and runs unit tests for **auditbeat** on the configured macOS runner usin
 ## When it runs
 
 - `workflow_dispatch`.
-- `pull_request`: paths: `["auditbeat/**", "go.mod", "dev-tools/**", "libbeat/**", ".github/workflows/auditbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
-- `push`: branches: `["main"]`; paths: `["auditbeat/**", "go.mod", "dev-tools/**", "libbeat/**", ".github/workflows/auditbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `pull_request`: paths: `["auditbeat/**", "go.mod", ".python-version", "dev-tools/**", "libbeat/**", ".github/workflows/auditbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `push`: branches: `["main"]`; paths: `["auditbeat/**", "go.mod", ".python-version", "dev-tools/**", "libbeat/**", ".github/workflows/auditbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
 
 ## Execution flow
 

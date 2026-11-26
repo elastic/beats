@@ -23,6 +23,8 @@ const (
 	AuthTypeClientSecret string = "client_secret"
 	// AuthTypeManagedIdentity uses Azure Managed Identity authentication.
 	AuthTypeManagedIdentity string = "managed_identity"
+	// AuthTypeWorkloadIdentity uses a federated Kubernetes service account token.
+	AuthTypeWorkloadIdentity string = "workload_identity"
 )
 
 // createCredential creates a TokenCredential if needed based on the authentication type.
@@ -42,6 +44,12 @@ func createCredential(cfg *azureInputConfig, log *logp.Logger) (azcore.TokenCred
 		credential, err := newManagedIdentityCredential(cfg, log)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create managed identity credential: %w", err)
+		}
+		return credential, nil
+	case AuthTypeWorkloadIdentity:
+		credential, err := newWorkloadIdentityCredential(cfg, log)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create workload identity credential: %w", err)
 		}
 		return credential, nil
 	default:

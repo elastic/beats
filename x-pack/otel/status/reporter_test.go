@@ -6,6 +6,8 @@ package status
 
 import (
 	"fmt"
+	"maps"
+	"slices"
 	"testing"
 	"testing/synctest"
 	"time"
@@ -21,6 +23,7 @@ import (
 func TestGroupStatus(t *testing.T) {
 	m := &oteltest.MockHost{}
 	reporter := newGroupStatusReporter(m, 0) // report every change
+	reporter.SetRunners("test", []string{"1", "2", "3"})
 
 	subReporter1, subReporter2, subReporter3 := reporter.GetReporterForRunner("1"), reporter.GetReporterForRunner("2"), reporter.GetReporterForRunner("3")
 
@@ -107,6 +110,7 @@ func TestRunnerStateRaw(t *testing.T) {
 func TestInputStatusesInEventAttributes(t *testing.T) {
 	m := &oteltest.MockHost{}
 	reporter := newGroupStatusReporter(m, 0) // report every change
+	reporter.SetRunners("test", []string{"runner-1", "runner-2"})
 
 	subReporter1 := reporter.GetReporterForRunner("runner-1")
 	subReporter2 := reporter.GetReporterForRunner("runner-2")
@@ -153,6 +157,7 @@ func TestInputStatusesInEventAttributes(t *testing.T) {
 func TestUnchangedRunnerStatusIsNotReported(t *testing.T) {
 	m := &oteltest.MockHost{}
 	reporter := newGroupStatusReporter(m, 0) // report every change
+	reporter.SetRunners("test", []string{"runner-1"})
 	sub := reporter.GetReporterForRunner("runner-1")
 
 	sub.UpdateStatus(status.Running, "")
@@ -169,7 +174,8 @@ func TestUnchangedRunnerStatusIsNotReported(t *testing.T) {
 // receiver.
 func TestGroupStatusHasNoInputStatuses(t *testing.T) {
 	m := &oteltest.MockHost{}
-	reporter := NewGroupStatusReporter(m)
+	reporter := newGroupStatusReporter(m, 0) // report every change
+	reporter.SetRunners("test", []string{"runner-1"})
 
 	reporter.GetReporterForRunner("runner-1").UpdateStatus(status.Failed, "runner failed")
 	require.NotNil(t, m.GetEvent(), "expected the runner status to be reported")
@@ -187,6 +193,12 @@ func TestGroupStatusCoalescesBursts(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		m := &oteltest.MockHost{}
 		reporter := newGroupStatusReporter(m, 100*time.Millisecond)
+		ids := make([]string, 1000)
+		for i := range ids {
+			ids[i] = fmt.Sprintf("runner-%d", i)
+		}
+		reporter.SetRunners("test", ids)
+		require.Empty(t, m.GetEvents(), "added runners should be reported with their first update")
 
 		// a change after a quiet interval is reported right away
 		reporter.GetReporterForRunner("runner-0").UpdateStatus(status.Running, "")
@@ -222,6 +234,7 @@ func TestGroupStatusOverridesScheduledReport(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		m := &oteltest.MockHost{}
 		reporter := newGroupStatusReporter(m, 100*time.Millisecond)
+		reporter.SetRunners("test", []string{"runner-0", "runner-1"})
 
 		reporter.GetReporterForRunner("runner-0").UpdateStatus(status.Running, "")
 		reporter.GetReporterForRunner("runner-1").UpdateStatus(status.Running, "")
@@ -238,6 +251,7 @@ func TestRunnerChangeAfterGroupStatusIsReported(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		m := &oteltest.MockHost{}
 		reporter := newGroupStatusReporter(m, 100*time.Millisecond)
+		reporter.SetRunners("test", []string{"runner-0", "runner-1"})
 
 		reporter.GetReporterForRunner("runner-0").UpdateStatus(status.Running, "")
 		reporter.GetReporterForRunner("runner-1").UpdateStatus(status.Running, "")
@@ -265,4 +279,72 @@ func BenchmarkCalculateOtelStatus(b *testing.B) {
 			}
 		})
 	}
+}
+
+// inputStatuses returns the status of each input in the last reported event.
+func inputStatuses(t *testing.T, m *oteltest.MockHost) map[string]string {
+	t.Helper()
+	evt := m.GetEvent()
+	require.NotNil(t, evt, "expected a status event")
+	inputs, ok := evt.Attributes().Get(InputStatusAttributesKey)
+	require.True(t, ok, "expected the event to carry input statuses")
+	statuses := make(map[string]string)
+	for id, input := range inputs.Map().All() {
+		s, _ := input.Map().Get("status")
+		statuses[id] = s.Str()
+	}
+	return statuses
+}
+
+func TestSetRunners(t *testing.T) {
+	m := &oteltest.MockHost{}
+	reporter := newGroupStatusReporter(m, 0) // report every change
+
+	assert.Nil(t, reporter.GetReporterForRunner("runner-1"), "an unconfigured runner should get no reporter")
+
+	reporter.SetRunners("test", []string{"runner-1", "runner-2"})
+	assert.Empty(t, m.GetEvents(), "added runners should be reported with their first update")
+
+	runner1 := reporter.GetReporterForRunner("runner-1")
+	runner2 := reporter.GetReporterForRunner("runner-2")
+	require.NotNil(t, runner1, "a configured runner should get a reporter")
+	require.NotNil(t, runner2, "a configured runner should get a reporter")
+	runner1.UpdateStatus(status.Running, "")
+	assert.Equal(t, map[string]string{
+		"runner-1": componentstatus.StatusOK.String(),
+		"runner-2": componentstatus.StatusStarting.String(),
+	}, inputStatuses(t, m), "a configured runner should be reported as starting until it reports")
+	runner2.UpdateStatus(status.Failed, "runner-2 failed")
+	require.Equal(t, componentstatus.StatusPermanentError, m.GetEvent().Status(), "the failed runner should fail the group")
+
+	// removing the failed runner removes its status and its failure
+	reporter.SetRunners("test", []string{"runner-1"})
+	assert.Equal(t, componentstatus.StatusOK, m.GetEvent().Status(), "the removed runner should not count towards the group status")
+	assert.Equal(t, map[string]string{
+		"runner-1": componentstatus.StatusOK.String(),
+	}, inputStatuses(t, m), "the removed runner should not be reported")
+
+	// a removed runner can't add its status back
+	events := len(m.GetEvents())
+	runner2.UpdateStatus(status.Stopped, "")
+	assert.Len(t, m.GetEvents(), events, "an update of a removed runner should not be reported")
+	assert.Nil(t, reporter.GetReporterForRunner("runner-2"), "a removed runner should get no reporter")
+}
+
+func TestSetRunnersFromSeveralSources(t *testing.T) {
+	m := &oteltest.MockHost{}
+	reporter := newGroupStatusReporter(m, 0) // report every change
+
+	reporter.SetRunners("static", []string{"shared", "static-only"})
+	reporter.SetRunners("reloaded", []string{"shared", "reloaded-only"})
+	assert.ElementsMatch(t, []string{"shared", "static-only", "reloaded-only"}, slices.Collect(maps.Keys(reporter.runnerStates)),
+		"the runners of every source should be kept")
+
+	reporter.SetRunners("reloaded", nil)
+	assert.ElementsMatch(t, []string{"shared", "static-only"}, slices.Collect(maps.Keys(inputStatuses(t, m))),
+		"a runner another source still wants should be kept")
+
+	events := len(m.GetEvents())
+	reporter.SetRunners("static", []string{"static-only", "shared"})
+	assert.Len(t, m.GetEvents(), events, "setting the same runners again should not be reported")
 }

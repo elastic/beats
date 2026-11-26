@@ -26,7 +26,8 @@
 //
 // References are only replaced in the configuration copy given to the monitor
 // plugin. Everywhere else (config hashing, diagnostics, std fields) they stay
-// as text.
+// as text. The values that replaced them are removed from the events and
+// errors of the monitor, see Scrubber.
 package secretstores
 
 import (
@@ -51,7 +52,8 @@ type Store interface {
 	Validate(cfg *conf.C, scope Scope) error
 	// Replace returns a copy of the monitor config cfg with the references
 	// of scope replaced by their secret values, and the others left as they
-	// are. cfg must not be modified. Without references of scope, it must
+	// are. cfg must not be modified. It must call Track with ctx for every
+	// secret value it puts in the copy. Without references of scope, it must
 	// return cfg itself: allowed_hosts only applies to connections whose
 	// references were replaced.
 	Replace(ctx context.Context, cfg *conf.C, scope Scope) (*conf.C, error)

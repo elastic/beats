@@ -829,7 +829,9 @@ func (q *OSQueryD) args(userFlags Flags) Args {
 		flags[flagDisableTables] = strings.Join(disabledTables, ",")
 	}
 
-	return convertToArgs(flags)
+	// Enforce the FIPS settings on the finished flags, so that nothing above
+	// can undo them. This changes nothing without the requirefips tag.
+	return convertToArgs(enforceFIPSFlags(flags, q.log))
 }
 
 func arrayToSet(arr []string) map[string]struct{} {
