@@ -19,5 +19,5 @@ func init() {
 // AssetSysmon returns asset data.
 // This is the base64 encoded zlib format compressed contents of module/sysmon.
 func AssetSysmon() string {
-	return "eJysjrFOKzEQRXt/xVX6+ANcvOo1NDRBokSOfVcZ4djBM5uwf49iEqGVIiraGd1zzhbvXAJ00WOrDjCxwoDNbhxwbHku3DggU1OXk0mrAf8cALwcqETshB0InlkNk7BkhZ6YZJIEa+O5wnkHdBZGZcCeFh1uu+AGeIsaj7xX+VzVq0WbdXwBW04M1/BL6/l2W/W9Ss3tovheIbVMdNrcKzOm1kfT/+cdPmb2xT+0TlLoY08HOTOvxPvWCmN9JH6qWVI0KmQaksxCu0qlEJeouBN/kYq+8ZNptrgv/ENzxQ/Wu68AAAD//xH3plw="
+	return "eJyszjFuQjEQBNDepxjR4wO4SJUmTRoipYyMPV+sYmzi3Q/5t48woAgJpUq7q5k3a3xyCdBF9606wMQKA1abccC+5blw5YBMTV0OJq0GPDkAeNtRidgJ2xE8shomYckKPTDJJAnWxvOuzjugszAqA7a06HDNBTeK16hxz9sqn6t6tWizji9gy4HhPPzUer7e7va9S83tpLikkFomOm3ulRlT62PT8+sGXzP74h+qkxT62NNOjrwhF3jbWmGsj+CXmiVFo0KmgWQW2hmVQpyi4tb4Byr6wW+m2eK28B/lit9a734GABH3plw="
 }
