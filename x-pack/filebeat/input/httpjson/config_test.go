@@ -423,6 +423,18 @@ func TestConfigOauth2Validation(t *testing.T) {
 			},
 		},
 		{
+			name:        "use_cloud_connectors requires the azure provider",
+			expectedErr: "azure.use_cloud_connectors requires provider: azure accessing 'auth.oauth2'",
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
+					"azure.use_cloud_connectors": true,
+					"client.id":                  "a_client_id",
+					"client.secret":              "",
+					"token_url":                  "localhost",
+				},
+			},
+		},
+		{
 			name:        "azure with use_cloud_connectors needs client id",
 			expectedErr: "client credentials must be provided accessing 'auth.oauth2'",
 			input: map[string]any{

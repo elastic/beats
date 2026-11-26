@@ -622,6 +622,18 @@ var oAuth2ValidationTests = []struct {
 		},
 	},
 	{
+		name:    "use_cloud_connectors_requires_the_azure_provider",
+		wantErr: errors.New("azure.use_cloud_connectors requires provider: azure accessing 'auth.oauth2'"),
+		input: map[string]any{
+			"auth.oauth2": map[string]any{
+				"azure.use_cloud_connectors": true,
+				"client.id":                  "a_client_id",
+				"client.secret":              "",
+				"token_url":                  "localhost",
+			},
+		},
+	},
+	{
 		name:    "azure_with_use_cloud_connectors_needs_client_id",
 		wantErr: errors.New("client credentials must be provided accessing 'auth.oauth2'"),
 		input: map[string]any{

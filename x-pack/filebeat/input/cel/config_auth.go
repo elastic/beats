@@ -387,6 +387,9 @@ func (o *oAuth2Config) Validate() error {
 	if !o.isEnabled() {
 		return nil
 	}
+	if o.AzureUseCloudConnectors && o.getProvider() != oAuth2ProviderAzure {
+		return errors.New("azure.use_cloud_connectors requires provider: azure")
+	}
 
 	switch o.getProvider() {
 	case oAuth2ProviderAzure:
