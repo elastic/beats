@@ -450,6 +450,20 @@ func TestConfigOauth2Validation(t *testing.T) {
 			},
 		},
 		{
+			name:        "azure with use_cloud_connectors rejects client secret",
+			expectedErr: "client.secret can't be used with azure.use_cloud_connectors accessing 'auth.oauth2'",
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
+					"provider":                   "azure",
+					"azure.tenant_id":            "a_tenant_id",
+					"azure.use_cloud_connectors": true,
+					"client.id":                  "a_client_id",
+					"client.secret":              "a_client_secret",
+					"scopes":                     []string{"https://management.azure.com/.default"},
+				},
+			},
+		},
+		{
 			name:        "use_cloud_connectors requires the azure provider",
 			expectedErr: "azure.use_cloud_connectors requires provider: azure accessing 'auth.oauth2'",
 			input: map[string]any{
