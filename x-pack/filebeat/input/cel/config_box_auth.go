@@ -21,6 +21,7 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/dpop"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/jwtauth"
 )
 
 // boxTokenURL is the Box OAuth2 token endpoint.
@@ -119,7 +120,7 @@ func (o *oAuth2Config) resolveBoxCredentials() (boxCredentials, error) {
 			c.subjectID = o.BoxSubjectID
 		}
 
-		key, err := pemPKCS8PrivateKey([]byte(app.BoxAppSettings.AppAuth.PrivateKey), app.BoxAppSettings.AppAuth.Passphrase)
+		key, err := jwtauth.ParsePrivateKey([]byte(app.BoxAppSettings.AppAuth.PrivateKey), app.BoxAppSettings.AppAuth.Passphrase)
 		if err != nil {
 			return c, fmt.Errorf("box.config_json private key: %w", err)
 		}
@@ -144,7 +145,7 @@ func (o *oAuth2Config) resolveBoxCredentials() (boxCredentials, error) {
 			c.subjectID = o.BoxSubjectID
 		}
 
-		key, err := pemPKCS8PrivateKey([]byte(o.BoxPrivateKey), o.BoxPassphrase)
+		key, err := jwtauth.ParsePrivateKey([]byte(o.BoxPrivateKey), o.BoxPassphrase)
 		if err != nil {
 			return c, fmt.Errorf("box.private_key: %w", err)
 		}

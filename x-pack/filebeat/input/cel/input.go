@@ -1302,6 +1302,13 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		}
 	}
 
+	if cfg.Auth.JWT.isEnabled() {
+		c, err = cfg.Auth.JWT.client(ctx, c)
+		if err != nil {
+			return nil, nil, nil, nil, err
+		}
+	}
+
 	return c, trace, otelMetrics, contextInjector, nil
 }
 
