@@ -298,6 +298,9 @@ func TestHTTPSProxy(t *testing.T) {
 	targetHost := "not-a-server.example"
 	proxy, client, target := prepareMTLSProxyAndTargetServer(t, targetHost)
 	t.Cleanup(func() {
+		// The proxy waits for the HTTPS tunnels to end, and the client keeps
+		// them open as idle keep-alive connections.
+		client.CloseIdleConnections()
 		proxy.Close()
 		target.Close()
 	})
