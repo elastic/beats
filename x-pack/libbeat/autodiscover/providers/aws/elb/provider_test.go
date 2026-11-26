@@ -9,8 +9,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -75,7 +75,7 @@ func Test_internalBuilder(t *testing.T) {
 		Period:  time.Nanosecond,
 	}
 
-	uuid, _ := uuid.NewV4()
+	uuid := uuid.NewV4()
 	k, _ := keystore.NewFileKeystore("test")
 	provider, err := internalBuilder(uuid, pBus, cfg, fetcher, k, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)

@@ -9,8 +9,7 @@ package add_cloudfoundry_metadata
 import (
 	"errors"
 	"fmt"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -47,7 +46,7 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 
 	// ShardID is required in cloudfoundry config to consume from the firehose,
 	// but not for metadata requests, randomly generate one and use it.
-	config.ShardID = uuid.Must(uuid.NewV4()).String()
+	config.ShardID = uuid.NewV4().String()
 
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)

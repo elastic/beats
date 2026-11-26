@@ -10,8 +10,7 @@ import (
 	"fmt"
 	"slices"
 	"time"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 
 	"github.com/elastic/beats/v7/pkg/logp"
 )
@@ -56,10 +55,7 @@ func (client *Client) GetMetricValues() (ListMetricsResultsItem, error) {
 				Orderby:     &metrics.OrderBy,
 				Filter:      &metrics.Filter,
 			}
-			id, err := uuid.NewV4()
-			if err != nil {
-				return result, fmt.Errorf("could not generate identifier in client: %w", err)
-			}
+			id := uuid.NewV4()
 			strID := id.String()
 			bodyMetrics = append(bodyMetrics, MetricsBatchRequestItem{ID: &strID, Parameters: &params})
 		}

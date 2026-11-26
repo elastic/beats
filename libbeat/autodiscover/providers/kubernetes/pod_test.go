@@ -23,8 +23,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -364,10 +364,7 @@ func TestPod_EmitEvent(t *testing.T) {
 	containerImage := "elastic/filebeat:6.3.0"
 	node := "node"
 	cid := "005f3b90-4b9d-12f8-acf0-31020a840133.filebeat"
-	UUID, err := uuid.NewV4()
-	if err != nil {
-		t.Fatal(err)
-	}
+	UUID := uuid.NewV4()
 
 	typeMeta := metav1.TypeMeta{
 		Kind:       "Pod",
@@ -2129,10 +2126,7 @@ func TestNodePodUpdater(t *testing.T) {
 
 func TestPodEventer_Namespace_Node_Watcher(t *testing.T) {
 	client := k8sfake.NewSimpleClientset()
-	uuid, err := uuid.NewV4()
-	if err != nil {
-		t.Fatal(err)
-	}
+	uuid := uuid.NewV4()
 
 	tests := []struct {
 		cfg         mapstr.M

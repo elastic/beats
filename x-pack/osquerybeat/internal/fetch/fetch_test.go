@@ -10,8 +10,8 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -19,7 +19,7 @@ func TestDownload(t *testing.T) {
 	ctx := context.Background()
 
 	localFilePathUUID := func() string {
-		return uuid.Must(uuid.NewV4()).String()
+		return uuid.NewV4().String()
 	}
 	tests := []struct {
 		Name          string

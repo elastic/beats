@@ -21,8 +21,8 @@ import (
 	"encoding/json"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -64,9 +64,9 @@ func TestGenerateProcessorList(t *testing.T) {
 func TestProcessorsConfigs(t *testing.T) {
 	defaultInfo := beat.Info{
 		Beat:        "test",
-		EphemeralID: uuid.Must(uuid.FromString("123e4567-e89b-12d3-a456-426655440000")),
+		EphemeralID: uuid.MustParse("123e4567-e89b-12d3-a456-426655440000"),
 		Hostname:    "test.host.name",
-		ID:          uuid.Must(uuid.FromString("123e4567-e89b-12d3-a456-426655440001")),
+		ID:          uuid.MustParse("123e4567-e89b-12d3-a456-426655440001"),
 		Name:        "test.host.name",
 		Version:     "0.1",
 		Paths:       tmpPaths(t),

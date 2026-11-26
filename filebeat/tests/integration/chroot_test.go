@@ -32,8 +32,8 @@ import (
 	"path/filepath"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/moby/moby/api/types/container"
 	"github.com/moby/moby/api/types/mount"
 	"github.com/moby/moby/client"
@@ -49,7 +49,7 @@ func TestJournaldChroot(t *testing.T) {
 	defer cli.Close()
 
 	imageName := "journald-chroot"
-	syslogID := uuid.Must(uuid.NewV4()).String()
+	syslogID := uuid.NewV4().String()
 
 	generateJournaldLogs(t, syslogID, 5, 100)
 

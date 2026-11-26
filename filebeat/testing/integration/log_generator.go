@@ -25,8 +25,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/klauspost/compress/gzip"
 )
 
@@ -122,11 +122,7 @@ func generateLogFiles(
 
 	filenames := make([]string, 0, files)
 	for range files {
-		id, err := uuid.NewV4()
-		if err != nil {
-			t.Fatalf("failed to generate a unique filename: %s", err)
-			return "", nil
-		}
+		id := uuid.NewV4()
 		filename := filepath.Join(logsPath, id.String()+generator.FileExtension())
 		filenames = append(filenames, filename)
 		gen(t, filename, lines, generator)

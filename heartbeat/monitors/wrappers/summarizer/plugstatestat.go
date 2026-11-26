@@ -19,8 +19,7 @@ package summarizer
 
 import (
 	"fmt"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
@@ -144,10 +143,7 @@ type commonSSP struct {
 }
 
 func newCommonSSP(stateTracker *monitorstate.Tracker, sf stdfields.StdMonitorFields, logger *logp.Logger) *commonSSP {
-	uu, err := uuid.NewV1()
-	if err != nil {
-		logger.Errorf("could not create v1 UUID for retry group: %s", err)
-	}
+	uu := uuid.NewV7()
 	js := jobsummary.NewJobSummary(1, sf.MaxAttempts, uu.String())
 	return &commonSSP{
 		js:           js,

@@ -18,9 +18,9 @@ import (
 	"strings"
 	"syscall"
 	"time"
+	"uuid"
 
 	"github.com/cespare/xxhash/v2"
-	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
@@ -335,10 +335,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 
 	ms.log.Debugf("Found %v users", len(users))
 	if len(users) > 0 {
-		stateID, err := uuid.NewV4()
-		if err != nil {
-			errs = append(errs, fmt.Errorf("error generating state ID: %w", err))
-		}
+		stateID := uuid.NewV4()
 
 		for _, user := range users {
 			event := ms.userEvent(user, eventTypeState, eventActionExistingUser)

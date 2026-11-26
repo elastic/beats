@@ -11,8 +11,7 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/monitoring"
@@ -325,7 +324,7 @@ func (d *scheduledResultDispatcher) enqueue(ctx context.Context, client schedule
 		d.mu.Unlock()
 		return
 	}
-	responseID := uuid.Must(uuid.NewV4()).String()
+	responseID := uuid.NewV4().String()
 	job.queuedAt, job.responseID = time.Now(), responseID
 	d.queue.push(job)
 	profiles := d.lease.profiles

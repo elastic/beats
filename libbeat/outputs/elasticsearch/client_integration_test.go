@@ -27,11 +27,11 @@ import (
 	"math/rand/v2"
 	"testing"
 	"time"
+	"uuid"
 
 	"go.elastic.co/apm/v2/apmtest"
 	"go.uber.org/zap"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -533,7 +533,7 @@ func createDatastreamFailureStore(t *testing.T, client *Client, ds string) {
 }
 
 func TestFailureStoreOutputMetrics(t *testing.T) {
-	ds := "test-failure-store-" + uuid.Must(uuid.NewV4()).String()
+	ds := "test-failure-store-" + uuid.NewV4().String()
 	registry := monitoring.NewRegistry()
 
 	cfg := map[string]any{

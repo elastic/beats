@@ -11,8 +11,8 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/hashicorp/nomad/api"
 	"github.com/stretchr/testify/assert"
 
@@ -100,10 +100,7 @@ func TestEmitEvent(t *testing.T) {
 	host := "nomad1"
 	namespace := "default"
 
-	UUID, err := uuid.NewV4()
-	if err != nil {
-		t.Fatal(err)
-	}
+	UUID := uuid.NewV4()
 
 	tests := []struct {
 		Message    string

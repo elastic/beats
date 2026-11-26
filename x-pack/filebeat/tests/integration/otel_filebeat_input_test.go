@@ -21,8 +21,8 @@ import (
 	"testing"
 	"text/template"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -71,8 +71,8 @@ func TestCELInputOTelE2E(t *testing.T) {
 	user := host.User.Username()
 	password, _ := host.User.Password()
 
-	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
-	fbNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	otelNamespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
+	fbNamespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 
 	otelIndex := "logs-integration-" + otelNamespace
 	fbIndex := "logs-integration-" + fbNamespace
@@ -187,8 +187,8 @@ func TestFilebeatOTelHTTPJSONInput(t *testing.T) {
 	password, _ := host.User.Password()
 
 	// create a random uuid and make sure it doesn't contain dashes/
-	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
-	fbNameSpace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	otelNamespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
+	fbNameSpace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 
 	otelIndex := "logs-integration-" + otelNamespace
 	fbIndex := "logs-integration-" + fbNameSpace
@@ -281,8 +281,8 @@ func TestRedisInputOTelE2E(t *testing.T) {
 	user := host.User.Username()
 	password, _ := host.User.Password()
 
-	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
-	fbNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	otelNamespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
+	fbNamespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 
 	otelIndex := "logs-integration-" + otelNamespace
 	fbIndex := "logs-filebeat-" + fbNamespace
@@ -472,14 +472,14 @@ func TestMQTTInputOTelE2E(t *testing.T) {
 	user := host.User.Username()
 	password, _ := host.User.Password()
 
-	otelNamespace := fmt.Sprintf("%x", uuid.Must(uuid.NewV4()))
-	fbNamespace := fmt.Sprintf("%x", uuid.Must(uuid.NewV4()))
+	otelNamespace := fmt.Sprintf("%x", uuid.NewV4())
+	fbNamespace := fmt.Sprintf("%x", uuid.NewV4())
 
 	otelIndex := "logs-integration-" + otelNamespace
 	fbIndex := "logs-integration-" + fbNamespace
 	mqttInputTestMsg := "mqtt-input-otel-e2e-test-event"
 
-	topic := fmt.Sprintf("test-mqtt-input-%s", uuid.Must(uuid.NewV4()).String())
+	topic := fmt.Sprintf("test-mqtt-input-%s", uuid.NewV4().String())
 
 	emitCtx, emitCancel := context.WithCancel(t.Context())
 	t.Cleanup(emitCancel)
@@ -593,8 +593,8 @@ func TestCometdInputOTelE2E(t *testing.T) {
 	user := host.User.Username()
 	password, _ := host.User.Password()
 
-	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
-	fbNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	otelNamespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
+	fbNamespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 
 	otelIndex := "logs-integration-" + otelNamespace
 	fbIndex := "logs-integration-" + fbNamespace
@@ -639,7 +639,7 @@ receivers:
             - add_cloud_metadata: ~
             - add_docker_metadata: ~
             - add_kubernetes_metadata: ~
-        path.home: {{ .PathHome }}	
+        path.home: {{ .PathHome }}
 ` + otelElasticsearchServiceYAML
 
 	optionsValue := options{
@@ -721,8 +721,8 @@ func TestGCSInputOTelE2E(t *testing.T) {
 	user := host.User.Username()
 	password, _ := host.User.Password()
 
-	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
-	fbNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	otelNamespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
+	fbNamespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 
 	otelIndex := "logs-integration-" + otelNamespace
 	fbIndex := "logs-integration-" + fbNamespace
@@ -858,8 +858,8 @@ func TestAzureBlobStorageInputOTelE2E(t *testing.T) {
 	user := host.User.Username()
 	password, _ := host.User.Password()
 
-	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
-	fbNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	otelNamespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
+	fbNamespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 
 	otelIndex := "logs-integration-" + otelNamespace
 	fbIndex := "logs-integration-" + fbNamespace
@@ -979,8 +979,8 @@ func TestGCPInputOTelE2E(t *testing.T) {
 	user := host.User.Username()
 	password, _ := host.User.Password()
 
-	otelNamespace := fmt.Sprintf("%x", uuid.Must(uuid.NewV4()))
-	fbNamespace := fmt.Sprintf("%x", uuid.Must(uuid.NewV4()))
+	otelNamespace := fmt.Sprintf("%x", uuid.NewV4())
+	fbNamespace := fmt.Sprintf("%x", uuid.NewV4())
 
 	otelIndex := "logs-integration-" + otelNamespace
 	fbIndex := "logs-integration-" + fbNamespace
@@ -1084,8 +1084,8 @@ func TestHTTPEndpointInputOTelE2E(t *testing.T) {
 	user := host.User.Username()
 	password, _ := host.User.Password()
 
-	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
-	fbNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	otelNamespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
+	fbNamespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 
 	otelIndex := "logs-integration-" + otelNamespace
 	fbIndex := "logs-integration-" + fbNamespace
@@ -1218,8 +1218,8 @@ func TestNetflowInputOTelE2E(t *testing.T) {
 	user := host.User.Username()
 	password, _ := host.User.Password()
 
-	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
-	fbNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	otelNamespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
+	fbNamespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 
 	otelIndex := "logs-integration-" + otelNamespace
 	fbIndex := "logs-integration-" + fbNamespace
@@ -1647,8 +1647,8 @@ func runEntityAnalyticsOTelE2E(t *testing.T, tc entityAnalyticsE2ECase) {
 	user := host.User.Username()
 	password, _ := host.User.Password()
 
-	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
-	fbNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	otelNamespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
+	fbNamespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 
 	otelIndex := "logs-integration-" + otelNamespace
 	fbIndex := "logs-integration-" + fbNamespace

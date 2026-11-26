@@ -19,8 +19,8 @@ import (
 	"testing"
 	"text/template"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -133,7 +133,7 @@ func TestPacketbeatOTelE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 
 	tmpdir := t.TempDir()
-	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	namespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 	index := "logs-integration-" + namespace
 
 	cfg := fmt.Sprintf(`receivers:
@@ -209,7 +209,7 @@ func TestPacketbeatOTelMultipleReceiversE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 
 	tmpdir := t.TempDir()
-	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	namespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 	index := "logs-integration-" + namespace
 
 	receivers := []receiverConfig{
@@ -305,7 +305,7 @@ func TestPacketbeatOTelBeatE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 
 	tmpdir := t.TempDir()
-	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	namespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 	pbOtelIndex := "logs-integration-" + namespace
 	pbIndex := "logs-packetbeat-" + namespace
 
@@ -420,7 +420,7 @@ func TestPacketbeatOTelLiveInterfaceE2E(t *testing.T) {
 	skipIfNotRoot(t)
 
 	tmpdir := t.TempDir()
-	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	namespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 	index := "logs-integration-" + namespace
 
 	// The HTTP server binds an ephemeral port; packetbeat is configured to
@@ -510,7 +510,7 @@ func TestPacketbeatOTelLiveInterfaceMultipleReceiversE2E(t *testing.T) {
 	skipIfNotRoot(t)
 
 	tmpdir := t.TempDir()
-	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	namespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 	index := "logs-integration-" + namespace
 
 	// Each HTTP server binds an ephemeral port; packetbeat sniffs the resolved

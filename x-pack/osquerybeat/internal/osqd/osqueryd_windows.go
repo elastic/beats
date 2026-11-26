@@ -10,8 +10,7 @@ import (
 	"fmt"
 	"os/exec"
 	"syscall"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 )
 
 const (
@@ -24,7 +23,7 @@ func CreateSocketPath() (string, func(), error) {
 }
 
 func SocketPath(dir string) string {
-	return `\\.\pipe\elastic\osquery\` + uuid.Must(uuid.NewV4()).String()
+	return `\\.\pipe\elastic\osquery\` + uuid.NewV4().String()
 }
 
 func platformArgs() map[string]any {

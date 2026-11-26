@@ -21,8 +21,8 @@ import (
 	"strings"
 	"sync/atomic"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"go.opentelemetry.io/collector/consumer"
 
 	"github.com/elastic/beats/v7/pkg/logp"

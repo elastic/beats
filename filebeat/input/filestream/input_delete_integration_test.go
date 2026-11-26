@@ -30,8 +30,8 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
@@ -64,7 +64,7 @@ func TestFilestreamDelete(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			env := newInputTestingEnvironment(t)
 			logfile := strings.ReplaceAll(t.Name(), "/", "_") + ".log"
-			conf["id"] = "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+			conf["id"] = "fake-ID-" + uuid.NewV4().String()
 			conf["paths"] = []string{env.abspath(logfile)}
 			inp := env.mustCreateInput(conf)
 

@@ -8,15 +8,13 @@ import (
 	"fmt"
 	"strings"
 	"time"
-
-	"github.com/gofrs/uuid/v5"
-
-	"github.com/elastic/beats/v7/pkg/autodiscover/utils"
+	"uuid"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/utils"
 	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/keystore"
 	"github.com/elastic/beats/v7/pkg/logp"

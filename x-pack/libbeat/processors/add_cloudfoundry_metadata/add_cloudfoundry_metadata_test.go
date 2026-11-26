@@ -8,9 +8,9 @@ package add_cloudfoundry_metadata
 
 import (
 	"testing"
+	"uuid"
 
 	"github.com/cloudfoundry-community/go-cfclient"
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -203,9 +203,6 @@ func (c *fakeClient) Close() error {
 }
 
 func mustCreateFakeGuid() string {
-	uuid, err := uuid.NewV4()
-	if err != nil {
-		panic(err)
-	}
+	uuid := uuid.NewV4()
 	return uuid.String()
 }

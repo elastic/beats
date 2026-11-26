@@ -35,8 +35,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 )
 
 type Proxy struct {
@@ -209,7 +208,7 @@ func New(t *testing.T, optns ...Option) *Proxy {
 
 			w := &proxyResponseWriter{w: ww}
 
-			requestID := uuid.Must(uuid.NewV4()).String()
+			requestID := uuid.NewV4().String()
 			p.log.Info(fmt.Sprintf("STARTING - %s '%s' %s %s",
 				r.Method, r.URL, r.Proto, r.RemoteAddr))
 

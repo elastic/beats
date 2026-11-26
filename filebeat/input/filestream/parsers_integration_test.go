@@ -22,8 +22,8 @@ package filestream
 import (
 	"context"
 	"testing"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 )
 
@@ -31,7 +31,7 @@ func TestParsersAgentLogs(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := uuid.Must(uuid.NewV4()).String()
+	id := uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     "fake-ID",
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -70,7 +70,7 @@ func TestParsersIncludeMessage(t *testing.T) {
 
 	testlogName := "test.log"
 	readLine := "include this"
-	id := uuid.Must(uuid.NewV4()).String()
+	id := uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     "fake-ID",
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -106,7 +106,7 @@ func TestParsersDockerLogsFiltering(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := uuid.Must(uuid.NewV4()).String()
+	id := uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     "fake-ID",
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -148,7 +148,7 @@ func TestParsersSimpleJSONOverwrite(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := uuid.Must(uuid.NewV4()).String()
+	id := uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     "fake-ID",
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -187,7 +187,7 @@ func TestParsersTimestampInJSONMessage(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := uuid.Must(uuid.NewV4()).String()
+	id := uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     "fake-ID",
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -231,7 +231,7 @@ func TestParsersJavaElasticsearchLogs(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := uuid.Must(uuid.NewV4()).String()
+	id := uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     "fake-ID",
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -269,7 +269,7 @@ func TestParsersCStyleLog(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := uuid.Must(uuid.NewV4()).String()
+	id := uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     "fake-ID",
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -313,7 +313,7 @@ func TestParsersRabbitMQMultilineLog(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := uuid.Must(uuid.NewV4()).String()
+	id := uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     "fake-ID",
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -372,7 +372,7 @@ func TestParsersMultilineMaxLines(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := uuid.Must(uuid.NewV4()).String()
+	id := uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     "fake-ID",
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -419,7 +419,7 @@ func TestParsersMultilineTimeout(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := uuid.Must(uuid.NewV4()).String()
+	id := uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     "fake-ID",
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -487,7 +487,7 @@ func TestParsersMultilineMaxBytes(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := uuid.Must(uuid.NewV4()).String()
+	id := uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     "fake-ID",
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -532,7 +532,7 @@ func TestParsersCloseTimeoutWithMultiline(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := uuid.Must(uuid.NewV4()).String()
+	id := uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     "fake-ID",
 		"paths":                                  []string{env.abspath(testlogName)},
@@ -600,7 +600,7 @@ func TestParsersConsecutiveNewline(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	id := uuid.Must(uuid.NewV4()).String()
+	id := uuid.NewV4().String()
 	inp := env.mustCreateInput(map[string]any{
 		"id":                                     "fake-ID",
 		"paths":                                  []string{env.abspath(testlogName)},

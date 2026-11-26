@@ -9,8 +9,8 @@ import (
 	"runtime"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
@@ -76,7 +76,7 @@ func TestActionHandlerExecute(t *testing.T) {
 
 	ctx := context.Background()
 
-	actionID := uuid.Must(uuid.NewV4()).String()
+	actionID := uuid.NewV4().String()
 	actionSQL := "select * from uptime"
 	nonMatchingPlatform := "windows"
 	if runtime.GOOS == "windows" {
@@ -234,10 +234,7 @@ func TestActionHandlerExecuteSpaceID(t *testing.T) {
 	exec := &mockExecutor{result: []map[string]any{osqueryInfoRow}}
 	pub := &mockPublisher{}
 
-	id, err := uuid.NewV4()
-	if err != nil {
-		t.Fatal(err)
-	}
+	id := uuid.NewV4()
 	req := map[string]any{
 		"id":       id.String(),
 		"space_id": "my-space",

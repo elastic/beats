@@ -23,8 +23,7 @@ import (
 	"strings"
 	"text/template"
 	"time"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/version"
@@ -509,10 +508,7 @@ func hexDecode(enc string) string {
 }
 
 func uuidString() string {
-	uuid, err := uuid.NewV4()
-	if err != nil {
-		return ""
-	}
+	uuid := uuid.NewV4()
 	return uuid.String()
 }
 

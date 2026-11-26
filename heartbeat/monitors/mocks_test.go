@@ -25,8 +25,8 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/pkg/config"
@@ -50,8 +50,8 @@ import (
 
 func makeMockFactory(t *testing.T, pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sched *scheduler.Scheduler, close func()) {
 	t.Helper()
-	id, _ := uuid.NewV4()
-	eid, _ := uuid.NewV4()
+	id := uuid.NewV4()
+	eid := uuid.NewV4()
 	info := beat.Info{
 		Beat:            "heartbeat",
 		IndexPrefix:     "heartbeat",

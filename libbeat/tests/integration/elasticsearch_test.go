@@ -33,8 +33,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
@@ -133,7 +133,7 @@ func TestCertificateReload(t *testing.T) {
 	var mu sync.Mutex
 	var lastClientName string
 
-	uid := uuid.Must(uuid.NewV4())
+	uid := uuid.NewV4()
 	rdr := sdkmetric.NewManualReader()
 	provider := sdkmetric.NewMeterProvider(sdkmetric.WithReader(rdr))
 	esHandler := api.NewAPIHandler(

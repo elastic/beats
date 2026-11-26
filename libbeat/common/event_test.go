@@ -21,8 +21,8 @@ import (
 	"encoding/json"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -288,10 +288,7 @@ func TestNormalizeValue(t *testing.T) {
 	var nilStringPtr *string
 	var nilTimePtr *time.Time
 	someString := "foo"
-	uuidValue, err := uuid.NewV1()
-	if err != nil {
-		t.Fatalf("error while generating uuid: %v", err)
-	}
+	uuidValue := uuid.NewV4()
 
 	type mybool bool
 	type myint int32

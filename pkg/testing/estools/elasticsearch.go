@@ -25,8 +25,7 @@ import (
 	"io"
 	"strconv"
 	"strings"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 
 	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/elastic-transport-go/v8/elastictransport"
@@ -220,7 +219,7 @@ func CreateServiceToken(ctx context.Context, client elastictransport.Interface, 
 	req := esapi.SecurityCreateServiceTokenRequest{
 		Namespace: "elastic",
 		Service:   service,
-		Name:      uuid.Must(uuid.NewV4()).String(), // FIXME(michel-laterman): We need to specify a random name until an upstream issue is fixed: https://github.com/elastic/go-elasticsearch/issues/861
+		Name:      uuid.NewV4().String(), // FIXME(michel-laterman): We need to specify a random name until an upstream issue is fixed: https://github.com/elastic/go-elasticsearch/issues/861
 	}
 	resp, err := req.Do(ctx, client)
 	if err != nil {

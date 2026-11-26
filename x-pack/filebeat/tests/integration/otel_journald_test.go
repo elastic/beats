@@ -14,8 +14,8 @@ import (
 	"testing"
 	"text/template"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
@@ -39,7 +39,7 @@ func TestJournaldInputOTelE2E(t *testing.T) {
 	password, _ := host.User.Password()
 
 	otelHome := t.TempDir()
-	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	namespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 	syslogID := "journald-e2e-" + namespace
 	testMessage := "otel journald e2e " + namespace
 

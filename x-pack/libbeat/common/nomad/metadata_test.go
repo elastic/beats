@@ -6,8 +6,8 @@ package nomad
 
 import (
 	"testing"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/hashicorp/nomad/api"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -182,11 +182,5 @@ func TestCronJob(t *testing.T) {
 }
 
 func newUUID() string {
-	id, err := uuid.NewV4()
-
-	if err != nil {
-		return "b87daa1c-b091-4355-a2d2-60f9f3bff1b0"
-	}
-
-	return id.String()
+	return uuid.NewV4().String()
 }

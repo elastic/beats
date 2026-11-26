@@ -8,8 +8,7 @@ package fetcher
 
 import (
 	"context"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 
 	"github.com/elastic/beats/v7/pkg/logp"
 )

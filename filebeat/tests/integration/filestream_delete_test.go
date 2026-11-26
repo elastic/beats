@@ -31,9 +31,9 @@ import (
 	"strings"
 	"testing"
 	"time"
+	"uuid"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
@@ -377,7 +377,7 @@ func TestFilestreamDeleteRealESFSAndNotify(t *testing.T) {
 	gracePeriod := 5 * time.Second
 	delta := time.Second
 
-	index := "test-delete" + uuid.Must(uuid.NewV4()).String()
+	index := "test-delete" + uuid.NewV4().String()
 	testDataPath, err := filepath.Abs("./testdata")
 	if err != nil {
 		t.Fatalf("cannot get absolute path for 'testdata': %s", err)

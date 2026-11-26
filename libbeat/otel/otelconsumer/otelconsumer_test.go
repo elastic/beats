@@ -27,8 +27,8 @@ import (
 	"net/http/httptest"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	"github.com/stretchr/testify/assert"
@@ -779,7 +779,7 @@ func parseJSONDoc(t *testing.T, name string, data []byte) any {
 func newMockES(t *testing.T, handler func(mockesapi.Action, []byte) int) *mockesapi.APIHandler {
 	t.Helper()
 	return mockesapi.NewDeterministicAPIHandler(
-		uuid.Must(uuid.NewV4()),
+		uuid.NewV4(),
 		"",
 		nil,
 		time.Now().Add(time.Hour),

@@ -28,8 +28,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -442,7 +442,7 @@ func TestManager_InputsRun(t *testing.T) {
 		cancelCtx := t.Context()
 
 		var clientCounters pubtest.ClientCounter
-		id := uuid.Must(uuid.NewV4()).String()
+		id := uuid.NewV4().String()
 		ctx := input.Context{
 			ID:              id,
 			IDWithoutName:   id,
@@ -472,7 +472,7 @@ func TestManager_InputsRun(t *testing.T) {
 		cancelCtx := t.Context()
 
 		var clientCounters pubtest.ClientCounter
-		id := uuid.Must(uuid.NewV4()).String()
+		id := uuid.NewV4().String()
 		ctx := input.Context{
 			ID:              id,
 			IDWithoutName:   id,
@@ -506,7 +506,7 @@ func TestManager_InputsRun(t *testing.T) {
 		var clientCounters pubtest.ClientCounter
 		var wg sync.WaitGroup
 		wg.Go(func() {
-			id := uuid.Must(uuid.NewV4()).String()
+			id := uuid.NewV4().String()
 			ctx := input.Context{
 				ID:              id,
 				IDWithoutName:   id,
@@ -570,7 +570,7 @@ func TestManager_InputsRun(t *testing.T) {
 		// create and run first instance
 		inp, err := manager.Create(conf.MustNewConfigFrom(runConfig{Max: 3}))
 		require.NoError(t, err)
-		id := uuid.Must(uuid.NewV4()).String()
+		id := uuid.NewV4().String()
 		ctx := input.Context{
 			ID:              id,
 			IDWithoutName:   id,
@@ -584,7 +584,7 @@ func TestManager_InputsRun(t *testing.T) {
 		// create and run second instance
 		inp, err = manager.Create(conf.MustNewConfigFrom(runConfig{Max: 3}))
 		require.NoError(t, err)
-		id = uuid.Must(uuid.NewV4()).String()
+		id = uuid.NewV4().String()
 		ctx = input.Context{
 			ID:              id,
 			IDWithoutName:   id,
@@ -646,7 +646,7 @@ func TestManager_InputsRun(t *testing.T) {
 		// start the input
 		var wg sync.WaitGroup
 		wg.Go(func() {
-			id := uuid.Must(uuid.NewV4()).String()
+			id := uuid.NewV4().String()
 			ctx := input.Context{
 				ID:              id,
 				IDWithoutName:   id,
@@ -740,7 +740,7 @@ func TestManager_RunHoldsLeaseUntilDone(t *testing.T) {
 	var runErr error
 	var runWg sync.WaitGroup
 	runWg.Go(func() {
-		id := uuid.Must(uuid.NewV4()).String()
+		id := uuid.NewV4().String()
 		inpCtx := input.Context{
 			ID:              id,
 			IDWithoutName:   id,

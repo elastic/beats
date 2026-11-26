@@ -17,8 +17,7 @@ import (
 	"sync"
 	"testing"
 	"time"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -348,7 +347,7 @@ func startJamfIntegServer(t *testing.T, fixture *atomicFixture) *httptest.Server
 		}
 
 		tokenMu.Lock()
-		currentToken = uuid.Must(uuid.NewV4()).String()
+		currentToken = uuid.NewV4().String()
 		tok := currentToken
 		tokenMu.Unlock()
 

@@ -27,13 +27,12 @@ import (
 	"testing"
 	"text/template"
 	"time"
+	"uuid"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
-
-	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/features"
 	esoutput "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
@@ -53,7 +52,7 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	numEvents := 1
 
 	tmpdir := t.TempDir()
-	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	namespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 	fbOtelIndex := "logs-integration-" + namespace
 	fbIndex := "logs-filebeat-" + namespace
 
@@ -275,7 +274,7 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
 	logFilePath := filepath.Join(tmpdir, "log.log")
 	writeEventsToLogFile(t, logFilePath, wantEvents)
 
-	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	namespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 	otelConfig := struct {
 		Index     string
 		Receivers []multiReceiverConfig
@@ -555,7 +554,7 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 
 			// Create the base deterministic handler
 			baseHandler := api.NewDeterministicAPIHandler(
-				uuid.Must(uuid.NewV4()),
+				uuid.NewV4(),
 				"",
 				provider,
 				time.Now().Add(24*time.Hour),
@@ -605,7 +604,7 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 			server := httptest.NewServer(mux)
 			defer server.Close()
 
-			namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+			namespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 			index := "logs-integration-" + namespace
 
 			beatsConfig := struct {
@@ -790,7 +789,7 @@ func TestFileBeatKerberos(t *testing.T) {
 
 	setupRoleMapping(t, es)
 
-	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	namespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 	filebeatIndex := "logs-filebeat.kerberos-" + namespace
 
 	otelConfig := struct {
@@ -880,7 +879,7 @@ func TestFilebeatOTelBeatProcessorE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 	wantEvents := 1
 
-	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	namespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 	processorIndex := "logs-processor-" + namespace
 	receiverIndex := "logs-receiver-" + namespace
 
@@ -1066,7 +1065,7 @@ func TestNoDuplicates(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 
 	tmpdir := t.TempDir()
-	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	namespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 	fbOtelIndex := "logs-integration-" + namespace
 
 	otelCfgFile := `receivers:
@@ -1142,7 +1141,7 @@ service:
 				return
 			default:
 			}
-			msg := fmt.Sprintf("This is spam message %d: %v", i, uuid.Must(uuid.NewV4()))
+			msg := fmt.Sprintf("This is spam message %d: %v", i, uuid.NewV4())
 			_, err := logFile.Write([]byte(msg + "\n"))
 			require.NoErrorf(t, err, "failed to write line %d to temp file", i)
 			writenLines = append(writenLines, msg)
@@ -1307,7 +1306,7 @@ func TestFilebeatOTelNoEventLossDuringESOutage(t *testing.T) {
 
 	tmpdir := t.TempDir()
 	logFilePath := filepath.Join(tmpdir, "log.log")
-	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	namespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 	index := "logs-integration-" + namespace
 
 	// Reserve an ephemeral port for the mock Elasticsearch server. The server
@@ -1345,7 +1344,7 @@ func TestFilebeatOTelNoEventLossDuringESOutage(t *testing.T) {
 
 		mockServer := httptest.NewUnstartedServer(
 			api.NewDeterministicAPIHandler(
-				uuid.Must(uuid.NewV4()),
+				uuid.NewV4(),
 				"",
 				provider,
 				time.Now().Add(24*time.Hour),
@@ -1615,7 +1614,7 @@ func TestFilebeatOTelHTTPJSONStateStoreIsPerInputID(t *testing.T) {
 
 	host := integration.GetESURL(t, "http")
 	password, _ := host.User.Password()
-	suffix := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	suffix := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 
 	params := struct {
 		ESURL, Username, Password, InputURL, PathHome string
@@ -1996,7 +1995,7 @@ func benchmarkFilebeatOTelThroughputMockES(b *testing.B, preset benchPreset) {
 
 		mockServer := httptest.NewServer(
 			api.NewDeterministicAPIHandler(
-				uuid.Must(uuid.NewV4()),
+				uuid.NewV4(),
 				"",
 				nil,
 				time.Now().Add(24*time.Hour),
@@ -2299,7 +2298,7 @@ func TestFilestreamRawIndexRoutingE2E(t *testing.T) {
 
 	const numEvents = 1
 
-	suffix := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")[:16]
+	suffix := strings.ReplaceAll(uuid.NewV4().String(), "-", "")[:16]
 	targetIndex := "log." + suffix
 
 	esHost := integration.GetESURL(t, "http")

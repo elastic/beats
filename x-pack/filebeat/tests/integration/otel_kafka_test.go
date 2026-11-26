@@ -16,8 +16,8 @@ import (
 	"testing"
 	"text/template"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -34,8 +34,8 @@ func TestFilebeatOTelKafkaOutputE2E(t *testing.T) {
 	numEvents := 1
 
 	tmpdir := t.TempDir()
-	fbTopic := fmt.Sprintf("test-fb-kafka-%s", uuid.Must(uuid.NewV4()).String())
-	otelTopic := fmt.Sprintf("test-otel-kafka-%s", uuid.Must(uuid.NewV4()).String())
+	fbTopic := fmt.Sprintf("test-fb-kafka-%s", uuid.NewV4().String())
+	otelTopic := fmt.Sprintf("test-otel-kafka-%s", uuid.NewV4().String())
 
 	logFilePath := filepath.Join(tmpdir, "kafka_e2e.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
@@ -193,15 +193,15 @@ func TestKafkaInputOTelE2E(t *testing.T) {
 	password, _ := host.User.Password()
 	kafkaInputTestMsg := "kafka-input-otel-e2e-test-event"
 
-	otelNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
-	fbNamespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	otelNamespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
+	fbNamespace := strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 
 	otelIndex := "logs-integration-" + otelNamespace
 	fbIndex := "logs-filebeat-" + fbNamespace
 
-	topic := fmt.Sprintf("test-kafka-input-%s", uuid.Must(uuid.NewV4()).String())
-	otelGroupID := fmt.Sprintf("otel-kafka-%s", uuid.Must(uuid.NewV4()).String())
-	fbGroupID := fmt.Sprintf("fb-kafka-%s", uuid.Must(uuid.NewV4()).String())
+	topic := fmt.Sprintf("test-kafka-input-%s", uuid.NewV4().String())
+	otelGroupID := fmt.Sprintf("otel-kafka-%s", uuid.NewV4().String())
+	fbGroupID := fmt.Sprintf("fb-kafka-%s", uuid.NewV4().String())
 
 	testutil.EnsureKafkaTopicReadyForWrites(t, topic)
 	testutil.WriteToKafkaTopic(t, topic, kafkaInputTestMsg, []sarama.RecordHeader{

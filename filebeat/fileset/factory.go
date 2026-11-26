@@ -20,8 +20,8 @@ package fileset
 import (
 	"fmt"
 	"sync"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gohugoio/hashstructure"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -76,7 +76,7 @@ func NewFactory(
 		inputFactory:          inputFactory,
 		beatInfo:              beatInfo,
 		pipelineLoaderFactory: pipelineLoaderFactory,
-		pipelineCallbackID:    uuid.Nil,
+		pipelineCallbackID:    uuid.Nil(),
 		overwritePipelines:    overwritePipelines,
 	}
 }
@@ -190,7 +190,7 @@ func (p *inputsRunner) Start() {
 }
 
 func (p *inputsRunner) Stop() {
-	if p.pipelineCallbackID != uuid.Nil {
+	if p.pipelineCallbackID != uuid.Nil() {
 		elasticsearch.DeregisterConnectCallback(p.pipelineCallbackID)
 	}
 

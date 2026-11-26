@@ -27,8 +27,7 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/fileset"
@@ -157,7 +156,7 @@ func NewInput(
 		meta = nil
 	}
 
-	uuid, _ := uuid.NewV4()
+	uuid := uuid.NewV4()
 	inputlogger := logger.Named("input").With("input_id", uuid)
 
 	p := &Input{

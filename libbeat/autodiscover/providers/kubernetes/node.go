@@ -22,10 +22,10 @@ package kubernetes
 import (
 	"fmt"
 	"time"
+	"uuid"
 
 	"github.com/elastic/beats/v7/pkg/autodiscover/utils"
 
-	"github.com/gofrs/uuid/v5"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
 	k8s "k8s.io/client-go/kubernetes"

@@ -9,9 +9,9 @@ package cloudfoundry
 import (
 	"testing"
 	"time"
+	"uuid"
 
 	"github.com/cloudfoundry-community/go-cfclient"
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -93,10 +93,7 @@ func (f *fakeCFClient) GetAppByGuid(guid string) (cfclient.App, error) {
 }
 
 func mustCreateFakeGuid() string {
-	uuid, err := uuid.NewV4()
-	if err != nil {
-		panic(err)
-	}
+	uuid := uuid.NewV4()
 	return uuid.String()
 }
 

@@ -20,8 +20,7 @@ package autodiscover
 import (
 	"fmt"
 	"strings"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
@@ -91,10 +90,7 @@ func (r *registry) BuildProvider(
 		return nil, fmt.Errorf("unknown autodiscover provider %s", config.Type)
 	}
 
-	uuid, err := uuid.NewV4()
-	if err != nil {
-		return nil, err
-	}
+	uuid := uuid.NewV4()
 
 	return builder(beatName, bus, uuid, c, keystore, logger, path)
 }

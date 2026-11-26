@@ -13,8 +13,7 @@ import (
 	"net/http/httptest"
 	"slices"
 	"testing"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/entcollect"

@@ -13,9 +13,9 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"uuid"
 
 	"github.com/Masterminds/semver"
-	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
@@ -306,7 +306,7 @@ func (h *recurrenceQueryHandler) executeQuery(ctx context.Context, scheduledQuer
 		return nil
 	}
 
-	responseID := uuid.Must(uuid.NewV4()).String()
+	responseID := uuid.NewV4().String()
 	profSt := h.initRRuleRuntimeProfiling(ctx, name, query)
 
 	startedAt := time.Now()

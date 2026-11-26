@@ -107,9 +107,13 @@ linters:
           recommendations:
             - github.com/stretchr/testify
           reason: Use one assertion library consistently across the codebase
+        - module: github.com/gofrs/uuid/v5
+          recommendations:
+            - uuid
+          reason: Use one uuid library consistently across the codebase
         - module: github.com/google/uuid
           recommendations:
-            - github.com/gofrs/uuid/v5
+            - uuid
           reason: Use one uuid library consistently across the codebase
     gosec:
       excludes:

@@ -17,8 +17,8 @@ import (
 	"net/url"
 	"sort"
 	"strings"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -422,7 +422,7 @@ func (f *graph) UserMFADetails(ctx context.Context) (map[uuid.UUID]*fetcher.MFAR
 		_ = body.Close()
 
 		for _, d := range response.Details {
-			id, err := uuid.FromString(d.ID)
+			id, err := uuid.Parse(d.ID)
 			if err != nil {
 				f.logger.Warnf("Skipping MFA entry with invalid user ID %q: %v", d.ID, err)
 				continue
@@ -497,7 +497,7 @@ func (f *graph) fetchSignInActivityPage(ctx context.Context, fetchURL string, re
 		if u.SignInActivity == nil {
 			continue
 		}
-		id, err := uuid.FromString(u.ID)
+		id, err := uuid.Parse(u.ID)
 		if err != nil {
 			f.logger.Warnf("Skipping sign-in activity entry with invalid user ID %q: %v", u.ID, err)
 			continue
@@ -696,7 +696,7 @@ func newUserFromAPI(u userAPI) (*fetcher.User, error) {
 
 	if idRaw, ok := newUser.Fields["id"]; ok {
 		idStr, _ := idRaw.(string)
-		if newUser.ID, err = uuid.FromString(idStr); err != nil {
+		if newUser.ID, err = uuid.Parse(idStr); err != nil {
 			return nil, fmt.Errorf("unable to unmarshal user, invalid ID: %w", err)
 		}
 		delete(newUser.Fields, "id")
@@ -750,7 +750,7 @@ func newDeviceFromAPI(d deviceAPI) (*fetcher.Device, error) {
 
 	if idRaw, ok := newDevice.Fields["id"]; ok {
 		idStr, _ := idRaw.(string)
-		if newDevice.ID, err = uuid.FromString(idStr); err != nil {
+		if newDevice.ID, err = uuid.Parse(idStr); err != nil {
 			return nil, fmt.Errorf("unable to unmarshal device, invalid ID: %w", err)
 		}
 		delete(newDevice.Fields, "id")

@@ -46,8 +46,8 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
@@ -1277,7 +1277,7 @@ func StartMockES(
 	historyCap uint,
 ) (*http.Server, string, *api.APIHandler, *sdkmetric.ManualReader) {
 
-	uid := uuid.Must(uuid.NewV4())
+	uid := uuid.NewV4()
 
 	rdr := sdkmetric.NewManualReader()
 	provider := sdkmetric.NewMeterProvider(

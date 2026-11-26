@@ -18,8 +18,8 @@ import (
 	"testing"
 	"text/template"
 	"time"
+	"uuid"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -323,7 +323,7 @@ func newMockCFAPIServer(apps []mockCFApp) *mockCFAPIServer {
 	// OAuth token endpoint
 	mux.HandleFunc("/oauth/token", func(w http.ResponseWriter, r *http.Request) {
 		token := map[string]any{
-			"access_token": "mock-access-token-" + uuid.Must(uuid.NewV4()).String(),
+			"access_token": "mock-access-token-" + uuid.NewV4().String(),
 			"token_type":   "bearer",
 			"expires_in":   3600,
 		}

@@ -21,8 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/beats/v7/pkg/config"
@@ -184,10 +183,7 @@ func newBaseMetricSets(r *Register, m Module, p *paths.Path, logger *logp.Logger
 	for _, name := range metricSetNames {
 		name = strings.ToLower(name)
 		for _, host := range hosts {
-			id, err := uuid.NewV4()
-			if err != nil {
-				return nil, fmt.Errorf("failed to generate ID for metricset: %w", err)
-			}
+			id := uuid.NewV4()
 			msID := id.String()
 			metrics := monitoring.NewRegistry()
 			monitoring.NewString(metrics, "input").Set(m.Name() + "/" + name)

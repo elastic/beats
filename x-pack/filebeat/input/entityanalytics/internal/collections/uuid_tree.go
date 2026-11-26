@@ -6,8 +6,7 @@ package collections
 
 import (
 	"encoding/json"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 )
 
 type UUIDTree struct {

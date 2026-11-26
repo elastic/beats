@@ -7,8 +7,7 @@ package mock
 
 import (
 	"context"
-
-	"github.com/gofrs/uuid/v5"
+	"uuid"
 
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher"
@@ -17,7 +16,7 @@ import (
 // MFAResponse is the set of MFA registration details returned by the mock fetcher.
 // Keys are the UUIDs of users in UserResponse.
 var MFAResponse = map[uuid.UUID]*fetcher.MFARegistrationDetails{
-	uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")): {
+	uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"): {
 		IsMFACapable:          true,
 		IsMFARegistered:       true,
 		IsPasswordlessCapable: false,
@@ -28,7 +27,7 @@ var MFAResponse = map[uuid.UUID]*fetcher.MFARegistrationDetails{
 		UserPreferredMethodForSecondaryAuthentication: "push",
 		UserType: "member",
 	},
-	uuid.Must(uuid.FromString("d897d560-3d17-4dae-81b3-c898fe82bf84")): {
+	uuid.MustParse("d897d560-3d17-4dae-81b3-c898fe82bf84"): {
 		IsMFACapable:          false,
 		IsMFARegistered:       false,
 		IsPasswordlessCapable: false,
@@ -44,12 +43,12 @@ var MFAResponse = map[uuid.UUID]*fetcher.MFARegistrationDetails{
 // SignInActivityResponse is the set of sign-in activity details returned by the mock fetcher.
 // Keys are the UUIDs of users in UserResponse.
 var SignInActivityResponse = map[uuid.UUID]*fetcher.SignInActivityDetails{
-	uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")): {
+	uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"): {
 		LastSignInDateTime:               "2024-01-15T08:00:00Z",
 		LastSignInRequestId:              "req-id-1",
 		LastNonInteractiveSignInDateTime: "2024-01-15T08:30:00Z",
 	},
-	uuid.Must(uuid.FromString("d897d560-3d17-4dae-81b3-c898fe82bf84")): {
+	uuid.MustParse("d897d560-3d17-4dae-81b3-c898fe82bf84"): {
 		LastSignInDateTime:               "2024-01-14T10:00:00Z",
 		LastSignInRequestId:              "req-id-2",
 		LastNonInteractiveSignInDateTime: "2024-01-14T11:00:00Z",
@@ -64,43 +63,43 @@ var (
 
 var GroupResponse = []*fetcher.Group{
 	{
-		ID:   uuid.Must(uuid.FromString("331676df-b8fd-4492-82ed-02b927f8dd80")),
+		ID:   uuid.MustParse("331676df-b8fd-4492-82ed-02b927f8dd80"),
 		Name: "group1",
 		Members: []fetcher.Member{
 			{
-				ID:   uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
+				ID:   uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
 				Type: fetcher.MemberUser,
 			},
 			{
-				ID:   uuid.Must(uuid.FromString("6a59ea83-02bd-468f-a40b-f2c3d1821983")),
+				ID:   uuid.MustParse("6a59ea83-02bd-468f-a40b-f2c3d1821983"),
 				Type: fetcher.MemberDevice,
 			},
 		},
 	},
 	{
-		ID:   uuid.Must(uuid.FromString("d140978f-d641-4f01-802f-4ecc1acf8935")),
+		ID:   uuid.MustParse("d140978f-d641-4f01-802f-4ecc1acf8935"),
 		Name: "group2",
 		Members: []fetcher.Member{
 			{
-				ID:   uuid.Must(uuid.FromString("331676df-b8fd-4492-82ed-02b927f8dd80")),
+				ID:   uuid.MustParse("331676df-b8fd-4492-82ed-02b927f8dd80"),
 				Type: fetcher.MemberGroup,
 			},
 			{
-				ID:   uuid.Must(uuid.FromString("d897d560-3d17-4dae-81b3-c898fe82bf84")),
+				ID:   uuid.MustParse("d897d560-3d17-4dae-81b3-c898fe82bf84"),
 				Type: fetcher.MemberUser,
 			},
 			{
-				ID:   uuid.Must(uuid.FromString("adbbe40a-0627-4328-89f1-88cac84dbc7f")),
+				ID:   uuid.MustParse("adbbe40a-0627-4328-89f1-88cac84dbc7f"),
 				Type: fetcher.MemberDevice,
 			},
 		},
 	},
 	{
-		ID:   uuid.Must(uuid.FromString("10db9800-3908-40cc-81c5-511fa8ccf7fd")),
+		ID:   uuid.MustParse("10db9800-3908-40cc-81c5-511fa8ccf7fd"),
 		Name: "group3",
 		Members: []fetcher.Member{
 			{
-				ID:   uuid.Must(uuid.FromString("d140978f-d641-4f01-802f-4ecc1acf8935")),
+				ID:   uuid.MustParse("d140978f-d641-4f01-802f-4ecc1acf8935"),
 				Type: fetcher.MemberGroup,
 			},
 		},
@@ -109,7 +108,7 @@ var GroupResponse = []*fetcher.Group{
 
 var UserResponse = []*fetcher.User{
 	{
-		ID: uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
+		ID: uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
 		Fields: map[string]any{
 			"userPrincipalName": "user.one@example.com",
 			"mail":              "user.one@example.com",
@@ -122,7 +121,7 @@ var UserResponse = []*fetcher.User{
 		},
 	},
 	{
-		ID: uuid.Must(uuid.FromString("d897d560-3d17-4dae-81b3-c898fe82bf84")),
+		ID: uuid.MustParse("d897d560-3d17-4dae-81b3-c898fe82bf84"),
 		Fields: map[string]any{
 			"userPrincipalName": "user.two@example.com",
 			"mail":              "user.two@example.com",
@@ -138,7 +137,7 @@ var UserResponse = []*fetcher.User{
 
 var DeviceResponse = []*fetcher.Device{
 	{
-		ID: uuid.Must(uuid.FromString("6a59ea83-02bd-468f-a40b-f2c3d1821983")),
+		ID: uuid.MustParse("6a59ea83-02bd-468f-a40b-f2c3d1821983"),
 		Fields: map[string]any{
 			"accountEnabled":         true,
 			"deviceId":               "eab73519-780d-4d43-be6d-a4a89af2a348",
@@ -162,7 +161,7 @@ var DeviceResponse = []*fetcher.Device{
 		},
 	},
 	{
-		ID: uuid.Must(uuid.FromString("adbbe40a-0627-4328-89f1-88cac84dbc7f")),
+		ID: uuid.MustParse("adbbe40a-0627-4328-89f1-88cac84dbc7f"),
 		Fields: map[string]any{
 			"accountEnabled":         true,
 			"deviceId":               "2fbbb8f9-ff67-4a21-b867-a344d18a4198",
