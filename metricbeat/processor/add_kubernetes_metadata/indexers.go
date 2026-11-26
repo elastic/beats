@@ -19,7 +19,7 @@ package add_kubernetes_metadata
 
 import (
 	kubernetes "github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 )
 
 // InitializeModule initializes this module.

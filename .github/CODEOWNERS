@@ -120,8 +120,7 @@ changelog/fragments/
 /metricbeat/module/windows/wmi @elastic/obs-signals-integrations-team
 /metricbeat/module/zookeeper @elastic/obs-signals-integrations-team
 /packetbeat/ @elastic/security-service-integrations
-/pkg/systemmetrics/ @elastic/elastic-agent-data-plane
-/pkg/autodiscover/ @elastic/elastic-agent-data-plane
+/pkg/ @elastic/elastic-agent-data-plane
 /script/ @elastic/elastic-agent-data-plane
 /testing/ @elastic/elastic-agent-data-plane
 /tools/ @elastic/elastic-agent-data-plane
@@ -209,7 +208,7 @@ changelog/fragments/
 /x-pack/filebeat/module/zscaler @elastic/security-service-integrations
 /x-pack/filebeat/modules.d/zoom.yml.disabled @elastic/security-service-integrations
 /x-pack/filebeat/processors/decode_cef/ @elastic/security-service-integrations
-/x-pack/heartbeat/ @elastic/obs-ds-hosted-services
+/x-pack/heartbeat/ @elastic/obs-signals-logs-team
 /x-pack/heartbeat/hbreceiver/ @elastic/elastic-agent-data-plane
 /x-pack/libbeat/common/identityfederation/ @elastic/cloud-services
 /x-pack/libbeat/reader/parquet/ @elastic/security-service-integrations

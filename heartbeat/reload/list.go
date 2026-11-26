@@ -31,9 +31,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 
 	"github.com/gohugoio/hashstructure"
 )
@@ -110,6 +110,14 @@ func (r *HBRunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	stopList := r.copyRunnerList()
 
 	r.logger.Debugf("Starting reload procedure, current runners: %d", len(stopList))
+
+	enabledConfigs := make([]*config.C, 0, len(configs))
+	for _, config := range configs {
+		if config.Config.Enabled() {
+			enabledConfigs = append(enabledConfigs, config.Config)
+		}
+	}
+	cfgfile.SetRunnerConfigs(r.factory, r, enabledConfigs)
 
 	// diff current & desired state, create action lists
 	for _, config := range configs {
@@ -226,6 +234,9 @@ func (r *HBRunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 func (r *HBRunnerList) Stop() {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
+
+	// The configs were set even if their runners failed to start.
+	cfgfile.SetRunnerConfigs(r.factory, r, nil)
 
 	if len(r.runners) == 0 {
 		return

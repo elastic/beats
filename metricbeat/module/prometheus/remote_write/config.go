@@ -17,7 +17,7 @@
 
 package remote_write
 
-import "github.com/elastic/elastic-agent-libs/transport/tlscommon"
+import "github.com/elastic/beats/v7/pkg/transport/tlscommon"
 
 const (
 	// DefaultMaxCompressedBodyBytes is the default maximum size of compressed request body (2MB)

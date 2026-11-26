@@ -18,7 +18,7 @@
 package hints
 
 import (
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 )
 
 type config struct {

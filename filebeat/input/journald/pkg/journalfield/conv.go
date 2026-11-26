@@ -26,8 +26,8 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common/capabilities"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // FieldConversion provides the mappings and conversion rules for raw fields of journald entries.
@@ -95,7 +95,7 @@ func convertValue(fc Conversion, value any) (any, error) {
 	if fc.IsInteger {
 		strValue, isString := value.(string)
 		if !isString {
-			return nil, fmt.Errorf("value  '%[1]v', type %[1]T is not a string", value)
+			return nil, fmt.Errorf("value '%[1]v', type %[1]T is not a string", value)
 		}
 		v, err := strconv.ParseInt(strValue, 10, 64)
 		if err != nil {

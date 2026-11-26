@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 )
 
 func TestStorageContainerValidate(t *testing.T) {
@@ -438,7 +438,7 @@ func TestConnectionStringConfigValidation(t *testing.T) {
 				return c
 			}(),
 			expectError: true,
-			errorMsg:    "unknown auth_type: invalid_auth_type (valid values: connection_string, client_secret, managed_identity)",
+			errorMsg:    "unknown auth_type: invalid_auth_type (valid values: connection_string, client_secret, managed_identity, workload_identity)",
 		},
 		{
 			name: "invalid processor_version",

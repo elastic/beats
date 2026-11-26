@@ -24,7 +24,7 @@ import (
 
 	"github.com/gohugoio/hashstructure"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 type GlobWatcher struct {

@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Add bzip2 and tar support to the CEL input, with stream_bzip2, stream_tar and the application/x-bzip2 and application/x-tar MIME types.
+component: filebeat

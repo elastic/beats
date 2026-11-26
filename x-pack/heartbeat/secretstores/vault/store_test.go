@@ -26,10 +26,10 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/secretstores"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/redact"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/redact"
 )
 
 const (
@@ -265,8 +265,69 @@ func TestConfigValidation(t *testing.T) {
 		entry   map[string]any
 		wantErr string
 	}{
-		{name: "token", entry: tokenEntry("https://vault:8200")},
-		{name: "approle", entry: appRoleEntry("http://vault:8200")},
+		{name: "token over verified https", entry: tokenEntry("https://vault:8200")},
+		{name: "approle over loopback http", entry: appRoleEntry("http://localhost:8200")},
+		{name: "remote http hostname", entry: tokenEntry("http://vault:8200"), wantErr: "must use https unless its host is loopback"},
+		{name: "remote http with loopback userinfo", entry: tokenEntry("http://localhost@vault.example:8200"), wantErr: "must use https unless its host is loopback"},
+		{name: "remote http hostname resolving to loopback", entry: tokenEntry("http://127.0.0.1.nip.io:8200"), wantErr: "must use https unless its host is loopback"},
+		{name: "remote http private IPv4", entry: tokenEntry("http://10.0.0.5:8200"), wantErr: "must use https unless its host is loopback"},
+		{name: "remote http IPv6", entry: tokenEntry("http://[2001:db8::1]:8200"), wantErr: "must use https unless its host is loopback"},
+		{name: "localhost http", entry: tokenEntry("http://localhost:8200")},
+		{name: "mixed-case localhost http", entry: tokenEntry("http://LOCALHOST:8200")},
+		{name: "IPv4 loopback http", entry: tokenEntry("http://127.42.0.1:8200")},
+		{name: "IPv6 loopback http", entry: tokenEntry("http://[::1]:8200")},
+		{name: "expanded IPv6 loopback http", entry: tokenEntry("http://[0:0:0:0:0:0:0:1]:8200")},
+		{
+			name: "remote https without verification",
+			entry: map[string]any{
+				"address": "https://vault:8200",
+				"auth":    map[string]any{"token": "x"},
+				"ssl":     map[string]any{"verification_mode": "none"},
+			},
+			wantErr: "'ssl.verification_mode' must be 'full' or 'strict' unless the address host is loopback",
+		},
+		{
+			name: "remote https without hostname verification",
+			entry: map[string]any{
+				"address": "https://vault:8200",
+				"auth":    map[string]any{"token": "x"},
+				"ssl":     map[string]any{"verification_mode": "certificate"},
+			},
+			wantErr: "'ssl.verification_mode' must be 'full' or 'strict' unless the address host is loopback",
+		},
+		{
+			name: "remote https with strict verification",
+			entry: map[string]any{
+				"address": "https://vault:8200",
+				"auth":    map[string]any{"token": "x"},
+				"ssl":     map[string]any{"verification_mode": "strict"},
+			},
+		},
+		{
+			name: "remote https with disabled ssl settings and no verification",
+			entry: map[string]any{
+				"address": "https://vault:8200",
+				"auth":    map[string]any{"token": "x"},
+				"ssl":     map[string]any{"enabled": false, "verification_mode": "none"},
+			},
+			wantErr: "'ssl.verification_mode' must be 'full' or 'strict' unless the address host is loopback",
+		},
+		{
+			name: "loopback https without verification",
+			entry: map[string]any{
+				"address": "https://[::1]:8200",
+				"auth":    map[string]any{"token": "x"},
+				"ssl":     map[string]any{"verification_mode": "none"},
+			},
+		},
+		{
+			name: "loopback https without hostname verification",
+			entry: map[string]any{
+				"address": "https://localhost:8200",
+				"auth":    map[string]any{"token": "x"},
+				"ssl":     map[string]any{"verification_mode": "certificate"},
+			},
+		},
 		{name: "missing address", entry: map[string]any{"auth": map[string]any{"token": "x"}}, wantErr: "'address' is required"},
 		{name: "bad address", entry: map[string]any{"address": "vault:8200", "auth": map[string]any{"token": "x"}}, wantErr: "must be an http or https URL"},
 		{name: "no auth", entry: map[string]any{"address": "https://vault"}, wantErr: "'auth' must have one method"},
@@ -286,12 +347,13 @@ func TestConfigValidation(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			cfg, err := conf.NewConfigFrom(tc.entry)
 			require.NoError(t, err, "test entry must be valid")
-			_, err = newStore(cfg, logptest.NewTestingLogger(t, ""))
+			store, err := newStore(cfg, logptest.NewTestingLogger(t, ""))
 			if tc.wantErr == "" {
 				assert.NoError(t, err, "config must be valid")
 				return
 			}
 			assert.ErrorContains(t, err, tc.wantErr, "config must be rejected")
+			assert.Nil(t, store, "invalid config must not create a store that can send credentials")
 		})
 	}
 }
@@ -348,6 +410,27 @@ func TestTokenAuth(t *testing.T) {
 	assert.Equal(t, testToken, req.Header.Get("X-Vault-Token"), "the configured token must be sent")
 	assert.Equal(t, "admin/team-a", req.Header.Get("X-Vault-Namespace"), "the configured namespace must be sent")
 	assert.Equal(t, "true", req.Header.Get("X-Vault-Request"), "the Vault request header must be sent")
+}
+
+func TestResolvedSecretsAreScrubbed(t *testing.T) {
+	fv := newFakeVault(t)
+	entry := tokenEntry(fv.address)
+	entry["type"] = storeType
+	entry["name"] = "main"
+	cfg, err := conf.NewConfigFrom(map[string]any{
+		"url":                  "https://host/?token=vault://main@myapp/creds#password",
+		secretstores.ConfigKey: []any{entry},
+	})
+	require.NoError(t, err, "monitor config must be valid")
+
+	resolved, scrubber, err := secretstores.NewResolver(logptest.NewTestingLogger(t, "")).Resolve(cfg, nil)
+	require.NoError(t, err, "references must resolve")
+	target, err := resolved.String("url", -1)
+	require.NoError(t, err, "resolved config must have the url")
+	require.Contains(t, target, testPassword, "the reference must be replaced")
+
+	require.NotNil(t, scrubber, "resolved secrets must be scrubbed")
+	assert.Equal(t, "https://host/?token=<hidden>", scrubber.String(target), "the secret must be removed")
 }
 
 func TestTokenAuthRejectedIsNotRetried(t *testing.T) {

@@ -21,8 +21,8 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/paths"
 )
 
 type sqsReaderInput struct {
@@ -87,7 +87,7 @@ func (in *sqsReaderInput) Run(
 	}
 
 	// Start the main run loop
-	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
+	ctx := inputContext.Cancelation
 	in.run(ctx)
 	in.cleanup()
 	in.health.UpdateStatus(status.Stopped, "Input execution ended")

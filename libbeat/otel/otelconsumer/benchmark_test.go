@@ -28,8 +28,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/collector/consumer"
@@ -221,6 +221,7 @@ func makeTestOtelConsumer(t testing.TB, consumeFn func(ctx context.Context, ld p
 		logsConsumer: logConsumer,
 		beatInfo:     beat.Info{},
 		log:          logp.NewNopLogger(),
+		retry:        newRetryBackoff(retryBackoffInit, retryBackoffMax),
 	}
 	return consumer
 }

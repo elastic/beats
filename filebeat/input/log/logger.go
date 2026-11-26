@@ -19,7 +19,7 @@ package log
 
 import (
 	"github.com/elastic/beats/v7/filebeat/input/file"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 func loggerWithState(logger *logp.Logger, state file.State) *logp.Logger {

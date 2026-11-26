@@ -23,10 +23,9 @@
 package journalctl
 
 import (
+	"context"
 	"sync"
 	"time"
-
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
 )
 
 // Ensure, that JctlMock does implement Jctl.
@@ -42,7 +41,7 @@ var _ Jctl = &JctlMock{}
 //			KillFunc: func() error {
 //				panic("mock out the Kill method")
 //			},
-//			NextFunc: func(canceler input.Canceler) ([]byte, error) {
+//			NextFunc: func(canceler context.Context) ([]byte, error) {
 //				panic("mock out the Next method")
 //			},
 //			SetReadDeadlineFunc: func(t time.Time) bool {
@@ -59,7 +58,7 @@ type JctlMock struct {
 	KillFunc func() error
 
 	// NextFunc mocks the Next method.
-	NextFunc func(canceler input.Canceler) ([]byte, error)
+	NextFunc func(canceler context.Context) ([]byte, error)
 
 	// SetReadDeadlineFunc mocks the SetReadDeadline method.
 	SetReadDeadlineFunc func(t time.Time) bool
@@ -72,7 +71,7 @@ type JctlMock struct {
 		// Next holds details about calls to the Next method.
 		Next []struct {
 			// Canceler is the canceler argument value.
-			Canceler input.Canceler
+			Canceler context.Context
 		}
 		// SetReadDeadline holds details about calls to the SetReadDeadline method.
 		SetReadDeadline []struct {
@@ -113,12 +112,12 @@ func (mock *JctlMock) KillCalls() []struct {
 }
 
 // Next calls NextFunc.
-func (mock *JctlMock) Next(canceler input.Canceler) ([]byte, error) {
+func (mock *JctlMock) Next(canceler context.Context) ([]byte, error) {
 	if mock.NextFunc == nil {
 		panic("JctlMock.NextFunc: method is nil but Jctl.Next was just called")
 	}
 	callInfo := struct {
-		Canceler input.Canceler
+		Canceler context.Context
 	}{
 		Canceler: canceler,
 	}
@@ -133,10 +132,10 @@ func (mock *JctlMock) Next(canceler input.Canceler) ([]byte, error) {
 //
 //	len(mockedJctl.NextCalls())
 func (mock *JctlMock) NextCalls() []struct {
-	Canceler input.Canceler
+	Canceler context.Context
 } {
 	var calls []struct {
-		Canceler input.Canceler
+		Canceler context.Context
 	}
 	mock.lockNext.RLock()
 	calls = mock.calls.Next

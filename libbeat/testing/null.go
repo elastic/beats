@@ -18,7 +18,7 @@
 package testing
 
 import (
-	libtesting "github.com/elastic/elastic-agent-libs/testing"
+	libtesting "github.com/elastic/beats/v7/pkg/testing"
 )
 
 type nullDriver struct{}

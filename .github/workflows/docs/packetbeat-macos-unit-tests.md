@@ -17,8 +17,8 @@ Builds and runs unit tests for **packetbeat** on the configured macOS runner usi
 ## When it runs
 
 - `workflow_dispatch`.
-- `pull_request`: paths: `["packetbeat/**", "go.mod", "dev-tools/**", "libbeat/**", ".github/workflows/packetbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
-- `push`: branches: `["main"]`; paths: `["packetbeat/**", "go.mod", "dev-tools/**", "libbeat/**", ".github/workflows/packetbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `pull_request`: paths: `["packetbeat/**", "go.mod", ".python-version", "dev-tools/**", "libbeat/**", ".github/workflows/packetbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `push`: branches: `["main"]`; paths: `["packetbeat/**", "go.mod", ".python-version", "dev-tools/**", "libbeat/**", ".github/workflows/packetbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
 
 ## Execution flow
 

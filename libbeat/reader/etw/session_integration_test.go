@@ -33,11 +33,15 @@ import (
 	"sort"
 	"strings"
 	"sync/atomic"
+	"syscall"
 	"testing"
 	"time"
+	"unsafe"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"golang.org/x/sys/windows"
+
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 var (
@@ -561,4 +565,224 @@ func checkForBadDataRecursive(value any, eventIdx, propIdx int, propName string,
 		}
 	}
 	return badCount
+}
+
+// TestRealtimeSessionIndependent checks what Windows reports for the logging
+// mode of a running session, the way an input sees it when it attaches to an
+// existing one. StartTrace can accept a logging mode and still not apply all
+// of it, so only a query of the running session shows what is in effect.
+func TestRealtimeSessionIndependent(t *testing.T) {
+	if !isRunningAsAdmin() {
+		t.Skip("creating an ETW session requires administrator privileges")
+	}
+
+	tests := []struct {
+		name string
+		mode uint32 // LogFileMode requested from StartTrace; 0 keeps the default.
+		want bool
+	}{
+		{name: "default", want: true},
+		{name: "real-time only", mode: EVENT_TRACE_REAL_TIME_MODE, want: false},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			name := uniqueSessionName("IndependentTestETW")
+			namePtr, err := syscall.UTF16PtrFromString(name)
+			if err != nil {
+				t.Fatalf("UTF16PtrFromString(%q) failed: %v", name, err)
+			}
+			props := newSessionProperties(name, Config{})
+			if tc.mode != 0 {
+				props.LogFileMode = tc.mode
+			}
+			var handle uintptr
+			if err := _StartTrace(&handle, namePtr, props); err != nil {
+				t.Fatalf("StartTrace(%q, mode %#010x) failed: %v", name, props.LogFileMode, err)
+			}
+			t.Cleanup(func() {
+				if err := _ControlTrace(handle, nil, newSessionProperties(name, Config{}), EVENT_TRACE_CONTROL_STOP); err != nil {
+					t.Errorf("stopping session %q failed: %v", name, err)
+				}
+			})
+
+			attached, err := NewSession(Config{Session: name}, logptest.NewTestingLogger(t, ""))
+			if err != nil {
+				t.Fatalf("NewSession(attach %q) failed: %v", name, err)
+			}
+			// Clear the mode preset by newSessionProperties so that only the
+			// query can set it.
+			attached.properties.LogFileMode = 0
+			if err := attached.AttachToExistingSession(); err != nil {
+				t.Fatalf("AttachToExistingSession() failed: %v", err)
+			}
+			if got := attached.Independent(); got != tc.want {
+				t.Errorf("Independent() = %t for session started with mode %#010x, reported mode %#010x; want %t",
+					got, props.LogFileMode, attached.properties.LogFileMode, tc.want)
+			}
+		})
+	}
+}
+
+// TestRealtimeSessionWithFailingSibling checks that a session receives every
+// event from a provider while writes of those events to another session
+// enabled for the same provider fail. Unless a session is independent,
+// Windows does not write an event to it when writing that event to any other
+// session on the provider fails.
+func TestRealtimeSessionWithFailingSibling(t *testing.T) {
+	if !isRunningAsAdmin() {
+		t.Skip("creating an ETW session requires administrator privileges")
+	}
+	setupProviderManager(t)
+
+	const (
+		events  = 2000
+		payload = 16 << 10 // Larger than the sibling's buffers, smaller than the receiver's.
+	)
+
+	tests := []struct {
+		name    string
+		mode    uint32 // LogFileMode of the receiving session; 0 keeps the default.
+		wantAll bool
+	}{
+		{name: "default", wantAll: true},
+		{name: "real-time only", mode: EVENT_TRACE_REAL_TIME_MODE, wantAll: false},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			guid, err := windows.GUIDFromString(testProviderGUID)
+			if err != nil {
+				t.Fatalf("GUIDFromString(%q) failed: %v", testProviderGUID, err)
+			}
+
+			// The receiving session counts the test provider's events.
+			var got atomic.Int64
+			receiver := startTestConsumer(t, "FailingSiblingReceiver", tc.mode, func(r *EventRecord) uintptr {
+				if r.EventHeader.ProviderId == guid {
+					got.Add(1)
+				}
+				return 0
+			})
+
+			// The sibling's 4 KB buffers cannot hold any of the events, so
+			// every write to it fails. This stands in for a sibling whose
+			// buffers are full, which is hard to reproduce reliably: Windows
+			// keeps undelivered realtime buffers on disk, and a file session
+			// stops when its file is full.
+			siblingName := uniqueSessionName("FailingSibling")
+			out, err := exec.CommandContext(t.Context(), "logman", "start", siblingName, "-ets", "-rt",
+				"-bs", "4", "-nb", "2", "2",
+				"-p", testProviderGUID, "0xFFFFFFFFFFFFFFFF", "0xFF").CombinedOutput()
+			if err != nil {
+				t.Fatalf("starting sibling session %q failed: %v: %s", siblingName, err, out)
+			}
+			t.Cleanup(func() { _ = stopETWSession(siblingName) })
+
+			// Give the consumer time to open its trace.
+			time.Sleep(2 * time.Second)
+
+			gen, err := NewETWEventGenerator()
+			if err != nil {
+				t.Fatalf("NewETWEventGenerator() failed: %v", err)
+			}
+			data := make([]byte, payload)
+			desc := []EventDataDescriptor{newEventDataDescriptorPtr(unsafe.Pointer(&data[0]), len(data))}
+			var writeErrs int
+			for i := range events {
+				if gen.writeEvent(allDataTypesEventID, desc) != nil {
+					writeErrs++
+				}
+				if i%100 == 99 {
+					// Let the receiver's consumer keep up.
+					time.Sleep(10 * time.Millisecond)
+				}
+			}
+			if err := gen.close(); err != nil {
+				t.Errorf("closing the event generator failed: %v", err)
+			}
+
+			receiverStats := querySession(t, receiver.Name)
+			siblingStats := querySession(t, siblingName)
+			// StopSession flushes the receiver and waits for the flushed
+			// events to be delivered before closing the trace.
+			stopTestConsumer(t, receiver)
+
+			t.Logf("wrote %d events (%d EventWrite errors); receiver got %d, receiver mode %#010x lost %d; sibling mode %#010x lost %d",
+				events, writeErrs, got.Load(), receiverStats.LogFileMode, receiverStats.EventsLost,
+				siblingStats.LogFileMode, siblingStats.EventsLost)
+			if siblingStats.EventsLost == 0 {
+				t.Fatalf("sibling session lost no events, so writes to it did not fail")
+			}
+			if all := got.Load() == events; all != tc.wantAll {
+				t.Errorf("receiver got %d of %d events; want all = %t", got.Load(), events, tc.wantAll)
+			}
+		})
+	}
+}
+
+// testConsumer is a realtime session with a consumer running on its own
+// goroutine. done is closed when the consumer returns.
+type testConsumer struct {
+	*Session
+	done chan struct{}
+}
+
+// startTestConsumer creates a realtime session for the test provider and
+// starts consuming it with callback. A non-zero mode replaces the session's
+// LogFileMode. The session is stopped when the test ends.
+func startTestConsumer(t *testing.T, prefix string, mode uint32, callback func(*EventRecord) uintptr) *testConsumer {
+	t.Helper()
+	cfg := createTestSessionConfig(uniqueSessionName(prefix))
+	s, err := NewSession(cfg, logptest.NewTestingLogger(t, ""))
+	if err != nil {
+		t.Fatalf("NewSession(%q) failed: %v", cfg.SessionName, err)
+	}
+	if mode != 0 {
+		s.properties.LogFileMode = mode
+	}
+	s.Callback = callback
+	if err := s.CreateRealtimeSession(); err != nil {
+		t.Fatalf("CreateRealtimeSession(%q) failed: %v", cfg.SessionName, err)
+	}
+	c := &testConsumer{Session: s, done: make(chan struct{})}
+	go func() {
+		defer close(c.done)
+		if err := s.StartConsumer(); err != nil {
+			t.Logf("consumer for %q returned: %v", s.Name, err)
+		}
+	}()
+	t.Cleanup(func() { stopTestConsumer(t, c) })
+	return c
+}
+
+// stopTestConsumer stops the session and waits for its consumer to return.
+// It is safe to call more than once.
+func stopTestConsumer(t *testing.T, c *testConsumer) {
+	t.Helper()
+	select {
+	case <-c.done:
+		return
+	default:
+	}
+	if err := c.StopSession(); err != nil {
+		t.Errorf("StopSession(%q) failed: %v", c.Name, err)
+	}
+	select {
+	case <-c.done:
+	case <-time.After(30 * time.Second):
+		t.Errorf("consumer for %q did not return", c.Name)
+	}
+}
+
+// querySession returns the current properties of the running session name.
+func querySession(t *testing.T, name string) *EventTraceProperties {
+	t.Helper()
+	namePtr, err := syscall.UTF16PtrFromString(name)
+	if err != nil {
+		t.Fatalf("UTF16PtrFromString(%q) failed: %v", name, err)
+	}
+	props := newSessionProperties(name, Config{})
+	if err := _ControlTrace(0, namePtr, props, EVENT_TRACE_CONTROL_QUERY); err != nil {
+		t.Fatalf("querying session %q failed: %v", name, err)
+	}
+	return props
 }

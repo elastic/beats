@@ -1,10 +1,10 @@
 {
-  "version": "5.24.0",
+  "version": "5.24.1",
   "checksums": {
-    "darwin": "41c56afaa8dfa0e83ac7f47c0ce325e69cf20813327bee592b1a13ee9e3393f6",
-    "linux_amd64": "3e2fbfe0d9e3cdde60cc58903d03ab3d44449c481bf1117e42351f9e4a460ade",
-    "linux_arm64": "f2a8a2a46b6bd6433189991fe64b225d0fd5c453787af470bcf98563e937b425",
-    "windows_arm64": "a858cf4640b2b0a95df4e76a141ad6874ced1320302363da17d0069d95782605",
-    "windows_amd64": "2a55cf9d27765f0c7ce9e3484bdf1aee560df65442f39189d7201107f21544a5"
+    "darwin": "950cc119f68c4d292f3e9407171205633e7174e13fc14ab593f48c75d907bd4f",
+    "linux_amd64": "31435ee69c43449eba612d0f3df3f2bccfe59805ab9a14fadc550bdc34814f2e",
+    "linux_arm64": "121246c1c0f798dde5218d308f56e112d44f2b81fb28d215ebc5ed932a8c9bed",
+    "windows_arm64": "a14a5d605298eb1eee90c9df59da341114d8b1b2014b3cfe557fa66940a83c6f",
+    "windows_amd64": "a71d6d3f57b9fb051988c341fd5186c548fcf83bc94f73cc2cc0a83d702391e9"
   }
 }

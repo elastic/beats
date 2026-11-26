@@ -19,10 +19,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/paths"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/beats/v7/x-pack/libbeat/statusreporterhelper"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // inputV2 is the V2 implementation of the aws-s3 input, gated behind
@@ -64,7 +64,7 @@ func (in *inputV2) Run(inputCtx v2.Context, pipeline beat.Pipeline) error {
 		return fmt.Errorf("initializing AWS config: %w", err)
 	}
 
-	ctx := v2.GoContextFromCanceler(inputCtx.Cancelation)
+	ctx := inputCtx.Cancelation
 
 	if in.config.QueueURL != "" {
 		err = in.runSQS(ctx, log, awsCfg, pipeline, inputCtx)

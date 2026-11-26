@@ -19,10 +19,10 @@ package sysinit
 
 import (
 	"github.com/elastic/beats/v7/metricbeat/helper"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
-func InitModule(config string, logger *logp.Logger) {
+func InitModule(logger *logp.Logger) {
 	if err := helper.CheckAndEnableSeDebugPrivilege(logger); err != nil {
 		logger.Warnf("%v", err)
 	}

@@ -58,7 +58,7 @@ make clean
 
 ## Notes
 
-Every container has a name corresponding with the service. This requires to shut down an environment and clean it up before starting another environment. This is intentional to prevent conflicts.
+Every container has a name corresponding with the service. This requires shutting down an environment and cleaning it up before starting another environment. This is intentional to prevent conflicts.
 
 
 # Automated Testing

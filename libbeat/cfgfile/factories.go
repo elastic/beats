@@ -21,7 +21,7 @@ import (
 	"errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/pkg/config"
 )
 
 type multiplexedFactory []FactoryMatcher
@@ -97,4 +97,32 @@ type FactoryWrapper func(RunnerFactory) RunnerFactory
 
 type WithOtelFactoryWrapper interface {
 	WithOtelFactoryWrapper(FactoryWrapper)
+}
+
+// RunnerConfigsSetter is implemented by runner factories that need to know
+// every config their callers want running, not only the runners they create.
+// The OTel status wrapper uses it to report a status only for configured
+// runners, so the statuses of removed runners don't accumulate.
+type RunnerConfigsSetter interface {
+	// SetRunnerConfigs sets the configs source wants running.
+	SetRunnerConfigs(source any, configs []*config.C)
+}
+
+// SetRunnerConfigs tells factory, or the first factory it wraps that
+// implements RunnerConfigsSetter, which configs source wants running. Callers
+// that run a set of runners call it with the whole set before they create or
+// stop runners, and with no configs once they stop them all. source identifies
+// the caller and must be comparable.
+func SetRunnerConfigs(factory RunnerFactory, source any, configs []*config.C) {
+	for {
+		if s, ok := factory.(RunnerConfigsSetter); ok {
+			s.SetRunnerConfigs(source, configs)
+			return
+		}
+		w, ok := factory.(interface{ Unwrap() RunnerFactory })
+		if !ok {
+			return
+		}
+		factory = w.Unwrap()
+	}
 }

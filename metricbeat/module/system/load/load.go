@@ -20,13 +20,16 @@
 package load
 
 import (
+	"context"
+	"errors"
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/cpu"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/numcpu"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 )
 
 func init() {
@@ -39,18 +42,24 @@ func init() {
 // MetricSet for fetching system CPU load metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
+	sys resolve.Resolver
 }
 
 // New returns a new load MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	sys, ok := base.Module().(resolve.Resolver)
+	if !ok {
+		return nil, errors.New("base.Module is not resolve.Resolver")
+	}
 	return &MetricSet{
 		BaseMetricSet: base,
+		sys:           sys,
 	}, nil
 }
 
 // Fetch fetches system load metrics.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	load, err := cpu.LoadWithLogger(m.Logger())
+	load, err := cpu.LoadWithContextAndLogger(resolve.Context(context.Background(), m.sys), m.Logger())
 	if err != nil {
 		return fmt.Errorf("failed to get CPU load values: %w", err)
 	}

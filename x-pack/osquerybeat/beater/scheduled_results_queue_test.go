@@ -18,12 +18,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pub"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type outageTestOutput struct {
@@ -96,8 +96,8 @@ func TestScheduledResultsSaturatedPipelineDoesNotBlockShutdown(t *testing.T) {
 	require.NoError(t, err, "create the real publisher pipeline")
 	observed := &observedResultPipeline{PipelineConnector: pipe, entered: make(chan struct{})}
 	bt := &osquerybeat{log: log}
-	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents, func(allowed func() bool, dropped func(), cut func(int)) osquerybeatPublisher {
-		return pub.NewScheduled(&beat.Beat{Publisher: observed}, log, allowed, dropped, cut)
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents, func(ctx context.Context, allowed func() bool, dropped, rejected func(), cut func(int)) osquerybeatPublisher {
+		return pub.NewScheduled(ctx, &beat.Beat{Publisher: observed}, log, allowed, dropped, rejected, cut)
 	}, bt.handleScheduledQueryResult)
 	t.Cleanup(func() {
 		_ = output.Close()
@@ -214,8 +214,8 @@ func TestScheduledWorkerGetsSlotsUnderPoolPressure(t *testing.T) {
 	})
 
 	bt := &osquerybeat{log: log}
-	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents, func(allowed func() bool, dropped func(), cut func(int)) osquerybeatPublisher {
-		return pub.NewScheduled(&beat.Beat{Publisher: pipe}, log, allowed, dropped, cut)
+	d := newScheduledResultDispatcher(monitoring.NewRegistry(), log, config.DefaultScheduledMaxEvents, func(ctx context.Context, allowed func() bool, dropped, rejected func(), cut func(int)) osquerybeatPublisher {
+		return pub.NewScheduled(ctx, &beat.Beat{Publisher: pipe}, log, allowed, dropped, rejected, cut)
 	}, bt.handleScheduledQueryResult)
 	t.Cleanup(func() {
 		d.stop()

@@ -25,7 +25,7 @@ import (
 	"strconv"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // platformFileFields is the number of fields setFileSystemMetadata always writes
