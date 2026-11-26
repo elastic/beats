@@ -21,7 +21,7 @@ import (
 	"bytes"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // GetCmdStr Convert cmd array to cmd line

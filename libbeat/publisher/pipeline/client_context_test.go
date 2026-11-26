@@ -35,9 +35,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/slabqueue"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/paths"
 )
 
 // newContextTestClient returns an open client publishing to p, wired like
@@ -390,6 +390,32 @@ func TestClientPublishContextFiltered(t *testing.T) {
 	assert.NoError(t, c.PublishContext(t.Context(), beat.Event{}), "a filtered event must not be an error")
 	assert.Equal(t, 1, listener.eventsFiltered, "the event must be reported as filtered")
 	assert.Equal(t, 0, listener.eventsDroppedOnPublish, "a filtered event must not be reported as dropped")
+}
+
+// TestClientPublishContextCancelledByProcessors checks that a publish whose ctx
+// is cancelled while the processors run is not queued, even though the queue
+// has room.
+func TestClientPublishContextCancelledByProcessors(t *testing.T) {
+	queued := 0
+	listener := &mockClientListener{}
+	c := newContextTestClient(&testProducer{
+		publish: func(bool, publisher.Event) (queue.EntryID, bool) {
+			queued++
+			return 0, true
+		},
+	}, listener, nil)
+	ctx, cancel := context.WithCancel(t.Context())
+	c.processors = &testProcessor{
+		processorFn: func(e *beat.Event) (*beat.Event, error) {
+			cancel()
+			return e, nil
+		},
+	}
+
+	assert.ErrorIs(t, c.PublishContext(ctx, beat.Event{}), context.Canceled, "a publish cancelled during processing must return the ctx error")
+	assert.Equal(t, 0, queued, "a publish cancelled during processing must not reach the queue")
+	assert.Equal(t, 1, listener.eventsDroppedOnPublish, "the cancelled event must be reported as dropped")
+	assert.Equal(t, 0, listener.eventsPublished, "no event must be published")
 }
 
 // TestClientPublishContextWithEventListener checks that a client with an event

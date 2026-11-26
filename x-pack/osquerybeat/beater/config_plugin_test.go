@@ -15,11 +15,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/testutil"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func renderFullConfigJSON(inputs []config.InputConfig) (string, error) {
@@ -45,9 +45,9 @@ func renderFullConfigJSON(inputs []config.InputConfig) (string, error) {
 		}
 		packs[input.Name] = pack
 	}
-	raw, err := newOsqueryConfig(&config.OsqueryConfig{
+	raw, err := withFIPSOptions(newOsqueryConfig(&config.OsqueryConfig{
 		Packs: packs,
-	}).Render()
+	})).Render()
 	if err != nil {
 		return "", err
 	}
@@ -244,12 +244,8 @@ func TestFlattenECSMappingMoreEdges(t *testing.T) {
 func TestSet(t *testing.T) {
 	logger := logp.NewLogger("config_test")
 
-	const noQueriesConfig = `{
-    "options": {
-        "schedule_max_drift": 60,
-        "schedule_splay_percent": 10
-    }
-}`
+	// noQueriesConfig is defined next to the tests for each build tag, because
+	// FIPS builds add their enforced options to the config.
 	oneInputConfig := []config.InputConfig{
 		{
 			Name: "osquery-manager-1",

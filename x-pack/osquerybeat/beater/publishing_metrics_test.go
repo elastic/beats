@@ -11,8 +11,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 func TestPublishingMetricsNames(t *testing.T) {
@@ -31,6 +31,7 @@ func TestPublishingMetricsNames(t *testing.T) {
 				"osquerybeat.publishing.scheduled.dropped_rows.stale":    0,
 				"osquerybeat.publishing.scheduled.dropped.shutdown":      0,
 				"osquerybeat.publishing.scheduled.dropped_rows.shutdown": 0,
+				"osquerybeat.publishing.scheduled.dropped_rows.rejected": 0,
 				"osquerybeat.publishing.scheduled.queue.items":           2,
 				"osquerybeat.publishing.scheduled.queue.events":          9,
 			},
@@ -44,6 +45,7 @@ func TestPublishingMetricsNames(t *testing.T) {
 				"osquerybeat.publishing.live.dropped_rows.shutdown": 0,
 				"osquerybeat.publishing.live.dropped.timeout":       1,
 				"osquerybeat.publishing.live.dropped_rows.timeout":  7,
+				"osquerybeat.publishing.live.dropped_rows.rejected": 0,
 				"osquerybeat.publishing.live.queue.items":           2,
 				"osquerybeat.publishing.live.queue.events":          9,
 			},

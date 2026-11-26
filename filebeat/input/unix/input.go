@@ -31,12 +31,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
-	"github.com/elastic/go-concert/ctxtool"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
+	"github.com/elastic/beats/v7/pkg/monitoring/adapter"
 )
 
 func Plugin() input.Plugin {
@@ -120,7 +119,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 
 	log.Debugf("%v Input '%v' initialized", s.config.Config.SocketType, ctx.ID)
 
-	err = server.Run(ctxtool.FromCanceller(ctx.Cancelation))
+	err = server.Run(ctx.Cancelation)
 
 	// ignore error from 'Run' in case shutdown was signaled.
 	if ctxerr := ctx.Cancelation.Err(); ctxerr != nil {

@@ -10,7 +10,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // parquetFile is a struct that contains the name of the parquet

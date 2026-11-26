@@ -22,8 +22,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/libbeat/statusreporterhelper"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/timed"
 )
 
@@ -92,7 +92,7 @@ func (in *s3PollerInput) Run(
 	}
 	defer in.registry.Close()
 
-	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
+	ctx := inputContext.Cancelation
 	in.status.UpdateStatus(status.Configuring, "Configuring input")
 	in.s3, err = in.createS3API(ctx)
 	if err != nil {

@@ -30,11 +30,8 @@ import (
 	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-
-	//mage:import
-	"github.com/elastic/elastic-agent-libs/dev-tools/mage"
-
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
+	"github.com/elastic/beats/v7/dev-tools/mage/release"
 )
 
 var (
@@ -78,9 +75,32 @@ var (
 // Aliases are shortcuts to long target names.
 // nolint: deadcode // it's used by `mage`.
 var Aliases = map[string]interface{}{
-	"llc":  mage.Linter.LastChange,
-	"lint": mage.Linter.All,
+	"llc":  Linter.LastChange,
+	"lint": Linter.All,
 }
+
+// Linter contains targets related to linting the Go code. It delegates to
+// devtools.Linter; the namespace is redeclared here because mage only exposes
+// targets declared in (or //mage:import-ed into) the magefile package.
+type Linter mg.Namespace
+
+// All runs the linter against the entire codebase.
+func (Linter) All() error { return devtools.Linter{}.All() }
+
+// LastChange runs the linter against all files changed since the fork point from `main`.
+func (Linter) LastChange() error { return devtools.Linter{}.LastChange() }
+
+// Install installs golangci-lint to `./build` if it is not there yet.
+func (Linter) Install() error { return devtools.Linter{}.Install() }
+
+// ForceInstall installs golangci-lint regardless of whether it exists or not.
+func (Linter) ForceInstall() error { return devtools.Linter{}.ForceInstall() }
+
+// CheckConfig makes sure that the `.golangci.yml` does not have uncommitted changes.
+func (Linter) CheckConfig() error { return devtools.Linter{}.CheckConfig() }
+
+// Version prints the version of the linter in use.
+func (Linter) Version() error { return devtools.Linter{}.Version() }
 
 // PackageBeatDashboards packages the dashboards from all Beats into a zip
 // file. The dashboards must be generated first.
@@ -280,4 +300,68 @@ func runOnEveryBeat(beatDirs []string, mageTarget string) error {
 	}
 
 	return nil
+}
+
+// Release is the namespace for release automation tasks.
+type Release mg.Namespace
+
+func loadReleaseConfig() (*release.ReleaseConfig, error) {
+	settings, err := devtools.LoadReleaseSettings()
+	if err != nil {
+		return nil, err
+	}
+	if err := settings.RequireRelease(); err != nil {
+		return nil, err
+	}
+	return settings, nil
+}
+
+// UpdateVersion updates the version in libbeat/version/version.go
+func (Release) UpdateVersion(version string) error {
+	return release.UpdateVersion(version)
+}
+
+// UpdateDocs updates version references in documentation and K8s manifests
+func (Release) UpdateDocs(version string) error {
+	return release.UpdateDocs(version)
+}
+
+// UpdateTestEnv updates docker-compose.yml files to the latest published Stack release.
+func (Release) UpdateTestEnv(latest string) error {
+	return release.UpdateTestEnv(latest)
+}
+
+// UpdateMergify updates .mergify.yml backport configuration
+func (Release) UpdateMergify(version string) error {
+	return release.UpdateMergify(version)
+}
+
+// RunMajorMinor executes the feature-freeze workflow: creates the release branch
+// and 3 grouped PRs (main backport+version, ff-release, main docs+env).
+// Next-patch bumps are owned by RunPatch, not this workflow.
+func (Release) RunMajorMinor() error {
+	cfg, err := loadReleaseConfig()
+	if err != nil {
+		return err
+	}
+	return release.RunMajorMinorRelease(cfg)
+}
+
+// RunPatch executes the post-release patch bump: version + test-env to NEXT_RELEASE.
+func (Release) RunPatch() error {
+	cfg, err := loadReleaseConfig()
+	if err != nil {
+		return err
+	}
+	return release.RunPatchRelease(cfg)
+}
+
+// EnsureIssueTracker creates or updates the Beats release checklist issue for
+// NEXT_RELEASE, linking related Beats PRs labeled "release".
+func (Release) EnsureIssueTracker() error {
+	cfg, err := loadReleaseConfig()
+	if err != nil {
+		return err
+	}
+	return release.EnsureReleaseIssueTracker(cfg, nil)
 }

@@ -30,12 +30,12 @@ import (
 
 	psutil "github.com/shirou/gopsutil/v4/process"
 
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/opt"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/network"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/opt"
-	"github.com/elastic/elastic-agent-libs/transform/typeconv"
+	"github.com/elastic/beats/v7/pkg/transform/typeconv"
 	"github.com/elastic/go-sysinfo"
 	sysinfotypes "github.com/elastic/go-sysinfo/types"
 )
@@ -73,7 +73,7 @@ func ListStates(hostfs resolve.Resolver) ([]ProcState, error) {
 func GetPIDState(hostfs resolve.Resolver, pid int) (PidState, error) {
 	// This library still doesn't have a good cross-platform way to distinguish between "does not eixst" and other process errors.
 	// This is a fairly difficult problem to solve in a cross-platform way
-	exists, err := psutil.PidExistsWithContext(context.Background(), int32(pid)) //nolint:gosec // G115 — PID fits in int32 on supported platforms
+	exists, err := psutil.PidExistsWithContext(resolve.Context(context.Background(), hostfs), int32(pid)) //nolint:gosec // G115 — PID fits in int32 on supported platforms
 	if err != nil {
 		return "", fmt.Errorf("Error trying to find process: %d: %w", pid, err)
 	}

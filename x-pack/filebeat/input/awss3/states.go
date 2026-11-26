@@ -12,7 +12,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 const awsS3ObjectStatePrefix = "filebeat::aws-s3::state::"

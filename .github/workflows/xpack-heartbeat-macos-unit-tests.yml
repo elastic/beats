@@ -2,7 +2,7 @@ name: xpack-heartbeat-macos-unit-tests
 
 env:
   BEAT: "x-pack/heartbeat"
-  NODEJS_VERSION: "22.20.0"
+  NODEJS_VERSION: "22.23.4"
 
 on:
   workflow_dispatch:
@@ -12,6 +12,7 @@ on:
       - x-pack/heartbeat/**
       # OSS
       - go.mod
+      - .python-version
       - dev-tools/**
       - libbeat/**
       - x-pack/libbeat/**
@@ -26,6 +27,7 @@ on:
       - x-pack/heartbeat/**
       # OSS
       - go.mod
+      - .python-version
       - dev-tools/**
       - libbeat/**
       - x-pack/libbeat/**

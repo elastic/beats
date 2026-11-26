@@ -13,7 +13,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // Validator is a CRC validation function type. It applies the provided validator

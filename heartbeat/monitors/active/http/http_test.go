@@ -41,9 +41,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
@@ -938,8 +938,10 @@ func TestNoGzipDecodeWithoutHeader(t *testing.T) {
 
 	assert.NoError(t, err)
 
-	// doesn't decode gzip text without content header
-	assert.Exactly(t, "\x1f\x8b\b\x00\x00\x00\x00\x00\x00\xff\nI-.q\xcdK\xceO\xc9\xccKwLNN-(\x01\x04\x00\x00\xff\xffW\xbeE\x0e\x12\x00\x00\x00", content)
+	// doesn't decode gzip text without content header. Compare with the
+	// compressed bytes rather than a literal: compress/flate output can change
+	// between Go releases.
+	assert.Exactly(t, gzBuffer.String(), content, "the body must be returned still gzip encoded")
 }
 
 /* When Heartbeat doesn't request `gzip`, and the server responds with a `gzip` body/header anyway,

@@ -21,8 +21,8 @@ import (
 	"errors"
 	"unsafe"
 
+	"github.com/elastic/beats/v7/pkg/opt"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
-	"github.com/elastic/elastic-agent-libs/opt"
 )
 
 /*

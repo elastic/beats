@@ -64,9 +64,10 @@ through the clients of the current policy if that policy still has the query
 with the same namespace and SQL, and drops it otherwise. A policy change retires
 the previous clients. The item in flight keeps publishing on them while the new
 policy still has its query with the same namespace and SQL; otherwise its rows
-not yet handed to the output are dropped. One `Publish` call can still be
-blocked on the retired clients until the output recovers or the pipeline
-closes.
+not yet handed to the output are dropped, and a publish waiting for the output
+is cancelled. A publish can only be cancelled when the publishing pipeline
+supports it (see below); otherwise one `Publish` call can still be blocked on
+the retired clients until the output recovers or the pipeline closes.
 
 The queue also survives osqueryd restarts, such as an options or extensions
 change or a crash. The worker resolves a native result's column types when it
@@ -78,7 +79,11 @@ osqueryd run ends, queued items the current policy no longer publishes are
 dropped. The rows and response of a native result whose column types osqueryd
 could not resolve are dropped.
 
-Shutdown drops the queued items and does not wait for a blocked `Publish`.
+Shutdown drops the queued items and cancels a publish waiting for the output.
+Without cancellation support it does not wait for a blocked `Publish`.
+
+Cancellation works with the memory, slab and disk queues. A cancelled row is
+counted as dropped and is not queued.
 
 ## Live queue
 
@@ -87,11 +92,13 @@ A live query action waits for its rows to be handed to the output for at most
 use up the window. On the OTel runtime the action's own context can end first,
 at the Fleet action timeout (1 minute by default); that is handled the same
 way. If the timeout elapses, the action reports the rows handed over so far as
-its count, with an error. The remaining rows are skipped; a row
-already inside a blocked `Publish` can still be delivered late. The action's
+its count, with an error. The remaining rows are skipped and a publish waiting
+for the output is cancelled; without cancellation support, a row already
+inside a blocked `Publish` can still be delivered late. The action's
 response document is published after its rows and is not dropped by the
 timeout, so Kibana learns the outcome unless osquerybeat stops before the
-response is published. If osquerybeat is stopping, the
+response is published. Stopping cancels a response publish waiting for the
+output, when the pipeline supports it. If osquerybeat is stopping, the
 action reports an error instead of a count. If no results stream is configured,
 the action reports that error instead.
 
@@ -125,6 +132,7 @@ Reasons:
 | `stale` | both | No current policy publishes it: the query was removed, moved to another namespace or changed SQL (also while it was in flight), osqueryd could not resolve its column types, no results stream is configured, or, for a profile or an action response, no profile or action response stream is configured |
 | `shutdown` | both | Osquerybeat was stopping |
 | `timeout` | live | The action stopped waiting after `live.timeout`, or its context ended first |
+| `rejected` | both | The queue refused the event, such as one the disk queue cannot serialize; reported under `dropped_rows` only |
 
 For a live action, an item is the action's results and profile, and its rows
 are the rows and profile not handed to the output. The live `queue.*` gauges
@@ -132,8 +140,13 @@ cover only the waiting action, not the action responses queued behind it. A
 live action response dropped because osquerybeat is stopping, or because no
 live clients or no action response stream are configured, counts as its own
 item of one row. An event the pipeline discards while closing counts in
-`dropped_rows.shutdown` only. Each queue logs at most one warning per minute
-about drops, naming the counter that moved.
+`dropped_rows.shutdown` only. An event the queue refuses counts in
+`dropped_rows.rejected` only, and a live action leaves a refused row out of
+its count. Without cancellation support a refused event is not reported as
+such: the scheduled queue cannot tell it from one discarded while closing and
+counts it as `shutdown`, and the live queue counts it as handed over. Each
+queue logs at most one warning per minute about drops, naming the counter that
+moved.
 
 A scheduled profile dropped once it is queued is counted only under
 `osquerybeat.publishing.scheduled`. The profile collection worker reports

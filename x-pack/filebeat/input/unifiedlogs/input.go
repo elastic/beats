@@ -26,11 +26,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/go-concert/ctxtool"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 const (
@@ -109,7 +108,7 @@ func (input input) Test(src inputcursor.Source, _ v2.TestContext) error {
 func (input *input) Run(ctxt v2.Context, src inputcursor.Source, resumeCursor inputcursor.Cursor, pub inputcursor.Publisher) error {
 	reg := ctxt.MetricsRegistry
 
-	stdCtx := ctxtool.FromCanceller(ctxt.Cancelation)
+	stdCtx := ctxt.Cancelation
 	log := ctxt.Logger.With("source", src.Name())
 
 	startFrom, err := loadCursor(resumeCursor, log)

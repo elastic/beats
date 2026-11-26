@@ -22,8 +22,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 const (
@@ -111,7 +111,7 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 		n.mtx.Unlock()
 		return nil
 	}
-	n.ctx, n.cancelFunc = context.WithCancel(v2.GoContextFromCanceler(env.Cancelation))
+	n.ctx, n.cancelFunc = context.WithCancel(env.Cancelation)
 	n.started = true
 	n.mtx.Unlock()
 

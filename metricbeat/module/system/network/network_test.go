@@ -32,7 +32,8 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 )
 
 func TestFetch(t *testing.T) {
@@ -56,18 +57,14 @@ func TestNormalHostMetrics(t *testing.T) {
 
 	reporter := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 
-	firstProc := filepath.Join(basePath, "/tests/testdata/proc/")
-	err = os.Setenv("HOST_PROC", firstProc)
-	require.NoError(t, err)
+	setHostFS(t, reporter, filepath.Join(basePath, "/tests/testdata"))
 
 	// get initial metrics
 	_, errs := mbtest.ReportingFetchV2Error(reporter)
 	require.Empty(t, errs)
 
 	// second event
-	secondProc := filepath.Join(basePath, "/tests/testdata2/proc/")
-	err = os.Setenv("HOST_PROC", secondProc)
-	require.NoError(t, err)
+	setHostFS(t, reporter, filepath.Join(basePath, "/tests/testdata2"))
 
 	events, errs := mbtest.ReportingFetchV2Error(reporter)
 	require.Empty(t, errs)
@@ -103,16 +100,12 @@ func TestRollover(t *testing.T) {
 
 	reporter := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 
-	firstProc := filepath.Join(basePath, "/tests/rollover/proc/")
-	err = os.Setenv("HOST_PROC", firstProc)
-	require.NoError(t, err)
+	setHostFS(t, reporter, filepath.Join(basePath, "/tests/rollover"))
 
 	_, errs := mbtest.ReportingFetchV2Error(reporter)
 	require.Empty(t, errs)
 
-	secondProc := filepath.Join(basePath, "/tests/rollover2/proc/")
-	err = os.Setenv("HOST_PROC", secondProc)
-	require.NoError(t, err)
+	setHostFS(t, reporter, filepath.Join(basePath, "/tests/rollover2"))
 
 	events, errs := mbtest.ReportingFetchV2Error(reporter)
 	require.Empty(t, errs)
@@ -139,16 +132,12 @@ func TestRollover32(t *testing.T) {
 
 	reporter := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 
-	firstProc := filepath.Join(basePath, "/tests/rollover32/proc/")
-	err = os.Setenv("HOST_PROC", firstProc)
-	require.NoError(t, err)
+	setHostFS(t, reporter, filepath.Join(basePath, "/tests/rollover32"))
 
 	_, errs := mbtest.ReportingFetchV2Error(reporter)
 	require.Empty(t, errs)
 
-	secondProc := filepath.Join(basePath, "/tests/rollover32_2/proc/")
-	err = os.Setenv("HOST_PROC", secondProc)
-	require.NoError(t, err)
+	setHostFS(t, reporter, filepath.Join(basePath, "/tests/rollover32_2"))
 
 	events, errs := mbtest.ReportingFetchV2Error(reporter)
 	require.Empty(t, errs)
@@ -193,6 +182,12 @@ func TestGaugeRolloverIncrement(t *testing.T) {
 
 	resultu32 := createGaugeWithRollover(current, prevU64, logptest.NewTestingLogger(t, ""))
 	require.Equal(t, uint64(1), resultu32)
+}
+
+func setHostFS(t *testing.T, reporter mb.ReportingMetricSetV2Error, dir string) {
+	m, ok := reporter.(*MetricSet)
+	require.True(t, ok, "reporter must be a network MetricSet")
+	m.sys = resolve.NewTestResolver(dir)
 }
 
 func findRootEvent(events []mb.Event) (bool, mb.Event) {

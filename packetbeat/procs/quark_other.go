@@ -23,7 +23,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // newTupleWatcher returns an error: the kernel_tracing backend is

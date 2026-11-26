@@ -30,10 +30,9 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/go-concert/ctxtool"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 )
 
 func Plugin() input.Plugin {
@@ -130,5 +129,5 @@ func (s *server) Run(ctx input.Context, evtChan chan<- netinput.DataMetadata, me
 	logger.Debug("udp input initialized")
 	ctx.UpdateStatus(status.Running, "")
 
-	return server.Run(ctxtool.FromCanceller(ctx.Cancelation))
+	return server.Run(ctx.Cancelation)
 }

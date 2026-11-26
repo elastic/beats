@@ -30,9 +30,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/service"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/service"
 
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/module"
@@ -212,6 +212,7 @@ const pipelinesWarning = "Packetbeat is unable to load the ingest pipelines for 
 // runStatic constructs a packetbeat runner and starts it, returning on cancellation
 // or the first fatal error.
 func (pb *packetbeat) runStatic(b *beat.Beat, factory cfgfile.RunnerFactory) error {
+	cfgfile.SetRunnerConfigs(factory, pb, []*conf.C{pb.config})
 	runner, err := factory.Create(b.Publisher, pb.config)
 	if err != nil {
 		return err

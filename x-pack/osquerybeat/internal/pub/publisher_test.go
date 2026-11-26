@@ -22,10 +22,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions" // Registers the add_fields processor used by inputWithNamespace.
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type recordingClient struct {
@@ -639,7 +639,7 @@ func TestPublishEachStops(t *testing.T) {
 	hits := []map[string]any{{"n": 1}, {"n": 2}, {"n": 3}}
 
 	calls := 0
-	n := p.PublishEach("index", "action", "action_id", "", "", "", "", "", nil, hits, nil, nil, func() bool {
+	n := p.PublishEach(t.Context(), "index", "action", "action_id", "", "", "", "", "", nil, hits, nil, nil, func() bool {
 		calls++
 		return calls > 2
 	})
@@ -648,6 +648,6 @@ func TestPublishEachStops(t *testing.T) {
 	published := client.snapshot()
 	require.Len(t, published, 2, "publish only the rows before stop returned true")
 	assert.Equal(t, map[string]any{"n": 2}, published[1].Fields["osquery"], "publish rows in order")
-	n = p.PublishEach("index", "action", "action_id", "", "", "", "", "", nil, hits, nil, nil, func() bool { return false })
+	n = p.PublishEach(t.Context(), "index", "action", "action_id", "", "", "", "", "", nil, hits, nil, nil, func() bool { return false })
 	assert.Equal(t, 3, n, "publish every row when stop never returns true")
 }

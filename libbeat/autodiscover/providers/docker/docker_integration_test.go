@@ -29,10 +29,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	dk "github.com/elastic/beats/v7/libbeat/tests/docker"
 	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/keystore"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/keystore"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // Test docker start emits an autodiscover event

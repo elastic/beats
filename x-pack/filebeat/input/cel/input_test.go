@@ -33,12 +33,12 @@ import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/version"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/paths"
-	"github.com/elastic/elastic-agent-libs/useragent"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
+	"github.com/elastic/beats/v7/pkg/paths"
+	"github.com/elastic/beats/v7/pkg/useragent"
 )
 
 var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints")
@@ -772,6 +772,128 @@ var inputTests = []struct {
 			{"line": "hello world"},
 			{"line": "foo bar"},
 			{"line": "baz qux"},
+		},
+	},
+	{
+		name: "decode_json_stream_lazy_bzip2",
+		config: map[string]any{
+			"interval": 1,
+			"program": `
+	base64_decode(
+		// base64 encoded bzip2 compressed:
+		//  {"id":"a"}
+		//  {"id":"b"}
+		"QlpoOTFBWSZTWXDyMnQAAAlZgAAQEAAAEDQgAAogADEGTEBVTQ02pHnUZmEUinxdyRThQkHDyMnQ"
+	).stream_bzip2().decode_json_stream_lazy().map(e, e).as(events,
+		{"events": events}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]any{
+				"url": "",
+			},
+		},
+		want: []map[string]any{
+			{"id": "a"},
+			{"id": "b"},
+		},
+	},
+	{
+		// An archive like the hourly feed of a service that provides a
+		// .tar.bz2 of bzip2 compressed NDJSON files.
+		name: "stream_tar_bzip2_all_entries",
+		config: map[string]any{
+			"interval": 1,
+			"program": `
+	base64_decode(
+		// base64 encoded bzip2 compressed tar archive holding a directory
+		// and two bzip2 compressed NDJSON files:
+		//  d/m1.ndjson.bz2: {"id":"a"} {"id":"b"}
+		//  d/m2.ndjson.bz2: {"id":"c"}
+		"QlpoOTFBWSZTWVG1EEEAAJh//8/2RABjAf+gdBYqM3VT3jRMEAIQJAAARAxiRCAwABQIMADWsDUpk0DQAAAAGgBk0ZA0GEaZpqDSiemhNNAxGgyAAAAGgAAAA0VPU0PUyADIZAAAANAAAAA0GGQ3+EUvCIHJQgA280HxEAmENYQdlwXQvDBMpGRJUQSSQAMEZhQwGEEhaoYQBTu9wklUsjOTwmeVwWswaiYyXDBAiBxhWIiODN1zB4wNZGwWkvqqYTKSuso6gc4ySgkdFPXCckbygwObNsWURHAK8QsrCRDLsYBhMigLPfzCBgJDoGRHDY1qkaDhNyBGiPuB40gthwq6H3a6rivQPAx7MBZgMaIQD+LuSKcKEgo2oggg"
+	).stream_bzip2().stream_tar().stream_bzip2().decode_json_stream_lazy().map(e, e).as(events,
+		{"events": events}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]any{
+				"url": "",
+			},
+		},
+		want: []map[string]any{
+			{"id": "a"},
+			{"id": "b"},
+			{"id": "c"},
+		},
+	},
+	{
+		// Indexes count only regular files, so index 1 is the second file
+		// and not the first file after the directory entry.
+		name: "stream_tar_bzip2_entry_by_index",
+		config: map[string]any{
+			"interval": 1,
+			"program": `
+	base64_decode(
+		// The archive in stream_tar_bzip2_all_entries.
+		"QlpoOTFBWSZTWVG1EEEAAJh//8/2RABjAf+gdBYqM3VT3jRMEAIQJAAARAxiRCAwABQIMADWsDUpk0DQAAAAGgBk0ZA0GEaZpqDSiemhNNAxGgyAAAAGgAAAA0VPU0PUyADIZAAAANAAAAA0GGQ3+EUvCIHJQgA280HxEAmENYQdlwXQvDBMpGRJUQSSQAMEZhQwGEEhaoYQBTu9wklUsjOTwmeVwWswaiYyXDBAiBxhWIiODN1zB4wNZGwWkvqqYTKSuso6gc4ySgkdFPXCckbygwObNsWURHAK8QsrCRDLsYBhMigLPfzCBgJDoGRHDY1qkaDhNyBGiPuB40gthwq6H3a6rivQPAx7MBZgMaIQD+LuSKcKEgo2oggg"
+	).stream_bzip2().stream_tar(1).stream_bzip2().decode_json_stream_lazy().map(e, e).as(events,
+		{"events": events}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]any{
+				"url": "",
+			},
+		},
+		want: []map[string]any{
+			{"id": "c"},
+		},
+	},
+	{
+		name: "mime_bzip2",
+		config: map[string]any{
+			"interval": 1,
+			"program": `
+	base64_decode(
+		// The data in decode_json_stream_lazy_bzip2.
+		"QlpoOTFBWSZTWXDyMnQAAAlZgAAQEAAAEDQgAAogADEGTEBVTQ02pHnUZmEUinxdyRThQkHDyMnQ"
+	).mime("application/x-bzip2").as(text,
+		{"events": [{"text": string(text)}]}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]any{
+				"url": "",
+			},
+		},
+		want: []map[string]any{
+			{"text": "{\"id\":\"a\"}\n{\"id\":\"b\"}\n"},
+		},
+	},
+	{
+		name: "mime_tar",
+		config: map[string]any{
+			"interval": 1,
+			"program": `
+	base64_decode(
+		// base64 encoded bzip2 compressed tar archive holding a directory
+		// and the files a.txt and b.txt:
+		"QlpoOTFBWSZTWUGac1wAAG9bgMmQQAH/gAAhdgGewAQoIAB0G1U09IQ9QNpG2lA8oJJQNGhoAAA4J4PKF88ZDkkMyRLbC0jpFXGMnpwgYFrWR6IlHqRWggVE+YG6Ydau0FRcMssEyzUFjAN6GELX+Ts0yxdXGsrnMkC/i7kinChIIM05rgA="
+	).mime("application/x-bzip2").mime("application/x-tar").File.map(f,
+		{"name": f.Name, "type": f.Type, "data": string(f.Data)}
+	).as(files,
+		{"events": files}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]any{
+				"url": "",
+			},
+		},
+		want: []map[string]any{
+			{"name": "d/", "type": "5", "data": ""},
+			{"name": "d/a.txt", "type": "0", "data": "one\n"},
+			{"name": "d/b.txt", "type": "0", "data": "two\n"},
 		},
 	},
 

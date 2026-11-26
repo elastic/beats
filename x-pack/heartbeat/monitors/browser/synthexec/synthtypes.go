@@ -6,13 +6,14 @@
 package synthexec
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"net/url"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
@@ -96,8 +97,13 @@ func (se SynthEvent) ToMap() (m mapstr.M) {
 		u, e := url.Parse(se.URL)
 		if e != nil {
 			_, _ = m.Put("url", mapstr.M{"full": se.URL})
+			// Neither the URL nor e, which quotes it, are logged: the URL can
+			// hold a secret value, and this logger doesn't scrub.
+			if urlErr, ok := errors.AsType[*url.Error](e); ok {
+				e = urlErr.Err
+			}
 			//nolint:forbidigo // ToMap has no logger handle; matches the pre-existing pattern in this package.
-			logp.L().Warnf("Could not parse synthetics URL '%s': %s", se.URL, e.Error())
+			logp.L().Warnf("Could not parse synthetics URL: %s", e)
 		} else {
 			_, _ = m.Put("url", wraputil.URLFields(u))
 		}

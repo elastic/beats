@@ -22,10 +22,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/beats/v7/x-pack/libbeat/statusreporterhelper"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -90,14 +90,14 @@ func (in *cloudwatchInput) Test(ctx v2.TestContext) error {
 }
 
 func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
-	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
+	ctx := inputContext.Cancelation
 	log := inputContext.Logger
 
 	// setup status reporter
 	in.status = statusreporterhelper.New(inputContext, log, "CloudWatch")
 	in.status.UpdateStatus(status.Starting, "Input starting")
 
-	handler, err := newStateHandler(log, in.config, in.store)
+	handler, err := newStateHandler(log, in.config, in.store, inputContext.ID)
 	if err != nil {
 		in.status.UpdateStatus(status.Failed, fmt.Sprintf("State registry creation failure: %s", err.Error()))
 		return fmt.Errorf("failed to create state handler: %w", err)

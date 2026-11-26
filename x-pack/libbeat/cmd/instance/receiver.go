@@ -20,14 +20,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report/log"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	metricreport "github.com/elastic/beats/v7/pkg/systemmetrics/report"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
 	otelstatus "github.com/elastic/beats/v7/x-pack/otel/status"
 	oteltelemetry "github.com/elastic/beats/v7/x-pack/otel/telemetry"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/extension/extensionauth"
@@ -132,7 +132,7 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 
 	beater, err := creator(&b.Beat, beatConfig)
 	if err != nil {
-		return BeatReceiver{}, fmt.Errorf("error getting %s creator:%w", b.Info.Beat, err)
+		return BeatReceiver{}, fmt.Errorf("error getting %s creator: %w", b.Info.Beat, err)
 	}
 
 	bridge, err := oteltelemetry.NewRegistryBridge(bridgeTelemetrySettings, receiverID.String(), b.Monitoring.StatsRegistry(), b.Monitoring.InputsRegistry())

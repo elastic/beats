@@ -33,7 +33,7 @@ Runs the full test suite of every Beat on one commit, and publishes the result a
 | Triggering Build for x-pack/winlogbeat | No step-level condition or agent declared | None declared | key `test-x-pack-winlogbeat`; triggers pipeline `beats-xpack-winlogbeat`; trigger build fields `["commit", "branch"]` |
 | Triggering Build for Deploy/K8S | No step-level condition or agent declared | None declared | key `test-deploy-k8s`; triggers pipeline `deploy-k8s`; trigger build fields `["commit", "branch"]` |
 | Triggering Build for Libbeat | No step-level condition or agent declared | None declared | key `test-libbeat`; triggers pipeline `beats-libbeat`; trigger build fields `["commit", "branch"]` |
-| Triggering Build for pkg/systemmetrics | No step-level condition or agent declared | None declared | key `test-pkg-systemmetrics`; triggers pipeline `beats-pkg-systemmetrics`; trigger build fields `["commit", "branch"]` |
+| Triggering Build for pkg | No step-level condition or agent declared | None declared | key `test-pkg-systemmetrics`; triggers pipeline `beats-pkg-systemmetrics`; trigger build fields `["commit", "branch"]` |
 | Triggering Build for x-pack/libbeat | No step-level condition or agent declared | None declared | key `test-x-pack-libbeat`; triggers pipeline `beats-xpack-libbeat`; trigger build fields `["commit", "branch"]` |
 | Triggering Build for x-pack/otel | No step-level condition or agent declared | None declared | key `test-x-pack-otel`; triggers pipeline `beats-xpack-otel`; trigger build fields `["commit", "branch"]` |
 | Triggering Build for x-pack/auditbeat | No step-level condition or agent declared | None declared | key `test-x-pack-auditbeat`; triggers pipeline `beats-xpack-auditbeat`; trigger build fields `["commit", "branch"]` |

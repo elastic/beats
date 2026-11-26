@@ -27,9 +27,9 @@ import (
 	vaultapi "github.com/hashicorp/vault/api"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/secretstores"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 )
 
 // storeType is the secret_stores type and the reference prefix.
@@ -182,7 +182,12 @@ func (s *store) resolve(ctx context.Context, content string) (string, error) {
 	if !ok {
 		return "", fmt.Errorf("vault: field %q not found at %s", field, s.location(path))
 	}
-	return stringValue(v)
+	value, err := stringValue(v)
+	if err != nil {
+		return "", err
+	}
+	secretstores.Track(ctx, value)
+	return value, nil
 }
 
 // secret returns the data of the secret at path, from the cache when

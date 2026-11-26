@@ -46,7 +46,22 @@ In agentless deployments, state is stored in Elasticsearch (index `agentless-sta
 
 When running with a local file store (the default for non-agentless deployments), state is stored in a bbolt database under the Filebeat data directory.
 
-Defaults to `false`. In Fleet-managed agentless deployments, integration packages set this to `true` automatically.
+If a full synchronization fails, it is retried after `update_interval`. The wait doubles after each further failure, up to `sync_interval`. The input reports a degraded status when a synchronization fails:
+
+* After a failed full synchronization, the status stays degraded until a full synchronization succeeds.
+* After a failed incremental synchronization, it stays degraded until a later synchronization of either kind succeeds.
+
+{applies_to}`stack: preview 9.5.8+` The input also reports a degraded status when a synchronization is incomplete: it finishes but could not collect some data, for example when some Okta enrichment requests still fail after retrying. Its changes are kept, and the missing data is collected again by the next full synchronization, so the status stays degraded until a full synchronization succeeds, and an incomplete full synchronization is not retried early.
+
+Defaults to `false`. The Okta, Microsoft Entra ID and Active Directory integration packages set this to `true` by default.
+
+With `use_minimal_state: true`, the HTTP settings (`request.*` for Jamf and Okta, and the top-level `proxy_url`, `ssl` and `timeout` for Azure Active Directory) and the `tracer.*` settings work as they do in the legacy implementation, with these differences:
+
+- `request.retry.*` is not used. The provider retries failed requests itself, and logs a warning at startup if these options are set.
+- Keep-alive connections stay enabled unless `request.keep_alive.disable` is set to `true`.
+- For Azure Active Directory, `timeout` defaults to 90 seconds, and the `expand.*` options are not supported.
+
+In earlier patch releases of 9.5 and 9.6, these settings were ignored when `use_minimal_state` is `true`.
 
 
 ## Common options [filebeat-input-entity-analytics-common-options]
@@ -353,6 +368,8 @@ The set of directory attributes to request from the Active Directory server when
 #### `ad_paging_size` [_ad_paging_size]
 
 The number of records to request from the Active Directory server for each page, if set.
+
+{applies_to}`stack: preview 9.5.8+` When `use_minimal_state` is `true`, it defaults to `500`.
 
 
 #### `ad_password` [_ad_password]
@@ -761,6 +778,8 @@ stack: preview 9.1.0
 
 Add [user query relationship expansions](https://learn.microsoft.com/en-us/graph/api/resources/user?view=graph-rest-1.0#relationships). This is a map of relationship names to attribute lists. By default this is not set. If an empty relationship list is given, the relationship expansion is the same as the users query.
 
+This option is ignored, with a warning, when `use_minimal_state` is `true`, because the Microsoft Graph user delta query that the minimal-state implementation uses doesn't support `$expand`.
+
 
 #### `expand.groups` [_expand_groups]
 
@@ -770,6 +789,8 @@ stack: preview 9.1.0
 
 Add [group query relationship expansions](https://learn.microsoft.com/en-us/graph/api/resources/group?view=graph-rest-1.0#relationships). This is a map of relationship names to attribute lists. By default this is not set. If an empty relationship list is given, the relationship expansion is the same as the groups query.
 
+This option is ignored, with a warning, when `use_minimal_state` is `true`. The minimal-state implementation doesn't support group relationship expansions.
+
 
 #### `expand.devices` [_expand_devices]
 
@@ -778,6 +799,8 @@ stack: preview 9.1.0
 ```
 
 Add [device query relationship expansions](https://learn.microsoft.com/en-us/graph/api/resources/device?view=graph-rest-1.0#relationships). This is a map of relationship names to attribute lists. By default this is not set. If an empty relationship list is given, the relationship expansion is the same as the devices query.
+
+This option is ignored, with a warning, when `use_minimal_state` is `true`, because the Microsoft Graph device delta query that the minimal-state implementation uses doesn't support `$expand`.
 
 
 #### `enrich_with` [_enrich_with_azuread]
@@ -924,6 +947,8 @@ The `jamf` provider supports the following configuration:
 
 The Jamf tenant host. Field is required.
 
+{applies_to}`stack: preview 9.5.8+` When `use_minimal_state` is `true`, a value that isn't a host name or address, optionally followed by a port, is rejected at startup.
+
 
 #### `jamf_username` [_jamf_username]
 
@@ -939,6 +964,8 @@ The Jamf user password, used for authentication. Field is required.
 
 The number of computer records to collect with each API request. Defaults to [API default](https://developer.jamf.com/jamf-pro/reference/get_preview-computers).
 
+{applies_to}`stack: preview 9.5.8+` When `use_minimal_state` is `true`, a negative value is rejected at startup.
+
 
 #### `sync_interval` [_sync_interval_3]
 
@@ -948,6 +975,31 @@ The interval in which full synchronizations should occur. The interval must be l
 #### `update_interval` [_update_interval_3]
 
 The interval in which incremental updates should occur. The interval must be shorter than the full synchronization interval (`sync_interval`). Expressed as a duration string (e.g., 1m, 3h, 24h). Defaults to `15m` (15 minutes).
+
+#### `request.redirect.forward_headers` [_jamf_request_redirect_forward_headers]
+
+When set to `true`, request headers are forwarded when the API responds with a redirect. Headers listed in `request.redirect.sensitive_headers` are removed on redirects to a different host or port, and on redirects from HTTPS to HTTP. Defaults to `false`.
+
+
+#### `request.redirect.headers_ban_list` [_jamf_request_redirect_headers_ban_list]
+
+When `request.redirect.forward_headers` is `true`, all headers except the ones in this list are forwarded. Defaults to `[]`.
+
+
+#### `request.redirect.sensitive_headers` [_jamf_request_redirect_sensitive_headers]
+```{applies_to}
+stack: ga 9.5+
+```
+
+A list of header names that are removed when a redirect goes to a different host or port, or from HTTPS to HTTP. This stops credentials being sent to an unintended origin. Defaults to `["Authorization", "Proxy-Authorization", "Cookie"]`. A list you set replaces the default list.
+
+Set to `[]` to forward all headers regardless of the redirect target. Do this only if the target shares the authentication domain of the API.
+
+
+#### `request.redirect.max_redirects` [_jamf_request_redirect_max_redirects]
+
+The maximum number of redirects to follow for a request. Defaults to `10`.
+
 
 ### `tracer.enabled` [_tracer_enabled_1]
 
@@ -1279,6 +1331,8 @@ The `okta` provider supports the following configuration:
 
 The Okta domain. Field is required.
 
+{applies_to}`stack: preview 9.5.8+` When `use_minimal_state` is `true`, the domain may start with `https://`, and a value that isn't a host name or address, optionally followed by a port, is rejected at startup.
+
 
 #### `okta_token` [_okta_token]
 
@@ -1335,6 +1389,8 @@ stack: ga 9.2.0
 ```
 
 The OAuth2 token endpoint URL. Typically `https://your-domain.okta.com/oauth2/v1/token`.
+
+{applies_to}`stack: preview 9.5.8+` When `use_minimal_state` is `true`, it must be an absolute `https` URL.
 
 ##### `oauth2.jwk_file`
 
@@ -1400,6 +1456,8 @@ The interval in which incremental updates should occur. The interval must be sho
 
 The time between Okta API rate limit resets. Expressed as a duration string (e.g., 1m, 3h, 24h). Defaults to `1m` (1 minute).
 
+{applies_to}`stack: preview 9.5.8+` When `use_minimal_state` is `true`, it must be positive.
+
 
 #### `batch_size` [_batch_size]
 
@@ -1409,10 +1467,14 @@ stack: preview 9.0.1
 
 The pagination batch size for requests. If it is zero or negative, the API default is used. The default is 200.
 
+{applies_to}`stack: preview 9.5.8+` When `use_minimal_state` is `true`, a negative value is rejected at startup.
+
 
 #### `limit_fixed` [_limit_fixed]
 
 The number of requests to allow in each limit window, if set. This parameter should only be set in exceptional cases. When it is set, rate limit information in API responses will be ignored in favor of the fixed limit. The limit is applied separately to each endpoint. Defaults to unset.
+
+{applies_to}`stack: preview 9.5.8+` When `use_minimal_state` is `true`, it must be positive if set.
 
 
 #### `scratch_dir` [_scratch_dir]
@@ -1422,6 +1484,31 @@ stack: preview 9.5.0
 ```
 
 The directory for the temporary file that holds group membership during a full synchronization. This is only used when `use_minimal_state` is `true`. Defaults to the system temporary directory. The directory must already exist and be writable by Filebeat. Use an absolute path: a relative path is resolved against the working directory of the Filebeat process, not against `path.data`.
+
+
+#### `request.redirect.forward_headers` [_okta_request_redirect_forward_headers]
+
+When set to `true`, request headers are forwarded when the API responds with a redirect. Headers listed in `request.redirect.sensitive_headers` are removed on redirects to a different host or port, and on redirects from HTTPS to HTTP. Defaults to `false`.
+
+
+#### `request.redirect.headers_ban_list` [_okta_request_redirect_headers_ban_list]
+
+When `request.redirect.forward_headers` is `true`, all headers except the ones in this list are forwarded. Defaults to `[]`.
+
+
+#### `request.redirect.sensitive_headers` [_okta_request_redirect_sensitive_headers]
+```{applies_to}
+stack: ga 9.5+
+```
+
+A list of header names that are removed when a redirect goes to a different host or port, or from HTTPS to HTTP. This stops credentials being sent to an unintended origin. Defaults to `["Authorization", "Proxy-Authorization", "Cookie"]`. A list you set replaces the default list.
+
+Set to `[]` to forward all headers regardless of the redirect target. Do this only if the target shares the authentication domain of the API.
+
+
+#### `request.redirect.max_redirects` [_okta_request_redirect_max_redirects]
+
+The maximum number of redirects to follow for a request. Defaults to `10`.
 
 
 #### `tracer.enabled` [_tracer_enabled_2]
@@ -1500,6 +1587,16 @@ A scratch file is removed when the synchronization ends. If Filebeat is killed (
 ### Rate limiting
 
 EntraID APIs may return 429 (Too Many Requests) with `Retry-After` headers. Throttle wait time is additive to baseline sync duration. For example, at 1,000 groups with a policy of one throttle per 50 requests, expect ~20 throttle events adding ~20s total.
+
+### Request retries and timeouts
+
+```{applies_to}
+stack: preview 9.5.8+
+```
+
+The Okta provider retries a request that fails with a server error, a 429 (Too Many Requests) response, a timeout, or an empty or unreadable response, up to five attempts with increasing waits. For a 429 response, it waits as long as the `Retry-After` header says, up to 30 minutes. Requests that enrich individual users share a limit of 20 retries in any five minutes. When an enrichment request still fails, the user is published without that enrichment and the synchronization is incomplete (see [`use_minimal_state`](#_use_minimal_state)).
+
+The Active Directory provider stops waiting for an LDAP request after three minutes, and stops in-flight requests when the input stops.
 
 ### Document size
 

@@ -25,12 +25,13 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"sync"
 
 	"github.com/docker/go-units"
 
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/mime"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 const (
@@ -97,16 +98,35 @@ func readBody(resp *http.Response, maxSampleBytes int) (bodySample string, bodyS
 	return bodySample, respSize, hash, err
 }
 
+// copyBufSize is the buffer size io.Copy uses when it is not given one. The
+// standard library does not export that default (io.copyBuffer hardcodes
+// 32 * 1024), so it is repeated here to keep the same read granularity as
+// before pooling. io.Copy only shrinks its buffer when the source is a
+// *io.LimitedReader itself; here the first copy reads from an io.TeeReader
+// wrapping one, so it always allocated the full size.
+const copyBufSize = 32 * 1024
+
+// copyBufPool holds the buffers readPrefixAndHash copies the body with.
+var copyBufPool = sync.Pool{
+	New: func() any {
+		buf := make([]byte, copyBufSize)
+		return &buf
+	},
+}
+
 func readPrefixAndHash(body io.ReadCloser, maxPrefixSize int) (respSize int, prefix string, hashStr string, err error) {
 	hash := sha256.New()
 
 	var prefixBuf strings.Builder
 
-	n, err := io.Copy(&prefixBuf, io.TeeReader(io.LimitReader(body, int64(maxPrefixSize)), hash))
+	bufp, _ := copyBufPool.Get().(*[]byte)
+	defer copyBufPool.Put(bufp)
+
+	n, err := io.CopyBuffer(&prefixBuf, io.TeeReader(io.LimitReader(body, int64(maxPrefixSize)), hash), *bufp)
 	if err == nil {
 		// finish streaming into hash if the body has not been fully consumed yet
 		var m int64
-		m, err = io.Copy(hash, body)
+		m, err = io.CopyBuffer(hash, body, *bufp)
 		n += m
 	}
 
