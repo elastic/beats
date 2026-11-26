@@ -9,12 +9,15 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
+	"encoding/pem"
 	"errors"
 	"fmt"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
@@ -938,6 +941,50 @@ func TestConcurrentResolveAndClose(t *testing.T) {
 
 	assert.Empty(t, s.client.Token(), "client token must stay cleared")
 	assert.Empty(t, s.cache, "cache must stay empty")
+}
+
+func TestPluginRecoversAfterCAFileAppears(t *testing.T) {
+	fv := newFakeVault(t)
+	srv := httptest.NewTLSServer(http.HandlerFunc(fv.handle))
+	t.Cleanup(srv.Close)
+	caPath := filepath.Join(t.TempDir(), "ca.pem")
+	entry := tokenEntry(srv.URL)
+	entry["type"], entry["name"] = storeType, "main"
+	entry["ssl"] = map[string]any{"certificate_authorities": []string{caPath}}
+	cfg, err := conf.NewConfigFrom(map[string]any{
+		"type":                 "http",
+		"password":             "vault://main@myapp/creds#password",
+		secretstores.ConfigKey: []any{entry},
+	})
+	require.NoError(t, err, "monitor config must be valid")
+
+	logger := logptest.NewTestingLogger(t, "")
+	inner := plugin.PluginFactory{
+		Name: "test",
+		Make: func(_ string, cfg *conf.C, info beat.Info) (plugin.Plugin, error) {
+			password, err := cfg.String("password", -1)
+			require.NoError(t, err, "resolved password must be readable")
+			assert.Equal(t, testPassword, password, "plugin must receive the resolved secret")
+			return plugin.Plugin{
+				Endpoints: 1,
+				Logger:    info.Logger,
+				Jobs:      []jobs.Job{func(*beat.Event) ([]jobs.Job, error) { return nil, nil }},
+			}, nil
+		},
+	}
+	wrapped := secretstores.NewResolver(logger).WrapFactory(inner, secretstores.NewRedactor())
+	p, err := wrapped.Make("test", cfg, beat.Info{Logger: logger})
+	require.NoError(t, err, "store creation failure must be deferred to scheduled runs")
+	t.Cleanup(func() { assert.NoError(t, p.Close(), "plugin must close successfully") })
+	_, err = p.Jobs[0](&beat.Event{})
+	require.ErrorContains(t, err, "initial CA load failed", "missing CA must prevent store creation")
+
+	cert := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: srv.Certificate().Raw})
+	require.NoError(t, os.WriteFile(caPath, cert, 0600), "CA file must be provisioned")
+	_, err = p.Jobs[0](&beat.Event{})
+	require.NoError(t, err, "next run must recover without updating the config")
+	_, reads := fv.counts()
+	assert.Equal(t, 1, reads, "recovered store must read the secret")
 }
 
 func TestVaultStoreEvictedAndRevokedOnPluginClose(t *testing.T) {

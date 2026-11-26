@@ -160,6 +160,17 @@ func (p *secretPlugin) current(job int) (plugin.Plugin, error) {
 		p.mu.Unlock()
 		return plugin.Plugin{}, errPluginClosed
 	}
+	// Store creation can recover, for example after a missing CA file appears.
+	if p.pinErr != nil {
+		removed := p.syncStoresLocked(p.config)
+		p.mu.Unlock()
+		p.stores.release(p.logger, removed...)
+		p.mu.Lock()
+		if p.closed {
+			p.mu.Unlock()
+			return plugin.Plugin{}, errPluginClosed
+		}
+	}
 	if p.pinErr != nil {
 		err := p.pinErr
 		p.mu.Unlock()
