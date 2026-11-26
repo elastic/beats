@@ -86,7 +86,7 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/elastic-agent-client/v7 v7.20.0
 	github.com/elastic/elastic-transport-go/v8 v8.9.0
-	github.com/elastic/entcollect v0.0.0-20260916061436-646037f10512
+	github.com/elastic/entcollect v0.0.0-20261113091743-3520586d133a
 	github.com/elastic/go-concert v0.3.1
 	github.com/elastic/go-elasticsearch/v8 v8.19.7
 	github.com/elastic/go-freelru v0.16.0

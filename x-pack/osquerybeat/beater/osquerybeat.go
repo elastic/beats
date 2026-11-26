@@ -148,6 +148,9 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
+	if err := config.CheckFIPS(c.Inputs); err != nil {
+		return nil, fmt.Errorf("unsupported configuration: %w", err)
+	}
 	installCfg := config.GetOsqueryInstallConfig(c.Inputs)
 	var err error
 	installCfg, err = installCfg.NormalizeAndValidate()
@@ -1122,8 +1125,11 @@ func (bt *osquerybeat) configurePublishers(inputs []config.InputConfig) error {
 
 // validatePolicy dry-runs the policy steps of configurePublishers and
 // runOsquery, so that a policy that would fail them is rejected before any of
-// it is applied.
+// it is applied. It also rejects settings that the build does not support.
 func validatePolicy(ctx context.Context, log *logp.Logger, inputs []config.InputConfig) error {
+	if err := config.CheckFIPS(inputs); err != nil {
+		return fmt.Errorf("unsupported configuration: %w", err)
+	}
 	if _, err := config.GetPublishingConfig(inputs); err != nil {
 		return err
 	}
