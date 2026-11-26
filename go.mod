@@ -65,7 +65,7 @@ require (
 	github.com/elastic/go-seccomp-bpf v1.6.0
 	github.com/elastic/go-structform v0.0.12
 	github.com/elastic/go-sysinfo v1.15.5
-	github.com/elastic/go-ucfg v0.9.2
+	github.com/elastic/go-ucfg v0.9.3
 	github.com/elastic/gosigar v0.14.4
 	github.com/fatih/color v1.18.0
 	github.com/fearful-symmetry/gorapl v0.0.4
@@ -134,7 +134,6 @@ require (
 	google.golang.org/grpc v1.85.0
 	google.golang.org/protobuf v1.36.12
 	gopkg.in/inf.v0 v0.9.1
-	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools/gotestsum v1.7.0
 	howett.net/plist v1.0.1
 	k8s.io/api v0.37.1
