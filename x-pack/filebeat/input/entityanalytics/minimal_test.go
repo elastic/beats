@@ -820,16 +820,10 @@ func runUntil(t *testing.T, mi *minimalStateInput, done func([]statusUpdate) boo
 	go func() {
 		runErr <- mi.Run(
 			v2.Context{
-<<<<<<< HEAD
-				Logger:      logptest.NewTestingLogger(t, "test"),
-				ID:          "test-" + t.Name(),
-				Cancelation: v2.GoContextFromCanceler(ctx),
-=======
 				Logger: logptest.NewTestingLogger(t, "test"),
 				// The ID names the store file, so it can't contain a slash.
 				ID:          "test-" + strings.ReplaceAll(t.Name(), "/", "_"),
-				Cancelation: ctx,
->>>>>>> 4d549bc (x-pack/filebeat/input/entityanalytics: bump entcollect and commit incomplete syncs (#54769))
+				Cancelation: v2.GoContextFromCanceler(ctx),
 			}.WithStatusReporter(reporter),
 			&fakeConnector{client: &ackingClient{inner: &fakeClient{}}},
 		)
