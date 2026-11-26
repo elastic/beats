@@ -17,6 +17,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 
 	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/identityfederation"
 )
 
 const (
@@ -72,8 +73,15 @@ func newMetricsClient(cfg Config, logger *logp.Logger) (*metricsClient, error) {
 	clientOpts := &policy.ClientOptions{}
 
 	var perCall, perRetry []policy.Policy
-	switch cfg.AuthType {
-	case AuthTypeClientSecret:
+	switch {
+	case cfg.UseCloudConnectors:
+		logger.Debug("Using identity federation (WII) authentication for App Insights")
+		cred, err := identityfederation.AzureNewWIIClientAssertionCredentialFromEnv(cfg.TenantId, cfg.ClientId, nil, logger)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create identity federation credential: %w", err)
+		}
+		perRetry = append(perRetry, runtime.NewBearerTokenPolicy(cred, []string{appInsightsScope}, nil))
+	case cfg.AuthType == AuthTypeClientSecret:
 		logger.Debug("Using client secret authentication for App Insights")
 		cred, err := azidentity.NewClientSecretCredential(cfg.TenantId, cfg.ClientId, cfg.ClientSecret, nil)
 		if err != nil {

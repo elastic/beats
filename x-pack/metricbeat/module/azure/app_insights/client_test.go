@@ -136,6 +136,34 @@ func TestConfigValidate(t *testing.T) {
 			wantErr: "client_secret is required when auth_type is client_secret",
 		},
 		{
+			name: "valid config with use_cloud_connectors",
+			config: Config{
+				ApplicationId:      "app-id",
+				TenantId:           "tenant-id",
+				ClientId:           "client-id",
+				UseCloudConnectors: true,
+			},
+			wantErr: "",
+		},
+		{
+			name: "invalid config - use_cloud_connectors missing tenant_id",
+			config: Config{
+				ApplicationId:      "app-id",
+				ClientId:           "client-id",
+				UseCloudConnectors: true,
+			},
+			wantErr: "tenant_id is required when use_cloud_connectors is true",
+		},
+		{
+			name: "invalid config - use_cloud_connectors missing client_id",
+			config: Config{
+				ApplicationId:      "app-id",
+				TenantId:           "tenant-id",
+				UseCloudConnectors: true,
+			},
+			wantErr: "client_id is required when use_cloud_connectors is true",
+		},
+		{
 			name: "invalid config - unknown auth_type",
 			config: Config{
 				ApplicationId: "app-id",
