@@ -84,7 +84,7 @@ require (
 	github.com/eapache/go-resiliency v1.7.0
 	github.com/eclipse/paho.mqtt.golang v1.5.1
 	github.com/elastic/bayeux v1.0.5
-	github.com/elastic/elastic-agent-client/v7 v7.20.0
+	github.com/elastic/elastic-agent-client/v7 v7.21.0
 	github.com/elastic/elastic-transport-go/v8 v8.9.0
 	github.com/elastic/entcollect v0.0.0-20261113091743-3520586d133a
 	github.com/elastic/go-concert v0.3.1
@@ -361,7 +361,6 @@ require (
 	github.com/eapache/go-xerial-snappy v0.0.0-20230731223053-c322873962e3 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
 	github.com/ebitengine/purego v0.11.2 // indirect
-	github.com/elastic/elastic-agent-libs v0.7.2 // indirect
 	github.com/elastic/go-docappender/v2 v2.15.0 // indirect
 	github.com/elazarl/goproxy/ext v0.0.0-20240909085733-6741dbfc16a1 // indirect
 	github.com/emicklei/go-restful/v3 v3.13.0 // indirect
