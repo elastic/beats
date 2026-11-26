@@ -408,6 +408,7 @@ func TestConfigOauth2Validation(t *testing.T) {
 					"azure.tenant_id":            "a_tenant_id",
 					"azure.use_cloud_connectors": true,
 					"client.id":                  "a_client_id",
+					"scopes":                     []string{"https://management.azure.com/.default"},
 				},
 			},
 		},
@@ -417,6 +418,32 @@ func TestConfigOauth2Validation(t *testing.T) {
 				"auth.oauth2": map[string]any{
 					"provider":                   "azure",
 					"token_url":                  "localhost",
+					"azure.use_cloud_connectors": true,
+					"client.id":                  "a_client_id",
+					"azure.resource":             "https://api.securitycenter.windows.com/",
+				},
+			},
+		},
+		{
+			name:        "azure with use_cloud_connectors and tenant_id needs scopes",
+			expectedErr: "azure.use_cloud_connectors requires scopes, or token_url with azure.resource accessing 'auth.oauth2'",
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
+					"provider":                   "azure",
+					"azure.tenant_id":            "a_tenant_id",
+					"azure.use_cloud_connectors": true,
+					"client.id":                  "a_client_id",
+				},
+			},
+		},
+		{
+			name:        "azure with use_cloud_connectors and tenant_id does not accept only resource",
+			expectedErr: "azure.use_cloud_connectors requires scopes, or token_url with azure.resource accessing 'auth.oauth2'",
+			input: map[string]any{
+				"auth.oauth2": map[string]any{
+					"provider":                   "azure",
+					"azure.tenant_id":            "a_tenant_id",
+					"azure.resource":             "https://management.azure.com/",
 					"azure.use_cloud_connectors": true,
 					"client.id":                  "a_client_id",
 				},
