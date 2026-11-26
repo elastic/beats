@@ -3,163 +3,16 @@ module github.com/elastic/beats/v7
 go 1.27.4
 
 require (
-<<<<<<< HEAD
-	cloud.google.com/go/bigquery v1.85.0
-	cloud.google.com/go/monitoring v1.31.0
-	cloud.google.com/go/pubsub v1.51.1
-	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
-	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
-	code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a // indirect
-	github.com/Azure/azure-event-hubs-go/v3 v3.6.2
-	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible // indirect
-	github.com/Azure/go-autorest/autorest v0.11.30
-	github.com/Azure/go-autorest/autorest/date v0.3.1
-	github.com/Masterminds/semver v1.5.0
-	github.com/Microsoft/go-winio v0.6.4
-	github.com/PaesslerAG/gval v1.2.2
-	github.com/PaesslerAG/jsonpath v0.1.1
-	github.com/StackExchange/wmi v1.2.1
-	github.com/akavel/rsrc v0.10.2 // indirect
-	github.com/apoydence/eachers v0.0.0-20181020210610-23942921fe77 // indirect
-	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
-	github.com/aws/aws-sdk-go-v2 v1.47.5
-	github.com/aws/aws-sdk-go-v2/config v1.33.13
-	github.com/aws/aws-sdk-go-v2/credentials v1.20.13
-	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.73.3
-	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.89.3
-	github.com/aws/aws-sdk-go-v2/service/costexplorer v1.74.1
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.339.0
-	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.63.4
-	github.com/aws/aws-sdk-go-v2/service/iam v1.64.4
-	github.com/aws/aws-sdk-go-v2/service/organizations v1.62.0
-	github.com/aws/aws-sdk-go-v2/service/rds v1.130.3
-	github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.41.4
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.114.3
-	github.com/aws/aws-sdk-go-v2/service/sqs v1.52.4
-	github.com/aws/aws-sdk-go-v2/service/sts v1.51.6
-	github.com/blakesmith/ar v0.0.0-20150311145944-8bd4349a67f2
-	github.com/cavaliergopher/rpm v1.2.0
-	github.com/cespare/xxhash/v2 v2.3.0
-	github.com/cloudfoundry-community/go-cfclient v0.0.0-20190808214049-35bcce23fc5f
-	github.com/cloudfoundry/noaa v2.1.0+incompatible
-	github.com/cloudfoundry/sonde-go v0.0.0-20171206171820-b33733203bb4
-	github.com/containerd/fifo v1.1.0
-	github.com/coreos/go-systemd/v22 v22.7.0
-	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f
-	github.com/devigned/tab v0.1.2-0.20190607222403-0c15cf42f9a2
-	github.com/digitalocean/go-libvirt v0.0.0-20240709142323-d8406205c752
-	github.com/docker/go-connections v0.7.0
-	github.com/docker/go-plugins-helpers v0.0.0-20181025120712-1e6269c305b8
-	github.com/docker/go-units v0.5.0
-	github.com/dop251/goja v0.0.0-20200831102558-9af81ddcf0e1
-	github.com/dop251/goja_nodejs v0.0.0-20171011081505-adff31b136e6
-	github.com/dustin/go-humanize v1.0.1
-	github.com/eapache/go-resiliency v1.7.0
-	github.com/eclipse/paho.mqtt.golang v1.5.1
-	github.com/elastic/elastic-agent-client/v7 v7.20.0
-	github.com/elastic/go-concert v0.3.1
-	github.com/elastic/go-libaudit/v2 v2.6.2
-	github.com/elastic/go-licenser v0.4.2
-	github.com/elastic/go-lookslike v1.0.1
-	github.com/elastic/go-lumber v0.2.0
-	github.com/elastic/go-perf v0.0.0-20260224073651-af0ee0c731b7
-	github.com/elastic/go-seccomp-bpf v1.6.0
-	github.com/elastic/go-structform v0.0.12
-	github.com/elastic/go-sysinfo v1.15.5
-	github.com/elastic/go-ucfg v0.9.2
-	github.com/elastic/gosigar v0.14.4
-	github.com/fatih/color v1.18.0
-	github.com/fearful-symmetry/gorapl v0.0.4
-	github.com/fsnotify/fsevents v0.1.1
-	github.com/fsnotify/fsnotify v1.10.1
-	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
-	github.com/go-sql-driver/mysql v1.10.0
-	github.com/go-viper/mapstructure/v2 v2.5.0
-	github.com/gocarina/gocsv v0.0.0-20170324095351-ffef3ffc77be
-	github.com/godbus/dbus/v5 v5.2.2
-	github.com/godror/godror v0.51.4
-	github.com/gofrs/flock v0.13.0
-	github.com/gogo/protobuf v1.3.2
-	github.com/gohugoio/hashstructure v0.5.0
-	github.com/golang/snappy v1.0.0
-	github.com/gomodule/redigo v1.9.3
-	github.com/google/flatbuffers v25.12.19+incompatible
-	github.com/google/go-cmp v0.7.0
-	github.com/google/gopacket v1.1.19
-	github.com/google/uuid v1.6.0 // indirect
-	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
-	github.com/h2non/filetype v1.1.1
-	github.com/hashicorp/go-retryablehttp v0.7.8
-	github.com/hashicorp/nomad/api v0.0.0-20260528135333-5b027732945f
-	github.com/hectane/go-acl v0.0.0-20190604041725-da78bae5fc95
-	github.com/insomniacslk/dhcp v0.0.0-20251020182700-175e84fbb167
-	github.com/jonboulle/clockwork v0.2.2
-	github.com/josephspurrier/goversioninfo v1.5.0
-	github.com/jpillora/backoff v1.0.0 // indirect
-	github.com/lib/pq v1.12.3
-	github.com/magefile/mage v1.17.2
-	github.com/mattn/go-colorable v0.1.14
-	github.com/miekg/dns v1.1.72
-	github.com/moby/moby/v2 v2.0.0-beta.14
-	github.com/osquery/osquery-go v0.0.0-20260226222546-0cc22f415e57
-	github.com/pkg/errors v0.9.1
-	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
-	github.com/prometheus/client_model v0.6.3 // indirect
-	github.com/prometheus/common v0.72.1
-	github.com/prometheus/procfs v0.22.0
-	github.com/rcrowley/go-metrics v0.0.0-20250401214520-65e299d6c5c9
-	github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e // indirect
-	github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54
-	github.com/shopspring/decimal v1.4.0
-	github.com/spf13/cobra v1.10.2
-	github.com/spf13/pflag v1.0.10
-	github.com/stretchr/testify v1.12.1
-	github.com/ugorji/go/codec v1.1.8
-	github.com/vmware/govmomi v0.56.2
-	go.elastic.co/ecszap v1.0.3
-	go.elastic.co/go-licence-detector v0.11.1
-	go.etcd.io/bbolt v1.5.0
-	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.28.0
-	golang.org/x/crypto v0.58.0
-	golang.org/x/mod v0.42.0
-	golang.org/x/net v0.62.0
-	golang.org/x/oauth2 v0.37.0
-	golang.org/x/sync v0.24.0
-	golang.org/x/sys v0.49.0
-	golang.org/x/text v0.43.0
-	golang.org/x/time v0.16.0
-	golang.org/x/tools v0.51.0
-	google.golang.org/api v0.288.0
-	google.golang.org/genproto v0.0.0-20260715232425-e75dac1f907d // indirect
-	google.golang.org/grpc v1.85.0
-	google.golang.org/protobuf v1.36.12
-	gopkg.in/inf.v0 v0.9.1
-	gopkg.in/yaml.v2 v2.4.0
-	gotest.tools/gotestsum v1.7.0
-	howett.net/plist v1.0.1
-	k8s.io/api v0.37.1
-	k8s.io/apimachinery v0.37.1
-	k8s.io/client-go v0.37.1
-	kernel.org/pub/linux/libs/security/libcap/cap v1.2.57
-)
-
-require (
-	cloud.google.com/go v0.123.0
-	cloud.google.com/go/compute v1.72.0
-	cloud.google.com/go/redis v1.26.0
-=======
 	cel.dev/cel-go v0.32.0
 	cloud.google.com/go v0.123.0
-	cloud.google.com/go/bigquery v1.86.0
-	cloud.google.com/go/compute v1.74.0
-	cloud.google.com/go/monitoring v1.32.0
+	cloud.google.com/go/bigquery v1.85.0
+	cloud.google.com/go/compute v1.72.0
+	cloud.google.com/go/monitoring v1.31.0
 	cloud.google.com/go/pubsub v1.51.1
-	cloud.google.com/go/redis v1.28.0
-	cloud.google.com/go/storage v1.70.0
+	cloud.google.com/go/redis v1.26.0
+	cloud.google.com/go/storage v1.69.0
 	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
 	github.com/Azure/azure-event-hubs-go/v3 v3.6.2
->>>>>>> 3a323f1 (chore(deps): update Go to 1.27.4 (#54741))
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.23.3
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.15.0
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/v2 v2.0.2
@@ -237,17 +90,12 @@ require (
 	github.com/elastic/go-concert v0.3.1
 	github.com/elastic/go-elasticsearch/v8 v8.19.7
 	github.com/elastic/go-freelru v0.16.0
-<<<<<<< HEAD
-	github.com/elastic/go-quark v0.9.0
-	github.com/elastic/go-sfdc v0.0.0-20260504130806-a46e22d049d9
-	github.com/elastic/mito v1.28.2
-=======
 	github.com/elastic/go-libaudit/v2 v2.6.2
 	github.com/elastic/go-licenser v0.4.2
 	github.com/elastic/go-lookslike v1.0.1
 	github.com/elastic/go-lumber v0.2.0
 	github.com/elastic/go-perf v0.0.0-20260224073651-af0ee0c731b7
-	github.com/elastic/go-quark v0.10.0
+	github.com/elastic/go-quark v0.9.0
 	github.com/elastic/go-seccomp-bpf v1.6.0
 	github.com/elastic/go-sfdc v0.0.0-20260504130806-a46e22d049d9
 	github.com/elastic/go-structform v0.0.12
@@ -257,8 +105,7 @@ require (
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/elastic/gosigar v0.14.4
 	github.com/elastic/lumberjack v0.0.0-20260715013204-c5b60bbeaaab
-	github.com/elastic/mito v1.29.0
->>>>>>> 3a323f1 (chore(deps): update Go to 1.27.4 (#54741))
+	github.com/elastic/mito v1.28.2
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
 	github.com/elastic/sarama v1.19.1-0.20261105163725-10d0ecc585be
 	github.com/elastic/tk-btf v0.3.0
@@ -269,7 +116,7 @@ require (
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/go-git/go-billy/v5 v5.9.2
 	github.com/go-git/go-git/v5 v5.19.3
-	github.com/go-jose/go-jose/v4 v4.1.6
+	github.com/go-jose/go-jose/v4 v4.1.4
 	github.com/go-ldap/ldap/v3 v3.4.13
 	github.com/go-logr/logr v1.4.4
 	github.com/go-ole/go-ole v1.3.0
@@ -359,10 +206,7 @@ require (
 	go.opentelemetry.io/collector/component/componentstatus v0.165.0
 	go.opentelemetry.io/collector/component/componenttest v0.165.0
 	go.opentelemetry.io/collector/config/configauth v1.71.0
-	go.opentelemetry.io/collector/config/configcompression v1.71.0
 	go.opentelemetry.io/collector/config/confighttp v1.71.0
-	go.opentelemetry.io/collector/config/configmiddleware v1.71.0
-	go.opentelemetry.io/collector/config/configopaque v1.71.0
 	go.opentelemetry.io/collector/config/configoptional v1.71.0
 	go.opentelemetry.io/collector/config/configtls v1.71.0
 	go.opentelemetry.io/collector/confmap v1.71.0
@@ -416,7 +260,7 @@ require (
 	golang.org/x/text v0.43.0
 	golang.org/x/time v0.16.0
 	golang.org/x/tools v0.51.0
-	google.golang.org/api v0.307.0
+	google.golang.org/api v0.288.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260928230214-8a89bd6388cc
 	google.golang.org/grpc v1.85.0
 	google.golang.org/protobuf v1.36.12
@@ -442,16 +286,10 @@ require (
 	cloud.google.com/go/auth v0.24.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.3.0 // indirect
 	cloud.google.com/go/compute/metadata v0.10.0 // indirect
-<<<<<<< HEAD
 	cloud.google.com/go/iam v1.14.0 // indirect
 	cloud.google.com/go/longrunning v1.3.0 // indirect
 	cloud.google.com/go/pubsub/v2 v2.7.0 // indirect
-=======
-	cloud.google.com/go/iam v1.15.0 // indirect
-	cloud.google.com/go/longrunning v1.4.0 // indirect
-	cloud.google.com/go/pubsub/v2 v2.8.0 // indirect
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
->>>>>>> 3a323f1 (chore(deps): update Go to 1.27.4 (#54741))
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f // indirect
 	code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a // indirect
 	dario.cat/mergo v1.0.2 // indirect
@@ -533,11 +371,7 @@ require (
 	github.com/foxboron/go-tpm-keyfiles v0.0.0-20260902202739-8c9c2d1005f4 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.4 // indirect
 	github.com/go-asn1-ber/asn1-ber v1.5.8-0.20250403174932-29230038a667 // indirect
-<<<<<<< HEAD
-	github.com/go-jose/go-jose/v4 v4.1.4
-=======
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
->>>>>>> 3a323f1 (chore(deps): update Go to 1.27.4 (#54741))
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/jsonpointer v1.0.1 // indirect
@@ -569,12 +403,8 @@ require (
 	github.com/google/licenseclassifier v0.0.0-20260218193730-3cfbab2d0e0d // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
-<<<<<<< HEAD
-	github.com/googleapis/enterprise-certificate-proxy v0.3.17 // indirect
-=======
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/googleapis/enterprise-certificate-proxy v0.3.23 // indirect
->>>>>>> 3a323f1 (chore(deps): update Go to 1.27.4 (#54741))
+	github.com/googleapis/enterprise-certificate-proxy v0.3.17 // indirect
 	github.com/grafana/regexp v0.0.0-20250905093917-f7b3be9d1853 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.31.0 // indirect
 	github.com/hashicorp/cronexpr v1.1.3 // indirect
@@ -676,14 +506,10 @@ require (
 	go.elastic.co/fastjson v1.5.1 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
-<<<<<<< HEAD
 	go.opentelemetry.io/collector/config/configcompression v1.71.0 // indirect
 	go.opentelemetry.io/collector/config/configmiddleware v1.71.0 // indirect
 	go.opentelemetry.io/collector/config/confignet v1.71.0 // indirect
 	go.opentelemetry.io/collector/config/configopaque v1.71.0 // indirect
-=======
-	go.opentelemetry.io/collector/config/confignet v1.71.0 // indirect
->>>>>>> 3a323f1 (chore(deps): update Go to 1.27.4 (#54741))
 	go.opentelemetry.io/collector/config/configretry v1.71.0 // indirect
 	go.opentelemetry.io/collector/config/configtelemetry v0.165.0 // indirect
 	go.opentelemetry.io/collector/confmap/xconfmap v0.165.0 // indirect
@@ -734,12 +560,8 @@ require (
 	golang.org/x/telemetry v0.0.0-20260924152758-ed294f943157 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	gonum.org/v1/gonum v0.17.0 // indirect
-<<<<<<< HEAD
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260928230214-8a89bd6388cc // indirect
-=======
 	google.golang.org/genproto v0.0.0-20260715232425-e75dac1f907d // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20261019180522-ce908d29299b // indirect
->>>>>>> 3a323f1 (chore(deps): update Go to 1.27.4 (#54741))
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260928230214-8a89bd6388cc // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	k8s.io/klog/v2 v2.140.0 // indirect
@@ -753,16 +575,6 @@ require (
 	sigs.k8s.io/yaml v1.6.0 // indirect
 )
 
-<<<<<<< HEAD
-require (
-	cloud.google.com/go/storage v1.69.0
-	github.com/PaloAltoNetworks/pango v0.10.2
-	github.com/dlclark/regexp2 v1.4.0 // indirect
-	github.com/yuin/gopher-lua v1.1.1 // indirect
-)
-
-=======
->>>>>>> 3a323f1 (chore(deps): update Go to 1.27.4 (#54741))
 replace (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption => github.com/elastic/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0-elastic
 	github.com/apoydence/eachers => github.com/poy/eachers v0.0.0-20181020210610-23942921fe77 //indirect, see https://github.com/elastic/beats/pull/29780 for details.
