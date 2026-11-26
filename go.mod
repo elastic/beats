@@ -230,7 +230,7 @@ require (
 	github.com/apache/arrow-go/v18 v18.7.0
 	github.com/cilium/ebpf v0.22.0
 	github.com/coder/websocket v1.8.14
-	github.com/elastic/entcollect v0.0.0-20260916061436-646037f10512
+	github.com/elastic/entcollect v0.0.0-20261113091743-3520586d133a
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/elastic/lumberjack v0.0.0-20260715013204-c5b60bbeaaab
 	github.com/go-git/go-billy/v5 v5.9.2
