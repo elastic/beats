@@ -124,11 +124,9 @@ func TestStopTracker(t *testing.T) {
 		tr := newStopTracker(3, func() { calls.Add(1) })
 		var wg sync.WaitGroup
 		for i := range 3 {
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
+			wg.Go(func() {
 				tr.stopped(fmt.Sprint(i))
-			}()
+			})
 		}
 		wg.Wait()
 		assert.Equal(t, int32(1), calls.Load(), "stop should be called exactly once")
