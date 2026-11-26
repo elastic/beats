@@ -213,6 +213,7 @@ steps:
           - x-pack/auditbeat
           - x-pack/filebeat
           - x-pack/metricbeat
+          - x-pack/osquerybeat
 
       - label: "SNAPSHOT: {{matrix}} Linux/arm64 and Windows/arm64 FIPS"
         env:
@@ -240,6 +241,7 @@ steps:
           - x-pack/auditbeat
           - x-pack/filebeat
           - x-pack/metricbeat
+          - x-pack/osquerybeat
 
   - group: Packaging Staging
     key: packaging-staging
@@ -351,6 +353,7 @@ steps:
           - x-pack/auditbeat
           - x-pack/filebeat
           - x-pack/metricbeat
+          - x-pack/osquerybeat
 
       - label: "STAGING: {{matrix}} Linux/arm64 and Windows/arm64 FIPS"
         env:
@@ -380,6 +383,7 @@ steps:
           - x-pack/auditbeat
           - x-pack/filebeat
           - x-pack/metricbeat
+          - x-pack/osquerybeat
 
   - group: DRA publish
     key: dra

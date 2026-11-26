@@ -14,6 +14,13 @@ shared:
     url: '{{.BeatURL}}'
     description: '{{.BeatDescription}}'
 
+  # The FIPS packages have the same content as the others. They are named
+  # osquerybeat-fips, and are built only when FIPS=true.
+  - &common_fips
+    <<: *common
+    name: '{{.BeatName}}-fips'
+    fips: true
+
   - &binary_files
     '{{.BeatName}}{{.BinaryExt}}':
       source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
@@ -61,6 +68,18 @@ shared:
 
   - &windows_binary_spec
     <<: *common
+    files:
+      <<: *binary_files
+      <<: *windows_binary_files
+
+  - &unix_binary_spec_fips
+    <<: *common_fips
+    files:
+      <<: *binary_files
+      <<: *unix_binary_files
+
+  - &windows_binary_spec_fips
+    <<: *common_fips
     files:
       <<: *binary_files
       <<: *windows_binary_files
@@ -129,6 +148,50 @@ specs:
       types: [tgz]
       spec:
         <<: *unix_binary_spec
+        <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    ###
+    # FIPS packages. These are only for the platforms that FIPS builds support
+    # (see dev-tools/mage/fips-settings.yaml), so there is no macOS package.
+    ###
+    - os: windows
+      arch: amd64
+      types: [zip]
+      spec:
+        <<: *windows_binary_spec_fips
+        <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    - os: windows
+      arch: arm64
+      types: [zip]
+      spec:
+        <<: *windows_binary_spec_fips
+        <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    - os: linux
+      arch: amd64
+      types: [tgz]
+      spec:
+        <<: *unix_binary_spec_fips
+        <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    - os: linux
+      arch: arm64
+      types: [tgz]
+      spec:
+        <<: *unix_binary_spec_fips
         <<: *elastic_license_for_binaries
         files:
           '{{.BeatName}}{{.BinaryExt}}':
