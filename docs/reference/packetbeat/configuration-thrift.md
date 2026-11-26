@@ -84,7 +84,7 @@ If this option is set to true, Packetbeat replaces all strings found in method p
 
 ### `drop_after_n_struct_fields` [_drop_after_n_struct_fields]
 
-The maximum number of fields that a structure can have before Packetbeat ignores the whole transaction. This is a memory protection mechanism (so that Packetbeat’s memory doesn’t grow indefinitely), so you would typically set this to a relatively high value. The default is 500.
+The maximum number of fields that a structure can have before Packetbeat ignores the whole transaction. This is a memory protection mechanism (so that Packetbeat’s memory doesn’t grow indefinitely), so you would typically set this to a relatively high value. The default is 500. Packetbeat also ignores a message whose values nest structs, lists, sets or maps more than 64 levels deep. This limit is fixed.
 
 
 

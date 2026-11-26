@@ -1,0 +1,8 @@
+kind: bug-fix
+summary: Limit nesting depth in the Packetbeat Thrift parser.
+description: |
+  The Thrift parser followed nested structs, lists, sets and maps without
+  limit. A stream with very deep nesting could overflow the stack,
+  which is a fatal error that terminated Packetbeat. Messages containing
+  values nested more than 64 levels deep are now dropped.
+component: packetbeat

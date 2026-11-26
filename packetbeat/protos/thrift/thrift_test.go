@@ -20,16 +20,19 @@
 package thrift
 
 import (
+	"bytes"
 	"encoding/hex"
 	"fmt"
 	"net"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
 	"github.com/elastic/beats/v7/pkg/logp"
 )
 
@@ -423,6 +426,132 @@ func TestThrift_thriftReadField(t *testing.T) {
 			field.value != `(1: 1, 2: {1, 2, 3})` {
 			t.Error("Bad values:", field.id, field.Type, field.value)
 		}
+	}
+}
+
+// TestThrift_nestingDepth checks that deeply nested structs, lists, sets and
+// maps are rejected as parse errors rather than exhausting the stack, which
+// is a fatal error that cannot be recovered.
+func TestThrift_nestingDepth(t *testing.T) {
+	tests := []struct {
+		name string
+		// build returns an encoded value nested n levels deep.
+		build func(n int) []byte
+		read  func(*thriftPlugin, []byte) (string, bool, bool, int)
+	}{
+		{
+			name: "struct",
+			build: func(n int) []byte {
+				return append(bytes.Repeat([]byte("\x0c\x00\x01"), n), make([]byte, n+1)...)
+			},
+			read: func(p *thriftPlugin, b []byte) (string, bool, bool, int) { return p.readStruct(b, 0) },
+		},
+		{
+			name: "list",
+			build: func(n int) []byte {
+				b := bytes.Repeat([]byte("\x0f\x00\x00\x00\x01"), n)
+				return append(b, "\x03\x00\x00\x00\x00"...)
+			},
+			read: func(p *thriftPlugin, b []byte) (string, bool, bool, int) { return p.readList(b, 0) },
+		},
+		{
+			name: "set",
+			build: func(n int) []byte {
+				b := bytes.Repeat([]byte("\x0e\x00\x00\x00\x01"), n)
+				return append(b, "\x03\x00\x00\x00\x00"...)
+			},
+			read: func(p *thriftPlugin, b []byte) (string, bool, bool, int) { return p.readSet(b, 0) },
+		},
+		{
+			name: "map",
+			build: func(n int) []byte {
+				// Each level is a map with one entry: a byte key and a map value.
+				b := bytes.Repeat([]byte("\x03\x0d\x00\x00\x00\x01\x00"), n)
+				return append(b, "\x03\x03\x00\x00\x00\x00"...)
+			},
+			read: func(p *thriftPlugin, b []byte) (string, bool, bool, int) { return p.readMap(b, 0) },
+		},
+		{
+			name: "map_key",
+			build: func(n int) []byte {
+				// Each level is a map with one entry: a map key and a byte value.
+				b := bytes.Repeat([]byte("\x0d\x03\x00\x00\x00\x01"), n)
+				b = append(b, "\x03\x03\x00\x00\x00\x00"...)
+				return append(b, bytes.Repeat([]byte("\x00"), n)...)
+			},
+			read: func(p *thriftPlugin, b []byte) (string, bool, bool, int) { return p.readMap(b, 0) },
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name+"_within_limit", func(t *testing.T) {
+			thrift := thriftForTests()
+			_, ok, complete, _ := test.read(thrift, test.build(maxNestingDepth))
+			assert.True(t, ok, "value nested %d levels should parse", maxNestingDepth)
+			assert.True(t, complete, "value nested %d levels should be complete", maxNestingDepth)
+		})
+		t.Run(test.name+"_beyond_limit", func(t *testing.T) {
+			thrift := thriftForTests()
+			_, ok, _, _ := test.read(thrift, test.build(maxNestingDepth+1))
+			assert.False(t, ok, "value nested %d levels should be rejected", maxNestingDepth+1)
+		})
+		t.Run(test.name+"_stack_exhaustion", func(t *testing.T) {
+			// Without a depth limit this overflows the stack and kills the
+			// test binary.
+			thrift := thriftForTests()
+			_, ok, _, _ := test.read(thrift, test.build(tcp.TCPMaxDataInStream/3))
+			assert.False(t, ok, "extremely deep value should be rejected")
+		})
+	}
+}
+
+// TestThrift_nestingDepthParse checks the nesting limit through Parse, the
+// path used in production, where an argument value is read at depth zero.
+func TestThrift_nestingDepthParse(t *testing.T) {
+	// nested returns a struct containing n levels of structs.
+	var nested func(n int) string
+	nested = func(n int) string {
+		if n == 0 {
+			return "00"
+		}
+		return "0c0001" + nested(n-1) + "00"
+	}
+
+	tests := []struct {
+		name  string
+		depth int
+		want  bool
+	}{
+		{name: "at_limit", depth: maxNestingDepth - 1, want: true},
+		{name: "beyond_limit", depth: maxNestingDepth, want: false},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			thrift := thriftForTests()
+			thrift.publishQueue = make(chan *thriftTransaction, 10)
+			tcptuple := testTCPTuple()
+
+			// The request has one argument holding the nested structs.
+			req := createTestPacket(t, "800100010000000470696e67"+"00000000"+"0c0001"+nested(test.depth)+"00")
+			repl := createTestPacket(t, "800100020000000470696e670000000000")
+
+			priv := thrift.Parse(req, tcptuple, 0, nil)
+			thrift.Parse(repl, tcptuple, 1, nil)
+
+			got := false
+			select {
+			case trans := <-thrift.publishQueue:
+				got = trans.request.method == "ping" && trans.request.params != ""
+			default:
+			}
+			assert.Equal(t, test.want, got, "transaction published for %d nested structs", test.depth)
+
+			if !test.want {
+				data, ok := priv.(thriftPrivateData)
+				require.True(t, ok, "unexpected private data type %T", priv)
+				assert.Nil(t, data.data[0], "stream should be dropped")
+			}
+		})
 	}
 }
 
