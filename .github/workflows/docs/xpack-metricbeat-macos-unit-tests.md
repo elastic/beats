@@ -17,8 +17,8 @@ Builds and runs unit tests for **x-pack metricbeat** on the configured macOS run
 ## When it runs
 
 - `workflow_dispatch`.
-- `pull_request`: paths: `["metricbeat/**", "x-pack/metricbeat/**", "go.mod", "dev-tools/**", "libbeat/**", ".github/workflows/xpack-metricbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
-- `push`: branches: `["main"]`; paths: `["metricbeat/**", "x-pack/metricbeat/**", "go.mod", "dev-tools/**", "libbeat/**", ".github/workflows/xpack-metricbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `pull_request`: paths: `["metricbeat/**", "x-pack/metricbeat/**", "go.mod", ".python-version", "dev-tools/**", "libbeat/**", ".github/workflows/xpack-metricbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `push`: branches: `["main"]`; paths: `["metricbeat/**", "x-pack/metricbeat/**", "go.mod", ".python-version", "dev-tools/**", "libbeat/**", ".github/workflows/xpack-metricbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
 
 ## Execution flow
 

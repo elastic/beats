@@ -17,8 +17,8 @@ Builds and runs unit tests for **x-pack osquerybeat** on the configured macOS ru
 ## When it runs
 
 - `workflow_dispatch`.
-- `pull_request`: paths: `["x-pack/osquerybeat/**", "x-pack/libbeat/**", "go.mod", "dev-tools/**", "libbeat/**", ".github/workflows/xpack-osquerybeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
-- `push`: branches: `["main"]`; paths: `["x-pack/osquerybeat/**", "x-pack/libbeat/**", "go.mod", "dev-tools/**", "libbeat/**", ".github/workflows/xpack-osquerybeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `pull_request`: paths: `["x-pack/osquerybeat/**", "x-pack/libbeat/**", "go.mod", ".python-version", "dev-tools/**", "libbeat/**", ".github/workflows/xpack-osquerybeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `push`: branches: `["main"]`; paths: `["x-pack/osquerybeat/**", "x-pack/libbeat/**", "go.mod", ".python-version", "dev-tools/**", "libbeat/**", ".github/workflows/xpack-osquerybeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
 
 ## Execution flow
 

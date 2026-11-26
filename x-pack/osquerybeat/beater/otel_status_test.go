@@ -5,6 +5,8 @@
 package beater
 
 import (
+	"maps"
+	"slices"
 	"testing"
 	"testing/synctest"
 	"time"
@@ -30,9 +32,15 @@ func TestOsqueryInputStatusFollowsDaemonRecovery(t *testing.T) {
 		}
 		factory := &osqueryInputRunnerFactory{}
 		wrapped := otelstatus.StatusReporterFactory(otelstatus.NewGroupStatusReporter(host))(factory)
+		configs := map[string]*conf.C{}
+		setConfigs := func() {
+			cfgfile.SetRunnerConfigs(wrapped, "test", slices.Collect(maps.Values(configs)))
+		}
 		create := func(id string) cfgfile.Runner {
 			cfg, err := conf.NewConfigFrom(map[string]any{"id": id})
 			require.NoError(t, err, "configure input status identity")
+			configs[id] = cfg
+			setConfigs()
 			runner, err := wrapped.Create(nil, cfg)
 			require.NoError(t, err, "create wrapped status runner")
 			runner.Start()
@@ -49,7 +57,9 @@ func TestOsqueryInputStatusFollowsDaemonRecovery(t *testing.T) {
 			inputs, ok := host.GetEvent().Attributes().Get("inputs")
 			require.True(t, ok, "receiver health must retain input attributes")
 			input, ok := inputs.Map().Get(id)
-			require.True(t, ok, "receiver health must identify input %s", id)
+			if !ok {
+				return ""
+			}
 			state, ok := input.Map().Get("status")
 			require.True(t, ok, "input health must contain status")
 			return state.Str()
@@ -57,17 +67,19 @@ func TestOsqueryInputStatusFollowsDaemonRecovery(t *testing.T) {
 		for _, id := range []string{"result", "response", "added-during-backoff"} {
 			require.Equal(t, componentstatus.StatusRecoverableError.String(), inputState(id), "input %s must inherit daemon degradation", id)
 		}
+		delete(configs, "result")
+		setConfigs()
 		first.Stop()
 		factory.UpdateStatus(status.Running, "Osqueryd configuration applied")
 		settle()
 		require.Equal(t, componentstatus.StatusOK, host.GetEvent().Status(), "replacement readiness must restore receiver health")
-		require.Equal(t, componentstatus.StatusStopped.String(), inputState("result"), "removed inputs must not be revived by recovery")
+		require.Empty(t, inputState("result"), "removed inputs must not be revived by recovery")
 		for _, id := range []string{"response", "added-during-backoff"} {
 			require.Equal(t, componentstatus.StatusOK.String(), inputState(id), "active input %s must recover", id)
 		}
 		factory.UpdateStatus(status.Failed, "osqueryd restart budget exhausted")
 		settle()
 		require.Equal(t, componentstatus.StatusPermanentError, host.GetEvent().Status(), "exhaustion must report failure to the OTel host")
-		require.Equal(t, componentstatus.StatusStopped.String(), inputState("result"), "removed inputs must remain stopped after exhaustion")
+		require.Empty(t, inputState("result"), "removed inputs must not be revived after exhaustion")
 	})
 }

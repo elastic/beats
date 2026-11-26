@@ -5,6 +5,7 @@
 package cel
 
 import (
+	"compress/bzip2"
 	"compress/gzip"
 	"context"
 	"encoding/json"
@@ -59,7 +60,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 	"github.com/elastic/mito/lib"
 )
@@ -162,7 +162,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 
 	metrics, reg := newInputMetrics(env.MetricsRegistry, env.Logger)
 
-	ctx := ctxtool.FromCanceller(env.Cancelation)
+	ctx := env.Cancelation
 	otelTracerProvider := i.tracerProvider
 	if otelTracerProvider == nil {
 		var err error
@@ -1530,7 +1530,9 @@ var (
 	// mimetypes holds supported MIME type mappings.
 	mimetypes = map[string]any{
 		"application/gzip":         func(r io.Reader) (io.Reader, error) { return gzip.NewReader(r) },
+		"application/x-bzip2":      func(r io.Reader) io.Reader { return bzip2.NewReader(r) },
 		"application/x-ndjson":     lib.NDJSON,
+		"application/x-tar":        lib.Tar,
 		"application/zip":          lib.Zip,
 		"text/csv; header=absent":  lib.CSVNoHeader,
 		"text/csv; header=present": lib.CSVHeader,

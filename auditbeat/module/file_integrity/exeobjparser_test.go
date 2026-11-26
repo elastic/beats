@@ -22,11 +22,16 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"maps"
 	"math"
 	"os"
 	"reflect"
+	"slices"
 	"strconv"
+	"strings"
 	"testing"
+
+	"github.com/elastic/toutoumomoma"
 
 	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/testing/testutils"
@@ -54,7 +59,9 @@ func TestExeObjParser(t *testing.T) {
 					}
 				}
 
-				testutils.SkipIfFIPSOnly(t, "file parser uses MD5.")
+				if hashAvailable() {
+					testutils.SkipIfFIPSOnly(t, "file parser uses MD5.")
+				}
 
 				got := make(mapstr.M)
 				err := exeObjParser(nil).Parse(got, target)
@@ -83,6 +90,10 @@ func TestExeObjParser(t *testing.T) {
 				for _, f := range fields {
 					path := format + "." + f.path
 					wantV, wantErr := want[key].GetValue(path)
+					if _, ok := fileParserFor["file."+path]; !ok {
+						// The field is not available in this build.
+						wantV, wantErr = nil, mapstr.ErrKeyNotFound
+					}
 					gotV, gotErr := got.GetValue(path)
 					if gotErr != wantErr {
 						t.Errorf("unexpected error for %s %s: got:%v want:%v", key, path, gotErr, wantErr)
@@ -96,6 +107,109 @@ func TestExeObjParser(t *testing.T) {
 				}
 			})
 		}
+	}
+}
+
+// hashAvailable returns whether the build provides the MD5-based import
+// and symbol hash fields.
+func hashAvailable() bool {
+	_, ok := fileParserFor["file.pe.imphash"]
+	return ok
+}
+
+func TestExeObjParserFields(t *testing.T) {
+	tests := []struct {
+		format    string
+		field     string
+		needsHash bool
+	}{
+		{format: "elf", field: "go_imports_names_var_entropy"},
+		{format: "elf", field: "go_imports_names_entropy"},
+		{format: "elf", field: "go_imports"},
+		{format: "elf", field: "go_import_hash", needsHash: true},
+		{format: "macho", field: "imports_names_var_entropy"},
+		{format: "macho", field: "imports_names_entropy"},
+		{format: "macho", field: "imports"},
+		{format: "macho", field: "symhash", needsHash: true},
+		{format: "macho", field: "import_hash", needsHash: true},
+	}
+	for _, test := range tests {
+		t.Run(test.format+"."+test.field, func(t *testing.T) {
+			target := fmt.Sprintf("./testdata/go_%s_executable", test.format)
+			if _, ci := os.LookupEnv("CI"); ci {
+				if _, err := os.Stat(target); err != nil && errors.Is(err, fs.ErrNotExist) {
+					t.Skip("skipping test because target binary was not found: see https://github.com/elastic/beats/issues/38211")
+				}
+			}
+			if test.needsHash {
+				if !hashAvailable() {
+					t.Skip("hash fields are not available in this build")
+				}
+				testutils.SkipIfFIPSOnly(t, "file parser uses MD5.")
+			}
+
+			got := make(mapstr.M)
+			fields := map[string]bool{"file." + test.format + "." + test.field: true}
+			err := exeObjParser(fields).Parse(got, target)
+			if err != nil {
+				t.Fatalf("unexpected error calling exeObjParser.Parse: %v", err)
+			}
+
+			v, err := got.GetValue(test.format)
+			if err != nil {
+				t.Fatalf("no %s details: %v", test.format, err)
+			}
+			details, ok := v.(mapstr.M)
+			if !ok {
+				t.Fatalf("unexpected type for %s details: %T", test.format, v)
+			}
+			gotKeys := slices.Sorted(maps.Keys(details))
+			want := []string{test.field}
+			if !slices.Equal(gotKeys, want) {
+				t.Errorf("unexpected fields for %s.%s: got:%v want:%v", test.format, test.field, gotKeys, want)
+			}
+		})
+	}
+}
+
+func TestExeObjParserNotGo(t *testing.T) {
+	// The testdata executables are all Go executables, so use a
+	// system executable that is not.
+	const target = "/bin/sh"
+	if _, err := os.Stat(target); err != nil {
+		t.Skipf("skipping test because %s is not available: %v", target, err)
+	}
+
+	f, err := toutoumomoma.Open(target)
+	if err != nil {
+		t.Skipf("skipping test because %s is not a recognised executable: %v", target, err)
+	}
+	typ := strings.ToLower(f.Type())
+	f.Close()
+	if typ == "mach-o" {
+		typ = "macho"
+	}
+
+	fields := map[string]bool{
+		"file." + typ + ".go_imports":  true,
+		"file." + typ + ".go_stripped": true,
+	}
+	got := make(mapstr.M)
+	err = exeObjParser(fields).Parse(got, target)
+	if err != nil {
+		t.Fatalf("unexpected error calling exeObjParser.Parse: %v", err)
+	}
+
+	path := typ + ".go_stripped"
+	v, err := got.GetValue(path)
+	if err != nil {
+		t.Fatalf("no %s for non-Go executable: %v", path, err)
+	}
+	if v != false {
+		t.Errorf("unexpected %s for non-Go executable: got:%v want:false", path, v)
+	}
+	if _, err := got.GetValue(typ + ".go_imports"); err == nil {
+		t.Errorf("unexpected %s.go_imports for non-Go executable", typ)
 	}
 }
 

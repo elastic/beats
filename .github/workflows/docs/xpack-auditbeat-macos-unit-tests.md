@@ -17,8 +17,8 @@ Builds and runs unit tests for **x-pack auditbeat** on the configured macOS runn
 ## When it runs
 
 - `workflow_dispatch`.
-- `pull_request`: paths: `["auditbeat/**", "x-pack/auditbeat/**", "go.mod", "pytest.ini", "dev-tools/**", "libbeat/**", "x-pack/libbeat/**", ".github/workflows/xpack-auditbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
-- `push`: branches: `["main"]`; paths: `["auditbeat/**", "x-pack/auditbeat/**", "go.mod", "pytest.ini", "dev-tools/**", "libbeat/**", "x-pack/libbeat/**", ".github/workflows/xpack-auditbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `pull_request`: paths: `["auditbeat/**", "x-pack/auditbeat/**", "go.mod", ".python-version", "pytest.ini", "dev-tools/**", "libbeat/**", "x-pack/libbeat/**", ".github/workflows/xpack-auditbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
+- `push`: branches: `["main"]`; paths: `["auditbeat/**", "x-pack/auditbeat/**", "go.mod", ".python-version", "pytest.ini", "dev-tools/**", "libbeat/**", "x-pack/libbeat/**", ".github/workflows/xpack-auditbeat-macos-unit-tests.yml", ".github/actions/unit-test/action.yml"]`
 
 ## Execution flow
 
