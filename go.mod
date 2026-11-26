@@ -291,6 +291,7 @@ require (
 	cloud.google.com/go/compute/metadata v0.10.0 // indirect
 	cloud.google.com/go/iam v1.15.0 // indirect
 	cloud.google.com/go/longrunning v1.4.0 // indirect
+	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee //indirect
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f // indirect
 	code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a // indirect
 	dario.cat/mergo v1.0.2 // indirect
