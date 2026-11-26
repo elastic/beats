@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -56,9 +57,10 @@ var errResolve = errors.New("store unavailable")
 var testStore = &switchableStore{}
 
 type switchableStore struct {
-	mtx   sync.Mutex
-	value string
-	err   error
+	mtx    sync.Mutex
+	value  string
+	err    error
+	closes atomic.Int64
 }
 
 func (s *switchableStore) set(value string, err error) {
@@ -68,6 +70,11 @@ func (s *switchableStore) set(value string, err error) {
 }
 
 func (s *switchableStore) Validate(*conf.C, secretstores.Scope) error { return nil }
+
+func (s *switchableStore) Close() error {
+	s.closes.Add(1)
+	return nil
+}
 
 func (s *switchableStore) Replace(ctx context.Context, cfg *conf.C, _ secretstores.Scope) (*conf.C, error) {
 	s.mtx.Lock()
@@ -341,4 +348,29 @@ func TestMonitorScrubbingKeepsHeartbeatFields(t *testing.T) {
 			assert.Equal(t, "synthetics-leaky-type-default", e.Meta[events.FieldMetaRawIndex], "secret %q must not change the index", secret)
 		})
 	}
+}
+
+func TestMonitorStopEvictsSecretStore(t *testing.T) {
+	testStore.set("resolved", nil)
+	testStore.closes.Store(0)
+
+	reg, _ := capturingPluginsReg()
+	factory, _, closeFactory := makeMockFactory(t, reg)
+	defer closeFactory()
+
+	cfg1 := captureMonitorConf(t, "capture", true)
+	require.NoError(t, cfg1.SetString("id", -1, "mon-1"), "id must be set")
+	cfg2 := captureMonitorConf(t, "capture", true)
+	require.NoError(t, cfg2.SetString("id", -1, "mon-2"), "id must be set")
+
+	r1, err := factory.Create(&MockPipeline{}, cfg1)
+	require.NoError(t, err, "first monitor must be created")
+	r2, err := factory.Create(&MockPipeline{}, cfg2)
+	require.NoError(t, err, "second monitor must be created")
+
+	r1.Stop()
+	assert.Zero(t, testStore.closes.Load(), "shared store must stay open while another monitor references it")
+
+	r2.Stop()
+	assert.Equal(t, int64(1), testStore.closes.Load(), "shared store must be evicted and closed when the last monitor stops")
 }

@@ -218,7 +218,8 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	defer stopStaticMonitors()
 
 	if b.Manager.ConfigFromControlProtocol() {
-		bt.RunCentralMgmtMonitors(b)
+		stopCentralMgmt := bt.RunCentralMgmtMonitors(b)
+		defer stopCentralMgmt()
 	}
 
 	if bt.config.ConfigMonitors.Enabled() {
@@ -310,8 +311,9 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat, pipeline beat.Pipeline) (st
 	return stop, nil
 }
 
-// RunCentralMgmtMonitors loads any central management configured configs.
-func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
+// RunCentralMgmtMonitors loads any central management configured configs and
+// returns a function that stops all managed monitors on shutdown.
+func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) func() {
 	// Register output reloader for managed outputs
 	b.OutputConfigReloader = reload.ReloadableFunc(func(r *reload.ConfigWithMeta) error {
 		// Do not return error here, it will prevent libbeat output from processing the same event
@@ -337,6 +339,7 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 
 	inputs := hbrunner.NewHBRunnerList(management.DebugK, bt.monitorFactory, b.Publisher, b.Info.Logger)
 	b.Registry.MustRegisterInput(inputs)
+	return inputs.Stop
 }
 
 // RunReloadableMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.
