@@ -44,17 +44,17 @@ type Config struct {
 	ClientId     string `config:"client_id"`
 	ClientSecret string `config:"client_secret"`
 
-	// UseCloudConnectors replaces auth_type with a workload-identity-issuer token for Microsoft Entra ID.
+	// UseCloudConnectors replaces client_secret with a workload-identity-issuer token; auth_type defaults to client_secret.
 	UseCloudConnectors bool `config:"use_cloud_connectors"`
 }
 
 // Validate checks that the authentication configuration is complete.
 func (c *Config) Validate() error {
-	if c.AuthType == "" {
-		c.AuthType = AuthTypeAPIKey
-	}
 	if c.UseCloudConnectors {
 		return c.validateCloudConnectorsAuth()
+	}
+	if c.AuthType == "" {
+		c.AuthType = AuthTypeAPIKey
 	}
 
 	switch c.AuthType {
@@ -88,6 +88,12 @@ func (c *Config) validateClientSecretAuth() error {
 }
 
 func (c *Config) validateCloudConnectorsAuth() error {
+	if c.AuthType == "" {
+		c.AuthType = AuthTypeClientSecret
+	}
+	if c.AuthType != AuthTypeClientSecret {
+		return fmt.Errorf("use_cloud_connectors requires auth_type %s", AuthTypeClientSecret)
+	}
 	if c.TenantId == "" {
 		return fmt.Errorf("tenant_id is required when use_cloud_connectors is true")
 	}
