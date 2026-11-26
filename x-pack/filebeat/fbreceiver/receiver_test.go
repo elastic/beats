@@ -140,8 +140,7 @@ func (mockProvider) String() string {
 }
 
 func TestReceiverRecreatesAutodiscoverBuilders(t *testing.T) {
-	id, err := uuid.NewV4()
-	require.NoError(t, err, "failed to generate mock autodiscover UUID")
+	id := uuid.NewV4()
 	builderType := "mock-builder-" + id.String()
 	providerType := "mock-provider-" + id.String()
 

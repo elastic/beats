@@ -364,10 +364,7 @@ func TestPod_EmitEvent(t *testing.T) {
 	containerImage := "elastic/filebeat:6.3.0"
 	node := "node"
 	cid := "005f3b90-4b9d-12f8-acf0-31020a840133.filebeat"
-	UUID, err := uuid.NewV4()
-	if err != nil {
-		t.Fatal(err)
-	}
+	UUID := uuid.NewV4()
 
 	typeMeta := metav1.TypeMeta{
 		Kind:       "Pod",

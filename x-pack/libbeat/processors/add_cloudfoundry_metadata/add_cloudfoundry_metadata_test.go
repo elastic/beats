@@ -203,9 +203,6 @@ func (c *fakeClient) Close() error {
 }
 
 func mustCreateFakeGuid() string {
-	uuid, err := uuid.NewV4()
-	if err != nil {
-		panic(err)
-	}
+	uuid := uuid.NewV4()
 	return uuid.String()
 }
