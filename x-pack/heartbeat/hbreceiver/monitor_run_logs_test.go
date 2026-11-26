@@ -56,9 +56,10 @@ func TestMonitorRunLogsUseOwnReceiverLogger(t *testing.T) {
 			"path.home":               t.TempDir(),
 		}}
 		factory := NewFactoryWithSettings(Settings{Home: t.TempDir()})
-		set := receiver.Settings{}
-		set.ID = component.NewIDWithName(factory.Type(), name)
-		set.Logger = zap.New(core)
+		set := receiver.Settings{
+			ID:     component.NewIDWithName(factory.Type(), name),
+			Logger: zap.New(core),
+		}
 
 		rec, err := factory.CreateLogs(t.Context(), set, cfg, consumertest.NewNop())
 		require.NoError(t, err, "creating receiver %s", name)
