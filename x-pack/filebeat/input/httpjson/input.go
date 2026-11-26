@@ -305,7 +305,7 @@ func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *request
 	)
 	switch {
 	case authCfg.AWS.IsEnabled():
-		client, err = newNetHTTPClient(ctx, requestCfg, log, reg)
+		client, err = newNetHTTPClient(ctx, requestCfg, authCfg.sensitiveHeaders(), log, reg)
 		if err != nil {
 			log.Errorw("creation of initial http client failed", "error", err)
 			return nil, err
@@ -319,7 +319,7 @@ func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *request
 		}
 		client.Transport = tr
 	case authCfg.File.isEnabled():
-		client, err = newNetHTTPClient(ctx, requestCfg, log, reg)
+		client, err = newNetHTTPClient(ctx, requestCfg, authCfg.sensitiveHeaders(), log, reg)
 		if err != nil {
 			return nil, err
 		}
@@ -331,7 +331,7 @@ func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *request
 	case authCfg.OAuth2.isEnabled():
 		client = authCfg.OAuth2.prepared
 		if client == nil {
-			client, err = newNetHTTPClient(ctx, requestCfg, log, reg)
+			client, err = newNetHTTPClient(ctx, requestCfg, authCfg.sensitiveHeaders(), log, reg)
 			if err != nil {
 				return nil, err
 			}
@@ -342,7 +342,7 @@ func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *request
 			authCfg.OAuth2.prepared = client
 		}
 	default:
-		client, err = newNetHTTPClient(ctx, requestCfg, log, reg)
+		client, err = newNetHTTPClient(ctx, requestCfg, authCfg.sensitiveHeaders(), log, reg)
 		if err != nil {
 			return nil, err
 		}
@@ -370,7 +370,7 @@ func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *request
 	return &httpClient{client: client, limiter: limiter}, nil
 }
 
-func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger, reg *monitoring.Registry) (*http.Client, error) {
+func newNetHTTPClient(ctx context.Context, cfg *requestConfig, sensitive []string, log *logp.Logger, reg *monitoring.Registry) (*http.Client, error) {
 	netHTTPClient, err := cfg.Transport.Client(clientOptions(cfg.URL.URL, cfg.KeepAlive.settings(), log)...)
 	if err != nil {
 		return nil, err
@@ -391,7 +391,7 @@ func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger,
 		traceLogger := zap.New(core)
 
 		maxBodyLen := cfg.Tracer.MaxSize * 1e6 / 10 // 10% of file max
-		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger, maxBodyLen, []string{"Authorization"}, log)
+		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger, maxBodyLen, sensitive, log)
 	} else if cfg.Tracer != nil {
 		// We have a trace log name, but we are not enabled,
 		// so remove all trace logs we own.

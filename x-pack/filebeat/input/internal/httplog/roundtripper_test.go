@@ -518,8 +518,8 @@ func TestLogRequestRedactsSensitiveHeaders(t *testing.T) {
 				"Content-Type":  []string{"application/json"},
 			},
 			sensitive:   []string{"Authorization"},
-			wantAbsent:  []string{"Authorization", "secret-token"},
-			wantPresent: []string{"Content-Type", "application/json"},
+			wantAbsent:  []string{"secret-token"},
+			wantPresent: []string{"Authorization", "Bearer", "REDACTED", "Content-Type", "application/json"},
 		},
 		{
 			name: "multiple_sensitive_headers",
@@ -533,14 +533,14 @@ func TestLogRequestRedactsSensitiveHeaders(t *testing.T) {
 			wantPresent: []string{"Accept"},
 		},
 		{
-			name: "no_sensitive_headers",
+			name: "no_caller_list_known_credentials_still_masked",
 			headers: http.Header{
-				"Authorization": []string{"Bearer visible"},
+				"Authorization": []string{"Bearer hidden"},
 				"Content-Type":  []string{"text/plain"},
 			},
 			sensitive:   nil,
-			wantAbsent:  nil,
-			wantPresent: []string{"Authorization", "visible"},
+			wantAbsent:  []string{"hidden"},
+			wantPresent: []string{"Authorization", "Bearer", "REDACTED", "text/plain"},
 		},
 	}
 

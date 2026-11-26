@@ -60,6 +60,7 @@ var inputTests = []struct {
 	wantFile            string
 	wantNoFile          string
 	wantTraceNotContain []string
+	wantTraceContain    []string
 }{
 	// Autonomous tests (no FS or net dependency).
 	{
@@ -2449,7 +2450,8 @@ var inputTests = []struct {
 			},
 		},
 		wantFile:            filepath.Join("cel", "logs", "http-request-trace-test_id_trace_sanitize_basic_auth.ndjson"),
-		wantTraceNotContain: []string{"Authorization"},
+		wantTraceNotContain: []string{base64.StdEncoding.EncodeToString([]byte("test_client:secret_password")), "secret_password"},
+		wantTraceContain:    []string{"REDACTED"},
 	},
 	{
 		name: "trace_sanitize_token_auth",
@@ -2491,7 +2493,8 @@ var inputTests = []struct {
 			},
 		},
 		wantFile:            filepath.Join("cel", "logs", "http-request-trace-test_id_trace_sanitize_token_auth.ndjson"),
-		wantTraceNotContain: []string{"Authorization"},
+		wantTraceNotContain: []string{"sssh_super_secret_token"},
+		wantTraceContain:    []string{"REDACTED"},
 	},
 	{
 		name: "trace_sanitize_oauth2",
@@ -2529,7 +2532,8 @@ var inputTests = []struct {
 			{"hello": "world"},
 		},
 		wantFile:            filepath.Join("cel", "logs", "http-request-trace-test_id_trace_sanitize_oauth2.ndjson"),
-		wantTraceNotContain: []string{"Authorization"},
+		wantTraceNotContain: []string{"a_client_secret", "Bearer abcd"},
+		wantTraceContain:    []string{"REDACTED"},
 	},
 
 	// Multi-step requests.
@@ -2995,7 +2999,7 @@ func TestInput(t *testing.T) {
 					t.Errorf("unexpected files found: %v", paths)
 				}
 			}
-			if len(test.wantTraceNotContain) > 0 && test.wantFile != "" {
+			if (len(test.wantTraceNotContain) > 0 || len(test.wantTraceContain) > 0) && test.wantFile != "" {
 				traceData, err := os.ReadFile(filepath.Join(tempDir, test.wantFile))
 				if err != nil {
 					t.Fatalf("failed to read trace file for content check: %v", err)
@@ -3003,6 +3007,11 @@ func TestInput(t *testing.T) {
 				for _, s := range test.wantTraceNotContain {
 					if bytes.Contains(traceData, []byte(s)) {
 						t.Errorf("trace log must not contain %q", s)
+					}
+				}
+				for _, s := range test.wantTraceContain {
+					if !bytes.Contains(traceData, []byte(s)) {
+						t.Errorf("trace log must contain %q", s)
 					}
 				}
 			}

@@ -40,6 +40,7 @@ var testCases = []struct {
 	expectedFile            string
 	expectedNoFile          string
 	expectedTraceNotContain []string
+	expectedTraceContain    []string
 	wantErr                 error
 
 	skipReason string
@@ -711,7 +712,8 @@ var testCases = []struct {
 		handler:                 tokenAuthHandler("Basic dGVzdF91c2VyOnRlc3RfcGFzc3dvcmQ=", "", defaultHandler(http.MethodGet, "", "")),
 		expected:                []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		expectedFile:            filepath.Join("httpjson", "logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
-		expectedTraceNotContain: []string{"Authorization"},
+		expectedTraceNotContain: []string{"dGVzdF91c2VyOnRlc3RfcGFzc3dvcmQ=", "test_password"},
+		expectedTraceContain:    []string{"REDACTED"},
 	},
 	{
 		name: "trace_sanitize_oauth2",
@@ -736,7 +738,8 @@ var testCases = []struct {
 		handler:                 oauth2Handler,
 		expected:                []string{`{"hello": "world"}`},
 		expectedFile:            filepath.Join("httpjson", "logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
-		expectedTraceNotContain: []string{"Authorization"},
+		expectedTraceNotContain: []string{"a_client_secret", "Bearer abcd"},
+		expectedTraceContain:    []string{"REDACTED"},
 	},
 	{
 		name: "trace_sanitize_aws_auth",
@@ -758,7 +761,8 @@ var testCases = []struct {
 		handler:                 awsAuthHandler("AKIAIOSFODNN7EXAMPLE", defaultHandler(http.MethodGet, "", "")),
 		expected:                []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		expectedFile:            filepath.Join("httpjson", "logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
-		expectedTraceNotContain: []string{"Authorization"},
+		expectedTraceNotContain: []string{"wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY", "AKIAIOSFODNN7EXAMPLE"},
+		expectedTraceContain:    []string{"REDACTED"},
 	},
 	{
 		name: "trace_sanitize_file_auth",
@@ -785,7 +789,34 @@ var testCases = []struct {
 		handler:                 tokenAuthHandler("Bearer file-secret", "", defaultHandler(http.MethodGet, "", "")),
 		expected:                []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		expectedFile:            filepath.Join("httpjson", "logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
-		expectedTraceNotContain: []string{"Authorization"},
+		expectedTraceNotContain: []string{"file-secret"},
+		expectedTraceContain:    []string{"REDACTED"},
+	},
+	{
+		name: "trace_sanitize_file_auth_custom_header",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]any) {
+			dir := t.TempDir()
+			tokenPath := filepath.Join(dir, "gateway_token")
+			if err := os.WriteFile(tokenPath, []byte("gateway-token-value\n"), 0o600); err != nil {
+				t.Fatalf("failed to write token file: %v", err)
+			}
+			config["auth.file.path"] = tokenPath
+			config["auth.file.header"] = "X-Gateway"
+			server := httptest.NewServer(h)
+			config["request.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]any{
+			"interval":                1,
+			"request.method":          http.MethodGet,
+			"request.tracer.enabled":  true,
+			"request.tracer.filename": "httpjson/logs/http-request-trace-*.ndjson",
+		},
+		handler:                 tokenAuthHandler("gateway-token-value", "X-Gateway", defaultHandler(http.MethodGet, "", "")),
+		expected:                []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+		expectedFile:            filepath.Join("httpjson", "logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
+		expectedTraceNotContain: []string{"gateway-token-value"},
+		expectedTraceContain:    []string{"X-Gateway", "REDACTED"},
 	},
 	{
 		name: "request_transforms_can_access_state_from_previous_transforms",
@@ -1847,7 +1878,7 @@ func TestInput(t *testing.T) {
 					t.Errorf("unexpected files found: %v", paths)
 				}
 			}
-			if len(test.expectedTraceNotContain) > 0 && test.expectedFile != "" {
+			if (len(test.expectedTraceNotContain) > 0 || len(test.expectedTraceContain) > 0) && test.expectedFile != "" {
 				traceData, err := os.ReadFile(filepath.Join(tempDir, test.expectedFile))
 				if err != nil {
 					t.Fatalf("failed to read trace file for content check: %v", err)
@@ -1855,6 +1886,11 @@ func TestInput(t *testing.T) {
 				for _, s := range test.expectedTraceNotContain {
 					if bytes.Contains(traceData, []byte(s)) {
 						t.Errorf("trace log must not contain %q", s)
+					}
+				}
+				for _, s := range test.expectedTraceContain {
+					if !bytes.Contains(traceData, []byte(s)) {
+						t.Errorf("trace log must contain %q", s)
 					}
 				}
 			}

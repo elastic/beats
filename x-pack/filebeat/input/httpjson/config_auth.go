@@ -56,6 +56,16 @@ func (c authConfig) Validate() error {
 	return nil
 }
 
+// sensitiveHeaders returns the names of the headers that carry credentials, so
+// that the request tracer can mask their values.
+func (c authConfig) sensitiveHeaders() []string {
+	names := []string{"Authorization"}
+	if c.File.isEnabled() {
+		names = append(names, c.File.headerName())
+	}
+	return names
+}
+
 type basicAuthConfig struct {
 	Enabled  *bool  `config:"enabled"`
 	User     string `config:"user"`

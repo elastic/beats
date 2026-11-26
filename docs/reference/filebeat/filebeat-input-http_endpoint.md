@@ -418,6 +418,11 @@ It is possible to log HTTP requests to a local file-system for debugging configu
 
 Enabling this option compromises security and should only be used for debugging.
 
+::::{include} /reference/_snippets/filebeat-request-tracer-masking.md
+::::
+
+{applies_to}`stack: ga 9.7.0` For this input, the tracer also masks the values of the headers named by `secret.header` and `hmac.header`. It logs the body of the response that the input sends as it is, without masking.
+
 
 ### `tracer.filename` [_tracer_filename_4]
 
