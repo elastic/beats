@@ -110,8 +110,8 @@ func validHost(h string) bool {
 // allowed hosts: without the trailing dot of a fully qualified name, IPs in
 // their canonical form, names in lowercase ASCII. Like net/http, which dials
 // the result, non-ASCII names are converted with IDNA: Unicode case folding
-// doesn't always agree with it ("ẞ" lowercases to "ß", IDNA maps it to
-// "ss"). ok is false if the name can't be converted; such a host must not
+// doesn't always agree with it ("İ" lowercases to "i", IDNA maps it to
+// "i̇"). ok is false if the name can't be converted; such a host must not
 // match.
 func normalizeHost(h string) (normalized string, ok bool) {
 	h = strings.TrimSuffix(h, ".")

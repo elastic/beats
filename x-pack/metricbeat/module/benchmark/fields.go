@@ -19,5 +19,5 @@ func init() {
 // AssetBenchmark returns asset data.
 // This is the base64 encoded zlib format compressed contents of module/benchmark.
 func AssetBenchmark() string {
-	return "eJx8kM1txCAUhO9UMdr7NsAhh9SQBliYDcj8WPhZEd1HOHFiEyvf8Q36ZsQdE5vGg9n6ZOqkAAkSqXF73W83BVRGmoX9pRgFOC62hllCyRovCsCvA6m4NVIBz8DoFr3Fd2STeK7qSJup8V7LOn9fLtxn1VEX8rP8HK9snXH9zmXTF4N3rD9OsGXNwnrK9iUT20epbsj+6e28eSKL3zYgUWqwYAoidHg0iOffz/4MAAD//xhTfdM="
+	return "eJx8kMttxSAURPdUMXr71wCLLFJDGuDBOCDzsfC1IrqP7MSJf7J0VzPozBFP9GwaL2brk6m9AiRIpMbjfc0eCqiMNCPnl2IU4DjaGgYJJWu8KQD/DKTipkgFdIHRjXqpn8gmcT8159IGanzWMg2/yQV7j9riQu7KX3hFA872wM3Szx24x/mtgi1TFtZdt5r0bF+lukN3szvfhyey+MUBiVKDBVMQocOrQTzPn/09ABhTfdM="
 }
