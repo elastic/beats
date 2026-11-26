@@ -7,6 +7,7 @@ package collections
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
@@ -15,12 +16,13 @@ import (
 
 func TestUUIDTree_UnmarshalJSON(t *testing.T) {
 	tests := map[string]struct {
-		In      []byte
-		Want    UUIDTree
-		WantErr string
+		In          []byte
+		Want        UUIDTree
+		WantErr     string
+		WantTypeErr *wantTypeErr
 	}{
 		"ok": {
-			In: []byte(fmt.Sprintf(`{"%s":["%s","%s"],"%s":["%s"]}`, testUUID1Str, testUUID2Str, testUUID3Str, testUUID4Str, testUUID5Str)),
+			In: fmt.Appendf(nil, `{"%s":["%s","%s"],"%s":["%s"]}`, testUUID1Str, testUUID2Str, testUUID3Str, testUUID4Str, testUUID5Str),
 			Want: UUIDTree{edges: map[uuid.UUID]*UUIDSet{
 				testUUID1: {m: map[uuid.UUID]struct{}{testUUID2: {}, testUUID3: {}}},
 				testUUID4: {m: map[uuid.UUID]struct{}{testUUID5: {}}},
@@ -35,17 +37,16 @@ func TestUUIDTree_UnmarshalJSON(t *testing.T) {
 			Want: UUIDTree{edges: map[uuid.UUID]*UUIDSet{}},
 		},
 		"err-bad-uuid-key": {
-			In:      []byte(fmt.Sprintf(`{"1":["%s"]}`, testUUID1)),
+			In:      fmt.Appendf(nil, `{"1":["%s"]}`, testUUID1),
 			WantErr: "uuid: incorrect UUID length 1 in string \"1\"",
 		},
 		"err-bad-uuid-set": {
-			In:      []byte(fmt.Sprintf(`{"%s":[1]}`, testUUID1)),
-			WantErr: "json: cannot unmarshal number into Go value of type uuid.UUID",
+			In:          fmt.Appendf(nil, `{"%s":[1]}`, testUUID1),
+			WantTypeErr: &wantTypeErr{Value: "number", Type: reflect.TypeFor[uuid.UUID]()},
 		},
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -53,9 +54,12 @@ func TestUUIDTree_UnmarshalJSON(t *testing.T) {
 
 			gotErr := json.Unmarshal(tc.In, &tree)
 
-			if tc.WantErr != "" {
+			switch {
+			case tc.WantTypeErr != nil:
+				requireUnmarshalTypeErr(t, gotErr, tc.WantTypeErr)
+			case tc.WantErr != "":
 				require.ErrorContains(t, gotErr, tc.WantErr)
-			} else {
+			default:
 				require.NoError(t, gotErr)
 				require.Equal(t, tc.Want, tree)
 			}
@@ -78,12 +82,11 @@ func TestUUIDTree_MarshalJSON(t *testing.T) {
 				testUUID1: {m: map[uuid.UUID]struct{}{testUUID2: {}, testUUID3: {}}},
 				testUUID4: {m: map[uuid.UUID]struct{}{testUUID5: {}}},
 			}},
-			Want: []byte(fmt.Sprintf(`{"%s":["%s","%s"],"%s":["%s"]}`, testUUID1Str, testUUID2Str, testUUID3Str, testUUID4Str, testUUID5Str)),
+			Want: fmt.Appendf(nil, `{"%s":["%s","%s"],"%s":["%s"]}`, testUUID1Str, testUUID2Str, testUUID3Str, testUUID4Str, testUUID5Str),
 		},
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -124,7 +127,6 @@ func TestUUIDTree_RemoveVertex(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -165,7 +167,6 @@ func TestUUIDTree_ContainsVertex(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -214,7 +215,6 @@ func TestUUIDTree_AddEdge(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -259,7 +259,6 @@ func TestUUIDTree_RemoveEdge(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -294,7 +293,6 @@ func TestUUIDTree_ContainsEdge(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -328,7 +326,6 @@ func TestUUIDTree_Expand(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -362,7 +359,6 @@ func TestUUIDTree_ExpandFromSet(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
