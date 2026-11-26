@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Prevent Okta entity analytics provider from holding connections longer than necessary during detail collection loop.
+component: filebeat
