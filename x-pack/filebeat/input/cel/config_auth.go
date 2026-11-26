@@ -559,10 +559,10 @@ func (o *oAuth2Config) validateAzureProvider() error {
 	if o.ClientID == "" || (o.ClientSecret == nil && !o.AzureUseCloudConnectors) {
 		return errors.New("client credentials must be provided")
 	}
-	// tenant_id gives the Entra v2 endpoint, which needs scopes; a token_url can be a v1 endpoint, which takes azure.resource.
 	if o.AzureUseCloudConnectors && maybeString(o.ClientSecret) != "" {
 		return errors.New("client.secret can't be used with azure.use_cloud_connectors")
 	}
+	// tenant_id gives the Entra v2 endpoint, which needs scopes; a token_url can be a v1 endpoint, which takes azure.resource.
 	if o.AzureUseCloudConnectors && len(o.Scopes) == 0 && (o.TokenURL == "" || o.AzureResource == "") {
 		return errors.New("azure.use_cloud_connectors requires scopes, or token_url with azure.resource")
 	}
