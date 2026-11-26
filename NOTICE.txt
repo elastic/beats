@@ -11090,11 +11090,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-transpo
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/entcollect
-Version: v0.0.0-20260916061436-646037f10512
+Version: v0.0.0-20261113091743-3520586d133a
 Licence type (autodetected): Elastic
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/entcollect@v0.0.0-20260916061436-646037f10512/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/entcollect@v0.0.0-20261113091743-3520586d133a/LICENSE.txt:
 
 Elastic License 2.0
 
