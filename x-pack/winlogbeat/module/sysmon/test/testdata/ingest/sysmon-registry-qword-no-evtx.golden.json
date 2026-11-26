@@ -1,0 +1,298 @@
+[
+  {
+    "@timestamp": "2020-05-05T14:57:44.714Z",
+    "ecs": {
+      "version": "8.17.0"
+    },
+    "event": {
+      "action": "RegistryEvent (Value Set)",
+      "category": [
+        "configuration",
+        "registry"
+      ],
+      "code": "13",
+      "kind": "event",
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "Registry value set:\nRuleName: -\nEventType: SetValue\nUtcTime: 2020-05-05 14:57:44.714\nProcessGuid: {5B522F6E-77AE-5EB1-2C03-000000000800}\nProcessId: 0\nImage: C:\\Windows\\regedit.exe\nTargetObject: HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 3\nDetails: QWORD (0x01d6fa4c-0x7094beae)\nUser: %9",
+    "process": {
+      "entity_id": "{5B522F6E-77AE-5EB1-2C03-000000000800}",
+      "executable": "C:\\Windows\\regedit.exe",
+      "name": "regedit.exe",
+      "pid": 6072
+    },
+    "registry": {
+      "data": {
+        "strings": [
+          "132568445267263150"
+        ],
+        "type": "SZ_QWORD"
+      },
+      "hive": "HKU",
+      "key": "S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 3",
+      "path": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 3",
+      "value": "Key 3"
+    },
+    "user": {
+      "id": "S-1-5-18"
+    },
+    "winlog": {
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant",
+      "event_data": {
+        "EventType": "SetValue"
+      },
+      "event_id": "13",
+      "opcode": "Info",
+      "process": {
+        "pid": 5496,
+        "thread": {
+          "id": 876
+        }
+      },
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": "2688",
+      "task": "Registry value set (rule: RegistryEvent)",
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 2
+    }
+  },
+  {
+    "@timestamp": "2020-05-05T14:57:44.714Z",
+    "ecs": {
+      "version": "8.17.0"
+    },
+    "event": {
+      "action": "RegistryEvent (Value Set)",
+      "category": [
+        "configuration",
+        "registry"
+      ],
+      "code": "13",
+      "kind": "event",
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "Registry value set:\nRuleName: -\nEventType: SetValue\nUtcTime: 2020-05-05 14:57:44.714\nProcessGuid: {5B522F6E-77AE-5EB1-2C03-000000000800}\nProcessId: 0\nImage: C:\\Windows\\regedit.exe\nTargetObject: HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 4\nDetails: QWORD (0x00000001-0x00000000)\nUser: %9",
+    "process": {
+      "entity_id": "{5B522F6E-77AE-5EB1-2C03-000000000800}",
+      "executable": "C:\\Windows\\regedit.exe",
+      "name": "regedit.exe",
+      "pid": 6072
+    },
+    "registry": {
+      "data": {
+        "strings": [
+          "4294967296"
+        ],
+        "type": "SZ_QWORD"
+      },
+      "hive": "HKU",
+      "key": "S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 4",
+      "path": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 4",
+      "value": "Key 4"
+    },
+    "user": {
+      "id": "S-1-5-18"
+    },
+    "winlog": {
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant",
+      "event_data": {
+        "EventType": "SetValue"
+      },
+      "event_id": "13",
+      "opcode": "Info",
+      "process": {
+        "pid": 5496,
+        "thread": {
+          "id": 876
+        }
+      },
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": "2689",
+      "task": "Registry value set (rule: RegistryEvent)",
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 2
+    }
+  },
+  {
+    "@timestamp": "2020-05-05T14:57:44.714Z",
+    "ecs": {
+      "version": "8.17.0"
+    },
+    "event": {
+      "action": "RegistryEvent (Value Set)",
+      "category": [
+        "configuration",
+        "registry"
+      ],
+      "code": "13",
+      "kind": "event",
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "Registry value set:\nRuleName: -\nEventType: SetValue\nUtcTime: 2020-05-05 14:57:44.714\nProcessGuid: {5B522F6E-77AE-5EB1-2C03-000000000800}\nProcessId: 0\nImage: C:\\Windows\\regedit.exe\nTargetObject: HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 5\nDetails: QWORD (0x80000000-0x00000000)\nUser: %9",
+    "process": {
+      "entity_id": "{5B522F6E-77AE-5EB1-2C03-000000000800}",
+      "executable": "C:\\Windows\\regedit.exe",
+      "name": "regedit.exe",
+      "pid": 6072
+    },
+    "registry": {
+      "data": {
+        "strings": [
+          "9223372036854775808"
+        ],
+        "type": "SZ_QWORD"
+      },
+      "hive": "HKU",
+      "key": "S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 5",
+      "path": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 5",
+      "value": "Key 5"
+    },
+    "user": {
+      "id": "S-1-5-18"
+    },
+    "winlog": {
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant",
+      "event_data": {
+        "EventType": "SetValue"
+      },
+      "event_id": "13",
+      "opcode": "Info",
+      "process": {
+        "pid": 5496,
+        "thread": {
+          "id": 876
+        }
+      },
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": "2690",
+      "task": "Registry value set (rule: RegistryEvent)",
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 2
+    }
+  },
+  {
+    "@timestamp": "2020-05-05T14:57:44.714Z",
+    "ecs": {
+      "version": "8.17.0"
+    },
+    "event": {
+      "action": "RegistryEvent (Value Set)",
+      "category": [
+        "configuration",
+        "registry"
+      ],
+      "code": "13",
+      "kind": "event",
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "Registry value set:\nRuleName: -\nEventType: SetValue\nUtcTime: 2020-05-05 14:57:44.714\nProcessGuid: {5B522F6E-77AE-5EB1-2C03-000000000800}\nProcessId: 0\nImage: C:\\Windows\\regedit.exe\nTargetObject: HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 6\nDetails: QWORD (0xffffffff-0xffffffff)\nUser: %9",
+    "process": {
+      "entity_id": "{5B522F6E-77AE-5EB1-2C03-000000000800}",
+      "executable": "C:\\Windows\\regedit.exe",
+      "name": "regedit.exe",
+      "pid": 6072
+    },
+    "registry": {
+      "data": {
+        "strings": [
+          "18446744073709551615"
+        ],
+        "type": "SZ_QWORD"
+      },
+      "hive": "HKU",
+      "key": "S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 6",
+      "path": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 6",
+      "value": "Key 6"
+    },
+    "user": {
+      "id": "S-1-5-18"
+    },
+    "winlog": {
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant",
+      "event_data": {
+        "EventType": "SetValue"
+      },
+      "event_id": "13",
+      "opcode": "Info",
+      "process": {
+        "pid": 5496,
+        "thread": {
+          "id": 876
+        }
+      },
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": "2691",
+      "task": "Registry value set (rule: RegistryEvent)",
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 2
+    }
+  }
+]

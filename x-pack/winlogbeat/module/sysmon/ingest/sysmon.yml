@@ -1326,7 +1326,7 @@ processors:
             def parsedLowByte = Long.parseLong(matcher.group(3).substring(prefixLen), 16);
             if (!Double.isNaN(parsedHighByte) && !Double.isNaN(parsedLowByte)) {
               dataType = "SZ_QWORD";
-              dataValue = Long.toString(((parsedHighByte << 8) + parsedLowByte));
+              dataValue = Long.toUnsignedString(((parsedHighByte << 32) + parsedLowByte));
               ctx.registry.data = [
                 "strings": [dataValue],
                 "type": dataType
