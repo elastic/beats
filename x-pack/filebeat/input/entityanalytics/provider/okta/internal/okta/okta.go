@@ -518,13 +518,13 @@ func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, end
 
 			return nil
 		}()
+		if err != nil {
+			return nil, nil, err
+		}
 		if resp.StatusCode == http.StatusTooManyRequests {
 			log.Warnw("received 429 Too Many Requests")
 			retryCount++
 			continue
-		}
-		if err != nil {
-			return nil, nil, err
 		}
 
 		if resp.StatusCode != http.StatusOK {
