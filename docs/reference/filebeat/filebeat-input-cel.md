@@ -1362,6 +1362,9 @@ It is possible to log HTTP requests and responses in a CEL program to a local fi
 
 Enabling this option compromises security and should only be used for debugging.
 
+::::{include} /reference/_snippets/filebeat-request-tracer-masking.md
+::::
+
 
 ### `resource.tracer.filename` [_resource_tracer_filename]
 

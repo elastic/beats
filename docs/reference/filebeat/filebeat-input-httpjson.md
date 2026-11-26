@@ -866,6 +866,9 @@ It is possible to log HTTP requests and responses to a local file-system for deb
 
 Enabling this option compromises security and should only be used for debugging.
 
+::::{include} /reference/_snippets/filebeat-request-tracer-masking.md
+::::
+
 
 ## `request.tracer.filename` [_request_tracer_filename]
 

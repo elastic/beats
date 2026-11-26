@@ -13,7 +13,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"maps"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -156,21 +155,24 @@ func SanitizeFileName(name string) string {
 
 // NewLoggingRoundTripper returns a LoggingRoundTripper that logs requests and
 // responses to the provided logger. Transaction creation is logged to log.
-// Header names matching strings in sensitive are not logged.
+// The values of headers with names matching strings in sensitive, ignoring
+// case, are replaced. So are the values of well-known credential headers,
+// credential parameters in URL queries, credential fields in form and JSON
+// bodies, and the user info of URLs.
 func NewLoggingRoundTripper(next http.RoundTripper, logger *zap.Logger, maxBodyLen int, sensitive []string, log *logp.Logger) *LoggingRoundTripper {
 	return &LoggingRoundTripper{
-		sensitiveHeaders: sensitive,
-		transport:        next,
-		maxBodyLen:       maxBodyLen,
-		txLog:            logger,
-		txBaseID:         newID(),
-		log:              log,
+		mask:       newMasker(sensitive),
+		transport:  next,
+		maxBodyLen: maxBodyLen,
+		txLog:      logger,
+		txBaseID:   newID(),
+		log:        log,
 	}
 }
 
 // LoggingRoundTripper is an http.RoundTripper that logs requests and responses.
 type LoggingRoundTripper struct {
-	sensitiveHeaders []string
+	mask masker
 
 	transport   http.RoundTripper
 	maxBodyLen  int           // The maximum length of a body. Longer bodies will be truncated.
@@ -216,6 +218,11 @@ type LoggingRoundTripper struct {
 //
 // The trace.id and span.id fields are populated with IDs from the OTel span in
 // the request's context if the OTel span context exists.
+//
+// Credentials are masked before the body is truncated to the maximum body
+// length. The body.truncated fields report whether the logged content, after
+// masking, was cut. The body.bytes fields are the length of the body as it was
+// sent or received.
 func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	// Create a child logger for this request.
 	txID := rt.nextTxID()
@@ -231,7 +238,7 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 		)
 	}
 
-	req, respParts, errorsMessages := logRequest(log, req, rt.maxBodyLen, rt.sensitiveHeaders)
+	req, respParts, errorsMessages := logRequest(log, req, rt.maxBodyLen, rt.mask)
 
 	resp, err := rt.transport.RoundTrip(req)
 	if err != nil {
@@ -251,12 +258,13 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 	if err != nil {
 		errorsMessages = append(errorsMessages, fmt.Sprintf("failed to read response body: %s", err))
 	}
+	logged := maskBody(resp.Header.Get("Content-Type"), body)
 	respParts = append(respParts,
-		zap.ByteString("http.response.body.content", body[:min(len(body), rt.maxBodyLen)]),
-		zap.Bool("http.response.body.truncated", rt.maxBodyLen < len(body)),
+		zap.ByteString("http.response.body.content", logged[:min(len(logged), rt.maxBodyLen)]),
+		zap.Bool("http.response.body.truncated", rt.maxBodyLen < len(logged)),
 		zap.Int("http.response.body.bytes", len(body)),
 		zap.String("http.response.mime_type", resp.Header.Get("Content-Type")),
-		zap.Any("http.response.header", redactHeaders(resp.Header, rt.sensitiveHeaders)),
+		zap.Any("http.response.header", rt.mask.header(resp.Header)),
 	)
 	switch len(errorsMessages) {
 	case 0:
@@ -289,22 +297,26 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 //	http.request.header
 //
 // Additional fields in extra will also be logged.
-// Header names matching strings in sensitive are not logged.
+// The values of headers with names matching strings in sensitive, ignoring
+// case, are replaced. So are the values of well-known credential headers,
+// credential parameters in the URL query, credential fields in form and JSON
+// bodies, and the user info of the URL.
 func LogRequest(log *zap.Logger, req *http.Request, sensitive []string, maxBodyLen int, extra ...zapcore.Field) *http.Request {
-	req, _, _ = logRequest(log, req, maxBodyLen, sensitive, extra...)
+	req, _, _ = logRequest(log, req, maxBodyLen, newMasker(sensitive), extra...)
 	return req
 }
 
-func logRequest(log *zap.Logger, req *http.Request, maxBodyLen int, sensitive []string, extra ...zapcore.Field) (_ *http.Request, parts []zapcore.Field, errorsMessages []string) {
+func logRequest(log *zap.Logger, req *http.Request, maxBodyLen int, mask masker, extra ...zapcore.Field) (_ *http.Request, parts []zapcore.Field, errorsMessages []string) {
+	original, query := maskURL(req.URL)
 	reqParts := append([]zapcore.Field{
-		zap.String("url.original", req.URL.String()),
+		zap.String("url.original", original),
 		zap.String("url.scheme", req.URL.Scheme),
 		zap.String("url.path", req.URL.Path),
 		zap.String("url.domain", req.URL.Hostname()),
 		zap.String("url.port", req.URL.Port()),
-		zap.String("url.query", req.URL.RawQuery),
+		zap.String("url.query", query),
 		zap.String("http.request.method", req.Method),
-		zap.Any("http.request.header", redactHeaders(req.Header, sensitive)),
+		zap.Any("http.request.header", mask.header(req.Header)),
 		zap.String("user_agent.original", req.Header.Get("User-Agent")),
 	}, extra...)
 
@@ -316,9 +328,10 @@ func logRequest(log *zap.Logger, req *http.Request, maxBodyLen int, sensitive []
 	if err != nil {
 		errorsMessages = append(errorsMessages, fmt.Sprintf("failed to read request body: %s", err))
 	}
+	logged := maskBody(req.Header.Get("Content-Type"), body)
 	reqParts = append(reqParts,
-		zap.ByteString("http.request.body.content", body[:min(len(body), maxBodyLen)]),
-		zap.Bool("http.request.body.truncated", maxBodyLen < len(body)),
+		zap.ByteString("http.request.body.content", logged[:min(len(logged), maxBodyLen)]),
+		zap.Bool("http.request.body.truncated", maxBodyLen < len(logged)),
 		zap.Int("http.request.body.bytes", len(body)),
 		zap.String("http.request.mime_type", req.Header.Get("Content-Type")),
 	)
@@ -361,17 +374,6 @@ func newID() string {
 	var data [8]byte
 	binary.LittleEndian.PutUint64(data[:], uint64(time.Now().UnixNano()))
 	return base32.HexEncoding.WithPadding(base32.NoPadding).EncodeToString(data[:])
-}
-
-func redactHeaders(h http.Header, sensitive []string) http.Header {
-	if len(sensitive) == 0 {
-		return h
-	}
-	h = maps.Clone(h)
-	for _, s := range sensitive {
-		delete(h, s)
-	}
-	return h
 }
 
 // copyBody is derived from drainBody in net/http/httputil/dump.go

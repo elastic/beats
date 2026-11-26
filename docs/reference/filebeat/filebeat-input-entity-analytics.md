@@ -826,6 +826,9 @@ It is possible to log HTTP requests and responses to the EntraID API to a local 
 
 Enabling this option compromises security and should only be used for debugging.
 
+::::{include} /reference/_snippets/filebeat-request-tracer-masking.md
+::::
+
 
 ### `tracer.filename` [_tracer_filename]
 
@@ -1006,6 +1009,9 @@ The maximum number of redirects to follow for a request. Defaults to `10`.
 It is possible to log HTTP requests and responses to the Jamf API to a local file-system for debugging configurations. This option is enabled by setting `tracer.enabled` to true and setting the `tracer.filename` value. Additional options are available to tune log rotation behavior. To delete existing logs, set `tracer.enabled` to false without unsetting the filename option.
 
 Enabling this option compromises security and should only be used for debugging.
+
+::::{include} /reference/_snippets/filebeat-request-tracer-masking.md
+::::
 
 
 ### `tracer.filename` [_tracer_filename_2]
@@ -1516,6 +1522,9 @@ The maximum number of redirects to follow for a request. Defaults to `10`.
 It is possible to log HTTP requests and responses to the Okta API to a local file-system for debugging configurations. This option is enabled by setting `tracer.enabled` to true and setting the `tracer.filename` value. Additional options are available to tune log rotation behavior. To delete existing logs, set `tracer.enabled` to false without unsetting the filename option.
 
 Enabling this option compromises security and should only be used for debugging.
+
+::::{include} /reference/_snippets/filebeat-request-tracer-masking.md
+::::
 
 
 #### `tracer.filename` [_tracer_filename_3]

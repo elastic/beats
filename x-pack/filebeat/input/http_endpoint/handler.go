@@ -428,13 +428,26 @@ func (h *handler) logRequest(txID string, r *http.Request, status int, respBody 
 		)
 	}
 	h.log.Debugw("new request trace transaction", "id", txID)
-	httplog.LogRequest(h.reqLogger.With(zap.String("transaction.id", txID)), r, []string{"Authorization"}, maxLogBodyLen, extra...)
+	httplog.LogRequest(h.reqLogger.With(zap.String("transaction.id", txID)), r, h.sensitiveHeaders(), maxLogBodyLen, extra...)
 	if scheme != "" {
 		r.URL.Scheme = scheme
 	}
 	if host != "" {
 		r.URL.Host = host
 	}
+}
+
+// sensitiveHeaders returns the names of the request headers that carry
+// credentials: Authorization, and the headers that the secret and HMAC
+// validators read.
+func (h *handler) sensitiveHeaders() []string {
+	names := []string{"Authorization"}
+	for _, n := range []string{h.validator.secretHeader, h.validator.hmacHeader} {
+		if n != "" {
+			names = append(names, n)
+		}
+	}
+	return names
 }
 
 func (h *handler) nextTxID() string {

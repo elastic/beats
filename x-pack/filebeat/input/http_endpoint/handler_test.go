@@ -1133,3 +1133,47 @@ tracer:
 		t.Errorf("ServeHTTP() read %d bytes of the body; want between %d and %d", body.n, lo, hi)
 	}
 }
+
+func TestSecretHeaderIsMaskedInTrace(t *testing.T) {
+	const secret = "fake-secret-value-12345"
+	traceFile := filepath.Join(t.TempDir(), "trace.ndjson")
+	c := defaultConfig()
+	cfg, err := confpkg.NewConfigWithYAML([]byte(`
+secret.header: X-Gateway
+secret.value: `+secret+`
+tracer:
+  enabled: true
+  filename: `+traceFile+`
+`), "secret_tracer")
+	if err != nil {
+		t.Fatalf("failed to parse YAML config: %v", err)
+	}
+	err = cfg.Unpack(&c)
+	if err != nil {
+		t.Fatalf("failed to unpack config: %v", err)
+	}
+
+	var pub publisher
+	metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+	h := newHandler(t.Context(), c, nil, pub.Publish, nil, logptest.NewTestingLogger(t, ""), metrics)
+
+	// Only responses that report an error, and acknowledged requests, are
+	// traced, so send a body that is not JSON.
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", strings.NewReader("not json"))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Gateway", secret)
+	h.ServeHTTP(httptest.NewRecorder(), req)
+
+	trace, err := os.ReadFile(traceFile)
+	if err != nil {
+		t.Fatalf("failed to read the trace file: %v", err)
+	}
+	if bytes.Contains(trace, []byte(secret)) {
+		t.Errorf("trace must not contain the secret header value:\n%s", trace)
+	}
+	for _, want := range []string{"X-Gateway", "REDACTED"} {
+		if !bytes.Contains(trace, []byte(want)) {
+			t.Errorf("trace must contain %q:\n%s", want, trace)
+		}
+	}
+}
