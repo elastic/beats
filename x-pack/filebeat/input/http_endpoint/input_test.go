@@ -1172,6 +1172,10 @@ func TestPatternReregistration(t *testing.T) {
 		t.Fatal("first registration did not return in time")
 	}
 	wg.Wait()
+	// Since Go 1.27, closing an unread response body keeps the connection
+	// idle for reuse. Drop it so the next request cannot be sent on the
+	// connection to the server that was just shut down and fail with EOF.
+	http.DefaultClient.CloseIdleConnections()
 
 	// Re-register same pattern on a new server.
 	ctx2, cancel2 := newCtx("test", "input-2")
