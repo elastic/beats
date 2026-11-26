@@ -176,12 +176,12 @@ func waitKubeStateMetricsReadiness(env map[string]string, stdOut, stdErr io.Writ
 func kubernetesClusterName() string {
 	commit, err := mage.CommitHash()
 	if err != nil {
-		panic(fmt.Errorf("failed to construct kind cluster name:  %w", err))
+		panic(fmt.Errorf("failed to construct kind cluster name: %w", err))
 	}
 
 	version, err := mage.BeatQualifiedVersion()
 	if err != nil {
-		panic(fmt.Errorf("failed to construct kind cluster name:  %w", err))
+		panic(fmt.Errorf("failed to construct kind cluster name: %w", err))
 	}
 	version = strings.NewReplacer(".", "-").Replace(version)
 

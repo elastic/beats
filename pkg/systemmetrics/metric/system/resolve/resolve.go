@@ -17,7 +17,12 @@
 
 package resolve
 
-import "path/filepath"
+import (
+	"context"
+	"path/filepath"
+
+	"github.com/shirou/gopsutil/v4/common"
+)
 
 // Resolver is an interface for HostFS resolvers. This is meant to be generic and (hopefully) future-proof way of dealing with a user-supplied root filesystem path.
 // A resolver-style function serves two ends:
@@ -61,4 +66,13 @@ func (t TestingResolver) Join(path ...string) string {
 
 func (t TestingResolver) IsSet() bool {
 	return t.isSet
+}
+
+// Context returns ctx with the gopsutil host paths resolved through r.
+func Context(ctx context.Context, r Resolver) context.Context {
+	return context.WithValue(ctx, common.EnvKey, common.EnvMap{
+		common.HostProcEnvKey: r.ResolveHostFS("/proc"),
+		common.HostSysEnvKey:  r.ResolveHostFS("/sys"),
+		common.HostEtcEnvKey:  r.ResolveHostFS("/etc"),
+	})
 }

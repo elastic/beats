@@ -109,8 +109,8 @@ func NewStats(reg *monitoring.Registry, logger *logp.Logger) *Stats {
 		readBytes:  monitoring.NewUint(reg, "read.bytes"),
 		readErrors: monitoring.NewUint(reg, "read.errors"),
 
-		sendLatencyLifetimeMillis: metrics.NewUniformSample(1024),
-		sendLatencyDeltaMillis:    metrics.NewUniformSample(1024),
+		sendLatencyLifetimeMillis: newLazySample(1024),
+		sendLatencyDeltaMillis:    newLazySample(1024),
 	}
 	_ = adapter.NewGoMetrics(reg, "write.latency", logger, adapter.Accept).Register("histogram", metrics.NewHistogram(obj.sendLatencyLifetimeMillis))
 	_ = adapter.NewGoMetrics(reg, "write.latency_delta", logger, adapter.Accept).Register("histogram", adapter.NewClearOnVisitHistogram(obj.sendLatencyDeltaMillis))

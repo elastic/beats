@@ -22,7 +22,7 @@ func init() {
 	plugin.RegisterWithHashFunc("browser", HashConfig, create, "synthetic", "synthetics/synthetic")
 }
 
-func create(name string, cfg *config.C, _ beat.Info) (p plugin.Plugin, err error) {
+func create(name string, cfg *config.C, info beat.Info) (p plugin.Plugin, err error) {
 	// We don't want users running synthetics in environments that don't have the required GUI libraries etc, so we check
 	// this flag. When we're ready to support the many possible configurations of systems outside the docker environment
 	// we can remove this check.
@@ -35,7 +35,7 @@ func create(name string, cfg *config.C, _ beat.Info) (p plugin.Plugin, err error
 		return plugin.Plugin{}, fmt.Errorf("script monitors cannot be run as root")
 	}
 
-	s, err := NewSourceJob(cfg)
+	s, err := NewSourceJob(cfg, info.Logger)
 	if err != nil {
 		return plugin.Plugin{}, err
 	}

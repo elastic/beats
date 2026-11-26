@@ -175,7 +175,7 @@ func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, f
 
 		moduleConfig, err := mcfgFromConfig(cfg)
 		if err != nil {
-			return nil, fmt.Errorf("error unpacking module config :%w", err)
+			return nil, fmt.Errorf("error unpacking module config: %w", err)
 		}
 		mcfgs = append(mcfgs, moduleConfig)
 	}

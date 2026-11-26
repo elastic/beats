@@ -82,7 +82,7 @@ type Group struct {
 // RegisterType registers a new output type.
 func RegisterType(name string, f Factory) {
 	if outputReg[name] != nil {
-		panic(fmt.Errorf("output type  '%v' exists already", name))
+		panic(fmt.Errorf("output type '%v' exists already", name))
 	}
 	outputReg[name] = f
 }

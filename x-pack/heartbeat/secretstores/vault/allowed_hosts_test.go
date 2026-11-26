@@ -105,7 +105,7 @@ func TestAllowedHosts(t *testing.T) {
 				destinations = pf.Destinations
 			}
 
-			_, err = secretstores.NewResolver(logptest.NewTestingLogger(t, "")).Resolve(cfg, destinations)
+			_, _, err = secretstores.NewResolver(logptest.NewTestingLogger(t, "")).Resolve(cfg, destinations)
 			if tc.wantErr == "" {
 				assert.NoError(t, err, "the monitor must be allowed")
 				return

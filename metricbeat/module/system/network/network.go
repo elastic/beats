@@ -20,6 +20,8 @@
 package network
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"math"
 	"strings"
@@ -28,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 
 	"github.com/shirou/gopsutil/v4/net"
 )
@@ -44,6 +47,7 @@ func init() {
 // MetricSet for fetching system network IO metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
+	sys                  resolve.Resolver
 	interfaces           map[string]struct{}
 	prevInterfaceCounter map[string]networkCounter
 	currentGaugeCounter  map[string]networkCounter
@@ -59,6 +63,11 @@ type networkCounter struct {
 
 // New is a mb.MetricSetFactory that returns a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	sys, ok := base.Module().(resolve.Resolver)
+	if !ok {
+		return nil, errors.New("base.Module is not resolve.Resolver")
+	}
+
 	// Unpack additional configuration options.
 	config := struct {
 		Interfaces []string `config:"interfaces"`
@@ -79,6 +88,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet:        base,
+		sys:                  sys,
 		interfaces:           interfaceSet,
 		prevInterfaceCounter: map[string]networkCounter{},
 		currentGaugeCounter:  map[string]networkCounter{},
@@ -87,7 +97,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches network IO metrics from the OS.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	stats, err := net.IOCounters(true)
+	stats, err := net.IOCountersWithContext(resolve.Context(context.Background(), m.sys), true)
 	if err != nil {
 		return fmt.Errorf("network io counters: %w", err)
 	}

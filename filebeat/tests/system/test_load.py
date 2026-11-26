@@ -84,7 +84,7 @@ class Test(BaseTest):
         #    if i not in entry_list:
         #        print i
         # Stats about the files read
-        #unique_entries = len(set(entry_list))
+        # unique_entries = len(set(entry_list))
         # print "Total lines: " + str(total_lines)
         # print "Total unique entries: " + str(unique_entries)
         # print "Total entries: " + str(len(entry_list))
