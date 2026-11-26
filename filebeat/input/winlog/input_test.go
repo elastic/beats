@@ -60,7 +60,14 @@ func TestStartState(t *testing.T) {
 	withLegacy := winlogInput{opts: Options{InitialState: func(n string) (checkpoint.EventLogState, bool) {
 		return legacy, n == "Security"
 	}}}
-	unpackStored := func(to any) error { *(to.(*checkpoint.EventLogState)) = stored; return nil }
+	unpackStored := func(to any) error {
+		st, ok := to.(*checkpoint.EventLogState)
+		if !ok {
+			return errors.New("unexpected type")
+		}
+		*st = stored
+		return nil
+	}
 	unpackFail := func(any) error { return errors.New("bad") }
 
 	assert.Equal(t, legacy, withLegacy.startState(log, "Security", true, unpackStored),
