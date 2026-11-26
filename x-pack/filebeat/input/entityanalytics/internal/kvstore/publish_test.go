@@ -93,6 +93,47 @@ func TestNewPublisher_FieldMapping(t *testing.T) {
 	}
 }
 
+// TestNewPublisher_DottedSubkey checks that a dotted key is kept when
+// the document also has a map under its parent key, whichever order the
+// keys come out of the map.
+func TestNewPublisher_DottedSubkey(t *testing.T) {
+	t.Parallel()
+
+	client := &fakeClient{}
+	tracker := NewTxTracker(context.Background())
+	pub := NewPublisher(client, "input-123", tracker)
+
+	// Map iteration order is random, so publish enough times that both
+	// orders are all but certain to occur.
+	const n = 50
+	for range n {
+		doc := entcollect.Document{
+			ID:     "user-abc",
+			Kind:   entcollect.KindUser,
+			Action: entcollect.ActionDiscovered,
+			Fields: map[string]any{
+				"azure_ad":                map[string]any{"displayName": "Alice"},
+				"azure_ad.signInActivity": "recent",
+			},
+		}
+		if err := pub(t.Context(), doc); err != nil {
+			t.Fatalf("Publish: %v", err)
+		}
+	}
+
+	for i, e := range client.Events() {
+		for field, want := range map[string]any{
+			"azure_ad.displayName":    "Alice",
+			"azure_ad.signInActivity": "recent",
+		} {
+			got, _ := e.Fields.GetValue(field)
+			if got != want {
+				t.Errorf("event %d: Fields[%q] = %v; want %v", i, field, got, want)
+			}
+		}
+	}
+}
+
 func TestNewPublisher_TrackerAddBeforePublish(t *testing.T) {
 	t.Parallel()
 
