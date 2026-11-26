@@ -54,7 +54,7 @@ func TestArgsUserTables(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			osq, err := newOsqueryD("/var/run/foobar", WithLogger(logptest.NewTestingLogger(t, "osqueryd_test")))
+			osq, err := New("/var/run/foobar", WithLogger(logptest.NewTestingLogger(t, "osqueryd_test")))
 			require.NoError(t, err, "creating osqueryd")
 
 			args := osq.args(tc.flags)
