@@ -567,13 +567,18 @@ func (s *BuildVariableSources) GetDocBranch() (string, error) {
 	return s.DocBranchParser(data)
 }
 
-func parseBeatVersion(data []byte) (string, error) {
+// ParseBeatVersion extracts defaultBeatVersion from version.go file contents.
+func ParseBeatVersion(data []byte) (string, error) {
 	matches := beatVersionRegex.FindSubmatch(data)
 	if len(matches) == 2 {
 		return string(matches[1]), nil
 	}
 
 	return "", errors.New("failed to parse beat version file")
+}
+
+func parseBeatVersion(data []byte) (string, error) {
+	return ParseBeatVersion(data)
 }
 
 func parseGoVersion(data []byte) (string, error) {

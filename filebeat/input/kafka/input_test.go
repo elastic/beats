@@ -20,15 +20,18 @@
 package kafka
 
 import (
+	"io"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/sarama"
 )
 
 func TestNewInputDone(t *testing.T) {
@@ -39,6 +42,18 @@ func TestNewInputDone(t *testing.T) {
 	})
 
 	AssertNotStartedInputCanBeDone(t, config)
+}
+
+// TestNoPanicOnClientError checks that Test returns an error instead of
+// panicking when the broker connection fails.
+func TestNoPanicOnClientError(t *testing.T) {
+	k := &kafkaInput{
+		config:       kafkaInputConfig{Hosts: []string{"127.0.0.1:1"}, Topics: []string{"topic-a"}},
+		saramaConfig: sarama.NewConfig(),
+	}
+
+	err := k.Test(input.TestContext{Logger: logp.NewLogger("kafka-repro")})
+	require.Error(t, err)
 }
 
 // AssertNotStartedInputCanBeDone checks that the context of an input can be
@@ -77,5 +92,64 @@ func TestAckEventPrivate(t *testing.T) {
 	for i := range 3 {
 		ack := <-ackedCh
 		assert.Equal(t, i, ack, "expecting ack to be %d, got %d. The order or value is wrong", i, ack)
+	}
+}
+
+type fakeClaim struct {
+	sarama.ConsumerGroupClaim
+	messages chan *sarama.ConsumerMessage
+}
+
+func (c *fakeClaim) Topic() string                            { return "test-topic" }
+func (c *fakeClaim) Partition() int32                         { return 0 }
+func (c *fakeClaim) Messages() <-chan *sarama.ConsumerMessage { return c.messages }
+
+type fakeSession struct {
+	sarama.ConsumerGroupSession
+	marked []int64
+}
+
+func (s *fakeSession) MarkMessage(msg *sarama.ConsumerMessage, _ string) {
+	s.marked = append(s.marked, msg.Offset)
+}
+
+func TestListFromFieldReaderZeroEventMessages(t *testing.T) {
+	cases := []struct {
+		name    string
+		payload string
+	}{
+		{name: "empty array", payload: `{"records":[]}`},
+		{name: "non-array field", payload: `{"records":"not-an-array"}`},
+		{name: "missing field", payload: `{"other":[{"id":1}]}`},
+		{name: "null field", payload: `{"records":null}`},
+		{name: "invalid json", payload: `not-json`},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			ch := make(chan *sarama.ConsumerMessage, 2)
+			ch <- &sarama.ConsumerMessage{Offset: 0, Value: []byte(tc.payload)}
+			ch <- &sarama.ConsumerMessage{Offset: 1, Value: []byte(`{"records":[{"id":"good"}]}`)}
+			close(ch)
+
+			session := &fakeSession{}
+			handler := &groupHandler{
+				session:                  session,
+				expandEventListFromField: "records",
+				log:                      logp.NewNopLogger(),
+			}
+			r := handler.createReader(&fakeClaim{messages: ch})
+
+			msg, err := r.Next()
+			require.NoError(t, err, "expected Next to skip zero-event message and return the next valid event")
+			assert.JSONEq(t, `{"id":"good"}`, string(msg.Content), "unexpected expanded event content")
+			assert.Empty(t, session.marked, "expected no offset to be marked before the valid event is acknowledged")
+
+			ackEventPrivate(msg.Private)
+			assert.Equal(t, []int64{1}, session.marked, "expected valid message offset to be marked after event ack")
+
+			_, err = r.Next()
+			require.ErrorIs(t, err, io.EOF, "expected io.EOF after all messages are consumed")
+		})
 	}
 }

@@ -30,6 +30,7 @@ import (
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
+	"github.com/elastic/beats/v7/dev-tools/mage/release"
 )
 
 var (
@@ -170,4 +171,68 @@ func CheckLicenseHeaders() error {
 // DumpVariables writes the template variables and values to stdout.
 func DumpVariables() error {
 	return devtools.DumpVariables()
+}
+
+// Release is the namespace for release automation tasks.
+type Release mg.Namespace
+
+func loadReleaseConfig() (*release.ReleaseConfig, error) {
+	settings, err := devtools.LoadReleaseSettings()
+	if err != nil {
+		return nil, err
+	}
+	if err := settings.RequireRelease(); err != nil {
+		return nil, err
+	}
+	return settings, nil
+}
+
+// UpdateVersion updates the version in libbeat/version/version.go
+func (Release) UpdateVersion(version string) error {
+	return release.UpdateVersion(version)
+}
+
+// UpdateDocs updates version references in documentation and K8s manifests
+func (Release) UpdateDocs(version string) error {
+	return release.UpdateDocs(version)
+}
+
+// UpdateTestEnv updates docker-compose.yml files to the latest published Stack release.
+func (Release) UpdateTestEnv(latest string) error {
+	return release.UpdateTestEnv(latest)
+}
+
+// UpdateMergify updates .mergify.yml backport configuration
+func (Release) UpdateMergify(version string) error {
+	return release.UpdateMergify(version)
+}
+
+// RunMajorMinor executes the feature-freeze workflow: creates the release branch
+// and 3 grouped PRs (main backport+version, ff-release, main docs+env).
+// Next-patch bumps are owned by RunPatch, not this workflow.
+func (Release) RunMajorMinor() error {
+	cfg, err := loadReleaseConfig()
+	if err != nil {
+		return err
+	}
+	return release.RunMajorMinorRelease(cfg)
+}
+
+// RunPatch executes the post-release patch bump: version + test-env to NEXT_RELEASE.
+func (Release) RunPatch() error {
+	cfg, err := loadReleaseConfig()
+	if err != nil {
+		return err
+	}
+	return release.RunPatchRelease(cfg)
+}
+
+// EnsureIssueTracker creates or updates the Beats release checklist issue for
+// NEXT_RELEASE, linking related Beats PRs labeled "release".
+func (Release) EnsureIssueTracker() error {
+	cfg, err := loadReleaseConfig()
+	if err != nil {
+		return err
+	}
+	return release.EnsureReleaseIssueTracker(cfg, nil)
 }
