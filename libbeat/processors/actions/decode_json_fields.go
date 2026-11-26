@@ -235,26 +235,7 @@ func unmarshal(maxDepth int, text string, fields *any, processArray bool) error 
 func decodeJSON(text string, to *any) error {
 	dec := json.NewDecoder(strings.NewReader(text))
 	dec.UseNumber()
-<<<<<<< HEAD
 	err := dec.Decode(to)
-=======
-	var err error
-	if limit > 0 {
-		*to, err = decodeLimited(dec, text, level, limit)
-		if err != nil {
-			// Report the error Decode reports for the same input. Token and
-			// More report malformed input differently (e.g. truncated input
-			// as io.EOF where Decode reports io.ErrUnexpectedEOF), and how
-			// they differ changed with the encoding/json v2 backend in Go 1.27.
-			var v any
-			if errDecode := json.NewDecoder(strings.NewReader(text)).Decode(&v); errDecode != nil {
-				err = errDecode
-			}
-		}
-	} else {
-		err = dec.Decode(to)
-	}
->>>>>>> 3a323f1 (chore(deps): update Go to 1.27.4 (#54741))
 
 	if err != nil {
 		return err
