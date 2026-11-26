@@ -76,7 +76,6 @@ func TestNewUUIDSet(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -101,38 +100,28 @@ func TestUUIDSet_UnmarshalJSON(t *testing.T) {
 			Want: NewUUIDSet(),
 		},
 		"ok-testUUID1-elem": {
-			In:   []byte(fmt.Sprintf(`["%s"]`, testUUID1Str)),
+			In:   fmt.Appendf(nil, `["%s"]`, testUUID1Str),
 			Want: NewUUIDSet(testUUID1),
 		},
 		"ok-testUUID3-elem": {
-			In:   []byte(fmt.Sprintf(`["%s", "%s", "%s"]`, testUUID1Str, testUUID2Str, testUUID3Str)),
+			In:   fmt.Appendf(nil, `["%s", "%s", "%s"]`, testUUID1Str, testUUID2Str, testUUID3Str),
 			Want: NewUUIDSet(testUUID1, testUUID2, testUUID3),
 		},
 		"ok-dup-elem": {
-			In:   []byte(fmt.Sprintf(`["%s","%s","%s"]`, testUUID1Str, testUUID2Str, testUUID2Str)),
+			In:   fmt.Appendf(nil, `["%s","%s","%s"]`, testUUID1Str, testUUID2Str, testUUID2Str),
 			Want: NewUUIDSet(testUUID1, testUUID2),
 		},
 		"err-mixed-types": {
-<<<<<<< HEAD
-			In:      []byte(fmt.Sprintf(`["%s",0]`, testUUID1Str)),
-			WantErr: "json: cannot unmarshal number into Go value of type uuid.UUID",
-		},
-		"err-not-list-str": {
-			In:      []byte(fmt.Sprintf(`"%s"`, testUUID1Str)),
-			WantErr: "json: cannot unmarshal string into Go value of type []uuid.UUID",
-=======
 			In:          fmt.Appendf(nil, `["%s",0]`, testUUID1Str),
 			WantTypeErr: &wantTypeErr{Value: "number", Type: reflect.TypeFor[uuid.UUID]()},
 		},
 		"err-not-list-str": {
 			In:          fmt.Appendf(nil, `"%s"`, testUUID1Str),
 			WantTypeErr: &wantTypeErr{Value: "string", Type: reflect.TypeFor[[]uuid.UUID]()},
->>>>>>> 3a323f1 (chore(deps): update Go to 1.27.4 (#54741))
 		},
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -162,16 +151,15 @@ func TestUUIDSet_MarshalJSON(t *testing.T) {
 		},
 		"ok-testUUID1-elem": {
 			In:   NewUUIDSet(testUUID1),
-			Want: []byte(fmt.Sprintf(`["%s"]`, testUUID1Str)),
+			Want: fmt.Appendf(nil, `["%s"]`, testUUID1Str),
 		},
 		"ok-testUUID3-elem": {
 			In:   NewUUIDSet(testUUID1, testUUID2, testUUID3),
-			Want: []byte(fmt.Sprintf(`["%s","%s","%s"]`, testUUID1Str, testUUID2Str, testUUID3Str)),
+			Want: fmt.Appendf(nil, `["%s","%s","%s"]`, testUUID1Str, testUUID2Str, testUUID3Str),
 		},
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -203,7 +191,6 @@ func TestUUIDSet_Len(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -229,7 +216,6 @@ func TestUUIDSet_Values(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -268,7 +254,6 @@ func TestUUIDSet_Add(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -308,7 +293,6 @@ func TestUUIDSet_Remove(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -342,7 +326,6 @@ func TestUUIDSet_Contains(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
