@@ -26,6 +26,8 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	"github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/pkg/paths"
@@ -347,6 +349,87 @@ func TestMinimalInput_RunSync_WaitsForLastACK(t *testing.T) {
 	}
 }
 
+// TestMinimalInput_RunSync_IncompleteCommits checks that both syncers
+// commit an incomplete sync and return its error.
+func TestMinimalInput_RunSync_IncompleteCommits(t *testing.T) {
+	t.Parallel()
+
+	syncErr := &entcollect.IncompleteError{Err: errors.New("enrichment skipped")}
+	prov := &fakeProvider{
+		fullFunc: func(ctx context.Context, s entcollect.Store, pub entcollect.Publisher, log *slog.Logger) error {
+			if err := s.Set("cursor", "page-2"); err != nil {
+				return err
+			}
+			return syncErr
+		},
+	}
+
+	// Each newSyncer returns a syncer and a function that reads a
+	// committed key from its store.
+	tests := []struct {
+		name      string
+		newSyncer func(t *testing.T) (syncer, func(key string, dst any) error)
+	}{
+		{
+			name: "bbolt",
+			newSyncer: func(t *testing.T) (syncer, func(string, any) error) {
+				store, err := kvstore.NewStore(logptest.NewTestingLogger(t, "test"), filepath.Join(t.TempDir(), "test.db"), 0o600)
+				if err != nil {
+					t.Fatalf("NewStore: %v", err)
+				}
+				t.Cleanup(func() { store.Close() })
+				const bucket = "entcollect.testprov"
+				get := func(key string, dst any) error {
+					return store.RunTransaction(false, func(tx *kvstore.Transaction) error {
+						return tx.Get([]byte(bucket), []byte(key), dst)
+					})
+				}
+				return &bboltSyncer{store: store, bucketName: bucket}, get
+			},
+		},
+		{
+			name: "es",
+			newSyncer: func(t *testing.T) (syncer, func(string, any) error) {
+				reg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
+				t.Cleanup(func() { reg.Close() })
+				store, err := reg.Get("test")
+				if err != nil {
+					t.Fatalf("registry Get: %v", err)
+				}
+				t.Cleanup(func() { store.Close() })
+				return &esSyncer{store: store}, kvstore.NewStateStoreAdapter(store).Get
+			},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			s, get := test.newSyncer(t)
+			log := logptest.NewTestingLogger(t, "test")
+			err := s.runSync(
+				v2.Context{
+					Logger:      log,
+					ID:          "test-incomplete",
+					Cancelation: t.Context(),
+				},
+				prov,
+				&ackingClient{inner: &fakeClient{}},
+				slogLogger(log),
+				true,
+			)
+			if !errors.Is(err, syncErr) {
+				t.Errorf("runSync = %v; want %v", err, syncErr)
+			}
+			var cursor string
+			if err := get("cursor", &cursor); err != nil {
+				t.Fatalf("reading cursor after incomplete sync: %v", err)
+			}
+			if cursor != "page-2" {
+				t.Errorf("cursor = %q; want %q", cursor, "page-2")
+			}
+		})
+	}
+}
+
 func TestMinimalInput_RunCancelation(t *testing.T) {
 	t.Parallel()
 
@@ -515,9 +598,9 @@ func TestMinimalInput_RunFullSyncBackoff(t *testing.T) {
 	}
 }
 
-// TestMinimalInput_RunIncrementalSyncStatus checks that a failed
-// incremental sync is reported as degraded, and that the next successful
-// one reports running.
+// TestMinimalInput_RunIncrementalSyncStatus checks that a failed incremental
+// sync is reported as degraded, and that the next successful one reports
+// running.
 func TestMinimalInput_RunIncrementalSyncStatus(t *testing.T) {
 	t.Parallel()
 
@@ -545,25 +628,143 @@ func TestMinimalInput_RunIncrementalSyncStatus(t *testing.T) {
 	}
 }
 
+// TestMinimalInput_RunIncompleteIncrementalSync checks that an incomplete
+// incremental sync is reported as degraded until the next full sync, even
+// when a later incremental sync fails and the ones after it succeed.
+func TestMinimalInput_RunIncompleteIncrementalSync(t *testing.T) {
+	t.Parallel()
+
+	var calls atomic.Int32
+	prov := &fakeProvider{
+		incrFunc: func(ctx context.Context, s entcollect.Store, pub entcollect.Publisher, log *slog.Logger) error {
+			switch calls.Add(1) {
+			case 1:
+				return &entcollect.IncompleteError{Err: errors.New("enrichment skipped")}
+			case 2:
+				return errors.New("incremental failure")
+			default:
+				return nil
+			}
+		},
+	}
+	mi := newTestMinimalInput(t, prov, time.Hour, 10*time.Millisecond)
+
+	incomplete := statusUpdate{status.Degraded, "Incomplete incremental sync: enrichment skipped"}
+	failed := statusUpdate{status.Degraded, "Error running incremental sync: incremental failure"}
+	updates := runUntil(t, mi, func(u []statusUpdate) bool {
+		i := slices.Index(u, failed)
+		return i >= 0 && len(u)-i >= 4
+	})
+
+	i := slices.Index(updates, incomplete)
+	if i < 0 || i > slices.Index(updates, failed) {
+		t.Fatalf("got updates %v; want %v before %v", updates, incomplete, failed)
+	}
+	for _, u := range updates[i:] {
+		if u != incomplete && u != failed {
+			t.Errorf("status %v %q reported after an incomplete incremental sync; want %v", u.status, u.msg, incomplete)
+		}
+	}
+	if got := updates[len(updates)-1]; got != incomplete {
+		t.Errorf("last status = %v %q; want %v", got.status, got.msg, incomplete)
+	}
+}
+
+// TestMinimalInput_RunIncompleteFullSync checks that an incomplete full
+// sync is not retried early, and is reported as degraded until the next
+// full sync, even when incremental syncs succeed in between.
+func TestMinimalInput_RunIncompleteFullSync(t *testing.T) {
+	t.Parallel()
+
+	var calls atomic.Int32
+	prov := &fakeProvider{
+		fullFunc: func(ctx context.Context, s entcollect.Store, pub entcollect.Publisher, log *slog.Logger) error {
+			calls.Add(1)
+			return &entcollect.IncompleteError{Err: errors.New("enrichment skipped")}
+		},
+	}
+	// A failed full sync would be retried after the 10ms incremental
+	// interval, well before the next full sync is due.
+	mi := newTestMinimalInput(t, prov, time.Hour, 10*time.Millisecond)
+
+	incomplete := statusUpdate{status.Degraded, "Incomplete full sync: enrichment skipped"}
+	updates := runUntil(t, mi, func(u []statusUpdate) bool {
+		i := slices.Index(u, incomplete)
+		return i >= 0 && len(u)-i >= 4
+	})
+
+	if got := calls.Load(); got != 1 {
+		t.Errorf("got %d full syncs; want 1 (no early retry of an incomplete full sync)", got)
+	}
+	for _, u := range updates[slices.Index(updates, incomplete):] {
+		if u != incomplete {
+			t.Errorf("status %v %q reported after an incomplete full sync; want %v", u.status, u.msg, incomplete)
+		}
+	}
+}
+
 // TestMinimalInput_RunFullSyncClearsIncrementalError checks that a
 // successful full sync reports running even if the last incremental sync
-// failed.
+// failed or was incomplete.
 func TestMinimalInput_RunFullSyncClearsIncrementalError(t *testing.T) {
 	t.Parallel()
 
-	prov := &fakeProvider{
-		incrFunc: func(ctx context.Context, s entcollect.Store, pub entcollect.Publisher, log *slog.Logger) error {
-			return errors.New("incremental failure")
+	tests := []struct {
+		name string
+		err  error
+		want string
+	}{
+		{
+			name: "failed",
+			err:  errors.New("incremental failure"),
+			want: "Error running incremental sync: incremental failure",
+		},
+		{
+			name: "incomplete",
+			err:  &entcollect.IncompleteError{Err: errors.New("enrichment skipped")},
+			want: "Incomplete incremental sync: enrichment skipped",
 		},
 	}
-	mi := newTestMinimalInput(t, prov, 100*time.Millisecond, 20*time.Millisecond)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
 
-	failed := statusUpdate{status.Degraded, "Error running incremental sync: incremental failure"}
-	recovered := statusUpdate{status.Running, "Successful full sync"}
-	runUntil(t, mi, func(u []statusUpdate) bool {
-		i := slices.Index(u, failed)
-		return i >= 0 && slices.Contains(u[i:], recovered)
-	})
+			prov := &fakeProvider{
+				incrFunc: func(ctx context.Context, s entcollect.Store, pub entcollect.Publisher, log *slog.Logger) error {
+					return test.err
+				},
+			}
+			mi := newTestMinimalInput(t, prov, 100*time.Millisecond, 20*time.Millisecond)
+
+			failed := statusUpdate{status.Degraded, test.want}
+			recovered := statusUpdate{status.Running, "Successful full sync"}
+			runUntil(t, mi, func(u []statusUpdate) bool {
+				i := slices.Index(u, failed)
+				return i >= 0 && slices.Contains(u[i:], recovered)
+			})
+		})
+	}
+}
+
+func TestDegradedMsg(t *testing.T) {
+	t.Parallel()
+
+	cause := errors.New("enrichment skipped")
+	tests := []struct {
+		kind string
+		err  error
+		want string
+	}{
+		{kind: "full", err: errors.New("provider failure"), want: "Error running full sync: provider failure"},
+		{kind: "full", err: &entcollect.IncompleteError{Err: cause}, want: "Incomplete full sync: enrichment skipped"},
+		{kind: "incremental", err: &entcollect.IncompleteError{}, want: "Incomplete incremental sync"},
+		{kind: "full", err: fmt.Errorf("wrapped: %w", &entcollect.IncompleteError{Err: cause}), want: "Incomplete full sync: enrichment skipped"},
+	}
+	for _, test := range tests {
+		if got := degradedMsg(test.kind, test.err); got != test.want {
+			t.Errorf("degradedMsg(%q, %v) = %q; want %q", test.kind, test.err, got, test.want)
+		}
+	}
 }
 
 // TestRetryBackoff checks the doubling, the cap and the reset of the full
@@ -619,8 +820,9 @@ func runUntil(t *testing.T, mi *minimalStateInput, done func([]statusUpdate) boo
 	go func() {
 		runErr <- mi.Run(
 			v2.Context{
-				Logger:      logptest.NewTestingLogger(t, "test"),
-				ID:          "test-" + t.Name(),
+				Logger: logptest.NewTestingLogger(t, "test"),
+				// The ID names the store file, so it can't contain a slash.
+				ID:          "test-" + strings.ReplaceAll(t.Name(), "/", "_"),
 				Cancelation: v2.GoContextFromCanceler(ctx),
 			}.WithStatusReporter(reporter),
 			&fakeConnector{client: &ackingClient{inner: &fakeClient{}}},
