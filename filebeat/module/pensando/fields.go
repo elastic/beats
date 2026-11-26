@@ -32,5 +32,9 @@ func init() {
 // AssetPensando returns asset data.
 // This is the base64 encoded zlib format compressed contents of module/pensando.
 func AssetPensando() string {
+<<<<<<< HEAD
 	return "eJy0k9+KqzAQh+99inmB9gG8OHCgFM7FgbJd2MuSNaMNjU5IRqRvvyRVm7qR/lk3l0n8fZ+TmRWc8JyDwcaJRlIGwIo15rDrdyADkOgKqwwranL4kwHA+AH8J9lqzABKhVq6PJyuoBE13sT6xWeDOVSWWtPvJJL92oYsKC3VVxFNlVv3V2JYDJRlB+NmCuiXRY3CYQ6fyCLan5GJfMhedTbbj+jKVCiWEoWPvDka1E547sjKydm8SFh/Qx5QA3xEKDV1a0iDjTmoafgFrBrGCi08STZGq0IE/L9NGirRsWrCnYOQ0qJzU8rNvz+r0EdSGZNmChC7GLKcFnmtFjuf95iFsnh5suV6YDNmUjm2QRpvLDEVpBek74bIu3Dbajyob4/8kw54azX67uOjYOiEg1pwcUQ5U32Hzvn3n5N47fX3l1TvcbcGg4FjwbhgIQaHkBtrzFWCWlvgbwzlPiSDuM7mYypLz2TvYfrRvCPBqkbHojZpBemr+hz/fUzs6ZqqNWRfAQAA//+7tuLm"
+=======
+	return "eJy0k0GK4zAQRfc5xb9A5wBeDAyEhl4MhOmBWQaNVU5Eyy4hlQm5/SDFdquNHcfgxlmViv9evq0XfNCtgKMmqEbzDhAjlgocPyeaQumNE8NNgR87AMM+frFuLe2AypDVoUinL2hUTV9S41hujgqcPbeum0wkx99rykLluR48YPkc9t1KDsuBurpiGE4B4+PJkgpU4B+JyuYzMpkP+0+dw+vfbGUslEupMjb35ahX+6Dblb0enc2LpOdnygM3kAuhsnzdYxrs3MmMw+9g0widyWMl2TlrSpXwb4dpqKYgpkk7J6W1pxDw6L+vVegiucpJ+2UXx16wYRfHmPechfF0f2WPelhHPwyZXA2fwTTeeRYu2W5IP/aRi3DfWjoZ/ZCNdfDfrSW8HSAXJbiqgFpJeSE9036gEOK3aPSWb//9nho9FjvoDYIooQ2L6B1Sbq4x1wS3vqTvuJTvKRl98tMqW9/JzsN1V3NBQkxNQVTtxpS7go6truP/GRI7uuXzHrv/AwDH4OLG"
+>>>>>>> 3a323f1 (chore(deps): update Go to 1.27.4 (#54741))
 }

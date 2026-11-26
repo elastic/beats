@@ -32,5 +32,9 @@ func init() {
 // AssetMongodb returns asset data.
 // This is the base64 encoded zlib format compressed contents of module/mongodb.
 func AssetMongodb() string {
+<<<<<<< HEAD
 	return "eJyUk9Gu0zAMhu/7FNa5P0eaBOeiF0iwo0lcFJ4hNG5mLbFD4o6Vp0dpJ2ghbJovf+v397tunuGEUwtB2In91gAoqccWnq7KUwNgMfeJopJwCx8aAIBO7OgRBkkQTcrEDrpiePsEXhwM5DG/NAADobe5nT3PwCbgmlVKp4gtuCRjvCoV3FKHeRgMScKaNoNKrWFroBe3mvIv8Ca01F5YDXG+Ev6foJbiT45eQhRG1s34m2SAw8h96RkPvVF0kuinKQLIAAFzNg43JryYEMsJ91+77uOXt01zWf6E0w9JthqRFS8PBdwvlrtxiEkNW09ZkR8KlfGMiXSqmIwnkzd6NHqcT/7i8Yx+0wvkkln20DRiBVXb4Dap5rjPIfvIJ/7Mig4TJIwJM7KW96ZHhJHp+4hAtmgDYSpXKI3yCLMaxfD37/b7Hu9ed+9fd7vKql7YNb8CAAD//8hOG3I="
+=======
+	return "eJyUk8Fu2zAQRO/6ivmBBDDQ5qBDgTZBgB7cfgNrjZhFqCVLrlKrX19QaVMrIGwY4mlGqzfc1d7gmUuPKaqPw48OMLHAHvsqPHzpgIHlkCWZRO3xqQOAfRzmQIwxI7lcRP2/9xGixyiB5bYDRmEYSr/W3EDdxFNSfWxJ7OFznNNfpYF7PY/rxzDmOJ3SVhCwhZ0CQ/RvWgt4FlrPfVRzogXjhQStFP9zHOKUolLtxLtABh5nPdTOu4CDM/qY5berAuKIiaU4z00Rj25KdYD33/f7z98eNubr5Z+5/Ip5aEZU4/GqgLU5PNrFOKJiTocgxahXhSp8YRZbGkUuiCsbPTl7Wkd+G/jCsPEm8XntXQ/LMxuo1g3Ok1oVlzkyXNPir2r0zMhMmYVqdd/siZhVfs6EDFUbhblOoRp1CYs54/T+d3ubx4e73ce73W5j2pLYI0T13Z8BACicGs4="
+>>>>>>> 3a323f1 (chore(deps): update Go to 1.27.4 (#54741))
 }

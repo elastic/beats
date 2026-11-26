@@ -19,5 +19,9 @@ func init() {
 // AssetCoredns returns asset data.
 // This is the base64 encoded zlib format compressed contents of module/coredns.
 func AssetCoredns() string {
+<<<<<<< HEAD
 	return "eJy8zjFS9DAMBeA+p3gX2P8ALv4GWmg4gTd+znrwWkZWCu/pGbMhZBhoUflGep9OeGV3mEUZSpsAS5bp8LAHgW3WVC1Jcfg/AcCThDUTURQXX0JOZUGWpaGqhHVmwLkfKmNiDs19nJ5Q/JVHcIz1SodFZa1b8oM6ZjvbKuGjUVFErz6nmx/b2+rR/FLfVmr/19KNe+OdTsW4UPc0jkpzOHdj29NfngJGIyTCLsTj88vdmb7hylalNP6B/0lN7wEAAP//HDeN8A=="
+=======
+	return "eJy8zjFyKyEQBNCcU/QF9A9A8BMrtRKdAC3NijJi8MAG6PQubGRvuezUBdHA9OsDXtgtFlH6XA3QYku0eBLl8XQ2gGddNJYWJVv8NwDwLH5LRBDF1WWfYl6RZK0oKn5b6HHpu8gQmXy176sHZHfjHhyn9UKLVWUrc/KDOu5cm5FwoVGRRW8uxbsbHefXvfmlvm7U/q/GO+fDg465caV+TsOIbBaX3vgo+WspYCRCAtqVOJ7OH475hitrkVz5B76yFsmV5m0Ac2iNkA=="
+>>>>>>> 3a323f1 (chore(deps): update Go to 1.27.4 (#54741))
 }
