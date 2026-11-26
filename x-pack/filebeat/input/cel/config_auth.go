@@ -27,7 +27,9 @@ import (
 	"golang.org/x/oauth2/google"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/identityfederation"
 )
 
 type authConfig struct {
@@ -232,6 +234,8 @@ type oAuth2Config struct {
 	// microsoft azure specific
 	AzureTenantID string `config:"azure.tenant_id"`
 	AzureResource string `config:"azure.resource"`
+	// AzureUseCloudConnectors replaces client.secret with a workload-identity-issuer token.
+	AzureUseCloudConnectors bool `config:"azure.use_cloud_connectors"`
 
 	// okta specific RSA JWK private key
 	OktaJWKFile string          `config:"okta.jwk_file"`
@@ -269,7 +273,7 @@ func (o *oAuth2Config) clientCredentialsGrant(ctx context.Context, _ *http.Clien
 }
 
 // Client wraps the given http.Client and returns a new one that will use the oauth authentication.
-func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.Client, error) {
+func (o *oAuth2Config) client(ctx context.Context, client *http.Client, log *logp.Logger) (*http.Client, error) {
 	ctx = context.WithValue(ctx, oauth2.HTTPClient, client)
 
 	switch o.getProvider() {
@@ -292,6 +296,14 @@ func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.C
 			return o.clientCredentialsGrant(ctx, client), nil
 		}
 	case oAuth2ProviderAzure:
+		if o.AzureUseCloudConnectors {
+			log.Info("Switching credentials provider to Identity Federation (WII)")
+			ts, err := identityfederation.AzureNewWIIOAuth2TokenSourceFromEnv(ctx, o.getTokenURL(), o.ClientID, o.Scopes, o.getEndpointParams(), log)
+			if err != nil {
+				return nil, fmt.Errorf("oauth2 client: %w", err)
+			}
+			return oauth2.NewClient(ctx, ts), nil
+		}
 		return o.clientCredentialsGrant(ctx, client), nil
 	case oAuth2ProviderBox:
 		return o.fetchBoxOauthClient(ctx)
@@ -541,7 +553,7 @@ func (o *oAuth2Config) validateAzureProvider() error {
 	if o.TokenURL != "" && o.AzureTenantID != "" {
 		return errors.New("only one of token_url and tenant_id can be used")
 	}
-	if o.ClientID == "" || o.ClientSecret == nil {
+	if o.ClientID == "" || (o.ClientSecret == nil && !o.AzureUseCloudConnectors) {
 		return errors.New("client credentials must be provided")
 	}
 

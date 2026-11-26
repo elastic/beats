@@ -23,10 +23,6 @@ import (
 	"github.com/elastic/beats/v7/pkg/logp"
 )
 
-// AzureTokenExchangeAudience is the audience Microsoft Entra expects in a
-// federated identity credential.
-const AzureTokenExchangeAudience = "api://AzureADTokenExchange" //nolint:gosec // G101: a public audience URI, not a credential
-
 // AzureParams configures the Azure client assertion credential flow.
 //
 // Authentication chain:
@@ -123,19 +119,9 @@ func AzureNewWIIClientAssertionCredential(params AzureWIIParams) (*azidentity.Cl
 
 // AzureNewWIIClientAssertionCredentialFromEnv reads the WII environment that the agentless controller sets.
 func AzureNewWIIClientAssertionCredentialFromEnv(tenantID, clientID string, opts *azidentity.ClientAssertionCredentialOptions, logger *logp.Logger) (*azidentity.ClientAssertionCredential, error) {
-	wiiIssuerURL := os.Getenv(WIIIssuerURLEnvVar)
-	wiiCertFile := os.Getenv(WIISSLCertFileEnvVar)
-	wiiKeyFile := os.Getenv(WIISSLKeyFileEnvVar)
-
-	if wiiIssuerURL == "" {
-		return nil, fmt.Errorf("identity federation for Azure requires the workload-identity-issuer environment set by the agentless controller: %s is not set", WIIIssuerURLEnvVar)
-	}
-	if wiiCertFile == "" || wiiKeyFile == "" {
-		return nil, fmt.Errorf("%s and %s must be set when %s is configured", WIISSLCertFileEnvVar, WIISSLKeyFileEnvVar, WIIIssuerURLEnvVar)
-	}
-	tokenSource, err := NewWIITokenSource(wiiIssuerURL, wiiCertFile, wiiKeyFile, AzureTokenExchangeAudience, logger)
+	tokenSource, err := azureWIITokenSourceFromEnv(logger)
 	if err != nil {
-		return nil, fmt.Errorf("configuring WII token source: %w", err)
+		return nil, err
 	}
 	return AzureNewWIIClientAssertionCredential(AzureWIIParams{
 		TenantID:    tenantID,

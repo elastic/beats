@@ -600,6 +600,39 @@ var oAuth2ValidationTests = []struct {
 		},
 	},
 	{
+		name: "azure_with_use_cloud_connectors_does_not_need_client_secret",
+		input: map[string]any{
+			"auth.oauth2": map[string]any{
+				"provider":                   "azure",
+				"azure.tenant_id":            "a_tenant_id",
+				"azure.use_cloud_connectors": true,
+				"client.id":                  "a_client_id",
+			},
+		},
+	},
+	{
+		name: "azure_with_use_cloud_connectors_accepts_token_url",
+		input: map[string]any{
+			"auth.oauth2": map[string]any{
+				"provider":                   "azure",
+				"token_url":                  "localhost",
+				"azure.use_cloud_connectors": true,
+				"client.id":                  "a_client_id",
+			},
+		},
+	},
+	{
+		name:    "azure_with_use_cloud_connectors_needs_client_id",
+		wantErr: errors.New("client credentials must be provided accessing 'auth.oauth2'"),
+		input: map[string]any{
+			"auth.oauth2": map[string]any{
+				"provider":                   "azure",
+				"azure.tenant_id":            "a_tenant_id",
+				"azure.use_cloud_connectors": true,
+			},
+		},
+	},
+	{
 		name:    "google_can't_have_token_url_or_client_credentials_set",
 		wantErr: errors.New("none of token_url, client credentials, azure_tenant_id, azure_resource or endpoint_params can be used with the google provider; use google.credentials_file, google.jwt_file, google.credentials_json or ADC instead accessing 'auth.oauth2'"),
 		input: map[string]any{
