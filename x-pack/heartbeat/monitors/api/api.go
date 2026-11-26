@@ -28,7 +28,7 @@ func init() {
 	plugin.RegisterWithHashFunc("api", browser.HashConfig, create, "synthetics/api")
 }
 
-func create(name string, cfg *config.C, _ beat.Info) (p plugin.Plugin, err error) {
+func create(name string, cfg *config.C, info beat.Info) (p plugin.Plugin, err error) {
 	// API journeys don't launch Chromium, but they run the same Node.js
 	// synthetics agent as browser monitors, which is only present where
 	// ELASTIC_SYNTHETICS_CAPABLE is set. Gate on it like browser does.
@@ -41,7 +41,7 @@ func create(name string, cfg *config.C, _ beat.Info) (p plugin.Plugin, err error
 		return plugin.Plugin{}, fmt.Errorf("api monitors cannot be run as root")
 	}
 
-	sj, err := browser.NewSourceJob(cfg)
+	sj, err := browser.NewSourceJob(cfg, info.Logger)
 	if err != nil {
 		return plugin.Plugin{}, err
 	}

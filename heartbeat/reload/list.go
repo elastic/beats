@@ -111,6 +111,14 @@ func (r *HBRunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 
 	r.logger.Debugf("Starting reload procedure, current runners: %d", len(stopList))
 
+	enabledConfigs := make([]*config.C, 0, len(configs))
+	for _, config := range configs {
+		if config.Config.Enabled() {
+			enabledConfigs = append(enabledConfigs, config.Config)
+		}
+	}
+	cfgfile.SetRunnerConfigs(r.factory, r, enabledConfigs)
+
 	// diff current & desired state, create action lists
 	for _, config := range configs {
 		hash, err := r.HashConfig(config.Config)
@@ -226,6 +234,9 @@ func (r *HBRunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 func (r *HBRunnerList) Stop() {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
+
+	// The configs were set even if their runners failed to start.
+	cfgfile.SetRunnerConfigs(r.factory, r, nil)
 
 	if len(r.runners) == 0 {
 		return

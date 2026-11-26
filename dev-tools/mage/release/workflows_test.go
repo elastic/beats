@@ -1,0 +1,528 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+package release
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"slices"
+	"strings"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/google/go-github/v68/github"
+)
+
+func TestRunMajorMinorReleaseDryRunBranches(t *testing.T) {
+	origMakeUpdate := runMakeUpdate
+	runMakeUpdate = func() error { return nil }
+	t.Cleanup(func() { runMakeUpdate = origMakeUpdate })
+
+	origFetch := fetchLatestReleaseBefore
+	fetchLatestReleaseBefore = func(token, owner, repo, current string) (string, error) {
+		return "9.4.3", nil
+	}
+	t.Cleanup(func() { fetchLatestReleaseBefore = origFetch })
+
+	tmpDir := setupWorkflowTestRepo(t)
+
+	// Feature freeze expects BASE_BRANCH version.go to already equal NEXT_RELEASE
+	// (set by the previous cycle's next-minor bump on main).
+	runGit := func(args ...string) {
+		t.Helper()
+		cmd := exec.CommandContext(context.Background(), "git", args...)
+		cmd.Dir = tmpDir
+		if out, err := cmd.CombinedOutput(); err != nil {
+			t.Fatalf("git %v: %v (%s)", args, err, out)
+		}
+	}
+	if err := os.WriteFile(filepath.Join(tmpDir, "libbeat/version/version.go"), []byte(`package version
+
+const defaultBeatVersion = "9.5.0"
+`), 0644); err != nil {
+		t.Fatalf("failed to seed version.go: %v", err)
+	}
+	runGit("add", ".")
+	runGit("commit", "-m", "seed main at 9.5.0")
+
+	origDir, err := os.Getwd()
+	require.NoError(t, err, "failed to get cwd")
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("failed to restore cwd: %v", err)
+		}
+	}()
+	require.NoError(t, os.Chdir(tmpDir), "failed to chdir")
+
+	cfg := &ReleaseConfig{
+		NextRelease:             "9.5.0",
+		LatestRelease:           "9.4.3",
+		NextProjectMinorVersion: "9.6.0",
+		NextProjectMinorBranch:  "9.6",
+		BaseBranch:              "main",
+		ReleaseBranch:           "9.5",
+		DryRun:                  true,
+		GitAuthorName:           "Test User",
+		GitAuthorEmail:          "test@example.com",
+	}
+
+	require.NoError(t, RunMajorMinorRelease(cfg), "RunMajorMinorRelease dry run failed")
+
+	repo, err := openRepo(".")
+	require.NoError(t, err, "failed to open repo")
+
+	wantBranches := []string{
+		"main",
+		"9.5",
+		"ff-prep-main-9.5.0",
+		"ff-release-9.5.0",
+		"ff-prep-main-docs-env-9.6.0",
+	}
+	for _, branch := range wantBranches {
+		exists, err := repo.branchExists(branch)
+		if err != nil {
+			t.Fatalf("failed checking branch %s: %v", branch, err)
+		}
+		if !exists {
+			t.Errorf("expected branch %s to exist after dry run", branch)
+		}
+	}
+
+	// Next-patch is owned by RunPatchRelease, not minor/FF.
+	exists, err := repo.branchExists("ff-prep-next-patch-9.5.1")
+	require.NoError(t, err, "failed checking next-patch branch")
+	if exists {
+		t.Errorf("minor/FF must not create ff-prep-next-patch-9.5.1")
+	}
+
+	// PR-C must not rewrite README /main/ → next minor branch.
+	assertGitShowContains(t, tmpDir, "ff-prep-main-docs-env-9.6.0", "README.md", "/main/")
+	assertGitShowNotContains(t, tmpDir, "ff-prep-main-docs-env-9.6.0", "README.md", "/9.6/")
+	assertGitShowContains(t, tmpDir, "ff-prep-main-docs-env-9.6.0", "libbeat/docs/version.asciidoc", ":stack-version: 9.6.0")
+}
+
+func TestRunMajorMinorReleaseRejectsMismatchedNextRelease(t *testing.T) {
+	origMakeUpdate := runMakeUpdate
+	runMakeUpdate = func() error { return nil }
+	t.Cleanup(func() { runMakeUpdate = origMakeUpdate })
+
+	origFetch := fetchLatestReleaseBefore
+	fetchLatestReleaseBefore = func(token, owner, repo, current string) (string, error) {
+		return "9.4.3", nil
+	}
+	t.Cleanup(func() { fetchLatestReleaseBefore = origFetch })
+
+	tmpDir := setupWorkflowTestRepo(t) // version.go is 9.4.3
+
+	origDir, err := os.Getwd()
+	require.NoError(t, err, "failed to get cwd")
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("failed to restore cwd: %v", err)
+		}
+	}()
+	require.NoError(t, os.Chdir(tmpDir), "failed to chdir")
+
+	cfg := &ReleaseConfig{
+		NextRelease:             "9.5.0", // off-by-one vs main
+		LatestRelease:           "9.4.3",
+		NextProjectMinorVersion: "9.6.0",
+		BaseBranch:              "main",
+		ReleaseBranch:           "9.5",
+		DryRun:                  true,
+		GitAuthorName:           "Test User",
+		GitAuthorEmail:          "test@example.com",
+	}
+
+	err = RunMajorMinorRelease(cfg)
+	require.Error(t, err, "expected RunMajorMinorRelease to fail when NEXT_RELEASE mismatches main version")
+	require.Contains(t, err.Error(), "does not match version on main")
+}
+
+func assertGitShowContains(t *testing.T, dir, branch, file, want string) {
+	t.Helper()
+	out, err := exec.CommandContext(context.Background(), "git", "-C", dir, "show", branch+":"+file).CombinedOutput()
+	if err != nil {
+		t.Fatalf("git show %s:%s: %v (%s)", branch, file, err, out)
+	}
+	require.Contains(t, string(out), want)
+}
+
+func assertGitShowNotContains(t *testing.T, dir, branch, file, forbid string) {
+	t.Helper()
+	out, err := exec.CommandContext(context.Background(), "git", "-C", dir, "show", branch+":"+file).CombinedOutput()
+	if err != nil {
+		t.Fatalf("git show %s:%s: %v (%s)", branch, file, err, out)
+	}
+	if strings.Contains(string(out), forbid) {
+		t.Errorf("%s:%s should not contain %q, got:\n%s", branch, file, forbid, out)
+	}
+}
+
+func TestMajorMinorPrepBranchNames(t *testing.T) {
+	cfg := &ReleaseConfig{
+		NextRelease:             "9.5.0",
+		NextProjectMinorVersion: "9.6.0",
+		ReleaseBranch:           "9.5",
+		BaseBranch:              "main",
+	}
+
+	cases := []struct {
+		name   string
+		branch string
+	}{
+		{name: "PR-A", branch: fmt.Sprintf("ff-prep-main-%s", cfg.NextRelease)},
+		{name: "PR-B", branch: fmt.Sprintf("ff-release-%s", cfg.NextRelease)},
+		{name: "PR-C", branch: fmt.Sprintf("ff-prep-main-docs-env-%s", cfg.NextProjectMinorVersion)},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.branch == "" {
+				t.Fatal("branch name should not be empty")
+			}
+		})
+	}
+
+	casesLabels := []struct {
+		name   string
+		labels []string
+		want   string
+	}{
+		{name: "PR-A", labels: prAMainLabels(cfg.ReleaseBranch), want: mergeLabelFFDay},
+		{name: "PR-B", labels: prBReleaseLabels(), want: mergeLabelAfterBranch},
+		{name: "PR-C", labels: prCMainLabels(cfg.ReleaseBranch), want: mergeLabelAfterImages},
+	}
+	for _, tc := range casesLabels {
+		t.Run(tc.name+" labels", func(t *testing.T) {
+			if !slices.Contains(tc.labels, tc.want) {
+				t.Errorf("%s labels should include %q, got %v", tc.name, tc.want, tc.labels)
+			}
+		})
+	}
+
+	labelsA := prAMainLabels(cfg.ReleaseBranch)
+	if !slices.Contains(labelsA, "backport-9.5") {
+		t.Errorf("PR-A labels should include backport-9.5, got %v", labelsA)
+	}
+}
+
+func TestRunPatchReleaseDryRunBranches(t *testing.T) {
+	origMakeUpdate := runMakeUpdate
+	runMakeUpdate = func() error { return nil }
+	t.Cleanup(func() { runMakeUpdate = origMakeUpdate })
+
+	tmpDir := setupWorkflowTestRepo(t)
+
+	// Patch workflow starts from an existing release branch whose version.go
+	// equals the previous patch (NEXT_RELEASE - 1). NEXT_RELEASE is the
+	// version to land (NEW_VERSION from version-bump).
+	runGit := func(args ...string) {
+		t.Helper()
+		cmd := exec.CommandContext(context.Background(), "git", args...)
+		cmd.Dir = tmpDir
+		if out, err := cmd.CombinedOutput(); err != nil {
+			t.Fatalf("git %v: %v (%s)", args, err, out)
+		}
+	}
+	runGit("branch", "9.5")
+	runGit("checkout", "9.5")
+	versionPath := filepath.Join(tmpDir, "libbeat/version/version.go")
+	if err := os.WriteFile(versionPath, []byte(`package version
+
+const defaultBeatVersion = "9.5.1"
+`), 0644); err != nil {
+		t.Fatalf("failed to seed version.go: %v", err)
+	}
+	docsPath := filepath.Join(tmpDir, "libbeat/docs/version.asciidoc")
+	if err := os.WriteFile(docsPath, []byte(`:stack-version: 9.5.1
+:doc-branch: 9.5
+`), 0644); err != nil {
+		t.Fatalf("failed to seed version.asciidoc: %v", err)
+	}
+	latestPath := filepath.Join(tmpDir, "testing/environments/latest.yml")
+	if err := os.WriteFile(latestPath, []byte(`services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.5.0
+`), 0644); err != nil {
+		t.Fatalf("failed to seed latest.yml: %v", err)
+	}
+	runGit("add", ".")
+	runGit("commit", "-m", "seed 9.5 branch at 9.5.1")
+	runGit("checkout", "main")
+
+	origDir, err := os.Getwd()
+	require.NoError(t, err, "failed to get cwd")
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("failed to restore cwd: %v", err)
+		}
+	}()
+	require.NoError(t, os.Chdir(tmpDir), "failed to chdir")
+
+	cfg := &ReleaseConfig{
+		NextRelease:    "9.5.2",
+		LatestRelease:  "9.5.1",
+		ReleaseBranch:  "9.5",
+		DryRun:         true,
+		GitAuthorName:  "Test User",
+		GitAuthorEmail: "test@example.com",
+	}
+
+	require.NoError(t, RunPatchRelease(cfg), "RunPatchRelease dry run failed")
+
+	repo, err := openRepo(".")
+	require.NoError(t, err, "failed to open repo")
+
+	wantBranches := []string{
+		"9.5",
+		"update-version-9.5.2",
+	}
+	for _, branch := range wantBranches {
+		exists, err := repo.branchExists(branch)
+		if err != nil {
+			t.Fatalf("failed checking branch %s: %v", branch, err)
+		}
+		if !exists {
+			t.Errorf("expected branch %s to exist after dry run", branch)
+		}
+	}
+
+	exists, err := repo.branchExists("patch-release-9.5.2")
+	if err != nil {
+		t.Fatalf("failed checking docs branch: %v", err)
+	}
+	if exists {
+		t.Errorf("patch must not create docs branch patch-release-9.5.2")
+	}
+
+	assertGitShowContains(t, tmpDir, "update-version-9.5.2", "libbeat/version/version.go", `defaultBeatVersion = "9.5.2"`)
+	assertGitShowContains(t, tmpDir, "update-version-9.5.2", "testing/environments/latest.yml", "elasticsearch:9.5.1")
+	if cfg.LatestRelease != "9.5.1" {
+		t.Errorf("LatestRelease forced to previous patch = %s, want 9.5.1", cfg.LatestRelease)
+	}
+}
+
+func TestRunPatchReleaseRejectsMismatchedNextRelease(t *testing.T) {
+	origMakeUpdate := runMakeUpdate
+	runMakeUpdate = func() error { return nil }
+	t.Cleanup(func() { runMakeUpdate = origMakeUpdate })
+
+	tmpDir := setupWorkflowTestRepo(t)
+	runGit := func(args ...string) {
+		t.Helper()
+		cmd := exec.CommandContext(context.Background(), "git", args...)
+		cmd.Dir = tmpDir
+		if out, err := cmd.CombinedOutput(); err != nil {
+			t.Fatalf("git %v: %v (%s)", args, err, out)
+		}
+	}
+	runGit("branch", "9.5")
+	runGit("checkout", "9.5")
+	if err := os.WriteFile(filepath.Join(tmpDir, "libbeat/version/version.go"), []byte(`package version
+
+const defaultBeatVersion = "9.5.1"
+`), 0644); err != nil {
+		t.Fatalf("failed to seed version.go: %v", err)
+	}
+	runGit("add", ".")
+	runGit("commit", "-m", "seed version 9.5.1")
+	runGit("checkout", "main")
+
+	origDir, err := os.Getwd()
+	require.NoError(t, err, "failed to get cwd")
+	defer func() {
+		if err := os.Chdir(origDir); err != nil {
+			t.Errorf("failed to restore cwd: %v", err)
+		}
+	}()
+	require.NoError(t, os.Chdir(tmpDir), "failed to chdir")
+
+	cfg := &ReleaseConfig{
+		NextRelease:    "9.5.3", // expects branch at 9.5.2
+		LatestRelease:  "9.5.2",
+		ReleaseBranch:  "9.5",
+		DryRun:         true,
+		GitAuthorName:  "Test User",
+		GitAuthorEmail: "test@example.com",
+	}
+
+	err = RunPatchRelease(cfg)
+	require.Error(t, err, "expected RunPatchRelease to fail when branch version is not previous patch")
+	require.Contains(t, err.Error(), "expects version")
+}
+
+func TestPatchPrepLabels(t *testing.T) {
+	labels := patchVersionBumpLabels()
+	if !slices.Contains(labels, mergeLabelAfterRelease) {
+		t.Errorf("patch bump labels should include %q, got %v", mergeLabelAfterRelease, labels)
+	}
+	for _, want := range []string{"release", "Team:Automation", "skip-changelog"} {
+		if !slices.Contains(labels, want) {
+			t.Errorf("patch bump labels should include %q, got %v", want, labels)
+		}
+	}
+	if slices.Contains(labels, "docs") {
+		t.Errorf("patch bump must not include docs label, got %v", labels)
+	}
+}
+
+func TestReleasePRBodiesIncludeReleaseHeader(t *testing.T) {
+	cfg := &ReleaseConfig{
+		NextRelease:             "9.4.1",
+		LatestRelease:           "9.4.0",
+		NextProjectMinorVersion: "9.5.0",
+		ReleaseBranch:           "9.4",
+	}
+
+	bodies := []string{
+		prAMainBody(cfg),
+		prBReleaseBody(cfg),
+		prCMainBody(cfg),
+		patchVersionBumpBody(cfg),
+	}
+	for _, body := range bodies {
+		require.Contains(t, body, "## [Release][9.4.1]")
+		require.Contains(t, body, "**Merge:**")
+	}
+
+	if !strings.Contains(patchVersionBumpBody(cfg), "to 9.4.1") {
+		t.Error("patch bump body should mention landing version 9.4.1")
+	}
+	if strings.Contains(patchVersionBumpBody(cfg), "Merge after the release of") {
+		t.Error("patch bump body must not park with Merge-after-release wording")
+	}
+}
+
+func TestFormatWorkflowPRLine(t *testing.T) {
+	withPR := workflowPRResult{
+		item: workflowPR{branch: "patch-release-9.3.1", base: "9.3"},
+		pr: &github.PullRequest{
+			HTMLURL: new("https://github.com/elastic/beats/pull/42"),
+			State:   new("open"),
+		},
+	}
+	got := formatWorkflowPRLine(1, withPR)
+	want := "PR 1: https://github.com/elastic/beats/pull/42 (open)"
+	require.Equal(t, want, got)
+
+	skipped := workflowPRResult{
+		item: workflowPR{branch: "patch-release-9.3.1", base: "9.3"},
+	}
+	got = formatWorkflowPRLine(1, skipped)
+	want = "PR 1: skipped (no related open/merged PR for patch-release-9.3.1 → 9.3)"
+	require.Equal(t, want, got)
+}
+
+func TestMajorMinorPRTitles(t *testing.T) {
+	cfg := &ReleaseConfig{
+		NextRelease:             "9.4.0",
+		LatestRelease:           "9.3.2",
+		NextProjectMinorVersion: "9.5.0",
+		ReleaseBranch:           "9.4",
+		BaseBranch:              "main",
+	}
+	cases := []struct {
+		name  string
+		title string
+	}{
+		{"PR-A", fmt.Sprintf("[Release][%s] Prepare main for %s and mergify backport-%s", cfg.NextRelease, cfg.NextProjectMinorVersion, cfg.ReleaseBranch)},
+		{"PR-B", fmt.Sprintf("[Release][%s] ff-release: update versions %s", cfg.NextRelease, cfg.NextRelease)},
+		{"PR-C", fmt.Sprintf("[Release][%s] Update docs for %s and test environment to latest release %s", cfg.NextRelease, cfg.NextProjectMinorVersion, cfg.LatestRelease)},
+	}
+	for _, tc := range cases {
+		if !strings.HasPrefix(tc.title, "[Release][9.4.0] ") {
+			t.Errorf("%s title missing release header: %s", tc.name, tc.title)
+		}
+	}
+	if !strings.Contains(cases[2].title, "latest release 9.3.2") {
+		t.Errorf("PR-C title should name the pinned latest release: %s", cases[2].title)
+	}
+	body := prCMainBody(cfg)
+	if strings.Contains(body, "CI may stay red") {
+		t.Error("PR-C body must not claim CI waits for unreleased images")
+	}
+	if !strings.Contains(body, "latest published Elastic Stack release 9.3.2") {
+		t.Errorf("PR-C body should describe latest release pin:\n%s", body)
+	}
+}
+
+func setupWorkflowTestRepo(t *testing.T) string {
+	t.Helper()
+	tmpDir := t.TempDir()
+	ctx := context.Background()
+
+	runGit := func(args ...string) {
+		t.Helper()
+		cmd := exec.CommandContext(ctx, "git", args...)
+		cmd.Dir = tmpDir
+		if out, err := cmd.CombinedOutput(); err != nil {
+			t.Skipf("git not available: %v (%s)", err, out)
+		}
+	}
+
+	runGit("init", "-b", "main")
+	runGit("config", "user.name", "Test User")
+	runGit("config", "user.email", "test@example.com")
+
+	files := map[string]string{
+		"libbeat/version/version.go": `package version
+
+const defaultBeatVersion = "9.4.3"
+`,
+		"libbeat/docs/version.asciidoc": `:stack-version: 9.4.3
+:doc-branch: main
+`,
+		".mergify.yml": `pull_request_rules:
+  - name: backport patches to 9.4 branch
+    conditions:
+      - merged
+      - label=backport-9.4
+    actions:
+      backport:
+        branches:
+          - "9.4"
+`,
+		"testing/environments/latest.yml": `services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.4.3
+`,
+		"metricbeat/docker-compose.yml": `image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-9.4.3}-1
+`,
+		"README.md": "# Beats\n\nDocs: https://www.elastic.co/guide/en/beats/libbeat/main/index.html\n",
+	}
+
+	for path, content := range files {
+		fullPath := filepath.Join(tmpDir, path)
+		if err := os.MkdirAll(filepath.Dir(fullPath), 0755); err != nil {
+			t.Fatalf("failed to create dir for %s: %v", path, err)
+		}
+		if err := os.WriteFile(fullPath, []byte(content), 0644); err != nil {
+			t.Fatalf("failed to write %s: %v", path, err)
+		}
+	}
+
+	runGit("add", ".")
+	runGit("commit", "-m", "initial commit")
+
+	return tmpDir
+}

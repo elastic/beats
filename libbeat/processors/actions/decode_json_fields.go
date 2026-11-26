@@ -247,10 +247,15 @@ func decodeJSON(text string, to *any, level, limit int) error {
 	var err error
 	if limit > 0 {
 		*to, err = decodeLimited(dec, text, level, limit)
-		if errors.Is(err, io.EOF) && strings.TrimSpace(text) != "" {
-			// Token reports truncated input as io.EOF where Decode
-			// reports io.ErrUnexpectedEOF.
-			err = io.ErrUnexpectedEOF
+		if err != nil {
+			// Report the error Decode reports for the same input. Token and
+			// More report malformed input differently (e.g. truncated input
+			// as io.EOF where Decode reports io.ErrUnexpectedEOF), and how
+			// they differ changed with the encoding/json v2 backend in Go 1.27.
+			var v any
+			if errDecode := json.NewDecoder(strings.NewReader(text)).Decode(&v); errDecode != nil {
+				err = errDecode
+			}
 		}
 	} else {
 		err = dec.Decode(to)

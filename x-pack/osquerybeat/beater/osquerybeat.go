@@ -148,6 +148,9 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
+	if err := config.CheckFIPS(c.Inputs); err != nil {
+		return nil, fmt.Errorf("unsupported configuration: %w", err)
+	}
 	installCfg := config.GetOsqueryInstallConfig(c.Inputs)
 	var err error
 	installCfg, err = installCfg.NormalizeAndValidate()
@@ -316,18 +319,29 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		if otelFactory == nil {
 			return
 		}
+		type newInput struct {
+			key string
+			cfg *conf.C
+		}
 		newKeys := make(map[string]struct{}, len(inputs))
+		rawCfgs := make([]*conf.C, 0, len(inputs))
+		var added []newInput
 		for i := range inputs {
 			key := inputKey(i, inputs[i])
 			newKeys[key] = struct{}{}
-			if _, exists := otelRunners[key]; exists {
-				continue
-			}
 			rawCfg, cfgErr := conf.NewConfigFrom(&inputs[i])
 			if cfgErr != nil {
 				bt.log.Warnf("otel status: failed to build config for input %s: %v", key, cfgErr)
 				continue
 			}
+			rawCfgs = append(rawCfgs, rawCfg)
+			if _, exists := otelRunners[key]; !exists {
+				added = append(added, newInput{key: key, cfg: rawCfg})
+			}
+		}
+		cfgfile.SetRunnerConfigs(otelFactory, bt, rawCfgs)
+		for _, in := range added {
+			key, rawCfg := in.key, in.cfg
 			runner, cfgErr := otelFactory.Create(b.Publisher, rawCfg)
 			if cfgErr != nil {
 				bt.log.Warnf("otel status: failed to create status runner for input %s: %v", key, cfgErr)
@@ -1111,8 +1125,11 @@ func (bt *osquerybeat) configurePublishers(inputs []config.InputConfig) error {
 
 // validatePolicy dry-runs the policy steps of configurePublishers and
 // runOsquery, so that a policy that would fail them is rejected before any of
-// it is applied.
+// it is applied. It also rejects settings that the build does not support.
 func validatePolicy(ctx context.Context, log *logp.Logger, inputs []config.InputConfig) error {
+	if err := config.CheckFIPS(inputs); err != nil {
+		return fmt.Errorf("unsupported configuration: %w", err)
+	}
 	if _, err := config.GetPublishingConfig(inputs); err != nil {
 		return err
 	}
