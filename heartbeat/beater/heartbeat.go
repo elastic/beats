@@ -380,6 +380,16 @@ func (bt *Heartbeat) WithElasticsearchStateLoader(requester monitorstate.Elastic
 	bt.replaceStateLoader(monitorstate.MakeESLoader(requester, monitorstate.DefaultDataStreams, bt.config.RunFrom, bt.logger))
 }
 
+// WithoutStateLoader atomically installs a state loader that reports no prior
+// monitor state. Hosts that take their monitors over the control protocol get a
+// deferred state loader, which blocks every state load until it is replaced, so
+// callers such as the OTel Heartbeat receiver invoke this before Run when no
+// Elasticsearch client is available. Monitors then start without prior state
+// instead of waiting out the deferred loader's timeout.
+func (bt *Heartbeat) WithoutStateLoader() {
+	bt.replaceStateLoader(monitorstate.NilStateLoader)
+}
+
 // makeESClient establishes an ES connection meant to load monitors' state
 func makeESClient(
 	ctx context.Context,

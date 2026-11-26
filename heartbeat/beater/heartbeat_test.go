@@ -69,6 +69,33 @@ func TestHeartbeatWithElasticsearchStateLoader(t *testing.T) {
 	assert.Equal(t, 1, requestCount, "installed loader should call the injected requester")
 }
 
+// TestHeartbeatWithoutStateLoader checks that installing the no-op loader ends
+// the wait of the deferred loader Heartbeat uses when its monitors come over the
+// control protocol.
+func TestHeartbeatWithoutStateLoader(t *testing.T) {
+	logger := logp.NewNopLogger()
+	// The timeout is the one newHeartbeat uses for monitors taken over the
+	// control protocol.
+	deferredTimeout := 15 * time.Second
+	stateLoader, replaceStateLoader := monitorstate.DeferredStateLoader(monitorstate.NilStateLoader, deferredTimeout, logger)
+
+	bt := &Heartbeat{
+		config:             &config.Config{},
+		replaceStateLoader: replaceStateLoader,
+		logger:             logger,
+	}
+
+	bt.WithoutStateLoader()
+
+	start := time.Now()
+	state, err := stateLoader(stdfields.StdMonitorFields{ID: "mon-1", Type: "http"})
+	elapsed := time.Since(start)
+
+	require.NoError(t, err, "the no-op loader should not fail")
+	assert.Nil(t, state, "the no-op loader should report no prior monitor state")
+	assert.Less(t, elapsed, deferredTimeout, "installing the no-op loader should end the deferred loader's wait instead of timing out")
+}
+
 func TestMakeESClient(t *testing.T) {
 	t.Run("should not modify the timeout setting from original config", func(t *testing.T) {
 		origTimeout := 90

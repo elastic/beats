@@ -23,7 +23,7 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc/credentials"
 
-	"github.com/elastic/beats/v7/heartbeat/beater"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/pkg/logp"
@@ -95,6 +95,21 @@ func (f fakePerRPC) GetRequestMetadata(context.Context, ...string) (map[string]s
 
 func (fakePerRPC) RequireTransportSecurity() bool { return false }
 
+// fakeStateLoaderInstaller records which monitor state loader the start hook
+// installed, standing in for *beater.Heartbeat.
+type fakeStateLoaderInstaller struct {
+	elasticsearchLoaders int
+	noStateLoaders       int
+}
+
+func (f *fakeStateLoaderInstaller) WithElasticsearchStateLoader(monitorstate.ElasticsearchRequester) {
+	f.elasticsearchLoaders++
+}
+
+func (f *fakeStateLoaderInstaller) WithoutStateLoader() {
+	f.noStateLoaders++
+}
+
 func TestBeatsAuthStartHookErrors(t *testing.T) {
 	missingID := component.MustNewIDWithName("beatsauth", "missing")
 	wrongTypeID := component.MustNewIDWithName("beatsauth", "wrong-type")
@@ -145,28 +160,59 @@ func TestBeatsAuthStartHookErrors(t *testing.T) {
 	}
 }
 
-func TestBeatsAuthStartHookEmptyReference(t *testing.T) {
-	require.NoError(t, beatsAuthStartHook(t.Context(), "", nil, emptyUserAgent, logp.NewNopLogger(), func(*eslegclient.Connection) {})(nil), "empty Beats auth reference should be a no-op")
+// TestBeatsAuthStartHookWithoutElasticsearch covers the paths where the hook
+// cannot install an Elasticsearch state loader. Monitors taken over the control
+// protocol block on their state loader until one is installed, so these paths
+// have to install the no-op loader rather than leave monitors waiting for the
+// deferred loader to time out.
+func TestBeatsAuthStartHookWithoutElasticsearch(t *testing.T) {
+	authID := component.MustNewIDWithName("beatsauth", "auth")
+
+	tests := []struct {
+		name      string
+		reference string
+		host      component.Host
+	}{
+		{
+			name:      "no monitor_state.elasticsearch configured",
+			reference: "",
+			host:      elasticsearchAuthTestHost{},
+		},
+		{
+			// The extension has no endpoints, so no client can be built.
+			name:      "Elasticsearch client cannot be built",
+			reference: authID.String(),
+			host: elasticsearchAuthTestHost{extensions: map[component.ID]component.Component{
+				authID: &fakeBeatsAuthExtension{},
+			}},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			installer := &fakeStateLoaderInstaller{}
+			requesterSet := false
+			err := beatsAuthStartHook(
+				t.Context(),
+				test.reference,
+				installer,
+				emptyUserAgent,
+				logp.NewNopLogger(),
+				func(*eslegclient.Connection) { requesterSet = true },
+			)(test.host)
+
+			require.NoError(t, err, "monitor state setup failures must not prevent receiver startup")
+			assert.False(t, requesterSet, "no Elasticsearch requester should be installed without a client")
+			assert.Zero(t, installer.elasticsearchLoaders, "no Elasticsearch state loader should be installed without a client")
+			assert.Equal(t, 1, installer.noStateLoaders, "the no-op state loader should be installed so monitors don't wait for one")
+		})
+	}
 }
 
-func TestBeatsAuthStartHookESClientFailureIsBestEffort(t *testing.T) {
-	authID := component.MustNewIDWithName("beatsauth", "auth")
-	host := elasticsearchAuthTestHost{extensions: map[component.ID]component.Component{
-		authID: &fakeBeatsAuthExtension{},
-	}}
-
-	requesterSet := false
-	err := beatsAuthStartHook(
-		t.Context(),
-		authID.String(),
-		&beater.Heartbeat{},
-		emptyUserAgent,
-		logp.NewNopLogger(),
-		func(*eslegclient.Connection) { requesterSet = true },
-	)(host)
-
-	require.NoError(t, err, "monitor state client setup failures must not prevent receiver startup")
-	assert.False(t, requesterSet, "failed client setup must not install an Elasticsearch requester")
+func TestBeatsAuthStartHookWithoutHeartbeat(t *testing.T) {
+	require.NoError(t,
+		beatsAuthStartHook(t.Context(), "", nil, emptyUserAgent, logp.NewNopLogger(), func(*eslegclient.Connection) {})(nil),
+		"an empty Beats auth reference should be a no-op when there is no Heartbeat to install a state loader into")
 }
 
 func TestNewESClientConnectivityFailureIsBestEffort(t *testing.T) {
