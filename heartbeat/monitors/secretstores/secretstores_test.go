@@ -60,7 +60,7 @@ func (s *fakeStore) Validate(cfg *conf.C, scope Scope) error {
 	return err
 }
 
-func (s *fakeStore) Replace(_ context.Context, cfg *conf.C, scope Scope) (*conf.C, error) {
+func (s *fakeStore) Replace(ctx context.Context, cfg *conf.C, scope Scope) (*conf.C, error) {
 	// Resolve keystore and environment references now: the result is built
 	// without variable expansion, so secret values stay literal.
 	var m map[string]any
@@ -71,7 +71,9 @@ func (s *fakeStore) Replace(_ context.Context, cfg *conf.C, scope Scope) (*conf.
 		if s.fail {
 			return "", errFakeUnavailable
 		}
-		return s.id + "-" + name, nil
+		value := s.id + "-" + name
+		Track(ctx, value)
+		return value, nil
 	})
 	if err != nil || !replaced {
 		return cfg, err
@@ -269,7 +271,7 @@ func TestResolveWithoutSecretStores(t *testing.T) {
 	r := NewResolver(logptest.NewTestingLogger(t, ""))
 	cfg := newTestConfig(t, map[string]any{"type": "http", "target": "fake:main@token", "x": "${unknown.ref}"})
 
-	got, err := r.Resolve(cfg, nil)
+	got, _, err := r.Resolve(cfg, nil)
 	require.NoError(t, err, "a config without secret stores must not fail")
 	assert.Same(t, cfg, got, "a config without secret stores must be returned as is")
 	assert.NoError(t, r.Validate(cfg), "references are not checked without secret stores")
@@ -285,7 +287,7 @@ func TestResolveReplacesOnlyInCopy(t *testing.T) {
 		ConfigKey:  fakeStores(),
 	})
 
-	got, err := r.Resolve(cfg, nil)
+	got, _, err := r.Resolve(cfg, nil)
 	require.NoError(t, err, "references must resolve")
 
 	var resolved struct {
@@ -304,6 +306,21 @@ func TestResolveReplacesOnlyInCopy(t *testing.T) {
 	assert.True(t, cfg.HasField(ConfigKey), "the original config must keep secret_stores")
 }
 
+func TestResolveReturnsScrubber(t *testing.T) {
+	resetSharedStores(t)
+	r := NewResolver(logptest.NewTestingLogger(t, ""))
+
+	cfg := newTestConfig(t, map[string]any{"type": "http", "username": "fake:main@user", ConfigKey: fakeStores()})
+	_, scrubber, err := r.Resolve(cfg, nil)
+	require.NoError(t, err, "references must resolve")
+	require.NotNil(t, scrubber, "resolved secrets must be scrubbed")
+	assert.Equal(t, "login <hidden>", scrubber.String("login secret-user"), "the resolved value must be scrubbed")
+
+	_, scrubber, err = r.Resolve(newTestConfig(t, map[string]any{"type": "http", "username": "plain", ConfigKey: fakeStores()}), nil)
+	require.NoError(t, err, "a config without references must resolve")
+	assert.Nil(t, scrubber, "there is nothing to scrub without references")
+}
+
 func TestResolveRunsStoresInOrder(t *testing.T) {
 	resetSharedStores(t)
 	r := NewResolver(logptest.NewTestingLogger(t, ""))
@@ -315,7 +332,7 @@ func TestResolveRunsStoresInOrder(t *testing.T) {
 		"chained": "fake:main@x",
 		ConfigKey: []any{map[string]any{"type": fakeType, "name": "main", "id": "fake:main@"}, map[string]any{"type": otherType, "name": "main"}},
 	})
-	got, err := r.Resolve(cfg, nil)
+	got, _, err := r.Resolve(cfg, nil)
 	require.NoError(t, err, "references must resolve")
 	var resolved struct {
 		Chained string `config:"chained"`
@@ -331,9 +348,9 @@ func TestResolveSharesStoresAcrossMonitors(t *testing.T) {
 		return newTestConfig(t, map[string]any{"type": "http", "target": "fake:main@token", ConfigKey: fakeStores()})
 	}
 
-	_, err := r.Resolve(newCfg(), nil)
+	_, _, err := r.Resolve(newCfg(), nil)
 	require.NoError(t, err, "first monitor must resolve")
-	_, err = r.Resolve(newCfg(), nil)
+	_, _, err = r.Resolve(newCfg(), nil)
 	require.NoError(t, err, "second monitor must resolve")
 
 	assert.Equal(t, 1, sharedStoreCount(), "monitors with the same connection must share one store")
@@ -360,7 +377,7 @@ func TestResolveErrors(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			resetSharedStores(t)
 			r := NewResolver(logptest.NewTestingLogger(t, ""))
-			_, err := r.Resolve(newTestConfig(t, tc.cfg), nil)
+			_, _, err := r.Resolve(newTestConfig(t, tc.cfg), nil)
 			assert.ErrorContains(t, err, tc.wantErr, "resolution must fail")
 		})
 	}
@@ -455,7 +472,7 @@ func TestResolveNamedEntries(t *testing.T) {
 
 			// Validation must find the same problems without contacting the stores.
 			verr := r.Validate(cfg)
-			got, err := r.Resolve(cfg, nil)
+			got, _, err := r.Resolve(cfg, nil)
 			if tc.wantErr != "" {
 				assert.ErrorContains(t, verr, tc.wantErr, "validation must fail")
 				assert.ErrorContains(t, err, tc.wantErr, "resolution must fail")

@@ -10,6 +10,7 @@ on:
       - pkg/**
       # OSS
       - go.mod
+      - .python-version
       - dev-tools/**
       # Workflow
       - .github/workflows/pkg-macos-unit-tests.yml
@@ -21,6 +22,7 @@ on:
       - pkg/**
       # OSS
       - go.mod
+      - .python-version
       - dev-tools/**
       # Workflow
       - .github/workflows/pkg-macos-unit-tests.yml

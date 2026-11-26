@@ -21,6 +21,7 @@ package socket_summary
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"os"
 
@@ -130,6 +131,6 @@ func parseSockstat(path string) (SockStat, error) {
 
 // connections gets connection information
 // The linux function doesn't query UIDs for performance
-func connections(kind string) ([]net.ConnectionStat, error) {
-	return net.ConnectionsWithoutUids(kind)
+func connections(sys resolve.Resolver, kind string) ([]net.ConnectionStat, error) {
+	return net.ConnectionsWithoutUidsWithContext(resolve.Context(context.Background(), sys), kind)
 }

@@ -10,6 +10,7 @@ on:
       - heartbeat/**
       # OSS
       - go.mod
+      - .python-version
       - dev-tools/**
       - libbeat/**
       # Workflow
@@ -23,6 +24,7 @@ on:
       - heartbeat/**
       # OSS
       - go.mod
+      - .python-version
       - dev-tools/**
       - libbeat/**
       # Workflow
