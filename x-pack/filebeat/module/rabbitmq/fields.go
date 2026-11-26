@@ -19,5 +19,5 @@ func init() {
 // AssetRabbitmq returns asset data.
 // This is the base64 encoded zlib format compressed contents of module/rabbitmq.
 func AssetRabbitmq() string {
-	return "eJx0kMFuhSAURPd8xcS9xrgkjbsuXbTpD6BcKRGFAqb17xttNeLz3eWc5Mzk5hho4fCibXUcvxgQdTTEkb1vUfOWMUBS6Lx2UduJo2YAsGM0Vs6GGNBrMjLwjeaYxEiJd724OOJQ3s7uP7kxp6azzVh1ZHeyp8K/OyYbq9BrQ+GEr53nXqdlku/dAy3f1l9ZsuDjk/DqjZgUnLcdhYAHGf2I0a0/fymLqqqKsma/AQAA///y5GyB"
+	return "eJx0kMFqhDAURff5iot7RVyG4q5LFy39gWieaTCaNIl0/PtBGQfjONtz4NzHyzHQwuFF2+o4/jEg6miII/veUPOVMUBS6Lx2UduJo2YAsGs0Vs6GGNBrMjLwzeaYxEhJd8VxccShvJ3dg1yU09KxZqx6sqvY2yCQnGysQq8NhYM+bx53nZYJ37cHWv6tP7vkgp9fwqc3YlJw3nYUAl5idBOjW3/+URZVVRVlze4DAPLkbIE="
 }

@@ -276,6 +276,11 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	p.serveHTTP(w, r)
 }
 
+// Close waits for the ongoing requests to finish and shuts the proxy down.
+// An HTTPS (CONNECT) tunnel lasts until the client closes it, so close the
+// clients' idle connections first, e.g. with http.Client.CloseIdleConnections:
+// since Go 1.27 closing an unread response body can leave the connection idle
+// instead of closing it, and Close then blocks.
 func (p *Proxy) Close() {
 	// Sometimes, on CI obviously, the last log happens after the test
 	// finishes. See https://github.com/elastic/elastic-agent/issues/5869.
