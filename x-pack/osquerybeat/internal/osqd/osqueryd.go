@@ -22,9 +22,9 @@ import (
 	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/libbeat/common/proc"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqlog"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -448,7 +448,7 @@ func (q *OSQueryD) args(userFlags Flags) Args {
 	for k, userValue := range userFlags {
 		// Skip enable_tables and disable_tables flags, they are set later in this function
 		// after merging with default disabled tables
-		if k == flagEnableTables || flagEnableTables == flagDisableTables {
+		if k == flagEnableTables || k == flagDisableTables {
 			continue
 		}
 		flags[k] = userValue

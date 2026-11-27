@@ -39,7 +39,7 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
 	"github.com/elastic/beats/v7/libbeat/processors/dissect"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // Check looks for created/modified/deleted/renamed files and returns an error

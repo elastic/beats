@@ -21,7 +21,7 @@ import (
 	"crypto/tls"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/beats/v7/pkg/transport/tlscommon"
 )
 
 // MetricSet is the base metricset for all Kafka metricsets

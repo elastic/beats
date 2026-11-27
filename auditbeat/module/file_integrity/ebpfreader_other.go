@@ -15,14 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux && !(amd64 || arm64)
+//go:build linux && !((amd64 || arm64) && cgo)
 
 package file_integrity
 
 import (
 	"errors"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 func newEBPFReader(c Config, l *logp.Logger) (EventProducer, error) {

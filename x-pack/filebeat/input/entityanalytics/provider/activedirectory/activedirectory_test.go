@@ -15,7 +15,7 @@ import (
 
 	"github.com/go-ldap/ldap/v3"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 var logResponses = flag.Bool("log_response", false, "use to log users/groups returned from the API")

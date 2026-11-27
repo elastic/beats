@@ -20,7 +20,7 @@ package datastore
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/vmware/govmomi/vim25/mo"

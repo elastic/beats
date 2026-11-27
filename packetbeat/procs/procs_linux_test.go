@@ -20,13 +20,17 @@
 package procs
 
 import (
+	"net"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap/zapcore"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 func TestFindSocketsOfPid(t *testing.T) {
@@ -152,4 +156,71 @@ func assertUint64ArraysAreEqual(t *testing.T, expected []uint64, result []uint64
 		}
 	}
 	return true
+}
+
+func TestGetProcessVanishedPID(t *testing.T) {
+	logger, logs := logptest.NewTestingLoggerWithObserver(t, "")
+	procs := ProcessesWatcher{}
+	err := procs.Init(ProcsConfig{Enabled: true}, logger)
+	require.NoError(t, err)
+
+	// A PID far above any kernel pid_max, standing in for a process that
+	// exited after the socket scan.
+	p := procs.GetProcess(1 << 30)
+	assert.Nil(t, p, "process for a vanished PID")
+
+	for _, e := range logs.All() {
+		assert.Less(t, e.Level, zapcore.ErrorLevel, "vanished PID logged at %s: %s", e.Level, e.Message)
+	}
+	assert.NotZero(t, logs.FilterMessageSnippet("Unable to get command-line for PID").Len(), "expected a debug message for the vanished PID")
+}
+
+func TestGetLocalPortToPIDMappingSkipsClosedPort(t *testing.T) {
+	// A socket table with one UDP socket on 127.0.0.53:53 and no IPv6
+	// table.
+	dir := t.TempDir()
+	udp := filepath.Join(dir, "udp")
+	const table = `  sl  local_address rem_address   st tx_queue rx_queue tr tm->when retrnsmt   uid  timeout inode ref pointer drops
+  1: 3500007F:0035 00000000:0000 07 00000000:00000000 00:00000000 00000000   101        0 12345 2 0000000000000000 0
+`
+	err := os.WriteFile(udp, []byte(table), 0o600)
+	require.NoError(t, err)
+	orig := procFiles[applayer.TransportUDP]
+	procFiles[applayer.TransportUDP] = struct{ ipv4, ipv6 string }{udp, filepath.Join(dir, "udp6")}
+	t.Cleanup(func() { procFiles[applayer.TransportUDP] = orig })
+
+	var procs ProcessesWatcher
+	err = procs.Init(ProcsConfig{Enabled: true}, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	ports, scanned, err := procs.GetLocalPortToPIDMapping(applayer.TransportUDP, 40000)
+	assert.NoError(t, err, "lookup of a closed port")
+	assert.False(t, scanned, "full scan for a port with no socket")
+	assert.Empty(t, ports, "mappings for a port with no socket")
+
+	_, scanned, err = procs.GetLocalPortToPIDMapping(applayer.TransportUDP, 53)
+	assert.NoError(t, err, "lookup of an open port")
+	assert.True(t, scanned, "full scan for a port with a socket")
+}
+
+func TestHasSocket(t *testing.T) {
+	socks := []*socketInfo{
+		{srcIP: net.ParseIP("127.0.0.53"), srcPort: 53, inode: 100},
+		{srcIP: net.IPv4zero, srcPort: 8080, inode: 101},
+		{srcIP: net.ParseIP("10.0.0.1"), srcPort: 40000, inode: 0}, // TIME_WAIT
+	}
+	for _, tc := range []struct {
+		port uint16
+		want bool
+	}{
+		{53, true},
+		{8080, true},   // Wildcard address.
+		{40000, false}, // No owning process.
+		{40001, false}, // Closed.
+	} {
+		got := hasSocket(socks, tc.port)
+		if got != tc.want {
+			t.Errorf("hasSocket(socks, %d) = %t; want %t", tc.port, got, tc.want)
+		}
+	}
 }

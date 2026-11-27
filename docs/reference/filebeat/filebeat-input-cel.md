@@ -4,7 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html
 sub:
   mito_docs: https://pkg.go.dev/github.com/elastic/mito
-  mito_version: v1.26.1-0.20260617204810-b54ab9f21153
+  mito_version: v1.27.1
 applies_to:
   stack: ga 8.6.0
   serverless: ga

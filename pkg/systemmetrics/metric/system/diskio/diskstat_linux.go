@@ -20,15 +20,16 @@
 package diskio
 
 import (
+	"context"
 	"errors"
 	"math"
 
 	"github.com/shirou/gopsutil/v4/cpu"
 	"github.com/shirou/gopsutil/v4/disk"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/numcpu"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // IOStat carries disk statistics for all devices
@@ -46,8 +47,8 @@ func GetCLKTCK() uint32 {
 }
 
 // IOCounters should map functionality to disk package for linux os.
-func IOCounters(_ *logp.Logger, names ...string) (map[string]disk.IOCountersStat, error) {
-	return disk.IOCounters(names...)
+func IOCounters(ctx context.Context, _ *logp.Logger, names ...string) (map[string]disk.IOCountersStat, error) {
+	return disk.IOCountersWithContext(ctx, names...)
 }
 
 // NewDiskIOStat :init DiskIOStat object.
@@ -59,8 +60,8 @@ func NewDiskIOStat() *IOStat {
 
 // OpenSampling creates current cpu sampling
 // need call as soon as get IOCounters.
-func (stat *IOStat) OpenSampling() error {
-	times, err := cpu.Times(false)
+func (stat *IOStat) OpenSampling(ctx context.Context) error {
+	times, err := cpu.TimesWithContext(ctx, false)
 	if err != nil {
 		return err
 	}

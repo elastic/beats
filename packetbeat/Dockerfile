@@ -1,4 +1,4 @@
-FROM golang:1.26.10-bookworm
+FROM golang:1.27.4-bookworm
 
 RUN \
     apt-get update \
@@ -17,4 +17,4 @@ ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-RUN pip3 install --upgrade pip==20.1.1
+RUN pip3 install --upgrade pip==26.2.2

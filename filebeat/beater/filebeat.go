@@ -46,9 +46,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/go-concert/unison"
 
 	// Add filebeat level processors
@@ -337,12 +337,6 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// must be closed before Stop is called to avoid a 5-second timeout on
 	// every early-exit error path.
 	defer fb.runReady.Close()
-
-	registryMigrator := registrar.NewMigrator(config.Registry, fb.logger, b.Info.Paths)
-	if err := registryMigrator.Run(); err != nil {
-		fb.logger.Errorf("Failed to migrate registry file: %+v", err)
-		return err
-	}
 
 	// Use context, like normal people do, hooking up to the beat.done channel
 	ctx, cn := context.WithCancel(context.Background())

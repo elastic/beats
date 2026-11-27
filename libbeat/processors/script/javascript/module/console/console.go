@@ -23,7 +23,7 @@ import (
 	"github.com/dop251/goja"
 	"github.com/dop251/goja_nodejs/require"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 
 	// Require the util module for handling the log format arguments.
 	_ "github.com/dop251/goja_nodejs/util"

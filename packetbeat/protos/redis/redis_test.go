@@ -20,12 +20,14 @@
 package redis
 
 import (
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 func newTestStream(content []byte) *stream {
@@ -178,6 +180,41 @@ func TestRedisParser_InvalidArrayLength(t *testing.T) {
 			}, "invalid array length must not panic the parser")
 		})
 	}
+}
+
+func TestRedisParser_ArrayNestingDepth(t *testing.T) {
+	// nest builds n nested single-element arrays around a simple string.
+	nest := func(n int) []byte {
+		return []byte(strings.Repeat("*1\r\n", n) + "+x\r\n")
+	}
+
+	t.Run("at_limit", func(t *testing.T) {
+		_, ok, complete := parse(nest(maxArrayDepth))
+		assert.True(t, ok, "nesting at the limit must be accepted")
+		assert.True(t, complete, "nesting at the limit must yield a complete message")
+	})
+
+	t.Run("empty_array_over_limit", func(t *testing.T) {
+		msg := []byte(strings.Repeat("*1\r\n", maxArrayDepth) + "*0\r\n")
+		_, ok, complete := parse(msg)
+		assert.True(t, ok, "an empty array does not recur and must be accepted")
+		assert.True(t, complete, "an empty array at the limit must yield a complete message")
+	})
+
+	t.Run("over_limit", func(t *testing.T) {
+		_, ok, complete := parse(nest(maxArrayDepth + 1))
+		assert.False(t, ok, "nesting over the limit must be rejected")
+		assert.False(t, complete, "nesting over the limit must not yield a complete message")
+	})
+
+	// Without a depth limit this stream, which fits in the stream buffer
+	// (tcp.TCPMaxDataInStream, 10 MiB), recurs about 2.6 million levels deep and kills the process
+	// with an unrecoverable stack overflow rather than failing the test.
+	t.Run("stream_buffer_sized", func(t *testing.T) {
+		_, ok, complete := parse([]byte(strings.Repeat("*1\r\n", tcp.TCPMaxDataInStream/4)))
+		assert.False(t, ok, "deeply nested arrays must be rejected")
+		assert.False(t, complete, "deeply nested arrays must not yield a complete message")
+	})
 }
 
 func TestRedisParser_NilString(t *testing.T) {

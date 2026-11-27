@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
 
-	"github.com/elastic/elastic-agent-libs/testing/estools"
+	"github.com/elastic/beats/v7/pkg/testing/estools"
 )
 
 func TestGCPInputOTelE2E(t *testing.T) {

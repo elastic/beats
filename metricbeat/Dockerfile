@@ -1,4 +1,4 @@
-FROM golang:1.26.10-bookworm
+FROM golang:1.27.4-bookworm
 COPY --from=docker:26.0.0-alpine3.19 /usr/local/bin/docker  /usr/local/bin/
 COPY --from=docker:26.0.0-alpine3.19 /usr/local/libexec/docker/cli-plugins/docker-compose /usr/local/lib/docker/cli-plugins/docker-compose
 
@@ -22,7 +22,7 @@ ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-RUN pip3 install --upgrade pip==20.1.1
+RUN pip3 install --upgrade pip==26.2.2
 RUN pip3 install --upgrade setuptools==47.3.2
 RUN pip3 install --upgrade PyYAML==6.0.1
 RUN pip3 install requests==2.32.3

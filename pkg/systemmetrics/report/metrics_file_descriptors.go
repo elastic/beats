@@ -22,12 +22,12 @@ package report
 import (
 	"context"
 
-	"github.com/shirou/gopsutil/v4/common"
 	psprocess "github.com/shirou/gopsutil/v4/process"
 
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/process"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
 )
 
 func SetupLinuxBSDFDMetrics(logger *logp.Logger, reg *monitoring.Registry, processStats *process.Stats) {
@@ -49,7 +49,7 @@ func FDUsageReporter(logger *logp.Logger, processStats *process.Stats) func(_ mo
 
 	ctx := context.Background()
 	if processStats != nil && processStats.Hostfs != nil && processStats.Hostfs.IsSet() {
-		ctx = context.WithValue(context.Background(), common.EnvKey, common.EnvMap{common.HostProcEnvKey: processStats.Hostfs.ResolveHostFS("/proc")})
+		ctx = resolve.Context(ctx, processStats.Hostfs)
 	}
 
 	return func(_ monitoring.Mode, V monitoring.Visitor) {

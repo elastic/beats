@@ -7,8 +7,8 @@ package management
 import (
 	"fmt"
 
+	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
-	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // NewConfigFromProto converts the given *proto.Features object to

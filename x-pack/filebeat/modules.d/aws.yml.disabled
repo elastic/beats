@@ -47,11 +47,11 @@
     #var.session_token: session_token
 
     # The duration that the received messages are hidden from ReceiveMessage request
-    # Default to be 300s
+    # Defaults to 300s
     #var.visibility_timeout: 300s
 
     # Maximum duration before AWS API request will be interrupted
-    # Default to be 120s
+    # Defaults to 120s
     #var.api_timeout: 120s
 
     # Custom endpoint used to access AWS APIs
@@ -105,11 +105,11 @@
     #var.session_token: session_token
 
     # The duration that the received messages are hidden from ReceiveMessage request
-    # Default to be 300s
+    # Defaults to 300s
     #var.visibility_timeout: 300s
 
     # Maximum duration before AWS API request will be interrupted
-    # Default to be 120s
+    # Defaults to 120s
     #var.api_timeout: 120s
 
     # Custom endpoint used to access AWS APIs
@@ -163,11 +163,11 @@
     #var.session_token: session_token
 
     # The duration that the received messages are hidden from ReceiveMessage request
-    # Default to be 300s
+    # Defaults to 300s
     #var.visibility_timeout: 300s
 
     # Maximum duration before AWS API request will be interrupted
-    # Default to be 120s
+    # Defaults to 120s
     #var.api_timeout: 120s
 
     # Custom endpoint used to access AWS APIs
@@ -221,11 +221,11 @@
     #var.session_token: session_token
 
     # The duration that the received messages are hidden from ReceiveMessage request
-    # Default to be 300s
+    # Defaults to 300s
     #var.visibility_timeout: 300s
 
     # Maximum duration before AWS API request will be interrupted
-    # Default to be 120s
+    # Defaults to 120s
     #var.api_timeout: 120s
 
     # Custom endpoint used to access AWS APIs
@@ -279,11 +279,11 @@
     #var.session_token: session_token
 
     # The duration that the received messages are hidden from ReceiveMessage request
-    # Default to be 300s
+    # Defaults to 300s
     #var.visibility_timeout: 300s
 
     # Maximum duration before AWS API request will be interrupted
-    # Default to be 120s
+    # Defaults to 120s
     #var.api_timeout: 120s
 
     # Custom endpoint used to access AWS APIs
@@ -337,11 +337,11 @@
     #var.session_token: session_token
 
     # The duration that the received messages are hidden from ReceiveMessage request
-    # Default to be 300s
+    # Defaults to 300s
     #var.visibility_timeout: 300s
 
     # Maximum duration before AWS API request will be interrupted
-    # Default to be 120s
+    # Defaults to 120s
     #var.api_timeout: 120s
 
     # Custom endpoint used to access AWS APIs

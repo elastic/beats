@@ -13,7 +13,7 @@ import (
 	"text/template"
 
 	"github.com/elastic/beats/v7/auditbeat/tracing"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // ProbeDef couples a probe with a decoder factory.

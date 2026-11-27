@@ -1,4 +1,0 @@
-kind: enhancement
-summary: bump npcap OEM installer to 1.89
-description: Bump the npcap OEM installer version used by Packetbeat to 1.89.
-component: packetbeat

@@ -1,3 +1,0 @@
-kind: enhancement
-summary: Bundle the Npcap OEM installer with Packetbeat for windows/arm64.
-component: packetbeat

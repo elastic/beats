@@ -28,10 +28,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // mockReceiverBeater is a minimal Beater that publishes a fixed number of
@@ -368,6 +368,41 @@ func TestBeatReceiverStartFailureShutdownDoesNotHang(t *testing.T) {
 	case <-done:
 	case <-time.After(5 * time.Second):
 		t.Fatal("Shutdown hung after BeatReceiver.Start failed — nil runDone not fixed")
+	}
+}
+
+// TestBeatReceiverShutdownWithoutStart covers the collector calling Shutdown on
+// a receiver that was never started
+func TestBeatReceiverShutdownWithoutStart(t *testing.T) {
+	creator := func(*beat.Beat, *conf.C) (beat.Beater, error) { return &mockReceiverBeater{}, nil }
+
+	b, err := NewBeatForReceiver(
+		cmd.FilebeatSettings("filebeat"),
+		map[string]any{"path.home": t.TempDir()},
+		consumertest.NewNop(),
+		"test-receiver",
+		zapcore.NewNopCore(),
+	)
+	require.NoError(t, err, "building the receiver beat should succeed")
+
+	rs := receiver.Settings{
+		ID: component.NewIDWithName(component.MustNewType("mockbeatreceiver"), "r1"),
+		TelemetrySettings: component.TelemetrySettings{
+			Logger: zap.NewNop(),
+		},
+	}
+	br, err := NewBeatReceiver(t.Context(), b, creator, rs)
+	require.NoError(t, err, "creating the beat receiver should succeed")
+
+	// Use t.Context() (no deadline during test execution) so that waiting on
+	// a runDone that is never signaled would block indefinitely.
+	done := make(chan error, 1)
+	go func() { done <- br.Shutdown(t.Context()) }()
+	select {
+	case err := <-done:
+		require.NoError(t, err, "Shutdown without Start should not error")
+	case <-time.After(5 * time.Second):
+		t.Fatal("Shutdown hung when Start was never called")
 	}
 }
 
