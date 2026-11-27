@@ -67,6 +67,24 @@ Filtering out a huge number of logs can cause many registry updates, slowing dow
 ::::
 
 
+### `registry.max_log_size` [_registry_max_log_size]
+```{applies_to}
+stack: ga 9.7
+```
+
+The maximum size of the registry transaction log (`log.json`) before Filebeat writes a full registry checkpoint. This setting applies only when `registry.backend` is `memlog`.
+
+The checkpoint threshold starts at 10MiB. After each checkpoint, the threshold follows the size of the new checkpoint file, up to `registry.max_log_size`. As the registry grows, Filebeat writes full checkpoints less often. The default value is `512MiB`. Specify the size with a unit, such as `512MiB`.
+
+To keep a fixed 10MiB threshold, set `registry.max_log_size` to `10MiB`. In versions before 9.7, Filebeat always used a fixed 10MiB threshold.
+
+A larger value writes fewer full checkpoints. It also uses more disk space for the transaction log and increases the amount of the log that Filebeat replays when it starts.
+
+```yaml
+filebeat.registry.max_log_size: 512MiB
+```
+
+
 
 ### `registry.migrate_file` [_registry_migrate_file]
 

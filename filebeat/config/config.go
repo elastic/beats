@@ -24,7 +24,9 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
 	conf "github.com/elastic/beats/v7/pkg/config"
 )
 
@@ -52,6 +54,10 @@ type Registry struct {
 	CleanInterval time.Duration `config:"cleanup_interval"`
 	MigrateFile   string        `config:"migrate_file"`
 	Backend       string        `config:"backend"`
+	// MaxLogSize is the maximum size of the registry transaction log
+	// (log.json) before a checkpoint is forced. Accepts human-readable
+	// sizes (e.g. 512MiB) or bytes.
+	MaxLogSize cfgtype.ByteSize `config:"max_log_size" validate:"min=0"`
 	// FileStorage holds the raw user configuration for the OpenTelemetry file_storage
 	// extension when Backend is "otel_file_storage". The map is decoded into
 	// filestorage.Config using confmap (which honours mapstructure tags) at registry
@@ -68,6 +74,7 @@ var DefaultConfig = Config{
 		CleanInterval: 5 * time.Minute,
 		FlushTimeout:  time.Second,
 		Backend:       "memlog",
+		MaxLogSize:    cfgtype.ByteSize(memlog.DefaultMaxLogSize),
 	},
 	ShutdownTimeout:    0,
 	OverwritePipelines: false,
