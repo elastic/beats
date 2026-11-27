@@ -86,24 +86,6 @@ func (t *fileStateTable) UpdateDescriptor(name string, desc loginp.FileDescripto
 	}
 }
 
-// LookupOSState returns the open file identity for name.
-// A missing entry or zero StateOS returns ok=false. For example, Windows can
-// fail to read the identity of a locked file or a file pending deletion.
-func (t *fileStateTable) LookupOSState(name string) (file.StateOS, bool) {
-	if t == nil {
-		return file.StateOS{}, false
-	}
-
-	t.mu.Lock()
-	defer t.mu.Unlock()
-
-	h, ok := t.entries[name]
-	if !ok || h.os == (file.StateOS{}) {
-		return file.StateOS{}, false
-	}
-	return h.os, true
-}
-
 // PinOSState records the open file identity from fstat.
 func (h *openFileState) PinOSState(st file.StateOS) {
 	if h == nil {
@@ -132,6 +114,28 @@ func (h *openFileState) Publish(name string, desc loginp.FileDescriptor) {
 	}
 	h.name = name
 	t.entries[name] = h
+}
+
+// LongerReplacement returns the path in the latest scanner descriptor if it is
+// a different file from the open one and larger than offset, or "".
+func (h *openFileState) LongerReplacement(offset int64) string {
+	if h == nil {
+		return ""
+	}
+
+	h.table.mu.Lock()
+	defer h.table.mu.Unlock()
+
+	// GZIP sizes are compressed, so they cannot be compared to offset.
+	if h.desc.Info == nil || h.desc.GZIP || h.os == (file.StateOS{}) {
+		return ""
+	}
+	// A zero StateOS means the scanner could not read the identity.
+	scanned := h.desc.Info.GetOSState()
+	if scanned == (file.StateOS{}) || h.os.IsSame(scanned) || h.desc.Info.Size() <= offset {
+		return ""
+	}
+	return h.desc.Filename
 }
 
 // FingerprintSum returns the completed SHA-256 fingerprint or "".
