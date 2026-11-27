@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Add the AutoOps ES cluster_settings watermark.flood_stage_frozen exported field
+component: metricbeat
