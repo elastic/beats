@@ -317,7 +317,7 @@ func TestHarvesterClosedDuringScan(t *testing.T) {
 		})
 	}
 	for range 20 {
-		fw.ScanOnce(t.Context(), func(loginp.FSEvent) {}, newTestMetrics(), 0, time.Time{})
+		fw.ScanOnce(t.Context(), func(loginp.FSEvent) {}, newTestMetrics(), 0, time.Time{}, nil)
 	}
 	wg.Wait()
 }

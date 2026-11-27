@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
@@ -37,8 +38,6 @@ const (
 )
 
 // resolvedPreset is the preset an input runs and the values it implies.
-// It is written once in fileProspector.Init, before Run and before any
-// harvester exists, and is read-only afterwards, so it needs no lock.
 type resolvedPreset struct {
 	highCardinality bool
 	// harvesterLimit is the maximum number of open harvesters, 0 means no
@@ -53,6 +52,31 @@ func (r resolvedPreset) name() string {
 		return presetHighCardinality
 	}
 	return presetDefault
+}
+
+// sharedPreset is the resolved preset shared by a prospector and its input's
+// harvester. The prospector stores it in Init and again when it restarts the
+// input into high_cardinality, while harvesters read it, including stuck ones
+// that outlived the restart. The zero value holds the zero resolvedPreset.
+type sharedPreset struct {
+	v atomic.Pointer[resolvedPreset]
+}
+
+func newSharedPreset(res resolvedPreset) *sharedPreset {
+	s := &sharedPreset{}
+	s.store(res)
+	return s
+}
+
+func (s *sharedPreset) load() resolvedPreset {
+	if res := s.v.Load(); res != nil {
+		return *res
+	}
+	return resolvedPreset{}
+}
+
+func (s *sharedPreset) store(res resolvedPreset) {
+	s.v.Store(&res)
 }
 
 // presetInputs is what the configuration contributes to the preset
@@ -115,6 +139,16 @@ func resolvePreset(in presetInputs, fileCount int) resolvedPreset {
 	return res
 }
 
+// needsHighCardinalityRestart reports whether a scan that found fileCount
+// files must restart an input running res into high_cardinality. Only a
+// preset chosen from the file count switches, and only from default to
+// high_cardinality, never back.
+func needsHighCardinalityRestart(in presetInputs, res resolvedPreset, fileCount int) bool {
+	return in.fileCountDecides() &&
+		!res.highCardinality &&
+		fileCount >= in.selection.threshold
+}
+
 // startAction is what the high_cardinality preset does with a file the
 // prospector would start a harvester for.
 type startAction uint8
@@ -172,14 +206,31 @@ func presetMessage(in presetInputs, fileCount int, res resolvedPreset) string {
 	if in.fileCountDecides() {
 		parts = append(parts, fmt.Sprintf("threshold: %d files", in.selection.threshold))
 	}
+	parts = append(parts, presetValues(res)...)
 
+	return strings.Join(parts, "; ")
+}
+
+// presetRestartMessage describes the restart of an input from the default
+// preset into high_cardinality, for the log line written when it happens.
+func presetRestartMessage(in presetInputs, fileCount int, res resolvedPreset) string {
+	parts := []string{
+		fmt.Sprintf("preset changed from %s to %s, restarting the input", presetDefault, res.name()),
+		fmt.Sprintf("%d files found", fileCount),
+		fmt.Sprintf("threshold: %d files", in.selection.threshold),
+	}
+	parts = append(parts, presetValues(res)...)
+
+	return strings.Join(parts, "; ")
+}
+
+func presetValues(res resolvedPreset) []string {
 	limit := "no limit"
 	if res.harvesterLimit > 0 {
 		limit = strconv.FormatUint(res.harvesterLimit, 10)
 	}
-	parts = append(parts,
-		"harvester limit: "+limit,
-		"check interval: "+res.checkInterval.String())
-
-	return strings.Join(parts, "; ")
+	return []string{
+		"harvester limit: " + limit,
+		"check interval: " + res.checkInterval.String(),
+	}
 }

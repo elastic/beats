@@ -260,7 +260,7 @@ func TestHighCardinalityAutoSelection(t *testing.T) {
 		}
 	}
 
-	t.Run("below the threshold runs default and is not re-resolved", func(t *testing.T) {
+	t.Run("below the threshold runs default", func(t *testing.T) {
 		env := newInputTestingEnvironment(t)
 		id, cfg := autoInputConfig(env, "*.log", 3)
 		// The preset is resolved when the input is created, so the files
@@ -273,15 +273,13 @@ func TestHighCardinalityAutoSelection(t *testing.T) {
 		env.startInput(ctx, id, inp)
 		env.waitUntilEventCount(2)
 		want := fileCounts{opened: 2, closed: 0, active: 2}
-		waitFileCounts(t, env, id, want, "files must stay open after EOF under the default preset")
-		requireStableCounts(t, env, id, want)
-
-		// Four files are above the threshold, but the preset is not
-		// resolved again.
-		writeFiles(env, "c.log", "d.log")
-		env.waitUntilEventCount(4)
-		want = fileCounts{opened: 4, closed: 0, active: 4}
-		waitFileCounts(t, env, id, want, "files found after the input started must stay open after EOF")
+		waitFileCounts(
+			t,
+			env,
+			id,
+			want,
+			"files must stay open after EOF under the default preset",
+		)
 		requireStableCounts(t, env, id, want)
 
 		cancel()
@@ -304,6 +302,127 @@ func TestHighCardinalityAutoSelection(t *testing.T) {
 		cancel()
 		env.waitUntilInputStops()
 	})
+}
+
+// TestHighCardinalityAutoRestart uses a threshold of 4 files. The input starts
+// with 3 files under the default preset and restarts into high_cardinality
+// once a fourth file appears.
+func TestHighCardinalityAutoRestart(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+	id, cfg := autoInputConfig(env, "*.log", 4)
+	for _, name := range []string{"a.log", "b.log", "c.log"} {
+		env.mustWriteToFile(name, []byte(name+" line 1\n"))
+	}
+	inp := env.mustCreateInput(cfg)
+	env.logContains("preset resolved: default; selected by 'preset.auto';")
+
+	ctx, cancel := context.WithCancel(t.Context())
+	env.startInput(ctx, id, inp)
+	env.waitUntilEventCount(3)
+	waitFileCounts(
+		t,
+		env,
+		id,
+		fileCounts{opened: 3, closed: 0, active: 3},
+		"files must stay open after EOF under the default preset",
+	)
+
+	// c.log grows while the restart happens: its old harvester may or may
+	// not read the new line before it is stopped, either way it must be
+	// published once.
+	env.mustAppendToFile("c.log", []byte("c.log line 2\n"))
+	env.mustWriteToFile("d.log", []byte("d.log line 1\n"))
+
+	env.WaitLogsContains(
+		"preset changed from default to high_cardinality, "+
+			"restarting the input; 4 files found; threshold: 4 files",
+		10*time.Second,
+		"crossing the threshold must restart the input",
+	)
+	env.WaitLogsContains(
+		fmt.Sprintf(
+			"starting filestream harvester (max %d open files)",
+			highCardinalityHarvesterLimit,
+		),
+		10*time.Second,
+		"the restarted harvester group must get the preset's limit",
+	)
+
+	// The first scan after the restart reports every file as new, in map
+	// order, so each line is searched from the start of the log.
+	for _, name := range []string{"a.log", "b.log"} {
+		env.testLogger.ResetOffset()
+		size := len(name + " line 1\n")
+		env.WaitLogsContains(
+			fmt.Sprintf(
+				"File %s is already read, not starting a harvester: "+
+					"offset %d, size %d",
+				logPath(env.abspath(name)),
+				size,
+				size,
+			),
+			10*time.Second,
+			"an idle, fully read file must not be opened after the restart",
+		)
+	}
+
+	env.waitUntilEventCount(5)
+	require.EventuallyWithT(
+		t,
+		func(c *assert.CollectT) {
+			got, ok := readFileCounts(env, id)
+			assert.True(
+				c,
+				ok,
+				"the metrics registry of input %q must exist",
+				id,
+			)
+			assert.Zero(
+				c,
+				got.active,
+				"every file must be closed after the restart",
+			)
+			assert.Equal(
+				c,
+				got.opened,
+				got.closed,
+				"every opened file must be closed",
+			)
+			assert.LessOrEqual(
+				c,
+				got.opened,
+				uint64(5),
+				"only d.log, and c.log if not fully read, may be reopened",
+			)
+		},
+		10*time.Second,
+		10*time.Millisecond,
+		"the files must be closed at EOF under high_cardinality",
+	)
+	got, _ := readFileCounts(env, id)
+	requireStableCounts(t, env, id, got)
+
+	assert.ElementsMatch(
+		t,
+		[]string{
+			"a.log line 1",
+			"b.log line 1",
+			"c.log line 1",
+			"c.log line 2",
+			"d.log line 1",
+		},
+		messages(env),
+		"every line must be published once",
+	)
+	const restartMsg = "preset changed from default to high_cardinality"
+	env.testLogger.ResetOffset()
+	env.logContains(restartMsg)
+	found, err := env.testLogger.FindInLogs(restartMsg)
+	require.NoError(t, err, "the log file must be readable")
+	assert.False(t, found, "the input must restart only once")
+
+	cancel()
+	env.waitUntilInputStops()
 }
 
 // TestHighCardinalityWarnsAboutCloseOnEOF is the only test that reaches the

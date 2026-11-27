@@ -97,7 +97,7 @@ func newProspector(
 	log *logp.Logger,
 	srci *loginp.SourceIdentifier,
 	dc *dirCache,
-	harvesterState *fileStateTable) (loginp.Prospector, *resolvedPreset, error) {
+	harvesterState *fileStateTable) (loginp.Prospector, *sharedPreset, error) {
 
 	logger := log.Named("filestream").With("id", config.ID)
 
@@ -129,7 +129,7 @@ func newProspector(
 	if err != nil {
 		return nil, nil, fmt.Errorf("invalid preset: %w", err)
 	}
-	preset := &resolvedPreset{}
+	preset := &sharedPreset{}
 
 	fileprospector := fileProspector{
 		filewatcher:           filewatcher,

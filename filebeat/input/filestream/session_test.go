@@ -259,7 +259,7 @@ func TestHarvestSession_ReadSlice(t *testing.T) {
 		closer := closerConfig{OnStateChange: stateChangeCloserConfig{CheckInterval: -time.Hour}}
 		s := newReadSession(t, closer, content, 0)
 		// The budget is only in effect with a resolved harvester limit.
-		s.inp.preset.harvesterLimit = 1
+		s.inp.preset.store(resolvedPreset{harvesterLimit: 1})
 		pub := &countingPublisher{}
 
 		verdict, err := s.ReadSlice(backgroundCtx(), pub)
@@ -308,7 +308,7 @@ func TestHarvestSession_ReadSliceHighCardinality(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			s := newReadSession(t, tc.closer, "a\nb\n", 0)
-			s.inp.preset.highCardinality = true
+			s.inp.preset.store(resolvedPreset{highCardinality: true})
 			s.src.keepOpen = tc.keepOpen
 
 			verdict, err := s.ReadSlice(backgroundCtx(), &countingPublisher{})
@@ -500,7 +500,7 @@ func testFilestream(t *testing.T, closer closerConfig) *filestream {
 	encFactory, ok := encoding.FindEncoding("")
 	require.True(t, ok, "the default encoding must be available")
 	return &filestream{
-		preset:          &resolvedPreset{},
+		preset:          &sharedPreset{},
 		compression:     CompressionNone,
 		encodingFactory: encFactory,
 		readerConfig:    readerConfig{BufferSize: 1024, MaxBytes: 1 << 20, LineTerminator: readfile.AutoLineTerminator},

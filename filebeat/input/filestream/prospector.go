@@ -91,17 +91,53 @@ type fileProspector struct {
 	growingFingerprint    bool
 	harvesterState        *fileStateTable
 	presetInputs          presetInputs
-	// preset is shared with the input's harvester and written once in Init.
-	// It must not be nil.
-	preset *resolvedPreset
+	// preset is shared with the input's harvester. It is resolved in Init and
+	// again in Restart. It must not be nil.
+	preset *sharedPreset
+	// restartFileCount is the file count of the scan that requested a restart
+	// into high_cardinality, see needsHighCardinalityRestart. It is only
+	// meaningful when restartRequested is true.
+	restartFileCount int
+	restartRequested bool
 }
 
-var _ loginp.HarvesterLimiter = (*fileProspector)(nil)
+var (
+	_ loginp.HarvesterLimiter = (*fileProspector)(nil)
+	_ loginp.Restarter        = (*fileProspector)(nil)
+)
 
 // HarvesterLimit returns the harvester limit the input runs with, 0 means no
 // limit. It is valid after Init, which resolves the preset.
 func (p *fileProspector) HarvesterLimit() uint64 {
-	return p.preset.harvesterLimit
+	return p.preset.load().harvesterLimit
+}
+
+// RestartRequested reports whether the last Run returned because a scan
+// found enough files to switch from the default preset to high_cardinality.
+func (p *fileProspector) RestartRequested() bool {
+	return p.restartRequested
+}
+
+// Restart resolves the preset again from the file count of the scan that
+// requested the restart, and resets the file watcher so that the next scan
+// reports every file as new, like the first scan after Init.
+func (p *fileProspector) Restart() {
+	res := resolvePreset(p.presetInputs, p.restartFileCount)
+	p.preset.store(res)
+	p.logger.Info(presetRestartMessage(p.presetInputs, p.restartFileCount, res))
+	p.warnIgnoredCloseOnEOF(res)
+
+	if fw, ok := p.filewatcher.(*fileWatcher); ok {
+		fw.reset()
+	}
+	p.restartRequested = false
+	p.restartFileCount = 0
+}
+
+func (p *fileProspector) warnIgnoredCloseOnEOF(res resolvedPreset) {
+	if res.highCardinality && p.presetInputs.closeOnEOF {
+		p.logger.Warn("'close.reader.on_eof' is ignored: the high_cardinality preset decides per file whether it is closed at EOF")
+	}
 }
 
 func (p *fileProspector) previousID(name string, fd loginp.FileDescriptor, v loginp.TakeOverState) string {
@@ -193,11 +229,10 @@ func (p *fileProspector) Init(
 ) error {
 	files := p.filewatcher.GetFiles(loginp.FileScanOptions{}).Files
 
-	*p.preset = resolvePreset(p.presetInputs, len(files))
-	p.logger.Info(presetMessage(p.presetInputs, len(files), *p.preset))
-	if p.preset.highCardinality && p.presetInputs.closeOnEOF {
-		p.logger.Warn("'close.reader.on_eof' is ignored: the high_cardinality preset decides per file whether it is closed at EOF")
-	}
+	res := resolvePreset(p.presetInputs, len(files))
+	p.preset.store(res)
+	p.logger.Info(presetMessage(p.presetInputs, len(files), res))
+	p.warnIgnoredCloseOnEOF(res)
 
 	// If this fileProspector belongs to an input that did not have an ID
 	// this will find its files in the registry and update them to use the
@@ -363,7 +398,12 @@ func (p *fileProspector) Run(
 	// ctx.Logger has its 'log.logger' set to 'input.filestream'.
 	// Because the harvester is not really part of the prospector,
 	// we use this logger instead of the prospector logger.
-	defer p.stopHarvesterGroup(ctx.Logger, hg)
+	// On a restart the input stops the harvesters, see loginp.Restarter.
+	defer func() {
+		if !p.restartRequested {
+			p.stopHarvesterGroup(ctx.Logger, hg)
+		}
+	}()
 
 	// The harvester needs to notify the FileWatcher
 	// when it closes
@@ -386,8 +426,9 @@ func (p *fileProspector) Run(
 }
 
 // scanLoop scans the file system on the calling goroutine, handing each event
-// to sink, until ctx is cancelled. It re-scans every resolved check interval;
-// a non-positive one disables re-scanning after the initial scan.
+// to sink, until ctx is cancelled or a scan requests a restart into
+// high_cardinality. It re-scans every resolved check interval; a non-positive
+// one disables re-scanning after the initial scan.
 func (p *fileProspector) scanLoop(
 	ctx unison.Canceler,
 	metrics *loginp.Metrics,
@@ -396,18 +437,39 @@ func (p *fileProspector) scanLoop(
 ) {
 	defer metrics.Cleanup()
 
-	p.filewatcher.ScanOnce(ctx, sink, metrics, p.ignoreOlder, ignoreInactiveSince)
-	if p.preset.checkInterval <= 0 {
+	preset := p.preset.load()
+	// The scan that requests the restart is dropped before it emits any
+	// event, so no harvester starts under the preset being replaced.
+	gate := func(fileCount int) bool {
+		if !needsHighCardinalityRestart(p.presetInputs, preset, fileCount) {
+			return true
+		}
+		p.restartRequested = true
+		p.restartFileCount = fileCount
+		return false
+	}
+	scan := func() {
+		p.filewatcher.ScanOnce(ctx, sink, metrics, p.ignoreOlder, ignoreInactiveSince, gate)
+	}
+
+	scan()
+	if p.restartRequested {
+		return
+	}
+	if preset.checkInterval <= 0 {
 		<-ctx.Done()
 		return
 	}
 
-	ticker := time.NewTicker(p.preset.checkInterval)
+	ticker := time.NewTicker(preset.checkInterval)
 	defer ticker.Stop()
 	for {
 		select {
 		case <-ticker.C:
-			p.filewatcher.ScanOnce(ctx, sink, metrics, p.ignoreOlder, ignoreInactiveSince)
+			scan()
+			if p.restartRequested {
+				return
+			}
 		case <-ctx.Done():
 			return
 		}
@@ -545,7 +607,7 @@ func (p *fileProspector) sourceToStart(
 	src loginp.Source,
 	updater loginp.StateMetadataUpdater,
 ) (loginp.Source, bool) {
-	if !p.preset.highCardinality {
+	if !p.preset.load().highCardinality {
 		return src, true
 	}
 
