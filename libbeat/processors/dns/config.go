@@ -30,7 +30,8 @@ import (
 
 // config defines the configuration options for the DNS processor.
 type config struct {
-	cacheConfig  `config:",inline"`
+	// Must stay exported: go-ucfg skips fields with lowercase names (#42570).
+	CacheConfig  `config:",inline"`
 	Nameservers  []string      `config:"nameservers"`              // Required on Windows. /etc/resolv.conf is used if none are given.
 	Timeout      time.Duration `config:"timeout"`                  // Per request timeout (with 2 nameservers the total timeout would be 2x).
 	Type         queryType     `config:"type" validate:"required"` // One of A, AAAA, TXT or PTR (or reverse).
@@ -112,15 +113,15 @@ func (qt *queryType) Unpack(v string) error {
 	return nil
 }
 
-// cacheConfig defines the success and failure caching parameters.
-type cacheConfig struct {
+// CacheConfig defines the success and failure caching parameters.
+type CacheConfig struct {
 	SuccessCache cacheSettings `config:"success_cache"`
 	FailureCache cacheSettings `config:"failure_cache"`
 }
 
 // cacheSettings define the caching behavior for an individual cache.
 type cacheSettings struct {
-	// Disable the use of the cache.
+	// Enabled controls whether the cache is used.
 	Enabled bool `config:"enabled"`
 
 	// TTL value for items in cache. Not used for success because we use TTL
@@ -162,8 +163,8 @@ func (c *config) Validate() error {
 	return nil
 }
 
-// Validate validates the data contained in the cacheConfig.
-func (c *cacheConfig) Validate() error {
+// Validate validates the data contained in the CacheConfig.
+func (c *CacheConfig) Validate() error {
 	if c.SuccessCache.MinTTL <= 0 {
 		return fmt.Errorf("success_cache.min_ttl must be > 0")
 	}
@@ -190,7 +191,7 @@ func (c *cacheConfig) Validate() error {
 
 func defaultConfig() config {
 	return config{
-		cacheConfig: cacheConfig{
+		CacheConfig: CacheConfig{
 			SuccessCache: cacheSettings{
 				Enabled:         true,
 				MinTTL:          time.Minute,
