@@ -19,8 +19,12 @@ package secretstores
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"maps"
+	"net"
+	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -43,6 +47,8 @@ const swapType = "fake_swap"
 type swapStore struct{ id string }
 
 func (s *swapStore) Validate(*conf.C, Scope) error { return nil }
+
+func (s *swapStore) Close() error { return nil }
 
 func (s *swapStore) Replace(_ context.Context, cfg *conf.C, _ Scope) (*conf.C, error) {
 	c := conf.NewConfig()
@@ -120,6 +126,46 @@ func TestParseAllowedHosts(t *testing.T) {
 	}
 }
 
+// TestNormalizeHostMatchesNetHTTP checks normalizeHost against the host that
+// net/http dials. They convert names with separate copies of the IDNA tables
+// (golang.org/x/net and the copy in the standard library), which follow the
+// Unicode version of the Go release, so a Go update can change the result.
+func TestNormalizeHostMatchesNetHTTP(t *testing.T) {
+	errStop := errors.New("stop before dialing")
+	hosts := []string{
+		"API.Example.COM",
+		"bücher.example",
+		"BÜCHER.example",
+		"ß.example",
+		"ẞ.example",
+		"İ.example",
+		"ﬃ.example",
+		"ＡＰＩ.example",
+		"ſ.example",
+		"Kelvin.example", // Kelvin sign
+	}
+	for _, host := range hosts {
+		var dialed string
+		client := &http.Client{Transport: &http.Transport{
+			DialContext: func(_ context.Context, _, addr string) (net.Conn, error) {
+				dialed = addr
+				return nil, errStop
+			},
+		}}
+		resp, err := client.Get("http://" + host + "/") //nolint:noctx // the request never leaves the process
+		if resp != nil {
+			_ = resp.Body.Close()
+		}
+		require.ErrorIs(t, err, errStop, "net/http must try to dial %q", host)
+		dialedHost, _, err := net.SplitHostPort(dialed)
+		require.NoError(t, err, "unexpected dial address %q for %q", dialed, host)
+
+		got, ok := normalizeHost(host)
+		assert.True(t, ok, "%q must be normalized", host)
+		assert.Equal(t, strings.ToLower(dialedHost), got, "normalizeHost(%q) must match the host net/http dials", host)
+	}
+}
+
 func TestNormalizeHost(t *testing.T) {
 	tests := map[string]string{
 		"API.Example.COM":  "api.example.com",
@@ -133,8 +179,11 @@ func TestNormalizeHost(t *testing.T) {
 		"BÜCHER.example.":       "xn--bcher-kva.example",
 		"xn--bcher-kva.example": "xn--bcher-kva.example",
 		"ß.example":             "xn--zca.example",
-		// Capital sharp s lowercases to "ß", but IDNA maps it to "ss".
-		"ẞ.example": "ss.example",
+		// Capital I with dot lowercases to "i", but IDNA maps it to "i̇".
+		"İ.example": "xn--i-9bb.example",
+		// Capital sharp s maps to "ß" since Unicode 15.1 (Go 1.27); it
+		// used to map to "ss".
+		"ẞ.example": "xn--zca.example",
 		// Kelvin sign.
 		"Kelvin.example": "kelvin.example",
 	}
@@ -234,10 +283,10 @@ func TestAllowedHosts(t *testing.T) {
 			cfg:    map[string]any{"type": "dest", "host": "xn--bcher-kva.example", "header": "fake:prod@token"},
 		},
 		{
-			// "ẞ" lowercases to "ß", but net/http dials "ss.example".
+			// "İ" lowercases to "i", but net/http dials "xn--i-9bb.example".
 			name:    "name that lowercases to an allowed host but dials another",
-			stores:  []any{prod("ß.example")},
-			cfg:     map[string]any{"type": "dest", "host": "ẞ.example", "header": "fake:prod@token"},
+			stores:  []any{prod("i.example")},
+			cfg:     map[string]any{"type": "dest", "host": "İ.example", "header": "fake:prod@token"},
 			wantErr: "a host that is not allowed",
 		},
 		{
@@ -321,7 +370,8 @@ func TestAllowedHosts(t *testing.T) {
 				assert.NoError(t, err, "the monitor must be allowed")
 				return
 			}
-			assert.ErrorContains(t, err, tc.wantErr, "the monitor must be rejected")
+			// require: the checks below call err.Error().
+			require.ErrorContains(t, err, tc.wantErr, "the monitor must be rejected")
 			if tc.wantConfigErr {
 				assert.NotErrorIs(t, err, ErrNotAllowed, "a config error must not be a policy error")
 				assert.NotContains(t, err.Error(), allowedHostsKey, "a config error must not mention allowed_hosts")

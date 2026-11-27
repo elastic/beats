@@ -85,9 +85,9 @@ func GenerateOSSMetricbeatModuleIncludeListGo() error {
 	// while ModuleDirs finds the metricsets one level down via their _meta directories.
 	err = devtools.GenerateIncludeListGo(
 		devtools.IncludeListOptions{
-			ImportDirs:            []string{"module/linux", "module/system", "module/windows"},
-			ModuleDirs:            []string{"module/linux", "module/system", "module/windows"},
-			ModulesToExclude:      nil,
+			ImportDirs:            []string{"module/http", "module/linux", "module/system", "module/windows"},
+			ModuleDirs:            []string{"module/http", "module/linux", "module/system", "module/windows"},
+			ModulesToExclude:      []string{"module/http/server"}, // agent only uses http/json
 			Outfile:               "include/list_common_edr.go",
 			BuildTags:             "\n//go:build edr\n",
 			Pkg:                   "include",

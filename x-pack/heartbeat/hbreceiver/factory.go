@@ -60,6 +60,15 @@ func (c *heartbeatCreator) create(b *beat.Beat, cfg *conf.C) (beat.Beater, error
 	return created, nil
 }
 
+// stateLoaders returns the created Heartbeat, or a nil interface if none was
+// created, so the start hook can tell the two apart.
+func (c *heartbeatCreator) stateLoaders() stateLoaderInstaller {
+	if c.heartbeat == nil {
+		return nil
+	}
+	return c.heartbeat
+}
+
 func createReceiver(ctx context.Context, set receiver.Settings, baseCfg component.Config, consumer consumer.Logs) (receiver.Logs, error) {
 	cfg, ok := baseCfg.(*Config)
 	if !ok {
@@ -98,7 +107,7 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 		beatsAuthStartHook(
 			hbReceiver.ctx,
 			cfg.MonitorState.Elasticsearch,
-			creator.heartbeat,
+			creator.stateLoaders(),
 			func() string { return b.Info.UserAgent },
 			b.Info.Logger,
 			func(requester *eslegclient.Connection) {

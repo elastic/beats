@@ -32,5 +32,5 @@ func init() {
 // AssetMunin returns asset data.
 // This is the base64 encoded zlib format compressed contents of module/munin.
 func AssetMunin() string {
-	return "eJx8kUFuwyAURPc+xSibSJHiA7DoDdorRNhMKA0GBN9qffvKhlaOanX5Z/5oHp8rHlwUpjm40AHixFPh9LrOpw4wLGN2SVwMCi8dAGweQjTERMluLOBXilmYOyDTUxcqWN0Bd0dvitpyVwQ9sXX1LdpfNg+QJVEhDh8cpUl1uFXHxHnw/OvcJp2SC7atnS/ntnNAvtHvkAsNhgUayc/WBcQ7dMWrz9OWQfoD+Lrfr9IT/oPLZ8zmf4I3PXGtknf+FI/Re47igl3V8nvYg+6nPpvjnJqyP3VN7b/iOwAA//84wJVl"
+	return "eJx8kUFu6zAMRPc+xSCbAAHsA2jxb5B/hUC2JooaWRIkGq1vX9hSixQ1CntDDsk3pHo8uSrMS3ChA8SJp8LpusWnDjAsU3ZJXAwK/zoA2DWEaIiZkt1UwI8UszB3QKanLlSwugPujt4Utff1CHpmYw2tdbjsGiBrokIc3zhJS9XgVhUTl9Hzt3KbdUou2FZ2vpxbzYHz7b++WC40GFdoJL9YFxDv0NVeXU9bBhkOzNf6YdunDa70J9f3mM3fDv7rmRtKHvwCT9F7TuKChTxYvg97wG5jKs/muKSWeT319vU/nuJzADjAlWU="
 }

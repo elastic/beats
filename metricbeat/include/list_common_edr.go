@@ -23,6 +23,8 @@ package include
 
 import (
 	// Import packages that perform 'func init()'.
+	_ "github.com/elastic/beats/v7/metricbeat/module/http"
+	_ "github.com/elastic/beats/v7/metricbeat/module/http/json"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux/conntrack"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux/iostat"
