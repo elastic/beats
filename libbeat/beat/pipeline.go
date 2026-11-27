@@ -165,6 +165,10 @@ type ProcessingConfig struct {
 	// Fields provides additional 'global' fields to be added to every event
 	Fields mapstr.M
 
+	// FieldsReadOnly promises that Fields is never modified after Connect, so the
+	// pipeline may keep it and add it to events without copying it.
+	FieldsReadOnly bool
+
 	// DynamicFields provides additional fields to be added to every event, supporting live updates
 	DynamicFields *mapstr.Pointer
 
