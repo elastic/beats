@@ -5,9 +5,10 @@ wait-for-event-log 1
 exec winlogbeat -c winlogbeat.yml
 check-event-count output 1
 
-# Registry file must be in the custom path, not in the default location.
-exists $WORK/custom-data/state/.winlogbeat.yml
-! exists $WORK/data/.winlogbeat.yml
+# The registry is under the custom data path. The legacy registry_file setting
+# is still accepted but no state file is written.
+exists $WORK/custom-data/registry/winlogbeat
+! exists $WORK/custom-data/state/.winlogbeat.yml
 
 -- winlogbeat.yml --
 winlogbeat.shutdown_timeout: 30s

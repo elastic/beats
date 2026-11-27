@@ -5,10 +5,9 @@ wait-for-event-log 1
 exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
 check-event-count output 1
 
-# Verify the checkpoint file exists and has the expected fields.
-exists $WORK/data/.winlogbeat.yml
-grep 'record_number' $WORK/data/.winlogbeat.yml
-grep 'bookmark' $WORK/data/.winlogbeat.yml
+# The state lives in the Filebeat registry, not in the old state file.
+exists $WORK/data/registry/winlogbeat
+! exists $WORK/data/.winlogbeat.yml
 
 -- winlogbeat.yml --
 winlogbeat.shutdown_timeout: 30s

@@ -50,10 +50,39 @@ func (pub *publisher) Publish(records []eventlog.Record) error {
 	return nil
 }
 
-type winlogInput struct{}
+// Options customises the winlog input for hosts other than Filebeat.
+type Options struct {
+	// InitialState returns the position to start from for an event log that
+	// has no cursor in the registry. name is the event log's Name().
+	InitialState func(name string) (checkpoint.EventLogState, bool)
+	// OnStopped is called once when an event log's reader returns for any
+	// reason other than cancellation. name is the event log's Name().
+	OnStopped func(name string)
+}
+
+type winlogInput struct {
+	opts Options
+}
 
 // Plugin create a stateful input Plugin collecting logs from Windows Event Logs.
 func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
+	return PluginWithOptions(log, store, Options{})
+}
+
+// PluginWithOptions is like Plugin but applies opts to the input.
+func PluginWithOptions(log *logp.Logger, store statestore.States, opts Options) input.Plugin {
+	configure := func(cfg *conf.C, logger *logp.Logger) ([]cursor.Source, cursor.Input, error) {
+		// TODO: do we want to allow to read multiple eventLogs using a single config
+		//       as is common for other inputs?
+		eventLog, err := eventlog.New(cfg, logger)
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to create new event log. %w", err)
+		}
+
+		sources := []cursor.Source{eventLog}
+		return sources, winlogInput{opts: opts}, nil
+	}
+
 	return input.Plugin{
 		Name:       pluginName,
 		Stability:  feature.Stable,
@@ -67,18 +96,6 @@ func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 			Configure:  configure,
 		},
 	}
-}
-
-func configure(cfg *conf.C, logger *logp.Logger) ([]cursor.Source, cursor.Input, error) {
-	// TODO: do we want to allow to read multiple eventLogs using a single config
-	//       as is common for other inputs?
-	eventLog, err := eventlog.New(cfg, logger)
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create new event log. %w", err)
-	}
-
-	sources := []cursor.Source{eventLog}
-	return sources, winlogInput{}, nil
 }
 
 func (winlogInput) Name() string { return pluginName }
@@ -100,27 +117,36 @@ func (in winlogInput) Run(
 ) error {
 	api, _ := source.(eventlog.EventLog)
 	log := ctx.Logger.With("eventlog", source.Name(), "channel", api.Channel())
-	return eventlog.Run(
-		&ctx,
-		ctx.Cancelation,
-		ctx.MetricsRegistry,
-		api,
-		initCheckpoint(log, cursor),
-		&publisher{cursorPub: pub},
-		log,
-	)
+	return in.run(ctx, api, in.startState(log, source.Name(), cursor.IsNew(), cursor.Unpack), &publisher{cursorPub: pub})
 }
 
-func initCheckpoint(log *logp.Logger, cursor cursor.Cursor) checkpoint.EventLogState {
+// startState picks the start position: the unpacked cursor if one exists,
+// else opts.InitialState, else the zero state.
+func (in winlogInput) startState(log *logp.Logger, name string, isNew bool, unpack func(any) error) checkpoint.EventLogState {
 	var cp checkpoint.EventLogState
-	if cursor.IsNew() {
+	if isNew {
+		if in.opts.InitialState != nil {
+			if state, ok := in.opts.InitialState(name); ok {
+				return state
+			}
+		}
 		return cp
 	}
 
-	if err := cursor.Unpack(&cp); err != nil {
+	if err := unpack(&cp); err != nil {
 		log.Errorf("Reset winlog position. Failed to read checkpoint from registry: %v", err)
 		return checkpoint.EventLogState{}
 	}
 
 	return cp
+}
+
+// run calls eventlog.Run and then OnStopped when ctx.Cancelation is not done.
+func (in winlogInput) run(ctx input.Context, api eventlog.EventLog, start checkpoint.EventLogState, pub eventlog.Publisher) error {
+	log := ctx.Logger.With("eventlog", api.Name(), "channel", api.Channel())
+	err := eventlog.Run(&ctx, ctx.Cancelation, ctx.MetricsRegistry, api, start, pub, log)
+	if in.opts.OnStopped != nil && ctx.Cancelation.Err() == nil {
+		in.opts.OnStopped(api.Name())
+	}
+	return err
 }

@@ -30,15 +30,21 @@ You can specify the following options in the `winlogbeat` section of the `winlog
 
 ### `registry_file` [_registry_file]
 
-The name of the file where Winlogbeat stores information that it uses to resume monitoring after a restart. By default, the file is stored as `.winlogbeat.yml` in the directory where Beat was started. When you run the process as a Windows service, set the value to `C:/Program Files/Winlogbeat-Data/.winlogbeat.yml`.
+Winlogbeat keeps the information that it uses to resume monitoring after a restart in the registry at `registry/winlogbeat` under `path.data`.
+
+This setting names the old state file from earlier versions of Winlogbeat. By default, the old state file is `.winlogbeat.yml` under `path.data`. You only need to set this option if the old state file is somewhere else.
+
+When Winlogbeat starts collecting events, it reads the old state file if it exists. For each event log that has no position in the registry yet, it uses the position from the old state file as the starting position. Winlogbeat never modifies, renames or deletes the old state file. If the file exists but cannot be parsed, Winlogbeat fails to start.
+
+To read event logs from the beginning again, delete both the `registry/` directory under `path.data` and the old state file.
 
 ```yaml
 winlogbeat.registry_file: C:/Program Files/Winlogbeat-Data/.winlogbeat.yml
 ```
 
-The default location varies:
-* {applies_to}`stack: ga 9.1+` `C:/Program Files/Winlogbeat-Data/.winlogbeat.yml`
-* {applies_to}`stack: ga =9.0` `C:/ProgramData/winlogbeat/.winlogbeat.yml`
+The default location of `path.data`, and so of both the old state file and the `registry/` directory, varies:
+* {applies_to}`stack: ga 9.1+` `C:/Program Files/Winlogbeat-Data`
+* {applies_to}`stack: ga =9.0` `C:/ProgramData/winlogbeat`
 
 ::::{note}
 The forward slashes (/) in the path are automatically changed to backslashes (\) for Windows compatibility. You can use either forward or backslashes. Forward slashes are easier to work with in YAML because there is no need to escape them.
@@ -48,9 +54,9 @@ The forward slashes (/) in the path are automatically changed to backslashes (\)
 
 ### `registry_flush` [_registry_flush]
 
-The timeout value that controls when registry entries are written to disk (flushed). When an unwritten update exceeds this value, it triggers a write to disk. When flush is set to 0s, the registry is written to disk after each batch of events has been published successfully.
+The registry flush interval. It controls when registry entries are written to disk (flushed). When an unwritten update exceeds this value, it triggers a write to disk. When flush is set to 0s, the registry is written to disk after each batch of events has been published successfully.
 
-The default value is 5s.
+The default value is 1s.
 
 Valid time units are `ns`, `us`, `ms`, `s`, `m`, `h`.
 
@@ -61,7 +67,7 @@ winlogbeat.registry_flush: 5s
 
 ### `shutdown_timeout` [_shutdown_timeout]
 
-The amount of time to wait for all events to be published when shutting down. By default there is no shutdown timeout so Winlogbeat will stop without waiting. When you restart it will resume from the last successfully published event in each event log.
+The amount of time to wait for all events to be published when shutting down. If you do not set it, Winlogbeat waits up to 1s for events to be acknowledged when it shuts down. When you restart it will resume from the last successfully published event in each event log.
 
 In some use cases you do want to wait for the publishing queue to drain before exiting and that’s when you would use this option.
 

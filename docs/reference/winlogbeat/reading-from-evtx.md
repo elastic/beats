@@ -18,7 +18,7 @@ winlogbeat.event_logs:
     no_more_events: stop <2>
 
 winlogbeat.shutdown_timeout: 30s <3>
-winlogbeat.registry_file: evtx-registry.yml <4>
+path.data: C:/ProgramData/winlogbeat-evtx <4>
 
 output.elasticsearch.hosts: ['http://localhost:9200']
 ```
@@ -26,7 +26,7 @@ output.elasticsearch.hosts: ['http://localhost:9200']
 1. `name` will be set to the value of the `EVTX_FILE` environment variable.
 2. `no_more_events` sets the behavior of Winlogbeat when Windows reports that there are no more events to read. We want Winlogbeat to *stop* rather than *wait* since this is an archived file that will not receive any more events.
 3. `shutdown_timeout` controls the maximum amount of time Winlogbeat will wait to finish publishing the events to {{es}} after stopping because it reached the end of the log.
-4. A separate registry file is used to avoid overwriting the default registry file. You can delete this file after you’re done ingesting the .evtx data.
+4. Winlogbeat keeps the position in the .evtx file in the registry under `path.data`, like any other event log. A separate `path.data` keeps this state apart from the state of your normal Winlogbeat. You can delete this directory after you’re done ingesting the .evtx data.
 
 Now execute Winlogbeat and wait for it to complete. It will exit when it’s done.
 

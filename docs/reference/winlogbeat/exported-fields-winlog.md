@@ -16,6 +16,12 @@ Fields from the Windows Event Log.
 :   The raw XML representation of the event obtained from Windows. This field is only available on operating systems supporting the Windows Event Log API (Microsoft Windows Vista and newer). This field is not included by default and must be enabled by setting `include_xml: true` as a configuration option for an individual event log. The XML representation of the event is useful for troubleshooting purposes. The data in the fields reported by Winlogbeat can be compared to the data in the XML to diagnose problems.
 
 
+**`input.type`**
+:   The input type from which the event was generated. Always `winlog`.
+
+    type: keyword
+
+
 ## winlog [_winlog]
 
 All fields specific to the Windows Event Log are defined here.

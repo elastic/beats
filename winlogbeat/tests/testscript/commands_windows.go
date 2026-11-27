@@ -32,9 +32,14 @@ import (
 	"unsafe"
 
 	"github.com/rogpeppe/go-internal/testscript"
+	"go.yaml.in/yaml/v2"
 	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/registry"
 
+	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 )
 
@@ -51,6 +56,7 @@ func customCommands() map[string]func(*testscript.TestScript, bool, []string) {
 		"check-event-field-exists":   cmdCheckEventFieldExists,
 		"check-event-field-absent":   cmdCheckEventFieldAbsent,
 		"check-event-field-contains": cmdCheckEventFieldContains,
+		"seed-legacy-state":          cmdSeedLegacyState,
 		"sleep":                      cmdSleep,
 		"wait-for-event-count":       cmdWaitForEventCount,
 		"wait-for-event-log":         cmdWaitForEventLog,
@@ -509,6 +515,63 @@ func numberOfEventLogRecords(h windows.Handle) (int, error) {
 		return 0, fmt.Errorf("GetNumberOfEventLogRecords: %w", e1)
 	}
 	return int(n), nil
+}
+
+// registryRecord is the part of a stored registry value that holds the cursor.
+type registryRecord struct {
+	Cursor checkpoint.EventLogState `struct:"cursor"`
+}
+
+// cmdSeedLegacyState implements: seed-legacy-state <registry dir> <event log name> <out file>
+//
+// It reads the cursor Winlogbeat stored in the registry under <registry dir>
+// for the event log and writes it to <out file> in the layout of the old
+// .winlogbeat.yml state file, using <event log name> as the entry name. The
+// cursor key is winlog::<name>, or winlog::<name>::<name> for an event log
+// configured with id <name>.
+func cmdSeedLegacyState(script *testscript.TestScript, neg bool, args []string) {
+	if len(args) != 3 {
+		script.Fatalf("usage: seed-legacy-state <registry dir> <event log name> <out file>")
+	}
+	regDir := script.MkAbs(args[0])
+	name := args[1]
+	out := script.MkAbs(args[2])
+
+	reg, err := memlog.New(logp.NewNopLogger(), memlog.Settings{Root: regDir})
+	if err != nil {
+		script.Fatalf("seed-legacy-state: open registry: %v", err)
+	}
+	defer reg.Close()
+	store, err := statestore.NewRegistry(reg).Get("winlogbeat")
+	if err != nil {
+		script.Fatalf("seed-legacy-state: open store: %v", err)
+	}
+	defer store.Close()
+
+	var rec registryRecord
+	err = store.Get("winlog::"+name, &rec)
+	if err != nil {
+		err = store.Get("winlog::"+name+"::"+name, &rec)
+	}
+	if err != nil {
+		script.Fatalf("seed-legacy-state: no cursor for %q: %v", name, err)
+	}
+
+	state := rec.Cursor
+	state.Name = name
+	data, err := yaml.Marshal(checkpoint.PersistedState{
+		UpdateTime: time.Now(),
+		States:     []checkpoint.EventLogState{state},
+	})
+	if err != nil {
+		script.Fatalf("seed-legacy-state: marshal: %v", err)
+	}
+	if err := os.MkdirAll(filepath.Dir(out), 0o755); err != nil {
+		script.Fatalf("seed-legacy-state: %v", err)
+	}
+	if err := os.WriteFile(out, data, 0o644); err != nil {
+		script.Fatalf("seed-legacy-state: %v", err)
+	}
 }
 
 // cmdSleep implements: sleep <duration>

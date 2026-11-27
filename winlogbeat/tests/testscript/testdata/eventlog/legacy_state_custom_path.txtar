@@ -1,0 +1,40 @@
+[!windows] skip 'requires Windows'
+
+# First run with a separate data path to produce a cursor.
+write-event 'First event'
+wait-for-event-log 1
+exec winlogbeat -c winlogbeat.yml --path.data $WORK/seed
+check-event-count output 1
+check-event-field output 0 message 'First event'
+
+# The legacy entry for an event log with an id is named after the id.
+seed-legacy-state $WORK/seed/registry my-id $WORK/data/state/old.yml
+exists $WORK/data/state/old.yml
+rm $WORK/output
+
+# Second run reads the legacy state from the custom registry_file path.
+write-event 'Second event'
+wait-for-event-log 2
+exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
+check-event-count output 1
+check-event-field output 0 message 'Second event'
+exists $WORK/data/state/old.yml
+exists $WORK/data/registry/winlogbeat
+
+-- winlogbeat.yml --
+winlogbeat.shutdown_timeout: 30s
+winlogbeat.registry_file: state/old.yml
+winlogbeat.event_logs:
+  - name: ${PROVIDER:?missing PROVIDER}
+    id: my-id
+    no_more_events: stop
+output.file:
+  path: ${WORK:?missing WORK}/output
+  filename: winlogbeat
+  rotate_every_kb: 10000
+queue.mem:
+  events: 4096
+  flush.min_events: 1
+  flush.timeout: 0.1s
+logging.level: warning
+logging.to_files: false
