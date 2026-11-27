@@ -1,4 +1,5 @@
 ---
+description: "Use the dissect processor in Metricbeat to extract fields from a string with a tokenizer pattern. Covers field, target_prefix, and trim options, with an example."
 navigation_title: "dissect"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/dissect.html
@@ -7,7 +8,7 @@ applies_to:
   serverless: ga
 ---
 
-# Dissect strings [dissect]
+# Dissect strings in Metricbeat [dissect]
 
 
 The `dissect` processor tokenizes incoming strings using defined patterns.

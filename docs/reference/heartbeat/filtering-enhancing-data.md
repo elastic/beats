@@ -1,4 +1,6 @@
 ---
+meta_title: "Filter and enhance Heartbeat data with processors"
+description: "Use Heartbeat processors to drop events and fields, decode JSON, and add metadata before data is sent to the output. Includes drop event and decode JSON examples."
 navigation_title: "Processors"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/filtering-and-enhancing-data.html
@@ -7,7 +9,7 @@ applies_to:
   serverless: ga
 ---
 
-# Filter and enhance data with processors [filtering-and-enhancing-data]
+# Filter and enhance data with processors in Heartbeat [filtering-and-enhancing-data]
 
 
 You can [define processors](/reference/heartbeat/defining-processors.md) in your configuration to process events before they are sent to the configured output. The libbeat library provides processors for:
