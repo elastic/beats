@@ -25,6 +25,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
@@ -290,6 +291,103 @@ func TestGroupToSingleEvent(t *testing.T) {
 	val, err = event.MetricSetFields.GetValue("%_user_time:count")
 	assert.NoError(t, err)
 	assert.Equal(t, val, mapstr.M{"processor_count": float64(2)})
+}
+
+func TestGroupToSingleEventInstanceCount(t *testing.T) {
+	process := func(counter, field string, instances ...string) PerfCounter {
+		perfCounter := PerfCounter{
+			QueryField:   "process." + field,
+			QueryName:    `\Process(w3wp*)\` + counter,
+			ObjectName:   "Process",
+			InstanceName: "w3wp*",
+		}
+		for _, instance := range instances {
+			perfCounter.ChildQueries = append(perfCounter.ChildQueries, `\Process(`+instance+`)\`+counter)
+		}
+		return perfCounter
+	}
+	value := func(instance string, measurement any) []pdh.CounterValue {
+		return []pdh.CounterValue{{Instance: instance, Measurement: measurement}}
+	}
+	total := PerfCounter{
+		QueryField:   "network.current_connections",
+		QueryName:    `\Web Service(_Total)\Current Connections`,
+		ObjectName:   "Web Service",
+		InstanceName: "_Total",
+		ChildQueries: []string{`\Web Service(_Total)\Current Connections`},
+	}
+	noInstance := PerfCounter{
+		QueryField:   "cache.uri_cache_hits",
+		QueryName:    `\Web Service Cache\URI Cache Hits`,
+		ObjectName:   "Web Service Cache",
+		ChildQueries: []string{`\Web Service Cache\URI Cache Hits`},
+	}
+
+	tests := map[string]struct {
+		counters []PerfCounter
+		values   map[string][]pdh.CounterValue
+		want     mapstr.M
+	}{
+		"one instance of a wildcard": {
+			counters: []PerfCounter{process("Handle Count", "handle_count", "w3wp")},
+			values: map[string][]pdh.CounterValue{
+				`\Process(w3wp)\Handle Count`: value("w3wp", 120),
+			},
+			want: mapstr.M{"process": mapstr.M{"handle_count": 120.0, "worker_process_count": 1.0}},
+		},
+		"several instances of a wildcard": {
+			counters: []PerfCounter{process("Handle Count", "handle_count", "w3wp", "w3wp#1")},
+			values: map[string][]pdh.CounterValue{
+				`\Process(w3wp)\Handle Count`:   value("w3wp", 120),
+				`\Process(w3wp#1)\Handle Count`: value("w3wp#1", 30),
+			},
+			want: mapstr.M{"process": mapstr.M{"handle_count": 150.0, "worker_process_count": 2.0}},
+		},
+		"counter without a value for every instance": {
+			counters: []PerfCounter{
+				process("Handle Count", "handle_count", "w3wp", "w3wp#1"),
+				process("% Processor Time", "cpu_usage_perc", "w3wp", "w3wp#1"),
+			},
+			values: map[string][]pdh.CounterValue{
+				`\Process(w3wp)\Handle Count`:     value("w3wp", 120),
+				`\Process(w3wp#1)\Handle Count`:   value("w3wp#1", 30),
+				`\Process(w3wp)\% Processor Time`: value("w3wp", 2.5),
+				`\Process(w3wp#1)\% Processor Time`: {
+					{Instance: "w3wp#1", Err: pdh.CounterValueError{Error: pdh.PDH_CALC_NEGATIVE_VALUE}},
+				},
+			},
+			want: mapstr.M{"process": mapstr.M{"handle_count": 150.0, "cpu_usage_perc": 2.5, "worker_process_count": 2.0}},
+		},
+		"no instances of a wildcard": {
+			counters: []PerfCounter{process("Handle Count", "handle_count"), total},
+			values: map[string][]pdh.CounterValue{
+				`\Web Service(_Total)\Current Connections`: value("_Total", 7),
+			},
+			want: mapstr.M{"network": mapstr.M{"current_connections": 7.0}},
+		},
+		"counters that are not a wildcard": {
+			counters: []PerfCounter{total, noInstance},
+			values: map[string][]pdh.CounterValue{
+				`\Web Service(_Total)\Current Connections`: value("_Total", 7),
+				`\Web Service Cache\URI Cache Hits`:        value("", 3),
+			},
+			want: mapstr.M{
+				"network": mapstr.M{"current_connections": 7.0},
+				"cache":   mapstr.M{"uri_cache_hits": 3.0},
+			},
+		},
+	}
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			reader := Reader{
+				log:      logptest.NewTestingLogger(t, ""),
+				config:   Config{GroupAllCountersTo: "worker_process_count"},
+				counters: test.counters,
+			}
+			event := reader.groupToSingleEvent(test.values)
+			assert.Equal(t, test.want, event.MetricSetFields, "unexpected event fields")
+		})
+	}
 }
 
 func TestMatchByParentInstance(t *testing.T) {
