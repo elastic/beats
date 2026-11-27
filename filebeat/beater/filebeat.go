@@ -72,6 +72,7 @@ var once = flag.Bool("once", false, "Run filebeat only once until all harvesters
 type Filebeat struct {
 	config                   *cfg.Config
 	moduleRegistry           *fileset.ModuleRegistry
+	noModules                bool // Set by WithoutModules.
 	pluginFactory            PluginFactory
 	done                     chan struct{}
 	stopOnce                 sync.Once // wraps the Stop() method
@@ -87,14 +88,33 @@ type PluginFactory func(beat.Info, statestore.States) []v2.Plugin
 
 var _ backend.WithESStateStoreExtension = (*Filebeat)(nil)
 
+// Option configures the beater returned by New.
+type Option func(*options)
+
+type options struct {
+	noModules bool
+}
+
+// WithoutModules is for beats that run the Filebeat beater but ship no
+// Filebeat fileset modules. The beater does not look for the module
+// directory, does not load fileset ingest pipelines and does not warn that
+// it cannot load them.
+func WithoutModules() Option {
+	return func(o *options) { o.noModules = true }
+}
+
 // New creates a new Filebeat pointer instance.
-func New(plugins PluginFactory) beat.Creator {
+func New(plugins PluginFactory, opts ...Option) beat.Creator {
+	var o options
+	for _, opt := range opts {
+		opt(&o)
+	}
 	return func(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
-		return newBeater(b, plugins, rawConfig)
+		return newBeater(b, plugins, rawConfig, o)
 	}
 }
 
-func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Beater, error) {
+func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C, o options) (beat.Beater, error) {
 	config := cfg.DefaultConfig
 	if err := rawConfig.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %w", err) //nolint:staticcheck //Keep old behavior
@@ -128,9 +148,13 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		EnableAllFilesets:         enableAllFilesets,
 		ForceEnableModuleFilesets: forceEnableModuleFilesets,
 	}
-	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info, true, filesetOverrides)
-	if err != nil {
-		return nil, err
+	moduleRegistry := new(fileset.ModuleRegistry)
+	if !o.noModules {
+		var err error
+		moduleRegistry, err = fileset.NewModuleRegistry(config.Modules, b.Info, true, filesetOverrides)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	moduleInputs, err := moduleRegistry.GetInputConfigs()
@@ -177,6 +201,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		runReady:       &closeOnce{ch: make(chan struct{})},
 		config:         &config,
 		moduleRegistry: moduleRegistry,
+		noModules:      o.noModules,
 		pluginFactory:  plugins,
 		logger:         b.Info.Logger,
 		ctx:            ctx,
@@ -193,6 +218,9 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 
 // setupPipelineLoaderCallback sets the callback function for loading pipelines during setup.
 func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
+	if fb.noModules {
+		return nil
+	}
 	if b.Config.Output.Name() != "elasticsearch" && !management.UnderAgent() {
 		fb.logger.Warn(pipelinesWarning)
 		return nil
@@ -435,7 +463,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		if b.Config.Output.Name() == "elasticsearch" {
 			pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config(), b.Info)
 		} else {
-			if !management.UnderAgent() {
+			if !management.UnderAgent() && !fb.noModules {
 				fb.logger.Warn(pipelinesWarning)
 			}
 		}
