@@ -19,7 +19,9 @@ Everyone’s got an opinion on style. To avoid spending time on this issue we re
 
 As software projects grow so does the complexity of their test cases and with that the probability of some tests becoming *flaky*. It is everyone’s responsibility to handle flaky tests. If you notice a pull request build failing for a reason that is unrelated to the pushed code follow the procedure below:
 
-1. Create an issue using the "Flaky Test" github issue template with the "Flaky Test" label attached.
+1. Create an issue using the "Flaky Test" GitHub issue template, which attaches the `flaky-test` label for you.
 2. Create a PR to mute or fix the flaky test.
 3. Merge that PR and rebase off of it before continuing with the normal PR process for your original PR.
+
+Adding the `triaged` label to a `flaky-test` issue also hands it to the automated fixer in `.github/workflows/trigger-issue-fixer.yml`, which only runs on issues that carry both labels.
 
