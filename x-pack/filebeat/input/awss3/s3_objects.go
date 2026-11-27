@@ -390,6 +390,7 @@ func (p *s3ObjectProcessor) readFile(r io.Reader, logger *logp.Logger) error {
 	reader = readfile.NewStripNewline(reader, p.readerConfig.LineTerminator)
 	reader = p.readerConfig.Parsers.Create(reader, logger)
 	reader = readfile.NewLimitReader(reader, int(p.readerConfig.MaxBytes))
+	defer reader.Close() // release to pool
 
 	var offset int64
 	for {
