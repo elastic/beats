@@ -18,7 +18,7 @@ import (
 func TestStateHandler(t *testing.T) {
 	t.Run("simple run - register once and complete once", func(t *testing.T) {
 		cfg := config{LogGroupARN: "logGroupARN"}
-		st, err := newStateHandler(nil, cfg, createTestInputStore())
+		st, err := newStateHandler(nil, cfg, createTestInputStore(), "test-id")
 		assert.NoError(t, err)
 
 		st.WorkRegister(100, 1)
@@ -36,7 +36,7 @@ func TestStateHandler(t *testing.T) {
 	t.Run("Track and validate multiple work counts", func(t *testing.T) {
 		// given
 		cfg := config{LogGroupARN: "logGroupARN"}
-		st, err := newStateHandler(nil, cfg, createTestInputStore())
+		st, err := newStateHandler(nil, cfg, createTestInputStore(), "test-id")
 		assert.NoError(t, err)
 
 		tStamp := int64(100)
@@ -64,7 +64,7 @@ func TestStateHandler(t *testing.T) {
 
 	t.Run("State is not updated if oldest work is not yet complete", func(t *testing.T) {
 		cfg := config{LogGroupARN: "logGroupARN"}
-		st, err := newStateHandler(nil, cfg, createTestInputStore())
+		st, err := newStateHandler(nil, cfg, createTestInputStore(), "test-id")
 		assert.NoError(t, err)
 
 		st.WorkRegister(100, 1)
@@ -142,7 +142,7 @@ func TestStoreAndGetState(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			stHandler, err := newStateHandler(nil, test.cfg, createTestInputStore())
+			stHandler, err := newStateHandler(nil, test.cfg, createTestInputStore(), "test-id")
 			require.NoError(t, err)
 
 			err = stHandler.storeState(test.storingState)
@@ -211,9 +211,16 @@ func TestGenerateID(t *testing.T) {
 // testInputStore - State registry for testing needs
 type testInputStore struct {
 	registry *statestore.Registry
+	gotTyp   string
+	gotID    string
 }
 
+<<<<<<< HEAD
 func (s *testInputStore) StoreFor(typ string) (*statestore.Store, error) {
+=======
+func (s *testInputStore) StoreFor(typ, id string) (*statestore.Store, error) {
+	s.gotTyp, s.gotID = typ, id
+>>>>>>> 7a889ce (x-pack/filebeat/input/awscloudwatch: use ES state store on agentless (#54573))
 	return s.registry.Get(typ)
 }
 
@@ -229,4 +236,25 @@ func (s *testInputStore) CleanupInterval() time.Duration {
 
 func (s *testInputStore) Close() {
 	_ = s.registry.Close()
+}
+
+func TestStateHandlerStoreRequest(t *testing.T) {
+	cfg := config{LogGroupARN: "arn:aws:logs:us-east-1:123:log-group:g"}
+	ts := createTestInputStore()
+
+	st, err := newStateHandler(nil, cfg, ts, "my-input-id")
+	require.NoError(t, err)
+	assert.Equal(t, "aws-cloudwatch", ts.gotTyp, "store must be requested with the input type")
+	assert.Equal(t, "my-input-id", ts.gotID, "store must be requested with the configured input ID")
+
+	require.NoError(t, st.storeState(storableState{LastSyncEpoch: 1234}))
+	st.Close()
+
+	// A new handler (e.g. after pod replacement) with the same ID restores lastSync.
+	st2, err := newStateHandler(nil, cfg, ts, "my-input-id")
+	require.NoError(t, err)
+	defer st2.Close()
+	got, err := st2.GetState()
+	require.NoError(t, err)
+	assert.Equal(t, int64(1234), got.LastSyncEpoch, "lastSync must be restored from the store, not epoch 0")
 }
