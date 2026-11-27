@@ -438,7 +438,7 @@ func TestConnectionStringConfigValidation(t *testing.T) {
 				return c
 			}(),
 			expectError: true,
-			errorMsg:    "unknown auth_type: invalid_auth_type (valid values: connection_string, client_secret, managed_identity)",
+			errorMsg:    "unknown auth_type: invalid_auth_type (valid values: connection_string, client_secret, managed_identity, workload_identity)",
 		},
 		{
 			name: "invalid processor_version",
