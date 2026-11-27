@@ -79,6 +79,19 @@ In a URL any special characters should be URL encoded.
 In the logfmt-encoded DSN format, if the password contains a backslash character (`\`), it must be escaped with another backslash. For example, if the password is `my\_password`, it must be written as `my\\_password`.
 
 
+## FIPS mode [_fips_mode]
+
+```{applies_to}
+stack: ga 9.7+
+```
+
+FIPS-compatible Metricbeat includes the Oracle module. Metricbeat doesn't encrypt the connection to Oracle Database itself. The Oracle Instant Client that you install on the Metricbeat host encrypts it.
+
+To run the module in a FIPS-compliant deployment, configure the Oracle Instant Client and Oracle Database to use a FIPS 140-3 validated cryptographic provider. Elastic doesn't ship or configure the Oracle Instant Client, so this configuration is your responsibility. For the settings, refer to the Oracle Database documentation.
+
+For other FIPS limitations, refer to [FIPS mode for Ingest tools](docs-content://deploy-manage/security/fips-ingest.md).
+
+
 ## Metricsets [_metricsets_58]
 
 The following Metricsets are included in the module:
