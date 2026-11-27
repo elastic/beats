@@ -101,6 +101,41 @@ func TestConfigUnpackValidatesBillingDurations(t *testing.T) {
 	}
 }
 
+func TestConfigUnpackClientSecret(t *testing.T) {
+	tests := []struct {
+		name    string
+		values  map[string]any
+		wantErr string
+	}{
+		{
+			name:    "rejects a missing client_secret",
+			values:  map[string]any{},
+			wantErr: "client_secret is required unless use_cloud_connectors is true",
+		},
+		{
+			name:   "accepts a missing client_secret with use_cloud_connectors",
+			values: map[string]any{"use_cloud_connectors": true},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			values := validConfig(test.values)
+			delete(values, "client_secret")
+			rawConfig, err := config.NewConfigFrom(values)
+			require.NoError(t, err, "expected the test configuration to be created")
+
+			var cfg Config
+			err = rawConfig.Unpack(&cfg)
+			if test.wantErr == "" {
+				assert.NoError(t, err, "expected the configuration without client_secret to be accepted")
+				return
+			}
+			assert.ErrorContains(t, err, test.wantErr, "expected the configuration without client_secret to be rejected")
+		})
+	}
+}
+
 func validConfig(values map[string]any) map[string]any {
 	cfg := map[string]any{
 		"client_id":       "client",

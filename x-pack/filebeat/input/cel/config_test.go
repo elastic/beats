@@ -600,6 +600,92 @@ var oAuth2ValidationTests = []struct {
 		},
 	},
 	{
+		name: "azure_with_use_cloud_connectors_does_not_need_client_secret",
+		input: map[string]any{
+			"auth.oauth2": map[string]any{
+				"provider":                   "azure",
+				"azure.tenant_id":            "a_tenant_id",
+				"azure.use_cloud_connectors": true,
+				"client.id":                  "a_client_id",
+				"scopes":                     []string{"https://management.azure.com/.default"},
+			},
+		},
+	},
+	{
+		name: "azure_with_use_cloud_connectors_accepts_token_url",
+		input: map[string]any{
+			"auth.oauth2": map[string]any{
+				"provider":                   "azure",
+				"token_url":                  "localhost",
+				"azure.use_cloud_connectors": true,
+				"client.id":                  "a_client_id",
+				"azure.resource":             "https://api.securitycenter.windows.com/",
+			},
+		},
+	},
+	{
+		name:    "azure_with_use_cloud_connectors_and_tenant_id_needs_scopes",
+		wantErr: errors.New("azure.use_cloud_connectors requires scopes, or token_url with azure.resource accessing 'auth.oauth2'"),
+		input: map[string]any{
+			"auth.oauth2": map[string]any{
+				"provider":                   "azure",
+				"azure.tenant_id":            "a_tenant_id",
+				"azure.use_cloud_connectors": true,
+				"client.id":                  "a_client_id",
+			},
+		},
+	},
+	{
+		name:    "azure_with_use_cloud_connectors_and_tenant_id_does_not_accept_only_resource",
+		wantErr: errors.New("azure.use_cloud_connectors requires scopes, or token_url with azure.resource accessing 'auth.oauth2'"),
+		input: map[string]any{
+			"auth.oauth2": map[string]any{
+				"provider":                   "azure",
+				"azure.tenant_id":            "a_tenant_id",
+				"azure.resource":             "https://management.azure.com/",
+				"azure.use_cloud_connectors": true,
+				"client.id":                  "a_client_id",
+			},
+		},
+	},
+	{
+		name:    "azure_with_use_cloud_connectors_rejects_client_secret",
+		wantErr: errors.New("client.secret can't be used with azure.use_cloud_connectors accessing 'auth.oauth2'"),
+		input: map[string]any{
+			"auth.oauth2": map[string]any{
+				"provider":                   "azure",
+				"azure.tenant_id":            "a_tenant_id",
+				"azure.use_cloud_connectors": true,
+				"client.id":                  "a_client_id",
+				"client.secret":              "a_client_secret",
+				"scopes":                     []string{"https://management.azure.com/.default"},
+			},
+		},
+	},
+	{
+		name:    "use_cloud_connectors_requires_the_azure_provider",
+		wantErr: errors.New("azure.use_cloud_connectors requires provider: azure accessing 'auth.oauth2'"),
+		input: map[string]any{
+			"auth.oauth2": map[string]any{
+				"azure.use_cloud_connectors": true,
+				"client.id":                  "a_client_id",
+				"client.secret":              "",
+				"token_url":                  "localhost",
+			},
+		},
+	},
+	{
+		name:    "azure_with_use_cloud_connectors_needs_client_id",
+		wantErr: errors.New("client credentials must be provided accessing 'auth.oauth2'"),
+		input: map[string]any{
+			"auth.oauth2": map[string]any{
+				"provider":                   "azure",
+				"azure.tenant_id":            "a_tenant_id",
+				"azure.use_cloud_connectors": true,
+			},
+		},
+	},
+	{
 		name:    "google_can't_have_token_url_or_client_credentials_set",
 		wantErr: errors.New("none of token_url, client credentials, azure_tenant_id, azure_resource or endpoint_params can be used with the google provider; use google.credentials_file, google.jwt_file, google.credentials_json or ADC instead accessing 'auth.oauth2'"),
 		input: map[string]any{

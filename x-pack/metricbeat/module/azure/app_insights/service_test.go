@@ -21,6 +21,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/identityfederation"
 )
 
 func TestAPIKeyPolicy_SetsHeader(t *testing.T) {
@@ -75,6 +76,34 @@ func TestNewMetricsClient_ClientSecret(t *testing.T) {
 	client, err := newMetricsClient(cfg, logger)
 	require.NoError(t, err, "client secret client construction should succeed for valid inputs")
 	require.NotNil(t, client, "metricsClient must not be nil")
+}
+
+func TestNewMetricsClient_CloudConnectors(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+
+	cfg := Config{
+		ApplicationId:      "app-id",
+		TenantId:           "00000000-0000-0000-0000-000000000000",
+		ClientId:           "00000000-0000-0000-0000-000000000001",
+		UseCloudConnectors: true,
+	}
+
+	t.Run("with WII environment", func(t *testing.T) {
+		t.Setenv(identityfederation.WIIIssuerURLEnvVar, "https://wii.example.com")
+		t.Setenv(identityfederation.WIISSLCertFileEnvVar, "/cert")
+		t.Setenv(identityfederation.WIISSLKeyFileEnvVar, "/key")
+
+		client, err := newMetricsClient(cfg, logger)
+		require.NoError(t, err, "WII client construction should succeed when the WII environment is set")
+		require.NotNil(t, client, "metricsClient must not be nil")
+	})
+
+	t.Run("without WII environment", func(t *testing.T) {
+		t.Setenv(identityfederation.WIIIssuerURLEnvVar, "")
+
+		_, err := newMetricsClient(cfg, logger)
+		assert.ErrorContains(t, err, identityfederation.WIIIssuerURLEnvVar, "the error must name the missing WII variable")
+	})
 }
 
 func TestMetricsClient_GetMultiple(t *testing.T) {
