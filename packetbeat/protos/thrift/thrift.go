@@ -505,15 +505,15 @@ func (thrift *thriftPlugin) readI64(data []byte) (value string, ok bool, complet
 }
 
 // Common implementation for lists and sets (they share the same binary repr).
-func (thrift *thriftPlugin) readListOrSet(data []byte) (value string, ok bool, complete bool, off int) {
+func (thrift *thriftPlugin) readListOrSet(data []byte, depth int) (value string, ok bool, complete bool, off int) {
 	if len(data) < 5 {
 		return "", true, false, 0
 	}
 	typ := data[0]
 
-	funcReader, typeFound := thrift.funcReadersByType(typ)
+	funcReader, typeFound := thrift.funcReadersByType(typ, depth)
 	if !typeFound {
-		thrift.logger.Debugf("Field type %d not known", typ)
+		thrift.logger.Debugf("Field type %d not known or nested too deeply (depth %d)", typ, depth)
 		return "", false, false, 0
 	}
 
@@ -546,38 +546,38 @@ func (thrift *thriftPlugin) readListOrSet(data []byte) (value string, ok bool, c
 	return strings.Join(fields, ", "), true, true, offset
 }
 
-func (thrift *thriftPlugin) readSet(data []byte) (value string, ok bool, complete bool, off int) {
-	value, ok, complete, off = thrift.readListOrSet(data)
+func (thrift *thriftPlugin) readSet(data []byte, depth int) (value string, ok bool, complete bool, off int) {
+	value, ok, complete, off = thrift.readListOrSet(data, depth)
 	if value != "" {
 		value = "{" + value + "}"
 	}
 	return value, ok, complete, off
 }
 
-func (thrift *thriftPlugin) readList(data []byte) (value string, ok bool, complete bool, off int) {
-	value, ok, complete, off = thrift.readListOrSet(data)
+func (thrift *thriftPlugin) readList(data []byte, depth int) (value string, ok bool, complete bool, off int) {
+	value, ok, complete, off = thrift.readListOrSet(data, depth)
 	if value != "" {
 		value = "[" + value + "]"
 	}
 	return value, ok, complete, off
 }
 
-func (thrift *thriftPlugin) readMap(data []byte) (value string, ok bool, complete bool, off int) {
+func (thrift *thriftPlugin) readMap(data []byte, depth int) (value string, ok bool, complete bool, off int) {
 	if len(data) < 6 {
 		return "", true, false, 0
 	}
 	typeKey := data[0]
 	typeValue := data[1]
 
-	funcReaderKey, typeFound := thrift.funcReadersByType(typeKey)
+	funcReaderKey, typeFound := thrift.funcReadersByType(typeKey, depth)
 	if !typeFound {
-		thrift.logger.Debugf("Field type %d not known", typeKey)
+		thrift.logger.Debugf("Field type %d not known or nested too deeply (depth %d)", typeKey, depth)
 		return "", false, false, 0
 	}
 
-	funcReaderValue, typeFound := thrift.funcReadersByType(typeValue)
+	funcReaderValue, typeFound := thrift.funcReadersByType(typeValue, depth)
 	if !typeFound {
-		thrift.logger.Debugf("Field type %d not known", typeValue)
+		thrift.logger.Debugf("Field type %d not known or nested too deeply (depth %d)", typeValue, depth)
 		return "", false, false, 0
 	}
 
@@ -619,7 +619,7 @@ func (thrift *thriftPlugin) readMap(data []byte) (value string, ok bool, complet
 	return "{" + strings.Join(fields, ", ") + "}", true, true, offset
 }
 
-func (thrift *thriftPlugin) readStruct(data []byte) (value string, ok bool, complete bool, off int) {
+func (thrift *thriftPlugin) readStruct(data []byte, depth int) (value string, ok bool, complete bool, off int) {
 	var bytesRead int
 	offset := 0
 	fields := []thriftField{}
@@ -652,9 +652,9 @@ func (thrift *thriftPlugin) readStruct(data []byte) (value string, ok bool, comp
 		field.id = common.BytesNtohs(data[offset : offset+2])
 		offset += 2
 
-		funcReader, typeFound := thrift.funcReadersByType(field.Type)
+		funcReader, typeFound := thrift.funcReadersByType(field.Type, depth)
 		if !typeFound {
-			thrift.logger.Debugf("Field type %d not known", field.Type)
+			thrift.logger.Debugf("Field type %d not known or nested too deeply (depth %d)", field.Type, depth)
 			return "", false, false, 0
 		}
 
@@ -689,8 +689,21 @@ func (thrift *thriftPlugin) formatStruct(fields []thriftField, resolveNames bool
 	return "(" + strings.Join(toJoin, ", ") + ")"
 }
 
-// Dictionary wrapped in a function to avoid "initialization loop"
-func (thrift *thriftPlugin) funcReadersByType(typ byte) (fn thriftFieldReader, exists bool) {
+// maxNestingDepth is the maximum number of nested structs, lists, sets and
+// maps that will be followed. Without a limit, deeply nested input can exhaust
+// the goroutine stack, which is a fatal error that cannot be recovered. The
+// value matches the default recursion limit of the Apache Thrift libraries.
+const maxNestingDepth = 64
+
+// funcReadersByType returns the reader for the given type, to be called at
+// the given nesting depth. It is wrapped in a function to avoid an
+// "initialization loop".
+func (thrift *thriftPlugin) funcReadersByType(typ byte, depth int) (fn thriftFieldReader, exists bool) {
+	if depth >= maxNestingDepth && composite(typ) {
+		// Report the type as unknown so that the caller drops the
+		// stream as a parse error.
+		return nil, false
+	}
 	switch typ {
 	case ThriftTypeBool:
 		return thrift.readBool, true
@@ -707,15 +720,24 @@ func (thrift *thriftPlugin) funcReadersByType(typ byte) (fn thriftFieldReader, e
 	case ThriftTypeString:
 		return thrift.readAndQuoteString, true
 	case ThriftTypeList:
-		return thrift.readList, true
+		return func(data []byte) (string, bool, bool, int) { return thrift.readList(data, depth+1) }, true
 	case ThriftTypeSet:
-		return thrift.readSet, true
+		return func(data []byte) (string, bool, bool, int) { return thrift.readSet(data, depth+1) }, true
 	case ThriftTypeMap:
-		return thrift.readMap, true
+		return func(data []byte) (string, bool, bool, int) { return thrift.readMap(data, depth+1) }, true
 	case ThriftTypeStruct:
-		return thrift.readStruct, true
+		return func(data []byte) (string, bool, bool, int) { return thrift.readStruct(data, depth+1) }, true
 	default:
 		return nil, false
+	}
+}
+
+func composite(typ byte) bool {
+	switch typ {
+	case ThriftTypeList, ThriftTypeSet, ThriftTypeMap, ThriftTypeStruct:
+		return true
+	default:
+		return false
 	}
 }
 
@@ -740,7 +762,7 @@ func (thrift *thriftPlugin) readField(s *thriftStream) (ok bool, complete bool, 
 	field.id = common.BytesNtohs(s.data[offset : offset+2])
 	offset += 2
 
-	funcReader, typeFound := thrift.funcReadersByType(field.Type)
+	funcReader, typeFound := thrift.funcReadersByType(field.Type, 0)
 	if !typeFound {
 		thrift.logger.Debugf("Field type %d not known", field.Type)
 		return false, false, nil
