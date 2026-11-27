@@ -9,7 +9,6 @@ package jamf
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"maps"
 	"net/http"
@@ -103,12 +102,7 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	p.metrics = newMetrics(inputCtx.MetricsRegistry, p.logger)
 
 	lastSyncTime, _ := getLastSync(store)
-	syncWaitTime := time.Until(lastSyncTime.Add(p.cfg.SyncInterval))
 	lastUpdateTime, _ := getLastUpdate(store)
-	updateWaitTime := time.Until(lastUpdateTime.Add(p.cfg.UpdateInterval))
-
-	syncTimer := time.NewTimer(syncWaitTime)
-	updateTimer := time.NewTimer(updateWaitTime)
 
 	if p.cfg.Tracer != nil {
 		resolved, err := httplog.ResolveTraceFilename(inputCtx.Agent.Paths, Name, inputCtx.IDWithoutName, p.cfg.Tracer.Filename)
@@ -124,65 +118,21 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 		return err
 	}
 
-	inputCtx.UpdateStatus(status.Running, "")
-	for {
-		select {
-		case <-inputCtx.Cancelation.Done():
-			if !errors.Is(inputCtx.Cancelation.Err(), context.Canceled) {
-				err := inputCtx.Cancelation.Err()
-				inputCtx.UpdateStatus(status.Stopping, err.Error())
-				return err
-			}
-			inputCtx.UpdateStatus(status.Stopping, "Deadline passed")
-			return nil
-		case <-syncTimer.C:
-			start := time.Now()
-			if err := p.runFullSync(inputCtx, store, client); err != nil {
-				if provider.SyncInterrupted(inputCtx, err) {
-					p.logger.Infow(provider.SyncInterruptedMsg, "error", err)
-				} else {
-					msg := "Error running full sync"
-					p.logger.Errorw(msg, "error", err)
-					inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
-				}
-				p.metrics.syncError.Inc()
-			} else {
-				inputCtx.UpdateStatus(status.Running, "Successful full sync")
-			}
-			p.metrics.syncTotal.Inc()
-			p.metrics.syncProcessingTime.Update(time.Since(start).Nanoseconds())
-
-			syncTimer.Reset(p.cfg.SyncInterval)
-			p.logger.Debugf("Next sync expected at: %v", time.Now().Add(p.cfg.SyncInterval))
-
-			// Reset the update timer and wait the configured interval. If the
-			// update timer has already fired, then drain the timer's channel
-			// before resetting.
-			if !updateTimer.Stop() {
-				<-updateTimer.C
-			}
-			updateTimer.Reset(p.cfg.UpdateInterval)
-			p.logger.Debugf("Next update expected at: %v", time.Now().Add(p.cfg.UpdateInterval))
-		case <-updateTimer.C:
-			start := time.Now()
-			if err := p.runIncrementalUpdate(inputCtx, store, client); err != nil {
-				if provider.SyncInterrupted(inputCtx, err) {
-					p.logger.Infow(provider.SyncInterruptedMsg, "error", err)
-				} else {
-					msg := "Error running incremental update"
-					p.logger.Errorw(msg, "error", err)
-					inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
-				}
-				p.metrics.updateError.Inc()
-			} else {
-				inputCtx.UpdateStatus(status.Running, "Successful incremental update")
-			}
-			p.metrics.updateTotal.Inc()
-			p.metrics.updateProcessingTime.Update(time.Since(start).Nanoseconds())
-			updateTimer.Reset(p.cfg.UpdateInterval)
-			p.logger.Debugf("Next update expected at: %v", time.Now().Add(p.cfg.UpdateInterval))
-		}
+	loop := provider.SyncLoop{
+		Logger:         p.logger,
+		Metrics:        p.metrics.syncMetrics(),
+		SyncInterval:   p.cfg.SyncInterval,
+		UpdateInterval: p.cfg.UpdateInterval,
+		LastSync:       lastSyncTime,
+		LastUpdate:     lastUpdateTime,
+		FullSync: func() error {
+			return p.runFullSync(inputCtx, store, client)
+		},
+		IncrementalUpdate: func() error {
+			return p.runIncrementalUpdate(inputCtx, store, client)
+		},
 	}
+	return loop.Run(inputCtx)
 }
 
 func newClient(ctx context.Context, cfg conf, log *logp.Logger) (*http.Client, error) {

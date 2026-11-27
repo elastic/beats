@@ -51,6 +51,8 @@ If a full synchronization fails, it is retried after `update_interval`. The wait
 * After a failed full synchronization, the status stays degraded until a full synchronization succeeds.
 * After a failed incremental synchronization, it stays degraded until a later synchronization of either kind succeeds.
 
+The legacy implementation works in the same way. In earlier releases, it retries a failed full synchronization only after `sync_interval`, and a successful incremental synchronization clears the degraded status.
+
 {applies_to}`stack: preview 9.5.8+` The input also reports a degraded status when a synchronization is incomplete: it finishes but could not collect some data, for example when some Okta enrichment requests still fail after retrying. Its changes are kept, and the missing data is collected again by the next full synchronization, so the status stays degraded until a full synchronization succeeds, and an incomplete full synchronization is not retried early.
 
 Defaults to `false`. The Okta, Microsoft Entra ID and Active Directory integration packages set this to `true` by default.

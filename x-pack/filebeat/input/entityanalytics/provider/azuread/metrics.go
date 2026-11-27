@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/beats/v7/pkg/monitoring/adapter"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
 )
 
 // inputMetrics defines metrics for this provider.
@@ -37,4 +38,16 @@ func newMetrics(reg *monitoring.Registry, logger *logp.Logger) *inputMetrics {
 	adapter.NewGoMetrics(reg, "update_processing_time", logger, adapter.Accept).Register("histogram", metrics.NewHistogram(out.updateProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 
 	return &out
+}
+
+// syncMetrics returns the metrics that the provider's sync loop updates.
+func (m *inputMetrics) syncMetrics() provider.SyncMetrics {
+	return provider.SyncMetrics{
+		SyncTotal:            m.syncTotal,
+		SyncError:            m.syncError,
+		SyncProcessingTime:   m.syncProcessingTime,
+		UpdateTotal:          m.updateTotal,
+		UpdateError:          m.updateError,
+		UpdateProcessingTime: m.updateProcessingTime,
+	}
 }
