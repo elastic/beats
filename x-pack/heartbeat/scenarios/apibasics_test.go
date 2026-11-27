@@ -7,7 +7,6 @@
 package scenarios
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -19,13 +18,7 @@ import (
 )
 
 // TestAPISummaries runs a real inline apiJourney end-to-end through the agent.
-// It needs an apiJourney-capable @elastic/synthetics (unreleased at time of
-// writing), so it only runs when ELASTIC_SYNTHETICS_API_CAPABLE=true and a
-// matching agent is installed (see the pinned-commit CI step).
 func TestAPISummaries(t *testing.T) {
-	if os.Getenv("ELASTIC_SYNTHETICS_API_CAPABLE") != "true" {
-		t.Skip("set ELASTIC_SYNTHETICS_API_CAPABLE=true with an apiJourney-capable agent to run")
-	}
 	t.Parallel()
 	scenarioDB.RunTagWithSeparateTwists(t, "api", StdAttemptTwists, func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
 		require.NoError(t, err, "api scenario run must not error")

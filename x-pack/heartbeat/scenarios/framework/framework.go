@@ -161,14 +161,8 @@ func (sdb *ScenarioDB) Init() {
 	sdb.initOnce.Do(func() {
 		var prunedList []Scenario
 		icmpCapable := os.Getenv("ELASTIC_ICMP_CAPABLE") == "true"
-		// apiJourney ships only in unreleased @elastic/synthetics, so api
-		// scenarios need an explicitly installed capable agent to run.
-		apiCapable := os.Getenv("ELASTIC_SYNTHETICS_API_CAPABLE") == "true"
 		for _, s := range sdb.All {
 			if s.Type == "icmp" && !icmpCapable {
-				continue
-			}
-			if s.Type == "api" && !apiCapable {
 				continue
 			}
 			prunedList = append(prunedList, s)
