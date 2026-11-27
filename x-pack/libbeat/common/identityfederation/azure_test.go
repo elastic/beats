@@ -223,10 +223,8 @@ func newFakeEntra(t *testing.T) *fakeEntra {
 
 func (e *fakeEntra) options() *azidentity.ClientAssertionCredentialOptions {
 	return &azidentity.ClientAssertionCredentialOptions{
-		ClientOptions: azcore.ClientOptions{
-			Cloud:     cloud.Configuration{ActiveDirectoryAuthorityHost: e.srv.URL + "/"},
-			Transport: e.srv.Client(),
-		},
+		Cloud:                    cloud.Configuration{ActiveDirectoryAuthorityHost: e.srv.URL + "/"},
+		Transport:                e.srv.Client(),
 		DisableInstanceDiscovery: true,
 	}
 }
