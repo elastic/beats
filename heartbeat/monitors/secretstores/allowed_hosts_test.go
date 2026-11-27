@@ -48,6 +48,8 @@ type swapStore struct{ id string }
 
 func (s *swapStore) Validate(*conf.C, Scope) error { return nil }
 
+func (s *swapStore) Close() error { return nil }
+
 func (s *swapStore) Replace(_ context.Context, cfg *conf.C, _ Scope) (*conf.C, error) {
 	c := conf.NewConfig()
 	if err := c.Merge(cfg); err != nil {

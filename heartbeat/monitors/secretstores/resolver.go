@@ -48,11 +48,14 @@ func NewResolver(logger *logp.Logger) *Resolver {
 // If a connection with allowed_hosts replaced references, every host that
 // destinations returns for the resolved config must be allowed. A nil
 // destinations means the monitor type can't use such connections.
-//
 // The Scrubber removes the substituted secret values from what the monitor
 // publishes. It is nil if there is nothing to scrub. It is also returned with
 // an error, which can quote a value substituted before the failure.
 func (r *Resolver) Resolve(cfg *conf.C, destinations plugin.DestinationsFunc) (*conf.C, *Scrubber, error) {
+	return r.resolve(context.Background(), cfg, destinations, nil)
+}
+
+func (r *Resolver) resolve(ctx context.Context, cfg *conf.C, destinations plugin.DestinationsFunc, pinned map[string]Store) (*conf.C, *Scrubber, error) {
 	entries, err := configEntries(cfg)
 	if err != nil || len(entries) == 0 {
 		return cfg, nil, err
@@ -62,16 +65,30 @@ func (r *Resolver) Resolve(cfg *conf.C, destinations plugin.DestinationsFunc) (*
 	if err != nil {
 		return nil, nil, err
 	}
+	stores := make([]Store, len(entries))
+	for i, e := range entries {
+		var s Store
+		if pinned != nil {
+			id, idErr := e.identity()
+			if idErr != nil {
+				return nil, nil, fmt.Errorf("%s: %q entry: %w", ConfigKey, e.storeType, idErr)
+			}
+			var ok bool
+			if s, ok = pinned[id]; !ok {
+				return nil, nil, fmt.Errorf("%s: %s connection is not available", ConfigKey, e.label())
+			}
+		} else if s, err = sharedStores.get(e, r.logger); err != nil {
+			return nil, nil, err
+		}
+		stores[i] = s
+	}
+
 	t := newTracker()
-	ctx := withTracker(context.Background(), t)
+	ctx = withTracker(ctx, t)
 	scopes := scopes(entries)
 	var usedRestricted []entry
 	for i, e := range entries {
-		s, err := sharedStores.get(e, r.logger)
-		if err != nil {
-			return nil, t.scrubber(), err
-		}
-		next, err := s.Replace(ctx, resolved, scopes[i])
+		next, err := stores[i].Replace(ctx, resolved, scopes[i])
 		if err != nil {
 			if errors.Is(err, ErrSelection) {
 				return nil, t.scrubber(), fmt.Errorf("%s: %w", ConfigKey, err)
@@ -112,7 +129,9 @@ func (r *Resolver) Validate(cfg *conf.C) error {
 		if err != nil {
 			return err
 		}
-		if err := s.Validate(monitorCfg, scopes[i]); err != nil {
+		err = s.Validate(monitorCfg, scopes[i])
+		_ = s.Close()
+		if err != nil {
 			if errors.Is(err, ErrSelection) {
 				return fmt.Errorf("%s: %w", ConfigKey, err)
 			}
