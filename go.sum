@@ -780,17 +780,10 @@ github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+o
 github.com/klauspost/asmfmt v1.3.2 h1:4Ri7ox3EwapiOjCki+hw14RyKk201CN4rzyCJRFLpK4=
 github.com/klauspost/asmfmt v1.3.2/go.mod h1:AG8TuvYojzulgDAMCnYn50l/5QV3Bs/tp6j0HLHbNSE=
 github.com/klauspost/compress v1.15.9/go.mod h1:PhcZ0MbTNciWF3rruxRgKxI5NkcHHrHUDtV4Yw2GlzU=
-<<<<<<< HEAD
-github.com/klauspost/compress v1.20.3 h1:zWNoFqq/lSuYQRim3dUXlXeA0IqwuZGicdG5ZTfY5j4=
-github.com/klauspost/compress v1.20.3/go.mod h1:LUdAzn7YLVvxLpc7y3V1m40wESHTgc1422pwwBSKYuI=
-github.com/klauspost/cpuid/v2 v2.3.0 h1:S4CRMLnYUhGeDFDqkGriYKdfoFlDnMtqTiI/sFzhA9Y=
-github.com/klauspost/cpuid/v2 v2.3.0/go.mod h1:hqwkgyIinND0mEev00jJYCxPNVRVXFQeu1XKlok6oO0=
-=======
 github.com/klauspost/compress v1.20.4 h1:dD0v/bvxtjCBqQu6sx1TNWkalEY5lNTIe+HY9w8TeNI=
 github.com/klauspost/compress v1.20.4/go.mod h1:LUdAzn7YLVvxLpc7y3V1m40wESHTgc1422pwwBSKYuI=
-github.com/klauspost/cpuid/v2 v2.4.0 h1:S6Hrbc7+ywsr0r+RLapfGBHfyefhCTwEh3A0tV913Dw=
-github.com/klauspost/cpuid/v2 v2.4.0/go.mod h1:19jmZ9mjzoF//ddRSUsv0zfBTJWh3QJh9FNxZTMrGxU=
->>>>>>> 083cd5e (chore(deps): update OTel Collector dependencies from 0.165.x to 0.166.0 (#54929))
+github.com/klauspost/cpuid/v2 v2.3.0 h1:S4CRMLnYUhGeDFDqkGriYKdfoFlDnMtqTiI/sFzhA9Y=
+github.com/klauspost/cpuid/v2 v2.3.0/go.mod h1:hqwkgyIinND0mEev00jJYCxPNVRVXFQeu1XKlok6oO0=
 github.com/knadh/koanf/maps v0.1.3 h1:P1z7EvTqdFBrPYbzSvorvrpib+sjkUMxf0FVvA5NKK4=
 github.com/knadh/koanf/maps v0.1.3/go.mod h1:npD/QZY3V6ghQDdcQzl1W4ICNVTkohC8E73eI2xW4yI=
 github.com/knadh/koanf/providers/confmap v1.0.1 h1:L15hbvMqlvhwUuCtL9BkL+rqiMAjk6cZc8O9XoDtE3A=
@@ -905,38 +898,10 @@ github.com/onsi/ginkgo/v2 v2.16.0/go.mod h1:llBI3WDLL9Z6taip6f33H76YcWtJv+7R3Hig
 github.com/onsi/gomega v1.4.3/go.mod h1:ex+gbHU/CVuBBDIJjb2X0qEXbFg53c61hWP/1CpauHY=
 github.com/onsi/gomega v1.34.1 h1:EUMJIKUjM8sKjYbtxQI9A4z2o+rruxnzNvpknOXie6k=
 github.com/onsi/gomega v1.34.1/go.mod h1:kU1QgUvBDLXBJq618Xvm2LUX6rSAfRaFRTcdOeDLwwY=
-<<<<<<< HEAD
-github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.165.1 h1:3Lk2m/u+ssab7A8DL0RC9xxyhp+SQUpjE78+ImM07j4=
-github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.165.1/go.mod h1:eG1DgfNUE9FKAxXmIDbw95hflcitQFepDEzf+GTv8d4=
-github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.165.1 h1:asFki9ZI/w41ZQ/Yqr3vFWToEcbMmUwqhftQJ41pmo4=
-github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.165.1/go.mod h1:MIOPGk0GLPeCx6h2C/UGIUxAx2/jwhbMdZOrOqWoVM8=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.165.1 h1:bNMJTnuIS+llNVQrwhMj0c6kd0hljNeiPMHmJfYYhDw=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.165.1/go.mod h1:xgjaCv2AeoKdTW1TwaNiPB8aQO9U2Lxmbl1cJIIvQ00=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.165.1 h1:SOoC7ntFrBwKN72W+snLCZ6d5qiUvdINKVlhdRvnstg=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.165.1/go.mod h1:9C1pN1Q2d5J1iw4kiIGsN5sDJO/QP8j/BwkrVfmmIeI=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/kafka v0.165.1 h1:Uui/Lhx7fjEBm6oRSPIQ2bp5FGcZS5bhPVG6nf0htG4=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/kafka v0.165.1/go.mod h1:8GwuBSQH7DODnMR4cqioVV4A71/uYu1j5X5vi1uiSOk=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/batchpersignal v0.165.1 h1:5plve+gfnkA0Luh+xk/l5qs0z3MVVKcEaxKSZNlUBAI=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/batchpersignal v0.165.1/go.mod h1:UdifibTp6IqNTDvBfsb/d+m70JxA+H3Ix+bu3UE77ho=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/core/xidutils v0.165.1 h1:uf5VY4wp/zmxVfzIc/d0jTYa7rUVI62rveTxV1joUy8=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/core/xidutils v0.165.1/go.mod h1:sQlk01FmqV4POQuF2KtJdaKq7kIlyWC4NuywEYQyNwE=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/kafka/configkafka v0.165.1 h1:sFwoq9vQfcaHd/klPK+vJJpWc7Zwj4Tc2OC1vX0csZM=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/kafka/configkafka v0.165.1/go.mod h1:Db2OX+gW+xapZbTU923sdYBdIpD1bVVDhKV+ULfqB5o=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/kafka/topic v0.165.1 h1:4jmn9aq5mQr+YTtVvXsPutNXAGH4KhwEWSjxTOx9tsA=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/kafka/topic v0.165.1/go.mod h1:5dBCwOfN6cYeWrCgcnUJFa0F4iF4IcqgBi+0w31tkk4=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/pdatatest v0.165.1 h1:2Qf8Me+OZfdY/dF/vS/1J93spGBbG/JJDXtk6vE8fWA=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/pdatatest v0.165.1/go.mod h1:4C9XQNZXN6Y6S6lWukCteEGM+brwwP1hruzVRPaJ3WI=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/jaeger v0.165.1 h1:ZSjKjVOEW+rWYzqsOBOCx7kpgUlXOqDbBmzgUL7B8Wg=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/jaeger v0.165.1/go.mod h1:zlCoZSsM4dxJDBqY10c6WQW74/t9ad57bVCym3+0keA=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/zipkin v0.165.1 h1:qWbdpdd1Vge46Jdnx2BQuR+LInKkrLDCVCwPxsGX2lc=
-github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/zipkin v0.165.1/go.mod h1:hFT320FRlDj0liTvIgQzUM3FcGIfj8eHkEBCbDr79CQ=
-=======
 github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.166.0 h1:6f+mrW1HrJ6RNezFLmKmIPBsC5qfjtBunsEJZ9FpF2E=
 github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.166.0/go.mod h1:/hFR2cyaH8903zo/OLgew6FhQKs1cbHt3sL3q+MrGMs=
 github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.166.0 h1:wGakn0M35Ndep0/4c8bYxNrB7T/6CWmCkFa1JDt1q8w=
 github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.166.0/go.mod h1:ThzGTWh00F2Gp1KTRH67WjKQzu0/oPeorSmV4fHhu4w=
-github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage v0.166.0 h1:4q/On14z3F+B3qFyMFOa02NttavUqwJweRNFMVNfwv4=
-github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage v0.166.0/go.mod h1:fIdtfcCvc9xUQ1i/IQk6TyeyWeje6taZAvhAf+XWVbw=
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.166.0 h1:amgvicJa9i9tARjRJZSe4jfe9AyGp3gUYLeXyT/C81s=
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.166.0/go.mod h1:6K9FcOab14dS1OXSA+duel3JWeoDLwzCVTQRQWgWDyg=
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.166.0 h1:o8Ye6NJj5pIsNPTUWhOJOx699l3VM8UO2RksE8PZPlo=
@@ -957,7 +922,6 @@ github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/jaeger 
 github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/jaeger v0.166.0/go.mod h1:AC3/YMpCBnrqsvcfE18nyhQEQO0D+UtkJSOa+U6NYCM=
 github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/zipkin v0.166.0 h1:CNkI8qVuwpk8mnwbItZb5YVwRGJGDefD8frI2dda1Ms=
 github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/zipkin v0.166.0/go.mod h1:dfx87se6uabRKHdrjTvlA3T+SDq47tfpL5f1Bp660lA=
->>>>>>> 083cd5e (chore(deps): update OTel Collector dependencies from 0.165.x to 0.166.0 (#54929))
 github.com/opencontainers/go-digest v1.0.0 h1:apOUWs51W5PlhuyGyz9FCeeBIOUDA/6nW8Oi/yOhh5U=
 github.com/opencontainers/go-digest v1.0.0/go.mod h1:0JzlMkj0TRzQZfJkVvzbP0HBR3IKzErnv2BNG4W4MAM=
 github.com/opencontainers/image-spec v1.1.1 h1:y0fUlFfIZhPF1W537XOLg0/fcx6zcHCJwooC2xJA040=
@@ -1408,15 +1372,8 @@ go.uber.org/ratelimit v0.3.1 h1:K4qVE+byfv/B3tC+4nYWP7v/6SimcO7HzHekoMNBma0=
 go.uber.org/ratelimit v0.3.1/go.mod h1:6euWsTB6U/Nb3X++xEUXA8ciPJvr19Q/0h1+oDcJhRk=
 go.uber.org/zap v1.28.0 h1:IZzaP1Fv73/T/pBMLk4VutPl36uNC+OSUh3JLG3FIjo=
 go.uber.org/zap v1.28.0/go.mod h1:rDLpOi171uODNm/mxFcuYWxDsqWSAVkFdX4XojSKg/Q=
-<<<<<<< HEAD
-go.yaml.in/yaml/v2 v2.4.4 h1:tuyd0P+2Ont/d6e2rl3be67goVK4R6deVxCUX5vyPaQ=
-go.yaml.in/yaml/v2 v2.4.4/go.mod h1:gMZqIpDtDqOfM0uNfy0SkpRhvUryYH0Z6wdMYcacYXQ=
-=======
-go.uber.org/zap/exp v0.3.0 h1:6JYzdifzYkGmTdRR59oYH+Ng7k49H9qVpWwNSsGJj3U=
-go.uber.org/zap/exp v0.3.0/go.mod h1:5I384qq7XGxYyByIhHm6jg5CHkGY0nsTfbDLgDDlgJQ=
 go.yaml.in/yaml/v2 v2.4.5 h1:a5nxWvYi94DRl6QSLlTbLpVmutgx2qg8EVjnJtuFpwI=
 go.yaml.in/yaml/v2 v2.4.5/go.mod h1:gMZqIpDtDqOfM0uNfy0SkpRhvUryYH0Z6wdMYcacYXQ=
->>>>>>> 083cd5e (chore(deps): update OTel Collector dependencies from 0.165.x to 0.166.0 (#54929))
 go.yaml.in/yaml/v3 v3.0.4/go.mod h1:DhzuOOF2ATzADvBadXxruRBLzYTpT36CKvDb3+aBEFg=
 go.yaml.in/yaml/v3 v3.0.6 h1:zcDfvjXEqTQmpjniUBLc91xYJMB2c4QOFxEF/LCEckM=
 go.yaml.in/yaml/v3 v3.0.6/go.mod h1:HVTZu1O7/Vkt2N+BFy8Zza+lnLsABggaTM2ZpNIGuKg=
