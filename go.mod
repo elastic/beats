@@ -159,7 +159,7 @@ require (
 	github.com/mattn/go-colorable v0.1.14
 	github.com/mattn/go-sqlite3 v1.14.32
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
-	github.com/microsoft/go-mssqldb v1.11.2
+	github.com/microsoft/go-mssqldb v1.12.0
 	github.com/microsoft/wmi v0.45.0
 	github.com/miekg/dns v1.1.72
 	github.com/moby/moby/api v1.56.1
