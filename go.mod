@@ -8,7 +8,7 @@ require (
 	cloud.google.com/go/bigquery v1.86.0
 	cloud.google.com/go/compute v1.74.0
 	cloud.google.com/go/monitoring v1.32.0
-	cloud.google.com/go/pubsub v1.51.1
+	cloud.google.com/go/pubsub/v2 v2.8.0
 	cloud.google.com/go/redis v1.28.0
 	cloud.google.com/go/storage v1.70.0
 	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
@@ -291,8 +291,7 @@ require (
 	cloud.google.com/go/compute/metadata v0.10.0 // indirect
 	cloud.google.com/go/iam v1.15.0 // indirect
 	cloud.google.com/go/longrunning v1.4.0 // indirect
-	cloud.google.com/go/pubsub/v2 v2.8.0 // indirect
-	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
+	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee //indirect
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f // indirect
 	code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a // indirect
 	dario.cat/mergo v1.0.2 // indirect

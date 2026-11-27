@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path"
 	"strconv"
 	"sync"
 	"testing"
@@ -17,8 +18,11 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 
-	"cloud.google.com/go/pubsub"
+	"cloud.google.com/go/pubsub/v2"
+	"cloud.google.com/go/pubsub/v2/apiv1/pubsubpb"
 	"google.golang.org/api/iterator"
+	"google.golang.org/grpc/codes"
+	grpcstatus "google.golang.org/grpc/status"
 )
 
 const (
@@ -55,7 +59,6 @@ func TestSetup(t *testing.T) (*pubsub.Client, context.CancelFunc) {
 	host := EnsureEmulator(t)
 
 	once.Do(func() {
-
 		// Disable HTTP keep-alives to ensure no extra goroutines hang around.
 		httpClient := http.Client{Transport: &http.Transport{DisableKeepAlives: true}}
 
@@ -90,46 +93,60 @@ func CreateTopic(t *testing.T, client *pubsub.Client) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	topic := client.Topic(emulatorTopic)
-	exists, err := topic.Exists(ctx)
-	if err != nil {
+	topic := path.Join("projects", client.Project(), "topics", emulatorTopic)
+
+	_, err := client.TopicAdminClient.GetTopic(ctx, &pubsubpb.GetTopicRequest{
+		Topic: topic,
+	})
+	if err == nil {
+		return
+	}
+
+	if grpcstatus.Code(err) != codes.NotFound {
 		t.Fatalf("failed to check if topic exists: %v", err)
 	}
-	if !exists {
-		if topic, err = client.CreateTopic(ctx, emulatorTopic); err != nil {
-			t.Fatalf("failed to create the topic: %v", err)
-		}
-		t.Log("Topic created:", topic.ID())
+
+	pbTopic, err := client.TopicAdminClient.CreateTopic(ctx, &pubsubpb.Topic{
+		Name: topic,
+	})
+	if err != nil {
+		t.Fatalf("failed to create the topic: %v", err)
 	}
+	t.Log("Topic created:", pbTopic.Name)
 }
 
 func CreateSubscription(t *testing.T, subscription string, client *pubsub.Client) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	sub := client.Subscription(subscription)
-	exists, err := sub.Exists(ctx)
-	if err != nil {
-		t.Fatalf("failed to check if sub exists: %v", err)
-	}
-	if exists {
+	sub := path.Join("projects", client.Project(), "subscriptions", subscription)
+
+	_, err := client.SubscriptionAdminClient.GetSubscription(ctx, &pubsubpb.GetSubscriptionRequest{
+		Subscription: sub,
+	})
+	if err == nil {
 		return
 	}
 
-	sub, err = client.CreateSubscription(ctx, subscription, pubsub.SubscriptionConfig{
-		Topic: client.Topic(emulatorTopic),
+	if grpcstatus.Code(err) != codes.NotFound {
+		t.Fatalf("failed to check if sub exists: %v", err)
+	}
+
+	pbSub, err := client.SubscriptionAdminClient.CreateSubscription(ctx, &pubsubpb.Subscription{
+		Name:  sub,
+		Topic: path.Join("projects", client.Project(), "topics", emulatorTopic),
 	})
 	if err != nil {
 		t.Fatalf("failed to create subscription: %v", err)
 	}
-	t.Log("New subscription created:", sub.ID())
+	t.Log("New subscription created:", pbSub.Name)
 }
 
 func PublishMessages(t *testing.T, client *pubsub.Client, numMsgs int) []string {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	topic := client.Topic(emulatorTopic)
+	topic := client.Publisher(emulatorTopic)
 	defer topic.Stop()
 
 	messageIDs := make([]string, numMsgs)
@@ -153,8 +170,12 @@ func resetPubSub(t *testing.T, client *pubsub.Client) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	proj := path.Join("projects/", client.Project())
+
 	// Clear topics.
-	topics := client.Topics(ctx)
+	topics := client.TopicAdminClient.ListTopics(ctx, &pubsubpb.ListTopicsRequest{
+		Project: proj,
+	})
 	for {
 		topic, err := topics.Next()
 		if errors.Is(err, iterator.Done) {
@@ -163,13 +184,18 @@ func resetPubSub(t *testing.T, client *pubsub.Client) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if err = topic.Delete(ctx); err != nil {
-			t.Fatalf("failed to delete topic %v: %v", topic.ID(), err)
+
+		if err = client.TopicAdminClient.DeleteTopic(ctx, &pubsubpb.DeleteTopicRequest{
+			Topic: topic.Name,
+		}); err != nil {
+			t.Fatalf("failed to delete topic %v: %v", topic.Name, err)
 		}
 	}
 
 	// Clear subscriptions.
-	subs := client.Subscriptions(ctx)
+	subs := client.SubscriptionAdminClient.ListSubscriptions(ctx, &pubsubpb.ListSubscriptionsRequest{
+		Project: proj,
+	})
 	for {
 		sub, err := subs.Next()
 		if errors.Is(err, iterator.Done) {
@@ -179,8 +205,10 @@ func resetPubSub(t *testing.T, client *pubsub.Client) {
 			t.Fatal(err)
 		}
 
-		if err = sub.Delete(ctx); err != nil {
-			t.Fatalf("failed to delete subscription %v: %v", sub.ID(), err)
+		if err = client.SubscriptionAdminClient.DeleteSubscription(ctx, &pubsubpb.DeleteSubscriptionRequest{
+			Subscription: sub.Name,
+		}); err != nil {
+			t.Fatalf("failed to delete subscription %v: %v", sub.Name, err)
 		}
 	}
 }
