@@ -26,5 +26,7 @@ import (
 func init() {
 	processors.RegisterPlugin("add_agent_metadata",
 		checks.ConfigChecked(addagentmetadata.CreateAddAgentMetadata,
-			checks.RequireFields("data_stream", "elastic_agent")))
+			// data_stream is optional: beats that route events themselves
+			// (Heartbeat synthetics) must not have it overwritten.
+			checks.RequireFields("elastic_agent")))
 }

@@ -183,6 +183,99 @@ func TestGlobalProcessorsInjectedOnceForSimpleConfig(t *testing.T) {
 	}
 }
 
+// TestSyntheticsStreamsForReceiver checks that synthetics inputs leave the
+// data stream routing to Heartbeat: no fixed `index`, a `data_stream` setting
+// and no processor that rewrites data_stream.* after Heartbeat routed the event.
+func TestSyntheticsStreamsForReceiver(t *testing.T) {
+	agentInfo := &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true, Tags: []string{"production"}}
+
+	newUnit := func(t *testing.T, inputType, dataset string, source map[string]any) *proto.UnitExpectedConfig {
+		return &proto.UnitExpectedConfig{
+			Id:         inputType + "-my-monitor",
+			Type:       inputType,
+			Name:       "synthetics-1",
+			DataStream: &proto.DataStream{Namespace: "custom-ns"},
+			Streams: []*proto.Stream{{
+				Id:         "stream-id",
+				DataStream: &proto.DataStream{Type: "synthetics", Dataset: dataset},
+				Source:     requireNewStruct(t, source),
+			}},
+		}
+	}
+
+	for _, tc := range []struct{ inputType, dataset string }{
+		{"synthetics/http", "http"},
+		{"synthetics/browser", "browser"},
+	} {
+		t.Run(tc.inputType, func(t *testing.T) {
+			unit := newUnit(t, tc.inputType, tc.dataset, map[string]any{"id": "my-monitor", "schedule": "@every 5s"})
+			inputs, err := CreateInputsFromStreamsForReceiver(unit, "logs", agentInfo)
+			require.NoError(t, err, "creating inputs")
+			require.Len(t, inputs, 1, "one input per stream")
+			in := inputs[0]
+
+			assert.NotContains(t, in, "index", "a fixed index would override Heartbeat's per-event routing")
+			assert.Equal(t, map[string]any{"type": "synthetics", "dataset": tc.dataset, "namespace": "custom-ns"},
+				in["data_stream"], "Heartbeat must receive the data_stream to build its own routing")
+
+			procs, ok := in["processors"].([]any)
+			require.True(t, ok, "processors must be a list, got %T", in["processors"])
+			require.Len(t, procs, 1, "only add_agent_metadata expected")
+			assert.Equal(t, mapstr.M{"add_agent_metadata": mapstr.M{
+				"elastic_agent": mapstr.M{"id": "beat-ID", "snapshot": true, "version": "8.0.0"},
+				"input_id":      tc.inputType + "-my-monitor",
+				"stream_id":     "stream-id",
+				"tags":          []string{"production"},
+			}}, procs[0], "add_agent_metadata must not carry data_stream")
+		})
+	}
+
+	t.Run("explicit index is preserved", func(t *testing.T) {
+		unit := newUnit(t, "synthetics/http", "http", map[string]any{"id": "m", "index": "custom-index"})
+		inputs, err := CreateInputsFromStreamsForReceiver(unit, "logs", agentInfo)
+		require.NoError(t, err, "creating inputs")
+		require.Len(t, inputs, 1, "one input per stream")
+		assert.Equal(t, "custom-index", inputs[0]["index"], "explicit index wins")
+		assert.NotContains(t, inputs[0], "data_stream", "data_stream is dropped when index is explicit")
+	})
+
+	t.Run("nil agent info does not overwrite the dataset", func(t *testing.T) {
+		unit := newUnit(t, "synthetics/browser", "browser", map[string]any{"id": "m"})
+		inputs, err := CreateInputsFromStreamsForReceiver(unit, "logs", nil)
+		require.NoError(t, err, "creating inputs")
+		require.Len(t, inputs, 1, "one input per stream")
+		assert.NotContains(t, inputs[0], "index", "no fixed index")
+		assert.Equal(t, map[string]any{"type": "synthetics", "dataset": "browser", "namespace": "custom-ns"},
+			inputs[0]["data_stream"], "data_stream setting kept")
+		for _, p := range inputs[0]["processors"].([]any) {
+			af, ok := p.(mapstr.M)["add_fields"].(mapstr.M)
+			if !ok {
+				continue
+			}
+			assert.NotEqual(t, "data_stream", af["target"], "add_fields must not rewrite data_stream")
+			assert.NotEqual(t, "event", af["target"], "add_fields must not rewrite event.dataset")
+		}
+	})
+
+	t.Run("non-synthetics inputs keep index and data_stream processor", func(t *testing.T) {
+		unit := &proto.UnitExpectedConfig{
+			Id: "filestream-1", Type: "filestream",
+			DataStream: &proto.DataStream{Namespace: "default"},
+			Streams: []*proto.Stream{{
+				Id:         "s",
+				DataStream: &proto.DataStream{Type: "logs", Dataset: "foo"},
+				Source:     requireNewStruct(t, map[string]any{"paths": []any{"/x"}}),
+			}},
+		}
+		inputs, err := CreateInputsFromStreamsForReceiver(unit, "logs", agentInfo)
+		require.NoError(t, err, "creating inputs")
+		assert.Equal(t, "logs-foo-default", inputs[0]["index"], "index still injected")
+		proc := inputs[0]["processors"].([]any)[0].(mapstr.M)["add_agent_metadata"].(mapstr.M)
+		assert.Equal(t, mapstr.M{"dataset": "foo", "namespace": "default", "type": "logs"}, proc["data_stream"],
+			"data_stream still set on add_agent_metadata")
+	})
+}
+
 func TestIndexPrecedence(t *testing.T) {
 
 	withSource := func(source map[string]any) *proto.UnitExpectedConfig {
