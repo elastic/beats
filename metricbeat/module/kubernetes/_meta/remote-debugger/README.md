@@ -1,6 +1,6 @@
 # README
 
-This readme explain how to remote debug metricbeat running on docker/kubernetes from your laptop with your local IDE.
+This readme explains how to remote debug metricbeat running on docker/kubernetes from your laptop with your local IDE.
 
 ## Steps to run on docker:
 
@@ -16,7 +16,7 @@ cd metricbeat
 GOOS=linux GOARCH=amd64 go build -gcflags "-N -l" -o metricbeat main.go
 ```
 
-2. buld docker container
+2. build docker container
 
 ```bash
 docker build -t metricbeat-debugger-image -f Dockerfile.debug .
@@ -49,7 +49,7 @@ cd metricbeat
 GOOS=linux GOARCH=amd64 go build -gcflags "-N -l" -o metricbeat main.go
 ```
 
-2. buld docker container
+2. build docker container
 
 ```bash
 docker build -t metricbeat-debugger-image -f Dockerfile.debug .

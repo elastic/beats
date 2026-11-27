@@ -4,7 +4,7 @@
         "kibanaSavedObjectMeta": {
             "searchSourceJSON": {}
         },
-        "title": "Webserver Total Bytes Transfered [Metricbeat IIS]",
+        "title": "Webserver Total Bytes Transferred [Metricbeat IIS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -113,7 +113,7 @@
                 "type": "timeseries",
                 "use_kibana_indexes": false
             },
-            "title": "Webserver Total Bytes Transfered [Metricbeat IIS]",
+            "title": "Webserver Total Bytes Transferred [Metricbeat IIS]",
             "type": "metrics"
         }
     },
