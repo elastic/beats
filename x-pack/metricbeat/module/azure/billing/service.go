@@ -15,7 +15,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
-	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement"
 )
@@ -47,13 +46,11 @@ type UsageService struct {
 
 // NewService builds a new UsageService using the given config.
 func NewService(config azure.Config, logger *logp.Logger) (*UsageService, error) {
-	credential, err := azidentity.NewClientSecretCredential(config.TenantId, config.ClientId, config.ClientSecret, &azidentity.ClientSecretCredentialOptions{
-		ClientOptions: policy.ClientOptions{
-			Cloud: azure.BuildCloudConfig(config),
-		},
-	})
+	credential, err := azure.NewCredential(config, policy.ClientOptions{
+		Cloud: azure.BuildCloudConfig(config),
+	}, logger)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't create client credentials: %w", err)
+		return nil, err
 	}
 
 	// Both billing clients share the same throttling mitigations: a ClientType

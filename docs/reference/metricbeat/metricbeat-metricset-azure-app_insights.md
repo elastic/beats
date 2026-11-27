@@ -31,7 +31,7 @@ This metricset allows users to retrieve application insights metrics from specif
 Two authentication methods are supported: **Client secret (Microsoft Entra ID)** and **API key**. The method is selected using the `auth_type` option.
 
 `auth_type`
-:   (*string*) The authentication method to use. Valid values: `api_key` (default), `client_secret`.
+:   (*string*) The authentication method to use. Valid values: `api_key` (default), `client_secret`. When `use_cloud_connectors` is enabled, the default is `client_secret`.
 
 #### Client secret authentication
 
@@ -48,7 +48,10 @@ Set `auth_type: "client_secret"` and provide the following options:
 `client_secret`
 :   (*string*) The client secret associated with the service principal.
 
-All three of `tenant_id`, `client_id`, and `client_secret` are required when `auth_type` is `client_secret`.
+When `auth_type` is `client_secret`, `tenant_id` and `client_id` are required. `client_secret` is also required unless `use_cloud_connectors` is enabled.
+
+`use_cloud_connectors` {applies_to}`stack: beta 9.7.0`
+:   (*boolean*) Optional, `false` by default. When enabled, the metricset authenticates `client_id` with identity federation instead of `client_secret`: it exchanges an identity token provided by the environment for a Microsoft Entra ID access token. `tenant_id` and `client_id` are required, `client_secret` is not, and `auth_type` defaults to `client_secret` (`api_key` can't be used). This option is intended for Elastic Agentless deployments, which provide the identity token. Only the Azure public cloud is supported.
 
 **Required permissions:** The service principal must be assigned a role that grants read access to Application Insights data. The minimum built-in role is **Monitoring Reader**, assigned at the Application Insights resource scope. Other roles that include the required permissions are **Monitoring Contributor**, **Contributor**, and **Owner**. For more details, see [Azure built-in roles for Monitor](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles/monitor).
 
@@ -58,7 +61,7 @@ All three of `tenant_id`, `client_id`, and `client_secret` are required when `au
 Microsoft is retiring API key authentication for Application Insights on **March 31, 2026**. After this date, API key authentication will no longer work. It is recommended to migrate to [client secret authentication](#_authentication) before this deadline. For more details, see [Transition to Microsoft Entra ID authentication](https://azure.microsoft.com/en-us/updates?id=transition-to-azure-ad-to-query-data-from-azure-monitor-application-insights-by-31-march-2026).
 ::::
 
-Set `auth_type: "api_key"` (or omit `auth_type`, as it defaults to `api_key`) and provide:
+Set `auth_type: "api_key"` (or omit `auth_type`, as it defaults to `api_key` unless `use_cloud_connectors` is enabled) and provide:
 
 `api_key`
 :   (*string*) The API key which will be generated, more on the steps here [https://dev.applicationinsights.io/documentation/Authorization/API-key-and-App-ID](https://dev.applicationinsights.io/documentation/Authorization/API-key-and-App-ID).

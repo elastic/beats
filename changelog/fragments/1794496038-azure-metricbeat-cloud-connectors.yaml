@@ -1,0 +1,3 @@
+kind: feature
+summary: Add identity federation authentication to the Azure module with use_cloud_connectors
+component: metricbeat
