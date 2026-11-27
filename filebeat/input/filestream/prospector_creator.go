@@ -89,12 +89,15 @@ func logFileIdentifiers(logger *logp.Logger) map[string]file.StateIdentifier {
 	return m
 }
 
+// newProspector creates the prospector of an input. It also returns the
+// preset the prospector resolves in Init, so the input's harvester can
+// share it.
 func newProspector(
 	config config,
 	log *logp.Logger,
 	srci *loginp.SourceIdentifier,
 	dc *dirCache,
-	harvesterState *fileStateTable) (loginp.Prospector, error) {
+	harvesterState *fileStateTable) (loginp.Prospector, *resolvedPreset, error) {
 
 	logger := log.Named("filestream").With("id", config.ID)
 
@@ -103,7 +106,7 @@ func newProspector(
 		config.Reader.Parsers.Suffix,
 		logger)
 	if err != nil {
-		return nil, fmt.Errorf("error while creating file identifier: %w", err)
+		return nil, nil, fmt.Errorf("error while creating file identifier: %w", err)
 	}
 	logger.Debugf("file identity is set to %s", identifier.Name())
 
@@ -119,12 +122,17 @@ func newProspector(
 		min(config.FileWatcher.Interval, maxDirCacheAge),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("error while creating filewatcher %w", err)
+		return nil, nil, fmt.Errorf("error while creating filewatcher %w", err)
 	}
+
+	sel, err := config.presetSelection()
+	if err != nil {
+		return nil, nil, fmt.Errorf("invalid preset: %w", err)
+	}
+	preset := &resolvedPreset{}
 
 	fileprospector := fileProspector{
 		filewatcher:           filewatcher,
-		checkInterval:         config.FileWatcher.Interval,
 		identifier:            identifier,
 		ignoreOlder:           config.IgnoreOlder,
 		ignoreInactiveSince:   config.IgnoreInactive,
@@ -136,25 +144,33 @@ func newProspector(
 		logIdentifiers:        logFileIdentifiers(logger),
 		growingFingerprint:    config.FileWatcher.Scanner.Fingerprint.Growing,
 		harvesterState:        harvesterState,
+		presetInputs: presetInputs{
+			selection:        sel,
+			harvesterLimit:   uint64(config.HarvesterLimit),
+			checkInterval:    config.FileWatcher.Interval,
+			checkIntervalSet: config.checkIntervalSet,
+			closeOnEOF:       config.Close.Reader.OnEOF,
+		},
+		preset: preset,
 	}
 	if config.Rotation == nil {
-		return &fileprospector, nil
+		return &fileprospector, preset, nil
 	}
 
 	rotationMethod := config.Rotation.Name()
 	switch rotationMethod {
 	case "":
-		return &fileprospector, nil
+		return &fileprospector, preset, nil
 
 	case internalMode:
-		return nil, fmt.Errorf("not implemented: internal log rotation")
+		return nil, nil, fmt.Errorf("not implemented: internal log rotation")
 
 	case externalMode:
 		externalConfig := config.Rotation.Config()
 		cfg := rotationConfig{}
 		err := externalConfig.Unpack(&cfg)
 		if err != nil {
-			return nil, fmt.Errorf("failed to unpack configuration of external rotation: %w", err)
+			return nil, nil, fmt.Errorf("failed to unpack configuration of external rotation: %w", err)
 		}
 		strategy := cfg.Strategy.Name()
 		switch strategy {
@@ -165,8 +181,15 @@ func newProspector(
 			if config.FileWatcher.Scanner.Fingerprint.Growing {
 				logger.Warn("the fingerprint file identity handles 'copytruncate' rotation automatically; " +
 					"the experimental 'rotation.external.strategy.copytruncate' setting is unnecessary and is ignored for this input")
-				return &fileprospector, nil
+				return &fileprospector, preset, nil
 			}
+
+			if sel.explicit && sel.name != presetDefault {
+				return nil, nil, fmt.Errorf(
+					"'rotation.external.strategy.copytruncate' cannot be used together with 'preset.%s', "+
+						"use 'preset.default' instead", sel.name)
+			}
+
 			experimentalWarning.Do(func() {
 				log.Warn(cfgwarn.Experimental("rotation.external.copytruncate is used."))
 			})
@@ -174,23 +197,25 @@ func newProspector(
 			cpCfg := &copyTruncateConfig{}
 			err = cfg.Strategy.Config().Unpack(&cpCfg)
 			if err != nil {
-				return nil, fmt.Errorf("failed to unpack configuration of external copytruncate rotation: %w", err)
+				return nil, nil, fmt.Errorf("failed to unpack configuration of external copytruncate rotation: %w", err)
 			}
 			suffix, err := regexp.Compile(cpCfg.SuffixRegex)
 			if err != nil {
-				return nil, fmt.Errorf("invalid suffix regex for copytruncate rotation")
+				return nil, nil, fmt.Errorf("invalid suffix regex for copytruncate rotation")
 			}
 			fileprospector.stateChangeCloser.Renamed = false
+			// The copytruncate prospector always runs the default preset.
+			fileprospector.presetInputs.forceDefault = true
 			return &copyTruncateFileProspector{
 				fileprospector,
 				suffix,
 				newRotatedFilestreams(cpCfg),
-			}, nil
+			}, preset, nil
 		default:
 		}
-		return nil, fmt.Errorf("no such external rotation strategy: %s", strategy)
+		return nil, nil, fmt.Errorf("no such external rotation strategy: %s", strategy)
 
 	default:
 	}
-	return nil, fmt.Errorf("no such rotation method: %s", rotationMethod)
+	return nil, nil, fmt.Errorf("no such rotation method: %s", rotationMethod)
 }

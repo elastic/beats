@@ -2315,7 +2315,8 @@ filebeat.inputs:
   #backoff_factor: 2
 
   # Max number of harvesters that are started in parallel.
-  # Default is 0 which means unlimited
+  # 0 means unlimited.
+  # Default: 0, or 500 under the high_cardinality preset.
   #harvester_limit: 0
 
   ### Harvester closing options
@@ -2397,11 +2398,33 @@ filebeat.inputs:
   # before parsers, use include_message parser.
   #include_lines: ['^ERR', '^WARN']
 
+  ### Preset
+
+  # Selects how the input tunes itself for the number of files it reads.
+  # Set only one of: auto, default, high_cardinality.
+  # auto (used when preset is not set) runs high_cardinality when the input
+  # finds at least min_files files when it starts, otherwise default.
+  # high_cardinality only starts harvesters for files with unread data, keeps
+  # files open only while they are written to and ignores close.reader.on_eof.
+  # Unless set, it uses harvester_limit: 500 and
+  # prospector.scanner.check_interval: 30s.
+  # auto and high_cardinality cannot be used with delete.enabled,
+  # clean_inactive or rotation.external.strategy.copytruncate.
+  #preset.auto:
+  #  high_cardinality.min_files: 5000
+  #preset.default: ~
+  #preset.high_cardinality: ~
+
+  # Maximum number of files harvested in parallel. 0 means no limit.
+  # Default: 0, or 500 under the high_cardinality preset.
+  #harvester_limit: 0
+
   ### Prospector options
 
   # How often the input checks for new files in the paths that are specified
   # for harvesting. Specify 1s to scan the directory as frequently as possible
-  # without causing Filebeat to scan too frequently. Default: 10s.
+  # without causing Filebeat to scan too frequently.
+  # Default: 10s, or 30s under the high_cardinality preset.
   #prospector.scanner.check_interval: 10s
 
   # Exclude files. A list of regular expressions to match. Filebeat drops the files that
@@ -2676,7 +2699,7 @@ filebeat.inputs:
   #close.on_state_change.removed: false
 
   # Closes the file handler as soon as the harvesters reaches the end of the file.
-  # By default this option is disabled.
+  # By default this option is disabled. Ignored under the high_cardinality preset.
   # Note: Potential data loss. Make sure to read and understand the docs for this option.
   #close.reader.on_eof: false
 

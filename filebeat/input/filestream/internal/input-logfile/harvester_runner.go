@@ -794,6 +794,7 @@ func (g *harvesterRunner) finish(state *sourceState) {
 	offset, notify := state.closedOffset, state.hasClosedOffset
 	if state.session != nil {
 		offset, notify = state.session.Offset(), true
+		state.resource.setEndedAtEOF(state.session.EndedAtEOF())
 		log.Debug("Closing reader of filestream")
 		_ = state.session.Close()
 	}
