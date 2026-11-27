@@ -12,6 +12,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	"cloud.google.com/go/storage"
 	"google.golang.org/api/iterator"
@@ -20,7 +21,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/monitoring"
-	"github.com/elastic/go-concert/timed"
 )
 
 // limiter, is used to limit the number of goroutines from blowing up the stack
@@ -75,9 +75,10 @@ func (s *scheduler) schedule(ctx context.Context) error {
 			return err
 		}
 
-		err = timed.Wait(ctx, s.src.PollInterval)
-		if err != nil {
-			return err
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-time.After(s.src.PollInterval):
 		}
 	}
 }

@@ -22,9 +22,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/elastic/go-concert/timed"
-	"github.com/elastic/go-concert/unison"
-
 	"github.com/elastic/beats/v7/pkg/logp"
 )
 
@@ -40,13 +37,19 @@ import (
 // The event acquisition timestamp is used as reference to clean resources. If a resources was blocked
 // for a long time, and the lifetime has been exhausted, then the resource will be removed immediately
 // once the last event has been ACKed.
-func runCleaner(logger *logp.Logger, canceler unison.Canceler, store *store, interval time.Duration) {
+func runCleaner(logger *logp.Logger, ctx context.Context, store *store, interval time.Duration) {
 	started := time.Now()
-	err := timed.Periodic(canceler, interval, func() error {
-		gcStore(logger, started, store)
-		return nil
-	})
-	if err != nil && !errors.Is(err, context.Canceled) {
+	ch := time.Tick(interval)
+	err := ctx.Err()
+	for err == nil {
+		select {
+		case <-ctx.Done():
+			err = ctx.Err()
+		case <-ch:
+			gcStore(logger, started, store)
+		}
+	}
+	if !errors.Is(err, context.Canceled) {
 		logger.Errorw("failed running periodic registry cleaning routine", "error", err)
 	}
 }

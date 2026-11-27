@@ -30,7 +30,6 @@ import (
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
-	"github.com/elastic/go-concert/timed"
 )
 
 var (
@@ -181,7 +180,10 @@ runLoop:
 			}
 
 			if len(records) == 0 {
-				_ = timed.Wait(cancelCtx, time.Second)
+				select {
+				case <-cancelCtx.Done():
+				case <-time.After(time.Second):
+				}
 				continue
 			}
 		}

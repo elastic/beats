@@ -17,7 +17,6 @@ import (
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/beats/v7/pkg/monitoring/adapter"
-	"github.com/elastic/go-concert/timed"
 )
 
 var (
@@ -202,11 +201,16 @@ func newInputMetrics(reg *monitoring.Registry, maxWorkers int, logger *logp.Logg
 
 	if maxWorkers > 0 {
 		// Periodically update the sqs worker utilization metric.
-		//nolint:errcheck // This never returns an error.
-		go timed.Periodic(ctx, 5*time.Second, func() error {
-			out.updateSqsWorkerUtilization()
-			return nil
-		})
+		ch := time.Tick(5 * time.Second)
+		go func() {
+			for ctx.Err() == nil {
+				select {
+				case <-ctx.Done():
+				case <-ch:
+					out.updateSqsWorkerUtilization()
+				}
+			}
+		}()
 	}
 
 	return out

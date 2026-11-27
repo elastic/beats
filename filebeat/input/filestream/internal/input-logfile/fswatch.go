@@ -18,13 +18,12 @@
 package input_logfile
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"hash"
 	"strings"
 	"time"
-
-	"github.com/elastic/go-concert/unison"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
 )
@@ -293,5 +292,5 @@ type FSWatcher interface {
 	// every event, so the caller owns the scan loop. Aside from the metrics
 	// struct it also has ignore older and ignore inactive as arguments.
 	// It stops early when ctx is cancelled.
-	ScanOnce(ctx unison.Canceler, sink FSEventSink, metrics *Metrics, ignoreOlder time.Duration, ignoreInactiveSince time.Time)
+	ScanOnce(ctx context.Context, sink FSEventSink, metrics *Metrics, ignoreOlder time.Duration, ignoreInactiveSince time.Time)
 }

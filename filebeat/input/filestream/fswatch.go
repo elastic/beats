@@ -18,11 +18,10 @@
 package filestream
 
 import (
+	"context"
 	"path/filepath"
 	"sync"
 	"time"
-
-	"github.com/elastic/go-concert/unison"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/pkg/logp"
@@ -171,7 +170,7 @@ func (w *fileWatcher) HarvesterClosed(evt loginp.HarvesterStatus) {
 // on the calling goroutine. It stops early, dropping the remaining events,
 // once ctx is cancelled.
 func (w *fileWatcher) ScanOnce(
-	ctx unison.Canceler,
+	ctx context.Context,
 	sink loginp.FSEventSink,
 	metrics *loginp.Metrics,
 	ignoreOlder time.Duration,

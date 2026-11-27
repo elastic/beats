@@ -18,7 +18,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/pkg/logp"
-	"github.com/elastic/go-concert/timed"
 )
 
 // pollingDiscoveryV2 implements the S3 polling discovery loop for the V2 input.
@@ -93,7 +92,10 @@ func (p *pollingDiscoveryV2) Run(ctx context.Context, pipeline beat.Pipeline) {
 		elapsed := time.Since(start)
 		p.metrics.s3PollingRunTime.Update(elapsed.Nanoseconds())
 		p.metrics.s3PollingRunTimeTotal.Add(uint64(elapsed.Nanoseconds())) //nolint:gosec // elapsed is non-negative
-		_ = timed.Wait(ctx, p.listInterval)
+		select {
+		case <-ctx.Done():
+		case <-time.After(p.listInterval):
+		}
 	}
 }
 

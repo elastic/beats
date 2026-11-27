@@ -42,7 +42,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/private"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-	"github.com/elastic/go-concert/timed"
 )
 
 const (
@@ -280,9 +279,17 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	}
 
 	// we trigger the first call immediately,
-	// then we schedule it on the given interval using timed.Periodic
+	// then we schedule it on the given interval
 	if err = doFunc(); err == nil {
-		err = timed.Periodic(stdCtx, cfg.Interval, doFunc)
+		ch := time.Tick(cfg.Interval)
+		for err == nil {
+			select {
+			case <-stdCtx.Done():
+				err = stdCtx.Err()
+			case <-ch:
+				err = doFunc()
+			}
+		}
 	}
 
 	log.Infof("Input stopped because context was cancelled with: %v", err)

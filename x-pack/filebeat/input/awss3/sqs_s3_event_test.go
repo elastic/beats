@@ -23,7 +23,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/pkg/logp/logptest"
-	"github.com/elastic/go-concert/timed"
 )
 
 func TestSQSS3EventProcessor(t *testing.T) {
@@ -112,7 +111,11 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		gomock.InOrder(
 			mockS3HandlerFactory.EXPECT().Create(gomock.Any(), gomock.Any()).
 				Do(func(ctx context.Context, _ s3EventV2) {
-					require.NoError(t, timed.Wait(ctx, 5*visibilityTimeout))
+					select {
+					case <-ctx.Done():
+						t.Fatal(ctx.Err())
+					case <-time.After(5 * visibilityTimeout):
+					}
 				}).Return(mockS3Handler),
 			mockS3Handler.EXPECT().ProcessS3Object(gomock.Any(), gomock.Any()).Return(nil),
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&msg)).Return(nil),

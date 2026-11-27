@@ -18,11 +18,11 @@
 package filestream
 
 import (
+	"context"
 	"time"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/pkg/logp"
-	"github.com/elastic/go-concert/unison"
 )
 
 // testWatcher wraps a fileWatcher and collects the events its scans produce
@@ -52,7 +52,7 @@ func newTestFileWatcher(
 	return wrapTestWatcher(w), nil
 }
 
-func (w *testWatcher) sink(ctx unison.Canceler) loginp.FSEventSink {
+func (w *testWatcher) sink(ctx context.Context) loginp.FSEventSink {
 	return func(e loginp.FSEvent) {
 		select {
 		case w.events <- e:
@@ -62,13 +62,13 @@ func (w *testWatcher) sink(ctx unison.Canceler) loginp.FSEventSink {
 }
 
 // watch runs one scan, sending its events to w.events.
-func (w *testWatcher) watch(ctx unison.Canceler, metrics *loginp.Metrics, ignoreOlder time.Duration, ignoreInactiveSince time.Time) {
+func (w *testWatcher) watch(ctx context.Context, metrics *loginp.Metrics, ignoreOlder time.Duration, ignoreInactiveSince time.Time) {
 	w.ScanOnce(ctx, w.sink(ctx), metrics, ignoreOlder, ignoreInactiveSince)
 }
 
 // Run scans every check interval until ctx is cancelled, like the prospector,
 // then closes w.events so Event returns an OpDone event.
-func (w *testWatcher) Run(ctx unison.Canceler, metrics *loginp.Metrics, ignoreOlder time.Duration, ignoreInactiveSince time.Time) {
+func (w *testWatcher) Run(ctx context.Context, metrics *loginp.Metrics, ignoreOlder time.Duration, ignoreInactiveSince time.Time) {
 	defer close(w.events)
 	defer metrics.Cleanup()
 	w.watch(ctx, metrics, ignoreOlder, ignoreInactiveSince)
