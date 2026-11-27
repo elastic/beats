@@ -121,7 +121,7 @@ func (c *config) Validate() error {
 	}
 
 	if c.QueueURL != "" && c.APITimeout < c.SQSWaitTime {
-		return fmt.Errorf("api_timeout <%v> must be greater than the sqs.wait_time <%v",
+		return fmt.Errorf("api_timeout <%v> must be greater than the sqs.wait_time <%v>",
 			c.APITimeout, c.SQSWaitTime)
 	}
 
