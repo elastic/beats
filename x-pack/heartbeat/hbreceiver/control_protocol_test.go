@@ -368,39 +368,6 @@ func inputStatus(evt *componentstatus.Event, id string) (string, string) {
 	return status.Str(), msg.Str()
 }
 
-// hostWithExtension is a collectorHost with a diagnostics extension.
-type hostWithExtension struct {
-	collectorHost
-	ext component.Component
-}
-
-func (h *hostWithExtension) GetExtensions() map[component.ID]component.Component {
-	return map[component.ID]component.Component{component.MustNewID("elastic_diagnostics"): h.ext}
-}
-
-// fakeDiagnosticExtension records the diagnostic hooks registered with it.
-type fakeDiagnosticExtension struct {
-	component.StartFunc
-	component.ShutdownFunc
-
-	mx    sync.Mutex
-	hooks map[string]func() []byte
-}
-
-func (e *fakeDiagnosticExtension) RegisterDiagnosticHook(_ string, _ string, filename string, _ string, hook func() []byte) {
-	e.mx.Lock()
-	defer e.mx.Unlock()
-	e.hooks[filename] = hook
-}
-
-func (e *fakeDiagnosticExtension) run(t *testing.T, filename string) string {
-	e.mx.Lock()
-	hook, ok := e.hooks[filename]
-	e.mx.Unlock()
-	require.True(t, ok, "no diagnostic hook for %s", filename)
-	return string(hook())
-}
-
 func startTCPTarget(t *testing.T) string {
 	listener, err := (&net.ListenConfig{}).Listen(t.Context(), "tcp", "127.0.0.1:0")
 	require.NoError(t, err)

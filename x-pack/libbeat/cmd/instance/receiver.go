@@ -52,6 +52,7 @@ type BeatReceiver struct {
 	bridge              *oteltelemetry.RegistryBridge
 	releaseSystemBridge func()
 	startHook           func(component.Host) error
+	diagnosticsExtra    func() mapstr.M
 	startCalled         chan struct{} // closed when Start is called
 	runDone             chan error    // receives the error from beater.Run; closed when Run returns
 }
@@ -164,6 +165,14 @@ func (br *BeatReceiver) SetStartHook(hook func(component.Host) error) {
 	br.startHook = hook
 }
 
+// SetDiagnosticsExtra sets a function whose metrics are merged into
+// beat_metrics.json, for metrics kept outside the receiver's own registry.
+// They may be shared with other receivers, and never overwrite the receiver's
+// own keys. It must be called before Start.
+func (br *BeatReceiver) SetDiagnosticsExtra(f func() mapstr.M) {
+	br.diagnosticsExtra = f
+}
+
 // BeatReceiver.Start() starts the beat receiver.
 func (br *BeatReceiver) Start(ctx context.Context, host component.Host) (retErr error) {
 	close(br.startCalled)
@@ -196,6 +205,9 @@ func (br *BeatReceiver) Start(ctx context.Context, host component.Host) (retErr 
 				"beat_metrics.json", "application/json", func() []byte {
 					m := monitoring.CollectStructSnapshot((br.beat.Monitoring.StatsRegistry()), monitoring.Full, true)
 					mapstr.M(m).DeepUpdateNoOverwrite(receiverSystemMetrics())
+					if br.diagnosticsExtra != nil {
+						mapstr.M(m).DeepUpdateNoOverwrite(br.diagnosticsExtra())
+					}
 					data, err := json.MarshalIndent(m, "", "  ")
 					if err != nil {
 						return fmt.Appendf(nil, "Failed to collect beat metric snapshot for Agent diagnostics: %v", err)

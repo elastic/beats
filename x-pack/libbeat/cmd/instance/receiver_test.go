@@ -306,6 +306,13 @@ func TestBeatReceiverStart_WiresActionAndDiagnosticExtensions(t *testing.T) {
 
 	br, err := NewBeatReceiver(t.Context(), b, creator, rs)
 	require.NoError(t, err, "creating the beat receiver should succeed")
+	br.SetDiagnosticsExtra(func() mapstr.M {
+		return mapstr.M{
+			"custom": mapstr.M{"value": 42},
+			// Collides with the receiver's own beat.info.name, which must win.
+			"beat": mapstr.M{"info": mapstr.M{"name": "from-extra"}},
+		}
+	})
 
 	ext := &fakeActionDiagExtension{}
 	host := &fakeExtensionHost{extensions: map[component.ID]component.Component{
@@ -343,6 +350,12 @@ func TestBeatReceiverStart_WiresActionAndDiagnosticExtensions(t *testing.T) {
 	info, _ := beatNS["info"].(map[string]any)
 	assert.Equal(t, b.Info.Version, info["version"], "beat.info must be the receiver's own, not the shared bridge's")
 	assert.NotEqual(t, "beat", info["name"], "beat.info must be the receiver's own, not the shared bridge's")
+
+	// Metrics from SetDiagnosticsExtra are merged in, without overwriting the receiver's own.
+	custom, ok := snapshot["custom"].(map[string]any)
+	require.True(t, ok, "beat_metrics.json should contain the extra custom namespace, got %v", snapshot)
+	assert.EqualValues(t, 42, custom["value"], "the extra metric should be merged with its value")
+	assert.NotEqual(t, "from-extra", info["name"], "the extra metrics must not overwrite the receiver's own beat.info.name")
 
 	// The action extension is only set on the manager by Start; the actual
 	// handler is registered once something (e.g. osquerybeat) calls
