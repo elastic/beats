@@ -60,8 +60,8 @@ jobs:
         with:
           node-version: ${{ env.NODEJS_VERSION }}
 
-      # Pin a release that supports Heartbeat's required --workdir option.
-      - run: npm i -g @elastic/synthetics@1.29.0
+      # Use the same release tag as the stack Docker images.
+      - run: npm i -g @elastic/synthetics@stack_release
 
       - uses: ./.github/actions/unit-test
         with:
