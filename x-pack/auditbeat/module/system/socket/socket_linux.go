@@ -83,22 +83,27 @@ func init() {
 		mb.DefaultMetricSet(),
 		mb.WithNamespace(namespace),
 	)
-	var err error
-	if kernelVersion, err = linux.KernelVersion(); err != nil {
-		logp.Err("Failed fetching Linux kernel version: %v", err)
-	}
 }
 
 var (
 	// Singleton to instantiate one socket dataset at a time.
 	instance      *MetricSet
 	instanceMutex sync.Mutex
+
+	kernelVersionOnce sync.Once
 )
 
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	instanceMutex.Lock()
 	defer instanceMutex.Unlock()
+
+	kernelVersionOnce.Do(func() {
+		var err error
+		if kernelVersion, err = linux.KernelVersion(); err != nil {
+			base.Logger().Errorf("Failed fetching Linux kernel version: %v", err)
+		}
+	})
 
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -123,8 +128,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 func newSocketMetricset(config Config, base mb.BaseMetricSet) (*MetricSet, error) {
 	base.Logger().Warn(cfgwarn.Beta("The %s dataset is beta.", fullName))
-	logger := base.Logger().Named(metricsetName)
-	sniffer, err := dns.NewSniffer(base, logger)
+	log := base.Logger().Named(metricsetName)
+	detailLog := base.Logger().Named(detailSelector)
+	sniffer, err := dns.NewSniffer(base, log)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create DNS sniffer: %w", err)
 	}
@@ -132,10 +138,10 @@ func newSocketMetricset(config Config, base mb.BaseMetricSet) (*MetricSet, error
 		SystemMetricSet: system.NewSystemMetricSet(base),
 		templateVars:    make(mapstr.M),
 		config:          config,
-		log:             logger,
-		isDebug:         logp.IsDebug(metricsetName),
-		detailLog:       base.Logger().Named(detailSelector),
-		isDetailed:      logp.HasSelector(detailSelector),
+		log:             log,
+		isDebug:         log.IsDebug(),
+		detailLog:       detailLog,
+		isDetailed:      detailLog.HasSelector(detailSelector),
 		sniffer:         sniffer,
 	}
 	// Setup the metricset before Run() so that startup can be halted in case of

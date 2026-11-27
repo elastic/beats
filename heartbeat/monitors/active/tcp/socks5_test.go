@@ -30,6 +30,7 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
@@ -119,10 +120,11 @@ func startSocks5Server(t *testing.T) (host string, port uint16, ip string, close
 		return "", 0, "", nil, err
 	}
 
+	logger := logptest.NewTestingLogger(t, "")
 	wg := sync.WaitGroup{}
 	wg.Go(func() {
 		if err := server.Serve(listener); err != nil {
-			debugf("Error in SOCKS5 Test Server %v", err)
+			logger.Debugf("Error in SOCKS5 Test Server %v", err)
 		}
 	})
 

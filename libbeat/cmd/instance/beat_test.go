@@ -251,7 +251,7 @@ func TestInitKibanaConfig(t *testing.T) {
 	err = os.Chmod(configPath, 0o644)
 	assert.NoError(t, err)
 
-	cfg, err := cfgfile.Load(configPath, nil)
+	cfg, err := cfgfile.Load(logptest.NewTestingLogger(t, ""), configPath, nil)
 	assert.NoError(t, err)
 	err = cfg.Unpack(&b.Config)
 	assert.NoError(t, err)

@@ -44,6 +44,7 @@ type Checkpoint struct {
 	numUpdates    int            // Number of updates received since last persisting to disk.
 	flushInterval time.Duration  // Maximum time interval that can pass before persisting to disk.
 	sort          []string       // Slice used for sorting states map (store to save on mallocs).
+	logger        *logp.Logger
 
 	lock   sync.RWMutex
 	states map[string]EventLogState
@@ -73,7 +74,7 @@ type EventLogState struct {
 // file is the name of the file where event log state is persisted as YAML.
 // interval is maximum amount of time that can pass since the last flush
 // before triggering a flush to disk (minimum value is 1s).
-func NewCheckpoint(file string, interval time.Duration) (*Checkpoint, error) {
+func NewCheckpoint(file string, interval time.Duration, logger *logp.Logger) (*Checkpoint, error) {
 	c := &Checkpoint{
 		done:          make(chan struct{}),
 		file:          file,
@@ -81,6 +82,7 @@ func NewCheckpoint(file string, interval time.Duration) (*Checkpoint, error) {
 		sort:          make([]string, 0, 10),
 		states:        make(map[string]EventLogState),
 		save:          make(chan EventLogState, 1),
+		logger:        logger.Named("checkpoint"),
 	}
 
 	// Minimum flush interval.
@@ -197,11 +199,11 @@ func (c *Checkpoint) persist() bool {
 
 	err := c.flush()
 	if err != nil {
-		logp.Err("%v", err)
+		c.logger.Errorf("%v", err)
 		return false
 	}
 
-	logp.Debug("checkpoint", "Checkpoint saved to disk. numUpdates=%d",
+	c.logger.Debugf("Checkpoint saved to disk. numUpdates=%d",
 		c.numUpdates)
 	c.numUpdates = 0
 	return true
@@ -286,6 +288,6 @@ func (c *Checkpoint) read() (*PersistedState, error) {
 // directory does not already exist.
 func (c *Checkpoint) createDir() error {
 	dir := filepath.Dir(c.file)
-	logp.Info("Creating %s if it does not exist.", dir)
+	c.logger.Infof("Creating %s if it does not exist.", dir)
 	return os.MkdirAll(dir, os.FileMode(0o750))
 }

@@ -23,10 +23,11 @@ import (
 	"path/filepath"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // ListAll lists all the multi-disk devices in a RAID array
-func ListAll(path string) ([]MDDevice, error) {
+func ListAll(logger *logp.Logger, path string) ([]MDDevice, error) {
 	dir, err := os.ReadDir(path)
 	if err != nil {
 		return nil, fmt.Errorf("could not read directory: %w", err)

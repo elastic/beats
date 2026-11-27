@@ -31,13 +31,6 @@ import (
 	"go.uber.org/zap/zaptest/observer"
 )
 
-func TestHasSelector(t *testing.T) {
-	err := DevelopmentSetup(WithSelectors("*", "config"))
-	require.NoError(t, err)
-	assert.True(t, HasSelector("config"))
-	assert.False(t, HasSelector("publish"))
-}
-
 func TestLoggerSelectors(t *testing.T) {
 	observedCore, observedLogs := observer.New(zapcore.DebugLevel)
 

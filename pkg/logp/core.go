@@ -46,7 +46,6 @@ func init() {
 	storeLogger(&coreLogger{
 		selectors:    map[string]struct{}{},
 		rootLogger:   zap.NewNop(),
-		globalLogger: zap.NewNop(),
 		level:        zap.NewAtomicLevel(),
 		logger:       newLogger(zap.NewNop(), make(map[string]struct{})),
 	})
@@ -55,7 +54,6 @@ func init() {
 type coreLogger struct {
 	selectors    map[string]struct{} // Set of enabled debug selectors.
 	rootLogger   *zap.Logger         // Root logger without any options configured.
-	globalLogger *zap.Logger         // Logger used by legacy global functions (e.g. logp.Info).
 	logger       *Logger             // Logger that is the basis for all logp.Loggers.
 	level        zap.AtomicLevel     // The minimum level being printed
 }
@@ -134,7 +132,6 @@ func ConfigureWithOutputs(defaultLoggerCfg Config, outputs ...zapcore.Core) erro
 	storeLogger(&coreLogger{
 		selectors:    selectors,
 		rootLogger:   root,
-		globalLogger: root.WithOptions(zap.AddCallerSkip(1)),
 		logger:       newLogger(root, selectors),
 		level:        level,
 	})
@@ -186,7 +183,6 @@ func ConfigureWithCore(loggerCfg Config, core zapcore.Core) error {
 	storeLogger(&coreLogger{
 		selectors:    selectors,
 		rootLogger:   root,
-		globalLogger: root.WithOptions(zap.AddCallerSkip(1)),
 		logger:       newLogger(root, selectors),
 		level:        level,
 	})
@@ -235,7 +231,6 @@ func ConfigureWithCoreLocal(loggerCfg Config, core zapcore.Core) (*Logger, error
 	storeLogger(&coreLogger{
 		selectors:    selectors,
 		rootLogger:   root,
-		globalLogger: root.WithOptions(zap.AddCallerSkip(1)),
 		logger:       newLogger(root, selectors),
 		level:        level,
 	})
@@ -283,7 +278,6 @@ func ConfigureWithTypedOutput(defaultLoggerCfg, typedLoggerCfg Config, key, valu
 	storeLogger(&coreLogger{
 		selectors:    selectors,
 		rootLogger:   root,
-		globalLogger: root.WithOptions(zap.AddCallerSkip(1)),
 		logger:       newLogger(root, selectors),
 		level:        level,
 	})
@@ -314,7 +308,6 @@ func ConfigureWithTypedOutputLocal(defaultLoggerCfg, typedLoggerCfg Config, key,
 	storeLogger(&coreLogger{
 		selectors:    selectors,
 		rootLogger:   root,
-		globalLogger: root.WithOptions(zap.AddCallerSkip(1)),
 		logger:       newLogger(root, selectors),
 		level:        level,
 	})
@@ -519,10 +512,6 @@ func wrappedCore(core zapcore.Core) zapcore.Core {
 	}
 
 	return wc
-}
-
-func globalLogger() *zap.Logger {
-	return loadLogger().globalLogger
 }
 
 func loadLogger() *coreLogger {

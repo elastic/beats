@@ -200,7 +200,7 @@ func defaultCertReloadConfig() certReloadConfig {
 // instance.
 // XXX Move this as a *Beat method?
 func Run(settings Settings, bt beat.Creator) error {
-	return handleError(func() error {
+	return handleError(logp.NewLogger(settings.Name), func() error {
 		defer func() {
 			if r := recover(); r != nil {
 				//nolint:forbidigo // top-level panic handler in Run; no *logp.Logger is in scope here.
@@ -671,7 +671,7 @@ func (b *Beat) RegisterHostname(useFQDN bool) {
 
 // TestConfig check all settings are ok and the beat can be run
 func (b *Beat) TestConfig(settings Settings, bt beat.Creator) error {
-	return handleError(func() error {
+	return handleError(logp.NewLogger(settings.Name), func() error {
 		err := b.InitWithSettings(settings)
 		if err != nil {
 			return err
@@ -705,7 +705,7 @@ type SetupSettings struct {
 //
 //nolint:forbidigo // required to give feedback to user
 func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) error {
-	return handleError(func() error {
+	return handleError(logp.NewLogger(settings.Name), func() error {
 		err := b.InitWithSettings(settings)
 		if err != nil {
 			return err
@@ -811,7 +811,7 @@ var HostnameFlag string
 
 // handleFlags invokes the HandleFlags callback if implemented by the Beat.
 func (b *Beat) handleFlags() error {
-	return cfgfile.HandleFlags()
+	return cfgfile.HandleFlags(logp.NewLogger(""))
 }
 
 // ApplyHostname sets Info.Hostname and Info.FQDN to h and updates the process-wide
@@ -844,7 +844,7 @@ func (b *Beat) configure(settings Settings) error {
 
 	b.InputQueueSize = settings.InputQueueSize
 
-	cfg, err := cfgfile.Load("", settings.ConfigOverrides)
+	cfg, err := cfgfile.Load(logp.NewLogger(""), "", settings.ConfigOverrides)
 	if err != nil {
 		return fmt.Errorf("error loading config file: %w", err)
 	}
@@ -1394,13 +1394,15 @@ func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
 // handleError handles the given error by logging it and then returning the
 // error. If the err is nil or is a GracefulExit error then the method will
 // return nil without logging anything.
-func handleError(err error) error {
+func handleError(logger *logp.Logger, err error) error {
 	if err == nil || err == beat.GracefulExit { //nolint:errorlint // keep old behaviour
 		return nil
 	}
 
 	// logp may not be initialized so log the err to stderr too.
-	logp.Critical("Exiting: %v", err)
+	if logger != nil {
+		logger.Errorf("Exiting: %v", err)
+	}
 	fmt.Fprintf(os.Stderr, "Exiting: %v\n", err)
 	return err
 }

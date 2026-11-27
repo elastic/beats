@@ -61,8 +61,6 @@ func (u UsedVals) IsZero() bool {
 	return u.Pct.IsZero() && u.Bytes.IsZero()
 }
 
-var debugf = logp.MakeDebug("libbeat.filesystem")
-
 func getFSPath(hostfs resolve.Resolver) string {
 	// Do a little work to make sure we don't break anything.
 	// This code would previously just blindly just search for /etc/mtab
@@ -78,7 +76,7 @@ func getFSPath(hostfs resolve.Resolver) string {
 }
 
 // GetFilesystems returns a filesystem list filtered by the callback function
-func GetFilesystems(hostfs resolve.Resolver, filter func(FSStat) bool) ([]FSStat, error) {
+func GetFilesystems(logger *logp.Logger, hostfs resolve.Resolver, filter func(FSStat) bool) ([]FSStat, error) {
 	fs := getFSPath(hostfs)
 
 	if filter == nil {
@@ -87,7 +85,7 @@ func GetFilesystems(hostfs resolve.Resolver, filter func(FSStat) bool) ([]FSStat
 
 	//combine user-supplied and built-in filters
 	filterFunc := func(fs FSStat) bool {
-		return avoidFileSystem(fs) && filter(fs)
+		return avoidFileSystem(logger.Named("libbeat.filesystem"), fs) && filter(fs)
 	}
 
 	mounts, err := parseMounts(fs, filterFunc)
@@ -173,11 +171,11 @@ func filterDuplicates(fsList []FSStat) []FSStat {
 	return filtered
 }
 
-func avoidFileSystem(fs FSStat) bool {
+func avoidFileSystem(logger *logp.Logger, fs FSStat) bool {
 	// Ignore relative mount points, which are present for example
 	// in /proc/mounts on Linux with network namespaces.
 	if !filepath.IsAbs(fs.Directory) {
-		debugf("Filtering filesystem with relative mountpoint %+v", fs)
+		logger.Debugf("Filtering filesystem with relative mountpoint %+v", fs)
 		return false
 	}
 
@@ -192,7 +190,7 @@ func avoidFileSystem(fs FSStat) bool {
 		// don't count it as it'd be counting again its parent filesystem.
 		devFileInfo, err := os.Stat(fs.Device)
 		if err != nil {
-			debugf("error stating filesystem: %s", err)
+			logger.Debugf("error stating filesystem: %s", err)
 		}
 		if devFileInfo != nil && devFileInfo.IsDir() {
 			return false

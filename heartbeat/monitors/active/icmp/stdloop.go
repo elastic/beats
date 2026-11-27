@@ -92,18 +92,18 @@ var (
 	stdICMPLoopSingleton *stdICMPLoop
 )
 
-func getStdLoop() (*stdICMPLoop, error) {
+func getStdLoop(logger *logp.Logger) (*stdICMPLoop, error) {
 	stdICMPLoopInit.Lock()
 	defer stdICMPLoopInit.Unlock()
 
 	if stdICMPLoopSingleton == nil {
-		debugf("initializing ICMP loop")
+		logger.Debug("initializing ICMP loop")
 		singleton, err := newICMPLoop()
 		if err != nil {
 			return nil, err
 		}
 		stdICMPLoopSingleton = singleton
-		debugf("ICMP loop successfully initialized")
+		logger.Debug("ICMP loop successfully initialized")
 	}
 
 	return stdICMPLoopSingleton, nil

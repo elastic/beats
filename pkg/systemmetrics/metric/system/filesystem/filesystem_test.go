@@ -33,7 +33,7 @@ func TestFileSystemList(t *testing.T) {
 	skipTypes := []string{"cdrom", "tracefs", "overlay", "fuse.lxcfs", "fuse.gvfsd-fuse", "nsfs", "squashfs", "vmhgfs"}
 	hostfs := systemtests.DockerTestResolver(logger)
 	//Exclude FS types that will give us a permission error
-	fss, err := GetFilesystems(hostfs, BuildFilterWithList(skipTypes))
+	fss, err := GetFilesystems(logger, hostfs, BuildFilterWithList(skipTypes))
 	if err != nil {
 		t.Fatal("GetFileSystemList", err)
 	}
@@ -147,7 +147,7 @@ func filterFileSystemList(logger *logp.Logger, stats []FSStat) []FSStat {
 	hostfs := systemtests.DockerTestResolver(logger)
 	filtered := []FSStat{}
 	for _, stat := range stats {
-		if avoidFileSystem(stat) && buildDefaultFilters(hostfs)(stat) {
+		if avoidFileSystem(logger, stat) && buildDefaultFilters(hostfs)(stat) {
 			filtered = append(filtered, stat)
 		}
 

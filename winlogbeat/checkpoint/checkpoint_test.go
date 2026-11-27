@@ -26,6 +26,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -68,7 +69,7 @@ func TestWriteTimedFlush(t *testing.T) {
 	}
 
 	const timeout = 5 * time.Second
-	cp, err := NewCheckpoint(file, timeout)
+	cp, err := NewCheckpoint(file, timeout, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}

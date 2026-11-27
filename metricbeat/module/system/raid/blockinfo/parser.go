@@ -28,8 +28,6 @@ import (
 	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
-var debugf = logp.MakeDebug("system.raid")
-
 // get the raid level and use that to determine how we fill out the array
 // Only data-reduntant RIAD levels (1,4,5,6,10) have some of these fields
 func isRedundant(raidStr string) bool {
@@ -91,7 +89,7 @@ func getSyncStatus(path string, size int64) (SyncStatus, error) {
 }
 
 // Create a new disk object, parsing any needed fields
-func newMD(path string) (MDDevice, error) {
+func newMD(logger *logp.Logger, path string) (MDDevice, error) {
 	var dev MDDevice
 
 	dev.Name = filepath.Base(path)
@@ -109,7 +107,7 @@ func newMD(path string) (MDDevice, error) {
 	dev.ArrayState = strings.TrimSpace(string(state))
 
 	//get total disks
-	disks, err := getDisks(path)
+	disks, err := getDisks(logger.Named("system.raid"), path)
 	if err != nil {
 		return dev, fmt.Errorf("could not get disk data: %w", err)
 	}
@@ -145,7 +143,7 @@ func newMD(path string) (MDDevice, error) {
 }
 
 // get all the disks associated with an MD device
-func getDisks(path string) (DiskStates, error) {
+func getDisks(logger *logp.Logger, path string) (DiskStates, error) {
 	//so far, haven't found a less hacky way to do this.
 	devices, err := filepath.Glob(filepath.Join(path, "md", "dev-*"))
 	if err != nil {
@@ -170,7 +168,7 @@ func getDisks(path string) (DiskStates, error) {
 		case "spare":
 			disks.Spare++
 		default:
-			debugf("Unknown disk state %s", disk)
+			logger.Debugf("Unknown disk state %s", disk)
 		}
 
 		if _, ok := disks.States[disk]; !ok {

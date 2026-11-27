@@ -18,20 +18,20 @@ import (
 )
 
 // LogAndSendErrorEventWithoutTransactionId sends an error event without a transaction id to the reporter with the provided details.
-func LogAndSendErrorEventWithoutTransactionId(err error, clusterInfo *utils.ClusterInfo, r mb.ReporterV2, metricSetName string, path string) {
-	LogAndSendErrorEvent(err, clusterInfo, r, metricSetName, path, "")
+func LogAndSendErrorEventWithoutTransactionId(logger *logp.Logger, err error, clusterInfo *utils.ClusterInfo, r mb.ReporterV2, metricSetName string, path string) {
+	LogAndSendErrorEvent(logger, err, clusterInfo, r, metricSetName, path, "")
 }
 
 // LogAndSendErrorEventWithoutClusterInfo sends an error event without cluster info to the reporter with the provided details.
-func LogAndSendErrorEventWithoutClusterInfo(err error, r mb.ReporterV2, metricSetName string) {
-	LogAndSendErrorEvent(err, &utils.ClusterInfo{
+func LogAndSendErrorEventWithoutClusterInfo(logger *logp.Logger, err error, r mb.ReporterV2, metricSetName string) {
+	LogAndSendErrorEvent(logger, err, &utils.ClusterInfo{
 		Version: utils.ClusterInfoVersion{Number: &version.V{}},
 	}, r, metricSetName, "/", "")
 }
 
 // LogAndSendErrorEvent sends an error event to the reporter with the provided details.
-func LogAndSendErrorEvent(err error, clusterInfo *utils.ClusterInfo, r mb.ReporterV2, metricSetName string, path string, transactionID string) {
-	logp.Err("Error fetching data for metricset %s: %s", metricSetName, err)
+func LogAndSendErrorEvent(logger *logp.Logger, err error, clusterInfo *utils.ClusterInfo, r mb.ReporterV2, metricSetName string, path string, transactionID string) {
+	logger.Errorf("Error fetching data for metricset %s: %s", metricSetName, err)
 
 	r.Event(createError(clusterInfo, err, path, transactionID))
 }

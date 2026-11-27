@@ -57,10 +57,11 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 }
 
 func newFromConfig(c config, logger *logp.Logger) (*processor, error) {
+	l := logger.Named(logName)
 	p := &processor{
 		config:  c,
-		log:     logger.Named(logName),
-		isDebug: logp.IsDebug(logName),
+		log:     l,
+		isDebug: l.IsDebug(),
 		tz:      c.Timezone.Location(),
 	}
 	if c.ID != "" {

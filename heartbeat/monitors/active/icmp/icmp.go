@@ -32,10 +32,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/v7/pkg/logp"
 )
-
-var debugf = logp.MakeDebug("icmp")
 
 func init() {
 	plugin.RegisterWithDestinations("icmp", destinations, create, "synthetics/icmp")
@@ -46,7 +43,7 @@ func create(
 	commonConfig *conf.C,
 	info beat.Info,
 ) (p plugin.Plugin, err error) {
-	loop, err := getStdLoop()
+	loop, err := getStdLoop(info.Logger.Named("icmp"))
 	if err != nil {
 		info.Logger.Warnf("Failed to initialize ICMP loop %v", err)
 		return plugin.Plugin{}, err
