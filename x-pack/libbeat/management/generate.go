@@ -19,6 +19,10 @@ import (
 
 const celInputPrefix = "cel-"
 
+// syntheticsInputPrefix is the policy input type prefix of Heartbeat synthetics monitors
+// (synthetics/http, synthetics/browser, ...).
+const syntheticsInputPrefix = "synthetics/"
+
 // DefaultNamespaceName is the fallback default namespace for data stream info
 var DefaultNamespaceName = "default"
 
@@ -177,9 +181,26 @@ func CreateInputsFromStreamsForReceiver(raw *proto.UnitExpectedConfig, defaultDa
 }
 
 func createStreamRulesForReceiver(raw *proto.UnitExpectedConfig, streamSource map[string]any, stream *proto.Stream, defaultDataStreamType string, agentInfo *client.AgentInfo) (map[string]any, error) {
-	if _, exists := streamSource["index"]; exists {
+	// Heartbeat routes browser/api sub-datasets (browser.network, ...) per
+	// event through its own add_data_stream processor. A fixed `index` or a
+	// processor rewriting data_stream.* would override that, so for synthetics
+	// inputs we hand Heartbeat the data_stream setting and let it build the
+	// index itself, like the process runtime does.
+	isSynthetics := strings.HasPrefix(raw.GetType(), syntheticsInputPrefix)
+	dsType, dataset, namespace := metadataFromDatastreamValues(defaultDataStreamType, raw, stream)
+
+	_, hasIndex := streamSource["index"]
+	switch {
+	case hasIndex:
+		// an explicit index takes precedence, data_stream would be ignored.
 		delete(streamSource, "data_stream")
-	} else {
+	case isSynthetics:
+		streamSource["data_stream"] = map[string]any{
+			"type":      dsType,
+			"dataset":   dataset,
+			"namespace": namespace,
+		}
+	default:
 		streamSource = injectIndexStream(defaultDataStreamType, raw, stream, streamSource)
 	}
 
@@ -189,14 +210,13 @@ func createStreamRulesForReceiver(raw *proto.UnitExpectedConfig, streamSource ma
 	// Replace injectAgentInfoRule + injectStreamProcessors with a single
 	// add_agent_metadata processor.
 	if agentInfo == nil {
-		streamSource, err := injectStreamProcessors(raw, defaultDataStreamType, stream, streamSource, nil)
+		streamSource, err := injectStreamProcessors(raw, defaultDataStreamType, stream, streamSource, !isSynthetics, nil)
 		if err != nil {
 			return nil, fmt.Errorf("error injecting stream processors: %w", err)
 		}
 		return streamSource, nil
 	}
 
-	dsType, dataset, namespace := metadataFromDatastreamValues(defaultDataStreamType, raw, stream)
 	proc := generateAgentMetadataProcessor(
 		agentInfo,
 		raw.GetId(),
@@ -204,6 +224,7 @@ func createStreamRulesForReceiver(raw *proto.UnitExpectedConfig, streamSource ma
 		dsType,
 		dataset,
 		namespace,
+		!isSynthetics,
 	)
 
 	streamSource["processors"] = prependProcessors(streamSource, []any{proc})
@@ -255,7 +276,7 @@ func createStreamRules(raw *proto.UnitExpectedConfig, streamSource map[string]an
 	}
 
 	// 3. stream processors
-	streamSource, err = injectStreamProcessors(raw, defaultDataStreamType, stream, streamSource, defaultProcessors)
+	streamSource, err = injectStreamProcessors(raw, defaultDataStreamType, stream, streamSource, true, defaultProcessors)
 	if err != nil {
 		return nil, fmt.Errorf("error injecting stream processors: %w", err)
 	}
@@ -322,7 +343,9 @@ func injectIndexStream(defaultDataStreamType string, expected *proto.UnitExpecte
 
 // injectStreamProcessors is an emulation of the InjectStreamProcessorRule AST code
 // this adds a variety of processors for metadata related to the dataset and input config.
-func injectStreamProcessors(expected *proto.UnitExpectedConfig, defaultDataStreamType string, streamExpected *proto.Stream, stream map[string]any, defaultProcessors []mapstr.M) (map[string]any, error) {
+// When includeDataStream is false, the data_stream and event.dataset fields are left alone
+// (the beat sets them itself, as Heartbeat does for synthetics).
+func injectStreamProcessors(expected *proto.UnitExpectedConfig, defaultDataStreamType string, streamExpected *proto.Stream, stream map[string]any, includeDataStream bool, defaultProcessors []mapstr.M) (map[string]any, error) {
 	// 1. start by "repairing" config to add any missing fields
 	// logic from datastreamTypeFromInputNode
 	procInputType, procInputDataset, procInputNamespace := metadataFromDatastreamValues(defaultDataStreamType, expected, streamExpected)
@@ -345,14 +368,16 @@ func injectStreamProcessors(expected *proto.UnitExpectedConfig, defaultDataStrea
 	}
 
 	// 2. Actually add the processors
-	// namespace
-	datastream := generateAddFieldsProcessor(mapstr.M{"dataset": procInputDataset,
-		"namespace": procInputNamespace, "type": procInputType}, "data_stream")
-	processors = append(processors, datastream)
+	if includeDataStream {
+		// namespace
+		datastream := generateAddFieldsProcessor(mapstr.M{"dataset": procInputDataset,
+			"namespace": procInputNamespace, "type": procInputType}, "data_stream")
+		processors = append(processors, datastream)
 
-	// dataset
-	event := generateAddFieldsProcessor(mapstr.M{"dataset": procInputDataset}, "event")
-	processors = append(processors, event)
+		// dataset
+		event := generateAddFieldsProcessor(mapstr.M{"dataset": procInputDataset}, "event")
+		processors = append(processors, event)
+	}
 
 	// source stream
 	if streamID := streamExpected.GetId(); streamID != "" {
@@ -405,18 +430,22 @@ func generateAddTagsProcessor(tags []string) mapstr.M {
 	}
 }
 
-func generateAgentMetadataProcessor(agentInfo *client.AgentInfo, inputID, streamID, dataStreamType, dataset, namespace string) mapstr.M {
+// generateAgentMetadataProcessor builds the add_agent_metadata processor. The data_stream
+// block is optional because it overwrites data_stream.* and event.dataset on every event.
+func generateAgentMetadataProcessor(agentInfo *client.AgentInfo, inputID, streamID, dataStreamType, dataset, namespace string, includeDataStream bool) mapstr.M {
 	cfg := mapstr.M{
-		"data_stream": mapstr.M{
-			"dataset":   dataset,
-			"namespace": namespace,
-			"type":      dataStreamType,
-		},
 		"elastic_agent": mapstr.M{
 			"id":       agentInfo.ID,
 			"snapshot": agentInfo.Snapshot,
 			"version":  agentInfo.Version,
 		},
+	}
+	if includeDataStream {
+		cfg["data_stream"] = mapstr.M{
+			"dataset":   dataset,
+			"namespace": namespace,
+			"type":      dataStreamType,
+		}
 	}
 	if inputID != "" {
 		cfg["input_id"] = inputID
