@@ -25,9 +25,9 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/process"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var (
@@ -70,16 +70,9 @@ func SetupMetricsOptions(opts MetricOptions) error {
 		IncludeTop:   process.IncludeTopConfig{},
 		Logger:       opts.Logger,
 
-		// Always use the local filesystem for self-monitoring metrics.
-		// Metricbeat will use the hostfs to set the environment variables:
-		// - HOST_PROC
-		// - HOST_SYS
-		// - HOST_ETC
-		// which are read by github.com/shirou/gopsutil/v4 and used when fetching metrics.
-		// This causes a miss match, because the PID we get does not take into consideration
-		// the hostfs, thus it cannot be used to get metrics from it.
-		// The hostfs configuration is read after this function is ran, so we cannot even
-		// rely on the environment variables set by Metricbeat.
+		// Always use the local filesystem for self-monitoring metrics, ignoring
+		// any HOST_PROC/HOST_SYS/HOST_ETC set in the environment, because our
+		// own PID is only valid in the local /proc.
 		Hostfs: localProcResolver{},
 	}
 
@@ -91,11 +84,17 @@ func SetupMetricsOptions(opts MetricOptions) error {
 	monitoring.NewFunc(opts.ProcessMetrics, "memstats", MemStatsReporter(opts.Logger, processStats), monitoring.Report)
 	monitoring.NewFunc(opts.ProcessMetrics, "cpu", InstanceCPUReporter(opts.Logger, processStats), monitoring.Report)
 	monitoring.NewFunc(opts.ProcessMetrics, "runtime", ReportRuntime, monitoring.Report)
-	monitoring.NewFunc(opts.ProcessMetrics, "info", infoReporter(opts.Name, opts.Version, opts.EphemeralID), monitoring.Report)
+	SetupInfoMetrics(opts)
 
 	setupPlatformSpecificMetrics(opts.Logger, processStats, opts.SystemMetrics, opts.ProcessMetrics)
 
 	return nil
+}
+
+// SetupInfoMetrics registers only the beat.info metrics (name, version,
+// ephemeral ID and uptime) in opts.ProcessMetrics.
+func SetupInfoMetrics(opts MetricOptions) {
+	monitoring.NewFunc(opts.ProcessMetrics, "info", infoReporter(processName(opts.Name), opts.Version, opts.EphemeralID), monitoring.Report)
 }
 
 // processName truncates the name if it is longer than 15 characters, so we don't fail process checks later on

@@ -159,7 +159,7 @@ Each `secret_stores` entry takes these options:
 :   The name that references use to select this entry, as in `vault://prod@my-app/api#token`. Names must be unique.
 
 `address`
-:   The URL of the Vault server.
+:   The URL of the Vault server. Non-loopback addresses must use `https`. Plain HTTP is allowed only for `localhost`, IPv4 addresses in `127.0.0.0/8`, and the IPv6 address `::1`.
 
 `namespace`
 :   (Optional) The Vault Enterprise namespace.
@@ -174,7 +174,7 @@ Each `secret_stores` entry takes these options:
     * `approle`: AppRole credentials: `role_id`, `secret_id`, and optionally `mount_path`, which defaults to `approle`.
 
 `ssl`
-:   (Optional) TLS settings of the connection to Vault, such as `certificate_authorities` to trust a private CA. They only apply to Vault: the `ssl` settings of the monitor apply to the monitored host. See [SSL](/reference/heartbeat/configuration-ssl.md) for the available settings.
+:   (Optional) TLS settings of the connection to Vault. You can set `certificate_authorities` to trust a private CA. For a non-loopback Vault address, `verification_mode` must be `full` (the default) or `strict`. These settings only apply to Vault: the `ssl` settings of the monitor apply to the monitored host. See [SSL](/reference/heartbeat/configuration-ssl.md) for the available settings.
 
 `allowed_hosts`
 :   (Optional) The hosts that the secrets of this connection can be sent to, as host names or IP addresses, without scheme, port, or path. Refer to [Restrict the hosts that receive secrets](#monitor-secret-stores-allowed-hosts). If you don't set this option, or set it to an empty list, any host can receive the secrets.
@@ -187,7 +187,15 @@ References in the `source.inline.script` setting of browser monitors are not res
 
 If a monitor with several URLs or hosts starts while Vault is unavailable, or if the resolved values change its number of URLs or hosts, it reports an error until you change its configuration or restart Heartbeat.
 
+::::{note}
+:applies_to: stack: preview 9.7+
+Heartbeat replaces resolved values with `<hidden>` in the events and logs of the monitor, for example in `url.full`, `url.query`, `error.message`, `error.stack_trace`, and the output of the browser runner. It also replaces their common percent-encoded and JSON-escaped forms, and each line of a multi-line value such as a PEM key. If the whole value of a field is a resolved value, such as `monitor.ip` when the host is a secret IP address, Heartbeat leaves the field out of the event, because `<hidden>` isn't valid for fields such as IP addresses. Fields that Heartbeat sets itself to identify and classify events, such as `monitor.id`, `monitor.name`, `event.type`, or `synthetics.type`, are never changed.
+
+Heartbeat doesn't hide values shorter than 6 characters, values transformed in other ways such as base64 or lowercase percent-encoding, screenshots, or what the browser runner records itself, such as network events. Prefer settings that aren't published for secrets, such as `username`, `password`, request headers, or TLS settings.
+::::
+
 ::::{warning}
+:applies_to: stack: preview =9.6
 Heartbeat uses the resolved values as they are. A secret in a setting that is published in events, such as a URL or a host, is visible in those events, for example in `url.full`, `url.query`, or `error.message`, as with any other secret in the configuration. Use settings that are not published for secrets, such as `username`, `password`, request headers, or TLS settings.
 ::::
 
@@ -250,7 +258,7 @@ In this example, the secrets of the `prod` connection can only be sent to `api.s
       allowed_hosts: ["api.stripe.com"]
 ```
 
-`allowed_hosts` restricts where secrets are sent, not who can see them. A secret in a setting that Heartbeat publishes is visible in events, as described in the [`secret_stores`](#monitor-secret-stores) warning.
+`allowed_hosts` restricts where secrets are sent, not who can see them. To learn how secrets appear in published events and logs, refer to [`secret_stores`](#monitor-secret-stores).
 
 
 ### `fields` [monitor-fields]

@@ -1,0 +1,8 @@
+kind: bug-fix
+summary: Limit array nesting depth in the Packetbeat Redis parser.
+description: |
+  The Redis parser recurred once for each level of array nesting with no limit.
+  A stream of deeply nested arrays could overflow the stack, which is a fatal
+  error that stops the whole Packetbeat process. The parser now rejects
+  messages that nest arrays more than 32 levels deep.
+component: packetbeat

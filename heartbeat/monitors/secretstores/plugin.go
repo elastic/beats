@@ -18,14 +18,17 @@
 package secretstores
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"maps"
+	"slices"
 	"sync"
 
 	"github.com/gohugoio/hashstructure"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
@@ -35,14 +38,17 @@ import (
 var errPluginClosed = errors.New("monitor is stopped")
 
 // WrapFactory returns a copy of pf whose plugins resolve the secret
-// references of their config on every run. Making a plugin never fails
-// because of the secret stores: their errors are returned by the jobs, so
-// the monitor reports them and retries on its next run.
-func (r *Resolver) WrapFactory(pf plugin.PluginFactory) plugin.PluginFactory {
+// references of their config on every run, and give the secret values to
+// redactor. Making a plugin never fails because of the secret stores: their
+// errors are returned by the jobs, so the monitor reports them and retries on
+// its next run.
+func (r *Resolver) WrapFactory(pf plugin.PluginFactory, redactor *Redactor) plugin.PluginFactory {
 	inner := pf
-	resolve := func(cfg *conf.C) (*conf.C, error) { return r.Resolve(cfg, inner.Destinations) }
+	resolve := func(ctx context.Context, cfg *conf.C, pinned map[string]Store) (*conf.C, *Scrubber, error) {
+		return r.resolve(ctx, cfg, inner.Destinations, pinned)
+	}
 	pf.Make = func(name string, cfg *conf.C, info beat.Info) (plugin.Plugin, error) {
-		return newSecretPlugin(resolve, inner, name, cfg, info, r.logger).plugin(), nil
+		return newSecretPlugin(resolve, sharedStores, inner, name, cfg, info, r.logger, redactor).plugin(), nil
 	}
 	return pf
 }
@@ -56,35 +62,55 @@ func (r *Resolver) WrapFactory(pf plugin.PluginFactory) plugin.PluginFactory {
 // Each job is scheduled on its own, so the number of jobs is fixed when the
 // plugin is made. Without an inner plugin at that time, there is one job.
 type secretPlugin struct {
-	resolve  func(*conf.C) (*conf.C, error)
+	resolve  func(context.Context, *conf.C, map[string]Store) (*conf.C, *Scrubber, error)
+	stores   *storeCache
 	factory  plugin.PluginFactory
 	name     string
 	info     beat.Info
 	logger   *logp.Logger
+	redactor *Redactor
 	jobCount int
+	ctx      context.Context
+	cancel   context.CancelFunc
 
 	mu sync.Mutex
 	// config is the unresolved monitor config, replaced by update.
 	config *conf.C
+	pinned map[string]Store
+	pinErr error
 	inner  plugin.Plugin
 	built  bool
 	// hash is the hash of the resolved config of inner, or of createErr.
 	hash      uint64
 	createErr error
-	closed    bool
+	// scrubber is the one of the resolved config of inner.
+	scrubber *Scrubber
+	closed   bool
 }
 
-func newSecretPlugin(resolve func(*conf.C) (*conf.C, error), factory plugin.PluginFactory, name string, cfg *conf.C, info beat.Info, logger *logp.Logger) *secretPlugin {
+func newSecretPlugin(resolve func(context.Context, *conf.C, map[string]Store) (*conf.C, *Scrubber, error), stores *storeCache, factory plugin.PluginFactory, name string, cfg *conf.C, info beat.Info, logger *logp.Logger, redactor *Redactor) *secretPlugin {
+	// The plugin logs with a logger that scrubs: its log lines can quote
+	// resolved values, such as the params of a browser monitor.
+	info.Logger = redactor.Logger(info.Logger)
+	ctx, cancel := context.WithCancel(context.Background())
 	p := &secretPlugin{
 		resolve:  resolve,
+		stores:   stores,
 		factory:  factory,
 		name:     name,
 		info:     info,
-		logger:   logger,
+		logger:   redactor.Logger(logger),
+		redactor: redactor,
+		ctx:      ctx,
+		cancel:   cancel,
 		config:   cfg,
 		jobCount: 1,
 	}
-	inner, err := p.current()
+	if p.stores != nil {
+		p.stores.release(p.logger, p.syncStoresLocked(cfg)...)
+	}
+	// The first job's first run replaces the values of this one.
+	inner, err := p.current(0)
 	if err != nil {
 		p.logger.Warnf("Could not create the monitor plugin, retrying on every run: %v", err)
 		return p
@@ -115,7 +141,7 @@ func (p *secretPlugin) plugin() plugin.Plugin {
 // job returns the job running the job i of the inner plugin.
 func (p *secretPlugin) job(i int) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
-		inner, err := p.current()
+		inner, err := p.current(i)
 		if err != nil {
 			return nil, err
 		}
@@ -126,15 +152,39 @@ func (p *secretPlugin) job(i int) jobs.Job {
 	}
 }
 
-// current returns the inner plugin for the current resolved config,
-// creating it if the resolved config changed.
-func (p *secretPlugin) current() (plugin.Plugin, error) {
+// current returns the inner plugin for the current resolved config, creating
+// it if the resolved config changed, for a run of the job.
+func (p *secretPlugin) current(job int) (plugin.Plugin, error) {
 	p.mu.Lock()
+	if p.closed {
+		p.mu.Unlock()
+		return plugin.Plugin{}, errPluginClosed
+	}
+	// Store creation can recover, for example after a missing CA file appears.
+	if p.pinErr != nil {
+		removed := p.syncStoresLocked(p.config)
+		p.mu.Unlock()
+		p.stores.release(p.logger, removed...)
+		p.mu.Lock()
+		if p.closed {
+			p.mu.Unlock()
+			return plugin.Plugin{}, errPluginClosed
+		}
+	}
+	if p.pinErr != nil {
+		err := p.pinErr
+		p.mu.Unlock()
+		return plugin.Plugin{}, err
+	}
 	config := p.config
+	ctx := p.ctx
+	pinned := maps.Clone(p.pinned)
 	p.mu.Unlock()
 
 	// Resolve without the lock, so a slow secret store doesn't block close.
-	resolved, err := p.resolve(config)
+	resolved, scrubber, err := p.resolve(ctx, config, pinned)
+	// Also on failure: the error can quote a value substituted before it.
+	p.redactor.set(job, scrubber)
 	if err != nil {
 		return plugin.Plugin{}, err
 	}
@@ -160,7 +210,7 @@ func (p *secretPlugin) current() (plugin.Plugin, error) {
 	// runs of a job never overlap.
 	_ = p.closeInner()
 	inner, err := p.factory.Make(p.name, resolved, p.info)
-	p.hash = hash
+	p.hash, p.scrubber = hash, scrubber
 	if err != nil {
 		// A plugin can return resources to close along with the error.
 		if closeErr := inner.Close(); closeErr != nil {
@@ -174,19 +224,88 @@ func (p *secretPlugin) current() (plugin.Plugin, error) {
 }
 
 // update replaces the config. The next run resolves it, so updating never
-// contacts the secret stores.
+// contacts the secret stores for resolution; removed connections are released.
 func (p *secretPlugin) update(cfg *conf.C) error {
 	p.mu.Lock()
-	defer p.mu.Unlock()
+	if p.closed {
+		p.mu.Unlock()
+		return errPluginClosed
+	}
 	p.config = cfg
+	removed := p.syncStoresLocked(cfg)
+	p.mu.Unlock()
+
+	if p.stores != nil {
+		p.stores.release(p.logger, removed...)
+	}
 	return nil
 }
 
 func (p *secretPlugin) close() error {
 	p.mu.Lock()
-	defer p.mu.Unlock()
+	if p.closed {
+		p.mu.Unlock()
+		return nil
+	}
 	p.closed = true
-	return p.closeInner()
+	p.cancel()
+	removed := slices.Collect(maps.Keys(p.pinned))
+	p.pinned = nil
+	err := p.closeInner()
+	p.mu.Unlock()
+
+	if p.stores != nil {
+		p.stores.release(p.logger, removed...)
+	}
+	return err
+}
+
+// syncStoresLocked updates p.pinned to match cfg's secret_stores, acquiring
+// new connections before returning removed ones to release outside p.mu.
+func (p *secretPlugin) syncStoresLocked(cfg *conf.C) []string {
+	if p.stores == nil {
+		return nil
+	}
+	rollback := func(acquired []string, err error) []string {
+		removed := append(acquired, slices.Collect(maps.Keys(p.pinned))...)
+		p.pinned, p.pinErr = nil, err
+		return removed
+	}
+
+	entries, err := configEntries(cfg)
+	if err != nil {
+		return rollback(nil, err)
+	}
+	desired := make(map[string]Store, len(entries))
+	var acquired []string
+	for _, e := range entries {
+		id, err := e.identity()
+		if err != nil {
+			return rollback(acquired, fmt.Errorf("%s: %q entry: %w", ConfigKey, e.storeType, err))
+		}
+		if _, dup := desired[id]; dup {
+			continue
+		}
+		if s, kept := p.pinned[id]; kept {
+			desired[id] = s
+			continue
+		}
+		s, err := p.stores.acquire(id, e, p.logger)
+		if err != nil {
+			return rollback(acquired, err)
+		}
+		desired[id] = s
+		acquired = append(acquired, id)
+	}
+
+	var removed []string
+	for id := range p.pinned {
+		if _, kept := desired[id]; !kept {
+			removed = append(removed, id)
+		}
+	}
+	p.pinned, p.pinErr = desired, nil
+	return removed
 }
 
 // closeInner closes the inner plugin. p.mu must be held.
@@ -197,9 +316,13 @@ func (p *secretPlugin) closeInner() error {
 	inner := p.inner
 	p.inner, p.built = plugin.Plugin{}, false
 	err := inner.Close()
-	if err != nil {
-		p.logger.Errorf("Could not close the monitor plugin: %v", err)
+	if err == nil {
+		return nil
 	}
+	// It can quote the values inner was made with, which the redactor no
+	// longer has after a rotation. The monitor logs it too.
+	err = errors.New(p.scrubber.String(err.Error()))
+	p.logger.Errorf("Could not close the monitor plugin: %v", err)
 	return err
 }
 

@@ -21,13 +21,14 @@ package socket_summary
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"os"
 
 	"github.com/shirou/gopsutil/v4/net"
 
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // SockStat contains data from /proc/net/sockstat
@@ -130,6 +131,6 @@ func parseSockstat(path string) (SockStat, error) {
 
 // connections gets connection information
 // The linux function doesn't query UIDs for performance
-func connections(kind string) ([]net.ConnectionStat, error) {
-	return net.ConnectionsWithoutUids(kind)
+func connections(sys resolve.Resolver, kind string) ([]net.ConnectionStat, error) {
+	return net.ConnectionsWithoutUidsWithContext(resolve.Context(context.Background(), sys), kind)
 }

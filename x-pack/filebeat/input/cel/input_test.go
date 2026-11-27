@@ -33,12 +33,12 @@ import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/version"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/paths"
-	"github.com/elastic/elastic-agent-libs/useragent"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
+	"github.com/elastic/beats/v7/pkg/paths"
+	"github.com/elastic/beats/v7/pkg/useragent"
 )
 
 var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints")
@@ -1077,6 +1077,67 @@ var inputTests = []struct {
 		want: []map[string]any{
 			{
 				"events": []any{"bar"},
+			},
+		},
+	},
+	{
+		name:   "GET_redirect_follow",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]any{
+			"interval": 1,
+			"program": `
+	get(state.url).Body.as(body, {
+		"events": [{"message": string(body)}]
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == "/" {
+				w.Header().Set("Location", "/file")
+				w.Header().Set("Content-Length", "2")
+				w.WriteHeader(http.StatusFound)
+				_, _ = w.Write([]byte("{}"))
+				return
+			}
+			_, _ = w.Write([]byte("hello"))
+		},
+		want: []map[string]any{
+			{
+				"message": "hello",
+			},
+		},
+	},
+	{
+		name:   "GET_redirect_no_follow",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]any{
+			"interval":                 1,
+			"resource.redirect.follow": false,
+			"program": `
+	get(state.url).as(resp, {
+		"events": [{
+			"status":   resp.StatusCode == 302 ? "found" : "other",
+			"location": resp.Header["Location"][0],
+			"message":  string(resp.Body),
+		}]
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == "/" {
+				w.Header().Set("Location", "/file")
+				w.Header().Set("Content-Length", "2")
+				w.WriteHeader(http.StatusFound)
+				_, _ = w.Write([]byte("{}"))
+				return
+			}
+			_, _ = w.Write([]byte("hello"))
+		},
+		want: []map[string]any{
+			{
+				"status":   "found",
+				"location": "/file",
+				"message":  "{}",
 			},
 		},
 	},

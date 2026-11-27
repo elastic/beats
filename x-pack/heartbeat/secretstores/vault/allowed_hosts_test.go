@@ -11,8 +11,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/secretstores"
@@ -105,7 +105,7 @@ func TestAllowedHosts(t *testing.T) {
 				destinations = pf.Destinations
 			}
 
-			_, err = secretstores.NewResolver(logptest.NewTestingLogger(t, "")).Resolve(cfg, destinations)
+			_, _, err = secretstores.NewResolver(logptest.NewTestingLogger(t, "")).Resolve(cfg, destinations)
 			if tc.wantErr == "" {
 				assert.NoError(t, err, "the monitor must be allowed")
 				return

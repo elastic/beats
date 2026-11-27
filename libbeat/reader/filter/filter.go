@@ -23,8 +23,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/match"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/match"
 	"github.com/elastic/go-concert/ctxtool"
 )
 

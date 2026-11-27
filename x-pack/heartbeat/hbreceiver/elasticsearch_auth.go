@@ -17,7 +17,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/beater"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 const elasticsearchRequestTimeout = 10 * time.Second
@@ -33,7 +33,7 @@ func beatsAuthStartHook(
 	ctx context.Context,
 	reference string,
 	heartbeat *beater.Heartbeat,
-	userAgent string,
+	userAgent func() string,
 	logger *logp.Logger,
 	setRequester func(*eslegclient.Connection),
 ) func(component.Host) error {
@@ -65,7 +65,7 @@ func beatsAuthStartHook(
 			return fmt.Errorf("heartbeat instance was not captured for monitor_state.elasticsearch extension %q", extensionID.String())
 		}
 
-		requester, err := newESClient(ctx, auth, userAgent, logger)
+		requester, err := newESClient(ctx, auth, userAgent(), logger)
 		if err != nil {
 			if ctx.Err() != nil {
 				return ctx.Err()

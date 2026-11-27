@@ -25,7 +25,7 @@ import (
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap/zaptest"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // ── helpers ──────────────────────────────────────────────────────────────────

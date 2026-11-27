@@ -25,8 +25,8 @@ import (
 	"github.com/shirou/gopsutil/v4/net"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/pkg/systemmetrics/metric/system/resolve"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -155,7 +155,7 @@ func calculateConnStats(conns []net.ConnectionStat) mapstr.M {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// all network connections
-	conns, err := connections("inet")
+	conns, err := connections(m.mod, "inet")
 
 	if err != nil {
 		return fmt.Errorf("error getting connections: %w", err)

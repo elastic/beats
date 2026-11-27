@@ -15,10 +15,10 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	sqlmod "github.com/elastic/beats/v7/x-pack/metricbeat/module/sql"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/sql/query/cursor"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // represents the response format of the query

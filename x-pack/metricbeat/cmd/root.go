@@ -16,8 +16,8 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	mbcmd "github.com/elastic/beats/v7/metricbeat/cmd"
 	"github.com/elastic/beats/v7/metricbeat/cmd/test"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	// Register the includes.
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"

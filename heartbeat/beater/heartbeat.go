@@ -25,8 +25,8 @@ import (
 	"syscall"
 	"time"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
@@ -112,7 +112,7 @@ func newHeartbeat(b *beat.Beat, rawConfig *conf.C, schedulerGroup string) (beat.
 
 	// Check if any of these can prevent using states client
 	stateLoader, replaceStateLoader := monitorstate.AtomicStateLoader(monitorstate.NilStateLoader, logger)
-	if b.Config.Output.Name() == "elasticsearch" && !b.Manager.Enabled() {
+	if b.Config.Output.Name() == "elasticsearch" && !management.UnderAgent() {
 		// Connect to ES and setup the State loader if the output is not managed by agent
 		// Note this, intentionally, blocks until connected or max attempts reached
 		esClient, err := makeESClient(context.TODO(), b.Config.Output.Config(), 3, 2*time.Second, logger, b.Info)
@@ -126,7 +126,7 @@ func newHeartbeat(b *beat.Beat, rawConfig *conf.C, schedulerGroup string) (beat.
 		} else {
 			replaceStateLoader(monitorstate.MakeESLoader(esClient, monitorstate.DefaultDataStreams, parsedConfig.RunFrom, logger))
 		}
-	} else if b.Manager.Enabled() {
+	} else if b.Manager.ConfigFromControlProtocol() {
 		stateLoader, replaceStateLoader = monitorstate.DeferredStateLoader(monitorstate.NilStateLoader, 15*time.Second, logger)
 	}
 
@@ -208,8 +208,6 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		bt.monitorFactory = bt.otelStatusFactoryWrapper(invalidMonitorFactory{RunnerFactory: bt.monitorFactory, logger: bt.logger})
 	}
 
-	waitMonitors := monitors.NewSignalWait()
-
 	// It is important this appear before we check for run once mode
 	// In run once mode we depend on these monitors being loaded, but not other more
 	// dynamic types.
@@ -219,12 +217,9 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	}
 	defer stopStaticMonitors()
 
-	if bt.config.RunOnce {
-		waitMonitors.Add(monitors.WithLog(sched.WaitForRunOnce, "Ending run_once run.", bt.logger))
-	}
-
-	if b.Manager.Enabled() {
-		bt.RunCentralMgmtMonitors(b)
+	if b.Manager.ConfigFromControlProtocol() {
+		stopCentralMgmt := bt.RunCentralMgmtMonitors(b)
+		defer stopCentralMgmt()
 	}
 
 	if bt.config.ConfigMonitors.Enabled() {
@@ -252,9 +247,16 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		defer bt.autodiscover.Stop()
 	}
 
-	// Wait until run_once ends or bt is being shut down
-	waitMonitors.AddChan(bt.done)
-	waitMonitors.Wait()
+	// Wait until run_once ends or bt is being shut down. Outside of run_once
+	// only bt.done can end the wait, so don't spend goroutines on a signalWait.
+	if bt.config.RunOnce {
+		waitMonitors := monitors.NewSignalWait()
+		waitMonitors.Add(monitors.WithLog(sched.WaitForRunOnce, "Ending run_once run.", bt.logger))
+		waitMonitors.AddChan(bt.done)
+		waitMonitors.Wait()
+	} else {
+		<-bt.done
+	}
 
 	bt.logger.Info("Shutting down, waiting for output to complete")
 
@@ -278,6 +280,14 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 // RunStaticMonitors runs the `heartbeat.monitors` portion of the yaml config if present.
 func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat, pipeline beat.Pipeline) (stop func(), err error) {
 	runners := make([]cfgfile.Runner, 0, len(bt.config.Monitors))
+	enabledMonitors := make([]*conf.C, 0, len(bt.config.Monitors))
+	for _, cfg := range bt.config.Monitors {
+		if cfg.Enabled() {
+			enabledMonitors = append(enabledMonitors, cfg)
+		}
+	}
+	cfgfile.SetRunnerConfigs(bt.monitorFactory, bt, enabledMonitors)
+
 	for _, cfg := range bt.config.Monitors {
 		created, err := bt.monitorFactory.Create(pipeline, cfg)
 		if err != nil {
@@ -301,8 +311,9 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat, pipeline beat.Pipeline) (st
 	return stop, nil
 }
 
-// RunCentralMgmtMonitors loads any central management configured configs.
-func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
+// RunCentralMgmtMonitors loads any central management configured configs and
+// returns a function that stops all managed monitors on shutdown.
+func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) func() {
 	// Register output reloader for managed outputs
 	b.OutputConfigReloader = reload.ReloadableFunc(func(r *reload.ConfigWithMeta) error {
 		// Do not return error here, it will prevent libbeat output from processing the same event
@@ -328,6 +339,7 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 
 	inputs := hbrunner.NewHBRunnerList(management.DebugK, bt.monitorFactory, b.Publisher, b.Info.Logger)
 	b.Registry.MustRegisterInput(inputs)
+	return inputs.Stop
 }
 
 // RunReloadableMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.

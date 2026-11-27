@@ -7,11 +7,30 @@ package collections
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+// wantTypeErr describes an expected *json.UnmarshalTypeError. Tests match its
+// fields instead of its message, because the message text differs between the
+// encoding/json v1 and v2 implementations.
+type wantTypeErr struct {
+	Value string
+	Type  reflect.Type
+}
+
+func requireUnmarshalTypeErr(t *testing.T, err error, want *wantTypeErr) {
+	t.Helper()
+
+	var typeErr *json.UnmarshalTypeError
+	require.ErrorAs(t, err, &typeErr, "expected a JSON unmarshal type error, got: %v", err)
+	assert.Equal(t, want.Value, typeErr.Value, "unexpected JSON value kind in type error")
+	assert.Equal(t, want.Type, typeErr.Type, "unexpected Go type in type error")
+}
 
 const (
 	testUUID1Str = "187f924c-e867-477e-8d74-dd762d6379dd"
@@ -68,9 +87,9 @@ func TestNewUUIDSet(t *testing.T) {
 
 func TestUUIDSet_UnmarshalJSON(t *testing.T) {
 	tests := map[string]struct {
-		In      []byte
-		Want    UUIDSet
-		WantErr string
+		In          []byte
+		Want        UUIDSet
+		WantTypeErr *wantTypeErr
 	}{
 		"ok-nil": {
 			In:   []byte(`null`),
@@ -93,12 +112,12 @@ func TestUUIDSet_UnmarshalJSON(t *testing.T) {
 			Want: NewUUIDSet(testUUID1, testUUID2),
 		},
 		"err-mixed-types": {
-			In:      fmt.Appendf(nil, `["%s",0]`, testUUID1Str),
-			WantErr: "json: cannot unmarshal number into Go value of type uuid.UUID",
+			In:          fmt.Appendf(nil, `["%s",0]`, testUUID1Str),
+			WantTypeErr: &wantTypeErr{Value: "number", Type: reflect.TypeFor[uuid.UUID]()},
 		},
 		"err-not-list-str": {
-			In:      fmt.Appendf(nil, `"%s"`, testUUID1Str),
-			WantErr: "json: cannot unmarshal string into Go value of type []uuid.UUID",
+			In:          fmt.Appendf(nil, `"%s"`, testUUID1Str),
+			WantTypeErr: &wantTypeErr{Value: "string", Type: reflect.TypeFor[[]uuid.UUID]()},
 		},
 	}
 
@@ -110,8 +129,8 @@ func TestUUIDSet_UnmarshalJSON(t *testing.T) {
 
 			gotErr := json.Unmarshal(tc.In, &s)
 
-			if tc.WantErr != "" {
-				require.ErrorContains(t, gotErr, tc.WantErr)
+			if tc.WantTypeErr != nil {
+				requireUnmarshalTypeErr(t, gotErr, tc.WantTypeErr)
 			} else {
 				require.NoError(t, gotErr)
 				require.Equal(t, tc.Want, s)

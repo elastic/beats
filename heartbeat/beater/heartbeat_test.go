@@ -29,10 +29,11 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
 )
 
 type fakeElasticsearchRequester struct {
@@ -86,4 +87,41 @@ func TestMakeESClient(t *testing.T) {
 		require.NoError(t, err)
 		assert.EqualValues(t, origTimeout, timeout)
 	})
+}
+
+func TestRunCentralMgmtMonitorsStop(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	factory := &fakeFactory{runners: map[string]*fakeRunner{}}
+	bt := &Heartbeat{
+		config:         &config.Config{},
+		monitorFactory: factory,
+		logger:         logger,
+	}
+	b := &beat.Beat{
+		Info:     beat.Info{Logger: logger},
+		Registry: reload.NewRegistry(),
+	}
+
+	stop := bt.RunCentralMgmtMonitors(b)
+
+	c1, err := conf.NewConfigFrom(map[string]any{"id": "mon-1"})
+	require.NoError(t, err, "could not build first monitor config")
+	c2, err := conf.NewConfigFrom(map[string]any{"id": "mon-2"})
+	require.NoError(t, err, "could not build second monitor config")
+
+	err = b.Registry.GetInputList().Reload([]*reload.ConfigWithMeta{
+		{Config: c1},
+		{Config: c2},
+	})
+	require.NoError(t, err, "reloading managed monitors should succeed")
+	require.Len(t, factory.runners, 2, "both managed monitors should be created")
+	for id, r := range factory.runners {
+		assert.True(t, r.started, "managed monitor %s should be started", id)
+		assert.False(t, r.stopped, "managed monitor %s should still be running before stop", id)
+	}
+
+	stop()
+	for id, r := range factory.runners {
+		assert.True(t, r.stopped, "managed monitor %s must be stopped on shutdown", id)
+	}
 }

@@ -26,7 +26,8 @@
 //
 // References are only replaced in the configuration copy given to the monitor
 // plugin. Everywhere else (config hashing, diagnostics, std fields) they stay
-// as text.
+// as text. The values that replaced them are removed from the events and
+// errors of the monitor, see Scrubber.
 package secretstores
 
 import (
@@ -35,8 +36,8 @@ import (
 	"regexp"
 	"sync"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // ConfigKey is the monitor setting holding the secret store connections.
@@ -51,10 +52,14 @@ type Store interface {
 	Validate(cfg *conf.C, scope Scope) error
 	// Replace returns a copy of the monitor config cfg with the references
 	// of scope replaced by their secret values, and the others left as they
-	// are. cfg must not be modified. Without references of scope, it must
+	// are. cfg must not be modified. It must call Track with ctx for every
+	// secret value it puts in the copy. Without references of scope, it must
 	// return cfg itself: allowed_hosts only applies to connections whose
 	// references were replaced.
 	Replace(ctx context.Context, cfg *conf.C, scope Scope) (*conf.C, error)
+	// Close clears cached secrets and releases resources held by the store
+	// when it is evicted from the cache.
+	Close() error
 }
 
 // Factory creates a Store from one secret_stores entry. It must validate the
@@ -98,15 +103,20 @@ func lookupFactory(storeType string) (Factory, bool) {
 	return f, ok
 }
 
-// storeCache keeps one Store per connection identity. The number of distinct
-// connections is small, so entries are never evicted.
+type cachedStore struct {
+	store Store
+	refs  int
+}
+
+// storeCache keeps one reference-counted Store per connection identity.
+// Entries are evicted and closed when their last reference is released.
 type storeCache struct {
 	mu     sync.Mutex
-	stores map[string]Store
+	stores map[string]*cachedStore
 }
 
 func newStoreCache() *storeCache {
-	return &storeCache{stores: map[string]Store{}}
+	return &storeCache{stores: map[string]*cachedStore{}}
 }
 
 // get returns the Store for the connection of e, creating it on first use.
@@ -115,18 +125,52 @@ func (c *storeCache) get(e entry, logger *logp.Logger) (Store, error) {
 	if err != nil {
 		return nil, fmt.Errorf("%s: %q entry: %w", ConfigKey, e.storeType, err)
 	}
+	return c.getOrCreate(id, e, logger, 0)
+}
 
+// acquire returns the Store for id/e, creating it on first use and incrementing
+// its reference count. Each acquire must be matched by a release of id.
+func (c *storeCache) acquire(id string, e entry, logger *logp.Logger) (Store, error) {
+	return c.getOrCreate(id, e, logger, 1)
+}
+
+func (c *storeCache) getOrCreate(id string, e entry, logger *logp.Logger, refDelta int) (Store, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if s, ok := c.stores[id]; ok {
-		return s, nil
+	if cs, ok := c.stores[id]; ok {
+		cs.refs += refDelta
+		return cs.store, nil
 	}
 	s, err := newStore(e, logger)
 	if err != nil {
 		return nil, err
 	}
-	c.stores[id] = s
+	c.stores[id] = &cachedStore{store: s, refs: refDelta}
 	return s, nil
+}
+
+// release decrements the reference count for each id and evicts and closes
+// stores that have no remaining references.
+func (c *storeCache) release(logger *logp.Logger, ids ...string) {
+	for _, id := range ids {
+		c.mu.Lock()
+		cs, ok := c.stores[id]
+		if !ok {
+			c.mu.Unlock()
+			continue
+		}
+		cs.refs--
+		if cs.refs > 0 {
+			c.mu.Unlock()
+			continue
+		}
+		delete(c.stores, id)
+		c.mu.Unlock()
+
+		if err := cs.store.Close(); err != nil && logger != nil {
+			logger.Warnf("Could not close secret store: %v", err)
+		}
+	}
 }
 
 func newStore(e entry, logger *logp.Logger) (Store, error) {

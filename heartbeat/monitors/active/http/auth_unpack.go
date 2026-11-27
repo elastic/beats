@@ -23,7 +23,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
-	conf "github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/beats/v7/pkg/config"
 )
 
 // kerberosSettings unpacks a nested object or a base64 YAML/JSON string.

@@ -23,7 +23,7 @@ import (
 
 	"github.com/elastic/go-concert/timed"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 // runCleaner periodically removes finished entries from the registry.

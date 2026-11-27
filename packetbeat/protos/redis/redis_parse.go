@@ -24,7 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/pkg/logp"
 )
 
 type parser struct {
@@ -366,6 +366,12 @@ func (p *parser) parseString(buf *streambuf.Buffer) (common.NetString, bool, boo
 	return common.NetString(content), true, true
 }
 
+// maxArrayDepth is the maximum number of nested arrays the parser accepts.
+// Real Redis traffic nests only a few levels. Without a limit, a stream of
+// repeated "*1\r\n" would recur once per 4 bytes until the goroutine stack
+// overflows, which is a fatal error that cannot be recovered.
+const maxArrayDepth = 32
+
 func (p *parser) parseArray(depth int, buf *streambuf.Buffer) (common.NetString, bool, bool, bool) {
 	line, err := buf.UntilCRLF()
 	if err != nil {
@@ -394,6 +400,13 @@ func (p *parser) parseArray(depth int, buf *streambuf.Buffer) (common.NetString,
 	} else if count == 0 {
 		// should not happen, but handle just in case ParseInt did return 0
 		return emptyArr, false, true, true
+	}
+
+	// Nil and empty arrays above do not recur, so only a non-empty array
+	// is limited.
+	if depth >= maxArrayDepth {
+		p.logger.Debugf("Array nesting exceeds the maximum depth of %d", maxArrayDepth)
+		return empty, false, false, false
 	}
 
 	// invariant: count > 0

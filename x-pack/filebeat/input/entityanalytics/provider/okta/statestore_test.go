@@ -14,9 +14,9 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta/internal/okta"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestStateStore(t *testing.T) {

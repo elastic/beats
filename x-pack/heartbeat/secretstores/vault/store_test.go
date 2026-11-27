@@ -9,12 +9,15 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
+	"encoding/pem"
 	"errors"
 	"fmt"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
@@ -25,11 +28,14 @@ import (
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v3"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/secretstores"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/redact"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/redact"
 )
 
 const (
@@ -59,6 +65,10 @@ type fakeVault struct {
 	logins      int
 	lookups     int
 	reads       int
+	revokes     int
+	revokedToks []string
+	revokeErr   int // HTTP status returned on revoke-self when > 0
+	revokeBlock chan struct{}
 	unavailable int // number of reads answered with 503
 	requests    []*http.Request
 	nextToken   int
@@ -102,6 +112,27 @@ func (fv *fakeVault) handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch {
+	case (r.Method == http.MethodPut || r.Method == http.MethodPost) && r.URL.Path == "/v1/auth/token/revoke-self":
+		block := fv.revokeBlock
+		if block != nil {
+			fv.mu.Unlock()
+			select {
+			case <-block:
+			case <-r.Context().Done():
+				fv.mu.Lock()
+				return
+			}
+			fv.mu.Lock()
+		}
+		fv.revokes++
+		tok := r.Header.Get("X-Vault-Token")
+		fv.revokedToks = append(fv.revokedToks, tok)
+		if fv.revokeErr > 0 {
+			writeJSON(fv.revokeErr, map[string]any{"errors": []string{"revoke failed"}})
+			return
+		}
+		delete(fv.validTokens, tok)
+		w.WriteHeader(http.StatusNoContent)
 	case r.Method == http.MethodPut || r.Method == http.MethodPost:
 		if r.URL.Path != "/v1/auth/approle/login" {
 			writeJSON(http.StatusNotFound, map[string]any{"errors": []string{"no handler for route"}})
@@ -173,6 +204,30 @@ func (fv *fakeVault) lookupCount() int {
 	fv.mu.Lock()
 	defer fv.mu.Unlock()
 	return fv.lookups
+}
+
+func (fv *fakeVault) revokeState() (count int, tokens []string) {
+	fv.mu.Lock()
+	defer fv.mu.Unlock()
+	return fv.revokes, append([]string(nil), fv.revokedToks...)
+}
+
+func (fv *fakeVault) isTokenValid(token string) bool {
+	fv.mu.Lock()
+	defer fv.mu.Unlock()
+	return fv.validTokens[token]
+}
+
+func (fv *fakeVault) setRevokeError(status int) {
+	fv.mu.Lock()
+	defer fv.mu.Unlock()
+	fv.revokeErr = status
+}
+
+func (fv *fakeVault) setRevokeBlock(ch chan struct{}) {
+	fv.mu.Lock()
+	defer fv.mu.Unlock()
+	fv.revokeBlock = ch
 }
 
 func (fv *fakeVault) deny(path string) {
@@ -265,8 +320,69 @@ func TestConfigValidation(t *testing.T) {
 		entry   map[string]any
 		wantErr string
 	}{
-		{name: "token", entry: tokenEntry("https://vault:8200")},
-		{name: "approle", entry: appRoleEntry("http://vault:8200")},
+		{name: "token over verified https", entry: tokenEntry("https://vault:8200")},
+		{name: "approle over loopback http", entry: appRoleEntry("http://localhost:8200")},
+		{name: "remote http hostname", entry: tokenEntry("http://vault:8200"), wantErr: "must use https unless its host is loopback"},
+		{name: "remote http with loopback userinfo", entry: tokenEntry("http://localhost@vault.example:8200"), wantErr: "must use https unless its host is loopback"},
+		{name: "remote http hostname resolving to loopback", entry: tokenEntry("http://127.0.0.1.nip.io:8200"), wantErr: "must use https unless its host is loopback"},
+		{name: "remote http private IPv4", entry: tokenEntry("http://10.0.0.5:8200"), wantErr: "must use https unless its host is loopback"},
+		{name: "remote http IPv6", entry: tokenEntry("http://[2001:db8::1]:8200"), wantErr: "must use https unless its host is loopback"},
+		{name: "localhost http", entry: tokenEntry("http://localhost:8200")},
+		{name: "mixed-case localhost http", entry: tokenEntry("http://LOCALHOST:8200")},
+		{name: "IPv4 loopback http", entry: tokenEntry("http://127.42.0.1:8200")},
+		{name: "IPv6 loopback http", entry: tokenEntry("http://[::1]:8200")},
+		{name: "expanded IPv6 loopback http", entry: tokenEntry("http://[0:0:0:0:0:0:0:1]:8200")},
+		{
+			name: "remote https without verification",
+			entry: map[string]any{
+				"address": "https://vault:8200",
+				"auth":    map[string]any{"token": "x"},
+				"ssl":     map[string]any{"verification_mode": "none"},
+			},
+			wantErr: "'ssl.verification_mode' must be 'full' or 'strict' unless the address host is loopback",
+		},
+		{
+			name: "remote https without hostname verification",
+			entry: map[string]any{
+				"address": "https://vault:8200",
+				"auth":    map[string]any{"token": "x"},
+				"ssl":     map[string]any{"verification_mode": "certificate"},
+			},
+			wantErr: "'ssl.verification_mode' must be 'full' or 'strict' unless the address host is loopback",
+		},
+		{
+			name: "remote https with strict verification",
+			entry: map[string]any{
+				"address": "https://vault:8200",
+				"auth":    map[string]any{"token": "x"},
+				"ssl":     map[string]any{"verification_mode": "strict"},
+			},
+		},
+		{
+			name: "remote https with disabled ssl settings and no verification",
+			entry: map[string]any{
+				"address": "https://vault:8200",
+				"auth":    map[string]any{"token": "x"},
+				"ssl":     map[string]any{"enabled": false, "verification_mode": "none"},
+			},
+			wantErr: "'ssl.verification_mode' must be 'full' or 'strict' unless the address host is loopback",
+		},
+		{
+			name: "loopback https without verification",
+			entry: map[string]any{
+				"address": "https://[::1]:8200",
+				"auth":    map[string]any{"token": "x"},
+				"ssl":     map[string]any{"verification_mode": "none"},
+			},
+		},
+		{
+			name: "loopback https without hostname verification",
+			entry: map[string]any{
+				"address": "https://localhost:8200",
+				"auth":    map[string]any{"token": "x"},
+				"ssl":     map[string]any{"verification_mode": "certificate"},
+			},
+		},
 		{name: "missing address", entry: map[string]any{"auth": map[string]any{"token": "x"}}, wantErr: "'address' is required"},
 		{name: "bad address", entry: map[string]any{"address": "vault:8200", "auth": map[string]any{"token": "x"}}, wantErr: "must be an http or https URL"},
 		{name: "no auth", entry: map[string]any{"address": "https://vault"}, wantErr: "'auth' must have one method"},
@@ -286,12 +402,13 @@ func TestConfigValidation(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			cfg, err := conf.NewConfigFrom(tc.entry)
 			require.NoError(t, err, "test entry must be valid")
-			_, err = newStore(cfg, logptest.NewTestingLogger(t, ""))
+			store, err := newStore(cfg, logptest.NewTestingLogger(t, ""))
 			if tc.wantErr == "" {
 				assert.NoError(t, err, "config must be valid")
 				return
 			}
 			assert.ErrorContains(t, err, tc.wantErr, "config must be rejected")
+			assert.Nil(t, store, "invalid config must not create a store that can send credentials")
 		})
 	}
 }
@@ -348,6 +465,27 @@ func TestTokenAuth(t *testing.T) {
 	assert.Equal(t, testToken, req.Header.Get("X-Vault-Token"), "the configured token must be sent")
 	assert.Equal(t, "admin/team-a", req.Header.Get("X-Vault-Namespace"), "the configured namespace must be sent")
 	assert.Equal(t, "true", req.Header.Get("X-Vault-Request"), "the Vault request header must be sent")
+}
+
+func TestResolvedSecretsAreScrubbed(t *testing.T) {
+	fv := newFakeVault(t)
+	entry := tokenEntry(fv.address)
+	entry["type"] = storeType
+	entry["name"] = "main"
+	cfg, err := conf.NewConfigFrom(map[string]any{
+		"url":                  "https://host/?token=vault://main@myapp/creds#password",
+		secretstores.ConfigKey: []any{entry},
+	})
+	require.NoError(t, err, "monitor config must be valid")
+
+	resolved, scrubber, err := secretstores.NewResolver(logptest.NewTestingLogger(t, "")).Resolve(cfg, nil)
+	require.NoError(t, err, "references must resolve")
+	target, err := resolved.String("url", -1)
+	require.NoError(t, err, "resolved config must have the url")
+	require.Contains(t, target, testPassword, "the reference must be replaced")
+
+	require.NotNil(t, scrubber, "resolved secrets must be scrubbed")
+	assert.Equal(t, "https://host/?token=<hidden>", scrubber.String(target), "the secret must be removed")
 }
 
 func TestTokenAuthRejectedIsNotRetried(t *testing.T) {
@@ -698,4 +836,196 @@ func TestSecretsAreNotLogged(t *testing.T) {
 		assert.False(t, found, "%q must not be logged", secret)
 		logger.ResetOffset()
 	}
+}
+
+func TestClose(t *testing.T) {
+	t.Run("approle revokes token and clears state", func(t *testing.T) {
+		fv := newFakeVault(t)
+		s, _, _ := newTestStore(t, appRoleEntry(fv.address), nil)
+
+		_, err := s.resolve(context.Background(), "myapp/creds#password")
+		require.NoError(t, err, "secret must be read")
+		token := s.client.Token()
+
+		require.NoError(t, s.Close(), "closing AppRole store must revoke token")
+		require.NoError(t, s.Close(), "closing twice must be a no-op")
+
+		revokes, revokedToks := fv.revokeState()
+		assert.Equal(t, 1, revokes, "revoke-self must be called once")
+		assert.Equal(t, []string{token}, revokedToks, "revoke-self must revoke the acquired AppRole token")
+		assert.False(t, fv.isTokenValid(token), "token must no longer be valid in Vault")
+		assert.Empty(t, s.client.Token(), "client token must be cleared")
+		assert.Empty(t, s.cfg.Auth.AppRole.RoleID, "role_id must be cleared")
+		assert.Empty(t, s.cfg.Auth.AppRole.SecretID, "secret_id must be cleared")
+		assert.Empty(t, s.cache, "cached secrets must be cleared")
+
+		_, err = s.resolve(context.Background(), "myapp/creds#password")
+		assert.ErrorIs(t, err, errStoreClosed, "resolve after close must fail")
+		logins, _ := fv.counts()
+		assert.Equal(t, 1, logins, "closed store must not log in again")
+	})
+
+	t.Run("approle without login does not revoke", func(t *testing.T) {
+		fv := newFakeVault(t)
+		s, _, _ := newTestStore(t, appRoleEntry(fv.address), nil)
+
+		require.NoError(t, s.Close(), "closing unused AppRole store must succeed")
+		revokes, _ := fv.revokeState()
+		assert.Zero(t, revokes, "unused store must not call revoke-self")
+		assert.Empty(t, s.cfg.Auth.AppRole.SecretID, "secret_id must be cleared")
+	})
+
+	t.Run("static token is not revoked", func(t *testing.T) {
+		fv := newFakeVault(t)
+		s, _, _ := newTestStore(t, tokenEntry(fv.address), nil)
+
+		_, err := s.resolve(context.Background(), "myapp/creds#password")
+		require.NoError(t, err, "secret must be read")
+		require.NoError(t, s.Close(), "closing static-token store must succeed")
+
+		revokes, _ := fv.revokeState()
+		assert.Zero(t, revokes, "static token must not be revoked")
+		assert.True(t, fv.isTokenValid(testToken), "static token must stay valid in Vault")
+		assert.Empty(t, s.client.Token(), "client token must be cleared")
+		assert.Empty(t, s.cfg.Auth.Token, "configured token must be cleared")
+		assert.Empty(t, s.cache, "cached secrets must be cleared")
+	})
+
+	t.Run("revoke error and timeout still clear state", func(t *testing.T) {
+		for _, tc := range []struct {
+			name  string
+			setup func(*fakeVault)
+		}{
+			{name: "vault 500", setup: func(fv *fakeVault) { fv.setRevokeError(http.StatusInternalServerError) }},
+			{name: "timeout", setup: func(fv *fakeVault) {
+				prev := revokeTimeout
+				revokeTimeout = 50 * time.Millisecond
+				t.Cleanup(func() { revokeTimeout = prev })
+				block := make(chan struct{})
+				t.Cleanup(func() { close(block) })
+				fv.setRevokeBlock(block)
+			}},
+		} {
+			t.Run(tc.name, func(t *testing.T) {
+				fv := newFakeVault(t)
+				s, _, _ := newTestStore(t, appRoleEntry(fv.address), nil)
+				_, err := s.resolve(context.Background(), "myapp/creds#password")
+				require.NoError(t, err, "secret must be read")
+				token := s.client.Token()
+
+				tc.setup(fv)
+				err = s.Close()
+				assert.ErrorContains(t, err, "revoking AppRole token", "revoke failure must be reported")
+				assert.NotContains(t, err.Error(), token, "error must not leak the token")
+				assert.Empty(t, s.client.Token(), "client token must still be cleared")
+				assert.Empty(t, s.cache, "cached secrets must still be cleared")
+			})
+		}
+	})
+}
+
+func TestConcurrentResolveAndClose(t *testing.T) {
+	fv := newFakeVault(t)
+	s, _, _ := newTestStore(t, appRoleEntry(fv.address), nil)
+
+	var wg sync.WaitGroup
+	for range 8 {
+		wg.Go(func() {
+			for range 5 {
+				_, _ = s.resolve(context.Background(), "myapp/creds#password")
+			}
+		})
+	}
+	assert.NoError(t, s.Close(), "concurrent close must succeed")
+	wg.Wait()
+
+	assert.Empty(t, s.client.Token(), "client token must stay cleared")
+	assert.Empty(t, s.cache, "cache must stay empty")
+}
+
+func TestPluginRecoversAfterCAFileAppears(t *testing.T) {
+	fv := newFakeVault(t)
+	srv := httptest.NewTLSServer(http.HandlerFunc(fv.handle))
+	t.Cleanup(srv.Close)
+	caPath := filepath.Join(t.TempDir(), "ca.pem")
+	entry := tokenEntry(srv.URL)
+	entry["type"], entry["name"] = storeType, "main"
+	entry["ssl"] = map[string]any{"certificate_authorities": []string{caPath}}
+	cfg, err := conf.NewConfigFrom(map[string]any{
+		"type":                 "http",
+		"password":             "vault://main@myapp/creds#password",
+		secretstores.ConfigKey: []any{entry},
+	})
+	require.NoError(t, err, "monitor config must be valid")
+
+	logger := logptest.NewTestingLogger(t, "")
+	inner := plugin.PluginFactory{
+		Name: "test",
+		Make: func(_ string, cfg *conf.C, info beat.Info) (plugin.Plugin, error) {
+			password, err := cfg.String("password", -1)
+			require.NoError(t, err, "resolved password must be readable")
+			assert.Equal(t, testPassword, password, "plugin must receive the resolved secret")
+			return plugin.Plugin{
+				Endpoints: 1,
+				Logger:    info.Logger,
+				Jobs:      []jobs.Job{func(*beat.Event) ([]jobs.Job, error) { return nil, nil }},
+			}, nil
+		},
+	}
+	wrapped := secretstores.NewResolver(logger).WrapFactory(inner, secretstores.NewRedactor())
+	p, err := wrapped.Make("test", cfg, beat.Info{Logger: logger})
+	require.NoError(t, err, "store creation failure must be deferred to scheduled runs")
+	t.Cleanup(func() { assert.NoError(t, p.Close(), "plugin must close successfully") })
+	_, err = p.Jobs[0](&beat.Event{})
+	require.ErrorContains(t, err, "initial CA load failed", "missing CA must prevent store creation")
+
+	cert := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: srv.Certificate().Raw})
+	require.NoError(t, os.WriteFile(caPath, cert, 0600), "CA file must be provisioned")
+	_, err = p.Jobs[0](&beat.Event{})
+	require.NoError(t, err, "next run must recover without updating the config")
+	_, reads := fv.counts()
+	assert.Equal(t, 1, reads, "recovered store must read the secret")
+}
+
+func TestVaultStoreEvictedAndRevokedOnPluginClose(t *testing.T) {
+	fv := newFakeVault(t)
+	logger := logptest.NewTestingLogger(t, "")
+	inner := plugin.PluginFactory{
+		Name: "test",
+		Make: func(_ string, cfg *conf.C, info beat.Info) (plugin.Plugin, error) {
+			return plugin.Plugin{
+				Endpoints: 1,
+				Logger:    info.Logger,
+				Jobs:      []jobs.Job{func(*beat.Event) ([]jobs.Job, error) { return nil, nil }},
+			}, nil
+		},
+	}
+
+	wrapped := secretstores.NewResolver(logger).WrapFactory(inner, secretstores.NewRedactor())
+	entry := appRoleEntry(fv.address)
+	entry["type"] = storeType
+	entry["name"] = "main"
+	cfg, err := conf.NewConfigFrom(map[string]any{
+		"type":                 "http",
+		"password":             "vault://main@myapp/creds#password",
+		secretstores.ConfigKey: []any{entry},
+	})
+	require.NoError(t, err, "monitor config must be valid")
+
+	p1, err := wrapped.Make("test", cfg, beat.Info{Logger: logger})
+	require.NoError(t, err, "first plugin must be created")
+	require.NoError(t, p1.Close(), "closing plugin must succeed")
+
+	revokes, revokedToks := fv.revokeState()
+	assert.Equal(t, 1, revokes, "evicting the Vault store must revoke its AppRole token")
+	require.Len(t, revokedToks, 1, "one token must be revoked")
+	assert.False(t, fv.isTokenValid(revokedToks[0]), "revoked token must be invalid in Vault")
+
+	p2, err := wrapped.Make("test", cfg, beat.Info{Logger: logger})
+	require.NoError(t, err, "second plugin must be created")
+	defer func() { _ = p2.Close() }()
+
+	logins, reads := fv.counts()
+	assert.Equal(t, 2, logins, "recreated store must log in again after eviction")
+	assert.Equal(t, 2, reads, "recreated store must re-read after cache eviction")
 }

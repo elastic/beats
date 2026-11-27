@@ -24,6 +24,8 @@ Privilege requirements vary by backend.
 
     In Docker containers, add `--cap-add=SYS_ADMIN --cap-add=BPF` and mount `/sys` from the host.
 
+    {applies_to}`stack: preview 9.6.0` The backend must also run in the host PID namespace. In Docker, add `--pid=host`. In Kubernetes, set `hostPID: true` on the pod, as the reference DaemonSet manifest already does. The backend attributes each file event to the process that made the change by looking the process up in a table built from the host's `/proc` and kept current from kernel events. The kernel reports host process IDs, but without the host PID namespace the table is built from the container's own process IDs. Events from processes that were already running when Auditbeat started are then dropped, or attributed to the wrong process when a host process ID happens to match a container one. Auditbeat logs a warning at startup when it isn't running in the host PID namespace.
+
 **ETW (Windows only)**
 :   Requires Administrator privileges.
 
@@ -40,7 +42,7 @@ At startup this module will perform an initial scan of the configured files and 
 
 The operating system features that power this feature are as follows.
 
-* Linux - Multiple backends are supported: `auto`, `fsnotify`, `kprobes`, `ebpf`. By default, `fsnotify` is used, and therefore the kernel must have inotify support. Inotify was initially merged into the 2.6.13 Linux kernel. The eBPF backend uses modern eBPF features and supports 5.10.16+ kernels. The `Kprobes` backend uses tracefs and supports 3.10+ kernels. FSNotify doesn’t have the ability to associate user data to file events. The preferred backend can be selected by specifying the `backend` config option. Since eBPF and Kprobes are in technical preview, `auto` will default to `fsnotify`.
+* Linux - Multiple backends are supported: `auto`, `fsnotify`, `kprobes`, `ebpf`. By default, `fsnotify` is used, and therefore the kernel must have inotify support. Inotify was initially merged into the 2.6.13 Linux kernel. The eBPF backend uses modern eBPF features and supports 5.10.16+ kernels. The `Kprobes` backend uses tracefs and supports 3.10+ kernels. FSNotify doesn’t have the ability to associate user data to file events. The preferred backend can be selected by specifying the `backend` config option. Since eBPF and Kprobes are in technical preview, `auto` defaults to `fsnotify`.
 * macOS (Darwin) - Uses the `FSEvents` API, present since macOS 10.5. This API coalesces multiple changes to a file into a single event. Auditbeat translates this coalesced changes into a meaningful sequence of actions. However, in rare situations the reported events may have a different ordering than what actually happened.
 * Windows:
   * `ReadDirectoryChangesW` is used.
@@ -75,7 +77,8 @@ This module has some configuration options for tuning its behavior. The followin
   scan_at_start: true
   scan_rate_per_sec: 50 MiB
   max_file_size: 100 MiB
-  hash_types: [sha1]
+  # Default is sha1, or sha256 in FIPS builds.
+  #hash_types: [sha1]
 ```
 
 {applies_to}`stack: preview 9.2.0` For Windows with the ETW backend, additional configuration options are available:
@@ -118,6 +121,8 @@ This module also supports the [standard configuration options](#module-standard-
 
 **`hash_types`**
 :   A list of hash types to compute when the file changes. The supported hash types are `blake2b_256`, `blake2b_384`, `blake2b_512`, `md5`, `sha1`, `sha224`, `sha256`, `sha384`, `sha512`, `sha512_224`, `sha512_256`, `sha3_224`, `sha3_256`, `sha3_384`, `sha3_512`, and `xxh64`. The default value is `sha1`.
+
+    {applies_to}`stack: ga 9.1+` In FIPS builds, the default value is `sha256`, and the `blake2b_*`, `md5`, and `sha1` hash types aren't supported.
 
 **`file_parsers`**
 :   A list of `file_integrity` fields under `file` that will be populated by file format parsers. The available fields that can be analysed are listed in the auditbeat.reference.yml file. File parsers are run on all files within the `max_file_size` limit in the configured paths during a scan or when a file event involves the file. Files that are not targets of the specific file parser are only sniffed to examine whether analysis should proceed. This will usually only involve reading a small number of bytes.

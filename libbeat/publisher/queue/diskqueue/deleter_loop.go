@@ -22,7 +22,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/beats/v7/pkg/paths"
 )
 
 type deleterLoop struct {

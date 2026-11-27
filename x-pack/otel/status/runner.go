@@ -10,7 +10,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/pkg/config"
 
 	"github.com/gohugoio/hashstructure"
 )
@@ -30,10 +30,28 @@ func (s *statusFactory) Create(p beat.PipelineConnector, config *config.C) (cfgf
 		if err != nil {
 			return nil, err
 		}
-		statusReporter := s.reporter.GetReporterForRunner(inputId)
-		runnerWithStatus.SetStatusReporter(statusReporter)
+		// Runners whose config no caller passed to SetRunnerConfigs, such as
+		// the inputs of a Filebeat module, report no status.
+		if statusReporter := s.reporter.GetReporterForRunner(inputId); statusReporter != nil {
+			runnerWithStatus.SetStatusReporter(statusReporter)
+		}
 	}
 	return runner, nil
+}
+
+// SetRunnerConfigs sets the runners that report a status for source to the
+// runners of configs.
+func (s *statusFactory) SetRunnerConfigs(source any, configs []*config.C) {
+	ids := make([]string, 0, len(configs))
+	for _, c := range configs {
+		id, err := getInputId(c)
+		if err != nil {
+			// Create fails for this config as well, so it never runs
+			continue
+		}
+		ids = append(ids, id)
+	}
+	s.reporter.SetRunners(source, ids)
 }
 
 // Unwrap returns the wrapped factory, so callers can use its optional

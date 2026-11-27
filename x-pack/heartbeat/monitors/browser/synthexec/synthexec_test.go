@@ -22,11 +22,13 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/goleak"
 
 	hbconfig "github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp/logptest"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 func TestCheckGroupFromEvent(t *testing.T) {
@@ -91,7 +93,7 @@ func TestSyntheticsCrosslinkEnv(t *testing.T) {
 func TestLineToSynthEventFactory(t *testing.T) {
 	testType := "mytype"
 	testText := "sometext"
-	f := lineToSynthEventFactory(testType)
+	f := lineToSynthEventFactory(logptest.NewTestingLogger(t, ""), testType)
 	res, err := f([]byte(testText), testText)
 	require.NoError(t, err)
 	require.NotNil(t, res)
@@ -269,13 +271,52 @@ func TestRunTimeoutExitCodeCmd(t *testing.T) {
 	})
 }
 
+// TestRunCmdStartFailure checks that runCmd releases the results pipe and every
+// goroutine it started when the synthetics command cannot be started.
+func TestRunCmdStartFailure(t *testing.T) {
+	defer goleak.VerifyNone(t, goleak.IgnoreCurrent())
+
+	cmd := exec.CommandContext(t.Context(), "/dev/null/no-such-binary")
+
+	mpx, err := runCmd(t.Context(), logptest.NewTestingLogger(t, ""), &SynthCmd{cmd}, nil, nil, FilterJourneyConfig{}, stdfields.StdMonitorFields{}, "")
+	assert.Error(t, err, "runCmd should report that the command could not be started")
+	assert.Nil(t, mpx, "runCmd should not return a multiplexer when the command could not be started")
+
+	assert.Len(t, cmd.ExtraFiles, 2, "runCmd should pass both results pipe ends to the command")
+	for _, f := range cmd.ExtraFiles {
+		assert.ErrorIsf(t, f.Close(), os.ErrClosed, "runCmd should close results pipe end %s", f.Name())
+	}
+}
+
+// TestRunCmdLogsWithGivenLogger checks that runCmd logs the command and what
+// the runner prints with the logger it's given, which the monitor sets up to
+// remove the values of secret references.
+func TestRunCmdLogsWithGivenLogger(t *testing.T) {
+	const secret = "s3cr3t-token"
+	logger, logs := logptest.NewTestingLoggerWithObserver(t, "")
+	cmd := exec.CommandContext(t.Context(), "sh", "-c", `echo "token=`+secret+`"; echo "err=`+secret+`" >&2`)
+	ctx := context.WithValue(t.Context(), SynthexecTimeoutKey, time.Minute)
+
+	mpx, err := runCmd(ctx, logger, &SynthCmd{cmd}, nil, nil, FilterJourneyConfig{}, stdfields.StdMonitorFields{}, "")
+	require.NoError(t, err, "the command must start")
+	for se := range mpx.SynthEvents() {
+		if se == nil {
+			break
+		}
+	}
+
+	for _, want := range []string{"Running command", "stdout: token=" + secret, "stderr: err=" + secret} {
+		assert.NotEmpty(t, logs.FilterMessageSnippet(want).All(), "%q must be logged with the given logger", want)
+	}
+}
+
 func runAndCollect(t *testing.T, cmd *exec.Cmd, stdinStr string, cmdTimeout time.Duration) []*SynthEvent {
 	cwd, err := os.Getwd()
 	require.NoError(t, err)
 	cmd.Dir = filepath.Join(cwd, "testcmd")
 	ctx := context.WithValue(context.TODO(), SynthexecTimeoutKey, cmdTimeout)
 
-	mpx, err := runCmd(ctx, &SynthCmd{cmd}, &stdinStr, nil, FilterJourneyConfig{}, stdfields.StdMonitorFields{}, "")
+	mpx, err := runCmd(ctx, logptest.NewTestingLogger(t, ""), &SynthCmd{cmd}, &stdinStr, nil, FilterJourneyConfig{}, stdfields.StdMonitorFields{}, "")
 	require.NoError(t, err)
 
 	var synthEvents []*SynthEvent
