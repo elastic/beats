@@ -60,7 +60,7 @@ func setNodeProcAttr(localUserName string) error {
 
 	localUser, err := user.Lookup(localUserName)
 	if err != nil {
-		return fmt.Errorf("could not lookup '%s': %w", localUser, err)
+		return fmt.Errorf("could not lookup '%s': %w", localUserName, err)
 	}
 	localUserUID, err := strconv.Atoi(localUser.Uid)
 	if err != nil {
