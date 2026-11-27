@@ -114,18 +114,29 @@
 // the login / logout real-time modules, so existing installs carry legacy
 // dateTimeCursor state with first_event_time / last_event_time populated but
 // progress_time empty. nextObjectBatchWindow seeds the first post-upgrade
-// window from whichever of progress_time, first_event_time or
-// last_event_time is set, in that order, before falling back to
-// runEnd - initial_interval. Without that fallback the first batched run on
-// an upgraded install would either skip events (legacy watermark is older
-// than runEnd - initial_interval) or replay them (legacy watermark is
+// window from progress_time if set, otherwise from the newer of
+// first_event_time and last_event_time, before falling back to
+// runEnd - initial_interval. The newer of the two legacy watermarks is used
+// so the seed is correct regardless of the pre-upgrade template's sort order:
+// descending real-time templates (login / logout) persist the newest row as
+// first_event_time, while ascending ones (aura_request) persist it as
+// last_event_time. Seeding from first_event_time alone would restart an
+// ascending stream from the oldest row of the final pre-upgrade poll and
+// replay that whole range. Without the fallback entirely the first batched
+// run on an upgraded install would either skip events (legacy watermark is
+// older than runEnd - initial_interval) or replay them (legacy watermark is
 // newer), depending on how long ago the input last ran.
 //
-// runObjectBatches additionally snapshots the object dateTimeCursor before
-// each batched query and restores it on error, so a failed paginated window
-// retries the exact same (Start, End] bounds instead of re-advancing from
-// first/last_event_time values partially updated mid-window by
-// runObjectQuery.
+// On the batched path runObjectQuery does not advance first_event_time,
+// last_event_time or last_event_id at all; progress_time is the sole watermark
+// and runObjectBatches advances it only after a whole (Start, End] window has
+// been published. runObjectBatches additionally snapshots the object
+// dateTimeCursor before each batched query and restores it on error, so a
+// failed paginated window retries the exact same bounds. Together these ensure
+// a crash or page failure mid-window can never persist a cursor that skips
+// rows which were never durably ingested — the worst case is replaying the
+// window from the last durable progress_time, which the fingerprint _id makes
+// idempotent.
 //
 // The reverse transition is also migration-safe: if a user disables
 // batching after having persisted progress_time, objectCursor projects
