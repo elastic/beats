@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: 'Fix goroutine and watcher leaks on Auditbeat file_integrity module shutdown or reload.'
+component: auditbeat
+issue: https://github.com/elastic/beats/issues/54690
