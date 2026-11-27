@@ -176,10 +176,12 @@ func runMonitorOnce(t *testing.T, monitor map[string]any) func() []routedEvent {
 	factory := NewFactoryWithSettings(Settings{Home: t.TempDir()})
 	set := receiver.Settings{
 		ID: component.NewIDWithName(factory.Type(), t.Name()),
+		TelemetrySettings: component.TelemetrySettings{
+			// Not zaptest: monitors/logger keeps a process-wide logger, which would
+			// outlive this test and panic on the next subtest's run log.
+			Logger: zap.NewNop(),
+		},
 	}
-	// Not zaptest: monitors/logger keeps a process-wide logger, which would
-	// outlive this test and panic on the next subtest's run log.
-	set.Logger = zap.NewNop()
 	monitorType, ok := monitor["type"].(string)
 	require.True(t, ok, "monitor type must be a string")
 
