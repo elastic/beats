@@ -156,9 +156,19 @@ func tryOverrideOrDefault(cfg config, c container) container {
 	// means that the container level ReaderConfig is not set, and we should use the
 	// global ReaderConfig. Partial definition of ReaderConfig at both the global
 	// and container level is not supported, it's an either or scenario.
+	//
+	// MaxDecodeBytes is the exception: it is merged on its own, so that setting
+	// it at the container level does not discard the global decoding options,
+	// and a global value is not lost when a container sets its own decoding.
+	maxDecodeBytes := c.ReaderConfig.MaxDecodeBytes
+	c.ReaderConfig.MaxDecodeBytes = 0
 	if reflect.DeepEqual(c.ReaderConfig, defaultReaderConfig) {
 		c.ReaderConfig = cfg.ReaderConfig
 	}
+	if maxDecodeBytes == 0 {
+		maxDecodeBytes = cfg.ReaderConfig.MaxDecodeBytes
+	}
+	c.ReaderConfig.MaxDecodeBytes = maxDecodeBytes
 
 	// If the container level PathPrefix is empty, use the global PathPrefix.
 	if c.PathPrefix == "" {

@@ -195,9 +195,22 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 	if err != nil {
 		return fmt.Errorf("failed to add gzip decoder to blob: %s, with error: %w", *j.blob.Name, err)
 	}
+	var lr *limitedReader
+	if j.src.ReaderConfig.Decoding.Codec != nil {
+		// Bound the decompressed size; the parquet codec reads the whole
+		// stream into memory.
+		lr = newLimitedReader(r, decodeLimit(j.src.ReaderConfig))
+		r = lr
+	}
 	dec, err := decoder.NewDecoder(j.src.ReaderConfig.Decoding, r, j.log)
 	if err != nil {
 		return err
+	}
+	// NewDecoder discards the error from creating a codec, such as the parquet
+	// reader failing to read an oversize blob, and returns a nil decoder.
+	if lr.exceeded() {
+		j.status.UpdateStatus(status.Degraded, lr.err.Error())
+		return lr.err
 	}
 	var evtOffset int64
 	switch dec := dec.(type) {
@@ -214,7 +227,7 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 				return err
 			}
 			evt := j.createEvent(string(msg), offset)
-			j.publish(evt, !dec.More(), id)
+			j.publish(evt, lr.last(!dec.More()), id)
 		}
 
 	case decoder.Decoder:
@@ -230,7 +243,7 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 				return err
 			}
 			evt := j.createEvent(string(msg), evtOffset)
-			j.publish(evt, !dec.More(), id)
+			j.publish(evt, lr.last(!dec.More()), id)
 			evtOffset++
 		}
 
@@ -241,7 +254,74 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 		}
 	}
 
+	// The CSV decoder treats a read error as the end of the data, so report
+	// a limit overrun here rather than let it pass as a complete blob.
+	if lr.exceeded() {
+		j.status.UpdateStatus(status.Degraded, lr.err.Error())
+		return lr.err
+	}
 	return nil
+}
+
+// defaultMaxDecodeBytes is used when no limit has been configured.
+const defaultMaxDecodeBytes = 256 << 20
+
+// errBlobTooLarge is returned when a blob exceeds max_decode_bytes.
+var errBlobTooLarge = errors.New("blob exceeds max_decode_bytes")
+
+func decodeLimit(rc readerConfig) int64 {
+	if rc.MaxDecodeBytes <= 0 {
+		return defaultMaxDecodeBytes
+	}
+	return int64(rc.MaxDecodeBytes)
+}
+
+// limitedReader reads at most max bytes from r and returns errBlobTooLarge
+// rather than a silent EOF if the stream is longer than that.
+type limitedReader struct {
+	r   io.Reader
+	max int64
+	n   int64 // Bytes remaining.
+	err error
+}
+
+func newLimitedReader(r io.Reader, max int64) *limitedReader {
+	return &limitedReader{r: r, max: max, n: max}
+}
+
+func (l *limitedReader) Read(p []byte) (int, error) {
+	if l.err != nil {
+		return 0, l.err
+	}
+	// Read one byte past the limit so that overflow can be detected.
+	if int64(len(p)) > l.n+1 {
+		p = p[:l.n+1]
+	}
+	n, err := l.r.Read(p)
+	if int64(n) > l.n {
+		n = int(l.n)
+		l.n = 0
+		l.err = fmt.Errorf("%w (%d bytes)", errBlobTooLarge, l.max)
+		// Return the error with the data, even if the underlying reader
+		// returned io.EOF, so that readers such as io.ReadAll do not treat
+		// the truncated stream as complete.
+		return n, l.err
+	}
+	l.n -= int64(n)
+	return n, err
+}
+
+// exceeded returns whether the limit has been exceeded. It is safe to call
+// on a nil limitedReader.
+func (l *limitedReader) exceeded() bool {
+	return l != nil && l.err != nil
+}
+
+// last returns whether the event being published is the last in the blob and
+// so should save the checkpoint. A blob that overran the limit was not read
+// completely, so it is never complete and will be retried.
+func (l *limitedReader) last(atEnd bool) bool {
+	return atEnd && !l.exceeded()
 }
 
 func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) error {

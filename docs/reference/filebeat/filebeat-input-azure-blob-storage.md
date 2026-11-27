@@ -139,6 +139,7 @@ $$$supported-attributes$$$
 16. [path_prefix](#attrib-path_prefix) {applies_to}`stack: ga 9.1.4+`
 17. [custom_properties](#attrib-custom-properties) {applies_to}`stack: ga 9.1.0+`
 18. [retry](#attrib-retry) {applies_to}`stack: ga 9.3+`
+19. [max_decode_bytes](#attrib-max-decode-bytes-azureblobstorage) {applies_to}`stack: ga 9.7.0+`
 
 ## `account_name` [attrib-account-name]
 
@@ -312,6 +313,19 @@ An example config is shown below:
   decoding.codec.csv.comma: "\t"
   decoding.codec.csv.comment: "#"
 ```
+
+
+## `max_decode_bytes` [attrib-max-decode-bytes-azureblobstorage]
+
+```{applies_to}
+stack: ga 9.7.0+
+```
+
+The maximum number of bytes, after any gzip decompression, that a [`decoding`](#input-azure-blob-storage-decoding) codec will read from a single blob. This bounds the memory and processing used for each blob, since codecs may buffer the whole blob in memory. The default is `256MiB`. If it is unset or `0` the default is used, and the limit cannot be switched off, so set a larger value if you need to read larger blobs. It does not apply when no `decoding` codec is configured.
+
+A blob that is larger than the limit fails to decode and is reported as an error. A blob that has failed this way is not marked as processed, so it is read again at each poll until the limit is raised or the blob is removed. With the CSV codec the rows that were read before the limit was reached are published each time. With the parquet codec nothing is published.
+
+This attribute can be specified at the root level of the configuration and at the container level. A container that does not set it uses the root level value, and this does not depend on whether the container sets its own `decoding` options.
 
 
 ## `file_selectors` [attrib-file_selectors]

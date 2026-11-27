@@ -1,0 +1,12 @@
+kind: bug-fix
+summary: Limit the size of blobs decoded by the Azure Blob Storage input codecs.
+description: |
+  The Azure Blob Storage input read the whole of a blob into memory when the
+  parquet codec was configured, with no size limit. A very large blob could
+  exhaust Filebeat's memory. The new `max_decode_bytes` setting (default
+  256MiB, counted after gzip decompression) now limits what a `decoding`
+  codec reads from one blob. A parquet blob over the limit produces no events.
+  A CSV blob over the limit has the rows read before the limit published, and
+  is not marked as processed, so it is read again at each poll until the limit
+  is raised. Blobs read without a codec are not limited.
+component: filebeat

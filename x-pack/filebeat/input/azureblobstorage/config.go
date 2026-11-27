@@ -11,6 +11,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 
+	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	conf "github.com/elastic/beats/v7/pkg/config"
@@ -140,6 +141,20 @@ type readerConfig struct {
 	OverrideContentType bool `config:"override_content_type"`
 	// OverrideEncoding indicates whether to force the Encoding rather than inferring it.
 	OverrideEncoding bool `config:"override_encoding"`
+	// MaxDecodeBytes is the maximum number of bytes, after gzip decompression,
+	// that a decoding codec (CSV or Parquet) will read from a single blob. The
+	// Parquet codec buffers the whole blob in memory, so this bounds the memory
+	// a single blob can consume. A blob that exceeds the limit fails to decode.
+	// If it is zero or unset, defaultMaxDecodeBytes is used.
+	MaxDecodeBytes cfgtype.ByteSize `config:"max_decode_bytes"`
+}
+
+// Validate checks the reader configuration.
+func (rc readerConfig) Validate() error {
+	if rc.MaxDecodeBytes < 0 {
+		return fmt.Errorf("max_decode_bytes <%v> must not be negative", rc.MaxDecodeBytes)
+	}
+	return nil
 }
 
 // retryConfig tunes how the input copes with transient Azure Storage failures,
