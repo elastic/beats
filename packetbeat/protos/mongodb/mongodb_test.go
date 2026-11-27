@@ -369,6 +369,51 @@ func TestOpCodeNames(t *testing.T) {
 	}
 }
 
+// Exercise deprecated opcodes through the TCP plugin path (not only the parser).
+func TestAdditionalOpCodesInPluginContext(t *testing.T) {
+	tests := []struct {
+		name       string
+		opCode     int32
+		responseTo int32
+		wantMethod string
+	}{
+		{name: "OP_COMMAND", opCode: int32(opCommand), wantMethod: "command"},
+		{name: "OP_COMPRESSED", opCode: int32(opCompressed), wantMethod: "compressed"},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			results, mongodb := mongodbModForTests(t)
+
+			data := buildMinimalMongoMessage(tc.opCode, tc.responseTo)
+			tcptuple := testTCPTuple()
+			private := mongodb.Parse(
+				&protos.Packet{Payload: data},
+				tcptuple,
+				0,
+				protos.ProtocolData(new(mongodbConnectionData)),
+			)
+			assert.NotNil(t, private, "parser should accept known opcode")
+
+			trans := expectTransaction(t, results)
+			assert.Equal(t, tc.wantMethod, trans["method"])
+		})
+	}
+
+	t.Run("OP_COMMANDREPLY without matching request", func(t *testing.T) {
+		results, mongodb := mongodbModForTests(t)
+		data := buildMinimalMongoMessage(int32(opCommandRep), 1)
+		private := mongodb.Parse(
+			&protos.Packet{Payload: data},
+			testTCPTuple(),
+			0,
+			protos.ProtocolData(new(mongodbConnectionData)),
+		)
+		assert.NotNil(t, private)
+		assert.Empty(t, results.events, "orphan replies are cached until a request appears")
+	})
+}
+
 // Test for a (recovered) panic parsing document length in request/response messages
 func TestDocumentLengthBoundsChecked(t *testing.T) {
 

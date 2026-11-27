@@ -21,7 +21,24 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
 )
+
+func TestOpCodeNames_additionalOpcodes(t *testing.T) {
+	tests := []struct {
+		code opCode
+		name string
+	}{
+		{opCommand, "OP_COMMAND"},
+		{opCommandRep, "OP_COMMANDREPLY"},
+		{opCompressed, "OP_COMPRESSED"},
+	}
+
+	for _, tc := range tests {
+		assert.True(t, validOpcode(tc.code))
+		assert.Equal(t, tc.name, tc.code.String())
+	}
+}
 
 func TestSetFlagBits(t *testing.T) {
 	tests := []struct {
