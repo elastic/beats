@@ -10,6 +10,7 @@ on:
       - filebeat/**
       # OSS
       - go.mod
+      - .python-version
       - dev-tools/**
       - libbeat/**
       # Workflow
@@ -22,6 +23,7 @@ on:
       - filebeat/**
       # OSS
       - go.mod
+      - .python-version
       - dev-tools/**
       - libbeat/**
       # Workflow
