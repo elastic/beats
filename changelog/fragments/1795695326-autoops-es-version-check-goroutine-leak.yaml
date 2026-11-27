@@ -1,0 +1,11 @@
+kind: bug-fix
+summary: Fix a goroutine leak in the autoops_es module that made memory grow on every fetch.
+description: |
+  Every fetch of every `autoops_es` metricset started a goroutine that waited for an
+  Elasticsearch version mismatch. When the version was supported, which is the normal
+  case, that goroutine never ended. Memory grew at a constant rate that depended on the
+  number of metricsets and their period, not on the size of the cluster, until the
+  process was OOMKilled. The goroutine is now only started when the version is not
+  supported.
+component: metricbeat
+issue: https://github.com/elastic/elastic-agent/issues/17523
