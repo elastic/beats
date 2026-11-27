@@ -100,7 +100,7 @@ require (
 	github.com/elastic/go-sfdc v0.0.0-20260504130806-a46e22d049d9
 	github.com/elastic/go-structform v0.0.12
 	github.com/elastic/go-sysinfo v1.15.5
-	github.com/elastic/go-ucfg v0.9.2
+	github.com/elastic/go-ucfg v0.9.3
 	github.com/elastic/go-windows v1.0.2
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/elastic/gosigar v0.14.4
@@ -269,8 +269,6 @@ require (
 	google.golang.org/protobuf v1.36.12
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/mcuadros/go-syslog.v2 v2.3.0
-	gopkg.in/yaml.v2 v2.4.0
-	gopkg.in/yaml.v3 v3.0.1
 	gotest.tools/gotestsum v1.7.0
 	howett.net/plist v1.0.1
 	k8s.io/api v0.37.1
@@ -567,6 +565,7 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20261019180522-ce908d29299b // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/klog/v2 v2.140.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20260821135717-be32def86098 // indirect
 	k8s.io/streaming v0.37.1 // indirect

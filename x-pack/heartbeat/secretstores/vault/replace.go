@@ -11,7 +11,7 @@ import (
 	"regexp"
 	"strings"
 
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 
 	conf "github.com/elastic/beats/v7/pkg/config"
 	ucfg "github.com/elastic/go-ucfg"
