@@ -15988,11 +15988,11 @@ Contents of probable licence file $GOMODCACHE/github.com/go-git/go-git/v5@v5.19.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/go-jose/go-jose/v4
-Version: v4.1.4
+Version: v4.1.6
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/go-jose/go-jose/v4@v4.1.4/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/go-jose/go-jose/v4@v4.1.6/LICENSE:
 
 
                                  Apache License
