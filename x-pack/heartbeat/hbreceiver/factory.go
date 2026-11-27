@@ -13,9 +13,12 @@ import (
 	"go.opentelemetry.io/collector/receiver"
 
 	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 
 	"github.com/elastic/beats/v7/heartbeat/beater"
 	"github.com/elastic/beats/v7/heartbeat/cmd"
+	"github.com/elastic/beats/v7/heartbeat/hbregistry"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 
@@ -103,6 +106,11 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 	}
 
 	hbReceiver := newHeartbeatReceiver(br)
+	// Heartbeat metrics are collector-wide, so they go to the diagnostics only,
+	// not to the receiver's registry, which is exported per receiver.
+	hbReceiver.SetDiagnosticsExtra(func() mapstr.M {
+		return mapstr.M{"heartbeat": monitoring.CollectStructSnapshot(hbregistry.StatsRegistry, monitoring.Full, true)}
+	})
 	hbReceiver.SetStartHook(
 		beatsAuthStartHook(
 			hbReceiver.ctx,
