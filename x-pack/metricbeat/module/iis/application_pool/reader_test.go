@@ -42,18 +42,40 @@ func TestInitCounters(t *testing.T) {
 }
 
 func TestGetProcessIds(t *testing.T) {
-	var key = "\\Process(w3wp#1)\\ID Process"
-	var counters = []pdh.CounterValue{
-		{
-			Instance:    "w3wp#1",
-			Measurement: 124.00,
-			Err:         pdh.CounterValueError{},
+	tests := map[string]struct {
+		counterValues map[string][]pdh.CounterValue
+		counterFields map[string]string
+	}{
+		"english": {
+			counterValues: map[string][]pdh.CounterValue{
+				"\\Process(w3wp#1)\\ID Process":   {{Instance: "w3wp#1", Measurement: 124.00}},
+				"\\Process(w3wp#1)\\Thread Count": {{Instance: "w3wp#1", Measurement: 30.00}},
+			},
+			counterFields: map[string]string{
+				"\\Process(w3wp#1)\\ID Process":   ecsProcessId,
+				"\\Process(w3wp#1)\\Thread Count": "process.thread_count",
+			},
+		},
+		// On non-English Windows the expanded counter paths are localized.
+		"german": {
+			counterValues: map[string][]pdh.CounterValue{
+				"\\Prozess(w3wp#1)\\Prozesskennung": {{Instance: "w3wp#1", Measurement: 124.00}},
+				"\\Prozess(w3wp#1)\\Threadanzahl":   {{Instance: "w3wp#1", Measurement: 30.00}},
+			},
+			counterFields: map[string]string{
+				"\\Prozess(w3wp#1)\\Prozesskennung": ecsProcessId,
+				"\\Prozess(w3wp#1)\\Threadanzahl":   "process.thread_count",
+			},
 		},
 	}
-	counterList := make(map[string][]pdh.CounterValue)
-	counterList[key] = counters
-	workerProcesses := getProcessIds(counterList)
-	assert.NotZero(t, len(workerProcesses))
-	assert.Equal(t, float64(workerProcesses[0].processId), counters[0].Measurement.(float64))
-	assert.Equal(t, workerProcesses[0].instanceName, counters[0].Instance)
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			workerProcesses := getProcessIds(tc.counterValues, tc.counterFields)
+			if !assert.Len(t, workerProcesses, 1, "expected exactly one worker process from the PID counter") {
+				return
+			}
+			assert.Equal(t, 124, workerProcesses[0].processId, "worker process ID should come from the PID counter value")
+			assert.Equal(t, "w3wp#1", workerProcesses[0].instanceName, "worker instance name should come from the PID counter instance")
+		})
+	}
 }

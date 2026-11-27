@@ -189,7 +189,7 @@ func (r *Reader) read() ([]mb.Event, error) {
 }
 
 func (r *Reader) mapEvents(values map[string][]pdh.CounterValue) map[string]mb.Event {
-	workers := getProcessIds(values)
+	workers := getProcessIds(values, r.workerProcesses)
 	events := make(map[string]mb.Event)
 	for _, appPool := range r.applicationPools {
 		events[appPool.name] = mb.Event{
@@ -289,11 +289,13 @@ func getw3wpProceses() (map[int]string, error) {
 	return wps, nil
 }
 
-// getProcessIds func maps the process ids from the counter values to worker process obj
-func getProcessIds(counterValues map[string][]pdh.CounterValue) []WorkerProcess {
+// getProcessIds maps the process ids from the counter values to worker process objects.
+// counterFields maps each expanded counter path to the field it was registered for.
+func getProcessIds(counterValues map[string][]pdh.CounterValue, counterFields map[string]string) []WorkerProcess {
 	var workers []WorkerProcess
 	for key, values := range counterValues {
-		if strings.Contains(key, "\\ID Process") && values[0].Measurement != nil {
+		isPIDCounter := counterFields[key] == ecsProcessId || strings.Contains(key, "\\ID Process")
+		if isPIDCounter && len(values) > 0 && values[0].Measurement != nil {
 			workers = append(workers, WorkerProcess{instanceName: values[0].Instance, processId: int(values[0].Measurement.(float64))})
 		}
 	}
