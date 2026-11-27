@@ -137,7 +137,7 @@ func (p *pollingDiscoveryV2) worker(ctx context.Context, pipeline beat.Pipeline,
 		client.Close()
 	}()
 
-	rateLimitWaiter := backoff.NewEqualJitterBackoff(1, 120)
+	rateLimitWaiter := backoff.NewEqualJitterBackoff(errorBackoffInit, errorBackoffMax)
 	for st := range work {
 		if err := p.registry.MarkObjectInFlight(st.Key); err != nil {
 			p.log.Errorf("failed to mark object in-flight: %v", err)
@@ -158,7 +158,9 @@ func (p *pollingDiscoveryV2) worker(ctx context.Context, pipeline beat.Pipeline,
 			if err := p.registry.UnmarkObjectInFlight(st.Key); err != nil {
 				p.log.Errorf("failed to unmark object in-flight: %v", err)
 			}
-			rateLimitWaiter.Wait(ctx)
+			if downloadErrorNeedsBackoff(procErr) {
+				rateLimitWaiter.Wait(ctx)
+			}
 			continue
 		}
 		rateLimitWaiter.Reset()
@@ -196,7 +198,7 @@ func (p *pollingDiscoveryV2) listObjects(ctx context.Context, workChan chan<- st
 	defer close(workChan)
 
 	isStateValid := p.filterProvider.getApplierFunc()
-	errorBackoff := backoff.NewEqualJitterBackoff(1, 120)
+	errorBackoff := backoff.NewEqualJitterBackoff(errorBackoffInit, errorBackoffMax)
 	circuitBreaker := 0
 
 	startAfterKey := p.registry.GetStartAfterKey()

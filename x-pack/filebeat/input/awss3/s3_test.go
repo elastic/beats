@@ -8,6 +8,7 @@ import (
 	"context"
 	"io"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -17,8 +18,11 @@ import (
 	"github.com/elastic/beats/v7/pkg/monitoring"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/retry"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
+	"github.com/aws/smithy-go"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
@@ -30,6 +34,8 @@ func TestS3Poller(t *testing.T) {
 	const numberOfWorkers = 5
 	const pollInterval = 2 * time.Second
 	const testTimeout = 1 * time.Second
+
+	setErrorBackoff(t, time.Millisecond, 10*time.Millisecond)
 
 	t.Run("Poll success", func(t *testing.T) {
 		store := openTestStatestore()
@@ -957,6 +963,161 @@ func TestS3Poller(t *testing.T) {
 		require.Equal(t, int64(1), inputMetrics.s3ObjectsListedPerRun.Count(), "s3ObjectsListedPerRun should have 1 sample")
 		require.Equal(t, int64(5), inputMetrics.s3ObjectsListedPerRun.Sum(), "s3ObjectsListedPerRun sum should be 5")
 	})
+}
+
+// TestS3PollerReaderLoopBacksOffAfterPagingError uses the default backoff
+// bounds, so it takes at least errorBackoffInit to run.
+func TestS3PollerReaderLoopBacksOffAfterPagingError(t *testing.T) {
+	const bucket = "bucket"
+
+	ctrl := gomock.NewController(t)
+	mockS3 := NewMockS3API(ctrl)
+	mockPager := NewMockS3Pager(ctrl)
+
+	var nextPageCalls []time.Time
+	mockS3.EXPECT().
+		ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq(""), gomock.Any()).
+		Return(mockPager)
+	gomock.InOrder(
+		mockPager.EXPECT().HasMorePages().Return(true),
+		mockPager.EXPECT().
+			NextPage(gomock.Any()).
+			DoAndReturn(func(_ context.Context, _ ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
+				nextPageCalls = append(nextPageCalls, time.Now())
+				return nil, errFakeConnectivityFailure
+			}),
+		mockPager.EXPECT().HasMorePages().Return(true),
+		mockPager.EXPECT().
+			NextPage(gomock.Any()).
+			DoAndReturn(func(_ context.Context, _ ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
+				nextPageCalls = append(nextPageCalls, time.Now())
+				return &s3.ListObjectsV2Output{}, nil
+			}),
+		mockPager.EXPECT().HasMorePages().Return(false),
+	)
+
+	registry, err := newStateRegistry(nil, openTestStatestore(), "", "", false, 0)
+	require.NoError(t, err, "registry creation must succeed")
+
+	cfg := config{BucketARN: bucket}
+	log := logptest.NewTestingLogger(t, inputName)
+	poller := &s3PollerInput{
+		log:            log,
+		config:         cfg,
+		s3:             mockS3,
+		registry:       registry,
+		metrics:        newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
+		filterProvider: newFilterProvider(&cfg),
+		strategy:       newPollingStrategy(false, log),
+		status:         &statusReporterHelperMock{},
+	}
+
+	_, _, ok := poller.readerLoop(t.Context(), make(chan state))
+
+	assert.True(t, ok, "listing should recover from a single paging error")
+	require.Len(t, nextPageCalls, 2, "the failed page should be retried once")
+	assert.GreaterOrEqual(t, nextPageCalls[1].Sub(nextPageCalls[0]), time.Second,
+		"listing should back off for at least a second before retrying a failed page")
+}
+
+// workerBackoffTests are download errors that a worker should, or should not,
+// back off after.
+var workerBackoffTests = []struct {
+	name        string
+	err         error
+	wantBackoff bool
+}{
+	{
+		name: "retryable error after all attempts",
+		err: &smithy.OperationError{ServiceID: "S3", OperationName: "GetObject",
+			Err: &retry.MaxAttemptsError{Attempt: 5, Err: errFakeConnectivityFailure}},
+		wantBackoff: true,
+	},
+	{
+		name: "access denied",
+		err: &smithy.OperationError{ServiceID: "S3", OperationName: "GetObject",
+			Err: &smithy.GenericAPIError{Code: "AccessDenied"}},
+		wantBackoff: false,
+	},
+}
+
+// assertWorkerBackoff checks whether a worker given two objects whose downloads
+// fail backs off before the second download. The error backoff must be long
+// enough to block the worker for the rest of the test.
+func assertWorkerBackoff(t *testing.T, wantBackoff bool, getObjectCalls *atomic.Int32) {
+	t.Helper()
+	require.Eventually(t, func() bool { return getObjectCalls.Load() >= 1 },
+		10*time.Second, time.Millisecond, "the worker should download the first object")
+	if wantBackoff {
+		assert.Never(t, func() bool { return getObjectCalls.Load() > 1 },
+			200*time.Millisecond, time.Millisecond, "the worker should back off before the next download")
+	} else {
+		assert.Eventually(t, func() bool { return getObjectCalls.Load() == 2 },
+			10*time.Second, time.Millisecond, "the worker should download the next object without backing off")
+	}
+}
+
+// setErrorBackoff sets the backoff bounds for download and listing errors for
+// the duration of the test.
+func setErrorBackoff(t *testing.T, init, maxBackoff time.Duration) {
+	t.Helper()
+	defaultInit, defaultMax := errorBackoffInit, errorBackoffMax
+	errorBackoffInit, errorBackoffMax = init, maxBackoff
+	t.Cleanup(func() { errorBackoffInit, errorBackoffMax = defaultInit, defaultMax })
+}
+
+func TestS3PollerWorkerLoopDownloadErrorBackoff(t *testing.T) {
+	const bucket = "bucket"
+	setErrorBackoff(t, time.Hour, time.Hour)
+
+	for _, tc := range workerBackoffTests {
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			mockS3 := NewMockS3API(ctrl)
+			var getObjectCalls atomic.Int32
+			mockS3.EXPECT().
+				GetObject(gomock.Any(), gomock.Any(), gomock.Eq(bucket), gomock.Any()).
+				MinTimes(1).
+				MaxTimes(2).
+				DoAndReturn(func(_ context.Context, _, _, _ string) (*s3.GetObjectOutput, error) {
+					getObjectCalls.Add(1)
+					return nil, tc.err
+				})
+
+			registry, err := newStateRegistry(nil, openTestStatestore(), "", "", false, 0)
+			require.NoError(t, err, "registry creation must succeed")
+
+			cfg := config{BucketARN: bucket}
+			poller := &s3PollerInput{
+				log:             logptest.NewTestingLogger(t, inputName),
+				config:          cfg,
+				s3:              mockS3,
+				pipeline:        newFakePipeline(),
+				s3ObjectHandler: newS3ObjectProcessorFactory(nil, mockS3, nil, backupConfig{}, logp.NewNopLogger()),
+				registry:        registry,
+				metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
+				filterProvider:  newFilterProvider(&cfg),
+				strategy:        newPollingStrategy(false, logp.NewNopLogger()),
+				status:          &statusReporterHelperMock{},
+			}
+
+			workChan := make(chan state, 2)
+			workChan <- newState(bucket, "key1", "etag1", time.Now())
+			workChan <- newState(bucket, "key2", "etag2", time.Now())
+			close(workChan)
+
+			ctx, cancel := context.WithCancel(t.Context())
+			done := make(chan struct{})
+			go func() {
+				defer close(done)
+				poller.workerLoop(ctx, workChan)
+			}()
+
+			assertWorkerBackoff(t, tc.wantBackoff, &getObjectCalls)
+			cancel()
+			<-done
+		})
+	}
 }
 
 func waitForChannel(t *testing.T, ch <-chan struct{}, timeout time.Duration) {

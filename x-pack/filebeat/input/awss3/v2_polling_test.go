@@ -6,6 +6,7 @@ package awss3
 
 import (
 	"context"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -139,6 +140,39 @@ func TestPollingDiscoveryV2_listObjects_skips_processed(t *testing.T) {
 	assert.Equal(t, key2, sent[0].Key)
 }
 
+func TestPollingDiscoveryV2_listObjects_BacksOffAfterPagingError(t *testing.T) {
+	log := logptest.NewTestingLogger(t, t.Name())
+	reg, err := newStateRegistryV2(stateRegistryV2Config{
+		Log:   log,
+		Store: openTestStatestore(),
+	})
+	require.NoError(t, err, "registry creation must succeed")
+	defer reg.Close()
+
+	metrics := newInputMetrics(monitoring.NewRegistry(), 0, log)
+	defer metrics.Close()
+
+	fakePager := &fakeS3Pager{pages: []s3.ListObjectsV2Output{{}}, failures: 1}
+	p := newPollingDiscoveryV2(pollingDiscoveryV2Config{
+		S3:             &fakeS3API{pager: fakePager},
+		Registry:       reg,
+		Metrics:        metrics,
+		Log:            log,
+		Status:         &noopStatusReporter{},
+		BucketARN:      "arn:aws:s3:::test-bucket",
+		NumWorkers:     1,
+		Region:         "us-east-1",
+		FilterProvider: newFilterProvider(&config{}),
+	})
+
+	_, _, ok := p.listObjects(t.Context(), make(chan state))
+
+	assert.True(t, ok, "listing should recover from a single paging error")
+	require.Len(t, fakePager.nextPageCalls, 2, "the failed page should be retried once")
+	assert.GreaterOrEqual(t, fakePager.nextPageCalls[1].Sub(fakePager.nextPageCalls[0]), time.Second,
+		"listing should back off for at least a second before retrying a failed page")
+}
+
 func TestPollingDiscoveryV2_stateToEvent(t *testing.T) {
 	p := &pollingDiscoveryV2{
 		bucketARN: "arn:aws:s3:::my-bucket",
@@ -156,6 +190,66 @@ func TestPollingDiscoveryV2_stateToEvent(t *testing.T) {
 	assert.Equal(t, "arn:aws:s3:::my-bucket", evt.S3.Bucket.ARN)
 	assert.Equal(t, "path/obj.log", evt.S3.Object.Key)
 	assert.Equal(t, now, evt.S3.Object.LastModified)
+}
+
+func TestPollingDiscoveryV2_worker_DownloadErrorBackoff(t *testing.T) {
+	setErrorBackoff(t, time.Hour, time.Hour)
+
+	for _, tc := range workerBackoffTests {
+		t.Run(tc.name, func(t *testing.T) {
+			log := logptest.NewTestingLogger(t, t.Name())
+			reg, err := newStateRegistryV2(stateRegistryV2Config{
+				Log:   log,
+				Store: openTestStatestore(),
+			})
+			require.NoError(t, err, "registry creation must succeed")
+			defer reg.Close()
+
+			metrics := newInputMetrics(monitoring.NewRegistry(), 0, log)
+			defer metrics.Close()
+
+			getter := &failingS3GetterV2{err: tc.err}
+			p := newPollingDiscoveryV2(pollingDiscoveryV2Config{
+				S3:             &fakeS3API{},
+				Processor:      newObjectProcessorV2(getter, metrics, nil, backupConfig{}),
+				Registry:       reg,
+				Metrics:        metrics,
+				Log:            log,
+				Status:         &noopStatusReporter{},
+				BucketARN:      "arn:aws:s3:::test-bucket",
+				NumWorkers:     1,
+				Region:         "us-east-1",
+				FilterProvider: newFilterProvider(&config{}),
+			})
+
+			work := make(chan state, 2)
+			work <- newState("test-bucket", "key1", "etag1", time.Now())
+			work <- newState("test-bucket", "key2", "etag2", time.Now())
+			close(work)
+
+			ctx, cancel := context.WithCancel(t.Context())
+			done := make(chan struct{})
+			go func() {
+				defer close(done)
+				p.worker(ctx, newFakePipeline(), work, cancel)
+			}()
+
+			assertWorkerBackoff(t, tc.wantBackoff, &getter.calls)
+			cancel()
+			<-done
+		})
+	}
+}
+
+// failingS3GetterV2 fails every download with err and counts the attempts.
+type failingS3GetterV2 struct {
+	err   error
+	calls atomic.Int32
+}
+
+func (f *failingS3GetterV2) GetObject(_ context.Context, _, _, _ string) (*s3.GetObjectOutput, error) {
+	f.calls.Add(1)
+	return nil, f.err
 }
 
 // fakeS3API is a minimal s3API implementation for testing listing.
@@ -183,6 +277,9 @@ func (f *fakeS3API) ListObjectsPaginator(bucket, prefix, startAfterKey string) s
 type fakeS3Pager struct {
 	pages []s3.ListObjectsV2Output
 	idx   int
+	// failures is how many NextPage calls fail before pages are returned.
+	failures      int
+	nextPageCalls []time.Time
 }
 
 func (p *fakeS3Pager) HasMorePages() bool {
@@ -190,6 +287,11 @@ func (p *fakeS3Pager) HasMorePages() bool {
 }
 
 func (p *fakeS3Pager) NextPage(ctx context.Context, _ ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
+	p.nextPageCalls = append(p.nextPageCalls, time.Now())
+	if p.failures > 0 {
+		p.failures--
+		return nil, errFakeConnectivityFailure
+	}
 	if p.idx >= len(p.pages) {
 		return &s3.ListObjectsV2Output{}, nil
 	}
