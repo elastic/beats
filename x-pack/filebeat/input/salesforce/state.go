@@ -5,8 +5,8 @@
 package salesforce
 
 import (
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // state is the state of the salesforce module. It is used to watermark the state

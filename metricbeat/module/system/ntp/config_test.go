@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	ucfg "github.com/elastic/elastic-agent-libs/config"
+	ucfg "github.com/elastic/beats/v7/pkg/config"
 
 	"github.com/stretchr/testify/assert"
 )

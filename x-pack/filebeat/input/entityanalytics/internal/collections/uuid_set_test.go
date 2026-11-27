@@ -7,11 +7,30 @@ package collections
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+// wantTypeErr describes an expected *json.UnmarshalTypeError. Tests match its
+// fields instead of its message, because the message text differs between the
+// encoding/json v1 and v2 implementations.
+type wantTypeErr struct {
+	Value string
+	Type  reflect.Type
+}
+
+func requireUnmarshalTypeErr(t *testing.T, err error, want *wantTypeErr) {
+	t.Helper()
+
+	var typeErr *json.UnmarshalTypeError
+	require.ErrorAs(t, err, &typeErr, "expected a JSON unmarshal type error, got: %v", err)
+	assert.Equal(t, want.Value, typeErr.Value, "unexpected JSON value kind in type error")
+	assert.Equal(t, want.Type, typeErr.Type, "unexpected Go type in type error")
+}
 
 const (
 	testUUID1Str = "187f924c-e867-477e-8d74-dd762d6379dd"
@@ -57,7 +76,6 @@ func TestNewUUIDSet(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -69,9 +87,9 @@ func TestNewUUIDSet(t *testing.T) {
 
 func TestUUIDSet_UnmarshalJSON(t *testing.T) {
 	tests := map[string]struct {
-		In      []byte
-		Want    UUIDSet
-		WantErr string
+		In          []byte
+		Want        UUIDSet
+		WantTypeErr *wantTypeErr
 	}{
 		"ok-nil": {
 			In:   []byte(`null`),
@@ -82,29 +100,28 @@ func TestUUIDSet_UnmarshalJSON(t *testing.T) {
 			Want: NewUUIDSet(),
 		},
 		"ok-testUUID1-elem": {
-			In:   []byte(fmt.Sprintf(`["%s"]`, testUUID1Str)),
+			In:   fmt.Appendf(nil, `["%s"]`, testUUID1Str),
 			Want: NewUUIDSet(testUUID1),
 		},
 		"ok-testUUID3-elem": {
-			In:   []byte(fmt.Sprintf(`["%s", "%s", "%s"]`, testUUID1Str, testUUID2Str, testUUID3Str)),
+			In:   fmt.Appendf(nil, `["%s", "%s", "%s"]`, testUUID1Str, testUUID2Str, testUUID3Str),
 			Want: NewUUIDSet(testUUID1, testUUID2, testUUID3),
 		},
 		"ok-dup-elem": {
-			In:   []byte(fmt.Sprintf(`["%s","%s","%s"]`, testUUID1Str, testUUID2Str, testUUID2Str)),
+			In:   fmt.Appendf(nil, `["%s","%s","%s"]`, testUUID1Str, testUUID2Str, testUUID2Str),
 			Want: NewUUIDSet(testUUID1, testUUID2),
 		},
 		"err-mixed-types": {
-			In:      []byte(fmt.Sprintf(`["%s",0]`, testUUID1Str)),
-			WantErr: "json: cannot unmarshal number into Go value of type uuid.UUID",
+			In:          fmt.Appendf(nil, `["%s",0]`, testUUID1Str),
+			WantTypeErr: &wantTypeErr{Value: "number", Type: reflect.TypeFor[uuid.UUID]()},
 		},
 		"err-not-list-str": {
-			In:      []byte(fmt.Sprintf(`"%s"`, testUUID1Str)),
-			WantErr: "json: cannot unmarshal string into Go value of type []uuid.UUID",
+			In:          fmt.Appendf(nil, `"%s"`, testUUID1Str),
+			WantTypeErr: &wantTypeErr{Value: "string", Type: reflect.TypeFor[[]uuid.UUID]()},
 		},
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -112,8 +129,8 @@ func TestUUIDSet_UnmarshalJSON(t *testing.T) {
 
 			gotErr := json.Unmarshal(tc.In, &s)
 
-			if tc.WantErr != "" {
-				require.ErrorContains(t, gotErr, tc.WantErr)
+			if tc.WantTypeErr != nil {
+				requireUnmarshalTypeErr(t, gotErr, tc.WantTypeErr)
 			} else {
 				require.NoError(t, gotErr)
 				require.Equal(t, tc.Want, s)
@@ -134,16 +151,15 @@ func TestUUIDSet_MarshalJSON(t *testing.T) {
 		},
 		"ok-testUUID1-elem": {
 			In:   NewUUIDSet(testUUID1),
-			Want: []byte(fmt.Sprintf(`["%s"]`, testUUID1Str)),
+			Want: fmt.Appendf(nil, `["%s"]`, testUUID1Str),
 		},
 		"ok-testUUID3-elem": {
 			In:   NewUUIDSet(testUUID1, testUUID2, testUUID3),
-			Want: []byte(fmt.Sprintf(`["%s","%s","%s"]`, testUUID1Str, testUUID2Str, testUUID3Str)),
+			Want: fmt.Appendf(nil, `["%s","%s","%s"]`, testUUID1Str, testUUID2Str, testUUID3Str),
 		},
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -175,7 +191,6 @@ func TestUUIDSet_Len(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -201,7 +216,6 @@ func TestUUIDSet_Values(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -240,7 +254,6 @@ func TestUUIDSet_Add(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -280,7 +293,6 @@ func TestUUIDSet_Remove(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -314,7 +326,6 @@ func TestUUIDSet_Contains(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 

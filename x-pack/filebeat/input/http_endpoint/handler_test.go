@@ -25,10 +25,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
 	"github.com/elastic/beats/v7/testing/testutils"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/lumberjack"
 )
 
@@ -262,6 +262,9 @@ func Test_apiResponse(t *testing.T) {
 		events       []mapstr.M         // Expected output events.
 		wantStatus   int                // Expected response code.
 		wantResponse string             // Expected response message.
+		// Expected response message pattern, used instead of wantResponse
+		// when the message includes text that depends on the Go release.
+		wantResponseRegexp string
 	}{
 		{
 			name: "single_event",
@@ -687,9 +690,11 @@ func Test_apiResponse(t *testing.T) {
 				req.Header.Set("Content-Type", "application/json")
 				return req
 			}(),
-			events:       nil,
-			wantStatus:   http.StatusBadRequest,
-			wantResponse: `{"message":"malformed JSON object at stream position 0: invalid character '\\n' in string literal"}`,
+			events:     nil,
+			wantStatus: http.StatusBadRequest,
+			// The encoding/json v2 backend (Go 1.27) says "in string", v1
+			// says "in string literal".
+			wantResponseRegexp: `^\{"message":"malformed JSON object at stream position 0: invalid character '\\\\n' in string( literal)?"\}$`,
 		},
 		{
 			name: "empty_CRC_challenge",
@@ -734,7 +739,12 @@ func Test_apiResponse(t *testing.T) {
 
 			// Validate responses.
 			assert.Equal(t, tc.wantStatus, respRec.Code)
-			assert.Equal(t, tc.wantResponse, strings.TrimSuffix(respRec.Body.String(), "\n"))
+			gotResponse := strings.TrimSuffix(respRec.Body.String(), "\n")
+			if tc.wantResponseRegexp != "" {
+				assert.Regexp(t, tc.wantResponseRegexp, gotResponse, "unexpected response message")
+			} else {
+				assert.Equal(t, tc.wantResponse, gotResponse)
+			}
 			require.Len(t, pub.events, len(tc.events))
 
 			for i, evt := range pub.events {

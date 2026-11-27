@@ -36,7 +36,7 @@ func ImageSelector(platform string) (string, error) {
 	}
 	if platform == "windows/amd64" {
 		image = strings.ReplaceAll(image, "beats-dev", "observability-ci") // Temporarily work around naming of npcap image.
-		image = strings.ReplaceAll(image, "main", "npcap-"+NpcapVersion+"-debian9")
+		image = strings.ReplaceAll(image, "main", "npcap-"+NpcapVersion)
 	}
 	return image, nil
 }

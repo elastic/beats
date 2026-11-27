@@ -21,11 +21,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/reader/etw"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/mapstr"
+	"github.com/elastic/beats/v7/pkg/monitoring"
+	"github.com/elastic/beats/v7/pkg/monitoring/adapter"
 	"github.com/elastic/go-concert/ctxtool"
 
 	"github.com/rcrowley/go-metrics"
@@ -284,6 +284,7 @@ func (e *etwInput) runSession(ctx input.Context, cancelCtx context.Context, firs
 // creating fails with ERROR_ALREADY_EXISTS the input attaches instead, which
 // is also how it picks a session back up after a reconnect races the owner.
 func (e *etwInput) connect() error {
+	var adopted bool // The input wanted its own session but found one with that name.
 	switch e.etwSession.NewSession {
 	case true:
 		createErr := e.operator.createRealtimeSession(e.etwSession)
@@ -299,6 +300,7 @@ func (e *etwInput) connect() error {
 			}
 		}
 		e.log.Debug("session already exists, trying to attach to it")
+		adopted = true
 		fallthrough
 	case false:
 		if err := e.operator.attachToExistingSession(e.etwSession); err != nil {
@@ -308,6 +310,13 @@ func (e *etwInput) connect() error {
 			}
 		}
 		e.log.Debug("attached to existing session")
+	}
+	if adopted && !e.etwSession.Independent() {
+		// A session left over from an earlier run, possibly by an older
+		// version, keeps the logging mode it was created with.
+		e.log.Warnf("attached to existing session %q, which was not created in independent mode: "+
+			"events may be lost when another session enabled for the same provider cannot accept them; "+
+			"stop the session (logman stop %q -ets) and restart the input to recreate it", e.etwSession.Name, e.etwSession.Name)
 	}
 	return nil
 }

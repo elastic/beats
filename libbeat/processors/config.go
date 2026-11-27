@@ -20,8 +20,8 @@ package processors
 import (
 	"fmt"
 
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 )
 
 // PluginConfig represents the list of processors given in beat configuration.

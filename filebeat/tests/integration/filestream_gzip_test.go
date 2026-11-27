@@ -36,7 +36,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/testing/gziptest"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
-	"github.com/elastic/elastic-agent-libs/iobuf"
+	"github.com/elastic/beats/v7/pkg/iobuf"
 )
 
 // TestFilestreamGZIPIncompleteFilesAreFullyRead ensures filestream correctly

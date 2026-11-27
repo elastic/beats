@@ -17,7 +17,7 @@
 
 package nfs
 
-import "github.com/elastic/elastic-agent-libs/logp"
+import "github.com/elastic/beats/v7/pkg/logp"
 
 func dropMalformed(context string, err error) bool {
 	if err != nil {

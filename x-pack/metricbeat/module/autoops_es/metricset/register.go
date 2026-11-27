@@ -13,9 +13,9 @@ import (
 	"slices"
 
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v7/pkg/logp"
+	"github.com/elastic/beats/v7/pkg/version"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/version"
 )
 
 const (
@@ -93,6 +93,24 @@ type cloudConnectedServiceSupport struct {
 // The special metricset.getClusterInfo function, which will shutdown the Beat / Agent if
 // the version is not supported.
 type clusterInfoFetcher func(*elasticsearch.MetricSet) (*utils.ClusterInfo, error)
+
+var checkedCloudConnectedMode bool = false
+
+// registerCloudConnectedClusterOnce checks Cloud Connected mode when the first metricset is created, and never again.
+func registerCloudConnectedClusterOnce(m *elasticsearch.MetricSet) error {
+	// metricsets are not started asynchronously, so there is no need for synchronization here
+	if checkedCloudConnectedMode {
+		return nil
+	}
+
+	checkedCloudConnectedMode = true
+
+	if err := maybeRegisterCloudConnectedCluster(m, GetInfo); err != nil {
+		return fmt.Errorf("failed to register Cloud Connected cluster: %w", err)
+	}
+
+	return nil
+}
 
 // maybeRegisterCloudConnectedCluster fetches cluster information and license details, then sets the global resource ID if applicable.
 func maybeRegisterCloudConnectedCluster(m *elasticsearch.MetricSet, getClusterInfo clusterInfoFetcher) error {

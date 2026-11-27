@@ -30,7 +30,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 

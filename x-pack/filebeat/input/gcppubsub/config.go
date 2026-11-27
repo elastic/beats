@@ -14,7 +14,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
 
 	"cloud.google.com/go/pubsub"
 	"golang.org/x/oauth2/google"

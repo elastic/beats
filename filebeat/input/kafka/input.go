@@ -31,7 +31,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -41,8 +41,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/beats/v7/pkg/config"
+	"github.com/elastic/beats/v7/pkg/logp"
 	"github.com/elastic/sarama"
 )
 
@@ -410,34 +410,41 @@ func (l *listFromFieldReader) Close() error {
 }
 
 func (l *listFromFieldReader) Next() (reader.Message, error) {
-	if len(l.buffer) != 0 {
-		return l.returnFromBuffer()
-	}
-
-	msg, ok := <-l.claim.Messages()
-	if !ok {
-		return reader.Message{}, io.EOF
-	}
-
-	timestamp, kafkaFields := composeEventMetadata(l.claim, l.groupHandler, msg)
-	messages := l.parseMultipleMessages(msg.Value)
-
-	neededAcks := atomic.Int64{}
-	neededAcks.Add(int64(len(messages)))
-	ackHandler := func() {
-		if neededAcks.Add(-1) == 0 {
-			l.groupHandler.ack(msg)
+	// Loop until a message yields events: returning EOF/err would abort
+	// ConsumeClaim, and the next message that yields events will advance the
+	// committed offset past any skipped zero-event messages once acknowledged.
+	for len(l.buffer) == 0 {
+		msg, ok := <-l.claim.Messages()
+		if !ok {
+			return reader.Message{}, io.EOF
 		}
-	}
-	for _, message := range messages {
-		newBuffer := append(l.buffer, composeMessage(timestamp, []byte(message), kafkaFields, ackHandler))
-		l.buffer = newBuffer
+
+		messages := l.parseMultipleMessages(msg.Value)
+		if len(messages) == 0 {
+			continue
+		}
+		timestamp, kafkaFields := composeEventMetadata(l.claim, l.groupHandler, msg)
+
+		neededAcks := atomic.Int64{}
+		neededAcks.Add(int64(len(messages)))
+		ackHandler := func() {
+			if neededAcks.Add(-1) == 0 {
+				l.groupHandler.ack(msg)
+			}
+		}
+		for _, message := range messages {
+			newBuffer := append(l.buffer, composeMessage(timestamp, []byte(message), kafkaFields, ackHandler))
+			l.buffer = newBuffer
+		}
 	}
 
 	return l.returnFromBuffer()
 }
 
 func (l *listFromFieldReader) returnFromBuffer() (reader.Message, error) {
+	if len(l.buffer) == 0 {
+		return reader.Message{}, io.EOF
+	}
 	next := l.buffer[0]
 	newBuffer := l.buffer[1:]
 	l.buffer = newBuffer

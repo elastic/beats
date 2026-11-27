@@ -15,8 +15,8 @@ import (
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/pkg/mapstr"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const TASK_RUNTIME_THRESHOLD_IN_SECONDS_NAME = "TASK_RUNTIME_THRESHOLD_IN_SECONDS"

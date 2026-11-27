@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/pkg/logp"
 	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type watcher struct {
