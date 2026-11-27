@@ -8,7 +8,6 @@ package osqd
 
 import (
 	"maps"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -240,17 +239,6 @@ func TestMergeTables(t *testing.T) {
 			assert.Equal(t, tc.want, got, "mergeTables(%q, %v)", tc.list, tc.names)
 		})
 	}
-}
-
-// disabledTablesFromArgs returns the tables named by the disable_tables flag.
-func disabledTablesFromArgs(args []string) []string {
-	const prefix = "--" + flagDisableTables + "="
-	for _, a := range args {
-		if list, ok := strings.CutPrefix(a, prefix); ok {
-			return strings.Split(list, ",")
-		}
-	}
-	return nil
 }
 
 // toSet returns the distinct values in all the lists.

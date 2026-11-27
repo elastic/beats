@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
 
 	conf "github.com/elastic/beats/v7/pkg/config"
 	"github.com/elastic/beats/v7/pkg/logp"
@@ -68,6 +69,33 @@ func TestHeartbeatWithElasticsearchStateLoader(t *testing.T) {
 	assert.Equal(t, 1, requestCount, "installed loader should call the injected requester")
 }
 
+// TestHeartbeatWithoutStateLoader checks that installing the no-op loader ends
+// the wait of the deferred loader Heartbeat uses when its monitors come over the
+// control protocol.
+func TestHeartbeatWithoutStateLoader(t *testing.T) {
+	logger := logp.NewNopLogger()
+	// The timeout is the one newHeartbeat uses for monitors taken over the
+	// control protocol.
+	deferredTimeout := 15 * time.Second
+	stateLoader, replaceStateLoader := monitorstate.DeferredStateLoader(monitorstate.NilStateLoader, deferredTimeout, logger)
+
+	bt := &Heartbeat{
+		config:             &config.Config{},
+		replaceStateLoader: replaceStateLoader,
+		logger:             logger,
+	}
+
+	bt.WithoutStateLoader()
+
+	start := time.Now()
+	state, err := stateLoader(stdfields.StdMonitorFields{ID: "mon-1", Type: "http"})
+	elapsed := time.Since(start)
+
+	require.NoError(t, err, "the no-op loader should not fail")
+	assert.Nil(t, state, "the no-op loader should report no prior monitor state")
+	assert.Less(t, elapsed, deferredTimeout, "installing the no-op loader should end the deferred loader's wait instead of timing out")
+}
+
 func TestMakeESClient(t *testing.T) {
 	t.Run("should not modify the timeout setting from original config", func(t *testing.T) {
 		origTimeout := 90
@@ -86,4 +114,41 @@ func TestMakeESClient(t *testing.T) {
 		require.NoError(t, err)
 		assert.EqualValues(t, origTimeout, timeout)
 	})
+}
+
+func TestRunCentralMgmtMonitorsStop(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	factory := &fakeFactory{runners: map[string]*fakeRunner{}}
+	bt := &Heartbeat{
+		config:         &config.Config{},
+		monitorFactory: factory,
+		logger:         logger,
+	}
+	b := &beat.Beat{
+		Info:     beat.Info{Logger: logger},
+		Registry: reload.NewRegistry(),
+	}
+
+	stop := bt.RunCentralMgmtMonitors(b)
+
+	c1, err := conf.NewConfigFrom(map[string]any{"id": "mon-1"})
+	require.NoError(t, err, "could not build first monitor config")
+	c2, err := conf.NewConfigFrom(map[string]any{"id": "mon-2"})
+	require.NoError(t, err, "could not build second monitor config")
+
+	err = b.Registry.GetInputList().Reload([]*reload.ConfigWithMeta{
+		{Config: c1},
+		{Config: c2},
+	})
+	require.NoError(t, err, "reloading managed monitors should succeed")
+	require.Len(t, factory.runners, 2, "both managed monitors should be created")
+	for id, r := range factory.runners {
+		assert.True(t, r.started, "managed monitor %s should be started", id)
+		assert.False(t, r.stopped, "managed monitor %s should still be running before stop", id)
+	}
+
+	stop()
+	for id, r := range factory.runners {
+		assert.True(t, r.stopped, "managed monitor %s must be stopped on shutdown", id)
+	}
 }

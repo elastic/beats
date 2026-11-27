@@ -29,18 +29,40 @@ type beatsAuthExtension interface {
 
 var _ monitorstate.ElasticsearchRequester = (*eslegclient.Connection)(nil)
 
+// stateLoaderInstaller installs the loader monitors read their prior state
+// from. It is implemented by *beater.Heartbeat.
+type stateLoaderInstaller interface {
+	WithElasticsearchStateLoader(monitorstate.ElasticsearchRequester)
+	WithoutStateLoader()
+}
+
+var _ stateLoaderInstaller = (*beater.Heartbeat)(nil)
+
 func beatsAuthStartHook(
 	ctx context.Context,
 	reference string,
-	heartbeat *beater.Heartbeat,
+	heartbeat stateLoaderInstaller,
 	userAgent func() string,
 	logger *logp.Logger,
 	setRequester func(*eslegclient.Connection),
 ) func(component.Host) error {
 
 	return func(host component.Host) error {
-		if reference == "" {
+		// A Heartbeat that takes its monitors over the control protocol starts
+		// with a deferred state loader, which blocks every state load until it is
+		// replaced. This hook is the only thing that replaces it in a receiver, so
+		// every path that doesn't install an Elasticsearch loader has to install
+		// the no-op one; otherwise the first monitor runs wait out the deferred
+		// loader's timeout.
+		withoutStateLoader := func() error {
+			if heartbeat != nil {
+				heartbeat.WithoutStateLoader()
+			}
 			return nil
+		}
+
+		if reference == "" {
+			return withoutStateLoader()
 		}
 
 		var extensionID component.ID
@@ -75,7 +97,7 @@ func beatsAuthStartHook(
 				extensionID.String(),
 				err,
 			)
-			return nil
+			return withoutStateLoader()
 		}
 		heartbeat.WithElasticsearchStateLoader(requester)
 		setRequester(requester)

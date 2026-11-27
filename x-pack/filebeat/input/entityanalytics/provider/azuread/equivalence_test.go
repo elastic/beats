@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/json"
 	"log/slog"
+	"maps"
 	"net/http/httptest"
 	"slices"
 	"testing"
@@ -27,7 +28,8 @@ import (
 
 // TestEquivalence_FullSync runs both the legacy and minimal-state EntraID
 // providers against the same fixture data and asserts that the azure_ad.*
-// payloads are structurally equivalent.
+// payloads, including the MFA and sign-in activity enrichment, are
+// structurally equivalent.
 //
 // Scope: FullSync only. Incremental sync divergences — especially group
 // membership invisibility (user delta endpoints do not report group membership
@@ -45,11 +47,10 @@ import (
 //     minimal-state stores only delta URLs.
 //   - Legacy uses group delta queries for incremental group changes;
 //     minimal-state re-fetches all groups each sync.
-//   - Legacy puts MFA under azure_ad.mfa (fetcher.MFARegistrationDetails);
-//     entcollect puts MFA under user.risk.mfa (ecentraid.MFADetails).
-//     MFA user-ID coverage is compared; field values are not.
-//   - Sign-in activity uses the same field path (azure_ad.signInActivity)
-//     on both sides with compatible JSON tags, so values are compared.
+//   - Legacy adds MFA and sign-in activity to the published document as
+//     azure_ad.mfa and azure_ad.signInActivity; entcollect puts them inside
+//     its azure_ad map. The legacy payloads are built the same way as
+//     publishUser builds them, so both are compared as one azure_ad map.
 //   - event.kind: asset present only in minimal-state (set by adapter).
 //   - event.action format differs: legacy uses "user-discovered" etc.;
 //     minimal-state uses entcollect.ActionDiscovered.
@@ -60,7 +61,7 @@ import (
 //     Users migrating configs will see different ownership document shapes
 //     in production.
 func TestEquivalence_FullSync(t *testing.T) {
-	legacyUsers, legacyDevices, legacyUserGroups, legacyDeviceGroups, legacyMFAUserIDs, legacySignIn := runLegacyFetch(t)
+	legacyUsers, legacyDevices, legacyUserGroups, legacyDeviceGroups, legacyMFA, legacySignIn := runLegacyFetch(t)
 
 	srv := testazuread.StartGraphServer(t)
 	minimalDocs := runMinimalFullSync(t, srv)
@@ -81,9 +82,6 @@ func TestEquivalence_FullSync(t *testing.T) {
 	compareGroups(t, "user", legacyUserGroups, minimalUsers, "user.group")
 	compareGroups(t, "device", legacyDeviceGroups, minimalDevices, "device.group")
 
-	compareMFACoverage(t, legacyMFAUserIDs, minimalUsers)
-	compareSignInActivity(t, legacySignIn, minimalUsers)
-
 	// Sanity: verify we actually compared non-trivial data.
 	if len(legacyUsers) == 0 {
 		t.Error("sanity: no legacy users")
@@ -97,22 +95,22 @@ func TestEquivalence_FullSync(t *testing.T) {
 	if len(legacyDeviceGroups) == 0 {
 		t.Error("sanity: no legacy device groups")
 	}
-	if len(legacyMFAUserIDs) == 0 {
-		t.Error("sanity: no legacy MFA user IDs")
+	if legacyMFA == 0 {
+		t.Error("sanity: no legacy users with MFA data")
 	}
-	if len(legacySignIn) == 0 {
-		t.Error("sanity: no legacy sign-in activity data")
+	if legacySignIn == 0 {
+		t.Error("sanity: no legacy users with sign-in activity data")
 	}
 }
 
 // runLegacyFetch runs the legacy doFetch path with the mock fetcher and
-// extracts entity payloads, group memberships, MFA user-ID coverage,
-// and sign-in activity data.
+// extracts entity payloads, group memberships, and the number of users
+// with MFA and with sign-in activity data. User payloads include the
+// enrichment, as publishUser adds it.
 func runLegacyFetch(t *testing.T) (
 	users, devices []idPayload,
 	userGroups, deviceGroups map[string][]groupECS,
-	mfaUserIDs []string,
-	signInActivity map[string]json.RawMessage,
+	mfa, signInActivity int,
 ) {
 	t.Helper()
 	a := azure{
@@ -133,9 +131,17 @@ func runLegacyFetch(t *testing.T) (
 	}
 
 	userGroups = make(map[string][]groupECS)
-	signInActivity = make(map[string]json.RawMessage)
 	for _, u := range ss.users {
-		b, err := json.Marshal(u.Fields)
+		fields := maps.Clone(u.Fields)
+		if u.MFA != nil {
+			fields["mfa"] = u.MFA
+			mfa++
+		}
+		if u.SignInActivity != nil {
+			fields["signInActivity"] = u.SignInActivity
+			signInActivity++
+		}
+		b, err := json.Marshal(fields)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -151,17 +157,6 @@ func runLegacyFetch(t *testing.T) (
 		})
 		if len(groups) > 0 {
 			userGroups[u.ID.String()] = groups
-		}
-
-		if u.MFA != nil {
-			mfaUserIDs = append(mfaUserIDs, u.ID.String())
-		}
-		if u.SignInActivity != nil {
-			raw, err := json.Marshal(u.SignInActivity)
-			if err != nil {
-				t.Fatal(err)
-			}
-			signInActivity[u.ID.String()] = raw
 		}
 	}
 
@@ -186,7 +181,7 @@ func runLegacyFetch(t *testing.T) (
 		}
 	}
 
-	return users, devices, userGroups, deviceGroups, mfaUserIDs, signInActivity
+	return users, devices, userGroups, deviceGroups, mfa, signInActivity
 }
 
 // runMinimalFullSync runs the entcollect FullSync path against the httptest
@@ -312,90 +307,6 @@ func compareGroups(t *testing.T, kind string, legacyGroups map[string][]groupECS
 				t.Errorf("%s %q group[%d] mismatch: legacy=%+v, minimal=%+v",
 					kind, doc.ID, j, legacyG[j], minimalG[j])
 			}
-		}
-	}
-}
-
-// compareMFACoverage checks that the same set of user IDs received MFA
-// enrichment on both sides. It does not compare MFA field values because
-// the two providers use different struct types (fetcher.MFARegistrationDetails
-// vs ecentraid.MFADetails) at different field paths (azure_ad.mfa vs
-// user.risk.mfa).
-func compareMFACoverage(t *testing.T, legacyMFAUserIDs []string, minimalUsers []entcollect.Document) {
-	t.Helper()
-
-	slices.Sort(legacyMFAUserIDs)
-
-	var minimalMFAUserIDs []string
-	for _, doc := range minimalUsers {
-		if _, ok := doc.Fields["user.risk.mfa"]; ok {
-			minimalMFAUserIDs = append(minimalMFAUserIDs, doc.ID)
-		}
-	}
-	slices.Sort(minimalMFAUserIDs)
-
-	if len(legacyMFAUserIDs) != len(minimalMFAUserIDs) {
-		t.Errorf("MFA user-ID count mismatch: legacy=%d, minimal=%d", len(legacyMFAUserIDs), len(minimalMFAUserIDs))
-		return
-	}
-	for i := range legacyMFAUserIDs {
-		if legacyMFAUserIDs[i] != minimalMFAUserIDs[i] {
-			t.Errorf("MFA user-ID[%d] mismatch: legacy=%q, minimal=%q", i, legacyMFAUserIDs[i], minimalMFAUserIDs[i])
-		}
-	}
-}
-
-// compareSignInActivity checks that the same set of user IDs received
-// sign-in activity enrichment and that the JSON-serialized values match.
-// Unlike MFA (which uses different field paths), both providers publish
-// sign-in activity at azure_ad.signInActivity with compatible JSON tags,
-// so values can be compared directly.
-func compareSignInActivity(t *testing.T, legacySignIn map[string]json.RawMessage, minimalUsers []entcollect.Document) {
-	t.Helper()
-
-	minimalSignIn := make(map[string]json.RawMessage)
-	for _, doc := range minimalUsers {
-		raw, ok := doc.Fields["azure_ad.signInActivity"]
-		if !ok {
-			continue
-		}
-		b, err := json.Marshal(raw)
-		if err != nil {
-			t.Fatalf("marshal minimal sign-in activity for %s: %v", doc.ID, err)
-		}
-		minimalSignIn[doc.ID] = b
-	}
-
-	if len(legacySignIn) != len(minimalSignIn) {
-		t.Errorf("sign-in activity user count mismatch: legacy=%d, minimal=%d", len(legacySignIn), len(minimalSignIn))
-	}
-
-	for id, legacyRaw := range legacySignIn {
-		minimalRaw, ok := minimalSignIn[id]
-		if !ok {
-			t.Errorf("sign-in activity for user %q: present in legacy, missing in minimal", id)
-			continue
-		}
-
-		var legacyMap, minimalMap map[string]any
-		if err := json.Unmarshal(legacyRaw, &legacyMap); err != nil {
-			t.Fatal(err)
-		}
-		if err := json.Unmarshal(minimalRaw, &minimalMap); err != nil {
-			t.Fatal(err)
-		}
-
-		legacyNorm, _ := json.Marshal(legacyMap)
-		minimalNorm, _ := json.Marshal(minimalMap)
-		if string(legacyNorm) != string(minimalNorm) {
-			t.Errorf("sign-in activity for user %q value mismatch:\n  legacy:  %s\n  minimal: %s",
-				id, legacyNorm, minimalNorm)
-		}
-	}
-
-	for id := range minimalSignIn {
-		if _, ok := legacySignIn[id]; !ok {
-			t.Errorf("sign-in activity for user %q: present in minimal, missing in legacy", id)
 		}
 	}
 }

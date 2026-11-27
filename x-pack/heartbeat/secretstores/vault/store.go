@@ -49,6 +49,11 @@ const (
 // retryBackoff holds the waits between attempts for transient errors.
 var retryBackoff = []time.Duration{time.Second, 2 * time.Second}
 
+// revokeTimeout caps the best-effort auth/token/revoke-self call on Close.
+var revokeTimeout = 5 * time.Second
+
+var errStoreClosed = errors.New("vault: secret store is closed")
+
 func init() {
 	// Registration only fails on programming errors, such as a duplicate type.
 	if err := secretstores.Register(storeType, newStore); err != nil {
@@ -57,9 +62,10 @@ func init() {
 }
 
 type store struct {
-	cfg    config
-	client *vaultapi.Client
-	logger *logp.Logger
+	cfg       config
+	client    *vaultapi.Client
+	closeIdle func()
+	logger    *logp.Logger
 
 	// loginMu is used to avoid concurrent auth failures
 	loginMu sync.Mutex
@@ -71,6 +77,7 @@ type store struct {
 	// belongs to another monitor.
 	failure     error
 	failedUntil time.Time
+	closed      bool
 
 	now   func() time.Time
 	sleep func(ctx context.Context, d time.Duration) error
@@ -92,28 +99,29 @@ func newStore(cfg *conf.C, logger *logp.Logger) (secretstores.Store, error) {
 		return nil, err
 	}
 
-	client, err := newClient(c, logger)
+	client, closeIdle, err := newClient(c, logger)
 	if err != nil {
 		return nil, err
 	}
 
 	return &store{
-		cfg:    c,
-		client: client,
-		logger: logger.Named(storeType),
-		cache:  map[string]cacheEntry{},
-		now:    time.Now,
-		sleep:  sleepContext,
+		cfg:       c,
+		client:    client,
+		closeIdle: closeIdle,
+		logger:    logger.Named(storeType),
+		cache:     map[string]cacheEntry{},
+		now:       time.Now,
+		sleep:     sleepContext,
 	}, nil
 }
 
 // newClient creates a Vault client that only uses the given config. The
 // Vault library reads VAULT_* environment variables by default; none of them
 // must change how Heartbeat connects.
-func newClient(c config, logger *logp.Logger) (*vaultapi.Client, error) {
+func newClient(c config, logger *logp.Logger) (*vaultapi.Client, func(), error) {
 	tlsConfig, err := clientTLSConfig(c, logger)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	// Same defaults as the Vault library, honoring the proxy environment.
 	transport := cleanhttp.DefaultPooledTransport()
@@ -134,7 +142,7 @@ func newClient(c config, logger *logp.Logger) (*vaultapi.Client, error) {
 		MaxRetries: 0,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("could not create client: %w", err)
+		return nil, nil, fmt.Errorf("could not create client: %w", err)
 	}
 
 	// NewClient always reads VAULT_TOKEN, VAULT_NAMESPACE and VAULT_HEADERS.
@@ -146,7 +154,7 @@ func newClient(c config, logger *logp.Logger) (*vaultapi.Client, error) {
 	if c.Auth.Token != "" {
 		client.SetToken(c.Auth.Token)
 	}
-	return client, nil
+	return client, transport.CloseIdleConnections, nil
 }
 
 // clientTLSConfig returns the TLS config of the connection to Vault. The
@@ -182,13 +190,69 @@ func (s *store) resolve(ctx context.Context, content string) (string, error) {
 	if !ok {
 		return "", fmt.Errorf("vault: field %q not found at %s", field, s.location(path))
 	}
-	return stringValue(v)
+	value, err := stringValue(v)
+	if err != nil {
+		return "", err
+	}
+	secretstores.Track(ctx, value)
+	return value, nil
+}
+
+// Close clears cached secrets and credentials, and revokes the AppRole client
+// token acquired by this store on a best-effort basis. User-supplied static
+// tokens are never revoked.
+func (s *store) Close() error {
+	s.mu.Lock()
+	if s.closed {
+		s.mu.Unlock()
+		return nil
+	}
+	s.closed = true
+	clear(s.cache)
+	s.failure = nil
+	s.failedUntil = time.Time{}
+	s.mu.Unlock()
+
+	s.loginMu.Lock()
+	defer s.loginMu.Unlock()
+
+	var revokeErr error
+	if s.cfg.Auth.AppRole != nil && s.client.Token() != "" {
+		ctx, cancel := context.WithTimeout(context.Background(), revokeTimeout)
+		defer cancel()
+		if err := s.client.Auth().Token().RevokeSelfWithContext(ctx, ""); err != nil {
+			revokeErr = requestError(err, "revoking AppRole token")
+		} else {
+			s.logger.Debugf("Revoked Vault AppRole token at auth/%s", s.cfg.Auth.AppRole.MountPath)
+		}
+	}
+
+	s.client.ClearToken()
+	s.cfg.Auth.Token = ""
+	if s.cfg.Auth.AppRole != nil {
+		s.cfg.Auth.AppRole.RoleID = ""
+		s.cfg.Auth.AppRole.SecretID = ""
+	}
+	if s.closeIdle != nil {
+		s.closeIdle()
+	}
+	return revokeErr
+}
+
+func (s *store) isClosed() bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.closed
 }
 
 // secret returns the data of the secret at path, from the cache when
 // possible.
 func (s *store) secret(ctx context.Context, path string) (map[string]any, error) {
 	s.mu.Lock()
+	if s.closed {
+		s.mu.Unlock()
+		return nil, errStoreClosed
+	}
 	if e, ok := s.cache[path]; ok && s.now().Before(e.expires) {
 		s.mu.Unlock()
 		if e.err != nil {
@@ -208,6 +272,9 @@ func (s *store) secret(ctx context.Context, path string) (map[string]any, error)
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if s.closed {
+		return nil, errStoreClosed
+	}
 	s.purgeExpired()
 	switch {
 	case err == nil:
@@ -261,7 +328,7 @@ func (s *store) fetch(ctx context.Context, path string) (map[string]any, error) 
 	token := s.client.Token()
 	secret, err := s.client.KVv2(s.cfg.KVMount).Get(ctx, path)
 	// Logging in again doesn't fix a token without access to the path.
-	if appRole && isAuthError(err) && s.tokenRejected(ctx, token) {
+	if appRole && isAuthError(err) && !s.isClosed() && s.tokenRejected(ctx, token) {
 		s.logger.Debug("Vault rejected the token, logging in again")
 		if err := s.login(ctx, token); err != nil {
 			return nil, err
@@ -304,6 +371,9 @@ func (s *store) login(ctx context.Context, staleToken string) error {
 	s.loginMu.Lock()
 	defer s.loginMu.Unlock()
 
+	if s.isClosed() {
+		return errStoreClosed
+	}
 	if s.client.Token() != staleToken {
 		return nil
 	}
