@@ -116,6 +116,15 @@ func TestReceiverWithControlProtocol(t *testing.T) {
 		return names
 	}
 
+	// Monitors publish as soon as they run. Their state loader must not hold
+	// their events back: a receiver taking its monitors over the control protocol
+	// gets a state loader that is deferred for 15s unless something installs one,
+	// and nothing installs an Elasticsearch loader here. The bound is loose enough
+	// for slow CI, but well below that 15s so the wait coming back fails the test.
+	require.EventuallyWithT(t, func(c *assert.CollectT) {
+		assert.NotEmpty(c, sink.AllLogs(), "no monitor events yet")
+	}, 10*time.Second, 50*time.Millisecond, "the first monitor event should not wait for the deferred monitor state loader")
+
 	require.EventuallyWithT(t, func(c *assert.CollectT) {
 		names := monitorNames()
 		assert.True(c, names["monitor-a"], "no events from monitor-a")
