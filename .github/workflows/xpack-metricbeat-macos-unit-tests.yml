@@ -11,6 +11,7 @@ on:
       - x-pack/metricbeat/**
       # OSS
       - go.mod
+      - .python-version
       - dev-tools/**
       - libbeat/**
       # Workflow
@@ -24,6 +25,7 @@ on:
       - x-pack/metricbeat/**
       # OSS
       - go.mod
+      - .python-version
       - dev-tools/**
       - libbeat/**
       # Workflow

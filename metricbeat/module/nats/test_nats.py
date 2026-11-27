@@ -1,6 +1,5 @@
 import metricbeat
 import unittest
-
 NATS_FIELDS = metricbeat.COMMON_FIELDS + ["nats"]
 
 
