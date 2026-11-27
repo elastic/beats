@@ -422,6 +422,27 @@ func RunPushMetricSetV2(timeout time.Duration, waitEvents int, metricSet mb.Push
 	return r.capture(waitEvents)
 }
 
+// RunPushMetricSetV2AndWait is like RunPushMetricSetV2, but after capturing
+// events it stops the metricset and waits for its Run method to return. Use it
+// when the metricset logs to a test logger, which panics if written to after
+// the test has completed.
+func RunPushMetricSetV2AndWait(timeout time.Duration, waitEvents int, metricSet mb.PushMetricSetV2) []mb.Event {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	r := newCapturingPushReporterV2(ctx)
+
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		metricSet.Run(r)
+	}()
+	events := r.capture(waitEvents)
+	cancel()
+	<-done
+	return events
+}
+
 // GetCapturingPushReporterV2 is a factory for a capturing push metricset
 func GetCapturingPushReporterV2() mb.PushReporterV2 {
 	return newCapturingPushReporterV2(context.Background())
