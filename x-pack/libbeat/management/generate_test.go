@@ -247,8 +247,12 @@ func TestSyntheticsStreamsForReceiver(t *testing.T) {
 		assert.NotContains(t, inputs[0], "index", "no fixed index")
 		assert.Equal(t, map[string]any{"type": "synthetics", "dataset": "browser", "namespace": "custom-ns"},
 			inputs[0]["data_stream"], "data_stream setting kept")
-		for _, p := range inputs[0]["processors"].([]any) {
-			af, ok := p.(mapstr.M)["add_fields"].(mapstr.M)
+		procs, ok := inputs[0]["processors"].([]any)
+		require.True(t, ok, "processors must be a []any")
+		for _, p := range procs {
+			pm, ok := p.(mapstr.M)
+			require.True(t, ok, "processor must be a mapstr.M")
+			af, ok := pm["add_fields"].(mapstr.M)
 			if !ok {
 				continue
 			}
@@ -270,7 +274,13 @@ func TestSyntheticsStreamsForReceiver(t *testing.T) {
 		inputs, err := CreateInputsFromStreamsForReceiver(unit, "logs", agentInfo)
 		require.NoError(t, err, "creating inputs")
 		assert.Equal(t, "logs-foo-default", inputs[0]["index"], "index still injected")
-		proc := inputs[0]["processors"].([]any)[0].(mapstr.M)["add_agent_metadata"].(mapstr.M)
+		procs, ok := inputs[0]["processors"].([]any)
+		require.True(t, ok, "processors must be a []any")
+		require.NotEmpty(t, procs, "processors must not be empty")
+		first, ok := procs[0].(mapstr.M)
+		require.True(t, ok, "first processor must be a mapstr.M")
+		proc, ok := first["add_agent_metadata"].(mapstr.M)
+		require.True(t, ok, "first processor must be add_agent_metadata")
 		assert.Equal(t, mapstr.M{"dataset": "foo", "namespace": "default", "type": "logs"}, proc["data_stream"],
 			"data_stream still set on add_agent_metadata")
 	})

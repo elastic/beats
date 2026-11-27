@@ -174,11 +174,14 @@ func runMonitorOnce(t *testing.T, monitor map[string]any) func() []routedEvent {
 		"path.home":               t.TempDir(),
 	}}
 	factory := NewFactoryWithSettings(Settings{Home: t.TempDir()})
-	set := receiver.Settings{}
-	set.ID = component.NewIDWithName(factory.Type(), t.Name())
+	set := receiver.Settings{
+		ID: component.NewIDWithName(factory.Type(), t.Name()),
+	}
 	// Not zaptest: monitors/logger keeps a process-wide logger, which would
 	// outlive this test and panic on the next subtest's run log.
 	set.Logger = zap.NewNop()
+	monitorType, ok := monitor["type"].(string)
+	require.True(t, ok, "monitor type must be a string")
 
 	rec, err := factory.CreateLogs(t.Context(), set, cfg, sink)
 	require.NoError(t, err, "creating receiver")
@@ -191,7 +194,7 @@ func runMonitorOnce(t *testing.T, monitor map[string]any) func() []routedEvent {
 		return append([]routedEvent(nil), got...)
 	}
 	require.Eventually(t, func() bool {
-		for _, ds := range fakeSyntheticsPlugins[monitor["type"].(string)] {
+		for _, ds := range fakeSyntheticsPlugins[monitorType] {
 			if _, ok := findSubDatasetEvent(snapshot(), ds); !ok {
 				return false
 			}
