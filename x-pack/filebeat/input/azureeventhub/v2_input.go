@@ -721,6 +721,8 @@ func newWebSocketDialer(proxy httpcommon.HTTPClientProxySettings) func(ctx conte
 			return nil, err
 		}
 
-		return websocket.NetConn(ctx, wssConn, websocket.MessageBinary), nil
+		// NetConn uses its context for all reads and writes. The SDK's dial
+		// context can end after the handshake while the connection is in use.
+		return websocket.NetConn(context.WithoutCancel(ctx), wssConn, websocket.MessageBinary), nil
 	}
 }
