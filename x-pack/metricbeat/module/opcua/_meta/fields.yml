@@ -1,0 +1,11 @@
+- key: opcua
+  title: "OPC UA"
+  description: >
+    OPC UA module
+  release: beta
+  fields:
+    - name: opcua
+      type: group
+      description: >
+        Values read from OPC UA servers.
+      fields:

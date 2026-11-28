@@ -1,0 +1,10 @@
+# Module: plc4x
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-plc4x.html
+
+- module: plc4x
+  metricsets: ["tag"]
+  period: 10s
+  hosts: ["modbus-tcp://localhost:502"]
+  plc_tags:
+    - address: "holding-register:1:REAL"
+      name: "temperature"

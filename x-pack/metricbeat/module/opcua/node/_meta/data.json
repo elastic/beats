@@ -1,0 +1,34 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "opcua.node",
+        "duration": 115000,
+        "module": "opcua"
+    },
+    "metricset": {
+        "name": "node",
+        "period": 10000
+    },
+    "opcua": {
+        "node": {
+            "data_type": "Uint32",
+            "id": "ns=3;s=StepUp",
+            "label": "step",
+            "name": "StepUp",
+            "server_timestamp": "2026-11-24T10:16:29.0926031Z",
+            "source_timestamp": "2026-11-24T10:16:29.0717551Z",
+            "status": {
+                "code": 0,
+                "name": "Good",
+                "severity": "good"
+            },
+            "value": {
+                "long": 287
+            }
+        }
+    },
+    "service": {
+        "address": "localhost:43637",
+        "type": "opcua"
+    }
+}

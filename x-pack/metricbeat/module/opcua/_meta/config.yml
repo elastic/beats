@@ -1,0 +1,13 @@
+- module: opcua
+  metricsets: ["node"]
+  period: 10s
+  hosts: ["opc.tcp://localhost:4840"]
+  nodes:
+    - id: "ns=3;s=StepUp"
+      label: "step"
+  #security_policy: "None"
+  #security_mode: "None"
+  #username: ""
+  #password: ""
+  #client_certificate: ""
+  #client_key: ""
