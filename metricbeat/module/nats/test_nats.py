@@ -1,6 +1,6 @@
 import metricbeat
 import unittest
-from pkg_resources import packaging
+import packaging.version
 from parameterized import parameterized
 
 NATS_FIELDS = metricbeat.COMMON_FIELDS + ["nats"]
