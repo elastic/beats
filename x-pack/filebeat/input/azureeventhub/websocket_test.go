@@ -17,18 +17,22 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/v2"
 	"github.com/coder/websocket"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/pkg/transport/httpcommon"
+	"github.com/elastic/beats/v7/testing/testutils"
 )
 
 func TestWebSocketConnectionSurvivesDialContextCancellation(t *testing.T) {
+	testutils.SkipIfFIPSOnly(t, "WebSocket handshake uses SHA-1.")
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ws, err := websocket.Accept(w, r, &websocket.AcceptOptions{Subprotocols: []string{"amqp"}})
 		if err != nil {
 			return
 		}
-		defer ws.CloseNow()
+		defer func() { _ = ws.CloseNow() }()
 
 		messageType, payload, err := ws.Read(r.Context())
 		if err == nil {
@@ -46,12 +50,12 @@ func TestWebSocketConnectionSurvivesDialContextCancellation(t *testing.T) {
 	defer conn.Close()
 	cancel()
 
-	require.NoError(t, conn.SetDeadline(time.Now().Add(5*time.Second)), "the exchange should have a deadline")
+	assert.NoError(t, conn.SetDeadline(time.Now().Add(5*time.Second)), "the exchange should have a deadline")
 	payload := []byte("probe")
 	_, err = conn.Write(payload)
 	require.NoError(t, err, "canceling the dial context should leave the established connection writable")
 	echo := make([]byte, len(payload))
 	_, err = io.ReadFull(conn, echo)
 	require.NoError(t, err, "canceling the dial context should leave the established connection readable")
-	require.Equal(t, payload, echo, "the server should echo the probe")
+	assert.Equal(t, payload, echo, "the server should echo the probe")
 }
